@@ -1,0 +1,187 @@
+
+namespace WBIN;
+
+struct UInt3 {
+  x:uint;
+  y:uint;
+  z:uint;
+}
+
+struct Float3{
+  x:float;
+  y:float;
+  z:float;
+}
+
+struct Float2{
+  x:float;
+  y:float;
+}
+
+struct Float4{
+  x:float;
+  y:float;
+  z:float;
+  w:float;
+}
+
+struct Bool3{
+  x:bool;
+  y:bool;
+  z:bool;
+}
+
+// Type 1 : Triangle + Vertices used to build the mesh
+table MeshData
+{
+  triangles:[UInt3]; // One element per triangle
+  vertexes:[Float3];
+}
+
+// Type 2 : Bounding Volume
+table AABB
+{
+  min:Float3;
+  max:Float3;
+}
+
+// Type 3 : Vertex Normals
+table Normal
+{
+  triangles:[UInt3]; // One element per triangle
+  normals:[Float3]; //< one for each vertex
+  // tangents:[Float3]; //< one for each vertex
+}
+
+// Type 4 : float channel list, store a float3 per vertex per face
+table Float3Channel
+{
+	id:uint;
+	// type:byte;
+	triangles:[UInt3]; // One element per triangle
+	vertexData:[Float3];
+}
+
+table Float3ChannelList
+{
+  channels:[Float3Channel];
+}
+
+// Type XXX : float channel list, store a float4 per vertex per face
+table Float4Channel
+{
+	id:uint;
+	// type:byte;
+	triangles:[UInt3]; // One element per triangle
+	vertexData:[Float4];
+}
+
+table Float4ChannelList
+{
+  channels:[Float4Channel];
+}
+
+// Type 5 : Edge visibility (allow to merge triangles and create polygons)
+table EdgeVisibility
+{
+  triangleEdgevisibility:[Bool3]; // One element per triangles, then per edge
+}
+
+// Type 6 : Material bank, listing all the materials used in the mesh (.mat.lua)
+table MaterialRef // List maps and 
+{
+	// Material inheritance
+	matName:string;
+	matLuaSource:string; // If this is set, no mat.lua will be exported
+	matLuaTemplate:string; // This sets the parent material file name (usually "Default")
+
+	diffuseTexPath:string; 		// Diffuse
+	normalTexPath:string; 		// Bump
+	roughTexMapPath:string; 	// Glossiness
+	cavityTexMapPath:string; 	// Specular Color
+	metalTexMapPath:string; 	// Specular Level
+	translucencyTexPath:string; // Self-Illum
+	opacityTexPath:string; 		// Opacity
+}  
+
+table MaterialBank
+{
+  materialRefs:[MaterialRef];
+}
+
+// Type 7 : Material ID list, setting the material ID for each triangle
+table Materials
+{
+  triangleMatIDs:[uint]; // One element per triangles, 
+  // materialID reference the entry in the MaterialBank
+}
+
+// Type 8 : Skeleton
+table BoneData
+{
+	parentBoneIndex:uint;
+	name:string; // zero terminated string (not preceded by size)
+	//float[4][4] matrix4; // may be necessary to add
+}
+  
+table Skeleton
+{
+  skeletonBoneList:[BoneData]; // Index in the list correspond to current bone index
+}
+
+//Type 9 : Skinning data
+struct BoneWeight
+{
+	boneIndex:int; // Signed int
+	weight:float;
+}
+
+table VertexBoneWeight
+{
+	boneWeight:[BoneWeight];
+}
+
+struct BoneMatrix
+{
+	matrix4:[float:16];
+}
+
+table Skin // used for skinned visual meshes or colliders
+{
+  vertexBoneWeights:[VertexBoneWeight]; //< one per vertex, then per up to 4 bones
+  bindPose:[BoneMatrix];
+}
+
+// Type 10 : Source file infos
+table SourceFileInf
+{
+	sourceFilePath:string; //Relative to p4 root (Point towards "SourceData")
+}
+
+union Data
+{
+	MeshData,
+	AABB,
+	Normal,
+	Float3ChannelList,
+	Float4ChannelList,
+	EdgeVisibility,
+	MaterialBank,
+	Materials,
+	Skeleton,
+	Skin,
+	SourceFileInf,
+	
+}
+
+table Field
+{
+	data:Data;
+}
+
+table WBin
+{
+	fields:[Field] (required);
+}
+
+root_type WBin;

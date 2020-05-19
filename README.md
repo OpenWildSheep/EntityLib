@@ -1,0 +1,1 @@
+Contains schema and code for cross-project data exchange between wildSheepStudio projects

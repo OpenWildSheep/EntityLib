@@ -8,27 +8,27 @@ struct UInt3 {
 }
 
 struct Float3{
-  x:float (required);
-  y:float (required);
-  z:float (required);
+  x:float;
+  y:float;
+  z:float;
 }
 
 struct Float2{
-  x:float (required);
-  y:float (required);
+  x:float;
+  y:float;
 }
 
 struct Float4{
-  x:float (required);
-  y:float (required);
-  z:float (required);
-  w:float (required);
+  x:float;
+  y:float;
+  z:float;
+  w:float;
 }
 
 struct Bool3{
-  x:bool (required);
-  y:bool (required);
-  z:bool (required);
+  x:bool;
+  y:bool;
+  z:bool;
 }
 
 // Type 2 : Bounding Volume
@@ -104,7 +104,7 @@ table Materials
 // Type 8 : Skeleton
 table BoneData
 {
-	parentBoneIndex:uint (required);
+	parentBoneIndex:uint;
 	name:string (required); // zero terminated string (not preceded by size)
 	//float[4][4] matrix4; // may be necessary to add
 }
@@ -117,8 +117,8 @@ table Skeleton
 //Type 9 : Skinning data
 struct BoneWeight
 {
-	boneIndex:int (required); // Signed int
-	weight:float (required);
+	boneIndex:int; // Signed int
+	weight:float;
 }
 
 table VertexBoneWeight
@@ -128,7 +128,7 @@ table VertexBoneWeight
 
 struct BoneMatrix
 {
-	matrix4:[float:16] (required);
+	matrix4:[float:16];
 }
 
 table Skin // used for skinned visual meshes or colliders

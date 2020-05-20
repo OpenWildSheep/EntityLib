@@ -8,27 +8,27 @@ struct UInt3 {
 }
 
 struct Float3{
-  x:float;
-  y:float;
-  z:float;
+  x:float (required);
+  y:float (required);
+  z:float (required);
 }
 
 struct Float2{
-  x:float;
-  y:float;
+  x:float (required);
+  y:float (required);
 }
 
 struct Float4{
-  x:float;
-  y:float;
-  z:float;
-  w:float;
+  x:float (required);
+  y:float (required);
+  z:float (required);
+  w:float (required);
 }
 
 struct Bool3{
-  x:bool;
-  y:bool;
-  z:bool;
+  x:bool (required);
+  y:bool (required);
+  z:bool (required);
 }
 
 // Type 2 : Bounding Volume
@@ -40,36 +40,36 @@ table AABB
 
 table FloatMask
 {
-	triangles:[UInt3];
-	vertexData:[float];
+	triangles:[UInt3] (required);
+	vertexData:[float] (required);
 }
 
 table Float2Channel
 {
-	triangles:[UInt3]; // One element per triangle
-	vertexData:[Float2];
+	triangles:[UInt3] (required); // One element per triangle
+	vertexData:[Float2] (required);
 }
 
 // Type 4 : float channel list, store a float3 per vertex per face
 table Float3Channel
 {
-	triangles:[UInt3]; // One element per triangle
-	vertexData:[Float3];
+	triangles:[UInt3] (required); // One element per triangle
+	vertexData:[Float3] (required);
 }
 
 
 // Type XXX : float channel list, store a float4 per vertex per face
 table Float4Channel
 {
-	triangles:[UInt3]; // One element per triangle
-	vertexData:[Float4];
+	triangles:[UInt3] (required); // One element per triangle
+	vertexData:[Float4] (required);
 }
 
 
 // Type 5 : Edge visibility (allow to merge triangles and create polygons)
 table EdgeVisibility
 {
-  triangleEdgevisibility:[Bool3]; // One element per triangles, then per edge
+  triangleEdgevisibility:[Bool3] (required); // One element per triangles, then per edge
 }
 
 // Type 6 : Material bank, listing all the materials used in the mesh (.mat.lua)
@@ -91,50 +91,50 @@ table MaterialRef // List maps and
 
 table MaterialBank
 {
-  materialRefs:[MaterialRef];
+  materialRefs:[MaterialRef] (required);
 }
 
 // Type 7 : Material ID list, setting the material ID for each triangle
 table Materials
 {
-  triangleMatIDs:[uint]; // One element per triangles, 
+  triangleMatIDs:[uint] (required); // One element per triangles, 
   // materialID reference the entry in the MaterialBank
 }
 
 // Type 8 : Skeleton
 table BoneData
 {
-	parentBoneIndex:uint;
-	name:string; // zero terminated string (not preceded by size)
+	parentBoneIndex:uint (required);
+	name:string (required); // zero terminated string (not preceded by size)
 	//float[4][4] matrix4; // may be necessary to add
 }
   
 table Skeleton
 {
-  skeletonBoneList:[BoneData]; // Index in the list correspond to current bone index
+  skeletonBoneList:[BoneData] (required); // Index in the list correspond to current bone index
 }
 
 //Type 9 : Skinning data
 struct BoneWeight
 {
-	boneIndex:int; // Signed int
-	weight:float;
+	boneIndex:int (required); // Signed int
+	weight:float (required);
 }
 
 table VertexBoneWeight
 {
-	boneWeight:[BoneWeight];
+	boneWeight:[BoneWeight] (required);
 }
 
 struct BoneMatrix
 {
-	matrix4:[float:16];
+	matrix4:[float:16] (required);
 }
 
 table Skin // used for skinned visual meshes or colliders
 {
-  vertexBoneWeights:[VertexBoneWeight]; //< one per vertex, then per up to 4 bones
-  bindPose:[BoneMatrix];
+  vertexBoneWeights:[VertexBoneWeight] (required); //< one per vertex, then per up to 4 bones
+  bindPose:[BoneMatrix] (required);
 }
 
 // Type 10 : Source file infos
@@ -142,20 +142,5 @@ table SourceFileInf
 {
 	sourceFilePath:string; //Relative to p4 root (Point towards "SourceData")
 }
-
-/*table WBin
-{
-	meshData:Float3Channel;
-	aabb:AABB;
-	normal:Float3Channel;
-	float3ChannelList:Float3ChannelList;
-	float4ChannelList:Float4ChannelList;
-	edgeVisibility:EdgeVisibility;
-	materialBank:MaterialBank;
-	materials:Materials;
-	skeleton:Skeleton;
-	skin:Skin;
-	sourceFileInf:SourceFileInf;
-}*/
 
 // root_type WBin;

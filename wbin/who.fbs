@@ -5,7 +5,7 @@ namespace WBIN;
 table HeihgtObj
 {
 	aabb:AABB;
-	meshData:Float3Channel (required);
+	position:Float3Channel (required);
 	edgeVisibility:EdgeVisibility (required);
 	materials:Materials (required);
 	color:Float3Channel;

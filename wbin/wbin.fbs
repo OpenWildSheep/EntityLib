@@ -40,36 +40,31 @@ table AABB
 
 table FloatMask
 {
-	id:uint;
 	triangles:[UInt3];
 	vertexData:[float];
+}
+
+table Float2Channel
+{
+	triangles:[UInt3]; // One element per triangle
+	vertexData:[Float2];
 }
 
 // Type 4 : float channel list, store a float3 per vertex per face
 table Float3Channel
 {
-	id:uint;
 	triangles:[UInt3]; // One element per triangle
 	vertexData:[Float3];
 }
 
-table Float3ChannelList
-{
-  channels:[Float3Channel];
-}
 
 // Type XXX : float channel list, store a float4 per vertex per face
 table Float4Channel
 {
-	id:uint;
 	triangles:[UInt3]; // One element per triangle
 	vertexData:[Float4];
 }
 
-table Float4ChannelList
-{
-  channels:[Float4Channel];
-}
 
 // Type 5 : Edge visibility (allow to merge triangles and create polygons)
 table EdgeVisibility
@@ -148,7 +143,7 @@ table SourceFileInf
 	sourceFilePath:string; //Relative to p4 root (Point towards "SourceData")
 }
 
-table WBin
+/*table WBin
 {
 	meshData:Float3Channel;
 	aabb:AABB;
@@ -161,6 +156,6 @@ table WBin
 	skeleton:Skeleton;
 	skin:Skin;
 	sourceFileInf:SourceFileInf;
-}
+}*/
 
-root_type WBin;
+// root_type WBin;

@@ -5,9 +5,10 @@ namespace WBIN;
 table Viz
 {
 	aabb:AABB;
-	meshData:Float3Channel (required);
+	position:Float3Channel (required);
 	normal:Float3Channel;
-	colorChannelList:Float4ChannelList;
+	color:Float4Channel;
+	texcoord:[Float2Channel];
 	materialBank:MaterialBank (required);
 	materials:Materials (required);
 	skin:Skin;

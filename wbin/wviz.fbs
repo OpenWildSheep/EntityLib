@@ -1,0 +1,17 @@
+include "wbin.fbs";
+
+namespace WBIN;
+
+table Viz
+{
+	aabb:AABB;
+	meshData:MeshData (required);
+	normal:Normal;
+	float4ChannelList:Float4ChannelList;
+	materialBank:MaterialBank (required);
+	materials:Materials (required);
+	skin:Skin;
+	sourceFileInf:SourceFileInf (required);
+}
+
+root_type Viz;

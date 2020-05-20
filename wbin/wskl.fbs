@@ -1,0 +1,12 @@
+include "wbin.fbs";
+
+namespace WBIN;
+
+table Skl
+{
+	skeleton:Skeleton (required);
+	sourceFileInf:SourceFileInf;
+}
+
+root_type Skl;
+

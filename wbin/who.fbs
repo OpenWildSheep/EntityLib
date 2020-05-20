@@ -2,7 +2,7 @@ include "wbin.fbs";
 
 namespace WBIN;
 
-table HeihgtObj
+table HeightObj
 {
 	aabb:AABB;
 	position:Float3Channel (required);
@@ -17,4 +17,4 @@ table HeihgtObj
 	sourceFileInf:SourceFileInf;
 }
 
-root_type HeihgtObj;
+root_type HeightObj;

@@ -2,7 +2,7 @@ include "wbin.fbs";
 
 namespace WBIN;
 
-table Viz
+table Vis
 {
 	aabb:AABB;
 	position:Float3Channel (required);
@@ -15,4 +15,4 @@ table Viz
 	sourceFileInf:SourceFileInf (required);
 }
 
-root_type Viz;
+root_type Vis;

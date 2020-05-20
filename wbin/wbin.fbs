@@ -41,8 +41,8 @@ table MeshData
 // Type 2 : Bounding Volume
 table AABB
 {
-  min:Float3;
-  max:Float3;
+  min:Float3 (required);
+  max:Float3 (required);
 }
 
 // Type 3 : Vertex Normals
@@ -53,11 +53,17 @@ table Normal
   // tangents:[Float3]; //< one for each vertex
 }
 
+table FloatMask
+{
+	id:uint;
+	triangles:[UInt3];
+	vertexData:[float];
+}
+
 // Type 4 : float channel list, store a float3 per vertex per face
 table Float3Channel
 {
 	id:uint;
-	// type:byte;
 	triangles:[UInt3]; // One element per triangle
 	vertexData:[Float3];
 }
@@ -71,7 +77,6 @@ table Float3ChannelList
 table Float4Channel
 {
 	id:uint;
-	// type:byte;
 	triangles:[UInt3]; // One element per triangle
 	vertexData:[Float4];
 }
@@ -158,30 +163,19 @@ table SourceFileInf
 	sourceFilePath:string; //Relative to p4 root (Point towards "SourceData")
 }
 
-union Data
-{
-	MeshData,
-	AABB,
-	Normal,
-	Float3ChannelList,
-	Float4ChannelList,
-	EdgeVisibility,
-	MaterialBank,
-	Materials,
-	Skeleton,
-	Skin,
-	SourceFileInf,
-	
-}
-
-table Field
-{
-	data:Data;
-}
-
 table WBin
 {
-	fields:[Field] (required);
+	meshData:MeshData;
+	aabb:AABB;
+	normal:Normal;
+	float3ChannelList:Float3ChannelList;
+	float4ChannelList:Float4ChannelList;
+	edgeVisibility:EdgeVisibility;
+	materialBank:MaterialBank;
+	materials:Materials;
+	skeleton:Skeleton;
+	skin:Skin;
+	sourceFileInf:SourceFileInf;
 }
 
 root_type WBin;

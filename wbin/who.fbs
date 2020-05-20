@@ -1,0 +1,20 @@
+include "wbin.fbs";
+
+namespace WBIN;
+
+table HeihgtObj
+{
+	aabb:AABB;
+	meshData:MeshData (required);
+	edgeVisibility:EdgeVisibility (required);
+	materials:Materials (required);
+	color:Float3Channel;
+	hardness:FloatMask;
+	erosionMask:FloatMask;
+	detailMask:FloatMask;
+	detailType:FloatMask;
+	motifMask:[FloatMask];
+	sourceFileInf:SourceFileInf;
+}
+
+root_type HeihgtObj;

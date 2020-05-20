@@ -31,26 +31,11 @@ struct Bool3{
   z:bool;
 }
 
-// Type 1 : Triangle + Vertices used to build the mesh
-table MeshData
-{
-  triangles:[UInt3]; // One element per triangle
-  vertexes:[Float3];
-}
-
 // Type 2 : Bounding Volume
 table AABB
 {
   min:Float3 (required);
   max:Float3 (required);
-}
-
-// Type 3 : Vertex Normals
-table Normal
-{
-  triangles:[UInt3]; // One element per triangle
-  normals:[Float3]; //< one for each vertex
-  // tangents:[Float3]; //< one for each vertex
 }
 
 table FloatMask
@@ -165,9 +150,9 @@ table SourceFileInf
 
 table WBin
 {
-	meshData:MeshData;
+	meshData:Float3Channel;
 	aabb:AABB;
-	normal:Normal;
+	normal:Float3Channel;
 	float3ChannelList:Float3ChannelList;
 	float4ChannelList:Float4ChannelList;
 	edgeVisibility:EdgeVisibility;

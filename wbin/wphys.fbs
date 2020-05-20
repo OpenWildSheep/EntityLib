@@ -5,7 +5,7 @@ namespace WBIN;
 table Phys
 {
 	aabb:AABB;
-	meshData:MeshData (required);
+	meshData:Float3Channel (required);
 	sourceFileInf:SourceFileInf;
 }
 

@@ -104,7 +104,7 @@ table Materials
 // Type 8 : Skeleton
 table BoneData
 {
-	parentBoneIndex:uint;
+	parentBoneIndex:int; // Signed int: -1 if no parent
 	name:string (required); // zero terminated string (not preceded by size)
 	//float[4][4] matrix4; // may be necessary to add
 }
@@ -117,7 +117,7 @@ table Skeleton
 //Type 9 : Skinning data
 struct BoneWeight
 {
-	boneIndex:int; // Signed int
+	boneIndex:uint;
 	weight:float;
 }
 

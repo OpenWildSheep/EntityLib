@@ -1,41 +1,46 @@
 
 namespace WBIN;
 
-struct UInt3 {
-  x:uint;
-  y:uint;
-  z:uint;
+struct UInt3 
+{
+	x:uint;
+	y:uint;
+	z:uint;
 }
 
-struct Float3{
-  x:float;
-  y:float;
-  z:float;
+struct Float3
+{
+	x:float;
+	y:float;
+	z:float;
 }
 
-struct Float2{
-  x:float;
-  y:float;
+struct Float2
+{
+	x:float;
+	y:float;
 }
 
-struct Float4{
-  x:float;
-  y:float;
-  z:float;
-  w:float;
+struct Float4
+{
+	x:float;
+	y:float;
+	z:float;
+	w:float;
 }
 
-struct Bool3{
-  x:bool;
-  y:bool;
-  z:bool;
+struct Bool3
+{
+	x:bool;
+	y:bool;
+	z:bool;
 }
 
 // Type 2 : Bounding Volume
 table AABB
 {
-  min:Float3 (required);
-  max:Float3 (required);
+	min:Float3 (required);
+	max:Float3 (required);
 }
 
 table FloatMask
@@ -69,7 +74,7 @@ table Float4Channel
 // Type 5 : Edge visibility (allow to merge triangles and create polygons)
 table EdgeVisibility
 {
-  triangleEdgevisibility:[Bool3] (required); // One element per triangles, then per edge
+	triangleEdgevisibility:[Bool3] (required); // One element per triangles, then per edge
 }
 
 // Type 6 : Material bank, listing all the materials used in the mesh (.mat.lua)
@@ -91,13 +96,13 @@ table MaterialRef // List maps and
 
 table MaterialBank
 {
-  materialRefs:[MaterialRef] (required);
+	materialRefs:[MaterialRef] (required);
 }
 
 // Type 7 : Material ID list, setting the material ID for each triangle
 table Materials
 {
-  triangleMatIDs:[uint] (required); // One element per triangles, 
+	triangleMatIDs:[uint] (required); // One element per triangles, 
   // materialID reference the entry in the MaterialBank
 }
 
@@ -111,7 +116,7 @@ table BoneData
   
 table Skeleton
 {
-  skeletonBoneList:[BoneData] (required); // Index in the list correspond to current bone index
+	skeletonBoneList:[BoneData] (required); // Index in the list correspond to current bone index
 }
 
 //Type 9 : Skinning data
@@ -133,8 +138,8 @@ struct BoneMatrix
 
 table Skin // used for skinned visual meshes or colliders
 {
-  vertexBoneWeights:[VertexBoneWeight] (required); //< one per vertex, then per up to 4 bones
-  bindPose:[BoneMatrix] (required);
+	vertexBoneWeights:[VertexBoneWeight] (required); //< one per vertex, then per up to 4 bones
+	bindPose:[BoneMatrix] (required);
 }
 
 // Type 10 : Source file infos

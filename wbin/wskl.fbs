@@ -2,6 +2,17 @@ include "wbin.fbs";
 
 namespace WBIN;
 
+table BoneData
+{
+	parentBoneIndex:int; // Signed int: -1 if no parent
+	name:string (required); // zero terminated string (not preceded by size)
+}
+  
+table Skeleton
+{
+	skeletonBoneList:[BoneData] (required); // Index in the list correspond to current bone index
+}
+
 table Skl
 {
 	skeleton:Skeleton (required);

@@ -36,7 +36,7 @@ struct Bool3
 	z:bool;
 }
 
-// Type 2 : Bounding Volume
+// Bounding Volume
 table AABB
 {
 	min:Float3 (required);
@@ -55,71 +55,27 @@ table Float2Channel
 	vertexData:[Float2] (required);
 }
 
-// Type 4 : float channel list, store a float3 per vertex per face
+// Float channel list, store a float3 per vertex per face
 table Float3Channel
 {
 	triangles:[UInt3] (required); // One element per triangle
 	vertexData:[Float3] (required);
 }
 
-
-// Type XXX : float channel list, store a float4 per vertex per face
+// Float channel list, store a float4 per vertex per face
 table Float4Channel
 {
 	triangles:[UInt3] (required); // One element per triangle
 	vertexData:[Float4] (required);
 }
 
-
-// Type 5 : Edge visibility (allow to merge triangles and create polygons)
-table EdgeVisibility
-{
-	triangleEdgevisibility:[Bool3] (required); // One element per triangles, then per edge
-}
-
-// Type 6 : Material bank, listing all the materials used in the mesh (.mat.lua)
-table MaterialRef // List maps and 
-{
-	// Material inheritance
-	matName:string;
-	matLuaSource:string; // If this is set, no mat.lua will be exported
-	matLuaTemplate:string; // This sets the parent material file name (usually "Default")
-
-	diffuseTexPath:string; 		// Diffuse
-	normalTexPath:string; 		// Bump
-	roughTexMapPath:string; 	// Glossiness
-	cavityTexMapPath:string; 	// Specular Color
-	metalTexMapPath:string; 	// Specular Level
-	translucencyTexPath:string; // Self-Illum
-	opacityTexPath:string; 		// Opacity
-}  
-
-table MaterialBank
-{
-	materialRefs:[MaterialRef] (required);
-}
-
-// Type 7 : Material ID list, setting the material ID for each triangle
+// Material ID list, setting the material ID for each triangle
 table Materials
 {
 	triangleMatIDs:[uint] (required); // One element per triangles, 
-  // materialID reference the entry in the MaterialBank
 }
 
-// Type 8 : Skeleton
-table BoneData
-{
-	parentBoneIndex:int; // Signed int: -1 if no parent
-	name:string (required); // zero terminated string (not preceded by size)
-	//float[4][4] matrix4; // may be necessary to add
-}
-  
-table Skeleton
-{
-	skeletonBoneList:[BoneData] (required); // Index in the list correspond to current bone index
-}
-
-//Type 9 : Skinning data
+// Skinning data
 struct BoneWeight
 {
 	boneIndex:uint;
@@ -142,10 +98,8 @@ table Skin // used for skinned visual meshes or colliders
 	bindPose:[BoneMatrix] (required);
 }
 
-// Type 10 : Source file infos
+// Source file infos
 table SourceFileInf
 {
 	sourceFilePath:string; //Relative to p4 root (Point towards "SourceData")
 }
-
-// root_type WBin;

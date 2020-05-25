@@ -2,6 +2,28 @@ include "wbin.fbs";
 
 namespace WBIN;
 
+// Material bank, listing all the materials used in the mesh (.mat.lua)
+table MaterialRef // List maps and 
+{
+	// Material inheritance
+	matName:string;
+	matLuaSource:string; // If this is set, no mat.lua will be exported
+	matLuaTemplate:string; // This sets the parent material file name (usually "Default")
+
+	diffuseTexPath:string; 		// Diffuse
+	normalTexPath:string; 		// Bump
+	roughTexMapPath:string; 	// Glossiness
+	cavityTexMapPath:string; 	// Specular Color
+	metalTexMapPath:string; 	// Specular Level
+	translucencyTexPath:string; // Self-Illum
+	opacityTexPath:string; 		// Opacity
+}  
+
+table MaterialBank
+{
+	materialRefs:[MaterialRef] (required);
+}
+
 table Vis
 {
 	aabb:AABB;

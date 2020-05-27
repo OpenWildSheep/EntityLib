@@ -39,8 +39,8 @@ struct Bool3
 // Bounding Volume
 table AABB
 {
-	min:Float3 (required);
-	max:Float3 (required);
+	min:Float3 (required, native_inline);
+	max:Float3 (required, native_inline);
 }
 
 table FloatMask
@@ -67,12 +67,6 @@ table Float4Channel
 {
 	triangles:[UInt3] (required); // One element per triangle
 	vertexData:[Float4] (required);
-}
-
-// Material ID list, setting the material ID for each triangle
-table Materials
-{
-	triangleMatIDs:[uint] (required); // One element per triangles, 
 }
 
 // Skinning data

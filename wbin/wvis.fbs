@@ -17,11 +17,6 @@ table MaterialRef // List maps and
 	metalTexMapPath:string; 	// Specular Level
 	translucencyTexPath:string; // Self-Illum
 	opacityTexPath:string; 		// Opacity
-}  
-
-table MaterialBank
-{
-	materialRefs:[MaterialRef] (required);
 }
 
 table Vis
@@ -31,8 +26,8 @@ table Vis
 	normal:Float3Channel;
 	color:Float4Channel;
 	texcoord:[Float3Channel];
-	materialBank:MaterialBank (required);
-	materials:Materials (required);
+	materialBank:[MaterialRef] (required);
+	materials:[uint] (required);
 	skin:Skin;
 	sourceFileInf:SourceFileInf (required);
 }

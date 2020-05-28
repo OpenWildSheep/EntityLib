@@ -6,6 +6,7 @@ table Phys
 {
 	aabb:AABB;
 	position:Float3Channel (required);
+	materials:[uint];
 	skin:Skin;
 	sourceFileInf:SourceFileInf;
 }

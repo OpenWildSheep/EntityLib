@@ -37,10 +37,10 @@ struct Bool3
 }
 
 // Bounding Volume
-table AABB
+struct AABB
 {
-	min:Float3 (required, native_inline);
-	max:Float3 (required, native_inline);
+	min:Float3 (native_inline);
+	max:Float3 (native_inline);
 }
 
 table FloatMask

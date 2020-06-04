@@ -1,0 +1,13 @@
+include "wbin.fbs";
+
+namespace WBIN;
+
+table PCloud
+{
+	position:Float3Channel (required);
+	color:Float3Channel;
+	texcoord:Float3Channel;
+	sourceFileInf:SourceFileInf;
+}
+
+root_type PCloud;

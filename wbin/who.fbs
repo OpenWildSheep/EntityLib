@@ -8,7 +8,6 @@ table HeightObj
 	position:Float3Channel (required);
 	edgeVisibility:[Bool3] (required);
 	materials:[uint] (required);
-	color:Float3Channel;
 	hardness:FloatMask;
 	erosionMask:FloatMask;
 	detailMask:FloatMask;

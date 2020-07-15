@@ -44,11 +44,48 @@ void printNode(char const* name, Ent::Node const& node, std::string tab)
     }
 }
 
+void displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::string indent)
+{
+    std::cout << indent << name << " : ";
+    switch (subschema.type)
+    {
+    case Ent::DataType::array:
+        std::cout << "array" << std::endl;
+        if (subschema.minItems != 0)
+            std::cout << indent << "  minItems:" << subschema.minItems << std::endl;
+        if (subschema.maxItems != size_t(-1))
+            std::cout << indent << "  maxItems:" << subschema.maxItems << std::endl;
+        if (subschema.items != nullptr)
+        {
+            displaySubSchema("items", *subschema.items, indent + "  ");
+        }
+        break;
+    case Ent::DataType::boolean: std::cout << "boolean" << std::endl; break;
+    case Ent::DataType::integer: std::cout << "integer" << std::endl; break;
+    case Ent::DataType::null: std::cout << "null" << std::endl; break;
+    case Ent::DataType::number: std::cout << "number" << std::endl; break;
+    case Ent::DataType::object:
+        std::cout << "object" << std::endl;
+        for (auto&& name_sub : subschema.properties)
+        {
+            displaySubSchema(std::get<0>(name_sub), std::get<1>(name_sub), indent + "  ");
+        }
+        break;
+    case Ent::DataType::string: std::cout << "string" << std::endl; break;
+    }
+}
+
 int main() // int argc, char** argv
 try
 {
-    // Ent::loadStaticData();
+    // ******************************** Test iteration of schema **********************************
+    Ent::StaticData entlib = Ent::loadStaticData("X:/Tools");
+    for (auto&& name_sub : entlib.schema.definitions)
+    {
+        displaySubSchema(std::get<0>(name_sub), std::get<1>(name_sub), {});
+    }
 
+    // ********************************** Test load/save scene ************************************
     Ent::Scene scene = Ent::loadScene("X:/RawData/22_World/SceneMainWorld/SceneMainWorld.scene");
     printf("Scene Loaded\n");
     printf("Entity count : %zu\n", scene.objects.size());

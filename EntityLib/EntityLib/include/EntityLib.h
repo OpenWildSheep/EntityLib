@@ -1,5 +1,6 @@
 #pragma once
 
+#pragma warning(push, 0)
 #include <vector>
 #include <memory>
 #include <map>
@@ -8,6 +9,7 @@
 
 #include "../external/mapbox/variant.hpp"
 #include "../external/optional.hpp"
+#pragma warning(pop)
 
 namespace std
 {
@@ -90,46 +92,6 @@ namespace Ent
 
     using Value =
         std::variant<Null, Override<std::string>, Override<float>, Override<int64_t>, Object, Array, Override<bool>>;
-
-    // *** Schema part ***
-
-    struct PropNull
-    {
-    };
-    struct PropString
-    {
-        tl::optional<std::string> defaultVal;
-    };
-
-    struct PropInteger
-    {
-        tl::optional<int64_t> defaultVal;
-    };
-
-    struct PropNumber
-    {
-        tl::optional<float> defaultVal;
-    };
-
-    struct Property;
-
-    struct PropObject
-    {
-        std::map<std::string, Property> properties;
-    };
-
-    struct PropArray
-    {
-        std::unique_ptr<Property> items;
-    };
-
-    struct PropBoolean
-    {
-        tl::optional<bool> defaultVal;
-    };
-
-    using PropData =
-        std::variant<PropNull, PropString, PropNumber, PropInteger, PropObject, PropArray, PropBoolean>;
 
     // *********************************** Scene/Entity/Component/Node ****************************
 
@@ -237,44 +199,18 @@ namespace Ent
 
     // ------------------------------ Schema ------------------------------------------------------
 
-    struct ENTLIB_DLLEXPORT Property
+    struct ENTLIB_DLLEXPORT Subschema
     {
-        Property() = default;
-        Property(std::string name, PropData val);
-        Property(Property const&) = delete;
-        Property& operator=(Property const&) = delete;
-        Property(Property&&) = default;
-        Property& operator=(Property&&) = default;
-
-        char const* getName() const;
-        DataType getType() const;
-
-        tl::optional<float> getDefaultFloat() const;
-        tl::optional<int64_t> getDefaultInt() const;
-        tl::optional<char const*> getDefaultString() const;
-        tl::optional<bool> getDefaultBool() const;
-
-        Property const* getArrayItemProperty() const;
-
-        std::vector<char const*, Property const*> getObjectProperties() const;
-
-        std::vector<char const*> getObjectPropertyNames() const;
-
-        Property const* getObjectProperty(char const* _propName) const;
-
-    private:
-        std::string name;
-        PropData value;
-    };
-
-    struct Definition
-    {
-        std::map<std::string, Property> properties;
+        DataType type = DataType::null;
+        std::map<std::string, Subschema> properties;
+        size_t maxItems = size_t(-1);
+        size_t minItems = 0;
+        std::unique_ptr<Subschema> items;
     };
 
     struct Schema
     {
-        std::map<std::string, Definition> definitions;
+        std::map<std::string, Subschema> definitions;
     };
 
     // ********************************** Static data *********************************************
@@ -285,7 +221,8 @@ namespace Ent
         std::map<std::string, std::vector<std::string>> componentDependencies;
     };
 
-    ENTLIB_DLLEXPORT StaticData loadStaticData(); // Read schema and dependencies
+    ENTLIB_DLLEXPORT
+    StaticData loadStaticData(std::filesystem::path const& toolsDir); //!< Read schema and dependencies
 
     // ********************************** Load/Save ***********************************************
 

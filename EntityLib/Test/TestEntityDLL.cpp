@@ -47,6 +47,8 @@ void printNode(char const* name, Ent::Node const& node, std::string tab)
 int main() // int argc, char** argv
 try
 {
+    // Ent::loadStaticData();
+
     Ent::Scene scene = Ent::loadScene("X:/RawData/22_World/SceneMainWorld/SceneMainWorld.scene");
     printf("Scene Loaded\n");
     printf("Entity count : %zu\n", scene.objects.size());
@@ -62,6 +64,8 @@ try
             printNode("", root, "      ");
         }
     }
+
+    Ent::saveScene(scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene");
 
     return EXIT_SUCCESS;
 }

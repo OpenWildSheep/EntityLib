@@ -2,23 +2,23 @@
 
 #include <vector>
 #include <memory>
+#include <map>
+#include <array>
 #include <filesystem>
 
 #include "../external/mapbox/variant.hpp"
 #include "../external/optional.hpp"
-#include "../external/json.hpp"
 
 namespace std
 {
     using namespace experimental;
-    using namespace tl;
     using namespace mapbox::util;
 } // namespace std
 
-#ifdef ENTLIB_NO_LINKAGE
+#ifdef ENTLIB_STATIC
 #define ENTLIB_DLLEXPORT
 #else
-#ifdef ENTLIB_INSIDE
+#ifdef ENTLIB_DYNAMIC
 #define ENTLIB_DLLEXPORT __declspec(dllexport)
 #else
 #define ENTLIB_DLLEXPORT __declspec(dllimport)
@@ -48,6 +48,9 @@ namespace Ent
     };
 
     // ******************************** Implem details ********************************************
+
+    // *** Entity part ***
+
     template <typename V>
     struct Override
     {
@@ -68,7 +71,7 @@ namespace Ent
 
     public:
         V defaultValue = V();
-        std::optional<V> value;
+        tl::optional<V> value;
     };
 
     struct Null
@@ -87,6 +90,46 @@ namespace Ent
 
     using Value =
         std::variant<Null, Override<std::string>, Override<float>, Override<int64_t>, Object, Array, Override<bool>>;
+
+    // *** Schema part ***
+
+    struct PropNull
+    {
+    };
+    struct PropString
+    {
+        tl::optional<std::string> defaultVal;
+    };
+
+    struct PropInteger
+    {
+        tl::optional<int64_t> defaultVal;
+    };
+
+    struct PropNumber
+    {
+        tl::optional<float> defaultVal;
+    };
+
+    struct Property;
+
+    struct PropObject
+    {
+        std::map<std::string, Property> properties;
+    };
+
+    struct PropArray
+    {
+        std::unique_ptr<Property> items;
+    };
+
+    struct PropBoolean
+    {
+        tl::optional<bool> defaultVal;
+    };
+
+    using PropData =
+        std::variant<PropNull, PropString, PropNumber, PropInteger, PropObject, PropArray, PropBoolean>;
 
     // *********************************** Scene/Entity/Component/Node ****************************
 
@@ -140,7 +183,10 @@ namespace Ent
 
     struct Component
     {
+        std::string type;
         Node root;
+        size_t version;
+        size_t index; ///< Useful to keep the componants order in the json file
     };
 
     struct ENTLIB_DLLEXPORT Entity
@@ -191,49 +237,10 @@ namespace Ent
 
     // ------------------------------ Schema ------------------------------------------------------
 
-    struct Definition;
-
-    struct PropNull
-    {
-    };
-    struct PropString
-    {
-        std::optional<std::string> defaultVal;
-    };
-
-    struct PropInteger
-    {
-        std::optional<int64_t> defaultVal;
-    };
-
-    struct PropNumber
-    {
-        std::optional<float> defaultVal;
-    };
-
-    struct Property;
-
-    struct PropObject
-    {
-        std::map<std::string, Property*> properties;
-    };
-
-    struct PropArray
-    {
-        std::unique_ptr<Property> items;
-    };
-
-    struct PropBoolean
-    {
-        std::optional<bool> defaultVal;
-    };
-
-    using PropData =
-        std::variant<PropNull, PropString, PropNumber, PropInteger, PropObject, PropArray, PropBoolean>;
-
     struct ENTLIB_DLLEXPORT Property
     {
         Property() = default;
+        Property(std::string name, PropData val);
         Property(Property const&) = delete;
         Property& operator=(Property const&) = delete;
         Property(Property&&) = default;
@@ -242,10 +249,10 @@ namespace Ent
         char const* getName() const;
         DataType getType() const;
 
-        std::optional<float> getDefaultFloat() const;
-        std::optional<int64_t> getDefaultInt() const;
-        std::optional<char const*> getDefaultString() const;
-        std::optional<bool> getDefaultBool() const;
+        tl::optional<float> getDefaultFloat() const;
+        tl::optional<int64_t> getDefaultInt() const;
+        tl::optional<char const*> getDefaultString() const;
+        tl::optional<bool> getDefaultBool() const;
 
         Property const* getArrayItemProperty() const;
 
@@ -317,7 +324,7 @@ namespace Ent
     template <typename V>
     void Override<V>::unset()
     {
-        value = std::nullopt;
+        value = tl::nullopt;
     }
 
 } // namespace Ent

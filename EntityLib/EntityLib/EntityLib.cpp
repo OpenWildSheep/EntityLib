@@ -316,12 +316,22 @@ static Ent::Entity loadEntity(json const& entNode)
 
     auto name = entNode.at("Name").get<std::string>();
 
-    json const& colorNode = entNode.at("Color");
     std::array<uint8_t, 4> color;
-    colorNode[0].get_to(color[0]);
-    colorNode[1].get_to(color[1]);
-    colorNode[2].get_to(color[2]);
-    colorNode[3].get_to(color[3]);
+    if (entNode.contains("Color"))
+    {
+        json const& colorNode = entNode.at("Color");
+        colorNode[0].get_to(color[0]);
+        colorNode[1].get_to(color[1]);
+        colorNode[2].get_to(color[2]);
+        colorNode[3].get_to(color[3]);
+    }
+    else
+    {
+        color[0] = 0;
+        color[1] = 0;
+        color[2] = 0;
+        color[3] = 0;
+    }
 
     std::map<std::string, Ent::Component> components;
     json const& componentsNode = entNode.at("Components");
@@ -333,7 +343,7 @@ static Ent::Entity loadEntity(json const& entNode)
 
         components.emplace(cmpType, std::move(comp));
     }
-    return Ent::Entity{ std::move(name), colorNode, std::move(components) };
+    return Ent::Entity{ std::move(name), color, std::move(components) };
 }
 
 Ent::Entity Ent::loadEntity(std::filesystem::path const& entityPath)

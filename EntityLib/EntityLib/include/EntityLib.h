@@ -32,10 +32,7 @@ namespace Ent
     // ******************************** Global declarations ***************************************
     struct BadType : std::runtime_error
     {
-        BadType()
-            : std::runtime_error("Bad node type")
-        {
-        }
+        BadType();
     };
 
     enum class DataType
@@ -46,7 +43,8 @@ namespace Ent
         integer,
         object,
         array,
-        boolean
+        boolean,
+        freeobject, // Object without schema. Used in Subscene/Embedded
     };
 
     // ******************************** Implem details ********************************************
@@ -154,12 +152,10 @@ namespace Ent
     struct ENTLIB_DLLEXPORT Entity
     {
         Entity() = default;
-        Entity(std::string _name, std::array<uint8_t, 4> _color, std::map<std::string, Component> _components)
-            : name(std::move(_name))
-            , color(_color)
-            , components(std::move(_components))
-        {
-        }
+        Entity(
+            std::string _name,
+            std::array<uint8_t, 4> _color,
+            std::map<std::string, Component> _components);
         Entity(Entity const&) = delete;
         Entity& operator=(Entity const&) = delete;
         Entity(Entity&&) = default;
@@ -174,17 +170,8 @@ namespace Ent
         Component const* getComponent(char const* type) const;
         Component* getComponent(char const* type);
         void removeComponent(char const* type);
-        std::vector<char const*> getComponentTypes() const
-        {
-            std::vector<char const*> types;
-            for (auto&& type_comp : components)
-                types.push_back(type_comp.first.c_str());
-            return types;
-        }
-        std::map<std::string, Component> const& getComponents() const
-        {
-            return components;
-        }
+        std::vector<char const*> getComponentTypes() const;
+        std::map<std::string, Component> const& getComponents() const;
 
     private:
         std::string name;
@@ -215,24 +202,30 @@ namespace Ent
 
     // ********************************** Static data *********************************************
 
-    struct StaticData
+    struct ENTLIB_DLLEXPORT EntityLib
     {
         Schema schema;
         std::map<std::string, std::vector<std::string>> componentDependencies;
+
+        EntityLib() = default;
+        EntityLib(EntityLib const&) = delete;
+        EntityLib& operator=(EntityLib const&) = delete;
+        EntityLib(EntityLib&&) = default;
+        EntityLib& operator=(EntityLib&&) = default;
+
+        // ********************************** Load/Save ***********************************************
+
+        Entity loadEntity(std::filesystem::path const& entityPath);
+
+        Scene loadScene(std::filesystem::path const& scenePath);
+
+        void saveEntity(Entity const& entity, std::filesystem::path const& entityPath);
+
+        void saveScene(Scene const& scene, std::filesystem::path const& scenePath);
     };
 
     ENTLIB_DLLEXPORT
-    StaticData loadStaticData(std::filesystem::path const& toolsDir); //!< Read schema and dependencies
-
-    // ********************************** Load/Save ***********************************************
-
-    ENTLIB_DLLEXPORT Entity loadEntity(std::filesystem::path const& entityPath);
-
-    ENTLIB_DLLEXPORT Scene loadScene(std::filesystem::path const& scenePath);
-
-    ENTLIB_DLLEXPORT void saveEntity(Entity const& entity, std::filesystem::path const& entityPath);
-
-    ENTLIB_DLLEXPORT void saveScene(Scene const& scene, std::filesystem::path const& scenePath);
+    EntityLib loadStaticData(std::filesystem::path const& toolsDir); //!< Read schema and dependencies
 
     // *************************** Implem details - method bodies *********************************
 

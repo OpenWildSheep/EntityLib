@@ -1,7 +1,9 @@
+#pragma warning(push, 0)
 #include <ciso646>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#pragma warning(pop)
 
 #include <EntityLib.h>
 
@@ -20,6 +22,7 @@ void printNode(char const* name, Ent::Node const& node, std::string tab)
         printf("%s%s [integer] : %lld\n", tab.c_str(), name, node.getInt());
         break;
     case Ent::DataType::object:
+    case Ent::DataType::freeobject:
         printf("%s%s [object]\n", tab.c_str(), name);
         for (char const* field : node.getFieldNames())
         {
@@ -31,7 +34,7 @@ void printNode(char const* name, Ent::Node const& node, std::string tab)
     case Ent::DataType::array:
         printf("%s%s [array]\n", tab.c_str(), name);
         // for (Ent::Node const* item : node.getItems())
-        for (int i = 0; i < node.size(); ++i)
+        for (size_t i = 0; i < node.size(); ++i)
         {
             std::stringstream ss;
             ss << i;
@@ -65,6 +68,7 @@ void displaySubSchema(std::string const& name, Ent::Subschema const& subschema, 
     case Ent::DataType::null: std::cout << "null" << std::endl; break;
     case Ent::DataType::number: std::cout << "number" << std::endl; break;
     case Ent::DataType::object:
+    case Ent::DataType::freeobject:
         std::cout << "object" << std::endl;
         for (auto&& name_sub : subschema.properties)
         {
@@ -79,14 +83,14 @@ int main() // int argc, char** argv
 try
 {
     // ******************************** Test iteration of schema **********************************
-    Ent::StaticData entlib = Ent::loadStaticData("X:/Tools");
+    Ent::EntityLib entlib = Ent::loadStaticData("X:/Tools");
     for (auto&& name_sub : entlib.schema.definitions)
     {
         displaySubSchema(std::get<0>(name_sub), std::get<1>(name_sub), {});
     }
 
     // ********************************** Test load/save scene ************************************
-    Ent::Scene scene = Ent::loadScene("X:/RawData/22_World/SceneMainWorld/SceneMainWorld.scene");
+    Ent::Scene scene = entlib.loadScene("X:/RawData/22_World/SceneMainWorld/SceneMainWorld.scene");
     printf("Scene Loaded\n");
     printf("Entity count : %zu\n", scene.objects.size());
 
@@ -102,7 +106,7 @@ try
         }
     }
 
-    Ent::saveScene(scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene");
+    entlib.saveScene(scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene");
 
     return EXIT_SUCCESS;
 }

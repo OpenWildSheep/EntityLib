@@ -15,14 +15,19 @@
 
 using namespace nlohmann;
 
+char schemaPath[2048] = {};
+
 #ifdef ENTLIB_LOADSCHEMA
 
 json const* fetchDocument(const std::string& uri)
 {
+    std::string const cleanPath =
+        schemaPath + ("/" + (uri.substr(0, 7) == "file://" ? uri.substr(7, uri.size()) : uri));
+
     json* fetchedRoot = new json{};
-    if (!valijson::utils::loadDocument(
-            uri.substr(0, 7) == "file://" ? uri.substr(7, uri.size()) : uri, *fetchedRoot))
+    if (!valijson::utils::loadDocument(cleanPath, *fetchedRoot))
     {
+        fprintf(stderr, "Can't load file %s\n", cleanPath.c_str());
         return nullptr;
     }
 
@@ -43,7 +48,7 @@ json const& getConstValue(const valijson::constraints::ConstConstraint& c)
     };
 
     valijson::adapters::FrozenValue const* val = c.getValue();
-    auto val2 = reinterpret_cast<NlohmannJsonFrozenValue const*>(val);
+    auto val2 = (NlohmannJsonFrozenValue const*)val;
     return val2->m_value;
 }
 
@@ -51,7 +56,13 @@ json const& getConstValue(const valijson::constraints::ConstConstraint& c)
 class FillDefinition : public valijson::constraints::ConstraintVisitor
 {
 public:
+    int subSceneLevel; // Are we in the special case of the Embeded in SubScene ?
     Ent::Subschema schema;
+
+    FillDefinition(int _subSceneLevel)
+        : subSceneLevel(_subSceneLevel)
+    {
+    }
 
     bool visit(const AllOfConstraint&) final
     {
@@ -166,7 +177,7 @@ public:
     bool visit(const PropertiesConstraint& c) final
     {
         c.applyToProperties([this](auto const& propName, valijson::Subschema const* sc) {
-            FillDefinition fillDef;
+            FillDefinition fillDef(propName == "Embedded" ? subSceneLevel + 1 : 0);
             auto visitor = valijson::Schema::ApplyFunction(
                 [&fillDef](valijson::constraints::Constraint const& constraint) {
                     return constraint.accept(fillDef);
@@ -190,13 +201,22 @@ public:
     bool visit(const SingularItemsConstraint& c) final
     {
         auto sc = c.getItemsSubschema();
-        FillDefinition itemDef;
-        auto visitor = valijson::Schema::ApplyFunction(
-            [&itemDef](valijson::constraints::Constraint const& constraint) {
-                return constraint.accept(itemDef);
-            });
-        sc->apply(visitor);
-        schema.items = std::make_unique<Ent::Subschema>(std::move(itemDef.schema));
+        if (subSceneLevel == 2) // We are in the "SubScene"/"properties"/"Embedded"/"items"
+        {
+            Ent::Subschema sub;
+            sub.type = Ent::DataType::freeobject;
+            schema.items = std::make_unique<Ent::Subschema>(std::move(sub));
+        }
+        else
+        {
+            FillDefinition itemDef(0);
+            auto visitor = valijson::Schema::ApplyFunction(
+                [&itemDef](valijson::constraints::Constraint const& constraint) {
+                    return constraint.accept(itemDef);
+                });
+            sc->apply(visitor);
+            schema.items = std::make_unique<Ent::Subschema>(std::move(itemDef.schema));
+        }
         return true;
     }
     bool visit(const TypeConstraint& c) final
@@ -279,16 +299,23 @@ valijson::Subschema const* findProperty(valijson::Subschema const* sc, char cons
 
 namespace Ent
 {
+    BadType::BadType()
+        : std::runtime_error("Bad node type")
+    {
+    }
+
 #ifdef ENTLIB_LOADSCHEMA
-    StaticData loadStaticData(std::filesystem::path const& toolsDir) // Read schema and dependencies
+    EntityLib loadStaticData(std::filesystem::path const& toolsDir) // Read schema and dependencies
     {
         // TODO : Read componentDependencies
+
+        sprintf_s(schemaPath, std::size(schemaPath), "%ls/WildPipeline/Schema", toolsDir.c_str());
 
         json schemaDocument;
         if (!valijson::utils::loadDocument(
                 (toolsDir / "WildPipeline/Schema/Scene-schema.json").u8string(), schemaDocument))
         {
-            return StaticData{};
+            return EntityLib{};
         }
 
         // Parse the json schema into an internal schema format
@@ -302,7 +329,7 @@ namespace Ent
         catch (std::exception& e)
         {
             std::cerr << "Failed to parse schema: " << e.what() << std::endl;
-            return StaticData{};
+            return EntityLib{};
         }
 
         Schema entSchema;
@@ -325,12 +352,12 @@ namespace Ent
             auto constConst = findConstraint<valijson::constraints::ConstConstraint>(type);
             std::string compName = getConstValue(*constConst).get<std::string>();
 
-            if (compName == "SubScene")
-                return true;
+            // if (compName == "SubScene")
+            //    return true;
             //      Find Data
             valijson::Subschema const* data = findProperty(sc, "Data");
 
-            FillDefinition visitConstraint;
+            FillDefinition visitConstraint(compName == "SubScene" ? 1 : 0);
 
             valijson::Subschema::ApplyFunction func =
                 [&visitConstraint](valijson::constraints::Constraint const& c) {
@@ -343,7 +370,7 @@ namespace Ent
             return true;
         });
 
-        return StaticData{ std::move(entSchema) };
+        return EntityLib{ std::move(entSchema) };
     }
 #endif
 
@@ -551,6 +578,14 @@ namespace Ent
 
     // ********************************* Entity ***************************************************
 
+    Entity::Entity(
+        std::string _name, std::array<uint8_t, 4> _color, std::map<std::string, Component> _components)
+        : name(std::move(_name))
+        , color(_color)
+        , components(std::move(_components))
+    {
+    }
+
     char const* Entity::getName() const
     {
         return name.c_str();
@@ -585,11 +620,24 @@ namespace Ent
         // TODO (check dependencies)
     }
 
+    std::vector<char const*> Entity::getComponentTypes() const
+    {
+        std::vector<char const*> types;
+        for (auto&& type_comp : components)
+            types.push_back(type_comp.first.c_str());
+        return types;
+    }
+
+    std::map<std::string, Component> const& Entity::getComponents() const
+    {
+        return components;
+    }
+
 } // namespace Ent
 
 // ********************************** Load/Save ***********************************************
 
-static Ent::Node loadNode(json const& data)
+static Ent::Node loadFreeObjectNode(json const& data)
 {
     Ent::Node result;
     switch (data.type())
@@ -615,7 +663,7 @@ static Ent::Node loadNode(json const& data)
         {
             std::string const& name = field.key();
             json const& value = field.value();
-            Ent::Node tmpNode = loadNode(value);
+            Ent::Node tmpNode = loadFreeObjectNode(value);
             object.emplace(name, std::make_unique<Ent::Node>(std::move(tmpNode)));
         }
         result = Ent::Node(std::move(object));
@@ -626,10 +674,10 @@ static Ent::Node loadNode(json const& data)
         Ent::Array arr;
         for (auto const& item : data)
         {
-            Ent::Node tmpNode = loadNode(item);
+            Ent::Node tmpNode = loadFreeObjectNode(item);
             arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
         }
-        arr.size = data.size();
+        arr.size = static_cast<int64_t>(data.size());
         result = Ent::Node(std::move(arr));
     }
     break;
@@ -638,7 +686,100 @@ static Ent::Node loadNode(json const& data)
     return result;
 }
 
-static json saveNode(Ent::Node const& node)
+static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data)
+{
+    Ent::Node result;
+    switch (nodeSchema.type)
+    {
+    case Ent::DataType::null: result = Ent::Node(Ent::Null{}); break;
+    case Ent::DataType::string:
+        if (data.is_string())
+            result = Ent::Node(Ent::Override<std::string>(data.get<std::string>()));
+        else
+            result = Ent::Node(Ent::Override<std::string>()); // Add default value
+        break;
+    case Ent::DataType::boolean:
+        if (data.is_boolean())
+        {
+            result = Ent::Node(Ent::Override<bool>(data.get<bool>()));
+        }
+        else
+        {
+            result = Ent::Node(Ent::Override<bool>()); // Add default value
+        }
+        break;
+    case Ent::DataType::integer:
+        if (data.is_number_integer() or data.is_number_unsigned() or data.is_number_float())
+        {
+            result = Ent::Node(Ent::Override<int64_t>(data.get<int64_t>()));
+        }
+        else
+        {
+            result = Ent::Node(Ent::Override<int64_t>()); // Add default value
+        }
+        break;
+    case Ent::DataType::number:
+        if (data.is_number_integer() or data.is_number_unsigned() or data.is_number_float())
+        {
+            result = Ent::Node(Ent::Override<float>(data.get<float>()));
+        }
+        else
+        {
+            result = Ent::Node(Ent::Override<float>()); // Add default value
+        }
+        break;
+    case Ent::DataType::object:
+    {
+        Ent::Object object;
+
+        for (auto&& name_sub : nodeSchema.properties)
+        {
+            std::string const& name = std::get<0>(name_sub);
+            if (data.count(name))
+            {
+                json const& value = data.at(name);
+                Ent::Node tmpNode = loadNode(std::get<1>(name_sub), value);
+                object.emplace(name, std::make_unique<Ent::Node>(std::move(tmpNode)));
+            }
+            else
+            {
+                Ent::Node tmpNode = loadNode(std::get<1>(name_sub), json{});
+                object.emplace(name, std::make_unique<Ent::Node>(std::move(tmpNode)));
+            }
+        }
+        result = Ent::Node(std::move(object));
+    }
+    break;
+    case Ent::DataType::array:
+    {
+        Ent::Array arr;
+        for (auto const& item : data)
+        {
+            Ent::Node tmpNode = loadNode(*nodeSchema.items, item);
+            arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
+        }
+        arr.size = static_cast<int64_t>(data.size());
+        result = Ent::Node(std::move(arr));
+    }
+    break;
+    case Ent::DataType::freeobject:
+    {
+        Ent::Object object;
+        for (auto const& field : data.items())
+        {
+            std::string const& name = field.key();
+            json const& value = field.value();
+            Ent::Node tmpNode = loadFreeObjectNode(value);
+            object.emplace(name, std::make_unique<Ent::Node>(std::move(tmpNode)));
+        }
+        result = Ent::Node(std::move(object));
+    }
+    break;
+    }
+    return result;
+}
+
+static json saveFreeObjectNode(Ent::Node const& node)
 {
     json data;
     switch (node.getDataType())
@@ -649,12 +790,13 @@ static json saveNode(Ent::Node const& node)
     case Ent::DataType::integer: data = node.getInt(); break;
     case Ent::DataType::number: data = node.getFloat(); break;
     case Ent::DataType::object:
+    case Ent::DataType::freeobject:
     {
         data = json::object();
         for (auto const& name : node.getFieldNames())
         {
             Ent::Node const* subNode = node.at(name);
-            json subJson = saveNode(*subNode);
+            json subJson = saveFreeObjectNode(*subNode);
             data[name] = std::move(subJson);
         }
     }
@@ -664,7 +806,7 @@ static json saveNode(Ent::Node const& node)
         data = json::array();
         for (Ent::Node const* item : node.getItems())
         {
-            json tmpNode = saveNode(*item);
+            json tmpNode = saveFreeObjectNode(*item);
             data.emplace_back(std::move(tmpNode));
         }
     }
@@ -673,7 +815,54 @@ static json saveNode(Ent::Node const& node)
     return data;
 }
 
-static Ent::Entity loadEntity(json const& entNode)
+static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
+{
+    json data;
+    switch (schema.type)
+    {
+    case Ent::DataType::null: break;
+    case Ent::DataType::string: data = node.getString(); break;
+    case Ent::DataType::boolean: data = node.getBool(); break;
+    case Ent::DataType::integer: data = node.getInt(); break;
+    case Ent::DataType::number: data = node.getFloat(); break;
+    case Ent::DataType::object:
+    {
+        data = json::object();
+        for (auto const& name_sub : schema.properties)
+        {
+            auto&& name = std::get<0>(name_sub);
+            Ent::Node const* subNode = node.at(name.c_str());
+            json subJson = saveNode(std::get<1>(name_sub), *subNode);
+            data[name] = std::move(subJson);
+        }
+    }
+    break;
+    case Ent::DataType::freeobject:
+    {
+        data = json::object();
+        for (auto const& name : node.getFieldNames())
+        {
+            Ent::Node const* subNode = node.at(name);
+            json subJson = saveFreeObjectNode(*subNode);
+            data[name] = std::move(subJson);
+        }
+    }
+    break;
+    case Ent::DataType::array:
+    {
+        data = json::array();
+        for (Ent::Node const* item : node.getItems())
+        {
+            json tmpNode = saveNode(*schema.items, *item);
+            data.emplace_back(std::move(tmpNode));
+        }
+    }
+    break;
+    }
+    return data;
+}
+
+static Ent::Entity loadEntity(Ent::Schema const& schema, json const& entNode)
 {
     // TODO override, types and default values
 
@@ -697,15 +886,18 @@ static Ent::Entity loadEntity(json const& entNode)
         auto const cmpType = compNode.at("Type").get<std::string>();
         auto const version = compNode.at("Version").get<size_t>();
         json const& data = compNode.at("Data");
-        Ent::Component comp{ cmpType, loadNode(data), version, index };
+
+        Ent::Subschema const& compSchema = schema.definitions.at(cmpType);
+
+        Ent::Component comp{ cmpType, loadNode(compSchema, data), version, index };
 
         components.emplace(cmpType, std::move(comp));
         ++index;
     }
-    return Ent::Entity{ std::move(name), color, std::move(components) };
+    return Ent::Entity(std::move(name), color, std::move(components));
 }
 
-Ent::Entity Ent::loadEntity(std::filesystem::path const& entityPath)
+Ent::Entity Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath)
 {
     std::ifstream file(entityPath);
     if (not file.is_open())
@@ -718,11 +910,11 @@ Ent::Entity Ent::loadEntity(std::filesystem::path const& entityPath)
     json document;
     file >> document;
 
-    Ent::Entity ent = ::loadEntity(document);
+    Ent::Entity ent = ::loadEntity(schema, document);
     return ent;
 }
 
-Ent::Scene Ent::loadScene(std::filesystem::path const& scenePath)
+Ent::Scene Ent::EntityLib::loadScene(std::filesystem::path const& scenePath)
 {
     json document;
     {
@@ -747,14 +939,14 @@ Ent::Scene Ent::loadScene(std::filesystem::path const& scenePath)
 
     for (json const& entNode : document.at("Objects"))
     {
-        Ent::Entity ent = ::loadEntity(entNode);
+        Ent::Entity ent = ::loadEntity(schema, entNode);
         scene.objects.emplace_back(std::move(ent));
     }
 
     return scene;
 }
 
-static json saveEntity(Ent::Entity const& entity)
+static json saveEntity(Ent::Schema const& schema, Ent::Entity const& entity)
 {
     // TODO override, types and default values
     json entNode;
@@ -777,14 +969,14 @@ static json saveEntity(Ent::Entity const& entity)
         json compNode;
         compNode.emplace("Version", comp->version);
         compNode.emplace("Type", comp->type);
-        compNode.emplace("Data", saveNode(comp->root));
+        compNode.emplace("Data", saveNode(schema.definitions.at(comp->type), comp->root));
 
         componentsNode.emplace_back(std::move(compNode));
     }
     return entNode;
 }
 
-void Ent::saveEntity(Entity const& entity, std::filesystem::path const& entityPath)
+void Ent::EntityLib::saveEntity(Entity const& entity, std::filesystem::path const& entityPath)
 {
     std::ofstream file(entityPath);
     if (not file.is_open())
@@ -794,12 +986,12 @@ void Ent::saveEntity(Entity const& entity, std::filesystem::path const& entityPa
         sprintf_s(message.data(), MessSize, "Can't open file for write: %ls", entityPath.c_str());
         throw std::runtime_error(message.data());
     }
-    json document = ::saveEntity(entity);
+    json document = ::saveEntity(schema, entity);
 
     file << document.dump(4);
 }
 
-void Ent::saveScene(Scene const& scene, std::filesystem::path const& scenePath)
+void Ent::EntityLib::saveScene(Scene const& scene, std::filesystem::path const& scenePath)
 {
     std::ofstream file(scenePath);
     if (not file.is_open())
@@ -816,7 +1008,7 @@ void Ent::saveScene(Scene const& scene, std::filesystem::path const& scenePath)
 
     for (Ent::Entity const& ent : scene.objects)
     {
-        objects.emplace_back(::saveEntity(ent));
+        objects.emplace_back(::saveEntity(schema, ent));
     }
 
     file << document.dump(4);

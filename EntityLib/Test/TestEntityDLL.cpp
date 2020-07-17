@@ -108,7 +108,8 @@ try
         }
     }
 
-    scene.objects.front().addComponent(entlib.schema, "StickToTerrain");
+    Ent::Component* heightObj = scene.objects.front().addComponent(entlib.schema, "HeightObj");
+    heightObj->root.at("DisplaceNoiseList")->push();
 
     entlib.saveScene(scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene");
 

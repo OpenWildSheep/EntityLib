@@ -93,11 +93,13 @@ namespace Ent
 
     // *********************************** Scene/Entity/Component/Node ****************************
 
+    struct Subschema;
+
     // Each node can search in any version
     struct ENTLIB_DLLEXPORT Node
     {
         Node() = default;
-        Node(Value val);
+        Node(Value val, Subschema const* schema);
         ~Node() = default;
 
         Node(Node const&) = delete;
@@ -118,6 +120,8 @@ namespace Ent
         Node const* at(size_t index) const;
         size_t size() const;
         std::vector<Node const*> getItems() const;
+        Node* push();
+        void pop();
 
         // Value
         float getFloat() const;
@@ -138,6 +142,7 @@ namespace Ent
         bool isArraySizeSet() const;
 
     private:
+        Subschema const* schema = nullptr;
         Value value;
     };
 

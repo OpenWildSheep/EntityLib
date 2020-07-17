@@ -376,8 +376,9 @@ namespace Ent
     }
 #endif
 
-    Node::Node(Value val)
-        : value(std::move(val))
+    Node::Node(Value val, Subschema const* _schema)
+        : schema(_schema)
+        , value(std::move(val))
     {
     }
 
@@ -578,6 +579,26 @@ namespace Ent
         throw BadType();
     }
 
+    Node* Node::push()
+    {
+        if (value.is<Array>())
+        {
+            auto itemSchema = schema->items.get();
+            value.get<Array>().data.emplace_back(
+                std::make_unique<Node>(loadNode(*itemSchema, json())));
+            return value.get<Array>().data.back().get();
+        }
+        throw BadType();
+    }
+    void Node::pop()
+    {
+        if (value.is<Array>())
+        {
+            value.get<Array>().data.pop_back();
+        }
+        throw BadType();
+    }
+
     // ********************************* Entity ***************************************************
 
     Entity::Entity(
@@ -648,19 +669,19 @@ static Ent::Node loadFreeObjectNode(json const& data)
     Ent::Node result;
     switch (data.type())
     {
-    case nlohmann::detail::value_t::null: result = Ent::Node(Ent::Null{}); break;
+    case nlohmann::detail::value_t::null: result = Ent::Node(Ent::Null{}, nullptr); break;
     case nlohmann::detail::value_t::string:
-        result = Ent::Node(Ent::Override<std::string>(data.get<std::string>()));
+        result = Ent::Node(Ent::Override<std::string>(data.get<std::string>()), nullptr);
         break;
     case nlohmann::detail::value_t::boolean:
-        result = Ent::Node(Ent::Override<bool>(data.get<bool>()));
+        result = Ent::Node(Ent::Override<bool>(data.get<bool>()), nullptr);
         break;
     case nlohmann::detail::value_t::number_integer:
     case nlohmann::detail::value_t::number_unsigned:
-        result = Ent::Node(Ent::Override<int64_t>(data.get<int64_t>()));
+        result = Ent::Node(Ent::Override<int64_t>(data.get<int64_t>()), nullptr);
         break;
     case nlohmann::detail::value_t::number_float:
-        result = Ent::Node(Ent::Override<float>(data.get<float>()));
+        result = Ent::Node(Ent::Override<float>(data.get<float>()), nullptr);
         break;
     case nlohmann::detail::value_t::object:
     {
@@ -672,7 +693,7 @@ static Ent::Node loadFreeObjectNode(json const& data)
             Ent::Node tmpNode = loadFreeObjectNode(value);
             object.emplace(name, std::make_unique<Ent::Node>(std::move(tmpNode)));
         }
-        result = Ent::Node(std::move(object));
+        result = Ent::Node(std::move(object), nullptr);
     }
     break;
     case nlohmann::detail::value_t::array:
@@ -684,7 +705,7 @@ static Ent::Node loadFreeObjectNode(json const& data)
             arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
         }
         arr.size = static_cast<int64_t>(data.size());
-        result = Ent::Node(std::move(arr));
+        result = Ent::Node(std::move(arr), nullptr);
     }
     break;
     case nlohmann::detail::value_t::discarded: break;
@@ -697,41 +718,41 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data)
     Ent::Node result;
     switch (nodeSchema.type)
     {
-    case Ent::DataType::null: result = Ent::Node(Ent::Null{}); break;
+    case Ent::DataType::null: result = Ent::Node(Ent::Null{}, &nodeSchema); break;
     case Ent::DataType::string:
         if (data.is_string())
-            result = Ent::Node(Ent::Override<std::string>(data.get<std::string>()));
+            result = Ent::Node(Ent::Override<std::string>(data.get<std::string>()), &nodeSchema);
         else
-            result = Ent::Node(Ent::Override<std::string>()); // Add default value
+            result = Ent::Node(Ent::Override<std::string>(), &nodeSchema); // Add default value
         break;
     case Ent::DataType::boolean:
         if (data.is_boolean())
         {
-            result = Ent::Node(Ent::Override<bool>(data.get<bool>()));
+            result = Ent::Node(Ent::Override<bool>(data.get<bool>()), &nodeSchema);
         }
         else
         {
-            result = Ent::Node(Ent::Override<bool>()); // Add default value
+            result = Ent::Node(Ent::Override<bool>(), &nodeSchema); // Add default value
         }
         break;
     case Ent::DataType::integer:
         if (data.is_number_integer() or data.is_number_unsigned() or data.is_number_float())
         {
-            result = Ent::Node(Ent::Override<int64_t>(data.get<int64_t>()));
+            result = Ent::Node(Ent::Override<int64_t>(data.get<int64_t>()), &nodeSchema);
         }
         else
         {
-            result = Ent::Node(Ent::Override<int64_t>()); // Add default value
+            result = Ent::Node(Ent::Override<int64_t>(), &nodeSchema); // Add default value
         }
         break;
     case Ent::DataType::number:
         if (data.is_number_integer() or data.is_number_unsigned() or data.is_number_float())
         {
-            result = Ent::Node(Ent::Override<float>(data.get<float>()));
+            result = Ent::Node(Ent::Override<float>(data.get<float>()), &nodeSchema);
         }
         else
         {
-            result = Ent::Node(Ent::Override<float>()); // Add default value
+            result = Ent::Node(Ent::Override<float>(), &nodeSchema); // Add default value
         }
         break;
     case Ent::DataType::object:
@@ -753,7 +774,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data)
                 object.emplace(name, std::make_unique<Ent::Node>(std::move(tmpNode)));
             }
         }
-        result = Ent::Node(std::move(object));
+        result = Ent::Node(std::move(object), &nodeSchema);
     }
     break;
     case Ent::DataType::array:
@@ -765,7 +786,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data)
             arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
         }
         arr.size = static_cast<int64_t>(data.size());
-        result = Ent::Node(std::move(arr));
+        result = Ent::Node(std::move(arr), &nodeSchema);
     }
     break;
     case Ent::DataType::freeobject:
@@ -778,7 +799,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data)
             Ent::Node tmpNode = loadFreeObjectNode(value);
             object.emplace(name, std::make_unique<Ent::Node>(std::move(tmpNode)));
         }
-        result = Ent::Node(std::move(object));
+        result = Ent::Node(std::move(object), &nodeSchema);
     }
     break;
     }
@@ -1059,16 +1080,19 @@ void Ent::mergeComponants(std::filesystem::path const& toolsDir)
 
     auto&& compList = sceneSch["definitions"]["Component"]["oneOf"];
     compList = json();
-    auto addComponants = [&compList](json const& componantsSchema, char const* filename) {
+    auto addComponent = [&compList](std::string const& name, char const* filename) {
+        json newComp;
+        auto&& prop = newComp["properties"];
+        prop["Type"]["const"] = name;
+        prop["Data"]["$ref"] = "file://" + (filename + ("#/definitions/" + name));
+
+        compList.push_back(std::move(newComp));
+    };
+    auto addComponants = [&compList,
+                          addComponent](json const& componantsSchema, char const* filename) {
         for (auto&& name_comp : componantsSchema.items())
         {
-            auto&& name = name_comp.key();
-            json newComp;
-            auto&& prop = newComp["properties"];
-            prop["Type"]["const"] = name;
-            prop["Data"]["$ref"] = "file://" + (filename + ("#/definitions/" + name));
-
-            compList.push_back(std::move(newComp));
+            addComponent(name_comp.key(), filename);
         }
     };
     addComponants(runtimeCompSch, "RuntimeComponants.json");

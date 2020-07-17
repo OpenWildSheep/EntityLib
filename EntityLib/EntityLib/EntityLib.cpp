@@ -17,6 +17,8 @@ using namespace nlohmann;
 
 char schemaPath[2048] = {};
 
+static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data);
+
 #ifdef ENTLIB_LOADSCHEMA
 
 json const* fetchDocument(const std::string& uri)
@@ -602,10 +604,13 @@ namespace Ent
     {
         color = _color;
     }
-    Component* Entity::addComponent(char const*) // type
+    Component* Entity::addComponent(Schema const& schema, char const* type)
     {
-        // TODO (check dependencies)
-        return nullptr;
+        // TODO : Use dependencies
+        Ent::Subschema const& compSchema = schema.definitions.at(type);
+        Ent::Component comp{ type, loadNode(compSchema, json()), 1, components.size() };
+        auto iter_bool = components.emplace(type, std::move(comp));
+        return &(iter_bool.first->second);
     }
     Component const* Entity::getComponent(char const* type) const
     {
@@ -615,9 +620,10 @@ namespace Ent
     {
         return &(components.at(type));
     }
-    void Entity::removeComponent(char const*) // type
+    void Entity::removeComponent(char const* type)
     {
-        // TODO (check dependencies)
+        // TODO : Use dependencies
+        components.erase(type);
     }
 
     std::vector<char const*> Entity::getComponentTypes() const
@@ -897,7 +903,7 @@ static Ent::Entity loadEntity(Ent::Schema const& schema, json const& entNode)
     return Ent::Entity(std::move(name), color, std::move(components));
 }
 
-Ent::Entity Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath)
+Ent::Entity Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath) const
 {
     std::ifstream file(entityPath);
     if (not file.is_open())
@@ -914,7 +920,7 @@ Ent::Entity Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath)
     return ent;
 }
 
-Ent::Scene Ent::EntityLib::loadScene(std::filesystem::path const& scenePath)
+Ent::Scene Ent::EntityLib::loadScene(std::filesystem::path const& scenePath) const
 {
     json document;
     {
@@ -976,7 +982,7 @@ static json saveEntity(Ent::Schema const& schema, Ent::Entity const& entity)
     return entNode;
 }
 
-void Ent::EntityLib::saveEntity(Entity const& entity, std::filesystem::path const& entityPath)
+void Ent::EntityLib::saveEntity(Entity const& entity, std::filesystem::path const& entityPath) const
 {
     std::ofstream file(entityPath);
     if (not file.is_open())
@@ -991,7 +997,7 @@ void Ent::EntityLib::saveEntity(Entity const& entity, std::filesystem::path cons
     file << document.dump(4);
 }
 
-void Ent::EntityLib::saveScene(Scene const& scene, std::filesystem::path const& scenePath)
+void Ent::EntityLib::saveScene(Scene const& scene, std::filesystem::path const& scenePath) const
 {
     std::ofstream file(scenePath);
     if (not file.is_open())
@@ -1012,4 +1018,66 @@ void Ent::EntityLib::saveScene(Scene const& scene, std::filesystem::path const& 
     }
 
     file << document.dump(4);
+}
+
+Ent::Component* Ent::EntityLib::addComponent(Entity& entity, char const* type) const
+{
+    return entity.addComponent(schema, type);
+}
+
+void Ent::mergeComponants(std::filesystem::path const& toolsDir)
+{
+    auto loadJsonFile = [](std::filesystem::path const& path) {
+        std::ifstream file(path);
+        if (not file.is_open())
+        {
+            throw std::runtime_error("Can't open file for read: " + path.u8string());
+        }
+        json doc;
+        doc << file;
+
+        /*std::filesystem::path p2 = path;
+        p2.replace_extension(".test.json");
+        std::ofstream file2(p2);
+        if (not file2.is_open())
+        {
+            throw std::runtime_error("Can't open file for write: " + p2.u8string());
+        }
+        file2 << doc.dump(4);*/
+
+        return doc;
+    };
+
+    json runtimeCompSch, editionCompSch, sceneSch;
+    runtimeCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/RuntimeComponants.json");
+    editionCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/EditionComponents.json");
+    auto sceneSchemaPath = toolsDir / "WildPipeline/Schema/Scene-schema.json";
+    sceneSch = loadJsonFile(sceneSchemaPath);
+
+    runtimeCompSch = runtimeCompSch["definitions"];
+    editionCompSch = editionCompSch["definitions"];
+
+    auto&& compList = sceneSch["definitions"]["Component"]["oneOf"];
+    compList = json();
+    auto addComponants = [&compList](json const& componantsSchema, char const* filename) {
+        for (auto&& name_comp : componantsSchema.items())
+        {
+            auto&& name = name_comp.key();
+            json newComp;
+            auto&& prop = newComp["properties"];
+            prop["Type"]["const"] = name;
+            prop["Data"]["$ref"] = "file://" + (filename + ("#/definitions/" + name));
+
+            compList.push_back(std::move(newComp));
+        }
+    };
+    addComponants(runtimeCompSch, "RuntimeComponants.json");
+    addComponants(editionCompSch, "EditionComponents.json");
+
+    std::ofstream file(sceneSchemaPath);
+    if (not file.is_open())
+    {
+        throw std::runtime_error("Can't open file for write: " + sceneSchemaPath.u8string());
+    }
+    file << sceneSch.dump(4);
 }

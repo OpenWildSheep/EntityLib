@@ -149,6 +149,8 @@ namespace Ent
         size_t index; ///< Useful to keep the componants order in the json file
     };
 
+    struct Schema;
+
     struct ENTLIB_DLLEXPORT Entity
     {
         Entity() = default;
@@ -166,7 +168,7 @@ namespace Ent
         std::array<uint8_t, 4> getColor() const;
         void setColor(std::array<uint8_t, 4> color);
 
-        Component* addComponent(char const* type);
+        Component* addComponent(Schema const& schema, char const* type);
         Component const* getComponent(char const* type) const;
         Component* getComponent(char const* type);
         void removeComponent(char const* type);
@@ -215,13 +217,15 @@ namespace Ent
 
         // ********************************** Load/Save ***********************************************
 
-        Entity loadEntity(std::filesystem::path const& entityPath);
+        Entity loadEntity(std::filesystem::path const& entityPath) const;
 
-        Scene loadScene(std::filesystem::path const& scenePath);
+        Scene loadScene(std::filesystem::path const& scenePath) const;
 
-        void saveEntity(Entity const& entity, std::filesystem::path const& entityPath);
+        void saveEntity(Entity const& entity, std::filesystem::path const& entityPath) const;
 
-        void saveScene(Scene const& scene, std::filesystem::path const& scenePath);
+        void saveScene(Scene const& scene, std::filesystem::path const& scenePath) const;
+
+        Component* addComponent(Entity& entity, char const* type) const;
     };
 
     ENTLIB_DLLEXPORT
@@ -257,4 +261,7 @@ namespace Ent
         value = tl::nullopt;
     }
 
+    // *********************** Merge Runtime componants into Entity schema ************************
+
+    void mergeComponants(std::filesystem::path const& toolsDir);
 } // namespace Ent

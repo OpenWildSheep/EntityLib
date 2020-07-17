@@ -82,6 +82,8 @@ void displaySubSchema(std::string const& name, Ent::Subschema const& subschema, 
 int main() // int argc, char** argv
 try
 {
+    // Ent::mergeComponants("X:/Tools");
+
     // ******************************** Test iteration of schema **********************************
     Ent::EntityLib entlib = Ent::loadStaticData("X:/Tools");
     for (auto&& name_sub : entlib.schema.definitions)
@@ -105,6 +107,8 @@ try
             printNode("", root, "      ");
         }
     }
+
+    scene.objects.front().addComponent(entlib.schema, "StickToTerrain");
 
     entlib.saveScene(scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene");
 

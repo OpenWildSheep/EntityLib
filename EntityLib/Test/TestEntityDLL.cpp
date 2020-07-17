@@ -108,8 +108,10 @@ try
         }
     }
 
-    Ent::Component* heightObj = scene.objects.front().addComponent(entlib.schema, "HeightObj");
+    Ent::Component* heightObj = scene.objects.front().addComponent(entlib, "HeightObj");
     heightObj->root.at("DisplaceNoiseList")->push();
+
+    scene.objects.front().addComponent(entlib, "BeamGenerator");
 
     entlib.saveScene(scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene");
 

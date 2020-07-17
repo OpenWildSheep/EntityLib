@@ -17,6 +17,18 @@ using namespace nlohmann;
 
 char schemaPath[2048] = {};
 
+static json loadJsonFile(std::filesystem::path const& path)
+{
+    std::ifstream file(path);
+    if (not file.is_open())
+    {
+        throw std::runtime_error("Can't open file for read: " + path.u8string());
+    }
+    json doc;
+    doc << file;
+    return doc;
+};
+
 static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data);
 
 #ifdef ENTLIB_LOADSCHEMA
@@ -372,7 +384,23 @@ namespace Ent
             return true;
         });
 
-        return EntityLib{ std::move(entSchema) };
+        json dependencies = loadJsonFile(toolsDir / "WildPipeline/Schema/Dependencies.json");
+        std::map<std::string, std::vector<std::string>> componentDependencies;
+        for (json const& comp : dependencies["Dependencies"])
+        {
+            auto name = comp["className"].get<std::string>();
+            std::vector<std::string> deps;
+            for (json const& dep : comp["dependencies"])
+            {
+                if (dep["Optional"].get<bool>() == false)
+                {
+                    deps.push_back(dep["Name"].get<std::string>());
+                }
+            }
+            componentDependencies.emplace(std::move(name), std::move(deps));
+        }
+
+        return EntityLib{ std::move(entSchema), std::move(componentDependencies) };
     }
 #endif
 
@@ -625,10 +653,17 @@ namespace Ent
     {
         color = _color;
     }
-    Component* Entity::addComponent(Schema const& schema, char const* type)
+    Component* Entity::addComponent(EntityLib const& entlib, char const* type)
     {
         // TODO : Use dependencies
-        Ent::Subschema const& compSchema = schema.definitions.at(type);
+        if (entlib.componentDependencies.count(type)) // Could be an editor componant
+        {
+            for (auto&& dep : entlib.componentDependencies.at(type))
+            {
+                addComponent(entlib, dep.c_str());
+            }
+        }
+        Ent::Subschema const& compSchema = entlib.schema.definitions.at(type);
         Ent::Component comp{ type, loadNode(compSchema, json()), 1, components.size() };
         auto iter_bool = components.emplace(type, std::move(comp));
         return &(iter_bool.first->second);
@@ -1043,37 +1078,15 @@ void Ent::EntityLib::saveScene(Scene const& scene, std::filesystem::path const& 
 
 Ent::Component* Ent::EntityLib::addComponent(Entity& entity, char const* type) const
 {
-    return entity.addComponent(schema, type);
+    return entity.addComponent(*this, type);
 }
 
 void Ent::mergeComponants(std::filesystem::path const& toolsDir)
 {
-    auto loadJsonFile = [](std::filesystem::path const& path) {
-        std::ifstream file(path);
-        if (not file.is_open())
-        {
-            throw std::runtime_error("Can't open file for read: " + path.u8string());
-        }
-        json doc;
-        doc << file;
-
-        /*std::filesystem::path p2 = path;
-        p2.replace_extension(".test.json");
-        std::ofstream file2(p2);
-        if (not file2.is_open())
-        {
-            throw std::runtime_error("Can't open file for write: " + p2.u8string());
-        }
-        file2 << doc.dump(4);*/
-
-        return doc;
-    };
-
-    json runtimeCompSch, editionCompSch, sceneSch;
-    runtimeCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/RuntimeComponants.json");
-    editionCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/EditionComponents.json");
+    json runtimeCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/RuntimeComponants.json");
+    json editionCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/EditionComponents.json");
     auto sceneSchemaPath = toolsDir / "WildPipeline/Schema/Scene-schema.json";
-    sceneSch = loadJsonFile(sceneSchemaPath);
+    json sceneSch = loadJsonFile(sceneSchemaPath);
 
     runtimeCompSch = runtimeCompSch["definitions"];
     editionCompSch = editionCompSch["definitions"];
@@ -1095,8 +1108,14 @@ void Ent::mergeComponants(std::filesystem::path const& toolsDir)
             addComponent(name_comp.key(), filename);
         }
     };
-    addComponants(runtimeCompSch, "RuntimeComponants.json");
     addComponants(editionCompSch, "EditionComponents.json");
+
+    json dependencies = loadJsonFile(toolsDir / "WildPipeline/Schema/Dependencies.json");
+    for (json const& dep : dependencies["Dependencies"])
+    {
+        auto name = dep["className"].get<std::string>();
+        addComponent(name, "RuntimeComponants.json");
+    }
 
     std::ofstream file(sceneSchemaPath);
     if (not file.is_open())

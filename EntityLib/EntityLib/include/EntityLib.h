@@ -155,6 +155,7 @@ namespace Ent
     };
 
     struct Schema;
+    struct EntityLib;
 
     struct ENTLIB_DLLEXPORT Entity
     {
@@ -173,7 +174,7 @@ namespace Ent
         std::array<uint8_t, 4> getColor() const;
         void setColor(std::array<uint8_t, 4> color);
 
-        Component* addComponent(Schema const& schema, char const* type);
+        Component* addComponent(EntityLib const& entlib, char const* type);
         Component const* getComponent(char const* type) const;
         Component* getComponent(char const* type);
         void removeComponent(char const* type);

@@ -56,8 +56,12 @@ namespace Ent
     struct Override
     {
         Override() = default;
-        Override(V val)
-            : defaultValue()
+        Override(V defaultVal)
+            : defaultValue(defaultVal)
+        {
+        }
+        Override(V defaultVal, V val)
+            : defaultValue(defaultVal)
             , value(val)
         {
         }
@@ -164,7 +168,8 @@ namespace Ent
         Entity(
             std::string _name,
             std::array<uint8_t, 4> _color,
-            std::map<std::string, Component> _components);
+            std::map<std::string, Component> _components,
+            tl::optional<std::string> _instanceOf = tl::nullopt);
         Entity(Entity const&) = delete;
         Entity& operator=(Entity const&) = delete;
         Entity(Entity&&) = default;
@@ -172,6 +177,7 @@ namespace Ent
 
         char const* getName() const;
         void setName(std::string name);
+        char const* getInstanceOf() const;
         std::array<uint8_t, 4> getColor() const;
         void setColor(std::array<uint8_t, 4> color);
 
@@ -183,6 +189,7 @@ namespace Ent
         std::map<std::string, Component> const& getComponents() const;
 
     private:
+        tl::optional<std::string> instanceOf;
         std::string name;
         std::array<uint8_t, 4> color;
         std::map<std::string, Component> components;
@@ -257,7 +264,7 @@ namespace Ent
     template <typename V>
     void Override<V>::set(V newVal)
     {
-        return *value = newVal;
+        value.emplace(std::move(newVal));
     }
 
     template <typename V>

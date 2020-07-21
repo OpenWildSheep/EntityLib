@@ -29,7 +29,7 @@ static json loadJsonFile(std::filesystem::path const& path)
     return doc;
 };
 
-static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data);
+static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, Ent::Node const* super);
 
 #ifdef ENTLIB_LOADSCHEMA
 
@@ -123,13 +123,12 @@ public:
     bool visit(const LinearItemsConstraint& c) final
     {
         schema.linearItems = std::vector<Ent::Subschema>();
-        c.applyToItemSubschemas([this](unsigned int index, valijson::Subschema const* sc)
-        {
+        c.applyToItemSubschemas([this](unsigned int index, valijson::Subschema const* sc) {
             FillDefinition fillDef(0);
             auto visitor = valijson::Schema::ApplyFunction(
                 [&fillDef](valijson::constraints::Constraint const& constraint) {
-                return constraint.accept(fillDef);
-            });
+                    return constraint.accept(fillDef);
+                });
             bool ok = sc->apply(visitor);
             if (schema.linearItems->size() <= index)
                 schema.linearItems->resize(index + 1);
@@ -531,19 +530,19 @@ namespace Ent
     }
     void Node::setFloat(float val)
     {
-        value = Override<float>{ val };
+        value.get<Override<float>>().set(val);
     }
     void Node::setInt(int64_t val)
     {
-        value = Override<int64_t>{ val };
+        value.get<Override<int64_t>>().set(val);
     }
     void Node::setString(char const* val)
     {
-        value = Override<std::string>{ val };
+        value.get<Override<std::string>>().set(val);
     }
     void Node::setBool(bool val)
     {
-        value = Override<bool>{ val };
+        value.get<Override<bool>>().set(val);
     }
 
     struct UnSet
@@ -579,7 +578,8 @@ namespace Ent
         bool operator()(U const& notOverride) const
         {
             (void*)&notOverride;
-            throw BadType();
+            // throw BadType();
+            return true; // Object and Array are always considered as overrided
         }
     };
 
@@ -629,10 +629,12 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            auto itemSchema = schema->singularItems.get();
-            value.get<Array>().data.emplace_back(
-                std::make_unique<Node>(loadNode(*itemSchema, json())));
-            return value.get<Array>().data.back().get();
+            if (auto itemSchema = schema->singularItems.get())
+            {
+                value.get<Array>().data.emplace_back(
+                    std::make_unique<Node>(loadNode(*itemSchema, json(), nullptr)));
+                return value.get<Array>().data.back().get();
+            }
         }
         throw BadType();
     }
@@ -648,10 +650,14 @@ namespace Ent
     // ********************************* Entity ***************************************************
 
     Entity::Entity(
-        std::string _name, std::array<uint8_t, 4> _color, std::map<std::string, Component> _components)
+        std::string _name,
+        std::array<uint8_t, 4> _color,
+        std::map<std::string, Component> _components,
+        tl::optional<std::string> _instanceOf)
         : name(std::move(_name))
         , color(_color)
         , components(std::move(_components))
+        , instanceOf(std::move(_instanceOf))
     {
     }
 
@@ -662,6 +668,10 @@ namespace Ent
     void Entity::setName(std::string _name)
     {
         name = _name;
+    }
+    char const* Entity::getInstanceOf() const
+    {
+        return instanceOf.has_value() ? instanceOf->c_str() : nullptr;
     }
     std::array<uint8_t, 4> Entity::getColor() const
     {
@@ -681,17 +691,19 @@ namespace Ent
             }
         }
         Ent::Subschema const& compSchema = entlib.schema.definitions.at(type);
-        Ent::Component comp{ type, loadNode(compSchema, json()), 1, components.size() };
+        Ent::Component comp{ type, loadNode(compSchema, json(), nullptr), 1, components.size() };
         auto iter_bool = components.emplace(type, std::move(comp));
         return &(iter_bool.first->second);
     }
     Component const* Entity::getComponent(char const* type) const
     {
-        return &(components.at(type));
+        auto iter = components.find(type);
+        return iter == components.end() ? nullptr : &(iter->second);
     }
     Component* Entity::getComponent(char const* type)
     {
-        return &(components.at(type));
+        auto iter = components.find(type);
+        return iter == components.end() ? nullptr : &(iter->second);
     }
     void Entity::removeComponent(char const* type)
     {
@@ -765,44 +777,56 @@ static Ent::Node loadFreeObjectNode(json const& data)
     return result;
 }
 
-static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data)
+static Ent::Node const emptyNode(Ent::Null(), nullptr);
+
+static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, Ent::Node const* super)
 {
     Ent::Node result;
+
     switch (nodeSchema.type)
     {
     case Ent::DataType::null: result = Ent::Node(Ent::Null{}, &nodeSchema); break;
     case Ent::DataType::string:
+    {
+        std::string const def = nodeSchema.defaultValue.is_null() ?
+                                    std::string() :
+                                    nodeSchema.defaultValue.get<std::string>();
+        std::string const supVal = super ? super->getString() : def;
+        result = Ent::Node(Ent::Override<std::string>(supVal), &nodeSchema);
         if (data.is_string())
-            result = Ent::Node(Ent::Override<std::string>(data.get<std::string>()), &nodeSchema);
-        else if(not nodeSchema.defaultValue.is_null())
-            result = Ent::Node(Ent::Override<std::string>(nodeSchema.defaultValue.get<std::string>()), &nodeSchema);
-        else
-            result = Ent::Node(Ent::Override<std::string>(), &nodeSchema);
-        break;
+            result.setString(data.get<std::string>().c_str());
+    }
+    break;
     case Ent::DataType::boolean:
+    {
+        bool const def =
+            nodeSchema.defaultValue.is_null() ? false : nodeSchema.defaultValue.get<bool>();
+        bool const supVal = super ? super->getBool() : def;
+        result = Ent::Node(Ent::Override<bool>(supVal), &nodeSchema);
         if (data.is_boolean())
-            result = Ent::Node(Ent::Override<bool>(data.get<bool>()), &nodeSchema);
-        else if (not nodeSchema.defaultValue.is_null())
-            result = Ent::Node(Ent::Override<bool>(nodeSchema.defaultValue.get<bool>()), &nodeSchema);
-        else
-            result = Ent::Node(Ent::Override<bool>(), &nodeSchema);
-        break;
+            result.setBool(data.get<bool>());
+    }
+    break;
     case Ent::DataType::integer:
-        if (data.is_number_integer() or data.is_number_unsigned() or data.is_number_float())
-            result = Ent::Node(Ent::Override<int64_t>(data.get<int64_t>()), &nodeSchema);
-        else if (not nodeSchema.defaultValue.is_null())
-            result = Ent::Node(Ent::Override<int64_t>(nodeSchema.defaultValue.get<int64_t>()), &nodeSchema);
-        else
-            result = Ent::Node(Ent::Override<int64_t>(), &nodeSchema);
-        break;
+    {
+        int64_t const def =
+            nodeSchema.defaultValue.is_null() ? false : nodeSchema.defaultValue.get<int64_t>();
+        int64_t const supVal = super ? super->getInt() : def;
+        result = Ent::Node(Ent::Override<int64_t>(supVal), &nodeSchema);
+        if (data.is_number_integer() or data.is_number_unsigned())
+            result.setInt(data.get<int64_t>());
+    }
+    break;
     case Ent::DataType::number:
-        if (data.is_number_integer() or data.is_number_unsigned() or data.is_number_float())
-            result = Ent::Node(Ent::Override<float>(data.get<float>()), &nodeSchema);
-        else if (not nodeSchema.defaultValue.is_null())
-            result = Ent::Node(Ent::Override<float>(nodeSchema.defaultValue.get<float>()), &nodeSchema);
-        else
-            result = Ent::Node(Ent::Override<float>(), &nodeSchema);
-        break;
+    {
+        float const def =
+            nodeSchema.defaultValue.is_null() ? false : nodeSchema.defaultValue.get<float>();
+        float const supVal = super ? super->getFloat() : def;
+        result = Ent::Node(Ent::Override<float>(supVal), &nodeSchema);
+        if (data.is_number_float())
+            result.setFloat(data.get<float>());
+    }
+    break;
     case Ent::DataType::object:
     {
         Ent::Object object;
@@ -810,17 +834,11 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data)
         for (auto&& name_sub : nodeSchema.properties)
         {
             std::string const& name = std::get<0>(name_sub);
-            if (data.count(name))
-            {
-                json const& value = data.at(name);
-                Ent::Node tmpNode = loadNode(std::get<1>(name_sub), value);
-                object.emplace(name, std::make_unique<Ent::Node>(std::move(tmpNode)));
-            }
-            else
-            {
-                Ent::Node tmpNode = loadNode(std::get<1>(name_sub), json{});
-                object.emplace(name, std::make_unique<Ent::Node>(std::move(tmpNode)));
-            }
+            Ent::Node const* superProp = super ? super->at(name.c_str()) : nullptr;
+            static json const emptyJson;
+            json const& prop = data.count(name) ? data.at(name) : emptyJson;
+            Ent::Node tmpNode = loadNode(std::get<1>(name_sub), prop, superProp);
+            object.emplace(name, std::make_unique<Ent::Node>(std::move(tmpNode)));
         }
         result = Ent::Node(std::move(object), &nodeSchema);
     }
@@ -828,12 +846,34 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data)
     case Ent::DataType::array:
     {
         Ent::Array arr;
-        for (auto const& item : data)
+        size_t index = 0;
+        if (nodeSchema.singularItems)
         {
-            Ent::Node tmpNode = loadNode(*nodeSchema.singularItems, item);
-            arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
+            for (auto const& item : data)
+            {
+                Ent::Node const* subSuper =
+                    (super and (super->size() > index)) ? super->at(index) : nullptr;
+                Ent::Node tmpNode = loadNode(*nodeSchema.singularItems, item, subSuper);
+                arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
+                ++index;
+            }
+            arr.size = static_cast<int64_t>(data.size());
         }
-        arr.size = static_cast<int64_t>(data.size());
+        else
+        {
+            assert(nodeSchema.linearItems.has_value());
+            for (Ent::Subschema const& sub : *nodeSchema.linearItems)
+            {
+                Ent::Node const* subSuper =
+                    (super and super->size() > index) ? super->at(index) : nullptr;
+                static json const emptyJson;
+                json const& prop = data.size() > index ? data.at(index) : emptyJson;
+                Ent::Node tmpNode = loadNode(sub, prop, subSuper);
+                arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
+                ++index;
+            }
+            arr.size = static_cast<int64_t>(nodeSchema.linearItems->size());
+        }
         result = Ent::Node(std::move(arr), &nodeSchema);
     }
     break;
@@ -907,8 +947,11 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
         {
             auto&& name = std::get<0>(name_sub);
             Ent::Node const* subNode = node.at(name.c_str());
-            json subJson = saveNode(std::get<1>(name_sub), *subNode);
-            data[name] = std::move(subJson);
+            if (subNode->isSet())
+            {
+                json subJson = saveNode(std::get<1>(name_sub), *subNode);
+                data[name] = std::move(subJson);
+            }
         }
     }
     break;
@@ -928,8 +971,15 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
         data = json::array();
         for (Ent::Node const* item : node.getItems())
         {
-            json tmpNode = saveNode(*schema.singularItems, *item);
-            data.emplace_back(std::move(tmpNode));
+            if (item->isSet())
+            {
+                json tmpNode = saveNode(*schema.singularItems, *item);
+                data.emplace_back(std::move(tmpNode));
+            }
+            else
+            {
+                data.emplace_back(json());
+            }
         }
     }
     break;
@@ -937,9 +987,17 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
     return data;
 }
 
-static Ent::Entity loadEntity(Ent::Schema const& schema, json const& entNode)
+static Ent::Entity loadEntity(Ent::EntityLib const& entlib, Ent::Schema const& schema, json const& entNode)
 {
     // TODO override, types and default values
+
+    tl::optional<std::string> instanceOf;
+    Ent::Entity superEntity;
+    if (entNode.count("InstanceOf"))
+    {
+        instanceOf = entNode.at("InstanceOf").get<std::string>();
+        superEntity = entlib.loadEntity(*instanceOf);
+    }
 
     auto name = entNode.at("Name").get<std::string>();
 
@@ -959,17 +1017,21 @@ static Ent::Entity loadEntity(Ent::Schema const& schema, json const& entNode)
     for (json const& compNode : componentsNode)
     {
         auto const cmpType = compNode.at("Type").get<std::string>();
+        Ent::Component* superComp = superEntity.getComponent(cmpType.c_str());
         auto const version = compNode.at("Version").get<size_t>();
         json const& data = compNode.at("Data");
 
         Ent::Subschema const& compSchema = schema.definitions.at(cmpType);
 
-        Ent::Component comp{ cmpType, loadNode(compSchema, data), version, index };
+        Ent::Component comp{ cmpType,
+                             loadNode(compSchema, data, (superComp ? &superComp->root : nullptr)),
+                             version,
+                             index };
 
         components.emplace(cmpType, std::move(comp));
         ++index;
     }
-    return Ent::Entity(std::move(name), color, std::move(components));
+    return Ent::Entity(std::move(name), color, std::move(components), instanceOf);
 }
 
 Ent::Entity Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath) const
@@ -985,7 +1047,7 @@ Ent::Entity Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath) 
     json document;
     file >> document;
 
-    Ent::Entity ent = ::loadEntity(schema, document);
+    Ent::Entity ent = ::loadEntity(*this, schema, document);
     return ent;
 }
 
@@ -1014,7 +1076,7 @@ Ent::Scene Ent::EntityLib::loadScene(std::filesystem::path const& scenePath) con
 
     for (json const& entNode : document.at("Objects"))
     {
-        Ent::Entity ent = ::loadEntity(schema, entNode);
+        Ent::Entity ent = ::loadEntity(*this, schema, entNode);
         scene.objects.emplace_back(std::move(ent));
     }
 
@@ -1025,7 +1087,13 @@ static json saveEntity(Ent::Schema const& schema, Ent::Entity const& entity)
 {
     // TODO override, types and default values
     json entNode;
+
     entNode.emplace("Name", entity.getName());
+
+    if (char const* instanceOf = entity.getInstanceOf())
+    {
+        entNode.emplace("InstanceOf", instanceOf);
+    }
 
     entNode.emplace("Color", entity.getColor());
 

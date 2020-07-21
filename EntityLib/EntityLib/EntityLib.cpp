@@ -53,7 +53,7 @@ void freeDocument(json const* adapter)
     delete adapter;
 }
 
-json const& getConstValue(const valijson::constraints::ConstConstraint& c)
+json const& getFrozenValue(valijson::adapters::FrozenValue const* val)
 {
     class NlohmannJsonFrozenValue : public valijson::adapters::FrozenValue
     {
@@ -61,7 +61,6 @@ json const& getConstValue(const valijson::constraints::ConstConstraint& c)
         nlohmann::json m_value;
     };
 
-    valijson::adapters::FrozenValue const* val = c.getValue();
     auto val2 = (NlohmannJsonFrozenValue const*)val;
     return val2->m_value;
 }
@@ -98,6 +97,11 @@ public:
         assert(false && "Unexpected constraint ConstConstraint");
         return true;
     }
+    bool visit(const DefaultConstraint& c) final
+    {
+        schema.defaultValue = getFrozenValue(c.getValue());
+        return true;
+    }
     bool visit(const ContainsConstraint&) final
     {
         assert(false && "Unexpected constraint ContainsConstraint");
@@ -108,14 +112,30 @@ public:
         assert(false && "Unexpected constraint DependenciesConstraint");
         return true;
     }
-    bool visit(const EnumConstraint&) final
+    bool visit(const EnumConstraint& c) final
     {
-        assert(false && "Unexpected constraint EnumConstraint");
+        c.applyToValues([this](valijson::adapters::FrozenValue const& v) {
+            schema.enumValues.push_back(getFrozenValue(&v));
+            return true;
+        });
         return true;
     }
-    bool visit(const LinearItemsConstraint&) final
+    bool visit(const LinearItemsConstraint& c) final
     {
-        assert(false && "Unexpected constraint LinearItemsConstraint");
+        schema.linearItems = std::vector<Ent::Subschema>();
+        c.applyToItemSubschemas([this](unsigned int index, valijson::Subschema const* sc)
+        {
+            FillDefinition fillDef(0);
+            auto visitor = valijson::Schema::ApplyFunction(
+                [&fillDef](valijson::constraints::Constraint const& constraint) {
+                return constraint.accept(fillDef);
+            });
+            bool ok = sc->apply(visitor);
+            if (schema.linearItems->size() <= index)
+                schema.linearItems->resize(index + 1);
+            (*schema.linearItems)[index] = std::move(fillDef.schema);
+            return ok;
+        });
         return true;
     }
     bool visit(const MaximumConstraint&) final
@@ -209,7 +229,7 @@ public:
     }
     bool visit(const RequiredConstraint&) final
     {
-        assert(false && "Unexpected constraint RequiredConstraint");
+        // TODO : load RequiredConstraint
         return true;
     }
     bool visit(const SingularItemsConstraint& c) final
@@ -219,7 +239,7 @@ public:
         {
             Ent::Subschema sub;
             sub.type = Ent::DataType::freeobject;
-            schema.items = std::make_unique<Ent::Subschema>(std::move(sub));
+            schema.singularItems = std::make_unique<Ent::Subschema>(std::move(sub));
         }
         else
         {
@@ -229,7 +249,7 @@ public:
                     return constraint.accept(itemDef);
                 });
             sc->apply(visitor);
-            schema.items = std::make_unique<Ent::Subschema>(std::move(itemDef.schema));
+            schema.singularItems = std::make_unique<Ent::Subschema>(std::move(itemDef.schema));
         }
         return true;
     }
@@ -321,8 +341,6 @@ namespace Ent
 #ifdef ENTLIB_LOADSCHEMA
     EntityLib loadStaticData(std::filesystem::path const& toolsDir) // Read schema and dependencies
     {
-        // TODO : Read componentDependencies
-
         sprintf_s(schemaPath, std::size(schemaPath), "%ls/WildPipeline/Schema", toolsDir.c_str());
 
         json schemaDocument;
@@ -364,7 +382,7 @@ namespace Ent
             auto type = findProperty(sc, "Type");
             //      Find Type to get the name of the componant
             auto constConst = findConstraint<valijson::constraints::ConstConstraint>(type);
-            std::string compName = getConstValue(*constConst).get<std::string>();
+            std::string compName = getFrozenValue(constConst->getValue()).get<std::string>();
 
             // if (compName == "SubScene")
             //    return true;
@@ -611,7 +629,7 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            auto itemSchema = schema->items.get();
+            auto itemSchema = schema->singularItems.get();
             value.get<Array>().data.emplace_back(
                 std::make_unique<Node>(loadNode(*itemSchema, json())));
             return value.get<Array>().data.back().get();
@@ -655,7 +673,6 @@ namespace Ent
     }
     Component* Entity::addComponent(EntityLib const& entlib, char const* type)
     {
-        // TODO : Use dependencies
         if (entlib.componentDependencies.count(type)) // Could be an editor componant
         {
             for (auto&& dep : entlib.componentDependencies.at(type))
@@ -757,38 +774,34 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data)
     case Ent::DataType::string:
         if (data.is_string())
             result = Ent::Node(Ent::Override<std::string>(data.get<std::string>()), &nodeSchema);
+        else if(not nodeSchema.defaultValue.is_null())
+            result = Ent::Node(Ent::Override<std::string>(nodeSchema.defaultValue.get<std::string>()), &nodeSchema);
         else
-            result = Ent::Node(Ent::Override<std::string>(), &nodeSchema); // Add default value
+            result = Ent::Node(Ent::Override<std::string>(), &nodeSchema);
         break;
     case Ent::DataType::boolean:
         if (data.is_boolean())
-        {
             result = Ent::Node(Ent::Override<bool>(data.get<bool>()), &nodeSchema);
-        }
+        else if (not nodeSchema.defaultValue.is_null())
+            result = Ent::Node(Ent::Override<bool>(nodeSchema.defaultValue.get<bool>()), &nodeSchema);
         else
-        {
-            result = Ent::Node(Ent::Override<bool>(), &nodeSchema); // Add default value
-        }
+            result = Ent::Node(Ent::Override<bool>(), &nodeSchema);
         break;
     case Ent::DataType::integer:
         if (data.is_number_integer() or data.is_number_unsigned() or data.is_number_float())
-        {
             result = Ent::Node(Ent::Override<int64_t>(data.get<int64_t>()), &nodeSchema);
-        }
+        else if (not nodeSchema.defaultValue.is_null())
+            result = Ent::Node(Ent::Override<int64_t>(nodeSchema.defaultValue.get<int64_t>()), &nodeSchema);
         else
-        {
-            result = Ent::Node(Ent::Override<int64_t>(), &nodeSchema); // Add default value
-        }
+            result = Ent::Node(Ent::Override<int64_t>(), &nodeSchema);
         break;
     case Ent::DataType::number:
         if (data.is_number_integer() or data.is_number_unsigned() or data.is_number_float())
-        {
             result = Ent::Node(Ent::Override<float>(data.get<float>()), &nodeSchema);
-        }
+        else if (not nodeSchema.defaultValue.is_null())
+            result = Ent::Node(Ent::Override<float>(nodeSchema.defaultValue.get<float>()), &nodeSchema);
         else
-        {
-            result = Ent::Node(Ent::Override<float>(), &nodeSchema); // Add default value
-        }
+            result = Ent::Node(Ent::Override<float>(), &nodeSchema);
         break;
     case Ent::DataType::object:
     {
@@ -817,7 +830,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data)
         Ent::Array arr;
         for (auto const& item : data)
         {
-            Ent::Node tmpNode = loadNode(*nodeSchema.items, item);
+            Ent::Node tmpNode = loadNode(*nodeSchema.singularItems, item);
             arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
         }
         arr.size = static_cast<int64_t>(data.size());
@@ -915,7 +928,7 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
         data = json::array();
         for (Ent::Node const* item : node.getItems())
         {
-            json tmpNode = saveNode(*schema.items, *item);
+            json tmpNode = saveNode(*schema.singularItems, *item);
             data.emplace_back(std::move(tmpNode));
         }
     }
@@ -1087,13 +1100,45 @@ void Ent::mergeComponants(std::filesystem::path const& toolsDir)
     json editionCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/EditionComponents.json");
     auto sceneSchemaPath = toolsDir / "WildPipeline/Schema/Scene-schema.json";
     json sceneSch = loadJsonFile(sceneSchemaPath);
+    json dependencies = loadJsonFile(toolsDir / "WildPipeline/Schema/Dependencies.json");
 
     runtimeCompSch = runtimeCompSch["definitions"];
     editionCompSch = editionCompSch["definitions"];
 
     auto&& compList = sceneSch["definitions"]["Component"]["oneOf"];
     compList = json();
-    auto addComponent = [&compList](std::string const& name, char const* filename) {
+
+    // Looking for components with same name and merge them
+    std::map<std::string, json const*> editionCompMap;
+    std::set<std::string> alreadyInsertedComponents;
+    for (auto&& name_comp : editionCompSch.items())
+    {
+        editionCompMap.emplace(name_comp.key(), &(name_comp.value()));
+    }
+
+    for (json const& dep : dependencies["Dependencies"])
+    {
+        auto name = dep["className"].get<std::string>();
+        auto iter = editionCompMap.find(name);
+        if (iter != editionCompMap.end())
+        {
+            json merged = dep.value("properties", json());
+            merged.update(*iter->second);
+
+            json newComp;
+            auto&& prop = newComp["properties"];
+            prop["Type"]["const"] = name;
+            prop["Data"] = std::move(merged);
+
+            compList.push_back(std::move(newComp));
+            alreadyInsertedComponents.insert(name);
+        }
+    }
+
+    // Add other components
+    auto addComponent = [&](std::string const& name, char const* filename) {
+        if (alreadyInsertedComponents.count(name))
+            return;
         json newComp;
         auto&& prop = newComp["properties"];
         prop["Type"]["const"] = name;
@@ -1101,16 +1146,11 @@ void Ent::mergeComponants(std::filesystem::path const& toolsDir)
 
         compList.push_back(std::move(newComp));
     };
-    auto addComponants = [&compList,
-                          addComponent](json const& componantsSchema, char const* filename) {
-        for (auto&& name_comp : componantsSchema.items())
-        {
-            addComponent(name_comp.key(), filename);
-        }
-    };
-    addComponants(editionCompSch, "EditionComponents.json");
+    for (auto&& name_comp : editionCompSch.items())
+    {
+        addComponent(name_comp.key(), "EditionComponents.json");
+    }
 
-    json dependencies = loadJsonFile(toolsDir / "WildPipeline/Schema/Dependencies.json");
     for (json const& dep : dependencies["Dependencies"])
     {
         auto name = dep["className"].get<std::string>();

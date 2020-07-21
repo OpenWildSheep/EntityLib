@@ -200,6 +200,34 @@ private:
     adapters::FrozenValue *m_value;
 };
 
+class DefaultConstraint : public BasicConstraint<DefaultConstraint>
+{
+public:
+    DefaultConstraint()
+        : m_value(nullptr) { }
+
+    DefaultConstraint(CustomAlloc allocFn, CustomFree freeFn)
+        : BasicConstraint(allocFn, freeFn),
+        m_value(nullptr) { }
+
+    DefaultConstraint(const DefaultConstraint &other)
+        : BasicConstraint(other),
+        m_value(other.m_value->clone()) { }
+
+    adapters::FrozenValue * getValue() const
+    {
+        return m_value;
+    }
+
+    void setValue(const adapters::Adapter &value)
+    {
+        m_value = value.freeze();
+    }
+
+private:
+    adapters::FrozenValue *m_value;
+};
+
 /**
  * @brief  Represents a 'contains' constraint
  *

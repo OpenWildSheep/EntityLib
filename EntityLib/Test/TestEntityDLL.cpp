@@ -58,9 +58,9 @@ void displaySubSchema(std::string const& name, Ent::Subschema const& subschema, 
             std::cout << indent << "  minItems:" << subschema.minItems << std::endl;
         if (subschema.maxItems != size_t(-1))
             std::cout << indent << "  maxItems:" << subschema.maxItems << std::endl;
-        if (subschema.items != nullptr)
+        if (subschema.singularItems != nullptr)
         {
-            displaySubSchema("items", *subschema.items, indent + "  ");
+            displaySubSchema("items", *subschema.singularItems, indent + "  ");
         }
         break;
     case Ent::DataType::boolean: std::cout << "boolean" << std::endl; break;
@@ -82,7 +82,7 @@ void displaySubSchema(std::string const& name, Ent::Subschema const& subschema, 
 int main() // int argc, char** argv
 try
 {
-    // Ent::mergeComponants("X:/Tools");
+    Ent::mergeComponants("X:/Tools");
 
     // ******************************** Test iteration of schema **********************************
     Ent::EntityLib entlib = Ent::loadStaticData("X:/Tools");
@@ -112,6 +112,7 @@ try
     heightObj->root.at("DisplaceNoiseList")->push();
 
     scene.objects.front().addComponent(entlib, "BeamGenerator");
+    scene.objects.front().addComponent(entlib, "ExplosionEffect");
 
     entlib.saveScene(scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene");
 

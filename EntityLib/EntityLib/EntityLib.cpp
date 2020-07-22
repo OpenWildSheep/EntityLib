@@ -277,9 +277,49 @@ namespace Ent
         }
     };
 
+    struct MakeInstanceOf
+    {
+        Subschema const* schema;
+
+        template <typename T>
+        Node operator()(Override<T> const& ov) const
+        {
+            return Node(ov.makeInstanceOf(), schema);
+        }
+
+        Node operator()(Null const&) const
+        {
+            return Node(Null{}, schema);
+        }
+
+        Node operator()(Array const& arr) const
+        {
+            Array out;
+            for (auto&& item : arr.data)
+                out.data.emplace_back(std::make_unique<Node>(item->makeInstanceOf()));
+            out.size = arr.size.detach();
+            return Node(std::move(out), schema);
+        }
+
+        Node operator()(Object const& obj) const
+        {
+            Object out;
+            for (auto&& name_node : obj)
+                out.emplace(
+                    std::get<0>(name_node),
+                    std::make_unique<Node>(std::get<1>(name_node)->makeInstanceOf()));
+            return Node(std::move(out), schema);
+        }
+    };
+
     Node Node::detach() const
     {
         return std::apply_visitor(Detach{ schema }, value);
+    }
+
+    Node Node::makeInstanceOf() const
+    {
+        return std::apply_visitor(MakeInstanceOf{ schema }, value);
     }
 
     std::vector<char const*> Node::getFieldNames() const
@@ -336,12 +376,14 @@ namespace Ent
 
     Entity::Entity(
         std::string _name,
-        std::array<uint8_t, 4> _color,
         std::map<std::string, Component> _components,
+        tl::optional<std::array<uint8_t, 4>> _color,
+        tl::optional<std::string> _thumbnail,
         tl::optional<std::string> _instanceOf)
         : name(std::move(_name))
-        , color(_color)
         , components(std::move(_components))
+        , color(_color)
+        , thumbnail(std::move(_thumbnail))
         , instanceOf(std::move(_instanceOf))
     {
     }
@@ -358,9 +400,13 @@ namespace Ent
     {
         return instanceOf.has_value() ? instanceOf->c_str() : nullptr;
     }
-    std::array<uint8_t, 4> Entity::getColor() const
+    char const* Entity::getThumbnail() const
     {
-        return color;
+        return thumbnail.has_value() ? thumbnail->c_str() : nullptr;
+    }
+    std::array<uint8_t, 4> const* Entity::getColor() const
+    {
+        return color.has_value() ? &(*color) : nullptr;
     }
     void Entity::setColor(std::array<uint8_t, 4> _color)
     {
@@ -697,16 +743,21 @@ static Ent::Entity loadEntity(Ent::EntityLib const& entlib, Ent::Schema const& s
         superEntity = entlib.loadEntity(*instanceOf);
     }
 
+    tl::optional<std::string> const thumbnail = entNode.count("Thumbnail") ?
+                                                    entNode.at("Thumbnail").get<std::string>() :
+                                                    tl::optional<std::string>();
+
     auto name = entNode.at("Name").get<std::string>();
 
-    std::array<uint8_t, 4> color{}; // {} => init to zero
+    tl::optional<std::array<uint8_t, 4>> color;
     if (entNode.contains("Color"))
     {
+        color.emplace();
         json const& colorNode = entNode.at("Color");
-        colorNode[0].get_to(color[0]);
-        colorNode[1].get_to(color[1]);
-        colorNode[2].get_to(color[2]);
-        colorNode[3].get_to(color[3]);
+        colorNode[0].get_to(color->at(0));
+        colorNode[1].get_to(color->at(1));
+        colorNode[2].get_to(color->at(2));
+        colorNode[3].get_to(color->at(3));
     }
 
     std::map<std::string, Ent::Component> components;
@@ -729,7 +780,22 @@ static Ent::Entity loadEntity(Ent::EntityLib const& entlib, Ent::Schema const& s
         components.emplace(cmpType, std::move(comp));
         ++index;
     }
-    return Ent::Entity(std::move(name), color, std::move(components), instanceOf);
+    // Add undeclared componants to be able to get values inside (They are full reference to prefab)
+    for (auto const& type_comp : superEntity.getComponents())
+    {
+        auto const& cmpType = std::get<0>(type_comp);
+        auto const& superComp = std::get<1>(type_comp);
+        if (not components.count(cmpType))
+        {
+            Ent::Component comp{
+                cmpType, superComp.root.makeInstanceOf(), superComp.version, superComp.index
+            };
+
+            components.emplace(cmpType, std::move(comp));
+        }
+        ++index;
+    }
+    return Ent::Entity(std::move(name), std::move(components), color, thumbnail, instanceOf);
 }
 
 Ent::Entity Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath) const
@@ -793,9 +859,17 @@ static json saveEntity(Ent::Schema const& schema, Ent::Entity const& entity)
         entNode.emplace("InstanceOf", instanceOf);
     }
 
-    entNode.emplace("Color", entity.getColor());
+    if (std::array<uint8_t, 4> const* color = entity.getColor())
+    {
+        entNode.emplace("Color", *color);
+    }
 
-    json& componentsNode = entNode["Components"];
+    if (const char* thumbnail = entity.getThumbnail())
+    {
+        entNode.emplace("Thumbnail", thumbnail);
+    }
+
+    json& componentsNode = entNode["Components"] = json::array();
     std::vector<Ent::Component const*> sortedComp;
     for (auto&& type_comp : entity.getComponents())
     {
@@ -831,7 +905,22 @@ Ent::Entity Ent::EntityLib::detachEntityFromPrefab(Entity const& entity) const
         components.emplace(type, std::move(detachedComp));
         ++index;
     }
-    return Ent::Entity(std::move(entity.getName()), entity.getColor(), std::move(components));
+    return Ent::Entity(
+        std::move(entity.getName()),
+        std::move(components),
+        entity.getColor() ? *entity.getColor() : tl::optional<std::array<uint8_t, 4>>(),
+        entity.getThumbnail() ? entity.getThumbnail() : tl::optional<std::string>());
+}
+
+Ent::Entity Ent::EntityLib::makeInstanceOf(
+    std::string name, std::string _instanceOf, tl::optional<std::array<uint8_t, 4>> color)
+{
+    return Ent::Entity(
+        std::move(name),
+        std::map<std::string, Ent::Component>(),
+        color,
+        tl::nullopt,
+        std::move(_instanceOf));
 }
 
 void Ent::EntityLib::saveEntity(Entity const& entity, std::filesystem::path const& entityPath) const

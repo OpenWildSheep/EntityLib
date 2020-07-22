@@ -58,6 +58,8 @@ namespace Ent
 
         Override<V> detach() const;
 
+        Override<V> makeInstanceOf() const;
+
     public:
         V defaultValue = V();
         tl::optional<V> prefabValue;
@@ -139,6 +141,8 @@ namespace Ent
 
         Node detach() const;
 
+        Node makeInstanceOf() const;
+
     private:
         Subschema const* schema = nullptr;
         Value value;
@@ -159,8 +163,9 @@ namespace Ent
         Entity() = default;
         Entity(
             std::string _name,
-            std::array<uint8_t, 4> _color,
             std::map<std::string, Component> _components,
+            tl::optional<std::array<uint8_t, 4>> color = tl::nullopt,
+            tl::optional<std::string> _thumbnail = tl::nullopt,
             tl::optional<std::string> _instanceOf = tl::nullopt);
         Entity(Entity const&) = delete;
         Entity& operator=(Entity const&) = delete;
@@ -170,7 +175,8 @@ namespace Ent
         char const* getName() const;
         void setName(std::string name);
         char const* getInstanceOf() const;
-        std::array<uint8_t, 4> getColor() const;
+        char const* getThumbnail() const;
+        std::array<uint8_t, 4> const* getColor() const;
         void setColor(std::array<uint8_t, 4> color);
 
         Component* addComponent(EntityLib const& entlib, char const* type);
@@ -181,10 +187,11 @@ namespace Ent
         std::map<std::string, Component> const& getComponents() const;
 
     private:
-        tl::optional<std::string> instanceOf;
         std::string name;
-        std::array<uint8_t, 4> color;
         std::map<std::string, Component> components;
+        tl::optional<std::array<uint8_t, 4>> color;
+        tl::optional<std::string> thumbnail;
+        tl::optional<std::string> instanceOf;
     };
 
     struct Scene
@@ -199,8 +206,7 @@ namespace Ent
         Schema schema;
         std::map<std::string, std::vector<std::string>> componentDependencies;
 
-        EntityLib() = default;
-        EntityLib(std::filesystem::path const& toolsDir);
+        explicit EntityLib(std::filesystem::path const& toolsDir);
         EntityLib(EntityLib const&) = delete;
         EntityLib& operator=(EntityLib const&) = delete;
         EntityLib(EntityLib&&) = default;
@@ -218,7 +224,13 @@ namespace Ent
 
         void saveScene(Scene const& scene, std::filesystem::path const& scenePath) const;
 
+        /// Add nothing if already exist
         Component* addComponent(Entity& entity, char const* type) const;
+
+        static Entity makeInstanceOf(
+            std::string name,
+            std::string _instanceOf,
+            tl::optional<std::array<uint8_t, 4>> color = tl::nullopt);
     };
 
     // *************************** Implem details - method bodies *********************************
@@ -262,6 +274,15 @@ namespace Ent
             return Override<V>(defaultValue, tl::nullopt, overrideValue);
         else
             return Override<V>(defaultValue, tl::nullopt, prefabValue);
+    }
+
+    template <typename V>
+    Override<V> Override<V>::makeInstanceOf() const
+    {
+        if (overrideValue.has_value())
+            return Override<V>(defaultValue, overrideValue, tl::nullopt);
+        else
+            return Override<V>(defaultValue, prefabValue, tl::nullopt);
     }
 
     // *********************** Merge Runtime componants into Entity schema ************************

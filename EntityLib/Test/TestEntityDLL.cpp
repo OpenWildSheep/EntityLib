@@ -82,19 +82,26 @@ void displaySubSchema(std::string const& name, Ent::Subschema const& subschema, 
 int main() // int argc, char** argv
 try
 {
-    Ent::mergeComponants("X:/Tools");
+    // Ent::mergeComponants("X:/Tools");
 
     Ent::EntityLib entlib("X:/Tools");
 
     {
-        // Test read prefab
         Ent::Entity ent = entlib.loadEntity("prefab.entity");
+
+        // Test read Thumbnail
+        ENTLIB_ASSERT(ent.getThumbnail() != nullptr);
+        ENTLIB_ASSERT(ent.getThumbnail() == std::string("TestThumbnail"));
+
+        // Test read prefab
         Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
         ENTLIB_ASSERT(sysCreat != nullptr);
 
         // TEST read setted values
         ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Shamans")); // set
+        ENTLIB_ASSERT(sysCreat->root.at("Faction")->isSet()); // is set
         ENTLIB_ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
+        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->isSet()); // is set
 
         // TEST read array
         ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->isSet());
@@ -145,6 +152,12 @@ try
             sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // Inherited
         ENTLIB_ASSERT(sysCreat->root.at("Life")->getFloat() == 1000.f); // Inherited
 
+        // TEST read inherited values in inherited component
+        Ent::Component* heightObj = ent.getComponent("HeightObj");
+        ENTLIB_ASSERT(heightObj != nullptr);
+        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
+        ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isSet());
+
         // TEST read default value
         ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // Inherited (from default)
         ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
@@ -178,6 +191,12 @@ try
         Ent::Entity ent = entlib.loadEntity("instance.copy.entity");
         Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
         ENTLIB_ASSERT(sysCreat != nullptr);
+
+        // TEST read inherited values in inherited component
+        Ent::Component* heightObj = ent.getComponent("HeightObj");
+        ENTLIB_ASSERT(heightObj != nullptr);
+        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
+        ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isSet());
 
         // TEST read overrided value
         ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Plouf")); // Overrided
@@ -220,11 +239,73 @@ try
     }
 
     {
-        // Detach Entity
-        // Test read instance of
+        // Test create detached
         Ent::Entity ent = entlib.loadEntity("instance.entity");
         Ent::Entity detached = entlib.detachEntityFromPrefab(ent);
+
+        Ent::Component* sysCreat = detached.getComponent("SystemicCreature");
+
+        // TEST default values
+        ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
+        ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root.at("Name")->getString() == std::string()); // default
+        ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
+
+        // TEST read setted values
+        ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Plouf")); // set
+        ENTLIB_ASSERT(sysCreat->root.at("Faction")->isSet()); // is set
+        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
+        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->isSet()); // is set
+
         entlib.saveEntity(detached, "instance.detached.entity");
+    }
+    {
+        // Test read detached
+        Ent::Entity ent = entlib.loadEntity("instance.detached.entity");
+
+        Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
+
+        // TEST default values
+        ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
+        ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root.at("Name")->getString() == std::string()); // default
+        ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
+
+        // TEST read setted values
+        ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Plouf")); // set
+        ENTLIB_ASSERT(sysCreat->root.at("Faction")->isSet()); // is set
+        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
+        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->isSet()); // is set
+    }
+
+    {
+        // Test create instance of
+        Ent::Entity instanceOf = entlib.makeInstanceOf("test_makeInstanceOf", "prefab.entity");
+        entlib.saveEntity(instanceOf, "instance.create.entity");
+    }
+    {
+        // Test read instance of
+        Ent::Entity ent = entlib.loadEntity("instance.create.entity");
+
+        // Test read prefab
+        Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
+        ENTLIB_ASSERT(sysCreat != nullptr);
+
+        // TEST read setted values
+        ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Shamans"));
+        ENTLIB_ASSERT(not sysCreat->root.at("Faction")->isSet()); // Not overrided
+        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey"));
+        ENTLIB_ASSERT(not sysCreat->root.at("Inventory")->isSet()); // Not overrided
+
+        // TEST read array
+        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->isSet()); // Arrays are always set
+        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->size() == 3);
+
+        // TEST default values
+        ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
+        ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root.at("Name")->getString() == std::string()); // default
+        ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
     }
 
     // ******************************** Test iteration of schema **********************************

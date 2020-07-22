@@ -1,334 +1,26 @@
 #include "include/EntityLib.h"
 
+#include "Tools.h"
+#include "SchemaLoader.h"
+
 #pragma warning(push, 0)
 #include <iostream>
 #include <fstream>
+#include <set>
 
 #include "external/json.hpp"
-#ifdef ENTLIB_LOADSCHEMA
-#include <valijson/adapters/nlohmann_json_adapter.hpp>
-#include <valijson/utils/nlohmann_json_utils.hpp>
-#include <valijson/schema.hpp>
-#include <valijson/schema_parser.hpp>
-#endif
+// TODO Add valid check
+//#include <valijson/adapters/nlohmann_json_adapter.hpp>
+//#include <valijson/utils/nlohmann_json_utils.hpp>
+//#include <valijson/schema.hpp>
+//#include <valijson/schema_parser.hpp>
 #pragma warning(pop)
 
 using namespace nlohmann;
 
-char schemaPath[2048] = {};
-
-static json loadJsonFile(std::filesystem::path const& path)
-{
-    std::ifstream file(path);
-    if (not file.is_open())
-    {
-        throw std::runtime_error("Can't open file for read: " + path.u8string());
-    }
-    json doc;
-    doc << file;
-    return doc;
-};
+// char schemaPath[2048] = {};
 
 static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, Ent::Node const* super);
-
-#ifdef ENTLIB_LOADSCHEMA
-
-json const* fetchDocument(const std::string& uri)
-{
-    std::string const cleanPath =
-        schemaPath + ("/" + (uri.substr(0, 7) == "file://" ? uri.substr(7, uri.size()) : uri));
-
-    json* fetchedRoot = new json{};
-    if (!valijson::utils::loadDocument(cleanPath, *fetchedRoot))
-    {
-        fprintf(stderr, "Can't load file %s\n", cleanPath.c_str());
-        return nullptr;
-    }
-
-    return fetchedRoot;
-}
-
-void freeDocument(json const* adapter)
-{
-    delete adapter;
-}
-
-json const& getFrozenValue(valijson::adapters::FrozenValue const* val)
-{
-    class NlohmannJsonFrozenValue : public valijson::adapters::FrozenValue
-    {
-    public:
-        nlohmann::json m_value;
-    };
-
-    auto val2 = (NlohmannJsonFrozenValue const*)val;
-    return val2->m_value;
-}
-
-/// Interface to allow usage of the visitor pattern with Constraints
-class FillDefinition : public valijson::constraints::ConstraintVisitor
-{
-public:
-    int subSceneLevel; // Are we in the special case of the Embeded in SubScene ?
-    Ent::Subschema schema;
-
-    FillDefinition(int _subSceneLevel)
-        : subSceneLevel(_subSceneLevel)
-    {
-    }
-
-    bool visit(const AllOfConstraint&) final
-    {
-        assert(false && "Unexpected constraint AllOfConstraint");
-        return true;
-    }
-    bool visit(const AnyOfConstraint&) final
-    {
-        assert(false && "Unexpected constraint AnyOfConstraint");
-        return true;
-    }
-    bool visit(const ConditionalConstraint&) final
-    {
-        assert(false && "Unexpected constraint ConditionalConstraint");
-        return true;
-    }
-    bool visit(const ConstConstraint&) final
-    {
-        assert(false && "Unexpected constraint ConstConstraint");
-        return true;
-    }
-    bool visit(const DefaultConstraint& c) final
-    {
-        schema.defaultValue = getFrozenValue(c.getValue());
-        return true;
-    }
-    bool visit(const ContainsConstraint&) final
-    {
-        assert(false && "Unexpected constraint ContainsConstraint");
-        return true;
-    }
-    bool visit(const DependenciesConstraint&) final
-    {
-        assert(false && "Unexpected constraint DependenciesConstraint");
-        return true;
-    }
-    bool visit(const EnumConstraint& c) final
-    {
-        c.applyToValues([this](valijson::adapters::FrozenValue const& v) {
-            schema.enumValues.push_back(getFrozenValue(&v));
-            return true;
-        });
-        return true;
-    }
-    bool visit(const LinearItemsConstraint& c) final
-    {
-        schema.linearItems = std::vector<Ent::Subschema>();
-        c.applyToItemSubschemas([this](unsigned int index, valijson::Subschema const* sc) {
-            FillDefinition fillDef(0);
-            auto visitor = valijson::Schema::ApplyFunction(
-                [&fillDef](valijson::constraints::Constraint const& constraint) {
-                    return constraint.accept(fillDef);
-                });
-            bool ok = sc->apply(visitor);
-            if (schema.linearItems->size() <= index)
-                schema.linearItems->resize(index + 1);
-            (*schema.linearItems)[index] = std::move(fillDef.schema);
-            return ok;
-        });
-        return true;
-    }
-    bool visit(const MaximumConstraint&) final
-    {
-        assert(false && "Unexpected constraint MaximumConstraint");
-        return true;
-    }
-    bool visit(const MaxItemsConstraint& c) final
-    {
-        schema.maxItems = c.getMaxItems();
-        return true;
-    }
-    bool visit(const MaxLengthConstraint&) final
-    {
-        assert(false && "Unexpected constraint MaxLengthConstraint");
-        return true;
-    }
-    bool visit(const MaxPropertiesConstraint&) final
-    {
-        assert(false && "Unexpected constraint MaxPropertiesConstraint");
-        return true;
-    }
-    bool visit(const MinimumConstraint&) final
-    {
-        assert(false && "Unexpected constraint MinimumConstraint");
-        return true;
-    }
-    bool visit(const MinItemsConstraint& c) final
-    {
-        schema.minItems = c.getMinItems();
-        return true;
-    }
-    bool visit(const MinLengthConstraint&) final
-    {
-        assert(false && "Unexpected constraint MinLengthConstraint");
-        return true;
-    }
-    bool visit(const MinPropertiesConstraint&) final
-    {
-        assert(false && "Unexpected constraint MinPropertiesConstraint");
-        return true;
-    }
-    bool visit(const MultipleOfDoubleConstraint&) final
-    {
-        assert(false && "Unexpected constraint MultipleOfDoubleConstraint");
-        return true;
-    }
-    bool visit(const MultipleOfIntConstraint&) final
-    {
-        assert(false && "Unexpected constraint MultipleOfIntConstraint");
-        return true;
-    }
-    bool visit(const NotConstraint&) final
-    {
-        assert(false && "Unexpected constraint NotConstraint");
-        return true;
-    }
-    bool visit(const OneOfConstraint&) final
-    {
-        assert(false && "Unexpected constraint OneOfConstraint");
-        return true;
-    }
-    bool visit(const PatternConstraint&) final
-    {
-        assert(false && "Unexpected constraint PatternConstraint");
-        return true;
-    }
-    bool visit(const PolyConstraint&) final
-    {
-        assert(false && "Unexpected constraint PolyConstraint");
-        return true;
-    }
-    bool visit(const PropertiesConstraint& c) final
-    {
-        c.applyToProperties([this](auto const& propName, valijson::Subschema const* sc) {
-            FillDefinition fillDef(propName == "Embedded" ? subSceneLevel + 1 : 0);
-            auto visitor = valijson::Schema::ApplyFunction(
-                [&fillDef](valijson::constraints::Constraint const& constraint) {
-                    return constraint.accept(fillDef);
-                });
-            bool ok = sc->apply(visitor);
-            schema.properties.emplace(propName.c_str(), std::move(fillDef.schema));
-            return ok;
-        });
-        return true;
-    }
-    bool visit(const PropertyNamesConstraint&) final
-    {
-        assert(false && "Unexpected constraint PropertyNamesConstraint");
-        return true;
-    }
-    bool visit(const RequiredConstraint&) final
-    {
-        // TODO : load RequiredConstraint
-        return true;
-    }
-    bool visit(const SingularItemsConstraint& c) final
-    {
-        auto sc = c.getItemsSubschema();
-        if (subSceneLevel == 2) // We are in the "SubScene"/"properties"/"Embedded"/"items"
-        {
-            Ent::Subschema sub;
-            sub.type = Ent::DataType::freeobject;
-            schema.singularItems = std::make_unique<Ent::Subschema>(std::move(sub));
-        }
-        else
-        {
-            FillDefinition itemDef(0);
-            auto visitor = valijson::Schema::ApplyFunction(
-                [&itemDef](valijson::constraints::Constraint const& constraint) {
-                    return constraint.accept(itemDef);
-                });
-            sc->apply(visitor);
-            schema.singularItems = std::make_unique<Ent::Subschema>(std::move(itemDef.schema));
-        }
-        return true;
-    }
-    bool visit(const TypeConstraint& c) final
-    {
-        c.applyToNamedTypes([this](valijson::constraints::TypeConstraint::JsonType type) {
-            assert((schema.type == Ent::DataType::null) && "Multiple type in Subschema is Unexpected");
-            switch (type)
-            {
-            case valijson::constraints::TypeConstraint::kAny:
-                assert("Unexpected JSON schema type : Any");
-                break;
-            case valijson::constraints::TypeConstraint::kArray:
-                schema.type = Ent::DataType::array;
-                break;
-            case valijson::constraints::TypeConstraint::kBoolean:
-                schema.type = Ent::DataType::boolean;
-                break;
-            case valijson::constraints::TypeConstraint::kInteger:
-                schema.type = Ent::DataType::integer;
-                break;
-            case valijson::constraints::TypeConstraint::kNull:
-                schema.type = Ent::DataType::null;
-                break;
-            case valijson::constraints::TypeConstraint::kNumber:
-                schema.type = Ent::DataType::number;
-                break;
-            case valijson::constraints::TypeConstraint::kObject:
-                schema.type = Ent::DataType::object;
-                break;
-            case valijson::constraints::TypeConstraint::kString:
-                schema.type = Ent::DataType::string;
-                break;
-            }
-            return true;
-        });
-
-        return true;
-    }
-    bool visit(const UniqueItemsConstraint&) final
-    {
-        assert(false && "Unexpected constraint UniqueItemsConstraint");
-        return true;
-    }
-};
-
-// ******************************* Utilities to search in schema **********************************
-
-template <typename Cons>
-Cons const* findConstraint(valijson::Subschema const* sc)
-{
-    Cons const* foundConstraint = nullptr;
-    valijson::Schema::ApplyFunction findPropConstF = [&](valijson::constraints::Constraint const& c) {
-        if (Cons const* found = dynamic_cast<Cons const*>(&c))
-        {
-            foundConstraint = found;
-            return false;
-        }
-        return true;
-    };
-    sc->apply(findPropConstF);
-    return foundConstraint;
-}
-
-valijson::Subschema const* findProperty(valijson::Subschema const* sc, char const* name)
-{
-    auto props = findConstraint<valijson::constraints::PropertiesConstraint>(sc);
-    valijson::Subschema const* result = nullptr;
-    props->applyToProperties([name, &result](auto const& propName, valijson::Subschema const* prop) {
-        if (propName == name)
-        {
-            result = prop;
-            return false;
-        }
-        return true;
-    });
-    return result;
-}
-
-#endif
 
 namespace Ent
 {
@@ -337,72 +29,29 @@ namespace Ent
     {
     }
 
-#ifdef ENTLIB_LOADSCHEMA
-    EntityLib loadStaticData(std::filesystem::path const& toolsDir) // Read schema and dependencies
+    EntityLib::EntityLib(std::filesystem::path const& toolsDir) // Read schema and dependencies
     {
-        sprintf_s(schemaPath, std::size(schemaPath), "%ls/WildPipeline/Schema", toolsDir.c_str());
+        auto schemaPath = toolsDir / "WildPipeline/Schema";
 
-        json schemaDocument;
-        if (!valijson::utils::loadDocument(
-                (toolsDir / "WildPipeline/Schema/Scene-schema.json").u8string(), schemaDocument))
+        json schemaDocument = loadJsonFile(toolsDir / "WildPipeline/Schema/Scene-schema.json");
+
+        json const& definition = schemaDocument.at("definitions");
+        json const& compList = definition.at("Component").at("oneOf");
+
+        SchemaLoader loader(schemaPath);
+
+        for (json const& comp : compList)
         {
-            return EntityLib{};
+            json const& properties = comp.at("properties");
+            auto compName = properties.at("Type").at("const").get<std::string>();
+
+            json const& data = properties["Data"];
+            Ent::Subschema sub = loader.readSchema(schemaDocument, data, compName);
+
+            schema.definitions.emplace(compName, std::move(sub));
         }
-
-        // Parse the json schema into an internal schema format
-        valijson::Schema schema;
-        valijson::SchemaParser parser;
-        valijson::adapters::NlohmannJsonAdapter schemaDocumentAdapter(schemaDocument);
-        try
-        {
-            parser.populateSchema(schemaDocumentAdapter, schema, fetchDocument, freeDocument);
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << "Failed to parse schema: " << e.what() << std::endl;
-            return EntityLib{};
-        }
-
-        Schema entSchema;
-
-        // Find PropertiesConstraint named Objects
-        auto objects = findProperty(schema.root(), "Objects");
-        // find SingularItemsConstraint
-        auto objItem = findConstraint<valijson::constraints::SingularItemsConstraint>(objects);
-        // find PropertiesConstraint named Components
-        auto components = findProperty(objItem->getItemsSubschema(), "Components");
-        // find SingularItemsConstraint
-        auto compoItem = findConstraint<valijson::constraints::SingularItemsConstraint>(components);
-        auto oneOf =
-            findConstraint<valijson::constraints::OneOfConstraint>(compoItem->getItemsSubschema());
-        // For each
-        oneOf->applyToSubschemas([&entSchema](int, valijson::Subschema const* sc) {
-            //      Find PropertiesConstraint
-            auto type = findProperty(sc, "Type");
-            //      Find Type to get the name of the componant
-            auto constConst = findConstraint<valijson::constraints::ConstConstraint>(type);
-            std::string compName = getFrozenValue(constConst->getValue()).get<std::string>();
-
-            // if (compName == "SubScene")
-            //    return true;
-            //      Find Data
-            valijson::Subschema const* data = findProperty(sc, "Data");
-
-            FillDefinition visitConstraint(compName == "SubScene" ? 1 : 0);
-
-            valijson::Subschema::ApplyFunction func =
-                [&visitConstraint](valijson::constraints::Constraint const& c) {
-                    return c.accept(visitConstraint);
-                };
-            data->apply(func);
-
-            entSchema.definitions.emplace(compName, std::move(visitConstraint.schema));
-
-            return true;
-        });
 
         json dependencies = loadJsonFile(toolsDir / "WildPipeline/Schema/Dependencies.json");
-        std::map<std::string, std::vector<std::string>> componentDependencies;
         for (json const& comp : dependencies["Dependencies"])
         {
             auto name = comp["className"].get<std::string>();
@@ -416,10 +65,7 @@ namespace Ent
             }
             componentDependencies.emplace(std::move(name), std::move(deps));
         }
-
-        return EntityLib{ std::move(entSchema), std::move(componentDependencies) };
     }
-#endif
 
     Node::Node(Value val, Subschema const* _schema)
         : schema(_schema)
@@ -914,7 +560,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
         }
         else
         {
-            assert(nodeSchema.linearItems.has_value());
+            ENTLIB_ASSERT(nodeSchema.linearItems.has_value());
             for (Ent::Subschema const& sub : *nodeSchema.linearItems)
             {
                 Ent::Node const* subSuper =

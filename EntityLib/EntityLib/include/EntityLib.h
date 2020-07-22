@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Schema.h"
+
 #pragma warning(push, 0)
 #include <vector>
 #include <memory>
@@ -18,34 +20,12 @@ namespace std
     using namespace mapbox::util;
 } // namespace std
 
-#ifdef ENTLIB_STATIC
-#define ENTLIB_DLLEXPORT
-#else
-#ifdef ENTLIB_DYNAMIC
-#define ENTLIB_DLLEXPORT __declspec(dllexport)
-#else
-#define ENTLIB_DLLEXPORT __declspec(dllimport)
-#endif
-#endif
-
 namespace Ent
 {
     // ******************************** Global declarations ***************************************
     struct BadType : std::runtime_error
     {
         BadType();
-    };
-
-    enum class DataType
-    {
-        null,
-        string,
-        number,
-        integer,
-        object,
-        array,
-        boolean,
-        freeobject, // Object without schema. Used in Subscene/Embedded
     };
 
     // ******************************** Implem details ********************************************
@@ -172,7 +152,6 @@ namespace Ent
         size_t index; ///< Useful to keep the componants order in the json file
     };
 
-    struct Schema;
     struct EntityLib;
 
     struct ENTLIB_DLLEXPORT Entity
@@ -213,26 +192,6 @@ namespace Ent
         std::vector<Entity> objects;
     };
 
-    // ------------------------------ Schema ------------------------------------------------------
-
-    struct ENTLIB_DLLEXPORT Subschema
-    {
-        DataType type = DataType::null;
-        bool required = true;
-        std::map<std::string, Subschema> properties;
-        size_t maxItems = size_t(-1);
-        size_t minItems = 0;
-        nlohmann::json defaultValue;
-        std::unique_ptr<Subschema> singularItems; // In valijson it is a SingularItems
-        tl::optional<std::vector<Subschema>> linearItems;
-        std::vector<std::string> enumValues;
-    };
-
-    struct Schema
-    {
-        std::map<std::string, Subschema> definitions;
-    };
-
     // ********************************** Static data *********************************************
 
     struct ENTLIB_DLLEXPORT EntityLib
@@ -241,6 +200,7 @@ namespace Ent
         std::map<std::string, std::vector<std::string>> componentDependencies;
 
         EntityLib() = default;
+        EntityLib(std::filesystem::path const& toolsDir);
         EntityLib(EntityLib const&) = delete;
         EntityLib& operator=(EntityLib const&) = delete;
         EntityLib(EntityLib&&) = default;
@@ -260,9 +220,6 @@ namespace Ent
 
         Component* addComponent(Entity& entity, char const* type) const;
     };
-
-    ENTLIB_DLLEXPORT
-    EntityLib loadStaticData(std::filesystem::path const& toolsDir); //!< Read schema and dependencies
 
     // *************************** Implem details - method bodies *********************************
 

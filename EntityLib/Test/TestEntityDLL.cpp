@@ -79,40 +79,32 @@ void displaySubSchema(std::string const& name, Ent::Subschema const& subschema, 
     }
 }
 
-void assertImpl(char const* _message, char const* _file, size_t _line)
-{
-    fprintf(stderr, "%s(%zu): Assert failed : %s", _file, _line, _message);
-}
-
-#define ASSERT(expression)                                                                         \
-    (void)((!!(expression)) || (assertImpl(#expression, __FILE__, __LINE__), 0))
-
 int main() // int argc, char** argv
 try
 {
-    // Ent::mergeComponants("X:/Tools");
+    Ent::mergeComponants("X:/Tools");
 
-    Ent::EntityLib entlib = Ent::loadStaticData("X:/Tools");
+    Ent::EntityLib entlib("X:/Tools");
 
     {
         // Test read prefab
         Ent::Entity ent = entlib.loadEntity("prefab.entity");
         Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
-        ASSERT(sysCreat != nullptr);
+        ENTLIB_ASSERT(sysCreat != nullptr);
 
         // TEST read setted values
-        ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Shamans")); // set
-        ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
+        ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Shamans")); // set
+        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
 
         // TEST read array
-        ASSERT(sysCreat->root.at("ScriptList")->isSet());
-        ASSERT(sysCreat->root.at("ScriptList")->size() == 3);
+        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->isSet());
+        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->size() == 3);
 
         // TEST default values
-        ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
-        ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
-        ASSERT(sysCreat->root.at("Name")->getString() == std::string()); // default
-        ASSERT(not sysCreat->root.at("Name")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
+        ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root.at("Name")->getString() == std::string()); // default
+        ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
 
         sysCreat->root.at("Name")->setString("Shamane_male");
         entlib.saveEntity(ent, "prefab.copy.entity");
@@ -121,46 +113,49 @@ try
         // Test write prefab
         Ent::Entity ent = entlib.loadEntity("prefab.copy.entity");
         Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
-        ASSERT(sysCreat != nullptr);
+        ENTLIB_ASSERT(sysCreat != nullptr);
         // TEST read setted values
-        ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Shamans")); // set
-        ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
+        ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Shamans")); // set
+        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
 
         // TEST read array
-        ASSERT(sysCreat->root.at("ScriptList")->isSet());
-        ASSERT(sysCreat->root.at("ScriptList")->size() == 3);
+        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->isSet());
+        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->size() == 3);
 
         // TEST default values unchanged
-        ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
-        ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
+        ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
 
         // TEST changed values
-        ASSERT(sysCreat->root.at("Name")->getString() == std::string("Shamane_male")); // set. changed.
-        ASSERT(sysCreat->root.at("Name")->isSet()); // set. changed.
+        ENTLIB_ASSERT(
+            sysCreat->root.at("Name")->getString() == std::string("Shamane_male")); // set. changed.
+        ENTLIB_ASSERT(sysCreat->root.at("Name")->isSet()); // set. changed.
     }
     {
         // Test read instance of
         Ent::Entity ent = entlib.loadEntity("instance.entity");
         Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
-        ASSERT(sysCreat != nullptr);
+        ENTLIB_ASSERT(sysCreat != nullptr);
 
         // TEST read overrided value
-        ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Plouf")); // Overrided
+        ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Plouf")); // Overrided
 
         // TEST read inherited values
-        ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // Inherited
-        ASSERT(sysCreat->root.at("Life")->getFloat() == 1000.f); // Inherited
+        ENTLIB_ASSERT(
+            sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // Inherited
+        ENTLIB_ASSERT(sysCreat->root.at("Life")->getFloat() == 1000.f); // Inherited
 
         // TEST read default value
-        ASSERT(sysCreat->root.at("Burried")->getBool() == false); // Inherited (from default)
-        ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // Inherited (from default)
+        ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
 
         // TEST read overrided in array
-        ASSERT(sysCreat->root.at("ScriptList")->at(1)->getString() == std::string("b2")); // Overrided
-        ASSERT(sysCreat->root.at("ScriptList")->at(1)->isSet()); // Overrided
+        ENTLIB_ASSERT(
+            sysCreat->root.at("ScriptList")->at(1)->getString() == std::string("b2")); // Overrided
+        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->at(1)->isSet()); // Overrided
         // TEST read Not overrided in array
-        ASSERT(sysCreat->root.at("ScriptList")->at(2)->getString() == std::string("c1")); // not overrided
-        ASSERT(not sysCreat->root.at("ScriptList")->at(2)->isSet()); // Not overrided
+        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->at(2)->getString() == std::string("c1")); // not overrided
+        ENTLIB_ASSERT(not sysCreat->root.at("ScriptList")->at(2)->isSet()); // Not overrided
 
         // Programatically unset
         sysCreat->root.at("ScriptList")->at(1)->unset();
@@ -168,12 +163,12 @@ try
         sysCreat->root.at("ScriptList")->at(2)->setString("c2");
 
         // TEST read array
-        ASSERT(sysCreat->root.at("ScriptList")->isSet());
-        ASSERT(sysCreat->root.at("ScriptList")->size() == 3);
+        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->isSet());
+        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->size() == 3);
 
         // TEST Extand array
         sysCreat->root.at("ScriptList")->push()->setString("d2");
-        ASSERT(sysCreat->root.at("ScriptList")->size() == 4);
+        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->size() == 4);
 
         sysCreat->root.at("BehaviorState")->setString("Overrided");
         entlib.saveEntity(ent, "instance.copy.entity");
@@ -182,40 +177,44 @@ try
         // Test write instance of
         Ent::Entity ent = entlib.loadEntity("instance.copy.entity");
         Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
-        ASSERT(sysCreat != nullptr);
+        ENTLIB_ASSERT(sysCreat != nullptr);
 
         // TEST read overrided value
-        ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Plouf")); // Overrided
+        ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Plouf")); // Overrided
 
         // TEST read inherited values
-        ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // Inherited
-        ASSERT(sysCreat->root.at("Life")->getFloat() == 1000.f); // Inherited
+        ENTLIB_ASSERT(
+            sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // Inherited
+        ENTLIB_ASSERT(sysCreat->root.at("Life")->getFloat() == 1000.f); // Inherited
 
         // TEST read default value
-        ASSERT(sysCreat->root.at("Burried")->getBool() == false); // Inherited (from default)
-        ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // Inherited (from default)
+        ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
 
         // TEST read programatically overrided in array
-        ASSERT(sysCreat->root.at("ScriptList")->at(1)->getString() == std::string("b1")); // No more
-                                                                                          // overrided
-        ASSERT(not sysCreat->root.at("ScriptList")->at(1)->isSet()); // No more overrided
+        ENTLIB_ASSERT(
+            sysCreat->root.at("ScriptList")->at(1)->getString() == std::string("b1")); // No more
+                                                                                       // overrided
+        ENTLIB_ASSERT(not sysCreat->root.at("ScriptList")->at(1)->isSet()); // No more overrided
         // TEST read programatically unset in array
-        ASSERT(sysCreat->root.at("ScriptList")->at(2)->getString() == std::string("c2")); // Overrided
-        ASSERT(sysCreat->root.at("ScriptList")->at(2)->isSet()); // Overrided
+        ENTLIB_ASSERT(
+            sysCreat->root.at("ScriptList")->at(2)->getString() == std::string("c2")); // Overrided
+        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->at(2)->isSet()); // Overrided
 
         // TEST read programatically extand array
-        ASSERT(sysCreat->root.at("ScriptList")->at(3)->getString() == std::string("d2")); // Overrided
-        ASSERT(sysCreat->root.at("ScriptList")->at(3)->isSet()); // Overrided
+        ENTLIB_ASSERT(
+            sysCreat->root.at("ScriptList")->at(3)->getString() == std::string("d2")); // Overrided
+        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->at(3)->isSet()); // Overrided
 
         // TEST read extanded array
-        ASSERT(sysCreat->root.at("ScriptList")->isSet());
-        ASSERT(sysCreat->root.at("ScriptList")->size() == 4);
+        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->isSet());
+        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->size() == 4);
 
         // TEST override value from code
-        ASSERT(
+        ENTLIB_ASSERT(
             sysCreat->root.at("BehaviorState")->getString()
             == std::string("Overrided")); // set. changed.
-        ASSERT(sysCreat->root.at("BehaviorState")->isSet()); // set. changed.
+        ENTLIB_ASSERT(sysCreat->root.at("BehaviorState")->isSet()); // set. changed.
 
         entlib.saveEntity(ent, "instance.copy.entity");
     }

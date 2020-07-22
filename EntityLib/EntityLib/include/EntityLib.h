@@ -56,8 +56,10 @@ namespace Ent
     struct Override
     {
         Override() = default;
-        Override(V defaultVal)
-            : defaultValue(defaultVal)
+        Override(V _defaultValue, tl::optional<V> _prefabValue, tl::optional<V> _overrideValue)
+            : defaultValue(std::move(_defaultValue))
+            , prefabValue(std::move(_prefabValue))
+            , overrideValue(std::move(_overrideValue))
         {
         }
         Override(V defaultVal, V val)
@@ -74,9 +76,12 @@ namespace Ent
 
         void unset();
 
+        Override<V> detach() const;
+
     public:
         V defaultValue = V();
-        tl::optional<V> value;
+        tl::optional<V> prefabValue;
+        tl::optional<V> overrideValue;
     };
 
     struct Null
@@ -91,6 +96,12 @@ namespace Ent
     {
         std::vector<std::unique_ptr<Node>> data;
         Override<int64_t> size;
+
+        Array() = default;
+        Array(Array const&) = delete;
+        Array& operator=(Array const&) = delete;
+        Array(Array&&) = default;
+        Array& operator=(Array&&) = default;
     };
 
     using Value =
@@ -145,6 +156,8 @@ namespace Ent
         bool isSet() const;
 
         bool isArraySizeSet() const;
+
+        Node detach() const;
 
     private:
         Subschema const* schema = nullptr;
@@ -241,6 +254,8 @@ namespace Ent
 
         void saveEntity(Entity const& entity, std::filesystem::path const& entityPath) const;
 
+        Entity detachEntityFromPrefab(Entity const& entity) const;
+
         void saveScene(Scene const& scene, std::filesystem::path const& scenePath) const;
 
         Component* addComponent(Entity& entity, char const* type) const;
@@ -254,9 +269,13 @@ namespace Ent
     template <typename V>
     V const& Override<V>::get() const
     {
-        if (value.has_value())
+        if (overrideValue.has_value())
         {
-            return *value;
+            return *overrideValue;
+        }
+        if (prefabValue.has_value())
+        {
+            return *prefabValue;
         }
         return defaultValue;
     }
@@ -264,19 +283,28 @@ namespace Ent
     template <typename V>
     void Override<V>::set(V newVal)
     {
-        value.emplace(std::move(newVal));
+        overrideValue.emplace(std::move(newVal));
     }
 
     template <typename V>
     bool Override<V>::isSet() const
     {
-        return value.has_value();
+        return overrideValue.has_value();
     }
 
     template <typename V>
     void Override<V>::unset()
     {
-        value = tl::nullopt;
+        overrideValue = tl::nullopt;
+    }
+
+    template <typename V>
+    Override<V> Override<V>::detach() const
+    {
+        if (overrideValue.has_value())
+            return Override<V>(defaultValue, tl::nullopt, overrideValue);
+        else
+            return Override<V>(defaultValue, tl::nullopt, prefabValue);
     }
 
     // *********************** Merge Runtime componants into Entity schema ************************

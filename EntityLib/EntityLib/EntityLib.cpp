@@ -597,6 +597,45 @@ namespace Ent
         throw BadType();
     }
 
+    struct Detach
+    {
+        Subschema const* schema;
+
+        template <typename T>
+        Node operator()(Override<T> const& ov) const
+        {
+            return Node(ov.detach(), schema);
+        }
+
+        Node operator()(Null const&) const
+        {
+            return Node(Null{}, schema);
+        }
+
+        Node operator()(Array const& arr) const
+        {
+            Array out;
+            for (auto&& item : arr.data)
+                out.data.emplace_back(std::make_unique<Node>(item->detach()));
+            out.size = arr.size.detach();
+            return Node(std::move(out), schema);
+        }
+
+        Node operator()(Object const& obj) const
+        {
+            Object out;
+            for (auto&& name_node : obj)
+                out.emplace(
+                    std::get<0>(name_node), std::make_unique<Node>(std::get<1>(name_node)->detach()));
+            return Node(std::move(out), schema);
+        }
+    };
+
+    Node Node::detach() const
+    {
+        return std::apply_visitor(Detach{ schema }, value);
+    }
+
     std::vector<char const*> Node::getFieldNames() const
     {
         if (value.is<Object>())
@@ -735,17 +774,19 @@ static Ent::Node loadFreeObjectNode(json const& data)
     {
     case nlohmann::detail::value_t::null: result = Ent::Node(Ent::Null{}, nullptr); break;
     case nlohmann::detail::value_t::string:
-        result = Ent::Node(Ent::Override<std::string>(data.get<std::string>()), nullptr);
+        result = Ent::Node(
+            Ent::Override<std::string>(std::string(), tl::nullopt, data.get<std::string>()), nullptr);
         break;
     case nlohmann::detail::value_t::boolean:
-        result = Ent::Node(Ent::Override<bool>(data.get<bool>()), nullptr);
+        result = Ent::Node(Ent::Override<bool>(bool{}, tl::nullopt, data.get<bool>()), nullptr);
         break;
     case nlohmann::detail::value_t::number_integer:
     case nlohmann::detail::value_t::number_unsigned:
-        result = Ent::Node(Ent::Override<int64_t>(data.get<int64_t>()), nullptr);
+        result =
+            Ent::Node(Ent::Override<int64_t>(int64_t{}, tl::nullopt, data.get<int64_t>()), nullptr);
         break;
     case nlohmann::detail::value_t::number_float:
-        result = Ent::Node(Ent::Override<float>(data.get<float>()), nullptr);
+        result = Ent::Node(Ent::Override<float>(float{}, tl::nullopt, data.get<float>()), nullptr);
         break;
     case nlohmann::detail::value_t::object:
     {
@@ -768,7 +809,7 @@ static Ent::Node loadFreeObjectNode(json const& data)
             Ent::Node tmpNode = loadFreeObjectNode(item);
             arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
         }
-        arr.size = static_cast<int64_t>(data.size());
+        arr.size = Ent::Override<int64_t>(int64_t{}, tl::nullopt, static_cast<int64_t>(data.size()));
         result = Ent::Node(std::move(arr), nullptr);
     }
     break;
@@ -791,40 +832,51 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
         std::string const def = nodeSchema.defaultValue.is_null() ?
                                     std::string() :
                                     nodeSchema.defaultValue.get<std::string>();
-        std::string const supVal = super ? super->getString() : def;
-        result = Ent::Node(Ent::Override<std::string>(supVal), &nodeSchema);
-        if (data.is_string())
-            result.setString(data.get<std::string>().c_str());
+        tl::optional<std::string> const supVal = super and super->isSet() ?
+                                                     tl::optional<std::string>(super->getString()) :
+                                                     tl::optional<std::string>(tl::nullopt);
+        tl::optional<std::string> const val =
+            data.is_string() ? tl::optional<std::string>(data.get<std::string>()) :
+                               tl::optional<std::string>(tl::nullopt);
+        result = Ent::Node(Ent::Override<std::string>(def, supVal, val), &nodeSchema);
     }
     break;
     case Ent::DataType::boolean:
     {
         bool const def =
-            nodeSchema.defaultValue.is_null() ? false : nodeSchema.defaultValue.get<bool>();
-        bool const supVal = super ? super->getBool() : def;
-        result = Ent::Node(Ent::Override<bool>(supVal), &nodeSchema);
-        if (data.is_boolean())
-            result.setBool(data.get<bool>());
+            nodeSchema.defaultValue.is_null() ? bool{} : nodeSchema.defaultValue.get<bool>();
+        tl::optional<bool> const supVal = super and super->isSet() ?
+                                              tl::optional<bool>(super->getBool()) :
+                                              tl::optional<bool>(tl::nullopt);
+        tl::optional<bool> const val = data.is_boolean() ? tl::optional<bool>(data.get<bool>()) :
+                                                           tl::optional<bool>(tl::nullopt);
+        result = Ent::Node(Ent::Override<bool>(def, supVal, val), &nodeSchema);
     }
     break;
     case Ent::DataType::integer:
     {
         int64_t const def =
-            nodeSchema.defaultValue.is_null() ? false : nodeSchema.defaultValue.get<int64_t>();
-        int64_t const supVal = super ? super->getInt() : def;
-        result = Ent::Node(Ent::Override<int64_t>(supVal), &nodeSchema);
-        if (data.is_number_integer() or data.is_number_unsigned())
-            result.setInt(data.get<int64_t>());
+            nodeSchema.defaultValue.is_null() ? int64_t{} : nodeSchema.defaultValue.get<int64_t>();
+        tl::optional<int64_t> const supVal = super and super->isSet() ?
+                                                 tl::optional<int64_t>(super->getInt()) :
+                                                 tl::optional<int64_t>(tl::nullopt);
+        tl::optional<int64_t> const val = data.is_number_integer() or data.is_number_unsigned() ?
+                                              tl::optional<int64_t>(data.get<int64_t>()) :
+                                              tl::optional<int64_t>(tl::nullopt);
+        result = Ent::Node(Ent::Override<int64_t>(def, supVal, val), &nodeSchema);
     }
     break;
     case Ent::DataType::number:
     {
         float const def =
-            nodeSchema.defaultValue.is_null() ? false : nodeSchema.defaultValue.get<float>();
-        float const supVal = super ? super->getFloat() : def;
-        result = Ent::Node(Ent::Override<float>(supVal), &nodeSchema);
-        if (data.is_number_float())
-            result.setFloat(data.get<float>());
+            nodeSchema.defaultValue.is_null() ? float{} : nodeSchema.defaultValue.get<float>();
+        tl::optional<float> const supVal = super and super->isSet() ?
+                                               tl::optional<float>(super->getFloat()) :
+                                               tl::optional<float>(tl::nullopt);
+        tl::optional<float> const val = data.is_number_float() ?
+                                            tl::optional<float>(data.get<float>()) :
+                                            tl::optional<float>(tl::nullopt);
+        result = Ent::Node(Ent::Override<float>(def, supVal, val), &nodeSchema);
     }
     break;
     case Ent::DataType::object:
@@ -857,7 +909,8 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                 arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
                 ++index;
             }
-            arr.size = static_cast<int64_t>(data.size());
+            arr.size =
+                Ent::Override<int64_t>(int64_t{}, tl::nullopt, static_cast<int64_t>(data.size()));
         }
         else
         {
@@ -872,7 +925,8 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                 arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
                 ++index;
             }
-            arr.size = static_cast<int64_t>(nodeSchema.linearItems->size());
+            arr.size = Ent::Override<int64_t>(
+                int64_t{}, tl::nullopt, static_cast<int64_t>(nodeSchema.linearItems->size()));
         }
         result = Ent::Node(std::move(arr), &nodeSchema);
     }
@@ -989,8 +1043,6 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
 
 static Ent::Entity loadEntity(Ent::EntityLib const& entlib, Ent::Schema const& schema, json const& entNode)
 {
-    // TODO override, types and default values
-
     tl::optional<std::string> instanceOf;
     Ent::Entity superEntity;
     if (entNode.count("InstanceOf"))
@@ -1117,6 +1169,23 @@ static json saveEntity(Ent::Schema const& schema, Ent::Entity const& entity)
         componentsNode.emplace_back(std::move(compNode));
     }
     return entNode;
+}
+
+Ent::Entity Ent::EntityLib::detachEntityFromPrefab(Entity const& entity) const
+{
+    std::map<std::string, Ent::Component> components;
+    size_t index = 0;
+    for (auto const& type_comp : entity.getComponents())
+    {
+        auto const& type = std::get<0>(type_comp);
+        auto const& comp = std::get<1>(type_comp);
+
+        Ent::Component detachedComp{ type, comp.root.detach(), 1, index };
+
+        components.emplace(type, std::move(detachedComp));
+        ++index;
+    }
+    return Ent::Entity(std::move(entity.getName()), entity.getColor(), std::move(components));
 }
 
 void Ent::EntityLib::saveEntity(Entity const& entity, std::filesystem::path const& entityPath) const

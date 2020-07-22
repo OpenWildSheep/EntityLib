@@ -53,7 +53,7 @@
                 "DisplaceNoiseList": [{
                         "DisplaceDistance": 0.0,
                         "LuminanceCenter": 0.0,
-                        "MapChannel": 0,
+                        "MapChannel": 51248,
                         "MotifName": "",
                         "MotifOffsetX": 0.0,
                         "MotifOffsetY": 0.0,

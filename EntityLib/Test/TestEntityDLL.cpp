@@ -89,6 +89,15 @@ try
     {
         Ent::Entity ent = entlib.loadEntity("prefab.entity");
 
+        // TEST read inherited values in inherited component
+        Ent::Component* heightObj = ent.getComponent("HeightObj");
+        ENTLIB_ASSERT(heightObj != nullptr);
+        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
+        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->isSet());
+        ENTLIB_ASSERT(
+            heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
+        ENTLIB_ASSERT(heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
+
         // Test read Thumbnail
         ENTLIB_ASSERT(ent.getThumbnail() != nullptr);
         ENTLIB_ASSERT(ent.getThumbnail() == std::string("TestThumbnail"));
@@ -119,6 +128,16 @@ try
     {
         // Test write prefab
         Ent::Entity ent = entlib.loadEntity("prefab.copy.entity");
+
+        // TEST read inherited values in inherited component
+        Ent::Component* heightObj = ent.getComponent("HeightObj");
+        ENTLIB_ASSERT(heightObj != nullptr);
+        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
+        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->isSet());
+        ENTLIB_ASSERT(
+            heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
+        ENTLIB_ASSERT(heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
+
         Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
         ENTLIB_ASSERT(sysCreat != nullptr);
         // TEST read setted values
@@ -157,6 +176,10 @@ try
         ENTLIB_ASSERT(heightObj != nullptr);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
         ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isSet());
+        ENTLIB_ASSERT(
+            heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
+        ENTLIB_ASSERT(
+            not heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 
         // TEST read default value
         ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // Inherited (from default)
@@ -197,6 +220,10 @@ try
         ENTLIB_ASSERT(heightObj != nullptr);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
         ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isSet());
+        ENTLIB_ASSERT(
+            heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
+        ENTLIB_ASSERT(
+            not heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 
         // TEST read overrided value
         ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Plouf")); // Overrided
@@ -245,6 +272,16 @@ try
 
         Ent::Component* sysCreat = detached.getComponent("SystemicCreature");
 
+        // TEST read inherited values in inherited component
+        Ent::Component* heightObj = ent.getComponent("HeightObj");
+        ENTLIB_ASSERT(heightObj != nullptr);
+        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
+        ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isSet());
+        ENTLIB_ASSERT(
+            heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
+        ENTLIB_ASSERT(
+            not heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
+
         // TEST default values
         ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
         ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
@@ -264,6 +301,15 @@ try
         Ent::Entity ent = entlib.loadEntity("instance.detached.entity");
 
         Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
+
+        // TEST read inherited values in inherited component
+        Ent::Component* heightObj = ent.getComponent("HeightObj");
+        ENTLIB_ASSERT(heightObj != nullptr);
+        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
+        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->isSet());
+        ENTLIB_ASSERT(
+            heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
+        ENTLIB_ASSERT(heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 
         // TEST default values
         ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
@@ -286,6 +332,16 @@ try
     {
         // Test read instance of
         Ent::Entity ent = entlib.loadEntity("instance.create.entity");
+
+        // TEST read inherited values in inherited component
+        Ent::Component* heightObj = ent.getComponent("HeightObj");
+        ENTLIB_ASSERT(heightObj != nullptr);
+        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
+        ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isSet());
+        ENTLIB_ASSERT(
+            heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
+        ENTLIB_ASSERT(
+            not heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 
         // Test read prefab
         Ent::Component* sysCreat = ent.getComponent("SystemicCreature");

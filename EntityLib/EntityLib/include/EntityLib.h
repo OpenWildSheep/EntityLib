@@ -143,6 +143,10 @@ namespace Ent
 
         Node makeInstanceOf() const;
 
+        /// Recursively check if there is an override inside.
+        /// If there is no override, there is no need to save it.
+        bool hasOverride() const;
+
     private:
         Subschema const* schema = nullptr;
         Value value;

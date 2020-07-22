@@ -277,6 +277,11 @@ namespace Ent
         }
     };
 
+    Node Node::detach() const
+    {
+        return std::apply_visitor(Detach{ schema }, value);
+    }
+
     struct MakeInstanceOf
     {
         Subschema const* schema;
@@ -312,14 +317,47 @@ namespace Ent
         }
     };
 
-    Node Node::detach() const
-    {
-        return std::apply_visitor(Detach{ schema }, value);
-    }
-
     Node Node::makeInstanceOf() const
     {
         return std::apply_visitor(MakeInstanceOf{ schema }, value);
+    }
+
+    struct HasOverride
+    {
+        Subschema const* schema;
+
+        template <typename T>
+        bool operator()(Override<T> const& ov) const
+        {
+            return ov.isSet();
+        }
+
+        bool operator()(Null const&) const
+        {
+            return false;
+        }
+
+        bool operator()(Array const& arr) const
+        {
+            return std::any_of(begin(arr.data), end(arr.data), std::mem_fn(&Ent::Node::hasOverride));
+        }
+
+        bool operator()(Object const& obj) const
+        {
+            for (auto&& name_node : obj)
+            {
+                if (std::get<1>(name_node)->hasOverride())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    };
+
+    bool Node::hasOverride() const
+    {
+        return std::apply_visitor(HasOverride{ schema }, value);
     }
 
     std::vector<char const*> Node::getFieldNames() const
@@ -593,16 +631,35 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
         size_t index = 0;
         if (nodeSchema.singularItems)
         {
-            for (auto const& item : data)
+            if (data.is_null()) // No overrided
             {
-                Ent::Node const* subSuper =
-                    (super and (super->size() > index)) ? super->at(index) : nullptr;
-                Ent::Node tmpNode = loadNode(*nodeSchema.singularItems, item, subSuper);
-                arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
-                ++index;
+                if (super != nullptr)
+                {
+                    for (Ent::Node const* subSuper : super->getItems())
+                    {
+                        Ent::Node tmpNode = loadNode(*nodeSchema.singularItems, json(), subSuper);
+                        arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
+                        ++index;
+                    }
+                    arr.size = Ent::Override<int64_t>(
+                        int64_t{}, tl::nullopt, static_cast<int64_t>(super->size()));
+                }
+                else
+                    arr.size = Ent::Override<int64_t>(int64_t{}, tl::nullopt, 0);
             }
-            arr.size =
-                Ent::Override<int64_t>(int64_t{}, tl::nullopt, static_cast<int64_t>(data.size()));
+            else
+            {
+                for (auto const& item : data)
+                {
+                    Ent::Node const* subSuper =
+                        (super and (super->size() > index)) ? super->at(index) : nullptr;
+                    Ent::Node tmpNode = loadNode(*nodeSchema.singularItems, item, subSuper);
+                    arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
+                    ++index;
+                }
+                arr.size = Ent::Override<int64_t>(
+                    int64_t{}, tl::nullopt, static_cast<int64_t>(data.size()));
+            }
         }
         else
         {
@@ -693,7 +750,7 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
         {
             auto&& name = std::get<0>(name_sub);
             Ent::Node const* subNode = node.at(name.c_str());
-            if (subNode->isSet())
+            if (subNode->hasOverride())
             {
                 json subJson = saveNode(std::get<1>(name_sub), *subNode);
                 data[name] = std::move(subJson);
@@ -717,7 +774,7 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
         data = json::array();
         for (Ent::Node const* item : node.getItems())
         {
-            if (item->isSet())
+            if (item->hasOverride())
             {
                 json tmpNode = saveNode(*schema.singularItems, *item);
                 data.emplace_back(std::move(tmpNode));
@@ -881,12 +938,15 @@ static json saveEntity(Ent::Schema const& schema, Ent::Entity const& entity)
         });
     for (Ent::Component const* comp : sortedComp)
     {
-        json compNode;
-        compNode.emplace("Version", comp->version);
-        compNode.emplace("Type", comp->type);
-        compNode.emplace("Data", saveNode(schema.definitions.at(comp->type), comp->root));
+        if (comp->root.hasOverride())
+        {
+            json compNode;
+            compNode.emplace("Version", comp->version);
+            compNode.emplace("Type", comp->type);
+            compNode.emplace("Data", saveNode(schema.definitions.at(comp->type), comp->root));
 
-        componentsNode.emplace_back(std::move(compNode));
+            componentsNode.emplace_back(std::move(compNode));
+        }
     }
     return entNode;
 }

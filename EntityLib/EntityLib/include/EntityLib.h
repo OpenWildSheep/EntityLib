@@ -120,6 +120,8 @@ namespace Ent
         std::vector<Node const*> getItems() const;
         Node* push();
         void pop();
+        void clear();
+        bool empty() const;
 
         // Value
         float getFloat() const;

@@ -405,7 +405,30 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            value.get<Array>().data.pop_back();
+            if (schema->singularItems != nullptr)
+            {
+                value.get<Array>().data.pop_back();
+                return;
+            }
+        }
+        throw BadType();
+    }
+
+    void Node::clear()
+    {
+        if (value.is<Array>())
+        {
+            value.get<Array>().data.clear();
+        }
+        else
+            throw BadType();
+    }
+
+    bool Node::empty() const
+    {
+        if (value.is<Array>())
+        {
+            return value.get<Array>().data.empty();
         }
         throw BadType();
     }

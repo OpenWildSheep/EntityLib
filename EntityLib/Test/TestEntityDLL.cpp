@@ -402,6 +402,7 @@ try
     ENTLIB_ASSERT(ep1Iter->getSubSceneComponent() != nullptr);
     entlib.saveScene(scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene");
 
+    std::cout << "Done" << std::endl;
     return EXIT_SUCCESS;
 }
 catch (std::exception& ex)

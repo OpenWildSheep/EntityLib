@@ -649,9 +649,10 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
         tl::optional<float> const supVal = super and super->isSet() ?
                                                tl::optional<float>(super->getFloat()) :
                                                tl::optional<float>(tl::nullopt);
-        tl::optional<float> const val = data.is_number_float() ?
-                                            tl::optional<float>(data.get<float>()) :
-                                            tl::optional<float>(tl::nullopt);
+        tl::optional<float> const val =
+            data.is_number_float() or data.is_number_integer() or data.is_number_unsigned() ?
+                tl::optional<float>(data.get<float>()) :
+                tl::optional<float>(tl::nullopt);
         result = Ent::Node(Ent::Override<float>(def, supVal, val), &nodeSchema);
     }
     break;

@@ -104,7 +104,7 @@
       <PreprocessorDefinitions>ENTLIB_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\EntityLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4571</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4571;4514</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,7 +141,7 @@
       <PreprocessorDefinitions>ENTLIB_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\EntityLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4571</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4571;4514</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,7 +153,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="TestEntityDLL.cpp" />
+    <ClCompile Include="TestEntityDLL.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4324;4251;4996;4625;4626;4820;4710;4711;4571;4514;4774</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4324;4251;4996;4625;4626;4820;4710;4711;4571;4514;4774</DisableSpecificWarnings>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

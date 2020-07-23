@@ -162,6 +162,15 @@ namespace Ent
         size_t index; ///< Useful to keep the componants order in the json file
     };
 
+    struct Scene;
+
+    struct SubSceneComponent
+    {
+        bool isEmbedded;
+        std::string file;
+        std::unique_ptr<Scene> embedded;
+    };
+
     struct EntityLib;
 
     struct ENTLIB_DLLEXPORT Entity
@@ -191,10 +200,13 @@ namespace Ent
         void removeComponent(char const* type);
         std::vector<char const*> getComponentTypes() const;
         std::map<std::string, Component> const& getComponents() const;
+        SubSceneComponent const* getSubSceneComponent() const;
+        SubSceneComponent* getSubSceneComponent();
 
     private:
         std::string name;
         std::map<std::string, Component> components;
+        tl::optional<SubSceneComponent> subSceneComponent;
         tl::optional<std::array<uint8_t, 4>> color;
         tl::optional<std::string> thumbnail;
         tl::optional<std::string> instanceOf;
@@ -218,20 +230,18 @@ namespace Ent
         EntityLib(EntityLib&&) = default;
         EntityLib& operator=(EntityLib&&) = default;
 
-        // ********************************** Load/Save ***********************************************
-
         Entity loadEntity(std::filesystem::path const& entityPath) const;
 
         Scene loadScene(std::filesystem::path const& scenePath) const;
 
         void saveEntity(Entity const& entity, std::filesystem::path const& entityPath) const;
 
-        Entity detachEntityFromPrefab(Entity const& entity) const;
-
         void saveScene(Scene const& scene, std::filesystem::path const& scenePath) const;
 
         /// Add nothing if already exist
         Component* addComponent(Entity& entity, char const* type) const;
+
+        Entity detachEntityFromPrefab(Entity const& entity) const;
 
         static Entity makeInstanceOf(
             std::string name,

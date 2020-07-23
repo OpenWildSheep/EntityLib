@@ -20,15 +20,11 @@ namespace Ent
         SchemaLoader(std::filesystem::path _schemaPath);
         Ent::Subschema readSchema(
             nlohmann::json const& _fileRoot, ///< Full file containing _data
-            nlohmann::json const& _data, ///< json node to extract schema
-            std::filesystem::path const& _dataPath ///< Path of _data in _fileRoot
+            nlohmann::json const& _data ///< json node to extract schema
         );
 
     private:
-        Ent::Subschema readSchemaNoRef(
-            nlohmann::json const& _fileRoot,
-            nlohmann::json const& _data,
-            std::filesystem::path const& _dataPath);
+        Ent::Subschema readSchemaNoRef(nlohmann::json const& _fileRoot, nlohmann::json const& _data);
 
         std::filesystem::path m_schemaPath;
         std::map<std::string, nlohmann::json> m_schemaMap;

@@ -21,6 +21,8 @@ using namespace nlohmann;
 // char schemaPath[2048] = {};
 
 static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, Ent::Node const* super);
+static Ent::Scene
+loadScene(Ent::EntityLib const& entLib, Ent::Schema const& schema, json const& document);
 
 namespace Ent
 {
@@ -46,7 +48,7 @@ namespace Ent
             auto compName = properties.at("Type").at("const").get<std::string>();
 
             json const& data = properties["Data"];
-            Ent::Subschema sub = loader.readSchema(schemaDocument, data, compName);
+            Ent::Subschema sub = loader.readSchema(schemaDocument, data);
 
             schema.definitions.emplace(compName, std::move(sub));
         }
@@ -516,6 +518,24 @@ namespace Ent
         return components;
     }
 
+    SubSceneComponent const* Entity::getSubSceneComponent() const
+    {
+        if (subSceneComponent.has_value())
+        {
+            return &(*subSceneComponent);
+        }
+        return nullptr;
+    }
+
+    SubSceneComponent* Entity::getSubSceneComponent()
+    {
+        if (subSceneComponent.has_value())
+        {
+            return &(*subSceneComponent);
+        }
+        return nullptr;
+    }
+
 } // namespace Ent
 
 // ********************************** Load/Save ***********************************************
@@ -846,18 +866,31 @@ static Ent::Entity loadEntity(Ent::EntityLib const& entlib, Ent::Schema const& s
     for (json const& compNode : componentsNode)
     {
         auto const cmpType = compNode.at("Type").get<std::string>();
-        Ent::Component* superComp = superEntity.getComponent(cmpType.c_str());
-        auto const version = compNode.at("Version").get<size_t>();
         json const& data = compNode.at("Data");
+        if (cmpType == "SubScene")
+        {
+            Ent::SubSceneComponent subSceneComp{ data["isEmbedded"].get<bool>(),
+                                                 data["File"].get<std::string>() };
+            if (subSceneComp.isEmbedded)
+            {
+                subSceneComp.embedded =
+                    std::make_unique<Ent::Scene>(loadScene(entlib, schema, data["Embedded"]));
+            }
+        }
+        else
+        {
+            Ent::Component* superComp = superEntity.getComponent(cmpType.c_str());
+            auto const version = compNode.at("Version").get<size_t>();
 
-        Ent::Subschema const& compSchema = schema.definitions.at(cmpType);
+            Ent::Subschema const& compSchema = schema.definitions.at(cmpType);
 
-        Ent::Component comp{ cmpType,
-                             loadNode(compSchema, data, (superComp ? &superComp->root : nullptr)),
-                             version,
-                             index };
+            Ent::Component comp{ cmpType,
+                                 loadNode(compSchema, data, (superComp ? &superComp->root : nullptr)),
+                                 version,
+                                 index };
 
-        components.emplace(cmpType, std::move(comp));
+            components.emplace(cmpType, std::move(comp));
+        }
         ++index;
     }
     // Add undeclared componants to be able to get values inside (They are full reference to prefab)
@@ -895,6 +928,19 @@ Ent::Entity Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath) 
     return ent;
 }
 
+static Ent::Scene loadScene(Ent::EntityLib const& entLib, Ent::Schema const& schema, json const& objects)
+{
+    Ent::Scene scene;
+
+    for (json const& entNode : objects)
+    {
+        Ent::Entity ent = ::loadEntity(entLib, schema, entNode);
+        scene.objects.emplace_back(std::move(ent));
+    }
+
+    return scene;
+}
+
 Ent::Scene Ent::EntityLib::loadScene(std::filesystem::path const& scenePath) const
 {
     json document;
@@ -915,16 +961,7 @@ Ent::Scene Ent::EntityLib::loadScene(std::filesystem::path const& scenePath) con
         std::ofstream file(scenePath);
         file << document.dump(4);
     }*/
-
-    Scene scene;
-
-    for (json const& entNode : document.at("Objects"))
-    {
-        Ent::Entity ent = ::loadEntity(*this, schema, entNode);
-        scene.objects.emplace_back(std::move(ent));
-    }
-
-    return scene;
+    return ::loadScene(*this, schema, document.at("Objects"));
 }
 
 static json saveEntity(Ent::Schema const& schema, Ent::Entity const& entity)

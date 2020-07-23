@@ -24,8 +24,7 @@ Ent::SchemaLoader::SchemaLoader(std::filesystem::path _schemaPath)
 {
 }
 
-Ent::Subschema Ent::SchemaLoader::readSchema(
-    json const& _fileRoot, json const& _data, std::filesystem::path const& _dataPath)
+Ent::Subschema Ent::SchemaLoader::readSchema(json const& _fileRoot, json const& _data)
 {
     if (_data.count("$ref"))
     {
@@ -58,16 +57,15 @@ Ent::Subschema Ent::SchemaLoader::readSchema(
         {
             node = &((*node).at(token));
         }
-        return readSchemaNoRef(*refRoot, *node, _dataPath);
+        return readSchemaNoRef(*refRoot, *node);
     }
     else
     {
-        return readSchemaNoRef(_fileRoot, _data, _dataPath);
+        return readSchemaNoRef(_fileRoot, _data);
     }
 }
 
-Ent::Subschema Ent::SchemaLoader::readSchemaNoRef(
-    json const& _rootFile, json const& _data, std::filesystem::path const& _dataPath)
+Ent::Subschema Ent::SchemaLoader::readSchemaNoRef(json const& _rootFile, json const& _data)
 {
     Ent::Subschema schema;
     // type
@@ -109,7 +107,7 @@ Ent::Subschema Ent::SchemaLoader::readSchemaNoRef(
             schema.type = Ent::DataType::string;
         }
         else
-            ENTLIB_ASSERT(false and "Unknown type");
+            ENTLIB_LOGIC_ERROR("Unknown type %s", type.c_str());
     }
     // properties
     if (_data.count("properties"))
@@ -118,7 +116,7 @@ Ent::Subschema Ent::SchemaLoader::readSchemaNoRef(
         {
             auto const& propName = name_prop.key();
             auto const& prop = name_prop.value();
-            Ent::Subschema sub = readSchema(_rootFile, prop, _dataPath / propName);
+            Ent::Subschema sub = readSchema(_rootFile, prop);
             schema.properties.emplace(propName.c_str(), std::move(sub));
         }
     }
@@ -136,27 +134,16 @@ Ent::Subschema Ent::SchemaLoader::readSchemaNoRef(
             schema.linearItems = std::vector<Ent::Subschema>(items.size());
             for (size_t index = 0; index < items.size(); ++index)
             {
-                (*schema.linearItems)[index] =
-                    readSchema(_rootFile, items[index], _dataPath / "items" / std::to_string(index));
+                (*schema.linearItems)[index] = readSchema(_rootFile, items[index]);
             }
         }
         // items singular
         else if (items.type() == nlohmann::detail::value_t::object)
         {
-            if (_dataPath == "SubScene/properties/Embedded/items")
-            {
-                Ent::Subschema sub;
-                sub.type = Ent::DataType::freeobject;
-                schema.singularItems = std::make_unique<Ent::Subschema>(std::move(sub));
-            }
-            else
-            {
-                schema.singularItems = std::make_unique<Ent::Subschema>(
-                    readSchema(_rootFile, items, _dataPath / "items"));
-            }
+            schema.singularItems = std::make_unique<Ent::Subschema>(readSchema(_rootFile, items));
         }
         else
-            ENTLIB_ASSERT(false and "Unexpected items type");
+            ENTLIB_LOGIC_ERROR("Unexpected json items type : %s", items.type_name());
     }
     if (_data.count("maxItems"))
     {

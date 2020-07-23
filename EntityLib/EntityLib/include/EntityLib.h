@@ -168,6 +168,7 @@ namespace Ent
     {
         bool isEmbedded;
         std::string file;
+        size_t index; ///< Useful to keep the componants order in the json file
         std::unique_ptr<Scene> embedded;
     };
 
@@ -179,6 +180,7 @@ namespace Ent
         Entity(
             std::string _name,
             std::map<std::string, Component> _components,
+            tl::optional<SubSceneComponent> _subSceneComponent,
             tl::optional<std::array<uint8_t, 4>> color = tl::nullopt,
             tl::optional<std::string> _thumbnail = tl::nullopt,
             tl::optional<std::string> _instanceOf = tl::nullopt);

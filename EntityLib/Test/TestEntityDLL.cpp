@@ -372,6 +372,7 @@ try
 
     // ********************************** Test load/save scene ************************************
     Ent::Scene scene = entlib.loadScene("X:/RawData/22_World/SceneMainWorld/SceneMainWorld.scene");
+
     printf("Scene Loaded\n");
     printf("Entity count : %zu\n", scene.objects.size());
 
@@ -393,6 +394,12 @@ try
     scene.objects.front().addComponent(entlib, "BeamGenerator");
     scene.objects.front().addComponent(entlib, "ExplosionEffect");
 
+    auto ep1Iter = std::find_if(
+        begin(scene.objects), end(scene.objects), [ep1 = std::string("EP1_")](auto&& ent) {
+            return ent.getName() == ep1;
+        });
+    ENTLIB_ASSERT(ep1Iter != end(scene.objects));
+    ENTLIB_ASSERT(ep1Iter->getSubSceneComponent() != nullptr);
     entlib.saveScene(scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene");
 
     return EXIT_SUCCESS;

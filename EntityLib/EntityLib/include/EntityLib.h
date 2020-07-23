@@ -293,5 +293,9 @@ namespace Ent
 
     // *********************** Merge Runtime componants into Entity schema ************************
 
-    void mergeComponants(std::filesystem::path const& toolsDir);
+    /// Merge the runtime components and the edition components, and generate the final scene schema
+    nlohmann::json mergeComponants(std::filesystem::path const& toolsDir);
+
+    /// Merge the runtime components and the edition components, update the scene schema file
+    void updateComponants(std::filesystem::path const& toolsDir);
 } // namespace Ent

@@ -33,7 +33,7 @@ namespace Ent
     {
         auto schemaPath = toolsDir / "WildPipeline/Schema";
 
-        json schemaDocument = loadJsonFile(toolsDir / "WildPipeline/Schema/Scene-schema.json");
+        json schemaDocument = mergeComponants(toolsDir);
 
         json const& definition = schemaDocument.at("definitions");
         json const& compList = definition.at("Component").at("oneOf");
@@ -1049,11 +1049,13 @@ Ent::Component* Ent::EntityLib::addComponent(Entity& entity, char const* type) c
     return entity.addComponent(*this, type);
 }
 
-void Ent::mergeComponants(std::filesystem::path const& toolsDir)
+char const* sceneSchemaLocation = "WildPipeline/Schema/Scene-schema.json";
+
+json Ent::mergeComponants(std::filesystem::path const& toolsDir)
 {
     json runtimeCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/RuntimeComponants.json");
     json editionCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/EditionComponents.json");
-    auto sceneSchemaPath = toolsDir / "WildPipeline/Schema/Scene-schema.json";
+    auto sceneSchemaPath = toolsDir / sceneSchemaLocation;
     json sceneSch = loadJsonFile(sceneSchemaPath);
     json dependencies = loadJsonFile(toolsDir / "WildPipeline/Schema/Dependencies.json");
 
@@ -1111,7 +1113,13 @@ void Ent::mergeComponants(std::filesystem::path const& toolsDir)
         auto name = dep["className"].get<std::string>();
         addComponent(name, "RuntimeComponants.json");
     }
+    return sceneSch;
+}
 
+void Ent::updateComponants(std::filesystem::path const& toolsDir)
+{
+    json sceneSch = mergeComponants(toolsDir);
+    auto sceneSchemaPath = toolsDir / sceneSchemaLocation;
     std::ofstream file(sceneSchemaPath);
     if (not file.is_open())
     {

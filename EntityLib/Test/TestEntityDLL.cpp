@@ -82,7 +82,7 @@ void displaySubSchema(std::string const& name, Ent::Subschema const& subschema, 
 int main() // int argc, char** argv
 try
 {
-    // Ent::mergeComponants("X:/Tools");
+    // Ent::updateComponants("X:/Tools");
 
     Ent::EntityLib entlib("X:/Tools");
 

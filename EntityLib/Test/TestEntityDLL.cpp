@@ -6,6 +6,7 @@
 #pragma warning(pop)
 
 #include <EntityLib.h>
+#include <ComponentMerge.h>
 
 void printNode(char const* name, Ent::Node const& node, std::string tab)
 {

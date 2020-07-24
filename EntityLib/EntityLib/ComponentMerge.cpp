@@ -37,8 +37,9 @@ json Ent::mergeComponants(std::filesystem::path const& toolsDir)
         auto iter = editionCompMap.find(name);
         if (iter != editionCompMap.end())
         {
-            json merged = dep.value("properties", json());
-            merged.update(*iter->second);
+            json merged = runtimeCompSch[name].value("properties", json());
+            json const& editionComp = iter->second->value("properties", json());
+            merged.update(editionComp);
 
             json newComp;
             auto&& prop = newComp["properties"];

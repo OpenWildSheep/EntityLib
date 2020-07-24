@@ -68,7 +68,7 @@ Ent::Subschema Ent::SchemaLoader::readSchema(json const& _fileRoot, json const& 
 Ent::Subschema Ent::SchemaLoader::readSchemaNoRef(json const& _rootFile, json const& _data, int depth)
 {
     Ent::Subschema schema;
-    if (depth > 100) // Avoid stackoverflow on cyrcular inclusion
+    if (depth > 20) // Avoid stackoverflow on cyrcular inclusion
         return schema;
     // type
     if (_data.count("type"))

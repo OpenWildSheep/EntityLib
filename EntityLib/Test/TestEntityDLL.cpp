@@ -334,6 +334,8 @@ try
         // Test read instance of
         Ent::Entity ent = entlib.loadEntity("instance.create.entity");
 
+        ent.getComponent("Transform")->root.getFieldNames();
+
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent.getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
@@ -392,8 +394,8 @@ try
     Ent::Component* heightObj = scene.objects.front().addComponent(entlib, "HeightObj");
     heightObj->root.at("DisplaceNoiseList")->push();
 
-    scene.objects.front().addComponent(entlib, "BeamGenerator");
-    scene.objects.front().addComponent(entlib, "ExplosionEffect");
+    scene.objects.front().addComponent(entlib, "BeamGenerator")->root.getFieldNames();
+    scene.objects.front().addComponent(entlib, "ExplosionEffect")->root.getFieldNames();
 
     auto ep1Iter = std::find_if(
         begin(scene.objects), end(scene.objects), [ep1 = std::string("EP1_")](auto&& ent) {

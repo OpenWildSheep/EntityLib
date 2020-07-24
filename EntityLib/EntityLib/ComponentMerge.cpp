@@ -9,6 +9,47 @@ using namespace nlohmann;
 
 char const* sceneSchemaLocation = "WildPipeline/Schema/Scene-schema.json";
 
+// When schema branches a copied from a file to an other, the local references become external
+void updateRefLinks(std::string const& sourceFile, json& node)
+{
+    switch (node.type())
+    {
+    case nlohmann::detail::value_t::null: break;
+    case nlohmann::detail::value_t::string: break;
+    case nlohmann::detail::value_t::boolean: break;
+    case nlohmann::detail::value_t::number_integer:
+    case nlohmann::detail::value_t::number_unsigned: break;
+    case nlohmann::detail::value_t::number_float: break;
+    case nlohmann::detail::value_t::object:
+    {
+        for (auto& field : node.items())
+        {
+            if (field.key() == "$ref")
+            {
+                std::string link = field.value();
+                if (link.front() == '#')
+                {
+                    link = "file://" + sourceFile + link;
+                    field.value() = link;
+                }
+            }
+            else
+                updateRefLinks(sourceFile, field.value());
+        }
+    }
+    break;
+    case nlohmann::detail::value_t::array:
+    {
+        for (auto& item : node)
+        {
+            updateRefLinks(sourceFile, item);
+        }
+    }
+    break;
+    case nlohmann::detail::value_t::discarded: break;
+    }
+};
+
 json Ent::mergeComponants(std::filesystem::path const& toolsDir)
 {
     json runtimeCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/RuntimeComponants.json");
@@ -38,13 +79,16 @@ json Ent::mergeComponants(std::filesystem::path const& toolsDir)
         if (iter != editionCompMap.end())
         {
             json merged = runtimeCompSch[name].value("properties", json());
-            json const& editionComp = iter->second->value("properties", json());
+            updateRefLinks("RuntimeComponants.json", merged);
+            json editionComp = iter->second->value("properties", json());
+            updateRefLinks("EditionComponents.json", editionComp);
             merged.update(editionComp);
 
             json newComp;
             auto&& prop = newComp["properties"];
             prop["Type"]["const"] = name;
-            prop["Data"] = std::move(merged);
+            prop["Data"]["type"] = "object";
+            prop["Data"]["properties"] = std::move(merged);
 
             compList.push_back(std::move(newComp));
             alreadyInsertedComponents.insert(name);

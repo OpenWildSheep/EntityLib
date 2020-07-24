@@ -50,6 +50,7 @@ namespace Ent
             json const& data = properties["Data"];
             Ent::Subschema sub = loader.readSchema(schemaDocument, data, 0);
 
+            ENTLIB_ASSERT(sub.type == DataType::object);
             schema.definitions.emplace(compName, std::move(sub));
         }
 

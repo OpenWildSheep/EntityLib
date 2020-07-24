@@ -125,7 +125,22 @@ Ent::Subschema Ent::SchemaLoader::readSchemaNoRef(json const& _rootFile, json co
     // default
     if (_data.count("default"))
     {
-        schema.defaultValue = _data["default"];
+        schema.defaultValue = Null{};
+        auto const& def = _data["default"];
+        switch (def.type())
+        {
+        case nlohmann::detail::value_t::null:
+        case nlohmann::detail::value_t::object:
+        case nlohmann::detail::value_t::array:
+        case nlohmann::detail::value_t::discarded: break;
+        case nlohmann::detail::value_t::string: schema.defaultValue = def.get<std::string>(); break;
+        case nlohmann::detail::value_t::boolean: schema.defaultValue = def.get<bool>(); break;
+        case nlohmann::detail::value_t::number_integer:
+        case nlohmann::detail::value_t::number_unsigned:
+            schema.defaultValue = def.get<int64_t>();
+            break;
+        case nlohmann::detail::value_t::number_float: schema.defaultValue = def.get<float>(); break;
+        }
     }
     if (_data.count("items"))
     {

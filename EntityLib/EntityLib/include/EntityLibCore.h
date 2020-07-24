@@ -21,26 +21,15 @@ namespace Ent
     template <typename... Args>
     inline std::string format(char const* message, Args&&... args)
     {
-        // return std::string();
-        std::string buffer(1024, ' ');
-#ifdef _MSC_VER
-        size_t const len =
-            (size_t)_sprintf_p((char*)buffer.data(), 1024, message, std::forward<Args>(args)...);
-        buffer.resize(len);
-        if (len > 1024)
-            _sprintf_p((char*)buffer.data(), len, std::forward<Args>(args)...);
-#else
-        auto const len = snprintf((char*)buffer.data(), 1024, std::forward<Args>(args)...);
-        buffer.resize(len);
-        if (len > 1024)
-            snprintf((char*)buffer.data(), len, std::forward<Args>(args)...);
-#endif
+        size_t const len = (size_t)sprintf_s(nullptr, 0, message, std::forward<Args>(args)...);
+        std::string buffer(len, ' ');
+        sprintf_s((char*)buffer.data(), len, std::forward<Args>(args)...);
         return buffer;
     }
 
     inline void logicError(char const* _message, char const* _file, long _line)
     {
-        fprintf(stderr, "%s(%ld): Assert failed : %s", _file, _line, _message);
+        fprintf(stderr, "%s(%ld): Assert failed : %s\n", _file, _line, _message);
         terminate();
     }
 

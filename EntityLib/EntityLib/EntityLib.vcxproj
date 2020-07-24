@@ -155,6 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ComponentMerge.cpp" />
     <ClCompile Include="EntityLib.cpp">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EnableAllWarnings</WarningLevel>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</TreatWarningAsError>
@@ -166,6 +167,7 @@
     <ClCompile Include="ValidJson.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\ComponentMerge.h" />
     <ClInclude Include="include\EntityLib.h" />
     <ClInclude Include="include\EntityLibCore.h" />
     <ClInclude Include="include\Schema.h" />

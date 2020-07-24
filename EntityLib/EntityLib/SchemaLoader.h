@@ -2,6 +2,8 @@
 
 #pragma warning(push, 0)
 #include <filesystem>
+
+#include "../external/json.hpp"
 #pragma warning(pop)
 
 #include "include/Schema.h"

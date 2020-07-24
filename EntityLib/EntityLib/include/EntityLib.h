@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Schema.h"
-
 #pragma warning(push, 0)
 #include <vector>
 #include <memory>
@@ -11,8 +9,9 @@
 
 #include "../external/mapbox/variant.hpp"
 #include "../external/optional.hpp"
-#include "../external/json.hpp" // TODO : Try to remove this inclusion
 #pragma warning(pop)
+
+#include "Schema.h"
 
 namespace std
 {
@@ -64,10 +63,6 @@ namespace Ent
         V defaultValue = V();
         tl::optional<V> prefabValue;
         tl::optional<V> overrideValue;
-    };
-
-    struct Null
-    {
     };
 
     struct Node;
@@ -304,11 +299,4 @@ namespace Ent
             return Override<V>(defaultValue, prefabValue, tl::nullopt);
     }
 
-    // *********************** Merge Runtime componants into Entity schema ************************
-
-    /// Merge the runtime components and the edition components, and generate the final scene schema
-    nlohmann::json mergeComponants(std::filesystem::path const& toolsDir);
-
-    /// Merge the runtime components and the edition components, update the scene schema file
-    void updateComponants(std::filesystem::path const& toolsDir);
 } // namespace Ent

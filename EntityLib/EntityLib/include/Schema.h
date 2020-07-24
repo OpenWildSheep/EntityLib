@@ -5,11 +5,16 @@
 #include <memory>
 #include <vector>
 
+#include "../external/mapbox/variant.hpp"
 #include "../external/optional.hpp"
-#include "../external/json.hpp" // TODO : Try to remove this inclusion
 #pragma warning(pop)
 
 #include "EntityLibCore.h"
+
+namespace std
+{
+    using namespace mapbox::util;
+} // namespace std
 
 namespace Ent
 {
@@ -25,6 +30,10 @@ namespace Ent
         freeobject, // Object without schema. Used in Subscene/Embedded
     };
 
+    struct Null
+    {
+    };
+
     struct ENTLIB_DLLEXPORT Subschema
     {
         DataType type = DataType::null;
@@ -32,7 +41,8 @@ namespace Ent
         std::map<std::string, Subschema> properties;
         size_t maxItems = size_t(-1);
         size_t minItems = 0;
-        nlohmann::json defaultValue;
+        using DefaultValue = std::variant<Null, std::string, float, int64_t, Null, Null, bool>;
+        DefaultValue defaultValue;
         std::unique_ptr<Subschema> singularItems; // In valijson it is a SingularItems
         tl::optional<std::vector<Subschema>> linearItems;
         std::vector<std::string> enumValues;

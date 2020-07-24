@@ -2,6 +2,7 @@
 
 #include "Tools.h"
 #include "SchemaLoader.h"
+#include "include/ComponentMerge.h"
 
 #pragma warning(push, 0)
 #pragma warning(disable : 4702)
@@ -603,7 +604,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
     case Ent::DataType::null: result = Ent::Node(Ent::Null{}, &nodeSchema); break;
     case Ent::DataType::string:
     {
-        std::string const def = nodeSchema.defaultValue.is_null() ?
+        std::string const def = nodeSchema.defaultValue.is<Ent::Null>() ?
                                     std::string() :
                                     nodeSchema.defaultValue.get<std::string>();
         tl::optional<std::string> const supVal = super and super->isSet() ?
@@ -618,7 +619,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
     case Ent::DataType::boolean:
     {
         bool const def =
-            nodeSchema.defaultValue.is_null() ? bool{} : nodeSchema.defaultValue.get<bool>();
+            nodeSchema.defaultValue.is<Ent::Null>() ? bool{} : nodeSchema.defaultValue.get<bool>();
         tl::optional<bool> const supVal = super and super->isSet() ?
                                               tl::optional<bool>(super->getBool()) :
                                               tl::optional<bool>(tl::nullopt);
@@ -629,8 +630,9 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
     break;
     case Ent::DataType::integer:
     {
-        int64_t const def =
-            nodeSchema.defaultValue.is_null() ? int64_t{} : nodeSchema.defaultValue.get<int64_t>();
+        int64_t const def = nodeSchema.defaultValue.is<Ent::Null>() ?
+                                int64_t{} :
+                                nodeSchema.defaultValue.get<int64_t>();
         tl::optional<int64_t> const supVal = super and super->isSet() ?
                                                  tl::optional<int64_t>(super->getInt()) :
                                                  tl::optional<int64_t>(tl::nullopt);
@@ -643,7 +645,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
     case Ent::DataType::number:
     {
         float const def =
-            nodeSchema.defaultValue.is_null() ? float{} : nodeSchema.defaultValue.get<float>();
+            nodeSchema.defaultValue.is<Ent::Null>() ? float{} : nodeSchema.defaultValue.get<float>();
         tl::optional<float> const supVal = super and super->isSet() ?
                                                tl::optional<float>(super->getFloat()) :
                                                tl::optional<float>(tl::nullopt);
@@ -1128,83 +1130,4 @@ void Ent::EntityLib::saveScene(Scene const& scene, std::filesystem::path const& 
 Ent::Component* Ent::EntityLib::addComponent(Entity& entity, char const* type) const
 {
     return entity.addComponent(*this, type);
-}
-
-char const* sceneSchemaLocation = "WildPipeline/Schema/Scene-schema.json";
-
-json Ent::mergeComponants(std::filesystem::path const& toolsDir)
-{
-    json runtimeCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/RuntimeComponants.json");
-    json editionCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/EditionComponents.json");
-    auto sceneSchemaPath = toolsDir / sceneSchemaLocation;
-    json sceneSch = loadJsonFile(sceneSchemaPath);
-    json dependencies = loadJsonFile(toolsDir / "WildPipeline/Schema/Dependencies.json");
-
-    runtimeCompSch = runtimeCompSch["definitions"];
-    editionCompSch = editionCompSch["definitions"];
-
-    auto&& compList = sceneSch["definitions"]["Component"]["oneOf"];
-    compList = json();
-
-    // Looking for components with same name and merge them
-    std::map<std::string, json const*> editionCompMap;
-    std::set<std::string> alreadyInsertedComponents;
-    for (auto&& name_comp : editionCompSch.items())
-    {
-        editionCompMap.emplace(name_comp.key(), &(name_comp.value()));
-    }
-
-    for (json const& dep : dependencies["Dependencies"])
-    {
-        auto name = dep["className"].get<std::string>();
-        auto iter = editionCompMap.find(name);
-        if (iter != editionCompMap.end())
-        {
-            json merged = dep.value("properties", json());
-            merged.update(*iter->second);
-
-            json newComp;
-            auto&& prop = newComp["properties"];
-            prop["Type"]["const"] = name;
-            prop["Data"] = std::move(merged);
-
-            compList.push_back(std::move(newComp));
-            alreadyInsertedComponents.insert(name);
-        }
-    }
-
-    // Add other components
-    auto addComponent = [&](std::string const& name, char const* filename) {
-        if (alreadyInsertedComponents.count(name))
-            return;
-        json newComp;
-        auto&& prop = newComp["properties"];
-        prop["Type"]["const"] = name;
-        prop["Data"]["$ref"] = "file://" + (filename + ("#/definitions/" + name));
-
-        compList.push_back(std::move(newComp));
-    };
-    for (auto&& name_comp : editionCompSch.items())
-    {
-        addComponent(name_comp.key(), "EditionComponents.json");
-    }
-
-    for (json const& dep : dependencies["Dependencies"])
-    {
-        auto name = dep["className"].get<std::string>();
-        addComponent(name, "RuntimeComponants.json");
-    }
-    return sceneSch;
-}
-
-void Ent::updateComponants(std::filesystem::path const& toolsDir)
-{
-    json sceneSch = mergeComponants(toolsDir);
-    auto sceneSchemaPath = toolsDir / sceneSchemaLocation;
-    std::ofstream file(sceneSchemaPath);
-    if (not file.is_open())
-    {
-        throw std::runtime_error("Can't open file for write: " + sceneSchemaPath.u8string());
-    }
-    file << sceneSch.dump(4);
 }

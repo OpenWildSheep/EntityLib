@@ -223,6 +223,7 @@ namespace Ent
 
     struct ENTLIB_DLLEXPORT EntityLib
     {
+        std::filesystem::path toolsDir;
         Schema schema;
         std::map<std::string, std::vector<std::string>> componentDependencies;
 

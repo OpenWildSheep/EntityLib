@@ -629,10 +629,6 @@ private:
             rootSchema.addConstraintToSubschema(makeConstConstraint(itr->second), &subschema);
         }
 
-        if ((itr = object.find("default")) != object.end()) {
-            rootSchema.addConstraintToSubschema(makeDefaultConstraint(itr->second), &subschema);
-        }
-
         if ((itr = object.find("contains")) != object.end()) {
             rootSchema.addConstraintToSubschema(
                     makeContainsConstraint(rootSchema, rootNode, itr->second,
@@ -1206,27 +1202,12 @@ private:
      *
      * @param   node  JSON node containing an arbitrary value
      *
-     * @return  pointer to a new ConstConstraint that belongs to the caller
+     * @return  pointer to a new MinimumConstraint that belongs to the caller
      */
     template<typename AdapterType>
     constraints::ConstConstraint makeConstConstraint(const AdapterType &node)
     {
         constraints::ConstConstraint constraint;
-        constraint.setValue(node);
-        return constraint;
-    }
-
-    /**
-    * @brief   Make a new DefaultConstraint object.
-    *
-    * @param   node  JSON node containing an arbitrary value
-    *
-    * @return  pointer to a new DefaultConstraint that belongs to the caller
-    */
-    template<typename AdapterType>
-    constraints::DefaultConstraint makeDefaultConstraint(const AdapterType &node)
-    {
-        constraints::DefaultConstraint constraint;
         constraint.setValue(node);
         return constraint;
     }

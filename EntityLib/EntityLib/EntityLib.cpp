@@ -4,16 +4,13 @@
 #include "SchemaLoader.h"
 
 #pragma warning(push, 0)
+#pragma warning(disable : 4702)
 #include <iostream>
 #include <fstream>
 #include <set>
 
 #include "external/json.hpp"
-// TODO Add valid check
-//#include <valijson/adapters/nlohmann_json_adapter.hpp>
-//#include <valijson/utils/nlohmann_json_utils.hpp>
-//#include <valijson/schema.hpp>
-//#include <valijson/schema_parser.hpp>
+#include "ValidJson.h"
 #pragma warning(pop)
 
 using namespace nlohmann;
@@ -32,7 +29,8 @@ namespace Ent
     {
     }
 
-    EntityLib::EntityLib(std::filesystem::path const& toolsDir) // Read schema and dependencies
+    EntityLib::EntityLib(std::filesystem::path const& _toolsDir)
+        : toolsDir(_toolsDir) // Read schema and dependencies
     {
         auto schemaPath = toolsDir / "WildPipeline/Schema";
 
@@ -49,7 +47,7 @@ namespace Ent
             auto compName = properties.at("Type").at("const").get<std::string>();
 
             json const& data = properties["Data"];
-            Ent::Subschema sub = loader.readSchema(schemaDocument, data);
+            Ent::Subschema sub = loader.readSchema(schemaDocument, data, 0);
 
             schema.definitions.emplace(compName, std::move(sub));
         }
@@ -935,6 +933,8 @@ Ent::Entity Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath) 
     json document;
     file >> document;
 
+    validEntity(toolsDir, document);
+
     Ent::Entity ent = ::loadEntity(*this, schema, document);
     return ent;
 }
@@ -954,24 +954,10 @@ static Ent::Scene loadScene(Ent::EntityLib const& entLib, Ent::Schema const& sch
 
 Ent::Scene Ent::EntityLib::loadScene(std::filesystem::path const& scenePath) const
 {
-    json document;
-    {
-        std::ifstream file(scenePath);
-        if (not file.is_open())
-        {
-            constexpr size_t MessSize = 1024;
-            std::array<char, MessSize> message = {};
-            sprintf_s(message.data(), MessSize, "Can't open file for read: %ls", scenePath.c_str());
-            throw std::runtime_error(message.data());
-        }
-        file >> document;
-    }
+    json document = loadJsonFile(scenePath);
 
-    // Reformat input to make diff easier
-    /*{
-        std::ofstream file(scenePath);
-        file << document.dump(4);
-    }*/
+    validScene(toolsDir, document);
+
     return ::loadScene(*this, schema, document.at("Objects"));
 }
 
@@ -1103,7 +1089,7 @@ void Ent::EntityLib::saveEntity(Entity const& entity, std::filesystem::path cons
         throw std::runtime_error(message.data());
     }
     json document = ::saveEntity(schema, entity);
-
+    validScene(toolsDir, document);
     file << document.dump(4);
 }
 
@@ -1134,6 +1120,8 @@ void Ent::EntityLib::saveScene(Scene const& scene, std::filesystem::path const& 
     }
 
     json document = ::saveScene(schema, scene);
+
+    validScene(toolsDir, document);
     file << document.dump(4);
 }
 

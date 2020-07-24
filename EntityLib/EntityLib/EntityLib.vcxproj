@@ -157,12 +157,13 @@
   <ItemGroup>
     <ClCompile Include="EntityLib.cpp">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EnableAllWarnings</WarningLevel>
-      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</TreatWarningAsError>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">EnableAllWarnings</WarningLevel>
-      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</TreatWarningAsError>
     </ClCompile>
     <ClCompile Include="SchemaLoader.cpp" />
     <ClCompile Include="Tools.cpp" />
+    <ClCompile Include="ValidJson.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\EntityLib.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="include\Schema.h" />
     <ClInclude Include="SchemaLoader.h" />
     <ClInclude Include="Tools.h" />
+    <ClInclude Include="ValidJson.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

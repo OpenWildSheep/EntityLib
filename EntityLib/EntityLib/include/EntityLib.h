@@ -22,14 +22,14 @@ namespace std
 namespace Ent
 {
     // ******************************** Global declarations ***************************************
+
+    /// Exception thrown when calling a method of a Node which has not the apropriate DataType
     struct BadType : std::runtime_error
     {
         BadType();
     };
 
     // ******************************** Implem details ********************************************
-
-    // *** Entity part ***
 
     template <typename V>
     struct Override
@@ -72,13 +72,6 @@ namespace Ent
     struct Array
     {
         std::vector<std::unique_ptr<Node>> data;
-        Override<int64_t> size;
-
-        Array() = default;
-        Array(Array const&) = delete;
-        Array& operator=(Array const&) = delete;
-        Array(Array&&) = default;
-        Array& operator=(Array&&) = default;
     };
 
     using Value =
@@ -133,8 +126,6 @@ namespace Ent
         void unset();
 
         bool isSet() const;
-
-        bool isArraySizeSet() const;
 
         Node detach() const;
 

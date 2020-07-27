@@ -237,15 +237,6 @@ namespace Ent
         return std::apply_visitor(IsSet{}, value);
     }
 
-    bool Node::isArraySizeSet() const
-    {
-        if (value.is<Array>())
-        {
-            return value.get<Array>().size.isSet();
-        }
-        throw BadType();
-    }
-
     struct Detach
     {
         Subschema const* schema;
@@ -266,7 +257,6 @@ namespace Ent
             Array out;
             for (auto&& item : arr.data)
                 out.data.emplace_back(std::make_unique<Node>(item->detach()));
-            out.size = arr.size.detach();
             return Node(std::move(out), schema);
         }
 
@@ -305,7 +295,6 @@ namespace Ent
             Array out;
             for (auto&& item : arr.data)
                 out.data.emplace_back(std::make_unique<Node>(item->makeInstanceOf()));
-            out.size = arr.size.detach();
             return Node(std::move(out), schema);
         }
 
@@ -585,7 +574,6 @@ static Ent::Node loadFreeObjectNode(json const& data)
             Ent::Node tmpNode = loadFreeObjectNode(item);
             arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
         }
-        arr.size = Ent::Override<int64_t>(int64_t{}, tl::nullopt, static_cast<int64_t>(data.size()));
         result = Ent::Node(std::move(arr), nullptr);
     }
     break;
@@ -689,11 +677,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                         arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
-                    arr.size = Ent::Override<int64_t>(
-                        int64_t{}, tl::nullopt, static_cast<int64_t>(super->size()));
                 }
-                else
-                    arr.size = Ent::Override<int64_t>(int64_t{}, tl::nullopt, 0);
             }
             else
             {
@@ -705,8 +689,6 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                     arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
                     ++index;
                 }
-                arr.size = Ent::Override<int64_t>(
-                    int64_t{}, tl::nullopt, static_cast<int64_t>(data.size()));
             }
         }
         else
@@ -722,8 +704,6 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                 arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
                 ++index;
             }
-            arr.size = Ent::Override<int64_t>(
-                int64_t{}, tl::nullopt, static_cast<int64_t>(nodeSchema.linearItems->size()));
         }
         result = Ent::Node(std::move(arr), &nodeSchema);
     }

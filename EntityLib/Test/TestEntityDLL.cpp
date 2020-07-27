@@ -154,8 +154,8 @@ try
         ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
 
         // TEST changed values
-        ENTLIB_ASSERT(
-            sysCreat->root.at("Name")->getString() == std::string("Shamane_male")); // set. changed.
+        ENTLIB_ASSERT(sysCreat->root.at("Name")->getString() == std::string("Shamane_male")); // set.
+                                                                                              // changed.
         ENTLIB_ASSERT(sysCreat->root.at("Name")->isSet()); // set. changed.
     }
     {
@@ -191,7 +191,9 @@ try
             sysCreat->root.at("ScriptList")->at(1)->getString() == std::string("b2")); // Overrided
         ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->at(1)->isSet()); // Overrided
         // TEST read Not overrided in array
-        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->at(2)->getString() == std::string("c1")); // not overrided
+        ENTLIB_ASSERT(
+            sysCreat->root.at("ScriptList")->at(2)->getString() == std::string("c1")); // not
+                                                                                       // overrided
         ENTLIB_ASSERT(not sysCreat->root.at("ScriptList")->at(2)->isSet()); // Not overrided
 
         // Programatically unset
@@ -269,7 +271,7 @@ try
     {
         // Test create detached
         Ent::Entity ent = entlib.loadEntity("instance.entity");
-        Ent::Entity detached = entlib.detachEntityFromPrefab(ent);
+        Ent::Entity detached = ent.detachEntityFromPrefab();
 
         Ent::Component* sysCreat = detached.getComponent("SystemicCreature");
 
@@ -391,11 +393,11 @@ try
         }
     }
 
-    Ent::Component* heightObj = scene.objects.front().addComponent(entlib, "HeightObj");
+    Ent::Component* heightObj = scene.objects.front().addComponent("HeightObj");
     heightObj->root.at("DisplaceNoiseList")->push();
 
-    scene.objects.front().addComponent(entlib, "BeamGenerator")->root.getFieldNames();
-    scene.objects.front().addComponent(entlib, "ExplosionEffect")->root.getFieldNames();
+    scene.objects.front().addComponent("BeamGenerator")->root.getFieldNames();
+    scene.objects.front().addComponent("ExplosionEffect")->root.getFieldNames();
 
     auto ep1Iter = std::find_if(
         begin(scene.objects), end(scene.objects), [ep1 = std::string("EP1_")](auto&& ent) {

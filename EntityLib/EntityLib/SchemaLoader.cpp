@@ -5,6 +5,8 @@
 #include <sstream>
 #pragma warning(pop)
 
+/// \cond PRIVATE
+
 using namespace nlohmann;
 
 static std::vector<std::string> split(const std::string& _str, char _delimiter)
@@ -184,3 +186,5 @@ Ent::Subschema Ent::SchemaLoader::readSchemaNoRef(json const& _rootFile, json co
     }
     return schema;
 }
+
+/// \endcond

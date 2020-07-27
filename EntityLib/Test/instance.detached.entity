@@ -1,0 +1,125 @@
+{
+    "Color": [
+        27,
+        177,
+        27,
+        255
+    ],
+    "Components": [
+        {
+            "Data": {
+                "Faction": 2254016666,
+                "InSpiritWorld": false,
+                "Visible": true
+            },
+            "Type": "Actor",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "BreakableSizeMax": "",
+                "BreathDamages": 10.0,
+                "BreathImpact": 0.0,
+                "BreathStaminaLoss": 0.0,
+                "ControllerVibrationCoef": 0.33000001311302185,
+                "DOTDamagesDuration": 1.0,
+                "Damages": 5.0,
+                "DistanceReductionDamageByStep": 3.0,
+                "DistanceReductionImpactByStep": 0.0,
+                "DistanceReductionStep": 2.0,
+                "EjectHit": true,
+                "HitSize": "",
+                "HitType": "",
+                "Impact": 0.0,
+                "PhysicExplosionStrength": -1.0,
+                "ShakeAttenuationRadius": 50.0,
+                "ShakeData": {
+                    "shakeDuration": 0.0,
+                    "shakeFrequency": 0.0,
+                    "shakeIntensity": 0.0
+                },
+                "ShakeRadius": 15.0,
+                "SpecificDuration": 3.0,
+                "SpecificRadiusStart": 1.0,
+                "SpecificRadiusStop": 5.0,
+                "StaminaLoss": 0.0
+            },
+            "Type": "ExplosionEffect",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "DisplaceNoiseList": [
+                    {
+                        "DisplaceDistance": 0.0,
+                        "LuminanceCenter": 0.0,
+                        "MapChannel": 51248,
+                        "MotifName": "",
+                        "MotifOffsetX": 0.0,
+                        "MotifOffsetY": 0.0,
+                        "MotifRotationZ": 0.0,
+                        "MotifSizeX": 0.0,
+                        "MotifSizeY": 0.0
+                    }
+                ],
+                "Subdivision": 0
+            },
+            "Type": "HeightObj",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "Tag": "ShamanPlayerSpawner",
+                "ThumbnailMesh": "02_creature/human/male/clothstrong/bodykai/CLOTH_Body.wbm",
+                "Type": "Spawner"
+            },
+            "Type": "NetworkNode",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "BehaviorPath": "Pesto/Behavior/FSMDefaultBehavior.pesto",
+                "BehaviorState": "Watch",
+                "CanBeMaster": false,
+                "Faction": "Plouf",
+                "Inventory": "KaiWOLgrey",
+                "Invincible": false,
+                "Life": 1000.0,
+                "PlayerSpawn": true,
+                "ScriptList": [
+                    "a1",
+                    "b2",
+                    "c1"
+                ],
+                "Spawner": "ShamanPlayerSpawner.gd",
+                "UniqueID": "Shaman_male_Bobby",
+                "Warrior": false
+            },
+            "Type": "SystemicCreature",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "Matrix": [
+                    0.96670001745224,
+                    0.2556999921798706,
+                    -0.013700000010430813,
+                    -0.2556000053882599,
+                    0.96670001745224,
+                    0.00839999970048666,
+                    0.015399999916553497,
+                    -0.004600000102072954,
+                    0.9998999834060669
+                ],
+                "Position": [
+                    105.22440338134766,
+                    152.78109741210938,
+                    29.66349983215332
+                ]
+            },
+            "Type": "Transform",
+            "Version": 1
+        }
+    ],
+    "Name": "PlayerSpawner__detached"
+}

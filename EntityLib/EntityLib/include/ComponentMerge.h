@@ -3,7 +3,7 @@
 #include <filesystem>
 
 #pragma warning(push, 0)
-#include "../external/json.hpp" // TODO : Try to remove this inclusion
+#include "../external/json.hpp"
 #pragma warning(pop)
 
 namespace std

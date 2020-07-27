@@ -60,7 +60,7 @@ ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: true
 PenaltyBreakAssignment : 2
 PenaltyBreakBeforeFirstCallParameter : 2
-PenaltyBreakComment: 100
+PenaltyBreakComment: 1
 PenaltyBreakFirstLessLess: 2
 PenaltyBreakString: 20
 PenaltyBreakTemplateDeclaration: 10

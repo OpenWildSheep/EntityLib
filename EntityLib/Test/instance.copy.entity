@@ -1,0 +1,26 @@
+{
+    "Color": [
+        27,
+        177,
+        27,
+        255
+    ],
+    "Components": [
+        {
+            "Data": {
+                "BehaviorState": "Overrided",
+                "Faction": "Plouf",
+                "ScriptList": [
+                    "a1",
+                    null,
+                    "c2",
+                    "d2"
+                ]
+            },
+            "Type": "SystemicCreature",
+            "Version": 1
+        }
+    ],
+    "InstanceOf": "prefab.entity",
+    "Name": "PlayerSpawner_"
+}

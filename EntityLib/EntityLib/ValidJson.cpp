@@ -11,6 +11,8 @@
 #include <valijson/validator.hpp>
 #pragma warning(pop)
 
+/// \cond PRIVATE
+
 using namespace nlohmann;
 
 char schemaPath[1024] = {};
@@ -40,6 +42,23 @@ void freeDocument(json const* adapter)
 
 char const* sceneSchemaPath = "WildPipeline/Schema/Scene-schema.json";
 
+static std::string createMessageFromValidationResult(valijson::ValidationResults result)
+{
+    std::string fullMessage;
+    for (valijson::ValidationResults::Error const& err : result)
+    {
+        fullMessage += err.description + "\n";
+        fullMessage += "In node : ";
+        for (std::string const& line : err.context)
+        {
+            fullMessage += line + '/';
+        }
+        fullMessage.pop_back();
+        fullMessage += "\n";
+    }
+    return fullMessage;
+}
+
 void Ent::validScene(std::filesystem::path toolsDir, nlohmann::json const& scene)
 {
     // valid the scene using schema
@@ -55,9 +74,12 @@ void Ent::validScene(std::filesystem::path toolsDir, nlohmann::json const& scene
 
     valijson::Validator validator;
     valijson::adapters::NlohmannJsonAdapter myTargetAdapter(scene);
-    if (!validator.validate(vjSchema, myTargetAdapter, NULL))
+    valijson::ValidationResults result;
+    if (!validator.validate(vjSchema, myTargetAdapter, &result))
     {
-        std::runtime_error("Validation failed.");
+        /// @todo un-comment soon
+        std::string message = createMessageFromValidationResult(result);
+        // throw Ent::JsonValidation(std::move(message));
     }
 }
 
@@ -76,8 +98,13 @@ void Ent::validEntity(std::filesystem::path toolsDir, nlohmann::json const& enti
 
     valijson::Validator validator;
     valijson::adapters::NlohmannJsonAdapter myTargetAdapter(entity);
-    if (!validator.validate(vjSchema, myTargetAdapter, NULL))
+    valijson::ValidationResults result;
+    if (!validator.validate(vjSchema, myTargetAdapter, &result))
     {
-        std::runtime_error("Validation failed.");
+        /// @todo un-comment soon
+        std::string message = createMessageFromValidationResult(result);
+        // throw Ent::JsonValidation(std::move(message));
     }
 }
+
+/// \endcond

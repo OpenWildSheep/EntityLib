@@ -14,6 +14,8 @@
 #include "ValidJson.h"
 #pragma warning(pop)
 
+/// \cond PRIVATE
+
 using namespace nlohmann;
 
 // char schemaPath[2048] = {};
@@ -69,6 +71,8 @@ namespace Ent
             componentDependencies.emplace(std::move(name), std::move(deps));
         }
     }
+
+    EntityLib::~EntityLib() = default;
 
     Node::Node(Value val, Subschema const* _schema)
         : schema(_schema)
@@ -173,10 +177,6 @@ namespace Ent
         throw BadType();
     }
 
-    void Node::setNone()
-    {
-        value = Null{};
-    }
     void Node::setFloat(float val)
     {
         value.get<Override<float>>().set(val);
@@ -428,13 +428,15 @@ namespace Ent
     // ********************************* Entity ***************************************************
 
     Entity::Entity(
+        EntityLib const& _entlib,
         std::string _name,
         std::map<std::string, Component> _components,
         tl::optional<SubSceneComponent> _subSceneComponent,
         tl::optional<std::array<uint8_t, 4>> _color,
         tl::optional<std::string> _thumbnail,
         tl::optional<std::string> _instanceOf)
-        : name(std::move(_name))
+        : entlib(&_entlib)
+        , name(std::move(_name))
         , subSceneComponent(std::move(_subSceneComponent))
         , components(std::move(_components))
         , color(_color)
@@ -467,16 +469,16 @@ namespace Ent
     {
         color = _color;
     }
-    Component* Entity::addComponent(EntityLib const& entlib, char const* type)
+    Component* Entity::addComponent(char const* type)
     {
-        if (entlib.componentDependencies.count(type)) // Could be an editor componant
+        if (entlib->componentDependencies.count(type)) // Could be an editor componant
         {
-            for (auto&& dep : entlib.componentDependencies.at(type))
+            for (auto&& dep : entlib->componentDependencies.at(type))
             {
-                addComponent(entlib, dep.c_str());
+                addComponent(dep.c_str());
             }
         }
-        Ent::Subschema const& compSchema = entlib.schema.definitions.at(type);
+        Ent::Subschema const& compSchema = entlib->schema.definitions.at(type);
         Ent::Component comp{ type, loadNode(compSchema, json(), nullptr), 1, components.size() };
         auto iter_bool = components.emplace(type, std::move(comp));
         return &(iter_bool.first->second);
@@ -895,6 +897,7 @@ static Ent::Entity loadEntity(Ent::EntityLib const& entlib, Ent::Schema const& s
     }
     components.erase("SubScene");
     return Ent::Entity(
+        entlib,
         std::move(name),
         std::move(components),
         std::move(subSceneComponent),
@@ -1013,46 +1016,48 @@ static json saveEntity(Ent::Schema const& schema, Ent::Entity const& entity)
     return entNode;
 }
 
-Ent::Entity Ent::EntityLib::detachEntityFromPrefab(Entity const& entity) const
+Ent::Entity Ent::Entity::detachEntityFromPrefab() const
 {
-    std::map<std::string, Ent::Component> components;
+    std::map<std::string, Ent::Component> detComponents;
     size_t index = 0;
-    for (auto const& type_comp : entity.getComponents())
+    for (auto const& type_comp : getComponents())
     {
         auto const& type = std::get<0>(type_comp);
         auto const& comp = std::get<1>(type_comp);
 
         Ent::Component detachedComp{ type, comp.root.detach(), 1, index };
 
-        components.emplace(type, std::move(detachedComp));
+        detComponents.emplace(type, std::move(detachedComp));
         ++index;
     }
-    tl::optional<SubSceneComponent> subSceneComponent;
-    if (SubSceneComponent const* subscene = entity.getSubSceneComponent())
+    tl::optional<SubSceneComponent> detSubSceneComponent;
+    if (SubSceneComponent const* subscene = getSubSceneComponent())
     {
-        subSceneComponent->isEmbedded = subscene->isEmbedded;
-        subSceneComponent->file = subscene->file;
+        detSubSceneComponent->isEmbedded = subscene->isEmbedded;
+        detSubSceneComponent->file = subscene->file;
         if (subscene->isEmbedded)
         {
-            subSceneComponent->embedded = std::make_unique<Ent::Scene>();
+            detSubSceneComponent->embedded = std::make_unique<Ent::Scene>();
             for (Ent::Entity const& subEntity : subscene->embedded->objects)
             {
-                subSceneComponent->embedded->objects.push_back(detachEntityFromPrefab(subEntity));
+                detSubSceneComponent->embedded->objects.push_back(subEntity.detachEntityFromPrefab());
             }
         }
     }
     return Ent::Entity(
-        std::move(entity.getName()),
-        std::move(components),
-        std::move(subSceneComponent),
-        entity.getColor() ? *entity.getColor() : tl::optional<std::array<uint8_t, 4>>(),
-        entity.getThumbnail() ? entity.getThumbnail() : tl::optional<std::string>());
+        *entlib,
+        std::move(std::string(getName()) + "_detached"),
+        std::move(detComponents),
+        std::move(detSubSceneComponent),
+        getColor() ? *getColor() : tl::optional<std::array<uint8_t, 4>>(),
+        getThumbnail() ? std::string(getThumbnail()) : tl::optional<std::string>());
 }
 
 Ent::Entity Ent::EntityLib::makeInstanceOf(
-    std::string name, std::string _instanceOf, tl::optional<std::array<uint8_t, 4>> color)
+    std::string name, std::string _instanceOf, tl::optional<std::array<uint8_t, 4>> color) const
 {
     return Ent::Entity(
+        *this,
         std::move(name),
         std::map<std::string, Ent::Component>(),
         tl::nullopt,
@@ -1108,7 +1113,4 @@ void Ent::EntityLib::saveScene(Scene const& scene, std::filesystem::path const& 
     file << document.dump(4);
 }
 
-Ent::Component* Ent::EntityLib::addComponent(Entity& entity, char const* type) const
-{
-    return entity.addComponent(*this, type);
-}
+/// \endcond

@@ -17,7 +17,15 @@
 
 namespace Ent
 {
+    /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
+    struct JsonValidation : std::runtime_error
+    {
+        /// Make a JsonValidation with the given _message
+        JsonValidation(std::string _message)
+            : std::runtime_error(std::move(_message)){};
+    };
 
+    /// A printf-like function which return a std::string
     template <typename... Args>
     inline std::string format(char const* message, Args&&... args)
     {
@@ -27,6 +35,7 @@ namespace Ent
         return buffer;
     }
 
+    /// Call it when a logic error (a bug) happen
     inline void logicError(char const* _message, char const* _file, long _line)
     {
         fprintf(stderr, "%s(%ld): Assert failed : %s\n", _file, _line, _message);

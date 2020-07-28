@@ -154,8 +154,8 @@ try
         ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
 
         // TEST changed values
-        ENTLIB_ASSERT(sysCreat->root.at("Name")->getString() == std::string("Shamane_male")); // set.
-                                                                                              // changed.
+        ENTLIB_ASSERT(
+            sysCreat->root.at("Name")->getString() == std::string("Shamane_male")); // set. changed.
         ENTLIB_ASSERT(sysCreat->root.at("Name")->isSet()); // set. changed.
     }
     {
@@ -192,8 +192,7 @@ try
         ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->at(1)->isSet()); // Overrided
         // TEST read Not overrided in array
         ENTLIB_ASSERT(
-            sysCreat->root.at("ScriptList")->at(2)->getString() == std::string("c1")); // not
-                                                                                       // overrided
+            sysCreat->root.at("ScriptList")->at(2)->getString() == std::string("c1")); // not overrided
         ENTLIB_ASSERT(not sysCreat->root.at("ScriptList")->at(2)->isSet()); // Not overrided
 
         // Programatically unset
@@ -242,8 +241,8 @@ try
 
         // TEST read programatically overrided in array
         ENTLIB_ASSERT(
-            sysCreat->root.at("ScriptList")->at(1)->getString() == std::string("b1")); // No more
-                                                                                       // overrided
+            sysCreat->root.at("ScriptList")->at(1)->getString()
+            == std::string("b1")); // No more overrided
         ENTLIB_ASSERT(not sysCreat->root.at("ScriptList")->at(1)->isSet()); // No more overrided
         // TEST read programatically unset in array
         ENTLIB_ASSERT(
@@ -261,8 +260,7 @@ try
 
         // TEST override value from code
         ENTLIB_ASSERT(
-            sysCreat->root.at("BehaviorState")->getString()
-            == std::string("Overrided")); // set. changed.
+            sysCreat->root.at("BehaviorState")->getString() == std::string("Overrided")); // set. changed.
         ENTLIB_ASSERT(sysCreat->root.at("BehaviorState")->isSet()); // set. changed.
 
         entlib.saveEntity(ent, "instance.copy.entity");

@@ -60,14 +60,14 @@ ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: true
 PenaltyBreakAssignment : 2
 PenaltyBreakBeforeFirstCallParameter : 2
-PenaltyBreakComment: 1
+PenaltyBreakComment: 100
 PenaltyBreakFirstLessLess: 2
 PenaltyBreakString: 20
 PenaltyBreakTemplateDeclaration: 10
 PenaltyExcessCharacter: 10
 PenaltyReturnTypeOnItsOwnLine: 100
 PointerAlignment: Left
-ReflowComments: true
+ReflowComments: false
 SortIncludes: false
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: false

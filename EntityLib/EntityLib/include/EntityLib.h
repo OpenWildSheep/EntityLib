@@ -204,6 +204,7 @@ namespace Ent
         void setName(std::string name); ///< Set the name of the component
         char const* getInstanceOf() const; ///< Name of the inherited prefab if there is one, or nullptr.
         char const* getThumbnail() const; ///< Get the Thumbnail path, or nullptr.
+        void setThumbnail(std::string _thumbPath); ///< Set the Thumbnail path
         std::array<uint8_t, 4> const* getColor() const; ///< Get the color of the is one, or nullptr.
         void setColor(std::array<uint8_t, 4> color); ///< Set the color RGBA 8bit
 

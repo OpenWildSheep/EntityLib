@@ -461,6 +461,10 @@ namespace Ent
     {
         return thumbnail.has_value() ? thumbnail->c_str() : nullptr;
     }
+    void Entity::setThumbnail(std::string _thumbPath)
+    {
+        thumbnail = std::move(_thumbPath);
+    }
     std::array<uint8_t, 4> const* Entity::getColor() const
     {
         return color.has_value() ? &(*color) : nullptr;

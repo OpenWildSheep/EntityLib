@@ -1,5 +1,4 @@
 #include "ValidJson.h"
-#include "Tools.h"
 
 #pragma warning(push, 0)
 #pragma warning(disable : 4702)
@@ -11,13 +10,131 @@
 #include <valijson/validator.hpp>
 #pragma warning(pop)
 
+#include "Tools.h"
+#include "include/EntityLibCore.h"
+#include "include/Schema.h"
+
 /// \cond PRIVATE
 
 using namespace nlohmann;
 
 char schemaPath[1024] = {};
 
-json const* fetchDocument(const std::string& uri)
+struct SetDefault
+{
+    char const* fieldName;
+    json* instSchema;
+    template <typename T>
+    void operator()(T const& val, std::enable_if_t<std::is_arithmetic<T>::value>* = 0) const
+    {
+        instSchema->emplace(fieldName, val);
+    }
+
+    void operator()(std::string const& val) const
+    {
+        instSchema->emplace(fieldName, val);
+    }
+
+    template <typename T>
+    void operator()(T const&, std::enable_if_t<not std::is_arithmetic<T>::value>* = 0) const
+    {
+    }
+};
+
+static std::string convertLink(std::string link)
+{
+    std::replace(begin(link), end(link), '#', '_');
+    std::replace(begin(link), end(link), '/', '_');
+    std::replace(begin(link), end(link), ':', '_');
+    std::replace(begin(link), end(link), '.', '_');
+    std::replace(begin(link), end(link), '-', '_');
+    return link;
+}
+
+static json convertToInstanceSchema(Ent::Subschema const& tmplSchema);
+
+static json convertToInstanceSchema(Ent::SubschemaRef const& tmplSchemaRef)
+{
+    if (tmplSchemaRef.subSchemaOrRef.is<Ent::SubschemaRef::Ref>())
+    {
+        json instSchema;
+        std::string link = tmplSchemaRef.subSchemaOrRef.get<Ent::SubschemaRef::Ref>().ref;
+        instSchema.emplace("$ref", "#/definitions/" + convertLink(link));
+        return instSchema;
+    }
+    else
+        return convertToInstanceSchema(*tmplSchemaRef);
+}
+
+static json convertToInstanceSchema(Ent::Subschema const& tmplSchema)
+{
+    json instSchema;
+    std::apply_visitor(SetDefault{ "default", &instSchema }, tmplSchema.defaultValue);
+    if (tmplSchema.constValue.has_value())
+        std::apply_visitor(SetDefault{ "const", &instSchema }, *tmplSchema.constValue);
+    if (not empty(tmplSchema.enumValues))
+        instSchema["enum"] = tmplSchema.enumValues;
+    if (tmplSchema.maxItems != size_t(-1))
+        instSchema["maxItems"] = tmplSchema.maxItems;
+    if (tmplSchema.minItems != 0)
+        instSchema["minItems"] = tmplSchema.minItems;
+
+    std::array<char const*, size_t(Ent::DataType::freeobject)> typeToStr = {
+        "null", "string", "number", "integer", "object", "array", "boolean"
+    };
+    instSchema["type"] = typeToStr[size_t(tmplSchema.type)];
+    std::vector<char const*> requiredList;
+    for (auto&& name_prop : tmplSchema.properties)
+    {
+        instSchema["properties"][name_prop.first] = convertToInstanceSchema(name_prop.second);
+        if (name_prop.second->required)
+            requiredList.push_back(name_prop.first.c_str());
+    }
+    json nullType;
+    nullType["type"] = "null";
+    if (tmplSchema.singularItems != nullptr)
+    {
+        json oneOf;
+        oneOf.push_back(convertToInstanceSchema(*tmplSchema.singularItems));
+        oneOf.push_back(nullType);
+        json items;
+        items.emplace("oneOf", oneOf);
+        instSchema.emplace("items", items);
+    }
+    else if (tmplSchema.linearItems.has_value())
+    {
+        for (auto&& prop : *tmplSchema.linearItems)
+        {
+            json item;
+            item["oneOf"].push_back(convertToInstanceSchema(prop));
+            item["oneOf"].push_back(nullType);
+            instSchema["items"].push_back(item);
+        }
+    }
+    if (tmplSchema.oneOf.has_value())
+    {
+        for (auto&& prop : *tmplSchema.oneOf)
+        {
+            instSchema["oneOf"].push_back(convertToInstanceSchema(prop));
+        }
+    }
+    if (not empty(requiredList))
+        instSchema["required"] = requiredList;
+    return instSchema;
+}
+
+static json convertToInstanceSchema(Ent::Schema const& schema, Ent::Subschema const& root)
+{
+    json instSchema = convertToInstanceSchema(root);
+    for (auto&& name_def : schema.allDefinitions)
+    {
+        instSchema["definitions"][convertLink(name_def.first)] =
+            convertToInstanceSchema(name_def.second);
+    }
+    return instSchema;
+}
+
+static json const* fetchDocument(const std::string& uri)
 {
     json* fetchedRoot = new json{};
     char buff[1024] = {};
@@ -35,12 +152,13 @@ json const* fetchDocument(const std::string& uri)
     return fetchedRoot;
 }
 
-void freeDocument(json const* adapter)
+static void freeDocument(json const* adapter)
 {
     delete adapter;
 }
 
-char const* sceneSchemaPath = "WildPipeline/Schema/Scene-schema.json";
+static char const* sceneSchemaPath = "WildPipeline/Schema/Scene-schema.json";
+static char const* entitySchemaPath = "WildPipeline/Schema/Entity-schema.json";
 
 static std::string createMessageFromValidationResult(valijson::ValidationResults result)
 {
@@ -54,23 +172,28 @@ static std::string createMessageFromValidationResult(valijson::ValidationResults
             fullMessage += line + '/';
         }
         fullMessage.pop_back();
-        fullMessage += "\n";
+        fullMessage += "\n\n";
     }
     return fullMessage;
 }
 
-void Ent::validScene(std::filesystem::path toolsDir, nlohmann::json const& scene)
+void Ent::validScene(Schema const& schema, std::filesystem::path toolsDir, nlohmann::json const& scene)
 {
     // valid the scene using schema
+    strcpy(schemaPath, (toolsDir / "WildPipeline/Schema").u8string().c_str());
 
     json schemaDocument = loadJsonFile(toolsDir / sceneSchemaPath);
 
+    json fullEntityInstanceSchema = convertToInstanceSchema(schema, *schema.root);
+
     // Parse the json schema into an internal schema format
-    strcpy(schemaPath, (toolsDir / "WildPipeline/Schema").u8string().c_str());
     valijson::Schema vjSchema;
     valijson::SchemaParser parser;
     parser.populateSchema(
-        valijson::adapters::NlohmannJsonAdapter(schemaDocument), vjSchema, fetchDocument, freeDocument);
+        valijson::adapters::NlohmannJsonAdapter(fullEntityInstanceSchema),
+        vjSchema,
+        fetchDocument,
+        freeDocument);
 
     valijson::Validator validator;
     valijson::adapters::NlohmannJsonAdapter myTargetAdapter(scene);
@@ -79,22 +202,28 @@ void Ent::validScene(std::filesystem::path toolsDir, nlohmann::json const& scene
     {
         /// @todo un-comment soon
         std::string message = createMessageFromValidationResult(result);
-        // throw Ent::JsonValidation(std::move(message));
+        throw Ent::JsonValidation(std::move(message));
     }
 }
 
-void Ent::validEntity(std::filesystem::path toolsDir, nlohmann::json const& entity)
+void Ent::validEntity(Schema const& schema, std::filesystem::path toolsDir, nlohmann::json const& entity)
 {
     // valid the scene using schema
+    strcpy(schemaPath, (toolsDir / "WildPipeline/Schema").u8string().c_str());
 
-    json schemaDocument = loadJsonFile(toolsDir / sceneSchemaPath);
+    json schemaDocument = loadJsonFile(toolsDir / entitySchemaPath);
+
+    json fullSceneInstanceSchema =
+        convertToInstanceSchema(schema, schema.allDefinitions.at("#/definitions/Object"));
 
     // Parse the json schema into an internal schema format
-    strcpy(schemaPath, (toolsDir / "WildPipeline/Schema").u8string().c_str());
     valijson::Schema vjSchema;
     valijson::SchemaParser parser;
     parser.populateSchema(
-        valijson::adapters::NlohmannJsonAdapter(schemaDocument), vjSchema, fetchDocument, freeDocument);
+        valijson::adapters::NlohmannJsonAdapter(fullSceneInstanceSchema),
+        vjSchema,
+        fetchDocument,
+        freeDocument);
 
     valijson::Validator validator;
     valijson::adapters::NlohmannJsonAdapter myTargetAdapter(entity);
@@ -103,7 +232,7 @@ void Ent::validEntity(std::filesystem::path toolsDir, nlohmann::json const& enti
     {
         /// @todo un-comment soon
         std::string message = createMessageFromValidationResult(result);
-        // throw Ent::JsonValidation(std::move(message));
+        throw Ent::JsonValidation(std::move(message));
     }
 }
 

@@ -179,7 +179,7 @@ namespace Ent
         std::unique_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
     };
 
-    struct EntityLib;
+    class EntityLib;
 
     /// Contains all data of an Entity. (Name, Color, Conponent ...)
     struct ENTLIB_DLLEXPORT Entity
@@ -253,12 +253,23 @@ namespace Ent
 
     // ********************************** Static data *********************************************
 
-    /// Entry point of the EntityLib. Used to load/save Scene/Entity and to parse the Schema
-    struct ENTLIB_DLLEXPORT EntityLib
+    /// Definition of all components
+    struct ComponentsSchema
     {
+        ComponentsSchema() = default;
+        ComponentsSchema(ComponentsSchema const&) = delete;
+        ComponentsSchema& operator=(ComponentsSchema const&) = delete;
+        std::map<std::string, Subschema*> components; ///< Schema of all possible Component s
+        Schema schema;
+    };
+
+    /// Entry point of the EntityLib. Used to load/save Scene/Entity and to parse the Schema
+    class ENTLIB_DLLEXPORT EntityLib
+    {
+    public:
         /// @todo Make public attribute private?
         std::filesystem::path toolsDir; ///< Path to the Tools dir in in the perforce root (X:/Tools)
-        Schema schema; ///< Schema of all components
+        ComponentsSchema schema; ///< Schema of all components
 
         /// Component needed for each type of components
         std::map<std::string, std::vector<std::string>> componentDependencies;
@@ -269,8 +280,6 @@ namespace Ent
         /// @cond PRIVATE
         EntityLib(EntityLib const&) = delete;
         EntityLib& operator=(EntityLib const&) = delete;
-        EntityLib(EntityLib&&) = default;
-        EntityLib& operator=(EntityLib&&) = default;
         /// @endcond
 
         /// Load the Entity at path _entityPath

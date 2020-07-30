@@ -22,5 +22,6 @@
         }
     ],
     "InstanceOf": "prefab.entity",
-    "Name": "PlayerSpawner_"
+    "Name": "PlayerSpawner_",
+    "Thumbnail": "prout"
 }

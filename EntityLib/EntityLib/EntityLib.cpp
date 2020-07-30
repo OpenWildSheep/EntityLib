@@ -22,8 +22,8 @@ using namespace nlohmann;
 
 static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, Ent::Node const* super);
 static Ent::Scene
-loadScene(Ent::EntityLib const& entLib, Ent::Schema const& schema, json const& document);
-static json saveScene(Ent::Schema const& schema, Ent::Scene const& scene);
+loadScene(Ent::EntityLib const& entLib, Ent::ComponentsSchema const& schema, json const& document);
+static json saveScene(Ent::ComponentsSchema const& schema, Ent::Scene const& scene);
 
 namespace Ent
 {
@@ -39,21 +39,23 @@ namespace Ent
 
         json schemaDocument = mergeComponants(toolsDir);
 
-        json const& definition = schemaDocument.at("definitions");
-        json const& compList = definition.at("Component").at("oneOf");
-
         SchemaLoader loader(schemaPath);
 
-        for (json const& comp : compList)
+        loader.readSchema(&schema.schema, schemaDocument, schemaDocument);
+
+        auto& compList = schema.schema.root->properties["Objects"]
+                                ->singularItems
+                                ->get() // get the Object
+                                .properties["Components"]
+                                ->singularItems
+                                ->get() // get the Component
+                                .oneOf;
+
+        for (SubschemaRef& comp : *compList)
         {
-            json const& properties = comp.at("properties");
-            auto compName = properties.at("Type").at("const").get<std::string>();
-
-            json const& data = properties["Data"];
-            Ent::Subschema sub = loader.readSchema(schemaDocument, data, 0);
-
-            ENTLIB_ASSERT(sub.type == DataType::object);
-            schema.definitions.emplace(compName, std::move(sub));
+            auto&& compName = comp->properties.at("Type")->constValue->get<std::string>();
+            auto&& compSchema = *comp->properties.at("Data");
+            schema.components.emplace(compName, &compSchema);
         }
 
         json dependencies = loadJsonFile(toolsDir / "WildPipeline/Schema/Dependencies.json");
@@ -384,10 +386,10 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            if (auto itemSchema = schema->singularItems.get())
+            if (SubschemaRef const* itemSchema = schema->singularItems.get())
             {
                 value.get<Array>().data.emplace_back(
-                    std::make_unique<Node>(loadNode(*itemSchema, json(), nullptr)));
+                    std::make_unique<Node>(loadNode(itemSchema->get(), json(), nullptr)));
                 return value.get<Array>().data.back().get();
             }
         }
@@ -482,7 +484,7 @@ namespace Ent
                 addComponent(dep.c_str());
             }
         }
-        Ent::Subschema const& compSchema = entlib->schema.definitions.at(type);
+        Ent::Subschema const& compSchema = *entlib->schema.components.at(type);
         Ent::Component comp{ type, loadNode(compSchema, json(), nullptr), 1, components.size() };
         auto iter_bool = components.emplace(type, std::move(comp));
         return &(iter_bool.first->second);
@@ -661,7 +663,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
             Ent::Node const* superProp = super ? super->at(name.c_str()) : nullptr;
             static json const emptyJson;
             json const& prop = data.count(name) ? data.at(name) : emptyJson;
-            Ent::Node tmpNode = loadNode(std::get<1>(name_sub), prop, superProp);
+            Ent::Node tmpNode = loadNode(*std::get<1>(name_sub), prop, superProp);
             object.emplace(name, std::make_unique<Ent::Node>(std::move(tmpNode)));
         }
         result = Ent::Node(std::move(object), &nodeSchema);
@@ -679,7 +681,8 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                 {
                     for (Ent::Node const* subSuper : super->getItems())
                     {
-                        Ent::Node tmpNode = loadNode(*nodeSchema.singularItems, json(), subSuper);
+                        Ent::Node tmpNode =
+                            loadNode(nodeSchema.singularItems->get(), json(), subSuper);
                         arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
@@ -691,7 +694,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                 {
                     Ent::Node const* subSuper =
                         (super and (super->size() > index)) ? super->at(index) : nullptr;
-                    Ent::Node tmpNode = loadNode(*nodeSchema.singularItems, item, subSuper);
+                    Ent::Node tmpNode = loadNode(nodeSchema.singularItems->get(), item, subSuper);
                     arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
                     ++index;
                 }
@@ -700,13 +703,13 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
         else
         {
             ENTLIB_ASSERT(nodeSchema.linearItems.has_value());
-            for (Ent::Subschema const& sub : *nodeSchema.linearItems)
+            for (Ent::SubschemaRef const& sub : *nodeSchema.linearItems)
             {
                 Ent::Node const* subSuper =
                     (super and super->size() > index) ? super->at(index) : nullptr;
                 static json const emptyJson;
                 json const& prop = data.size() > index ? data.at(index) : emptyJson;
-                Ent::Node tmpNode = loadNode(sub, prop, subSuper);
+                Ent::Node tmpNode = loadNode(*sub, prop, subSuper);
                 arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
                 ++index;
             }
@@ -786,7 +789,7 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
             Ent::Node const* subNode = node.at(name.c_str());
             if (subNode->hasOverride())
             {
-                json subJson = saveNode(std::get<1>(name_sub), *subNode);
+                json subJson = saveNode(*std::get<1>(name_sub), *subNode);
                 data[name] = std::move(subJson);
             }
         }
@@ -810,7 +813,7 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
         {
             if (item->hasOverride())
             {
-                json tmpNode = saveNode(*schema.singularItems, *item);
+                json tmpNode = saveNode(schema.singularItems->get(), *item);
                 data.emplace_back(std::move(tmpNode));
             }
             else
@@ -824,7 +827,8 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
     return data;
 }
 
-static Ent::Entity loadEntity(Ent::EntityLib const& entlib, Ent::Schema const& schema, json const& entNode)
+static Ent::Entity
+loadEntity(Ent::EntityLib const& entlib, Ent::ComponentsSchema const& schema, json const& entNode)
 {
     tl::optional<std::string> instanceOf;
     Ent::Entity superEntity;
@@ -874,7 +878,7 @@ static Ent::Entity loadEntity(Ent::EntityLib const& entlib, Ent::Schema const& s
         Ent::Component* superComp = superEntity.getComponent(cmpType.c_str());
         auto const version = compNode.at("Version").get<size_t>();
 
-        Ent::Subschema const& compSchema = schema.definitions.at(cmpType);
+        Ent::Subschema const& compSchema = *schema.components.at(cmpType);
 
         Ent::Component comp{ cmpType,
                              loadNode(compSchema, data, (superComp ? &superComp->root : nullptr)),
@@ -923,13 +927,14 @@ Ent::Entity Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath) 
     json document;
     file >> document;
 
-    validEntity(toolsDir, document);
+    validEntity(schema.schema, toolsDir, document);
 
     Ent::Entity ent = ::loadEntity(*this, schema, document);
     return ent;
 }
 
-static Ent::Scene loadScene(Ent::EntityLib const& entLib, Ent::Schema const& schema, json const& objects)
+static Ent::Scene
+loadScene(Ent::EntityLib const& entLib, Ent::ComponentsSchema const& schema, json const& objects)
 {
     Ent::Scene scene;
 
@@ -946,12 +951,12 @@ Ent::Scene Ent::EntityLib::loadScene(std::filesystem::path const& scenePath) con
 {
     json document = loadJsonFile(scenePath);
 
-    validScene(toolsDir, document);
+    validScene(schema.schema, toolsDir, document);
 
     return ::loadScene(*this, schema, document.at("Objects"));
 }
 
-static json saveEntity(Ent::Schema const& schema, Ent::Entity const& entity)
+static json saveEntity(Ent::ComponentsSchema const& schema, Ent::Entity const& entity)
 {
     // TODO override, types and default values
     json entNode;
@@ -999,7 +1004,7 @@ static json saveEntity(Ent::Schema const& schema, Ent::Entity const& entity)
             data.emplace("isEmbedded", subscene->isEmbedded);
             data.emplace("File", subscene->file);
             if (subscene->isEmbedded)
-                data.emplace("Embedded", saveScene(schema, *subscene->embedded));
+                data.emplace("Embedded", saveScene(schema, *subscene->embedded)["Objects"]);
 
             json compNode;
             compNode.emplace("Version", comp->version);
@@ -1012,7 +1017,7 @@ static json saveEntity(Ent::Schema const& schema, Ent::Entity const& entity)
             json compNode;
             compNode.emplace("Version", comp->version);
             compNode.emplace("Type", comp->type);
-            compNode.emplace("Data", saveNode(schema.definitions.at(comp->type), comp->root));
+            compNode.emplace("Data", saveNode(*schema.components.at(comp->type), comp->root));
 
             componentsNode.emplace_back(std::move(compNode));
         }
@@ -1081,11 +1086,14 @@ void Ent::EntityLib::saveEntity(Entity const& entity, std::filesystem::path cons
         throw std::runtime_error(message.data());
     }
     json document = ::saveEntity(schema, entity);
-    validScene(toolsDir, document);
     file << document.dump(4);
+    file.close();
+
+    // Better to check after save because it is easiest to debug
+    validEntity(schema.schema, toolsDir, document);
 }
 
-static json saveScene(Ent::Schema const& schema, Ent::Scene const& scene)
+static json saveScene(Ent::ComponentsSchema const& schema, Ent::Scene const& scene)
 {
     json document;
 
@@ -1113,8 +1121,11 @@ void Ent::EntityLib::saveScene(Scene const& scene, std::filesystem::path const& 
 
     json document = ::saveScene(schema, scene);
 
-    validScene(toolsDir, document);
     file << document.dump(4);
+    file.close();
+
+    // Better to check after save because it is easiest to debug
+    validScene(schema.schema, toolsDir, document);
 }
 
 /// \endcond

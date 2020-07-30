@@ -50,6 +50,8 @@ void printNode(char const* name, Ent::Node const& node, std::string tab)
 
 void displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::string indent)
 {
+    if (size(indent) > 80)
+        return;
     std::cout << indent << name << " : ";
     switch (subschema.type)
     {
@@ -61,7 +63,7 @@ void displaySubSchema(std::string const& name, Ent::Subschema const& subschema, 
             std::cout << indent << "  maxItems:" << subschema.maxItems << std::endl;
         if (subschema.singularItems != nullptr)
         {
-            displaySubSchema("items", *subschema.singularItems, indent + "  ");
+            displaySubSchema("items", subschema.singularItems->get(), indent + "  ");
         }
         break;
     case Ent::DataType::boolean: std::cout << "boolean" << std::endl; break;
@@ -73,7 +75,7 @@ void displaySubSchema(std::string const& name, Ent::Subschema const& subschema, 
         std::cout << "object" << std::endl;
         for (auto&& name_sub : subschema.properties)
         {
-            displaySubSchema(std::get<0>(name_sub), std::get<1>(name_sub), indent + "  ");
+            displaySubSchema(std::get<0>(name_sub), *std::get<1>(name_sub), indent + "  ");
         }
         break;
     case Ent::DataType::string: std::cout << "string" << std::endl; break;
@@ -368,9 +370,9 @@ try
     }
 
     // ******************************** Test iteration of schema **********************************
-    for (auto&& name_sub : entlib.schema.definitions)
+    for (auto&& name_sub : entlib.schema.components)
     {
-        displaySubSchema(std::get<0>(name_sub), std::get<1>(name_sub), {});
+        displaySubSchema(std::get<0>(name_sub), *std::get<1>(name_sub), {});
     }
 
     // ********************************** Test load/save scene ************************************
@@ -395,7 +397,8 @@ try
     heightObj->root.at("DisplaceNoiseList")->push();
 
     scene.objects.front().addComponent("BeamGenerator")->root.getFieldNames();
-    scene.objects.front().addComponent("ExplosionEffect")->root.getFieldNames();
+    ENTLIB_ASSERT(
+        scene.objects.front().addComponent("ExplosionEffect")->root.getFieldNames().size() == 22);
 
     auto ep1Iter = std::find_if(
         begin(scene.objects), end(scene.objects), [ep1 = std::string("EP1_")](auto&& ent) {
@@ -410,7 +413,7 @@ try
 }
 catch (std::exception& ex)
 {
-    std::cerr << typeid(ex).name() << " " << ex.what() << std::endl;
+    std::cerr << typeid(ex).name() << " : " << ex.what() << std::endl;
     return EXIT_FAILURE;
 }
 catch (...)

@@ -88,7 +88,7 @@
             "Version": 1
         }, {
             "Data": {
-                "BreakableSizeMax": "",
+                "BreakableSizeMax": "small",
                 "BreathDamages": 10.0,
                 "BreathImpact": 0.0,
                 "BreathStaminaLoss": 0.0,
@@ -99,8 +99,8 @@
                 "DistanceReductionImpactByStep": 0.0,
                 "DistanceReductionStep": 2.0,
                 "EjectHit": true,
-                "HitSize": "",
-                "HitType": "",
+                "HitSize": "medium",
+                "HitType": "HitInstant",
                 "Impact": 0.0,
                 "PhysicExplosionStrength": -1.0,
                 "ShakeAttenuationRadius": 50.0,
@@ -108,7 +108,7 @@
                     "shakeDuration": 0.0,
                     "shakeFrequency": 0.0,
                     "shakeIntensity": 0.0,
-                    "shakeRotation": []
+                    "shakeRotation": [12, 18, 47]
                 },
                 "ShakeRadius": 15.0,
                 "SpecificDuration": 3.0,

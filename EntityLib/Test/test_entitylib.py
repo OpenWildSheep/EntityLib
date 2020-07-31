@@ -66,10 +66,10 @@ try:
     # TEST read inherited values in inherited component
     heightObj = ent.get_component("HeightObj")
     assert(heightObj is not None)
-    assert(heightObj.root.at("Subdivision").get_int() == 0)
+    assert(heightObj.root.at("Subdivision").value == 0)
     assert(heightObj.root.at("Subdivision").is_set())
     assert(
-        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").get_int() == 51248)
+        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").value == 51248)
     assert(heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").is_set())
 
     # Test read Thumbnail
@@ -81,9 +81,9 @@ try:
     assert(sysCreat is not None)
 
     # TEST read setted values
-    assert(sysCreat.root.at("Faction").get_string() == "Shamans") # set
+    assert(sysCreat.root.at("Faction").value == "Shamans") # set
     assert(sysCreat.root.at("Faction").is_set()) # is set
-    assert(sysCreat.root.at("Inventory").get_string() == "KaiWOLgrey") # set
+    assert(sysCreat.root.at("Inventory").value == "KaiWOLgrey") # set
     assert(sysCreat.root.at("Inventory").is_set()) # is set
 
     # TEST read array
@@ -91,12 +91,12 @@ try:
     assert(sysCreat.root.at("ScriptList").size() == 3)
 
     # TEST default values
-    assert(sysCreat.root.at("Burried").get_bool() == False) # default
+    assert(sysCreat.root.at("Burried").value == False) # default
     assert(not sysCreat.root.at("Burried").is_set()) # default
-    assert(sysCreat.root.at("Name").get_string() == "") # default
+    assert(sysCreat.root.at("Name").value == "") # default
     assert(not sysCreat.root.at("Name").is_set()) # default
 
-    sysCreat.root.at("Name").set_string("Shamane_male")
+    sysCreat.root.at("Name").value = "Shamane_male"
     entlib.save_entity(ent, "prefab.copy.entity")
     ####################################################################################################################
     # Test write prefab
@@ -105,29 +105,29 @@ try:
     # TEST read inherited values in inherited component
     heightObj = ent.get_component("HeightObj")
     assert(heightObj is not None)
-    assert(heightObj.root.at("Subdivision").get_int() == 0)
+    assert(heightObj.root.at("Subdivision").value == 0)
     assert(heightObj.root.at("Subdivision").is_set())
     assert(
-        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").get_int() == 51248)
+        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").value == 51248)
     assert(heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").is_set())
 
     sysCreat = ent.get_component("SystemicCreature")
     assert(sysCreat is not None)
     # TEST read setted values
-    assert(sysCreat.root.at("Faction").get_string() == "Shamans") # set
-    assert(sysCreat.root.at("Inventory").get_string() == "KaiWOLgrey") # set
+    assert(sysCreat.root.at("Faction").value == "Shamans") # set
+    assert(sysCreat.root.at("Inventory").value == "KaiWOLgrey") # set
 
     # TEST read array
     assert(sysCreat.root.at("ScriptList").is_set())
     assert(sysCreat.root.at("ScriptList").size() == 3)
 
     # TEST default values unchanged
-    assert(sysCreat.root.at("Burried").get_bool() is False) # default
+    assert(sysCreat.root.at("Burried").value is False) # default
     assert(not sysCreat.root.at("Burried").is_set()) # default
 
     # TEST changed values
     assert(
-        sysCreat.root.at("Name").get_string() == "Shamane_male") # set. changed.
+        sysCreat.root.at("Name").value == "Shamane_male") # set. changed.
     assert(sysCreat.root.at("Name").is_set()) # set. changed.
     ####################################################################################################################
     # Test read instance of
@@ -136,50 +136,50 @@ try:
     assert(sysCreat is not None)
 
     # TEST read overrided value
-    assert(sysCreat.root.at("Faction").get_string() == "Plouf") # Overrided
+    assert(sysCreat.root.at("Faction").value == "Plouf") # Overrided
 
     # TEST read inherited values
     assert(
-        sysCreat.root.at("Inventory").get_string() == "KaiWOLgrey") # Inherited
-    assert(sysCreat.root.at("Life").get_float() == 1000.) # Inherited
+        sysCreat.root.at("Inventory").value == "KaiWOLgrey") # Inherited
+    assert(sysCreat.root.at("Life").value == 1000.) # Inherited
 
     # TEST read inherited values in inherited component
     heightObj = ent.get_component("HeightObj")
     assert(heightObj is not None)
-    assert(heightObj.root.at("Subdivision").get_int() == 0)
+    assert(heightObj.root.at("Subdivision").value == 0)
     assert(not heightObj.root.at("Subdivision").is_set())
     assert(
-        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").get_int() == 51248)
+        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").value == 51248)
     assert(
         not heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").is_set())
 
     # TEST read default value
-    assert(sysCreat.root.at("Burried").get_bool() == False) # Inherited (from default)
+    assert(sysCreat.root.at("Burried").value == False) # Inherited (from default)
     assert(not sysCreat.root.at("Burried").is_set()) # default
 
     # TEST read overrided in array
     assert(
-        sysCreat.root.at("ScriptList").at(1).get_string() == "b2") # Overrided
+        sysCreat.root.at("ScriptList").at(1).value == "b2") # Overrided
     assert(sysCreat.root.at("ScriptList").at(1).is_set()) # Overrided
     # TEST read Not overrided in array
     assert(
-        sysCreat.root.at("ScriptList").at(2).get_string() == "c1") # not overrided
+        sysCreat.root.at("ScriptList").at(2).value == "c1") # not overrided
     assert(not sysCreat.root.at("ScriptList").at(2).is_set()) # Not overrided
 
     # Programatically unset
     sysCreat.root.at("ScriptList").at(1).unset()
     # Programatically set
-    sysCreat.root.at("ScriptList").at(2).set_string("c2")
+    sysCreat.root.at("ScriptList").at(2).value = "c2"
 
     # TEST read array
     assert(sysCreat.root.at("ScriptList").is_set())
     assert(sysCreat.root.at("ScriptList").size() == 3)
 
     # TEST Extand array
-    sysCreat.root.at("ScriptList").push().set_string("d2")
+    sysCreat.root.at("ScriptList").push().value = "d2"
     assert(sysCreat.root.at("ScriptList").size() == 4)
 
-    sysCreat.root.at("BehaviorState").set_string("Overrided")
+    sysCreat.root.at("BehaviorState").value = "Overrided"
     entlib.save_entity(ent, "instance.copy.entity")
     ####################################################################################################################
     # Test write instance of
@@ -190,37 +190,37 @@ try:
     # TEST read inherited values in inherited component
     heightObj = ent.get_component("HeightObj")
     assert(heightObj is not None)
-    assert(heightObj.root.at("Subdivision").get_int() == 0)
+    assert(heightObj.root.at("Subdivision").value == 0)
     assert(not heightObj.root.at("Subdivision").is_set())
     assert(
-        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").get_int() == 51248)
+        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").value == 51248)
     assert(
         not heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").is_set())
 
     # TEST read overrided value
-    assert(sysCreat.root.at("Faction").get_string() == "Plouf") # Overrided
+    assert(sysCreat.root.at("Faction").value == "Plouf") # Overrided
 
     # TEST read inherited values
     assert(
-        sysCreat.root.at("Inventory").get_string() == "KaiWOLgrey") # Inherited
-    assert(sysCreat.root.at("Life").get_float() == 1000.) # Inherited
+        sysCreat.root.at("Inventory").value == "KaiWOLgrey") # Inherited
+    assert(sysCreat.root.at("Life").value == 1000.) # Inherited
 
     # TEST read default value
-    assert(sysCreat.root.at("Burried").get_bool() == False) # Inherited (from default)
+    assert(sysCreat.root.at("Burried").value == False) # Inherited (from default)
     assert(not sysCreat.root.at("Burried").is_set()) # default
 
     # TEST read programatically overrided in array
     assert(
-        sysCreat.root.at("ScriptList").at(1).get_string() == "b1") # No more overrided
+        sysCreat.root.at("ScriptList").at(1).value == "b1") # No more overrided
     assert(not sysCreat.root.at("ScriptList").at(1).is_set()) # No more overrided
     # TEST read programatically unset in array
     assert(
-        sysCreat.root.at("ScriptList").at(2).get_string() == "c2") # Overrided
+        sysCreat.root.at("ScriptList").at(2).value == "c2") # Overrided
     assert(sysCreat.root.at("ScriptList").at(2).is_set()) # Overrided
 
     # TEST read programatically extand array
     assert(
-        sysCreat.root.at("ScriptList").at(3).get_string() == "d2") # Overrided
+        sysCreat.root.at("ScriptList").at(3).value == "d2") # Overrided
     assert(sysCreat.root.at("ScriptList").at(3).is_set()) # Overrided
 
     # TEST read extanded array
@@ -229,7 +229,7 @@ try:
 
     # TEST override value from code
     assert(
-        sysCreat.root.at("BehaviorState").get_string() == "Overrided") # set. changed.
+        sysCreat.root.at("BehaviorState").value == "Overrided") # set. changed.
     assert(sysCreat.root.at("BehaviorState").is_set()) # set. changed.
 
     entlib.save_entity(ent, "instance.copy.entity")
@@ -243,23 +243,23 @@ try:
     # TEST read inherited values in inherited component
     heightObj = ent.get_component("HeightObj")
     assert(heightObj is not None)
-    assert(heightObj.root.at("Subdivision").get_int() == 0)
+    assert(heightObj.root.at("Subdivision").value == 0)
     assert(not heightObj.root.at("Subdivision").is_set())
     assert(
-        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").get_int() == 51248)
+        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").value == 51248)
     assert(
         not heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").is_set())
 
     # TEST default values
-    assert(sysCreat.root.at("Burried").get_bool() == False) # default
+    assert(sysCreat.root.at("Burried").value == False) # default
     assert(not sysCreat.root.at("Burried").is_set()) # default
-    assert(sysCreat.root.at("Name").get_string() == "") # default
+    assert(sysCreat.root.at("Name").value == "") # default
     assert(not sysCreat.root.at("Name").is_set()) # default
 
     # TEST read setted values
-    assert(sysCreat.root.at("Faction").get_string() == "Plouf") # set
+    assert(sysCreat.root.at("Faction").value == "Plouf") # set
     assert(sysCreat.root.at("Faction").is_set()) # is set
-    assert(sysCreat.root.at("Inventory").get_string() == "KaiWOLgrey") # set
+    assert(sysCreat.root.at("Inventory").value == "KaiWOLgrey") # set
     assert(sysCreat.root.at("Inventory").is_set()) # is set
 
     entlib.save_entity(detached, "instance.detached.entity")
@@ -272,22 +272,22 @@ try:
     # TEST read inherited values in inherited component
     heightObj = ent.get_component("HeightObj")
     assert(heightObj is not None)
-    assert(heightObj.root.at("Subdivision").get_int() == 0)
+    assert(heightObj.root.at("Subdivision").value == 0)
     assert(heightObj.root.at("Subdivision").is_set())
     assert(
-        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").get_int() == 51248)
+        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").value == 51248)
     assert(heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").is_set())
 
     # TEST default values
-    assert(sysCreat.root.at("Burried").get_bool() == False) # default
+    assert(sysCreat.root.at("Burried").value == False) # default
     assert(not sysCreat.root.at("Burried").is_set()) # default
-    assert(sysCreat.root.at("Name").get_string() == "") # default
+    assert(sysCreat.root.at("Name").value == "") # default
     assert(not sysCreat.root.at("Name").is_set()) # default
 
     # TEST read setted values
-    assert(sysCreat.root.at("Faction").get_string() == "Plouf") # set
+    assert(sysCreat.root.at("Faction").value == "Plouf") # set
     assert(sysCreat.root.at("Faction").is_set()) # is set
-    assert(sysCreat.root.at("Inventory").get_string() == "KaiWOLgrey") # set
+    assert(sysCreat.root.at("Inventory").value == "KaiWOLgrey") # set
     assert(sysCreat.root.at("Inventory").is_set()) # is set
     ####################################################################################################################
     # Test create instance of
@@ -303,10 +303,10 @@ try:
     # TEST read inherited values in inherited component
     heightObj = ent.get_component("HeightObj")
     assert(heightObj is not None)
-    assert(heightObj.root.at("Subdivision").get_int() == 0)
+    assert(heightObj.root.at("Subdivision").value == 0)
     assert(not heightObj.root.at("Subdivision").is_set())
     assert(
-        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").get_int() == 51248)
+        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").value == 51248)
     assert(
         not heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").is_set())
 
@@ -315,9 +315,9 @@ try:
     assert(sysCreat is not None)
 
     # TEST read setted values
-    assert(sysCreat.root.at("Faction").get_string() == "Shamans")
+    assert(sysCreat.root.at("Faction").value == "Shamans")
     assert(not sysCreat.root.at("Faction").is_set()) # Not overrided
-    assert(sysCreat.root.at("Inventory").get_string() == "KaiWOLgrey")
+    assert(sysCreat.root.at("Inventory").value == "KaiWOLgrey")
     assert(not sysCreat.root.at("Inventory").is_set()) # Not overrided
 
     # TEST read array
@@ -325,10 +325,10 @@ try:
     assert(sysCreat.root.at("ScriptList").size() == 3)
 
     # TEST default values
-    assert(sysCreat.root.at("Burried").get_bool() == False) # default
+    assert(sysCreat.root.at("Burried").value == False) # default
     assert (sysCreat.root.at("Burried").datatype == Ent.DataType.boolean)  # default
     assert(not sysCreat.root.at("Burried").is_set()) # default
-    assert(sysCreat.root.at("Name").get_string() == "") # default
+    assert(sysCreat.root.at("Name").value == "") # default
     assert(not sysCreat.root.at("Name").is_set()) # default
 
     # ******************************** Test iteration of schema **********************************

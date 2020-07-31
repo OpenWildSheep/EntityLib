@@ -42,6 +42,39 @@ namespace pybind11
 namespace py = pybind11;
 using namespace Ent;
 
+using Value = mapbox::util::variant<Null, std::string, float, int64_t, bool>;
+
+Value getValue(Ent::Node& node)
+{
+    switch (node.getDataType())
+    {
+    case Ent::DataType::array: return node.getFloat();
+    case Ent::DataType::freeobject: return node.getFloat();
+    case Ent::DataType::object: return node.getFloat();
+    case Ent::DataType::boolean: return node.getBool();
+    case Ent::DataType::integer: return node.getInt();
+    case Ent::DataType::null: return nullptr;
+    case Ent::DataType::number: return node.getFloat();
+    case Ent::DataType::string: return std::string(node.getString());
+    }
+    return Value();
+}
+
+void setValue(Ent::Node& node, Value const& val)
+{
+    switch (node.getDataType())
+    {
+    case Ent::DataType::array: node.setFloat(val.get<float>()); break;
+    case Ent::DataType::freeobject: node.setFloat(val.get<float>()); break;
+    case Ent::DataType::object: node.setFloat(val.get<float>()); break;
+    case Ent::DataType::boolean: node.setBool(val.get<bool>()); break;
+    case Ent::DataType::integer: node.setInt(val.get<int64_t>()); break;
+    case Ent::DataType::null: break;
+    case Ent::DataType::number: node.setFloat(val.get<float>()); break;
+    case Ent::DataType::string: node.setString(val.get<std::string>().c_str()); break;
+    }
+}
+
 using namespace pybind11::literals;
 
 PYBIND11_MODULE(EntityLibPy, ent)
@@ -129,6 +162,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_int", [](Node* node) { return node->getInt(); })
         .def("get_string", [](Node* node) { return node->getString(); })
         .def("get_bool", [](Node* node) { return node->getBool(); })
+        .def_property("value", getValue, setValue)
         .def("set_float", [](Node* node, float val) { return node->setFloat(val); })
         .def("set_int", [](Node* node, int64_t val) { return node->setInt(val); })
         .def(

@@ -291,7 +291,7 @@ try:
     assert(sysCreat.root.at("Inventory").is_set()) # is set
     ####################################################################################################################
     # Test create instance of
-    instanceOf = entlib.make_instance_of("test_makeInstanceOf", "prefab.entity")
+    instanceOf = entlib.make_instance_of("prefab.entity")
     entlib.save_entity(instanceOf, "instance.create.entity")
     ####################################################################################################################
     # Test read instance of

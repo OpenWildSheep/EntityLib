@@ -159,7 +159,7 @@ namespace Ent
     struct Component
     {
         std::string type; ///< Component type (ex : Transform, VisualGD, HeightObj ...)
-        Node root; ///< Root node a the component. Always of type Ent::DataType::object
+        Node root; ///< Root node of the component. Always of type Ent::DataType::object
         size_t version; ///< @todo remove?
         size_t index; ///< Useful to keep the componants order in the json file. To make diffs easier.
     };
@@ -306,10 +306,7 @@ namespace Ent
         /// @brief Create an Entity which instanciate an other.
         ///
         /// This allow to override some properties without change the prefab properties.
-        Entity makeInstanceOf(
-            std::string _name, ///< Name of the new Entity
-            std::string _instanceOf, ///< Path to the prefab Entity
-            tl::optional<std::array<uint8_t, 4>> _color = tl::nullopt ///< Optional color of the new Entity
+        Entity makeInstanceOf(std::string _instanceOf ///< Path to the prefab Entity
         ) const;
     };
 

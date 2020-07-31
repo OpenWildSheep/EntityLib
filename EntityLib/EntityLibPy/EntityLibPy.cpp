@@ -229,10 +229,5 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("load_scene", &EntityLib::loadScene)
         .def("save_entity", &EntityLib::saveEntity)
         .def("save_scene", &EntityLib::saveScene)
-        .def(
-            "make_instance_of",
-            &EntityLib::makeInstanceOf,
-            "name"_a,
-            "instanceOf"_a,
-            "color"_a = std::nullopt);
+        .def("make_instance_of", &EntityLib::makeInstanceOf, "instanceOf"_a);
 }

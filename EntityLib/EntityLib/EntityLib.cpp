@@ -1079,16 +1079,16 @@ Ent::Entity Ent::Entity::detachEntityFromPrefab() const
         getThumbnail() ? std::string(getThumbnail()) : tl::optional<std::string>());
 }
 
-Ent::Entity Ent::EntityLib::makeInstanceOf(
-    std::string name, std::string _instanceOf, tl::optional<std::array<uint8_t, 4>> color) const
+Ent::Entity Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
 {
+    Entity templ = loadEntity(_instanceOf);
     return Ent::Entity(
         *this,
-        std::move(name),
+        templ.getName(),
         std::map<std::string, Ent::Component>(),
         tl::nullopt,
-        color,
-        tl::nullopt,
+        templ.getColor() ? tl::optional<std::array<uint8_t, 4>>(*templ.getColor()) : tl::nullopt,
+        templ.getThumbnail() ? tl::optional<std::string>(templ.getThumbnail()) : tl::nullopt,
         std::move(_instanceOf));
 }
 

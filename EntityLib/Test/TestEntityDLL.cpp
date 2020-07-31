@@ -329,7 +329,7 @@ try
 
     {
         // Test create instance of
-        Ent::Entity instanceOf = entlib.makeInstanceOf("test_makeInstanceOf", "prefab.entity");
+        Ent::Entity instanceOf = entlib.makeInstanceOf("prefab.entity");
         entlib.saveEntity(instanceOf, "instance.create.entity");
     }
     {

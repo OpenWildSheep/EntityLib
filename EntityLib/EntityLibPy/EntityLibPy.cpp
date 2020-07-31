@@ -107,13 +107,17 @@ PYBIND11_MODULE(EntityLibPy, ent)
     py::class_<Node>(ent, "Node")
         .def_property_readonly("datatype", [](Node const* node) { return node->getDataType(); })
         .def(
-            "field",
+            "at",
             [](Node* node, char const* field) { return node->at(field); },
-            py::return_value_policy::reference)
+            py::return_value_policy::reference,
+            "In an Object, get the property by name")
         .def("count", [](Node* node, char const* field) { return node->count(field); })
         .def("get_field_names", &Node::getFieldNames)
         .def(
-            "item", [](Node* node, size_t i) { return node->at(i); }, py::return_value_policy::reference)
+            "at",
+            [](Node* node, size_t i) { return node->at(i); },
+            py::return_value_policy::reference,
+            "In an Array, get the element by index")
         .def("size", [](Node* node) { return node->size(); })
         .def("get_items", [](Node* node) { return node->getItems(); })
         .def(

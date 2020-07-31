@@ -16,7 +16,6 @@
 namespace std
 {
     using namespace experimental;
-    using namespace mapbox::util;
 } // namespace std
 
 namespace Ent
@@ -88,8 +87,8 @@ namespace Ent
     struct ENTLIB_DLLEXPORT Node
     {
         /// @cond PRIVATE
-        using Value =
-            std::variant<Null, Override<std::string>, Override<float>, Override<int64_t>, Object, Array, Override<bool>>;
+        using Value = mapbox::util::
+            variant<Null, Override<std::string>, Override<float>, Override<int64_t>, Object, Array, Override<bool>>;
         Node() = default;
         Node(Value val, Subschema const* schema);
         ~Node() = default;
@@ -171,12 +170,16 @@ namespace Ent
     /// @remark "SubScene" need a special case because it contain some Scene, although a Node can't be a Scene.
     ///  There are other solutions to sove this problem like keep everything as a Node and make
     ///  Scene/Component only wrapper to Node. Let's see if the current solution is ok.
+    /// @todo : Make all fields private since this struct has some invariants
     struct SubSceneComponent
     {
         bool isEmbedded; ///< If true, data are in embedded, else data are in file
         std::string file; ///< Path to a .scene file, whene isEmbedded is false
         size_t index; ///< Useful to keep the componants order in the json file
         std::unique_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
+
+        void makeEmbedded(bool make ///< false to make extern (not embedded)
+        );
     };
 
     class EntityLib;
@@ -248,6 +251,12 @@ namespace Ent
     /// Contain all data of a scene. (A list of Entity)
     struct Scene
     {
+        Scene() = default;
+        Scene(Scene const&) = delete;
+        Scene& operator=(Scene const&) = delete;
+        Scene(Scene&&) = default;
+        Scene& operator=(Scene&&) = default;
+
         std::vector<Entity> objects; ///< All Ent::Entity of this Scene
     };
 
@@ -300,7 +309,7 @@ namespace Ent
         Entity makeInstanceOf(
             std::string _name, ///< Name of the new Entity
             std::string _instanceOf, ///< Path to the prefab Entity
-            tl::optional<std::array<uint8_t, 4>> color = tl::nullopt ///< Optional color of the new Entity
+            tl::optional<std::array<uint8_t, 4>> _color = tl::nullopt ///< Optional color of the new Entity
         ) const;
     };
 

@@ -44,12 +44,12 @@ namespace Ent
         loader.readSchema(&schema.schema, schemaDocument, schemaDocument);
 
         auto& compList = schema.schema.root->properties["Objects"]
-                                ->singularItems
-                                ->get() // get the Object
-                                .properties["Components"]
-                                ->singularItems
-                                ->get() // get the Component
-                                .oneOf;
+                             ->singularItems
+                             ->get() // get the Object
+                             .properties["Components"]
+                             ->singularItems
+                             ->get() // get the Component
+                             .oneOf;
 
         for (SubschemaRef& comp : *compList)
         {
@@ -214,7 +214,7 @@ namespace Ent
 
     void Node::unset()
     {
-        std::apply_visitor(UnSet{}, value);
+        mapbox::util::apply_visitor(UnSet{}, value);
     }
 
     struct IsSet
@@ -236,7 +236,7 @@ namespace Ent
 
     bool Node::isSet() const
     {
-        return std::apply_visitor(IsSet{}, value);
+        return mapbox::util::apply_visitor(IsSet{}, value);
     }
 
     struct Detach
@@ -274,7 +274,7 @@ namespace Ent
 
     Node Node::detach() const
     {
-        return std::apply_visitor(Detach{ schema }, value);
+        return mapbox::util::apply_visitor(Detach{ schema }, value);
     }
 
     struct MakeInstanceOf
@@ -313,7 +313,7 @@ namespace Ent
 
     Node Node::makeInstanceOf() const
     {
-        return std::apply_visitor(MakeInstanceOf{ schema }, value);
+        return mapbox::util::apply_visitor(MakeInstanceOf{ schema }, value);
     }
 
     struct HasOverride
@@ -351,7 +351,7 @@ namespace Ent
 
     bool Node::hasOverride() const
     {
-        return std::apply_visitor(HasOverride{ schema }, value);
+        return mapbox::util::apply_visitor(HasOverride{ schema }, value);
     }
 
     std::vector<char const*> Node::getFieldNames() const
@@ -425,6 +425,23 @@ namespace Ent
             return value.get<Array>().data.empty();
         }
         throw BadType();
+    }
+
+    // ********************************* SubSceneComponent ****************************************
+
+    void SubSceneComponent::makeEmbedded(bool _embedded)
+    {
+        isEmbedded = _embedded;
+        if (_embedded)
+        {
+            if (embedded == nullptr)
+                embedded = std::make_unique<Scene>();
+            file.clear();
+        }
+        else
+        {
+            embedded.reset();
+        }
     }
 
     // ********************************* Entity ***************************************************

@@ -69,9 +69,9 @@ static json convertToInstanceSchema(Ent::SubschemaRef const& tmplSchemaRef)
 static json convertToInstanceSchema(Ent::Subschema const& tmplSchema)
 {
     json instSchema;
-    std::apply_visitor(SetDefault{ "default", &instSchema }, tmplSchema.defaultValue);
+    mapbox::util::apply_visitor(SetDefault{ "default", &instSchema }, tmplSchema.defaultValue);
     if (tmplSchema.constValue.has_value())
-        std::apply_visitor(SetDefault{ "const", &instSchema }, *tmplSchema.constValue);
+        mapbox::util::apply_visitor(SetDefault{ "const", &instSchema }, *tmplSchema.constValue);
     if (not empty(tmplSchema.enumValues))
         instSchema["enum"] = tmplSchema.enumValues;
     if (tmplSchema.maxItems != size_t(-1))

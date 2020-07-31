@@ -11,10 +11,6 @@
 
 #include "EntityLibCore.h"
 
-namespace std
-{
-    using namespace mapbox::util;
-} // namespace std
 
 /// EntityLib namespace
 namespace Ent
@@ -33,9 +29,7 @@ namespace Ent
     };
 
     /// @cond PRIVATE
-    struct Null
-    {
-    };
+    using Null = std::nullptr_t;
     /// @endcond
 
     struct SubschemaRef;
@@ -57,7 +51,8 @@ namespace Ent
         tl::optional<std::vector<SubschemaRef>> oneOf;
 
         /// Contains the simple value of one of the possible Ent::DataType
-        using DefaultValue = std::variant<Null, std::string, float, int64_t, Null, Null, bool>;
+        using DefaultValue =
+            mapbox::util::variant<Null, std::string, float, int64_t, Null, Null, bool>;
         DefaultValue defaultValue; ///< @brief Contains the data according to the type
         tl::optional<DefaultValue> constValue;
 
@@ -81,13 +76,19 @@ namespace Ent
     /// Can hold a Subschema OR a reference to a Subschema
     struct SubschemaRef
     {
+        SubschemaRef() = default;
+        SubschemaRef(SubschemaRef const&) = delete;
+        SubschemaRef& operator=(SubschemaRef const&) = delete;
+        SubschemaRef(SubschemaRef&&) = default;
+        SubschemaRef& operator=(SubschemaRef&&) = default;
+
         struct Ref
         {
             Schema* schema;
             std::string ref;
         };
 
-        std::variant<Null, Ref, Subschema> subSchemaOrRef;
+        mapbox::util::variant<Null, Ref, Subschema> subSchemaOrRef;
 
         Subschema const& get() const;
         Subschema& get();

@@ -1,0 +1,200 @@
+#include <iostream>
+
+#include <EntityLib.h>
+
+namespace std
+{
+    using tl::nullopt;
+    using tl::nullopt_t;
+    using tl::optional;
+} // namespace std
+
+#define PYBIND11_HAS_OPTIONAL 1
+
+#pragma warning(push, 0)
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#pragma warning(pop)
+
+namespace pybind11
+{
+    namespace detail
+    {
+        template <typename... Ts>
+        struct type_caster<mapbox::util::variant<Ts...>>
+            : variant_caster<mapbox::util::variant<Ts...>>
+        {
+        };
+
+        // Specifies the function used to visit the variant -- `apply_visitor` instead of `visit`
+        template <>
+        struct visit_helper<mapbox::util::variant>
+        {
+            template <typename... Args>
+            static auto call(Args&&... args) -> decltype(mapbox::util::apply_visitor(args...))
+            {
+                return mapbox::util::apply_visitor(args...);
+            }
+        };
+    } // namespace detail
+} // namespace pybind11
+
+namespace py = pybind11;
+using namespace Ent;
+
+using namespace pybind11::literals;
+
+PYBIND11_MODULE(EntityLibPy, ent)
+{
+    ent.doc() = "pybind11 for EntityLib";
+
+    // ****************************** Schema ******************************************************
+
+    py::enum_<DataType>(ent, "DataType")
+        .value("null", DataType::null)
+        .value("string", DataType::string)
+        .value("number", DataType::number)
+        .value("integer", DataType::integer)
+        .value("object", DataType::object)
+        .value("array", DataType::array)
+        .value("boolean", DataType::boolean)
+        .export_values();
+
+    py::class_<std::filesystem::path>(ent, "path").def(py::init<std::string>());
+
+    py::implicitly_convertible<std::string, std::filesystem::path>();
+
+    py::class_<Subschema>(ent, "Subschema")
+        .def_readonly("type", &Subschema::type)
+        .def_readonly("required", &Subschema::required)
+        .def_readonly("properties", &Subschema::properties, py::return_value_policy::reference)
+        .def_readonly("max_items", &Subschema::maxItems)
+        .def_readonly("min_items", &Subschema::minItems)
+        .def_readonly("one_of", &Subschema::oneOf, py::return_value_policy::reference)
+        .def_readonly("default_value", &Subschema::defaultValue, py::return_value_policy::reference)
+        .def(
+            "get_default_value",
+            [](Subschema& s) -> Ent::Subschema::DefaultValue& { return s.defaultValue; },
+            py::return_value_policy::reference)
+        .def_readonly("const_value", &Subschema::constValue, py::return_value_policy::reference)
+        // .def("singular_items", &Subschema::singularItems, py::return_value_policy::reference)
+        .def(
+            "get_singular_items",
+            [](Subschema const& s) -> SubschemaRef const* { return s.singularItems.get(); },
+            py::return_value_policy::reference)
+        .def("has_singular_items", [](Subschema const& s) { return s.singularItems != nullptr; })
+        .def(
+            "get_linear_items",
+            [](Subschema const& s) -> std::vector<SubschemaRef> const& { return *s.linearItems; },
+            py::return_value_policy::reference)
+        // .def("linear_items", &Subschema::linearItems, py::return_value_policy::reference)
+        .def("has_linear_items", [](Subschema const& s) { return s.linearItems.has_value(); })
+        .def_readonly("enum_values", &Subschema::enumValues, py::return_value_policy::reference);
+
+    py::class_<SubschemaRef>(ent, "SubschemaRef")
+        .def(py::init<>())
+        .def(
+            "get",
+            [](SubschemaRef const& s) -> Subschema const& { return s.get(); },
+            py::return_value_policy::reference);
+
+    py::class_<Schema>(ent, "Schema")
+        .def_readonly("root", &Schema::root, py::return_value_policy::reference)
+        .def_readonly("definitions", &Schema::allDefinitions, py::return_value_policy::reference);
+
+    // ******************************************** EntityLib *************************************
+
+    py::class_<Node>(ent, "Node")
+        .def_property_readonly("datatype", [](Node const* node) { return node->getDataType(); })
+        .def(
+            "field",
+            [](Node* node, char const* field) { return node->at(field); },
+            py::return_value_policy::reference)
+        .def("count", [](Node* node, char const* field) { return node->count(field); })
+        .def("get_field_names", &Node::getFieldNames)
+        .def(
+            "item", [](Node* node, size_t i) { return node->at(i); }, py::return_value_policy::reference)
+        .def("size", [](Node* node) { return node->size(); })
+        .def("get_items", [](Node* node) { return node->getItems(); })
+        .def(
+            "push", [](Node* node) { return node->push(); }, py::return_value_policy::reference)
+        .def("pop", [](Node* node) { return node->pop(); })
+        .def("clear", [](Node* node) { return node->clear(); })
+        .def("empty", [](Node* node) { return node->empty(); })
+        .def("get_float", [](Node* node) { return node->getFloat(); })
+        .def("get_int", [](Node* node) { return node->getInt(); })
+        .def("get_string", [](Node* node) { return node->getString(); })
+        .def("get_bool", [](Node* node) { return node->getBool(); })
+        .def("set_float", [](Node* node, float val) { return node->setFloat(val); })
+        .def("set_int", [](Node* node, int64_t val) { return node->setInt(val); })
+        .def(
+            "set_string", [](Node* node, char const* str) { return node->setString(std::move(str)); })
+        .def("set_bool", [](Node* node, bool val) { return node->setBool(val); })
+        .def("unset", [](Node* node) { return node->unset(); })
+        .def("is_set", [](Node* node) { return node->isSet(); });
+
+    py::class_<Component>(ent, "Component")
+        .def_readonly("type", &Component::type)
+        .def_readonly("root", &Component::root, py::return_value_policy::reference);
+
+    py::class_<SubSceneComponent>(ent, "SubSceneComponent")
+        .def_readonly("is_embedded", &SubSceneComponent::isEmbedded)
+        .def_property(
+            "file",
+            [](SubSceneComponent const& sc) { return sc.file; },
+            [](SubSceneComponent& sc, std::string f) { return sc.file = std::move(f); })
+        .def("make_embedded", &SubSceneComponent::makeEmbedded)
+        .def_property_readonly(
+            "embedded",
+            [](SubSceneComponent* comp) -> Scene& { return *comp->embedded; },
+            py::return_value_policy::reference);
+
+    py::class_<Entity>(ent, "Entity")
+        .def_property("name", &Entity::getName, &Entity::setName)
+        .def_property_readonly("instance_of", &Entity::getInstanceOf)
+        .def_property("thumbnail", &Entity::getThumbnail, &Entity::setThumbnail)
+        .def_property("color", &Entity::getColor, &Entity::setColor)
+        .def("add_component", &Entity::addComponent, py::return_value_policy::reference)
+        .def(
+            "get_component",
+            [](Entity& e, char const* name) { return e.getComponent(name); },
+            py::return_value_policy::reference)
+        .def("remove_component", &Entity::removeComponent)
+        .def("get_component_types", &Entity::getComponentTypes)
+        .def("get_components", &Entity::getComponents, py::return_value_policy::reference)
+        .def(
+            "get_subscene_component",
+            [](Entity& e) { return e.getSubSceneComponent(); },
+            py::return_value_policy::reference)
+        .def("detach_entity_from_prefab", &Entity::detachEntityFromPrefab);
+
+    py::class_<Scene>(ent, "Scene")
+        .def_readonly("entities", &Scene::objects, py::return_value_policy::reference);
+
+    py::class_<ComponentsSchema>(ent, "ComponentsSchema")
+        .def_readonly("components", &ComponentsSchema::components, py::return_value_policy::reference)
+        .def_readonly("schema", &ComponentsSchema::schema, py::return_value_policy::reference);
+
+    py::class_<std::array<uint8_t, 4>>(ent, "Color")
+        .def(py::init<>())
+        .def(py::init<uint8_t, uint8_t, uint8_t, uint8_t>());
+
+    py::class_<EntityLib>(ent, "EntityLib")
+        .def(py::init<std::string>())
+        .def_readonly("tools_dir", &EntityLib::toolsDir)
+        .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference)
+        .def_readonly(
+            "component_dependencies",
+            &EntityLib::componentDependencies,
+            py::return_value_policy::reference)
+        .def("load_entity", &EntityLib::loadEntity)
+        .def("load_scene", &EntityLib::loadScene)
+        .def("save_entity", &EntityLib::saveEntity)
+        .def("save_scene", &EntityLib::saveScene)
+        .def(
+            "make_instance_of",
+            &EntityLib::makeInstanceOf,
+            "name"_a,
+            "instanceOf"_a,
+            "color"_a = std::nullopt);
+}

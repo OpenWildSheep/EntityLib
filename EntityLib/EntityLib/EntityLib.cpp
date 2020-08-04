@@ -22,7 +22,7 @@ using namespace nlohmann;
 
 static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, Ent::Node const* super);
 static Ent::Scene
-loadScene(Ent::EntityLib const& entLib, Ent::ComponentsSchema const& schema, json const& document);
+loadScene(Ent::EntityLib const& entLib, Ent::ComponentsSchema const& schema, json const& entities);
 static json saveScene(Ent::ComponentsSchema const& schema, Ent::Scene const& scene);
 
 namespace Ent
@@ -32,8 +32,8 @@ namespace Ent
     {
     }
 
-    EntityLib::EntityLib(std::filesystem::path const& _toolsDir)
-        : toolsDir(_toolsDir) // Read schema and dependencies
+    EntityLib::EntityLib(std::filesystem::path _toolsDir)
+        : toolsDir(std::move(_toolsDir)) // Read schema and dependencies
     {
         auto schemaPath = toolsDir / "WildPipeline/Schema";
 
@@ -249,8 +249,9 @@ namespace Ent
             return Node(ov.detach(), schema);
         }
 
-        Node operator()(Null const&) const
+        Node operator()(Null const& val) const
         {
+            (void*)&val; // Null contains nothing so it is not needed
             return Node(Null{}, schema);
         }
 
@@ -287,8 +288,9 @@ namespace Ent
             return Node(ov.makeInstanceOf(), schema);
         }
 
-        Node operator()(Null const&) const
+        Node operator()(Null const& val) const
         {
+            (void*)&val; // Null contains nothing so it is not needed
             return Node(Null{}, schema);
         }
 
@@ -326,8 +328,9 @@ namespace Ent
             return ov.isSet();
         }
 
-        bool operator()(Null const&) const
+        bool operator()(Null const& val) const
         {
+            (void*)&val; // Null contains nothing so it is not needed
             return false;
         }
 
@@ -494,7 +497,7 @@ namespace Ent
     }
     Component* Entity::addComponent(char const* type)
     {
-        if (entlib->componentDependencies.count(type)) // Could be an editor componant
+        if (entlib->componentDependencies.count(type) != 0) // Could be an editor componant
         {
             for (auto&& dep : entlib->componentDependencies.at(type))
             {
@@ -621,7 +624,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
         std::string const def = nodeSchema.defaultValue.is<Ent::Null>() ?
                                     std::string() :
                                     nodeSchema.defaultValue.get<std::string>();
-        tl::optional<std::string> const supVal = super and super->isSet() ?
+        tl::optional<std::string> const supVal = (super != nullptr and super->isSet()) ?
                                                      tl::optional<std::string>(super->getString()) :
                                                      tl::optional<std::string>(tl::nullopt);
         tl::optional<std::string> const val =
@@ -634,7 +637,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
     {
         bool const def =
             nodeSchema.defaultValue.is<Ent::Null>() ? bool{} : nodeSchema.defaultValue.get<bool>();
-        tl::optional<bool> const supVal = super and super->isSet() ?
+        tl::optional<bool> const supVal = (super != nullptr and super->isSet()) ?
                                               tl::optional<bool>(super->getBool()) :
                                               tl::optional<bool>(tl::nullopt);
         tl::optional<bool> const val = data.is_boolean() ? tl::optional<bool>(data.get<bool>()) :
@@ -647,7 +650,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
         int64_t const def = nodeSchema.defaultValue.is<Ent::Null>() ?
                                 int64_t{} :
                                 nodeSchema.defaultValue.get<int64_t>();
-        tl::optional<int64_t> const supVal = super and super->isSet() ?
+        tl::optional<int64_t> const supVal = (super != nullptr and super->isSet()) ?
                                                  tl::optional<int64_t>(super->getInt()) :
                                                  tl::optional<int64_t>(tl::nullopt);
         tl::optional<int64_t> const val = data.is_number_integer() or data.is_number_unsigned() ?
@@ -660,7 +663,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
     {
         float const def =
             nodeSchema.defaultValue.is<Ent::Null>() ? float{} : nodeSchema.defaultValue.get<float>();
-        tl::optional<float> const supVal = super and super->isSet() ?
+        tl::optional<float> const supVal = (super != nullptr and super->isSet()) ?
                                                tl::optional<float>(super->getFloat()) :
                                                tl::optional<float>(tl::nullopt);
         tl::optional<float> const val =
@@ -677,9 +680,9 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
         for (auto&& name_sub : nodeSchema.properties)
         {
             std::string const& name = std::get<0>(name_sub);
-            Ent::Node const* superProp = super ? super->at(name.c_str()) : nullptr;
+            Ent::Node const* superProp = (super != nullptr) ? super->at(name.c_str()) : nullptr;
             static json const emptyJson;
-            json const& prop = data.count(name) ? data.at(name) : emptyJson;
+            json const& prop = data.count(name) != 0 ? data.at(name) : emptyJson;
             Ent::Node tmpNode = loadNode(*std::get<1>(name_sub), prop, superProp);
             object.emplace(name, std::make_unique<Ent::Node>(std::move(tmpNode)));
         }
@@ -710,7 +713,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                 for (auto const& item : data)
                 {
                     Ent::Node const* subSuper =
-                        (super and (super->size() > index)) ? super->at(index) : nullptr;
+                        (super != nullptr and (super->size() > index)) ? super->at(index) : nullptr;
                     Ent::Node tmpNode = loadNode(nodeSchema.singularItems->get(), item, subSuper);
                     arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
                     ++index;
@@ -723,7 +726,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
             for (Ent::SubschemaRef const& sub : *nodeSchema.linearItems)
             {
                 Ent::Node const* subSuper =
-                    (super and super->size() > index) ? super->at(index) : nullptr;
+                    (super != nullptr and super->size() > index) ? super->at(index) : nullptr;
                 static json const emptyJson;
                 json const& prop = data.size() > index ? data.at(index) : emptyJson;
                 Ent::Node tmpNode = loadNode(*sub, prop, subSuper);
@@ -849,13 +852,13 @@ loadEntity(Ent::EntityLib const& entlib, Ent::ComponentsSchema const& schema, js
 {
     tl::optional<std::string> instanceOf;
     Ent::Entity superEntity;
-    if (entNode.count("InstanceOf"))
+    if (entNode.count("InstanceOf") != 0)
     {
         instanceOf = entNode.at("InstanceOf").get<std::string>();
         superEntity = entlib.loadEntity(*instanceOf);
     }
 
-    tl::optional<std::string> const thumbnail = entNode.count("Thumbnail") ?
+    tl::optional<std::string> const thumbnail = entNode.count("Thumbnail") != 0 ?
                                                     entNode.at("Thumbnail").get<std::string>() :
                                                     tl::optional<std::string>();
 
@@ -897,10 +900,12 @@ loadEntity(Ent::EntityLib const& entlib, Ent::ComponentsSchema const& schema, js
 
         Ent::Subschema const& compSchema = *schema.components.at(cmpType);
 
-        Ent::Component comp{ cmpType,
-                             loadNode(compSchema, data, (superComp ? &superComp->root : nullptr)),
-                             version,
-                             index };
+        Ent::Component comp{
+            cmpType,
+            loadNode(compSchema, data, (superComp != nullptr ? &superComp->root : nullptr)),
+            version,
+            index
+        };
 
         components.emplace(cmpType, std::move(comp));
         ++index;
@@ -910,7 +915,7 @@ loadEntity(Ent::EntityLib const& entlib, Ent::ComponentsSchema const& schema, js
     {
         auto const& cmpType = std::get<0>(type_comp);
         auto const& superComp = std::get<1>(type_comp);
-        if (not components.count(cmpType))
+        if (components.count(cmpType) == 0)
         {
             Ent::Component comp{
                 cmpType, superComp.root.makeInstanceOf(), superComp.version, superComp.index
@@ -951,11 +956,11 @@ Ent::Entity Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath) 
 }
 
 static Ent::Scene
-loadScene(Ent::EntityLib const& entLib, Ent::ComponentsSchema const& schema, json const& objects)
+loadScene(Ent::EntityLib const& entLib, Ent::ComponentsSchema const& schema, json const& entities)
 {
     Ent::Scene scene;
 
-    for (json const& entNode : objects)
+    for (json const& entNode : entities)
     {
         Ent::Entity ent = ::loadEntity(entLib, schema, entNode);
         scene.objects.emplace_back(std::move(ent));
@@ -1075,8 +1080,8 @@ Ent::Entity Ent::Entity::detachEntityFromPrefab() const
         std::move(std::string(getName()) + "_detached"),
         std::move(detComponents),
         std::move(detSubSceneComponent),
-        getColor() ? *getColor() : tl::optional<std::array<uint8_t, 4>>(),
-        getThumbnail() ? std::string(getThumbnail()) : tl::optional<std::string>());
+        getColor() != nullptr ? *getColor() : tl::optional<std::array<uint8_t, 4>>(),
+        getThumbnail() != nullptr ? std::string(getThumbnail()) : tl::optional<std::string>());
 }
 
 Ent::Entity Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
@@ -1087,8 +1092,10 @@ Ent::Entity Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
         templ.getName(),
         std::map<std::string, Ent::Component>(),
         tl::nullopt,
-        templ.getColor() ? tl::optional<std::array<uint8_t, 4>>(*templ.getColor()) : tl::nullopt,
-        templ.getThumbnail() ? tl::optional<std::string>(templ.getThumbnail()) : tl::nullopt,
+        templ.getColor() != nullptr ? tl::optional<std::array<uint8_t, 4>>(*templ.getColor()) :
+                                      tl::nullopt,
+        templ.getThumbnail() != nullptr ? tl::optional<std::string>(templ.getThumbnail()) :
+                                          tl::nullopt,
         std::move(_instanceOf));
 }
 

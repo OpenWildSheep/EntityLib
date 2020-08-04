@@ -97,7 +97,7 @@ json Ent::mergeComponants(std::filesystem::path const& toolsDir)
 
     // Add other components
     auto addComponent = [&](std::string const& name, char const* filename) {
-        if (alreadyInsertedComponents.count(name))
+        if (alreadyInsertedComponents.count(name) != 0)
             return;
         json newComp;
         auto&& prop = newComp["properties"];

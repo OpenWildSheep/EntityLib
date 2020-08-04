@@ -178,7 +178,7 @@ namespace Ent
         size_t index; ///< Useful to keep the componants order in the json file
         std::unique_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
 
-        void makeEmbedded(bool make ///< false to make extern (not embedded)
+        void makeEmbedded(bool _embedded ///< false to make extern (not embedded)
         );
     };
 
@@ -284,7 +284,7 @@ namespace Ent
         std::map<std::string, std::vector<std::string>> componentDependencies;
 
         /// Load the EntityLib, given the path to the Tools directory
-        explicit EntityLib(std::filesystem::path const& _toolsDir);
+        explicit EntityLib(std::filesystem::path _toolsDir);
         ~EntityLib();
         /// @cond PRIVATE
         EntityLib(EntityLib const&) = delete;

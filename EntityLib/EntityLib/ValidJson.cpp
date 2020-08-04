@@ -18,14 +18,14 @@
 
 using namespace nlohmann;
 
-char schemaPath[1024] = {};
+static char schemaPath[1024] = {};
 
 struct SetDefault
 {
     char const* fieldName;
     json* instSchema;
     template <typename T>
-    void operator()(T const& val, std::enable_if_t<std::is_arithmetic<T>::value>* = 0) const
+    void operator()(T const& val, std::enable_if_t<std::is_arithmetic<T>::value>* = nullptr) const
     {
         instSchema->emplace(fieldName, val);
     }
@@ -36,7 +36,7 @@ struct SetDefault
     }
 
     template <typename T>
-    void operator()(T const&, std::enable_if_t<not std::is_arithmetic<T>::value>* = 0) const
+    void operator()(T const&, std::enable_if_t<not std::is_arithmetic<T>::value>* = nullptr) const
     {
     }
 };
@@ -62,8 +62,7 @@ static json convertToInstanceSchema(Ent::SubschemaRef const& tmplSchemaRef)
         instSchema.emplace("$ref", "#/definitions/" + convertLink(link));
         return instSchema;
     }
-    else
-        return convertToInstanceSchema(*tmplSchemaRef);
+    return convertToInstanceSchema(*tmplSchemaRef);
 }
 
 static json convertToInstanceSchema(Ent::Subschema const& tmplSchema)

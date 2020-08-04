@@ -259,7 +259,7 @@ namespace Ent
         {
             Array out;
             for (auto&& item : arr.data)
-                out.data.emplace_back(std::make_unique<Node>(item->detach()));
+                out.data.emplace_back(nonstd::make_value<Node>(item->detach()));
             return Node(std::move(out), schema);
         }
 
@@ -268,7 +268,8 @@ namespace Ent
             Object out;
             for (auto&& name_node : obj)
                 out.emplace(
-                    std::get<0>(name_node), std::make_unique<Node>(std::get<1>(name_node)->detach()));
+                    std::get<0>(name_node),
+                    nonstd::make_value<Node>(std::get<1>(name_node)->detach()));
             return Node(std::move(out), schema);
         }
     };
@@ -298,7 +299,7 @@ namespace Ent
         {
             Array out;
             for (auto&& item : arr.data)
-                out.data.emplace_back(std::make_unique<Node>(item->makeInstanceOf()));
+                out.data.emplace_back(nonstd::make_value<Node>(item->makeInstanceOf()));
             return Node(std::move(out), schema);
         }
 
@@ -308,7 +309,7 @@ namespace Ent
             for (auto&& name_node : obj)
                 out.emplace(
                     std::get<0>(name_node),
-                    std::make_unique<Node>(std::get<1>(name_node)->makeInstanceOf()));
+                    nonstd::make_value<Node>(std::get<1>(name_node)->makeInstanceOf()));
             return Node(std::move(out), schema);
         }
     };
@@ -392,7 +393,7 @@ namespace Ent
             if (SubschemaRef const* itemSchema = schema->singularItems.get())
             {
                 value.get<Array>().data.emplace_back(
-                    std::make_unique<Node>(loadNode(itemSchema->get(), json(), nullptr)));
+                    nonstd::make_value<Node>(loadNode(itemSchema->get(), json(), nullptr)));
                 return value.get<Array>().data.back().get();
             }
         }
@@ -438,7 +439,7 @@ namespace Ent
         if (_embedded)
         {
             if (embedded == nullptr)
-                embedded = std::make_unique<Scene>();
+                embedded = nonstd::make_value<Scene>();
             file.clear();
         }
         else
@@ -589,7 +590,7 @@ static Ent::Node loadFreeObjectNode(json const& data)
             std::string const& name = field.key();
             json const& value = field.value();
             Ent::Node tmpNode = loadFreeObjectNode(value);
-            object.emplace(name, std::make_unique<Ent::Node>(std::move(tmpNode)));
+            object.emplace(name, nonstd::make_value<Ent::Node>(std::move(tmpNode)));
         }
         result = Ent::Node(std::move(object), nullptr);
     }
@@ -600,7 +601,7 @@ static Ent::Node loadFreeObjectNode(json const& data)
         for (auto const& item : data)
         {
             Ent::Node tmpNode = loadFreeObjectNode(item);
-            arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
+            arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
         }
         result = Ent::Node(std::move(arr), nullptr);
     }
@@ -684,7 +685,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
             static json const emptyJson;
             json const& prop = data.count(name) != 0 ? data.at(name) : emptyJson;
             Ent::Node tmpNode = loadNode(*std::get<1>(name_sub), prop, superProp);
-            object.emplace(name, std::make_unique<Ent::Node>(std::move(tmpNode)));
+            object.emplace(name, nonstd::make_value<Ent::Node>(std::move(tmpNode)));
         }
         result = Ent::Node(std::move(object), &nodeSchema);
     }
@@ -703,7 +704,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                     {
                         Ent::Node tmpNode =
                             loadNode(nodeSchema.singularItems->get(), json(), subSuper);
-                        arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
+                        arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
                 }
@@ -715,7 +716,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                     Ent::Node const* subSuper =
                         (super != nullptr and (super->size() > index)) ? super->at(index) : nullptr;
                     Ent::Node tmpNode = loadNode(nodeSchema.singularItems->get(), item, subSuper);
-                    arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
+                    arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
                     ++index;
                 }
             }
@@ -730,7 +731,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                 static json const emptyJson;
                 json const& prop = data.size() > index ? data.at(index) : emptyJson;
                 Ent::Node tmpNode = loadNode(*sub, prop, subSuper);
-                arr.data.emplace_back(std::make_unique<Ent::Node>(std::move(tmpNode)));
+                arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
                 ++index;
             }
         }
@@ -745,7 +746,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
             std::string const& name = field.key();
             json const& value = field.value();
             Ent::Node tmpNode = loadFreeObjectNode(value);
-            object.emplace(name, std::make_unique<Ent::Node>(std::move(tmpNode)));
+            object.emplace(name, nonstd::make_value<Ent::Node>(std::move(tmpNode)));
         }
         result = Ent::Node(std::move(object), &nodeSchema);
     }
@@ -891,7 +892,7 @@ loadEntity(Ent::EntityLib const& entlib, Ent::ComponentsSchema const& schema, js
             if (subSceneComp.isEmbedded)
             {
                 subSceneComp.embedded =
-                    std::make_unique<Ent::Scene>(loadScene(entlib, schema, data["Embedded"]));
+                    nonstd::make_value<Ent::Scene>(loadScene(entlib, schema, data["Embedded"]));
             }
             subSceneComponent = std::move(subSceneComp);
         }
@@ -1068,7 +1069,7 @@ Ent::Entity Ent::Entity::detachEntityFromPrefab() const
         detSubSceneComponent->file = subscene->file;
         if (subscene->isEmbedded)
         {
-            detSubSceneComponent->embedded = std::make_unique<Ent::Scene>();
+            detSubSceneComponent->embedded = nonstd::make_value<Ent::Scene>();
             for (Ent::Entity const& subEntity : subscene->embedded->objects)
             {
                 detSubSceneComponent->embedded->objects.push_back(subEntity.detachEntityFromPrefab());

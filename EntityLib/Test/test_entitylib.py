@@ -361,6 +361,8 @@ try:
     assert (len(ep1) != 0)
     assert (ep1[0].get_subscene_component() is not None)
 
+    scene.entities.append(entlib.make_instance_of("prefab.entity"))
+
     print("save_scene")
     entlib.save_scene(scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene")
 

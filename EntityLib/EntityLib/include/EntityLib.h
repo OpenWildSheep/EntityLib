@@ -9,6 +9,7 @@
 
 #include "../external/mapbox/variant.hpp"
 #include "../external/optional.hpp"
+#include "../external/value_ptr.hpp"
 #pragma warning(pop)
 
 #include "Schema.h"
@@ -20,6 +21,7 @@ namespace std
 
 namespace Ent
 {
+    using nonstd::value_ptr;
     // ******************************** Global declarations ***************************************
 
     /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
@@ -35,12 +37,12 @@ namespace Ent
     /// \cond PRIVATE
 
     /// Content of a Node which has type Ent::DataType::object
-    using Object = std::map<std::string, std::unique_ptr<Node>>;
+    using Object = std::map<std::string, value_ptr<Node>>;
 
     /// Content of a Node which has type Ent::DataType::array
     struct Array
     {
-        std::vector<std::unique_ptr<Node>> data; ///< List of items of the array
+        std::vector<value_ptr<Node>> data; ///< List of items of the array
     };
 
     template <typename V>
@@ -92,11 +94,6 @@ namespace Ent
         Node() = default;
         Node(Value val, Subschema const* schema);
         ~Node() = default;
-
-        Node(Node const&) = delete;
-        Node& operator=(Node const&) = delete;
-        Node(Node&&) = default;
-        Node& operator=(Node&&) = default;
         /// @endcond
 
         DataType getDataType() const; ///< Type of this Node. @see Ent::DataType
@@ -176,7 +173,7 @@ namespace Ent
         bool isEmbedded; ///< If true, data are in embedded, else data are in file
         std::string file; ///< Path to a .scene file, whene isEmbedded is false
         size_t index; ///< Useful to keep the componants order in the json file
-        std::unique_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
+        value_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
 
         void makeEmbedded(bool _embedded ///< false to make extern (not embedded)
         );
@@ -197,10 +194,6 @@ namespace Ent
             tl::optional<std::array<uint8_t, 4>> color = tl::nullopt,
             tl::optional<std::string> _thumbnail = tl::nullopt,
             tl::optional<std::string> _instanceOf = tl::nullopt);
-        Entity(Entity const&) = delete;
-        Entity& operator=(Entity const&) = delete;
-        Entity(Entity&&) = default;
-        Entity& operator=(Entity&&) = default;
         /// @endcond
 
         char const* getName() const; ///< Get the name of the component
@@ -251,12 +244,6 @@ namespace Ent
     /// Contain all data of a scene. (A list of Entity)
     struct Scene
     {
-        Scene() = default;
-        Scene(Scene const&) = delete;
-        Scene& operator=(Scene const&) = delete;
-        Scene(Scene&&) = default;
-        Scene& operator=(Scene&&) = default;
-
         std::vector<Entity> objects; ///< All Ent::Entity of this Scene
     };
 

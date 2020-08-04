@@ -406,6 +406,9 @@ try
         });
     ENTLIB_ASSERT(ep1Iter != end(scene.objects));
     ENTLIB_ASSERT(ep1Iter->getSubSceneComponent() != nullptr);
+
+    scene.objects.push_back(entlib.makeInstanceOf("prefab.entity"));
+
     entlib.saveScene(scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene");
 
     std::cout << "Done" << std::endl;

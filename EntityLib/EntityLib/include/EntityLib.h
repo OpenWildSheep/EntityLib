@@ -9,6 +9,8 @@
 
 #include "../external/mapbox/variant.hpp"
 #include "../external/optional.hpp"
+
+#define nsvp_CONFIG_COMPARE_POINTERS 1
 #include "../external/value_ptr.hpp"
 #pragma warning(pop)
 
@@ -223,6 +225,11 @@ namespace Ent
         SubSceneComponent const* getSubSceneComponent() const;
         /// Get the special component SubScene or nullptr
         SubSceneComponent* getSubSceneComponent();
+
+        /// Add the special component SubScene
+        ///
+        /// @remark Do nothing if already exist, and return the existing one
+        SubSceneComponent* addSubSceneComponent();
 
         /// @brief Make the Entity independent from its prefab (instanceOf)
         ///

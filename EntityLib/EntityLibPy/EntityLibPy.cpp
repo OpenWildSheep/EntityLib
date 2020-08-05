@@ -204,6 +204,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "get_subscene_component",
             [](Entity& e) { return e.getSubSceneComponent(); },
             py::return_value_policy::reference)
+        .def("add_subscene_component", &Entity::addSubSceneComponent, py::return_value_policy::reference)
         .def("detach_entity_from_prefab", &Entity::detachEntityFromPrefab);
 
     py::class_<Scene>(ent, "Scene")

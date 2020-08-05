@@ -557,6 +557,15 @@ namespace Ent
         return nullptr;
     }
 
+    SubSceneComponent* Entity::addSubSceneComponent()
+    {
+        if (not subSceneComponent.has_value())
+        {
+            subSceneComponent = SubSceneComponent{};
+        }
+        return &(*subSceneComponent);
+    }
+
 } // namespace Ent
 
 // ********************************** Load/Save ***********************************************

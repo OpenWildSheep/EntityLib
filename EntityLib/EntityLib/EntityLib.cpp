@@ -566,6 +566,14 @@ namespace Ent
         return &(*subSceneComponent);
     }
 
+    void Entity::removeSubSceneComponent()
+    {
+        if (subSceneComponent.has_value())
+        {
+            subSceneComponent.reset();
+        }
+    }
+
 } // namespace Ent
 
 // ********************************** Load/Save ***********************************************

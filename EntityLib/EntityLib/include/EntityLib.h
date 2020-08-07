@@ -225,6 +225,8 @@ namespace Ent
         SubSceneComponent const* getSubSceneComponent() const;
         /// Get the special component SubScene or nullptr
         SubSceneComponent* getSubSceneComponent();
+        // Remove the special component SubScene
+        void removeSubSceneComponent();
 
         /// Add the special component SubScene
         ///

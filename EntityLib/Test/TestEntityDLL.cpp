@@ -375,6 +375,16 @@ try
         displaySubSchema(std::get<0>(name_sub), *std::get<1>(name_sub), {});
     }
 
+    // ******************* Test load/save complex entity pinetreec50cmh5mbasic ********************
+    {
+        Ent::Entity ent = entlib.loadEntity("pinetreec50cmh5mbasic.entity");
+        entlib.saveEntity(ent, "pinetreec50cmh5mbasic.copy.entity");
+        Ent::Entity copyEnt = entlib.loadEntity("pinetreec50cmh5mbasic.copy.entity");
+
+        // TEST keeping empty component after entity save
+        ENTLIB_ASSERT(copyEnt.getComponent("EventHandler") != nullptr);
+    }
+
     // ********************************** Test load/save scene ************************************
     Ent::Scene scene = entlib.loadScene("X:/RawData/22_World/SceneMainWorld/SceneMainWorld.scene");
 

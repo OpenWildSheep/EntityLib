@@ -1052,7 +1052,7 @@ static json saveEntity(Ent::ComponentsSchema const& schema, Ent::Entity const& e
             compNode.emplace("Data", std::move(data));
             componentsNode.emplace_back(std::move(compNode));
         }
-        else if (comp->root.hasOverride())
+        else if ((comp->root.hasOverride() && entity.getInstanceOf()) || entity.getInstanceOf() == nullptr)
         {
             json compNode;
             compNode.emplace("Version", comp->version);

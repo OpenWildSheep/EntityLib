@@ -16,6 +16,11 @@
             "Version": 1
         },
         {
+            "Data": {},
+            "Type": "BeamGenerator",
+            "Version": 1
+        },
+        {
             "Data": {
                 "BreakableSizeMax": "small",
                 "BreathDamages": 10.0,
@@ -73,12 +78,22 @@
             "Version": 1
         },
         {
+            "Data": {},
+            "Type": "Net",
+            "Version": 1
+        },
+        {
             "Data": {
                 "Tag": "ShamanPlayerSpawner",
                 "ThumbnailMesh": "02_creature/human/male/clothstrong/bodykai/CLOTH_Body.wbm",
                 "Type": "Spawner"
             },
             "Type": "NetworkNode",
+            "Version": 1
+        },
+        {
+            "Data": {},
+            "Type": "SmoothScaleComponent",
             "Version": 1
         },
         {

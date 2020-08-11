@@ -8,6 +8,7 @@
 #include <valijson/schema.hpp>
 #include <valijson/schema_parser.hpp>
 #include <valijson/validator.hpp>
+#include <regex>
 #pragma warning(pop)
 
 #include "Tools.h"
@@ -19,6 +20,22 @@
 using namespace nlohmann;
 
 static char schemaPath[1024] = {};
+
+static std::string filterError(char const* message)
+{
+	// Remove messages to say that all other components doesn't match
+	std::regex r(R"regex(Failed to validate against schema associated with property name \'Type\'\.
+In node \: \<root\>\/\[Components\]\/\[\d+\]
+
+Failed to validate against child schema #\d+.
+In node : \<root\>\/\[Components\]\/\[\d+\]
+
+Failed to match expected value set by \'const\' constraint\.
+In node : \<root\>\/\[Components\]\/\[\d+\]\/\[Type\]
+
+)regex");
+	return std::regex_replace(message, r, "");
+}
 
 struct SetDefault
 {
@@ -201,7 +218,7 @@ void Ent::validScene(Schema const& schema, std::filesystem::path toolsDir, nlohm
     {
         /// @todo un-comment soon
         std::string message = createMessageFromValidationResult(result);
-        throw Ent::JsonValidation(std::move(message));
+        throw Ent::JsonValidation(filterError(message.c_str()));
     }
 }
 
@@ -231,7 +248,7 @@ void Ent::validEntity(Schema const& schema, std::filesystem::path toolsDir, nloh
     {
         /// @todo un-comment soon
         std::string message = createMessageFromValidationResult(result);
-        throw Ent::JsonValidation(std::move(message));
+        throw Ent::JsonValidation(filterError(message.c_str()));
     }
 }
 

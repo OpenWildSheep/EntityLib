@@ -75,12 +75,27 @@
             "Version": 1
         },
         {
+            "Data": {},
+            "Type": "Net",
+            "Version": 1
+        },
+        {
+            "Data": {},
+            "Type": "SmoothScaleComponent",
+            "Version": 1
+        },
+        {
             "Data": {
                 "Faction": 2254016666,
                 "InSpiritWorld": false,
                 "Visible": true
             },
             "Type": "Actor",
+            "Version": 1
+        },
+        {
+            "Data": {},
+            "Type": "BeamGenerator",
             "Version": 1
         },
         {

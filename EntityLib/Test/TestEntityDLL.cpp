@@ -330,6 +330,8 @@ try
     {
         // Test create instance of
         Ent::Entity instanceOf = entlib.makeInstanceOf("prefab.entity");
+		ENTLIB_ASSERT(instanceOf.getComponent("NetworkNode") != nullptr);
+		instanceOf.getComponent("Transform")->root.getFieldNames();
         entlib.saveEntity(instanceOf, "instance.create.entity");
     }
     {

@@ -23,18 +23,18 @@ static char schemaPath[1024] = {};
 
 static std::string filterError(char const* message)
 {
-	// Remove messages to say that all other components doesn't match
-	std::regex r(R"regex(Failed to validate against schema associated with property name \'Type\'\.
-In node \: \<root\>\/\[Components\]\/\[\d+\]
+    // Remove messages to say that all other components doesn't match
+    std::regex r(R"regex(Failed to validate against schema associated with property name \'Type\'\.
+In node \: \<root\>/(\[Objects\]\/\[\d+\]|)\/\[Components\]\/\[\d+\]
 
 Failed to validate against child schema #\d+.
-In node : \<root\>\/\[Components\]\/\[\d+\]
+In node : \<root\>/(\[Objects\]\/\[\d+\]|)\/\[Components\]\/\[\d+\]
 
 Failed to match expected value set by \'const\' constraint\.
-In node : \<root\>\/\[Components\]\/\[\d+\]\/\[Type\]
+In node : \<root\>/(\[Objects\]\/\[\d+\]|)\/\[Components\]\/\[\d+\]\/\[Type\]
 
 )regex");
-	return std::regex_replace(message, r, "");
+    return std::regex_replace(message, r, "");
 }
 
 struct SetDefault

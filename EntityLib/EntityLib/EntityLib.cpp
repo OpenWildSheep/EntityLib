@@ -32,9 +32,11 @@ namespace Ent
     {
     }
 
-    EntityLib::EntityLib(std::filesystem::path _toolsDir)
-        : toolsDir(std::move(_toolsDir)) // Read schema and dependencies
+    EntityLib::EntityLib(std::filesystem::path _rootPath)
+        : rootPath(std::move(_rootPath)) // Read schema and dependencies
     {
+        rawdataPath = rootPath / "RawData";
+        toolsDir = rootPath / "Tools";
         auto schemaPath = toolsDir / "WildPipeline/Schema";
 
         json schemaDocument = mergeComponants(toolsDir);
@@ -873,7 +875,16 @@ loadEntity(Ent::EntityLib const& entlib, Ent::ComponentsSchema const& schema, js
     if (entNode.count("InstanceOf") != 0)
     {
         instanceOf = entNode.at("InstanceOf").get<std::string>();
-        superEntity = entlib.loadEntity(*instanceOf);
+        std::filesystem::path instanceOfPath = entNode.at("InstanceOf").get<std::string>();
+        if (instanceOfPath.is_absolute())
+        {
+            superEntity = entlib.loadEntity(*instanceOf);
+        }
+        else
+        {
+            instanceOfPath = entlib.rawdataPath / instanceOfPath;
+            superEntity = entlib.loadEntity(instanceOfPath);
+        }
     }
 
     tl::optional<std::string> const thumbnail = entNode.count("Thumbnail") != 0 ?

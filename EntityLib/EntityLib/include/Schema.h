@@ -37,24 +37,26 @@ namespace Ent
     /// Definition of an object
     struct ENTLIB_DLLEXPORT Subschema
     {
+		/// @cond PRIVATE
         Subschema() = default;
         Subschema(Subschema const&) = delete;
         Subschema& operator=(Subschema const&) = delete;
         Subschema(Subschema&&) = default;
         Subschema& operator=(Subschema&&) = default;
+		/// @endcond
 
         DataType type = DataType::null; ///< type of this Subschema. @see Ent::DataType
-        bool required = false; ///< Is this peroperty required?
+        bool required = false; ///< Is this property required?
         std::map<std::string, SubschemaRef> properties; ///< If type == Ent::DataType::object, child properties
         size_t maxItems = size_t(-1); ///< Maximum size of the array. (inclusive) [min, max]
         size_t minItems = 0; ///< @brief Minimum size of an array
-        tl::optional<std::vector<SubschemaRef>> oneOf;
+        tl::optional<std::vector<SubschemaRef>> oneOf; ///< This object have to match with one of thos schema (union)
 
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue =
             mapbox::util::variant<Null, std::string, float, int64_t, Null, Null, bool>;
         DefaultValue defaultValue; ///< @brief Contains the data according to the type
-        tl::optional<DefaultValue> constValue;
+        tl::optional<DefaultValue> constValue; ///< This property can only have this value
 
         /// @brief Subschema of the unique type of item
         ///
@@ -76,38 +78,43 @@ namespace Ent
     /// Can hold a Subschema OR a reference to a Subschema
     struct SubschemaRef
     {
-        SubschemaRef() = default;
+		/// @cond PRIVATE
+		SubschemaRef() = default;
         SubschemaRef(SubschemaRef const&) = delete;
         SubschemaRef& operator=(SubschemaRef const&) = delete;
         SubschemaRef(SubschemaRef&&) = default;
         SubschemaRef& operator=(SubschemaRef&&) = default;
+		/// @endcond
 
-        struct Ref
+		/// @cond PRIVATE
+		/// Make this private
+		struct Ref
         {
-            Schema* schema;
-            std::string ref;
+            Schema* schema; //!< Schema of the referenced object
+            std::string ref; //!< Name of the referenced object
         };
 
         mapbox::util::variant<Null, Ref, Subschema> subSchemaOrRef;
+		/// @endcond
 
-        Subschema const& get() const;
-        Subschema& get();
+        Subschema const& get() const; //!< Get the referenced subschema
+        Subschema& get(); //!< Get the referenced subschema
 
-        Subschema const& operator*() const;
-        Subschema& operator*();
-        Subschema const* operator->() const;
-        Subschema* operator->();
+        Subschema const& operator*() const; //!< Get the referenced subschema
+        Subschema& operator*(); //!< Get the referenced subschema
+        Subschema const* operator->() const; //!< Get the referenced subschema
+        Subschema* operator->(); //!< Get the referenced subschema
     };
 
-    /// Definition of all components
+    /// Definition of everything
     class Schema
     {
     public:
         Schema() = default;
         Schema(Schema const&) = delete;
         Schema& operator=(Schema const&) = delete;
-        SubschemaRef root; ///< Schema of all possible Component s
-        std::map<std::string, Subschema> allDefinitions;
+        SubschemaRef root; ///< Root Schema : Schema of the scene
+        std::map<std::string, Subschema> allDefinitions; ///< Definition of everything, by type name
     };
 
 #pragma warning(push)

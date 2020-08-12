@@ -177,6 +177,7 @@ namespace Ent
         size_t index; ///< Useful to keep the componants order in the json file
         value_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
 
+		/// Switch SubSceneComponent to embedded mode or to external mode
         void makeEmbedded(bool _embedded ///< false to make extern (not embedded)
         );
     };
@@ -225,7 +226,7 @@ namespace Ent
         SubSceneComponent const* getSubSceneComponent() const;
         /// Get the special component SubScene or nullptr
         SubSceneComponent* getSubSceneComponent();
-        // Remove the special component SubScene
+        /// Remove the special component SubScene
         void removeSubSceneComponent();
 
         /// Add the special component SubScene
@@ -265,7 +266,7 @@ namespace Ent
         ComponentsSchema(ComponentsSchema const&) = delete;
         ComponentsSchema& operator=(ComponentsSchema const&) = delete;
         std::map<std::string, Subschema*> components; ///< Schema of all possible Component s
-        Schema schema;
+        Schema schema; ///< Schemas of everything (object, enum...)
     };
 
     /// Entry point of the EntityLib. Used to load/save Scene/Entity and to parse the Schema

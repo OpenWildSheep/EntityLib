@@ -16,6 +16,8 @@ namespace std
 #include <pybind11/stl.h>
 #pragma warning(pop)
 
+ /// @cond PRIVATE
+
 namespace pybind11
 {
     namespace detail
@@ -232,3 +234,5 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("save_scene", &EntityLib::saveScene)
         .def("make_instance_of", &EntityLib::makeInstanceOf, "instanceOf"_a);
 }
+
+/// @endcond

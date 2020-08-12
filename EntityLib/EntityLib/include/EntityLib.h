@@ -136,18 +136,18 @@ namespace Ent
         /// Check if the value is set explicitly (it override the prefab or default value)
         bool isSet() const;
 
+		/// @brief Recursively check if there is an override inside.
+		///
+		/// If there is no override, there is no need to save it.
+		bool hasOverride() const;
+
         /// \cond PRIVATE
         /// Create a Node with the same value but which doesn't rely on prefab.
         Node detach() const;
 
         /// Create a Node is an "instance of" this one. With no override.
         Node makeInstanceOf() const;
-
-        /// @brief Recursively check if there is an override inside.
-        ///
-        /// If there is no override, there is no need to save it.
-        bool hasOverride() const;
-        /// \endcond
+		/// \endcond
 
     private:
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call

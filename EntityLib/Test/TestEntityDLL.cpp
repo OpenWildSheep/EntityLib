@@ -87,7 +87,10 @@ try
 {
     // Ent::updateComponants("X:/Tools");
 
-    Ent::EntityLib entlib("X:/Tools");
+    Ent::EntityLib entlib("X:/");
+	using namespace std::filesystem;
+
+	entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
 
     {
         Ent::Entity ent = entlib.loadEntity("prefab.entity");

@@ -273,6 +273,8 @@ namespace Ent
     {
     public:
         /// @todo Make public attribute private?
+        std::filesystem::path rootPath; ///< Path to the perforce root (X:/)
+        std::filesystem::path rawdataPath; ///< Path to the RawData dir in the perforce root (X:/RawData)
         std::filesystem::path toolsDir; ///< Path to the Tools dir in in the perforce root (X:/Tools)
         ComponentsSchema schema; ///< Schema of all components
 

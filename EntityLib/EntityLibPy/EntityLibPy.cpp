@@ -16,7 +16,7 @@ namespace std
 #include <pybind11/stl.h>
 #pragma warning(pop)
 
- /// @cond PRIVATE
+/// @cond PRIVATE
 
 namespace pybind11
 {
@@ -222,6 +222,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     py::class_<EntityLib>(ent, "EntityLib")
         .def(py::init<std::string>())
+        .def_readonly("root_path", &EntityLib::rootPath)
+        .def_readonly("rawdata_path", &EntityLib::rawdataPath)
         .def_readonly("tools_dir", &EntityLib::toolsDir)
         .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference)
         .def_readonly(

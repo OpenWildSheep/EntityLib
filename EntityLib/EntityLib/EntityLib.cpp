@@ -1115,30 +1115,38 @@ Ent::Entity Ent::Entity::detachEntityFromPrefab() const
 
 Ent::Entity Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
 {
-    Entity templ = loadEntity(_instanceOf);
-	std::map<std::string, Ent::Component> components;
-	for (auto const& type_comp : templ.getComponents())
-	{
-		auto const& cmpType = std::get<0>(type_comp);
-		auto const& superComp = std::get<1>(type_comp);
-		components.emplace(cmpType, Ent::Component{ 
-			cmpType,
-			superComp.root.makeInstanceOf(),
-			superComp.version,
-			superComp.index,
-		});
-	}
-	Entity inst = Ent::Entity(
+    std::filesystem::path instanceOfPath = _instanceOf;
+    if (!instanceOfPath.is_absolute())
+    {
+        instanceOfPath = rawdataPath / _instanceOf;
+    }
+
+    Entity templ = loadEntity(instanceOfPath);
+    std::map<std::string, Ent::Component> components;
+    for (auto const& type_comp : templ.getComponents())
+    {
+        auto const& cmpType = std::get<0>(type_comp);
+        auto const& superComp = std::get<1>(type_comp);
+        components.emplace(
+            cmpType,
+            Ent::Component{
+                cmpType,
+                superComp.root.makeInstanceOf(),
+                superComp.version,
+                superComp.index,
+            });
+    }
+    Entity inst = Ent::Entity(
         *this,
         templ.getName(),
-		components,
+        components,
         tl::nullopt,
         templ.getColor() != nullptr ? tl::optional<std::array<uint8_t, 4>>(*templ.getColor()) :
                                       tl::nullopt,
         templ.getThumbnail() != nullptr ? tl::optional<std::string>(templ.getThumbnail()) :
                                           tl::nullopt,
         std::move(_instanceOf));
-	return inst;
+    return inst;
 }
 
 void Ent::EntityLib::saveEntity(Entity const& entity, std::filesystem::path const& entityPath) const

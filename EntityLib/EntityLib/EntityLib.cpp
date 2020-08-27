@@ -978,7 +978,15 @@ Ent::Entity Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath) 
     json document;
     file >> document;
 
-    validEntity(schema.schema, toolsDir, document);
+    try
+    {
+        validEntity(schema.schema, toolsDir, document);
+    }
+    catch (...)
+    {
+        fprintf(stderr, "Error, loading entity : %ls\n", entityPath.c_str());
+        throw;
+    }
 
     Ent::Entity ent = ::loadEntity(*this, schema, document);
     return ent;
@@ -1001,8 +1009,15 @@ loadScene(Ent::EntityLib const& entLib, Ent::ComponentsSchema const& schema, jso
 Ent::Scene Ent::EntityLib::loadScene(std::filesystem::path const& scenePath) const
 {
     json document = loadJsonFile(scenePath);
-
-    validScene(schema.schema, toolsDir, document);
+    try
+    {
+        validScene(schema.schema, toolsDir, document);
+    }
+    catch (...)
+    {
+        fprintf(stderr, "Error, loading scene : %ls\n", scenePath.c_str());
+        throw;
+    }
 
     return ::loadScene(*this, schema, document.at("Objects"));
 }
@@ -1164,7 +1179,15 @@ void Ent::EntityLib::saveEntity(Entity const& entity, std::filesystem::path cons
     file.close();
 
     // Better to check after save because it is easiest to debug
-    validEntity(schema.schema, toolsDir, document);
+    try
+    {
+        validEntity(schema.schema, toolsDir, document);
+    }
+    catch (...)
+    {
+        fprintf(stderr, "Error, saving entity : %ls\n", entityPath.c_str());
+        throw;
+    }
 }
 
 static json saveScene(Ent::ComponentsSchema const& schema, Ent::Scene const& scene)
@@ -1199,7 +1222,15 @@ void Ent::EntityLib::saveScene(Scene const& scene, std::filesystem::path const& 
     file.close();
 
     // Better to check after save because it is easiest to debug
-    validScene(schema.schema, toolsDir, document);
+    try
+    {
+        validScene(schema.schema, toolsDir, document);
+    }
+    catch (...)
+    {
+        fprintf(stderr, "Error, saving scene : %ls\n", scenePath.c_str());
+        throw;
+    }
 }
 
 /// \endcond

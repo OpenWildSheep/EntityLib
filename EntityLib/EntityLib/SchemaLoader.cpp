@@ -63,7 +63,9 @@ void Ent::SchemaLoader::parseSchema(
             refRoot = &m_schemaMap[fileName];
         }
         json const* node = refRoot;
-        for (auto const& token : split(objectPath.string(), '\\'))
+        objectPath.make_preferred();
+        for (auto const& token :
+             split(objectPath.string(), std::filesystem::path::preferred_separator))
         {
             node = &((*node).at(token));
         }

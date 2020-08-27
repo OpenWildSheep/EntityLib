@@ -37,13 +37,13 @@ namespace Ent
     /// Definition of an object
     struct ENTLIB_DLLEXPORT Subschema
     {
-		/// @cond PRIVATE
+        /// @cond PRIVATE
         Subschema() = default;
         Subschema(Subschema const&) = delete;
         Subschema& operator=(Subschema const&) = delete;
         Subschema(Subschema&&) = default;
         Subschema& operator=(Subschema&&) = default;
-		/// @endcond
+        /// @endcond
 
         DataType type = DataType::null; ///< type of this Subschema. @see Ent::DataType
         bool required = false; ///< Is this property required?
@@ -71,6 +71,8 @@ namespace Ent
         ///     This is the description of each items
         tl::optional<std::vector<SubschemaRef>> linearItems;
         std::vector<std::string> enumValues; ///< List of all posible values for enum
+
+        DeleteCheck deleteCheck;
     };
 
     class Schema;
@@ -78,24 +80,25 @@ namespace Ent
     /// Can hold a Subschema OR a reference to a Subschema
     struct SubschemaRef
     {
-		/// @cond PRIVATE
-		SubschemaRef() = default;
+        /// @cond PRIVATE
+        SubschemaRef() = default;
         SubschemaRef(SubschemaRef const&) = delete;
         SubschemaRef& operator=(SubschemaRef const&) = delete;
         SubschemaRef(SubschemaRef&&) = default;
         SubschemaRef& operator=(SubschemaRef&&) = default;
-		/// @endcond
+        /// @endcond
 
-		/// @cond PRIVATE
-		/// Make this private
-		struct Ref
+        /// @cond PRIVATE
+        /// Make this private
+        struct Ref
         {
             Schema* schema; //!< Schema of the referenced object
             std::string ref; //!< Name of the referenced object
         };
 
         mapbox::util::variant<Null, Ref, Subschema> subSchemaOrRef;
-		/// @endcond
+        DeleteCheck deleteCheck;
+        /// @endcond
 
         Subschema const& get() const; //!< Get the referenced subschema
         Subschema& get(); //!< Get the referenced subschema
@@ -115,6 +118,7 @@ namespace Ent
         Schema& operator=(Schema const&) = delete;
         SubschemaRef root; ///< Root Schema : Schema of the scene
         std::map<std::string, Subschema> allDefinitions; ///< Definition of everything, by type name
+        DeleteCheck deleteCheck;
     };
 
 #pragma warning(push)

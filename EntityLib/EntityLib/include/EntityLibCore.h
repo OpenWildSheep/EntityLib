@@ -17,6 +17,21 @@
 
 namespace Ent
 {
+    struct DeleteCheck
+    {
+        enum class State
+        {
+            VALID = 0x91AC1F0,
+            DELETED = 0xCCDA459
+        } state_ = State::VALID;
+
+        ~DeleteCheck()
+        {
+            assert(state_ == State::VALID);
+            state_ = State::DELETED;
+        }
+    };
+
     /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
     struct JsonValidation : std::runtime_error
     {

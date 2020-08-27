@@ -45,6 +45,7 @@ namespace Ent
     struct Array
     {
         std::vector<value_ptr<Node>> data; ///< List of items of the array
+        DeleteCheck deleteCheck;
     };
 
     template <typename V>
@@ -79,6 +80,7 @@ namespace Ent
         V defaultValue = V();
         tl::optional<V> prefabValue;
         tl::optional<V> overrideValue;
+        DeleteCheck deleteCheck;
     };
 
     /// \endcond
@@ -136,10 +138,10 @@ namespace Ent
         /// Check if the value is set explicitly (it override the prefab or default value)
         bool isSet() const;
 
-		/// @brief Recursively check if there is an override inside.
-		///
-		/// If there is no override, there is no need to save it.
-		bool hasOverride() const;
+        /// @brief Recursively check if there is an override inside.
+        ///
+        /// If there is no override, there is no need to save it.
+        bool hasOverride() const;
 
         /// \cond PRIVATE
         /// Create a Node with the same value but which doesn't rely on prefab.
@@ -147,11 +149,12 @@ namespace Ent
 
         /// Create a Node is an "instance of" this one. With no override.
         Node makeInstanceOf() const;
-		/// \endcond
+        /// \endcond
 
     private:
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
         Value value; ///< Contains one of the types accepted by a Node
+        DeleteCheck deleteCheck;
     };
 
     /// The properties of a given component
@@ -161,6 +164,7 @@ namespace Ent
         Node root; ///< Root node of the component. Always of type Ent::DataType::object
         size_t version; ///< @todo remove?
         size_t index; ///< Useful to keep the componants order in the json file. To make diffs easier.
+        DeleteCheck deleteCheck;
     };
 
     struct Scene;
@@ -176,8 +180,9 @@ namespace Ent
         std::string file; ///< Path to a .scene file, whene isEmbedded is false
         size_t index; ///< Useful to keep the componants order in the json file
         value_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
+        DeleteCheck deleteCheck;
 
-		/// Switch SubSceneComponent to embedded mode or to external mode
+        /// Switch SubSceneComponent to embedded mode or to external mode
         void makeEmbedded(bool _embedded ///< false to make extern (not embedded)
         );
     };
@@ -249,12 +254,14 @@ namespace Ent
         tl::optional<std::array<uint8_t, 4>> color; ///< The optional Color of the Entity
         tl::optional<std::string> thumbnail; ///< Path to the thumbnail mesh (.wthumb)
         tl::optional<std::string> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
+        DeleteCheck deleteCheck;
     };
 
     /// Contain all data of a scene. (A list of Entity)
     struct Scene
     {
         std::vector<Entity> objects; ///< All Ent::Entity of this Scene
+        DeleteCheck deleteCheck;
     };
 
     // ********************************** Static data *********************************************
@@ -267,6 +274,7 @@ namespace Ent
         ComponentsSchema& operator=(ComponentsSchema const&) = delete;
         std::map<std::string, Subschema*> components; ///< Schema of all possible Component s
         Schema schema; ///< Schemas of everything (object, enum...)
+        DeleteCheck deleteCheck;
     };
 
     /// Entry point of the EntityLib. Used to load/save Scene/Entity and to parse the Schema
@@ -278,6 +286,7 @@ namespace Ent
         std::filesystem::path rawdataPath; ///< Path to the RawData dir in the perforce root (X:/RawData)
         std::filesystem::path toolsDir; ///< Path to the Tools dir in in the perforce root (X:/Tools)
         ComponentsSchema schema; ///< Schema of all components
+        DeleteCheck deleteCheck;
 
         /// Component needed for each type of components
         std::map<std::string, std::vector<std::string>> componentDependencies;

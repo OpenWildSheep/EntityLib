@@ -88,9 +88,9 @@ try
     // Ent::updateComponants("X:/Tools");
 
     Ent::EntityLib entlib("X:/");
-	using namespace std::filesystem;
+    using namespace std::filesystem;
 
-	entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
+    entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
 
     {
         Ent::Entity ent = entlib.loadEntity("prefab.entity");
@@ -163,6 +163,24 @@ try
             sysCreat->root.at("Name")->getString() == std::string("Shamane_male")); // set. changed.
         ENTLIB_ASSERT(sysCreat->root.at("Name")->isSet()); // set. changed.
     }
+
+    auto testInstanceOf = [](Ent::Entity const& ent) {
+        // TEST SubScene (without override)
+        Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();
+        ENTLIB_ASSERT(subScene != nullptr);
+        ENTLIB_ASSERT(subScene->isEmbedded);
+        Ent::Entity const& subObj = subScene->embedded->objects[0];
+        ENTLIB_ASSERT(subObj.getName() == std::string("EP1-Spout_LINK_001"));
+        Ent::Component const* netLink = subObj.getComponent("NetworkLink");
+        ENTLIB_ASSERT(netLink != nullptr);
+        ENTLIB_ASSERT(netLink->root.at("Source")->getString() == std::string(".EP1-Spout_"));
+        ENTLIB_ASSERT(netLink->root.at("Source")->isSet() == false);
+        ENTLIB_ASSERT(netLink->root.at("Target")->getString() == std::string(".EP1-crook_"));
+        ENTLIB_ASSERT(netLink->root.at("Target")->isSet() == false);
+        Ent::Component const* trans = subObj.getComponent("Transform");
+        ENTLIB_ASSERT(trans->root.at("Position")->at(0llu)->getFloat() == 0.0);
+    };
+
     {
         // Test read instance of
         Ent::Entity ent = entlib.loadEntity("instance.entity");
@@ -213,8 +231,41 @@ try
         sysCreat->root.at("ScriptList")->push()->setString("d2");
         ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->size() == 4);
 
+        // TEST SubScene (without override)
+        testInstanceOf(ent);
+
         sysCreat->root.at("BehaviorState")->setString("Overrided");
         entlib.saveEntity(ent, "instance.copy.entity");
+    }
+    auto testInstanceOverrideSubscene = [](Ent::Entity const& ent) {
+        // TEST SubScene (with override)
+        Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();
+        ENTLIB_ASSERT(subScene != nullptr);
+        ENTLIB_ASSERT(subScene->isEmbedded);
+        Ent::Entity const& subObj = subScene->embedded->objects[0];
+        ENTLIB_ASSERT(subObj.getName() == std::string("EP1-Spout_LINK_001_2"));
+
+        // Test an overrided Component
+        Ent::Component const* netLink = subObj.getComponent("NetworkLink");
+        ENTLIB_ASSERT(netLink != nullptr);
+        ENTLIB_ASSERT(netLink->root.at("Source")->getString() == std::string(".EP1-Spout_"));
+        ENTLIB_ASSERT(netLink->root.at("Source")->isSet() == false);
+        ENTLIB_ASSERT(netLink->root.at("Target")->getString() == std::string(".EP1-crook_2"));
+        ENTLIB_ASSERT(netLink->root.at("Target")->isSet());
+
+        // Test a not overrided Component
+        Ent::Component const* trans = subObj.getComponent("Transform");
+        ENTLIB_ASSERT(trans != nullptr);
+        ENTLIB_ASSERT(trans->root.at("Position")->at(0llu)->getFloat() == 0.0);
+    };
+    {
+        Ent::Entity ent = entlib.loadEntity("instance_override_subscene.entity");
+        testInstanceOverrideSubscene(ent);
+        entlib.saveEntity(ent, "instance_override_subscene.copy.entity");
+    }
+    {
+        Ent::Entity ent = entlib.loadEntity("instance_override_subscene.copy.entity");
+        testInstanceOverrideSubscene(ent);
     }
     {
         // Test write instance of
@@ -267,6 +318,8 @@ try
         ENTLIB_ASSERT(
             sysCreat->root.at("BehaviorState")->getString() == std::string("Overrided")); // set. changed.
         ENTLIB_ASSERT(sysCreat->root.at("BehaviorState")->isSet()); // set. changed.
+
+        testInstanceOf(ent);
 
         entlib.saveEntity(ent, "instance.copy.entity");
     }
@@ -333,8 +386,8 @@ try
     {
         // Test create instance of
         Ent::Entity instanceOf = entlib.makeInstanceOf("prefab.entity");
-		ENTLIB_ASSERT(instanceOf.getComponent("NetworkNode") != nullptr);
-		instanceOf.getComponent("Transform")->root.getFieldNames();
+        ENTLIB_ASSERT(instanceOf.getComponent("NetworkNode") != nullptr);
+        instanceOf.getComponent("Transform")->root.getFieldNames();
         entlib.saveEntity(instanceOf, "instance.create.entity");
     }
     {

@@ -16,6 +16,58 @@
             "Version": 1
         },
         {
+            "Data": {
+                "Embedded": [
+                    {
+                        "Color": [
+                            255,
+                            120,
+                            220,
+                            255
+                        ],
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Source": ".EP1-Spout_",
+                                    "Target": ".EP1-crook_",
+                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                },
+                                "Type": "NetworkLink",
+                                "Version": 1
+                            },
+                            {
+                                "Data": {
+                                    "Matrix": [
+                                        -0.00570000009611249,
+                                        -0.4374000132083893,
+                                        74.1084976196289,
+                                        0.0,
+                                        0.8992999792098999,
+                                        36.0432014465332,
+                                        -1.0,
+                                        0.0024999999441206455,
+                                        -0.424699991941452
+                                    ],
+                                    "Position": [
+                                        0.0,
+                                        0.0,
+                                        0.0
+                                    ]
+                                },
+                                "Type": "Transform",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "EP1-Spout_LINK_001_detached"
+                    }
+                ],
+                "File": "",
+                "isEmbedded": true
+            },
+            "Type": "SubScene",
+            "Version": 1
+        },
+        {
             "Data": {},
             "Type": "BeamGenerator",
             "Version": 1

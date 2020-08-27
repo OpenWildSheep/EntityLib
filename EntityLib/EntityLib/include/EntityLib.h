@@ -160,11 +160,22 @@ namespace Ent
     /// The properties of a given component
     struct Component
     {
+        bool hasTemplate; ///< True if if override an other component (not just default)
         std::string type; ///< Component type (ex : Transform, VisualGD, HeightObj ...)
         Node root; ///< Root node of the component. Always of type Ent::DataType::object
         size_t version; ///< @todo remove?
         size_t index; ///< Useful to keep the componants order in the json file. To make diffs easier.
         DeleteCheck deleteCheck;
+
+        Component makeInstanceOf() const
+        {
+            return Component{ true, type, root.makeInstanceOf(), version, index };
+        }
+
+        bool hasOverride() const
+        {
+            return root.hasOverride();
+        }
     };
 
     struct Scene;
@@ -185,6 +196,10 @@ namespace Ent
         /// Switch SubSceneComponent to embedded mode or to external mode
         void makeEmbedded(bool _embedded ///< false to make extern (not embedded)
         );
+
+        bool hasOverride() const;
+
+        SubSceneComponent makeInstanceOf() const;
     };
 
     class EntityLib;
@@ -246,6 +261,42 @@ namespace Ent
         /// The properties keep the sames values
         Entity detachEntityFromPrefab() const;
 
+        Entity makeInstanceOf() const
+        {
+            std::map<std::string, Component> instComponents;
+            tl::optional<SubSceneComponent> instSubSceneComponent;
+
+            for (auto&& name_comp : components)
+            {
+                instComponents.emplace(name_comp.first, name_comp.second.makeInstanceOf());
+            }
+            if (subSceneComponent.has_value())
+            {
+                instSubSceneComponent = subSceneComponent->makeInstanceOf();
+            }
+
+            return Entity(
+                *entlib,
+                name,
+                std::move(instComponents),
+                std::move(instSubSceneComponent),
+                color,
+                thumbnail,
+                instanceOf);
+        }
+
+        bool hasOverride() const
+        {
+            for (auto&& name_comp : components)
+            {
+                if (name_comp.second.hasOverride())
+                    return true;
+            }
+            if (subSceneComponent.has_value() && subSceneComponent->hasOverride())
+                return true;
+            return false;
+        }
+
     private:
         EntityLib const* entlib{}; ///< Reference the entity lib to find the schema when needed
         std::string name; ///< Entity name
@@ -262,6 +313,26 @@ namespace Ent
     {
         std::vector<Entity> objects; ///< All Ent::Entity of this Scene
         DeleteCheck deleteCheck;
+
+        Scene makeInstanceOf() const
+        {
+            std::vector<Entity> instanceEntities;
+            for (auto const& ent : objects)
+            {
+                instanceEntities.push_back(ent.makeInstanceOf());
+            }
+            return Scene{ std::move(instanceEntities) };
+        }
+
+        bool hasOverride() const
+        {
+            for (Entity const& ent : objects)
+            {
+                if (ent.hasOverride())
+                    return true;
+            }
+            return false;
+        }
     };
 
     // ********************************** Static data *********************************************
@@ -300,16 +371,23 @@ namespace Ent
         /// @endcond
 
         /// Load the Entity at path _entityPath
-        Entity loadEntity(std::filesystem::path const& entityPath) const;
+        Entity loadEntity(
+            std::filesystem::path const& entityPath, Ent::Entity const* super = nullptr) const;
 
         /// Load the Scene at path _scenePath
         Scene loadScene(std::filesystem::path const& _scenePath) const;
 
         /// Save the Entity at path _entityPath
-        void saveEntity(Entity const& entity, std::filesystem::path const& _entityPath) const;
+        void saveEntity(
+            Entity const& entity,
+            std::filesystem::path const& _entityPath,
+            Ent::Entity const* super = nullptr) const;
 
         /// Save the Scene at path _scenePath
-        void saveScene(Scene const& scene, std::filesystem::path const& _scenePath) const;
+        void saveScene(
+            Scene const& scene,
+            std::filesystem::path const& _scenePath,
+            Ent::Scene const* super = nullptr) const;
 
         /// @brief Create an Entity which instanciate an other.
         ///

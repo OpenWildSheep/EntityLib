@@ -118,7 +118,40 @@
             },
             "Type": "ExplosionEffect",
             "Version": 1
-        }
+        },
+		{
+			"Version": 1,
+			"Type": "SubScene",
+			"Data": {
+				"isEmbedded": true,
+				"File": "",
+				"Embedded": [
+					{
+						"Name": "EP1-Spout_LINK_001",
+						"Color": [255.0,120.0,220.0,255.0],
+						"Components": [
+							{
+								"Version": 1,
+								"Type": "Transform",
+								"Data": {
+									"Matrix": [-0.0057,-0.4374,74.1085,0.0000,0.8993,36.0432,-1.0000,0.0025,-0.4247],
+									"Position": [0.0000,0.0000,0.0000]
+								}
+							},
+							{
+								"Version": 1,
+								"Type": "NetworkLink",
+								"Data": {
+									"Source": ".EP1-Spout_",
+									"Target": ".EP1-crook_",
+									"ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+								}
+							}
+						]
+					}
+				]
+			}
+		}
     ],
     "Name": "PlayerSpawner_"
 }

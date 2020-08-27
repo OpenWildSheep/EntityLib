@@ -1,0 +1,45 @@
+{
+    "Color": [
+        27,
+        177,
+        27,
+        255
+    ],
+    "Components": [
+        {
+            "Data": {
+                "Faction": "Plouf",
+                "ScriptList": [
+                    "a1", "b2", null ]
+            },
+            "Type": "SystemicCreature",
+            "Version": 1
+        },
+		{
+			"Version": 1,
+			"Type": "SubScene",
+			"Data": {
+				"isEmbedded": true,
+				"File": "",
+				"Embedded": [
+					{
+						"Name": "EP1-Spout_LINK_001_2",
+						"Color": [255.0,120.0,220.0,255.0],
+						"Components": [
+							{
+								"Version": 1,
+								"Type": "NetworkLink",
+								"Data": {
+									"Target": ".EP1-crook_2"
+								}
+							}
+						]
+					}
+				]
+			}
+		}		
+    ],
+    "InstanceOf": "prefab.entity",
+	"Thumbnail": "prout",
+    "Name": "PlayerSpawner_"
+}

@@ -155,7 +155,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "In an Array, get the element by index")
         .def("size", [](Node* node) { return node->size(); })
         .def(
-            "get_items", [](Node* node) { return node->getItems(); }, py::return_value_policy::reference)
+            "get_items",
+            [](Node* node) { return node->getItems(); },
+            py::return_value_policy::reference_internal)
         .def(
             "push", [](Node* node) { return node->push(); }, py::return_value_policy::reference)
         .def("pop", [](Node* node) { return node->pop(); })
@@ -211,7 +213,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("detach_entity_from_prefab", &Entity::detachEntityFromPrefab);
 
     py::class_<Scene>(ent, "Scene")
-        .def_readonly("entities", &Scene::objects, py::return_value_policy::reference);
+        .def_readonly("entities", &Scene::objects, py::return_value_policy::reference_internal);
 
     py::class_<ComponentsSchema>(ent, "ComponentsSchema")
         .def_readonly("components", &ComponentsSchema::components, py::return_value_policy::reference)
@@ -231,8 +233,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "component_dependencies",
             &EntityLib::componentDependencies,
             py::return_value_policy::reference)
-        .def("load_entity", &EntityLib::loadEntity)
-        .def("load_scene", &EntityLib::loadScene)
+        .def("load_entity", &EntityLib::loadEntity, py::return_value_policy::copy)
+        .def("load_scene", &EntityLib::loadScene, py::return_value_policy::copy)
         .def("save_entity", &EntityLib::saveEntity)
         .def("save_scene", &EntityLib::saveScene)
         .def("make_instance_of", &EntityLib::makeInstanceOf, "instanceOf"_a);

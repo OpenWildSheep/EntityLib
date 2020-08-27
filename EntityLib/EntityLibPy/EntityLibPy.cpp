@@ -154,7 +154,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference,
             "In an Array, get the element by index")
         .def("size", [](Node* node) { return node->size(); })
-        .def("get_items", [](Node* node) { return node->getItems(); })
+        .def(
+            "get_items", [](Node* node) { return node->getItems(); }, py::return_value_policy::reference)
         .def(
             "push", [](Node* node) { return node->push(); }, py::return_value_policy::reference)
         .def("pop", [](Node* node) { return node->pop(); })

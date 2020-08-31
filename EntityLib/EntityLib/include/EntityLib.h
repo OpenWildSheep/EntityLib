@@ -227,6 +227,7 @@ namespace Ent
     {
         /// @cond PRIVATE
         Entity();
+        Entity(EntityLib const& _entlib);
         Entity(
             EntityLib const& _entlib,
             Override<std::string> _name,

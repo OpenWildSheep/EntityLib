@@ -474,6 +474,15 @@ namespace Ent
     {
     }
 
+    Entity::Entity(EntityLib const& _entlib)
+        : entlib(&_entlib)
+        , name(std::string(), tl::nullopt, tl::nullopt)
+        , color(Ent::makeDefaultColorField(_entlib))
+        , thumbnail(std::string(), tl::nullopt, tl::nullopt)
+        , instanceOf(std::string(), tl::nullopt, tl::nullopt)
+    {
+    }
+
     Entity::Entity(
         EntityLib const& _entlib,
         Override<std::string> _name,

@@ -233,9 +233,14 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "component_dependencies",
             &EntityLib::componentDependencies,
             py::return_value_policy::reference)
-        .def("load_entity", &EntityLib::loadEntity, py::return_value_policy::copy)
+        .def(
+            "load_entity",
+            &EntityLib::loadEntity,
+            py::return_value_policy::copy,
+            "entityPath"_a,
+            "super"_a = nullptr)
         .def("load_scene", &EntityLib::loadScene, py::return_value_policy::copy)
-        .def("save_entity", &EntityLib::saveEntity)
+        .def("save_entity", &EntityLib::saveEntity, "entity"_a, "_entityPath"_a, "super"_a = nullptr)
         .def("save_scene", &EntityLib::saveScene)
         .def("make_instance_of", &EntityLib::makeInstanceOf, "instanceOf"_a);
 }

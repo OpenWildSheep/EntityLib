@@ -187,6 +187,8 @@ try
         Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
         ENTLIB_ASSERT(sysCreat != nullptr);
 
+        ENTLIB_ASSERT(ent.getColorValue().hasOverride());
+
         // TEST read overrided value
         ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Plouf")); // Overrided
 
@@ -328,6 +330,8 @@ try
         // Test create detached
         Ent::Entity ent = entlib.loadEntity("instance.entity");
         Ent::Entity detached = ent.detachEntityFromPrefab();
+
+        ENTLIB_ASSERT(detached.getColorValue().hasOverride());
 
         Ent::Component* sysCreat = detached.getComponent("SystemicCreature");
 

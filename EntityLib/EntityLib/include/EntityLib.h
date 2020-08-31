@@ -46,6 +46,8 @@ namespace Ent
     {
         std::vector<value_ptr<Node>> data; ///< List of items of the array
         DeleteCheck deleteCheck;
+
+        bool hasOverride() const;
     };
 
     template <typename V>
@@ -75,6 +77,22 @@ namespace Ent
         Override<V> detach() const;
 
         Override<V> makeInstanceOf() const;
+
+        /// makeInstanceOf, then set a value
+        Override<V> makeOverridedInstanceOf(tl::optional<V> _overrideValue) const
+        {
+            Override<V> result = makeInstanceOf();
+            result.overrideValue = _overrideValue;
+            return result;
+        }
+
+        /// True if no value was set in template or in instance
+        bool isDefault() const
+        {
+            return !(prefabValue.has_value() || overrideValue.has_value());
+        }
+
+        // bool hasOverride() const;
 
     public:
         V defaultValue = V();
@@ -188,7 +206,7 @@ namespace Ent
     struct SubSceneComponent
     {
         bool isEmbedded; ///< If true, data are in embedded, else data are in file
-        std::string file; ///< Path to a .scene file, whene isEmbedded is false
+        Override<std::string> file; ///< Path to a .scene file, whene isEmbedded is false
         size_t index; ///< Useful to keep the componants order in the json file
         value_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
         DeleteCheck deleteCheck;
@@ -208,15 +226,15 @@ namespace Ent
     struct ENTLIB_DLLEXPORT Entity
     {
         /// @cond PRIVATE
-        Entity() = default;
+        Entity();
         Entity(
             EntityLib const& _entlib,
-            std::string _name,
+            Override<std::string> _name,
             std::map<std::string, Component> _components,
             tl::optional<SubSceneComponent> _subSceneComponent,
-            tl::optional<std::array<uint8_t, 4>> color = tl::nullopt,
-            tl::optional<std::string> _thumbnail = tl::nullopt,
-            tl::optional<std::string> _instanceOf = tl::nullopt);
+            Node color = {},
+            Override<std::string> _thumbnail = {},
+            Override<std::string> _instanceOf = {});
         /// @endcond
 
         char const* getName() const; ///< Get the name of the component
@@ -224,7 +242,7 @@ namespace Ent
         char const* getInstanceOf() const; ///< Name of the inherited prefab if there is one, or nullptr.
         char const* getThumbnail() const; ///< Get the Thumbnail path, or nullptr.
         void setThumbnail(std::string _thumbPath); ///< Set the Thumbnail path
-        std::array<uint8_t, 4> const* getColor() const; ///< Get the color of the is one, or nullptr.
+        std::array<uint8_t, 4> getColor() const; ///< Get the color of the is one, or nullptr.
         void setColor(std::array<uint8_t, 4> color); ///< Set the color RGBA 8bit
 
         /// @brief Create a component of the given _type, with the default values
@@ -297,14 +315,34 @@ namespace Ent
             return false;
         }
 
+        Override<std::string> const& getNameValue() const
+        {
+            return name;
+        }
+
+        Node const& getColorValue() const
+        {
+            return color;
+        }
+
+        Override<std::string> const& getThumbnailValue() const
+        {
+            return thumbnail;
+        }
+
+        Override<std::string> const& getInstanceOfValue() const
+        {
+            return instanceOf;
+        }
+
     private:
         EntityLib const* entlib{}; ///< Reference the entity lib to find the schema when needed
-        std::string name; ///< Entity name
+        Override<std::string> name; ///< Entity name
         std::map<std::string, Component> components; ///< All components of this Entity
         tl::optional<SubSceneComponent> subSceneComponent; ///< the optional SubScene Component
-        tl::optional<std::array<uint8_t, 4>> color; ///< The optional Color of the Entity
-        tl::optional<std::string> thumbnail; ///< Path to the thumbnail mesh (.wthumb)
-        tl::optional<std::string> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
+        Node color; ///< The optional Color of the Entity
+        Override<std::string> thumbnail; ///< Path to the thumbnail mesh (.wthumb)
+        Override<std::string> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
         DeleteCheck deleteCheck;
     };
 

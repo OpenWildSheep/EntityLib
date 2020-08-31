@@ -128,7 +128,7 @@
 				"Embedded": [
 					{
 						"Name": "EP1-Spout_LINK_001",
-						"Color": [255.0,120.0,220.0,255.0],
+						"Color": [255,120,220,255],
 						"Components": [
 							{
 								"Version": 1,

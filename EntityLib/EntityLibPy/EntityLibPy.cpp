@@ -185,7 +185,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property(
             "file",
             [](SubSceneComponent const& sc) { return sc.file; },
-            [](SubSceneComponent& sc, std::string f) { return sc.file = std::move(f); })
+            [](SubSceneComponent& sc, std::string f) { return sc.file.set(std::move(f)); })
         .def("make_embedded", &SubSceneComponent::makeEmbedded)
         .def_property_readonly(
             "embedded",

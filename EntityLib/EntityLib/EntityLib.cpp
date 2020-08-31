@@ -31,6 +31,20 @@ saveScene(Ent::ComponentsSchema const& schema, Ent::Scene const& scene, Ent::Sce
 
 namespace Ent
 {
+    char const* colorSchemaName = "#/definitions/Color";
+    static Ent::Node makeDefaultColorField(EntityLib const& entlib)
+    {
+        Ent::Override<float> zero{ 0.f, tl::nullopt, tl::nullopt };
+        std::vector<nonstd::value_ptr<Ent::Node>> nodes{
+            nonstd::make_value<Ent::Node>(zero, nullptr),
+            nonstd::make_value<Ent::Node>(zero, nullptr),
+            nonstd::make_value<Ent::Node>(zero, nullptr),
+            nonstd::make_value<Ent::Node>(zero, nullptr),
+        };
+        Ent::Subschema const& colorSchema = entlib.schema.schema.allDefinitions.at(colorSchemaName);
+        return Node{ Array{ nodes }, &colorSchema };
+    }
+
     BadType::BadType()
         : std::runtime_error("Bad node type")
     {
@@ -343,7 +357,7 @@ namespace Ent
 
         bool operator()(Array const& arr) const
         {
-            return std::any_of(begin(arr.data), end(arr.data), std::mem_fn(&Ent::Node::hasOverride));
+            return arr.hasOverride();
         }
 
         bool operator()(Object const& obj) const
@@ -446,7 +460,7 @@ namespace Ent
         {
             if (embedded == nullptr)
                 embedded = nonstd::make_value<Scene>();
-            file.clear();
+            file.set(std::string());
         }
         else
         {
@@ -456,14 +470,18 @@ namespace Ent
 
     // ********************************* Entity ***************************************************
 
+    Entity::Entity()
+    {
+    }
+
     Entity::Entity(
         EntityLib const& _entlib,
-        std::string _name,
+        Override<std::string> _name,
         std::map<std::string, Component> _components,
         tl::optional<SubSceneComponent> _subSceneComponent,
-        tl::optional<std::array<uint8_t, 4>> _color,
-        tl::optional<std::string> _thumbnail,
-        tl::optional<std::string> _instanceOf)
+        Node _color,
+        Override<std::string> _thumbnail,
+        Override<std::string> _instanceOf)
         : entlib(&_entlib)
         , name(std::move(_name))
         , subSceneComponent(std::move(_subSceneComponent))
@@ -476,31 +494,35 @@ namespace Ent
 
     char const* Entity::getName() const
     {
-        return name.c_str();
+        return name.get().c_str();
     }
     void Entity::setName(std::string _name)
     {
-        name = _name;
+        name.set(_name);
     }
     char const* Entity::getInstanceOf() const
     {
-        return instanceOf.has_value() ? instanceOf->c_str() : nullptr;
+        return instanceOf.isDefault() ? nullptr : instanceOf.get().c_str();
     }
     char const* Entity::getThumbnail() const
     {
-        return thumbnail.has_value() ? thumbnail->c_str() : nullptr;
+        return thumbnail.isDefault() ? nullptr : thumbnail.get().c_str();
     }
     void Entity::setThumbnail(std::string _thumbPath)
     {
-        thumbnail = std::move(_thumbPath);
+        thumbnail.set(std::move(_thumbPath));
     }
-    std::array<uint8_t, 4> const* Entity::getColor() const
+    std::array<uint8_t, 4> Entity::getColor() const
     {
-        return color.has_value() ? &(*color) : nullptr;
+        std::array<uint8_t, 4> col;
+        for (size_t i = 0; i < 4; ++i)
+            col[i] = (uint8_t)color.at(i)->getInt();
+        return col;
     }
     void Entity::setColor(std::array<uint8_t, 4> _color)
     {
-        color = _color;
+        for (size_t i = 0; i < 4; ++i)
+            color.at(i)->setFloat(_color[i]);
     }
     Component* Entity::addComponent(char const* type)
     {
@@ -903,18 +925,38 @@ static Ent::Entity loadEntity(
     tl::optional<std::string> const thumbnail = entNode.count("Thumbnail") != 0 ?
                                                     entNode.at("Thumbnail").get<std::string>() :
                                                     tl::optional<std::string>();
+    Ent::Override<std::string> superThumbnail =
+        superEntity != nullptr ?
+            superEntity->getThumbnailValue() :
+            Ent::Override<std::string>{ std::string(), tl::nullopt, tl::nullopt };
+    Ent::Override<std::string> ovThumbnail = superThumbnail.makeOverridedInstanceOf(thumbnail);
 
-    auto name = entNode.at("Name").get<std::string>();
+    tl::optional<std::string> const name = entNode.count("Name") != 0 ?
+                                               entNode.at("Name").get<std::string>() :
+                                               tl::optional<std::string>();
 
-    tl::optional<std::array<uint8_t, 4>> color;
+    Ent::Override<std::string> superName =
+        superEntity != nullptr ?
+            superEntity->getNameValue() :
+            Ent::Override<std::string>{ std::string(), tl::nullopt, tl::nullopt };
+    Ent::Override<std::string> ovName = superName.makeOverridedInstanceOf(name);
+
+    Ent::Override<std::string> superInstanceOf =
+        superEntity != nullptr ?
+            superEntity->getInstanceOfValue() :
+            Ent::Override<std::string>{ std::string(), tl::nullopt, tl::nullopt };
+    Ent::Override<std::string> ovInstanceOf = superName.makeOverridedInstanceOf(instanceOf);
+
+    Ent::Node ovColor = Ent::makeDefaultColorField(entlib);
     if (entNode.contains("Color"))
     {
-        color.emplace();
-        json const& colorNode = entNode.at("Color");
-        colorNode[0].get_to(color->at(0));
-        colorNode[1].get_to(color->at(1));
-        colorNode[2].get_to(color->at(2));
-        colorNode[3].get_to(color->at(3));
+        Ent::Subschema const& colorSchema =
+            entlib.schema.schema.allDefinitions.at(Ent::colorSchemaName);
+        ovColor = loadNode(
+            colorSchema,
+            entNode.at("Color"),
+            superEntityFromParentEntity != nullptr ? &superEntityFromParentEntity->getColorValue() :
+                                                     nullptr);
     }
 
     std::map<std::string, Ent::Component> components;
@@ -929,9 +971,13 @@ static Ent::Entity loadEntity(
         {
             Ent::SubSceneComponent const* superComp = superEntity->getSubSceneComponent();
 
-            Ent::SubSceneComponent subSceneComp{ data["isEmbedded"].get<bool>(),
-                                                 data["File"].get<std::string>(),
-                                                 index };
+            Ent::Override<std::string> file =
+                superComp != nullptr ?
+                    superComp->file :
+                    Ent::Override<std::string>(std::string(), tl::nullopt, tl::nullopt);
+
+            file = file.makeOverridedInstanceOf(data["File"].get<std::string>());
+            Ent::SubSceneComponent subSceneComp{ data["isEmbedded"].get<bool>(), file, index };
             if (subSceneComp.isEmbedded)
             {
                 subSceneComp.embedded = nonstd::make_value<Ent::Scene>(loadScene(
@@ -988,12 +1034,12 @@ static Ent::Entity loadEntity(
     }
     return Ent::Entity(
         entlib,
-        std::move(name),
+        std::move(ovName),
         std::move(components),
         std::move(subSceneComponent),
-        color,
-        std::move(thumbnail),
-        std::move(instanceOf));
+        std::move(ovColor),
+        std::move(ovThumbnail),
+        std::move(ovInstanceOf));
 }
 
 Ent::Entity
@@ -1069,17 +1115,19 @@ saveEntity(Ent::ComponentsSchema const& schema, Ent::Entity const& entity, Ent::
     // TODO override, types and default values
     json entNode;
 
-    entNode.emplace("Name", entity.getName());
-
-    if (char const* instanceOf = entity.getInstanceOf())
+    if (entity.getNameValue().isSet())
     {
-        entNode.emplace("InstanceOf", instanceOf);
+        entNode.emplace("Name", entity.getNameValue().get());
     }
 
-    if (std::array<uint8_t, 4> const* color = entity.getColor())
+    if (entity.getInstanceOfValue().isSet())
     {
-        entNode.emplace("Color", *color);
+        entNode.emplace("InstanceOf", entity.getInstanceOfValue().get());
     }
+
+    Ent::Subschema const& colorSchema = schema.schema.allDefinitions.at(Ent::colorSchemaName);
+    if (entity.getColorValue().hasOverride())
+        entNode.emplace("Color", saveNode(colorSchema, entity.getColorValue()));
 
     if (const char* thumbnail = entity.getThumbnail())
     {
@@ -1115,7 +1163,8 @@ saveEntity(Ent::ComponentsSchema const& schema, Ent::Entity const& entity, Ent::
             {
                 json data;
                 data.emplace("isEmbedded", subscene->isEmbedded);
-                data.emplace("File", subscene->file);
+                if (subscene->file.isSet())
+                    data.emplace("File", subscene->file.get());
                 if (subscene->isEmbedded)
                 {
                     ENTLIB_ASSERT_MSG(
@@ -1177,13 +1226,16 @@ Ent::Entity Ent::Entity::detachEntityFromPrefab() const
             }
         }
     }
+
+    auto detachedColor = getColorValue().detach();
+
     return Ent::Entity(
         *entlib,
-        std::move(std::string(getName()) + "_detached"),
+        getNameValue().detach().makeOverridedInstanceOf(std::string(getName()) + "_detached"),
         std::move(detComponents),
         std::move(detSubSceneComponent),
-        getColor() != nullptr ? *getColor() : tl::optional<std::array<uint8_t, 4>>(),
-        getThumbnail() != nullptr ? std::string(getThumbnail()) : tl::optional<std::string>());
+        std::move(detachedColor),
+        getThumbnailValue().detach());
 }
 
 Ent::Entity Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
@@ -1212,14 +1264,12 @@ Ent::Entity Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
     }
     Entity inst = Ent::Entity(
         *this,
-        templ.getName(),
+        templ.getNameValue().makeInstanceOf(),
         components,
         tl::nullopt,
-        templ.getColor() != nullptr ? tl::optional<std::array<uint8_t, 4>>(*templ.getColor()) :
-                                      tl::nullopt,
-        templ.getThumbnail() != nullptr ? tl::optional<std::string>(templ.getThumbnail()) :
-                                          tl::nullopt,
-        std::move(_instanceOf));
+        templ.getColorValue().makeInstanceOf(),
+        templ.getThumbnailValue().makeInstanceOf(),
+        templ.getInstanceOfValue().makeOverridedInstanceOf(_instanceOf));
     return inst;
 }
 
@@ -1320,6 +1370,11 @@ bool Ent::SubSceneComponent::hasOverride() const
     if (embedded != nullptr && embedded->hasOverride())
         return true;
     return false;
+}
+
+bool Ent::Array::hasOverride() const
+{
+    return std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasOverride));
 }
 
 /// \endcond

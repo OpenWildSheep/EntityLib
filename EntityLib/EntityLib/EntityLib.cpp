@@ -525,7 +525,7 @@ namespace Ent
     {
         std::array<uint8_t, 4> col;
         for (size_t i = 0; i < 4; ++i)
-            col[i] = (uint8_t)color.at(i)->getInt();
+            col[i] = (uint8_t)color.at(i)->getFloat();
         return col;
     }
     void Entity::setColor(std::array<uint8_t, 4> _color)

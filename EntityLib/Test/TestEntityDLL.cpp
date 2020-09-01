@@ -470,7 +470,7 @@ try
 
     scene.objects.front().addComponent("BeamGenerator")->root.getFieldNames();
     ENTLIB_ASSERT(
-        scene.objects.front().addComponent("ExplosionEffect")->root.getFieldNames().size() == 22);
+        scene.objects.front().addComponent("ExplosionEffect")->root.getFieldNames().size() == 23);
 
     auto ep1Iter = std::find_if(
         begin(scene.objects), end(scene.objects), [ep1 = std::string("EP1_")](auto&& ent) {

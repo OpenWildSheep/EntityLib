@@ -52,7 +52,7 @@ void updateRefLinks(std::string const& sourceFile, json& node)
 
 json Ent::mergeComponants(std::filesystem::path const& toolsDir)
 {
-    json runtimeCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/RuntimeComponants.json");
+    json runtimeCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/RuntimeComponents.json");
     json editionCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/EditionComponents.json");
     auto sceneSchemaPath = toolsDir / sceneSchemaLocation;
     json sceneSch = loadJsonFile(sceneSchemaPath);
@@ -79,7 +79,7 @@ json Ent::mergeComponants(std::filesystem::path const& toolsDir)
         if (iter != editionCompMap.end())
         {
             json merged = runtimeCompSch[name].value("properties", json());
-            updateRefLinks("RuntimeComponants.json", merged);
+            updateRefLinks("RuntimeComponents.json", merged);
             json editionComp = iter->second->value("properties", json());
             updateRefLinks("EditionComponents.json", editionComp);
             merged.update(editionComp);
@@ -114,7 +114,7 @@ json Ent::mergeComponants(std::filesystem::path const& toolsDir)
     for (json const& dep : dependencies["Dependencies"])
     {
         auto name = dep["className"].get<std::string>();
-        addComponent(name, "RuntimeComponants.json");
+        addComponent(name, "RuntimeComponents.json");
     }
     return sceneSch;
 }

@@ -151,6 +151,11 @@
 					}
 				]
 			}
+		},
+		{
+			"Data": {},
+			"Type": "VoxelSimulationGD",
+			"Version": 1
 		}
     ],
     "Name": "PlayerSpawner_"

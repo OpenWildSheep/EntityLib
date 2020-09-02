@@ -140,7 +140,7 @@ namespace Ent
 
         // Value
         float getFloat() const; ///< @pre number or integer. @brief Get the value as float
-        int64_t getInt() const; ///< @pre number or integer. @brief Get the value as float
+        int64_t getInt() const; ///< @pre integer. @brief Get the value as float
         char const* getString() const; ///< @pre Ent::DataType == string. @brief Get the value as string
         bool getBool() const; ///< @pre type==Ent::DataType::boolean. @brief Get the value as bool
 
@@ -168,6 +168,15 @@ namespace Ent
         /// Create a Node is an "instance of" this one. With no override.
         Node makeInstanceOf() const;
         /// \endcond
+
+        bool isDefault() const; ///< true if the value was set in a template or in the instance
+
+        float getDefaultFloat() const; ///< @pre number or integer. @brief Get the default value as float
+        int64_t getDefaultInt() const; ///< @pre integer. @brief Get the default value as float
+        char const* getDefaultString() const; ///< @pre DataType == string. @brief Get the default value as string
+        bool getDefaultBool() const; ///< @pre DataType == bool. @brief Get the default value as bool
+
+        char const* getTypeName() const; ///< Get the name of the Subschema type, or nullptr if the is no
 
     private:
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call

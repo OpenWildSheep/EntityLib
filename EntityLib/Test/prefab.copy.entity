@@ -186,6 +186,11 @@
             },
             "Type": "SubScene",
             "Version": 1
+        },
+        {
+            "Data": {},
+            "Type": "VoxelSimulationGD",
+            "Version": 1
         }
     ],
     "Name": "PlayerSpawner_",

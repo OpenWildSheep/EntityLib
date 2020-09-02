@@ -51,6 +51,7 @@ namespace Ent
         size_t maxItems = size_t(-1); ///< Maximum size of the array. (inclusive) [min, max]
         size_t minItems = 0; ///< @brief Minimum size of an array
         tl::optional<std::vector<SubschemaRef>> oneOf; ///< This object have to match with one of thos schema (union)
+        std::string name; ///< This is not a constraint. Just the name of the definition
 
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue =

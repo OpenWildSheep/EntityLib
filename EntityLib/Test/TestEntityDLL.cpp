@@ -95,11 +95,19 @@ try
     {
         Ent::Entity ent = entlib.loadEntity("prefab.entity");
 
+        // Test default value
+        Ent::Component* voxelSimulationGD = ent.getComponent("VoxelSimulationGD");
+        ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->getFloat() == 100.f);
+        ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->isDefault());
+        ENTLIB_ASSERT(voxelSimulationGD->root.getTypeName() == std::string("VoxelSimulationGD"));
+
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent.getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->isSet());
+        ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isDefault());
+        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getDefaultInt() == 0);
         ENTLIB_ASSERT(
             heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
         ENTLIB_ASSERT(heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());

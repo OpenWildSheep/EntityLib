@@ -451,6 +451,84 @@ namespace Ent
         throw BadType();
     }
 
+    struct IsDefault
+    {
+        Subschema const* schema;
+
+        template <typename T>
+        bool operator()(Override<T> const& ov) const
+        {
+            return not ov.prefabValue.has_value() and not ov.overrideValue.has_value();
+        }
+
+        bool operator()(Null const& val) const
+        {
+            (void*)&val; // Null contains nothing so it is not needed
+            return false;
+        }
+
+        bool operator()(Array const& arr) const
+        {
+            (void*)&arr;
+            return false;
+        }
+
+        bool operator()(Object const& obj) const
+        {
+            (void*)&obj;
+            return false;
+        }
+    };
+
+    bool Node::isDefault() const
+    {
+        return mapbox::util::apply_visitor(IsDefault{ schema }, value);
+    }
+
+    float Node::getDefaultFloat() const
+    {
+        if (value.is<Override<float>>())
+        {
+            return value.get<Override<float>>().defaultValue;
+        }
+        if (value.is<Override<int64_t>>())
+        {
+            return static_cast<float>(value.get<Override<int64_t>>().defaultValue);
+        }
+        throw BadType();
+    }
+    int64_t Node::getDefaultInt() const
+    {
+        if (value.is<Override<int64_t>>())
+        {
+            return value.get<Override<int64_t>>().defaultValue;
+        }
+        throw BadType();
+    }
+    char const* Node::getDefaultString() const
+    {
+        if (value.is<Override<std::string>>())
+        {
+            return value.get<Override<std::string>>().defaultValue.c_str();
+        }
+        throw BadType();
+    }
+    bool Node::getDefaultBool() const
+    {
+        if (value.is<Override<bool>>())
+        {
+            return value.get<Override<bool>>().defaultValue;
+        }
+        throw BadType();
+    }
+
+    char const* Node::getTypeName() const
+    {
+        if (schema == nullptr)
+            return nullptr;
+        return schema->name.c_str();
+    }
+
     // ********************************* SubSceneComponent ****************************************
 
     void SubSceneComponent::makeEmbedded(bool _embedded)

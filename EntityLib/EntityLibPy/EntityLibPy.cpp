@@ -101,6 +101,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     py::class_<Subschema>(ent, "Subschema")
         .def_readonly("type", &Subschema::type)
+        .def_readonly("name", &Subschema::name)
         .def_readonly("required", &Subschema::required)
         .def_readonly("properties", &Subschema::properties, py::return_value_policy::reference)
         .def_readonly("max_items", &Subschema::maxItems)
@@ -249,6 +250,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("save_entity", &EntityLib::saveEntity, "entity"_a, "_entityPath"_a, "super"_a = nullptr)
         .def("save_scene", &EntityLib::saveScene)
         .def("make_instance_of", &EntityLib::makeInstanceOf, "instanceOf"_a);
+
+    py::register_exception<Ent::JsonValidation>(ent, "JsonValidation");
 }
 
 /// @endcond

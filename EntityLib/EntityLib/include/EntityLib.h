@@ -154,6 +154,7 @@ namespace Ent
         void unset();
 
         /// Check if the value is set explicitly (it override the prefab or default value)
+        /// @remark return true when object or array
         bool isSet() const;
 
         /// @brief Recursively check if there is an override inside.

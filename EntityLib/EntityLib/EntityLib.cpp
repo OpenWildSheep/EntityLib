@@ -1063,8 +1063,12 @@ static Ent::Entity loadEntity(
                     superComp->file :
                     Ent::Override<std::string>(std::string(), tl::nullopt, tl::nullopt);
 
-            file = file.makeOverridedInstanceOf(data["File"].get<std::string>());
-            Ent::SubSceneComponent subSceneComp{ data["isEmbedded"].get<bool>(), file, index };
+            auto fileInJson = data.count("File") ?
+                                  tl::optional<std::string>(data["File"].get<std::string>()) :
+                                  tl::nullopt;
+            file = file.makeOverridedInstanceOf(fileInJson);
+            bool isEmbeddedInJson = data.count("isEmbedded") ? data["isEmbedded"].get<bool>() : false;
+            Ent::SubSceneComponent subSceneComp{ isEmbeddedInJson, file, index };
             if (subSceneComp.isEmbedded)
             {
                 subSceneComp.embedded = nonstd::make_value<Ent::Scene>(loadScene(
@@ -1172,7 +1176,11 @@ static Ent::Scene loadScene(
             (super == nullptr) ?
                 nullptr :
                 entIdx < super->objects.size() ? &(super->objects[entIdx]) : nullptr;
-        Ent::Entity ent = ::loadEntity(entLib, schema, entNode, superEnt);
+        Ent::Entity ent;
+        if (entNode.is_null())
+            ent = superEnt->makeInstanceOf();
+        else
+            ent = ::loadEntity(entLib, schema, entNode, superEnt);
         scene.objects.emplace_back(std::move(ent));
         ++entIdx;
     }

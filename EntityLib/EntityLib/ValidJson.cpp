@@ -34,7 +34,18 @@ Failed to match expected value set by \'const\' constraint\.
 In node : \<root\>(\/\[Objects\]\/\[\d+\]|)\/\[Components\]\/\[\d+\]\/\[Type\]
 
 )regex");
-    return std::regex_replace(message, r, "");
+    std::string const message2 = std::regex_replace(message, r, "");
+    std::regex r2(R"regex(Failed to validate against schema associated with property name \'Type\'\.
+In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/\[Embedded\]\/\[\d+\]|)\/\[Components\]\/\[\d+\]
+
+Failed to validate against child schema #\d+.
+In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/\[Embedded\]\/\[\d+\]|)\/\[Components\]\/\[\d+\]
+
+Failed to match expected value set by \'const\' constraint\.
+In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/\[Embedded\]\/\[\d+\]|)\/\[Components\]\/\[\d+\]\/\[Type\]
+
+)regex");
+    return std::regex_replace(message2, r2, "");
 }
 
 struct SetDefault

@@ -15,3 +15,13 @@ json loadJsonFile(std::filesystem::path const& path)
     doc << file;
     return doc;
 };
+
+char const* Ent::getRefTypeName(char const* link)
+{
+    // Force to create the definition (do nothing if already exist)
+    static char const* definitionsStr = "#/definitions/";
+    auto const defPos = strstr(link, definitionsStr);
+    if (defPos == nullptr)
+        return nullptr;
+    return defPos + strlen(definitionsStr);
+}

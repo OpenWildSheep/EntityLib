@@ -323,11 +323,10 @@ void Ent::SchemaLoader::readSchema(Schema* globalSchema, json const& _fileRoot, 
     };
 
     vis.openRef = [&](char const* link) {
+        char const* typeName = getRefTypeName(link);
         // Force to create the definition (do nothing if already exist)
-        static char const* definitionsStr = "#/definitions/";
-        auto const defPos = strstr(link, definitionsStr);
-        ENTLIB_ASSERT_MSG(defPos != nullptr, "'%s' is expected inside '%s'!!", definitionsStr, link);
-        globalSchema->allDefinitions[link].name = defPos + strlen(definitionsStr);
+        ENTLIB_ASSERT_MSG(typeName != nullptr, "Can't get type name in '%s'!!", link);
+        globalSchema->allDefinitions[link].name = typeName;
         stack.back()->subSchemaOrRef = SubschemaRef::Ref{ globalSchema, link };
     };
     vis.closeRef = [&]() {

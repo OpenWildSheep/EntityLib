@@ -12,3 +12,8 @@ namespace std
 } // namespace std
 
 nlohmann::json loadJsonFile(std::filesystem::path const& path);
+
+namespace Ent
+{
+    char const* getRefTypeName(char const* ref);
+}

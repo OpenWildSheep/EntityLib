@@ -140,7 +140,7 @@ namespace Ent
 
         // Value
         float getFloat() const; ///< @pre number or integer. @brief Get the value as float
-        int64_t getInt() const; ///< @pre integer. @brief Get the value as float
+        int64_t getInt() const; ///< @pre integer. @brief Get the value as int
         char const* getString() const; ///< @pre Ent::DataType == string. @brief Get the value as string
         bool getBool() const; ///< @pre type==Ent::DataType::boolean. @brief Get the value as bool
 
@@ -170,10 +170,12 @@ namespace Ent
         Node makeInstanceOf() const;
         /// \endcond
 
+        bool hasDefaultValue() const; ///< true if the actual value is equal to default value, false if there is no default defined
+
         bool isDefault() const; ///< true if the value was set in a template or in the instance
 
         float getDefaultFloat() const; ///< @pre number or integer. @brief Get the default value as float
-        int64_t getDefaultInt() const; ///< @pre integer. @brief Get the default value as float
+        int64_t getDefaultInt() const; ///< @pre integer. @brief Get the default value as int
         char const* getDefaultString() const; ///< @pre DataType == string. @brief Get the default value as string
         bool getDefaultBool() const; ///< @pre DataType == bool. @brief Get the default value as bool
 

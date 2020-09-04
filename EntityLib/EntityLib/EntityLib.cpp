@@ -259,6 +259,44 @@ namespace Ent
         return mapbox::util::apply_visitor(IsSet{}, value);
     }
 
+    struct HasDefaultValue
+    {
+        Subschema const* schema;
+
+        template <typename T>
+        bool operator()(Override<T> const& ov) const
+        {
+            return !schema->defaultValue.is<Ent::Null>()
+                && schema->defaultValue.get<T>() == ov.get();
+        }
+
+        bool operator()(Null const& val) const
+        {
+            (void*)&val;
+            return false;
+        }
+
+        bool operator()(Array const& arr) const
+        {
+            return std::all_of(begin(arr.data), end(arr.data), 
+                std::mem_fn(&Node::hasDefaultValue));
+        }
+
+        bool operator()(Object const& obj) const
+        {
+            return std::all_of(begin(obj), end(obj), 
+                [](auto&& name_node)
+                {
+                    return std::get<1>(name_node)->hasDefaultValue();
+                });
+        }
+    };
+
+    bool Node::hasDefaultValue() const
+    {
+        return mapbox::util::apply_visitor(HasDefaultValue{ schema }, value);
+    }
+
     struct Detach
     {
         Subschema const* schema;

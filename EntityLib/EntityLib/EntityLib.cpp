@@ -57,7 +57,7 @@ namespace Ent
         toolsDir = rootPath / "Tools";
         auto schemaPath = toolsDir / "WildPipeline/Schema";
 
-        json schemaDocument = mergeComponants(toolsDir);
+        json schemaDocument = mergeComponents(toolsDir);
 
         SchemaLoader loader(schemaPath);
 

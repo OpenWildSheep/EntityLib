@@ -50,7 +50,7 @@ void updateRefLinks(std::string const& sourceFile, json& node)
     }
 };
 
-json Ent::mergeComponants(std::filesystem::path const& toolsDir)
+json Ent::mergeComponents(std::filesystem::path const& toolsDir)
 {
     json runtimeCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/RuntimeComponents.json");
     json editionCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/EditionComponents.json");
@@ -89,6 +89,9 @@ json Ent::mergeComponants(std::filesystem::path const& toolsDir)
             prop["Type"]["const"] = name;
             prop["Data"]["type"] = "object";
             prop["Data"]["properties"] = std::move(merged);
+            auto&& meta = newComp["meta"];
+            meta["editor"] = true;
+            meta["runtime"] = true;
 
             compList.push_back(std::move(newComp));
             alreadyInsertedComponents.insert(name);
@@ -96,32 +99,40 @@ json Ent::mergeComponants(std::filesystem::path const& toolsDir)
     }
 
     // Add other components
-    auto addComponent = [&](std::string const& name, char const* filename) {
+    auto addComponent = [&](std::string const& name, char const* filename, const json& meta) {
         if (alreadyInsertedComponents.count(name) != 0)
             return;
         json newComp;
         auto&& prop = newComp["properties"];
         prop["Type"]["const"] = name;
         prop["Data"]["$ref"] = "file://" + (filename + ("#/definitions/" + name));
-
+        newComp["meta"] = meta;
         compList.push_back(std::move(newComp));
     };
     for (auto&& name_comp : editionCompSch.items())
     {
-        addComponent(name_comp.key(), "EditionComponents.json");
+        json editorOnlyMeta;
+        editorOnlyMeta["editor"] = true;
+        editorOnlyMeta["runtime"] = false;
+
+        addComponent(name_comp.key(), "EditionComponents.json", editorOnlyMeta);
     }
 
     for (json const& dep : dependencies["Dependencies"])
     {
+        json runtimeOnlyMeta;
+        runtimeOnlyMeta["editor"] = false;
+        runtimeOnlyMeta["runtime"] = true;
+
         auto name = dep["className"].get<std::string>();
-        addComponent(name, "RuntimeComponents.json");
+        addComponent(name, "RuntimeComponents.json", runtimeOnlyMeta);
     }
     return sceneSch;
 }
 
-void Ent::updateComponants(std::filesystem::path const& toolsDir)
+void Ent::updateComponents(std::filesystem::path const& toolsDir)
 {
-    json sceneSch = mergeComponants(toolsDir);
+    json sceneSch = mergeComponents(toolsDir);
     auto sceneSchemaPath = toolsDir / sceneSchemaLocation;
     std::ofstream file(sceneSchemaPath);
     if (not file.is_open())

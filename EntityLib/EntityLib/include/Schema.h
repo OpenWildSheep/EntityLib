@@ -53,6 +53,13 @@ namespace Ent
         tl::optional<std::vector<SubschemaRef>> oneOf; ///< This object have to match with one of thos schema (union)
         std::string name; ///< This is not a constraint. Just the name of the definition
 
+        /// Meta informations
+        struct Meta
+        {
+            bool usedInEditor = true; ///< Does this Subschema exists in edition context ?
+            bool usedInRuntime = true;  ///< Does this Subschema exists in runtime context ?
+        } meta;
+
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue =
             mapbox::util::variant<Null, std::string, float, int64_t, Null, Null, bool>;

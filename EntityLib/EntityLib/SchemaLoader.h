@@ -33,7 +33,7 @@ namespace Ent
             nlohmann::json const& _data ///< json node to extract schema
         );
 
-        /// @todo Make Visitor an inteeface to inherit
+        /// @todo Make Visitor an interface to inherit
         struct Visitor
         {
             std::function<void(char const*)> openProperty;
@@ -56,6 +56,7 @@ namespace Ent
             std::function<void()> closeRef;
             std::function<void()> openSubschema;
             std::function<void()> closeSubschema;
+            std::function<void(Subschema::Meta)> setMeta;
         };
 
         void parseSchema(

@@ -250,6 +250,27 @@ void Ent::SchemaLoader::parseSchemaNoRef(
     {
         // TODO required
     }
+    if (_data.count("meta"))
+    {
+        if (!_data["meta"].is_object())
+        {
+            ENTLIB_LOGIC_ERROR("Unexpected json items type for \"meta\" : %s", _data["meta"].type_name());
+        }
+        else
+        {
+            auto&& metaJson = _data["meta"];
+            Ent::Subschema::Meta meta;
+            if (metaJson.count("editor"))
+            {
+                meta.usedInEditor = metaJson["editor"].get<bool>();
+            }
+            if (metaJson.count("runtime"))
+            {
+                meta.usedInRuntime = metaJson["runtime"].get<bool>();
+            }
+            vis.setMeta(meta);
+        }
+    }
 }
 
 void Ent::SchemaLoader::readSchema(Schema* globalSchema, json const& _fileRoot, json const& _data)
@@ -336,7 +357,10 @@ void Ent::SchemaLoader::readSchema(Schema* globalSchema, json const& _fileRoot, 
     };
     vis.closeSubschema = [&]() {
     };
-
+    vis.setMeta = [&](Subschema::Meta meta) {
+        ENTLIB_ASSERT_MSG(stack.back()->subSchemaOrRef.is<Subschema>(), "Can't add meta to SubSchema ref");
+        stack.back()->subSchemaOrRef.get<Subschema>().meta = meta;
+    };
     parseSchema(_fileRoot, _data, vis, 0);
 }
 

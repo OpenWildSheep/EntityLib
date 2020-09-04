@@ -181,6 +181,8 @@ namespace Ent
 
         char const* getTypeName() const; ///< Get the name of the Subschema type, or nullptr if the is no
 
+        Subschema const* getSchema() const; ///< Get the Node schema.
+
     private:
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
         Value value; ///< Contains one of the types accepted by a Node
@@ -205,6 +207,16 @@ namespace Ent
         bool hasOverride() const
         {
             return root.hasOverride();
+        }
+
+        bool isUsedInRuntime() const
+        {
+            return root.getSchema() && root.getSchema()->meta.usedInRuntime;
+        }
+
+        bool isUsedInEditor() const
+        {
+            return root.getSchema() && root.getSchema()->meta.usedInEditor;
         }
     };
 

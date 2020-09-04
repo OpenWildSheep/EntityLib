@@ -567,6 +567,11 @@ namespace Ent
         return schema->name.c_str();
     }
 
+    Subschema const* Node::getSchema() const
+    {
+        return schema;
+    }
+
     // ********************************* SubSceneComponent ****************************************
 
     void SubSceneComponent::makeEmbedded(bool _embedded)

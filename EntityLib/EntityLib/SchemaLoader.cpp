@@ -80,9 +80,71 @@ void Ent::SchemaLoader::parseSchema(
     }
 }
 
+Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
+{
+    const auto setBaseMetas = [&](Ent::Subschema::BaseMeta* _meta)
+    {
+        if (_data.count("editor"))
+        {
+            _meta->usedInEditor = _data["editor"].get<bool>();
+        }
+        if (_data.count("runtime"))
+        {
+            _meta->usedInRuntime = _data["runtime"].get<bool>();
+        }
+        if (_data.count("deprecated"))
+        {
+            _meta->deprecated = _data["deprecated"].get<bool>();
+        }
+    };
+
+    const auto setNumberMetas = [&](Ent::Subschema::NumberMeta& _meta)
+    {
+        if (_data.count("bitdepth"))
+        {
+            _meta.bitDepth = _data["bitdepth"].get<uint32_t>();
+        }
+        if (_data.count("signed"))
+        {
+            _meta.isSigned = _data["signed"].get<bool>();
+        }
+    };
+    switch (_type)
+    {
+    case Ent::DataType::integer:
+    case Ent::DataType::number:
+    {
+        Ent::Subschema::NumberMeta meta;
+        setBaseMetas(&meta);
+        setNumberMetas(meta);
+        return meta;
+    }
+    case Ent::DataType::string:
+    case Ent::DataType::freeobject:
+    case Ent::DataType::object:
+    case Ent::DataType::array:
+    case Ent::DataType::boolean:
+    {
+        Ent::Subschema::GenericMeta meta;
+        setBaseMetas(&meta);
+        return meta;
+    }
+    case Ent::DataType::null:
+    default:
+        ENTLIB_ASSERT_MSG(false, "Invalid current type (null) when parsing meta");
+        return Ent::Subschema::GenericMeta{};
+    }
+}
+
 void Ent::SchemaLoader::parseSchemaNoRef(
     json const& _rootFile, json const& _data, Visitor const& vis, int depth)
 {
+    DataType currentType = DataType::null;
+    const auto setType = [&](DataType _type)
+    {
+        currentType = _type;
+        vis.setType(_type);
+    };
     // type
     if (_data.count("type"))
     {
@@ -93,31 +155,31 @@ void Ent::SchemaLoader::parseSchemaNoRef(
         }
         else if (type == "array")
         {
-            vis.setType(Ent::DataType::array);
+            setType(Ent::DataType::array);
         }
         else if (type == "boolean")
         {
-            vis.setType(Ent::DataType::boolean);
+            setType(Ent::DataType::boolean);
         }
         else if (type == "integer")
         {
-            vis.setType(Ent::DataType::integer);
+            setType(Ent::DataType::integer);
         }
         else if (type == "null")
         {
-            vis.setType(Ent::DataType::null);
+            setType(Ent::DataType::null);
         }
         else if (type == "number")
         {
-            vis.setType(Ent::DataType::number);
+            setType(Ent::DataType::number);
         }
         else if (type == "object")
         {
-            vis.setType(Ent::DataType::object);
+            setType(Ent::DataType::object);
         }
         else if (type == "string")
         {
-            vis.setType(Ent::DataType::string);
+            setType(Ent::DataType::string);
         }
         else
             ENTLIB_LOGIC_ERROR("Unknown type %s", type.c_str());
@@ -125,7 +187,7 @@ void Ent::SchemaLoader::parseSchemaNoRef(
     // properties
     if (_data.count("properties"))
     {
-        vis.setType(Ent::DataType::object);
+        setType(Ent::DataType::object);
         for (auto&& name_prop : _data["properties"].items())
         {
             auto const& propName = name_prop.key();
@@ -142,25 +204,25 @@ void Ent::SchemaLoader::parseSchemaNoRef(
         json const& def = _data.at("default");
         switch (def.type())
         {
-        case nlohmann::json::value_t::null: vis.setType(Ent::DataType::null); break;
-        case nlohmann::json::value_t::object: vis.setType(Ent::DataType::object); break;
-        case nlohmann::json::value_t::array: vis.setType(Ent::DataType::array); break;
+        case nlohmann::json::value_t::null: setType(Ent::DataType::null); break;
+        case nlohmann::json::value_t::object: setType(Ent::DataType::object); break;
+        case nlohmann::json::value_t::array: setType(Ent::DataType::array); break;
         case nlohmann::json::value_t::discarded: break;
         case nlohmann::json::value_t::string:
-            vis.setType(Ent::DataType::string);
+            setType(Ent::DataType::string);
             vis.setDefaultValue(def.get<std::string>());
             break;
         case nlohmann::json::value_t::boolean:
-            vis.setType(Ent::DataType::boolean);
+            setType(Ent::DataType::boolean);
             vis.setDefaultValue(def.get<bool>());
             break;
         case nlohmann::json::value_t::number_integer:
         case nlohmann::json::value_t::number_unsigned:
-            vis.setType(Ent::DataType::integer);
+            setType(Ent::DataType::integer);
             vis.setDefaultValue(def.get<int64_t>());
             break;
         case nlohmann::json::value_t::number_float:
-            vis.setType(Ent::DataType::number);
+            setType(Ent::DataType::number);
             vis.setDefaultValue(def.get<float>());
             break;
         }
@@ -171,32 +233,32 @@ void Ent::SchemaLoader::parseSchemaNoRef(
         json const& def = _data.at("const");
         switch (def.type())
         {
-        case nlohmann::json::value_t::null: vis.setType(Ent::DataType::null); break;
-        case nlohmann::json::value_t::object: vis.setType(Ent::DataType::object); break;
-        case nlohmann::json::value_t::array: vis.setType(Ent::DataType::array); break;
+        case nlohmann::json::value_t::null: setType(Ent::DataType::null); break;
+        case nlohmann::json::value_t::object: setType(Ent::DataType::object); break;
+        case nlohmann::json::value_t::array: setType(Ent::DataType::array); break;
         case nlohmann::json::value_t::discarded: break;
         case nlohmann::json::value_t::string:
-            vis.setType(Ent::DataType::string);
+            setType(Ent::DataType::string);
             vis.setConstValue(def.get<std::string>());
             break;
         case nlohmann::json::value_t::boolean:
-            vis.setType(Ent::DataType::boolean);
+            setType(Ent::DataType::boolean);
             vis.setConstValue(def.get<bool>());
             break;
         case nlohmann::json::value_t::number_integer:
         case nlohmann::json::value_t::number_unsigned:
-            vis.setType(Ent::DataType::integer);
+            setType(Ent::DataType::integer);
             vis.setConstValue(def.get<int64_t>());
             break;
         case nlohmann::json::value_t::number_float:
-            vis.setType(Ent::DataType::number);
+            setType(Ent::DataType::number);
             vis.setConstValue(def.get<float>());
             break;
         }
     }
     if (_data.count("items"))
     {
-        vis.setType(Ent::DataType::array);
+        setType(Ent::DataType::array);
         auto const& items = _data["items"];
         // items linear
         if (items.type() == nlohmann::json::value_t::array)
@@ -258,17 +320,16 @@ void Ent::SchemaLoader::parseSchemaNoRef(
         }
         else
         {
-            auto&& metaJson = _data["meta"];
-            Ent::Subschema::Meta meta;
-            if (metaJson.count("editor"))
+            if (currentType == DataType::null)
             {
-                meta.usedInEditor = metaJson["editor"].get<bool>();
+                std::string name = "Unnamed definition";
+                if (_data.count("name"))
+                {
+                    name = _data["name"].get<std::string>();
+                }
+                ENTLIB_LOGIC_ERROR("Unexpected json definition type (\"%s\")", name.c_str());
             }
-            if (metaJson.count("runtime"))
-            {
-                meta.usedInRuntime = metaJson["runtime"].get<bool>();
-            }
-            vis.setMeta(meta);
+            vis.setMeta(parseMetaForType(_data["meta"], currentType));
         }
     }
 }
@@ -358,8 +419,8 @@ void Ent::SchemaLoader::readSchema(Schema* globalSchema, json const& _fileRoot, 
     vis.closeSubschema = [&]() {
     };
     vis.setMeta = [&](Subschema::Meta meta) {
-        ENTLIB_ASSERT_MSG(stack.back()->subSchemaOrRef.is<Subschema>(), "Can't add meta to SubSchema ref");
-        stack.back()->subSchemaOrRef.get<Subschema>().meta = meta;
+        auto&& subSchema = stack.back()->get();
+        subSchema.meta = std::move(meta);
     };
     parseSchema(_fileRoot, _data, vis, 0);
 }

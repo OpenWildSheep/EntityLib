@@ -577,6 +577,37 @@ namespace Ent
         return schema;
     }
 
+    // ************************************* Component ********************************************
+
+    struct BasicFieldGetter
+    {
+        std::function<bool(const Subschema::BaseMeta*)> _fieldSelector;
+
+        template <class MetaT>
+        bool operator()(const MetaT& _meta)
+        {
+            return _fieldSelector(&_meta);
+        }
+    };
+
+    bool Component::isUsedInRuntime() const
+    {
+        ENTLIB_ASSERT(root.getSchema());
+        return mapbox::util::apply_visitor( 
+            BasicFieldGetter{ [](const Subschema::BaseMeta* _meta)
+                { return _meta->usedInRuntime; } }, 
+            root.getSchema()->meta);
+    }
+
+    bool Component::isUsedInEditor() const
+    {
+        ENTLIB_ASSERT(root.getSchema());
+        return mapbox::util::apply_visitor(
+            BasicFieldGetter{ [](const Subschema::BaseMeta* _meta)
+                { return _meta->usedInEditor; } }, 
+            root.getSchema()->meta);
+    }
+
     // ********************************* SubSceneComponent ****************************************
 
     void SubSceneComponent::makeEmbedded(bool _embedded)

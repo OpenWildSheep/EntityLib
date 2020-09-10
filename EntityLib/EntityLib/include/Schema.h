@@ -54,11 +54,20 @@ namespace Ent
         std::string name; ///< This is not a constraint. Just the name of the definition
 
         /// Meta informations
-        struct Meta
+        struct BaseMeta
         {
             bool usedInEditor = true; ///< Does this Subschema exists in edition context ?
             bool usedInRuntime = true;  ///< Does this Subschema exists in runtime context ?
-        } meta;
+            bool deprecated = false; ///< Is this Subschema deprecated ?
+        };
+        struct NumberMeta : BaseMeta
+        {
+            uint32_t bitDepth = 32; ///< Bit depth of this number, either 8, 16, 32 or 64
+            bool isSigned = true; ///< is this number signed ?
+        };
+        struct GenericMeta : BaseMeta {};
+        using Meta = mapbox::util::variant<NumberMeta, GenericMeta>;
+        Meta meta;
 
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue =

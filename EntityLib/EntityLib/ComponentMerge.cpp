@@ -78,35 +78,42 @@ json Ent::mergeComponents(std::filesystem::path const& toolsDir)
         auto iter = editionCompMap.find(name);
         if (iter != editionCompMap.end())
         {
-            json merged = runtimeCompSch[name].value("properties", json());
-            updateRefLinks("RuntimeComponents.json", merged);
+            json mergedProperties = runtimeCompSch[name].value("properties", json());
+            updateRefLinks("RuntimeComponents.json", mergedProperties);
             json editionComp = iter->second->value("properties", json());
             updateRefLinks("EditionComponents.json", editionComp);
-            merged.update(editionComp);
+            mergedProperties.update(editionComp);
+
+            json mergedMetas = runtimeCompSch[name].value("meta", json());
+            json editionCompMetas = iter->second->value("meta", json::object());
+            mergedMetas.update(editionCompMetas);
+            mergedMetas["editor"] = true;
+            mergedMetas["runtime"] = true;
 
             json newComp;
             auto&& prop = newComp["properties"];
             prop["Type"]["const"] = name;
             prop["Data"]["type"] = "object";
-            prop["Data"]["properties"] = std::move(merged);
-            auto&& meta = newComp["meta"];
-            meta["editor"] = true;
-            meta["runtime"] = true;
-
+            prop["Data"]["properties"] = std::move(mergedProperties);
+            newComp["meta"] = std::move(mergedMetas);
+            
             compList.push_back(std::move(newComp));
             alreadyInsertedComponents.insert(name);
         }
     }
 
     // Add other components
-    auto addComponent = [&](std::string const& name, char const* filename, const json& meta) {
+    auto addComponent = [&](std::string const& name, char const* filename, const json& additionalMetas) {
         if (alreadyInsertedComponents.count(name) != 0)
             return;
         json newComp;
         auto&& prop = newComp["properties"];
         prop["Type"]["const"] = name;
         prop["Data"]["$ref"] = "file://" + (filename + ("#/definitions/" + name));
-        newComp["meta"] = meta;
+
+        json metas = newComp.value("meta", json());
+        metas.update(additionalMetas);
+        newComp["meta"] = std::move(metas);
         compList.push_back(std::move(newComp));
     };
     for (auto&& name_comp : editionCompSch.items())

@@ -211,15 +211,9 @@ namespace Ent
             return root.hasOverride();
         }
 
-        bool isUsedInRuntime() const
-        {
-            return root.getSchema() && root.getSchema()->meta.usedInRuntime;
-        }
+        bool isUsedInRuntime() const; ///< Is this component used in runtime engine ?
 
-        bool isUsedInEditor() const
-        {
-            return root.getSchema() && root.getSchema()->meta.usedInEditor;
-        }
+        bool isUsedInEditor() const; ///< Is this component used in editors ?
     };
 
     struct Scene;

@@ -199,6 +199,11 @@ namespace Ent
         throw BadType();
     }
 
+    const Node::Value& Node::GetRawValue() const
+    {
+        return value;
+    }
+
     void Node::setFloat(float val)
     {
         value.get<Override<float>>().set(val);

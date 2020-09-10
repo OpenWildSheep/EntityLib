@@ -144,6 +144,8 @@ namespace Ent
         char const* getString() const; ///< @pre Ent::DataType == string. @brief Get the value as string
         bool getBool() const; ///< @pre type==Ent::DataType::boolean. @brief Get the value as bool
 
+        const Value& GetRawValue() const; ///< returns a reference to the raw Value (variant) stored at this node. Useful to write visitors.
+
         void setFloat(float val); ///< @pre type==Ent::DataType::number. @brief Set the float value
         void setInt(int64_t val); ///< @pre type==Ent::DataType::integer. @brief Set the int64_t value
         void setString(char const* val); ///< @pre type==Ent::DataType::string. @brief Set the string value

@@ -53,7 +53,7 @@ namespace Ent
         tl::optional<std::vector<SubschemaRef>> oneOf; ///< This object have to match with one of thos schema (union)
         std::string name; ///< This is not a constraint. Just the name of the definition
 
-        /// Meta informations
+        // Meta informations
         struct BaseMeta
         {
             bool usedInEditor = true; ///< Does this Subschema exists in edition context ?
@@ -68,6 +68,13 @@ namespace Ent
         struct GenericMeta : BaseMeta {};
         using Meta = mapbox::util::variant<NumberMeta, GenericMeta>;
         Meta meta;
+
+        // helper methods
+        bool IsDeprecated() const;
+        bool IsUsedInEditor() const;
+        bool IsUsedInRuntime() const;
+        bool IsRuntimeOnly() const { return IsUsedInRuntime() && ! IsUsedInEditor(); }
+        bool IsEditorOnly() const { return ! IsUsedInRuntime() && IsUsedInEditor(); }
 
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue =
@@ -140,6 +147,41 @@ namespace Ent
 
 #pragma warning(push)
 #pragma warning(disable : 4702)
+    struct BasicFieldGetter
+    {
+        std::function<bool(const Subschema::BaseMeta*)> _fieldSelector;
+
+        template <class MetaT>
+        bool operator()(const MetaT& _meta)
+        {
+            return _fieldSelector(&_meta);
+        }
+    };
+
+    inline bool Subschema::IsDeprecated() const
+    {
+        return mapbox::util::apply_visitor( 
+            BasicFieldGetter{ [](const Subschema::BaseMeta* _meta)
+                { return _meta->deprecated; } }, 
+            meta);
+    }
+
+    inline bool Subschema::IsUsedInEditor() const
+    {
+        return mapbox::util::apply_visitor( 
+            BasicFieldGetter{ [](const Subschema::BaseMeta* _meta)
+                { return _meta->usedInEditor; } }, 
+            meta);
+    }
+
+    inline bool Subschema::IsUsedInRuntime() const
+    {
+        return mapbox::util::apply_visitor( 
+            BasicFieldGetter{ [](const Subschema::BaseMeta* _meta)
+                { return _meta->usedInRuntime; } }, 
+            meta);
+    }
+
     inline Subschema const& SubschemaRef::get() const
     {
         if (subSchemaOrRef.is<Ref>())

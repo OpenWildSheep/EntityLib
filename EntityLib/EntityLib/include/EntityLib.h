@@ -210,10 +210,10 @@ namespace Ent
         {
             return root.hasOverride();
         }
-
-        bool isUsedInRuntime() const; ///< Is this component used in runtime engine ?
-
-        bool isUsedInEditor() const; ///< Is this component used in editors ?
+        /// Is this component used in runtime engine ?
+        bool isUsedInRuntime() const { return root.getSchema() && root.getSchema()->IsUsedInRuntime(); }
+        /// Is this component used in editors ?
+        bool isUsedInEditor() const { return root.getSchema() && root.getSchema()->IsEditorOnly(); }
     };
 
     struct Scene;

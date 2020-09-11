@@ -305,7 +305,7 @@
         },
         {
             "Version": 1,
-            "Type": "PhysicsMeshProvider",
+            "Type": "PhysicsMeshProviderGD",
             "Data": {}
         },
         {
@@ -423,42 +423,42 @@
         },
         {
             "Version": 1,
-            "Type": "EventHandler",
+            "Type": "EventHandlerGD",
             "Data": {}
         },
         {
             "Version": 1,
-            "Type": "Transform",
+            "Type": "TransformGD",
             "Data": {}
         },
         {
             "Version": 1,
-            "Type": "Actor",
+            "Type": "ActorGD",
             "Data": {}
         },
         {
             "Version": 1,
-            "Type": "SmallActorSpawner",
+            "Type": "SmallActorSpawnerGD",
             "Data": {}
         },
         {
             "Version": 1,
-            "Type": "Net",
+            "Type": "NetGD",
             "Data": {}
         },
         {
             "Version": 1,
-            "Type": "UnifiedPhysicsData",
+            "Type": "UnifiedPhysicsDataGD",
             "Data": {}
         },
         {
             "Version": 1,
-            "Type": "PhysicsMeshDeformer",
+            "Type": "PhysicsMeshDeformerGD",
             "Data": {}
         },
         {
             "Version": 1,
-            "Type": "Healer",
+            "Type": "HealerGD",
             "Data": {}
         }
     ]

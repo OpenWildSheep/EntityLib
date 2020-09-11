@@ -8,11 +8,9 @@
     "Components": [
         {
             "Data": {
-                "Faction": 2254016666,
-                "InSpiritWorld": false,
-                "Visible": true
+                "InSpiritWorld": false
             },
-            "Type": "Actor",
+            "Type": "ActorGD",
             "Version": 1
         },
         {
@@ -54,7 +52,7 @@
                                         0.0
                                     ]
                                 },
-                                "Type": "Transform",
+                                "Type": "TransformGD",
                                 "Version": 1
                             }
                         ],
@@ -69,7 +67,7 @@
         },
         {
             "Data": {},
-            "Type": "BeamGenerator",
+            "Type": "BeamGeneratorGD",
             "Version": 1
         },
         {
@@ -131,7 +129,7 @@
         },
         {
             "Data": {},
-            "Type": "Net",
+            "Type": "NetGD",
             "Version": 1
         },
         {
@@ -145,7 +143,7 @@
         },
         {
             "Data": {},
-            "Type": "SmoothScaleComponent",
+            "Type": "SmoothScaleComponentGD",
             "Version": 1
         },
         {
@@ -189,7 +187,7 @@
                     29.66349983215332
                 ]
             },
-            "Type": "Transform",
+            "Type": "TransformGD",
             "Version": 1
         },
         {

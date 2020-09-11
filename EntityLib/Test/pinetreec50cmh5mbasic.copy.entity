@@ -134,6 +134,7 @@
                             0.0,
                             0.0
                         ],
+                        "Target": "SquirrelTree",
                         "Type": "spawnlife"
                     },
                     {
@@ -153,6 +154,7 @@
                             -1.0,
                             0.0
                         ],
+                        "Target": "pinetopbranch",
                         "Type": "spawnlife"
                     },
                     {
@@ -172,6 +174,7 @@
                             -1.0,
                             0.0
                         ],
+                        "Target": "LittleCreatureHelmetWildLife",
                         "Type": "spawnlife"
                     },
                     {
@@ -191,6 +194,7 @@
                             -1.0,
                             0.0
                         ],
+                        "Target": "SquirrelWildLife",
                         "Type": "spawnlife"
                     },
                     {
@@ -210,6 +214,7 @@
                             0.0,
                             1.0
                         ],
+                        "Target": "RabbitWildLife",
                         "Type": "spawnlife"
                     },
                     {
@@ -229,6 +234,7 @@
                             0.0,
                             1.0
                         ],
+                        "Target": "LittleCreatureBushAlone",
                         "Type": "spawnlife"
                     },
                     {
@@ -248,6 +254,7 @@
                             0.0,
                             1.0
                         ],
+                        "Target": "LittleCreatureFernAlone",
                         "Type": "spawnlife"
                     },
                     {
@@ -283,7 +290,7 @@
         },
         {
             "Data": {},
-            "Type": "PhysicsMeshProvider",
+            "Type": "PhysicsMeshProviderGD",
             "Version": 1
         },
         {
@@ -390,42 +397,42 @@
         },
         {
             "Data": {},
-            "Type": "EventHandler",
+            "Type": "EventHandlerGD",
             "Version": 1
         },
         {
             "Data": {},
-            "Type": "Transform",
+            "Type": "TransformGD",
             "Version": 1
         },
         {
             "Data": {},
-            "Type": "Actor",
+            "Type": "ActorGD",
             "Version": 1
         },
         {
             "Data": {},
-            "Type": "SmallActorSpawner",
+            "Type": "SmallActorSpawnerGD",
             "Version": 1
         },
         {
             "Data": {},
-            "Type": "Net",
+            "Type": "NetGD",
             "Version": 1
         },
         {
             "Data": {},
-            "Type": "UnifiedPhysicsData",
+            "Type": "UnifiedPhysicsDataGD",
             "Version": 1
         },
         {
             "Data": {},
-            "Type": "PhysicsMeshDeformer",
+            "Type": "PhysicsMeshDeformerGD",
             "Version": 1
         },
         {
             "Data": {},
-            "Type": "Healer",
+            "Type": "HealerGD",
             "Version": 1
         }
     ],

@@ -185,7 +185,7 @@ try
         ENTLIB_ASSERT(netLink->root.at("Source")->isSet() == false);
         ENTLIB_ASSERT(netLink->root.at("Target")->getString() == std::string(".EP1-crook_"));
         ENTLIB_ASSERT(netLink->root.at("Target")->isSet() == false);
-        Ent::Component const* trans = subObj.getComponent("Transform");
+        Ent::Component const* trans = subObj.getComponent("TransformGD");
         ENTLIB_ASSERT(trans->root.at("Position")->at(0llu)->getFloat() == 0.0);
     };
 
@@ -264,7 +264,7 @@ try
         ENTLIB_ASSERT(netLink->root.at("Target")->isSet());
 
         // Test a not overrided Component
-        Ent::Component const* trans = subObj.getComponent("Transform");
+        Ent::Component const* trans = subObj.getComponent("TransformGD");
         ENTLIB_ASSERT(trans != nullptr);
         ENTLIB_ASSERT(trans->root.at("Position")->at(0llu)->getFloat() == 0.0);
     };
@@ -399,14 +399,14 @@ try
         // Test create instance of
         Ent::Entity instanceOf = entlib.makeInstanceOf("prefab.entity");
         ENTLIB_ASSERT(instanceOf.getComponent("NetworkNode") != nullptr);
-        instanceOf.getComponent("Transform")->root.getFieldNames();
+        instanceOf.getComponent("TransformGD")->root.getFieldNames();
         entlib.saveEntity(instanceOf, "instance.create.entity");
     }
     {
         // Test read instance of
         Ent::Entity ent = entlib.loadEntity("instance.create.entity");
 
-        ent.getComponent("Transform")->root.getFieldNames();
+        ent.getComponent("TransformGD")->root.getFieldNames();
 
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent.getComponent("HeightObj");
@@ -452,7 +452,7 @@ try
         Ent::Entity copyEnt = entlib.loadEntity("pinetreec50cmh5mbasic.copy.entity");
 
         // TEST keeping empty component after entity save
-        ENTLIB_ASSERT(copyEnt.getComponent("EventHandler") != nullptr);
+        ENTLIB_ASSERT(copyEnt.getComponent("EventHandlerGD") != nullptr);
     }
 
     // ********************************** Test load/save scene ************************************
@@ -476,7 +476,7 @@ try
     Ent::Component* heightObj = scene.objects.front().addComponent("HeightObj");
     heightObj->root.at("DisplaceNoiseList")->push();
 
-    scene.objects.front().addComponent("BeamGenerator")->root.getFieldNames();
+    scene.objects.front().addComponent("BeamGeneratorGD")->root.getFieldNames();
     ENTLIB_ASSERT(
         scene.objects.front().addComponent("ExplosionEffect")->root.getFieldNames().size() == 23);
 

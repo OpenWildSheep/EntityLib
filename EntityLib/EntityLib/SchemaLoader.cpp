@@ -332,6 +332,11 @@ void Ent::SchemaLoader::parseSchemaNoRef(
             vis.setMeta(parseMetaForType(_data["meta"], currentType));
         }
     }
+    if (_data.count("name"))
+    {
+        // manually specified type name (typically used for enums properties that are inlined)
+        vis.setName(_data["name"].get<std::string>());
+    }
 }
 
 void Ent::SchemaLoader::readSchema(Schema* globalSchema, json const& _fileRoot, json const& _data)
@@ -421,6 +426,13 @@ void Ent::SchemaLoader::readSchema(Schema* globalSchema, json const& _fileRoot, 
     vis.setMeta = [&](Subschema::Meta meta) {
         auto&& subSchema = stack.back()->get();
         subSchema.meta = std::move(meta);
+    };
+    vis.setName = [&](std::string name) {
+        auto&& subSchema = stack.back()->get();
+        ENTLIB_ASSERT_MSG(subSchema.name.empty(), 
+            "Subschema is already named '%s' (new name: '%s')", 
+            subSchema.name.c_str(), name.c_str());
+        subSchema.name = std::move(name);
     };
     parseSchema(_fileRoot, _data, vis, 0);
 }

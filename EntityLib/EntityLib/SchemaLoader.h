@@ -57,6 +57,7 @@ namespace Ent
             std::function<void()> openSubschema;
             std::function<void()> closeSubschema;
             std::function<void(Subschema::Meta)> setMeta;
+            std::function<void(std::string)> setName;
         };
 
         void parseSchema(

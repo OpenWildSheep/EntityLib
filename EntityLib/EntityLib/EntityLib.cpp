@@ -271,8 +271,11 @@ namespace Ent
         template <typename T>
         bool operator()(Override<T> const& ov) const
         {
-            return !schema->defaultValue.is<Ent::Null>()
-                && schema->defaultValue.get<T>() == ov.get();
+            T defaultValue = schema->defaultValue.is<Ent::Null>()
+                ? T{}
+                : schema->defaultValue.get<T>();
+            auto& value = ov.get();
+            return defaultValue == value;
         }
 
         bool operator()(Null const& val) const

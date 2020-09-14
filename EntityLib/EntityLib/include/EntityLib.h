@@ -144,6 +144,8 @@ namespace Ent
         char const* getString() const; ///< @pre Ent::DataType == string. @brief Get the value as string
         bool getBool() const; ///< @pre type==Ent::DataType::boolean. @brief Get the value as bool
 
+        const Value& GetRawValue() const; ///< returns a reference to the raw Value (variant) stored at this node. Useful to write visitors.
+
         void setFloat(float val); ///< @pre type==Ent::DataType::number. @brief Set the float value
         void setInt(int64_t val); ///< @pre type==Ent::DataType::integer. @brief Set the int64_t value
         void setString(char const* val); ///< @pre type==Ent::DataType::string. @brief Set the string value
@@ -181,6 +183,8 @@ namespace Ent
 
         char const* getTypeName() const; ///< Get the name of the Subschema type, or nullptr if the is no
 
+        Subschema const* getSchema() const; ///< Get the Node schema.
+
     private:
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
         Value value; ///< Contains one of the types accepted by a Node
@@ -206,6 +210,10 @@ namespace Ent
         {
             return root.hasOverride();
         }
+        /// Is this component used in runtime engine ?
+        bool isUsedInRuntime() const { return root.getSchema() && root.getSchema()->IsUsedInRuntime(); }
+        /// Is this component used in editors ?
+        bool isUsedInEditor() const { return root.getSchema() && root.getSchema()->IsEditorOnly(); }
     };
 
     struct Scene;

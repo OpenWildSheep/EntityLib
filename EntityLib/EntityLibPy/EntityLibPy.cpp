@@ -125,7 +125,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference)
         // .def("linear_items", &Subschema::linearItems, py::return_value_policy::reference)
         .def("has_linear_items", [](Subschema const& s) { return s.linearItems.has_value(); })
-        .def_readonly("enum_values", &Subschema::enumValues, py::return_value_policy::reference);
+        .def_readonly("enum_values", &Subschema::enumValues, py::return_value_policy::reference)
+        .def_property_readonly("is_deprecated", [](Subschema const& s) { return s.IsDeprecated(); });
 
     py::class_<SubschemaRef>(ent, "SubschemaRef")
         .def(py::init<>())
@@ -185,7 +186,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     py::class_<Component>(ent, "Component")
         .def_readonly("type", &Component::type)
-        .def_readonly("root", &Component::root, py::return_value_policy::reference);
+        .def_readonly("root", &Component::root, py::return_value_policy::reference)
+        .def_property_readonly("is_used_in_editor", [](Component const& comp) { return comp.isUsedInEditor(); })
+        .def_property_readonly("is_used_in_runtime", [](Component const& comp) { return comp.isUsedInRuntime(); });
 
     py::class_<SubSceneComponent>(ent, "SubSceneComponent")
         .def_readonly("is_embedded", &SubSceneComponent::isEmbedded)

@@ -67,7 +67,7 @@ namespace Ent
         struct GenericMeta : BaseMeta
         {
         };
-        using Meta = mapbox::util::variant<NumberMeta, GenericMeta>;
+        using Meta = mapbox::util::variant<GenericMeta, NumberMeta>;
         Meta meta;
 
         // helper methods

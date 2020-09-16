@@ -76,6 +76,7 @@ namespace Ent
         {
             auto&& compName = comp->properties.at("Type")->constValue->get<std::string>();
             auto&& compSchema = *comp->properties.at("Data");
+            compSchema.meta = comp->meta;
             schema.components.emplace(compName, &compSchema);
         }
 

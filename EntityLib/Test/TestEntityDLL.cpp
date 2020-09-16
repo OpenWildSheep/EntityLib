@@ -8,7 +8,7 @@
 #include <EntityLib.h>
 #include <ComponentMerge.h>
 
-void printNode(char const* name, Ent::Node const& node, std::string tab)
+static void printNode(char const* name, Ent::Node const& node, std::string const& tab)
 {
     switch (node.getDataType())
     {
@@ -48,19 +48,26 @@ void printNode(char const* name, Ent::Node const& node, std::string tab)
     }
 }
 
-void displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::string indent)
+static void
+displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::string const& indent)
 {
     if (size(indent) > 80)
+    {
         return;
+    }
     std::cout << indent << name << " : ";
     switch (subschema.type)
     {
     case Ent::DataType::array:
         std::cout << "array" << std::endl;
         if (subschema.minItems != 0)
+        {
             std::cout << indent << "  minItems:" << subschema.minItems << std::endl;
+        }
         if (subschema.maxItems != size_t(-1))
+        {
             std::cout << indent << "  maxItems:" << subschema.maxItems << std::endl;
+        }
         if (subschema.singularItems != nullptr)
         {
             displaySubSchema("items", subschema.singularItems->get(), indent + "  ");

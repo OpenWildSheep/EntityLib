@@ -9,7 +9,7 @@ namespace std
     using tl::optional;
 } // namespace std
 
-#define PYBIND11_HAS_OPTIONAL 1
+#define PYBIND11_HAS_OPTIONAL 1 // NOLINT
 
 #pragma warning(push, 0)
 #include <pybind11/pybind11.h>
@@ -50,12 +50,12 @@ Value getValue(Ent::Node& node)
 {
     switch (node.getDataType())
     {
-    case Ent::DataType::array: return node.getFloat();
-    case Ent::DataType::freeobject: return node.getFloat();
-    case Ent::DataType::object: return node.getFloat();
+    case Ent::DataType::array:
+    case Ent::DataType::freeobject:
+    case Ent::DataType::object:
+    case Ent::DataType::null: return nullptr;
     case Ent::DataType::boolean: return node.getBool();
     case Ent::DataType::integer: return node.getInt();
-    case Ent::DataType::null: return nullptr;
     case Ent::DataType::number: return node.getFloat();
     case Ent::DataType::string: return std::string(node.getString());
     }
@@ -66,12 +66,12 @@ void setValue(Ent::Node& node, Value const& val)
 {
     switch (node.getDataType())
     {
-    case Ent::DataType::array: node.setFloat(val.get<float>()); break;
-    case Ent::DataType::freeobject: node.setFloat(val.get<float>()); break;
-    case Ent::DataType::object: node.setFloat(val.get<float>()); break;
+    case Ent::DataType::array:
+    case Ent::DataType::freeobject:
+    case Ent::DataType::object:
+    case Ent::DataType::null: break;
     case Ent::DataType::boolean: node.setBool(val.get<bool>()); break;
     case Ent::DataType::integer: node.setInt(val.get<int64_t>()); break;
-    case Ent::DataType::null: break;
     case Ent::DataType::number: node.setFloat(val.get<float>()); break;
     case Ent::DataType::string: node.setString(val.get<std::string>().c_str()); break;
     }
@@ -178,8 +178,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property("value", getValue, setValue)
         .def("set_float", [](Node* node, float val) { return node->setFloat(val); })
         .def("set_int", [](Node* node, int64_t val) { return node->setInt(val); })
-        .def(
-            "set_string", [](Node* node, char const* str) { return node->setString(std::move(str)); })
+        .def("set_string", [](Node* node, char const* str) { return node->setString(str); })
         .def("set_bool", [](Node* node, bool val) { return node->setBool(val); })
         .def("unset", [](Node* node) { return node->unset(); })
         .def("is_set", [](Node* node) { return node->isSet(); });
@@ -187,8 +186,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
     py::class_<Component>(ent, "Component")
         .def_readonly("type", &Component::type)
         .def_readonly("root", &Component::root, py::return_value_policy::reference)
-        .def_property_readonly("is_used_in_editor", [](Component const& comp) { return comp.isUsedInEditor(); })
-        .def_property_readonly("is_used_in_runtime", [](Component const& comp) { return comp.isUsedInRuntime(); });
+        .def_property_readonly(
+            "is_used_in_editor", [](Component const& comp) { return comp.isUsedInEditor(); })
+        .def_property_readonly(
+            "is_used_in_runtime", [](Component const& comp) { return comp.isUsedInRuntime(); });
 
     py::class_<SubSceneComponent>(ent, "SubSceneComponent")
         .def_readonly("is_embedded", &SubSceneComponent::isEmbedded)

@@ -11,7 +11,6 @@
 
 #include "EntityLibCore.h"
 
-
 /// EntityLib namespace
 namespace Ent
 {
@@ -57,7 +56,7 @@ namespace Ent
         struct BaseMeta
         {
             bool usedInEditor = true; ///< Does this Subschema exists in edition context ?
-            bool usedInRuntime = true;  ///< Does this Subschema exists in runtime context ?
+            bool usedInRuntime = true; ///< Does this Subschema exists in runtime context ?
             bool deprecated = false; ///< Is this Subschema deprecated ?
         };
         struct NumberMeta : BaseMeta
@@ -65,7 +64,9 @@ namespace Ent
             uint32_t bitDepth = 32; ///< Bit depth of this number, either 8, 16, 32 or 64
             bool isSigned = true; ///< is this number signed ?
         };
-        struct GenericMeta : BaseMeta {};
+        struct GenericMeta : BaseMeta
+        {
+        };
         using Meta = mapbox::util::variant<NumberMeta, GenericMeta>;
         Meta meta;
 
@@ -73,8 +74,14 @@ namespace Ent
         bool IsDeprecated() const;
         bool IsUsedInEditor() const;
         bool IsUsedInRuntime() const;
-        bool IsRuntimeOnly() const { return IsUsedInRuntime() && ! IsUsedInEditor(); }
-        bool IsEditorOnly() const { return ! IsUsedInRuntime() && IsUsedInEditor(); }
+        bool IsRuntimeOnly() const
+        {
+            return IsUsedInRuntime() && !IsUsedInEditor();
+        }
+        bool IsEditorOnly() const
+        {
+            return !IsUsedInRuntime() && IsUsedInEditor();
+        }
 
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue =
@@ -160,25 +167,28 @@ namespace Ent
 
     inline bool Subschema::IsDeprecated() const
     {
-        return mapbox::util::apply_visitor( 
-            BasicFieldGetter{ [](const Subschema::BaseMeta* _meta)
-                { return _meta->deprecated; } }, 
+        return mapbox::util::apply_visitor(
+            BasicFieldGetter{ [](const Subschema::BaseMeta* _meta) {
+                return _meta->deprecated;
+            } },
             meta);
     }
 
     inline bool Subschema::IsUsedInEditor() const
     {
-        return mapbox::util::apply_visitor( 
-            BasicFieldGetter{ [](const Subschema::BaseMeta* _meta)
-                { return _meta->usedInEditor; } }, 
+        return mapbox::util::apply_visitor(
+            BasicFieldGetter{ [](const Subschema::BaseMeta* _meta) {
+                return _meta->usedInEditor;
+            } },
             meta);
     }
 
     inline bool Subschema::IsUsedInRuntime() const
     {
-        return mapbox::util::apply_visitor( 
-            BasicFieldGetter{ [](const Subschema::BaseMeta* _meta)
-                { return _meta->usedInRuntime; } }, 
+        return mapbox::util::apply_visitor(
+            BasicFieldGetter{ [](const Subschema::BaseMeta* _meta) {
+                return _meta->usedInRuntime;
+            } },
             meta);
     }
 

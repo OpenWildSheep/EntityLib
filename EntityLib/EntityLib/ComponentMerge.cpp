@@ -96,26 +96,27 @@ json Ent::mergeComponents(std::filesystem::path const& toolsDir)
             prop["Data"]["type"] = "object";
             prop["Data"]["properties"] = std::move(mergedProperties);
             newComp["meta"] = std::move(mergedMetas);
-            
+
             compList.push_back(std::move(newComp));
             alreadyInsertedComponents.insert(name);
         }
     }
 
     // Add other components
-    auto addComponent = [&](std::string const& name, char const* filename, const json& additionalMetas) {
-        if (alreadyInsertedComponents.count(name) != 0)
-            return;
-        json newComp;
-        auto&& prop = newComp["properties"];
-        prop["Type"]["const"] = name;
-        prop["Data"]["$ref"] = "file://" + (filename + ("#/definitions/" + name));
+    auto addComponent =
+        [&](std::string const& name, char const* filename, const json& additionalMetas) {
+            if (alreadyInsertedComponents.count(name) != 0)
+                return;
+            json newComp;
+            auto&& prop = newComp["properties"];
+            prop["Type"]["const"] = name;
+            prop["Data"]["$ref"] = "file://" + (filename + ("#/definitions/" + name));
 
-        json metas = newComp.value("meta", json());
-        metas.update(additionalMetas);
-        newComp["meta"] = std::move(metas);
-        compList.push_back(std::move(newComp));
-    };
+            json metas = newComp.value("meta", json());
+            metas.update(additionalMetas);
+            newComp["meta"] = std::move(metas);
+            compList.push_back(std::move(newComp));
+        };
     for (auto&& name_comp : editionCompSch.items())
     {
         json editorOnlyMeta;

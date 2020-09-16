@@ -144,7 +144,8 @@ namespace Ent
         char const* getString() const; ///< @pre Ent::DataType == string. @brief Get the value as string
         bool getBool() const; ///< @pre type==Ent::DataType::boolean. @brief Get the value as bool
 
-        const Value& GetRawValue() const; ///< returns a reference to the raw Value (variant) stored at this node. Useful to write visitors.
+        const Value& GetRawValue()
+            const; ///< returns a reference to the raw Value (variant) stored at this node. Useful to write visitors.
 
         void setFloat(float val); ///< @pre type==Ent::DataType::number. @brief Set the float value
         void setInt(int64_t val); ///< @pre type==Ent::DataType::integer. @brief Set the int64_t value
@@ -172,7 +173,8 @@ namespace Ent
         Node makeInstanceOf() const;
         /// \endcond
 
-        bool hasDefaultValue() const; ///< true if the actual value is equal to default value, false if there is no default defined
+        bool hasDefaultValue()
+            const; ///< true if the actual value is equal to default value, false if there is no default defined
 
         bool isDefault() const; ///< true if the value was set in a template or in the instance
 
@@ -211,9 +213,15 @@ namespace Ent
             return root.hasOverride();
         }
         /// Is this component used in runtime engine ?
-        bool isUsedInRuntime() const { return root.getSchema() && root.getSchema()->IsUsedInRuntime(); }
+        bool isUsedInRuntime() const
+        {
+            return root.getSchema() && root.getSchema()->IsUsedInRuntime();
+        }
         /// Is this component used in editors ?
-        bool isUsedInEditor() const { return root.getSchema() && root.getSchema()->IsEditorOnly(); }
+        bool isUsedInEditor() const
+        {
+            return root.getSchema() && root.getSchema()->IsEditorOnly();
+        }
     };
 
     struct Scene;

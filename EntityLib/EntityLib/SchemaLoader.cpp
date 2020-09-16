@@ -82,8 +82,7 @@ void Ent::SchemaLoader::parseSchema(
 
 Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
 {
-    const auto setBaseMetas = [&](Ent::Subschema::BaseMeta* _meta)
-    {
+    const auto setBaseMetas = [&](Ent::Subschema::BaseMeta* _meta) {
         if (_data.count("editor"))
         {
             _meta->usedInEditor = _data["editor"].get<bool>();
@@ -98,8 +97,7 @@ Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
         }
     };
 
-    const auto setNumberMetas = [&](Ent::Subschema::NumberMeta& _meta)
-    {
+    const auto setNumberMetas = [&](Ent::Subschema::NumberMeta& _meta) {
         if (_data.count("bitdepth"))
         {
             _meta.bitDepth = _data["bitdepth"].get<uint32_t>();
@@ -140,8 +138,7 @@ void Ent::SchemaLoader::parseSchemaNoRef(
     json const& _rootFile, json const& _data, Visitor const& vis, int depth)
 {
     DataType currentType = DataType::null;
-    const auto setType = [&](DataType _type)
-    {
+    const auto setType = [&](DataType _type) {
         currentType = _type;
         vis.setType(_type);
     };
@@ -316,7 +313,8 @@ void Ent::SchemaLoader::parseSchemaNoRef(
     {
         if (!_data["meta"].is_object())
         {
-            ENTLIB_LOGIC_ERROR("Unexpected json items type for \"meta\" : %s", _data["meta"].type_name());
+            ENTLIB_LOGIC_ERROR(
+                "Unexpected json items type for \"meta\" : %s", _data["meta"].type_name());
         }
         else
         {
@@ -429,9 +427,11 @@ void Ent::SchemaLoader::readSchema(Schema* globalSchema, json const& _fileRoot, 
     };
     vis.setName = [&](std::string name) {
         auto&& subSchema = stack.back()->get();
-        ENTLIB_ASSERT_MSG(subSchema.name.empty(), 
-            "Subschema is already named '%s' (new name: '%s')", 
-            subSchema.name.c_str(), name.c_str());
+        ENTLIB_ASSERT_MSG(
+            subSchema.name.empty(),
+            "Subschema is already named '%s' (new name: '%s')",
+            subSchema.name.c_str(),
+            name.c_str());
         subSchema.name = std::move(name);
     };
     parseSchema(_fileRoot, _data, vis, 0);

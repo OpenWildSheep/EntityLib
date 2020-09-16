@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <set>
+#include <utility>
 
 #include "external/json.hpp"
 #include "ValidJson.h"
@@ -85,7 +86,7 @@ namespace Ent
             std::vector<std::string> deps;
             for (json const& dep : comp["dependencies"])
             {
-                if (dep["Optional"].get<bool>() == false)
+                if (not dep["Optional"].get<bool>())
                 {
                     deps.push_back(dep["Name"].get<std::string>());
                 }
@@ -321,7 +322,9 @@ namespace Ent
         {
             Array out;
             for (auto&& item : arr.data)
+            {
                 out.data.emplace_back(nonstd::make_value<Node>(item->detach()));
+            }
             return Node(std::move(out), schema);
         }
 
@@ -329,9 +332,11 @@ namespace Ent
         {
             Object out;
             for (auto&& name_node : obj)
+            {
                 out.emplace(
                     std::get<0>(name_node),
                     nonstd::make_value<Node>(std::get<1>(name_node)->detach()));
+            }
             return Node(std::move(out), schema);
         }
     };
@@ -361,7 +366,9 @@ namespace Ent
         {
             Array out;
             for (auto&& item : arr.data)
+            {
                 out.data.emplace_back(nonstd::make_value<Node>(item->makeInstanceOf()));
+            }
             return Node(std::move(out), schema);
         }
 
@@ -369,9 +376,11 @@ namespace Ent
         {
             Object out;
             for (auto&& name_node : obj)
+            {
                 out.emplace(
                     std::get<0>(name_node),
                     nonstd::make_value<Node>(std::get<1>(name_node)->makeInstanceOf()));
+            }
             return Node(std::move(out), schema);
         }
     };
@@ -481,7 +490,9 @@ namespace Ent
             value.get<Array>().data.clear();
         }
         else
+        {
             throw BadType();
+        }
     }
 
     bool Node::empty() const
@@ -567,7 +578,9 @@ namespace Ent
     char const* Node::getTypeName() const
     {
         if (schema == nullptr)
+        {
             return nullptr;
+        }
         return schema->name.c_str();
     }
 
@@ -577,6 +590,19 @@ namespace Ent
     }
 
     // ********************************* SubSceneComponent ****************************************
+    SubSceneComponent::SubSceneComponent(
+        bool _isEmbedded, Override<std::string> _file, size_t _index, value_ptr<Scene> embedded)
+        : isEmbedded(_isEmbedded)
+        , file(std::move(_file))
+        , index(_index)
+        , embedded(std::move(embedded))
+    {
+    }
+
+    SubSceneComponent::SubSceneComponent(SubSceneComponent const&) = default;
+    SubSceneComponent::SubSceneComponent(SubSceneComponent&&) noexcept = default;
+    SubSceneComponent& SubSceneComponent::operator=(SubSceneComponent const&) = default;
+    SubSceneComponent& SubSceneComponent::operator=(SubSceneComponent&&) noexcept = default;
 
     void SubSceneComponent::makeEmbedded(bool _embedded)
     {
@@ -584,7 +610,9 @@ namespace Ent
         if (_embedded)
         {
             if (embedded == nullptr)
+            {
                 embedded = nonstd::make_value<Scene>();
+            }
             file.set(std::string());
         }
         else
@@ -595,9 +623,7 @@ namespace Ent
 
     // ********************************* Entity ***************************************************
 
-    Entity::Entity()
-    {
-    }
+    Entity::Entity() = default;
 
     Entity::Entity(EntityLib const& _entlib)
         : entlib(&_entlib)
@@ -618,9 +644,9 @@ namespace Ent
         Override<std::string> _instanceOf)
         : entlib(&_entlib)
         , name(std::move(_name))
-        , subSceneComponent(std::move(_subSceneComponent))
         , components(std::move(_components))
-        , color(_color)
+        , subSceneComponent(std::move(_subSceneComponent))
+        , color(std::move(_color))
         , thumbnail(std::move(_thumbnail))
         , instanceOf(std::move(_instanceOf))
     {
@@ -632,7 +658,7 @@ namespace Ent
     }
     void Entity::setName(std::string _name)
     {
-        name.set(_name);
+        name.set(std::move(_name));
     }
     char const* Entity::getInstanceOf() const
     {
@@ -648,15 +674,19 @@ namespace Ent
     }
     std::array<uint8_t, 4> Entity::getColor() const
     {
-        std::array<uint8_t, 4> col;
+        std::array<uint8_t, 4> col{};
         for (size_t i = 0; i < 4; ++i)
+        {
             col[i] = (uint8_t)color.at(i)->getFloat();
+        }
         return col;
     }
     void Entity::setColor(std::array<uint8_t, 4> _color)
     {
         for (size_t i = 0; i < 4; ++i)
+        {
             color.at(i)->setFloat(_color[i]);
+        }
     }
     Component* Entity::addComponent(char const* type)
     {
@@ -692,7 +722,9 @@ namespace Ent
     {
         std::vector<char const*> types;
         for (auto&& type_comp : components)
+        {
             types.push_back(type_comp.first.c_str());
+        }
         return types;
     }
 
@@ -723,7 +755,7 @@ namespace Ent
     {
         if (not subSceneComponent.has_value())
         {
-            subSceneComponent = SubSceneComponent{};
+            subSceneComponent = SubSceneComponent();
         }
         return &(*subSceneComponent);
     }
@@ -1054,7 +1086,9 @@ static Ent::Entity loadEntity(
     }
 
     if (not superIsInit and superEntityFromParentEntity != nullptr)
+    {
         superEntity = superEntityFromParentEntity;
+    }
 
     tl::optional<std::string> const thumbnail = entNode.count("Thumbnail") != 0 ?
                                                     entNode.at("Thumbnail").get<std::string>() :
@@ -1110,11 +1144,12 @@ static Ent::Entity loadEntity(
                     superComp->file :
                     Ent::Override<std::string>(std::string(), tl::nullopt, tl::nullopt);
 
-            auto fileInJson = data.count("File") ?
+            auto fileInJson = (data.count("File") != 0) ?
                                   tl::optional<std::string>(data["File"].get<std::string>()) :
                                   tl::nullopt;
             file = file.makeOverridedInstanceOf(fileInJson);
-            bool isEmbeddedInJson = data.count("isEmbedded") ? data["isEmbedded"].get<bool>() : false;
+            bool isEmbeddedInJson =
+                (data.count("isEmbedded") != 0) ? data["isEmbedded"].get<bool>() : false;
             Ent::SubSceneComponent subSceneComp{ isEmbeddedInJson, file, index };
             if (subSceneComp.isEmbedded)
             {
@@ -1225,9 +1260,16 @@ static Ent::Scene loadScene(
                 entIdx < super->objects.size() ? &(super->objects[entIdx]) : nullptr;
         Ent::Entity ent;
         if (entNode.is_null())
-            ent = superEnt->makeInstanceOf();
+        {
+            if (superEnt != nullptr)
+            {
+                ent = superEnt->makeInstanceOf();
+            }
+        }
         else
+        {
             ent = ::loadEntity(entLib, schema, entNode, superEnt);
+        }
         scene.objects.emplace_back(std::move(ent));
         ++entIdx;
     }
@@ -1269,7 +1311,9 @@ saveEntity(Ent::ComponentsSchema const& schema, Ent::Entity const& entity, Ent::
 
     Ent::Subschema const& colorSchema = schema.schema.allDefinitions.at(Ent::colorSchemaName);
     if (entity.getColorValue().hasOverride())
+    {
         entNode.emplace("Color", saveNode(colorSchema, entity.getColorValue()));
+    }
 
     if (const char* thumbnail = entity.getThumbnail())
     {
@@ -1300,13 +1344,15 @@ saveEntity(Ent::ComponentsSchema const& schema, Ent::Entity const& entity, Ent::
             Ent::SubSceneComponent const* superSubsceneCmp =
                 super == nullptr ? nullptr : super->getSubSceneComponent();
             ENTLIB_ASSERT(subscene != nullptr);
-            if ((subscene->hasOverride() && entity.getInstanceOf())
+            if ((subscene->hasOverride() && entity.getInstanceOf() != nullptr)
                 || entity.getInstanceOf() == nullptr)
             {
                 json data;
                 data.emplace("isEmbedded", subscene->isEmbedded);
                 if (subscene->file.isSet())
+                {
                     data.emplace("File", subscene->file.get());
+                }
                 if (subscene->isEmbedded)
                 {
                     ENTLIB_ASSERT_MSG(
@@ -1497,7 +1543,9 @@ Ent::SubSceneComponent Ent::SubSceneComponent::makeInstanceOf() const
 {
     value_ptr<Scene> instEmbedded;
     if (embedded)
+    {
         instEmbedded = embedded->makeInstanceOf();
+    }
     return SubSceneComponent{ isEmbedded, file, index, instEmbedded };
 }
 
@@ -1509,9 +1557,7 @@ bool Ent::SubSceneComponent::hasOverride() const
     //    return true;
     //if (index.isSet())
     //    return true;
-    if (embedded != nullptr && embedded->hasOverride())
-        return true;
-    return false;
+    return embedded != nullptr && embedded->hasOverride();
 }
 
 bool Ent::Array::hasOverride() const

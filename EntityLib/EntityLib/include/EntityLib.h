@@ -115,7 +115,6 @@ namespace Ent
             variant<Null, Override<std::string>, Override<float>, Override<int64_t>, Object, Array, Override<bool>>;
         Node() = default;
         Node(Value val, Subschema const* schema);
-        ~Node() = default;
         /// @endcond
 
         DataType getDataType() const; ///< Type of this Node. @see Ent::DataType
@@ -233,11 +232,21 @@ namespace Ent
     /// @todo : Make all fields private since this struct has some invariants
     struct SubSceneComponent
     {
-        bool isEmbedded; ///< If true, data are in embedded, else data are in file
+        bool isEmbedded = false; ///< If true, data are in embedded, else data are in file
         Override<std::string> file; ///< Path to a .scene file, whene isEmbedded is false
-        size_t index; ///< Useful to keep the componants order in the json file
+        size_t index = 0; ///< Useful to keep the componants order in the json file
         value_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
         DeleteCheck deleteCheck;
+
+        explicit SubSceneComponent(
+            bool _isEmbedded = false,
+            Override<std::string> _file = {},
+            size_t _index = 0,
+            value_ptr<Scene> embedded = {});
+        SubSceneComponent(SubSceneComponent const&);
+        SubSceneComponent(SubSceneComponent&&) noexcept;
+        SubSceneComponent& operator=(SubSceneComponent const&);
+        SubSceneComponent& operator=(SubSceneComponent&&) noexcept;
 
         /// Switch SubSceneComponent to embedded mode or to external mode
         void makeEmbedded(bool _embedded ///< false to make extern (not embedded)
@@ -430,7 +439,7 @@ namespace Ent
         std::map<std::string, std::vector<std::string>> componentDependencies;
 
         /// Load the EntityLib, given the path to the Tools directory
-        explicit EntityLib(std::filesystem::path _toolsDir);
+        explicit EntityLib(std::filesystem::path _rootPath);
         ~EntityLib();
         /// @cond PRIVATE
         EntityLib(EntityLib const&) = delete;

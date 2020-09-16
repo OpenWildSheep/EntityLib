@@ -12,7 +12,7 @@ json loadJsonFile(std::filesystem::path const& path)
         throw std::runtime_error("Can't open file for read: " + path.u8string());
     }
     json doc;
-    doc << file;
+    file >> doc;
     return doc;
 };
 
@@ -22,6 +22,8 @@ char const* Ent::getRefTypeName(char const* link)
     static char const* definitionsStr = "#/definitions/";
     auto const defPos = strstr(link, definitionsStr);
     if (defPos == nullptr)
+    {
         return nullptr;
+    }
     return defPos + strlen(definitionsStr);
 }

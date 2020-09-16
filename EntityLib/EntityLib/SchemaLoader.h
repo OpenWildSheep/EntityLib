@@ -71,7 +71,7 @@ namespace Ent
         /// Load the Schema of a Component or a property
         /// @pre _data CAN NOT be a reference ($ref)
         void parseSchemaNoRef(
-            nlohmann::json const& _fileRoot, nlohmann::json const& _data, Visitor const& vis, int depth);
+            nlohmann::json const& _rootFile, nlohmann::json const& _data, Visitor const& vis, int depth);
 
         std::filesystem::path m_schemaPath; ///< Path to the global Scene Schema
         std::map<std::string, nlohmann::json> m_schemaMap; ///< Cache of already loaded schema documents

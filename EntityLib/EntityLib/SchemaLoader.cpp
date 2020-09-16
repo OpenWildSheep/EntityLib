@@ -3,6 +3,7 @@
 
 #pragma warning(push, 0)
 #include <sstream>
+#include <utility>
 #pragma warning(pop)
 
 /// \cond PRIVATE
@@ -29,11 +30,11 @@ Ent::SchemaLoader::SchemaLoader(std::filesystem::path _schemaPath)
 void Ent::SchemaLoader::parseSchema(
     json const& _fileRoot, json const& _data, Visitor const& vis, int depth)
 {
-    if (_data.count("$ref"))
+    if (_data.count("$ref") != 0)
     {
         auto ref = _data["$ref"].get<std::string>();
         vis.openRef(ref.c_str());
-        if (parsedRef.count(ref)) // Was already parsed
+        if (parsedRef.count(ref) != 0) // Was already parsed
         {
             vis.closeRef();
             return;
@@ -44,7 +45,7 @@ void Ent::SchemaLoader::parseSchema(
         {
             ref = ref.substr(strlen("file://"));
         }
-        auto sharp = ref.find("#");
+        auto sharp = ref.find('#');
         auto fileName = ref.substr(0, sharp);
         std::filesystem::path objectPath = ref.substr(sharp + 2);
 
@@ -83,26 +84,26 @@ void Ent::SchemaLoader::parseSchema(
 Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
 {
     const auto setBaseMetas = [&](Ent::Subschema::BaseMeta* _meta) {
-        if (_data.count("editor"))
+        if (_data.count("editor") != 0u)
         {
             _meta->usedInEditor = _data["editor"].get<bool>();
         }
-        if (_data.count("runtime"))
+        if (_data.count("runtime") != 0u)
         {
             _meta->usedInRuntime = _data["runtime"].get<bool>();
         }
-        if (_data.count("deprecated"))
+        if (_data.count("deprecated") != 0u)
         {
             _meta->deprecated = _data["deprecated"].get<bool>();
         }
     };
 
     const auto setNumberMetas = [&](Ent::Subschema::NumberMeta& _meta) {
-        if (_data.count("bitdepth"))
+        if (_data.count("bitdepth") != 0u)
         {
             _meta.bitDepth = _data["bitdepth"].get<uint32_t>();
         }
-        if (_data.count("signed"))
+        if (_data.count("signed") != 0u)
         {
             _meta.isSigned = _data["signed"].get<bool>();
         }
@@ -143,7 +144,7 @@ void Ent::SchemaLoader::parseSchemaNoRef(
         vis.setType(_type);
     };
     // type
-    if (_data.count("type"))
+    if (_data.count("type") != 0u)
     {
         auto type = _data["type"].get<std::string>();
         if (type == "anyOf")
@@ -179,10 +180,12 @@ void Ent::SchemaLoader::parseSchemaNoRef(
             setType(Ent::DataType::string);
         }
         else
+        {
             ENTLIB_LOGIC_ERROR("Unknown type %s", type.c_str());
+        }
     }
     // properties
-    if (_data.count("properties"))
+    if (_data.count("properties") != 0u)
     {
         setType(Ent::DataType::object);
         for (auto&& name_prop : _data["properties"].items())
@@ -195,7 +198,7 @@ void Ent::SchemaLoader::parseSchemaNoRef(
         }
     }
     // default
-    if (_data.count("default"))
+    if (_data.count("default") != 0u)
     {
         vis.setDefaultValue(Null{});
         json const& def = _data.at("default");
@@ -224,7 +227,7 @@ void Ent::SchemaLoader::parseSchemaNoRef(
             break;
         }
     }
-    if (_data.count("const"))
+    if (_data.count("const") != 0u)
     {
         vis.setConstValue(Null{});
         json const& def = _data.at("const");
@@ -253,7 +256,7 @@ void Ent::SchemaLoader::parseSchemaNoRef(
             break;
         }
     }
-    if (_data.count("items"))
+    if (_data.count("items") != 0u)
     {
         setType(Ent::DataType::array);
         auto const& items = _data["items"];
@@ -276,9 +279,11 @@ void Ent::SchemaLoader::parseSchemaNoRef(
             vis.closeSingularItem();
         }
         else
+        {
             ENTLIB_LOGIC_ERROR("Unexpected json items type : %s", items.type_name());
+        }
     }
-    if (_data.count("oneOf"))
+    if (_data.count("oneOf") != 0u)
     {
         auto const& items = _data["oneOf"];
         ENTLIB_ASSERT(vis.setOneOf != nullptr);
@@ -290,26 +295,26 @@ void Ent::SchemaLoader::parseSchemaNoRef(
             vis.closeOneOfItem();
         }
     }
-    if (_data.count("maxItems"))
+    if (_data.count("maxItems") != 0u)
     {
         vis.setMaxItems(_data["maxItems"].get<size_t>());
     }
-    if (_data.count("minItems"))
+    if (_data.count("minItems") != 0u)
     {
         vis.setMinItems(_data["minItems"].get<size_t>());
     }
-    if (_data.count("enum"))
+    if (_data.count("enum") != 0u)
     {
         for (json const& enmNode : _data["enum"])
         {
             vis.addEnumValue(enmNode.get<std::string>().c_str());
         }
     }
-    if (_data.count("required"))
+    if (_data.count("required") != 0u)
     {
         // TODO required
     }
-    if (_data.count("meta"))
+    if (_data.count("meta") != 0u)
     {
         if (!_data["meta"].is_object())
         {
@@ -321,7 +326,7 @@ void Ent::SchemaLoader::parseSchemaNoRef(
             if (currentType == DataType::null)
             {
                 std::string name = "Unnamed definition";
-                if (_data.count("name"))
+                if (_data.count("name") != 0u)
                 {
                     name = _data["name"].get<std::string>();
                 }
@@ -330,7 +335,7 @@ void Ent::SchemaLoader::parseSchemaNoRef(
             vis.setMeta(parseMetaForType(_data["meta"], currentType));
         }
     }
-    if (_data.count("name"))
+    if (_data.count("name") != 0u)
     {
         // manually specified type name (typically used for enums properties that are inlined)
         vis.setName(_data["name"].get<std::string>());
@@ -344,7 +349,7 @@ void Ent::SchemaLoader::readSchema(Schema* globalSchema, json const& _fileRoot, 
     std::vector<Ent::SubschemaRef*> stack{ &schema };
     stack.reserve(1000);
     vis.addEnumValue = [&](char const* val) {
-        stack.back()->get().enumValues.push_back(val);
+        stack.back()->get().enumValues.emplace_back(val);
     };
     vis.closeLinearItem = [&] {
         ENTLIB_ASSERT(
@@ -376,11 +381,11 @@ void Ent::SchemaLoader::readSchema(Schema* globalSchema, json const& _fileRoot, 
         stack.back()->get().singularItems = std::make_unique<Ent::SubschemaRef>();
         stack.push_back(&(*stack.back()->get().singularItems));
     };
-    vis.setConstValue = [&](Subschema::DefaultValue val) {
+    vis.setConstValue = [&](const Subschema::DefaultValue& val) {
         stack.back()->get().constValue = val;
     };
     vis.setDefaultValue = [&](Subschema::DefaultValue val) {
-        stack.back()->get().defaultValue = val;
+        stack.back()->get().defaultValue = std::move(val);
     };
     vis.setLinearItem = [&](size_t size) {
         stack.back()->get().linearItems = std::vector<Ent::SubschemaRef>();

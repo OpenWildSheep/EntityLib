@@ -14,11 +14,11 @@ void updateRefLinks(std::string const& sourceFile, json& node)
 {
     switch (node.type())
     {
-    case nlohmann::detail::value_t::null: break;
-    case nlohmann::detail::value_t::string: break;
-    case nlohmann::detail::value_t::boolean: break;
+    case nlohmann::detail::value_t::null:
+    case nlohmann::detail::value_t::string:
+    case nlohmann::detail::value_t::boolean:
     case nlohmann::detail::value_t::number_integer:
-    case nlohmann::detail::value_t::number_unsigned: break;
+    case nlohmann::detail::value_t::number_unsigned:
     case nlohmann::detail::value_t::number_float: break;
     case nlohmann::detail::value_t::object:
     {
@@ -34,7 +34,9 @@ void updateRefLinks(std::string const& sourceFile, json& node)
                 }
             }
             else
+            {
                 updateRefLinks(sourceFile, field.value());
+            }
         }
     }
     break;
@@ -106,7 +108,9 @@ json Ent::mergeComponents(std::filesystem::path const& toolsDir)
     auto addComponent =
         [&](std::string const& name, char const* filename, const json& additionalMetas) {
             if (alreadyInsertedComponents.count(name) != 0)
+            {
                 return;
+            }
             json newComp;
             auto&& prop = newComp["properties"];
             prop["Type"]["const"] = name;

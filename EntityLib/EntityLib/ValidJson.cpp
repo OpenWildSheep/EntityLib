@@ -216,7 +216,7 @@ static std::string createMessageFromValidationResult(valijson::ValidationResults
     return fullMessage;
 }
 
-void Ent::validScene(
+void Ent::validateScene(
     Schema const& schema, std::filesystem::path const& toolsDir, nlohmann::json const& scene)
 {
     // valid the scene using schema
@@ -246,7 +246,7 @@ void Ent::validScene(
     }
 }
 
-void Ent::validEntity(
+void Ent::validateEntity(
     Schema const& schema, std::filesystem::path const& toolsDir, nlohmann::json const& entity)
 {
     // valid the scene using schema

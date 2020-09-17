@@ -1230,14 +1230,17 @@ Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath, Ent::Entity 
     json document;
     file >> document;
 
-    try
+    if (validationEnabled)
     {
-        validEntity(schema.schema, toolsDir, document);
-    }
-    catch (...)
-    {
-        fprintf(stderr, "Error, loading entity : %ls\n", entityPath.c_str());
-        throw;
+        try
+        {
+            validateEntity(schema.schema, toolsDir, document);
+        }
+        catch (...)
+        {
+            fprintf(stderr, "Error, loading entity : %ls\n", entityPath.c_str());
+            throw;
+        }
     }
 
     Ent::Entity ent = ::loadEntity(*this, schema, document, super);
@@ -1281,14 +1284,17 @@ static Ent::Scene loadScene(
 Ent::Scene Ent::EntityLib::loadScene(std::filesystem::path const& scenePath) const
 {
     json document = loadJsonFile(scenePath);
-    try
+    if (validationEnabled)
     {
-        validScene(schema.schema, toolsDir, document);
-    }
-    catch (...)
-    {
-        fprintf(stderr, "Error, loading scene : %ls\n", scenePath.c_str());
-        throw;
+        try
+        {
+            validateScene(schema.schema, toolsDir, document);
+        }
+        catch (...)
+        {
+            fprintf(stderr, "Error, loading scene : %ls\n", scenePath.c_str());
+            throw;
+        }
     }
 
     return ::loadScene(*this, schema, document.at("Objects"), nullptr);
@@ -1478,14 +1484,17 @@ void Ent::EntityLib::saveEntity(
     file.close();
 
     // Better to check after save because it is easiest to debug
-    try
+    if (validationEnabled)
     {
-        validEntity(schema.schema, toolsDir, document);
-    }
-    catch (...)
-    {
-        fprintf(stderr, "Error, saving entity : %ls\n", entityPath.c_str());
-        throw;
+        try
+        {
+            validateEntity(schema.schema, toolsDir, document);
+        }
+        catch (...)
+        {
+            fprintf(stderr, "Error, saving entity : %ls\n", entityPath.c_str());
+            throw;
+        }
     }
 }
 
@@ -1529,14 +1538,17 @@ void Ent::EntityLib::saveScene(
     file.close();
 
     // Better to check after save because it is easiest to debug
-    try
+    if (validationEnabled)
     {
-        validScene(schema.schema, toolsDir, document);
-    }
-    catch (...)
-    {
-        fprintf(stderr, "Error, saving scene : %ls\n", scenePath.c_str());
-        throw;
+        try
+        {
+            validateScene(schema.schema, toolsDir, document);
+        }
+        catch (...)
+        {
+            fprintf(stderr, "Error, saving scene : %ls\n", scenePath.c_str());
+            throw;
+        }
     }
 }
 

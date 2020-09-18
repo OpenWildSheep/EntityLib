@@ -172,8 +172,7 @@ namespace Ent
         Node makeInstanceOf() const;
         /// \endcond
 
-        bool hasDefaultValue()
-            const; ///< true if the actual value is equal to default value, false if there is no default defined
+        bool hasDefaultValue() const; ///< false if something was set in instance or prefab
 
         bool isDefault() const; ///< true if the value was set in a template or in the instance
 

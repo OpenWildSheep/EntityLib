@@ -367,6 +367,7 @@ try
         ENTLIB_ASSERT(heightObj != nullptr);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
         ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isSet());
+        ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->hasDefaultValue()); // Prefab has value
         ENTLIB_ASSERT(
             heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
         ENTLIB_ASSERT(
@@ -375,11 +376,13 @@ try
         // TEST default values
         ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
         ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root.at("Burried")->hasDefaultValue()); // default
         ENTLIB_ASSERT(sysCreat->root.at("Name")->getString() == std::string()); // default
         ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
 
         // TEST read setted values
         ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Plouf")); // set
+        ENTLIB_ASSERT(not sysCreat->root.at("Faction")->hasDefaultValue()); // is set in instance
         ENTLIB_ASSERT(sysCreat->root.at("Faction")->isSet()); // is set
         ENTLIB_ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
         ENTLIB_ASSERT(sysCreat->root.at("Inventory")->isSet()); // is set

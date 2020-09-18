@@ -92,12 +92,15 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
 int main() // int argc, char** argv
 try
 {
-    // Ent::updateComponants("X:/Tools");
+    // Ent::updateComponents("X:/Tools");
 
     Ent::EntityLib entlib("X:/");
     using namespace std::filesystem;
 
     entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
+#ifdef _DEBUG
+    entlib.validationEnabled = false;
+#endif
 
     {
         Ent::Entity ent = entlib.loadEntity("prefab.entity");
@@ -143,6 +146,13 @@ try
         ENTLIB_ASSERT(sysCreat->root.at("Name")->getString() == std::string()); // default
         ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
 
+        // TEST SubScene
+        Ent::SubSceneComponent* subScenecomp = ent.getSubSceneComponent();
+        auto&& allSubEntities = subScenecomp->embedded->objects;
+        ENTLIB_ASSERT(allSubEntities.size() == 1);
+        ENTLIB_ASSERT(allSubEntities.front().getName() == std::string("EP1-Spout_LINK_001"));
+        ENTLIB_ASSERT(allSubEntities.front().getColor()[0] == 255);
+
         sysCreat->root.at("Name")->setString("Shamane_male");
         entlib.saveEntity(ent, "prefab.copy.entity");
     }
@@ -186,6 +196,8 @@ try
         ENTLIB_ASSERT(subScene->isEmbedded);
         Ent::Entity const& subObj = subScene->embedded->objects[0];
         ENTLIB_ASSERT(subObj.getName() == std::string("EP1-Spout_LINK_001"));
+        ENTLIB_ASSERT(not subObj.getNameValue().isSet());
+        ENTLIB_ASSERT(not subObj.hasOverride());
         Ent::Component const* netLink = subObj.getComponent("NetworkLink");
         ENTLIB_ASSERT(netLink != nullptr);
         ENTLIB_ASSERT(netLink->root.at("Source")->getString() == std::string(".EP1-Spout_"));
@@ -260,7 +272,7 @@ try
         ENTLIB_ASSERT(subScene != nullptr);
         ENTLIB_ASSERT(subScene->isEmbedded);
         Ent::Entity const& subObj = subScene->embedded->objects[0];
-        ENTLIB_ASSERT(subObj.getName() == std::string("EP1-Spout_LINK_001_2"));
+        ENTLIB_ASSERT(subObj.getName() == std::string("EP1-Spout_LINK_001"));
 
         // Test an overrided Component
         Ent::Component const* netLink = subObj.getComponent("NetworkLink");
@@ -460,6 +472,46 @@ try
 
         // TEST keeping empty component after entity save
         ENTLIB_ASSERT(copyEnt.getComponent("EventHandlerGD") != nullptr);
+    }
+
+    // ******************* Test the override of an entity in a SubScene ***************************
+    auto testOverrideSubEntity = [](Ent::Entity const& ent) {
+        Ent::SubSceneComponent const* subScenecomp = ent.getSubSceneComponent();
+        auto&& allSubEntities = subScenecomp->embedded->objects;
+        ENTLIB_ASSERT(allSubEntities.size() == 1);
+        ENTLIB_ASSERT(allSubEntities.front().getName() == std::string("EP1-Spout_LINK_001"));
+        ENTLIB_ASSERT(allSubEntities.front().getColor()[0] == 42);
+    };
+    {
+        Ent::Entity ent = entlib.loadEntity("instance_override_subentity.entity");
+        testOverrideSubEntity(ent);
+        entlib.saveEntity(ent, "instance_override_subentity.copy.entity");
+        Ent::Entity copyEnt = entlib.loadEntity("instance_override_subentity.copy.entity");
+        testOverrideSubEntity(copyEnt);
+    }
+
+    // ******************* Test the add of an entity in a SubScene *****************************
+    auto testAddSubEntity = [](Ent::Entity const& ent) {
+        Ent::SubSceneComponent const* subScenecomp = ent.getSubSceneComponent();
+        auto&& allSubEntities = subScenecomp->embedded->objects;
+        ENTLIB_ASSERT(allSubEntities.size() == 2);
+        char const* name0 = allSubEntities[0].getName();
+        char const* name1 = allSubEntities[1].getName();
+        ENTLIB_ASSERT(name0 == std::string("EP1-Spout_LINK_001"));
+        auto red = allSubEntities[0].getColor()[0];
+        ENTLIB_ASSERT(not allSubEntities[0].hasOverride());
+        ENTLIB_ASSERT(red == 255);
+        ENTLIB_ASSERT(not allSubEntities[0].canBeRenamed());
+        ENTLIB_ASSERT(name1 == std::string("EP1-Spout_LINK_001_added"));
+        ENTLIB_ASSERT(allSubEntities[1].getColor()[0] == 44);
+        ENTLIB_ASSERT(allSubEntities[1].canBeRenamed());
+    };
+    {
+        Ent::Entity ent = entlib.loadEntity("instance_add_subentity.entity");
+        testAddSubEntity(ent);
+        entlib.saveEntity(ent, "instance_add_subentity.copy.entity");
+        Ent::Entity copyEnt = entlib.loadEntity("instance_add_subentity.copy.entity");
+        testAddSubEntity(copyEnt);
     }
 
     // ********************************** Test load/save scene ************************************

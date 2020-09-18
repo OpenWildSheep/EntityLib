@@ -272,11 +272,14 @@ namespace Ent
             tl::optional<SubSceneComponent> _subSceneComponent,
             Node color = {},
             Override<std::string> _thumbnail = {},
-            Override<std::string> _instanceOf = {});
+            Override<std::string> _instanceOf = {},
+            bool hasASuper = false);
         /// @endcond
 
         char const* getName() const; ///< Get the name of the component
         void setName(std::string name); ///< Set the name of the component
+        bool canBeRenamed() const; ///< A SubEntity of an instance which override a SubEntity in a prefab can't be renamed
+        void setCanBeRenamed(bool can);
         char const* getInstanceOf() const; ///< Name of the inherited prefab if there is one, or nullptr.
         char const* getThumbnail() const; ///< Get the Thumbnail path, or nullptr.
         void setThumbnail(std::string _thumbPath); ///< Set the Thumbnail path
@@ -333,16 +336,24 @@ namespace Ent
 
             return Entity(
                 *entlib,
-                name,
+                name.makeInstanceOf(),
                 std::move(instComponents),
                 std::move(instSubSceneComponent),
-                color,
-                thumbnail,
+                color.makeInstanceOf(),
+                thumbnail.makeInstanceOf(),
                 instanceOf);
         }
 
         bool hasOverride() const
         {
+            if (name.isSet())
+                return true;
+            if (color.hasOverride())
+                return true;
+            if (thumbnail.isSet())
+                return true;
+            if (instanceOf.isSet())
+                return true;
             for (auto&& name_comp : components)
             {
                 if (name_comp.second.hasOverride())
@@ -382,6 +393,7 @@ namespace Ent
         Override<std::string> thumbnail; ///< Path to the thumbnail mesh (.wthumb)
         Override<std::string> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
         DeleteCheck deleteCheck;
+        bool hasASuper = false;
     };
 
     /// Contain all data of a scene. (A list of Entity)
@@ -435,7 +447,7 @@ namespace Ent
         ComponentsSchema schema; ///< Schema of all components
         DeleteCheck deleteCheck;
         bool validationEnabled = true; ///< validate all objects at load/save
-        
+
         /// Component needed for each type of components
         std::map<std::string, std::vector<std::string>> componentDependencies;
 

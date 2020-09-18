@@ -23,7 +23,7 @@
 				"File": "",
 				"Embedded": [
 					{
-						"Name": "EP1-Spout_LINK_001_2",
+						"Name": "EP1-Spout_LINK_001",
 						"Color": [255,120,220,255],
 						"Components": [
 							{

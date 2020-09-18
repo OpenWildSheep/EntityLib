@@ -23,20 +23,12 @@
                 "Embedded": [
                     {
                         "Color": [
-                            255.0,
+                            42.0,
                             120.0,
                             220.0,
                             255.0
                         ],
-                        "Components": [
-                            {
-                                "Data": {
-                                    "Target": ".EP1-crook_2"
-                                },
-                                "Type": "NetworkLink",
-                                "Version": 1
-                            }
-                        ],
+                        "Components": [],
                         "Name": "EP1-Spout_LINK_001"
                     }
                 ],

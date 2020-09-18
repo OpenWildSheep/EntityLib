@@ -1,5 +1,6 @@
 {
     "Components": [],
     "InstanceOf": "prefab.entity",
+    "Name": "PlayerSpawner_",
     "Thumbnail": "TestThumbnail"
 }

@@ -642,7 +642,8 @@ namespace Ent
         tl::optional<SubSceneComponent> _subSceneComponent,
         Node _color,
         Override<std::string> _thumbnail,
-        Override<std::string> _instanceOf)
+        Override<std::string> _instanceOf,
+        bool _hasASuper)
         : entlib(&_entlib)
         , name(std::move(_name))
         , components(std::move(_components))
@@ -650,6 +651,7 @@ namespace Ent
         , color(std::move(_color))
         , thumbnail(std::move(_thumbnail))
         , instanceOf(std::move(_instanceOf))
+        , hasASuper(_hasASuper)
     {
     }
 
@@ -659,8 +661,21 @@ namespace Ent
     }
     void Entity::setName(std::string _name)
     {
+        ENTLIB_ASSERT_MSG(
+            not hasASuper,
+            "A SubEntity of an instance which override a SubEntity in a prefab can't be renamed. "
+            "Check the canBeRenamed method.");
         name.set(std::move(_name));
     }
+    bool Entity::canBeRenamed() const
+    {
+        return not hasASuper;
+    }
+    void Entity::setCanBeRenamed(bool can)
+    {
+        hasASuper = not can;
+    }
+
     char const* Entity::getInstanceOf() const
     {
         return instanceOf.isDefault() ? nullptr : instanceOf.get().c_str();
@@ -1073,7 +1088,7 @@ static Ent::Entity loadEntity(
     if (entNode.count("InstanceOf") != 0)
     {
         instanceOf = entNode.at("InstanceOf").get<std::string>();
-        std::filesystem::path instanceOfPath = entNode.at("InstanceOf").get<std::string>();
+        std::filesystem::path instanceOfPath = *instanceOf;
         if (instanceOfPath.is_absolute())
         {
             superEntityOfThisEntity = entlib.loadEntity(*instanceOf, superEntityFromParentEntity);
@@ -1127,59 +1142,66 @@ static Ent::Entity loadEntity(
             superEntityFromParentEntity != nullptr ? &superEntityFromParentEntity->getColorValue() :
                                                      nullptr);
     }
+    else
+    {
+        ovColor = superEntity->getColorValue().makeInstanceOf();
+    }
 
     std::map<std::string, Ent::Component> components;
-    json const& componentsNode = entNode.at("Components");
-    size_t index = 0;
     tl::optional<Ent::SubSceneComponent> subSceneComponent;
-    for (json const& compNode : componentsNode)
+    size_t index = 0;
+    if (entNode.count("Components") != 0)
     {
-        auto const cmpType = compNode.at("Type").get<std::string>();
-        json const& data = compNode.at("Data");
-        if (cmpType == "SubScene")
+        json const& componentsNode = entNode.at("Components");
+        for (json const& compNode : componentsNode)
         {
-            Ent::SubSceneComponent const* superComp = superEntity->getSubSceneComponent();
-
-            Ent::Override<std::string> file =
-                superComp != nullptr ?
-                    superComp->file :
-                    Ent::Override<std::string>(std::string(), tl::nullopt, tl::nullopt);
-
-            auto fileInJson = (data.count("File") != 0) ?
-                                  tl::optional<std::string>(data["File"].get<std::string>()) :
-                                  tl::nullopt;
-            file = file.makeOverridedInstanceOf(fileInJson);
-            bool isEmbeddedInJson =
-                (data.count("isEmbedded") != 0) ? data["isEmbedded"].get<bool>() : false;
-            Ent::SubSceneComponent subSceneComp{ isEmbeddedInJson, file, index };
-            if (subSceneComp.isEmbedded)
+            auto const cmpType = compNode.at("Type").get<std::string>();
+            json const& data = compNode.at("Data");
+            if (cmpType == "SubScene")
             {
-                subSceneComp.embedded = nonstd::make_value<Ent::Scene>(loadScene(
-                    entlib,
-                    schema,
-                    data["Embedded"],
-                    (superComp != nullptr ? superComp->embedded.get() : nullptr)));
+                Ent::SubSceneComponent const* superComp = superEntity->getSubSceneComponent();
+
+                Ent::Override<std::string> file =
+                    superComp != nullptr ?
+                        superComp->file :
+                        Ent::Override<std::string>(std::string(), tl::nullopt, tl::nullopt);
+
+                auto fileInJson = (data.count("File") != 0) ?
+                                      tl::optional<std::string>(data["File"].get<std::string>()) :
+                                      tl::nullopt;
+                file = file.makeOverridedInstanceOf(fileInJson);
+                bool isEmbeddedInJson =
+                    (data.count("isEmbedded") != 0) ? data["isEmbedded"].get<bool>() : false;
+                Ent::SubSceneComponent subSceneComp{ isEmbeddedInJson, file, index };
+                if (subSceneComp.isEmbedded)
+                {
+                    subSceneComp.embedded = nonstd::make_value<Ent::Scene>(loadScene(
+                        entlib,
+                        schema,
+                        data["Embedded"],
+                        (superComp != nullptr ? superComp->embedded.get() : nullptr)));
+                }
+                subSceneComponent = std::move(subSceneComp);
             }
-            subSceneComponent = std::move(subSceneComp);
+            else
+            {
+                Ent::Component const* superComp = superEntity->getComponent(cmpType.c_str());
+                auto const version = compNode.at("Version").get<size_t>();
+
+                Ent::Subschema const& compSchema = *schema.components.at(cmpType);
+
+                Ent::Component comp{
+                    superComp != nullptr, // has a super component
+                    cmpType,
+                    loadNode(compSchema, data, (superComp != nullptr ? &superComp->root : nullptr)),
+                    version,
+                    index
+                };
+
+                components.emplace(cmpType, std::move(comp));
+            }
+            ++index;
         }
-        else
-        {
-            Ent::Component const* superComp = superEntity->getComponent(cmpType.c_str());
-            auto const version = compNode.at("Version").get<size_t>();
-
-            Ent::Subschema const& compSchema = *schema.components.at(cmpType);
-
-            Ent::Component comp{
-                superComp != nullptr, // has a super component
-                cmpType,
-                loadNode(compSchema, data, (superComp != nullptr ? &superComp->root : nullptr)),
-                version,
-                index
-            };
-
-            components.emplace(cmpType, std::move(comp));
-        }
-        ++index;
     }
     // Add undeclared componants to be able to get values inside (They are full reference to prefab)
     for (auto const& type_comp : superEntity->getComponents())
@@ -1255,27 +1277,48 @@ static Ent::Scene loadScene(
 {
     Ent::Scene scene;
 
-    size_t entIdx = 0;
+    // Add all entities from super scene ...
+    std::set<std::string> entFromSuper;
+    if (super != nullptr)
+    {
+        for (auto&& superEnt : super->objects)
+        {
+            entFromSuper.insert(superEnt.getName());
+            json const* instEntNode = nullptr;
+            // ... and look if there is an override.
+            for (json const& entNode : entities)
+            {
+                std::string const instEntName = entNode.at("Name").get<std::string>();
+                if (superEnt.getName() == instEntName)
+                {
+                    instEntNode = &entNode;
+                    break;
+                }
+            }
+            Ent::Entity ent;
+            if (instEntNode == nullptr)
+            {
+                ent = superEnt.makeInstanceOf();
+            }
+            else
+            {
+                ent = ::loadEntity(entLib, schema, *instEntNode, &superEnt);
+            }
+            ent.setCanBeRenamed(false);
+            scene.objects.emplace_back(std::move(ent));
+        }
+    }
+
+    // Add new entities
     for (json const& entNode : entities)
     {
-        Ent::Entity const* superEnt =
-            (super == nullptr) ?
-                nullptr :
-                entIdx < super->objects.size() ? &(super->objects[entIdx]) : nullptr;
-        Ent::Entity ent;
-        if (entNode.is_null())
+        std::string const name = entNode.at("Name").get<std::string>();
+        if (entFromSuper.count(name) != 0)
         {
-            if (superEnt != nullptr)
-            {
-                ent = superEnt->makeInstanceOf();
-            }
+            continue;
         }
-        else
-        {
-            ent = ::loadEntity(entLib, schema, entNode, superEnt);
-        }
+        Ent::Entity ent = ::loadEntity(entLib, schema, entNode, nullptr);
         scene.objects.emplace_back(std::move(ent));
-        ++entIdx;
     }
 
     return scene;
@@ -1306,10 +1349,8 @@ saveEntity(Ent::ComponentsSchema const& schema, Ent::Entity const& entity, Ent::
     // TODO override, types and default values
     json entNode;
 
-    if (entity.getNameValue().isSet())
-    {
-        entNode.emplace("Name", entity.getNameValue().get());
-    }
+    // Always save Name since it is use for override
+    entNode.emplace("Name", entity.getNameValue().get());
 
     if (entity.getInstanceOfValue().isSet())
     {
@@ -1351,8 +1392,9 @@ saveEntity(Ent::ComponentsSchema const& schema, Ent::Entity const& entity, Ent::
             Ent::SubSceneComponent const* superSubsceneCmp =
                 super == nullptr ? nullptr : super->getSubSceneComponent();
             ENTLIB_ASSERT(subscene != nullptr);
-            if ((subscene->hasOverride() && entity.getInstanceOf() != nullptr)
-                || entity.getInstanceOf() == nullptr)
+            bool const subsceneHasOverride = subscene->hasOverride();
+            bool const hasInstanceOf = entity.getInstanceOf() != nullptr;
+            if ((subsceneHasOverride and hasInstanceOf) or not hasInstanceOf)
             {
                 json data;
                 data.emplace("isEmbedded", subscene->isEmbedded);
@@ -1506,20 +1548,31 @@ saveScene(Ent::ComponentsSchema const& schema, Ent::Scene const& scene, Ent::Sce
     document.emplace("Version", 2);
     json& objects = document["Objects"];
 
-    size_t entityIdx = 0;
     for (Ent::Entity const& ent : scene.objects)
     {
-        Ent::Entity const* superEnt =
-            super == nullptr ?
-                nullptr :
-                entityIdx >= super->objects.size() ? nullptr : &super->objects[entityIdx];
-        objects.emplace_back(::saveEntity(schema, ent, superEnt));
-        ++entityIdx;
+        if (ent.hasOverride())
+        {
+            char const* name = ent.getName();
+            Ent::Entity const* superEnt = nullptr;
+            if (super != nullptr)
+            {
+                for (auto&& obj : super->objects)
+                {
+                    if (strcmp(obj.getName(), name) == 0)
+                    {
+                        superEnt = &obj;
+                    }
+                }
+            }
+
+            objects.emplace_back(::saveEntity(schema, ent, superEnt));
+        }
     }
 
     return document;
 }
 
+// TODO : Remove the param super from saveEntity and saveScene
 void Ent::EntityLib::saveScene(
     Scene const& scene, std::filesystem::path const& scenePath, Ent::Scene const* super) const
 {

@@ -1,0 +1,77 @@
+{
+    "Color": [
+        27.0,
+        177.0,
+        27.0,
+        255.0
+    ],
+    "Components": [
+        {
+            "Data": {
+                "Faction": "Plouf",
+                "ScriptList": [
+                    "a1",
+                    "b2",
+                    null
+                ]
+            },
+            "Type": "SystemicCreature",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "Embedded": [
+                    {
+                        "Color": [
+                            44.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Matrix": [
+                                        -0.00570000009611249,
+                                        -0.4374000132083893,
+                                        74.1084976196289,
+                                        0.0,
+                                        0.8992999792098999,
+                                        36.0432014465332,
+                                        -1.0,
+                                        0.0024999999441206455,
+                                        -0.424699991941452
+                                    ],
+                                    "Position": [
+                                        0.0,
+                                        0.0,
+                                        0.0
+                                    ]
+                                },
+                                "Type": "TransformGD",
+                                "Version": 1
+                            },
+                            {
+                                "Data": {
+                                    "Source": ".EP1-Spout_",
+                                    "Target": ".EP1-crook_",
+                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                },
+                                "Type": "NetworkLink",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "EP1-Spout_LINK_001_added"
+                    }
+                ],
+                "File": "",
+                "isEmbedded": true
+            },
+            "Type": "SubScene",
+            "Version": 1
+        }
+    ],
+    "InstanceOf": "prefab.entity",
+    "Name": "PlayerSpawner_",
+    "Thumbnail": "prout"
+}

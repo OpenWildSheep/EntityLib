@@ -1,0 +1,45 @@
+{
+    "Color": [
+        27.0,
+        177.0,
+        27.0,
+        255.0
+    ],
+    "Components": [
+        {
+            "Data": {
+                "Faction": "Plouf",
+                "ScriptList": [
+                    "a1",
+                    "b2",
+                    null
+                ]
+            },
+            "Type": "SystemicCreature",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "Embedded": [
+                    {
+                        "Color": [
+                            42.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [],
+                        "Name": "EP1-Spout_LINK_001"
+                    }
+                ],
+                "File": "",
+                "isEmbedded": true
+            },
+            "Type": "SubScene",
+            "Version": 1
+        }
+    ],
+    "InstanceOf": "prefab.entity",
+    "Name": "PlayerSpawner_",
+    "Thumbnail": "prout"
+}

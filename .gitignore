@@ -1,0 +1,11 @@
+.vs
+x64
+*.opendb
+*.VC.db
+*.user
+/doc
+/EntityLib/*.psess
+/EntityLib/*.vspx
+**/__pycache__
+*.pyc
+/EntityLib_doc

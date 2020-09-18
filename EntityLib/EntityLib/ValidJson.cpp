@@ -2,7 +2,6 @@
 
 #pragma warning(push, 0)
 #pragma warning(disable : 4702)
-// TODO Add valid check
 #include <valijson/adapters/nlohmann_json_adapter.hpp>
 #include <valijson/utils/nlohmann_json_utils.hpp>
 #include <valijson/schema.hpp>
@@ -114,7 +113,7 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema)
         instSchema["minItems"] = tmplSchema.minItems;
     }
 
-    std::array<char const*, size_t(Ent::DataType::freeobject)> typeToStr = {
+    std::array<char const*, size_t(Ent::DataType::boolean) + 1> typeToStr = {
         "null", "string", "number", "integer", "object", "array", "boolean"
     };
     instSchema["type"] = typeToStr[size_t(tmplSchema.type)];

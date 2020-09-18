@@ -23,7 +23,6 @@ static void printNode(char const* name, Ent::Node const& node, std::string const
         printf("%s%s [integer] : %lld\n", tab.c_str(), name, node.getInt());
         break;
     case Ent::DataType::object:
-    case Ent::DataType::freeobject:
         printf("%s%s [object]\n", tab.c_str(), name);
         for (char const* field : node.getFieldNames())
         {
@@ -78,7 +77,6 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
     case Ent::DataType::null: std::cout << "null" << std::endl; break;
     case Ent::DataType::number: std::cout << "number" << std::endl; break;
     case Ent::DataType::object:
-    case Ent::DataType::freeobject:
         std::cout << "object" << std::endl;
         for (auto&& name_sub : subschema.properties)
         {

@@ -319,49 +319,9 @@ namespace Ent
         /// The properties keep the sames values
         Entity detachEntityFromPrefab() const;
 
-        Entity makeInstanceOf() const
-        {
-            std::map<std::string, Component> instComponents;
-            tl::optional<SubSceneComponent> instSubSceneComponent;
+        Entity makeInstanceOf() const;
 
-            for (auto&& name_comp : components)
-            {
-                instComponents.emplace(name_comp.first, name_comp.second.makeInstanceOf());
-            }
-            if (subSceneComponent.has_value())
-            {
-                instSubSceneComponent = subSceneComponent->makeInstanceOf();
-            }
-
-            return Entity(
-                *entlib,
-                name.makeInstanceOf(),
-                std::move(instComponents),
-                std::move(instSubSceneComponent),
-                color.makeInstanceOf(),
-                thumbnail.makeInstanceOf(),
-                instanceOf);
-        }
-
-        bool hasOverride() const
-        {
-            if (name.isSet())
-                return true;
-            if (color.hasOverride())
-                return true;
-            if (thumbnail.isSet())
-                return true;
-            if (instanceOf.isSet())
-                return true;
-            for (auto&& name_comp : components)
-            {
-                if (name_comp.second.hasOverride())
-                    return true;
-            }
-            if (subSceneComponent.has_value() && subSceneComponent->hasOverride())
-                return true;
-            return false;
-        }
+        bool hasOverride() const;
 
         Override<std::string> const& getNameValue() const
         {
@@ -466,16 +426,12 @@ namespace Ent
         Scene loadScene(std::filesystem::path const& _scenePath) const;
 
         /// Save the Entity at path _entityPath
-        void saveEntity(
-            Entity const& entity,
-            std::filesystem::path const& _entityPath,
-            Ent::Entity const* super = nullptr) const;
+        void saveEntity(Entity const& entity, std::filesystem::path const& _entityPath) const;
 
         /// Save the Scene at path _scenePath
         void saveScene(
             Scene const& scene,
-            std::filesystem::path const& _scenePath,
-            Ent::Scene const* super = nullptr) const;
+            std::filesystem::path const& _scenePath) const;
 
         /// @brief Create an Entity which instanciate an other.
         ///

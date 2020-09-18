@@ -24,7 +24,6 @@ namespace Ent
         object, ///< @see Ent::DataType::object
         array, ///< @see Ent::DataType::array
         boolean,
-        freeobject, ///< Object without schema. Used in Subscene/Embedded. @todo remove?
     };
 
     /// @cond PRIVATE

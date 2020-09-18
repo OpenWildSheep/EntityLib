@@ -27,8 +27,7 @@ static Ent::Scene loadScene(
     Ent::ComponentsSchema const& schema,
     json const& entities,
     Ent::Scene const* super);
-static json
-saveScene(Ent::ComponentsSchema const& schema, Ent::Scene const& scene, Ent::Scene const* super);
+static json saveScene(Ent::ComponentsSchema const& schema, Ent::Scene const& scene);
 
 namespace Ent
 {
@@ -780,6 +779,49 @@ namespace Ent
         }
     }
 
+    Entity Entity::makeInstanceOf() const
+    {
+        std::map<std::string, Component> instComponents;
+        tl::optional<SubSceneComponent> instSubSceneComponent;
+
+        for (auto&& name_comp : components)
+        {
+            instComponents.emplace(name_comp.first, name_comp.second.makeInstanceOf());
+        }
+        if (subSceneComponent.has_value())
+        {
+            instSubSceneComponent = subSceneComponent->makeInstanceOf();
+        }
+
+        return Entity(
+            *entlib,
+            name.makeInstanceOf(),
+            std::move(instComponents),
+            std::move(instSubSceneComponent),
+            color.makeInstanceOf(),
+            thumbnail.makeInstanceOf(),
+            instanceOf);
+    }
+
+    bool Entity::hasOverride() const
+    {
+        if (name.isSet())
+            return true;
+        if (color.hasOverride())
+            return true;
+        if (thumbnail.isSet())
+            return true;
+        if (instanceOf.isSet())
+            return true;
+        for (auto&& name_comp : components)
+        {
+            if (name_comp.second.hasOverride())
+                return true;
+        }
+        if (subSceneComponent.has_value() && subSceneComponent->hasOverride())
+            return true;
+        return false;
+    }
 } // namespace Ent
 
 // ********************************** Load/Save ***********************************************
@@ -961,19 +1003,6 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
         result = Ent::Node(std::move(arr), &nodeSchema);
     }
     break;
-    case Ent::DataType::freeobject:
-    {
-        Ent::Object object;
-        for (auto const& field : data.items())
-        {
-            std::string const& name = field.key();
-            json const& value = field.value();
-            Ent::Node tmpNode = loadFreeObjectNode(value);
-            object.emplace(name, nonstd::make_value<Ent::Node>(std::move(tmpNode)));
-        }
-        result = Ent::Node(std::move(object), &nodeSchema);
-    }
-    break;
     }
     return result;
 }
@@ -989,7 +1018,6 @@ static json saveFreeObjectNode(Ent::Node const& node)
     case Ent::DataType::integer: data = node.getInt(); break;
     case Ent::DataType::number: data = node.getFloat(); break;
     case Ent::DataType::object:
-    case Ent::DataType::freeobject:
     {
         data = json::object();
         for (auto const& name : node.getFieldNames())
@@ -1036,17 +1064,6 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
                 json subJson = saveNode(*std::get<1>(name_sub), *subNode);
                 data[name] = std::move(subJson);
             }
-        }
-    }
-    break;
-    case Ent::DataType::freeobject:
-    {
-        data = json::object();
-        for (auto const& name : node.getFieldNames())
-        {
-            Ent::Node const* subNode = node.at(name);
-            json subJson = saveFreeObjectNode(*subNode);
-            data[name] = std::move(subJson);
         }
     }
     break;
@@ -1339,10 +1356,8 @@ Ent::Scene Ent::EntityLib::loadScene(std::filesystem::path const& scenePath) con
     return ::loadScene(*this, schema, document.at("Objects"), nullptr);
 }
 
-static json
-saveEntity(Ent::ComponentsSchema const& schema, Ent::Entity const& entity, Ent::Entity const* super)
+static json saveEntity(Ent::ComponentsSchema const& schema, Ent::Entity const& entity)
 {
-    // TODO override, types and default values
     json entNode;
 
     // Always save Name since it is use for override
@@ -1385,8 +1400,6 @@ saveEntity(Ent::ComponentsSchema const& schema, Ent::Entity const& entity, Ent::
         if (comp->type == "SubScene")
         {
             Ent::SubSceneComponent const* subscene = entity.getSubSceneComponent();
-            Ent::SubSceneComponent const* superSubsceneCmp =
-                super == nullptr ? nullptr : super->getSubSceneComponent();
             ENTLIB_ASSERT(subscene != nullptr);
             bool const subsceneHasOverride = subscene->hasOverride();
             bool const hasInstanceOf = entity.getInstanceOf() != nullptr;
@@ -1400,14 +1413,7 @@ saveEntity(Ent::ComponentsSchema const& schema, Ent::Entity const& entity, Ent::
                 }
                 if (subscene->isEmbedded)
                 {
-                    ENTLIB_ASSERT_MSG(
-                        superSubsceneCmp == nullptr or superSubsceneCmp->isEmbedded,
-                        "Can't override the isEmbedded state! (Not embedded scene can't become "
-                        "embedded)");
-                    Ent::Scene const* superSubscene =
-                        superSubsceneCmp == nullptr ? nullptr : superSubsceneCmp->embedded.get();
-                    data.emplace(
-                        "Embedded", saveScene(schema, *subscene->embedded, superSubscene)["Objects"]);
+                    data.emplace("Embedded", saveScene(schema, *subscene->embedded)["Objects"]);
                 }
 
                 json compNode;
@@ -1506,8 +1512,7 @@ Ent::Entity Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
     return inst;
 }
 
-void Ent::EntityLib::saveEntity(
-    Entity const& entity, std::filesystem::path const& entityPath, Ent::Entity const* super) const
+void Ent::EntityLib::saveEntity(Entity const& entity, std::filesystem::path const& entityPath) const
 {
     std::ofstream file(entityPath);
     if (not file.is_open())
@@ -1517,7 +1522,7 @@ void Ent::EntityLib::saveEntity(
         sprintf_s(message.data(), MessSize, "Can't open file for write: %ls", entityPath.c_str());
         throw std::runtime_error(message.data());
     }
-    json document = ::saveEntity(schema, entity, super);
+    json document = ::saveEntity(schema, entity);
     file << document.dump(4);
     file.close();
 
@@ -1536,8 +1541,7 @@ void Ent::EntityLib::saveEntity(
     }
 }
 
-static json
-saveScene(Ent::ComponentsSchema const& schema, Ent::Scene const& scene, Ent::Scene const* super)
+static json saveScene(Ent::ComponentsSchema const& schema, Ent::Scene const& scene)
 {
     json document;
 
@@ -1548,29 +1552,14 @@ saveScene(Ent::ComponentsSchema const& schema, Ent::Scene const& scene, Ent::Sce
     {
         if (ent.hasOverride())
         {
-            char const* name = ent.getName();
-            Ent::Entity const* superEnt = nullptr;
-            if (super != nullptr)
-            {
-                for (auto&& obj : super->objects)
-                {
-                    if (strcmp(obj.getName(), name) == 0)
-                    {
-                        superEnt = &obj;
-                    }
-                }
-            }
-
-            objects.emplace_back(::saveEntity(schema, ent, superEnt));
+            objects.emplace_back(::saveEntity(schema, ent));
         }
     }
 
     return document;
 }
 
-// TODO : Remove the param super from saveEntity and saveScene
-void Ent::EntityLib::saveScene(
-    Scene const& scene, std::filesystem::path const& scenePath, Ent::Scene const* super) const
+void Ent::EntityLib::saveScene(Scene const& scene, std::filesystem::path const& scenePath) const
 {
     std::ofstream file(scenePath);
     if (not file.is_open())
@@ -1581,7 +1570,7 @@ void Ent::EntityLib::saveScene(
         throw std::runtime_error(message.data());
     }
 
-    json document = ::saveScene(schema, scene, super);
+    json document = ::saveScene(schema, scene);
 
     file << document.dump(4);
     file.close();

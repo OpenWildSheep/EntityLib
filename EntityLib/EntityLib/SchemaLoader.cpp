@@ -119,7 +119,6 @@ Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
         return meta;
     }
     case Ent::DataType::string:
-    case Ent::DataType::freeobject:
     case Ent::DataType::object:
     case Ent::DataType::array:
     case Ent::DataType::boolean:

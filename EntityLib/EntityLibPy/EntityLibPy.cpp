@@ -51,7 +51,6 @@ Value getValue(Ent::Node& node)
     switch (node.getDataType())
     {
     case Ent::DataType::array:
-    case Ent::DataType::freeobject:
     case Ent::DataType::object:
     case Ent::DataType::null: return nullptr;
     case Ent::DataType::boolean: return node.getBool();
@@ -67,7 +66,6 @@ void setValue(Ent::Node& node, Value const& val)
     switch (node.getDataType())
     {
     case Ent::DataType::array:
-    case Ent::DataType::freeobject:
     case Ent::DataType::object:
     case Ent::DataType::null: break;
     case Ent::DataType::boolean: node.setBool(val.get<bool>()); break;

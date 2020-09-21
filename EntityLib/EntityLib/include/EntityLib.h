@@ -404,7 +404,7 @@ namespace Ent
         std::filesystem::path toolsDir; ///< Path to the Tools dir in in the perforce root (X:/Tools)
         ComponentsSchema schema; ///< Schema of all components
         DeleteCheck deleteCheck;
-        bool validationEnabled = true; ///< validate all objects at load/save
+        bool validationEnabled = false; ///< validate all objects at load/save
 
         /// Component needed for each type of components
         std::map<std::string, std::vector<std::string>> componentDependencies;

@@ -262,7 +262,6 @@ namespace Ent
     struct ENTLIB_DLLEXPORT Entity
     {
         /// @cond PRIVATE
-        Entity();
         Entity(EntityLib const& _entlib);
         Entity(
             EntityLib const& _entlib,

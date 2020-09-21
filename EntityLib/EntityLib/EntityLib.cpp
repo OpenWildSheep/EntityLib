@@ -619,8 +619,6 @@ namespace Ent
 
     // ********************************* Entity ***************************************************
 
-    Entity::Entity() = default;
-
     Entity::Entity(EntityLib const& _entlib)
         : entlib(&_entlib)
         , name(std::string(), tl::nullopt, tl::nullopt)
@@ -1095,7 +1093,7 @@ static Ent::Entity loadEntity(
     Ent::Entity const* superEntityFromParentEntity)
 {
     tl::optional<std::string> instanceOf;
-    Ent::Entity superEntityOfThisEntity;
+    Ent::Entity superEntityOfThisEntity(entlib);
     bool superIsInit = false;
     Ent::Entity const* superEntity = &superEntityOfThisEntity;
     if (entNode.count("InstanceOf") != 0)
@@ -1308,15 +1306,9 @@ static Ent::Scene loadScene(
                     break;
                 }
             }
-            Ent::Entity ent;
-            if (instEntNode == nullptr)
-            {
-                ent = superEnt.makeInstanceOf();
-            }
-            else
-            {
-                ent = ::loadEntity(entLib, schema, *instEntNode, &superEnt);
-            }
+            Ent::Entity ent = (instEntNode == nullptr) ?
+                                  superEnt.makeInstanceOf() :
+                                  ::loadEntity(entLib, schema, *instEntNode, &superEnt);
             ent.setCanBeRenamed(false);
             scene.objects.emplace_back(std::move(ent));
         }

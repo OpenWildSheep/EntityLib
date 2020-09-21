@@ -249,7 +249,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "entityPath"_a,
             "super"_a = nullptr)
         .def("load_scene", &EntityLib::loadScene, py::return_value_policy::copy)
-        .def("save_entity", &EntityLib::saveEntity, "entity"_a, "_entityPath"_a, "super"_a = nullptr)
+        .def("save_entity", &EntityLib::saveEntity, "entity"_a, "_entityPath"_a)
         .def("save_scene", &EntityLib::saveScene)
         .def("make_instance_of", &EntityLib::makeInstanceOf, "instanceOf"_a);
 

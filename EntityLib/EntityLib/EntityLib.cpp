@@ -803,22 +803,18 @@ namespace Ent
 
     bool Entity::hasOverride() const
     {
-        if (name.isSet())
+        if (name.isSet() or color.hasOverride() or thumbnail.isSet() or instanceOf.isSet())
+        {
             return true;
-        if (color.hasOverride())
-            return true;
-        if (thumbnail.isSet())
-            return true;
-        if (instanceOf.isSet())
-            return true;
+        }
         for (auto&& name_comp : components)
         {
             if (name_comp.second.hasOverride())
+            {
                 return true;
+            }
         }
-        if (subSceneComponent.has_value() && subSceneComponent->hasOverride())
-            return true;
-        return false;
+        return subSceneComponent.has_value() && subSceneComponent->hasOverride();
     }
 } // namespace Ent
 

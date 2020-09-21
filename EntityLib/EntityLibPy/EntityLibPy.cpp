@@ -234,6 +234,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     py::class_<EntityLib>(ent, "EntityLib")
         .def(py::init<std::string>())
+        .def_readwrite("validation_enabled", &EntityLib::validationEnabled)
         .def_readonly("root_path", &EntityLib::rootPath)
         .def_readonly("rawdata_path", &EntityLib::rawdataPath)
         .def_readonly("tools_dir", &EntityLib::toolsDir)

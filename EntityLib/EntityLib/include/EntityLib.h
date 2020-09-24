@@ -50,6 +50,13 @@ namespace Ent
         bool hasOverride() const;
     };
 
+    enum class ActivationLevel
+    {
+        InWorld,
+        Loading,
+        Started
+    };
+
     template <typename V>
     struct Override
     {
@@ -271,6 +278,7 @@ namespace Ent
             Node color = {},
             Override<std::string> _thumbnail = {},
             Override<std::string> _instanceOf = {},
+            Override<ActivationLevel> _maxActivationLevel = {},
             bool hasASuper = false);
         /// @endcond
 
@@ -279,6 +287,8 @@ namespace Ent
         bool canBeRenamed() const; ///< A SubEntity of an instance which override a SubEntity in a prefab can't be renamed
         void setCanBeRenamed(bool can);
         char const* getInstanceOf() const; ///< Name of the inherited prefab if there is one, or nullptr.
+        ActivationLevel getMaxActivationLevel() const; ///< Get the initial max activation level of the entity at runtime.
+        void setMaxActivationLevel(ActivationLevel _level); ///< Set the initial max activation level of the entity at runtime.
         char const* getThumbnail() const; ///< Get the Thumbnail path, or nullptr.
         void setThumbnail(std::string _thumbPath); ///< Set the Thumbnail path
         std::array<uint8_t, 4> getColor() const; ///< Get the color of the is one, or nullptr.
@@ -342,6 +352,11 @@ namespace Ent
             return instanceOf;
         }
 
+        Override<ActivationLevel> const& getMaxActivationLevelValue() const
+        {
+            return maxActivationLevel;
+        }
+
     private:
         EntityLib const* entlib{}; ///< Reference the entity lib to find the schema when needed
         Override<std::string> name; ///< Entity name
@@ -350,6 +365,7 @@ namespace Ent
         Node color; ///< The optional Color of the Entity
         Override<std::string> thumbnail; ///< Path to the thumbnail mesh (.wthumb)
         Override<std::string> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
+        Override<ActivationLevel> maxActivationLevel; ///< Maximum activation level of this entity in runtime
         DeleteCheck deleteCheck;
         bool hasASuper = false;
     };

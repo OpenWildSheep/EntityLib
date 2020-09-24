@@ -151,12 +151,18 @@ try
         ENTLIB_ASSERT(allSubEntities.front().getName() == std::string("EP1-Spout_LINK_001"));
         ENTLIB_ASSERT(allSubEntities.front().getColor()[0] == 255);
 
+        // TEST MaxActivationLevel
+        ent.setMaxActivationLevel(Ent::ActivationLevel::InWorld);
+
         sysCreat->root.at("Name")->setString("Shamane_male");
         entlib.saveEntity(ent, "prefab.copy.entity");
     }
     {
         // Test write prefab
         Ent::Entity ent = entlib.loadEntity("prefab.copy.entity");
+
+        // TEST MaxActivationLevel
+        ENTLIB_ASSERT(ent.getMaxActivationLevel() == Ent::ActivationLevel::InWorld);
 
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent.getComponent("HeightObj");

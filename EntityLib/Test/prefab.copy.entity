@@ -191,6 +191,7 @@
             "Version": 1
         }
     ],
+    "MaxActivationLevel": "InWorld",
     "Name": "PlayerSpawner_",
     "Thumbnail": "TestThumbnail"
 }

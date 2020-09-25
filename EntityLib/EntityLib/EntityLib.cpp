@@ -1193,7 +1193,8 @@ static Ent::Entity loadEntity(
             else
             {
                 Ent::Component const* superComp = superEntity->getComponent(cmpType.c_str());
-                auto const version = compNode.at("Version").get<size_t>();
+                auto const version =
+                    compNode.count("Version") ? compNode.at("Version").get<size_t>() : 0;
 
                 Ent::Subschema const& compSchema = *schema.components.at(cmpType);
 

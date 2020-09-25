@@ -1097,38 +1097,41 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
     return data;
 }
 
-Ent::ActivationLevel parseActivationLevel(const std::string& _name)
+namespace
 {
-    if (_name == "Started")
+    Ent::ActivationLevel parseActivationLevel(const std::string& _name)
     {
+        if (_name == "Started")
+        {
+            return Ent::ActivationLevel::Started;
+        }
+        if (_name == "Loading")
+        {
+            return Ent::ActivationLevel::Loading;
+        }
+        if (_name == "InWorld")
+        {
+            return Ent::ActivationLevel::InWorld;
+        }
         return Ent::ActivationLevel::Started;
     }
-    if (_name == "Loading")
-    {
-        return Ent::ActivationLevel::Loading;
-    }
-    if (_name == "InWorld")
-    {
-        return Ent::ActivationLevel::InWorld;
-    }
-    return Ent::ActivationLevel::Started;
-}
 
-char const* getActivationLevelString(Ent::ActivationLevel _level)
-{
-    if (_level == Ent::ActivationLevel::Started)
+    char const* getActivationLevelString(Ent::ActivationLevel _level)
     {
+        if (_level == Ent::ActivationLevel::Started)
+        {
+            return "Started";
+        }
+        if (_level == Ent::ActivationLevel::Loading)
+        {
+            return "Loading";
+        }
+        if (_level == Ent::ActivationLevel::InWorld)
+        {
+            return "InWorld";
+        }
         return "Started";
     }
-    if (_level == Ent::ActivationLevel::Loading)
-    {
-        return "Loading";
-    }
-    if (_level == Ent::ActivationLevel::InWorld)
-    {
-        return "InWorld";
-    }
-    return "Started";
 }
 
 static Ent::Entity loadEntity(

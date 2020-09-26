@@ -282,6 +282,14 @@ namespace Ent
             bool hasASuper = false);
         /// @endcond
 
+        Entity(const Entity& _other);
+
+        Entity(Entity&& _other);
+
+        Entity& operator=(const Entity& _other);
+
+        Entity& operator=(Entity&& _other);
+
         char const* getName() const; ///< Get the name of the component
         void setName(std::string name); ///< Set the name of the component
         bool canBeRenamed() const; ///< A SubEntity of an instance which override a SubEntity in a prefab can't be renamed
@@ -334,6 +342,10 @@ namespace Ent
 
         Entity* resolveEntityRef(const EntityRef& _entityRef);
 
+        Scene* getParentScene() const;
+
+        void setParentScene(Scene* scene);
+
         Override<std::string> const& getNameValue() const
         {
             return name;
@@ -355,6 +367,7 @@ namespace Ent
         }
 
     private:
+        void updateSubSceneOwner();
         EntityLib const* entlib{}; ///< Reference the entity lib to find the schema when needed
         Override<std::string> name; ///< Entity name
         std::map<std::string, Component> components; ///< All components of this Entity
@@ -364,33 +377,37 @@ namespace Ent
         Override<std::string> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
         DeleteCheck deleteCheck;
         bool hasASuper = false;
+        Scene* parentScene = nullptr;
     };
 
     /// Contain all data of a scene. (A list of Entity)
     struct Scene
     {
+        Scene();
+        Scene(std::vector<Entity>);
+
+        Scene(const Scene& _other);
+
+        Scene(Scene&& _other);
+
+        Scene& operator=(const Scene& _other);
+
+        Scene& operator=(Scene&& _other);
+
         std::vector<Entity> objects; ///< All Ent::Entity of this Scene
         DeleteCheck deleteCheck;
 
-        Scene makeInstanceOf() const
-        {
-            std::vector<Entity> instanceEntities;
-            for (auto const& ent : objects)
-            {
-                instanceEntities.push_back(ent.makeInstanceOf());
-            }
-            return Scene{ std::move(instanceEntities) };
-        }
+        Scene makeInstanceOf() const;
 
-        bool hasOverride() const
-        {
-            for (Entity const& ent : objects)
-            {
-                if (ent.hasOverride())
-                    return true;
-            }
-            return false;
-        }
+        bool hasOverride() const;
+
+        Entity* getOwnerEntity() const;
+
+        void setOwnerEntity(Entity* entity);
+
+    private:
+        Entity* ownerEntity = nullptr;
+        void updateChildrenContext();
     };
 
     // ********************************** Static data *********************************************

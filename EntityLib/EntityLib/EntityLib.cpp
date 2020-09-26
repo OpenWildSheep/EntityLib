@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <set>
+#include <sstream>
 #include <utility>
 
 #include "external/json.hpp"
@@ -660,6 +661,73 @@ namespace Ent
         , instanceOf(std::move(_instanceOf))
         , hasASuper(_hasASuper)
     {
+        updateSubSceneOwner();
+    }
+
+    Entity::Entity(const Entity& _other)
+        : entlib(_other.entlib),
+          name(_other.name),
+          components(_other.components),
+          subSceneComponent(_other.subSceneComponent),
+          color(_other.color),
+          thumbnail(_other.thumbnail),
+          instanceOf(_other.instanceOf),
+          deleteCheck(_other.deleteCheck),
+          hasASuper(_other.hasASuper),
+          parentScene(_other.parentScene)
+    {
+        updateSubSceneOwner();
+    }
+
+    Entity::Entity(Entity&& _other)
+        : entlib(_other.entlib),
+          name(std::move(_other.name)),
+          components(std::move(_other.components)),
+          subSceneComponent(std::move(_other.subSceneComponent)),
+          color(std::move(_other.color)),
+          thumbnail(std::move(_other.thumbnail)),
+          instanceOf(std::move(_other.instanceOf)),
+          deleteCheck(std::move(_other.deleteCheck)),
+          hasASuper(_other.hasASuper),
+          parentScene(std::move(_other.parentScene))
+    {
+        updateSubSceneOwner();
+    }
+
+    Entity& Entity::operator=(const Entity& _other)
+    {
+        if (this == &_other)
+            return *this;
+        entlib = _other.entlib;
+        name = _other.name;
+        components = _other.components;
+        subSceneComponent = _other.subSceneComponent;
+        color = _other.color;
+        thumbnail = _other.thumbnail;
+        instanceOf = _other.instanceOf;
+        deleteCheck = _other.deleteCheck;
+        hasASuper = _other.hasASuper;
+        parentScene = _other.parentScene;
+        updateSubSceneOwner();
+        return *this;
+    }
+
+    Entity& Entity::operator=(Entity&& _other)
+    {
+        if (this == &_other)
+            return *this;
+        entlib = _other.entlib;
+        name = std::move(_other.name);
+        components = std::move(_other.components);
+        subSceneComponent = std::move(_other.subSceneComponent);
+        color = std::move(_other.color);
+        thumbnail = std::move(_other.thumbnail);
+        instanceOf = std::move(_other.instanceOf);
+        deleteCheck = std::move(_other.deleteCheck);
+        hasASuper = _other.hasASuper;
+        parentScene = std::move(_other.parentScene);
+        updateSubSceneOwner();
+        return *this;
     }
 
     char const* Entity::getName() const
@@ -830,14 +898,245 @@ namespace Ent
         }
         return subSceneComponent.has_value() && subSceneComponent->hasOverride();
     }
+
+    void Entity::setParentScene(Scene* scene)
+    {
+        parentScene = scene;
+    }
+
+    Scene* Entity::getParentScene() const
+    {
+        return parentScene;
+    }
+
+    static std::vector<std::string> absolutePath(Entity* entity)
+    {
+        Entity* current = entity;
+        std::vector<std::string> path;
+        while (current != nullptr)
+        {
+            path.emplace_back(current->getName());
+            current = current->getParentScene() ? 
+                current->getParentScene()->getOwnerEntity() :
+                nullptr;
+        }
+        return path;
+    }
+
     EntityRef Entity::makeEntityRef(Entity& entity)
     {
-        // TODO: major 2020-09-25 @Seb: make an EntityRef resolving to _entity in the context of this entity
+        // get the two absolute path
+        auto&& thisPath = absolutePath(this);
+        auto&& entityPath = absolutePath(&entity);
+
+        // TODO: major 2020-09-26 @Seb: assert roots are the same
+
+        while (not thisPath.empty() 
+			and not entityPath.empty() 
+			and thisPath.back() == entityPath.back())
+        {
+            entityPath.pop_back();
+            thisPath.pop_back();
+        }
+        std::stringstream thisToEntityPath;
+        for (size_t i = 0; i < thisPath.size(); ++i)
+        {
+            thisToEntityPath << "../";
+        }
+        for (auto it = entityPath.rbegin(); it != entityPath.rend(); ++it)
+        {
+            thisToEntityPath << *it << '/';
+        }
+        std::string result = thisToEntityPath.str();
+        result.pop_back(); // remove trailing '/'
+        return { std::move(result) };
+    }
+
+    static std::vector<std::string> split(const std::string& str, char delim)
+    {
+        std::vector<std::string> parts;
+        std::string part;
+        std::istringstream istream(str);
+        while (std::getline(istream, part, delim))
+        {
+            if (not part.empty())
+            {
+                parts.push_back(part);
+            }
+        }
+        return parts;
+    }
+
+    static Scene* getSubScene(Entity* entity)
+    {
+        if (auto* subScene = entity->getSubSceneComponent())
+        {
+            if (subScene->isEmbedded)
+            {
+                return subScene->embedded.get();
+            }
+            // TODO: major 2020-09-26 @Seb: else open non embedded subscene ?
+        }
+        return nullptr;
+    }
+
+    static Entity* findChild(Scene* scene, const std::string& name)
+    {
+        auto&& children = scene->objects;
+        const auto found = std::find_if(
+            children.begin(),
+            children.end(),
+            [&name](Entity& child)
+            {
+                return child.getName() == name;
+            });
+        return found == children.end() ? nullptr : &(*found);
     }
 
     Entity* Entity::resolveEntityRef(const EntityRef& _entityRef)
     {
+        if (_entityRef.entityPath.empty())
+        {
+            // empty ref
+            return nullptr;
+        }
+
+        // split around '/'
+        std::vector<std::string> parts = split(_entityRef.entityPath, '/');
+        
+        Entity* entity = this;
+        Scene* sceneDown = getSubScene(entity);
+        Scene* sceneUp = entity->getParentScene();
+
+        while (not parts.empty())
+        {
+            auto& head = parts.front();
+            if (head == "..")
+            {
+                // go up in hierarchy
+                if (sceneUp == nullptr)
+                {
+                    // broken ref
+                    return nullptr;
+                }
+                entity = sceneUp->getOwnerEntity();
+                sceneDown = sceneUp;
+                sceneUp = entity == nullptr ? nullptr : entity->getParentScene();
+            }
+            else if (head != ".")
+            {
+                // go down in child hierarchy named "head"
+                if (sceneDown == nullptr)
+                {
+                    // broken ref
+                    return nullptr;
+                }
+                entity = findChild(sceneDown, head);
+                sceneUp = sceneDown;
+                sceneDown = entity == nullptr ? nullptr : getSubScene(entity);
+            }
+            parts.erase(parts.begin());
+        }
+        return entity;
     }
+
+    void Entity::updateSubSceneOwner()
+    {
+        if (auto* subScene = getSubSceneComponent())
+        {
+            if (subScene->isEmbedded)
+            {
+                subScene->embedded->setOwnerEntity(this);
+            }
+        }
+    }
+
+    // ********************************* Scene ***************************************************
+    
+    Scene::Scene() = default;
+
+    Scene::Scene(std::vector<Entity> entities)
+        : objects(std::move(entities))
+    {
+        updateChildrenContext();
+    }
+
+    Scene::Scene(const Scene& _other)
+        : objects(_other.objects),
+          deleteCheck(_other.deleteCheck),
+          ownerEntity(_other.ownerEntity)
+    {
+        updateChildrenContext();
+    }
+
+    Scene::Scene(Scene&& _other)
+        : objects(std::move(_other.objects)),
+          deleteCheck(std::move(_other.deleteCheck)),
+          ownerEntity(_other.ownerEntity)
+    {
+        updateChildrenContext();
+    }
+
+    Scene& Scene::operator=(const Scene& _other)
+    {
+        if (this == &_other)
+            return *this;
+        objects = _other.objects;
+        deleteCheck = _other.deleteCheck;
+        ownerEntity = _other.ownerEntity;
+        updateChildrenContext();
+        return *this;
+    }
+
+    Scene& Scene::operator=(Scene&& _other)
+    {
+        if (this == &_other)
+            return *this;
+        objects = std::move(_other.objects);
+        deleteCheck = std::move(_other.deleteCheck);
+        ownerEntity = _other.ownerEntity;
+        updateChildrenContext();
+        return *this;
+    }
+
+    Scene Scene::makeInstanceOf() const
+    {
+        std::vector<Entity> instanceEntities;
+        for (auto const& ent : objects)
+        {
+            instanceEntities.push_back(ent.makeInstanceOf());
+        }
+        return Scene{ std::move(instanceEntities) };
+    }
+
+    bool Scene::hasOverride() const
+    {
+        for (Entity const& ent : objects)
+        {
+            if (ent.hasOverride())
+                return true;
+        }
+        return false;
+    }
+
+    Entity* Scene::getOwnerEntity() const
+    {
+        return ownerEntity;
+    }
+
+    void Scene::setOwnerEntity(Entity* entity)
+    {
+        ownerEntity = entity;
+    }
+
+    void Scene::updateChildrenContext()
+    {
+        for (Entity& childEntity : objects)
+        {
+            childEntity.setParentScene(this);
+        }
+    }
+    
 } // namespace Ent
 
 // ********************************** Load/Save ***********************************************

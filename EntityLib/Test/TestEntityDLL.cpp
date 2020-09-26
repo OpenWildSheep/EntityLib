@@ -155,7 +155,7 @@ try
         ENTLIB_ASSERT(allSubEntities.front().getName() == std::string("EP1-Spout_LINK_001"));
         ENTLIB_ASSERT(allSubEntities.front().getColor()[0] == 255);
 
-        // TEST entity refs
+        // TEST simple entity ref creation
         Ent::Component* testEntityRef = ent.addComponent("TestEntityRef");
         ENTLIB_ASSERT(testEntityRef != nullptr);
         testEntityRef->root.at("TestRef")->setEntityRef(ent.makeEntityRef(allSubEntities.front()));
@@ -195,7 +195,7 @@ try
             sysCreat->root.at("Name")->getString() == std::string("Shamane_male")); // set. changed.
         ENTLIB_ASSERT(sysCreat->root.at("Name")->isSet()); // set. changed.
 
-        // TEST entity refs
+        // TEST simple entity refs resolution
         Ent::Component* testEntityRef = ent.getComponent("TestEntityRef");
         ENTLIB_ASSERT(testEntityRef != nullptr);
         ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->isSet());
@@ -208,6 +208,51 @@ try
         ENTLIB_ASSERT(allSubEntities.size() == 1);
         Ent::Entity& originalEnt = allSubEntities.front();
         ENTLIB_ASSERT(resolvedEntity == &originalEnt);
+    }
+
+    {
+        // TEST entity refs
+        // file: entity-references-a.entity
+        // - A-entity [ref to B: "B"]
+	    //     - B [ref to A: ".."]
+        //
+        // file: entity-references.scene
+        // - root-scene
+	    //     - InstanceOfA
+		//     - C [ref to B in InstanceOfA: "../InstanceOfA/B"]
+		//
+        Ent::Scene scene = entlib.loadScene("entity-references.scene");
+        ENTLIB_ASSERT(scene.objects.size() == 2);
+        Ent::Entity& instanceOfA = scene.objects.front();
+        ENTLIB_ASSERT(strcmp(instanceOfA.getName(), "InstanceOfA") == 0);
+        Ent::SubSceneComponent* subSceneComp = instanceOfA.getSubSceneComponent();
+        ENTLIB_ASSERT(subSceneComp != nullptr);
+        ENTLIB_ASSERT(subSceneComp->isEmbedded);
+        ENTLIB_ASSERT(subSceneComp->embedded->objects.size() == 1);
+        Ent::Entity& B = subSceneComp->embedded->objects.front();
+        ENTLIB_ASSERT(strcmp(B.getName(), "B") == 0);
+        Ent::Entity& C = scene.objects[1];
+        ENTLIB_ASSERT(strcmp(C.getName(), "C") == 0);
+        
+        // TEST entity ref creation
+        Ent::EntityRef BToInstanceOfAref = B.makeEntityRef(instanceOfA);
+        ENTLIB_ASSERT(BToInstanceOfAref.entityPath == "..");
+        Ent::EntityRef InstanceOfAToBref = instanceOfA.makeEntityRef(B);
+        ENTLIB_ASSERT(InstanceOfAToBref.entityPath == "B");
+        Ent::EntityRef CToBref = C.makeEntityRef(B);
+        ENTLIB_ASSERT(CToBref.entityPath == "../InstanceOfA/B");
+        Ent::EntityRef BToCref = B.makeEntityRef(C);
+        ENTLIB_ASSERT(BToCref.entityPath == "../../C");
+        
+        // TEST entity ref resolution
+        Ent::Entity* resolvedInstanceOfA = B.resolveEntityRef({".."});
+        ENTLIB_ASSERT(resolvedInstanceOfA == &instanceOfA);
+        Ent::Entity* resolvedB = instanceOfA.resolveEntityRef({"B"});
+        ENTLIB_ASSERT(resolvedB == &B);
+        Ent::Entity* resolvedBbis = C.resolveEntityRef({"../InstanceOfA/B"});
+        ENTLIB_ASSERT(resolvedBbis == &B);
+        Ent::Entity* resolvedC = B.resolveEntityRef({"../../C"});
+        ENTLIB_ASSERT(resolvedC == &C);
     }
 
     auto testInstanceOf = [](Ent::Entity const& ent) {

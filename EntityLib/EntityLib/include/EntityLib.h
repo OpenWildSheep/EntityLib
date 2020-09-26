@@ -397,6 +397,8 @@ namespace Ent
         std::vector<Entity> objects; ///< All Ent::Entity of this Scene
         DeleteCheck deleteCheck;
 
+        Entity* resolveEntityRef(const EntityRef& _entityRef);
+
         Scene makeInstanceOf() const;
 
         bool hasOverride() const;

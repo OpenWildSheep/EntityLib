@@ -255,6 +255,13 @@ try
         ENTLIB_ASSERT(resolvedBbis == &B);
         Ent::Entity* resolvedC = B.resolveEntityRef({"../../C"});
         ENTLIB_ASSERT(resolvedC == &C);
+
+        // TEST entity ref resolution from scenes
+        ENTLIB_ASSERT(scene.resolveEntityRef({".."}) == nullptr);
+        ENTLIB_ASSERT(scene.resolveEntityRef({"InstanceOfA"}) == &instanceOfA);
+        ENTLIB_ASSERT(scene.resolveEntityRef({"InstanceOfA/B"}) == &B);
+        ENTLIB_ASSERT(scene.resolveEntityRef({"C"}) == &C);
+        ENTLIB_ASSERT(scene.resolveEntityRef({"InstanceOfA/B/../../C"}) == &C);
     }
 
     auto testInstanceOf = [](Ent::Entity const& ent) {

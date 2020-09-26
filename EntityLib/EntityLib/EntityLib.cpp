@@ -1006,6 +1006,44 @@ namespace Ent
         return found == children.end() ? nullptr : &(*found);
     }
 
+    static Entity* resolveEntityRefRecursive(
+        Entity* current, Scene* up, Scene* down, 
+        std::vector<std::string>& path)
+    {
+        auto& head = path.front();
+        
+        if (head == "..")
+        {
+            // go up in hierarchy
+            if (up == nullptr)
+            {
+                // broken ref
+                return nullptr;
+            }
+            current = up->getOwnerEntity();
+            down = up;
+            up = current == nullptr ? nullptr : current->getParentScene();
+        }
+        else if (head != ".")
+        {
+            // go down in child hierarchy named "head"
+            if (down == nullptr)
+            {
+                // broken ref
+                return nullptr;
+            }
+            current = findChild(down, head);
+            up = down;
+            down = current == nullptr ? nullptr : getSubScene(current);
+        }
+        path.erase(path.begin());
+        if (path.empty())
+        {
+            return current;
+        }
+        return resolveEntityRefRecursive(current, up, down, path);
+    }
+
     Entity* Entity::resolveEntityRef(const EntityRef& _entityRef)
     {
         if (_entityRef.entityPath.empty())
@@ -1017,40 +1055,11 @@ namespace Ent
         // split around '/'
         std::vector<std::string> parts = split(_entityRef.entityPath, '/');
         
-        Entity* entity = this;
-        Scene* sceneDown = getSubScene(entity);
-        Scene* sceneUp = entity->getParentScene();
+        Entity* current = this;
+        Scene* down = getSubScene(current);
+        Scene* up = current->getParentScene();
 
-        while (not parts.empty())
-        {
-            auto& head = parts.front();
-            if (head == "..")
-            {
-                // go up in hierarchy
-                if (sceneUp == nullptr)
-                {
-                    // broken ref
-                    return nullptr;
-                }
-                entity = sceneUp->getOwnerEntity();
-                sceneDown = sceneUp;
-                sceneUp = entity == nullptr ? nullptr : entity->getParentScene();
-            }
-            else if (head != ".")
-            {
-                // go down in child hierarchy named "head"
-                if (sceneDown == nullptr)
-                {
-                    // broken ref
-                    return nullptr;
-                }
-                entity = findChild(sceneDown, head);
-                sceneUp = sceneDown;
-                sceneDown = entity == nullptr ? nullptr : getSubScene(entity);
-            }
-            parts.erase(parts.begin());
-        }
-        return entity;
+        return resolveEntityRefRecursive(current, up, down, parts);
     }
 
     void Entity::updateSubSceneOwner()
@@ -1110,6 +1119,24 @@ namespace Ent
         ownerEntity = _other.ownerEntity;
         updateChildrenContext();
         return *this;
+    }
+
+    Entity* Scene::resolveEntityRef(const EntityRef& _entityRef)
+    {
+        if (_entityRef.entityPath.empty())
+        {
+            // empty ref
+            return nullptr;
+        }
+
+        // split around '/'
+        std::vector<std::string> parts = split(_entityRef.entityPath, '/');
+        
+        Entity* current = getOwnerEntity();
+        Scene* down = this;
+        Scene* up = current == nullptr ? nullptr : current->getParentScene();
+
+        return resolveEntityRefRecursive(current, up, down, parts);
     }
 
     Scene Scene::makeInstanceOf() const

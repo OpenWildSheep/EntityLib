@@ -200,6 +200,15 @@ namespace Ent
         throw BadType();
     }
 
+    EntityRef Node::getEntityRef() const
+    {
+        if (value.is<Override<EntityRef>>())
+        {
+            return value.get<Override<EntityRef>>().get();
+        }
+        throw BadType();
+    }
+
     const Node::Value& Node::GetRawValue() const
     {
         return value;
@@ -220,6 +229,11 @@ namespace Ent
     void Node::setBool(bool val)
     {
         value.get<Override<bool>>().set(val);
+    }
+
+    void Node::setEntityRef(EntityRef entityRef)
+    {
+        value.get<Override<EntityRef>>().set(entityRef);
     }
 
     struct UnSet
@@ -816,6 +830,14 @@ namespace Ent
         }
         return subSceneComponent.has_value() && subSceneComponent->hasOverride();
     }
+    EntityRef Entity::makeEntityRef(Entity& entity)
+    {
+        // TODO: major 2020-09-25 @Seb: make an EntityRef resolving to _entity in the context of this entity
+    }
+
+    Entity* Entity::resolveEntityRef(const EntityRef& _entityRef)
+    {
+    }
 } // namespace Ent
 
 // ********************************** Load/Save ***********************************************
@@ -997,43 +1019,28 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
         result = Ent::Node(std::move(arr), &nodeSchema);
     }
     break;
+    case Ent::DataType::entityRef:
+    {
+        Ent::EntityRef const def;
+
+        tl::optional<Ent::EntityRef> const supVal = (super != nullptr and super->isSet()) ?
+                                    tl::optional<Ent::EntityRef>( super->getEntityRef()) :
+                                    tl::optional<Ent::EntityRef>(tl::nullopt);
+
+        // TODO: major 2020-09-22 @Seb: load an entity ref
+        tl::optional<std::string> const refString = data.is_string() ?
+                                                  data.get<std::string>() :
+                                                  tl::optional<std::string>(tl::nullopt);
+
+		tl::optional<Ent::EntityRef> const val = refString.has_value() ? 
+			tl::optional<Ent::EntityRef>(Ent::EntityRef{refString.value()}) :
+            tl::optional<Ent::EntityRef>(tl::nullopt);
+
+        result = Ent::Node(Ent::Override<Ent::EntityRef>(def, supVal, val), &nodeSchema);
+    }
+    break;
     }
     return result;
-}
-
-static json saveFreeObjectNode(Ent::Node const& node)
-{
-    json data;
-    switch (node.getDataType())
-    {
-    case Ent::DataType::null: break;
-    case Ent::DataType::string: data = node.getString(); break;
-    case Ent::DataType::boolean: data = node.getBool(); break;
-    case Ent::DataType::integer: data = node.getInt(); break;
-    case Ent::DataType::number: data = node.getFloat(); break;
-    case Ent::DataType::object:
-    {
-        data = json::object();
-        for (auto const& name : node.getFieldNames())
-        {
-            Ent::Node const* subNode = node.at(name);
-            json subJson = saveFreeObjectNode(*subNode);
-            data[name] = std::move(subJson);
-        }
-    }
-    break;
-    case Ent::DataType::array:
-    {
-        data = json::array();
-        for (Ent::Node const* item : node.getItems())
-        {
-            json tmpNode = saveFreeObjectNode(*item);
-            data.emplace_back(std::move(tmpNode));
-        }
-    }
-    break;
-    }
-    return data;
 }
 
 static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
@@ -1078,6 +1085,12 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
         }
     }
     break;
+    case Ent::DataType::entityRef:
+    {
+        Ent::EntityRef ref = node.getEntityRef();
+        data = ref.entityPath;
+    }
+    break;
     }
     return data;
 }
@@ -1116,26 +1129,17 @@ static Ent::Entity loadEntity(
     tl::optional<std::string> const thumbnail = entNode.count("Thumbnail") != 0 ?
                                                     entNode.at("Thumbnail").get<std::string>() :
                                                     tl::optional<std::string>();
-    Ent::Override<std::string> superThumbnail =
-        superEntity != nullptr ?
-            superEntity->getThumbnailValue() :
-            Ent::Override<std::string>{ std::string(), tl::nullopt, tl::nullopt };
+    Ent::Override<std::string> superThumbnail = superEntity->getThumbnailValue();
     Ent::Override<std::string> ovThumbnail = superThumbnail.makeOverridedInstanceOf(thumbnail);
 
     tl::optional<std::string> const name = entNode.count("Name") != 0 ?
                                                entNode.at("Name").get<std::string>() :
                                                tl::optional<std::string>();
 
-    Ent::Override<std::string> superName =
-        superEntity != nullptr ?
-            superEntity->getNameValue() :
-            Ent::Override<std::string>{ std::string(), tl::nullopt, tl::nullopt };
+    Ent::Override<std::string> superName = superEntity->getNameValue();
     Ent::Override<std::string> ovName = superName.makeOverridedInstanceOf(name);
 
-    Ent::Override<std::string> superInstanceOf =
-        superEntity != nullptr ?
-            superEntity->getInstanceOfValue() :
-            Ent::Override<std::string>{ std::string(), tl::nullopt, tl::nullopt };
+    Ent::Override<std::string> superInstanceOf = superEntity->getInstanceOfValue();
     Ent::Override<std::string> ovInstanceOf = superName.makeOverridedInstanceOf(instanceOf);
 
     Ent::Node ovColor = Ent::makeDefaultColorField(entlib);

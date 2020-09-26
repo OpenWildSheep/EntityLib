@@ -50,6 +50,11 @@ namespace Ent
         bool hasOverride() const;
     };
 
+    struct EntityRef
+    {
+        std::string entityPath;
+    };
+
     template <typename V>
     struct Override
     {
@@ -112,7 +117,8 @@ namespace Ent
     {
         /// @cond PRIVATE
         using Value = mapbox::util::
-            variant<Null, Override<std::string>, Override<float>, Override<int64_t>, Object, Array, Override<bool>>;
+        variant<Null, Override<std::string>, Override<float>, Override<int64_t>, Object, Array,
+                Override<bool>, Override<EntityRef>>;
         Node() = default;
         Node(Value val, Subschema const* schema);
         /// @endcond
@@ -142,6 +148,7 @@ namespace Ent
         int64_t getInt() const; ///< @pre integer. @brief Get the value as int
         char const* getString() const; ///< @pre Ent::DataType == string. @brief Get the value as string
         bool getBool() const; ///< @pre type==Ent::DataType::boolean. @brief Get the value as bool
+        EntityRef getEntityRef() const; ///< @pre type==Ent::DataType::entityRef. @brief Get the value as an Entity reference
 
         const Value& GetRawValue()
             const; ///< returns a reference to the raw Value (variant) stored at this node. Useful to write visitors.
@@ -150,6 +157,7 @@ namespace Ent
         void setInt(int64_t val); ///< @pre type==Ent::DataType::integer. @brief Set the int64_t value
         void setString(char const* val); ///< @pre type==Ent::DataType::string. @brief Set the string value
         void setBool(bool val); ///< @pre type==Ent::DataType::boolean. @brief Set the bool value
+        void setEntityRef(EntityRef); ///< @pre type==Ent::DataType::entityRef. @brief Set the Entity reference value
 
         /// @brief Fallback the the prefab or default value. The value will not be saved in json.
         /// @pre Ent::DataType is in {number, integer, boolean, string}
@@ -321,6 +329,10 @@ namespace Ent
         Entity makeInstanceOf() const;
 
         bool hasOverride() const;
+
+        EntityRef makeEntityRef(Entity& entity);
+
+        Entity* resolveEntityRef(const EntityRef& _entityRef);
 
         Override<std::string> const& getNameValue() const
         {

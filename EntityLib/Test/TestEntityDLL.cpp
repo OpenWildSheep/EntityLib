@@ -44,6 +44,9 @@ static void printNode(char const* name, Ent::Node const& node, std::string const
     case Ent::DataType::boolean:
         printf("%s%s [boolean] : %s\n", tab.c_str(), name, node.getBool() ? "true" : "false");
         break;
+    case Ent::DataType::entityRef:
+        printf("%s%s [EntityRef] : %s\n", tab.c_str(), name, node.getEntityRef().entityPath.c_str());
+        break;
     }
 }
 
@@ -84,6 +87,7 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
         }
         break;
     case Ent::DataType::string: std::cout << "string" << std::endl; break;
+    case Ent::DataType::entityRef: std::cout << "entity ref" << std::endl; break;
     }
 }
 
@@ -151,6 +155,11 @@ try
         ENTLIB_ASSERT(allSubEntities.front().getName() == std::string("EP1-Spout_LINK_001"));
         ENTLIB_ASSERT(allSubEntities.front().getColor()[0] == 255);
 
+        // TEST entity refs
+        Ent::Component* testEntityRef = ent.addComponent("TestEntityRef");
+        ENTLIB_ASSERT(testEntityRef != nullptr);
+        testEntityRef->root.at("TestRef")->setEntityRef(ent.makeEntityRef(allSubEntities.front()));
+        
         sysCreat->root.at("Name")->setString("Shamane_male");
         entlib.saveEntity(ent, "prefab.copy.entity");
     }
@@ -185,6 +194,20 @@ try
         ENTLIB_ASSERT(
             sysCreat->root.at("Name")->getString() == std::string("Shamane_male")); // set. changed.
         ENTLIB_ASSERT(sysCreat->root.at("Name")->isSet()); // set. changed.
+
+        // TEST entity refs
+        Ent::Component* testEntityRef = ent.getComponent("TestEntityRef");
+        ENTLIB_ASSERT(testEntityRef != nullptr);
+        ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->isSet());
+        Ent::EntityRef entityRef = testEntityRef->root.at("TestRef")->getEntityRef();
+        Ent::Entity* resolvedEntity = ent.resolveEntityRef(entityRef);
+        ENTLIB_ASSERT(resolvedEntity != nullptr);
+
+        Ent::SubSceneComponent* subScenecomp = ent.getSubSceneComponent();
+        auto&& allSubEntities = subScenecomp->embedded->objects;
+        ENTLIB_ASSERT(allSubEntities.size() == 1);
+        Ent::Entity& originalEnt = allSubEntities.front();
+        ENTLIB_ASSERT(resolvedEntity == &originalEnt);
     }
 
     auto testInstanceOf = [](Ent::Entity const& ent) {

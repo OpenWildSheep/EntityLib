@@ -52,6 +52,7 @@ namespace Ent
 
     struct EntityRef
     {
+        /// @brief string representation of this entity ref, works like a file path, always relative.
         std::string entityPath;
     };
 
@@ -338,12 +339,18 @@ namespace Ent
 
         bool hasOverride() const;
 
+        /// @brief Create a relative EntityRef to the given entity
+        /// that will resolve to it from this entity.
         EntityRef makeEntityRef(Entity& entity);
 
+        /// @brief Resolve an EntityRef relative to this entity.
+        /// Returns nullptr in case of failure.
         Entity* resolveEntityRef(const EntityRef& _entityRef);
 
+        /// @brief Get the parent scene object containing this entity, if any.
         Scene* getParentScene() const;
 
+        /// @brief Set the parent scene object containing this entity.
         void setParentScene(Scene* scene);
 
         Override<std::string> const& getNameValue() const
@@ -377,7 +384,7 @@ namespace Ent
         Override<std::string> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
         DeleteCheck deleteCheck;
         bool hasASuper = false;
-        Scene* parentScene = nullptr;
+        Scene* parentScene = nullptr; ///< ptr the scene containing this entity.
     };
 
     /// Contain all data of a scene. (A list of Entity)
@@ -397,18 +404,22 @@ namespace Ent
         std::vector<Entity> objects; ///< All Ent::Entity of this Scene
         DeleteCheck deleteCheck;
 
+        /// @brief Resolve an EntityRef relative to this scene.
+        /// Returns nullptr in case of failure.
         Entity* resolveEntityRef(const EntityRef& _entityRef);
 
         Scene makeInstanceOf() const;
 
         bool hasOverride() const;
 
+        /// @brief Get the entity owning this scene if it is embedded.
         Entity* getOwnerEntity() const;
 
+        /// @brief Set the entity owning this scene if it is embedded.
         void setOwnerEntity(Entity* entity);
 
     private:
-        Entity* ownerEntity = nullptr;
+        Entity* ownerEntity = nullptr; ///< the entity owning this scene if it is embedded
         void updateChildrenContext();
     };
 

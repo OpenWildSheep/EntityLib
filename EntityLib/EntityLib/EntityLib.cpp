@@ -909,13 +909,15 @@ namespace Ent
         return parentScene;
     }
 
-    static std::vector<std::string> absolutePath(Entity* entity)
+    static std::vector<std::string> absolutePath(Entity* entity, Entity*& rootEntity, Scene*& rootScene)
     {
         Entity* current = entity;
         std::vector<std::string> path;
         while (current != nullptr)
         {
             path.emplace_back(current->getName());
+            rootEntity = current;
+            rootScene = current->getParentScene();
             current = current->getParentScene() ? 
                 current->getParentScene()->getOwnerEntity() :
                 nullptr;
@@ -925,11 +927,22 @@ namespace Ent
 
     EntityRef Entity::makeEntityRef(Entity& entity)
     {
+        Entity  *thisRootEntity = nullptr,
+                *entityRootEntity = nullptr;
+        Scene   *thisRootScene = nullptr,
+                *entityRootScene = nullptr;
         // get the two absolute path
-        auto&& thisPath = absolutePath(this);
-        auto&& entityPath = absolutePath(&entity);
+        auto&& thisPath = absolutePath(this, thisRootEntity, thisRootScene);
+        auto&& entityPath = absolutePath(&entity, entityRootEntity, entityRootScene);
 
-        // TODO: major 2020-09-26 @Seb: assert roots are the same
+        // entities should either share a common root scene
+        // or a common root entity if they are in a .entity (i.e there is no root scene)
+        if (thisRootScene != entityRootScene
+            or thisRootEntity == nullptr and thisRootEntity != entityRootEntity)
+        {
+            // cannot reference unrelated entities
+            return {};
+        }
 
         while (not thisPath.empty() 
 			and not entityPath.empty() 

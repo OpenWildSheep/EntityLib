@@ -245,6 +245,8 @@ try
         ENTLIB_ASSERT(BToCref.entityPath == "../../C");
         
         // TEST entity ref resolution
+        Ent::Entity* resolvedEmptyRef = instanceOfA.resolveEntityRef({});
+        ENTLIB_ASSERT(resolvedEmptyRef == nullptr);
         Ent::Entity* resolvedInstanceOfA = B.resolveEntityRef({".."});
         ENTLIB_ASSERT(resolvedInstanceOfA == &instanceOfA);
         Ent::Entity* resolvedB = instanceOfA.resolveEntityRef({"B"});

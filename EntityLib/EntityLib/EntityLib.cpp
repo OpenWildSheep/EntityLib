@@ -951,28 +951,10 @@ namespace Ent
         auto&& thisPath = std::get<0>(thisPathInfos);
         auto&& entityPath = std::get<0>(entityPathInfos);
 
-        // remove common ancestors
-        while (not thisPath.empty() 
-			and not entityPath.empty() 
-			and thisPath.back() == entityPath.back())
-        {
-            entityPath.pop_back();
-            thisPath.pop_back();
-        }
-        std::stringstream thisToEntityPath;
-        // go sufficiently back in hierarchy
-        for (size_t i = 0; i < thisPath.size(); ++i)
-        {
-            thisToEntityPath << "../";
-        }
-        // then go forward to the target
-        for (auto it = entityPath.rbegin(); it != entityPath.rend(); ++it)
-        {
-            thisToEntityPath << *it << '/';
-        }
-        std::string result = thisToEntityPath.str();
-        result.pop_back(); // remove trailing '/'
-        return { std::move(result) };
+        std::string relativePath = computeRelativePath(
+            std::move(thisPath), std::move(entityPath), false);
+
+        return { std::move(relativePath) };
     }
 
     static Scene* getSubScene(Entity* entity)

@@ -408,6 +408,9 @@ namespace Ent
         /// Returns nullptr in case of failure.
         Entity* resolveEntityRef(const EntityRef& _entityRef);
 
+        /// @brief Find an entity in the scene hierarchy given its path 
+        Entity* findEntityByPath(const std::string& _path);
+
         Scene makeInstanceOf() const;
 
         bool hasOverride() const;

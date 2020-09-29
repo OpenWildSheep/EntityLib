@@ -1134,6 +1134,11 @@ namespace Ent
         return resolveEntityRefRecursive(current, up, down, parts);
     }
 
+    Entity* Scene::findEntityByPath(const std::string& _path)
+    {
+        return resolveEntityRef({ _path });
+    }
+
     Scene Scene::makeInstanceOf() const
     {
         std::vector<Entity> instanceEntities;

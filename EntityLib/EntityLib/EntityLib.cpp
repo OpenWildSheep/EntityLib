@@ -909,9 +909,12 @@ namespace Ent
         return parentScene;
     }
 
-    static std::vector<std::string> absolutePath(Entity* entity, Entity*& rootEntity, Scene*& rootScene)
+    static std::tuple<std::vector<std::string>, Entity*, Scene*>
+    getAbsolutePathReversed(Entity* entity)
     {
         Entity* current = entity;
+        Entity* rootEntity = nullptr;
+        Scene* rootScene = nullptr;
         std::vector<std::string> path;
         while (current != nullptr)
         {
@@ -922,19 +925,20 @@ namespace Ent
                 current->getParentScene()->getOwnerEntity() :
                 nullptr;
         }
-        return path;
+        return { std::move(path), rootEntity, rootScene };
     }
 
     EntityRef Entity::makeEntityRef(Entity& entity)
     {
-        Entity  *thisRootEntity = nullptr,
-                *entityRootEntity = nullptr;
-        Scene   *thisRootScene = nullptr,
-                *entityRootScene = nullptr;
         // get the two absolute path
-        auto&& thisPath = absolutePath(this, thisRootEntity, thisRootScene);
-        auto&& entityPath = absolutePath(&entity, entityRootEntity, entityRootScene);
+        auto&& thisPathInfos = getAbsolutePathReversed(this);
+        auto&& entityPathInfos = getAbsolutePathReversed(&entity);
 
+        Entity  *thisRootEntity = std::get<1>(thisPathInfos),
+                *entityRootEntity = std::get<1>(entityPathInfos);
+        Scene   *thisRootScene = std::get<2>(thisPathInfos),
+                *entityRootScene = std::get<2>(entityPathInfos);
+        
         // entities should either share a common root scene
         // or a common root entity if they are in a .entity (i.e there is no root scene)
         if (thisRootScene != entityRootScene
@@ -943,6 +947,9 @@ namespace Ent
             // cannot reference unrelated entities
             return {};
         }
+
+        auto&& thisPath = std::get<0>(thisPathInfos);
+        auto&& entityPath = std::get<0>(entityPathInfos);
 
         // remove common ancestors
         while (not thisPath.empty() 

@@ -1,6 +1,7 @@
 #include "Tools.h"
 
 #include <fstream>
+#include <sstream>
 
 using namespace nlohmann;
 
@@ -26,4 +27,19 @@ char const* Ent::getRefTypeName(char const* link)
         return nullptr;
     }
     return defPos + strlen(definitionsStr);
+}
+
+std::vector<std::string> Ent::splitString(const std::string& _str, char _delimiter)
+{
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream tokenStream(_str);
+    while (std::getline(tokenStream, token, _delimiter))
+    {
+        if (not token.empty())
+        {
+            tokens.push_back(token);
+        }
+    }
+    return tokens;
 }

@@ -968,21 +968,6 @@ namespace Ent
         return { std::move(result) };
     }
 
-    static std::vector<std::string> split(const std::string& str, char delim)
-    {
-        std::vector<std::string> parts;
-        std::string part;
-        std::istringstream istream(str);
-        while (std::getline(istream, part, delim))
-        {
-            if (not part.empty())
-            {
-                parts.push_back(part);
-            }
-        }
-        return parts;
-    }
-
     static Scene* getSubScene(Entity* entity)
     {
         if (auto* subScene = entity->getSubSceneComponent())
@@ -1056,7 +1041,7 @@ namespace Ent
         }
 
         // split around '/'
-        std::vector<std::string> parts = split(_entityRef.entityPath, '/');
+        std::vector<std::string> parts = splitString(_entityRef.entityPath, '/');
         
         Entity* current = this;
         Scene* down = getSubScene(current);
@@ -1133,7 +1118,7 @@ namespace Ent
         }
 
         // split around '/'
-        std::vector<std::string> parts = split(_entityRef.entityPath, '/');
+        std::vector<std::string> parts = splitString(_entityRef.entityPath, '/');
         
         Entity* current = getOwnerEntity();
         Scene* down = this;

@@ -10,18 +10,6 @@
 
 using namespace nlohmann;
 
-static std::vector<std::string> split(const std::string& _str, char _delimiter)
-{
-    std::vector<std::string> tokens;
-    std::string token;
-    std::istringstream tokenStream(_str);
-    while (std::getline(tokenStream, token, _delimiter))
-    {
-        tokens.push_back(token);
-    }
-    return tokens;
-}
-
 Ent::SchemaLoader::SchemaLoader(std::filesystem::path _schemaPath)
     : m_schemaPath(std::move(_schemaPath))
 {
@@ -78,7 +66,7 @@ void Ent::SchemaLoader::parseSchema(
         json const* node = refRoot;
         objectPath.make_preferred();
         for (auto const& token :
-             split(objectPath.string(), std::filesystem::path::preferred_separator))
+             splitString(objectPath.string(), std::filesystem::path::preferred_separator))
         {
             node = &((*node).at(token));
         }

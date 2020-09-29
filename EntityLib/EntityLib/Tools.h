@@ -16,4 +16,6 @@ nlohmann::json loadJsonFile(std::filesystem::path const& path);
 namespace Ent
 {
     char const* getRefTypeName(char const* link);
+
+    std::vector<std::string> splitString(const std::string& _str, char _delimiter);
 }

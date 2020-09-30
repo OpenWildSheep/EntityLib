@@ -222,7 +222,17 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("detach_entity_from_prefab", &Entity::detachEntityFromPrefab);
 
     py::class_<Scene>(ent, "Scene")
-        .def_readonly("entities", &Scene::objects, py::return_value_policy::reference_internal);
+        .def_property_readonly(
+            "entities",
+            [](Scene* scene) -> std::vector<Entity*> {
+                std::vector<Entity*> entities;
+                for (std::unique_ptr<Entity>& ent : scene->objects)
+                {
+                    entities.push_back(ent.get());
+                }
+                return entities;
+            },
+            py::return_value_policy::reference_internal);
 
     py::class_<ComponentsSchema>(ent, "ComponentsSchema")
         .def_readonly("components", &ComponentsSchema::components, py::return_value_policy::reference)

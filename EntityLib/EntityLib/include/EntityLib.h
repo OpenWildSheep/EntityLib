@@ -117,9 +117,15 @@ namespace Ent
     struct ENTLIB_DLLEXPORT Node
     {
         /// @cond PRIVATE
-        using Value = mapbox::util::
-        variant<Null, Override<std::string>, Override<float>, Override<int64_t>, Object, Array,
-                Override<bool>, Override<EntityRef>>;
+        using Value = mapbox::util::variant<
+            Null,
+            Override<std::string>,
+            Override<float>,
+            Override<int64_t>,
+            Object,
+            Array,
+            Override<bool>,
+            Override<EntityRef>>;
         Node() = default;
         Node(Value val, Subschema const* schema);
         /// @endcond
@@ -149,7 +155,8 @@ namespace Ent
         int64_t getInt() const; ///< @pre integer. @brief Get the value as int
         char const* getString() const; ///< @pre Ent::DataType == string. @brief Get the value as string
         bool getBool() const; ///< @pre type==Ent::DataType::boolean. @brief Get the value as bool
-        EntityRef getEntityRef() const; ///< @pre type==Ent::DataType::entityRef. @brief Get the value as an Entity reference
+        EntityRef getEntityRef()
+            const; ///< @pre type==Ent::DataType::entityRef. @brief Get the value as an Entity reference
 
         const Value& GetRawValue()
             const; ///< returns a reference to the raw Value (variant) stored at this node. Useful to write visitors.
@@ -243,18 +250,18 @@ namespace Ent
         bool isEmbedded = false; ///< If true, data are in embedded, else data are in file
         Override<std::string> file; ///< Path to a .scene file, whene isEmbedded is false
         size_t index = 0; ///< Useful to keep the componants order in the json file
-        value_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
+        std::unique_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
         DeleteCheck deleteCheck;
 
         explicit SubSceneComponent(
             bool _isEmbedded = false,
             Override<std::string> _file = {},
             size_t _index = 0,
-            value_ptr<Scene> embedded = {});
-        SubSceneComponent(SubSceneComponent const&);
-        SubSceneComponent(SubSceneComponent&&) noexcept;
-        SubSceneComponent& operator=(SubSceneComponent const&);
-        SubSceneComponent& operator=(SubSceneComponent&&) noexcept;
+            std::unique_ptr<Scene> embedded = {});
+        SubSceneComponent(SubSceneComponent const&) = delete;
+        SubSceneComponent(SubSceneComponent&&) noexcept = delete;
+        SubSceneComponent& operator=(SubSceneComponent const&) = delete;
+        SubSceneComponent& operator=(SubSceneComponent&&) noexcept = delete;
 
         /// Switch SubSceneComponent to embedded mode or to external mode
         void makeEmbedded(bool _embedded ///< false to make extern (not embedded)
@@ -262,7 +269,7 @@ namespace Ent
 
         bool hasOverride() const;
 
-        SubSceneComponent makeInstanceOf() const;
+        std::unique_ptr<SubSceneComponent> makeInstanceOf() const;
     };
 
     class EntityLib;
@@ -276,20 +283,16 @@ namespace Ent
             EntityLib const& _entlib,
             Override<std::string> _name,
             std::map<std::string, Component> _components,
-            tl::optional<SubSceneComponent> _subSceneComponent,
+            std::unique_ptr<SubSceneComponent> _subSceneComponent,
             Node color = {},
             Override<std::string> _thumbnail = {},
             Override<std::string> _instanceOf = {},
             bool hasASuper = false);
+        Entity(Entity const&) = delete;
+        Entity& operator=(Entity const&) = delete;
+        Entity(Entity&&) = delete;
+        Entity& operator=(Entity&&) = delete;
         /// @endcond
-
-        Entity(const Entity& _other);
-
-        Entity(Entity&& _other);
-
-        Entity& operator=(const Entity& _other);
-
-        Entity& operator=(Entity&& _other);
 
         char const* getName() const; ///< Get the name of the component
         void setName(std::string name); ///< Set the name of the component
@@ -333,9 +336,9 @@ namespace Ent
         /// All properties overrided in _entity OR in the prefeb become overrided in the Entity.
         /// The prefab is no more referenced.
         /// The properties keep the sames values
-        Entity detachEntityFromPrefab() const;
+        std::unique_ptr<Entity> detachEntityFromPrefab() const;
 
-        Entity makeInstanceOf() const;
+        std::unique_ptr<Entity> makeInstanceOf() const;
 
         bool hasOverride() const;
 
@@ -373,16 +376,17 @@ namespace Ent
             return instanceOf;
         }
 
+        DeleteCheck deleteCheck;
+
     private:
         void updateSubSceneOwner();
         EntityLib const* entlib{}; ///< Reference the entity lib to find the schema when needed
         Override<std::string> name; ///< Entity name
         std::map<std::string, Component> components; ///< All components of this Entity
-        tl::optional<SubSceneComponent> subSceneComponent; ///< the optional SubScene Component
+        std::unique_ptr<SubSceneComponent> subSceneComponent; ///< the optional SubScene Component
         Node color; ///< The optional Color of the Entity
         Override<std::string> thumbnail; ///< Path to the thumbnail mesh (.wthumb)
         Override<std::string> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
-        DeleteCheck deleteCheck;
         bool hasASuper = false;
         Scene* parentScene = nullptr; ///< ptr the scene containing this entity.
     };
@@ -391,27 +395,23 @@ namespace Ent
     struct Scene
     {
         Scene();
-        Scene(std::vector<Entity>);
+        Scene(std::vector<std::unique_ptr<Entity>>);
+        Scene(Scene const&) = delete;
+        Scene& operator=(Scene const&) = delete;
+        Scene(Scene&&) = delete;
+        Scene& operator=(Scene&&) = delete;
 
-        Scene(const Scene& _other);
-
-        Scene(Scene&& _other);
-
-        Scene& operator=(const Scene& _other);
-
-        Scene& operator=(Scene&& _other);
-
-        std::vector<Entity> objects; ///< All Ent::Entity of this Scene
+        std::vector<std::unique_ptr<Entity>> objects; ///< All Ent::Entity of this Scene
         DeleteCheck deleteCheck;
 
         /// @brief Resolve an EntityRef relative to this scene.
         /// Returns nullptr in case of failure.
         Entity* resolveEntityRef(const EntityRef& _entityRef);
 
-        /// @brief Find an entity in the scene hierarchy given its path 
+        /// @brief Find an entity in the scene hierarchy given its path
         Entity* findEntityByPath(const std::string& _path);
 
-        Scene makeInstanceOf() const;
+        std::unique_ptr<Scene> makeInstanceOf() const;
 
         bool hasOverride() const;
 
@@ -463,24 +463,22 @@ namespace Ent
         /// @endcond
 
         /// Load the Entity at path _entityPath
-        Entity loadEntity(
+        std::unique_ptr<Entity> loadEntity(
             std::filesystem::path const& entityPath, Ent::Entity const* super = nullptr) const;
 
         /// Load the Scene at path _scenePath
-        Scene loadScene(std::filesystem::path const& _scenePath) const;
+        std::unique_ptr<Scene> loadScene(std::filesystem::path const& _scenePath) const;
 
         /// Save the Entity at path _entityPath
         void saveEntity(Entity const& entity, std::filesystem::path const& _entityPath) const;
 
         /// Save the Scene at path _scenePath
-        void saveScene(
-            Scene const& scene,
-            std::filesystem::path const& _scenePath) const;
+        void saveScene(Scene const& scene, std::filesystem::path const& _scenePath) const;
 
         /// @brief Create an Entity which instanciate an other.
         ///
         /// This allow to override some properties without change the prefab properties.
-        Entity makeInstanceOf(std::string _instanceOf ///< Path to the prefab Entity
+        std::unique_ptr<Entity> makeInstanceOf(std::string _instanceOf ///< Path to the prefab Entity
         ) const;
     };
 

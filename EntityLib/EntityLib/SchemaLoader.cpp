@@ -10,22 +10,12 @@
 
 using namespace nlohmann;
 
-static std::vector<std::string> split(const std::string& _str, char _delimiter)
-{
-    std::vector<std::string> tokens;
-    std::string token;
-    std::istringstream tokenStream(_str);
-    while (std::getline(tokenStream, token, _delimiter))
-    {
-        tokens.push_back(token);
-    }
-    return tokens;
-}
-
 Ent::SchemaLoader::SchemaLoader(std::filesystem::path _schemaPath)
     : m_schemaPath(std::move(_schemaPath))
 {
 }
+
+static char const* entityRefSchemaName = "#/definitions/EntityRef";
 
 void Ent::SchemaLoader::parseSchema(
     json const& _fileRoot, json const& _data, Visitor const& vis, int depth)
@@ -33,6 +23,16 @@ void Ent::SchemaLoader::parseSchema(
     if (_data.count("$ref") != 0)
     {
         auto ref = _data["$ref"].get<std::string>();
+        // special EntityRef handling
+        if (ref == entityRefSchemaName)
+        {
+            // EntityRef are not parsed but handled as primitive type
+            vis.openSubschema();
+            vis.setName("EntityRef");
+            vis.setType(DataType::entityRef);
+            vis.closeSubschema();
+            return;
+        }
         vis.openRef(ref.c_str());
         if (parsedRef.count(ref) != 0) // Was already parsed
         {
@@ -66,7 +66,7 @@ void Ent::SchemaLoader::parseSchema(
         json const* node = refRoot;
         objectPath.make_preferred();
         for (auto const& token :
-             split(objectPath.string(), std::filesystem::path::preferred_separator))
+             splitString(objectPath.string(), std::filesystem::path::preferred_separator))
         {
             node = &((*node).at(token));
         }
@@ -122,6 +122,7 @@ Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
     case Ent::DataType::object:
     case Ent::DataType::array:
     case Ent::DataType::boolean:
+    case Ent::DataType::entityRef:
     {
         Ent::Subschema::GenericMeta meta;
         setBaseMetas(&meta);

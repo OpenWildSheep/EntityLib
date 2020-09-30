@@ -50,6 +50,12 @@ namespace Ent
         bool hasOverride() const;
     };
 
+    struct EntityRef
+    {
+        /// @brief string representation of this entity ref, works like a file path, always relative.
+        std::string entityPath;
+    };
+
     template <typename V>
     struct Override
     {
@@ -111,8 +117,15 @@ namespace Ent
     struct ENTLIB_DLLEXPORT Node
     {
         /// @cond PRIVATE
-        using Value = mapbox::util::
-            variant<Null, Override<std::string>, Override<float>, Override<int64_t>, Object, Array, Override<bool>>;
+        using Value = mapbox::util::variant<
+            Null,
+            Override<std::string>,
+            Override<float>,
+            Override<int64_t>,
+            Object,
+            Array,
+            Override<bool>,
+            Override<EntityRef>>;
         Node() = default;
         Node(Value val, Subschema const* schema);
         /// @endcond
@@ -142,6 +155,8 @@ namespace Ent
         int64_t getInt() const; ///< @pre integer. @brief Get the value as int
         char const* getString() const; ///< @pre Ent::DataType == string. @brief Get the value as string
         bool getBool() const; ///< @pre type==Ent::DataType::boolean. @brief Get the value as bool
+        EntityRef getEntityRef()
+            const; ///< @pre type==Ent::DataType::entityRef. @brief Get the value as an Entity reference
 
         const Value& GetRawValue()
             const; ///< returns a reference to the raw Value (variant) stored at this node. Useful to write visitors.
@@ -150,6 +165,7 @@ namespace Ent
         void setInt(int64_t val); ///< @pre type==Ent::DataType::integer. @brief Set the int64_t value
         void setString(char const* val); ///< @pre type==Ent::DataType::string. @brief Set the string value
         void setBool(bool val); ///< @pre type==Ent::DataType::boolean. @brief Set the bool value
+        void setEntityRef(EntityRef); ///< @pre type==Ent::DataType::entityRef. @brief Set the Entity reference value
 
         /// @brief Fallback the the prefab or default value. The value will not be saved in json.
         /// @pre Ent::DataType is in {number, integer, boolean, string}
@@ -326,6 +342,20 @@ namespace Ent
 
         bool hasOverride() const;
 
+        /// @brief Create a relative EntityRef to the given entity
+        /// that will resolve to it from this entity.
+        EntityRef makeEntityRef(Entity& entity);
+
+        /// @brief Resolve an EntityRef relative to this entity.
+        /// Returns nullptr in case of failure.
+        Entity* resolveEntityRef(const EntityRef& _entityRef);
+
+        /// @brief Get the parent scene object containing this entity, if any.
+        Scene* getParentScene() const;
+
+        /// @brief Set the parent scene object containing this entity.
+        void setParentScene(Scene* scene);
+
         Override<std::string> const& getNameValue() const
         {
             return name;
@@ -349,6 +379,7 @@ namespace Ent
         DeleteCheck deleteCheck;
 
     private:
+        void updateSubSceneOwner();
         EntityLib const* entlib{}; ///< Reference the entity lib to find the schema when needed
         Override<std::string> name; ///< Entity name
         std::map<std::string, Component> components; ///< All components of this Entity
@@ -357,12 +388,14 @@ namespace Ent
         Override<std::string> thumbnail; ///< Path to the thumbnail mesh (.wthumb)
         Override<std::string> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
         bool hasASuper = false;
+        Scene* parentScene = nullptr; ///< ptr the scene containing this entity.
     };
 
     /// Contain all data of a scene. (A list of Entity)
     struct Scene
     {
-        Scene() = default;
+        Scene();
+        Scene(std::vector<std::unique_ptr<Entity>>);
         Scene(Scene const&) = delete;
         Scene& operator=(Scene const&) = delete;
         Scene(Scene&&) = delete;
@@ -371,27 +404,26 @@ namespace Ent
         std::vector<std::unique_ptr<Entity>> objects; ///< All Ent::Entity of this Scene
         DeleteCheck deleteCheck;
 
-        std::unique_ptr<Scene> makeInstanceOf() const
-        {
-            std::vector<std::unique_ptr<Entity>> instanceEntities;
-            for (auto const& ent : objects)
-            {
-                instanceEntities.emplace_back(ent->makeInstanceOf());
-            }
-            auto scene = std::make_unique<Scene>();
-            scene->objects = std::move(instanceEntities);
-            return scene;
-        }
+        /// @brief Resolve an EntityRef relative to this scene.
+        /// Returns nullptr in case of failure.
+        Entity* resolveEntityRef(const EntityRef& _entityRef);
 
-        bool hasOverride() const
-        {
-            for (std::unique_ptr<Entity> const& ent : objects)
-            {
-                if (ent->hasOverride())
-                    return true;
-            }
-            return false;
-        }
+        /// @brief Find an entity in the scene hierarchy given its path
+        Entity* findEntityByPath(const std::string& _path);
+
+        std::unique_ptr<Scene> makeInstanceOf() const;
+
+        bool hasOverride() const;
+
+        /// @brief Get the entity owning this scene if it is embedded.
+        Entity* getOwnerEntity() const;
+
+        /// @brief Set the entity owning this scene if it is embedded.
+        void setOwnerEntity(Entity* entity);
+
+    private:
+        Entity* ownerEntity = nullptr; ///< the entity owning this scene if it is embedded
+        void updateChildrenContext();
     };
 
     // ********************************** Static data *********************************************

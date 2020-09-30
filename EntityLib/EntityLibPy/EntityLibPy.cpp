@@ -222,7 +222,6 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("detach_entity_from_prefab", &Entity::detachEntityFromPrefab);
 
     py::class_<Scene>(ent, "Scene")
-        //.def_readonly("entities", &Scene::objects);
         .def_property_readonly(
             "entities",
             [](Scene* scene) -> std::vector<Entity*> {

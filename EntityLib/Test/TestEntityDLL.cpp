@@ -44,6 +44,9 @@ static void printNode(char const* name, Ent::Node const& node, std::string const
     case Ent::DataType::boolean:
         printf("%s%s [boolean] : %s\n", tab.c_str(), name, node.getBool() ? "true" : "false");
         break;
+    case Ent::DataType::entityRef:
+        printf("%s%s [EntityRef] : %s\n", tab.c_str(), name, node.getEntityRef().entityPath.c_str());
+        break;
     }
 }
 
@@ -84,6 +87,7 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
         }
         break;
     case Ent::DataType::string: std::cout << "string" << std::endl; break;
+    case Ent::DataType::entityRef: std::cout << "entity ref" << std::endl; break;
     }
 }
 
@@ -155,6 +159,11 @@ try
         ENTLIB_ASSERT(allSubEntities.front()->getName() == std::string("EP1-Spout_LINK_001"));
         ENTLIB_ASSERT(allSubEntities.front()->getColor()[0] == 255);
 
+        // TEST simple entity ref creation
+        Ent::Component* testEntityRef = ent->addComponent("TestEntityRef");
+        ENTLIB_ASSERT(testEntityRef != nullptr);
+        testEntityRef->root.at("TestRef")->setEntityRef(ent->makeEntityRef(*allSubEntities.front()));
+
         sysCreat->root.at("Name")->setString("Shamane_male");
         entlib.saveEntity(*ent, "prefab.copy.entity");
     }
@@ -189,6 +198,74 @@ try
         ENTLIB_ASSERT(
             sysCreat->root.at("Name")->getString() == std::string("Shamane_male")); // set. changed.
         ENTLIB_ASSERT(sysCreat->root.at("Name")->isSet()); // set. changed.
+
+        // TEST simple entity refs resolution
+        Ent::Component* testEntityRef = ent->getComponent("TestEntityRef");
+        ENTLIB_ASSERT(testEntityRef != nullptr);
+        ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->isSet());
+        Ent::EntityRef entityRef = testEntityRef->root.at("TestRef")->getEntityRef();
+        Ent::Entity* resolvedEntity = ent->resolveEntityRef(entityRef);
+        ENTLIB_ASSERT(resolvedEntity != nullptr);
+
+        Ent::SubSceneComponent* subScenecomp = ent->getSubSceneComponent();
+        auto&& allSubEntities = subScenecomp->embedded->objects;
+        ENTLIB_ASSERT(allSubEntities.size() == 1);
+        Ent::Entity& originalEnt = *allSubEntities.front();
+        ENTLIB_ASSERT(resolvedEntity == &originalEnt);
+    }
+
+    {
+        // TEST entity refs
+        // file: entity-references-a.entity
+        // - A-entity [ref to B: "B"]
+        //     - B [ref to A: ".."]
+        //
+        // file: entity-references.scene
+        // - root-scene
+        //     - InstanceOfA
+        //     - C [ref to B in InstanceOfA: "../InstanceOfA/B"]
+        //
+        std::unique_ptr<Ent::Scene> scene = entlib.loadScene("entity-references.scene");
+        ENTLIB_ASSERT(scene->objects.size() == 2);
+        Ent::Entity& instanceOfA = *scene->objects.front();
+        ENTLIB_ASSERT(strcmp(instanceOfA.getName(), "InstanceOfA") == 0);
+        Ent::SubSceneComponent* subSceneComp = instanceOfA.getSubSceneComponent();
+        ENTLIB_ASSERT(subSceneComp != nullptr);
+        ENTLIB_ASSERT(subSceneComp->isEmbedded);
+        ENTLIB_ASSERT(subSceneComp->embedded->objects.size() == 1);
+        Ent::Entity& B = *subSceneComp->embedded->objects.front();
+        ENTLIB_ASSERT(strcmp(B.getName(), "B") == 0);
+        Ent::Entity& C = *scene->objects[1];
+        ENTLIB_ASSERT(strcmp(C.getName(), "C") == 0);
+
+        // TEST entity ref creation
+        Ent::EntityRef BToInstanceOfAref = B.makeEntityRef(instanceOfA);
+        ENTLIB_ASSERT(BToInstanceOfAref.entityPath == "..");
+        Ent::EntityRef InstanceOfAToBref = instanceOfA.makeEntityRef(B);
+        ENTLIB_ASSERT(InstanceOfAToBref.entityPath == "B");
+        Ent::EntityRef CToBref = C.makeEntityRef(B);
+        ENTLIB_ASSERT(CToBref.entityPath == "../InstanceOfA/B");
+        Ent::EntityRef BToCref = B.makeEntityRef(C);
+        ENTLIB_ASSERT(BToCref.entityPath == "../../C");
+
+        // TEST entity ref resolution
+        Ent::Entity* resolvedEmptyRef = instanceOfA.resolveEntityRef({});
+        ENTLIB_ASSERT(resolvedEmptyRef == nullptr);
+        Ent::Entity* resolvedInstanceOfA = B.resolveEntityRef({ ".." });
+        ENTLIB_ASSERT(resolvedInstanceOfA == &instanceOfA);
+        Ent::Entity* resolvedB = instanceOfA.resolveEntityRef({ "B" });
+        ENTLIB_ASSERT(resolvedB == &B);
+        Ent::Entity* resolvedBbis = C.resolveEntityRef({ "../InstanceOfA/B" });
+        ENTLIB_ASSERT(resolvedBbis == &B);
+        Ent::Entity* resolvedC = B.resolveEntityRef({ "../../C" });
+        ENTLIB_ASSERT(resolvedC == &C);
+
+        // TEST entity ref resolution from scenes
+        ENTLIB_ASSERT(scene->resolveEntityRef({ ".." }) == nullptr);
+        ENTLIB_ASSERT(scene->resolveEntityRef({ "InstanceOfA" }) == &instanceOfA);
+        ENTLIB_ASSERT(scene->resolveEntityRef({ "InstanceOfA/B" }) == &B);
+        ENTLIB_ASSERT(scene->resolveEntityRef({ "C" }) == &C);
+        ENTLIB_ASSERT(scene->resolveEntityRef({ "InstanceOfA/B/../../C" }) == &C);
     }
 
     auto testInstanceOf = [](Ent::Entity const& ent) {

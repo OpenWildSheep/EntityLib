@@ -1348,7 +1348,6 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                                     tl::optional<Ent::EntityRef>( super->getEntityRef()) :
                                     tl::optional<Ent::EntityRef>(tl::nullopt);
 
-        // TODO: major 2020-09-22 @Seb: load an entity ref
         tl::optional<std::string> const refString = data.is_string() ?
                                                   data.get<std::string>() :
                                                   tl::optional<std::string>(tl::nullopt);

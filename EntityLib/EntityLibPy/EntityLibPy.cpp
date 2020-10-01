@@ -223,6 +223,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](Entity& e) { return e.getSubSceneComponent(); },
             py::return_value_policy::reference)
         .def("add_subscene_component", &Entity::addSubSceneComponent, py::return_value_policy::reference)
+        .def("make_entityref", &Entity::makeEntityRef)
         .def("detach_entity_from_prefab", &Entity::detachEntityFromPrefab);
 
     py::class_<Scene>(ent, "Scene")
@@ -253,7 +254,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(py::init<std::string>())
         .def_readwrite("validation_enabled", &EntityLib::validationEnabled)
         .def_readonly("root_path", &EntityLib::rootPath)
-        .def_readonly("rawdata_path", &EntityLib::rawdataPath)
+        .def_readwrite("rawdata_path", &EntityLib::rawdataPath)
         .def_readonly("tools_dir", &EntityLib::toolsDir)
         .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference)
         .def_readonly(

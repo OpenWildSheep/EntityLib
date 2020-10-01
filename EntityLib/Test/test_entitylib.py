@@ -58,10 +58,20 @@ try:
     print(Ent.__doc__)
     help(Ent)
 
-    entlib = Ent.EntityLib("X:/Tools")
+    entlib = Ent.EntityLib("X:/")
+
+    entlib.rawdata_path = "C:/Code/WildShared/EntityLib/Test/"
+
+    entlib.validation_enabled = True
 
     ####################################################################################################################
-    ent = entlib.load_entity("prefab.entity")
+    ent = entlib.load_entity("prefab.entity") # type: Ent.Entity
+
+    # Test default value
+    voxelSimulationGD = ent.get_component("VoxelSimulationGD")
+    assert(voxelSimulationGD.root.at("TransmissionBySecond").value == 100.)
+    assert(voxelSimulationGD.root.at("TransmissionBySecond").is_default())
+    assert(voxelSimulationGD.root.get_type_name() == "VoxelSimulationGD")
 
     # TEST read inherited values in inherited component
     heightObj = ent.get_component("HeightObj")
@@ -95,6 +105,21 @@ try:
     assert(not sysCreat.root.at("Burried").is_set()) # default
     assert(sysCreat.root.at("Name").value == "") # default
     assert(not sysCreat.root.at("Name").is_set()) # default
+
+    # TEST SubScene
+    subScenecomp = ent.get_subscene_component()
+    allSubEntities = subScenecomp.embedded.entities
+    assert(allSubEntities.size() == 1)
+    assert(allSubEntities.front().name == "EP1-Spout_LINK_001")
+    assert(allSubEntities.front().color[0] == 255)
+
+    # TEST simple entity ref creation
+    testEntityRef = ent.add_component("TestEntityRef")
+    assert(testEntityRef != nullptr);
+    assert(testEntityRef.root.at("TestRef").entityref == "")
+    testEntityRef.root.at("TestRef").entityref = ent.makeEntityRef(*ent)
+    assert(testEntityRef->root.at("TestRef")->getEntityRef().entityPath == ".");
+    testEntityRef->root.at("TestRef")->setEntityRef(ent->makeEntityRef(*allSubEntities.front()));
 
     sysCreat.root.at("Name").value = "Shamane_male"
     entlib.save_entity(ent, "prefab.copy.entity")
@@ -297,7 +322,7 @@ try:
     # Test read instance of
     ent = entlib.load_entity("instance.create.entity")
 
-    for f in ent.get_component("Transform").root.get_field_names():
+    for f in ent.get_component("TransformGD").root.get_field_names():
         print(f)
 
     # TEST read inherited values in inherited component
@@ -337,6 +362,7 @@ try:
 
     # ********************************** Test load/save scene ************************************
     print("load_scene")
+    entlib.rawdata_path = "X:/RawData"
     scene = entlib.load_scene("X:/RawData/22_World/SceneMainWorld/SceneMainWorld.scene")
 
     print("Scene Loaded\n")
@@ -353,15 +379,15 @@ try:
     heightObj = scene.entities[0].add_component("HeightObj")
     heightObj.root.at("DisplaceNoiseList").push()
 
-    scene.entities[0].add_component("BeamGenerator").root.get_field_names()
+    scene.entities[0].add_component("BeamGeneratorGD").root.get_field_names()
     assert(
-        len(scene.entities[0].add_component("ExplosionEffect").root.get_field_names()) == 22)
+        len(scene.entities[0].add_component("ExplosionEffect").root.get_field_names()) == 23)
 
     ep1 = [ent for ent in scene.entities if ent.name == "EP1_"]
     assert (len(ep1) != 0)
     assert (ep1[0].get_subscene_component() is not None)
 
-    scene.entities.append(entlib.make_instance_of("prefab.entity"))
+    scene.entities.append(entlib.make_instance_of(os.getcwd() + "/prefab.entity"))
 
     print("save_scene")
     entlib.save_scene(scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene")

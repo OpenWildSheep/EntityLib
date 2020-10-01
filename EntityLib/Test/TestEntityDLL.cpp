@@ -156,7 +156,7 @@ try
 
         // TEST SubScene
         Ent::SubSceneComponent* subScenecomp = ent->getSubSceneComponent();
-        auto&& allSubEntities = subScenecomp->embedded->objects;
+        auto&& allSubEntities = subScenecomp->embedded->getObjects();
         ENTLIB_ASSERT(allSubEntities.size() == 1);
         ENTLIB_ASSERT(allSubEntities.front()->getName() == std::string("EP1-Spout_LINK_001"));
         ENTLIB_ASSERT(allSubEntities.front()->getColor()[0] == 255);
@@ -213,7 +213,7 @@ try
         ENTLIB_ASSERT(resolvedEntity != nullptr);
 
         Ent::SubSceneComponent* subScenecomp = ent->getSubSceneComponent();
-        auto&& allSubEntities = subScenecomp->embedded->objects;
+        auto&& allSubEntities = subScenecomp->embedded->getObjects();
         ENTLIB_ASSERT(allSubEntities.size() == 1);
         Ent::Entity& originalEnt = *allSubEntities.front();
         ENTLIB_ASSERT(resolvedEntity == &originalEnt);
@@ -231,16 +231,16 @@ try
         //     - C [ref to B in InstanceOfA: "../InstanceOfA/B"]
         //
         std::unique_ptr<Ent::Scene> scene = entlib.loadScene("entity-references.scene");
-        ENTLIB_ASSERT(scene->objects.size() == 2);
-        Ent::Entity& instanceOfA = *scene->objects.front();
+        ENTLIB_ASSERT(scene->getObjects().size() == 2);
+        Ent::Entity& instanceOfA = *scene->getObjects().front();
         ENTLIB_ASSERT(strcmp(instanceOfA.getName(), "InstanceOfA") == 0);
         Ent::SubSceneComponent* subSceneComp = instanceOfA.getSubSceneComponent();
         ENTLIB_ASSERT(subSceneComp != nullptr);
         ENTLIB_ASSERT(subSceneComp->isEmbedded);
-        ENTLIB_ASSERT(subSceneComp->embedded->objects.size() == 1);
-        Ent::Entity& B = *subSceneComp->embedded->objects.front();
+        ENTLIB_ASSERT(subSceneComp->embedded->getObjects().size() == 1);
+        Ent::Entity& B = *subSceneComp->embedded->getObjects().front();
         ENTLIB_ASSERT(strcmp(B.getName(), "B") == 0);
-        Ent::Entity& C = *scene->objects[1];
+        Ent::Entity& C = *scene->getObjects()[1];
         ENTLIB_ASSERT(strcmp(C.getName(), "C") == 0);
 
         // TEST entity ref creation
@@ -278,7 +278,7 @@ try
         Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();
         ENTLIB_ASSERT(subScene != nullptr);
         ENTLIB_ASSERT(subScene->isEmbedded);
-        Ent::Entity const& subObj = *subScene->embedded->objects[0];
+        Ent::Entity const& subObj = *subScene->embedded->getObjects()[0];
         ENTLIB_ASSERT(subObj.getName() == std::string("EP1-Spout_LINK_001"));
         ENTLIB_ASSERT(not subObj.getNameValue().isSet());
         ENTLIB_ASSERT(not subObj.hasOverride());
@@ -355,7 +355,7 @@ try
         Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();
         ENTLIB_ASSERT(subScene != nullptr);
         ENTLIB_ASSERT(subScene->isEmbedded);
-        EntityPtr const& subObj = subScene->embedded->objects[0];
+        EntityPtr const& subObj = subScene->embedded->getObjects()[0];
         ENTLIB_ASSERT(subObj->getName() == std::string("EP1-Spout_LINK_001"));
 
         // Test an overrided Component
@@ -566,7 +566,7 @@ try
     // ******************* Test the override of an entity in a SubScene ***************************
     auto testOverrideSubEntity = [](Ent::Entity const& ent) {
         Ent::SubSceneComponent const* subScenecomp = ent.getSubSceneComponent();
-        auto&& allSubEntities = subScenecomp->embedded->objects;
+        auto&& allSubEntities = subScenecomp->embedded->getObjects();
         ENTLIB_ASSERT(allSubEntities.size() == 1);
         ENTLIB_ASSERT(allSubEntities.front()->getName() == std::string("EP1-Spout_LINK_001"));
         ENTLIB_ASSERT(allSubEntities.front()->getColor()[0] == 42);
@@ -583,7 +583,7 @@ try
     // ******************* Test the add of an entity in a SubScene *****************************
     auto testAddSubEntity = [](Ent::Entity const& ent) {
         Ent::SubSceneComponent const* subScenecomp = ent.getSubSceneComponent();
-        auto&& allSubEntities = subScenecomp->embedded->objects;
+        auto&& allSubEntities = subScenecomp->embedded->getObjects();
         ENTLIB_ASSERT(allSubEntities.size() == 2);
         char const* name0 = allSubEntities[0]->getName();
         char const* name1 = allSubEntities[1]->getName();
@@ -612,9 +612,9 @@ try
                                                          "SceneMainWorld.scene");
 
     printf("Scene Loaded\n");
-    printf("Entity count : %zu\n", scene->objects.size());
+    printf("Entity count : %zu\n", scene->getObjects().size());
 
-    for (EntityPtr const& ent : scene->objects)
+    for (EntityPtr const& ent : scene->getObjects())
     {
         printf("  Name \"%s\"\n", ent->getName());
 
@@ -626,22 +626,22 @@ try
         }
     }
 
-    Ent::Component* heightObj = scene->objects.front()->addComponent("HeightObj");
+    Ent::Component* heightObj = scene->getObjects().front()->addComponent("HeightObj");
     heightObj->root.at("DisplaceNoiseList")->push();
 
-    scene->objects.front()->addComponent("BeamGeneratorGD")->root.getFieldNames();
+    scene->getObjects().front()->addComponent("BeamGeneratorGD")->root.getFieldNames();
     ENTLIB_ASSERT(
-        scene->objects.front()->addComponent("ExplosionEffect")->root.getFieldNames().size() == 23);
+        scene->getObjects().front()->addComponent("ExplosionEffect")->root.getFieldNames().size()
+        == 23);
 
     auto ep1Iter = std::find_if(
-        begin(scene->objects), end(scene->objects), [ep1 = std::string("EP1_")](auto&& ent) {
-            return ent->getName() == ep1;
-        });
-    ENTLIB_ASSERT(ep1Iter != end(scene->objects));
+        begin(scene->getObjects()),
+        end(scene->getObjects()),
+        [ep1 = std::string("EP1_")](auto&& ent) { return ent->getName() == ep1; });
+    ENTLIB_ASSERT(ep1Iter != end(scene->getObjects()));
     ENTLIB_ASSERT((*ep1Iter)->getSubSceneComponent() != nullptr);
 
-    scene->objects.push_back(
-        entlib.makeInstanceOf((current_path() / "prefab.entity").generic_u8string()));
+    scene->addEntity(entlib.makeInstanceOf((current_path() / "prefab.entity").generic_u8string()));
 
     entlib.saveScene(*scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene");
 

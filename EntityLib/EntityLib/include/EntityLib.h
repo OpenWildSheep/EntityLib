@@ -396,13 +396,19 @@ namespace Ent
     {
         Scene();
         Scene(std::vector<std::unique_ptr<Entity>>);
+
+        /// @cond PRIVATE
         Scene(Scene const&) = delete;
         Scene& operator=(Scene const&) = delete;
         Scene(Scene&&) = delete;
         Scene& operator=(Scene&&) = delete;
 
-        std::vector<std::unique_ptr<Entity>> objects; ///< All Ent::Entity of this Scene
-        DeleteCheck deleteCheck;
+        DeleteCheck deleteCheck; // Just for debug
+        /// @endcond
+
+        void addEntity(std::unique_ptr<Entity>&& entity);
+
+        std::vector<std::unique_ptr<Entity>> const& getObjects() const;
 
         /// @brief Resolve an EntityRef relative to this scene.
         /// Returns nullptr in case of failure.
@@ -424,6 +430,7 @@ namespace Ent
     private:
         Entity* ownerEntity = nullptr; ///< the entity owning this scene if it is embedded
         void updateChildrenContext();
+        std::vector<std::unique_ptr<Entity>> objects; ///< All Ent::Entity of this Scene
     };
 
     // ********************************** Static data *********************************************

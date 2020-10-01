@@ -900,7 +900,7 @@ namespace Ent
 
     static Entity* findChild(Scene* scene, const std::string& name)
     {
-        auto&& children = scene->objects;
+        auto&& children = scene->getObjects();
         const auto found = std::find_if(children.begin(), children.end(), [&name](auto& childPtr) {
             return childPtr->getName() == name;
         });
@@ -981,6 +981,17 @@ namespace Ent
         : objects(std::move(entities))
     {
         updateChildrenContext();
+    }
+
+    void Scene::addEntity(std::unique_ptr<Entity>&& entity)
+    {
+        entity->setParentScene(this);
+        objects.emplace_back(std::move(entity));
+    }
+
+    std::vector<std::unique_ptr<Entity>> const& Scene::getObjects() const
+    {
+        return objects;
     }
 
     Entity* Scene::resolveEntityRef(const EntityRef& _entityRef)
@@ -1525,7 +1536,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
     std::set<std::string> entFromSuper;
     if (super != nullptr)
     {
-        for (auto&& superEnt : super->objects)
+        for (auto&& superEnt : super->getObjects())
         {
             entFromSuper.insert(superEnt->getName());
             json const* instEntNode = nullptr;
@@ -1544,8 +1555,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
                     superEnt->makeInstanceOf() :
                     ::loadEntity(entLib, schema, *instEntNode, superEnt.get());
             ent->setCanBeRenamed(false);
-            ent->setParentScene(scene.get());
-            scene->objects.emplace_back(std::move(ent));
+            scene->addEntity(std::move(ent));
         }
     }
 
@@ -1558,8 +1568,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
             continue;
         }
         std::unique_ptr<Ent::Entity> ent = ::loadEntity(entLib, schema, entNode, nullptr);
-        ent->setParentScene(scene.get());
-        scene->objects.emplace_back(std::move(ent));
+        scene->addEntity(std::move(ent));
     }
 
     return scene;
@@ -1687,11 +1696,9 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
         if (subscene->isEmbedded)
         {
             detSubSceneComponent->embedded = std::make_unique<Ent::Scene>();
-            for (std::unique_ptr<Ent::Entity> const& subEntity : subscene->embedded->objects)
+            for (std::unique_ptr<Ent::Entity> const& subEntity : subscene->embedded->getObjects())
             {
-                detSubSceneComponent->embedded->objects.push_back(subEntity->detachEntityFromPrefab());
-                detSubSceneComponent->embedded->objects.back()->setParentScene(
-                    detSubSceneComponent->embedded.get());
+                detSubSceneComponent->embedded->addEntity(subEntity->detachEntityFromPrefab());
             }
         }
     }
@@ -1778,7 +1785,7 @@ static json saveScene(Ent::ComponentsSchema const& schema, Ent::Scene const& sce
     document.emplace("Version", 2);
     json& objects = document["Objects"];
 
-    for (std::unique_ptr<Ent::Entity> const& ent : scene.objects)
+    for (std::unique_ptr<Ent::Entity> const& ent : scene.getObjects())
     {
         if (ent->hasOverride())
         {

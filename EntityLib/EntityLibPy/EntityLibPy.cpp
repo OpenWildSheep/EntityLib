@@ -226,7 +226,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "entities",
             [](Scene* scene) -> std::vector<Entity*> {
                 std::vector<Entity*> entities;
-                for (std::unique_ptr<Entity>& ent : scene->objects)
+                for (std::unique_ptr<Entity> const& ent : scene->getObjects())
                 {
                     entities.push_back(ent.get());
                 }

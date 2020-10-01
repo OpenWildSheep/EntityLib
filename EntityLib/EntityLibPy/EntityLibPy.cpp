@@ -57,6 +57,8 @@ Value getValue(Ent::Node& node)
     case Ent::DataType::integer: return node.getInt();
     case Ent::DataType::number: return node.getFloat();
     case Ent::DataType::string: return std::string(node.getString());
+    case Ent::DataType::entityRef: return node.getEntityRef().entityPath;
+    case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
     return Value();
 }
@@ -72,6 +74,8 @@ void setValue(Ent::Node& node, Value const& val)
     case Ent::DataType::integer: node.setInt(val.get<int64_t>()); break;
     case Ent::DataType::number: node.setFloat(val.get<float>()); break;
     case Ent::DataType::string: node.setString(val.get<std::string>().c_str()); break;
+    case Ent::DataType::entityRef: node.setEntityRef({ val.get<std::string>() }); break;
+    case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
 }
 
@@ -222,6 +226,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("detach_entity_from_prefab", &Entity::detachEntityFromPrefab);
 
     py::class_<Scene>(ent, "Scene")
+        .def(
+            "add_entity",
+            [](Scene* scene, Entity* ent) { scene->addEntity(std::unique_ptr<Entity>(ent)); })
         .def_property_readonly(
             "entities",
             [](Scene* scene) -> std::vector<Entity*> {

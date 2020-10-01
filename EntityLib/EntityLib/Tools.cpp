@@ -106,6 +106,13 @@ std::string Ent::computeRelativePath(
     }
 
     std::string result = relativePath.str();
-    result.pop_back(); // remove trailing '/'
+    if (result.empty())
+    {
+        result = '.';
+    }
+    else
+    {
+        result.pop_back(); // remove trailing '/'
+    }
     return result;
 }

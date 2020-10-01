@@ -162,6 +162,9 @@ try
         // TEST simple entity ref creation
         Ent::Component* testEntityRef = ent->addComponent("TestEntityRef");
         ENTLIB_ASSERT(testEntityRef != nullptr);
+        ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->getEntityRef().entityPath == "");
+        testEntityRef->root.at("TestRef")->setEntityRef(ent->makeEntityRef(*ent));
+        ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->getEntityRef().entityPath == ".");
         testEntityRef->root.at("TestRef")->setEntityRef(ent->makeEntityRef(*allSubEntities.front()));
 
         sysCreat->root.at("Name")->setString("Shamane_male");

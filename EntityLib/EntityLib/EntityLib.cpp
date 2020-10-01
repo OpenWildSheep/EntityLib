@@ -234,7 +234,7 @@ namespace Ent
 
     void Node::setEntityRef(EntityRef entityRef)
     {
-        value.get<Override<EntityRef>>().set(entityRef);
+        value.get<Override<EntityRef>>().set(std::move(entityRef));
     }
 
     struct UnSet
@@ -849,8 +849,9 @@ namespace Ent
             path.emplace_back(current->getName());
             rootEntity = current;
             rootScene = current->getParentScene();
-            current =
-                current->getParentScene() ? current->getParentScene()->getOwnerEntity() : nullptr;
+            current = current->getParentScene() != nullptr ?
+                          current->getParentScene()->getOwnerEntity() :
+                          nullptr;
         }
         return { std::move(path), rootEntity, rootScene };
     }
@@ -861,10 +862,10 @@ namespace Ent
         auto&& thisPathInfos = getAbsolutePathReversed(this);
         auto&& entityPathInfos = getAbsolutePathReversed(&entity);
 
-        Entity *thisRootEntity = std::get<1>(thisPathInfos),
-               *entityRootEntity = std::get<1>(entityPathInfos);
-        Scene *thisRootScene = std::get<2>(thisPathInfos),
-              *entityRootScene = std::get<2>(entityPathInfos);
+        Entity* thisRootEntity = std::get<1>(thisPathInfos);
+        Entity* entityRootEntity = std::get<1>(entityPathInfos);
+        Scene* thisRootScene = std::get<2>(thisPathInfos);
+        Scene* entityRootScene = std::get<2>(entityPathInfos);
 
         // entities should either share a common root scene
         // or a common root entity if they are in a .entity (i.e there is no root scene)
@@ -1023,7 +1024,9 @@ namespace Ent
         for (std::unique_ptr<Entity> const& ent : objects)
         {
             if (ent->hasOverride())
+            {
                 return true;
+            }
         }
         return false;
     }
@@ -1427,7 +1430,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
             {
                 Ent::Component const* superComp = superEntity->getComponent(cmpType.c_str());
                 auto const version =
-                    compNode.count("Version") ? compNode.at("Version").get<size_t>() : 0;
+                    compNode.count("Version") != 0u ? compNode.at("Version").get<size_t>() : 0;
 
                 Ent::Subschema const& compSchema = *schema.components.at(cmpType);
 

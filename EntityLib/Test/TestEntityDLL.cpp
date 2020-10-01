@@ -47,6 +47,7 @@ static void printNode(char const* name, Ent::Node const& node, std::string const
     case Ent::DataType::entityRef:
         printf("%s%s [EntityRef] : %s\n", tab.c_str(), name, node.getEntityRef().entityPath.c_str());
         break;
+    case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
     }
 }
 
@@ -88,6 +89,7 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
         break;
     case Ent::DataType::string: std::cout << "string" << std::endl; break;
     case Ent::DataType::entityRef: std::cout << "entity ref" << std::endl; break;
+    case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
     }
 }
 

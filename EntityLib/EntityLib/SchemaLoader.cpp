@@ -129,9 +129,8 @@ Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
         return meta;
     }
     case Ent::DataType::null:
-    default:
-        ENTLIB_ASSERT_MSG(false, "Invalid current type (null) when parsing meta");
-        return Ent::Subschema::GenericMeta{};
+    case Ent::DataType::COUNT:
+    default: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta");
     }
 }
 

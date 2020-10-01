@@ -24,7 +24,8 @@ namespace Ent
         object, ///< @see Ent::DataType::object
         array, ///< @see Ent::DataType::array
         boolean,
-        entityRef
+        entityRef,
+        COUNT
     };
 
     /// @cond PRIVATE

@@ -1247,6 +1247,8 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
         result = Ent::Node(Ent::Override<Ent::EntityRef>(def, supVal, val), &nodeSchema);
     }
     break;
+    case Ent::DataType::COUNT:
+    default: ENTLIB_LOGIC_ERROR("Invalid DataType"); break;
     }
     return result;
 }
@@ -1299,6 +1301,8 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
         data = ref.entityPath;
     }
     break;
+    case Ent::DataType::COUNT:
+    default: ENTLIB_LOGIC_ERROR("DataType is Ent::DataType::COUNT"); break;
     }
     return data;
 }

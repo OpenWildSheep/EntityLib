@@ -699,6 +699,11 @@ namespace Ent
     }
     Component* Entity::addComponent(char const* type)
     {
+        if (entlib->schema.components.count(type) == 0)
+        {
+            fprintf(stderr, "Error : Unknown Component type : %s\n", type);
+            return nullptr;
+        }
         if (entlib->componentDependencies.count(type) != 0) // Could be an editor componant
         {
             for (auto&& dep : entlib->componentDependencies.at(type))
@@ -1196,17 +1201,25 @@ static Ent::Entity loadEntity(
                 auto const version =
                     compNode.count("Version") ? compNode.at("Version").get<size_t>() : 0;
 
-                Ent::Subschema const& compSchema = *schema.components.at(cmpType);
+                if (schema.components.count(cmpType) == 0)
+                {
+                    fprintf(stderr, "Error : Unknown Component type : %s\n", cmpType.c_str());
+                }
+                else
+                {
+                    Ent::Subschema const& compSchema = *schema.components.at(cmpType);
 
-                Ent::Component comp{
-                    superComp != nullptr, // has a super component
-                    cmpType,
-                    loadNode(compSchema, data, (superComp != nullptr ? &superComp->root : nullptr)),
-                    version,
-                    index
-                };
+                    Ent::Component comp{
+                        superComp != nullptr, // has a super component
+                        cmpType,
+                        loadNode(
+                            compSchema, data, (superComp != nullptr ? &superComp->root : nullptr)),
+                        version,
+                        index
+                    };
 
-                components.emplace(cmpType, std::move(comp));
+                    components.emplace(cmpType, std::move(comp));
+                }
             }
             ++index;
         }

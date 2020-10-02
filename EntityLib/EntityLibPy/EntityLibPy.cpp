@@ -61,6 +61,53 @@ Value getValue(Ent::Node& node)
     return Value();
 }
 
+template <typename I, typename O>
+struct Converter
+{
+    O operator()(I const& val) const
+    {
+        throw std::runtime_error(
+            std::string("Can't convert") + typeid(I).name() + " to " + typeid(O).name());
+    }
+};
+
+template <typename IO>
+struct Converter<IO, IO>
+{
+    IO const& operator()(IO const& val) const
+    {
+        return val;
+    }
+};
+
+template <>
+struct Converter<int64_t, float>
+{
+    float operator()(int64_t const& val) const
+    {
+        return static_cast<float>(val);
+    }
+};
+
+template <>
+struct Converter<int64_t, bool>
+{
+    bool operator()(int64_t const& val) const
+    {
+        return val != 0;
+    }
+};
+
+template <typename O>
+struct GetValue
+{
+    template <typename I>
+    O operator()(I const& val) const
+    {
+        return Converter<I, O>{}(val);
+    }
+};
+
 void setValue(Ent::Node& node, Value const& val)
 {
     switch (node.getDataType())
@@ -68,10 +115,18 @@ void setValue(Ent::Node& node, Value const& val)
     case Ent::DataType::array:
     case Ent::DataType::object:
     case Ent::DataType::null: break;
-    case Ent::DataType::boolean: node.setBool(val.get<bool>()); break;
-    case Ent::DataType::integer: node.setInt(val.get<int64_t>()); break;
-    case Ent::DataType::number: node.setFloat(val.get<float>()); break;
-    case Ent::DataType::string: node.setString(val.get<std::string>().c_str()); break;
+    case Ent::DataType::boolean:
+        node.setBool(mapbox::util::apply_visitor(GetValue<bool>{}, val));
+        break;
+    case Ent::DataType::integer:
+        node.setInt(mapbox::util::apply_visitor(GetValue<int64_t>{}, val));
+        break;
+    case Ent::DataType::number:
+        node.setFloat(mapbox::util::apply_visitor(GetValue<float>{}, val));
+        break;
+    case Ent::DataType::string:
+        node.setString(mapbox::util::apply_visitor(GetValue<std::string>{}, val).c_str());
+        break;
     }
 }
 

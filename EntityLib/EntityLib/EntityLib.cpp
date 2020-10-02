@@ -659,6 +659,30 @@ namespace Ent
         updateSubSceneOwner();
     }
 
+    std::unique_ptr<Entity> Entity::clone() const
+    {
+        std::map<std::string, Component> instComponents;
+        std::unique_ptr<SubSceneComponent> instSubSceneComponent;
+
+        for (auto&& name_comp : components)
+        {
+            instComponents.emplace(name_comp.first, name_comp.second);
+        }
+        if (subSceneComponent != nullptr)
+        {
+            instSubSceneComponent = subSceneComponent->clone();
+        }
+
+        return std::make_unique<Entity>(
+            *entlib,
+            name.makeInstanceOf(),
+            std::move(instComponents),
+            std::move(instSubSceneComponent),
+            color.makeInstanceOf(),
+            thumbnail.makeInstanceOf(),
+            instanceOf);
+    }
+
     char const* Entity::getName() const
     {
         return name.get().c_str();
@@ -994,6 +1018,20 @@ namespace Ent
         return objects;
     }
 
+    std::vector<std::unique_ptr<Entity>>& Scene::getObjects()
+    {
+        return objects;
+    }
+
+    std::vector<std::unique_ptr<Entity>> Scene::releaseAllEntities()
+    {
+        std::vector<std::unique_ptr<Entity>> freeEntities;
+        for (auto&& ent : objects)
+            freeEntities.emplace_back(std::move(ent));
+        objects.clear();
+        return freeEntities;
+    }
+
     Entity* Scene::resolveEntityRef(const EntityRef& _entityRef)
     {
         if (_entityRef.entityPath.empty())
@@ -1024,6 +1062,19 @@ namespace Ent
         for (auto const& ent : objects)
         {
             instanceEntities.emplace_back(ent->makeInstanceOf());
+            instanceEntities.back()->setParentScene(scene.get());
+        }
+        scene->objects = std::move(instanceEntities);
+        return scene;
+    }
+
+    std::unique_ptr<Scene> Scene::clone() const
+    {
+        std::vector<std::unique_ptr<Entity>> instanceEntities;
+        auto scene = std::make_unique<Scene>();
+        for (auto const& ent : objects)
+        {
+            instanceEntities.emplace_back(ent->clone());
             instanceEntities.back()->setParentScene(scene.get());
         }
         scene->objects = std::move(instanceEntities);
@@ -1833,6 +1884,16 @@ std::unique_ptr<Ent::SubSceneComponent> Ent::SubSceneComponent::makeInstanceOf()
     if (embedded)
     {
         instEmbedded = embedded->makeInstanceOf();
+    }
+    return std::make_unique<SubSceneComponent>(isEmbedded, file, index, std::move(instEmbedded));
+}
+
+std::unique_ptr<Ent::SubSceneComponent> Ent::SubSceneComponent::clone() const
+{
+    std::unique_ptr<Scene> instEmbedded;
+    if (embedded)
+    {
+        instEmbedded = embedded->clone();
     }
     return std::make_unique<SubSceneComponent>(isEmbedded, file, index, std::move(instEmbedded));
 }

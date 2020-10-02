@@ -270,6 +270,7 @@ namespace Ent
         bool hasOverride() const;
 
         std::unique_ptr<SubSceneComponent> makeInstanceOf() const;
+        std::unique_ptr<SubSceneComponent> clone() const;
     };
 
     class EntityLib;
@@ -339,6 +340,7 @@ namespace Ent
         std::unique_ptr<Entity> detachEntityFromPrefab() const;
 
         std::unique_ptr<Entity> makeInstanceOf() const;
+        std::unique_ptr<Entity> clone() const;
 
         bool hasOverride() const;
 
@@ -409,6 +411,9 @@ namespace Ent
         void addEntity(std::unique_ptr<Entity>&& entity);
 
         std::vector<std::unique_ptr<Entity>> const& getObjects() const;
+        std::vector<std::unique_ptr<Entity>>& getObjects();
+
+        std::vector<std::unique_ptr<Entity>> releaseAllEntities();
 
         /// @brief Resolve an EntityRef relative to this scene.
         /// Returns nullptr in case of failure.
@@ -418,6 +423,7 @@ namespace Ent
         Entity* findEntityByPath(const std::string& _path);
 
         std::unique_ptr<Scene> makeInstanceOf() const;
+        std::unique_ptr<Scene> clone() const;
 
         bool hasOverride() const;
 

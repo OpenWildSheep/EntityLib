@@ -301,7 +301,7 @@
                 "GPEType": "BendTree",
                 "HotspotID": 7
             },
-            "Type": "PossessedGPEGD",
+            "Type": "PossessableGPEGD",
             "Version": 1
         },
         {

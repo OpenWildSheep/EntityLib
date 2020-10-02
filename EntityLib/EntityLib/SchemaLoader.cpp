@@ -130,7 +130,7 @@ Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
     }
     case Ent::DataType::null:
     case Ent::DataType::COUNT:
-    default: ENTLIB_ASSERT_MSG(false, "Invalid DataType when parsing meta");
+    default: ENTLIB_ASSERT_MSG(false, "Invalid DataType when parsing meta"); return {};
     }
 }
 

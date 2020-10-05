@@ -287,13 +287,11 @@
         },
         {
             "Data": {
-                "BendTreeBendStartSoundEvent": "GPE_Tree_Catapult_Bend",
-                "BendTreeCatapultStartSoundEvent": "GPE_Tree_Catapult_Start",
                 "GPEActorStateName": "ActorStateBendingTree",
                 "GPEType": "BendTree",
                 "HotspotID": 7
             },
-            "Type": "PossessedGPEGD",
+            "Type": "PossessableGPEGD",
             "Version": 1
         },
         {

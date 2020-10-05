@@ -24,6 +24,8 @@ namespace Ent
         object, ///< @see Ent::DataType::object
         array, ///< @see Ent::DataType::array
         boolean,
+        entityRef,
+        COUNT
     };
 
     /// @cond PRIVATE
@@ -84,7 +86,7 @@ namespace Ent
 
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue =
-            mapbox::util::variant<Null, std::string, float, int64_t, Null, Null, bool>;
+            mapbox::util::variant<Null, std::string, float, int64_t, Null, Null, bool, Null>;
         DefaultValue defaultValue; ///< @brief Contains the data according to the type
         tl::optional<DefaultValue> constValue; ///< This property can only have this value
 

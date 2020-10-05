@@ -1,0 +1,21 @@
+{
+    "Objects": [
+        {
+            "InstanceOf": "entity-references-a.entity",
+            "Name": "InstanceOfA"
+        },
+        {
+            "Name": "C",
+            "Components": [
+                {
+                    "Data": {
+                        "TestRef": "../InstanceOfA/B"
+                    },
+                    "Type": "TestEntityRef",
+                    "Version": 1
+                }
+            ]
+        }
+    ],
+    "Version": 2
+}

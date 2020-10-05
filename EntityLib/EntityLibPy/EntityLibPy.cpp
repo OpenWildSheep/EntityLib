@@ -44,7 +44,7 @@ namespace pybind11
 namespace py = pybind11;
 using namespace Ent;
 
-using Value = mapbox::util::variant<Null, std::string, float, int64_t, bool>;
+using Value = mapbox::util::variant<Null, std::string, float, int64_t, bool, EntityRef>;
 
 Value getValue(Ent::Node& node)
 {
@@ -57,6 +57,8 @@ Value getValue(Ent::Node& node)
     case Ent::DataType::integer: return node.getInt();
     case Ent::DataType::number: return node.getFloat();
     case Ent::DataType::string: return std::string(node.getString());
+    case Ent::DataType::entityRef: return node.getEntityRef();
+    case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
     return Value();
 }
@@ -64,7 +66,7 @@ Value getValue(Ent::Node& node)
 template <typename I, typename O>
 struct Converter
 {
-    O operator()(I const& val) const
+    O operator()(I const&) const
     {
         throw std::runtime_error(
             std::string("Can't convert") + typeid(I).name() + " to " + typeid(O).name());
@@ -127,6 +129,8 @@ void setValue(Ent::Node& node, Value const& val)
     case Ent::DataType::string:
         node.setString(mapbox::util::apply_visitor(GetValue<std::string>{}, val).c_str());
         break;
+    case Ent::DataType::entityRef: node.setEntityRef({ val.get<EntityRef>() }); break;
+    case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
 }
 
@@ -222,6 +226,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_int", [](Node* node) { return node->getInt(); })
         .def("get_string", [](Node* node) { return node->getString(); })
         .def("get_bool", [](Node* node) { return node->getBool(); })
+        .def("get_entityref", &Node::getEntityRef)
         .def("get_default_float", [](Node* node) { return node->getDefaultFloat(); })
         .def("get_default_int", [](Node* node) { return node->getDefaultInt(); })
         .def("get_default_string", [](Node* node) { return node->getDefaultString(); })
@@ -233,6 +238,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("set_int", [](Node* node, int64_t val) { return node->setInt(val); })
         .def("set_string", [](Node* node, char const* str) { return node->setString(str); })
         .def("set_bool", [](Node* node, bool val) { return node->setBool(val); })
+        .def("set_entityref", &Node::setEntityRef)
         .def("unset", [](Node* node) { return node->unset(); })
         .def("is_set", [](Node* node) { return node->isSet(); });
 
@@ -261,6 +267,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property_readonly("instance_of", &Entity::getInstanceOf)
         .def_property("thumbnail", &Entity::getThumbnail, &Entity::setThumbnail)
         .def_property("color", &Entity::getColor, &Entity::setColor)
+        .def("has_override", &Entity::hasOverride)
         .def("add_component", &Entity::addComponent, py::return_value_policy::reference)
         .def(
             "get_component",
@@ -274,10 +281,28 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](Entity& e) { return e.getSubSceneComponent(); },
             py::return_value_policy::reference)
         .def("add_subscene_component", &Entity::addSubSceneComponent, py::return_value_policy::reference)
-        .def("detach_entity_from_prefab", &Entity::detachEntityFromPrefab);
+        .def("make_entityref", &Entity::makeEntityRef)
+        .def("resolve_entityref", &Entity::resolveEntityRef, py::return_value_policy::reference)
+        .def("detach_entity_from_prefab", [](Entity* ent) {
+            return ent->detachEntityFromPrefab().release();
+        });
 
     py::class_<Scene>(ent, "Scene")
-        .def_readonly("entities", &Scene::objects, py::return_value_policy::reference_internal);
+        .def(
+            "add_entity",
+            [](Scene* scene, Entity* ent) { scene->addEntity(std::unique_ptr<Entity>(ent)); })
+        .def("resolve_entityref", &Scene::resolveEntityRef, py::return_value_policy::reference)
+        .def_property_readonly(
+            "entities",
+            [](Scene* scene) -> std::vector<Entity*> {
+                std::vector<Entity*> entities;
+                for (std::unique_ptr<Entity> const& ent : scene->getObjects())
+                {
+                    entities.push_back(ent.get());
+                }
+                return entities;
+            },
+            py::return_value_policy::reference_internal);
 
     py::class_<ComponentsSchema>(ent, "ComponentsSchema")
         .def_readonly("components", &ComponentsSchema::components, py::return_value_policy::reference)
@@ -291,7 +316,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(py::init<std::string>())
         .def_readwrite("validation_enabled", &EntityLib::validationEnabled)
         .def_readonly("root_path", &EntityLib::rootPath)
-        .def_readonly("rawdata_path", &EntityLib::rawdataPath)
+        .def_readwrite("rawdata_path", &EntityLib::rawdataPath) // unit-test need to write it
         .def_readonly("tools_dir", &EntityLib::toolsDir)
         .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference)
         .def_readonly(
@@ -300,14 +325,25 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference)
         .def(
             "load_entity",
-            &EntityLib::loadEntity,
-            py::return_value_policy::copy,
-            "entityPath"_a,
-            "super"_a = nullptr)
-        .def("load_scene", &EntityLib::loadScene, py::return_value_policy::copy)
+            [](EntityLib* lib, std::string const& path) { return lib->loadEntity(path).release(); },
+            "entityPath"_a)
+        .def(
+            "load_scene",
+            [](EntityLib* lib, std::string const& path) { return lib->loadScene(path).release(); })
         .def("save_entity", &EntityLib::saveEntity, "entity"_a, "_entityPath"_a)
         .def("save_scene", &EntityLib::saveScene)
-        .def("make_instance_of", &EntityLib::makeInstanceOf, "instanceOf"_a);
+        .def(
+            "make_instance_of",
+            [](EntityLib* lib, std::string const& path) {
+                return lib->makeInstanceOf(path).release();
+            },
+            "instanceOf"_a);
+
+    py::class_<EntityRef>(ent, "EntityRef")
+        .def(py::init<>())
+        .def(py::init<std::string>())
+        .def_readwrite("entity_path", &EntityRef::entityPath)
+        .def("__str__", [](EntityRef* ref) { return ref->entityPath; });
 
     py::register_exception<Ent::JsonValidation>(ent, "JsonValidation");
 }

@@ -310,7 +310,7 @@
         },
         {
             "Version": 1,
-            "Type": "PossessedGPEGD",
+            "Type": "PossessableGPEGD",
             "Data": {
                 "BendTreeBendStartSoundEvent": "GPE_Tree_Catapult_Bend",
                 "BendTreeCatapultStartSoundEvent": "GPE_Tree_Catapult_Start",

@@ -44,6 +44,10 @@ static void printNode(char const* name, Ent::Node const& node, std::string const
     case Ent::DataType::boolean:
         printf("%s%s [boolean] : %s\n", tab.c_str(), name, node.getBool() ? "true" : "false");
         break;
+    case Ent::DataType::entityRef:
+        printf("%s%s [EntityRef] : %s\n", tab.c_str(), name, node.getEntityRef().entityPath.c_str());
+        break;
+    case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
     }
 }
 
@@ -84,6 +88,8 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
         }
         break;
     case Ent::DataType::string: std::cout << "string" << std::endl; break;
+    case Ent::DataType::entityRef: std::cout << "entity ref" << std::endl; break;
+    case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
     }
 }
 
@@ -98,19 +104,23 @@ try
     entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
 #ifdef _DEBUG
     entlib.validationEnabled = false;
+#else
+    entlib.validationEnabled = true;
 #endif
 
+    using EntityPtr = std::unique_ptr<Ent::Entity>;
+
     {
-        Ent::Entity ent = entlib.loadEntity("prefab.entity");
+        EntityPtr ent = entlib.loadEntity("prefab.entity");
 
         // Test default value
-        Ent::Component* voxelSimulationGD = ent.getComponent("VoxelSimulationGD");
+        Ent::Component* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
         ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->getFloat() == 100.f);
         ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->isDefault());
         ENTLIB_ASSERT(voxelSimulationGD->root.getTypeName() == std::string("VoxelSimulationGD"));
 
         // TEST read inherited values in inherited component
-        Ent::Component* heightObj = ent.getComponent("HeightObj");
+        Ent::Component* heightObj = ent->getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->isSet());
@@ -121,11 +131,11 @@ try
         ENTLIB_ASSERT(heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 
         // Test read Thumbnail
-        ENTLIB_ASSERT(ent.getThumbnail() != nullptr);
-        ENTLIB_ASSERT(ent.getThumbnail() == std::string("TestThumbnail"));
+        ENTLIB_ASSERT(ent->getThumbnail() != nullptr);
+        ENTLIB_ASSERT(ent->getThumbnail() == std::string("TestThumbnail"));
 
         // Test read prefab
-        Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
+        Ent::Component* sysCreat = ent->getComponent("SystemicCreature");
         ENTLIB_ASSERT(sysCreat != nullptr);
 
         // TEST read setted values
@@ -145,21 +155,29 @@ try
         ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
 
         // TEST SubScene
-        Ent::SubSceneComponent* subScenecomp = ent.getSubSceneComponent();
-        auto&& allSubEntities = subScenecomp->embedded->objects;
+        Ent::SubSceneComponent* subScenecomp = ent->getSubSceneComponent();
+        auto&& allSubEntities = subScenecomp->embedded->getObjects();
         ENTLIB_ASSERT(allSubEntities.size() == 1);
-        ENTLIB_ASSERT(allSubEntities.front().getName() == std::string("EP1-Spout_LINK_001"));
-        ENTLIB_ASSERT(allSubEntities.front().getColor()[0] == 255);
+        ENTLIB_ASSERT(allSubEntities.front()->getName() == std::string("EP1-Spout_LINK_001"));
+        ENTLIB_ASSERT(allSubEntities.front()->getColor()[0] == 255);
+
+        // TEST simple entity ref creation
+        Ent::Component* testEntityRef = ent->addComponent("TestEntityRef");
+        ENTLIB_ASSERT(testEntityRef != nullptr);
+        ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->getEntityRef().entityPath == "");
+        testEntityRef->root.at("TestRef")->setEntityRef(ent->makeEntityRef(*ent));
+        ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->getEntityRef().entityPath == ".");
+        testEntityRef->root.at("TestRef")->setEntityRef(ent->makeEntityRef(*allSubEntities.front()));
 
         sysCreat->root.at("Name")->setString("Shamane_male");
-        entlib.saveEntity(ent, "prefab.copy.entity");
+        entlib.saveEntity(*ent, "prefab.copy.entity");
     }
     {
         // Test write prefab
-        Ent::Entity ent = entlib.loadEntity("prefab.copy.entity");
+        EntityPtr ent = entlib.loadEntity("prefab.copy.entity");
 
         // TEST read inherited values in inherited component
-        Ent::Component* heightObj = ent.getComponent("HeightObj");
+        Ent::Component* heightObj = ent->getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->isSet());
@@ -167,7 +185,7 @@ try
             heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
         ENTLIB_ASSERT(heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 
-        Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
+        Ent::Component* sysCreat = ent->getComponent("SystemicCreature");
         ENTLIB_ASSERT(sysCreat != nullptr);
         // TEST read setted values
         ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Shamans")); // set
@@ -185,6 +203,74 @@ try
         ENTLIB_ASSERT(
             sysCreat->root.at("Name")->getString() == std::string("Shamane_male")); // set. changed.
         ENTLIB_ASSERT(sysCreat->root.at("Name")->isSet()); // set. changed.
+
+        // TEST simple entity refs resolution
+        Ent::Component* testEntityRef = ent->getComponent("TestEntityRef");
+        ENTLIB_ASSERT(testEntityRef != nullptr);
+        ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->isSet());
+        Ent::EntityRef entityRef = testEntityRef->root.at("TestRef")->getEntityRef();
+        Ent::Entity* resolvedEntity = ent->resolveEntityRef(entityRef);
+        ENTLIB_ASSERT(resolvedEntity != nullptr);
+
+        Ent::SubSceneComponent* subScenecomp = ent->getSubSceneComponent();
+        auto&& allSubEntities = subScenecomp->embedded->getObjects();
+        ENTLIB_ASSERT(allSubEntities.size() == 1);
+        Ent::Entity& originalEnt = *allSubEntities.front();
+        ENTLIB_ASSERT(resolvedEntity == &originalEnt);
+    }
+
+    {
+        // TEST entity refs
+        // file: entity-references-a.entity
+        // - A-entity [ref to B: "B"]
+        //     - B [ref to A: ".."]
+        //
+        // file: entity-references.scene
+        // - root-scene
+        //     - InstanceOfA
+        //     - C [ref to B in InstanceOfA: "../InstanceOfA/B"]
+        //
+        std::unique_ptr<Ent::Scene> scene = entlib.loadScene("entity-references.scene");
+        ENTLIB_ASSERT(scene->getObjects().size() == 2);
+        Ent::Entity& instanceOfA = *scene->getObjects().front();
+        ENTLIB_ASSERT(strcmp(instanceOfA.getName(), "InstanceOfA") == 0);
+        Ent::SubSceneComponent* subSceneComp = instanceOfA.getSubSceneComponent();
+        ENTLIB_ASSERT(subSceneComp != nullptr);
+        ENTLIB_ASSERT(subSceneComp->isEmbedded);
+        ENTLIB_ASSERT(subSceneComp->embedded->getObjects().size() == 1);
+        Ent::Entity& B = *subSceneComp->embedded->getObjects().front();
+        ENTLIB_ASSERT(strcmp(B.getName(), "B") == 0);
+        Ent::Entity& C = *scene->getObjects()[1];
+        ENTLIB_ASSERT(strcmp(C.getName(), "C") == 0);
+
+        // TEST entity ref creation
+        Ent::EntityRef BToInstanceOfAref = B.makeEntityRef(instanceOfA);
+        ENTLIB_ASSERT(BToInstanceOfAref.entityPath == "..");
+        Ent::EntityRef InstanceOfAToBref = instanceOfA.makeEntityRef(B);
+        ENTLIB_ASSERT(InstanceOfAToBref.entityPath == "B");
+        Ent::EntityRef CToBref = C.makeEntityRef(B);
+        ENTLIB_ASSERT(CToBref.entityPath == "../InstanceOfA/B");
+        Ent::EntityRef BToCref = B.makeEntityRef(C);
+        ENTLIB_ASSERT(BToCref.entityPath == "../../C");
+
+        // TEST entity ref resolution
+        Ent::Entity* resolvedEmptyRef = instanceOfA.resolveEntityRef({});
+        ENTLIB_ASSERT(resolvedEmptyRef == nullptr);
+        Ent::Entity* resolvedInstanceOfA = B.resolveEntityRef({ ".." });
+        ENTLIB_ASSERT(resolvedInstanceOfA == &instanceOfA);
+        Ent::Entity* resolvedB = instanceOfA.resolveEntityRef({ "B" });
+        ENTLIB_ASSERT(resolvedB == &B);
+        Ent::Entity* resolvedBbis = C.resolveEntityRef({ "../InstanceOfA/B" });
+        ENTLIB_ASSERT(resolvedBbis == &B);
+        Ent::Entity* resolvedC = B.resolveEntityRef({ "../../C" });
+        ENTLIB_ASSERT(resolvedC == &C);
+
+        // TEST entity ref resolution from scenes
+        ENTLIB_ASSERT(scene->resolveEntityRef({ ".." }) == nullptr);
+        ENTLIB_ASSERT(scene->resolveEntityRef({ "InstanceOfA" }) == &instanceOfA);
+        ENTLIB_ASSERT(scene->resolveEntityRef({ "InstanceOfA/B" }) == &B);
+        ENTLIB_ASSERT(scene->resolveEntityRef({ "C" }) == &C);
+        ENTLIB_ASSERT(scene->resolveEntityRef({ "InstanceOfA/B/../../C" }) == &C);
     }
 
     auto testInstanceOf = [](Ent::Entity const& ent) {
@@ -192,7 +278,7 @@ try
         Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();
         ENTLIB_ASSERT(subScene != nullptr);
         ENTLIB_ASSERT(subScene->isEmbedded);
-        Ent::Entity const& subObj = subScene->embedded->objects[0];
+        Ent::Entity const& subObj = *subScene->embedded->getObjects()[0];
         ENTLIB_ASSERT(subObj.getName() == std::string("EP1-Spout_LINK_001"));
         ENTLIB_ASSERT(not subObj.getNameValue().isSet());
         ENTLIB_ASSERT(not subObj.hasOverride());
@@ -208,11 +294,11 @@ try
 
     {
         // Test read instance of
-        Ent::Entity ent = entlib.loadEntity("instance.entity");
-        Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
+        EntityPtr ent = entlib.loadEntity("instance.entity");
+        Ent::Component* sysCreat = ent->getComponent("SystemicCreature");
         ENTLIB_ASSERT(sysCreat != nullptr);
 
-        ENTLIB_ASSERT(ent.getColorValue().hasOverride());
+        ENTLIB_ASSERT(ent->getColorValue().hasOverride());
 
         // TEST read overrided value
         ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Plouf")); // Overrided
@@ -223,7 +309,7 @@ try
         ENTLIB_ASSERT(sysCreat->root.at("Life")->getFloat() == 1000.f); // Inherited
 
         // TEST read inherited values in inherited component
-        Ent::Component* heightObj = ent.getComponent("HeightObj");
+        Ent::Component* heightObj = ent->getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
         ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isSet());
@@ -259,21 +345,21 @@ try
         ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->size() == 4);
 
         // TEST SubScene (without override)
-        testInstanceOf(ent);
+        testInstanceOf(*ent);
 
         sysCreat->root.at("BehaviorState")->setString("Overrided");
-        entlib.saveEntity(ent, "instance.copy.entity");
+        entlib.saveEntity(*ent, "instance.copy.entity");
     }
     auto testInstanceOverrideSubscene = [](Ent::Entity const& ent) {
         // TEST SubScene (with override)
         Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();
         ENTLIB_ASSERT(subScene != nullptr);
         ENTLIB_ASSERT(subScene->isEmbedded);
-        Ent::Entity const& subObj = subScene->embedded->objects[0];
-        ENTLIB_ASSERT(subObj.getName() == std::string("EP1-Spout_LINK_001"));
+        EntityPtr const& subObj = subScene->embedded->getObjects()[0];
+        ENTLIB_ASSERT(subObj->getName() == std::string("EP1-Spout_LINK_001"));
 
         // Test an overrided Component
-        Ent::Component const* netLink = subObj.getComponent("NetworkLink");
+        Ent::Component const* netLink = subObj->getComponent("NetworkLink");
         ENTLIB_ASSERT(netLink != nullptr);
         ENTLIB_ASSERT(netLink->root.at("Source")->getString() == std::string(".EP1-Spout_"));
         ENTLIB_ASSERT(netLink->root.at("Source")->isSet() == false);
@@ -281,27 +367,28 @@ try
         ENTLIB_ASSERT(netLink->root.at("Target")->isSet());
 
         // Test a not overrided Component
-        Ent::Component const* trans = subObj.getComponent("TransformGD");
+        Ent::Component const* trans = subObj->getComponent("TransformGD");
         ENTLIB_ASSERT(trans != nullptr);
         ENTLIB_ASSERT(trans->root.at("Position")->at(0llu)->getFloat() == 0.0);
     };
     {
-        Ent::Entity ent = entlib.loadEntity("instance_override_subscene.entity");
-        testInstanceOverrideSubscene(ent);
-        entlib.saveEntity(ent, "instance_override_subscene.copy.entity");
+        EntityPtr ent = entlib.loadEntity("instance_override_subscene.entity");
+        testInstanceOverrideSubscene(*ent);
+        entlib.saveEntity(*ent, "instance_override_subscene.copy.entity");
     }
     {
-        Ent::Entity ent = entlib.loadEntity("instance_override_subscene.copy.entity");
-        testInstanceOverrideSubscene(ent);
+        EntityPtr ent = entlib.loadEntity("instance_override_subscene.copy."
+                                          "entity");
+        testInstanceOverrideSubscene(*ent);
     }
     {
         // Test write instance of
-        Ent::Entity ent = entlib.loadEntity("instance.copy.entity");
-        Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
+        EntityPtr ent = entlib.loadEntity("instance.copy.entity");
+        Ent::Component* sysCreat = ent->getComponent("SystemicCreature");
         ENTLIB_ASSERT(sysCreat != nullptr);
 
         // TEST read inherited values in inherited component
-        Ent::Component* heightObj = ent.getComponent("HeightObj");
+        Ent::Component* heightObj = ent->getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
         ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isSet());
@@ -346,22 +433,22 @@ try
             sysCreat->root.at("BehaviorState")->getString() == std::string("Overrided")); // set. changed.
         ENTLIB_ASSERT(sysCreat->root.at("BehaviorState")->isSet()); // set. changed.
 
-        testInstanceOf(ent);
+        testInstanceOf(*ent);
 
-        entlib.saveEntity(ent, "instance.copy.entity");
+        entlib.saveEntity(*ent, "instance.copy.entity");
     }
 
     {
         // Test create detached
-        Ent::Entity ent = entlib.loadEntity("instance.entity");
-        Ent::Entity detached = ent.detachEntityFromPrefab();
+        EntityPtr ent = entlib.loadEntity("instance.entity");
+        EntityPtr detached = ent->detachEntityFromPrefab();
 
-        ENTLIB_ASSERT(detached.getColorValue().hasOverride());
+        ENTLIB_ASSERT(detached->getColorValue().hasOverride());
 
-        Ent::Component* sysCreat = detached.getComponent("SystemicCreature");
+        Ent::Component* sysCreat = detached->getComponent("SystemicCreature");
 
         // TEST read inherited values in inherited component
-        Ent::Component* heightObj = ent.getComponent("HeightObj");
+        Ent::Component* heightObj = ent->getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
         ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isSet());
@@ -385,16 +472,16 @@ try
         ENTLIB_ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
         ENTLIB_ASSERT(sysCreat->root.at("Inventory")->isSet()); // is set
 
-        entlib.saveEntity(detached, "instance.detached.entity");
+        entlib.saveEntity(*detached, "instance.detached.entity");
     }
     {
         // Test read detached
-        Ent::Entity ent = entlib.loadEntity("instance.detached.entity");
+        EntityPtr ent = entlib.loadEntity("instance.detached.entity");
 
-        Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
+        Ent::Component* sysCreat = ent->getComponent("SystemicCreature");
 
         // TEST read inherited values in inherited component
-        Ent::Component* heightObj = ent.getComponent("HeightObj");
+        Ent::Component* heightObj = ent->getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->isSet());
@@ -417,19 +504,19 @@ try
 
     {
         // Test create instance of
-        Ent::Entity instanceOf = entlib.makeInstanceOf("prefab.entity");
-        ENTLIB_ASSERT(instanceOf.getComponent("NetworkNode") != nullptr);
-        instanceOf.getComponent("TransformGD")->root.getFieldNames();
-        entlib.saveEntity(instanceOf, "instance.create.entity");
+        EntityPtr instanceOf = entlib.makeInstanceOf("prefab.entity");
+        ENTLIB_ASSERT(instanceOf->getComponent("NetworkNode") != nullptr);
+        instanceOf->getComponent("TransformGD")->root.getFieldNames();
+        entlib.saveEntity(*instanceOf, "instance.create.entity");
     }
     {
         // Test read instance of
-        Ent::Entity ent = entlib.loadEntity("instance.create.entity");
+        EntityPtr ent = entlib.loadEntity("instance.create.entity");
 
-        ent.getComponent("TransformGD")->root.getFieldNames();
+        ent->getComponent("TransformGD")->root.getFieldNames();
 
         // TEST read inherited values in inherited component
-        Ent::Component* heightObj = ent.getComponent("HeightObj");
+        Ent::Component* heightObj = ent->getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
         ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isSet());
@@ -439,7 +526,7 @@ try
             not heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 
         // Test read prefab
-        Ent::Component* sysCreat = ent.getComponent("SystemicCreature");
+        Ent::Component* sysCreat = ent->getComponent("SystemicCreature");
         ENTLIB_ASSERT(sysCreat != nullptr);
 
         // TEST read setted values
@@ -467,89 +554,96 @@ try
 
     // ******************* Test load/save complex entity pinetreec50cmh5mbasic ********************
     {
-        Ent::Entity ent = entlib.loadEntity("pinetreec50cmh5mbasic.entity");
-        entlib.saveEntity(ent, "pinetreec50cmh5mbasic.copy.entity");
-        Ent::Entity copyEnt = entlib.loadEntity("pinetreec50cmh5mbasic.copy.entity");
+        EntityPtr ent = entlib.loadEntity("pinetreec50cmh5mbasic.entity");
+        entlib.saveEntity(*ent, "pinetreec50cmh5mbasic.copy.entity");
+        EntityPtr copyEnt = entlib.loadEntity("pinetreec50cmh5mbasic.copy."
+                                              "entity");
 
         // TEST keeping empty component after entity save
-        ENTLIB_ASSERT(copyEnt.getComponent("EventHandlerGD") != nullptr);
+        ENTLIB_ASSERT(copyEnt->getComponent("EventHandlerGD") != nullptr);
     }
 
     // ******************* Test the override of an entity in a SubScene ***************************
     auto testOverrideSubEntity = [](Ent::Entity const& ent) {
         Ent::SubSceneComponent const* subScenecomp = ent.getSubSceneComponent();
-        auto&& allSubEntities = subScenecomp->embedded->objects;
+        auto&& allSubEntities = subScenecomp->embedded->getObjects();
         ENTLIB_ASSERT(allSubEntities.size() == 1);
-        ENTLIB_ASSERT(allSubEntities.front().getName() == std::string("EP1-Spout_LINK_001"));
-        ENTLIB_ASSERT(allSubEntities.front().getColor()[0] == 42);
+        ENTLIB_ASSERT(allSubEntities.front()->getName() == std::string("EP1-Spout_LINK_001"));
+        ENTLIB_ASSERT(allSubEntities.front()->getColor()[0] == 42);
     };
     {
-        Ent::Entity ent = entlib.loadEntity("instance_override_subentity.entity");
-        testOverrideSubEntity(ent);
-        entlib.saveEntity(ent, "instance_override_subentity.copy.entity");
-        Ent::Entity copyEnt = entlib.loadEntity("instance_override_subentity.copy.entity");
-        testOverrideSubEntity(copyEnt);
+        EntityPtr ent = entlib.loadEntity("instance_override_subentity.entity");
+        testOverrideSubEntity(*ent);
+        entlib.saveEntity(*ent, "instance_override_subentity.copy.entity");
+        EntityPtr copyEnt = entlib.loadEntity("instance_override_subentity.copy."
+                                              "entity");
+        testOverrideSubEntity(*copyEnt);
     }
 
     // ******************* Test the add of an entity in a SubScene *****************************
     auto testAddSubEntity = [](Ent::Entity const& ent) {
         Ent::SubSceneComponent const* subScenecomp = ent.getSubSceneComponent();
-        auto&& allSubEntities = subScenecomp->embedded->objects;
+        auto&& allSubEntities = subScenecomp->embedded->getObjects();
         ENTLIB_ASSERT(allSubEntities.size() == 2);
-        char const* name0 = allSubEntities[0].getName();
-        char const* name1 = allSubEntities[1].getName();
+        char const* name0 = allSubEntities[0]->getName();
+        char const* name1 = allSubEntities[1]->getName();
         ENTLIB_ASSERT(name0 == std::string("EP1-Spout_LINK_001"));
-        auto red = allSubEntities[0].getColor()[0];
-        ENTLIB_ASSERT(not allSubEntities[0].hasOverride());
+        auto red = allSubEntities[0]->getColor()[0];
+        ENTLIB_ASSERT(not allSubEntities[0]->hasOverride());
         ENTLIB_ASSERT(red == 255);
-        ENTLIB_ASSERT(not allSubEntities[0].canBeRenamed());
+        ENTLIB_ASSERT(not allSubEntities[0]->canBeRenamed());
         ENTLIB_ASSERT(name1 == std::string("EP1-Spout_LINK_001_added"));
-        ENTLIB_ASSERT(allSubEntities[1].getColor()[0] == 44);
-        ENTLIB_ASSERT(allSubEntities[1].canBeRenamed());
+        ENTLIB_ASSERT(allSubEntities[1]->getColor()[0] == 44);
+        ENTLIB_ASSERT(allSubEntities[1]->canBeRenamed());
     };
     {
-        Ent::Entity ent = entlib.loadEntity("instance_add_subentity.entity");
-        testAddSubEntity(ent);
-        entlib.saveEntity(ent, "instance_add_subentity.copy.entity");
-        Ent::Entity copyEnt = entlib.loadEntity("instance_add_subentity.copy.entity");
-        testAddSubEntity(copyEnt);
+        EntityPtr ent = entlib.loadEntity("instance_add_subentity.entity");
+        testAddSubEntity(*ent);
+        entlib.saveEntity(*ent, "instance_add_subentity.copy.entity");
+        EntityPtr copyEnt = entlib.loadEntity("instance_add_subentity.copy."
+                                              "entity");
+        testAddSubEntity(*copyEnt);
     }
 
     // ********************************** Test load/save scene ************************************
-    Ent::Scene scene = entlib.loadScene("X:/RawData/22_World/SceneMainWorld/SceneMainWorld.scene");
+    entlib.rawdataPath = "X:/RawData";
+
+    std::unique_ptr<Ent::Scene> scene = entlib.loadScene("X:/RawData/22_World/SceneMainWorld/"
+                                                         "SceneMainWorld.scene");
 
     printf("Scene Loaded\n");
-    printf("Entity count : %zu\n", scene.objects.size());
+    printf("Entity count : %zu\n", scene->getObjects().size());
 
-    for (Ent::Entity const& ent : scene.objects)
+    for (EntityPtr const& ent : scene->getObjects())
     {
-        printf("  Name \"%s\"\n", ent.getName());
+        printf("  Name \"%s\"\n", ent->getName());
 
-        for (char const* type : ent.getComponentTypes())
+        for (char const* type : ent->getComponentTypes())
         {
             printf("    Type \"%s\"\n", type);
-            Ent::Node const& root = ent.getComponent(type)->root;
+            Ent::Node const& root = ent->getComponent(type)->root;
             printNode("", root, "      ");
         }
     }
 
-    Ent::Component* heightObj = scene.objects.front().addComponent("HeightObj");
+    Ent::Component* heightObj = scene->getObjects().front()->addComponent("HeightObj");
     heightObj->root.at("DisplaceNoiseList")->push();
 
-    scene.objects.front().addComponent("BeamGeneratorGD")->root.getFieldNames();
+    scene->getObjects().front()->addComponent("BeamGeneratorGD")->root.getFieldNames();
     ENTLIB_ASSERT(
-        scene.objects.front().addComponent("ExplosionEffect")->root.getFieldNames().size() == 23);
+        scene->getObjects().front()->addComponent("ExplosionEffect")->root.getFieldNames().size()
+        == 23);
 
     auto ep1Iter = std::find_if(
-        begin(scene.objects), end(scene.objects), [ep1 = std::string("EP1_")](auto&& ent) {
-            return ent.getName() == ep1;
-        });
-    ENTLIB_ASSERT(ep1Iter != end(scene.objects));
-    ENTLIB_ASSERT(ep1Iter->getSubSceneComponent() != nullptr);
+        begin(scene->getObjects()),
+        end(scene->getObjects()),
+        [ep1 = std::string("EP1_")](auto&& ent) { return ent->getName() == ep1; });
+    ENTLIB_ASSERT(ep1Iter != end(scene->getObjects()));
+    ENTLIB_ASSERT((*ep1Iter)->getSubSceneComponent() != nullptr);
 
-    scene.objects.push_back(entlib.makeInstanceOf("prefab.entity"));
+    scene->addEntity(entlib.makeInstanceOf((current_path() / "prefab.entity").generic_u8string()));
 
-    entlib.saveScene(scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene");
+    entlib.saveScene(*scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene");
 
     std::cout << "Done" << std::endl;
     return EXIT_SUCCESS;

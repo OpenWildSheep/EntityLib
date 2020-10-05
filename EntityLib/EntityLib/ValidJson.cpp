@@ -113,8 +113,8 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema)
         instSchema["minItems"] = tmplSchema.minItems;
     }
 
-    std::array<char const*, size_t(Ent::DataType::boolean) + 1> typeToStr = {
-        "null", "string", "number", "integer", "object", "array", "boolean"
+    std::array<char const*, static_cast<size_t>(Ent::DataType::COUNT)> typeToStr = {
+        "null", "string", "number", "integer", "object", "array", "boolean", "string"
     };
     instSchema["type"] = typeToStr[size_t(tmplSchema.type)];
     std::vector<char const*> requiredList;

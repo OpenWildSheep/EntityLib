@@ -261,7 +261,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(py::init<std::string>())
         .def_readwrite("validation_enabled", &EntityLib::validationEnabled)
         .def_readonly("root_path", &EntityLib::rootPath)
-        .def_readwrite("rawdata_path", &EntityLib::rawdataPath)
+        .def_readwrite("rawdata_path", &EntityLib::rawdataPath) // unit-test need to write it
         .def_readonly("tools_dir", &EntityLib::toolsDir)
         .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference)
         .def_readonly(

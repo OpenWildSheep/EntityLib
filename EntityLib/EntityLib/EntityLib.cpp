@@ -675,11 +675,11 @@ namespace Ent
 
         return std::make_unique<Entity>(
             *entlib,
-            name.makeInstanceOf(),
+            name,
             std::move(instComponents),
             std::move(instSubSceneComponent),
-            color.makeInstanceOf(),
-            thumbnail.makeInstanceOf(),
+            color,
+            thumbnail,
             instanceOf);
     }
 
@@ -1027,7 +1027,10 @@ namespace Ent
     {
         std::vector<std::unique_ptr<Entity>> freeEntities;
         for (auto&& ent : objects)
+        {
+            ent->setParentScene(nullptr);
             freeEntities.emplace_back(std::move(ent));
+        }
         objects.clear();
         return freeEntities;
     }

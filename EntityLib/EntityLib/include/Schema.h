@@ -25,6 +25,7 @@ namespace Ent
         array, ///< @see Ent::DataType::array
         boolean,
         entityRef,
+        oneOf,
         COUNT
     };
 
@@ -65,10 +66,15 @@ namespace Ent
             uint32_t bitDepth = 32; ///< Bit depth of this number, either 8, 16, 32 or 64
             bool isSigned = true; ///< is this number signed ?
         };
+        struct UnionMeta : BaseMeta
+        {
+            std::string dataField;
+            std::string typeField;
+        };
         struct GenericMeta : BaseMeta
         {
         };
-        using Meta = mapbox::util::variant<GenericMeta, NumberMeta>;
+        using Meta = mapbox::util::variant<GenericMeta, NumberMeta, UnionMeta>;
         Meta meta;
 
         // helper methods

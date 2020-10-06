@@ -88,6 +88,19 @@
             "Version": 1
         }, {
             "Data": {
+				"ScriptEvents": [
+					{
+						"className": "GE_Spawn",
+						"classData": {
+							"NbEntitiesToSpawn": 37
+						}
+					}
+				]
+			},
+            "Type": "CinematicGD",
+            "Version": 1
+        }, {
+            "Data": {
                 "BreakableSizeMax": "small",
                 "BreathDamages": 10.0,
                 "BreathImpact": 0.0,

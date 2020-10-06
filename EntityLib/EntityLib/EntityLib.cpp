@@ -1320,6 +1320,27 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
         result = Ent::Node(Ent::Override<Ent::EntityRef>(def, supVal, val), &nodeSchema);
     }
     break;
+    case Ent::DataType::oneOf:
+    {
+        auto&& meta = nodeSchema.meta.get<Ent::Subschema::UnionMeta>();
+        std::string const& typeField = meta.typeField;
+        std::string const& dataField = meta.dataField;
+        std::string const& dataType = data.at(typeField).get<std::string>();
+        for (Ent::SubschemaRef const& schemaTocheck : *nodeSchema.oneOf)
+        {
+            std::string const& schemaType =
+                schemaTocheck->properties.at(typeField).get().constValue->get<std::string>();
+            if (schemaType == dataType)
+            {
+                return loadNode(
+                    schemaTocheck.get(),
+                    data.at(dataField),
+                    super != nullptr ? super->at(dataField.c_str()) : nullptr);
+            }
+        }
+        result = Ent::Node();
+    }
+    break;
     case Ent::DataType::COUNT:
     default: ENTLIB_LOGIC_ERROR("Invalid DataType"); break;
     }
@@ -1374,8 +1395,9 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
         data = ref.entityPath;
     }
     break;
+    case Ent::DataType::oneOf:
     case Ent::DataType::COUNT:
-    default: ENTLIB_LOGIC_ERROR("DataType is Ent::DataType::COUNT"); break;
+    default: ENTLIB_LOGIC_ERROR("DataType is Invalid!!"); break;
     }
     return data;
 }

@@ -47,6 +47,7 @@ static void printNode(char const* name, Ent::Node const& node, std::string const
     case Ent::DataType::entityRef:
         printf("%s%s [EntityRef] : %s\n", tab.c_str(), name, node.getEntityRef().entityPath.c_str());
         break;
+    case Ent::DataType::oneOf: // oneOf only exists in Schema. It can't be in data.
     case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
     }
 }
@@ -89,6 +90,7 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
         break;
     case Ent::DataType::string: std::cout << "string" << std::endl; break;
     case Ent::DataType::entityRef: std::cout << "entity ref" << std::endl; break;
+    case Ent::DataType::oneOf: std::cout << "oneOf" << std::endl; break;
     case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
     }
 }
@@ -160,6 +162,20 @@ try
         ENTLIB_ASSERT(allSubEntities.size() == 1);
         ENTLIB_ASSERT(allSubEntities.front()->getName() == std::string("EP1-Spout_LINK_001"));
         ENTLIB_ASSERT(allSubEntities.front()->getColor()[0] == 255);
+
+        // TEST union
+        Ent::Component* cinematicGD = ent->getComponent("CinematicGD");
+        Ent::Node* scriptEvents = cinematicGD->root.at("ScriptEvents");
+        ENTLIB_ASSERT(scriptEvents->getDataType() == Ent::DataType::array);
+        Ent::Node* firstScriptEvent = scriptEvents->at(0llu);
+        ENTLIB_ASSERT(firstScriptEvent->getDataType() == Ent::DataType::object);
+        ENTLIB_ASSERT(firstScriptEvent->at("className")->getString() == std::string("GE_Spawn"));
+        Ent::Node* geSpawn = firstScriptEvent->at("classData");
+        ENTLIB_ASSERT(geSpawn->getTypeName() == std::string("GE_Spawn"));
+        Ent::Node* nbEnt = geSpawn->at("NbEntitiesToSpawn");
+        ENTLIB_ASSERT(nbEnt != nullptr);
+        ENTLIB_ASSERT(nbEnt->getDataType() == Ent::DataType::integer);
+        ENTLIB_ASSERT(nbEnt->getInt() == 37);
 
         // TEST simple entity ref creation
         Ent::Component* testEntityRef = ent->addComponent("TestEntityRef");

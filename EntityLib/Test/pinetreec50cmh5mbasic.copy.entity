@@ -295,8 +295,6 @@
         },
         {
             "Data": {
-                "BendTreeBendStartSoundEvent": "GPE_Tree_Catapult_Bend",
-                "BendTreeCatapultStartSoundEvent": "GPE_Tree_Catapult_Start",
                 "GPEActorStateName": "ActorStateBendingTree",
                 "GPEType": "BendTree",
                 "HotspotID": 7

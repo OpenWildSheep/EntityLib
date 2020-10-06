@@ -108,6 +108,16 @@ Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
             _meta.isSigned = _data["signed"].get<bool>();
         }
     };
+    const auto setUnionMetas = [&](Ent::Subschema::UnionMeta& _meta) {
+        if (_data.count("unionDataField") != 0u)
+        {
+            _meta.dataField = _data["unionDataField"].get<std::string>();
+        }
+        if (_data.count("unionTypeField") != 0u)
+        {
+            _meta.typeField = _data["unionTypeField"].get<std::string>();
+        }
+    };
     switch (_type)
     {
     case Ent::DataType::integer:
@@ -126,6 +136,13 @@ Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
     {
         Ent::Subschema::GenericMeta meta;
         setBaseMetas(&meta);
+        return meta;
+    }
+    case Ent::DataType::oneOf:
+    {
+        Ent::Subschema::UnionMeta meta;
+        setBaseMetas(&meta);
+        setUnionMetas(meta);
         return meta;
     }
     case Ent::DataType::null:
@@ -400,6 +417,7 @@ void Ent::SchemaLoader::readSchema(Schema* globalSchema, json const& _fileRoot, 
         stack.back()->get().type = type;
     };
     vis.setOneOf = [&](size_t size) {
+        stack.back()->get().type = Ent::DataType::oneOf;
         stack.back()->get().oneOf = std::vector<Ent::SubschemaRef>();
         stack.back()->get().oneOf->resize(size);
     };

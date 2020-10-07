@@ -18,8 +18,10 @@ Ent::SchemaLoader::SchemaLoader(std::filesystem::path _schemaPath)
 static char const* entityRefSchemaName = "#/definitions/EntityRef";
 
 void Ent::SchemaLoader::parseSchema(
-    json const& _fileRoot, json const& _data, Visitor const& vis, int depth)
+    std::string const& _filename, json const& _fileRoot, json const& _data, Visitor const& vis, int depth)
 {
+    ENTLIB_ASSERT(not _filename.empty());
+
     if (_data.count("$ref") != 0)
     {
         auto ref = _data["$ref"].get<std::string>();
@@ -33,13 +35,15 @@ void Ent::SchemaLoader::parseSchema(
             vis.closeSubschema();
             return;
         }
-        vis.openRef(ref.c_str());
-        if (parsedRef.count(ref) != 0) // Was already parsed
+        // Use absolute path to avoid name collision
+        auto absRef = (ref.front() == '#') ? ("file://" + _filename + ref) : ref;
+        vis.openRef(absRef.c_str());
+        if (parsedRef.count(absRef) != 0) // Was already parsed
         {
             vis.closeRef();
             return;
         }
-        parsedRef.insert(ref);
+        parsedRef.insert(absRef);
         // ref look like this : "file://EditionComponents.json#/definitions/HeightObj"
         if (ref.find("file://") == 0)
         {
@@ -53,6 +57,7 @@ void Ent::SchemaLoader::parseSchema(
         if (fileName.empty())
         {
             refRoot = &_fileRoot;
+            fileName = _filename;
         }
         else
         {
@@ -70,13 +75,13 @@ void Ent::SchemaLoader::parseSchema(
         {
             node = &((*node).at(token));
         }
-        parseSchemaNoRef(*refRoot, *node, vis, depth);
+        parseSchemaNoRef(fileName, *refRoot, *node, vis, depth);
         vis.closeRef();
     }
     else
     {
         vis.openSubschema();
-        parseSchemaNoRef(_fileRoot, _data, vis, depth);
+        parseSchemaNoRef(_filename, _fileRoot, _data, vis, depth);
         vis.closeSubschema();
     }
 }
@@ -152,7 +157,7 @@ Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
 }
 
 void Ent::SchemaLoader::parseSchemaNoRef(
-    json const& _rootFile, json const& _data, Visitor const& vis, int depth)
+    std::string const& _filename, json const& _rootFile, json const& _data, Visitor const& vis, int depth)
 {
     DataType currentType = DataType::null;
     const auto setType = [&](DataType _type) {
@@ -209,7 +214,7 @@ void Ent::SchemaLoader::parseSchemaNoRef(
             auto const& propName = name_prop.key();
             auto const& prop = name_prop.value();
             vis.openProperty(propName.c_str());
-            parseSchema(_rootFile, prop, vis, depth + 1);
+            parseSchema(_filename, _rootFile, prop, vis, depth + 1);
             vis.closeProperty();
         }
     }
@@ -283,7 +288,7 @@ void Ent::SchemaLoader::parseSchemaNoRef(
             for (size_t index = 0; index < items.size(); ++index)
             {
                 vis.openLinearItem(index);
-                parseSchema(_rootFile, items[index], vis, depth + 1);
+                parseSchema(_filename, _rootFile, items[index], vis, depth + 1);
                 vis.closeLinearItem();
             }
         }
@@ -291,7 +296,7 @@ void Ent::SchemaLoader::parseSchemaNoRef(
         else if (items.type() == nlohmann::json::value_t::object)
         {
             vis.openSingularItem();
-            parseSchema(_rootFile, items, vis, depth + 1);
+            parseSchema(_filename, _rootFile, items, vis, depth + 1);
             vis.closeSingularItem();
         }
         else
@@ -301,13 +306,14 @@ void Ent::SchemaLoader::parseSchemaNoRef(
     }
     if (_data.count("oneOf") != 0u)
     {
+        setType(Ent::DataType::oneOf);
         auto const& items = _data["oneOf"];
         ENTLIB_ASSERT(vis.setOneOf != nullptr);
         vis.setOneOf(items.size());
         for (size_t index = 0; index < items.size(); ++index)
         {
             vis.openOneOfItem(index);
-            parseSchema(_rootFile, items[index], vis, depth + 1);
+            parseSchema(_filename, _rootFile, items[index], vis, depth + 1);
             vis.closeOneOfItem();
         }
     }
@@ -358,7 +364,15 @@ void Ent::SchemaLoader::parseSchemaNoRef(
     }
 }
 
-void Ent::SchemaLoader::readSchema(Schema* globalSchema, json const& _fileRoot, json const& _data)
+// TODO Loïc : (Low prio) It could be good to use a real logger system. (like spdlog for example)
+#ifdef ENTLIB_DEBUG_READSCHEMA
+#define ENTLIB_DEBUG_PRINTF(message, ...) printf(message, __VA_ARGS__);
+#else
+#define ENTLIB_DEBUG_PRINTF(message, ...)
+#endif
+
+void Ent::SchemaLoader::readSchema(
+    Schema* globalSchema, std::string const& _filename, json const& _fileRoot, json const& _data)
 {
     Ent::SubschemaRef& schema = globalSchema->root;
     Visitor vis;
@@ -367,87 +381,145 @@ void Ent::SchemaLoader::readSchema(Schema* globalSchema, json const& _fileRoot, 
     vis.addEnumValue = [&](char const* val) {
         stack.back()->get().enumValues.emplace_back(val);
     };
+    auto checkAllStack = [&stack] {
+        for (Ent::SubschemaRef* ref : stack)
+        {
+            ENTLIB_ASSERT(ref->deleteCheck.state_ == DeleteCheck::State::VALID);
+        }
+    };
+    auto getTab = [&stack] {
+        return std::string(stack.size() * 4, ' ').c_str();
+    };
     vis.closeLinearItem = [&] {
+        checkAllStack();
         ENTLIB_ASSERT(
             stack.back()->get().type != DataType::array or stack.back()->get().singularItems != nullptr
             or stack.back()->get().linearItems.has_value());
         stack.pop_back();
+        checkAllStack();
+        ENTLIB_DEBUG_PRINTF("%sloseLinearItem\n", getTab());
     };
     vis.closeProperty = [&] {
+        checkAllStack();
         ENTLIB_ASSERT(
             stack.back()->get().type != DataType::array or stack.back()->get().singularItems != nullptr
             or stack.back()->get().linearItems.has_value());
         stack.pop_back();
+        checkAllStack();
+        ENTLIB_DEBUG_PRINTF("%scloseProperty\n", getTab());
     };
     vis.closeSingularItem = [&] {
+        checkAllStack();
         ENTLIB_ASSERT(
             stack.back()->get().type != DataType::array or stack.back()->get().singularItems != nullptr
             or stack.back()->get().linearItems.has_value());
         stack.pop_back();
+        checkAllStack();
+        ENTLIB_DEBUG_PRINTF("%scloseSingularItem\n", getTab());
     };
     vis.openLinearItem = [&](size_t index) {
+        checkAllStack();
+        ENTLIB_DEBUG_PRINTF("%sopenLinearItem %zu\n", getTab(), index);
         Ent::SubschemaRef& lin = stack.back()->get().linearItems->at(index);
         stack.push_back(&lin);
+        checkAllStack();
     };
     vis.openProperty = [&](char const* propName) {
+        checkAllStack();
+        ENTLIB_DEBUG_PRINTF("%sopenProperty %s\n", getTab(), propName);
         Ent::SubschemaRef& subSchema = stack.back()->get().properties[propName];
         stack.push_back(&subSchema);
+        checkAllStack();
     };
     vis.openSingularItem = [&]() {
+        checkAllStack();
+        ENTLIB_DEBUG_PRINTF("%sopenSingularItem\n", getTab());
         stack.back()->get().singularItems = std::make_unique<Ent::SubschemaRef>();
+        checkAllStack();
         stack.push_back(&(*stack.back()->get().singularItems));
+        checkAllStack();
     };
     vis.setConstValue = [&](const Subschema::DefaultValue& val) {
+        checkAllStack();
         stack.back()->get().constValue = val;
     };
     vis.setDefaultValue = [&](Subschema::DefaultValue val) {
+        checkAllStack();
         stack.back()->get().defaultValue = std::move(val);
     };
     vis.setLinearItem = [&](size_t size) {
+        checkAllStack();
         stack.back()->get().linearItems = std::vector<Ent::SubschemaRef>();
         stack.back()->get().linearItems->resize(size);
     };
     vis.setMaxItems = [&](size_t val) {
+        checkAllStack();
         stack.back()->get().maxItems = val;
     };
     vis.setMinItems = [&](size_t val) {
+        checkAllStack();
         stack.back()->get().minItems = val;
     };
     vis.setType = [&](DataType type) {
+        ENTLIB_DEBUG_PRINTF("%ssetType %d\n", getTab(), (int)type);
+        checkAllStack();
         stack.back()->get().type = type;
     };
     vis.setOneOf = [&](size_t size) {
+        ENTLIB_DEBUG_PRINTF("%ssetOneOf %zu\n", getTab(), size);
+        checkAllStack();
         stack.back()->get().type = Ent::DataType::oneOf;
         stack.back()->get().oneOf = std::vector<Ent::SubschemaRef>();
         stack.back()->get().oneOf->resize(size);
     };
     vis.openOneOfItem = [&](size_t index) {
+        ENTLIB_DEBUG_PRINTF("%sopenOneOfItem %zu\n", getTab(), index);
+        checkAllStack();
         Ent::SubschemaRef& lin = stack.back()->get().oneOf->at(index);
         stack.push_back(&lin);
+        checkAllStack();
     };
     vis.closeOneOfItem = [&] {
+        checkAllStack();
         stack.pop_back();
+        checkAllStack();
+        ENTLIB_DEBUG_PRINTF("%scloseOneOfItem\n", getTab());
     };
 
     vis.openRef = [&](char const* link) {
+        checkAllStack();
+        ENTLIB_DEBUG_PRINTF("%sopenRef %s\n", getTab(), link);
         char const* typeName = getRefTypeName(link);
         // Force to create the definition (do nothing if already exist)
         ENTLIB_ASSERT_MSG(typeName != nullptr, "Can't get type name in '%s'!!", link);
         globalSchema->allDefinitions[link].name = typeName;
-        stack.back()->subSchemaOrRef = SubschemaRef::Ref{ globalSchema, link };
+        auto& ref = stack.back()->subSchemaOrRef;
+        ENTLIB_ASSERT(ref.is<Null>());
+        ref = SubschemaRef::Ref{ globalSchema, link };
     };
     vis.closeRef = [&]() {
+        checkAllStack();
+        ENTLIB_DEBUG_PRINTF("%scloseRef\n", getTab());
     };
     vis.openSubschema = [&]() {
+        ENTLIB_DEBUG_PRINTF("%sopenSubschema\n", getTab());
+        checkAllStack();
+        ENTLIB_ASSERT(stack.back()->subSchemaOrRef.is<Null>());
         stack.back()->subSchemaOrRef = Subschema{};
+        ENTLIB_DEBUG_PRINTF("%sopenSubschema2\n", getTab());
+        checkAllStack();
     };
     vis.closeSubschema = [&]() {
+        ENTLIB_DEBUG_PRINTF("%scloseSubschema\n", getTab());
     };
     vis.setMeta = [&](Subschema::Meta meta) {
+        checkAllStack();
         auto&& subSchema = stack.back()->get();
         subSchema.meta = std::move(meta);
     };
     vis.setName = [&](std::string name) {
+        ENTLIB_DEBUG_PRINTF("%ssetName %s\n", getTab(), name.c_str());
+        checkAllStack();
         auto&& subSchema = stack.back()->get();
         ENTLIB_ASSERT_MSG(
             subSchema.name.empty(),
@@ -456,7 +528,7 @@ void Ent::SchemaLoader::readSchema(Schema* globalSchema, json const& _fileRoot, 
             name.c_str());
         subSchema.name = std::move(name);
     };
-    parseSchema(_fileRoot, _data, vis, 0);
+    parseSchema(_filename, _fileRoot, _data, vis, 0);
 }
 
 /// \endcond

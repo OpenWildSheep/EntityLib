@@ -110,6 +110,8 @@ try
     entlib.validationEnabled = true;
 #endif
 
+    ENTLIB_ASSERT(Ent::format("Toto %d", 37) == "Toto 37");
+
     using EntityPtr = std::unique_ptr<Ent::Entity>;
 
     {
@@ -169,13 +171,21 @@ try
         ENTLIB_ASSERT(scriptEvents->getDataType() == Ent::DataType::array);
         Ent::Node* firstScriptEvent = scriptEvents->at(0llu);
         ENTLIB_ASSERT(firstScriptEvent->getDataType() == Ent::DataType::object);
-        ENTLIB_ASSERT(firstScriptEvent->at("className")->getString() == std::string("GE_Spawn"));
-        Ent::Node* geSpawn = firstScriptEvent->at("classData");
-        ENTLIB_ASSERT(geSpawn->getTypeName() == std::string("GE_Spawn"));
-        Ent::Node* nbEnt = geSpawn->at("NbEntitiesToSpawn");
+        std::string className = firstScriptEvent->at("className")->getString();
+        ENTLIB_ASSERT(className == "CineEventTestBlackboardHasFact");
+        Ent::Node* cineEvent = firstScriptEvent->at("classData");
+
+        ENTLIB_ASSERT(cineEvent->getTypeName() == std::string("CineEventTestBlackboardHasFact"));
+
+        Ent::Node* nbEnt = cineEvent->at("FactName");
         ENTLIB_ASSERT(nbEnt != nullptr);
-        ENTLIB_ASSERT(nbEnt->getDataType() == Ent::DataType::integer);
-        ENTLIB_ASSERT(nbEnt->getInt() == 37);
+        ENTLIB_ASSERT(nbEnt->getDataType() == Ent::DataType::string);
+        ENTLIB_ASSERT(nbEnt->getString() == std::string("Toto"));
+
+        // TEST sub-object with non-default values
+        Ent::Component* explosionEffect = ent->getComponent("ExplosionEffect");
+        Ent::Node* shakeData = explosionEffect->root.at("ShakeData");
+        ENTLIB_ASSERT(shakeData->at("shakeDuration")->getFloat() == 0.0f);
 
         // TEST simple entity ref creation
         Ent::Component* testEntityRef = ent->addComponent("TestEntityRef");

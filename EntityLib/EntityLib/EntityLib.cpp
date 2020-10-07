@@ -32,7 +32,7 @@ static json saveScene(Ent::ComponentsSchema const& schema, Ent::Scene const& sce
 
 namespace Ent
 {
-    char const* colorSchemaName = "#/definitions/Color";
+    char const* colorSchemaName = "file://RuntimeComponents.json#/definitions/Color";
     static Ent::Node makeDefaultColorField(EntityLib const& entlib)
     {
         Ent::Override<float> zero{ 0.f, tl::nullopt, tl::nullopt };
@@ -62,7 +62,7 @@ namespace Ent
 
         SchemaLoader loader(schemaPath);
 
-        loader.readSchema(&schema.schema, schemaDocument, schemaDocument);
+        loader.readSchema(&schema.schema, "Scene-schema.json", schemaDocument, schemaDocument);
 
         auto& compList = schema.schema.root->properties["Objects"]
                              ->singularItems
@@ -1334,7 +1334,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
             {
                 return loadNode(
                     schemaTocheck.get(),
-                    data.at(dataField),
+                    data,
                     super != nullptr ? super->at(dataField.c_str()) : nullptr);
             }
         }
@@ -1379,7 +1379,7 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
         {
             if (item->hasOverride())
             {
-                json tmpNode = saveNode(schema.singularItems->get(), *item);
+                json tmpNode = saveNode(*item->getSchema(), *item);
                 data.emplace_back(std::move(tmpNode));
             }
             else

@@ -88,15 +88,15 @@
             "Version": 1
         }, {
             "Data": {
-				"ScriptEvents": [
-					{
-						"className": "GE_Spawn",
-						"classData": {
-							"NbEntitiesToSpawn": 37
-						}
-					}
-				]
-			},
+                "ScriptEvents": [
+                    {
+                        "className": "CineEventTestBlackboardHasFact",
+                        "classData": {
+                            "FactName": "Toto"
+                        }
+                    }
+                ]
+            },
             "Type": "CinematicGD",
             "Version": 1
         }, {

@@ -98,6 +98,20 @@
         },
         {
             "Data": {
+                "ScriptEvents": [
+                    {
+                        "classData": {
+                            "FactName": "Toto"
+                        },
+                        "className": "CineEventTestBlackboardHasFact"
+                    }
+                ]
+            },
+            "Type": "CinematicGD",
+            "Version": 1
+        },
+        {
+            "Data": {
                 "BreakableSizeMax": "small",
                 "BreathDamages": 10.0,
                 "BreathImpact": 0.0,

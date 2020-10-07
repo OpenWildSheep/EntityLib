@@ -50,6 +50,12 @@ namespace Ent
         bool hasOverride() const;
     };
 
+    struct OneOf
+    {
+        value_ptr<Node> data;
+        bool hasOverride() const;
+    };
+
     struct EntityRef
     {
         /// @brief string representation of this entity ref, works like a file path, always relative.
@@ -125,7 +131,8 @@ namespace Ent
             Object,
             Array,
             Override<bool>,
-            Override<EntityRef>>;
+            Override<EntityRef>,
+            OneOf>;
         Node() = default;
         Node(Value val, Subschema const* schema);
         /// @endcond
@@ -149,6 +156,10 @@ namespace Ent
         void pop(); ///< @pre type==Ent::DataType::array. @brief Remove an item at the end of array
         void clear(); ///< @pre type==Ent::DataType::array. @brief Remove all items in array
         bool empty() const; ///< ///< @pre type==Ent::DataType::array. @brief return true if array is empty
+
+        // OneOf
+        Node* getUnionData();
+        Node const* getUnionData() const;
 
         // Value
         float getFloat() const; ///< @pre number or integer. @brief Get the value as float

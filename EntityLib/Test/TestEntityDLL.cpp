@@ -47,7 +47,10 @@ static void printNode(char const* name, Ent::Node const& node, std::string const
     case Ent::DataType::entityRef:
         printf("%s%s [EntityRef] : %s\n", tab.c_str(), name, node.getEntityRef().entityPath.c_str());
         break;
-    case Ent::DataType::oneOf: // oneOf only exists in Schema. It can't be in data.
+    case Ent::DataType::oneOf:
+        printf("%s%s [Union]\n", tab.c_str(), name);
+        printNode("Data", *node.getUnionData(), tab + "    ");
+        break;
     case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
     }
 }
@@ -114,6 +117,11 @@ try
 
     using EntityPtr = std::unique_ptr<Ent::Entity>;
 
+    ENTLIB_ASSERT(
+        entlib.schema.schema.allDefinitions.count("file://RuntimeComponents.json#/definitions/"
+                                                  "Color")
+        == 1);
+
     {
         EntityPtr ent = entlib.loadEntity("prefab.entity");
 
@@ -121,7 +129,9 @@ try
         Ent::Component* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
         ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->getFloat() == 100.f);
         ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->isDefault());
-        ENTLIB_ASSERT(voxelSimulationGD->root.getTypeName() == std::string("VoxelSimulationGD"));
+        ENTLIB_ASSERT(
+            voxelSimulationGD->root.getTypeName()
+            == std::string("file://RuntimeComponents.json#/definitions/VoxelSimulationGD"));
 
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent->getComponent("HeightObj");
@@ -169,13 +179,13 @@ try
         Ent::Component* cinematicGD = ent->getComponent("CinematicGD");
         Ent::Node* scriptEvents = cinematicGD->root.at("ScriptEvents");
         ENTLIB_ASSERT(scriptEvents->getDataType() == Ent::DataType::array);
-        Ent::Node* firstScriptEvent = scriptEvents->at(0llu);
-        ENTLIB_ASSERT(firstScriptEvent->getDataType() == Ent::DataType::object);
-        std::string className = firstScriptEvent->at("className")->getString();
-        ENTLIB_ASSERT(className == "CineEventTestBlackboardHasFact");
-        Ent::Node* cineEvent = firstScriptEvent->at("classData");
-
-        ENTLIB_ASSERT(cineEvent->getTypeName() == std::string("CineEventTestBlackboardHasFact"));
+        Ent::Node* oneOfScripts = scriptEvents->at(0llu);
+        ENTLIB_ASSERT(oneOfScripts->getDataType() == Ent::DataType::oneOf);
+        Ent::Node* cineEvent = oneOfScripts->getUnionData();
+        ENTLIB_ASSERT(
+            cineEvent->getTypeName()
+            == std::string(
+                R"(file://RuntimeComponents.json#/definitions/CineEventTestBlackboardHasFact)"));
 
         Ent::Node* nbEnt = cineEvent->at("FactName");
         ENTLIB_ASSERT(nbEnt != nullptr);

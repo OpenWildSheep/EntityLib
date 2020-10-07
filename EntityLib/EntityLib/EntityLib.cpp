@@ -164,6 +164,23 @@ namespace Ent
         throw BadType();
     }
 
+    Node* Node::getUnionData()
+    {
+        if (value.is<OneOf>())
+        {
+            return value.get<OneOf>().data.get();
+        }
+        throw BadType();
+    }
+    Node const* Node::getUnionData() const
+    {
+        if (value.is<OneOf>())
+        {
+            return value.get<OneOf>().data.get();
+        }
+        throw BadType();
+    }
+
     float Node::getFloat() const
     {
         if (value.is<Override<float>>())
@@ -306,6 +323,11 @@ namespace Ent
                 return std::get<1>(name_node)->hasDefaultValue();
             });
         }
+
+        bool operator()(OneOf const& var) const
+        {
+            return var.data->hasDefaultValue();
+        }
     };
 
     bool Node::hasDefaultValue() const
@@ -349,6 +371,11 @@ namespace Ent
                     nonstd::make_value<Node>(std::get<1>(name_node)->detach()));
             }
             return Node(std::move(out), schema);
+        }
+
+        Node operator()(OneOf const& var) const
+        {
+            return Node(OneOf{ var.data->detach() }, schema);
         }
     };
 
@@ -394,6 +421,11 @@ namespace Ent
             }
             return Node(std::move(out), schema);
         }
+
+        Node operator()(OneOf const& var) const
+        {
+            return Node(OneOf{ var.data->makeInstanceOf() }, schema);
+        }
     };
 
     Node Node::makeInstanceOf() const
@@ -432,6 +464,11 @@ namespace Ent
                 }
             }
             return false;
+        }
+
+        bool operator()(OneOf const& var) const
+        {
+            return var.hasOverride();
         }
     };
 
@@ -540,6 +577,12 @@ namespace Ent
         bool operator()(Object const& obj) const
         {
             (void*)&obj;
+            return false;
+        }
+
+        bool operator()(OneOf const& var) const
+        {
+            (void*)&var;
             return false;
         }
     };
@@ -1332,10 +1375,11 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                 schemaTocheck->properties.at(typeField).get().constValue->get<std::string>();
             if (schemaType == dataType)
             {
-                return loadNode(
-                    schemaTocheck.get(),
-                    data,
+                Ent::Node dataNode = loadNode(
+                    schemaTocheck->properties.at(dataField).get(),
+                    data.at(dataField),
                     super != nullptr ? super->at(dataField.c_str()) : nullptr);
+                return Ent::Node(Ent::OneOf{ dataNode }, &nodeSchema);
             }
         }
         result = Ent::Node();
@@ -1396,6 +1440,18 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
     }
     break;
     case Ent::DataType::oneOf:
+    {
+        Ent::Subschema::UnionMeta const& meta = schema.meta.get<Ent::Subschema::UnionMeta>();
+        Ent::Node const* dataInsideUnion = node.getUnionData();
+        std::string const absType = dataInsideUnion->getTypeName();
+        static std::string const defTag = "#/definitions/";
+        auto defPos = absType.find(defTag);
+        std::string type =
+            (defPos == std::string::npos) ? absType : absType.substr(defPos + defTag.size());
+        data[meta.typeField] = std::move(type);
+        data[meta.dataField] = saveNode(*dataInsideUnion->getSchema(), *dataInsideUnion);
+    }
+    break;
     case Ent::DataType::COUNT:
     default: ENTLIB_LOGIC_ERROR("DataType is Invalid!!"); break;
     }
@@ -1950,6 +2006,11 @@ bool Ent::SubSceneComponent::hasOverride() const
 bool Ent::Array::hasOverride() const
 {
     return std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasOverride));
+}
+
+bool Ent::OneOf::hasOverride() const
+{
+    return data->hasOverride();
 }
 
 /// \endcond

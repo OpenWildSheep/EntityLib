@@ -492,7 +492,7 @@ void Ent::SchemaLoader::readSchema(
         char const* typeName = getRefTypeName(link);
         // Force to create the definition (do nothing if already exist)
         ENTLIB_ASSERT_MSG(typeName != nullptr, "Can't get type name in '%s'!!", link);
-        globalSchema->allDefinitions[link].name = typeName;
+        globalSchema->allDefinitions[link].name = link;
         auto& ref = stack.back()->subSchemaOrRef;
         ENTLIB_ASSERT(ref.is<Null>());
         ref = SubschemaRef::Ref{ globalSchema, link };

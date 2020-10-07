@@ -52,6 +52,7 @@ namespace Ent
 
     enum class ActivationLevel
     {
+        Created,
         InWorld,
         Loading,
         Started

@@ -10,8 +10,9 @@
 
 using namespace nlohmann;
 
-Ent::SchemaLoader::SchemaLoader(std::filesystem::path _schemaPath)
+Ent::SchemaLoader::SchemaLoader(std::filesystem::path _toolsdir, std::filesystem::path _schemaPath)
     : m_schemaPath(std::move(_schemaPath))
+    , m_toolsdir(std::move(_toolsdir))
 {
 }
 
@@ -59,7 +60,7 @@ void Ent::SchemaLoader::parseSchema(
             auto iter = m_schemaMap.find(fileName);
             if (iter == m_schemaMap.end())
             {
-                m_schemaMap[fileName] = loadJsonFile(m_schemaPath / fileName);
+                m_schemaMap[fileName] = loadJsonFile(m_toolsdir, m_schemaPath / fileName);
             }
             refRoot = &m_schemaMap[fileName];
         }

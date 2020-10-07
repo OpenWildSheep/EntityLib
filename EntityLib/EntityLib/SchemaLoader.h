@@ -23,7 +23,7 @@ namespace Ent
     {
     public:
         /// Create a SchemaLoader given the file of the global Scene schema
-        SchemaLoader(std::filesystem::path _schemaPath);
+        SchemaLoader(std::filesystem::path _toolsdir, std::filesystem::path _schemaPath);
 
         /// Load the Schema of a Component or a property
         /// @remark _data can be a reference ($ref)
@@ -74,6 +74,7 @@ namespace Ent
             nlohmann::json const& _rootFile, nlohmann::json const& _data, Visitor const& vis, int depth);
 
         std::filesystem::path m_schemaPath; ///< Path to the global Scene Schema
+        std::filesystem::path m_toolsdir; ///< Path to the X:/Tools directory
         std::map<std::string, nlohmann::json> m_schemaMap; ///< Cache of already loaded schema documents
         std::set<std::string> parsedRef; ///< To know if a definition was already parsed
     };

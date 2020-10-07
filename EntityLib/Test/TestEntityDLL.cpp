@@ -144,6 +144,10 @@ try
         ENTLIB_ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
         ENTLIB_ASSERT(sysCreat->root.at("Inventory")->isSet()); // is set
 
+        // TEST comment
+        ENTLIB_ASSERT(
+            sysCreat->root.at("BehaviorState")->getString() == std::string("W/*at*/c//h")); // set
+
         // TEST read array
         ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->isSet());
         ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->size() == 3);

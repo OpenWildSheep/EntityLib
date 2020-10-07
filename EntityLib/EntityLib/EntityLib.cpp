@@ -166,17 +166,17 @@ namespace Ent
 
     Node* Node::getUnionData()
     {
-        if (value.is<OneOf>())
+        if (value.is<Union>())
         {
-            return value.get<OneOf>().data.get();
+            return value.get<Union>().data.get();
         }
         throw BadType();
     }
     Node const* Node::getUnionData() const
     {
-        if (value.is<OneOf>())
+        if (value.is<Union>())
         {
-            return value.get<OneOf>().data.get();
+            return value.get<Union>().data.get();
         }
         throw BadType();
     }
@@ -324,7 +324,7 @@ namespace Ent
             });
         }
 
-        bool operator()(OneOf const& var) const
+        bool operator()(Union const& var) const
         {
             return var.data->hasDefaultValue();
         }
@@ -373,9 +373,9 @@ namespace Ent
             return Node(std::move(out), schema);
         }
 
-        Node operator()(OneOf const& var) const
+        Node operator()(Union const& var) const
         {
-            return Node(OneOf{ var.data->detach() }, schema);
+            return Node(Union{ var.data->detach() }, schema);
         }
     };
 
@@ -422,9 +422,9 @@ namespace Ent
             return Node(std::move(out), schema);
         }
 
-        Node operator()(OneOf const& var) const
+        Node operator()(Union const& var) const
         {
-            return Node(OneOf{ var.data->makeInstanceOf() }, schema);
+            return Node(Union{ var.data->makeInstanceOf() }, schema);
         }
     };
 
@@ -466,7 +466,7 @@ namespace Ent
             return false;
         }
 
-        bool operator()(OneOf const& var) const
+        bool operator()(Union const& var) const
         {
             return var.hasOverride();
         }
@@ -580,7 +580,7 @@ namespace Ent
             return false;
         }
 
-        bool operator()(OneOf const& var) const
+        bool operator()(Union const& var) const
         {
             (void*)&var;
             return false;
@@ -1379,7 +1379,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                     schemaTocheck->properties.at(dataField).get(),
                     data.at(dataField),
                     super != nullptr ? super->at(dataField.c_str()) : nullptr);
-                return Ent::Node(Ent::OneOf{ dataNode }, &nodeSchema);
+                return Ent::Node(Ent::Union{ dataNode }, &nodeSchema);
             }
         }
         result = Ent::Node();
@@ -2008,7 +2008,7 @@ bool Ent::Array::hasOverride() const
     return std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasOverride));
 }
 
-bool Ent::OneOf::hasOverride() const
+bool Ent::Union::hasOverride() const
 {
     return data->hasOverride();
 }

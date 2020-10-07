@@ -25,7 +25,7 @@ namespace Ent
         array, ///< @see Ent::DataType::array
         boolean,
         entityRef,
-        oneOf,
+        oneOf, ///< It is actually a union type, but union is a C keyword
         COUNT
     };
 

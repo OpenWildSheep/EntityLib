@@ -50,7 +50,7 @@ namespace Ent
         bool hasOverride() const;
     };
 
-    struct OneOf
+    struct Union
     {
         value_ptr<Node> data;
         bool hasOverride() const;
@@ -132,7 +132,7 @@ namespace Ent
             Array,
             Override<bool>,
             Override<EntityRef>,
-            OneOf>;
+            Union>;
         Node() = default;
         Node(Value val, Subschema const* schema);
         /// @endcond
@@ -157,7 +157,7 @@ namespace Ent
         void clear(); ///< @pre type==Ent::DataType::array. @brief Remove all items in array
         bool empty() const; ///< ///< @pre type==Ent::DataType::array. @brief return true if array is empty
 
-        // OneOf
+        // Union
         Node* getUnionData();
         Node const* getUnionData() const;
 

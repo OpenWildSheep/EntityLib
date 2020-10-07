@@ -54,11 +54,13 @@ void updateRefLinks(std::string const& sourceFile, json& node)
 
 json Ent::mergeComponents(std::filesystem::path const& toolsDir)
 {
-    json runtimeCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/RuntimeComponents.json");
-    json editionCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/EditionComponents.json");
+    json runtimeCompSch =
+        loadJsonFile(toolsDir, toolsDir / "WildPipeline/Schema/RuntimeComponents.json");
+    json editionCompSch =
+        loadJsonFile(toolsDir, toolsDir / "WildPipeline/Schema/EditionComponents.json");
     auto sceneSchemaPath = toolsDir / sceneSchemaLocation;
-    json sceneSch = loadJsonFile(sceneSchemaPath);
-    json dependencies = loadJsonFile(toolsDir / "WildPipeline/Schema/Dependencies.json");
+    json sceneSch = loadJsonFile(toolsDir, sceneSchemaPath);
+    json dependencies = loadJsonFile(toolsDir, toolsDir / "WildPipeline/Schema/Dependencies.json");
 
     runtimeCompSch = runtimeCompSch["definitions"];
     editionCompSch = editionCompSch["definitions"];

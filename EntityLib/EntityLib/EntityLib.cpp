@@ -60,7 +60,7 @@ namespace Ent
 
         json schemaDocument = mergeComponents(toolsDir);
 
-        SchemaLoader loader(schemaPath);
+        SchemaLoader loader(toolsDir, schemaPath);
 
         loader.readSchema(&schema.schema, schemaDocument, schemaDocument);
 
@@ -80,7 +80,8 @@ namespace Ent
             schema.components.emplace(compName, &compSchema);
         }
 
-        json dependencies = loadJsonFile(toolsDir / "WildPipeline/Schema/Dependencies.json");
+        json dependencies =
+            loadJsonFile(toolsDir, toolsDir / "WildPipeline/Schema/Dependencies.json");
         for (json const& comp : dependencies["Dependencies"])
         {
             auto name = comp["className"].get<std::string>();
@@ -1564,16 +1565,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
 std::unique_ptr<Ent::Entity>
 Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath, Ent::Entity const* super) const
 {
-    std::ifstream file(entityPath);
-    if (not file.is_open())
-    {
-        constexpr size_t MessSize = 1024;
-        std::array<char, MessSize> message = {};
-        sprintf_s(message.data(), MessSize, "Can't open file for read: %ls", entityPath.c_str());
-        throw std::runtime_error(message.data());
-    }
-    json document;
-    file >> document;
+    json document = loadJsonFile(toolsDir, entityPath);
 
     if (validationEnabled)
     {
@@ -1643,7 +1635,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
 
 std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(std::filesystem::path const& scenePath) const
 {
-    json document = loadJsonFile(scenePath);
+    json document = loadJsonFile(toolsDir, scenePath);
     if (validationEnabled)
     {
         try

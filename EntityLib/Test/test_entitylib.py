@@ -71,7 +71,7 @@ try:
     voxelSimulationGD = ent.get_component("VoxelSimulationGD")
     assert(voxelSimulationGD.root.at("TransmissionBySecond").value == 100.)
     assert(voxelSimulationGD.root.at("TransmissionBySecond").is_default())
-    assert(voxelSimulationGD.root.get_type_name() == "VoxelSimulationGD")
+    assert(voxelSimulationGD.root.get_type_name() == "file://RuntimeComponents.json#/definitions/VoxelSimulationGD")
 
     # TEST read inherited values in inherited component
     heightObj = ent.get_component("HeightObj")
@@ -112,6 +112,25 @@ try:
     assert(len(allSubEntities) == 1)
     assert(allSubEntities[0].name == "EP1-Spout_LINK_001")
     assert(allSubEntities[0].color[0] == 255)
+
+    # TEST union
+    cinematicGD = ent.get_component("CinematicGD")  # type: Ent.Component
+    scriptEvents = cinematicGD.root.at("ScriptEvents")  # type: Ent.Node
+    assert(scriptEvents.datatype == Ent.DataType.array)
+    oneOfScripts = scriptEvents.at(0)  # type: Ent.Node
+    assert(oneOfScripts.datatype == Ent.DataType.union)
+    cineEvent = oneOfScripts.get_union_data()  # type: Ent.Node
+    assert(cineEvent.get_type_name() == "file://RuntimeComponents.json#/definitions/CineEventTestBlackboardHasFact")
+
+    nbEnt = cineEvent.at("FactName")  # type: Ent.Node
+    assert(nbEnt is not None)
+    assert(nbEnt.datatype == Ent.DataType.string)
+    assert(nbEnt.value == "Toto")
+
+    # TEST sub - object with non - default values
+    explosionEffect = ent.get_component("ExplosionEffect")  # type: Ent.Component
+    shakeData = explosionEffect.root.at("ShakeData")  # type: Ent.Node
+    assert(shakeData.at("shakeDuration").value == 0.)
 
     # TEST simple entity ref creation
     testEntityRef = ent.add_component("TestEntityRef")

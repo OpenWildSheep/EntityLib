@@ -114,7 +114,7 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema)
     }
 
     std::array<char const*, static_cast<size_t>(Ent::DataType::COUNT)> typeToStr = {
-        "null", "string", "number", "integer", "object", "array", "boolean", "string"
+        "null", "string", "number", "integer", "object", "array", "boolean", "string", "object"
     };
     instSchema["type"] = typeToStr[size_t(tmplSchema.type)];
     std::vector<char const*> requiredList;
@@ -253,8 +253,8 @@ void Ent::validateEntity(
 
     json schemaDocument = loadJsonFile(toolsDir / entitySchemaPath);
 
-    json fullSceneInstanceSchema =
-        convertToInstanceSchema(schema, schema.allDefinitions.at("#/definitions/Object"));
+    json fullSceneInstanceSchema = convertToInstanceSchema(
+        schema, schema.allDefinitions.at("file://Scene-schema.json#/definitions/Object"));
 
     // Parse the json schema into an internal schema format
     valijson::Schema vjSchema;

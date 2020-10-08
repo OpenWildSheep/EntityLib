@@ -65,6 +65,8 @@ namespace Ent
 
 namespace Ent
 {
+    /// @cond PRIVATE
+    /// Used to detect access to uninitialized or freed memory
     struct DeleteCheck
     {
         enum class State
@@ -79,4 +81,5 @@ namespace Ent
             state_ = State::DELETED;
         }
     };
+    /// @endcond
 } // namespace Ent

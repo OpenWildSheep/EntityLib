@@ -18,13 +18,13 @@ namespace Ent
     enum class DataType
     {
         null,
-        string,
-        number,
-        integer,
-        object, ///< @see Ent::DataType::object
-        array, ///< @see Ent::DataType::array
-        boolean,
-        entityRef,
+        string, ///< Contains a string
+        number, ///< Contains a number (real)
+        integer, ///< Contains an integer
+        object, ///< Contains a json object (it has properties)
+        array, ///< Contains an array . It can be singular (one type for all) or linear (one type per element)
+        boolean, ///< Contains a boolean value
+        entityRef, ///< Contains a string which is a path to an Entity
         oneOf, ///< It is actually a union type, but union is a C keyword
         COUNT
     };
@@ -35,7 +35,7 @@ namespace Ent
 
     struct SubschemaRef;
 
-    /// Definition of an object
+    /// Definition of a json Node
     struct ENTLIB_DLLEXPORT Subschema
     {
         /// @cond PRIVATE
@@ -44,6 +44,7 @@ namespace Ent
         Subschema& operator=(Subschema const&) = delete;
         Subschema(Subschema&&) = default;
         Subschema& operator=(Subschema&&) = default;
+        DeleteCheck deleteCheck;
         /// @endcond
 
         DataType type = DataType::null; ///< type of this Subschema. @see Ent::DataType
@@ -55,37 +56,42 @@ namespace Ent
         std::string name; ///< This is not a constraint. Just the name of the definition
 
         // Meta informations
+        /// Store metadata for any type
         struct BaseMeta
         {
             bool usedInEditor = true; ///< Does this Subschema exists in edition context ?
             bool usedInRuntime = true; ///< Does this Subschema exists in runtime context ?
             bool deprecated = false; ///< Is this Subschema deprecated ?
         };
+        /// Store metadata for numeric type
         struct NumberMeta : BaseMeta
         {
             uint32_t bitDepth = 32; ///< Bit depth of this number, either 8, 16, 32 or 64
             bool isSigned = true; ///< is this number signed ?
         };
+        /// Store metadata for union type (oneOf in json schema)
         struct UnionMeta : BaseMeta
         {
-            std::string dataField;
-            std::string typeField;
+            std::string dataField; ///< Name of the field containing the data (ex : classData)
+            std::string typeField; ///< Name of the field containing the type of the data (ex : className)
         };
+        /// Store metadata for all schema which doesn't have specific field
         struct GenericMeta : BaseMeta
         {
         };
+        /// Meta data for any type of Node
         using Meta = mapbox::util::variant<GenericMeta, NumberMeta, UnionMeta>;
-        Meta meta;
+        Meta meta; ///< Contains meta data for any type of Node
 
         // helper methods
-        bool IsDeprecated() const;
-        bool IsUsedInEditor() const;
-        bool IsUsedInRuntime() const;
-        bool IsRuntimeOnly() const
+        bool IsDeprecated() const; ///< Is this node deprecated? (access to meta data)
+        bool IsUsedInEditor() const; ///< Is this node used in editor? (access to meta data)
+        bool IsUsedInRuntime() const; ///< Is this node used in runtime? (access to meta data)
+        bool IsRuntimeOnly() const /// Is this node used in runtime only? (access to meta data)
         {
             return IsUsedInRuntime() && !IsUsedInEditor();
         }
-        bool IsEditorOnly() const
+        bool IsEditorOnly() const /// Is this node used in editor only? (access to meta data)
         {
             return !IsUsedInRuntime() && IsUsedInEditor();
         }
@@ -109,8 +115,6 @@ namespace Ent
         ///     This is the description of each items
         tl::optional<std::vector<SubschemaRef>> linearItems;
         std::vector<std::string> enumValues; ///< List of all posible values for enum
-
-        DeleteCheck deleteCheck;
     };
 
     class Schema;
@@ -156,11 +160,17 @@ namespace Ent
         Schema& operator=(Schema const&) = delete;
         SubschemaRef root; ///< Root Schema : Schema of the scene
         std::map<std::string, Subschema> allDefinitions; ///< Definition of everything, by type name
+
+        /// @cond PRIVATE
         DeleteCheck deleteCheck;
+        /// @endcond
     };
 
 #pragma warning(push)
 #pragma warning(disable : 4702)
+    /// @cond PRIVATE
+
+    /// variant visitor to get a specifique field in a Subschema::BaseMeta
     struct BasicFieldGetter
     {
         std::function<bool(const Subschema::BaseMeta*)> _fieldSelector;
@@ -210,6 +220,7 @@ namespace Ent
             return subSchemaOrRef.get<Subschema>();
         else
         {
+            // TODO : Loïc - Prefer to use ENTLIB_LOGIC_ERROR to capture the __FILE__ and __LINE__
             logicError("Uninitialized SubschemaRef!", __FILE__, __LINE__);
             return subSchemaOrRef.get<Subschema>();
         }
@@ -247,6 +258,8 @@ namespace Ent
     {
         return &get();
     }
+
+    /// @endcond
 
 #pragma warning(pop)
 

@@ -1066,11 +1066,6 @@ namespace Ent
         return objects;
     }
 
-    std::vector<std::unique_ptr<Entity>>& Scene::getObjects()
-    {
-        return objects;
-    }
-
     std::vector<std::unique_ptr<Entity>> Scene::releaseAllEntities()
     {
         std::vector<std::unique_ptr<Entity>> freeEntities;
@@ -1444,11 +1439,9 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
         Ent::Subschema::UnionMeta const& meta = schema.meta.get<Ent::Subschema::UnionMeta>();
         Ent::Node const* dataInsideUnion = node.getUnionData();
         std::string const absType = dataInsideUnion->getTypeName();
-        static std::string const defTag = "#/definitions/";
-        auto defPos = absType.find(defTag);
-        std::string type =
-            (defPos == std::string::npos) ? absType : absType.substr(defPos + defTag.size());
-        data[meta.typeField] = std::move(type);
+        char const* defPos = Ent::getRefTypeName(absType.c_str());
+        char const* type = (defPos == nullptr) ? absType.c_str() : defPos;
+        data[meta.typeField] = type;
         data[meta.dataField] = saveNode(*dataInsideUnion->getSchema(), *dataInsideUnion);
     }
     break;

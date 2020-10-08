@@ -155,11 +155,11 @@ namespace Ent
         Node* push(); ///< @pre type==Ent::DataType::array. @brief Add a new item at the end of array
         void pop(); ///< @pre type==Ent::DataType::array. @brief Remove an item at the end of array
         void clear(); ///< @pre type==Ent::DataType::array. @brief Remove all items in array
-        bool empty() const; ///< ///< @pre type==Ent::DataType::array. @brief return true if array is empty
+        bool empty() const; ///< @pre type==Ent::DataType::array. @brief return true if array is empty
 
         // Union
-        Node* getUnionData();
-        Node const* getUnionData() const;
+        Node* getUnionData(); ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data
+        Node const* getUnionData() const; ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data
 
         // Value
         float getFloat() const; ///< @pre number or integer. @brief Get the value as float
@@ -195,7 +195,7 @@ namespace Ent
         /// Create a Node with the same value but which doesn't rely on prefab.
         Node detach() const;
 
-        /// Create a Node is an "instance of" this one. With no override.
+        /// Create a Node which is an "instance of" this one. With no override.
         Node makeInstanceOf() const;
         /// \endcond
 
@@ -226,13 +226,18 @@ namespace Ent
         Node root; ///< Root node of the component. Always of type Ent::DataType::object
         size_t version; ///< @todo remove?
         size_t index; ///< Useful to keep the componants order in the json file. To make diffs easier.
+
+        /// \cond PRIVATE
         DeleteCheck deleteCheck;
 
+        /// Create a Component which is an "instance of" this one. With no override.
         Component makeInstanceOf() const
         {
             return Component{ true, type, root.makeInstanceOf(), version, index };
         }
+        /// \endcond
 
+        /// @brief Recursively check if there is an override inside.
         bool hasOverride() const
         {
             return root.hasOverride();
@@ -262,8 +267,8 @@ namespace Ent
         Override<std::string> file; ///< Path to a .scene file, whene isEmbedded is false
         size_t index = 0; ///< Useful to keep the componants order in the json file
         std::unique_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
-        DeleteCheck deleteCheck;
 
+        /// @cond PRIVATE
         explicit SubSceneComponent(
             bool _isEmbedded = false,
             Override<std::string> _file = {},
@@ -273,15 +278,19 @@ namespace Ent
         SubSceneComponent(SubSceneComponent&&) noexcept = delete;
         SubSceneComponent& operator=(SubSceneComponent const&) = delete;
         SubSceneComponent& operator=(SubSceneComponent&&) noexcept = delete;
+        DeleteCheck deleteCheck;
+        /// @brief Create a SubSceneComponent which instanciate this one. (internal use only)
+        std::unique_ptr<SubSceneComponent> makeInstanceOf() const;
+        /// @endcond PRIVATE
 
         /// Switch SubSceneComponent to embedded mode or to external mode
         void makeEmbedded(bool _embedded ///< false to make extern (not embedded)
         );
 
+        /// @brief Recursively check if there is an override inside.
         bool hasOverride() const;
 
-        std::unique_ptr<SubSceneComponent> makeInstanceOf() const;
-        std::unique_ptr<SubSceneComponent> clone() const;
+        std::unique_ptr<SubSceneComponent> clone() const; ///< Clone this SubSceneComponent identically
     };
 
     class EntityLib;
@@ -304,12 +313,33 @@ namespace Ent
         Entity& operator=(Entity const&) = delete;
         Entity(Entity&&) = delete;
         Entity& operator=(Entity&&) = delete;
+        DeleteCheck deleteCheck;
+        void setCanBeRenamed(bool can); ///< If it has a super it can't be renamed
+
+        Override<std::string> const& getNameValue() const
+        {
+            return name;
+        }
+
+        Node const& getColorValue() const
+        {
+            return color;
+        }
+
+        Override<std::string> const& getThumbnailValue() const
+        {
+            return thumbnail;
+        }
+
+        Override<std::string> const& getInstanceOfValue() const
+        {
+            return instanceOf;
+        }
         /// @endcond
 
         char const* getName() const; ///< Get the name of the component
         void setName(std::string name); ///< Set the name of the component
         bool canBeRenamed() const; ///< A SubEntity of an instance which override a SubEntity in a prefab can't be renamed
-        void setCanBeRenamed(bool can);
         char const* getInstanceOf() const; ///< Name of the inherited prefab if there is one, or nullptr.
         char const* getThumbnail() const; ///< Get the Thumbnail path, or nullptr.
         void setThumbnail(std::string _thumbPath); ///< Set the Thumbnail path
@@ -350,9 +380,13 @@ namespace Ent
         /// The properties keep the sames values
         std::unique_ptr<Entity> detachEntityFromPrefab() const;
 
+        /// @brief Create an Entity which instanciate this one.
         std::unique_ptr<Entity> makeInstanceOf() const;
+
+        /// Clone this Entity identically. (No instance of)
         std::unique_ptr<Entity> clone() const;
 
+        /// @brief Recursively check if there is an override inside.
         bool hasOverride() const;
 
         /// @brief Create a relative EntityRef to the given entity
@@ -368,28 +402,6 @@ namespace Ent
 
         /// @brief Set the parent scene object containing this entity.
         void setParentScene(Scene* scene);
-
-        Override<std::string> const& getNameValue() const
-        {
-            return name;
-        }
-
-        Node const& getColorValue() const
-        {
-            return color;
-        }
-
-        Override<std::string> const& getThumbnailValue() const
-        {
-            return thumbnail;
-        }
-
-        Override<std::string> const& getInstanceOfValue() const
-        {
-            return instanceOf;
-        }
-
-        DeleteCheck deleteCheck;
 
     private:
         void updateSubSceneOwner();
@@ -419,11 +431,13 @@ namespace Ent
         DeleteCheck deleteCheck; // Just for debug
         /// @endcond
 
+        /// Add a new entity in the scene and take its ownership
         void addEntity(std::unique_ptr<Entity>&& entity);
 
+        /// Get all entities in the scene
         std::vector<std::unique_ptr<Entity>> const& getObjects() const;
-        std::vector<std::unique_ptr<Entity>>& getObjects();
 
+        /// Abandons ownership of all entities and return them.
         std::vector<std::unique_ptr<Entity>> releaseAllEntities();
 
         /// @brief Resolve an EntityRef relative to this scene.
@@ -433,9 +447,13 @@ namespace Ent
         /// @brief Find an entity in the scene hierarchy given its path
         Entity* findEntityByPath(const std::string& _path);
 
+        /// Create a new scene which if the "instance of" this one
         std::unique_ptr<Scene> makeInstanceOf() const;
+
+        /// Clone this scene identically. (No instance of)
         std::unique_ptr<Scene> clone() const;
 
+        /// @brief Recursively check if there is an override inside.
         bool hasOverride() const;
 
         /// @brief Get the entity owning this scene if it is embedded.
@@ -460,7 +478,10 @@ namespace Ent
         ComponentsSchema& operator=(ComponentsSchema const&) = delete;
         std::map<std::string, Subschema*> components; ///< Schema of all possible Component s
         Schema schema; ///< Schemas of everything (object, enum...)
-        DeleteCheck deleteCheck;
+
+        /// @cond PRIVATE
+        DeleteCheck deleteCheck; // Just for debug
+        /// @endcond
     };
 
     /// Entry point of the EntityLib. Used to load/save Scene/Entity and to parse the Schema
@@ -472,7 +493,6 @@ namespace Ent
         std::filesystem::path rawdataPath; ///< Path to the RawData dir in the perforce root (X:/RawData)
         std::filesystem::path toolsDir; ///< Path to the Tools dir in in the perforce root (X:/Tools)
         ComponentsSchema schema; ///< Schema of all components
-        DeleteCheck deleteCheck;
         bool validationEnabled = false; ///< validate all objects at load/save
 
         /// Component needed for each type of components
@@ -484,6 +504,7 @@ namespace Ent
         /// @cond PRIVATE
         EntityLib(EntityLib const&) = delete;
         EntityLib& operator=(EntityLib const&) = delete;
+        DeleteCheck deleteCheck;
         /// @endcond
 
         /// Load the Entity at path _entityPath

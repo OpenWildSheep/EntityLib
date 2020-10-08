@@ -1400,6 +1400,10 @@ namespace
 {
     Ent::ActivationLevel parseActivationLevel(const std::string& _name)
     {
+        if (_name == "Created")
+        {
+            return Ent::ActivationLevel::Created;
+        }
         if (_name == "Started")
         {
             return Ent::ActivationLevel::Started;
@@ -1417,6 +1421,10 @@ namespace
 
     char const* getActivationLevelString(Ent::ActivationLevel _level)
     {
+        if (_level == Ent::ActivationLevel::Created)
+        {
+            return "Created";
+        }
         if (_level == Ent::ActivationLevel::Started)
         {
             return "Started";

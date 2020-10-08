@@ -153,6 +153,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .export_values();
 
     py::enum_<ActivationLevel>(ent, "ActivationLevel")
+        .value("Created", ActivationLevel::Created)
         .value("Started", ActivationLevel::Started)
         .value("Loading", ActivationLevel::Loading)
         .value("InWorld", ActivationLevel::InWorld)

@@ -47,6 +47,10 @@ static void printNode(char const* name, Ent::Node const& node, std::string const
     case Ent::DataType::entityRef:
         printf("%s%s [EntityRef] : %s\n", tab.c_str(), name, node.getEntityRef().entityPath.c_str());
         break;
+    case Ent::DataType::oneOf:
+        printf("%s%s [Union]\n", tab.c_str(), name);
+        printNode("Data", *node.getUnionData(), tab + "    ");
+        break;
     case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
     }
 }
@@ -89,6 +93,7 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
         break;
     case Ent::DataType::string: std::cout << "string" << std::endl; break;
     case Ent::DataType::entityRef: std::cout << "entity ref" << std::endl; break;
+    case Ent::DataType::oneOf: std::cout << "oneOf" << std::endl; break;
     case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
     }
 }
@@ -108,7 +113,14 @@ try
     entlib.validationEnabled = true;
 #endif
 
+    ENTLIB_ASSERT(Ent::format("Toto %d", 37) == "Toto 37");
+
     using EntityPtr = std::unique_ptr<Ent::Entity>;
+
+    ENTLIB_ASSERT(
+        entlib.schema.schema.allDefinitions.count("file://RuntimeComponents.json#/definitions/"
+                                                  "Color")
+        == 1);
 
     {
         EntityPtr ent = entlib.loadEntity("prefab.entity");
@@ -117,7 +129,9 @@ try
         Ent::Component* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
         ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->getFloat() == 100.f);
         ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->isDefault());
-        ENTLIB_ASSERT(voxelSimulationGD->root.getTypeName() == std::string("VoxelSimulationGD"));
+        ENTLIB_ASSERT(
+            voxelSimulationGD->root.getTypeName()
+            == std::string("file://RuntimeComponents.json#/definitions/VoxelSimulationGD"));
 
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent->getComponent("HeightObj");
@@ -165,10 +179,32 @@ try
         ENTLIB_ASSERT(allSubEntities.front()->getName() == std::string("EP1-Spout_LINK_001"));
         ENTLIB_ASSERT(allSubEntities.front()->getColor()[0] == 255);
 
+        // TEST union
+        Ent::Component* cinematicGD = ent->getComponent("CinematicGD");
+        Ent::Node* scriptEvents = cinematicGD->root.at("ScriptEvents");
+        ENTLIB_ASSERT(scriptEvents->getDataType() == Ent::DataType::array);
+        Ent::Node* oneOfScripts = scriptEvents->at(0llu);
+        ENTLIB_ASSERT(oneOfScripts->getDataType() == Ent::DataType::oneOf);
+        Ent::Node* cineEvent = oneOfScripts->getUnionData();
+        ENTLIB_ASSERT(
+            cineEvent->getTypeName()
+            == std::string(
+                R"(file://RuntimeComponents.json#/definitions/CineEventTestBlackboardHasFact)"));
+
+        Ent::Node* nbEnt = cineEvent->at("FactName");
+        ENTLIB_ASSERT(nbEnt != nullptr);
+        ENTLIB_ASSERT(nbEnt->getDataType() == Ent::DataType::string);
+        ENTLIB_ASSERT(nbEnt->getString() == std::string("Toto"));
+
+        // TEST sub-object with non-default values
+        Ent::Component* explosionEffect = ent->getComponent("ExplosionEffect");
+        Ent::Node* shakeData = explosionEffect->root.at("ShakeData");
+        ENTLIB_ASSERT(shakeData->at("shakeDuration")->getFloat() == 0.0f);
+
         // TEST simple entity ref creation
         Ent::Component* testEntityRef = ent->addComponent("TestEntityRef");
         ENTLIB_ASSERT(testEntityRef != nullptr);
-        ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->getEntityRef().entityPath == "");
+        ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->getEntityRef().entityPath.empty());
         testEntityRef->root.at("TestRef")->setEntityRef(ent->makeEntityRef(*ent));
         ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->getEntityRef().entityPath == ".");
         testEntityRef->root.at("TestRef")->setEntityRef(ent->makeEntityRef(*allSubEntities.front()));

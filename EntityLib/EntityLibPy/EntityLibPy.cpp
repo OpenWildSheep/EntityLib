@@ -52,6 +52,7 @@ Value getValue(Ent::Node& node)
     {
     case Ent::DataType::array:
     case Ent::DataType::object:
+    case Ent::DataType::oneOf:
     case Ent::DataType::null: return nullptr;
     case Ent::DataType::boolean: return node.getBool();
     case Ent::DataType::integer: return node.getInt();
@@ -116,6 +117,7 @@ void setValue(Ent::Node& node, Value const& val)
     {
     case Ent::DataType::array:
     case Ent::DataType::object:
+    case Ent::DataType::oneOf:
     case Ent::DataType::null: break;
     case Ent::DataType::boolean:
         node.setBool(mapbox::util::apply_visitor(GetValue<bool>{}, val));
@@ -150,6 +152,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .value("object", DataType::object)
         .value("array", DataType::array)
         .value("boolean", DataType::boolean)
+        .value("entityRef", DataType::entityRef)
+        .value("union", DataType::oneOf)
         .export_values();
 
     py::enum_<ActivationLevel>(ent, "ActivationLevel")
@@ -246,6 +250,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("set_string", [](Node* node, char const* str) { return node->setString(str); })
         .def("set_bool", [](Node* node, bool val) { return node->setBool(val); })
         .def("set_entityref", &Node::setEntityRef)
+        .def(
+            "get_union_data",
+            [](Node* node) { return node->getUnionData(); },
+            py::return_value_policy::reference)
         .def("unset", [](Node* node) { return node->unset(); })
         .def("is_set", [](Node* node) { return node->isSet(); });
 

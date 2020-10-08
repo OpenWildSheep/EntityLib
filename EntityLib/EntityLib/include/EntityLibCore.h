@@ -29,9 +29,9 @@ namespace Ent
     template <typename... Args>
     inline std::string format(char const* message, Args&&... args)
     {
-        size_t const len = (size_t)sprintf_s(nullptr, 0, message, std::forward<Args>(args)...);
+        size_t const len = (size_t)snprintf(nullptr, 0, message, std::forward<Args>(args)...);
         std::string buffer(len, ' ');
-        sprintf_s((char*)buffer.data(), len, message, std::forward<Args>(args)...);
+        snprintf((char*)buffer.data(), len + 1, message, std::forward<Args>(args)...);
         return buffer;
     }
 
@@ -65,6 +65,8 @@ namespace Ent
 
 namespace Ent
 {
+    /// @cond PRIVATE
+    /// Used to detect access to uninitialized or freed memory
     struct DeleteCheck
     {
         enum class State
@@ -79,4 +81,5 @@ namespace Ent
             state_ = State::DELETED;
         }
     };
+    /// @endcond
 } // namespace Ent

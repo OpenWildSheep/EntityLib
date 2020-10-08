@@ -32,7 +32,7 @@ static json saveScene(Ent::ComponentsSchema const& schema, Ent::Scene const& sce
 
 namespace Ent
 {
-    char const* colorSchemaName = "#/definitions/Color";
+    char const* colorSchemaName = "file://RuntimeComponents.json#/definitions/Color";
     static Ent::Node makeDefaultColorField(EntityLib const& entlib)
     {
         Ent::Override<float> zero{ 0.f, tl::nullopt, tl::nullopt };
@@ -62,7 +62,7 @@ namespace Ent
 
         SchemaLoader loader(toolsDir, schemaPath);
 
-        loader.readSchema(&schema.schema, schemaDocument, schemaDocument);
+        loader.readSchema(&schema.schema, "Scene-schema.json", schemaDocument, schemaDocument);
 
         auto& compList = schema.schema.root->properties["Objects"]
                              ->singularItems
@@ -161,6 +161,23 @@ namespace Ent
         if (value.is<Array>())
         {
             return value.get<Array>().data.size();
+        }
+        throw BadType();
+    }
+
+    Node* Node::getUnionData()
+    {
+        if (value.is<Union>())
+        {
+            return value.get<Union>().data.get();
+        }
+        throw BadType();
+    }
+    Node const* Node::getUnionData() const
+    {
+        if (value.is<Union>())
+        {
+            return value.get<Union>().data.get();
         }
         throw BadType();
     }
@@ -307,6 +324,11 @@ namespace Ent
                 return std::get<1>(name_node)->hasDefaultValue();
             });
         }
+
+        bool operator()(Union const& var) const
+        {
+            return var.data->hasDefaultValue();
+        }
     };
 
     bool Node::hasDefaultValue() const
@@ -350,6 +372,11 @@ namespace Ent
                     nonstd::make_value<Node>(std::get<1>(name_node)->detach()));
             }
             return Node(std::move(out), schema);
+        }
+
+        Node operator()(Union const& var) const
+        {
+            return Node(Union{ var.data->detach() }, schema);
         }
     };
 
@@ -395,6 +422,11 @@ namespace Ent
             }
             return Node(std::move(out), schema);
         }
+
+        Node operator()(Union const& var) const
+        {
+            return Node(Union{ var.data->makeInstanceOf() }, schema);
+        }
     };
 
     Node Node::makeInstanceOf() const
@@ -433,6 +465,11 @@ namespace Ent
                 }
             }
             return false;
+        }
+
+        bool operator()(Union const& var) const
+        {
+            return var.hasOverride();
         }
     };
 
@@ -541,6 +578,12 @@ namespace Ent
         bool operator()(Object const& obj) const
         {
             (void*)&obj;
+            return false;
+        }
+
+        bool operator()(Union const& var) const
+        {
+            (void*)&var;
             return false;
         }
     };
@@ -1039,11 +1082,6 @@ namespace Ent
         return objects;
     }
 
-    std::vector<std::unique_ptr<Entity>>& Scene::getObjects()
-    {
-        return objects;
-    }
-
     std::vector<std::unique_ptr<Entity>> Scene::releaseAllEntities()
     {
         std::vector<std::unique_ptr<Entity>> freeEntities;
@@ -1336,6 +1374,36 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
         result = Ent::Node(Ent::Override<Ent::EntityRef>(def, supVal, val), &nodeSchema);
     }
     break;
+    case Ent::DataType::oneOf:
+    {
+        auto&& meta = nodeSchema.meta.get<Ent::Subschema::UnionMeta>();
+        std::string const& typeField = meta.typeField;
+        std::string const& dataField = meta.dataField;
+        std::string const& dataType = data.at(typeField).get<std::string>();
+        bool typeFound = false;
+        for (Ent::SubschemaRef const& schemaTocheck : *nodeSchema.oneOf)
+        {
+            auto&& schemaType =
+                schemaTocheck->properties.at(typeField).get().constValue->get<std::string>();
+            if (schemaType == dataType)
+            {
+                Ent::Node dataNode = loadNode(
+                    schemaTocheck->properties.at(dataField).get(),
+                    data.value(dataField, json{}),
+                    super != nullptr ? super->at(dataField.c_str()) : nullptr);
+                result = Ent::Node(Ent::Union{ dataNode }, &nodeSchema);
+                typeFound = true;
+                break;
+            }
+        }
+        if (not typeFound)
+        {
+            fprintf(
+                stderr, "Can't find type %s in schema %s\n", dataType.c_str(), nodeSchema.name.c_str());
+            result = Ent::Node(Ent::Union{ Ent::Node{} }, &nodeSchema);
+        }
+    }
+    break;
     case Ent::DataType::COUNT:
     default: ENTLIB_LOGIC_ERROR("Invalid DataType"); break;
     }
@@ -1374,7 +1442,7 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
         {
             if (item->hasOverride())
             {
-                json tmpNode = saveNode(schema.singularItems->get(), *item);
+                json tmpNode = saveNode(*item->getSchema(), *item);
                 data.emplace_back(std::move(tmpNode));
             }
             else
@@ -1390,8 +1458,19 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
         data = ref.entityPath;
     }
     break;
+    case Ent::DataType::oneOf:
+    {
+        auto&& meta = schema.meta.get<Ent::Subschema::UnionMeta>();
+        Ent::Node const* dataInsideUnion = node.getUnionData();
+        std::string const absType = dataInsideUnion->getTypeName();
+        char const* defPos = Ent::getRefTypeName(absType.c_str());
+        char const* type = (defPos == nullptr) ? absType.c_str() : defPos;
+        data[meta.typeField] = type;
+        data[meta.dataField] = saveNode(*dataInsideUnion->getSchema(), *dataInsideUnion);
+    }
+    break;
     case Ent::DataType::COUNT:
-    default: ENTLIB_LOGIC_ERROR("DataType is Ent::DataType::COUNT"); break;
+    default: ENTLIB_LOGIC_ERROR("DataType is Invalid!!"); break;
     }
     return data;
 }
@@ -2000,6 +2079,11 @@ bool Ent::SubSceneComponent::hasOverride() const
 bool Ent::Array::hasOverride() const
 {
     return std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasOverride));
+}
+
+bool Ent::Union::hasOverride() const
+{
+    return data->hasOverride();
 }
 
 /// \endcond

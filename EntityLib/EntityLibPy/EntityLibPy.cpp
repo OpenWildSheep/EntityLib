@@ -263,6 +263,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference);
 
     py::class_<Entity>(ent, "Entity")
+        .def(py::init<EntityLib const&>())
         .def_property("name", &Entity::getName, &Entity::setName)
         .def_property_readonly("instance_of", &Entity::getInstanceOf)
         .def_property("thumbnail", &Entity::getThumbnail, &Entity::setThumbnail)

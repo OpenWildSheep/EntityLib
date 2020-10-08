@@ -11,7 +11,7 @@ namespace std
     using namespace experimental;
 } // namespace std
 
-nlohmann::json loadJsonFile(std::filesystem::path const& path);
+nlohmann::json loadJsonFile(std::filesystem::path const& _toolsDir, std::filesystem::path const& _path);
 
 namespace Ent
 {

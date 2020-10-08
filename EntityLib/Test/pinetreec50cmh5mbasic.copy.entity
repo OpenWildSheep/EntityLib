@@ -3,14 +3,6 @@
         {
             "Data": {
                 "EDITOR_skeleton": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/editor/skeleton/pinetreec50cmh5mbasic.wskl",
-                "closeAnimationData": {
-                    "animationDatabasePath": "03_Environment/Tree/Pine/Tree/PineTreeC50cmH5mBasic/Animation",
-                    "skeletonPath": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/skeleton/pinetreec50cmh5mbasic.skl"
-                },
-                "farAnimationData": {
-                    "animationDatabasePath": "03_Environment/Tree/Pine/Tree/PineTreeC50cmH5mBasic/Animation",
-                    "skeletonPath": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/skeleton/pinetreec50cmh5mbasic.skl"
-                },
                 "skeleton": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/skeleton/pinetreec50cmh5mbasic.skl"
             },
             "Type": "AnimationControllerGD",

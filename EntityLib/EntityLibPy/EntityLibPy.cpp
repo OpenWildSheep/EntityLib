@@ -156,6 +156,13 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .value("union", DataType::oneOf)
         .export_values();
 
+    py::enum_<ActivationLevel>(ent, "ActivationLevel")
+        .value("Created", ActivationLevel::Created)
+        .value("Started", ActivationLevel::Started)
+        .value("Loading", ActivationLevel::Loading)
+        .value("InWorld", ActivationLevel::InWorld)
+        .export_values();
+
     py::class_<std::filesystem::path>(ent, "path").def(py::init<std::string>());
 
     py::implicitly_convertible<std::string, std::filesystem::path>();
@@ -274,6 +281,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property("name", &Entity::getName, &Entity::setName)
         .def_property_readonly("instance_of", &Entity::getInstanceOf)
         .def_property("thumbnail", &Entity::getThumbnail, &Entity::setThumbnail)
+        .def_property("max_activation_level", &Entity::getMaxActivationLevel, &Entity::setMaxActivationLevel)
         .def_property("color", &Entity::getColor, &Entity::setColor)
         .def("has_override", &Entity::hasOverride)
         .def("add_component", &Entity::addComponent, py::return_value_policy::reference)

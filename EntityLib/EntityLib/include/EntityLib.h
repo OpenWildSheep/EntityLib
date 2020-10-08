@@ -50,6 +50,14 @@ namespace Ent
         bool hasOverride() const;
     };
 
+    enum class ActivationLevel
+    {
+        Created,
+        InWorld,
+        Loading,
+        Started
+    };
+
     struct Union
     {
         value_ptr<Node> data;
@@ -310,6 +318,7 @@ namespace Ent
             Node color = {},
             Override<std::string> _thumbnail = {},
             Override<std::string> _instanceOf = {},
+            Override<ActivationLevel> _maxActivationLevel = {},
             bool hasASuper = false);
         Entity(Entity const&) = delete;
         Entity& operator=(Entity const&) = delete;
@@ -337,12 +346,19 @@ namespace Ent
         {
             return instanceOf;
         }
+
+        Override<ActivationLevel> const& getMaxActivationLevelValue() const
+        {
+            return maxActivationLevel;
+        }
         /// @endcond
 
         char const* getName() const; ///< Get the name of the component
         void setName(std::string name); ///< Set the name of the component
         bool canBeRenamed() const; ///< A SubEntity of an instance which override a SubEntity in a prefab can't be renamed
         char const* getInstanceOf() const; ///< Name of the inherited prefab if there is one, or nullptr.
+        ActivationLevel getMaxActivationLevel() const; ///< Get the initial max activation level of the entity at runtime.
+        void setMaxActivationLevel(ActivationLevel _level); ///< Set the initial max activation level of the entity at runtime.
         char const* getThumbnail() const; ///< Get the Thumbnail path, or nullptr.
         void setThumbnail(std::string _thumbPath); ///< Set the Thumbnail path
         std::array<uint8_t, 4> getColor() const; ///< Get the color of the is one, or nullptr.
@@ -414,6 +430,7 @@ namespace Ent
         Node color; ///< The optional Color of the Entity
         Override<std::string> thumbnail; ///< Path to the thumbnail mesh (.wthumb)
         Override<std::string> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
+        Override<ActivationLevel> maxActivationLevel; ///< Maximum activation level of this entity in runtime
         bool hasASuper = false;
         Scene* parentScene = nullptr; ///< ptr the scene containing this entity.
     };

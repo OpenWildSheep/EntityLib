@@ -33,7 +33,7 @@
             "Data": {
                 "BehaviorModifierTagList": [],
                 "BehaviorPath": "Pesto/Behavior/FSMDefaultBehavior.pesto",
-                "BehaviorState": "Watch",
+                "BehaviorState": "W/*at*/c//h",
                 "CanBeMaster": false,
                 "Faction": "Shamans",
                 "Inventory": "KaiWOLgrey",
@@ -104,13 +104,16 @@
                 "BreakableSizeMax": "small",
                 "BreathDamages": 10.0,
                 "BreathImpact": 0.0,
+                // sdfkjdsfkjhsdkjgh dsjjgk
                 "BreathStaminaLoss": 0.0,
                 "ControllerVibrationCoef": 0.33000001311302185,
                 "DOTDamagesDuration": 1.0,
                 "Damages": 5.0,
                 "DistanceReductionDamageByStep": 3.0,
-                "DistanceReductionImpactByStep": 0.0,
-                "DistanceReductionStep": 2.0,
+                "DistanceReductionImpactByStep": 0.0, /* dsgsdg
+                dfsgdfhdgf
+                fhgfj
+                */ "DistanceReductionStep": 2.0,
                 "EjectHit": true,
                 "HitSize": "medium",
                 "HitType": "HitInstant",

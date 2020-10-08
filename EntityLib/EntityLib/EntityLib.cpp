@@ -60,7 +60,7 @@ namespace Ent
 
         json schemaDocument = mergeComponents(toolsDir);
 
-        SchemaLoader loader(schemaPath);
+        SchemaLoader loader(toolsDir, schemaPath);
 
         loader.readSchema(&schema.schema, "Scene-schema.json", schemaDocument, schemaDocument);
 
@@ -80,7 +80,8 @@ namespace Ent
             schema.components.emplace(compName, &compSchema);
         }
 
-        json dependencies = loadJsonFile(toolsDir / "WildPipeline/Schema/Dependencies.json");
+        json dependencies =
+            loadJsonFile(toolsDir, toolsDir / "WildPipeline/Schema/Dependencies.json");
         for (json const& comp : dependencies["Dependencies"])
         {
             auto name = comp["className"].get<std::string>();
@@ -678,6 +679,7 @@ namespace Ent
         , color(Ent::makeDefaultColorField(_entlib))
         , thumbnail(std::string(), tl::nullopt, tl::nullopt)
         , instanceOf(std::string(), tl::nullopt, tl::nullopt)
+        , maxActivationLevel(Ent::ActivationLevel::Started, tl::nullopt, tl::nullopt)
     {
     }
 
@@ -689,6 +691,7 @@ namespace Ent
         Node _color,
         Override<std::string> _thumbnail,
         Override<std::string> _instanceOf,
+        Override<Ent::ActivationLevel> _maxActivationLevel,
         bool _hasASuper)
         : entlib(&_entlib)
         , name(std::move(_name))
@@ -697,6 +700,7 @@ namespace Ent
         , color(std::move(_color))
         , thumbnail(std::move(_thumbnail))
         , instanceOf(std::move(_instanceOf))
+        , maxActivationLevel(std::move(_maxActivationLevel))
         , hasASuper(_hasASuper)
     {
         updateSubSceneOwner();
@@ -751,6 +755,17 @@ namespace Ent
     {
         return instanceOf.isDefault() ? nullptr : instanceOf.get().c_str();
     }
+
+    ActivationLevel Entity::getMaxActivationLevel() const
+    {
+        return maxActivationLevel.get();
+    }
+
+    void Entity::setMaxActivationLevel(ActivationLevel _level)
+    {
+        maxActivationLevel.set(_level);
+    }
+
     char const* Entity::getThumbnail() const
     {
         return thumbnail.isDefault() ? nullptr : thumbnail.get().c_str();
@@ -881,7 +896,8 @@ namespace Ent
             std::move(instSubSceneComponent),
             color.makeInstanceOf(),
             thumbnail.makeInstanceOf(),
-            instanceOf);
+            instanceOf,
+            maxActivationLevel.makeInstanceOf());
     }
 
     bool Entity::hasOverride() const
@@ -1459,6 +1475,51 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
     return data;
 }
 
+namespace
+{
+    Ent::ActivationLevel parseActivationLevel(const std::string& _name)
+    {
+        if (_name == "Created")
+        {
+            return Ent::ActivationLevel::Created;
+        }
+        if (_name == "Started")
+        {
+            return Ent::ActivationLevel::Started;
+        }
+        if (_name == "Loading")
+        {
+            return Ent::ActivationLevel::Loading;
+        }
+        if (_name == "InWorld")
+        {
+            return Ent::ActivationLevel::InWorld;
+        }
+        return Ent::ActivationLevel::Started;
+    }
+
+    char const* getActivationLevelString(Ent::ActivationLevel _level)
+    {
+        if (_level == Ent::ActivationLevel::Created)
+        {
+            return "Created";
+        }
+        if (_level == Ent::ActivationLevel::Started)
+        {
+            return "Started";
+        }
+        if (_level == Ent::ActivationLevel::Loading)
+        {
+            return "Loading";
+        }
+        if (_level == Ent::ActivationLevel::InWorld)
+        {
+            return "InWorld";
+        }
+        return "Started";
+    }
+}
+
 static std::unique_ptr<Ent::Entity> loadEntity(
     Ent::EntityLib const& entlib,
     Ent::ComponentsSchema const& schema,
@@ -1521,6 +1582,17 @@ static std::unique_ptr<Ent::Entity> loadEntity(
 
     Ent::Override<std::string> superInstanceOf = superEntity->getInstanceOfValue();
     Ent::Override<std::string> ovInstanceOf = superName.makeOverridedInstanceOf(instanceOf);
+
+    tl::optional<Ent::ActivationLevel> maxActivationLevel;
+    if (entNode.count("MaxActivationLevel") != 0)
+    {
+        maxActivationLevel = parseActivationLevel(entNode.at("MaxActivationLevel").get<std::string>());
+    }
+    Ent::Override<Ent::ActivationLevel> superActivationLevel =
+        superEntity != nullptr ?
+            superEntity->getMaxActivationLevelValue() :
+            Ent::Override<Ent::ActivationLevel>{ Ent::ActivationLevel::Started, tl::nullopt, tl::nullopt };
+    Ent::Override<Ent::ActivationLevel> ovMaxActivationLevel = superActivationLevel.makeOverridedInstanceOf(maxActivationLevel);
 
     Ent::Node ovColor = Ent::makeDefaultColorField(entlib);
     if (entNode.contains("Color"))
@@ -1637,22 +1709,14 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         std::move(subSceneComponent),
         std::move(ovColor),
         std::move(ovThumbnail),
-        std::move(ovInstanceOf));
+        std::move(ovInstanceOf),
+        std::move(ovMaxActivationLevel));
 }
 
 std::unique_ptr<Ent::Entity>
 Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath, Ent::Entity const* super) const
 {
-    std::ifstream file(entityPath);
-    if (not file.is_open())
-    {
-        constexpr size_t MessSize = 1024;
-        std::array<char, MessSize> message = {};
-        sprintf_s(message.data(), MessSize, "Can't open file for read: %ls", entityPath.c_str());
-        throw std::runtime_error(message.data());
-    }
-    json document;
-    file >> document;
+    json document = loadJsonFile(toolsDir, entityPath);
 
     if (validationEnabled)
     {
@@ -1722,7 +1786,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
 
 std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(std::filesystem::path const& scenePath) const
 {
-    json document = loadJsonFile(scenePath);
+    json document = loadJsonFile(toolsDir, scenePath);
     if (validationEnabled)
     {
         try
@@ -1760,6 +1824,11 @@ static json saveEntity(Ent::ComponentsSchema const& schema, Ent::Entity const& e
     if (const char* thumbnail = entity.getThumbnail())
     {
         entNode.emplace("Thumbnail", thumbnail);
+    }
+
+    if (!entity.getMaxActivationLevelValue().isDefault())
+    {
+        entNode.emplace("MaxActivationLevel", getActivationLevelString(entity.getMaxActivationLevel()));
     }
 
     json& componentsNode = entNode["Components"] = json::array();
@@ -1850,14 +1919,16 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
     }
 
     auto detachedColor = getColorValue().detach();
-
+    auto detachedMaxActivationLevel = getMaxActivationLevelValue().detach();
     return std::make_unique<Ent::Entity>(
         *entlib,
         getNameValue().detach().makeOverridedInstanceOf(std::string(getName()) + "_detached"),
         std::move(detComponents),
         std::move(detSubSceneComponent),
         std::move(detachedColor),
-        getThumbnailValue().detach());
+        getThumbnailValue().detach(),
+        Override<std::string>{},
+        std::move(detachedMaxActivationLevel));
 }
 
 std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
@@ -1891,7 +1962,8 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanc
         nullptr,
         templ->getColorValue().makeInstanceOf(),
         templ->getThumbnailValue().makeInstanceOf(),
-        templ->getInstanceOfValue().makeOverridedInstanceOf(_instanceOf));
+        templ->getInstanceOfValue().makeOverridedInstanceOf(_instanceOf),
+		templ->getMaxActivationLevelValue().makeInstanceOf());
     return inst;
 }
 

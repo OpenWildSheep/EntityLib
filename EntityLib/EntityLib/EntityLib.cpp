@@ -11,6 +11,7 @@
 #include <set>
 #include <sstream>
 #include <utility>
+#include <ciso646>
 
 #include "external/json.hpp"
 #include "ValidJson.h"
@@ -80,8 +81,7 @@ namespace Ent
             schema.components.emplace(compName, &compSchema);
         }
 
-        json dependencies =
-            loadJsonFile(toolsDir, toolsDir / "WildPipeline/Schema/Dependencies.json");
+        json dependencies = loadJsonFile(toolsDir / "WildPipeline/Schema/Dependencies.json");
         for (json const& comp : dependencies["Dependencies"])
         {
             auto name = comp["className"].get<std::string>();
@@ -1222,6 +1222,7 @@ static Ent::Node loadFreeObjectNode(json const& data)
         result = Ent::Node(std::move(arr), nullptr);
     }
     break;
+    case nlohmann::detail::value_t::binary:
     case nlohmann::detail::value_t::discarded: break;
     }
     return result;
@@ -1518,7 +1519,7 @@ namespace
         }
         return "Started";
     }
-}
+} // namespace
 
 static std::unique_ptr<Ent::Entity> loadEntity(
     Ent::EntityLib const& entlib,
@@ -1586,13 +1587,16 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     tl::optional<Ent::ActivationLevel> maxActivationLevel;
     if (entNode.count("MaxActivationLevel") != 0)
     {
-        maxActivationLevel = parseActivationLevel(entNode.at("MaxActivationLevel").get<std::string>());
+        maxActivationLevel =
+            parseActivationLevel(entNode.at("MaxActivationLevel").get<std::string>());
     }
     Ent::Override<Ent::ActivationLevel> superActivationLevel =
-        superEntity != nullptr ?
-            superEntity->getMaxActivationLevelValue() :
-            Ent::Override<Ent::ActivationLevel>{ Ent::ActivationLevel::Started, tl::nullopt, tl::nullopt };
-    Ent::Override<Ent::ActivationLevel> ovMaxActivationLevel = superActivationLevel.makeOverridedInstanceOf(maxActivationLevel);
+        superEntity != nullptr ? superEntity->getMaxActivationLevelValue() :
+                                 Ent::Override<Ent::ActivationLevel>{ Ent::ActivationLevel::Started,
+                                                                      tl::nullopt,
+                                                                      tl::nullopt };
+    Ent::Override<Ent::ActivationLevel> ovMaxActivationLevel =
+        superActivationLevel.makeOverridedInstanceOf(maxActivationLevel);
 
     Ent::Node ovColor = Ent::makeDefaultColorField(entlib);
     if (entNode.contains("Color"))
@@ -1716,7 +1720,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
 std::unique_ptr<Ent::Entity>
 Ent::EntityLib::loadEntity(std::filesystem::path const& entityPath, Ent::Entity const* super) const
 {
-    json document = loadJsonFile(toolsDir, entityPath);
+    json document = loadJsonFile(entityPath);
 
     if (validationEnabled)
     {
@@ -1786,7 +1790,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
 
 std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(std::filesystem::path const& scenePath) const
 {
-    json document = loadJsonFile(toolsDir, scenePath);
+    json document = loadJsonFile(scenePath);
     if (validationEnabled)
     {
         try
@@ -1828,7 +1832,8 @@ static json saveEntity(Ent::ComponentsSchema const& schema, Ent::Entity const& e
 
     if (!entity.getMaxActivationLevelValue().isDefault())
     {
-        entNode.emplace("MaxActivationLevel", getActivationLevelString(entity.getMaxActivationLevel()));
+        entNode.emplace(
+            "MaxActivationLevel", getActivationLevelString(entity.getMaxActivationLevel()));
     }
 
     json& componentsNode = entNode["Components"] = json::array();
@@ -1963,7 +1968,7 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanc
         templ->getColorValue().makeInstanceOf(),
         templ->getThumbnailValue().makeInstanceOf(),
         templ->getInstanceOfValue().makeOverridedInstanceOf(_instanceOf),
-		templ->getMaxActivationLevelValue().makeInstanceOf());
+        templ->getMaxActivationLevelValue().makeInstanceOf());
     return inst;
 }
 

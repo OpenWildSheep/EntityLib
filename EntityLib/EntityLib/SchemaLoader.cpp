@@ -4,6 +4,7 @@
 #pragma warning(push, 0)
 #include <sstream>
 #include <utility>
+#include <ciso646>
 #pragma warning(pop)
 
 /// \cond PRIVATE
@@ -65,7 +66,7 @@ void Ent::SchemaLoader::parseSchema(
             auto iter = m_schemaMap.find(fileName);
             if (iter == m_schemaMap.end())
             {
-                m_schemaMap[fileName] = loadJsonFile(m_toolsdir, m_schemaPath / fileName);
+                m_schemaMap[fileName] = loadJsonFile(m_schemaPath / fileName);
             }
             refRoot = &m_schemaMap[fileName];
         }
@@ -229,6 +230,7 @@ void Ent::SchemaLoader::parseSchemaNoRef(
         case nlohmann::json::value_t::null: setType(Ent::DataType::null); break;
         case nlohmann::json::value_t::object: setType(Ent::DataType::object); break;
         case nlohmann::json::value_t::array: setType(Ent::DataType::array); break;
+        case nlohmann::json::value_t::binary:
         case nlohmann::json::value_t::discarded: break;
         case nlohmann::json::value_t::string:
             setType(Ent::DataType::string);
@@ -258,6 +260,7 @@ void Ent::SchemaLoader::parseSchemaNoRef(
         case nlohmann::json::value_t::null: setType(Ent::DataType::null); break;
         case nlohmann::json::value_t::object: setType(Ent::DataType::object); break;
         case nlohmann::json::value_t::array: setType(Ent::DataType::array); break;
+        case nlohmann::json::value_t::binary:
         case nlohmann::json::value_t::discarded: break;
         case nlohmann::json::value_t::string:
             setType(Ent::DataType::string);

@@ -8,6 +8,7 @@
 #include <valijson/schema_parser.hpp>
 #include <valijson/validator.hpp>
 #include <regex>
+#include <ciso646>
 #pragma warning(pop)
 
 #include "Tools.h"
@@ -221,7 +222,7 @@ void Ent::validateScene(
     // valid the scene using schema
     strcpy_s(schemaPath, sizeof(schemaPath), (toolsDir / "WildPipeline/Schema").u8string().c_str());
 
-    json schemaDocument = loadJsonFile(toolsDir, toolsDir / sceneSchemaPath);
+    json schemaDocument = loadJsonFile(toolsDir / sceneSchemaPath);
 
     json fullEntityInstanceSchema = convertToInstanceSchema(schema, *schema.root);
 
@@ -251,7 +252,7 @@ void Ent::validateEntity(
     // valid the scene using schema
     strcpy_s(schemaPath, sizeof(schemaPath), (toolsDir / "WildPipeline/Schema").u8string().c_str());
 
-    json schemaDocument = loadJsonFile(toolsDir, toolsDir / entitySchemaPath);
+    json schemaDocument = loadJsonFile(toolsDir / entitySchemaPath);
 
     json fullSceneInstanceSchema = convertToInstanceSchema(
         schema, schema.allDefinitions.at("file://Scene-schema.json#/definitions/Object"));

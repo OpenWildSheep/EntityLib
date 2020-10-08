@@ -2,52 +2,27 @@
 
 #include <fstream>
 #include <sstream>
+#include <ciso646>
 
 using namespace nlohmann;
 
 /// @cond PRIVATE
 
-static std::tuple<std::string, int> exec(char const* command)
+json loadJsonFile(std::filesystem::path const& path)
 {
-    // Open pipe to file
-    FILE* pipe = _popen(command, "r");
-    if (pipe == nullptr)
+    std::ifstream file(path, std::ios::binary);
+    if (not file.is_open())
     {
-        return { "popen failed!", -1 };
+        throw std::runtime_error("Can't open file for read: " + path.u8string());
     }
-
-    // read till end of process:
-    char buffer[128];
-    std::string result;
-    while (feof(pipe) == 0)
-    {
-        // use buffer to read and add to result
-        if (fgets(buffer, 128, pipe) != nullptr)
-        {
-            result += buffer;
-        }
-    }
-
-    auto exitCode = _pclose(pipe);
-    return { std::move(result), exitCode };
-}
-
-json loadJsonFile(std::filesystem::path const& _toolsDir, std::filesystem::path const& _path)
-{
-    // Call the mcpp preprocessor to remove all C-style comments inside the json file
-    auto mcppPath = _toolsDir / "External/mcpp/mcpp.exe";
-    std::stringstream ss;
-    ss << mcppPath << " ";
-    ss << _path << " -P -a -W 0";
     std::string data;
-    int errorCode{};
-    std::tie(data, errorCode) = exec(ss.str().c_str()); // NOLINT(readability-redundant-string-cstr)
-    if (errorCode != 0)
-    {
-        throw std::runtime_error("Can't preprocess file: " + _path.u8string());
-    }
-
-    json doc = json::parse(data);
+    std::getline(file, data, char(0));
+    json doc = json::parse(
+        data,
+        nullptr, // Parser callback
+        true, // allow_exceptions
+        true // ignore_comments
+    );
     return doc;
 };
 

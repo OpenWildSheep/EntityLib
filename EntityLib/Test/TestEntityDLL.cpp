@@ -173,12 +173,18 @@ try
         ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->getEntityRef().entityPath == ".");
         testEntityRef->root.at("TestRef")->setEntityRef(ent->makeEntityRef(*allSubEntities.front()));
 
+        // TEST MaxActivationLevel
+        ent->setMaxActivationLevel(Ent::ActivationLevel::InWorld);
+
         sysCreat->root.at("Name")->setString("Shamane_male");
         entlib.saveEntity(*ent, "prefab.copy.entity");
     }
     {
         // Test write prefab
         EntityPtr ent = entlib.loadEntity("prefab.copy.entity");
+
+        // TEST MaxActivationLevel
+        ENTLIB_ASSERT(ent->getMaxActivationLevel() == Ent::ActivationLevel::InWorld);
 
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent->getComponent("HeightObj");

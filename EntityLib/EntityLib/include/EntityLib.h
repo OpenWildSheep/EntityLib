@@ -208,7 +208,9 @@ namespace Ent
         char const* getDefaultString() const; ///< @pre DataType == string. @brief Get the default value as string
         bool getDefaultBool() const; ///< @pre DataType == bool. @brief Get the default value as bool
 
-        char const* getTypeName() const; ///< Get the name of the Subschema type, or nullptr if the is no
+        /// Get the absolute full link of the Subschema type, or nullptr if the is no
+        /// Example : "file://RuntimeComponents.json#/definitions/VoxelSimulationGD"
+        char const* getTypeName() const;
 
         Subschema const* getSchema() const; ///< Get the Node schema.
 

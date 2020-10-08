@@ -1364,20 +1364,28 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
         std::string const& typeField = meta.typeField;
         std::string const& dataField = meta.dataField;
         std::string const& dataType = data.at(typeField).get<std::string>();
+        bool typeFound = false;
         for (Ent::SubschemaRef const& schemaTocheck : *nodeSchema.oneOf)
         {
-            std::string const& schemaType =
+            auto&& schemaType =
                 schemaTocheck->properties.at(typeField).get().constValue->get<std::string>();
             if (schemaType == dataType)
             {
                 Ent::Node dataNode = loadNode(
                     schemaTocheck->properties.at(dataField).get(),
-                    data.at(dataField),
+                    data.value(dataField, json{}),
                     super != nullptr ? super->at(dataField.c_str()) : nullptr);
-                return Ent::Node(Ent::Union{ dataNode }, &nodeSchema);
+                result = Ent::Node(Ent::Union{ dataNode }, &nodeSchema);
+                typeFound = true;
+                break;
             }
         }
-        result = Ent::Node();
+        if (not typeFound)
+        {
+            fprintf(
+                stderr, "Can't find type %s in schema %s\n", dataType.c_str(), nodeSchema.name.c_str());
+            result = Ent::Node(Ent::Union{ Ent::Node{} }, &nodeSchema);
+        }
     }
     break;
     case Ent::DataType::COUNT:
@@ -1436,7 +1444,7 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
     break;
     case Ent::DataType::oneOf:
     {
-        Ent::Subschema::UnionMeta const& meta = schema.meta.get<Ent::Subschema::UnionMeta>();
+        auto&& meta = schema.meta.get<Ent::Subschema::UnionMeta>();
         Ent::Node const* dataInsideUnion = node.getUnionData();
         std::string const absType = dataInsideUnion->getTypeName();
         char const* defPos = Ent::getRefTypeName(absType.c_str());

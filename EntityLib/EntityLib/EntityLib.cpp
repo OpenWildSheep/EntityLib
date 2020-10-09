@@ -36,14 +36,15 @@ namespace Ent
     char const* colorSchemaName = "file://RuntimeComponents.json#/definitions/Color";
     static Ent::Node makeDefaultColorField(EntityLib const& entlib)
     {
-        Ent::Override<float> zero{ 0.f, tl::nullopt, tl::nullopt };
-        std::vector<nonstd::value_ptr<Ent::Node>> nodes{
-            nonstd::make_value<Ent::Node>(zero, nullptr),
-            nonstd::make_value<Ent::Node>(zero, nullptr),
-            nonstd::make_value<Ent::Node>(zero, nullptr),
-            nonstd::make_value<Ent::Node>(zero, nullptr),
-        };
         Ent::Subschema const& colorSchema = entlib.schema.schema.allDefinitions.at(colorSchemaName);
+        Ent::Subschema const* itemSchema = &colorSchema.singularItems->get();
+        Ent::Override<float> one{ 255.f, tl::nullopt, tl::nullopt };
+        std::vector<nonstd::value_ptr<Ent::Node>> nodes{
+            nonstd::make_value<Ent::Node>(one, itemSchema),
+            nonstd::make_value<Ent::Node>(one, itemSchema),
+            nonstd::make_value<Ent::Node>(one, itemSchema),
+            nonstd::make_value<Ent::Node>(one, itemSchema),
+        };
         return Node{ Array{ nodes }, &colorSchema };
     }
 
@@ -1325,6 +1326,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                         ++index;
                     }
                 }
+                // TODO : Create minItem items
             }
             else
             {

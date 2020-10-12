@@ -21,7 +21,7 @@ namespace Ent
     /// Example : "file://EditionComponents.json#/definitions/HeightObj" => "HeightObj"
     char const* getRefTypeName(char const* link);
 
-    std::vector<std::string> splitString(const std::string& _str, char _delimiter);
+    std::vector<std::string> splitString(const std::string& _str, char _delimiter, bool _keepEmptyToken = false);
 
     /// @brief Given two absolute path,
     ///   compute the shorter relative path to go from _fromAbsolute to _toAbsolute

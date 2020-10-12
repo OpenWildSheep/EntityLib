@@ -166,6 +166,7 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">EnableAllWarnings</WarningLevel>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</TreatWarningAsError>
     </ClCompile>
+    <ClCompile Include="include\Schema.cpp" />
     <ClCompile Include="SchemaLoader.cpp" />
     <ClCompile Include="Tools.cpp" />
     <ClCompile Include="ValidJson.cpp" />

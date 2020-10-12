@@ -24,13 +24,6 @@ namespace std
 namespace Ent
 {
     using nonstd::value_ptr;
-    // ******************************** Global declarations ***************************************
-
-    /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
-    struct BadType : std::runtime_error
-    {
-        BadType();
-    };
 
     // ******************************** Implem details ********************************************
 
@@ -60,7 +53,9 @@ namespace Ent
 
     struct Union
     {
+        Subschema const* schema = nullptr; ///< The schema of the object containing the oneOf field
         value_ptr<Node> data;
+        std::string type;  ///< The type as it is stored in the json. (The leaf of the $ref path)
         bool hasOverride() const;
     };
 
@@ -168,6 +163,13 @@ namespace Ent
         // Union
         Node* getUnionData(); ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data
         Node const* getUnionData() const; ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data
+        /// @brief Get the type inside the union
+        /// @pre type==Ent::DataType::oneOf
+        char const* getUnionType() const;
+        /// @brief Change the type inside the union
+        /// @pre type==Ent::DataType::oneOf
+        /// @pre type match with a type declared inside the json "oneOf"
+        Node* setUnionType(char const* type);
 
         // Value
         float getFloat() const; ///< @pre number or integer. @brief Get the value as float
@@ -357,8 +359,10 @@ namespace Ent
         void setName(std::string name); ///< Set the name of the component
         bool canBeRenamed() const; ///< A SubEntity of an instance which override a SubEntity in a prefab can't be renamed
         char const* getInstanceOf() const; ///< Name of the inherited prefab if there is one, or nullptr.
-        ActivationLevel getMaxActivationLevel() const; ///< Get the initial max activation level of the entity at runtime.
-        void setMaxActivationLevel(ActivationLevel _level); ///< Set the initial max activation level of the entity at runtime.
+        /// Get the initial max activation level of the entity at runtime.
+        ActivationLevel getMaxActivationLevel() const;
+        /// Set the initial max activation level of the entity at runtime.
+        void setMaxActivationLevel(ActivationLevel _level);
         char const* getThumbnail() const; ///< Get the Thumbnail path, or nullptr.
         void setThumbnail(std::string _thumbPath); ///< Set the Thumbnail path
         std::array<uint8_t, 4> getColor() const; ///< Get the color of the is one, or nullptr.
@@ -438,8 +442,10 @@ namespace Ent
     /// Contain all data of a scene. (A list of Entity)
     struct Scene
     {
+        /// Construct an empty Scene
         Scene();
-        Scene(std::vector<std::unique_ptr<Entity>>);
+        /// Construct a scene taking the ownership of a list of \p _entities
+        Scene(std::vector<std::unique_ptr<Entity>> _entities);
 
         /// @cond PRIVATE
         Scene(Scene const&) = delete;

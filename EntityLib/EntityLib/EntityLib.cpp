@@ -48,11 +48,6 @@ namespace Ent
         return Node{ Array{ nodes }, &colorSchema };
     }
 
-    BadType::BadType()
-        : std::runtime_error("Bad node type")
-    {
-    }
-
     EntityLib::EntityLib(std::filesystem::path _rootPath)
         : rootPath(std::move(_rootPath)) // Read schema and dependencies
     {
@@ -178,6 +173,36 @@ namespace Ent
     {
         if (value.is<Union>())
         {
+            return value.get<Union>().data.get();
+        }
+        throw BadType();
+    }
+
+    char const* Node::getUnionType() const
+    {
+        if (value.is<Union>())
+        {
+            auto&& un = value.get<Union>();
+            return un.type.c_str();
+        }
+        throw BadType();
+    }
+
+    Node* Node::setUnionType(char const* type)
+    {
+        if (value.is<Union>())
+        {
+            auto&& un = value.get<Union>();
+            if (un.type == type) // Nothing to do
+            {
+                return value.get<Union>().data.get();
+            }
+            Subschema const* subTypeSchema = schema->getUnionType(type);
+            un.type = type;
+            // TODO : Loïc - low prio - Find a way to get the super.
+            //   It could be hard because we are no more in the loading phase, so the super is
+            //   now delete.
+            un.data = loadNode(*subTypeSchema, json(), nullptr);
             return value.get<Union>().data.get();
         }
         throw BadType();
@@ -377,7 +402,11 @@ namespace Ent
 
         Node operator()(Union const& var) const
         {
-            return Node(Union{ var.data->detach() }, schema);
+            Union detUnion{};
+            detUnion.schema = var.schema;
+            detUnion.data = var.data->detach();
+            detUnion.type = var.type;
+            return Node(std::move(detUnion), schema);
         }
     };
 
@@ -426,7 +455,11 @@ namespace Ent
 
         Node operator()(Union const& var) const
         {
-            return Node(Union{ var.data->makeInstanceOf() }, schema);
+            Union detUnion{};
+            detUnion.schema = var.schema;
+            detUnion.data = var.data->makeInstanceOf();
+            detUnion.type = var.type;
+            return Node(std::move(detUnion), schema);
         }
     };
 
@@ -468,9 +501,10 @@ namespace Ent
             return false;
         }
 
-        bool operator()(Union const& var) const
+        bool operator()(Union const&) const
         {
-            return var.hasOverride();
+            // TODO : Find a way to check if className was overrode
+            return true;
         }
     };
 
@@ -968,8 +1002,7 @@ namespace Ent
         auto&& thisPath = std::get<0>(thisPathInfos);
         auto&& entityPath = std::get<0>(entityPathInfos);
 
-        std::string relativePath =
-            computeRelativePath(std::move(thisPath), std::move(entityPath), false);
+        std::string relativePath = computeRelativePath(thisPath, std::move(entityPath), false);
 
         return { std::move(relativePath) };
     }
@@ -1390,11 +1423,16 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                 schemaTocheck->properties.at(typeField).get().constValue->get<std::string>();
             if (schemaType == dataType)
             {
+                Ent::Subschema const* dataSchema = &schemaTocheck->properties.at(dataField).get();
                 Ent::Node dataNode = loadNode(
-                    schemaTocheck->properties.at(dataField).get(),
+                    *dataSchema,
                     data.value(dataField, json{}),
-                    super != nullptr ? super->at(dataField.c_str()) : nullptr);
-                result = Ent::Node(Ent::Union{ dataNode }, &nodeSchema);
+                    super != nullptr ? super->getUnionData() : nullptr);
+                Ent::Union un{};
+                un.schema = dataSchema;
+                un.data = nonstd::make_value<Ent::Node>(std::move(dataNode));
+                un.type = schemaType;
+                result = Ent::Node(std::move(un), &nodeSchema);
                 typeFound = true;
                 break;
             }
@@ -1403,7 +1441,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
         {
             fprintf(
                 stderr, "Can't find type %s in schema %s\n", dataType.c_str(), nodeSchema.name.c_str());
-            result = Ent::Node(Ent::Union{ Ent::Node{} }, &nodeSchema);
+            result = Ent::Node(Ent::Union{}, &nodeSchema);
         }
     }
     break;
@@ -1445,6 +1483,7 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
         {
             if (item->hasOverride())
             {
+                ENTLIB_ASSERT(item->getSchema() != nullptr);
                 json tmpNode = saveNode(*item->getSchema(), *item);
                 data.emplace_back(std::move(tmpNode));
             }
@@ -1465,9 +1504,7 @@ static json saveNode(Ent::Subschema const& schema, Ent::Node const& node)
     {
         auto&& meta = schema.meta.get<Ent::Subschema::UnionMeta>();
         Ent::Node const* dataInsideUnion = node.getUnionData();
-        std::string const absType = dataInsideUnion->getTypeName();
-        char const* defPos = Ent::getRefTypeName(absType.c_str());
-        char const* type = (defPos == nullptr) ? absType.c_str() : defPos;
+        char const* type = node.getUnionType();
         data[meta.typeField] = type;
         data[meta.dataField] = saveNode(*dataInsideUnion->getSchema(), *dataInsideUnion);
     }

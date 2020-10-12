@@ -183,6 +183,8 @@ try
         Ent::Component* cinematicGD = ent->getComponent("CinematicGD");
         Ent::Node* scriptEvents = cinematicGD->root.at("ScriptEvents");
         ENTLIB_ASSERT(scriptEvents->getDataType() == Ent::DataType::array);
+
+        // Read Union type
         Ent::Node* oneOfScripts = scriptEvents->at(0llu);
         ENTLIB_ASSERT(oneOfScripts->getDataType() == Ent::DataType::oneOf);
         Ent::Node* cineEvent = oneOfScripts->getUnionData();
@@ -190,11 +192,26 @@ try
             cineEvent->getTypeName()
             == std::string(
                 R"(file://RuntimeComponents.json#/definitions/CineEventTestBlackboardHasFact)"));
+        auto fieldNames = cineEvent->getFieldNames();
+        ENTLIB_ASSERT(fieldNames[0] == std::string("FactName"));
+        ENTLIB_ASSERT(fieldNames[1] == std::string("Super"));
 
         Ent::Node* nbEnt = cineEvent->at("FactName");
         ENTLIB_ASSERT(nbEnt != nullptr);
         ENTLIB_ASSERT(nbEnt->getDataType() == Ent::DataType::string);
         ENTLIB_ASSERT(nbEnt->getString() == std::string("Toto"));
+
+        // Set Union type
+        Ent::Node* oneOfScripts2 = scriptEvents->at(1llu);
+        ENTLIB_ASSERT(oneOfScripts2->getDataType() == Ent::DataType::oneOf);
+        ENTLIB_ASSERT(oneOfScripts2->getUnionType() == std::string("CineEventTestBlackboardHasFact"));
+        oneOfScripts2->setUnionType("CineEventTestCurrentGameState");
+        Ent::Node* testCurrentState = oneOfScripts2->getUnionData();
+        ENTLIB_ASSERT(oneOfScripts2->getUnionType() == std::string("CineEventTestCurrentGameState"));
+        auto fieldNames2 = testCurrentState->getFieldNames();
+        ENTLIB_ASSERT(fieldNames2[0] == std::string("GameStateName"));
+        ENTLIB_ASSERT(fieldNames2[1] == std::string("Super"));
+        testCurrentState->at("GameStateName")->setString("Pouet!");
 
         // TEST sub-object with non-default values
         Ent::Component* explosionEffect = ent->getComponent("ExplosionEffect");

@@ -254,6 +254,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "get_union_data",
             [](Node* node) { return node->getUnionData(); },
             py::return_value_policy::reference)
+        .def("get_union_type", &Node::getUnionType, py::return_value_policy::reference)
+        .def("set_union_type", &Node::setUnionType, py::return_value_policy::reference)
         .def("unset", [](Node* node) { return node->unset(); })
         .def("is_set", [](Node* node) { return node->isSet(); });
 
@@ -282,7 +284,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property("name", &Entity::getName, &Entity::setName)
         .def_property_readonly("instance_of", &Entity::getInstanceOf)
         .def_property("thumbnail", &Entity::getThumbnail, &Entity::setThumbnail)
-        .def_property("max_activation_level", &Entity::getMaxActivationLevel, &Entity::setMaxActivationLevel)
+        .def_property(
+            "max_activation_level", &Entity::getMaxActivationLevel, &Entity::setMaxActivationLevel)
         .def_property("color", &Entity::getColor, &Entity::setColor)
         .def("has_override", &Entity::hasOverride)
         .def("add_component", &Entity::addComponent, py::return_value_policy::reference)

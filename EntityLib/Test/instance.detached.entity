@@ -78,6 +78,12 @@
                             "FactName": "Toto"
                         },
                         "className": "CineEventTestBlackboardHasFact"
+                    },
+                    {
+                        "classData": {
+                            "FactName": "Tutu"
+                        },
+                        "className": "CineEventTestBlackboardHasFact"
                     }
                 ]
             },

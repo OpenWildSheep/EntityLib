@@ -104,6 +104,12 @@
                             "FactName": "Toto"
                         },
                         "className": "CineEventTestBlackboardHasFact"
+                    },
+                    {
+                        "classData": {
+                            "GameStateName": "Pouet!"
+                        },
+                        "className": "CineEventTestCurrentGameState"
                     }
                 ]
             },
@@ -212,7 +218,6 @@
             "Version": 1
         }
     ],
-    "MaxActivationLevel": "InWorld",
     "Name": "PlayerSpawner_",
     "Thumbnail": "TestThumbnail"
 }

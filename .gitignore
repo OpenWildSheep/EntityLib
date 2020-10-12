@@ -9,3 +9,6 @@ x64
 **/__pycache__
 *.pyc
 /EntityLib_doc
+/EntityLib/EntityLib/Debug
+/EntityLib/EntityLibPy/Debug
+/EntityLib/Test/Debug

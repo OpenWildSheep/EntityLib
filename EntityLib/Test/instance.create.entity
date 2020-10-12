@@ -1,22 +1,5 @@
 {
-    "Components": [
-        {
-            "Data": {
-                "ScriptEvents": [
-                    {
-                        "classData": {},
-                        "className": "CineEventTestBlackboardHasFact"
-                    },
-                    {
-                        "classData": {},
-                        "className": "CineEventTestBlackboardHasFact"
-                    }
-                ]
-            },
-            "Type": "CinematicGD",
-            "Version": 1
-        }
-    ],
+    "Components": [],
     "InstanceOf": "prefab.entity",
     "Name": "PlayerSpawner_",
     "Thumbnail": "TestThumbnail"

@@ -20,7 +20,8 @@ namespace Ent
     {
     }
 
-    Subschema const* Subschema::getUnionType(char const* _subtype) const
+    /// @cond PRIVATE
+    Subschema const* Subschema::getUnionTypeWrapper(char const* _subtype) const
     {
         if (type != Ent::DataType::oneOf)
         {
@@ -41,8 +42,15 @@ namespace Ent
         }
         else
         {
-            return &iter->get().properties.at(un.dataField).get();
+            return &iter->get();
         }
+    }
+    /// @endcond
+
+    Subschema const* Subschema::getUnionType(char const* _subtype) const
+    {
+        auto const& un = meta.get<UnionMeta>();
+        return &getUnionTypeWrapper(_subtype)->properties.at(un.dataField).get();
     }
 
 } // namespace Ent

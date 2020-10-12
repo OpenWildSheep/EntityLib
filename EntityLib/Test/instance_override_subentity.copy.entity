@@ -37,22 +37,6 @@
             },
             "Type": "SubScene",
             "Version": 1
-        },
-        {
-            "Data": {
-                "ScriptEvents": [
-                    {
-                        "classData": {},
-                        "className": "CineEventTestBlackboardHasFact"
-                    },
-                    {
-                        "classData": {},
-                        "className": "CineEventTestBlackboardHasFact"
-                    }
-                ]
-            },
-            "Type": "CinematicGD",
-            "Version": 1
         }
     ],
     "InstanceOf": "prefab.entity",

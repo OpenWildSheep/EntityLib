@@ -100,6 +100,12 @@
                         "classData": {
                             "FactName": "Tutu"
                         }
+                    },
+                    {
+                        "className": "CineEventTestBlackboardHasFact",
+                        "classData": {
+                            "FactName": "Titi"
+                        }
                     }
                 ]
             },

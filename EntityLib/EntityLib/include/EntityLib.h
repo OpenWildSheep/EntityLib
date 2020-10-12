@@ -54,9 +54,18 @@ namespace Ent
     struct Union
     {
         Subschema const* schema = nullptr; ///< The schema of the object containing the oneOf field
-        value_ptr<Node> data;
-        std::string type;  ///< The type as it is stored in the json. (The leaf of the $ref path)
-        bool hasOverride() const;
+        value_ptr<Node> data; ///< Node containing the className/classData
+        std::string type; ///< The type as it is stored in the json. (The leaf of the $ref path)
+        std::string classNameField;
+        std::string classDatafield;
+
+        bool hasOverride() const; ///< Recursively check if there is an override inside.
+        Node* getUnionData(); ///< return the underlying data (The type is given by getUnionType)
+        Node const* getUnionData() const; ///< return the underlying data (The type is given by getUnionType)
+        char const* getUnionType() const; ///< Get the type inside the union
+        /// @brief Change the type inside the union
+        /// @pre type match with a type declared inside the json "oneOf"
+        Node* setUnionType(char const* type);
     };
 
     struct EntityRef
@@ -138,6 +147,11 @@ namespace Ent
             Union>;
         Node() = default;
         Node(Value val, Subschema const* schema);
+
+        /// @brief return the node containing the data and the type nodes (An element of the oneOf array)
+        /// @pre type==Ent::DataType::oneOf
+        /// @remark For internal use
+        Node const* getUnionDataWrapper() const;
         /// @endcond
 
         DataType getDataType() const; ///< Type of this Node. @see Ent::DataType

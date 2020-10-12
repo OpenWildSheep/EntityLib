@@ -98,6 +98,24 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
     }
 }
 
+#define ENTLIB_CHECK_EXCEPTION(expression, excep_type)                                             \
+    {                                                                                              \
+        bool exception_throw = false;                                                              \
+        try                                                                                        \
+        {                                                                                          \
+            expression;                                                                            \
+        }                                                                                          \
+        catch (excep_type&)                                                                        \
+        {                                                                                          \
+            exception_throw = true;                                                                \
+        }                                                                                          \
+        catch (...)                                                                                \
+        {                                                                                          \
+            ENTLIB_LOGIC_ERROR("Wrong exception thrown!");                                         \
+        }                                                                                          \
+        ENTLIB_ASSERT_MSG(exception_throw, "Exception not thrown!");                               \
+    }
+
 int main() // int argc, char** argv
 try
 {
@@ -201,17 +219,24 @@ try
         ENTLIB_ASSERT(nbEnt->getDataType() == Ent::DataType::string);
         ENTLIB_ASSERT(nbEnt->getString() == std::string("Toto"));
 
-        // Set Union type
+        // Set Union type and override
         Ent::Node* oneOfScripts2 = scriptEvents->at(1llu);
         ENTLIB_ASSERT(oneOfScripts2->getDataType() == Ent::DataType::oneOf);
         ENTLIB_ASSERT(oneOfScripts2->getUnionType() == std::string("CineEventTestBlackboardHasFact"));
         oneOfScripts2->setUnionType("CineEventTestCurrentGameState");
+        ENTLIB_CHECK_EXCEPTION(oneOfScripts2->setUnionType("ThisTypeDoesntExist"), Ent::BadUnionType);
         Ent::Node* testCurrentState = oneOfScripts2->getUnionData();
         ENTLIB_ASSERT(oneOfScripts2->getUnionType() == std::string("CineEventTestCurrentGameState"));
         auto fieldNames2 = testCurrentState->getFieldNames();
         ENTLIB_ASSERT(fieldNames2[0] == std::string("GameStateName"));
         ENTLIB_ASSERT(fieldNames2[1] == std::string("Super"));
         testCurrentState->at("GameStateName")->setString("Pouet!");
+
+        // Set Union type without override
+        Ent::Node* oneOfScripts3 = scriptEvents->at(2llu);
+        ENTLIB_ASSERT(oneOfScripts3->getDataType() == Ent::DataType::oneOf);
+        ENTLIB_ASSERT(oneOfScripts3->getUnionType() == std::string("CineEventTestBlackboardHasFact"));
+        oneOfScripts3->setUnionType("CineEventTestCurrentGameState");
 
         // TEST sub-object with non-default values
         Ent::Component* explosionEffect = ent->getComponent("ExplosionEffect");

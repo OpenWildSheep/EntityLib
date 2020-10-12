@@ -110,6 +110,10 @@
                             "GameStateName": "Pouet!"
                         },
                         "className": "CineEventTestCurrentGameState"
+                    },
+                    {
+                        "classData": {},
+                        "className": "CineEventTestCurrentGameState"
                     }
                 ]
             },
@@ -218,6 +222,7 @@
             "Version": 1
         }
     ],
+    "MaxActivationLevel": "InWorld",
     "Name": "PlayerSpawner_",
     "Thumbnail": "TestThumbnail"
 }

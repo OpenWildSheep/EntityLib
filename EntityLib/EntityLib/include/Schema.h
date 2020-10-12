@@ -71,6 +71,12 @@ namespace Ent
         Subschema(Subschema&&) = default;
         Subschema& operator=(Subschema&&) = default;
         DeleteCheck deleteCheck;
+
+        /// @brief Get the Subschema related to the given \p _subtype (className)
+        /// @throw BadType if the schema is not a oneOf
+        /// @throw MissingMetadata if the schema doesn't have a meta className and classData
+        /// @throw BadUnionType if \p _subtype is not listed in the oneOf field
+        Subschema const* getUnionTypeWrapper(char const* _subtype) const;
         /// @endcond
 
         DataType type = DataType::null; ///< type of this Subschema. @see Ent::DataType

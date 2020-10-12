@@ -95,6 +95,45 @@ namespace Ent
 
     EntityLib::~EntityLib() = default;
 
+    // ************************************ Union *************************************************
+
+    bool Ent::Union::hasOverride() const
+    {
+        return data->hasOverride();
+    }
+
+    Node* Union::getUnionData()
+    {
+        return data->at(classDatafield.c_str());
+    }
+
+    Node const* Union::getUnionData() const
+    {
+        return data->at(classDatafield.c_str());
+    }
+
+    char const* Union::getUnionType() const
+    {
+        return data->at(classNameField.c_str())->getString();
+    }
+
+    Node* Union::setUnionType(char const* _type)
+    {
+        if (type != _type) // Nothing to do
+        {
+            Subschema const* subTypeSchema = schema->getUnionTypeWrapper(_type);
+            type = _type;
+            // TODO : Loïc - low prio - Find a way to get the super.
+            //   It could be hard because we are no more in the loading phase, so the super is
+            //   now delete.
+            data = loadNode(*subTypeSchema, json(), nullptr);
+            data->at(classNameField.c_str())->setString(_type);
+        }
+        return getUnionData();
+    }
+
+    // ************************************* Node *************************************************
+
     Node::Node(Value val, Subschema const* _schema)
         : schema(_schema)
         , value(std::move(val))
@@ -161,7 +200,7 @@ namespace Ent
         throw BadType();
     }
 
-    Node* Node::getUnionData()
+    Node const* Node::getUnionDataWrapper() const
     {
         if (value.is<Union>())
         {
@@ -169,11 +208,20 @@ namespace Ent
         }
         throw BadType();
     }
+
+    Node* Node::getUnionData()
+    {
+        if (value.is<Union>())
+        {
+            return value.get<Union>().getUnionData();
+        }
+        throw BadType();
+    }
     Node const* Node::getUnionData() const
     {
         if (value.is<Union>())
         {
-            return value.get<Union>().data.get();
+            return value.get<Union>().getUnionData();
         }
         throw BadType();
     }
@@ -182,28 +230,16 @@ namespace Ent
     {
         if (value.is<Union>())
         {
-            auto&& un = value.get<Union>();
-            return un.type.c_str();
+            return value.get<Union>().getUnionType();
         }
         throw BadType();
     }
 
-    Node* Node::setUnionType(char const* type)
+    Node* Node::setUnionType(char const* _type)
     {
         if (value.is<Union>())
         {
-            auto&& un = value.get<Union>();
-            if (un.type == type) // Nothing to do
-            {
-                return value.get<Union>().data.get();
-            }
-            Subschema const* subTypeSchema = schema->getUnionType(type);
-            un.type = type;
-            // TODO : Loïc - low prio - Find a way to get the super.
-            //   It could be hard because we are no more in the loading phase, so the super is
-            //   now delete.
-            un.data = loadNode(*subTypeSchema, json(), nullptr);
-            return value.get<Union>().data.get();
+            return value.get<Union>().setUnionType(_type);
         }
         throw BadType();
     }
@@ -406,6 +442,8 @@ namespace Ent
             detUnion.schema = var.schema;
             detUnion.data = var.data->detach();
             detUnion.type = var.type;
+            detUnion.classDatafield = var.classDatafield;
+            detUnion.classNameField = var.classNameField;
             return Node(std::move(detUnion), schema);
         }
     };
@@ -459,6 +497,8 @@ namespace Ent
             detUnion.schema = var.schema;
             detUnion.data = var.data->makeInstanceOf();
             detUnion.type = var.type;
+            detUnion.classDatafield = var.classDatafield;
+            detUnion.classNameField = var.classNameField;
             return Node(std::move(detUnion), schema);
         }
     };
@@ -501,10 +541,9 @@ namespace Ent
             return false;
         }
 
-        bool operator()(Union const&) const
+        bool operator()(Union const& un) const
         {
-            // TODO : Find a way to check if className was overrode
-            return true;
+            return un.data->hasOverride();
         }
     };
 
@@ -1423,15 +1462,16 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                 schemaTocheck->properties.at(typeField).get().constValue->get<std::string>();
             if (schemaType == dataType)
             {
-                Ent::Subschema const* dataSchema = &schemaTocheck->properties.at(dataField).get();
                 Ent::Node dataNode = loadNode(
-                    *dataSchema,
-                    data.value(dataField, json{}),
-                    super != nullptr ? super->getUnionData() : nullptr);
+                    schemaTocheck.get(),
+                    data,
+                    super != nullptr ? super->getUnionDataWrapper() : nullptr);
                 Ent::Union un{};
-                un.schema = dataSchema;
+                un.schema = &nodeSchema;
                 un.data = nonstd::make_value<Ent::Node>(std::move(dataNode));
                 un.type = schemaType;
+                un.classDatafield = dataField;
+                un.classNameField = typeField;
                 result = Ent::Node(std::move(un), &nodeSchema);
                 typeFound = true;
                 break;
@@ -2123,11 +2163,6 @@ bool Ent::SubSceneComponent::hasOverride() const
 bool Ent::Array::hasOverride() const
 {
     return std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasOverride));
-}
-
-bool Ent::Union::hasOverride() const
-{
-    return data->hasOverride();
 }
 
 /// \endcond

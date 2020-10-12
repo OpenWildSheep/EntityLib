@@ -99,35 +99,35 @@ namespace Ent
 
     bool Ent::Union::hasOverride() const
     {
-        return data->hasOverride();
+        return wrapper->hasOverride();
     }
 
     Node* Union::getUnionData()
     {
-        return data->at(classDatafield.c_str());
+        return wrapper->at(classDatafield.c_str());
     }
 
     Node const* Union::getUnionData() const
     {
-        return data->at(classDatafield.c_str());
+        return wrapper->at(classDatafield.c_str());
     }
 
     char const* Union::getUnionType() const
     {
-        return data->at(classNameField.c_str())->getString();
+        return wrapper->at(classNameField.c_str())->getString();
     }
 
     Node* Union::setUnionType(char const* _type)
     {
-        if (type != _type) // Nothing to do
+        if (type != _type)
         {
             Subschema const* subTypeSchema = schema->getUnionTypeWrapper(_type);
             type = _type;
             // TODO : Loïc - low prio - Find a way to get the super.
             //   It could be hard because we are no more in the loading phase, so the super is
             //   now delete.
-            data = loadNode(*subTypeSchema, json(), nullptr);
-            data->at(classNameField.c_str())->setString(_type);
+            wrapper = loadNode(*subTypeSchema, json(), nullptr);
+            wrapper->at(classNameField.c_str())->setString(_type);
         }
         return getUnionData();
     }
@@ -204,7 +204,7 @@ namespace Ent
     {
         if (value.is<Union>())
         {
-            return value.get<Union>().data.get();
+            return value.get<Union>().wrapper.get();
         }
         throw BadType();
     }
@@ -389,7 +389,7 @@ namespace Ent
 
         bool operator()(Union const& var) const
         {
-            return var.data->hasDefaultValue();
+            return var.wrapper->hasDefaultValue();
         }
     };
 
@@ -440,7 +440,7 @@ namespace Ent
         {
             Union detUnion{};
             detUnion.schema = var.schema;
-            detUnion.data = var.data->detach();
+            detUnion.wrapper = var.wrapper->detach();
             detUnion.type = var.type;
             detUnion.classDatafield = var.classDatafield;
             detUnion.classNameField = var.classNameField;
@@ -495,7 +495,7 @@ namespace Ent
         {
             Union detUnion{};
             detUnion.schema = var.schema;
-            detUnion.data = var.data->makeInstanceOf();
+            detUnion.wrapper = var.wrapper->makeInstanceOf();
             detUnion.type = var.type;
             detUnion.classDatafield = var.classDatafield;
             detUnion.classNameField = var.classNameField;
@@ -543,7 +543,7 @@ namespace Ent
 
         bool operator()(Union const& un) const
         {
-            return un.data->hasOverride();
+            return un.wrapper->hasOverride();
         }
     };
 
@@ -1468,7 +1468,7 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                     super != nullptr ? super->getUnionDataWrapper() : nullptr);
                 Ent::Union un{};
                 un.schema = &nodeSchema;
-                un.data = nonstd::make_value<Ent::Node>(std::move(dataNode));
+                un.wrapper = nonstd::make_value<Ent::Node>(std::move(dataNode));
                 un.type = schemaType;
                 un.classDatafield = dataField;
                 un.classNameField = typeField;

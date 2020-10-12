@@ -387,9 +387,9 @@ namespace Ent
             });
         }
 
-        bool operator()(Union const& var) const
+        bool operator()(Union const& _un) const
         {
-            return var.wrapper->hasDefaultValue();
+            return _un.wrapper->hasDefaultValue();
         }
     };
 
@@ -436,14 +436,14 @@ namespace Ent
             return Node(std::move(out), schema);
         }
 
-        Node operator()(Union const& var) const
+        Node operator()(Union const& _un) const
         {
             Union detUnion{};
-            detUnion.schema = var.schema;
-            detUnion.wrapper = var.wrapper->detach();
-            detUnion.type = var.type;
-            detUnion.classDatafield = var.classDatafield;
-            detUnion.classNameField = var.classNameField;
+            detUnion.schema = _un.schema;
+            detUnion.wrapper = _un.wrapper->detach();
+            detUnion.type = _un.type;
+            detUnion.classDatafield = _un.classDatafield;
+            detUnion.classNameField = _un.classNameField;
             return Node(std::move(detUnion), schema);
         }
     };
@@ -491,14 +491,14 @@ namespace Ent
             return Node(std::move(out), schema);
         }
 
-        Node operator()(Union const& var) const
+        Node operator()(Union const& _un) const
         {
             Union detUnion{};
-            detUnion.schema = var.schema;
-            detUnion.wrapper = var.wrapper->makeInstanceOf();
-            detUnion.type = var.type;
-            detUnion.classDatafield = var.classDatafield;
-            detUnion.classNameField = var.classNameField;
+            detUnion.schema = _un.schema;
+            detUnion.wrapper = _un.wrapper->makeInstanceOf();
+            detUnion.type = _un.type;
+            detUnion.classDatafield = _un.classDatafield;
+            detUnion.classNameField = _un.classNameField;
             return Node(std::move(detUnion), schema);
         }
     };
@@ -541,9 +541,9 @@ namespace Ent
             return false;
         }
 
-        bool operator()(Union const& un) const
+        bool operator()(Union const& _un) const
         {
-            return un.wrapper->hasOverride();
+            return _un.wrapper->hasOverride();
         }
     };
 
@@ -655,9 +655,8 @@ namespace Ent
             return false;
         }
 
-        bool operator()(Union const& var) const
+        bool operator()(Union const&) const
         {
-            (void*)&var;
             return false;
         }
     };

@@ -1,17 +1,11 @@
 #pragma once
 
 #pragma warning(push, 0)
-#include <filesystem>
-
 #include "../external/json.hpp"
+#include "../external/filesystem.hpp"
 #pragma warning(pop)
 
 /// \cond PRIVATE
-
-namespace std
-{
-    using namespace experimental;
-} // namespace std
 
 namespace Ent
 {

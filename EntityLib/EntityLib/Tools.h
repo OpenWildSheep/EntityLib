@@ -1,15 +1,9 @@
 #pragma once
 
 #pragma warning(push, 0)
-#include <filesystem>
-
 #include "../external/json.hpp"
+#include "../external/filesystem.hpp"
 #pragma warning(pop)
-
-namespace std
-{
-    using namespace experimental;
-} // namespace std
 
 nlohmann::json loadJsonFile(std::filesystem::path const& _path);
 
@@ -21,7 +15,8 @@ namespace Ent
     /// Example : "file://EditionComponents.json#/definitions/HeightObj" => "HeightObj"
     char const* getRefTypeName(char const* link);
 
-    std::vector<std::string> splitString(const std::string& _str, char _delimiter, bool _keepEmptyToken = false);
+    std::vector<std::string>
+    splitString(const std::string& _str, char _delimiter, bool _keepEmptyToken = false);
 
     /// @brief Given two absolute path,
     ///   compute the shorter relative path to go from _fromAbsolute to _toAbsolute

@@ -114,15 +114,17 @@ namespace Ent
 
     char const* Union::getUnionType() const
     {
-        return wrapper->at(classNameField.c_str())->getString();
+        if (wrapper.has_value())
+            return wrapper->at(classNameField.c_str())->getString();
+        else
+            return nullptr;
     }
 
     Node* Union::setUnionType(char const* _type)
     {
-        if (type != _type)
+        if (getUnionType() != _type)
         {
             Subschema const* subTypeSchema = schema->getUnionTypeWrapper(_type);
-            type = _type;
             // TODO : Loïc - low prio - Find a way to get the super.
             //   It could be hard because we are no more in the loading phase, so the super is
             //   now delete.
@@ -441,7 +443,6 @@ namespace Ent
             Union detUnion{};
             detUnion.schema = _un.schema;
             detUnion.wrapper = _un.wrapper->detach();
-            detUnion.type = _un.type;
             detUnion.classDatafield = _un.classDatafield;
             detUnion.classNameField = _un.classNameField;
             return Node(std::move(detUnion), schema);
@@ -496,7 +497,6 @@ namespace Ent
             Union detUnion{};
             detUnion.schema = _un.schema;
             detUnion.wrapper = _un.wrapper->makeInstanceOf();
-            detUnion.type = _un.type;
             detUnion.classDatafield = _un.classDatafield;
             detUnion.classNameField = _un.classNameField;
             return Node(std::move(detUnion), schema);
@@ -1468,7 +1468,6 @@ static Ent::Node loadNode(Ent::Subschema const& nodeSchema, json const& data, En
                 Ent::Union un{};
                 un.schema = &nodeSchema;
                 un.wrapper = nonstd::make_value<Ent::Node>(std::move(dataNode));
-                un.type = schemaType;
                 un.classDatafield = dataField;
                 un.classNameField = typeField;
                 result = Ent::Node(std::move(un), &nodeSchema);

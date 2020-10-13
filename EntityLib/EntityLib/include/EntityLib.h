@@ -55,7 +55,6 @@ namespace Ent
     {
         Subschema const* schema = nullptr; ///< The schema of the object containing the oneOf field
         value_ptr<Node> wrapper; ///< Node containing the className/classData
-        std::string type; ///< The type as it is stored in the json. (The leaf of the $ref path)
         std::string classNameField; ///< Name of the field containing the type under union
         std::string classDatafield; ///< Name of the field containing the data under union
 

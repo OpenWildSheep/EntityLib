@@ -11,9 +11,9 @@ using namespace nlohmann;
 char const* sceneSchemaLocation = "WildPipeline/Schema/Scene-schema.json";
 
 // When schema branches a copied from a file to an other, the local references become external
-void updateRefLinks(std::string const& sourceFile, json& node)
+void updateRefLinks(std::string const& _sourceFile, json& _node)
 {
-    switch (node.type())
+    switch (_node.type())
     {
     case nlohmann::detail::value_t::null:
     case nlohmann::detail::value_t::string:
@@ -23,29 +23,29 @@ void updateRefLinks(std::string const& sourceFile, json& node)
     case nlohmann::detail::value_t::number_float: break;
     case nlohmann::detail::value_t::object:
     {
-        for (auto& field : node.items())
+        for (auto& field : _node.items())
         {
             if (field.key() == "$ref")
             {
                 std::string link = field.value();
                 if (link.front() == '#')
                 {
-                    link = "file://" + sourceFile + link;
+                    link = "file://" + _sourceFile + link;
                     field.value() = link;
                 }
             }
             else
             {
-                updateRefLinks(sourceFile, field.value());
+                updateRefLinks(_sourceFile, field.value());
             }
         }
     }
     break;
     case nlohmann::detail::value_t::array:
     {
-        for (auto& item : node)
+        for (auto& item : _node)
         {
-            updateRefLinks(sourceFile, item);
+            updateRefLinks(_sourceFile, item);
         }
     }
     break;
@@ -54,13 +54,13 @@ void updateRefLinks(std::string const& sourceFile, json& node)
     }
 };
 
-json Ent::mergeComponents(std::filesystem::path const& toolsDir)
+json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
 {
-    json runtimeCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/RuntimeComponents.json");
-    json editionCompSch = loadJsonFile(toolsDir / "WildPipeline/Schema/EditionComponents.json");
-    auto sceneSchemaPath = toolsDir / sceneSchemaLocation;
+    json runtimeCompSch = loadJsonFile(_toolsDir / "WildPipeline/Schema/RuntimeComponents.json");
+    json editionCompSch = loadJsonFile(_toolsDir / "WildPipeline/Schema/EditionComponents.json");
+    auto sceneSchemaPath = _toolsDir / sceneSchemaLocation;
     json sceneSch = loadJsonFile(sceneSchemaPath);
-    json dependencies = loadJsonFile(toolsDir / "WildPipeline/Schema/Dependencies.json");
+    json dependencies = loadJsonFile(_toolsDir / "WildPipeline/Schema/Dependencies.json");
 
     runtimeCompSch = runtimeCompSch["definitions"];
     editionCompSch = editionCompSch["definitions"];
@@ -144,10 +144,10 @@ json Ent::mergeComponents(std::filesystem::path const& toolsDir)
     return sceneSch;
 }
 
-void Ent::updateComponents(std::filesystem::path const& toolsDir)
+void Ent::updateComponents(std::filesystem::path const& _toolsDir)
 {
-    json sceneSch = mergeComponents(toolsDir);
-    auto sceneSchemaPath = toolsDir / sceneSchemaLocation;
+    json sceneSch = mergeComponents(_toolsDir);
+    auto sceneSchemaPath = _toolsDir / sceneSchemaLocation;
     std::ofstream file(sceneSchemaPath);
     if (not file.is_open())
     {

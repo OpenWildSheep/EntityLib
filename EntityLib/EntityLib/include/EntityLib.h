@@ -83,15 +83,15 @@ namespace Ent
             , overrideValue(std::move(_overrideValue))
         {
         }
-        Override(V defaultVal, V val)
-            : defaultValue(defaultVal)
-            , value(val)
+        Override(V _defaultVal, V _val)
+            : defaultValue(_defaultVal)
+            , value(_val)
         {
         }
 
         V const& get() const;
 
-        void set(V newVal);
+        void set(V _newVal);
 
         bool isSet() const;
 
@@ -145,7 +145,7 @@ namespace Ent
             Override<EntityRef>,
             Union>;
         Node() = default;
-        Node(Value val, Subschema const* schema);
+        Node(Value _val, Subschema const* _schema);
 
         /// @brief return the node containing the data and the type nodes (An element of the oneOf array)
         /// @pre type==Ent::DataType::oneOf
@@ -195,11 +195,11 @@ namespace Ent
         const Value& GetRawValue()
             const; ///< returns a reference to the raw Value (variant) stored at this node. Useful to write visitors.
 
-        void setFloat(float val); ///< @pre type==Ent::DataType::number. @brief Set the float value
-        void setInt(int64_t val); ///< @pre type==Ent::DataType::integer. @brief Set the int64_t value
-        void setString(char const* val); ///< @pre type==Ent::DataType::string. @brief Set the string value
-        void setBool(bool val); ///< @pre type==Ent::DataType::boolean. @brief Set the bool value
-        void setEntityRef(EntityRef); ///< @pre type==Ent::DataType::entityRef. @brief Set the Entity reference value
+        void setFloat(float _val); ///< @pre type==Ent::DataType::number. @brief Set the float value
+        void setInt(int64_t _val); ///< @pre type==Ent::DataType::integer. @brief Set the int64_t value
+        void setString(char const* _val); ///< @pre type==Ent::DataType::string. @brief Set the string value
+        void setBool(bool _val); ///< @pre type==Ent::DataType::boolean. @brief Set the bool value
+        void setEntityRef(EntityRef _entityRef); ///< @pre type==Ent::DataType::entityRef. @brief Set the Entity reference value
 
         /// @brief Fallback the the prefab or default value. The value will not be saved in json.
         /// @pre Ent::DataType is in {number, integer, boolean, string}
@@ -298,7 +298,7 @@ namespace Ent
             bool _isEmbedded = false,
             Override<std::string> _file = {},
             size_t _index = 0,
-            std::unique_ptr<Scene> embedded = {});
+            std::unique_ptr<Scene> _embedded = {});
         SubSceneComponent(SubSceneComponent const&) = delete;
         SubSceneComponent(SubSceneComponent&&) noexcept = delete;
         SubSceneComponent& operator=(SubSceneComponent const&) = delete;
@@ -330,17 +330,17 @@ namespace Ent
             Override<std::string> _name,
             std::map<std::string, Component> _components,
             std::unique_ptr<SubSceneComponent> _subSceneComponent,
-            Node color = {},
+            Node _color = {},
             Override<std::string> _thumbnail = {},
             Override<std::string> _instanceOf = {},
             Override<ActivationLevel> _maxActivationLevel = {},
-            bool hasASuper = false);
+            bool _hasASuper = false);
         Entity(Entity const&) = delete;
         Entity& operator=(Entity const&) = delete;
         Entity(Entity&&) = delete;
         Entity& operator=(Entity&&) = delete;
         DeleteCheck deleteCheck;
-        void setCanBeRenamed(bool can); ///< If it has a super it can't be renamed
+        void setCanBeRenamed(bool _can); ///< If it has a super it can't be renamed
 
         Override<std::string> const& getNameValue() const
         {
@@ -369,7 +369,7 @@ namespace Ent
         /// @endcond
 
         char const* getName() const; ///< Get the name of the component
-        void setName(std::string name); ///< Set the name of the component
+        void setName(std::string _name); ///< Set the name of the component
         bool canBeRenamed() const; ///< A SubEntity of an instance which override a SubEntity in a prefab can't be renamed
         char const* getInstanceOf() const; ///< Name of the inherited prefab if there is one, or nullptr.
         /// Get the initial max activation level of the entity at runtime.
@@ -379,7 +379,7 @@ namespace Ent
         char const* getThumbnail() const; ///< Get the Thumbnail path, or nullptr.
         void setThumbnail(std::string _thumbPath); ///< Set the Thumbnail path
         std::array<uint8_t, 4> getColor() const; ///< Get the color of the is one, or nullptr.
-        void setColor(std::array<uint8_t, 4> color); ///< Set the color RGBA 8bit
+        void setColor(std::array<uint8_t, 4> _color); ///< Set the color RGBA 8bit
 
         /// @brief Create a component of the given _type, with the default values
         /// @pre A component of this _type doesn't exist yet
@@ -426,7 +426,7 @@ namespace Ent
 
         /// @brief Create a relative EntityRef to the given entity
         /// that will resolve to it from this entity.
-        EntityRef makeEntityRef(Entity& entity);
+        EntityRef makeEntityRef(Entity& _entity);
 
         /// @brief Resolve an EntityRef relative to this entity.
         /// Returns nullptr in case of failure.
@@ -436,7 +436,7 @@ namespace Ent
         Scene* getParentScene() const;
 
         /// @brief Set the parent scene object containing this entity.
-        void setParentScene(Scene* scene);
+        void setParentScene(Scene* _scene);
 
     private:
         void updateSubSceneOwner();
@@ -470,7 +470,7 @@ namespace Ent
         /// @endcond
 
         /// Add a new entity in the scene and take its ownership
-        void addEntity(std::unique_ptr<Entity>&& entity);
+        void addEntity(std::unique_ptr<Entity>&& _entity);
 
         /// Get all entities in the scene
         std::vector<std::unique_ptr<Entity>> const& getObjects() const;
@@ -498,7 +498,7 @@ namespace Ent
         Entity* getOwnerEntity() const;
 
         /// @brief Set the entity owning this scene if it is embedded.
-        void setOwnerEntity(Entity* entity);
+        void setOwnerEntity(Entity* _entity);
 
     private:
         Entity* ownerEntity = nullptr; ///< the entity owning this scene if it is embedded
@@ -547,16 +547,16 @@ namespace Ent
 
         /// Load the Entity at path _entityPath
         std::unique_ptr<Entity> loadEntity(
-            std::filesystem::path const& entityPath, Ent::Entity const* super = nullptr) const;
+            std::filesystem::path const& _entityPath, Ent::Entity const* _super = nullptr) const;
 
         /// Load the Scene at path _scenePath
         std::unique_ptr<Scene> loadScene(std::filesystem::path const& _scenePath) const;
 
         /// Save the Entity at path _entityPath
-        void saveEntity(Entity const& entity, std::filesystem::path const& _entityPath) const;
+        void saveEntity(Entity const& _entity, std::filesystem::path const& _entityPath) const;
 
         /// Save the Scene at path _scenePath
-        void saveScene(Scene const& scene, std::filesystem::path const& _scenePath) const;
+        void saveScene(Scene const& _scene, std::filesystem::path const& _scenePath) const;
 
         /// @brief Create an Entity which instanciate an other.
         ///
@@ -583,9 +583,9 @@ namespace Ent
     }
 
     template <typename V>
-    void Override<V>::set(V newVal)
+    void Override<V>::set(V _newVal)
     {
-        overrideValue.emplace(std::move(newVal));
+        overrideValue.emplace(std::move(_newVal));
     }
 
     template <typename V>

@@ -28,7 +28,7 @@ namespace Ent
         /// Load the Schema of a Component or a property
         /// @remark _data can be a reference ($ref)
         void readSchema(
-            Schema* globalSchema,
+            Schema* _globalSchema,
             std::string const& _filename,
             nlohmann::json const& _fileRoot, ///< Full file containing _data
             nlohmann::json const& _data ///< json node to extract schema
@@ -65,8 +65,8 @@ namespace Ent
             std::string const& _filename,
             nlohmann::json const& _fileRoot, ///< Full file containing _data
             nlohmann::json const& _data, ///< json node to extract schema
-            Visitor const& vis,
-            int depth = 0 ///< depth of this Node. (For internal use)
+            Visitor const& _vis,
+            int _depth = 0 ///< depth of this Node. (For internal use)
         );
 
     private:

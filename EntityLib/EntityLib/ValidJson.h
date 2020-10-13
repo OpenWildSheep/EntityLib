@@ -20,11 +20,11 @@ namespace Ent
     /// Valid a Scene using the JSON scheme of scene
     /// @throw JsonValidation when the Scene in invalid
     void validateScene(
-        Schema const& schema, std::filesystem::path const& toolsDir, nlohmann::json const& scene);
+        Schema const& _schema, std::filesystem::path const& _toolsDir, nlohmann::json const& _scene);
     /// Valid an Entity using the JSON scheme of entities
     /// @throw JsonValidation when the Entity in invalid
     void validateEntity(
-        Schema const& schema, std::filesystem::path const& toolsDir, nlohmann::json const& entity);
+        Schema const& _schema, std::filesystem::path const& _toolsDir, nlohmann::json const& _entity);
 } // namespace Ent
 
 /// \endcond

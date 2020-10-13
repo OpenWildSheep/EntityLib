@@ -117,6 +117,8 @@ try:
     cinematicGD = ent.get_component("CinematicGD")  # type: Ent.Component
     scriptEvents = cinematicGD.root.at("ScriptEvents")  # type: Ent.Node
     assert(scriptEvents.datatype == Ent.DataType.array)
+
+    # Read Union type
     oneOfScripts = scriptEvents.at(0)  # type: Ent.Node
     assert(oneOfScripts.datatype == Ent.DataType.union)
     cineEvent = oneOfScripts.get_union_data()  # type: Ent.Node
@@ -127,6 +129,18 @@ try:
     assert(nbEnt.datatype == Ent.DataType.string)
     assert(nbEnt.value == "Toto")
 
+    # Set Union type
+    oneOfScripts2 = scriptEvents.at(1)  # type: Ent.Node
+    assert(oneOfScripts2.datatype == Ent.DataType.union)
+    assert(oneOfScripts2.get_union_type() == "CineEventTestBlackboardHasFact")
+    oneOfScripts2.set_union_type("CineEventTestCurrentGameState")
+    testCurrentState = oneOfScripts2.get_union_data()  # type: Ent.Node
+    assert(oneOfScripts2.get_union_type() == "CineEventTestCurrentGameState")
+    fieldNames2 = testCurrentState.get_field_names()
+    assert(fieldNames2[0] == "GameStateName")
+    assert(fieldNames2[1] == "Super")
+    testCurrentState.at("GameStateName").set_string("Pouet!")
+    
     # TEST sub - object with non - default values
     explosionEffect = ent.get_component("ExplosionEffect")  # type: Ent.Component
     shakeData = explosionEffect.root.at("ShakeData")  # type: Ent.Node

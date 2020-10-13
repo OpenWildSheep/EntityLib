@@ -104,6 +104,16 @@
                             "FactName": "Toto"
                         },
                         "className": "CineEventTestBlackboardHasFact"
+                    },
+                    {
+                        "classData": {
+                            "GameStateName": "Pouet!"
+                        },
+                        "className": "CineEventTestCurrentGameState"
+                    },
+                    {
+                        "classData": {},
+                        "className": "CineEventTestCurrentGameState"
                     }
                 ]
             },

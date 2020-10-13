@@ -33,6 +33,32 @@ namespace Ent
     using Null = std::nullptr_t;
     /// @endcond
 
+    // ******************************** Exception declarations ************************************
+
+    /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
+    struct BadType : std::runtime_error
+    {
+        BadType(); ///< ctor
+    };
+
+    /// Exception thrown when a metadata is missing in the json schema
+    ///
+    /// Example : oneOf need className and classData
+    struct MissingMetadata : std::runtime_error
+    {
+        MissingMetadata(char const* _schemaName); ///< ctor
+    };
+
+    /// Exception thrown when trying to switch a Union to a type that woesn't exit
+    struct BadUnionType : std::runtime_error
+    {
+        /// ctor
+        BadUnionType(char const* _type ///< The type/className that doen't exist in this union
+        );
+    };
+
+    // *************************************** Subschema ******************************************
+
     struct SubschemaRef;
 
     /// Definition of a json Node
@@ -45,6 +71,12 @@ namespace Ent
         Subschema(Subschema&&) = default;
         Subschema& operator=(Subschema&&) = default;
         DeleteCheck deleteCheck;
+
+        /// @brief Get the Subschema related to the given \p _subtype (className)
+        /// @throw BadType if the schema is not a oneOf
+        /// @throw MissingMetadata if the schema doesn't have a meta className and classData
+        /// @throw BadUnionType if \p _subtype is not listed in the oneOf field
+        Subschema const* getUnionTypeWrapper(char const* _subtype) const;
         /// @endcond
 
         DataType type = DataType::null; ///< type of this Subschema. @see Ent::DataType
@@ -95,6 +127,11 @@ namespace Ent
         {
             return !IsUsedInRuntime() && IsUsedInEditor();
         }
+        /// @brief Get the Subschema related to the given \p _type (className)
+        /// @throw BadType if the schema is not a oneOf
+        /// @throw MissingMetadata if the schema doesn't have a meta className and classData
+        /// @throw BadUnionType if \p _type is not listed in the oneOf field
+        Subschema const* getUnionType(char const* _subtype) const;
 
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue =

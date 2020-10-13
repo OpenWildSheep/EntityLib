@@ -262,7 +262,7 @@
     </Link>
     <PostBuildEvent>
       <Command>for /f %%i in ('p4 -F %%clientRoot%% -ztag info') do set p4_root=%%i
-%p4_root%\Tools\Python37\python $(ProjectDir)stubgen\stubgen_EntityLibPy.py</Command>
+%p4_root%\Tools\Python37\python $(ProjectDir)stubgen_EntityLibPy.py</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>generate Python typing info stubs</Message>

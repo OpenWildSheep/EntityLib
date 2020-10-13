@@ -392,7 +392,9 @@ void Ent::SchemaLoader::readSchema(
         }
     };
     auto getTab = [&stack] {
-        return std::string(stack.size() * 4, ' ').c_str();
+        static std::string tab;
+        tab.assign(stack.size() * 4, ' ');
+        return tab;
     };
     vis.closeLinearItem = [&] {
         checkAllStack();

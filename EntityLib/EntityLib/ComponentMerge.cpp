@@ -82,26 +82,37 @@ json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
         auto iter = editionCompMap.find(name);
         if (iter != editionCompMap.end())
         {
+            // Merge properties
             json mergedProperties = runtimeCompSch[name].value("properties", json());
             updateRefLinks("RuntimeComponents.json", mergedProperties);
             json editionComp = iter->second->value("properties", json());
             updateRefLinks("EditionComponents.json", editionComp);
             mergedProperties.update(editionComp);
 
+            // Create the schema of the component
+            json mergedComponent;
+            mergedComponent["type"] = "object";
+            mergedComponent["properties"] = std::move(mergedProperties);
+
+            // Add the new schema of the merged component in Scene-schema.json
+            sceneSch["definitions"][name] = std::move(mergedComponent);
+
+            // Merge the meta data
             json mergedMetas = runtimeCompSch[name].value("meta", json());
             json editionCompMetas = iter->second->value("meta", json::object());
             mergedMetas.update(editionCompMetas);
             mergedMetas["editor"] = true;
             mergedMetas["runtime"] = true;
 
-            json newComp;
-            auto&& prop = newComp["properties"];
+            // Make the component wrapper (containing "Type" and "Data" field)
+            json wrapper;
+            auto&& prop = wrapper["properties"];
             prop["Type"]["const"] = name;
-            prop["Data"]["type"] = "object";
-            prop["Data"]["properties"] = std::move(mergedProperties);
-            newComp["meta"] = std::move(mergedMetas);
+            prop["Data"]["$ref"] = "#/definitions/" + name;
+            wrapper["meta"] = std::move(mergedMetas);
 
-            compList.push_back(std::move(newComp));
+            // Add the component wrapper in the oneOf of Component (definitions/Component/oneOf)
+            compList.push_back(std::move(wrapper));
             alreadyInsertedComponents.insert(name);
         }
     }

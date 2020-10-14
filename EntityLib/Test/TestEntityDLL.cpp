@@ -135,10 +135,16 @@ try
 
     using EntityPtr = std::unique_ptr<Ent::Entity>;
 
-    ENTLIB_ASSERT(
-        entlib.schema.schema.allDefinitions.count("file://RuntimeComponents.json#/definitions/"
-                                                  "Color")
-        == 1);
+    char const* colorRef = "file://RuntimeComponents.json#/definitions/Color";
+    ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(colorRef) == 1);
+
+    // Ensure that all components have a ref and is in entlib.schema.schema.allDefinitions
+    for (auto&& name_schema : entlib.schema.components)
+    {
+        auto&& absRef = std::get<1>(name_schema)->name;
+        ENTLIB_ASSERT(absRef.find("file://") == 0);
+        ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(absRef) == 1);
+    }
 
     {
         EntityPtr ent = entlib.loadEntity("prefab.entity");

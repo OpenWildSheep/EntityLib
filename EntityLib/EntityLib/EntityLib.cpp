@@ -1318,16 +1318,26 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
     case Ent::DataType::null: result = Ent::Node(Ent::Null{}, &_nodeSchema); break;
     case Ent::DataType::string:
     {
-        std::string const def = _nodeSchema.defaultValue.is<Ent::Null>() ?
-                                    std::string() :
-                                    _nodeSchema.defaultValue.get<std::string>();
-        tl::optional<std::string> const supVal = (_super != nullptr and _super->isSet()) ?
-                                                     tl::optional<std::string>(_super->getString()) :
-                                                     tl::optional<std::string>(tl::nullopt);
-        tl::optional<std::string> const val =
-            _data.is_string() ? tl::optional<std::string>(_data.get<std::string>()) :
-                                tl::optional<std::string>(tl::nullopt);
-        result = Ent::Node(Ent::Override<std::string>(def, supVal, val), &_nodeSchema);
+        if (_nodeSchema.constValue.has_value())
+        {
+            // _nodeSchema is const and the value can't be overriden
+            std::string const def = _nodeSchema.constValue->get<std::string>();
+            result = Ent::Node(Ent::Override<std::string>("", tl::nullopt, def), &_nodeSchema);
+        }
+        else
+        {
+            std::string const def = _nodeSchema.defaultValue.is<Ent::Null>() ?
+                                        std::string() :
+                                        _nodeSchema.defaultValue.get<std::string>();
+            tl::optional<std::string> const supVal =
+                (_super != nullptr and _super->isSet()) ?
+                    tl::optional<std::string>(_super->getString()) :
+                    tl::optional<std::string>(tl::nullopt);
+            tl::optional<std::string> const val =
+                _data.is_string() ? tl::optional<std::string>(_data.get<std::string>()) :
+                                    tl::optional<std::string>(tl::nullopt);
+            result = Ent::Node(Ent::Override<std::string>(def, supVal, val), &_nodeSchema);
+        }
     }
     break;
     case Ent::DataType::boolean:
@@ -1462,7 +1472,17 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
         auto&& meta = _nodeSchema.meta.get<Ent::Subschema::UnionMeta>();
         std::string const& typeField = meta.typeField;
         std::string const& dataField = meta.dataField;
-        std::string const& dataType = _data.at(typeField).get<std::string>();
+        std::string dataType;
+        if (_data.count(typeField))
+            dataType = _data.at(typeField).get<std::string>();
+        else
+        {
+            // We are making a new node without input data
+            // "back()" because the base type is at the end of the type list
+            // TODO : Loïc - Add in metadata the name of the default type
+            dataType =
+                _nodeSchema.oneOf->back()->properties.at(typeField).get().constValue->get<std::string>();
+        }
         bool typeFound = false;
         for (Ent::SubschemaRef const& schemaTocheck : *_nodeSchema.oneOf)
         {

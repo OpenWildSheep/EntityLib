@@ -244,6 +244,12 @@ try
         ENTLIB_ASSERT(oneOfScripts3->getUnionType() == std::string("CineEventTestBlackboardHasFact"));
         oneOfScripts3->setUnionType("CineEventTestCurrentGameState");
 
+        // Push in an array of Union
+        Ent::Node* oneOfScripts4 = scriptEvents->push();
+        ENTLIB_ASSERT(oneOfScripts4->getDataType() == Ent::DataType::oneOf);
+        ENTLIB_ASSERT(oneOfScripts4->getUnionType() == std::string("CineEvent"));
+        ENTLIB_ASSERT(scriptEvents->at(3llu) == oneOfScripts4);
+
         // TEST sub-object with non-default values
         Ent::Component* explosionEffect = ent->getComponent("ExplosionEffect");
         Ent::Node* shakeData = explosionEffect->root.at("ShakeData");

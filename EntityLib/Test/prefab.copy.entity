@@ -114,6 +114,10 @@
                     {
                         "classData": {},
                         "className": "CineEventTestCurrentGameState"
+                    },
+                    {
+                        "classData": {},
+                        "className": "CineEvent"
                     }
                 ]
             },

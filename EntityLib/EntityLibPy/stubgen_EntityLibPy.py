@@ -26,7 +26,8 @@ stubgen_path = os.path.abspath("../../../ExternalTools/Python37/stubgen/pybind11
 input_path = os.path.abspath("../x64/Release-3.7")	# the path to the EntityLibPy.pyd module
 output_path = os.path.abspath("../x64")				# the path where stubgen will generate its output
 
-os.environ["PYTHONPATH"] += ";" + input_path	# we need to add the EntityLibPy module's directory to PYTHONPATH so that stubgen can access it
+# we need to add the EntityLibPy module's directory to PYTHONPATH so that stubgen can access it
+os.environ["PYTHONPATH"] = f"{os.environ['PYTHONPATH']};{input_path}" if "PYTHONPATH" in os.environ else input_path
 subprocess.call(f"{stubgen_path} EntityLibPy -o {output_path}")
 print("stubgen done")
 

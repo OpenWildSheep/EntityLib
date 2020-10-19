@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "dgSpecHash": "vK/Fi36gcr3aV1jrDiSxPOj7kLALU7KB7BJBEnI8U+bO+ifvqQ7KuJH5xGDZulxe2rKS9nOzHcX0JvgZ7uWytA==",
+  "success": true,
+  "projectFilePath": "D:\\WildCode\\WildShared\\EntityLib\\EntityLibClassGenerator\\EntityLibClassGenerator.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\QA\\.nuget\\packages\\jetbrains.annotations\\2020.1.0\\jetbrains.annotations.2020.1.0.nupkg.sha512",
+    "C:\\Users\\QA\\.nuget\\packages\\json.more.net\\1.2.0\\json.more.net.1.2.0.nupkg.sha512",
+    "C:\\Users\\QA\\.nuget\\packages\\jsonpointer.net\\1.1.1\\jsonpointer.net.1.1.1.nupkg.sha512",
+    "C:\\Users\\QA\\.nuget\\packages\\jsonschema.net\\1.1.0\\jsonschema.net.1.1.0.nupkg.sha512",
+    "C:\\Users\\QA\\.nuget\\packages\\system.codedom\\4.7.0\\system.codedom.4.7.0.nupkg.sha512",
+    "C:\\Users\\QA\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512",
+    "C:\\Users\\QA\\.nuget\\packages\\system.text.json\\4.7.2\\system.text.json.4.7.2.nupkg.sha512",
+    "C:\\Users\\QA\\.nuget\\packages\\zstring\\2.2.0\\zstring.2.2.0.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -562,16 +562,25 @@ namespace Ent
     private:
         std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
 
+        /// Load an Entity or a Scene, using the given cache
+        template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
+        std::unique_ptr<Type> loadEntityOrScene(
+            std::filesystem::path const& _path,
+            Cache& cache,
+            ValidateFunc&& validate,
+            LoadFunc&& load,
+            Type const* _super) const;
+
         struct EntityFile
         {
-            std::unique_ptr<Entity> entity;
+            std::unique_ptr<Entity> data;
             std::filesystem::file_time_type time;
         };
         mutable std::map<std::filesystem::path, EntityFile> m_entityCache;
 
         struct SceneFile
         {
-            std::unique_ptr<Scene> scene;
+            std::unique_ptr<Scene> data;
             std::filesystem::file_time_type time;
         };
         mutable std::map<std::filesystem::path, SceneFile> m_sceneCache;

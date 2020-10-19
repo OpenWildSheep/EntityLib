@@ -1814,14 +1814,19 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         std::move(ovMaxActivationLevel));
 }
 
-std::unique_ptr<Ent::Entity>
-Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath, Ent::Entity const* _super) const
+template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
+std::unique_ptr<Type> Ent::EntityLib::loadEntityOrScene(
+    std::filesystem::path const& _path,
+    Cache& cache,
+    ValidateFunc&& validate,
+    LoadFunc&& load,
+    Type const* _super) const
 {
-    auto const absPath = getAbsolutePath(_entityPath);
+    auto const absPath = getAbsolutePath(_path);
     bool reload = false;
     auto timestamp = std::filesystem::last_write_time(absPath);
-    auto iter = m_entityCache.find(absPath);
-    if (iter == m_entityCache.end())
+    auto iter = cache.find(absPath);
+    if (iter == cache.end())
     {
         reload = true;
     }
@@ -1841,24 +1846,31 @@ Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath, Ent::Entity
         {
             try
             {
-                validateEntity(schema.schema, toolsDir, document);
+                validate(schema.schema, toolsDir, document);
             }
             catch (...)
             {
-                fprintf(stderr, "Error, loading entity : %ls\n", _entityPath.c_str());
+                fprintf(stderr, "Error, loading : %ls\n", _path.c_str());
                 throw;
             }
         }
 
-        std::unique_ptr<Ent::Entity> entity = ::loadEntity(*this, schema, document, _super);
-        auto file = EntityFile{ entity->clone(), timestamp };
-        auto iter_bool = m_entityCache.emplace(absPath, std::move(file));
+        std::unique_ptr<Type> entity = load(*this, schema, document, _super);
+        auto file = Cache::mapped_type{ entity->clone(), timestamp };
+        auto iter_bool = cache.emplace(absPath, std::move(file));
         return entity;
     }
     else
     {
-        return iter->second.entity->clone();
+        return iter->second.data->clone();
     }
+}
+
+std::unique_ptr<Ent::Entity>
+Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath, Ent::Entity const* _super) const
+{
+    return loadEntityOrScene<Ent::Entity>(
+        _entityPath, m_entityCache, &validateEntity, &::loadEntity, _super);
 }
 
 static std::unique_ptr<Ent::Scene> loadScene(
@@ -1913,49 +1925,14 @@ static std::unique_ptr<Ent::Scene> loadScene(
 
 std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(std::filesystem::path const& _scenePath) const
 {
-    auto const absPath = getAbsolutePath(_scenePath);
-    bool reload = false;
-    auto timestamp = std::filesystem::last_write_time(absPath);
-    auto iter = m_sceneCache.find(absPath);
-    if (iter == m_sceneCache.end())
-    {
-        reload = true;
-    }
-    else
-    {
-        if (timestamp > iter->second.time)
-        {
-            reload = true;
-        }
-    }
+    auto loadFunc = [](Ent::EntityLib const& _entLib,
+                       Ent::ComponentsSchema const& _schema,
+                       json const& _document,
+                       Ent::Scene const* _super) {
+        return ::loadScene(_entLib, _schema, _document.at("Objects"), _super);
+    };
 
-    if (reload)
-    {
-        json document = loadJsonFile(absPath);
-
-        if (validationEnabled)
-        {
-            try
-            {
-                validateScene(schema.schema, toolsDir, document);
-            }
-            catch (...)
-            {
-                fprintf(stderr, "Error, loading scene : %ls\n", _scenePath.c_str());
-                throw;
-            }
-        }
-
-        std::unique_ptr<Ent::Scene> scene =
-            ::loadScene(*this, schema, document.at("Objects"), nullptr);
-        auto file = SceneFile{ scene->clone(), timestamp };
-        auto iter_bool = m_sceneCache.emplace(absPath, std::move(file));
-        return scene;
-    }
-    else
-    {
-        return iter->second.scene->clone();
-    }
+    return loadEntityOrScene<Ent::Scene>(_scenePath, m_sceneCache, &validateScene, loadFunc, nullptr);
 }
 
 static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& _entity)

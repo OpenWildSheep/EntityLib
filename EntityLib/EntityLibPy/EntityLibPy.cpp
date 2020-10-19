@@ -144,7 +144,21 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     // ****************************** Schema ******************************************************
 
-    py::enum_<DataType>(ent, "DataType")
+    /*
+     * "forward-declare" all bound classes to avoid naming issues that lead to bad typing information,
+     * see https://github.com/sizmailov/pybind11/blob/7b9242c84826b36fa10e6dcedb6f97fe4429fa61/docs/advanced/misc.rst#avoiding-c-types-in-docstrings
+     *
+     * NOTE: it wasn't strictly to pre-declare ALL classes to fix the issues we currently had,
+     * but it just seemed safer in case we add new methods with new dependencies.
+     */
+    auto pyDataType = py::enum_<DataType>(ent, "DataType");
+    auto pyActivationLevel = py::enum_<ActivationLevel>(ent, "ActivationLevel");
+    auto pyPath = py::class_<std::filesystem::path>(ent, "path");
+    auto pySubschema = py::class_<Subschema>(ent, "Subschema");
+    auto pySubschemaRef = py::class_<SubschemaRef>(ent, "SubschemaRef");
+    auto pySchema = py::class_<Schema>(ent, "Schema");
+
+    pyDataType
         .value("null", DataType::null)
         .value("string", DataType::string)
         .value("number", DataType::number)
@@ -156,18 +170,20 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .value("union", DataType::oneOf)
         .export_values();
 
-    py::enum_<ActivationLevel>(ent, "ActivationLevel")
+    pyActivationLevel
         .value("Created", ActivationLevel::Created)
         .value("Started", ActivationLevel::Started)
         .value("Loading", ActivationLevel::Loading)
         .value("InWorld", ActivationLevel::InWorld)
         .export_values();
 
-    py::class_<std::filesystem::path>(ent, "path").def(py::init<std::string>());
+    pyPath
+        .def(py::init<std::string>())
+        .def("__str__", [](std::filesystem::path* path) { return path->string(); });
 
     py::implicitly_convertible<std::string, std::filesystem::path>();
 
-    py::class_<Subschema>(ent, "Subschema")
+    pySubschema
         .def_readonly("type", &Subschema::type)
         .def_readonly("name", &Subschema::name)
         .def_readonly("required", &Subschema::required)
@@ -196,20 +212,37 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readonly("enum_values", &Subschema::enumValues, py::return_value_policy::reference)
         .def_property_readonly("is_deprecated", [](Subschema const& s) { return s.IsDeprecated(); });
 
-    py::class_<SubschemaRef>(ent, "SubschemaRef")
+    pySubschemaRef
         .def(py::init<>())
         .def(
             "get",
             [](SubschemaRef const& s) -> Subschema const& { return s.get(); },
             py::return_value_policy::reference);
 
-    py::class_<Schema>(ent, "Schema")
+    pySchema
         .def_readonly("root", &Schema::root, py::return_value_policy::reference)
         .def_readonly("definitions", &Schema::allDefinitions, py::return_value_policy::reference);
 
     // ******************************************** EntityLib *************************************
 
-    py::class_<Node>(ent, "Node")
+    /*
+     * "forward-declare" all bound classes to avoid naming issues that lead to bad typing information,
+     * see https://github.com/sizmailov/pybind11/blob/7b9242c84826b36fa10e6dcedb6f97fe4429fa61/docs/advanced/misc.rst#avoiding-c-types-in-docstrings
+     *
+     * NOTE: it wasn't strictly to pre-declare ALL classes to fix the issues we currently had,
+     * but it just seemed safer in case we add new methods with new dependencies.
+     */
+    auto pyNode = py::class_<Node>(ent, "Node");
+    auto pyComponent = py::class_<Component>(ent, "Component");
+    auto pySubSceneComponent = py::class_<SubSceneComponent>(ent, "SubSceneComponent");
+    auto pyEntity = py::class_<Entity>(ent, "Entity");
+    auto pyScene = py::class_<Scene>(ent, "Scene");
+    auto pyComponentsSchema = py::class_<ComponentsSchema>(ent, "ComponentsSchema");
+    auto pyColor = py::class_<std::array<uint8_t, 4>>(ent, "Color");
+    auto pyEntityLib = py::class_<EntityLib>(ent, "EntityLib");
+    auto pyEntityRef = py::class_<EntityRef>(ent, "EntityRef");
+
+    pyNode
         .def_property_readonly("datatype", [](Node const* node) { return node->getDataType(); })
         .def(
             "at",
@@ -259,7 +292,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("unset", [](Node* node) { return node->unset(); })
         .def("is_set", [](Node* node) { return node->isSet(); });
 
-    py::class_<Component>(ent, "Component")
+    pyComponent
         .def_readonly("type", &Component::type)
         .def_readonly("root", &Component::root, py::return_value_policy::reference)
         .def_property_readonly(
@@ -267,7 +300,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property_readonly(
             "is_used_in_runtime", [](Component const& comp) { return comp.isUsedInRuntime(); });
 
-    py::class_<SubSceneComponent>(ent, "SubSceneComponent")
+    pySubSceneComponent
         .def_readonly("is_embedded", &SubSceneComponent::isEmbedded)
         .def_property(
             "file",
@@ -279,7 +312,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](SubSceneComponent* comp) -> Scene& { return *comp->embedded; },
             py::return_value_policy::reference);
 
-    py::class_<Entity>(ent, "Entity")
+    pyEntity
         .def(py::init<EntityLib const&>())
         .def_property("name", &Entity::getName, &Entity::setName)
         .def_property_readonly("instance_of", &Entity::getInstanceOf)
@@ -307,7 +340,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             return ent->detachEntityFromPrefab().release();
         });
 
-    py::class_<Scene>(ent, "Scene")
+    pyScene
         .def(
             "add_entity",
             [](Scene* scene, Entity* ent) { scene->addEntity(std::unique_ptr<Entity>(ent)); })
@@ -324,15 +357,15 @@ PYBIND11_MODULE(EntityLibPy, ent)
             },
             py::return_value_policy::reference_internal);
 
-    py::class_<ComponentsSchema>(ent, "ComponentsSchema")
+    pyComponentsSchema
         .def_readonly("components", &ComponentsSchema::components, py::return_value_policy::reference)
         .def_readonly("schema", &ComponentsSchema::schema, py::return_value_policy::reference);
 
-    py::class_<std::array<uint8_t, 4>>(ent, "Color")
+    pyColor
         .def(py::init<>())
         .def(py::init<uint8_t, uint8_t, uint8_t, uint8_t>());
 
-    py::class_<EntityLib>(ent, "EntityLib")
+    pyEntityLib
         .def(py::init<std::string>())
         .def_readwrite("validation_enabled", &EntityLib::validationEnabled)
         .def_readonly("root_path", &EntityLib::rootPath)
@@ -359,7 +392,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             },
             "instanceOf"_a);
 
-    py::class_<EntityRef>(ent, "EntityRef")
+    pyEntityRef
         .def(py::init<>())
         .def(py::init<std::string>())
         .def_readwrite("entity_path", &EntityRef::entityPath)

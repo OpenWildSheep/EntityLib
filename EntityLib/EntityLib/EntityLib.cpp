@@ -1835,7 +1835,6 @@ Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath, Ent::Entity
 
     if (reload)
     {
-        printf("loadEntity %ls\n", _entityPath.c_str());
         json document = loadJsonFile(absPath);
 
         if (validationEnabled)

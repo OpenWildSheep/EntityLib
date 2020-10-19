@@ -1,0 +1,157 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "EntityLibClassGenerator/1.0.0": {
+        "dependencies": {
+          "JsonSchema.Net": "1.1.0",
+          "System.CodeDom": "4.7.0"
+        },
+        "runtime": {
+          "EntityLibClassGenerator.dll": {}
+        }
+      },
+      "JetBrains.Annotations/2020.1.0": {
+        "runtime": {
+          "lib/netstandard2.0/JetBrains.Annotations.dll": {
+            "assemblyVersion": "2020.1.0.0",
+            "fileVersion": "2020.1.0.0"
+          }
+        }
+      },
+      "Json.More.Net/1.2.0": {
+        "dependencies": {
+          "System.Text.Json": "4.7.2"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Json.More.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.2.0.0"
+          }
+        }
+      },
+      "JsonPointer.Net/1.1.1": {
+        "dependencies": {
+          "Json.More.Net": "1.2.0",
+          "System.Text.Json": "4.7.2",
+          "ZString": "2.2.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/JsonPointer.Net.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.1.1.0"
+          }
+        }
+      },
+      "JsonSchema.Net/1.1.0": {
+        "dependencies": {
+          "JetBrains.Annotations": "2020.1.0",
+          "Json.More.Net": "1.2.0",
+          "JsonPointer.Net": "1.1.1",
+          "System.Text.Json": "4.7.2"
+        },
+        "runtime": {
+          "lib/netstandard2.0/JsonSchema.Net.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.1.0.0"
+          }
+        }
+      },
+      "System.CodeDom/4.7.0": {
+        "runtime": {
+          "lib/netstandard2.0/System.CodeDom.dll": {
+            "assemblyVersion": "4.0.3.0",
+            "fileVersion": "4.700.19.56404"
+          }
+        }
+      },
+      "System.Memory/4.5.3": {},
+      "System.Text.Json/4.7.2": {
+        "runtime": {
+          "lib/netcoreapp3.0/System.Text.Json.dll": {
+            "assemblyVersion": "4.0.1.2",
+            "fileVersion": "4.700.20.21406"
+          }
+        }
+      },
+      "ZString/2.2.0": {
+        "dependencies": {
+          "System.Memory": "4.5.3"
+        },
+        "runtime": {
+          "lib/netstandard2.1/ZString.dll": {
+            "assemblyVersion": "2.2.0.0",
+            "fileVersion": "2.2.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "EntityLibClassGenerator/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "JetBrains.Annotations/2020.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-kD9D2ey3DGeLbfIzS8PkwLFkcF5vCOLk2rdjgfSxTfpoyovl7gAyoS6yq6T77zo9QgJGaVJ7PO/cSgLopnKlzg==",
+      "path": "jetbrains.annotations/2020.1.0",
+      "hashPath": "jetbrains.annotations.2020.1.0.nupkg.sha512"
+    },
+    "Json.More.Net/1.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-YYqnDdqJATVfSi9Z3BhimvRqN3OKpBK9+7JKbhB1tnsVfwftz8rh7G2iBt5W/U9w8GDTS0MbWXCCD/T1bDhhVg==",
+      "path": "json.more.net/1.2.0",
+      "hashPath": "json.more.net.1.2.0.nupkg.sha512"
+    },
+    "JsonPointer.Net/1.1.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-RsPnW4CtVSozvx4cZy13+5/roWGhxSkMSsRowCScRADdeRpg5EBIb3xk5qX5uUytq1C+jhUHGo4DePqyZG2Nog==",
+      "path": "jsonpointer.net/1.1.1",
+      "hashPath": "jsonpointer.net.1.1.1.nupkg.sha512"
+    },
+    "JsonSchema.Net/1.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/3jOgtPD94xqYaFs9QI4RMhKXhivLl+95ov/26OQgdI9fQuScYM0gaha3Ik2h3CCbHkfacpug0rdHOYabIEc8g==",
+      "path": "jsonschema.net/1.1.0",
+      "hashPath": "jsonschema.net.1.1.0.nupkg.sha512"
+    },
+    "System.CodeDom/4.7.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Hs9pw/kmvH3lXaZ1LFKj3pLQsiGfj2xo3sxSzwiLlRL6UcMZUTeCfoJ9Udalvn3yq5dLlPEZzYegrTQ1/LhPOQ==",
+      "path": "system.codedom/4.7.0",
+      "hashPath": "system.codedom.4.7.0.nupkg.sha512"
+    },
+    "System.Memory/4.5.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-3oDzvc/zzetpTKWMShs1AADwZjQ/36HnsufHRPcOjyRAAMLDlu2iD33MBI2opxnezcVUtXyqDXXjoFMOU9c7SA==",
+      "path": "system.memory/4.5.3",
+      "hashPath": "system.memory.4.5.3.nupkg.sha512"
+    },
+    "System.Text.Json/4.7.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-TcMd95wcrubm9nHvJEQs70rC0H/8omiSGGpU4FQ/ZA1URIqD4pjmFJh2Mfv1yH1eHgJDWTi2hMDXwTET+zOOyg==",
+      "path": "system.text.json/4.7.2",
+      "hashPath": "system.text.json.4.7.2.nupkg.sha512"
+    },
+    "ZString/2.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-EehuNbaZUy+b77H8hV7zhMvFyK/h0WTiM3s2Q87kXTvpUQF7QqMpOe7jG7d4uEXI5K3JA6d/mdiTuUcE5N64EA==",
+      "path": "zstring/2.2.0",
+      "hashPath": "zstring.2.2.0.nupkg.sha512"
+    }
+  }
+}

@@ -558,6 +558,34 @@ namespace Ent
         /// This allow to override some properties without change the prefab properties.
         std::unique_ptr<Entity> makeInstanceOf(std::string _instanceOf ///< Path to the prefab Entity
         ) const;
+
+        struct EntityFile
+        {
+            std::unique_ptr<Entity> data;
+            std::filesystem::file_time_type time;
+        };
+        struct SceneFile
+        {
+            std::unique_ptr<Scene> data;
+            std::filesystem::file_time_type time;
+        };
+        std::map<std::filesystem::path, EntityFile> const& getEntityCache() const;
+        std::map<std::filesystem::path, SceneFile> const& getSceneCache() const;
+
+    private:
+        std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
+
+        /// Load an Entity or a Scene, using the given cache
+        template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
+        std::unique_ptr<Type> loadEntityOrScene(
+            std::filesystem::path const& _path,
+            Cache& cache,
+            ValidateFunc&& validate,
+            LoadFunc&& load,
+            Type const* _super) const;
+
+        mutable std::map<std::filesystem::path, EntityFile> m_entityCache;
+        mutable std::map<std::filesystem::path, SceneFile> m_sceneCache;
     };
 
     // *************************** Implem details - method bodies *********************************

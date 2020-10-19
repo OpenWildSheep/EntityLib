@@ -1814,33 +1814,63 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         std::move(ovMaxActivationLevel));
 }
 
-std::unique_ptr<Ent::Entity>
-Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath, Ent::Entity const* _super) const
+template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
+std::unique_ptr<Type> Ent::EntityLib::loadEntityOrScene(
+    std::filesystem::path const& _path,
+    Cache& cache,
+    ValidateFunc&& validate,
+    LoadFunc&& load,
+    Type const* _super) const
 {
-    json document;
-    if (_entityPath.is_absolute())
+    auto const absPath = getAbsolutePath(_path);
+    bool reload = false;
+    auto timestamp = std::filesystem::last_write_time(absPath);
+    auto iter = cache.find(absPath);
+    if (iter == cache.end())
     {
-        document = loadJsonFile(_entityPath);
+        reload = true;
     }
     else
     {
-        document = loadJsonFile(rawdataPath / _entityPath);
+        if (timestamp > iter->second.time)
+        {
+            reload = true;
+        }
     }
 
-    if (validationEnabled)
+    if (reload)
     {
-        try
-        {
-            validateEntity(schema.schema, toolsDir, document);
-        }
-        catch (...)
-        {
-            fprintf(stderr, "Error, loading entity : %ls\n", _entityPath.c_str());
-            throw;
-        }
-    }
+        json document = loadJsonFile(absPath);
 
-    return ::loadEntity(*this, schema, document, _super);
+        if (validationEnabled)
+        {
+            try
+            {
+                validate(schema.schema, toolsDir, document);
+            }
+            catch (...)
+            {
+                fprintf(stderr, "Error, loading : %ls\n", _path.c_str());
+                throw;
+            }
+        }
+
+        std::unique_ptr<Type> entity = load(*this, schema, document, _super);
+        auto file = Cache::mapped_type{ entity->clone(), timestamp };
+        auto iter_bool = cache.emplace(absPath, std::move(file));
+        return entity;
+    }
+    else
+    {
+        return iter->second.data->clone();
+    }
+}
+
+std::unique_ptr<Ent::Entity>
+Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath, Ent::Entity const* _super) const
+{
+    return loadEntityOrScene<Ent::Entity>(
+        _entityPath, m_entityCache, &validateEntity, &::loadEntity, _super);
 }
 
 static std::unique_ptr<Ent::Scene> loadScene(
@@ -1895,30 +1925,14 @@ static std::unique_ptr<Ent::Scene> loadScene(
 
 std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(std::filesystem::path const& _scenePath) const
 {
-    json document;
-    if (_scenePath.is_absolute())
-    {
-        document = loadJsonFile(_scenePath);
-    }
-    else
-    {
-        document = loadJsonFile(rawdataPath / _scenePath);
-    }
+    auto loadFunc = [](Ent::EntityLib const& _entLib,
+                       Ent::ComponentsSchema const& _schema,
+                       json const& _document,
+                       Ent::Scene const* _super) {
+        return ::loadScene(_entLib, _schema, _document.at("Objects"), _super);
+    };
 
-    if (validationEnabled)
-    {
-        try
-        {
-            validateScene(schema.schema, toolsDir, document);
-        }
-        catch (...)
-        {
-            fprintf(stderr, "Error, loading scene : %ls\n", _scenePath.c_str());
-            throw;
-        }
-    }
-
-    return ::loadScene(*this, schema, document.at("Objects"), nullptr);
+    return loadEntityOrScene<Ent::Scene>(_scenePath, m_sceneCache, &validateScene, loadFunc, nullptr);
 }
 
 static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& _entity)
@@ -2107,6 +2121,32 @@ void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path con
             throw;
         }
     }
+}
+
+std::filesystem::path Ent::EntityLib::getAbsolutePath(std::filesystem::path const& _path) const
+{
+    if (_path.is_absolute())
+    {
+        std::filesystem::path absPath = _path;
+        absPath.make_preferred();
+        return std::filesystem::canonical(absPath);
+    }
+    else
+    {
+        std::filesystem::path absPath = rawdataPath;
+        absPath /= _path;
+        absPath.make_preferred();
+        return std::filesystem::canonical(absPath);
+    }
+}
+
+std::map<std::filesystem::path, Ent::EntityLib::EntityFile> const& Ent::EntityLib::getEntityCache() const
+{
+    return m_entityCache;
+}
+std::map<std::filesystem::path, Ent::EntityLib::SceneFile> const& Ent::EntityLib::getSceneCache() const
+{
+    return m_sceneCache;
 }
 
 static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _scene)

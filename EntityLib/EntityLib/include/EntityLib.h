@@ -19,17 +19,12 @@
 namespace Ent
 {
     using nonstd::value_ptr;
-    struct Node;
-    struct Entity;
-    struct Scene;
+
     // ******************************** Implem details ********************************************
 
-    /// \cond PRIVATE
+    struct Node;
 
-    struct Cache
-    {
-        std::map<std::filesystem::path, std::unique_ptr<Entity>> entities;
-    };
+    /// \cond PRIVATE
 
     /// Content of a Node which has type Ent::DataType::object
     using Object = std::map<std::string, value_ptr<Node>>;
@@ -543,24 +538,11 @@ namespace Ent
         EntityLib(EntityLib const&) = delete;
         EntityLib& operator=(EntityLib const&) = delete;
         DeleteCheck deleteCheck;
-
-        /// @brief Load the Entity at path _entityPath
-        /// @remark For internal use
-        std::unique_ptr<Ent::Entity> loadEntity(
-            std::filesystem::path const& _entityPath, ///< Path to the .entuity file
-            Ent::Entity const* _super, ///< Entity to override comming from a template of an upper-entity
-            Ent::Cache& cache ///< Cache to avoid loading twice the scene .entity file
-        ) const;
-
-        std::unique_ptr<Ent::Scene>
-        loadScene(std::filesystem::path const& _scenePath, Ent::Cache& cache) const;
-
-        std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
-
         /// @endcond
 
         /// Load the Entity at path _entityPath
-        std::unique_ptr<Entity> loadEntity(std::filesystem::path const& _entityPath) const;
+        std::unique_ptr<Entity> loadEntity(
+            std::filesystem::path const& _entityPath, Ent::Entity const* _super = nullptr) const;
 
         /// Load the Scene at path _scenePath
         std::unique_ptr<Scene> loadScene(std::filesystem::path const& _scenePath) const;
@@ -576,6 +558,23 @@ namespace Ent
         /// This allow to override some properties without change the prefab properties.
         std::unique_ptr<Entity> makeInstanceOf(std::string _instanceOf ///< Path to the prefab Entity
         ) const;
+
+    private:
+        std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
+
+        struct EntityFile
+        {
+            std::unique_ptr<Entity> entity;
+            std::filesystem::file_time_type time;
+        };
+        mutable std::map<std::filesystem::path, EntityFile> m_entityCache;
+
+        struct SceneFile
+        {
+            std::unique_ptr<Scene> scene;
+            std::filesystem::file_time_type time;
+        };
+        mutable std::map<std::filesystem::path, SceneFile> m_sceneCache;
     };
 
     // *************************** Implem details - method bodies *********************************

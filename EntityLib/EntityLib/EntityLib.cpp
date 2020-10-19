@@ -21,14 +21,14 @@
 
 using namespace nlohmann;
 
-static Ent::Node loadNode(
-    Ent::Subschema const& _nodeSchema, json const& _data, Ent::Node const* _super, Ent::Cache& cache);
+// char schemaPath[2048] = {};
+
+static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, Ent::Node const* _super);
 static std::unique_ptr<Ent::Scene> loadScene(
     Ent::EntityLib const& _entLib,
     Ent::ComponentsSchema const& _schema,
     json const& _entities,
-    Ent::Scene const* _super,
-    Ent::Cache& cache);
+    Ent::Scene const* _super);
 static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _scene);
 
 namespace Ent
@@ -132,8 +132,7 @@ namespace Ent
             // TODO : Loïc - low prio - Find a way to get the super.
             //   It could be hard because we are no more in the loading phase, so the super is
             //   now delete.
-            Ent::Cache cache;
-            wrapper = loadNode(*subTypeSchema, json(), nullptr, cache);
+            wrapper = loadNode(*subTypeSchema, json(), nullptr);
             wrapper->at(classNameField.c_str())->setString(_type);
         }
         return getUnionData();
@@ -591,9 +590,8 @@ namespace Ent
         {
             if (SubschemaRef const* itemSchema = schema->singularItems.get())
             {
-                Ent::Cache cache;
                 value.get<Array>().data.emplace_back(
-                    nonstd::make_value<Node>(loadNode(itemSchema->get(), json(), nullptr, cache)));
+                    nonstd::make_value<Node>(loadNode(itemSchema->get(), json(), nullptr)));
                 return value.get<Array>().data.back().get();
             }
         }
@@ -884,9 +882,8 @@ namespace Ent
             }
         }
         Ent::Subschema const& compSchema = *entlib->schema.components.at(_type);
-        Ent::Cache cache;
         Ent::Component comp{
-            false, _type, loadNode(compSchema, json(), nullptr, cache), 1, components.size()
+            false, _type, loadNode(compSchema, json(), nullptr), 1, components.size()
         };
         auto iter_bool = components.emplace(_type, std::move(comp));
         return &(iter_bool.first->second);
@@ -1312,8 +1309,7 @@ static Ent::Node loadFreeObjectNode(json const& _data)
 
 static Ent::Node const emptyNode(Ent::Null(), nullptr);
 
-static Ent::Node loadNode(
-    Ent::Subschema const& _nodeSchema, json const& _data, Ent::Node const* _super, Ent::Cache& cache)
+static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, Ent::Node const* _super)
 {
     Ent::Node result;
 
@@ -1395,7 +1391,7 @@ static Ent::Node loadNode(
             Ent::Node const* superProp = (_super != nullptr) ? _super->at(name.c_str()) : nullptr;
             static json const emptyJson;
             json const& prop = _data.count(name) != 0 ? _data.at(name) : emptyJson;
-            Ent::Node tmpNode = loadNode(*std::get<1>(name_sub), prop, superProp, cache);
+            Ent::Node tmpNode = loadNode(*std::get<1>(name_sub), prop, superProp);
             object.emplace(name, nonstd::make_value<Ent::Node>(std::move(tmpNode)));
         }
         result = Ent::Node(std::move(object), &_nodeSchema);
@@ -1414,7 +1410,7 @@ static Ent::Node loadNode(
                     for (Ent::Node const* subSuper : _super->getItems())
                     {
                         Ent::Node tmpNode =
-                            loadNode(_nodeSchema.singularItems->get(), json(), subSuper, cache);
+                            loadNode(_nodeSchema.singularItems->get(), json(), subSuper);
                         arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
@@ -1428,8 +1424,7 @@ static Ent::Node loadNode(
                     Ent::Node const* subSuper = (_super != nullptr and (_super->size() > index)) ?
                                                     _super->at(index) :
                                                     nullptr;
-                    Ent::Node tmpNode =
-                        loadNode(_nodeSchema.singularItems->get(), item, subSuper, cache);
+                    Ent::Node tmpNode = loadNode(_nodeSchema.singularItems->get(), item, subSuper);
                     arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
                     ++index;
                 }
@@ -1444,7 +1439,7 @@ static Ent::Node loadNode(
                     (_super != nullptr and _super->size() > index) ? _super->at(index) : nullptr;
                 static json const emptyJson;
                 json const& prop = _data.size() > index ? _data.at(index) : emptyJson;
-                Ent::Node tmpNode = loadNode(*sub, prop, subSuper, cache);
+                Ent::Node tmpNode = loadNode(*sub, prop, subSuper);
                 arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
                 ++index;
             }
@@ -1498,8 +1493,7 @@ static Ent::Node loadNode(
                 Ent::Node dataNode = loadNode(
                     schemaTocheck.get(),
                     _data,
-                    _super != nullptr ? _super->getUnionDataWrapper() : nullptr,
-                    cache);
+                    _super != nullptr ? _super->getUnionDataWrapper() : nullptr);
                 Ent::Union un{};
                 un.schema = &_nodeSchema;
                 un.wrapper = nonstd::make_value<Ent::Node>(std::move(dataNode));
@@ -1640,8 +1634,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     Ent::EntityLib const& _entlib,
     Ent::ComponentsSchema const& _schema,
     json const& _entNode,
-    Ent::Entity const* _superEntityFromParentEntity,
-    Ent::Cache& cache)
+    Ent::Entity const* _superEntityFromParentEntity)
 {
     ENTLIB_ASSERT(
         _superEntityFromParentEntity == nullptr
@@ -1656,21 +1649,10 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     if (_entNode.count("InstanceOf") != 0)
     {
         instanceOf = _entNode.at("InstanceOf").get<std::string>();
-
-        auto absPath = _entlib.getAbsolutePath(*instanceOf);
-        auto iter = cache.entities.find(absPath);
-        if (iter == cache.entities.end())
-        {
-            superEntityOfThisEntity =
-                _entlib.loadEntity(absPath, _superEntityFromParentEntity, cache);
-            ENTLIB_ASSERT(
-                superEntityOfThisEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
-            superEntity = superEntityOfThisEntity.get();
-            cache.entities.emplace(absPath, std::move(superEntityOfThisEntity));
-        }
-        else
-            superEntity = iter->second.get();
-
+        superEntityOfThisEntity = _entlib.loadEntity(*instanceOf, _superEntityFromParentEntity);
+        superEntity = superEntityOfThisEntity.get();
+        ENTLIB_ASSERT(
+            superEntityOfThisEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
         ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
         std::filesystem::path instanceOfPath = *instanceOf;
         superIsInit = true;
@@ -1718,10 +1700,11 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     {
         Ent::Subschema const& colorSchema =
             _entlib.schema.schema.allDefinitions.at(Ent::colorSchemaName);
-        Ent::Node const* superColor = _superEntityFromParentEntity != nullptr ?
-                                          &_superEntityFromParentEntity->getColorValue() :
-                                          nullptr;
-        ovColor = loadNode(colorSchema, _entNode.at("Color"), superColor, cache);
+        ovColor = loadNode(
+            colorSchema,
+            _entNode.at("Color"),
+            _superEntityFromParentEntity != nullptr ? &_superEntityFromParentEntity->getColorValue() :
+                                                      nullptr);
     }
     else
     {
@@ -1757,10 +1740,11 @@ static std::unique_ptr<Ent::Entity> loadEntity(
                     std::make_unique<Ent::SubSceneComponent>(isEmbeddedInJson, file, index);
                 if (subSceneComp->isEmbedded)
                 {
-                    Ent::Scene const* superEmbedded =
-                        superComp != nullptr ? superComp->embedded.get() : nullptr;
-                    subSceneComp->embedded =
-                        loadScene(_entlib, _schema, data["Embedded"], superEmbedded, cache);
+                    subSceneComp->embedded = loadScene(
+                        _entlib,
+                        _schema,
+                        data["Embedded"],
+                        (superComp != nullptr ? superComp->embedded.get() : nullptr));
                 }
                 subSceneComponent = std::move(subSceneComp);
             }
@@ -1777,12 +1761,15 @@ static std::unique_ptr<Ent::Entity> loadEntity(
                 else
                 {
                     Ent::Subschema const& compSchema = *_schema.components.at(cmpType);
-                    Ent::Node const* superRoot = superComp != nullptr ? &superComp->root : nullptr;
-                    Ent::Component comp{ superComp != nullptr, // has a super component
-                                         cmpType,
-                                         loadNode(compSchema, data, superRoot, cache),
-                                         version,
-                                         index };
+
+                    Ent::Component comp{
+                        superComp != nullptr, // has a super component
+                        cmpType,
+                        loadNode(
+                            compSchema, data, (superComp != nullptr ? &superComp->root : nullptr)),
+                        version,
+                        index
+                    };
 
                     components.emplace(cmpType, std::move(comp));
                 }
@@ -1827,47 +1814,59 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         std::move(ovMaxActivationLevel));
 }
 
-std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntity(
-    std::filesystem::path const& _entityPath, Ent::Entity const* _super, Ent::Cache& cache) const
+std::unique_ptr<Ent::Entity>
+Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath, Ent::Entity const* _super) const
 {
-    json document;
-    if (_entityPath.is_absolute())
+    auto const absPath = getAbsolutePath(_entityPath);
+    bool reload = false;
+    auto timestamp = std::filesystem::last_write_time(absPath);
+    auto iter = m_entityCache.find(absPath);
+    if (iter == m_entityCache.end())
     {
-        document = loadJsonFile(_entityPath);
+        reload = true;
     }
     else
     {
-        document = loadJsonFile(rawdataPath / _entityPath);
+        if (timestamp > iter->second.time)
+        {
+            reload = true;
+        }
     }
 
-    if (validationEnabled)
+    if (reload)
     {
-        try
+        printf("loadEntity %ls\n", _entityPath.c_str());
+        json document = loadJsonFile(absPath);
+
+        if (validationEnabled)
         {
-            validateEntity(schema.schema, toolsDir, document);
+            try
+            {
+                validateEntity(schema.schema, toolsDir, document);
+            }
+            catch (...)
+            {
+                fprintf(stderr, "Error, loading entity : %ls\n", _entityPath.c_str());
+                throw;
+            }
         }
-        catch (...)
-        {
-            fprintf(stderr, "Error, loading entity : %ls\n", _entityPath.c_str());
-            throw;
-        }
+
+        std::unique_ptr<Ent::Entity> entity = ::loadEntity(*this, schema, document, _super);
+        auto file = EntityFile{ entity->clone(), timestamp };
+        auto iter_bool = m_entityCache.emplace(absPath, std::move(file));
+        return entity;
     }
-
-    return ::loadEntity(*this, schema, document, _super, cache);
-}
-
-std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath) const
-{
-    Ent::Cache cache;
-    return loadEntity(_entityPath, nullptr, cache);
+    else
+    {
+        return iter->second.entity->clone();
+    }
 }
 
 static std::unique_ptr<Ent::Scene> loadScene(
     Ent::EntityLib const& _entLib,
     Ent::ComponentsSchema const& _schema,
     json const& _entities,
-    Ent::Scene const* _super,
-    Ent::Cache& cache)
+    Ent::Scene const* _super)
 {
     auto scene = std::make_unique<Ent::Scene>();
 
@@ -1892,7 +1891,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
             std::unique_ptr<Ent::Entity> ent =
                 (instEntNode == nullptr) ?
                     superEnt->makeInstanceOf() :
-                    ::loadEntity(_entLib, _schema, *instEntNode, superEnt.get(), cache);
+                    ::loadEntity(_entLib, _schema, *instEntNode, superEnt.get());
             ent->setCanBeRenamed(false);
             scene->addEntity(std::move(ent));
         }
@@ -1906,46 +1905,58 @@ static std::unique_ptr<Ent::Scene> loadScene(
         {
             continue;
         }
-        std::unique_ptr<Ent::Entity> ent = ::loadEntity(_entLib, _schema, entNode, nullptr, cache);
+        std::unique_ptr<Ent::Entity> ent = ::loadEntity(_entLib, _schema, entNode, nullptr);
         scene->addEntity(std::move(ent));
     }
 
     return scene;
 }
 
-std::unique_ptr<Ent::Scene>
-Ent::EntityLib::loadScene(std::filesystem::path const& _scenePath, Ent::Cache& cache) const
+std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(std::filesystem::path const& _scenePath) const
 {
-    json document;
-    if (_scenePath.is_absolute())
+    auto const absPath = getAbsolutePath(_scenePath);
+    bool reload = false;
+    auto timestamp = std::filesystem::last_write_time(absPath);
+    auto iter = m_sceneCache.find(absPath);
+    if (iter == m_sceneCache.end())
     {
-        document = loadJsonFile(_scenePath);
+        reload = true;
     }
     else
     {
-        document = loadJsonFile(rawdataPath / _scenePath);
+        if (timestamp > iter->second.time)
+        {
+            reload = true;
+        }
     }
 
-    if (validationEnabled)
+    if (reload)
     {
-        try
+        json document = loadJsonFile(absPath);
+
+        if (validationEnabled)
         {
-            validateScene(schema.schema, toolsDir, document);
+            try
+            {
+                validateScene(schema.schema, toolsDir, document);
+            }
+            catch (...)
+            {
+                fprintf(stderr, "Error, loading scene : %ls\n", _scenePath.c_str());
+                throw;
+            }
         }
-        catch (...)
-        {
-            fprintf(stderr, "Error, loading scene : %ls\n", _scenePath.c_str());
-            throw;
-        }
+
+        std::unique_ptr<Ent::Scene> scene =
+            ::loadScene(*this, schema, document.at("Objects"), nullptr);
+        auto file = SceneFile{ scene->clone(), timestamp };
+        auto iter_bool = m_sceneCache.emplace(absPath, std::move(file));
+        return scene;
     }
-
-    return ::loadScene(*this, schema, document.at("Objects"), nullptr, cache);
-}
-
-std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(std::filesystem::path const& _scenePath) const
-{
-    Ent::Cache cache;
-    return loadScene(_scenePath, cache);
+    else
+    {
+        return iter->second.scene->clone();
+    }
 }
 
 static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& _entity)
@@ -2079,8 +2090,7 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
 
 std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
 {
-    Ent::Cache cache;
-    std::unique_ptr<Ent::Entity> templ = loadEntity(_instanceOf, nullptr, cache);
+    std::unique_ptr<Ent::Entity> templ = loadEntity(_instanceOf, nullptr);
     std::map<std::string, Ent::Component> components;
     for (auto const& type_comp : templ->getComponents())
     {

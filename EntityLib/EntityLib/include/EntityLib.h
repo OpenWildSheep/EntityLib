@@ -559,6 +559,19 @@ namespace Ent
         std::unique_ptr<Entity> makeInstanceOf(std::string _instanceOf ///< Path to the prefab Entity
         ) const;
 
+        struct EntityFile
+        {
+            std::unique_ptr<Entity> data;
+            std::filesystem::file_time_type time;
+        };
+        struct SceneFile
+        {
+            std::unique_ptr<Scene> data;
+            std::filesystem::file_time_type time;
+        };
+        std::map<std::filesystem::path, EntityFile> const& getEntityCache() const;
+        std::map<std::filesystem::path, SceneFile> const& getSceneCache() const;
+
     private:
         std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
 
@@ -571,18 +584,7 @@ namespace Ent
             LoadFunc&& load,
             Type const* _super) const;
 
-        struct EntityFile
-        {
-            std::unique_ptr<Entity> data;
-            std::filesystem::file_time_type time;
-        };
         mutable std::map<std::filesystem::path, EntityFile> m_entityCache;
-
-        struct SceneFile
-        {
-            std::unique_ptr<Scene> data;
-            std::filesystem::file_time_type time;
-        };
         mutable std::map<std::filesystem::path, SceneFile> m_sceneCache;
     };
 

@@ -2140,6 +2140,15 @@ std::filesystem::path Ent::EntityLib::getAbsolutePath(std::filesystem::path cons
     }
 }
 
+std::map<std::filesystem::path, Ent::EntityLib::EntityFile> const& Ent::EntityLib::getEntityCache() const
+{
+    return m_entityCache;
+}
+std::map<std::filesystem::path, Ent::EntityLib::SceneFile> const& Ent::EntityLib::getSceneCache() const
+{
+    return m_sceneCache;
+}
+
 static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _scene)
 {
     json document;

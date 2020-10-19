@@ -1649,25 +1649,12 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     if (_entNode.count("InstanceOf") != 0)
     {
         instanceOf = _entNode.at("InstanceOf").get<std::string>();
+        superEntityOfThisEntity = _entlib.loadEntity(*instanceOf, _superEntityFromParentEntity);
+        superEntity = superEntityOfThisEntity.get();
+        ENTLIB_ASSERT(
+            superEntityOfThisEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
+        ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
         std::filesystem::path instanceOfPath = *instanceOf;
-        if (instanceOfPath.is_absolute())
-        {
-            superEntityOfThisEntity = _entlib.loadEntity(*instanceOf, _superEntityFromParentEntity);
-            superEntity = superEntityOfThisEntity.get();
-            ENTLIB_ASSERT(
-                superEntityOfThisEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
-            ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
-        }
-        else
-        {
-            instanceOfPath = _entlib.rawdataPath / instanceOfPath;
-            superEntityOfThisEntity =
-                _entlib.loadEntity(instanceOfPath, _superEntityFromParentEntity);
-            superEntity = superEntityOfThisEntity.get();
-            ENTLIB_ASSERT(
-                superEntityOfThisEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
-            ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
-        }
         superIsInit = true;
     }
     ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
@@ -1830,7 +1817,15 @@ static std::unique_ptr<Ent::Entity> loadEntity(
 std::unique_ptr<Ent::Entity>
 Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath, Ent::Entity const* _super) const
 {
-    json document = loadJsonFile(_entityPath);
+    json document;
+    if (_entityPath.is_absolute())
+    {
+        document = loadJsonFile(_entityPath);
+    }
+    else
+    {
+        document = loadJsonFile(rawdataPath / _entityPath);
+    }
 
     if (validationEnabled)
     {
@@ -1900,7 +1895,16 @@ static std::unique_ptr<Ent::Scene> loadScene(
 
 std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(std::filesystem::path const& _scenePath) const
 {
-    json document = loadJsonFile(_scenePath);
+    json document;
+    if (_scenePath.is_absolute())
+    {
+        document = loadJsonFile(_scenePath);
+    }
+    else
+    {
+        document = loadJsonFile(rawdataPath / _scenePath);
+    }
+
     if (validationEnabled)
     {
         try
@@ -2048,13 +2052,7 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
 
 std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
 {
-    std::filesystem::path instanceOfPath = _instanceOf;
-    if (!instanceOfPath.is_absolute())
-    {
-        instanceOfPath = rawdataPath / _instanceOf;
-    }
-
-    std::unique_ptr<Ent::Entity> templ = loadEntity(instanceOfPath, nullptr);
+    std::unique_ptr<Ent::Entity> templ = loadEntity(_instanceOf, nullptr);
     std::map<std::string, Ent::Component> components;
     for (auto const& type_comp : templ->getComponents())
     {

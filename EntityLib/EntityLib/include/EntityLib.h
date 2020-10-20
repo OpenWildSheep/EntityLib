@@ -540,6 +540,13 @@ namespace Ent
         DeleteCheck deleteCheck;
         /// @endcond
 
+        /// Load the Entity at path _entityPath then return a pointer to the cached data
+        Entity const* loadEntityReadOnly(
+            std::filesystem::path const& _entityPath, Ent::Entity const* _super = nullptr) const;
+
+        /// Load the Scene at path _scenePath then return a pointer to the cached data
+        Scene const* loadSceneReadOnly(std::filesystem::path const& _scenePath) const;
+
         /// Load the Entity at path _entityPath
         std::unique_ptr<Entity> loadEntity(
             std::filesystem::path const& _entityPath, Ent::Entity const* _super = nullptr) const;
@@ -579,7 +586,7 @@ namespace Ent
 
         /// Load an Entity or a Scene, using the given cache
         template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
-        std::unique_ptr<Type> loadEntityOrScene(
+        Type const* loadEntityOrScene(
             std::filesystem::path const& _path,
             Cache& cache,
             ValidateFunc&& validate,

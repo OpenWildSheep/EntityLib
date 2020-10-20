@@ -158,11 +158,9 @@ try
         ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(absRef) == 1);
     }
 
-    {
-        EntityPtr ent = entlib.loadEntity("prefab.entity");
-
+    auto testPrefabEntity = [](Ent::Entity const* ent) {
         // Test default value
-        Ent::Component* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
+        Ent::Component const* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
         ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->getFloat() == 100.f);
         ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->isDefault());
         ENTLIB_ASSERT(
@@ -170,7 +168,7 @@ try
             == std::string("file://RuntimeComponents.json#/definitions/VoxelSimulationGD"));
 
         // TEST read inherited values in inherited component
-        Ent::Component* heightObj = ent->getComponent("HeightObj");
+        Ent::Component const* heightObj = ent->getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->isSet());
@@ -185,7 +183,7 @@ try
         ENTLIB_ASSERT(ent->getThumbnail() == std::string("TestThumbnail"));
 
         // Test read prefab
-        Ent::Component* sysCreat = ent->getComponent("SystemicCreature");
+        Ent::Component const* sysCreat = ent->getComponent("SystemicCreature");
         ENTLIB_ASSERT(sysCreat != nullptr);
 
         // TEST read setted values
@@ -209,21 +207,21 @@ try
         ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
 
         // TEST SubScene
-        Ent::SubSceneComponent* subScenecomp = ent->getSubSceneComponent();
+        Ent::SubSceneComponent const* subScenecomp = ent->getSubSceneComponent();
         auto&& allSubEntities = subScenecomp->embedded->getObjects();
         ENTLIB_ASSERT(allSubEntities.size() == 1);
         ENTLIB_ASSERT(allSubEntities.front()->getName() == std::string("EP1-Spout_LINK_001"));
         ENTLIB_ASSERT(allSubEntities.front()->getColor()[0] == 255);
 
         // TEST union
-        Ent::Component* cinematicGD = ent->getComponent("CinematicGD");
-        Ent::Node* scriptEvents = cinematicGD->root.at("ScriptEvents");
+        Ent::Component const* cinematicGD = ent->getComponent("CinematicGD");
+        Ent::Node const* scriptEvents = cinematicGD->root.at("ScriptEvents");
         ENTLIB_ASSERT(scriptEvents->getDataType() == Ent::DataType::array);
 
         // Read Union type
-        Ent::Node* oneOfScripts = scriptEvents->at(0llu);
+        Ent::Node const* oneOfScripts = scriptEvents->at(0llu);
         ENTLIB_ASSERT(oneOfScripts->getDataType() == Ent::DataType::oneOf);
-        Ent::Node* cineEvent = oneOfScripts->getUnionData();
+        Ent::Node const* cineEvent = oneOfScripts->getUnionData();
         ENTLIB_ASSERT(
             cineEvent->getTypeName()
             == std::string(
@@ -232,12 +230,25 @@ try
         ENTLIB_ASSERT(fieldNames[0] == std::string("FactName"));
         ENTLIB_ASSERT(fieldNames[1] == std::string("Super"));
 
-        Ent::Node* nbEnt = cineEvent->at("FactName");
+        Ent::Node const* nbEnt = cineEvent->at("FactName");
         ENTLIB_ASSERT(nbEnt != nullptr);
         ENTLIB_ASSERT(nbEnt->getDataType() == Ent::DataType::string);
         ENTLIB_ASSERT(nbEnt->getString() == std::string("Toto"));
 
+        // TEST sub-object with non-default values
+        Ent::Component const* explosionEffect = ent->getComponent("ExplosionEffect");
+        Ent::Node const* shakeData = explosionEffect->root.at("ShakeData");
+        ENTLIB_ASSERT(shakeData->at("shakeDuration")->getFloat() == 0.0f);
+    };
+
+    {
+        EntityPtr ent = entlib.loadEntity("prefab.entity");
+
+        testPrefabEntity(ent.get());
+
         // Set Union type and override
+        Ent::Component* cinematicGD = ent->getComponent("CinematicGD");
+        Ent::Node* scriptEvents = cinematicGD->root.at("ScriptEvents");
         Ent::Node* oneOfScripts2 = scriptEvents->at(1llu);
         ENTLIB_ASSERT(oneOfScripts2->getDataType() == Ent::DataType::oneOf);
         ENTLIB_ASSERT(oneOfScripts2->getUnionType() == std::string("CineEventTestBlackboardHasFact"));
@@ -257,15 +268,10 @@ try
         oneOfScripts3->setUnionType("CineEventTestCurrentGameState");
 
         // Push in an array of Union
-        Ent::Node* oneOfScripts4 = scriptEvents->push();
+        Ent::Node const* oneOfScripts4 = scriptEvents->push();
         ENTLIB_ASSERT(oneOfScripts4->getDataType() == Ent::DataType::oneOf);
         ENTLIB_ASSERT(oneOfScripts4->getUnionType() == std::string("CineEvent"));
         ENTLIB_ASSERT(scriptEvents->at(3llu) == oneOfScripts4);
-
-        // TEST sub-object with non-default values
-        Ent::Component* explosionEffect = ent->getComponent("ExplosionEffect");
-        Ent::Node* shakeData = explosionEffect->root.at("ShakeData");
-        ENTLIB_ASSERT(shakeData->at("shakeDuration")->getFloat() == 0.0f);
 
         // TEST simple entity ref creation
         Ent::Component* testEntityRef = ent->addComponent("TestEntityRef");
@@ -273,13 +279,21 @@ try
         ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->getEntityRef().entityPath.empty());
         testEntityRef->root.at("TestRef")->setEntityRef(ent->makeEntityRef(*ent));
         ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->getEntityRef().entityPath == ".");
+        Ent::SubSceneComponent* subScenecomp = ent->getSubSceneComponent();
+        auto&& allSubEntities = subScenecomp->embedded->getObjects();
         testEntityRef->root.at("TestRef")->setEntityRef(ent->makeEntityRef(*allSubEntities.front()));
 
         // TEST MaxActivationLevel
         ent->setMaxActivationLevel(Ent::ActivationLevel::InWorld);
 
+        Ent::Component* sysCreat = ent->getComponent("SystemicCreature");
         sysCreat->root.at("Name")->setString("Shamane_male");
         entlib.saveEntity(*ent, "prefab.copy.entity");
+    }
+    {
+        // Test the readOnly prefab.entity
+        Ent::Entity const* ent = entlib.loadEntityReadOnly("prefab.entity");
+        testPrefabEntity(ent);
     }
     {
         // Test write prefab

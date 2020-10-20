@@ -797,14 +797,17 @@ namespace Ent
             instSubSceneComponent = subSceneComponent->clone();
         }
 
-        return std::make_unique<Entity>(
+        std::unique_ptr<Entity> ent = std::make_unique<Entity>(
             *entlib,
             name,
             std::move(instComponents),
             std::move(instSubSceneComponent),
             color,
             thumbnail,
-            instanceOf);
+            instanceOf,
+            maxActivationLevel);
+        ent->hasASuper = hasASuper;
+        return ent;
     }
 
     char const* Entity::getName() const
@@ -1649,10 +1652,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     if (_entNode.count("InstanceOf") != 0)
     {
         instanceOf = _entNode.at("InstanceOf").get<std::string>();
-        superEntityOfThisEntity = _entlib.loadEntity(*instanceOf, _superEntityFromParentEntity);
-        superEntity = superEntityOfThisEntity.get();
-        ENTLIB_ASSERT(
-            superEntityOfThisEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
+        superEntity = _entlib.loadEntityReadOnly(*instanceOf, _superEntityFromParentEntity);
         ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
         std::filesystem::path instanceOfPath = *instanceOf;
         superIsInit = true;
@@ -1815,7 +1815,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
 }
 
 template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
-std::unique_ptr<Type> Ent::EntityLib::loadEntityOrScene(
+Type const* Ent::EntityLib::loadEntityOrScene(
     std::filesystem::path const& _path,
     Cache& cache,
     ValidateFunc&& validate,
@@ -1857,18 +1857,18 @@ std::unique_ptr<Type> Ent::EntityLib::loadEntityOrScene(
         }
 
         std::unique_ptr<Type> entity = load(*this, schema, document, _super);
-        auto file = typename Cache::mapped_type{ entity->clone(), timestamp };
-        auto iter_bool = cache.emplace(relPath, std::move(file));
-        return entity;
+        auto file = typename Cache::mapped_type{ std::move(entity), timestamp };
+        auto iter_bool = cache.insert_or_assign(relPath, std::move(file));
+        return std::get<0>(iter_bool)->second.data.get();
     }
     else
     {
-        return iter->second.data->clone();
+        return iter->second.data.get();
     }
 }
 
-std::unique_ptr<Ent::Entity>
-Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath, Ent::Entity const* _super) const
+Ent::Entity const* Ent::EntityLib::loadEntityReadOnly(
+    std::filesystem::path const& _entityPath, Ent::Entity const* _super) const
 {
     return loadEntityOrScene<Ent::Entity>(
         _entityPath, m_entityCache, &validateEntity, &::loadEntity, _super);
@@ -1924,7 +1924,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
     return scene;
 }
 
-std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(std::filesystem::path const& _scenePath) const
+Ent::Scene const* Ent::EntityLib::loadSceneReadOnly(std::filesystem::path const& _scenePath) const
 {
     auto loadFunc = [](Ent::EntityLib const& _entLib,
                        Ent::ComponentsSchema const& _schema,
@@ -1934,6 +1934,17 @@ std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(std::filesystem::path cons
     };
 
     return loadEntityOrScene<Ent::Scene>(_scenePath, m_sceneCache, &validateScene, loadFunc, nullptr);
+}
+
+std::unique_ptr<Ent::Entity>
+Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath, Ent::Entity const* _super) const
+{
+    return loadEntityReadOnly(_entityPath, _super)->clone();
+}
+
+std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(std::filesystem::path const& _scenePath) const
+{
+    return loadSceneReadOnly(_scenePath)->clone();
 }
 
 static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& _entity)
@@ -2067,7 +2078,7 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
 
 std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
 {
-    std::unique_ptr<Ent::Entity> templ = loadEntity(_instanceOf, nullptr);
+    Ent::Entity const* templ = loadEntityReadOnly(_instanceOf, nullptr);
     std::map<std::string, Ent::Component> components;
     for (auto const& type_comp : templ->getComponents())
     {

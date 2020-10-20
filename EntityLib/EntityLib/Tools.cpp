@@ -10,13 +10,11 @@ using namespace nlohmann;
 
 json loadJsonFile(std::filesystem::path const& path)
 {
-    std::ifstream file(path, std::ios::binary);
-    if (not file.is_open())
-    {
-        throw std::runtime_error("Can't open file for read: " + path.u8string());
-    }
-    std::string data;
-    std::getline(file, data, char(0));
+    std::ifstream file(path, std::ios::binary | std::ios::ate);
+    auto const length = file.tellg();
+    file.seekg(0, std::ios::beg);
+    std::vector<char> data((size_t(length)));
+    file.read(data.data(), length);
     json doc = json::parse(
         data,
         nullptr, // Parser callback
@@ -54,7 +52,9 @@ std::vector<std::string> Ent::splitString(const std::string& _str, char _delimit
 }
 
 std::string Ent::computeRelativePath(
-    std::vector<std::string> _fromAbsolute, std::vector<std::string> _toAbsolute, bool _leavesAreLast)
+    std::vector<std::string> _fromAbsolute, // NOLINT(performance-unnecessary-value-param)
+    std::vector<std::string> _toAbsolute,
+    bool _leavesAreLast)
 {
     using PopRootFun = void (*)(std::vector<std::string>&);
     const auto popRoot =

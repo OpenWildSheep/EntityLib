@@ -127,6 +127,12 @@ namespace Ent
         {
             return !IsUsedInRuntime() && IsUsedInEditor();
         }
+
+        /// @brief Get all types acceptable in the union, with their names
+        /// @throw BadType if the schema is not a oneOf
+        /// @throw MissingMetadata if the schema doesn't have a meta className and classData
+        std::map<std::string, Subschema const*> getUnionTypesMap() const;
+
         /// @brief Get the Subschema related to the given \p _type (className)
         /// @throw BadType if the schema is not a oneOf
         /// @throw MissingMetadata if the schema doesn't have a meta className and classData

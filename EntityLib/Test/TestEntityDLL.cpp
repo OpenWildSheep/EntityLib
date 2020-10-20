@@ -135,8 +135,20 @@ try
 
     using EntityPtr = std::unique_ptr<Ent::Entity>;
 
+    // Test $ref links in entlib.schema.schema.allDefinitions
     char const* colorRef = "file://RuntimeComponents.json#/definitions/Color";
     ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(colorRef) == 1);
+
+    // Check Ent::Subschema::getUnionTypesMap
+    char const* cinematicGDRef = "file://RuntimeComponents.json#/definitions/CinematicGD";
+    Ent::Subschema const& cinematicGDSchema = entlib.schema.schema.allDefinitions.at(cinematicGDRef);
+    Ent::Subschema const& scriptEventUnionSchema =
+        cinematicGDSchema.properties.at("ScriptEvents")->singularItems->get();
+    auto&& nameToTypeMap = scriptEventUnionSchema.getUnionTypesMap();
+    ENTLIB_ASSERT(size(nameToTypeMap) == 14);
+    ENTLIB_ASSERT(nameToTypeMap.count("CineEventTest") == 1);
+    ENTLIB_ASSERT(nameToTypeMap.count("CineEventTestBlackboardHasFact") == 1);
+    ENTLIB_ASSERT(nameToTypeMap.count("CineEventTestEndCurrentSequence") == 1);
 
     // Ensure that all components have a ref and is in entlib.schema.schema.allDefinitions
     for (auto&& name_schema : entlib.schema.components)

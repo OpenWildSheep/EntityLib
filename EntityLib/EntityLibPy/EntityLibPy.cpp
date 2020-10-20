@@ -197,7 +197,6 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](Subschema& s) -> Ent::Subschema::DefaultValue& { return s.defaultValue; },
             py::return_value_policy::reference)
         .def_readonly("const_value", &Subschema::constValue, py::return_value_policy::reference)
-        // .def("singular_items", &Subschema::singularItems, py::return_value_policy::reference)
         .def(
             "get_singular_items",
             [](Subschema const& s) -> SubschemaRef const* { return s.singularItems.get(); },
@@ -207,6 +206,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "get_linear_items",
             [](Subschema const& s) -> std::vector<SubschemaRef> const& { return *s.linearItems; },
             py::return_value_policy::reference)
+        .def(
+            "get_union_types_dict",
+            &Ent::Subschema::getUnionTypesMap,
+            py::return_value_policy::reference_internal)
         // .def("linear_items", &Subschema::linearItems, py::return_value_policy::reference)
         .def("has_linear_items", [](Subschema const& s) { return s.linearItems.has_value(); })
         .def_readonly("enum_values", &Subschema::enumValues, py::return_value_policy::reference)

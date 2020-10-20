@@ -60,9 +60,24 @@ try:
 
     entlib = Ent.EntityLib("X:/")
 
-    entlib.rawdata_path = "C:/Code/WildShared/EntityLib/Test/"
+    entlib.rawdata_path = os.getcwd()
 
     entlib.validation_enabled = True
+
+    ####################################################################################################################
+    # Test $ref links in entlib.schema.schema.allDefinitions
+    colorRef = "file://RuntimeComponents.json#/definitions/Color"
+    assert colorRef in entlib.schema.schema.definitions
+
+    # Check Ent::Subschema::getUnionTypesMap
+    cinematicGDRef = "file://RuntimeComponents.json#/definitions/CinematicGD"
+    cinematicGDSchema = entlib.schema.schema.definitions[cinematicGDRef]
+    scriptEventUnionSchema = cinematicGDSchema.properties["ScriptEvents"].get().get_singular_items().get()
+    nameToTypeMap = scriptEventUnionSchema.get_union_types_dict()
+    assert len(nameToTypeMap) == 14
+    assert "CineEventTest" in nameToTypeMap
+    assert "CineEventTestBlackboardHasFact" in nameToTypeMap
+    assert "CineEventTestEndCurrentSequence" in nameToTypeMap
 
     ####################################################################################################################
     ent = entlib.load_entity("prefab.entity")  # type: Ent.Entity

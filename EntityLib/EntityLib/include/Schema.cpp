@@ -53,4 +53,30 @@ namespace Ent
         return &getUnionTypeWrapper(_subtype)->properties.at(un.dataField).get();
     }
 
+    std::map<std::string, Subschema const*> Subschema::getUnionTypesMap() const
+    {
+        if (type != Ent::DataType::oneOf)
+        {
+            throw BadType();
+        }
+        if (not meta.is<UnionMeta>())
+        {
+            throw MissingMetadata(name.c_str());
+        }
+
+        std::map<std::string, Subschema const*> result;
+
+        UnionMeta const& unionData = meta.get<UnionMeta>();
+
+        for (SubschemaRef const& ref : *oneOf)
+        {
+            std::string acceptedType =
+                ref.get().properties.at(unionData.typeField)->constValue->get<std::string>();
+            Subschema const& schema = ref.get().properties.at(unionData.dataField).get();
+            result.emplace(std::move(acceptedType), &schema);
+        }
+
+        return result;
+    }
+
 } // namespace Ent

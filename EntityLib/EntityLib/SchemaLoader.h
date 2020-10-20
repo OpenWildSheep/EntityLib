@@ -29,38 +29,37 @@ namespace Ent
             nlohmann::json const& _data ///< json node to extract schema
         );
 
-        /// @todo Make Visitor an interface to inherit
-        struct Visitor
+        struct Visitor abstract
         {
-            std::function<void(char const*)> openProperty;
-            std::function<void()> closeProperty;
-            std::function<void(size_t)> setLinearItem;
-            std::function<void(size_t)> openLinearItem;
-            std::function<void()> closeLinearItem;
-            std::function<void()> openSingularItem;
-            std::function<void()> closeSingularItem;
-            std::function<void(size_t)> setMaxItems;
-            std::function<void(size_t)> setMinItems;
-            std::function<void(DataType)> setType;
-            std::function<void(char const*)> addEnumValue;
-            std::function<void(Subschema::DefaultValue)> setDefaultValue;
-            std::function<void(Subschema::DefaultValue)> setConstValue;
-            std::function<void(size_t)> setOneOf;
-            std::function<void(size_t)> openOneOfItem;
-            std::function<void()> closeOneOfItem;
-            std::function<void(char const*)> openRef;
-            std::function<void()> closeRef;
-            std::function<void()> openSubschema;
-            std::function<void()> closeSubschema;
-            std::function<void(Subschema::Meta)> setMeta;
-            std::function<void(std::string)> setName;
+            virtual void openProperty(char const*) = 0;
+            virtual void closeProperty() = 0;
+            virtual void setLinearItem(size_t) = 0;
+            virtual void openLinearItem(size_t) = 0;
+            virtual void closeLinearItem() = 0;
+            virtual void openSingularItem() = 0;
+            virtual void closeSingularItem() = 0;
+            virtual void setMaxItems(size_t) = 0;
+            virtual void setMinItems(size_t) = 0;
+            virtual void setType(DataType) = 0;
+            virtual void addEnumValue(char const*) = 0;
+            virtual void setDefaultValue(Subschema::DefaultValue) = 0;
+            virtual void setConstValue(Subschema::DefaultValue) = 0;
+            virtual void setOneOf(size_t) = 0;
+            virtual void openOneOfItem(size_t) = 0;
+            virtual void closeOneOfItem() = 0;
+            virtual void openRef(char const*) = 0;
+            virtual void closeRef() = 0;
+            virtual void openSubschema() = 0;
+            virtual void closeSubschema() = 0;
+            virtual void setMeta(Subschema::Meta) = 0;
+            virtual void setName(std::string) = 0;
         };
 
         void parseSchema(
             std::string const& _filename,
             nlohmann::json const& _fileRoot, ///< Full file containing _data
             nlohmann::json const& _data, ///< json node to extract schema
-            Visitor const& _vis,
+            Visitor& _vis,
             int _depth = 0 ///< depth of this Node. (For internal use)
         );
 
@@ -71,7 +70,7 @@ namespace Ent
             std::string const& _filename,
             nlohmann::json const& _rootFile,
             nlohmann::json const& _data,
-            Visitor const& vis,
+            Visitor& vis,
             int depth);
 
         std::filesystem::path m_schemaPath; ///< Path to the global Scene Schema

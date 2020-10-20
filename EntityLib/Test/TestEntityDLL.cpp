@@ -163,7 +163,7 @@ try
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->isSet());
         ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isDefault());
-        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getDefaultInt() == 0);
+        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getDefaultInt() == 6);
         ENTLIB_ASSERT(
             heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
         ENTLIB_ASSERT(heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());

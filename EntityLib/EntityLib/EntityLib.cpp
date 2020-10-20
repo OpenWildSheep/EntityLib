@@ -51,8 +51,8 @@ namespace Ent
     EntityLib::EntityLib(std::filesystem::path _rootPath)
         : rootPath(std::move(_rootPath)) // Read schema and dependencies
     {
-        rawdataPath = rootPath / "RawData";
-        toolsDir = rootPath / "Tools";
+        rawdataPath = getAbsolutePath(rootPath / "RawData");
+        toolsDir = getAbsolutePath(rootPath / "Tools");
         auto schemaPath = toolsDir / "WildPipeline/Schema";
 
         json schemaDocument = mergeComponents(toolsDir);
@@ -1823,9 +1823,10 @@ std::unique_ptr<Type> Ent::EntityLib::loadEntityOrScene(
     Type const* _super) const
 {
     auto const absPath = getAbsolutePath(_path);
+    std::filesystem::path relPath = absPath.c_str() + rawdataPath.native().size() + 1;
     bool reload = false;
     auto timestamp = std::filesystem::last_write_time(absPath);
-    auto iter = cache.find(absPath);
+    auto iter = cache.find(relPath);
     if (iter == cache.end())
     {
         reload = true;
@@ -1856,8 +1857,8 @@ std::unique_ptr<Type> Ent::EntityLib::loadEntityOrScene(
         }
 
         std::unique_ptr<Type> entity = load(*this, schema, document, _super);
-        auto file = Cache::mapped_type{ entity->clone(), timestamp };
-        auto iter_bool = cache.emplace(absPath, std::move(file));
+        auto file = typename Cache::mapped_type{ entity->clone(), timestamp };
+        auto iter_bool = cache.emplace(relPath, std::move(file));
         return entity;
     }
     else
@@ -2147,6 +2148,12 @@ std::map<std::filesystem::path, Ent::EntityLib::EntityFile> const& Ent::EntityLi
 std::map<std::filesystem::path, Ent::EntityLib::SceneFile> const& Ent::EntityLib::getSceneCache() const
 {
     return m_sceneCache;
+}
+
+void Ent::EntityLib::clearCache()
+{
+    m_entityCache.clear();
+    m_sceneCache.clear();
 }
 
 static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _scene)

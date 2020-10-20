@@ -572,6 +572,8 @@ namespace Ent
         std::map<std::filesystem::path, EntityFile> const& getEntityCache() const;
         std::map<std::filesystem::path, SceneFile> const& getSceneCache() const;
 
+        void clearCache();
+
     private:
         std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
 

@@ -48,14 +48,16 @@ namespace Ent
         return Node{ Array{ nodes }, &colorSchema };
     }
 
-    EntityLib::EntityLib(std::filesystem::path _rootPath)
+    EntityLib::EntityLib(std::filesystem::path _rootPath, bool _doMergeComponents)
         : rootPath(std::move(_rootPath)) // Read schema and dependencies
     {
         rawdataPath = getAbsolutePath(rootPath / "RawData");
         toolsDir = getAbsolutePath(rootPath / "Tools");
         auto schemaPath = toolsDir / "WildPipeline/Schema";
 
-        json schemaDocument = mergeComponents(toolsDir);
+        json schemaDocument = _doMergeComponents ?
+                                  mergeComponents(toolsDir) :
+                                  loadJsonFile(toolsDir / "WildPipeline/Schema/Scene-schema.json");
 
         SchemaLoader loader(toolsDir, schemaPath);
 

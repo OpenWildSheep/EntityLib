@@ -120,8 +120,13 @@ int main() // int argc, char** argv
 try
 {
     // Ent::updateComponents("X:/Tools");
+#ifdef _DEBUG
+    bool const doMergeComponents = false;
+#else
+    bool const doMergeComponents = true;
+#endif
 
-    Ent::EntityLib entlib("X:/");
+    Ent::EntityLib entlib("X:/", doMergeComponents);
     using namespace std::filesystem;
 
     entlib.rawdataPath = current_path(); // It is a hack to work in the working dir

@@ -532,7 +532,7 @@ namespace Ent
         std::map<std::string, std::vector<std::string>> componentDependencies;
 
         /// Load the EntityLib, given the path to the Tools directory
-        explicit EntityLib(std::filesystem::path _rootPath);
+        explicit EntityLib(std::filesystem::path _rootPath, bool _doMergeComponents = true);
         ~EntityLib();
         /// @cond PRIVATE
         EntityLib(EntityLib const&) = delete;

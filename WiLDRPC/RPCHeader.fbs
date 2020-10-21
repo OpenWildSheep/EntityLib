@@ -1,0 +1,11 @@
+include "WildRPC.fbs";
+include "Result.fbs";
+
+namespace WildRPC;
+
+table RPCHeader
+{
+	methodName:string;
+}
+
+root_type RPCHeader;

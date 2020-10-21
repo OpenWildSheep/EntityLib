@@ -1,0 +1,12 @@
+include "WildRPC.fbs";
+include "Result.fbs";
+
+namespace WildRPC;
+
+table Camera
+{
+	position:Position;
+	orientation:Quat;
+}
+
+root_type Camera;

@@ -11,6 +11,10 @@ using namespace nlohmann;
 json loadJsonFile(std::filesystem::path const& path)
 {
     std::ifstream file(path, std::ios::binary | std::ios::ate);
+    if (not file.is_open())
+    {
+        throw std::runtime_error("Can't open file for read: " + path.u8string());
+    }
     auto const length = file.tellg();
     file.seekg(0, std::ios::beg);
     std::vector<char> data((size_t(length)));

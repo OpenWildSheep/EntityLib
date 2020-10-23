@@ -392,10 +392,6 @@ void Ent::SchemaLoader::readSchema(
             , stack(_stack)
         {
         }
-        FillSchema(FillSchema const&) = delete;
-        FillSchema(FillSchema&&) = delete;
-        FillSchema& operator=(FillSchema const&) = delete;
-        FillSchema& operator=(FillSchema&&) = delete;
 
         std::string const& getTab()
         {

@@ -29,8 +29,15 @@ namespace Ent
             nlohmann::json const& _data ///< json node to extract schema
         );
 
-        struct Visitor abstract
+        struct Visitor
         {
+            Visitor() = default;
+            virtual ~Visitor() = default;
+            Visitor(Visitor const&) = delete;
+            Visitor(Visitor&&) = delete;
+            Visitor& operator=(Visitor const&) = delete;
+            Visitor& operator=(Visitor&&) = delete;
+
             virtual void openProperty(char const*) = 0;
             virtual void closeProperty() = 0;
             virtual void setLinearItem(size_t) = 0;

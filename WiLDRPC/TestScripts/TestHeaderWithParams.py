@@ -37,17 +37,19 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
     dataViewReadIndex = 0
 
+    # print("Starting to read from : ", dataViewReadIndex)
     result = rpc.Decode(rpc.Type_Integer, dataView[dataViewReadIndex:])
-    readSize = 28
-    dataViewReadIndex = dataViewReadIndex + readSize
-    print(result[0])
-    print("Size = ", readSize)
+    dataViewReadIndex = dataViewReadIndex + result[1] + 4
 
-    result = rpc.Decode(rpc.Type_Float, dataView[dataViewReadIndex:])
-    readSize = result[1]
-    dataViewReadIndex = dataViewReadIndex + readSize
     print(result[0])
-    print("Size = ", readSize)
+    # print("Size = ", readSize)
+
+    # print("Starting to read from : ", dataViewReadIndex)
+    result = rpc.Decode(rpc.Type_Float, dataView[dataViewReadIndex:])
+    dataViewReadIndex = dataViewReadIndex + result[1] + 4
+    
+    print(result[0])
+    # print("Size = ", readSize)
 
     # Disconnect from Server
     s.close()

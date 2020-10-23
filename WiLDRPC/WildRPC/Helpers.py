@@ -115,7 +115,6 @@ def bytes_to_int(bytes):
 	result = 0
 	index = 0
 	for b in bytes:
-		print(int(b))
 		result = result + int(b) * (256 ** index)
 		index = index + 1
 	return result
@@ -141,7 +140,7 @@ decoders = {
 def Decode(type, bytes):
 	dataView = memoryview(bytes)
 	prefixedSize = bytes_to_int(dataView[0:3])
-
+	#print("prefixedSize = ", prefixedSize)
 	# Get the function from switcher dictionary
 	func = decoders.get(type, "nothing")
 	# Execute the function

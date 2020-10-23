@@ -84,12 +84,28 @@ class CameraManager:
 def CameraToBinary(camera):
     # Create Camera Data
     bldr2 = flatbuffers.Builder(0)
+
+    WildRPC.Vector3.Vector3Start(bldr2)
+    WildRPC.Vector3.Vector3AddX(bldr2, camera.localX)
+    WildRPC.Vector3.Vector3AddY(bldr2, camera.localY)
+    WildRPC.Vector3.Vector3AddZ(bldr2, camera.localZ)
+    local = WildRPC.Vector3.Vector3End(bldr2)
+
+    WildRPC.Position.PositionStart(bldr2)
+    WildRPC.Position.PositionAddWorldCellX(bldr2, camera.worldCellX)
+    WildRPC.Position.PositionAddWorldCellY(bldr2, camera.worldCellY)
+    WildRPC.Position.PositionAddLocalPosition(bldr2, local)
+    pos = WildRPC.Position.PositionEnd(bldr2)
+
+    WildRPC.Quat.QuatStart(bldr2)
+    WildRPC.Quat.QuatAddX(bldr2, camera.quatX)
+    WildRPC.Quat.QuatAddY(bldr2, camera.quatY)
+    WildRPC.Quat.QuatAddZ(bldr2, camera.quatZ)
+    WildRPC.Quat.QuatAddW(bldr2, camera.quatW)
+    ornt = WildRPC.Quat.QuatEnd(bldr2)
+
     WildRPC.Camera.CameraStart(bldr2)
-
-    pos = WildRPC.Position.CreatePosition(bldr2, camera.worldCellX, camera.worldCellY, camera.localX, camera.localY, camera.localZ)
     WildRPC.Camera.CameraAddPosition(bldr2, pos)
-
-    ornt = WildRPC.Quat.CreateQuat(bldr2, camera.quatX, camera.quatY, camera.quatZ, camera.quatW)
     WildRPC.Camera.CameraAddOrientation(bldr2, ornt)
 
     gen_camera = WildRPC.Camera.CameraEnd(bldr2)

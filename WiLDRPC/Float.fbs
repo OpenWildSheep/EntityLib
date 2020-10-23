@@ -1,0 +1,9 @@
+
+namespace WildRPC;
+
+table Float
+{
+	value:float;
+}
+
+root_type Float;

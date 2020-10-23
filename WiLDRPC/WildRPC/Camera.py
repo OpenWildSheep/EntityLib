@@ -24,7 +24,7 @@ class Camera(object):
     def Position(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
-            x = o + self._tab.Pos
+            x = self._tab.Indirect(o + self._tab.Pos)
             from WildRPC.Position import Position
             obj = Position()
             obj.Init(self._tab.Bytes, x)
@@ -35,7 +35,7 @@ class Camera(object):
     def Orientation(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
-            x = o + self._tab.Pos
+            x = self._tab.Indirect(o + self._tab.Pos)
             from WildRPC.Quat import Quat
             obj = Quat()
             obj.Init(self._tab.Bytes, x)
@@ -43,6 +43,6 @@ class Camera(object):
         return None
 
 def CameraStart(builder): builder.StartObject(2)
-def CameraAddPosition(builder, position): builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
-def CameraAddOrientation(builder, orientation): builder.PrependStructSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(orientation), 0)
+def CameraAddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
+def CameraAddOrientation(builder, orientation): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(orientation), 0)
 def CameraEnd(builder): return builder.EndObject()

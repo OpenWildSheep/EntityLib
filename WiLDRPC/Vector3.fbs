@@ -1,0 +1,11 @@
+
+namespace WildRPC;
+
+table Vector3
+{
+	x:float;
+	y:float;
+	z:float;
+}
+
+root_type Vector3;

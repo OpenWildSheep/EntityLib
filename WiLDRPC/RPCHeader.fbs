@@ -1,11 +1,14 @@
-include "WildRPC.fbs";
 include "Result.fbs";
 
 namespace WildRPC;
 
+enum Type : byte { UInt3 = 1, Vector3, Vector2, Quat, Position, Float, Integer, Boolean }
+
 table RPCHeader
 {
 	methodName:string;
+	parameterTypes:[Type];
+	resultTypes:[Type];
 }
 
 root_type RPCHeader;

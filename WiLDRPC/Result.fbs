@@ -1,5 +1,3 @@
-include "WildRPC.fbs";
-
 namespace WildRPC;
 
 table Result

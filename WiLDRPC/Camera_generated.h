@@ -6,8 +6,9 @@
 
 #include "flatbuffers/flatbuffers.h"
 
-#include "Result_generated.h"
-#include "WildRPC_generated.h"
+#include "Position_generated.h"
+#include "Quat_generated.h"
+#include "Vector3_generated.h"
 
 namespace WildRPC {
 
@@ -21,15 +22,17 @@ struct Camera FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_ORIENTATION = 6
   };
   const WildRPC::Position *position() const {
-    return GetStruct<const WildRPC::Position *>(VT_POSITION);
+    return GetPointer<const WildRPC::Position *>(VT_POSITION);
   }
   const WildRPC::Quat *orientation() const {
-    return GetStruct<const WildRPC::Quat *>(VT_ORIENTATION);
+    return GetPointer<const WildRPC::Quat *>(VT_ORIENTATION);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<WildRPC::Position>(verifier, VT_POSITION) &&
-           VerifyField<WildRPC::Quat>(verifier, VT_ORIENTATION) &&
+           VerifyOffset(verifier, VT_POSITION) &&
+           verifier.VerifyTable(position()) &&
+           VerifyOffset(verifier, VT_ORIENTATION) &&
+           verifier.VerifyTable(orientation()) &&
            verifier.EndTable();
   }
 };
@@ -38,11 +41,11 @@ struct CameraBuilder {
   typedef Camera Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_position(const WildRPC::Position *position) {
-    fbb_.AddStruct(Camera::VT_POSITION, position);
+  void add_position(flatbuffers::Offset<WildRPC::Position> position) {
+    fbb_.AddOffset(Camera::VT_POSITION, position);
   }
-  void add_orientation(const WildRPC::Quat *orientation) {
-    fbb_.AddStruct(Camera::VT_ORIENTATION, orientation);
+  void add_orientation(flatbuffers::Offset<WildRPC::Quat> orientation) {
+    fbb_.AddOffset(Camera::VT_ORIENTATION, orientation);
   }
   explicit CameraBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -58,8 +61,8 @@ struct CameraBuilder {
 
 inline flatbuffers::Offset<Camera> CreateCamera(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const WildRPC::Position *position = 0,
-    const WildRPC::Quat *orientation = 0) {
+    flatbuffers::Offset<WildRPC::Position> position = 0,
+    flatbuffers::Offset<WildRPC::Quat> orientation = 0) {
   CameraBuilder builder_(_fbb);
   builder_.add_orientation(orientation);
   builder_.add_position(position);

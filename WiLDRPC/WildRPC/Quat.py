@@ -9,23 +9,48 @@ np = import_numpy()
 class Quat(object):
     __slots__ = ['_tab']
 
+    @classmethod
+    def GetRootAsQuat(cls, buf, offset):
+        n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
+        x = Quat()
+        x.Init(buf, n + offset)
+        return x
+
     # Quat
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Quat
-    def X(self): return self._tab.Get(flatbuffers.number_types.Float32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0))
-    # Quat
-    def Y(self): return self._tab.Get(flatbuffers.number_types.Float32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(4))
-    # Quat
-    def Z(self): return self._tab.Get(flatbuffers.number_types.Float32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(8))
-    # Quat
-    def W(self): return self._tab.Get(flatbuffers.number_types.Float32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(12))
+    def X(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+        return 0.0
 
-def CreateQuat(builder, x, y, z, w):
-    builder.Prep(4, 16)
-    builder.PrependFloat32(w)
-    builder.PrependFloat32(z)
-    builder.PrependFloat32(y)
-    builder.PrependFloat32(x)
-    return builder.Offset()
+    # Quat
+    def Y(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+        return 0.0
+
+    # Quat
+    def Z(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+        return 0.0
+
+    # Quat
+    def W(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+        return 0.0
+
+def QuatStart(builder): builder.StartObject(4)
+def QuatAddX(builder, x): builder.PrependFloat32Slot(0, x, 0.0)
+def QuatAddY(builder, y): builder.PrependFloat32Slot(1, y, 0.0)
+def QuatAddZ(builder, z): builder.PrependFloat32Slot(2, z, 0.0)
+def QuatAddW(builder, w): builder.PrependFloat32Slot(3, w, 0.0)
+def QuatEnd(builder): return builder.EndObject()

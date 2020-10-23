@@ -1,0 +1,12 @@
+include "Vector3.fbs";
+
+namespace WildRPC;
+
+table Position
+{
+	worldCellX:uint;
+	worldCellY:uint;
+	localPosition:Vector3;
+}
+
+root_type Position;

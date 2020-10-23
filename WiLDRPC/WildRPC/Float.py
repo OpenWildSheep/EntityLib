@@ -6,35 +6,27 @@ import flatbuffers
 from flatbuffers.compat import import_numpy
 np = import_numpy()
 
-class Vector2(object):
+class Float(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsVector2(cls, buf, offset):
+    def GetRootAsFloat(cls, buf, offset):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
-        x = Vector2()
+        x = Float()
         x.Init(buf, n + offset)
         return x
 
-    # Vector2
+    # Float
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
-    # Vector2
-    def X(self):
+    # Float
+    def Value(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
         return 0.0
 
-    # Vector2
-    def Y(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
-        return 0.0
-
-def Vector2Start(builder): builder.StartObject(2)
-def Vector2AddX(builder, x): builder.PrependFloat32Slot(0, x, 0.0)
-def Vector2AddY(builder, y): builder.PrependFloat32Slot(1, y, 0.0)
-def Vector2End(builder): return builder.EndObject()
+def FloatStart(builder): builder.StartObject(1)
+def FloatAddValue(builder, value): builder.PrependFloat32Slot(0, value, 0.0)
+def FloatEnd(builder): return builder.EndObject()

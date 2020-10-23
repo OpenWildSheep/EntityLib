@@ -27,6 +27,64 @@ class RPCHeader(object):
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def RPCHeaderStart(builder): builder.StartObject(1)
+    # RPCHeader
+    def ParameterTypes(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            a = self._tab.Vector(o)
+            return self._tab.Get(flatbuffers.number_types.Int8Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 1))
+        return 0
+
+    # RPCHeader
+    def ParameterTypesAsNumpy(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Int8Flags, o)
+        return 0
+
+    # RPCHeader
+    def ParameterTypesLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # RPCHeader
+    def ParameterTypesIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        return o == 0
+
+    # RPCHeader
+    def ResultTypes(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            a = self._tab.Vector(o)
+            return self._tab.Get(flatbuffers.number_types.Int8Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 1))
+        return 0
+
+    # RPCHeader
+    def ResultTypesAsNumpy(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Int8Flags, o)
+        return 0
+
+    # RPCHeader
+    def ResultTypesLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # RPCHeader
+    def ResultTypesIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        return o == 0
+
+def RPCHeaderStart(builder): builder.StartObject(3)
 def RPCHeaderAddMethodName(builder, methodName): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(methodName), 0)
+def RPCHeaderAddParameterTypes(builder, parameterTypes): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(parameterTypes), 0)
+def RPCHeaderStartParameterTypesVector(builder, numElems): return builder.StartVector(1, numElems, 1)
+def RPCHeaderAddResultTypes(builder, resultTypes): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(resultTypes), 0)
+def RPCHeaderStartResultTypesVector(builder, numElems): return builder.StartVector(1, numElems, 1)
 def RPCHeaderEnd(builder): return builder.EndObject()

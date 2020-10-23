@@ -9,26 +9,44 @@ np = import_numpy()
 class Position(object):
     __slots__ = ['_tab']
 
+    @classmethod
+    def GetRootAsPosition(cls, buf, offset):
+        n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
+        x = Position()
+        x.Init(buf, n + offset)
+        return x
+
     # Position
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Position
-    def WorldCellX(self): return self._tab.Get(flatbuffers.number_types.Uint32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0))
-    # Position
-    def WorldCellY(self): return self._tab.Get(flatbuffers.number_types.Uint32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(4))
-    # Position
-    def LocalPosition(self, obj):
-        obj.Init(self._tab.Bytes, self._tab.Pos + 8)
-        return obj
+    def WorldCellX(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
+        return 0
 
+    # Position
+    def WorldCellY(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
+        return 0
 
-def CreatePosition(builder, worldCellX, worldCellY, localPosition_x, localPosition_y, localPosition_z):
-    builder.Prep(4, 20)
-    builder.Prep(4, 12)
-    builder.PrependFloat32(localPosition_z)
-    builder.PrependFloat32(localPosition_y)
-    builder.PrependFloat32(localPosition_x)
-    builder.PrependUint32(worldCellY)
-    builder.PrependUint32(worldCellX)
-    return builder.Offset()
+    # Position
+    def LocalPosition(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            x = self._tab.Indirect(o + self._tab.Pos)
+            from WildRPC.Vector3 import Vector3
+            obj = Vector3()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+def PositionStart(builder): builder.StartObject(3)
+def PositionAddWorldCellX(builder, worldCellX): builder.PrependUint32Slot(0, worldCellX, 0)
+def PositionAddWorldCellY(builder, worldCellY): builder.PrependUint32Slot(1, worldCellY, 0)
+def PositionAddLocalPosition(builder, localPosition): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(localPosition), 0)
+def PositionEnd(builder): return builder.EndObject()

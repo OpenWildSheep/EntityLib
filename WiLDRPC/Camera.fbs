@@ -1,5 +1,6 @@
-include "WildRPC.fbs";
-include "Result.fbs";
+include "Position.fbs";
+include "Quat.fbs";
+include "Vector3.fbs";
 
 namespace WildRPC;
 

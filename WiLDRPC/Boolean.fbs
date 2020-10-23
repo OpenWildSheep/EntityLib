@@ -1,0 +1,9 @@
+
+namespace WildRPC;
+
+table Boolean
+{
+	value:bool;
+}
+
+root_type Boolean;

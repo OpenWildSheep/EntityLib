@@ -1,5 +1,6 @@
 #include <ComponentMerge.h>
 #include <iostream>
+#include <filesystem>
 
 int main(int argc, char** argv)
 try
@@ -10,9 +11,11 @@ try
         return EXIT_FAILURE;
     }
 
+    std::experimental::filesystem::path sceneSchemaPath = argv[1];
+    sceneSchemaPath /= "WildPipeline/Schema/Scene-schema.json";
+    sceneSchemaPath = std::experimental::filesystem::canonical(sceneSchemaPath);
     char editCmd[1024];
-    sprintf_s(
-        editCmd, sizeof(editCmd), R"(p4 edit "%s\WildPipeline\Schema\Scene-schema.json)", argv[1]);
+    sprintf_s(editCmd, sizeof(editCmd), R"(p4 edit "%ls")", sceneSchemaPath.c_str());
 
     system(editCmd);
 

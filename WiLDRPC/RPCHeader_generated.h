@@ -22,11 +22,12 @@ enum Type {
   Type_Float = 6,
   Type_Integer = 7,
   Type_Boolean = 8,
+  Type_Color = 9,
   Type_MIN = Type_UInt3,
-  Type_MAX = Type_Boolean
+  Type_MAX = Type_Color
 };
 
-inline const Type (&EnumValuesType())[8] {
+inline const Type (&EnumValuesType())[9] {
   static const Type values[] = {
     Type_UInt3,
     Type_Vector3,
@@ -35,13 +36,14 @@ inline const Type (&EnumValuesType())[8] {
     Type_Position,
     Type_Float,
     Type_Integer,
-    Type_Boolean
+    Type_Boolean,
+    Type_Color
   };
   return values;
 }
 
 inline const char * const *EnumNamesType() {
-  static const char * const names[9] = {
+  static const char * const names[10] = {
     "UInt3",
     "Vector3",
     "Vector2",
@@ -50,13 +52,14 @@ inline const char * const *EnumNamesType() {
     "Float",
     "Integer",
     "Boolean",
+    "Color",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameType(Type e) {
-  if (flatbuffers::IsOutRange(e, Type_UInt3, Type_Boolean)) return "";
+  if (flatbuffers::IsOutRange(e, Type_UInt3, Type_Color)) return "";
   const size_t index = static_cast<size_t>(e) - static_cast<size_t>(Type_UInt3);
   return EnumNamesType()[index];
 }
@@ -64,10 +67,14 @@ inline const char *EnumNameType(Type e) {
 struct RPCHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef RPCHeaderBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_METHODNAME = 4,
-    VT_PARAMETERTYPES = 6,
-    VT_RESULTTYPES = 8
+    VT_MANAGERNAME = 4,
+    VT_METHODNAME = 6,
+    VT_PARAMETERTYPES = 8,
+    VT_RESULTTYPES = 10
   };
+  const flatbuffers::String *managerName() const {
+    return GetPointer<const flatbuffers::String *>(VT_MANAGERNAME);
+  }
   const flatbuffers::String *methodName() const {
     return GetPointer<const flatbuffers::String *>(VT_METHODNAME);
   }
@@ -79,6 +86,8 @@ struct RPCHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_MANAGERNAME) &&
+           verifier.VerifyString(managerName()) &&
            VerifyOffset(verifier, VT_METHODNAME) &&
            verifier.VerifyString(methodName()) &&
            VerifyOffset(verifier, VT_PARAMETERTYPES) &&
@@ -93,6 +102,9 @@ struct RPCHeaderBuilder {
   typedef RPCHeader Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_managerName(flatbuffers::Offset<flatbuffers::String> managerName) {
+    fbb_.AddOffset(RPCHeader::VT_MANAGERNAME, managerName);
+  }
   void add_methodName(flatbuffers::Offset<flatbuffers::String> methodName) {
     fbb_.AddOffset(RPCHeader::VT_METHODNAME, methodName);
   }
@@ -116,6 +128,7 @@ struct RPCHeaderBuilder {
 
 inline flatbuffers::Offset<RPCHeader> CreateRPCHeader(
     flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> managerName = 0,
     flatbuffers::Offset<flatbuffers::String> methodName = 0,
     flatbuffers::Offset<flatbuffers::Vector<int8_t>> parameterTypes = 0,
     flatbuffers::Offset<flatbuffers::Vector<int8_t>> resultTypes = 0) {
@@ -123,19 +136,23 @@ inline flatbuffers::Offset<RPCHeader> CreateRPCHeader(
   builder_.add_resultTypes(resultTypes);
   builder_.add_parameterTypes(parameterTypes);
   builder_.add_methodName(methodName);
+  builder_.add_managerName(managerName);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<RPCHeader> CreateRPCHeaderDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
+    const char *managerName = nullptr,
     const char *methodName = nullptr,
     const std::vector<int8_t> *parameterTypes = nullptr,
     const std::vector<int8_t> *resultTypes = nullptr) {
+  auto managerName__ = managerName ? _fbb.CreateString(managerName) : 0;
   auto methodName__ = methodName ? _fbb.CreateString(methodName) : 0;
   auto parameterTypes__ = parameterTypes ? _fbb.CreateVector<int8_t>(*parameterTypes) : 0;
   auto resultTypes__ = resultTypes ? _fbb.CreateVector<int8_t>(*resultTypes) : 0;
   return WildRPC::CreateRPCHeader(
       _fbb,
+      managerName__,
       methodName__,
       parameterTypes__,
       resultTypes__);

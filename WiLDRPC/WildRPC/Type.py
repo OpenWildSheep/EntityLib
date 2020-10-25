@@ -11,4 +11,5 @@ class Type(object):
     Float = 6
     Integer = 7
     Boolean = 8
+    Color = 9
 

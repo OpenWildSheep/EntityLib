@@ -15,7 +15,9 @@ import WildRPC.Vector3
 import WildRPC.Vector2
 import WildRPC.Integer
 import WildRPC.Float
-import WildRPC.Boolean	
+import WildRPC.Boolean
+import WildRPC.Color
+import WildRPC.Position	
 
 
 Type_UInt3 = 1
@@ -26,6 +28,7 @@ Type_Position = 5
 Type_Float = 6
 Type_Integer = 7
 Type_Boolean = 8
+Type_Color = 9
 
 def BuildHeader(_RPCFunctionName):
 	builder = flatbuffers.Builder(0)
@@ -37,13 +40,14 @@ def BuildHeader(_RPCFunctionName):
 	result = builder.Bytes[builder.Head():]
 	return result
 
-def BuildHeaderWithParameters(_RPCFunctionName, parametersTypes, resultTypes):
+def BuildHeaderWithParameters(_managerName, _methodName, parametersTypes, resultTypes):
 	nbParameterTypes = len(parametersTypes)
 	nbResultTypes = len(resultTypes)
 
 	builder = flatbuffers.Builder(0)
 
-	methodName = builder.CreateString(_RPCFunctionName)
+	managerName = builder.CreateString(_managerName)
+	methodName = builder.CreateString(_methodName)
 	
 	WildRPC.RPCHeader.RPCHeaderStartParameterTypesVector(builder, nbParameterTypes)
 	for type in reversed(parametersTypes):
@@ -57,6 +61,7 @@ def BuildHeaderWithParameters(_RPCFunctionName, parametersTypes, resultTypes):
 	result = builder.EndVector(nbResultTypes)
 
 	WildRPC.RPCHeader.RPCHeaderStart(builder)
+	WildRPC.RPCHeader.RPCHeaderAddManagerName(builder, managerName)
 	WildRPC.RPCHeader.RPCHeaderAddMethodName(builder, methodName)
 	WildRPC.RPCHeader.RPCHeaderAddParameterTypes(builder, params)
 	WildRPC.RPCHeader.RPCHeaderAddResultTypes(builder, result)
@@ -65,7 +70,7 @@ def BuildHeaderWithParameters(_RPCFunctionName, parametersTypes, resultTypes):
 	builder.FinishSizePrefixed(gen_header)
 	
 	result = builder.Bytes[builder.Head():]
-	return result
+	return result, parametersTypes, resultTypes
 
 def DecodeByteArray(type, bytes):
 	return 0
@@ -105,6 +110,56 @@ def BuildFloat(f):
 	flt = WildRPC.Float.FloatEnd(builder)
 
 	builder.FinishSizePrefixed(flt)
+	
+	result = builder.Bytes[builder.Head():]
+	return result
+
+def BuildPosition(wcx, wcy, x, y, z):
+	builder = flatbuffers.Builder(0)
+
+	WildRPC.Vector3.Vector3Start(builder)
+	WildRPC.Vector3.Vector3AddX(builder, x)
+	WildRPC.Vector3.Vector3AddY(builder, y)
+	WildRPC.Vector3.Vector3AddZ(builder, z)
+	lps = WildRPC.Vector3.Vector3End(builder)
+
+	WildRPC.Position.PositionStart(builder)
+	WildRPC.Position.PositionAddWorldCellX(builder, wcx)
+	WildRPC.Position.PositionAddWorldCellY(builder, wcy)
+	WildRPC.Position.PositionAddLocalPosition(builder, lps)
+	flt = WildRPC.Position.PositionEnd(builder)
+
+	builder.FinishSizePrefixed(flt)
+	
+	result = builder.Bytes[builder.Head():]
+	return result
+
+def BuildColor(r, g, b, a):
+	builder = flatbuffers.Builder(0)
+
+	WildRPC.Color.ColorStart(builder)
+	WildRPC.Color.ColorAddR(builder, r)
+	WildRPC.Color.ColorAddG(builder, g)
+	WildRPC.Color.ColorAddB(builder, b)
+	WildRPC.Color.ColorAddA(builder, a)
+	color = WildRPC.Color.ColorEnd(builder)
+
+	builder.FinishSizePrefixed(color)
+	
+	result = builder.Bytes[builder.Head():]
+	return result
+
+def BuildQuat(x, y, z, w):
+	builder = flatbuffers.Builder(0)
+
+	WildRPC.Quat.QuatStart(builder)
+	WildRPC.Quat.QuatAddX(builder, x)
+	WildRPC.Quat.QuatAddY(builder, y)
+	WildRPC.Quat.QuatAddZ(builder, z)
+	WildRPC.Quat.QuatAddW(builder, w)
+	quat = WildRPC.Quat.QuatEnd(builder)
+
+	builder.FinishSizePrefixed(quat)
 	
 	result = builder.Bytes[builder.Head():]
 	return result

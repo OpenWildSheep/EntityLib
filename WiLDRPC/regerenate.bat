@@ -16,6 +16,9 @@
 "../../External/FlatBuffers/Release/flatc" --cpp Quat.fbs
 "../../External/FlatBuffers/Release/flatc" --python Quat.fbs
 
+"../../External/FlatBuffers/Release/flatc" --cpp Color.fbs
+"../../External/FlatBuffers/Release/flatc" --python Color.fbs
+
 "../../External/FlatBuffers/Release/flatc" --cpp UInt3.fbs
 "../../External/FlatBuffers/Release/flatc" --python UInt3.fbs
 

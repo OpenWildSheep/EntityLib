@@ -211,13 +211,13 @@ def BuildParamQuat(params):
 	return BuildQuat(params[0], params[1], params[2], params[3])
 
 def BuildParamFloat(params):
-	return BuildFloat(params[0])
+	return BuildFloat(params)
 
 def BuildParamInteger(params):
-	return BuildInteger(params[0])
+	return BuildInteger(params)
 
 def BuildParamBoolean(params):
-	return BuildBoolean(params[0])
+	return BuildBoolean(params)
 
 parameterBuilders = {
 	    Type_Float: BuildParamFloat,
@@ -257,7 +257,7 @@ class RPCMethod:
 
 		self.socket.sendall(outByteStream)
 
-		data = self.socket.recv(1024)
+		data = self.socket.recv(4096)
 
 		protocolError = data[0]
 		applicationError = data[1]

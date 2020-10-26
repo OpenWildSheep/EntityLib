@@ -24,9 +24,9 @@ PORT = 9387         # The port used by the server
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
 
-    rpcMethd = rpc.RPCMethod(s, "CameraManager", "RPC_SetCamera", [rpc.Type_Position, rpc.Type_Quat, rpc.Type_Float], [rpc.Type_Integer])
+    rpcMethod = rpc.RPCMethod(s, "CameraManager", "RPC_SetCamera", [rpc.Type_Position, rpc.Type_Quat, rpc.Type_Float], [rpc.Type_Integer])
     results = []
-    errors = rpcMethd.Invoke([[32768, 32768, 1.0, -150.0, 100.0], [0.0, 0.0, 0.0, 1.0], [120.0]], results)
+    errors = rpcMethod.Invoke([[32768, 32768, 1.0, -150.0, 100.0], [0.0, 0.0, 0.0, 1.0], 120.0], results)
 
     print("Errors = ", errors)
     print("Results = ", results)

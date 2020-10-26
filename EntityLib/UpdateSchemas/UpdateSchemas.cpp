@@ -11,11 +11,11 @@ try
         return EXIT_FAILURE;
     }
 
-    std::experimental::filesystem::path sceneSchemaPath = argv[1];
-    sceneSchemaPath /= "WildPipeline/Schema/Scene-schema.json";
-    sceneSchemaPath = std::experimental::filesystem::canonical(sceneSchemaPath);
+    std::experimental::filesystem::path mergedCompSchemaPath = argv[1];
+    mergedCompSchemaPath /= "WildPipeline/Schema/MergedComponents.json";
+    mergedCompSchemaPath = std::experimental::filesystem::canonical(mergedCompSchemaPath);
     char editCmd[1024];
-    sprintf_s(editCmd, sizeof(editCmd), R"(p4 edit "%ls")", sceneSchemaPath.c_str());
+    sprintf_s(editCmd, sizeof(editCmd), R"(p4 edit "%ls")", mergedCompSchemaPath.c_str());
 
     system(editCmd);
 

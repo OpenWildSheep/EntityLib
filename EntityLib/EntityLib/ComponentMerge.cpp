@@ -56,16 +56,20 @@ void updateRefLinks(std::string const& _sourceFile, json& _node)
 
 json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
 {
-    json runtimeCompSch = loadJsonFile(_toolsDir / "WildPipeline/Schema/RuntimeComponents.json");
-    json editionCompSch = loadJsonFile(_toolsDir / "WildPipeline/Schema/EditionComponents.json");
+    json const runtimeCmps = loadJsonFile(_toolsDir / "WildPipeline/Schema/RuntimeComponents.json");
+    json const editionCmps = loadJsonFile(_toolsDir / "WildPipeline/Schema/EditionComponents.json");
     auto sceneSchemaPath = _toolsDir / sceneSchemaLocation;
-    json sceneSch = loadJsonFile(sceneSchemaPath);
-    json dependencies = loadJsonFile(_toolsDir / "WildPipeline/Schema/Dependencies.json");
+    json const sceneSch = loadJsonFile(sceneSchemaPath);
+    json const dependencies = loadJsonFile(_toolsDir / "WildPipeline/Schema/Dependencies.json");
 
-    runtimeCompSch = runtimeCompSch["definitions"];
-    editionCompSch = editionCompSch["definitions"];
+    json const& runtimeCompSch = runtimeCmps.at("definitions");
+    json const& editionCompSch = editionCmps.at("definitions");
 
-    auto&& compList = sceneSch["definitions"]["Component"]["oneOf"];
+    json mergedCompSch;
+    mergedCompSch["$ref"] = "#/definitions/Component";
+    mergedCompSch["$schema"] = "http://json-schema.org/draft-07/schema#";
+
+    auto&& compList = mergedCompSch["definitions"]["Component"]["oneOf"];
     compList = json();
 
     // Looking for components with same name and merge them
@@ -95,7 +99,7 @@ json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
             mergedComponent["properties"] = std::move(mergedProperties);
 
             // Add the new schema of the merged component in Scene-schema.json
-            sceneSch["definitions"][name] = std::move(mergedComponent);
+            mergedCompSch["definitions"][name] = std::move(mergedComponent);
 
             // Merge the meta data
             json mergedMetas = runtimeCompSch[name].value("meta", json());
@@ -152,17 +156,18 @@ json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
         auto name = dep["className"].get<std::string>();
         addComponent(name, "RuntimeComponents.json", runtimeOnlyMeta);
     }
-    return sceneSch;
+    return mergedCompSch;
 }
 
 void Ent::updateComponents(std::filesystem::path const& _toolsDir)
 {
     json sceneSch = mergeComponents(_toolsDir);
-    auto sceneSchemaPath = _toolsDir / sceneSchemaLocation;
-    std::ofstream file(sceneSchemaPath);
+    char const* mergedComponentsSchemaLocation = "WildPipeline/Schema/MergedComponents.json";
+    auto mergedSchemaPath = _toolsDir / mergedComponentsSchemaLocation;
+    std::ofstream file(mergedSchemaPath);
     if (not file.is_open())
     {
-        throw std::runtime_error("Can't open file for write: " + sceneSchemaPath.u8string());
+        throw std::runtime_error("Can't open file for write: " + mergedSchemaPath.u8string());
     }
     file << sceneSch.dump(4);
 }

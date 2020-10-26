@@ -41,6 +41,7 @@ def BuildHeader(_RPCFunctionName):
 	return result
 
 def BuildHeaderWithParameters(_managerName, _methodName, parametersTypes, resultTypes):
+
 	nbParameterTypes = len(parametersTypes)
 	nbResultTypes = len(resultTypes)
 
@@ -200,3 +201,79 @@ def Decode(type, bytes):
 	func = decoders.get(type, "nothing")
 	# Execute the function
 	return func(dataView[4:]), prefixedSize
+
+# -------------------
+
+def BuildParamPosition(params):
+	return BuildPosition(params[0], params[1], params[2], params[3], params[4])
+
+def BuildParamQuat(params):
+	return BuildQuat(params[0], params[1], params[2], params[3])
+
+def BuildParamFloat(params):
+	return BuildFloat(params[0])
+
+def BuildParamInteger(params):
+	return BuildInteger(params[0])
+
+def BuildParamBoolean(params):
+	return BuildBoolean(params[0])
+
+parameterBuilders = {
+	    Type_Float: BuildParamFloat,
+        Type_Integer: BuildParamInteger,
+        Type_Boolean: BuildParamBoolean,
+        Type_Position: BuildParamPosition,
+        Type_Quat: BuildParamQuat
+}
+
+def BuildParam(type, params):
+	func = parameterBuilders.get(type, "nothing")
+	return func(params)
+
+class RPCMethod:
+
+	managerName = ""
+	methodName = ""
+	parameterTypes = []
+	resultTypes = []
+
+	def __init__(self, socket, managerName, methodName, parameterTypes, resultTypes):
+		self.socket = socket
+		self.managerName = managerName
+		self.methodName = methodName
+		self.parameterTypes = parameterTypes
+		self.resultTypes = resultTypes
+
+	def Invoke(self, params, results):
+		idx = 0
+		header = BuildHeaderWithParameters(self.managerName, self.methodName, self.parameterTypes, self.resultTypes)
+		outByteStream = header[0]
+		for prm in params:
+			paramType = self.parameterTypes[idx]
+			bts = BuildParam(paramType, prm)
+			outByteStream += bts
+			idx += 1
+
+		self.socket.sendall(outByteStream)
+
+		data = self.socket.recv(1024)
+
+		protocolError = data[0]
+		applicationError = data[1]
+
+		if protocolError != 0:
+			print("Protocol Error = ", protocolError)
+		else:
+			if applicationError != 0:
+				print("Application Error", applicationError)
+
+			dataView = memoryview(data)
+			dataViewReadIndex = 2
+			for resultType in self.resultTypes:
+				result = Decode(resultType, dataView[dataViewReadIndex:])
+				dataViewReadIndex = dataViewReadIndex + result[1] + 4
+
+				results.append(result[0])
+
+		return protocolError, applicationError

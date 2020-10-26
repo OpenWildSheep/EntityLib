@@ -30,6 +30,17 @@ Type_Integer = 7
 Type_Boolean = 8
 Type_Color = 9
 
+RPCProtocolErrors = [
+	"No Error",
+	"Maximum buffer size exceeded",
+	"RPC Header is Missing",
+	"Manager Name or Method is Missing",
+	"Parameter or Result Types are Missing",
+	"Manager Class could not be Found",
+	"Manager Method could not be Found",
+	"Received Types do not match with Manager Method's types"
+	]
+
 def BuildHeader(_RPCFunctionName):
 	builder = flatbuffers.Builder(0)
 	methodName = builder.CreateString(_RPCFunctionName);
@@ -263,7 +274,7 @@ class RPCMethod:
 		applicationError = data[1]
 
 		if protocolError != 0:
-			print("Protocol Error = ", protocolError)
+			print("Protocol ERROR: ", RPCProtocolErrors[protocolError])
 		else:
 			if applicationError != 0:
 				print("Application Error", applicationError)

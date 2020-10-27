@@ -19,7 +19,6 @@ import WildRPC.Boolean
 import WildRPC.Color
 import WildRPC.Position	
 
-
 Type_UInt3 = 1
 Type_Vector3 = 2
 Type_Vector2 = 3
@@ -87,7 +86,17 @@ def BuildHeaderWithParameters(_managerName, _methodName, parametersTypes, result
 def DecodeByteArray(type, bytes):
 	return 0
 
+def BuildVector2(x, y):
+	builder = flatbuffers.Builder(0)
 
+	WildRPC.Vector2.Vector2Start(builder)
+	WildRPC.Vector2.Vector2AddX(builder, x)
+	WildRPC.Vector2.Vector2AddY(builder, y)
+	vector2 = WildRPC.Vector2.Vector2End(builder)
+	builder.FinishSizePrefixed(vector2)
+	
+	result = builder.Bytes[builder.Head():]
+	return result
 
 def BuildVector3(x, y, z):
 	builder = flatbuffers.Builder(0)
@@ -98,6 +107,31 @@ def BuildVector3(x, y, z):
 	WildRPC.Vector3.Vector3AddZ(builder, z)
 	vector3 = WildRPC.Vector3.Vector3End(builder)
 	builder.FinishSizePrefixed(vector3)
+	
+	result = builder.Bytes[builder.Head():]
+	return result
+
+def BuildUint3(x, y, z):
+	builder = flatbuffers.Builder(0)
+
+	WildRPC.UInt3.UInt3Start(builder)
+	WildRPC.UInt3.UInt3AddX(builder, x)
+	WildRPC.UInt3.UInt3AddY(builder, y)
+	WildRPC.UInt3.UInt3AddZ(builder, z)
+	uint3 = WildRPC.UInt3.UInt3End(builder)
+	builder.FinishSizePrefixed(uint3)
+	
+	result = builder.Bytes[builder.Head():]
+	return result
+
+def BuildBoolean(b):
+	builder = flatbuffers.Builder(0)
+
+	WildRPC.Boolean.BooleanStart(builder)
+	WildRPC.Boolean.BooleanAddValue(builder, b)
+	boolean = WildRPC.Boolean.BooleanEnd(builder)
+
+	builder.FinishSizePrefixed(boolean)
 	
 	result = builder.Bytes[builder.Head():]
 	return result
@@ -197,11 +231,41 @@ def DecodeInteger(bytes):
 def DecodeBool(bytes):
 	RPCBoolean = WildRPC.Boolean.Boolean.GetRootAsBoolean(bytes, 0)
 	return RPCBoolean.Value()
+
+def DecodePosition(bytes):
+	RPCPosition = WildRPC.Position.Position.GetRootAsPosition(bytes, 0)
+	return RPCPosition.Value()
+ 
+def DecodeQuat(bytes):
+	RPCQuat = WildRPC.Quat.Quat.GetRootAsQuat(bytes, 0)
+	return RPCQuat.Value()
+ 
+def DecodeColor(bytes):
+	RPCColor = WildRPC.Color.Color.GetRootAsColor(bytes, 0)
+	return RPCColor.Value()
+
+def DecodeVector3(bytes):
+	RPCVector3 = WildRPC.Vector3.Vector3.GetRootAsVector3(bytes, 0)
+	return RPCVector3.Value()
+ 
+def DecodeVector2(bytes):
+	RPCVector2 = WildRPC.Vector2.Vector2.GetRootAsVector2(bytes, 0)
+	return RPCVector2.Value()
+ 
+def DecodeUInt3(bytes):
+	RPCUInt3 = WildRPC.UInt3.UInt3.GetRootAsUInt3(bytes, 0)
+	return RPCUInt3.Value()
  
 decoders = {
         Type_Float: DecodeFloat,
         Type_Integer: DecodeInteger,
         Type_Boolean: DecodeBool
+        Type_Position: DecodePosition,
+        Type_Quat: DecodeQuat,
+        Type_Color: DecodeColor,
+        Type_Vector3: DecodeVector3,
+        Type_Vector2: DecodeVector2,
+        Type_UInt3: DecodeUInt3,
     }
  
 def Decode(type, bytes):
@@ -221,6 +285,9 @@ def BuildParamPosition(params):
 def BuildParamQuat(params):
 	return BuildQuat(params[0], params[1], params[2], params[3])
 
+def BuildParamColor(params):
+	return BuildColor(params[0], params[1], params[2], params[3])
+
 def BuildParamFloat(params):
 	return BuildFloat(params)
 
@@ -230,12 +297,25 @@ def BuildParamInteger(params):
 def BuildParamBoolean(params):
 	return BuildBoolean(params)
 
+def BuildVector3(params):
+	return BuildVector3(params[0], params[1], params[2])
+
+def BuildVector2(params):
+	return BuildVector2(params[0], params[1])
+
+def BuildUInt3(params):
+	return BuildUInt3(params[0], params[1], params[2])	
+
 parameterBuilders = {
 	    Type_Float: BuildParamFloat,
         Type_Integer: BuildParamInteger,
         Type_Boolean: BuildParamBoolean,
         Type_Position: BuildParamPosition,
-        Type_Quat: BuildParamQuat
+        Type_Quat: BuildParamQuat,
+        Type_Color: BuildParamColor,
+        Type_Vector3: BuildParamVector3,
+        Type_Vector2: BuildParamVector2,
+        Type_UInt3: BuildParamUInt3,
 }
 
 def BuildParam(type, params):

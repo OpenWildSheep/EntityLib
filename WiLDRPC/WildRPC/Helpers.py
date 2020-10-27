@@ -259,7 +259,7 @@ def DecodeUInt3(bytes):
 decoders = {
         Type_Float: DecodeFloat,
         Type_Integer: DecodeInteger,
-        Type_Boolean: DecodeBool
+        Type_Boolean: DecodeBool,
         Type_Position: DecodePosition,
         Type_Quat: DecodeQuat,
         Type_Color: DecodeColor,
@@ -297,13 +297,13 @@ def BuildParamInteger(params):
 def BuildParamBoolean(params):
 	return BuildBoolean(params)
 
-def BuildVector3(params):
+def BuildParamVector3(params):
 	return BuildVector3(params[0], params[1], params[2])
 
-def BuildVector2(params):
+def BuildParamVector2(params):
 	return BuildVector2(params[0], params[1])
 
-def BuildUInt3(params):
+def BuildParamUInt3(params):
 	return BuildUInt3(params[0], params[1], params[2])	
 
 parameterBuilders = {

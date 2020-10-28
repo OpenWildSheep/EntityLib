@@ -86,13 +86,13 @@ struct RPCHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_MANAGERNAME) &&
+           VerifyOffsetRequired(verifier, VT_MANAGERNAME) &&
            verifier.VerifyString(managerName()) &&
-           VerifyOffset(verifier, VT_METHODNAME) &&
+           VerifyOffsetRequired(verifier, VT_METHODNAME) &&
            verifier.VerifyString(methodName()) &&
-           VerifyOffset(verifier, VT_PARAMETERTYPES) &&
+           VerifyOffsetRequired(verifier, VT_PARAMETERTYPES) &&
            verifier.VerifyVector(parameterTypes()) &&
-           VerifyOffset(verifier, VT_RESULTTYPES) &&
+           VerifyOffsetRequired(verifier, VT_RESULTTYPES) &&
            verifier.VerifyVector(resultTypes()) &&
            verifier.EndTable();
   }
@@ -122,6 +122,10 @@ struct RPCHeaderBuilder {
   flatbuffers::Offset<RPCHeader> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<RPCHeader>(end);
+    fbb_.Required(o, RPCHeader::VT_MANAGERNAME);
+    fbb_.Required(o, RPCHeader::VT_METHODNAME);
+    fbb_.Required(o, RPCHeader::VT_PARAMETERTYPES);
+    fbb_.Required(o, RPCHeader::VT_RESULTTYPES);
     return o;
   }
 };

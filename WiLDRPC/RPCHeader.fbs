@@ -6,10 +6,10 @@ enum Type : byte { UInt3 = 1, Vector3, Vector2, Quat, Position, Float, Integer, 
 
 table RPCHeader
 {
-	managerName:string;
-	methodName:string;
-	parameterTypes:[Type];
-	resultTypes:[Type];
+	managerName:string (required);
+	methodName:string (required);
+	parameterTypes:[Type] (required);
+	resultTypes:[Type] (required);
 }
 
 root_type RPCHeader;

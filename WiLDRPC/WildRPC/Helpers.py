@@ -40,6 +40,11 @@ RPCProtocolErrors = [
 	"Received Types do not match with Manager Method's types"
 	]
 
+# -----------------------------------------------
+
+
+# -----------------------------------------------
+
 def BuildHeader(_RPCFunctionName):
 	builder = flatbuffers.Builder(0)
 	methodName = builder.CreateString(_RPCFunctionName);
@@ -234,27 +239,34 @@ def DecodeBool(bytes):
 
 def DecodePosition(bytes):
 	RPCPosition = WildRPC.Position.Position.GetRootAsPosition(bytes, 0)
-	return RPCPosition.Value()
+	localPos = RPCPosition.LocalPosition();
+	result = [RPCPosition.WorldCellX(), RPCPosition.WorldCellY(), localPos.X(), localPos.Y(), localPos.Z()]
+	return result
  
 def DecodeQuat(bytes):
 	RPCQuat = WildRPC.Quat.Quat.GetRootAsQuat(bytes, 0)
-	return RPCQuat.Value()
+	result = [RPCQuat.X(), RPCQuat.Y(), RPCQuat.Z(), RPCQuat.W()]
+	return result
  
 def DecodeColor(bytes):
 	RPCColor = WildRPC.Color.Color.GetRootAsColor(bytes, 0)
-	return RPCColor.Value()
+	result = [RPCColor.R(), RPCColor.G(), RPCColor.B(), RPCColor.A()]
+	return result
 
 def DecodeVector3(bytes):
 	RPCVector3 = WildRPC.Vector3.Vector3.GetRootAsVector3(bytes, 0)
-	return RPCVector3.Value()
+	result = [RPCVector3.X(), RPCVector3.Y(), RPCVector3.Z()]
+	return result
  
 def DecodeVector2(bytes):
 	RPCVector2 = WildRPC.Vector2.Vector2.GetRootAsVector2(bytes, 0)
-	return RPCVector2.Value()
+	result = [RPCVector2.X(), RPCVector2.Y()]
+	return result
  
 def DecodeUInt3(bytes):
 	RPCUInt3 = WildRPC.UInt3.UInt3.GetRootAsUInt3(bytes, 0)
-	return RPCUInt3.Value()
+	result = [RPCUInt3.X(), RPCUInt3.Y(), RPCUInt3.Z()]
+	return result
  
 decoders = {
         Type_Float: DecodeFloat,

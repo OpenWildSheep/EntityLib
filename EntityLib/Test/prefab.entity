@@ -1,5 +1,13 @@
 {
-	"Thumbnail": "TestThumbnail",
+    "Thumbnail": "TestThumbnail",
+    "ActorStates":[
+        {
+            "className": "ActionChosen",
+            "classData":{
+                "ExitRequired": true
+            }
+        }
+    ],
     "Components": [{
             "Data": {
                 "Matrix": [

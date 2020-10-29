@@ -33,6 +33,7 @@ static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _s
 
 namespace Ent
 {
+    char const* actorStatesSchemaName = "file://Scene-schema.json#/definitions/ActorStates";
     char const* colorSchemaName = "file://RuntimeComponents.json#/definitions/Color";
     static Ent::Node makeDefaultColorField(EntityLib const& _entlib)
     {
@@ -55,21 +56,21 @@ namespace Ent
         toolsDir = getAbsolutePath(rootPath / "Tools");
         auto schemaPath = toolsDir / "WildPipeline/Schema";
 
-        json schemaDocument = _doMergeComponents ?
-                                  mergeComponents(toolsDir) :
-                                  loadJsonFile(toolsDir / "WildPipeline/Schema/Scene-schema.json");
-
         SchemaLoader loader(toolsDir, schemaPath);
+
+        if (_doMergeComponents)
+        {
+            // mergeComponents create the content of the "MergedComponents.json" file
+            json mergedComps = mergeComponents(toolsDir);
+            loader.addInCache("MergedComponents.json", std::move(mergedComps));
+        }
+
+        json schemaDocument = loadJsonFile(toolsDir / "WildPipeline/Schema/Scene-schema.json");
 
         loader.readSchema(&schema.schema, "Scene-schema.json", schemaDocument, schemaDocument);
 
-        auto& compList = schema.schema.root->properties["Objects"]
-                             ->singularItems
-                             ->get() // get the Object
-                             .properties["Components"]
-                             ->singularItems
-                             ->get() // get the Component
-                             .oneOf;
+        auto&& compList =
+            schema.schema.allDefinitions["file://MergedComponents.json#/definitions/Component"].oneOf;
 
         for (SubschemaRef& comp : *compList)
         {
@@ -767,6 +768,7 @@ namespace Ent
         Override<std::string> _name,
         std::map<std::string, Component> _components,
         std::unique_ptr<SubSceneComponent> _subSceneComponent,
+        Node _actorStates,
         Node _color,
         Override<std::string> _thumbnail,
         Override<std::string> _instanceOf,
@@ -776,6 +778,7 @@ namespace Ent
         , name(std::move(_name))
         , components(std::move(_components))
         , subSceneComponent(std::move(_subSceneComponent))
+        , actorStates(std::move(_actorStates))
         , color(std::move(_color))
         , thumbnail(std::move(_thumbnail))
         , instanceOf(std::move(_instanceOf))
@@ -804,6 +807,7 @@ namespace Ent
             name,
             std::move(instComponents),
             std::move(instSubSceneComponent),
+            actorStates,
             color,
             thumbnail,
             instanceOf,
@@ -978,6 +982,7 @@ namespace Ent
             name.makeInstanceOf(),
             std::move(instComponents),
             std::move(instSubSceneComponent),
+            actorStates.makeInstanceOf(),
             color.makeInstanceOf(),
             thumbnail.makeInstanceOf(),
             instanceOf,
@@ -1713,6 +1718,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     Ent::Override<Ent::ActivationLevel> ovMaxActivationLevel =
         superActivationLevel.makeOverridedInstanceOf(maxActivationLevel);
 
+    // Color
     Ent::Node ovColor = Ent::makeDefaultColorField(_entlib);
     if (_entNode.contains("Color"))
     {
@@ -1727,6 +1733,23 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     else
     {
         ovColor = superEntity->getColorValue().makeInstanceOf();
+    }
+
+    // ActorStates
+    Ent::Subschema const& actorStatesSchema =
+        _entlib.schema.schema.allDefinitions.at(Ent::actorStatesSchemaName);
+    Ent::Node ovActorStates(Ent::Array{}, &actorStatesSchema);
+    if (_entNode.contains("ActorStates"))
+    {
+        ovActorStates = loadNode(
+            actorStatesSchema,
+            _entNode.at("ActorStates"),
+            _superEntityFromParentEntity != nullptr ? &_superEntityFromParentEntity->getActorStates() :
+                                                      nullptr);
+    }
+    else
+    {
+        ovActorStates = superEntity->getActorStates().makeInstanceOf();
     }
 
     std::map<std::string, Ent::Component> components;
@@ -1826,6 +1849,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         std::move(ovName),
         std::move(components),
         std::move(subSceneComponent),
+        std::move(ovActorStates),
         std::move(ovColor),
         std::move(ovThumbnail),
         std::move(ovInstanceOf),
@@ -2088,6 +2112,7 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
         getNameValue().detach().makeOverridedInstanceOf(std::string(getName()) + "_detached"),
         std::move(detComponents),
         std::move(detSubSceneComponent),
+        actorStates.detach(),
         std::move(detachedColor),
         getThumbnailValue().detach(),
         Override<std::string>{},
@@ -2117,6 +2142,7 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanc
         templ->getNameValue().makeInstanceOf(),
         components,
         nullptr,
+        templ->getActorStates().makeInstanceOf(),
         templ->getColorValue().makeInstanceOf(),
         templ->getThumbnailValue().makeInstanceOf(),
         templ->getInstanceOfValue().makeOverridedInstanceOf(_instanceOf),

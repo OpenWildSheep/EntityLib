@@ -13,6 +13,7 @@ import flatbuffers
 import WildRPC.RPCHeader
 import WildRPC.Vector3
 import WildRPC.Vector2
+import WildRPC.UInt3
 import WildRPC.Integer
 import WildRPC.Float
 import WildRPC.Boolean
@@ -33,11 +34,11 @@ RPCProtocolErrors = [
 	"No Error",
 	"Maximum buffer size exceeded",
 	"RPC Header is Missing",
-	"Manager Name or Method is Missing",
-	"Parameter or Result Types are Missing",
 	"Manager Class could not be Found",
 	"Manager Method could not be Found",
-	"Received Types do not match with Manager Method's types"
+	"Manager Method is not Valid",
+	"Received Types do not match with Manager Method's types",
+	"Send Buffer was too small for Result"
 	]
 
 # -----------------------------------------------
@@ -116,7 +117,7 @@ def BuildVector3(x, y, z):
 	result = builder.Bytes[builder.Head():]
 	return result
 
-def BuildUint3(x, y, z):
+def BuildUInt3(x, y, z):
 	builder = flatbuffers.Builder(0)
 
 	WildRPC.UInt3.UInt3Start(builder)

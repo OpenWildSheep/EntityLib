@@ -20,15 +20,15 @@ import WildRPC.Boolean
 import WildRPC.Color
 import WildRPC.Position	
 
-Type_UInt3 = 1
-Type_Vector3 = 2
+Type_Boolean = 0
+Type_Integer = 1
+Type_Float = 2
 Type_Vector2 = 3
-Type_Quat = 4
-Type_Position = 5
-Type_Float = 6
-Type_Integer = 7
-Type_Boolean = 8
-Type_Color = 9
+Type_UInt3 = 4
+Type_Vector3 = 5
+Type_Quat = 6
+Type_Color = 7
+Type_Position = 8
 
 RPCProtocolErrors = [
 	"No Error",

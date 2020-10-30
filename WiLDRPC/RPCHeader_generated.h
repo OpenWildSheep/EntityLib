@@ -14,53 +14,53 @@ struct RPCHeader;
 struct RPCHeaderBuilder;
 
 enum Type {
-  Type_UInt3 = 1,
-  Type_Vector3 = 2,
+  Type_Boolean = 0,
+  Type_Integer = 1,
+  Type_Float = 2,
   Type_Vector2 = 3,
-  Type_Quat = 4,
-  Type_Position = 5,
-  Type_Float = 6,
-  Type_Integer = 7,
-  Type_Boolean = 8,
-  Type_Color = 9,
-  Type_MIN = Type_UInt3,
-  Type_MAX = Type_Color
+  Type_UInt3 = 4,
+  Type_Vector3 = 5,
+  Type_Quat = 6,
+  Type_Color = 7,
+  Type_Position = 8,
+  Type_MIN = Type_Boolean,
+  Type_MAX = Type_Position
 };
 
 inline const Type (&EnumValuesType())[9] {
   static const Type values[] = {
+    Type_Boolean,
+    Type_Integer,
+    Type_Float,
+    Type_Vector2,
     Type_UInt3,
     Type_Vector3,
-    Type_Vector2,
     Type_Quat,
-    Type_Position,
-    Type_Float,
-    Type_Integer,
-    Type_Boolean,
-    Type_Color
+    Type_Color,
+    Type_Position
   };
   return values;
 }
 
 inline const char * const *EnumNamesType() {
   static const char * const names[10] = {
+    "Boolean",
+    "Integer",
+    "Float",
+    "Vector2",
     "UInt3",
     "Vector3",
-    "Vector2",
     "Quat",
-    "Position",
-    "Float",
-    "Integer",
-    "Boolean",
     "Color",
+    "Position",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameType(Type e) {
-  if (flatbuffers::IsOutRange(e, Type_UInt3, Type_Color)) return "";
-  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(Type_UInt3);
+  if (flatbuffers::IsOutRange(e, Type_Boolean, Type_Position)) return "";
+  const size_t index = static_cast<size_t>(e);
   return EnumNamesType()[index];
 }
 

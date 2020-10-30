@@ -3,13 +3,13 @@
 # namespace: WildRPC
 
 class Type(object):
-    UInt3 = 1
-    Vector3 = 2
+    Boolean = 0
+    Integer = 1
+    Float = 2
     Vector2 = 3
-    Quat = 4
-    Position = 5
-    Float = 6
-    Integer = 7
-    Boolean = 8
-    Color = 9
+    UInt3 = 4
+    Vector3 = 5
+    Quat = 6
+    Color = 7
+    Position = 8
 

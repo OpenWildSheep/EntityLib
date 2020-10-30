@@ -48,14 +48,16 @@ namespace Ent
         return Node{ Array{ nodes }, &colorSchema };
     }
 
-    EntityLib::EntityLib(std::filesystem::path _rootPath)
+    EntityLib::EntityLib(std::filesystem::path _rootPath, bool _doMergeComponents)
         : rootPath(std::move(_rootPath)) // Read schema and dependencies
     {
         rawdataPath = getAbsolutePath(rootPath / "RawData");
         toolsDir = getAbsolutePath(rootPath / "Tools");
         auto schemaPath = toolsDir / "WildPipeline/Schema";
 
-        json schemaDocument = mergeComponents(toolsDir);
+        json schemaDocument = _doMergeComponents ?
+                                  mergeComponents(toolsDir) :
+                                  loadJsonFile(toolsDir / "WildPipeline/Schema/Scene-schema.json");
 
         SchemaLoader loader(toolsDir, schemaPath);
 
@@ -1314,6 +1316,7 @@ static Ent::Node const emptyNode(Ent::Null(), nullptr);
 
 static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, Ent::Node const* _super)
 {
+    ENTLIB_ASSERT(_super == nullptr or &_nodeSchema == _super->getSchema());
     Ent::Node result;
 
     switch (_nodeSchema.type)
@@ -1476,15 +1479,28 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
         std::string const& typeField = meta.typeField;
         std::string const& dataField = meta.dataField;
         std::string dataType;
-        if (_data.count(typeField))
-            dataType = _data.at(typeField).get<std::string>();
-        else
+        if (_data.count(typeField) != 0)
         {
-            // We are making a new node without input data
-            // "back()" because the base type is at the end of the type list
-            // TODO : Loïc - Add in metadata the name of the default type
-            dataType =
-                _nodeSchema.oneOf->back()->properties.at(typeField).get().constValue->get<std::string>();
+            dataType = _data.at(typeField).get<std::string>();
+            if (_super != nullptr and dataType != _super->at(typeField.c_str())->getString())
+            {
+                _super = nullptr; // The datatype has changed. No more use the data from _super
+            }
+        }
+        else // No uniontype
+        {
+            if (_super != nullptr) // If no uniontype, use the one the template
+            {
+                dataType = _super->getUnionType();
+            }
+            else
+            {
+                // We are making a new node without input data
+                // "back()" because the base type is at the end of the type list
+                // TODO : Loïc - Add in metadata the name of the default type
+                dataType =
+                    _nodeSchema.oneOf->back()->properties.at(typeField).get().constValue->get<std::string>();
+            }
         }
         bool typeFound = false;
         for (Ent::SubschemaRef const& schemaTocheck : *_nodeSchema.oneOf)
@@ -1493,10 +1509,12 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                 schemaTocheck->properties.at(typeField).get().constValue->get<std::string>();
             if (schemaType == dataType)
             {
-                Ent::Node dataNode = loadNode(
-                    schemaTocheck.get(),
-                    _data,
-                    _super != nullptr ? _super->getUnionDataWrapper() : nullptr);
+                Ent::Node const* superUnionDataWrapper =
+                    _super != nullptr ? _super->getUnionDataWrapper() : nullptr;
+                ENTLIB_ASSERT(
+                    superUnionDataWrapper == nullptr
+                    or &schemaTocheck.get() == superUnionDataWrapper->getSchema());
+                Ent::Node dataNode = loadNode(schemaTocheck.get(), _data, superUnionDataWrapper);
                 Ent::Union un{};
                 un.schema = &_nodeSchema;
                 un.wrapper = nonstd::make_value<Ent::Node>(std::move(dataNode));

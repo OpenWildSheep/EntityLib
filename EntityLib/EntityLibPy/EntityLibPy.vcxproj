@@ -179,7 +179,7 @@
       <PreprocessorDefinitions>ENTLIB_STATIC;_DEBUG;_WINDOWS;_USRDLL;ENTITYLIBPY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -250,7 +250,7 @@
       <PreprocessorDefinitions>ENTLIB_STATIC;NDEBUG;_WINDOWS;_USRDLL;ENTITYLIBPY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -261,8 +261,10 @@
       <AdditionalDependencies>EntityLib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>for /f %%i in ('p4 -F %%clientRoot%% -ztag info') do set p4_root=%%i
-%p4_root%\Tools\Python37\python $(ProjectDir)stubgen_EntityLibPy.py</Command>
+      <Command>cd "$(ProjectDir)"
+for /f %%i in ('p4 -F %%clientRoot%% -ztag info') do set p4_root=%%i
+echo "%p4_root%\Tools\Python37\python.exe" "$(ProjectDir)stubgen_EntityLibPy.py"
+"%p4_root%\Tools\Python37\python.exe" "$(ProjectDir)stubgen_EntityLibPy.py"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>generate Python typing info stubs</Message>
@@ -279,7 +281,7 @@
       <PreprocessorDefinitions>ENTLIB_STATIC;NDEBUG;_WINDOWS;_USRDLL;ENTITYLIBPY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -301,7 +303,7 @@
       <PreprocessorDefinitions>ENTLIB_STATIC;NDEBUG;_WINDOWS;_USRDLL;ENTITYLIBPY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -19,7 +19,8 @@ print(sys.version)
 # change the working dir to this script's dir
 script_dir = os.path.dirname(__file__)
 os.chdir(script_dir)
-#print(os.getcwd())
+print("Current working dir:")
+print(os.getcwd())
 
 
 stubgen_path = os.path.abspath("../../../ExternalTools/Python37/stubgen/pybind11-stubgen.exe")
@@ -27,7 +28,7 @@ input_path = os.path.abspath("../x64/Release-3.7")	# the path to the EntityLibPy
 output_path = os.path.abspath("../x64")				# the path where stubgen will generate its output
 
 # we need to add the EntityLibPy module's directory to PYTHONPATH so that stubgen can access it
-os.environ["PYTHONPATH"] = f"{os.environ['PYTHONPATH']};{input_path}" if "PYTHONPATH" in os.environ else input_path
+os.environ["PYTHONPATH"] = f"{input_path};{os.environ['PYTHONPATH']}" if "PYTHONPATH" in os.environ else input_path
 subprocess.call(f"{stubgen_path} EntityLibPy -o {output_path}")
 print("stubgen done")
 

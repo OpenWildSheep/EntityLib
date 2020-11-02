@@ -1843,7 +1843,16 @@ Type const* Ent::EntityLib::loadEntityOrScene(
     auto const absPath = getAbsolutePath(_path);
     std::filesystem::path relPath = absPath.c_str() + rawdataPath.native().size() + 1;
     bool reload = false;
-    auto timestamp = std::filesystem::last_write_time(absPath);
+    std::filesystem::file_time_type timestamp;
+    try
+    {
+        timestamp = std::filesystem::last_write_time(absPath);
+    }
+    catch (...)
+    {
+        fprintf(stderr, "Error, loading : %ls\n", absPath.c_str());
+        throw;
+    }
     auto iter = cache.find(relPath);
     if (iter == cache.end())
     {
@@ -1869,7 +1878,7 @@ Type const* Ent::EntityLib::loadEntityOrScene(
             }
             catch (...)
             {
-                fprintf(stderr, "Error, loading : %ls\n", _path.c_str());
+                fprintf(stderr, "Error, validating : %ls\n", absPath.c_str());
                 throw;
             }
         }

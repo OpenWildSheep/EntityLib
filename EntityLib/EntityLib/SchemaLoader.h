@@ -70,6 +70,12 @@ namespace Ent
             int _depth = 0 ///< depth of this Node. (For internal use)
         );
 
+        /// Add this file in the cache of already read files. (Useful for files generated in memory)
+        void addInCache(std::string _filename, nlohmann::json _json)
+        {
+            m_schemaMap.insert_or_assign(std::move(_filename), std::move(_json));
+        }
+
     private:
         /// Load the Schema of a Component or a property
         /// @pre _data CAN NOT be a reference ($ref)

@@ -325,6 +325,7 @@ namespace Ent
             Override<std::string> _name,
             std::map<std::string, Component> _components,
             std::unique_ptr<SubSceneComponent> _subSceneComponent,
+            Node _actorStates = {},
             Node _color = {},
             Override<std::string> _thumbnail = {},
             Override<std::string> _instanceOf = {},
@@ -403,6 +404,11 @@ namespace Ent
         /// @remark Do nothing if already exist, and return the existing one
         SubSceneComponent* addSubSceneComponent();
 
+        Node const& getActorStates() const
+        {
+            return actorStates;
+        }
+
         /// @brief Make the Entity independent from its prefab (instanceOf)
         ///
         /// All properties overrided in _entity OR in the prefeb become overrided in the Entity.
@@ -439,6 +445,7 @@ namespace Ent
         Override<std::string> name; ///< Entity name
         std::map<std::string, Component> components; ///< All components of this Entity
         std::unique_ptr<SubSceneComponent> subSceneComponent; ///< the optional SubScene Component
+        Node actorStates; ///< All actorStates of this Entity
         Node color; ///< The optional Color of the Entity
         Override<std::string> thumbnail; ///< Path to the thumbnail mesh (.wthumb)
         Override<std::string> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity

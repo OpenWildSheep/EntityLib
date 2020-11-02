@@ -79,72 +79,103 @@ try:
     assert "CineEventTestBlackboardHasFact" in nameToTypeMap
     assert "CineEventTestEndCurrentSequence" in nameToTypeMap
 
+    # Ensure that all components have a ref and is in entlib.schema.schema.allDefinitions
+    for name, schema in entlib.schema.components.items():
+        absRef = schema.name
+        assert absRef.find("file://") == 0
+        assert absRef in entlib.schema.schema.definitions
+
+    ####################################################################################################################
+    def testPrefabEntity(ent: Ent.Entity):
+        # ActorStates
+        actorStates = ent.get_actorstates() # type: Ent.Node
+        assert actorStates.datatype == Ent.DataType.array
+        actorState = actorStates.at(0)
+        assert actorState is not None
+        chosen = actorState.get_union_data()
+        assert chosen is not None
+        exitRequired = chosen.at("ExitRequired")
+        assert exitRequired is not None
+        assert exitRequired.get_bool() is True
+
+        # Test default value
+        voxelSimulationGD = ent.get_component("VoxelSimulationGD")
+        assert(voxelSimulationGD.root.at("TransmissionBySecond").value == 100.)
+        assert(voxelSimulationGD.root.at("TransmissionBySecond").is_default())
+        assert(voxelSimulationGD.root.get_type_name() == "file://RuntimeComponents.json#/definitions/VoxelSimulationGD")
+
+        # TEST read inherited values in inherited component
+        heightObj = ent.get_component("HeightObj")
+        assert(heightObj is not None)
+        assert(heightObj.root.at("Subdivision").value == 0)
+        assert(heightObj.root.at("Subdivision").is_set())
+        assert(
+            heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").value == 51248)
+        assert(heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").is_set())
+
+        # Test read Thumbnail
+        assert(ent.thumbnail is not None)
+        assert(ent.thumbnail == "TestThumbnail")
+
+        # Test read prefab
+        sysCreat = ent.get_component("SystemicCreature")
+        assert(sysCreat is not None)
+
+        # TEST read setted values
+        assert(sysCreat.root.at("Faction").value == "Shamans") # set
+        assert(sysCreat.root.at("Faction").is_set()) # is set
+        assert(sysCreat.root.at("Inventory").value == "KaiWOLgrey") # set
+        assert(sysCreat.root.at("Inventory").is_set()) # is set
+
+        # TEST comment
+        assert sysCreat.root.at("BehaviorState").get_string() == "W/*at*/c//h"
+
+        # TEST read array
+        assert(sysCreat.root.at("ScriptList").is_set())
+        assert(sysCreat.root.at("ScriptList").size() == 3)
+
+        # TEST default values
+        assert(sysCreat.root.at("Burried").value == False) # default
+        assert(not sysCreat.root.at("Burried").is_set()) # default
+        assert(sysCreat.root.at("Name").value == "") # default
+        assert(not sysCreat.root.at("Name").is_set()) # default
+
+        # TEST SubScene
+        subScenecomp = ent.get_subscene_component()
+        allSubEntities = subScenecomp.embedded.entities
+        assert(len(allSubEntities) == 1)
+        assert(allSubEntities[0].name == "EP1-Spout_LINK_001")
+        assert(allSubEntities[0].color[0] == 255)
+
+        # TEST union
+        cinematicGD = ent.get_component("CinematicGD")  # type: Ent.Component
+        scriptEvents = cinematicGD.root.at("ScriptEvents")  # type: Ent.Node
+        assert(scriptEvents.datatype == Ent.DataType.array)
+
+        # Read Union type
+        oneOfScripts = scriptEvents.at(0)  # type: Ent.Node
+        assert(oneOfScripts.datatype == Ent.DataType.union)
+        cineEvent = oneOfScripts.get_union_data()  # type: Ent.Node
+        assert(cineEvent.get_type_name() == "file://RuntimeComponents.json#/definitions/CineEventTestBlackboardHasFact")
+
+        nbEnt = cineEvent.at("FactName")  # type: Ent.Node
+        assert(nbEnt is not None)
+        assert(nbEnt.datatype == Ent.DataType.string)
+        assert(nbEnt.value == "Toto")
+
+        # TEST sub - object with non - default values
+        explosionEffect = ent.get_component("ExplosionEffect")  # type: Ent.Component
+        shakeData = explosionEffect.root.at("ShakeData")  # type: Ent.Node
+        assert(shakeData.at("shakeDuration").value == 0.)
+
     ####################################################################################################################
     ent = entlib.load_entity("prefab.entity")  # type: Ent.Entity
 
-    # Test default value
-    voxelSimulationGD = ent.get_component("VoxelSimulationGD")
-    assert(voxelSimulationGD.root.at("TransmissionBySecond").value == 100.)
-    assert(voxelSimulationGD.root.at("TransmissionBySecond").is_default())
-    assert(voxelSimulationGD.root.get_type_name() == "file://RuntimeComponents.json#/definitions/VoxelSimulationGD")
-
-    # TEST read inherited values in inherited component
-    heightObj = ent.get_component("HeightObj")
-    assert(heightObj is not None)
-    assert(heightObj.root.at("Subdivision").value == 0)
-    assert(heightObj.root.at("Subdivision").is_set())
-    assert(
-        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").value == 51248)
-    assert(heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").is_set())
-
-    # Test read Thumbnail
-    assert(ent.thumbnail is not None)
-    assert(ent.thumbnail == "TestThumbnail")
-
-    # Test read prefab
-    sysCreat = ent.get_component("SystemicCreature")
-    assert(sysCreat is not None)
-
-    # TEST read setted values
-    assert(sysCreat.root.at("Faction").value == "Shamans") # set
-    assert(sysCreat.root.at("Faction").is_set()) # is set
-    assert(sysCreat.root.at("Inventory").value == "KaiWOLgrey") # set
-    assert(sysCreat.root.at("Inventory").is_set()) # is set
-
-    # TEST read array
-    assert(sysCreat.root.at("ScriptList").is_set())
-    assert(sysCreat.root.at("ScriptList").size() == 3)
-
-    # TEST default values
-    assert(sysCreat.root.at("Burried").value == False) # default
-    assert(not sysCreat.root.at("Burried").is_set()) # default
-    assert(sysCreat.root.at("Name").value == "") # default
-    assert(not sysCreat.root.at("Name").is_set()) # default
-
-    # TEST SubScene
-    subScenecomp = ent.get_subscene_component()
-    allSubEntities = subScenecomp.embedded.entities
-    assert(len(allSubEntities) == 1)
-    assert(allSubEntities[0].name == "EP1-Spout_LINK_001")
-    assert(allSubEntities[0].color[0] == 255)
-
-    # TEST union
-    cinematicGD = ent.get_component("CinematicGD")  # type: Ent.Component
-    scriptEvents = cinematicGD.root.at("ScriptEvents")  # type: Ent.Node
-    assert(scriptEvents.datatype == Ent.DataType.array)
-
-    # Read Union type
-    oneOfScripts = scriptEvents.at(0)  # type: Ent.Node
-    assert(oneOfScripts.datatype == Ent.DataType.union)
-    cineEvent = oneOfScripts.get_union_data()  # type: Ent.Node
-    assert(cineEvent.get_type_name() == "file://RuntimeComponents.json#/definitions/CineEventTestBlackboardHasFact")
-
-    nbEnt = cineEvent.at("FactName")  # type: Ent.Node
-    assert(nbEnt is not None)
-    assert(nbEnt.datatype == Ent.DataType.string)
-    assert(nbEnt.value == "Toto")
+    testPrefabEntity(ent)
 
     # Set Union type
+    cinematicGD = ent.get_component("CinematicGD")  # type: Ent.Component
+    scriptEvents = cinematicGD.root.at("ScriptEvents")  # type: Ent.Node
     oneOfScripts2 = scriptEvents.at(1)  # type: Ent.Node
     assert(oneOfScripts2.datatype == Ent.DataType.union)
     assert(oneOfScripts2.get_union_type() == "CineEventTestBlackboardHasFact")
@@ -155,11 +186,6 @@ try:
     assert(fieldNames2[0] == "GameStateName")
     assert(fieldNames2[1] == "Super")
     testCurrentState.at("GameStateName").set_string("Pouet!")
-    
-    # TEST sub - object with non - default values
-    explosionEffect = ent.get_component("ExplosionEffect")  # type: Ent.Component
-    shakeData = explosionEffect.root.at("ShakeData")  # type: Ent.Node
-    assert(shakeData.at("shakeDuration").value == 0.)
 
     # TEST simple entity ref creation
     testEntityRef = ent.add_component("TestEntityRef")
@@ -167,8 +193,11 @@ try:
     assert(testEntityRef.root.at("TestRef").get_entityref().entity_path == "")  # value                             ????
     testEntityRef.root.at("TestRef").set_entityref(ent.make_entityref(ent))
     assert(testEntityRef.root.at("TestRef").get_entityref().entity_path == ".")
+    subScenecomp = ent.get_subscene_component()
+    allSubEntities = subScenecomp.embedded.entities
     testEntityRef.root.at("TestRef").value = ent.make_entityref(allSubEntities[0])
 
+    sysCreat = ent.get_component("SystemicCreature")
     sysCreat.root.at("Name").value = "Shamane_male"
     entlib.save_entity(ent, "prefab.copy.entity")
     ####################################################################################################################

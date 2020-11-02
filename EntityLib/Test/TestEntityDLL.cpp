@@ -164,6 +164,17 @@ try
     }
 
     auto testPrefabEntity = [](Ent::Entity const* ent) {
+        // ActorStates
+        Ent::Node const& actorStates = ent->getActorStates();
+        ENTLIB_ASSERT(actorStates.getDataType() == Ent::DataType::array);
+        Ent::Node const* actorState = actorStates.at(0llu);
+        ENTLIB_ASSERT(actorState != nullptr);
+        Ent::Node const* chosen = actorState->getUnionData();
+        ENTLIB_ASSERT(chosen != nullptr);
+        Ent::Node const* exitRequired = chosen->at("ExitRequired");
+        ENTLIB_ASSERT(exitRequired != nullptr);
+        ENTLIB_ASSERT(exitRequired->getBool() == true);
+
         // Test default value
         Ent::Component const* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
         ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->getFloat() == 100.f);

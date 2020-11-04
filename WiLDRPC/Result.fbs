@@ -1,0 +1,8 @@
+namespace WildRPC;
+
+table Result
+{
+	result:int;
+}
+
+root_type Result;

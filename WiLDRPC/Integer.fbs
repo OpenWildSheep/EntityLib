@@ -1,0 +1,9 @@
+
+namespace WildRPC;
+
+table Integer
+{
+	value:int;
+}
+
+root_type Integer;

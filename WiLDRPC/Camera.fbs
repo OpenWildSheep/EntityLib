@@ -1,0 +1,13 @@
+include "Position.fbs";
+include "Quat.fbs";
+include "Vector3.fbs";
+
+namespace WildRPC;
+
+table Camera
+{
+	position:Position;
+	orientation:Quat;
+}
+
+root_type Camera;

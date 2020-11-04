@@ -1,0 +1,12 @@
+
+namespace WildRPC;
+
+table Quat
+{
+	x:float;
+	y:float;
+	z:float;
+	w:float;
+}
+
+root_type Quat;

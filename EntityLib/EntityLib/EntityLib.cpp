@@ -131,7 +131,7 @@ namespace Ent
         if (getUnionType() != _type)
         {
             Subschema const* subTypeSchema = schema->getUnionTypeWrapper(_type);
-            // TODO : Loïc - low prio - Find a way to get the super.
+            // TODO : LoÃ¯c - low prio - Find a way to get the super.
             //   It could be hard because we are no more in the loading phase, so the super is
             //   now delete.
             wrapper = loadNode(*subTypeSchema, json(), nullptr);
@@ -1497,7 +1497,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
             {
                 // We are making a new node without input data
                 // "back()" because the base type is at the end of the type list
-                // TODO : Loïc - Add in metadata the name of the default type
+                // TODO : LoÃ¯c - Add in metadata the name of the default type
                 dataType =
                     _nodeSchema.oneOf->back()->properties.at(typeField).get().constValue->get<std::string>();
             }
@@ -1843,15 +1843,15 @@ Type const* Ent::EntityLib::loadEntityOrScene(
     auto const absPath = getAbsolutePath(_path);
     std::filesystem::path relPath = absPath.c_str() + rawdataPath.native().size() + 1;
     bool reload = false;
-    std::filesystem::file_time_type timestamp;
-    try
+    auto error = std::error_code{};
+    auto timestamp = std::filesystem::last_write_time(absPath, error);
+    if (error)
     {
-        timestamp = std::filesystem::last_write_time(absPath);
-    }
-    catch (...)
-    {
-        fprintf(stderr, "Error, loading : %ls\n", absPath.c_str());
-        throw;
+        const auto msg = not std::filesystem::exists(absPath)
+            ? format("file doesn't exist: %ls", absPath.c_str())
+            : format("last_write_time(p): invalid argument: %ls (%s)",
+                absPath.c_str(), error.message().c_str());
+        throw std::filesystem::filesystem_error(msg);
     }
     auto iter = cache.find(relPath);
     if (iter == cache.end())

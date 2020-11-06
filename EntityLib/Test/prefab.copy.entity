@@ -1,4 +1,16 @@
 {
+    "ActorStates": [
+        {
+            "classData": {
+                "locomotionMode": "crouch"
+            },
+            "className": "ActionClimbEdge"
+        },
+        {
+            "classData": {},
+            "className": "ActionCinematic"
+        }
+    ],
     "Components": [
         {
             "Data": {

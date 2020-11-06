@@ -2,9 +2,14 @@
     "Thumbnail": "TestThumbnail",
     "ActorStates":[
         {
-            "className": "ActionChosen",
+            "className": "ActionClimbEdge",
             "classData":{
-                "ExitRequired": true
+                "locomotionMode": "crouch"
+            }
+        },
+        {
+            "className": "ActionCinematic",
+            "classData":{
             }
         }
     ],

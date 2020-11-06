@@ -125,6 +125,10 @@ Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
             _meta.typeField = _data["unionTypeField"].get<std::string>();
         }
     };
+    const auto setArrayMetas = [&](Ent::Subschema::ArrayMeta& _meta) {
+        _meta.overridePolicy = _data.value("overridePolicy", "");
+        _meta.keyField = _data.value("keyField", "");
+    };
     switch (_type)
     {
     case Ent::DataType::integer:
@@ -137,12 +141,18 @@ Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
     }
     case Ent::DataType::string:
     case Ent::DataType::object:
-    case Ent::DataType::array:
     case Ent::DataType::boolean:
     case Ent::DataType::entityRef:
     {
         Ent::Subschema::GenericMeta meta;
         setBaseMetas(&meta);
+        return meta;
+    }
+    case Ent::DataType::array:
+    {
+        Ent::Subschema::ArrayMeta meta;
+        setBaseMetas(&meta);
+        setArrayMetas(meta);
         return meta;
     }
     case Ent::DataType::oneOf:
@@ -360,6 +370,9 @@ void Ent::SchemaLoader::parseSchemaNoRef(
             vis.setMeta(parseMetaForType(_data["meta"], currentType));
         }
     }
+    else if (currentType != DataType::null)
+        vis.setMeta(parseMetaForType(
+            json::object(), currentType)); // Set Meta to default values for the currentType
     if (_data.count("name") != 0u)
     {
         // manually specified type name (typically used for enums properties that are inlined)

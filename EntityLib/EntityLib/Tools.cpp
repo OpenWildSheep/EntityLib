@@ -9,6 +9,7 @@ using namespace nlohmann;
 /// @cond PRIVATE
 
 json loadJsonFile(std::filesystem::path const& path)
+try
 {
     std::ifstream file(path, std::ios::binary | std::ios::ate);
     if (not file.is_open())
@@ -26,7 +27,12 @@ json loadJsonFile(std::filesystem::path const& path)
         true // ignore_comments
     );
     return doc;
-};
+}
+catch (...)
+{
+    fprintf(stderr, "Error when parsing file %ls\n", path.c_str());
+    throw;
+}
 
 char const* Ent::getRefTypeName(char const* link)
 {

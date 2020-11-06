@@ -5,6 +5,20 @@
         27,
         255
     ],
+    "ActorStates":[
+        {
+            "className": "ActionChosen",
+            "classData":{
+                "ExitRequired": true
+            }
+        },
+        {
+            "className": "ActionCinematic",
+            "classData":{
+                "Type": 13
+            }
+        }
+    ],	
     "Components": [
         {
             "Data": {

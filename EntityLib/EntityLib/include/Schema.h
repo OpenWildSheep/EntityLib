@@ -107,12 +107,18 @@ namespace Ent
             std::string dataField; ///< Name of the field containing the data (ex : classData)
             std::string typeField; ///< Name of the field containing the type of the data (ex : className)
         };
+        /// Store metadata for array type
+        struct ArrayMeta : BaseMeta
+        {
+            std::string overridePolicy; ///< Policy used to override the array from the template
+            std::string keyField; ///< Name of the key field if the overridePolicy is "set"
+        };
         /// Store metadata for all schema which doesn't have specific field
         struct GenericMeta : BaseMeta
         {
         };
         /// Meta data for any type of Node
-        using Meta = mapbox::util::variant<GenericMeta, NumberMeta, UnionMeta>;
+        using Meta = mapbox::util::variant<GenericMeta, NumberMeta, UnionMeta, ArrayMeta>;
         Meta meta; ///< Contains meta data for any type of Node
 
         // helper methods

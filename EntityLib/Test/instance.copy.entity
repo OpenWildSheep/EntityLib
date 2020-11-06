@@ -1,4 +1,18 @@
 {
+    "ActorStates": [
+        {
+            "classData": {
+                "Type": 13
+            },
+            "className": "ActionCinematic"
+        },
+        {
+            "classData": {
+                "ExitRequired": true
+            },
+            "className": "ActionChosen"
+        }
+    ],
     "Color": [
         27.0,
         177.0,

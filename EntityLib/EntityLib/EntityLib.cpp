@@ -1,4 +1,4 @@
-#include "include/EntityLib.h"
+﻿#include "include/EntityLib.h"
 
 #include "Tools.h"
 #include "SchemaLoader.h"
@@ -1273,60 +1273,6 @@ namespace Ent
 
 // ********************************** Load/Save ***********************************************
 
-static Ent::Node loadFreeObjectNode(json const& _data)
-{
-    Ent::Node result;
-    switch (_data.type())
-    {
-    case nlohmann::detail::value_t::null: result = Ent::Node(Ent::Null{}, nullptr); break;
-    case nlohmann::detail::value_t::string:
-        result = Ent::Node(
-            Ent::Override<std::string>(std::string(), tl::nullopt, _data.get<std::string>()),
-            nullptr);
-        break;
-    case nlohmann::detail::value_t::boolean:
-        result = Ent::Node(Ent::Override<bool>(bool{}, tl::nullopt, _data.get<bool>()), nullptr);
-        break;
-    case nlohmann::detail::value_t::number_integer:
-    case nlohmann::detail::value_t::number_unsigned:
-        result =
-            Ent::Node(Ent::Override<int64_t>(int64_t{}, tl::nullopt, _data.get<int64_t>()), nullptr);
-        break;
-    case nlohmann::detail::value_t::number_float:
-        result = Ent::Node(Ent::Override<float>(float{}, tl::nullopt, _data.get<float>()), nullptr);
-        break;
-    case nlohmann::detail::value_t::object:
-    {
-        Ent::Object object;
-        for (auto const& field : _data.items())
-        {
-            std::string const& name = field.key();
-            json const& value = field.value();
-            Ent::Node tmpNode = loadFreeObjectNode(value);
-            object.emplace(name, nonstd::make_value<Ent::Node>(std::move(tmpNode)));
-        }
-        result = Ent::Node(std::move(object), nullptr);
-    }
-    break;
-    case nlohmann::detail::value_t::array:
-    {
-        Ent::Array arr;
-        for (auto const& item : _data)
-        {
-            Ent::Node tmpNode = loadFreeObjectNode(item);
-            arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
-        }
-        result = Ent::Node(std::move(arr), nullptr);
-    }
-    break;
-    case nlohmann::detail::value_t::binary:
-    case nlohmann::detail::value_t::discarded: break;
-    }
-    return result;
-}
-
-static Ent::Node const emptyNode(Ent::Null(), nullptr);
-
 static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, Ent::Node const* _super)
 {
     ENTLIB_ASSERT(_super == nullptr or &_nodeSchema == _super->getSchema());
@@ -1341,7 +1287,11 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
         {
             // _nodeSchema is const and the value can't be overriden
             std::string const def = _nodeSchema.constValue->get<std::string>();
-            result = Ent::Node(Ent::Override<std::string>("", tl::nullopt, def), &_nodeSchema);
+            // We don't to "override" this value to avoid to write every oneOf
+            if (_super != nullptr) // If there is a template, the vale is not overriden
+                result = Ent::Node(Ent::Override<std::string>("", def, tl::nullopt), &_nodeSchema);
+            else // If there is no template, it is overriden to be sure the node "hasOverride" and be saved
+                result = Ent::Node(Ent::Override<std::string>("", tl::nullopt, def), &_nodeSchema);
         }
         else
         {
@@ -1438,14 +1388,107 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
             }
             else
             {
-                for (auto const& item : _data)
+                auto&& meta = _nodeSchema.meta.get<Ent::Subschema::ArrayMeta>();
+                using namespace Ent;
+                // Merge the instance array/map with the template array/map and put the result into arr.data
+                auto mergeMapOverride = [&](auto&& getKeyJson, auto&& getKeyNode) {
+                    // Make a map key=>item for the instance
+                    std::map<std::string, json const*> instancePropMap;
+                    for (auto const& item : _data)
+                    {
+                        instancePropMap.emplace(getKeyJson(item), &item);
+                    }
+                    if (_super != nullptr)
+                    {
+                        // Load all Nodes from the _super (overriden or not)
+                        for (Ent::Node const* subSuper : _super->getItems())
+                        {
+                            char const* key = getKeyNode(subSuper);
+                            if (instancePropMap.count(key)) // Overriden in instance
+                            {
+                                Ent::Node tmpNode = loadNode(
+                                    _nodeSchema.singularItems->get(),
+                                    *instancePropMap[key],
+                                    subSuper); // ->getUnionData());
+                                arr.data.emplace_back(
+                                    nonstd::make_value<Ent::Node>(std::move(tmpNode)));
+                                instancePropMap.erase(key);
+                            }
+                            else // Not overriden
+                            {
+                                Ent::Node tmpNode = loadNode(
+                                    _nodeSchema.singularItems->get(),
+                                    json(),
+                                    subSuper); // ->getUnionData());
+                                arr.data.emplace_back(
+                                    nonstd::make_value<Ent::Node>(std::move(tmpNode)));
+                                if (arr.data.back()->hasOverride())
+                                    arr.data.back()->hasOverride();
+                                ENTLIB_ASSERT(arr.data.back()->hasOverride() == false);
+                            }
+                        }
+                    }
+                    // Load items from instance which are not in template (they are new)
+                    for (auto const& item : _data)
+                    {
+                        auto key = getKeyJson(item);
+                        if (instancePropMap.count(key))
+                        {
+                            Ent::Node tmpNode =
+                                loadNode(_nodeSchema.singularItems->get(), item, nullptr);
+                            arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
+                        }
+                    }
+                };
+                switch (hash(meta.overridePolicy))
                 {
-                    Ent::Node const* subSuper = (_super != nullptr and (_super->size() > index)) ?
-                                                    _super->at(index) :
-                                                    nullptr;
-                    Ent::Node tmpNode = loadNode(_nodeSchema.singularItems->get(), item, subSuper);
-                    arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
-                    ++index;
+                case "unionSet"_hash:
+                {
+                    auto getKeyJson = [&_nodeSchema](json const& item) {
+                        auto const& unionMeta =
+                            _nodeSchema.singularItems->get().meta.get<Ent::Subschema::UnionMeta>();
+                        return item[unionMeta.typeField].get<std::string>();
+                    };
+                    auto getKeyNode = [&meta](Node const* subSuper) {
+                        return subSuper->getUnionType();
+                    };
+                    mergeMapOverride(getKeyJson, getKeyNode);
+                }
+                break;
+#ifdef NOT_YET_TESTED
+                case "set"_hash:
+                {
+                    auto getKeyJson = [&meta](json const& item) {
+                        if (item.count(meta.keyField) == 0)
+                            throw std::runtime_error("Key field (" + meta.keyField + ") not found");
+                        return item[meta.keyField].get<std::string>();
+                    };
+                    auto getKeyNode = [&meta](Node const* subSuper) {
+                        return subSuper->at(meta.keyField.c_str())->getString();
+                    };
+                    mergeMapOverride(getKeyJson, getKeyNode);
+                }
+                break;
+#endif
+                case ""_hash:
+                {
+                    for (auto const& item : _data)
+                    {
+                        Ent::Node const* subSuper =
+                            (_super != nullptr and (_super->size() > index)) ? _super->at(index) :
+                                                                               nullptr;
+                        Ent::Node tmpNode =
+                            loadNode(_nodeSchema.singularItems->get(), item, subSuper);
+                        arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
+                        ++index;
+                    }
+                }
+                break;
+                default:
+                    throw std::runtime_error(format(
+                        "Unknown key type (%s) in schema of %s",
+                        meta.overridePolicy.c_str(),
+                        _nodeSchema.name.c_str()));
                 }
             }
         }
@@ -1583,6 +1626,7 @@ static json saveNode(Ent::Subschema const& _schema, Ent::Node const& _node)
     case Ent::DataType::array:
     {
         data = json::array();
+        auto&& meta = _schema.meta.get<Ent::Subschema::ArrayMeta>();
         for (Ent::Node const* item : _node.getItems())
         {
             if (item->hasOverride())
@@ -1591,7 +1635,7 @@ static json saveNode(Ent::Subschema const& _schema, Ent::Node const& _node)
                 json tmpNode = saveNode(*item->getSchema(), *item);
                 data.emplace_back(std::move(tmpNode));
             }
-            else
+            else if (meta.overridePolicy.empty())
             {
                 data.emplace_back(json());
             }

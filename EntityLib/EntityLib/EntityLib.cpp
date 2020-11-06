@@ -753,9 +753,17 @@ namespace Ent
 
     // ********************************* Entity ***************************************************
 
+    static Ent::Node makeDefaultActorStatesField(EntityLib const& _entlib)
+    {
+        Ent::Subschema const& actorStatesSchema =
+            _entlib.schema.schema.allDefinitions.at(actorStatesSchemaName);
+        return Node{ Array{}, &actorStatesSchema };
+    }
+
     Entity::Entity(EntityLib const& _entlib)
         : entlib(&_entlib)
         , name(std::string(), tl::nullopt, tl::nullopt)
+        , actorStates(Ent::makeDefaultActorStatesField(_entlib))
         , color(Ent::makeDefaultColorField(_entlib))
         , thumbnail(std::string(), tl::nullopt, tl::nullopt)
         , instanceOf(std::string(), tl::nullopt, tl::nullopt)
@@ -1487,7 +1495,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
         if (_data.count(typeField) != 0)
         {
             dataType = _data.at(typeField).get<std::string>();
-            if (_super != nullptr and dataType != _super->at(typeField.c_str())->getString())
+            if (_super != nullptr and dataType != _super->getUnionType())
             {
                 _super = nullptr; // The datatype has changed. No more use the data from _super
             }
@@ -1741,11 +1749,8 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     Ent::Node ovActorStates(Ent::Array{}, &actorStatesSchema);
     if (_entNode.contains("ActorStates"))
     {
-        ovActorStates = loadNode(
-            actorStatesSchema,
-            _entNode.at("ActorStates"),
-            _superEntityFromParentEntity != nullptr ? &_superEntityFromParentEntity->getActorStates() :
-                                                      nullptr);
+        ovActorStates =
+            loadNode(actorStatesSchema, _entNode.at("ActorStates"), &superEntity->getActorStates());
     }
     else
     {
@@ -2082,6 +2087,12 @@ static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& 
 
             componentsNode.emplace_back(std::move(compNode));
         }
+    }
+    Ent::Subschema const& actorStatesSchema =
+        _schema.schema.allDefinitions.at(Ent::actorStatesSchemaName);
+    if (_entity.getActorStates().hasOverride())
+    {
+        entNode.emplace("ActorStates", saveNode(actorStatesSchema, _entity.getActorStates()));
     }
     return entNode;
 }

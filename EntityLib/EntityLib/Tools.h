@@ -1,8 +1,8 @@
 #pragma once
 
 #pragma warning(push, 0)
-#include "../external/json.hpp"
-#include "../external/filesystem.hpp"
+#include "external/json.hpp"
+#include "external/filesystem.hpp"
 #pragma warning(pop)
 
 nlohmann::json loadJsonFile(std::filesystem::path const& _path);

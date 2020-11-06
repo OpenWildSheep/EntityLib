@@ -2150,7 +2150,7 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanc
         *this,
         templ->getNameValue().makeInstanceOf(),
         components,
-        nullptr,
+        templ->getSubSceneComponent()->makeInstanceOf(),
         templ->getActorStates().makeInstanceOf(),
         templ->getColorValue().makeInstanceOf(),
         templ->getThumbnailValue().makeInstanceOf(),

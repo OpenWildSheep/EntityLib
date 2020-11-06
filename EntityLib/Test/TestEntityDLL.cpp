@@ -746,6 +746,23 @@ try
                                               "entity");
         testAddSubEntity(*copyEnt);
     }
+    {
+        // Test access subscene override
+        EntityPtr ent = entlib.makeInstanceOf("entity-subscene.entity");
+        auto subs = ent->getSubSceneComponent();
+
+        ENTLIB_ASSERT(subs->embedded->getObjects().size() != 0);
+
+        auto&& allSubEntities = subs->embedded->getObjects();
+        allSubEntities[0]->addComponent("ActorGD")->root.at("InSpiritWorld")->setBool(true);
+        entlib.saveEntity(*ent, "entity-subscene-override-saved.entity");
+
+        EntityPtr ovrdEntt = entlib.loadEntity("entity-subscene-override-saved.entity");
+        auto ovrdSubs = ovrdEntt->getSubSceneComponent();
+
+        //Test that we properly still have access to the template subscene entities
+        ENTLIB_ASSERT(ovrdSubs->embedded->getObjects().size() != 0);
+    }
 
     // ********************************** Test load/save scene ************************************
     entlib.rawdataPath = "X:/RawData";

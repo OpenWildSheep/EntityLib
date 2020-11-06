@@ -1,0 +1,5 @@
+{
+    "Components": [],
+    "Name": "entity-subscene-override",
+    "InstanceOf" : "entity-subscene.entity"
+}

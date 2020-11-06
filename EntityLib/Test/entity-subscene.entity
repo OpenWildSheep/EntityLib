@@ -1,0 +1,166 @@
+{
+    "Components": [
+        {
+            "Data": {
+                "FullCursed": "wolf_full_fire",
+                "FullLush": "wolf_full_lush",
+                "SklCursed": "wolf_skeleton_fire",
+                "SklLush": "wolf_skeleton_lush",
+                "SklNeutral": "wolf_skeleton_neutral"
+            },
+            "Type": "TestCreature",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "Embedded": [
+                    {
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Matrix": [
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0
+                                    ],
+                                    "Position": [
+                                        -1.4485297203063965,
+                                        -1.9073486328125e-06,
+                                        3.814697265625e-06
+                                    ]
+                                },
+                                "Type": "TransformGD",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "wolf_skeleton_lush",
+                        "Thumbnail": "02_Creature/Wolf/MALE/cloththin/regularskeletonlush/CLOTH_Body.wthumb"
+                    },
+                    {
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Matrix": [
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0
+                                    ],
+                                    "Position": [
+                                        0.0,
+                                        -0.9543056488037109,
+                                        0.0
+                                    ]
+                                },
+                                "Type": "TransformGD",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "wolf_skeleton_neutral",
+                        "Thumbnail": "02_Creature/Wolf/MALE/cloththin/bodyskeleton/cloth_body.wthumb"
+                    },
+                    {
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Matrix": [
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0
+                                    ],
+                                    "Position": [
+                                        1.4368996620178223,
+                                        -3.0517578125e-05,
+                                        0.0
+                                    ]
+                                },
+                                "Type": "TransformGD",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "wolf_skeleton_fire",
+                        "Thumbnail": "02_Creature/Wolf/MALE/cloththin/regularskeletonfire/cloth_body.wthumb"
+                    },
+                    {
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Matrix": [
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0
+                                    ],
+                                    "Position": [
+                                        -1.3049018383026123,
+                                        -2.6808643341064453,
+                                        -7.62939453125e-06
+                                    ]
+                                },
+                                "Type": "TransformGD",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "wolf_full_lush",
+                        "Thumbnail": "02_Creature/Wolf/MALE/cloththin/BodyWolfWhite/CLOTH_Body.wthumb"
+                    },
+                    {
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Matrix": [
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0
+                                    ],
+                                    "Position": [
+                                        1.4836406707763672,
+                                        -2.692093849182129,
+                                        0.0
+                                    ]
+                                },
+                                "Type": "TransformGD",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "wolf_full_fire",
+                        "Thumbnail": "02_Creature/Wolf/MALE/cloththin/BodyWolfBlack/cloth_body.wthumb"
+                    }
+                ],
+                "File": "",
+                "isEmbedded": true
+            },
+            "Type": "SubScene",
+            "Version": 1
+        }
+    ],
+    "Name": "entity-subscene"
+}

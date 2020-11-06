@@ -1871,10 +1871,12 @@ Type const* Ent::EntityLib::loadEntityOrScene(
     auto timestamp = std::filesystem::last_write_time(absPath, error);
     if (error)
     {
-        const auto msg = not std::filesystem::exists(absPath)
-            ? format("file doesn't exist: %ls", absPath.c_str())
-            : format("last_write_time(p): invalid argument: %ls (%s)",
-                absPath.c_str(), error.message().c_str());
+        const auto msg = not std::filesystem::exists(absPath) ?
+                             format("file doesn't exist: %ls", absPath.c_str()) :
+                             format(
+                                 "last_write_time(p): invalid argument: %ls (%s)",
+                                 absPath.c_str(),
+                                 error.message().c_str());
         throw std::filesystem::filesystem_error(msg);
     }
     auto iter = cache.find(relPath);
@@ -2150,7 +2152,8 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanc
         *this,
         templ->getNameValue().makeInstanceOf(),
         components,
-        templ->getSubSceneComponent()->makeInstanceOf(),
+        templ->getSubSceneComponent() != nullptr ? templ->getSubSceneComponent()->makeInstanceOf() :
+                                                   nullptr,
         templ->getActorStates().makeInstanceOf(),
         templ->getColorValue().makeInstanceOf(),
         templ->getThumbnailValue().makeInstanceOf(),

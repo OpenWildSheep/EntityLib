@@ -28,6 +28,29 @@
             },
             "Type": "SystemicCreature",
             "Version": 1
+        },
+        {
+            "Version": 1,
+            "Type": "PathNodeGD",
+            "Data": {
+                "Radius": 30.0,
+                "Tags": {
+                    "Tags": [
+                        [
+                            "a",
+                            []
+                        ],
+                        [
+                            "b",
+                            ["1", "2"]
+                        ],
+                        [
+                            "c",
+                            ["1", "3"]
+                        ]
+                    ]
+                }
+            }
         }
     ],
     "InstanceOf": "prefab.entity",

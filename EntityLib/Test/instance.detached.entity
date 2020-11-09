@@ -188,6 +188,39 @@
             "Version": 1
         },
         {
+            "Data": {
+                "Radius": 30.0,
+                "Tags": {
+                    "Tags": [
+                        [
+                            "a",
+                            [
+                                "1",
+                                "2"
+                            ]
+                        ],
+                        [
+                            "b",
+                            [
+                                "1",
+                                "2"
+                            ]
+                        ],
+                        [
+                            "c",
+                            [
+                                "1",
+                                "2",
+                                "3"
+                            ]
+                        ]
+                    ]
+                }
+            },
+            "Type": "PathNodeGD",
+            "Version": 1
+        },
+        {
             "Data": {},
             "Type": "SmoothScaleComponentGD",
             "Version": 1

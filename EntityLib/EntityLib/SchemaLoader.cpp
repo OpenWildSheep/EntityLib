@@ -127,7 +127,7 @@ Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
     };
     const auto setArrayMetas = [&](Ent::Subschema::ArrayMeta& _meta) {
         _meta.overridePolicy = _data.value("overridePolicy", "");
-        _meta.keyField = _data.value("keyField", "");
+        _meta.ordered = _data.value("ordered", true);
     };
     switch (_type)
     {

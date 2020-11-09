@@ -1391,9 +1391,11 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                 auto&& meta = _nodeSchema.meta.get<Ent::Subschema::ArrayMeta>();
                 using namespace Ent;
                 // Merge the instance array/map with the template array/map and put the result into arr.data
-                auto mergeMapOverride = [&](auto&& getKeyJson, auto&& getKeyNode) {
+                auto mergeMapOverride = [&](bool ordered, auto&& getKeyJson, auto&& getKeyNode) {
                     // Make a map key=>item for the instance
-                    std::map<std::string, json const*> instancePropMap;
+                    using KeyType = std::remove_reference_t<decltype(getKeyJson(json()))>;
+                    std::map<KeyType, json const*> instancePropMap;
+                    std::vector<std::pair<KeyType, Node>> result;
                     for (auto const& item : _data)
                     {
                         instancePropMap.emplace(getKeyJson(item), &item);
@@ -1403,15 +1405,14 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                         // Load all Nodes from the _super (overriden or not)
                         for (Ent::Node const* subSuper : _super->getItems())
                         {
-                            char const* key = getKeyNode(subSuper);
+                            KeyType key = getKeyNode(subSuper);
                             if (instancePropMap.count(key)) // Overriden in instance
                             {
                                 Ent::Node tmpNode = loadNode(
                                     _nodeSchema.singularItems->get(),
                                     *instancePropMap[key],
                                     subSuper); // ->getUnionData());
-                                arr.data.emplace_back(
-                                    nonstd::make_value<Ent::Node>(std::move(tmpNode)));
+                                result.emplace_back(key, std::move(tmpNode));
                                 instancePropMap.erase(key);
                             }
                             else // Not overriden
@@ -1420,11 +1421,8 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                                     _nodeSchema.singularItems->get(),
                                     json(),
                                     subSuper); // ->getUnionData());
-                                arr.data.emplace_back(
-                                    nonstd::make_value<Ent::Node>(std::move(tmpNode)));
-                                if (arr.data.back()->hasOverride())
-                                    arr.data.back()->hasOverride();
-                                ENTLIB_ASSERT(arr.data.back()->hasOverride() == false);
+                                ENTLIB_ASSERT(tmpNode.hasOverride() == false);
+                                result.emplace_back(key, std::move(tmpNode));
                             }
                         }
                     }
@@ -1436,40 +1434,100 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                         {
                             Ent::Node tmpNode =
                                 loadNode(_nodeSchema.singularItems->get(), item, nullptr);
-                            arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
+                            result.emplace_back(key, std::move(tmpNode));
                         }
+                    }
+                    if (ordered)
+                    {
+                        std::sort(begin(result), end(result), [](auto&& a, auto&& b) {
+                            return std::get<0>(a) < std::get<0>(b);
+                        });
+                    }
+                    for (auto const& key_node : result)
+                    {
+                        arr.data.emplace_back(
+                            nonstd::make_value<Ent::Node>(std::move(std::get<1>(key_node))));
                     }
                 };
                 switch (hash(meta.overridePolicy))
                 {
-                case "unionSet"_hash:
+                case "map"_hash:
                 {
-                    auto getKeyJson = [&_nodeSchema](json const& item) {
-                        auto const& unionMeta =
-                            _nodeSchema.singularItems->get().meta.get<Ent::Subschema::UnionMeta>();
-                        return item[unionMeta.typeField].get<std::string>();
-                    };
-                    auto getKeyNode = [&meta](Node const* subSuper) {
-                        return subSuper->getUnionType();
-                    };
-                    mergeMapOverride(getKeyJson, getKeyNode);
+                    Ent::DataType keyType = _nodeSchema.singularItems->get().linearItems->at(0)->type;
+#pragma warning(push)
+#pragma warning(disable : 4061) // There are switches with missing cases. This is wanted.
+                    switch (keyType)
+                    {
+                    case Ent::DataType::string:
+                        mergeMapOverride(
+                            meta.ordered,
+                            [](json const& item) { return item[0].get<std::string>(); },
+                            [](Node const* tmplItem) { return tmplItem->at(0llu)->getString(); });
+                        break;
+                    case Ent::DataType::number:
+                        mergeMapOverride(
+                            meta.ordered,
+                            [](json const& item) { return item[0].get<float>(); },
+                            [](Node const* tmplItem) { return tmplItem->at(0llu)->getFloat(); });
+                        break;
+                    case Ent::DataType::integer:
+                        mergeMapOverride(
+                            meta.ordered,
+                            [](json const& item) { return item[0].get<int64_t>(); },
+                            [](Node const* tmplItem) { return tmplItem->at(0llu)->getInt(); });
+                        break;
+                    default:
+                        throw std::runtime_error("Unknown key type in map " + _nodeSchema.name);
+                    }
                 }
                 break;
-#ifdef NOT_YET_TESTED
                 case "set"_hash:
                 {
-                    auto getKeyJson = [&meta](json const& item) {
-                        if (item.count(meta.keyField) == 0)
-                            throw std::runtime_error("Key field (" + meta.keyField + ") not found");
-                        return item[meta.keyField].get<std::string>();
-                    };
-                    auto getKeyNode = [&meta](Node const* subSuper) {
-                        return subSuper->at(meta.keyField.c_str())->getString();
-                    };
-                    mergeMapOverride(getKeyJson, getKeyNode);
+                    Ent::DataType const keyType = _nodeSchema.singularItems->get().type;
+                    switch (keyType)
+                    {
+                    case Ent::DataType::oneOf:
+                    {
+                        auto const& unionMeta =
+                            _nodeSchema.singularItems->get().meta.get<Ent::Subschema::UnionMeta>();
+                        mergeMapOverride(
+                            meta.ordered,
+                            [&unionMeta](json const& item) {
+                                return item[unionMeta.typeField].get<std::string>();
+                            },
+                            [](Node const* subSuper) { return subSuper->getUnionType(); });
+                    }
+                    break;
+                    case Ent::DataType::string:
+                        mergeMapOverride(
+                            meta.ordered,
+                            [](json const& item) { return item.get<std::string>(); },
+                            [](Node const* tmplItem) { return tmplItem->getString(); });
+                        break;
+                    case Ent::DataType::number:
+                        mergeMapOverride(
+                            meta.ordered,
+                            [](json const& item) { return item.get<float>(); },
+                            [](Node const* tmplItem) { return tmplItem->getFloat(); });
+                        break;
+                    case Ent::DataType::integer:
+                        mergeMapOverride(
+                            meta.ordered,
+                            [](json const& item) { return item.get<int64_t>(); },
+                            [](Node const* tmplItem) { return tmplItem->getInt(); });
+                        break;
+                    case Ent::DataType::boolean:
+                        mergeMapOverride(
+                            meta.ordered,
+                            [](json const& item) { return item.get<bool>(); },
+                            [](Node const* tmplItem) { return tmplItem->getBool(); });
+                        break;
+                    default:
+                        throw std::runtime_error("Unknown key type in set " + _nodeSchema.name);
+                    }
+#pragma warning(pop)
                 }
                 break;
-#endif
                 case ""_hash:
                 {
                     for (auto const& item : _data)

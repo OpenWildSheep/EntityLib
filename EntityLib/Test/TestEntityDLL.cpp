@@ -183,6 +183,15 @@ try
         ENTLIB_ASSERT(type != nullptr);
         ENTLIB_ASSERT(type->getInt() == -1);
 
+        // Map and Set overridePolicy
+        Ent::Component const* pathNodeGD = ent->getComponent("PathNodeGD");
+        Ent::Node const* tags = pathNodeGD->root.at("Tags")->at("Tags");
+        ENTLIB_ASSERT(tags->size() == 2);
+        ENTLIB_ASSERT(tags->at(0llu)->at(0llu)->getString() == std::string("a"));
+        ENTLIB_ASSERT(tags->at(1llu)->at(0llu)->getString() == std::string("c"));
+        ENTLIB_ASSERT(tags->at(1llu)->at(1llu)->size() == 1);
+        ENTLIB_ASSERT(tags->at(1llu)->at(1llu)->at(0llu)->getString() == std::string("2"));
+
         // Test default value
         Ent::Component const* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
         ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->getFloat() == 100.f);
@@ -451,6 +460,18 @@ try
         Ent::Node const* exitRequ = chosen->at("ExitRequired");
         ENTLIB_ASSERT(exitRequ != nullptr);
         ENTLIB_ASSERT(exitRequ->getBool() == true);
+
+        // Map and Set overridePolicy
+        Ent::Component const* pathNodeGD = ent.getComponent("PathNodeGD");
+        Ent::Node const* tags = pathNodeGD->root.at("Tags")->at("Tags");
+        ENTLIB_ASSERT(tags->size() == 3);
+        ENTLIB_ASSERT(tags->at(0llu)->at(0llu)->getString() == std::string("a"));
+        ENTLIB_ASSERT(tags->at(1llu)->at(0llu)->getString() == std::string("b"));
+        ENTLIB_ASSERT(tags->at(2llu)->at(0llu)->getString() == std::string("c"));
+        ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->size() == 3);
+        ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(0llu)->getString() == std::string("1"));
+        ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(1llu)->getString() == std::string("2"));
+        ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(2llu)->getString() == std::string("3"));
 
         // TEST SubScene (without override)
         Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();

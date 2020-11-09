@@ -111,7 +111,7 @@ namespace Ent
         struct ArrayMeta : BaseMeta
         {
             std::string overridePolicy; ///< Policy used to override the array from the template
-            std::string keyField; ///< Name of the key field if the overridePolicy is "set"
+            bool ordered = true;
         };
         /// Store metadata for all schema which doesn't have specific field
         struct GenericMeta : BaseMeta

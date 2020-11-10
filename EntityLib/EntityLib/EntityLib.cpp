@@ -1462,7 +1462,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                 }
                 // TODO : Create minItem items
             }
-            else
+            else // If it is a singularItems and there is _data, we have to use the overridePolicy
             {
                 auto&& meta = _nodeSchema.meta.get<Ent::Subschema::ArrayMeta>();
                 using namespace Ent;
@@ -1471,6 +1471,10 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                 {
                 case "map"_hash:
                 {
+                    // It is a C++ map.
+                    // In json it is an array of "2 item array" where the 1st item is the key
+                    // and can be string, float or integer
+                    // meta.ordered means the items have to be sorted by the key
                     Ent::DataType keyType = _nodeSchema.singularItems->get().linearItems->at(0)->type;
 #pragma warning(push)
 #pragma warning(disable : 4061) // There are switches with missing cases. This is wanted.
@@ -1498,10 +1502,13 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                 break;
                 case "set"_hash:
                 {
+                    // It is a C++ set.
+                    // In json it is an array of primitive. string, float or integer or oneOf
+                    // meta.ordered means the items have to be sorted by the key
                     Ent::DataType const keyType = _nodeSchema.singularItems->get().type;
                     switch (keyType)
                     {
-                    case Ent::DataType::oneOf:
+                    case Ent::DataType::oneOf: // The key is the className string
                     {
                         auto const& unionMeta =
                             _nodeSchema.singularItems->get().meta.get<Ent::Subschema::UnionMeta>();
@@ -1512,25 +1519,20 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                             [](Node const* subSuper) { return subSuper->getUnionType(); });
                     }
                     break;
-                    case Ent::DataType::string:
+                    case Ent::DataType::string: // The key is the item itself
                         arr = mergeMapOverride(
                             [](json const& item) { return item.get<std::string>(); },
                             [](Node const* tmplItem) { return tmplItem->getString(); });
                         break;
-                    case Ent::DataType::number:
+                    case Ent::DataType::number: // The key is the item itself
                         arr = mergeMapOverride(
                             [](json const& item) { return item.get<float>(); },
                             [](Node const* tmplItem) { return tmplItem->getFloat(); });
                         break;
-                    case Ent::DataType::integer:
+                    case Ent::DataType::integer: // The key is the item itself
                         arr = mergeMapOverride(
                             [](json const& item) { return item.get<int64_t>(); },
                             [](Node const* tmplItem) { return tmplItem->getInt(); });
-                        break;
-                    case Ent::DataType::boolean:
-                        arr = mergeMapOverride(
-                            [](json const& item) { return item.get<bool>(); },
-                            [](Node const* tmplItem) { return tmplItem->getBool(); });
                         break;
                     default:
                         throw std::runtime_error("Unknown key type in set " + _nodeSchema.name);
@@ -1538,7 +1540,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
 #pragma warning(pop)
                 }
                 break;
-                case ""_hash:
+                case ""_hash: // The default "overridePolicy" is for simple array
                 {
                     for (auto const& item : _data)
                     {

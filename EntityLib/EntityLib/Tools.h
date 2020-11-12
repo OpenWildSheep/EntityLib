@@ -33,9 +33,14 @@ namespace Ent
     template <>
     struct hasher<std::string>
     {
-        std::size_t constexpr operator()(char const* input) const
+        uint32_t constexpr HashStrRecur(uint32_t _hash, const char* _str) const
         {
-            return *input ? static_cast<unsigned int>(*input) + 33 * (*this)(input + 1) : 5381;
+            return (*_str == 0) ? _hash : HashStrRecur(((_hash << 5) + _hash) + *_str, _str + 1);
+        }
+
+        std::size_t constexpr operator()(char const* _str) const
+        {
+            return (*_str == 0) ? 0 : HashStrRecur(5381, _str);
         }
         std::size_t operator()(const std::string& str) const
         {

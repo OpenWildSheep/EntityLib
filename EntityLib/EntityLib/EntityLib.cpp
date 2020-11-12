@@ -1321,6 +1321,7 @@ struct MergeMapOverride
             }
         }
         // Load items from instance which are not in template (they are new)
+        // Use _data (and not instancePropMap) to keep the order of items inside _data
         for (auto const& item : _data)
         {
             auto key = getKeyJson(item);

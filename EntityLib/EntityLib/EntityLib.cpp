@@ -141,6 +141,17 @@ namespace Ent
         return getUnionData();
     }
 
+    void Union::computeMemory(MemoryProfiler& prof) const
+    {
+        if (wrapper)
+        {
+            wrapper->computeMemory(prof);
+            prof.add("Union::wrapper", sizeof(Node));
+        }
+        prof.add("Union::classNameField", classNameField.capacity());
+        prof.add("Union::classNameField", classDatafield.capacity());
+    }
+
     // ************************************* Node *************************************************
 
     Node::Node(Value val, Subschema const* _schema)
@@ -722,6 +733,51 @@ namespace Ent
     Subschema const* Node::getSchema() const
     {
         return schema;
+    }
+
+    struct ComputeMem
+    {
+        MemoryProfiler& prof;
+        template <typename T>
+        void operator()(Override<T> const& _ov) const
+        {
+            return _ov.computeMemory(prof);
+        }
+
+        void operator()(Null const&) const
+        {
+        }
+
+        void operator()(Array const& _arr) const
+        {
+            prof.add("Array::data", _arr.data.capacity() * sizeof(_arr.data.front()));
+            for (auto&& item : _arr.data)
+            {
+                item->computeMemory(prof);
+                prof.add("Array::data::value_ptr", sizeof(Ent::Node));
+            }
+        }
+
+        void operator()(Object const& _obj) const
+        {
+            for (auto&& name_node : _obj)
+            {
+                prof.add("Object::name_node", sizeof(name_node));
+                prof.add("Object::name_node::first", std::get<0>(name_node).capacity());
+                std::get<1>(name_node)->computeMemory(prof);
+                prof.add("Object::name_node::second", sizeof(Ent::Node));
+            }
+        }
+
+        void operator()(Union const& _un) const
+        {
+            _un.computeMemory(prof);
+        }
+    };
+
+    void Node::computeMemory(MemoryProfiler& prof) const
+    {
+        mapbox::util::apply_visitor(ComputeMem{ prof }, value);
     }
 
     // ********************************* SubSceneComponent ****************************************
@@ -2396,6 +2452,13 @@ void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const&
             throw;
         }
     }
+}
+
+void Ent::SubSceneComponent::computeMemory(MemoryProfiler& prof) const
+{
+    file.computeMemory(prof);
+    if (embedded)
+        embedded->computeMemory(prof);
 }
 
 std::unique_ptr<Ent::SubSceneComponent> Ent::SubSceneComponent::makeInstanceOf() const

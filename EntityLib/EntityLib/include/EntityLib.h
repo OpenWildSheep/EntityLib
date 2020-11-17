@@ -22,6 +22,18 @@ namespace Ent
 
     // ******************************** Implem details ********************************************
 
+    struct MemoryProfiler
+    {
+        std::map<std::string, size_t> mem;
+        size_t total = 0;
+
+        void add(char const* name, size_t value)
+        {
+            mem[name] += value;
+            total += value;
+        }
+    };
+
     struct Node;
 
     /// \cond PRIVATE
@@ -60,6 +72,8 @@ namespace Ent
         /// @brief Change the type inside the union
         /// @pre type match with a type declared inside the json "oneOf"
         Node* setUnionType(char const* _type);
+
+        void computeMemory(MemoryProfiler& prof) const;
     };
 
     struct EntityRef
@@ -109,6 +123,8 @@ namespace Ent
         {
             return !(prefabValue.has_value() || overrideValue.has_value());
         }
+
+        void computeMemory(MemoryProfiler& prof) const;
 
         // bool hasOverride() const;
 
@@ -232,6 +248,8 @@ namespace Ent
 
         Subschema const* getSchema() const; ///< Get the Node schema.
 
+        void computeMemory(MemoryProfiler& prof) const;
+
     private:
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
         Value value; ///< Contains one of the types accepted by a Node
@@ -249,6 +267,12 @@ namespace Ent
 
         /// \cond PRIVATE
         DeleteCheck deleteCheck;
+
+        void computeMemory(MemoryProfiler& prof) const
+        {
+            prof.add("Component::type", type.size());
+            root.computeMemory(prof);
+        }
 
         /// Create a Component which is an "instance of" this one. With no override.
         Component makeInstanceOf() const
@@ -287,6 +311,8 @@ namespace Ent
         Override<std::string> file; ///< Path to a .scene file, whene isEmbedded is false
         size_t index = 0; ///< Useful to keep the componants order in the json file
         std::unique_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
+
+        void computeMemory(MemoryProfiler& prof) const;
 
         /// @cond PRIVATE
         explicit SubSceneComponent(
@@ -439,6 +465,24 @@ namespace Ent
         /// @brief Set the parent scene object containing this entity.
         void setParentScene(Scene* _scene);
 
+        void computeMemory(MemoryProfiler& prof) const
+        {
+            name.computeMemory(prof);
+            for (auto&& name_comp : components)
+            {
+                prof.add("Entity::components::value", sizeof(name_comp));
+                prof.add("Entity::components::key", sizeof(std::get<0>(name_comp).size()));
+                std::get<1>(name_comp).computeMemory(prof);
+            }
+            if (subSceneComponent)
+                subSceneComponent->computeMemory(prof);
+            actorStates.computeMemory(prof);
+            color.computeMemory(prof);
+            thumbnail.computeMemory(prof);
+            instanceOf.computeMemory(prof);
+            maxActivationLevel.computeMemory(prof);
+        }
+
     private:
         void updateSubSceneOwner();
         EntityLib const* entlib{}; ///< Reference the entity lib to find the schema when needed
@@ -501,6 +545,13 @@ namespace Ent
 
         /// @brief Set the entity owning this scene if it is embedded.
         void setOwnerEntity(Entity* _entity);
+
+        void computeMemory(MemoryProfiler& prof) const
+        {
+            prof.add("Scene::objects", objects.capacity() * sizeof(objects.front()));
+            for (auto&& entityPtr : objects)
+                entityPtr->computeMemory(prof);
+        }
 
     private:
         Entity* ownerEntity = nullptr; ///< the entity owning this scene if it is embedded
@@ -656,6 +707,33 @@ namespace Ent
         else
             return Override<V>(defaultValue, prefabValue, tl::nullopt);
     }
+
+    struct Memory
+    {
+        MemoryProfiler* prof;
+
+        template <typename T>
+        void operator()(T) const
+        {
+        }
+
+        void operator()(std::string const& str) const
+        {
+            prof->add("Override<string>", str.capacity());
+        }
+    };
+
+    template <typename V>
+    void Override<V>::computeMemory(MemoryProfiler& prof) const
+    {
+        Memory compute{ &prof };
+        compute(defaultValue);
+        if (prefabValue)
+            compute(prefabValue);
+        if (overrideValue)
+            compute(overrideValue);
+    }
+
     /// \endcond
 
 } // namespace Ent

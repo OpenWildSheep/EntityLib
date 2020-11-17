@@ -39,13 +39,19 @@ namespace Ent
     /// \cond PRIVATE
 
     /// Content of a Node which has type Ent::DataType::object
-    using Object = std::map<String, Node>;
+    struct CompStr
+    {
+        bool operator()(char const* a, char const* b) const
+        {
+            return strcmp(a, b) < 0;
+        }
+    };
+    using Object = std::map<char const*, Node, CompStr>;
 
     /// Content of a Node which has type Ent::DataType::array
     struct Array
     {
         std::vector<value_ptr<Node>> data; ///< List of items of the array
-        DeleteCheck deleteCheck;
 
         bool hasOverride() const;
     };

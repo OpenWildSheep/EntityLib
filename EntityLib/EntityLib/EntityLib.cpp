@@ -569,7 +569,7 @@ namespace Ent
             std::vector<char const*> fields;
             for (auto&& f : value.get<Object>())
             {
-                fields.push_back(f.first.c_str());
+                fields.push_back(f.first);
             }
             return fields;
         }
@@ -755,7 +755,6 @@ namespace Ent
             for (auto&& name_node : _obj)
             {
                 prof.add("Object::name_node", sizeof(name_node));
-                prof.add("Object::name_node::first", std::get<0>(name_node).capacity());
                 std::get<1>(name_node).computeMemory(prof);
             }
         }
@@ -1344,7 +1343,7 @@ struct MergeMapOverride
         using KeyType = std::remove_reference_t<decltype(getKeyJson(json()))>;
         std::map<KeyType, json const*> instancePropMap;
         for (auto const& item : _data)
-    {
+        {
             instancePropMap.emplace(getKeyJson(item), &item);
         }
         std::vector<std::pair<KeyType, Node>> result;
@@ -1360,13 +1359,13 @@ struct MergeMapOverride
                         loadNode(_nodeSchema.singularItems->get(), *instancePropMap[key], subSuper);
                     result.emplace_back(key, std::move(tmpNode));
                     instancePropMap.erase(key); // Later we need to know which item are NOT in the template
-        }
+                }
                 else // Not overriden
                 {
                     Ent::Node tmpNode = loadNode(_nodeSchema.singularItems->get(), json(), subSuper);
                     ENTLIB_ASSERT(tmpNode.hasOverride() == false);
                     result.emplace_back(key, std::move(tmpNode));
-    }
+                }
             }
         }
         // Load items from instance which are not in template (they are new)
@@ -1377,19 +1376,19 @@ struct MergeMapOverride
             if (instancePropMap.count(key))
             {
                 result.emplace_back(key, loadNode(_nodeSchema.singularItems->get(), item, nullptr));
+            }
         }
-    }
         if (ordered)
         {
             std::sort(begin(result), end(result), [](auto&& a, auto&& b) {
                 return std::get<0>(a) < std::get<0>(b);
             });
-    }
+        }
         Ent::Array arr;
         for (auto const& key_node : result)
         {
             arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(std::get<1>(key_node))));
-}
+        }
         return arr;
     }
 };
@@ -1412,11 +1411,11 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
             // We don't want to "override" this value to avoid to write every oneOf
             if (_super != nullptr) // If there is a template, the value is not overriden
             {
-                result = Ent::Node(Ent::Override<std::string>("", def, tl::nullopt), &_nodeSchema);
+                result = Ent::Node(Ent::Override<String>("", def, tl::nullopt), &_nodeSchema);
             }
             else // If there is no template, it is overriden to be sure the node "hasOverride" and be saved
             {
-                result = Ent::Node(Ent::Override<std::string>("", tl::nullopt, def), &_nodeSchema);
+                result = Ent::Node(Ent::Override<String>("", tl::nullopt, def), &_nodeSchema);
             }
         }
         else
@@ -1487,7 +1486,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
             static json const emptyJson;
             json const& prop = _data.count(name) != 0 ? _data.at(name) : emptyJson;
             Ent::Node tmpNode = loadNode(*std::get<1>(name_sub), prop, superProp);
-            object.emplace(name, std::move(tmpNode));
+            object.emplace(name.c_str(), std::move(tmpNode));
         }
         result = Ent::Node(std::move(object), &_nodeSchema);
     }
@@ -1592,24 +1591,24 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                 break;
                 case ""_hash: // The default "overridePolicy" is for simple array
                 {
-                for (auto const& item : _data)
-                {
+                    for (auto const& item : _data)
+                    {
                         Ent::Node const* subSuper =
                             (_super != nullptr and (_super->size() > index)) ? _super->at(index) :
-                                                    nullptr;
+                                                                               nullptr;
                         Ent::Node tmpNode =
                             loadNode(_nodeSchema.singularItems->get(), item, subSuper);
-                    arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
-                    ++index;
+                        arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
+                        ++index;
+                    }
                 }
-            }
                 break;
                 default:
                     throw std::runtime_error(format(
                         "Unknown key type (%s) in schema of %s",
                         meta.overridePolicy.c_str(),
                         _nodeSchema.name.c_str()));
-        }
+                }
             }
         }
         else

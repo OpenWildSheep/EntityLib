@@ -298,15 +298,23 @@ namespace Ent
     /// The properties of a given component
     struct Component
     {
-        bool hasTemplate; ///< True if if override an other component (not just default)
         std::string type; ///< Component type (ex : Transform, VisualGD, HeightObj ...)
         Node root; ///< Root node of the component. Always of type Ent::DataType::object
-        size_t version; ///< @todo remove?
-        size_t index; ///< Useful to keep the componants order in the json file. To make diffs easier.
+        size_t version{}; ///< @todo remove?
+        size_t index{}; ///< Useful to keep the componants order in the json file. To make diffs easier.
+        DeleteCheck deleteCheck;
+        bool hasTemplate{}; ///< True if if override an other component (not just default)
+
+        Component(bool _hasTemplate, std::string _type, Node _root, size_t _version, size_t _index)
+            : type(std::move(_type))
+            , root(std::move(_root))
+            , version(_version)
+            , index(_index)
+            , hasTemplate(_hasTemplate)
+        {
+        }
 
         /// \cond PRIVATE
-        DeleteCheck deleteCheck;
-
         void computeMemory(MemoryProfiler& prof) const
         {
             prof.add("Component::type", type.size());

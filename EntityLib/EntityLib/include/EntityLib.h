@@ -62,8 +62,7 @@ namespace Ent
     {
         Subschema const* schema = nullptr; ///< The schema of the object containing the oneOf field
         value_ptr<Node> wrapper; ///< Node containing the className/classData
-        String classNameField; ///< Name of the field containing the type under union
-        String classDatafield; ///< Name of the field containing the data under union
+        Ent::Subschema::UnionMeta const* metaData = nullptr;
 
         bool hasOverride() const; ///< Recursively check if there is an override inside.
         Node* getUnionData(); ///< return the underlying data (The type is given by getUnionType)

@@ -107,19 +107,19 @@ namespace Ent
 
     Node* Union::getUnionData()
     {
-        return wrapper->at(classDatafield.c_str());
+        return wrapper->at(metaData->dataField.c_str());
     }
 
     Node const* Union::getUnionData() const
     {
-        return wrapper->at(classDatafield.c_str());
+        return wrapper->at(metaData->dataField.c_str());
     }
 
     char const* Union::getUnionType() const
     {
         if (wrapper.has_value())
         {
-            return wrapper->at(classNameField.c_str())->getString();
+            return wrapper->at(metaData->typeField.c_str())->getString();
         }
         else
         {
@@ -136,7 +136,7 @@ namespace Ent
             //   It could be hard because we are no more in the loading phase, so the super is
             //   now delete.
             wrapper = loadNode(*subTypeSchema, json(), nullptr);
-            wrapper->at(classNameField.c_str())->setString(_type);
+            wrapper->at(metaData->typeField.c_str())->setString(_type);
         }
         return getUnionData();
     }
@@ -148,8 +148,6 @@ namespace Ent
             wrapper->computeMemory(prof);
             prof.add("Union::wrapper", sizeof(Node));
         }
-        prof.add("Union::classNameField", classNameField.capacity());
-        prof.add("Union::classNameField", classDatafield.capacity());
     }
 
     // ************************************* Node *************************************************
@@ -459,8 +457,7 @@ namespace Ent
             Union detUnion{};
             detUnion.schema = _un.schema;
             detUnion.wrapper = _un.wrapper->detach();
-            detUnion.classDatafield = _un.classDatafield;
-            detUnion.classNameField = _un.classNameField;
+            detUnion.metaData = _un.metaData;
             return Node(std::move(detUnion), schema);
         }
     };
@@ -511,8 +508,7 @@ namespace Ent
             Union detUnion{};
             detUnion.schema = _un.schema;
             detUnion.wrapper = _un.wrapper->makeInstanceOf();
-            detUnion.classDatafield = _un.classDatafield;
-            detUnion.classNameField = _un.classNameField;
+            detUnion.metaData = _un.metaData;
             return Node(std::move(detUnion), schema);
         }
     };
@@ -1657,7 +1653,6 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
     {
         auto&& meta = _nodeSchema.meta.get<Ent::Subschema::UnionMeta>();
         std::string const& typeField = meta.typeField;
-        std::string const& dataField = meta.dataField;
         std::string dataType;
         if (_data.count(typeField) != 0)
         {
@@ -1698,8 +1693,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                 Ent::Union un{};
                 un.schema = &_nodeSchema;
                 un.wrapper = nonstd::make_value<Ent::Node>(std::move(dataNode));
-                un.classDatafield = dataField;
-                un.classNameField = typeField;
+                un.metaData = &meta;
                 result = Ent::Node(std::move(un), &_nodeSchema);
                 typeFound = true;
                 break;

@@ -26,6 +26,9 @@ namespace Ent
     {
         std::map<std::string, size_t> mem;
         size_t total = 0;
+        size_t nodeCount = 0;
+        std::map<std::string, size_t> nodeByComp;
+        std::vector<std::string> currentComp;
 
         void add(char const* name, size_t value)
         {
@@ -297,7 +300,6 @@ namespace Ent
     private:
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
         Value value; ///< Contains one of the types accepted by a Node
-        DeleteCheck deleteCheck;
     };
 
     /// The properties of a given component
@@ -322,8 +324,10 @@ namespace Ent
         /// \cond PRIVATE
         void computeMemory(MemoryProfiler& prof) const
         {
+            prof.currentComp.push_back(type);
             prof.add("Component::type", type.size());
             root.computeMemory(prof);
+            prof.currentComp.pop_back();
         }
 
         /// Create a Component which is an "instance of" this one. With no override.

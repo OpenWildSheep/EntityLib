@@ -748,6 +748,8 @@ namespace Ent
                 item->computeMemory(prof);
                 prof.add("Array::data::value_ptr", sizeof(Ent::Node));
             }
+            prof.nodeCount += _arr.data.size();
+            prof.nodeByComp[prof.currentComp.front()] += _arr.data.size();
         }
 
         void operator()(Object const& _obj) const
@@ -757,6 +759,8 @@ namespace Ent
                 prof.add("Object::name_node", sizeof(name_node));
                 std::get<1>(name_node).computeMemory(prof);
             }
+            prof.nodeCount += _obj.size();
+            prof.nodeByComp[prof.currentComp.front()] += _obj.size();
         }
 
         void operator()(Union const& _un) const

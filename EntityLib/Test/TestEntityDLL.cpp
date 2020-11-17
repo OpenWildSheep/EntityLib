@@ -167,13 +167,30 @@ try
         // ActorStates
         Ent::Node const& actorStates = ent->getActorStates();
         ENTLIB_ASSERT(actorStates.getDataType() == Ent::DataType::array);
+        ENTLIB_ASSERT(actorStates.size() == 2);
         Ent::Node const* actorState = actorStates.at(0llu);
         ENTLIB_ASSERT(actorState != nullptr);
-        Ent::Node const* chosen = actorState->getUnionData();
-        ENTLIB_ASSERT(chosen != nullptr);
-        Ent::Node const* exitRequired = chosen->at("ExitRequired");
+        Ent::Node const* climbEdge = actorState->getUnionData();
+        ENTLIB_ASSERT(climbEdge != nullptr);
+        Ent::Node const* exitRequired = climbEdge->at("locomotionMode");
         ENTLIB_ASSERT(exitRequired != nullptr);
-        ENTLIB_ASSERT(exitRequired->getBool() == true);
+        ENTLIB_ASSERT(exitRequired->getString() == std::string("crouch"));
+        Ent::Node const* actorState2 = actorStates.at(1llu);
+        ENTLIB_ASSERT(actorState2 != nullptr);
+        Ent::Node const* cinematic = actorState2->getUnionData();
+        ENTLIB_ASSERT(cinematic != nullptr);
+        Ent::Node const* type = cinematic->at("Type");
+        ENTLIB_ASSERT(type != nullptr);
+        ENTLIB_ASSERT(type->getInt() == -1);
+
+        // Map and Set overridePolicy
+        Ent::Component const* pathNodeGD = ent->getComponent("PathNodeGD");
+        Ent::Node const* tags = pathNodeGD->root.at("Tags")->at("Tags");
+        ENTLIB_ASSERT(tags->size() == 2);
+        ENTLIB_ASSERT(tags->at(0llu)->at(0llu)->getString() == std::string("a"));
+        ENTLIB_ASSERT(tags->at(1llu)->at(0llu)->getString() == std::string("c"));
+        ENTLIB_ASSERT(tags->at(1llu)->at(1llu)->size() == 1);
+        ENTLIB_ASSERT(tags->at(1llu)->at(1llu)->at(0llu)->getString() == std::string("2"));
 
         // Test default value
         Ent::Component const* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
@@ -219,8 +236,6 @@ try
         // TEST default values
         ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
         ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
-        ENTLIB_ASSERT(sysCreat->root.at("Name")->getString() == std::string()); // default
-        ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
 
         // TEST SubScene
         Ent::SubSceneComponent const* subScenecomp = ent->getSubSceneComponent();
@@ -303,6 +318,8 @@ try
         ent->setMaxActivationLevel(Ent::ActivationLevel::InWorld);
 
         Ent::Component* sysCreat = ent->getComponent("SystemicCreature");
+        ENTLIB_ASSERT(sysCreat->root.at("Name")->getString() == std::string()); // default
+        ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
         sysCreat->root.at("Name")->setString("Shamane_male");
         entlib.saveEntity(*ent, "prefab.copy.entity");
     }
@@ -314,6 +331,8 @@ try
     {
         // Test write prefab
         EntityPtr ent = entlib.loadEntity("prefab.copy.entity");
+
+        testPrefabEntity(ent.get());
 
         // TEST MaxActivationLevel
         ENTLIB_ASSERT(ent->getMaxActivationLevel() == Ent::ActivationLevel::InWorld);
@@ -416,6 +435,44 @@ try
     }
 
     auto testInstanceOf = [](Ent::Entity const& ent) {
+        // ActorStates
+        Ent::Node const& actorStates = ent.getActorStates();
+        ENTLIB_ASSERT(actorStates.getDataType() == Ent::DataType::array);
+        ENTLIB_ASSERT(actorStates.size() == 3);
+        Ent::Node const* actorState = actorStates.at(0llu);
+        ENTLIB_ASSERT(actorState != nullptr);
+        Ent::Node const* climbEdge = actorState->getUnionData();
+        ENTLIB_ASSERT(climbEdge != nullptr);
+        Ent::Node const* exitRequired = climbEdge->at("locomotionMode");
+        ENTLIB_ASSERT(exitRequired != nullptr);
+        ENTLIB_ASSERT(exitRequired->getString() == std::string("crouch"));
+        Ent::Node const* actorState2 = actorStates.at(1llu);
+        ENTLIB_ASSERT(actorState2 != nullptr);
+        Ent::Node const* cinematic = actorState2->getUnionData();
+        ENTLIB_ASSERT(cinematic != nullptr);
+        Ent::Node const* type = cinematic->at("Type");
+        ENTLIB_ASSERT(type != nullptr);
+        ENTLIB_ASSERT(type->getInt() == 13);
+        Ent::Node const* actorState3 = actorStates.at(2llu);
+        ENTLIB_ASSERT(actorState3 != nullptr);
+        Ent::Node const* chosen = actorState3->getUnionData();
+        ENTLIB_ASSERT(chosen != nullptr);
+        Ent::Node const* exitRequ = chosen->at("ExitRequired");
+        ENTLIB_ASSERT(exitRequ != nullptr);
+        ENTLIB_ASSERT(exitRequ->getBool() == true);
+
+        // Map and Set overridePolicy
+        Ent::Component const* pathNodeGD = ent.getComponent("PathNodeGD");
+        Ent::Node const* tags = pathNodeGD->root.at("Tags")->at("Tags");
+        ENTLIB_ASSERT(tags->size() == 3);
+        ENTLIB_ASSERT(tags->at(0llu)->at(0llu)->getString() == std::string("a"));
+        ENTLIB_ASSERT(tags->at(1llu)->at(0llu)->getString() == std::string("b"));
+        ENTLIB_ASSERT(tags->at(2llu)->at(0llu)->getString() == std::string("c"));
+        ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->size() == 3);
+        ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(0llu)->getString() == std::string("1"));
+        ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(1llu)->getString() == std::string("2"));
+        ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(2llu)->getString() == std::string("3"));
+
         // TEST SubScene (without override)
         Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();
         ENTLIB_ASSERT(subScene != nullptr);

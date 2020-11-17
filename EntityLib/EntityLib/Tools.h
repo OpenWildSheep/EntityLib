@@ -27,5 +27,37 @@ namespace Ent
         std::vector<std::string> _fromAbsolute,
         std::vector<std::string> _toAbsolute,
         bool _leavesAreLast = true);
+
+    template <class>
+    struct hasher;
+    template <>
+    struct hasher<std::string>
+    {
+        uint32_t constexpr HashStrRecur(uint32_t _hash, const char* _str) const
+        {
+            return (*_str == 0) ? _hash : HashStrRecur(((_hash << 5) + _hash) + *_str, _str + 1);
+        }
+
+        std::size_t constexpr operator()(char const* _str) const
+        {
+            return (*_str == 0) ? 0 : HashStrRecur(5381, _str);
+        }
+        std::size_t operator()(const std::string& str) const
+        {
+            return (*this)(str.c_str());
+        }
+    };
+    template <typename T>
+    std::size_t constexpr hash(T&& t)
+    {
+        return hasher<typename std::decay<T>::type>()(std::forward<T>(t));
+    }
+    inline namespace literals
+    {
+        std::size_t constexpr operator"" _hash(const char* s, size_t)
+        {
+            return hasher<std::string>()(s);
+        }
+    } // namespace literals
     /// @endcond PRIVATE
 } // namespace Ent

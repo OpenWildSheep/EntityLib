@@ -1,4 +1,4 @@
-#include "include/EntityLib.h"
+﻿#include "include/EntityLib.h"
 
 #include "Tools.h"
 #include "SchemaLoader.h"
@@ -1273,63 +1273,82 @@ namespace Ent
 
 // ********************************** Load/Save ***********************************************
 
-static Ent::Node loadFreeObjectNode(json const& _data)
+struct MergeMapOverride
 {
-    Ent::Node result;
-    switch (_data.type())
+    Ent::Subschema const& _nodeSchema;
+    json const& _data;
+    Ent::Node const* _super;
+
+    // Merge the instance array/map/set with the template array/map/set and return the resulting Ent::Array
+    template <typename GetKeyJson, typename GetKeyNode>
+    Ent::Array operator()(
+        GetKeyJson&& getKeyJson, ///< Function to get the key in the json (instance)
+        GetKeyNode&& getKeyNode ///< Function to get the key in the Node (template)
+    )
     {
-    case nlohmann::detail::value_t::null: result = Ent::Node(Ent::Null{}, nullptr); break;
-    case nlohmann::detail::value_t::string:
-        result = Ent::Node(
-            Ent::Override<std::string>(std::string(), tl::nullopt, _data.get<std::string>()),
-            nullptr);
-        break;
-    case nlohmann::detail::value_t::boolean:
-        result = Ent::Node(Ent::Override<bool>(bool{}, tl::nullopt, _data.get<bool>()), nullptr);
-        break;
-    case nlohmann::detail::value_t::number_integer:
-    case nlohmann::detail::value_t::number_unsigned:
-        result =
-            Ent::Node(Ent::Override<int64_t>(int64_t{}, tl::nullopt, _data.get<int64_t>()), nullptr);
-        break;
-    case nlohmann::detail::value_t::number_float:
-        result = Ent::Node(Ent::Override<float>(float{}, tl::nullopt, _data.get<float>()), nullptr);
-        break;
-    case nlohmann::detail::value_t::object:
-    {
-        Ent::Object object;
-        for (auto const& field : _data.items())
-        {
-            std::string const& name = field.key();
-            json const& value = field.value();
-            Ent::Node tmpNode = loadFreeObjectNode(value);
-            object.emplace(name, nonstd::make_value<Ent::Node>(std::move(tmpNode)));
-        }
-        result = Ent::Node(std::move(object), nullptr);
-    }
-    break;
-    case nlohmann::detail::value_t::array:
-    {
-        Ent::Array arr;
+        using namespace Ent;
+
+        auto&& meta = _nodeSchema.meta.get<Ent::Subschema::ArrayMeta>();
+        bool const ordered = meta.ordered;
+
+        // Make a map key=>item of the instance array
+        using KeyType = std::remove_reference_t<decltype(getKeyJson(json()))>;
+        std::map<KeyType, json const*> instancePropMap;
         for (auto const& item : _data)
         {
-            Ent::Node tmpNode = loadFreeObjectNode(item);
-            arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
+            instancePropMap.emplace(getKeyJson(item), &item);
         }
-        result = Ent::Node(std::move(arr), nullptr);
+        std::vector<std::pair<KeyType, Node>> result;
+        if (_super != nullptr)
+        {
+            // Load all Nodes from the _super (overriden or not)
+            for (Ent::Node const* subSuper : _super->getItems())
+            {
+                KeyType key = getKeyNode(subSuper);
+                if (instancePropMap.count(key)) // Overriden in instance
+                {
+                    Ent::Node tmpNode =
+                        loadNode(_nodeSchema.singularItems->get(), *instancePropMap[key], subSuper);
+                    result.emplace_back(key, std::move(tmpNode));
+                    instancePropMap.erase(key); // Later we need to know which item are NOT in the template
+                }
+                else // Not overriden
+                {
+                    Ent::Node tmpNode = loadNode(_nodeSchema.singularItems->get(), json(), subSuper);
+                    ENTLIB_ASSERT(tmpNode.hasOverride() == false);
+                    result.emplace_back(key, std::move(tmpNode));
+                }
+            }
+        }
+        // Load items from instance which are not in template (they are new)
+        // Use _data (and not instancePropMap) to keep the order of items inside _data
+        for (auto const& item : _data)
+        {
+            auto key = getKeyJson(item);
+            if (instancePropMap.count(key))
+            {
+                result.emplace_back(key, loadNode(_nodeSchema.singularItems->get(), item, nullptr));
+            }
+        }
+        if (ordered)
+        {
+            std::sort(begin(result), end(result), [](auto&& a, auto&& b) {
+                return std::get<0>(a) < std::get<0>(b);
+            });
+        }
+        Ent::Array arr;
+        for (auto const& key_node : result)
+        {
+            arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(std::get<1>(key_node))));
+        }
+        return arr;
     }
-    break;
-    case nlohmann::detail::value_t::binary:
-    case nlohmann::detail::value_t::discarded: break;
-    }
-    return result;
-}
-
-static Ent::Node const emptyNode(Ent::Null(), nullptr);
+};
 
 static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, Ent::Node const* _super)
 {
     ENTLIB_ASSERT(_super == nullptr or &_nodeSchema == _super->getSchema());
+
     Ent::Node result;
 
     switch (_nodeSchema.type)
@@ -1341,7 +1360,15 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
         {
             // _nodeSchema is const and the value can't be overriden
             std::string const def = _nodeSchema.constValue->get<std::string>();
-            result = Ent::Node(Ent::Override<std::string>("", tl::nullopt, def), &_nodeSchema);
+            // We don't want to "override" this value to avoid to write every oneOf
+            if (_super != nullptr) // If there is a template, the value is not overriden
+            {
+                result = Ent::Node(Ent::Override<std::string>("", def, tl::nullopt), &_nodeSchema);
+            }
+            else // If there is no template, it is overriden to be sure the node "hasOverride" and be saved
+            {
+                result = Ent::Node(Ent::Override<std::string>("", tl::nullopt, def), &_nodeSchema);
+            }
         }
         else
         {
@@ -1436,16 +1463,103 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                 }
                 // TODO : Create minItem items
             }
-            else
+            else // If it is a singularItems and there is _data, we have to use the overridePolicy
             {
-                for (auto const& item : _data)
+                auto&& meta = _nodeSchema.meta.get<Ent::Subschema::ArrayMeta>();
+                using namespace Ent;
+                MergeMapOverride mergeMapOverride{ _nodeSchema, _data, _super };
+                switch (hash(meta.overridePolicy))
                 {
-                    Ent::Node const* subSuper = (_super != nullptr and (_super->size() > index)) ?
-                                                    _super->at(index) :
-                                                    nullptr;
-                    Ent::Node tmpNode = loadNode(_nodeSchema.singularItems->get(), item, subSuper);
-                    arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
-                    ++index;
+                case "map"_hash:
+                {
+                    // It is a C++ map.
+                    // In json it is an array of "2 item array" where the 1st item is the key
+                    // and can be string, float or integer
+                    // meta.ordered means the items have to be sorted by the key
+                    Ent::DataType keyType = _nodeSchema.singularItems->get().linearItems->at(0)->type;
+#pragma warning(push)
+#pragma warning(disable : 4061) // There are switches with missing cases. This is wanted.
+                    switch (keyType)
+                    {
+                    case Ent::DataType::string:
+                        arr = mergeMapOverride(
+                            [](json const& item) { return item[0].get<std::string>(); },
+                            [](Node const* tmplItem) { return tmplItem->at(0llu)->getString(); });
+                        break;
+                    case Ent::DataType::number:
+                        arr = mergeMapOverride(
+                            [](json const& item) { return item[0].get<float>(); },
+                            [](Node const* tmplItem) { return tmplItem->at(0llu)->getFloat(); });
+                        break;
+                    case Ent::DataType::integer:
+                        arr = mergeMapOverride(
+                            [](json const& item) { return item[0].get<int64_t>(); },
+                            [](Node const* tmplItem) { return tmplItem->at(0llu)->getInt(); });
+                        break;
+                    default:
+                        throw std::runtime_error("Unknown key type in map " + _nodeSchema.name);
+                    }
+                }
+                break;
+                case "set"_hash:
+                {
+                    // It is a C++ set.
+                    // In json it is an array of primitive. string, float or integer or oneOf
+                    // meta.ordered means the items have to be sorted by the key
+                    Ent::DataType const keyType = _nodeSchema.singularItems->get().type;
+                    switch (keyType)
+                    {
+                    case Ent::DataType::oneOf: // The key is the className string
+                    {
+                        auto const& unionMeta =
+                            _nodeSchema.singularItems->get().meta.get<Ent::Subschema::UnionMeta>();
+                        arr = mergeMapOverride(
+                            [&unionMeta](json const& item) {
+                                return item[unionMeta.typeField].get<std::string>();
+                            },
+                            [](Node const* subSuper) { return subSuper->getUnionType(); });
+                    }
+                    break;
+                    case Ent::DataType::string: // The key is the item itself
+                        arr = mergeMapOverride(
+                            [](json const& item) { return item.get<std::string>(); },
+                            [](Node const* tmplItem) { return tmplItem->getString(); });
+                        break;
+                    case Ent::DataType::number: // The key is the item itself
+                        arr = mergeMapOverride(
+                            [](json const& item) { return item.get<float>(); },
+                            [](Node const* tmplItem) { return tmplItem->getFloat(); });
+                        break;
+                    case Ent::DataType::integer: // The key is the item itself
+                        arr = mergeMapOverride(
+                            [](json const& item) { return item.get<int64_t>(); },
+                            [](Node const* tmplItem) { return tmplItem->getInt(); });
+                        break;
+                    default:
+                        throw std::runtime_error("Unknown key type in set " + _nodeSchema.name);
+                    }
+#pragma warning(pop)
+                }
+                break;
+                case ""_hash: // The default "overridePolicy" is for simple array
+                {
+                    for (auto const& item : _data)
+                    {
+                        Ent::Node const* subSuper =
+                            (_super != nullptr and (_super->size() > index)) ? _super->at(index) :
+                                                                               nullptr;
+                        Ent::Node tmpNode =
+                            loadNode(_nodeSchema.singularItems->get(), item, subSuper);
+                        arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
+                        ++index;
+                    }
+                }
+                break;
+                default:
+                    throw std::runtime_error(format(
+                        "Unknown key type (%s) in schema of %s",
+                        meta.overridePolicy.c_str(),
+                        _nodeSchema.name.c_str()));
                 }
             }
         }
@@ -1583,6 +1697,7 @@ static json saveNode(Ent::Subschema const& _schema, Ent::Node const& _node)
     case Ent::DataType::array:
     {
         data = json::array();
+        auto&& meta = _schema.meta.get<Ent::Subschema::ArrayMeta>();
         for (Ent::Node const* item : _node.getItems())
         {
             if (item->hasOverride())
@@ -1591,7 +1706,7 @@ static json saveNode(Ent::Subschema const& _schema, Ent::Node const& _node)
                 json tmpNode = saveNode(*item->getSchema(), *item);
                 data.emplace_back(std::move(tmpNode));
             }
-            else
+            else if (meta.overridePolicy.empty())
             {
                 data.emplace_back(json());
             }

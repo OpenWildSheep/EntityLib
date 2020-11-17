@@ -169,7 +169,7 @@ namespace Ent
     {
         if (value.is<Object>())
         {
-            return value.get<Object>().at(_field).get();
+            return &value.get<Object>().at(_field);
         }
         throw BadType();
     }
@@ -177,7 +177,7 @@ namespace Ent
     {
         if (value.is<Object>())
         {
-            return value.get<Object>().at(_field).get();
+            return &value.get<Object>().at(_field);
         }
         throw BadType();
     }
@@ -203,7 +203,7 @@ namespace Ent
         {
             auto iter = value.get<Object>().begin();
             std::advance(iter, _index);
-            return iter->second.get();
+            return &iter->second;
         }
         if (value.is<Array>())
         {
@@ -403,7 +403,7 @@ namespace Ent
         bool operator()(Object const& _obj) const
         {
             return std::all_of(begin(_obj), end(_obj), [](auto&& name_node) {
-                return std::get<1>(name_node)->hasDefaultValue();
+                return std::get<1>(name_node).hasDefaultValue();
             });
         }
 
@@ -449,9 +449,7 @@ namespace Ent
             Object out;
             for (auto&& name_node : _obj)
             {
-                out.emplace(
-                    std::get<0>(name_node),
-                    nonstd::make_value<Node>(std::get<1>(name_node)->detach()));
+                out.emplace(std::get<0>(name_node), std::get<1>(name_node).detach());
             }
             return Node(std::move(out), schema);
         }
@@ -503,9 +501,7 @@ namespace Ent
             Object out;
             for (auto&& name_node : _obj)
             {
-                out.emplace(
-                    std::get<0>(name_node),
-                    nonstd::make_value<Node>(std::get<1>(name_node)->makeInstanceOf()));
+                out.emplace(std::get<0>(name_node), std::get<1>(name_node).makeInstanceOf());
             }
             return Node(std::move(out), schema);
         }
@@ -551,7 +547,7 @@ namespace Ent
         {
             for (auto&& name_node : _obj)
             {
-                if (std::get<1>(name_node)->hasOverride())
+                if (std::get<1>(name_node).hasOverride())
                 {
                     return true;
                 }
@@ -764,8 +760,7 @@ namespace Ent
             {
                 prof.add("Object::name_node", sizeof(name_node));
                 prof.add("Object::name_node::first", std::get<0>(name_node).capacity());
-                std::get<1>(name_node)->computeMemory(prof);
-                prof.add("Object::name_node::second", sizeof(Ent::Node));
+                std::get<1>(name_node).computeMemory(prof);
             }
         }
 
@@ -1494,7 +1489,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
             static json const emptyJson;
             json const& prop = _data.count(name) != 0 ? _data.at(name) : emptyJson;
             Ent::Node tmpNode = loadNode(*std::get<1>(name_sub), prop, superProp);
-            object.emplace(name, nonstd::make_value<Ent::Node>(std::move(tmpNode)));
+            object.emplace(name, std::move(tmpNode));
         }
         result = Ent::Node(std::move(object), &_nodeSchema);
     }

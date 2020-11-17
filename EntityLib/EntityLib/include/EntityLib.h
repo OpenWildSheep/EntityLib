@@ -39,7 +39,7 @@ namespace Ent
     /// \cond PRIVATE
 
     /// Content of a Node which has type Ent::DataType::object
-    using Object = std::map<std::string, value_ptr<Node>>;
+    using Object = std::map<std::string, Node>;
 
     /// Content of a Node which has type Ent::DataType::array
     struct Array

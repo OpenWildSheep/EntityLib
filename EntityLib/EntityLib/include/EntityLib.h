@@ -88,13 +88,36 @@ namespace Ent
         Override() = default;
         Override(V _defaultValue, tl::optional<V> _prefabValue, tl::optional<V> _overrideValue)
             : defaultValue(std::move(_defaultValue))
+        {
+            hasPrefab = _prefabValue.has_value();
+            hasOverride = _overrideValue.has_value();
+            if (hasPrefab)
+                prefabValue = std::move(*_prefabValue);
+            if (hasOverride)
+                overrideValue = std::move(*_overrideValue);
+        }
+        Override(V _defaultValue, V _prefabValue, V _overrideValue, bool _hasPrefab, bool _hasOverride)
+            : defaultValue(std::move(_defaultValue))
             , prefabValue(std::move(_prefabValue))
             , overrideValue(std::move(_overrideValue))
+            , hasPrefab(_hasPrefab)
+            , hasOverride(_hasOverride)
         {
         }
-        Override(V _defaultVal, V _val)
+        Override(V _defaultValue, V const* _prefabValue, V const* _overrideValue)
+            : defaultValue(std::move(_defaultValue))
+            , hasPrefab(_prefabValue != nullptr)
+            , hasOverride(_overrideValue != nullptr)
+        {
+            if (hasPrefab)
+                prefabValue = *_prefabValue;
+            if (hasOverride)
+                overrideValue = *_overrideValue;
+        }
+        Override(V _defaultVal)
             : defaultValue(_defaultVal)
-            , value(_val)
+            , hasPrefab(false)
+            , hasOverride(false)
         {
         }
 
@@ -114,24 +137,41 @@ namespace Ent
         Override<V> makeOverridedInstanceOf(tl::optional<V> _overrideValue) const
         {
             Override<V> result = makeInstanceOf();
-            result.overrideValue = _overrideValue;
+            result.hasOverride = _overrideValue.has_value();
+            if (result.hasOverride)
+                result.overrideValue = *_overrideValue;
+            else
+                result.overrideValue = {};
             return result;
         }
 
         /// True if no value was set in template or in instance
         bool isDefault() const
         {
-            return !(prefabValue.has_value() || overrideValue.has_value());
+            return !(hasPrefab || hasOverride);
         }
 
         void computeMemory(MemoryProfiler& prof) const;
 
         // bool hasOverride() const;
 
+        V const& getDefaltValue() const
+        {
+            return defaultValue;
+        }
+
+        V& getDefaltValue()
+        {
+            return defaultValue;
+        }
+
     public:
-        tl::optional<V> prefabValue;
-        tl::optional<V> overrideValue;
-        V defaultValue = V();
+        V defaultValue{};
+        V prefabValue{};
+        V overrideValue{};
+        bool hasPrefab : 1; // No default init for bitfield until c++20
+        bool hasOverride : 1;
+        // DeleteCheck deleteCheck;
     };
 
     /// \endcond
@@ -660,13 +700,13 @@ namespace Ent
     template <typename V>
     V const& Override<V>::get() const
     {
-        if (overrideValue.has_value())
+        if (hasOverride)
         {
-            return *overrideValue;
+            return overrideValue;
         }
-        if (prefabValue.has_value())
+        if (hasPrefab)
         {
-            return *prefabValue;
+            return prefabValue;
         }
         return defaultValue;
     }
@@ -674,37 +714,39 @@ namespace Ent
     template <typename V>
     void Override<V>::set(V _newVal)
     {
-        overrideValue.emplace(std::move(_newVal));
+        overrideValue = std::move(_newVal);
+        hasOverride = 1;
     }
 
     template <typename V>
     bool Override<V>::isSet() const
     {
-        return overrideValue.has_value();
+        return hasOverride;
     }
 
     template <typename V>
     void Override<V>::unset()
     {
-        overrideValue = tl::nullopt;
+        hasOverride = false;
+        overrideValue = {};
     }
 
     template <typename V>
     Override<V> Override<V>::detach() const
     {
-        if (overrideValue.has_value())
-            return Override<V>(defaultValue, tl::nullopt, overrideValue);
+        if (hasOverride)
+            return Override<V>(defaultValue, V{}, overrideValue, false, hasOverride);
         else
-            return Override<V>(defaultValue, tl::nullopt, prefabValue);
+            return Override<V>(defaultValue, V{}, prefabValue, false, hasPrefab);
     }
 
     template <typename V>
     Override<V> Override<V>::makeInstanceOf() const
     {
-        if (overrideValue.has_value())
-            return Override<V>(defaultValue, overrideValue, tl::nullopt);
+        if (hasOverride)
+            return Override<V>(defaultValue, overrideValue, V{}, hasOverride, false);
         else
-            return Override<V>(defaultValue, prefabValue, tl::nullopt);
+            return Override<V>(defaultValue, prefabValue, V{}, hasPrefab, false);
     }
 
     struct Memory
@@ -727,9 +769,9 @@ namespace Ent
     {
         Memory compute{ &prof };
         compute(defaultValue);
-        if (prefabValue)
+        if (hasPrefab)
             compute(prefabValue);
-        if (overrideValue)
+        if (hasOverride)
             compute(overrideValue);
     }
 

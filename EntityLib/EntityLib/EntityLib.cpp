@@ -39,7 +39,7 @@ namespace Ent
     {
         Ent::Subschema const& colorSchema = _entlib.schema.schema.allDefinitions.at(colorSchemaName);
         Ent::Subschema const* itemSchema = &colorSchema.singularItems->get();
-        Ent::Override<float> one{ 255.f, tl::nullopt, tl::nullopt };
+        Ent::Override<float> one{ 255.f };
         std::vector<nonstd::value_ptr<Ent::Node>> nodes{
             nonstd::make_value<Ent::Node>(one, itemSchema),
             nonstd::make_value<Ent::Node>(one, itemSchema),
@@ -387,7 +387,7 @@ namespace Ent
         template <typename T>
         bool operator()(Override<T> const& _ov) const
         {
-            return (not _ov.prefabValue.has_value()) and (not _ov.overrideValue.has_value());
+            return (not _ov.hasPrefab) and (not _ov.hasOverride);
         }
 
         bool operator()(Null const&) const
@@ -648,7 +648,7 @@ namespace Ent
         template <typename T>
         bool operator()(Override<T> const& _ov) const
         {
-            return not _ov.prefabValue.has_value() and not _ov.overrideValue.has_value();
+            return not _ov.hasPrefab and not _ov.hasOverride;
         }
 
         bool operator()(Null const& _val) const
@@ -684,11 +684,11 @@ namespace Ent
     {
         if (value.is<Override<float>>())
         {
-            return value.get<Override<float>>().defaultValue;
+            return value.get<Override<float>>().getDefaltValue();
         }
         if (value.is<Override<int64_t>>())
         {
-            return static_cast<float>(value.get<Override<int64_t>>().defaultValue);
+            return static_cast<float>(value.get<Override<int64_t>>().getDefaltValue());
         }
         throw BadType();
     }
@@ -696,7 +696,7 @@ namespace Ent
     {
         if (value.is<Override<int64_t>>())
         {
-            return value.get<Override<int64_t>>().defaultValue;
+            return value.get<Override<int64_t>>().getDefaltValue();
         }
         throw BadType();
     }
@@ -704,7 +704,7 @@ namespace Ent
     {
         if (value.is<Override<String>>())
         {
-            return value.get<Override<String>>().defaultValue.c_str();
+            return value.get<Override<String>>().getDefaltValue().c_str();
         }
         throw BadType();
     }
@@ -712,7 +712,7 @@ namespace Ent
     {
         if (value.is<Override<bool>>())
         {
-            return value.get<Override<bool>>().defaultValue;
+            return value.get<Override<bool>>().getDefaltValue();
         }
         throw BadType();
     }
@@ -813,12 +813,12 @@ namespace Ent
 
     Entity::Entity(EntityLib const& _entlib)
         : entlib(&_entlib)
-        , name(std::string(), tl::nullopt, tl::nullopt)
+        , name(std::string())
         , actorStates(Ent::makeDefaultActorStatesField(_entlib))
         , color(Ent::makeDefaultColorField(_entlib))
-        , thumbnail(std::string(), tl::nullopt, tl::nullopt)
-        , instanceOf(std::string(), tl::nullopt, tl::nullopt)
-        , maxActivationLevel(Ent::ActivationLevel::Started, tl::nullopt, tl::nullopt)
+        , thumbnail(std::string())
+        , instanceOf(std::string())
+        , maxActivationLevel(Ent::ActivationLevel::Started)
     {
     }
 
@@ -1887,10 +1887,9 @@ static std::unique_ptr<Ent::Entity> loadEntity(
             parseActivationLevel(_entNode.at("MaxActivationLevel").get<std::string>());
     }
     Ent::Override<Ent::ActivationLevel> superActivationLevel =
-        superEntity != nullptr ? superEntity->getMaxActivationLevelValue() :
-                                 Ent::Override<Ent::ActivationLevel>{ Ent::ActivationLevel::Started,
-                                                                      tl::nullopt,
-                                                                      tl::nullopt };
+        superEntity != nullptr ?
+            superEntity->getMaxActivationLevelValue() :
+            Ent::Override<Ent::ActivationLevel>{ Ent::ActivationLevel::Started };
     Ent::Override<Ent::ActivationLevel> ovMaxActivationLevel =
         superActivationLevel.makeOverridedInstanceOf(maxActivationLevel);
 
@@ -1940,9 +1939,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
                 Ent::SubSceneComponent const* superComp = superEntity->getSubSceneComponent();
 
                 Ent::Override<String> file =
-                    superComp != nullptr ?
-                        superComp->file :
-                        Ent::Override<String>(std::string(), tl::nullopt, tl::nullopt);
+                    superComp != nullptr ? superComp->file : Ent::Override<String>(std::string());
 
                 auto fileInJson = (data.count("File") != 0) ?
                                       tl::optional<std::string>(data["File"].get<std::string>()) :

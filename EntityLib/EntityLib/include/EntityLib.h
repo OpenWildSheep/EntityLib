@@ -39,7 +39,7 @@ namespace Ent
     /// \cond PRIVATE
 
     /// Content of a Node which has type Ent::DataType::object
-    using Object = std::map<std::string, Node>;
+    using Object = std::map<String, Node>;
 
     /// Content of a Node which has type Ent::DataType::array
     struct Array
@@ -62,8 +62,8 @@ namespace Ent
     {
         Subschema const* schema = nullptr; ///< The schema of the object containing the oneOf field
         value_ptr<Node> wrapper; ///< Node containing the className/classData
-        std::string classNameField; ///< Name of the field containing the type under union
-        std::string classDatafield; ///< Name of the field containing the data under union
+        String classNameField; ///< Name of the field containing the type under union
+        String classDatafield; ///< Name of the field containing the data under union
 
         bool hasOverride() const; ///< Recursively check if there is an override inside.
         Node* getUnionData(); ///< return the underlying data (The type is given by getUnionType)
@@ -79,7 +79,7 @@ namespace Ent
     struct EntityRef
     {
         /// @brief string representation of this entity ref, works like a file path, always relative.
-        std::string entityPath;
+        String entityPath;
     };
 
     template <typename V>
@@ -129,10 +129,9 @@ namespace Ent
         // bool hasOverride() const;
 
     public:
-        V defaultValue = V();
         tl::optional<V> prefabValue;
         tl::optional<V> overrideValue;
-        DeleteCheck deleteCheck;
+        V defaultValue = V();
     };
 
     /// \endcond
@@ -147,7 +146,7 @@ namespace Ent
         /// @cond PRIVATE
         using Value = mapbox::util::variant<
             Null,
-            Override<std::string>,
+            Override<String>,
             Override<float>,
             Override<int64_t>,
             Object,
@@ -308,7 +307,7 @@ namespace Ent
     struct SubSceneComponent
     {
         bool isEmbedded = false; ///< If true, data are in embedded, else data are in file
-        Override<std::string> file; ///< Path to a .scene file, whene isEmbedded is false
+        Override<String> file; ///< Path to a .scene file, whene isEmbedded is false
         size_t index = 0; ///< Useful to keep the componants order in the json file
         std::unique_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
 
@@ -317,7 +316,7 @@ namespace Ent
         /// @cond PRIVATE
         explicit SubSceneComponent(
             bool _isEmbedded = false,
-            Override<std::string> _file = {},
+            Override<String> _file = {},
             size_t _index = 0,
             std::unique_ptr<Scene> _embedded = {});
         SubSceneComponent(SubSceneComponent const&) = delete;
@@ -348,13 +347,13 @@ namespace Ent
         Entity(EntityLib const& _entlib);
         Entity(
             EntityLib const& _entlib,
-            Override<std::string> _name,
+            Override<String> _name,
             std::map<std::string, Component> _components,
             std::unique_ptr<SubSceneComponent> _subSceneComponent,
             Node _actorStates = {},
             Node _color = {},
-            Override<std::string> _thumbnail = {},
-            Override<std::string> _instanceOf = {},
+            Override<String> _thumbnail = {},
+            Override<String> _instanceOf = {},
             Override<ActivationLevel> _maxActivationLevel = {},
             bool _hasASuper = false);
         Entity(Entity const&) = delete;
@@ -364,7 +363,7 @@ namespace Ent
         DeleteCheck deleteCheck;
         void setCanBeRenamed(bool _can); ///< If it has a super it can't be renamed
 
-        Override<std::string> const& getNameValue() const
+        Override<String> const& getNameValue() const
         {
             return name;
         }
@@ -374,12 +373,12 @@ namespace Ent
             return color;
         }
 
-        Override<std::string> const& getThumbnailValue() const
+        Override<String> const& getThumbnailValue() const
         {
             return thumbnail;
         }
 
-        Override<std::string> const& getInstanceOfValue() const
+        Override<String> const& getInstanceOfValue() const
         {
             return instanceOf;
         }
@@ -486,13 +485,13 @@ namespace Ent
     private:
         void updateSubSceneOwner();
         EntityLib const* entlib{}; ///< Reference the entity lib to find the schema when needed
-        Override<std::string> name; ///< Entity name
+        Override<String> name; ///< Entity name
         std::map<std::string, Component> components; ///< All components of this Entity
         std::unique_ptr<SubSceneComponent> subSceneComponent; ///< the optional SubScene Component
         Node actorStates; ///< All actorStates of this Entity
         Node color; ///< The optional Color of the Entity
-        Override<std::string> thumbnail; ///< Path to the thumbnail mesh (.wthumb)
-        Override<std::string> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
+        Override<String> thumbnail; ///< Path to the thumbnail mesh (.wthumb)
+        Override<String> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
         Override<ActivationLevel> maxActivationLevel; ///< Maximum activation level of this entity in runtime
         bool hasASuper = false;
         Scene* parentScene = nullptr; ///< ptr the scene containing this entity.

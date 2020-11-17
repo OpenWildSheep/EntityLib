@@ -286,9 +286,9 @@ namespace Ent
     }
     char const* Node::getString() const
     {
-        if (value.is<Override<std::string>>())
+        if (value.is<Override<String>>())
         {
-            return value.get<Override<std::string>>().get().c_str();
+            return value.get<Override<String>>().get().c_str();
         }
         throw BadType();
     }
@@ -325,7 +325,7 @@ namespace Ent
     }
     void Node::setString(char const* _val)
     {
-        value.get<Override<std::string>>().set(_val);
+        value.get<Override<String>>().set(_val);
     }
     void Node::setBool(bool _val)
     {
@@ -702,9 +702,9 @@ namespace Ent
     }
     char const* Node::getDefaultString() const
     {
-        if (value.is<Override<std::string>>())
+        if (value.is<Override<String>>())
         {
-            return value.get<Override<std::string>>().defaultValue.c_str();
+            return value.get<Override<String>>().defaultValue.c_str();
         }
         throw BadType();
     }
@@ -777,7 +777,7 @@ namespace Ent
 
     // ********************************* SubSceneComponent ****************************************
     SubSceneComponent::SubSceneComponent(
-        bool _isEmbedded, Override<std::string> _file, size_t _index, std::unique_ptr<Scene> _embedded)
+        bool _isEmbedded, Override<String> _file, size_t _index, std::unique_ptr<Scene> _embedded)
         : isEmbedded(_isEmbedded)
         , file(std::move(_file))
         , index(_index)
@@ -824,13 +824,13 @@ namespace Ent
 
     Entity::Entity(
         EntityLib const& _entlib,
-        Override<std::string> _name,
+        Override<String> _name,
         std::map<std::string, Component> _components,
         std::unique_ptr<SubSceneComponent> _subSceneComponent,
         Node _actorStates,
         Node _color,
-        Override<std::string> _thumbnail,
-        Override<std::string> _instanceOf,
+        Override<String> _thumbnail,
+        Override<String> _instanceOf,
         Override<Ent::ActivationLevel> _maxActivationLevel,
         bool _hasASuper)
         : entlib(&_entlib)
@@ -1188,7 +1188,7 @@ namespace Ent
         }
 
         // split around '/'
-        std::vector<std::string> parts = splitString(_entityRef.entityPath, '/');
+        std::vector<std::string> parts = splitString(_entityRef.entityPath.c_str(), '/');
 
         Entity* current = this;
         Scene* down = getSubScene(current);
@@ -1250,7 +1250,7 @@ namespace Ent
         }
 
         // split around '/'
-        std::vector<std::string> parts = splitString(_entityRef.entityPath, '/');
+        std::vector<std::string> parts = splitString(_entityRef.entityPath.c_str(), '/');
 
         Entity* current = getOwnerEntity();
         Scene* down = this;
@@ -1324,6 +1324,8 @@ namespace Ent
 
 // ********************************** Load/Save ***********************************************
 
+using Ent::String;
+
 struct MergeMapOverride
 {
     Ent::Subschema const& _nodeSchema;
@@ -1346,7 +1348,7 @@ struct MergeMapOverride
         using KeyType = std::remove_reference_t<decltype(getKeyJson(json()))>;
         std::map<KeyType, json const*> instancePropMap;
         for (auto const& item : _data)
-        {
+    {
             instancePropMap.emplace(getKeyJson(item), &item);
         }
         std::vector<std::pair<KeyType, Node>> result;
@@ -1362,13 +1364,13 @@ struct MergeMapOverride
                         loadNode(_nodeSchema.singularItems->get(), *instancePropMap[key], subSuper);
                     result.emplace_back(key, std::move(tmpNode));
                     instancePropMap.erase(key); // Later we need to know which item are NOT in the template
-                }
+        }
                 else // Not overriden
                 {
                     Ent::Node tmpNode = loadNode(_nodeSchema.singularItems->get(), json(), subSuper);
                     ENTLIB_ASSERT(tmpNode.hasOverride() == false);
                     result.emplace_back(key, std::move(tmpNode));
-                }
+    }
             }
         }
         // Load items from instance which are not in template (they are new)
@@ -1379,19 +1381,19 @@ struct MergeMapOverride
             if (instancePropMap.count(key))
             {
                 result.emplace_back(key, loadNode(_nodeSchema.singularItems->get(), item, nullptr));
-            }
         }
+    }
         if (ordered)
         {
             std::sort(begin(result), end(result), [](auto&& a, auto&& b) {
                 return std::get<0>(a) < std::get<0>(b);
             });
-        }
+    }
         Ent::Array arr;
         for (auto const& key_node : result)
         {
             arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(std::get<1>(key_node))));
-        }
+}
         return arr;
     }
 };
@@ -1433,7 +1435,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
             tl::optional<std::string> const val =
                 _data.is_string() ? tl::optional<std::string>(_data.get<std::string>()) :
                                     tl::optional<std::string>(tl::nullopt);
-            result = Ent::Node(Ent::Override<std::string>(def, supVal, val), &_nodeSchema);
+            result = Ent::Node(Ent::Override<String>(def, supVal, val), &_nodeSchema);
         }
     }
     break;
@@ -1594,24 +1596,24 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                 break;
                 case ""_hash: // The default "overridePolicy" is for simple array
                 {
-                    for (auto const& item : _data)
-                    {
+                for (auto const& item : _data)
+                {
                         Ent::Node const* subSuper =
                             (_super != nullptr and (_super->size() > index)) ? _super->at(index) :
-                                                                               nullptr;
+                                                    nullptr;
                         Ent::Node tmpNode =
                             loadNode(_nodeSchema.singularItems->get(), item, subSuper);
-                        arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
-                        ++index;
-                    }
+                    arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
+                    ++index;
                 }
+            }
                 break;
                 default:
                     throw std::runtime_error(format(
                         "Unknown key type (%s) in schema of %s",
                         meta.overridePolicy.c_str(),
                         _nodeSchema.name.c_str()));
-                }
+        }
             }
         }
         else
@@ -1767,7 +1769,7 @@ static json saveNode(Ent::Subschema const& _schema, Ent::Node const& _node)
     case Ent::DataType::entityRef:
     {
         Ent::EntityRef ref = _node.getEntityRef();
-        data = ref.entityPath;
+        data = ref.entityPath.c_str();
     }
     break;
     case Ent::DataType::oneOf:
@@ -1865,18 +1867,18 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     tl::optional<std::string> const thumbnail = _entNode.count("Thumbnail") != 0 ?
                                                     _entNode.at("Thumbnail").get<std::string>() :
                                                     tl::optional<std::string>();
-    Ent::Override<std::string> superThumbnail = superEntity->getThumbnailValue();
-    Ent::Override<std::string> ovThumbnail = superThumbnail.makeOverridedInstanceOf(thumbnail);
+    Ent::Override<String> superThumbnail = superEntity->getThumbnailValue();
+    Ent::Override<String> ovThumbnail = superThumbnail.makeOverridedInstanceOf(thumbnail);
 
     tl::optional<std::string> const name = _entNode.count("Name") != 0 ?
                                                _entNode.at("Name").get<std::string>() :
                                                tl::optional<std::string>();
 
-    Ent::Override<std::string> superName = superEntity->getNameValue();
-    Ent::Override<std::string> ovName = superName.makeOverridedInstanceOf(name);
+    Ent::Override<String> superName = superEntity->getNameValue();
+    Ent::Override<String> ovName = superName.makeOverridedInstanceOf(name);
 
-    Ent::Override<std::string> superInstanceOf = superEntity->getInstanceOfValue();
-    Ent::Override<std::string> ovInstanceOf = superName.makeOverridedInstanceOf(instanceOf);
+    Ent::Override<String> superInstanceOf = superEntity->getInstanceOfValue();
+    Ent::Override<String> ovInstanceOf = superName.makeOverridedInstanceOf(instanceOf);
 
     tl::optional<Ent::ActivationLevel> maxActivationLevel;
     if (_entNode.count("MaxActivationLevel") != 0)
@@ -1937,10 +1939,10 @@ static std::unique_ptr<Ent::Entity> loadEntity(
             {
                 Ent::SubSceneComponent const* superComp = superEntity->getSubSceneComponent();
 
-                Ent::Override<std::string> file =
+                Ent::Override<String> file =
                     superComp != nullptr ?
                         superComp->file :
-                        Ent::Override<std::string>(std::string(), tl::nullopt, tl::nullopt);
+                        Ent::Override<String>(std::string(), tl::nullopt, tl::nullopt);
 
                 auto fileInJson = (data.count("File") != 0) ?
                                       tl::optional<std::string>(data["File"].get<std::string>()) :
@@ -2176,11 +2178,11 @@ static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& 
     json entNode;
 
     // Always save Name since it is use for override
-    entNode.emplace("Name", _entity.getNameValue().get());
+    entNode.emplace("Name", _entity.getNameValue().get().c_str());
 
     if (_entity.getInstanceOfValue().isSet())
     {
-        entNode.emplace("InstanceOf", _entity.getInstanceOfValue().get());
+        entNode.emplace("InstanceOf", _entity.getInstanceOfValue().get().c_str());
     }
 
     Ent::Subschema const& colorSchema = _schema.schema.allDefinitions.at(Ent::colorSchemaName);
@@ -2230,7 +2232,7 @@ static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& 
                 data.emplace("isEmbedded", subscene->isEmbedded);
                 if (subscene->file.isSet())
                 {
-                    data.emplace("File", subscene->file.get());
+                    data.emplace("File", subscene->file.get().c_str());
                 }
                 if (subscene->isEmbedded)
                 {
@@ -2303,7 +2305,7 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
         actorStates.detach(),
         std::move(detachedColor),
         getThumbnailValue().detach(),
-        Override<std::string>{},
+        Override<String>{},
         std::move(detachedMaxActivationLevel));
 }
 

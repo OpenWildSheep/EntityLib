@@ -81,5 +81,80 @@ namespace Ent
             state_ = State::DELETED;
         }
     };
+
+    /// A string class which has the size of a pointer
+    struct String
+    {
+        std::unique_ptr<char[]> str;
+        String()
+        {
+        }
+        String(char const* _str)
+        {
+            auto len = strlen(_str);
+            str = std::make_unique<char[]>(len + 1);
+            strcpy(str.get(), _str);
+        }
+        String(std::string const& _str)
+        {
+            auto len = _str.size();
+            str = std::make_unique<char[]>(len + 1);
+            strcpy(str.get(), _str.c_str());
+        }
+        String(String const& ot)
+        {
+            if (ot.str == nullptr)
+                return;
+            auto len = ot.size();
+            str = std::make_unique<char[]>(len + 1);
+            strcpy(str.get(), ot.str.get());
+        }
+        String& operator=(String const& ot)
+        {
+            if (ot.str == nullptr)
+            {
+                str.reset();
+            }
+            else
+            {
+                auto len = ot.size();
+                str = std::make_unique<char[]>(len + 1);
+                strcpy(str.get(), ot.str.get());
+            }
+            return *this;
+        }
+        String(String&& ot) = default;
+        String& operator=(String&& ot) = default;
+
+        bool operator==(String const& ot) const
+        {
+            return strcmp(str.get(), ot.str.get()) == 0;
+        }
+
+        bool operator<(String const& ot) const
+        {
+            return strcmp(str.get(), ot.str.get()) < 0;
+        }
+
+        char const* c_str() const
+        {
+            return str.get();
+        }
+
+        size_t capacity() const
+        {
+            return strlen(str.get());
+        }
+
+        size_t size() const
+        {
+            return strlen(str.get());
+        }
+
+        bool empty() const
+        {
+            return str == nullptr || size() == 0;
+        }
+    };
     /// @endcond
 } // namespace Ent

@@ -749,7 +749,7 @@ namespace Ent
                 prof.add("Array::data::value_ptr", sizeof(Ent::Node));
             }
             prof.nodeCount += _arr.data.size();
-            prof.nodeByComp[prof.currentComp.front()] += _arr.data.size();
+            prof.nodeByComp[prof.currentComp.back()] += _arr.data.size();
         }
 
         void operator()(Object const& _obj) const
@@ -760,12 +760,14 @@ namespace Ent
                 std::get<1>(name_node).computeMemory(prof);
             }
             prof.nodeCount += _obj.size();
-            prof.nodeByComp[prof.currentComp.front()] += _obj.size();
+            prof.nodeByComp[prof.currentComp.back()] += _obj.size();
         }
 
         void operator()(Union const& _un) const
         {
+            prof.currentComp.push_back(_un.getUnionType());
             _un.computeMemory(prof);
+            prof.currentComp.pop_back();
         }
     };
 
@@ -2447,9 +2449,11 @@ void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const&
 
 void Ent::SubSceneComponent::computeMemory(MemoryProfiler& prof) const
 {
+    prof.currentComp.push_back("SubScene");
     file.computeMemory(prof);
     if (embedded)
         embedded->computeMemory(prof);
+    prof.currentComp.pop_back();
 }
 
 std::unique_ptr<Ent::SubSceneComponent> Ent::SubSceneComponent::makeInstanceOf() const

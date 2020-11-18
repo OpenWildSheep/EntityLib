@@ -50,7 +50,7 @@ namespace Ent
     /// \cond PRIVATE
 
     /// Content of a Node which has type Ent::DataType::object
-    using Object = std::map<char const*, Node, CompStr>;
+    using Object = std::vector<std::pair<char const*, value_ptr<Node>>>;
 
     /// Content of a Node which has type Ent::DataType::array
     struct Array
@@ -792,6 +792,11 @@ namespace Ent
         if (hasOverride)
             compute(overrideValue);
     }
+
+    size_t count(Object const& obj, char const* key);
+    void emplace(Object& obj, std::pair<char const*, Node> const& value);
+    Node const& at(Object const& obj, char const* key);
+    Node& at(Object& obj, char const* key);
 
     /// \endcond
 

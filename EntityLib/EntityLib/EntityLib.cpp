@@ -150,6 +150,55 @@ namespace Ent
         }
     }
 
+    // ************************************* Object ***********************************************
+
+    struct CompObject
+    {
+        bool operator()(
+            std::pair<char const*, value_ptr<Node>> const& a,
+            std::pair<char const*, value_ptr<Node>> const& b) const
+        {
+            return strcmp(a.first, b.first) < 0;
+        }
+    };
+
+    size_t count(Object const& obj, char const* key)
+    {
+        auto range = std::equal_range(
+            begin(obj),
+            end(obj),
+            std::pair<char const*, value_ptr<Node>>{ key, nullptr },
+            CompObject());
+        return (size_t)std::distance(range.first, range.second);
+    }
+    void emplace(Object& obj, std::pair<char const*, Node> const& value)
+    {
+        auto range = std::equal_range(begin(obj), end(obj), value, CompObject());
+        if (range.first == range.second)
+            obj.insert(range.first, value);
+    }
+    Node const& at(Object const& obj, char const* key)
+    {
+        auto range = std::equal_range(
+            begin(obj),
+            end(obj),
+            std::pair<char const*, value_ptr<Node>>{ key, nullptr },
+            CompObject());
+        if (range.first == range.second)
+            throw std::logic_error(std::string("Bad key : ") + key);
+        else
+            return *range.first->second;
+    }
+    Node& at(Object& obj, char const* key)
+    {
+        auto range = std::equal_range(
+            begin(obj), end(obj), std::pair<char const*, Node>{ key, Node() }, CompObject());
+        if (range.first == range.second)
+            throw std::logic_error(std::string("Bad key : ") + key);
+        else
+            return *range.first->second;
+    }
+
     // ************************************* Node *************************************************
 
     Node::Node(Value val, Subschema const* _schema)
@@ -167,7 +216,7 @@ namespace Ent
     {
         if (value.is<Object>())
         {
-            return &value.get<Object>().at(_field);
+            return &Ent::at(value.get<Object>(), _field);
         }
         throw BadType();
     }
@@ -175,7 +224,7 @@ namespace Ent
     {
         if (value.is<Object>())
         {
-            return &value.get<Object>().at(_field);
+            return &Ent::at(value.get<Object>(), _field);
         }
         throw BadType();
     }
@@ -183,7 +232,7 @@ namespace Ent
     {
         if (value.is<Object>())
         {
-            return value.get<Object>().count(_field) != 0;
+            return Ent::count(value.get<Object>(), _field) != 0;
         }
         throw BadType();
     }
@@ -201,7 +250,7 @@ namespace Ent
         {
             auto iter = value.get<Object>().begin();
             std::advance(iter, _index);
-            return &iter->second;
+            return &(*iter->second);
         }
         if (value.is<Array>())
         {
@@ -401,7 +450,7 @@ namespace Ent
         bool operator()(Object const& _obj) const
         {
             return std::all_of(begin(_obj), end(_obj), [](auto&& name_node) {
-                return std::get<1>(name_node).hasDefaultValue();
+                return std::get<1>(name_node)->hasDefaultValue();
             });
         }
 
@@ -445,9 +494,10 @@ namespace Ent
         Node operator()(Object const& _obj) const
         {
             Object out;
+            out.reserve(_obj.size());
             for (auto&& name_node : _obj)
             {
-                out.emplace(std::get<0>(name_node), std::get<1>(name_node).detach());
+                emplace(out, { std::get<0>(name_node), std::get<1>(name_node)->detach() });
             }
             return Node(std::move(out), schema);
         }
@@ -496,9 +546,10 @@ namespace Ent
         Node operator()(Object const& _obj) const
         {
             Object out;
+            out.reserve(_obj.size());
             for (auto&& name_node : _obj)
             {
-                out.emplace(std::get<0>(name_node), std::get<1>(name_node).makeInstanceOf());
+                emplace(out, { std::get<0>(name_node), std::get<1>(name_node)->makeInstanceOf() });
             }
             return Node(std::move(out), schema);
         }
@@ -543,7 +594,7 @@ namespace Ent
         {
             for (auto&& name_node : _obj)
             {
-                if (std::get<1>(name_node).hasOverride())
+                if (std::get<1>(name_node)->hasOverride())
                 {
                     return true;
                 }
@@ -754,10 +805,11 @@ namespace Ent
 
         void operator()(Object const& _obj) const
         {
+            prof.add("Object", _obj.capacity() * sizeof(_obj.front()));
             for (auto&& name_node : _obj)
             {
-                prof.add("Object::name_node", sizeof(name_node));
-                std::get<1>(name_node).computeMemory(prof);
+                std::get<1>(name_node)->computeMemory(prof);
+                prof.add("Object::value_ptr", sizeof(Ent::Node));
             }
             prof.nodeCount += _obj.size();
             prof.nodeByComp[prof.currentComp.back()] += _obj.size();
@@ -1484,7 +1536,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
     case Ent::DataType::object:
     {
         Ent::Object object;
-
+        object.reserve(_nodeSchema.properties.size());
         for (auto&& name_sub : _nodeSchema.properties)
         {
             std::string const& name = std::get<0>(name_sub);
@@ -1492,7 +1544,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
             static json const emptyJson;
             json const& prop = _data.count(name) != 0 ? _data.at(name) : emptyJson;
             Ent::Node tmpNode = loadNode(*std::get<1>(name_sub), prop, superProp);
-            object.emplace(name.c_str(), std::move(tmpNode));
+            emplace(object, { name.c_str(), std::move(tmpNode) });
         }
         result = Ent::Node(std::move(object), &_nodeSchema);
     }

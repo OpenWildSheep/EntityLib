@@ -22,13 +22,21 @@ namespace Ent
 
     // ******************************** Implem details ********************************************
 
+    struct CompStr
+    {
+        bool operator()(char const* a, char const* b) const
+        {
+            return strcmp(a, b) < 0;
+        }
+    };
+
     struct MemoryProfiler
     {
-        std::map<std::string, size_t> mem;
+        std::map<char const*, size_t, CompStr> mem;
         size_t total = 0;
         size_t nodeCount = 0;
-        std::map<std::string, size_t> nodeByComp;
-        std::vector<std::string> currentComp;
+        std::map<char const*, size_t, CompStr> nodeByComp;
+        std::vector<char const*> currentComp;
 
         void add(char const* name, size_t value)
         {
@@ -42,13 +50,6 @@ namespace Ent
     /// \cond PRIVATE
 
     /// Content of a Node which has type Ent::DataType::object
-    struct CompStr
-    {
-        bool operator()(char const* a, char const* b) const
-        {
-            return strcmp(a, b) < 0;
-        }
-    };
     using Object = std::map<char const*, Node, CompStr>;
 
     /// Content of a Node which has type Ent::DataType::array
@@ -324,7 +325,7 @@ namespace Ent
         /// \cond PRIVATE
         void computeMemory(MemoryProfiler& prof) const
         {
-            prof.currentComp.push_back(type);
+            prof.currentComp.push_back(type.c_str());
             prof.add("Component::type", type.size());
             root.computeMemory(prof);
             prof.currentComp.pop_back();

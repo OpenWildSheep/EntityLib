@@ -33,6 +33,8 @@ static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _s
 
 namespace Ent
 {
+    Pool<Node> Pool<Node>::pool;
+
     char const* actorStatesSchemaName = "file://Scene-schema.json#/definitions/ActorStates";
     char const* colorSchemaName = "file://RuntimeComponents.json#/definitions/Color";
     static Ent::Node makeDefaultColorField(EntityLib const& _entlib)
@@ -40,11 +42,11 @@ namespace Ent
         Ent::Subschema const& colorSchema = _entlib.schema.schema.allDefinitions.at(colorSchemaName);
         Ent::Subschema const* itemSchema = &colorSchema.singularItems->get();
         Ent::Override<float> one{ 255.f };
-        std::vector<nonstd::value_ptr<Ent::Node>> nodes{
-            nonstd::make_value<Ent::Node>(one, itemSchema),
-            nonstd::make_value<Ent::Node>(one, itemSchema),
-            nonstd::make_value<Ent::Node>(one, itemSchema),
-            nonstd::make_value<Ent::Node>(one, itemSchema),
+        std::vector<value_ptr<Ent::Node>> nodes{
+            make_value<Ent::Node>(one, itemSchema),
+            make_value<Ent::Node>(one, itemSchema),
+            make_value<Ent::Node>(one, itemSchema),
+            make_value<Ent::Node>(one, itemSchema),
         };
         return Node{ Array{ nodes }, &colorSchema };
     }
@@ -486,7 +488,7 @@ namespace Ent
             Array out;
             for (auto&& item : _arr.data)
             {
-                out.data.emplace_back(nonstd::make_value<Node>(item->detach()));
+                out.data.emplace_back(make_value<Node>(item->detach()));
             }
             return Node(std::move(out), schema);
         }
@@ -538,7 +540,7 @@ namespace Ent
             Array out;
             for (auto&& item : _arr.data)
             {
-                out.data.emplace_back(nonstd::make_value<Node>(item->makeInstanceOf()));
+                out.data.emplace_back(make_value<Node>(item->makeInstanceOf()));
             }
             return Node(std::move(out), schema);
         }
@@ -648,7 +650,7 @@ namespace Ent
             if (SubschemaRef const* itemSchema = schema->singularItems.get())
             {
                 value.get<Array>().data.emplace_back(
-                    nonstd::make_value<Node>(loadNode(itemSchema->get(), json(), nullptr)));
+                    make_value<Node>(loadNode(itemSchema->get(), json(), nullptr)));
                 return value.get<Array>().data.back().get();
             }
         }
@@ -1445,7 +1447,7 @@ struct MergeMapOverride
         Ent::Array arr;
         for (auto const& key_node : result)
         {
-            arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(std::get<1>(key_node))));
+            arr.data.emplace_back(make_value<Ent::Node>(std::move(std::get<1>(key_node))));
         }
         return arr;
     }
@@ -1563,7 +1565,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                     {
                         Ent::Node tmpNode =
                             loadNode(_nodeSchema.singularItems->get(), json(), subSuper);
-                        arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
+                        arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
                 }
@@ -1656,7 +1658,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                                                                                nullptr;
                         Ent::Node tmpNode =
                             loadNode(_nodeSchema.singularItems->get(), item, subSuper);
-                        arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
+                        arr.data.emplace_back(make_value<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
                 }
@@ -1679,7 +1681,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                 static json const emptyJson;
                 json const& prop = _data.size() > index ? _data.at(index) : emptyJson;
                 Ent::Node tmpNode = loadNode(*sub, prop, subSuper);
-                arr.data.emplace_back(nonstd::make_value<Ent::Node>(std::move(tmpNode)));
+                arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
                 ++index;
             }
         }
@@ -1749,7 +1751,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                 Ent::Node dataNode = loadNode(schemaTocheck.get(), _data, superUnionDataWrapper);
                 Ent::Union un{};
                 un.schema = &_nodeSchema;
-                un.wrapper = nonstd::make_value<Ent::Node>(std::move(dataNode));
+                un.wrapper = Ent::make_value<Ent::Node>(std::move(dataNode));
                 un.metaData = &meta;
                 result = Ent::Node(std::move(un), &_nodeSchema);
                 typeFound = true;

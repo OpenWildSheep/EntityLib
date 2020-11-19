@@ -9,17 +9,12 @@
 #include "../external/mapbox/variant.hpp"
 #include "../external/optional.hpp"
 #include "../external/filesystem.hpp"
-
-#define nsvp_CONFIG_COMPARE_POINTERS 1
-#include "../external/value_ptr.hpp"
 #pragma warning(pop)
 
 #include "Schema.h"
 
 namespace Ent
 {
-    using nonstd::value_ptr;
-
     // ******************************** Implem details ********************************************
 
     struct CompStr

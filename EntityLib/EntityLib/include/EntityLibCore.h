@@ -93,13 +93,13 @@ namespace Ent
         {
             auto len = strlen(_str);
             str = std::make_unique<char[]>(len + 1);
-            strcpy(str.get(), _str);
+            strcpy_s(str.get(), len + 1, _str);
         }
         String(std::string const& _str)
         {
             auto len = _str.size();
             str = std::make_unique<char[]>(len + 1);
-            strcpy(str.get(), _str.c_str());
+            strcpy_s(str.get(), len + 1, _str.c_str());
         }
         String(String const& ot)
         {
@@ -107,7 +107,7 @@ namespace Ent
                 return;
             auto len = ot.size();
             str = std::make_unique<char[]>(len + 1);
-            strcpy(str.get(), ot.str.get());
+            strcpy_s(str.get(), len + 1, ot.str.get());
         }
         String& operator=(String const& ot)
         {
@@ -119,7 +119,7 @@ namespace Ent
             {
                 auto len = ot.size();
                 str = std::make_unique<char[]>(len + 1);
-                strcpy(str.get(), ot.str.get());
+                strcpy_s(str.get(), len + 1, ot.str.get());
             }
             return *this;
         }
@@ -155,10 +155,16 @@ namespace Ent
         {
             return str == nullptr || size() == 0;
         }
+
+        operator std::string() const
+        {
+            return std::string(str.get());
+        }
     };
 
     /// Extremely simple memory pool. Not thread-safe and can't alloc array.
-    template <typename T, size_t BucketSize = 1024>
+    /// Since there is millions of Nodes 1024 is not enought
+    template <typename T, size_t BucketSize = 1024 * 1024>
     struct Pool
     {
         std::vector<void*> freePtr;

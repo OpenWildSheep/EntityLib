@@ -179,7 +179,11 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     pyPath
         .def(py::init<std::string>())
-        .def("__str__", [](std::filesystem::path* path) { return path->string(); });
+        .def("__str__", [](std::filesystem::path* path) { return path->string(); })
+        .def("__eq__", [](std::filesystem::path& a, std::filesystem::path& b) { return a == b; })
+        .def("__hash__", [](std::filesystem::path& path) {
+            return std::filesystem::hash_value(path);
+        });
 
     py::implicitly_convertible<std::string, std::filesystem::path>();
 
@@ -244,6 +248,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pyColor = py::class_<std::array<uint8_t, 4>>(ent, "Color");
     auto pyEntityLib = py::class_<EntityLib>(ent, "EntityLib");
     auto pyEntityRef = py::class_<EntityRef>(ent, "EntityRef");
+    auto pyEntityFile = py::class_<EntityLib::EntityFile>(ent, "EntityFile");
+    auto pySceneFile = py::class_<EntityLib::SceneFile>(ent, "SceneFile");
 
     pyNode
         .def_property_readonly("datatype", [](Node const* node) { return node->getDataType(); })
@@ -390,6 +396,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](EntityLib* lib, std::string const& path) { return lib->loadScene(path).release(); })
         .def("save_entity", &EntityLib::saveEntity, "entity"_a, "_entityPath"_a)
         .def("save_scene", &EntityLib::saveScene)
+        .def("get_entity_cache", &EntityLib::getEntityCache, py::return_value_policy::reference)
+        .def("get_scene_cache", &EntityLib::getSceneCache, py::return_value_policy::reference)
+        .def("clear_cache", &EntityLib::clearCache)
         .def(
             "make_instance_of",
             [](EntityLib* lib, std::string const& path) {
@@ -402,6 +411,20 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(py::init<std::string>())
         .def_readwrite("entity_path", &EntityRef::entityPath)
         .def("__str__", [](EntityRef* ref) { return ref->entityPath; });
+
+    pyEntityFile
+        .def_property_readonly(
+            "data",
+            [](EntityLib::EntityFile* entF) { return entF->data.get(); },
+            py::return_value_policy::reference)
+        .def_readonly("time", &EntityLib::EntityFile::time, py::return_value_policy::reference);
+
+    pySceneFile
+        .def_property_readonly(
+            "data",
+            [](EntityLib::SceneFile* sceneF) { return sceneF->data.get(); },
+            py::return_value_policy::reference)
+        .def_readonly("time", &EntityLib::SceneFile::time, py::return_value_policy::reference);
 
     py::register_exception<Ent::JsonValidation>(ent, "JsonValidation");
 }

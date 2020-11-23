@@ -88,15 +88,33 @@ try:
     ####################################################################################################################
     def testPrefabEntity(ent: Ent.Entity):
         # ActorStates
-        actorStates = ent.get_actorstates() # type: Ent.Node
-        assert actorStates.datatype == Ent.DataType.array
+        actorStates = ent.get_actorstates()
+        assert(actorStates.datatype == Ent.DataType.array)
+        assert(actorStates.size() == 2)
         actorState = actorStates.at(0)
-        assert actorState is not None
-        chosen = actorState.get_union_data()
-        assert chosen is not None
-        exitRequired = chosen.at("ExitRequired")
-        assert exitRequired is not None
-        assert exitRequired.get_bool() is True
+        assert(actorState != None)
+        climbEdge = actorState.get_union_data()
+        assert(climbEdge != None)
+        exitRequired = climbEdge.at("locomotionMode")
+        assert(exitRequired != None)
+        assert(exitRequired.get_string() == "crouch")
+        actorState2 = actorStates.at(1)
+        assert(actorState2 != None)
+        cinematic = actorState2.get_union_data()
+        assert(cinematic != None)
+        type = cinematic.at("Type")
+        assert(type != None)
+        assert(type.get_int() == -1)
+
+        # Map and Set overridePolicy
+        pathNodeGD = ent.get_component("PathNodeGD")
+        tags = pathNodeGD.root.at("Tags").at("Tags")
+        assert(tags.size() == 2)
+        assert(tags.at(0).at(0).get_string() == "a")
+        assert(tags.at(1).at(0).get_string() == "c")
+        assert(tags.at(1).at(1).size() == 1)
+        assert(tags.at(1).at(1).at(0).get_string() == "2")
+
 
         # Test default value
         voxelSimulationGD = ent.get_component("VoxelSimulationGD")
@@ -567,7 +585,18 @@ try:
     # ********************************** Test load/save scene ************************************
     print("load_scene")
     entlib.rawdata_path = "X:/RawData"
+    entlib.clear_cache()
     scene = entlib.load_scene("X:/RawData/22_World/SceneMainWorld/SceneMainWorld.scene")
+    assert(len(entlib.get_entity_cache()) > 0)
+    assert (len(entlib.get_scene_cache()) > 0)
+    scene_cache = entlib.get_scene_cache()
+    found = False
+    for k, v in scene_cache.items():
+        if k == r"22_World\SceneMainWorld\SceneMainWorld.scene":
+            print(len(v.data.entities))
+            found = True
+            break
+    assert(found)
 
     print("Scene Loaded\n")
     print("Entity count : {}\n".format(len(scene.entities)))

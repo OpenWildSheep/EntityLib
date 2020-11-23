@@ -298,6 +298,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pyComponent
         .def_readonly("type", &Component::type)
         .def_readonly("root", &Component::root, py::return_value_policy::reference)
+        .def_property_readonly("raw_data", [](Component const& comp) { return comp.rawData.dump(4); })
         .def_property_readonly(
             "is_used_in_editor", [](Component const& comp) { return comp.isUsedInEditor(); })
         .def_property_readonly(

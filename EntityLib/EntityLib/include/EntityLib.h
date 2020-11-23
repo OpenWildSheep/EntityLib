@@ -10,6 +10,8 @@
 #include "../external/optional.hpp"
 #include "../external/filesystem.hpp"
 
+#include "../external/json.hpp" // TODO : Remove when the rawData in Component is no more useful
+
 #define nsvp_CONFIG_COMPARE_POINTERS 1
 #include "../external/value_ptr.hpp"
 #pragma warning(pop)
@@ -241,6 +243,7 @@ namespace Ent
     /// The properties of a given component
     struct Component
     {
+        nlohmann::json rawData;
         bool hasTemplate; ///< True if if override an other component (not just default)
         std::string type; ///< Component type (ex : Transform, VisualGD, HeightObj ...)
         Node root; ///< Root node of the component. Always of type Ent::DataType::object
@@ -253,7 +256,7 @@ namespace Ent
         /// Create a Component which is an "instance of" this one. With no override.
         Component makeInstanceOf() const
         {
-            return Component{ true, type, root.makeInstanceOf(), version, index };
+            return Component{ rawData, true, type, root.makeInstanceOf(), version, index };
         }
         /// \endcond
 

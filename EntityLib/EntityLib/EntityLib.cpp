@@ -499,8 +499,9 @@ namespace Ent
             out.reserve(_obj.size());
             for (auto&& name_node : _obj)
             {
-                emplace(out, { std::get<0>(name_node), std::get<1>(name_node)->detach() });
+                out.push_back({ std::get<0>(name_node), std::get<1>(name_node)->detach() });
             }
+            std::sort(begin(out), end(out), CompObject());
             return Node(std::move(out), schema);
         }
 
@@ -551,8 +552,9 @@ namespace Ent
             out.reserve(_obj.size());
             for (auto&& name_node : _obj)
             {
-                emplace(out, { std::get<0>(name_node), std::get<1>(name_node)->makeInstanceOf() });
+                out.push_back({ std::get<0>(name_node), std::get<1>(name_node)->makeInstanceOf() });
             }
+            std::sort(begin(out), end(out), CompObject());
             return Node(std::move(out), schema);
         }
 
@@ -1546,8 +1548,9 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
             static json const emptyJson;
             json const& prop = _data.count(name) != 0 ? _data.at(name) : emptyJson;
             Ent::Node tmpNode = loadNode(*std::get<1>(name_sub), prop, superProp);
-            emplace(object, { name.c_str(), std::move(tmpNode) });
+            object.push_back({ name.c_str(), std::move(tmpNode) });
         }
+        std::sort(begin(object), end(object), Ent::CompObject());
         result = Ent::Node(std::move(object), &_nodeSchema);
     }
     break;

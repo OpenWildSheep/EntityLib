@@ -220,7 +220,7 @@ namespace Ent
     ///
     /// It is like a unique_ptr but copyable (deep-copy)
     /// It is like an optional but heap allocated
-    /// It is like a vector with a size if 1
+    /// It is like a vector with a size of 1
     ///
     /// Allocation will use the Ent::Pool
     template <typename T>

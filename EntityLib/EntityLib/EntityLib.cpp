@@ -148,7 +148,7 @@ namespace Ent
         if (wrapper)
         {
             wrapper->computeMemory(prof);
-            prof.add("Union::wrapper", sizeof(Node));
+            prof.addMem("Union::wrapper", sizeof(Node));
         }
     }
 
@@ -735,11 +735,11 @@ namespace Ent
     {
         if (value.is<Override<float>>())
         {
-            return value.get<Override<float>>().getDefaltValue();
+            return value.get<Override<float>>().getDefaultValue();
         }
         if (value.is<Override<int64_t>>())
         {
-            return static_cast<float>(value.get<Override<int64_t>>().getDefaltValue());
+            return static_cast<float>(value.get<Override<int64_t>>().getDefaultValue());
         }
         throw BadType();
     }
@@ -747,7 +747,7 @@ namespace Ent
     {
         if (value.is<Override<int64_t>>())
         {
-            return value.get<Override<int64_t>>().getDefaltValue();
+            return value.get<Override<int64_t>>().getDefaultValue();
         }
         throw BadType();
     }
@@ -755,7 +755,7 @@ namespace Ent
     {
         if (value.is<Override<String>>())
         {
-            return value.get<Override<String>>().getDefaltValue().c_str();
+            return value.get<Override<String>>().getDefaultValue().c_str();
         }
         throw BadType();
     }
@@ -763,7 +763,7 @@ namespace Ent
     {
         if (value.is<Override<bool>>())
         {
-            return value.get<Override<bool>>().getDefaltValue();
+            return value.get<Override<bool>>().getDefaultValue();
         }
         throw BadType();
     }
@@ -797,26 +797,24 @@ namespace Ent
 
         void operator()(Array const& _arr) const
         {
-            prof.add("Array::data", _arr.data.capacity() * sizeof(_arr.data.front()));
+            prof.addMem("Array::data", _arr.data.capacity() * sizeof(_arr.data.front()));
             for (auto&& item : _arr.data)
             {
                 item->computeMemory(prof);
-                prof.add("Array::data::value_ptr", sizeof(Ent::Node));
+                prof.addMem("Array::data::value_ptr", sizeof(Ent::Node));
             }
-            prof.nodeCount += _arr.data.size();
-            prof.nodeByComp[prof.currentComp.back()] += _arr.data.size();
+            prof.addNodes(_arr.data.size());
         }
 
         void operator()(Object const& _obj) const
         {
-            prof.add("Object", _obj.capacity() * sizeof(_obj.front()));
+            prof.addMem("Object", _obj.capacity() * sizeof(_obj.front()));
             for (auto&& name_node : _obj)
             {
                 std::get<1>(name_node)->computeMemory(prof);
-                prof.add("Object::value_ptr", sizeof(Ent::Node));
+                prof.addMem("Object::value_ptr", sizeof(Ent::Node));
             }
-            prof.nodeCount += _obj.size();
-            prof.nodeByComp[prof.currentComp.back()] += _obj.size();
+            prof.addNodes(_obj.size());
         }
 
         void operator()(Union const& _un) const

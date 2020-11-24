@@ -33,10 +33,16 @@ namespace Ent
         std::map<char const*, size_t, CompStr> nodeByComp;
         std::vector<char const*> currentComp;
 
-        void add(char const* name, size_t value)
+        void addMem(char const* name, size_t value)
         {
             mem[name] += value;
             total += value;
+        }
+
+        void addNodes(size_t count)
+        {
+            nodeCount += count;
+            nodeByComp[currentComp.back()] += count;
         }
     };
 
@@ -159,12 +165,12 @@ namespace Ent
 
         // bool hasOverride() const;
 
-        V const& getDefaltValue() const
+        V const& getDefaultValue() const
         {
             return defaultValue;
         }
 
-        V& getDefaltValue()
+        V& getDefaultValue()
         {
             return defaultValue;
         }
@@ -321,7 +327,7 @@ namespace Ent
         void computeMemory(MemoryProfiler& prof) const
         {
             prof.currentComp.push_back(type.c_str());
-            prof.add("Component::type", type.size());
+            prof.addMem("Component::type", type.size());
             root.computeMemory(prof);
             prof.currentComp.pop_back();
         }
@@ -522,8 +528,8 @@ namespace Ent
             name.computeMemory(prof);
             for (auto&& name_comp : components)
             {
-                prof.add("Entity::components::value", sizeof(name_comp));
-                prof.add("Entity::components::key", sizeof(std::get<0>(name_comp).size()));
+                prof.addMem("Entity::components::value", sizeof(name_comp));
+                prof.addMem("Entity::components::key", sizeof(std::get<0>(name_comp).size()));
                 std::get<1>(name_comp).computeMemory(prof);
             }
             if (subSceneComponent)
@@ -600,7 +606,7 @@ namespace Ent
 
         void computeMemory(MemoryProfiler& prof) const
         {
-            prof.add("Scene::objects", objects.capacity() * sizeof(objects.front()));
+            prof.addMem("Scene::objects", objects.capacity() * sizeof(objects.front()));
             for (auto&& entityPtr : objects)
                 entityPtr->computeMemory(prof);
         }
@@ -728,7 +734,7 @@ namespace Ent
     void Override<V>::set(V _newVal)
     {
         overrideValue = std::move(_newVal);
-        hasOverride = 1;
+        hasOverride = true;
     }
 
     template <typename V>
@@ -773,7 +779,7 @@ namespace Ent
 
         void operator()(std::string const& str) const
         {
-            prof->add("Override<string>", str.capacity());
+            prof->addMem("Override<string>", str.capacity());
         }
     };
 

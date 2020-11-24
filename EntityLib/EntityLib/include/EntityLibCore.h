@@ -86,9 +86,7 @@ namespace Ent
     struct String
     {
         std::unique_ptr<char[]> str;
-        String()
-        {
-        }
+        String() = default;
         String(char const* _str)
         {
             auto len = strlen(_str);
@@ -128,11 +126,32 @@ namespace Ent
 
         bool operator==(String const& ot) const
         {
+            if (str == nullptr)
+            {
+                return ot.str == nullptr;
+            }
+            if (ot.str == nullptr)
+            {
+                return false;
+            }
             return strcmp(str.get(), ot.str.get()) == 0;
         }
 
         bool operator<(String const& ot) const
         {
+            if (str == nullptr)
+            {
+                if (ot.str == nullptr)
+                {
+                    return false;
+                }
+                else
+                    return true;
+            }
+            if (ot.str == nullptr)
+            {
+                return false;
+            }
             return strcmp(str.get(), ot.str.get()) < 0;
         }
 
@@ -143,11 +162,13 @@ namespace Ent
 
         size_t capacity() const
         {
-            return strlen(str.get());
+            return size();
         }
 
         size_t size() const
         {
+            if (str == nullptr)
+                return 0;
             return strlen(str.get());
         }
 
@@ -158,6 +179,8 @@ namespace Ent
 
         operator std::string() const
         {
+            if (str == nullptr)
+                return std::string();
             return std::string(str.get());
         }
     };

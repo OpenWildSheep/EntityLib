@@ -11,31 +11,54 @@
 #include "../external/filesystem.hpp"
 
 #include "../external/json.hpp" // TODO : Remove when the rawData in Component is no more useful
-
-#define nsvp_CONFIG_COMPARE_POINTERS 1
-#include "../external/value_ptr.hpp"
 #pragma warning(pop)
 
 #include "Schema.h"
 
 namespace Ent
 {
-    using nonstd::value_ptr;
-
     // ******************************** Implem details ********************************************
+
+    struct CompStr
+    {
+        bool operator()(char const* a, char const* b) const
+        {
+            return strcmp(a, b) < 0;
+        }
+    };
+
+    struct MemoryProfiler
+    {
+        std::map<char const*, size_t, CompStr> mem;
+        size_t total = 0;
+        size_t nodeCount = 0;
+        std::map<char const*, size_t, CompStr> nodeByComp;
+        std::vector<char const*> currentComp;
+
+        void addMem(char const* name, size_t value)
+        {
+            mem[name] += value;
+            total += value;
+        }
+
+        void addNodes(size_t count)
+        {
+            nodeCount += count;
+            nodeByComp[currentComp.back()] += count;
+        }
+    };
 
     struct Node;
 
     /// \cond PRIVATE
 
     /// Content of a Node which has type Ent::DataType::object
-    using Object = std::map<std::string, value_ptr<Node>>;
+    using Object = std::vector<std::pair<char const*, value_ptr<Node>>>;
 
     /// Content of a Node which has type Ent::DataType::array
     struct Array
     {
         std::vector<value_ptr<Node>> data; ///< List of items of the array
-        DeleteCheck deleteCheck;
 
         bool hasOverride() const;
     };
@@ -52,8 +75,7 @@ namespace Ent
     {
         Subschema const* schema = nullptr; ///< The schema of the object containing the oneOf field
         value_ptr<Node> wrapper; ///< Node containing the className/classData
-        std::string classNameField; ///< Name of the field containing the type under union
-        std::string classDatafield; ///< Name of the field containing the data under union
+        Ent::Subschema::UnionMeta const* metaData = nullptr;
 
         bool hasOverride() const; ///< Recursively check if there is an override inside.
         Node* getUnionData(); ///< return the underlying data (The type is given by getUnionType)
@@ -62,12 +84,14 @@ namespace Ent
         /// @brief Change the type inside the union
         /// @pre type match with a type declared inside the json "oneOf"
         Node* setUnionType(char const* _type);
+
+        void computeMemory(MemoryProfiler& prof) const;
     };
 
     struct EntityRef
     {
         /// @brief string representation of this entity ref, works like a file path, always relative.
-        std::string entityPath;
+        String entityPath;
     };
 
     template <typename V>
@@ -76,13 +100,36 @@ namespace Ent
         Override() = default;
         Override(V _defaultValue, tl::optional<V> _prefabValue, tl::optional<V> _overrideValue)
             : defaultValue(std::move(_defaultValue))
+        {
+            hasPrefab = _prefabValue.has_value();
+            hasOverride = _overrideValue.has_value();
+            if (hasPrefab)
+                prefabValue = std::move(*_prefabValue);
+            if (hasOverride)
+                overrideValue = std::move(*_overrideValue);
+        }
+        Override(V _defaultValue, V _prefabValue, V _overrideValue, bool _hasPrefab, bool _hasOverride)
+            : defaultValue(std::move(_defaultValue))
             , prefabValue(std::move(_prefabValue))
             , overrideValue(std::move(_overrideValue))
+            , hasPrefab(_hasPrefab)
+            , hasOverride(_hasOverride)
         {
         }
-        Override(V _defaultVal, V _val)
+        Override(V _defaultValue, V const* _prefabValue, V const* _overrideValue)
+            : defaultValue(std::move(_defaultValue))
+            , hasPrefab(_prefabValue != nullptr)
+            , hasOverride(_overrideValue != nullptr)
+        {
+            if (hasPrefab)
+                prefabValue = *_prefabValue;
+            if (hasOverride)
+                overrideValue = *_overrideValue;
+        }
+        Override(V _defaultVal)
             : defaultValue(_defaultVal)
-            , value(_val)
+            , hasPrefab(false)
+            , hasOverride(false)
         {
         }
 
@@ -102,23 +149,41 @@ namespace Ent
         Override<V> makeOverridedInstanceOf(tl::optional<V> _overrideValue) const
         {
             Override<V> result = makeInstanceOf();
-            result.overrideValue = _overrideValue;
+            result.hasOverride = _overrideValue.has_value();
+            if (result.hasOverride)
+                result.overrideValue = *_overrideValue;
+            else
+                result.overrideValue = {};
             return result;
         }
 
         /// True if no value was set in template or in instance
         bool isDefault() const
         {
-            return !(prefabValue.has_value() || overrideValue.has_value());
+            return !(hasPrefab || hasOverride);
         }
+
+        void computeMemory(MemoryProfiler& prof) const;
 
         // bool hasOverride() const;
 
+        V const& getDefaultValue() const
+        {
+            return defaultValue;
+        }
+
+        V& getDefaultValue()
+        {
+            return defaultValue;
+        }
+
     public:
-        V defaultValue = V();
-        tl::optional<V> prefabValue;
-        tl::optional<V> overrideValue;
-        DeleteCheck deleteCheck;
+        V defaultValue{};
+        V prefabValue{};
+        V overrideValue{};
+        bool hasPrefab : 1; // No default init for bitfield until c++20
+        bool hasOverride : 1;
+        // DeleteCheck deleteCheck;
     };
 
     /// \endcond
@@ -133,7 +198,7 @@ namespace Ent
         /// @cond PRIVATE
         using Value = mapbox::util::variant<
             Null,
-            Override<std::string>,
+            Override<String>,
             Override<float>,
             Override<int64_t>,
             Object,
@@ -234,24 +299,48 @@ namespace Ent
 
         Subschema const* getSchema() const; ///< Get the Node schema.
 
+        void computeMemory(MemoryProfiler& prof) const;
+
     private:
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
         Value value; ///< Contains one of the types accepted by a Node
-        DeleteCheck deleteCheck;
     };
 
     /// The properties of a given component
     struct Component
     {
         nlohmann::json rawData;
-        bool hasTemplate; ///< True if if override an other component (not just default)
         std::string type; ///< Component type (ex : Transform, VisualGD, HeightObj ...)
         Node root; ///< Root node of the component. Always of type Ent::DataType::object
-        size_t version; ///< @todo remove?
-        size_t index; ///< Useful to keep the componants order in the json file. To make diffs easier.
+        size_t version{}; ///< @todo remove?
+        size_t index{}; ///< Useful to keep the componants order in the json file. To make diffs easier.
+        DeleteCheck deleteCheck;
+        bool hasTemplate{}; ///< True if if override an other component (not just default)
+
+        Component(
+            nlohmann::json _rawData,
+            bool _hasTemplate,
+            std::string _type,
+            Node _root,
+            size_t _version,
+            size_t _index)
+            : rawData(_rawData)
+            , type(std::move(_type))
+            , root(std::move(_root))
+            , version(_version)
+            , index(_index)
+            , hasTemplate(_hasTemplate)
+        {
+        }
 
         /// \cond PRIVATE
-        DeleteCheck deleteCheck;
+        void computeMemory(MemoryProfiler& prof) const
+        {
+            prof.currentComp.push_back(type.c_str());
+            prof.addMem("Component::type", type.size());
+            root.computeMemory(prof);
+            prof.currentComp.pop_back();
+        }
 
         /// Create a Component which is an "instance of" this one. With no override.
         Component makeInstanceOf() const
@@ -287,14 +376,16 @@ namespace Ent
     struct SubSceneComponent
     {
         bool isEmbedded = false; ///< If true, data are in embedded, else data are in file
-        Override<std::string> file; ///< Path to a .scene file, whene isEmbedded is false
+        Override<String> file; ///< Path to a .scene file, whene isEmbedded is false
         size_t index = 0; ///< Useful to keep the componants order in the json file
         std::unique_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
+
+        void computeMemory(MemoryProfiler& prof) const;
 
         /// @cond PRIVATE
         explicit SubSceneComponent(
             bool _isEmbedded = false,
-            Override<std::string> _file = {},
+            Override<String> _file = {},
             size_t _index = 0,
             std::unique_ptr<Scene> _embedded = {});
         SubSceneComponent(SubSceneComponent const&) = delete;
@@ -325,13 +416,13 @@ namespace Ent
         Entity(EntityLib const& _entlib);
         Entity(
             EntityLib const& _entlib,
-            Override<std::string> _name,
+            Override<String> _name,
             std::map<std::string, Component> _components,
             std::unique_ptr<SubSceneComponent> _subSceneComponent,
             Node _actorStates = {},
             Node _color = {},
-            Override<std::string> _thumbnail = {},
-            Override<std::string> _instanceOf = {},
+            Override<String> _thumbnail = {},
+            Override<String> _instanceOf = {},
             Override<ActivationLevel> _maxActivationLevel = {},
             bool _hasASuper = false);
         Entity(Entity const&) = delete;
@@ -341,7 +432,7 @@ namespace Ent
         DeleteCheck deleteCheck;
         void setCanBeRenamed(bool _can); ///< If it has a super it can't be renamed
 
-        Override<std::string> const& getNameValue() const
+        Override<String> const& getNameValue() const
         {
             return name;
         }
@@ -351,12 +442,12 @@ namespace Ent
             return color;
         }
 
-        Override<std::string> const& getThumbnailValue() const
+        Override<String> const& getThumbnailValue() const
         {
             return thumbnail;
         }
 
-        Override<std::string> const& getInstanceOfValue() const
+        Override<String> const& getInstanceOfValue() const
         {
             return instanceOf;
         }
@@ -442,16 +533,34 @@ namespace Ent
         /// @brief Set the parent scene object containing this entity.
         void setParentScene(Scene* _scene);
 
+        void computeMemory(MemoryProfiler& prof) const
+        {
+            name.computeMemory(prof);
+            for (auto&& name_comp : components)
+            {
+                prof.addMem("Entity::components::value", sizeof(name_comp));
+                prof.addMem("Entity::components::key", sizeof(std::get<0>(name_comp).size()));
+                std::get<1>(name_comp).computeMemory(prof);
+            }
+            if (subSceneComponent)
+                subSceneComponent->computeMemory(prof);
+            actorStates.computeMemory(prof);
+            color.computeMemory(prof);
+            thumbnail.computeMemory(prof);
+            instanceOf.computeMemory(prof);
+            maxActivationLevel.computeMemory(prof);
+        }
+
     private:
         void updateSubSceneOwner();
         EntityLib const* entlib{}; ///< Reference the entity lib to find the schema when needed
-        Override<std::string> name; ///< Entity name
+        Override<String> name; ///< Entity name
         std::map<std::string, Component> components; ///< All components of this Entity
         std::unique_ptr<SubSceneComponent> subSceneComponent; ///< the optional SubScene Component
         Node actorStates; ///< All actorStates of this Entity
         Node color; ///< The optional Color of the Entity
-        Override<std::string> thumbnail; ///< Path to the thumbnail mesh (.wthumb)
-        Override<std::string> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
+        Override<String> thumbnail; ///< Path to the thumbnail mesh (.wthumb)
+        Override<String> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
         Override<ActivationLevel> maxActivationLevel; ///< Maximum activation level of this entity in runtime
         bool hasASuper = false;
         Scene* parentScene = nullptr; ///< ptr the scene containing this entity.
@@ -504,6 +613,13 @@ namespace Ent
 
         /// @brief Set the entity owning this scene if it is embedded.
         void setOwnerEntity(Entity* _entity);
+
+        void computeMemory(MemoryProfiler& prof) const
+        {
+            prof.addMem("Scene::objects", objects.capacity() * sizeof(objects.front()));
+            for (auto&& entityPtr : objects)
+                entityPtr->computeMemory(prof);
+        }
 
     private:
         Entity* ownerEntity = nullptr; ///< the entity owning this scene if it is embedded
@@ -613,13 +729,13 @@ namespace Ent
     template <typename V>
     V const& Override<V>::get() const
     {
-        if (overrideValue.has_value())
+        if (hasOverride)
         {
-            return *overrideValue;
+            return overrideValue;
         }
-        if (prefabValue.has_value())
+        if (hasPrefab)
         {
-            return *prefabValue;
+            return prefabValue;
         }
         return defaultValue;
     }
@@ -627,38 +743,72 @@ namespace Ent
     template <typename V>
     void Override<V>::set(V _newVal)
     {
-        overrideValue.emplace(std::move(_newVal));
+        overrideValue = std::move(_newVal);
+        hasOverride = true;
     }
 
     template <typename V>
     bool Override<V>::isSet() const
     {
-        return overrideValue.has_value();
+        return hasOverride;
     }
 
     template <typename V>
     void Override<V>::unset()
     {
-        overrideValue = tl::nullopt;
+        hasOverride = false;
+        overrideValue = {};
     }
 
     template <typename V>
     Override<V> Override<V>::detach() const
     {
-        if (overrideValue.has_value())
-            return Override<V>(defaultValue, tl::nullopt, overrideValue);
+        if (hasOverride)
+            return Override<V>(defaultValue, V{}, overrideValue, false, hasOverride);
         else
-            return Override<V>(defaultValue, tl::nullopt, prefabValue);
+            return Override<V>(defaultValue, V{}, prefabValue, false, hasPrefab);
     }
 
     template <typename V>
     Override<V> Override<V>::makeInstanceOf() const
     {
-        if (overrideValue.has_value())
-            return Override<V>(defaultValue, overrideValue, tl::nullopt);
+        if (hasOverride)
+            return Override<V>(defaultValue, overrideValue, V{}, hasOverride, false);
         else
-            return Override<V>(defaultValue, prefabValue, tl::nullopt);
+            return Override<V>(defaultValue, prefabValue, V{}, hasPrefab, false);
     }
+
+    struct Memory
+    {
+        MemoryProfiler* prof;
+
+        template <typename T>
+        void operator()(T) const
+        {
+        }
+
+        void operator()(std::string const& str) const
+        {
+            prof->addMem("Override<string>", str.capacity());
+        }
+    };
+
+    template <typename V>
+    void Override<V>::computeMemory(MemoryProfiler& prof) const
+    {
+        Memory compute{ &prof };
+        compute(defaultValue);
+        if (hasPrefab)
+            compute(prefabValue);
+        if (hasOverride)
+            compute(overrideValue);
+    }
+
+    size_t count(Object const& obj, char const* key);
+    void emplace(Object& obj, std::pair<char const*, Node> const& value);
+    Node const& at(Object const& obj, char const* key);
+    Node& at(Object& obj, char const* key);
+
     /// \endcond
 
 } // namespace Ent

@@ -93,6 +93,8 @@ try:
         assert(actorStates.size() == 2)
         actorState = actorStates.at(0)
         assert(actorState != None)
+        assert actorState.get_schema().get_union_name_field() == "className"
+        assert actorState.get_schema().get_union_data_field() == "classData"
         climbEdge = actorState.get_union_data()
         assert(climbEdge != None)
         exitRequired = climbEdge.at("locomotionMode")

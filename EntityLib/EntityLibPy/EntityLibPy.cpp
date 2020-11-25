@@ -196,6 +196,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readonly("min_items", &Subschema::minItems)
         .def_readonly("one_of", &Subschema::oneOf, py::return_value_policy::reference)
         .def_readonly("default_value", &Subschema::defaultValue, py::return_value_policy::reference)
+        .def("get_union_name_field", &Subschema::getUnionNameField, py::return_value_policy::reference)
+        .def("get_union_data_field", &Subschema::getUnionDataField, py::return_value_policy::reference)
         .def(
             "get_default_value",
             [](Subschema& s) -> Ent::Subschema::DefaultValue& { return s.defaultValue; },
@@ -299,6 +301,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference)
         .def("get_union_type", &Node::getUnionType, py::return_value_policy::reference)
         .def("set_union_type", &Node::setUnionType, py::return_value_policy::reference)
+        .def(
+            "get_schema",
+            [](Node* node) { return node->getSchema(); },
+            py::return_value_policy::reference)
         .def("unset", [](Node* node) { return node->unset(); })
         .def("is_set", [](Node* node) { return node->isSet(); });
 

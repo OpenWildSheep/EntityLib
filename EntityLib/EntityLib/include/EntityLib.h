@@ -9,6 +9,8 @@
 #include "../external/mapbox/variant.hpp"
 #include "../external/optional.hpp"
 #include "../external/filesystem.hpp"
+
+#include "../external/json.hpp" // TODO : Remove when the rawData in Component is no more useful
 #pragma warning(pop)
 
 #include "Schema.h"
@@ -307,6 +309,7 @@ namespace Ent
     /// The properties of a given component
     struct Component
     {
+        nlohmann::json rawData;
         std::string type; ///< Component type (ex : Transform, VisualGD, HeightObj ...)
         Node root; ///< Root node of the component. Always of type Ent::DataType::object
         size_t version{}; ///< @todo remove?
@@ -314,8 +317,15 @@ namespace Ent
         DeleteCheck deleteCheck;
         bool hasTemplate{}; ///< True if if override an other component (not just default)
 
-        Component(bool _hasTemplate, std::string _type, Node _root, size_t _version, size_t _index)
-            : type(std::move(_type))
+        Component(
+            nlohmann::json _rawData,
+            bool _hasTemplate,
+            std::string _type,
+            Node _root,
+            size_t _version,
+            size_t _index)
+            : rawData(_rawData)
+            , type(std::move(_type))
             , root(std::move(_root))
             , version(_version)
             , index(_index)
@@ -335,7 +345,7 @@ namespace Ent
         /// Create a Component which is an "instance of" this one. With no override.
         Component makeInstanceOf() const
         {
-            return Component{ true, type, root.makeInstanceOf(), version, index };
+            return Component{ rawData, true, type, root.makeInstanceOf(), version, index };
         }
         /// \endcond
 

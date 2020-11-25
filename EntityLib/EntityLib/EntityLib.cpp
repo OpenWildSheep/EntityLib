@@ -1005,9 +1005,9 @@ namespace Ent
             }
         }
         Ent::Subschema const& compSchema = *entlib->schema.components.at(_type);
-        Ent::Component comp{
-            false, _type, loadNode(compSchema, json(), nullptr), 1, components.size()
-        };
+        Ent::Component comp{ json(), false,
+                             _type,  loadNode(compSchema, json(), nullptr),
+                             1,      components.size() };
         auto iter_bool = components.emplace(_type, std::move(comp));
         return &(iter_bool.first->second);
     }
@@ -2026,8 +2026,10 @@ static std::unique_ptr<Ent::Entity> loadEntity(
                 else
                 {
                     Ent::Subschema const& compSchema = *_schema.components.at(cmpType);
-
+                    json rawData = (superComp != nullptr ? superComp->rawData : json());
+                    rawData.merge_patch(data);
                     Ent::Component comp{
+                        rawData,
                         superComp != nullptr, // has a super component
                         cmpType,
                         loadNode(
@@ -2049,9 +2051,9 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         auto const& superComp = std::get<1>(type_comp);
         if (components.count(cmpType) == 0)
         {
-            Ent::Component comp{
-                true, cmpType, superComp.root.makeInstanceOf(), superComp.version, superComp.index
-            };
+            Ent::Component comp{ superComp.rawData, true,
+                                 cmpType,           superComp.root.makeInstanceOf(),
+                                 superComp.version, superComp.index };
 
             components.emplace(cmpType, std::move(comp));
         }
@@ -2259,7 +2261,7 @@ static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& 
     {
         sortedComp.push_back(&std::get<1>(type_comp));
     }
-    Ent::Component subscenePlaceholder{ true, "SubScene", Ent::Node(), 1, 0 };
+    Ent::Component subscenePlaceholder{ json(), true, "SubScene", Ent::Node(), 1, 0 };
     if (Ent::SubSceneComponent const* subscene = _entity.getSubSceneComponent())
     {
         subscenePlaceholder.index = subscene->index;
@@ -2325,7 +2327,7 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
         auto const& type = std::get<0>(type_comp);
         auto const& comp = std::get<1>(type_comp);
 
-        Ent::Component detachedComp{ false, type, comp.root.detach(), 1, index };
+        Ent::Component detachedComp{ comp.rawData, false, type, comp.root.detach(), 1, index };
 
         detComponents.emplace(type, std::move(detachedComp));
         ++index;
@@ -2371,6 +2373,7 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanc
         components.emplace(
             cmpType,
             Ent::Component{
+                superComp.rawData,
                 true,
                 cmpType,
                 superComp.root.makeInstanceOf(),

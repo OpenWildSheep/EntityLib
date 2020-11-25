@@ -242,8 +242,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pyNode = py::class_<Node>(ent, "Node");
     auto pyComponent = py::class_<Component>(ent, "Component");
     auto pySubSceneComponent = py::class_<SubSceneComponent>(ent, "SubSceneComponent");
-    auto pyEntity = py::class_<Entity>(ent, "Entity");
-    auto pyScene = py::class_<Scene>(ent, "Scene");
+    // Make python internally use shared_ptr for Entity and Scene
+    auto pyEntity = py::class_<Entity, std::shared_ptr<Entity>>(ent, "Entity");
+    auto pyScene = py::class_<Scene, std::shared_ptr<Scene>>(ent, "Scene");
     auto pyComponentsSchema = py::class_<ComponentsSchema>(ent, "ComponentsSchema");
     auto pyColor = py::class_<std::array<uint8_t, 4>>(ent, "Color");
     auto pyEntityLib = py::class_<EntityLib>(ent, "EntityLib");
@@ -394,6 +395,14 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(
             "load_scene",
             [](EntityLib* lib, std::string const& path) { return lib->loadScene(path).release(); })
+        .def(
+            "load_entity_read_only",
+            [](EntityLib* lib, std::string const& path) { return lib->loadEntityReadOnly(path); },
+            py::return_value_policy::reference)
+        .def(
+            "load_scene_read_only",
+            [](EntityLib* lib, std::string const& path) { return lib->loadSceneReadOnly(path); },
+            py::return_value_policy::reference)
         .def("save_entity", &EntityLib::saveEntity, "entity"_a, "_entityPath"_a)
         .def("save_scene", &EntityLib::saveScene)
         .def("get_entity_cache", &EntityLib::getEntityCache, py::return_value_policy::reference)

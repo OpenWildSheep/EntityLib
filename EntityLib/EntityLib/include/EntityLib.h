@@ -667,11 +667,11 @@ namespace Ent
         /// @endcond
 
         /// Load the Entity at path _entityPath then return a pointer to the cached data
-        Entity const* loadEntityReadOnly(
+        std::shared_ptr<Entity const> loadEntityReadOnly(
             std::filesystem::path const& _entityPath, Ent::Entity const* _super = nullptr) const;
 
         /// Load the Scene at path _scenePath then return a pointer to the cached data
-        Scene const* loadSceneReadOnly(std::filesystem::path const& _scenePath) const;
+        std::shared_ptr<Scene const> loadSceneReadOnly(std::filesystem::path const& _scenePath) const;
 
         /// Load the Entity at path _entityPath
         std::unique_ptr<Entity> loadEntity(
@@ -694,12 +694,12 @@ namespace Ent
 
         struct EntityFile
         {
-            std::unique_ptr<Entity> data;
+            std::shared_ptr<Entity> data;
             std::filesystem::file_time_type time;
         };
         struct SceneFile
         {
-            std::unique_ptr<Scene> data;
+            std::shared_ptr<Scene> data;
             std::filesystem::file_time_type time;
         };
         std::map<std::filesystem::path, EntityFile> const& getEntityCache() const;
@@ -712,7 +712,7 @@ namespace Ent
 
         /// Load an Entity or a Scene, using the given cache
         template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
-        Type const* loadEntityOrScene(
+        std::shared_ptr<Type const> loadEntityOrScene(
             std::filesystem::path const& _path,
             Cache& cache,
             ValidateFunc&& validate,

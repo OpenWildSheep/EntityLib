@@ -325,8 +325,8 @@ try
     }
     {
         // Test the readOnly prefab.entity
-        Ent::Entity const* ent = entlib.loadEntityReadOnly("prefab.entity");
-        testPrefabEntity(ent);
+        std::shared_ptr<Ent::Entity const> ent = entlib.loadEntityReadOnly("prefab.entity");
+        testPrefabEntity(ent.get());
     }
     {
         // Test write prefab

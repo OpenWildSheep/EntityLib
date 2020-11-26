@@ -361,7 +361,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pyScene
         .def(
             "add_entity",
-            [](Scene* scene, Entity* ent) { scene->addEntity(std::unique_ptr<Entity>(ent)); })
+            [](Scene* scene, Entity* ent) -> Entity*
+            {
+                scene->addEntity(ent->clone()); return scene->getObjects().back().get();
+            }, py::return_value_policy::reference)
         .def("resolve_entityref", &Scene::resolveEntityRef, py::return_value_policy::reference)
         .def_property_readonly(
             "entities",

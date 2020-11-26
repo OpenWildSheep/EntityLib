@@ -154,6 +154,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pyDataType = py::enum_<DataType>(ent, "DataType");
     auto pyActivationLevel = py::enum_<ActivationLevel>(ent, "ActivationLevel");
     auto pyPath = py::class_<std::filesystem::path>(ent, "path");
+    auto pyEntString = py::class_<Ent::String>(ent, "String");
     auto pySubschema = py::class_<Subschema>(ent, "Subschema");
     auto pySubschemaRef = py::class_<SubschemaRef>(ent, "SubschemaRef");
     auto pySchema = py::class_<Schema>(ent, "Schema");
@@ -186,7 +187,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         });
 
     py::implicitly_convertible<std::string, std::filesystem::path>();
-
+    py::implicitly_convertible<std::string, Ent::String>();
+    
     pySubschema
         .def_readonly("type", &Subschema::type)
         .def_readonly("name", &Subschema::name)

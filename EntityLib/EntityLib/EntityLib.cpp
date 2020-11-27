@@ -2539,7 +2539,7 @@ std::unique_ptr<Ent::Scene> Ent::SubSceneComponent::detachEmbedded()
 {
     if (isEmbedded)
     {
-		auto scene = std::make_unique<Scene>();
+        auto scene = std::make_unique<Scene>();
         std::swap(scene, embedded);
 
         // we don't to swap owners though

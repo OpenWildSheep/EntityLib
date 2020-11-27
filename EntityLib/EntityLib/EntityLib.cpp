@@ -2512,33 +2512,28 @@ static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _s
 
 void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const& _scenePath) const
 {
-    std::ofstream file(_scenePath);
-    if (not file.is_open())
+    Ent::Entity sceneEntity{*this};
+    // scene entity is named after scene base file name
+    sceneEntity.setName(_scenePath.stem().string());
+
+    // generate relative wthumb path
+    auto thumbNailPath = _scenePath.string() + ".wthumb";
+    const auto pos = thumbNailPath.find(rawdataPath.string());
+    if (pos != std::string::npos)
     {
-        constexpr size_t MessSize = 1024;
-        std::array<char, MessSize> message = {};
-        sprintf_s(message.data(), MessSize, "Can't open file for write: %ls", _scenePath.c_str());
-        throw std::runtime_error(message.data());
+        thumbNailPath = thumbNailPath.substr(pos);
+    }
+    sceneEntity.setThumbnail(thumbNailPath);
+
+    // embed scene
+    auto* subScene = sceneEntity.addSubSceneComponent();
+    subScene->makeEmbedded(true);
+    for (auto&& entity : _scene.getObjects())
+    {
+        subScene->embedded->addEntity(entity->clone());
     }
 
-    json document = ::saveScene(schema, _scene);
-
-    file << document.dump(4);
-    file.close();
-
-    // Better to check after save because it is easiest to debug
-    if (validationEnabled)
-    {
-        try
-        {
-            validateScene(schema.schema, toolsDir, document);
-        }
-        catch (...)
-        {
-            fprintf(stderr, "Error, saving scene : %ls\n", _scenePath.c_str());
-            throw;
-        }
-    }
+    saveEntity(sceneEntity, _scenePath);
 }
 
 void Ent::SubSceneComponent::computeMemory(MemoryProfiler& prof) const

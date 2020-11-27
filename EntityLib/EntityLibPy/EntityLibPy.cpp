@@ -334,7 +334,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property_readonly(
             "embedded",
             [](SubSceneComponent* comp) -> Scene& { return *comp->embedded; },
-            py::return_value_policy::reference);
+            py::return_value_policy::reference)
+        .def("detach_embedded",
+            [](SubSceneComponent* comp) -> Scene* { return comp->detachEmbedded().release(); });
 
     pyEntity
         .def(py::init<EntityLib const&>())

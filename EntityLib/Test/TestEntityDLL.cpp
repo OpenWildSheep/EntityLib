@@ -324,6 +324,14 @@ try
         ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
         sysCreat->root.at("Name")->setString("Shamane_male");
         entlib.saveEntity(*ent, "prefab.copy.entity");
+
+        // TEST SubScene detach
+        auto&& originalSubEntities =  ent->getSubSceneComponent()->embedded->getObjects();
+        auto detachedSubScene = ent->getSubSceneComponent()->detachEmbedded();
+        ENTLIB_ASSERT(ent->getSubSceneComponent()->embedded->getObjects().empty());
+        ENTLIB_ASSERT(std::equal(
+            begin(originalSubEntities), end(originalSubEntities),
+            begin(detachedSubScene->getObjects())));
     }
     {
         // Test the readOnly prefab.entity

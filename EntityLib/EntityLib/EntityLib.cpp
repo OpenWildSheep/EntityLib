@@ -848,6 +848,7 @@ namespace Ent
             if (embedded == nullptr)
             {
                 embedded = std::make_unique<Scene>();
+                // TODO: 2020-11-27 @Seb : set embedded owner entity
             }
             file.set(std::string());
         }
@@ -2532,6 +2533,22 @@ std::unique_ptr<Ent::SubSceneComponent> Ent::SubSceneComponent::clone() const
         instEmbedded = embedded->clone();
     }
     return std::make_unique<SubSceneComponent>(isEmbedded, file, index, std::move(instEmbedded));
+}
+
+std::unique_ptr<Ent::Scene> Ent::SubSceneComponent::detachEmbedded()
+{
+    if (isEmbedded)
+    {
+		auto scene = std::make_unique<Scene>();
+        std::swap(scene, embedded);
+
+        // we don't to swap owners though
+        embedded->setOwnerEntity(scene->getOwnerEntity());
+        scene->setOwnerEntity(nullptr); // detached scene is not owned by any entity
+
+        return scene;
+    }
+    return {};
 }
 
 bool Ent::SubSceneComponent::hasOverride() const

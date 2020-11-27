@@ -376,9 +376,9 @@ namespace Ent
     struct SubSceneComponent
     {
         bool isEmbedded = false; ///< If true, data are in embedded, else data are in file
-        Override<String> file; ///< Path to a .scene file, whene isEmbedded is false
-        size_t index = 0; ///< Useful to keep the componants order in the json file
-        std::unique_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
+        Override<String> file; ///< Path to a .scene file, when isEmbedded is false
+        size_t index = 0; ///< Useful to keep the components order in the json file
+        std::unique_ptr<Scene> embedded; ///< Embedded Scene, when isEmbedded is true
 
         void computeMemory(MemoryProfiler& prof) const;
 
@@ -405,6 +405,10 @@ namespace Ent
         bool hasOverride() const;
 
         std::unique_ptr<SubSceneComponent> clone() const; ///< Clone this SubSceneComponent identically
+
+        /// @brief detach the Scene from this sub scene components, leaving the embedded sub scene empty
+        /// @pre this SubScene is embedded, i.e. isEmbedded is true
+        std::unique_ptr<Scene> detachEmbedded();
     };
 
     class EntityLib;

@@ -128,11 +128,11 @@ namespace Ent
         {
             if (str == nullptr)
             {
-                return ot.str == nullptr;
+                return ot.size() == 0; // null and size 0 are identical in the std::string way
             }
             if (ot.str == nullptr)
             {
-                return false;
+                return size() == 0;
             }
             return strcmp(str.get(), ot.str.get()) == 0;
         }

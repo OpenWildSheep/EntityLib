@@ -826,8 +826,8 @@ try
     // ********************************** Test load/save scene ************************************
     entlib.rawdataPath = "X:/RawData";
 
-    std::unique_ptr<Ent::Scene> scene = entlib.loadScene("X:/RawData/22_World/SceneMainWorld/"
-                                                         "SceneMainWorld.scene");
+    auto scene = entlib.loadScene("X:/RawData/22_World/SceneMainWorld/"
+                                  "SceneMainWorld_entitylib_unit_test.scene");
 
     printf("Scene Loaded\n");
     printf("Entity count : %zu\n", scene->getObjects().size());

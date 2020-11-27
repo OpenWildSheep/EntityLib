@@ -186,6 +186,11 @@ PYBIND11_MODULE(EntityLibPy, ent)
             return std::filesystem::hash_value(path);
         });
 
+    pyEntString
+        .def(py::init<std::string>())
+        .def("__str__", [](Ent::String* str) { return (std::string)*str; })
+        .def("__eq__", [](Ent::String& a, Ent::String& b) { return a == b; });
+
     py::implicitly_convertible<std::string, std::filesystem::path>();
     py::implicitly_convertible<std::string, Ent::String>();
     

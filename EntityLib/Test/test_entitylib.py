@@ -600,13 +600,14 @@ try:
     print("load_scene")
     entlib.rawdata_path = "X:/RawData"
     entlib.clear_cache()
-    scene = entlib.load_scene_read_only("X:/RawData/22_World/SceneMainWorld/SceneMainWorld.scene")
+    scene = entlib.load_scene_read_only(
+        "X:/RawData/22_World/SceneMainWorld/SceneMainWorld_entitylib_unit_test.scene")
     assert(len(entlib.get_entity_cache()) > 0)
     assert (len(entlib.get_scene_cache()) > 0)
     scene_cache = entlib.get_scene_cache()
     found = False
     for k, v in scene_cache.items():
-        if k == r"22_World\SceneMainWorld\SceneMainWorld.scene":
+        if k == r"22_World\SceneMainWorld\SceneMainWorld_entitylib_unit_test.scene":
             print(len(v.data.entities))
             found = True
             break

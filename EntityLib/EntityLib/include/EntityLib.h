@@ -97,7 +97,11 @@ namespace Ent
     template <typename V>
     struct Override
     {
-        Override() = default;
+        Override()
+            : hasPrefab(false)
+            , hasOverride(false)
+        {
+        }
         Override(V _defaultValue, tl::optional<V> _prefabValue, tl::optional<V> _overrideValue)
             : defaultValue(std::move(_defaultValue))
         {

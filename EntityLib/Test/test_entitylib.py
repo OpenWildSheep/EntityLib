@@ -230,7 +230,7 @@ try:
     original_sub_entities = ent.get_subscene_component().embedded.entities;
     detached_sub_scene = ent.get_subscene_component().detach_embedded();
     assert(len(ent.get_subscene_component().embedded.entities) is 0);
-    assert(all(a == b for a, b in zip(originalSubEntities, detached_sub_scene.entities)))
+    assert(all(a == b for a, b in zip(original_sub_entities, detached_sub_scene.entities)))
     
     ####################################################################################################################
     # Test write prefab

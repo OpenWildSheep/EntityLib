@@ -597,10 +597,10 @@ try:
         displaySubSchema(name, sub, "")
 
     # ********************************** Test load/save scene ************************************
-    print("load_scene")
+    print("load_legacy_scene")
     entlib.rawdata_path = "X:/RawData"
     entlib.clear_cache()
-    scene = entlib.load_scene_read_only(
+    scene = entlib.load_legacy_scene_read_only(
         "X:/RawData/22_World/SceneMainWorld/SceneMainWorld_entitylib_unit_test.scene")
     assert(len(entlib.get_entity_cache()) > 0)
     assert (len(entlib.get_scene_cache()) > 0)

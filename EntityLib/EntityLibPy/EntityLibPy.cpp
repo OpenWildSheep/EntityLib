@@ -414,12 +414,19 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "load_scene",
             [](EntityLib* lib, std::string const& path) { return lib->loadScene(path).release(); })
         .def(
+            "load_legacy_scene",
+            [](EntityLib* lib, std::string const& path) { return lib->loadLegacyScene(path).release(); })
+        .def(
             "load_entity_read_only",
             [](EntityLib* lib, std::string const& path) { return lib->loadEntityReadOnly(path); },
             py::return_value_policy::reference)
         .def(
             "load_scene_read_only",
             [](EntityLib* lib, std::string const& path) { return lib->loadSceneReadOnly(path); },
+            py::return_value_policy::reference)
+        .def(
+            "load_legacy_scene_read_only",
+            [](EntityLib* lib, std::string const& path) { return lib->loadLegacySceneReadOnly(path); },
             py::return_value_policy::reference)
         .def("save_entity", &EntityLib::saveEntity, "entity"_a, "_entityPath"_a)
         .def("save_scene", &EntityLib::saveScene)

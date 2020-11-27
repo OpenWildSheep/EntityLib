@@ -2083,6 +2083,12 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         std::move(ovMaxActivationLevel));
 }
 
+/// Exception thrown when a method is called on legacy data (or vice versa)
+struct UnsupportedFormat : std::exception
+{
+    UnsupportedFormat() = default;
+};
+
 template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
 std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
     std::filesystem::path const& _path,
@@ -2122,7 +2128,14 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
     if (reload)
     {
         json document = loadJsonFile(absPath);
-
+        if (document.count("Objects") and typeid(Type) == typeid(Entity)
+            or (document.count("Name") or document.count("InstanceOf") or document.count("Components"))
+            and typeid(Type) == typeid(Scene))
+        {
+            // we are trying to load a legacy scene through loadScene method
+            // or a new Scene format through loadLegacyScene method
+            throw UnsupportedFormat();
+        }
         if (validationEnabled)
         {
             try
@@ -2206,6 +2219,11 @@ static std::unique_ptr<Ent::Scene> loadScene(
 
 std::shared_ptr<Ent::Scene const> Ent::EntityLib::loadSceneReadOnly(std::filesystem::path const& _scenePath) const
 {
+	return loadScene(_scenePath);
+}
+
+std::shared_ptr<Ent::Scene const> Ent::EntityLib::loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const
+{
     auto loadFunc = [](Ent::EntityLib const& _entLib,
                        Ent::ComponentsSchema const& _schema,
                        json const& _document,
@@ -2224,7 +2242,24 @@ Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath, Ent::Entity
 
 std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(std::filesystem::path const& _scenePath) const
 {
-    return loadSceneReadOnly(_scenePath)->clone();
+    try
+    {
+        auto entity = loadEntity(_scenePath);
+        if (auto* subScene = entity->getSubSceneComponent())
+        {
+            return subScene->detachEmbedded();
+        }
+        return {};
+	}
+    catch (const UnsupportedFormat&)
+    {
+        return loadLegacyScene(_scenePath);
+    }
+}
+
+std::unique_ptr<Ent::Scene> Ent::EntityLib::loadLegacyScene(std::filesystem::path const& _scenePath) const
+{
+    return loadLegacySceneReadOnly(_scenePath)->clone();
 }
 
 static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& _entity)

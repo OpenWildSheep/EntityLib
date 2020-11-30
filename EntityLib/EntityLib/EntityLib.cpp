@@ -2517,11 +2517,13 @@ void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const&
     sceneEntity.setName(_scenePath.stem().string());
 
     // generate relative wthumb path
-    auto thumbNailPath = _scenePath.string() + ".wthumb";
-    const auto pos = thumbNailPath.find(rawdataPath.string());
-    if (pos != std::string::npos)
+    auto thumbNailPath = _scenePath.generic_string() + ".wthumb";
+    const auto genericRawdataPath = rawdataPath.generic_string();
+    const auto pos = thumbNailPath.find(genericRawdataPath);
+    if (pos == 0)
     {
-        thumbNailPath = thumbNailPath.substr(pos);
+        const size_t offset = genericRawdataPath.size() + 1; // also strip the leading '/'
+        thumbNailPath = thumbNailPath.substr(offset);
     }
     sceneEntity.setThumbnail(thumbNailPath);
 

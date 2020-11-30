@@ -1100,7 +1100,7 @@ namespace Ent
             actorStates.makeInstanceOf(),
             color.makeInstanceOf(),
             thumbnail.makeInstanceOf(),
-            instanceOf,
+            instanceOf.makeInstanceOf(),
             maxActivationLevel.makeInstanceOf());
     }
 
@@ -2130,7 +2130,7 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
         json document = loadJsonFile(absPath);
         if (document.count("Objects") and typeid(Type) == typeid(Entity)
             or (document.count("Name") or document.count("InstanceOf") or document.count("Components"))
-            and typeid(Type) == typeid(Scene))
+                   and typeid(Type) == typeid(Scene))
         {
             // we are trying to load a legacy scene through loadScene method
             // or a new Scene format through loadLegacyScene method
@@ -2250,7 +2250,7 @@ std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(std::filesystem::path cons
             return subScene->detachEmbedded();
         }
         return {};
-	}
+    }
     catch (const UnsupportedFormat&)
     {
         return loadLegacyScene(_scenePath);
@@ -2280,12 +2280,12 @@ static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& 
         entNode.emplace("Color", saveNode(colorSchema, _entity.getColorValue()));
     }
 
-    if (const char* thumbnail = _entity.getThumbnail())
+    if (_entity.getThumbnailValue().isSet())
     {
-        entNode.emplace("Thumbnail", thumbnail);
+        entNode.emplace("Thumbnail", _entity.getThumbnail());
     }
 
-    if (not _entity.getMaxActivationLevelValue().isDefault())
+    if (_entity.getMaxActivationLevelValue().isSet())
     {
         entNode.emplace(
             "MaxActivationLevel", getActivationLevelString(_entity.getMaxActivationLevel()));
@@ -2433,12 +2433,13 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanc
 
 void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path const& _entityPath) const
 {
-    std::ofstream file(_entityPath);
+    std::filesystem::path entityPath = getAbsolutePath(_entityPath);
+    std::ofstream file(entityPath);
     if (not file.is_open())
     {
         constexpr size_t MessSize = 1024;
         std::array<char, MessSize> message = {};
-        sprintf_s(message.data(), MessSize, "Can't open file for write: %ls", _entityPath.c_str());
+        sprintf_s(message.data(), MessSize, "Can't open file for write: %ls", entityPath.c_str());
         throw std::runtime_error(message.data());
     }
     json document = ::saveEntity(schema, _entity);
@@ -2454,7 +2455,7 @@ void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path con
         }
         catch (...)
         {
-            fprintf(stderr, "Error, saving entity : %ls\n", _entityPath.c_str());
+            fprintf(stderr, "Error, saving entity : %ls\n", entityPath.c_str());
             throw;
         }
     }
@@ -2512,7 +2513,7 @@ static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _s
 
 void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const& _scenePath) const
 {
-    Ent::Entity sceneEntity{*this};
+    Ent::Entity sceneEntity{ *this };
     // scene entity is named after scene base file name
     sceneEntity.setName(_scenePath.stem().string());
 

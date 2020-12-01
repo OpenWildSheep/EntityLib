@@ -19,9 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Float.h" />
+    <ClInclude Include="include\MethodInvocation.h" />
+    <ClInclude Include="include\Parameter.h" />
+    <ClInclude Include="include\Position.h" />
+    <ClInclude Include="include\Quat.h" />
     <ClInclude Include="include\WildRPCClient.h" />
+    <ClInclude Include="include\WildRPCType.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\Float.cpp" />
+    <ClCompile Include="include\MethodInvocation.cpp" />
+    <ClCompile Include="include\Parameter.cpp" />
+    <ClCompile Include="include\Position.cpp" />
+    <ClCompile Include="include\Quat.cpp" />
     <ClCompile Include="WildRPCClient.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -109,7 +120,7 @@
       </PrecompiledHeader>
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);ASIO_STANDALONE</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>

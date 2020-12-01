@@ -38,7 +38,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print("Errors = ", errors_set)
     print("Results = ", results_set)
 
-    rpcMethod_get = rpc.RPCMethod(s, "CameraManager", "RPC_GetCamera", [], [rpc.Type_Position, rpc.Type_Quat])
+    rpcMethod_get = rpc.RPCMethod(s, "CameraManager", "RPC_GetCamera", [], [rpc.Type_Position, rpc.Type_Quat, rpc.Type_Float])
     results_get = []
     errors_get = rpcMethod_get.Invoke([], results_get)
 

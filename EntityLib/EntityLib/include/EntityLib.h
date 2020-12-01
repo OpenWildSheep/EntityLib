@@ -681,12 +681,18 @@ namespace Ent
         /// Load the Scene at path _scenePath then return a pointer to the cached data
         std::shared_ptr<Scene const> loadSceneReadOnly(std::filesystem::path const& _scenePath) const;
 
+        /// Load the Scene in legacy format at path _scenePath then return a pointer to the cached data
+        std::shared_ptr<Scene const> loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const;
+
         /// Load the Entity at path _entityPath
         std::unique_ptr<Entity> loadEntity(
             std::filesystem::path const& _entityPath, Ent::Entity const* _super = nullptr) const;
 
         /// Load the Scene at path _scenePath
         std::unique_ptr<Scene> loadScene(std::filesystem::path const& _scenePath) const;
+
+        /// Load the Scene in legacy format at path _scenePath
+        std::unique_ptr<Scene> loadLegacyScene(std::filesystem::path const& _scenePath) const;
 
         /// Save the Entity at path _entityPath
         void saveEntity(Entity const& _entity, std::filesystem::path const& _entityPath) const;

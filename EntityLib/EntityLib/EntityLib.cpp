@@ -1100,7 +1100,7 @@ namespace Ent
             actorStates.makeInstanceOf(),
             color.makeInstanceOf(),
             thumbnail.makeInstanceOf(),
-            instanceOf,
+            instanceOf.makeInstanceOf(),
             maxActivationLevel.makeInstanceOf());
     }
 
@@ -2083,6 +2083,12 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         std::move(ovMaxActivationLevel));
 }
 
+/// Exception thrown when a method is called on legacy data (or vice versa)
+struct UnsupportedFormat : std::exception
+{
+    UnsupportedFormat() = default;
+};
+
 template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
 std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
     std::filesystem::path const& _path,
@@ -2122,7 +2128,14 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
     if (reload)
     {
         json document = loadJsonFile(absPath);
-
+        if (document.count("Objects") and typeid(Type) == typeid(Entity)
+            or (document.count("Name") or document.count("InstanceOf") or document.count("Components"))
+                   and typeid(Type) == typeid(Scene))
+        {
+            // we are trying to load a legacy scene through loadScene method
+            // or a new Scene format through loadLegacyScene method
+            throw UnsupportedFormat();
+        }
         if (validationEnabled)
         {
             try
@@ -2206,6 +2219,11 @@ static std::unique_ptr<Ent::Scene> loadScene(
 
 std::shared_ptr<Ent::Scene const> Ent::EntityLib::loadSceneReadOnly(std::filesystem::path const& _scenePath) const
 {
+	return loadScene(_scenePath);
+}
+
+std::shared_ptr<Ent::Scene const> Ent::EntityLib::loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const
+{
     auto loadFunc = [](Ent::EntityLib const& _entLib,
                        Ent::ComponentsSchema const& _schema,
                        json const& _document,
@@ -2224,7 +2242,24 @@ Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath, Ent::Entity
 
 std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(std::filesystem::path const& _scenePath) const
 {
-    return loadSceneReadOnly(_scenePath)->clone();
+    try
+    {
+        auto entity = loadEntity(_scenePath);
+        if (auto* subScene = entity->getSubSceneComponent())
+        {
+            return subScene->detachEmbedded();
+        }
+        return {};
+    }
+    catch (const UnsupportedFormat&)
+    {
+        return loadLegacyScene(_scenePath);
+    }
+}
+
+std::unique_ptr<Ent::Scene> Ent::EntityLib::loadLegacyScene(std::filesystem::path const& _scenePath) const
+{
+    return loadLegacySceneReadOnly(_scenePath)->clone();
 }
 
 static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& _entity)
@@ -2245,12 +2280,12 @@ static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& 
         entNode.emplace("Color", saveNode(colorSchema, _entity.getColorValue()));
     }
 
-    if (const char* thumbnail = _entity.getThumbnail())
+    if (_entity.getThumbnailValue().isSet())
     {
-        entNode.emplace("Thumbnail", thumbnail);
+        entNode.emplace("Thumbnail", _entity.getThumbnail());
     }
 
-    if (not _entity.getMaxActivationLevelValue().isDefault())
+    if (_entity.getMaxActivationLevelValue().isSet())
     {
         entNode.emplace(
             "MaxActivationLevel", getActivationLevelString(_entity.getMaxActivationLevel()));
@@ -2398,12 +2433,13 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanc
 
 void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path const& _entityPath) const
 {
-    std::ofstream file(_entityPath);
+    std::filesystem::path entityPath = getAbsolutePath(_entityPath);
+    std::ofstream file(entityPath);
     if (not file.is_open())
     {
         constexpr size_t MessSize = 1024;
         std::array<char, MessSize> message = {};
-        sprintf_s(message.data(), MessSize, "Can't open file for write: %ls", _entityPath.c_str());
+        sprintf_s(message.data(), MessSize, "Can't open file for write: %ls", entityPath.c_str());
         throw std::runtime_error(message.data());
     }
     json document = ::saveEntity(schema, _entity);
@@ -2419,7 +2455,7 @@ void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path con
         }
         catch (...)
         {
-            fprintf(stderr, "Error, saving entity : %ls\n", _entityPath.c_str());
+            fprintf(stderr, "Error, saving entity : %ls\n", entityPath.c_str());
             throw;
         }
     }
@@ -2477,33 +2513,30 @@ static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _s
 
 void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const& _scenePath) const
 {
-    std::ofstream file(_scenePath);
-    if (not file.is_open())
+    Ent::Entity sceneEntity{ *this };
+    // scene entity is named after scene base file name
+    sceneEntity.setName(_scenePath.stem().string());
+
+    // generate relative wthumb path
+    auto thumbNailPath = _scenePath.generic_string() + ".wthumb";
+    const auto genericRawdataPath = rawdataPath.generic_string();
+    const auto pos = thumbNailPath.find(genericRawdataPath);
+    if (pos == 0)
     {
-        constexpr size_t MessSize = 1024;
-        std::array<char, MessSize> message = {};
-        sprintf_s(message.data(), MessSize, "Can't open file for write: %ls", _scenePath.c_str());
-        throw std::runtime_error(message.data());
+        const size_t offset = genericRawdataPath.size() + 1; // also strip the leading '/'
+        thumbNailPath = thumbNailPath.substr(offset);
+    }
+    sceneEntity.setThumbnail(thumbNailPath);
+
+    // embed scene
+    auto* subScene = sceneEntity.addSubSceneComponent();
+    subScene->makeEmbedded(true);
+    for (auto&& entity : _scene.getObjects())
+    {
+        subScene->embedded->addEntity(entity->clone());
     }
 
-    json document = ::saveScene(schema, _scene);
-
-    file << document.dump(4);
-    file.close();
-
-    // Better to check after save because it is easiest to debug
-    if (validationEnabled)
-    {
-        try
-        {
-            validateScene(schema.schema, toolsDir, document);
-        }
-        catch (...)
-        {
-            fprintf(stderr, "Error, saving scene : %ls\n", _scenePath.c_str());
-            throw;
-        }
-    }
+    saveEntity(sceneEntity, _scenePath);
 }
 
 void Ent::SubSceneComponent::computeMemory(MemoryProfiler& prof) const

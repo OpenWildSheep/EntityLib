@@ -10,12 +10,12 @@
 
 namespace WRPC
 {
-	void Quat::GetValues(float* _x, float* _y, float* _z, float* _w)
+	void Quat::GetValues(float& _x, float& _y, float& _z, float& _w)
 	{
-		*_x = m_values[0];
-		*_y = m_values[1];
-		*_z = m_values[2];
-		*_w = m_values[3];
+		_x = m_values[0];
+		_y = m_values[1];
+		_z = m_values[2];
+		_w = m_values[3];
 	}
 
 	void  Quat::SetValues(float _x, float _y, float _z, float _w)
@@ -26,7 +26,7 @@ namespace WRPC
 		m_values[3] = _w;
 	}
 
-	Quat::Quat(const char* _name) : m_name(_name)
+	Quat::Quat()
 	{
 		for (int i = 0; i < 4; i++)
 		{
@@ -39,10 +39,10 @@ namespace WRPC
 		flatbuffers::FlatBufferBuilder fbb;
 
 		WildRPC::QuatBuilder quatBuilder(fbb);
-		quatBuilder.add_x(0.0f);
-		quatBuilder.add_y(0.0f);
-		quatBuilder.add_z(0.0f);
-		quatBuilder.add_w(1.0f);
+		quatBuilder.add_x(m_values[0]);
+		quatBuilder.add_y(m_values[1]);
+		quatBuilder.add_z(m_values[2]);
+		quatBuilder.add_w(m_values[3]);
 		auto ornt = quatBuilder.Finish();
 
 		fbb.FinishSizePrefixed(ornt);
@@ -63,7 +63,9 @@ namespace WRPC
 
 	bool Quat::DecodeFrom(unsigned char* _buffer, size_t _totalBufferSize, size_t* _offset)
 	{
-		unsigned char* sz = reinterpret_cast<unsigned char*>(_buffer);
+		unsigned char* bufferChunk = _buffer + *_offset;
+
+		unsigned char* sz = reinterpret_cast<unsigned char*>(bufferChunk);
 		int size = *sz;
 
 		if ((int)(*_offset + size) >= _totalBufferSize)
@@ -71,7 +73,7 @@ namespace WRPC
 			return false;
 		}
 
-		auto quat = WildRPC::GetSizePrefixedQuat(_buffer);
+		auto quat = WildRPC::GetSizePrefixedQuat(bufferChunk);
 		SetValues(quat->x(), quat->y(), quat->z(), quat->w());
 
 		*_offset += size + 4;

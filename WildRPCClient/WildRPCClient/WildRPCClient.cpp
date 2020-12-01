@@ -30,132 +30,6 @@ namespace WRPC
     {
     }
 
-	bool RPCClient::test1()
-	{
-		try
-		{
-			asio::io_context my_io_context;
-
-			asio::ip::tcp::socket s(my_io_context);
-			asio::ip::tcp::resolver resolver(my_io_context);
-			asio::connect(s, resolver.resolve("127.0.0.1", "9993"));
-
-			const size_t max_length = 4 * 1024;
-
-			//char request[max_length];
-			//WildRPC::RPCHeader* header = nullptr;
-
-			// Serialize into new flatbuffer.
-			
-
-			unsigned char buffer[4 * 1024];
-			unsigned int currentPosition = 0;
-
-			// --------------------------------------
-
-			flatbuffers::FlatBufferBuilder fbb;
-
-			auto managerName = fbb.CreateString("CameraManager");
-			auto methodName = fbb.CreateString("DATA_SetCamera");
-
-			std::vector<int8_t> params;
-			params.push_back((int8_t)RPC_Type::Position);
-			params.push_back((int8_t)RPC_Type::Quat);
-			params.push_back((int8_t)RPC_Type::Float);
-			auto prms = fbb.CreateVector(params);
-
-			std::vector<int8_t> results;
-			auto rslts = fbb.CreateVector(results);
-
-			WildRPC::RPCHeaderBuilder rpcHeader(fbb);
-			rpcHeader.add_managerName(managerName);
-			rpcHeader.add_methodName(methodName);
-			rpcHeader.add_parameterTypes(prms);
-			rpcHeader.add_resultTypes(rslts);
-
-			auto hdr = rpcHeader.Finish();
-			fbb.FinishSizePrefixed(hdr);
-
-			auto size = fbb.GetSize();
-			auto ptr = fbb.GetBufferPointer();
-			memcpy(buffer + currentPosition, ptr, size);
-			currentPosition += size;
-
-			// ------------------
-
-			fbb.Clear();
-
-			WildRPC::Vector3Builder vec3Builder(fbb);
-			vec3Builder.add_x(1.0f);
-			vec3Builder.add_y(2.0f);
-			vec3Builder.add_z(3.0f);
-			auto localPos = vec3Builder.Finish();
-
-			WildRPC::PositionBuilder posBuilder(fbb);
-			posBuilder.add_worldCellX(32768);
-			posBuilder.add_worldCellY(32768);
-			posBuilder.add_localPosition(localPos);
-			auto pos = posBuilder.Finish();
-
-			fbb.FinishSizePrefixed(pos);
-
-			size = fbb.GetSize();
-			ptr = fbb.GetBufferPointer();
-			memcpy(buffer + currentPosition, ptr, size);
-			currentPosition += size;
-
-			// ------------------
-
-			fbb.Clear();
-
-			WildRPC::QuatBuilder quatBuilder(fbb);
-			quatBuilder.add_x(0.0f);
-			quatBuilder.add_y(0.0f);
-			quatBuilder.add_z(0.0f);
-			quatBuilder.add_w(1.0f);
-			auto ornt = quatBuilder.Finish();
-
-			fbb.FinishSizePrefixed(ornt);
-
-			size = fbb.GetSize();
-			ptr = fbb.GetBufferPointer();
-			memcpy(buffer + currentPosition, ptr, size);
-			currentPosition += size;
-
-			// --------------------
-
-			fbb.Clear();
-
-			WildRPC::FloatBuilder floatBuilder(fbb);
-			floatBuilder.add_value(120.0f);
-			auto foV = floatBuilder.Finish();
-
-			fbb.FinishSizePrefixed(foV);
-
-			size = fbb.GetSize();
-			ptr = fbb.GetBufferPointer();
-			memcpy(buffer + currentPosition, ptr, size);
-			currentPosition += size;
-
-			// ---------------------
-			
-			asio::write(s, asio::buffer(buffer, currentPosition + 1));
-
-			char reply[max_length];
-			size_t reply_length = asio::read(s, asio::buffer(reply, max_length));
-
-
-			
-			std::cout << "Read:" << reply_length << "\n";
-		}
-		catch (std::exception& e)
-		{
-			std::cerr << "Exception: " << e.what() << "\n";
-		}
-
-		return true;
-	}
-
 	bool RPCClient::test2()
 	{
 		try
@@ -166,79 +40,79 @@ namespace WRPC
 			asio::ip::tcp::resolver resolver(my_io_context);
 			asio::connect(s, resolver.resolve("127.0.0.1", "9993"));
 
-			const size_t max_length = 4 * 1024;
+			MethodInvocation getCameraMethod("CameraManager", "DATA_GetCamera");
+			getCameraMethod.AddResult(RPC_Type::Position, "position");
+			getCameraMethod.AddResult(RPC_Type::Quat, "quat");
+			getCameraMethod.AddResult(RPC_Type::Float, "fov");
 
-			//char request[max_length];
-			//WildRPC::RPCHeader* header = nullptr;
+			RPC_Error error = getCameraMethod.Execute(s);
 
-			// Serialize into new flatbuffer.
+			if (error.m_protocolError == 0 && error.m_applicativeError == 0)
+			{
+				unsigned short wx, wy;
+				float x, y, z;
+				bool pos_ok = getCameraMethod.GetPositionResult("position", wx, wy, x, y, z);
 
+				float qx, qy, qz, qw;
+				bool quat_ok = getCameraMethod.GetQuatResult("quat", qx, qy, qz, qw);
 
-			unsigned char buffer[4 * 1024];
-			unsigned int currentPosition = 0;
+				float fov;
+				bool fov_Ok = getCameraMethod.GetFloatResult("fov", fov);
 
-			// --------------------------------------
+				if (pos_ok)
+				{
+					printf("Position (%d, %d, %.2f, %.2f, %.2f)\n", wx, wy, x, y, z);
+				}
+				else
+				{
+					printf("Position Not Ok!\n");
+				}
 
-			flatbuffers::FlatBufferBuilder fbb;
+				if (quat_ok)
+				{
+					printf("Quat (%.2f, %.2f, %.2f, %.2f)\n", qx, qy, qz, qw);
+				}
+				else
+				{
+					printf("Quat Not Ok!\n");
+				}
 
-			auto managerName = fbb.CreateString("CameraManager");
-			auto methodName = fbb.CreateString("DATA_GetCamera");
+				if (fov_Ok)
+				{
+					printf("FoV : %.2f\n", fov);
+				}
+				else
+				{
+					printf("FoV Not Ok!\n");
+				}
+			}
 
-			std::vector<int8_t> params;
-			auto prms = fbb.CreateVector(params);
+		}
+		catch (std::exception& e)
+		{
+			std::cerr << "Exception: " << e.what() << "\n";
+		}
 
-			std::vector<int8_t> results;
-			results.push_back((int8_t)RPC_Type::Position);
-			results.push_back((int8_t)RPC_Type::Quat);
-			results.push_back((int8_t)RPC_Type::Float);
-			auto rslts = fbb.CreateVector(results);
+		return true;
+	}
 
-			WildRPC::RPCHeaderBuilder rpcHeader(fbb);
-			rpcHeader.add_managerName(managerName);
-			rpcHeader.add_methodName(methodName);
-			rpcHeader.add_parameterTypes(prms);
-			rpcHeader.add_resultTypes(rslts);
+	bool RPCClient::test1()
+	{
+		try
+		{
+			asio::io_context my_io_context;
 
-			auto hdr = rpcHeader.Finish();
-			fbb.FinishSizePrefixed(hdr);
+			asio::ip::tcp::socket s(my_io_context);
+			asio::ip::tcp::resolver resolver(my_io_context);
+			asio::connect(s, resolver.resolve("127.0.0.1", "9993"));
 
-			auto size = fbb.GetSize();
-			auto ptr = fbb.GetBufferPointer();
-			memcpy(buffer + currentPosition, ptr, size);
-			currentPosition += size;
+			MethodInvocation getCameraMethod("CameraManager", "DATA_SetCamera");
+			getCameraMethod.AddPositionParameter(32766, 32767, 60.0f, 20.0f, 40.0f);
+			getCameraMethod.AddQuatParameter(0.0f, 0.0f, 0.0f, 1.0f);
+			getCameraMethod.AddFloatParameter(120.0f);
 
-			// ------------------
+			RPC_Error error = getCameraMethod.Execute(s);
 
-			asio::write(s, asio::buffer(buffer, currentPosition + 1));
-
-			unsigned char reply[max_length];
-			size_t reply_length = asio::read(s, asio::buffer(reply, max_length));
-
-			unsigned char protocolErrpr = reply[0];
-			unsigned char applicativeErrpr = reply[1];
-			printf("%d / %d\n", protocolErrpr, applicativeErrpr);
-
-			int readingIndex = 2;
-
-			unsigned char* sz = reinterpret_cast<unsigned char*>(&reply[readingIndex]);
-			size = *sz;
-			auto pos = WildRPC::GetSizePrefixedPosition(&reply[readingIndex]);
-			printf("Position (%d,%d) (%.2f, %.2f, %.2f)\n", pos->worldCellX(), pos->worldCellY(), pos->localPosition()->x(), pos->localPosition()->y(), pos->localPosition()->z());
-			readingIndex += (size + 4);
-
-			sz = reinterpret_cast<unsigned char*>(&reply[readingIndex]);
-			size = *sz;
-			auto quat = WildRPC::GetSizePrefixedQuat(&reply[readingIndex]);
-			printf("Quat (%.2f, %.2f, %.2f, %.2f)\n", quat->x(), quat->y(), quat->z(), quat->w());
-			readingIndex += (size + 4);
-
-			sz = reinterpret_cast<unsigned char*>(&reply[readingIndex]);
-			size = *sz;
-			auto floatValue = WildRPC::GetSizePrefixedFloat(&reply[readingIndex]);
-			printf("FoV: %f\n", floatValue->value());
-			readingIndex += (size + 4);
-
-			std::cout << "Read:" << reply_length << "\n";
 		}
 		catch (std::exception& e)
 		{
@@ -250,24 +124,62 @@ namespace WRPC
 
 	bool RPCClient::test3()
 	{
-		try
-		{
-			asio::io_context my_io_context;
+		SetEngineIPAddress("127.0.0.1");
 
-			asio::ip::tcp::socket s(my_io_context);
-			asio::ip::tcp::resolver resolver(my_io_context);
-			asio::connect(s, resolver.resolve("127.0.0.1", "9993"));
+		// CONNECT -----------------------
+		Connect();
 
-			MethodInvocation getCameraMethod("CameraManager", "DATA_GetCamera");
-			RPC_Error error = getCameraMethod.Execute(s);
+		// SET Camera --------------------
+		PrepareMethodInvocation("CameraManager", "DATA_SetCamera");
+		AddPositionParameter(32766, 32767, 60.0f, 20.0f, 40.0f);
+		AddQuatParameter(0.0f, 0.0f, 0.0f, 1.0f);
+		AddFloatParameter(120.0f);
 
-		}
-		catch (std::exception& e)
-		{
-			std::cerr << "Exception: " << e.what() << "\n";
-		}
+		RPC_Error error = ExecuteMethod_ThreadSafe();
 
-		return true;
+		// GET Camera --------------------
+		PrepareMethodInvocation("CameraManager", "DATA_GetCamera");
+		AddResult(RPC_Type::Position, "position");
+		AddResult(RPC_Type::Quat, "quat");
+		AddResult(RPC_Type::Float, "fov");
+		
+		RPC_Error error = ExecuteMethod_ThreadSafe();
+
+		unsigned short wx, wy;
+		float x, y, z;
+		bool pos_ok = GetPositionResult("position", wx, wy, x, y, z);
+
+		float qx, qy, qz, qw;
+		bool quat_ok = GetQuatResult("quat", qx, qy, qz, qw);
+
+		float fov;
+		bool fov_Ok = GetFloatResult("fov", fov);
+
+		// DISCONNECT -----------------------
+		Disconnect();
 	}
+
+	// ------------------------------
+
+	void RPCClient::SetEngineIPAddress(const char* _address) {}
+
+	bool RPCClient::Connect() { return false; }
+	bool RPCClient::Disconnect() { return false; }
+	bool RPCClient::IsConnected() { return false; }
+
+	void RPCClient::PrepareMethodInvocation(const char* _managerName, const char* _methodName) {}
+
+	void RPCClient::AddPositionParameter(unsigned short _worldCellX, unsigned short _worldCellY, float _x, float _y, float _z) {}
+	void RPCClient::AddQuatParameter(float _x, float _y, float _z, float _w) {}
+	void RPCClient::AddFloatParameter(float _value) {}
+
+	void RPCClient::AddResult(RPC_Type _param, const char* _name) {}
+
+	RPC_Error RPCClient::ExecuteMethod_ThreadSafe() {}
+	RPC_Error RPCClient::ExecuteMethod_NotThreadSafe() {}
+
+	bool RPCClient::GetFloatResult(const char* _paramName, float& _result) {}
+	bool RPCClient::GetPositionResult(const char* _paramName, unsigned short& _worldCellX, unsigned short& _worldCellY, float& _x, float& _y, float& _z) {}
+	bool RPCClient::GetQuatResult(const char* _paramName, float& _x, float& _y, float& _z, float& _w) {}
 
 } // namespace WRPC

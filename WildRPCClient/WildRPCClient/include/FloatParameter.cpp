@@ -1,4 +1,4 @@
-#include "Float.h"
+#include "FloatParameter.h"
 
 #include <iostream>
 #include <array>
@@ -10,7 +10,7 @@
 
 namespace WRPC
 {
-	Float::Float(const char* _name) : m_name(_name)
+	Float::Float()
 	{
 
 	}
@@ -21,9 +21,9 @@ namespace WRPC
 
 		WildRPC::FloatBuilder floatBuilder(fbb);
 		floatBuilder.add_value(m_value);
-		auto foV = floatBuilder.Finish();
+		auto flt = floatBuilder.Finish();
 
-		fbb.FinishSizePrefixed(foV);
+		fbb.FinishSizePrefixed(flt);
 
 		auto size = fbb.GetSize();
 		auto ptr = fbb.GetBufferPointer();
@@ -41,7 +41,9 @@ namespace WRPC
 
 	bool Float::DecodeFrom(unsigned char* _buffer, size_t _totalBufferSize, size_t* _offset)
 	{
-		unsigned char* sz = reinterpret_cast<unsigned char*>(_buffer);
+		unsigned char* bufferChunk = _buffer + *_offset;
+
+		unsigned char* sz = reinterpret_cast<unsigned char*>(bufferChunk);
 		int size = *sz;
 		
 		if ((int)(*_offset + size) >= _totalBufferSize)
@@ -49,7 +51,7 @@ namespace WRPC
 			return false;
 		}
 
-		auto flt = WildRPC::GetSizePrefixedFloat(_buffer);
+		auto flt = WildRPC::GetSizePrefixedFloat(bufferChunk);
 
 		if (flt == nullptr)
 		{

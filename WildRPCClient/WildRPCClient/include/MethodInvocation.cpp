@@ -1,6 +1,6 @@
 #include "MethodInvocation.h"
 
-#include "Float.h"
+#include "FloatParameter.h"
 #include "Quat.h"
 #include "Position.h"
 
@@ -14,20 +14,8 @@
 
 namespace WRPC
 {
-	void MethodInvocation::AddParameter(RPC_Type _param, const char* _name)
-	{
-		_AddParamInOut(true, _param, _name);
-	}
-
 	void MethodInvocation::AddResult(RPC_Type _param, const char* _name)
 	{
-		_AddParamInOut(false, _param, _name);
-	}
-
-	void MethodInvocation::_AddParamInOut(bool _isIN, RPC_Type _param, const char* _name)
-	{
-		auto& prms = _isIN ? m_parameters : m_results;
-
 		switch (_param)
 		{
 		case RPC_Type::Boolean:
@@ -37,7 +25,11 @@ namespace WRPC
 			return;
 
 		case RPC_Type::Float:
-			prms.push_back(new Float(_name));
+		{
+			Float* flt = new Float();
+			flt->SetName(_name);
+			m_results.push_back(flt);
+		}
 			return;
 
 		case RPC_Type::Vector2:
@@ -50,15 +42,23 @@ namespace WRPC
 			return;
 
 		case RPC_Type::Quat:
-			prms.push_back(new Quat(_name));
+		{
+			Quat* quat = new Quat();
+			quat->SetName(_name);
+			m_results.push_back(quat);
+		}
 			return;
 
 		case RPC_Type::Color:
 			return;
 
 		case RPC_Type::Position:
-			prms.push_back(new Position(_name));
+		{
+			Position* pos = new Position();
+			pos->SetName(_name);
+			m_results.push_back(pos);
 			return;
+		}
 		}
 	}
 
@@ -80,14 +80,14 @@ namespace WRPC
 		std::vector<int8_t> params;
 		for (auto prm : m_parameters)
 		{
-			params.push_back(prm->GetType());
+			params.push_back((int8_t)prm->GetType());
 		}
 		auto prms = fbb.CreateVector(params);
 
 		std::vector<int8_t> results;
 		for (auto rslt : m_results)
 		{
-			results.push_back(rslt->GetType());
+			results.push_back((int8_t)rslt->GetType());
 		}
 		auto rslts = fbb.CreateVector(results);
 
@@ -116,37 +116,112 @@ namespace WRPC
 
 		asio::write(_socket, asio::buffer(buffer, currentPosition + 1));
 
-		char reply[replyBufferSize];
+		unsigned char reply[replyBufferSize];
 		size_t reply_length = asio::read(_socket, asio::buffer(reply, replyBufferSize));
 		assert(replyBufferSize == reply_length);
 
 		// ------------------------------
 
+		RPC_Error error;
+		error.m_protocolError = reply[0];
+		error.m_applicativeError = reply[1];
+
+		currentPosition = 2;
 		for (auto rslt : m_results)
 		{
-			rslt->DecodeFrom(buffer, requestBufferSize, &currentPosition);
+			rslt->DecodeFrom(reply, replyBufferSize, &currentPosition);
 		}
 
 		// ------------------------------
 
-		return RPC_Error();
+		return error;
 	}
 
-	float MethodInvocation::GetFloatResult(const char* _paramName)
+	// --------------------------------------------------
+
+	void MethodInvocation::AddPositionParameter(unsigned short _worldCellX, unsigned short _worldCellY, float _x, float _y, float _z)
 	{
-		printf("GetFloatResult(%s)\n", _paramName);
-		return 0.0f;
+		Position* pos = new Position();
+		pos->SetValues(_worldCellX, _worldCellY, _x, _y, _z);
+		m_parameters.push_back(pos);
 	}
 
-	int MethodInvocation::GetIntResult(const char* _paramName)
+	void MethodInvocation::AddQuatParameter(float _x, float _y, float _z, float _w)
 	{
-		printf("GetIntResult(%s)\n", _paramName);
-		return 0;
+		Quat* quat = new Quat();
+		quat->SetValues(_x, _y, _z, _w);
+		m_parameters.push_back(quat);
 	}
 
-	bool MethodInvocation::GetBoolResult(const char* _paramName)
+	void MethodInvocation::AddFloatParameter(float _value)
 	{
-		printf("GetBoolResult(%s)\n", _paramName);
-		return false;
+		Float* flt = new Float();
+		flt->SetValue(_value);
+		m_parameters.push_back(flt);
 	}
+
+	// --------------------------------------------------
+
+	Parameter* MethodInvocation::_GetResult(const char* _paramName, RPC_Type _type)
+	{
+		for (auto rslt : m_results)
+		{
+			if (strcmp(rslt->GetName(), _paramName) != 0)
+			{
+				continue;
+			}
+
+			if (rslt->GetType() != _type)
+			{
+				continue;
+			}
+
+			return rslt;
+		}
+
+		return nullptr;
+	}
+
+	bool MethodInvocation::GetFloatResult(const char* _paramName, float& _result)
+	{
+		Parameter* prm = _GetResult(_paramName, RPC_Type::Float);
+		Float* flt = dynamic_cast<Float*>(prm);
+		
+		if (flt == nullptr)
+		{
+			return false;
+		}
+
+		_result = flt->GetValue();
+		return true;
+	}
+
+	bool MethodInvocation::GetPositionResult(const char* _paramName, unsigned short& _worldCellX, unsigned short& _worldCellY, float& _x, float& _y, float& _z)
+	{
+		Parameter* prm = _GetResult(_paramName, RPC_Type::Position);
+		Position* pos = dynamic_cast<Position*>(prm);
+
+		if (pos == nullptr)
+		{
+			return false;
+		}
+
+		pos->GetValues(_worldCellX, _worldCellY, _x, _y, _z);
+		return true;
+	}
+
+	bool MethodInvocation::GetQuatResult(const char* _paramName, float& _x, float& _y, float& _z, float& _w)
+	{
+		Parameter* prm = _GetResult(_paramName, RPC_Type::Quat);
+		Quat* quat = dynamic_cast<Quat*>(prm);
+
+		if (quat == nullptr)
+		{
+			return false;
+		}
+
+		quat->GetValues(_x, _y, _z, _w);
+		return true;
+	}
+
 }

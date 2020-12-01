@@ -11,13 +11,13 @@
 
 namespace WRPC
 {
-	void Position::GetValues(unsigned short* _worldCellX, unsigned short* _worldCellY, float* _x, float* _y, float* _z)
+	void Position::GetValues(unsigned short& _worldCellX, unsigned short& _worldCellY, float& _x, float& _y, float& _z)
 	{
-		*_worldCellX = m_worldCellsCoords[0];
-		*_worldCellY = m_worldCellsCoords[1];
-		*_x = m_localCoordinates[0];
-		*_y = m_localCoordinates[1];
-		*_z = m_localCoordinates[2];
+		_worldCellX = m_worldCellsCoords[0];
+		_worldCellY = m_worldCellsCoords[1];
+		_x = m_localCoordinates[0];
+		_y = m_localCoordinates[1];
+		_z = m_localCoordinates[2];
 	}
 
 	void Position::SetValues(unsigned short _worldCellX, unsigned short _worldCellY, float _x, float _y, float _z)
@@ -29,7 +29,7 @@ namespace WRPC
 		m_localCoordinates[2] = _z;
 	}
 
-	Position::Position(const char* _name) : m_name(_name)
+	Position::Position()
 	{
 		for (int i = 0; i < 2; i++)
 		{
@@ -47,14 +47,14 @@ namespace WRPC
 		flatbuffers::FlatBufferBuilder fbb;
 
 		WildRPC::Vector3Builder vec3Builder(fbb);
-		vec3Builder.add_x(1.0f);
-		vec3Builder.add_y(2.0f);
-		vec3Builder.add_z(3.0f);
+		vec3Builder.add_x(m_localCoordinates[0]);
+		vec3Builder.add_y(m_localCoordinates[1]);
+		vec3Builder.add_z(m_localCoordinates[2]);
 		auto localPos = vec3Builder.Finish();
 
 		WildRPC::PositionBuilder posBuilder(fbb);
-		posBuilder.add_worldCellX(32768);
-		posBuilder.add_worldCellY(32768);
+		posBuilder.add_worldCellX(m_worldCellsCoords[0]);
+		posBuilder.add_worldCellY(m_worldCellsCoords[1]);
 		posBuilder.add_localPosition(localPos);
 		auto pos = posBuilder.Finish();
 
@@ -76,7 +76,9 @@ namespace WRPC
 
 	bool Position::DecodeFrom(unsigned char* _buffer, size_t _totalBufferSize, size_t* _offset)
 	{
-		unsigned char* sz = reinterpret_cast<unsigned char*>(_buffer);
+		unsigned char* bufferChunk = _buffer + *_offset;
+
+		unsigned char* sz = reinterpret_cast<unsigned char*>(bufferChunk);
 		int size = *sz;
 
 		if ((int)(*_offset + size) >= _totalBufferSize)
@@ -84,7 +86,7 @@ namespace WRPC
 			return false;
 		}
 		
-		auto pos = WildRPC::GetSizePrefixedPosition(_buffer);
+		auto pos = WildRPC::GetSizePrefixedPosition(bufferChunk);
 
 		if (pos == nullptr)
 		{

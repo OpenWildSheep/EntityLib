@@ -9,7 +9,7 @@
 #include "../external/asio/include/asio.hpp"
 #pragma warning(pop)
 
-#include "include/WildRPCType.h"
+#include "WildRPCType.h"
 
 namespace WRPC
 {
@@ -77,6 +77,11 @@ namespace WRPC
 
     class WRPC_DLLEXPORT RPCClient
     {
+	public:
+		bool test1();
+		bool test2();
+		bool test3();
+
     public:
         DeleteCheck deleteCheck;
 
@@ -88,9 +93,26 @@ namespace WRPC
         RPCClient(RPCClient&&) = delete;
         RPCClient& operator=(RPCClient&&) = delete;
 
-        bool test1(); // TODO : Remove this
-		bool test2(); // TODO : Remove this
-		bool test3(); // TODO : Remove this
+		void SetEngineIPAddress(const char* _address);
+		
+		bool Connect();
+		bool Disconnect();
+		bool IsConnected();
+
+		void PrepareMethodInvocation(const char* _managerName, const char* _methodName);
+
+		void AddPositionParameter(unsigned short _worldCellX, unsigned short _worldCellY, float _x, float _y, float _z);
+		void AddQuatParameter(float _x, float _y, float _z, float _w);
+		void AddFloatParameter(float _value);
+
+		void AddResult(RPC_Type _param, const char* _name);
+
+		RPC_Error ExecuteMethod_ThreadSafe();
+		RPC_Error ExecuteMethod_NotThreadSafe();
+
+		bool GetFloatResult(const char* _paramName, float& _result);
+		bool GetPositionResult(const char* _paramName, unsigned short& _worldCellX, unsigned short& _worldCellY, float& _x, float& _y, float& _z);
+		bool GetQuatResult(const char* _paramName, float& _x, float& _y, float& _z, float& _w);
 
     private:
         asio::io_context io_context;

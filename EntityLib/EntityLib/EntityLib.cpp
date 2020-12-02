@@ -2499,6 +2499,7 @@ static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _s
 
     document.emplace("Version", 2);
     json& objects = document["Objects"];
+    objects = json::array();
 
     for (std::unique_ptr<Ent::Entity> const& ent : _scene.getObjects())
     {

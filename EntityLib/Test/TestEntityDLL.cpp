@@ -327,20 +327,28 @@ try
 
         // TEST SubScene detach
         const auto& subEntities = ent->getSubSceneComponent()->embedded->getObjects();
+        ENTLIB_ASSERT(not subEntities.empty());
         std::vector<Ent::Entity*> originalSubEntities;
-        std::transform(begin(subEntities), end(subEntities),
-                       std::back_inserter(originalSubEntities),
-                       [](auto&& entityPtr) { return entityPtr.get(); });
+        std::transform(
+            begin(subEntities),
+            end(subEntities),
+            std::back_inserter(originalSubEntities),
+            [](auto&& entityPtr) { return entityPtr.get(); });
         ENTLIB_ASSERT(not originalSubEntities.empty());
         auto detachedSubScene = ent->getSubSceneComponent()->detachEmbedded();
         ENTLIB_ASSERT(ent->getSubSceneComponent()->embedded->getObjects().empty());
         std::vector<Ent::Entity*> detachedSubEntities;
-        std::transform(begin(detachedSubScene->getObjects()), end(detachedSubScene->getObjects()),
-                       std::back_inserter(detachedSubEntities),
-                       [](auto&& entityPtr) { return entityPtr.get(); });
+        std::transform(
+            begin(detachedSubScene->getObjects()),
+            end(detachedSubScene->getObjects()),
+            std::back_inserter(detachedSubEntities),
+            [](auto&& entityPtr) { return entityPtr.get(); });
         ENTLIB_ASSERT(std::equal(
-            begin(originalSubEntities), end(originalSubEntities),
-            begin(detachedSubEntities)));
+            begin(originalSubEntities), end(originalSubEntities), begin(detachedSubEntities)));
+
+        ent->removeSubSceneComponent();
+        ent->addSubSceneComponent()->makeEmbedded(true);
+        entlib.saveEntity(*ent, "prefab.emptyembbeded.entity"); // to check the schema
     }
     {
         // Test the readOnly prefab.entity

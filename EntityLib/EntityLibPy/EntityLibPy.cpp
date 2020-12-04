@@ -198,34 +198,34 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readonly("type", &Subschema::type)
         .def_readonly("name", &Subschema::name)
         .def_readonly("required", &Subschema::required)
-        .def_readonly("properties", &Subschema::properties, py::return_value_policy::reference)
+        .def_readonly("properties", &Subschema::properties, py::return_value_policy::reference_internal)
         .def_readonly("max_items", &Subschema::maxItems)
         .def_readonly("min_items", &Subschema::minItems)
-        .def_readonly("one_of", &Subschema::oneOf, py::return_value_policy::reference)
-        .def_readonly("default_value", &Subschema::defaultValue, py::return_value_policy::reference)
-        .def("get_union_name_field", &Subschema::getUnionNameField, py::return_value_policy::reference)
-        .def("get_union_data_field", &Subschema::getUnionDataField, py::return_value_policy::reference)
+        .def_readonly("one_of", &Subschema::oneOf, py::return_value_policy::reference_internal)
+        .def_readonly("default_value", &Subschema::defaultValue, py::return_value_policy::reference_internal)
+        .def("get_union_name_field", &Subschema::getUnionNameField, py::return_value_policy::reference_internal)
+        .def("get_union_data_field", &Subschema::getUnionDataField, py::return_value_policy::reference_internal)
         .def(
             "get_default_value",
             [](Subschema& s) -> Ent::Subschema::DefaultValue& { return s.defaultValue; },
-            py::return_value_policy::reference)
-        .def_readonly("const_value", &Subschema::constValue, py::return_value_policy::reference)
+            py::return_value_policy::reference_internal)
+        .def_readonly("const_value", &Subschema::constValue, py::return_value_policy::reference_internal)
         .def(
             "get_singular_items",
             [](Subschema const& s) -> SubschemaRef const* { return s.singularItems.get(); },
-            py::return_value_policy::reference)
+            py::return_value_policy::reference_internal)
         .def("has_singular_items", [](Subschema const& s) { return s.singularItems != nullptr; })
         .def(
             "get_linear_items",
             [](Subschema const& s) -> std::vector<SubschemaRef> const& { return *s.linearItems; },
-            py::return_value_policy::reference)
+            py::return_value_policy::reference_internal)
         .def(
             "get_union_types_dict",
             &Ent::Subschema::getUnionTypesMap,
             py::return_value_policy::reference_internal)
-        // .def("linear_items", &Subschema::linearItems, py::return_value_policy::reference)
+        // .def("linear_items", &Subschema::linearItems, py::return_value_policy::reference_internal)
         .def("has_linear_items", [](Subschema const& s) { return s.linearItems.has_value(); })
-        .def_readonly("enum_values", &Subschema::enumValues, py::return_value_policy::reference)
+        .def_readonly("enum_values", &Subschema::enumValues, py::return_value_policy::reference_internal)
         .def_property_readonly("is_deprecated", [](Subschema const& s) { return s.IsDeprecated(); });
 
     pySubschemaRef
@@ -233,11 +233,11 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(
             "get",
             [](SubschemaRef const& s) -> Subschema const& { return s.get(); },
-            py::return_value_policy::reference);
+            py::return_value_policy::reference_internal);
 
     pySchema
-        .def_readonly("root", &Schema::root, py::return_value_policy::reference)
-        .def_readonly("definitions", &Schema::allDefinitions, py::return_value_policy::reference);
+        .def_readonly("root", &Schema::root, py::return_value_policy::reference_internal)
+        .def_readonly("definitions", &Schema::allDefinitions, py::return_value_policy::reference_internal);
 
     // ******************************************** EntityLib *************************************
 
@@ -266,14 +266,14 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(
             "at",
             [](Node* node, char const* field) { return node->at(field); },
-            py::return_value_policy::reference,
+            py::return_value_policy::reference_internal,
             "In an Object, get the property by name")
         .def("count", [](Node* node, char const* field) { return node->count(field); })
         .def("get_field_names", &Node::getFieldNames)
         .def(
             "at",
             [](Node* node, size_t i) { return node->at(i); },
-            py::return_value_policy::reference,
+            py::return_value_policy::reference_internal,
             "In an Array, get the element by index")
         .def("size", [](Node* node) { return node->size(); })
         .def(
@@ -281,7 +281,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](Node* node) { return node->getItems(); },
             py::return_value_policy::reference_internal)
         .def(
-            "push", [](Node* node) { return node->push(); }, py::return_value_policy::reference)
+            "push", [](Node* node) { return node->push(); }, py::return_value_policy::reference_internal)
         .def("pop", [](Node* node) { return node->pop(); })
         .def("clear", [](Node* node) { return node->clear(); })
         .def("empty", [](Node* node) { return node->empty(); })
@@ -305,19 +305,19 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(
             "get_union_data",
             [](Node* node) { return node->getUnionData(); },
-            py::return_value_policy::reference)
-        .def("get_union_type", &Node::getUnionType, py::return_value_policy::reference)
-        .def("set_union_type", &Node::setUnionType, py::return_value_policy::reference)
+            py::return_value_policy::reference_internal)
+        .def("get_union_type", &Node::getUnionType, py::return_value_policy::reference_internal)
+        .def("set_union_type", &Node::setUnionType, py::return_value_policy::reference_internal)
         .def(
             "get_schema",
             [](Node* node) { return node->getSchema(); },
-            py::return_value_policy::reference)
+            py::return_value_policy::reference_internal)
         .def("unset", [](Node* node) { return node->unset(); })
         .def("is_set", [](Node* node) { return node->isSet(); });
 
     pyComponent
         .def_readonly("type", &Component::type)
-        .def_readonly("root", &Component::root, py::return_value_policy::reference)
+        .def_readonly("root", &Component::root, py::return_value_policy::reference_internal)
         .def_property_readonly("raw_data", [](Component const& comp) { return comp.rawData.dump(4); })
         .def_property_readonly(
             "is_used_in_editor", [](Component const& comp) { return comp.isUsedInEditor(); })
@@ -334,7 +334,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property_readonly(
             "embedded",
             [](SubSceneComponent* comp) -> Scene& { return *comp->embedded; },
-            py::return_value_policy::reference)
+            py::return_value_policy::reference_internal)
         .def("detach_embedded",
             [](SubSceneComponent* comp) -> Scene* { return comp->detachEmbedded().release(); });
 
@@ -347,22 +347,22 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "max_activation_level", &Entity::getMaxActivationLevel, &Entity::setMaxActivationLevel)
         .def_property("color", &Entity::getColor, &Entity::setColor)
         .def("has_override", &Entity::hasOverride)
-        .def("add_component", &Entity::addComponent, py::return_value_policy::reference)
+        .def("add_component", &Entity::addComponent, py::return_value_policy::reference_internal)
         .def(
             "get_component",
             [](Entity& e, char const* name) { return e.getComponent(name); },
-            py::return_value_policy::reference)
+            py::return_value_policy::reference_internal)
         .def("remove_component", &Entity::removeComponent)
         .def("get_component_types", &Entity::getComponentTypes)
-        .def("get_components", &Entity::getComponents, py::return_value_policy::reference)
-        .def("get_actorstates", &Entity::getActorStates, py::return_value_policy::reference)
+        .def("get_components", &Entity::getComponents, py::return_value_policy::reference_internal)
+        .def("get_actorstates", &Entity::getActorStates, py::return_value_policy::reference_internal)
         .def(
             "get_subscene_component",
             [](Entity& e) { return e.getSubSceneComponent(); },
-            py::return_value_policy::reference)
-        .def("add_subscene_component", &Entity::addSubSceneComponent, py::return_value_policy::reference)
+            py::return_value_policy::reference_internal)
+        .def("add_subscene_component", &Entity::addSubSceneComponent, py::return_value_policy::reference_internal)
         .def("make_entityref", &Entity::makeEntityRef)
-        .def("resolve_entityref", &Entity::resolveEntityRef, py::return_value_policy::reference)
+        .def("resolve_entityref", &Entity::resolveEntityRef, py::return_value_policy::reference_internal)
         .def("detach_entity_from_prefab", [](Entity* ent) {
             return ent->detachEntityFromPrefab().release();
         });
@@ -373,12 +373,11 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](Scene* scene, Entity* ent) -> Entity*
             {
                 scene->addEntity(ent->clone()); return scene->getObjects().back().get();
-            }, py::return_value_policy::reference)
-        .def("resolve_entityref", &Scene::resolveEntityRef, py::return_value_policy::reference)
+            }, py::return_value_policy::reference_internal)
+        .def("resolve_entityref", &Scene::resolveEntityRef, py::return_value_policy::reference_internal)
         .def("get_entity",
             static_cast<Entity*(Scene::*)(size_t)>(&Scene::getEntity),
-            py::return_value_policy::reference_internal,
-            py::keep_alive<1, 0>()) // The scene will be kept alive as long as the entity is used
+            py::return_value_policy::reference_internal)
         .def_property_readonly("entity_count", &Scene::entityCount)
         .def_property_readonly(
             "entities",
@@ -393,8 +392,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference_internal);
 
     pyComponentsSchema
-        .def_readonly("components", &ComponentsSchema::components, py::return_value_policy::reference)
-        .def_readonly("schema", &ComponentsSchema::schema, py::return_value_policy::reference);
+        .def_readonly("components", &ComponentsSchema::components, py::return_value_policy::reference_internal)
+        .def_readonly("schema", &ComponentsSchema::schema, py::return_value_policy::reference_internal);
 
     pyColor
         .def(py::init<>())
@@ -406,11 +405,11 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readonly("root_path", &EntityLib::rootPath)
         .def_readwrite("rawdata_path", &EntityLib::rawdataPath) // unit-test need to write it
         .def_readonly("tools_dir", &EntityLib::toolsDir)
-        .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference)
+        .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference_internal)
         .def_readonly(
             "component_dependencies",
             &EntityLib::componentDependencies,
-            py::return_value_policy::reference)
+            py::return_value_policy::reference_internal)
         .def(
             "load_entity",
             [](EntityLib* lib, std::string const& path) { return lib->loadEntity(path).release(); },
@@ -424,19 +423,19 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(
             "load_entity_read_only",
             [](EntityLib* lib, std::string const& path) { return lib->loadEntityReadOnly(path); },
-            py::return_value_policy::reference)
+            py::return_value_policy::reference_internal)
         .def(
             "load_scene_read_only",
             [](EntityLib* lib, std::string const& path) { return lib->loadSceneReadOnly(path); },
-            py::return_value_policy::reference)
+            py::return_value_policy::reference_internal)
         .def(
             "load_legacy_scene_read_only",
             [](EntityLib* lib, std::string const& path) { return lib->loadLegacySceneReadOnly(path); },
-            py::return_value_policy::reference)
+            py::return_value_policy::reference_internal)
         .def("save_entity", &EntityLib::saveEntity, "entity"_a, "_entityPath"_a)
         .def("save_scene", &EntityLib::saveScene)
-        .def("get_entity_cache", &EntityLib::getEntityCache, py::return_value_policy::reference)
-        .def("get_scene_cache", &EntityLib::getSceneCache, py::return_value_policy::reference)
+        .def("get_entity_cache", &EntityLib::getEntityCache, py::return_value_policy::reference_internal)
+        .def("get_scene_cache", &EntityLib::getSceneCache, py::return_value_policy::reference_internal)
         .def("clear_cache", &EntityLib::clearCache)
         .def(
             "make_instance_of",
@@ -455,15 +454,15 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property_readonly(
             "data",
             [](EntityLib::EntityFile* entF) { return entF->data.get(); },
-            py::return_value_policy::reference)
-        .def_readonly("time", &EntityLib::EntityFile::time, py::return_value_policy::reference);
+            py::return_value_policy::reference_internal)
+        .def_readonly("time", &EntityLib::EntityFile::time, py::return_value_policy::reference_internal);
 
     pySceneFile
         .def_property_readonly(
             "data",
             [](EntityLib::SceneFile* sceneF) { return sceneF->data.get(); },
-            py::return_value_policy::reference)
-        .def_readonly("time", &EntityLib::SceneFile::time, py::return_value_policy::reference);
+            py::return_value_policy::reference_internal)
+        .def_readonly("time", &EntityLib::SceneFile::time, py::return_value_policy::reference_internal);
 
     py::register_exception<Ent::JsonValidation>(ent, "JsonValidation");
 }

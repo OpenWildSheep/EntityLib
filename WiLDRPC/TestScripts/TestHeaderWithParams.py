@@ -4,7 +4,7 @@ import socket
 import struct
 import time
 import math
-import mathutils
+#import mathutils
 
 import sys
 sys.path.append('..')

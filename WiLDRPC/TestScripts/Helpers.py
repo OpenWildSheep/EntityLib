@@ -2,9 +2,29 @@ import socket
 import struct
 import time
 import math
-import mathutils
+#import mathutils
 
 import sys
+
+# -----------------------------------------------
+#
+# HACK to emulate the "with socket(...) as s" syntax in Python 2
+#
+print(sys.version)
+_python2 = sys.version_info.major == 2
+
+if _python2:
+	def socket__enter__(self): # type: (socket.socket) -> socket.socket
+		return self
+
+	def socket__exit__(self, *args): # type: (socket.socket, ...) -> None
+		#if not self._closed: self.close()
+		self.close()
+
+	socket.socket.__enter__ = socket__enter__
+	socket.socket.__exit__ = socket__exit__
+# -----------------------------------------------
+
 sys.path.append('..')
 sys.path.append('../../../External/FlatBuffers/python')
 
@@ -230,13 +250,11 @@ def BuildString(s):
 
 # -----------------------
 
-def bytes_to_int(bytes):
-	result = 0
-	index = 0
-	for b in bytes:
-		result = result + int(b) * (256 ** index)
-		index = index + 1
-	return result
+def int_from_bytes(byte4):  # type: (memoryview[4]) -> int
+	import struct
+	return struct.unpack("<i", byte4)[0]  # <i = little-endian, signed
+	#return int(codecs.encode(byte4, 'hex'), 16) # big-endian, unsigned :(
+	#return int.from_bytes(byte4, byteorder="little", signed=True) # Python3-only
 
 def DecodeFloat(bytes):
 	RPCfloat = WildRPC.Float.Float.GetRootAsFloat(bytes, 0)
@@ -300,7 +318,7 @@ decoders = {
  
 def Decode(type, bytes):
 	dataView = memoryview(bytes)
-	prefixedSize = bytes_to_int(dataView[0:3])
+	prefixedSize = int_from_bytes(dataView[0:4])
 	#print("prefixedSize = ", prefixedSize)
 	# Get the function from switcher dictionary
 	func = decoders.get(type, "nothing")
@@ -381,8 +399,9 @@ class RPCMethod:
 
 		data = self.socket.recv(4096)
 
-		protocolError = data[0]
-		applicationError = data[1]
+		errors = bytearray(data[:2]) if _python2 else data
+		protocolError = errors[0]
+		applicationError = errors[1]
 
 		if protocolError != 0:
 			print("Protocol ERROR: ", RPCProtocolErrors[protocolError])

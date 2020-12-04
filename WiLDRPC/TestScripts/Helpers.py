@@ -18,7 +18,8 @@ import WildRPC.Integer
 import WildRPC.Float
 import WildRPC.Boolean
 import WildRPC.Color
-import WildRPC.Position	
+import WildRPC.Position
+import WildRPC.Quat
 
 Type_Boolean = 0
 Type_Integer = 1

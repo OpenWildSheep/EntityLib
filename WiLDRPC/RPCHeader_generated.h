@@ -23,11 +23,12 @@ enum Type {
   Type_Quat = 6,
   Type_Color = 7,
   Type_Position = 8,
+  Type_String = 9,
   Type_MIN = Type_Boolean,
-  Type_MAX = Type_Position
+  Type_MAX = Type_String
 };
 
-inline const Type (&EnumValuesType())[9] {
+inline const Type (&EnumValuesType())[10] {
   static const Type values[] = {
     Type_Boolean,
     Type_Integer,
@@ -37,13 +38,14 @@ inline const Type (&EnumValuesType())[9] {
     Type_Vector3,
     Type_Quat,
     Type_Color,
-    Type_Position
+    Type_Position,
+    Type_String
   };
   return values;
 }
 
 inline const char * const *EnumNamesType() {
-  static const char * const names[10] = {
+  static const char * const names[11] = {
     "Boolean",
     "Integer",
     "Float",
@@ -53,13 +55,14 @@ inline const char * const *EnumNamesType() {
     "Quat",
     "Color",
     "Position",
+    "String",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameType(Type e) {
-  if (flatbuffers::IsOutRange(e, Type_Boolean, Type_Position)) return "";
+  if (flatbuffers::IsOutRange(e, Type_Boolean, Type_String)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesType()[index];
 }

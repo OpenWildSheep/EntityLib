@@ -2,7 +2,7 @@ include "Result.fbs";
 
 namespace WildRPC;
 
-enum Type : byte { Boolean = 0, Integer, Float, Vector2, UInt3, Vector3, Quat, Color, 	Position }
+enum Type : byte { Boolean = 0, Integer, Float, Vector2, UInt3, Vector3, Quat, Color, Position, String }
 
 table RPCHeader
 {

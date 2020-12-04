@@ -12,4 +12,5 @@ class Type(object):
     Quat = 6
     Color = 7
     Position = 8
+    String = 9
 

@@ -39,5 +39,19 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     print("Errors = ", errors_get)
     print("Results = ", results_get)
 
+    rpcMethod_set = rpc.RPCMethod(s, "CameraManager", "DATA_SetTestString", [rpc.Type_String], [])
+    results_set = []
+    errors_set = rpcMethod_set.Invoke(["bla"], results_set)
+    print("CameraManager", "DATA_SetTestString")
+    print("Errors = ", errors_set)
+    print("Results = ", results_set)
+
+    rpcMethod_get = rpc.RPCMethod(s, "CameraManager", "DATA_GetTestString", [], [rpc.Type_String])
+    results_get = []
+    errors_get = rpcMethod_get.Invoke([], results_get)
+    print("CameraManager", "DATA_GetTestString")
+    print("Errors = ", errors_get)
+    print("Results = ", results_get)
+
     # Disconnect from Server
     s.close()

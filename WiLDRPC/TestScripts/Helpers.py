@@ -20,6 +20,7 @@ import WildRPC.Boolean
 import WildRPC.Color
 import WildRPC.Position
 import WildRPC.Quat
+import WildRPC.String
 
 Type_Boolean = 0
 Type_Integer = 1
@@ -30,6 +31,7 @@ Type_Vector3 = 5
 Type_Quat = 6
 Type_Color = 7
 Type_Position = 8
+Type_String = 9
 
 RPCProtocolErrors = [
 	"No Error",
@@ -217,6 +219,15 @@ def BuildQuat(x, y, z, w):
 	result = builder.Bytes[builder.Head():]
 	return result
 
+def BuildString(s):
+	builder = flatbuffers.Builder(0)
+	s = builder.CreateString(s)
+	WildRPC.String.StringStart(builder)
+	WildRPC.String.StringAddValue(builder, s)
+	end = WildRPC.String.StringEnd(builder)
+	builder.FinishSizePrefixed(end)
+	return builder.Bytes[builder.Head():]
+
 # -----------------------
 
 def bytes_to_int(bytes):
@@ -270,6 +281,10 @@ def DecodeUInt3(bytes):
 	result = [RPCUInt3.X(), RPCUInt3.Y(), RPCUInt3.Z()]
 	return result
  
+def DecodeString(bytes):
+	RPCString = WildRPC.String.String.GetRootAsString(bytes, 0)
+	return RPCString.Value()
+ 
 decoders = {
         Type_Float: DecodeFloat,
         Type_Integer: DecodeInteger,
@@ -280,6 +295,7 @@ decoders = {
         Type_Vector3: DecodeVector3,
         Type_Vector2: DecodeVector2,
         Type_UInt3: DecodeUInt3,
+        Type_String: DecodeString,
     }
  
 def Decode(type, bytes):
@@ -330,6 +346,7 @@ parameterBuilders = {
         Type_Vector3: BuildParamVector3,
         Type_Vector2: BuildParamVector2,
         Type_UInt3: BuildParamUInt3,
+        Type_String: BuildString,
 }
 
 def BuildParam(type, params):

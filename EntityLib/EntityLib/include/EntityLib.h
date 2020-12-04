@@ -597,6 +597,15 @@ namespace Ent
         /// Get all entities in the scene
         std::vector<std::unique_ptr<Entity>> const& getObjects() const;
 
+        /// Get the nth entity
+        Entity const* getEntity(size_t index) const;
+
+        /// Get the nth entity
+        Entity* getEntity(size_t index);
+
+        /// Number of entity in the scene
+        size_t entityCount() const;
+
         /// Abandons ownership of all entities and return them.
         std::vector<std::unique_ptr<Entity>> releaseAllEntities();
 

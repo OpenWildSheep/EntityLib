@@ -1285,6 +1285,21 @@ namespace Ent
         return objects;
     }
 
+    Entity const* Scene::getEntity(size_t index) const
+    {
+        return objects.at(index).get();
+    }
+
+    Entity* Scene::getEntity(size_t index)
+    {
+        return objects.at(index).get();
+    }
+
+    size_t Scene::entityCount() const
+    {
+        return objects.size();
+    }
+
     std::vector<std::unique_ptr<Entity>> Scene::releaseAllEntities()
     {
         std::vector<std::unique_ptr<Entity>> freeEntities;

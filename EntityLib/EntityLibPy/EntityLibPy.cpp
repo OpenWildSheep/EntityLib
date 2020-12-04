@@ -375,6 +375,11 @@ PYBIND11_MODULE(EntityLibPy, ent)
                 scene->addEntity(ent->clone()); return scene->getObjects().back().get();
             }, py::return_value_policy::reference)
         .def("resolve_entityref", &Scene::resolveEntityRef, py::return_value_policy::reference)
+        .def("get_entity",
+            static_cast<Entity*(Scene::*)(size_t)>(&Scene::getEntity),
+            py::return_value_policy::reference_internal,
+            py::keep_alive<1, 0>()) // The scene will be kept alive as long as the entity is used
+        .def_property_readonly("entity_count", &Scene::entityCount)
         .def_property_readonly(
             "entities",
             [](Scene* scene) -> std::vector<Entity*> {

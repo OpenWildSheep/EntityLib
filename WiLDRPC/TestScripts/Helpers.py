@@ -2,9 +2,29 @@ import socket
 import struct
 import time
 import math
-import mathutils
+#import mathutils
 
 import sys
+
+# -----------------------------------------------
+#
+# HACK to emulate the "with socket(...) as s" syntax in Python 2
+#
+print(sys.version)
+_python2 = sys.version_info.major == 2
+
+if _python2:
+	def socket__enter__(self): # type: (socket.socket) -> socket.socket
+		return self
+
+	def socket__exit__(self, *args): # type: (socket.socket, ...) -> None
+		#if not self._closed: self.close()
+		self.close()
+
+	socket.socket.__enter__ = socket__enter__
+	socket.socket.__exit__ = socket__exit__
+# -----------------------------------------------
+
 sys.path.append('..')
 sys.path.append('../../../External/FlatBuffers/python')
 
@@ -18,7 +38,9 @@ import WildRPC.Integer
 import WildRPC.Float
 import WildRPC.Boolean
 import WildRPC.Color
-import WildRPC.Position	
+import WildRPC.Position
+import WildRPC.Quat
+import WildRPC.String
 
 Type_Boolean = 0
 Type_Integer = 1
@@ -29,6 +51,7 @@ Type_Vector3 = 5
 Type_Quat = 6
 Type_Color = 7
 Type_Position = 8
+Type_String = 9
 
 RPCProtocolErrors = [
 	"No Error",
@@ -216,15 +239,22 @@ def BuildQuat(x, y, z, w):
 	result = builder.Bytes[builder.Head():]
 	return result
 
+def BuildString(s):
+	builder = flatbuffers.Builder(0)
+	s = builder.CreateString(s)
+	WildRPC.String.StringStart(builder)
+	WildRPC.String.StringAddValue(builder, s)
+	end = WildRPC.String.StringEnd(builder)
+	builder.FinishSizePrefixed(end)
+	return builder.Bytes[builder.Head():]
+
 # -----------------------
 
-def bytes_to_int(bytes):
-	result = 0
-	index = 0
-	for b in bytes:
-		result = result + int(b) * (256 ** index)
-		index = index + 1
-	return result
+def int_from_bytes(byte4):  # type: (memoryview[4]) -> int
+	import struct
+	return struct.unpack("<i", byte4)[0]  # <i = little-endian, signed
+	#return int(codecs.encode(byte4, 'hex'), 16) # big-endian, unsigned :(
+	#return int.from_bytes(byte4, byteorder="little", signed=True) # Python3-only
 
 def DecodeFloat(bytes):
 	RPCfloat = WildRPC.Float.Float.GetRootAsFloat(bytes, 0)
@@ -269,6 +299,10 @@ def DecodeUInt3(bytes):
 	result = [RPCUInt3.X(), RPCUInt3.Y(), RPCUInt3.Z()]
 	return result
  
+def DecodeString(bytes):
+	RPCString = WildRPC.String.String.GetRootAsString(bytes, 0)
+	return RPCString.Value()
+ 
 decoders = {
         Type_Float: DecodeFloat,
         Type_Integer: DecodeInteger,
@@ -279,11 +313,12 @@ decoders = {
         Type_Vector3: DecodeVector3,
         Type_Vector2: DecodeVector2,
         Type_UInt3: DecodeUInt3,
+        Type_String: DecodeString,
     }
  
 def Decode(type, bytes):
 	dataView = memoryview(bytes)
-	prefixedSize = bytes_to_int(dataView[0:3])
+	prefixedSize = int_from_bytes(dataView[0:4])
 	#print("prefixedSize = ", prefixedSize)
 	# Get the function from switcher dictionary
 	func = decoders.get(type, "nothing")
@@ -329,6 +364,7 @@ parameterBuilders = {
         Type_Vector3: BuildParamVector3,
         Type_Vector2: BuildParamVector2,
         Type_UInt3: BuildParamUInt3,
+        Type_String: BuildString,
 }
 
 def BuildParam(type, params):
@@ -363,8 +399,9 @@ class RPCMethod:
 
 		data = self.socket.recv(4096)
 
-		protocolError = data[0]
-		applicationError = data[1]
+		errors = bytearray(data[:2]) if _python2 else data
+		protocolError = errors[0]
+		applicationError = errors[1]
 
 		if protocolError != 0:
 			print("Protocol ERROR: ", RPCProtocolErrors[protocolError])

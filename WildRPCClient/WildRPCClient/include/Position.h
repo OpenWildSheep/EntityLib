@@ -13,11 +13,13 @@ namespace WRPC
 	class WRPC_DLLEXPORT Position : public Parameter
 	{
 	public:
-		Position();
+		Position(const char* _name, Argument _inout);
+		Position(Position* _position);
 
 		void GetValues(unsigned short& _worldCellX, unsigned short& _worldCellY, float& _x, float& _y, float& _z);
 		void SetValues(unsigned short _worldCellX, unsigned short worldCellY, float _x, float _y, float _z);
 
+		static RPC_Type GetRPCType() { return RPC_Type::Position; }
 		RPC_Type GetType() override { return RPC_Type::Position; }
 
 		bool EncodeIn(unsigned char* _buffer, size_t _totalBufferSize, size_t* _offset)  override;

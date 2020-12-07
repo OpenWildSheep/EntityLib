@@ -1,4 +1,4 @@
-#include "FloatParameter.h"
+#include "include/FloatParameter.h"
 
 #include <iostream>
 #include <array>
@@ -10,10 +10,12 @@
 
 namespace WRPC
 {
-	Float::Float()
+	Float::Float(Float* _original) : Float(_original->GetName(), Argument::CopiedResult)
 	{
-
+		m_value = _original->m_value;
 	}
+
+	Float::Float(const char* _name, Argument _inout) : Parameter(_name, _inout) {}
 
 	bool Float::EncodeIn(unsigned char* _buffer, size_t _totalBufferSize, size_t* _offset)
 	{

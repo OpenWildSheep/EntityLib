@@ -1,4 +1,4 @@
-#include "Position.h"
+#include "include/Position.h"
 
 #include <iostream>
 #include <array>
@@ -11,6 +11,18 @@
 
 namespace WRPC
 {
+	Position::Position(Position* _position) : Position(_position->GetName(), Argument::CopiedResult)
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			m_worldCellsCoords[i] = _position->m_worldCellsCoords[i];
+		}
+		for (int i = 0; i < 3; i++)
+		{
+			m_localCoordinates[i] = _position->m_localCoordinates[i];
+		}
+	}
+
 	void Position::GetValues(unsigned short& _worldCellX, unsigned short& _worldCellY, float& _x, float& _y, float& _z)
 	{
 		_worldCellX = m_worldCellsCoords[0];
@@ -29,7 +41,7 @@ namespace WRPC
 		m_localCoordinates[2] = _z;
 	}
 
-	Position::Position()
+	Position::Position(const char* _name, Argument _inout) : Parameter(_name, _inout)
 	{
 		for (int i = 0; i < 2; i++)
 		{

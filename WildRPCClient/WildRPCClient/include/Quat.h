@@ -12,12 +12,14 @@ namespace WRPC
 	class WRPC_DLLEXPORT Quat : public Parameter
 	{
 	public:
-		Quat();
+		Quat(const char* _name, Argument _inout);
+		Quat(Quat* _original);
 
 		void GetValues(float& _x, float& _y, float& _z, float& _w);
 		void SetValues(float _x, float _y, float _z, float _w);
 
-		RPC_Type GetType() override { return RPC_Type::Quat; }
+		static RPC_Type GetRPCType() { return RPC_Type::Quat; }
+		RPC_Type		GetType() override { return RPC_Type::Quat; }
 
 		bool EncodeIn(unsigned char* _buffer, size_t _totalBufferSize, size_t* _offset)  override;
 		bool DecodeFrom(unsigned char* _buffer, size_t _totalBufferSize, size_t* _offset)  override;

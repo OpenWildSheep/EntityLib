@@ -18,11 +18,33 @@ enum class RPC_Type
 	Vector3,
 	Quat,
 	Color,
-	Position
+	Position,
+	None
+};
+
+enum class ConnectionStatus
+{
+	NotConnected = 0,
+	Connected,
+	ExplicitelyDeniedByServer,
+	TimeOut,
 };
 
 struct RPC_Error
 {
 	unsigned char m_protocolError = 0;
 	unsigned char m_applicativeError = 0;
+};
+
+enum class Argument
+{
+	In,
+	Out,
+	CopiedResult
+};
+
+enum class ThreadSafety
+{
+	Safe,
+	Unsafe
 };

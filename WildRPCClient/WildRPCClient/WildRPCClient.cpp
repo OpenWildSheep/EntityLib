@@ -20,6 +20,10 @@
 
 #include "include/MethodInvocation.h"
 
+#include "include/Position.h"
+#include "include/Quat.h"
+#include "include/FloatParameter.h"
+
 namespace WRPC
 {
 
@@ -30,156 +34,56 @@ namespace WRPC
     {
     }
 
-	bool RPCClient::test2()
+	bool RPCClient::test()
 	{
-		try
+		Connection* connection = NewConnection("127.0.0.1");
+
+		MethodInvocation* setCamera = NewMethodInvocation("CameraManager", "DATA_SetCamera", ThreadSafety::Safe);
+		setCamera->AddParameter<Position>("_position", Argument::In, 32768u, 32768u, 1.0f, 2.0f, 3.0f);
+		setCamera->AddParameter<Quat>("_orientation", Argument::In, 0.0f, 0.0f, 0.0f, 1.0f);
+		setCamera->AddParameter<Float>("_foV", Argument::In, 50.0f);
+
+		Result result;
+		setCamera->Execute(connection, result);
+
+		MethodInvocation* getCamera = NewMethodInvocation("CameraManager", "DATA_GetCamera", ThreadSafety::Safe);
+		getCamera->AddParameter<Position>("_position", Argument::Out);
+		getCamera->AddParameter<Quat>("_orientation", Argument::Out);
+		getCamera->AddParameter<Float>("_foV", Argument::Out);
+
+		Result anotherResult;
+		getCamera->Execute(connection, anotherResult);
+
+		if (!result.HasError())
 		{
-			asio::io_context my_io_context;
+			unsigned short wx, wy;
+			float x, y, z;
+			anotherResult.GetParameter<Position>("_position", wx, wy, x, y, z);
+			printf("_position: [%d,%d] (%.2f, %.2f, %.2f)\n", wx, wy, x, y, z);
 
-			asio::ip::tcp::socket s(my_io_context);
-			asio::ip::tcp::resolver resolver(my_io_context);
-			asio::connect(s, resolver.resolve("127.0.0.1", "9993"));
+			float qx, qy, qz, qw;
+			anotherResult.GetParameter<Quat>("_quat", qx, qy, qz, qw);
+			printf("_quat: (%.2f, %.2f, %.2f, %.2f)\n", qx, qy, qz, qw);
 
-			MethodInvocation getCameraMethod("CameraManager", "DATA_GetCamera");
-			getCameraMethod.AddResult(RPC_Type::Position, "position");
-			getCameraMethod.AddResult(RPC_Type::Quat, "quat");
-			getCameraMethod.AddResult(RPC_Type::Float, "fov");
-
-			RPC_Error error = getCameraMethod.Execute(s);
-
-			if (error.m_protocolError == 0 && error.m_applicativeError == 0)
-			{
-				unsigned short wx, wy;
-				float x, y, z;
-				bool pos_ok = getCameraMethod.GetPositionResult("position", wx, wy, x, y, z);
-
-				float qx, qy, qz, qw;
-				bool quat_ok = getCameraMethod.GetQuatResult("quat", qx, qy, qz, qw);
-
-				float fov;
-				bool fov_Ok = getCameraMethod.GetFloatResult("fov", fov);
-
-				if (pos_ok)
-				{
-					printf("Position (%d, %d, %.2f, %.2f, %.2f)\n", wx, wy, x, y, z);
-				}
-				else
-				{
-					printf("Position Not Ok!\n");
-				}
-
-				if (quat_ok)
-				{
-					printf("Quat (%.2f, %.2f, %.2f, %.2f)\n", qx, qy, qz, qw);
-				}
-				else
-				{
-					printf("Quat Not Ok!\n");
-				}
-
-				if (fov_Ok)
-				{
-					printf("FoV : %.2f\n", fov);
-				}
-				else
-				{
-					printf("FoV Not Ok!\n");
-				}
-			}
-
-		}
-		catch (std::exception& e)
-		{
-			std::cerr << "Exception: " << e.what() << "\n";
-		}
+			float value;
+			anotherResult.GetParameter<Float>("_foV", value);
+			printf("_foV: (%.2f)\n", value);
+ 		}
 
 		return true;
-	}
-
-	bool RPCClient::test1()
-	{
-		try
-		{
-			asio::io_context my_io_context;
-
-			asio::ip::tcp::socket s(my_io_context);
-			asio::ip::tcp::resolver resolver(my_io_context);
-			asio::connect(s, resolver.resolve("127.0.0.1", "9993"));
-
-			MethodInvocation getCameraMethod("CameraManager", "DATA_SetCamera");
-			getCameraMethod.AddPositionParameter(32766, 32767, 60.0f, 20.0f, 40.0f);
-			getCameraMethod.AddQuatParameter(0.0f, 0.0f, 0.0f, 1.0f);
-			getCameraMethod.AddFloatParameter(120.0f);
-
-			RPC_Error error = getCameraMethod.Execute(s);
-
-		}
-		catch (std::exception& e)
-		{
-			std::cerr << "Exception: " << e.what() << "\n";
-		}
-
-		return true;
-	}
-
-	bool RPCClient::test3()
-	{
-		SetEngineIPAddress("127.0.0.1");
-
-		// CONNECT -----------------------
-		Connect();
-
-		// SET Camera --------------------
-		PrepareMethodInvocation("CameraManager", "DATA_SetCamera");
-		AddPositionParameter(32766, 32767, 60.0f, 20.0f, 40.0f);
-		AddQuatParameter(0.0f, 0.0f, 0.0f, 1.0f);
-		AddFloatParameter(120.0f);
-
-		RPC_Error error = ExecuteMethod_ThreadSafe();
-
-		// GET Camera --------------------
-		PrepareMethodInvocation("CameraManager", "DATA_GetCamera");
-		AddResult(RPC_Type::Position, "position");
-		AddResult(RPC_Type::Quat, "quat");
-		AddResult(RPC_Type::Float, "fov");
-		
-		RPC_Error error = ExecuteMethod_ThreadSafe();
-
-		unsigned short wx, wy;
-		float x, y, z;
-		bool pos_ok = GetPositionResult("position", wx, wy, x, y, z);
-
-		float qx, qy, qz, qw;
-		bool quat_ok = GetQuatResult("quat", qx, qy, qz, qw);
-
-		float fov;
-		bool fov_Ok = GetFloatResult("fov", fov);
-
-		// DISCONNECT -----------------------
-		Disconnect();
 	}
 
 	// ------------------------------
 
-	void RPCClient::SetEngineIPAddress(const char* _address) {}
+	MethodInvocation* RPCClient::NewMethodInvocation(const char* _managerName, const char* _methodName, ThreadSafety _threadSafety)
+	{
+		return new MethodInvocation(_managerName, _methodName, _threadSafety);
+	}
 
-	bool RPCClient::Connect() { return false; }
-	bool RPCClient::Disconnect() { return false; }
-	bool RPCClient::IsConnected() { return false; }
-
-	void RPCClient::PrepareMethodInvocation(const char* _managerName, const char* _methodName) {}
-
-	void RPCClient::AddPositionParameter(unsigned short _worldCellX, unsigned short _worldCellY, float _x, float _y, float _z) {}
-	void RPCClient::AddQuatParameter(float _x, float _y, float _z, float _w) {}
-	void RPCClient::AddFloatParameter(float _value) {}
-
-	void RPCClient::AddResult(RPC_Type _param, const char* _name) {}
-
-	RPC_Error RPCClient::ExecuteMethod_ThreadSafe() {}
-	RPC_Error RPCClient::ExecuteMethod_NotThreadSafe() {}
-
-	bool RPCClient::GetFloatResult(const char* _paramName, float& _result) {}
-	bool RPCClient::GetPositionResult(const char* _paramName, unsigned short& _worldCellX, unsigned short& _worldCellY, float& _x, float& _y, float& _z) {}
-	bool RPCClient::GetQuatResult(const char* _paramName, float& _x, float& _y, float& _z, float& _w) {}
+	Connection* RPCClient::NewConnection(const char* _IPaddress) {
+		auto cnnx = new Connection(_IPaddress);
+		cnnx->Open();
+		return cnnx;
+	}
 
 } // namespace WRPC

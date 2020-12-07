@@ -1,4 +1,4 @@
-#include "Quat.h"
+#include "include/Quat.h"
 
 #include <iostream>
 #include <array>
@@ -10,6 +10,14 @@
 
 namespace WRPC
 {
+	Quat::Quat(Quat* _original) : Quat(_original->GetName(), Argument::CopiedResult)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			m_values[i] = _original->m_values[i];
+		}
+	}
+
 	void Quat::GetValues(float& _x, float& _y, float& _z, float& _w)
 	{
 		_x = m_values[0];
@@ -26,7 +34,7 @@ namespace WRPC
 		m_values[3] = _w;
 	}
 
-	Quat::Quat()
+	Quat::Quat(const char* _name, Argument _inout) : Parameter(_name, _inout)
 	{
 		for (int i = 0; i < 4; i++)
 		{

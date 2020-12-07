@@ -19,20 +19,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Connection.h" />
     <ClInclude Include="include\FloatParameter.h" />
     <ClInclude Include="include\MethodInvocation.h" />
     <ClInclude Include="include\Parameter.h" />
     <ClInclude Include="include\Position.h" />
     <ClInclude Include="include\Quat.h" />
+    <ClInclude Include="include\Result.h" />
     <ClInclude Include="include\WildRPCClient.h" />
     <ClInclude Include="include\WildRPCType.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\FloatParameter.cpp" />
-    <ClCompile Include="include\MethodInvocation.cpp" />
-    <ClCompile Include="include\Parameter.cpp" />
-    <ClCompile Include="include\Position.cpp" />
-    <ClCompile Include="include\Quat.cpp" />
+    <ClCompile Include="Connection.cpp" />
+    <ClCompile Include="FloatParameter.cpp" />
+    <ClCompile Include="MethodInvocation.cpp" />
+    <ClCompile Include="Parameter.cpp" />
+    <ClCompile Include="Position.cpp" />
+    <ClCompile Include="Quat.cpp" />
+    <ClCompile Include="Result.cpp" />
     <ClCompile Include="WildRPCClient.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

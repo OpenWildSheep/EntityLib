@@ -37,16 +37,31 @@ namespace WRPC
 
 	void Connection::Close()
 	{
-		if (m_socket_NOT_ThreadSafe)
+		if (m_status != ConnectionStatus::Connected)
 		{
-			delete m_socket_NOT_ThreadSafe;
-		}
-
-		if (m_socket_ThreadSafe)
-		{
-			delete m_socket_ThreadSafe;
+			return;
 		}
 
 		m_status = ConnectionStatus::NotConnected;
+		try
+		{
+			if (m_socket_NOT_ThreadSafe)
+			{
+				m_socket_NOT_ThreadSafe->close();
+				delete m_socket_NOT_ThreadSafe;
+				m_socket_NOT_ThreadSafe = nullptr;
+			}
+
+			if (m_socket_ThreadSafe)
+			{
+				m_socket_ThreadSafe->close();
+				delete m_socket_ThreadSafe;
+				m_socket_ThreadSafe = nullptr;
+			}
+		}
+		catch (std::exception& e)
+		{
+			std::cerr << "Exception: " << e.what() << "\n";
+		}
 	}
 }

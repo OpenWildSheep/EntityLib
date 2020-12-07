@@ -32,23 +32,33 @@ namespace WRPC
 
 	bool RPCClient::test()
 	{
-		Connection* connection = NewConnection("127.0.0.1");
+		Connection connection("127.0.0.1");
+		connection.Open();
 
-		MethodInvocation* setCamera = NewMethodInvocation("CameraManager", "DATA_SetCamera", ThreadSafety::Safe);
-		setCamera->AddParameter(RPC_Type::Position, "_position", 32768u, 32768u, 1.0f, 2.0f, 3.0f);
-		setCamera->AddParameter(RPC_Type::Quat, "_orientation", 0.0f, 0.0f, 0.0f, 1.0f);
-		setCamera->AddParameter(RPC_Type::Float, "_foV", 50.0f);
+		MethodInvocation setCamera("CameraManager", "DATA_SetCamera", ThreadSafety::Safe);
+		setCamera.AddParameter(RPC_Type::Position, "_position", 32768u, 32768u, 1.0f, 2.0f, 3.0f);
+		setCamera.AddParameter(RPC_Type::Quat, "_orientation", 0.0f, 0.0f, 0.0f, 1.0f);
+		setCamera.AddParameter(RPC_Type::Float, "_foV", 50.0f);
+		setCamera.Execute(connection);
 
-		Result result = setCamera->Execute(connection);
+		setCamera.ChangeParameterValue(RPC_Type::Position, "_position", 32768u, 32768u, 1.0f, 2.0f, 4.0f);
+		setCamera.Execute(connection);
 
-		MethodInvocation* getCamera = NewMethodInvocation("CameraManager", "DATA_GetCamera", ThreadSafety::Safe);
-		getCamera->AddResult(RPC_Type::Position, "_position");
-		getCamera->AddResult(RPC_Type::Quat, "_orientation");
-		getCamera->AddResult(RPC_Type::Float, "_foV");
+		MethodInvocation getCamera("CameraManager", "DATA_GetCamera", ThreadSafety::Safe);
+		getCamera.AddResult(RPC_Type::Position, "_position");
+		getCamera.AddResult(RPC_Type::Quat, "_orientation");
+		getCamera.AddResult(RPC_Type::Float, "_foV");
 
-		Result anotherResult = getCamera->Execute(connection);
+		Result anotherResult = getCamera.Execute(connection);
 
-		if (!result.HasError())
+		connection.Close();
+
+		connection.Open();
+		setCamera.ChangeParameterValue(RPC_Type::Position, "_position", 32768u, 32768u, 1.0f, 2.0f, 100.0f);
+		setCamera.Execute(connection);
+		connection.Close();
+
+		if (!anotherResult.HasError())
 		{
 			unsigned short wx, wy;
 			float x, y, z;
@@ -62,7 +72,7 @@ namespace WRPC
 			float value;
 			anotherResult.GetParameter(RPC_Type::Float, "_foV", value);
 			printf("_foV: (%.2f)\n", value);
- 		}
+		}
 
 		return true;
 	}

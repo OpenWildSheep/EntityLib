@@ -23,10 +23,10 @@ namespace WRPC
 		Connection(const char* _IPAddress);
 		~Connection();
 
-		ConnectionStatus	Open();
-		void				Close();
+		ConnectionStatus		Open();
+		void					Close();
 
-		ConnectionStatus	GetStatus() { return m_status; }
+		ConnectionStatus		GetStatus() { return m_status; }
 
 	private:
 		std::string				m_IPaddress;

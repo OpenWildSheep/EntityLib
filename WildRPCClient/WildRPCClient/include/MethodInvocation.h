@@ -27,10 +27,15 @@ namespace WRPC
 		void AddParameter(RPC_Type _type, const char* _name, float _value);
 		void AddResult   (RPC_Type _type, const char* _name);
 
-		Result Execute(Connection* _connection);
+		void ChangeParameterValue(RPC_Type _type, const char* _name, unsigned short _wx, unsigned short _wy, float _x, float _y, float _z);
+		void ChangeParameterValue(RPC_Type _type, const char* _name, float _x, float _y, float _z, float _w);
+		void ChangeParameterValue(RPC_Type _type, const char* _name, float _value);
+
+		Result Execute(Connection& _connection);
 
 	private:
 		Parameter* _AddParameter(RPC_Type _type, const char* _name, Argument _inout);
+		Parameter* _GetParameter(RPC_Type _type, const char* _name, Argument _inout);
 
 	private:
 		const char*					m_managerName;

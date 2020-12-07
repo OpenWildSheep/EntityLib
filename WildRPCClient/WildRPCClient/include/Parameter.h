@@ -13,8 +13,6 @@ namespace WRPC
 		float			m_localCoords[3];
 	};
 
-
-
 	class WRPC_DLLEXPORT Parameter
 	{
 	private:
@@ -34,26 +32,26 @@ namespace WRPC
 		virtual RPC_Type GetType() { return m_type; }
 		Argument		 GetArgument() { return m_argumentInOut; }
 
-		virtual bool EncodeIn(unsigned char* _buffer, size_t _totalBufferSize, size_t* _offset);
-		virtual bool DecodeFrom(unsigned char* _buffer, size_t _totalBufferSize, size_t* _offset);
-
-		void		 SetName(const char* _name) { m_name = _name; }
-		const char*  GetName() { return m_name; }
+		virtual bool	 EncodeIn(unsigned char* _buffer, size_t _totalBufferSize, size_t* _offset);
+		virtual bool	 DecodeFrom(unsigned char* _buffer, size_t _totalBufferSize, size_t* _offset);
+						 
+		void			 SetName(const char* _name) { m_name = _name; }
+		const char*		 GetName() { return m_name; }
 
 		// -------------------------
 
 		void	SetValues(float _x, float _y, float _z, float _w);
-		void	SetValues(unsigned short _wx, unsigned short _wy, float _x, float _y, float _z);
+		void	SetValues(uint16_t _wx, uint16_t _wy, float _x, float _y, float _z);
 		void	SetValue(float _values);
 
 		void	GetValues(float& _x, float& _y, float& _z, float& _w);
 		void	GetValues(uint16_t& _wx, uint16_t& _wy, float& _x, float& _y, float& _z);
 		void	GetValue(float& _value);
 
-	protected:
+	private:
 		Argument			m_argumentInOut = Argument::In;
 		const char*			m_name = nullptr;
-		RPC_Type			m_type;
+		RPC_Type			m_type = RPC_Type::None;
 		ParameterValues		m_values;
 	};
 

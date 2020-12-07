@@ -214,7 +214,7 @@ namespace WRPC
 		}
 	}
 
-	 // ---------------
+	 // Setters ---------------
 
 	void Parameter::SetValues(float _x, float _y, float _z, float _w)
 	{
@@ -241,7 +241,7 @@ namespace WRPC
 		m_values.m_floats[0] = _values;
 	}
 
-	// -------------------
+	// Getters -------------------
 
 	void Parameter::GetValues(float& _x, float& _y, float& _z, float& _w)
 	{

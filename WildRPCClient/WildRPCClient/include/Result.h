@@ -14,9 +14,7 @@ namespace WRPC
 	{
 		friend class MethodInvocation;
 
-	public:
-		Result() {}
-		
+	public:		
 		bool	HasError();
 
 		void	AddParameter(const Parameter& _param);

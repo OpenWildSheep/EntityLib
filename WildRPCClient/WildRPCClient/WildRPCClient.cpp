@@ -20,10 +20,6 @@
 
 #include "include/MethodInvocation.h"
 
-#include "include/Position.h"
-#include "include/Quat.h"
-#include "include/FloatParameter.h"
-
 namespace WRPC
 {
 
@@ -39,34 +35,32 @@ namespace WRPC
 		Connection* connection = NewConnection("127.0.0.1");
 
 		MethodInvocation* setCamera = NewMethodInvocation("CameraManager", "DATA_SetCamera", ThreadSafety::Safe);
-		setCamera->AddParameter<Position>("_position", Argument::In, 32768u, 32768u, 1.0f, 2.0f, 3.0f);
-		setCamera->AddParameter<Quat>("_orientation", Argument::In, 0.0f, 0.0f, 0.0f, 1.0f);
-		setCamera->AddParameter<Float>("_foV", Argument::In, 50.0f);
+		setCamera->AddParameter(RPC_Type::Position, "_position", 32768u, 32768u, 1.0f, 2.0f, 3.0f);
+		setCamera->AddParameter(RPC_Type::Quat, "_orientation", 0.0f, 0.0f, 0.0f, 1.0f);
+		setCamera->AddParameter(RPC_Type::Float, "_foV", 50.0f);
 
-		Result result;
-		setCamera->Execute(connection, result);
+		Result result = setCamera->Execute(connection);
 
 		MethodInvocation* getCamera = NewMethodInvocation("CameraManager", "DATA_GetCamera", ThreadSafety::Safe);
-		getCamera->AddParameter<Position>("_position", Argument::Out);
-		getCamera->AddParameter<Quat>("_orientation", Argument::Out);
-		getCamera->AddParameter<Float>("_foV", Argument::Out);
+		getCamera->AddResult(RPC_Type::Position, "_position");
+		getCamera->AddResult(RPC_Type::Quat, "_orientation");
+		getCamera->AddResult(RPC_Type::Float, "_foV");
 
-		Result anotherResult;
-		getCamera->Execute(connection, anotherResult);
+		Result anotherResult = getCamera->Execute(connection);
 
 		if (!result.HasError())
 		{
 			unsigned short wx, wy;
 			float x, y, z;
-			anotherResult.GetParameter<Position>("_position", wx, wy, x, y, z);
+			anotherResult.GetParameter(RPC_Type::Position, "_position", wx, wy, x, y, z);
 			printf("_position: [%d,%d] (%.2f, %.2f, %.2f)\n", wx, wy, x, y, z);
 
 			float qx, qy, qz, qw;
-			anotherResult.GetParameter<Quat>("_quat", qx, qy, qz, qw);
+			anotherResult.GetParameter(RPC_Type::Quat, "_orientation", qx, qy, qz, qw);
 			printf("_quat: (%.2f, %.2f, %.2f, %.2f)\n", qx, qy, qz, qw);
 
 			float value;
-			anotherResult.GetParameter<Float>("_foV", value);
+			anotherResult.GetParameter(RPC_Type::Float, "_foV", value);
 			printf("_foV: (%.2f)\n", value);
  		}
 

@@ -1,9 +1,5 @@
 #include "include/MethodInvocation.h"
 
-#include "include/FloatParameter.h"
-#include "include/Quat.h"
-#include "include/Position.h"
-
 #include <iostream>
 #include <array>
 
@@ -17,30 +13,57 @@
 
 namespace WRPC
 {
-	void MethodInvocation::_AddParameter(Parameter* _param)
+	void MethodInvocation::AddParameter(RPC_Type _type, const char* _name, unsigned short _wx, unsigned short _wy, float _x, float _y, float _z)
 	{
-		switch (_param->GetArgument())
-		{
-		case Argument::In:
-			m_parameters.push_back(_param);
-			break;
-		case Argument::Out:
-			m_results.push_back(_param);
-			break;
-		case Argument::CopiedResult:
-			assert(false);
-			break;
-		default:;
-		}
+		Parameter* param = _AddParameter(_type, _name, Argument::In);
+		param->SetValues(_wx, _wy, _x, _y, _z);
 	}
 
-	void MethodInvocation::Execute(Connection* _connection, Result& _result)
+	void MethodInvocation::AddParameter(RPC_Type _type, const char* _name, float _x, float _y, float _z, float _w)
 	{
+		Parameter* param = _AddParameter(_type, _name, Argument::In);
+		param->SetValues(_x, _y, _z, _w);
+	}
+
+	void MethodInvocation::AddParameter(RPC_Type _type, const char* _name, float _value)
+	{
+		Parameter* param = _AddParameter(_type, _name, Argument::In);
+		param->SetValue(_value);
+	}
+
+	void MethodInvocation::AddResult(RPC_Type _type, const char* _name)
+	{
+		_AddParameter(_type, _name, Argument::Out);
+	}
+
+	Parameter* MethodInvocation::_AddParameter(RPC_Type _type, const char* _name, Argument _inout)
+	{
+		switch (_inout)
+		{
+		case Argument::In:
+			m_parameters.emplace_back(_type, _name, _inout);
+			return &m_parameters.back();
+
+		case Argument::Out:
+			m_results.emplace_back(_type, _name, _inout);
+			return &m_results.back();
+
+		default:;
+		case Argument::CopiedResult:
+			assert(false);
+			return nullptr;
+		}
+		
+	}
+
+	Result MethodInvocation::Execute(Connection* _connection)
+	{
+		Result result;
 
 		if (_connection->GetStatus() != ConnectionStatus::Connected)
 		{
-			_result.m_error.m_protocolError = 0xFF;
-			return;
+			result.m_error.m_protocolError = 0xFF;
+			return result;
 		}
 
 		unsigned char buffer[REQUEST_BUFFER_SIZE];
@@ -56,14 +79,14 @@ namespace WRPC
 		std::vector<int8_t> params;
 		for (auto prm : m_parameters)
 		{
-			params.push_back((int8_t)prm->GetType());
+			params.push_back((int8_t)prm.GetType());
 		}
 		auto prms = fbb.CreateVector(params);
 
 		std::vector<int8_t> results;
 		for (auto rslt : m_results)
 		{
-			results.push_back((int8_t)rslt->GetType());
+			results.push_back((int8_t)rslt.GetType());
 		}
 		auto rslts = fbb.CreateVector(results);
 
@@ -85,7 +108,7 @@ namespace WRPC
 
 		for (auto prm : m_parameters)
 		{
-			prm->EncodeIn(buffer, REQUEST_BUFFER_SIZE, &currentPosition);
+			prm.EncodeIn(buffer, REQUEST_BUFFER_SIZE, &currentPosition);
 		}
 
 		// ------------------------------
@@ -100,22 +123,23 @@ namespace WRPC
 
 		// ------------------------------
 
-		_result.m_error.m_protocolError = reply[0];
-		_result.m_error.m_applicativeError = reply[1];
+		result.m_error.m_protocolError = reply[0];
+		result.m_error.m_applicativeError = reply[1];
 
 		currentPosition = 2;
-		for (auto rslt : m_results)
+		for (auto& rslt : m_results)
 		{
-			rslt->DecodeFrom(reply, REPLY_BUFFER_SIZE, &currentPosition);
+			rslt.DecodeFrom(reply, REPLY_BUFFER_SIZE, &currentPosition);
 		}
 
 		// ------------------------------
 
-		// Copy Result
-		for (auto rslt : m_results)
+		for (auto& rslt : m_results)
 		{
-			_result.AddParameter(rslt);
+			result.AddParameter(rslt);
 		}
+
+		return result;
 	}
 
 }

@@ -9,6 +9,10 @@
 namespace WRPC
 {
 	Connection::Connection(const char* _IPAddress) : m_IPaddress(_IPAddress) {}
+	Connection::~Connection()
+	{
+		Close();
+	}
 
 	ConnectionStatus Connection::Open()
 	{
@@ -29,5 +33,20 @@ namespace WRPC
 		}
 
 		return (m_status = ConnectionStatus::Connected);
+	}
+
+	void Connection::Close()
+	{
+		if (m_socket_NOT_ThreadSafe)
+		{
+			delete m_socket_NOT_ThreadSafe;
+		}
+
+		if (m_socket_ThreadSafe)
+		{
+			delete m_socket_ThreadSafe;
+		}
+
+		m_status = ConnectionStatus::NotConnected;
 	}
 }

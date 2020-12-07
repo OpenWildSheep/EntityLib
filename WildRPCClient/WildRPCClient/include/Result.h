@@ -15,57 +15,47 @@ namespace WRPC
 		friend class MethodInvocation;
 
 	public:
-		// non copyable
-		Result(const Result& _other) = delete;
-		Result& operator=(const Result& _other) = delete;
-
-		// non movable
-		Result(Result&& _other) = delete;
-		Result& operator=(Result&& _other) = delete;
-
 		Result() {}
-		~Result();
 		
 		bool	HasError();
 
-		void	AddParameter(Parameter* _param);
+		void	AddParameter(const Parameter& _param);
 
-		template <class T>
-		bool GetParameter(const char* _name, unsigned short& _wx, unsigned short& _wy, float& _x, float& _y, float& _z)
+		bool GetParameter(RPC_Type _type, const char* _name, unsigned short& _wx, unsigned short& _wy, float& _x, float& _y, float& _z)
 		{
-			T* foundParameter = (T*)_GetParameter(_name, T::GetRPCType());
-			if (foundParameter == nullptr) { return false; }
+			Parameter* param = nullptr;
+			bool ok = _GetParameter(_name, _type, &param);
+			if (!ok) { return false; }
 
-			foundParameter->GetValues(_wx, _wy, _x, _y, _z);
+			param->GetValues(_wx, _wy, _x, _y, _z);
 			return true;
 		}
 
-		template <class T>
-		bool GetParameter(const char* _name, float& _x, float& _y, float& _z, float& _w)
+		bool GetParameter(RPC_Type _type, const char* _name, float& _x, float& _y, float& _z, float& _w)
 		{
-			T* foundParameter = (T*)_GetParameter(_name, T::GetRPCType());
-			if (foundParameter == nullptr) { return false; }
+			Parameter* param = nullptr;
+			bool ok = _GetParameter(_name, _type, &param);
+			if (!ok) { return false; }
 
-			foundParameter->GetValues(_x, _y, _z, _w);
+			param->GetValues(_x, _y, _z, _w);
 			return true;
 		}
 
-		template <class T>
-		bool GetParameter(const char* _name, float& _value)
+		bool GetParameter(RPC_Type _type, const char* _name, float& _value)
 		{
-			T* foundParameter = (T*)_GetParameter(_name, T::GetRPCType());
-			if (foundParameter == nullptr) { return false; }
+			Parameter* param = nullptr;
+			bool ok = _GetParameter(_name, _type, &param);
+			if (!ok) { return false; }
 
-			_value = foundParameter->GetValue();
+			param->GetValue(_value);
 			return true;
 		}
 
 	private:
-		Parameter* _GetParameter(const char* _paramName, RPC_Type _type);
-
+		bool _GetParameter(const char* _paramName, RPC_Type _type, Parameter** _param);
 
 	private:
-		std::vector<Parameter*>		m_parameters;
+		std::vector<Parameter>		m_parameters;
 		RPC_Error					m_error;
 	};
 }

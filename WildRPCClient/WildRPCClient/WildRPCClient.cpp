@@ -35,43 +35,41 @@ namespace WRPC
 		Connection connection("127.0.0.1");
 		connection.Open();
 
-		MethodInvocation setCamera("CameraManager", "DATA_SetCamera", ThreadSafety::Safe);
-		setCamera.AddParameter(RPC_Type::Position, "_position", 32768u, 32768u, 1.0f, 2.0f, 3.0f);
-		setCamera.AddParameter(RPC_Type::Quat, "_orientation", 0.0f, 0.0f, 0.0f, 1.0f);
-		setCamera.AddParameter(RPC_Type::Float, "_foV", 50.0f);
-		setCamera.Execute(connection);
+		if (connection.GetStatus() != ConnectionStatus::Connected)
+		{
+			printf("Connection ERROR!\n");
+			return false;
+		}
 
-		setCamera.ChangeParameterValue(RPC_Type::Position, "_position", 32768u, 32768u, 1.0f, 2.0f, 4.0f);
+		MethodInvocation setCamera("CameraManager", "DATA_SetCamera", ThreadSafety::Safe);
+		setCamera.SetSignature({ WildRPC::Type_Position, WildRPC::Type_Quat, WildRPC::Type_Float }, {});
+		setCamera.SetParametersValues({ Param(32768, 32768, 1.0f, 2.0f, 3.0f), Param(0.0f, 0.0f, 0.0f, 1.0f), Param(40.0f) });
 		setCamera.Execute(connection);
 
 		MethodInvocation getCamera("CameraManager", "DATA_GetCamera", ThreadSafety::Safe);
-		getCamera.AddResult(RPC_Type::Position, "_position");
-		getCamera.AddResult(RPC_Type::Quat, "_orientation");
-		getCamera.AddResult(RPC_Type::Float, "_foV");
-
+		getCamera.SetSignature({}, { WildRPC::Type_Position, WildRPC::Type_Quat, WildRPC::Type_Float });
 		Result anotherResult = getCamera.Execute(connection);
 
-		connection.Close();
-
-		connection.Open();
-		setCamera.ChangeParameterValue(RPC_Type::Position, "_position", 32768u, 32768u, 1.0f, 2.0f, 100.0f);
-		setCamera.Execute(connection);
 		connection.Close();
 
 		if (!anotherResult.HasError())
 		{
 			unsigned short wx, wy;
 			float x, y, z;
-			anotherResult.GetParameter(RPC_Type::Position, "_position", wx, wy, x, y, z);
+			anotherResult.GetParam(0).GetValue(wx, wy, x, y, z);
 			printf("_position: [%d,%d] (%.2f, %.2f, %.2f)\n", wx, wy, x, y, z);
-
+		
 			float qx, qy, qz, qw;
-			anotherResult.GetParameter(RPC_Type::Quat, "_orientation", qx, qy, qz, qw);
+			anotherResult.GetParam(1).GetValue(qx, qy, qz, qw);
 			printf("_quat: (%.2f, %.2f, %.2f, %.2f)\n", qx, qy, qz, qw);
-
+		
 			float value;
-			anotherResult.GetParameter(RPC_Type::Float, "_foV", value);
+			anotherResult.GetParam(2).GetValue(value);
 			printf("_foV: (%.2f)\n", value);
+		}
+		else
+		{
+			printf("Connection ERROR!\n");
 		}
 
 		return true;

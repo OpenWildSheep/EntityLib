@@ -21,16 +21,14 @@
   <ItemGroup>
     <ClInclude Include="include\Connection.h" />
     <ClInclude Include="include\MethodInvocation.h" />
-    <ClInclude Include="include\Parameter.h" />
-    <ClInclude Include="include\Result.h" />
+    <ClInclude Include="include\RPCParameters.h" />
     <ClInclude Include="include\WildRPCClient.h" />
     <ClInclude Include="include\WildRPCType.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="MethodInvocation.cpp" />
-    <ClCompile Include="Parameter.cpp" />
-    <ClCompile Include="Result.cpp" />
+    <ClCompile Include="RPCParameters.cpp" />
     <ClCompile Include="WildRPCClient.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

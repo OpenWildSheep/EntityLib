@@ -8,42 +8,32 @@
 #define WRPC_DLLEXPORT
 #endif
 
-enum class RPC_Type
+namespace WRPC
 {
-	Boolean = 0,
-	Integer,
-	Float,
-	Vector2,
-	UInt3,
-	Vector3,
-	Quat,
-	Color,
-	Position,
-	None
-};
+	enum class ConnectionStatus
+	{
+		NotConnected = 0,
+		Connected,
+		Errored
+	};
 
-enum class ConnectionStatus
-{
-	NotConnected = 0,
-	Connected,
-	Errored
-};
+	struct RPC_Error
+	{
+		unsigned char m_protocolError = 0;
+		unsigned char m_applicativeError = 0;
+	};
 
-struct RPC_Error
-{
-	unsigned char m_protocolError = 0;
-	unsigned char m_applicativeError = 0;
-};
+	enum class Argument
+	{
+		In,
+		Out,
+		CopiedResult
+	};
 
-enum class Argument
-{
-	In,
-	Out,
-	CopiedResult
-};
+	enum class ThreadSafety
+	{
+		Safe,
+		Unsafe
+	};
 
-enum class ThreadSafety
-{
-	Safe,
-	Unsafe
-};
+}

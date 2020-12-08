@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "WildRPCType.h"
-#include "Parameter.h"
 
 #pragma warning(push, 0)
 #pragma warning(disable : 4355)

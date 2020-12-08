@@ -225,6 +225,13 @@ try:
     sysCreat = ent.get_component("SystemicCreature")
     sysCreat.root.at("Name").value = "Shamane_male"
     entlib.save_entity(ent, "prefab.copy.entity")
+
+    # TEST SubScene detach
+    original_sub_entities = ent.get_subscene_component().embedded.entities;
+    detached_sub_scene = ent.get_subscene_component().detach_embedded();
+    assert(len(ent.get_subscene_component().embedded.entities) is 0);
+    assert(all(a == b for a, b in zip(original_sub_entities, detached_sub_scene.entities)))
+    
     ####################################################################################################################
     # Test write prefab
     ent = entlib.load_entity("prefab.copy.entity")
@@ -590,16 +597,17 @@ try:
         displaySubSchema(name, sub, "")
 
     # ********************************** Test load/save scene ************************************
-    print("load_scene")
+    print("load_legacy_scene")
     entlib.rawdata_path = "X:/RawData"
     entlib.clear_cache()
-    scene = entlib.load_scene_read_only("X:/RawData/22_World/SceneMainWorld/SceneMainWorld.scene")
+    scene = entlib.load_legacy_scene_read_only(
+        "X:/RawData/22_World/SceneMainWorld/SceneMainWorld_entitylib_unit_test.scene")
     assert(len(entlib.get_entity_cache()) > 0)
     assert (len(entlib.get_scene_cache()) > 0)
     scene_cache = entlib.get_scene_cache()
     found = False
     for k, v in scene_cache.items():
-        if k == r"22_World\SceneMainWorld\SceneMainWorld.scene":
+        if k == r"22_World\SceneMainWorld\SceneMainWorld_entitylib_unit_test.scene":
             print(len(v.data.entities))
             found = True
             break

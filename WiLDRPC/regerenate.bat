@@ -28,9 +28,11 @@
 "../../External/FlatBuffers/Release/flatc" --cpp Result.fbs
 "../../External/FlatBuffers/Release/flatc" --python Result.fbs
 
-
 "../../External/FlatBuffers/Release/flatc" --cpp Position.fbs
 "../../External/FlatBuffers/Release/flatc" --python Position.fbs
+
+"../../External/FlatBuffers/Release/flatc" --cpp String.fbs
+"../../External/FlatBuffers/Release/flatc" --python String.fbs
 
 "../../External/FlatBuffers/Release/flatc" --cpp RPCHeader.fbs
 "../../External/FlatBuffers/Release/flatc" --python RPCHeader.fbs

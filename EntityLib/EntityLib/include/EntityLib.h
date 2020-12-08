@@ -97,7 +97,11 @@ namespace Ent
     template <typename V>
     struct Override
     {
-        Override() = default;
+        Override()
+            : hasPrefab(false)
+            , hasOverride(false)
+        {
+        }
         Override(V _defaultValue, tl::optional<V> _prefabValue, tl::optional<V> _overrideValue)
             : defaultValue(std::move(_defaultValue))
         {
@@ -376,9 +380,9 @@ namespace Ent
     struct SubSceneComponent
     {
         bool isEmbedded = false; ///< If true, data are in embedded, else data are in file
-        Override<String> file; ///< Path to a .scene file, whene isEmbedded is false
-        size_t index = 0; ///< Useful to keep the componants order in the json file
-        std::unique_ptr<Scene> embedded; ///< Embedded Scene, whene isEmbedded is true
+        Override<String> file; ///< Path to a .scene file, when isEmbedded is false
+        size_t index = 0; ///< Useful to keep the components order in the json file
+        std::unique_ptr<Scene> embedded; ///< Embedded Scene, when isEmbedded is true
 
         void computeMemory(MemoryProfiler& prof) const;
 
@@ -405,6 +409,10 @@ namespace Ent
         bool hasOverride() const;
 
         std::unique_ptr<SubSceneComponent> clone() const; ///< Clone this SubSceneComponent identically
+
+        /// @brief detach the Scene from this sub scene components, leaving the embedded sub scene empty
+        /// @pre this SubScene is embedded, i.e. isEmbedded is true
+        std::unique_ptr<Scene> detachEmbedded();
     };
 
     class EntityLib;
@@ -589,6 +597,15 @@ namespace Ent
         /// Get all entities in the scene
         std::vector<std::unique_ptr<Entity>> const& getObjects() const;
 
+        /// Get the nth entity
+        Entity const* getEntity(size_t index) const;
+
+        /// Get the nth entity
+        Entity* getEntity(size_t index);
+
+        /// Number of entity in the scene
+        size_t entityCount() const;
+
         /// Abandons ownership of all entities and return them.
         std::vector<std::unique_ptr<Entity>> releaseAllEntities();
 
@@ -673,12 +690,18 @@ namespace Ent
         /// Load the Scene at path _scenePath then return a pointer to the cached data
         std::shared_ptr<Scene const> loadSceneReadOnly(std::filesystem::path const& _scenePath) const;
 
+        /// Load the Scene in legacy format at path _scenePath then return a pointer to the cached data
+        std::shared_ptr<Scene const> loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const;
+
         /// Load the Entity at path _entityPath
         std::unique_ptr<Entity> loadEntity(
             std::filesystem::path const& _entityPath, Ent::Entity const* _super = nullptr) const;
 
         /// Load the Scene at path _scenePath
         std::unique_ptr<Scene> loadScene(std::filesystem::path const& _scenePath) const;
+
+        /// Load the Scene in legacy format at path _scenePath
+        std::unique_ptr<Scene> loadLegacyScene(std::filesystem::path const& _scenePath) const;
 
         /// Save the Entity at path _entityPath
         void saveEntity(Entity const& _entity, std::filesystem::path const& _entityPath) const;

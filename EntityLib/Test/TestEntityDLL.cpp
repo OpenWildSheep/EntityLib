@@ -324,6 +324,31 @@ try
         ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
         sysCreat->root.at("Name")->setString("Shamane_male");
         entlib.saveEntity(*ent, "prefab.copy.entity");
+
+        // TEST SubScene detach
+        const auto& subEntities = ent->getSubSceneComponent()->embedded->getObjects();
+        ENTLIB_ASSERT(not subEntities.empty());
+        std::vector<Ent::Entity*> originalSubEntities;
+        std::transform(
+            begin(subEntities),
+            end(subEntities),
+            std::back_inserter(originalSubEntities),
+            [](auto&& entityPtr) { return entityPtr.get(); });
+        ENTLIB_ASSERT(not originalSubEntities.empty());
+        auto detachedSubScene = ent->getSubSceneComponent()->detachEmbedded();
+        ENTLIB_ASSERT(ent->getSubSceneComponent()->embedded->getObjects().empty());
+        std::vector<Ent::Entity*> detachedSubEntities;
+        std::transform(
+            begin(detachedSubScene->getObjects()),
+            end(detachedSubScene->getObjects()),
+            std::back_inserter(detachedSubEntities),
+            [](auto&& entityPtr) { return entityPtr.get(); });
+        ENTLIB_ASSERT(std::equal(
+            begin(originalSubEntities), end(originalSubEntities), begin(detachedSubEntities)));
+
+        ent->removeSubSceneComponent();
+        ent->addSubSceneComponent()->makeEmbedded(true);
+        entlib.saveEntity(*ent, "prefab.emptyembbeded.entity"); // to check the schema
     }
     {
         // Test the readOnly prefab.entity
@@ -826,8 +851,8 @@ try
     // ********************************** Test load/save scene ************************************
     entlib.rawdataPath = "X:/RawData";
 
-    std::unique_ptr<Ent::Scene> scene = entlib.loadScene("X:/RawData/22_World/SceneMainWorld/"
-                                                         "SceneMainWorld.scene");
+    auto scene = entlib.loadScene("X:/RawData/22_World/SceneMainWorld/"
+                                  "SceneMainWorld_entitylib_unit_test.scene");
 
     printf("Scene Loaded\n");
     printf("Entity count : %zu\n", scene->getObjects().size());

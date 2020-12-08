@@ -26,8 +26,7 @@ enum class ConnectionStatus
 {
 	NotConnected = 0,
 	Connected,
-	ExplicitelyDeniedByServer,
-	TimeOut,
+	Errored
 };
 
 struct RPC_Error

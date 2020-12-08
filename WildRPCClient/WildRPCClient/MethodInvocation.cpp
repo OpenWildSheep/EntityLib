@@ -162,17 +162,28 @@ namespace WRPC
 			prm.EncodeIn(buffer, REQUEST_BUFFER_SIZE, &currentPosition);
 		}
 
-		// Send Buffer ------------------------------
-
-		auto socket = (m_threadSafety == ThreadSafety::Unsafe) ? _connection.m_socket_NOT_ThreadSafe : _connection.m_socket_ThreadSafe;
-
-		asio::write(*socket, asio::buffer(buffer, currentPosition + 1));
-
-		// Receive Reply Buffer -----------------------
-
 		unsigned char reply[REPLY_BUFFER_SIZE];
-		size_t reply_length = asio::read(*socket, asio::buffer(reply, REPLY_BUFFER_SIZE));
-		assert(REPLY_BUFFER_SIZE == reply_length);
+
+		try
+		{
+			// Send Buffer ------------------------------
+
+			auto socket = (m_threadSafety == ThreadSafety::Unsafe) ? _connection.m_socket_NOT_ThreadSafe : _connection.m_socket_ThreadSafe;
+
+			asio::write(*socket, asio::buffer(buffer, currentPosition + 1));
+
+			// Receive Reply Buffer -----------------------
+			size_t reply_length = asio::read(*socket, asio::buffer(reply, REPLY_BUFFER_SIZE));
+			assert(REPLY_BUFFER_SIZE == reply_length);
+		}
+		catch (std::exception& e)
+		{
+			std::cerr << "Exception: " << e.what() << "\n";
+			_connection.m_status = ConnectionStatus::Errored;
+
+			result.m_error.m_protocolError = 0xFF;
+			return result;
+		}
 
 		// Decode Result ------------------------------
 

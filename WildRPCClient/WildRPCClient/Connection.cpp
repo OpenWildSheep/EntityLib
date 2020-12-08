@@ -29,7 +29,7 @@ namespace WRPC
 		catch (std::exception& e)
 		{
 			std::cerr << "Exception: " << e.what() << "\n";
-			return ConnectionStatus::ExplicitelyDeniedByServer;
+			return ConnectionStatus::Errored;
 		}
 
 		return (m_status = ConnectionStatus::Connected);
@@ -62,6 +62,7 @@ namespace WRPC
 		catch (std::exception& e)
 		{
 			std::cerr << "Exception: " << e.what() << "\n";
+			m_status = ConnectionStatus::Errored;
 		}
 	}
 }

@@ -145,6 +145,16 @@ namespace Ent
         /// @throw BadUnionType if \p _type is not listed in the oneOf field
         Subschema const* getUnionType(char const* _subtype) const;
 
+        /// @brief Get the name of the json field containing the type name
+        /// @throw BadType if the schema is not a oneOf
+        /// @throw MissingMetadata if the schema doesn't have a meta className and classData
+        char const* getUnionNameField() const;
+
+        /// @brief Get the name of the json field containing the data
+        /// @throw BadType if the schema is not a oneOf
+        /// @throw MissingMetadata if the schema doesn't have a meta className and classData
+        char const* getUnionDataField() const;
+
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue =
             mapbox::util::variant<Null, std::string, float, int64_t, Null, Null, bool, Null>;

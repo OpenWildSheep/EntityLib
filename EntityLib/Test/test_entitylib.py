@@ -93,6 +93,8 @@ try:
         assert(actorStates.size() == 2)
         actorState = actorStates.at(0)
         assert(actorState != None)
+        assert actorState.get_schema().get_union_name_field() == "className"
+        assert actorState.get_schema().get_union_data_field() == "classData"
         climbEdge = actorState.get_union_data()
         assert(climbEdge != None)
         exitRequired = climbEdge.at("locomotionMode")
@@ -185,6 +187,11 @@ try:
         explosionEffect = ent.get_component("ExplosionEffect")  # type: Ent.Component
         shakeData = explosionEffect.root.at("ShakeData")  # type: Ent.Node
         assert(shakeData.at("shakeDuration").value == 0.)
+
+    ####################################################################################################################
+    # Test the readOnly prefab.entity
+    ent = entlib.load_entity_read_only("prefab.entity")  # type: Ent.Entity
+    testPrefabEntity(ent)
 
     ####################################################################################################################
     ent = entlib.load_entity("prefab.entity")  # type: Ent.Entity
@@ -586,7 +593,7 @@ try:
     print("load_scene")
     entlib.rawdata_path = "X:/RawData"
     entlib.clear_cache()
-    scene = entlib.load_scene("X:/RawData/22_World/SceneMainWorld/SceneMainWorld.scene")
+    scene = entlib.load_scene_read_only("X:/RawData/22_World/SceneMainWorld/SceneMainWorld.scene")
     assert(len(entlib.get_entity_cache()) > 0)
     assert (len(entlib.get_scene_cache()) > 0)
     scene_cache = entlib.get_scene_cache()

@@ -170,6 +170,8 @@ try
         ENTLIB_ASSERT(actorStates.size() == 2);
         Ent::Node const* actorState = actorStates.at(0llu);
         ENTLIB_ASSERT(actorState != nullptr);
+        ENTLIB_ASSERT(actorState->getSchema()->getUnionNameField() == std::string("className"));
+        ENTLIB_ASSERT(actorState->getSchema()->getUnionDataField() == std::string("classData"));
         Ent::Node const* climbEdge = actorState->getUnionData();
         ENTLIB_ASSERT(climbEdge != nullptr);
         Ent::Node const* exitRequired = climbEdge->at("locomotionMode");
@@ -325,8 +327,8 @@ try
     }
     {
         // Test the readOnly prefab.entity
-        Ent::Entity const* ent = entlib.loadEntityReadOnly("prefab.entity");
-        testPrefabEntity(ent);
+        std::shared_ptr<Ent::Entity const> ent = entlib.loadEntityReadOnly("prefab.entity");
+        testPrefabEntity(ent.get());
     }
     {
         // Test write prefab

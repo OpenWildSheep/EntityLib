@@ -160,7 +160,7 @@ namespace WRPC
 									std::string*
 	> ResultHolder;
 
-	struct ResultValue
+	struct WRPC_DLLEXPORT ResultValue
 	{
 		ResultValue(bool& _bool);
 		ResultValue(int32_t& _int);

@@ -23,6 +23,7 @@
 namespace WRPC
 {
 	typedef Parameter v;
+	typedef ResultValue r;
 
     RPCClient::RPCClient()
     {
@@ -58,18 +59,15 @@ namespace WRPC
 
 		if (!anotherResult.HasError())
 		{
-			unsigned short wx, wy;
+			uint32_t wx, wy;
 			float x, y, z;
-			anotherResult.GetParameter(0).GetValue(wx, wy, x, y, z);
-			printf("_position: [%d,%d] (%.2f, %.2f, %.2f)\n", wx, wy, x, y, z);
-		
 			float qx, qy, qz, qw;
-			anotherResult.GetParameter(1).GetValue(qx, qy, qz, qw);
+			float foV;
+			anotherResult.RetrieveValues({ r(wx, wy, x, y, z), r(qx, qy, qz, qw), r(foV) });
+
+			printf("_position: [%d,%d] (%.2f, %.2f, %.2f)\n", wx, wy, x, y, z);
 			printf("_quat: (%.2f, %.2f, %.2f, %.2f)\n", qx, qy, qz, qw);
-		
-			float value;
-			anotherResult.GetParameter(2).GetValue(value);
-			printf("_foV: (%.2f)\n", value);
+			printf("_foV: (%.2f)\n", foV);
 		}
 		else
 		{

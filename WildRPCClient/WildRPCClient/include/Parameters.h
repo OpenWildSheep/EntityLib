@@ -97,8 +97,8 @@ namespace WRPC
 		bool GetValue(uint32_t& _x, uint32_t& _y, uint32_t& _z) const;
 		bool GetValue(float& _x, float& _y, float& _z) const;
 		bool GetValue(float& _x, float& _y, float& _z, float& _w) const;
-		bool GetValue(uint16_t& _wx, uint16_t& _wy, float& _x, float& _y, float& _z) const;
-		bool GetValue(const char*& _char) const;
+		bool GetValue(uint32_t& _wx, uint32_t& _wy, float& _x, float& _y, float& _z) const;
+		bool GetValue(std::string& _char) const;
 
 		// En/Decoding ----------------------------------
 		bool EncodeIn(uint8_t* _buffer, const size_t _bufferSize, size_t& _offset) const;
@@ -107,6 +107,72 @@ namespace WRPC
 		// Debug -----------------------------------------
 
 		void Print() const;
+	};
+
+	// -----------------------
+
+	struct Vector2H
+	{
+		float *x, *y;
+		Vector2H(float& _x, float& _y) : x(&_x), y(&_y) {}
+	};
+
+	struct Vector3H
+	{
+		float *x, *y, *z;
+		Vector3H(float& _x, float& _y, float& _z) : x(&_x), y(&_y), z(&_z) {}
+	};
+
+	struct QuatH
+	{
+		float *x, *y, *z, *w;
+		QuatH(float& _x, float& _y, float& _z, float& _w) : x(&_x), y(&_y), z(&_z), w(&_w) {}
+	};
+
+	struct ColorH
+	{
+		float *r, *g, *b, *a;
+		ColorH(float& _r, float& _g, float& _b, float& _a) : r(&_r), g(&_g), b(&_b), a(&_a) {}
+	};
+
+	struct Vector3iH
+	{
+		uint32_t *x, *y, *z;
+		Vector3iH(uint32_t& _x, uint32_t& _y, uint32_t& _z) : x(&_x), y(&_y), z(&_z) {}
+	};
+
+	struct PositionH
+	{
+		uint32_t *wx, *wy;
+		float *x, *y, *z;
+		PositionH(uint32_t& _wx, uint32_t& _wy, float& _x, float& _y, float& _z) : wx(&_wx), wy(&_wy), x(&_x), y(&_y), z(&_z) {}
+	};
+
+	typedef mapbox::util::variant<  bool*,
+									int32_t*,
+									float*,
+									Vector2H,
+									Vector3iH,
+									Vector3H,
+									QuatH,
+									ColorH,
+									PositionH,
+									std::string*
+	> ResultHolder;
+
+	struct ResultValue
+	{
+		ResultValue(bool& _bool);
+		ResultValue(int32_t& _int);
+		ResultValue(float& _float);
+		ResultValue(float& _x, float& _y);
+		ResultValue(uint32_t& _x, uint32_t& _y, uint32_t& _z);
+		ResultValue(float& _x, float& _y, float& _z);
+		ResultValue(float& _qx, float& _qy, float& _qz, float& _qw, bool _isColor = false);
+		ResultValue(uint32_t& _wx, uint32_t& _wy, float& _x, float& _y, float& _z);
+		ResultValue(std::string& _strg);
+
+		ResultHolder m_value;
 	};
 
 	class WRPC_DLLEXPORT Result
@@ -120,6 +186,7 @@ namespace WRPC
 		}
 
 		Parameter&	GetParameter(size_t idx) { return m_paramsBuffer[idx]; }
+		bool		RetrieveValues(std::vector<ResultValue> _holders);
 
 	private:
 		std::vector<Parameter>	m_paramsBuffer;

@@ -177,7 +177,7 @@ namespace WRPC
 		return false;
 	}
 
-	bool Parameter::GetValue(uint16_t& _wx, uint16_t& _wy, float& _x, float& _y, float& _z) const
+	bool Parameter::GetValue(uint32_t& _wx, uint32_t& _wy, float& _x, float& _y, float& _z) const
 	{
 		if (GetType() != WildRPC::Type_Position)
 		{
@@ -193,14 +193,14 @@ namespace WRPC
 		return true;
 	}
 
-	bool Parameter::GetValue(const char*& _char) const
+	bool Parameter::GetValue(std::string& _strg) const
 	{
 		if (GetType() != WildRPC::Type_String)
 		{
 			return false;
 		}
 
-		_char = m_value.get<std::string>().c_str();
+		_strg = m_value.get<std::string>();
 		return true;
 	}
 
@@ -432,4 +432,134 @@ namespace WRPC
 		return true;
 	}
 
+
+	// -------------------------
+
+	ResultValue::ResultValue(uint32_t& _wx, uint32_t& _wy, float& _x, float& _y, float& _z)
+	{
+		m_value = PositionH(_wx, _wy, _x, _y, _z);
+	}
+
+	ResultValue::ResultValue(float& _qx, float& _qy, float& _qz, float& _qw, bool _isColor)
+	{
+		if (_isColor)
+		{
+			m_value = ColorH(_qx, _qy, _qz, _qw);
+		}
+		else
+		{
+			m_value = QuatH(_qx, _qy, _qz, _qw);
+		}
+	}
+
+	ResultValue::ResultValue(float& _float)
+	{
+		m_value = &_float;
+	}
+
+	ResultValue::ResultValue(bool& _bool)
+	{
+		m_value = &_bool;
+	}
+
+	ResultValue::ResultValue(int32_t& _int)
+	{
+		m_value = &_int;
+	}
+
+	ResultValue::ResultValue(float& _x, float& _y)
+	{
+		m_value = Vector2H(_x, _y);
+	}
+
+	ResultValue::ResultValue(uint32_t& _x, uint32_t& _y, uint32_t& _z)
+	{
+		m_value = Vector3iH(_x, _y, _z);
+	}
+
+	ResultValue::ResultValue(float& _x, float& _y, float& _z)
+	{
+		m_value = Vector3H(_x, _y, _z);
+	}
+
+	ResultValue::ResultValue(std::string& _strg)
+	{
+		m_value = &_strg;
+	}
+
+	bool Result::RetrieveValues(std::vector<ResultValue> _holders)
+	{
+		size_t idx = 0;
+		for (auto& prm : m_paramsBuffer)
+		{
+			auto& hldr = _holders[idx];
+
+			auto type = prm.GetType();
+			switch (type)
+			{
+				case WildRPC::Type_Boolean:
+				{
+					auto bl = hldr.m_value.get<bool*>();
+					prm.GetValue(*bl);
+				}
+					break;
+				case WildRPC::Type_Integer:
+				{
+					auto it = hldr.m_value.get<int*>();
+					prm.GetValue(*it);
+				}
+					break;
+				case WildRPC::Type_Float:
+				{
+					auto flt = hldr.m_value.get<float*>();
+					prm.GetValue(*flt);
+				}
+					break;
+				case WildRPC::Type_Vector2:
+				{
+					auto& vct2 = hldr.m_value.get<Vector2H>();
+					prm.GetValue(*vct2.x, *vct2.y);
+				}
+					break;
+				case WildRPC::Type_UInt3:
+				{
+					auto& vct3i = hldr.m_value.get<Vector3iH>();
+					prm.GetValue(*vct3i.x, *vct3i.y, *vct3i.z);
+				}
+					break;
+				case WildRPC::Type_Vector3:
+				{
+					auto& vct3 = hldr.m_value.get<Vector3H>();
+					prm.GetValue(*vct3.x, *vct3.y, *vct3.z);
+				}
+					break;
+				case WildRPC::Type_Quat:
+				{
+					auto& qt = hldr.m_value.get<QuatH>();
+					prm.GetValue(*qt.x, *qt.y, *qt.z, *qt.w);
+				}
+					break;
+				case WildRPC::Type_Color:
+				{
+					auto& clr = hldr.m_value.get<ColorH>();
+					prm.GetValue(*clr.r, *clr.g, *clr.b, *clr.a);
+				}
+					break;
+				case WildRPC::Type_Position:
+				{
+					auto& ps = hldr.m_value.get<PositionH>();
+					prm.GetValue(*ps.wx, *ps.wy, *ps.x, *ps.y, *ps.z);
+				}
+					break;
+				case WildRPC::Type_String:
+				{
+					auto strg = hldr.m_value.get<std::string*>();
+					prm.GetValue(*strg);
+				}
+				default:;
+			}
+			idx++;
+		}
+		return true;
+	}
 }

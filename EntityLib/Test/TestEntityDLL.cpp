@@ -117,9 +117,23 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
         ENTLIB_ASSERT_MSG(exception_throw, "Exception not thrown!");                               \
     }
 
-int main() // int argc, char** argv
+int main(int argc, char** argv)
 try
 {
+    bool doDisplayScene = false;
+    bool doDisplaySubSchema = false;
+    for (int i = 1; i < argc; ++i)
+    {
+        if (strcmp(argv[i], "--displaySchema") == 0)
+        {
+            doDisplaySubSchema = true;
+        }
+        else if (strcmp(argv[i], "--displayScene") == 0)
+        {
+            doDisplayScene = true;
+        }
+    }
+
     // Ent::updateComponents("X:/Tools");
 #ifdef _DEBUG
     bool const doMergeComponents = false;
@@ -774,9 +788,12 @@ try
     }
 
     // ******************************** Test iteration of schema **********************************
-    for (auto&& name_sub : entlib.schema.components)
+    if (doDisplaySubSchema)
     {
-        displaySubSchema(std::get<0>(name_sub), *std::get<1>(name_sub), {});
+        for (auto&& name_sub : entlib.schema.components)
+        {
+            displaySubSchema(std::get<0>(name_sub), *std::get<1>(name_sub), {});
+        }
     }
 
     // ******************* Test load/save complex entity pinetreec50cmh5mbasic ********************
@@ -855,18 +872,21 @@ try
     auto scene = entlib.loadScene("X:/RawData/22_World/SceneMainWorld/"
                                   "SceneMainWorld_entitylib_unit_test.scene");
 
-    printf("Scene Loaded\n");
-    printf("Entity count : %zu\n", scene->getObjects().size());
-
-    for (EntityPtr const& ent : scene->getObjects())
+    if (doDisplayScene)
     {
-        printf("  Name \"%s\"\n", ent->getName());
+        printf("Scene Loaded\n");
+        printf("Entity count : %zu\n", scene->getObjects().size());
 
-        for (char const* type : ent->getComponentTypes())
+        for (EntityPtr const& ent : scene->getObjects())
         {
-            printf("    Type \"%s\"\n", type);
-            Ent::Node const& root = ent->getComponent(type)->root;
-            printNode("", root, "      ");
+            printf("  Name \"%s\"\n", ent->getName());
+
+            for (char const* type : ent->getComponentTypes())
+            {
+                printf("    Type \"%s\"\n", type);
+                Ent::Node const& root = ent->getComponent(type)->root;
+                printNode("", root, "      ");
+            }
         }
     }
 

@@ -335,7 +335,7 @@ namespace Ent
     template <typename T, typename... Args>
     value_ptr<T> make_value(Args&&... args)
     {
-        return value_ptr<T>(new T(std::forward<Args>(args)...));
+        return value_ptr<T>(T(std::forward<Args>(args)...));
     }
     /// @endcond
 } // namespace Ent

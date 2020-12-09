@@ -138,6 +138,8 @@ void setValue(Ent::Node& node, Value const& val)
 
 using namespace pybind11::literals;
 
+// clang-format off
+
 PYBIND11_MODULE(EntityLibPy, ent)
 {
     ent.doc() = "pybind11 for EntityLib";
@@ -193,7 +195,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     py::implicitly_convertible<std::string, std::filesystem::path>();
     py::implicitly_convertible<std::string, Ent::String>();
-    
+
     pySubschema
         .def_readonly("type", &Subschema::type)
         .def_readonly("name", &Subschema::name)
@@ -329,7 +331,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property(
             "file",
             [](SubSceneComponent const& sc) -> std::string { return sc.file.get(); },
-            [](SubSceneComponent& sc, std::string f) { return sc.file.set(std::move(f)); })
+            [](SubSceneComponent& sc, std::string const& f) { return sc.file.set(f); })
         .def("make_embedded", &SubSceneComponent::makeEmbedded)
         .def_property_readonly(
             "embedded",
@@ -466,5 +468,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     py::register_exception<Ent::JsonValidation>(ent, "JsonValidation");
 }
+
+// clang-format on
 
 /// @endcond

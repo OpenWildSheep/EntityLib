@@ -1,0 +1,28 @@
+{
+    "Components": [
+        {
+            "Data": {
+                "Embedded": [
+                    {
+                        "Components": [
+                            {
+                                "Data": {
+                                    "InSpiritWorld": true
+                                },
+                                "Type": "ActorGD",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "wolf_skeleton_lush"
+                    }
+                ],
+                "File": "",
+                "isEmbedded": true
+            },
+            "Type": "SubScene",
+            "Version": 1
+        }
+    ],
+    "InstanceOf": "entity-subscene.entity",
+    "Name": "entity-subscene"
+}

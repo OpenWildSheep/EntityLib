@@ -371,8 +371,10 @@ void Ent::SchemaLoader::parseSchemaNoRef(
         }
     }
     else if (currentType != DataType::null)
-        vis.setMeta(parseMetaForType(
-            json::object(), currentType)); // Set Meta to default values for the currentType
+    {
+        // Set Meta to default values for the currentType
+        vis.setMeta(parseMetaForType(json::object(), currentType));
+    }
     if (_data.count("name") != 0u)
     {
         // manually specified type name (typically used for enums properties that are inlined)

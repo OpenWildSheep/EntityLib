@@ -98,6 +98,7 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
     }
 }
 
+// NOLINTNEXTLINE
 #define ENTLIB_CHECK_EXCEPTION(expression, excep_type)                                             \
     {                                                                                              \
         bool exception_throw = false;                                                              \
@@ -105,7 +106,7 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
         {                                                                                          \
             expression;                                                                            \
         }                                                                                          \
-        catch (excep_type&)                                                                        \
+        catch (std::remove_reference_t<excep_type>&)                                               \
         {                                                                                          \
             exception_throw = true;                                                                \
         }                                                                                          \
@@ -835,7 +836,7 @@ try
         EntityPtr ent = entlib.makeInstanceOf("entity-subscene.entity");
         auto subs = ent->getSubSceneComponent();
 
-        ENTLIB_ASSERT(subs->embedded->getObjects().size() != 0);
+        ENTLIB_ASSERT(not empty(subs->embedded->getObjects()));
 
         auto&& allSubEntities = subs->embedded->getObjects();
         allSubEntities[0]->addComponent("ActorGD")->root.at("InSpiritWorld")->setBool(true);
@@ -845,7 +846,7 @@ try
         auto ovrdSubs = ovrdEntt->getSubSceneComponent();
 
         //Test that we properly still have access to the template subscene entities
-        ENTLIB_ASSERT(ovrdSubs->embedded->getObjects().size() != 0);
+        ENTLIB_ASSERT(not empty(ovrdSubs->embedded->getObjects()));
     }
 
     // ********************************** Test load/save scene ************************************

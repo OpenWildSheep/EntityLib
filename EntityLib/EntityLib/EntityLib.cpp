@@ -33,6 +33,7 @@ static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _s
 
 namespace Ent
 {
+    template <>
     Pool<Node> Pool<Node>::pool;
 
     char const* actorStatesSchemaName = "file://Scene-schema.json#/definitions/ActorStates";
@@ -177,7 +178,9 @@ namespace Ent
     {
         auto range = std::equal_range(begin(obj), end(obj), value, CompObject());
         if (range.first == range.second)
+        {
             obj.insert(range.first, value);
+        }
     }
     Node const& at(Object const& obj, char const* key)
     {
@@ -187,18 +190,26 @@ namespace Ent
             std::pair<char const*, value_ptr<Node>>{ key, nullptr },
             CompObject());
         if (range.first == range.second)
+        {
             throw std::logic_error(std::string("Bad key : ") + key);
+        }
         else
+        {
             return *range.first->second;
+        }
     }
     Node& at(Object& obj, char const* key)
     {
         auto range = std::equal_range(
             begin(obj), end(obj), std::pair<char const*, Node>{ key, Node() }, CompObject());
         if (range.first == range.second)
+        {
             throw std::logic_error(std::string("Bad key : ") + key);
+        }
         else
+        {
             return *range.first->second;
+        }
     }
 
     // ************************************* Node *************************************************
@@ -897,7 +908,7 @@ namespace Ent
         , color(std::move(_color))
         , thumbnail(std::move(_thumbnail))
         , instanceOf(std::move(_instanceOf))
-        , maxActivationLevel(std::move(_maxActivationLevel))
+        , maxActivationLevel(_maxActivationLevel)
         , hasASuper(_hasASuper)
     {
         updateSubSceneOwner();
@@ -935,7 +946,7 @@ namespace Ent
     {
         return name.get().c_str();
     }
-    void Entity::setName(std::string _name)
+    void Entity::setName(Ent::String _name)
     {
         ENTLIB_ASSERT_MSG(
             not hasASuper,
@@ -971,7 +982,7 @@ namespace Ent
     {
         return thumbnail.isDefault() ? nullptr : thumbnail.get().c_str();
     }
-    void Entity::setThumbnail(std::string _thumbPath)
+    void Entity::setThumbnail(Ent::String _thumbPath)
     {
         thumbnail.set(std::move(_thumbPath));
     }
@@ -1173,7 +1184,7 @@ namespace Ent
 
         std::string relativePath = computeRelativePath(thisPath, std::move(entityPath), false);
 
-        return { std::move(relativePath) };
+        return { relativePath };
     }
 
     static Scene* getSubScene(Entity* _entity)
@@ -2095,7 +2106,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         std::move(ovColor),
         std::move(ovThumbnail),
         std::move(ovInstanceOf),
-        std::move(ovMaxActivationLevel));
+        ovMaxActivationLevel);
 }
 
 /// Exception thrown when a method is called on legacy data (or vice versa)
@@ -2232,12 +2243,14 @@ static std::unique_ptr<Ent::Scene> loadScene(
     return scene;
 }
 
-std::shared_ptr<Ent::Scene const> Ent::EntityLib::loadSceneReadOnly(std::filesystem::path const& _scenePath) const
+std::shared_ptr<Ent::Scene const>
+Ent::EntityLib::loadSceneReadOnly(std::filesystem::path const& _scenePath) const
 {
-	return loadScene(_scenePath);
+    return loadScene(_scenePath);
 }
 
-std::shared_ptr<Ent::Scene const> Ent::EntityLib::loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const
+std::shared_ptr<Ent::Scene const>
+Ent::EntityLib::loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const
 {
     auto loadFunc = [](Ent::EntityLib const& _entLib,
                        Ent::ComponentsSchema const& _schema,
@@ -2410,7 +2423,7 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
         std::move(detachedColor),
         getThumbnailValue().detach(),
         Override<String>{},
-        std::move(detachedMaxActivationLevel));
+        detachedMaxActivationLevel);
 }
 
 std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
@@ -2560,7 +2573,9 @@ void Ent::SubSceneComponent::computeMemory(MemoryProfiler& prof) const
     prof.currentComp.push_back("SubScene");
     file.computeMemory(prof);
     if (embedded)
+    {
         embedded->computeMemory(prof);
+    }
     prof.currentComp.pop_back();
 }
 

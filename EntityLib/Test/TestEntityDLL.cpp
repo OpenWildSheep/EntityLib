@@ -887,7 +887,7 @@ try
 
     scene->addEntity(entlib.makeInstanceOf((current_path() / "prefab.entity").generic_u8string()));
 
-    entlib.saveScene(*scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene");
+    entlib.saveScene(*scene, current_path() / "SceneMainWorld.test.scene");
 
     auto const& addedEntity = scene->getObjects().back();
     Ent::Component const* cinematicCmp = addedEntity->getComponent("CinematicGD");

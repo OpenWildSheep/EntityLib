@@ -58,7 +58,7 @@ namespace WRPC
 		Position(uint32_t _wx, uint32_t _wy, float _x, float _y, float _z) : wx(_wx), wy(_wy), x(_x), y(_y), z(_z) {}
 	};
 
-	struct Parameter
+	struct WRPC_DLLEXPORT Parameter
 	{
 		mapbox::util::variant<  bool,
 								int32_t,
@@ -109,7 +109,7 @@ namespace WRPC
 		void Print() const;
 	};
 
-	class Result
+	class WRPC_DLLEXPORT Result
 	{
 		friend class MethodInvocation;
 

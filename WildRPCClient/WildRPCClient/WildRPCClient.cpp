@@ -41,13 +41,15 @@ namespace WRPC
 			return false;
 		}
 
-		MethodInvocation setCamera("CameraManager", "DATA_SetCamera", ThreadSafety::Safe);
-		setCamera.SetSignature({ WildRPC::Type_Position, WildRPC::Type_Quat, WildRPC::Type_Float }, {});
-		setCamera.SetParametersValues({ Param(32768, 32768, 1.0f, 2.0f, 3.0f), Param(0.0f, 0.0f, 0.0f, 1.0f), Param(40.0f) });
+		MethodInvocation setCamera("CameraManager", "DATA_SetCamera",
+								   ThreadSafety::Safe,
+								   { WildRPC::Type_Position, WildRPC::Type_Quat, WildRPC::Type_Float }, {});
+		setCamera.SetParameters({ P(32768u, 32768u, 1.0f, 2.0f, 3.0f), P(0.0f, 0.0f, 0.0f, 1.0f, false), P(40.0f) });
 		setCamera.Execute(connection);
 
-		MethodInvocation getCamera("CameraManager", "DATA_GetCamera", ThreadSafety::Safe);
-		getCamera.SetSignature({}, { WildRPC::Type_Position, WildRPC::Type_Quat, WildRPC::Type_Float });
+		MethodInvocation getCamera("CameraManager", "DATA_GetCamera",
+								   ThreadSafety::Safe,
+								   {},  { WildRPC::Type_Position, WildRPC::Type_Quat, WildRPC::Type_Float });
 		Result anotherResult = getCamera.Execute(connection);
 
 		connection.Close();
@@ -56,15 +58,15 @@ namespace WRPC
 		{
 			unsigned short wx, wy;
 			float x, y, z;
-			anotherResult.GetParam(0).GetValue(wx, wy, x, y, z);
+			anotherResult.GetParameter(0).GetValue(wx, wy, x, y, z);
 			printf("_position: [%d,%d] (%.2f, %.2f, %.2f)\n", wx, wy, x, y, z);
 		
 			float qx, qy, qz, qw;
-			anotherResult.GetParam(1).GetValue(qx, qy, qz, qw);
+			anotherResult.GetParameter(1).GetValue(qx, qy, qz, qw);
 			printf("_quat: (%.2f, %.2f, %.2f, %.2f)\n", qx, qy, qz, qw);
 		
 			float value;
-			anotherResult.GetParam(2).GetValue(value);
+			anotherResult.GetParameter(2).GetValue(value);
 			printf("_foV: (%.2f)\n", value);
 		}
 		else
@@ -73,19 +75,6 @@ namespace WRPC
 		}
 
 		return true;
-	}
-
-	// ------------------------------
-
-	MethodInvocation* RPCClient::NewMethodInvocation(const char* _managerName, const char* _methodName, ThreadSafety _threadSafety)
-	{
-		return new MethodInvocation(_managerName, _methodName, _threadSafety);
-	}
-
-	Connection* RPCClient::NewConnection(const char* _IPaddress) {
-		auto cnnx = new Connection(_IPaddress);
-		cnnx->Open();
-		return cnnx;
 	}
 
 } // namespace WRPC

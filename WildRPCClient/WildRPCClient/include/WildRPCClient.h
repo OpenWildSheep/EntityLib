@@ -93,10 +93,6 @@ namespace WRPC
         RPCClient(RPCClient&&) = delete;
         RPCClient& operator=(RPCClient&&) = delete;
 
-		Connection*			NewConnection(const char* _IPaddress);
-		MethodInvocation*	NewMethodInvocation(const char* _managerName, const char* _methodName, ThreadSafety _threadSafety);
-
-
     private:
         asio::io_context io_context;
     };

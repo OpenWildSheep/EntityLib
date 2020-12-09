@@ -13,21 +13,23 @@
 
 namespace WRPC
 {
-	void MethodInvocation::SetSignature(std::vector<WildRPC::Type> _in, std::vector<WildRPC::Type> _out)
+	MethodInvocation::MethodInvocation(const char* _managerName, const char* _methodName, ThreadSafety _threadSafety, std::vector<WildRPC::Type> _in, std::vector<WildRPC::Type> _out) : m_managerName(_managerName), m_methodName(_methodName), m_threadSafety(_threadSafety)
 	{
 		for (auto type : _in)
 		{
-			m_inBuffer.Add(INOUT_Input, type);
+			m_inBuffer.emplace_back();
+			m_inBuffer.back().Init(type);
 		}
 		for (auto type : _out)
 		{
-			m_outBuffer.Add(INOUT_Output, type);
+			m_outBuffer.emplace_back();
+			m_outBuffer.back().Init(type);
 		}
 	}
 
-	void MethodInvocation::SetParametersValues(std::vector<Param> _values)
+	void MethodInvocation::SetParameters(std::vector<Parameter> _values)
 	{
-		if (_values.size() != m_inBuffer.m_parameters.size())
+		if (_values.size() != m_inBuffer.size())
 		{
 			assert(false);
 			return;
@@ -36,104 +38,11 @@ namespace WRPC
 		size_t index = 0;
 		for (auto& prm : _values)
 		{
-			m_inBuffer.m_parameters[index] = prm;
+			m_inBuffer[index] = prm;
 			index++;
 		}
 	}
 
-	// ----------------------
-
-//	void MethodInvocation::AddParameter(RPC_Type _type, const char* _name, unsigned short _wx, unsigned short _wy, float _x, float _y, float _z)
-//	{
-//		Parameter* param = _AddParameter(_type, _name, Argument::In);
-//		param->SetValues(_wx, _wy, _x, _y, _z);
-//	}
-//
-//	void MethodInvocation::AddParameter(RPC_Type _type, const char* _name, float _x, float _y, float _z, float _w)
-//	{
-//		Parameter* param = _AddParameter(_type, _name, Argument::In);
-//		param->SetValues(_x, _y, _z, _w);
-//	}
-//
-//	void MethodInvocation::AddParameter(RPC_Type _type, const char* _name, float _value)
-//	{
-//		Parameter* param = _AddParameter(_type, _name, Argument::In);
-//		param->SetValue(_value);
-//	}
-//
-//	void MethodInvocation::AddResult(RPC_Type _type, const char* _name)
-//	{
-//		_AddParameter(_type, _name, Argument::Out);
-//	}
-//
-//	Parameter* MethodInvocation::_AddParameter(RPC_Type _type, const char* _name, Argument _inout)
-//	{
-//		switch (_inout)
-//		{
-//		case Argument::In:
-//			m_parameters.emplace_back(_type, _name, _inout);
-//			return &m_parameters.back();
-//
-//		case Argument::Out:
-//			m_results.emplace_back(_type, _name, _inout);
-//			return &m_results.back();
-//
-//		default:;
-//		case Argument::CopiedResult:
-//			assert(false);
-//			return nullptr;
-//		}	
-//	}
-//
-//	// ---------------------------------------------------------
-//
-//	void MethodInvocation::ChangeParameterValue(RPC_Type _type, const char* _name, unsigned short _wx, unsigned short _wy, float _x, float _y, float _z)
-//	{
-//		Parameter* param = _GetParameter(_type, _name, Argument::In);
-//		if (param)
-//		{
-//			param->SetValues(_wx, _wy, _x, _y, _z);
-//		}
-//	}
-//
-//	void MethodInvocation::ChangeParameterValue(RPC_Type _type, const char* _name, float _x, float _y, float _z, float _w)
-//	{
-//		Parameter* param = _GetParameter(_type, _name, Argument::In);
-//		if (param)
-//		{
-//			param->SetValues(_x, _y, _z, _w);
-//		}
-//	}
-//
-//	void MethodInvocation::ChangeParameterValue(RPC_Type _type, const char* _name, float _value)
-//	{
-//		Parameter* param = _GetParameter(_type, _name, Argument::In);
-//		if (param)
-//		{
-//			param->SetValue(_value);
-//		}
-//	}
-//
-//	Parameter* MethodInvocation::_GetParameter(RPC_Type _type, const char* _name, Argument _inout)
-//	{
-//		auto& prms = (_inout == Argument::In) ? m_parameters : m_results;
-//
-//		for (auto& rslt : prms)
-//		{
-//			if (strcmp(rslt.GetName(), _name) != 0)
-//			{
-//				continue;
-//			}
-//
-//			if (rslt.GetType() != _type)
-//			{
-//				continue;
-//			}
-//
-//			return &rslt;
-//		}
-//		return nullptr;
-//	}
 
 	// --------------------------------------------------------------
 
@@ -158,14 +67,14 @@ namespace WRPC
 		auto methodName = fbb.CreateString(m_methodName);
 
 		std::vector<int8_t> params;
-		for (auto prm : m_inBuffer.m_parameters)
+		for (auto prm : m_inBuffer)
 		{
 			params.push_back((int8_t)prm.GetType());
 		}
 		auto prms = fbb.CreateVector(params);
 
 		std::vector<int8_t> results;
-		for (auto rslt : m_outBuffer.m_parameters)
+		for (auto rslt : m_outBuffer)
 		{
 			results.push_back((int8_t)rslt.GetType());
 		}
@@ -187,12 +96,10 @@ namespace WRPC
 
 		// Encode Parameters ------------------------
 
-		//for (auto prm : m_parameters)
-		//{
-		//	prm.EncodeIn(buffer, REQUEST_BUFFER_SIZE, &currentPosition);
-		//}
-
-		m_inBuffer.EncodeIn(buffer, REQUEST_BUFFER_SIZE, currentPosition);
+		for (auto& prm : m_inBuffer)
+		{
+			prm.EncodeIn(buffer, REQUEST_BUFFER_SIZE, currentPosition);
+		}
 
 		unsigned char reply[REPLY_BUFFER_SIZE];
 
@@ -223,23 +130,12 @@ namespace WRPC
 		result.m_error.m_applicativeError = reply[1];
 
 		currentPosition = 2;
-		//for (auto& rslt : m_results)
-		//{
-		//	rslt.DecodeFrom(reply, REPLY_BUFFER_SIZE, &currentPosition);
-		//}
-		m_outBuffer.DecodeFrom(reply, REPLY_BUFFER_SIZE, currentPosition);
+		for (auto& prm : m_outBuffer)
+		{
+			prm.DecodeFrom(reply, REPLY_BUFFER_SIZE, currentPosition);
+		}
 
 		// Copy Result ------------------------------
-
-		//for (auto& rslt : m_outBuffer.m_parameters)
-		//{
-		//	result.AddParameter(rslt);
-		//}
-
-		for (auto rslt : m_outBuffer.m_parameters)
-		{
-			rslt.Print();
-		}
 
 		result.m_paramsBuffer = m_outBuffer;
 

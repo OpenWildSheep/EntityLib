@@ -23,13 +23,6 @@ namespace WRPC
 		unsigned char m_applicativeError = 0;
 	};
 
-	enum class Argument
-	{
-		In,
-		Out,
-		CopiedResult
-	};
-
 	enum class ThreadSafety
 	{
 		Safe,

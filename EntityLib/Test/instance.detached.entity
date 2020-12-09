@@ -95,7 +95,10 @@
                 "ScriptEvents": [
                     {
                         "classData": {
-                            "FactName": "Toto"
+                            "FactName": "Toto",
+                            "Super": {
+                                "InvertTest": true
+                            }
                         },
                         "className": "CineEventTestBlackboardHasFact"
                     },

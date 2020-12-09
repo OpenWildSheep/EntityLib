@@ -113,7 +113,10 @@
                 "ScriptEvents": [
                     {
                         "classData": {
-                            "FactName": "Toto"
+                            "FactName": "Toto",
+                            "Super": {
+                                "InvertTest": true
+                            }
                         },
                         "className": "CineEventTestBlackboardHasFact"
                     },
@@ -124,12 +127,10 @@
                         "className": "CineEventTestCurrentGameState"
                     },
                     {
-                        "classData": {},
-                        "className": "CineEventTestCurrentGameState"
-                    },
-                    {
-                        "classData": {},
-                        "className": "CineEvent"
+                        "classData": {
+                            "FactName": "Titi"
+                        },
+                        "className": "CineEventTestBlackboardHasFact"
                     }
                 ]
             },
@@ -262,7 +263,6 @@
             "Version": 1
         }
     ],
-    "MaxActivationLevel": "InWorld",
     "Name": "PlayerSpawner_",
     "Thumbnail": "TestThumbnail"
 }

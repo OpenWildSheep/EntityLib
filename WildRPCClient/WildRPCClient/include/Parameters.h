@@ -15,8 +15,6 @@ namespace WildRPC
 
 namespace WRPC
 {
-	typedef Parameter P;
-
 	struct Vector2
 	{
 		float x, y;
@@ -60,8 +58,6 @@ namespace WRPC
 		Position(uint32_t _wx, uint32_t _wy, float _x, float _y, float _z) : wx(_wx), wy(_wy), x(_x), y(_y), z(_z) {}
 	};
 
-	static const int RPC_NB_SUPPORTED_TYPES = 10;
-
 	struct Parameter
 	{
 		mapbox::util::variant<  bool,
@@ -85,32 +81,32 @@ namespace WRPC
 		Parameter(float _x, float _y);
 		Parameter(uint32_t _x, uint32_t _y, uint32_t _z);
 		Parameter(float _x, float _y, float _z);
-		Parameter(float _x, float _y, float _z, float _w, bool _isColor);
+		Parameter(float _x, float _y, float _z, float _w, bool _isQuat = true);
 		Parameter(uint16_t _wx, uint16_t _wy, float _x, float _y, float _z);
 		Parameter(const char* _char);
 
 		void Init(WildRPC::Type _type);
 
 		// Getters -------------------------------------
-		WildRPC::Type GetType();
+		WildRPC::Type GetType() const;
 
-		bool GetValue(bool& _bool);
-		bool GetValue(int& _int);
-		bool GetValue(float& _float);
-		bool GetValue(float& _x, float& _y);
-		bool GetValue(uint32_t& _x, uint32_t& _y, uint32_t& _z);
-		bool GetValue(float& _x, float& _y, float& _z);
-		bool GetValue(float& _x, float& _y, float& _z, float& _w);
-		bool GetValue(uint16_t& _wx, uint16_t& _wy, float& _x, float& _y, float& _z);
-		bool GetValue(const char*& _char);
+		bool GetValue(bool& _bool) const;
+		bool GetValue(int& _int) const;
+		bool GetValue(float& _float) const;
+		bool GetValue(float& _x, float& _y) const;
+		bool GetValue(uint32_t& _x, uint32_t& _y, uint32_t& _z) const;
+		bool GetValue(float& _x, float& _y, float& _z) const;
+		bool GetValue(float& _x, float& _y, float& _z, float& _w) const;
+		bool GetValue(uint16_t& _wx, uint16_t& _wy, float& _x, float& _y, float& _z) const;
+		bool GetValue(const char*& _char) const;
 
 		// En/Decoding ----------------------------------
-		bool EncodeIn(uint8_t* _buffer, const size_t _bufferSize, size_t& _offset);
+		bool EncodeIn(uint8_t* _buffer, const size_t _bufferSize, size_t& _offset) const;
 		bool DecodeFrom(uint8_t* _buffer, const size_t _bufferSize, size_t& _offset);
 
 		// Debug -----------------------------------------
 
-		void Print();
+		void Print() const;
 	};
 
 	class Result
@@ -118,7 +114,7 @@ namespace WRPC
 		friend class MethodInvocation;
 
 	public:
-		bool HasError()
+		bool HasError() const
 		{
 			return (m_error.m_protocolError != 0) || (m_error.m_applicativeError != 0);
 		}

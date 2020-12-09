@@ -92,8 +92,5 @@ namespace WRPC
         RPCClient& operator=(RPCClient const&) = delete;
         RPCClient(RPCClient&&) = delete;
         RPCClient& operator=(RPCClient&&) = delete;
-
-    private:
-        asio::io_context io_context;
     };
 } // namespace WRPC

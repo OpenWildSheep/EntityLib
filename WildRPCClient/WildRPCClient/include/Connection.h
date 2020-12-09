@@ -25,7 +25,7 @@ namespace WRPC
 		ConnectionStatus		Open();
 		void					Close();
 
-		ConnectionStatus		GetStatus() { return m_status; }
+		ConnectionStatus		GetStatus() const { return m_status; }
 
 	private:
 		std::string				m_IPaddress;

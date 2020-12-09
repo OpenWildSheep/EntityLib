@@ -22,6 +22,7 @@
 
 namespace WRPC
 {
+	typedef Parameter v;
 
     RPCClient::RPCClient()
     {
@@ -44,13 +45,14 @@ namespace WRPC
 		MethodInvocation setCamera("CameraManager", "DATA_SetCamera",
 								   ThreadSafety::Safe,
 								   { WildRPC::Type_Position, WildRPC::Type_Quat, WildRPC::Type_Float }, {});
-		setCamera.SetParameters({ P(32768u, 32768u, 1.0f, 2.0f, 3.0f), P(0.0f, 0.0f, 0.0f, 1.0f, false), P(40.0f) });
-		setCamera.Execute(connection);
+
+		setCamera.Execute(connection, {v(32768u, 32768u, 1.0f, 2.0f, 3.0f), v(0.0f, 0.0f, 0.0f, 1.0f), v(40.0f)});
 
 		MethodInvocation getCamera("CameraManager", "DATA_GetCamera",
 								   ThreadSafety::Safe,
 								   {},  { WildRPC::Type_Position, WildRPC::Type_Quat, WildRPC::Type_Float });
-		Result anotherResult = getCamera.Execute(connection);
+
+		Result anotherResult = getCamera.Execute(connection, {});
 
 		connection.Close();
 

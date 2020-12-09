@@ -21,19 +21,19 @@ namespace WRPC
 
 	public:
 		MethodInvocation(const char* _managerName, const char* _methodName, ThreadSafety _threadSafety, std::vector<WildRPC::Type> _in, std::vector<WildRPC::Type> _out);
-		void SetParametersValues(std::vector<Parameter> _values);
-
-		Result Execute(Connection& _connection);
-
+		Result Execute(Connection& _connection, const std::vector<Parameter>& _values);
 
 	private:
-		const char*					m_managerName;
-		const char*					m_methodName;
+		void _SetParameters(const std::vector<Parameter>& _values);
 
-		std::vector<Parameter>			m_inBuffer;
-		std::vector<Parameter>			m_outBuffer;
+	private:
+		const char*				m_managerName;
+		const char*				m_methodName;
 
-		ThreadSafety				m_threadSafety = ThreadSafety::Unsafe;
+		std::vector<Parameter>	m_inParams;
+		std::vector<Parameter>	m_outParams;
+
+		ThreadSafety			m_threadSafety = ThreadSafety::Unsafe;
 	};
 
 

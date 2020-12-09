@@ -17,19 +17,19 @@ namespace WRPC
 	{
 		for (auto type : _in)
 		{
-			m_inBuffer.emplace_back();
-			m_inBuffer.back().Init(type);
+			m_inParams.emplace_back();
+			m_inParams.back().Init(type);
 		}
 		for (auto type : _out)
 		{
-			m_outBuffer.emplace_back();
-			m_outBuffer.back().Init(type);
+			m_outParams.emplace_back();
+			m_outParams.back().Init(type);
 		}
 	}
 
-	void MethodInvocation::SetParameters(std::vector<Parameter> _values)
+	void MethodInvocation::_SetParameters(const std::vector<Parameter>& _values)
 	{
-		if (_values.size() != m_inBuffer.size())
+		if (_values.size() != m_inParams.size())
 		{
 			assert(false);
 			return;
@@ -38,7 +38,8 @@ namespace WRPC
 		size_t index = 0;
 		for (auto& prm : _values)
 		{
-			m_inBuffer[index] = prm;
+			if ((m_inParams[index].GetType() == prm.GetType())) {}
+			m_inParams[index] = prm;
 			index++;
 		}
 	}
@@ -46,8 +47,10 @@ namespace WRPC
 
 	// --------------------------------------------------------------
 
-	Result MethodInvocation::Execute(Connection& _connection)
+	Result MethodInvocation::Execute(Connection& _connection, const std::vector<Parameter>& _values)
 	{
+		_SetParameters(_values);
+
 		Result result;
 
 		if (_connection.GetStatus() != ConnectionStatus::Connected)
@@ -67,14 +70,14 @@ namespace WRPC
 		auto methodName = fbb.CreateString(m_methodName);
 
 		std::vector<int8_t> params;
-		for (auto prm : m_inBuffer)
+		for (auto prm : m_inParams)
 		{
 			params.push_back((int8_t)prm.GetType());
 		}
 		auto prms = fbb.CreateVector(params);
 
 		std::vector<int8_t> results;
-		for (auto rslt : m_outBuffer)
+		for (auto rslt : m_outParams)
 		{
 			results.push_back((int8_t)rslt.GetType());
 		}
@@ -96,7 +99,7 @@ namespace WRPC
 
 		// Encode Parameters ------------------------
 
-		for (auto& prm : m_inBuffer)
+		for (auto& prm : m_inParams)
 		{
 			prm.EncodeIn(buffer, REQUEST_BUFFER_SIZE, currentPosition);
 		}
@@ -130,14 +133,14 @@ namespace WRPC
 		result.m_error.m_applicativeError = reply[1];
 
 		currentPosition = 2;
-		for (auto& prm : m_outBuffer)
+		for (auto& prm : m_outParams)
 		{
 			prm.DecodeFrom(reply, REPLY_BUFFER_SIZE, currentPosition);
 		}
 
 		// Copy Result ------------------------------
 
-		result.m_paramsBuffer = m_outBuffer;
+		result.m_paramsBuffer = m_outParams;
 
 		return result;
 	}

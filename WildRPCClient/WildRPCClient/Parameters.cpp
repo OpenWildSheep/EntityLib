@@ -55,17 +55,17 @@ namespace WRPC
 		m_value = Vector3(_x, _y, _z);
 	}
 
-	Parameter::Parameter(float _x, float _y, float _z, float _w, bool _isColor)
+	Parameter::Parameter(float _x, float _y, float _z, float _w, bool _isQuat)
 	{
-		if (_isColor)
-		{
-			Init(WildRPC::Type_Color);
-			m_value = Color(_x, _y, _z, _w);
-		}
-		else
+		if (_isQuat)
 		{
 			Init(WildRPC::Type_Quat);
 			m_value = Quat(_x, _y, _z, _w);
+		}
+		else
+		{
+			Init(WildRPC::Type_Color);
+			m_value = Color(_x, _y, _z, _w);
 		}
 	}
 
@@ -83,7 +83,7 @@ namespace WRPC
 
 	// GETTERS --------------------------------------
 
-	bool Parameter::GetValue(bool& _bool)
+	bool Parameter::GetValue(bool& _bool) const
 	{
 		if (GetType() != WildRPC::Type_Boolean)
 		{
@@ -93,7 +93,7 @@ namespace WRPC
 		return true;
 	}
 
-	bool Parameter::GetValue(int& _int)
+	bool Parameter::GetValue(int& _int) const
 	{
 		if (GetType() != WildRPC::Type_Integer)
 		{
@@ -103,7 +103,7 @@ namespace WRPC
 		return true;
 	}
 
-	bool Parameter::GetValue(float& _float)
+	bool Parameter::GetValue(float& _float) const
 	{
 		if (GetType() != WildRPC::Type_Float)
 		{
@@ -113,52 +113,52 @@ namespace WRPC
 		return true;
 	}
 
-	bool Parameter::GetValue(float& _x, float& _y)
+	bool Parameter::GetValue(float& _x, float& _y) const
 	{
 		if (GetType() != WildRPC::Type_Vector2)
 		{
 			return false;
 		}
 
-		Vector2& pos = m_value.get<Vector2>();
+		const Vector2& pos = m_value.get<Vector2>();
 		_x = pos.x;
 		_y = pos.y;
 		return true;
 	}
 
-	bool Parameter::GetValue(uint32_t& _x, uint32_t& _y, uint32_t& _z)
+	bool Parameter::GetValue(uint32_t& _x, uint32_t& _y, uint32_t& _z) const
 	{
 		if (GetType() != WildRPC::Type_UInt3)
 		{
 			return false;
 		}
 
-		Vector3i& pos = m_value.get<Vector3i>();
+		const Vector3i& pos = m_value.get<Vector3i>();
 		_x = pos.x;
 		_y = pos.y;
 		_z = pos.z;
 		return true;
 	}
 
-	bool Parameter::GetValue(float& _x, float& _y, float& _z)
+	bool Parameter::GetValue(float& _x, float& _y, float& _z) const
 	{
 		if (GetType() != WildRPC::Type_Vector3)
 		{
 			return false;
 		}
 
-		Vector3& pos = m_value.get<Vector3>();
+		const Vector3& pos = m_value.get<Vector3>();
 		_x = pos.x;
 		_y = pos.y;
 		_z = pos.z;
 		return true;
 	}
 
-	bool Parameter::GetValue(float& _x, float& _y, float& _z, float& _w)
+	bool Parameter::GetValue(float& _x, float& _y, float& _z, float& _w) const
 	{
 		if (GetType() == WildRPC::Type_Quat)
 		{
-			Quat& pos = m_value.get<Quat>();
+			const Quat& pos = m_value.get<Quat>();
 			_x = pos.x;
 			_y = pos.y;
 			_z = pos.z;
@@ -167,7 +167,7 @@ namespace WRPC
 
 		if (GetType() == WildRPC::Type_Color)
 		{
-			Color& pos = m_value.get<Color>();
+			const Color& pos = m_value.get<Color>();
 			_x = pos.r;
 			_y = pos.g;
 			_z = pos.b;
@@ -177,14 +177,14 @@ namespace WRPC
 		return false;
 	}
 
-	bool Parameter::GetValue(uint16_t& _wx, uint16_t& _wy, float& _x, float& _y, float& _z)
+	bool Parameter::GetValue(uint16_t& _wx, uint16_t& _wy, float& _x, float& _y, float& _z) const
 	{
 		if (GetType() != WildRPC::Type_Position)
 		{
 			return false;
 		}
 
-		Position& pos = m_value.get<Position>();
+		const Position& pos = m_value.get<Position>();
 		_wx = (uint16_t)pos.wx;
 		_wy = (uint16_t)pos.wy;
 		_x = pos.x;
@@ -193,7 +193,7 @@ namespace WRPC
 		return true;
 	}
 
-	bool Parameter::GetValue(const char*& _char)
+	bool Parameter::GetValue(const char*& _char) const
 	{
 		if (GetType() != WildRPC::Type_String)
 		{
@@ -228,20 +228,20 @@ namespace WRPC
 
 	struct VisitPrint
 	{
-		void operator()(bool& _value) { printf(_value ? "true" : "false"); }
-		void operator()(int& _value) { printf("(int) %d", _value); }
-		void operator()(float& _value) { printf("(float) %.2f", _value); }
-		void operator()(Vector2& _value) { printf("(Vector2) (%f, %f)", _value.x, _value.y); }
-		void operator()(Vector3i& _value) { printf("(Vector3i) (%d, %d, %d)", _value.x, _value.y, _value.z); }
-		void operator()(Vector3& _value) { printf("(Vector3) (%f, %f, %f)", _value.x, _value.y, _value.z); }
-		void operator()(Quat& _value) { printf("(Quat) (%f, %f, %f, %f)", _value.x, _value.y, _value.z, _value.w); }
-		void operator()(Color& _value) { printf("(Color) (%f, %f, %f, %f)", _value.r, _value.g, _value.b, _value.a); }
-		void operator()(Position& _value) { printf("(Position) [%d, %d] (%f, %f, %f)", _value.wx, _value.wy, _value.x, _value.y, _value.z); }
-		void operator()(std::string& _value) { printf("(string) <%s>", _value.c_str()); }
+		void operator()(const bool& _value) { printf(_value ? "true" : "false"); }
+		void operator()(const int& _value) { printf("(int) %d", _value); }
+		void operator()(const float& _value) { printf("(float) %.2f", _value); }
+		void operator()(const Vector2& _value) { printf("(Vector2) (%f, %f)", _value.x, _value.y); }
+		void operator()(const Vector3i& _value) { printf("(Vector3i) (%d, %d, %d)", _value.x, _value.y, _value.z); }
+		void operator()(const Vector3& _value) { printf("(Vector3) (%f, %f, %f)", _value.x, _value.y, _value.z); }
+		void operator()(const Quat& _value) { printf("(Quat) (%f, %f, %f, %f)", _value.x, _value.y, _value.z, _value.w); }
+		void operator()(const Color& _value) { printf("(Color) (%f, %f, %f, %f)", _value.r, _value.g, _value.b, _value.a); }
+		void operator()(const Position& _value) { printf("(Position) [%d, %d] (%f, %f, %f)", _value.wx, _value.wy, _value.x, _value.y, _value.z); }
+		void operator()(const std::string& _value) { printf("(string) <%s>", _value.c_str()); }
 	};
 
 
-	void Parameter::Print()
+	void Parameter::Print() const
 	{
 		mapbox::util::apply_visitor(VisitPrint(), m_value);
 	}
@@ -252,19 +252,19 @@ namespace WRPC
 	{
 		WildRPC::Type m_type = WildRPC::Type_Integer;
 
-		void operator()(bool& ) { m_type = WildRPC::Type_Boolean; }
-		void operator()(int& ) { m_type = WildRPC::Type_Integer; }
-		void operator()(float& ) { m_type = WildRPC::Type_Float; }
-		void operator()(Vector2& ) { m_type = WildRPC::Type_Vector2; }
-		void operator()(Vector3i& ) { m_type = WildRPC::Type_UInt3; }
-		void operator()(Vector3& ) { m_type = WildRPC::Type_Vector3; }
-		void operator()(Quat& ) { m_type = WildRPC::Type_Quat; }
-		void operator()(Color& ) { m_type = WildRPC::Type_Color; }
-		void operator()(Position& ) { m_type = WildRPC::Type_Position; }
-		void operator()(std::string& ) { m_type = WildRPC::Type_String; }
+		void operator()(const bool& ) { m_type = WildRPC::Type_Boolean; }
+		void operator()(const int& ) { m_type = WildRPC::Type_Integer; }
+		void operator()(const float& ) { m_type = WildRPC::Type_Float; }
+		void operator()(const Vector2& ) { m_type = WildRPC::Type_Vector2; }
+		void operator()(const Vector3i& ) { m_type = WildRPC::Type_UInt3; }
+		void operator()(const Vector3& ) { m_type = WildRPC::Type_Vector3; }
+		void operator()(const Quat& ) { m_type = WildRPC::Type_Quat; }
+		void operator()(const Color& ) { m_type = WildRPC::Type_Color; }
+		void operator()(const Position& ) { m_type = WildRPC::Type_Position; }
+		void operator()(const std::string& ) { m_type = WildRPC::Type_String; }
 	};
 
-	WildRPC::Type Parameter::GetType()
+	WildRPC::Type Parameter::GetType() const
 	{
 		VisitType visitType;
 		mapbox::util::apply_visitor(visitType, m_value);
@@ -280,60 +280,60 @@ namespace WRPC
 
 		VisitEncode(flatbuffers::FlatBufferBuilder& _builder) : m_builder(_builder) {}
 
-		void operator()(bool& _value) {
+		void operator()(const bool& _value) {
 			auto result = WildRPC::CreateBoolean(m_builder, _value);
 			m_builder.FinishSizePrefixed(result);
 		}
 
-		void operator()(int& _value) {
+		void operator()(const int& _value) {
 			auto result = WildRPC::CreateInteger(m_builder, _value);
 			m_builder.FinishSizePrefixed(result);
 		}
 
-		void operator()(float& _value) {
+		void operator()(const float& _value) {
 			auto result = WildRPC::CreateFloat(m_builder, _value);
 			m_builder.FinishSizePrefixed(result);
 		}
 
-		void operator()(Vector2& _value) {
+		void operator()(const Vector2& _value) {
 			auto result = WildRPC::CreateVector2(m_builder, _value.x, _value.y);
 			m_builder.FinishSizePrefixed(result);
 		}
 
-		void operator()(Vector3i& _value) {
+		void operator()(const Vector3i& _value) {
 			auto result = WildRPC::CreateUInt3(m_builder, _value.x, _value.y, _value.z);
 			m_builder.FinishSizePrefixed(result);
 		}
 
-		void operator()(Vector3& _value) {
+		void operator()(const Vector3& _value) {
 			auto result = WildRPC::CreateVector3(m_builder, _value.x, _value.y, _value.z);
 			m_builder.FinishSizePrefixed(result);
 		}
 
-		void operator()(Quat& _value) {
+		void operator()(const Quat& _value) {
 			auto result = WildRPC::CreateQuat(m_builder, _value.x, _value.y, _value.z, _value.w);
 			m_builder.FinishSizePrefixed(result);
 		}
 
-		void operator()(Color& _value) {
+		void operator()(const Color& _value) {
 			auto result = WildRPC::CreateColor(m_builder, _value.r, _value.g, _value.b, _value.a);
 			m_builder.FinishSizePrefixed(result);
 		}
 
-		void operator()(Position& _value) {
+		void operator()(const Position& _value) {
 			auto localPos = WildRPC::CreateVector3(m_builder, _value.x, _value.y, _value.z);
 			auto result = WildRPC::CreatePosition(m_builder, _value.wx, _value.wy, localPos);
 			m_builder.FinishSizePrefixed(result);
 		}
 
-		void operator()(std::string& _value) {
+		void operator()(const std::string& _value) {
 			auto fbstring = m_builder.CreateString(_value);
 			auto result = WildRPC::CreateString(m_builder, fbstring);
 			m_builder.FinishSizePrefixed(result);
 		}
 	};
 
-	bool Parameter::EncodeIn(uint8_t* _buffer, const size_t _bufferSize, size_t& _offset)
+	bool Parameter::EncodeIn(uint8_t* _buffer, const size_t _bufferSize, size_t& _offset) const
 	{
 		flatbuffers::FlatBufferBuilder builder(1024);
 		mapbox::util::apply_visitor(VisitEncode(builder), m_value);

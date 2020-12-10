@@ -127,10 +127,12 @@
                         "className": "CineEventTestCurrentGameState"
                     },
                     {
-                        "classData": {
-                            "FactName": "Titi"
-                        },
-                        "className": "CineEventTestBlackboardHasFact"
+                        "classData": {},
+                        "className": "CineEventTestCurrentGameState"
+                    },
+                    {
+                        "classData": {},
+                        "className": "CineEvent"
                     }
                 ]
             },
@@ -263,6 +265,7 @@
             "Version": 1
         }
     ],
+    "MaxActivationLevel": "InWorld",
     "Name": "PlayerSpawner_",
     "Thumbnail": "TestThumbnail"
 }

@@ -371,7 +371,7 @@ namespace WRPC
 
 	// -------------------------
 
-	bool Result::RetrieveValues(std::vector<ResultValue> _holders)
+	bool Result::RetrieveValues(const std::vector<ResultValue>& _holders)
 	{
 		size_t idx = 0;
 		for (auto& prm : m_paramsBuffer)

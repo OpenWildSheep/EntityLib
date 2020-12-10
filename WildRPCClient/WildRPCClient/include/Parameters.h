@@ -329,7 +329,7 @@ namespace WRPC
 		}
 
 		Parameter&	GetParameter(size_t idx) { return m_paramsBuffer[idx]; }
-		bool		RetrieveValues(std::vector<ResultValue> _holders);
+		bool		RetrieveValues(const std::vector<ResultValue>& _holders);
 
 		const char* GetErrorString() { return RPC_PROTOCOL_ERROR_STRINGS[(int)m_error.m_protocolError]; }
 

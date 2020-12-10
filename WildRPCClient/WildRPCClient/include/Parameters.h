@@ -75,25 +75,60 @@ namespace WRPC
 	public:
 
 		template <WildRPC::Type t>
-		static Parameter Build(bool _bool) { assert(t == WildRPC::Type_Boolean);  Parameter param; param.m_value = _bool; return param; }
+		static Parameter Build(bool _bool)
+		{
+			assert(t == WildRPC::Type_Boolean);
+			Parameter param; param.m_value = _bool;
+			return param;
+		}
 
 		template <WildRPC::Type t>
-		static Parameter Build(int _int) { assert(t == WildRPC::Type_Integer);  Parameter param; param.m_value = _int; return param; }
+		static Parameter Build(int _int)
+		{
+			assert(t == WildRPC::Type_Integer); 
+			Parameter param; param.m_value = _int;
+			return param;
+		}
 
 		template <WildRPC::Type t>
-		static Parameter Build(float _float) { assert(t == WildRPC::Type_Float);  Parameter param; param.m_value = _float; return param; }
+		static Parameter Build(float _float)
+		{
+			assert(t == WildRPC::Type_Float); 
+			Parameter param; param.m_value = _float;
+			return param;
+		}
 
 		template <WildRPC::Type t>
-		static Parameter Build(float _x, float _y) { assert(t == WildRPC::Type_Vector2);  Parameter param; param.m_value = Vector2(_x, _y); return param; }
+		static Parameter Build(float _x, float _y)
+		{
+			assert(t == WildRPC::Type_Vector2); 
+			Parameter param; param.m_value = Vector2(_x, _y);
+			return param;
+		}
 
 		template <WildRPC::Type t>
-		static Parameter Build(uint32_t _x, uint32_t _y, uint32_t _z) { assert(t == WildRPC::Type_UInt3);  Parameter param; param.m_value = Vector3i(_x, _y, _z); return param; }
+		static Parameter Build(uint32_t _x, uint32_t _y, uint32_t _z)
+		{
+			assert(t == WildRPC::Type_UInt3);
+			Parameter param; param.m_value = Vector3i(_x, _y, _z);
+			return param;
+		}
 
 		template <WildRPC::Type t>
-		static Parameter Build(float _x, float _y, float _z) { assert(t == WildRPC::Type_Vector3);  Parameter param; param.m_value = Vector3(_x, _y, _z); return param; }
+		static Parameter Build(float _x, float _y, float _z)
+		{
+			assert(t == WildRPC::Type_Vector3);
+			Parameter param; param.m_value = Vector3(_x, _y, _z);
+			return param;
+		}
 
 		template <WildRPC::Type t>
-		static Parameter Build(uint32_t _wx, uint32_t _wy, float _x, float _y, float _z) { assert(t == WildRPC::Type_Position);  Parameter param; param.m_value = Position(_wx, _wy, _x, _y, _z); return param; }
+		static Parameter Build(uint32_t _wx, uint32_t _wy, float _x, float _y, float _z)
+		{
+			assert(t == WildRPC::Type_Position);
+			Parameter param; param.m_value = Position(_wx, _wy, _x, _y, _z);
+			return param;
+		}
 
 		template <WildRPC::Type t>
 		static Parameter Build(float _x, float _y, float _z, float _w)
@@ -202,22 +237,52 @@ namespace WRPC
 	struct WRPC_DLLEXPORT ResultValue
 	{
 		template <WildRPC::Type t>
-		static ResultValue Build(bool& _bool) { assert(t == WildRPC::Type_Boolean);  ResultValue result; result.m_value = &_bool; return result; }
+		static ResultValue Build(bool& _bool)
+		{
+			assert(t == WildRPC::Type_Boolean);  
+			ResultValue result; result.m_value = &_bool;
+			return result;
+		}
 
 		template <WildRPC::Type t>
-		static ResultValue Build(int32_t& _int) { assert(t == WildRPC::Type_Integer);  ResultValue result; result.m_value = &_int; return result; }
+		static ResultValue Build(int32_t& _int)
+		{
+			assert(t == WildRPC::Type_Integer);
+			ResultValue result; result.m_value = &_int;
+			return result;
+		}
 
 		template <WildRPC::Type t>
-		static ResultValue Build(float& _float) { assert(t == WildRPC::Type_Float);  ResultValue result; result.m_value = &_float; return result; }
+		static ResultValue Build(float& _float)
+		{
+			assert(t == WildRPC::Type_Float); 
+			ResultValue result; result.m_value = &_float;
+			return result;
+		}
 
 		template <WildRPC::Type t>
-		static ResultValue Build(float& _x, float& _y) { assert(t == WildRPC::Type_Vector2);  ResultValue result; result.m_value = Vector2H(_x, _y); return result; }
+		static ResultValue Build(float& _x, float& _y)
+		{
+			assert(t == WildRPC::Type_Vector2); 
+			ResultValue result; result.m_value = Vector2H(_x, _y);
+			return result;
+		}
 
 		template <WildRPC::Type t>
-		static ResultValue Build(uint32_t& _x, uint32_t& _y, uint32_t& _z) { assert(t == WildRPC::Type_UInt3);  ResultValue result; result.m_value = Vector3iH(_x, _y, _z); return result; }
+		static ResultValue Build(uint32_t& _x, uint32_t& _y, uint32_t& _z)
+		{
+			assert(t == WildRPC::Type_UInt3);
+			ResultValue result; result.m_value = Vector3iH(_x, _y, _z);
+			return result;
+		}
 
 		template <WildRPC::Type t>
-		static ResultValue Build(float& _x, float& _y, float& _z) { assert(t == WildRPC::Type_Vector3);  ResultValue result; result.m_value = Vector3H(_x, _y, _z); return result; }
+		static ResultValue Build(float& _x, float& _y, float& _z)
+		{
+			assert(t == WildRPC::Type_Vector3);
+			ResultValue result; result.m_value = Vector3H(_x, _y, _z);
+			return result;
+		}
 
 		template <WildRPC::Type t>
 		static ResultValue Build(float& _x, float& _y, float& _z, float& _w)
@@ -242,10 +307,19 @@ namespace WRPC
 		}
 
 		template <WildRPC::Type t>
-		static ResultValue Build(uint32_t& _wx, uint32_t& _wy, float& _x, float& _y, float& _z) { assert(t == WildRPC::Type_Position);  ResultValue result; result.m_value = PositionH(_wx, _wy, _x, _y, _z); return result; }
+		static ResultValue Build(uint32_t& _wx, uint32_t& _wy, float& _x, float& _y, float& _z)
+		{
+			assert(t == WildRPC::Type_Position);
+			ResultValue result; result.m_value = PositionH(_wx, _wy, _x, _y, _z);
+			return result;
+		}
 
 		template <WildRPC::Type t>
-		static ResultValue Build(std::string& _strg) { assert(t == WildRPC::Type_String);  ResultValue result; result.m_value = &_strg; return result; }
+		static ResultValue Build(std::string& _strg) {
+			assert(t == WildRPC::Type_String); 
+			ResultValue result; result.m_value = &_strg;
+			return result;
+		}
 
 		ResultHolder m_value;
 	};

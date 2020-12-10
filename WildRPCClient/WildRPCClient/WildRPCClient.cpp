@@ -22,9 +22,6 @@
 
 namespace WRPC
 {
-	typedef Parameter v;
-	typedef ResultValue r;
-
     RPCClient::RPCClient()
     {
     }
@@ -46,13 +43,11 @@ namespace WRPC
 		MethodInvocation setCamera("CameraManager", "DATA_SetCamera",
 								   ThreadSafety::Safe,
 								   { WildRPC::Type_Position, WildRPC::Type_Quat, WildRPC::Type_Float }, {});
-
-		setCamera.Execute(connection, {v(32768u, 32768u, 1.0f, 2.0f, 3.0f), v(0.0f, 0.0f, 0.0f, 1.0f), v(40.0f)});
+		setCamera.Execute(connection, { Parameter::Build<WildRPC::Type_Position>(32768, 32768, 1.0f, 2.0f, 3.0f), Parameter::Build<WildRPC::Type_Quat>(0.0f, 0.0f, 0.0f, 1.0f), Parameter::Build<WildRPC::Type_Float>(40.0f)});
 
 		MethodInvocation getCamera("CameraManager", "DATA_GetCamera",
 								   ThreadSafety::Safe,
 								   {},  { WildRPC::Type_Position, WildRPC::Type_Quat, WildRPC::Type_Float });
-
 		Result anotherResult = getCamera.Execute(connection, {});
 
 		connection.Close();
@@ -63,7 +58,7 @@ namespace WRPC
 			float x, y, z;
 			float qx, qy, qz, qw;
 			float foV;
-			anotherResult.RetrieveValues({ r(wx, wy, x, y, z), r(qx, qy, qz, qw), r(foV) });
+			anotherResult.RetrieveValues({ ResultValue::Build<WildRPC::Type_Position>(wx, wy, x, y, z), ResultValue::Build<WildRPC::Type_Quat>(qx, qy, qz, qw), ResultValue::Build<WildRPC::Type_Float>(foV) });
 
 			printf("_position: [%d,%d] (%.2f, %.2f, %.2f)\n", wx, wy, x, y, z);
 			printf("_quat: (%.2f, %.2f, %.2f, %.2f)\n", qx, qy, qz, qw);

@@ -17,70 +17,6 @@
 
 namespace WRPC
 {
-	// CONSTRUCTORS ------------------------------------------------------------------------
-
-	Parameter::Parameter(bool _bool)
-	{
-		Init(WildRPC::Type_Boolean);
-		m_value = _bool;
-	}
-
-	Parameter::Parameter(int _int)
-	{
-		Init(WildRPC::Type_Integer);
-		m_value = _int;
-	}
-
-	Parameter::Parameter(float _float)
-	{
-		Init(WildRPC::Type_Float);
-		m_value = _float;
-	}
-
-	Parameter::Parameter(float _x, float _y)
-	{
-		Init(WildRPC::Type_Vector2);
-		m_value = Vector2(_x, _y);
-	}
-
-	Parameter::Parameter(uint32_t _x, uint32_t _y, uint32_t _z)
-	{
-		Init(WildRPC::Type_UInt3);
-		m_value = Vector3i(_x, _y, _z);
-	}
-
-	Parameter::Parameter(float _x, float _y, float _z)
-	{
-		Init(WildRPC::Type_Vector3);
-		m_value = Vector3(_x, _y, _z);
-	}
-
-	Parameter::Parameter(float _x, float _y, float _z, float _w, bool _isQuat)
-	{
-		if (_isQuat)
-		{
-			Init(WildRPC::Type_Quat);
-			m_value = Quat(_x, _y, _z, _w);
-		}
-		else
-		{
-			Init(WildRPC::Type_Color);
-			m_value = Color(_x, _y, _z, _w);
-		}
-	}
-
-	Parameter::Parameter(uint16_t _wx, uint16_t _wy, float _x, float _y, float _z)
-	{
-		Init(WildRPC::Type_Position);
-		m_value = Position(_wx, _wy, _x, _y, _z);
-	}
-
-	Parameter::Parameter(const char* _char)
-	{
-		Init(WildRPC::Type_String);
-		m_value = std::string(_char);
-	}
-
 	// GETTERS --------------------------------------
 
 	bool Parameter::GetValue(bool& _bool) const
@@ -434,58 +370,6 @@ namespace WRPC
 
 
 	// -------------------------
-
-	ResultValue::ResultValue(uint32_t& _wx, uint32_t& _wy, float& _x, float& _y, float& _z)
-	{
-		m_value = PositionH(_wx, _wy, _x, _y, _z);
-	}
-
-	ResultValue::ResultValue(float& _qx, float& _qy, float& _qz, float& _qw, bool _isColor)
-	{
-		if (_isColor)
-		{
-			m_value = ColorH(_qx, _qy, _qz, _qw);
-		}
-		else
-		{
-			m_value = QuatH(_qx, _qy, _qz, _qw);
-		}
-	}
-
-	ResultValue::ResultValue(float& _float)
-	{
-		m_value = &_float;
-	}
-
-	ResultValue::ResultValue(bool& _bool)
-	{
-		m_value = &_bool;
-	}
-
-	ResultValue::ResultValue(int32_t& _int)
-	{
-		m_value = &_int;
-	}
-
-	ResultValue::ResultValue(float& _x, float& _y)
-	{
-		m_value = Vector2H(_x, _y);
-	}
-
-	ResultValue::ResultValue(uint32_t& _x, uint32_t& _y, uint32_t& _z)
-	{
-		m_value = Vector3iH(_x, _y, _z);
-	}
-
-	ResultValue::ResultValue(float& _x, float& _y, float& _z)
-	{
-		m_value = Vector3H(_x, _y, _z);
-	}
-
-	ResultValue::ResultValue(std::string& _strg)
-	{
-		m_value = &_strg;
-	}
 
 	bool Result::RetrieveValues(std::vector<ResultValue> _holders)
 	{

@@ -64,44 +64,44 @@ namespace WRPC
 
 		// --------------------------------------
 
-		flatbuffers::FlatBufferBuilder fbb;
+		flatbuffers::FlatBufferBuilder fbbuilder;
 
-		auto managerName = fbb.CreateString(m_managerName);
-		auto methodName = fbb.CreateString(m_methodName);
+		auto managerName = fbbuilder.CreateString(m_managerName);
+		auto methodName = fbbuilder.CreateString(m_methodName);
 
 		std::vector<int8_t> params;
 		for (auto prm : m_inParams)
 		{
 			params.push_back((int8_t)prm.GetType());
 		}
-		auto prms = fbb.CreateVector(params);
+		auto prms = fbbuilder.CreateVector(params);
 
 		std::vector<int8_t> results;
 		for (auto rslt : m_outParams)
 		{
 			results.push_back((int8_t)rslt.GetType());
 		}
-		auto rslts = fbb.CreateVector(results);
+		auto rslts = fbbuilder.CreateVector(results);
 
-		WildRPC::RPCHeaderBuilder rpcHeader(fbb);
+		WildRPC::RPCHeaderBuilder rpcHeader(fbbuilder);
 		rpcHeader.add_managerName(managerName);
 		rpcHeader.add_methodName(methodName);
 		rpcHeader.add_parameterTypes(prms);
 		rpcHeader.add_resultTypes(rslts);
 
-		auto hdr = rpcHeader.Finish();
-		fbb.FinishSizePrefixed(hdr);
+		auto header = rpcHeader.Finish();
+		fbbuilder.FinishSizePrefixed(header);
 
-		auto size = fbb.GetSize();
-		auto ptr = fbb.GetBufferPointer();
-		memcpy(buffer + currentPosition, ptr, size);
+		auto size = fbbuilder.GetSize();
+		auto bufferPointer = fbbuilder.GetBufferPointer();
+		memcpy(buffer + currentPosition, bufferPointer, size);
 		currentPosition += size;
 
 		// Encode Parameters ------------------------
 
-		for (auto& prm : m_inParams)
+		for (auto& param : m_inParams)
 		{
-			prm.EncodeIn(buffer, REQUEST_BUFFER_SIZE, currentPosition);
+			param.EncodeIn(buffer, REQUEST_BUFFER_SIZE, currentPosition);
 		}
 
 		unsigned char reply[REPLY_BUFFER_SIZE];
@@ -133,9 +133,9 @@ namespace WRPC
 		result.m_error.m_applicativeError = reply[1];
 
 		currentPosition = 2;
-		for (auto& prm : m_outParams)
+		for (auto& param : m_outParams)
 		{
-			prm.DecodeFrom(reply, REPLY_BUFFER_SIZE, currentPosition);
+			param.DecodeFrom(reply, REPLY_BUFFER_SIZE, currentPosition);
 		}
 
 		// Copy Result ------------------------------

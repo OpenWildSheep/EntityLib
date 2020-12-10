@@ -1022,7 +1022,7 @@ namespace Ent
     {
         if (entlib->schema.components.count(_type) == 0)
         {
-            fprintf(stderr, "Error : Unknown Component type : %s\n", _type);
+            ENTLIB_LOG_ERROR("Unknown Component type : %s", _type);
             return nullptr;
         }
         if (entlib->componentDependencies.count(_type) != 0) // Could be an editor componant
@@ -1804,11 +1804,8 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
         }
         if (not typeFound)
         {
-            fprintf(
-                stderr,
-                "Can't find type %s in schema %s\n",
-                dataType.c_str(),
-                _nodeSchema.name.c_str());
+            ENTLIB_LOG_ERROR(
+                "Can't find type %s in schema %s", dataType.c_str(), _nodeSchema.name.c_str());
             result = Ent::Node(Ent::Union{}, &_nodeSchema);
         }
     }
@@ -2085,7 +2082,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
 
                 if (_schema.components.count(cmpType) == 0)
                 {
-                    fprintf(stderr, "Error : Unknown Component type : %s\n", cmpType.c_str());
+                    ENTLIB_LOG_ERROR("Unknown Component type : %s", cmpType.c_str());
                 }
                 else
                 {
@@ -2207,7 +2204,7 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
             }
             catch (...)
             {
-                fprintf(stderr, "Error, validating : %ls\n", absPath.c_str());
+                ENTLIB_LOG_ERROR("validating : %ls", absPath.c_str());
                 throw;
             }
         }
@@ -2520,7 +2517,7 @@ void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path con
         }
         catch (...)
         {
-            fprintf(stderr, "Error, saving entity : %ls\n", entityPath.c_str());
+            ENTLIB_LOG_ERROR("saving entity : %ls", entityPath.c_str());
             throw;
         }
     }

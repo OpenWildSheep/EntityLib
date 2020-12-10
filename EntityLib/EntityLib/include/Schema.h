@@ -279,8 +279,7 @@ namespace Ent
             return subSchemaOrRef.get<Subschema>();
         else
         {
-            // TODO : Loïc - Prefer to use ENTLIB_LOGIC_ERROR to capture the __FILE__ and __LINE__
-            logicError("Uninitialized SubschemaRef!", __FILE__, __LINE__);
+            ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
             return subSchemaOrRef.get<Subschema>();
         }
     }
@@ -296,7 +295,7 @@ namespace Ent
             return subSchemaOrRef.get<Subschema>();
         else
         {
-            logicError("Uninitialized SubschemaRef!", __FILE__, __LINE__);
+            ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
             return subSchemaOrRef.get<Subschema>();
         }
     }

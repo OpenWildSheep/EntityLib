@@ -4,6 +4,8 @@
 #include <exception>
 #include <string>
 #include <cstdio>
+#include <memory>
+#include <vector>
 
 #ifdef ENTLIB_STATIC
 #define ENTLIB_DLLEXPORT
@@ -27,7 +29,7 @@ namespace Ent
 
     /// A printf-like function which return a std::string
     template <typename... Args>
-    inline std::string format(char const* message, Args&&... args)
+    std::string format(char const* message, Args&&... args)
     {
         size_t const len = (size_t)snprintf(nullptr, 0, message, std::forward<Args>(args)...);
         std::string buffer(len, ' ');
@@ -35,29 +37,69 @@ namespace Ent
         return buffer;
     }
 
-    /// Call it when a logic error (a bug) happen
-    inline void logicError(char const* _message, char const* _file, long _line)
+    /// print the message into the output and also in the VisualStudio debugger if possible
+    void fprintfImpl(FILE* output, char const* message);
+
+    /// format and print the message into the output and also in the VisualStudio debugger if possible
+    template <typename... Args>
+    void fprintfmt(FILE* output, char const* message, Args&&... args)
     {
-        fprintf(stderr, "%s(%ld): Assert failed : %s\n", _file, _line, _message);
+        fprintfImpl(output, format(message, std::forward<Args>(args)...).c_str());
+    }
+
+    /// format and print the message into stdout and also in the VisualStudio debugger if possible
+    template <typename... Args>
+    void printfmt(char const* message, Args&&... args)
+    {
+        fprintfmt(stdout, message, std::forward<Args>(args)...);
+    }
+
+    /// Call it when a logic error (a bug) happen
+    /// format and print the message into stderr and call terminate
+    template <typename... Args>
+    void logicError(char const* _file, long _line, char const* _message, Args&&... args)
+    {
+        log(_file, _line, stderr, "ERROR : ", _message, std::forward<Args>(args)...);
         terminate();
+    }
+
+    /// format the message, adding _file, _line and _category, and print in the _output
+    template <typename... Args>
+    void
+    log(char const* _file,
+        long _line,
+        FILE* _output,
+        char const* _category,
+        char const* _message,
+        Args&&... args)
+    {
+        char mess[1024]; // format string are usually short
+        sprintf_s(mess, sizeof(mess), "%s%s\n", "%s%s(%ld) : ", _message);
+        fprintfmt(_output, mess, _category, _file, _line, std::forward<Args>(args)...);
     }
 
 } // namespace Ent
 
 #define ENTLIB_LOGIC_ERROR(message, ...)                                                           \
-    (void)((::Ent::logicError(::Ent::format(message, __VA_ARGS__).c_str(), __FILE__, __LINE__), 0))
+    (void)((::Ent::logicError(__FILE__, __LINE__, message, __VA_ARGS__), 0))
+
+#define ENTLIB_LOG(message, ...)                                                                   \
+    (void)((::Ent::log(__FILE__, __LINE__, stdout, "", message, __VA_ARGS__), 0))
+
+#define ENTLIB_LOG_ERROR(message, ...)                                                             \
+    (void)((::Ent::log(__FILE__, __LINE__, stderr, "ERROR : ", message, __VA_ARGS__), 0))
 
 #define ENTLIB_ASSERT(expression)                                                                  \
-    (void)((!!(expression)) || (::Ent::logicError(#expression, __FILE__, __LINE__), 0))
+    (void)((!!(expression)) || (::Ent::logicError(__FILE__, __LINE__, #expression), 0))
 
 #define ENTLIB_ASSERT_MSG(expression, message, ...)                                                \
-    (void)((!!(expression)) || (::Ent::logicError(::Ent::format(message, __VA_ARGS__).c_str(), __FILE__, __LINE__), 0))
+    (void)((!!(expression)) || (::Ent::logicError(__FILE__, __LINE__, message, __VA_ARGS__), 0))
 
 #ifdef _DEBUG
 #define ENTLIB_DBG_ASSERT(expression)                                                              \
-    (void)((!!(expression)) || (::Ent::logicError(#expression, __FILE__, __LINE__), 0))
+    (void)((!!(expression)) || (::Ent::logicError(__FILE__, __LINE__, #expression), 0))
 #define ENTLIB_DBG_ASSERT_MSG(expression, message, ...)                                            \
-    (void)((!!(expression)) || (::Ent::logicError(::Ent::format(message, __VA_ARGS__).c_str(), __FILE__, __LINE__), 0))
+    (void)((!!(expression)) || (::Ent::logicError(__FILE__, __LINE__, message, __VA_ARGS__), 0))
 #else
 #define ENTLIB_DBG_ASSERT(expression) ((void)0)
 #define ENTLIB_DBG_ASSERT_MSG(expression, ...) ((void)0)

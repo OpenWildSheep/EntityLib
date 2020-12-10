@@ -10,29 +10,30 @@
 
 static void printNode(char const* name, Ent::Node const& node, std::string const& tab)
 {
+    using namespace Ent;
     switch (node.getDataType())
     {
-    case Ent::DataType::null: printf("%s%s [null]\n", tab.c_str(), name); break;
+    case Ent::DataType::null: printfmt("%s%s [null]\n", tab.c_str(), name); break;
     case Ent::DataType::string:
-        printf("%s%s [string] : %s\n", tab.c_str(), name, node.getString());
+        printfmt("%s%s [string] : %s\n", tab.c_str(), name, node.getString());
         break;
     case Ent::DataType::number:
-        printf("%s%s [number] : %f\n", tab.c_str(), name, node.getFloat());
+        printfmt("%s%s [number] : %f\n", tab.c_str(), name, node.getFloat());
         break;
     case Ent::DataType::integer:
-        printf("%s%s [integer] : %lld\n", tab.c_str(), name, node.getInt());
+        printfmt("%s%s [integer] : %lld\n", tab.c_str(), name, node.getInt());
         break;
     case Ent::DataType::object:
-        printf("%s%s [object]\n", tab.c_str(), name);
+        printfmt("%s%s [object]\n", tab.c_str(), name);
         for (char const* field : node.getFieldNames())
         {
-            // printf("%s  \"%s\"\n", tab.c_str(), field);
+            // printfmt("%s  \"%s\"\n", tab.c_str(), field);
             Ent::Node const* sub = node.at(field);
             printNode(field, *sub, tab + "    ");
         }
         break;
     case Ent::DataType::array:
-        printf("%s%s [array]\n", tab.c_str(), name);
+        printfmt("%s%s [array]\n", tab.c_str(), name);
         // for (Ent::Node const* item : node.getItems())
         for (size_t i = 0; i < node.size(); ++i)
         {
@@ -42,13 +43,14 @@ static void printNode(char const* name, Ent::Node const& node, std::string const
         }
         break;
     case Ent::DataType::boolean:
-        printf("%s%s [boolean] : %s\n", tab.c_str(), name, node.getBool() ? "true" : "false");
+        printfmt("%s%s [boolean] : %s\n", tab.c_str(), name, node.getBool() ? "true" : "false");
         break;
     case Ent::DataType::entityRef:
-        printf("%s%s [EntityRef] : %s\n", tab.c_str(), name, node.getEntityRef().entityPath.c_str());
+        printfmt(
+            "%s%s [EntityRef] : %s\n", tab.c_str(), name, node.getEntityRef().entityPath.c_str());
         break;
     case Ent::DataType::oneOf:
-        printf("%s%s [Union]\n", tab.c_str(), name);
+        printfmt("%s%s [Union]\n", tab.c_str(), name);
         printNode("Data", *node.getUnionData(), tab + "    ");
         break;
     case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
@@ -62,38 +64,38 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
     {
         return;
     }
-    std::cout << indent << name << " : ";
+    Ent::printfmt("%s%s : ", indent.c_str(), name.c_str());
     switch (subschema.type)
     {
     case Ent::DataType::array:
-        std::cout << "array" << std::endl;
+        Ent::printfmt("array\n");
         if (subschema.minItems != 0)
         {
-            std::cout << indent << "  minItems:" << subschema.minItems << std::endl;
+            Ent::printfmt("%s  minItems:%d\n", indent.c_str(), subschema.minItems);
         }
         if (subschema.maxItems != size_t(-1))
         {
-            std::cout << indent << "  maxItems:" << subschema.maxItems << std::endl;
+            Ent::printfmt("%s  maxItems:%d\n", indent, subschema.maxItems);
         }
         if (subschema.singularItems != nullptr)
         {
             displaySubSchema("items", subschema.singularItems->get(), indent + "  ");
         }
         break;
-    case Ent::DataType::boolean: std::cout << "boolean" << std::endl; break;
-    case Ent::DataType::integer: std::cout << "integer" << std::endl; break;
-    case Ent::DataType::null: std::cout << "null" << std::endl; break;
-    case Ent::DataType::number: std::cout << "number" << std::endl; break;
+    case Ent::DataType::boolean: Ent::printfmt("boolean\n"); break;
+    case Ent::DataType::integer: Ent::printfmt("integer\n"); break;
+    case Ent::DataType::null: Ent::printfmt("null\n"); break;
+    case Ent::DataType::number: Ent::printfmt("number\n"); break;
     case Ent::DataType::object:
-        std::cout << "object" << std::endl;
+        Ent::printfmt("object\n");
         for (auto&& name_sub : subschema.properties)
         {
             displaySubSchema(std::get<0>(name_sub), *std::get<1>(name_sub), indent + "  ");
         }
         break;
-    case Ent::DataType::string: std::cout << "string" << std::endl; break;
-    case Ent::DataType::entityRef: std::cout << "entity ref" << std::endl; break;
-    case Ent::DataType::oneOf: std::cout << "oneOf" << std::endl; break;
+    case Ent::DataType::string: Ent::printfmt("string\n"); break;
+    case Ent::DataType::entityRef: Ent::printfmt("entity ref\n"); break;
+    case Ent::DataType::oneOf: Ent::printfmt("oneOf\n"); break;
     case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
     }
 }
@@ -122,6 +124,7 @@ try
 {
     bool doDisplayScene = false;
     bool doDisplaySubSchema = false;
+    bool dumpNodes = false;
     for (int i = 1; i < argc; ++i)
     {
         if (strcmp(argv[i], "--displaySchema") == 0)
@@ -131,6 +134,10 @@ try
         else if (strcmp(argv[i], "--displayScene") == 0)
         {
             doDisplayScene = true;
+        }
+        else if (strcmp(argv[i], "--dumpNodes") == 0)
+        {
+            dumpNodes = true;
         }
     }
 
@@ -874,16 +881,17 @@ try
 
     if (doDisplayScene)
     {
-        printf("Scene Loaded\n");
-        printf("Entity count : %zu\n", scene->getObjects().size());
+        using namespace Ent;
+        printfmt("Scene Loaded\n");
+        printfmt("Entity count : %zu\n", scene->getObjects().size());
 
         for (EntityPtr const& ent : scene->getObjects())
         {
-            printf("  Name \"%s\"\n", ent->getName());
+            printfmt("  Name \"%s\"\n", ent->getName());
 
             for (char const* type : ent->getComponentTypes())
             {
-                printf("    Type \"%s\"\n", type);
+                printfmt("    Type \"%s\"\n", type);
                 Ent::Node const& root = ent->getComponent(type)->root;
                 printNode("", root, "      ");
             }
@@ -914,31 +922,32 @@ try
     ENTLIB_ASSERT(cinematicCmp != nullptr);
 
     // Test dumpNode
-    std::cout << "dumpNode(Override):\n";
-    std::cout << cinematicCmp->root.toJson(
-        Ent::OverrideValueSource::Override,
-        true).dump(4) << std::endl;
+    if (dumpNodes)
+    {
+        Ent::printfmt("dumpNode(Override):\n");
+        Ent::printfmt(
+            "%s\n",
+            cinematicCmp->root.toJson(Ent::OverrideValueSource::Override, true).dump(4).c_str());
 
-    std::cout << "dumpNode(OverrideOrPrefab):\n";
-    std::cout << cinematicCmp->root.toJson(
-        Ent::OverrideValueSource::OverrideOrPrefab,
-        true).dump(4) << std::endl;
+        Ent::printfmt("dumpNode(OverrideOrPrefab):\n");
+        Ent::printfmt(
+            "%s\n",
+            cinematicCmp->root.toJson(Ent::OverrideValueSource::OverrideOrPrefab, true).dump(4).c_str());
 
-    std::cout << "dumpNode(Any):\n";
-    std::cout << cinematicCmp->root.toJson(
-        Ent::OverrideValueSource::Any,
-        true).dump(4) << std::endl;
-
-    std::cout << "Done" << std::endl;
+        Ent::printfmt("dumpNode(Any):\n");
+        Ent::printfmt(
+            "%s\n", cinematicCmp->root.toJson(Ent::OverrideValueSource::Any, true).dump(4).c_str());
+    }
+    Ent::printfmt("Done\n");
     return EXIT_SUCCESS;
 }
 catch (std::exception& ex)
 {
-    std::cerr << typeid(ex).name() << " : " << ex.what() << std::endl;
+    ENTLIB_LOG_ERROR("%s : %s", typeid(ex).name(), ex.what());
     return EXIT_FAILURE;
 }
 catch (...)
 {
-    std::cerr << "UNKOWN EXCEPTION" << std::endl;
+    ENTLIB_LOG_ERROR("UNKOWN EXCEPTION");
     return EXIT_FAILURE;
 }

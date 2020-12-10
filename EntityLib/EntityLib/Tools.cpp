@@ -4,6 +4,8 @@
 #include <sstream>
 #include <ciso646>
 
+#include "include/EntityLibCore.h"
+
 using namespace nlohmann;
 
 /// @cond PRIVATE
@@ -30,7 +32,7 @@ try
 }
 catch (...)
 {
-    fprintf(stderr, "Error when parsing file %ls\n", path.c_str());
+    ENTLIB_LOG_ERROR("parsing file %ls", path.c_str());
     throw;
 }
 

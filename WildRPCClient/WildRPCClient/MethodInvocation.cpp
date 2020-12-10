@@ -38,7 +38,7 @@ namespace WRPC
 		size_t index = 0;
 		for (auto& prm : _values)
 		{
-			if ((m_inParams[index].GetType() == prm.GetType())) {}
+			assert(m_inParams[index].GetType() == prm.GetType());
 			m_inParams[index] = prm;
 			index++;
 		}

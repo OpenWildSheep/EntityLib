@@ -889,6 +889,26 @@ try
 
     entlib.saveScene(*scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene");
 
+    auto const& addedEntity = scene->getObjects().back();
+    Ent::Component const* cinematicCmp = addedEntity->getComponent("CinematicGD");
+    ENTLIB_ASSERT(cinematicCmp != nullptr);
+
+    // Test dumpNode
+    std::cout << "dumpNode(Override):\n";
+    std::cout << cinematicCmp->root.toJson(
+        Ent::OverrideValueSource::Override,
+        true).dump(4) << std::endl;
+
+    std::cout << "dumpNode(OverrideOrPrefab):\n";
+    std::cout << cinematicCmp->root.toJson(
+        Ent::OverrideValueSource::OverrideOrPrefab,
+        true).dump(4) << std::endl;
+
+    std::cout << "dumpNode(Any):\n";
+    std::cout << cinematicCmp->root.toJson(
+        Ent::OverrideValueSource::Any,
+        true).dump(4) << std::endl;
+
     std::cout << "Done" << std::endl;
     return EXIT_SUCCESS;
 }

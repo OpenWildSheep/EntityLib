@@ -155,6 +155,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
      */
     auto pyDataType = py::enum_<DataType>(ent, "DataType");
     auto pyActivationLevel = py::enum_<ActivationLevel>(ent, "ActivationLevel");
+    auto pyOverrideValueSource = py::enum_<OverrideValueSource>(ent, "OverrideValueSource");
     auto pyPath = py::class_<std::filesystem::path>(ent, "path");
     auto pyEntString = py::class_<Ent::String>(ent, "String");
     auto pySubschema = py::class_<Subschema>(ent, "Subschema");
@@ -178,6 +179,12 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .value("Started", ActivationLevel::Started)
         .value("Loading", ActivationLevel::Loading)
         .value("InWorld", ActivationLevel::InWorld)
+        .export_values();
+
+    pyOverrideValueSource
+        .value("Override", OverrideValueSource::Override)
+        .value("OverrideOrPrefab", OverrideValueSource::OverrideOrPrefab)
+        .value("Any", OverrideValueSource::Any)
         .export_values();
 
     pyPath
@@ -315,7 +322,12 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](Node* node) { return node->getSchema(); },
             py::return_value_policy::reference_internal)
         .def("unset", [](Node* node) { return node->unset(); })
-        .def("is_set", [](Node* node) { return node->isSet(); });
+        .def("is_set", [](Node* node) { return node->isSet(); })
+        .def("dumps", [](Node* node, OverrideValueSource source, bool superKeyIsType)
+             {
+                 return node->toJson(source, superKeyIsType).dump(4);
+             }, 
+             "source"_a = OverrideValueSource::Override, "superKeyIsType"_a = false);
 
     pyComponent
         .def_readonly("type", &Component::type)

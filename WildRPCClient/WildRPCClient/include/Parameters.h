@@ -135,10 +135,7 @@ namespace WRPC
 		{
 			bool isColor = (t == WildRPC::Type_Color);
 			bool isQuat = (t == WildRPC::Type_Quat);
-			if (!isQuat && !isColor)
-			{
-				assert(false);
-			}
+			assert(isQuat || isColor);
 
 			Parameter param;
 			if (isColor)
@@ -289,10 +286,7 @@ namespace WRPC
 		{
 			bool isColor = (t == WildRPC::Type_Color);
 			bool isQuat = (t == WildRPC::Type_Quat);
-			if (!isQuat && !isColor)
-			{
-				assert(false);
-			}
+			assert(isQuat || isColor);
 
 			ResultValue result;
 			if (isColor)

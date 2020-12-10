@@ -55,7 +55,7 @@ namespace WRPC
 
 		if (_connection.GetStatus() != ConnectionStatus::Connected)
 		{
-			result.m_error.m_protocolError = 0xFF;
+			result.m_error.m_protocolError = RPCProtocolError::NoConnectionToHost;
 			return result;
 		}
 
@@ -97,15 +97,25 @@ namespace WRPC
 		memcpy(buffer + currentPosition, bufferPointer, size);
 		currentPosition += size;
 
+		if (currentPosition >= REQUEST_BUFFER_SIZE)
+		{
+			result.m_error.m_protocolError = RPCProtocolError::Exceeded_BufferSize;
+			return result;
+		}
+
 		// Encode Parameters ------------------------
 
 		for (auto& param : m_inParams)
 		{
-			param.EncodeIn(buffer, REQUEST_BUFFER_SIZE, currentPosition);
+			bool ok = param.EncodeIn(buffer, REQUEST_BUFFER_SIZE, currentPosition);
+			if (!ok)
+			{
+				result.m_error.m_protocolError = RPCProtocolError::Exceeded_BufferSize;
+				return result;
+			}
 		}
 
 		unsigned char reply[REPLY_BUFFER_SIZE];
-
 		try
 		{
 			// Send Buffer ------------------------------
@@ -116,26 +126,41 @@ namespace WRPC
 
 			// Receive Reply Buffer -----------------------
 			size_t reply_length = asio::read(*socket, asio::buffer(reply, REPLY_BUFFER_SIZE));
-			assert(REPLY_BUFFER_SIZE == reply_length);
+			
+			if (reply_length != REPLY_BUFFER_SIZE)
+			{
+				result.m_error.m_protocolError = RPCProtocolError::WrongReplyBufferSize;
+				return result;
+			}
 		}
 		catch (std::exception& e)
 		{
 			std::cerr << "Exception: " << e.what() << "\n";
 			_connection.m_status = ConnectionStatus::Errored;
 
-			result.m_error.m_protocolError = 0xFF;
+			result.m_error.m_protocolError = RPCProtocolError::NoConnectionToHost;
 			return result;
 		}
 
 		// Decode Result ------------------------------
 
-		result.m_error.m_protocolError = reply[0];
+		result.m_error.m_protocolError = (RPCProtocolError)reply[0];
 		result.m_error.m_applicativeError = reply[1];
+
+		if ((result.m_error.m_protocolError != RPCProtocolError::No_Error) || (result.m_error.m_applicativeError != 0))
+		{
+			return result;
+		}
 
 		currentPosition = 2;
 		for (auto& param : m_outParams)
 		{
-			param.DecodeFrom(reply, REPLY_BUFFER_SIZE, currentPosition);
+			bool ok = param.DecodeFrom(reply, REPLY_BUFFER_SIZE, currentPosition);
+			if (!ok)
+			{
+				result.m_error.m_protocolError = RPCProtocolError::Exceeded_ReplyBufferSize;
+				return result;
+			}
 		}
 
 		// Copy Result ------------------------------

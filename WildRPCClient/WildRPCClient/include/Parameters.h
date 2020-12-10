@@ -257,11 +257,13 @@ namespace WRPC
 	public:
 		bool HasError() const
 		{
-			return (m_error.m_protocolError != 0) || (m_error.m_applicativeError != 0);
+			return (m_error.m_protocolError != RPCProtocolError::No_Error) || (m_error.m_applicativeError != 0);
 		}
 
 		Parameter&	GetParameter(size_t idx) { return m_paramsBuffer[idx]; }
 		bool		RetrieveValues(std::vector<ResultValue> _holders);
+
+		const char* GetErrorString() { return RPC_PROTOCOL_ERROR_STRINGS[(int)m_error.m_protocolError]; }
 
 	private:
 		std::vector<Parameter>	m_paramsBuffer;

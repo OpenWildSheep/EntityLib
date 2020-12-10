@@ -37,7 +37,7 @@ namespace WRPC
 		if (connection.GetStatus() != ConnectionStatus::Connected)
 		{
 			printf("Connection ERROR!\n");
-			return false;
+			return true;
 		}
 
 		MethodInvocation setCamera("CameraManager", "DATA_SetCamera",
@@ -66,7 +66,7 @@ namespace WRPC
 		}
 		else
 		{
-			printf("Connection ERROR!\n");
+			printf("Connection ERROR: %s!\n", anotherResult.GetErrorString());
 		}
 
 		return true;

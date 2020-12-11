@@ -52,56 +52,7 @@
             "Version": 1
         },
         {
-            "Data": {
-                "cameraData": {
-                    "ridden": {
-                        "aim": {
-                            "AutoRotateYawSpeedSmooth": 1.0,
-                            "DecenteringPositionX": 0.7900000214576721,
-                            "TargetDistance": 6.699999809265137,
-                            "TargetMaxSpeed": 5.0,
-                            "TargetOffsetZ": 0.0,
-                            "WorldZOffset": 3.0
-                        },
-                        "fps": {
-                            "TargetOffsetZ": 0.0,
-                            "WorldZOffset": 3.0
-                        },
-                        "lock": {
-                            "CollisionZOffset": 0.10999999940395355,
-                            "CollisionZOffsetMaxRadius": 1.659999966621399,
-                            "TargetOffsetZ": 0.0,
-                            "WorldZOffset": 3.0
-                        },
-                        "shoulder": {
-                            "AutoRotateYawSpeedSmooth": 1.0,
-                            "DecenteringPositionX": 0.8399999737739563,
-                            "DecenteringPositionZ": 0.0,
-                            "TargetDistance": 6.929999828338623,
-                            "TargetMaxSpeed": 5.0,
-                            "TargetOffsetZ": 0.0,
-                            "WorldZOffset": 3.0
-                        },
-                        "thirdperson": {
-                            "AnticipationMaxYaw": 22.0,
-                            "AutoRotateIdealPitch": -10.0,
-                            "AutoRotatePitchSpeedSmooth": 0.18000000715255737,
-                            "CollisionZOffset": 0.10999999940395355,
-                            "CollisionZOffsetMaxRadius": 1.659999966621399,
-                            "DecenteringPositionZ": 0.5,
-                            "DistanceModifierRamp": 0.20000000298023224,
-                            "FOVRamp": 0.10000000149011612,
-                            "TargetDistance": 7.5,
-                            "TargetMaxSpeed": 16.0,
-                            "TargetOffsetZ": 0.0,
-                            "WorldZOffset": 3.0
-                        },
-                        "zoom": {
-                            "WorldZOffset": 2.200000047683716
-                        }
-                    }
-                }
-            },
+            "Data": {},
             "Type": "CameraDataGD",
             "Version": 1
         },

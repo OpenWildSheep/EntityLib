@@ -138,6 +138,8 @@ void setValue(Ent::Node& node, Value const& val)
 
 using namespace pybind11::literals;
 
+// clang-format off
+
 PYBIND11_MODULE(EntityLibPy, ent)
 {
     ent.doc() = "pybind11 for EntityLib";
@@ -153,6 +155,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
      */
     auto pyDataType = py::enum_<DataType>(ent, "DataType");
     auto pyActivationLevel = py::enum_<ActivationLevel>(ent, "ActivationLevel");
+    auto pyOverrideValueSource = py::enum_<OverrideValueSource>(ent, "OverrideValueSource");
     auto pyPath = py::class_<std::filesystem::path>(ent, "path");
     auto pyEntString = py::class_<Ent::String>(ent, "String");
     auto pySubschema = py::class_<Subschema>(ent, "Subschema");
@@ -178,6 +181,12 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .value("InWorld", ActivationLevel::InWorld)
         .export_values();
 
+    pyOverrideValueSource
+        .value("Override", OverrideValueSource::Override)
+        .value("OverrideOrPrefab", OverrideValueSource::OverrideOrPrefab)
+        .value("Any", OverrideValueSource::Any)
+        .export_values();
+
     pyPath
         .def(py::init<std::string>())
         .def("__str__", [](std::filesystem::path* path) { return path->string(); })
@@ -193,7 +202,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     py::implicitly_convertible<std::string, std::filesystem::path>();
     py::implicitly_convertible<std::string, Ent::String>();
-    
+
     pySubschema
         .def_readonly("type", &Subschema::type)
         .def_readonly("name", &Subschema::name)
@@ -313,7 +322,12 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](Node* node) { return node->getSchema(); },
             py::return_value_policy::reference_internal)
         .def("unset", [](Node* node) { return node->unset(); })
-        .def("is_set", [](Node* node) { return node->isSet(); });
+        .def("is_set", [](Node* node) { return node->isSet(); })
+        .def("dumps", [](Node* node, OverrideValueSource source, bool superKeyIsType)
+             {
+                 return node->toJson(source, superKeyIsType).dump(4);
+             }, 
+             "source"_a = OverrideValueSource::Override, "superKeyIsType"_a = false);
 
     pyComponent
         .def_readonly("type", &Component::type)
@@ -329,7 +343,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property(
             "file",
             [](SubSceneComponent const& sc) -> std::string { return sc.file.get(); },
-            [](SubSceneComponent& sc, std::string f) { return sc.file.set(std::move(f)); })
+            [](SubSceneComponent& sc, std::string const& f) { return sc.file.set(f); })
         .def("make_embedded", &SubSceneComponent::makeEmbedded)
         .def_property_readonly(
             "embedded",
@@ -466,5 +480,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     py::register_exception<Ent::JsonValidation>(ent, "JsonValidation");
 }
+
+// clang-format on
 
 /// @endcond

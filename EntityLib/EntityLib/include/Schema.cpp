@@ -64,7 +64,7 @@ namespace Ent
             throw MissingMetadata(name.c_str());
         }
 
-        UnionMeta const& unionData = meta.get<UnionMeta>();
+        auto const& unionData = meta.get<UnionMeta>();
         return unionData.typeField.c_str();
     }
 
@@ -79,7 +79,7 @@ namespace Ent
             throw MissingMetadata(name.c_str());
         }
 
-        UnionMeta const& unionData = meta.get<UnionMeta>();
+        auto const& unionData = meta.get<UnionMeta>();
         return unionData.dataField.c_str();
     }
 
@@ -96,7 +96,7 @@ namespace Ent
 
         std::map<std::string, Subschema const*> result;
 
-        UnionMeta const& unionData = meta.get<UnionMeta>();
+        auto const& unionData = meta.get<UnionMeta>();
 
         for (SubschemaRef const& ref : *oneOf)
         {

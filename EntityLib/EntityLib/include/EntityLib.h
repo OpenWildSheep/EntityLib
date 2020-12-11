@@ -94,6 +94,17 @@ namespace Ent
         String entityPath;
     };
 
+    /// @brief The possible source of an Override value
+    enum class OverrideValueSource
+    {
+        /// Value is set in this Override
+        Override,
+        /// Value is set in the Prefab or in this Override
+        OverrideOrPrefab,
+        /// Value can be any source: Override, Prefab or the default value
+        Any,
+    };
+
     template <typename V>
     struct Override
     {
@@ -280,6 +291,9 @@ namespace Ent
         /// If there is no override, there is no need to save it.
         bool hasOverride() const;
 
+        /// @brief Check recursively if this node content match the given value source.
+        bool matchValueSource(OverrideValueSource _source) const;
+
         /// \cond PRIVATE
         /// Create a Node with the same value but which doesn't rely on prefab.
         Node detach() const;
@@ -291,6 +305,12 @@ namespace Ent
         bool hasDefaultValue() const; ///< false if something was set in instance or prefab
 
         bool isDefault() const; ///< true if the value was set in a template or in the instance
+
+        /// Dump this Node as a json value
+        nlohmann::json toJson(
+			OverrideValueSource _dumpedValueSource = OverrideValueSource::Override, ///< Dump only fields with given value source
+            bool _superKeyIsTypeName = false, ///< Super sub-node are dumped using their type name for key instead of "Super"
+            std::function<void(EntityRef&)> const& _entityRefPreProc = {}) const;
 
         float getDefaultFloat() const; ///< @pre number or integer. @brief Get the default value as float
         int64_t getDefaultInt() const; ///< @pre integer. @brief Get the default value as int
@@ -467,7 +487,7 @@ namespace Ent
         /// @endcond
 
         char const* getName() const; ///< Get the name of the component
-        void setName(std::string _name); ///< Set the name of the component
+        void setName(Ent::String _name); ///< Set the name of the component
         bool canBeRenamed() const; ///< A SubEntity of an instance which override a SubEntity in a prefab can't be renamed
         char const* getInstanceOf() const; ///< Name of the inherited prefab if there is one, or nullptr.
         /// Get the initial max activation level of the entity at runtime.
@@ -475,7 +495,7 @@ namespace Ent
         /// Set the initial max activation level of the entity at runtime.
         void setMaxActivationLevel(ActivationLevel _level);
         char const* getThumbnail() const; ///< Get the Thumbnail path, or nullptr.
-        void setThumbnail(std::string _thumbPath); ///< Set the Thumbnail path
+        void setThumbnail(Ent::String _thumbPath); ///< Set the Thumbnail path
         std::array<uint8_t, 4> getColor() const; ///< Get the color of the is one, or nullptr.
         void setColor(std::array<uint8_t, 4> _color); ///< Set the color RGBA 8bit
 
@@ -691,7 +711,8 @@ namespace Ent
         std::shared_ptr<Scene const> loadSceneReadOnly(std::filesystem::path const& _scenePath) const;
 
         /// Load the Scene in legacy format at path _scenePath then return a pointer to the cached data
-        std::shared_ptr<Scene const> loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const;
+        std::shared_ptr<Scene const>
+        loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const;
 
         /// Load the Entity at path _entityPath
         std::unique_ptr<Entity> loadEntity(
@@ -708,6 +729,14 @@ namespace Ent
 
         /// Save the Scene at path _scenePath
         void saveScene(Scene const& _scene, std::filesystem::path const& _scenePath) const;
+
+        /// Dump the given Node with the given schema in json format
+        static nlohmann::json dumpNode(
+			Subschema const& _schema, ///< Schema for the Node
+			Node const& _node, ///< the Node to dump
+            OverrideValueSource _dumpedValueSource = OverrideValueSource::Override, ///< Dump only fields with given value source
+            bool _superKeyIsTypeName = false, ///< Super sub-node are dumped using their type name for key instead of "Super"
+            std::function<void(EntityRef&)> const& _entityRefPreProc = {});
 
         /// @brief Create an Entity which instanciate an other.
         ///

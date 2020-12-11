@@ -17,6 +17,10 @@ namespace WRPC
 		Connection(const char* _IPAddress);
 		~Connection();
 
+		// No copy, no assign ----------------------------
+		Connection(Connection const&) = delete;
+		Connection& operator=(Connection const&) = delete;
+
 		ConnectionStatus		Open();
 		void					Close();
 

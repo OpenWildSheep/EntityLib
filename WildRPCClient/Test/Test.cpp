@@ -10,7 +10,7 @@ try
 {
     WRPC::RPCClient client;
 
-    WRPC_ASSERT(client.test());
+	WRPC_ASSERT(client.test());
 
     std::cerr << "Test success" << std::endl;
     return EXIT_SUCCESS;

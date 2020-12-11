@@ -19,9 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Connection.h" />
+    <ClInclude Include="include\MethodInvocation.h" />
+    <ClInclude Include="include\Parameters.h" />
     <ClInclude Include="include\WildRPCClient.h" />
+    <ClInclude Include="include\WildRPCType.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Connection.cpp" />
+    <ClCompile Include="MethodInvocation.cpp" />
+    <ClCompile Include="Parameters.cpp" />
     <ClCompile Include="WildRPCClient.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -109,7 +116,7 @@
       </PrecompiledHeader>
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0601;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);ASIO_STANDALONE</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>

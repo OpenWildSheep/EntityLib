@@ -9,13 +9,9 @@
 #include "../external/asio/include/asio.hpp"
 #pragma warning(pop)
 
-#if defined(WRPC_DYNAMIC_EXPORT)
-#define WRPC_DLLEXPORT __declspec(dllexport)
-#elif defined(WRPC_DYNAMIC_IMPORT)
-#define WRPC_DLLEXPORT __declspec(dllimport)
-#else
-#define WRPC_DLLEXPORT
-#endif
+#include "WildRPCType.h"
+#include "Connection.h"
+#include "MethodInvocation.h"
 
 namespace WRPC
 {
@@ -83,6 +79,9 @@ namespace WRPC
 
     class WRPC_DLLEXPORT RPCClient
     {
+	public:
+		bool test();
+
     public:
         DeleteCheck deleteCheck;
 
@@ -93,10 +92,5 @@ namespace WRPC
         RPCClient& operator=(RPCClient const&) = delete;
         RPCClient(RPCClient&&) = delete;
         RPCClient& operator=(RPCClient&&) = delete;
-
-        bool test(); // TODO : Remove this
-
-    private:
-        asio::io_context io_context;
     };
 } // namespace WRPC

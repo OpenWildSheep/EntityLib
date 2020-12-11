@@ -61,7 +61,8 @@ RPCProtocolErrors = [
 	"Manager Method could not be Found",
 	"Manager Method is not Valid",
 	"Received Types do not match with Manager Method's types",
-	"Send Buffer was too small for Result"
+	"Send Buffer was too small for Result",
+	"Using Wrong Port for Method"
 	]
 
 # -----------------------------------------------

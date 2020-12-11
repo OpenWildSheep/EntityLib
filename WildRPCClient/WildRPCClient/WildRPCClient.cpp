@@ -1,7 +1,24 @@
 #include "include/WildRPCClient.h"
+#include "include/WildRPCType.h"
 
 #include <iostream>
 #include <array>
+
+#pragma warning(push, 0)
+#include <flatbuffers/flatbuffers.h>
+#include <WiLDRPC/Color_generated.h>
+#include <WiLDRPC/Quat_generated.h>
+#include <WiLDRPC/Position_generated.h>
+#include <WiLDRPC/Vector3_generated.h>
+#include <WiLDRPC/Vector2_generated.h>
+#include <WiLDRPC/Uint3_generated.h>
+#include <WiLDRPC/Float_generated.h>
+#include <WiLDRPC/Integer_generated.h>
+#include <WiLDRPC/Boolean_generated.h>
+#include <WiLDRPC/RPCHeader_generated.h>
+#pragma warning(pop)
+
+#include "include/MethodInvocation.h"
 
 namespace WRPC
 {
@@ -12,63 +29,47 @@ namespace WRPC
     {
     }
 
-    bool RPCClient::test()
-    {
-        asio::ip::tcp::iostream s;
+	bool RPCClient::test()
+	{
+		Connection connection("127.0.0.1");
+		connection.Open();
 
-        // The entire sequence of I/O operations must complete within 60 seconds.
-        // If an expiry occurs, the socket is automatically closed and the stream
-        // becomes bad.
-        s.expires_after(std::chrono::seconds(60));
+		if (connection.GetStatus() != ConnectionStatus::Connected)
+		{
+			printf("Connection ERROR!\n");
+			return true;
+		}
 
-        // Establish a connection to the server.
-        char const* server = "wildsheepstudio.com";
-        s.connect(server, "http");
-        if (!s)
-        {
-            std::cout << "Unable to connect: " << s.error().message() << "\n";
-            return false;
-        }
+		MethodInvocation setCamera("CameraManager", "DATA_SetCamera",
+								   ThreadSafety::Safe,
+								   { WildRPC::Type_Position, WildRPC::Type_Quat, WildRPC::Type_Float }, {});
+		setCamera.Execute(connection, { Parameter::Build<WildRPC::Type_Position>(32768, 32768, 1.0f, 2.0f, 3.0f), Parameter::Build<WildRPC::Type_Quat>(0.0f, 0.0f, 0.0f, 1.0f), Parameter::Build<WildRPC::Type_Float>(40.0f)});
 
-        char const* arg2 = "/";
-        // Send the request. We specify the "Connection: close" header so that the
-        // server will close the socket after transmitting the response. This will
-        // allow us to treat all data up until the EOF as the content.
-        s << "GET " << arg2 << " HTTP/1.0\r\n";
-        s << "Host: " << server << "\r\n";
-        s << "Accept: */*\r\n";
-        s << "Connection: close\r\n\r\n";
+		MethodInvocation getCamera("CameraManager", "DATA_GetCamera",
+								   ThreadSafety::Safe,
+								   {},  { WildRPC::Type_Position, WildRPC::Type_Quat, WildRPC::Type_Float });
+		Result anotherResult = getCamera.Execute(connection, {});
 
-        // By default, the stream is tied with itself. This means that the stream
-        // automatically flush the buffered output before attempting a read. It is
-        // not necessary not explicitly flush the stream at this point.
+		connection.Close();
 
-        // Check that response is OK.
-        std::string http_version;
-        s >> http_version;
-        unsigned int status_code;
-        s >> status_code;
-        std::string status_message;
-        std::getline(s, status_message);
-        if (!s || http_version.substr(0, 5) != "HTTP/")
-        {
-            std::cout << "Invalid response\n";
-            return false;
-        }
-        if (status_code != 200)
-        {
-            std::cout << "Response returned with status code " << status_code << "\n";
-            return false;
-        }
+		if (!anotherResult.HasError())
+		{
+			uint32_t wx, wy;
+			float x, y, z;
+			float qx, qy, qz, qw;
+			float foV;
+			anotherResult.RetrieveValues({ ResultValue::Build<WildRPC::Type_Position>(wx, wy, x, y, z), ResultValue::Build<WildRPC::Type_Quat>(qx, qy, qz, qw), ResultValue::Build<WildRPC::Type_Float>(foV) });
 
-        // Process the response headers, which are terminated by a blank line.
-        std::string header;
-        while (std::getline(s, header) && header != "\r")
-            std::cout << header << "\n";
-        std::cout << "\n";
+			printf("_position: [%d,%d] (%.2f, %.2f, %.2f)\n", wx, wy, x, y, z);
+			printf("_quat: (%.2f, %.2f, %.2f, %.2f)\n", qx, qy, qz, qw);
+			printf("_foV: (%.2f)\n", foV);
+		}
+		else
+		{
+			printf("Connection ERROR: %s!\n", anotherResult.GetErrorString());
+		}
 
-        // Write the remaining data to output.
-        std::cout << s.rdbuf();
-        return true;
-    }
+		return true;
+	}
+
 } // namespace WRPC

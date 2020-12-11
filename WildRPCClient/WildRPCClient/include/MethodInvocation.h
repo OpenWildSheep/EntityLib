@@ -24,7 +24,7 @@ namespace WRPC
 		Result Execute(Connection& _connection, const std::vector<Parameter>& _values);
 
 	private:
-		void _SetParameters(const std::vector<Parameter>& _values);
+		bool _SetParameters(const std::vector<Parameter>& _values);
 
 	private:
 		const char*				m_managerName;

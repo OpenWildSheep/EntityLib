@@ -27,21 +27,28 @@ namespace WRPC
 		}
 	}
 
-	void MethodInvocation::_SetParameters(const std::vector<Parameter>& _values)
+	bool MethodInvocation::_SetParameters(const std::vector<Parameter>& _values)
 	{
 		if (_values.size() != m_inParams.size())
 		{
 			assert(false);
-			return;
+			return false;
 		}
 
 		size_t index = 0;
 		for (auto& prm : _values)
 		{
-			assert(m_inParams[index].GetType() == prm.GetType());
+			if (m_inParams[index].GetType() != prm.GetType())
+			{
+				assert(false);
+				return false;
+			}
+
 			m_inParams[index] = prm;
 			index++;
 		}
+
+		return true;
 	}
 
 
@@ -49,9 +56,14 @@ namespace WRPC
 
 	Result MethodInvocation::Execute(Connection& _connection, const std::vector<Parameter>& _values)
 	{
-		_SetParameters(_values);
-
 		Result result;
+
+		bool paramsOk = _SetParameters(_values);
+		if (!paramsOk)
+		{
+			result.m_error.m_protocolError = RPCProtocolError::TypesMismatch;
+			return result;
+		}
 
 		if (_connection.GetStatus() != ConnectionStatus::Connected)
 		{

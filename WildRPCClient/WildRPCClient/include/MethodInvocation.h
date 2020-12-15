@@ -6,14 +6,8 @@
 #include <vector>
 
 #include "WildRPCType.h"
-//#include "Result.h"
 #include "Connection.h"
 #include "Parameters.h"
-
-#pragma warning(push, 0)
-#pragma warning(disable : 4355)
-#include "../external/asio/include/asio.hpp"
-#pragma warning(pop)
 
 namespace WRPC
 {

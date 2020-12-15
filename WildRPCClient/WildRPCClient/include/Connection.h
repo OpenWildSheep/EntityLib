@@ -2,14 +2,14 @@
 
 #include "WildRPCType.h"
 
-#pragma warning(push, 0)
-#pragma warning(disable : 4355)
-#include "../external/asio/include/asio.hpp"
-#pragma warning(pop)
+#include <memory>
 
 namespace WRPC
 {
-	class WRPC_DLLEXPORT Connection {
+	class ConnectionPimpl;
+
+	class WRPC_DLLEXPORT Connection
+	{
 
 		friend class MethodInvocation;
 
@@ -24,15 +24,9 @@ namespace WRPC
 		ConnectionStatus		Open();
 		void					Close();
 
-		ConnectionStatus		GetStatus() const { return m_status; }
+		ConnectionStatus		GetStatus() const;
 
 	private:
-		std::string				m_IPaddress;
-		asio::io_context		m_io_context;
-
-		asio::ip::tcp::socket*	m_socket_ThreadSafe = nullptr;
-		asio::ip::tcp::socket*	m_socket_NOT_ThreadSafe = nullptr;
-
-		ConnectionStatus		m_status = ConnectionStatus::NotConnected;
+		std::unique_ptr<ConnectionPimpl> m_pimpl;
 	};
-}
+} // namespace WRPC

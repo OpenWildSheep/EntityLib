@@ -8,6 +8,8 @@
 #include <WiLDRPC/RPCHeader_generated.h>
 #pragma warning(pop)
 
+#include "ConnectionPimpl.h"
+
 #define REQUEST_BUFFER_SIZE (4 * 1024)
 #define REPLY_BUFFER_SIZE (4 * 1024)
 
@@ -132,13 +134,16 @@ namespace WRPC
 		{
 			// Send Buffer ------------------------------
 
-			auto socket = (m_threadSafety == ThreadSafety::Unsafe) ? _connection.m_socket_NOT_ThreadSafe : _connection.m_socket_ThreadSafe;
+			auto socket =
+				(m_threadSafety == ThreadSafety::Unsafe) ?
+				_connection.m_pimpl->m_socket_NOT_ThreadSafe :
+				_connection.m_pimpl->m_socket_ThreadSafe;
 
 			asio::write(*socket, asio::buffer(buffer, currentPosition + 1));
 
 			// Receive Reply Buffer -----------------------
 			size_t reply_length = asio::read(*socket, asio::buffer(reply, REPLY_BUFFER_SIZE));
-			
+
 			if (reply_length != REPLY_BUFFER_SIZE)
 			{
 				result.m_error.m_protocolError = RPCProtocolError::WrongReplyBufferSize;
@@ -148,7 +153,7 @@ namespace WRPC
 		catch (std::exception& e)
 		{
 			std::cerr << "Exception: " << e.what() << "\n";
-			_connection.m_status = ConnectionStatus::Errored;
+			_connection.m_pimpl->m_status = ConnectionStatus::Errored;
 
 			result.m_error.m_protocolError = RPCProtocolError::NoConnectionToHost;
 			return result;

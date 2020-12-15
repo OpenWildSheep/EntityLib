@@ -20,7 +20,7 @@ namespace WRPC
 	class WRPC_DLLEXPORT MethodInvocation	{
 
 	public:
-		MethodInvocation(const char* _managerName, const char* _methodName, ThreadSafety _threadSafety, std::vector<WildRPC::Type> _in, std::vector<WildRPC::Type> _out);
+		MethodInvocation(const char* _managerName, const char* _methodName, std::vector<WildRPC::Type> _in, std::vector<WildRPC::Type> _out);
 		Result Execute(Connection& _connection, const std::vector<Parameter>& _values);
 
 	private:
@@ -32,8 +32,6 @@ namespace WRPC
 
 		std::vector<Parameter>	m_inParams;
 		std::vector<Parameter>	m_outParams;
-
-		ThreadSafety			m_threadSafety = ThreadSafety::Unsafe;
 	};
 
 

@@ -13,7 +13,7 @@
 
 namespace WRPC
 {
-	MethodInvocation::MethodInvocation(const char* _managerName, const char* _methodName, ThreadSafety _threadSafety, std::vector<WildRPC::Type> _in, std::vector<WildRPC::Type> _out) : m_managerName(_managerName), m_methodName(_methodName), m_threadSafety(_threadSafety)
+	MethodInvocation::MethodInvocation(const char* _managerName, const char* _methodName, std::vector<WildRPC::Type> _in, std::vector<WildRPC::Type> _out) : m_managerName(_managerName), m_methodName(_methodName)
 	{
 		for (auto type : _in)
 		{
@@ -132,7 +132,7 @@ namespace WRPC
 		{
 			// Send Buffer ------------------------------
 
-			auto socket = (m_threadSafety == ThreadSafety::Unsafe) ? _connection.m_socket_NOT_ThreadSafe : _connection.m_socket_ThreadSafe;
+			auto socket = _connection.m_socket;
 
 			asio::write(*socket, asio::buffer(buffer, currentPosition + 1));
 

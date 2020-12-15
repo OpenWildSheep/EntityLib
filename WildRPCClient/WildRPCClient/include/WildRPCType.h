@@ -55,10 +55,4 @@ namespace WRPC
 		unsigned char m_applicativeError = 0;
 	};
 
-	enum class ThreadSafety
-	{
-		Safe,
-		Unsafe
-	};
-
 }

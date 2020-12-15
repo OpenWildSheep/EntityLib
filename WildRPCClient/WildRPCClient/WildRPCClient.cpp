@@ -41,8 +41,7 @@ namespace WRPC
 			return true;
 		}
 
-		MethodInvocation setCamera("CameraManager", "DATA_SetCamera",
-								   ThreadSafety::Safe,
+		MethodInvocation setCamera("CameraManager", "RPC_SetCamera",
 								   { WildRPC::Type_Vector3, WildRPC::Type_Quat, WildRPC::Type_Float }, {});
 
 		std::clock();
@@ -56,21 +55,19 @@ namespace WRPC
 			while (std::clock() < (now + 32.0f)) continue;
 		}
 
-		MethodInvocation getCamera("CameraManager", "DATA_GetCamera",
-								   ThreadSafety::Safe,
-								   {},  { WildRPC::Type_Vector3, WildRPC::Type_Quat, WildRPC::Type_Float });
+		MethodInvocation getCamera( "CameraManager", "RPC_GetCamera",
+								     {},  { WildRPC::Type_Vector3, WildRPC::Type_Quat, WildRPC::Type_Float });
 		Result anotherResult = getCamera.Execute(connection, {});
-
+		
 		MethodInvocation stringTest("DebugManager", "RPC_DebugStringParameters",
-			ThreadSafety::Unsafe,
-			{ WildRPC::Type_String }, { WildRPC::Type_String });
-		Result yetAnotherResult = stringTest.Execute(connection, { Parameter::Build<WildRPC::Type_String>("Knock knock, who's there?")});
+									 { WildRPC::Type_String }, { WildRPC::Type_String });
+		Result yetAnotherResult = stringTest.Execute(connection, { Parameter::Build<WildRPC::Type_String>("Knock knock!")});
 		std::string answer;
-
+		
 		yetAnotherResult.RetrieveValues({ ResultValue::Build<WildRPC::Type_String>(answer)});
-
+		
 		connection.Close();
-
+		
 		if (!anotherResult.HasError())
 		{
 			float x, y, z;
@@ -79,7 +76,7 @@ namespace WRPC
 			anotherResult.RetrieveValues({ ResultValue::Build<WildRPC::Type_Vector3>(x, y, z),
 										   ResultValue::Build<WildRPC::Type_Quat>(qx, qy, qz, qw),
 										   ResultValue::Build<WildRPC::Type_Float>(foV) });
-
+		
 			printf("_position: (%.2f, %.2f, %.2f)\n", x, y, z);
 			printf("_quat: (%.2f, %.2f, %.2f, %.2f)\n", qx, qy, qz, qw);
 			printf("_foV: (%.2f)\n", foV);

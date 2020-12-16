@@ -3,8 +3,7 @@
 #include <iostream>
 #include <array>
 
-#define SERV_PORT_NOT_THREAD_SAFE "9387"
-#define SERV_PORT_THREAD_SAFE     "9993"
+#define SERV_PORT "9387"
 
 namespace WRPC
 {
@@ -20,11 +19,8 @@ namespace WRPC
 		{
 			asio::ip::tcp::resolver resolver(m_io_context);
 
-			m_socket_NOT_ThreadSafe = new asio::ip::tcp::socket(m_io_context);
-			asio::connect(*m_socket_NOT_ThreadSafe, resolver.resolve(m_IPaddress.c_str(), SERV_PORT_NOT_THREAD_SAFE));
-
-			m_socket_ThreadSafe = new asio::ip::tcp::socket(m_io_context);
-			asio::connect(*m_socket_ThreadSafe, resolver.resolve(m_IPaddress.c_str(), SERV_PORT_THREAD_SAFE));
+			m_socket = new asio::ip::tcp::socket(m_io_context);
+			asio::connect(*m_socket, resolver.resolve(m_IPaddress.c_str(), SERV_PORT));
 		}
 		catch (std::exception& e)
 		{
@@ -45,18 +41,11 @@ namespace WRPC
 		m_status = ConnectionStatus::NotConnected;
 		try
 		{
-			if (m_socket_NOT_ThreadSafe)
+			if (m_socket)
 			{
-				m_socket_NOT_ThreadSafe->close();
-				delete m_socket_NOT_ThreadSafe;
-				m_socket_NOT_ThreadSafe = nullptr;
-			}
-
-			if (m_socket_ThreadSafe)
-			{
-				m_socket_ThreadSafe->close();
-				delete m_socket_ThreadSafe;
-				m_socket_ThreadSafe = nullptr;
+				m_socket->close();
+				delete m_socket;
+				m_socket = nullptr;
 			}
 		}
 		catch (std::exception& e)

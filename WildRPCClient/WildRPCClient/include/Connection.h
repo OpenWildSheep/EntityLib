@@ -30,8 +30,7 @@ namespace WRPC
 		std::string				m_IPaddress;
 		asio::io_context		m_io_context;
 
-		asio::ip::tcp::socket*	m_socket_ThreadSafe = nullptr;
-		asio::ip::tcp::socket*	m_socket_NOT_ThreadSafe = nullptr;
+		asio::ip::tcp::socket*	m_socket = nullptr;
 
 		ConnectionStatus		m_status = ConnectionStatus::NotConnected;
 	};

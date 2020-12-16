@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <array>
+#include <ctime>
 
 #pragma warning(push, 0)
 #include <flatbuffers/flatbuffers.h>
@@ -40,27 +41,43 @@ namespace WRPC
 			return true;
 		}
 
-		MethodInvocation setCamera("CameraManager", "DATA_SetCamera",
-								   ThreadSafety::Safe,
-								   { WildRPC::Type_Position, WildRPC::Type_Quat, WildRPC::Type_Float }, {});
-		setCamera.Execute(connection, { Parameter::Build<WildRPC::Type_Position>(32768, 32768, 1.0f, 2.0f, 3.0f), Parameter::Build<WildRPC::Type_Quat>(0.0f, 0.0f, 0.0f, 1.0f), Parameter::Build<WildRPC::Type_Float>(40.0f)});
+		MethodInvocation setCamera("CameraManager", "RPC_SetCamera",
+								   { WildRPC::Type_Vector3, WildRPC::Type_Quat, WildRPC::Type_Float }, {});
 
-		MethodInvocation getCamera("CameraManager", "DATA_GetCamera",
-								   ThreadSafety::Safe,
-								   {},  { WildRPC::Type_Position, WildRPC::Type_Quat, WildRPC::Type_Float });
+		std::clock();
+		for (int i = 0; i < 300; i++)
+		{
+			setCamera.Execute(connection, { Parameter::Build<WildRPC::Type_Vector3>(0.0f, 0.0f, -10.0f + 0.1f * i),
+											Parameter::Build<WildRPC::Type_Quat>(0.0f, 0.0f, 0.0f, 1.0f),
+											Parameter::Build<WildRPC::Type_Float>(40.0f) });
+
+			auto now = std::clock();
+			while (std::clock() < (now + 32.0f)) continue;
+		}
+
+		MethodInvocation getCamera( "CameraManager", "RPC_GetCamera",
+								     {},  { WildRPC::Type_Vector3, WildRPC::Type_Quat, WildRPC::Type_Float });
 		Result anotherResult = getCamera.Execute(connection, {});
-
+		
+		MethodInvocation stringTest("DebugManager", "RPC_DebugStringParameters",
+									 { WildRPC::Type_String }, { WildRPC::Type_String });
+		Result yetAnotherResult = stringTest.Execute(connection, { Parameter::Build<WildRPC::Type_String>("Knock knock!")});
+		std::string answer;
+		
+		yetAnotherResult.RetrieveValues({ ResultValue::Build<WildRPC::Type_String>(answer)});
+		
 		connection.Close();
-
+		
 		if (!anotherResult.HasError())
 		{
-			uint32_t wx, wy;
 			float x, y, z;
 			float qx, qy, qz, qw;
 			float foV;
-			anotherResult.RetrieveValues({ ResultValue::Build<WildRPC::Type_Position>(wx, wy, x, y, z), ResultValue::Build<WildRPC::Type_Quat>(qx, qy, qz, qw), ResultValue::Build<WildRPC::Type_Float>(foV) });
-
-			printf("_position: [%d,%d] (%.2f, %.2f, %.2f)\n", wx, wy, x, y, z);
+			anotherResult.RetrieveValues({ ResultValue::Build<WildRPC::Type_Vector3>(x, y, z),
+										   ResultValue::Build<WildRPC::Type_Quat>(qx, qy, qz, qw),
+										   ResultValue::Build<WildRPC::Type_Float>(foV) });
+		
+			printf("_position: (%.2f, %.2f, %.2f)\n", x, y, z);
 			printf("_quat: (%.2f, %.2f, %.2f, %.2f)\n", qx, qy, qz, qw);
 			printf("_foV: (%.2f)\n", foV);
 		}

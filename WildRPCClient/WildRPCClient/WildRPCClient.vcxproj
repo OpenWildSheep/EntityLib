@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ConnectionPimpl.h" />
     <ClInclude Include="include\Connection.h" />
     <ClInclude Include="include\MethodInvocation.h" />
     <ClInclude Include="include\Parameters.h" />
@@ -27,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Connection.cpp" />
+    <ClCompile Include="ConnectionPimpl.cpp" />
     <ClCompile Include="MethodInvocation.cpp" />
     <ClCompile Include="Parameters.cpp" />
     <ClCompile Include="WildRPCClient.cpp" />

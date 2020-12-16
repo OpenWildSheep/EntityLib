@@ -4,11 +4,6 @@
 #include <exception>
 #include <string>
 
-#pragma warning(push, 0)
-#pragma warning(disable : 4355)
-#include "../external/asio/include/asio.hpp"
-#pragma warning(pop)
-
 #include "WildRPCType.h"
 #include "Connection.h"
 #include "MethodInvocation.h"

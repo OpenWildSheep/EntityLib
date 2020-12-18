@@ -74,8 +74,8 @@ namespace WRPC
 
     class WRPC_DLLEXPORT RPCClient
     {
-	public:
-		bool test();
+    public:
+        bool test();
 
     public:
         DeleteCheck deleteCheck;

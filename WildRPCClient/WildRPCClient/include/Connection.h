@@ -6,27 +6,27 @@
 
 namespace WRPC
 {
-	class ConnectionPimpl;
+    class ConnectionPimpl;
 
-	class WRPC_DLLEXPORT Connection
-	{
+    class WRPC_DLLEXPORT Connection
+    {
 
-		friend class MethodInvocation;
+        friend class MethodInvocation;
 
-	public:
-		Connection(const char* _IPAddress);
-		~Connection();
+    public:
+        Connection(const char* _IPAddress);
+        ~Connection();
 
-		// No copy, no assign ----------------------------
-		Connection(Connection const&) = delete;
-		Connection& operator=(Connection const&) = delete;
+        // No copy, no assign ----------------------------
+        Connection(Connection const&) = delete;
+        Connection& operator=(Connection const&) = delete;
 
-		ConnectionStatus		Open();
-		void					Close();
+        ConnectionStatus Open();
+        void Close();
 
-		ConnectionStatus		GetStatus() const;
+        ConnectionStatus GetStatus() const;
 
-	private:
-		std::unique_ptr<ConnectionPimpl> m_pimpl;
-	};
+    private:
+        std::unique_ptr<ConnectionPimpl> m_pimpl;
+    };
 } // namespace WRPC

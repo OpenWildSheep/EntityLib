@@ -1,6 +1,10 @@
 #include <ComponentMerge.h>
+
+#pragma warning(push, 0)
 #include <iostream>
-#include <filesystem>
+#pragma warning(pop)
+
+#include "../EntityLib/external/filesystem.hpp"
 
 int main(int argc, char** argv)
 try
@@ -11,9 +15,9 @@ try
         return EXIT_FAILURE;
     }
 
-    std::experimental::filesystem::path mergedCompSchemaPath = argv[1];
+    std::filesystem::path mergedCompSchemaPath = argv[1];
     mergedCompSchemaPath /= "WildPipeline/Schema/MergedComponents.json";
-    mergedCompSchemaPath = std::experimental::filesystem::canonical(mergedCompSchemaPath);
+    mergedCompSchemaPath = std::filesystem::canonical(mergedCompSchemaPath);
     char editCmd[1024];
     sprintf_s(editCmd, sizeof(editCmd), R"(p4 edit "%ls")", mergedCompSchemaPath.c_str());
 

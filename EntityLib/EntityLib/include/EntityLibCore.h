@@ -1,11 +1,14 @@
 #pragma once
 
+#pragma warning(push, 0)
 #include <cstdio>
 #include <exception>
 #include <string>
 #include <cstdio>
 #include <memory>
 #include <vector>
+#include <stdexcept>
+#pragma warning(pop)
 
 #ifdef ENTLIB_STATIC
 #define ENTLIB_DLLEXPORT

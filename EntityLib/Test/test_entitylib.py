@@ -4,7 +4,7 @@ import traceback
 import logging
 import sys
 
-entitylib_path = "../x64/Release"
+entitylib_path = "../x64/Release-3.7"
 if "PYTHONPATH" in os.environ:
     os.environ["PYTHONPATH"] += "" + entitylib_path
 else:
@@ -638,7 +638,7 @@ try:
     scene.add_entity(entlib.make_instance_of(os.getcwd() + "/prefab.entity"))
 
     print("save_scene")
-    entlib.save_scene(scene, "X:/RawData/22_World/SceneMainWorld/SceneMainWorld.test.scene")
+    entlib.save_scene(scene, os.getcwd() + "/SceneMainWorld.test.scene")
 
     added_entity = scene.entities[-1]
     cinematic_comp = added_entity.get_component("CinematicGD")

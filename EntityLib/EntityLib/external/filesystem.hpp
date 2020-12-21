@@ -11,6 +11,17 @@
 #if COMPILER_VERSION < 201499L
 namespace std
 {
+    namespace experimental
+    {
+        namespace filesystem
+        {
+            inline path weakly_canonical(const path& _path)
+            {
+                return canonical(_path);
+            }
+        } // namespace filesystem
+    } // namespace experimental
+
     using namespace experimental;
 } // namespace std
 #endif

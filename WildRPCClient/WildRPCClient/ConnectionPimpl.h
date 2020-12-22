@@ -1,9 +1,9 @@
 #pragma once
 
-#include <string>
-
 #pragma warning(push, 0)
 #pragma warning(disable : 4355)
+#pragma warning(disable : 5204)
+#include <string>
 #include "external/asio/include/asio.hpp"
 #pragma warning(pop)
 

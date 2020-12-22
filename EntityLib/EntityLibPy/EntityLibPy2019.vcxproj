@@ -180,14 +180,14 @@
       <PreprocessorDefinitions>ENTLIB_STATIC;_DEBUG;_WINDOWS;_USRDLL;ENTITYLIBPY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027;4623</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4324;4251;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027;4623</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\ExternalTools\Python37\libs;..\x64\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>EntityLib2019.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>EntityLib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-3.7|Win32'">
@@ -252,7 +252,7 @@
       <PreprocessorDefinitions>ENTLIB_STATIC;NDEBUG;_WINDOWS;_USRDLL;ENTITYLIBPY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027;4623</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4324;4251;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027;4623</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -261,7 +261,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\ExternalTools\Python37\libs;..\x64\Release\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>EntityLib2019.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>EntityLib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>cd "$(ProjectDir)"
@@ -284,7 +284,7 @@ echo "%p4_root%\Tools\Python37\python.exe" "$(ProjectDir)stubgen_EntityLibPy.py"
       <PreprocessorDefinitions>ENTLIB_STATIC;NDEBUG;_WINDOWS;_USRDLL;ENTITYLIBPY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027;4623</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4324;4251;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027;4623</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -293,7 +293,7 @@ echo "%p4_root%\Tools\Python37\python.exe" "$(ProjectDir)stubgen_EntityLibPy.py"
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\ExternalTools\Python38\libs;..\x64\Release\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>EntityLib2019.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>EntityLib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-2.7|x64'">
@@ -307,7 +307,7 @@ echo "%p4_root%\Tools\Python37\python.exe" "$(ProjectDir)stubgen_EntityLibPy.py"
       <PreprocessorDefinitions>ENTLIB_STATIC;NDEBUG;_WINDOWS;_USRDLL;ENTITYLIBPY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4324;4251;4996;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027;4623</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4324;4251;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027;4623</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -316,7 +316,7 @@ echo "%p4_root%\Tools\Python37\python.exe" "$(ProjectDir)stubgen_EntityLibPy.py"
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\ExternalTools\Python27\libs;..\x64\Release\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>EntityLib2019.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>EntityLib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

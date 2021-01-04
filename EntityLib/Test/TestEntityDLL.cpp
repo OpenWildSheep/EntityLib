@@ -75,7 +75,7 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
         }
         if (subschema.maxItems != size_t(-1))
         {
-            Ent::printfmt("%s  maxItems:%d\n", indent, subschema.maxItems);
+            Ent::printfmt("%s  maxItems:%d\n", indent.c_str(), subschema.maxItems);
         }
         if (subschema.singularItems != nullptr)
         {

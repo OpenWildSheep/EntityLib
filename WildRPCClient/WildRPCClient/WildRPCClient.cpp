@@ -52,12 +52,12 @@ namespace WRPC
         {
             setCamera.Execute(
                 connection,
-                { Parameter::Build<WildRPC::Type_Vector3>(0.0f, 0.0f, -10.0f + 0.1f * i),
+                { Parameter::Build<WildRPC::Type_Vector3>(0.0f, 0.0f, -10.0f + 0.1f * float(i)),
                   Parameter::Build<WildRPC::Type_Quat>(0.0f, 0.0f, 0.0f, 1.0f),
                   Parameter::Build<WildRPC::Type_Float>(40.0f) });
 
             auto now = std::clock();
-            while (std::clock() < (now + 32.0f))
+            while (std::clock() < (now + 32 * CLOCKS_PER_SEC)) // 32 seconds
                 continue;
         }
 

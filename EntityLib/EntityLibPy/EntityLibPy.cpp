@@ -2,14 +2,6 @@
 
 #include <EntityLib.h>
 
-namespace std
-{
-    using tl::nullopt;
-    using tl::nullopt_t;
-    using tl::optional;
-} // namespace std
-
-#define PYBIND11_HAS_OPTIONAL 1 // NOLINT
 
 #pragma warning(push, 0)
 #include <pybind11/pybind11.h>
@@ -38,6 +30,13 @@ namespace pybind11
                 return mapbox::util::apply_visitor(args...);
             }
         };
+
+        // Use tj::optional like a std::optional
+        template <typename T>
+        struct type_caster<tl::optional<T>> : public optional_caster<tl::optional<T>>
+        {
+        };
+
     } // namespace detail
 } // namespace pybind11
 

@@ -167,8 +167,8 @@ static json convertToInstanceSchema(Ent::Schema const& schema, Ent::Subschema co
     json instSchema = convertToInstanceSchema(root);
     for (auto&& name_def : schema.allDefinitions)
     {
-        instSchema["definitions"][convertLink(name_def.first)] =
-            convertToInstanceSchema(name_def.second);
+        auto const link = convertLink(name_def.first);
+        instSchema["definitions"][link] = convertToInstanceSchema(name_def.second);
     }
     return instSchema;
 }

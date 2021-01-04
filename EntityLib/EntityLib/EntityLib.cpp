@@ -1,4 +1,4 @@
-﻿#include "include/EntityLib.h"
+#include "include/EntityLib.h"
 
 #include "Tools.h"
 #include "SchemaLoader.h"
@@ -2170,7 +2170,7 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
                                  "last_write_time(p): invalid argument: %ls (%s)",
                                  absPath.c_str(),
                                  error.message().c_str());
-        throw std::filesystem::filesystem_error(msg);
+        throw std::filesystem::filesystem_error(msg, absPath, error);
     }
     auto iter = cache.find(relPath);
     if (iter == cache.end())
@@ -2529,14 +2529,14 @@ std::filesystem::path Ent::EntityLib::getAbsolutePath(std::filesystem::path cons
     {
         std::filesystem::path absPath = _path;
         absPath.make_preferred();
-        return std::filesystem::canonical(absPath);
+        return std::filesystem::weakly_canonical(absPath);
     }
     else
     {
         std::filesystem::path absPath = rawdataPath;
         absPath /= _path;
         absPath.make_preferred();
-        return std::filesystem::canonical(absPath);
+        return std::filesystem::weakly_canonical(absPath);
     }
 }
 

@@ -57,15 +57,6 @@ namespace Ent
         fprintfmt(stdout, message, std::forward<Args>(args)...);
     }
 
-    /// Call it when a logic error (a bug) happen
-    /// format and print the message into stderr and call terminate
-    template <typename... Args>
-    void logicError(char const* _file, long _line, char const* _message, Args&&... args)
-    {
-        log(_file, _line, stderr, "ERROR : ", _message, std::forward<Args>(args)...);
-        terminate();
-    }
-
     /// format the message, adding _file, _line and _category, and print in the _output
     template <typename... Args>
     void
@@ -81,6 +72,14 @@ namespace Ent
         fprintfmt(_output, mess, _category, _file, _line, std::forward<Args>(args)...);
     }
 
+    /// Call it when a logic error (a bug) happen
+    /// format and print the message into stderr and call terminate
+    template <typename... Args>
+    void logicError(char const* _file, long _line, char const* _message, Args&&... args)
+    {
+        log(_file, _line, stderr, "ERROR : ", _message, std::forward<Args>(args)...);
+        terminate();
+    }
 } // namespace Ent
 
 #define ENTLIB_LOGIC_ERROR(message, ...)                                                           \

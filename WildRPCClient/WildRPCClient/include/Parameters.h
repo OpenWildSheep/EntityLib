@@ -112,7 +112,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static Parameter Build(bool _bool)
         {
-            assert(t == WildRPC::Type_Boolean);
+            static_assert(t == WildRPC::Type_Boolean, "t != WildRPC::Type_Boolean!!");
             Parameter param;
             param.m_value = _bool;
             return param;
@@ -121,7 +121,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static Parameter Build(int _int)
         {
-            assert(t == WildRPC::Type_Integer);
+            static_assert(t == WildRPC::Type_Integer, "t != WildRPC::Type_Integer!!");
             Parameter param;
             param.m_value = _int;
             return param;
@@ -130,7 +130,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static Parameter Build(float _float)
         {
-            assert(t == WildRPC::Type_Float);
+            static_assert(t == WildRPC::Type_Float, "t != WildRPC::Type_Float!!");
             Parameter param;
             param.m_value = _float;
             return param;
@@ -139,7 +139,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static Parameter Build(float _x, float _y)
         {
-            assert(t == WildRPC::Type_Vector2);
+            static_assert(t == WildRPC::Type_Vector2, "t != WildRPC::Type_Vector2!!");
             Parameter param;
             param.m_value = Vector2(_x, _y);
             return param;
@@ -148,7 +148,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static Parameter Build(uint32_t _x, uint32_t _y, uint32_t _z)
         {
-            assert(t == WildRPC::Type_UInt3);
+            static_assert(t == WildRPC::Type_UInt3, "t != WildRPC::Type_UInt3!!");
             Parameter param;
             param.m_value = Vector3i(_x, _y, _z);
             return param;
@@ -157,7 +157,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static Parameter Build(float _x, float _y, float _z)
         {
-            assert(t == WildRPC::Type_Vector3);
+            static_assert(t == WildRPC::Type_Vector3, "t != WildRPC::Type_Vector3!!");
             Parameter param;
             param.m_value = Vector3(_x, _y, _z);
             return param;
@@ -166,7 +166,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static Parameter Build(uint32_t _wx, uint32_t _wy, float _x, float _y, float _z)
         {
-            assert(t == WildRPC::Type_Position);
+            static_assert(t == WildRPC::Type_Position, "t != WildRPC::Type_Position!!");
             Parameter param;
             param.m_value = Position(_wx, _wy, _x, _y, _z);
             return param;
@@ -175,9 +175,9 @@ namespace WRPC
         template <WildRPC::Type t>
         static Parameter Build(float _x, float _y, float _z, float _w)
         {
-            bool isColor = (t == WildRPC::Type_Color);
-            bool isQuat = (t == WildRPC::Type_Quat);
-            assert(isQuat || isColor);
+            constexpr bool isColor = (t == WildRPC::Type_Color);
+            constexpr bool isQuat = (t == WildRPC::Type_Quat);
+            static_assert(isQuat || isColor, "!(isQuat || isColor)");
 
             Parameter param;
             if (isColor)
@@ -194,7 +194,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static Parameter Build(const char* _strg)
         {
-            assert(t == WildRPC::Type_String);
+            static_assert(t == WildRPC::Type_String, "t != WildRPC::Type_String!!");
             Parameter param;
             param.m_value = std::string(_strg);
             return param;
@@ -309,7 +309,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static ResultValue Build(bool& _bool)
         {
-            assert(t == WildRPC::Type_Boolean);
+            static_assert(t == WildRPC::Type_Boolean, "t != WildRPC::Type_Boolean!!");
             ResultValue result;
             result.m_value = &_bool;
             return result;
@@ -318,7 +318,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static ResultValue Build(int32_t& _int)
         {
-            assert(t == WildRPC::Type_Integer);
+            static_assert(t == WildRPC::Type_Integer, "t != WildRPC::Type_Integer!!");
             ResultValue result;
             result.m_value = &_int;
             return result;
@@ -327,7 +327,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static ResultValue Build(float& _float)
         {
-            assert(t == WildRPC::Type_Float);
+            static_assert(t == WildRPC::Type_Float, "t != WildRPC::Type_Float!!");
             ResultValue result;
             result.m_value = &_float;
             return result;
@@ -336,7 +336,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static ResultValue Build(float& _x, float& _y)
         {
-            assert(t == WildRPC::Type_Vector2);
+            static_assert(t == WildRPC::Type_Vector2, "t != WildRPC::Type_Vector2!!");
             ResultValue result;
             result.m_value = Vector2H(_x, _y);
             return result;
@@ -345,7 +345,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static ResultValue Build(uint32_t& _x, uint32_t& _y, uint32_t& _z)
         {
-            assert(t == WildRPC::Type_UInt3);
+            static_assert(t == WildRPC::Type_UInt3, "t != WildRPC::Type_UInt3!!");
             ResultValue result;
             result.m_value = Vector3iH(_x, _y, _z);
             return result;
@@ -354,7 +354,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static ResultValue Build(float& _x, float& _y, float& _z)
         {
-            assert(t == WildRPC::Type_Vector3);
+            static_assert(t == WildRPC::Type_Vector3, "t != WildRPC::Type_Vector3!!");
             ResultValue result;
             result.m_value = Vector3H(_x, _y, _z);
             return result;
@@ -363,9 +363,9 @@ namespace WRPC
         template <WildRPC::Type t>
         static ResultValue Build(float& _x, float& _y, float& _z, float& _w)
         {
-            bool isColor = (t == WildRPC::Type_Color);
-            bool isQuat = (t == WildRPC::Type_Quat);
-            assert(isQuat || isColor);
+            constexpr bool isColor = (t == WildRPC::Type_Color);
+            constexpr bool isQuat = (t == WildRPC::Type_Quat);
+            static_assert(isQuat || isColor, "!(isQuat || isColor)");
 
             ResultValue result;
             if (isColor)
@@ -382,7 +382,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static ResultValue Build(uint32_t& _wx, uint32_t& _wy, float& _x, float& _y, float& _z)
         {
-            assert(t == WildRPC::Type_Position);
+            static_assert(t == WildRPC::Type_Position, "t != WildRPC::Type_Position!!");
             ResultValue result;
             result.m_value = PositionH(_wx, _wy, _x, _y, _z);
             return result;
@@ -391,7 +391,7 @@ namespace WRPC
         template <WildRPC::Type t>
         static ResultValue Build(std::string& _strg)
         {
-            assert(t == WildRPC::Type_String);
+            static_assert(t == WildRPC::Type_String, "t != WildRPC::Type_String!!");
             ResultValue result;
             result.m_value = &_strg;
             return result;

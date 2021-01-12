@@ -44,7 +44,7 @@ namespace WRPC
         MethodInvocation setCamera(
             "CameraManager",
             "RPC_SetCamera",
-            { WildRPC::Type_Vector3, WildRPC::Type_Quat, WildRPC::Type_Float },
+            {WildRPC::Type_Vector3, WildRPC::Type_Quat, WildRPC::Type_Float},
             {});
 
         std::clock();
@@ -52,9 +52,9 @@ namespace WRPC
         {
             setCamera.Execute(
                 connection,
-                { Parameter::Build<WildRPC::Type_Vector3>(0.0f, 0.0f, -10.0f + 0.1f * float(i)),
-                  Parameter::Build<WildRPC::Type_Quat>(0.0f, 0.0f, 0.0f, 1.0f),
-                  Parameter::Build<WildRPC::Type_Float>(40.0f) });
+                {Parameter::Build<WildRPC::Type_Vector3>(0.0f, 0.0f, -10.0f + 0.1f * float(i)),
+                 Parameter::Build<WildRPC::Type_Quat>(0.0f, 0.0f, 0.0f, 1.0f),
+                 Parameter::Build<WildRPC::Type_Float>(40.0f)});
 
             auto now = std::clock();
             while (std::clock() < (now + 32 * CLOCKS_PER_SEC)) // 32 seconds
@@ -65,19 +65,19 @@ namespace WRPC
             "CameraManager",
             "RPC_GetCamera",
             {},
-            { WildRPC::Type_Vector3, WildRPC::Type_Quat, WildRPC::Type_Float });
+            {WildRPC::Type_Vector3, WildRPC::Type_Quat, WildRPC::Type_Float});
         Result anotherResult = getCamera.Execute(connection, {});
 
         MethodInvocation stringTest(
             "DebugManager",
             "RPC_DebugStringParameters",
-            { WildRPC::Type_String },
-            { WildRPC::Type_String });
-        Result yetAnotherResult = stringTest.Execute(
-            connection, { Parameter::Build<WildRPC::Type_String>("Knock knock!") });
+            {WildRPC::Type_String},
+            {WildRPC::Type_String});
+        Result yetAnotherResult =
+            stringTest.Execute(connection, {Parameter::Build<WildRPC::Type_String>("Knock knock!")});
         std::string answer;
 
-        yetAnotherResult.RetrieveValues({ ResultValue::Build<WildRPC::Type_String>(answer) });
+        yetAnotherResult.RetrieveValues({ResultValue::Build<WildRPC::Type_String>(answer)});
 
         connection.Close();
 
@@ -86,9 +86,10 @@ namespace WRPC
             float x, y, z;
             float qx, qy, qz, qw;
             float foV;
-            anotherResult.RetrieveValues({ ResultValue::Build<WildRPC::Type_Vector3>(x, y, z),
-                                           ResultValue::Build<WildRPC::Type_Quat>(qx, qy, qz, qw),
-                                           ResultValue::Build<WildRPC::Type_Float>(foV) });
+            anotherResult.RetrieveValues(
+                {ResultValue::Build<WildRPC::Type_Vector3>(x, y, z),
+                 ResultValue::Build<WildRPC::Type_Quat>(qx, qy, qz, qw),
+                 ResultValue::Build<WildRPC::Type_Float>(foV)});
 
             printf("_position: (%.2f, %.2f, %.2f)\n", x, y, z);
             printf("_quat: (%.2f, %.2f, %.2f, %.2f)\n", qx, qy, qz, qw);

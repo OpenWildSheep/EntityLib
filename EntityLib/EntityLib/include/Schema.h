@@ -244,27 +244,27 @@ namespace Ent
     inline bool Subschema::IsDeprecated() const
     {
         return mapbox::util::apply_visitor(
-            BasicFieldGetter{ [](const Subschema::BaseMeta* _meta) {
+            BasicFieldGetter{[](const Subschema::BaseMeta* _meta) {
                 return _meta->deprecated;
-            } },
+            }},
             meta);
     }
 
     inline bool Subschema::IsUsedInEditor() const
     {
         return mapbox::util::apply_visitor(
-            BasicFieldGetter{ [](const Subschema::BaseMeta* _meta) {
+            BasicFieldGetter{[](const Subschema::BaseMeta* _meta) {
                 return _meta->usedInEditor;
-            } },
+            }},
             meta);
     }
 
     inline bool Subschema::IsUsedInRuntime() const
     {
         return mapbox::util::apply_visitor(
-            BasicFieldGetter{ [](const Subschema::BaseMeta* _meta) {
+            BasicFieldGetter{[](const Subschema::BaseMeta* _meta) {
                 return _meta->usedInRuntime;
-            } },
+            }},
             meta);
     }
 

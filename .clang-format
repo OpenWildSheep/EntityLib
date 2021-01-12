@@ -39,7 +39,7 @@ CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth : 4
 ContinuationIndentWidth : 4
-Cpp11BracedListStyle: false
+Cpp11BracedListStyle: true
 DerivePointerAlignment: false
 FixNamespaceComments: true
 IncludeBlocks: Preserve
@@ -89,4 +89,5 @@ SpacesInSquareBrackets : false
 Standard: Cpp11
 TabWidth: 4
 UseTab: Never
+UseCRLF: true
 ...

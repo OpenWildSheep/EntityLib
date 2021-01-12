@@ -394,7 +394,7 @@ void Ent::SchemaLoader::readSchema(
 {
     Ent::SubschemaRef& schema = globalSchema->root;
 
-    std::vector<Ent::SubschemaRef*> stack{ &schema };
+    std::vector<Ent::SubschemaRef*> stack{&schema};
     stack.reserve(1000);
 
     struct FillSchema : Visitor
@@ -553,7 +553,7 @@ void Ent::SchemaLoader::readSchema(
             globalSchema->allDefinitions[link].name = link;
             auto& ref = stack.back()->subSchemaOrRef;
             ENTLIB_ASSERT(ref.is<Null>());
-            ref = SubschemaRef::Ref{ globalSchema, link };
+            ref = SubschemaRef::Ref{globalSchema, link};
         }
         void closeRef() override
         {
@@ -592,7 +592,7 @@ void Ent::SchemaLoader::readSchema(
             subSchema.name = std::move(name);
         }
     };
-    FillSchema vis{ globalSchema, stack };
+    FillSchema vis{globalSchema, stack};
 
     parseSchema(_filename, _fileRoot, _data, vis, 0);
 }

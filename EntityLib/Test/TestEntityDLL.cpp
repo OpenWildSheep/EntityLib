@@ -466,21 +466,21 @@ try
         // TEST entity ref resolution
         Ent::Entity* resolvedEmptyRef = instanceOfA.resolveEntityRef({});
         ENTLIB_ASSERT(resolvedEmptyRef == nullptr);
-        Ent::Entity* resolvedInstanceOfA = B.resolveEntityRef({ ".." });
+        Ent::Entity* resolvedInstanceOfA = B.resolveEntityRef({".."});
         ENTLIB_ASSERT(resolvedInstanceOfA == &instanceOfA);
-        Ent::Entity* resolvedB = instanceOfA.resolveEntityRef({ "B" });
+        Ent::Entity* resolvedB = instanceOfA.resolveEntityRef({"B"});
         ENTLIB_ASSERT(resolvedB == &B);
-        Ent::Entity* resolvedBbis = C.resolveEntityRef({ "../InstanceOfA/B" });
+        Ent::Entity* resolvedBbis = C.resolveEntityRef({"../InstanceOfA/B"});
         ENTLIB_ASSERT(resolvedBbis == &B);
-        Ent::Entity* resolvedC = B.resolveEntityRef({ "../../C" });
+        Ent::Entity* resolvedC = B.resolveEntityRef({"../../C"});
         ENTLIB_ASSERT(resolvedC == &C);
 
         // TEST entity ref resolution from scenes
-        ENTLIB_ASSERT(scene->resolveEntityRef({ ".." }) == nullptr);
-        ENTLIB_ASSERT(scene->resolveEntityRef({ "InstanceOfA" }) == &instanceOfA);
-        ENTLIB_ASSERT(scene->resolveEntityRef({ "InstanceOfA/B" }) == &B);
-        ENTLIB_ASSERT(scene->resolveEntityRef({ "C" }) == &C);
-        ENTLIB_ASSERT(scene->resolveEntityRef({ "InstanceOfA/B/../../C" }) == &C);
+        ENTLIB_ASSERT(scene->resolveEntityRef({".."}) == nullptr);
+        ENTLIB_ASSERT(scene->resolveEntityRef({"InstanceOfA"}) == &instanceOfA);
+        ENTLIB_ASSERT(scene->resolveEntityRef({"InstanceOfA/B"}) == &B);
+        ENTLIB_ASSERT(scene->resolveEntityRef({"C"}) == &C);
+        ENTLIB_ASSERT(scene->resolveEntityRef({"InstanceOfA/B/../../C"}) == &C);
     }
 
     auto testInstanceOf = [](Ent::Entity const& ent) {

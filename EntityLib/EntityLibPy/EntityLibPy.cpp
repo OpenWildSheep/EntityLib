@@ -2,7 +2,6 @@
 
 #include <EntityLib.h>
 
-
 #pragma warning(push, 0)
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -130,7 +129,7 @@ void setValue(Ent::Node& node, Value const& val)
     case Ent::DataType::string:
         node.setString(mapbox::util::apply_visitor(GetValue<std::string>{}, val).c_str());
         break;
-    case Ent::DataType::entityRef: node.setEntityRef({ val.get<EntityRef>() }); break;
+    case Ent::DataType::entityRef: node.setEntityRef({val.get<EntityRef>()}); break;
     case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
 }

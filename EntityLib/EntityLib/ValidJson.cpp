@@ -96,10 +96,10 @@ static json convertToInstanceSchema(Ent::SubschemaRef const& tmplSchemaRef)
 static json convertToInstanceSchema(Ent::Subschema const& tmplSchema)
 {
     json instSchema;
-    mapbox::util::apply_visitor(SetDefault{ "default", &instSchema }, tmplSchema.defaultValue);
+    mapbox::util::apply_visitor(SetDefault{"default", &instSchema}, tmplSchema.defaultValue);
     if (tmplSchema.constValue.has_value())
     {
-        mapbox::util::apply_visitor(SetDefault{ "const", &instSchema }, *tmplSchema.constValue);
+        mapbox::util::apply_visitor(SetDefault{"const", &instSchema}, *tmplSchema.constValue);
     }
     if (not empty(tmplSchema.enumValues))
     {
@@ -115,8 +115,7 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema)
     }
 
     std::array<char const*, static_cast<size_t>(Ent::DataType::COUNT)> typeToStr = {
-        "null", "string", "number", "integer", "object", "array", "boolean", "string", "object"
-    };
+        "null", "string", "number", "integer", "object", "array", "boolean", "string", "object"};
     instSchema["type"] = typeToStr[size_t(tmplSchema.type)];
     std::vector<char const*> requiredList;
     for (auto&& name_prop : tmplSchema.properties)

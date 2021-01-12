@@ -20,9 +20,7 @@ namespace WRPC
             asio::ip::tcp::resolver resolver(m_io_context);
 
             m_socket = new asio::ip::tcp::socket(m_io_context);
-            asio::connect(
-                *m_socket,
-                resolver.resolve(m_IPaddress.c_str(), SERV_PORT));
+            asio::connect(*m_socket, resolver.resolve(m_IPaddress.c_str(), SERV_PORT));
         }
         catch (std::exception& e)
         {
@@ -45,9 +43,9 @@ namespace WRPC
         {
             if (m_socket)
             {
-				m_socket->close();
+                m_socket->close();
                 delete m_socket;
-				m_socket = nullptr;
+                m_socket = nullptr;
             }
         }
         catch (std::exception& e)

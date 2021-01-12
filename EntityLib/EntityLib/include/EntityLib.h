@@ -309,8 +309,10 @@ namespace Ent
 
         /// Dump this Node as a json value
         nlohmann::json toJson(
-			OverrideValueSource _dumpedValueSource = OverrideValueSource::Override, ///< Dump only fields with given value source
-            bool _superKeyIsTypeName = false, ///< Super sub-node are dumped using their type name for key instead of "Super"
+            OverrideValueSource _dumpedValueSource =
+                OverrideValueSource::Override, ///< Dump only fields with given value source
+            bool _superKeyIsTypeName =
+                false, ///< Super sub-node are dumped using their type name for key instead of "Super"
             std::function<void(EntityRef&)> const& _entityRefPreProc = {}) const;
 
         float getDefaultFloat() const; ///< @pre number or integer. @brief Get the default value as float
@@ -370,7 +372,7 @@ namespace Ent
         /// Create a Component which is an "instance of" this one. With no override.
         Component makeInstanceOf() const
         {
-            return Component{ rawData, true, type, root.makeInstanceOf(), version, index };
+            return Component{rawData, true, type, root.makeInstanceOf(), version, index};
         }
         /// \endcond
 
@@ -733,10 +735,12 @@ namespace Ent
 
         /// Dump the given Node with the given schema in json format
         static nlohmann::json dumpNode(
-			Subschema const& _schema, ///< Schema for the Node
-			Node const& _node, ///< the Node to dump
-            OverrideValueSource _dumpedValueSource = OverrideValueSource::Override, ///< Dump only fields with given value source
-            bool _superKeyIsTypeName = false, ///< Super sub-node are dumped using their type name for key instead of "Super"
+            Subschema const& _schema, ///< Schema for the Node
+            Node const& _node, ///< the Node to dump
+            OverrideValueSource _dumpedValueSource =
+                OverrideValueSource::Override, ///< Dump only fields with given value source
+            bool _superKeyIsTypeName =
+                false, ///< Super sub-node are dumped using their type name for key instead of "Super"
             std::function<void(EntityRef&)> const& _entityRefPreProc = {});
 
         /// @brief Create an Entity which instanciate an other.
@@ -849,7 +853,7 @@ namespace Ent
     template <typename V>
     void Override<V>::computeMemory(MemoryProfiler& prof) const
     {
-        Memory compute{ &prof };
+        Memory compute{&prof};
         compute(defaultValue);
         if (hasPrefab)
             compute(prefabValue);

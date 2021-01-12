@@ -239,7 +239,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyPool",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -301,7 +301,7 @@
                                                     "Data": {
                                                         "Source": ".EP1_",
                                                         "Target": ".EP1-DrainRoot_",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -318,7 +318,7 @@
                             }
                         ],
                         "Name": "EP1_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -353,7 +353,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -423,7 +423,7 @@
                                                     "Data": {
                                                         "Source": ".EP1-Crook_",
                                                         "Target": ".EP1-Crook_001",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -440,7 +440,7 @@
                             }
                         ],
                         "Name": "EP1-Crook_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -475,7 +475,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyDrain_Root",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -537,7 +537,7 @@
                                                     "Data": {
                                                         "Source": ".EP1-DrainRoot_",
                                                         "Target": ".EP1-Crook_",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -554,7 +554,7 @@
                             }
                         ],
                         "Name": "EP1-DrainRoot_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -589,7 +589,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyPool_Hub",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -616,7 +616,7 @@
                             }
                         ],
                         "Name": "MainPool-Hub_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -651,7 +651,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergySpout_Root",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -678,7 +678,7 @@
                             }
                         ],
                         "Name": "MainPool-SpoutRoot1_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -713,7 +713,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergySpout_Root",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -740,7 +740,7 @@
                             }
                         ],
                         "Name": "MainPool-SpoutRoot2_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -775,7 +775,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyPool",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -837,7 +837,7 @@
                                                     "Data": {
                                                         "Source": ".EP2_",
                                                         "Target": ".EP2-DrainRoot_",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -854,7 +854,7 @@
                             }
                         ],
                         "Name": "EP2_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -889,7 +889,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -959,7 +959,7 @@
                                                     "Data": {
                                                         "Source": ".EP2-Crook_",
                                                         "Target": ".EP2-Crook_001",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -976,7 +976,7 @@
                             }
                         ],
                         "Name": "EP2-Crook_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -1011,7 +1011,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyDrain_Root",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -1073,7 +1073,7 @@
                                                     "Data": {
                                                         "Source": ".EP2-DrainRoot_",
                                                         "Target": ".EP2-Crook_",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -1090,7 +1090,7 @@
                             }
                         ],
                         "Name": "EP2-DrainRoot_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -1274,7 +1274,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyPool",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -1336,7 +1336,7 @@
                                                     "Data": {
                                                         "Source": ".EP3_",
                                                         "Target": ".EP3-DrainRoot_",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -1353,7 +1353,7 @@
                             }
                         ],
                         "Name": "EP3_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -1388,7 +1388,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyDrain_Root",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -1450,7 +1450,7 @@
                                                     "Data": {
                                                         "Source": ".EP3-DrainRoot_",
                                                         "Target": ".EP3-Crook_",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -1467,7 +1467,7 @@
                             }
                         ],
                         "Name": "EP3-DrainRoot_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -1502,7 +1502,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -1572,7 +1572,7 @@
                                                     "Data": {
                                                         "Source": ".EP3-Crook_",
                                                         "Target": ".EP3-Crook_001",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -1589,7 +1589,7 @@
                             }
                         ],
                         "Name": "EP3-Crook_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -1624,7 +1624,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyPool",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -1686,7 +1686,7 @@
                                                     "Data": {
                                                         "Source": ".EP4_",
                                                         "Target": ".EP4-DrainRoot_",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -1703,7 +1703,7 @@
                             }
                         ],
                         "Name": "EP4_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -1738,7 +1738,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -1808,7 +1808,7 @@
                                                     "Data": {
                                                         "Source": ".EP4_Crook",
                                                         "Target": ".EP4_Crook001",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -1825,7 +1825,7 @@
                             }
                         ],
                         "Name": "EP4_Crook",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -1860,7 +1860,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyDrain_Root",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -1922,7 +1922,7 @@
                                                     "Data": {
                                                         "Source": ".EP4-DrainRoot_",
                                                         "Target": ".EP4_Crook",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -1939,7 +1939,7 @@
                             }
                         ],
                         "Name": "EP4-DrainRoot_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -1974,7 +1974,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergySpout_Root",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -2001,7 +2001,7 @@
                             }
                         ],
                         "Name": "MainPool-SpoutRoot4_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -2036,7 +2036,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergySpout_Root",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -2063,7 +2063,7 @@
                             }
                         ],
                         "Name": "MainPool-SpoutRoot3_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -2354,7 +2354,7 @@
                             {
                                 "Data": {
                                     "Tag": "ButterfliesFlocking",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -2384,7 +2384,7 @@
                             }
                         ],
                         "Name": "SpawnerButterflies_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -2419,7 +2419,7 @@
                             {
                                 "Data": {
                                     "Tag": "ButterfliesFlocking",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -2449,7 +2449,7 @@
                             }
                         ],
                         "Name": "SpawnerButterflies_003",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -2484,7 +2484,7 @@
                             {
                                 "Data": {
                                     "Tag": "ButterfliesFlocking",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -2514,7 +2514,7 @@
                             }
                         ],
                         "Name": "SpawnerButterflies_004",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -2549,7 +2549,7 @@
                             {
                                 "Data": {
                                     "Tag": "ButterfliesFlocking",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -2579,7 +2579,7 @@
                             }
                         ],
                         "Name": "SpawnerButterflies_005",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -2614,7 +2614,7 @@
                             {
                                 "Data": {
                                     "Tag": "GrassHopperFlockingSpawner",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -2644,7 +2644,7 @@
                             }
                         ],
                         "Name": "SpawnerMushrooms_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -2679,7 +2679,7 @@
                             {
                                 "Data": {
                                     "Tag": "GrassHopperFlockingSpawner",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -2709,7 +2709,7 @@
                             }
                         ],
                         "Name": "SpawnerMushrooms_001",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -2939,7 +2939,7 @@
                             {
                                 "Data": {
                                     "Tag": "GrassHopperFlockingSpawner",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -2969,7 +2969,7 @@
                             }
                         ],
                         "Name": "SpawnerMushrooms_006",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -3004,7 +3004,7 @@
                             {
                                 "Data": {
                                     "Tag": "ButterfliesFlocking",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -3034,7 +3034,7 @@
                             }
                         ],
                         "Name": "SpawnerButterflies_008",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -10581,7 +10581,7 @@
                             {
                                 "Data": {
                                     "Tag": "ButterfliesFlocking",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -10611,7 +10611,7 @@
                             }
                         ],
                         "Name": "SpawnerButterflies_010",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -10961,7 +10961,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -11033,7 +11033,7 @@
                                                     "Data": {
                                                         "Source": ".EP1-Crook_001",
                                                         "Target": ".EP1-Crook_002",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -11050,7 +11050,7 @@
                             }
                         ],
                         "Name": "EP1-Crook_001",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -11085,7 +11085,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -11157,7 +11157,7 @@
                                                     "Data": {
                                                         "Source": ".EP1-Crook_002",
                                                         "Target": ".EP1-Crook_003",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -11174,7 +11174,7 @@
                             }
                         ],
                         "Name": "EP1-Crook_002",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -11209,7 +11209,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -11281,7 +11281,7 @@
                                                     "Data": {
                                                         "Source": ".EP1-Crook_003",
                                                         "Target": ".EP1-Crook_004",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -11298,7 +11298,7 @@
                             }
                         ],
                         "Name": "EP1-Crook_003",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -11333,7 +11333,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -11405,7 +11405,7 @@
                                                     "Data": {
                                                         "Source": ".EP1-Crook_004",
                                                         "Target": ".EP1-Crook_005",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -11422,7 +11422,7 @@
                             }
                         ],
                         "Name": "EP1-Crook_004",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -11457,7 +11457,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -11529,7 +11529,7 @@
                                                     "Data": {
                                                         "Source": ".EP1-Crook_005",
                                                         "Target": ".EP1-Crook_006",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -11546,7 +11546,7 @@
                             }
                         ],
                         "Name": "EP1-Crook_005",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -11581,7 +11581,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -11653,7 +11653,7 @@
                                                     "Data": {
                                                         "Source": ".EP1-Crook_006",
                                                         "Target": ".EP1-Crook_007",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -11670,7 +11670,7 @@
                             }
                         ],
                         "Name": "EP1-Crook_006",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -11705,7 +11705,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -11777,7 +11777,7 @@
                                                     "Data": {
                                                         "Source": ".EP1-Crook_007",
                                                         "Target": ".EP1-Crook_008",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -11794,7 +11794,7 @@
                             }
                         ],
                         "Name": "EP1-Crook_007",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -11829,7 +11829,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -11901,7 +11901,7 @@
                                                     "Data": {
                                                         "Source": ".EP1-Crook_008",
                                                         "Target": ".EP1-Crook_009",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -11918,7 +11918,7 @@
                             }
                         ],
                         "Name": "EP1-Crook_008",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -11953,7 +11953,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -12025,7 +12025,7 @@
                                                     "Data": {
                                                         "Source": ".EP1-Crook_009",
                                                         "Target": ".MainPool-SpoutRoot1_",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -12042,7 +12042,7 @@
                             }
                         ],
                         "Name": "EP1-Crook_009",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -12077,7 +12077,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -12149,7 +12149,7 @@
                                                     "Data": {
                                                         "Source": ".EP2-Crook_001",
                                                         "Target": ".EP2-Crook_002",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -12166,7 +12166,7 @@
                             }
                         ],
                         "Name": "EP2-Crook_001",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -12201,7 +12201,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -12273,7 +12273,7 @@
                                                     "Data": {
                                                         "Source": ".EP2-Crook_002",
                                                         "Target": ".EP2-Crook_003",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -12290,7 +12290,7 @@
                             }
                         ],
                         "Name": "EP2-Crook_002",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -12325,7 +12325,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -12397,7 +12397,7 @@
                                                     "Data": {
                                                         "Source": ".EP2-Crook_003",
                                                         "Target": ".EP2-Crook_004",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -12414,7 +12414,7 @@
                             }
                         ],
                         "Name": "EP2-Crook_003",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -12449,7 +12449,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -12521,7 +12521,7 @@
                                                     "Data": {
                                                         "Source": ".EP2-Crook_004",
                                                         "Target": ".EP2-Crook_005",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -12538,7 +12538,7 @@
                             }
                         ],
                         "Name": "EP2-Crook_004",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -12573,7 +12573,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -12645,7 +12645,7 @@
                                                     "Data": {
                                                         "Source": ".EP2-Crook_005",
                                                         "Target": ".EP2-Crook_006",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -12662,7 +12662,7 @@
                             }
                         ],
                         "Name": "EP2-Crook_005",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -12697,7 +12697,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -12769,7 +12769,7 @@
                                                     "Data": {
                                                         "Source": ".EP2-Crook_006",
                                                         "Target": ".EP2-Crook_007",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -12786,7 +12786,7 @@
                             }
                         ],
                         "Name": "EP2-Crook_006",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -12821,7 +12821,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -12893,7 +12893,7 @@
                                                     "Data": {
                                                         "Source": ".EP2-Crook_007",
                                                         "Target": ".MainPool-SpoutRoot2_",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -12910,7 +12910,7 @@
                             }
                         ],
                         "Name": "EP2-Crook_007",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -12945,7 +12945,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -13017,7 +13017,7 @@
                                                     "Data": {
                                                         "Source": ".EP3-Crook_001",
                                                         "Target": ".EP3-Crook_002",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -13034,7 +13034,7 @@
                             }
                         ],
                         "Name": "EP3-Crook_001",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -13069,7 +13069,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -13141,7 +13141,7 @@
                                                     "Data": {
                                                         "Source": ".EP3-Crook_002",
                                                         "Target": ".EP3-Crook_003",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -13158,7 +13158,7 @@
                             }
                         ],
                         "Name": "EP3-Crook_002",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -13193,7 +13193,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -13265,7 +13265,7 @@
                                                     "Data": {
                                                         "Source": ".EP3-Crook_003",
                                                         "Target": ".EP3-Crook_004",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -13282,7 +13282,7 @@
                             }
                         ],
                         "Name": "EP3-Crook_003",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -13317,7 +13317,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -13389,7 +13389,7 @@
                                                     "Data": {
                                                         "Source": ".EP3-Crook_004",
                                                         "Target": ".EP3-Crook_005",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -13406,7 +13406,7 @@
                             }
                         ],
                         "Name": "EP3-Crook_004",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -13441,7 +13441,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -13513,7 +13513,7 @@
                                                     "Data": {
                                                         "Source": ".EP3-Crook_005",
                                                         "Target": ".EP3-Crook_006",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -13530,7 +13530,7 @@
                             }
                         ],
                         "Name": "EP3-Crook_005",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -13565,7 +13565,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -13637,7 +13637,7 @@
                                                     "Data": {
                                                         "Source": ".EP3-Crook_006",
                                                         "Target": ".EP3-Crook_007",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -13654,7 +13654,7 @@
                             }
                         ],
                         "Name": "EP3-Crook_006",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -13689,7 +13689,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -13761,7 +13761,7 @@
                                                     "Data": {
                                                         "Source": ".EP3-Crook_007",
                                                         "Target": ".EP3-Crook_008",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -13778,7 +13778,7 @@
                             }
                         ],
                         "Name": "EP3-Crook_007",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -13813,7 +13813,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -13885,7 +13885,7 @@
                                                     "Data": {
                                                         "Source": ".EP3-Crook_008",
                                                         "Target": ".EP3-Crook_009",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -13902,7 +13902,7 @@
                             }
                         ],
                         "Name": "EP3-Crook_008",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -13937,7 +13937,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -14009,7 +14009,7 @@
                                                     "Data": {
                                                         "Source": ".EP3-Crook_009",
                                                         "Target": ".MainPool-SpoutRoot3_",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -14026,7 +14026,7 @@
                             }
                         ],
                         "Name": "EP3-Crook_009",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -33071,7 +33071,7 @@
                             {
                                 "Data": {
                                     "Tag": "ButterfliesFlocking",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -33101,7 +33101,7 @@
                             }
                         ],
                         "Name": "SpawnerButterflies_011",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -33136,7 +33136,7 @@
                             {
                                 "Data": {
                                     "Tag": "ButterfliesFlocking",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -33166,7 +33166,7 @@
                             }
                         ],
                         "Name": "SpawnerButterflies_012",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -33201,7 +33201,7 @@
                             {
                                 "Data": {
                                     "Tag": "ButterfliesFlocking",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -33231,7 +33231,7 @@
                             }
                         ],
                         "Name": "SpawnerButterflies_013",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -33266,7 +33266,7 @@
                             {
                                 "Data": {
                                     "Tag": "GrassHopperFlockingSpawner",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -33296,7 +33296,7 @@
                             }
                         ],
                         "Name": "SpawnerMushrooms_007",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -33331,7 +33331,7 @@
                             {
                                 "Data": {
                                     "Tag": "GrassHopperFlockingSpawner",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -33361,7 +33361,7 @@
                             }
                         ],
                         "Name": "SpawnerMushrooms_008",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -40076,7 +40076,7 @@
                             {
                                 "Data": {
                                     "Tag": "ButterfliesFlocking",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -40106,7 +40106,7 @@
                             }
                         ],
                         "Name": "SpawnerButterflies_014",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -40411,7 +40411,7 @@
                             {
                                 "Data": {
                                     "Tag": "FlockingBirdRavenLushSpawner",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -40441,7 +40441,7 @@
                             }
                         ],
                         "Name": "SpawnerFlocking_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -40476,7 +40476,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -40548,7 +40548,7 @@
                                                     "Data": {
                                                         "Source": ".EP4_Crook001",
                                                         "Target": ".EP4_Crook002",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -40565,7 +40565,7 @@
                             }
                         ],
                         "Name": "EP4_Crook001",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -40600,7 +40600,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -40672,7 +40672,7 @@
                                                     "Data": {
                                                         "Source": ".EP4_Crook002",
                                                         "Target": ".EP4_Crook003",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -40689,7 +40689,7 @@
                             }
                         ],
                         "Name": "EP4_Crook002",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -40724,7 +40724,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -40796,7 +40796,7 @@
                                                     "Data": {
                                                         "Source": ".EP4_Crook003",
                                                         "Target": ".EP4_Crook004",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -40813,7 +40813,7 @@
                             }
                         ],
                         "Name": "EP4_Crook003",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -40848,7 +40848,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -40920,7 +40920,7 @@
                                                     "Data": {
                                                         "Source": ".EP4_Crook004",
                                                         "Target": ".EP4_Crook005",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -40937,7 +40937,7 @@
                             }
                         ],
                         "Name": "EP4_Crook004",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -40972,7 +40972,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -41044,7 +41044,7 @@
                                                     "Data": {
                                                         "Source": ".EP4_Crook005",
                                                         "Target": ".EP4_Crook006",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -41061,7 +41061,7 @@
                             }
                         ],
                         "Name": "EP4_Crook005",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -41096,7 +41096,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -41168,7 +41168,7 @@
                                                     "Data": {
                                                         "Source": ".EP4_Crook006",
                                                         "Target": ".EP4_Crook007",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -41185,7 +41185,7 @@
                             }
                         ],
                         "Name": "EP4_Crook006",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -41220,7 +41220,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -41292,7 +41292,7 @@
                                                     "Data": {
                                                         "Source": ".EP4_Crook007",
                                                         "Target": ".MainPool-SpoutRoot4_",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -41309,7 +41309,7 @@
                             }
                         ],
                         "Name": "EP4_Crook007",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -43099,7 +43099,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyPool",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -43161,7 +43161,7 @@
                                                     "Data": {
                                                         "Source": ".EP5_",
                                                         "Target": ".EP5-Drainroot_",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -43178,7 +43178,7 @@
                             }
                         ],
                         "Name": "EP5_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -43213,7 +43213,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyDrain_Root",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -43275,7 +43275,7 @@
                                                     "Data": {
                                                         "Source": ".EP5-Drainroot_",
                                                         "Target": ".EP5-crook_",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -43292,7 +43292,7 @@
                             }
                         ],
                         "Name": "EP5-Drainroot_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -43327,7 +43327,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergyCrook",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -43399,7 +43399,7 @@
                                                     "Data": {
                                                         "Source": ".EP5-crook_",
                                                         "Target": ".MainPool-SpoutRoot5_",
-                                                        "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                                        "ThumbnailMesh": "01_Common/Spawner/DefaultLinkVisual.wthumb"
                                                     },
                                                     "Type": "NetworkLink",
                                                     "Version": 1
@@ -43416,7 +43416,7 @@
                             }
                         ],
                         "Name": "EP5-crook_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -43451,7 +43451,7 @@
                             {
                                 "Data": {
                                     "Tag": "EnergySpout_Root",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -43478,7 +43478,7 @@
                             }
                         ],
                         "Name": "MainPool-SpoutRoot5_",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -43513,7 +43513,7 @@
                             {
                                 "Data": {
                                     "Tag": "TroutRegularFullLush",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -43543,7 +43543,7 @@
                             }
                         ],
                         "Name": "SpawnerTrout_004",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -43578,7 +43578,7 @@
                             {
                                 "Data": {
                                     "Tag": "TroutRegularFullLush",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -43608,7 +43608,7 @@
                             }
                         ],
                         "Name": "SpawnerTrout_005",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -43643,7 +43643,7 @@
                             {
                                 "Data": {
                                     "Tag": "TroutRegularFullLush",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -43673,7 +43673,7 @@
                             }
                         ],
                         "Name": "SpawnerTrout_006",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [
@@ -43792,7 +43792,7 @@
                             {
                                 "Data": {
                                     "Tag": "ButterfliesFlockingUnderwater",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultNodeVisual.wbm",
+                                    "ThumbnailMesh": "01_Common/Spawner/DefaultNodeVisual.wthumb",
                                     "Type": "Spawner"
                                 },
                                 "Type": "NetworkNode",
@@ -43822,7 +43822,7 @@
                             }
                         ],
                         "Name": "SpawnerTrout_007",
-                        "Thumbnail": "WildMaxScript/Resources/DefaultNodeVisual.wthumb"
+                        "Thumbnail": "01_Common/Spawner/DefaultNodeVisual.wthumb"
                     },
                     {
                         "Color": [

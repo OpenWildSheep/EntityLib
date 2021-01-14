@@ -355,6 +355,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property("name", &Entity::getName, &Entity::setName)
         .def_property_readonly("instance_of", &Entity::getInstanceOf)
         .def_property("thumbnail", &Entity::getThumbnail, &Entity::setThumbnail)
+        .def_property_readonly("parent_scene", &Entity::getParentScene)
         .def_property(
             "max_activation_level", &Entity::getMaxActivationLevel, &Entity::setMaxActivationLevel)
         .def_property("color", &Entity::getColor, &Entity::setColor)
@@ -387,6 +388,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
                 scene->addEntity(ent->clone()); return scene->getObjects().back().get();
             }, py::return_value_policy::reference_internal)
         .def("resolve_entityref", &Scene::resolveEntityRef, py::return_value_policy::reference_internal)
+        .def_property_readonly("owner_entity", &Scene::getOwnerEntity)
         .def("get_entity",
             static_cast<Entity*(Scene::*)(size_t)>(&Scene::getEntity),
             py::return_value_policy::reference_internal)

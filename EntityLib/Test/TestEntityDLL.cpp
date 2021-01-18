@@ -297,6 +297,12 @@ try
     };
 
     {
+        Ent::Entity ent(entlib);
+        ent.setInstanceOf("prefab.entity");
+        ENTLIB_ASSERT(ent.getInstanceOf() == std::string("prefab.entity"));
+    }
+
+    {
         EntityPtr ent = entlib.loadEntity("prefab.entity");
 
         testPrefabEntity(ent.get());
@@ -751,15 +757,15 @@ try
     }
 
     {
-        // Test create instance of
+        // Test makeInstanceOf
         EntityPtr instanceOf = entlib.makeInstanceOf("prefab.entity");
         ENTLIB_ASSERT(instanceOf->getComponent("NetworkNode") != nullptr);
         instanceOf->getComponent("TransformGD")->root.getFieldNames();
         entlib.saveEntity(*instanceOf, "instance.create.entity");
     }
-    {
+    auto testCreateInstanceOf = [&entlib](char const* _instancePath) {
         // Test read instance of
-        EntityPtr ent = entlib.loadEntity("instance.create.entity");
+        EntityPtr ent = entlib.loadEntity(_instancePath);
 
         ent->getComponent("TransformGD")->root.getFieldNames();
 
@@ -792,7 +798,17 @@ try
         ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
         ENTLIB_ASSERT(sysCreat->root.at("Name")->getString() == std::string()); // default
         ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
+    };
+    testCreateInstanceOf("instance.create.entity");
+    {
+        // Test setInstanceOf
+        Ent::Entity instanceOf(entlib);
+        instanceOf.setInstanceOf("prefab.entity");
+        ENTLIB_ASSERT(instanceOf.getComponent("NetworkNode") != nullptr);
+        instanceOf.getComponent("TransformGD")->root.getFieldNames();
+        entlib.saveEntity(instanceOf, "setInstanceOf.entity");
     }
+    testCreateInstanceOf("setInstanceOf.entity");
 
     // ******************************** Test iteration of schema **********************************
     if (doDisplaySubSchema)

@@ -582,6 +582,11 @@ namespace Ent
             maxActivationLevel.computeMemory(prof);
         }
 
+        /// Reset the Entity to be an instance of the given \b _template
+        ///
+        /// @warning All Nodes into the Entity will be invalidated
+        void setInstanceOf(char const* _template);
+
     private:
         void updateSubSceneOwner();
         EntityLib const* entlib{}; ///< Reference the entity lib to find the schema when needed

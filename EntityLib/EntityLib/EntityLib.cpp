@@ -1148,6 +1148,38 @@ namespace Ent
         parentScene = _scene;
     }
 
+    void Entity::setInstanceOf(char const* _template)
+    {
+        std::shared_ptr<Ent::Entity const> templ = entlib->loadEntityReadOnly(_template, nullptr);
+        components.clear();
+        for (auto const& type_comp : templ->getComponents())
+        {
+            auto const& cmpType = std::get<0>(type_comp);
+            auto const& superComp = std::get<1>(type_comp);
+            components.emplace(
+                cmpType,
+                Ent::Component{
+                    superComp.rawData,
+                    true,
+                    cmpType,
+                    superComp.root.makeInstanceOf(),
+                    superComp.version,
+                    superComp.index,
+                });
+        }
+        name = templ->getNameValue().makeInstanceOf();
+        subSceneComponent = templ->getSubSceneComponent() != nullptr ?
+                                templ->getSubSceneComponent()->makeInstanceOf() :
+                                nullptr;
+        actorStates = templ->getActorStates().makeInstanceOf();
+        color = templ->getColorValue().makeInstanceOf();
+        thumbnail = templ->getThumbnailValue().makeInstanceOf();
+        instanceOf = templ->getInstanceOfValue().makeOverridedInstanceOf(_template);
+        maxActivationLevel = templ->getMaxActivationLevelValue().makeInstanceOf();
+
+        updateSubSceneOwner();
+    }
+
     Scene* Entity::getParentScene() const
     {
         return parentScene;
@@ -2473,34 +2505,8 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
 
 std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
 {
-    std::shared_ptr<Ent::Entity const> templ = loadEntityReadOnly(_instanceOf, nullptr);
-    std::map<std::string, Ent::Component> components;
-    for (auto const& type_comp : templ->getComponents())
-    {
-        auto const& cmpType = std::get<0>(type_comp);
-        auto const& superComp = std::get<1>(type_comp);
-        components.emplace(
-            cmpType,
-            Ent::Component{
-                superComp.rawData,
-                true,
-                cmpType,
-                superComp.root.makeInstanceOf(),
-                superComp.version,
-                superComp.index,
-            });
-    }
-    auto inst = std::make_unique<Ent::Entity>(
-        *this,
-        templ->getNameValue().makeInstanceOf(),
-        components,
-        templ->getSubSceneComponent() != nullptr ? templ->getSubSceneComponent()->makeInstanceOf() :
-                                                   nullptr,
-        templ->getActorStates().makeInstanceOf(),
-        templ->getColorValue().makeInstanceOf(),
-        templ->getThumbnailValue().makeInstanceOf(),
-        templ->getInstanceOfValue().makeOverridedInstanceOf(_instanceOf),
-        templ->getMaxActivationLevelValue().makeInstanceOf());
+    std::unique_ptr<Ent::Entity> inst = std::make_unique<Ent::Entity>(*this);
+    inst->setInstanceOf(_instanceOf.c_str());
     return inst;
 }
 

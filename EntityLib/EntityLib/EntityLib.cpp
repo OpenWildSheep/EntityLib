@@ -1231,7 +1231,9 @@ namespace Ent
         return {relativePath};
     }
 
-    static Scene* getSubScene(Entity* _entity)
+    /// @tparam E is Entity or Entity const.
+    template <typename E>
+    static auto getSubScene(E* _entity) -> decltype(_entity->getSubSceneComponent()->embedded.get())
     {
         if (auto* subScene = _entity->getSubSceneComponent())
         {
@@ -1253,8 +1255,10 @@ namespace Ent
         return found == children.end() ? nullptr : found->get();
     }
 
-    static Entity* resolveEntityRefRecursive(
-        Entity* _current, Scene* _up, Scene* _down, std::vector<std::string>& _path)
+    /// @tparam E is Entity or Entity const.
+    template <typename E>
+    static E*
+    resolveEntityRefRecursive(E* _current, Scene* _up, Scene* _down, std::vector<std::string>& _path)
     {
         auto& head = _path.front();
 
@@ -1290,7 +1294,9 @@ namespace Ent
         return resolveEntityRefRecursive(_current, _up, _down, _path);
     }
 
-    Entity* Entity::resolveEntityRef(const EntityRef& _entityRef)
+    /// @tparam E is Entity or Entity const.
+    template <typename E>
+    E* resolveEntityRefImpl(E* _current, const EntityRef& _entityRef)
     {
         if (_entityRef.entityPath.empty())
         {
@@ -1301,11 +1307,20 @@ namespace Ent
         // split around '/'
         std::vector<std::string> parts = splitString(_entityRef.entityPath.c_str(), '/');
 
-        Entity* current = this;
-        Scene* down = getSubScene(current);
-        Scene* up = current->getParentScene();
+        Scene* down = getSubScene(_current);
+        Scene* up = _current->getParentScene();
 
-        return resolveEntityRefRecursive(current, up, down, parts);
+        return resolveEntityRefRecursive(_current, up, down, parts);
+    }
+
+    Entity* Entity::resolveEntityRef(const EntityRef& _entityRef)
+    {
+        return resolveEntityRefImpl(this, _entityRef);
+    }
+
+    Entity const* Entity::resolveEntityRef(const EntityRef& _entityRef) const
+    {
+        return resolveEntityRefImpl(this, _entityRef);
     }
 
     void Entity::updateSubSceneOwner()

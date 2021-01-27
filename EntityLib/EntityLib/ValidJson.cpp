@@ -181,7 +181,7 @@ static json const* fetchDocument(const std::string& uri)
         std::size(buff),
         "%s/%s",
         schemaPath,
-        uri.find("file://") == 0 ? uri.c_str() + 7 : uri.c_str());
+        uri.find("./") == 0 ? uri.c_str() + strlen("./") : uri.c_str());
     if (!valijson::utils::loadDocument(buff, *fetchedRoot))
     {
         return nullptr;
@@ -254,7 +254,7 @@ void Ent::validateEntity(
     json schemaDocument = loadJsonFile(_toolsDir / entitySchemaPath);
 
     json fullSceneInstanceSchema = convertToInstanceSchema(
-        _schema, _schema.allDefinitions.at("file://Scene-schema.json#/definitions/Object"));
+        _schema, _schema.allDefinitions.at("./Scene-schema.json#/definitions/Object"));
 
     // Parse the json schema into an internal schema format
     valijson::Schema vjSchema;

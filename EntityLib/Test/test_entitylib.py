@@ -66,11 +66,11 @@ try:
 
     ####################################################################################################################
     # Test $ref links in entlib.schema.schema.allDefinitions
-    colorRef = "file://RuntimeComponents.json#/definitions/Color"
+    colorRef = "./RuntimeComponents.json#/definitions/Color"
     assert colorRef in entlib.schema.schema.definitions
 
     # Check Ent::Subschema::getUnionTypesMap
-    cinematicGDRef = "file://RuntimeComponents.json#/definitions/CinematicGD"
+    cinematicGDRef = "./RuntimeComponents.json#/definitions/CinematicGD"
     cinematicGDSchema = entlib.schema.schema.definitions[cinematicGDRef]
     scriptEventUnionSchema = cinematicGDSchema.properties["ScriptEvents"].get().get_singular_items().get()
     nameToTypeMap = scriptEventUnionSchema.get_union_types_dict()
@@ -82,7 +82,7 @@ try:
     # Ensure that all components have a ref and is in entlib.schema.schema.allDefinitions
     for name, schema in entlib.schema.components.items():
         absRef = schema.name
-        assert absRef.find("file://") == 0
+        assert absRef.find("./") == 0
         assert absRef in entlib.schema.schema.definitions
 
     ####################################################################################################################
@@ -122,7 +122,7 @@ try:
         voxelSimulationGD = ent.get_component("VoxelSimulationGD")
         assert(voxelSimulationGD.root.at("TransmissionBySecond").value == 100.)
         assert(voxelSimulationGD.root.at("TransmissionBySecond").is_default())
-        assert(voxelSimulationGD.root.get_type_name() == "file://RuntimeComponents.json#/definitions/VoxelSimulationGD")
+        assert(voxelSimulationGD.root.get_type_name() == "./RuntimeComponents.json#/definitions/VoxelSimulationGD")
 
         # TEST read inherited values in inherited component
         heightObj = ent.get_component("HeightObj")
@@ -176,7 +176,7 @@ try:
         oneOfScripts = scriptEvents.at(0)  # type: Ent.Node
         assert(oneOfScripts.datatype == Ent.DataType.union)
         cineEvent = oneOfScripts.get_union_data()  # type: Ent.Node
-        assert(cineEvent.get_type_name() == "file://RuntimeComponents.json#/definitions/CineEventTestBlackboardHasFact")
+        assert(cineEvent.get_type_name() == "./RuntimeComponents.json#/definitions/CineEventTestBlackboardHasFact")
 
         nbEnt = cineEvent.at("FactName")  # type: Ent.Node
         assert(nbEnt is not None)

@@ -558,6 +558,10 @@ namespace Ent
         /// Returns nullptr in case of failure.
         Entity* resolveEntityRef(const EntityRef& _entityRef);
 
+        /// @brief Resolve an EntityRef relative to this entity.
+        /// Returns nullptr in case of failure.
+        Entity const* resolveEntityRef(const EntityRef& _entityRef) const;
+
         /// @brief Get the parent scene object containing this entity, if any.
         Scene* getParentScene() const;
 

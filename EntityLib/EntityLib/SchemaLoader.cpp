@@ -38,7 +38,7 @@ void Ent::SchemaLoader::parseSchema(
             return;
         }
         // Use absolute path to avoid name collision
-        auto absRef = (ref.front() == '#') ? ("file://" + _filename + ref) : ref;
+        auto absRef = (ref.front() == '#') ? ("./" + _filename + ref) : ref;
         vis.openRef(absRef.c_str());
         if (parsedRef.count(absRef) != 0) // Was already parsed
         {
@@ -46,10 +46,10 @@ void Ent::SchemaLoader::parseSchema(
             return;
         }
         parsedRef.insert(absRef);
-        // ref look like this : "file://EditionComponents.json#/definitions/HeightObj"
-        if (ref.find("file://") == 0)
+        // ref look like this : "./EditionComponents.json#/definitions/HeightObj"
+        if (ref.find("./") == 0)
         {
-            ref = ref.substr(strlen("file://"));
+            ref = ref.substr(strlen("./"));
         }
         auto sharp = ref.find('#');
         auto fileName = ref.substr(0, sharp);

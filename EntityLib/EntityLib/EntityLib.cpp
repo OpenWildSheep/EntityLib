@@ -36,8 +36,8 @@ namespace Ent
     template <>
     Pool<Node> Pool<Node>::pool;
 
-    char const* actorStatesSchemaName = "file://Scene-schema.json#/definitions/ActorStates";
-    char const* colorSchemaName = "file://RuntimeComponents.json#/definitions/Color";
+    char const* actorStatesSchemaName = "./Scene-schema.json#/definitions/ActorStates";
+    char const* colorSchemaName = "./RuntimeComponents.json#/definitions/Color";
     static Ent::Node makeDefaultColorField(EntityLib const& _entlib)
     {
         Ent::Subschema const& colorSchema = _entlib.schema.schema.allDefinitions.at(colorSchemaName);
@@ -73,7 +73,7 @@ namespace Ent
         loader.readSchema(&schema.schema, "Scene-schema.json", schemaDocument, schemaDocument);
 
         auto&& compList =
-            schema.schema.allDefinitions["file://MergedComponents.json#/definitions/Component"].oneOf;
+            schema.schema.allDefinitions["./MergedComponents.json#/definitions/Component"].oneOf;
 
         for (SubschemaRef& comp : *compList)
         {

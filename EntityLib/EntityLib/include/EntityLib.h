@@ -58,6 +58,7 @@ namespace Ent
     struct Object
     {
         std::vector<std::pair<char const*, value_ptr<Node>>> nodes;
+        Override<Ent::String> instanceOf;
 
         size_t size() const
         {
@@ -145,6 +146,7 @@ namespace Ent
     // *********************************** Scene/Entity/Component/Node ****************************
 
     struct Subschema;
+    class EntityLib;
 
     /// Property node. Can contains any type in Ent::DataType
     struct ENTLIB_DLLEXPORT Node
@@ -178,6 +180,7 @@ namespace Ent
             const; ///< @pre type==Ent::DataType::object @brief true if a field with this name exist
         std::vector<char const*>
         getFieldNames() const; ///< @pre type==Ent::DataType::object @brief Get all field names
+        char const* getInstanceOf() const; ///< @pre type==Ent::DataType::object @brief path to the tmpl Node
 
         // Array
         Node* at(size_t _index); ///< @pre type==Ent::DataType::array. @brief Get the item at _index
@@ -269,6 +272,8 @@ namespace Ent
     private:
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
         Value value; ///< Contains one of the types accepted by a Node
+
+        friend EntityLib;
     };
 
     /// The properties of a given component
@@ -711,9 +716,16 @@ namespace Ent
 
         void clearCache();
 
-    private:
+        /// Reset the Node to be an instance of the given \b _template
+        ///
+        /// @warning All sub-nodes into \b _node will be invalidated
+        /// @param _templateNodePath path to the template Node (relative to RawData)
+        /// @param _node which will become instance of \b _templateNodePath
+        void setInstanceOf(char const* _templateNodePath, Node& _node);
+
         std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
 
+    private:
         /// Load an Entity or a Scene, using the given cache
         template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
         std::shared_ptr<Type const> loadEntityOrScene(

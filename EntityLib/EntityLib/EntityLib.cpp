@@ -460,6 +460,8 @@ namespace Ent
 
         bool operator()(Object const& _obj) const
         {
+            if (_obj.instanceOf.hasPrefab or _obj.instanceOf.hasOverride)
+                return false;
             return std::all_of(begin(_obj), end(_obj), [](auto&& name_node) {
                 return std::get<1>(name_node)->hasDefaultValue();
             });
@@ -558,6 +560,7 @@ namespace Ent
         Node operator()(Object const& _obj) const
         {
             Object out;
+            out.instanceOf = _obj.instanceOf.makeInstanceOf();
             out.nodes.reserve(_obj.size());
             for (auto&& name_node : _obj)
             {
@@ -606,6 +609,8 @@ namespace Ent
 
         bool operator()(Object const& _obj) const
         {
+            if (_obj.instanceOf.hasOverride)
+                return true;
             for (auto&& name_node : _obj)
             {
                 if (std::get<1>(name_node)->hasOverride())
@@ -647,6 +652,15 @@ namespace Ent
                 fields.push_back(f.first);
             }
             return fields;
+        }
+        throw BadType();
+    }
+
+    char const* Node::getInstanceOf() const
+    {
+        if (value.is<Object>())
+        {
+            return value.get<Object>().instanceOf.get().c_str();
         }
         throw BadType();
     }
@@ -838,6 +852,7 @@ namespace Ent
         void operator()(Object const& _obj) const
         {
             prof.addMem("Object", _obj.nodes.capacity() * sizeof(_obj.front()));
+            _obj.instanceOf.computeMemory(prof);
             for (auto&& name_node : _obj)
             {
                 std::get<1>(name_node)->computeMemory(prof);
@@ -1636,6 +1651,20 @@ static Ent::Node loadNode(
     case Ent::DataType::object:
     {
         Ent::Object object;
+        // Read the InstanceOf field
+        Ent::Node templateNode;
+        auto InstanceOfIter = _data.find("InstanceOf");
+        if (InstanceOfIter != _data.end())
+        {
+            std::string nodeFileName = InstanceOfIter->get<std::string>();
+            json nodeData = loadJsonFile(_entlib->getAbsolutePath(nodeFileName));
+            templateNode = loadNode(_entlib, _nodeSchema, nodeData, _super);
+            _super = &templateNode;
+            Ent::Override<String> tmplPath("", tl::nullopt, InstanceOfIter->get<std::string>());
+            object.instanceOf = std::move(tmplPath);
+        }
+
+        // Read the fields in schema
         object.nodes.reserve(_nodeSchema.properties.size());
         for (auto&& name_sub : _nodeSchema.properties)
         {
@@ -1912,6 +1941,10 @@ json Ent::EntityLib::dumpNode(
                     data[name] = std::move(subJson);
                 }
             }
+        }
+        if (_node.value.get<Ent::Object>().instanceOf.isSet())
+        {
+            data["InstanceOf"] = _node.getInstanceOf();
         }
     }
     break;
@@ -2587,6 +2620,20 @@ std::filesystem::path Ent::EntityLib::getAbsolutePath(std::filesystem::path cons
         absPath.make_preferred();
         return std::filesystem::weakly_canonical(absPath);
     }
+}
+
+void Ent::EntityLib::setInstanceOf(char const* _templateNodePath, Node& _node)
+{
+    if (not _node.value.is<Object>())
+        throw BadType();
+
+    // TODO : Loïc - How to get the "super" ?
+    //  "super" is the Template data comming from parents Node
+    Node* super = nullptr;
+    json nodeData = loadJsonFile(getAbsolutePath(_templateNodePath));
+    Node templateNode = loadNode(this, *_node.getSchema(), nodeData, super);
+    _node = templateNode.makeInstanceOf();
+    _node.value.get<Object>().instanceOf.set(_templateNodePath);
 }
 
 std::map<std::filesystem::path, Ent::EntityLib::EntityFile> const& Ent::EntityLib::getEntityCache() const

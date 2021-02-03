@@ -230,6 +230,14 @@
         },
         {
             "Data": {
+                "NormalRatio": 0.6000000238418579,
+                "ZOffset": 10.0
+            },
+            "Type": "StickToTerrain",
+            "Version": 1
+        },
+        {
+            "Data": {
                 "BehaviorPath": "Pesto/Behavior/FSMDefaultBehavior.pesto",
                 "BehaviorState": "W/*at*/c//h",
                 "CanBeMaster": false,

@@ -1168,9 +1168,11 @@ namespace Ent
         parentScene = _scene;
     }
 
-    void Entity::setInstanceOf(char const* _template)
+    void Entity::setInstanceOf(std::string _template)
     {
-        std::shared_ptr<Ent::Entity const> templ = entlib->loadEntityReadOnly(_template, nullptr);
+        std::replace(begin(_template), end(_template), '\\', '/');
+        char const* normTmpl = _template.c_str();
+        std::shared_ptr<Ent::Entity const> templ = entlib->loadEntityReadOnly(normTmpl, nullptr);
         components.clear();
         for (auto const& type_comp : templ->getComponents())
         {
@@ -1194,7 +1196,7 @@ namespace Ent
         actorStates = templ->getActorStates().makeInstanceOf();
         color = templ->getColorValue().makeInstanceOf();
         thumbnail = templ->getThumbnailValue().makeInstanceOf();
-        instanceOf = templ->getInstanceOfValue().makeOverridedInstanceOf(_template);
+        instanceOf = templ->getInstanceOfValue().makeOverridedInstanceOf(normTmpl);
         maxActivationLevel = templ->getMaxActivationLevelValue().makeInstanceOf();
 
         updateSubSceneOwner();
@@ -2571,7 +2573,7 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
 std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
 {
     std::unique_ptr<Ent::Entity> inst = std::make_unique<Ent::Entity>(*this);
-    inst->setInstanceOf(_instanceOf.c_str());
+    inst->setInstanceOf(std::move(_instanceOf));
     return inst;
 }
 

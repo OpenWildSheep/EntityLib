@@ -532,7 +532,7 @@ namespace Ent
         /// Reset the Entity to be an instance of the given \b _template
         ///
         /// @warning All Nodes into the Entity will be invalidated
-        void setInstanceOf(char const* _template);
+        void setInstanceOf(std::string _template);
 
     private:
         void updateSubSceneOwner();

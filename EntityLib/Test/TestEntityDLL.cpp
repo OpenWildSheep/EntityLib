@@ -544,6 +544,13 @@ try
         ENTLIB_ASSERT(netLink->root.at("Target")->isSet() == false);
         Ent::Component const* trans = subObj.getComponent("TransformGD");
         ENTLIB_ASSERT(trans->root.at("Position")->at(0llu)->getFloat() == 0.0);
+
+        // Test instanciation of a template Node
+        Ent::Component const* stickToTerrain = ent.getComponent("StickToTerrain");
+        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
+        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isSet() == false);
+        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isDefault() == false);
+        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("ZOffset")->getFloat() - 10.) < 0.0001);
     };
 
     {
@@ -759,6 +766,18 @@ try
     {
         // Test makeInstanceOf
         EntityPtr instanceOf = entlib.makeInstanceOf("prefab.entity");
+
+        // Test instanciation of a template Node
+        Ent::Component* stickToTerrain = instanceOf->addComponent("StickToTerrain");
+        entlib.setInstanceOf("test.StickToTerrain.node", stickToTerrain->root);
+        ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
+        stickToTerrain->root.at("NormalRatio")->setFloat(0.6f);
+
+        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
+        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isSet() == false);
+        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isDefault() == false);
+        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("ZOffset")->getFloat() - 10.) < 0.0001);
+
         ENTLIB_ASSERT(instanceOf->getComponent("NetworkNode") != nullptr);
         instanceOf->getComponent("TransformGD")->root.getFieldNames();
         entlib.saveEntity(*instanceOf, "instance.create.entity");
@@ -768,6 +787,14 @@ try
         EntityPtr ent = entlib.loadEntity(_instancePath);
 
         ent->getComponent("TransformGD")->root.getFieldNames();
+
+        // Test instanciation of a template Node
+        Ent::Component const* stickToTerrain = ent->getComponent("StickToTerrain");
+        ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
+        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
+        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isSet() == false);
+        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isDefault() == false);
+        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("ZOffset")->getFloat() - 10.) < 0.0001);
 
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent->getComponent("HeightObj");
@@ -806,6 +833,12 @@ try
         instanceOf.setInstanceOf("prefab.entity");
         ENTLIB_ASSERT(instanceOf.getComponent("NetworkNode") != nullptr);
         instanceOf.getComponent("TransformGD")->root.getFieldNames();
+
+        // Test instanciation of a template Node
+        Ent::Component* stickToTerrain = instanceOf.addComponent("StickToTerrain");
+        entlib.setInstanceOf("test.StickToTerrain.node", stickToTerrain->root);
+        stickToTerrain->root.at("NormalRatio")->setFloat(0.6f);
+
         entlib.saveEntity(instanceOf, "setInstanceOf.entity");
     }
     testCreateInstanceOf("setInstanceOf.entity");

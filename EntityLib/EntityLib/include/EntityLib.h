@@ -54,7 +54,40 @@ namespace Ent
     /// \cond PRIVATE
 
     /// Content of a Node which has type Ent::DataType::object
-    using Object = std::vector<std::pair<char const*, value_ptr<Node>>>;
+    struct Object
+    {
+        std::vector<std::pair<char const*, value_ptr<Node>>> nodes;
+
+        size_t size() const
+        {
+            return nodes.size();
+        }
+
+        auto front() const
+        {
+            return nodes.front();
+        }
+    };
+
+    inline auto begin(Object const& obj)
+    {
+        return obj.nodes.begin();
+    }
+
+    inline auto end(Object const& obj)
+    {
+        return obj.nodes.end();
+    }
+
+    inline auto begin(Object& obj)
+    {
+        return obj.nodes.begin();
+    }
+
+    inline auto end(Object& obj)
+    {
+        return obj.nodes.end();
+    }
 
     /// Content of a Node which has type Ent::DataType::array
     struct Array

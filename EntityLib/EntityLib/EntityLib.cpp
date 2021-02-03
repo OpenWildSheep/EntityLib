@@ -176,7 +176,7 @@ namespace Ent
         auto range = std::equal_range(begin(obj), end(obj), value, CompObject());
         if (range.first == range.second)
         {
-            obj.insert(range.first, value);
+            obj.nodes.insert(range.first, value);
         }
     }
     Node const& at(Object const& obj, char const* key)
@@ -255,7 +255,7 @@ namespace Ent
     {
         if (value.is<Object>())
         {
-            auto iter = value.get<Object>().begin();
+            auto iter = begin(value.get<Object>());
             std::advance(iter, _index);
             return &(*iter->second);
         }
@@ -501,10 +501,10 @@ namespace Ent
         Node operator()(Object const& _obj) const
         {
             Object out;
-            out.reserve(_obj.size());
+            out.nodes.reserve(_obj.size());
             for (auto&& name_node : _obj)
             {
-                out.push_back({std::get<0>(name_node), std::get<1>(name_node)->detach()});
+                out.nodes.push_back({std::get<0>(name_node), std::get<1>(name_node)->detach()});
             }
             std::sort(begin(out), end(out), CompObject());
             return Node(std::move(out), schema);
@@ -554,10 +554,11 @@ namespace Ent
         Node operator()(Object const& _obj) const
         {
             Object out;
-            out.reserve(_obj.size());
+            out.nodes.reserve(_obj.size());
             for (auto&& name_node : _obj)
             {
-                out.push_back({std::get<0>(name_node), std::get<1>(name_node)->makeInstanceOf()});
+                out.nodes.push_back(
+                    {std::get<0>(name_node), std::get<1>(name_node)->makeInstanceOf()});
             }
             std::sort(begin(out), end(out), CompObject());
             return Node(std::move(out), schema);
@@ -832,7 +833,7 @@ namespace Ent
 
         void operator()(Object const& _obj) const
         {
-            prof.addMem("Object", _obj.capacity() * sizeof(_obj.front()));
+            prof.addMem("Object", _obj.nodes.capacity() * sizeof(_obj.front()));
             for (auto&& name_node : _obj)
             {
                 std::get<1>(name_node)->computeMemory(prof);
@@ -1624,7 +1625,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
     case Ent::DataType::object:
     {
         Ent::Object object;
-        object.reserve(_nodeSchema.properties.size());
+        object.nodes.reserve(_nodeSchema.properties.size());
         for (auto&& name_sub : _nodeSchema.properties)
         {
             std::string const& name = std::get<0>(name_sub);
@@ -1632,7 +1633,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
             static json const emptyJson;
             json const& prop = _data.count(name) != 0 ? _data.at(name) : emptyJson;
             Ent::Node tmpNode = loadNode(*std::get<1>(name_sub), prop, superProp);
-            object.push_back({name.c_str(), std::move(tmpNode)});
+            object.nodes.push_back({name.c_str(), std::move(tmpNode)});
         }
         std::sort(begin(object), end(object), Ent::CompObject());
         result = Ent::Node(std::move(object), &_nodeSchema);

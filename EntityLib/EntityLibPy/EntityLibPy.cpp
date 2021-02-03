@@ -376,6 +376,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference_internal)
         .def("add_subscene_component", &Entity::addSubSceneComponent, py::return_value_policy::reference_internal)
         .def("make_entityref", &Entity::makeEntityRef)
+        .def("set_instance_of", &Entity::setInstanceOf)
         .def("resolve_entityref", (Entity* (Entity::*)(const EntityRef&))&Entity::resolveEntityRef, py::return_value_policy::reference_internal)
         .def("detach_entity_from_prefab", [](Entity* ent) {
             return ent->detachEntityFromPrefab().release();

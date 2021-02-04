@@ -1942,7 +1942,8 @@ json Ent::EntityLib::dumpNode(
                 }
             }
         }
-        if (_node.value.get<Ent::Object>().instanceOf.isSet())
+        if (_dumpedValueSource == OverrideValueSource::Override
+            and _node.value.get<Ent::Object>().instanceOf.isSet())
         {
             data["InstanceOf"] = _node.getInstanceOf();
         }

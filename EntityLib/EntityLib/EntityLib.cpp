@@ -460,8 +460,6 @@ namespace Ent
 
         bool operator()(Object const& _obj) const
         {
-            if (_obj.instanceOf.hasPrefab or _obj.instanceOf.hasOverride)
-                return false;
             return std::all_of(begin(_obj), end(_obj), [](auto&& name_node) {
                 return std::get<1>(name_node)->hasDefaultValue();
             });

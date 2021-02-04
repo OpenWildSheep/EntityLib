@@ -2628,11 +2628,8 @@ void Ent::EntityLib::setInstanceOf(char const* _templateNodePath, Node& _node)
     if (not _node.value.is<Object>())
         throw BadType();
 
-    // TODO : Loïc - How to get the "super" ?
-    //  "super" is the Template data comming from parents Node
-    Node* super = nullptr;
     json nodeData = loadJsonFile(getAbsolutePath(_templateNodePath));
-    Node templateNode = loadNode(this, *_node.getSchema(), nodeData, super);
+    Node templateNode = loadNode(this, *_node.getSchema(), nodeData, nullptr);
     _node = templateNode.makeInstanceOf();
     _node.value.get<Object>().instanceOf.set(_templateNodePath);
 }

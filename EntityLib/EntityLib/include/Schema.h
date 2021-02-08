@@ -57,6 +57,12 @@ namespace Ent
         );
     };
 
+    /// Exception thrown when a schema is ill-formed
+    struct IllFormedSchema : std::runtime_error
+    {
+        IllFormedSchema(char const* _message); ///< ctor
+    };
+
     // *************************************** Subschema ******************************************
 
     struct SubschemaRef;

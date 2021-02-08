@@ -20,6 +20,11 @@ namespace Ent
     {
     }
 
+    IllFormedSchema::IllFormedSchema(char const* _type)
+        : std::runtime_error(std::string("Ill-formed schema : ") + _type)
+    {
+    }
+
     /// @cond PRIVATE
     Subschema const* Subschema::getUnionTypeWrapper(char const* _subtype) const
     {

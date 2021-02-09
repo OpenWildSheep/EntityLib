@@ -321,7 +321,7 @@ namespace Ent
         bool getDefaultBool() const; ///< @pre DataType == bool. @brief Get the default value as bool
 
         /// Get the absolute full link of the Subschema type, or nullptr if the is no
-        /// Example : "file://RuntimeComponents.json#/definitions/VoxelSimulationGD"
+        /// Example : "./RuntimeComponents.json#/definitions/VoxelSimulationGD"
         char const* getTypeName() const;
 
         Subschema const* getSchema() const; ///< Get the Node schema.
@@ -557,6 +557,10 @@ namespace Ent
         /// @brief Resolve an EntityRef relative to this entity.
         /// Returns nullptr in case of failure.
         Entity* resolveEntityRef(const EntityRef& _entityRef);
+
+        /// @brief Resolve an EntityRef relative to this entity.
+        /// Returns nullptr in case of failure.
+        Entity const* resolveEntityRef(const EntityRef& _entityRef) const;
 
         /// @brief Get the parent scene object containing this entity, if any.
         Scene* getParentScene() const;

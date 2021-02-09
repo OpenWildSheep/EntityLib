@@ -12,7 +12,7 @@ namespace Ent
     /// @cond PRIVATE
     /// @brief Given a link to a definition, get the name of the definition.
     ///
-    /// Example : "file://EditionComponents.json#/definitions/HeightObj" => "HeightObj"
+    /// Example : "./EditionComponents.json#/definitions/HeightObj" => "HeightObj"
     char const* getRefTypeName(char const* link);
 
     std::vector<std::string>

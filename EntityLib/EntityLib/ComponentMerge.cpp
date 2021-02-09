@@ -30,7 +30,7 @@ void updateRefLinks(std::string const& _sourceFile, json& _node)
                 std::string link = field.value();
                 if (link.front() == '#')
                 {
-                    link = "file://" + _sourceFile + link;
+                    link = "./" + _sourceFile + link;
                     field.value() = link;
                 }
             }
@@ -131,7 +131,7 @@ json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
             json newComp;
             auto&& prop = newComp["properties"];
             prop["Type"]["const"] = name;
-            prop["Data"]["$ref"] = "file://" + (filename + ("#/definitions/" + name));
+            prop["Data"]["$ref"] = "./" + (filename + ("#/definitions/" + name));
 
             json metas = newComp.value("meta", json());
             metas.update(additionalMetas);

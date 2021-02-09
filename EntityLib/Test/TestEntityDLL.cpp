@@ -163,11 +163,11 @@ try
     using EntityPtr = std::unique_ptr<Ent::Entity>;
 
     // Test $ref links in entlib.schema.schema.allDefinitions
-    char const* colorRef = "file://RuntimeComponents.json#/definitions/Color";
+    char const* colorRef = "./RuntimeComponents.json#/definitions/Color";
     ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(colorRef) == 1);
 
     // Check Ent::Subschema::getUnionTypesMap
-    char const* cinematicGDRef = "file://RuntimeComponents.json#/definitions/CinematicGD";
+    char const* cinematicGDRef = "./RuntimeComponents.json#/definitions/CinematicGD";
     Ent::Subschema const& cinematicGDSchema = entlib.schema.schema.allDefinitions.at(cinematicGDRef);
     Ent::Subschema const& scriptEventUnionSchema =
         cinematicGDSchema.properties.at("ScriptEvents")->singularItems->get();
@@ -181,7 +181,7 @@ try
     for (auto&& name_schema : entlib.schema.components)
     {
         auto&& absRef = std::get<1>(name_schema)->name;
-        ENTLIB_ASSERT(absRef.find("file://") == 0);
+        ENTLIB_ASSERT(absRef.find("./") == 0);
         ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(absRef) == 1);
     }
 
@@ -222,7 +222,7 @@ try
         ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->isDefault());
         ENTLIB_ASSERT(
             voxelSimulationGD->root.getTypeName()
-            == std::string("file://RuntimeComponents.json#/definitions/VoxelSimulationGD"));
+            == std::string("./RuntimeComponents.json#/definitions/VoxelSimulationGD"));
 
         // TEST read inherited values in inherited component
         Ent::Component const* heightObj = ent->getComponent("HeightObj");
@@ -280,7 +280,7 @@ try
         ENTLIB_ASSERT(
             cineEvent->getTypeName()
             == std::string(
-                R"(file://RuntimeComponents.json#/definitions/CineEventTestBlackboardHasFact)"));
+                R"(./RuntimeComponents.json#/definitions/CineEventTestBlackboardHasFact)"));
         auto fieldNames = cineEvent->getFieldNames();
         ENTLIB_ASSERT(fieldNames[0] == std::string("FactName"));
         ENTLIB_ASSERT(fieldNames[1] == std::string("Super"));

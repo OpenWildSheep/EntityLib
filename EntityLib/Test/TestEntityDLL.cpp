@@ -194,6 +194,7 @@ try
         ENTLIB_ASSERT(actorState != nullptr);
         ENTLIB_ASSERT(actorState->getSchema()->getUnionNameField() == std::string("className"));
         ENTLIB_ASSERT(actorState->getSchema()->getUnionDataField() == std::string("classData"));
+        ENTLIB_ASSERT(actorState->getSchema()->userMeta["unionTypeField"] == "className");
         Ent::Node const* climbEdge = actorState->getUnionData();
         ENTLIB_ASSERT(climbEdge != nullptr);
         Ent::Node const* exitRequired = climbEdge->at("locomotionMode");

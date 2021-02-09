@@ -95,6 +95,7 @@ try:
         assert(actorState != None)
         assert actorState.get_schema().get_union_name_field() == "className"
         assert actorState.get_schema().get_union_data_field() == "classData"
+        assert actorState.get_schema().user_meta["unionTypeField"] == "className"
         climbEdge = actorState.get_union_data()
         assert(climbEdge != None)
         exitRequired = climbEdge.at("locomotionMode")

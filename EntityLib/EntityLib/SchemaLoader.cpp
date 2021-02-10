@@ -367,7 +367,9 @@ void Ent::SchemaLoader::parseSchemaNoRef(
                 }
                 ENTLIB_LOGIC_ERROR("Unexpected json definition type (\"%s\")", name.c_str());
             }
-            vis.setMeta(parseMetaForType(_data["meta"], currentType), _data["meta"]);
+            vis.setMeta(
+                parseMetaForType(_data["meta"], currentType),
+                _data["meta"].value("user", json::object()));
         }
     }
     else if (currentType != DataType::null)

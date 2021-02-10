@@ -103,24 +103,24 @@
             "Data": {
                 "ScriptEvents": [
                     {
-                        "className": "CineEventTestBlackboardHasFact",
+                        "className": "CineEventTriggerEventHandlerPost",
                         "classData": {
-                            "FactName": "Toto",
+                            "EventName": "Toto",
                             "Super": {
                                 "InvertTest": true
                             }
                         }
                     },
                     {
-                        "className": "CineEventTestBlackboardHasFact",
+                        "className": "CineEventTriggerEventHandlerPost",
                         "classData": {
-                            "FactName": "Tutu"
+                            "EventName": "Tutu"
                         }
                     },
                     {
-                        "className": "CineEventTestBlackboardHasFact",
+                        "className": "CineEventTriggerEventHandlerPost",
                         "classData": {
-                            "FactName": "Titi"
+                            "EventName": "Titi"
                         }
                     }
                 ]

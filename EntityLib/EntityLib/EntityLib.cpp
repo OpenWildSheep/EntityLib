@@ -115,7 +115,14 @@ namespace Ent
 
     Node const* Union::getUnionData() const
     {
-        return wrapper->at(metaData->dataField.c_str());
+        if (wrapper.has_value())
+        {
+            return wrapper->at(metaData->dataField.c_str());
+        }
+        else
+        {
+            return nullptr;
+        }
     }
 
     char const* Union::getUnionType() const
@@ -566,6 +573,7 @@ namespace Ent
         Node operator()(Union const& _un) const
         {
             Union detUnion{};
+            ENTLIB_ASSERT(_un.schema != nullptr);
             detUnion.schema = _un.schema;
             detUnion.wrapper = _un.wrapper->makeInstanceOf();
             detUnion.metaData = _un.metaData;
@@ -1873,7 +1881,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
         {
             ENTLIB_LOG_ERROR(
                 "Can't find type %s in schema %s", dataType.c_str(), _nodeSchema.name.c_str());
-            result = Ent::Node(Ent::Union{}, &_nodeSchema);
+            result = Ent::Node(Ent::Union{&_nodeSchema, nullptr, &meta}, &_nodeSchema);
         }
     }
     break;

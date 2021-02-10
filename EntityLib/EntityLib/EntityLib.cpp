@@ -2238,6 +2238,23 @@ struct UnsupportedFormat : std::exception
     UnsupportedFormat() = default;
 };
 
+struct FileSystemError : public std::runtime_error
+{
+    std::string makeWhatMessage(
+        std::string const& msg, std::filesystem::path const& path1, std::error_code error)
+    {
+        return Ent::format(
+            "%s %s : '%ls'",
+            msg.c_str(),
+            Ent::convertANSIToUTF8(error.message()).c_str(),
+            path1.c_str());
+    }
+    FileSystemError(std::string const& msg, std::filesystem::path const& path1, std::error_code error)
+        : std::runtime_error(makeWhatMessage(msg, path1, error))
+    {
+    }
+};
+
 template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
 std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
     std::filesystem::path const& _path,
@@ -2259,7 +2276,7 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
                                  "last_write_time(p): invalid argument: %ls (%s)",
                                  absPath.c_str(),
                                  error.message().c_str());
-        throw std::filesystem::filesystem_error(msg, absPath, error);
+        throw FileSystemError(msg.c_str(), absPath, error);
     }
     auto iter = cache.find(relPath);
     if (iter == cache.end())

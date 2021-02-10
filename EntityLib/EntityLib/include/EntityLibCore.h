@@ -381,5 +381,7 @@ namespace Ent
     {
         return value_ptr<T>(T(std::forward<Args>(args)...));
     }
+
+    std::string convertANSIToUTF8(std::string const& message);
     /// @endcond
 } // namespace Ent

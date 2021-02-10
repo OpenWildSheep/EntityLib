@@ -194,7 +194,6 @@ try
         ENTLIB_ASSERT(actorState != nullptr);
         ENTLIB_ASSERT(actorState->getSchema()->getUnionNameField() == std::string("className"));
         ENTLIB_ASSERT(actorState->getSchema()->getUnionDataField() == std::string("classData"));
-        ENTLIB_ASSERT(actorState->getSchema()->userMeta["unionTypeField"] == "className");
         Ent::Node const* climbEdge = actorState->getUnionData();
         ENTLIB_ASSERT(climbEdge != nullptr);
         Ent::Node const* exitRequired = climbEdge->at("locomotionMode");
@@ -232,6 +231,10 @@ try
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->isSet());
         ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isDefault());
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getDefaultInt() == 6);
+        ENTLIB_ASSERT(
+            heightObj->root.at("Subdivision")->getSchema()->userMeta["testUserMetatdata"].get<int>()
+            == 42);
+
         ENTLIB_ASSERT(
             heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
         ENTLIB_ASSERT(heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());

@@ -95,7 +95,6 @@ try:
         assert(actorState != None)
         assert actorState.get_schema().get_union_name_field() == "className"
         assert actorState.get_schema().get_union_data_field() == "classData"
-        assert actorState.get_schema().user_meta["unionTypeField"] == "className"
         climbEdge = actorState.get_union_data()
         assert(climbEdge != None)
         exitRequired = climbEdge.at("locomotionMode")
@@ -133,6 +132,7 @@ try:
         assert(
             heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").value == 51248)
         assert(heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").is_set())
+        assert heightObj.root.at("Subdivision").get_schema().user_meta["testUserMetatdata"] is 42
 
         # Test read Thumbnail
         assert(ent.thumbnail is not None)

@@ -74,9 +74,9 @@ try:
     cinematicGDSchema = entlib.schema.schema.definitions[cinematicGDRef]
     scriptEventUnionSchema = cinematicGDSchema.properties["ScriptEvents"].get().get_singular_items().get()
     nameToTypeMap = scriptEventUnionSchema.get_union_types_dict()
-    assert len(nameToTypeMap) == 14
+    assert len(nameToTypeMap) == 12
     assert "CineEventTest" in nameToTypeMap
-    assert "CineEventTestBlackboardHasFact" in nameToTypeMap
+    assert "CineEventTriggerEventHandlerPost" in nameToTypeMap
     assert "CineEventTestEndCurrentSequence" in nameToTypeMap
 
     # Ensure that all components have a ref and is in entlib.schema.schema.allDefinitions
@@ -177,9 +177,9 @@ try:
         oneOfScripts = scriptEvents.at(0)  # type: Ent.Node
         assert(oneOfScripts.datatype == Ent.DataType.union)
         cineEvent = oneOfScripts.get_union_data()  # type: Ent.Node
-        assert(cineEvent.get_type_name() == "./RuntimeComponents.json#/definitions/CineEventTestBlackboardHasFact")
+        assert(cineEvent.get_type_name() == "./RuntimeComponents.json#/definitions/CineEventTriggerEventHandlerPost")
 
-        nbEnt = cineEvent.at("FactName")  # type: Ent.Node
+        nbEnt = cineEvent.at("EventName")  # type: Ent.Node
         assert(nbEnt is not None)
         assert(nbEnt.datatype == Ent.DataType.string)
         assert(nbEnt.value == "Toto")
@@ -204,7 +204,7 @@ try:
     scriptEvents = cinematicGD.root.at("ScriptEvents")  # type: Ent.Node
     oneOfScripts2 = scriptEvents.at(1)  # type: Ent.Node
     assert(oneOfScripts2.datatype == Ent.DataType.union)
-    assert(oneOfScripts2.get_union_type() == "CineEventTestBlackboardHasFact")
+    assert(oneOfScripts2.get_union_type() == "CineEventTriggerEventHandlerPost")
     oneOfScripts2.set_union_type("CineEventTestCurrentGameState")
     testCurrentState = oneOfScripts2.get_union_data()  # type: Ent.Node
     assert(oneOfScripts2.get_union_type() == "CineEventTestCurrentGameState")
@@ -228,9 +228,9 @@ try:
     entlib.save_entity(ent, "prefab.copy.entity")
 
     # TEST SubScene detach
-    original_sub_entities = ent.get_subscene_component().embedded.entities;
-    detached_sub_scene = ent.get_subscene_component().detach_embedded();
-    assert(len(ent.get_subscene_component().embedded.entities) is 0);
+    original_sub_entities = ent.get_subscene_component().embedded.entities
+    detached_sub_scene = ent.get_subscene_component().detach_embedded()
+    assert(len(ent.get_subscene_component().embedded.entities) is 0)
     assert(all(a == b for a, b in zip(original_sub_entities, detached_sub_scene.entities)))
     
     ####################################################################################################################
@@ -630,7 +630,7 @@ try:
 
     scene.entities[0].add_component("BeamGeneratorGD").root.get_field_names()
     assert(
-        len(scene.entities[0].add_component("ExplosionEffect").root.get_field_names()) == 23)
+        len(scene.entities[0].add_component("ExplosionEffect").root.get_field_names()) == 21)
 
     ep1 = [ent for ent in scene.entities if ent.name == "EP1_"]
     assert (len(ep1) != 0)

@@ -172,9 +172,9 @@ try
     Ent::Subschema const& scriptEventUnionSchema =
         cinematicGDSchema.properties.at("ScriptEvents")->singularItems->get();
     auto&& nameToTypeMap = scriptEventUnionSchema.getUnionTypesMap();
-    ENTLIB_ASSERT(size(nameToTypeMap) == 14);
+    ENTLIB_ASSERT(size(nameToTypeMap) == 12);
     ENTLIB_ASSERT(nameToTypeMap.count("CineEventTest") == 1);
-    ENTLIB_ASSERT(nameToTypeMap.count("CineEventTestBlackboardHasFact") == 1);
+    ENTLIB_ASSERT(nameToTypeMap.count("CineEventTriggerEventHandlerPost") == 1);
     ENTLIB_ASSERT(nameToTypeMap.count("CineEventTestEndCurrentSequence") == 1);
 
     // Ensure that all components have a ref and is in entlib.schema.schema.allDefinitions
@@ -281,15 +281,16 @@ try
         Ent::Node const* oneOfScripts = scriptEvents->at(0llu);
         ENTLIB_ASSERT(oneOfScripts->getDataType() == Ent::DataType::oneOf);
         Ent::Node const* cineEvent = oneOfScripts->getUnionData();
+        ENTLIB_ASSERT(cineEvent != nullptr);
         ENTLIB_ASSERT(
             cineEvent->getTypeName()
             == std::string(
-                R"(./RuntimeComponents.json#/definitions/CineEventTestBlackboardHasFact)"));
+                R"(./RuntimeComponents.json#/definitions/CineEventTriggerEventHandlerPost)"));
         auto fieldNames = cineEvent->getFieldNames();
-        ENTLIB_ASSERT(fieldNames[0] == std::string("FactName"));
-        ENTLIB_ASSERT(fieldNames[1] == std::string("Super"));
+        ENTLIB_ASSERT(fieldNames[1] == std::string("EventName"));
+        ENTLIB_ASSERT(fieldNames[2] == std::string("Super"));
 
-        Ent::Node const* nbEnt = cineEvent->at("FactName");
+        Ent::Node const* nbEnt = cineEvent->at("EventName");
         ENTLIB_ASSERT(nbEnt != nullptr);
         ENTLIB_ASSERT(nbEnt->getDataType() == Ent::DataType::string);
         ENTLIB_ASSERT(nbEnt->getString() == std::string("Toto"));
@@ -316,7 +317,8 @@ try
         Ent::Node* scriptEvents = cinematicGD->root.at("ScriptEvents");
         Ent::Node* oneOfScripts2 = scriptEvents->at(1llu);
         ENTLIB_ASSERT(oneOfScripts2->getDataType() == Ent::DataType::oneOf);
-        ENTLIB_ASSERT(oneOfScripts2->getUnionType() == std::string("CineEventTestBlackboardHasFact"));
+        ENTLIB_ASSERT(
+            oneOfScripts2->getUnionType() == std::string("CineEventTriggerEventHandlerPost"));
         oneOfScripts2->setUnionType("CineEventTestCurrentGameState");
         ENTLIB_CHECK_EXCEPTION(oneOfScripts2->setUnionType("ThisTypeDoesntExist"), Ent::BadUnionType);
         Ent::Node* testCurrentState = oneOfScripts2->getUnionData();
@@ -329,7 +331,8 @@ try
         // Set Union type without override
         Ent::Node* oneOfScripts3 = scriptEvents->at(2llu);
         ENTLIB_ASSERT(oneOfScripts3->getDataType() == Ent::DataType::oneOf);
-        ENTLIB_ASSERT(oneOfScripts3->getUnionType() == std::string("CineEventTestBlackboardHasFact"));
+        ENTLIB_ASSERT(
+            oneOfScripts3->getUnionType() == std::string("CineEventTriggerEventHandlerPost"));
         oneOfScripts3->setUnionType("CineEventTestCurrentGameState");
 
         // Push in an array of Union
@@ -922,9 +925,9 @@ try
     heightObj->root.at("DisplaceNoiseList")->push();
 
     scene->getObjects().front()->addComponent("BeamGeneratorGD")->root.getFieldNames();
-    ENTLIB_ASSERT(
-        scene->getObjects().front()->addComponent("ExplosionEffect")->root.getFieldNames().size()
-        == 23);
+    auto fieldNameCount =
+        scene->getObjects().front()->addComponent("ExplosionEffect")->root.getFieldNames().size();
+    ENTLIB_ASSERT(fieldNameCount == 21);
 
     auto ep1Iter = std::find_if(
         begin(scene->getObjects()),

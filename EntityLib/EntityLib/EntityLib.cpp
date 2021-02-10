@@ -115,7 +115,14 @@ namespace Ent
 
     Node const* Union::getUnionData() const
     {
-        return wrapper->at(metaData->dataField.c_str());
+        if (wrapper.has_value())
+        {
+            return wrapper->at(metaData->dataField.c_str());
+        }
+        else
+        {
+            return nullptr;
+        }
     }
 
     char const* Union::getUnionType() const
@@ -566,6 +573,7 @@ namespace Ent
         Node operator()(Union const& _un) const
         {
             Union detUnion{};
+            ENTLIB_ASSERT(_un.schema != nullptr);
             detUnion.schema = _un.schema;
             if (_un.wrapper != nullptr)
                 detUnion.wrapper = _un.wrapper->makeInstanceOf();
@@ -1799,6 +1807,11 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
     {
         auto&& meta = _nodeSchema.meta.get<Ent::Subschema::UnionMeta>();
         std::string const& typeField = meta.typeField;
+        if (typeField.empty())
+        {
+            auto message = Ent::format("%s has no meta/unionTypeField", _nodeSchema.name.c_str());
+            throw Ent::IllFormedSchema(message.c_str());
+        }
         std::string dataType;
         if (_data.count(typeField) != 0)
         {
@@ -1819,13 +1832,33 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                 // We are making a new node without input data
                 // "back()" because the base type is at the end of the type list
                 // TODO : Loïc - Add in metadata the name of the default type
+                auto& lastSubSchema = _nodeSchema.oneOf->back();
+                if (lastSubSchema->properties.count(typeField) == 0)
+                {
+                    auto message = Ent::format(
+                        "Last subschema of %s has no typeField named '%s'",
+                        _nodeSchema.name.c_str(),
+                        typeField.c_str());
+                    throw Ent::IllFormedSchema(message.c_str());
+                }
                 dataType =
-                    _nodeSchema.oneOf->back()->properties.at(typeField).get().constValue->get<std::string>();
+                    lastSubSchema->properties.at(typeField).get().constValue->get<std::string>();
             }
         }
         bool typeFound = false;
+        int subSchemaIndex = -1;
         for (Ent::SubschemaRef const& schemaTocheck : *_nodeSchema.oneOf)
         {
+            ++subSchemaIndex;
+            if (schemaTocheck->properties.count(typeField) == 0)
+            {
+                auto message = Ent::format(
+                    "%dth subschema of %s has no typeField named '%s'",
+                    subSchemaIndex,
+                    _nodeSchema.name.c_str(),
+                    typeField.c_str());
+                throw Ent::IllFormedSchema(message.c_str());
+            }
             auto&& schemaType =
                 schemaTocheck->properties.at(typeField).get().constValue->get<std::string>();
             if (schemaType == dataType)
@@ -1849,7 +1882,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
         {
             ENTLIB_LOG_ERROR(
                 "Can't find type %s in schema %s", dataType.c_str(), _nodeSchema.name.c_str());
-            result = Ent::Node(Ent::Union{}, &_nodeSchema);
+            result = Ent::Node(Ent::Union{&_nodeSchema, nullptr, &meta}, &_nodeSchema);
         }
     }
     break;

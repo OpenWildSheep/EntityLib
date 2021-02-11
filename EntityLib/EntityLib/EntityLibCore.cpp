@@ -24,17 +24,17 @@ namespace Ent
         int convertResult =
             MultiByteToWideChar(CP_ACP, 0, message.c_str(), (int)message.size(), nullptr, 0);
         std::wstring wide;
-        wide.resize(convertResult);
+        wide.resize((size_t)convertResult);
         MultiByteToWideChar(
             CP_ACP, 0, message.c_str(), (int)message.size(), &wide[0], (int)wide.size());
         // utf16 to utf8
         convertResult = WideCharToMultiByte(
             CP_UTF8, 0, wide.c_str(), (int)wide.size(), nullptr, 0, nullptr, nullptr);
         std::string result;
-        result.resize(convertResult);
+        result.resize((size_t)convertResult);
         WideCharToMultiByte(
             CP_UTF8, 0, wide.c_str(), (int)wide.size(), &result[0], (int)result.size(), nullptr, nullptr);
-        result.resize(convertResult);
+        result.resize((size_t)convertResult);
         return result;
     }
 

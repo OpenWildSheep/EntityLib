@@ -1885,7 +1885,10 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
         {
             ENTLIB_LOG_ERROR(
                 "Can't find type %s in schema %s", dataType.c_str(), _nodeSchema.name.c_str());
-            result = Ent::Node(Ent::Union{&_nodeSchema, nullptr, &meta}, &_nodeSchema);
+            Ent::Union un;
+            un.schema = &_nodeSchema;
+            un.metaData = &meta;
+            result = Ent::Node(std::move(un), &_nodeSchema);
         }
     }
     break;

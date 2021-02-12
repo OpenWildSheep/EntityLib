@@ -1582,7 +1582,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                                         std::string() :
                                         _nodeSchema.defaultValue.get<std::string>();
             tl::optional<std::string> const supVal =
-                (_super != nullptr and _super->isSet()) ?
+                (_super != nullptr and not _super->hasDefaultValue()) ?
                     tl::optional<std::string>(_super->getString()) :
                     tl::optional<std::string>(tl::nullopt);
             tl::optional<std::string> const val =
@@ -1596,7 +1596,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
     {
         bool const def =
             _nodeSchema.defaultValue.is<Ent::Null>() ? bool{} : _nodeSchema.defaultValue.get<bool>();
-        tl::optional<bool> const supVal = (_super != nullptr and _super->isSet()) ?
+        tl::optional<bool> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
                                               tl::optional<bool>(_super->getBool()) :
                                               tl::optional<bool>(tl::nullopt);
         tl::optional<bool> const val = _data.is_boolean() ? tl::optional<bool>(_data.get<bool>()) :
@@ -1609,7 +1609,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
         int64_t const def = _nodeSchema.defaultValue.is<Ent::Null>() ?
                                 int64_t{} :
                                 _nodeSchema.defaultValue.get<int64_t>();
-        tl::optional<int64_t> const supVal = (_super != nullptr and _super->isSet()) ?
+        tl::optional<int64_t> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
                                                  tl::optional<int64_t>(_super->getInt()) :
                                                  tl::optional<int64_t>(tl::nullopt);
         tl::optional<int64_t> const val = _data.is_number_integer() or _data.is_number_unsigned() ?
@@ -1623,7 +1623,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
         float const def = _nodeSchema.defaultValue.is<Ent::Null>() ?
                               float{} :
                               _nodeSchema.defaultValue.get<float>();
-        tl::optional<float> const supVal = (_super != nullptr and _super->isSet()) ?
+        tl::optional<float> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
                                                tl::optional<float>(_super->getFloat()) :
                                                tl::optional<float>(tl::nullopt);
         tl::optional<float> const val =

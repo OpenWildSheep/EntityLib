@@ -612,6 +612,10 @@ try
         sysCreat->root.at("BehaviorState")->setString("Overrided");
         entlib.saveEntity(*ent, "instance.copy.entity");
     }
+    {
+        EntityPtr ent = entlib.loadEntity("instance2.entity");
+        testInstanceOf(*ent);
+    }
     auto testInstanceOverrideSubscene = [](Ent::Entity const& ent) {
         // TEST SubScene (with override)
         Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();

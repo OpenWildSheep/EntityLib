@@ -58,7 +58,7 @@ namespace Ent
             virtual void closeRef() = 0;
             virtual void openSubschema() = 0;
             virtual void closeSubschema() = 0;
-            virtual void setMeta(Subschema::Meta) = 0;
+            virtual void setMeta(Subschema::Meta, nlohmann::json user) = 0;
             virtual void setName(std::string) = 0;
         };
 

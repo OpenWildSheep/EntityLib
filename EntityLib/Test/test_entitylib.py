@@ -132,6 +132,7 @@ try:
         assert(
             heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").value == 51248)
         assert(heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").is_set())
+        assert heightObj.root.at("Subdivision").get_schema().user_meta["testUserMetatdata"] is 42
 
         # Test read Thumbnail
         assert(ent.thumbnail is not None)

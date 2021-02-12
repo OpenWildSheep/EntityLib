@@ -237,6 +237,10 @@ try
         ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isDefault());
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getDefaultInt() == 6);
         ENTLIB_ASSERT(
+            heightObj->root.at("Subdivision")->getSchema()->userMeta["testUserMetatdata"].get<int>()
+            == 42);
+
+        ENTLIB_ASSERT(
             heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
         ENTLIB_ASSERT(heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 

@@ -575,7 +575,8 @@ namespace Ent
             Union detUnion{};
             ENTLIB_ASSERT(_un.schema != nullptr);
             detUnion.schema = _un.schema;
-            detUnion.wrapper = _un.wrapper->makeInstanceOf();
+            if (_un.wrapper != nullptr)
+                detUnion.wrapper = _un.wrapper->makeInstanceOf();
             detUnion.metaData = _un.metaData;
             return Node(std::move(detUnion), schema);
         }

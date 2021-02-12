@@ -7,6 +7,7 @@
 
 #include "../../../external/mapbox/variant.hpp"
 #include "../external/optional.hpp"
+#include "../external/json.hpp"
 #pragma warning(pop)
 
 #include "EntityLibCore.h"
@@ -92,6 +93,7 @@ namespace Ent
         size_t minItems = 0; ///< @brief Minimum size of an array
         tl::optional<std::vector<SubschemaRef>> oneOf; ///< This object have to match with one of thos schema (union)
         std::string name; ///< This is not a constraint. Just the name of the definition
+        nlohmann::json userMeta;
 
         // Meta informations
         /// Store metadata for any type

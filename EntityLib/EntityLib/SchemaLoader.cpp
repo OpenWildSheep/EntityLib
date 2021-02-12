@@ -367,13 +367,15 @@ void Ent::SchemaLoader::parseSchemaNoRef(
                 }
                 ENTLIB_LOGIC_ERROR("Unexpected json definition type (\"%s\")", name.c_str());
             }
-            vis.setMeta(parseMetaForType(_data["meta"], currentType));
+            vis.setMeta(
+                parseMetaForType(_data["meta"], currentType),
+                _data["meta"].value("user", json::object()));
         }
     }
     else if (currentType != DataType::null)
     {
         // Set Meta to default values for the currentType
-        vis.setMeta(parseMetaForType(json::object(), currentType));
+        vis.setMeta(parseMetaForType(json::object(), currentType), json::object());
     }
     if (_data.count("name") != 0u)
     {
@@ -382,7 +384,7 @@ void Ent::SchemaLoader::parseSchemaNoRef(
     }
 }
 
-// TODO Loïc : (Low prio) It could be good to use a real logger system. (like spdlog for example)
+// TODO LoÃ¯c : (Low prio) It could be good to use a real logger system. (like spdlog for example)
 #ifdef ENTLIB_DEBUG_READSCHEMA
 #define ENTLIB_DEBUG_PRINTF(message, ...) printf(message, __VA_ARGS__);
 #else
@@ -573,11 +575,12 @@ void Ent::SchemaLoader::readSchema(
         {
             ENTLIB_DEBUG_PRINTF("%scloseSubschema\n", getTab());
         }
-        void setMeta(Subschema::Meta meta) override
+        void setMeta(Subschema::Meta meta, nlohmann::json user) override
         {
             CHECK_WHOLE_STACK;
             auto&& subSchema = stack.back()->get();
             subSchema.meta = std::move(meta);
+            subSchema.userMeta = std::move(user);
         }
         void setName(std::string name) override
         {

@@ -279,7 +279,7 @@ namespace Ent
         if (subSchemaOrRef.is<Ref>())
         {
             Ref const& ref = subSchemaOrRef.get<Ref>();
-            return ref.schema->allDefinitions.at(ref.ref);
+            return AT(ref.schema->allDefinitions, ref.ref);
         }
         else if (subSchemaOrRef.is<Subschema>())
             return subSchemaOrRef.get<Subschema>();
@@ -295,7 +295,7 @@ namespace Ent
         if (subSchemaOrRef.is<Ref>())
         {
             Ref const& ref = subSchemaOrRef.get<Ref>();
-            return ref.schema->allDefinitions.at(ref.ref);
+            return AT(ref.schema->allDefinitions, ref.ref);
         }
         else if (subSchemaOrRef.is<Subschema>())
             return subSchemaOrRef.get<Subschema>();

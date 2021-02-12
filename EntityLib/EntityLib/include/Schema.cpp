@@ -39,7 +39,7 @@ namespace Ent
         }
         auto const& un = meta.get<UnionMeta>();
         auto iter = std::find_if(begin(*oneOf), end(*oneOf), [&](SubschemaRef const& ref) {
-            return ref->properties.at(un.typeField).get().constValue->get<std::string>() == subtype;
+            return AT(ref->properties, un.typeField).get().constValue->get<std::string>() == subtype;
         });
         if (iter == end(*oneOf))
         {
@@ -55,7 +55,7 @@ namespace Ent
     Subschema const* Subschema::getUnionType(char const* _subtype) const
     {
         auto const& un = meta.get<UnionMeta>();
-        return &getUnionTypeWrapper(_subtype)->properties.at(un.dataField).get();
+        return &AT(getUnionTypeWrapper(_subtype)->properties, un.dataField).get();
     }
 
     char const* Subschema::getUnionNameField() const
@@ -106,8 +106,8 @@ namespace Ent
         for (SubschemaRef const& ref : *oneOf)
         {
             std::string acceptedType =
-                ref.get().properties.at(unionData.typeField)->constValue->get<std::string>();
-            Subschema const& schema = ref.get().properties.at(unionData.dataField).get();
+                AT(ref.get().properties, unionData.typeField)->constValue->get<std::string>();
+            Subschema const& schema = AT(ref.get().properties, unionData.dataField).get();
             result.emplace(std::move(acceptedType), &schema);
         }
 

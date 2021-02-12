@@ -40,7 +40,7 @@ namespace Ent
     char const* colorSchemaName = "./RuntimeComponents.json#/definitions/Color";
     static Ent::Node makeDefaultColorField(EntityLib const& _entlib)
     {
-        Ent::Subschema const& colorSchema = _entlib.schema.schema.allDefinitions.at(colorSchemaName);
+        Ent::Subschema const& colorSchema = AT(_entlib.schema.schema.allDefinitions, colorSchemaName);
         Ent::Subschema const* itemSchema = &colorSchema.singularItems->get();
         Ent::Override<float> one{255.f};
         std::vector<value_ptr<Ent::Node>> nodes{
@@ -77,8 +77,8 @@ namespace Ent
 
         for (SubschemaRef& comp : *compList)
         {
-            auto&& compName = comp->properties.at("Type")->constValue->get<std::string>();
-            auto&& compSchema = *comp->properties.at("Data");
+            auto&& compName = AT(comp->properties, "Type")->constValue->get<std::string>();
+            auto&& compSchema = *AT(comp->properties, "Data");
             compSchema.meta = comp->meta;
             schema.components.emplace(compName, &compSchema);
         }
@@ -895,7 +895,7 @@ namespace Ent
     static Ent::Node makeDefaultActorStatesField(EntityLib const& _entlib)
     {
         Ent::Subschema const& actorStatesSchema =
-            _entlib.schema.schema.allDefinitions.at(actorStatesSchemaName);
+            AT(_entlib.schema.schema.allDefinitions, actorStatesSchemaName);
         return Node{Array{}, &actorStatesSchema};
     }
 
@@ -1032,12 +1032,12 @@ namespace Ent
         }
         if (entlib->componentDependencies.count(_type) != 0) // Could be an editor componant
         {
-            for (auto&& dep : entlib->componentDependencies.at(_type))
+            for (auto&& dep : AT(entlib->componentDependencies, _type))
             {
                 addComponent(dep.c_str());
             }
         }
-        Ent::Subschema const& compSchema = *entlib->schema.components.at(_type);
+        Ent::Subschema const& compSchema = *AT(entlib->schema.components, _type);
         Ent::Component comp{
             json(), false, _type, loadNode(compSchema, json(), nullptr), 1, components.size()};
         auto iter_bool = components.emplace(_type, std::move(comp));
@@ -1365,11 +1365,15 @@ namespace Ent
 
     Entity const* Scene::getEntity(size_t index) const
     {
+        if (index >= objects.size())
+            return nullptr;
         return objects.at(index).get();
     }
 
     Entity* Scene::getEntity(size_t index)
     {
+        if (index >= objects.size())
+            return nullptr;
         return objects.at(index).get();
     }
 
@@ -1841,7 +1845,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                     throw Ent::IllFormedSchema(message.c_str());
                 }
                 dataType =
-                    lastSubSchema->properties.at(typeField).get().constValue->get<std::string>();
+                    AT(lastSubSchema->properties, typeField).get().constValue->get<std::string>();
             }
         }
         bool typeFound = false;
@@ -1859,7 +1863,7 @@ static Ent::Node loadNode(Ent::Subschema const& _nodeSchema, json const& _data, 
                 throw Ent::IllFormedSchema(message.c_str());
             }
             auto&& schemaType =
-                schemaTocheck->properties.at(typeField).get().constValue->get<std::string>();
+                AT(schemaTocheck->properties, typeField).get().constValue->get<std::string>();
             if (schemaType == dataType)
             {
                 Ent::Node const* superUnionDataWrapper =
@@ -2099,7 +2103,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     if (_entNode.contains("Color"))
     {
         Ent::Subschema const& colorSchema =
-            _entlib.schema.schema.allDefinitions.at(Ent::colorSchemaName);
+            AT(_entlib.schema.schema.allDefinitions, Ent::colorSchemaName);
         ovColor = loadNode(
             colorSchema,
             _entNode.at("Color"),
@@ -2113,7 +2117,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
 
     // ActorStates
     Ent::Subschema const& actorStatesSchema =
-        _entlib.schema.schema.allDefinitions.at(Ent::actorStatesSchemaName);
+        AT(_entlib.schema.schema.allDefinitions, Ent::actorStatesSchemaName);
     Ent::Node ovActorStates(Ent::Array{}, &actorStatesSchema);
     if (_entNode.contains("ActorStates"))
     {
@@ -2172,7 +2176,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
                 }
                 else
                 {
-                    Ent::Subschema const& compSchema = *_schema.components.at(cmpType);
+                    Ent::Subschema const& compSchema = *AT(_schema.components, cmpType);
                     json rawData = (superComp != nullptr ? superComp->rawData : json());
                     rawData.merge_patch(data);
                     Ent::Component comp{
@@ -2442,7 +2446,7 @@ static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& 
         entNode.emplace("InstanceOf", _entity.getInstanceOfValue().get().c_str());
     }
 
-    Ent::Subschema const& colorSchema = _schema.schema.allDefinitions.at(Ent::colorSchemaName);
+    Ent::Subschema const& colorSchema = AT(_schema.schema.allDefinitions, Ent::colorSchemaName);
     if (_entity.getColorValue().hasOverride())
     {
         entNode.emplace("Color", Ent::EntityLib::dumpNode(colorSchema, _entity.getColorValue()));
@@ -2509,13 +2513,13 @@ static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& 
             compNode.emplace("Version", comp->version);
             compNode.emplace("Type", comp->type);
             compNode.emplace(
-                "Data", Ent::EntityLib::dumpNode(*_schema.components.at(comp->type), comp->root));
+                "Data", Ent::EntityLib::dumpNode(*AT(_schema.components, comp->type), comp->root));
 
             componentsNode.emplace_back(std::move(compNode));
         }
     }
     Ent::Subschema const& actorStatesSchema =
-        _schema.schema.allDefinitions.at(Ent::actorStatesSchemaName);
+        AT(_schema.schema.allDefinitions, Ent::actorStatesSchemaName);
     if (_entity.getActorStates().hasOverride())
     {
         entNode.emplace(

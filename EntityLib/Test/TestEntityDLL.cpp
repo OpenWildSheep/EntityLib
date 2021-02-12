@@ -160,6 +160,11 @@ try
 
     ENTLIB_ASSERT(Ent::format("Toto %d", 37) == "Toto 37");
 
+    {
+        std::map<std::string, int> emptyMap;
+        ENTLIB_CHECK_EXCEPTION(AT(emptyMap, "not"), Ent::InvalidKey);
+    }
+
     using EntityPtr = std::unique_ptr<Ent::Entity>;
 
     // Test $ref links in entlib.schema.schema.allDefinitions

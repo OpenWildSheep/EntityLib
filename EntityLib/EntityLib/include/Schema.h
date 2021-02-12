@@ -7,7 +7,7 @@
 
 #include "../../../external/mapbox/variant.hpp"
 #include "../external/optional.hpp"
-#include "../external/json.hpp" // TODO : Remove when the rawData in Component is no more useful
+#include "../external/json.hpp"
 #pragma warning(pop)
 
 #include "EntityLibCore.h"

@@ -314,6 +314,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("pop", [](Node* node) { return node->pop(); })
         .def("clear", [](Node* node) { return node->clear(); })
         .def("empty", [](Node* node) { return node->empty(); })
+        .def("get_instance_of", [](Node* node) { return node->getInstanceOf(); })
         .def("get_float", [](Node* node) { return node->getFloat(); })
         .def("get_int", [](Node* node) { return node->getInt(); })
         .def("get_string", [](Node* node) { return node->getString(); })
@@ -397,6 +398,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference_internal)
         .def("add_subscene_component", &Entity::addSubSceneComponent, py::return_value_policy::reference_internal)
         .def("make_entityref", &Entity::makeEntityRef)
+        .def("set_instance_of", &Entity::setInstanceOf)
         .def("resolve_entityref", (Entity* (Entity::*)(const EntityRef&))&Entity::resolveEntityRef, py::return_value_policy::reference_internal)
         .def("detach_entity_from_prefab", [](Entity* ent) {
             return ent->detachEntityFromPrefab().release();
@@ -473,6 +475,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_entity_cache", &EntityLib::getEntityCache, py::return_value_policy::reference_internal)
         .def("get_scene_cache", &EntityLib::getSceneCache, py::return_value_policy::reference_internal)
         .def("clear_cache", &EntityLib::clearCache)
+        .def("set_node_instance_of", &EntityLib::setInstanceOf)
         .def(
             "make_instance_of",
             [](EntityLib* lib, std::string const& path) {

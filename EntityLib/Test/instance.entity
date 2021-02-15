@@ -51,6 +51,13 @@
                     ]
                 }
             }
+        }, {
+            "Data": {
+                "InstanceOf": "test.StickToTerrain.node",
+                "NormalRatio": 0.6
+            },
+            "Type": "StickToTerrain",
+            "Version": 1
         }
     ],
     "InstanceOf": "prefab.entity",

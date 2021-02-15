@@ -410,11 +410,11 @@ void Ent::SchemaLoader::readSchema(
         {
         }
 
-        std::string const& getTab()
+        char const* getTab()
         {
             static std::string tab;
             tab.assign(stack.size() * 4, ' ');
-            return tab;
+            return tab.c_str();
         };
 
         void checkWholeStack()

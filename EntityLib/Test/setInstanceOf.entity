@@ -1,5 +1,14 @@
 {
-    "Components": [],
+    "Components": [
+        {
+            "Data": {
+                "InstanceOf": "test.StickToTerrain.node",
+                "NormalRatio": 0.6000000238418579
+            },
+            "Type": "StickToTerrain",
+            "Version": 1
+        }
+    ],
     "InstanceOf": "prefab.entity",
     "Name": "PlayerSpawner_"
 }

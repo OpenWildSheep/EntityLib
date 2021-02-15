@@ -3,6 +3,7 @@ import subprocess
 import traceback
 import logging
 import sys
+from math import fabs
 
 entitylib_path = "../x64/Release-3.7"
 if "PYTHONPATH" in os.environ:
@@ -69,7 +70,7 @@ try:
     colorRef = "./RuntimeComponents.json#/definitions/Color"
     assert colorRef in entlib.schema.schema.definitions
 
-    # Check Ent::Subschema::getUnionTypesMap
+    # Check Ent.Subschema.getUnionTypesMap
     cinematicGDRef = "./RuntimeComponents.json#/definitions/CinematicGD"
     cinematicGDSchema = entlib.schema.schema.definitions[cinematicGDRef]
     scriptEventUnionSchema = cinematicGDSchema.properties["ScriptEvents"].get().get_singular_items().get()
@@ -213,6 +214,18 @@ try:
     assert(fieldNames2[1] == "Super")
     testCurrentState.at("GameStateName").set_string("Pouet!")
 
+    # Set Union type without override
+    oneOfScripts3 = scriptEvents.at(2)
+    assert(oneOfScripts3.datatype == Ent.DataType.union)
+    assert(oneOfScripts3.get_union_type() == "CineEventTestBlackboardHasFact")
+    oneOfScripts3.set_union_type("CineEventTestCurrentGameState")
+
+    # Push in an array of Union Ent.Node
+    oneOfScripts4 = scriptEvents.push()
+    assert(oneOfScripts4.datatype == Ent.DataType.union)
+    assert(oneOfScripts4.get_union_type() == "CineEvent")
+    assert(scriptEvents.at(3) == oneOfScripts4)
+
     # TEST simple entity ref creation
     testEntityRef = ent.add_component("TestEntityRef")
     assert(testEntityRef is not None)
@@ -222,6 +235,9 @@ try:
     subScenecomp = ent.get_subscene_component()
     allSubEntities = subScenecomp.embedded.entities
     testEntityRef.root.at("TestRef").value = ent.make_entityref(allSubEntities[0])
+
+    # TEST MaxActivationLevel
+    ent.max_activation_level = Ent.ActivationLevel.InWorld
 
     sysCreat = ent.get_component("SystemicCreature")
     sysCreat.root.at("Name").value = "Shamane_male"
@@ -282,16 +298,16 @@ try:
     ####################################################################################################################
     
     """
-    // TEST entity refs
-    // file: entity-references-a.entity
-    // - A-entity [ref to B: "B"]
-    //     - B [ref to A: ".."]
-    //
-    // file: entity-references.scene
-    // - root-scene
-    //     - InstanceOfA
-    //     - C [ref to B in InstanceOfA: "../InstanceOfA/B"]
-    //
+    # TEST entity refs
+    # file: entity-references-a.entity
+    # - A-entity [ref to B: "B"]
+    #     - B [ref to A: ".."]
+    #
+    # file: entity-references.scene
+    # - root-scene
+    #     - InstanceOfA
+    #     - C [ref to B in InstanceOfA: "../InstanceOfA/B"]
+    #
     """
     scene = entlib.load_scene("entity-references.scene")
     assert(len(scene.entities) == 2)
@@ -337,6 +353,44 @@ try:
 
     ####################################################################################################################
     def testInstanceOf(ent: Ent.Entity):
+        # ActorStates
+        actorStates = ent.get_actorstates()
+        assert(actorStates.datatype == Ent.DataType.array)
+        assert(actorStates.size() == 3)
+        actorState = actorStates.at(0)
+        assert(actorState is not None)
+        climbEdge = actorState.get_union_data()
+        assert(climbEdge is not None)
+        exitRequired = climbEdge.at("locomotionMode")
+        assert(exitRequired is not None)
+        assert(exitRequired.get_string() == "crouch")
+        actorState2 = actorStates.at(1)
+        assert(actorState2 is not None)
+        cinematic = actorState2.get_union_data()
+        assert(cinematic is not None)
+        type = cinematic.at("Type")
+        assert(type is not None)
+        assert(type.get_int() == 13)
+        actorState3 = actorStates.at(2)
+        assert(actorState3 is not None)
+        chosen = actorState3.get_union_data()
+        assert(chosen is not None)
+        exitRequ = chosen.at("ExitRequired")
+        assert(exitRequ is not None)
+        assert(exitRequ.get_bool() == True)
+
+        # Map and Set overridePolicy
+        pathNodeGD = ent.get_component("PathNodeGD")
+        tags = pathNodeGD.root.at("Tags").at("Tags")
+        assert(tags.size() == 3)
+        assert(tags.at(0).at(0).get_string() == "a")
+        assert(tags.at(1).at(0).get_string() == "b")
+        assert(tags.at(2).at(0).get_string() == "c")
+        assert(tags.at(2).at(1).size() == 3)
+        assert(tags.at(2).at(1).at(0).get_string() == "1")
+        assert(tags.at(2).at(1).at(1).get_string() == "2")
+        assert(tags.at(2).at(1).at(2).get_string() == "3")
+
         # TEST SubScene (without override)
         subScene = ent.get_subscene_component()  # type: Ent.SubSceneComponent
         assert(subScene is not None)
@@ -352,7 +406,14 @@ try:
         assert(not netLink.root.at("Target").is_set())
         trans = subObj.get_component("TransformGD")
         assert(trans.root.at("Position").at(0).value == 0.0)
-    
+        
+        # Test instanciation of a template Node
+        stickToTerrain = ent.get_component("StickToTerrain")
+        assert(fabs(stickToTerrain.root.at("NormalRatio").get_float() - 0.6) < 0.0001)
+        assert(stickToTerrain.root.at("ZOffset").is_set() is False)
+        assert(stickToTerrain.root.at("ZOffset").is_default() is False)
+        assert(fabs(stickToTerrain.root.at("ZOffset").get_float() - 10.) < 0.0001)
+
     # Test read instance of
     ent = entlib.load_entity("instance.entity")
     sysCreat = ent.get_component("SystemicCreature")
@@ -554,44 +615,86 @@ try:
     assert(sysCreat.root.at("Inventory").is_set())  # is set
 
     ####################################################################################################################
-    # Test create instance of
+    # Test make_instance_of
     instanceOf = entlib.make_instance_of("prefab.entity")
+
+    # Test instanciation of a template Node
+    stickToTerrain = instanceOf.add_component("StickToTerrain")
+    entlib.set_node_instance_of("test.StickToTerrain.node", stickToTerrain.root)
+    assert(stickToTerrain.root.get_instance_of() is not None)
+    stickToTerrain.root.at("NormalRatio").set_float(0.6)
+
+    assert(fabs(stickToTerrain.root.at("NormalRatio").get_float() - 0.6) < 0.0001)
+    assert(stickToTerrain.root.at("ZOffset").is_set() is False)
+    assert(stickToTerrain.root.at("ZOffset").is_default() is False)
+    assert(fabs(stickToTerrain.root.at("ZOffset").get_float() - 10.) < 0.0001)
+
+    assert(instanceOf.get_component("NetworkNode") is not None)
+    instanceOf.get_component("TransformGD").root.get_field_names()
     entlib.save_entity(instanceOf, "instance.create.entity")
 
     ####################################################################################################################
-    # Test read instance of
-    ent = entlib.load_entity("instance.create.entity")
+    def testCreateInstanceOf(_instancePath):
+        # Test read instance of
+        ent = entlib.load_entity(_instancePath)
 
-    # TEST read inherited values in inherited component
-    heightObj = ent.get_component("HeightObj")
-    assert(heightObj is not None)
-    assert(heightObj.root.at("Subdivision").value == 0)
-    assert(not heightObj.root.at("Subdivision").is_set())
-    assert(
-        heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").value == 51248)
-    assert(
-        not heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").is_set())
+        ent.get_component("TransformGD").root.get_field_names()
 
-    # Test read prefab
-    sysCreat = ent.get_component("SystemicCreature")
-    assert(sysCreat is not None)
+        # Test instanciation of a template Node
+        stickToTerrain = ent.get_component("StickToTerrain")
+        assert(stickToTerrain.root.get_instance_of() is not None)
+        assert(fabs(stickToTerrain.root.at("NormalRatio").get_float() - 0.6) < 0.0001)
+        assert(stickToTerrain.root.at("ZOffset").is_set() is False)
+        assert(stickToTerrain.root.at("ZOffset").is_default() is False)
+        assert(fabs(stickToTerrain.root.at("ZOffset").get_float() - 10.) < 0.0001)
 
-    # TEST read setted values
-    assert(sysCreat.root.at("Faction").value == "Shamans")
-    assert(not sysCreat.root.at("Faction").is_set())  # Not overrided
-    assert(sysCreat.root.at("Inventory").value == "KaiWOLgrey")
-    assert(not sysCreat.root.at("Inventory").is_set())  # Not overrided
+        # TEST read inherited values in inherited component
+        heightObj = ent.get_component("HeightObj")
+        assert(heightObj is not None)
+        assert(heightObj.root.at("Subdivision").value == 0)
+        assert(not heightObj.root.at("Subdivision").is_set())
+        assert(
+            heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").value == 51248)
+        assert(
+            not heightObj.root.at("DisplaceNoiseList").at(0).at("MapChannel").is_set())
 
-    # TEST read array
-    assert(sysCreat.root.at("ScriptList").is_set()) # Arrays are always set
-    assert(sysCreat.root.at("ScriptList").size() == 3)
+        # Test read prefab
+        sysCreat = ent.get_component("SystemicCreature")
+        assert(sysCreat is not None)
 
-    # TEST default values
-    assert(sysCreat.root.at("Burried").value is False)  # default
-    assert (sysCreat.root.at("Burried").datatype == Ent.DataType.boolean)  # default
-    assert(not sysCreat.root.at("Burried").is_set())  # default
-    assert(sysCreat.root.at("Name").value == "")  # default
-    assert(not sysCreat.root.at("Name").is_set())  # default
+        # TEST read setted values
+        assert(sysCreat.root.at("Faction").value == "Shamans")
+        assert(not sysCreat.root.at("Faction").is_set())  # Not overrided
+        assert(sysCreat.root.at("Inventory").value == "KaiWOLgrey")
+        assert(not sysCreat.root.at("Inventory").is_set())  # Not overrided
+
+        # TEST read array
+        assert(sysCreat.root.at("ScriptList").is_set()) # Arrays are always set
+        assert(sysCreat.root.at("ScriptList").size() == 3)
+
+        # TEST default values
+        assert(sysCreat.root.at("Burried").value is False)  # default
+        assert (sysCreat.root.at("Burried").datatype == Ent.DataType.boolean)  # default
+        assert(not sysCreat.root.at("Burried").is_set())  # default
+        assert(sysCreat.root.at("Name").value == "")  # default
+        assert(not sysCreat.root.at("Name").is_set())  # default
+
+    testCreateInstanceOf("instance.create.entity")
+
+    # ****************************** Test set_node_instance_of ******************************************
+    instanceOf = Ent.Entity(entlib)
+    instanceOf.set_instance_of("prefab.entity")
+    assert(instanceOf.get_component("NetworkNode") is not None)
+    instanceOf.get_component("TransformGD").root.get_field_names()
+
+    # Test instanciation of a template Node
+    stickToTerrain = instanceOf.add_component("StickToTerrain")
+    entlib.set_node_instance_of("test.StickToTerrain.node", stickToTerrain.root)
+    stickToTerrain.root.at("NormalRatio").set_float(0.6)
+
+    entlib.save_entity(instanceOf, "setInstanceOf.entity")
+
+    testCreateInstanceOf("setInstanceOf.entity")
 
     # ******************************** Test iteration of schema **********************************
     for name, sub in entlib.schema.components.items():
@@ -636,7 +739,7 @@ try:
     assert (len(ep1) != 0)
     assert (ep1[0].get_subscene_component() is not None)
 
-    scene.add_entity(entlib.make_instance_of(os.getcwd() + "/prefab.entity"))
+    scene.add_entity(entlib.make_instance_of(os.path.normpath(os.getcwd() + "/prefab.entity")))
 
     print("save_scene")
     entlib.save_scene(scene, os.getcwd() + "/SceneMainWorld.test.scene")

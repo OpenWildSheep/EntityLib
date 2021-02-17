@@ -388,7 +388,7 @@ namespace Ent
     {
         template <typename Map>
         std::string
-        makeError(Map const&, std::string const& key, char const* file, size_t line, char const* func)
+        makeError(Map const&, std::string const& key, char const* file, long line, char const* func)
         {
             return format(
                 "%s(%d) : (%s) Can't find key '%s' in map of type '%s'",
@@ -400,20 +400,20 @@ namespace Ent
         }
 
         template <typename Map>
-        InvalidKey(Map const& map, std::string const& key, char const* file, size_t line, char const* func)
+        InvalidKey(Map const& map, std::string const& key, char const* file, long line, char const* func)
             : std::logic_error(makeError(map, key.c_str(), file, line, func))
         {
         }
 
         template <typename Map>
-        InvalidKey(Map const& map, char const* key, char const* file, size_t line, char const* func)
+        InvalidKey(Map const& map, char const* key, char const* file, long line, char const* func)
             : std::logic_error(makeError(map, key, file, line, func))
         {
         }
     };
 
     template <typename Map, typename Key>
-    auto at(Map&& map, Key const& key, char const* file, size_t line, char const* func)
+    auto at(Map&& map, Key const& key, char const* file, long line, char const* func)
         -> decltype(map.at(key))
     {
         auto iter = map.find(key);

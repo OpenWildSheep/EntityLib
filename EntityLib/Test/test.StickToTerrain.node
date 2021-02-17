@@ -1,0 +1,5 @@
+{
+    "$schema": "./EditionComponents.json#/definitions/StickToTerrain",
+    "NormalRatio": 11.0,
+    "ZOffset": 10.0
+}

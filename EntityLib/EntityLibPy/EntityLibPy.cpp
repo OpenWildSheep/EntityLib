@@ -5,6 +5,7 @@
 #pragma warning(push, 0)
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include "external/pybind11_json.hpp"
 #pragma warning(pop)
 
 /// @cond PRIVATE
@@ -159,6 +160,11 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pySubschema = py::class_<Subschema>(ent, "Subschema");
     auto pySubschemaRef = py::class_<SubschemaRef>(ent, "SubschemaRef");
     auto pySchema = py::class_<Schema>(ent, "Schema");
+    auto pySubschemaBaseMeta = py::class_<Subschema::BaseMeta>(ent, "Subschema_BaseMeta");
+    auto pySubschemaArrayMeta = py::class_<Subschema::ArrayMeta>(ent, "Subschema_ArrayMeta");
+    auto pySubschemaGenericMeta = py::class_<Subschema::GenericMeta>(ent, "Subschema_GenericMeta");
+    auto pySubschemaNumberMeta = py::class_<Subschema::NumberMeta>(ent, "Subschema_NumberMeta");
+    auto pySubschemaUnionMeta = py::class_<Subschema::UnionMeta>(ent, "Subschema_UnionMeta");
 
     pyDataType
         .value("null", DataType::null)
@@ -201,6 +207,20 @@ PYBIND11_MODULE(EntityLibPy, ent)
     py::implicitly_convertible<std::string, std::filesystem::path>();
     py::implicitly_convertible<std::string, Ent::String>();
 
+    pySubschemaBaseMeta
+        .def_readonly("used_in_editor", &Subschema::BaseMeta::usedInEditor)
+        .def_readonly("used_in_runtime", &Subschema::BaseMeta::usedInRuntime)
+        .def_readonly("deprecated", &Subschema::BaseMeta::deprecated);
+    pySubschemaArrayMeta
+        .def_readonly("override_policy", &Subschema::ArrayMeta::overridePolicy)
+        .def_readonly("ordered", &Subschema::ArrayMeta::ordered);
+    pySubschemaNumberMeta
+        .def_readonly("bit_depth", &Subschema::NumberMeta::bitDepth)
+        .def_readonly("is_signed", &Subschema::NumberMeta::isSigned);
+    pySubschemaUnionMeta
+        .def_readonly("data_field", &Subschema::UnionMeta::dataField)
+        .def_readonly("type_field", &Subschema::UnionMeta::typeField);
+
     pySubschema
         .def_readonly("type", &Subschema::type)
         .def_readonly("name", &Subschema::name)
@@ -210,6 +230,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readonly("min_items", &Subschema::minItems)
         .def_readonly("one_of", &Subschema::oneOf, py::return_value_policy::reference_internal)
         .def_readonly("default_value", &Subschema::defaultValue, py::return_value_policy::reference_internal)
+        .def_readonly("meta", &Subschema::meta, py::return_value_policy::reference_internal)
+        .def_readonly("user_meta", &Subschema::userMeta, py::return_value_policy::reference_internal)
         .def("get_union_name_field", &Subschema::getUnionNameField, py::return_value_policy::reference_internal)
         .def("get_union_data_field", &Subschema::getUnionDataField, py::return_value_policy::reference_internal)
         .def(
@@ -292,6 +314,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("pop", [](Node* node) { return node->pop(); })
         .def("clear", [](Node* node) { return node->clear(); })
         .def("empty", [](Node* node) { return node->empty(); })
+        .def("get_instance_of", [](Node* node) { return node->getInstanceOf(); })
         .def("get_float", [](Node* node) { return node->getFloat(); })
         .def("get_int", [](Node* node) { return node->getInt(); })
         .def("get_string", [](Node* node) { return node->getString(); })
@@ -375,6 +398,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference_internal)
         .def("add_subscene_component", &Entity::addSubSceneComponent, py::return_value_policy::reference_internal)
         .def("make_entityref", &Entity::makeEntityRef)
+        .def("set_instance_of", &Entity::setInstanceOf)
         .def("resolve_entityref", (Entity* (Entity::*)(const EntityRef&))&Entity::resolveEntityRef, py::return_value_policy::reference_internal)
         .def("detach_entity_from_prefab", [](Entity* ent) {
             return ent->detachEntityFromPrefab().release();
@@ -451,6 +475,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_entity_cache", &EntityLib::getEntityCache, py::return_value_policy::reference_internal)
         .def("get_scene_cache", &EntityLib::getSceneCache, py::return_value_policy::reference_internal)
         .def("clear_cache", &EntityLib::clearCache)
+        .def("set_node_instance_of", &EntityLib::setInstanceOf)
         .def(
             "make_instance_of",
             [](EntityLib* lib, std::string const& path) {

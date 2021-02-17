@@ -7,6 +7,7 @@
 
 #include "../../../external/mapbox/variant.hpp"
 #include "../external/optional.hpp"
+#include "../external/json.hpp"
 #pragma warning(pop)
 
 #include "EntityLibCore.h"
@@ -57,6 +58,12 @@ namespace Ent
         );
     };
 
+    /// Exception thrown when a schema is ill-formed
+    struct IllFormedSchema : std::runtime_error
+    {
+        IllFormedSchema(char const* _message); ///< ctor
+    };
+
     // *************************************** Subschema ******************************************
 
     struct SubschemaRef;
@@ -86,6 +93,7 @@ namespace Ent
         size_t minItems = 0; ///< @brief Minimum size of an array
         tl::optional<std::vector<SubschemaRef>> oneOf; ///< This object have to match with one of thos schema (union)
         std::string name; ///< This is not a constraint. Just the name of the definition
+        nlohmann::json userMeta;
 
         // Meta informations
         /// Store metadata for any type
@@ -273,7 +281,7 @@ namespace Ent
         if (subSchemaOrRef.is<Ref>())
         {
             Ref const& ref = subSchemaOrRef.get<Ref>();
-            return ref.schema->allDefinitions.at(ref.ref);
+            return AT(ref.schema->allDefinitions, ref.ref);
         }
         else if (subSchemaOrRef.is<Subschema>())
             return subSchemaOrRef.get<Subschema>();
@@ -289,7 +297,7 @@ namespace Ent
         if (subSchemaOrRef.is<Ref>())
         {
             Ref const& ref = subSchemaOrRef.get<Ref>();
-            return ref.schema->allDefinitions.at(ref.ref);
+            return AT(ref.schema->allDefinitions, ref.ref);
         }
         else if (subSchemaOrRef.is<Subschema>())
             return subSchemaOrRef.get<Subschema>();

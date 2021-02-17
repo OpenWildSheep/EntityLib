@@ -2,9 +2,8 @@
 
 #pragma warning(push, 0)
 #include <iostream>
-#pragma warning(pop)
-
 #include "../EntityLib/external/filesystem.hpp"
+#pragma warning(pop)
 
 int main(int argc, char** argv)
 try

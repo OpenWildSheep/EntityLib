@@ -122,12 +122,9 @@
                 "ScriptEvents": [
                     {
                         "classData": {
-                            "FactName": "Toto",
-                            "Super": {
-                                "InvertTest": true
-                            }
+                            "EventName": "Toto"
                         },
-                        "className": "CineEventTestBlackboardHasFact"
+                        "className": "CineEventTriggerEventHandlerPost"
                     },
                     {
                         "classData": {
@@ -153,7 +150,6 @@
                 "BreakableSizeMax": "small",
                 "BreathDamages": 10.0,
                 "BreathImpact": 0.0,
-                "BreathStaminaLoss": 0.0,
                 "ControllerVibrationCoef": 0.33000001311302185,
                 "DOTDamagesDuration": 1.0,
                 "Damages": 5.0,
@@ -179,8 +175,7 @@
                 "ShakeRadius": 15.0,
                 "SpecificDuration": 3.0,
                 "SpecificRadiusStart": 1.0,
-                "SpecificRadiusStop": 5.0,
-                "StaminaLoss": 0.0
+                "SpecificRadiusStop": 5.0
             },
             "Type": "ExplosionEffect",
             "Version": 1

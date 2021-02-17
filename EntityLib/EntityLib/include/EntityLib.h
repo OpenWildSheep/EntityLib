@@ -2,6 +2,7 @@
 
 #pragma warning(push, 0)
 #pragma warning(disable : 4996)
+#include "../Override.h"
 #include <vector>
 #include <memory>
 #include <map>
@@ -54,7 +55,41 @@ namespace Ent
     /// \cond PRIVATE
 
     /// Content of a Node which has type Ent::DataType::object
-    using Object = std::vector<std::pair<char const*, value_ptr<Node>>>;
+    struct Object
+    {
+        std::vector<std::pair<char const*, value_ptr<Node>>> nodes;
+        Override<Ent::String> instanceOf;
+
+        size_t size() const
+        {
+            return nodes.size();
+        }
+
+        auto front() const
+        {
+            return nodes.front();
+        }
+    };
+
+    inline auto begin(Object const& obj)
+    {
+        return obj.nodes.begin();
+    }
+
+    inline auto end(Object const& obj)
+    {
+        return obj.nodes.end();
+    }
+
+    inline auto begin(Object& obj)
+    {
+        return obj.nodes.begin();
+    }
+
+    inline auto end(Object& obj)
+    {
+        return obj.nodes.end();
+    }
 
     /// Content of a Node which has type Ent::DataType::array
     struct Array
@@ -98,108 +133,12 @@ namespace Ent
     /// @brief The possible source of an Override value
     enum class OverrideValueSource
     {
-        /// Value is set in this Override
+        /// Value is set in this Override. Write the "InstaneOf" field.
         Override,
-        /// Value is set in the Prefab or in this Override
+        /// Value is set in the Prefab or in this Override. Don't write the "InstaneOf" field.
         OverrideOrPrefab,
-        /// Value can be any source: Override, Prefab or the default value
+        /// Value can be any source: Override, Prefab or the default value. Don't write the "InstaneOf" field.
         Any,
-    };
-
-    template <typename V>
-    struct Override
-    {
-        Override()
-            : hasPrefab(false)
-            , hasOverride(false)
-        {
-        }
-        Override(V _defaultValue, tl::optional<V> _prefabValue, tl::optional<V> _overrideValue)
-            : defaultValue(std::move(_defaultValue))
-        {
-            hasPrefab = _prefabValue.has_value();
-            hasOverride = _overrideValue.has_value();
-            if (hasPrefab)
-                prefabValue = std::move(*_prefabValue);
-            if (hasOverride)
-                overrideValue = std::move(*_overrideValue);
-        }
-        Override(V _defaultValue, V _prefabValue, V _overrideValue, bool _hasPrefab, bool _hasOverride)
-            : defaultValue(std::move(_defaultValue))
-            , prefabValue(std::move(_prefabValue))
-            , overrideValue(std::move(_overrideValue))
-            , hasPrefab(_hasPrefab)
-            , hasOverride(_hasOverride)
-        {
-        }
-        Override(V _defaultValue, V const* _prefabValue, V const* _overrideValue)
-            : defaultValue(std::move(_defaultValue))
-            , hasPrefab(_prefabValue != nullptr)
-            , hasOverride(_overrideValue != nullptr)
-        {
-            if (hasPrefab)
-                prefabValue = *_prefabValue;
-            if (hasOverride)
-                overrideValue = *_overrideValue;
-        }
-        Override(V _defaultVal)
-            : defaultValue(_defaultVal)
-            , hasPrefab(false)
-            , hasOverride(false)
-        {
-        }
-
-        V const& get() const;
-
-        void set(V _newVal);
-
-        bool isSet() const;
-
-        void unset();
-
-        Override<V> detach() const;
-
-        Override<V> makeInstanceOf() const;
-
-        /// makeInstanceOf, then set a value
-        Override<V> makeOverridedInstanceOf(tl::optional<V> _overrideValue) const
-        {
-            Override<V> result = makeInstanceOf();
-            result.hasOverride = _overrideValue.has_value();
-            if (result.hasOverride)
-                result.overrideValue = *_overrideValue;
-            else
-                result.overrideValue = {};
-            return result;
-        }
-
-        /// True if no value was set in template or in instance
-        bool isDefault() const
-        {
-            return !(hasPrefab || hasOverride);
-        }
-
-        void computeMemory(MemoryProfiler& prof) const;
-
-        // bool hasOverride() const;
-
-        V const& getDefaultValue() const
-        {
-            return defaultValue;
-        }
-
-        V& getDefaultValue()
-        {
-            return defaultValue;
-        }
-
-    public:
-        V defaultValue{};
-        V prefabValue{};
-        V overrideValue{};
-        bool hasPrefab : 1; // No default init for bitfield until c++20
-        bool hasOverride : 1;
-        // DeleteCheck deleteCheck;
     };
 
     /// \endcond
@@ -207,6 +146,7 @@ namespace Ent
     // *********************************** Scene/Entity/Component/Node ****************************
 
     struct Subschema;
+    class EntityLib;
 
     /// Property node. Can contains any type in Ent::DataType
     struct ENTLIB_DLLEXPORT Node
@@ -240,6 +180,7 @@ namespace Ent
             const; ///< @pre type==Ent::DataType::object @brief true if a field with this name exist
         std::vector<char const*>
         getFieldNames() const; ///< @pre type==Ent::DataType::object @brief Get all field names
+        char const* getInstanceOf() const; ///< @pre type==Ent::DataType::object @brief path to the tmpl Node
 
         // Array
         Node* at(size_t _index); ///< @pre type==Ent::DataType::array. @brief Get the item at _index
@@ -331,6 +272,8 @@ namespace Ent
     private:
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
         Value value; ///< Contains one of the types accepted by a Node
+
+        friend EntityLib;
     };
 
     /// The properties of a given component
@@ -589,7 +532,7 @@ namespace Ent
         /// Reset the Entity to be an instance of the given \b _template
         ///
         /// @warning All Nodes into the Entity will be invalidated
-        void setInstanceOf(char const* _template);
+        void setInstanceOf(std::string _template);
 
     private:
         void updateSubSceneOwner();
@@ -773,9 +716,16 @@ namespace Ent
 
         void clearCache();
 
-    private:
+        /// Reset the Node to be an instance of the given \b _template
+        ///
+        /// @warning All sub-nodes into \b _node will be invalidated
+        /// @param _templateNodePath path to the template Node (relative to RawData)
+        /// @param _node which will become instance of \b _templateNodePath
+        void setInstanceOf(char const* _templateNodePath, Node& _node);
+
         std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
 
+    private:
         /// Load an Entity or a Scene, using the given cache
         template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
         std::shared_ptr<Type const> loadEntityOrScene(

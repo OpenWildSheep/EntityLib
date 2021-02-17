@@ -160,6 +160,11 @@ try
 
     ENTLIB_ASSERT(Ent::format("Toto %d", 37) == "Toto 37");
 
+    {
+        std::map<std::string, int> emptyMap;
+        ENTLIB_CHECK_EXCEPTION(AT(emptyMap, "not"), Ent::InvalidKey);
+    }
+
     using EntityPtr = std::unique_ptr<Ent::Entity>;
 
     // Test $ref links in entlib.schema.schema.allDefinitions
@@ -172,9 +177,9 @@ try
     Ent::Subschema const& scriptEventUnionSchema =
         cinematicGDSchema.properties.at("ScriptEvents")->singularItems->get();
     auto&& nameToTypeMap = scriptEventUnionSchema.getUnionTypesMap();
-    ENTLIB_ASSERT(size(nameToTypeMap) == 14);
+    ENTLIB_ASSERT(size(nameToTypeMap) == 12);
     ENTLIB_ASSERT(nameToTypeMap.count("CineEventTest") == 1);
-    ENTLIB_ASSERT(nameToTypeMap.count("CineEventTestBlackboardHasFact") == 1);
+    ENTLIB_ASSERT(nameToTypeMap.count("CineEventTriggerEventHandlerPost") == 1);
     ENTLIB_ASSERT(nameToTypeMap.count("CineEventTestEndCurrentSequence") == 1);
 
     // Ensure that all components have a ref and is in entlib.schema.schema.allDefinitions
@@ -232,6 +237,10 @@ try
         ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isDefault());
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getDefaultInt() == 6);
         ENTLIB_ASSERT(
+            heightObj->root.at("Subdivision")->getSchema()->userMeta["testUserMetatdata"].get<int>()
+            == 42);
+
+        ENTLIB_ASSERT(
             heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
         ENTLIB_ASSERT(heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 
@@ -277,15 +286,16 @@ try
         Ent::Node const* oneOfScripts = scriptEvents->at(0llu);
         ENTLIB_ASSERT(oneOfScripts->getDataType() == Ent::DataType::oneOf);
         Ent::Node const* cineEvent = oneOfScripts->getUnionData();
+        ENTLIB_ASSERT(cineEvent != nullptr);
         ENTLIB_ASSERT(
             cineEvent->getTypeName()
             == std::string(
-                R"(./RuntimeComponents.json#/definitions/CineEventTestBlackboardHasFact)"));
+                R"(./RuntimeComponents.json#/definitions/CineEventTriggerEventHandlerPost)"));
         auto fieldNames = cineEvent->getFieldNames();
-        ENTLIB_ASSERT(fieldNames[0] == std::string("FactName"));
-        ENTLIB_ASSERT(fieldNames[1] == std::string("Super"));
+        ENTLIB_ASSERT(fieldNames[1] == std::string("EventName"));
+        ENTLIB_ASSERT(fieldNames[2] == std::string("Super"));
 
-        Ent::Node const* nbEnt = cineEvent->at("FactName");
+        Ent::Node const* nbEnt = cineEvent->at("EventName");
         ENTLIB_ASSERT(nbEnt != nullptr);
         ENTLIB_ASSERT(nbEnt->getDataType() == Ent::DataType::string);
         ENTLIB_ASSERT(nbEnt->getString() == std::string("Toto"));
@@ -312,7 +322,8 @@ try
         Ent::Node* scriptEvents = cinematicGD->root.at("ScriptEvents");
         Ent::Node* oneOfScripts2 = scriptEvents->at(1llu);
         ENTLIB_ASSERT(oneOfScripts2->getDataType() == Ent::DataType::oneOf);
-        ENTLIB_ASSERT(oneOfScripts2->getUnionType() == std::string("CineEventTestBlackboardHasFact"));
+        ENTLIB_ASSERT(
+            oneOfScripts2->getUnionType() == std::string("CineEventTriggerEventHandlerPost"));
         oneOfScripts2->setUnionType("CineEventTestCurrentGameState");
         ENTLIB_CHECK_EXCEPTION(oneOfScripts2->setUnionType("ThisTypeDoesntExist"), Ent::BadUnionType);
         Ent::Node* testCurrentState = oneOfScripts2->getUnionData();
@@ -325,7 +336,8 @@ try
         // Set Union type without override
         Ent::Node* oneOfScripts3 = scriptEvents->at(2llu);
         ENTLIB_ASSERT(oneOfScripts3->getDataType() == Ent::DataType::oneOf);
-        ENTLIB_ASSERT(oneOfScripts3->getUnionType() == std::string("CineEventTestBlackboardHasFact"));
+        ENTLIB_ASSERT(
+            oneOfScripts3->getUnionType() == std::string("CineEventTriggerEventHandlerPost"));
         oneOfScripts3->setUnionType("CineEventTestCurrentGameState");
 
         // Push in an array of Union
@@ -544,6 +556,13 @@ try
         ENTLIB_ASSERT(netLink->root.at("Target")->isSet() == false);
         Ent::Component const* trans = subObj.getComponent("TransformGD");
         ENTLIB_ASSERT(trans->root.at("Position")->at(0llu)->getFloat() == 0.0);
+
+        // Test instanciation of a template Node
+        Ent::Component const* stickToTerrain = ent.getComponent("StickToTerrain");
+        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
+        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isSet() == false);
+        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isDefault() == false);
+        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("ZOffset")->getFloat() - 10.) < 0.0001);
     };
 
     {
@@ -603,6 +622,10 @@ try
 
         sysCreat->root.at("BehaviorState")->setString("Overrided");
         entlib.saveEntity(*ent, "instance.copy.entity");
+    }
+    {
+        EntityPtr ent = entlib.loadEntity("instance2.entity");
+        testInstanceOf(*ent);
     }
     auto testInstanceOverrideSubscene = [](Ent::Entity const& ent) {
         // TEST SubScene (with override)
@@ -759,6 +782,18 @@ try
     {
         // Test makeInstanceOf
         EntityPtr instanceOf = entlib.makeInstanceOf("prefab.entity");
+
+        // Test instanciation of a template Node
+        Ent::Component* stickToTerrain = instanceOf->addComponent("StickToTerrain");
+        entlib.setInstanceOf("test.StickToTerrain.node", stickToTerrain->root);
+        ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
+        stickToTerrain->root.at("NormalRatio")->setFloat(0.6f);
+
+        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
+        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isSet() == false);
+        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isDefault() == false);
+        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("ZOffset")->getFloat() - 10.) < 0.0001);
+
         ENTLIB_ASSERT(instanceOf->getComponent("NetworkNode") != nullptr);
         instanceOf->getComponent("TransformGD")->root.getFieldNames();
         entlib.saveEntity(*instanceOf, "instance.create.entity");
@@ -768,6 +803,14 @@ try
         EntityPtr ent = entlib.loadEntity(_instancePath);
 
         ent->getComponent("TransformGD")->root.getFieldNames();
+
+        // Test instanciation of a template Node
+        Ent::Component const* stickToTerrain = ent->getComponent("StickToTerrain");
+        ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
+        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
+        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isSet() == false);
+        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isDefault() == false);
+        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("ZOffset")->getFloat() - 10.) < 0.0001);
 
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent->getComponent("HeightObj");
@@ -806,6 +849,12 @@ try
         instanceOf.setInstanceOf("prefab.entity");
         ENTLIB_ASSERT(instanceOf.getComponent("NetworkNode") != nullptr);
         instanceOf.getComponent("TransformGD")->root.getFieldNames();
+
+        // Test instanciation of a template Node
+        Ent::Component* stickToTerrain = instanceOf.addComponent("StickToTerrain");
+        entlib.setInstanceOf("test.StickToTerrain.node", stickToTerrain->root);
+        stickToTerrain->root.at("NormalRatio")->setFloat(0.6f);
+
         entlib.saveEntity(instanceOf, "setInstanceOf.entity");
     }
     testCreateInstanceOf("setInstanceOf.entity");
@@ -918,9 +967,9 @@ try
     heightObj->root.at("DisplaceNoiseList")->push();
 
     scene->getObjects().front()->addComponent("BeamGeneratorGD")->root.getFieldNames();
-    ENTLIB_ASSERT(
-        scene->getObjects().front()->addComponent("ExplosionEffect")->root.getFieldNames().size()
-        == 23);
+    auto fieldNameCount =
+        scene->getObjects().front()->addComponent("ExplosionEffect")->root.getFieldNames().size();
+    ENTLIB_ASSERT(fieldNameCount == 21);
 
     auto ep1Iter = std::find_if(
         begin(scene->getObjects()),

@@ -1,0 +1,25 @@
+{
+    "Components": [
+        {
+            "Data": {
+                "Faction": "Plouf"
+            },
+            "Type": "SystemicCreature",
+            "Version": 1
+        },
+        {
+            "Version": 1,
+            "Type": "PathNodeGD",
+            "Data": {
+                "Radius": 30.0
+            }
+        }, {
+            "Data": {
+                "NormalRatio": 0.6
+            },
+            "Type": "StickToTerrain",
+            "Version": 1
+        }
+    ],
+    "InstanceOf": "instance.entity"
+}

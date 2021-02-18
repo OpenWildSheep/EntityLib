@@ -1026,16 +1026,16 @@ namespace Ent
     {
         thumbnail.set(std::move(_thumbPath));
     }
-    std::array<uint8_t, 4> Entity::getColor() const
+    std::array<float, 4> Entity::getColor() const
     {
-        std::array<uint8_t, 4> col{};
+        std::array<float, 4> col{};
         for (size_t i = 0; i < 4; ++i)
         {
-            col[i] = (uint8_t)color.at(i)->getFloat();
+            col[i] = color.at(i)->getFloat();
         }
         return col;
     }
-    void Entity::setColor(std::array<uint8_t, 4> _color)
+    void Entity::setColor(std::array<float, 4> _color)
     {
         for (size_t i = 0; i < 4; ++i)
         {

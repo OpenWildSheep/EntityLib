@@ -301,9 +301,9 @@ try
         ENTLIB_ASSERT(nbEnt->getString() == std::string("Toto"));
 
         // TEST sub-object with non-default values
-        Ent::Component const* explosionEffect = ent->getComponent("ExplosionEffect");
-        Ent::Node const* shakeData = explosionEffect->root.at("ShakeData");
-        ENTLIB_ASSERT(shakeData->at("shakeDuration")->getFloat() == 0.0f);
+        Ent::Component const* ldprimitive = ent->getComponent("LDPrimitive");
+        Ent::Node const* primitiveData = ldprimitive->root.at("PrimitiveData");
+        ENTLIB_ASSERT(primitiveData->at("Height")->getFloat() == 42.0f);
     };
 
     {
@@ -968,8 +968,8 @@ try
 
     scene->getObjects().front()->addComponent("BeamGeneratorGD")->root.getFieldNames();
     auto fieldNameCount =
-        scene->getObjects().front()->addComponent("ExplosionEffect")->root.getFieldNames().size();
-    ENTLIB_ASSERT(fieldNameCount == 21);
+        scene->getObjects().front()->addComponent("HeightObj")->root.getFieldNames().size();
+    ENTLIB_ASSERT(fieldNameCount == 5);
 
     auto ep1Iter = std::find_if(
         begin(scene->getObjects()),

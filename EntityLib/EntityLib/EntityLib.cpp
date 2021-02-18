@@ -75,9 +75,10 @@ namespace Ent
         json schemaDocument = loadJsonFile(toolsDir / "WildPipeline/Schema/Scene-schema.json");
 
         loader.readSchema(&schema.schema, "Scene-schema.json", schemaDocument, schemaDocument);
+        schema.schema.entityLib = this;
 
         auto&& compList =
-            schema.schema.allDefinitions["./MergedComponents.json#/definitions/Component"].oneOf;
+            schema.schema.allDefinitions.at("./MergedComponents.json#/definitions/Component").oneOf;
 
         for (SubschemaRef& comp : *compList)
         {

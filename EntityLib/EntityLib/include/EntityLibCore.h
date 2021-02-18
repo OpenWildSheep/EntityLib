@@ -256,8 +256,6 @@ namespace Ent
         {
             freePtr.push_back(ptr);
         }
-
-        static Pool<T> pool;
     };
 
     /// @brief smart-pointer with deep-copy
@@ -266,7 +264,7 @@ namespace Ent
     /// It is like an optional but heap allocated
     /// It is like a vector with a size of 1
     ///
-    /// Allocation will use the Ent::Pool
+    /// This class is only for the Node type
     template <typename T>
     struct value_ptr
     {
@@ -274,8 +272,7 @@ namespace Ent
         {
             void operator()(T* ptr) const
             {
-                ptr->~T();
-                Pool<T>::pool.free(ptr);
+                destroyAndFree(ptr);
             }
         };
 
@@ -288,23 +285,23 @@ namespace Ent
         }
 
         template <typename... Args>
-        void initPtr(Args&&... args)
+        void initPtr(Pool<T>& pool, Args&&... args)
         {
-            ptr.reset(new (Pool<T>::pool.alloc()) T(std::forward<Args>(args)...));
+            ptr.reset(new (pool.alloc()) T(std::forward<Args>(args)...));
         }
 
         value_ptr(T const& data)
         {
-            initPtr(data);
+            initPtr(getPool(&data), data);
         }
         explicit value_ptr(T const* data)
         {
             if (data != nullptr)
-                initPtr(*data);
+                initPtr(getPool(data), *data);
         }
         value_ptr(T&& data)
         {
-            initPtr(std::move(data));
+            initPtr(getPool(&data), std::move(data));
         }
         value_ptr(nullptr_t)
         {
@@ -321,7 +318,7 @@ namespace Ent
             else
             {
                 if (ot.ptr != nullptr)
-                    initPtr(*ot);
+                    initPtr(getPool(ot.ptr.get()), *ot);
             }
             return *this;
         }

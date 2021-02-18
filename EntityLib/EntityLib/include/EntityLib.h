@@ -269,12 +269,20 @@ namespace Ent
 
         void computeMemory(MemoryProfiler& prof) const;
 
+        EntityLib* getEntityLib() const
+        {
+            return schema->rootSchema->entityLib;
+        }
+
     private:
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
         Value value; ///< Contains one of the types accepted by a Node
 
         friend EntityLib;
     };
+
+    void destroyAndFree(Node* ptr);
+    Pool<Node>& getPool(Node const* ptr);
 
     /// The properties of a given component
     struct Component
@@ -639,6 +647,7 @@ namespace Ent
     class ENTLIB_DLLEXPORT EntityLib
     {
     public:
+        Pool<Node> nodePool;
         /// @todo Make public attribute private?
         std::filesystem::path rootPath; ///< Path to the perforce root (X:/)
         std::filesystem::path rawdataPath; ///< Path to the RawData dir in the perforce root (X:/RawData)

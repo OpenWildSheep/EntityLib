@@ -37,9 +37,6 @@ static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _s
 
 namespace Ent
 {
-    template <>
-    Pool<Node> Pool<Node>::pool;
-
     char const* actorStatesSchemaName = "./Scene-schema.json#/definitions/ActorStates";
     char const* colorSchemaName = "./RuntimeComponents.json#/definitions/Color";
     static Ent::Node makeDefaultColorField(EntityLib const& _entlib)
@@ -207,7 +204,10 @@ namespace Ent
     Node& at(Object& obj, char const* key)
     {
         auto range = std::equal_range(
-            begin(obj), end(obj), std::pair<char const*, Node>{key, Node()}, CompObject());
+            begin(obj),
+            end(obj),
+            std::pair<char const*, value_ptr<Node>>{key, value_ptr<Node>()},
+            CompObject());
         if (range.first == range.second)
         {
             throw std::logic_error(std::string("Bad key : ") + key);
@@ -880,6 +880,20 @@ namespace Ent
     void Node::computeMemory(MemoryProfiler& prof) const
     {
         mapbox::util::apply_visitor(ComputeMem{prof}, value);
+    }
+
+    void destroyAndFree(Node* ptr)
+    {
+        auto& pool = ptr->getSchema()->rootSchema->entityLib->nodePool;
+        ptr->~Node();
+        pool.free(ptr);
+    }
+
+    Pool<Node>& getPool(Node const* ptr)
+    {
+        ENTLIB_ASSERT(ptr);
+        ENTLIB_ASSERT(ptr->getSchema());
+        return ptr->getEntityLib()->nodePool;
     }
 
     // ********************************* SubSceneComponent ****************************************

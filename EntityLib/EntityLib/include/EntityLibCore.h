@@ -234,6 +234,11 @@ namespace Ent
     template <typename T, size_t BucketSize = 1024 * 1024>
     struct Pool
     {
+        ~Pool()
+        {
+            ENTLIB_ASSERT(allocatedCount == 0);
+        }
+        size_t allocatedCount = 0;
         std::vector<void*> freePtr;
         std::vector<std::vector<typename std::aligned_storage<sizeof(T), alignof(T)>::type>> buckets;
         void* alloc()
@@ -249,11 +254,13 @@ namespace Ent
             }
             void* ptr = freePtr.back();
             freePtr.pop_back();
+            ++allocatedCount;
             return ptr;
         }
 
         void free(void* ptr)
         {
+            --allocatedCount;
             freePtr.push_back(ptr);
         }
     };

@@ -244,6 +244,12 @@ namespace Ent
         Node makeInstanceOf() const;
         /// \endcond
 
+        /// Reset the Node to be an instance of the given \b _template
+        ///
+        /// @warning All sub-nodes into \b _node will be invalidated
+        /// @param _templateNodePath path to the template Node (relative to RawData)
+        void setInstanceOf(char const* _templateNodePath);
+
         bool hasDefaultValue() const; ///< false if something was set in instance or prefab
 
         bool isDefault() const; ///< true if the value was set in a template or in the instance
@@ -724,13 +730,6 @@ namespace Ent
         std::map<std::filesystem::path, SceneFile> const& getSceneCache() const;
 
         void clearCache();
-
-        /// Reset the Node to be an instance of the given \b _template
-        ///
-        /// @warning All sub-nodes into \b _node will be invalidated
-        /// @param _templateNodePath path to the template Node (relative to RawData)
-        /// @param _node which will become instance of \b _templateNodePath
-        void setInstanceOf(char const* _templateNodePath, Node& _node);
 
         std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
 

@@ -620,7 +620,7 @@ try:
 
     # Test instanciation of a template Node
     stickToTerrain = instanceOf.add_component("StickToTerrain")
-    entlib.set_node_instance_of("test.StickToTerrain.node", stickToTerrain.root)
+    stickToTerrain.root.set_instance_of("test.StickToTerrain.node", )
     assert(stickToTerrain.root.get_instance_of() is not None)
     stickToTerrain.root.at("NormalRatio").set_float(0.6)
 
@@ -689,7 +689,7 @@ try:
 
     # Test instanciation of a template Node
     stickToTerrain = instanceOf.add_component("StickToTerrain")
-    entlib.set_node_instance_of("test.StickToTerrain.node", stickToTerrain.root)
+    stickToTerrain.root.set_instance_of("test.StickToTerrain.node")
     stickToTerrain.root.at("NormalRatio").set_float(0.6)
 
     entlib.save_entity(instanceOf, "setInstanceOf.entity")

@@ -882,6 +882,17 @@ namespace Ent
         mapbox::util::apply_visitor(ComputeMem{prof}, value);
     }
 
+    void Ent::Node::setInstanceOf(char const* _templateNodePath)
+    {
+        if (not value.is<Object>())
+            throw BadType();
+
+        json nodeData = loadJsonFile(getEntityLib()->getAbsolutePath(_templateNodePath));
+        Node templateNode = loadNode(getEntityLib(), *getSchema(), nodeData, nullptr);
+        (*this) = templateNode.makeInstanceOf();
+        value.get<Object>().instanceOf.set(_templateNodePath);
+    }
+
     void destroyAndFree(Node* ptr)
     {
         auto& pool = ptr->getSchema()->rootSchema->entityLib->nodePool;
@@ -2694,17 +2705,6 @@ std::filesystem::path Ent::EntityLib::getAbsolutePath(std::filesystem::path cons
         absPath.make_preferred();
         return std::filesystem::weakly_canonical(absPath);
     }
-}
-
-void Ent::EntityLib::setInstanceOf(char const* _templateNodePath, Node& _node)
-{
-    if (not _node.value.is<Object>())
-        throw BadType();
-
-    json nodeData = loadJsonFile(getAbsolutePath(_templateNodePath));
-    Node templateNode = loadNode(this, *_node.getSchema(), nodeData, nullptr);
-    _node = templateNode.makeInstanceOf();
-    _node.value.get<Object>().instanceOf.set(_templateNodePath);
 }
 
 std::map<std::filesystem::path, Ent::EntityLib::EntityFile> const& Ent::EntityLib::getEntityCache() const

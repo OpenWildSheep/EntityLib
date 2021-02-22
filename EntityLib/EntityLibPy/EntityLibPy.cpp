@@ -371,10 +371,14 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "embedded",
             [](SubSceneComponent* comp) -> Scene& { return *comp->embedded; },
             py::return_value_policy::reference_internal)
-        .def("detach_embedded",
-            [](SubSceneComponent* comp) {
-                return std::shared_ptr<Scene>(comp->detachEmbedded().release());
-            })
+        // detachEmbedded is hard to bind in python because it change the way the entities inside
+        // are managed by python.
+        // They were reference_internal and become managed by python.
+        // Since this function is used nowhere is seems acceptable to not bind it now.
+        //.def("detach_embedded",
+        //    [](SubSceneComponent* comp) {
+        //        return std::shared_ptr<Scene>(comp->detachEmbedded().release());
+        //    })
         ;
 
     pyEntity

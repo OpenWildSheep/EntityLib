@@ -141,6 +141,9 @@ namespace Ent
         Any,
     };
 
+    void destroyAndFree(Node* ptr); ///< Internally used by the Node memory Pool
+    Pool<Node>& getPool(Node const* ptr); ///< Internally used by the Node memory Pool
+
     /// \endcond
 
     // *********************************** Scene/Entity/Component/Node ****************************
@@ -275,10 +278,7 @@ namespace Ent
 
         void computeMemory(MemoryProfiler& prof) const;
 
-        EntityLib* getEntityLib() const
-        {
-            return schema->rootSchema->entityLib;
-        }
+        EntityLib* getEntityLib() const;
 
     private:
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
@@ -286,9 +286,6 @@ namespace Ent
 
         friend EntityLib;
     };
-
-    void destroyAndFree(Node* ptr);
-    Pool<Node>& getPool(Node const* ptr);
 
     /// The properties of a given component
     struct Component

@@ -236,7 +236,10 @@ namespace Ent
     {
         ~Pool()
         {
-            ENTLIB_ASSERT(allocatedCount == 0);
+            if (allocatedCount != 0)
+            {
+                ENTLIB_LOG_ERROR("EntityLib is deleted but some Nodes are not deleted yet!");
+            }
         }
         size_t allocatedCount = 0;
         std::vector<void*> freePtr;

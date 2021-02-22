@@ -893,6 +893,11 @@ namespace Ent
         value.get<Object>().instanceOf.set(_templateNodePath);
     }
 
+    EntityLib* Ent::Node::getEntityLib() const
+    {
+        return schema->rootSchema->entityLib;
+    }
+
     void destroyAndFree(Node* ptr)
     {
         auto& pool = ptr->getSchema()->rootSchema->entityLib->nodePool;

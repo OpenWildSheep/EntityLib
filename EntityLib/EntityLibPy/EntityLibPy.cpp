@@ -375,10 +375,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         // are managed by python.
         // They were reference_internal and become managed by python.
         // Since this function is used nowhere is seems acceptable to not bind it now.
-        //.def("detach_embedded",
-        //    [](SubSceneComponent* comp) {
-        //        return std::shared_ptr<Scene>(comp->detachEmbedded().release());
-        //    })
+        // .def("detach_embedded",
+        //     [](SubSceneComponent* comp) -> Scene* { return comp->detachEmbedded().release(); })
         ;
 
     pyEntity
@@ -459,7 +457,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(
             "load_entity",
             [](EntityLib* lib, std::string const& path) { return lib->loadEntity(path).release(); },
-            py::keep_alive<0, 1>()) // py::keep_alive<0, 1> => Do not destroy EntityLib before Entity
+            py::keep_alive<0, 1>(), // py::keep_alive<0, 1> => Do not destroy EntityLib before Entity
+            "entityPath"_a)
         .def(
             "load_scene",
             [](EntityLib* lib, std::string const& path) { return lib->loadScene(path).release(); },

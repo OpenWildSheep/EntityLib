@@ -1705,12 +1705,21 @@ static Ent::Node loadNode(
                     for (Ent::Node const* subSuper : _super->getItems())
                     {
                         Ent::Node tmpNode =
-                            loadNode(nullptr, _nodeSchema.singularItems->get(), json(), subSuper);
+                            loadNode(_entlib, _nodeSchema.singularItems->get(), json(), subSuper);
                         arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
                 }
-                // TODO : Create minItem items
+                else
+                {
+                    for (size_t i = 0; i < _nodeSchema.minItems; ++i)
+                    {
+                        Ent::Node tmpNode =
+                            loadNode(_entlib, _nodeSchema.singularItems->get(), json(), nullptr);
+                        arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
+                        ++index;
+                    }
+                }
             }
             else // If it is a singularItems and there is _data, we have to use the overridePolicy
             {

@@ -304,6 +304,11 @@ try
         Ent::Component const* ldprimitive = ent->getComponent("LDPrimitive");
         Ent::Node const* primitiveData = ldprimitive->root.at("PrimitiveData");
         ENTLIB_ASSERT(primitiveData->at("Height")->getFloat() == 42.0f);
+
+        // TEST Default size for array is minItems
+        Ent::Component const* physicsGD = ent->getComponent("PhysicsGD");
+        Ent::Node const* axisRestriction = physicsGD->root.at("AxisRestriction");
+        ENTLIB_ASSERT(axisRestriction->size() == 3);
     };
 
     {

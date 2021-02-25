@@ -2634,6 +2634,16 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanc
     return inst;
 }
 
+void Ent::EntityLib::resetInstanceOf(Node& _node) const
+{
+    if (not _node.value.is<Object>())
+    {
+        throw BadType();
+    }
+    _node = loadNode(this, *_node.getSchema(), json(), nullptr);
+    _node.value.get<Object>().instanceOf.unset();
+}
+
 void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path const& _entityPath) const
 {
     std::filesystem::path entityPath = getAbsolutePath(_entityPath);

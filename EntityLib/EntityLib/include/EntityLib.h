@@ -722,7 +722,7 @@ namespace Ent
         /// @param _templateNodePath path to the template Node (relative to RawData)
         /// @param _node which will become instance of \b _templateNodePath
         void setInstanceOf(char const* _templateNodePath, Node& _node);
-
+        void resetInstanceOf(Node& _node) const;
         std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
 
     private:

@@ -324,6 +324,11 @@ namespace Ent
         {
             return root.hasOverride();
         }
+        /// @brief Recursively check if values are at default value.
+        bool hasDefaultValue() const
+        {
+            return root.hasDefaultValue();
+        }
         /// Is this component used in runtime engine ?
         bool isUsedInRuntime() const
         {

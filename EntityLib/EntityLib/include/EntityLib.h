@@ -252,6 +252,7 @@ namespace Ent
         /// @warning All sub-nodes into \b _node will be invalidated
         /// @param _templateNodePath path to the template Node (relative to RawData)
         void setInstanceOf(char const* _templateNodePath);
+        void resetInstanceOf();
 
         bool hasDefaultValue() const; ///< false if something was set in instance or prefab
 
@@ -334,6 +335,11 @@ namespace Ent
         bool hasOverride() const
         {
             return root.hasOverride();
+        }
+        /// @brief Recursively check if values are at default value.
+        bool hasDefaultValue() const
+        {
+            return root.hasDefaultValue();
         }
         /// Is this component used in runtime engine ?
         bool isUsedInRuntime() const

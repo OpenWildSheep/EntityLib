@@ -97,6 +97,11 @@
             "Version": 1
         },
         {
+            "Data": {},
+            "Type": "PhysicsGD",
+            "Version": 1
+        },
+        {
             "Data": {
                 "InSpiritWorld": false
             },

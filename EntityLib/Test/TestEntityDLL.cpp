@@ -790,7 +790,7 @@ try
 
         // Test instanciation of a template Node
         Ent::Component* stickToTerrain = instanceOf->addComponent("StickToTerrain");
-        entlib.setInstanceOf("test.StickToTerrain.node", stickToTerrain->root);
+        stickToTerrain->root.setInstanceOf("test.StickToTerrain.node");
         ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
         stickToTerrain->root.at("NormalRatio")->setFloat(0.6f);
 
@@ -857,7 +857,7 @@ try
 
         // Test instanciation of a template Node
         Ent::Component* stickToTerrain = instanceOf.addComponent("StickToTerrain");
-        entlib.setInstanceOf("test.StickToTerrain.node", stickToTerrain->root);
+        stickToTerrain->root.setInstanceOf("test.StickToTerrain.node");
         stickToTerrain->root.at("NormalRatio")->setFloat(0.6f);
 
         entlib.saveEntity(instanceOf, "setInstanceOf.entity");

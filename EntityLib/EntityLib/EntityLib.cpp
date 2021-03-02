@@ -37,9 +37,6 @@ static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _s
 
 namespace Ent
 {
-    template <>
-    Pool<Node> Pool<Node>::pool;
-
     char const* actorStatesSchemaName = "./Scene-schema.json#/definitions/ActorStates";
     char const* colorSchemaName = "./RuntimeComponents.json#/definitions/Color";
     static Ent::Node makeDefaultColorField(EntityLib const& _entlib)
@@ -75,9 +72,10 @@ namespace Ent
         json schemaDocument = loadJsonFile(toolsDir / "WildPipeline/Schema/Scene-schema.json");
 
         loader.readSchema(&schema.schema, "Scene-schema.json", schemaDocument, schemaDocument);
+        schema.schema.entityLib = this;
 
         auto&& compList =
-            schema.schema.allDefinitions["./MergedComponents.json#/definitions/Component"].oneOf;
+            schema.schema.allDefinitions.at("./MergedComponents.json#/definitions/Component").oneOf;
 
         for (SubschemaRef& comp : *compList)
         {
@@ -206,7 +204,10 @@ namespace Ent
     Node& at(Object& obj, char const* key)
     {
         auto range = std::equal_range(
-            begin(obj), end(obj), std::pair<char const*, Node>{key, Node()}, CompObject());
+            begin(obj),
+            end(obj),
+            std::pair<char const*, value_ptr<Node>>{key, value_ptr<Node>()},
+            CompObject());
         if (range.first == range.second)
         {
             throw std::logic_error(std::string("Bad key : ") + key);
@@ -879,6 +880,46 @@ namespace Ent
     void Node::computeMemory(MemoryProfiler& prof) const
     {
         mapbox::util::apply_visitor(ComputeMem{prof}, value);
+    }
+
+    void Ent::Node::setInstanceOf(char const* _templateNodePath)
+    {
+        if (not value.is<Object>())
+            throw BadType();
+
+        json nodeData = loadJsonFile(getEntityLib()->getAbsolutePath(_templateNodePath));
+        Node templateNode = loadNode(getEntityLib(), *getSchema(), nodeData, nullptr);
+        (*this) = templateNode.makeInstanceOf();
+        value.get<Object>().instanceOf.set(_templateNodePath);
+    }
+
+    void Ent::Node::resetInstanceOf()
+    {
+        if (not value.is<Object>())
+        {
+            throw BadType();
+        }
+        (*this) = loadNode(getEntityLib(), *getSchema(), json(), nullptr);
+        value.get<Object>().instanceOf.unset();
+    }
+
+    EntityLib* Ent::Node::getEntityLib() const
+    {
+        return schema->rootSchema->entityLib;
+    }
+
+    void destroyAndFree(Node* ptr)
+    {
+        auto& pool = ptr->getSchema()->rootSchema->entityLib->nodePool;
+        ptr->~Node();
+        pool.free(ptr);
+    }
+
+    Pool<Node>& getPool(Node const* ptr)
+    {
+        ENTLIB_ASSERT(ptr);
+        ENTLIB_ASSERT(ptr->getSchema());
+        return ptr->getEntityLib()->nodePool;
     }
 
     // ********************************* SubSceneComponent ****************************************
@@ -2643,16 +2684,6 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanc
     return inst;
 }
 
-void Ent::EntityLib::resetInstanceOf(Node& _node) const
-{
-    if (not _node.value.is<Object>())
-    {
-        throw BadType();
-    }
-    _node = loadNode(this, *_node.getSchema(), json(), nullptr);
-    _node.value.get<Object>().instanceOf.unset();
-}
-
 void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path const& _entityPath) const
 {
     std::filesystem::path entityPath = getAbsolutePath(_entityPath);
@@ -2698,17 +2729,6 @@ std::filesystem::path Ent::EntityLib::getAbsolutePath(std::filesystem::path cons
         absPath.make_preferred();
         return std::filesystem::weakly_canonical(absPath);
     }
-}
-
-void Ent::EntityLib::setInstanceOf(char const* _templateNodePath, Node& _node)
-{
-    if (not _node.value.is<Object>())
-        throw BadType();
-
-    json nodeData = loadJsonFile(getAbsolutePath(_templateNodePath));
-    Node templateNode = loadNode(this, *_node.getSchema(), nodeData, nullptr);
-    _node = templateNode.makeInstanceOf();
-    _node.value.get<Object>().instanceOf.set(_templateNodePath);
 }
 
 std::map<std::filesystem::path, Ent::EntityLib::EntityFile> const& Ent::EntityLib::getEntityCache() const

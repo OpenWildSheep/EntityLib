@@ -320,6 +320,10 @@ try
     {
         EntityPtr ent = entlib.loadEntity("prefab.entity");
 
+        // Test saveNode
+        Ent::Component const* heightObj = ent->getComponent("HeightObj");
+        heightObj->root.saveNode("test.HeightObj.node");
+
         testPrefabEntity(ent.get());
 
         // Set Union type and override

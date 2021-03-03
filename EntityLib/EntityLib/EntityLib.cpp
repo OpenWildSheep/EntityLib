@@ -782,6 +782,20 @@ namespace Ent
             *getSchema(), *this, _dumpedValueSource, _superKeyIsTypeName, _entityRefPreProc);
     }
 
+    void Node::saveNode(std::filesystem::path const& _path) const
+    {
+        json node = toJson();
+        node["$schema"] = getSchema()->name;
+
+        std::filesystem::path path = getEntityLib()->getAbsolutePath(_path);
+        std::ofstream file(path);
+        if (not file.is_open())
+        {
+            throw std::runtime_error(format("Can't open file for write: %ls", path.c_str()));
+        }
+        file << node.dump(4);
+    }
+
     float Node::getDefaultFloat() const
     {
         if (value.is<Override<float>>())

@@ -266,6 +266,9 @@ namespace Ent
                 false, ///< Super sub-node are dumped using their type name for key instead of "Super"
             std::function<void(EntityRef&)> const& _entityRefPreProc = {}) const;
 
+        /// Save as a Node prebab
+        void saveNode(std::filesystem::path const& path) const;
+
         float getDefaultFloat() const; ///< @pre number or integer. @brief Get the default value as float
         int64_t getDefaultInt() const; ///< @pre integer. @brief Get the default value as int
         char const* getDefaultString() const; ///< @pre DataType == string. @brief Get the default value as string

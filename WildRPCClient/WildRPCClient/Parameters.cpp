@@ -571,4 +571,10 @@ namespace WRPC
         }
         return true;
     }
+
+    bool Result::RetrieveValues(std::initializer_list<ResultValue> _holders)
+    {
+        return RetrieveValues(std::vector<ResultValue>(_holders));
+    }
+
 } // namespace WRPC

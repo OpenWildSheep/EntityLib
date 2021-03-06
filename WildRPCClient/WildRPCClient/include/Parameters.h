@@ -200,6 +200,76 @@ namespace WRPC
             return param;
         }
 
+        static Parameter BuildBool(bool _bool)
+        {
+            Parameter param;
+            param.m_value = _bool;
+            return param;
+        }
+
+        static Parameter BuildInt(int _int)
+        {
+            Parameter param;
+            param.m_value = _int;
+            return param;
+        }
+
+        static Parameter BuildFloat(float _float)
+        {
+            Parameter param;
+            param.m_value = _float;
+            return param;
+        }
+
+        static Parameter BuildVector2f(float _x, float _y)
+        {
+            Parameter param;
+            param.m_value = Vector2(_x, _y);
+            return param;
+        }
+
+        static Parameter BuildVector3i(uint32_t _x, uint32_t _y, uint32_t _z)
+        {
+            Parameter param;
+            param.m_value = Vector3i(_x, _y, _z);
+            return param;
+        }
+
+        static Parameter BuildVector3f(float _x, float _y, float _z)
+        {
+            Parameter param;
+            param.m_value = Vector3(_x, _y, _z);
+            return param;
+        }
+
+        static Parameter BuildPosition(uint32_t _wx, uint32_t _wy, float _x, float _y, float _z)
+        {
+            Parameter param;
+            param.m_value = Position(_wx, _wy, _x, _y, _z);
+            return param;
+        }
+
+        static Parameter BuildQuat(float _x, float _y, float _z, float _w)
+        {
+            Parameter param;
+            param.m_value = Quat(_x, _y, _z, _w);
+            return param;
+        }
+
+        static Parameter BuildColor(float _x, float _y, float _z, float _w)
+        {
+            Parameter param;
+            param.m_value = Color(_x, _y, _z, _w);
+            return param;
+        }
+
+        static Parameter BuildString(const char* _strg)
+        {
+            Parameter param;
+            param.m_value = std::string(_strg);
+            return param;
+        }
+
         // Constructors --------------------------------
         Parameter()
         {
@@ -397,6 +467,75 @@ namespace WRPC
             return result;
         }
 
+        static ResultValue BuildBool(bool& _bool)
+        {
+            ResultValue result;
+            result.m_value = &_bool;
+            return result;
+        }
+
+        static ResultValue BuildInt(int32_t& _int)
+        {
+            ResultValue result;
+            result.m_value = &_int;
+            return result;
+        }
+
+        static ResultValue BuildFloat(float& _float)
+        {
+            ResultValue result;
+            result.m_value = &_float;
+            return result;
+        }
+
+        static ResultValue BuildVector2f(float& _x, float& _y)
+        {
+            ResultValue result;
+            result.m_value = Vector2H(_x, _y);
+            return result;
+        }
+
+        static ResultValue BuildVector3i(uint32_t& _x, uint32_t& _y, uint32_t& _z)
+        {
+            ResultValue result;
+            result.m_value = Vector3iH(_x, _y, _z);
+            return result;
+        }
+
+        static ResultValue BuildVector3f(float& _x, float& _y, float& _z)
+        {
+            ResultValue result;
+            result.m_value = Vector3H(_x, _y, _z);
+            return result;
+        }
+
+        static ResultValue BuildColor(float& _x, float& _y, float& _z, float& _w)
+        {
+            ResultValue result;
+            result.m_value = ColorH(_x, _y, _z, _w);
+            return result;
+        }
+        static ResultValue BuildQuat(float& _x, float& _y, float& _z, float& _w)
+        {
+            ResultValue result;
+            result.m_value = QuatH(_x, _y, _z, _w);
+            return result;
+        }
+
+        static ResultValue BuildPosition(uint32_t& _wx, uint32_t& _wy, float& _x, float& _y, float& _z)
+        {
+            ResultValue result;
+            result.m_value = PositionH(_wx, _wy, _x, _y, _z);
+            return result;
+        }
+
+        static ResultValue BuildString(std::string& _strg)
+        {
+            ResultValue result;
+            result.m_value = &_strg;
+            return result;
+        }
+
         ResultHolder m_value;
     };
 
@@ -416,6 +555,7 @@ namespace WRPC
             return m_paramsBuffer[idx];
         }
         bool RetrieveValues(const std::vector<ResultValue>& _holders);
+        bool RetrieveValues(std::initializer_list<ResultValue> _holders);
 
         const char* GetErrorString()
         {

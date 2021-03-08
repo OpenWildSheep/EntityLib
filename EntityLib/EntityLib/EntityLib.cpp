@@ -2019,7 +2019,14 @@ json Ent::EntityLib::dumpNode(
     case Ent::DataType::string: data = _node.getString(); break;
     case Ent::DataType::boolean: data = _node.getBool(); break;
     case Ent::DataType::integer: data = _node.getInt(); break;
-    case Ent::DataType::number: data = _node.getFloat(); break;
+    case Ent::DataType::number:
+    {
+        // Round to six digit after the dot
+        float const value = _node.getFloat();
+        auto const i = std::llround(double(value) * 1000000.);
+        data = double(i) / 1000000.0;
+        break;
+    }
     case Ent::DataType::object:
     {
         data = json::object();

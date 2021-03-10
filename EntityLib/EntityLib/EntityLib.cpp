@@ -782,6 +782,20 @@ namespace Ent
             *getSchema(), *this, _dumpedValueSource, _superKeyIsTypeName, _entityRefPreProc);
     }
 
+    void Node::saveNode(std::filesystem::path const& _path) const
+    {
+        json node = toJson();
+        node["$schema"] = getSchema()->name;
+
+        std::filesystem::path path = getEntityLib()->getAbsolutePath(_path);
+        std::ofstream file(path);
+        if (not file.is_open())
+        {
+            throw std::runtime_error(format("Can't open file for write: %ls", path.c_str()));
+        }
+        file << node.dump(4);
+    }
+
     float Node::getDefaultFloat() const
     {
         if (value.is<Override<float>>())
@@ -2005,7 +2019,14 @@ json Ent::EntityLib::dumpNode(
     case Ent::DataType::string: data = _node.getString(); break;
     case Ent::DataType::boolean: data = _node.getBool(); break;
     case Ent::DataType::integer: data = _node.getInt(); break;
-    case Ent::DataType::number: data = _node.getFloat(); break;
+    case Ent::DataType::number:
+    {
+        // Round to six digit after the dot
+        float const value = _node.getFloat();
+        auto const i = std::llround(double(value) * 1000000.);
+        data = double(i) / 1000000.0;
+        break;
+    }
     case Ent::DataType::object:
     {
         data = json::object();

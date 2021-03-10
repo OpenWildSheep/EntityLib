@@ -12,7 +12,7 @@
             "Data": {
                 "BendData": {
                     "AcceptDrag": true,
-                    "AttractDuration": 0.10000000149011612,
+                    "AttractDuration": 0.1,
                     "MaxBendAngleFirstBone": 1,
                     "MaxBendAngleValueAtFirstBone": 15.25,
                     "MaxBendAngleValueAtLastBone": 40.0
@@ -21,10 +21,10 @@
                     "AutoSetupForceInfluence": true,
                     "AutoSetupForceInfluenceLevelStart": 1,
                     "AutoSetupForceInfluenceLevelStop": 7,
-                    "AutoSetupForceInfluenceValueAfterStop": 0.008500000461935997,
+                    "AutoSetupForceInfluenceValueAfterStop": 0.0085,
                     "AutoSetupForceInfluenceValueBeforeStart": 0.0,
-                    "AutoSetupForceInfluenceValueStart": 0.10000000149011612,
-                    "AutoSetupForceInfluenceValueStop": 0.20000000298023224
+                    "AutoSetupForceInfluenceValueStart": 0.1,
+                    "AutoSetupForceInfluenceValueStop": 0.2
                 },
                 "GrowData": {
                     "GrowingState": "grown",
@@ -36,7 +36,7 @@
                         "EventLooping": true,
                         "IncreaseEventName": "Gpe_HealthArea_Regeneration_Tree_Grow_Lp",
                         "IncreaseStartThreshold": 0.0,
-                        "IncreaseStopThreshold": 0.699999988079071
+                        "IncreaseStopThreshold": 0.7
                     }
                 }
             },
@@ -62,7 +62,7 @@
                     {
                         "Bone": "PineTreeC50cmH5mBasicBone04",
                         "InitPosition": [
-                            0.10000000149011612,
+                            0.1,
                             0.0,
                             0.0
                         ],
@@ -293,7 +293,7 @@
                         ]
                     }
                 ],
-                "RUNTIME_LODScale": 0.02500000037252903,
+                "RUNTIME_LODScale": 0.025,
                 "RUNTIME_LODs": [
                     {
                         "Meshes": [

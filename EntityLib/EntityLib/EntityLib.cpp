@@ -2750,9 +2750,19 @@ std::filesystem::path Ent::EntityLib::getRelativePath(std::filesystem::path cons
 {
     if (_path.is_absolute())
     {
-        std::filesystem::path absPath =
-            std::filesystem::relative(_path, rawdataPath).make_preferred();
-        return absPath;
+        // Code for VS2015
+        std::string pathStr = std::filesystem::weakly_canonical(_path).generic_u8string();
+        std::string baseStr = std::filesystem::weakly_canonical(rawdataPath).generic_u8string();
+        if (pathStr.size() == baseStr.size())
+            return std::filesystem::path();
+        else if (pathStr.size() > baseStr.size())
+            return (pathStr.c_str() + 1) + baseStr.size();
+        else
+            return _path; // _path is not inside _base
+        // Code for VS2019
+        //std::filesystem::path absPath =
+        //    std::filesystem::relative(_path, rawdataPath).make_preferred();
+        //return absPath;
     }
     else
     {

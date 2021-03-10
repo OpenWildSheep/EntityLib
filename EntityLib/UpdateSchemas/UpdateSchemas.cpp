@@ -16,9 +16,10 @@ try
 
     std::filesystem::path mergedCompSchemaPath = argv[1];
     mergedCompSchemaPath /= "WildPipeline/Schema/MergedComponents.json";
-    mergedCompSchemaPath = std::filesystem::canonical(mergedCompSchemaPath);
+    // canonical or weakly_canonical find the original physic drive but we want to keep X:
     char editCmd[1024];
-    sprintf_s(editCmd, sizeof(editCmd), R"(p4 edit "%ls")", mergedCompSchemaPath.c_str());
+    sprintf_s(
+        editCmd, sizeof(editCmd), R"(p4 edit "%s")", mergedCompSchemaPath.generic_u8string().c_str());
 
     system(editCmd);
 

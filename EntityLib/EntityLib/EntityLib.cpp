@@ -904,7 +904,8 @@ namespace Ent
         json nodeData = loadJsonFile(getEntityLib()->getAbsolutePath(_templateNodePath));
         Node templateNode = loadNode(getEntityLib(), *getSchema(), nodeData, nullptr);
         (*this) = templateNode.makeInstanceOf();
-        value.get<Object>().instanceOf.set(_templateNodePath);
+        value.get<Object>().instanceOf.set(
+            getEntityLib()->getRelativePath(_templateNodePath).generic_u8string());
     }
 
     void Ent::Node::resetInstanceOf()
@@ -2749,6 +2750,20 @@ std::filesystem::path Ent::EntityLib::getAbsolutePath(std::filesystem::path cons
         absPath /= _path;
         absPath.make_preferred();
         return std::filesystem::weakly_canonical(absPath);
+    }
+}
+
+std::filesystem::path Ent::EntityLib::getRelativePath(std::filesystem::path const& _path) const
+{
+    if (_path.is_absolute())
+    {
+        std::filesystem::path absPath =
+            std::filesystem::relative(_path, rawdataPath).make_preferred();
+        return absPath;
+    }
+    else
+    {
+        return _path;
     }
 }
 

@@ -462,8 +462,8 @@ namespace Ent
         void setMaxActivationLevel(ActivationLevel _level);
         char const* getThumbnail() const; ///< Get the Thumbnail path, or nullptr.
         void setThumbnail(Ent::String _thumbPath); ///< Set the Thumbnail path
-        std::array<uint8_t, 4> getColor() const; ///< Get the color of the is one, or nullptr.
-        void setColor(std::array<uint8_t, 4> _color); ///< Set the color RGBA 8bit
+        std::array<float, 4> getColor() const; ///< Get the color of the is one, or nullptr.
+        void setColor(std::array<float, 4> _color); ///< Set the color RGBA 8bit
 
         /// @brief Create a component of the given _type, with the default values
         /// @pre A component of this _type doesn't exist yet

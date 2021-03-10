@@ -141,6 +141,9 @@ namespace Ent
         Any,
     };
 
+    void destroyAndFree(Node* ptr); ///< Internally used by the Node memory Pool
+    Pool<Node>& getPool(Node const* ptr); ///< Internally used by the Node memory Pool
+
     /// \endcond
 
     // *********************************** Scene/Entity/Component/Node ****************************
@@ -244,6 +247,13 @@ namespace Ent
         Node makeInstanceOf() const;
         /// \endcond
 
+        /// Reset the Node to be an instance of the given \b _template
+        ///
+        /// @warning All sub-nodes into \b _node will be invalidated
+        /// @param _templateNodePath path to the template Node (relative to RawData)
+        void setInstanceOf(char const* _templateNodePath);
+        void resetInstanceOf();
+
         bool hasDefaultValue() const; ///< false if something was set in instance or prefab
 
         bool isDefault() const; ///< true if the value was set in a template or in the instance
@@ -255,6 +265,9 @@ namespace Ent
             bool _superKeyIsTypeName =
                 false, ///< Super sub-node are dumped using their type name for key instead of "Super"
             std::function<void(EntityRef&)> const& _entityRefPreProc = {}) const;
+
+        /// Save as a Node prebab
+        void saveNode(std::filesystem::path const& path) const;
 
         float getDefaultFloat() const; ///< @pre number or integer. @brief Get the default value as float
         int64_t getDefaultInt() const; ///< @pre integer. @brief Get the default value as int
@@ -268,6 +281,8 @@ namespace Ent
         Subschema const* getSchema() const; ///< Get the Node schema.
 
         void computeMemory(MemoryProfiler& prof) const;
+
+        EntityLib* getEntityLib() const;
 
     private:
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
@@ -323,6 +338,11 @@ namespace Ent
         bool hasOverride() const
         {
             return root.hasOverride();
+        }
+        /// @brief Recursively check if values are at default value.
+        bool hasDefaultValue() const
+        {
+            return root.hasDefaultValue();
         }
         /// Is this component used in runtime engine ?
         bool isUsedInRuntime() const
@@ -639,6 +659,7 @@ namespace Ent
     class ENTLIB_DLLEXPORT EntityLib
     {
     public:
+        Pool<Node> nodePool;
         /// @todo Make public attribute private?
         std::filesystem::path rootPath; ///< Path to the perforce root (X:/)
         std::filesystem::path rawdataPath; ///< Path to the RawData dir in the perforce root (X:/RawData)
@@ -716,14 +737,8 @@ namespace Ent
 
         void clearCache();
 
-        /// Reset the Node to be an instance of the given \b _template
-        ///
-        /// @warning All sub-nodes into \b _node will be invalidated
-        /// @param _templateNodePath path to the template Node (relative to RawData)
-        /// @param _node which will become instance of \b _templateNodePath
-        void setInstanceOf(char const* _templateNodePath, Node& _node);
-
         std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
+        std::filesystem::path getRelativePath(std::filesystem::path const& _path) const;
 
     private:
         /// Load an Entity or a Scene, using the given cache

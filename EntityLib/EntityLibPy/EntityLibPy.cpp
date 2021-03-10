@@ -315,6 +315,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("clear", [](Node* node) { return node->clear(); })
         .def("empty", [](Node* node) { return node->empty(); })
         .def("get_instance_of", [](Node* node) { return node->getInstanceOf(); })
+        .def("set_instance_of", &Node::setInstanceOf)
         .def("get_float", [](Node* node) { return node->getFloat(); })
         .def("get_int", [](Node* node) { return node->getInt(); })
         .def("get_string", [](Node* node) { return node->getString(); })
@@ -370,8 +371,13 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "embedded",
             [](SubSceneComponent* comp) -> Scene& { return *comp->embedded; },
             py::return_value_policy::reference_internal)
-        .def("detach_embedded",
-            [](SubSceneComponent* comp) -> Scene* { return comp->detachEmbedded().release(); });
+        // detachEmbedded is hard to bind in python because it change the way the entities inside
+        // are managed by python.
+        // They were reference_internal and become managed by python.
+        // Since this function is used nowhere is seems acceptable to not bind it now.
+        // .def("detach_embedded",
+        //     [](SubSceneComponent* comp) -> Scene* { return comp->detachEmbedded().release(); })
+        ;
 
     pyEntity
         .def(py::init<EntityLib const&>())
@@ -451,31 +457,34 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(
             "load_entity",
             [](EntityLib* lib, std::string const& path) { return lib->loadEntity(path).release(); },
+            py::keep_alive<0, 1>(), // py::keep_alive<0, 1> => Do not destroy EntityLib before Entity
             "entityPath"_a)
         .def(
             "load_scene",
-            [](EntityLib* lib, std::string const& path) { return lib->loadScene(path).release(); })
+            [](EntityLib* lib, std::string const& path) { return lib->loadScene(path).release(); },
+            py::keep_alive<0, 1>())
         .def(
             "load_legacy_scene",
-            [](EntityLib* lib, std::string const& path) { return lib->loadLegacyScene(path).release(); })
+            [](EntityLib* lib, std::string const& path) { return lib->loadLegacyScene(path).release(); },
+            py::keep_alive<0, 1>())
         .def(
             "load_entity_read_only",
-            [](EntityLib* lib, std::string const& path) { return lib->loadEntityReadOnly(path); },
-            py::return_value_policy::reference_internal)
+            [](EntityLib* lib, std::string const& path) {
+                return lib->loadEntityReadOnly(path);},
+            py::keep_alive<0, 1>())
         .def(
             "load_scene_read_only",
             [](EntityLib* lib, std::string const& path) { return lib->loadSceneReadOnly(path); },
-            py::return_value_policy::reference_internal)
+            py::keep_alive<0, 1>())
         .def(
             "load_legacy_scene_read_only",
             [](EntityLib* lib, std::string const& path) { return lib->loadLegacySceneReadOnly(path); },
-            py::return_value_policy::reference_internal)
+            py::keep_alive<0, 1>())
         .def("save_entity", &EntityLib::saveEntity, "entity"_a, "_entityPath"_a)
         .def("save_scene", &EntityLib::saveScene)
         .def("get_entity_cache", &EntityLib::getEntityCache, py::return_value_policy::reference_internal)
         .def("get_scene_cache", &EntityLib::getSceneCache, py::return_value_policy::reference_internal)
         .def("clear_cache", &EntityLib::clearCache)
-        .def("set_node_instance_of", &EntityLib::setInstanceOf)
         .def(
             "make_instance_of",
             [](EntityLib* lib, std::string const& path) {

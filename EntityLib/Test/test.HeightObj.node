@@ -1,0 +1,17 @@
+{
+    "$schema": "./EditionComponents.json#/definitions/HeightObj",
+    "DisplaceNoiseList": [
+        {
+            "DisplaceDistance": 0.0,
+            "LuminanceCenter": 0.0,
+            "MapChannel": 51248,
+            "MotifName": "",
+            "MotifOffsetX": 0.0,
+            "MotifOffsetY": 0.0,
+            "MotifRotationZ": 0.0,
+            "MotifSizeX": 0.0,
+            "MotifSizeY": 0.0
+        }
+    ],
+    "Subdivision": 0
+}

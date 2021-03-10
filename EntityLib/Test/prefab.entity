@@ -88,6 +88,10 @@
             "Type": "SmoothScaleComponentGD",
             "Version": 1
         }, {
+            "Data": {},
+            "Type": "PhysicsGD",
+            "Version": 1
+        }, {
             "Data": {
                 "Faction": 2254016666,
                 "InSpiritWorld": false,

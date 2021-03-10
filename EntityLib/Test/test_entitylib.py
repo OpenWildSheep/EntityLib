@@ -186,9 +186,9 @@ try:
         assert(nbEnt.value == "Toto")
 
         # TEST sub - object with non - default values
-        explosionEffect = ent.get_component("ExplosionEffect")  # type: Ent.Component
-        shakeData = explosionEffect.root.at("ShakeData")  # type: Ent.Node
-        assert(shakeData.at("shakeDuration").value == 0.)
+        ldprimitive = ent.get_component("LDPrimitive")  # type: Ent.Component
+        primitiveData = ldprimitive.root.at("PrimitiveData")  # type: Ent.Node
+        assert(primitiveData.at("Height").value == 42.)
 
     ####################################################################################################################
     # Test the readOnly prefab.entity
@@ -217,7 +217,7 @@ try:
     # Set Union type without override
     oneOfScripts3 = scriptEvents.at(2)
     assert(oneOfScripts3.datatype == Ent.DataType.union)
-    assert(oneOfScripts3.get_union_type() == "CineEventTestBlackboardHasFact")
+    assert(oneOfScripts3.get_union_type() == "CineEventTriggerEventHandlerPost")
     oneOfScripts3.set_union_type("CineEventTestCurrentGameState")
 
     # Push in an array of Union Ent.Node
@@ -243,12 +243,6 @@ try:
     sysCreat.root.at("Name").value = "Shamane_male"
     entlib.save_entity(ent, "prefab.copy.entity")
 
-    # TEST SubScene detach
-    original_sub_entities = ent.get_subscene_component().embedded.entities
-    detached_sub_scene = ent.get_subscene_component().detach_embedded()
-    assert(len(ent.get_subscene_component().embedded.entities) is 0)
-    assert(all(a == b for a, b in zip(original_sub_entities, detached_sub_scene.entities)))
-    
     ####################################################################################################################
     # Test write prefab
     ent = entlib.load_entity("prefab.copy.entity")
@@ -620,7 +614,7 @@ try:
 
     # Test instanciation of a template Node
     stickToTerrain = instanceOf.add_component("StickToTerrain")
-    entlib.set_node_instance_of("test.StickToTerrain.node", stickToTerrain.root)
+    stickToTerrain.root.set_instance_of("test.StickToTerrain.node", )
     assert(stickToTerrain.root.get_instance_of() is not None)
     stickToTerrain.root.at("NormalRatio").set_float(0.6)
 
@@ -689,7 +683,7 @@ try:
 
     # Test instanciation of a template Node
     stickToTerrain = instanceOf.add_component("StickToTerrain")
-    entlib.set_node_instance_of("test.StickToTerrain.node", stickToTerrain.root)
+    stickToTerrain.root.set_instance_of("test.StickToTerrain.node")
     stickToTerrain.root.at("NormalRatio").set_float(0.6)
 
     entlib.save_entity(instanceOf, "setInstanceOf.entity")
@@ -733,7 +727,7 @@ try:
 
     scene.entities[0].add_component("BeamGeneratorGD").root.get_field_names()
     assert(
-        len(scene.entities[0].add_component("ExplosionEffect").root.get_field_names()) == 21)
+        len(scene.entities[0].add_component("HeightObj").root.get_field_names()) == 5)
 
     ep1 = [ent for ent in scene.entities if ent.name == "EP1_"]
     assert (len(ep1) != 0)

@@ -301,9 +301,14 @@ try
         ENTLIB_ASSERT(nbEnt->getString() == std::string("Toto"));
 
         // TEST sub-object with non-default values
-        Ent::Component const* explosionEffect = ent->getComponent("ExplosionEffect");
-        Ent::Node const* shakeData = explosionEffect->root.at("ShakeData");
-        ENTLIB_ASSERT(shakeData->at("shakeDuration")->getFloat() == 0.0f);
+        Ent::Component const* ldprimitive = ent->getComponent("LDPrimitive");
+        Ent::Node const* primitiveData = ldprimitive->root.at("PrimitiveData");
+        ENTLIB_ASSERT(primitiveData->at("Height")->getFloat() == 42.0f);
+
+        // TEST Default size for array is minItems
+        Ent::Component const* physicsGD = ent->getComponent("PhysicsGD");
+        Ent::Node const* axisRestriction = physicsGD->root.at("AxisRestriction");
+        ENTLIB_ASSERT(axisRestriction->size() == 3);
     };
 
     {
@@ -314,6 +319,10 @@ try
 
     {
         EntityPtr ent = entlib.loadEntity("prefab.entity");
+
+        // Test saveNode
+        Ent::Component const* heightObj = ent->getComponent("HeightObj");
+        heightObj->root.saveNode("test.HeightObj.node");
 
         testPrefabEntity(ent.get());
 
@@ -785,7 +794,7 @@ try
 
         // Test instanciation of a template Node
         Ent::Component* stickToTerrain = instanceOf->addComponent("StickToTerrain");
-        entlib.setInstanceOf("test.StickToTerrain.node", stickToTerrain->root);
+        stickToTerrain->root.setInstanceOf("test.StickToTerrain.node");
         ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
         stickToTerrain->root.at("NormalRatio")->setFloat(0.6f);
 
@@ -852,7 +861,7 @@ try
 
         // Test instanciation of a template Node
         Ent::Component* stickToTerrain = instanceOf.addComponent("StickToTerrain");
-        entlib.setInstanceOf("test.StickToTerrain.node", stickToTerrain->root);
+        stickToTerrain->root.setInstanceOf("test.StickToTerrain.node");
         stickToTerrain->root.at("NormalRatio")->setFloat(0.6f);
 
         entlib.saveEntity(instanceOf, "setInstanceOf.entity");
@@ -968,8 +977,8 @@ try
 
     scene->getObjects().front()->addComponent("BeamGeneratorGD")->root.getFieldNames();
     auto fieldNameCount =
-        scene->getObjects().front()->addComponent("ExplosionEffect")->root.getFieldNames().size();
-    ENTLIB_ASSERT(fieldNameCount == 21);
+        scene->getObjects().front()->addComponent("HeightObj")->root.getFieldNames().size();
+    ENTLIB_ASSERT(fieldNameCount == 5);
 
     auto ep1Iter = std::find_if(
         begin(scene->getObjects()),

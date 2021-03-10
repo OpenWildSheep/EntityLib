@@ -67,6 +67,7 @@ namespace Ent
     // *************************************** Subschema ******************************************
 
     struct SubschemaRef;
+    class Schema;
 
     /// Definition of a json Node
     struct ENTLIB_DLLEXPORT Subschema
@@ -86,6 +87,7 @@ namespace Ent
         Subschema const* getUnionTypeWrapper(char const* _subtype) const;
         /// @endcond
 
+        Schema* rootSchema{};
         DataType type = DataType::null; ///< type of this Subschema. @see Ent::DataType
         bool required = false; ///< Is this property required?
         std::map<std::string, SubschemaRef> properties; ///< If type == Ent::DataType::object, child properties
@@ -218,6 +220,8 @@ namespace Ent
         Subschema* operator->(); //!< Get the referenced subschema
     };
 
+    class EntityLib;
+
     /// Definition of everything
     class Schema
     {
@@ -227,6 +231,7 @@ namespace Ent
         Schema& operator=(Schema const&) = delete;
         SubschemaRef root; ///< Root Schema : Schema of the scene
         std::map<std::string, Subschema> allDefinitions; ///< Definition of everything, by type name
+        EntityLib* entityLib = nullptr;
 
         /// @cond PRIVATE
         DeleteCheck deleteCheck;

@@ -88,6 +88,10 @@
             "Type": "SmoothScaleComponentGD",
             "Version": 1
         }, {
+            "Data": {},
+            "Type": "PhysicsGD",
+            "Version": 1
+        }, {
             "Data": {
                 "Faction": 2254016666,
                 "InSpiritWorld": false,
@@ -129,38 +133,18 @@
             "Version": 1
         }, {
             "Data": {
-                "BreakableSizeMax": "small",
-                "BreathDamages": 10.0,
-                "BreathImpact": 0.0,
+                "NonDisuptive": true,
                 // sdfkjdsfkjhsdkjgh dsjjgk
-                "BreathStaminaLoss": 0.0,
-                "ControllerVibrationCoef": 0.33000001311302185,
-                "DOTDamagesDuration": 1.0,
-                "Damages": 5.0,
-                "DistanceReductionDamageByStep": 3.0,
-                "DistanceReductionImpactByStep": 0.0, /* dsgsdg
+                "PrimitiveType": "test", /* dsgsdg
                 dfsgdfhdgf
                 fhgfj
-                */ "DistanceReductionStep": 2.0,
-                "EjectHit": true,
-                "HitSize": "medium",
-                "HitType": "HitInstant",
-                "Impact": 0.0,
-                "PhysicExplosionStrength": -1.0,
-                "ShakeAttenuationRadius": 50.0,
-                "ShakeData": {
-                    "shakeDuration": 0.0,
-                    "shakeFrequency": 0.0,
-                    "shakeIntensity": 0.0,
-                    "shakeRotation": [12, 18, 47]
-                },
-                "ShakeRadius": 15.0,
-                "SpecificDuration": 3.0,
-                "SpecificRadiusStart": 1.0,
-                "SpecificRadiusStop": 5.0,
-                "StaminaLoss": 0.0
+                */ "PrimitiveData": {
+                    "Width": 0.0,
+                    "Length": 0.0,
+                    "Height": 42.0
+                }
             },
-            "Type": "ExplosionEffect",
+            "Type": "LDPrimitive",
             "Version": 1
         }, {
             "Version": 1,

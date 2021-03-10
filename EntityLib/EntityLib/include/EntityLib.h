@@ -738,6 +738,7 @@ namespace Ent
         void clearCache();
 
         std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
+        std::filesystem::path getRelativePath(std::filesystem::path const& _path) const;
 
     private:
         /// Load an Entity or a Scene, using the given cache

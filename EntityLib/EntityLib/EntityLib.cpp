@@ -901,11 +901,11 @@ namespace Ent
         if (not value.is<Object>())
             throw BadType();
 
+        auto relPath = getEntityLib()->getRelativePath(_templateNodePath).generic_u8string();
         json nodeData = loadJsonFile(getEntityLib()->getAbsolutePath(_templateNodePath));
         Node templateNode = loadNode(getEntityLib(), *getSchema(), nodeData, nullptr);
         (*this) = templateNode.makeInstanceOf();
-        value.get<Object>().instanceOf.set(
-            getEntityLib()->getRelativePath(_templateNodePath).generic_u8string());
+        value.get<Object>().instanceOf.set(relPath);
     }
 
     void Ent::Node::resetInstanceOf()
@@ -2750,7 +2750,21 @@ std::filesystem::path Ent::EntityLib::getRelativePath(std::filesystem::path cons
 {
     if (_path.is_absolute())
     {
-        // Code for VS2015
+        // Check if _path is inside rawdataPath
+        std::filesystem::path parrent = _path;
+        while (parrent != rawdataPath)
+        {
+            if (parrent.has_parent_path() and parrent.parent_path() != parrent)
+            {
+                parrent = parrent.parent_path();
+            }
+            else
+            {
+                throw std::runtime_error(format(
+                    "_path %ls in not inside rawdata %ls", _path.c_str(), rawdataPath.c_str()));
+            }
+        }
+
         std::string pathStr = std::filesystem::weakly_canonical(_path).generic_u8string();
         std::string baseStr = std::filesystem::weakly_canonical(rawdataPath).generic_u8string();
         if (pathStr.size() == baseStr.size())
@@ -2759,10 +2773,6 @@ std::filesystem::path Ent::EntityLib::getRelativePath(std::filesystem::path cons
             return (pathStr.c_str() + 1) + baseStr.size();
         else
             return _path; // _path is not inside _base
-        // Code for VS2019
-        //std::filesystem::path absPath =
-        //    std::filesystem::relative(_path, rawdataPath).make_preferred();
-        //return absPath;
     }
     else
     {

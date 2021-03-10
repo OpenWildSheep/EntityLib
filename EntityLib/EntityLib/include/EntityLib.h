@@ -738,7 +738,7 @@ namespace Ent
         void clearCache();
 
         std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
-        /// @param _path : A file path inside the rawdata path
+        /// @param _path : A file path absolute or relative but inside the rawdata path
         std::filesystem::path getRelativePath(std::filesystem::path const& _path) const;
 
     private:

@@ -2752,10 +2752,15 @@ std::filesystem::path Ent::EntityLib::getRelativePath(std::filesystem::path cons
     {
         // Check if _path is inside rawdataPath
         std::filesystem::path parrent = _path;
+        std::filesystem::path relPath;
         while (parrent != rawdataPath)
         {
             if (parrent.has_parent_path() and parrent.parent_path() != parrent)
             {
+                if (relPath.empty())
+                    relPath = parrent.filename();
+                else
+                    relPath = parrent.filename() / relPath;
                 parrent = parrent.parent_path();
             }
             else
@@ -2765,14 +2770,7 @@ std::filesystem::path Ent::EntityLib::getRelativePath(std::filesystem::path cons
             }
         }
 
-        std::string pathStr = std::filesystem::weakly_canonical(_path).generic_u8string();
-        std::string baseStr = std::filesystem::weakly_canonical(rawdataPath).generic_u8string();
-        if (pathStr.size() == baseStr.size())
-            return std::filesystem::path();
-        else if (pathStr.size() > baseStr.size())
-            return (pathStr.c_str() + 1) + baseStr.size();
-        else
-            return _path; // _path is not inside _base
+        return relPath;
     }
     else
     {

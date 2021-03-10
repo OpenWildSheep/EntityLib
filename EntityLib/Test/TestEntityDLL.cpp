@@ -794,7 +794,11 @@ try
 
         // Test instanciation of a template Node
         Ent::Component* stickToTerrain = instanceOf->addComponent("StickToTerrain");
+        ENTLIB_CHECK_EXCEPTION(
+            stickToTerrain->root.setInstanceOf("C:/test.StickToTerrain.node"), std::runtime_error);
         stickToTerrain->root.setInstanceOf("test.StickToTerrain.node");
+        stickToTerrain->root.setInstanceOf(
+            (current_path() / "test.StickToTerrain.node").generic_u8string().c_str());
         ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
         stickToTerrain->root.at("NormalRatio")->setFloat(0.6f);
 

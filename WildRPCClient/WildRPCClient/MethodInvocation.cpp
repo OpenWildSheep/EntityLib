@@ -35,6 +35,16 @@ namespace WRPC
         }
     }
 
+    MethodInvocation::MethodInvocation(
+        const char* _managerName,
+        const char* _methodName,
+        std::initializer_list<WildRPC::Type> _in,
+        std::initializer_list<WildRPC::Type> _out)
+        : MethodInvocation(
+            _managerName, _methodName, std::vector<WildRPC::Type>(_in), std::vector<WildRPC::Type>(_out))
+    {
+    }
+
     bool MethodInvocation::_SetParameters(const std::vector<Parameter>& _values)
     {
         if (_values.size() != m_inParams.size())
@@ -186,6 +196,20 @@ namespace WRPC
         result.m_paramsBuffer = m_outParams;
 
         return result;
+    }
+
+    WRPC::Result
+    MethodInvocation::Execute(Connection& _connection, Parameter const* _values, size_t _valueCount)
+    {
+        std::vector<Parameter> v;
+        v.assign(_values, _values + _valueCount);
+        return Execute(_connection, std::move(v));
+    }
+
+    WRPC::Result
+    MethodInvocation::Execute(Connection& _connection, std::initializer_list<Parameter> _values)
+    {
+        return Execute(_connection, std::vector<Parameter>(_values));
     }
 
 } // namespace WRPC

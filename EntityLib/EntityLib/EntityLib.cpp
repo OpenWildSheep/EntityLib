@@ -901,10 +901,11 @@ namespace Ent
         if (not value.is<Object>())
             throw BadType();
 
+        auto relPath = getEntityLib()->getRelativePath(_templateNodePath).generic_u8string();
         json nodeData = loadJsonFile(getEntityLib()->getAbsolutePath(_templateNodePath));
         Node templateNode = loadNode(getEntityLib(), *getSchema(), nodeData, nullptr);
         (*this) = templateNode.makeInstanceOf();
-        value.get<Object>().instanceOf.set(_templateNodePath);
+        value.get<Object>().instanceOf.set(relPath);
     }
 
     void Ent::Node::resetInstanceOf()
@@ -1081,16 +1082,16 @@ namespace Ent
     {
         thumbnail.set(std::move(_thumbPath));
     }
-    std::array<uint8_t, 4> Entity::getColor() const
+    std::array<float, 4> Entity::getColor() const
     {
-        std::array<uint8_t, 4> col{};
+        std::array<float, 4> col{};
         for (size_t i = 0; i < 4; ++i)
         {
-            col[i] = (uint8_t)color.at(i)->getFloat();
+            col[i] = color.at(i)->getFloat();
         }
         return col;
     }
-    void Entity::setColor(std::array<uint8_t, 4> _color)
+    void Entity::setColor(std::array<float, 4> _color)
     {
         for (size_t i = 0; i < 4; ++i)
         {
@@ -2741,14 +2742,48 @@ std::filesystem::path Ent::EntityLib::getAbsolutePath(std::filesystem::path cons
     {
         std::filesystem::path absPath = _path;
         absPath.make_preferred();
-        return std::filesystem::weakly_canonical(absPath);
+        // canonical or weakly_canonical find the original physic drive but we want to keep X:
+        return absPath;
     }
     else
     {
         std::filesystem::path absPath = rawdataPath;
         absPath /= _path;
         absPath.make_preferred();
-        return std::filesystem::weakly_canonical(absPath);
+        // canonical or weakly_canonical find the original physic drive but we want to keep X:
+        return absPath;
+    }
+}
+
+std::filesystem::path Ent::EntityLib::getRelativePath(std::filesystem::path const& _path) const
+{
+    if (_path.is_absolute())
+    {
+        // Check if _path is inside rawdataPath
+        std::filesystem::path parrent = _path;
+        std::filesystem::path relPath;
+        while (parrent != rawdataPath)
+        {
+            if (parrent.has_parent_path() and parrent.parent_path() != parrent)
+            {
+                if (relPath.empty())
+                    relPath = parrent.filename();
+                else
+                    relPath = parrent.filename() / relPath;
+                parrent = parrent.parent_path();
+            }
+            else
+            {
+                throw std::runtime_error(format(
+                    "_path %ls in not inside rawdata %ls", _path.c_str(), rawdataPath.c_str()));
+            }
+        }
+
+        return relPath;
+    }
+    else
+    {
+        return _path;
     }
 }
 

@@ -2742,14 +2742,16 @@ std::filesystem::path Ent::EntityLib::getAbsolutePath(std::filesystem::path cons
     {
         std::filesystem::path absPath = _path;
         absPath.make_preferred();
-        return std::filesystem::weakly_canonical(absPath);
+        // canonical or weakly_canonical find the original physic drive but we want to keep X:
+        return absPath;
     }
     else
     {
         std::filesystem::path absPath = rawdataPath;
         absPath /= _path;
         absPath.make_preferred();
-        return std::filesystem::weakly_canonical(absPath);
+        // canonical or weakly_canonical find the original physic drive but we want to keep X:
+        return absPath;
     }
 }
 

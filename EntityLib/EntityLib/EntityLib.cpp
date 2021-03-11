@@ -28,7 +28,7 @@ static Ent::Node loadNode(
     Ent::Subschema const& _nodeSchema,
     json const& _data,
     Ent::Node const* _super,
-    bool loadingDefault = false);
+    json const* _default = nullptr);
 static std::unique_ptr<Ent::Scene> loadScene(
     Ent::EntityLib const& _entLib,
     Ent::ComponentsSchema const& _schema,
@@ -1562,6 +1562,7 @@ struct MergeMapOverride
     Ent::Subschema const& _nodeSchema;
     json const& _data;
     Ent::Node const* _super;
+    json const* _default;
     Ent::EntityLib const* entlib;
 
     // Merge the instance array/map/set with the template array/map/set and return the resulting Ent::Array
@@ -1586,27 +1587,62 @@ struct MergeMapOverride
         std::vector<std::pair<KeyType, Node>> result;
         if (_super != nullptr)
         {
+            size_t index = 0;
             // Load all Nodes from the _super (overriden or not)
             for (Ent::Node const* subSuper : _super->getItems())
             {
+                json const* subDefault = _default == nullptr ? nullptr : &_default->at(index);
                 KeyType key = getKeyNode(subSuper);
                 if (instancePropMap.count(key)) // Overriden in instance
                 {
                     Ent::Node tmpNode = loadNode(
-                        entlib, _nodeSchema.singularItems->get(), *instancePropMap[key], subSuper);
+                        entlib,
+                        _nodeSchema.singularItems->get(),
+                        *instancePropMap[key],
+                        subSuper,
+                        subDefault);
                     result.emplace_back(key, std::move(tmpNode));
                     instancePropMap.erase(key); // Later we need to know which item are NOT in the template
                 }
                 else // Not overriden
                 {
-                    Ent::Node tmpNode =
-                        loadNode(entlib, _nodeSchema.singularItems->get(), json(), subSuper);
+                    Ent::Node tmpNode = loadNode(
+                        entlib, _nodeSchema.singularItems->get(), json(), subSuper, subDefault);
                     ENTLIB_ASSERT(tmpNode.hasOverride() == false);
                     result.emplace_back(key, std::move(tmpNode));
                 }
+                ++index;
             }
         }
-        // Load items from instance which are not in template (they are new)
+        else if (_default != nullptr)
+        {
+            size_t index = 0;
+            // Load all Nodes from the _default (overriden or not)
+            for (json const& subDefault : *_default)
+            {
+                json const& key = getKeyJson(subDefault);
+                if (instancePropMap.count(key)) // Overriden in instance
+                {
+                    Ent::Node tmpNode = loadNode(
+                        entlib,
+                        _nodeSchema.singularItems->get(),
+                        *instancePropMap[key],
+                        nullptr,
+                        &subDefault);
+                    result.emplace_back(key, std::move(tmpNode));
+                    instancePropMap.erase(key); // Later we need to know which item are NOT in the template
+                }
+                else // Not overriden
+                {
+                    Ent::Node tmpNode = loadNode(
+                        entlib, _nodeSchema.singularItems->get(), json(), nullptr, &subDefault);
+                    ENTLIB_ASSERT(tmpNode.hasOverride() == false);
+                    result.emplace_back(key, std::move(tmpNode));
+                }
+                ++index;
+            }
+        }
+        // Load items from instance which are not in template nether in default (they are new)
         // Use _data (and not instancePropMap) to keep the order of items inside _data
         for (auto const& item : _data)
         {
@@ -1637,7 +1673,7 @@ static Ent::Node loadNode(
     Ent::Subschema const& _nodeSchema,
     json const& _data,
     Ent::Node const* _super,
-    bool loadingDefault)
+    json const* _default)
 {
     ENTLIB_ASSERT(_super == nullptr or &_nodeSchema == _super->getSchema());
 
@@ -1664,9 +1700,11 @@ static Ent::Node loadNode(
         }
         else
         {
-            std::string const def = _nodeSchema.defaultValue.is_null() ?
-                                        std::string() :
-                                        _nodeSchema.defaultValue.get<std::string>();
+            std::string def;
+            if (_default != nullptr)
+                def = _default->get<std::string>();
+            else if (not _nodeSchema.defaultValue.is_null())
+                def = _nodeSchema.defaultValue.get<std::string>();
             tl::optional<std::string> const supVal =
                 (_super != nullptr and not _super->hasDefaultValue()) ?
                     tl::optional<std::string>(_super->getString()) :
@@ -1680,8 +1718,11 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::boolean:
     {
-        bool const def =
-            _nodeSchema.defaultValue.is_null() ? bool{} : _nodeSchema.defaultValue.get<bool>();
+        bool def{};
+        if (_default != nullptr)
+            def = _default->get<bool>();
+        else if (not _nodeSchema.defaultValue.is_null())
+            def = _nodeSchema.defaultValue.get<bool>();
         tl::optional<bool> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
                                               tl::optional<bool>(_super->getBool()) :
                                               tl::optional<bool>(tl::nullopt);
@@ -1692,8 +1733,11 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::integer:
     {
-        int64_t const def =
-            _nodeSchema.defaultValue.is_null() ? int64_t{} : _nodeSchema.defaultValue.get<int64_t>();
+        int64_t def{};
+        if (_default != nullptr)
+            def = _default->get<int64_t>();
+        else if (not _nodeSchema.defaultValue.is_null())
+            def = _nodeSchema.defaultValue.get<int64_t>();
         tl::optional<int64_t> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
                                                  tl::optional<int64_t>(_super->getInt()) :
                                                  tl::optional<int64_t>(tl::nullopt);
@@ -1705,8 +1749,11 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::number:
     {
-        float const def =
-            _nodeSchema.defaultValue.is_null() ? float{} : _nodeSchema.defaultValue.get<float>();
+        float def{};
+        if (_default != nullptr)
+            def = _default->get<float>();
+        else if (not _nodeSchema.defaultValue.is_null())
+            def = _nodeSchema.defaultValue.get<float>();
         tl::optional<float> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
                                                tl::optional<float>(_super->getFloat()) :
                                                tl::optional<float>(tl::nullopt);
@@ -1719,11 +1766,9 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::object:
     {
-        Ent::Node defaultNode;
-        if (not loadingDefault and _super == nullptr and not _nodeSchema.defaultValue.is_null())
+        if (_default == nullptr and not _nodeSchema.defaultValue.is_null())
         {
-            defaultNode = loadNode(_entlib, _nodeSchema, _nodeSchema.defaultValue, nullptr, true);
-            _super = &(defaultNode);
+            _default = &_nodeSchema.defaultValue;
         }
 
         Ent::Object object;
@@ -1734,7 +1779,7 @@ static Ent::Node loadNode(
         {
             std::string nodeFileName = InstanceOfIter->get<std::string>();
             json nodeData = loadJsonFile(_entlib->getAbsolutePath(nodeFileName));
-            templateNode = loadNode(_entlib, _nodeSchema, nodeData, _super);
+            templateNode = loadNode(_entlib, _nodeSchema, nodeData, _super, _default);
             _super = &templateNode;
             Ent::Override<String> tmplPath("", tl::nullopt, InstanceOfIter->get<std::string>());
             object.instanceOf = std::move(tmplPath);
@@ -1746,9 +1791,12 @@ static Ent::Node loadNode(
         {
             std::string const& name = std::get<0>(name_sub);
             Ent::Node const* superProp = (_super != nullptr) ? _super->at(name.c_str()) : nullptr;
+            json const* defaultProp =
+                (_default != nullptr) and _default->count(name) ? &_default->at(name) : nullptr;
             static json const emptyJson;
             json const& prop = _data.count(name) != 0 ? _data.at(name) : emptyJson;
-            Ent::Node tmpNode = loadNode(_entlib, *std::get<1>(name_sub), prop, superProp);
+            Ent::Node tmpNode =
+                loadNode(_entlib, *std::get<1>(name_sub), prop, superProp, defaultProp);
             object.nodes.push_back({name.c_str(), std::move(tmpNode)});
         }
         std::sort(begin(object), end(object), Ent::CompObject());
@@ -1757,11 +1805,9 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::array:
     {
-        Ent::Node defArr;
-        if (not loadingDefault and _super == nullptr and not _nodeSchema.defaultValue.is_null())
+        if (_default == nullptr and not _nodeSchema.defaultValue.is_null())
         {
-            defArr = loadNode(_entlib, _nodeSchema, _nodeSchema.defaultValue, nullptr, true);
-            _super = &(defArr);
+            _default = &_nodeSchema.defaultValue;
         }
 
         Ent::Array arr;
@@ -1774,8 +1820,20 @@ static Ent::Node loadNode(
                 {
                     for (Ent::Node const* subSuper : _super->getItems())
                     {
-                        Ent::Node tmpNode =
-                            loadNode(_entlib, _nodeSchema.singularItems->get(), json(), subSuper);
+                        json const* defaultItem =
+                            _default == nullptr ? nullptr : &_default->at(index);
+                        Ent::Node tmpNode = loadNode(
+                            _entlib, _nodeSchema.singularItems->get(), json(), subSuper, defaultItem);
+                        arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
+                        ++index;
+                    }
+                }
+                else if (_default != nullptr)
+                {
+                    for (json const& subDefault : *_default)
+                    {
+                        Ent::Node tmpNode = loadNode(
+                            _entlib, _nodeSchema.singularItems->get(), json(), nullptr, &subDefault);
                         arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
@@ -1795,7 +1853,7 @@ static Ent::Node loadNode(
             {
                 auto&& meta = _nodeSchema.meta.get<Ent::Subschema::ArrayMeta>();
                 using namespace Ent;
-                MergeMapOverride mergeMapOverride{_nodeSchema, _data, _super, _entlib};
+                MergeMapOverride mergeMapOverride{_nodeSchema, _data, _super, _default, _entlib};
                 switch (hash(meta.overridePolicy))
                 {
                 case "map"_hash:
@@ -1876,8 +1934,12 @@ static Ent::Node loadNode(
                         Ent::Node const* subSuper =
                             (_super != nullptr and (_super->size() > index)) ? _super->at(index) :
                                                                                nullptr;
-                        Ent::Node tmpNode =
-                            loadNode(_entlib, _nodeSchema.singularItems->get(), item, subSuper);
+                        json const* subDefault =
+                            (_default != nullptr and (_default->size() > index)) ?
+                                &_default->at(index) :
+                                nullptr;
+                        Ent::Node tmpNode = loadNode(
+                            _entlib, _nodeSchema.singularItems->get(), item, subSuper, subDefault);
                         arr.data.emplace_back(make_value<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
@@ -1898,9 +1960,12 @@ static Ent::Node loadNode(
             {
                 Ent::Node const* subSuper =
                     (_super != nullptr and _super->size() > index) ? _super->at(index) : nullptr;
+                json const* subDefault = (_default != nullptr and _default->size() > index) ?
+                                             &_default->at(index) :
+                                             nullptr;
                 static json const emptyJson;
                 json const& prop = _data.size() > index ? _data.at(index) : emptyJson;
-                Ent::Node tmpNode = loadNode(_entlib, *sub, prop, subSuper);
+                Ent::Node tmpNode = loadNode(_entlib, *sub, prop, subSuper, subDefault);
                 arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
                 ++index;
             }
@@ -1910,7 +1975,9 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::entityRef:
     {
-        Ent::EntityRef const def;
+        Ent::EntityRef const def = _default == nullptr ?
+                                       Ent::EntityRef() :
+                                       Ent::EntityRef{String(_default->get<std::string>())};
 
         tl::optional<Ent::EntityRef> const supVal =
             (_super != nullptr and _super->isSet()) ?
@@ -1993,7 +2060,7 @@ static Ent::Node loadNode(
                     superUnionDataWrapper == nullptr
                     or &schemaTocheck.get() == superUnionDataWrapper->getSchema());
                 Ent::Node dataNode =
-                    loadNode(_entlib, schemaTocheck.get(), _data, superUnionDataWrapper);
+                    loadNode(_entlib, schemaTocheck.get(), _data, superUnionDataWrapper, _default);
                 Ent::Union un{};
                 un.schema = &_nodeSchema;
                 un.wrapper = Ent::make_value<Ent::Node>(std::move(dataNode));

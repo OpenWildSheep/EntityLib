@@ -403,12 +403,26 @@ try
         ent->removeComponent("TransformGD");
         Ent::Component* transformGD = ent->addComponent("TransformGD");
         Ent::Node* mat33 = transformGD->root.at("Matrix");
-        ENTLIB_ASSERT(mat33->at(0llu)->getFloat() == 1.f);
-        ENTLIB_ASSERT(mat33->at(1llu)->getFloat() == 0.f);
-        ENTLIB_ASSERT(mat33->at(2llu)->getFloat() == 0.f);
-        ENTLIB_ASSERT(mat33->at(3llu)->getFloat() == 0.f);
-        ENTLIB_ASSERT(mat33->at(4llu)->getFloat() == 1.f);
-        ENTLIB_ASSERT(mat33->at(5llu)->getFloat() == 0.f);
+        auto testMat33 = [&]() {
+            ENTLIB_ASSERT(mat33->at(0llu)->getFloat() == 1.f);
+            ENTLIB_ASSERT(mat33->at(0llu)->getDefaultFloat() == 1.f);
+            ENTLIB_ASSERT(mat33->at(1llu)->getFloat() == 0.f);
+            ENTLIB_ASSERT(mat33->at(1llu)->getDefaultFloat() == 0.f);
+            ENTLIB_ASSERT(mat33->at(2llu)->getFloat() == 0.f);
+            ENTLIB_ASSERT(mat33->at(3llu)->getFloat() == 0.f);
+            ENTLIB_ASSERT(mat33->at(4llu)->getFloat() == 1.f);
+            ENTLIB_ASSERT(mat33->at(4llu)->getDefaultFloat() == 1.f);
+            ENTLIB_ASSERT(mat33->at(5llu)->getFloat() == 0.f);
+        };
+
+        Ent::Component* testDefaultValues = ent->addComponent("TestDefaultValues");
+        mat33 = testDefaultValues->root.at("Matrix");
+        testMat33();
+        mat33 = testDefaultValues->root.at("Matrix2");
+        ENTLIB_ASSERT(mat33->at(4llu)->getDefaultFloat() == 4.f);
+        ENTLIB_ASSERT(mat33->at(4llu)->getFloat() == 4.f);
+        ENTLIB_ASSERT(not mat33->at(4llu)->hasOverride());
+        ENTLIB_ASSERT(not mat33->at(4llu)->isSet());
     }
     {
         // Test the readOnly prefab.entity

@@ -27,7 +27,8 @@ static Ent::Node loadNode(
     Ent::EntityLib const* _entlib,
     Ent::Subschema const& _nodeSchema,
     json const& _data,
-    Ent::Node const* _super);
+    Ent::Node const* _super,
+    bool loadingDefault = false);
 static std::unique_ptr<Ent::Scene> loadScene(
     Ent::EntityLib const& _entLib,
     Ent::ComponentsSchema const& _schema,
@@ -1635,7 +1636,8 @@ static Ent::Node loadNode(
     Ent::EntityLib const* _entlib,
     Ent::Subschema const& _nodeSchema,
     json const& _data,
-    Ent::Node const* _super)
+    Ent::Node const* _super,
+    bool loadingDefault)
 {
     ENTLIB_ASSERT(_super == nullptr or &_nodeSchema == _super->getSchema());
 
@@ -1662,7 +1664,7 @@ static Ent::Node loadNode(
         }
         else
         {
-            std::string const def = _nodeSchema.defaultValue.is<Ent::Null>() ?
+            std::string const def = _nodeSchema.defaultValue.is_null() ?
                                         std::string() :
                                         _nodeSchema.defaultValue.get<std::string>();
             tl::optional<std::string> const supVal =
@@ -1679,7 +1681,7 @@ static Ent::Node loadNode(
     case Ent::DataType::boolean:
     {
         bool const def =
-            _nodeSchema.defaultValue.is<Ent::Null>() ? bool{} : _nodeSchema.defaultValue.get<bool>();
+            _nodeSchema.defaultValue.is_null() ? bool{} : _nodeSchema.defaultValue.get<bool>();
         tl::optional<bool> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
                                               tl::optional<bool>(_super->getBool()) :
                                               tl::optional<bool>(tl::nullopt);
@@ -1690,9 +1692,8 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::integer:
     {
-        int64_t const def = _nodeSchema.defaultValue.is<Ent::Null>() ?
-                                int64_t{} :
-                                _nodeSchema.defaultValue.get<int64_t>();
+        int64_t const def =
+            _nodeSchema.defaultValue.is_null() ? int64_t{} : _nodeSchema.defaultValue.get<int64_t>();
         tl::optional<int64_t> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
                                                  tl::optional<int64_t>(_super->getInt()) :
                                                  tl::optional<int64_t>(tl::nullopt);
@@ -1704,9 +1705,8 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::number:
     {
-        float const def = _nodeSchema.defaultValue.is<Ent::Null>() ?
-                              float{} :
-                              _nodeSchema.defaultValue.get<float>();
+        float const def =
+            _nodeSchema.defaultValue.is_null() ? float{} : _nodeSchema.defaultValue.get<float>();
         tl::optional<float> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
                                                tl::optional<float>(_super->getFloat()) :
                                                tl::optional<float>(tl::nullopt);
@@ -1719,6 +1719,13 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::object:
     {
+        Ent::Node defaultNode;
+        if (not loadingDefault and _super == nullptr and not _nodeSchema.defaultValue.is_null())
+        {
+            defaultNode = loadNode(_entlib, _nodeSchema, _nodeSchema.defaultValue, nullptr, true);
+            _super = &(defaultNode);
+        }
+
         Ent::Object object;
         // Read the InstanceOf field
         Ent::Node templateNode;
@@ -1750,6 +1757,13 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::array:
     {
+        Ent::Node defArr;
+        if (not loadingDefault and _super == nullptr and not _nodeSchema.defaultValue.is_null())
+        {
+            defArr = loadNode(_entlib, _nodeSchema, _nodeSchema.defaultValue, nullptr, true);
+            _super = &(defArr);
+        }
+
         Ent::Array arr;
         size_t index = 0;
         if (_nodeSchema.singularItems)

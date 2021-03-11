@@ -233,8 +233,8 @@ void Ent::SchemaLoader::parseSchemaNoRef(
     // default
     if (_data.count("default") != 0u)
     {
-        vis.setDefaultValue(Null{});
         json const& def = _data.at("default");
+        vis.setDefaultValue(def);
         switch (def.type())
         {
         case nlohmann::json::value_t::null: setType(Ent::DataType::null); break;
@@ -242,29 +242,17 @@ void Ent::SchemaLoader::parseSchemaNoRef(
         case nlohmann::json::value_t::array: setType(Ent::DataType::array); break;
         case nlohmann::json::value_t::binary:
         case nlohmann::json::value_t::discarded: break;
-        case nlohmann::json::value_t::string:
-            setType(Ent::DataType::string);
-            vis.setDefaultValue(def.get<std::string>());
-            break;
-        case nlohmann::json::value_t::boolean:
-            setType(Ent::DataType::boolean);
-            vis.setDefaultValue(def.get<bool>());
-            break;
+        case nlohmann::json::value_t::string: setType(Ent::DataType::string); break;
+        case nlohmann::json::value_t::boolean: setType(Ent::DataType::boolean); break;
         case nlohmann::json::value_t::number_integer:
-        case nlohmann::json::value_t::number_unsigned:
-            setType(Ent::DataType::integer);
-            vis.setDefaultValue(def.get<int64_t>());
-            break;
-        case nlohmann::json::value_t::number_float:
-            setType(Ent::DataType::number);
-            vis.setDefaultValue(def.get<float>());
-            break;
+        case nlohmann::json::value_t::number_unsigned: setType(Ent::DataType::integer); break;
+        case nlohmann::json::value_t::number_float: setType(Ent::DataType::number); break;
         }
     }
     if (_data.count("const") != 0u)
     {
-        vis.setConstValue(Null{});
         json const& def = _data.at("const");
+        vis.setConstValue(def);
         switch (def.type())
         {
         case nlohmann::json::value_t::null: setType(Ent::DataType::null); break;
@@ -272,23 +260,11 @@ void Ent::SchemaLoader::parseSchemaNoRef(
         case nlohmann::json::value_t::array: setType(Ent::DataType::array); break;
         case nlohmann::json::value_t::binary:
         case nlohmann::json::value_t::discarded: break;
-        case nlohmann::json::value_t::string:
-            setType(Ent::DataType::string);
-            vis.setConstValue(def.get<std::string>());
-            break;
-        case nlohmann::json::value_t::boolean:
-            setType(Ent::DataType::boolean);
-            vis.setConstValue(def.get<bool>());
-            break;
+        case nlohmann::json::value_t::string: setType(Ent::DataType::string); break;
+        case nlohmann::json::value_t::boolean: setType(Ent::DataType::boolean); break;
         case nlohmann::json::value_t::number_integer:
-        case nlohmann::json::value_t::number_unsigned:
-            setType(Ent::DataType::integer);
-            vis.setConstValue(def.get<int64_t>());
-            break;
-        case nlohmann::json::value_t::number_float:
-            setType(Ent::DataType::number);
-            vis.setConstValue(def.get<float>());
-            break;
+        case nlohmann::json::value_t::number_unsigned: setType(Ent::DataType::integer); break;
+        case nlohmann::json::value_t::number_float: setType(Ent::DataType::number); break;
         }
     }
     if (_data.count("items") != 0u)

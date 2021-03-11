@@ -48,27 +48,6 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
     return std::regex_replace(message2, r2, "");
 }
 
-struct SetDefault
-{
-    char const* fieldName;
-    json* instSchema;
-    template <typename T>
-    void operator()(T const& val, std::enable_if_t<std::is_arithmetic<T>::value>* = nullptr) const
-    {
-        instSchema->emplace(fieldName, val);
-    }
-
-    void operator()(std::string const& val) const
-    {
-        instSchema->emplace(fieldName, val);
-    }
-
-    template <typename T>
-    void operator()(T const&, std::enable_if_t<not std::is_arithmetic<T>::value>* = nullptr) const
-    {
-    }
-};
-
 static std::string convertLink(std::string link)
 {
     std::replace(begin(link), end(link), '#', '_');
@@ -96,10 +75,10 @@ static json convertToInstanceSchema(Ent::SubschemaRef const& tmplSchemaRef)
 static json convertToInstanceSchema(Ent::Subschema const& tmplSchema)
 {
     json instSchema;
-    mapbox::util::apply_visitor(SetDefault{"default", &instSchema}, tmplSchema.defaultValue);
+    instSchema["default"] = tmplSchema.defaultValue;
     if (tmplSchema.constValue.has_value())
     {
-        mapbox::util::apply_visitor(SetDefault{"const", &instSchema}, *tmplSchema.constValue);
+        instSchema["const"] = *tmplSchema.constValue;
     }
     if (not empty(tmplSchema.enumValues))
     {

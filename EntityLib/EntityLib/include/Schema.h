@@ -166,8 +166,7 @@ namespace Ent
         char const* getUnionDataField() const;
 
         /// Contains the simple value of one of the possible Ent::DataType
-        using DefaultValue =
-            mapbox::util::variant<Null, std::string, float, int64_t, Null, Null, bool, Null>;
+        using DefaultValue = nlohmann::json;
         DefaultValue defaultValue; ///< @brief Contains the data according to the type
         tl::optional<DefaultValue> constValue; ///< This property can only have this value
 

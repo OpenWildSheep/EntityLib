@@ -1642,7 +1642,7 @@ struct MergeMapOverride
                 ++index;
             }
         }
-        // Load items from instance which are not in template nether in default (they are new)
+        // Load items from instance which are not in template neither in default (they are new)
         // Use _data (and not instancePropMap) to keep the order of items inside _data
         for (auto const& item : _data)
         {
@@ -1679,6 +1679,11 @@ static Ent::Node loadNode(
 
     Ent::Node result;
 
+    if (_default == nullptr and not _nodeSchema.defaultValue.is_null())
+    {
+        _default = &_nodeSchema.defaultValue;
+    }
+
     switch (_nodeSchema.type)
     {
     case Ent::DataType::null: result = Ent::Node(Ent::Null{}, &_nodeSchema); break;
@@ -1700,11 +1705,8 @@ static Ent::Node loadNode(
         }
         else
         {
-            std::string def;
-            if (_default != nullptr)
-                def = _default->get<std::string>();
-            else if (not _nodeSchema.defaultValue.is_null())
-                def = _nodeSchema.defaultValue.get<std::string>();
+            std::string const def =
+                _default == nullptr ? std::string() : _default->get<std::string>();
             tl::optional<std::string> const supVal =
                 (_super != nullptr and not _super->hasDefaultValue()) ?
                     tl::optional<std::string>(_super->getString()) :
@@ -1718,11 +1720,7 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::boolean:
     {
-        bool def{};
-        if (_default != nullptr)
-            def = _default->get<bool>();
-        else if (not _nodeSchema.defaultValue.is_null())
-            def = _nodeSchema.defaultValue.get<bool>();
+        bool const def = _default == nullptr ? bool{} : _default->get<bool>();
         tl::optional<bool> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
                                               tl::optional<bool>(_super->getBool()) :
                                               tl::optional<bool>(tl::nullopt);
@@ -1733,11 +1731,7 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::integer:
     {
-        int64_t def{};
-        if (_default != nullptr)
-            def = _default->get<int64_t>();
-        else if (not _nodeSchema.defaultValue.is_null())
-            def = _nodeSchema.defaultValue.get<int64_t>();
+        int64_t const def = _default == nullptr ? int64_t{} : _default->get<int64_t>();
         tl::optional<int64_t> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
                                                  tl::optional<int64_t>(_super->getInt()) :
                                                  tl::optional<int64_t>(tl::nullopt);
@@ -1749,11 +1743,7 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::number:
     {
-        float def{};
-        if (_default != nullptr)
-            def = _default->get<float>();
-        else if (not _nodeSchema.defaultValue.is_null())
-            def = _nodeSchema.defaultValue.get<float>();
+        float const def = _default == nullptr ? float{} : _default->get<float>();
         tl::optional<float> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
                                                tl::optional<float>(_super->getFloat()) :
                                                tl::optional<float>(tl::nullopt);
@@ -1766,11 +1756,6 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::object:
     {
-        if (_default == nullptr and not _nodeSchema.defaultValue.is_null())
-        {
-            _default = &_nodeSchema.defaultValue;
-        }
-
         Ent::Object object;
         // Read the InstanceOf field
         Ent::Node templateNode;
@@ -1805,11 +1790,6 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::array:
     {
-        if (_default == nullptr and not _nodeSchema.defaultValue.is_null())
-        {
-            _default = &_nodeSchema.defaultValue;
-        }
-
         Ent::Array arr;
         size_t index = 0;
         if (_nodeSchema.singularItems)

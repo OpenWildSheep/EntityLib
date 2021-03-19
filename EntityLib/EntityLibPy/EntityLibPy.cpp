@@ -292,6 +292,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     pyNode
         .def("has_override", &Node::hasOverride)
+        .def("has_prefab_value", &Node::hasPrefabValue)
         .def_property_readonly("datatype", [](Node const* node) { return node->getDataType(); })
         .def(
             "at",

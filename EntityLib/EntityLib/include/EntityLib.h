@@ -101,6 +101,8 @@ namespace Ent
         Override<uint64_t> arraySize; ///< Size of the array, to keep track on array size changes
 
         bool hasOverride() const;
+
+        bool hasPrefabValue() const;
     };
 
     enum class ActivationLevel
@@ -239,6 +241,9 @@ namespace Ent
         ///
         /// If there is no override, there is no need to save it.
         bool hasOverride() const;
+
+        /// @brief Recursively check if value is set in a prefab (overriden or not by this Node)
+        bool hasPrefabValue() const;
 
         /// @brief Check recursively if this node content match the given value source.
         bool matchValueSource(OverrideValueSource _source) const;

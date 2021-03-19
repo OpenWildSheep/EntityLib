@@ -653,6 +653,52 @@ namespace Ent
         return mapbox::util::apply_visitor(HasOverride{schema}, value);
     }
 
+    struct HasPrefabValue
+    {
+        Subschema const* schema;
+
+        template <typename T>
+        bool operator()(Override<T> const& _ov) const
+        {
+            return _ov.hasPrefab;
+        }
+
+        bool operator()(Null const& _val) const
+        {
+            (void*)&_val; // Null contains nothing so it is not needed
+            return false;
+        }
+
+        bool operator()(Array const& _arr) const
+        {
+            return _arr.hasPrefabValue();
+        }
+
+        bool operator()(Object const& _obj) const
+        {
+            if (_obj.instanceOf.hasPrefab)
+                return true;
+            for (auto&& name_node : _obj)
+            {
+                if (std::get<1>(name_node)->hasPrefabValue())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool operator()(Union const& _un) const
+        {
+            return _un.wrapper->hasPrefabValue();
+        }
+    };
+
+    bool Node::hasPrefabValue() const
+    {
+        return mapbox::util::apply_visitor(HasPrefabValue{schema}, value);
+    }
+
     bool Node::matchValueSource(OverrideValueSource _source) const
     {
         if (_source == OverrideValueSource::OverrideOrPrefab and hasDefaultValue()
@@ -3042,6 +3088,12 @@ bool Ent::Array::hasOverride() const
 {
     return arraySize.isSet() ||
         std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasOverride));
+}
+
+bool Ent::Array::hasPrefabValue() const
+{
+    return arraySize.hasPrefab ||
+        std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasPrefabValue));
 }
 
 /// \endcond

@@ -44,14 +44,20 @@ namespace Ent
     {
         Ent::Subschema const& colorSchema = AT(_entlib.schema.schema.allDefinitions, colorSchemaName);
         Ent::Subschema const* itemSchema = &colorSchema.singularItems->get();
-        Ent::Override<float> one{255.f};
-        std::vector<value_ptr<Ent::Node>> nodes{
-            make_value<Ent::Node>(one, itemSchema),
-            make_value<Ent::Node>(one, itemSchema),
-            make_value<Ent::Node>(one, itemSchema),
-            make_value<Ent::Node>(one, itemSchema),
+        const auto& defaultColor = colorSchema.defaultValue;
+        const auto getDefaultColorChannel = [&](size_t _channel)
+        {
+            return Override<float>{defaultColor.at(_channel).get<float>()};
         };
-        return Node{Array{nodes}, &colorSchema};
+        std::vector<value_ptr<Ent::Node>> nodes{
+			make_value<Ent::Node>(getDefaultColorChannel(0), itemSchema),
+            make_value<Ent::Node>(getDefaultColorChannel(1), itemSchema),
+            make_value<Ent::Node>(getDefaultColorChannel(2), itemSchema),
+            make_value<Ent::Node>(getDefaultColorChannel(3), itemSchema),
+        };
+        Array root;
+        root.data = std::move(nodes);
+        return Node{std::move(root), &colorSchema};
     }
 
     EntityLib::EntityLib(std::filesystem::path _rootPath, bool _doMergeComponents)

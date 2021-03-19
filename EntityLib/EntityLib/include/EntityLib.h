@@ -195,6 +195,11 @@ namespace Ent
         Node* at(size_t _index); ///< @pre type==Ent::DataType::array. @brief Get the item at _index
         Node const* at(size_t _index) const; ///< @pre type==Ent::DataType::array. @brief Get the item at _index
         size_t size() const; ///< @pre type==Ent::DataType::array. @brief Get array size
+        /// @pre type==Ent::DataType::array. 
+        /// @brief Get the raw Override value of the array size.
+        /// @param _location the desired Override value location.
+        /// @return the array size at the given Override value location.
+        tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         std::vector<Node const*> getItems() const; ///< @pre type==Ent::DataType::array. @brief Get all items
         Node* push(); ///< @pre type==Ent::DataType::array. @brief Add a new item at the end of array
         void pop(); ///< @pre type==Ent::DataType::array. @brief Remove an item at the end of array

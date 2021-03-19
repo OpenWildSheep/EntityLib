@@ -294,6 +294,15 @@ namespace Ent
         throw BadType();
     }
 
+    tl::optional<size_t> Node::getRawSize(OverrideValueLocation _location) const
+    {
+        if (value.is<Array>())
+        {
+            return value.get<Array>().arraySize.getRaw(_location);
+        }
+        throw BadType();
+    }
+
     Node const* Node::getUnionDataWrapper() const
     {
         if (value.is<Union>())

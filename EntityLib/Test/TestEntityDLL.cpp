@@ -439,19 +439,9 @@ try
             ENTLIB_ASSERT(node);
             ENTLIB_ASSERT(node->hasPrefabValue() == prefabSize.has_value());
             ENTLIB_ASSERT(node->hasOverride() == overrideSize.has_value());
-            const auto& arrSize = node->GetRawValue().get<Ent::Array>().arraySize;
-            ENTLIB_ASSERT(arrSize.defaultValue == defaultSize);
-            ENTLIB_ASSERT(arrSize.hasPrefab == prefabSize.has_value());
-            if (prefabSize.has_value())
-            {
-                ENTLIB_ASSERT(arrSize.prefabValue == prefabSize.value());
-            }
-            ENTLIB_ASSERT(arrSize.hasOverride == overrideSize.has_value());
-            if (overrideSize.has_value())
-            {
-                ENTLIB_ASSERT(arrSize.overrideValue == overrideSize.value());
-            }
-            ENTLIB_ASSERT(node->size() == arrSize.get());
+            ENTLIB_ASSERT(node->getRawSize(Ent::OverrideValueLocation::Default).value() == defaultSize);
+            ENTLIB_ASSERT(node->getRawSize(Ent::OverrideValueLocation::Prefab) == prefabSize);
+            ENTLIB_ASSERT(node->getRawSize(Ent::OverrideValueLocation::Override) == overrideSize);
 		};
         testArrayMember("DefaultValue", 2, tl::nullopt, tl::nullopt);
         testArrayMember("PrefabValue", 2, 4, tl::nullopt);

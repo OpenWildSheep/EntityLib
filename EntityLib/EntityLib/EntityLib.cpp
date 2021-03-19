@@ -929,7 +929,6 @@ namespace Ent
         void operator()(Array const& _arr) const
         {
             prof.addMem("Array::data", _arr.data.capacity() * sizeof(_arr.data.front()));
-            prof.addMem("Array::arraySize", sizeof(_arr.arraySize));
             for (auto&& item : _arr.data)
             {
                 item->computeMemory(prof);

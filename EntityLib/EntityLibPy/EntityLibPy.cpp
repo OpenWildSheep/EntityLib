@@ -291,6 +291,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pySceneFile = py::class_<EntityLib::SceneFile>(ent, "SceneFile");
 
     pyNode
+        .def("has_override", &Node::hasOverride)
         .def_property_readonly("datatype", [](Node const* node) { return node->getDataType(); })
         .def(
             "at",

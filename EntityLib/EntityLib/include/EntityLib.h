@@ -94,7 +94,11 @@ namespace Ent
     /// Content of a Node which has type Ent::DataType::array
     struct Array
     {
+        Array();
+
         std::vector<value_ptr<Node>> data; ///< List of items of the array
+
+        Override<uint64_t> arraySize; ///< Size of the array, to keep track on array size changes
 
         bool hasOverride() const;
     };
@@ -133,9 +137,9 @@ namespace Ent
     /// @brief The possible source of an Override value
     enum class OverrideValueSource
     {
-        /// Value is set in this Override. Write the "InstaneOf" field.
+        /// Value is set in this Override. Write the "InstanceOf" field.
         Override,
-        /// Value is set in the Prefab or in this Override. Don't write the "InstaneOf" field.
+        /// Value is set in the Prefab or in this Override. Don't write the "InstanceOf" field.
         OverrideOrPrefab,
         /// Value can be any source: Override, Prefab or the default value. Don't write the "InstaneOf" field.
         Any,

@@ -57,6 +57,7 @@ namespace Ent
         };
         Array root;
         root.data = std::move(nodes);
+        root.arraySize = Override<uint64_t>{4};
         return Node{std::move(root), &colorSchema};
     }
 
@@ -470,7 +471,8 @@ namespace Ent
 
         bool operator()(Array const& _arr) const
         {
-            return std::all_of(begin(_arr.data), end(_arr.data), std::mem_fn(&Node::hasDefaultValue));
+            return this->operator()(_arr.arraySize) &&
+                std::all_of(begin(_arr.data), end(_arr.data), std::mem_fn(&Node::hasDefaultValue));
         }
 
         bool operator()(Object const& _obj) const
@@ -514,6 +516,8 @@ namespace Ent
             {
                 out.data.emplace_back(make_value<Node>(item->detach()));
             }
+            out.arraySize = _arr.arraySize.detach();
+            ENTLIB_ASSERT(out.arraySize.get() == out.data.size());
             return Node(std::move(out), schema);
         }
 
@@ -567,6 +571,8 @@ namespace Ent
             {
                 out.data.emplace_back(make_value<Node>(item->makeInstanceOf()));
             }
+            out.arraySize = _arr.arraySize.makeInstanceOf();
+            ENTLIB_ASSERT(out.arraySize.get() == out.data.size());
             return Node(std::move(out), schema);
         }
 
@@ -700,8 +706,10 @@ namespace Ent
         {
             if (SubschemaRef const* itemSchema = schema->singularItems.get())
             {
-                value.get<Array>().data.emplace_back(
+                auto& arrayRoot = value.get<Array>();
+                arrayRoot.data.emplace_back(
                     make_value<Node>(loadNode(nullptr, itemSchema->get(), json(), nullptr)));
+                arrayRoot.arraySize.set(arrayRoot.arraySize.get() + 1);
                 return value.get<Array>().data.back().get();
             }
         }
@@ -713,7 +721,10 @@ namespace Ent
         {
             if (schema->singularItems != nullptr)
             {
-                value.get<Array>().data.pop_back();
+                auto& arrayRoot = value.get<Array>();
+                ENTLIB_ASSERT(not arrayRoot.data.empty());
+                arrayRoot.data.pop_back();
+                arrayRoot.arraySize.set(arrayRoot.arraySize.get() - 1);
                 return;
             }
         }
@@ -724,7 +735,9 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            value.get<Array>().data.clear();
+            auto& arrayRoot = value.get<Array>();
+            arrayRoot.data.clear();
+            arrayRoot.arraySize.set(0);
         }
         else
         {
@@ -870,6 +883,7 @@ namespace Ent
         void operator()(Array const& _arr) const
         {
             prof.addMem("Array::data", _arr.data.capacity() * sizeof(_arr.data.front()));
+            prof.addMem("Array::arraySize", sizeof(_arr.arraySize));
             for (auto&& item : _arr.data)
             {
                 item->computeMemory(prof);
@@ -1583,6 +1597,10 @@ struct MergeMapOverride
         auto&& meta = _nodeSchema.meta.get<Ent::Subschema::ArrayMeta>();
         bool const ordered = meta.ordered;
 
+        uint64_t defaultElementCount = 0;
+        uint64_t prefabAdditionalElementCount = 0;
+        uint64_t instanceAdditionalElementCount = 0;
+
         // Make a map key=>item of the instance array
         using KeyType = std::remove_reference_t<decltype(getKeyJson(json()))>;
         std::map<KeyType, json const*> instancePropMap;
@@ -1598,6 +1616,16 @@ struct MergeMapOverride
             for (Ent::Node const* subSuper : _super->getItems())
             {
                 json const* subDefault = _default == nullptr ? nullptr : &_default->at(index);
+                if (subDefault != nullptr)
+                {
+                    // item was added in default
+                    defaultElementCount++;
+                }
+				else
+				{
+					// item was added in prefab
+                    prefabAdditionalElementCount++;
+				}
                 KeyType key = getKeyNode(subSuper);
                 if (instancePropMap.count(key)) // Overriden in instance
                 {
@@ -1622,6 +1650,7 @@ struct MergeMapOverride
         }
         else if (_default != nullptr)
         {
+            defaultElementCount = _default->size();
             size_t index = 0;
             // Load all Nodes from the _default (overriden or not)
             for (json const& subDefault : *_default)
@@ -1657,6 +1686,7 @@ struct MergeMapOverride
             {
                 result.emplace_back(
                     key, loadNode(entlib, _nodeSchema.singularItems->get(), item, nullptr));
+                instanceAdditionalElementCount++;
             }
         }
         if (ordered)
@@ -1670,6 +1700,16 @@ struct MergeMapOverride
         {
             arr.data.emplace_back(make_value<Ent::Node>(std::move(std::get<1>(key_node))));
         }
+        const auto prefabArraySize = prefabAdditionalElementCount > 0
+                                         ? tl::optional<uint64_t>{defaultElementCount + prefabAdditionalElementCount}
+                                         : tl::nullopt;
+        const auto instanceArraySize = instanceAdditionalElementCount > 0
+                                           ? tl::optional<uint64_t>{
+                                               defaultElementCount + prefabAdditionalElementCount +
+                                               instanceAdditionalElementCount
+                                           }
+                                           : tl::nullopt;
+        arr.arraySize = Override<uint64_t>{defaultElementCount, prefabArraySize, instanceArraySize};
         return arr;
     }
 };
@@ -1800,6 +1840,7 @@ static Ent::Node loadNode(
         size_t index = 0;
         if (_nodeSchema.singularItems)
         {
+            uint64_t defaultArraySize = std::max(_nodeSchema.minItems, _default == nullptr ? 0 : _default->size());
             if (_data.is_null()) // No overrided
             {
                 if (_super != nullptr)
@@ -1814,6 +1855,10 @@ static Ent::Node loadNode(
                         arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
+                    tl::optional<uint64_t> prefabArraySize = defaultArraySize == _super->size()
+                                                                 ? tl::nullopt
+                                                                 : tl::optional<uint64_t>{_super->size()};
+                    arr.arraySize = Ent::Override<uint64_t>(defaultArraySize, prefabArraySize, tl::nullopt);
                 }
                 else if (_default != nullptr)
                 {
@@ -1824,6 +1869,7 @@ static Ent::Node loadNode(
                         arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
+                    arr.arraySize = Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt);
                 }
                 else
                 {
@@ -1834,6 +1880,7 @@ static Ent::Node loadNode(
                         arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
+                    arr.arraySize = Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt);
                 }
             }
             else // If it is a singularItems and there is _data, we have to use the overridePolicy
@@ -1930,6 +1977,14 @@ static Ent::Node loadNode(
                         arr.data.emplace_back(make_value<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
+                    tl::optional<uint64_t> prefabArraySize = (_super != nullptr and _super->size() != defaultArraySize)
+                                                                 ? tl::optional<uint64_t>{_super->size()}
+                                                                 : tl::nullopt;
+                    const uint64_t sizeInPrefab = prefabArraySize.value_or(defaultArraySize);
+                    tl::optional<uint64_t> overrideArraySize = _data.size() == sizeInPrefab
+                                                                   ? tl::nullopt
+                                                                   : tl::optional<uint64_t>{_data.size()};
+                    arr.arraySize = Ent::Override<uint64_t>(defaultArraySize, prefabArraySize, overrideArraySize);
                 }
                 break;
                 default:
@@ -1956,7 +2011,10 @@ static Ent::Node loadNode(
                 arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
                 ++index;
             }
+            uint64_t defaultArraySize = _nodeSchema.linearItems->size();
+            arr.arraySize = Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt);
         }
+        ENTLIB_ASSERT(arr.arraySize.get() == arr.data.size());
         result = Ent::Node(std::move(arr), &_nodeSchema);
     }
     break;
@@ -2975,9 +3033,15 @@ bool Ent::SubSceneComponent::hasOverride() const
     return embedded != nullptr && embedded->hasOverride();
 }
 
+Ent::Array::Array()
+    : arraySize(0llu, tl::nullopt, tl::nullopt)
+{
+}
+
 bool Ent::Array::hasOverride() const
 {
-    return std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasOverride));
+    return arraySize.isSet() ||
+        std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasOverride));
 }
 
 /// \endcond

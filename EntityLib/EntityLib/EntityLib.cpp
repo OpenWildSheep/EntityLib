@@ -1806,8 +1806,9 @@ static Ent::Node loadNode(
                 {
                     for (Ent::Node const* subSuper : _super->getItems())
                     {
-                        json const* defaultItem =
-                            _default == nullptr ? nullptr : &_default->at(index);
+                        json const* defaultItem = (_default != nullptr and index < _default->size())
+                                                      ? &_default->at(index)
+                                                      : nullptr;
                         Ent::Node tmpNode = loadNode(
                             _entlib, _nodeSchema.singularItems->get(), json(), subSuper, defaultItem);
                         arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));

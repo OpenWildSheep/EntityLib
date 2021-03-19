@@ -155,6 +155,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pyDataType = py::enum_<DataType>(ent, "DataType");
     auto pyActivationLevel = py::enum_<ActivationLevel>(ent, "ActivationLevel");
     auto pyOverrideValueSource = py::enum_<OverrideValueSource>(ent, "OverrideValueSource");
+    auto pyOverrideValueLocation = py::enum_<OverrideValueLocation>(ent, "OverrideValueLocation");
     auto pyPath = py::class_<std::filesystem::path>(ent, "path");
     auto pyEntString = py::class_<Ent::String>(ent, "String");
     auto pySubschema = py::class_<Subschema>(ent, "Subschema");
@@ -189,6 +190,12 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .value("Override", OverrideValueSource::Override)
         .value("OverrideOrPrefab", OverrideValueSource::OverrideOrPrefab)
         .value("Any", OverrideValueSource::Any)
+        .export_values();
+
+    pyOverrideValueLocation
+        .value("Default", OverrideValueLocation::Default)
+        .value("Prefab", OverrideValueLocation::Prefab)
+        .value("Override", OverrideValueLocation::Override)
         .export_values();
 
     pyPath
@@ -307,6 +314,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference_internal,
             "In an Array, get the element by index")
         .def("size", [](Node* node) { return node->size(); })
+        .def("get_raw_size", &Node::getRawSize)
         .def(
             "get_items",
             [](Node* node) { return node->getItems(); },

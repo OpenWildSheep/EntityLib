@@ -1,0 +1,17 @@
+{
+    "Components": [
+        {
+            "Type": "TestArrays",
+            "Data": {
+                "OverridedPrefabValue": [
+                    null, null, null
+                ],
+                "OverridedDefaultValue": [
+                    null, null, 0
+                ]
+            }
+        }
+    ],
+    "Name": "TestArraysInstance",
+    "InstanceOf": "entity-arrays.entity"
+}

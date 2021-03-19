@@ -8,6 +8,17 @@ namespace Ent
 {
     struct MemoryProfiler;
 
+    /// @brief Value location inside an \e Override<T>
+    enum class OverrideValueLocation
+    {
+        /// Override value comes from default value.
+        Default,
+        /// Override value comes from the prefab.
+        Prefab,
+        /// Override value comes from the instance.
+        Override
+    };
+    
     template <typename V>
     struct Override
     {
@@ -93,6 +104,36 @@ namespace Ent
         V& getDefaultValue()
         {
             return defaultValue;
+        }
+
+		tl::optional<V&> getRaw(OverrideValueLocation _location)
+        {
+            switch (_location)
+            {
+			case OverrideValueLocation::Default:
+                return defaultValue;
+			case OverrideValueLocation::Prefab:
+                return hasPrefab ? tl::optional<V&>{prefabValue} : tl::nullopt;
+            case OverrideValueLocation::Override:
+                return hasOverride ? tl::optional<V&>{overrideValue} : tl::nullopt;
+            default:
+                return tl::nullopt;
+            }
+        }
+
+        tl::optional<V const&> getRaw(OverrideValueLocation _location) const
+        {
+            switch (_location)
+            {
+			case OverrideValueLocation::Default:
+                return defaultValue;
+			case OverrideValueLocation::Prefab:
+                return hasPrefab ? tl::optional<V const&>{prefabValue} : tl::nullopt;
+            case OverrideValueLocation::Override:
+                return hasOverride ? tl::optional<V const&>{overrideValue} : tl::nullopt;
+			default:
+                return tl::nullopt;
+            }
         }
 
     public:

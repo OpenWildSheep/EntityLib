@@ -94,9 +94,15 @@ namespace Ent
     /// Content of a Node which has type Ent::DataType::array
     struct Array
     {
+        Array();
+
         std::vector<value_ptr<Node>> data; ///< List of items of the array
 
+        Override<uint64_t> arraySize; ///< Size of the array, to keep track on array size changes
+
         bool hasOverride() const;
+
+        bool hasPrefabValue() const;
     };
 
     enum class ActivationLevel
@@ -133,9 +139,9 @@ namespace Ent
     /// @brief The possible source of an Override value
     enum class OverrideValueSource
     {
-        /// Value is set in this Override. Write the "InstaneOf" field.
+        /// Value is set in this Override. Write the "InstanceOf" field.
         Override,
-        /// Value is set in the Prefab or in this Override. Don't write the "InstaneOf" field.
+        /// Value is set in the Prefab or in this Override. Don't write the "InstanceOf" field.
         OverrideOrPrefab,
         /// Value can be any source: Override, Prefab or the default value. Don't write the "InstaneOf" field.
         Any,
@@ -189,6 +195,11 @@ namespace Ent
         Node* at(size_t _index); ///< @pre type==Ent::DataType::array. @brief Get the item at _index
         Node const* at(size_t _index) const; ///< @pre type==Ent::DataType::array. @brief Get the item at _index
         size_t size() const; ///< @pre type==Ent::DataType::array. @brief Get array size
+        /// @pre type==Ent::DataType::array. 
+        /// @brief Get the raw Override value of the array size.
+        /// @param _location the desired Override value location.
+        /// @return the array size at the given Override value location.
+        tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         std::vector<Node const*> getItems() const; ///< @pre type==Ent::DataType::array. @brief Get all items
         Node* push(); ///< @pre type==Ent::DataType::array. @brief Add a new item at the end of array
         void pop(); ///< @pre type==Ent::DataType::array. @brief Remove an item at the end of array
@@ -235,6 +246,9 @@ namespace Ent
         ///
         /// If there is no override, there is no need to save it.
         bool hasOverride() const;
+
+        /// @brief Recursively check if value is set in a prefab (overriden or not by this Node)
+        bool hasPrefabValue() const;
 
         /// @brief Check recursively if this node content match the given value source.
         bool matchValueSource(OverrideValueSource _source) const;

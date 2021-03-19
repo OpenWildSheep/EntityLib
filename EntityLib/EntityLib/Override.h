@@ -96,17 +96,7 @@ namespace Ent
 
         // bool hasOverride() const;
 
-        V const& getDefaultValue() const
-        {
-            return defaultValue;
-        }
-
-        V& getDefaultValue()
-        {
-            return defaultValue;
-        }
-
-		tl::optional<V&> getRaw(OverrideValueLocation _location)
+        tl::optional<V&> getRaw(OverrideValueLocation _location)
         {
             switch (_location)
             {

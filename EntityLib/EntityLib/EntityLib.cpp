@@ -873,37 +873,60 @@ namespace Ent
 
     float Node::getDefaultFloat() const
     {
-        if (value.is<Override<float>>())
-        {
-            return value.get<Override<float>>().getDefaultValue();
-        }
-        if (value.is<Override<int64_t>>())
-        {
-            return static_cast<float>(value.get<Override<int64_t>>().getDefaultValue());
-        }
-        throw BadType();
+        return getRawFloat(OverrideValueLocation::Default).value();
     }
     int64_t Node::getDefaultInt() const
     {
-        if (value.is<Override<int64_t>>())
-        {
-            return value.get<Override<int64_t>>().getDefaultValue();
-        }
-        throw BadType();
+        return getRawInt(OverrideValueLocation::Default).value();
     }
     char const* Node::getDefaultString() const
     {
-        if (value.is<Override<String>>())
-        {
-            return value.get<Override<String>>().getDefaultValue().c_str();
-        }
-        throw BadType();
+        return getRawString(OverrideValueLocation::Default).value();
     }
     bool Node::getDefaultBool() const
     {
+        return getRawBool(OverrideValueLocation::Default).value();
+    }
+
+    tl::optional<float> Node::getRawFloat(OverrideValueLocation _location) const
+    {
+        if (value.is<Override<float>>())
+        {
+            return value.get<Override<float>>().getRaw(_location);
+        }
+        if (value.is<Override<int64_t>>())
+        {
+            auto intValue = value.get<Override<int64_t>>().getRaw(_location);
+            return intValue.has_value() ? tl::optional<float>{static_cast<float>(intValue.value())} : tl::nullopt;
+        }
+        throw BadType();
+    }
+
+    tl::optional<int> Node::getRawInt(OverrideValueLocation _location) const
+    {
+        if (value.is<Override<int64_t>>())
+        {
+            return value.get<Override<int64_t>>().getRaw(_location);
+        }
+        throw BadType();
+    }
+
+    tl::optional<char const*> Node::getRawString(OverrideValueLocation _location) const
+    {
+        if (value.is<Override<String>>())
+        {
+            auto strValue = value.get<Override<String>>().getRaw(_location);
+			return strValue.has_value() ? tl::optional<char const*>{strValue.value().c_str()} : tl::nullopt;
+        }
+        throw BadType();
+    }
+
+    tl::optional<bool> Node::getRawBool(OverrideValueLocation _location) const
+    {
         if (value.is<Override<bool>>())
         {
-            return value.get<Override<bool>>().getDefaultValue();
+            auto boolValue = value.get<Override<bool>>().getRaw(_location);
+            return boolValue.has_value() ? tl::optional<bool>{boolValue} : tl::nullopt;
         }
         throw BadType();
     }

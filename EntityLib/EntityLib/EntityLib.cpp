@@ -2418,7 +2418,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     Ent::Override<String> ovName = superName.makeOverridedInstanceOf(name);
 
     Ent::Override<String> superInstanceOf = superEntity->getInstanceOfValue();
-    Ent::Override<String> ovInstanceOf = superName.makeOverridedInstanceOf(instanceOf);
+    Ent::Override<String> ovInstanceOf = superInstanceOf.makeOverridedInstanceOf(instanceOf);
 
     tl::optional<Ent::ActivationLevel> maxActivationLevel;
     if (_entNode.count("MaxActivationLevel") != 0)

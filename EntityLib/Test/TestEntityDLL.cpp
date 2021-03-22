@@ -431,18 +431,18 @@ try
         Ent::Component const* comp = ent->getComponent("TestArrays");
         ENTLIB_ASSERT(comp);
         const auto testArrayMember = [&](char const* _arrayName,
-            size_t defaultSize,
-			tl::optional<size_t> prefabSize,
-			tl::optional<size_t> overrideSize)
-        {
+                                         size_t defaultSize,
+                                         tl::optional<size_t> prefabSize,
+                                         tl::optional<size_t> overrideSize) {
             Ent::Node const* node = comp->root.at(_arrayName);
             ENTLIB_ASSERT(node);
             ENTLIB_ASSERT(node->hasPrefabValue() == prefabSize.has_value());
             ENTLIB_ASSERT(node->hasOverride() == overrideSize.has_value());
-            ENTLIB_ASSERT(node->getRawSize(Ent::OverrideValueLocation::Default).value() == defaultSize);
+            ENTLIB_ASSERT(
+                node->getRawSize(Ent::OverrideValueLocation::Default).value() == defaultSize);
             ENTLIB_ASSERT(node->getRawSize(Ent::OverrideValueLocation::Prefab) == prefabSize);
             ENTLIB_ASSERT(node->getRawSize(Ent::OverrideValueLocation::Override) == overrideSize);
-		};
+        };
         testArrayMember("DefaultValue", 2, tl::nullopt, tl::nullopt);
         testArrayMember("PrefabValue", 2, 4, tl::nullopt);
         testArrayMember("OverridedDefaultValue", 2, tl::nullopt, 3);

@@ -195,7 +195,7 @@ namespace Ent
         Node* at(size_t _index); ///< @pre type==Ent::DataType::array. @brief Get the item at _index
         Node const* at(size_t _index) const; ///< @pre type==Ent::DataType::array. @brief Get the item at _index
         size_t size() const; ///< @pre type==Ent::DataType::array. @brief Get array size
-        /// @pre type==Ent::DataType::array. 
+        /// @pre type==Ent::DataType::array.
         /// @brief Get the raw Override value of the array size.
         /// @param _location the desired Override value location.
         /// @return the array size at the given Override value location.
@@ -288,22 +288,22 @@ namespace Ent
         char const* getDefaultString() const; ///< @pre DataType == string. @brief Get the default value as string
         bool getDefaultBool() const; ///< @pre DataType == bool. @brief Get the default value as bool
 
-        /// @pre number or integer. 
+        /// @pre number or integer.
         /// @brief Get the raw Override value as float.
         /// @param _location the desired Override value location.
         /// @return the float value at the given Override value location.
         tl::optional<float> getRawFloat(OverrideValueLocation _location) const;
-        /// @pre integer. 
+        /// @pre integer.
         /// @brief Get the raw Override value as int.
         /// @param _location the desired Override value location.
         /// @return the int value at the given Override value location.
         tl::optional<int> getRawInt(OverrideValueLocation _location) const;
-        /// @pre DataType == string. 
+        /// @pre DataType == string.
         /// @brief Get the raw Override value as string.
         /// @param _location the desired Override value location.
         /// @return the string value at the given Override value location.
         tl::optional<char const*> getRawString(OverrideValueLocation _location) const;
-        /// @pre DataType == bool. 
+        /// @pre DataType == bool.
         /// @brief Get the raw Override value as bool.
         /// @param _location the desired Override value location.
         /// @return the bool value at the given Override value location.

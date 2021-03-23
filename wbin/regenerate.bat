@@ -16,8 +16,6 @@
 "../../External/FlatBuffers/Release/flatc" --python --gen-object-api --gen-mutable wsp.fbs
 "../../External/FlatBuffers/Release/flatc" --cpp --gen-object-api --gen-mutable wtso.fbs
 "../../External/FlatBuffers/Release/flatc" --python --gen-object-api --gen-mutable wtso.fbs
-"../../External/FlatBuffers/Release/flatc" --cpp --gen-object-api --gen-mutable wgpcloud.fbs
-"../../External/FlatBuffers/Release/flatc" --python --gen-object-api --gen-mutable wgpcloud.fbs
 "../../External/FlatBuffers/Release/flatc" --cpp --gen-object-api --gen-mutable wgvoxelvolume.fbs
 "../../External/FlatBuffers/Release/flatc" --python --gen-object-api --gen-mutable wgvoxelvolume.fbs
 "../../External/FlatBuffers/Release/flatc" --cpp --gen-object-api --gen-mutable wstampcloud.fbs

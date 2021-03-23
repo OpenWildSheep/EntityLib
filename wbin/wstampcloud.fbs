@@ -14,7 +14,7 @@ struct Matrix44
 // These types only differ by the size and shape of their stamp
 // as well as the tags that they embed
 //
-// For now stamps are only represented as AABBs
+// For now stamps are only represented as bounding box shapes
 table Stamp
 {
 	shape:AABB;

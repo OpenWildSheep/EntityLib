@@ -10,8 +10,6 @@
 
 namespace WBIN {
 
-struct Matrix44;
-
 struct Stamp;
 struct StampBuilder;
 struct StampT;
@@ -19,23 +17,6 @@ struct StampT;
 struct StampCloud;
 struct StampCloudBuilder;
 struct StampCloudT;
-
-FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Matrix44 FLATBUFFERS_FINAL_CLASS {
- private:
-  float values_[16];
-
- public:
-  Matrix44() {
-    memset(static_cast<void *>(this), 0, sizeof(Matrix44));
-  }
-  const flatbuffers::Array<float, 16> *values() const {
-    return reinterpret_cast<const flatbuffers::Array<float, 16> *>(values_);
-  }
-  flatbuffers::Array<float, 16> *mutable_values() {
-    return reinterpret_cast<flatbuffers::Array<float, 16> *>(values_);
-  }
-};
-FLATBUFFERS_STRUCT_END(Matrix44, 64);
 
 struct StampT : public flatbuffers::NativeTable {
   typedef Stamp TableType;

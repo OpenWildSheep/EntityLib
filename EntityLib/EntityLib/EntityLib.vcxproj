@@ -182,7 +182,7 @@
     <ClInclude Include="ValidJson.h" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="external\mapbox\NATVIS\Variant.natvis" />
+    <Natvis Include="..\..\external\mapbox\NATVIS\Variant.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -20,7 +20,15 @@ namespace WRPC
             const char* _methodName,
             std::vector<WildRPC::Type> _in,
             std::vector<WildRPC::Type> _out);
+
+        MethodInvocation(
+            const char* _managerName,
+            const char* _methodName,
+            std::initializer_list<WildRPC::Type> _in,
+            std::initializer_list<WildRPC::Type> _out);
         Result Execute(Connection& _connection, const std::vector<Parameter>& _values);
+        Result Execute(Connection& _connection, std::initializer_list<Parameter> _values);
+        Result Execute(Connection& _connection, Parameter const* _values, size_t _valueCount);
 
     private:
         bool _SetParameters(const std::vector<Parameter>& _values);

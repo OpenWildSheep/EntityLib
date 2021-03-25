@@ -155,6 +155,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pyDataType = py::enum_<DataType>(ent, "DataType");
     auto pyActivationLevel = py::enum_<ActivationLevel>(ent, "ActivationLevel");
     auto pyOverrideValueSource = py::enum_<OverrideValueSource>(ent, "OverrideValueSource");
+    auto pyOverrideValueLocation = py::enum_<OverrideValueLocation>(ent, "OverrideValueLocation");
     auto pyPath = py::class_<std::filesystem::path>(ent, "path");
     auto pyEntString = py::class_<Ent::String>(ent, "String");
     auto pySubschema = py::class_<Subschema>(ent, "Subschema");
@@ -189,6 +190,12 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .value("Override", OverrideValueSource::Override)
         .value("OverrideOrPrefab", OverrideValueSource::OverrideOrPrefab)
         .value("Any", OverrideValueSource::Any)
+        .export_values();
+
+    pyOverrideValueLocation
+        .value("Default", OverrideValueLocation::Default)
+        .value("Prefab", OverrideValueLocation::Prefab)
+        .value("Override", OverrideValueLocation::Override)
         .export_values();
 
     pyPath
@@ -291,6 +298,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pySceneFile = py::class_<EntityLib::SceneFile>(ent, "SceneFile");
 
     pyNode
+        .def("has_override", &Node::hasOverride)
+        .def("has_prefab_value", &Node::hasPrefabValue)
         .def_property_readonly("datatype", [](Node const* node) { return node->getDataType(); })
         .def(
             "at",
@@ -305,6 +314,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference_internal,
             "In an Array, get the element by index")
         .def("size", [](Node* node) { return node->size(); })
+        .def("get_raw_size", &Node::getRawSize)
         .def(
             "get_items",
             [](Node* node) { return node->getItems(); },
@@ -321,6 +331,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_string", [](Node* node) { return node->getString(); })
         .def("get_bool", [](Node* node) { return node->getBool(); })
         .def("get_entityref", &Node::getEntityRef)
+        .def("get_raw_float", &Node::getRawFloat)
+        .def("get_raw_int", &Node::getRawInt)
+        .def("get_raw_string", &Node::getRawString)
+        .def("get_raw_bool", &Node::getRawBool)
         .def("get_default_float", [](Node* node) { return node->getDefaultFloat(); })
         .def("get_default_int", [](Node* node) { return node->getDefaultInt(); })
         .def("get_default_string", [](Node* node) { return node->getDefaultString(); })

@@ -44,14 +44,20 @@ namespace Ent
     {
         Ent::Subschema const& colorSchema = AT(_entlib.schema.schema.allDefinitions, colorSchemaName);
         Ent::Subschema const* itemSchema = &colorSchema.singularItems->get();
-        Ent::Override<float> one{255.f};
-        std::vector<value_ptr<Ent::Node>> nodes{
-            make_value<Ent::Node>(one, itemSchema),
-            make_value<Ent::Node>(one, itemSchema),
-            make_value<Ent::Node>(one, itemSchema),
-            make_value<Ent::Node>(one, itemSchema),
+        const auto& defaultColor = colorSchema.defaultValue;
+        const auto getDefaultColorChannel = [&](size_t _channel) {
+            return Override<float>{defaultColor.at(_channel).get<float>()};
         };
-        return Node{Array{nodes}, &colorSchema};
+        std::vector<value_ptr<Ent::Node>> nodes{
+            make_value<Ent::Node>(getDefaultColorChannel(0), itemSchema),
+            make_value<Ent::Node>(getDefaultColorChannel(1), itemSchema),
+            make_value<Ent::Node>(getDefaultColorChannel(2), itemSchema),
+            make_value<Ent::Node>(getDefaultColorChannel(3), itemSchema),
+        };
+        Array root;
+        root.data = std::move(nodes);
+        root.arraySize = Override<uint64_t>{4};
+        return Node{std::move(root), &colorSchema};
     }
 
     EntityLib::EntityLib(std::filesystem::path _rootPath, bool _doMergeComponents)
@@ -287,6 +293,15 @@ namespace Ent
         throw BadType();
     }
 
+    tl::optional<size_t> Node::getRawSize(OverrideValueLocation _location) const
+    {
+        if (value.is<Array>())
+        {
+            return value.get<Array>().arraySize.getRaw(_location);
+        }
+        throw BadType();
+    }
+
     Node const* Node::getUnionDataWrapper() const
     {
         if (value.is<Union>())
@@ -464,7 +479,9 @@ namespace Ent
 
         bool operator()(Array const& _arr) const
         {
-            return std::all_of(begin(_arr.data), end(_arr.data), std::mem_fn(&Node::hasDefaultValue));
+            return this->operator()(_arr.arraySize)
+                   && std::all_of(
+                       begin(_arr.data), end(_arr.data), std::mem_fn(&Node::hasDefaultValue));
         }
 
         bool operator()(Object const& _obj) const
@@ -508,6 +525,8 @@ namespace Ent
             {
                 out.data.emplace_back(make_value<Node>(item->detach()));
             }
+            out.arraySize = _arr.arraySize.detach();
+            ENTLIB_ASSERT(out.arraySize.get() == out.data.size());
             return Node(std::move(out), schema);
         }
 
@@ -561,6 +580,8 @@ namespace Ent
             {
                 out.data.emplace_back(make_value<Node>(item->makeInstanceOf()));
             }
+            out.arraySize = _arr.arraySize.makeInstanceOf();
+            ENTLIB_ASSERT(out.arraySize.get() == out.data.size());
             return Node(std::move(out), schema);
         }
 
@@ -641,6 +662,52 @@ namespace Ent
         return mapbox::util::apply_visitor(HasOverride{schema}, value);
     }
 
+    struct HasPrefabValue
+    {
+        Subschema const* schema;
+
+        template <typename T>
+        bool operator()(Override<T> const& _ov) const
+        {
+            return _ov.hasPrefab;
+        }
+
+        bool operator()(Null const& _val) const
+        {
+            (void*)&_val; // Null contains nothing so it is not needed
+            return false;
+        }
+
+        bool operator()(Array const& _arr) const
+        {
+            return _arr.hasPrefabValue();
+        }
+
+        bool operator()(Object const& _obj) const
+        {
+            if (_obj.instanceOf.hasPrefab)
+                return true;
+            for (auto&& name_node : _obj)
+            {
+                if (std::get<1>(name_node)->hasPrefabValue())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool operator()(Union const& _un) const
+        {
+            return _un.wrapper->hasPrefabValue();
+        }
+    };
+
+    bool Node::hasPrefabValue() const
+    {
+        return mapbox::util::apply_visitor(HasPrefabValue{schema}, value);
+    }
+
     bool Node::matchValueSource(OverrideValueSource _source) const
     {
         if (_source == OverrideValueSource::OverrideOrPrefab and hasDefaultValue()
@@ -694,8 +761,10 @@ namespace Ent
         {
             if (SubschemaRef const* itemSchema = schema->singularItems.get())
             {
-                value.get<Array>().data.emplace_back(
+                auto& arrayRoot = value.get<Array>();
+                arrayRoot.data.emplace_back(
                     make_value<Node>(loadNode(nullptr, itemSchema->get(), json(), nullptr)));
+                arrayRoot.arraySize.set(arrayRoot.arraySize.get() + 1);
                 return value.get<Array>().data.back().get();
             }
         }
@@ -707,7 +776,10 @@ namespace Ent
         {
             if (schema->singularItems != nullptr)
             {
-                value.get<Array>().data.pop_back();
+                auto& arrayRoot = value.get<Array>();
+                ENTLIB_ASSERT(not arrayRoot.data.empty());
+                arrayRoot.data.pop_back();
+                arrayRoot.arraySize.set(arrayRoot.arraySize.get() - 1);
                 return;
             }
         }
@@ -718,7 +790,9 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            value.get<Array>().data.clear();
+            auto& arrayRoot = value.get<Array>();
+            arrayRoot.data.clear();
+            arrayRoot.arraySize.set(0);
         }
         else
         {
@@ -799,37 +873,62 @@ namespace Ent
 
     float Node::getDefaultFloat() const
     {
-        if (value.is<Override<float>>())
-        {
-            return value.get<Override<float>>().getDefaultValue();
-        }
-        if (value.is<Override<int64_t>>())
-        {
-            return static_cast<float>(value.get<Override<int64_t>>().getDefaultValue());
-        }
-        throw BadType();
+        return getRawFloat(OverrideValueLocation::Default).value();
     }
     int64_t Node::getDefaultInt() const
     {
-        if (value.is<Override<int64_t>>())
-        {
-            return value.get<Override<int64_t>>().getDefaultValue();
-        }
-        throw BadType();
+        return getRawInt(OverrideValueLocation::Default).value();
     }
     char const* Node::getDefaultString() const
     {
-        if (value.is<Override<String>>())
-        {
-            return value.get<Override<String>>().getDefaultValue().c_str();
-        }
-        throw BadType();
+        return getRawString(OverrideValueLocation::Default).value();
     }
     bool Node::getDefaultBool() const
     {
+        return getRawBool(OverrideValueLocation::Default).value();
+    }
+
+    tl::optional<float> Node::getRawFloat(OverrideValueLocation _location) const
+    {
+        if (value.is<Override<float>>())
+        {
+            return value.get<Override<float>>().getRaw(_location);
+        }
+        if (value.is<Override<int64_t>>())
+        {
+            auto intValue = value.get<Override<int64_t>>().getRaw(_location);
+            return intValue.has_value() ? tl::optional<float>{static_cast<float>(intValue.value())} :
+                                          tl::nullopt;
+        }
+        throw BadType();
+    }
+
+    tl::optional<int> Node::getRawInt(OverrideValueLocation _location) const
+    {
+        if (value.is<Override<int64_t>>())
+        {
+            return value.get<Override<int64_t>>().getRaw(_location);
+        }
+        throw BadType();
+    }
+
+    tl::optional<char const*> Node::getRawString(OverrideValueLocation _location) const
+    {
+        if (value.is<Override<String>>())
+        {
+            auto strValue = value.get<Override<String>>().getRaw(_location);
+            return strValue.has_value() ? tl::optional<char const*>{strValue.value().c_str()} :
+                                          tl::nullopt;
+        }
+        throw BadType();
+    }
+
+    tl::optional<bool> Node::getRawBool(OverrideValueLocation _location) const
+    {
         if (value.is<Override<bool>>())
         {
-            return value.get<Override<bool>>().getDefaultValue();
+            auto boolValue = value.get<Override<bool>>().getRaw(_location);
+            return boolValue.has_value() ? tl::optional<bool>{boolValue} : tl::nullopt;
         }
         throw BadType();
     }
@@ -1577,6 +1676,10 @@ struct MergeMapOverride
         auto&& meta = _nodeSchema.meta.get<Ent::Subschema::ArrayMeta>();
         bool const ordered = meta.ordered;
 
+        uint64_t defaultElementCount = 0;
+        uint64_t prefabAdditionalElementCount = 0;
+        uint64_t instanceAdditionalElementCount = 0;
+
         // Make a map key=>item of the instance array
         using KeyType = std::remove_reference_t<decltype(getKeyJson(json()))>;
         std::map<KeyType, json const*> instancePropMap;
@@ -1592,6 +1695,16 @@ struct MergeMapOverride
             for (Ent::Node const* subSuper : _super->getItems())
             {
                 json const* subDefault = _default == nullptr ? nullptr : &_default->at(index);
+                if (subDefault != nullptr)
+                {
+                    // item was added in default
+                    defaultElementCount++;
+                }
+                else
+                {
+                    // item was added in prefab
+                    prefabAdditionalElementCount++;
+                }
                 KeyType key = getKeyNode(subSuper);
                 if (instancePropMap.count(key)) // Overriden in instance
                 {
@@ -1616,6 +1729,7 @@ struct MergeMapOverride
         }
         else if (_default != nullptr)
         {
+            defaultElementCount = _default->size();
             size_t index = 0;
             // Load all Nodes from the _default (overriden or not)
             for (json const& subDefault : *_default)
@@ -1651,6 +1765,7 @@ struct MergeMapOverride
             {
                 result.emplace_back(
                     key, loadNode(entlib, _nodeSchema.singularItems->get(), item, nullptr));
+                instanceAdditionalElementCount++;
             }
         }
         if (ordered)
@@ -1664,6 +1779,16 @@ struct MergeMapOverride
         {
             arr.data.emplace_back(make_value<Ent::Node>(std::move(std::get<1>(key_node))));
         }
+        const auto prefabArraySize =
+            prefabAdditionalElementCount > 0 ?
+                tl::optional<uint64_t>{defaultElementCount + prefabAdditionalElementCount} :
+                tl::nullopt;
+        const auto instanceArraySize = instanceAdditionalElementCount > 0 ?
+                                           tl::optional<uint64_t>{
+                                               defaultElementCount + prefabAdditionalElementCount
+                                               + instanceAdditionalElementCount} :
+                                           tl::nullopt;
+        arr.arraySize = Override<uint64_t>{defaultElementCount, prefabArraySize, instanceArraySize};
         return arr;
     }
 };
@@ -1794,19 +1919,27 @@ static Ent::Node loadNode(
         size_t index = 0;
         if (_nodeSchema.singularItems)
         {
+            uint64_t defaultArraySize =
+                std::max(_nodeSchema.minItems, _default == nullptr ? 0 : _default->size());
             if (_data.is_null()) // No overrided
             {
                 if (_super != nullptr)
                 {
                     for (Ent::Node const* subSuper : _super->getItems())
                     {
-                        json const* defaultItem =
-                            _default == nullptr ? nullptr : &_default->at(index);
+                        json const* defaultItem = (_default != nullptr and index < _default->size()) ?
+                                                      &_default->at(index) :
+                                                      nullptr;
                         Ent::Node tmpNode = loadNode(
                             _entlib, _nodeSchema.singularItems->get(), json(), subSuper, defaultItem);
                         arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
+                    tl::optional<uint64_t> prefabArraySize =
+                        defaultArraySize == _super->size() ? tl::nullopt :
+                                                             tl::optional<uint64_t>{_super->size()};
+                    arr.arraySize =
+                        Ent::Override<uint64_t>(defaultArraySize, prefabArraySize, tl::nullopt);
                 }
                 else if (_default != nullptr)
                 {
@@ -1817,6 +1950,8 @@ static Ent::Node loadNode(
                         arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
+                    arr.arraySize =
+                        Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt);
                 }
                 else
                 {
@@ -1827,6 +1962,8 @@ static Ent::Node loadNode(
                         arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
+                    arr.arraySize =
+                        Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt);
                 }
             }
             else // If it is a singularItems and there is _data, we have to use the overridePolicy
@@ -1923,6 +2060,16 @@ static Ent::Node loadNode(
                         arr.data.emplace_back(make_value<Ent::Node>(std::move(tmpNode)));
                         ++index;
                     }
+                    tl::optional<uint64_t> prefabArraySize =
+                        (_super != nullptr and _super->size() != defaultArraySize) ?
+                            tl::optional<uint64_t>{_super->size()} :
+                            tl::nullopt;
+                    const uint64_t sizeInPrefab = prefabArraySize.value_or(defaultArraySize);
+                    tl::optional<uint64_t> overrideArraySize =
+                        _data.size() == sizeInPrefab ? tl::nullopt :
+                                                       tl::optional<uint64_t>{_data.size()};
+                    arr.arraySize = Ent::Override<uint64_t>(
+                        defaultArraySize, prefabArraySize, overrideArraySize);
                 }
                 break;
                 default:
@@ -1949,7 +2096,10 @@ static Ent::Node loadNode(
                 arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
                 ++index;
             }
+            uint64_t defaultArraySize = _nodeSchema.linearItems->size();
+            arr.arraySize = Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt);
         }
+        ENTLIB_ASSERT(arr.arraySize.get() == arr.data.size());
         result = Ent::Node(std::move(arr), &_nodeSchema);
     }
     break;
@@ -2268,7 +2418,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     Ent::Override<String> ovName = superName.makeOverridedInstanceOf(name);
 
     Ent::Override<String> superInstanceOf = superEntity->getInstanceOfValue();
-    Ent::Override<String> ovInstanceOf = superName.makeOverridedInstanceOf(instanceOf);
+    Ent::Override<String> ovInstanceOf = superInstanceOf.makeOverridedInstanceOf(instanceOf);
 
     tl::optional<Ent::ActivationLevel> maxActivationLevel;
     if (_entNode.count("MaxActivationLevel") != 0)
@@ -2968,9 +3118,21 @@ bool Ent::SubSceneComponent::hasOverride() const
     return embedded != nullptr && embedded->hasOverride();
 }
 
+Ent::Array::Array()
+    : arraySize(0llu, tl::nullopt, tl::nullopt)
+{
+}
+
 bool Ent::Array::hasOverride() const
 {
-    return std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasOverride));
+    return arraySize.isSet()
+           || std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasOverride));
+}
+
+bool Ent::Array::hasPrefabValue() const
+{
+    return arraySize.hasPrefab
+           || std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasPrefabValue));
 }
 
 /// \endcond

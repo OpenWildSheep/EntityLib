@@ -8,3 +8,13 @@ for %%f in (*.fbs) do (
 	%flatc% --cpp    %%~ff
 	%flatc% --python %%~ff
 )
+
+:: replace __init__.py with the list of all generated types
+(
+	for %%f in (WildRPC\*.py) do (
+		if not "%%~nf" == "__init__" (
+		if not "%%~nf" == "__all__" (
+			echo from . import %%~nf
+		))
+	)
+) > WildRPC\__all__.py

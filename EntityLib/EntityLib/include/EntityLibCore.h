@@ -41,7 +41,7 @@ namespace Ent
     }
 
     /// print the message into the output and also in the VisualStudio debugger if possible
-    void fprintfImpl(FILE* output, char const* message);
+    void fprintfImpl(FILE* file, char const* message);
 
     /// format and print the message into the output and also in the VisualStudio debugger if possible
     template <typename... Args>

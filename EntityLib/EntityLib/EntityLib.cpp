@@ -536,7 +536,7 @@ namespace Ent
             out.nodes.reserve(_obj.size());
             for (auto&& name_node : _obj)
             {
-                out.nodes.push_back({std::get<0>(name_node), std::get<1>(name_node)->detach()});
+                out.nodes.emplace_back(std::get<0>(name_node), std::get<1>(name_node)->detach());
             }
             std::sort(begin(out), end(out), CompObject());
             return Node(std::move(out), schema);
@@ -592,8 +592,8 @@ namespace Ent
             out.nodes.reserve(_obj.size());
             for (auto&& name_node : _obj)
             {
-                out.nodes.push_back(
-                    {std::get<0>(name_node), std::get<1>(name_node)->makeInstanceOf()});
+                out.nodes.emplace_back(
+                    std::get<0>(name_node), std::get<1>(name_node)->makeInstanceOf());
             }
             std::sort(begin(out), end(out), CompObject());
             return Node(std::move(out), schema);
@@ -605,7 +605,9 @@ namespace Ent
             ENTLIB_ASSERT(_un.schema != nullptr);
             detUnion.schema = _un.schema;
             if (_un.wrapper != nullptr)
+            {
                 detUnion.wrapper = _un.wrapper->makeInstanceOf();
+            }
             detUnion.metaData = _un.metaData;
             return Node(std::move(detUnion), schema);
         }
@@ -640,7 +642,9 @@ namespace Ent
         bool operator()(Object const& _obj) const
         {
             if (_obj.instanceOf.hasOverride)
+            {
                 return true;
+            }
             for (auto&& name_node : _obj)
             {
                 if (std::get<1>(name_node)->hasOverride())
@@ -686,7 +690,9 @@ namespace Ent
         bool operator()(Object const& _obj) const
         {
             if (_obj.instanceOf.hasPrefab)
+            {
                 return true;
+            }
             for (auto&& name_node : _obj)
             {
                 if (std::get<1>(name_node)->hasPrefabValue())
@@ -710,12 +716,9 @@ namespace Ent
 
     bool Node::matchValueSource(OverrideValueSource _source) const
     {
-        if (_source == OverrideValueSource::OverrideOrPrefab and hasDefaultValue()
-            or _source == OverrideValueSource::Override and not hasOverride())
-        {
-            return false;
-        }
-        return true;
+        return not(
+            _source == OverrideValueSource::OverrideOrPrefab and hasDefaultValue()
+            or _source == OverrideValueSource::Override and not hasOverride());
     }
 
     std::vector<char const*> Node::getFieldNames() const
@@ -999,7 +1002,9 @@ namespace Ent
     void Ent::Node::setInstanceOf(char const* _templateNodePath)
     {
         if (not value.is<Object>())
+        {
             throw BadType();
+        }
 
         auto relPath = getEntityLib()->getRelativePath(_templateNodePath).generic_u8string();
         json nodeData = loadJsonFile(getEntityLib()->getAbsolutePath(_templateNodePath));
@@ -1543,14 +1548,18 @@ namespace Ent
     Entity const* Scene::getEntity(size_t index) const
     {
         if (index >= objects.size())
+        {
             return nullptr;
+        }
         return objects.at(index).get();
     }
 
     Entity* Scene::getEntity(size_t index)
     {
         if (index >= objects.size())
+        {
             return nullptr;
+        }
         return objects.at(index).get();
     }
 
@@ -1817,7 +1826,7 @@ static Ent::Node loadNode(
         if (_nodeSchema.constValue.has_value())
         {
             // _nodeSchema is const and the value can't be overriden
-            std::string const def = _nodeSchema.constValue->get<std::string>();
+            auto const def = _nodeSchema.constValue->get<std::string>();
             // We don't want to "override" this value to avoid to write every oneOf
             if (_super != nullptr) // If there is a template, the value is not overriden
             {
@@ -1887,7 +1896,7 @@ static Ent::Node loadNode(
         auto InstanceOfIter = _data.find("InstanceOf");
         if (InstanceOfIter != _data.end())
         {
-            std::string nodeFileName = InstanceOfIter->get<std::string>();
+            auto nodeFileName = InstanceOfIter->get<std::string>();
             json nodeData = loadJsonFile(_entlib->getAbsolutePath(nodeFileName));
             templateNode = loadNode(_entlib, _nodeSchema, nodeData, _super, _default);
             _super = &templateNode;
@@ -1902,12 +1911,12 @@ static Ent::Node loadNode(
             std::string const& name = std::get<0>(name_sub);
             Ent::Node const* superProp = (_super != nullptr) ? _super->at(name.c_str()) : nullptr;
             json const* defaultProp =
-                (_default != nullptr) and _default->count(name) ? &_default->at(name) : nullptr;
+                (_default != nullptr) and _default->count(name) != 0 ? &_default->at(name) : nullptr;
             static json const emptyJson;
             json const& prop = _data.count(name) != 0 ? _data.at(name) : emptyJson;
             Ent::Node tmpNode =
                 loadNode(_entlib, *std::get<1>(name_sub), prop, superProp, defaultProp);
-            object.nodes.push_back({name.c_str(), std::move(tmpNode)});
+            object.nodes.emplace_back(name.c_str(), std::move(tmpNode));
         }
         std::sort(begin(object), end(object), Ent::CompObject());
         result = Ent::Node(std::move(object), &_nodeSchema);
@@ -2582,7 +2591,7 @@ struct UnsupportedFormat : std::exception
 
 struct FileSystemError : public std::runtime_error
 {
-    std::string makeWhatMessage(
+    static std::string makeWhatMessage(
         std::string const& msg, std::filesystem::path const& path1, std::error_code error)
     {
         return Ent::format(
@@ -2618,7 +2627,7 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
                                  "last_write_time(p): invalid argument: %ls (%s)",
                                  absPath.c_str(),
                                  error.message().c_str());
-        throw FileSystemError(msg.c_str(), absPath, error);
+        throw FileSystemError(msg, absPath, error);
     }
     auto iter = cache.find(relPath);
     if (iter == cache.end())
@@ -2694,7 +2703,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
             // ... and look if there is an override.
             for (json const& entNode : _entities)
             {
-                std::string const instEntName = entNode.at("Name").get<std::string>();
+                auto const instEntName = entNode.at("Name").get<std::string>();
                 if (superEnt->getName() == instEntName)
                 {
                     instEntNode = &entNode;
@@ -2713,7 +2722,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
     // Add new entities
     for (json const& entNode : _entities)
     {
-        std::string const name = entNode.at("Name").get<std::string>();
+        auto const name = entNode.at("Name").get<std::string>();
         if (entFromSuper.count(name) != 0)
         {
             continue;
@@ -2978,9 +2987,13 @@ std::filesystem::path Ent::EntityLib::getRelativePath(std::filesystem::path cons
             if (parrent.has_parent_path() and parrent.parent_path() != parrent)
             {
                 if (relPath.empty())
+                {
                     relPath = parrent.filename();
+                }
                 else
+                {
                     relPath = parrent.filename() / relPath;
+                }
                 parrent = parrent.parent_path();
             }
             else

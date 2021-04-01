@@ -20,8 +20,8 @@ namespace Ent
     {
     }
 
-    IllFormedSchema::IllFormedSchema(char const* _type)
-        : std::runtime_error(std::string("Ill-formed schema : ") + _type)
+    IllFormedSchema::IllFormedSchema(char const* _message)
+        : std::runtime_error(std::string("Ill-formed schema : ") + _message)
     {
     }
 
@@ -105,7 +105,7 @@ namespace Ent
 
         for (SubschemaRef const& ref : *oneOf)
         {
-            std::string acceptedType =
+            auto acceptedType =
                 AT(ref.get().properties, unionData.typeField)->constValue->get<std::string>();
             Subschema const& schema = AT(ref.get().properties, unionData.dataField).get();
             result.emplace(std::move(acceptedType), &schema);

@@ -1031,7 +1031,7 @@ try
     scene->getObjects().front()->addComponent("BeamGeneratorGD")->root.getFieldNames();
     auto fieldNameCount =
         scene->getObjects().front()->addComponent("HeightObj")->root.getFieldNames().size();
-    ENTLIB_ASSERT(fieldNameCount == 5);
+    ENTLIB_ASSERT(fieldNameCount == 6);
 
     auto ep1Iter = std::find_if(
         begin(scene->getObjects()),

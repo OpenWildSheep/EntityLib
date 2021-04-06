@@ -46,7 +46,7 @@ namespace Ent
         Ent::Subschema const* itemSchema = &colorSchema.singularItems->get();
         const auto& defaultColor = colorSchema.defaultValue;
         const auto getDefaultColorChannel = [&](size_t _channel) {
-            return Override<float>{defaultColor.at(_channel).get<float>()};
+            return Override<double>{defaultColor.at(_channel).get<double>()};
         };
         std::vector<value_ptr<Ent::Node>> nodes{
             make_value<Ent::Node>(getDefaultColorChannel(0), itemSchema),
@@ -346,15 +346,15 @@ namespace Ent
         throw BadType();
     }
 
-    float Node::getFloat() const
+    double Node::getFloat() const
     {
-        if (value.is<Override<float>>())
+        if (value.is<Override<double>>())
         {
-            return value.get<Override<float>>().get();
+            return value.get<Override<double>>().get();
         }
         if (value.is<Override<int64_t>>())
         {
-            return static_cast<float>(value.get<Override<int64_t>>().get());
+            return static_cast<double>(value.get<Override<int64_t>>().get());
         }
         throw BadType();
     }
@@ -397,9 +397,9 @@ namespace Ent
         return value;
     }
 
-    void Node::setFloat(float _val)
+    void Node::setFloat(double _val)
     {
-        value.get<Override<float>>().set(_val);
+        value.get<Override<double>>().set(_val);
     }
     void Node::setInt(int64_t _val)
     {
@@ -874,7 +874,7 @@ namespace Ent
         file << node.dump(4);
     }
 
-    float Node::getDefaultFloat() const
+    double Node::getDefaultFloat() const
     {
         return getRawFloat(OverrideValueLocation::Default).value();
     }
@@ -891,17 +891,18 @@ namespace Ent
         return getRawBool(OverrideValueLocation::Default).value();
     }
 
-    tl::optional<float> Node::getRawFloat(OverrideValueLocation _location) const
+    tl::optional<double> Node::getRawFloat(OverrideValueLocation _location) const
     {
-        if (value.is<Override<float>>())
+        if (value.is<Override<double>>())
         {
-            return value.get<Override<float>>().getRaw(_location);
+            return value.get<Override<double>>().getRaw(_location);
         }
         if (value.is<Override<int64_t>>())
         {
             auto intValue = value.get<Override<int64_t>>().getRaw(_location);
-            return intValue.has_value() ? tl::optional<float>{static_cast<float>(intValue.value())} :
-                                          tl::nullopt;
+            return intValue.has_value() ?
+                       tl::optional<double>{static_cast<double>(intValue.value())} :
+                       tl::nullopt;
         }
         throw BadType();
     }
@@ -1187,16 +1188,16 @@ namespace Ent
     {
         thumbnail.set(std::move(_thumbPath));
     }
-    std::array<float, 4> Entity::getColor() const
+    std::array<double, 4> Entity::getColor() const
     {
-        std::array<float, 4> col{};
+        std::array<double, 4> col{};
         for (size_t i = 0; i < 4; ++i)
         {
             col[i] = color.at(i)->getFloat();
         }
         return col;
     }
-    void Entity::setColor(std::array<float, 4> _color)
+    void Entity::setColor(std::array<double, 4> _color)
     {
         for (size_t i = 0; i < 4; ++i)
         {
@@ -1877,15 +1878,15 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::number:
     {
-        float const def = _default == nullptr ? float{} : _default->get<float>();
-        tl::optional<float> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
-                                               tl::optional<float>(_super->getFloat()) :
-                                               tl::optional<float>(tl::nullopt);
-        tl::optional<float> const val =
+        double const def = _default == nullptr ? double{} : _default->get<double>();
+        tl::optional<double> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
+                                                tl::optional<double>(_super->getFloat()) :
+                                                tl::optional<double>(tl::nullopt);
+        tl::optional<double> const val =
             _data.is_number_float() or _data.is_number_integer() or _data.is_number_unsigned() ?
-                tl::optional<float>(_data.get<float>()) :
-                tl::optional<float>(tl::nullopt);
-        result = Ent::Node(Ent::Override<float>(def, supVal, val), &_nodeSchema);
+                tl::optional<double>(_data.get<double>()) :
+                tl::optional<double>(tl::nullopt);
+        result = Ent::Node(Ent::Override<double>(def, supVal, val), &_nodeSchema);
     }
     break;
     case Ent::DataType::object:
@@ -1986,7 +1987,7 @@ static Ent::Node loadNode(
                 {
                     // It is a C++ map.
                     // In json it is an array of "2 item array" where the 1st item is the key
-                    // and can be string, float or integer
+                    // and can be string, double or integer
                     // meta.ordered means the items have to be sorted by the key
                     Ent::DataType keyType = _nodeSchema.singularItems->get().linearItems->at(0)->type;
 #pragma warning(push)
@@ -2000,7 +2001,7 @@ static Ent::Node loadNode(
                         break;
                     case Ent::DataType::number:
                         arr = mergeMapOverride(
-                            [](json const& item) { return item[0].get<float>(); },
+                            [](json const& item) { return item[0].get<double>(); },
                             [](Node const* tmplItem) { return tmplItem->at(0llu)->getFloat(); });
                         break;
                     case Ent::DataType::integer:
@@ -2016,7 +2017,7 @@ static Ent::Node loadNode(
                 case "set"_hash:
                 {
                     // It is a C++ set.
-                    // In json it is an array of primitive. string, float or integer or oneOf
+                    // In json it is an array of primitive. string, double or integer or oneOf
                     // meta.ordered means the items have to be sorted by the key
                     Ent::DataType const keyType = _nodeSchema.singularItems->get().type;
                     switch (keyType)
@@ -2039,7 +2040,7 @@ static Ent::Node loadNode(
                         break;
                     case Ent::DataType::number: // The key is the item itself
                         arr = mergeMapOverride(
-                            [](json const& item) { return item.get<float>(); },
+                            [](json const& item) { return item.get<double>(); },
                             [](Node const* tmplItem) { return tmplItem->getFloat(); });
                         break;
                     case Ent::DataType::integer: // The key is the item itself
@@ -2240,14 +2241,7 @@ json Ent::EntityLib::dumpNode(
     case Ent::DataType::string: data = _node.getString(); break;
     case Ent::DataType::boolean: data = _node.getBool(); break;
     case Ent::DataType::integer: data = _node.getInt(); break;
-    case Ent::DataType::number:
-    {
-        // Round to six digit after the dot
-        float const value = _node.getFloat();
-        auto const i = std::llround(double(value) * 1000000.);
-        data = double(i) / 1000000.0;
-        break;
-    }
+    case Ent::DataType::number: data = _node.getFloat(); break;
     case Ent::DataType::object:
     {
         data = json::object();

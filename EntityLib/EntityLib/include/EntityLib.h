@@ -164,7 +164,7 @@ namespace Ent
         using Value = mapbox::util::variant<
             Null,
             Override<String>,
-            Override<float>,
+            Override<double>,
             Override<int64_t>,
             Object,
             Array,
@@ -218,7 +218,7 @@ namespace Ent
         Node* setUnionType(char const* _type);
 
         // Value
-        float getFloat() const; ///< @pre number or integer. @brief Get the value as float
+        double getFloat() const; ///< @pre number or integer. @brief Get the value as double
         int64_t getInt() const; ///< @pre integer. @brief Get the value as int
         char const* getString() const; ///< @pre Ent::DataType == string. @brief Get the value as string
         bool getBool() const; ///< @pre type==Ent::DataType::boolean. @brief Get the value as bool
@@ -228,7 +228,7 @@ namespace Ent
         const Value& GetRawValue()
             const; ///< returns a reference to the raw Value (variant) stored at this node. Useful to write visitors.
 
-        void setFloat(float _val); ///< @pre type==Ent::DataType::number. @brief Set the float value
+        void setFloat(double _val); ///< @pre type==Ent::DataType::number. @brief Set the double value
         void setInt(int64_t _val); ///< @pre type==Ent::DataType::integer. @brief Set the int64_t value
         void setString(char const* _val); ///< @pre type==Ent::DataType::string. @brief Set the string value
         void setBool(bool _val); ///< @pre type==Ent::DataType::boolean. @brief Set the bool value
@@ -283,16 +283,16 @@ namespace Ent
         /// Save as a Node prebab
         void saveNode(std::filesystem::path const& path) const;
 
-        float getDefaultFloat() const; ///< @pre number or integer. @brief Get the default value as float
+        double getDefaultFloat() const; ///< @pre number or integer. @brief Get the default value as double
         int64_t getDefaultInt() const; ///< @pre integer. @brief Get the default value as int
         char const* getDefaultString() const; ///< @pre DataType == string. @brief Get the default value as string
         bool getDefaultBool() const; ///< @pre DataType == bool. @brief Get the default value as bool
 
         /// @pre number or integer.
-        /// @brief Get the raw Override value as float.
+        /// @brief Get the raw Override value as double.
         /// @param _location the desired Override value location.
-        /// @return the float value at the given Override value location.
-        tl::optional<float> getRawFloat(OverrideValueLocation _location) const;
+        /// @return the double value at the given Override value location.
+        tl::optional<double> getRawFloat(OverrideValueLocation _location) const;
         /// @pre integer.
         /// @brief Get the raw Override value as int.
         /// @param _location the desired Override value location.
@@ -497,8 +497,8 @@ namespace Ent
         void setMaxActivationLevel(ActivationLevel _level);
         char const* getThumbnail() const; ///< Get the Thumbnail path, or nullptr.
         void setThumbnail(Ent::String _thumbPath); ///< Set the Thumbnail path
-        std::array<float, 4> getColor() const; ///< Get the color of the is one, or nullptr.
-        void setColor(std::array<float, 4> _color); ///< Set the color RGBA 8bit
+        std::array<double, 4> getColor() const; ///< Get the color of the is one, or nullptr.
+        void setColor(std::array<double, 4> _color); ///< Set the color RGBA 8bit
 
         /// @brief Create a component of the given _type, with the default values
         /// @pre A component of this _type doesn't exist yet

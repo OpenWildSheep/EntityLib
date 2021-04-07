@@ -615,7 +615,7 @@ try
         Ent::Component const* trans = subObj.getComponent("TransformGD");
         ENTLIB_ASSERT(trans->root.at("Position")->at(0llu)->getFloat() == 0.0);
 
-        // Test instanciation of a template Node
+        // Test instanciation of a prefab Node
         Ent::Component const* stickToTerrain = ent.getComponent("StickToTerrain");
         ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
         ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isSet() == false);
@@ -841,7 +841,7 @@ try
         // Test makeInstanceOf
         EntityPtr instanceOf = entlib.makeInstanceOf("prefab.entity");
 
-        // Test instanciation of a template Node
+        // Test instanciation of a prefab Node
         Ent::Component* stickToTerrain = instanceOf->addComponent("StickToTerrain");
         ENTLIB_CHECK_EXCEPTION(
             stickToTerrain->root.setInstanceOf("C:/test.StickToTerrain.node"), std::runtime_error);
@@ -866,7 +866,7 @@ try
 
         ent->getComponent("TransformGD")->root.getFieldNames();
 
-        // Test instanciation of a template Node
+        // Test instanciation of a prefab Node
         Ent::Component const* stickToTerrain = ent->getComponent("StickToTerrain");
         ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
         ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
@@ -912,7 +912,7 @@ try
         ENTLIB_ASSERT(instanceOf.getComponent("NetworkNode") != nullptr);
         instanceOf.getComponent("TransformGD")->root.getFieldNames();
 
-        // Test instanciation of a template Node
+        // Test instanciation of a prefab Node
         Ent::Component* stickToTerrain = instanceOf.addComponent("StickToTerrain");
         stickToTerrain->root.setInstanceOf("test.StickToTerrain.node");
         stickToTerrain->root.at("NormalRatio")->setFloat(0.6);
@@ -996,7 +996,7 @@ try
         EntityPtr ovrdEntt = entlib.loadEntity("entity-subscene-override-saved.entity");
         auto ovrdSubs = ovrdEntt->getSubSceneComponent();
 
-        //Test that we properly still have access to the template subscene entities
+        //Test that we properly still have access to the prefab subscene entities
         ENTLIB_ASSERT(not empty(ovrdSubs->embedded->getObjects()));
     }
 

@@ -1000,17 +1000,17 @@ namespace Ent
         mapbox::util::apply_visitor(ComputeMem{prof}, value);
     }
 
-    void Ent::Node::setInstanceOf(char const* _templateNodePath)
+    void Ent::Node::setInstanceOf(char const* _prefabNodePath)
     {
         if (not value.is<Object>())
         {
             throw BadType();
         }
 
-        auto relPath = getEntityLib()->getRelativePath(_templateNodePath).generic_u8string();
-        json nodeData = loadJsonFile(getEntityLib()->getAbsolutePath(_templateNodePath));
-        Node templateNode = loadNode(getEntityLib(), *getSchema(), nodeData, nullptr);
-        (*this) = templateNode.makeInstanceOf();
+        auto relPath = getEntityLib()->getRelativePath(_prefabNodePath).generic_u8string();
+        json nodeData = loadJsonFile(getEntityLib()->getAbsolutePath(_prefabNodePath));
+        Node prefabNode = loadNode(getEntityLib(), *getSchema(), nodeData, nullptr);
+        (*this) = prefabNode.makeInstanceOf();
         value.get<Object>().instanceOf.set(relPath);
     }
 
@@ -1337,10 +1337,10 @@ namespace Ent
         parentScene = _scene;
     }
 
-    void Entity::setInstanceOf(std::string _template)
+    void Entity::setInstanceOf(std::string _prefab)
     {
-        std::replace(begin(_template), end(_template), '\\', '/');
-        char const* normTmpl = _template.c_str();
+        std::replace(begin(_prefab), end(_prefab), '\\', '/');
+        char const* normTmpl = _prefab.c_str();
         std::shared_ptr<Ent::Entity const> templ = entlib->loadEntityReadOnly(normTmpl, nullptr);
         components.clear();
         for (auto const& type_comp : templ->getComponents())
@@ -1674,11 +1674,11 @@ struct MergeMapOverride
     json const* _default;
     Ent::EntityLib const* entlib;
 
-    // Merge the instance array/map/set with the template array/map/set and return the resulting Ent::Array
+    // Merge the instance array/map/set with the prefab array/map/set and return the resulting Ent::Array
     template <typename GetKeyJson, typename GetKeyNode>
     Ent::Array operator()(
         GetKeyJson&& getKeyJson, ///< Function to get the key in the json (instance)
-        GetKeyNode&& getKeyNode ///< Function to get the key in the Node (template)
+        GetKeyNode&& getKeyNode ///< Function to get the key in the Node (prefab)
     )
     {
         using namespace Ent;
@@ -1725,7 +1725,7 @@ struct MergeMapOverride
                         subSuper,
                         subDefault);
                     result.emplace_back(key, std::move(tmpNode));
-                    instancePropMap.erase(key); // Later we need to know which item are NOT in the template
+                    instancePropMap.erase(key); // Later we need to know which item are NOT in the prefab
                 }
                 else // Not overriden
                 {
@@ -1754,7 +1754,7 @@ struct MergeMapOverride
                         nullptr,
                         &subDefault);
                     result.emplace_back(key, std::move(tmpNode));
-                    instancePropMap.erase(key); // Later we need to know which item are NOT in the template
+                    instancePropMap.erase(key); // Later we need to know which item are NOT in the prefab
                 }
                 else // Not overriden
                 {
@@ -1766,7 +1766,7 @@ struct MergeMapOverride
                 ++index;
             }
         }
-        // Load items from instance which are not in template neither in default (they are new)
+        // Load items from instance which are not in prefab neither in default (they are new)
         // Use _data (and not instancePropMap) to keep the order of items inside _data
         for (auto const& item : _data)
         {
@@ -1829,11 +1829,11 @@ static Ent::Node loadNode(
             // _nodeSchema is const and the value can't be overriden
             auto const def = _nodeSchema.constValue->get<std::string>();
             // We don't want to "override" this value to avoid to write every oneOf
-            if (_super != nullptr) // If there is a template, the value is not overriden
+            if (_super != nullptr) // If there is a prefab, the value is not overriden
             {
                 result = Ent::Node(Ent::Override<String>("", def, tl::nullopt), &_nodeSchema);
             }
-            else // If there is no template, it is overriden to be sure the node "hasOverride" and be saved
+            else // If there is no prefab, it is overriden to be sure the node "hasOverride" and be saved
             {
                 result = Ent::Node(Ent::Override<String>("", tl::nullopt, def), &_nodeSchema);
             }
@@ -1893,14 +1893,14 @@ static Ent::Node loadNode(
     {
         Ent::Object object;
         // Read the InstanceOf field
-        Ent::Node templateNode;
+        Ent::Node prefabNode;
         auto InstanceOfIter = _data.find("InstanceOf");
         if (InstanceOfIter != _data.end())
         {
             auto nodeFileName = InstanceOfIter->get<std::string>();
             json nodeData = loadJsonFile(_entlib->getAbsolutePath(nodeFileName));
-            templateNode = loadNode(_entlib, _nodeSchema, nodeData, _super, _default);
-            _super = &templateNode;
+            prefabNode = loadNode(_entlib, _nodeSchema, nodeData, _super, _default);
+            _super = &prefabNode;
             Ent::Override<String> tmplPath("", tl::nullopt, InstanceOfIter->get<std::string>());
             object.instanceOf = std::move(tmplPath);
         }
@@ -2154,7 +2154,7 @@ static Ent::Node loadNode(
         }
         else // No uniontype
         {
-            if (_super != nullptr) // If no uniontype, use the one the template
+            if (_super != nullptr) // If no uniontype, use the one the prefab
             {
                 dataType = _super->getUnionType();
             }
@@ -2848,7 +2848,7 @@ static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& 
                 componentsNode.emplace_back(std::move(compNode));
             }
         }
-        else if (not comp->hasTemplate or comp->root.hasOverride())
+        else if (not comp->hasPrefab or comp->root.hasOverride())
         {
             json compNode;
             compNode.emplace("Version", comp->version);

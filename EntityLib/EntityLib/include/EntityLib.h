@@ -261,16 +261,16 @@ namespace Ent
         Node makeInstanceOf() const;
         /// \endcond
 
-        /// Reset the Node to be an instance of the given \b _template
+        /// Reset the Node to be an instance of the given \b _prefabNodePath
         ///
         /// @warning All sub-nodes into \b _node will be invalidated
-        /// @param _templateNodePath path to the template Node (relative to RawData)
-        void setInstanceOf(char const* _templateNodePath);
+        /// @param _prefabNodePath path to the prefab Node (relative to RawData)
+        void setInstanceOf(char const* _prefabNodePath);
         void resetInstanceOf();
 
         bool hasDefaultValue() const; ///< false if something was set in instance or prefab
 
-        bool isDefault() const; ///< true if the value was set in a template or in the instance
+        bool isDefault() const; ///< true if the value was set in a prefab or in the instance
 
         /// Dump this Node as a json value
         nlohmann::json toJson(
@@ -335,11 +335,11 @@ namespace Ent
         size_t version{}; ///< @todo remove?
         size_t index{}; ///< Useful to keep the componants order in the json file. To make diffs easier.
         DeleteCheck deleteCheck;
-        bool hasTemplate{}; ///< True if if override an other component (not just default)
+        bool hasPrefab{}; ///< True if if override an other component (not just default)
 
         Component(
             nlohmann::json _rawData,
-            bool _hasTemplate,
+            bool _hasPrefab,
             std::string _type,
             Node _root,
             size_t _version,
@@ -349,7 +349,7 @@ namespace Ent
             , root(std::move(_root))
             , version(_version)
             , index(_index)
-            , hasTemplate(_hasTemplate)
+            , hasPrefab(_hasPrefab)
         {
         }
 
@@ -534,7 +534,7 @@ namespace Ent
 
         /// @brief Make the Entity independent from its prefab (instanceOf)
         ///
-        /// All properties overrided in _entity OR in the prefeb become overrided in the Entity.
+        /// All properties overrided in _entity OR in the prefab become overrided in the Entity.
         /// The prefab is no more referenced.
         /// The properties keep the sames values
         std::unique_ptr<Entity> detachEntityFromPrefab() const;
@@ -584,10 +584,10 @@ namespace Ent
             maxActivationLevel.computeMemory(prof);
         }
 
-        /// Reset the Entity to be an instance of the given \b _template
+        /// Reset the Entity to be an instance of the given \b _prefab
         ///
         /// @warning All Nodes into the Entity will be invalidated
-        void setInstanceOf(std::string _template);
+        void setInstanceOf(std::string _prefab);
 
     private:
         void updateSubSceneOwner();

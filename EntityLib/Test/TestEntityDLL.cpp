@@ -1040,6 +1040,7 @@ try
     ENTLIB_ASSERT(ep1Iter != end(scene->getObjects()));
     ENTLIB_ASSERT((*ep1Iter)->getSubSceneComponent() != nullptr);
 
+    entlib.rawdataPath = current_path();
     scene->addEntity(entlib.makeInstanceOf((current_path() / "prefab.entity").generic_u8string()));
 
     entlib.saveScene(*scene, current_path() / "SceneMainWorld.test.scene");

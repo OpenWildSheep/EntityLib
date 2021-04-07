@@ -43937,7 +43937,7 @@
                     },
                     {
                         "Components": [],
-                        "InstanceOf": "E:/code/WildShared/EntityLib/Test/prefab.entity",
+                        "InstanceOf": "prefab.entity",
                         "Name": "PlayerSpawner_"
                     }
                 ],
@@ -43949,5 +43949,5 @@
         }
     ],
     "Name": "SceneMainWorld.test",
-    "Thumbnail": "E:/code/WildShared/EntityLib/Test/SceneMainWorld.test.scene.wthumb"
+    "Thumbnail": "SceneMainWorld.test.scene.wthumb"
 }

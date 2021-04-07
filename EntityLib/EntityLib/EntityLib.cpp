@@ -1337,10 +1337,10 @@ namespace Ent
         parentScene = _scene;
     }
 
-    void Entity::setInstanceOf(std::string _prefab)
+    void Entity::setInstanceOf(std::string const& _prefab)
     {
-        std::replace(begin(_prefab), end(_prefab), '\\', '/');
-        char const* normTmpl = _prefab.c_str();
+        std::string const prefab = entlib->getRelativePath(_prefab).generic_u8string();
+        char const* normTmpl = prefab.c_str();
         std::shared_ptr<Ent::Entity const> templ = entlib->loadEntityReadOnly(normTmpl, nullptr);
         components.clear();
         for (auto const& type_comp : templ->getComponents())

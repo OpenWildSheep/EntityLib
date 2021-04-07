@@ -587,7 +587,7 @@ namespace Ent
         /// Reset the Entity to be an instance of the given \b _prefab
         ///
         /// @warning All Nodes into the Entity will be invalidated
-        void setInstanceOf(std::string _prefab);
+        void setInstanceOf(std::string const& _prefab);
 
     private:
         void updateSubSceneOwner();

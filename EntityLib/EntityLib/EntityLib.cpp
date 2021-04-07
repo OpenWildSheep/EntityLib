@@ -1913,7 +1913,7 @@ static Ent::Node loadNode(
             Ent::Node const* superProp = (_super != nullptr) ? _super->at(name.c_str()) : nullptr;
             json const* defaultProp =
                 (_default != nullptr) and _default->count(name) != 0 ? &_default->at(name) : nullptr;
-            static json const emptyJson;
+            json const emptyJson;
             json const& prop = _data.count(name) != 0 ? _data.at(name) : emptyJson;
             Ent::Node tmpNode =
                 loadNode(_entlib, *std::get<1>(name_sub), prop, superProp, defaultProp);
@@ -2100,7 +2100,7 @@ static Ent::Node loadNode(
                 json const* subDefault = (_default != nullptr and _default->size() > index) ?
                                              &_default->at(index) :
                                              nullptr;
-                static json const emptyJson;
+                json const emptyJson;
                 json const& prop = _data.size() > index ? _data.at(index) : emptyJson;
                 Ent::Node tmpNode = loadNode(_entlib, *sub, prop, subSuper, subDefault);
                 arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));

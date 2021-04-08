@@ -33,7 +33,6 @@ class GVoxelPile(object):
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
-            x = self._tab.Indirect(x)
             from WBIN.GVoxelData import GVoxelData
             obj = GVoxelData()
             obj.Init(self._tab.Bytes, x)
@@ -100,12 +99,9 @@ class GVoxelPileT(object):
     # GVoxelPileT
     def Pack(self, builder):
         if self.voxels is not None:
-            voxelslist = []
-            for i in range(len(self.voxels)):
-                voxelslist.append(self.voxels[i].Pack(builder))
             GVoxelPileStartVoxelsVector(builder, len(self.voxels))
             for i in reversed(range(len(self.voxels))):
-                builder.PrependUOffsetTRelative(voxelslist[i])
+                self.voxels[i].Pack(builder)
             voxels = builder.EndVector(len(self.voxels))
         GVoxelPileStart(builder)
         GVoxelPileAddNbEmptyVoxels(builder, self.nbEmptyVoxels)

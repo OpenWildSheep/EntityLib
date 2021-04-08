@@ -9,27 +9,17 @@ np = import_numpy()
 class GVoxelData(object):
     __slots__ = ['_tab']
 
-    @classmethod
-    def GetRootAsGVoxelData(cls, buf, offset):
-        n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
-        x = GVoxelData()
-        x.Init(buf, n + offset)
-        return x
-
     # GVoxelData
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # GVoxelData
-    def Data(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
-        return 0
+    def Data(self): return self._tab.Get(flatbuffers.number_types.Int32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0))
 
-def GVoxelDataStart(builder): builder.StartObject(1)
-def GVoxelDataAddData(builder, data): builder.PrependInt32Slot(0, data, 0)
-def GVoxelDataEnd(builder): return builder.EndObject()
+def CreateGVoxelData(builder, data):
+    builder.Prep(4, 4)
+    builder.PrependInt32(data)
+    return builder.Offset()
 
 
 class GVoxelDataT(object):
@@ -58,7 +48,4 @@ class GVoxelDataT(object):
 
     # GVoxelDataT
     def Pack(self, builder):
-        GVoxelDataStart(builder)
-        GVoxelDataAddData(builder, self.data)
-        gVoxelData = GVoxelDataEnd(builder)
-        return gVoxelData
+        return CreateGVoxelData(builder, self.data)

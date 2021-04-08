@@ -11,8 +11,6 @@
 namespace WBIN {
 
 struct GVoxelData;
-struct GVoxelDataBuilder;
-struct GVoxelDataT;
 
 struct GVoxelPile;
 struct GVoxelPileBuilder;
@@ -26,69 +24,30 @@ struct GVoxelVolume;
 struct GVoxelVolumeBuilder;
 struct GVoxelVolumeT;
 
-struct GVoxelDataT : public flatbuffers::NativeTable {
-  typedef GVoxelData TableType;
-  int32_t data;
-  GVoxelDataT()
-      : data(0) {
-  }
-};
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) GVoxelData FLATBUFFERS_FINAL_CLASS {
+ private:
+  int32_t data_;
 
-struct GVoxelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef GVoxelDataT NativeTableType;
-  typedef GVoxelDataBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_DATA = 4
-  };
+ public:
+  GVoxelData() {
+    memset(static_cast<void *>(this), 0, sizeof(GVoxelData));
+  }
+  GVoxelData(int32_t _data)
+      : data_(flatbuffers::EndianScalar(_data)) {
+  }
   int32_t data() const {
-    return GetField<int32_t>(VT_DATA, 0);
+    return flatbuffers::EndianScalar(data_);
   }
-  bool mutate_data(int32_t _data) {
-    return SetField<int32_t>(VT_DATA, _data, 0);
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<int32_t>(verifier, VT_DATA) &&
-           verifier.EndTable();
-  }
-  GVoxelDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(GVoxelDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<GVoxelData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const GVoxelDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct GVoxelDataBuilder {
-  typedef GVoxelData Table;
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_data(int32_t data) {
-    fbb_.AddElement<int32_t>(GVoxelData::VT_DATA, data, 0);
-  }
-  explicit GVoxelDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  GVoxelDataBuilder &operator=(const GVoxelDataBuilder &);
-  flatbuffers::Offset<GVoxelData> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<GVoxelData>(end);
-    return o;
+  void mutate_data(int32_t _data) {
+    flatbuffers::WriteScalar(&data_, _data);
   }
 };
-
-inline flatbuffers::Offset<GVoxelData> CreateGVoxelData(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    int32_t data = 0) {
-  GVoxelDataBuilder builder_(_fbb);
-  builder_.add_data(data);
-  return builder_.Finish();
-}
-
-flatbuffers::Offset<GVoxelData> CreateGVoxelData(flatbuffers::FlatBufferBuilder &_fbb, const GVoxelDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+FLATBUFFERS_STRUCT_END(GVoxelData, 4);
 
 struct GVoxelPileT : public flatbuffers::NativeTable {
   typedef GVoxelPile TableType;
   int32_t nbEmptyVoxels;
-  std::vector<std::unique_ptr<WBIN::GVoxelDataT>> voxels;
+  std::vector<WBIN::GVoxelData> voxels;
   GVoxelPileT()
       : nbEmptyVoxels(0) {
   }
@@ -107,18 +66,17 @@ struct GVoxelPile FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool mutate_nbEmptyVoxels(int32_t _nbEmptyVoxels) {
     return SetField<int32_t>(VT_NBEMPTYVOXELS, _nbEmptyVoxels, 0);
   }
-  const flatbuffers::Vector<flatbuffers::Offset<WBIN::GVoxelData>> *voxels() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<WBIN::GVoxelData>> *>(VT_VOXELS);
+  const flatbuffers::Vector<const WBIN::GVoxelData *> *voxels() const {
+    return GetPointer<const flatbuffers::Vector<const WBIN::GVoxelData *> *>(VT_VOXELS);
   }
-  flatbuffers::Vector<flatbuffers::Offset<WBIN::GVoxelData>> *mutable_voxels() {
-    return GetPointer<flatbuffers::Vector<flatbuffers::Offset<WBIN::GVoxelData>> *>(VT_VOXELS);
+  flatbuffers::Vector<const WBIN::GVoxelData *> *mutable_voxels() {
+    return GetPointer<flatbuffers::Vector<const WBIN::GVoxelData *> *>(VT_VOXELS);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_NBEMPTYVOXELS) &&
            VerifyOffset(verifier, VT_VOXELS) &&
            verifier.VerifyVector(voxels()) &&
-           verifier.VerifyVectorOfTables(voxels()) &&
            verifier.EndTable();
   }
   GVoxelPileT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -133,7 +91,7 @@ struct GVoxelPileBuilder {
   void add_nbEmptyVoxels(int32_t nbEmptyVoxels) {
     fbb_.AddElement<int32_t>(GVoxelPile::VT_NBEMPTYVOXELS, nbEmptyVoxels, 0);
   }
-  void add_voxels(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<WBIN::GVoxelData>>> voxels) {
+  void add_voxels(flatbuffers::Offset<flatbuffers::Vector<const WBIN::GVoxelData *>> voxels) {
     fbb_.AddOffset(GVoxelPile::VT_VOXELS, voxels);
   }
   explicit GVoxelPileBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -151,7 +109,7 @@ struct GVoxelPileBuilder {
 inline flatbuffers::Offset<GVoxelPile> CreateGVoxelPile(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t nbEmptyVoxels = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<WBIN::GVoxelData>>> voxels = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<const WBIN::GVoxelData *>> voxels = 0) {
   GVoxelPileBuilder builder_(_fbb);
   builder_.add_voxels(voxels);
   builder_.add_nbEmptyVoxels(nbEmptyVoxels);
@@ -161,8 +119,8 @@ inline flatbuffers::Offset<GVoxelPile> CreateGVoxelPile(
 inline flatbuffers::Offset<GVoxelPile> CreateGVoxelPileDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t nbEmptyVoxels = 0,
-    const std::vector<flatbuffers::Offset<WBIN::GVoxelData>> *voxels = nullptr) {
-  auto voxels__ = voxels ? _fbb.CreateVector<flatbuffers::Offset<WBIN::GVoxelData>>(*voxels) : 0;
+    const std::vector<WBIN::GVoxelData> *voxels = nullptr) {
+  auto voxels__ = voxels ? _fbb.CreateVectorOfStructs<WBIN::GVoxelData>(*voxels) : 0;
   return WBIN::CreateGVoxelPile(
       _fbb,
       nbEmptyVoxels,
@@ -309,32 +267,6 @@ inline flatbuffers::Offset<GVoxelVolume> CreateGVoxelVolumeDirect(
 
 flatbuffers::Offset<GVoxelVolume> CreateGVoxelVolume(flatbuffers::FlatBufferBuilder &_fbb, const GVoxelVolumeT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
-inline GVoxelDataT *GVoxelData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::GVoxelDataT> _o = std::unique_ptr<WBIN::GVoxelDataT>(new GVoxelDataT());
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void GVoxelData::UnPackTo(GVoxelDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = data(); _o->data = _e; }
-}
-
-inline flatbuffers::Offset<GVoxelData> GVoxelData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const GVoxelDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateGVoxelData(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<GVoxelData> CreateGVoxelData(flatbuffers::FlatBufferBuilder &_fbb, const GVoxelDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const GVoxelDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _data = _o->data;
-  return WBIN::CreateGVoxelData(
-      _fbb,
-      _data);
-}
-
 inline GVoxelPileT *GVoxelPile::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   std::unique_ptr<WBIN::GVoxelPileT> _o = std::unique_ptr<WBIN::GVoxelPileT>(new GVoxelPileT());
   UnPackTo(_o.get(), _resolver);
@@ -345,7 +277,7 @@ inline void GVoxelPile::UnPackTo(GVoxelPileT *_o, const flatbuffers::resolver_fu
   (void)_o;
   (void)_resolver;
   { auto _e = nbEmptyVoxels(); _o->nbEmptyVoxels = _e; }
-  { auto _e = voxels(); if (_e) { _o->voxels.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->voxels[_i] = std::unique_ptr<WBIN::GVoxelDataT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = voxels(); if (_e) { _o->voxels.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->voxels[_i] = *_e->Get(_i); } } }
 }
 
 inline flatbuffers::Offset<GVoxelPile> GVoxelPile::Pack(flatbuffers::FlatBufferBuilder &_fbb, const GVoxelPileT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -357,7 +289,7 @@ inline flatbuffers::Offset<GVoxelPile> CreateGVoxelPile(flatbuffers::FlatBufferB
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const GVoxelPileT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _nbEmptyVoxels = _o->nbEmptyVoxels;
-  auto _voxels = _o->voxels.size() ? _fbb.CreateVector<flatbuffers::Offset<WBIN::GVoxelData>> (_o->voxels.size(), [](size_t i, _VectorArgs *__va) { return CreateGVoxelData(*__va->__fbb, __va->__o->voxels[i].get(), __va->__rehasher); }, &_va ) : 0;
+  auto _voxels = _o->voxels.size() ? _fbb.CreateVectorOfStructs(_o->voxels) : 0;
   return WBIN::CreateGVoxelPile(
       _fbb,
       _nbEmptyVoxels,

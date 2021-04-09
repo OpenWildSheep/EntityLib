@@ -18,6 +18,8 @@ struct Float4;
 
 struct Bool3;
 
+struct Matrix44;
+
 struct AABB;
 
 struct FloatMask;
@@ -231,6 +233,23 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(1) Bool3 FLATBUFFERS_FINAL_CLASS {
   }
 };
 FLATBUFFERS_STRUCT_END(Bool3, 3);
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Matrix44 FLATBUFFERS_FINAL_CLASS {
+ private:
+  float values_[16];
+
+ public:
+  Matrix44() {
+    memset(static_cast<void *>(this), 0, sizeof(Matrix44));
+  }
+  const flatbuffers::Array<float, 16> *values() const {
+    return reinterpret_cast<const flatbuffers::Array<float, 16> *>(values_);
+  }
+  flatbuffers::Array<float, 16> *mutable_values() {
+    return reinterpret_cast<flatbuffers::Array<float, 16> *>(values_);
+  }
+};
+FLATBUFFERS_STRUCT_END(Matrix44, 64);
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) AABB FLATBUFFERS_FINAL_CLASS {
  private:

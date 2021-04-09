@@ -36,6 +36,11 @@ struct Bool3
 	z:bool;
 }
 
+struct Matrix44
+{
+	values:[float:16];
+}
+
 // Bounding Volume
 struct AABB
 {

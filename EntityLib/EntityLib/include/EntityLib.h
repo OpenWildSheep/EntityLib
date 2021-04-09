@@ -94,9 +94,15 @@ namespace Ent
     /// Content of a Node which has type Ent::DataType::array
     struct Array
     {
+        Array();
+
         std::vector<value_ptr<Node>> data; ///< List of items of the array
 
+        Override<uint64_t> arraySize; ///< Size of the array, to keep track on array size changes
+
         bool hasOverride() const;
+
+        bool hasPrefabValue() const;
     };
 
     enum class ActivationLevel
@@ -133,9 +139,9 @@ namespace Ent
     /// @brief The possible source of an Override value
     enum class OverrideValueSource
     {
-        /// Value is set in this Override. Write the "InstaneOf" field.
+        /// Value is set in this Override. Write the "InstanceOf" field.
         Override,
-        /// Value is set in the Prefab or in this Override. Don't write the "InstaneOf" field.
+        /// Value is set in the Prefab or in this Override. Don't write the "InstanceOf" field.
         OverrideOrPrefab,
         /// Value can be any source: Override, Prefab or the default value. Don't write the "InstaneOf" field.
         Any,
@@ -158,7 +164,7 @@ namespace Ent
         using Value = mapbox::util::variant<
             Null,
             Override<String>,
-            Override<float>,
+            Override<double>,
             Override<int64_t>,
             Object,
             Array,
@@ -189,6 +195,11 @@ namespace Ent
         Node* at(size_t _index); ///< @pre type==Ent::DataType::array. @brief Get the item at _index
         Node const* at(size_t _index) const; ///< @pre type==Ent::DataType::array. @brief Get the item at _index
         size_t size() const; ///< @pre type==Ent::DataType::array. @brief Get array size
+        /// @pre type==Ent::DataType::array.
+        /// @brief Get the raw Override value of the array size.
+        /// @param _location the desired Override value location.
+        /// @return the array size at the given Override value location.
+        tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         std::vector<Node const*> getItems() const; ///< @pre type==Ent::DataType::array. @brief Get all items
         Node* push(); ///< @pre type==Ent::DataType::array. @brief Add a new item at the end of array
         void pop(); ///< @pre type==Ent::DataType::array. @brief Remove an item at the end of array
@@ -207,7 +218,7 @@ namespace Ent
         Node* setUnionType(char const* _type);
 
         // Value
-        float getFloat() const; ///< @pre number or integer. @brief Get the value as float
+        double getFloat() const; ///< @pre number or integer. @brief Get the value as double
         int64_t getInt() const; ///< @pre integer. @brief Get the value as int
         char const* getString() const; ///< @pre Ent::DataType == string. @brief Get the value as string
         bool getBool() const; ///< @pre type==Ent::DataType::boolean. @brief Get the value as bool
@@ -217,7 +228,7 @@ namespace Ent
         const Value& GetRawValue()
             const; ///< returns a reference to the raw Value (variant) stored at this node. Useful to write visitors.
 
-        void setFloat(float _val); ///< @pre type==Ent::DataType::number. @brief Set the float value
+        void setFloat(double _val); ///< @pre type==Ent::DataType::number. @brief Set the double value
         void setInt(int64_t _val); ///< @pre type==Ent::DataType::integer. @brief Set the int64_t value
         void setString(char const* _val); ///< @pre type==Ent::DataType::string. @brief Set the string value
         void setBool(bool _val); ///< @pre type==Ent::DataType::boolean. @brief Set the bool value
@@ -236,6 +247,9 @@ namespace Ent
         /// If there is no override, there is no need to save it.
         bool hasOverride() const;
 
+        /// @brief Recursively check if value is set in a prefab (overriden or not by this Node)
+        bool hasPrefabValue() const;
+
         /// @brief Check recursively if this node content match the given value source.
         bool matchValueSource(OverrideValueSource _source) const;
 
@@ -247,16 +261,16 @@ namespace Ent
         Node makeInstanceOf() const;
         /// \endcond
 
-        /// Reset the Node to be an instance of the given \b _template
+        /// Reset the Node to be an instance of the given \b _prefabNodePath
         ///
         /// @warning All sub-nodes into \b _node will be invalidated
-        /// @param _templateNodePath path to the template Node (relative to RawData)
-        void setInstanceOf(char const* _templateNodePath);
+        /// @param _prefabNodePath path to the prefab Node (relative to RawData)
+        void setInstanceOf(char const* _prefabNodePath);
         void resetInstanceOf();
 
         bool hasDefaultValue() const; ///< false if something was set in instance or prefab
 
-        bool isDefault() const; ///< true if the value was set in a template or in the instance
+        bool isDefault() const; ///< true if the value was set in a prefab or in the instance
 
         /// Dump this Node as a json value
         nlohmann::json toJson(
@@ -269,10 +283,31 @@ namespace Ent
         /// Save as a Node prebab
         void saveNode(std::filesystem::path const& path) const;
 
-        float getDefaultFloat() const; ///< @pre number or integer. @brief Get the default value as float
+        double getDefaultFloat() const; ///< @pre number or integer. @brief Get the default value as double
         int64_t getDefaultInt() const; ///< @pre integer. @brief Get the default value as int
         char const* getDefaultString() const; ///< @pre DataType == string. @brief Get the default value as string
         bool getDefaultBool() const; ///< @pre DataType == bool. @brief Get the default value as bool
+
+        /// @pre number or integer.
+        /// @brief Get the raw Override value as double.
+        /// @param _location the desired Override value location.
+        /// @return the double value at the given Override value location.
+        tl::optional<double> getRawFloat(OverrideValueLocation _location) const;
+        /// @pre integer.
+        /// @brief Get the raw Override value as int.
+        /// @param _location the desired Override value location.
+        /// @return the int value at the given Override value location.
+        tl::optional<int> getRawInt(OverrideValueLocation _location) const;
+        /// @pre DataType == string.
+        /// @brief Get the raw Override value as string.
+        /// @param _location the desired Override value location.
+        /// @return the string value at the given Override value location.
+        tl::optional<char const*> getRawString(OverrideValueLocation _location) const;
+        /// @pre DataType == bool.
+        /// @brief Get the raw Override value as bool.
+        /// @param _location the desired Override value location.
+        /// @return the bool value at the given Override value location.
+        tl::optional<bool> getRawBool(OverrideValueLocation _location) const;
 
         /// Get the absolute full link of the Subschema type, or nullptr if the is no
         /// Example : "./RuntimeComponents.json#/definitions/VoxelSimulationGD"
@@ -300,11 +335,11 @@ namespace Ent
         size_t version{}; ///< @todo remove?
         size_t index{}; ///< Useful to keep the componants order in the json file. To make diffs easier.
         DeleteCheck deleteCheck;
-        bool hasTemplate{}; ///< True if if override an other component (not just default)
+        bool hasPrefab{}; ///< True if if override an other component (not just default)
 
         Component(
             nlohmann::json _rawData,
-            bool _hasTemplate,
+            bool _hasPrefab,
             std::string _type,
             Node _root,
             size_t _version,
@@ -314,7 +349,7 @@ namespace Ent
             , root(std::move(_root))
             , version(_version)
             , index(_index)
-            , hasTemplate(_hasTemplate)
+            , hasPrefab(_hasPrefab)
         {
         }
 
@@ -462,8 +497,8 @@ namespace Ent
         void setMaxActivationLevel(ActivationLevel _level);
         char const* getThumbnail() const; ///< Get the Thumbnail path, or nullptr.
         void setThumbnail(Ent::String _thumbPath); ///< Set the Thumbnail path
-        std::array<float, 4> getColor() const; ///< Get the color of the is one, or nullptr.
-        void setColor(std::array<float, 4> _color); ///< Set the color RGBA 8bit
+        std::array<double, 4> getColor() const; ///< Get the color of the is one, or nullptr.
+        void setColor(std::array<double, 4> _color); ///< Set the color RGBA 8bit
 
         /// @brief Create a component of the given _type, with the default values
         /// @pre A component of this _type doesn't exist yet
@@ -499,7 +534,7 @@ namespace Ent
 
         /// @brief Make the Entity independent from its prefab (instanceOf)
         ///
-        /// All properties overrided in _entity OR in the prefeb become overrided in the Entity.
+        /// All properties overrided in _entity OR in the prefab become overrided in the Entity.
         /// The prefab is no more referenced.
         /// The properties keep the sames values
         std::unique_ptr<Entity> detachEntityFromPrefab() const;
@@ -549,10 +584,10 @@ namespace Ent
             maxActivationLevel.computeMemory(prof);
         }
 
-        /// Reset the Entity to be an instance of the given \b _template
+        /// Reset the Entity to be an instance of the given \b _prefab
         ///
         /// @warning All Nodes into the Entity will be invalidated
-        void setInstanceOf(std::string _template);
+        void setInstanceOf(std::string const& _prefab);
 
     private:
         void updateSubSceneOwner();

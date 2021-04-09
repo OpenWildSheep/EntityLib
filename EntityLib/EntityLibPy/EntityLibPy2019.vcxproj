@@ -133,6 +133,8 @@
     <LinkIncremental>true</LinkIncremental>
     <TargetExt>.pyd</TargetExt>
     <IncludePath>..\..\..\ExternalTools\pybind11\include;..\..\..\ExternalTools\Python37\include;..\EntityLib\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <EnableMicrosoftCodeAnalysis>false</EnableMicrosoftCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-3.7|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -147,16 +149,22 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetExt>.pyd</TargetExt>
     <IncludePath>..\..\..\ExternalTools\pybind11\include;..\..\..\ExternalTools\Python37\include;..\EntityLib\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <EnableMicrosoftCodeAnalysis>false</EnableMicrosoftCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-3.8|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetExt>.pyd</TargetExt>
     <IncludePath>..\..\..\ExternalTools\pybind11\include;..\..\..\ExternalTools\Python38\include;..\EntityLib\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <EnableMicrosoftCodeAnalysis>false</EnableMicrosoftCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-2.7|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetExt>.pyd</TargetExt>
     <IncludePath>..\..\..\ExternalTools\pybind11\include;..\..\..\ExternalTools\Python27\include;..\EntityLib\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <EnableMicrosoftCodeAnalysis>false</EnableMicrosoftCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

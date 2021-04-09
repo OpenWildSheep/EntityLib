@@ -379,6 +379,7 @@ void Ent::SchemaLoader::readSchema(
     {
         Schema* globalSchema;
         std::vector<Ent::SubschemaRef*>& stack;
+        std::string tab;
 
         FillSchema(Schema* _globalSchema, std::vector<Ent::SubschemaRef*>& _stack)
             : globalSchema(_globalSchema)
@@ -388,7 +389,6 @@ void Ent::SchemaLoader::readSchema(
 
         char const* getTab()
         {
-            static std::string tab;
             tab.assign(stack.size() * 4, ' ');
             return tab.c_str();
         };

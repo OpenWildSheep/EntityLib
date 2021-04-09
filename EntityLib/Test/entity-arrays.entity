@@ -1,0 +1,16 @@
+{
+    "Components": [
+        {
+            "Type": "TestArrays",
+            "Data": {
+                "OverridedPrefabValue": [
+                    1, 2, 3, 4
+                ],
+                "PrefabValue": [
+                    1, 2, 3, 4
+                ]
+            }
+        }
+    ],
+    "Name": "TestArrays"
+}

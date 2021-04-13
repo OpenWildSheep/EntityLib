@@ -10,12 +10,16 @@ class UInt3(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsUInt3(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = UInt3()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsUInt3(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # UInt3
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -41,8 +45,23 @@ class UInt3(object):
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
-def UInt3Start(builder): builder.StartObject(3)
-def UInt3AddX(builder, x): builder.PrependUint32Slot(0, x, 0)
-def UInt3AddY(builder, y): builder.PrependUint32Slot(1, y, 0)
-def UInt3AddZ(builder, z): builder.PrependUint32Slot(2, z, 0)
-def UInt3End(builder): return builder.EndObject()
+def Start(builder): builder.StartObject(3)
+def UInt3Start(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddX(builder, x): builder.PrependUint32Slot(0, x, 0)
+def UInt3AddX(builder, x):
+    """This method is deprecated. Please switch to AddX."""
+    return AddX(builder, x)
+def AddY(builder, y): builder.PrependUint32Slot(1, y, 0)
+def UInt3AddY(builder, y):
+    """This method is deprecated. Please switch to AddY."""
+    return AddY(builder, y)
+def AddZ(builder, z): builder.PrependUint32Slot(2, z, 0)
+def UInt3AddZ(builder, z):
+    """This method is deprecated. Please switch to AddZ."""
+    return AddZ(builder, z)
+def End(builder): return builder.EndObject()
+def UInt3End(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)

@@ -10,12 +10,16 @@ class String(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsString(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = String()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsString(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # String
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -27,6 +31,15 @@ class String(object):
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def StringStart(builder): builder.StartObject(1)
-def StringAddValue(builder, value): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(value), 0)
-def StringEnd(builder): return builder.EndObject()
+def Start(builder): builder.StartObject(1)
+def StringStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddValue(builder, value): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(value), 0)
+def StringAddValue(builder, value):
+    """This method is deprecated. Please switch to AddValue."""
+    return AddValue(builder, value)
+def End(builder): return builder.EndObject()
+def StringEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)

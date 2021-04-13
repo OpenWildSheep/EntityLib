@@ -53,7 +53,6 @@ struct UInt3Builder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  UInt3Builder &operator=(const UInt3Builder &);
   flatbuffers::Offset<UInt3> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<UInt3>(end);

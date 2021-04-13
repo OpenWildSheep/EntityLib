@@ -10,12 +10,16 @@ class Position(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsPosition(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Position()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsPosition(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # Position
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -45,8 +49,23 @@ class Position(object):
             return obj
         return None
 
-def PositionStart(builder): builder.StartObject(3)
-def PositionAddWorldCellX(builder, worldCellX): builder.PrependUint32Slot(0, worldCellX, 0)
-def PositionAddWorldCellY(builder, worldCellY): builder.PrependUint32Slot(1, worldCellY, 0)
-def PositionAddLocalPosition(builder, localPosition): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(localPosition), 0)
-def PositionEnd(builder): return builder.EndObject()
+def Start(builder): builder.StartObject(3)
+def PositionStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddWorldCellX(builder, worldCellX): builder.PrependUint32Slot(0, worldCellX, 0)
+def PositionAddWorldCellX(builder, worldCellX):
+    """This method is deprecated. Please switch to AddWorldCellX."""
+    return AddWorldCellX(builder, worldCellX)
+def AddWorldCellY(builder, worldCellY): builder.PrependUint32Slot(1, worldCellY, 0)
+def PositionAddWorldCellY(builder, worldCellY):
+    """This method is deprecated. Please switch to AddWorldCellY."""
+    return AddWorldCellY(builder, worldCellY)
+def AddLocalPosition(builder, localPosition): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(localPosition), 0)
+def PositionAddLocalPosition(builder, localPosition):
+    """This method is deprecated. Please switch to AddLocalPosition."""
+    return AddLocalPosition(builder, localPosition)
+def End(builder): return builder.EndObject()
+def PositionEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)

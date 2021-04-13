@@ -51,7 +51,6 @@ struct CameraBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  CameraBuilder &operator=(const CameraBuilder &);
   flatbuffers::Offset<Camera> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Camera>(end);

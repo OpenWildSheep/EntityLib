@@ -198,12 +198,15 @@ namespace Ent
         SubschemaRef& operator=(SubschemaRef&&) = default;
         /// @endcond
 
+        using DefaultValue = nlohmann::json;
+
         /// @cond PRIVATE
         /// Make this private
         struct Ref
         {
             Schema* schema; //!< Schema of the referenced object
             std::string ref; //!< Name of the referenced object
+            DefaultValue defaultValue; ///< Additional default values (beside a "$ref")
         };
 
         mapbox::util::variant<Null, Ref, Subschema> subSchemaOrRef;
@@ -217,6 +220,19 @@ namespace Ent
         Subschema& operator*(); //!< Get the referenced subschema
         Subschema const* operator->() const; //!< Get the referenced subschema
         Subschema* operator->(); //!< Get the referenced subschema
+
+        /// Get the default values beside a "$ref", or nullptr
+        DefaultValue const* getRefDefaultValues() const
+        {
+            if (subSchemaOrRef.is<Ref>() && !subSchemaOrRef.get<Ref>().defaultValue.is_null())
+            {
+                return &subSchemaOrRef.get<Ref>().defaultValue;
+            }
+            else
+            {
+                return nullptr;
+            }
+        }
     };
 
     class EntityLib;

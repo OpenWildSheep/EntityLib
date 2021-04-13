@@ -78,6 +78,16 @@ void Ent::SchemaLoader::parseSchema(
             node = &((*node).at(token));
         }
         parseSchemaNoRef(fileName, *refRoot, *node, vis, depth);
+
+        // default values beside a "$ref" are "special".
+        // They are not attached to the pointed class, but to the $ref itself.
+        // So let's call setRefDefaultValue
+        if (_data.count("default") != 0u)
+        {
+            json const& def = _data.at("default");
+            vis.setRefDefaultValue(def);
+        }
+
         vis.closeRef();
     }
     else
@@ -474,6 +484,11 @@ void Ent::SchemaLoader::readSchema(
         {
             CHECK_WHOLE_STACK;
             stack.back()->get().defaultValue = std::move(val);
+        }
+        void setRefDefaultValue(Subschema::DefaultValue val) override
+        {
+            CHECK_WHOLE_STACK;
+            stack.back()->subSchemaOrRef.get<SubschemaRef::Ref>().defaultValue = std::move(val);
         }
         void setLinearItem(size_t size) override
         {

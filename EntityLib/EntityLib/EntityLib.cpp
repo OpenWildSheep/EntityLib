@@ -1909,14 +1909,17 @@ static Ent::Node loadNode(
         object.nodes.reserve(_nodeSchema.properties.size());
         for (auto&& name_sub : _nodeSchema.properties)
         {
+            Ent::SubschemaRef const& propSchemaRef = std::get<1>(name_sub);
             std::string const& name = std::get<0>(name_sub);
             Ent::Node const* superProp = (_super != nullptr) ? _super->at(name.c_str()) : nullptr;
-            json const* defaultProp =
+            json const* refDefault = propSchemaRef.getRefDefaultValues();
+            json const* schemaDefault =
                 (_default != nullptr) and _default->count(name) != 0 ? &_default->at(name) : nullptr;
+            // The less local default value has the priority
+            json const* defaultProp = schemaDefault != nullptr ? schemaDefault : refDefault;
             json const emptyJson;
             json const& prop = _data.count(name) != 0 ? _data.at(name) : emptyJson;
-            Ent::Node tmpNode =
-                loadNode(_entlib, *std::get<1>(name_sub), prop, superProp, defaultProp);
+            Ent::Node tmpNode = loadNode(_entlib, *propSchemaRef, prop, superProp, defaultProp);
             object.nodes.emplace_back(name.c_str(), std::move(tmpNode));
         }
         std::sort(begin(object), end(object), Ent::CompObject());

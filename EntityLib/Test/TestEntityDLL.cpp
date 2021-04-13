@@ -309,6 +309,26 @@ try
         Ent::Component const* physicsGD = ent->getComponent("PhysicsGD");
         Ent::Node const* axisRestriction = physicsGD->root.at("AxisRestriction");
         ENTLIB_ASSERT(axisRestriction->size() == 3);
+
+        // Test default values related to a property of type class/struct.
+        Ent::Component const* characterController = ent->getComponent("CharacterControllerGD");
+        Ent::Node const* slideData = characterController->root.at("SlideData");
+        Ent::Node const* adherenceMin = slideData->at("adherenceMinDependingOnTheSlope");
+        Ent::Node const* in = adherenceMin->at("in");
+        ENTLIB_ASSERT(in->size() == 2);
+        ENTLIB_ASSERT(in->at(0llu)->getFloat() == -1.);
+        ENTLIB_ASSERT(in->at(1llu)->getFloat() == 0.5);
+
+        // Ensure that default values of property are not poluted by default values of pointer class
+        Ent::Component const* testDefaultValues = ent->getComponent("TestDefaultValues");
+        ENTLIB_ASSERT(testDefaultValues != nullptr);
+        Ent::Node const* propertyWithDefault = testDefaultValues->root.at("propertyWithDefault");
+        Ent::Node const* propertyWithDefault2 = propertyWithDefault->at("propertyWithDefault2");
+        ENTLIB_ASSERT(propertyWithDefault2->at("A")->getInt() == 3);
+        ENTLIB_ASSERT(propertyWithDefault2->at("B")->getInt() == 0);
+        Ent::Node const* propertyWithDefault3 = propertyWithDefault->at("propertyWithDefault3");
+        ENTLIB_ASSERT(propertyWithDefault3->at("A")->getInt() == 3);
+        ENTLIB_ASSERT(propertyWithDefault3->at("B")->getInt() == 0);
     };
 
     {

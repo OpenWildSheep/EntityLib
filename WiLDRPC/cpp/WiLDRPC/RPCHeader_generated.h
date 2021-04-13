@@ -6,8 +6,6 @@
 
 #include "flatbuffers/flatbuffers.h"
 
-#include "Result_generated.h"
-
 namespace WildRPC {
 
 struct RPCHeader;

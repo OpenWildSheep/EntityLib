@@ -20,11 +20,9 @@ struct StampCloudT;
 
 struct StampT : public flatbuffers::NativeTable {
   typedef Stamp TableType;
-  std::unique_ptr<WBIN::AABB> shape;
-  std::unique_ptr<WBIN::Matrix44> matrix;
-  std::vector<int32_t> tags;
-  StampT() {
-  }
+  std::unique_ptr<WBIN::AABB> shape{};
+  std::unique_ptr<WBIN::Matrix44> matrix{};
+  std::vector<int32_t> tags{};
 };
 
 struct Stamp FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -83,7 +81,6 @@ struct StampBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  StampBuilder &operator=(const StampBuilder &);
   flatbuffers::Offset<Stamp> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Stamp>(end);
@@ -120,10 +117,8 @@ flatbuffers::Offset<Stamp> CreateStamp(flatbuffers::FlatBufferBuilder &_fbb, con
 
 struct StampCloudT : public flatbuffers::NativeTable {
   typedef StampCloud TableType;
-  std::vector<std::unique_ptr<WBIN::StampT>> stamps;
-  std::unique_ptr<WBIN::AABB> boundingBox;
-  StampCloudT() {
-  }
+  std::vector<std::unique_ptr<WBIN::StampT>> stamps{};
+  std::unique_ptr<WBIN::AABB> boundingBox{};
 };
 
 struct StampCloud FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -172,7 +167,6 @@ struct StampCloudBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  StampCloudBuilder &operator=(const StampCloudBuilder &);
   flatbuffers::Offset<StampCloud> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<StampCloud>(end);
@@ -204,7 +198,7 @@ inline flatbuffers::Offset<StampCloud> CreateStampCloudDirect(
 flatbuffers::Offset<StampCloud> CreateStampCloud(flatbuffers::FlatBufferBuilder &_fbb, const StampCloudT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 inline StampT *Stamp::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::StampT> _o = std::unique_ptr<WBIN::StampT>(new StampT());
+  auto _o = std::unique_ptr<StampT>(new StampT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
@@ -236,7 +230,7 @@ inline flatbuffers::Offset<Stamp> CreateStamp(flatbuffers::FlatBufferBuilder &_f
 }
 
 inline StampCloudT *StampCloud::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::StampCloudT> _o = std::unique_ptr<WBIN::StampCloudT>(new StampCloudT());
+  auto _o = std::unique_ptr<StampCloudT>(new StampCloudT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }

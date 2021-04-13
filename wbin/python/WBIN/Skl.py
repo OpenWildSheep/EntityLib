@@ -10,12 +10,16 @@ class Skl(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsSkl(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Skl()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsSkl(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # Skl
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -56,12 +60,26 @@ class Skl(object):
             return obj
         return None
 
-def SklStart(builder): builder.StartObject(2)
-def SklAddSkeleton(builder, skeleton): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(skeleton), 0)
-def SklStartSkeletonVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def SklAddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
-def SklEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(2)
+def SklStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddSkeleton(builder, skeleton): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(skeleton), 0)
+def SklAddSkeleton(builder, skeleton):
+    """This method is deprecated. Please switch to AddSkeleton."""
+    return AddSkeleton(builder, skeleton)
+def StartSkeletonVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def SklStartSkeletonVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartSkeletonVector(builder, numElems)
+def AddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
+def SklAddSourceFileInf(builder, sourceFileInf):
+    """This method is deprecated. Please switch to AddSourceFileInf."""
+    return AddSourceFileInf(builder, sourceFileInf)
+def End(builder): return builder.EndObject()
+def SklEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.BoneData
 import WBIN.SourceFileInf
 try:
@@ -109,16 +127,16 @@ class SklT(object):
             skeletonlist = []
             for i in range(len(self.skeleton)):
                 skeletonlist.append(self.skeleton[i].Pack(builder))
-            SklStartSkeletonVector(builder, len(self.skeleton))
+            StartSkeletonVector(builder, len(self.skeleton))
             for i in reversed(range(len(self.skeleton))):
                 builder.PrependUOffsetTRelative(skeletonlist[i])
-            skeleton = builder.EndVector(len(self.skeleton))
+            skeleton = builder.EndVector()
         if self.sourceFileInf is not None:
             sourceFileInf = self.sourceFileInf.Pack(builder)
-        SklStart(builder)
+        Start(builder)
         if self.skeleton is not None:
-            SklAddSkeleton(builder, skeleton)
+            AddSkeleton(builder, skeleton)
         if self.sourceFileInf is not None:
-            SklAddSourceFileInf(builder, sourceFileInf)
-        skl = SklEnd(builder)
+            AddSourceFileInf(builder, sourceFileInf)
+        skl = End(builder)
         return skl

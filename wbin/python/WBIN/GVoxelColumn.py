@@ -10,12 +10,16 @@ class GVoxelColumn(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsGVoxelColumn(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = GVoxelColumn()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsGVoxelColumn(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # GVoxelColumn
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -45,11 +49,22 @@ class GVoxelColumn(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def GVoxelColumnStart(builder): builder.StartObject(1)
-def GVoxelColumnAddPiles(builder, piles): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(piles), 0)
-def GVoxelColumnStartPilesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def GVoxelColumnEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(1)
+def GVoxelColumnStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddPiles(builder, piles): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(piles), 0)
+def GVoxelColumnAddPiles(builder, piles):
+    """This method is deprecated. Please switch to AddPiles."""
+    return AddPiles(builder, piles)
+def StartPilesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def GVoxelColumnStartPilesVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartPilesVector(builder, numElems)
+def End(builder): return builder.EndObject()
+def GVoxelColumnEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.GVoxelPile
 try:
     from typing import List
@@ -93,12 +108,12 @@ class GVoxelColumnT(object):
             pileslist = []
             for i in range(len(self.piles)):
                 pileslist.append(self.piles[i].Pack(builder))
-            GVoxelColumnStartPilesVector(builder, len(self.piles))
+            StartPilesVector(builder, len(self.piles))
             for i in reversed(range(len(self.piles))):
                 builder.PrependUOffsetTRelative(pileslist[i])
-            piles = builder.EndVector(len(self.piles))
-        GVoxelColumnStart(builder)
+            piles = builder.EndVector()
+        Start(builder)
         if self.piles is not None:
-            GVoxelColumnAddPiles(builder, piles)
-        gVoxelColumn = GVoxelColumnEnd(builder)
+            AddPiles(builder, piles)
+        gVoxelColumn = End(builder)
         return gVoxelColumn

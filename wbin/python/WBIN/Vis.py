@@ -10,12 +10,16 @@ class Vis(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsVis(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Vis()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsVis(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # Vis
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -163,21 +167,62 @@ class Vis(object):
             return obj
         return None
 
-def VisStart(builder): builder.StartObject(9)
-def VisAddAabb(builder, aabb): builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(aabb), 0)
-def VisAddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
-def VisAddNormal(builder, normal): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(normal), 0)
-def VisAddColor(builder, color): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(color), 0)
-def VisAddTexcoord(builder, texcoord): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(texcoord), 0)
-def VisStartTexcoordVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def VisAddMaterialBank(builder, materialBank): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(materialBank), 0)
-def VisStartMaterialBankVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def VisAddMaterials(builder, materials): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(materials), 0)
-def VisStartMaterialsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def VisAddSkin(builder, skin): builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(skin), 0)
-def VisAddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
-def VisEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(9)
+def VisStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddAabb(builder, aabb): builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(aabb), 0)
+def VisAddAabb(builder, aabb):
+    """This method is deprecated. Please switch to AddAabb."""
+    return AddAabb(builder, aabb)
+def AddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
+def VisAddPosition(builder, position):
+    """This method is deprecated. Please switch to AddPosition."""
+    return AddPosition(builder, position)
+def AddNormal(builder, normal): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(normal), 0)
+def VisAddNormal(builder, normal):
+    """This method is deprecated. Please switch to AddNormal."""
+    return AddNormal(builder, normal)
+def AddColor(builder, color): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(color), 0)
+def VisAddColor(builder, color):
+    """This method is deprecated. Please switch to AddColor."""
+    return AddColor(builder, color)
+def AddTexcoord(builder, texcoord): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(texcoord), 0)
+def VisAddTexcoord(builder, texcoord):
+    """This method is deprecated. Please switch to AddTexcoord."""
+    return AddTexcoord(builder, texcoord)
+def StartTexcoordVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def VisStartTexcoordVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartTexcoordVector(builder, numElems)
+def AddMaterialBank(builder, materialBank): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(materialBank), 0)
+def VisAddMaterialBank(builder, materialBank):
+    """This method is deprecated. Please switch to AddMaterialBank."""
+    return AddMaterialBank(builder, materialBank)
+def StartMaterialBankVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def VisStartMaterialBankVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartMaterialBankVector(builder, numElems)
+def AddMaterials(builder, materials): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(materials), 0)
+def VisAddMaterials(builder, materials):
+    """This method is deprecated. Please switch to AddMaterials."""
+    return AddMaterials(builder, materials)
+def StartMaterialsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def VisStartMaterialsVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartMaterialsVector(builder, numElems)
+def AddSkin(builder, skin): builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(skin), 0)
+def VisAddSkin(builder, skin):
+    """This method is deprecated. Please switch to AddSkin."""
+    return AddSkin(builder, skin)
+def AddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
+def VisAddSourceFileInf(builder, sourceFileInf):
+    """This method is deprecated. Please switch to AddSourceFileInf."""
+    return AddSourceFileInf(builder, sourceFileInf)
+def End(builder): return builder.EndObject()
+def VisEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.AABB
 import WBIN.Float3Channel
 import WBIN.Float4Channel
@@ -267,49 +312,49 @@ class VisT(object):
             texcoordlist = []
             for i in range(len(self.texcoord)):
                 texcoordlist.append(self.texcoord[i].Pack(builder))
-            VisStartTexcoordVector(builder, len(self.texcoord))
+            StartTexcoordVector(builder, len(self.texcoord))
             for i in reversed(range(len(self.texcoord))):
                 builder.PrependUOffsetTRelative(texcoordlist[i])
-            texcoord = builder.EndVector(len(self.texcoord))
+            texcoord = builder.EndVector()
         if self.materialBank is not None:
             materialBanklist = []
             for i in range(len(self.materialBank)):
                 materialBanklist.append(self.materialBank[i].Pack(builder))
-            VisStartMaterialBankVector(builder, len(self.materialBank))
+            StartMaterialBankVector(builder, len(self.materialBank))
             for i in reversed(range(len(self.materialBank))):
                 builder.PrependUOffsetTRelative(materialBanklist[i])
-            materialBank = builder.EndVector(len(self.materialBank))
+            materialBank = builder.EndVector()
         if self.materials is not None:
             if np is not None and type(self.materials) is np.ndarray:
                 materials = builder.CreateNumpyVector(self.materials)
             else:
-                VisStartMaterialsVector(builder, len(self.materials))
+                StartMaterialsVector(builder, len(self.materials))
                 for i in reversed(range(len(self.materials))):
                     builder.PrependUint32(self.materials[i])
-                materials = builder.EndVector(len(self.materials))
+                materials = builder.EndVector()
         if self.skin is not None:
             skin = self.skin.Pack(builder)
         if self.sourceFileInf is not None:
             sourceFileInf = self.sourceFileInf.Pack(builder)
-        VisStart(builder)
+        Start(builder)
         if self.aabb is not None:
             aabb = self.aabb.Pack(builder)
-            VisAddAabb(builder, aabb)
+            AddAabb(builder, aabb)
         if self.position is not None:
-            VisAddPosition(builder, position)
+            AddPosition(builder, position)
         if self.normal is not None:
-            VisAddNormal(builder, normal)
+            AddNormal(builder, normal)
         if self.color is not None:
-            VisAddColor(builder, color)
+            AddColor(builder, color)
         if self.texcoord is not None:
-            VisAddTexcoord(builder, texcoord)
+            AddTexcoord(builder, texcoord)
         if self.materialBank is not None:
-            VisAddMaterialBank(builder, materialBank)
+            AddMaterialBank(builder, materialBank)
         if self.materials is not None:
-            VisAddMaterials(builder, materials)
+            AddMaterials(builder, materials)
         if self.skin is not None:
-            VisAddSkin(builder, skin)
+            AddSkin(builder, skin)
         if self.sourceFileInf is not None:
-            VisAddSourceFileInf(builder, sourceFileInf)
-        vis = VisEnd(builder)
+            AddSourceFileInf(builder, sourceFileInf)
+        vis = End(builder)
         return vis

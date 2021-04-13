@@ -10,12 +10,16 @@ class FloatMask(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsFloatMask(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = FloatMask()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsFloatMask(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # FloatMask
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -71,13 +75,30 @@ class FloatMask(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
-def FloatMaskStart(builder): builder.StartObject(2)
-def FloatMaskAddTriangles(builder, triangles): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(triangles), 0)
-def FloatMaskStartTrianglesVector(builder, numElems): return builder.StartVector(12, numElems, 4)
-def FloatMaskAddVertexData(builder, vertexData): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(vertexData), 0)
-def FloatMaskStartVertexDataVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def FloatMaskEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(2)
+def FloatMaskStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddTriangles(builder, triangles): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(triangles), 0)
+def FloatMaskAddTriangles(builder, triangles):
+    """This method is deprecated. Please switch to AddTriangles."""
+    return AddTriangles(builder, triangles)
+def StartTrianglesVector(builder, numElems): return builder.StartVector(12, numElems, 4)
+def FloatMaskStartTrianglesVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartTrianglesVector(builder, numElems)
+def AddVertexData(builder, vertexData): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(vertexData), 0)
+def FloatMaskAddVertexData(builder, vertexData):
+    """This method is deprecated. Please switch to AddVertexData."""
+    return AddVertexData(builder, vertexData)
+def StartVertexDataVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def FloatMaskStartVertexDataVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartVertexDataVector(builder, numElems)
+def End(builder): return builder.EndObject()
+def FloatMaskEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.UInt3
 try:
     from typing import List
@@ -126,22 +147,22 @@ class FloatMaskT(object):
     # FloatMaskT
     def Pack(self, builder):
         if self.triangles is not None:
-            FloatMaskStartTrianglesVector(builder, len(self.triangles))
+            StartTrianglesVector(builder, len(self.triangles))
             for i in reversed(range(len(self.triangles))):
                 self.triangles[i].Pack(builder)
-            triangles = builder.EndVector(len(self.triangles))
+            triangles = builder.EndVector()
         if self.vertexData is not None:
             if np is not None and type(self.vertexData) is np.ndarray:
                 vertexData = builder.CreateNumpyVector(self.vertexData)
             else:
-                FloatMaskStartVertexDataVector(builder, len(self.vertexData))
+                StartVertexDataVector(builder, len(self.vertexData))
                 for i in reversed(range(len(self.vertexData))):
                     builder.PrependFloat32(self.vertexData[i])
-                vertexData = builder.EndVector(len(self.vertexData))
-        FloatMaskStart(builder)
+                vertexData = builder.EndVector()
+        Start(builder)
         if self.triangles is not None:
-            FloatMaskAddTriangles(builder, triangles)
+            AddTriangles(builder, triangles)
         if self.vertexData is not None:
-            FloatMaskAddVertexData(builder, vertexData)
-        floatMask = FloatMaskEnd(builder)
+            AddVertexData(builder, vertexData)
+        floatMask = End(builder)
         return floatMask

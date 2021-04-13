@@ -20,18 +20,16 @@ struct VisT;
 
 struct MaterialRefT : public flatbuffers::NativeTable {
   typedef MaterialRef TableType;
-  std::string matName;
-  std::string matLuaSource;
-  std::string matLuaTemplate;
-  std::string diffuseTexPath;
-  std::string normalTexPath;
-  std::string roughTexMapPath;
-  std::string cavityTexMapPath;
-  std::string metalTexMapPath;
-  std::string translucencyTexPath;
-  std::string opacityTexPath;
-  MaterialRefT() {
-  }
+  std::string matName{};
+  std::string matLuaSource{};
+  std::string matLuaTemplate{};
+  std::string diffuseTexPath{};
+  std::string normalTexPath{};
+  std::string roughTexMapPath{};
+  std::string cavityTexMapPath{};
+  std::string metalTexMapPath{};
+  std::string translucencyTexPath{};
+  std::string opacityTexPath{};
 };
 
 struct MaterialRef FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -176,7 +174,6 @@ struct MaterialRefBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  MaterialRefBuilder &operator=(const MaterialRefBuilder &);
   flatbuffers::Offset<MaterialRef> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<MaterialRef>(end);
@@ -250,17 +247,15 @@ flatbuffers::Offset<MaterialRef> CreateMaterialRef(flatbuffers::FlatBufferBuilde
 
 struct VisT : public flatbuffers::NativeTable {
   typedef Vis TableType;
-  std::unique_ptr<WBIN::AABB> aabb;
-  std::unique_ptr<WBIN::Float3ChannelT> position;
-  std::unique_ptr<WBIN::Float3ChannelT> normal;
-  std::unique_ptr<WBIN::Float4ChannelT> color;
-  std::vector<std::unique_ptr<WBIN::Float3ChannelT>> texcoord;
-  std::vector<std::unique_ptr<WBIN::MaterialRefT>> materialBank;
-  std::vector<uint32_t> materials;
-  std::unique_ptr<WBIN::SkinT> skin;
-  std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf;
-  VisT() {
-  }
+  std::unique_ptr<WBIN::AABB> aabb{};
+  std::unique_ptr<WBIN::Float3ChannelT> position{};
+  std::unique_ptr<WBIN::Float3ChannelT> normal{};
+  std::unique_ptr<WBIN::Float4ChannelT> color{};
+  std::vector<std::unique_ptr<WBIN::Float3ChannelT>> texcoord{};
+  std::vector<std::unique_ptr<WBIN::MaterialRefT>> materialBank{};
+  std::vector<uint32_t> materials{};
+  std::unique_ptr<WBIN::SkinT> skin{};
+  std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf{};
 };
 
 struct Vis FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -394,7 +389,6 @@ struct VisBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  VisBuilder &operator=(const VisBuilder &);
   flatbuffers::Offset<Vis> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Vis>(end);
@@ -460,7 +454,7 @@ inline flatbuffers::Offset<Vis> CreateVisDirect(
 flatbuffers::Offset<Vis> CreateVis(flatbuffers::FlatBufferBuilder &_fbb, const VisT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 inline MaterialRefT *MaterialRef::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::MaterialRefT> _o = std::unique_ptr<WBIN::MaterialRefT>(new MaterialRefT());
+  auto _o = std::unique_ptr<MaterialRefT>(new MaterialRefT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
@@ -513,7 +507,7 @@ inline flatbuffers::Offset<MaterialRef> CreateMaterialRef(flatbuffers::FlatBuffe
 }
 
 inline VisT *Vis::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::VisT> _o = std::unique_ptr<WBIN::VisT>(new VisT());
+  auto _o = std::unique_ptr<VisT>(new VisT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }

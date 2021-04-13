@@ -16,18 +16,16 @@ struct HeightObjT;
 
 struct HeightObjT : public flatbuffers::NativeTable {
   typedef HeightObj TableType;
-  std::unique_ptr<WBIN::AABB> aabb;
-  std::unique_ptr<WBIN::Float3ChannelT> position;
-  std::vector<WBIN::Bool3> edgeVisibility;
-  std::vector<uint32_t> materials;
-  std::unique_ptr<WBIN::FloatMaskT> hardness;
-  std::unique_ptr<WBIN::FloatMaskT> erosionMask;
-  std::unique_ptr<WBIN::FloatMaskT> detailMask;
-  std::unique_ptr<WBIN::FloatMaskT> detailType;
-  std::vector<std::unique_ptr<WBIN::FloatMaskT>> motifMask;
-  std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf;
-  HeightObjT() {
-  }
+  std::unique_ptr<WBIN::AABB> aabb{};
+  std::unique_ptr<WBIN::Float3ChannelT> position{};
+  std::vector<WBIN::Bool3> edgeVisibility{};
+  std::vector<uint32_t> materials{};
+  std::unique_ptr<WBIN::FloatMaskT> hardness{};
+  std::unique_ptr<WBIN::FloatMaskT> erosionMask{};
+  std::unique_ptr<WBIN::FloatMaskT> detailMask{};
+  std::unique_ptr<WBIN::FloatMaskT> detailType{};
+  std::vector<std::unique_ptr<WBIN::FloatMaskT>> motifMask{};
+  std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf{};
 };
 
 struct HeightObj FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -172,7 +170,6 @@ struct HeightObjBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  HeightObjBuilder &operator=(const HeightObjBuilder &);
   flatbuffers::Offset<HeightObj> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<HeightObj>(end);
@@ -241,7 +238,7 @@ inline flatbuffers::Offset<HeightObj> CreateHeightObjDirect(
 flatbuffers::Offset<HeightObj> CreateHeightObj(flatbuffers::FlatBufferBuilder &_fbb, const HeightObjT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 inline HeightObjT *HeightObj::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::HeightObjT> _o = std::unique_ptr<WBIN::HeightObjT>(new HeightObjT());
+  auto _o = std::unique_ptr<HeightObjT>(new HeightObjT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }

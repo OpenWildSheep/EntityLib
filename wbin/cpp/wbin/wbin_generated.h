@@ -61,8 +61,10 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) UInt3 FLATBUFFERS_FINAL_CLASS {
   uint32_t z_;
 
  public:
-  UInt3() {
-    memset(static_cast<void *>(this), 0, sizeof(UInt3));
+  UInt3()
+      : x_(0),
+        y_(0),
+        z_(0) {
   }
   UInt3(uint32_t _x, uint32_t _y, uint32_t _z)
       : x_(flatbuffers::EndianScalar(_x)),
@@ -97,8 +99,10 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Float3 FLATBUFFERS_FINAL_CLASS {
   float z_;
 
  public:
-  Float3() {
-    memset(static_cast<void *>(this), 0, sizeof(Float3));
+  Float3()
+      : x_(0),
+        y_(0),
+        z_(0) {
   }
   Float3(float _x, float _y, float _z)
       : x_(flatbuffers::EndianScalar(_x)),
@@ -132,8 +136,9 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Float2 FLATBUFFERS_FINAL_CLASS {
   float y_;
 
  public:
-  Float2() {
-    memset(static_cast<void *>(this), 0, sizeof(Float2));
+  Float2()
+      : x_(0),
+        y_(0) {
   }
   Float2(float _x, float _y)
       : x_(flatbuffers::EndianScalar(_x)),
@@ -162,8 +167,11 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Float4 FLATBUFFERS_FINAL_CLASS {
   float w_;
 
  public:
-  Float4() {
-    memset(static_cast<void *>(this), 0, sizeof(Float4));
+  Float4()
+      : x_(0),
+        y_(0),
+        z_(0),
+        w_(0) {
   }
   Float4(float _x, float _y, float _z, float _w)
       : x_(flatbuffers::EndianScalar(_x)),
@@ -205,8 +213,10 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(1) Bool3 FLATBUFFERS_FINAL_CLASS {
   uint8_t z_;
 
  public:
-  Bool3() {
-    memset(static_cast<void *>(this), 0, sizeof(Bool3));
+  Bool3()
+      : x_(0),
+        y_(0),
+        z_(0) {
   }
   Bool3(bool _x, bool _y, bool _z)
       : x_(flatbuffers::EndianScalar(static_cast<uint8_t>(_x))),
@@ -239,14 +249,17 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Matrix44 FLATBUFFERS_FINAL_CLASS {
   float values_[16];
 
  public:
-  Matrix44() {
-    memset(static_cast<void *>(this), 0, sizeof(Matrix44));
+  Matrix44()
+      : values_() {
+  }
+  Matrix44(flatbuffers::span<const float, 16> _values) {
+    flatbuffers::CastToArray(values_).CopyFromSpan(_values);
   }
   const flatbuffers::Array<float, 16> *values() const {
-    return reinterpret_cast<const flatbuffers::Array<float, 16> *>(values_);
+    return &flatbuffers::CastToArray(values_);
   }
   flatbuffers::Array<float, 16> *mutable_values() {
-    return reinterpret_cast<flatbuffers::Array<float, 16> *>(values_);
+    return &flatbuffers::CastToArray(values_);
   }
 };
 FLATBUFFERS_STRUCT_END(Matrix44, 64);
@@ -257,8 +270,9 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) AABB FLATBUFFERS_FINAL_CLASS {
   WBIN::Float3 max_;
 
  public:
-  AABB() {
-    memset(static_cast<void *>(this), 0, sizeof(AABB));
+  AABB()
+      : min_(),
+        max_() {
   }
   AABB(const WBIN::Float3 &_min, const WBIN::Float3 &_max)
       : min_(_min),
@@ -285,8 +299,9 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) BoneWeight FLATBUFFERS_FINAL_CLASS {
   float weight_;
 
  public:
-  BoneWeight() {
-    memset(static_cast<void *>(this), 0, sizeof(BoneWeight));
+  BoneWeight()
+      : boneIndex_(0),
+        weight_(0) {
   }
   BoneWeight(uint32_t _boneIndex, float _weight)
       : boneIndex_(flatbuffers::EndianScalar(_boneIndex)),
@@ -312,24 +327,25 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) BoneMatrix FLATBUFFERS_FINAL_CLASS {
   float matrix4_[16];
 
  public:
-  BoneMatrix() {
-    memset(static_cast<void *>(this), 0, sizeof(BoneMatrix));
+  BoneMatrix()
+      : matrix4_() {
+  }
+  BoneMatrix(flatbuffers::span<const float, 16> _matrix4) {
+    flatbuffers::CastToArray(matrix4_).CopyFromSpan(_matrix4);
   }
   const flatbuffers::Array<float, 16> *matrix4() const {
-    return reinterpret_cast<const flatbuffers::Array<float, 16> *>(matrix4_);
+    return &flatbuffers::CastToArray(matrix4_);
   }
   flatbuffers::Array<float, 16> *mutable_matrix4() {
-    return reinterpret_cast<flatbuffers::Array<float, 16> *>(matrix4_);
+    return &flatbuffers::CastToArray(matrix4_);
   }
 };
 FLATBUFFERS_STRUCT_END(BoneMatrix, 64);
 
 struct FloatMaskT : public flatbuffers::NativeTable {
   typedef FloatMask TableType;
-  std::vector<WBIN::UInt3> triangles;
-  std::vector<float> vertexData;
-  FloatMaskT() {
-  }
+  std::vector<WBIN::UInt3> triangles{};
+  std::vector<float> vertexData{};
 };
 
 struct FloatMask FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -378,7 +394,6 @@ struct FloatMaskBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  FloatMaskBuilder &operator=(const FloatMaskBuilder &);
   flatbuffers::Offset<FloatMask> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<FloatMask>(end);
@@ -414,10 +429,8 @@ flatbuffers::Offset<FloatMask> CreateFloatMask(flatbuffers::FlatBufferBuilder &_
 
 struct Float2ChannelT : public flatbuffers::NativeTable {
   typedef Float2Channel TableType;
-  std::vector<WBIN::UInt3> triangles;
-  std::vector<WBIN::Float2> vertexData;
-  Float2ChannelT() {
-  }
+  std::vector<WBIN::UInt3> triangles{};
+  std::vector<WBIN::Float2> vertexData{};
 };
 
 struct Float2Channel FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -466,7 +479,6 @@ struct Float2ChannelBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  Float2ChannelBuilder &operator=(const Float2ChannelBuilder &);
   flatbuffers::Offset<Float2Channel> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Float2Channel>(end);
@@ -502,10 +514,8 @@ flatbuffers::Offset<Float2Channel> CreateFloat2Channel(flatbuffers::FlatBufferBu
 
 struct Float3ChannelT : public flatbuffers::NativeTable {
   typedef Float3Channel TableType;
-  std::vector<WBIN::UInt3> triangles;
-  std::vector<WBIN::Float3> vertexData;
-  Float3ChannelT() {
-  }
+  std::vector<WBIN::UInt3> triangles{};
+  std::vector<WBIN::Float3> vertexData{};
 };
 
 struct Float3Channel FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -554,7 +564,6 @@ struct Float3ChannelBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  Float3ChannelBuilder &operator=(const Float3ChannelBuilder &);
   flatbuffers::Offset<Float3Channel> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Float3Channel>(end);
@@ -590,10 +599,8 @@ flatbuffers::Offset<Float3Channel> CreateFloat3Channel(flatbuffers::FlatBufferBu
 
 struct Float4ChannelT : public flatbuffers::NativeTable {
   typedef Float4Channel TableType;
-  std::vector<WBIN::UInt3> triangles;
-  std::vector<WBIN::Float4> vertexData;
-  Float4ChannelT() {
-  }
+  std::vector<WBIN::UInt3> triangles{};
+  std::vector<WBIN::Float4> vertexData{};
 };
 
 struct Float4Channel FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -642,7 +649,6 @@ struct Float4ChannelBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  Float4ChannelBuilder &operator=(const Float4ChannelBuilder &);
   flatbuffers::Offset<Float4Channel> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Float4Channel>(end);
@@ -678,9 +684,7 @@ flatbuffers::Offset<Float4Channel> CreateFloat4Channel(flatbuffers::FlatBufferBu
 
 struct VertexBoneWeightT : public flatbuffers::NativeTable {
   typedef VertexBoneWeight TableType;
-  std::vector<WBIN::BoneWeight> boneWeight;
-  VertexBoneWeightT() {
-  }
+  std::vector<WBIN::BoneWeight> boneWeight{};
 };
 
 struct VertexBoneWeight FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -717,7 +721,6 @@ struct VertexBoneWeightBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  VertexBoneWeightBuilder &operator=(const VertexBoneWeightBuilder &);
   flatbuffers::Offset<VertexBoneWeight> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<VertexBoneWeight>(end);
@@ -747,10 +750,8 @@ flatbuffers::Offset<VertexBoneWeight> CreateVertexBoneWeight(flatbuffers::FlatBu
 
 struct SkinT : public flatbuffers::NativeTable {
   typedef Skin TableType;
-  std::vector<std::unique_ptr<WBIN::VertexBoneWeightT>> vertexBoneWeights;
-  std::vector<WBIN::BoneMatrix> bindPose;
-  SkinT() {
-  }
+  std::vector<std::unique_ptr<WBIN::VertexBoneWeightT>> vertexBoneWeights{};
+  std::vector<WBIN::BoneMatrix> bindPose{};
 };
 
 struct Skin FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -800,7 +801,6 @@ struct SkinBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  SkinBuilder &operator=(const SkinBuilder &);
   flatbuffers::Offset<Skin> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Skin>(end);
@@ -836,9 +836,7 @@ flatbuffers::Offset<Skin> CreateSkin(flatbuffers::FlatBufferBuilder &_fbb, const
 
 struct SourceFileInfT : public flatbuffers::NativeTable {
   typedef SourceFileInf TableType;
-  std::string sourceFilePath;
-  SourceFileInfT() {
-  }
+  std::string sourceFilePath{};
 };
 
 struct SourceFileInf FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -875,7 +873,6 @@ struct SourceFileInfBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  SourceFileInfBuilder &operator=(const SourceFileInfBuilder &);
   flatbuffers::Offset<SourceFileInf> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<SourceFileInf>(end);
@@ -903,7 +900,7 @@ inline flatbuffers::Offset<SourceFileInf> CreateSourceFileInfDirect(
 flatbuffers::Offset<SourceFileInf> CreateSourceFileInf(flatbuffers::FlatBufferBuilder &_fbb, const SourceFileInfT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 inline FloatMaskT *FloatMask::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::FloatMaskT> _o = std::unique_ptr<WBIN::FloatMaskT>(new FloatMaskT());
+  auto _o = std::unique_ptr<FloatMaskT>(new FloatMaskT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
@@ -932,7 +929,7 @@ inline flatbuffers::Offset<FloatMask> CreateFloatMask(flatbuffers::FlatBufferBui
 }
 
 inline Float2ChannelT *Float2Channel::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::Float2ChannelT> _o = std::unique_ptr<WBIN::Float2ChannelT>(new Float2ChannelT());
+  auto _o = std::unique_ptr<Float2ChannelT>(new Float2ChannelT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
@@ -961,7 +958,7 @@ inline flatbuffers::Offset<Float2Channel> CreateFloat2Channel(flatbuffers::FlatB
 }
 
 inline Float3ChannelT *Float3Channel::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::Float3ChannelT> _o = std::unique_ptr<WBIN::Float3ChannelT>(new Float3ChannelT());
+  auto _o = std::unique_ptr<Float3ChannelT>(new Float3ChannelT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
@@ -990,7 +987,7 @@ inline flatbuffers::Offset<Float3Channel> CreateFloat3Channel(flatbuffers::FlatB
 }
 
 inline Float4ChannelT *Float4Channel::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::Float4ChannelT> _o = std::unique_ptr<WBIN::Float4ChannelT>(new Float4ChannelT());
+  auto _o = std::unique_ptr<Float4ChannelT>(new Float4ChannelT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
@@ -1019,7 +1016,7 @@ inline flatbuffers::Offset<Float4Channel> CreateFloat4Channel(flatbuffers::FlatB
 }
 
 inline VertexBoneWeightT *VertexBoneWeight::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::VertexBoneWeightT> _o = std::unique_ptr<WBIN::VertexBoneWeightT>(new VertexBoneWeightT());
+  auto _o = std::unique_ptr<VertexBoneWeightT>(new VertexBoneWeightT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
@@ -1045,7 +1042,7 @@ inline flatbuffers::Offset<VertexBoneWeight> CreateVertexBoneWeight(flatbuffers:
 }
 
 inline SkinT *Skin::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::SkinT> _o = std::unique_ptr<WBIN::SkinT>(new SkinT());
+  auto _o = std::unique_ptr<SkinT>(new SkinT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
@@ -1074,7 +1071,7 @@ inline flatbuffers::Offset<Skin> CreateSkin(flatbuffers::FlatBufferBuilder &_fbb
 }
 
 inline SourceFileInfT *SourceFileInf::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::SourceFileInfT> _o = std::unique_ptr<WBIN::SourceFileInfT>(new SourceFileInfT());
+  auto _o = std::unique_ptr<SourceFileInfT>(new SourceFileInfT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }

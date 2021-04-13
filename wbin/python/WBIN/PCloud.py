@@ -10,12 +10,16 @@ class PCloud(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsPCloud(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = PCloud()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsPCloud(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # PCloud
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -64,13 +68,30 @@ class PCloud(object):
             return obj
         return None
 
-def PCloudStart(builder): builder.StartObject(4)
-def PCloudAddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
-def PCloudAddColor(builder, color): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(color), 0)
-def PCloudAddTexcoord(builder, texcoord): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(texcoord), 0)
-def PCloudAddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
-def PCloudEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(4)
+def PCloudStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
+def PCloudAddPosition(builder, position):
+    """This method is deprecated. Please switch to AddPosition."""
+    return AddPosition(builder, position)
+def AddColor(builder, color): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(color), 0)
+def PCloudAddColor(builder, color):
+    """This method is deprecated. Please switch to AddColor."""
+    return AddColor(builder, color)
+def AddTexcoord(builder, texcoord): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(texcoord), 0)
+def PCloudAddTexcoord(builder, texcoord):
+    """This method is deprecated. Please switch to AddTexcoord."""
+    return AddTexcoord(builder, texcoord)
+def AddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
+def PCloudAddSourceFileInf(builder, sourceFileInf):
+    """This method is deprecated. Please switch to AddSourceFileInf."""
+    return AddSourceFileInf(builder, sourceFileInf)
+def End(builder): return builder.EndObject()
+def PCloudEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.Float3Channel
 import WBIN.SourceFileInf
 try:
@@ -122,14 +143,14 @@ class PCloudT(object):
             texcoord = self.texcoord.Pack(builder)
         if self.sourceFileInf is not None:
             sourceFileInf = self.sourceFileInf.Pack(builder)
-        PCloudStart(builder)
+        Start(builder)
         if self.position is not None:
-            PCloudAddPosition(builder, position)
+            AddPosition(builder, position)
         if self.color is not None:
-            PCloudAddColor(builder, color)
+            AddColor(builder, color)
         if self.texcoord is not None:
-            PCloudAddTexcoord(builder, texcoord)
+            AddTexcoord(builder, texcoord)
         if self.sourceFileInf is not None:
-            PCloudAddSourceFileInf(builder, sourceFileInf)
-        pCloud = PCloudEnd(builder)
+            AddSourceFileInf(builder, sourceFileInf)
+        pCloud = End(builder)
         return pCloud

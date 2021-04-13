@@ -20,11 +20,8 @@ struct SklT;
 
 struct BoneDataT : public flatbuffers::NativeTable {
   typedef BoneData TableType;
-  int32_t parentBoneIndex;
-  std::string name;
-  BoneDataT()
-      : parentBoneIndex(0) {
-  }
+  int32_t parentBoneIndex = 0;
+  std::string name{};
 };
 
 struct BoneData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -72,7 +69,6 @@ struct BoneDataBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  BoneDataBuilder &operator=(const BoneDataBuilder &);
   flatbuffers::Offset<BoneData> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<BoneData>(end);
@@ -106,10 +102,8 @@ flatbuffers::Offset<BoneData> CreateBoneData(flatbuffers::FlatBufferBuilder &_fb
 
 struct SklT : public flatbuffers::NativeTable {
   typedef Skl TableType;
-  std::vector<std::unique_ptr<WBIN::BoneDataT>> skeleton;
-  std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf;
-  SklT() {
-  }
+  std::vector<std::unique_ptr<WBIN::BoneDataT>> skeleton{};
+  std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf{};
 };
 
 struct Skl FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -159,7 +153,6 @@ struct SklBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  SklBuilder &operator=(const SklBuilder &);
   flatbuffers::Offset<Skl> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Skl>(end);
@@ -192,7 +185,7 @@ inline flatbuffers::Offset<Skl> CreateSklDirect(
 flatbuffers::Offset<Skl> CreateSkl(flatbuffers::FlatBufferBuilder &_fbb, const SklT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 inline BoneDataT *BoneData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::BoneDataT> _o = std::unique_ptr<WBIN::BoneDataT>(new BoneDataT());
+  auto _o = std::unique_ptr<BoneDataT>(new BoneDataT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
@@ -221,7 +214,7 @@ inline flatbuffers::Offset<BoneData> CreateBoneData(flatbuffers::FlatBufferBuild
 }
 
 inline SklT *Skl::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::SklT> _o = std::unique_ptr<WBIN::SklT>(new SklT());
+  auto _o = std::unique_ptr<SklT>(new SklT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }

@@ -10,12 +10,16 @@ class GVoxelVolume(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsGVoxelVolume(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = GVoxelVolume()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsGVoxelVolume(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # GVoxelVolume
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -45,11 +49,22 @@ class GVoxelVolume(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def GVoxelVolumeStart(builder): builder.StartObject(1)
-def GVoxelVolumeAddColumns(builder, columns): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(columns), 0)
-def GVoxelVolumeStartColumnsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def GVoxelVolumeEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(1)
+def GVoxelVolumeStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddColumns(builder, columns): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(columns), 0)
+def GVoxelVolumeAddColumns(builder, columns):
+    """This method is deprecated. Please switch to AddColumns."""
+    return AddColumns(builder, columns)
+def StartColumnsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def GVoxelVolumeStartColumnsVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartColumnsVector(builder, numElems)
+def End(builder): return builder.EndObject()
+def GVoxelVolumeEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.GVoxelColumn
 try:
     from typing import List
@@ -93,12 +108,12 @@ class GVoxelVolumeT(object):
             columnslist = []
             for i in range(len(self.columns)):
                 columnslist.append(self.columns[i].Pack(builder))
-            GVoxelVolumeStartColumnsVector(builder, len(self.columns))
+            StartColumnsVector(builder, len(self.columns))
             for i in reversed(range(len(self.columns))):
                 builder.PrependUOffsetTRelative(columnslist[i])
-            columns = builder.EndVector(len(self.columns))
-        GVoxelVolumeStart(builder)
+            columns = builder.EndVector()
+        Start(builder)
         if self.columns is not None:
-            GVoxelVolumeAddColumns(builder, columns)
-        gVoxelVolume = GVoxelVolumeEnd(builder)
+            AddColumns(builder, columns)
+        gVoxelVolume = End(builder)
         return gVoxelVolume

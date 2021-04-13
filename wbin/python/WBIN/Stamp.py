@@ -10,12 +10,16 @@ class Stamp(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsStamp(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Stamp()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsStamp(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # Stamp
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -69,13 +73,30 @@ class Stamp(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
-def StampStart(builder): builder.StartObject(3)
-def StampAddShape(builder, shape): builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(shape), 0)
-def StampAddMatrix(builder, matrix): builder.PrependStructSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(matrix), 0)
-def StampAddTags(builder, tags): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(tags), 0)
-def StampStartTagsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def StampEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(3)
+def StampStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddShape(builder, shape): builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(shape), 0)
+def StampAddShape(builder, shape):
+    """This method is deprecated. Please switch to AddShape."""
+    return AddShape(builder, shape)
+def AddMatrix(builder, matrix): builder.PrependStructSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(matrix), 0)
+def StampAddMatrix(builder, matrix):
+    """This method is deprecated. Please switch to AddMatrix."""
+    return AddMatrix(builder, matrix)
+def AddTags(builder, tags): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(tags), 0)
+def StampAddTags(builder, tags):
+    """This method is deprecated. Please switch to AddTags."""
+    return AddTags(builder, tags)
+def StartTagsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def StampStartTagsVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartTagsVector(builder, numElems)
+def End(builder): return builder.EndObject()
+def StampEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.AABB
 import WBIN.Matrix44
 try:
@@ -125,18 +146,18 @@ class StampT(object):
             if np is not None and type(self.tags) is np.ndarray:
                 tags = builder.CreateNumpyVector(self.tags)
             else:
-                StampStartTagsVector(builder, len(self.tags))
+                StartTagsVector(builder, len(self.tags))
                 for i in reversed(range(len(self.tags))):
                     builder.PrependInt32(self.tags[i])
-                tags = builder.EndVector(len(self.tags))
-        StampStart(builder)
+                tags = builder.EndVector()
+        Start(builder)
         if self.shape is not None:
             shape = self.shape.Pack(builder)
-            StampAddShape(builder, shape)
+            AddShape(builder, shape)
         if self.matrix is not None:
             matrix = self.matrix.Pack(builder)
-            StampAddMatrix(builder, matrix)
+            AddMatrix(builder, matrix)
         if self.tags is not None:
-            StampAddTags(builder, tags)
-        stamp = StampEnd(builder)
+            AddTags(builder, tags)
+        stamp = End(builder)
         return stamp

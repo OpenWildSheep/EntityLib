@@ -16,9 +16,7 @@ struct TSOT;
 
 struct TSOT : public flatbuffers::NativeTable {
   typedef TSO TableType;
-  std::unique_ptr<WBIN::Float3ChannelT> position;
-  TSOT() {
-  }
+  std::unique_ptr<WBIN::Float3ChannelT> position{};
 };
 
 struct TSO FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -55,7 +53,6 @@ struct TSOBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  TSOBuilder &operator=(const TSOBuilder &);
   flatbuffers::Offset<TSO> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<TSO>(end);
@@ -75,7 +72,7 @@ inline flatbuffers::Offset<TSO> CreateTSO(
 flatbuffers::Offset<TSO> CreateTSO(flatbuffers::FlatBufferBuilder &_fbb, const TSOT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 inline TSOT *TSO::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::TSOT> _o = std::unique_ptr<WBIN::TSOT>(new TSOT());
+  auto _o = std::unique_ptr<TSOT>(new TSOT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }

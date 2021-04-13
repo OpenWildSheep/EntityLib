@@ -10,12 +10,16 @@ class SeedPatch(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsSeedPatch(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = SeedPatch()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsSeedPatch(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # SeedPatch
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -88,15 +92,38 @@ class SeedPatch(object):
             return obj
         return None
 
-def SeedPatchStart(builder): builder.StartObject(5)
-def SeedPatchAddAabb(builder, aabb): builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(aabb), 0)
-def SeedPatchAddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
-def SeedPatchAddEdgeVisibility(builder, edgeVisibility): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(edgeVisibility), 0)
-def SeedPatchStartEdgeVisibilityVector(builder, numElems): return builder.StartVector(3, numElems, 1)
-def SeedPatchAddColor(builder, color): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(color), 0)
-def SeedPatchAddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
-def SeedPatchEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(5)
+def SeedPatchStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddAabb(builder, aabb): builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(aabb), 0)
+def SeedPatchAddAabb(builder, aabb):
+    """This method is deprecated. Please switch to AddAabb."""
+    return AddAabb(builder, aabb)
+def AddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
+def SeedPatchAddPosition(builder, position):
+    """This method is deprecated. Please switch to AddPosition."""
+    return AddPosition(builder, position)
+def AddEdgeVisibility(builder, edgeVisibility): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(edgeVisibility), 0)
+def SeedPatchAddEdgeVisibility(builder, edgeVisibility):
+    """This method is deprecated. Please switch to AddEdgeVisibility."""
+    return AddEdgeVisibility(builder, edgeVisibility)
+def StartEdgeVisibilityVector(builder, numElems): return builder.StartVector(3, numElems, 1)
+def SeedPatchStartEdgeVisibilityVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartEdgeVisibilityVector(builder, numElems)
+def AddColor(builder, color): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(color), 0)
+def SeedPatchAddColor(builder, color):
+    """This method is deprecated. Please switch to AddColor."""
+    return AddColor(builder, color)
+def AddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
+def SeedPatchAddSourceFileInf(builder, sourceFileInf):
+    """This method is deprecated. Please switch to AddSourceFileInf."""
+    return AddSourceFileInf(builder, sourceFileInf)
+def End(builder): return builder.EndObject()
+def SeedPatchEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.AABB
 import WBIN.Bool3
 import WBIN.Float3Channel
@@ -154,25 +181,25 @@ class SeedPatchT(object):
         if self.position is not None:
             position = self.position.Pack(builder)
         if self.edgeVisibility is not None:
-            SeedPatchStartEdgeVisibilityVector(builder, len(self.edgeVisibility))
+            StartEdgeVisibilityVector(builder, len(self.edgeVisibility))
             for i in reversed(range(len(self.edgeVisibility))):
                 self.edgeVisibility[i].Pack(builder)
-            edgeVisibility = builder.EndVector(len(self.edgeVisibility))
+            edgeVisibility = builder.EndVector()
         if self.color is not None:
             color = self.color.Pack(builder)
         if self.sourceFileInf is not None:
             sourceFileInf = self.sourceFileInf.Pack(builder)
-        SeedPatchStart(builder)
+        Start(builder)
         if self.aabb is not None:
             aabb = self.aabb.Pack(builder)
-            SeedPatchAddAabb(builder, aabb)
+            AddAabb(builder, aabb)
         if self.position is not None:
-            SeedPatchAddPosition(builder, position)
+            AddPosition(builder, position)
         if self.edgeVisibility is not None:
-            SeedPatchAddEdgeVisibility(builder, edgeVisibility)
+            AddEdgeVisibility(builder, edgeVisibility)
         if self.color is not None:
-            SeedPatchAddColor(builder, color)
+            AddColor(builder, color)
         if self.sourceFileInf is not None:
-            SeedPatchAddSourceFileInf(builder, sourceFileInf)
-        seedPatch = SeedPatchEnd(builder)
+            AddSourceFileInf(builder, sourceFileInf)
+        seedPatch = End(builder)
         return seedPatch

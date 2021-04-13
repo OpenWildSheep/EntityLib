@@ -16,13 +16,11 @@ struct PhysT;
 
 struct PhysT : public flatbuffers::NativeTable {
   typedef Phys TableType;
-  std::unique_ptr<WBIN::AABB> aabb;
-  std::unique_ptr<WBIN::Float3ChannelT> position;
-  std::vector<uint32_t> materials;
-  std::unique_ptr<WBIN::SkinT> skin;
-  std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf;
-  PhysT() {
-  }
+  std::unique_ptr<WBIN::AABB> aabb{};
+  std::unique_ptr<WBIN::Float3ChannelT> position{};
+  std::vector<uint32_t> materials{};
+  std::unique_ptr<WBIN::SkinT> skin{};
+  std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf{};
 };
 
 struct Phys FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -106,7 +104,6 @@ struct PhysBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  PhysBuilder &operator=(const PhysBuilder &);
   flatbuffers::Offset<Phys> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Phys>(end);
@@ -151,7 +148,7 @@ inline flatbuffers::Offset<Phys> CreatePhysDirect(
 flatbuffers::Offset<Phys> CreatePhys(flatbuffers::FlatBufferBuilder &_fbb, const PhysT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 inline PhysT *Phys::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::PhysT> _o = std::unique_ptr<WBIN::PhysT>(new PhysT());
+  auto _o = std::unique_ptr<PhysT>(new PhysT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }

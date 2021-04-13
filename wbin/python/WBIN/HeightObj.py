@@ -10,12 +10,16 @@ class HeightObj(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsHeightObj(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = HeightObj()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsHeightObj(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # HeightObj
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -173,22 +177,66 @@ class HeightObj(object):
             return obj
         return None
 
-def HeightObjStart(builder): builder.StartObject(10)
-def HeightObjAddAabb(builder, aabb): builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(aabb), 0)
-def HeightObjAddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
-def HeightObjAddEdgeVisibility(builder, edgeVisibility): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(edgeVisibility), 0)
-def HeightObjStartEdgeVisibilityVector(builder, numElems): return builder.StartVector(3, numElems, 1)
-def HeightObjAddMaterials(builder, materials): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(materials), 0)
-def HeightObjStartMaterialsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def HeightObjAddHardness(builder, hardness): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(hardness), 0)
-def HeightObjAddErosionMask(builder, erosionMask): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(erosionMask), 0)
-def HeightObjAddDetailMask(builder, detailMask): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(detailMask), 0)
-def HeightObjAddDetailType(builder, detailType): builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(detailType), 0)
-def HeightObjAddMotifMask(builder, motifMask): builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(motifMask), 0)
-def HeightObjStartMotifMaskVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def HeightObjAddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(9, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
-def HeightObjEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(10)
+def HeightObjStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddAabb(builder, aabb): builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(aabb), 0)
+def HeightObjAddAabb(builder, aabb):
+    """This method is deprecated. Please switch to AddAabb."""
+    return AddAabb(builder, aabb)
+def AddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
+def HeightObjAddPosition(builder, position):
+    """This method is deprecated. Please switch to AddPosition."""
+    return AddPosition(builder, position)
+def AddEdgeVisibility(builder, edgeVisibility): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(edgeVisibility), 0)
+def HeightObjAddEdgeVisibility(builder, edgeVisibility):
+    """This method is deprecated. Please switch to AddEdgeVisibility."""
+    return AddEdgeVisibility(builder, edgeVisibility)
+def StartEdgeVisibilityVector(builder, numElems): return builder.StartVector(3, numElems, 1)
+def HeightObjStartEdgeVisibilityVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartEdgeVisibilityVector(builder, numElems)
+def AddMaterials(builder, materials): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(materials), 0)
+def HeightObjAddMaterials(builder, materials):
+    """This method is deprecated. Please switch to AddMaterials."""
+    return AddMaterials(builder, materials)
+def StartMaterialsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def HeightObjStartMaterialsVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartMaterialsVector(builder, numElems)
+def AddHardness(builder, hardness): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(hardness), 0)
+def HeightObjAddHardness(builder, hardness):
+    """This method is deprecated. Please switch to AddHardness."""
+    return AddHardness(builder, hardness)
+def AddErosionMask(builder, erosionMask): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(erosionMask), 0)
+def HeightObjAddErosionMask(builder, erosionMask):
+    """This method is deprecated. Please switch to AddErosionMask."""
+    return AddErosionMask(builder, erosionMask)
+def AddDetailMask(builder, detailMask): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(detailMask), 0)
+def HeightObjAddDetailMask(builder, detailMask):
+    """This method is deprecated. Please switch to AddDetailMask."""
+    return AddDetailMask(builder, detailMask)
+def AddDetailType(builder, detailType): builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(detailType), 0)
+def HeightObjAddDetailType(builder, detailType):
+    """This method is deprecated. Please switch to AddDetailType."""
+    return AddDetailType(builder, detailType)
+def AddMotifMask(builder, motifMask): builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(motifMask), 0)
+def HeightObjAddMotifMask(builder, motifMask):
+    """This method is deprecated. Please switch to AddMotifMask."""
+    return AddMotifMask(builder, motifMask)
+def StartMotifMaskVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def HeightObjStartMotifMaskVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartMotifMaskVector(builder, numElems)
+def AddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(9, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
+def HeightObjAddSourceFileInf(builder, sourceFileInf):
+    """This method is deprecated. Please switch to AddSourceFileInf."""
+    return AddSourceFileInf(builder, sourceFileInf)
+def End(builder): return builder.EndObject()
+def HeightObjEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.AABB
 import WBIN.Bool3
 import WBIN.Float3Channel
@@ -273,18 +321,18 @@ class HeightObjT(object):
         if self.position is not None:
             position = self.position.Pack(builder)
         if self.edgeVisibility is not None:
-            HeightObjStartEdgeVisibilityVector(builder, len(self.edgeVisibility))
+            StartEdgeVisibilityVector(builder, len(self.edgeVisibility))
             for i in reversed(range(len(self.edgeVisibility))):
                 self.edgeVisibility[i].Pack(builder)
-            edgeVisibility = builder.EndVector(len(self.edgeVisibility))
+            edgeVisibility = builder.EndVector()
         if self.materials is not None:
             if np is not None and type(self.materials) is np.ndarray:
                 materials = builder.CreateNumpyVector(self.materials)
             else:
-                HeightObjStartMaterialsVector(builder, len(self.materials))
+                StartMaterialsVector(builder, len(self.materials))
                 for i in reversed(range(len(self.materials))):
                     builder.PrependUint32(self.materials[i])
-                materials = builder.EndVector(len(self.materials))
+                materials = builder.EndVector()
         if self.hardness is not None:
             hardness = self.hardness.Pack(builder)
         if self.erosionMask is not None:
@@ -297,33 +345,33 @@ class HeightObjT(object):
             motifMasklist = []
             for i in range(len(self.motifMask)):
                 motifMasklist.append(self.motifMask[i].Pack(builder))
-            HeightObjStartMotifMaskVector(builder, len(self.motifMask))
+            StartMotifMaskVector(builder, len(self.motifMask))
             for i in reversed(range(len(self.motifMask))):
                 builder.PrependUOffsetTRelative(motifMasklist[i])
-            motifMask = builder.EndVector(len(self.motifMask))
+            motifMask = builder.EndVector()
         if self.sourceFileInf is not None:
             sourceFileInf = self.sourceFileInf.Pack(builder)
-        HeightObjStart(builder)
+        Start(builder)
         if self.aabb is not None:
             aabb = self.aabb.Pack(builder)
-            HeightObjAddAabb(builder, aabb)
+            AddAabb(builder, aabb)
         if self.position is not None:
-            HeightObjAddPosition(builder, position)
+            AddPosition(builder, position)
         if self.edgeVisibility is not None:
-            HeightObjAddEdgeVisibility(builder, edgeVisibility)
+            AddEdgeVisibility(builder, edgeVisibility)
         if self.materials is not None:
-            HeightObjAddMaterials(builder, materials)
+            AddMaterials(builder, materials)
         if self.hardness is not None:
-            HeightObjAddHardness(builder, hardness)
+            AddHardness(builder, hardness)
         if self.erosionMask is not None:
-            HeightObjAddErosionMask(builder, erosionMask)
+            AddErosionMask(builder, erosionMask)
         if self.detailMask is not None:
-            HeightObjAddDetailMask(builder, detailMask)
+            AddDetailMask(builder, detailMask)
         if self.detailType is not None:
-            HeightObjAddDetailType(builder, detailType)
+            AddDetailType(builder, detailType)
         if self.motifMask is not None:
-            HeightObjAddMotifMask(builder, motifMask)
+            AddMotifMask(builder, motifMask)
         if self.sourceFileInf is not None:
-            HeightObjAddSourceFileInf(builder, sourceFileInf)
-        heightObj = HeightObjEnd(builder)
+            AddSourceFileInf(builder, sourceFileInf)
+        heightObj = End(builder)
         return heightObj

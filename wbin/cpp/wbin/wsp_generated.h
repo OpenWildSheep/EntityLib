@@ -16,13 +16,11 @@ struct SeedPatchT;
 
 struct SeedPatchT : public flatbuffers::NativeTable {
   typedef SeedPatch TableType;
-  std::unique_ptr<WBIN::AABB> aabb;
-  std::unique_ptr<WBIN::Float3ChannelT> position;
-  std::vector<WBIN::Bool3> edgeVisibility;
-  std::unique_ptr<WBIN::Float3ChannelT> color;
-  std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf;
-  SeedPatchT() {
-  }
+  std::unique_ptr<WBIN::AABB> aabb{};
+  std::unique_ptr<WBIN::Float3ChannelT> position{};
+  std::vector<WBIN::Bool3> edgeVisibility{};
+  std::unique_ptr<WBIN::Float3ChannelT> color{};
+  std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf{};
 };
 
 struct SeedPatch FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -106,7 +104,6 @@ struct SeedPatchBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  SeedPatchBuilder &operator=(const SeedPatchBuilder &);
   flatbuffers::Offset<SeedPatch> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<SeedPatch>(end);
@@ -152,7 +149,7 @@ inline flatbuffers::Offset<SeedPatch> CreateSeedPatchDirect(
 flatbuffers::Offset<SeedPatch> CreateSeedPatch(flatbuffers::FlatBufferBuilder &_fbb, const SeedPatchT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 inline SeedPatchT *SeedPatch::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::SeedPatchT> _o = std::unique_ptr<WBIN::SeedPatchT>(new SeedPatchT());
+  auto _o = std::unique_ptr<SeedPatchT>(new SeedPatchT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }

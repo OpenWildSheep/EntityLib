@@ -10,6 +10,7 @@ namespace WildRPC {
 
 struct RPCHeader;
 struct RPCHeaderBuilder;
+struct RPCHeaderT;
 
 enum Type : int8_t {
   Type_Boolean = 0,
@@ -65,7 +66,16 @@ inline const char *EnumNameType(Type e) {
   return EnumNamesType()[index];
 }
 
+struct RPCHeaderT : public flatbuffers::NativeTable {
+  typedef RPCHeader TableType;
+  std::string managerName{};
+  std::string methodName{};
+  std::vector<WildRPC::Type> parameterTypes{};
+  std::vector<WildRPC::Type> resultTypes{};
+};
+
 struct RPCHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef RPCHeaderT NativeTableType;
   typedef RPCHeaderBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_MANAGERNAME = 4,
@@ -76,14 +86,26 @@ struct RPCHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *managerName() const {
     return GetPointer<const flatbuffers::String *>(VT_MANAGERNAME);
   }
+  flatbuffers::String *mutable_managerName() {
+    return GetPointer<flatbuffers::String *>(VT_MANAGERNAME);
+  }
   const flatbuffers::String *methodName() const {
     return GetPointer<const flatbuffers::String *>(VT_METHODNAME);
+  }
+  flatbuffers::String *mutable_methodName() {
+    return GetPointer<flatbuffers::String *>(VT_METHODNAME);
   }
   const flatbuffers::Vector<int8_t> *parameterTypes() const {
     return GetPointer<const flatbuffers::Vector<int8_t> *>(VT_PARAMETERTYPES);
   }
+  flatbuffers::Vector<int8_t> *mutable_parameterTypes() {
+    return GetPointer<flatbuffers::Vector<int8_t> *>(VT_PARAMETERTYPES);
+  }
   const flatbuffers::Vector<int8_t> *resultTypes() const {
     return GetPointer<const flatbuffers::Vector<int8_t> *>(VT_RESULTTYPES);
+  }
+  flatbuffers::Vector<int8_t> *mutable_resultTypes() {
+    return GetPointer<flatbuffers::Vector<int8_t> *>(VT_RESULTTYPES);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -97,6 +119,9 @@ struct RPCHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVector(resultTypes()) &&
            verifier.EndTable();
   }
+  RPCHeaderT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(RPCHeaderT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<RPCHeader> Pack(flatbuffers::FlatBufferBuilder &_fbb, const RPCHeaderT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct RPCHeaderBuilder {
@@ -162,12 +187,53 @@ inline flatbuffers::Offset<RPCHeader> CreateRPCHeaderDirect(
       resultTypes__);
 }
 
+flatbuffers::Offset<RPCHeader> CreateRPCHeader(flatbuffers::FlatBufferBuilder &_fbb, const RPCHeaderT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+inline RPCHeaderT *RPCHeader::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<RPCHeaderT>(new RPCHeaderT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void RPCHeader::UnPackTo(RPCHeaderT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = managerName(); if (_e) _o->managerName = _e->str(); }
+  { auto _e = methodName(); if (_e) _o->methodName = _e->str(); }
+  { auto _e = parameterTypes(); if (_e) { _o->parameterTypes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->parameterTypes[_i] = static_cast<WildRPC::Type>(_e->Get(_i)); } } }
+  { auto _e = resultTypes(); if (_e) { _o->resultTypes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->resultTypes[_i] = static_cast<WildRPC::Type>(_e->Get(_i)); } } }
+}
+
+inline flatbuffers::Offset<RPCHeader> RPCHeader::Pack(flatbuffers::FlatBufferBuilder &_fbb, const RPCHeaderT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateRPCHeader(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<RPCHeader> CreateRPCHeader(flatbuffers::FlatBufferBuilder &_fbb, const RPCHeaderT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RPCHeaderT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _managerName = _fbb.CreateString(_o->managerName);
+  auto _methodName = _fbb.CreateString(_o->methodName);
+  auto _parameterTypes = _fbb.CreateVectorScalarCast<int8_t>(flatbuffers::data(_o->parameterTypes), _o->parameterTypes.size());
+  auto _resultTypes = _fbb.CreateVectorScalarCast<int8_t>(flatbuffers::data(_o->resultTypes), _o->resultTypes.size());
+  return WildRPC::CreateRPCHeader(
+      _fbb,
+      _managerName,
+      _methodName,
+      _parameterTypes,
+      _resultTypes);
+}
+
 inline const WildRPC::RPCHeader *GetRPCHeader(const void *buf) {
   return flatbuffers::GetRoot<WildRPC::RPCHeader>(buf);
 }
 
 inline const WildRPC::RPCHeader *GetSizePrefixedRPCHeader(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<WildRPC::RPCHeader>(buf);
+}
+
+inline RPCHeader *GetMutableRPCHeader(void *buf) {
+  return flatbuffers::GetMutableRoot<RPCHeader>(buf);
 }
 
 inline bool VerifyRPCHeaderBuffer(
@@ -190,6 +256,18 @@ inline void FinishSizePrefixedRPCHeaderBuffer(
     flatbuffers::FlatBufferBuilder &fbb,
     flatbuffers::Offset<WildRPC::RPCHeader> root) {
   fbb.FinishSizePrefixed(root);
+}
+
+inline std::unique_ptr<WildRPC::RPCHeaderT> UnPackRPCHeader(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::RPCHeaderT>(GetRPCHeader(buf)->UnPack(res));
+}
+
+inline std::unique_ptr<WildRPC::RPCHeaderT> UnPackSizePrefixedRPCHeader(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::RPCHeaderT>(GetSizePrefixedRPCHeader(buf)->UnPack(res));
 }
 
 }  // namespace WildRPC

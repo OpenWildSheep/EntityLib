@@ -124,3 +124,83 @@ def End(builder): return builder.EndObject()
 def RPCHeaderEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+try:
+    from typing import List
+except:
+    pass
+
+class RPCHeaderT(object):
+
+    # RPCHeaderT
+    def __init__(self):
+        self.managerName = None  # type: str
+        self.methodName = None  # type: str
+        self.parameterTypes = None  # type: List[int]
+        self.resultTypes = None  # type: List[int]
+
+    @classmethod
+    def InitFromBuf(cls, buf, pos):
+        rPCHeader = RPCHeader()
+        rPCHeader.Init(buf, pos)
+        return cls.InitFromObj(rPCHeader)
+
+    @classmethod
+    def InitFromObj(cls, rPCHeader):
+        x = RPCHeaderT()
+        x._UnPack(rPCHeader)
+        return x
+
+    # RPCHeaderT
+    def _UnPack(self, rPCHeader):
+        if rPCHeader is None:
+            return
+        self.managerName = rPCHeader.ManagerName()
+        self.methodName = rPCHeader.MethodName()
+        if not rPCHeader.ParameterTypesIsNone():
+            if np is None:
+                self.parameterTypes = []
+                for i in range(rPCHeader.ParameterTypesLength()):
+                    self.parameterTypes.append(rPCHeader.ParameterTypes(i))
+            else:
+                self.parameterTypes = rPCHeader.ParameterTypesAsNumpy()
+        if not rPCHeader.ResultTypesIsNone():
+            if np is None:
+                self.resultTypes = []
+                for i in range(rPCHeader.ResultTypesLength()):
+                    self.resultTypes.append(rPCHeader.ResultTypes(i))
+            else:
+                self.resultTypes = rPCHeader.ResultTypesAsNumpy()
+
+    # RPCHeaderT
+    def Pack(self, builder):
+        if self.managerName is not None:
+            managerName = builder.CreateString(self.managerName)
+        if self.methodName is not None:
+            methodName = builder.CreateString(self.methodName)
+        if self.parameterTypes is not None:
+            if np is not None and type(self.parameterTypes) is np.ndarray:
+                parameterTypes = builder.CreateNumpyVector(self.parameterTypes)
+            else:
+                StartParameterTypesVector(builder, len(self.parameterTypes))
+                for i in reversed(range(len(self.parameterTypes))):
+                    builder.PrependByte(self.parameterTypes[i])
+                parameterTypes = builder.EndVector()
+        if self.resultTypes is not None:
+            if np is not None and type(self.resultTypes) is np.ndarray:
+                resultTypes = builder.CreateNumpyVector(self.resultTypes)
+            else:
+                StartResultTypesVector(builder, len(self.resultTypes))
+                for i in reversed(range(len(self.resultTypes))):
+                    builder.PrependByte(self.resultTypes[i])
+                resultTypes = builder.EndVector()
+        Start(builder)
+        if self.managerName is not None:
+            AddManagerName(builder, managerName)
+        if self.methodName is not None:
+            AddMethodName(builder, methodName)
+        if self.parameterTypes is not None:
+            AddParameterTypes(builder, parameterTypes)
+        if self.resultTypes is not None:
+            AddResultTypes(builder, resultTypes)
+        rPCHeader = End(builder)
+        return rPCHeader

@@ -1,13 +1,14 @@
 namespace WildRPC;
 
-enum Type : byte { Boolean = 0, Integer, Float, Vector2, UInt3, Vector3, Quat, Color, Position, String }
+enum ElementType : ubyte { Boolean = 0, Integer, Float, Vector2, UInt3, Vector3, Quat, Color, Position, String }
+enum TypeInfo : ushort (bit_flags) { Array, Boolean, Integer, Float, Vector2, UInt3, Vector3, Quat, Color, Position, String }
 
 table RPCHeader
 {
 	managerName:string (required);
 	methodName:string (required);
-	parameterTypes:[Type] (required);
-	resultTypes:[Type] (required);
+	parameterTypes:[TypeInfo] (required);
+	resultTypes:[TypeInfo] (required);
 }
 
 root_type RPCHeader;

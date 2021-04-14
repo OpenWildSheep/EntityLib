@@ -43,14 +43,14 @@ class RPCHeader(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Int8Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 1))
+            return self._tab.Get(flatbuffers.number_types.Uint16Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 2))
         return 0
 
     # RPCHeader
     def ParameterTypesAsNumpy(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
-            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Int8Flags, o)
+            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Uint16Flags, o)
         return 0
 
     # RPCHeader
@@ -70,14 +70,14 @@ class RPCHeader(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Int8Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 1))
+            return self._tab.Get(flatbuffers.number_types.Uint16Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 2))
         return 0
 
     # RPCHeader
     def ResultTypesAsNumpy(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
-            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Int8Flags, o)
+            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Uint16Flags, o)
         return 0
 
     # RPCHeader
@@ -108,7 +108,7 @@ def AddParameterTypes(builder, parameterTypes): builder.PrependUOffsetTRelativeS
 def RPCHeaderAddParameterTypes(builder, parameterTypes):
     """This method is deprecated. Please switch to AddParameterTypes."""
     return AddParameterTypes(builder, parameterTypes)
-def StartParameterTypesVector(builder, numElems): return builder.StartVector(1, numElems, 1)
+def StartParameterTypesVector(builder, numElems): return builder.StartVector(2, numElems, 2)
 def RPCHeaderStartParameterTypesVector(builder, numElems):
     """This method is deprecated. Please switch to Start."""
     return StartParameterTypesVector(builder, numElems)
@@ -116,7 +116,7 @@ def AddResultTypes(builder, resultTypes): builder.PrependUOffsetTRelativeSlot(3,
 def RPCHeaderAddResultTypes(builder, resultTypes):
     """This method is deprecated. Please switch to AddResultTypes."""
     return AddResultTypes(builder, resultTypes)
-def StartResultTypesVector(builder, numElems): return builder.StartVector(1, numElems, 1)
+def StartResultTypesVector(builder, numElems): return builder.StartVector(2, numElems, 2)
 def RPCHeaderStartResultTypesVector(builder, numElems):
     """This method is deprecated. Please switch to Start."""
     return StartResultTypesVector(builder, numElems)
@@ -183,7 +183,7 @@ class RPCHeaderT(object):
             else:
                 StartParameterTypesVector(builder, len(self.parameterTypes))
                 for i in reversed(range(len(self.parameterTypes))):
-                    builder.PrependByte(self.parameterTypes[i])
+                    builder.PrependUint16(self.parameterTypes[i])
                 parameterTypes = builder.EndVector()
         if self.resultTypes is not None:
             if np is not None and type(self.resultTypes) is np.ndarray:
@@ -191,7 +191,7 @@ class RPCHeaderT(object):
             else:
                 StartResultTypesVector(builder, len(self.resultTypes))
                 for i in reversed(range(len(self.resultTypes))):
-                    builder.PrependByte(self.resultTypes[i])
+                    builder.PrependUint16(self.resultTypes[i])
                 resultTypes = builder.EndVector()
         Start(builder)
         if self.managerName is not None:

@@ -12,38 +12,38 @@ struct RPCHeader;
 struct RPCHeaderBuilder;
 struct RPCHeaderT;
 
-enum Type : int8_t {
-  Type_Boolean = 0,
-  Type_Integer = 1,
-  Type_Float = 2,
-  Type_Vector2 = 3,
-  Type_UInt3 = 4,
-  Type_Vector3 = 5,
-  Type_Quat = 6,
-  Type_Color = 7,
-  Type_Position = 8,
-  Type_String = 9,
-  Type_MIN = Type_Boolean,
-  Type_MAX = Type_String
+enum ElementType : uint8_t {
+  ElementType_Boolean = 0,
+  ElementType_Integer = 1,
+  ElementType_Float = 2,
+  ElementType_Vector2 = 3,
+  ElementType_UInt3 = 4,
+  ElementType_Vector3 = 5,
+  ElementType_Quat = 6,
+  ElementType_Color = 7,
+  ElementType_Position = 8,
+  ElementType_String = 9,
+  ElementType_MIN = ElementType_Boolean,
+  ElementType_MAX = ElementType_String
 };
 
-inline const Type (&EnumValuesType())[10] {
-  static const Type values[] = {
-    Type_Boolean,
-    Type_Integer,
-    Type_Float,
-    Type_Vector2,
-    Type_UInt3,
-    Type_Vector3,
-    Type_Quat,
-    Type_Color,
-    Type_Position,
-    Type_String
+inline const ElementType (&EnumValuesElementType())[10] {
+  static const ElementType values[] = {
+    ElementType_Boolean,
+    ElementType_Integer,
+    ElementType_Float,
+    ElementType_Vector2,
+    ElementType_UInt3,
+    ElementType_Vector3,
+    ElementType_Quat,
+    ElementType_Color,
+    ElementType_Position,
+    ElementType_String
   };
   return values;
 }
 
-inline const char * const *EnumNamesType() {
+inline const char * const *EnumNamesElementType() {
   static const char * const names[11] = {
     "Boolean",
     "Integer",
@@ -60,18 +60,68 @@ inline const char * const *EnumNamesType() {
   return names;
 }
 
-inline const char *EnumNameType(Type e) {
-  if (flatbuffers::IsOutRange(e, Type_Boolean, Type_String)) return "";
+inline const char *EnumNameElementType(ElementType e) {
+  if (flatbuffers::IsOutRange(e, ElementType_Boolean, ElementType_String)) return "";
   const size_t index = static_cast<size_t>(e);
-  return EnumNamesType()[index];
+  return EnumNamesElementType()[index];
+}
+
+enum TypeInfo : uint16_t {
+  TypeInfo_Array = 1,
+  TypeInfo_Boolean = 2,
+  TypeInfo_Integer = 4,
+  TypeInfo_Float = 8,
+  TypeInfo_Vector2 = 16,
+  TypeInfo_UInt3 = 32,
+  TypeInfo_Vector3 = 64,
+  TypeInfo_Quat = 128,
+  TypeInfo_Color = 256,
+  TypeInfo_Position = 512,
+  TypeInfo_String = 1024,
+  TypeInfo_NONE = 0,
+  TypeInfo_ANY = 2047
+};
+
+inline const TypeInfo (&EnumValuesTypeInfo())[11] {
+  static const TypeInfo values[] = {
+    TypeInfo_Array,
+    TypeInfo_Boolean,
+    TypeInfo_Integer,
+    TypeInfo_Float,
+    TypeInfo_Vector2,
+    TypeInfo_UInt3,
+    TypeInfo_Vector3,
+    TypeInfo_Quat,
+    TypeInfo_Color,
+    TypeInfo_Position,
+    TypeInfo_String
+  };
+  return values;
+}
+
+inline const char *EnumNameTypeInfo(TypeInfo e) {
+  switch (e) {
+    case TypeInfo_Array: return "Array";
+    case TypeInfo_Boolean: return "Boolean";
+    case TypeInfo_Integer: return "Integer";
+    case TypeInfo_Float: return "Float";
+    case TypeInfo_Vector2: return "Vector2";
+    case TypeInfo_UInt3: return "UInt3";
+    case TypeInfo_Vector3: return "Vector3";
+    case TypeInfo_Quat: return "Quat";
+    case TypeInfo_Color: return "Color";
+    case TypeInfo_Position: return "Position";
+    case TypeInfo_String: return "String";
+    default: return "";
+  }
 }
 
 struct RPCHeaderT : public flatbuffers::NativeTable {
   typedef RPCHeader TableType;
   std::string managerName{};
   std::string methodName{};
-  std::vector<WildRPC::Type> parameterTypes{};
-  std::vector<WildRPC::Type> resultTypes{};
+  std::vector<WildRPC::TypeInfo> parameterTypes{};
+  std::vector<WildRPC::TypeInfo> resultTypes{};
 };
 
 struct RPCHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -95,17 +145,17 @@ struct RPCHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   flatbuffers::String *mutable_methodName() {
     return GetPointer<flatbuffers::String *>(VT_METHODNAME);
   }
-  const flatbuffers::Vector<int8_t> *parameterTypes() const {
-    return GetPointer<const flatbuffers::Vector<int8_t> *>(VT_PARAMETERTYPES);
+  const flatbuffers::Vector<uint16_t> *parameterTypes() const {
+    return GetPointer<const flatbuffers::Vector<uint16_t> *>(VT_PARAMETERTYPES);
   }
-  flatbuffers::Vector<int8_t> *mutable_parameterTypes() {
-    return GetPointer<flatbuffers::Vector<int8_t> *>(VT_PARAMETERTYPES);
+  flatbuffers::Vector<uint16_t> *mutable_parameterTypes() {
+    return GetPointer<flatbuffers::Vector<uint16_t> *>(VT_PARAMETERTYPES);
   }
-  const flatbuffers::Vector<int8_t> *resultTypes() const {
-    return GetPointer<const flatbuffers::Vector<int8_t> *>(VT_RESULTTYPES);
+  const flatbuffers::Vector<uint16_t> *resultTypes() const {
+    return GetPointer<const flatbuffers::Vector<uint16_t> *>(VT_RESULTTYPES);
   }
-  flatbuffers::Vector<int8_t> *mutable_resultTypes() {
-    return GetPointer<flatbuffers::Vector<int8_t> *>(VT_RESULTTYPES);
+  flatbuffers::Vector<uint16_t> *mutable_resultTypes() {
+    return GetPointer<flatbuffers::Vector<uint16_t> *>(VT_RESULTTYPES);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -134,10 +184,10 @@ struct RPCHeaderBuilder {
   void add_methodName(flatbuffers::Offset<flatbuffers::String> methodName) {
     fbb_.AddOffset(RPCHeader::VT_METHODNAME, methodName);
   }
-  void add_parameterTypes(flatbuffers::Offset<flatbuffers::Vector<int8_t>> parameterTypes) {
+  void add_parameterTypes(flatbuffers::Offset<flatbuffers::Vector<uint16_t>> parameterTypes) {
     fbb_.AddOffset(RPCHeader::VT_PARAMETERTYPES, parameterTypes);
   }
-  void add_resultTypes(flatbuffers::Offset<flatbuffers::Vector<int8_t>> resultTypes) {
+  void add_resultTypes(flatbuffers::Offset<flatbuffers::Vector<uint16_t>> resultTypes) {
     fbb_.AddOffset(RPCHeader::VT_RESULTTYPES, resultTypes);
   }
   explicit RPCHeaderBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -159,8 +209,8 @@ inline flatbuffers::Offset<RPCHeader> CreateRPCHeader(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> managerName = 0,
     flatbuffers::Offset<flatbuffers::String> methodName = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int8_t>> parameterTypes = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int8_t>> resultTypes = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<uint16_t>> parameterTypes = 0,
+    flatbuffers::Offset<flatbuffers::Vector<uint16_t>> resultTypes = 0) {
   RPCHeaderBuilder builder_(_fbb);
   builder_.add_resultTypes(resultTypes);
   builder_.add_parameterTypes(parameterTypes);
@@ -173,12 +223,12 @@ inline flatbuffers::Offset<RPCHeader> CreateRPCHeaderDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *managerName = nullptr,
     const char *methodName = nullptr,
-    const std::vector<int8_t> *parameterTypes = nullptr,
-    const std::vector<int8_t> *resultTypes = nullptr) {
+    const std::vector<uint16_t> *parameterTypes = nullptr,
+    const std::vector<uint16_t> *resultTypes = nullptr) {
   auto managerName__ = managerName ? _fbb.CreateString(managerName) : 0;
   auto methodName__ = methodName ? _fbb.CreateString(methodName) : 0;
-  auto parameterTypes__ = parameterTypes ? _fbb.CreateVector<int8_t>(*parameterTypes) : 0;
-  auto resultTypes__ = resultTypes ? _fbb.CreateVector<int8_t>(*resultTypes) : 0;
+  auto parameterTypes__ = parameterTypes ? _fbb.CreateVector<uint16_t>(*parameterTypes) : 0;
+  auto resultTypes__ = resultTypes ? _fbb.CreateVector<uint16_t>(*resultTypes) : 0;
   return WildRPC::CreateRPCHeader(
       _fbb,
       managerName__,
@@ -200,8 +250,8 @@ inline void RPCHeader::UnPackTo(RPCHeaderT *_o, const flatbuffers::resolver_func
   (void)_resolver;
   { auto _e = managerName(); if (_e) _o->managerName = _e->str(); }
   { auto _e = methodName(); if (_e) _o->methodName = _e->str(); }
-  { auto _e = parameterTypes(); if (_e) { _o->parameterTypes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->parameterTypes[_i] = static_cast<WildRPC::Type>(_e->Get(_i)); } } }
-  { auto _e = resultTypes(); if (_e) { _o->resultTypes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->resultTypes[_i] = static_cast<WildRPC::Type>(_e->Get(_i)); } } }
+  { auto _e = parameterTypes(); if (_e) { _o->parameterTypes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->parameterTypes[_i] = static_cast<WildRPC::TypeInfo>(_e->Get(_i)); } } }
+  { auto _e = resultTypes(); if (_e) { _o->resultTypes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->resultTypes[_i] = static_cast<WildRPC::TypeInfo>(_e->Get(_i)); } } }
 }
 
 inline flatbuffers::Offset<RPCHeader> RPCHeader::Pack(flatbuffers::FlatBufferBuilder &_fbb, const RPCHeaderT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -214,8 +264,8 @@ inline flatbuffers::Offset<RPCHeader> CreateRPCHeader(flatbuffers::FlatBufferBui
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RPCHeaderT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _managerName = _fbb.CreateString(_o->managerName);
   auto _methodName = _fbb.CreateString(_o->methodName);
-  auto _parameterTypes = _fbb.CreateVectorScalarCast<int8_t>(flatbuffers::data(_o->parameterTypes), _o->parameterTypes.size());
-  auto _resultTypes = _fbb.CreateVectorScalarCast<int8_t>(flatbuffers::data(_o->resultTypes), _o->resultTypes.size());
+  auto _parameterTypes = _fbb.CreateVectorScalarCast<uint16_t>(flatbuffers::data(_o->parameterTypes), _o->parameterTypes.size());
+  auto _resultTypes = _fbb.CreateVectorScalarCast<uint16_t>(flatbuffers::data(_o->resultTypes), _o->resultTypes.size());
   return WildRPC::CreateRPCHeader(
       _fbb,
       _managerName,

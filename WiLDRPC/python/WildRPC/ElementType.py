@@ -2,7 +2,7 @@
 
 # namespace: WildRPC
 
-class Type(object):
+class ElementType(object):
     Boolean = 0
     Integer = 1
     Float = 2

@@ -72,12 +72,27 @@ json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
     auto&& compList = mergedCompSch["definitions"]["Component"]["oneOf"];
     compList = json();
 
+    auto isComponent = [](json const& node) {
+        if (node.count("properties"))
+        {
+            if (node.at("properties").count("Super"))
+            {
+                auto ref = node.at("properties").at("Super").at("$ref").get<std::string>();
+                return ref.find("ComponentGD") != std::string::npos;
+            }
+        }
+        return false;
+    };
+
     // Looking for components with same name and merge them
     std::map<std::string, json const*> editionCompMap;
     std::set<std::string> alreadyInsertedComponents;
     for (auto&& name_comp : editionCompSch.items())
     {
-        editionCompMap.emplace(name_comp.key(), &(name_comp.value()));
+        if (isComponent(name_comp.value()))
+        {
+            editionCompMap.emplace(name_comp.key(), &(name_comp.value()));
+        }
     }
 
     for (json const& dep : dependencies["Dependencies"])
@@ -140,11 +155,14 @@ json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
         };
     for (auto&& name_comp : editionCompSch.items())
     {
-        json editorOnlyMeta;
-        editorOnlyMeta["editor"] = true;
-        editorOnlyMeta["runtime"] = false;
+        if (isComponent(name_comp.value()))
+        {
+            json editorOnlyMeta;
+            editorOnlyMeta["editor"] = true;
+            editorOnlyMeta["runtime"] = false;
 
-        addComponent(name_comp.key(), "EditionComponents.json", editorOnlyMeta);
+            addComponent(name_comp.key(), "EditionComponents.json", editorOnlyMeta);
+        }
     }
 
     for (json const& dep : dependencies["Dependencies"])

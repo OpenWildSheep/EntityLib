@@ -4,13 +4,14 @@
 
 #pragma warning(push, 0)
 #include "../../../external/mapbox/variant.hpp"
+#include <WiLDRPC/RPCHeader_generated.h>
 #pragma warning(pop)
 
 #include "WildRPCType.h"
 
 namespace WildRPC
 {
-    enum Type : int;
+    enum Type : int8_t;
 }
 
 namespace WRPC

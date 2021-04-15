@@ -1,0 +1,29 @@
+include "wbin.fbs";
+
+namespace WBIN;
+
+struct GVoxelData
+{
+	data:int;
+}
+
+table GVoxelPile
+{
+	nbEmptyVoxels:int;
+	voxels:[GVoxelData];
+}
+
+table GVoxelColumn
+{
+	piles:[GVoxelPile];
+}
+
+table GVoxelVolume
+{
+	columns:[GVoxelColumn];
+}
+
+root_type GVoxelVolume;
+
+
+

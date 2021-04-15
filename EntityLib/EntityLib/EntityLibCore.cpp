@@ -11,7 +11,7 @@ namespace Ent
     void fprintfImpl(FILE* file, char const* message)
     {
         fprintf(file, message);
-        if (::IsDebuggerPresent())
+        if (::IsDebuggerPresent() != 0)
         {
             ::OutputDebugStringA(message);
         }

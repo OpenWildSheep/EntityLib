@@ -1,0 +1,27 @@
+include "wbin.fbs";
+
+namespace WBIN;
+
+// Each stamp may stand for a different type of spatial data:
+// - vegetation mesh
+// - biome area
+// - ...
+// These types only differ by the size and shape of their stamp
+// as well as the tags that they embed
+//
+// For now stamps are only represented as bounding box shapes
+table Stamp
+{
+	shape:AABB;
+	matrix:Matrix44;
+	tags:[int];
+}
+
+table StampCloud
+{
+	stamps:[Stamp];
+	boundingBox:AABB;
+}
+
+root_type StampCloud;
+

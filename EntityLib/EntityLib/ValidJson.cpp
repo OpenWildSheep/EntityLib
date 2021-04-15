@@ -19,7 +19,9 @@
 
 using namespace nlohmann;
 
-static char schemaPath[1024] = {};
+// Since the prototype of fetchDocument is fixed by valijson and is a C function,
+// schemaPath can only be static
+static thread_local char schemaPath[1024] = {};
 
 static std::string filterError(char const* message)
 {

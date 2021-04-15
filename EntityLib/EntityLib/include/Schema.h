@@ -120,7 +120,7 @@ namespace Ent
         /// Store metadata for array type
         struct ArrayMeta : BaseMeta
         {
-            std::string overridePolicy; ///< Policy used to override the array from the template
+            std::string overridePolicy; ///< Policy used to override the array from the prefab
             bool ordered = true;
         };
         /// Store metadata for all schema which doesn't have specific field

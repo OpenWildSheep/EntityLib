@@ -46,7 +46,7 @@ namespace Ent
         Ent::Subschema const* itemSchema = &colorSchema.singularItems->get();
         const auto& defaultColor = colorSchema.defaultValue;
         const auto getDefaultColorChannel = [&](size_t _channel) {
-            return Override<float>{defaultColor.at(_channel).get<float>()};
+            return Override<double>{defaultColor.at(_channel).get<double>()};
         };
         std::vector<value_ptr<Ent::Node>> nodes{
             make_value<Ent::Node>(getDefaultColorChannel(0), itemSchema),
@@ -346,15 +346,15 @@ namespace Ent
         throw BadType();
     }
 
-    float Node::getFloat() const
+    double Node::getFloat() const
     {
-        if (value.is<Override<float>>())
+        if (value.is<Override<double>>())
         {
-            return value.get<Override<float>>().get();
+            return value.get<Override<double>>().get();
         }
         if (value.is<Override<int64_t>>())
         {
-            return static_cast<float>(value.get<Override<int64_t>>().get());
+            return static_cast<double>(value.get<Override<int64_t>>().get());
         }
         throw BadType();
     }
@@ -397,9 +397,9 @@ namespace Ent
         return value;
     }
 
-    void Node::setFloat(float _val)
+    void Node::setFloat(double _val)
     {
-        value.get<Override<float>>().set(_val);
+        value.get<Override<double>>().set(_val);
     }
     void Node::setInt(int64_t _val)
     {
@@ -536,7 +536,7 @@ namespace Ent
             out.nodes.reserve(_obj.size());
             for (auto&& name_node : _obj)
             {
-                out.nodes.push_back({std::get<0>(name_node), std::get<1>(name_node)->detach()});
+                out.nodes.emplace_back(std::get<0>(name_node), std::get<1>(name_node)->detach());
             }
             std::sort(begin(out), end(out), CompObject());
             return Node(std::move(out), schema);
@@ -592,8 +592,8 @@ namespace Ent
             out.nodes.reserve(_obj.size());
             for (auto&& name_node : _obj)
             {
-                out.nodes.push_back(
-                    {std::get<0>(name_node), std::get<1>(name_node)->makeInstanceOf()});
+                out.nodes.emplace_back(
+                    std::get<0>(name_node), std::get<1>(name_node)->makeInstanceOf());
             }
             std::sort(begin(out), end(out), CompObject());
             return Node(std::move(out), schema);
@@ -605,7 +605,9 @@ namespace Ent
             ENTLIB_ASSERT(_un.schema != nullptr);
             detUnion.schema = _un.schema;
             if (_un.wrapper != nullptr)
+            {
                 detUnion.wrapper = _un.wrapper->makeInstanceOf();
+            }
             detUnion.metaData = _un.metaData;
             return Node(std::move(detUnion), schema);
         }
@@ -640,7 +642,9 @@ namespace Ent
         bool operator()(Object const& _obj) const
         {
             if (_obj.instanceOf.hasOverride)
+            {
                 return true;
+            }
             for (auto&& name_node : _obj)
             {
                 if (std::get<1>(name_node)->hasOverride())
@@ -686,7 +690,9 @@ namespace Ent
         bool operator()(Object const& _obj) const
         {
             if (_obj.instanceOf.hasPrefab)
+            {
                 return true;
+            }
             for (auto&& name_node : _obj)
             {
                 if (std::get<1>(name_node)->hasPrefabValue())
@@ -710,12 +716,9 @@ namespace Ent
 
     bool Node::matchValueSource(OverrideValueSource _source) const
     {
-        if (_source == OverrideValueSource::OverrideOrPrefab and hasDefaultValue()
-            or _source == OverrideValueSource::Override and not hasOverride())
-        {
-            return false;
-        }
-        return true;
+        return not(
+            _source == OverrideValueSource::OverrideOrPrefab and hasDefaultValue()
+            or _source == OverrideValueSource::Override and not hasOverride());
     }
 
     std::vector<char const*> Node::getFieldNames() const
@@ -871,7 +874,7 @@ namespace Ent
         file << node.dump(4);
     }
 
-    float Node::getDefaultFloat() const
+    double Node::getDefaultFloat() const
     {
         return getRawFloat(OverrideValueLocation::Default).value();
     }
@@ -888,17 +891,18 @@ namespace Ent
         return getRawBool(OverrideValueLocation::Default).value();
     }
 
-    tl::optional<float> Node::getRawFloat(OverrideValueLocation _location) const
+    tl::optional<double> Node::getRawFloat(OverrideValueLocation _location) const
     {
-        if (value.is<Override<float>>())
+        if (value.is<Override<double>>())
         {
-            return value.get<Override<float>>().getRaw(_location);
+            return value.get<Override<double>>().getRaw(_location);
         }
         if (value.is<Override<int64_t>>())
         {
             auto intValue = value.get<Override<int64_t>>().getRaw(_location);
-            return intValue.has_value() ? tl::optional<float>{static_cast<float>(intValue.value())} :
-                                          tl::nullopt;
+            return intValue.has_value() ?
+                       tl::optional<double>{static_cast<double>(intValue.value())} :
+                       tl::nullopt;
         }
         throw BadType();
     }
@@ -996,15 +1000,17 @@ namespace Ent
         mapbox::util::apply_visitor(ComputeMem{prof}, value);
     }
 
-    void Ent::Node::setInstanceOf(char const* _templateNodePath)
+    void Ent::Node::setInstanceOf(char const* _prefabNodePath)
     {
         if (not value.is<Object>())
+        {
             throw BadType();
+        }
 
-        auto relPath = getEntityLib()->getRelativePath(_templateNodePath).generic_u8string();
-        json nodeData = loadJsonFile(getEntityLib()->getAbsolutePath(_templateNodePath));
-        Node templateNode = loadNode(getEntityLib(), *getSchema(), nodeData, nullptr);
-        (*this) = templateNode.makeInstanceOf();
+        auto relPath = getEntityLib()->getRelativePath(_prefabNodePath).generic_u8string();
+        json nodeData = loadJsonFile(getEntityLib()->getAbsolutePath(_prefabNodePath));
+        Node prefabNode = loadNode(getEntityLib(), *getSchema(), nodeData, nullptr);
+        (*this) = prefabNode.makeInstanceOf();
         value.get<Object>().instanceOf.set(relPath);
     }
 
@@ -1182,16 +1188,16 @@ namespace Ent
     {
         thumbnail.set(std::move(_thumbPath));
     }
-    std::array<float, 4> Entity::getColor() const
+    std::array<double, 4> Entity::getColor() const
     {
-        std::array<float, 4> col{};
+        std::array<double, 4> col{};
         for (size_t i = 0; i < 4; ++i)
         {
             col[i] = color.at(i)->getFloat();
         }
         return col;
     }
-    void Entity::setColor(std::array<float, 4> _color)
+    void Entity::setColor(std::array<double, 4> _color)
     {
         for (size_t i = 0; i < 4; ++i)
         {
@@ -1331,10 +1337,10 @@ namespace Ent
         parentScene = _scene;
     }
 
-    void Entity::setInstanceOf(std::string _template)
+    void Entity::setInstanceOf(std::string const& _prefab)
     {
-        std::replace(begin(_template), end(_template), '\\', '/');
-        char const* normTmpl = _template.c_str();
+        std::string const prefab = entlib->getRelativePath(_prefab).generic_u8string();
+        char const* normTmpl = prefab.c_str();
         std::shared_ptr<Ent::Entity const> templ = entlib->loadEntityReadOnly(normTmpl, nullptr);
         components.clear();
         for (auto const& type_comp : templ->getComponents())
@@ -1543,14 +1549,18 @@ namespace Ent
     Entity const* Scene::getEntity(size_t index) const
     {
         if (index >= objects.size())
+        {
             return nullptr;
+        }
         return objects.at(index).get();
     }
 
     Entity* Scene::getEntity(size_t index)
     {
         if (index >= objects.size())
+        {
             return nullptr;
+        }
         return objects.at(index).get();
     }
 
@@ -1664,11 +1674,11 @@ struct MergeMapOverride
     json const* _default;
     Ent::EntityLib const* entlib;
 
-    // Merge the instance array/map/set with the template array/map/set and return the resulting Ent::Array
+    // Merge the instance array/map/set with the prefab array/map/set and return the resulting Ent::Array
     template <typename GetKeyJson, typename GetKeyNode>
     Ent::Array operator()(
         GetKeyJson&& getKeyJson, ///< Function to get the key in the json (instance)
-        GetKeyNode&& getKeyNode ///< Function to get the key in the Node (template)
+        GetKeyNode&& getKeyNode ///< Function to get the key in the Node (prefab)
     )
     {
         using namespace Ent;
@@ -1715,7 +1725,7 @@ struct MergeMapOverride
                         subSuper,
                         subDefault);
                     result.emplace_back(key, std::move(tmpNode));
-                    instancePropMap.erase(key); // Later we need to know which item are NOT in the template
+                    instancePropMap.erase(key); // Later we need to know which item are NOT in the prefab
                 }
                 else // Not overriden
                 {
@@ -1744,7 +1754,7 @@ struct MergeMapOverride
                         nullptr,
                         &subDefault);
                     result.emplace_back(key, std::move(tmpNode));
-                    instancePropMap.erase(key); // Later we need to know which item are NOT in the template
+                    instancePropMap.erase(key); // Later we need to know which item are NOT in the prefab
                 }
                 else // Not overriden
                 {
@@ -1756,7 +1766,7 @@ struct MergeMapOverride
                 ++index;
             }
         }
-        // Load items from instance which are not in template neither in default (they are new)
+        // Load items from instance which are not in prefab neither in default (they are new)
         // Use _data (and not instancePropMap) to keep the order of items inside _data
         for (auto const& item : _data)
         {
@@ -1817,13 +1827,13 @@ static Ent::Node loadNode(
         if (_nodeSchema.constValue.has_value())
         {
             // _nodeSchema is const and the value can't be overriden
-            std::string const def = _nodeSchema.constValue->get<std::string>();
+            auto const def = _nodeSchema.constValue->get<std::string>();
             // We don't want to "override" this value to avoid to write every oneOf
-            if (_super != nullptr) // If there is a template, the value is not overriden
+            if (_super != nullptr) // If there is a prefab, the value is not overriden
             {
                 result = Ent::Node(Ent::Override<String>("", def, tl::nullopt), &_nodeSchema);
             }
-            else // If there is no template, it is overriden to be sure the node "hasOverride" and be saved
+            else // If there is no prefab, it is overriden to be sure the node "hasOverride" and be saved
             {
                 result = Ent::Node(Ent::Override<String>("", tl::nullopt, def), &_nodeSchema);
             }
@@ -1868,29 +1878,29 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::number:
     {
-        float const def = _default == nullptr ? float{} : _default->get<float>();
-        tl::optional<float> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
-                                               tl::optional<float>(_super->getFloat()) :
-                                               tl::optional<float>(tl::nullopt);
-        tl::optional<float> const val =
+        double const def = _default == nullptr ? double{} : _default->get<double>();
+        tl::optional<double> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
+                                                tl::optional<double>(_super->getFloat()) :
+                                                tl::optional<double>(tl::nullopt);
+        tl::optional<double> const val =
             _data.is_number_float() or _data.is_number_integer() or _data.is_number_unsigned() ?
-                tl::optional<float>(_data.get<float>()) :
-                tl::optional<float>(tl::nullopt);
-        result = Ent::Node(Ent::Override<float>(def, supVal, val), &_nodeSchema);
+                tl::optional<double>(_data.get<double>()) :
+                tl::optional<double>(tl::nullopt);
+        result = Ent::Node(Ent::Override<double>(def, supVal, val), &_nodeSchema);
     }
     break;
     case Ent::DataType::object:
     {
         Ent::Object object;
         // Read the InstanceOf field
-        Ent::Node templateNode;
+        Ent::Node prefabNode;
         auto InstanceOfIter = _data.find("InstanceOf");
         if (InstanceOfIter != _data.end())
         {
-            std::string nodeFileName = InstanceOfIter->get<std::string>();
+            auto nodeFileName = InstanceOfIter->get<std::string>();
             json nodeData = loadJsonFile(_entlib->getAbsolutePath(nodeFileName));
-            templateNode = loadNode(_entlib, _nodeSchema, nodeData, _super, _default);
-            _super = &templateNode;
+            prefabNode = loadNode(_entlib, _nodeSchema, nodeData, _super, _default);
+            _super = &prefabNode;
             Ent::Override<String> tmplPath("", tl::nullopt, InstanceOfIter->get<std::string>());
             object.instanceOf = std::move(tmplPath);
         }
@@ -1902,12 +1912,12 @@ static Ent::Node loadNode(
             std::string const& name = std::get<0>(name_sub);
             Ent::Node const* superProp = (_super != nullptr) ? _super->at(name.c_str()) : nullptr;
             json const* defaultProp =
-                (_default != nullptr) and _default->count(name) ? &_default->at(name) : nullptr;
-            static json const emptyJson;
+                (_default != nullptr) and _default->count(name) != 0 ? &_default->at(name) : nullptr;
+            json const emptyJson;
             json const& prop = _data.count(name) != 0 ? _data.at(name) : emptyJson;
             Ent::Node tmpNode =
                 loadNode(_entlib, *std::get<1>(name_sub), prop, superProp, defaultProp);
-            object.nodes.push_back({name.c_str(), std::move(tmpNode)});
+            object.nodes.emplace_back(name.c_str(), std::move(tmpNode));
         }
         std::sort(begin(object), end(object), Ent::CompObject());
         result = Ent::Node(std::move(object), &_nodeSchema);
@@ -1977,7 +1987,7 @@ static Ent::Node loadNode(
                 {
                     // It is a C++ map.
                     // In json it is an array of "2 item array" where the 1st item is the key
-                    // and can be string, float or integer
+                    // and can be string, double or integer
                     // meta.ordered means the items have to be sorted by the key
                     Ent::DataType keyType = _nodeSchema.singularItems->get().linearItems->at(0)->type;
 #pragma warning(push)
@@ -1991,7 +2001,7 @@ static Ent::Node loadNode(
                         break;
                     case Ent::DataType::number:
                         arr = mergeMapOverride(
-                            [](json const& item) { return item[0].get<float>(); },
+                            [](json const& item) { return item[0].get<double>(); },
                             [](Node const* tmplItem) { return tmplItem->at(0llu)->getFloat(); });
                         break;
                     case Ent::DataType::integer:
@@ -2007,7 +2017,7 @@ static Ent::Node loadNode(
                 case "set"_hash:
                 {
                     // It is a C++ set.
-                    // In json it is an array of primitive. string, float or integer or oneOf
+                    // In json it is an array of primitive. string, double or integer or oneOf
                     // meta.ordered means the items have to be sorted by the key
                     Ent::DataType const keyType = _nodeSchema.singularItems->get().type;
                     switch (keyType)
@@ -2030,7 +2040,7 @@ static Ent::Node loadNode(
                         break;
                     case Ent::DataType::number: // The key is the item itself
                         arr = mergeMapOverride(
-                            [](json const& item) { return item.get<float>(); },
+                            [](json const& item) { return item.get<double>(); },
                             [](Node const* tmplItem) { return tmplItem->getFloat(); });
                         break;
                     case Ent::DataType::integer: // The key is the item itself
@@ -2090,7 +2100,7 @@ static Ent::Node loadNode(
                 json const* subDefault = (_default != nullptr and _default->size() > index) ?
                                              &_default->at(index) :
                                              nullptr;
-                static json const emptyJson;
+                json const emptyJson;
                 json const& prop = _data.size() > index ? _data.at(index) : emptyJson;
                 Ent::Node tmpNode = loadNode(_entlib, *sub, prop, subSuper, subDefault);
                 arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
@@ -2144,7 +2154,7 @@ static Ent::Node loadNode(
         }
         else // No uniontype
         {
-            if (_super != nullptr) // If no uniontype, use the one the template
+            if (_super != nullptr) // If no uniontype, use the one the prefab
             {
                 dataType = _super->getUnionType();
             }
@@ -2231,14 +2241,7 @@ json Ent::EntityLib::dumpNode(
     case Ent::DataType::string: data = _node.getString(); break;
     case Ent::DataType::boolean: data = _node.getBool(); break;
     case Ent::DataType::integer: data = _node.getInt(); break;
-    case Ent::DataType::number:
-    {
-        // Round to six digit after the dot
-        float const value = _node.getFloat();
-        auto const i = std::llround(double(value) * 1000000.);
-        data = double(i) / 1000000.0;
-        break;
-    }
+    case Ent::DataType::number: data = _node.getFloat(); break;
     case Ent::DataType::object:
     {
         data = json::object();
@@ -2582,7 +2585,7 @@ struct UnsupportedFormat : std::exception
 
 struct FileSystemError : public std::runtime_error
 {
-    std::string makeWhatMessage(
+    static std::string makeWhatMessage(
         std::string const& msg, std::filesystem::path const& path1, std::error_code error)
     {
         return Ent::format(
@@ -2618,7 +2621,7 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
                                  "last_write_time(p): invalid argument: %ls (%s)",
                                  absPath.c_str(),
                                  error.message().c_str());
-        throw FileSystemError(msg.c_str(), absPath, error);
+        throw FileSystemError(msg, absPath, error);
     }
     auto iter = cache.find(relPath);
     if (iter == cache.end())
@@ -2694,7 +2697,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
             // ... and look if there is an override.
             for (json const& entNode : _entities)
             {
-                std::string const instEntName = entNode.at("Name").get<std::string>();
+                auto const instEntName = entNode.at("Name").get<std::string>();
                 if (superEnt->getName() == instEntName)
                 {
                     instEntNode = &entNode;
@@ -2713,7 +2716,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
     // Add new entities
     for (json const& entNode : _entities)
     {
-        std::string const name = entNode.at("Name").get<std::string>();
+        auto const name = entNode.at("Name").get<std::string>();
         if (entFromSuper.count(name) != 0)
         {
             continue;
@@ -2845,7 +2848,7 @@ static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& 
                 componentsNode.emplace_back(std::move(compNode));
             }
         }
-        else if (not comp->hasTemplate or comp->root.hasOverride())
+        else if (not comp->hasPrefab or comp->root.hasOverride())
         {
             json compNode;
             compNode.emplace("Version", comp->version);
@@ -2978,9 +2981,13 @@ std::filesystem::path Ent::EntityLib::getRelativePath(std::filesystem::path cons
             if (parrent.has_parent_path() and parrent.parent_path() != parrent)
             {
                 if (relPath.empty())
+                {
                     relPath = parrent.filename();
+                }
                 else
+                {
                     relPath = parrent.filename() / relPath;
+                }
                 parrent = parrent.parent_path();
             }
             else

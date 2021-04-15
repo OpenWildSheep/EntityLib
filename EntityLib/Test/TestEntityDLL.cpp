@@ -223,7 +223,7 @@ try
 
         // Test default value
         Ent::Component const* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
-        ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->getFloat() == 100.f);
+        ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->getFloat() == 100.);
         ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->isDefault());
         ENTLIB_ASSERT(
             voxelSimulationGD->root.getTypeName()
@@ -303,7 +303,7 @@ try
         // TEST sub-object with non-default values
         Ent::Component const* ldprimitive = ent->getComponent("LDPrimitive");
         Ent::Node const* primitiveData = ldprimitive->root.at("PrimitiveData");
-        ENTLIB_ASSERT(primitiveData->at("Height")->getFloat() == 42.0f);
+        ENTLIB_ASSERT(primitiveData->at("Height")->getFloat() == 42.0);
 
         // TEST Default size for array is minItems
         Ent::Component const* physicsGD = ent->getComponent("PhysicsGD");
@@ -404,23 +404,23 @@ try
         Ent::Component* transformGD = ent->addComponent("TransformGD");
         Ent::Node* mat33 = transformGD->root.at("Matrix");
         auto testMat33 = [&]() {
-            ENTLIB_ASSERT(mat33->at(0llu)->getFloat() == 1.f);
-            ENTLIB_ASSERT(mat33->at(0llu)->getDefaultFloat() == 1.f);
-            ENTLIB_ASSERT(mat33->at(1llu)->getFloat() == 0.f);
-            ENTLIB_ASSERT(mat33->at(1llu)->getDefaultFloat() == 0.f);
-            ENTLIB_ASSERT(mat33->at(2llu)->getFloat() == 0.f);
-            ENTLIB_ASSERT(mat33->at(3llu)->getFloat() == 0.f);
-            ENTLIB_ASSERT(mat33->at(4llu)->getFloat() == 1.f);
-            ENTLIB_ASSERT(mat33->at(4llu)->getDefaultFloat() == 1.f);
-            ENTLIB_ASSERT(mat33->at(5llu)->getFloat() == 0.f);
+            ENTLIB_ASSERT(mat33->at(0llu)->getFloat() == 1.);
+            ENTLIB_ASSERT(mat33->at(0llu)->getDefaultFloat() == 1.);
+            ENTLIB_ASSERT(mat33->at(1llu)->getFloat() == 0.);
+            ENTLIB_ASSERT(mat33->at(1llu)->getDefaultFloat() == 0.);
+            ENTLIB_ASSERT(mat33->at(2llu)->getFloat() == 0.);
+            ENTLIB_ASSERT(mat33->at(3llu)->getFloat() == 0.);
+            ENTLIB_ASSERT(mat33->at(4llu)->getFloat() == 1.);
+            ENTLIB_ASSERT(mat33->at(4llu)->getDefaultFloat() == 1.);
+            ENTLIB_ASSERT(mat33->at(5llu)->getFloat() == 0.);
         };
 
         Ent::Component* testDefaultValues = ent->addComponent("TestDefaultValues");
         mat33 = testDefaultValues->root.at("Matrix");
         testMat33();
         mat33 = testDefaultValues->root.at("Matrix2");
-        ENTLIB_ASSERT(mat33->at(4llu)->getDefaultFloat() == 4.f);
-        ENTLIB_ASSERT(mat33->at(4llu)->getFloat() == 4.f);
+        ENTLIB_ASSERT(mat33->at(4llu)->getDefaultFloat() == 4.);
+        ENTLIB_ASSERT(mat33->at(4llu)->getFloat() == 4.);
         ENTLIB_ASSERT(not mat33->at(4llu)->hasOverride());
         ENTLIB_ASSERT(not mat33->at(4llu)->isSet());
     }
@@ -615,7 +615,7 @@ try
         Ent::Component const* trans = subObj.getComponent("TransformGD");
         ENTLIB_ASSERT(trans->root.at("Position")->at(0llu)->getFloat() == 0.0);
 
-        // Test instanciation of a template Node
+        // Test instanciation of a prefab Node
         Ent::Component const* stickToTerrain = ent.getComponent("StickToTerrain");
         ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
         ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isSet() == false);
@@ -637,7 +637,7 @@ try
         // TEST read inherited values
         ENTLIB_ASSERT(
             sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // Inherited
-        ENTLIB_ASSERT(sysCreat->root.at("Life")->getFloat() == 1000.f); // Inherited
+        ENTLIB_ASSERT(sysCreat->root.at("Life")->getFloat() == 1000.); // Inherited
 
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent->getComponent("HeightObj");
@@ -738,7 +738,7 @@ try
         // TEST read inherited values
         ENTLIB_ASSERT(
             sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // Inherited
-        ENTLIB_ASSERT(sysCreat->root.at("Life")->getFloat() == 1000.f); // Inherited
+        ENTLIB_ASSERT(sysCreat->root.at("Life")->getFloat() == 1000.); // Inherited
 
         // TEST read default value
         ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // Inherited (from default)
@@ -841,7 +841,7 @@ try
         // Test makeInstanceOf
         EntityPtr instanceOf = entlib.makeInstanceOf("prefab.entity");
 
-        // Test instanciation of a template Node
+        // Test instanciation of a prefab Node
         Ent::Component* stickToTerrain = instanceOf->addComponent("StickToTerrain");
         ENTLIB_CHECK_EXCEPTION(
             stickToTerrain->root.setInstanceOf("C:/test.StickToTerrain.node"), std::runtime_error);
@@ -849,7 +849,7 @@ try
         stickToTerrain->root.setInstanceOf(
             (current_path() / "test.StickToTerrain.node").generic_u8string().c_str());
         ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
-        stickToTerrain->root.at("NormalRatio")->setFloat(0.6f);
+        stickToTerrain->root.at("NormalRatio")->setFloat(0.6);
 
         ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
         ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isSet() == false);
@@ -866,7 +866,7 @@ try
 
         ent->getComponent("TransformGD")->root.getFieldNames();
 
-        // Test instanciation of a template Node
+        // Test instanciation of a prefab Node
         Ent::Component const* stickToTerrain = ent->getComponent("StickToTerrain");
         ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
         ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
@@ -912,10 +912,10 @@ try
         ENTLIB_ASSERT(instanceOf.getComponent("NetworkNode") != nullptr);
         instanceOf.getComponent("TransformGD")->root.getFieldNames();
 
-        // Test instanciation of a template Node
+        // Test instanciation of a prefab Node
         Ent::Component* stickToTerrain = instanceOf.addComponent("StickToTerrain");
         stickToTerrain->root.setInstanceOf("test.StickToTerrain.node");
-        stickToTerrain->root.at("NormalRatio")->setFloat(0.6f);
+        stickToTerrain->root.at("NormalRatio")->setFloat(0.6);
 
         entlib.saveEntity(instanceOf, "setInstanceOf.entity");
     }
@@ -996,7 +996,7 @@ try
         EntityPtr ovrdEntt = entlib.loadEntity("entity-subscene-override-saved.entity");
         auto ovrdSubs = ovrdEntt->getSubSceneComponent();
 
-        //Test that we properly still have access to the template subscene entities
+        //Test that we properly still have access to the prefab subscene entities
         ENTLIB_ASSERT(not empty(ovrdSubs->embedded->getObjects()));
     }
 
@@ -1031,7 +1031,7 @@ try
     scene->getObjects().front()->addComponent("BeamGeneratorGD")->root.getFieldNames();
     auto fieldNameCount =
         scene->getObjects().front()->addComponent("HeightObj")->root.getFieldNames().size();
-    ENTLIB_ASSERT(fieldNameCount == 5);
+    ENTLIB_ASSERT(fieldNameCount == 6);
 
     auto ep1Iter = std::find_if(
         begin(scene->getObjects()),
@@ -1040,6 +1040,7 @@ try
     ENTLIB_ASSERT(ep1Iter != end(scene->getObjects()));
     ENTLIB_ASSERT((*ep1Iter)->getSubSceneComponent() != nullptr);
 
+    entlib.rawdataPath = current_path();
     scene->addEntity(entlib.makeInstanceOf((current_path() / "prefab.entity").generic_u8string()));
 
     entlib.saveScene(*scene, current_path() / "SceneMainWorld.test.scene");

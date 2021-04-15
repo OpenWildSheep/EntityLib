@@ -16,12 +16,10 @@ struct PCloudT;
 
 struct PCloudT : public flatbuffers::NativeTable {
   typedef PCloud TableType;
-  std::unique_ptr<WBIN::Float3ChannelT> position;
-  std::unique_ptr<WBIN::Float3ChannelT> color;
-  std::unique_ptr<WBIN::Float3ChannelT> texcoord;
-  std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf;
-  PCloudT() {
-  }
+  std::unique_ptr<WBIN::Float3ChannelT> position{};
+  std::unique_ptr<WBIN::Float3ChannelT> color{};
+  std::unique_ptr<WBIN::Float3ChannelT> texcoord{};
+  std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf{};
 };
 
 struct PCloud FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -94,7 +92,6 @@ struct PCloudBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  PCloudBuilder &operator=(const PCloudBuilder &);
   flatbuffers::Offset<PCloud> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<PCloud>(end);
@@ -120,7 +117,7 @@ inline flatbuffers::Offset<PCloud> CreatePCloud(
 flatbuffers::Offset<PCloud> CreatePCloud(flatbuffers::FlatBufferBuilder &_fbb, const PCloudT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 inline PCloudT *PCloud::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::PCloudT> _o = std::unique_ptr<WBIN::PCloudT>(new PCloudT());
+  auto _o = std::unique_ptr<PCloudT>(new PCloudT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }

@@ -37,7 +37,6 @@ struct FloatBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  FloatBuilder &operator=(const FloatBuilder &);
   flatbuffers::Offset<Float> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Float>(end);

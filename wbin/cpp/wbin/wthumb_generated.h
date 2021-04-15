@@ -16,12 +16,10 @@ struct ThumbT;
 
 struct ThumbT : public flatbuffers::NativeTable {
   typedef Thumb TableType;
-  std::unique_ptr<WBIN::AABB> aabb;
-  std::unique_ptr<WBIN::Float3ChannelT> position;
-  std::vector<WBIN::Float3> color;
-  std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf;
-  ThumbT() {
-  }
+  std::unique_ptr<WBIN::AABB> aabb{};
+  std::unique_ptr<WBIN::Float3ChannelT> position{};
+  std::vector<WBIN::Float3> color{};
+  std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf{};
 };
 
 struct Thumb FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -93,7 +91,6 @@ struct ThumbBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ThumbBuilder &operator=(const ThumbBuilder &);
   flatbuffers::Offset<Thumb> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Thumb>(end);
@@ -135,7 +132,7 @@ inline flatbuffers::Offset<Thumb> CreateThumbDirect(
 flatbuffers::Offset<Thumb> CreateThumb(flatbuffers::FlatBufferBuilder &_fbb, const ThumbT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 inline ThumbT *Thumb::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::ThumbT> _o = std::unique_ptr<WBIN::ThumbT>(new ThumbT());
+  auto _o = std::unique_ptr<ThumbT>(new ThumbT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }

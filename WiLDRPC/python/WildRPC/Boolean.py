@@ -10,12 +10,16 @@ class Boolean(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsBoolean(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Boolean()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsBoolean(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # Boolean
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -27,6 +31,15 @@ class Boolean(object):
             return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
         return False
 
-def BooleanStart(builder): builder.StartObject(1)
-def BooleanAddValue(builder, value): builder.PrependBoolSlot(0, value, 0)
-def BooleanEnd(builder): return builder.EndObject()
+def Start(builder): builder.StartObject(1)
+def BooleanStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddValue(builder, value): builder.PrependBoolSlot(0, value, 0)
+def BooleanAddValue(builder, value):
+    """This method is deprecated. Please switch to AddValue."""
+    return AddValue(builder, value)
+def End(builder): return builder.EndObject()
+def BooleanEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)

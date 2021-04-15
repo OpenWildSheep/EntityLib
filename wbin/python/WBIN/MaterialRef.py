@@ -10,12 +10,16 @@ class MaterialRef(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsMaterialRef(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = MaterialRef()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsMaterialRef(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # MaterialRef
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -90,19 +94,54 @@ class MaterialRef(object):
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def MaterialRefStart(builder): builder.StartObject(10)
-def MaterialRefAddMatName(builder, matName): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(matName), 0)
-def MaterialRefAddMatLuaSource(builder, matLuaSource): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(matLuaSource), 0)
-def MaterialRefAddMatLuaTemplate(builder, matLuaTemplate): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(matLuaTemplate), 0)
-def MaterialRefAddDiffuseTexPath(builder, diffuseTexPath): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(diffuseTexPath), 0)
-def MaterialRefAddNormalTexPath(builder, normalTexPath): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(normalTexPath), 0)
-def MaterialRefAddRoughTexMapPath(builder, roughTexMapPath): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(roughTexMapPath), 0)
-def MaterialRefAddCavityTexMapPath(builder, cavityTexMapPath): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(cavityTexMapPath), 0)
-def MaterialRefAddMetalTexMapPath(builder, metalTexMapPath): builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(metalTexMapPath), 0)
-def MaterialRefAddTranslucencyTexPath(builder, translucencyTexPath): builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(translucencyTexPath), 0)
-def MaterialRefAddOpacityTexPath(builder, opacityTexPath): builder.PrependUOffsetTRelativeSlot(9, flatbuffers.number_types.UOffsetTFlags.py_type(opacityTexPath), 0)
-def MaterialRefEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(10)
+def MaterialRefStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddMatName(builder, matName): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(matName), 0)
+def MaterialRefAddMatName(builder, matName):
+    """This method is deprecated. Please switch to AddMatName."""
+    return AddMatName(builder, matName)
+def AddMatLuaSource(builder, matLuaSource): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(matLuaSource), 0)
+def MaterialRefAddMatLuaSource(builder, matLuaSource):
+    """This method is deprecated. Please switch to AddMatLuaSource."""
+    return AddMatLuaSource(builder, matLuaSource)
+def AddMatLuaTemplate(builder, matLuaTemplate): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(matLuaTemplate), 0)
+def MaterialRefAddMatLuaTemplate(builder, matLuaTemplate):
+    """This method is deprecated. Please switch to AddMatLuaTemplate."""
+    return AddMatLuaTemplate(builder, matLuaTemplate)
+def AddDiffuseTexPath(builder, diffuseTexPath): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(diffuseTexPath), 0)
+def MaterialRefAddDiffuseTexPath(builder, diffuseTexPath):
+    """This method is deprecated. Please switch to AddDiffuseTexPath."""
+    return AddDiffuseTexPath(builder, diffuseTexPath)
+def AddNormalTexPath(builder, normalTexPath): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(normalTexPath), 0)
+def MaterialRefAddNormalTexPath(builder, normalTexPath):
+    """This method is deprecated. Please switch to AddNormalTexPath."""
+    return AddNormalTexPath(builder, normalTexPath)
+def AddRoughTexMapPath(builder, roughTexMapPath): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(roughTexMapPath), 0)
+def MaterialRefAddRoughTexMapPath(builder, roughTexMapPath):
+    """This method is deprecated. Please switch to AddRoughTexMapPath."""
+    return AddRoughTexMapPath(builder, roughTexMapPath)
+def AddCavityTexMapPath(builder, cavityTexMapPath): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(cavityTexMapPath), 0)
+def MaterialRefAddCavityTexMapPath(builder, cavityTexMapPath):
+    """This method is deprecated. Please switch to AddCavityTexMapPath."""
+    return AddCavityTexMapPath(builder, cavityTexMapPath)
+def AddMetalTexMapPath(builder, metalTexMapPath): builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(metalTexMapPath), 0)
+def MaterialRefAddMetalTexMapPath(builder, metalTexMapPath):
+    """This method is deprecated. Please switch to AddMetalTexMapPath."""
+    return AddMetalTexMapPath(builder, metalTexMapPath)
+def AddTranslucencyTexPath(builder, translucencyTexPath): builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(translucencyTexPath), 0)
+def MaterialRefAddTranslucencyTexPath(builder, translucencyTexPath):
+    """This method is deprecated. Please switch to AddTranslucencyTexPath."""
+    return AddTranslucencyTexPath(builder, translucencyTexPath)
+def AddOpacityTexPath(builder, opacityTexPath): builder.PrependUOffsetTRelativeSlot(9, flatbuffers.number_types.UOffsetTFlags.py_type(opacityTexPath), 0)
+def MaterialRefAddOpacityTexPath(builder, opacityTexPath):
+    """This method is deprecated. Please switch to AddOpacityTexPath."""
+    return AddOpacityTexPath(builder, opacityTexPath)
+def End(builder): return builder.EndObject()
+def MaterialRefEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 
 class MaterialRefT(object):
 
@@ -168,26 +207,26 @@ class MaterialRefT(object):
             translucencyTexPath = builder.CreateString(self.translucencyTexPath)
         if self.opacityTexPath is not None:
             opacityTexPath = builder.CreateString(self.opacityTexPath)
-        MaterialRefStart(builder)
+        Start(builder)
         if self.matName is not None:
-            MaterialRefAddMatName(builder, matName)
+            AddMatName(builder, matName)
         if self.matLuaSource is not None:
-            MaterialRefAddMatLuaSource(builder, matLuaSource)
+            AddMatLuaSource(builder, matLuaSource)
         if self.matLuaTemplate is not None:
-            MaterialRefAddMatLuaTemplate(builder, matLuaTemplate)
+            AddMatLuaTemplate(builder, matLuaTemplate)
         if self.diffuseTexPath is not None:
-            MaterialRefAddDiffuseTexPath(builder, diffuseTexPath)
+            AddDiffuseTexPath(builder, diffuseTexPath)
         if self.normalTexPath is not None:
-            MaterialRefAddNormalTexPath(builder, normalTexPath)
+            AddNormalTexPath(builder, normalTexPath)
         if self.roughTexMapPath is not None:
-            MaterialRefAddRoughTexMapPath(builder, roughTexMapPath)
+            AddRoughTexMapPath(builder, roughTexMapPath)
         if self.cavityTexMapPath is not None:
-            MaterialRefAddCavityTexMapPath(builder, cavityTexMapPath)
+            AddCavityTexMapPath(builder, cavityTexMapPath)
         if self.metalTexMapPath is not None:
-            MaterialRefAddMetalTexMapPath(builder, metalTexMapPath)
+            AddMetalTexMapPath(builder, metalTexMapPath)
         if self.translucencyTexPath is not None:
-            MaterialRefAddTranslucencyTexPath(builder, translucencyTexPath)
+            AddTranslucencyTexPath(builder, translucencyTexPath)
         if self.opacityTexPath is not None:
-            MaterialRefAddOpacityTexPath(builder, opacityTexPath)
-        materialRef = MaterialRefEnd(builder)
+            AddOpacityTexPath(builder, opacityTexPath)
+        materialRef = End(builder)
         return materialRef

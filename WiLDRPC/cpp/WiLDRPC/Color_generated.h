@@ -61,7 +61,6 @@ struct ColorBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ColorBuilder &operator=(const ColorBuilder &);
   flatbuffers::Offset<Color> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Color>(end);

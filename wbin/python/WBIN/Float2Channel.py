@@ -10,12 +10,16 @@ class Float2Channel(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsFloat2Channel(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Float2Channel()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsFloat2Channel(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # Float2Channel
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -68,13 +72,30 @@ class Float2Channel(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
-def Float2ChannelStart(builder): builder.StartObject(2)
-def Float2ChannelAddTriangles(builder, triangles): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(triangles), 0)
-def Float2ChannelStartTrianglesVector(builder, numElems): return builder.StartVector(12, numElems, 4)
-def Float2ChannelAddVertexData(builder, vertexData): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(vertexData), 0)
-def Float2ChannelStartVertexDataVector(builder, numElems): return builder.StartVector(8, numElems, 4)
-def Float2ChannelEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(2)
+def Float2ChannelStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddTriangles(builder, triangles): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(triangles), 0)
+def Float2ChannelAddTriangles(builder, triangles):
+    """This method is deprecated. Please switch to AddTriangles."""
+    return AddTriangles(builder, triangles)
+def StartTrianglesVector(builder, numElems): return builder.StartVector(12, numElems, 4)
+def Float2ChannelStartTrianglesVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartTrianglesVector(builder, numElems)
+def AddVertexData(builder, vertexData): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(vertexData), 0)
+def Float2ChannelAddVertexData(builder, vertexData):
+    """This method is deprecated. Please switch to AddVertexData."""
+    return AddVertexData(builder, vertexData)
+def StartVertexDataVector(builder, numElems): return builder.StartVector(8, numElems, 4)
+def Float2ChannelStartVertexDataVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartVertexDataVector(builder, numElems)
+def End(builder): return builder.EndObject()
+def Float2ChannelEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.Float2
 import WBIN.UInt3
 try:
@@ -125,19 +146,19 @@ class Float2ChannelT(object):
     # Float2ChannelT
     def Pack(self, builder):
         if self.triangles is not None:
-            Float2ChannelStartTrianglesVector(builder, len(self.triangles))
+            StartTrianglesVector(builder, len(self.triangles))
             for i in reversed(range(len(self.triangles))):
                 self.triangles[i].Pack(builder)
-            triangles = builder.EndVector(len(self.triangles))
+            triangles = builder.EndVector()
         if self.vertexData is not None:
-            Float2ChannelStartVertexDataVector(builder, len(self.vertexData))
+            StartVertexDataVector(builder, len(self.vertexData))
             for i in reversed(range(len(self.vertexData))):
                 self.vertexData[i].Pack(builder)
-            vertexData = builder.EndVector(len(self.vertexData))
-        Float2ChannelStart(builder)
+            vertexData = builder.EndVector()
+        Start(builder)
         if self.triangles is not None:
-            Float2ChannelAddTriangles(builder, triangles)
+            AddTriangles(builder, triangles)
         if self.vertexData is not None:
-            Float2ChannelAddVertexData(builder, vertexData)
-        float2Channel = Float2ChannelEnd(builder)
+            AddVertexData(builder, vertexData)
+        float2Channel = End(builder)
         return float2Channel

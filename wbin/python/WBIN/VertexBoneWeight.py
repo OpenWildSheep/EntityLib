@@ -10,12 +10,16 @@ class VertexBoneWeight(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsVertexBoneWeight(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = VertexBoneWeight()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsVertexBoneWeight(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # VertexBoneWeight
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -44,11 +48,22 @@ class VertexBoneWeight(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def VertexBoneWeightStart(builder): builder.StartObject(1)
-def VertexBoneWeightAddBoneWeight(builder, boneWeight): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(boneWeight), 0)
-def VertexBoneWeightStartBoneWeightVector(builder, numElems): return builder.StartVector(8, numElems, 4)
-def VertexBoneWeightEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(1)
+def VertexBoneWeightStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddBoneWeight(builder, boneWeight): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(boneWeight), 0)
+def VertexBoneWeightAddBoneWeight(builder, boneWeight):
+    """This method is deprecated. Please switch to AddBoneWeight."""
+    return AddBoneWeight(builder, boneWeight)
+def StartBoneWeightVector(builder, numElems): return builder.StartVector(8, numElems, 4)
+def VertexBoneWeightStartBoneWeightVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartBoneWeightVector(builder, numElems)
+def End(builder): return builder.EndObject()
+def VertexBoneWeightEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.BoneWeight
 try:
     from typing import List
@@ -89,12 +104,12 @@ class VertexBoneWeightT(object):
     # VertexBoneWeightT
     def Pack(self, builder):
         if self.boneWeight is not None:
-            VertexBoneWeightStartBoneWeightVector(builder, len(self.boneWeight))
+            StartBoneWeightVector(builder, len(self.boneWeight))
             for i in reversed(range(len(self.boneWeight))):
                 self.boneWeight[i].Pack(builder)
-            boneWeight = builder.EndVector(len(self.boneWeight))
-        VertexBoneWeightStart(builder)
+            boneWeight = builder.EndVector()
+        Start(builder)
         if self.boneWeight is not None:
-            VertexBoneWeightAddBoneWeight(builder, boneWeight)
-        vertexBoneWeight = VertexBoneWeightEnd(builder)
+            AddBoneWeight(builder, boneWeight)
+        vertexBoneWeight = End(builder)
         return vertexBoneWeight

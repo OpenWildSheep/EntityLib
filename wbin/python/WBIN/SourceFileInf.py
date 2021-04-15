@@ -10,12 +10,16 @@ class SourceFileInf(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsSourceFileInf(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = SourceFileInf()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsSourceFileInf(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # SourceFileInf
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -27,10 +31,18 @@ class SourceFileInf(object):
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def SourceFileInfStart(builder): builder.StartObject(1)
-def SourceFileInfAddSourceFilePath(builder, sourceFilePath): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFilePath), 0)
-def SourceFileInfEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(1)
+def SourceFileInfStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddSourceFilePath(builder, sourceFilePath): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFilePath), 0)
+def SourceFileInfAddSourceFilePath(builder, sourceFilePath):
+    """This method is deprecated. Please switch to AddSourceFilePath."""
+    return AddSourceFilePath(builder, sourceFilePath)
+def End(builder): return builder.EndObject()
+def SourceFileInfEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 
 class SourceFileInfT(object):
 
@@ -60,8 +72,8 @@ class SourceFileInfT(object):
     def Pack(self, builder):
         if self.sourceFilePath is not None:
             sourceFilePath = builder.CreateString(self.sourceFilePath)
-        SourceFileInfStart(builder)
+        Start(builder)
         if self.sourceFilePath is not None:
-            SourceFileInfAddSourceFilePath(builder, sourceFilePath)
-        sourceFileInf = SourceFileInfEnd(builder)
+            AddSourceFilePath(builder, sourceFilePath)
+        sourceFileInf = End(builder)
         return sourceFileInf

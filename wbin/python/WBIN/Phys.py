@@ -10,12 +10,16 @@ class Phys(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsPhys(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Phys()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsPhys(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # Phys
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -91,15 +95,38 @@ class Phys(object):
             return obj
         return None
 
-def PhysStart(builder): builder.StartObject(5)
-def PhysAddAabb(builder, aabb): builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(aabb), 0)
-def PhysAddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
-def PhysAddMaterials(builder, materials): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(materials), 0)
-def PhysStartMaterialsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def PhysAddSkin(builder, skin): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(skin), 0)
-def PhysAddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
-def PhysEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(5)
+def PhysStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddAabb(builder, aabb): builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(aabb), 0)
+def PhysAddAabb(builder, aabb):
+    """This method is deprecated. Please switch to AddAabb."""
+    return AddAabb(builder, aabb)
+def AddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
+def PhysAddPosition(builder, position):
+    """This method is deprecated. Please switch to AddPosition."""
+    return AddPosition(builder, position)
+def AddMaterials(builder, materials): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(materials), 0)
+def PhysAddMaterials(builder, materials):
+    """This method is deprecated. Please switch to AddMaterials."""
+    return AddMaterials(builder, materials)
+def StartMaterialsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def PhysStartMaterialsVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartMaterialsVector(builder, numElems)
+def AddSkin(builder, skin): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(skin), 0)
+def PhysAddSkin(builder, skin):
+    """This method is deprecated. Please switch to AddSkin."""
+    return AddSkin(builder, skin)
+def AddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
+def PhysAddSourceFileInf(builder, sourceFileInf):
+    """This method is deprecated. Please switch to AddSourceFileInf."""
+    return AddSourceFileInf(builder, sourceFileInf)
+def End(builder): return builder.EndObject()
+def PhysEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.AABB
 import WBIN.Float3Channel
 import WBIN.Skin
@@ -159,25 +186,25 @@ class PhysT(object):
             if np is not None and type(self.materials) is np.ndarray:
                 materials = builder.CreateNumpyVector(self.materials)
             else:
-                PhysStartMaterialsVector(builder, len(self.materials))
+                StartMaterialsVector(builder, len(self.materials))
                 for i in reversed(range(len(self.materials))):
                     builder.PrependUint32(self.materials[i])
-                materials = builder.EndVector(len(self.materials))
+                materials = builder.EndVector()
         if self.skin is not None:
             skin = self.skin.Pack(builder)
         if self.sourceFileInf is not None:
             sourceFileInf = self.sourceFileInf.Pack(builder)
-        PhysStart(builder)
+        Start(builder)
         if self.aabb is not None:
             aabb = self.aabb.Pack(builder)
-            PhysAddAabb(builder, aabb)
+            AddAabb(builder, aabb)
         if self.position is not None:
-            PhysAddPosition(builder, position)
+            AddPosition(builder, position)
         if self.materials is not None:
-            PhysAddMaterials(builder, materials)
+            AddMaterials(builder, materials)
         if self.skin is not None:
-            PhysAddSkin(builder, skin)
+            AddSkin(builder, skin)
         if self.sourceFileInf is not None:
-            PhysAddSourceFileInf(builder, sourceFileInf)
-        phys = PhysEnd(builder)
+            AddSourceFileInf(builder, sourceFileInf)
+        phys = End(builder)
         return phys

@@ -53,7 +53,6 @@ struct Vector3Builder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  Vector3Builder &operator=(const Vector3Builder &);
   flatbuffers::Offset<Vector3> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Vector3>(end);

@@ -11,7 +11,7 @@
 
 namespace WildRPC
 {
-    enum Type : int;
+    enum Type : int8_t;
 }
 
 namespace WRPC

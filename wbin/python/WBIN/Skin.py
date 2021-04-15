@@ -10,12 +10,16 @@ class Skin(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsSkin(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Skin()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsSkin(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # Skin
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -69,13 +73,30 @@ class Skin(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
-def SkinStart(builder): builder.StartObject(2)
-def SkinAddVertexBoneWeights(builder, vertexBoneWeights): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(vertexBoneWeights), 0)
-def SkinStartVertexBoneWeightsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def SkinAddBindPose(builder, bindPose): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(bindPose), 0)
-def SkinStartBindPoseVector(builder, numElems): return builder.StartVector(64, numElems, 4)
-def SkinEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(2)
+def SkinStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddVertexBoneWeights(builder, vertexBoneWeights): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(vertexBoneWeights), 0)
+def SkinAddVertexBoneWeights(builder, vertexBoneWeights):
+    """This method is deprecated. Please switch to AddVertexBoneWeights."""
+    return AddVertexBoneWeights(builder, vertexBoneWeights)
+def StartVertexBoneWeightsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def SkinStartVertexBoneWeightsVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartVertexBoneWeightsVector(builder, numElems)
+def AddBindPose(builder, bindPose): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(bindPose), 0)
+def SkinAddBindPose(builder, bindPose):
+    """This method is deprecated. Please switch to AddBindPose."""
+    return AddBindPose(builder, bindPose)
+def StartBindPoseVector(builder, numElems): return builder.StartVector(64, numElems, 4)
+def SkinStartBindPoseVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartBindPoseVector(builder, numElems)
+def End(builder): return builder.EndObject()
+def SkinEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.BoneMatrix
 import WBIN.VertexBoneWeight
 try:
@@ -129,19 +150,19 @@ class SkinT(object):
             vertexBoneWeightslist = []
             for i in range(len(self.vertexBoneWeights)):
                 vertexBoneWeightslist.append(self.vertexBoneWeights[i].Pack(builder))
-            SkinStartVertexBoneWeightsVector(builder, len(self.vertexBoneWeights))
+            StartVertexBoneWeightsVector(builder, len(self.vertexBoneWeights))
             for i in reversed(range(len(self.vertexBoneWeights))):
                 builder.PrependUOffsetTRelative(vertexBoneWeightslist[i])
-            vertexBoneWeights = builder.EndVector(len(self.vertexBoneWeights))
+            vertexBoneWeights = builder.EndVector()
         if self.bindPose is not None:
-            SkinStartBindPoseVector(builder, len(self.bindPose))
+            StartBindPoseVector(builder, len(self.bindPose))
             for i in reversed(range(len(self.bindPose))):
                 self.bindPose[i].Pack(builder)
-            bindPose = builder.EndVector(len(self.bindPose))
-        SkinStart(builder)
+            bindPose = builder.EndVector()
+        Start(builder)
         if self.vertexBoneWeights is not None:
-            SkinAddVertexBoneWeights(builder, vertexBoneWeights)
+            AddVertexBoneWeights(builder, vertexBoneWeights)
         if self.bindPose is not None:
-            SkinAddBindPose(builder, bindPose)
-        skin = SkinEnd(builder)
+            AddBindPose(builder, bindPose)
+        skin = End(builder)
         return skin

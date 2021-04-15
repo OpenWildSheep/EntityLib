@@ -37,7 +37,6 @@ struct BooleanBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  BooleanBuilder &operator=(const BooleanBuilder &);
   flatbuffers::Offset<Boolean> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Boolean>(end);

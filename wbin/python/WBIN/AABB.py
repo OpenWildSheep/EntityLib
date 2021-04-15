@@ -9,6 +9,10 @@ np = import_numpy()
 class AABB(object):
     __slots__ = ['_tab']
 
+    @classmethod
+    def SizeOf(cls):
+        return 24
+
     # AABB
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)

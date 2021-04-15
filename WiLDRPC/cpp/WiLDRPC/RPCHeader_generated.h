@@ -13,7 +13,7 @@ namespace WildRPC {
 struct RPCHeader;
 struct RPCHeaderBuilder;
 
-enum Type {
+enum Type : int8_t {
   Type_Boolean = 0,
   Type_Integer = 1,
   Type_Float = 2,
@@ -121,7 +121,6 @@ struct RPCHeaderBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  RPCHeaderBuilder &operator=(const RPCHeaderBuilder &);
   flatbuffers::Offset<RPCHeader> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<RPCHeader>(end);

@@ -29,8 +29,8 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) GVoxelData FLATBUFFERS_FINAL_CLASS {
   int32_t data_;
 
  public:
-  GVoxelData() {
-    memset(static_cast<void *>(this), 0, sizeof(GVoxelData));
+  GVoxelData()
+      : data_(0) {
   }
   GVoxelData(int32_t _data)
       : data_(flatbuffers::EndianScalar(_data)) {
@@ -46,11 +46,8 @@ FLATBUFFERS_STRUCT_END(GVoxelData, 4);
 
 struct GVoxelPileT : public flatbuffers::NativeTable {
   typedef GVoxelPile TableType;
-  int32_t nbEmptyVoxels;
-  std::vector<WBIN::GVoxelData> voxels;
-  GVoxelPileT()
-      : nbEmptyVoxels(0) {
-  }
+  int32_t nbEmptyVoxels = 0;
+  std::vector<WBIN::GVoxelData> voxels{};
 };
 
 struct GVoxelPile FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -98,7 +95,6 @@ struct GVoxelPileBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  GVoxelPileBuilder &operator=(const GVoxelPileBuilder &);
   flatbuffers::Offset<GVoxelPile> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<GVoxelPile>(end);
@@ -131,9 +127,7 @@ flatbuffers::Offset<GVoxelPile> CreateGVoxelPile(flatbuffers::FlatBufferBuilder 
 
 struct GVoxelColumnT : public flatbuffers::NativeTable {
   typedef GVoxelColumn TableType;
-  std::vector<std::unique_ptr<WBIN::GVoxelPileT>> piles;
-  GVoxelColumnT() {
-  }
+  std::vector<std::unique_ptr<WBIN::GVoxelPileT>> piles{};
 };
 
 struct GVoxelColumn FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -171,7 +165,6 @@ struct GVoxelColumnBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  GVoxelColumnBuilder &operator=(const GVoxelColumnBuilder &);
   flatbuffers::Offset<GVoxelColumn> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<GVoxelColumn>(end);
@@ -200,9 +193,7 @@ flatbuffers::Offset<GVoxelColumn> CreateGVoxelColumn(flatbuffers::FlatBufferBuil
 
 struct GVoxelVolumeT : public flatbuffers::NativeTable {
   typedef GVoxelVolume TableType;
-  std::vector<std::unique_ptr<WBIN::GVoxelColumnT>> columns;
-  GVoxelVolumeT() {
-  }
+  std::vector<std::unique_ptr<WBIN::GVoxelColumnT>> columns{};
 };
 
 struct GVoxelVolume FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -240,7 +231,6 @@ struct GVoxelVolumeBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  GVoxelVolumeBuilder &operator=(const GVoxelVolumeBuilder &);
   flatbuffers::Offset<GVoxelVolume> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<GVoxelVolume>(end);
@@ -268,7 +258,7 @@ inline flatbuffers::Offset<GVoxelVolume> CreateGVoxelVolumeDirect(
 flatbuffers::Offset<GVoxelVolume> CreateGVoxelVolume(flatbuffers::FlatBufferBuilder &_fbb, const GVoxelVolumeT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 inline GVoxelPileT *GVoxelPile::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::GVoxelPileT> _o = std::unique_ptr<WBIN::GVoxelPileT>(new GVoxelPileT());
+  auto _o = std::unique_ptr<GVoxelPileT>(new GVoxelPileT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
@@ -297,7 +287,7 @@ inline flatbuffers::Offset<GVoxelPile> CreateGVoxelPile(flatbuffers::FlatBufferB
 }
 
 inline GVoxelColumnT *GVoxelColumn::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::GVoxelColumnT> _o = std::unique_ptr<WBIN::GVoxelColumnT>(new GVoxelColumnT());
+  auto _o = std::unique_ptr<GVoxelColumnT>(new GVoxelColumnT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
@@ -323,7 +313,7 @@ inline flatbuffers::Offset<GVoxelColumn> CreateGVoxelColumn(flatbuffers::FlatBuf
 }
 
 inline GVoxelVolumeT *GVoxelVolume::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  std::unique_ptr<WBIN::GVoxelVolumeT> _o = std::unique_ptr<WBIN::GVoxelVolumeT>(new GVoxelVolumeT());
+  auto _o = std::unique_ptr<GVoxelVolumeT>(new GVoxelVolumeT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }

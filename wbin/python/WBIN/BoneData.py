@@ -10,12 +10,16 @@ class BoneData(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsBoneData(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = BoneData()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsBoneData(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # BoneData
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -34,11 +38,22 @@ class BoneData(object):
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def BoneDataStart(builder): builder.StartObject(2)
-def BoneDataAddParentBoneIndex(builder, parentBoneIndex): builder.PrependInt32Slot(0, parentBoneIndex, 0)
-def BoneDataAddName(builder, name): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
-def BoneDataEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(2)
+def BoneDataStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddParentBoneIndex(builder, parentBoneIndex): builder.PrependInt32Slot(0, parentBoneIndex, 0)
+def BoneDataAddParentBoneIndex(builder, parentBoneIndex):
+    """This method is deprecated. Please switch to AddParentBoneIndex."""
+    return AddParentBoneIndex(builder, parentBoneIndex)
+def AddName(builder, name): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(name), 0)
+def BoneDataAddName(builder, name):
+    """This method is deprecated. Please switch to AddName."""
+    return AddName(builder, name)
+def End(builder): return builder.EndObject()
+def BoneDataEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 
 class BoneDataT(object):
 
@@ -70,9 +85,9 @@ class BoneDataT(object):
     def Pack(self, builder):
         if self.name is not None:
             name = builder.CreateString(self.name)
-        BoneDataStart(builder)
-        BoneDataAddParentBoneIndex(builder, self.parentBoneIndex)
+        Start(builder)
+        AddParentBoneIndex(builder, self.parentBoneIndex)
         if self.name is not None:
-            BoneDataAddName(builder, name)
-        boneData = BoneDataEnd(builder)
+            AddName(builder, name)
+        boneData = End(builder)
         return boneData

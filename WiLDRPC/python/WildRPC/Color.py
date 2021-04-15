@@ -10,12 +10,16 @@ class Color(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsColor(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Color()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsColor(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # Color
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -48,9 +52,27 @@ class Color(object):
             return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
         return 0.0
 
-def ColorStart(builder): builder.StartObject(4)
-def ColorAddR(builder, r): builder.PrependFloat32Slot(0, r, 0.0)
-def ColorAddG(builder, g): builder.PrependFloat32Slot(1, g, 0.0)
-def ColorAddB(builder, b): builder.PrependFloat32Slot(2, b, 0.0)
-def ColorAddA(builder, a): builder.PrependFloat32Slot(3, a, 0.0)
-def ColorEnd(builder): return builder.EndObject()
+def Start(builder): builder.StartObject(4)
+def ColorStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddR(builder, r): builder.PrependFloat32Slot(0, r, 0.0)
+def ColorAddR(builder, r):
+    """This method is deprecated. Please switch to AddR."""
+    return AddR(builder, r)
+def AddG(builder, g): builder.PrependFloat32Slot(1, g, 0.0)
+def ColorAddG(builder, g):
+    """This method is deprecated. Please switch to AddG."""
+    return AddG(builder, g)
+def AddB(builder, b): builder.PrependFloat32Slot(2, b, 0.0)
+def ColorAddB(builder, b):
+    """This method is deprecated. Please switch to AddB."""
+    return AddB(builder, b)
+def AddA(builder, a): builder.PrependFloat32Slot(3, a, 0.0)
+def ColorAddA(builder, a):
+    """This method is deprecated. Please switch to AddA."""
+    return AddA(builder, a)
+def End(builder): return builder.EndObject()
+def ColorEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)

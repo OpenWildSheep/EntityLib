@@ -10,12 +10,16 @@ class Camera(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsCamera(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Camera()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsCamera(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # Camera
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -42,7 +46,19 @@ class Camera(object):
             return obj
         return None
 
-def CameraStart(builder): builder.StartObject(2)
-def CameraAddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
-def CameraAddOrientation(builder, orientation): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(orientation), 0)
-def CameraEnd(builder): return builder.EndObject()
+def Start(builder): builder.StartObject(2)
+def CameraStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
+def CameraAddPosition(builder, position):
+    """This method is deprecated. Please switch to AddPosition."""
+    return AddPosition(builder, position)
+def AddOrientation(builder, orientation): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(orientation), 0)
+def CameraAddOrientation(builder, orientation):
+    """This method is deprecated. Please switch to AddOrientation."""
+    return AddOrientation(builder, orientation)
+def End(builder): return builder.EndObject()
+def CameraEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)

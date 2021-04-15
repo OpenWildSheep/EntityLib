@@ -10,12 +10,16 @@ class Thumb(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsThumb(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Thumb()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsThumb(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # Thumb
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -77,14 +81,34 @@ class Thumb(object):
             return obj
         return None
 
-def ThumbStart(builder): builder.StartObject(4)
-def ThumbAddAabb(builder, aabb): builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(aabb), 0)
-def ThumbAddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
-def ThumbAddColor(builder, color): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(color), 0)
-def ThumbStartColorVector(builder, numElems): return builder.StartVector(12, numElems, 4)
-def ThumbAddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
-def ThumbEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(4)
+def ThumbStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddAabb(builder, aabb): builder.PrependStructSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(aabb), 0)
+def ThumbAddAabb(builder, aabb):
+    """This method is deprecated. Please switch to AddAabb."""
+    return AddAabb(builder, aabb)
+def AddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
+def ThumbAddPosition(builder, position):
+    """This method is deprecated. Please switch to AddPosition."""
+    return AddPosition(builder, position)
+def AddColor(builder, color): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(color), 0)
+def ThumbAddColor(builder, color):
+    """This method is deprecated. Please switch to AddColor."""
+    return AddColor(builder, color)
+def StartColorVector(builder, numElems): return builder.StartVector(12, numElems, 4)
+def ThumbStartColorVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartColorVector(builder, numElems)
+def AddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
+def ThumbAddSourceFileInf(builder, sourceFileInf):
+    """This method is deprecated. Please switch to AddSourceFileInf."""
+    return AddSourceFileInf(builder, sourceFileInf)
+def End(builder): return builder.EndObject()
+def ThumbEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.AABB
 import WBIN.Float3
 import WBIN.Float3Channel
@@ -139,21 +163,21 @@ class ThumbT(object):
         if self.position is not None:
             position = self.position.Pack(builder)
         if self.color is not None:
-            ThumbStartColorVector(builder, len(self.color))
+            StartColorVector(builder, len(self.color))
             for i in reversed(range(len(self.color))):
                 self.color[i].Pack(builder)
-            color = builder.EndVector(len(self.color))
+            color = builder.EndVector()
         if self.sourceFileInf is not None:
             sourceFileInf = self.sourceFileInf.Pack(builder)
-        ThumbStart(builder)
+        Start(builder)
         if self.aabb is not None:
             aabb = self.aabb.Pack(builder)
-            ThumbAddAabb(builder, aabb)
+            AddAabb(builder, aabb)
         if self.position is not None:
-            ThumbAddPosition(builder, position)
+            AddPosition(builder, position)
         if self.color is not None:
-            ThumbAddColor(builder, color)
+            AddColor(builder, color)
         if self.sourceFileInf is not None:
-            ThumbAddSourceFileInf(builder, sourceFileInf)
-        thumb = ThumbEnd(builder)
+            AddSourceFileInf(builder, sourceFileInf)
+        thumb = End(builder)
         return thumb

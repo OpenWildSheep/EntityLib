@@ -10,12 +10,16 @@ class Integer(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsInteger(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = Integer()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsInteger(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # Integer
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -27,6 +31,15 @@ class Integer(object):
             return self._tab.Get(flatbuffers.number_types.Int32Flags, o + self._tab.Pos)
         return 0
 
-def IntegerStart(builder): builder.StartObject(1)
-def IntegerAddValue(builder, value): builder.PrependInt32Slot(0, value, 0)
-def IntegerEnd(builder): return builder.EndObject()
+def Start(builder): builder.StartObject(1)
+def IntegerStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddValue(builder, value): builder.PrependInt32Slot(0, value, 0)
+def IntegerAddValue(builder, value):
+    """This method is deprecated. Please switch to AddValue."""
+    return AddValue(builder, value)
+def End(builder): return builder.EndObject()
+def IntegerEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)

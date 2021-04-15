@@ -61,7 +61,6 @@ struct QuatBuilder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  QuatBuilder &operator=(const QuatBuilder &);
   flatbuffers::Offset<Quat> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Quat>(end);

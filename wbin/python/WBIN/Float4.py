@@ -9,6 +9,10 @@ np = import_numpy()
 class Float4(object):
     __slots__ = ['_tab']
 
+    @classmethod
+    def SizeOf(cls):
+        return 16
+
     # Float4
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)

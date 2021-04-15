@@ -10,12 +10,16 @@ class RPCHeader(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsRPCHeader(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = RPCHeader()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsRPCHeader(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # RPCHeader
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -88,11 +92,35 @@ class RPCHeader(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
-def RPCHeaderStart(builder): builder.StartObject(4)
-def RPCHeaderAddManagerName(builder, managerName): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(managerName), 0)
-def RPCHeaderAddMethodName(builder, methodName): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(methodName), 0)
-def RPCHeaderAddParameterTypes(builder, parameterTypes): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(parameterTypes), 0)
-def RPCHeaderStartParameterTypesVector(builder, numElems): return builder.StartVector(1, numElems, 1)
-def RPCHeaderAddResultTypes(builder, resultTypes): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(resultTypes), 0)
-def RPCHeaderStartResultTypesVector(builder, numElems): return builder.StartVector(1, numElems, 1)
-def RPCHeaderEnd(builder): return builder.EndObject()
+def Start(builder): builder.StartObject(4)
+def RPCHeaderStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddManagerName(builder, managerName): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(managerName), 0)
+def RPCHeaderAddManagerName(builder, managerName):
+    """This method is deprecated. Please switch to AddManagerName."""
+    return AddManagerName(builder, managerName)
+def AddMethodName(builder, methodName): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(methodName), 0)
+def RPCHeaderAddMethodName(builder, methodName):
+    """This method is deprecated. Please switch to AddMethodName."""
+    return AddMethodName(builder, methodName)
+def AddParameterTypes(builder, parameterTypes): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(parameterTypes), 0)
+def RPCHeaderAddParameterTypes(builder, parameterTypes):
+    """This method is deprecated. Please switch to AddParameterTypes."""
+    return AddParameterTypes(builder, parameterTypes)
+def StartParameterTypesVector(builder, numElems): return builder.StartVector(1, numElems, 1)
+def RPCHeaderStartParameterTypesVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartParameterTypesVector(builder, numElems)
+def AddResultTypes(builder, resultTypes): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(resultTypes), 0)
+def RPCHeaderAddResultTypes(builder, resultTypes):
+    """This method is deprecated. Please switch to AddResultTypes."""
+    return AddResultTypes(builder, resultTypes)
+def StartResultTypesVector(builder, numElems): return builder.StartVector(1, numElems, 1)
+def RPCHeaderStartResultTypesVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartResultTypesVector(builder, numElems)
+def End(builder): return builder.EndObject()
+def RPCHeaderEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)

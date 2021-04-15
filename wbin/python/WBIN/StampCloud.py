@@ -10,12 +10,16 @@ class StampCloud(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsStampCloud(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = StampCloud()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsStampCloud(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # StampCloud
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -56,12 +60,26 @@ class StampCloud(object):
             return obj
         return None
 
-def StampCloudStart(builder): builder.StartObject(2)
-def StampCloudAddStamps(builder, stamps): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(stamps), 0)
-def StampCloudStartStampsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def StampCloudAddBoundingBox(builder, boundingBox): builder.PrependStructSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(boundingBox), 0)
-def StampCloudEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(2)
+def StampCloudStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddStamps(builder, stamps): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(stamps), 0)
+def StampCloudAddStamps(builder, stamps):
+    """This method is deprecated. Please switch to AddStamps."""
+    return AddStamps(builder, stamps)
+def StartStampsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def StampCloudStartStampsVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartStampsVector(builder, numElems)
+def AddBoundingBox(builder, boundingBox): builder.PrependStructSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(boundingBox), 0)
+def StampCloudAddBoundingBox(builder, boundingBox):
+    """This method is deprecated. Please switch to AddBoundingBox."""
+    return AddBoundingBox(builder, boundingBox)
+def End(builder): return builder.EndObject()
+def StampCloudEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.AABB
 import WBIN.Stamp
 try:
@@ -109,15 +127,15 @@ class StampCloudT(object):
             stampslist = []
             for i in range(len(self.stamps)):
                 stampslist.append(self.stamps[i].Pack(builder))
-            StampCloudStartStampsVector(builder, len(self.stamps))
+            StartStampsVector(builder, len(self.stamps))
             for i in reversed(range(len(self.stamps))):
                 builder.PrependUOffsetTRelative(stampslist[i])
-            stamps = builder.EndVector(len(self.stamps))
-        StampCloudStart(builder)
+            stamps = builder.EndVector()
+        Start(builder)
         if self.stamps is not None:
-            StampCloudAddStamps(builder, stamps)
+            AddStamps(builder, stamps)
         if self.boundingBox is not None:
             boundingBox = self.boundingBox.Pack(builder)
-            StampCloudAddBoundingBox(builder, boundingBox)
-        stampCloud = StampCloudEnd(builder)
+            AddBoundingBox(builder, boundingBox)
+        stampCloud = End(builder)
         return stampCloud

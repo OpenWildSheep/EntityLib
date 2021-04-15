@@ -10,12 +10,16 @@ class GVoxelPile(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAsGVoxelPile(cls, buf, offset):
+    def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
         x = GVoxelPile()
         x.Init(buf, n + offset)
         return x
 
+    @classmethod
+    def GetRootAsGVoxelPile(cls, buf, offset=0):
+        """This method is deprecated. Please switch to GetRootAs."""
+        return cls.GetRootAs(buf, offset)
     # GVoxelPile
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
@@ -51,12 +55,26 @@ class GVoxelPile(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         return o == 0
 
-def GVoxelPileStart(builder): builder.StartObject(2)
-def GVoxelPileAddNbEmptyVoxels(builder, nbEmptyVoxels): builder.PrependInt32Slot(0, nbEmptyVoxels, 0)
-def GVoxelPileAddVoxels(builder, voxels): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(voxels), 0)
-def GVoxelPileStartVoxelsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def GVoxelPileEnd(builder): return builder.EndObject()
-
+def Start(builder): builder.StartObject(2)
+def GVoxelPileStart(builder):
+    """This method is deprecated. Please switch to Start."""
+    return Start(builder)
+def AddNbEmptyVoxels(builder, nbEmptyVoxels): builder.PrependInt32Slot(0, nbEmptyVoxels, 0)
+def GVoxelPileAddNbEmptyVoxels(builder, nbEmptyVoxels):
+    """This method is deprecated. Please switch to AddNbEmptyVoxels."""
+    return AddNbEmptyVoxels(builder, nbEmptyVoxels)
+def AddVoxels(builder, voxels): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(voxels), 0)
+def GVoxelPileAddVoxels(builder, voxels):
+    """This method is deprecated. Please switch to AddVoxels."""
+    return AddVoxels(builder, voxels)
+def StartVoxelsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def GVoxelPileStartVoxelsVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartVoxelsVector(builder, numElems)
+def End(builder): return builder.EndObject()
+def GVoxelPileEnd(builder):
+    """This method is deprecated. Please switch to End."""
+    return End(builder)
 import WBIN.GVoxelData
 try:
     from typing import List
@@ -99,13 +117,13 @@ class GVoxelPileT(object):
     # GVoxelPileT
     def Pack(self, builder):
         if self.voxels is not None:
-            GVoxelPileStartVoxelsVector(builder, len(self.voxels))
+            StartVoxelsVector(builder, len(self.voxels))
             for i in reversed(range(len(self.voxels))):
                 self.voxels[i].Pack(builder)
-            voxels = builder.EndVector(len(self.voxels))
-        GVoxelPileStart(builder)
-        GVoxelPileAddNbEmptyVoxels(builder, self.nbEmptyVoxels)
+            voxels = builder.EndVector()
+        Start(builder)
+        AddNbEmptyVoxels(builder, self.nbEmptyVoxels)
         if self.voxels is not None:
-            GVoxelPileAddVoxels(builder, voxels)
-        gVoxelPile = GVoxelPileEnd(builder)
+            AddVoxels(builder, voxels)
+        gVoxelPile = End(builder)
         return gVoxelPile

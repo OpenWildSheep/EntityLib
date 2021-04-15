@@ -45,7 +45,6 @@ struct Vector2Builder {
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  Vector2Builder &operator=(const Vector2Builder &);
   flatbuffers::Offset<Vector2> Finish() {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Vector2>(end);

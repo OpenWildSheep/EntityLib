@@ -212,6 +212,16 @@
             "Version": 1
         },
         {
+            "Data": {},
+            "Type": "CharacterControllerGD",
+            "Version": 1
+        },
+        {
+            "Data": {},
+            "Type": "TestDefaultValues",
+            "Version": 1
+        },
+        {
             "Data": {
                 "Radius": 30.0,
                 "Tags": {

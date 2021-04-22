@@ -50,6 +50,7 @@ namespace Ent
             virtual void setType(DataType) = 0;
             virtual void addEnumValue(char const*) = 0;
             virtual void setDefaultValue(Subschema::DefaultValue) = 0;
+            virtual void setRefDefaultValue(Subschema::DefaultValue) = 0;
             virtual void setConstValue(Subschema::DefaultValue) = 0;
             virtual void setOneOf(size_t) = 0;
             virtual void openOneOfItem(size_t) = 0;

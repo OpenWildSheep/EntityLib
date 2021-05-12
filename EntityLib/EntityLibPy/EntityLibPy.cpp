@@ -298,6 +298,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pySceneFile = py::class_<EntityLib::SceneFile>(ent, "SceneFile");
 
     pyNode
+        .def("get_ptr", [](Node* self) {return (intptr_t)self;})
+        .def_static("from_ptr", [](intptr_t _ptr) {return (Node*)_ptr;})
         .def("has_override", &Node::hasOverride)
         .def("has_prefab_value", &Node::hasPrefabValue)
         .def("has_default_value", &Node::hasDefaultValue)
@@ -396,6 +398,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     pyEntity
         .def(py::init<EntityLib const&>())
+        .def("get_ptr", [](Entity* self) {return (intptr_t)self;})
+        .def_static("from_ptr", [](intptr_t _ptr) {return (Entity*)_ptr;})
         .def_property("name", &Entity::getName, &Entity::setName)
         .def_property_readonly("instance_of", &Entity::getInstanceOf)
         .def_property("thumbnail", &Entity::getThumbnail, &Entity::setThumbnail)
@@ -426,6 +430,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         });
 
     pyScene
+        .def("get_ptr", [](Scene* self) {return (intptr_t)self;})
+        .def_static("from_ptr", [](intptr_t _ptr) {return (Scene*)_ptr;})
         .def(
             "add_entity",
             [](Scene* scene, Entity* ent) -> Entity*
@@ -460,6 +466,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     pyEntityLib
         .def(py::init<std::string>())
+        .def("get_ptr", [](EntityLib* self) {return (intptr_t)self;})
+        .def_static("from_ptr", [](intptr_t _ptr) {return (EntityLib*)_ptr;})
         .def_readwrite("validation_enabled", &EntityLib::validationEnabled)
         .def_readonly("root_path", &EntityLib::rootPath)
         .def_readwrite("rawdata_path", &EntityLib::rawdataPath) // unit-test need to write it

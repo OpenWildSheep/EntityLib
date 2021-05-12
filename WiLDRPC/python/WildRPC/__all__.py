@@ -1,5 +1,6 @@
 from . import Boolean
 from . import Color
+from . import ContainerType
 from . import ElementType
 from . import Float
 from . import Integer

@@ -42,16 +42,13 @@ class RPCHeader(object):
     def ParameterTypes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
-            a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Uint16Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 2))
-        return 0
-
-    # RPCHeader
-    def ParameterTypesAsNumpy(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
-        if o != 0:
-            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Uint16Flags, o)
-        return 0
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 2
+            from WildRPC.TypeInfo import TypeInfo
+            obj = TypeInfo()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
 
     # RPCHeader
     def ParameterTypesLength(self):
@@ -69,16 +66,13 @@ class RPCHeader(object):
     def ResultTypes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
-            a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Uint16Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 2))
-        return 0
-
-    # RPCHeader
-    def ResultTypesAsNumpy(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
-        if o != 0:
-            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Uint16Flags, o)
-        return 0
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 2
+            from WildRPC.TypeInfo import TypeInfo
+            obj = TypeInfo()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
 
     # RPCHeader
     def ResultTypesLength(self):
@@ -108,7 +102,7 @@ def AddParameterTypes(builder, parameterTypes): builder.PrependUOffsetTRelativeS
 def RPCHeaderAddParameterTypes(builder, parameterTypes):
     """This method is deprecated. Please switch to AddParameterTypes."""
     return AddParameterTypes(builder, parameterTypes)
-def StartParameterTypesVector(builder, numElems): return builder.StartVector(2, numElems, 2)
+def StartParameterTypesVector(builder, numElems): return builder.StartVector(2, numElems, 1)
 def RPCHeaderStartParameterTypesVector(builder, numElems):
     """This method is deprecated. Please switch to Start."""
     return StartParameterTypesVector(builder, numElems)
@@ -116,7 +110,7 @@ def AddResultTypes(builder, resultTypes): builder.PrependUOffsetTRelativeSlot(3,
 def RPCHeaderAddResultTypes(builder, resultTypes):
     """This method is deprecated. Please switch to AddResultTypes."""
     return AddResultTypes(builder, resultTypes)
-def StartResultTypesVector(builder, numElems): return builder.StartVector(2, numElems, 2)
+def StartResultTypesVector(builder, numElems): return builder.StartVector(2, numElems, 1)
 def RPCHeaderStartResultTypesVector(builder, numElems):
     """This method is deprecated. Please switch to Start."""
     return StartResultTypesVector(builder, numElems)
@@ -124,6 +118,7 @@ def End(builder): return builder.EndObject()
 def RPCHeaderEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+import WildRPC.TypeInfo
 try:
     from typing import List
 except:
@@ -135,8 +130,8 @@ class RPCHeaderT(object):
     def __init__(self):
         self.managerName = None  # type: str
         self.methodName = None  # type: str
-        self.parameterTypes = None  # type: List[int]
-        self.resultTypes = None  # type: List[int]
+        self.parameterTypes = None  # type: List[WildRPC.TypeInfo.TypeInfoT]
+        self.resultTypes = None  # type: List[WildRPC.TypeInfo.TypeInfoT]
 
     @classmethod
     def InitFromBuf(cls, buf, pos):
@@ -157,19 +152,21 @@ class RPCHeaderT(object):
         self.managerName = rPCHeader.ManagerName()
         self.methodName = rPCHeader.MethodName()
         if not rPCHeader.ParameterTypesIsNone():
-            if np is None:
-                self.parameterTypes = []
-                for i in range(rPCHeader.ParameterTypesLength()):
-                    self.parameterTypes.append(rPCHeader.ParameterTypes(i))
-            else:
-                self.parameterTypes = rPCHeader.ParameterTypesAsNumpy()
+            self.parameterTypes = []
+            for i in range(rPCHeader.ParameterTypesLength()):
+                if rPCHeader.ParameterTypes(i) is None:
+                    self.parameterTypes.append(None)
+                else:
+                    typeInfo_ = WildRPC.TypeInfo.TypeInfoT.InitFromObj(rPCHeader.ParameterTypes(i))
+                    self.parameterTypes.append(typeInfo_)
         if not rPCHeader.ResultTypesIsNone():
-            if np is None:
-                self.resultTypes = []
-                for i in range(rPCHeader.ResultTypesLength()):
-                    self.resultTypes.append(rPCHeader.ResultTypes(i))
-            else:
-                self.resultTypes = rPCHeader.ResultTypesAsNumpy()
+            self.resultTypes = []
+            for i in range(rPCHeader.ResultTypesLength()):
+                if rPCHeader.ResultTypes(i) is None:
+                    self.resultTypes.append(None)
+                else:
+                    typeInfo_ = WildRPC.TypeInfo.TypeInfoT.InitFromObj(rPCHeader.ResultTypes(i))
+                    self.resultTypes.append(typeInfo_)
 
     # RPCHeaderT
     def Pack(self, builder):
@@ -178,21 +175,15 @@ class RPCHeaderT(object):
         if self.methodName is not None:
             methodName = builder.CreateString(self.methodName)
         if self.parameterTypes is not None:
-            if np is not None and type(self.parameterTypes) is np.ndarray:
-                parameterTypes = builder.CreateNumpyVector(self.parameterTypes)
-            else:
-                StartParameterTypesVector(builder, len(self.parameterTypes))
-                for i in reversed(range(len(self.parameterTypes))):
-                    builder.PrependUint16(self.parameterTypes[i])
-                parameterTypes = builder.EndVector()
+            StartParameterTypesVector(builder, len(self.parameterTypes))
+            for i in reversed(range(len(self.parameterTypes))):
+                self.parameterTypes[i].Pack(builder)
+            parameterTypes = builder.EndVector()
         if self.resultTypes is not None:
-            if np is not None and type(self.resultTypes) is np.ndarray:
-                resultTypes = builder.CreateNumpyVector(self.resultTypes)
-            else:
-                StartResultTypesVector(builder, len(self.resultTypes))
-                for i in reversed(range(len(self.resultTypes))):
-                    builder.PrependUint16(self.resultTypes[i])
-                resultTypes = builder.EndVector()
+            StartResultTypesVector(builder, len(self.resultTypes))
+            for i in reversed(range(len(self.resultTypes))):
+                self.resultTypes[i].Pack(builder)
+            resultTypes = builder.EndVector()
         Start(builder)
         if self.managerName is not None:
             AddManagerName(builder, managerName)

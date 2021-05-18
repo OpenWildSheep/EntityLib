@@ -18,14 +18,14 @@ class TypeInfo(object):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # TypeInfo
-    def ContainerType(self): return self._tab.Get(flatbuffers.number_types.Uint8Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0))
+    def ContainerType(self): return self._tab.Get(flatbuffers.number_types.Int8Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0))
     # TypeInfo
-    def ElementType(self): return self._tab.Get(flatbuffers.number_types.Uint8Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(1))
+    def ElementType(self): return self._tab.Get(flatbuffers.number_types.Int8Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(1))
 
 def CreateTypeInfo(builder, containerType, elementType):
     builder.Prep(1, 2)
-    builder.PrependUint8(elementType)
-    builder.PrependUint8(containerType)
+    builder.PrependInt8(elementType)
+    builder.PrependInt8(containerType)
     return builder.Offset()
 
 

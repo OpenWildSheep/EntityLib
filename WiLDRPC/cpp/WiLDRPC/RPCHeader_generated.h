@@ -14,15 +14,17 @@ struct RPCHeader;
 struct RPCHeaderBuilder;
 struct RPCHeaderT;
 
-enum ContainerType : uint8_t {
+enum ContainerType : int8_t {
+  ContainerType_Invalid = -1,
   ContainerType_None = 0,
   ContainerType_Array = 1,
-  ContainerType_MIN = ContainerType_None,
+  ContainerType_MIN = ContainerType_Invalid,
   ContainerType_MAX = ContainerType_Array
 };
 
-inline const ContainerType (&EnumValuesContainerType())[2] {
+inline const ContainerType (&EnumValuesContainerType())[3] {
   static const ContainerType values[] = {
+    ContainerType_Invalid,
     ContainerType_None,
     ContainerType_Array
   };
@@ -30,7 +32,8 @@ inline const ContainerType (&EnumValuesContainerType())[2] {
 }
 
 inline const char * const *EnumNamesContainerType() {
-  static const char * const names[3] = {
+  static const char * const names[4] = {
+    "Invalid",
     "None",
     "Array",
     nullptr
@@ -39,12 +42,13 @@ inline const char * const *EnumNamesContainerType() {
 }
 
 inline const char *EnumNameContainerType(ContainerType e) {
-  if (flatbuffers::IsOutRange(e, ContainerType_None, ContainerType_Array)) return "";
-  const size_t index = static_cast<size_t>(e);
+  if (flatbuffers::IsOutRange(e, ContainerType_Invalid, ContainerType_Array)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(ContainerType_Invalid);
   return EnumNamesContainerType()[index];
 }
 
-enum ElementType : uint8_t {
+enum ElementType : int8_t {
+  ElementType_Invalid = -1,
   ElementType_Boolean = 0,
   ElementType_Integer = 1,
   ElementType_Float = 2,
@@ -55,12 +59,13 @@ enum ElementType : uint8_t {
   ElementType_Color = 7,
   ElementType_Position = 8,
   ElementType_String = 9,
-  ElementType_MIN = ElementType_Boolean,
+  ElementType_MIN = ElementType_Invalid,
   ElementType_MAX = ElementType_String
 };
 
-inline const ElementType (&EnumValuesElementType())[10] {
+inline const ElementType (&EnumValuesElementType())[11] {
   static const ElementType values[] = {
+    ElementType_Invalid,
     ElementType_Boolean,
     ElementType_Integer,
     ElementType_Float,
@@ -76,7 +81,8 @@ inline const ElementType (&EnumValuesElementType())[10] {
 }
 
 inline const char * const *EnumNamesElementType() {
-  static const char * const names[11] = {
+  static const char * const names[12] = {
+    "Invalid",
     "Boolean",
     "Integer",
     "Float",
@@ -93,15 +99,15 @@ inline const char * const *EnumNamesElementType() {
 }
 
 inline const char *EnumNameElementType(ElementType e) {
-  if (flatbuffers::IsOutRange(e, ElementType_Boolean, ElementType_String)) return "";
-  const size_t index = static_cast<size_t>(e);
+  if (flatbuffers::IsOutRange(e, ElementType_Invalid, ElementType_String)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(ElementType_Invalid);
   return EnumNamesElementType()[index];
 }
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(1) TypeInfo FLATBUFFERS_FINAL_CLASS {
  private:
-  uint8_t containerType_;
-  uint8_t elementType_;
+  int8_t containerType_;
+  int8_t elementType_;
 
  public:
   TypeInfo()
@@ -109,20 +115,20 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(1) TypeInfo FLATBUFFERS_FINAL_CLASS {
         elementType_(0) {
   }
   TypeInfo(WildRPC::ContainerType _containerType, WildRPC::ElementType _elementType)
-      : containerType_(flatbuffers::EndianScalar(static_cast<uint8_t>(_containerType))),
-        elementType_(flatbuffers::EndianScalar(static_cast<uint8_t>(_elementType))) {
+      : containerType_(flatbuffers::EndianScalar(static_cast<int8_t>(_containerType))),
+        elementType_(flatbuffers::EndianScalar(static_cast<int8_t>(_elementType))) {
   }
   WildRPC::ContainerType containerType() const {
     return static_cast<WildRPC::ContainerType>(flatbuffers::EndianScalar(containerType_));
   }
   void mutate_containerType(WildRPC::ContainerType _containerType) {
-    flatbuffers::WriteScalar(&containerType_, static_cast<uint8_t>(_containerType));
+    flatbuffers::WriteScalar(&containerType_, static_cast<int8_t>(_containerType));
   }
   WildRPC::ElementType elementType() const {
     return static_cast<WildRPC::ElementType>(flatbuffers::EndianScalar(elementType_));
   }
   void mutate_elementType(WildRPC::ElementType _elementType) {
-    flatbuffers::WriteScalar(&elementType_, static_cast<uint8_t>(_elementType));
+    flatbuffers::WriteScalar(&elementType_, static_cast<int8_t>(_elementType));
   }
 };
 FLATBUFFERS_STRUCT_END(TypeInfo, 2);

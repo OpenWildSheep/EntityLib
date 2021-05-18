@@ -3,6 +3,7 @@
 # namespace: WildRPC
 
 class ContainerType(object):
+    Invalid = -1
     None_ = 0
     Array = 1
 

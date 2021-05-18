@@ -9,13 +9,49 @@
 
 #include "WildRPCType.h"
 
-namespace WildRPC
-{
-    enum Type : int8_t;
-}
-
 namespace WRPC
 {
+    using namespace WildRPC;
+
+    namespace Type
+    {
+        static TypeInfo Invalid(ContainerType_None, ElementType_Invalid);
+        static TypeInfo Boolean(ContainerType_None, ElementType_Boolean);
+        static TypeInfo Integer(ContainerType_None, ElementType_Integer);
+        static TypeInfo Float(ContainerType_None, ElementType_Float);
+        static TypeInfo Vector2(ContainerType_None, ElementType_Vector2);
+        static TypeInfo UInt3(ContainerType_None, ElementType_UInt3);
+        static TypeInfo Vector3(ContainerType_None, ElementType_Vector3);
+        static TypeInfo Quat(ContainerType_None, ElementType_Quat);
+        static TypeInfo Color(ContainerType_None, ElementType_Color);
+        static TypeInfo Position(ContainerType_None, ElementType_Position);
+        static TypeInfo String(ContainerType_None, ElementType_String);
+
+        static TypeInfo InvalidArray(ContainerType_Array, ElementType_Invalid);
+        static TypeInfo BooleanArray(ContainerType_Array, ElementType_Boolean);
+        static TypeInfo IntegerArray(ContainerType_Array, ElementType_Integer);
+        static TypeInfo FloatArray(ContainerType_Array, ElementType_Float);
+        static TypeInfo Vector2Array(ContainerType_Array, ElementType_Vector2);
+        static TypeInfo UInt3Array(ContainerType_Array, ElementType_UInt3);
+        static TypeInfo Vector3Array(ContainerType_Array, ElementType_Vector3);
+        static TypeInfo QuatArray(ContainerType_Array, ElementType_Quat);
+        static TypeInfo ColorArray(ContainerType_Array, ElementType_Color);
+        static TypeInfo PositionArray(ContainerType_Array, ElementType_Position);
+        static TypeInfo StringArray(ContainerType_Array, ElementType_String);
+    }
+
+    inline bool operator==(const TypeInfo& lhs, const TypeInfo& rhs)
+    {
+        return lhs.containerType() == rhs.containerType()
+            && lhs.elementType() == rhs.elementType();
+    }
+
+    inline bool operator!=(const TypeInfo& lhs, const TypeInfo& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+
     struct Vector2
     {
         float x = 0.0f, y = 0.0f;
@@ -110,74 +146,74 @@ namespace WRPC
             m_value;
 
     public:
-        template <WildRPC::Type t>
+        template <ElementType t>
         static Parameter Build(bool _bool)
         {
-            static_assert(t == WildRPC::Type_Boolean, "t != WildRPC::Type_Boolean!!");
+            static_assert(t == ElementType_Boolean, "t != ElementType_Boolean!!");
             Parameter param;
             param.m_value = _bool;
             return param;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static Parameter Build(int _int)
         {
-            static_assert(t == WildRPC::Type_Integer, "t != WildRPC::Type_Integer!!");
+            static_assert(t == ElementType_Integer, "t != ElementType_Integer!!");
             Parameter param;
             param.m_value = _int;
             return param;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static Parameter Build(float _float)
         {
-            static_assert(t == WildRPC::Type_Float, "t != WildRPC::Type_Float!!");
+            static_assert(t == ElementType_Float, "t != ElementType_Float!!");
             Parameter param;
             param.m_value = _float;
             return param;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static Parameter Build(float _x, float _y)
         {
-            static_assert(t == WildRPC::Type_Vector2, "t != WildRPC::Type_Vector2!!");
+            static_assert(t == ElementType_Vector2, "t != ElementType_Vector2!!");
             Parameter param;
             param.m_value = Vector2(_x, _y);
             return param;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static Parameter Build(uint32_t _x, uint32_t _y, uint32_t _z)
         {
-            static_assert(t == WildRPC::Type_UInt3, "t != WildRPC::Type_UInt3!!");
+            static_assert(t == ElementType_UInt3, "t != ElementType_UInt3!!");
             Parameter param;
             param.m_value = Vector3i(_x, _y, _z);
             return param;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static Parameter Build(float _x, float _y, float _z)
         {
-            static_assert(t == WildRPC::Type_Vector3, "t != WildRPC::Type_Vector3!!");
+            static_assert(t == ElementType_Vector3, "t != ElementType_Vector3!!");
             Parameter param;
             param.m_value = Vector3(_x, _y, _z);
             return param;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static Parameter Build(uint32_t _wx, uint32_t _wy, float _x, float _y, float _z)
         {
-            static_assert(t == WildRPC::Type_Position, "t != WildRPC::Type_Position!!");
+            static_assert(t == ElementType_Position, "t != ElementType_Position!!");
             Parameter param;
             param.m_value = Position(_wx, _wy, _x, _y, _z);
             return param;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static Parameter Build(float _x, float _y, float _z, float _w)
         {
-            constexpr bool isColor = (t == WildRPC::Type_Color);
-            constexpr bool isQuat = (t == WildRPC::Type_Quat);
+            constexpr bool isColor = (t == ElementType_Color);
+            constexpr bool isQuat = (t == ElementType_Quat);
             static_assert(isQuat || isColor, "!(isQuat || isColor)");
 
             Parameter param;
@@ -192,10 +228,10 @@ namespace WRPC
             return param;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static Parameter Build(const char* _strg)
         {
-            static_assert(t == WildRPC::Type_String, "t != WildRPC::Type_String!!");
+            static_assert(t == ElementType_String, "t != ElementType_String!!");
             Parameter param;
             param.m_value = std::string(_strg);
             return param;
@@ -275,10 +311,10 @@ namespace WRPC
         Parameter()
         {
         }
-        void Init(WildRPC::Type _type);
+        void Init(const TypeInfo& _type);
 
         // Getters -------------------------------------
-        WildRPC::Type GetType() const;
+        TypeInfo GetType() const;
 
         bool GetValue(bool& _bool) const;
         bool GetValue(int& _int) const;
@@ -377,65 +413,65 @@ namespace WRPC
 
     struct WRPC_DLLEXPORT ResultValue
     {
-        template <WildRPC::Type t>
+        template <ElementType t>
         static ResultValue Build(bool& _bool)
         {
-            static_assert(t == WildRPC::Type_Boolean, "t != WildRPC::Type_Boolean!!");
+            static_assert(t == ElementType_Boolean, "t != ElementType_Boolean!!");
             ResultValue result;
             result.m_value = &_bool;
             return result;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static ResultValue Build(int32_t& _int)
         {
-            static_assert(t == WildRPC::Type_Integer, "t != WildRPC::Type_Integer!!");
+            static_assert(t == ElementType_Integer, "t != ElementType_Integer!!");
             ResultValue result;
             result.m_value = &_int;
             return result;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static ResultValue Build(float& _float)
         {
-            static_assert(t == WildRPC::Type_Float, "t != WildRPC::Type_Float!!");
+            static_assert(t == ElementType_Float, "t != ElementType_Float!!");
             ResultValue result;
             result.m_value = &_float;
             return result;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static ResultValue Build(float& _x, float& _y)
         {
-            static_assert(t == WildRPC::Type_Vector2, "t != WildRPC::Type_Vector2!!");
+            static_assert(t == ElementType_Vector2, "t != ElementType_Vector2!!");
             ResultValue result;
             result.m_value = Vector2H(_x, _y);
             return result;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static ResultValue Build(uint32_t& _x, uint32_t& _y, uint32_t& _z)
         {
-            static_assert(t == WildRPC::Type_UInt3, "t != WildRPC::Type_UInt3!!");
+            static_assert(t == ElementType_UInt3, "t != ElementType_UInt3!!");
             ResultValue result;
             result.m_value = Vector3iH(_x, _y, _z);
             return result;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static ResultValue Build(float& _x, float& _y, float& _z)
         {
-            static_assert(t == WildRPC::Type_Vector3, "t != WildRPC::Type_Vector3!!");
+            static_assert(t == ElementType_Vector3, "t != ElementType_Vector3!!");
             ResultValue result;
             result.m_value = Vector3H(_x, _y, _z);
             return result;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static ResultValue Build(float& _x, float& _y, float& _z, float& _w)
         {
-            constexpr bool isColor = (t == WildRPC::Type_Color);
-            constexpr bool isQuat = (t == WildRPC::Type_Quat);
+            constexpr bool isColor = (t == ElementType_Color);
+            constexpr bool isQuat = (t == ElementType_Quat);
             static_assert(isQuat || isColor, "!(isQuat || isColor)");
 
             ResultValue result;
@@ -450,19 +486,19 @@ namespace WRPC
             return result;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static ResultValue Build(uint32_t& _wx, uint32_t& _wy, float& _x, float& _y, float& _z)
         {
-            static_assert(t == WildRPC::Type_Position, "t != WildRPC::Type_Position!!");
+            static_assert(t == ElementType_Position, "t != ElementType_Position!!");
             ResultValue result;
             result.m_value = PositionH(_wx, _wy, _x, _y, _z);
             return result;
         }
 
-        template <WildRPC::Type t>
+        template <ElementType t>
         static ResultValue Build(std::string& _strg)
         {
-            static_assert(t == WildRPC::Type_String, "t != WildRPC::Type_String!!");
+            static_assert(t == ElementType_String, "t != ElementType_String!!");
             ResultValue result;
             result.m_value = &_strg;
             return result;

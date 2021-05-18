@@ -16,13 +16,15 @@
 #include <WiLDRPC/RPCHeader_generated.h>
 #pragma warning(pop)
 
+using namespace WildRPC;
+
 namespace WRPC
 {
     // GETTERS --------------------------------------
 
     bool Parameter::GetValue(bool& _bool) const
     {
-        if (GetType() != WildRPC::Type_Boolean)
+        if (GetType() != Type::Boolean)
         {
             return false;
         }
@@ -32,7 +34,7 @@ namespace WRPC
 
     bool Parameter::GetValue(int& _int) const
     {
-        if (GetType() != WildRPC::Type_Integer)
+        if (GetType() != Type::Integer)
         {
             return false;
         }
@@ -42,7 +44,7 @@ namespace WRPC
 
     bool Parameter::GetValue(float& _float) const
     {
-        if (GetType() != WildRPC::Type_Float)
+        if (GetType() != Type::Float)
         {
             return false;
         }
@@ -52,7 +54,7 @@ namespace WRPC
 
     bool Parameter::GetValue(float& _x, float& _y) const
     {
-        if (GetType() != WildRPC::Type_Vector2)
+        if (GetType() != Type::Vector2)
         {
             return false;
         }
@@ -65,7 +67,7 @@ namespace WRPC
 
     bool Parameter::GetValue(uint32_t& _x, uint32_t& _y, uint32_t& _z) const
     {
-        if (GetType() != WildRPC::Type_UInt3)
+        if (GetType() != Type::UInt3)
         {
             return false;
         }
@@ -79,7 +81,7 @@ namespace WRPC
 
     bool Parameter::GetValue(float& _x, float& _y, float& _z) const
     {
-        if (GetType() != WildRPC::Type_Vector3)
+        if (GetType() != Type::Vector3)
         {
             return false;
         }
@@ -93,7 +95,7 @@ namespace WRPC
 
     bool Parameter::GetValue(float& _x, float& _y, float& _z, float& _w) const
     {
-        if (GetType() == WildRPC::Type_Quat)
+        if (GetType() == Type::Quat)
         {
             const Quat& pos = m_value.get<Quat>();
             _x = pos.x;
@@ -102,7 +104,7 @@ namespace WRPC
             _w = pos.w;
         }
 
-        if (GetType() == WildRPC::Type_Color)
+        if (GetType() == Type::Color)
         {
             const Color& pos = m_value.get<Color>();
             _x = pos.r;
@@ -116,7 +118,7 @@ namespace WRPC
 
     bool Parameter::GetValue(uint32_t& _wx, uint32_t& _wy, float& _x, float& _y, float& _z) const
     {
-        if (GetType() != WildRPC::Type_Position)
+        if (GetType() != Type::Position)
         {
             return false;
         }
@@ -132,7 +134,7 @@ namespace WRPC
 
     bool Parameter::GetValue(std::string& _strg) const
     {
-        if (GetType() != WildRPC::Type_String)
+        if (GetType() != Type::String)
         {
             return false;
         }
@@ -143,60 +145,62 @@ namespace WRPC
 
     // ---------------------------------------------------
 
-    void Parameter::Init(WildRPC::Type _type)
+    void Parameter::Init(const TypeInfo& _type)
     {
         // Initialises the variant.
-        switch (_type)
+        switch (_type.elementType())
         {
-        case WildRPC::Type_UInt3:
+        case ElementType_UInt3:
         {
             m_value = Vector3i();
         }
         break;
-        case WildRPC::Type_Vector3:
+        case ElementType_Vector3:
         {
             m_value = Vector3();
         }
         break;
-        case WildRPC::Type_Vector2:
+        case ElementType_Vector2:
         {
             m_value = Vector2();
         }
         break;
-        case WildRPC::Type_Quat:
+        case ElementType_Quat:
         {
             m_value = Quat();
         }
         break;
-        case WildRPC::Type_Color:
+        case ElementType_Color:
         {
             m_value = Color();
         }
         break;
-        case WildRPC::Type_Position:
+        case ElementType_Position:
         {
             m_value = Position();
         }
         break;
-        case WildRPC::Type_Float:
+        case ElementType_Float:
         {
             m_value = 0.0f;
         }
         break;
-        case WildRPC::Type_Integer:
+        case ElementType_Integer:
         {
             m_value = 0;
         }
         break;
-        case WildRPC::Type_Boolean:
+        case ElementType_Boolean:
         {
             m_value = false;
         }
         break;
-        case WildRPC::Type_String:
+        case ElementType_String:
         {
             m_value = std::string("");
         }
+        break;
+        case ElementType_Invalid:
         break;
         }
     }
@@ -257,51 +261,51 @@ namespace WRPC
 
     struct VisitType
     {
-        WildRPC::Type m_type = WildRPC::Type_Integer;
+        TypeInfo m_type;
 
         void operator()(const bool&)
         {
-            m_type = WildRPC::Type_Boolean;
+            m_type = Type::Boolean;
         }
         void operator()(const int&)
         {
-            m_type = WildRPC::Type_Integer;
+            m_type = Type::Integer;
         }
         void operator()(const float&)
         {
-            m_type = WildRPC::Type_Float;
+            m_type = Type::Float;
         }
         void operator()(const Vector2&)
         {
-            m_type = WildRPC::Type_Vector2;
+            m_type = Type::Vector2;
         }
         void operator()(const Vector3i&)
         {
-            m_type = WildRPC::Type_UInt3;
+            m_type = Type::UInt3;
         }
         void operator()(const Vector3&)
         {
-            m_type = WildRPC::Type_Vector3;
+            m_type = Type::Vector3;
         }
         void operator()(const Quat&)
         {
-            m_type = WildRPC::Type_Quat;
+            m_type = Type::Quat;
         }
         void operator()(const Color&)
         {
-            m_type = WildRPC::Type_Color;
+            m_type = Type::Color;
         }
         void operator()(const Position&)
         {
-            m_type = WildRPC::Type_Position;
+            m_type = Type::Position;
         }
         void operator()(const std::string&)
         {
-            m_type = WildRPC::Type_String;
+            m_type = Type::String;
         }
     };
 
-    WildRPC::Type Parameter::GetType() const
+    TypeInfo Parameter::GetType() const
     {
         VisitType visitType;
         mapbox::util::apply_visitor(visitType, m_value);
@@ -504,68 +508,69 @@ namespace WRPC
             auto& hldr = _holders[idx];
 
             auto type = prm.GetType();
-            switch (type)
+            switch (type.elementType())
             {
-            case WildRPC::Type_Boolean:
+            case ElementType_Boolean:
             {
                 auto bl = hldr.m_value.get<bool*>();
                 prm.GetValue(*bl);
             }
             break;
-            case WildRPC::Type_Integer:
+            case ElementType_Integer:
             {
                 auto it = hldr.m_value.get<int*>();
                 prm.GetValue(*it);
             }
             break;
-            case WildRPC::Type_Float:
+            case ElementType_Float:
             {
                 auto flt = hldr.m_value.get<float*>();
                 prm.GetValue(*flt);
             }
             break;
-            case WildRPC::Type_Vector2:
+            case ElementType_Vector2:
             {
                 auto& vct2 = hldr.m_value.get<Vector2H>();
                 prm.GetValue(*vct2.x, *vct2.y);
             }
             break;
-            case WildRPC::Type_UInt3:
+            case ElementType_UInt3:
             {
                 auto& vct3i = hldr.m_value.get<Vector3iH>();
                 prm.GetValue(*vct3i.x, *vct3i.y, *vct3i.z);
             }
             break;
-            case WildRPC::Type_Vector3:
+            case ElementType_Vector3:
             {
                 auto& vct3 = hldr.m_value.get<Vector3H>();
                 prm.GetValue(*vct3.x, *vct3.y, *vct3.z);
             }
             break;
-            case WildRPC::Type_Quat:
+            case ElementType_Quat:
             {
                 auto& qt = hldr.m_value.get<QuatH>();
                 prm.GetValue(*qt.x, *qt.y, *qt.z, *qt.w);
             }
             break;
-            case WildRPC::Type_Color:
+            case ElementType_Color:
             {
                 auto& clr = hldr.m_value.get<ColorH>();
                 prm.GetValue(*clr.r, *clr.g, *clr.b, *clr.a);
             }
             break;
-            case WildRPC::Type_Position:
+            case ElementType_Position:
             {
                 auto& ps = hldr.m_value.get<PositionH>();
                 prm.GetValue(*ps.wx, *ps.wy, *ps.x, *ps.y, *ps.z);
             }
             break;
-            case WildRPC::Type_String:
+            case ElementType_String:
             {
                 auto strg = hldr.m_value.get<std::string*>();
                 prm.GetValue(*strg);
             }
-            default:;
+            case ElementType_Invalid: break;
+            default: break;
             }
             idx++;
         }

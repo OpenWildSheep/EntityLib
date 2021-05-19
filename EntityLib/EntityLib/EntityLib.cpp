@@ -2002,6 +2002,13 @@ static Ent::Node loadNode(
                             [](json const& item) { return item[0].get<std::string>(); },
                             [](Node const* tmplItem) { return tmplItem->at(0llu)->getString(); });
                         break;
+                    case Ent::DataType::entityRef:
+                        arr = mergeMapOverride(
+                            [](json const& item) { return item[0].get<std::string>(); },
+                            [](Node const* tmplItem) {
+                                return tmplItem->at(0llu)->getEntityRef().entityPath;
+                            });
+                        break;
                     case Ent::DataType::number:
                         arr = mergeMapOverride(
                             [](json const& item) { return item[0].get<double>(); },

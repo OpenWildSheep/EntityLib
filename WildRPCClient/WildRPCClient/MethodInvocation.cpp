@@ -10,8 +10,8 @@
 
 #include "ConnectionPimpl.h"
 
-#define REQUEST_BUFFER_SIZE (4 * 1024)
-#define REPLY_BUFFER_SIZE (4 * 1024)
+#define REQUEST_BUFFER_SIZE 65535 // max TCP packet size is 64 kb (65535 bytes)
+#define REPLY_BUFFER_SIZE 65535
 
 namespace WRPC
 {
@@ -25,13 +25,11 @@ namespace WRPC
     {
         for (auto type : _in)
         {
-            m_inParams.emplace_back();
-            m_inParams.back().Init(type);
+            m_inParams.emplace_back(type);
         }
         for (auto type : _out)
         {
-            m_outParams.emplace_back();
-            m_outParams.back().Init(type);
+            m_outParams.emplace_back(type);
         }
     }
 
@@ -89,7 +87,7 @@ namespace WRPC
         }
 
         unsigned char buffer[REQUEST_BUFFER_SIZE];
-        size_t currentPosition = 0;
+        uoffset_t currentPosition = 0;
 
         // --------------------------------------
 

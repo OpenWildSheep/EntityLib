@@ -168,6 +168,9 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4324;4251;4996;4625;4626;4820;4710;4711;4571;4514;4774</DisableSpecificWarnings>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\external\mapbox\NATVIS\Variant.natvis" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -94,15 +94,93 @@ namespace Ent
     /// Content of a Node which has type Ent::DataType::array
     struct Array
     {
-        Array();
+        Array(Subschema const* _schema);
 
-        std::vector<value_ptr<Node>> data; ///< List of items of the array
+        Subschema const* schema = nullptr; ///< The schema of the object containing the oneOf field
 
-        Override<uint64_t> arraySize; ///< Size of the array, to keep track on array size changes
+        struct Deletable
+        {
+            // Node* node = nullptr;
+            size_t index = size_t(-1);
+            bool deleted = false; // Make it Override-able
+
+            // bool hasDefaultValue() const;
+        };
+        // mapbox::util::variant<int64_t, String>
+
+        using KeyType = mapbox::util::variant<String, int64_t>;
 
         bool hasOverride() const;
 
         bool hasPrefabValue() const;
+
+        bool hasDefaultValue() const;
+
+        bool hasKey() const;
+
+        Node* at(uint64_t _index);
+        Node const* at(uint64_t _index) const;
+
+        using KeyType = Array::KeyType; // mapbox::util::variant<String, int64_t>;
+        // KeyType getChildKey(Node const* _child) const;
+        bool mapErase(std::string const& _key);
+        bool mapErase(char const* _key);
+        bool mapRestore(char const* _key);
+        Node* mapGet(char const* _key);
+        Node const* mapGet(char const* _key) const;
+        bool mapErase(int64_t _key);
+        bool mapRestore(int64_t _key);
+        Node* mapGet(int64_t _key);
+        Node const* mapGet(int64_t _key) const;
+        Node* mapAdd(OverrideValueLocation, KeyType _key, Node _node);
+        Node* mapAdd(OverrideValueLocation, char const* _key, Node _node);
+        Node* mapAdd(OverrideValueLocation, int64_t _key, Node _node);
+        Node* add(OverrideValueLocation, Node _node);
+        bool isErased(KeyType _key) const;
+
+        std::vector<Node const*> getItems() const;
+
+        void checkInvariants() const;
+
+        void pop();
+
+        void clear();
+
+        bool empty() const;
+
+        void computeMemory(MemoryProfiler& prof) const;
+
+        /*std::map<KeyType, Deletable>& getFullMap()
+        {
+            return itemMap;
+        }
+
+        std::map<KeyType, Deletable> const& getFullMap() const
+        {
+            return itemMap;
+        }*/
+
+        size_t size() const
+        {
+            return arraySize.get();
+        }
+
+        Override<uint64_t> const& getRawSize() const
+        {
+            return arraySize;
+        }
+
+    private:
+        template <typename Key>
+        bool mapEraseImpl(Key key);
+        template <typename Key>
+        bool mapRestoreImpl(Key _key);
+        template <typename Key>
+        Node const* mapGetImpl(Key _key) const;
+
+        std::vector<value_ptr<Node>> data; ///< List of items of the array
+        std::map<KeyType, Deletable> itemMap;
+        Override<uint64_t> arraySize; ///< Size of the array, to keep track on array size changes
     };
 
     enum class ActivationLevel
@@ -205,6 +283,17 @@ namespace Ent
         void pop(); ///< @pre type==Ent::DataType::array. @brief Remove an item at the end of array
         void clear(); ///< @pre type==Ent::DataType::array. @brief Remove all items in array
         bool empty() const; ///< @pre type==Ent::DataType::array. @brief return true if array is empty
+        // Array - map
+        using KeyType = Array::KeyType; // mapbox::util::variant<String, int64_t>;
+        // KeyType getChildKey(Node const* _child) const;
+        bool mapErase(char const* _key);
+        bool mapRestore(char const* _key);
+        Node* mapGet(char const* _key);
+        Node const* mapGet(char const* _key) const;
+        bool mapErase(int64_t _key);
+        bool mapRestore(int64_t _key);
+        Node* mapGet(int64_t _key);
+        Node const* mapGet(int64_t _key) const;
 
         // Union
         Node* getUnionData(); ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data

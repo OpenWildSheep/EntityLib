@@ -167,6 +167,57 @@ try
 
     using EntityPtr = std::unique_ptr<Ent::Entity>;
 
+    /*entlib.rawdataPath = "X:/RawData";
+    {
+        auto const cl = 62662;
+        int fileCount = 0;
+        std::vector<std::filesystem::path> pathToCheckout;
+        for (auto& p : std::filesystem::recursive_directory_iterator(entlib.rawdataPath))
+        {
+            if (p.path().extension() == ".entity")
+            {
+                ++fileCount;
+                if (fileCount % 1 == 0)
+                    pathToCheckout.push_back(p.path());
+            }
+            if (p.path().extension() == ".scene")
+            {
+                ++fileCount;
+                if (fileCount % 1 == 0)
+                    pathToCheckout.push_back(p.path());
+            }
+        }
+        for (auto& p : pathToCheckout)
+        {
+            if (p.extension() == ".entity")
+            {
+                try
+                {
+                    EntityPtr ent = entlib.loadEntity(p);
+                }
+                catch (std::exception& ex)
+                {
+                    std::cerr << typeid(ex).name() << " : " << ex.what() << std::endl;
+                }
+            }
+            if (p.extension() == ".scene")
+            {
+                try
+                {
+                    EntityPtr ent = entlib.loadEntity(p);
+                }
+                catch (std::exception& ex)
+                {
+                    std::cerr << typeid(ex).name() << " : " << ex.what() << std::endl;
+                }
+            }
+        }
+    }*/
+
+    std::cout << "RawData check done" << std::endl;
+
+    entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
+
     // Test $ref links in entlib.schema.schema.allDefinitions
     char const* colorRef = "./RuntimeComponents.json#/definitions/Color";
     ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(colorRef) == 1);
@@ -200,6 +251,8 @@ try
         ENTLIB_ASSERT(actorState->getSchema()->getUnionNameField() == std::string("className"));
         ENTLIB_ASSERT(actorState->getSchema()->getUnionDataField() == std::string("classData"));
         Ent::Node const* climbEdge = actorState->getUnionData();
+        char const* climbEdgeType = actorState->getUnionType();
+        ENTLIB_ASSERT(strcmp(climbEdgeType, "ActionClimbEdge") == 0);
         ENTLIB_ASSERT(climbEdge != nullptr);
         Ent::Node const* exitRequired = climbEdge->at("locomotionMode");
         ENTLIB_ASSERT(exitRequired != nullptr);
@@ -215,7 +268,7 @@ try
         // Map and Set overridePolicy
         Ent::Component const* pathNodeGD = ent->getComponent("PathNodeGD");
         Ent::Node const* tags = pathNodeGD->root.at("Tags")->at("Tags");
-        ENTLIB_ASSERT(tags->size() == 2);
+        ENTLIB_ASSERT(tags->size() == 3);
         ENTLIB_ASSERT(tags->at(0llu)->at(0llu)->getString() == std::string("a"));
         ENTLIB_ASSERT(tags->at(1llu)->at(0llu)->getString() == std::string("c"));
         ENTLIB_ASSERT(tags->at(1llu)->at(1llu)->size() == 1);
@@ -579,7 +632,7 @@ try
         ENTLIB_ASSERT(scene->resolveEntityRef({"InstanceOfA/B/../../C"}) == &C);
     }
 
-    auto testInstanceOf = [](Ent::Entity const& ent) {
+    auto testInstanceOf = [](Ent::Entity& ent) {
         // ActorStates
         Ent::Node const& actorStates = ent.getActorStates();
         ENTLIB_ASSERT(actorStates.getDataType() == Ent::DataType::array);
@@ -607,8 +660,8 @@ try
         ENTLIB_ASSERT(exitRequ->getBool() == true);
 
         // Map and Set overridePolicy
-        Ent::Component const* pathNodeGD = ent.getComponent("PathNodeGD");
-        Ent::Node const* tags = pathNodeGD->root.at("Tags")->at("Tags");
+        Ent::Component* pathNodeGD = ent.getComponent("PathNodeGD");
+        Ent::Node* tags = pathNodeGD->root.at("Tags")->at("Tags");
         ENTLIB_ASSERT(tags->size() == 3);
         ENTLIB_ASSERT(tags->at(0llu)->at(0llu)->getString() == std::string("a"));
         ENTLIB_ASSERT(tags->at(1llu)->at(0llu)->getString() == std::string("b"));
@@ -617,6 +670,11 @@ try
         ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(0llu)->getString() == std::string("1"));
         ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(1llu)->getString() == std::string("2"));
         ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(2llu)->getString() == std::string("3"));
+        ENTLIB_ASSERT(not tags->mapErase(2));
+        ENTLIB_ASSERT(tags->mapGet("c") != nullptr);
+        //ENTLIB_ASSERT(tags->mapErase("c"));
+        //ENTLIB_ASSERT(tags->size() == 2);
+        //ENTLIB_ASSERT(tags->mapGet("c") == nullptr);
 
         // TEST SubScene (without override)
         Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();
@@ -1051,7 +1109,7 @@ try
     scene->getObjects().front()->addComponent("BeamGeneratorGD")->root.getFieldNames();
     auto fieldNameCount =
         scene->getObjects().front()->addComponent("HeightObj")->root.getFieldNames().size();
-    ENTLIB_ASSERT(fieldNameCount == 6);
+    ENTLIB_ASSERT(fieldNameCount == 7);
 
     auto ep1Iter = std::find_if(
         begin(scene->getObjects()),

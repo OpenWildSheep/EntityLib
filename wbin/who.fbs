@@ -12,6 +12,7 @@ table HeightObj
 	erosionMask:FloatMask;
 	detailMask:FloatMask;
 	detailType:FloatMask;
+	influence:FloatMask;
 	motifMask:[FloatMask];
 	sourceFileInf:SourceFileInf;
 }

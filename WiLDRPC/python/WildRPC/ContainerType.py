@@ -4,6 +4,6 @@
 
 class ContainerType(object):
     Invalid = -1
-    None_ = 0
+    Scalar = 0
     Array = 1
 

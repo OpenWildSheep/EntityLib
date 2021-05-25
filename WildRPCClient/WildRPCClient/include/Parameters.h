@@ -16,17 +16,17 @@ namespace WRPC
 
     namespace Type
     {
-        static TypeInfo Invalid(ContainerType_None, ElementType_Invalid);
-        static TypeInfo Boolean(ContainerType_None, ElementType_Boolean);
-        static TypeInfo Integer(ContainerType_None, ElementType_Integer);
-        static TypeInfo Float(ContainerType_None, ElementType_Float);
-        static TypeInfo Vector2(ContainerType_None, ElementType_Vector2);
-        static TypeInfo UInt3(ContainerType_None, ElementType_UInt3);
-        static TypeInfo Vector3(ContainerType_None, ElementType_Vector3);
-        static TypeInfo Quat(ContainerType_None, ElementType_Quat);
-        static TypeInfo Color(ContainerType_None, ElementType_Color);
-        static TypeInfo Position(ContainerType_None, ElementType_Position);
-        static TypeInfo String(ContainerType_None, ElementType_String);
+        static TypeInfo Invalid(ContainerType_Scalar, ElementType_Invalid);
+        static TypeInfo Boolean(ContainerType_Scalar, ElementType_Boolean);
+        static TypeInfo Integer(ContainerType_Scalar, ElementType_Integer);
+        static TypeInfo Float(ContainerType_Scalar, ElementType_Float);
+        static TypeInfo Vector2(ContainerType_Scalar, ElementType_Vector2);
+        static TypeInfo UInt3(ContainerType_Scalar, ElementType_UInt3);
+        static TypeInfo Vector3(ContainerType_Scalar, ElementType_Vector3);
+        static TypeInfo Quat(ContainerType_Scalar, ElementType_Quat);
+        static TypeInfo Color(ContainerType_Scalar, ElementType_Color);
+        static TypeInfo Position(ContainerType_Scalar, ElementType_Position);
+        static TypeInfo String(ContainerType_Scalar, ElementType_String);
 
         static TypeInfo InvalidArray(ContainerType_Array, ElementType_Invalid);
         static TypeInfo BooleanArray(ContainerType_Array, ElementType_Boolean);
@@ -187,7 +187,7 @@ namespace WRPC
         Parameter(const T& _scalar)
         {
             m_value = vector<T>{_scalar};
-            m_type = TypeInfo(ContainerType_None, GetElementType<T>());
+            m_type = TypeInfo(ContainerType_Scalar, GetElementType<T>());
         }
 
         template <typename T>
@@ -222,7 +222,7 @@ namespace WRPC
         template <typename T>
         bool TryGetScalar(T& _value) const
         {
-            if (m_type != TypeInfo(ContainerType_None, GetElementType<T>()))
+            if (m_type != TypeInfo(ContainerType_Scalar, GetElementType<T>()))
             {
                 return false;
             }

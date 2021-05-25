@@ -1,6 +1,6 @@
 namespace WildRPC;
 
-enum ContainerType : byte { Invalid = -1, None, Array }
+enum ContainerType : byte { Invalid = -1, Scalar, Array }
 
 enum ElementType : byte { Invalid = -1, Boolean, Integer, Float, Vector2, UInt3, Vector3, Quat, Color, Position, String }
 

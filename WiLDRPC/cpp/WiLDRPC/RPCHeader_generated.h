@@ -16,7 +16,7 @@ struct RPCHeaderT;
 
 enum ContainerType : int8_t {
   ContainerType_Invalid = -1,
-  ContainerType_None = 0,
+  ContainerType_Scalar = 0,
   ContainerType_Array = 1,
   ContainerType_MIN = ContainerType_Invalid,
   ContainerType_MAX = ContainerType_Array
@@ -25,7 +25,7 @@ enum ContainerType : int8_t {
 inline const ContainerType (&EnumValuesContainerType())[3] {
   static const ContainerType values[] = {
     ContainerType_Invalid,
-    ContainerType_None,
+    ContainerType_Scalar,
     ContainerType_Array
   };
   return values;
@@ -34,7 +34,7 @@ inline const ContainerType (&EnumValuesContainerType())[3] {
 inline const char * const *EnumNamesContainerType() {
   static const char * const names[4] = {
     "Invalid",
-    "None",
+    "Scalar",
     "Array",
     nullptr
   };

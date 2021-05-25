@@ -12,8 +12,17 @@ namespace WildRPC {
 
 struct Position;
 struct PositionBuilder;
+struct PositionT;
+
+struct PositionT : public flatbuffers::NativeTable {
+  typedef Position TableType;
+  uint32_t worldCellX = 0;
+  uint32_t worldCellY = 0;
+  std::unique_ptr<WildRPC::Vector3T> localPosition{};
+};
 
 struct Position FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef PositionT NativeTableType;
   typedef PositionBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_WORLDCELLX = 4,
@@ -23,11 +32,20 @@ struct Position FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   uint32_t worldCellX() const {
     return GetField<uint32_t>(VT_WORLDCELLX, 0);
   }
+  bool mutate_worldCellX(uint32_t _worldCellX) {
+    return SetField<uint32_t>(VT_WORLDCELLX, _worldCellX, 0);
+  }
   uint32_t worldCellY() const {
     return GetField<uint32_t>(VT_WORLDCELLY, 0);
   }
+  bool mutate_worldCellY(uint32_t _worldCellY) {
+    return SetField<uint32_t>(VT_WORLDCELLY, _worldCellY, 0);
+  }
   const WildRPC::Vector3 *localPosition() const {
     return GetPointer<const WildRPC::Vector3 *>(VT_LOCALPOSITION);
+  }
+  WildRPC::Vector3 *mutable_localPosition() {
+    return GetPointer<WildRPC::Vector3 *>(VT_LOCALPOSITION);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -37,6 +55,9 @@ struct Position FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(localPosition()) &&
            verifier.EndTable();
   }
+  PositionT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(PositionT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Position> Pack(flatbuffers::FlatBufferBuilder &_fbb, const PositionT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct PositionBuilder {
@@ -75,12 +96,50 @@ inline flatbuffers::Offset<Position> CreatePosition(
   return builder_.Finish();
 }
 
+flatbuffers::Offset<Position> CreatePosition(flatbuffers::FlatBufferBuilder &_fbb, const PositionT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+inline PositionT *Position::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<PositionT>(new PositionT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Position::UnPackTo(PositionT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = worldCellX(); _o->worldCellX = _e; }
+  { auto _e = worldCellY(); _o->worldCellY = _e; }
+  { auto _e = localPosition(); if (_e) _o->localPosition = std::unique_ptr<WildRPC::Vector3T>(_e->UnPack(_resolver)); }
+}
+
+inline flatbuffers::Offset<Position> Position::Pack(flatbuffers::FlatBufferBuilder &_fbb, const PositionT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreatePosition(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Position> CreatePosition(flatbuffers::FlatBufferBuilder &_fbb, const PositionT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const PositionT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _worldCellX = _o->worldCellX;
+  auto _worldCellY = _o->worldCellY;
+  auto _localPosition = _o->localPosition ? CreateVector3(_fbb, _o->localPosition.get(), _rehasher) : 0;
+  return WildRPC::CreatePosition(
+      _fbb,
+      _worldCellX,
+      _worldCellY,
+      _localPosition);
+}
+
 inline const WildRPC::Position *GetPosition(const void *buf) {
   return flatbuffers::GetRoot<WildRPC::Position>(buf);
 }
 
 inline const WildRPC::Position *GetSizePrefixedPosition(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<WildRPC::Position>(buf);
+}
+
+inline Position *GetMutablePosition(void *buf) {
+  return flatbuffers::GetMutableRoot<Position>(buf);
 }
 
 inline bool VerifyPositionBuffer(
@@ -103,6 +162,18 @@ inline void FinishSizePrefixedPositionBuffer(
     flatbuffers::FlatBufferBuilder &fbb,
     flatbuffers::Offset<WildRPC::Position> root) {
   fbb.FinishSizePrefixed(root);
+}
+
+inline std::unique_ptr<WildRPC::PositionT> UnPackPosition(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::PositionT>(GetPosition(buf)->UnPack(res));
+}
+
+inline std::unique_ptr<WildRPC::PositionT> UnPackSizePrefixedPosition(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::PositionT>(GetSizePrefixedPosition(buf)->UnPack(res));
 }
 
 }  // namespace WildRPC

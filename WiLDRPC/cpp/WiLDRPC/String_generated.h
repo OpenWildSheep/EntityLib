@@ -10,8 +10,15 @@ namespace WildRPC {
 
 struct String;
 struct StringBuilder;
+struct StringT;
+
+struct StringT : public flatbuffers::NativeTable {
+  typedef String TableType;
+  std::string value{};
+};
 
 struct String FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef StringT NativeTableType;
   typedef StringBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_VALUE = 4
@@ -19,12 +26,18 @@ struct String FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *value() const {
     return GetPointer<const flatbuffers::String *>(VT_VALUE);
   }
+  flatbuffers::String *mutable_value() {
+    return GetPointer<flatbuffers::String *>(VT_VALUE);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_VALUE) &&
            verifier.VerifyString(value()) &&
            verifier.EndTable();
   }
+  StringT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(StringT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<String> Pack(flatbuffers::FlatBufferBuilder &_fbb, const StringT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct StringBuilder {
@@ -62,12 +75,44 @@ inline flatbuffers::Offset<String> CreateStringDirect(
       value__);
 }
 
+flatbuffers::Offset<String> CreateString(flatbuffers::FlatBufferBuilder &_fbb, const StringT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+inline StringT *String::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<StringT>(new StringT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void String::UnPackTo(StringT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = value(); if (_e) _o->value = _e->str(); }
+}
+
+inline flatbuffers::Offset<String> String::Pack(flatbuffers::FlatBufferBuilder &_fbb, const StringT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateString(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<String> CreateString(flatbuffers::FlatBufferBuilder &_fbb, const StringT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const StringT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _value = _o->value.empty() ? 0 : _fbb.CreateString(_o->value);
+  return WildRPC::CreateString(
+      _fbb,
+      _value);
+}
+
 inline const WildRPC::String *GetString(const void *buf) {
   return flatbuffers::GetRoot<WildRPC::String>(buf);
 }
 
 inline const WildRPC::String *GetSizePrefixedString(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<WildRPC::String>(buf);
+}
+
+inline String *GetMutableString(void *buf) {
+  return flatbuffers::GetMutableRoot<String>(buf);
 }
 
 inline bool VerifyStringBuffer(
@@ -90,6 +135,18 @@ inline void FinishSizePrefixedStringBuffer(
     flatbuffers::FlatBufferBuilder &fbb,
     flatbuffers::Offset<WildRPC::String> root) {
   fbb.FinishSizePrefixed(root);
+}
+
+inline std::unique_ptr<WildRPC::StringT> UnPackString(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::StringT>(GetString(buf)->UnPack(res));
+}
+
+inline std::unique_ptr<WildRPC::StringT> UnPackSizePrefixedString(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::StringT>(GetSizePrefixedString(buf)->UnPack(res));
 }
 
 }  // namespace WildRPC

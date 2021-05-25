@@ -10,8 +10,17 @@ namespace WildRPC {
 
 struct UInt3;
 struct UInt3Builder;
+struct UInt3T;
+
+struct UInt3T : public flatbuffers::NativeTable {
+  typedef UInt3 TableType;
+  uint32_t x = 0;
+  uint32_t y = 0;
+  uint32_t z = 0;
+};
 
 struct UInt3 FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef UInt3T NativeTableType;
   typedef UInt3Builder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_X = 4,
@@ -21,11 +30,20 @@ struct UInt3 FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   uint32_t x() const {
     return GetField<uint32_t>(VT_X, 0);
   }
+  bool mutate_x(uint32_t _x) {
+    return SetField<uint32_t>(VT_X, _x, 0);
+  }
   uint32_t y() const {
     return GetField<uint32_t>(VT_Y, 0);
   }
+  bool mutate_y(uint32_t _y) {
+    return SetField<uint32_t>(VT_Y, _y, 0);
+  }
   uint32_t z() const {
     return GetField<uint32_t>(VT_Z, 0);
+  }
+  bool mutate_z(uint32_t _z) {
+    return SetField<uint32_t>(VT_Z, _z, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -34,6 +52,9 @@ struct UInt3 FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint32_t>(verifier, VT_Z) &&
            verifier.EndTable();
   }
+  UInt3T *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UInt3T *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<UInt3> Pack(flatbuffers::FlatBufferBuilder &_fbb, const UInt3T* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct UInt3Builder {
@@ -72,12 +93,50 @@ inline flatbuffers::Offset<UInt3> CreateUInt3(
   return builder_.Finish();
 }
 
+flatbuffers::Offset<UInt3> CreateUInt3(flatbuffers::FlatBufferBuilder &_fbb, const UInt3T *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+inline UInt3T *UInt3::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UInt3T>(new UInt3T());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UInt3::UnPackTo(UInt3T *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = x(); _o->x = _e; }
+  { auto _e = y(); _o->y = _e; }
+  { auto _e = z(); _o->z = _e; }
+}
+
+inline flatbuffers::Offset<UInt3> UInt3::Pack(flatbuffers::FlatBufferBuilder &_fbb, const UInt3T* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUInt3(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<UInt3> CreateUInt3(flatbuffers::FlatBufferBuilder &_fbb, const UInt3T *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const UInt3T* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _x = _o->x;
+  auto _y = _o->y;
+  auto _z = _o->z;
+  return WildRPC::CreateUInt3(
+      _fbb,
+      _x,
+      _y,
+      _z);
+}
+
 inline const WildRPC::UInt3 *GetUInt3(const void *buf) {
   return flatbuffers::GetRoot<WildRPC::UInt3>(buf);
 }
 
 inline const WildRPC::UInt3 *GetSizePrefixedUInt3(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<WildRPC::UInt3>(buf);
+}
+
+inline UInt3 *GetMutableUInt3(void *buf) {
+  return flatbuffers::GetMutableRoot<UInt3>(buf);
 }
 
 inline bool VerifyUInt3Buffer(
@@ -100,6 +159,18 @@ inline void FinishSizePrefixedUInt3Buffer(
     flatbuffers::FlatBufferBuilder &fbb,
     flatbuffers::Offset<WildRPC::UInt3> root) {
   fbb.FinishSizePrefixed(root);
+}
+
+inline std::unique_ptr<WildRPC::UInt3T> UnPackUInt3(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::UInt3T>(GetUInt3(buf)->UnPack(res));
+}
+
+inline std::unique_ptr<WildRPC::UInt3T> UnPackSizePrefixedUInt3(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::UInt3T>(GetSizePrefixedUInt3(buf)->UnPack(res));
 }
 
 }  // namespace WildRPC

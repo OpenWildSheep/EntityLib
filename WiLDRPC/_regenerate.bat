@@ -9,8 +9,8 @@ rmdir /s/q python\WildRPC
 :: generate all the .fbs schemas in the directory
 for %%f in (*.fbs) do (
 	::echo %%~ff
-	%flatc% --cpp    -o .\cpp\WiLDRPC %%~ff
-	%flatc% --python -o .\python\     %%~ff
+	%flatc% --cpp    --gen-object-api --gen-mutable -o .\cpp\WiLDRPC %%~ff
+	%flatc% --python --gen-object-api --gen-mutable -o .\python\     %%~ff
 )
 
 :: replace __init__.py with the list of all generated types

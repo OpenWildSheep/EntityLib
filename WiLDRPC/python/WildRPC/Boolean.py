@@ -43,3 +43,34 @@ def End(builder): return builder.EndObject()
 def BooleanEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+
+class BooleanT(object):
+
+    # BooleanT
+    def __init__(self):
+        self.value = False  # type: bool
+
+    @classmethod
+    def InitFromBuf(cls, buf, pos):
+        boolean = Boolean()
+        boolean.Init(buf, pos)
+        return cls.InitFromObj(boolean)
+
+    @classmethod
+    def InitFromObj(cls, boolean):
+        x = BooleanT()
+        x._UnPack(boolean)
+        return x
+
+    # BooleanT
+    def _UnPack(self, boolean):
+        if boolean is None:
+            return
+        self.value = boolean.Value()
+
+    # BooleanT
+    def Pack(self, builder):
+        Start(builder)
+        AddValue(builder, self.value)
+        boolean = End(builder)
+        return boolean

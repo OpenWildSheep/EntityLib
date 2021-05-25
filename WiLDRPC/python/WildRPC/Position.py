@@ -69,3 +69,49 @@ def End(builder): return builder.EndObject()
 def PositionEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+import WildRPC.Vector3
+try:
+    from typing import Optional
+except:
+    pass
+
+class PositionT(object):
+
+    # PositionT
+    def __init__(self):
+        self.worldCellX = 0  # type: int
+        self.worldCellY = 0  # type: int
+        self.localPosition = None  # type: Optional[WildRPC.Vector3.Vector3T]
+
+    @classmethod
+    def InitFromBuf(cls, buf, pos):
+        position = Position()
+        position.Init(buf, pos)
+        return cls.InitFromObj(position)
+
+    @classmethod
+    def InitFromObj(cls, position):
+        x = PositionT()
+        x._UnPack(position)
+        return x
+
+    # PositionT
+    def _UnPack(self, position):
+        if position is None:
+            return
+        self.worldCellX = position.WorldCellX()
+        self.worldCellY = position.WorldCellY()
+        if position.LocalPosition() is not None:
+            self.localPosition = WildRPC.Vector3.Vector3T.InitFromObj(position.LocalPosition())
+
+    # PositionT
+    def Pack(self, builder):
+        if self.localPosition is not None:
+            localPosition = self.localPosition.Pack(builder)
+        Start(builder)
+        AddWorldCellX(builder, self.worldCellX)
+        AddWorldCellY(builder, self.worldCellY)
+        if self.localPosition is not None:
+            AddLocalPosition(builder, localPosition)
+        position = End(builder)
+        return position

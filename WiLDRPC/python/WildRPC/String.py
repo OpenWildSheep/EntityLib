@@ -43,3 +43,37 @@ def End(builder): return builder.EndObject()
 def StringEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+
+class StringT(object):
+
+    # StringT
+    def __init__(self):
+        self.value = None  # type: str
+
+    @classmethod
+    def InitFromBuf(cls, buf, pos):
+        string = String()
+        string.Init(buf, pos)
+        return cls.InitFromObj(string)
+
+    @classmethod
+    def InitFromObj(cls, string):
+        x = StringT()
+        x._UnPack(string)
+        return x
+
+    # StringT
+    def _UnPack(self, string):
+        if string is None:
+            return
+        self.value = string.Value()
+
+    # StringT
+    def Pack(self, builder):
+        if self.value is not None:
+            value = builder.CreateString(self.value)
+        Start(builder)
+        if self.value is not None:
+            AddValue(builder, value)
+        string = End(builder)
+        return string

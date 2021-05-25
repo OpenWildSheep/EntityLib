@@ -76,3 +76,43 @@ def End(builder): return builder.EndObject()
 def ColorEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+
+class ColorT(object):
+
+    # ColorT
+    def __init__(self):
+        self.r = 0.0  # type: float
+        self.g = 0.0  # type: float
+        self.b = 0.0  # type: float
+        self.a = 0.0  # type: float
+
+    @classmethod
+    def InitFromBuf(cls, buf, pos):
+        color = Color()
+        color.Init(buf, pos)
+        return cls.InitFromObj(color)
+
+    @classmethod
+    def InitFromObj(cls, color):
+        x = ColorT()
+        x._UnPack(color)
+        return x
+
+    # ColorT
+    def _UnPack(self, color):
+        if color is None:
+            return
+        self.r = color.R()
+        self.g = color.G()
+        self.b = color.B()
+        self.a = color.A()
+
+    # ColorT
+    def Pack(self, builder):
+        Start(builder)
+        AddR(builder, self.r)
+        AddG(builder, self.g)
+        AddB(builder, self.b)
+        AddA(builder, self.a)
+        color = End(builder)
+        return color

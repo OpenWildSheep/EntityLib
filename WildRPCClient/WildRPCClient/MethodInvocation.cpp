@@ -10,38 +10,36 @@
 
 #include "ConnectionPimpl.h"
 
-#define REQUEST_BUFFER_SIZE (4 * 1024)
-#define REPLY_BUFFER_SIZE (4 * 1024)
+#define REQUEST_BUFFER_SIZE 65535 // max TCP packet size is 64 kb (65535 bytes)
+#define REPLY_BUFFER_SIZE 65535
 
 namespace WRPC
 {
     MethodInvocation::MethodInvocation(
         const char* _managerName,
         const char* _methodName,
-        std::vector<WildRPC::Type> _in,
-        std::vector<WildRPC::Type> _out)
+        std::vector<TypeInfo> _in,
+        std::vector<TypeInfo> _out)
         : m_managerName(_managerName)
         , m_methodName(_methodName)
     {
         for (auto type : _in)
         {
-            m_inParams.emplace_back();
-            m_inParams.back().Init(type);
+            m_inParams.emplace_back(type);
         }
         for (auto type : _out)
         {
-            m_outParams.emplace_back();
-            m_outParams.back().Init(type);
+            m_outParams.emplace_back(type);
         }
     }
 
     MethodInvocation::MethodInvocation(
         const char* _managerName,
         const char* _methodName,
-        std::initializer_list<WildRPC::Type> _in,
-        std::initializer_list<WildRPC::Type> _out)
+        std::initializer_list<TypeInfo> _in,
+        std::initializer_list<TypeInfo> _out)
         : MethodInvocation(
-            _managerName, _methodName, std::vector<WildRPC::Type>(_in), std::vector<WildRPC::Type>(_out))
+            _managerName, _methodName, std::vector<TypeInfo>(_in), std::vector<TypeInfo>(_out))
     {
     }
 
@@ -89,37 +87,28 @@ namespace WRPC
         }
 
         unsigned char buffer[REQUEST_BUFFER_SIZE];
-        size_t currentPosition = 0;
+        uoffset_t currentPosition = 0;
 
         // --------------------------------------
 
         flatbuffers::FlatBufferBuilder fbbuilder;
 
-        auto managerName = fbbuilder.CreateString(m_managerName);
-        auto methodName = fbbuilder.CreateString(m_methodName);
+        RPCHeaderT header;
+        header.managerName = m_managerName;
+        header.methodName = m_methodName;
 
-        std::vector<int8_t> params;
         for (auto prm : m_inParams)
         {
-            params.push_back((int8_t)prm.GetType());
+            header.parameterTypes.push_back(prm.GetType());
         }
-        auto prms = fbbuilder.CreateVector(params);
 
-        std::vector<int8_t> results;
         for (auto rslt : m_outParams)
         {
-            results.push_back((int8_t)rslt.GetType());
+            header.resultTypes.push_back(rslt.GetType());
         }
-        auto rslts = fbbuilder.CreateVector(results);
 
-        WildRPC::RPCHeaderBuilder rpcHeader(fbbuilder);
-        rpcHeader.add_managerName(managerName);
-        rpcHeader.add_methodName(methodName);
-        rpcHeader.add_parameterTypes(prms);
-        rpcHeader.add_resultTypes(rslts);
-
-        auto header = rpcHeader.Finish();
-        fbbuilder.FinishSizePrefixed(header);
+        auto headerPacked = RPCHeader::Pack(fbbuilder, &header);
+        fbbuilder.FinishSizePrefixed(headerPacked);
 
         auto size = fbbuilder.GetSize();
         auto bufferPointer = fbbuilder.GetBufferPointer();

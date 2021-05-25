@@ -43,3 +43,34 @@ def End(builder): return builder.EndObject()
 def IntegerEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+
+class IntegerT(object):
+
+    # IntegerT
+    def __init__(self):
+        self.value = 0  # type: int
+
+    @classmethod
+    def InitFromBuf(cls, buf, pos):
+        integer = Integer()
+        integer.Init(buf, pos)
+        return cls.InitFromObj(integer)
+
+    @classmethod
+    def InitFromObj(cls, integer):
+        x = IntegerT()
+        x._UnPack(integer)
+        return x
+
+    # IntegerT
+    def _UnPack(self, integer):
+        if integer is None:
+            return
+        self.value = integer.Value()
+
+    # IntegerT
+    def Pack(self, builder):
+        Start(builder)
+        AddValue(builder, self.value)
+        integer = End(builder)
+        return integer

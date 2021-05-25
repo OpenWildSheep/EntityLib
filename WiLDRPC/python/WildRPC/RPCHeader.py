@@ -42,16 +42,13 @@ class RPCHeader(object):
     def ParameterTypes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
-            a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Int8Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 1))
-        return 0
-
-    # RPCHeader
-    def ParameterTypesAsNumpy(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
-        if o != 0:
-            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Int8Flags, o)
-        return 0
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 2
+            from WildRPC.TypeInfo import TypeInfo
+            obj = TypeInfo()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
 
     # RPCHeader
     def ParameterTypesLength(self):
@@ -69,16 +66,13 @@ class RPCHeader(object):
     def ResultTypes(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
-            a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Int8Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 1))
-        return 0
-
-    # RPCHeader
-    def ResultTypesAsNumpy(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
-        if o != 0:
-            return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Int8Flags, o)
-        return 0
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 2
+            from WildRPC.TypeInfo import TypeInfo
+            obj = TypeInfo()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
 
     # RPCHeader
     def ResultTypesLength(self):
@@ -108,7 +102,7 @@ def AddParameterTypes(builder, parameterTypes): builder.PrependUOffsetTRelativeS
 def RPCHeaderAddParameterTypes(builder, parameterTypes):
     """This method is deprecated. Please switch to AddParameterTypes."""
     return AddParameterTypes(builder, parameterTypes)
-def StartParameterTypesVector(builder, numElems): return builder.StartVector(1, numElems, 1)
+def StartParameterTypesVector(builder, numElems): return builder.StartVector(2, numElems, 1)
 def RPCHeaderStartParameterTypesVector(builder, numElems):
     """This method is deprecated. Please switch to Start."""
     return StartParameterTypesVector(builder, numElems)
@@ -116,7 +110,7 @@ def AddResultTypes(builder, resultTypes): builder.PrependUOffsetTRelativeSlot(3,
 def RPCHeaderAddResultTypes(builder, resultTypes):
     """This method is deprecated. Please switch to AddResultTypes."""
     return AddResultTypes(builder, resultTypes)
-def StartResultTypesVector(builder, numElems): return builder.StartVector(1, numElems, 1)
+def StartResultTypesVector(builder, numElems): return builder.StartVector(2, numElems, 1)
 def RPCHeaderStartResultTypesVector(builder, numElems):
     """This method is deprecated. Please switch to Start."""
     return StartResultTypesVector(builder, numElems)
@@ -124,3 +118,80 @@ def End(builder): return builder.EndObject()
 def RPCHeaderEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+import WildRPC.TypeInfo
+try:
+    from typing import List
+except:
+    pass
+
+class RPCHeaderT(object):
+
+    # RPCHeaderT
+    def __init__(self):
+        self.managerName = None  # type: str
+        self.methodName = None  # type: str
+        self.parameterTypes = None  # type: List[WildRPC.TypeInfo.TypeInfoT]
+        self.resultTypes = None  # type: List[WildRPC.TypeInfo.TypeInfoT]
+
+    @classmethod
+    def InitFromBuf(cls, buf, pos):
+        rPCHeader = RPCHeader()
+        rPCHeader.Init(buf, pos)
+        return cls.InitFromObj(rPCHeader)
+
+    @classmethod
+    def InitFromObj(cls, rPCHeader):
+        x = RPCHeaderT()
+        x._UnPack(rPCHeader)
+        return x
+
+    # RPCHeaderT
+    def _UnPack(self, rPCHeader):
+        if rPCHeader is None:
+            return
+        self.managerName = rPCHeader.ManagerName()
+        self.methodName = rPCHeader.MethodName()
+        if not rPCHeader.ParameterTypesIsNone():
+            self.parameterTypes = []
+            for i in range(rPCHeader.ParameterTypesLength()):
+                if rPCHeader.ParameterTypes(i) is None:
+                    self.parameterTypes.append(None)
+                else:
+                    typeInfo_ = WildRPC.TypeInfo.TypeInfoT.InitFromObj(rPCHeader.ParameterTypes(i))
+                    self.parameterTypes.append(typeInfo_)
+        if not rPCHeader.ResultTypesIsNone():
+            self.resultTypes = []
+            for i in range(rPCHeader.ResultTypesLength()):
+                if rPCHeader.ResultTypes(i) is None:
+                    self.resultTypes.append(None)
+                else:
+                    typeInfo_ = WildRPC.TypeInfo.TypeInfoT.InitFromObj(rPCHeader.ResultTypes(i))
+                    self.resultTypes.append(typeInfo_)
+
+    # RPCHeaderT
+    def Pack(self, builder):
+        if self.managerName is not None:
+            managerName = builder.CreateString(self.managerName)
+        if self.methodName is not None:
+            methodName = builder.CreateString(self.methodName)
+        if self.parameterTypes is not None:
+            StartParameterTypesVector(builder, len(self.parameterTypes))
+            for i in reversed(range(len(self.parameterTypes))):
+                self.parameterTypes[i].Pack(builder)
+            parameterTypes = builder.EndVector()
+        if self.resultTypes is not None:
+            StartResultTypesVector(builder, len(self.resultTypes))
+            for i in reversed(range(len(self.resultTypes))):
+                self.resultTypes[i].Pack(builder)
+            resultTypes = builder.EndVector()
+        Start(builder)
+        if self.managerName is not None:
+            AddManagerName(builder, managerName)
+        if self.methodName is not None:
+            AddMethodName(builder, methodName)
+        if self.parameterTypes is not None:
+            AddParameterTypes(builder, parameterTypes)
+        if self.resultTypes is not None:
+            AddResultTypes(builder, resultTypes)
+        rPCHeader = End(builder)
+        return rPCHeader

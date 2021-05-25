@@ -3,7 +3,6 @@
 #pragma warning(push, 0)
 #pragma warning(disable : 5045)
 #include <iso646.h>
-#include <variant>
 #include <flatbuffers/flatbuffers.h>
 #include <WiLDRPC/Color_generated.h>
 #include <WiLDRPC/Quat_generated.h>
@@ -95,13 +94,13 @@ template<> bool Decoder::Decode(Parameter::string& _value)
     return DecodeInternal([&](auto buf){ _value = WildRPC::GetSizePrefixedString(buf)->value()->c_str(); });
 }
 
-template<> bool Decoder::Decode(Vector2T& _value) { return DecodeUnPack(WildRPC::GetSizePrefixedVector2, _value); }
-template<> bool Decoder::Decode(UInt3T& _value) { return DecodeUnPack(WildRPC::GetSizePrefixedUInt3, _value); }
-template<> bool Decoder::Decode(Vector3T& _value) { return DecodeUnPack(WildRPC::GetSizePrefixedVector3, _value); }
-template<> bool Decoder::Decode(QuatT& _value) { return DecodeUnPack(WildRPC::GetSizePrefixedQuat, _value); }
-template<> bool Decoder::Decode(ColorT& _value) { return DecodeUnPack(WildRPC::GetSizePrefixedColor, _value); }
-//template<> bool Decoder::Decode(PositionT& _value) { return DecodeUnPack(WildRPC::GetSizePrefixedPosition, _value); }
-template<> bool Decoder::Decode(Position& _value)
+template<> bool Decoder::Decode(Vector2& _value) { return DecodeUnPack(WildRPC::GetSizePrefixedVector2, _value); }
+template<> bool Decoder::Decode(Vector3i& _value) { return DecodeUnPack(WildRPC::GetSizePrefixedUInt3, _value); }
+template<> bool Decoder::Decode(Vector3& _value) { return DecodeUnPack(WildRPC::GetSizePrefixedVector3, _value); }
+template<> bool Decoder::Decode(Quat& _value) { return DecodeUnPack(WildRPC::GetSizePrefixedQuat, _value); }
+template<> bool Decoder::Decode(Color& _value) { return DecodeUnPack(WildRPC::GetSizePrefixedColor, _value); }
+//template<> bool Decoder::Decode(Position& _value) { return DecodeUnPack(WildRPC::GetSizePrefixedPosition, _value); }
+template<> bool Decoder::Decode(Position& _value) // WildRPC::PositionT is not a POD type so it cannot be reinterpreted to Game::Position :'(
 {
     return DecodeInternal([&](auto buf)
     {
@@ -126,11 +125,11 @@ bool Decoder::DecodeParameter(Parameter& _parameter)
     case WildRPC::ElementType_Integer: return DecodeVector<int>(size, _parameter);
     case WildRPC::ElementType_Float: return DecodeVector<float>(size, _parameter);
     case WildRPC::ElementType_String: return DecodeVector<Parameter::string>(size, _parameter);
-    case WildRPC::ElementType_Vector2: return DecodeVector<Vector2T>(size, _parameter);
-    case WildRPC::ElementType_UInt3: return DecodeVector<UInt3T>(size, _parameter);
-    case WildRPC::ElementType_Vector3: return DecodeVector<Vector3T>(size, _parameter);
-    case WildRPC::ElementType_Quat: return DecodeVector<QuatT>(size, _parameter);
-    case WildRPC::ElementType_Color: return DecodeVector<ColorT>(size, _parameter);
+    case WildRPC::ElementType_Vector2: return DecodeVector<Vector2>(size, _parameter);
+    case WildRPC::ElementType_UInt3: return DecodeVector<Vector3i>(size, _parameter);
+    case WildRPC::ElementType_Vector3: return DecodeVector<Vector3>(size, _parameter);
+    case WildRPC::ElementType_Quat: return DecodeVector<Quat>(size, _parameter);
+    case WildRPC::ElementType_Color: return DecodeVector<Color>(size, _parameter);
     case WildRPC::ElementType_Position: return DecodeVector<Position>(size, _parameter);
     case WildRPC::ElementType_Invalid:
     default:
@@ -209,12 +208,12 @@ template<> bool Encoder::Encode(const Parameter::string& _value)
     });
 }
 
-template<> bool Encoder::Encode(const Vector2T& _value) { return EncodeCreate(WildRPC::CreateVector2, _value); }
-template<> bool Encoder::Encode(const UInt3T& _value) { return EncodeCreate(WildRPC::CreateUInt3, _value); }
-template<> bool Encoder::Encode(const Vector3T& _value) { return EncodeCreate(WildRPC::CreateVector3, _value); }
-template<> bool Encoder::Encode(const QuatT& _value) { return EncodeCreate(WildRPC::CreateQuat, _value); }
-template<> bool Encoder::Encode(const ColorT& _value) { return EncodeCreate(WildRPC::CreateColor, _value); }
-//template<> bool Encoder::Encode(const PositionT& _value) { return EncodeCreate(WildRPC::CreatePosition, _value); }
+template<> bool Encoder::Encode(const Vector2& _value) { return EncodeCreate(WildRPC::CreateVector2, _value); }
+template<> bool Encoder::Encode(const Vector3i& _value) { return EncodeCreate(WildRPC::CreateUInt3, _value); }
+template<> bool Encoder::Encode(const Vector3& _value) { return EncodeCreate(WildRPC::CreateVector3, _value); }
+template<> bool Encoder::Encode(const Quat& _value) { return EncodeCreate(WildRPC::CreateQuat, _value); }
+template<> bool Encoder::Encode(const Color& _value) { return EncodeCreate(WildRPC::CreateColor, _value); }
+//template<> bool Encoder::Encode(const Position& _value) { return EncodeCreate(WildRPC::CreatePosition, _value); }
 template<> bool Encoder::Encode(const Position& v)
 {
     return EncodeInternal([&](auto& _builder)

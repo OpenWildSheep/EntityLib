@@ -39,7 +39,7 @@ namespace WRPC
         std::initializer_list<TypeInfo> _in,
         std::initializer_list<TypeInfo> _out)
         : MethodInvocation(
-            _managerName, _methodName, std::vector(_in), std::vector(_out))
+            _managerName, _methodName, std::vector<TypeInfo>(_in), std::vector<TypeInfo>(_out))
     {
     }
 

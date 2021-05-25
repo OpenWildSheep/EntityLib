@@ -21,8 +21,6 @@
 
 #include "include/MethodInvocation.h"
 
-using namespace WildRPC;
-
 namespace std
 {
     template <typename T>
@@ -42,14 +40,14 @@ namespace std
         return v;
     }
 
-    string to_string(const Vector3T& v)
+    string to_string(const WRPC::Vector3& v)
     {
         char buff[64];
         snprintf(buff, sizeof(buff), "(%f, %f, %f)", v.x, v.y, v.z);
         return buff;
     }
 
-    string to_string(const QuatT& v)
+    string to_string(const WRPC::Quat& v)
     {
         char buff[64];
         snprintf(buff, sizeof(buff), "(%f, %f, %f, %f)", v.x, v.y, v.z, v.w);
@@ -102,9 +100,9 @@ namespace WRPC
         r = GetString.Execute(connection, {});
         dump("GetString", r.NextScalar<string>());
 
-        SetVector3.Execute(connection, { Vector3T{{}, 1,2,3} });
+        SetVector3.Execute(connection, { Vector3(1,2,3) });
         r = GetVector3.Execute(connection, {});
-        dump("GetVector3", r.NextScalar<Vector3T>());
+        dump("GetVector3", r.NextScalar<Vector3>());
 
         SetPosition.Execute(connection, { Position(0,1, 2, 3, 4) });
         r = GetPosition.Execute(connection, {});
@@ -136,7 +134,7 @@ namespace WRPC
         MethodInvocation GetPositionArray("RPCMarshallingTests", "RPC_GetPositionArray", {}, {Type::PositionArray});
         MethodInvocation SetPositionArray("RPCMarshallingTests", "RPC_SetPositionArray", {Type::PositionArray}, {});
 
-        SetIntArray.Execute(connection, { vector{1, 2, 3} });
+        SetIntArray.Execute(connection, { vector<int>{1, 2, 3} });
         r = GetIntArray.Execute(connection, {});
         dump("GetIntArray", r.NextVector<int>());
 
@@ -144,9 +142,9 @@ namespace WRPC
         r = GetStringArray.Execute(connection, {});
         dump("GetStringArray", r.NextVector<string>());
 
-        SetVector3Array.Execute(connection, { vector<Vector3T>{{{}, 1, 2, 3}, {{}, 4, 5, 6}} });
+        SetVector3Array.Execute(connection, { vector<Vector3>{{1, 2, 3}, {4, 5, 6}} });
         r = GetVector3Array.Execute(connection, {});
-        dump("GetVector3Array", r.NextVector<Vector3T>());
+        dump("GetVector3Array", r.NextVector<Vector3>());
 
         SetPositionArray.Execute(connection, { vector<Position>{{0, 1, 2, 3, 4}, {5, 6, 7, 8, 9}} });
         r = GetPositionArray.Execute(connection, {});
@@ -156,8 +154,8 @@ namespace WRPC
         MethodInvocation SetCamera("CameraManager", "RPC_SetCamera", {Type::Vector3, Type::Quat, Type::Float}, {});
         MethodInvocation GetCamera("CameraManager", "RPC_GetCamera", {}, {Type::Vector3, Type::Quat, Type::Float});
         r = GetCamera.Execute(connection, {});
-        auto pos = r.NextScalar<Vector3T>();
-        auto rot = r.NextScalar<QuatT>();
+        auto pos = r.NextScalar<Vector3>();
+        auto rot = r.NextScalar<Quat>();
         auto fov = r.NextScalar<float>();
         printf("GetCamera: pos %s, rot %s, fov %s\n", to_string(pos).c_str(), to_string(rot).c_str(), to_string(fov).c_str());
     }
@@ -176,8 +174,8 @@ namespace WRPC
         {
             printf("setCamera %d\n", i);
             setCamera.Execute(connection, {
-                Vector3T{{}, 0.0f, 0.0f, -10.0f + 0.1f * float(i) },
-                QuatT{{}, 0.0f, 0.0f, 0.0f, 1.0f },
+                Vector3{0.0f, 0.0f, -10.0f + 0.1f * float(i)},
+                Quat{0.0f, 0.0f, 0.0f, 1.0f},
                 40.0f
             });
 
@@ -196,8 +194,8 @@ namespace WRPC
 
         if (!anotherResult.HasError())
         {
-            auto p = anotherResult.NextScalar<Vector3T>();
-            auto q = anotherResult.NextScalar<QuatT>();
+            auto p = anotherResult.NextScalar<Vector3>();
+            auto q = anotherResult.NextScalar<Quat>();
             auto foV = anotherResult.NextScalar<float>();
             printf("_position: (%.2f, %.2f, %.2f)\n", p.x, p.y, p.z);
             printf("_quat: (%.2f, %.2f, %.2f, %.2f)\n", q.x, q.y, q.z, q.w);

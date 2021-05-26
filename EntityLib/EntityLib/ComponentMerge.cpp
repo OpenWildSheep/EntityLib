@@ -8,8 +8,6 @@
 
 using namespace nlohmann;
 
-char const* sceneSchemaLocation = "WildPipeline/Schema/Scene-schema.json";
-
 // When schema branches a copied from a file to an other, the local references become external
 void updateRefLinks(std::string const& _sourceFile, json& _node)
 {
@@ -58,8 +56,6 @@ json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
 {
     json const runtimeCmps = loadJsonFile(_toolsDir / "WildPipeline/Schema/RuntimeComponents.json");
     json const editionCmps = loadJsonFile(_toolsDir / "WildPipeline/Schema/EditionComponents.json");
-    auto sceneSchemaPath = _toolsDir / sceneSchemaLocation;
-    json const sceneSch = loadJsonFile(sceneSchemaPath);
     json const dependencies = loadJsonFile(_toolsDir / "WildPipeline/Schema/Dependencies.json");
 
     json const& runtimeCompSch = runtimeCmps.at("definitions");
@@ -68,6 +64,9 @@ json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
     json mergedCompSch;
     mergedCompSch["$ref"] = "#/definitions/Component";
     mergedCompSch["$schema"] = "http://json-schema.org/draft-07/schema#";
+
+    mergedCompSch["definitions"]["Component"]["meta"]["unionDataField"] = "Data";
+    mergedCompSch["definitions"]["Component"]["meta"]["unionTypeField"] = "Type";
 
     auto&& compList = mergedCompSch["definitions"]["Component"]["oneOf"];
     compList = json();

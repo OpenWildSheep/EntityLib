@@ -2750,6 +2750,21 @@ Ent::EntityLib::loadLegacySceneReadOnly(std::filesystem::path const& _scenePath)
     return loadEntityOrScene<Ent::Scene>(_scenePath, m_sceneCache, &validateScene, loadFunc, nullptr);
 }
 
+Ent::Node Ent::EntityLib::loadEntityAsNode(std::filesystem::path const& _entityPath) const
+{
+    Ent::Subschema const& entitySchema =
+        AT(schema.schema.allDefinitions, "./Scene-schema.json#/definitions/Object");
+    return loadFileAsNode(_entityPath, entitySchema);
+}
+
+Ent::Node Ent::EntityLib::loadFileAsNode(
+    std::filesystem::path const& _path, Ent::Subschema const& _schema) const
+{
+    auto const absPath = getAbsolutePath(_path);
+    json jsonData = loadJsonFile(absPath);
+    return loadNode(this, _schema, jsonData, nullptr, nullptr);
+}
+
 std::unique_ptr<Ent::Entity>
 Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath, Ent::Entity const* _super) const
 {

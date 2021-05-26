@@ -725,6 +725,12 @@ namespace Ent
         std::shared_ptr<Scene const>
         loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const;
 
+        /// Load an entity file into a Node
+        Node loadEntityAsNode(std::filesystem::path const& _entityPath) const;
+
+        /// Load any entitylib file into a Node, giving a schema
+        Node loadFileAsNode(std::filesystem::path const& _path, Ent::Subschema const& _schema) const;
+
         /// Load the Entity at path _entityPath
         std::unique_ptr<Entity> loadEntity(
             std::filesystem::path const& _entityPath, Ent::Entity const* _super = nullptr) const;

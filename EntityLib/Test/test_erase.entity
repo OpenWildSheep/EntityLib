@@ -1,9 +1,7 @@
 {
     "ActorStates": [
         {
-            "classData": {
-                "Type": 13
-            },
+            "classData": null,
             "className": "ActionCinematic"
         },
         {
@@ -11,6 +9,10 @@
                 "ExitRequired": true
             },
             "className": "ActionChosen"
+        },
+        {
+            "classData": {},
+            "className": "ActionClamberRise"
         }
     ],
     "Color": [
@@ -52,14 +54,15 @@
                         ],
                         [
                             "c",
-                            [
-                                "1",
-                                "3"
-                            ]
+                            null
                         ],
                         [
                             "d",
                             null
+                        ],
+                        [
+                            "e",
+                            []
                         ]
                     ]
                 }

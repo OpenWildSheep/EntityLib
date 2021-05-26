@@ -101,12 +101,9 @@ namespace Ent
         struct Deletable
         {
             // Node* node = nullptr;
-            size_t index = size_t(-1);
-            bool deleted = false; // Make it Override-able
-
-            // bool hasDefaultValue() const;
+            size_t index;
+            bool deleted; // Make it Override-able
         };
-        // mapbox::util::variant<int64_t, String>
 
         using KeyType = mapbox::util::variant<String, int64_t>;
 
@@ -121,17 +118,19 @@ namespace Ent
         Node* at(uint64_t _index);
         Node const* at(uint64_t _index) const;
 
-        using KeyType = Array::KeyType; // mapbox::util::variant<String, int64_t>;
-        // KeyType getChildKey(Node const* _child) const;
+        Node* push();
+
         bool mapErase(std::string const& _key);
         bool mapErase(char const* _key);
-        bool mapRestore(char const* _key);
+        Ent::Node* mapRestore(char const* _key);
         Node* mapGet(char const* _key);
         Node const* mapGet(char const* _key) const;
+        Node* mapInsert(char const* _key);
         bool mapErase(int64_t _key);
-        bool mapRestore(int64_t _key);
+        Ent::Node* mapRestore(int64_t _key);
         Node* mapGet(int64_t _key);
         Node const* mapGet(int64_t _key) const;
+        Node* mapInsert(int64_t _key);
         Node* mapAdd(OverrideValueLocation, KeyType _key, Node _node);
         Node* mapAdd(OverrideValueLocation, char const* _key, Node _node);
         Node* mapAdd(OverrideValueLocation, int64_t _key, Node _node);
@@ -139,6 +138,7 @@ namespace Ent
         bool isErased(KeyType _key) const;
 
         std::vector<Node const*> getItems() const;
+        std::vector<Node const*> getItemsWithRemoved() const;
 
         void checkInvariants() const;
 
@@ -149,16 +149,6 @@ namespace Ent
         bool empty() const;
 
         void computeMemory(MemoryProfiler& prof) const;
-
-        /*std::map<KeyType, Deletable>& getFullMap()
-        {
-            return itemMap;
-        }
-
-        std::map<KeyType, Deletable> const& getFullMap() const
-        {
-            return itemMap;
-        }*/
 
         size_t size() const
         {
@@ -174,9 +164,11 @@ namespace Ent
         template <typename Key>
         bool mapEraseImpl(Key key);
         template <typename Key>
-        bool mapRestoreImpl(Key _key);
+        Node* mapRestoreImpl(Key _key);
         template <typename Key>
         Node const* mapGetImpl(Key _key) const;
+        template <typename Key>
+        Node* mapInsertImpl(Key _key);
 
         std::vector<value_ptr<Node>> data; ///< List of items of the array
         std::map<KeyType, Deletable> itemMap;
@@ -284,16 +276,16 @@ namespace Ent
         void clear(); ///< @pre type==Ent::DataType::array. @brief Remove all items in array
         bool empty() const; ///< @pre type==Ent::DataType::array. @brief return true if array is empty
         // Array - map
-        using KeyType = Array::KeyType; // mapbox::util::variant<String, int64_t>;
-        // KeyType getChildKey(Node const* _child) const;
         bool mapErase(char const* _key);
-        bool mapRestore(char const* _key);
+        Node* mapRestore(char const* _key);
         Node* mapGet(char const* _key);
         Node const* mapGet(char const* _key) const;
+        Node const* mapInsert(char const* _key);
         bool mapErase(int64_t _key);
-        bool mapRestore(int64_t _key);
+        Node* mapRestore(int64_t _key);
         Node* mapGet(int64_t _key);
         Node const* mapGet(int64_t _key) const;
+        Node const* mapInsert(int64_t _key);
 
         // Union
         Node* getUnionData(); ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data
@@ -617,6 +609,10 @@ namespace Ent
         SubSceneComponent* addSubSceneComponent();
 
         Node const& getActorStates() const
+        {
+            return actorStates;
+        }
+        Node& getActorStates()
         {
             return actorStates;
         }

@@ -139,12 +139,16 @@ namespace Ent
             // In json it is an array of "2 item array" where the 1st item is the key
             // and can be string, double or integer
             // meta.ordered means the items have to be sorted by the key
+            _child->GetRawValue().get<Array>().checkInvariants();
+            ENTLIB_ASSERT(_child->getSchema()->linearItems.has_value());
             Ent::DataType keyType = _arraySchema->singularItems->get().linearItems->at(0)->type;
 #pragma warning(push)
 #pragma warning(disable : 4061) // There are switches with missing cases. This is wanted.
             switch (keyType)
             {
-            case Ent::DataType::string: return _child->at(0llu)->getString();
+            case Ent::DataType::string:
+                ENTLIB_ASSERT(_child->at(0llu)->getString() != std::string());
+                return _child->at(0llu)->getString();
             case Ent::DataType::entityRef:
                 return _child->at(0llu)->getEntityRef().entityPath.c_str();
             case Ent::DataType::number: return _child->at(0llu)->getFloat();
@@ -170,6 +174,67 @@ namespace Ent
             // The key is the item itself
             case Ent::DataType::integer: return _child->getInt();
             default: throw std::runtime_error("Unknown key type in set " + _arraySchema->name);
+            }
+#pragma warning(pop)
+        }
+        break;
+        default:
+            throw std::runtime_error(format(
+                "Unknown key type (%s) in schema of %s",
+                meta.overridePolicy.c_str(),
+                _arraySchema->name.c_str()));
+        }
+    }
+
+    static void setChildKey(Subschema const* _arraySchema, Node* _child, Ent::Array::KeyType _key)
+    {
+        auto&& meta = _arraySchema->meta.get<Ent::Subschema::ArrayMeta>();
+        using namespace Ent;
+        switch (hash(meta.overridePolicy))
+        {
+        case "map"_hash:
+        {
+            // It is a C++ map.
+            // In json it is an array of "2 item array" where the 1st item is the key
+            // and can be string, double or integer
+            // meta.ordered means the items have to be sorted by the key
+            _child->GetRawValue().get<Array>().checkInvariants();
+            ENTLIB_ASSERT(_child->getSchema()->linearItems.has_value());
+            // ENTLIB_ASSERT(not _child->at(0llu)->hasDefaultValue); // Sometime there is a key in the default value
+            Ent::DataType keyType = _arraySchema->singularItems->get().linearItems->at(0)->type;
+#pragma warning(push)
+#pragma warning(disable : 4061) // There are switches with missing cases. This is wanted.
+            switch (keyType)
+            {
+            case Ent::DataType::string:
+                _child->at(0llu)->setString(_key.get<Ent::String>().c_str());
+                break;
+            case Ent::DataType::entityRef:
+                _child->at(0llu)->setEntityRef(Ent::EntityRef{_key.get<Ent::String>()});
+                break;
+            case Ent::DataType::integer: _child->at(0llu)->setInt(_key.get<int64_t>()); break;
+            default:
+                throw std::runtime_error(
+                    "Can't use this type as key of a map : " + _arraySchema->name);
+            }
+        }
+        break;
+        case "set"_hash:
+        {
+            // It is a C++ set.
+            // In json it is an array of primitive. string, double or integer or oneOf
+            // meta.ordered means the items have to be sorted by the key
+            Ent::DataType const keyType = _arraySchema->singularItems->get().type;
+            switch (keyType)
+            {
+            // The key is the className string
+            case Ent::DataType::oneOf: _child->setUnionType(_key.get<Ent::String>().c_str()); break;
+            // The key is the item itself
+            case Ent::DataType::string: _child->setString(_key.get<Ent::String>().c_str()); break;
+            // The key is the item itself
+            case Ent::DataType::integer: _child->setInt(_key.get<int64_t>()); break;
+            default:
+                throw std::runtime_error("Can't use this type in a set : " + _arraySchema->name);
             }
 #pragma warning(pop)
         }
@@ -249,16 +314,20 @@ namespace Ent
     }
 
     template <typename K>
-    bool Ent::Array::mapRestoreImpl(K _key)
+    Node* Ent::Array::mapRestoreImpl(K _key)
     {
         auto iter = itemMap.find(_key);
         if (iter == itemMap.end())
         {
-            return false;
+            return nullptr;
         }
-        iter->second.deleted = false;
+        if (iter->second.deleted)
+        {
+            iter->second.deleted = false;
+            arraySize.set(arraySize.get() + 1);
+        }
         checkInvariants();
-        return true;
+        return data[iter->second.index].get();
     }
 
     template <typename K>
@@ -273,6 +342,29 @@ namespace Ent
         {
             return nullptr;
         }
+        return data[iter->second.index].get();
+    }
+
+    template <typename Key>
+    Ent::Node* Ent::Array::mapInsertImpl(Key _key)
+    {
+        auto iter = itemMap.find(_key);
+        if (iter == itemMap.end())
+        {
+            if (SubschemaRef const* itemSchema = schema->singularItems.get())
+            {
+                auto newNode = loadNode(nullptr, itemSchema->get(), json(), nullptr);
+                setChildKey(schema, &newNode, _key);
+                return add(OverrideValueLocation::Override, std::move(newNode));
+            }
+            throw BadType("Array is not a singularItems array (Can't push in a pair or tuple)");
+        }
+        if (iter->second.deleted)
+        {
+            iter->second.deleted = false;
+            arraySize.set(arraySize.get() + 1);
+        }
+        checkInvariants();
         return data[iter->second.index].get();
     }
 
@@ -295,7 +387,7 @@ namespace Ent
     {
         return mapEraseImpl(_key);
     }
-    bool Ent::Array::mapRestore(char const* _key)
+    Ent::Node* Ent::Array::mapRestore(char const* _key)
     {
         return mapRestoreImpl(_key);
     }
@@ -307,11 +399,16 @@ namespace Ent
     {
         return mapGetImpl(_key);
     }
+    Ent::Node* Ent::Array::mapInsert(char const* _key)
+    {
+        return mapInsertImpl(_key);
+    }
+
     bool Ent::Array::mapErase(int64_t _key)
     {
         return mapEraseImpl(_key);
     }
-    bool Ent::Array::mapRestore(int64_t _key)
+    Ent::Node* Ent::Array::mapRestore(int64_t _key)
     {
         return mapRestoreImpl(_key);
     }
@@ -322,6 +419,10 @@ namespace Ent
     Ent::Node const* Ent::Array::mapGet(int64_t _key) const
     {
         return mapGetImpl(_key);
+    }
+    Ent::Node* Ent::Array::mapInsert(int64_t _key)
+    {
+        return mapInsertImpl(_key);
     }
 
     static void incrementSize(OverrideValueLocation loc, Override<uint64_t>& arraySize)
@@ -368,7 +469,8 @@ namespace Ent
     {
         checkInvariants();
         ENTLIB_ASSERT(&schema->singularItems->get() == _node.getSchema());
-        auto ptr = data.emplace_back(std::move(_node)).get();
+        data.emplace_back(std::move(_node));
+        auto ptr = data.back().get();
         itemMap.emplace(std::move(_key), Deletable{data.size() - 1});
         incrementSize(loc, arraySize);
         checkInvariants();
@@ -400,11 +502,23 @@ namespace Ent
         }
         else
         {
-            Node* ptr = data.emplace_back(Ent::make_value<Node>(std::move(_node))).get();
+            data.emplace_back(Ent::make_value<Node>(std::move(_node)));
+            Node* ptr = data.back().get();
             incrementSize(loc, arraySize);
             checkInvariants();
             return ptr;
         }
+    }
+
+    std::vector<Node const*> Ent::Array::getItemsWithRemoved() const
+    {
+        std::vector<Node const*> result;
+        result.reserve(arraySize.get());
+        for (auto&& node : data)
+        {
+            result.emplace_back(node.get());
+        }
+        return result;
     }
 
     std::vector<Node const*> Ent::Array::getItems() const
@@ -427,18 +541,6 @@ namespace Ent
             for (auto&& node : data)
             {
                 result.emplace_back(node.get());
-                if (schema->singularItems != nullptr)
-                {
-                    ENTLIB_ASSERT(node->getSchema() == &schema->singularItems->get());
-                }
-            }
-        }
-        if (schema->singularItems != nullptr)
-        {
-            for (auto* tmplItem : result)
-            {
-                auto itemSchema2 = tmplItem->getSchema();
-                ENTLIB_ASSERT(itemSchema2 == &schema->singularItems->get());
             }
         }
         return result;
@@ -454,9 +556,10 @@ namespace Ent
         if (hasKey())
         {
             ENTLIB_ASSERT(itemMap.size() == data.size());
-            deleted = std::count_if(begin(itemMap), end(itemMap), [](auto&& key_wrapper) {
-                return std::get<1>(key_wrapper).deleted;
-            });
+            deleted =
+                (std::size_t)std::count_if(begin(itemMap), end(itemMap), [](auto&& key_wrapper) {
+                    return std::get<1>(key_wrapper).deleted;
+                });
         }
         ENTLIB_ASSERT(arraySize.get() == data.size() - deleted);
         if (schema->singularItems != nullptr)
@@ -560,6 +663,21 @@ namespace Ent
         // TODO : itemMap
     }
 
+    Node* Ent::Array::push()
+    {
+        if (hasKey())
+        {
+            throw BadType("Can't 'push' in a map or set. Use 'mapInsert'.");
+        }
+        if (SubschemaRef const* itemSchema = schema->singularItems.get())
+        {
+            return add(
+                OverrideValueLocation::Override,
+                loadNode(nullptr, itemSchema->get(), json(), nullptr));
+        }
+        throw BadType("Array is not a singularItems array (Can't push in a pair or tuple)");
+    }
+
     // ************************************ Union *************************************************
 
     bool Ent::Union::hasOverride() const
@@ -588,7 +706,10 @@ namespace Ent
     {
         if (wrapper.has_value())
         {
-            return wrapper->at(metaData->typeField.c_str())->getString();
+            auto typeNode = wrapper->at(metaData->typeField.c_str());
+            ENTLIB_ASSERT_MSG(
+                not typeNode->hasDefaultValue(), "The type-field is expected to be set, in Union");
+            return typeNode->getString();
         }
         else
         {
@@ -1207,13 +1328,7 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            if (SubschemaRef const* itemSchema = schema->singularItems.get())
-            {
-                auto& arrayRoot = value.get<Array>();
-                return arrayRoot.add(
-                    OverrideValueLocation::Override,
-                    loadNode(nullptr, itemSchema->get(), json(), nullptr));
-            }
+            return value.get<Array>().push();
         }
         throw BadType();
     }
@@ -1256,7 +1371,7 @@ namespace Ent
         throw BadType();
     }
 
-    bool Node::mapRestore(char const* _key)
+    Ent::Node* Node::mapRestore(char const* _key)
     {
         if (value.is<Array>())
         {
@@ -1289,7 +1404,7 @@ namespace Ent
         }
         throw BadType();
     }
-    bool Node::mapRestore(int64_t _key)
+    Node* Node::mapRestore(int64_t _key)
     {
         if (value.is<Array>())
         {
@@ -1310,6 +1425,24 @@ namespace Ent
         if (value.is<Array>())
         {
             return value.get<Array>().mapGet(_key);
+        }
+        throw BadType();
+    }
+
+    Node const* Node::mapInsert(int64_t _key)
+    {
+        if (value.is<Array>())
+        {
+            return value.get<Array>().mapInsert(_key);
+        }
+        throw BadType();
+    }
+
+    Node const* Node::mapInsert(char const* _key)
+    {
+        if (value.is<Array>())
+        {
+            return value.get<Array>().mapInsert(_key);
         }
         throw BadType();
     }
@@ -2196,9 +2329,10 @@ struct MergeMapOverride
         }
         struct NodeWrapper
         {
-            Node node{};
-            OverrideValueLocation loc{};
-            bool removed{};
+            //TODO : Add default values when C++17
+            Node node;
+            OverrideValueLocation loc;
+            bool removed;
         };
         std::vector<std::pair<KeyType, NodeWrapper>> result;
         // std::vector<std::pair<KeyType, Node>> removedItems;
@@ -2571,9 +2705,6 @@ static Ent::Node loadNode(
                     // meta.ordered means the items have to be sorted by the key
                     Ent::DataType keyType = _nodeSchema.singularItems->get().linearItems->at(0)->type;
                     auto doRemove = [](json const& item) {
-                        //if (item[1].is_null())
-                        //    throw std::runtime_error("Has null in map");
-                        // printf("");
                         return item[1].is_null();
                     };
 #pragma warning(push)
@@ -2624,12 +2755,15 @@ static Ent::Node loadNode(
                     {
                         auto const& unionMeta =
                             _nodeSchema.singularItems->get().meta.get<Ent::Subschema::UnionMeta>();
+                        auto doRemoveUnion = [unionMeta](json const& item) {
+                            return item[unionMeta.dataField].is_null();
+                        };
                         arr = mergeMapOverride(
                             [&unionMeta](json const& item) {
                                 return item[unionMeta.typeField].get<std::string>();
                             },
                             [](Node const* subSuper) { return subSuper->getUnionType(); },
-                            doRemoveDefault);
+                            doRemoveUnion);
                     }
                     break;
                     case Ent::DataType::string: // The key is the item itself
@@ -2929,14 +3063,16 @@ json Ent::EntityLib::dumpNode(
         if (fullWrite)
             printf("");
         auto const& arr = _node.value.get<Ent::Array>();
+        arr.checkInvariants();
         if (arr.hasKey())
         {
-            for (auto& item : arr.getItems())
+            for (auto& item : arr.getItemsWithRemoved())
             {
                 // Node const* item = arr.at(wrapper.index);
                 if (arr.isErased(getChildKey(&_schema, item)))
                 {
-                    if (item->matchValueSource(_dumpedValueSource) or fullWrite)
+                    // TODO : Use the normal dumpNode with a "delete" argument?
+                    if (meta.overridePolicy == "map")
                     {
                         ENTLIB_ASSERT(item->getSchema() != nullptr);
                         json tmpNode;
@@ -2945,10 +3081,24 @@ json Ent::EntityLib::dumpNode(
                         tmpNode[1] = json();
                         data.emplace_back(std::move(tmpNode));
                     }
+                    else if (meta.overridePolicy == "set")
+                    {
+                        if (item->getSchema()->type != Ent::DataType::oneOf)
+                        {
+                            throw std::runtime_error("Can't write an erased element in a set of "
+                                                     "non-union");
+                        }
+                        auto& unionMeta = item->getSchema()->meta.get<Ent::Subschema::UnionMeta>();
+                        char const* type = item->getUnionType();
+                        json tmpNode;
+                        tmpNode[unionMeta.typeField] = type;
+                        tmpNode[unionMeta.dataField] = json();
+                        data.emplace_back(std::move(tmpNode));
+                    }
                 }
                 else
                 {
-                    if (item->matchValueSource(_dumpedValueSource) or fullWrite)
+                    if (item->matchValueSource(_dumpedValueSource))
                     {
                         ENTLIB_ASSERT(item->getSchema() != nullptr);
                         json tmpNode = dumpNode(
@@ -2970,7 +3120,7 @@ json Ent::EntityLib::dumpNode(
         {
             for (Ent::Node const* item : _node.getItems())
             {
-                if (item->matchValueSource(_dumpedValueSource))
+                if (item->matchValueSource(_dumpedValueSource) or fullWrite)
                 {
                     ENTLIB_ASSERT(item->getSchema() != nullptr);
                     json tmpNode = dumpNode(

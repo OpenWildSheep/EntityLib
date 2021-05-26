@@ -5,8 +5,8 @@
 
 namespace Ent
 {
-    BadType::BadType()
-        : std::runtime_error("Bad node type")
+    BadType::BadType(char const* _message)
+        : std::runtime_error(_message == nullptr ? "Bad node type" : _message)
     {
     }
 

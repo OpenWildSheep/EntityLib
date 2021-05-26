@@ -632,7 +632,7 @@ try
         ENTLIB_ASSERT(scene->resolveEntityRef({"InstanceOfA/B/../../C"}) == &C);
     }
 
-    auto testInstanceOf = [](Ent::Entity& ent) {
+    auto testInstanceOf = [](Ent::Entity const& ent) {
         // ActorStates
         Ent::Node const& actorStates = ent.getActorStates();
         ENTLIB_ASSERT(actorStates.getDataType() == Ent::DataType::array);
@@ -660,8 +660,8 @@ try
         ENTLIB_ASSERT(exitRequ->getBool() == true);
 
         // Map and Set overridePolicy
-        Ent::Component* pathNodeGD = ent.getComponent("PathNodeGD");
-        Ent::Node* tags = pathNodeGD->root.at("Tags")->at("Tags");
+        Ent::Component const* pathNodeGD = ent.getComponent("PathNodeGD");
+        Ent::Node const* tags = pathNodeGD->root.at("Tags")->at("Tags");
         ENTLIB_ASSERT(tags->size() == 3);
         ENTLIB_ASSERT(tags->at(0llu)->at(0llu)->getString() == std::string("a"));
         ENTLIB_ASSERT(tags->at(1llu)->at(0llu)->getString() == std::string("b"));
@@ -670,11 +670,7 @@ try
         ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(0llu)->getString() == std::string("1"));
         ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(1llu)->getString() == std::string("2"));
         ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(2llu)->getString() == std::string("3"));
-        ENTLIB_ASSERT(not tags->mapErase(2));
         ENTLIB_ASSERT(tags->mapGet("c") != nullptr);
-        //ENTLIB_ASSERT(tags->mapErase("c"));
-        //ENTLIB_ASSERT(tags->size() == 2);
-        //ENTLIB_ASSERT(tags->mapGet("c") == nullptr);
 
         // TEST SubScene (without override)
         Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();
@@ -758,6 +754,63 @@ try
 
         sysCreat->root.at("BehaviorState")->setString("Overrided");
         entlib.saveEntity(*ent, "instance.copy.entity");
+
+        // Test erase in union_set
+        {
+            Ent::Node& actorStates = ent->getActorStates();
+            ENTLIB_ASSERT(actorStates.mapGet("ActionCinematic") != nullptr);
+            ENTLIB_ASSERT(actorStates.mapErase("ActionCinematic"));
+            ENTLIB_ASSERT(actorStates.mapGet("ActionCinematic") == nullptr);
+
+            // Test insert in union_set
+            ENTLIB_ASSERT(actorStates.mapInsert("ActionClamberRise") != nullptr);
+
+            // Test erase in map
+            Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
+            Ent::Node* tags = pathNodeGD->root.at("Tags")->at("Tags");
+            ENTLIB_ASSERT(tags->mapGet("c") != nullptr);
+            ENTLIB_ASSERT(tags->size() == 3);
+            ENTLIB_ASSERT(tags->mapErase("c"));
+            ENTLIB_ASSERT(tags->size() == 2);
+            ENTLIB_ASSERT(tags->mapGet("c") == nullptr);
+            ENTLIB_ASSERT(not tags->mapErase(2));
+
+            // Test insert in map
+            ENTLIB_ASSERT(tags->mapGet("e") == nullptr);
+            ENTLIB_ASSERT(tags->mapInsert("e") != nullptr);
+            ENTLIB_ASSERT(tags->mapGet("e") != nullptr);
+            ENTLIB_ASSERT(tags->size() == 3);
+
+            entlib.saveEntity(*ent, "test_erase.entity");
+        }
+
+        {
+            ent = entlib.loadEntity("test_erase.entity");
+            Ent::Node& actorStates = ent->getActorStates();
+            Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
+            Ent::Node* tags = pathNodeGD->root.at("Tags")->at("Tags");
+
+            // Test erase in map (+save/load)
+            ENTLIB_ASSERT(tags->size() == 3);
+            ENTLIB_ASSERT(tags->mapGet("c") == nullptr);
+
+            // Test insert in map (+save/load)
+            auto e = tags->mapGet("e");
+            ENTLIB_ASSERT(e != nullptr);
+            ENTLIB_ASSERT(e->at(0llu)->getString() == std::string("e"));
+
+            // Test erase in union_set (+save/load)
+            ENTLIB_ASSERT(actorStates.mapGet("ActionCinematic") == nullptr);
+
+            // Test insert in union_set (+save/load)
+            ENTLIB_ASSERT(actorStates.mapGet("ActionClamberRise") != nullptr);
+
+            // Test un-erase in map
+            ENTLIB_ASSERT(tags->mapRestore("c"));
+            ENTLIB_ASSERT(not tags->mapRestore("fdghdhf"));
+            ENTLIB_ASSERT(tags->size() == 4);
+            ENTLIB_ASSERT(tags->mapGet("c") != nullptr);
+        }
     }
     {
         EntityPtr ent = entlib.loadEntity("instance2.entity");

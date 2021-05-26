@@ -366,7 +366,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("dumps", [](Node* node, OverrideValueSource source, bool superKeyIsType)
              {
                  return node->toJson(source, superKeyIsType).dump(4);
-             }, 
+             },
              "source"_a = OverrideValueSource::Override, "superKeyIsType"_a = false);
 
     pyComponent
@@ -418,7 +418,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("remove_component", &Entity::removeComponent)
         .def("get_component_types", &Entity::getComponentTypes)
         .def("get_components", &Entity::getComponents, py::return_value_policy::reference_internal)
-        .def("get_actorstates", &Entity::getActorStates, py::return_value_policy::reference_internal)
+        .def("get_actorstates", [](Entity* ent) { ent->getActorStates(); }, py::return_value_policy::reference_internal)
         .def(
             "get_subscene_component",
             [](Entity& e) { return e.getSubSceneComponent(); },

@@ -43,3 +43,34 @@ def End(builder): return builder.EndObject()
 def FloatEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+
+class FloatT(object):
+
+    # FloatT
+    def __init__(self):
+        self.value = 0.0  # type: float
+
+    @classmethod
+    def InitFromBuf(cls, buf, pos):
+        float = Float()
+        float.Init(buf, pos)
+        return cls.InitFromObj(float)
+
+    @classmethod
+    def InitFromObj(cls, float):
+        x = FloatT()
+        x._UnPack(float)
+        return x
+
+    # FloatT
+    def _UnPack(self, float):
+        if float is None:
+            return
+        self.value = float.Value()
+
+    # FloatT
+    def Pack(self, builder):
+        Start(builder)
+        AddValue(builder, self.value)
+        float = End(builder)
+        return float

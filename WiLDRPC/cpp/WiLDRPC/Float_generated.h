@@ -10,8 +10,15 @@ namespace WildRPC {
 
 struct Float;
 struct FloatBuilder;
+struct FloatT;
+
+struct FloatT : public flatbuffers::NativeTable {
+  typedef Float TableType;
+  float value = 0.0f;
+};
 
 struct Float FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FloatT NativeTableType;
   typedef FloatBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_VALUE = 4
@@ -19,11 +26,17 @@ struct Float FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   float value() const {
     return GetField<float>(VT_VALUE, 0.0f);
   }
+  bool mutate_value(float _value) {
+    return SetField<float>(VT_VALUE, _value, 0.0f);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<float>(verifier, VT_VALUE) &&
            verifier.EndTable();
   }
+  FloatT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(FloatT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Float> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FloatT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct FloatBuilder {
@@ -52,12 +65,44 @@ inline flatbuffers::Offset<Float> CreateFloat(
   return builder_.Finish();
 }
 
+flatbuffers::Offset<Float> CreateFloat(flatbuffers::FlatBufferBuilder &_fbb, const FloatT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+inline FloatT *Float::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<FloatT>(new FloatT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Float::UnPackTo(FloatT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = value(); _o->value = _e; }
+}
+
+inline flatbuffers::Offset<Float> Float::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FloatT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateFloat(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Float> CreateFloat(flatbuffers::FlatBufferBuilder &_fbb, const FloatT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FloatT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _value = _o->value;
+  return WildRPC::CreateFloat(
+      _fbb,
+      _value);
+}
+
 inline const WildRPC::Float *GetFloat(const void *buf) {
   return flatbuffers::GetRoot<WildRPC::Float>(buf);
 }
 
 inline const WildRPC::Float *GetSizePrefixedFloat(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<WildRPC::Float>(buf);
+}
+
+inline Float *GetMutableFloat(void *buf) {
+  return flatbuffers::GetMutableRoot<Float>(buf);
 }
 
 inline bool VerifyFloatBuffer(
@@ -80,6 +125,18 @@ inline void FinishSizePrefixedFloatBuffer(
     flatbuffers::FlatBufferBuilder &fbb,
     flatbuffers::Offset<WildRPC::Float> root) {
   fbb.FinishSizePrefixed(root);
+}
+
+inline std::unique_ptr<WildRPC::FloatT> UnPackFloat(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::FloatT>(GetFloat(buf)->UnPack(res));
+}
+
+inline std::unique_ptr<WildRPC::FloatT> UnPackSizePrefixedFloat(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::FloatT>(GetSizePrefixedFloat(buf)->UnPack(res));
 }
 
 }  // namespace WildRPC

@@ -54,3 +54,37 @@ def End(builder): return builder.EndObject()
 def Vector2End(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+
+class Vector2T(object):
+
+    # Vector2T
+    def __init__(self):
+        self.x = 0.0  # type: float
+        self.y = 0.0  # type: float
+
+    @classmethod
+    def InitFromBuf(cls, buf, pos):
+        vector2 = Vector2()
+        vector2.Init(buf, pos)
+        return cls.InitFromObj(vector2)
+
+    @classmethod
+    def InitFromObj(cls, vector2):
+        x = Vector2T()
+        x._UnPack(vector2)
+        return x
+
+    # Vector2T
+    def _UnPack(self, vector2):
+        if vector2 is None:
+            return
+        self.x = vector2.X()
+        self.y = vector2.Y()
+
+    # Vector2T
+    def Pack(self, builder):
+        Start(builder)
+        AddX(builder, self.x)
+        AddY(builder, self.y)
+        vector2 = End(builder)
+        return vector2

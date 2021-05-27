@@ -80,8 +80,8 @@ namespace WRPC
     public:
         DeleteCheck deleteCheck;
 
-        RPCClient();
-        ~RPCClient();
+        RPCClient() = default;
+        ~RPCClient() = default;
 
         RPCClient(RPCClient const&) = delete;
         RPCClient& operator=(RPCClient const&) = delete;

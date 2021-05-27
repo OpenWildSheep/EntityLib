@@ -65,3 +65,40 @@ def End(builder): return builder.EndObject()
 def UInt3End(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+
+class UInt3T(object):
+
+    # UInt3T
+    def __init__(self):
+        self.x = 0  # type: int
+        self.y = 0  # type: int
+        self.z = 0  # type: int
+
+    @classmethod
+    def InitFromBuf(cls, buf, pos):
+        uInt3 = UInt3()
+        uInt3.Init(buf, pos)
+        return cls.InitFromObj(uInt3)
+
+    @classmethod
+    def InitFromObj(cls, uInt3):
+        x = UInt3T()
+        x._UnPack(uInt3)
+        return x
+
+    # UInt3T
+    def _UnPack(self, uInt3):
+        if uInt3 is None:
+            return
+        self.x = uInt3.X()
+        self.y = uInt3.Y()
+        self.z = uInt3.Z()
+
+    # UInt3T
+    def Pack(self, builder):
+        Start(builder)
+        AddX(builder, self.x)
+        AddY(builder, self.y)
+        AddZ(builder, self.z)
+        uInt3 = End(builder)
+        return uInt3

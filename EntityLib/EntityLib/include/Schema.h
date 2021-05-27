@@ -69,6 +69,12 @@ namespace Ent
         IllFormedSchema(char const* _message); ///< ctor
     };
 
+    /// Exception thrown when some json data are invalid
+    struct InvalidJsonData : std::runtime_error
+    {
+        InvalidJsonData(char const* _message); ///< ctor
+    };
+
     // *************************************** Subschema ******************************************
 
     struct SubschemaRef;

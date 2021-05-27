@@ -30,6 +30,11 @@ namespace Ent
     {
     }
 
+    InvalidJsonData::InvalidJsonData(char const* _message)
+        : std::runtime_error(_message)
+    {
+    }
+
     /// @cond PRIVATE
     Subschema const* Subschema::getUnionTypeWrapper(char const* _subtype) const
     {

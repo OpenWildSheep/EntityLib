@@ -1,0 +1,22 @@
+{
+    "Thumbnail": "TestThumbnail",
+    "ActorStates":[
+        {
+            "className": "ActionClimbEdge",
+            "classData":{
+                "locomotionMode": "crouch"
+            }
+        },
+        {
+            "className": "ActionCinematic",
+            "classData":{
+            }
+        },
+        {
+            "className": "ActionClimbEdge",
+            "classData":{
+            }
+        }
+    ],
+    "Name": "PlayerSpawner_"
+}

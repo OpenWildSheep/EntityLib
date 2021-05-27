@@ -24,13 +24,11 @@
     "Components": [
         {
             "Data": {
-                "BehaviorState": "Overrided",
                 "Faction": "Plouf",
                 "ScriptList": [
                     "a1",
-                    null,
-                    "c2",
-                    "d2"
+                    "b2",
+                    null
                 ]
             },
             "Type": "SystemicCreature",

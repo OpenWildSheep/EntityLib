@@ -439,6 +439,8 @@ namespace Ent
 
     Ent::Node* Ent::Array::mapAdd(OverrideValueLocation loc, KeyType _key, Node _node)
     {
+        ENTLIB_ASSERT(hasKey());
+        ENTLIB_ASSERT(mapGet(_key) == nullptr);
         checkInvariants();
         ENTLIB_ASSERT(&schema->singularItems->get() == _node.getSchema());
         data.emplace_back(std::move(_node));
@@ -678,7 +680,9 @@ namespace Ent
     {
         if (wrapper.has_value())
         {
+            ENTLIB_ASSERT(wrapper->count(metaData->typeField.c_str()));
             auto typeNode = wrapper->at(metaData->typeField.c_str());
+            ENTLIB_ASSERT(typeNode);
             ENTLIB_ASSERT_MSG(
                 not typeNode->hasDefaultValue(), "The type-field is expected to be set, in Union");
             return typeNode->getString();
@@ -2431,6 +2435,12 @@ struct MergeMapOverride
         {
             auto&& key = std::get<0>(key_node);
             auto&& node = std::get<1>(key_node);
+            if (arr.mapGet(key) != nullptr)
+            {
+                std::stringstream ss;
+                ss << "Twice the same key in map : " << key;
+                throw InvalidJsonData(ss.str().c_str());
+            }
             arr.mapAdd(node.loc, key, std::move(node.node));
             if (node.removed)
             {

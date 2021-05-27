@@ -295,7 +295,7 @@ namespace Ent
         }
     }
 
-    bool Ent::Array::mapEraseImpl(KeyType _key)
+    bool Ent::Array::mapEraseImpl(KeyType const& _key)
     {
         auto iter = itemMap.find(_key);
         if (iter == itemMap.end())
@@ -312,7 +312,7 @@ namespace Ent
         return true;
     }
 
-    Node* Ent::Array::mapRestoreImpl(KeyType _key)
+    Node* Ent::Array::mapRestoreImpl(KeyType const& _key)
     {
         auto iter = itemMap.find(_key);
         if (iter == itemMap.end())
@@ -328,7 +328,7 @@ namespace Ent
         return data[iter->second.index].get();
     }
 
-    Node const* Ent::Array::mapGetImpl(KeyType _key) const
+    Node const* Ent::Array::mapGetImpl(KeyType const& _key) const
     {
         auto iter = itemMap.find(_key);
         if (iter == itemMap.end())
@@ -342,7 +342,7 @@ namespace Ent
         return data[iter->second.index].get();
     }
 
-    Ent::Node* Ent::Array::mapInsertImpl(KeyType _key)
+    Ent::Node* Ent::Array::mapInsertImpl(KeyType const& _key)
     {
         auto iter = itemMap.find(_key);
         if (iter == itemMap.end())
@@ -365,7 +365,7 @@ namespace Ent
         return data[iter->second.index].get();
     }
 
-    bool Ent::Array::isErased(KeyType _key) const
+    bool Ent::Array::isErased(KeyType const& _key) const
     {
         auto iter = itemMap.find(_key);
         if (iter == itemMap.end())
@@ -386,6 +386,7 @@ namespace Ent
     }
     Ent::Node* Ent::Array::mapGet(KeyType const& _key)
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
         return const_cast<Ent::Node*>(std::as_const(*this).mapGetImpl(_key));
     }
     Ent::Node const* Ent::Array::mapGet(KeyType const& _key) const
@@ -506,8 +507,10 @@ namespace Ent
             {
                 auto key = getChildKey(schema, node.get());
                 auto deleted = itemMap.at(key).deleted;
-                if (!deleted)
+                if (not deleted)
+                {
                     result.emplace_back(node.get());
+                }
             }
         }
         else
@@ -559,19 +562,21 @@ namespace Ent
     bool Ent::Array::hasDefaultValue() const
     {
         bool const sizeHasDefault = (!arraySize.hasOverride && !arraySize.hasPrefab);
-        if (!sizeHasDefault)
+        if (not sizeHasDefault)
+        {
             return false;
+        }
         if (hasKey())
         {
-            for (auto&& key_wrapper : itemMap)
-            {
-                if (!data[std::get<1>(key_wrapper).index]->hasDefaultValue())
-                    return false;
-            }
-            return true;
+            return std::all_of(begin(itemMap), end(itemMap), [this](auto&& key_wrapper) {
+                return data[std::get<1>(key_wrapper).index]->hasDefaultValue()
+                       and not std::get<1>(key_wrapper).deleted;
+            });
         }
         else
+        {
             return std::all_of(begin(data), end(data), std::mem_fn(&Node::hasDefaultValue));
+        }
     }
 
     void Ent::Array::pop()
@@ -589,7 +594,6 @@ namespace Ent
         data.pop_back();
         arraySize.set(arraySize.get() - 1);
         cleanSize(arraySize);
-        return;
     }
 
     void Ent::Array::clear()
@@ -2309,6 +2313,13 @@ struct MergeMapOverride
             Node node;
             OverrideValueLocation loc;
             bool removed;
+
+            NodeWrapper(Node _node, OverrideValueLocation _loc, bool _removed)
+                : node(std::move(_node))
+                , loc(_loc)
+                , removed(_removed)
+            {
+            }
         };
         std::vector<std::pair<KeyType, NodeWrapper>> result;
         // std::vector<std::pair<KeyType, Node>> removedItems;
@@ -2419,8 +2430,7 @@ struct MergeMapOverride
                         key, NodeWrapper{std::move(node), OverrideValueLocation::Override, false});
                     instanceAdditionalElementCount++;
                 }
-                else // New but removed => Let's ignore them.
-                    printf("");
+                // else? New but removed => Let's ignore them.
             }
         }
         if (ordered)
@@ -2622,10 +2632,6 @@ static Ent::Node loadNode(
                         arr.add(loc, std::move(tmpNode));
                         ++index;
                     }
-                    tl::optional<uint64_t> prefabArraySize =
-                        defaultArraySize == _super->size() ? tl::nullopt :
-                                                             tl::optional<uint64_t>{_super->size()};
-                    arr.checkInvariants();
                 }
                 else if (_default != nullptr)
                 {
@@ -2656,7 +2662,7 @@ static Ent::Node loadNode(
             else // If it is a singularItems and there is _data, we have to use the overridePolicy
             {
                 using namespace Ent;
-                if (_super)
+                if (_super != nullptr)
                 {
                     ENTLIB_ASSERT(&_nodeSchema == _super->getSchema());
                     auto&& superarr = _super->GetRawValue().get<Ent::Array>();
@@ -3747,10 +3753,10 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
         detachedMaxActivationLevel);
 }
 
-std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
+std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string const& _instanceOf) const
 {
     std::unique_ptr<Ent::Entity> inst = std::make_unique<Ent::Entity>(*this);
-    inst->setInstanceOf(std::move(_instanceOf));
+    inst->setInstanceOf(_instanceOf);
     return inst;
 }
 

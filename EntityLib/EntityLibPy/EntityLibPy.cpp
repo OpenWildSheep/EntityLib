@@ -10,35 +10,30 @@
 
 /// @cond PRIVATE
 
-namespace pybind11
+namespace pybind11::detail
 {
-    namespace detail
+    template <typename... Ts>
+    struct type_caster<mapbox::util::variant<Ts...>> : variant_caster<mapbox::util::variant<Ts...>>
     {
-        template <typename... Ts>
-        struct type_caster<mapbox::util::variant<Ts...>>
-            : variant_caster<mapbox::util::variant<Ts...>>
-        {
-        };
+    };
 
-        // Specifies the function used to visit the variant -- `apply_visitor` instead of `visit`
-        template <>
-        struct visit_helper<mapbox::util::variant>
+    // Specifies the function used to visit the variant -- `apply_visitor` instead of `visit`
+    template <>
+    struct visit_helper<mapbox::util::variant>
+    {
+        template <typename... Args>
+        static auto call(Args&&... args) -> decltype(mapbox::util::apply_visitor(args...))
         {
-            template <typename... Args>
-            static auto call(Args&&... args) -> decltype(mapbox::util::apply_visitor(args...))
-            {
-                return mapbox::util::apply_visitor(args...);
-            }
-        };
+            return mapbox::util::apply_visitor(args...);
+        }
+    };
 
-        // Use tj::optional like a std::optional
-        template <typename T>
-        struct type_caster<tl::optional<T>> : public optional_caster<tl::optional<T>>
-        {
-        };
-
-    } // namespace detail
-} // namespace pybind11
+    // Use tj::optional like a std::optional
+    template <typename T>
+    struct type_caster<tl::optional<T>> : public optional_caster<tl::optional<T>>
+    {
+    };
+} // namespace pybind11::detail
 
 namespace py = pybind11;
 using namespace Ent;

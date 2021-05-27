@@ -130,7 +130,7 @@ namespace Ent
         Node* mapAdd(OverrideValueLocation, char const* _key, Node _node);
         Node* mapAdd(OverrideValueLocation, int64_t _key, Node _node);
         Node* add(OverrideValueLocation, Node _node);
-        bool isErased(KeyType _key) const;
+        bool isErased(KeyType const& _key) const;
 
         std::vector<Node const*> getItems() const;
         std::vector<Node const*> getItemsWithRemoved() const;
@@ -156,10 +156,10 @@ namespace Ent
         }
 
     private:
-        bool mapEraseImpl(KeyType key);
-        Node* mapRestoreImpl(KeyType _key);
-        Node const* mapGetImpl(KeyType _key) const;
-        Node* mapInsertImpl(KeyType _key);
+        bool mapEraseImpl(KeyType const& key);
+        Node* mapRestoreImpl(KeyType const& _key);
+        Node const* mapGetImpl(KeyType const& _key) const;
+        Node* mapInsertImpl(KeyType const& _key);
 
         std::vector<value_ptr<Node>> data; ///< List of items of the array
         std::map<KeyType, Deletable> itemMap;
@@ -836,7 +836,7 @@ namespace Ent
         /// @brief Create an Entity which instanciate an other.
         ///
         /// This allow to override some properties without change the prefab properties.
-        std::unique_ptr<Entity> makeInstanceOf(std::string _instanceOf ///< Path to the prefab Entity
+        std::unique_ptr<Entity> makeInstanceOf(std::string const& _instanceOf ///< Path to the prefab Entity
         ) const;
 
         struct EntityFile

@@ -42,6 +42,11 @@ namespace Ent
         BadType(char const* _message = nullptr); ///< ctor
     };
 
+    struct BadArrayType : std::runtime_error
+    {
+        BadArrayType(char const* _message = nullptr); ///< ctor
+    };
+
     /// Exception thrown when a metadata is missing in the json schema
     ///
     /// Example : oneOf need className and classData

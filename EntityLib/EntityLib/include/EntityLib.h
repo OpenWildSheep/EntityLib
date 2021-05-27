@@ -118,19 +118,14 @@ namespace Ent
         Node* at(uint64_t _index);
         Node const* at(uint64_t _index) const;
 
-        Node* push();
+        Node* arrayPush();
 
-        bool mapErase(std::string const& _key);
-        bool mapErase(char const* _key);
-        Ent::Node* mapRestore(char const* _key);
-        Node* mapGet(char const* _key);
-        Node const* mapGet(char const* _key) const;
-        Node* mapInsert(char const* _key);
-        bool mapErase(int64_t _key);
-        Ent::Node* mapRestore(int64_t _key);
-        Node* mapGet(int64_t _key);
-        Node const* mapGet(int64_t _key) const;
-        Node* mapInsert(int64_t _key);
+        bool mapErase(KeyType const& _key);
+        Ent::Node* mapRestore(KeyType const& _key);
+        Node* mapGet(KeyType const& _key);
+        Node const* mapGet(KeyType const& _key) const;
+        Node* mapInsert(KeyType const& _key);
+
         Node* mapAdd(OverrideValueLocation, KeyType _key, Node _node);
         Node* mapAdd(OverrideValueLocation, char const* _key, Node _node);
         Node* mapAdd(OverrideValueLocation, int64_t _key, Node _node);
@@ -161,14 +156,10 @@ namespace Ent
         }
 
     private:
-        template <typename Key>
-        bool mapEraseImpl(Key key);
-        template <typename Key>
-        Node* mapRestoreImpl(Key _key);
-        template <typename Key>
-        Node const* mapGetImpl(Key _key) const;
-        template <typename Key>
-        Node* mapInsertImpl(Key _key);
+        bool mapEraseImpl(KeyType key);
+        Node* mapRestoreImpl(KeyType _key);
+        Node const* mapGetImpl(KeyType _key) const;
+        Node* mapInsertImpl(KeyType _key);
 
         std::vector<value_ptr<Node>> data; ///< List of items of the array
         std::map<KeyType, Deletable> itemMap;

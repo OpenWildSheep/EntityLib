@@ -295,8 +295,7 @@ namespace Ent
         }
     }
 
-    template <typename K>
-    bool Ent::Array::mapEraseImpl(K _key)
+    bool Ent::Array::mapEraseImpl(KeyType _key)
     {
         auto iter = itemMap.find(_key);
         if (iter == itemMap.end())
@@ -313,8 +312,7 @@ namespace Ent
         return true;
     }
 
-    template <typename K>
-    Node* Ent::Array::mapRestoreImpl(K _key)
+    Node* Ent::Array::mapRestoreImpl(KeyType _key)
     {
         auto iter = itemMap.find(_key);
         if (iter == itemMap.end())
@@ -330,8 +328,7 @@ namespace Ent
         return data[iter->second.index].get();
     }
 
-    template <typename K>
-    Node const* Ent::Array::mapGetImpl(K _key) const
+    Node const* Ent::Array::mapGetImpl(KeyType _key) const
     {
         auto iter = itemMap.find(_key);
         if (iter == itemMap.end())
@@ -345,8 +342,7 @@ namespace Ent
         return data[iter->second.index].get();
     }
 
-    template <typename Key>
-    Ent::Node* Ent::Array::mapInsertImpl(Key _key)
+    Ent::Node* Ent::Array::mapInsertImpl(KeyType _key)
     {
         auto iter = itemMap.find(_key);
         if (iter == itemMap.end())
@@ -357,7 +353,8 @@ namespace Ent
                 setChildKey(schema, &newNode, _key);
                 return add(OverrideValueLocation::Override, std::move(newNode));
             }
-            throw BadType("Array is not a singularItems array (Can't push in a pair or tuple)");
+            throw BadArrayType("Array is not a singularItems array (Can't push in a pair or "
+                               "tuple)");
         }
         if (iter->second.deleted)
         {
@@ -378,49 +375,24 @@ namespace Ent
         return iter->second.deleted;
     }
 
-    bool Ent::Array::mapErase(std::string const& _key)
-    {
-        return mapEraseImpl(_key.c_str());
-    }
-
-    bool Ent::Array::mapErase(char const* _key)
+    bool Ent::Array::mapErase(KeyType const& _key)
     {
         return mapEraseImpl(_key);
     }
-    Ent::Node* Ent::Array::mapRestore(char const* _key)
-    {
-        return mapRestoreImpl(_key);
-    }
-    Ent::Node* Ent::Array::mapGet(char const* _key)
-    {
-        return const_cast<Ent::Node*>(std::as_const(*this).mapGetImpl(_key));
-    }
-    Ent::Node const* Ent::Array::mapGet(char const* _key) const
-    {
-        return mapGetImpl(_key);
-    }
-    Ent::Node* Ent::Array::mapInsert(char const* _key)
-    {
-        return mapInsertImpl(_key);
-    }
 
-    bool Ent::Array::mapErase(int64_t _key)
-    {
-        return mapEraseImpl(_key);
-    }
-    Ent::Node* Ent::Array::mapRestore(int64_t _key)
+    Ent::Node* Ent::Array::mapRestore(KeyType const& _key)
     {
         return mapRestoreImpl(_key);
     }
-    Ent::Node* Ent::Array::mapGet(int64_t _key)
+    Ent::Node* Ent::Array::mapGet(KeyType const& _key)
     {
         return const_cast<Ent::Node*>(std::as_const(*this).mapGetImpl(_key));
     }
-    Ent::Node const* Ent::Array::mapGet(int64_t _key) const
+    Ent::Node const* Ent::Array::mapGet(KeyType const& _key) const
     {
         return mapGetImpl(_key);
     }
-    Ent::Node* Ent::Array::mapInsert(int64_t _key)
+    Ent::Node* Ent::Array::mapInsert(KeyType const& _key)
     {
         return mapInsertImpl(_key);
     }
@@ -604,11 +576,12 @@ namespace Ent
     {
         if (hasKey())
         {
-            // TODO : ERROR
+            throw BadArrayType("Can't call 'pop' on map/set array");
+            // TODO : Move exception into Node? (Array is internal)
         }
         if (schema->singularItems == nullptr)
         {
-            // TODO : ERROR
+            throw BadArrayType("Can't call 'pop' on pair/tuple");
         }
         ENTLIB_ASSERT(not data.empty());
         data.pop_back();
@@ -621,8 +594,7 @@ namespace Ent
     {
         if (schema->singularItems == nullptr)
         {
-            // TODO : ERROR
-            return;
+            throw BadArrayType("Can't call 'pop' on pair/tuple");
         }
         if (hasKey())
         {
@@ -663,11 +635,11 @@ namespace Ent
         // TODO : itemMap
     }
 
-    Node* Ent::Array::push()
+    Node* Ent::Array::arrayPush()
     {
         if (hasKey())
         {
-            throw BadType("Can't 'push' in a map or set. Use 'mapInsert'.");
+            throw BadArrayType("Can't 'push' in a map or set. Use 'mapInsert'.");
         }
         if (SubschemaRef const* itemSchema = schema->singularItems.get())
         {
@@ -675,7 +647,7 @@ namespace Ent
                 OverrideValueLocation::Override,
                 loadNode(nullptr, itemSchema->get(), json(), nullptr));
         }
-        throw BadType("Array is not a singularItems array (Can't push in a pair or tuple)");
+        throw BadArrayType("Array is not a singularItems array (Can't push in a pair or tuple)");
     }
 
     // ************************************ Union *************************************************
@@ -1328,7 +1300,7 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            return value.get<Array>().push();
+            return value.get<Array>().arrayPush();
         }
         throw BadType();
     }
@@ -3060,8 +3032,6 @@ json Ent::EntityLib::dumpNode(
         data = json::array();
         auto&& meta = _schema.meta.get<Ent::Subschema::ArrayMeta>();
         bool const fullWrite = meta.isMapItem;
-        if (fullWrite)
-            printf("");
         auto const& arr = _node.value.get<Ent::Array>();
         arr.checkInvariants();
         if (arr.hasKey())

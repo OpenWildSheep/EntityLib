@@ -10,6 +10,11 @@ namespace Ent
     {
     }
 
+    BadArrayType::BadArrayType(char const* _message)
+        : std::runtime_error(_message == nullptr ? "Bad array type" : _message)
+    {
+    }
+
     MissingMetadata::MissingMetadata(char const* _schemaName)
         : std::runtime_error(std::string("Metadata missing : ") + _schemaName)
     {

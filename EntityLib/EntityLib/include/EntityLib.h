@@ -155,6 +155,9 @@ namespace Ent
             return arraySize;
         }
 
+        void addRemovedPrefab();
+        void addRemovedDefault(OverrideValueLocation _removedIn);
+
     private:
         bool mapEraseImpl(KeyType const& key);
         Node* mapRestoreImpl(KeyType const& _key);

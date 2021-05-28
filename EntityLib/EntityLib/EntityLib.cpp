@@ -398,41 +398,45 @@ namespace Ent
         return mapInsertImpl(_key);
     }
 
-    static void incrementSize(OverrideValueLocation loc, Override<uint64_t>& arraySize)
+    static void
+    incrementSize(OverrideValueLocation loc, Override<uint64_t>& arraySize, bool decrement = false)
     {
+        auto operation = [decrement](auto&& v) {
+            v = decrement ? v - 1 : v + 1;
+        };
         switch (loc)
         {
         case OverrideValueLocation::Default:
-            ++arraySize.defaultValue;
+            operation(arraySize.defaultValue);
             if (arraySize.hasPrefab)
             {
-                ++arraySize.prefabValue;
+                operation(arraySize.prefabValue);
             }
             if (arraySize.hasOverride)
             {
-                ++arraySize.overrideValue;
+                operation(arraySize.overrideValue);
             }
             break;
         case OverrideValueLocation::Prefab:
-            if (!arraySize.hasPrefab)
+            if (not arraySize.hasPrefab)
             {
                 arraySize.prefabValue = arraySize.defaultValue;
                 arraySize.hasPrefab = true;
             }
-            ++arraySize.prefabValue;
+            operation(arraySize.prefabValue);
             if (arraySize.hasOverride)
             {
-                ++arraySize.overrideValue;
+                operation(arraySize.overrideValue);
             }
             break;
         case OverrideValueLocation::Override:
-            if (!arraySize.hasOverride)
+            if (not arraySize.hasOverride)
             {
                 arraySize.overrideValue =
                     arraySize.hasPrefab ? arraySize.prefabValue : arraySize.defaultValue;
                 arraySize.hasOverride = true;
             }
-            ++arraySize.overrideValue;
+            operation(arraySize.overrideValue);
             break;
         }
         cleanSize(arraySize);
@@ -629,6 +633,18 @@ namespace Ent
         return arraySize.get() == 0;
     }
 
+    void Ent::Array::addRemovedPrefab()
+    {
+        incrementSize(OverrideValueLocation::Prefab, arraySize);
+        incrementSize(OverrideValueLocation::Override, arraySize, true);
+    }
+
+    void Ent::Array::addRemovedDefault(OverrideValueLocation _removedIn)
+    {
+        incrementSize(OverrideValueLocation::Default, arraySize);
+        incrementSize(_removedIn, arraySize, true);
+    }
+
     void Ent::Array::computeMemory(MemoryProfiler& prof) const
     {
         prof.addMem("Array::data", data.capacity() * sizeof(data.front()));
@@ -653,7 +669,7 @@ namespace Ent
                 OverrideValueLocation::Override,
                 loadNode(nullptr, itemSchema->get(), json(), nullptr));
         }
-        throw BadArrayType("Array is not a singularItems array (Can't push in a pair or tuple)");
+        throw BadArrayType("Array is not a singularItems array (Can't push in a pair/tuple)");
     }
 
     // ************************************ Union *************************************************
@@ -2795,33 +2811,30 @@ static Ent::Node loadNode(
                                 nullptr;
                         Ent::Node tmpNode = loadNode(
                             _entlib, _nodeSchema.singularItems->get(), item, subSuper, subDefault);
-                        auto loc = (index < defaultArraySize) ? Ent::OverrideValueLocation::Default :
-                                   subSuper != nullptr        ? Ent::OverrideValueLocation::Prefab :
-                                                                Ent::OverrideValueLocation::Override;
+                        bool const isDefault = (index < defaultArraySize) or subDefault != nullptr;
+                        auto loc = isDefault           ? Ent::OverrideValueLocation::Default :
+                                   subSuper != nullptr ? Ent::OverrideValueLocation::Prefab :
+                                                         Ent::OverrideValueLocation::Override;
                         arr.add(loc, std::move(tmpNode));
                         ++index;
                     }
                     if (_super != nullptr)
                     {
+                        for (size_t i = _super->size(); i < defaultArraySize; ++i)
+                        {
+                            arr.addRemovedDefault(Ent::OverrideValueLocation::Prefab);
+                        }
                         for (size_t i = _data.size(); i < _super->size(); ++i)
                         {
-                            json const* subDefault =
-                                (_default != nullptr and (_default->size() > index)) ?
-                                    &_default->at(index) :
-                                    nullptr;
-                            Ent::Node tmpNode = loadNode(
-                                _entlib,
-                                _nodeSchema.singularItems->get(),
-                                json(),
-                                _super->at(index),
-                                subDefault);
-                            auto loc = (index < defaultArraySize) ?
-                                           Ent::OverrideValueLocation::Default :
-                                           Ent::OverrideValueLocation::Prefab;
-                            arr.add(loc, std::move(tmpNode));
-                            arr.pop();
+                            arr.addRemovedPrefab();
                         }
-                        ++index;
+                    }
+                    else
+                    {
+                        for (size_t i = _data.size(); i < defaultArraySize; ++i)
+                        {
+                            arr.addRemovedDefault(Ent::OverrideValueLocation::Override);
+                        }
                     }
                     tl::optional<uint64_t> prefabArraySize =
                         (_super != nullptr and _super->size() != defaultArraySize) ?
@@ -3071,8 +3084,8 @@ json Ent::EntityLib::dumpNode(
                     {
                         if (item->getSchema()->type != Ent::DataType::oneOf)
                         {
-                            throw std::runtime_error("Can't write an erased element in a set of "
-                                                     "non-union");
+                            throw std::runtime_error(
+                                R"(Can't write an erased element in a set of non-union)");
                         }
                         auto& unionMeta = item->getSchema()->meta.get<Ent::Subschema::UnionMeta>();
                         char const* type = item->getUnionType();

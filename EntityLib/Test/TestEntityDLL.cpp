@@ -1020,6 +1020,16 @@ try
         ENTLIB_ASSERT(not empty(ovrdSubs->embedded->getObjects()));
     }
 
+    {
+        auto ent = entlib.loadEntity(R"(Creature/my_creature_level2.entity)");
+        auto& subscene = ent->getSubSceneComponent()
+                             ->embedded->getEntity(0)
+                             ->getSubSceneComponent()
+                             ->embedded->getObjects();
+        ENTLIB_ASSERT(subscene.size() == 1);
+        ENTLIB_ASSERT(strcmp(subscene.front()->getName(), "default_level2") == 0);
+    }
+
     // ********************************** Test load/save scene ************************************
     entlib.rawdataPath = "X:/RawData";
 

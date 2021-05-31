@@ -1899,7 +1899,8 @@ static Ent::Node loadNode(
         {
             auto nodeFileName = InstanceOfIter->get<std::string>();
             json nodeData = loadJsonFile(_entlib->getAbsolutePath(nodeFileName));
-            prefabNode = loadNode(_entlib, _nodeSchema, nodeData, _super, _default);
+            // Do not inherit from _super since the override of InstanceOf reset the Entity
+            prefabNode = loadNode(_entlib, _nodeSchema, nodeData, nullptr, _default);
             _super = &prefabNode;
             Ent::Override<String> tmplPath("", tl::nullopt, InstanceOfIter->get<std::string>());
             object.instanceOf = std::move(tmplPath);
@@ -2404,7 +2405,8 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     if (_entNode.count("InstanceOf") != 0)
     {
         instanceOf = _entNode.at("InstanceOf").get<std::string>();
-        superEntity = _entlib.loadEntityReadOnly(*instanceOf, _superEntityFromParentEntity).get();
+        // Do not inherit from _superEntityFromParentEntity since the override of InstanceOf reset the Entity
+        superEntity = _entlib.loadEntityReadOnly(*instanceOf, nullptr).get();
         ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
         std::filesystem::path instanceOfPath = *instanceOf;
         superIsInit = true;

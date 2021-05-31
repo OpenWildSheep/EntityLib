@@ -387,6 +387,7 @@ try
     {
         Ent::Entity ent(entlib);
         ent.setInstanceOf("prefab.entity");
+        ENTLIB_ASSERT(not ent.hasOverride());
         ENTLIB_ASSERT(ent.getInstanceOf() == std::string("prefab.entity"));
     }
 
@@ -774,9 +775,6 @@ try
 
         // Test insert in union_set (+save/load)
         ENTLIB_ASSERT(actorStates.mapGet("ActionClamberRise") != nullptr);
-
-        // Test un-erase in map
-        ENTLIB_ASSERT(not tags->mapRestore("fdghdhf"));
     };
 
     {
@@ -803,11 +801,6 @@ try
         // Test insert in map
         ENTLIB_ASSERT(tags->mapGet("e") == nullptr);
         ENTLIB_ASSERT(tags->mapInsert("e") != nullptr);
-
-        ENTLIB_ASSERT(tags->mapRestore("c"));
-        ENTLIB_ASSERT(tags->size() == 4);
-        ENTLIB_ASSERT(tags->mapGet("c") != nullptr);
-        ENTLIB_ASSERT(tags->mapErase("c")); // un-restore
 
         test_erase(ent.get());
 
@@ -1128,6 +1121,7 @@ try
         EntityPtr ent = entlib.makeInstanceOf("entity-subscene.entity");
         auto subs = ent->getSubSceneComponent();
 
+        ENTLIB_ASSERT(not ent->hasOverride());
         ENTLIB_ASSERT(not empty(subs->embedded->getObjects()));
 
         auto&& allSubEntities = subs->embedded->getObjects();

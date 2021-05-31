@@ -96,35 +96,25 @@ namespace Ent
     {
         Array(Subschema const* _schema);
 
-        Subschema const* schema = nullptr; ///< The schema of the object containing the oneOf field
-
-        struct Deletable
-        {
-            // Node* node = nullptr;
-            size_t index;
-            bool deleted; // Make it Override-able
-        };
-
-        using KeyType = mapbox::util::variant<String, int64_t>;
-
+        /// Recursively check if there is an override inside.
         bool hasOverride() const;
-
+        /// Recursively check if value is set in a prefab (overriden or not by this Node)
         bool hasPrefabValue() const;
-
+        /// Recursively check if nothing is set in prefab and instance
         bool hasDefaultValue() const;
-
+        /// The elements have keys if the array is a map or a set
         bool hasKey() const;
 
-        Node* at(uint64_t _index);
-        Node const* at(uint64_t _index) const;
+        Node* at(uint64_t _index); ///< Get the item at _index
+        Node const* at(uint64_t _index) const; ///< Get the item at _index
 
-        Node* arrayPush();
+        Node* arrayPush(); ///< @pre not hasKey()
 
-        bool mapErase(KeyType const& _key);
-        Ent::Node* mapRestore(KeyType const& _key);
-        Node* mapGet(KeyType const& _key);
-        Node const* mapGet(KeyType const& _key) const;
-        Node* mapInsert(KeyType const& _key);
+        using KeyType = mapbox::util::variant<String, int64_t>;
+        bool mapErase(KeyType const& _key); ///< Erase the item with _key, or return false
+        Node* mapGet(KeyType const& _key); ///< @return the item with _key, or nullptr
+        Node const* mapGet(KeyType const& _key) const; ///< @return the item with _key, or nullptr
+        Node* mapInsert(KeyType const& _key); ///< @pre hasKey(). @brief Insert a new item with _key
 
         Node* mapAdd(OverrideValueLocation, KeyType _key, Node _node);
         Node* mapAdd(OverrideValueLocation, char const* _key, Node _node);
@@ -156,6 +146,11 @@ namespace Ent
         void addRemovedPrefab();
         void addRemovedDefault(OverrideValueLocation _removedIn);
 
+        Subschema const* getSchema() const
+        {
+            return schema;
+        }
+
     private:
         void checkInvariants() const;
         bool mapEraseImpl(KeyType const& key);
@@ -163,6 +158,13 @@ namespace Ent
         Node const* mapGetImpl(KeyType const& _key) const;
         Node* mapInsertImpl(KeyType const& _key);
 
+        struct Deletable
+        {
+            size_t index;
+            bool deleted; // Make it Override-able
+        };
+
+        Subschema const* schema = nullptr;
         std::vector<value_ptr<Node>> data; ///< List of items of the array
         std::map<KeyType, Deletable> itemMap;
         Override<uint64_t> arraySize; ///< Size of the array, to keep track on array size changes
@@ -270,12 +272,10 @@ namespace Ent
         bool empty() const; ///< @pre type==Ent::DataType::array. @brief return true if array is empty
         // Array - map
         bool mapErase(char const* _key);
-        Node* mapRestore(char const* _key);
         Node* mapGet(char const* _key);
         Node const* mapGet(char const* _key) const;
         Node const* mapInsert(char const* _key);
         bool mapErase(int64_t _key);
-        Node* mapRestore(int64_t _key);
         Node* mapGet(int64_t _key);
         Node const* mapGet(int64_t _key) const;
         Node const* mapInsert(int64_t _key);

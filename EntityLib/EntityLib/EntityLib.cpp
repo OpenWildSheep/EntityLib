@@ -332,17 +332,15 @@ namespace Ent
 
     Ent::Node* Ent::Array::mapInsertImpl(KeyType const& _key)
     {
+        ENTLIB_ASSERT_MSG(hasKey(), "Can't 'mapInsert' in simple array. Only in map/set");
         auto iter = itemMap.find(_key);
         if (iter == itemMap.end())
         {
-            if (SubschemaRef const* itemSchema = schema->singularItems.get())
-            {
-                auto newNode = loadNode(nullptr, itemSchema->get(), json(), nullptr);
-                setChildKey(schema, &newNode, _key);
-                return add(OverrideValueLocation::Override, std::move(newNode));
-            }
-            throw BadArrayType("Array is not a singularItems array (Can't push in a pair or "
-                               "tuple)");
+            SubschemaRef const* itemSchema = schema->singularItems.get();
+            ENTLIB_ASSERT_MSG(itemSchema, "map/set expect a singularItems");
+            auto newNode = loadNode(nullptr, itemSchema->get(), json(), nullptr);
+            setChildKey(schema, &newNode, _key);
+            return add(OverrideValueLocation::Override, std::move(newNode));
         }
         if (iter->second.deleted)
         {
@@ -368,10 +366,6 @@ namespace Ent
         return mapEraseImpl(_key);
     }
 
-    Ent::Node* Ent::Array::mapRestore(KeyType const& _key)
-    {
-        return mapRestoreImpl(_key);
-    }
     Ent::Node* Ent::Array::mapGet(KeyType const& _key)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
@@ -642,17 +636,13 @@ namespace Ent
 
     Node* Ent::Array::arrayPush()
     {
-        if (hasKey())
-        {
-            throw BadArrayType("Can't 'push' in a map or set. Use 'mapInsert'.");
-        }
-        if (SubschemaRef const* itemSchema = schema->singularItems.get())
-        {
-            return add(
-                OverrideValueLocation::Override,
-                loadNode(nullptr, itemSchema->get(), json(), nullptr));
-        }
-        throw BadArrayType("Array is not a singularItems array (Can't push in a pair/tuple)");
+        ENTLIB_ASSERT_MSG(not hasKey(), "Can't 'push' in a map or set. Use 'mapInsert'.");
+        ENTLIB_ASSERT_MSG(
+            schema->singularItems.get() != nullptr,
+            "Array is not a singularItems array (Can't push in a pair/tuple)");
+        SubschemaRef const* itemSchema = schema->singularItems.get();
+        return add(
+            OverrideValueLocation::Override, loadNode(nullptr, itemSchema->get(), json(), nullptr));
     }
 
     // ************************************ Union *************************************************
@@ -1073,7 +1063,7 @@ namespace Ent
 
         Node operator()(Array const& _arr) const
         {
-            Array out(_arr.schema);
+            Array out(_arr.getSchema());
             for (auto&& item : _arr.getItems())
             {
                 Node detached = item->detach();
@@ -1129,7 +1119,7 @@ namespace Ent
 
         Node operator()(Array const& _arr) const
         {
-            Array out(_arr.schema);
+            Array out(_arr.getSchema());
             for (auto&& item : _arr.getItems())
             {
                 out.add(OverrideValueLocation::Prefab, item->makeInstanceOf());
@@ -1309,7 +1299,12 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            return value.get<Array>().arrayPush();
+            auto& arr = value.get<Array>();
+            if (arr.hasKey())
+            {
+                throw BadArrayType("Can't 'push' in a map or set. Use 'mapInsert'.");
+            }
+            return arr.arrayPush();
         }
         throw BadType();
     }
@@ -1352,15 +1347,6 @@ namespace Ent
         throw BadType();
     }
 
-    Ent::Node* Node::mapRestore(char const* _key)
-    {
-        if (value.is<Array>())
-        {
-            return value.get<Array>().mapRestore(_key);
-        }
-        throw BadType();
-    }
-
     Node* Node::mapGet(char const* _key)
     {
         if (value.is<Array>())
@@ -1382,14 +1368,6 @@ namespace Ent
         if (value.is<Array>())
         {
             return value.get<Array>().mapErase(_key);
-        }
-        throw BadType();
-    }
-    Node* Node::mapRestore(int64_t _key)
-    {
-        if (value.is<Array>())
-        {
-            return value.get<Array>().mapRestore(_key);
         }
         throw BadType();
     }
@@ -1929,7 +1907,9 @@ namespace Ent
 
     bool Entity::hasOverride() const
     {
-        if (name.isSet() or color.hasOverride() or thumbnail.isSet() or instanceOf.isSet())
+        // The override is done in comparison with the prefab so
+        //     the "InstanceOf" path itself is never considered as overrided.
+        if (name.isSet() or color.hasOverride() or thumbnail.isSet())
         {
             return true;
         }
@@ -2663,10 +2643,11 @@ static Ent::Node loadNode(
                 {
                     ENTLIB_ASSERT(&_nodeSchema == _super->getSchema());
                     auto&& superarr = _super->GetRawValue().get<Ent::Array>();
-                    ENTLIB_ASSERT(&_nodeSchema == superarr.schema);
+                    ENTLIB_ASSERT(&_nodeSchema == superarr.getSchema());
                     ENTLIB_ASSERT(_nodeSchema.singularItems != nullptr);
                     ENTLIB_ASSERT(
-                        &_nodeSchema.singularItems->get() == &superarr.schema->singularItems->get());
+                        &_nodeSchema.singularItems->get()
+                        == &superarr.getSchema()->singularItems->get());
                     auto itemSchema = &_nodeSchema.singularItems->get();
                     for (auto* tmplItem : _super->getItems())
                     {

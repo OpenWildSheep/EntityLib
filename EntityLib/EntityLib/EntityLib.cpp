@@ -43,17 +43,7 @@ namespace Ent
     static Ent::Node makeDefaultColorField(EntityLib const& _entlib)
     {
         Ent::Subschema const& colorSchema = AT(_entlib.schema.schema.allDefinitions, colorSchemaName);
-        Ent::Subschema const* itemSchema = &colorSchema.singularItems->get();
-        const auto& defaultColor = colorSchema.defaultValue;
-        const auto getDefaultColorChannel = [&](size_t _channel) {
-            return Override<double>{defaultColor.at(_channel).get<double>()};
-        };
-        Array root(&colorSchema);
-        root.add(OverrideValueLocation::Default, Ent::Node(getDefaultColorChannel(0), itemSchema));
-        root.add(OverrideValueLocation::Default, Ent::Node(getDefaultColorChannel(1), itemSchema));
-        root.add(OverrideValueLocation::Default, Ent::Node(getDefaultColorChannel(2), itemSchema));
-        root.add(OverrideValueLocation::Default, Ent::Node(getDefaultColorChannel(3), itemSchema));
-        return Node{std::move(root), &colorSchema};
+        return loadNode(&_entlib, colorSchema, json(), nullptr);
     }
 
     EntityLib::EntityLib(std::filesystem::path _rootPath, bool _doMergeComponents)
@@ -139,7 +129,6 @@ namespace Ent
             // In json it is an array of "2 item array" where the 1st item is the key
             // and can be string, double or integer
             // meta.ordered means the items have to be sorted by the key
-            _child->GetRawValue().get<Array>().checkInvariants();
             ENTLIB_ASSERT(_child->getSchema()->linearItems.has_value());
             Ent::DataType keyType = _arraySchema->singularItems->get().linearItems->at(0)->type;
 #pragma warning(push)
@@ -198,7 +187,6 @@ namespace Ent
             // In json it is an array of "2 item array" where the 1st item is the key
             // and can be string, double or integer
             // meta.ordered means the items have to be sorted by the key
-            _child->GetRawValue().get<Array>().checkInvariants();
             ENTLIB_ASSERT(_child->getSchema()->linearItems.has_value());
             // ENTLIB_ASSERT(not _child->at(0llu)->hasDefaultValue); // Sometime there is a key in the default value
             Ent::DataType keyType = _arraySchema->singularItems->get().linearItems->at(0)->type;
@@ -558,11 +546,6 @@ namespace Ent
         }
     }
 
-    //bool Ent::Array::Deletable::hasDefaultValue() const
-    //{
-    //    return node->hasDefaultValue();
-    //}
-
     bool Ent::Array::hasDefaultValue() const
     {
         bool const sizeHasDefault = (!arraySize.hasOverride && !arraySize.hasPrefab);
@@ -700,11 +683,16 @@ namespace Ent
     {
         if (wrapper.has_value())
         {
-            ENTLIB_ASSERT(wrapper->count(metaData->typeField.c_str()));
+            ENTLIB_ASSERT_MSG(
+                wrapper->count(metaData->typeField.c_str()),
+                "Field %s not found in union",
+                metaData->typeField.c_str());
             auto typeNode = wrapper->at(metaData->typeField.c_str());
             ENTLIB_ASSERT(typeNode);
             ENTLIB_ASSERT_MSG(
-                not typeNode->hasDefaultValue(), "The type-field is expected to be set, in Union");
+                not typeNode->hasDefaultValue(),
+                "In Union, the type-field (%s) is expected to be set",
+                metaData->typeField.c_str());
             return typeNode->getString();
         }
         else
@@ -1093,7 +1081,6 @@ namespace Ent
                                                     OverrideValueLocation::Default;
                 out.add(loc, std::move(detached));
             }
-            out.checkInvariants();
             return Node(std::move(out), schema);
         }
 
@@ -1143,12 +1130,10 @@ namespace Ent
         Node operator()(Array const& _arr) const
         {
             Array out(_arr.schema);
-            _arr.checkInvariants();
             for (auto&& item : _arr.getItems())
             {
                 out.add(OverrideValueLocation::Prefab, item->makeInstanceOf());
             }
-            out.checkInvariants();
             return Node(std::move(out), schema);
         }
 
@@ -2495,7 +2480,6 @@ struct MergeMapOverride
         {
             ENTLIB_ASSERT(*instanceArraySize == arr.getRawSize().overrideValue);
         }
-        arr.checkInvariants();
         return arr;
     }
 };
@@ -2660,7 +2644,6 @@ static Ent::Node loadNode(
                         arr.add(Ent::OverrideValueLocation::Default, std::move(tmpNode));
                         ++index;
                     }
-                    arr.checkInvariants();
                 }
                 else
                 {
@@ -2671,9 +2654,7 @@ static Ent::Node loadNode(
                         arr.add(Ent::OverrideValueLocation::Default, std::move(tmpNode));
                         ++index;
                     }
-                    arr.checkInvariants();
                 }
-                arr.checkInvariants();
             }
             else // If it is a singularItems and there is _data, we have to use the overridePolicy
             {
@@ -2686,7 +2667,6 @@ static Ent::Node loadNode(
                     ENTLIB_ASSERT(_nodeSchema.singularItems != nullptr);
                     ENTLIB_ASSERT(
                         &_nodeSchema.singularItems->get() == &superarr.schema->singularItems->get());
-                    superarr.checkInvariants();
                     auto itemSchema = &_nodeSchema.singularItems->get();
                     for (auto* tmplItem : _super->getItems())
                     {
@@ -2858,15 +2838,13 @@ static Ent::Node loadNode(
                         ENTLIB_ASSERT(*overrideArraySize == arr.getRawSize().overrideValue);
                     }
                 }
-                    arr.checkInvariants();
-                    break;
+                break;
                 default:
                     throw std::runtime_error(format(
                         "Unknown key type (%s) in schema of %s",
                         meta.overridePolicy.c_str(),
                         _nodeSchema.name.c_str()));
                 }
-                arr.checkInvariants();
             }
         }
         else
@@ -2887,9 +2865,7 @@ static Ent::Node loadNode(
             }
             // uint64_t defaultArraySize = _nodeSchema.linearItems->size();
             // arr.arraySize = Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt);
-            arr.checkInvariants();
         }
-        arr.checkInvariants();
         result = Ent::Node(std::move(arr), &_nodeSchema);
     }
     break;
@@ -3062,7 +3038,6 @@ json Ent::EntityLib::dumpNode(
         auto&& meta = _schema.meta.get<Ent::Subschema::ArrayMeta>();
         bool const fullWrite = meta.isMapItem;
         auto const& arr = _node.value.get<Ent::Array>();
-        arr.checkInvariants();
         if (arr.hasKey())
         {
             for (auto& item : arr.getItemsWithRemoved())

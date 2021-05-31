@@ -135,8 +135,6 @@ namespace Ent
         std::vector<Node const*> getItems() const;
         std::vector<Node const*> getItemsWithRemoved() const;
 
-        void checkInvariants() const;
-
         void pop();
 
         void clear();
@@ -159,6 +157,7 @@ namespace Ent
         void addRemovedDefault(OverrideValueLocation _removedIn);
 
     private:
+        void checkInvariants() const;
         bool mapEraseImpl(KeyType const& key);
         Node* mapRestoreImpl(KeyType const& _key);
         Node const* mapGetImpl(KeyType const& _key) const;

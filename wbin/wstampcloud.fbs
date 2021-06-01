@@ -14,7 +14,7 @@ table Stamp
 {
 	shape:AABB;
 	matrix:Matrix44;
-	tags:[int];
+	tags:[uint];
 }
 
 table StampCloud

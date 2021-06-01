@@ -22,7 +22,7 @@ struct StampT : public flatbuffers::NativeTable {
   typedef Stamp TableType;
   std::unique_ptr<WBIN::AABB> shape{};
   std::unique_ptr<WBIN::Matrix44> matrix{};
-  std::vector<int32_t> tags{};
+  std::vector<uint32_t> tags{};
 };
 
 struct Stamp FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -45,11 +45,11 @@ struct Stamp FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   WBIN::Matrix44 *mutable_matrix() {
     return GetStruct<WBIN::Matrix44 *>(VT_MATRIX);
   }
-  const flatbuffers::Vector<int32_t> *tags() const {
-    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_TAGS);
+  const flatbuffers::Vector<uint32_t> *tags() const {
+    return GetPointer<const flatbuffers::Vector<uint32_t> *>(VT_TAGS);
   }
-  flatbuffers::Vector<int32_t> *mutable_tags() {
-    return GetPointer<flatbuffers::Vector<int32_t> *>(VT_TAGS);
+  flatbuffers::Vector<uint32_t> *mutable_tags() {
+    return GetPointer<flatbuffers::Vector<uint32_t> *>(VT_TAGS);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -74,7 +74,7 @@ struct StampBuilder {
   void add_matrix(const WBIN::Matrix44 *matrix) {
     fbb_.AddStruct(Stamp::VT_MATRIX, matrix);
   }
-  void add_tags(flatbuffers::Offset<flatbuffers::Vector<int32_t>> tags) {
+  void add_tags(flatbuffers::Offset<flatbuffers::Vector<uint32_t>> tags) {
     fbb_.AddOffset(Stamp::VT_TAGS, tags);
   }
   explicit StampBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -92,7 +92,7 @@ inline flatbuffers::Offset<Stamp> CreateStamp(
     flatbuffers::FlatBufferBuilder &_fbb,
     const WBIN::AABB *shape = 0,
     const WBIN::Matrix44 *matrix = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int32_t>> tags = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<uint32_t>> tags = 0) {
   StampBuilder builder_(_fbb);
   builder_.add_tags(tags);
   builder_.add_matrix(matrix);
@@ -104,8 +104,8 @@ inline flatbuffers::Offset<Stamp> CreateStampDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const WBIN::AABB *shape = 0,
     const WBIN::Matrix44 *matrix = 0,
-    const std::vector<int32_t> *tags = nullptr) {
-  auto tags__ = tags ? _fbb.CreateVector<int32_t>(*tags) : 0;
+    const std::vector<uint32_t> *tags = nullptr) {
+  auto tags__ = tags ? _fbb.CreateVector<uint32_t>(*tags) : 0;
   return WBIN::CreateStamp(
       _fbb,
       shape,

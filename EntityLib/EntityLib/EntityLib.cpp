@@ -340,7 +340,7 @@ namespace Ent
             ENTLIB_ASSERT_MSG(itemSchema, "map/set expect a singularItems");
             auto newNode = loadNode(nullptr, itemSchema->get(), json(), nullptr);
             setChildKey(schema, &newNode, _key);
-            return add(OverrideValueLocation::Override, std::move(newNode));
+            return mapInitInsert(OverrideValueLocation::Override, _key, std::move(newNode));
         }
         if (iter->second.deleted)
         {
@@ -424,10 +424,11 @@ namespace Ent
         cleanSize(arraySize);
     }
 
-    Ent::Node* Ent::Array::mapAdd(OverrideValueLocation loc, KeyType _key, Node _node)
+    Ent::Node* Ent::Array::mapInitInsert(OverrideValueLocation loc, KeyType _key, Node _node)
     {
         ENTLIB_ASSERT(hasKey());
         ENTLIB_ASSERT(mapGet(_key) == nullptr);
+        ENTLIB_ASSERT(itemMap.count(_key) == 0);
         checkInvariants();
         ENTLIB_ASSERT(&schema->singularItems->get() == _node.getSchema());
         data.emplace_back(std::move(_node));
@@ -437,14 +438,6 @@ namespace Ent
         checkInvariants();
         return ptr;
     }
-    Ent::Node* Ent::Array::mapAdd(OverrideValueLocation loc, char const* _key, Node _node)
-    {
-        return mapAdd(loc, KeyType(String(_key)), std::move(_node));
-    }
-    Ent::Node* Ent::Array::mapAdd(OverrideValueLocation loc, int64_t _key, Node _node)
-    {
-        return mapAdd(loc, KeyType(_key), std::move(_node));
-    }
 
     bool Ent::Array::hasKey() const
     {
@@ -452,22 +445,21 @@ namespace Ent
         return meta.overridePolicy == "map" || meta.overridePolicy == "set";
     }
 
-    Node* Ent::Array::add(OverrideValueLocation loc, Node _node)
+    bool Ent::Array::isTuple() const
     {
-        ENTLIB_ASSERT(
-            schema->singularItems == nullptr || (&schema->singularItems->get() == _node.getSchema()));
+        return schema->linearItems.has_value();
+    }
+
+    Node* Ent::Array::initAdd(OverrideValueLocation loc, Node _node)
+    {
         if (hasKey())
         {
             auto key = getChildKey(schema, &_node);
-            return mapAdd(loc, key, std::move(_node));
+            return mapInitInsert(loc, key, std::move(_node));
         }
         else
         {
-            data.emplace_back(Ent::make_value<Node>(std::move(_node)));
-            Node* ptr = data.back().get();
-            incrementSize(loc, arraySize);
-            checkInvariants();
-            return ptr;
+            return arrayInitPush(loc, std::move(_node));
         }
     }
 
@@ -562,15 +554,8 @@ namespace Ent
 
     void Ent::Array::pop()
     {
-        if (hasKey())
-        {
-            throw BadArrayType("Can't call 'pop' on map/set array");
-            // TODO : Move exception into Node? (Array is internal)
-        }
-        if (schema->singularItems == nullptr)
-        {
-            throw BadArrayType("Can't call 'pop' on pair/tuple");
-        }
+        ENTLIB_ASSERT(not hasKey());
+        ENTLIB_ASSERT(not isTuple());
         ENTLIB_ASSERT(not data.empty());
         data.pop_back();
         arraySize.set(arraySize.get() - 1);
@@ -579,10 +564,7 @@ namespace Ent
 
     void Ent::Array::clear()
     {
-        if (schema->singularItems == nullptr)
-        {
-            throw BadArrayType("Can't call 'pop' on pair/tuple");
-        }
+        ENTLIB_ASSERT(not isTuple());
         if (hasKey())
         {
             for (auto&& key_item : itemMap)
@@ -634,6 +616,18 @@ namespace Ent
         // TODO : itemMap
     }
 
+    Node* Ent::Array::arrayInitPush(OverrideValueLocation _loc, Node _node)
+    {
+        ENTLIB_ASSERT(
+            schema->singularItems == nullptr || (&schema->singularItems->get() == _node.getSchema()));
+        ENTLIB_ASSERT_MSG(not hasKey(), "Can't 'push' in a map or set. Use 'mapInsert'.");
+        data.emplace_back(Ent::make_value<Node>(std::move(_node)));
+        Node* ptr = data.back().get();
+        incrementSize(_loc, arraySize);
+        checkInvariants();
+        return ptr;
+    }
+
     Node* Ent::Array::arrayPush()
     {
         ENTLIB_ASSERT_MSG(not hasKey(), "Can't 'push' in a map or set. Use 'mapInsert'.");
@@ -641,7 +635,7 @@ namespace Ent
             schema->singularItems.get() != nullptr,
             "Array is not a singularItems array (Can't push in a pair/tuple)");
         SubschemaRef const* itemSchema = schema->singularItems.get();
-        return add(
+        return arrayInitPush(
             OverrideValueLocation::Override, loadNode(nullptr, itemSchema->get(), json(), nullptr));
     }
 
@@ -1069,7 +1063,7 @@ namespace Ent
                 Node detached = item->detach();
                 auto loc = detached.hasOverride() ? OverrideValueLocation::Override :
                                                     OverrideValueLocation::Default;
-                out.add(loc, std::move(detached));
+                out.initAdd(loc, std::move(detached));
             }
             return Node(std::move(out), schema);
         }
@@ -1122,7 +1116,7 @@ namespace Ent
             Array out(_arr.getSchema());
             for (auto&& item : _arr.getItems())
             {
-                out.add(OverrideValueLocation::Prefab, item->makeInstanceOf());
+                out.initAdd(OverrideValueLocation::Prefab, item->makeInstanceOf());
             }
             return Node(std::move(out), schema);
         }
@@ -1312,7 +1306,16 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            value.get<Array>().pop();
+            auto&& arr = value.get<Array>();
+            if (arr.hasKey())
+            {
+                throw BadArrayType("Can't call 'pop' on map/set array");
+            }
+            if (arr.isTuple())
+            {
+                throw BadArrayType("Can't call 'pop' on pair/tuple");
+            }
+            arr.pop();
         }
         throw BadType();
     }
@@ -1321,7 +1324,12 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            value.get<Array>().clear();
+            auto&& arr = value.get<Array>();
+            if (arr.isTuple())
+            {
+                throw BadArrayType("Can't call 'clear' on pair/tuple");
+            }
+            arr.clear();
         }
         else
         {
@@ -1340,70 +1348,58 @@ namespace Ent
 
     bool Node::mapErase(char const* _key)
     {
-        if (value.is<Array>())
-        {
-            return value.get<Array>().mapErase(_key);
-        }
-        throw BadType();
+        checkMap("mapErase");
+        return value.get<Array>().mapErase(_key);
     }
 
     Node* Node::mapGet(char const* _key)
     {
-        if (value.is<Array>())
-        {
-            return value.get<Array>().mapGet(_key);
-        }
-        throw BadType();
+        checkMap("mapGet");
+        return value.get<Array>().mapGet(_key);
     }
     Node const* Node::mapGet(char const* _key) const
     {
-        if (value.is<Array>())
-        {
-            return value.get<Array>().mapGet(_key);
-        }
-        throw BadType();
+        checkMap("mapGet");
+        return value.get<Array>().mapGet(_key);
     }
     bool Node::mapErase(int64_t _key)
     {
-        if (value.is<Array>())
-        {
-            return value.get<Array>().mapErase(_key);
-        }
-        throw BadType();
+        checkMap("mapErase");
+        return value.get<Array>().mapErase(_key);
     }
     Node* Node::mapGet(int64_t _key)
     {
-        if (value.is<Array>())
-        {
-            return value.get<Array>().mapGet(_key);
-        }
-        throw BadType();
+        checkMap("mapGet");
+        return value.get<Array>().mapGet(_key);
     }
     Node const* Node::mapGet(int64_t _key) const
     {
-        if (value.is<Array>())
-        {
-            return value.get<Array>().mapGet(_key);
-        }
-        throw BadType();
+        checkMap("mapGet");
+        return value.get<Array>().mapGet(_key);
     }
 
     Node const* Node::mapInsert(int64_t _key)
     {
-        if (value.is<Array>())
-        {
-            return value.get<Array>().mapInsert(_key);
-        }
-        throw BadType();
+        checkMap("mapInsert");
+        return value.get<Array>().mapInsert(_key);
     }
 
     Node const* Node::mapInsert(char const* _key)
     {
-        if (value.is<Array>())
+        checkMap("mapInsert");
+        return value.get<Array>().mapInsert(_key);
+    }
+
+    void Node::checkMap(char const* _calledMethod) const
+    {
+        if (not value.is<Array>())
         {
-            return value.get<Array>().mapInsert(_key);
+            throw BadType();
         }
-        throw BadType();
+        if (not value.get<Array>().hasKey())
+        {
+            throw BadArrayType(format("Can call '%s' only on map/set", _calledMethod).c_str());
+        }
     }
 
     struct IsDefault
@@ -2432,7 +2428,7 @@ struct MergeMapOverride
                 ss << "Twice the same key in map : " << key;
                 throw InvalidJsonData(ss.str().c_str());
             }
-            arr.mapAdd(node.loc, key, std::move(node.node));
+            arr.mapInitInsert(node.loc, key, std::move(node.node));
             if (node.removed)
             {
                 arr.mapErase(KeyType(key));
@@ -2609,7 +2605,7 @@ static Ent::Node loadNode(
                             _entlib, _nodeSchema.singularItems->get(), json(), subSuper, defaultItem);
                         auto loc = defaultItem == nullptr ? Ent::OverrideValueLocation::Prefab :
                                                             Ent::OverrideValueLocation::Default;
-                        arr.add(loc, std::move(tmpNode));
+                        arr.initAdd(loc, std::move(tmpNode));
                         ++index;
                     }
                 }
@@ -2621,7 +2617,7 @@ static Ent::Node loadNode(
                         Ent::Node tmpNode =
                             loadNode(_entlib, itemSchema, json(), nullptr, &subDefault);
                         // arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
-                        arr.add(Ent::OverrideValueLocation::Default, std::move(tmpNode));
+                        arr.initAdd(Ent::OverrideValueLocation::Default, std::move(tmpNode));
                         ++index;
                     }
                 }
@@ -2631,7 +2627,7 @@ static Ent::Node loadNode(
                     {
                         Ent::Node tmpNode =
                             loadNode(_entlib, _nodeSchema.singularItems->get(), json(), nullptr);
-                        arr.add(Ent::OverrideValueLocation::Default, std::move(tmpNode));
+                        arr.initAdd(Ent::OverrideValueLocation::Default, std::move(tmpNode));
                         ++index;
                     }
                 }
@@ -2776,7 +2772,7 @@ static Ent::Node loadNode(
                         auto loc = isDefault           ? Ent::OverrideValueLocation::Default :
                                    subSuper != nullptr ? Ent::OverrideValueLocation::Prefab :
                                                          Ent::OverrideValueLocation::Override;
-                        arr.add(loc, std::move(tmpNode));
+                        arr.initAdd(loc, std::move(tmpNode));
                         ++index;
                     }
                     if (_super != nullptr)
@@ -2841,7 +2837,7 @@ static Ent::Node loadNode(
                 json const emptyJson;
                 json const& prop = _data.size() > index ? _data.at(index) : emptyJson;
                 Ent::Node tmpNode = loadNode(_entlib, *sub, prop, subSuper, subDefault);
-                arr.add(Ent::OverrideValueLocation::Default, std::move(tmpNode));
+                arr.initAdd(Ent::OverrideValueLocation::Default, std::move(tmpNode));
                 ++index;
             }
             // uint64_t defaultArraySize = _nodeSchema.linearItems->size();

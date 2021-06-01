@@ -104,6 +104,7 @@ namespace Ent
         bool hasDefaultValue() const;
         /// The elements have keys if the array is a map or a set
         bool hasKey() const;
+        bool isTuple() const;
 
         Node* at(uint64_t _index); ///< Get the item at _index
         Node const* at(uint64_t _index) const; ///< Get the item at _index
@@ -116,18 +117,22 @@ namespace Ent
         Node const* mapGet(KeyType const& _key) const; ///< @return the item with _key, or nullptr
         Node* mapInsert(KeyType const& _key); ///< @pre hasKey(). @brief Insert a new item with _key
 
-        Node* mapAdd(OverrideValueLocation, KeyType _key, Node _node);
-        Node* mapAdd(OverrideValueLocation, char const* _key, Node _node);
-        Node* mapAdd(OverrideValueLocation, int64_t _key, Node _node);
-        Node* add(OverrideValueLocation, Node _node);
+        // For array initialization
+        Node* initAdd(OverrideValueLocation, Node _node); ///< @pre This _node is not yet added
+        /// @pre hasKey() and the key doesn't exist in map
+        Node* mapInitInsert(OverrideValueLocation, KeyType _key, Node _node);
+        /// @pre not hasKey()
+        Node* arrayInitPush(OverrideValueLocation _loc, Node _node);
+
+        /// @return true if it is a map/set and the _key was removed
         bool isErased(KeyType const& _key) const;
 
-        std::vector<Node const*> getItems() const;
-        std::vector<Node const*> getItemsWithRemoved() const;
+        std::vector<Node const*> getItems() const; ///< Get all not removed items
+        std::vector<Node const*> getItemsWithRemoved() const; ///< Get all items with the removed ones
 
-        void pop();
+        void pop(); ///< @pre not hasKey() and not isTuple()
 
-        void clear();
+        void clear(); //< @pre not isTuple()
 
         bool empty() const;
 
@@ -143,7 +148,9 @@ namespace Ent
             return arraySize;
         }
 
+        ///< Declare an element added in prefab and removed in instance
         void addRemovedPrefab();
+        ///< Declare an element added in default and removed in prefab or instance
         void addRemovedDefault(OverrideValueLocation _removedIn);
 
         Subschema const* getSchema() const
@@ -271,9 +278,9 @@ namespace Ent
         void clear(); ///< @pre type==Ent::DataType::array. @brief Remove all items in array
         bool empty() const; ///< @pre type==Ent::DataType::array. @brief return true if array is empty
         // Array - map
-        bool mapErase(char const* _key);
-        Node* mapGet(char const* _key);
-        Node const* mapGet(char const* _key) const;
+        bool mapErase(char const* _key); ///< erase the item with _key or return false
+        Node* mapGet(char const* _key); ///< Get the item with _key or return nullptr
+        Node const* mapGet(char const* _key) const; ///< Get the item with _key or return nullptr
         Node const* mapInsert(char const* _key);
         bool mapErase(int64_t _key);
         Node* mapGet(int64_t _key);
@@ -394,6 +401,7 @@ namespace Ent
         EntityLib* getEntityLib() const;
 
     private:
+        void checkMap(char const* _calledMethod) const; ///< Throw exception if not a set/map
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
         Value value; ///< Contains one of the types accepted by a Node
 

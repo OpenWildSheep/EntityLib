@@ -1909,7 +1909,7 @@ namespace Ent
     {
         // The override is done in comparison with the prefab so
         //     the "InstanceOf" path itself is never considered as overrided.
-        if (name.isSet() or color.hasOverride() or thumbnail.isSet())
+        if (name.isSet() or color.hasOverride() or thumbnail.isSet() or actorStates.hasOverride())
         {
             return true;
         }

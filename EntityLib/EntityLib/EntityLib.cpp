@@ -43,21 +43,7 @@ namespace Ent
     static Ent::Node makeDefaultColorField(EntityLib const& _entlib)
     {
         Ent::Subschema const& colorSchema = AT(_entlib.schema.schema.allDefinitions, colorSchemaName);
-        Ent::Subschema const* itemSchema = &colorSchema.singularItems->get();
-        const auto& defaultColor = colorSchema.defaultValue;
-        const auto getDefaultColorChannel = [&](size_t _channel) {
-            return Override<double>{defaultColor.at(_channel).get<double>()};
-        };
-        std::vector<value_ptr<Ent::Node>> nodes{
-            make_value<Ent::Node>(getDefaultColorChannel(0), itemSchema),
-            make_value<Ent::Node>(getDefaultColorChannel(1), itemSchema),
-            make_value<Ent::Node>(getDefaultColorChannel(2), itemSchema),
-            make_value<Ent::Node>(getDefaultColorChannel(3), itemSchema),
-        };
-        Array root;
-        root.data = std::move(nodes);
-        root.arraySize = Override<uint64_t>{4};
-        return Node{std::move(root), &colorSchema};
+        return loadNode(&_entlib, colorSchema, json(), nullptr);
     }
 
     EntityLib::EntityLib(std::filesystem::path _rootPath, bool _doMergeComponents)

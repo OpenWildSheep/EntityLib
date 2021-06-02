@@ -1032,6 +1032,12 @@ try
         ENTLIB_ASSERT(strcmp(subscene.front()->getName(), "default_level2") == 0);
     }
 
+    // ******************* Test default color *****************************************************
+    {
+        EntityPtr ent = std::make_unique<Ent::Entity>(entlib);
+        ENTLIB_ASSERT(ent->getColor() == (std::array<double, 4>{1., 1., 1., 1.}));
+    }
+
     // ********************************** Test load/save scene ************************************
     entlib.rawdataPath = "X:/RawData";
 

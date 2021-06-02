@@ -611,8 +611,8 @@ namespace Ent
             item->computeMemory(prof);
             prof.addMem("Array::data::value_ptr", sizeof(Ent::Node));
         }
+        prof.addMem("Array::itemMap", itemMap.size() * sizeof(*itemMap.begin()));
         prof.addNodes(data.size());
-        // TODO : itemMap
     }
 
     Node* Ent::Array::arrayInitPush(OverrideValueLocation _loc, Node _node)
@@ -3027,10 +3027,8 @@ json Ent::EntityLib::dumpNode(
         {
             for (auto& item : arr.getItemsWithRemoved())
             {
-                // Node const* item = arr.at(wrapper.index);
                 if (arr.isErased(getChildKey(&_schema, item)))
                 {
-                    // TODO : Use the normal dumpNode with a "delete" argument?
                     if (meta.overridePolicy == "map")
                     {
                         ENTLIB_ASSERT(item->getSchema() != nullptr);

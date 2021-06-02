@@ -96,15 +96,11 @@ namespace Ent
     {
         Array(Subschema const* _schema);
 
-        /// Recursively check if there is an override inside.
-        bool hasOverride() const;
-        /// Recursively check if value is set in a prefab (overriden or not by this Node)
-        bool hasPrefabValue() const;
-        /// Recursively check if nothing is set in prefab and instance
-        bool hasDefaultValue() const;
-        /// The elements have keys if the array is a map or a set
-        bool hasKey() const;
-        bool isTuple() const;
+        bool hasOverride() const; ///< Recursively check if there is an override inside
+        bool hasPrefabValue() const; ///< Recursively check if value is set in a prefab
+        bool hasDefaultValue() const; ///< Recursively check if nothing is set in prefab and instance
+        bool hasKey() const; ///< The elements have keys if the overridePolicy is a map or a set
+        bool isTuple() const; ///< @return true if the schema has linearItems
 
         Node* at(uint64_t _index); ///< Get the item at _index
         Node const* at(uint64_t _index) const; ///< Get the item at _index
@@ -116,13 +112,6 @@ namespace Ent
         Node* mapGet(KeyType const& _key); ///< @return the item with _key, or nullptr
         Node const* mapGet(KeyType const& _key) const; ///< @return the item with _key, or nullptr
         Node* mapInsert(KeyType const& _key); ///< @pre hasKey(). @brief Insert a new item with _key
-
-        // For array initialization
-        Node* initAdd(OverrideValueLocation, Node _node); ///< @pre This _node is not yet added
-        /// @pre hasKey() and the key doesn't exist in map
-        Node* mapInitInsert(OverrideValueLocation, KeyType _key, Node _node);
-        /// @pre not hasKey()
-        Node* arrayInitPush(OverrideValueLocation _loc, Node _node);
 
         /// @return true if it is a map/set and the _key was removed
         bool isErased(KeyType const& _key) const;
@@ -148,15 +137,21 @@ namespace Ent
             return arraySize;
         }
 
-        ///< Declare an element added in prefab and removed in instance
-        void addRemovedPrefab();
-        ///< Declare an element added in default and removed in prefab or instance
-        void addRemovedDefault(OverrideValueLocation _removedIn);
-
         Subschema const* getSchema() const
         {
             return schema;
         }
+
+        // **************************** For array initialization **********************************
+        Node* initAdd(OverrideValueLocation, Node _node); ///< @pre This _node is not yet added
+        /// @pre hasKey() and the key doesn't exist in map
+        Node* mapInitInsert(OverrideValueLocation, KeyType _key, Node _node);
+        /// @pre not hasKey()
+        Node* arrayInitPush(OverrideValueLocation _loc, Node _node);
+        /// Declare an element added in prefab and removed in instance
+        void addRemovedPrefab();
+        /// Declare an element added in default and removed in prefab or instance
+        void addRemovedDefault(OverrideValueLocation _removedIn);
 
     private:
         void incrementSize(OverrideValueLocation loc, bool decrement = false);

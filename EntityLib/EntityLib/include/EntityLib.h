@@ -159,6 +159,8 @@ namespace Ent
         }
 
     private:
+        void incrementSize(OverrideValueLocation loc, bool decrement = false);
+        void cleanSize();
         void checkInvariants() const;
         bool mapEraseImpl(KeyType const& key);
         Node* mapRestoreImpl(KeyType const& _key);
@@ -278,14 +280,15 @@ namespace Ent
         void clear(); ///< @pre type==Ent::DataType::array. @brief Remove all items in array
         bool empty() const; ///< @pre type==Ent::DataType::array. @brief return true if array is empty
         // Array - map
-        bool mapErase(char const* _key); ///< erase the item with _key or return false
-        Node* mapGet(char const* _key); ///< Get the item with _key or return nullptr
-        Node const* mapGet(char const* _key) const; ///< Get the item with _key or return nullptr
-        Node const* mapInsert(char const* _key);
-        bool mapErase(int64_t _key);
-        Node* mapGet(int64_t _key);
-        Node const* mapGet(int64_t _key) const;
-        Node const* mapInsert(int64_t _key);
+        bool mapErase(char const* _key); ///< @pre isMapOrSet() @brief erase the item with _key or return false
+        Node* mapGet(char const* _key); ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
+        Node const* mapGet(char const* _key) const; ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
+        Node const* mapInsert(char const* _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
+        bool mapErase(int64_t _key); ///< @pre isMapOrSet() @brief Erase the item at the given _key
+        Node* mapGet(int64_t _key); ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
+        Node const* mapGet(int64_t _key) const; ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
+        Node const* mapInsert(int64_t _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
+        bool isMapOrSet() const; ///< @return true if type==Ent::DataType::array and overridePolicy is map or set
 
         // Union
         Node* getUnionData(); ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data

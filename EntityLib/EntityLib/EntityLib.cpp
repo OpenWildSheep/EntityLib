@@ -235,7 +235,7 @@ namespace Ent
         }
     }
 
-    static void cleanSize(Override<uint64_t>& arraySize)
+    void Ent::Array::cleanSize()
     {
         if (arraySize.hasOverride)
         {
@@ -294,7 +294,7 @@ namespace Ent
         {
             iter->second.deleted = true;
             arraySize.set(arraySize.get() - 1);
-            cleanSize(arraySize);
+            cleanSize();
         }
         checkInvariants();
         return true;
@@ -380,8 +380,7 @@ namespace Ent
         return mapInsertImpl(_key);
     }
 
-    static void
-    incrementSize(OverrideValueLocation loc, Override<uint64_t>& arraySize, bool decrement = false)
+    void Ent::Array::incrementSize(OverrideValueLocation loc, bool decrement)
     {
         auto operation = [decrement](auto&& v) {
             v = decrement ? v - 1 : v + 1;
@@ -421,7 +420,7 @@ namespace Ent
             operation(arraySize.overrideValue);
             break;
         }
-        cleanSize(arraySize);
+        cleanSize();
     }
 
     Ent::Node* Ent::Array::mapInitInsert(OverrideValueLocation loc, KeyType _key, Node _node)
@@ -434,7 +433,7 @@ namespace Ent
         data.emplace_back(std::move(_node));
         auto ptr = data.back().get();
         itemMap.emplace(std::move(_key), Deletable{data.size() - 1});
-        incrementSize(loc, arraySize);
+        incrementSize(loc);
         checkInvariants();
         return ptr;
     }
@@ -559,7 +558,7 @@ namespace Ent
         ENTLIB_ASSERT(not data.empty());
         data.pop_back();
         arraySize.set(arraySize.get() - 1);
-        cleanSize(arraySize);
+        cleanSize();
     }
 
     void Ent::Array::clear()
@@ -574,7 +573,7 @@ namespace Ent
                 {
                     deletable.deleted = true;
                     arraySize.set(arraySize.get() - 1);
-                    cleanSize(arraySize);
+                    cleanSize();
                 }
             }
         }
@@ -582,7 +581,7 @@ namespace Ent
         {
             data.clear();
             arraySize.set(0);
-            cleanSize(arraySize);
+            cleanSize();
         }
         checkInvariants();
     }
@@ -594,14 +593,14 @@ namespace Ent
 
     void Ent::Array::addRemovedPrefab()
     {
-        incrementSize(OverrideValueLocation::Prefab, arraySize);
-        incrementSize(OverrideValueLocation::Override, arraySize, true);
+        incrementSize(OverrideValueLocation::Prefab);
+        incrementSize(OverrideValueLocation::Override, true);
     }
 
     void Ent::Array::addRemovedDefault(OverrideValueLocation _removedIn)
     {
-        incrementSize(OverrideValueLocation::Default, arraySize);
-        incrementSize(_removedIn, arraySize, true);
+        incrementSize(OverrideValueLocation::Default);
+        incrementSize(_removedIn, true);
     }
 
     void Ent::Array::computeMemory(MemoryProfiler& prof) const
@@ -623,7 +622,7 @@ namespace Ent
         ENTLIB_ASSERT_MSG(not hasKey(), "Can't 'push' in a map or set. Use 'mapInsert'.");
         data.emplace_back(Ent::make_value<Node>(std::move(_node)));
         Node* ptr = data.back().get();
-        incrementSize(_loc, arraySize);
+        incrementSize(_loc);
         checkInvariants();
         return ptr;
     }
@@ -1400,6 +1399,15 @@ namespace Ent
         {
             throw BadArrayType(format("Can call '%s' only on map/set", _calledMethod).c_str());
         }
+    }
+
+    bool Node::isMapOrSet() const
+    {
+        if (not value.is<Array>())
+        {
+            return false;
+        }
+        return value.get<Array>().hasKey();
     }
 
     struct IsDefault

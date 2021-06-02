@@ -1747,8 +1747,7 @@ namespace Ent
     {
         ENTLIB_ASSERT_MSG(
             not hasASuper,
-            "A SubEntity of an instance which override a SubEntity in a prefab can't be "
-            "renamed. "
+            "A SubEntity of an instance which override a SubEntity in a prefab can't be renamed. "
             "Check the canBeRenamed method.");
         name.set(std::move(_name));
     }
@@ -2323,7 +2322,6 @@ struct MergeMapOverride
             }
         };
         std::vector<std::pair<KeyType, NodeWrapper>> result;
-        // std::vector<std::pair<KeyType, Node>> removedItems;
         if (_super != nullptr)
         {
             size_t index = 0;
@@ -2360,7 +2358,6 @@ struct MergeMapOverride
                     {
                         result.emplace_back(key, NodeWrapper{std::move(tmpNode), loc, true});
                         --instanceAdditionalElementCount;
-                        // removedItems.emplace_back(key, std::move(tmpNode));
                     }
                     instancePropMap.erase(key); // Later we need to know which item are NOT in the prefab
                 }
@@ -2398,7 +2395,6 @@ struct MergeMapOverride
                     }
                     else
                     {
-                        // removedItems.emplace_back(key, std::move(tmpNode));
                         result.emplace_back(
                             key,
                             NodeWrapper{std::move(tmpNode), OverrideValueLocation::Default, true});
@@ -2639,7 +2635,6 @@ static Ent::Node loadNode(
                         auto& itemSchema = _nodeSchema.singularItems->get();
                         Ent::Node tmpNode =
                             loadNode(_entlib, itemSchema, json(), nullptr, &subDefault);
-                        // arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
                         arr.initAdd(Ent::OverrideValueLocation::Default, std::move(tmpNode));
                         ++index;
                     }
@@ -2710,12 +2705,12 @@ static Ent::Node loadNode(
                             },
                             doRemove);
                         break;
-                    //case Ent::DataType::number:
-                    //    arr = mergeMapOverride(
-                    //        [](json const& item) { return item[0].get<double>(); },
-                    //        [](Node const* tmplItem) { return tmplItem->at(0llu)->getFloat(); },
-                    //        doRemove);
-                    //    break;
+                    case Ent::DataType::number:
+                        arr = mergeMapOverride(
+                            [](json const& item) { return item[0].get<double>(); },
+                            [](Node const* tmplItem) { return tmplItem->at(0llu)->getFloat(); },
+                            doRemove);
+                        break;
                     case Ent::DataType::integer:
                         arr = mergeMapOverride(
                             [](json const& item) { return item[0].get<int64_t>(); },
@@ -2760,12 +2755,12 @@ static Ent::Node loadNode(
                             },
                             doRemoveDefault);
                         break;
-                    //case Ent::DataType::number: // The key is the item itself
-                    //    arr = mergeMapOverride(
-                    //        [](json const& item) { return item.get<double>(); },
-                    //        [](Node const* tmplItem) { return tmplItem->getFloat(); },
-                    //        doRemoveDefault);
-                    //    break;
+                    case Ent::DataType::number: // The key is the item itself
+                        arr = mergeMapOverride(
+                            [](json const& item) { return item.get<double>(); },
+                            [](Node const* tmplItem) { return tmplItem->getFloat(); },
+                            doRemoveDefault);
+                        break;
                     case Ent::DataType::integer: // The key is the item itself
                         arr = mergeMapOverride(
                             [](json const& item) { return item.get<int64_t>(); },
@@ -2824,8 +2819,6 @@ static Ent::Node loadNode(
                     tl::optional<uint64_t> overrideArraySize =
                         _data.size() == sizeInPrefab ? tl::nullopt :
                                                        tl::optional<uint64_t>{_data.size()};
-                    //arr.arraySize = Ent::Override<uint64_t>(
-                    //    defaultArraySize, prefabArraySize, overrideArraySize);
                     ENTLIB_ASSERT(defaultArraySize == arr.getRawSize().defaultValue);
                     ENTLIB_ASSERT(prefabArraySize.has_value() == arr.getRawSize().hasPrefab);
                     if (prefabArraySize.has_value())
@@ -2863,8 +2856,6 @@ static Ent::Node loadNode(
                 arr.initAdd(Ent::OverrideValueLocation::Default, std::move(tmpNode));
                 ++index;
             }
-            // uint64_t defaultArraySize = _nodeSchema.linearItems->size();
-            // arr.arraySize = Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt);
         }
         result = Ent::Node(std::move(arr), &_nodeSchema);
     }

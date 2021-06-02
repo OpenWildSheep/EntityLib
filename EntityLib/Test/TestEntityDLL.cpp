@@ -167,57 +167,6 @@ try
 
     using EntityPtr = std::unique_ptr<Ent::Entity>;
 
-    /*entlib.rawdataPath = "X:/RawData";
-    {
-        auto const cl = 62662;
-        int fileCount = 0;
-        std::vector<std::filesystem::path> pathToCheckout;
-        for (auto& p : std::filesystem::recursive_directory_iterator(entlib.rawdataPath))
-        {
-            if (p.path().extension() == ".entity")
-            {
-                ++fileCount;
-                if (fileCount % 1 == 0)
-                    pathToCheckout.push_back(p.path());
-            }
-            if (p.path().extension() == ".scene")
-            {
-                ++fileCount;
-                if (fileCount % 1 == 0)
-                    pathToCheckout.push_back(p.path());
-            }
-        }
-        for (auto& p : pathToCheckout)
-        {
-            if (p.extension() == ".entity")
-            {
-                try
-                {
-                    EntityPtr ent = entlib.loadEntity(p);
-                }
-                catch (std::exception& ex)
-                {
-                    std::cerr << typeid(ex).name() << " : " << ex.what() << std::endl;
-                }
-            }
-            if (p.extension() == ".scene")
-            {
-                try
-                {
-                    EntityPtr ent = entlib.loadEntity(p);
-                }
-                catch (std::exception& ex)
-                {
-                    std::cerr << typeid(ex).name() << " : " << ex.what() << std::endl;
-                }
-            }
-        }
-    }*/
-
-    std::cout << "RawData check done" << std::endl;
-
-    entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
-
     // Test $ref links in entlib.schema.schema.allDefinitions
     char const* colorRef = "./RuntimeComponents.json#/definitions/Color";
     ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(colorRef) == 1);

@@ -235,7 +235,7 @@ try
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->isSet());
         ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isDefault());
-        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getDefaultInt() == 6);
+        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getDefaultInt() == 3);
         ENTLIB_ASSERT(
             heightObj->root.at("Subdivision")->getSchema()->userMeta["testUserMetatdata"].get<int>()
             == 42);
@@ -1061,7 +1061,7 @@ try
     scene->getObjects().front()->addComponent("BeamGeneratorGD")->root.getFieldNames();
     auto fieldNameCount =
         scene->getObjects().front()->addComponent("HeightObj")->root.getFieldNames().size();
-    ENTLIB_ASSERT(fieldNameCount == 6);
+    ENTLIB_ASSERT(fieldNameCount == 8);
 
     auto ep1Iter = std::find_if(
         begin(scene->getObjects()),

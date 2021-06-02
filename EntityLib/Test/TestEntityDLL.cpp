@@ -334,6 +334,7 @@ try
     {
         Ent::Entity ent(entlib);
         ent.setInstanceOf("prefab.entity");
+        ENTLIB_ASSERT(not ent.hasOverride());
         ENTLIB_ASSERT(ent.getInstanceOf() == std::string("prefab.entity"));
     }
 
@@ -1007,6 +1008,7 @@ try
         EntityPtr ent = entlib.makeInstanceOf("entity-subscene.entity");
         auto subs = ent->getSubSceneComponent();
 
+        ENTLIB_ASSERT(not ent->hasOverride());
         ENTLIB_ASSERT(not empty(subs->embedded->getObjects()));
 
         auto&& allSubEntities = subs->embedded->getObjects();

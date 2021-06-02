@@ -869,7 +869,8 @@ namespace Ent
         std::ofstream file(path);
         if (not file.is_open())
         {
-            throw std::runtime_error(format("Can't open file for write: %ls", path.c_str()));
+            throw std::runtime_error(
+                format(R"(Can't open file for write: "%s")", path.generic_string().c_str()));
         }
         file << node.dump(4);
     }
@@ -2601,10 +2602,10 @@ struct FileSystemError : public std::runtime_error
         std::string const& msg, std::filesystem::path const& path1, std::error_code error)
     {
         return Ent::format(
-            "%s %s : '%ls'",
+            R"(%s %s : "%s")",
             msg.c_str(),
             Ent::convertANSIToUTF8(error.message()).c_str(),
-            path1.c_str());
+            path1.generic_string().c_str());
     }
     FileSystemError(std::string const& msg, std::filesystem::path const& path1, std::error_code error)
         : std::runtime_error(makeWhatMessage(msg, path1, error))
@@ -2628,10 +2629,10 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
     if (error)
     {
         const auto msg = not std::filesystem::exists(absPath) ?
-                             format("file doesn't exist: %ls", absPath.c_str()) :
+                             format(R"(file doesn't exist: "%s")", absPath.generic_string().c_str()) :
                              format(
-                                 "last_write_time(p): invalid argument: %ls (%s)",
-                                 absPath.c_str(),
+                                 R"(last_write_time(p): invalid argument: "%s" (%s))",
+                                 absPath.generic_string().c_str(),
                                  error.message().c_str());
         throw FileSystemError(msg, absPath, error);
     }
@@ -2650,32 +2651,33 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
 
     if (reload)
     {
-        json document = loadJsonFile(absPath);
-        if (document.count("Objects") and typeid(Type) == typeid(Entity)
-            or (document.count("Name") or document.count("InstanceOf") or document.count("Components"))
-                   and typeid(Type) == typeid(Scene))
+        try
         {
-            // we are trying to load a legacy scene through loadScene method
-            // or a new Scene format through loadLegacyScene method
-            throw UnsupportedFormat();
-        }
-        if (validationEnabled)
-        {
-            try
+            json document = loadJsonFile(absPath);
+            if (document.count("Objects") and typeid(Type) == typeid(Entity)
+                or (document.count("Name") or document.count("InstanceOf")
+                    or document.count("Components"))
+                       and typeid(Type) == typeid(Scene))
+            {
+                // we are trying to load a legacy scene through loadScene method
+                // or a new Scene format through loadLegacyScene method
+                throw UnsupportedFormat();
+            }
+            if (validationEnabled)
             {
                 validate(schema.schema, toolsDir, document);
             }
-            catch (...)
-            {
-                ENTLIB_LOG_ERROR("validating : %ls", absPath.c_str());
-                throw;
-            }
-        }
 
-        std::unique_ptr<Type> entity = load(*this, schema, document, _super);
-        auto file = typename Cache::mapped_type{std::move(entity), timestamp};
-        auto iter_bool = cache.insert_or_assign(relPath, std::move(file));
-        return std::get<0>(iter_bool)->second.data;
+            std::unique_ptr<Type> entity = load(*this, schema, document, _super);
+            auto file = typename Cache::mapped_type{std::move(entity), timestamp};
+            auto iter_bool = cache.insert_or_assign(relPath, std::move(file));
+            return std::get<0>(iter_bool)->second.data;
+        }
+        catch (...)
+        {
+            ENTLIB_LOG_ERROR(R"(loading : "%s")", absPath.generic_string().c_str());
+            throw;
+        }
     }
     else
     {
@@ -2955,7 +2957,11 @@ void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path con
     {
         constexpr size_t MessSize = 1024;
         std::array<char, MessSize> message = {};
-        sprintf_s(message.data(), MessSize, "Can't open file for write: %ls", entityPath.c_str());
+        sprintf_s(
+            message.data(),
+            MessSize,
+            R"(Can't open file for write: "%s")",
+            entityPath.generic_string().c_str());
         throw std::runtime_error(message.data());
     }
     json document = ::saveEntity(schema, _entity);
@@ -2971,7 +2977,7 @@ void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path con
         }
         catch (...)
         {
-            ENTLIB_LOG_ERROR("saving entity : %ls", entityPath.c_str());
+            ENTLIB_LOG_ERROR(R"(saving entity : "%s")", entityPath.generic_string().c_str());
             throw;
         }
     }
@@ -3020,7 +3026,9 @@ std::filesystem::path Ent::EntityLib::getRelativePath(std::filesystem::path cons
             else
             {
                 throw std::runtime_error(format(
-                    "_path %ls in not inside rawdata %ls", _path.c_str(), rawdataPath.c_str()));
+                    R"(_path "%s" in not inside rawdata "%s")",
+                    _path.generic_string().c_str(),
+                    rawdataPath.generic_string().c_str()));
             }
         }
 

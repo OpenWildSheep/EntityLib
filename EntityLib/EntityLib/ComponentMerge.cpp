@@ -1,4 +1,5 @@
 #include "include/ComponentMerge.h"
+#include "include/EntityLibCore.h"
 
 #include <set>
 #include <fstream>
@@ -184,7 +185,8 @@ void Ent::updateComponents(std::filesystem::path const& _toolsDir)
     std::ofstream file(mergedSchemaPath);
     if (not file.is_open())
     {
-        throw std::runtime_error("Can't open file for write: " + mergedSchemaPath.u8string());
+        throw std::runtime_error(format(
+            R"(Can't open file for write: "%s")", mergedSchemaPath.generic_string().c_str()));
     }
     file << sceneSch.dump(4);
 }

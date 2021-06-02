@@ -775,6 +775,10 @@ try
 
         // Test insert in union_set (+save/load)
         ENTLIB_ASSERT(actorStates.mapGet("ActionClamberRise") != nullptr);
+
+        // Test remove component
+        ENTLIB_ASSERT(ent->getComponent("TransformGD") == nullptr);
+        ENTLIB_ASSERT(ent->getSubSceneComponent() == nullptr);
     };
 
     {
@@ -801,6 +805,16 @@ try
         // Test insert in map
         ENTLIB_ASSERT(tags->mapGet("e") == nullptr);
         ENTLIB_ASSERT(tags->mapInsert("e") != nullptr);
+
+        // Test erase in Components
+        ENTLIB_ASSERT(ent->getComponent("TransformGD") != nullptr);
+        ent->removeComponent("TransformGD");
+        ENTLIB_ASSERT(ent->getComponent("TransformGD") == nullptr);
+
+        ENTLIB_ASSERT(ent->getComponent("SubScene") == nullptr);
+        ENTLIB_ASSERT(ent->getSubSceneComponent() != nullptr);
+        ent->removeSubSceneComponent();
+        ENTLIB_ASSERT(ent->getSubSceneComponent() == nullptr);
 
         test_erase(ent.get());
 

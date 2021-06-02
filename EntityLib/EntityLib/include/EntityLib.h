@@ -6,6 +6,7 @@
 #include <vector>
 #include <memory>
 #include <map>
+#include <set>
 #include <array>
 
 #include "../../../external/mapbox/variant.hpp"
@@ -415,7 +416,7 @@ namespace Ent
         size_t version{}; ///< @todo remove?
         size_t index{}; ///< Useful to keep the componants order in the json file. To make diffs easier.
         DeleteCheck deleteCheck;
-        bool hasPrefab{}; ///< True if if override an other component (not just default)
+        bool hasPrefab{}; ///< True if it override an other component (not just default)
 
         Component(
             nlohmann::json _rawData,
@@ -527,6 +528,7 @@ namespace Ent
             EntityLib const& _entlib,
             Override<String> _name,
             std::map<std::string, Component> _components,
+            std::set<std::string> _removedComponents,
             std::unique_ptr<SubSceneComponent> _subSceneComponent,
             Node _actorStates = {},
             Node _color = {},
@@ -673,11 +675,14 @@ namespace Ent
         /// @warning All Nodes into the Entity will be invalidated
         void setInstanceOf(std::string const& _prefab);
 
+        nlohmann::json saveEntity() const;
+
     private:
         void updateSubSceneOwner();
         EntityLib const* entlib{}; ///< Reference the entity lib to find the schema when needed
         Override<String> name; ///< Entity name
         std::map<std::string, Component> components; ///< All components of this Entity
+        std::set<std::string> removedComponents;
         std::unique_ptr<SubSceneComponent> subSceneComponent; ///< the optional SubScene Component
         Node actorStates; ///< All actorStates of this Entity
         Node color; ///< The optional Color of the Entity

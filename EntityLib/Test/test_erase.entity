@@ -75,6 +75,14 @@
             },
             "Type": "StickToTerrain",
             "Version": 1
+        },
+        {
+            "Data": null,
+            "Type": "SubScene"
+        },
+        {
+            "Data": null,
+            "Type": "TransformGD"
         }
     ],
     "InstanceOf": "prefab.entity",

@@ -34,7 +34,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
     Ent::ComponentsSchema const& _schema,
     json const& _entities,
     Ent::Scene const* _super);
-static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _scene);
+static json saveScene(Ent::Scene const& _scene);
 
 namespace Ent
 {
@@ -1687,6 +1687,7 @@ namespace Ent
         EntityLib const& _entlib,
         Override<String> _name,
         std::map<std::string, Component> _components,
+        std::set<std::string> _removedComponents,
         std::unique_ptr<SubSceneComponent> _subSceneComponent,
         Node _actorStates,
         Node _color,
@@ -1697,6 +1698,7 @@ namespace Ent
         : entlib(&_entlib)
         , name(std::move(_name))
         , components(std::move(_components))
+        , removedComponents(std::move(_removedComponents))
         , subSceneComponent(std::move(_subSceneComponent))
         , actorStates(std::move(_actorStates))
         , color(std::move(_color))
@@ -1726,6 +1728,7 @@ namespace Ent
             *entlib,
             name,
             std::move(instComponents),
+            removedComponents,
             std::move(instSubSceneComponent),
             actorStates,
             color,
@@ -1814,6 +1817,7 @@ namespace Ent
         Ent::Subschema const& compSchema = *AT(entlib->schema.components, _type);
         Ent::Component comp{
             json(), false, _type, loadNode(entlib, compSchema, json(), nullptr), 1, components.size()};
+        removedComponents.erase(_type);
         auto iter_bool = components.emplace(_type, std::move(comp));
         return &(iter_bool.first->second);
     }
@@ -1830,7 +1834,16 @@ namespace Ent
     void Entity::removeComponent(char const* _type)
     {
         // TODO : Use dependencies
-        components.erase(_type);
+        auto iter = components.find(_type);
+        if (iter != end(components))
+        {
+            Component const& comp = iter->second;
+            if (comp.hasPrefab)
+            {
+                removedComponents.insert(_type);
+            }
+            components.erase(iter);
+        }
     }
 
     std::vector<char const*> Entity::getComponentTypes() const
@@ -1871,6 +1884,7 @@ namespace Ent
         if (subSceneComponent == nullptr)
         {
             subSceneComponent = std::make_unique<SubSceneComponent>();
+            removedComponents.erase("SubScene");
         }
         return &(*subSceneComponent);
     }
@@ -1880,6 +1894,7 @@ namespace Ent
         if (subSceneComponent != nullptr)
         {
             subSceneComponent.reset();
+            removedComponents.insert("SubScene");
         }
     }
 
@@ -1901,6 +1916,7 @@ namespace Ent
             *entlib,
             name.makeInstanceOf(),
             std::move(instComponents),
+            std::set<std::string>{},
             std::move(instSubSceneComponent),
             actorStates.makeInstanceOf(),
             color.makeInstanceOf(),
@@ -2452,7 +2468,6 @@ struct MergeMapOverride
                                                defaultElementCount + prefabAdditionalElementCount
                                                + instanceAdditionalElementCount} :
                                            tl::nullopt;
-        // arr.arraySize = Override<uint64_t>{defaultElementCount, prefabArraySize, instanceArraySize};
         ENTLIB_ASSERT(defaultElementCount == arr.getRawSize().defaultValue);
         ENTLIB_ASSERT(prefabArraySize.has_value() == arr.getRawSize().hasPrefab);
         if (prefabArraySize.has_value())
@@ -3264,6 +3279,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     }
 
     std::map<std::string, Ent::Component> components;
+    std::set<std::string> removedComponents;
     std::unique_ptr<Ent::SubSceneComponent> subSceneComponent;
     size_t index = 0;
     if (_entNode.count("Components") != 0)
@@ -3273,6 +3289,12 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         {
             auto const cmpType = compNode.at("Type").get<std::string>();
             json const& data = compNode.at("Data");
+            if (data.is_null())
+            {
+                removedComponents.insert(cmpType);
+                continue;
+            }
+
             if (cmpType == "SubScene")
             {
                 Ent::SubSceneComponent const* superComp = superEntity->getSubSceneComponent();
@@ -3335,6 +3357,10 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     for (auto const& type_comp : superEntity->getComponents())
     {
         auto const& cmpType = std::get<0>(type_comp);
+        if (removedComponents.count(cmpType) != 0)
+        {
+            continue;
+        }
         auto const& superComp = std::get<1>(type_comp);
         if (components.count(cmpType) == 0)
         {
@@ -3352,7 +3378,8 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     }
     {
         Ent::SubSceneComponent const* superComp = superEntity->getSubSceneComponent();
-        if (superComp != nullptr and subSceneComponent == nullptr)
+        if (superComp != nullptr and subSceneComponent == nullptr
+            and removedComponents.count("SubScene") == 0)
         {
             subSceneComponent = std::make_unique<Ent::SubSceneComponent>(
                 superComp->isEmbedded,
@@ -3365,6 +3392,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         _entlib,
         std::move(ovName),
         std::move(components),
+        std::move(removedComponents),
         std::move(subSceneComponent),
         std::move(ovActorStates),
         std::move(ovColor),
@@ -3586,59 +3614,58 @@ std::unique_ptr<Ent::Scene> Ent::EntityLib::loadLegacyScene(std::filesystem::pat
     return loadLegacySceneReadOnly(_scenePath)->clone();
 }
 
-static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& _entity)
+nlohmann::json Ent::Entity::saveEntity() const
 {
+    ComponentsSchema const& _schema = entlib->schema;
     json entNode;
 
     // Always save Name since it is use for override
-    entNode.emplace("Name", _entity.getNameValue().get().c_str());
+    entNode.emplace("Name", getNameValue().get().c_str());
 
-    if (_entity.getInstanceOfValue().isSet())
+    if (getInstanceOfValue().isSet())
     {
-        entNode.emplace("InstanceOf", _entity.getInstanceOfValue().get().c_str());
+        entNode.emplace("InstanceOf", getInstanceOfValue().get().c_str());
     }
 
-    Ent::Subschema const& colorSchema = AT(_schema.schema.allDefinitions, Ent::colorSchemaName);
-    if (_entity.getColorValue().hasOverride())
+    Subschema const& colorSchema = AT(_schema.schema.allDefinitions, colorSchemaName);
+    if (getColorValue().hasOverride())
     {
-        entNode.emplace("Color", Ent::EntityLib::dumpNode(colorSchema, _entity.getColorValue()));
+        entNode.emplace("Color", EntityLib::dumpNode(colorSchema, getColorValue()));
     }
 
-    if (_entity.getThumbnailValue().isSet())
+    if (getThumbnailValue().isSet())
     {
-        entNode.emplace("Thumbnail", _entity.getThumbnail());
+        entNode.emplace("Thumbnail", getThumbnail());
     }
 
-    if (_entity.getMaxActivationLevelValue().isSet())
+    if (getMaxActivationLevelValue().isSet())
     {
-        entNode.emplace(
-            "MaxActivationLevel", getActivationLevelString(_entity.getMaxActivationLevel()));
+        entNode.emplace("MaxActivationLevel", getActivationLevelString(getMaxActivationLevel()));
     }
 
     json& componentsNode = entNode["Components"] = json::array();
-    std::vector<Ent::Component const*> sortedComp;
-    for (auto&& type_comp : _entity.getComponents())
+    std::vector<Component const*> sortedComp;
+    for (auto&& type_comp : getComponents())
     {
         sortedComp.push_back(&std::get<1>(type_comp));
     }
-    Ent::Component subscenePlaceholder{json(), true, "SubScene", Ent::Node(), 1, 0};
-    if (Ent::SubSceneComponent const* subscene = _entity.getSubSceneComponent())
+    Component subscenePlaceholder{json(), true, "SubScene", Node(), 1, 0};
+    if (SubSceneComponent const* subscene = getSubSceneComponent())
     {
         subscenePlaceholder.index = subscene->index;
         sortedComp.push_back(&subscenePlaceholder);
     }
-    std::sort(
-        begin(sortedComp), end(sortedComp), [](Ent::Component const* cmp, Ent::Component const* cmp2) {
-            return cmp->index < cmp2->index;
-        });
-    for (Ent::Component const* comp : sortedComp)
+    std::sort(begin(sortedComp), end(sortedComp), [](Component const* cmp, Component const* cmp2) {
+        return cmp->index < cmp2->index;
+    });
+    for (Component const* comp : sortedComp)
     {
         if (comp->type == "SubScene")
         {
-            Ent::SubSceneComponent const* subscene = _entity.getSubSceneComponent();
+            SubSceneComponent const* subscene = getSubSceneComponent();
             ENTLIB_ASSERT(subscene != nullptr);
             bool const subsceneHasOverride = subscene->hasOverride();
-            bool const hasInstanceOf = _entity.getInstanceOf() != nullptr;
+            bool const hasInstanceOf = getInstanceOf() != nullptr;
             if ((subsceneHasOverride and hasInstanceOf) or not hasInstanceOf)
             {
                 json data;
@@ -3649,7 +3676,7 @@ static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& 
                 }
                 if (subscene->isEmbedded)
                 {
-                    data.emplace("Embedded", saveScene(_schema, *subscene->embedded)["Objects"]);
+                    data.emplace("Embedded", saveScene(*subscene->embedded)["Objects"]);
                 }
 
                 json compNode;
@@ -3665,17 +3692,22 @@ static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& 
             compNode.emplace("Version", comp->version);
             compNode.emplace("Type", comp->type);
             compNode.emplace(
-                "Data", Ent::EntityLib::dumpNode(*AT(_schema.components, comp->type), comp->root));
+                "Data", EntityLib::dumpNode(*AT(_schema.components, comp->type), comp->root));
 
             componentsNode.emplace_back(std::move(compNode));
         }
     }
-    Ent::Subschema const& actorStatesSchema =
-        AT(_schema.schema.allDefinitions, Ent::actorStatesSchemaName);
-    if (_entity.getActorStates().hasOverride())
+    for (auto const& type : removedComponents)
     {
-        entNode.emplace(
-            "ActorStates", Ent::EntityLib::dumpNode(actorStatesSchema, _entity.getActorStates()));
+        json compNode;
+        compNode.emplace("Type", type);
+        compNode.emplace("Data", json{});
+        componentsNode.emplace_back(std::move(compNode));
+    }
+    Subschema const& actorStatesSchema = AT(_schema.schema.allDefinitions, actorStatesSchemaName);
+    if (getActorStates().hasOverride())
+    {
+        entNode.emplace("ActorStates", EntityLib::dumpNode(actorStatesSchema, getActorStates()));
     }
     return entNode;
 }
@@ -3716,6 +3748,7 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
         *entlib,
         getNameValue().detach().makeOverridedInstanceOf(std::string(getName()) + "_detached"),
         std::move(detComponents),
+        std::set<std::string>{}, // removedComponents
         std::move(detSubSceneComponent),
         actorStates.detach(),
         std::move(detachedColor),
@@ -3742,7 +3775,7 @@ void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path con
         sprintf_s(message.data(), MessSize, "Can't open file for write: %ls", entityPath.c_str());
         throw std::runtime_error(message.data());
     }
-    json document = ::saveEntity(schema, _entity);
+    json document = _entity.saveEntity();
     file << document.dump(4);
     file.close();
 
@@ -3831,7 +3864,7 @@ void Ent::EntityLib::clearCache()
     m_sceneCache.clear();
 }
 
-static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _scene)
+static json saveScene(Ent::Scene const& _scene)
 {
     json document;
 
@@ -3843,7 +3876,7 @@ static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _s
     {
         if (ent->hasOverride())
         {
-            objects.emplace_back(::saveEntity(_schema, *ent));
+            objects.emplace_back(ent->saveEntity());
         }
     }
 

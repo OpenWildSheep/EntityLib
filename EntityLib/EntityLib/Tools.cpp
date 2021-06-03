@@ -11,29 +11,33 @@ using namespace nlohmann;
 /// @cond PRIVATE
 
 json loadJsonFile(std::filesystem::path const& path)
-try
 {
     std::ifstream file(path, std::ios::binary | std::ios::ate);
     if (not file.is_open())
     {
-        throw std::runtime_error("Can't open file for read: " + path.u8string());
+        throw std::runtime_error(
+            Ent::format(R"(Can't open file for read: "%s")", path.generic_string().c_str()));
     }
-    auto const length = file.tellg();
-    file.seekg(0, std::ios::beg);
-    std::vector<char> data((size_t(length)));
-    file.read(data.data(), length);
-    json doc = json::parse(
-        data,
-        nullptr, // Parser callback
-        true, // allow_exceptions
-        true // ignore_comments
-    );
-    return doc;
-}
-catch (...)
-{
-    ENTLIB_LOG_ERROR("parsing file %ls", path.c_str());
-    throw;
+    try
+    {
+
+        auto const length = file.tellg();
+        file.seekg(0, std::ios::beg);
+        std::vector<char> data((size_t(length)));
+        file.read(data.data(), length);
+        json doc = json::parse(
+            data,
+            nullptr, // Parser callback
+            true, // allow_exceptions
+            true // ignore_comments
+        );
+        return doc;
+    }
+    catch (...)
+    {
+        ENTLIB_LOG_ERROR(R"(parsing file "%s")", path.generic_string().c_str());
+        throw;
+    }
 }
 
 char const* Ent::getRefTypeName(char const* link)

@@ -1,0 +1,41 @@
+{
+    "Components": [
+        {
+            "Data": {},
+            "Type": "TransformGD",
+            "Version": 1
+        },
+        {
+            "Data": {},
+            "Type": "EventHandlerGD",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "Embedded": [
+                    {
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Position": [
+                                        0,
+                                        0,
+                                        0
+                                    ]
+                                },
+                                "Type": "TransformGD",
+                                "Version": 1
+                            }
+                        ],
+                        "InstanceOf": "Creature/my_inventory_level1.entity",
+                        "Name": "inventory"
+                    }
+                ],
+                "isEmbedded": true
+            },
+            "Type": "SubScene",
+            "Version": 1
+        }
+    ],
+    "Name": "my_creature_level1_ent"
+}

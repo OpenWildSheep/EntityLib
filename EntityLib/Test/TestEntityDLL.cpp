@@ -1098,6 +1098,16 @@ try
         ENTLIB_ASSERT(not empty(ovrdSubs->embedded->getObjects()));
     }
 
+    {
+        auto ent = entlib.loadEntity(R"(Creature/my_creature_level2.entity)");
+        auto& subscene = ent->getSubSceneComponent()
+                             ->embedded->getEntity(0)
+                             ->getSubSceneComponent()
+                             ->embedded->getObjects();
+        ENTLIB_ASSERT(subscene.size() == 1);
+        ENTLIB_ASSERT(strcmp(subscene.front()->getName(), "default_level2") == 0);
+    }
+
     // ******************* Test twice the same key in map *************************************
     {
         ENTLIB_CHECK_EXCEPTION(entlib.loadEntity("key_double.entity"), Ent::InvalidJsonData);
@@ -1108,7 +1118,6 @@ try
         EntityPtr ent = std::make_unique<Ent::Entity>(entlib);
         ENTLIB_ASSERT(ent->getColor() == (std::array<double, 4>{1., 1., 1., 1.}));
     }
-
     // ********************************** Test load/save scene ************************************
     entlib.rawdataPath = "X:/RawData";
 

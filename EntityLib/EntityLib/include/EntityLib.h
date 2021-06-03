@@ -531,6 +531,10 @@ namespace Ent
         {
             return actorStates;
         }
+        Node& getActorStates()
+        {
+            return actorStates;
+        }
 
         /// @brief Make the Entity independent from its prefab (instanceOf)
         ///
@@ -760,7 +764,7 @@ namespace Ent
         /// @brief Create an Entity which instanciate an other.
         ///
         /// This allow to override some properties without change the prefab properties.
-        std::unique_ptr<Entity> makeInstanceOf(std::string _instanceOf ///< Path to the prefab Entity
+        std::unique_ptr<Entity> makeInstanceOf(std::string const& _instanceOf ///< Path to the prefab Entity
         ) const;
 
         struct EntityFile

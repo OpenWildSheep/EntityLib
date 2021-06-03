@@ -39,7 +39,7 @@ namespace Ent
     /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
     struct BadType : std::runtime_error
     {
-        BadType(); ///< ctor
+        BadType(char const* _message = nullptr); ///< ctor
     };
 
     /// Exception thrown when a metadata is missing in the json schema

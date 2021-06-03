@@ -124,7 +124,17 @@ namespace Ent
     {
         if (wrapper.has_value())
         {
-            return wrapper->at(metaData->typeField.c_str())->getString();
+            ENTLIB_ASSERT_MSG(
+                wrapper->count(metaData->typeField.c_str()),
+                "Field %s not found in union",
+                metaData->typeField.c_str());
+            auto typeNode = wrapper->at(metaData->typeField.c_str());
+            ENTLIB_ASSERT(typeNode);
+            ENTLIB_ASSERT_MSG(
+                not typeNode->hasDefaultValue(),
+                "In Union, the type-field (%s) is expected to be set",
+                metaData->typeField.c_str());
+            return typeNode->getString();
         }
         else
         {
@@ -2930,10 +2940,10 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
         detachedMaxActivationLevel);
 }
 
-std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string _instanceOf) const
+std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string const& _instanceOf) const
 {
     std::unique_ptr<Ent::Entity> inst = std::make_unique<Ent::Entity>(*this);
-    inst->setInstanceOf(std::move(_instanceOf));
+    inst->setInstanceOf(_instanceOf);
     return inst;
 }
 

@@ -8,6 +8,7 @@
 #include "Map.h"
 
 using namespace nlohmann;
+using namespace mapbox::util;
 
 Ent::Array::Array(EntityLib const* _entlib, Subschema const* _schema)
     : m_schema(_schema)
@@ -30,12 +31,12 @@ Ent::Map::KeyType Ent::Array::getChildKey(Ent::Node const* _child) const
 
 Ent::Node* Ent::Array::at(uint64_t _index)
 {
-    return mapbox::util::apply_visitor([_index](auto& a) { return a.at(_index); }, m_data);
+    return apply_visitor([_index](auto& a) { return a.at(_index); }, m_data);
 }
 
 Ent::Node const* Ent::Array::at(uint64_t _index) const
 {
-    return mapbox::util::apply_visitor([_index](auto const& a) { return a.at(_index); }, m_data);
+    return apply_visitor([_index](auto const& a) { return a.at(_index); }, m_data);
 }
 
 bool Ent::Array::isErased(Map::KeyType const& _key) const
@@ -102,27 +103,27 @@ std::vector<Ent::Node const*> Ent::Array::getItemsWithRemoved() const
 
 std::vector<Ent::Node const*> Ent::Array::getItems() const
 {
-    return mapbox::util::apply_visitor([](auto& a) { return a.getItems(); }, m_data);
+    return apply_visitor([](auto& a) { return a.getItems(); }, m_data);
 }
 
 void Ent::Array::checkInvariants() const
 {
-    return mapbox::util::apply_visitor([](auto& a) { return a.checkInvariants(); }, m_data);
+    return apply_visitor([](auto& a) { return a.checkInvariants(); }, m_data);
 }
 
 bool Ent::Array::hasOverride() const
 {
-    return mapbox::util::apply_visitor([](auto& a) { return a.hasOverride(); }, m_data);
+    return apply_visitor([](auto& a) { return a.hasOverride(); }, m_data);
 }
 
 bool Ent::Array::hasPrefabValue() const
 {
-    return mapbox::util::apply_visitor([](auto& a) { return a.hasPrefabValue(); }, m_data);
+    return apply_visitor([](auto& a) { return a.hasPrefabValue(); }, m_data);
 }
 
 bool Ent::Array::hasDefaultValue() const
 {
-    return mapbox::util::apply_visitor([](auto& a) { return a.hasDefaultValue(); }, m_data);
+    return apply_visitor([](auto& a) { return a.hasDefaultValue(); }, m_data);
 }
 
 void Ent::Array::pop()
@@ -133,7 +134,7 @@ void Ent::Array::pop()
 
 void Ent::Array::clear()
 {
-    mapbox::util::apply_visitor([](auto& a) { return a.clear(); }, m_data);
+    apply_visitor([](auto& a) { return a.clear(); }, m_data);
 }
 
 bool Ent::Array::empty() const
@@ -144,8 +145,7 @@ bool Ent::Array::empty() const
 Ent::Array Ent::Array::detach() const
 {
     Array result{nullptr, m_schema};
-    result.m_data =
-        mapbox::util::apply_visitor([](auto& a) { return MapOrVector(a.detach()); }, m_data);
+    result.m_data = apply_visitor([](auto& a) { return MapOrVector(a.detach()); }, m_data);
     result.checkInvariants();
     return result;
 }
@@ -153,8 +153,7 @@ Ent::Array Ent::Array::detach() const
 Ent::Array Ent::Array::makeInstanceOf() const
 {
     Array result{nullptr, m_schema};
-    result.m_data =
-        mapbox::util::apply_visitor([](auto& a) { return MapOrVector(a.makeInstanceOf()); }, m_data);
+    result.m_data = apply_visitor([](auto& a) { return MapOrVector(a.makeInstanceOf()); }, m_data);
     return result;
 }
 
@@ -165,7 +164,7 @@ void Ent::Array::arraySetSize(Override<size_t> _size)
 
 void Ent::Array::computeMemory(MemoryProfiler& _prof) const
 {
-    mapbox::util::apply_visitor([&_prof](auto& a) { return a.computeMemory(_prof); }, m_data);
+    apply_visitor([&_prof](auto& a) { return a.computeMemory(_prof); }, m_data);
 }
 
 Ent::Node* Ent::Array::arrayInitPush(Node _node)

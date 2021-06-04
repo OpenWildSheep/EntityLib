@@ -331,9 +331,12 @@ Ent::Map Ent::Map::detach() const
     {
         if (elt.isPresent.get())
         {
-            Node detachedNode(elt.node->detach());
-            auto key = ::getChildKey(m_schema, &detachedNode);
-            result.insert(OverrideValueLocation::Override, key, std::move(detachedNode));
+            Element detachedElt;
+            detachedElt.node = elt.node->detach();
+            detachedElt.isPresent = elt.isPresent.detach();
+            auto key = getChildKey(m_schema, detachedElt.node.get());
+            result.m_items.emplace_back(std::move(detachedElt));
+            result.m_itemMap.emplace(key, result.m_items.size() - 1);
         }
     }
     result.checkInvariants();
@@ -385,7 +388,8 @@ Ent::Map::Element Ent::Map::Element::makeInstanceOf() const
 
 size_t Ent::Map::size() const
 {
-    return (size_t)std::count_if(begin(m_items), end(m_items), [](auto&& d) { return d.isPresent.get(); });
+    return (size_t)std::count_if(
+        begin(m_items), end(m_items), [](auto&& d) { return d.isPresent.get(); });
 }
 
 size_t Ent::Map::getDefaultSize() const

@@ -108,6 +108,7 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const
     {
         if (oneOfDataField != nullptr and oneOfDataField == name_prop.first)
         {
+            // Allow Data field in OneOf to be "null"
             json oneOf;
             oneOf.push_back(convertToInstanceSchema(name_prop.second));
             oneOf.push_back(nullType);
@@ -116,7 +117,9 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const
             instSchema["properties"][name_prop.first] = items;
         }
         else
+        {
             instSchema["properties"][name_prop.first] = convertToInstanceSchema(name_prop.second);
+        }
         if (name_prop.second->required)
         {
             requiredList.push_back(name_prop.first.c_str());

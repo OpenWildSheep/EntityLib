@@ -19,6 +19,7 @@ namespace Ent
     struct Subschema;
     class EntityLib;
 
+    /// Storage of an Array which has no overridePolicy (simple array or tuple)
     struct Vector
     {
         explicit Vector(EntityLib const* _entlib = nullptr, Subschema const* _schema = nullptr);
@@ -39,8 +40,6 @@ namespace Ent
         void pop();
         bool isTuple() const;
         void clear();
-        // void addRemovedDefault(OverrideValueLocation _removedIn);
-        // Node* push(OverrideValueLocation loc);
         void computeMemory(MemoryProfiler& prof) const;
         Node* push();
         Node* initPush(Node _node);

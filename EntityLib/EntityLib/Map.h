@@ -19,6 +19,7 @@ namespace Ent
     struct Subschema;
     class EntityLib;
 
+    /// Storage of an Array which has the overridePolicy map or set
     struct Map
     {
         using KeyType = mapbox::util::variant<String, int64_t>;

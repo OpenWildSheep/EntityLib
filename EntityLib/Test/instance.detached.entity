@@ -28,7 +28,31 @@
     "Components": [
         {
             "Data": {
-                "InSpiritWorld": false
+                "InSpiritWorld": false,
+                "perceptionData": {
+                    "m_minPerceivedSizePerSize": [
+                        [
+                            "tiny",
+                            "tiny"
+                        ],
+                        [
+                            "small",
+                            "small"
+                        ],
+                        [
+                            "medium",
+                            "small"
+                        ],
+                        [
+                            "big",
+                            "small"
+                        ],
+                        [
+                            "enormous",
+                            "big"
+                        ]
+                    ]
+                }
             },
             "Type": "ActorGD",
             "Version": 1

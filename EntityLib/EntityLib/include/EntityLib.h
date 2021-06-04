@@ -114,7 +114,7 @@ namespace Ent
         Node const* mapGet(KeyType const& _key) const; ///< @return the item with _key, or nullptr
         Node* mapInsert(KeyType const& _key); ///< @pre hasKey(). @brief Insert a new item with _key
 
-        /// @return true if it is a map/set and the _key was removed
+        /// @return true if it is a map/set and the element with _key was removed
         bool isErased(KeyType const& _key) const;
 
         std::vector<Node const*> getItems() const; ///< Get all not removed items
@@ -126,16 +126,26 @@ namespace Ent
 
         bool empty() const;
 
+        Array detach() const;
+        Array makeInstanceOf() const;
+
+        void arraySetSize(Override<size_t> _size);
+
         void computeMemory(MemoryProfiler& prof) const;
 
         size_t size() const
         {
-            return arraySize.get();
+            return mapbox::util::apply_visitor([](auto& a) { return a.size(); }, data);
         }
 
-        Override<uint64_t> const& getRawSize() const
+        size_t getDefaultSize() const
         {
-            return arraySize;
+            return mapbox::util::apply_visitor([](auto& a) { return a.getDefaultSize(); }, data);
+        }
+
+        size_t getPrefabSize() const
+        {
+            return mapbox::util::apply_visitor([](auto& a) { return a.getPrefabSize(); }, data);
         }
 
         Subschema const* getSchema() const
@@ -143,36 +153,132 @@ namespace Ent
             return schema;
         }
 
+        tl::optional<size_t> getRawSize(OverrideValueLocation _location) const
+        {
+            return mapbox::util::apply_visitor(
+                [_location](auto& a) { return a.getRawSize(_location); }, data);
+        }
+
         // **************************** For array initialization **********************************
         Node* initAdd(OverrideValueLocation, Node _node); ///< @pre This _node is not yet added
         /// @pre hasKey() and the key doesn't exist in map
         Node* mapInitInsert(OverrideValueLocation, KeyType _key, Node _node);
         /// @pre not hasKey()
-        Node* arrayInitPush(OverrideValueLocation _loc, Node _node);
+        Node* arrayInitPush(Node _node);
         /// Declare an element added in prefab and removed in instance
-        void addRemovedPrefab();
+        // void arrayAddRemovedPrefab();
         /// Declare an element added in default and removed in prefab or instance
-        void addRemovedDefault(OverrideValueLocation _removedIn);
+        // void arrayAddRemovedDefault(OverrideValueLocation _removedIn);
 
     private:
-        void incrementSize(OverrideValueLocation loc, bool decrement = false);
-        void cleanSize();
         void checkInvariants() const;
-        bool mapEraseImpl(KeyType const& key);
-        Node* mapRestoreImpl(KeyType const& _key);
-        Node const* mapGetImpl(KeyType const& _key) const;
-        Node* mapInsertImpl(KeyType const& _key);
-
-        struct Deletable
-        {
-            size_t index;
-            bool deleted; // Make it Override-able
-        };
+        // bool mapEraseImpl(KeyType const& key);
+        // Node const* mapGetImpl(KeyType const& _key) const;
+        // Node* mapInsertImpl(KeyType const& _key);
 
         Subschema const* schema = nullptr;
-        std::vector<value_ptr<Node>> data; ///< List of items of the array
-        std::map<KeyType, Deletable> itemMap;
-        Override<uint64_t> arraySize; ///< Size of the array, to keep track on array size changes
+
+        struct Map
+        {
+            struct Element
+            {
+                value_ptr<Node> node;
+                Override<bool> isPresent;
+
+                bool hasOverride() const;
+                bool hasPrefabValue() const;
+                bool hasDefaultValue() const;
+                Element makeInstanceOf() const;
+            };
+
+            Subschema const* schema = nullptr;
+            std::vector<Element> items; ///< List of items of the array
+            std::map<KeyType, size_t> itemMap;
+
+            size_t size() const
+            {
+                return std::count_if(
+                    begin(items), end(items), [](auto&& d) { return d.isPresent.get(); });
+            }
+
+            size_t getDefaultSize() const
+            {
+                return std::count_if(begin(items), end(items), [](Element const& d) {
+                    return d.isPresent.defaultValue;
+                });
+            }
+
+            size_t getPrefabSize() const
+            {
+                return std::count_if(begin(items), end(items), [](Element const& d) {
+                    return d.isPresent.getPrefab();
+                });
+            }
+
+            bool hasOverride() const;
+            bool hasPrefabValue() const;
+            bool hasDefaultValue() const;
+
+            Node* at(uint64_t _index);
+            Node const* at(uint64_t _index) const;
+
+            bool erase(KeyType const& _key);
+            Node const* get(KeyType const& _key) const;
+            Ent::Node* insert(KeyType const& _key);
+            bool isErased(KeyType const& _key) const;
+            Ent::Node* insert(OverrideValueLocation loc, KeyType _key, Node _node);
+            void checkInvariants() const;
+            std::vector<Node const*> getItemsWithRemoved() const;
+            std::vector<Node const*> getItems() const;
+            void clear();
+            void computeMemory(MemoryProfiler& prof) const;
+            Map detach() const;
+            Map makeInstanceOf() const;
+            tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
+        };
+
+        struct Vector
+        {
+            Subschema const* schema = nullptr;
+            std::vector<value_ptr<Node>> data; ///< List of items of the array
+            Override<uint64_t> arraySize; ///< Size of the array, to keep track on array size changes
+
+            size_t size() const
+            {
+                return arraySize.get();
+            }
+
+            size_t getDefaultSize() const
+            {
+                return arraySize.defaultValue;
+            }
+
+            size_t getPrefabSize() const
+            {
+                return arraySize.getPrefab();
+            }
+
+            bool hasOverride() const;
+            bool hasPrefabValue() const;
+            bool hasDefaultValue() const;
+            Node* at(uint64_t _index);
+            Node const* at(uint64_t _index) const;
+            void checkInvariants() const;
+            std::vector<Node const*> getItems() const;
+            void pop();
+            bool isTuple() const;
+            void clear();
+            void addRemovedDefault(OverrideValueLocation _removedIn);
+            // Node* push(OverrideValueLocation loc);
+            void computeMemory(MemoryProfiler& prof) const;
+            Node* push();
+            Node* initPush(Node _node);
+            Vector detach() const;
+            Vector makeInstanceOf() const;
+            tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
+        };
+        using MapOrVector = mapbox::util::variant<Vector, Map>;
+        MapOrVector data;
     };
 
     enum class ActivationLevel

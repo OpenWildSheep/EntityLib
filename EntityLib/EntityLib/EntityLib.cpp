@@ -98,20 +98,48 @@ namespace Ent
 
     // ************************************ Array *************************************************
 
+    bool Ent::Array::Map::Element::hasOverride() const
+    {
+        return isPresent.hasOverride || node->hasOverride();
+    }
+
+    bool Ent::Array::Map::Element::hasPrefabValue() const
+    {
+        return isPresent.hasPrefab or node->hasPrefabValue();
+    }
+
+    bool Ent::Array::Map::Element::hasDefaultValue() const
+    {
+        return (not isPresent.hasPrefab and not isPresent.hasOverride) and node->hasDefaultValue();
+    }
+
+    bool Ent::Array::Map::hasOverride() const
+    {
+        return std::any_of(begin(items), end(items), std::mem_fn(&Element::hasOverride));
+    }
+
+    bool Ent::Array::Map::hasPrefabValue() const
+    {
+        return std::any_of(begin(items), end(items), std::mem_fn(&Element::hasPrefabValue));
+    }
+
     Ent::Array::Array(Subschema const* _schema)
         : schema(_schema)
-        , arraySize(0llu, tl::nullopt, tl::nullopt)
     {
+        if (hasKey())
+            data = Map{_schema};
+        else
+            data = Vector{_schema};
         ENTLIB_ASSERT(schema != nullptr);
     }
 
-    bool Ent::Array::hasOverride() const
+    bool Ent::Array::Vector::hasOverride() const
     {
         return arraySize.isSet()
                || std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasOverride));
     }
 
-    bool Ent::Array::hasPrefabValue() const
+    bool Ent::Array::Vector::hasPrefabValue() const
     {
         return arraySize.hasPrefab
                || std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasPrefabValue));
@@ -119,6 +147,14 @@ namespace Ent
 
     static Ent::Array::KeyType getChildKey(Subschema const* _arraySchema, Node const* _child)
     {
+        auto const& pol = _arraySchema->meta.get<Subschema::ArrayMeta>().overridePolicy;
+        ENTLIB_ASSERT(pol == "map" or pol == "set");
+        if (pol == "map")
+        {
+            ENTLIB_ASSERT(_child->size() == 2);
+            ENTLIB_ASSERT(_child->at(0llu) != nullptr);
+            ENTLIB_ASSERT(_child->at(1llu) != nullptr);
+        }
         auto&& meta = _arraySchema->meta.get<Ent::Subschema::ArrayMeta>();
         using namespace Ent;
         switch (hash(meta.overridePolicy))
@@ -235,33 +271,18 @@ namespace Ent
         }
     }
 
-    void Ent::Array::cleanSize()
-    {
-        if (arraySize.hasOverride)
-        {
-            if (arraySize.hasPrefab)
-            {
-                if (arraySize.prefabValue == arraySize.overrideValue)
-                {
-                    arraySize.hasOverride = false;
-                }
-            }
-            else if (arraySize.defaultValue == arraySize.overrideValue)
-            {
-                arraySize.hasOverride = false;
-            }
-        }
-        if (arraySize.hasPrefab)
-        {
-            if (arraySize.defaultValue == arraySize.prefabValue)
-            {
-                arraySize.hasPrefab = false;
-            }
-        }
-    }
-
     Node* Ent::Array::at(uint64_t _index)
     {
+        return mapbox::util::apply_visitor([_index](auto& a) { return a.at(_index); }, data);
+    }
+
+    Node const* Ent::Array::at(uint64_t _index) const
+    {
+        return mapbox::util::apply_visitor([_index](auto const& a) { return a.at(_index); }, data);
+    }
+
+    Node* Ent::Array::Vector::at(uint64_t _index)
+    {
         if (_index < data.size())
         {
             return data[_index].get();
@@ -271,7 +292,7 @@ namespace Ent
             return nullptr;
         }
     }
-    Node const* Ent::Array::at(uint64_t _index) const
+    Node const* Ent::Array::Vector::at(uint64_t _index) const
     {
         if (_index < data.size())
         {
@@ -283,56 +304,58 @@ namespace Ent
         }
     }
 
-    bool Ent::Array::mapEraseImpl(KeyType const& _key)
+    Node* Ent::Array::Map::at(uint64_t _index)
+    {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+        return const_cast<Ent::Node*>(std::as_const(*this).at(_index));
+    }
+    Node const* Ent::Array::Map::at(uint64_t _index) const
+    {
+        if (_index < items.size())
+        {
+            return items[_index].node.get();
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    bool Ent::Array::Map::erase(KeyType const& _key)
     {
         auto iter = itemMap.find(_key);
         if (iter == itemMap.end())
         {
             return false;
         }
-        if (!iter->second.deleted)
+        size_t index = iter->second;
+        Element& element = items.at(index);
+        if (element.isPresent.get())
         {
-            iter->second.deleted = true;
-            arraySize.set(arraySize.get() - 1);
-            cleanSize();
+            element.isPresent.set(false);
         }
         checkInvariants();
         return true;
     }
 
-    Node* Ent::Array::mapRestoreImpl(KeyType const& _key)
+    Node const* Ent::Array::Map::get(KeyType const& _key) const
     {
         auto iter = itemMap.find(_key);
         if (iter == itemMap.end())
         {
             return nullptr;
         }
-        if (iter->second.deleted)
-        {
-            iter->second.deleted = false;
-            arraySize.set(arraySize.get() + 1);
-        }
-        checkInvariants();
-        return data[iter->second.index].get();
-    }
-
-    Node const* Ent::Array::mapGetImpl(KeyType const& _key) const
-    {
-        auto iter = itemMap.find(_key);
-        if (iter == itemMap.end())
+        size_t index = iter->second;
+        Element const& element = items.at(index);
+        if (not element.isPresent.get())
         {
             return nullptr;
         }
-        if (iter->second.deleted)
-        {
-            return nullptr;
-        }
-        return data[iter->second.index].get();
+        return element.node.get();
     }
 
-    Ent::Node* Ent::Array::mapInsertImpl(KeyType const& _key)
+    Ent::Node* Ent::Array::Map::insert(KeyType const& _key)
     {
-        ENTLIB_ASSERT_MSG(hasKey(), "Can't 'mapInsert' in simple array. Only in map/set");
         auto iter = itemMap.find(_key);
         if (iter == itemMap.end())
         {
@@ -340,102 +363,78 @@ namespace Ent
             ENTLIB_ASSERT_MSG(itemSchema, "map/set expect a singularItems");
             auto newNode = loadNode(nullptr, itemSchema->get(), json(), nullptr);
             setChildKey(schema, &newNode, _key);
-            return mapInitInsert(OverrideValueLocation::Override, _key, std::move(newNode));
+            return insert(OverrideValueLocation::Override, _key, std::move(newNode));
         }
-        if (iter->second.deleted)
+        size_t index = iter->second;
+        Element& element = items.at(index);
+        if (not element.isPresent.get())
         {
-            iter->second.deleted = false;
-            arraySize.set(arraySize.get() + 1);
+            element.isPresent.set(true);
         }
         checkInvariants();
-        return data[iter->second.index].get();
+        return element.node.get();
     }
 
     bool Ent::Array::isErased(KeyType const& _key) const
+    {
+        ENTLIB_ASSERT(data.is<Map>());
+        return data.get<Map>().isErased(_key);
+    }
+
+    bool Ent::Array::Map::isErased(KeyType const& _key) const
     {
         auto iter = itemMap.find(_key);
         if (iter == itemMap.end())
         {
             return false;
         }
-        return iter->second.deleted;
+        return not items.at(iter->second).isPresent.get();
     }
 
     bool Ent::Array::mapErase(KeyType const& _key)
     {
-        return mapEraseImpl(_key);
+        ENTLIB_ASSERT(data.is<Map>());
+        return data.get<Map>().erase(_key);
     }
 
     Ent::Node* Ent::Array::mapGet(KeyType const& _key)
     {
+        ENTLIB_ASSERT(data.is<Map>());
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-        return const_cast<Ent::Node*>(std::as_const(*this).mapGetImpl(_key));
+        return const_cast<Ent::Node*>(std::as_const(*this).data.get<Map>().get(_key));
     }
     Ent::Node const* Ent::Array::mapGet(KeyType const& _key) const
     {
-        return mapGetImpl(_key);
+        return data.get<Map>().get(_key);
     }
     Ent::Node* Ent::Array::mapInsert(KeyType const& _key)
     {
-        return mapInsertImpl(_key);
+        return data.get<Map>().insert(_key);
     }
 
-    void Ent::Array::incrementSize(OverrideValueLocation loc, bool decrement)
+    Ent::Node* Ent::Array::Map::insert(OverrideValueLocation loc, KeyType _key, Node _node)
     {
-        auto operation = [decrement](auto&& v) {
-            v = decrement ? v - 1 : v + 1;
-        };
-        switch (loc)
-        {
-        case OverrideValueLocation::Default:
-            operation(arraySize.defaultValue);
-            if (arraySize.hasPrefab)
-            {
-                operation(arraySize.prefabValue);
-            }
-            if (arraySize.hasOverride)
-            {
-                operation(arraySize.overrideValue);
-            }
-            break;
-        case OverrideValueLocation::Prefab:
-            if (not arraySize.hasPrefab)
-            {
-                arraySize.prefabValue = arraySize.defaultValue;
-                arraySize.hasPrefab = true;
-            }
-            operation(arraySize.prefabValue);
-            if (arraySize.hasOverride)
-            {
-                operation(arraySize.overrideValue);
-            }
-            break;
-        case OverrideValueLocation::Override:
-            if (not arraySize.hasOverride)
-            {
-                arraySize.overrideValue =
-                    arraySize.hasPrefab ? arraySize.prefabValue : arraySize.defaultValue;
-                arraySize.hasOverride = true;
-            }
-            operation(arraySize.overrideValue);
-            break;
-        }
-        cleanSize();
-    }
-
-    Ent::Node* Ent::Array::mapInitInsert(OverrideValueLocation loc, KeyType _key, Node _node)
-    {
-        ENTLIB_ASSERT(hasKey());
-        ENTLIB_ASSERT(mapGet(_key) == nullptr);
+        ENTLIB_ASSERT(get(_key) == nullptr);
         ENTLIB_ASSERT(itemMap.count(_key) == 0);
         checkInvariants();
         ENTLIB_ASSERT(&schema->singularItems->get() == _node.getSchema());
-        data.emplace_back(std::move(_node));
-        auto ptr = data.back().get();
-        itemMap.emplace(std::move(_key), Deletable{data.size() - 1});
-        incrementSize(loc);
+        items.emplace_back(Element{std::move(_node)});
+        auto& elt = items.back();
+        switch (loc)
+        {
+        case OverrideValueLocation::Default: elt.isPresent.defaultValue = true; break;
+        case OverrideValueLocation::Prefab:
+            elt.isPresent.prefabValue = true;
+            elt.isPresent.hasPrefab = true;
+            break;
+        case OverrideValueLocation::Override:
+            elt.isPresent.overrideValue = true;
+            elt.isPresent.hasOverride = true;
+            break;
+        }
+        itemMap.emplace(std::move(_key), items.size() - 1);
         checkInvariants();
-        return ptr;
+        return elt.node.get();
     }
 
     bool Ent::Array::hasKey() const
@@ -446,6 +445,11 @@ namespace Ent
 
     bool Ent::Array::isTuple() const
     {
+        return data.get<Vector>().isTuple();
+    }
+
+    bool Ent::Array::Vector::isTuple() const
+    {
         return schema->linearItems.has_value();
     }
 
@@ -454,18 +458,62 @@ namespace Ent
         if (hasKey())
         {
             auto key = getChildKey(schema, &_node);
-            return mapInitInsert(loc, key, std::move(_node));
+            return data.get<Map>().insert(loc, key, std::move(_node));
         }
         else
         {
-            return arrayInitPush(loc, std::move(_node));
+            return data.get<Vector>().initPush(std::move(_node));
         }
+    }
+
+    Node* Ent::Array::mapInitInsert(OverrideValueLocation _loc, KeyType _key, Node _node)
+    {
+        return data.get<Map>().insert(_loc, _key, _node);
     }
 
     std::vector<Node const*> Ent::Array::getItemsWithRemoved() const
     {
+        ENTLIB_ASSERT(data.is<Map>());
+        return data.get<Map>().getItemsWithRemoved();
+    }
+
+    std::vector<Node const*> Ent::Array::Map::getItemsWithRemoved() const
+    {
         std::vector<Node const*> result;
-        result.reserve(arraySize.get());
+        result.reserve(items.size());
+        for (auto&& elt : items)
+        {
+            result.emplace_back(elt.node.get());
+        }
+        return result;
+    }
+
+    std::vector<Node const*> Ent::Array::getItems() const
+    {
+        return mapbox::util::apply_visitor([](auto& a) { return a.getItems(); }, data);
+    }
+
+    std::vector<Node const*> Ent::Array::Map::getItems() const
+    {
+        checkInvariants();
+        std::vector<Node const*> result;
+        result.reserve(items.size());
+        for (auto&& node : items)
+        {
+            auto key = getChildKey(schema, node.node.get());
+            if (node.isPresent.get())
+            {
+                result.emplace_back(node.node.get());
+            }
+        }
+        return result;
+    }
+
+    std::vector<Node const*> Ent::Array::Vector::getItems() const
+    {
+        checkInvariants();
+        std::vector<Node const*> result;
+        result.reserve(data.size());
         for (auto&& node : data)
         {
             result.emplace_back(node.get());
@@ -473,49 +521,15 @@ namespace Ent
         return result;
     }
 
-    std::vector<Node const*> Ent::Array::getItems() const
-    {
-        checkInvariants();
-        std::vector<Node const*> result;
-        result.reserve(arraySize.get());
-        if (hasKey())
-        {
-            for (auto&& node : data)
-            {
-                auto key = getChildKey(schema, node.get());
-                auto deleted = itemMap.at(key).deleted;
-                if (not deleted)
-                {
-                    result.emplace_back(node.get());
-                }
-            }
-        }
-        else
-        {
-            for (auto&& node : data)
-            {
-                result.emplace_back(node.get());
-            }
-        }
-        return result;
-    }
-
     void Ent::Array::checkInvariants() const
     {
-        if (data.size() >= 2)
-        {
-            ENTLIB_ASSERT(data[1].get() != data[0].get());
-        }
-        size_t deleted = 0;
-        if (hasKey())
-        {
-            ENTLIB_ASSERT(itemMap.size() == data.size());
-            deleted =
-                (std::size_t)std::count_if(begin(itemMap), end(itemMap), [](auto&& key_wrapper) {
-                    return std::get<1>(key_wrapper).deleted;
-                });
-        }
-        ENTLIB_ASSERT(arraySize.get() == data.size() - deleted);
+        return mapbox::util::apply_visitor([](auto& a) { return a.checkInvariants(); }, data);
+    }
+
+    void Ent::Array::Vector::checkInvariants() const
+    {
+        ENTLIB_ASSERT(schema != nullptr);
+        ENTLIB_ASSERT(data.size() == arraySize.get());
         if (schema->singularItems != nullptr)
         {
             auto singItem = &schema->singularItems->get();
@@ -523,87 +537,196 @@ namespace Ent
             {
                 ENTLIB_ASSERT(singItem == itm->getSchema());
             }
-            for (auto& key_item : itemMap)
-            {
-                auto schem = data[std::get<1>(key_item).index]->getSchema();
-                ENTLIB_ASSERT(singItem == schem);
-            }
         }
+        else
+        {
+            ENTLIB_ASSERT(data.size() == schema->linearItems->size());
+        }
+    }
+
+    void Ent::Array::Map::checkInvariants() const
+    {
+        ENTLIB_ASSERT(schema->singularItems != nullptr);
+        auto const& overridePolicy = schema->meta.get<Subschema::ArrayMeta>().overridePolicy;
+        ENTLIB_ASSERT(overridePolicy == "map" or overridePolicy == "set");
+        auto singItem = &schema->singularItems->get();
+        for (auto& itm : items)
+        {
+            ENTLIB_ASSERT(singItem == itm.node->getSchema());
+        }
+        for (auto& key_item : itemMap)
+        {
+            auto schem = items.at(std::get<1>(key_item)).node->getSchema();
+            ENTLIB_ASSERT(singItem == schem);
+        }
+    }
+
+    bool Ent::Array::hasOverride() const
+    {
+        return mapbox::util::apply_visitor([](auto& a) { return a.hasOverride(); }, data);
+    }
+
+    bool Ent::Array::hasPrefabValue() const
+    {
+        return mapbox::util::apply_visitor([](auto& a) { return a.hasPrefabValue(); }, data);
     }
 
     bool Ent::Array::hasDefaultValue() const
     {
-        bool const sizeHasDefault = (!arraySize.hasOverride && !arraySize.hasPrefab);
-        if (not sizeHasDefault)
-        {
-            return false;
-        }
-        if (hasKey())
-        {
-            return std::all_of(begin(itemMap), end(itemMap), [this](auto&& key_wrapper) {
-                return data[std::get<1>(key_wrapper).index]->hasDefaultValue()
-                       and not std::get<1>(key_wrapper).deleted;
-            });
-        }
-        else
-        {
-            return std::all_of(begin(data), end(data), std::mem_fn(&Node::hasDefaultValue));
-        }
+        return mapbox::util::apply_visitor([](auto& a) { return a.hasDefaultValue(); }, data);
+    }
+
+    bool Ent::Array::Map::hasDefaultValue() const
+    {
+        return std::all_of(begin(items), end(items), std::mem_fn(&Element::hasDefaultValue));
+    }
+
+    bool Ent::Array::Vector::hasDefaultValue() const
+    {
+        return std::all_of(begin(data), end(data), std::mem_fn(&Node::hasDefaultValue));
     }
 
     void Ent::Array::pop()
     {
         ENTLIB_ASSERT(not hasKey());
+        data.get<Vector>().pop();
+    }
+
+    void Ent::Array::Vector::pop()
+    {
         ENTLIB_ASSERT(not isTuple());
         ENTLIB_ASSERT(not data.empty());
         data.pop_back();
         arraySize.set(arraySize.get() - 1);
-        cleanSize();
     }
 
     void Ent::Array::clear()
     {
+        mapbox::util::apply_visitor([](auto& a) { return a.clear(); }, data);
+    }
+
+    void Ent::Array::Map::clear()
+    {
+        for (auto&& elt : items)
+        {
+            elt.isPresent.set(false);
+        }
+        checkInvariants();
+    }
+
+    void Ent::Array::Vector::clear()
+    {
         ENTLIB_ASSERT(not isTuple());
-        if (hasKey())
-        {
-            for (auto&& key_item : itemMap)
-            {
-                auto& deletable = std::get<1>(key_item);
-                if (!deletable.deleted)
-                {
-                    deletable.deleted = true;
-                    arraySize.set(arraySize.get() - 1);
-                    cleanSize();
-                }
-            }
-        }
-        else
-        {
-            data.clear();
-            arraySize.set(0);
-            cleanSize();
-        }
+        data.clear();
+        arraySize.set(0);
         checkInvariants();
     }
 
     bool Ent::Array::empty() const
     {
-        return arraySize.get() == 0;
+        return size() == 0;
     }
 
-    void Ent::Array::addRemovedPrefab()
+    Array Ent::Array::detach() const
     {
-        incrementSize(OverrideValueLocation::Prefab);
-        incrementSize(OverrideValueLocation::Override, true);
+        Array result{schema};
+        result.data =
+            mapbox::util::apply_visitor([](auto& a) { return MapOrVector(a.detach()); }, data);
+        result.checkInvariants();
+        return result;
     }
 
-    void Ent::Array::addRemovedDefault(OverrideValueLocation _removedIn)
+    Ent::Array::Map Ent::Array::Map::detach() const
     {
-        incrementSize(OverrideValueLocation::Default);
-        incrementSize(_removedIn, true);
+        Map result{schema};
+        for (auto const elt : items)
+        {
+            if (elt.isPresent.get())
+            {
+                Node detachedNode(elt.node->detach());
+                auto key = getChildKey(schema, &detachedNode);
+                result.insert(OverrideValueLocation::Override, key, std::move(detachedNode));
+            }
+        }
+        result.checkInvariants();
+        return result;
+    }
+
+    Ent::Array::Map Ent::Array::Map::makeInstanceOf() const
+    {
+        checkInvariants();
+        Map result{schema};
+        for (auto const& elt : items)
+        {
+            auto key = getChildKey(schema, elt.node.get());
+            result.items.push_back(elt.makeInstanceOf());
+            result.itemMap[key] = result.items.size() - 1;
+        }
+        return result;
+    }
+
+    Ent::Array::Vector Ent::Array::Vector::detach() const
+    {
+        Vector result{schema};
+        for (auto const elt : data)
+        {
+            result.data.emplace_back(elt->detach());
+        }
+        result.arraySize = arraySize.detach();
+        result.checkInvariants();
+        return result;
+    }
+
+    Ent::Array::Vector Ent::Array::Vector::makeInstanceOf() const
+    {
+        Vector result{schema};
+        for (auto const elt : data)
+        {
+            result.data.emplace_back(elt->makeInstanceOf());
+        }
+        result.arraySize = arraySize.makeInstanceOf();
+        return result;
+    }
+
+    Ent::Array::Map::Element Ent::Array::Map::Element::makeInstanceOf() const
+    {
+        Element result;
+        result.node = node->makeInstanceOf();
+        result.isPresent = isPresent.makeInstanceOf();
+        return result;
+    }
+
+    Array Ent::Array::makeInstanceOf() const
+    {
+        Array result{schema};
+        result.data = mapbox::util::apply_visitor(
+            [](auto& a) { return MapOrVector(a.makeInstanceOf()); }, data);
+        return result;
+    }
+
+    void Ent::Array::arraySetSize(Override<size_t> _size)
+    {
+        data.get<Vector>().arraySize = _size;
     }
 
     void Ent::Array::computeMemory(MemoryProfiler& prof) const
+    {
+        mapbox::util::apply_visitor([&prof](auto& a) { return a.computeMemory(prof); }, data);
+    }
+
+    void Ent::Array::Map::computeMemory(MemoryProfiler& prof) const
+    {
+        prof.addMem("Array::data", items.capacity() * sizeof(items.front()));
+        for (auto&& item : items)
+        {
+            item.node->computeMemory(prof);
+            prof.addMem("Array::data::value_ptr", sizeof(Ent::Node));
+        }
+        prof.addMem("Array::itemMap", itemMap.size() * sizeof(*itemMap.begin()));
+        prof.addNodes(items.size());
+    }
+
+    void Ent::Array::Vector::computeMemory(MemoryProfiler& prof) const
     {
         prof.addMem("Array::data", data.capacity() * sizeof(data.front()));
         for (auto&& item : data)
@@ -611,31 +734,61 @@ namespace Ent
             item->computeMemory(prof);
             prof.addMem("Array::data::value_ptr", sizeof(Ent::Node));
         }
-        prof.addMem("Array::itemMap", itemMap.size() * sizeof(*itemMap.begin()));
         prof.addNodes(data.size());
     }
 
-    Node* Ent::Array::arrayInitPush(OverrideValueLocation _loc, Node _node)
+    tl::optional<size_t> Ent::Array::Vector::getRawSize(OverrideValueLocation _location) const
+    {
+        return arraySize.getRaw(_location);
+    }
+
+    tl::optional<size_t> Ent::Array::Map::getRawSize(OverrideValueLocation _location) const
+    {
+        switch (_location)
+        {
+        case OverrideValueLocation::Default: return getDefaultSize();
+        case OverrideValueLocation::Prefab:
+        {
+            auto prefabSize = getPrefabSize();
+            auto defaultsize = getDefaultSize();
+            return (prefabSize == defaultsize) ? tl::optional<size_t>{} : prefabSize;
+        }
+        case OverrideValueLocation::Override:
+        {
+            auto instanceSize = size();
+            auto prefabsize = getPrefabSize();
+            return (instanceSize == prefabsize) ? tl::optional<size_t>{} : instanceSize;
+        }
+        }
+        ENTLIB_LOGIC_ERROR("Unknown OverrideValueLocation : %d", _location);
+        return {};
+    }
+
+    Node* Ent::Array::arrayInitPush(Node _node)
+    {
+        ENTLIB_ASSERT_MSG(not hasKey(), "Can't 'push' in a map or set. Use 'mapInsert'.");
+        return data.get<Vector>().initPush(_node);
+    }
+
+    Node* Ent::Array::Vector::initPush(Node _node)
     {
         ENTLIB_ASSERT(
             schema->singularItems == nullptr || (&schema->singularItems->get() == _node.getSchema()));
-        ENTLIB_ASSERT_MSG(not hasKey(), "Can't 'push' in a map or set. Use 'mapInsert'.");
         data.emplace_back(Ent::make_value<Node>(std::move(_node)));
-        Node* ptr = data.back().get();
-        incrementSize(_loc);
-        checkInvariants();
-        return ptr;
+        arraySize.set(arraySize.get() + 1);
+        return data.back().get();
     }
 
     Node* Ent::Array::arrayPush()
     {
         ENTLIB_ASSERT_MSG(not hasKey(), "Can't 'push' in a map or set. Use 'mapInsert'.");
-        ENTLIB_ASSERT_MSG(
-            schema->singularItems.get() != nullptr,
-            "Array is not a singularItems array (Can't push in a pair/tuple)");
+        return data.get<Vector>().push();
+    }
+
+    Node* Ent::Array::Vector::push()
+    {
         SubschemaRef const* itemSchema = schema->singularItems.get();
-        return arrayInitPush(
-            OverrideValueLocation::Override, loadNode(nullptr, itemSchema->get(), json(), nullptr));
+        return initPush(loadNode(nullptr, itemSchema->get(), json(), nullptr));
     }
 
     // ************************************ Union *************************************************
@@ -835,7 +988,7 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            return value.get<Array>().getRawSize().getRaw(_location);
+            return value.get<Array>().getRawSize(_location);
         }
         throw BadType();
     }
@@ -1056,15 +1209,7 @@ namespace Ent
 
         Node operator()(Array const& _arr) const
         {
-            Array out(_arr.getSchema());
-            for (auto&& item : _arr.getItems())
-            {
-                Node detached = item->detach();
-                auto loc = detached.hasOverride() ? OverrideValueLocation::Override :
-                                                    OverrideValueLocation::Default;
-                out.initAdd(loc, std::move(detached));
-            }
-            return Node(std::move(out), schema);
+            return Node(_arr.detach(), schema);
         }
 
         Node operator()(Object const& _obj) const
@@ -1112,12 +1257,7 @@ namespace Ent
 
         Node operator()(Array const& _arr) const
         {
-            Array out(_arr.getSchema());
-            for (auto&& item : _arr.getItems())
-            {
-                out.initAdd(OverrideValueLocation::Prefab, item->makeInstanceOf());
-            }
-            return Node(std::move(out), schema);
+            return Node(_arr.makeInstanceOf(), schema);
         }
 
         Node operator()(Object const& _obj) const
@@ -2438,7 +2578,6 @@ struct MergeMapOverride
             });
         }
         Ent::Array arr{&_nodeSchema};
-        size_t nodeIdx = 0;
         for (auto const& key_node : result)
         {
             auto&& key = std::get<0>(key_node);
@@ -2454,27 +2593,6 @@ struct MergeMapOverride
             {
                 arr.mapErase(KeyType(key));
             }
-            ++nodeIdx;
-        }
-        const auto prefabArraySize =
-            prefabAdditionalElementCount > 0 ?
-                tl::optional<uint64_t>{defaultElementCount + prefabAdditionalElementCount} :
-                tl::nullopt;
-        const auto instanceArraySize = instanceAdditionalElementCount != 0 ?
-                                           tl::optional<uint64_t>{
-                                               defaultElementCount + prefabAdditionalElementCount
-                                               + instanceAdditionalElementCount} :
-                                           tl::nullopt;
-        ENTLIB_ASSERT(defaultElementCount == arr.getRawSize().defaultValue);
-        ENTLIB_ASSERT(prefabArraySize.has_value() == arr.getRawSize().hasPrefab);
-        if (prefabArraySize.has_value())
-        {
-            ENTLIB_ASSERT(*prefabArraySize == arr.getRawSize().prefabValue);
-        }
-        ENTLIB_ASSERT(instanceArraySize.has_value() == arr.getRawSize().hasOverride);
-        if (instanceArraySize.has_value())
-        {
-            ENTLIB_ASSERT(*instanceArraySize == arr.getRawSize().overrideValue);
         }
         return arr;
     }
@@ -2629,6 +2747,15 @@ static Ent::Node loadNode(
                         arr.initAdd(loc, std::move(tmpNode));
                         ++index;
                     }
+                    if (not arr.hasKey())
+                    {
+                        tl::optional<uint64_t> prefabArraySize =
+                            defaultArraySize == _super->size() ?
+                                tl::nullopt :
+                                tl::optional<uint64_t>{_super->size()};
+                        arr.arraySetSize(Ent::Override<uint64_t>(
+                            defaultArraySize, prefabArraySize, tl::nullopt));
+                    }
                 }
                 else if (_default != nullptr)
                 {
@@ -2640,6 +2767,11 @@ static Ent::Node loadNode(
                         arr.initAdd(Ent::OverrideValueLocation::Default, std::move(tmpNode));
                         ++index;
                     }
+                    if (not arr.hasKey())
+                    {
+                        arr.arraySetSize(
+                            Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt));
+                    }
                 }
                 else
                 {
@@ -2650,28 +2782,16 @@ static Ent::Node loadNode(
                         arr.initAdd(Ent::OverrideValueLocation::Default, std::move(tmpNode));
                         ++index;
                     }
+                    if (not arr.hasKey())
+                    {
+                        arr.arraySetSize(
+                            Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt));
+                    }
                 }
             }
             else // If it is a singularItems and there is _data, we have to use the overridePolicy
             {
                 using namespace Ent;
-                if (_super != nullptr)
-                {
-                    ENTLIB_ASSERT(&_nodeSchema == _super->getSchema());
-                    auto&& superarr = _super->GetRawValue().get<Ent::Array>();
-                    ENTLIB_ASSERT(&_nodeSchema == superarr.getSchema());
-                    ENTLIB_ASSERT(_nodeSchema.singularItems != nullptr);
-                    ENTLIB_ASSERT(
-                        &_nodeSchema.singularItems->get()
-                        == &superarr.getSchema()->singularItems->get());
-                    auto itemSchema = &_nodeSchema.singularItems->get();
-                    for (auto* tmplItem : _super->getItems())
-                    {
-                        auto itemSchema2 = tmplItem->getSchema();
-                        ENTLIB_ASSERT(itemSchema2 == itemSchema);
-                    }
-                }
-
                 MergeMapOverride mergeMapOverride{_nodeSchema, _data, _super, _default, _entlib};
                 auto doRemoveDefault = [](json const&) {
                     return false;
@@ -2795,24 +2915,6 @@ static Ent::Node loadNode(
                         arr.initAdd(loc, std::move(tmpNode));
                         ++index;
                     }
-                    if (_super != nullptr)
-                    {
-                        for (size_t i = _super->size(); i < defaultArraySize; ++i)
-                        {
-                            arr.addRemovedDefault(Ent::OverrideValueLocation::Prefab);
-                        }
-                        for (size_t i = _data.size(); i < _super->size(); ++i)
-                        {
-                            arr.addRemovedPrefab();
-                        }
-                    }
-                    else
-                    {
-                        for (size_t i = _data.size(); i < defaultArraySize; ++i)
-                        {
-                            arr.addRemovedDefault(Ent::OverrideValueLocation::Override);
-                        }
-                    }
                     tl::optional<uint64_t> prefabArraySize =
                         (_super != nullptr and _super->size() != defaultArraySize) ?
                             tl::optional<uint64_t>{_super->size()} :
@@ -2821,17 +2923,8 @@ static Ent::Node loadNode(
                     tl::optional<uint64_t> overrideArraySize =
                         _data.size() == sizeInPrefab ? tl::nullopt :
                                                        tl::optional<uint64_t>{_data.size()};
-                    ENTLIB_ASSERT(defaultArraySize == arr.getRawSize().defaultValue);
-                    ENTLIB_ASSERT(prefabArraySize.has_value() == arr.getRawSize().hasPrefab);
-                    if (prefabArraySize.has_value())
-                    {
-                        ENTLIB_ASSERT(*prefabArraySize == arr.getRawSize().prefabValue);
-                    }
-                    ENTLIB_ASSERT(overrideArraySize.has_value() == arr.getRawSize().hasOverride);
-                    if (overrideArraySize.has_value())
-                    {
-                        ENTLIB_ASSERT(*overrideArraySize == arr.getRawSize().overrideValue);
-                    }
+                    arr.arraySetSize(Ent::Override<uint64_t>(
+                        defaultArraySize, prefabArraySize, overrideArraySize));
                 }
                 break;
                 default:
@@ -2855,9 +2948,11 @@ static Ent::Node loadNode(
                 json const emptyJson;
                 json const& prop = _data.size() > index ? _data.at(index) : emptyJson;
                 Ent::Node tmpNode = loadNode(_entlib, *sub, prop, subSuper, subDefault);
-                arr.initAdd(Ent::OverrideValueLocation::Default, std::move(tmpNode));
+                arr.arrayInitPush(std::move(tmpNode));
                 ++index;
             }
+            uint64_t defaultArraySize = _nodeSchema.linearItems->size();
+            arr.arraySetSize(Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt));
         }
         result = Ent::Node(std::move(arr), &_nodeSchema);
     }
@@ -3031,35 +3126,52 @@ json Ent::EntityLib::dumpNode(
         auto&& meta = _schema.meta.get<Ent::Subschema::ArrayMeta>();
         bool const fullWrite = meta.isMapItem;
         auto const& arr = _node.value.get<Ent::Array>();
-        for (auto& item : arr.getItemsWithRemoved())
+        if (arr.hasKey())
         {
-            if (arr.hasKey() and arr.isErased(getChildKey(&_schema, item)))
+            for (auto& item : arr.getItemsWithRemoved())
             {
-                if (meta.overridePolicy == "map")
+                if (arr.isErased(getChildKey(&_schema, item)))
+                {
+                    if (meta.overridePolicy == "map")
+                    {
+                        ENTLIB_ASSERT(item->getSchema() != nullptr);
+                        json tmpNode;
+                        tmpNode[0] = item->at(0llu)->toJson(
+                            _dumpedValueSource, _superKeyIsTypeName, _entityRefPreProc);
+                        tmpNode[1] = json();
+                        data.emplace_back(std::move(tmpNode));
+                    }
+                    else if (meta.overridePolicy == "set")
+                    {
+                        if (item->getSchema()->type != Ent::DataType::oneOf)
+                        {
+                            throw std::runtime_error(
+                                R"(Can't write an erased element in a set of non-union)");
+                        }
+                        auto& unionMeta = item->getSchema()->meta.get<Ent::Subschema::UnionMeta>();
+                        char const* type = item->getUnionType();
+                        json tmpNode;
+                        tmpNode[unionMeta.typeField] = type;
+                        tmpNode[unionMeta.dataField] = json();
+                        data.emplace_back(std::move(tmpNode));
+                    }
+                }
+                else
                 {
                     ENTLIB_ASSERT(item->getSchema() != nullptr);
-                    json tmpNode;
-                    tmpNode[0] = item->at(0llu)->toJson(
-                        _dumpedValueSource, _superKeyIsTypeName, _entityRefPreProc);
-                    tmpNode[1] = json();
-                    data.emplace_back(std::move(tmpNode));
-                }
-                else if (meta.overridePolicy == "set")
-                {
-                    if (item->getSchema()->type != Ent::DataType::oneOf)
-                    {
-                        throw std::runtime_error(
-                            R"(Can't write an erased element in a set of non-union)");
-                    }
-                    auto& unionMeta = item->getSchema()->meta.get<Ent::Subschema::UnionMeta>();
-                    char const* type = item->getUnionType();
-                    json tmpNode;
-                    tmpNode[unionMeta.typeField] = type;
-                    tmpNode[unionMeta.dataField] = json();
+                    json tmpNode = dumpNode(
+                        *item->getSchema(),
+                        *item,
+                        _dumpedValueSource,
+                        _superKeyIsTypeName,
+                        _entityRefPreProc);
                     data.emplace_back(std::move(tmpNode));
                 }
             }
-            else
+        }
+        else
+        {
+            for (auto& item : arr.getItems())
             {
                 if (item->matchValueSource(_dumpedValueSource) or fullWrite)
                 {
@@ -3072,7 +3184,7 @@ json Ent::EntityLib::dumpNode(
                         _entityRefPreProc);
                     data.emplace_back(std::move(tmpNode));
                 }
-                else if (meta.overridePolicy.empty())
+                else
                 {
                     data.emplace_back(json());
                 }

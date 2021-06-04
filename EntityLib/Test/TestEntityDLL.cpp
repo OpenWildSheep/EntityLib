@@ -119,6 +119,8 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
         ENTLIB_ASSERT_MSG(exception_throw, "Exception not thrown!");                               \
     }
 
+// Test : In Map : hasDefaultValue, when removed in prefab (expect false)
+
 int main(int argc, char** argv)
 try
 {

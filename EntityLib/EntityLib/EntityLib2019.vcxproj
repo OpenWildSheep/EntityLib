@@ -183,6 +183,7 @@
     <ClInclude Include="include\EntityLib.h" />
     <ClInclude Include="include\EntityLibCore.h" />
     <ClInclude Include="include\Schema.h" />
+    <ClInclude Include="Override.h" />
     <ClInclude Include="SchemaLoader.h" />
     <ClInclude Include="Tools.h" />
     <ClInclude Include="ValidJson.h" />

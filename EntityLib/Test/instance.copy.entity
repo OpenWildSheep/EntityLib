@@ -1,6 +1,10 @@
 {
     "ActorStates": [
         {
+            "classData": {},
+            "className": "ActionClimbEdge"
+        },
+        {
             "classData": {
                 "Type": 13
             },
@@ -41,7 +45,10 @@
                     "Tags": [
                         [
                             "a",
-                            []
+                            [
+                                "1",
+                                "2"
+                            ]
                         ],
                         [
                             "b",
@@ -54,6 +61,7 @@
                             "c",
                             [
                                 "1",
+                                "2",
                                 "3"
                             ]
                         ],

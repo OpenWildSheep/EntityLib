@@ -10,8 +10,18 @@ namespace WildRPC {
 
 struct Color;
 struct ColorBuilder;
+struct ColorT;
+
+struct ColorT : public flatbuffers::NativeTable {
+  typedef Color TableType;
+  float r = 0.0f;
+  float g = 0.0f;
+  float b = 0.0f;
+  float a = 0.0f;
+};
 
 struct Color FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ColorT NativeTableType;
   typedef ColorBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_R = 4,
@@ -22,14 +32,26 @@ struct Color FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   float r() const {
     return GetField<float>(VT_R, 0.0f);
   }
+  bool mutate_r(float _r) {
+    return SetField<float>(VT_R, _r, 0.0f);
+  }
   float g() const {
     return GetField<float>(VT_G, 0.0f);
+  }
+  bool mutate_g(float _g) {
+    return SetField<float>(VT_G, _g, 0.0f);
   }
   float b() const {
     return GetField<float>(VT_B, 0.0f);
   }
+  bool mutate_b(float _b) {
+    return SetField<float>(VT_B, _b, 0.0f);
+  }
   float a() const {
     return GetField<float>(VT_A, 0.0f);
+  }
+  bool mutate_a(float _a) {
+    return SetField<float>(VT_A, _a, 0.0f);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -39,6 +61,9 @@ struct Color FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<float>(verifier, VT_A) &&
            verifier.EndTable();
   }
+  ColorT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ColorT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Color> Pack(flatbuffers::FlatBufferBuilder &_fbb, const ColorT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct ColorBuilder {
@@ -82,12 +107,53 @@ inline flatbuffers::Offset<Color> CreateColor(
   return builder_.Finish();
 }
 
+flatbuffers::Offset<Color> CreateColor(flatbuffers::FlatBufferBuilder &_fbb, const ColorT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+inline ColorT *Color::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<ColorT>(new ColorT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Color::UnPackTo(ColorT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = r(); _o->r = _e; }
+  { auto _e = g(); _o->g = _e; }
+  { auto _e = b(); _o->b = _e; }
+  { auto _e = a(); _o->a = _e; }
+}
+
+inline flatbuffers::Offset<Color> Color::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ColorT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateColor(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Color> CreateColor(flatbuffers::FlatBufferBuilder &_fbb, const ColorT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ColorT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _r = _o->r;
+  auto _g = _o->g;
+  auto _b = _o->b;
+  auto _a = _o->a;
+  return WildRPC::CreateColor(
+      _fbb,
+      _r,
+      _g,
+      _b,
+      _a);
+}
+
 inline const WildRPC::Color *GetColor(const void *buf) {
   return flatbuffers::GetRoot<WildRPC::Color>(buf);
 }
 
 inline const WildRPC::Color *GetSizePrefixedColor(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<WildRPC::Color>(buf);
+}
+
+inline Color *GetMutableColor(void *buf) {
+  return flatbuffers::GetMutableRoot<Color>(buf);
 }
 
 inline bool VerifyColorBuffer(
@@ -110,6 +176,18 @@ inline void FinishSizePrefixedColorBuffer(
     flatbuffers::FlatBufferBuilder &fbb,
     flatbuffers::Offset<WildRPC::Color> root) {
   fbb.FinishSizePrefixed(root);
+}
+
+inline std::unique_ptr<WildRPC::ColorT> UnPackColor(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::ColorT>(GetColor(buf)->UnPack(res));
+}
+
+inline std::unique_ptr<WildRPC::ColorT> UnPackSizePrefixedColor(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::ColorT>(GetSizePrefixedColor(buf)->UnPack(res));
 }
 
 }  // namespace WildRPC

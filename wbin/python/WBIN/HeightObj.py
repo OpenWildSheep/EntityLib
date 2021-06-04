@@ -142,8 +142,19 @@ class HeightObj(object):
         return None
 
     # HeightObj
-    def MotifMask(self, j):
+    def Influence(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
+        if o != 0:
+            x = self._tab.Indirect(o + self._tab.Pos)
+            from WBIN.FloatMask import FloatMask
+            obj = FloatMask()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # HeightObj
+    def MotifMask(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(22))
         if o != 0:
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
@@ -156,19 +167,19 @@ class HeightObj(object):
 
     # HeightObj
     def MotifMaskLength(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(22))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # HeightObj
     def MotifMaskIsNone(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(22))
         return o == 0
 
     # HeightObj
     def SourceFileInf(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(22))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(24))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from WBIN.SourceFileInf import SourceFileInf
@@ -177,7 +188,7 @@ class HeightObj(object):
             return obj
         return None
 
-def Start(builder): builder.StartObject(10)
+def Start(builder): builder.StartObject(11)
 def HeightObjStart(builder):
     """This method is deprecated. Please switch to Start."""
     return Start(builder)
@@ -221,7 +232,11 @@ def AddDetailType(builder, detailType): builder.PrependUOffsetTRelativeSlot(7, f
 def HeightObjAddDetailType(builder, detailType):
     """This method is deprecated. Please switch to AddDetailType."""
     return AddDetailType(builder, detailType)
-def AddMotifMask(builder, motifMask): builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(motifMask), 0)
+def AddInfluence(builder, influence): builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(influence), 0)
+def HeightObjAddInfluence(builder, influence):
+    """This method is deprecated. Please switch to AddInfluence."""
+    return AddInfluence(builder, influence)
+def AddMotifMask(builder, motifMask): builder.PrependUOffsetTRelativeSlot(9, flatbuffers.number_types.UOffsetTFlags.py_type(motifMask), 0)
 def HeightObjAddMotifMask(builder, motifMask):
     """This method is deprecated. Please switch to AddMotifMask."""
     return AddMotifMask(builder, motifMask)
@@ -229,7 +244,7 @@ def StartMotifMaskVector(builder, numElems): return builder.StartVector(4, numEl
 def HeightObjStartMotifMaskVector(builder, numElems):
     """This method is deprecated. Please switch to Start."""
     return StartMotifMaskVector(builder, numElems)
-def AddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(9, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
+def AddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(10, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
 def HeightObjAddSourceFileInf(builder, sourceFileInf):
     """This method is deprecated. Please switch to AddSourceFileInf."""
     return AddSourceFileInf(builder, sourceFileInf)
@@ -259,6 +274,7 @@ class HeightObjT(object):
         self.erosionMask = None  # type: Optional[WBIN.FloatMask.FloatMaskT]
         self.detailMask = None  # type: Optional[WBIN.FloatMask.FloatMaskT]
         self.detailType = None  # type: Optional[WBIN.FloatMask.FloatMaskT]
+        self.influence = None  # type: Optional[WBIN.FloatMask.FloatMaskT]
         self.motifMask = None  # type: List[WBIN.FloatMask.FloatMaskT]
         self.sourceFileInf = None  # type: Optional[WBIN.SourceFileInf.SourceFileInfT]
 
@@ -305,6 +321,8 @@ class HeightObjT(object):
             self.detailMask = WBIN.FloatMask.FloatMaskT.InitFromObj(heightObj.DetailMask())
         if heightObj.DetailType() is not None:
             self.detailType = WBIN.FloatMask.FloatMaskT.InitFromObj(heightObj.DetailType())
+        if heightObj.Influence() is not None:
+            self.influence = WBIN.FloatMask.FloatMaskT.InitFromObj(heightObj.Influence())
         if not heightObj.MotifMaskIsNone():
             self.motifMask = []
             for i in range(heightObj.MotifMaskLength()):
@@ -341,6 +359,8 @@ class HeightObjT(object):
             detailMask = self.detailMask.Pack(builder)
         if self.detailType is not None:
             detailType = self.detailType.Pack(builder)
+        if self.influence is not None:
+            influence = self.influence.Pack(builder)
         if self.motifMask is not None:
             motifMasklist = []
             for i in range(len(self.motifMask)):
@@ -369,6 +389,8 @@ class HeightObjT(object):
             AddDetailMask(builder, detailMask)
         if self.detailType is not None:
             AddDetailType(builder, detailType)
+        if self.influence is not None:
+            AddInfluence(builder, influence)
         if self.motifMask is not None:
             AddMotifMask(builder, motifMask)
         if self.sourceFileInf is not None:

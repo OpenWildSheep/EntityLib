@@ -10,8 +10,16 @@ namespace WildRPC {
 
 struct Vector2;
 struct Vector2Builder;
+struct Vector2T;
+
+struct Vector2T : public flatbuffers::NativeTable {
+  typedef Vector2 TableType;
+  float x = 0.0f;
+  float y = 0.0f;
+};
 
 struct Vector2 FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef Vector2T NativeTableType;
   typedef Vector2Builder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_X = 4,
@@ -20,8 +28,14 @@ struct Vector2 FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   float x() const {
     return GetField<float>(VT_X, 0.0f);
   }
+  bool mutate_x(float _x) {
+    return SetField<float>(VT_X, _x, 0.0f);
+  }
   float y() const {
     return GetField<float>(VT_Y, 0.0f);
+  }
+  bool mutate_y(float _y) {
+    return SetField<float>(VT_Y, _y, 0.0f);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -29,6 +43,9 @@ struct Vector2 FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<float>(verifier, VT_Y) &&
            verifier.EndTable();
   }
+  Vector2T *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(Vector2T *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Vector2> Pack(flatbuffers::FlatBufferBuilder &_fbb, const Vector2T* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct Vector2Builder {
@@ -62,12 +79,47 @@ inline flatbuffers::Offset<Vector2> CreateVector2(
   return builder_.Finish();
 }
 
+flatbuffers::Offset<Vector2> CreateVector2(flatbuffers::FlatBufferBuilder &_fbb, const Vector2T *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+inline Vector2T *Vector2::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<Vector2T>(new Vector2T());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Vector2::UnPackTo(Vector2T *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = x(); _o->x = _e; }
+  { auto _e = y(); _o->y = _e; }
+}
+
+inline flatbuffers::Offset<Vector2> Vector2::Pack(flatbuffers::FlatBufferBuilder &_fbb, const Vector2T* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateVector2(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Vector2> CreateVector2(flatbuffers::FlatBufferBuilder &_fbb, const Vector2T *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const Vector2T* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _x = _o->x;
+  auto _y = _o->y;
+  return WildRPC::CreateVector2(
+      _fbb,
+      _x,
+      _y);
+}
+
 inline const WildRPC::Vector2 *GetVector2(const void *buf) {
   return flatbuffers::GetRoot<WildRPC::Vector2>(buf);
 }
 
 inline const WildRPC::Vector2 *GetSizePrefixedVector2(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<WildRPC::Vector2>(buf);
+}
+
+inline Vector2 *GetMutableVector2(void *buf) {
+  return flatbuffers::GetMutableRoot<Vector2>(buf);
 }
 
 inline bool VerifyVector2Buffer(
@@ -90,6 +142,18 @@ inline void FinishSizePrefixedVector2Buffer(
     flatbuffers::FlatBufferBuilder &fbb,
     flatbuffers::Offset<WildRPC::Vector2> root) {
   fbb.FinishSizePrefixed(root);
+}
+
+inline std::unique_ptr<WildRPC::Vector2T> UnPackVector2(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::Vector2T>(GetVector2(buf)->UnPack(res));
+}
+
+inline std::unique_ptr<WildRPC::Vector2T> UnPackSizePrefixedVector2(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::Vector2T>(GetSizePrefixedVector2(buf)->UnPack(res));
 }
 
 }  // namespace WildRPC

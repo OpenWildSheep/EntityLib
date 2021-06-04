@@ -65,3 +65,40 @@ def End(builder): return builder.EndObject()
 def Vector3End(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+
+class Vector3T(object):
+
+    # Vector3T
+    def __init__(self):
+        self.x = 0.0  # type: float
+        self.y = 0.0  # type: float
+        self.z = 0.0  # type: float
+
+    @classmethod
+    def InitFromBuf(cls, buf, pos):
+        vector3 = Vector3()
+        vector3.Init(buf, pos)
+        return cls.InitFromObj(vector3)
+
+    @classmethod
+    def InitFromObj(cls, vector3):
+        x = Vector3T()
+        x._UnPack(vector3)
+        return x
+
+    # Vector3T
+    def _UnPack(self, vector3):
+        if vector3 is None:
+            return
+        self.x = vector3.X()
+        self.y = vector3.Y()
+        self.z = vector3.Z()
+
+    # Vector3T
+    def Pack(self, builder):
+        Start(builder)
+        AddX(builder, self.x)
+        AddY(builder, self.y)
+        AddZ(builder, self.z)
+        vector3 = End(builder)
+        return vector3

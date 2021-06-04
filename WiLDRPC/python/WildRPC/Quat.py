@@ -76,3 +76,43 @@ def End(builder): return builder.EndObject()
 def QuatEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+
+class QuatT(object):
+
+    # QuatT
+    def __init__(self):
+        self.x = 0.0  # type: float
+        self.y = 0.0  # type: float
+        self.z = 0.0  # type: float
+        self.w = 0.0  # type: float
+
+    @classmethod
+    def InitFromBuf(cls, buf, pos):
+        quat = Quat()
+        quat.Init(buf, pos)
+        return cls.InitFromObj(quat)
+
+    @classmethod
+    def InitFromObj(cls, quat):
+        x = QuatT()
+        x._UnPack(quat)
+        return x
+
+    # QuatT
+    def _UnPack(self, quat):
+        if quat is None:
+            return
+        self.x = quat.X()
+        self.y = quat.Y()
+        self.z = quat.Z()
+        self.w = quat.W()
+
+    # QuatT
+    def Pack(self, builder):
+        Start(builder)
+        AddX(builder, self.x)
+        AddY(builder, self.y)
+        AddZ(builder, self.z)
+        AddW(builder, self.w)
+        quat = End(builder)
+        return quat

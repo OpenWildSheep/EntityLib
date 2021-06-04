@@ -1,15 +1,21 @@
-include "Result.fbs";
-
 namespace WildRPC;
 
-enum Type : byte { Boolean = 0, Integer, Float, Vector2, UInt3, Vector3, Quat, Color, Position, String }
+enum ContainerType : byte { Invalid = -1, Scalar, Array }
+
+enum ElementType : byte { Invalid = -1, Boolean, Integer, Float, Vector2, UInt3, Vector3, Quat, Color, Position, String }
+
+struct TypeInfo
+{
+	containerType:ContainerType;
+	elementType:ElementType;
+}
 
 table RPCHeader
 {
 	managerName:string (required);
 	methodName:string (required);
-	parameterTypes:[Type] (required);
-	resultTypes:[Type] (required);
+	parameterTypes:[TypeInfo] (required);
+	resultTypes:[TypeInfo] (required);
 }
 
 root_type RPCHeader;

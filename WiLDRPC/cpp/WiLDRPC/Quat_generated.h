@@ -10,8 +10,18 @@ namespace WildRPC {
 
 struct Quat;
 struct QuatBuilder;
+struct QuatT;
+
+struct QuatT : public flatbuffers::NativeTable {
+  typedef Quat TableType;
+  float x = 0.0f;
+  float y = 0.0f;
+  float z = 0.0f;
+  float w = 0.0f;
+};
 
 struct Quat FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef QuatT NativeTableType;
   typedef QuatBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_X = 4,
@@ -22,14 +32,26 @@ struct Quat FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   float x() const {
     return GetField<float>(VT_X, 0.0f);
   }
+  bool mutate_x(float _x) {
+    return SetField<float>(VT_X, _x, 0.0f);
+  }
   float y() const {
     return GetField<float>(VT_Y, 0.0f);
+  }
+  bool mutate_y(float _y) {
+    return SetField<float>(VT_Y, _y, 0.0f);
   }
   float z() const {
     return GetField<float>(VT_Z, 0.0f);
   }
+  bool mutate_z(float _z) {
+    return SetField<float>(VT_Z, _z, 0.0f);
+  }
   float w() const {
     return GetField<float>(VT_W, 0.0f);
+  }
+  bool mutate_w(float _w) {
+    return SetField<float>(VT_W, _w, 0.0f);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -39,6 +61,9 @@ struct Quat FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<float>(verifier, VT_W) &&
            verifier.EndTable();
   }
+  QuatT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(QuatT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Quat> Pack(flatbuffers::FlatBufferBuilder &_fbb, const QuatT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct QuatBuilder {
@@ -82,12 +107,53 @@ inline flatbuffers::Offset<Quat> CreateQuat(
   return builder_.Finish();
 }
 
+flatbuffers::Offset<Quat> CreateQuat(flatbuffers::FlatBufferBuilder &_fbb, const QuatT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+inline QuatT *Quat::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<QuatT>(new QuatT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Quat::UnPackTo(QuatT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = x(); _o->x = _e; }
+  { auto _e = y(); _o->y = _e; }
+  { auto _e = z(); _o->z = _e; }
+  { auto _e = w(); _o->w = _e; }
+}
+
+inline flatbuffers::Offset<Quat> Quat::Pack(flatbuffers::FlatBufferBuilder &_fbb, const QuatT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateQuat(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Quat> CreateQuat(flatbuffers::FlatBufferBuilder &_fbb, const QuatT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const QuatT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _x = _o->x;
+  auto _y = _o->y;
+  auto _z = _o->z;
+  auto _w = _o->w;
+  return WildRPC::CreateQuat(
+      _fbb,
+      _x,
+      _y,
+      _z,
+      _w);
+}
+
 inline const WildRPC::Quat *GetQuat(const void *buf) {
   return flatbuffers::GetRoot<WildRPC::Quat>(buf);
 }
 
 inline const WildRPC::Quat *GetSizePrefixedQuat(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<WildRPC::Quat>(buf);
+}
+
+inline Quat *GetMutableQuat(void *buf) {
+  return flatbuffers::GetMutableRoot<Quat>(buf);
 }
 
 inline bool VerifyQuatBuffer(
@@ -110,6 +176,18 @@ inline void FinishSizePrefixedQuatBuffer(
     flatbuffers::FlatBufferBuilder &fbb,
     flatbuffers::Offset<WildRPC::Quat> root) {
   fbb.FinishSizePrefixed(root);
+}
+
+inline std::unique_ptr<WildRPC::QuatT> UnPackQuat(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::QuatT>(GetQuat(buf)->UnPack(res));
+}
+
+inline std::unique_ptr<WildRPC::QuatT> UnPackSizePrefixedQuat(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::QuatT>(GetSizePrefixedQuat(buf)->UnPack(res));
 }
 
 }  // namespace WildRPC

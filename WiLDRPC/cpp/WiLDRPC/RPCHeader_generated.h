@@ -6,46 +6,83 @@
 
 #include "flatbuffers/flatbuffers.h"
 
-#include "Result_generated.h"
-
 namespace WildRPC {
+
+struct TypeInfo;
 
 struct RPCHeader;
 struct RPCHeaderBuilder;
+struct RPCHeaderT;
 
-enum Type : int8_t {
-  Type_Boolean = 0,
-  Type_Integer = 1,
-  Type_Float = 2,
-  Type_Vector2 = 3,
-  Type_UInt3 = 4,
-  Type_Vector3 = 5,
-  Type_Quat = 6,
-  Type_Color = 7,
-  Type_Position = 8,
-  Type_String = 9,
-  Type_MIN = Type_Boolean,
-  Type_MAX = Type_String
+enum ContainerType : int8_t {
+  ContainerType_Invalid = -1,
+  ContainerType_Scalar = 0,
+  ContainerType_Array = 1,
+  ContainerType_MIN = ContainerType_Invalid,
+  ContainerType_MAX = ContainerType_Array
 };
 
-inline const Type (&EnumValuesType())[10] {
-  static const Type values[] = {
-    Type_Boolean,
-    Type_Integer,
-    Type_Float,
-    Type_Vector2,
-    Type_UInt3,
-    Type_Vector3,
-    Type_Quat,
-    Type_Color,
-    Type_Position,
-    Type_String
+inline const ContainerType (&EnumValuesContainerType())[3] {
+  static const ContainerType values[] = {
+    ContainerType_Invalid,
+    ContainerType_Scalar,
+    ContainerType_Array
   };
   return values;
 }
 
-inline const char * const *EnumNamesType() {
-  static const char * const names[11] = {
+inline const char * const *EnumNamesContainerType() {
+  static const char * const names[4] = {
+    "Invalid",
+    "Scalar",
+    "Array",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameContainerType(ContainerType e) {
+  if (flatbuffers::IsOutRange(e, ContainerType_Invalid, ContainerType_Array)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(ContainerType_Invalid);
+  return EnumNamesContainerType()[index];
+}
+
+enum ElementType : int8_t {
+  ElementType_Invalid = -1,
+  ElementType_Boolean = 0,
+  ElementType_Integer = 1,
+  ElementType_Float = 2,
+  ElementType_Vector2 = 3,
+  ElementType_UInt3 = 4,
+  ElementType_Vector3 = 5,
+  ElementType_Quat = 6,
+  ElementType_Color = 7,
+  ElementType_Position = 8,
+  ElementType_String = 9,
+  ElementType_MIN = ElementType_Invalid,
+  ElementType_MAX = ElementType_String
+};
+
+inline const ElementType (&EnumValuesElementType())[11] {
+  static const ElementType values[] = {
+    ElementType_Invalid,
+    ElementType_Boolean,
+    ElementType_Integer,
+    ElementType_Float,
+    ElementType_Vector2,
+    ElementType_UInt3,
+    ElementType_Vector3,
+    ElementType_Quat,
+    ElementType_Color,
+    ElementType_Position,
+    ElementType_String
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesElementType() {
+  static const char * const names[12] = {
+    "Invalid",
     "Boolean",
     "Integer",
     "Float",
@@ -61,13 +98,51 @@ inline const char * const *EnumNamesType() {
   return names;
 }
 
-inline const char *EnumNameType(Type e) {
-  if (flatbuffers::IsOutRange(e, Type_Boolean, Type_String)) return "";
-  const size_t index = static_cast<size_t>(e);
-  return EnumNamesType()[index];
+inline const char *EnumNameElementType(ElementType e) {
+  if (flatbuffers::IsOutRange(e, ElementType_Invalid, ElementType_String)) return "";
+  const size_t index = static_cast<size_t>(e) - static_cast<size_t>(ElementType_Invalid);
+  return EnumNamesElementType()[index];
 }
 
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(1) TypeInfo FLATBUFFERS_FINAL_CLASS {
+ private:
+  int8_t containerType_;
+  int8_t elementType_;
+
+ public:
+  TypeInfo()
+      : containerType_(0),
+        elementType_(0) {
+  }
+  TypeInfo(WildRPC::ContainerType _containerType, WildRPC::ElementType _elementType)
+      : containerType_(flatbuffers::EndianScalar(static_cast<int8_t>(_containerType))),
+        elementType_(flatbuffers::EndianScalar(static_cast<int8_t>(_elementType))) {
+  }
+  WildRPC::ContainerType containerType() const {
+    return static_cast<WildRPC::ContainerType>(flatbuffers::EndianScalar(containerType_));
+  }
+  void mutate_containerType(WildRPC::ContainerType _containerType) {
+    flatbuffers::WriteScalar(&containerType_, static_cast<int8_t>(_containerType));
+  }
+  WildRPC::ElementType elementType() const {
+    return static_cast<WildRPC::ElementType>(flatbuffers::EndianScalar(elementType_));
+  }
+  void mutate_elementType(WildRPC::ElementType _elementType) {
+    flatbuffers::WriteScalar(&elementType_, static_cast<int8_t>(_elementType));
+  }
+};
+FLATBUFFERS_STRUCT_END(TypeInfo, 2);
+
+struct RPCHeaderT : public flatbuffers::NativeTable {
+  typedef RPCHeader TableType;
+  std::string managerName{};
+  std::string methodName{};
+  std::vector<WildRPC::TypeInfo> parameterTypes{};
+  std::vector<WildRPC::TypeInfo> resultTypes{};
+};
+
 struct RPCHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef RPCHeaderT NativeTableType;
   typedef RPCHeaderBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_MANAGERNAME = 4,
@@ -78,14 +153,26 @@ struct RPCHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *managerName() const {
     return GetPointer<const flatbuffers::String *>(VT_MANAGERNAME);
   }
+  flatbuffers::String *mutable_managerName() {
+    return GetPointer<flatbuffers::String *>(VT_MANAGERNAME);
+  }
   const flatbuffers::String *methodName() const {
     return GetPointer<const flatbuffers::String *>(VT_METHODNAME);
   }
-  const flatbuffers::Vector<int8_t> *parameterTypes() const {
-    return GetPointer<const flatbuffers::Vector<int8_t> *>(VT_PARAMETERTYPES);
+  flatbuffers::String *mutable_methodName() {
+    return GetPointer<flatbuffers::String *>(VT_METHODNAME);
   }
-  const flatbuffers::Vector<int8_t> *resultTypes() const {
-    return GetPointer<const flatbuffers::Vector<int8_t> *>(VT_RESULTTYPES);
+  const flatbuffers::Vector<const WildRPC::TypeInfo *> *parameterTypes() const {
+    return GetPointer<const flatbuffers::Vector<const WildRPC::TypeInfo *> *>(VT_PARAMETERTYPES);
+  }
+  flatbuffers::Vector<const WildRPC::TypeInfo *> *mutable_parameterTypes() {
+    return GetPointer<flatbuffers::Vector<const WildRPC::TypeInfo *> *>(VT_PARAMETERTYPES);
+  }
+  const flatbuffers::Vector<const WildRPC::TypeInfo *> *resultTypes() const {
+    return GetPointer<const flatbuffers::Vector<const WildRPC::TypeInfo *> *>(VT_RESULTTYPES);
+  }
+  flatbuffers::Vector<const WildRPC::TypeInfo *> *mutable_resultTypes() {
+    return GetPointer<flatbuffers::Vector<const WildRPC::TypeInfo *> *>(VT_RESULTTYPES);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -99,6 +186,9 @@ struct RPCHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVector(resultTypes()) &&
            verifier.EndTable();
   }
+  RPCHeaderT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(RPCHeaderT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<RPCHeader> Pack(flatbuffers::FlatBufferBuilder &_fbb, const RPCHeaderT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct RPCHeaderBuilder {
@@ -111,10 +201,10 @@ struct RPCHeaderBuilder {
   void add_methodName(flatbuffers::Offset<flatbuffers::String> methodName) {
     fbb_.AddOffset(RPCHeader::VT_METHODNAME, methodName);
   }
-  void add_parameterTypes(flatbuffers::Offset<flatbuffers::Vector<int8_t>> parameterTypes) {
+  void add_parameterTypes(flatbuffers::Offset<flatbuffers::Vector<const WildRPC::TypeInfo *>> parameterTypes) {
     fbb_.AddOffset(RPCHeader::VT_PARAMETERTYPES, parameterTypes);
   }
-  void add_resultTypes(flatbuffers::Offset<flatbuffers::Vector<int8_t>> resultTypes) {
+  void add_resultTypes(flatbuffers::Offset<flatbuffers::Vector<const WildRPC::TypeInfo *>> resultTypes) {
     fbb_.AddOffset(RPCHeader::VT_RESULTTYPES, resultTypes);
   }
   explicit RPCHeaderBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -136,8 +226,8 @@ inline flatbuffers::Offset<RPCHeader> CreateRPCHeader(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> managerName = 0,
     flatbuffers::Offset<flatbuffers::String> methodName = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int8_t>> parameterTypes = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int8_t>> resultTypes = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<const WildRPC::TypeInfo *>> parameterTypes = 0,
+    flatbuffers::Offset<flatbuffers::Vector<const WildRPC::TypeInfo *>> resultTypes = 0) {
   RPCHeaderBuilder builder_(_fbb);
   builder_.add_resultTypes(resultTypes);
   builder_.add_parameterTypes(parameterTypes);
@@ -150,12 +240,12 @@ inline flatbuffers::Offset<RPCHeader> CreateRPCHeaderDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *managerName = nullptr,
     const char *methodName = nullptr,
-    const std::vector<int8_t> *parameterTypes = nullptr,
-    const std::vector<int8_t> *resultTypes = nullptr) {
+    const std::vector<WildRPC::TypeInfo> *parameterTypes = nullptr,
+    const std::vector<WildRPC::TypeInfo> *resultTypes = nullptr) {
   auto managerName__ = managerName ? _fbb.CreateString(managerName) : 0;
   auto methodName__ = methodName ? _fbb.CreateString(methodName) : 0;
-  auto parameterTypes__ = parameterTypes ? _fbb.CreateVector<int8_t>(*parameterTypes) : 0;
-  auto resultTypes__ = resultTypes ? _fbb.CreateVector<int8_t>(*resultTypes) : 0;
+  auto parameterTypes__ = parameterTypes ? _fbb.CreateVectorOfStructs<WildRPC::TypeInfo>(*parameterTypes) : 0;
+  auto resultTypes__ = resultTypes ? _fbb.CreateVectorOfStructs<WildRPC::TypeInfo>(*resultTypes) : 0;
   return WildRPC::CreateRPCHeader(
       _fbb,
       managerName__,
@@ -164,12 +254,53 @@ inline flatbuffers::Offset<RPCHeader> CreateRPCHeaderDirect(
       resultTypes__);
 }
 
+flatbuffers::Offset<RPCHeader> CreateRPCHeader(flatbuffers::FlatBufferBuilder &_fbb, const RPCHeaderT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+inline RPCHeaderT *RPCHeader::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<RPCHeaderT>(new RPCHeaderT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void RPCHeader::UnPackTo(RPCHeaderT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = managerName(); if (_e) _o->managerName = _e->str(); }
+  { auto _e = methodName(); if (_e) _o->methodName = _e->str(); }
+  { auto _e = parameterTypes(); if (_e) { _o->parameterTypes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->parameterTypes[_i] = *_e->Get(_i); } } }
+  { auto _e = resultTypes(); if (_e) { _o->resultTypes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->resultTypes[_i] = *_e->Get(_i); } } }
+}
+
+inline flatbuffers::Offset<RPCHeader> RPCHeader::Pack(flatbuffers::FlatBufferBuilder &_fbb, const RPCHeaderT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateRPCHeader(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<RPCHeader> CreateRPCHeader(flatbuffers::FlatBufferBuilder &_fbb, const RPCHeaderT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RPCHeaderT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _managerName = _fbb.CreateString(_o->managerName);
+  auto _methodName = _fbb.CreateString(_o->methodName);
+  auto _parameterTypes = _fbb.CreateVectorOfStructs(_o->parameterTypes);
+  auto _resultTypes = _fbb.CreateVectorOfStructs(_o->resultTypes);
+  return WildRPC::CreateRPCHeader(
+      _fbb,
+      _managerName,
+      _methodName,
+      _parameterTypes,
+      _resultTypes);
+}
+
 inline const WildRPC::RPCHeader *GetRPCHeader(const void *buf) {
   return flatbuffers::GetRoot<WildRPC::RPCHeader>(buf);
 }
 
 inline const WildRPC::RPCHeader *GetSizePrefixedRPCHeader(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<WildRPC::RPCHeader>(buf);
+}
+
+inline RPCHeader *GetMutableRPCHeader(void *buf) {
+  return flatbuffers::GetMutableRoot<RPCHeader>(buf);
 }
 
 inline bool VerifyRPCHeaderBuffer(
@@ -192,6 +323,18 @@ inline void FinishSizePrefixedRPCHeaderBuffer(
     flatbuffers::FlatBufferBuilder &fbb,
     flatbuffers::Offset<WildRPC::RPCHeader> root) {
   fbb.FinishSizePrefixed(root);
+}
+
+inline std::unique_ptr<WildRPC::RPCHeaderT> UnPackRPCHeader(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::RPCHeaderT>(GetRPCHeader(buf)->UnPack(res));
+}
+
+inline std::unique_ptr<WildRPC::RPCHeaderT> UnPackSizePrefixedRPCHeader(
+    const void *buf,
+    const flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<WildRPC::RPCHeaderT>(GetSizePrefixedRPCHeader(buf)->UnPack(res));
 }
 
 }  // namespace WildRPC

@@ -2,7 +2,6 @@
 
 #pragma warning(push, 0)
 #pragma warning(disable : 4996)
-#include "../Override.h"
 #include <vector>
 #include <memory>
 #include <map>
@@ -14,6 +13,12 @@
 #include "../external/filesystem.hpp"
 
 #include "../external/json.hpp" // TODO : Remove when the rawData in Component is no more useful
+#pragma warning(pop)
+
+#pragma warning(push)
+#pragma warning(disable : 4464)
+#include "../Override.h"
+#include "../Array.h"
 #pragma warning(pop)
 
 #include "Schema.h"
@@ -92,195 +97,6 @@ namespace Ent
         return obj.nodes.end();
     }
 
-    /// Content of a Node which has type Ent::DataType::array
-    struct Array
-    {
-        Array(Subschema const* _schema);
-
-        bool hasOverride() const; ///< Recursively check if there is an override inside
-        bool hasPrefabValue() const; ///< Recursively check if value is set in a prefab
-        bool hasDefaultValue() const; ///< Recursively check if nothing is set in prefab and instance
-        bool hasKey() const; ///< The elements have keys if the overridePolicy is a map or a set
-        bool isTuple() const; ///< @return true if the schema has linearItems
-
-        Node* at(uint64_t _index); ///< Get the item at _index
-        Node const* at(uint64_t _index) const; ///< Get the item at _index
-
-        Node* arrayPush(); ///< @pre not hasKey()
-
-        using KeyType = mapbox::util::variant<String, int64_t>;
-        bool mapErase(KeyType const& _key); ///< Erase the item with _key, or return false
-        Node* mapGet(KeyType const& _key); ///< @return the item with _key, or nullptr
-        Node const* mapGet(KeyType const& _key) const; ///< @return the item with _key, or nullptr
-        Node* mapInsert(KeyType const& _key); ///< @pre hasKey(). @brief Insert a new item with _key
-
-        /// @return true if it is a map/set and the element with _key was removed
-        bool isErased(KeyType const& _key) const;
-
-        std::vector<Node const*> getItems() const; ///< Get all not removed items
-        std::vector<Node const*> getItemsWithRemoved() const; ///< Get all items with the removed ones
-
-        void pop(); ///< @pre not hasKey() and not isTuple()
-
-        void clear(); //< @pre not isTuple()
-
-        bool empty() const;
-
-        Array detach() const;
-        Array makeInstanceOf() const;
-
-        void arraySetSize(Override<size_t> _size);
-
-        void computeMemory(MemoryProfiler& prof) const;
-
-        size_t size() const
-        {
-            return mapbox::util::apply_visitor([](auto& a) { return a.size(); }, data);
-        }
-
-        size_t getDefaultSize() const
-        {
-            return mapbox::util::apply_visitor([](auto& a) { return a.getDefaultSize(); }, data);
-        }
-
-        size_t getPrefabSize() const
-        {
-            return mapbox::util::apply_visitor([](auto& a) { return a.getPrefabSize(); }, data);
-        }
-
-        Subschema const* getSchema() const
-        {
-            return schema;
-        }
-
-        tl::optional<size_t> getRawSize(OverrideValueLocation _location) const
-        {
-            return mapbox::util::apply_visitor(
-                [_location](auto& a) { return a.getRawSize(_location); }, data);
-        }
-
-        // **************************** For array initialization **********************************
-        Node* initAdd(OverrideValueLocation, Node _node); ///< @pre This _node is not yet added
-        /// @pre hasKey() and the key doesn't exist in map
-        Node* mapInitInsert(OverrideValueLocation, KeyType _key, Node _node);
-        /// @pre not hasKey()
-        Node* arrayInitPush(Node _node);
-        /// Declare an element added in prefab and removed in instance
-        // void arrayAddRemovedPrefab();
-        /// Declare an element added in default and removed in prefab or instance
-        // void arrayAddRemovedDefault(OverrideValueLocation _removedIn);
-
-    private:
-        void checkInvariants() const;
-        // bool mapEraseImpl(KeyType const& key);
-        // Node const* mapGetImpl(KeyType const& _key) const;
-        // Node* mapInsertImpl(KeyType const& _key);
-
-        Subschema const* schema = nullptr;
-
-        struct Map
-        {
-            struct Element
-            {
-                value_ptr<Node> node;
-                Override<bool> isPresent;
-
-                bool hasOverride() const;
-                bool hasPrefabValue() const;
-                bool hasDefaultValue() const;
-                Element makeInstanceOf() const;
-            };
-
-            Subschema const* schema = nullptr;
-            std::vector<Element> items; ///< List of items of the array
-            std::map<KeyType, size_t> itemMap;
-
-            size_t size() const
-            {
-                return std::count_if(
-                    begin(items), end(items), [](auto&& d) { return d.isPresent.get(); });
-            }
-
-            size_t getDefaultSize() const
-            {
-                return std::count_if(begin(items), end(items), [](Element const& d) {
-                    return d.isPresent.defaultValue;
-                });
-            }
-
-            size_t getPrefabSize() const
-            {
-                return std::count_if(begin(items), end(items), [](Element const& d) {
-                    return d.isPresent.getPrefab();
-                });
-            }
-
-            bool hasOverride() const;
-            bool hasPrefabValue() const;
-            bool hasDefaultValue() const;
-
-            Node* at(uint64_t _index);
-            Node const* at(uint64_t _index) const;
-
-            bool erase(KeyType const& _key);
-            Node const* get(KeyType const& _key) const;
-            Ent::Node* insert(KeyType const& _key);
-            bool isErased(KeyType const& _key) const;
-            Ent::Node* insert(OverrideValueLocation loc, KeyType _key, Node _node);
-            void checkInvariants() const;
-            std::vector<Node const*> getItemsWithRemoved() const;
-            std::vector<Node const*> getItems() const;
-            void clear();
-            void computeMemory(MemoryProfiler& prof) const;
-            Map detach() const;
-            Map makeInstanceOf() const;
-            tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
-        };
-
-        struct Vector
-        {
-            Subschema const* schema = nullptr;
-            std::vector<value_ptr<Node>> data; ///< List of items of the array
-            Override<uint64_t> arraySize; ///< Size of the array, to keep track on array size changes
-
-            size_t size() const
-            {
-                return arraySize.get();
-            }
-
-            size_t getDefaultSize() const
-            {
-                return arraySize.defaultValue;
-            }
-
-            size_t getPrefabSize() const
-            {
-                return arraySize.getPrefab();
-            }
-
-            bool hasOverride() const;
-            bool hasPrefabValue() const;
-            bool hasDefaultValue() const;
-            Node* at(uint64_t _index);
-            Node const* at(uint64_t _index) const;
-            void checkInvariants() const;
-            std::vector<Node const*> getItems() const;
-            void pop();
-            bool isTuple() const;
-            void clear();
-            void addRemovedDefault(OverrideValueLocation _removedIn);
-            // Node* push(OverrideValueLocation loc);
-            void computeMemory(MemoryProfiler& prof) const;
-            Node* push();
-            Node* initPush(Node _node);
-            Vector detach() const;
-            Vector makeInstanceOf() const;
-            tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
-        };
-        using MapOrVector = mapbox::util::variant<Vector, Map>;
-        MapOrVector data;
-    };
-
     enum class ActivationLevel
     {
         Created,
@@ -301,7 +117,7 @@ namespace Ent
         char const* getUnionType() const; ///< Get the type inside the union
         /// @brief Change the type inside the union
         /// @pre type match with a type declared inside the json "oneOf"
-        Node* setUnionType(char const* _type);
+        Node* setUnionType(EntityLib const& _entlib, char const* _type);
 
         void computeMemory(MemoryProfiler& prof) const;
     };
@@ -976,6 +792,12 @@ namespace Ent
         std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
         /// @param _path : A file path absolute or relative but inside the rawdata path
         std::filesystem::path getRelativePath(std::filesystem::path const& _path) const;
+
+        Ent::Node loadNode(
+            Ent::Subschema const& _nodeSchema,
+            nlohmann::json const& _data,
+            Ent::Node const* _super,
+            nlohmann::json const* _default = nullptr) const;
 
     private:
         /// Load an Entity or a Scene, using the given cache

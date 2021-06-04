@@ -385,18 +385,18 @@ Ent::Map::Element Ent::Map::Element::makeInstanceOf() const
 
 size_t Ent::Map::size() const
 {
-    return std::count_if(begin(m_items), end(m_items), [](auto&& d) { return d.isPresent.get(); });
+    return (size_t)std::count_if(begin(m_items), end(m_items), [](auto&& d) { return d.isPresent.get(); });
 }
 
 size_t Ent::Map::getDefaultSize() const
 {
-    return std::count_if(
+    return (size_t)std::count_if(
         begin(m_items), end(m_items), [](Element const& d) { return d.isPresent.defaultValue; });
 }
 
 size_t Ent::Map::getPrefabSize() const
 {
-    return std::count_if(
+    return (size_t)std::count_if(
         begin(m_items), end(m_items), [](Element const& d) { return d.isPresent.getPrefab(); });
 }
 

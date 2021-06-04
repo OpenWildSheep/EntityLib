@@ -59,33 +59,17 @@ namespace Ent
 
         void arraySetSize(Override<size_t> _size);
 
-        void computeMemory(MemoryProfiler& prof) const;
+        void computeMemory(MemoryProfiler& _prof) const;
 
-        size_t size() const
-        {
-            return mapbox::util::apply_visitor([](auto& a) { return a.size(); }, data);
-        }
+        size_t size() const;
 
-        size_t getDefaultSize() const
-        {
-            return mapbox::util::apply_visitor([](auto& a) { return a.getDefaultSize(); }, data);
-        }
+        size_t getDefaultSize() const;
 
-        size_t getPrefabSize() const
-        {
-            return mapbox::util::apply_visitor([](auto& a) { return a.getPrefabSize(); }, data);
-        }
+        size_t getPrefabSize() const;
 
-        Subschema const* getSchema() const
-        {
-            return schema;
-        }
+        Subschema const* getSchema() const;
 
-        tl::optional<size_t> getRawSize(OverrideValueLocation _location) const
-        {
-            return mapbox::util::apply_visitor(
-                [_location](auto& a) { return a.getRawSize(_location); }, data);
-        }
+        tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
 
         Ent::Map::KeyType getChildKey(Ent::Node const* _child) const;
 
@@ -99,10 +83,36 @@ namespace Ent
     private:
         void checkInvariants() const;
 
-        Subschema const* schema = nullptr;
+        Subschema const* m_schema = nullptr;
 
         using MapOrVector = mapbox::util::variant<Vector, Map>;
-        MapOrVector data;
+        MapOrVector m_data;
     };
+
+    inline size_t Array::size() const
+    {
+        return mapbox::util::apply_visitor([](auto& a) { return a.size(); }, m_data);
+    }
+
+    inline size_t Array::getDefaultSize() const
+    {
+        return mapbox::util::apply_visitor([](auto& a) { return a.getDefaultSize(); }, m_data);
+    }
+
+    inline size_t Array::getPrefabSize() const
+    {
+        return mapbox::util::apply_visitor([](auto& a) { return a.getPrefabSize(); }, m_data);
+    }
+
+    inline Subschema const* Array::getSchema() const
+    {
+        return m_schema;
+    }
+
+    inline tl::optional<size_t> Array::getRawSize(OverrideValueLocation _location) const
+    {
+        return mapbox::util::apply_visitor(
+            [_location](auto& a) { return a.getRawSize(_location); }, m_data);
+    }
 
 } // namespace Ent

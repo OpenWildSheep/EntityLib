@@ -10,70 +10,70 @@
 using namespace nlohmann;
 
 Ent::Array::Array(EntityLib const* _entlib, Subschema const* _schema)
-    : schema(_schema)
+    : m_schema(_schema)
 {
     if (hasKey())
     {
-        data = Map{_entlib, _schema};
+        m_data = Map{_entlib, _schema};
     }
     else
     {
-        data = Vector{_entlib, _schema};
+        m_data = Vector{_entlib, _schema};
     }
-    ENTLIB_ASSERT(schema != nullptr);
+    ENTLIB_ASSERT(m_schema != nullptr);
 }
 
 Ent::Map::KeyType Ent::Array::getChildKey(Ent::Node const* _child) const
 {
-    return Map::getChildKey(schema, _child);
+    return Map::getChildKey(m_schema, _child);
 }
 
 Ent::Node* Ent::Array::at(uint64_t _index)
 {
-    return mapbox::util::apply_visitor([_index](auto& a) { return a.at(_index); }, data);
+    return mapbox::util::apply_visitor([_index](auto& a) { return a.at(_index); }, m_data);
 }
 
 Ent::Node const* Ent::Array::at(uint64_t _index) const
 {
-    return mapbox::util::apply_visitor([_index](auto const& a) { return a.at(_index); }, data);
+    return mapbox::util::apply_visitor([_index](auto const& a) { return a.at(_index); }, m_data);
 }
 
 bool Ent::Array::isErased(Map::KeyType const& _key) const
 {
-    ENTLIB_ASSERT(data.is<Map>());
-    return data.get<Map>().isErased(_key);
+    ENTLIB_ASSERT(m_data.is<Map>());
+    return m_data.get<Map>().isErased(_key);
 }
 
 bool Ent::Array::mapErase(Map::KeyType const& _key)
 {
-    ENTLIB_ASSERT(data.is<Map>());
-    return data.get<Map>().erase(_key);
+    ENTLIB_ASSERT(m_data.is<Map>());
+    return m_data.get<Map>().erase(_key);
 }
 
 Ent::Node* Ent::Array::mapGet(Map::KeyType const& _key)
 {
-    ENTLIB_ASSERT(data.is<Map>());
+    ENTLIB_ASSERT(m_data.is<Map>());
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-    return const_cast<Ent::Node*>(std::as_const(*this).data.get<Map>().get(_key));
+    return const_cast<Ent::Node*>(std::as_const(*this).m_data.get<Map>().get(_key));
 }
 Ent::Node const* Ent::Array::mapGet(Map::KeyType const& _key) const
 {
-    return data.get<Map>().get(_key);
+    return m_data.get<Map>().get(_key);
 }
 Ent::Node* Ent::Array::mapInsert(Map::KeyType const& _key)
 {
-    return data.get<Map>().insert(_key);
+    return m_data.get<Map>().insert(_key);
 }
 
 bool Ent::Array::hasKey() const
 {
-    auto&& meta = schema->meta.get<Ent::Subschema::ArrayMeta>();
+    auto&& meta = m_schema->meta.get<Ent::Subschema::ArrayMeta>();
     return meta.overridePolicy == "map" || meta.overridePolicy == "set";
 }
 
 bool Ent::Array::isTuple() const
 {
-    return data.get<Vector>().isTuple();
+    return m_data.get<Vector>().isTuple();
 }
 
 Ent::Node* Ent::Array::initAdd(OverrideValueLocation loc, Node _node)
@@ -81,59 +81,59 @@ Ent::Node* Ent::Array::initAdd(OverrideValueLocation loc, Node _node)
     if (hasKey())
     {
         auto key = getChildKey(&_node);
-        return data.get<Map>().insert(loc, key, std::move(_node));
+        return m_data.get<Map>().insert(loc, key, std::move(_node));
     }
     else
     {
-        return data.get<Vector>().initPush(std::move(_node));
+        return m_data.get<Vector>().initPush(std::move(_node));
     }
 }
 
 Ent::Node* Ent::Array::mapInitInsert(OverrideValueLocation _loc, Map::KeyType _key, Node _node)
 {
-    return data.get<Map>().insert(_loc, _key, _node);
+    return m_data.get<Map>().insert(_loc, _key, _node);
 }
 
 std::vector<Ent::Node const*> Ent::Array::getItemsWithRemoved() const
 {
-    ENTLIB_ASSERT(data.is<Map>());
-    return data.get<Map>().getItemsWithRemoved();
+    ENTLIB_ASSERT(m_data.is<Map>());
+    return m_data.get<Map>().getItemsWithRemoved();
 }
 
 std::vector<Ent::Node const*> Ent::Array::getItems() const
 {
-    return mapbox::util::apply_visitor([](auto& a) { return a.getItems(); }, data);
+    return mapbox::util::apply_visitor([](auto& a) { return a.getItems(); }, m_data);
 }
 
 void Ent::Array::checkInvariants() const
 {
-    return mapbox::util::apply_visitor([](auto& a) { return a.checkInvariants(); }, data);
+    return mapbox::util::apply_visitor([](auto& a) { return a.checkInvariants(); }, m_data);
 }
 
 bool Ent::Array::hasOverride() const
 {
-    return mapbox::util::apply_visitor([](auto& a) { return a.hasOverride(); }, data);
+    return mapbox::util::apply_visitor([](auto& a) { return a.hasOverride(); }, m_data);
 }
 
 bool Ent::Array::hasPrefabValue() const
 {
-    return mapbox::util::apply_visitor([](auto& a) { return a.hasPrefabValue(); }, data);
+    return mapbox::util::apply_visitor([](auto& a) { return a.hasPrefabValue(); }, m_data);
 }
 
 bool Ent::Array::hasDefaultValue() const
 {
-    return mapbox::util::apply_visitor([](auto& a) { return a.hasDefaultValue(); }, data);
+    return mapbox::util::apply_visitor([](auto& a) { return a.hasDefaultValue(); }, m_data);
 }
 
 void Ent::Array::pop()
 {
     ENTLIB_ASSERT(not hasKey());
-    data.get<Vector>().pop();
+    m_data.get<Vector>().pop();
 }
 
 void Ent::Array::clear()
 {
-    mapbox::util::apply_visitor([](auto& a) { return a.clear(); }, data);
+    mapbox::util::apply_visitor([](auto& a) { return a.clear(); }, m_data);
 }
 
 bool Ent::Array::empty() const
@@ -143,50 +143,39 @@ bool Ent::Array::empty() const
 
 Ent::Array Ent::Array::detach() const
 {
-    Array result{nullptr, schema};
-    result.data = mapbox::util::apply_visitor([](auto& a) { return MapOrVector(a.detach()); }, data);
+    Array result{nullptr, m_schema};
+    result.m_data =
+        mapbox::util::apply_visitor([](auto& a) { return MapOrVector(a.detach()); }, m_data);
     result.checkInvariants();
     return result;
 }
 
 Ent::Array Ent::Array::makeInstanceOf() const
 {
-    Array result{nullptr, schema};
-    result.data =
-        mapbox::util::apply_visitor([](auto& a) { return MapOrVector(a.makeInstanceOf()); }, data);
+    Array result{nullptr, m_schema};
+    result.m_data =
+        mapbox::util::apply_visitor([](auto& a) { return MapOrVector(a.makeInstanceOf()); }, m_data);
     return result;
 }
 
 void Ent::Array::arraySetSize(Override<size_t> _size)
 {
-    data.get<Vector>().arraySize = _size;
+    m_data.get<Vector>().setSize(_size);
 }
 
-void Ent::Array::computeMemory(MemoryProfiler& prof) const
+void Ent::Array::computeMemory(MemoryProfiler& _prof) const
 {
-    mapbox::util::apply_visitor([&prof](auto& a) { return a.computeMemory(prof); }, data);
-}
-
-void Ent::Map::computeMemory(MemoryProfiler& prof) const
-{
-    prof.addMem("Array::data", items.capacity() * sizeof(items.front()));
-    for (auto&& item : items)
-    {
-        item.node->computeMemory(prof);
-        prof.addMem("Array::data::value_ptr", sizeof(Ent::Node));
-    }
-    prof.addMem("Array::itemMap", itemMap.size() * sizeof(*itemMap.begin()));
-    prof.addNodes(items.size());
+    mapbox::util::apply_visitor([&_prof](auto& a) { return a.computeMemory(_prof); }, m_data);
 }
 
 Ent::Node* Ent::Array::arrayInitPush(Node _node)
 {
     ENTLIB_ASSERT_MSG(not hasKey(), "Can't 'push' in a map or set. Use 'mapInsert'.");
-    return data.get<Vector>().initPush(_node);
+    return m_data.get<Vector>().initPush(_node);
 }
 
 Ent::Node* Ent::Array::arrayPush()
 {
     ENTLIB_ASSERT_MSG(not hasKey(), "Can't 'push' in a map or set. Use 'mapInsert'.");
-    return data.get<Vector>().push();
+    return m_data.get<Vector>().push();
 }

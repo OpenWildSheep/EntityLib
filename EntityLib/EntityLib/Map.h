@@ -23,6 +23,8 @@ namespace Ent
     {
         using KeyType = mapbox::util::variant<String, int64_t>;
 
+        explicit Map(EntityLib const* _entlib = nullptr, Subschema const* _schema = nullptr);
+
         struct Element
         {
             value_ptr<Node> node;
@@ -34,28 +36,11 @@ namespace Ent
             Element makeInstanceOf() const;
         };
 
-        EntityLib const* entlib = nullptr;
-        Subschema const* schema = nullptr;
-        std::vector<Element> items; ///< List of items of the array
-        std::map<KeyType, size_t> itemMap;
+        size_t size() const;
 
-        size_t size() const
-        {
-            return std::count_if(
-                begin(items), end(items), [](auto&& d) { return d.isPresent.get(); });
-        }
+        size_t getDefaultSize() const;
 
-        size_t getDefaultSize() const
-        {
-            return std::count_if(
-                begin(items), end(items), [](Element const& d) { return d.isPresent.defaultValue; });
-        }
-
-        size_t getPrefabSize() const
-        {
-            return std::count_if(
-                begin(items), end(items), [](Element const& d) { return d.isPresent.getPrefab(); });
-        }
+        size_t getPrefabSize() const;
 
         bool hasOverride() const;
         bool hasPrefabValue() const;
@@ -68,16 +53,22 @@ namespace Ent
         Node const* get(KeyType const& _key) const;
         Ent::Node* insert(KeyType const& _key);
         bool isErased(KeyType const& _key) const;
-        Ent::Node* insert(OverrideValueLocation loc, KeyType _key, Node _node);
+        Ent::Node* insert(OverrideValueLocation _loc, KeyType _key, Node _node);
         void checkInvariants() const;
         std::vector<Node const*> getItemsWithRemoved() const;
         std::vector<Node const*> getItems() const;
         void clear();
-        void computeMemory(MemoryProfiler& prof) const;
+        void computeMemory(MemoryProfiler& _prof) const;
         Map detach() const;
         Map makeInstanceOf() const;
         tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         static KeyType getChildKey(Subschema const* _schema, Ent::Node const* _child);
+
+    private:
+        EntityLib const* m_entlib = nullptr;
+        Subschema const* m_schema = nullptr;
+        std::vector<Element> m_items; ///< List of items of the array
+        std::map<KeyType, size_t> m_itemMap;
     };
 
 } // namespace Ent

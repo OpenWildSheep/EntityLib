@@ -91,7 +91,7 @@ Ent::Node* Ent::Array::initAdd(OverrideValueLocation loc, Node _node)
 
 Ent::Node* Ent::Array::mapInitInsert(OverrideValueLocation _loc, Map::KeyType _key, Node _node)
 {
-    return m_data.get<Map>().insert(_loc, _key, _node);
+    return m_data.get<Map>().insert(_loc, std::move(_key), std::move(_node));
 }
 
 std::vector<Ent::Node const*> Ent::Array::getItemsWithRemoved() const
@@ -171,7 +171,7 @@ void Ent::Array::computeMemory(MemoryProfiler& _prof) const
 Ent::Node* Ent::Array::arrayInitPush(Node _node)
 {
     ENTLIB_ASSERT_MSG(not hasKey(), "Can't 'push' in a map or set. Use 'mapInsert'.");
-    return m_data.get<Vector>().initPush(_node);
+    return m_data.get<Vector>().initPush(std::move(_node));
 }
 
 Ent::Node* Ent::Array::arrayPush()

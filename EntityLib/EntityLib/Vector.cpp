@@ -113,7 +113,7 @@ void Ent::Vector::clear()
 Ent::Vector Ent::Vector::detach() const
 {
     Vector result{nullptr, m_schema};
-    for (auto const elt : m_data)
+    for (auto const& elt : m_data)
     {
         result.m_data.emplace_back(elt->detach());
     }
@@ -125,7 +125,7 @@ Ent::Vector Ent::Vector::detach() const
 Ent::Vector Ent::Vector::makeInstanceOf() const
 {
     Vector result{nullptr, m_schema};
-    for (auto const elt : m_data)
+    for (auto const& elt : m_data)
     {
         result.m_data.emplace_back(elt->makeInstanceOf());
     }

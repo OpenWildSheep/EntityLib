@@ -67,14 +67,6 @@ static void setChildKey(Ent::Subschema const* _arraySchema, Ent::Node* _child, E
 
 static Ent::Map::KeyType getChildKey(Ent::Subschema const* _arraySchema, Ent::Node const* _child)
 {
-    auto const& pol = _arraySchema->meta.get<Ent::Subschema::ArrayMeta>().overridePolicy;
-    ENTLIB_ASSERT(pol == "map" or pol == "set");
-    if (pol == "map")
-    {
-        ENTLIB_ASSERT(_child->size() == 2);
-        ENTLIB_ASSERT(_child->at(0llu) != nullptr);
-        ENTLIB_ASSERT(_child->at(1llu) != nullptr);
-    }
     auto&& meta = _arraySchema->meta.get<Ent::Subschema::ArrayMeta>();
     using namespace Ent;
     switch (hash(meta.overridePolicy))
@@ -93,8 +85,9 @@ static Ent::Map::KeyType getChildKey(Ent::Subschema const* _arraySchema, Ent::No
         {
         case Ent::DataType::string:
             ENTLIB_ASSERT(_child->at(0llu)->getString() != std::string());
-            return _child->at(0llu)->getString();
-        case Ent::DataType::entityRef: return _child->at(0llu)->getEntityRef().entityPath.c_str();
+            return String(_child->at(0llu)->getString());
+        case Ent::DataType::entityRef:
+            return String(_child->at(0llu)->getEntityRef().entityPath.c_str());
         case Ent::DataType::number: return _child->at(0llu)->getFloat();
         case Ent::DataType::integer: return _child->at(0llu)->getInt();
         default: throw std::runtime_error("Unknown key type in map " + _arraySchema->name);
@@ -110,9 +103,9 @@ static Ent::Map::KeyType getChildKey(Ent::Subschema const* _arraySchema, Ent::No
         switch (keyType)
         {
         // The key is the className string
-        case Ent::DataType::oneOf: return _child->getUnionType(); break;
+        case Ent::DataType::oneOf: return String(_child->getUnionType()); break;
         // The key is the item itself
-        case Ent::DataType::string: return _child->getString();
+        case Ent::DataType::string: return String(_child->getString());
         // The key is the item itself
         case Ent::DataType::number: return _child->getFloat();
         // The key is the item itself
@@ -289,7 +282,7 @@ std::vector<Ent::Node const*> Ent::Map::getItems() const
     checkInvariants();
     std::vector<Node const*> result;
     result.reserve(m_items.size());
-    for (auto&& node : m_items)
+    for (auto const& node : m_items)
     {
         auto key = ::getChildKey(m_schema, node.node.get());
         if (node.isPresent.get())
@@ -334,7 +327,7 @@ void Ent::Map::clear()
 Ent::Map Ent::Map::detach() const
 {
     Map result{nullptr, m_schema};
-    for (auto const elt : m_items)
+    for (auto const& elt : m_items)
     {
         if (elt.isPresent.get())
         {

@@ -14,32 +14,32 @@ namespace WRPC
     using namespace WildRPC;
     typedef flatbuffers::uoffset_t uoffset_t;
 
-    namespace Type
+    struct Type
     {
-        static TypeInfo Invalid(ContainerType_Scalar, ElementType_Invalid);
-        static TypeInfo Boolean(ContainerType_Scalar, ElementType_Boolean);
-        static TypeInfo Integer(ContainerType_Scalar, ElementType_Integer);
-        static TypeInfo Float(ContainerType_Scalar, ElementType_Float);
-        static TypeInfo Vector2(ContainerType_Scalar, ElementType_Vector2);
-        static TypeInfo UInt3(ContainerType_Scalar, ElementType_UInt3);
-        static TypeInfo Vector3(ContainerType_Scalar, ElementType_Vector3);
-        static TypeInfo Quat(ContainerType_Scalar, ElementType_Quat);
-        static TypeInfo Color(ContainerType_Scalar, ElementType_Color);
-        static TypeInfo Position(ContainerType_Scalar, ElementType_Position);
-        static TypeInfo String(ContainerType_Scalar, ElementType_String);
+        static TypeInfo Invalid;
+        static TypeInfo Boolean;
+        static TypeInfo Integer;
+        static TypeInfo Float;
+        static TypeInfo Vector2;
+        static TypeInfo UInt3;
+        static TypeInfo Vector3;
+        static TypeInfo Quat;
+        static TypeInfo Color;
+        static TypeInfo Position;
+        static TypeInfo String;
 
-        static TypeInfo InvalidArray(ContainerType_Array, ElementType_Invalid);
-        static TypeInfo BooleanArray(ContainerType_Array, ElementType_Boolean);
-        static TypeInfo IntegerArray(ContainerType_Array, ElementType_Integer);
-        static TypeInfo FloatArray(ContainerType_Array, ElementType_Float);
-        static TypeInfo Vector2Array(ContainerType_Array, ElementType_Vector2);
-        static TypeInfo UInt3Array(ContainerType_Array, ElementType_UInt3);
-        static TypeInfo Vector3Array(ContainerType_Array, ElementType_Vector3);
-        static TypeInfo QuatArray(ContainerType_Array, ElementType_Quat);
-        static TypeInfo ColorArray(ContainerType_Array, ElementType_Color);
-        static TypeInfo PositionArray(ContainerType_Array, ElementType_Position);
-        static TypeInfo StringArray(ContainerType_Array, ElementType_String);
-    }
+        static TypeInfo InvalidArray;
+        static TypeInfo BooleanArray;
+        static TypeInfo IntegerArray;
+        static TypeInfo FloatArray;
+        static TypeInfo Vector2Array;
+        static TypeInfo UInt3Array;
+        static TypeInfo Vector3Array;
+        static TypeInfo QuatArray;
+        static TypeInfo ColorArray;
+        static TypeInfo PositionArray;
+        static TypeInfo StringArray;
+    };
 
     inline bool operator==(const TypeInfo& lhs, const TypeInfo& rhs)
     {
@@ -164,19 +164,17 @@ namespace WRPC
 
         TypeInfo m_type;
 
-
         template <typename T> static ElementType GetElementType();
-        template <> static ElementType GetElementType<bool>() { return ElementType_Boolean; }
-        template <> static ElementType GetElementType<int>() { return ElementType_Integer; }
-        template <> static ElementType GetElementType<float>() { return ElementType_Float; }
-        template <> static ElementType GetElementType<Vector2>() { return ElementType_Vector2; }
-        template <> static ElementType GetElementType<Vector3i>() { return ElementType_UInt3; }
-        template <> static ElementType GetElementType<Vector3>() { return ElementType_Vector3; }
-        template <> static ElementType GetElementType<Quat>() { return ElementType_Quat; }
-        template <> static ElementType GetElementType<Color>() { return ElementType_Color; }
-        template <> static ElementType GetElementType<Position>() { return ElementType_Position; }
-        template <> static ElementType GetElementType<string>() { return ElementType_String; }
-
+        template <> static ElementType GetElementType<bool>() { return ElementType_Boolean; } ///< @off
+        template <> static ElementType GetElementType<int>() { return ElementType_Integer; } ///< @off
+        template <> static ElementType GetElementType<float>() { return ElementType_Float; } ///< @off
+        template <> static ElementType GetElementType<Vector2>() { return ElementType_Vector2; } ///< @off
+        template <> static ElementType GetElementType<Vector3i>() { return ElementType_UInt3; } ///< @off
+        template <> static ElementType GetElementType<Vector3>() { return ElementType_Vector3; } ///< @off
+        template <> static ElementType GetElementType<Quat>() { return ElementType_Quat; } ///< @off
+        template <> static ElementType GetElementType<Color>() { return ElementType_Color; } ///< @off
+        template <> static ElementType GetElementType<Position>() { return ElementType_Position; } ///< @off
+        template <> static ElementType GetElementType<string>() { return ElementType_String; } ///< @off
 
         Parameter(const TypeInfo& _type)
         {
@@ -206,11 +204,15 @@ namespace WRPC
         template <typename T>
         Parameter(const vector<T>& _vector) : Parameter(_vector, 0) { }
 
+        template <typename T>
+        Parameter(const std::initializer_list<T>& _initlist) : Parameter(vector<T>{_initlist}, 0) { }
+
         Parameter(const char* _scalar) : Parameter(string(_scalar)) { }
 
 
         /// Get the value as a scalar.
         /// Throws a `bad_variant_access` exception if the type you requested does not match the actual type.
+        /// @instantiate <bool><int><float><Vector2><Vector3i><Vector3><Quat><Color><Position><string>
         template <typename T>
         T AsScalar() const
         {
@@ -225,9 +227,9 @@ namespace WRPC
             return m_value.get<vector<T>>();
         }
 
-
         /// Get the value as a scalar.
         /// Returns whether the correct type was requested.
+        /// @instantiate <bool><int><float><Vector2><Vector3i><Vector3><Quat><Color><Position><string>
         template <typename T>
         bool TryGetScalar(T& _value) const
         {
@@ -239,19 +241,17 @@ namespace WRPC
             return true;
         }
 
-        /// Get the value as a vector.
-        /// Returns whether the correct type was requested.
+        /// Try get the value as a vector.
         template <typename T>
         bool TryGetVector(vector<T>& _value) const
         {
             if (m_type != TypeInfo(ContainerType_Array, GetElementType<T>()))
-            {
+            { 
                 return false;
             }
             _value = m_value.get<vector<T>>();
             return true;
         }
-
 
         const TypeInfo& GetType() const { return m_type; }
         bool IsArray() const { return m_type.containerType() == ContainerType_Array; }
@@ -272,72 +272,6 @@ namespace WRPC
         Parameter(const Color& _scalar) : Parameter(_scalar, 0) { }
         Parameter(const Position& _scalar) : Parameter(_scalar, 0) { }
         Parameter(const string& _scalar) : Parameter(_scalar, 0) { }
-
-        Parameter(const vector<bool>& _vector) : Parameter(_vector, 0) { }
-        Parameter(const vector<int>& _vector) : Parameter(_vector, 0) { }
-        Parameter(const vector<float>& _vector) : Parameter(_vector, 0) { }
-        Parameter(const vector<Vector2>& _vector) : Parameter(_vector, 0) { }
-        Parameter(const vector<Vector3i>& _vector) : Parameter(_vector, 0) { }
-        Parameter(const vector<Vector3>& _vector) : Parameter(_vector, 0) { }
-        Parameter(const vector<Quat>& _vector) : Parameter(_vector, 0) { }
-        Parameter(const vector<Color>& _vector) : Parameter(_vector, 0) { }
-        Parameter(const vector<Position>& _vector) : Parameter(_vector, 0) { }
-        Parameter(const vector<string>& _vector) : Parameter(_vector, 0) { }
-
-        Parameter(const std::initializer_list<bool>& _list) : Parameter(vector<bool>(_list), 0) { }
-        Parameter(const std::initializer_list<int>& _list) : Parameter(vector<int>(_list), 0) { }
-        Parameter(const std::initializer_list<float>& _list) : Parameter(vector<float>(_list), 0) { }
-        Parameter(const std::initializer_list<Vector2>& _list) : Parameter(vector<Vector2>(_list), 0) { }
-        Parameter(const std::initializer_list<Vector3i>& _list) : Parameter(vector<Vector3i>(_list), 0) { }
-        Parameter(const std::initializer_list<Vector3>& _list) : Parameter(vector<Vector3>(_list), 0) { }
-        Parameter(const std::initializer_list<Quat>& _list) : Parameter(vector<Quat>(_list), 0) { }
-        Parameter(const std::initializer_list<Color>& _list) : Parameter(vector<Color>(_list), 0) { }
-        Parameter(const std::initializer_list<Position>& _list) : Parameter(vector<Position>(_list), 0) { }
-        Parameter(const std::initializer_list<string>& _list) : Parameter(vector<string>(_list), 0) { }
-
-        bool AsScalar_bool() const { return AsScalar<bool>(); }
-        int AsScalar_int() const { return AsScalar<int>(); }
-        float AsScalar_float() const { return AsScalar<float>(); }
-        Vector2 AsScalar_Vector2() const { return AsScalar<Vector2>(); }
-        Vector3i AsScalar_Vector3i() const { return AsScalar<Vector3i>(); }
-        Vector3 AsScalar_Vector3() const { return AsScalar<Vector3>(); }
-        Quat AsScalar_Quat() const { return AsScalar<Quat>(); }
-        Color AsScalar_Color() const { return AsScalar<Color>(); }
-        Position AsScalar_Position() const { return AsScalar<Position>(); }
-        string AsScalar_string() const { return AsScalar<string>(); }
-
-        const vector<bool>& AsVector_bool() const { return AsVector<bool>(); }
-        const vector<int>& AsVector_int() const { return AsVector<int>(); }
-        const vector<float>& AsVector_float() const { return AsVector<float>(); }
-        const vector<Vector2>& AsVector_Vector2() const { return AsVector<Vector2>(); }
-        const vector<Vector3i>& AsVector_Vector3i() const { return AsVector<Vector3i>(); }
-        const vector<Vector3>& AsVector_Vector3() const { return AsVector<Vector3>(); }
-        const vector<Quat>& AsVector_Quat() const { return AsVector<Quat>(); }
-        const vector<Color>& AsVector_Color() const { return AsVector<Color>(); }
-        const vector<Position>& AsVector_Position() const { return AsVector<Position>(); }
-        const vector<string>& AsVector_string() const { return AsVector<string>(); }
-
-        bool TryGetScalar_bool(bool& _value) const { return TryGetScalar<bool>(_value); }
-        bool TryGetScalar_int(int& _value) const { return TryGetScalar<int>(_value); }
-        bool TryGetScalar_float(float& _value) const { return TryGetScalar<float>(_value); }
-        bool TryGetScalar_Vector2(Vector2& _value) const { return TryGetScalar<Vector2>(_value); }
-        bool TryGetScalar_Vector3i(Vector3i& _value) const { return TryGetScalar<Vector3i>(_value); }
-        bool TryGetScalar_Vector3(Vector3& _value) const { return TryGetScalar<Vector3>(_value); }
-        bool TryGetScalar_Quat(Quat& _value) const { return TryGetScalar<Quat>(_value); }
-        bool TryGetScalar_Color(Color& _value) const { return TryGetScalar<Color>(_value); }
-        bool TryGetScalar_Position(Position& _value) const { return TryGetScalar<Position>(_value); }
-        bool TryGetScalar_string(string& _value) const { return TryGetScalar<string>(_value); }
-
-        bool TryGetVector_bool(vector<bool>& _value) const { return TryGetVector<bool>(_value); }
-        bool TryGetVector_int(vector<int>& _value) const { return TryGetVector<int>(_value); }
-        bool TryGetVector_float(vector<float>& _value) const { return TryGetVector<float>(_value); }
-        bool TryGetVector_Vector2(vector<Vector2>& _value) const { return TryGetVector<Vector2>(_value); }
-        bool TryGetVector_Vector3i(vector<Vector3i>& _value) const { return TryGetVector<Vector3i>(_value); }
-        bool TryGetVector_Vector3(vector<Vector3>& _value) const { return TryGetVector<Vector3>(_value); }
-        bool TryGetVector_Quat(vector<Quat>& _value) const { return TryGetVector<Quat>(_value); }
-        bool TryGetVector_Color(vector<Color>& _value) const { return TryGetVector<Color>(_value); }
-        bool TryGetVector_Position(vector<Position>& _value) const { return TryGetVector<Position>(_value); }
-        bool TryGetVector_string(vector<string>& _value) const { return TryGetVector<string>(_value); }
     };
 
     // -----------------------
@@ -347,6 +281,8 @@ namespace WRPC
         friend class MethodInvocation;
 
     public:
+        using string = Parameter::string;
+
         bool HasError() const
         {
             return (m_error.m_protocolError != RPCProtocolError::No_Error)
@@ -379,6 +315,19 @@ namespace WRPC
             return value;
         }
 
+        ///     auto arg2 = result.NextVector<float>();
+        /// @instantiate <bool><int><float><Vector2><Vector3i><Vector3><Quat><Color><Position><string>
+        template <typename T>
+        bool TryNextScalar(T& _out)
+        {
+            if(m_index < m_paramsBuffer.size())
+            {
+                _out = m_paramsBuffer[m_index++].AsScalar<T>();
+                return true;
+            }
+            return false;
+        }
+
         /// Get the next result as a vector.
         /// Pseudo-iterator pattern, inspired by FlexBuffers: https://google.github.io/flatbuffers/flexbuffers.html
         /// Usage:
@@ -394,30 +343,24 @@ namespace WRPC
             return value;
         }
 
+        /// @instantiate <bool><int><float><Vector2><Vector3i><Vector3><Quat><Color><Position><string>
+        template <typename T>
+        bool TryNextVector(T* _outArray, size_t _outArraySize)
+        {
+            if (m_index < m_paramsBuffer.size())
+            {
+                auto const& vec = m_paramsBuffer[m_index++].AsVector<T>();
+                for (size_t i = 0; i < std::min(_outArraySize, vec.size()); ++i)
+                {
+                    _outArray[i] = vec[i];
+                }
+                m_index++;
+                return true;
+            }
+            return false;
+        }
+
         // explicitly-typed overloads, for languages that don't support binding to template methods (eg Wolf, Python)
-        typedef Parameter::string string;
-
-        bool NextScalar_bool() { return NextScalar<bool>(); }
-        int NextScalar_int() { return NextScalar<int>(); }
-        float NextScalar_float() { return NextScalar<float>(); }
-        Vector2 NextScalar_Vector2() { return NextScalar<Vector2>(); }
-        Vector3i NextScalar_Vector3i() { return NextScalar<Vector3i>(); }
-        Vector3 NextScalar_Vector3() { return NextScalar<Vector3>(); }
-        Quat NextScalar_Quat() { return NextScalar<Quat>(); }
-        Color NextScalar_Color() { return NextScalar<Color>(); }
-        Position NextScalar_Position() { return NextScalar<Position>(); }
-        string NextScalar_string() { return NextScalar<string>(); }
-
-        const Parameter::vector<bool>& NextVector_bool() { return NextVector<bool>(); }
-        const Parameter::vector<int>& NextVector_int() { return NextVector<int>(); }
-        const Parameter::vector<float>& NextVector_float() { return NextVector<float>(); }
-        const Parameter::vector<Vector2>& NextVector_Vector2() { return NextVector<Vector2>(); }
-        const Parameter::vector<Vector3i>& NextVector_Vector3i() { return NextVector<Vector3i>(); }
-        const Parameter::vector<Vector3>& NextVector_Vector3() { return NextVector<Vector3>(); }
-        const Parameter::vector<Quat>& NextVector_Quat() { return NextVector<Quat>(); }
-        const Parameter::vector<Color>& NextVector_Color() { return NextVector<Color>(); }
-        const Parameter::vector<Position>& NextVector_Position() { return NextVector<Position>(); }
-        const Parameter::vector<string>& NextVector_string() { return NextVector<string>(); }
 
     private:
         RPC_Error m_error;

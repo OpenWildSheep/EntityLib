@@ -14,32 +14,32 @@ namespace WRPC
     using namespace WildRPC;
     typedef flatbuffers::uoffset_t uoffset_t;
 
-    namespace Type
+    struct Type
     {
-        static TypeInfo Invalid(ContainerType_Scalar, ElementType_Invalid);
-        static TypeInfo Boolean(ContainerType_Scalar, ElementType_Boolean);
-        static TypeInfo Integer(ContainerType_Scalar, ElementType_Integer);
-        static TypeInfo Float(ContainerType_Scalar, ElementType_Float);
-        static TypeInfo Vector2(ContainerType_Scalar, ElementType_Vector2);
-        static TypeInfo UInt3(ContainerType_Scalar, ElementType_UInt3);
-        static TypeInfo Vector3(ContainerType_Scalar, ElementType_Vector3);
-        static TypeInfo Quat(ContainerType_Scalar, ElementType_Quat);
-        static TypeInfo Color(ContainerType_Scalar, ElementType_Color);
-        static TypeInfo Position(ContainerType_Scalar, ElementType_Position);
-        static TypeInfo String(ContainerType_Scalar, ElementType_String);
+        static TypeInfo Invalid;
+        static TypeInfo Boolean;
+        static TypeInfo Integer;
+        static TypeInfo Float;
+        static TypeInfo Vector2;
+        static TypeInfo UInt3;
+        static TypeInfo Vector3;
+        static TypeInfo Quat;
+        static TypeInfo Color;
+        static TypeInfo Position;
+        static TypeInfo String;
 
-        static TypeInfo InvalidArray(ContainerType_Array, ElementType_Invalid);
-        static TypeInfo BooleanArray(ContainerType_Array, ElementType_Boolean);
-        static TypeInfo IntegerArray(ContainerType_Array, ElementType_Integer);
-        static TypeInfo FloatArray(ContainerType_Array, ElementType_Float);
-        static TypeInfo Vector2Array(ContainerType_Array, ElementType_Vector2);
-        static TypeInfo UInt3Array(ContainerType_Array, ElementType_UInt3);
-        static TypeInfo Vector3Array(ContainerType_Array, ElementType_Vector3);
-        static TypeInfo QuatArray(ContainerType_Array, ElementType_Quat);
-        static TypeInfo ColorArray(ContainerType_Array, ElementType_Color);
-        static TypeInfo PositionArray(ContainerType_Array, ElementType_Position);
-        static TypeInfo StringArray(ContainerType_Array, ElementType_String);
-    }
+        static TypeInfo InvalidArray;
+        static TypeInfo BooleanArray;
+        static TypeInfo IntegerArray;
+        static TypeInfo FloatArray;
+        static TypeInfo Vector2Array;
+        static TypeInfo UInt3Array;
+        static TypeInfo Vector3Array;
+        static TypeInfo QuatArray;
+        static TypeInfo ColorArray;
+        static TypeInfo PositionArray;
+        static TypeInfo StringArray;
+    };
 
     inline bool operator==(const TypeInfo& lhs, const TypeInfo& rhs)
     {
@@ -164,44 +164,55 @@ namespace WRPC
 
         TypeInfo m_type;
 
-
         template <typename T> static ElementType GetElementType();
-        template <> static ElementType GetElementType<bool>() { return ElementType_Boolean; }
-        template <> static ElementType GetElementType<int>() { return ElementType_Integer; }
-        template <> static ElementType GetElementType<float>() { return ElementType_Float; }
-        template <> static ElementType GetElementType<Vector2>() { return ElementType_Vector2; }
-        template <> static ElementType GetElementType<Vector3i>() { return ElementType_UInt3; }
-        template <> static ElementType GetElementType<Vector3>() { return ElementType_Vector3; }
-        template <> static ElementType GetElementType<Quat>() { return ElementType_Quat; }
-        template <> static ElementType GetElementType<Color>() { return ElementType_Color; }
-        template <> static ElementType GetElementType<Position>() { return ElementType_Position; }
-        template <> static ElementType GetElementType<string>() { return ElementType_String; }
-
+        template <> static ElementType GetElementType<bool>() { return ElementType_Boolean; } ///< @off
+        template <> static ElementType GetElementType<int>() { return ElementType_Integer; } ///< @off
+        template <> static ElementType GetElementType<float>() { return ElementType_Float; } ///< @off
+        template <> static ElementType GetElementType<Vector2>() { return ElementType_Vector2; } ///< @off
+        template <> static ElementType GetElementType<Vector3i>() { return ElementType_UInt3; } ///< @off
+        template <> static ElementType GetElementType<Vector3>() { return ElementType_Vector3; } ///< @off
+        template <> static ElementType GetElementType<Quat>() { return ElementType_Quat; } ///< @off
+        template <> static ElementType GetElementType<Color>() { return ElementType_Color; } ///< @off
+        template <> static ElementType GetElementType<Position>() { return ElementType_Position; } ///< @off
+        template <> static ElementType GetElementType<string>() { return ElementType_String; } ///< @off
 
         Parameter(const TypeInfo& _type)
         {
             m_type = _type;
         }
 
+    private:
+        // NOTE: these private constructors take a dummy second parameter, to disambiguate the explicitly-typed constructors
         template <typename T>
-        Parameter(const T& _scalar)
+        Parameter(const T& _scalar, char)
         {
             m_value = vector<T>{_scalar};
             m_type = TypeInfo(ContainerType_Scalar, GetElementType<T>());
         }
 
         template <typename T>
-        Parameter(const vector<T>& _vector)
+        Parameter(const vector<T>& _vector, char)
         {
             m_value = _vector;
             m_type = TypeInfo(ContainerType_Array, GetElementType<T>());
         }
 
-        Parameter(const char* _scalar) : Parameter(std::string(_scalar)) { }
+    public:
+        template <typename T>
+        Parameter(const T& _scalar) : Parameter(_scalar, 0) { }
+
+        template <typename T>
+        Parameter(const vector<T>& _vector) : Parameter(_vector, 0) { }
+
+        template <typename T>
+        Parameter(const std::initializer_list<T>& _initlist) : Parameter(vector<T>{_initlist}, 0) { }
+
+        Parameter(const char* _scalar) : Parameter(string(_scalar)) { }
 
 
         /// Get the value as a scalar.
         /// Throws a `bad_variant_access` exception if the type you requested does not match the actual type.
+        /// @instantiate <bool><int><float><Vector2><Vector3i><Vector3><Quat><Color><Position><string>
         template <typename T>
         T AsScalar() const
         {
@@ -216,9 +227,9 @@ namespace WRPC
             return m_value.get<vector<T>>();
         }
 
-
         /// Get the value as a scalar.
         /// Returns whether the correct type was requested.
+        /// @instantiate <bool><int><float><Vector2><Vector3i><Vector3><Quat><Color><Position><string>
         template <typename T>
         bool TryGetScalar(T& _value) const
         {
@@ -230,19 +241,17 @@ namespace WRPC
             return true;
         }
 
-        /// Get the value as a vector.
-        /// Returns whether the correct type was requested.
+        /// Try get the value as a vector.
         template <typename T>
         bool TryGetVector(vector<T>& _value) const
         {
             if (m_type != TypeInfo(ContainerType_Array, GetElementType<T>()))
-            {
+            { 
                 return false;
             }
             _value = m_value.get<vector<T>>();
             return true;
         }
-
 
         const TypeInfo& GetType() const { return m_type; }
         bool IsArray() const { return m_type.containerType() == ContainerType_Array; }
@@ -250,6 +259,19 @@ namespace WRPC
 
         bool EncodeIn(uint8_t* _buffer, const size_t _bufferSize, uoffset_t& _offset) const;
         bool DecodeFrom(uint8_t* _buffer, const size_t _bufferSize, uoffset_t& _offset);
+
+
+        // explicitly-typed overloads, for languages that don't support binding to template methods (eg Wolf, Python)
+        Parameter(const bool& _scalar) : Parameter(_scalar, 0) { }
+        Parameter(const int& _scalar) : Parameter(_scalar, 0) { }
+        Parameter(const float& _scalar) : Parameter(_scalar, 0) { }
+        Parameter(const Vector2& _scalar) : Parameter(_scalar, 0) { }
+        Parameter(const Vector3i& _scalar) : Parameter(_scalar, 0) { }
+        Parameter(const Vector3& _scalar) : Parameter(_scalar, 0) { }
+        Parameter(const Quat& _scalar) : Parameter(_scalar, 0) { }
+        Parameter(const Color& _scalar) : Parameter(_scalar, 0) { }
+        Parameter(const Position& _scalar) : Parameter(_scalar, 0) { }
+        Parameter(const string& _scalar) : Parameter(_scalar, 0) { }
     };
 
     // -----------------------
@@ -259,6 +281,8 @@ namespace WRPC
         friend class MethodInvocation;
 
     public:
+        using string = Parameter::string;
+
         bool HasError() const
         {
             return (m_error.m_protocolError != RPCProtocolError::No_Error)
@@ -291,6 +315,19 @@ namespace WRPC
             return value;
         }
 
+        ///     auto arg2 = result.NextVector<float>();
+        /// @instantiate <bool><int><float><Vector2><Vector3i><Vector3><Quat><Color><Position><string>
+        template <typename T>
+        bool TryNextScalar(T& _out)
+        {
+            if(m_index < m_paramsBuffer.size())
+            {
+                _out = m_paramsBuffer[m_index++].AsScalar<T>();
+                return true;
+            }
+            return false;
+        }
+
         /// Get the next result as a vector.
         /// Pseudo-iterator pattern, inspired by FlexBuffers: https://google.github.io/flatbuffers/flexbuffers.html
         /// Usage:
@@ -305,6 +342,25 @@ namespace WRPC
             m_index++;
             return value;
         }
+
+        /// @instantiate <bool><int><float><Vector2><Vector3i><Vector3><Quat><Color><Position><string>
+        template <typename T>
+        bool TryNextVector(T* _outArray, size_t _outArraySize)
+        {
+            if (m_index < m_paramsBuffer.size())
+            {
+                auto const& vec = m_paramsBuffer[m_index++].AsVector<T>();
+                for (size_t i = 0; i < std::min(_outArraySize, vec.size()); ++i)
+                {
+                    _outArray[i] = vec[i];
+                }
+                m_index++;
+                return true;
+            }
+            return false;
+        }
+
+        // explicitly-typed overloads, for languages that don't support binding to template methods (eg Wolf, Python)
 
     private:
         RPC_Error m_error;

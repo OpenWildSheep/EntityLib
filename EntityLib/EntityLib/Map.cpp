@@ -251,7 +251,11 @@ Ent::Node* Ent::Map::insert(OverrideValueLocation _loc, KeyType _key, Node _node
     auto& elt = m_items.back();
     switch (_loc)
     {
-    case OverrideValueLocation::Default: elt.isPresent.defaultValue = true; break;
+    case OverrideValueLocation::Default:
+    {
+        elt.isPresent.defaultValue = true;
+        break;
+    }
     case OverrideValueLocation::Prefab:
         elt.isPresent.prefabValue = true;
         elt.isPresent.hasPrefab = true;
@@ -306,7 +310,7 @@ void Ent::Map::checkInvariants() const
     for (auto& key_item : m_itemMap)
     {
         auto itemSchema = m_items.at(std::get<1>(key_item)).node->getSchema();
-        ENTLIB_ASSERT(singItem == itemSchema );
+        ENTLIB_ASSERT(singItem == itemSchema);
     }
 }
 
@@ -360,7 +364,10 @@ tl::optional<size_t> Ent::Map::getRawSize(OverrideValueLocation _location) const
 {
     switch (_location)
     {
-    case OverrideValueLocation::Default: return getDefaultSize();
+    case OverrideValueLocation::Default:
+    {
+        return getDefaultSize();
+    }
     case OverrideValueLocation::Prefab:
     {
         auto prefabSize = getPrefabSize();

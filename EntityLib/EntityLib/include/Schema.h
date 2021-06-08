@@ -133,7 +133,7 @@ namespace Ent
         {
             std::string overridePolicy; ///< Policy used to override the array from the prefab
             bool ordered = true;
-            bool isMapItem = false; ///< Can't be discarded at write (nether null)
+            bool isMapItem = false; ///< Can't be discarded at write (neither null)
         };
         /// Store metadata for all schema which doesn't have specific field
         struct GenericMeta : BaseMeta

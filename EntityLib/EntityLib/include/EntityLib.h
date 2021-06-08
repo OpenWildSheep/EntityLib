@@ -338,7 +338,7 @@ namespace Ent
         size_t version{}; ///< @todo remove?
         size_t index{}; ///< Useful to keep the componants order in the json file. To make diffs easier.
         DeleteCheck deleteCheck;
-        bool hasPrefab{}; ///< True if it override an other component (not just default)
+        bool hasPrefab{}; ///< True if it overrides an other component (not just default)
 
         Component(
             nlohmann::json _rawData,

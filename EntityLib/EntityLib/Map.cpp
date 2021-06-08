@@ -305,8 +305,8 @@ void Ent::Map::checkInvariants() const
     }
     for (auto& key_item : m_itemMap)
     {
-        auto schem = m_items.at(std::get<1>(key_item)).node->getSchema();
-        ENTLIB_ASSERT(singItem == schem);
+        auto itemSchema = m_items.at(std::get<1>(key_item)).node->getSchema();
+        ENTLIB_ASSERT(singItem == itemSchema );
     }
 }
 

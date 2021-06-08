@@ -140,7 +140,8 @@ namespace Ent
     {
         if (getUnionType() != _type)
         {
-            Subschema const* subTypeSchema = schema->getUnionTypeWrapper(_type);
+            Subschema const* subTypeSchema{};
+            std::tie(subTypeSchema, typeIndex) = schema->getUnionTypeWrapper(_type);
             // TODO : Loïc - low prio - Find a way to get the super.
             //   It could be hard because we are no more in the loading phase, so the super is
             //   now delete.
@@ -323,6 +324,15 @@ namespace Ent
         if (value.is<Union>())
         {
             return value.get<Union>().getUnionType();
+        }
+        throw BadType();
+    }
+
+    size_t Node::getUnionTypeIndex() const
+    {
+        if (value.is<Union>())
+        {
+            return value.get<Union>().typeIndex;
         }
         throw BadType();
     }
@@ -529,6 +539,7 @@ namespace Ent
             detUnion.schema = _un.schema;
             detUnion.wrapper = _un.wrapper->detach();
             detUnion.metaData = _un.metaData;
+            detUnion.typeIndex = _un.typeIndex;
             return Node(std::move(detUnion), schema);
         }
     };
@@ -583,6 +594,7 @@ namespace Ent
                 detUnion.wrapper = _un.wrapper->makeInstanceOf();
             }
             detUnion.metaData = _un.metaData;
+            detUnion.typeIndex = _un.typeIndex;
             return Node(std::move(detUnion), schema);
         }
     };
@@ -2316,6 +2328,7 @@ Ent::Node Ent::EntityLib::loadNode(
                 un.schema = &_nodeSchema;
                 un.wrapper = Ent::make_value<Ent::Node>(std::move(dataNode));
                 un.metaData = &meta;
+                un.typeIndex = subSchemaIndex;
                 result = Ent::Node(std::move(un), &_nodeSchema);
                 typeFound = true;
                 break;
@@ -2328,6 +2341,7 @@ Ent::Node Ent::EntityLib::loadNode(
             Ent::Union un;
             un.schema = &_nodeSchema;
             un.metaData = &meta;
+            un.typeIndex = 0;
             result = Ent::Node(std::move(un), &_nodeSchema);
         }
     }

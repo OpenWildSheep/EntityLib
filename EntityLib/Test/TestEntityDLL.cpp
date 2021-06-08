@@ -363,10 +363,12 @@ try
         ENTLIB_ASSERT(oneOfScripts2->getDataType() == Ent::DataType::oneOf);
         ENTLIB_ASSERT(
             oneOfScripts2->getUnionType() == std::string("CineEventTriggerEventHandlerPost"));
+        ENTLIB_ASSERT(oneOfScripts2->getUnionTypeIndex() == 7);
         oneOfScripts2->setUnionType("CineEventTestCurrentGameState");
         ENTLIB_CHECK_EXCEPTION(oneOfScripts2->setUnionType("ThisTypeDoesntExist"), Ent::BadUnionType);
         Ent::Node* testCurrentState = oneOfScripts2->getUnionData();
         ENTLIB_ASSERT(oneOfScripts2->getUnionType() == std::string("CineEventTestCurrentGameState"));
+        ENTLIB_ASSERT(oneOfScripts2->getUnionTypeIndex() == 1);
         auto fieldNames2 = testCurrentState->getFieldNames();
         ENTLIB_ASSERT(fieldNames2[0] == std::string("GameStateName"));
         ENTLIB_ASSERT(fieldNames2[1] == std::string("Super"));

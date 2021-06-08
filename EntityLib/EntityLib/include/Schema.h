@@ -95,7 +95,7 @@ namespace Ent
         /// @throw BadType if the schema is not a oneOf
         /// @throw MissingMetadata if the schema doesn't have a meta className and classData
         /// @throw BadUnionType if \p _subtype is not listed in the oneOf field
-        Subschema const* getUnionTypeWrapper(char const* _subtype) const;
+        std::pair<Subschema const*, size_t> getUnionTypeWrapper(char const* _subtype) const;
         /// @endcond
 
         Schema* rootSchema{};

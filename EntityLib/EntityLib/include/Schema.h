@@ -127,6 +127,7 @@ namespace Ent
         {
             std::string dataField; ///< Name of the field containing the data (ex : classData)
             std::string typeField; ///< Name of the field containing the type of the data (ex : className)
+            tl::optional<std::string> indexField; ///< Name of the field containing the index of the type
         };
         /// Store metadata for array type
         struct ArrayMeta : BaseMeta

@@ -2357,7 +2357,8 @@ json Ent::EntityLib::dumpNode(
     Node const& _node,
     OverrideValueSource _dumpedValueSource,
     bool _superKeyIsTypeName,
-    std::function<void(EntityRef&)> const& _entityRefPreProc)
+    std::function<void(EntityRef&)> const& _entityRefPreProc,
+    bool _saveUnionIndex)
 {
     json data;
     switch (_schema.type)
@@ -2438,6 +2439,10 @@ json Ent::EntityLib::dumpNode(
                             tmpNode[unionMeta.typeField] = type;
                             tmpNode[unionMeta.dataField] = json();
                             data.emplace_back(std::move(tmpNode));
+                            if (unionMeta.indexField.has_value() and _saveUnionIndex)
+                            {
+                                data[*unionMeta.indexField] = _node.getUnionTypeIndex();
+                            }
                         }
                     }
                 }
@@ -2499,6 +2504,10 @@ json Ent::EntityLib::dumpNode(
             _dumpedValueSource,
             _superKeyIsTypeName,
             _entityRefPreProc);
+        if (meta.indexField.has_value() and _saveUnionIndex)
+        {
+            data[*meta.indexField] = _node.getUnionTypeIndex();
+        }
     }
     break;
     case Ent::DataType::COUNT:

@@ -726,7 +726,7 @@ try
         ENTLIB_ASSERT(tags->mapGet("c") == nullptr);
 
         // Test insert in map (+save/load)
-        auto e = tags->mapGet("e");
+        auto e = tags->mapGet("A");
         ENTLIB_ASSERT(e != nullptr);
         ENTLIB_ASSERT(e->getDataType() == Ent::DataType::array);
 
@@ -763,8 +763,10 @@ try
         ENTLIB_ASSERT(not tags->mapErase(2));
 
         // Test insert in map
-        ENTLIB_ASSERT(tags->mapGet("e") == nullptr);
-        ENTLIB_ASSERT(tags->mapInsert("e") != nullptr);
+        ENTLIB_ASSERT(tags->mapGet("A") == nullptr);
+        ENTLIB_ASSERT(tags->mapInsert("A") != nullptr);
+        auto items = tags->getItems();
+        ENTLIB_ASSERT(items.front()->at(0llu)->getString() == std::string("A")); // "A" should be first
 
         // Test erase in Components
         ENTLIB_ASSERT(ent->getComponent("TransformGD") != nullptr);

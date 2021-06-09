@@ -277,9 +277,21 @@ std::vector<Ent::Node const*> Ent::Map::getItemsWithRemoved() const
 {
     std::vector<Node const*> result;
     result.reserve(m_items.size());
-    for (auto&& elt : m_items)
+    auto&& meta = m_schema->meta.get<Ent::Subschema::ArrayMeta>();
+    if (meta.ordered)
     {
-        result.push_back(elt.node.get());
+        for (auto const& key_index : m_itemMap)
+        {
+            auto& elt = m_items[std::get<1>(key_index)];
+            result.push_back(elt.node.get());
+        }
+    }
+    else
+    {
+        for (auto&& elt : m_items)
+        {
+            result.push_back(elt.node.get());
+        }
     }
     return result;
 }
@@ -289,12 +301,29 @@ std::vector<Ent::Node const*> Ent::Map::getItems() const
     checkInvariants();
     std::vector<Node const*> result;
     result.reserve(m_items.size());
-    for (auto const& node : m_items)
+    auto&& meta = m_schema->meta.get<Ent::Subschema::ArrayMeta>();
+    if (meta.ordered)
     {
-        auto key = ::getChildKey(m_schema, node.node.get());
-        if (node.isPresent.get())
+        for (auto const& key_index : m_itemMap)
         {
-            result.push_back(node.node.get());
+            auto key = std::get<0>(key_index);
+            auto index = std::get<1>(key_index);
+            auto& elt = m_items[index];
+            if (elt.isPresent.get())
+            {
+                result.push_back(elt.node.get());
+            }
+        }
+    }
+    else
+    {
+        for (auto const& node : m_items)
+        {
+            auto key = ::getChildKey(m_schema, node.node.get());
+            if (node.isPresent.get())
+            {
+                result.push_back(node.node.get());
+            }
         }
     }
     return result;

@@ -203,7 +203,14 @@ Ent::Node const* Ent::Map::get(KeyType const& _key) const
     {
         return nullptr;
     }
-    return element.node.get();
+    Ent::Node const* node = element.node.get();
+    auto const& overridePolicy = m_schema->meta.get<Subschema::ArrayMeta>().overridePolicy;
+    if (overridePolicy == "map")
+    {
+        return node->at(1llu);
+    }
+    else
+        return element.node.get();
 }
 
 Ent::Node* Ent::Map::insert(KeyType const& _key)

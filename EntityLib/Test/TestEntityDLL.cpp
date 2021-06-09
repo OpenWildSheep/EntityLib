@@ -223,7 +223,7 @@ try
         ENTLIB_ASSERT(tags->at(1llu)->at(1llu)->size() == 1);
         ENTLIB_ASSERT(tags->at(1llu)->at(1llu)->at(0llu)->getString() == std::string("2"));
         // Test mapGet on map and set
-        ENTLIB_ASSERT(tags->mapGet("a")->at(1llu)->mapGet("1")->getString() == std::string("1"));
+        ENTLIB_ASSERT(tags->mapGet("a")->mapGet("1")->getString() == std::string("1"));
 
         // Test default value
         Ent::Component const* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
@@ -353,7 +353,7 @@ try
         // Test mapErase in set of primitive
         Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
         Ent::Node* tags = pathNodeGD->root.at("Tags")->at("Tags");
-        auto primSet = tags->mapGet("a")->at(1llu);
+        auto primSet = tags->mapGet("a");
         ENTLIB_CHECK_EXCEPTION(primSet->mapErase("1"), Ent::BadArrayType);
 
         // Set Union type and override
@@ -628,11 +628,9 @@ try
         ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(1llu)->getString() == std::string("2"));
         ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(2llu)->getString() == std::string("3"));
         // Test mapGet on map
-        auto cPair = tags->mapGet("c");
-        ENTLIB_ASSERT(cPair != nullptr);
-        ENTLIB_ASSERT(cPair->at(0llu)->getString() == std::string("c"));
+        auto cValueSet = tags->mapGet("c");
+        ENTLIB_ASSERT(cValueSet != nullptr);
         // Test mapGet on set
-        auto cValueSet = cPair->at(1llu);
         ENTLIB_ASSERT(cValueSet->mapGet("1")->getString() == std::string("1"));
 
         // TEST SubScene (without override)
@@ -730,7 +728,7 @@ try
         // Test insert in map (+save/load)
         auto e = tags->mapGet("e");
         ENTLIB_ASSERT(e != nullptr);
-        ENTLIB_ASSERT(e->at(0llu)->getString() == std::string("e"));
+        ENTLIB_ASSERT(e->getDataType() == Ent::DataType::array);
 
         // Test erase in union_set (+save/load)
         ENTLIB_ASSERT(actorStates.mapGet("ActionCinematic") == nullptr);

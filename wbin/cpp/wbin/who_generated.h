@@ -24,9 +24,9 @@ struct HeightObjT : public flatbuffers::NativeTable {
   std::unique_ptr<WBIN::FloatMaskT> erosionMask{};
   std::unique_ptr<WBIN::FloatMaskT> detailMask{};
   std::unique_ptr<WBIN::FloatMaskT> detailType{};
-  std::unique_ptr<WBIN::FloatMaskT> influence{};
   std::vector<std::unique_ptr<WBIN::FloatMaskT>> motifMask{};
   std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf{};
+  std::unique_ptr<WBIN::FloatMaskT> influence{};
 };
 
 struct HeightObj FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -41,9 +41,9 @@ struct HeightObj FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_EROSIONMASK = 14,
     VT_DETAILMASK = 16,
     VT_DETAILTYPE = 18,
-    VT_INFLUENCE = 20,
-    VT_MOTIFMASK = 22,
-    VT_SOURCEFILEINF = 24
+    VT_MOTIFMASK = 20,
+    VT_SOURCEFILEINF = 22,
+    VT_INFLUENCE = 24
   };
   const WBIN::AABB *aabb() const {
     return GetStruct<const WBIN::AABB *>(VT_AABB);
@@ -93,12 +93,6 @@ struct HeightObj FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   WBIN::FloatMask *mutable_detailType() {
     return GetPointer<WBIN::FloatMask *>(VT_DETAILTYPE);
   }
-  const WBIN::FloatMask *influence() const {
-    return GetPointer<const WBIN::FloatMask *>(VT_INFLUENCE);
-  }
-  WBIN::FloatMask *mutable_influence() {
-    return GetPointer<WBIN::FloatMask *>(VT_INFLUENCE);
-  }
   const flatbuffers::Vector<flatbuffers::Offset<WBIN::FloatMask>> *motifMask() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<WBIN::FloatMask>> *>(VT_MOTIFMASK);
   }
@@ -110,6 +104,12 @@ struct HeightObj FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   WBIN::SourceFileInf *mutable_sourceFileInf() {
     return GetPointer<WBIN::SourceFileInf *>(VT_SOURCEFILEINF);
+  }
+  const WBIN::FloatMask *influence() const {
+    return GetPointer<const WBIN::FloatMask *>(VT_INFLUENCE);
+  }
+  WBIN::FloatMask *mutable_influence() {
+    return GetPointer<WBIN::FloatMask *>(VT_INFLUENCE);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -128,13 +128,13 @@ struct HeightObj FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(detailMask()) &&
            VerifyOffset(verifier, VT_DETAILTYPE) &&
            verifier.VerifyTable(detailType()) &&
-           VerifyOffset(verifier, VT_INFLUENCE) &&
-           verifier.VerifyTable(influence()) &&
            VerifyOffset(verifier, VT_MOTIFMASK) &&
            verifier.VerifyVector(motifMask()) &&
            verifier.VerifyVectorOfTables(motifMask()) &&
            VerifyOffset(verifier, VT_SOURCEFILEINF) &&
            verifier.VerifyTable(sourceFileInf()) &&
+           VerifyOffset(verifier, VT_INFLUENCE) &&
+           verifier.VerifyTable(influence()) &&
            verifier.EndTable();
   }
   HeightObjT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -170,14 +170,14 @@ struct HeightObjBuilder {
   void add_detailType(flatbuffers::Offset<WBIN::FloatMask> detailType) {
     fbb_.AddOffset(HeightObj::VT_DETAILTYPE, detailType);
   }
-  void add_influence(flatbuffers::Offset<WBIN::FloatMask> influence) {
-    fbb_.AddOffset(HeightObj::VT_INFLUENCE, influence);
-  }
   void add_motifMask(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<WBIN::FloatMask>>> motifMask) {
     fbb_.AddOffset(HeightObj::VT_MOTIFMASK, motifMask);
   }
   void add_sourceFileInf(flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf) {
     fbb_.AddOffset(HeightObj::VT_SOURCEFILEINF, sourceFileInf);
+  }
+  void add_influence(flatbuffers::Offset<WBIN::FloatMask> influence) {
+    fbb_.AddOffset(HeightObj::VT_INFLUENCE, influence);
   }
   explicit HeightObjBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -203,13 +203,13 @@ inline flatbuffers::Offset<HeightObj> CreateHeightObj(
     flatbuffers::Offset<WBIN::FloatMask> erosionMask = 0,
     flatbuffers::Offset<WBIN::FloatMask> detailMask = 0,
     flatbuffers::Offset<WBIN::FloatMask> detailType = 0,
-    flatbuffers::Offset<WBIN::FloatMask> influence = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<WBIN::FloatMask>>> motifMask = 0,
-    flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf = 0) {
+    flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf = 0,
+    flatbuffers::Offset<WBIN::FloatMask> influence = 0) {
   HeightObjBuilder builder_(_fbb);
+  builder_.add_influence(influence);
   builder_.add_sourceFileInf(sourceFileInf);
   builder_.add_motifMask(motifMask);
-  builder_.add_influence(influence);
   builder_.add_detailType(detailType);
   builder_.add_detailMask(detailMask);
   builder_.add_erosionMask(erosionMask);
@@ -231,9 +231,9 @@ inline flatbuffers::Offset<HeightObj> CreateHeightObjDirect(
     flatbuffers::Offset<WBIN::FloatMask> erosionMask = 0,
     flatbuffers::Offset<WBIN::FloatMask> detailMask = 0,
     flatbuffers::Offset<WBIN::FloatMask> detailType = 0,
-    flatbuffers::Offset<WBIN::FloatMask> influence = 0,
     const std::vector<flatbuffers::Offset<WBIN::FloatMask>> *motifMask = nullptr,
-    flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf = 0) {
+    flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf = 0,
+    flatbuffers::Offset<WBIN::FloatMask> influence = 0) {
   auto edgeVisibility__ = edgeVisibility ? _fbb.CreateVectorOfStructs<WBIN::Bool3>(*edgeVisibility) : 0;
   auto materials__ = materials ? _fbb.CreateVector<uint32_t>(*materials) : 0;
   auto motifMask__ = motifMask ? _fbb.CreateVector<flatbuffers::Offset<WBIN::FloatMask>>(*motifMask) : 0;
@@ -247,9 +247,9 @@ inline flatbuffers::Offset<HeightObj> CreateHeightObjDirect(
       erosionMask,
       detailMask,
       detailType,
-      influence,
       motifMask__,
-      sourceFileInf);
+      sourceFileInf,
+      influence);
 }
 
 flatbuffers::Offset<HeightObj> CreateHeightObj(flatbuffers::FlatBufferBuilder &_fbb, const HeightObjT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -271,9 +271,9 @@ inline void HeightObj::UnPackTo(HeightObjT *_o, const flatbuffers::resolver_func
   { auto _e = erosionMask(); if (_e) _o->erosionMask = std::unique_ptr<WBIN::FloatMaskT>(_e->UnPack(_resolver)); }
   { auto _e = detailMask(); if (_e) _o->detailMask = std::unique_ptr<WBIN::FloatMaskT>(_e->UnPack(_resolver)); }
   { auto _e = detailType(); if (_e) _o->detailType = std::unique_ptr<WBIN::FloatMaskT>(_e->UnPack(_resolver)); }
-  { auto _e = influence(); if (_e) _o->influence = std::unique_ptr<WBIN::FloatMaskT>(_e->UnPack(_resolver)); }
   { auto _e = motifMask(); if (_e) { _o->motifMask.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->motifMask[_i] = std::unique_ptr<WBIN::FloatMaskT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = sourceFileInf(); if (_e) _o->sourceFileInf = std::unique_ptr<WBIN::SourceFileInfT>(_e->UnPack(_resolver)); }
+  { auto _e = influence(); if (_e) _o->influence = std::unique_ptr<WBIN::FloatMaskT>(_e->UnPack(_resolver)); }
 }
 
 inline flatbuffers::Offset<HeightObj> HeightObj::Pack(flatbuffers::FlatBufferBuilder &_fbb, const HeightObjT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -292,9 +292,9 @@ inline flatbuffers::Offset<HeightObj> CreateHeightObj(flatbuffers::FlatBufferBui
   auto _erosionMask = _o->erosionMask ? CreateFloatMask(_fbb, _o->erosionMask.get(), _rehasher) : 0;
   auto _detailMask = _o->detailMask ? CreateFloatMask(_fbb, _o->detailMask.get(), _rehasher) : 0;
   auto _detailType = _o->detailType ? CreateFloatMask(_fbb, _o->detailType.get(), _rehasher) : 0;
-  auto _influence = _o->influence ? CreateFloatMask(_fbb, _o->influence.get(), _rehasher) : 0;
   auto _motifMask = _o->motifMask.size() ? _fbb.CreateVector<flatbuffers::Offset<WBIN::FloatMask>> (_o->motifMask.size(), [](size_t i, _VectorArgs *__va) { return CreateFloatMask(*__va->__fbb, __va->__o->motifMask[i].get(), __va->__rehasher); }, &_va ) : 0;
   auto _sourceFileInf = _o->sourceFileInf ? CreateSourceFileInf(_fbb, _o->sourceFileInf.get(), _rehasher) : 0;
+  auto _influence = _o->influence ? CreateFloatMask(_fbb, _o->influence.get(), _rehasher) : 0;
   return WBIN::CreateHeightObj(
       _fbb,
       _aabb,
@@ -305,9 +305,9 @@ inline flatbuffers::Offset<HeightObj> CreateHeightObj(flatbuffers::FlatBufferBui
       _erosionMask,
       _detailMask,
       _detailType,
-      _influence,
       _motifMask,
-      _sourceFileInf);
+      _sourceFileInf,
+      _influence);
 }
 
 inline const WBIN::HeightObj *GetHeightObj(const void *buf) {

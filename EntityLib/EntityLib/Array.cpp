@@ -45,9 +45,24 @@ bool Ent::Array::isErased(Map::KeyType const& _key) const
     return m_data.get<Map>().isErased(_key);
 }
 
+bool Ent::Array::canErase() const
+{
+    auto&& meta = m_schema->meta.get<Ent::Subschema::ArrayMeta>();
+    if (meta.overridePolicy == "map")
+    {
+        return true;
+    }
+    if (meta.overridePolicy != "set")
+    {
+        return false;
+    }
+    // If it is a set, it has a singularItems. Can erase only if item is a oneOf.
+    return getSchema()->singularItems->get().type == Ent::DataType::oneOf;
+}
+
 bool Ent::Array::mapErase(Map::KeyType const& _key)
 {
-    ENTLIB_ASSERT(m_data.is<Map>());
+    ENTLIB_ASSERT_MSG(canErase(), "Can only erase in a map or a set of union");
     return m_data.get<Map>().erase(_key);
 }
 

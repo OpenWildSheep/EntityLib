@@ -17,7 +17,7 @@ static void setChildKey(Ent::Subschema const* _arraySchema, Ent::Node* _child, E
     {
         // It is a C++ map.
         // In json it is an array of "2 item array" where the 1st item is the key
-        // and can be string, double or integer
+        // and can be string or integer
         // meta.ordered means the items have to be sorted by the key
         ENTLIB_ASSERT(_child->getSchema()->linearItems.has_value());
         // ENTLIB_ASSERT(not _child->at(0llu)->hasDefaultValue); // Sometime there is a key in the default value
@@ -88,7 +88,6 @@ static Ent::Map::KeyType getChildKey(Ent::Subschema const* _arraySchema, Ent::No
             return String(_child->at(0llu)->getString());
         case Ent::DataType::entityRef:
             return String(_child->at(0llu)->getEntityRef().entityPath.c_str());
-        case Ent::DataType::number: return _child->at(0llu)->getFloat();
         case Ent::DataType::integer: return _child->at(0llu)->getInt();
         default: throw std::runtime_error("Unknown key type in map " + _arraySchema->name);
         }
@@ -106,9 +105,6 @@ static Ent::Map::KeyType getChildKey(Ent::Subschema const* _arraySchema, Ent::No
         case Ent::DataType::oneOf: return String(_child->getUnionType()); break;
         // The key is the item itself
         case Ent::DataType::string: return String(_child->getString());
-        // The key is the item itself
-        case Ent::DataType::number: return _child->getFloat();
-        // The key is the item itself
         case Ent::DataType::integer: return _child->getInt();
         default: throw std::runtime_error("Unknown key type in set " + _arraySchema->name);
         }
@@ -276,7 +272,7 @@ std::vector<Ent::Node const*> Ent::Map::getItemsWithRemoved() const
     result.reserve(m_items.size());
     for (auto&& elt : m_items)
     {
-        result.emplace_back(elt.node.get());
+        result.push_back(elt.node.get());
     }
     return result;
 }
@@ -291,7 +287,7 @@ std::vector<Ent::Node const*> Ent::Map::getItems() const
         auto key = ::getChildKey(m_schema, node.node.get());
         if (node.isPresent.get())
         {
-            result.emplace_back(node.node.get());
+            result.push_back(node.node.get());
         }
     }
     return result;

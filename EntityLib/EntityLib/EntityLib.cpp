@@ -787,6 +787,10 @@ namespace Ent
     bool Node::mapErase(char const* _key)
     {
         checkMap("mapErase");
+        if (not value.get<Array>().canErase())
+        {
+            throw BadArrayType(format("Can call 'mapErase' only on map and set of union").c_str());
+        }
         return value.get<Array>().mapErase(_key);
     }
 

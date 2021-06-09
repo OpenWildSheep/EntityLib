@@ -37,7 +37,11 @@ namespace Ent
 
         Node* arrayPush(); ///< @pre not hasKey()
 
-        bool mapErase(Map::KeyType const& _key); ///< Erase the item with _key, or return false
+        bool canErase() const; ///< Erase is allowed if it is a map or a set of union
+
+        /// @brief Erase the item with _key, or return false
+        /// @pre canErase()
+        bool mapErase(Map::KeyType const& _key);
         Node* mapGet(Map::KeyType const& _key); ///< @return the item with _key, or nullptr
         Node const* mapGet(Map::KeyType const& _key) const; ///< @return the item with _key, or nullptr
         Node* mapInsert(Map::KeyType const& _key); ///< @pre hasKey(). @brief Insert a new item with _key
@@ -50,7 +54,7 @@ namespace Ent
 
         void pop(); ///< @pre not hasKey() and not isTuple()
 
-        void clear(); //< @pre not isTuple()
+        void clear(); ///< @pre not isTuple()
 
         bool empty() const;
 

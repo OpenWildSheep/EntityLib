@@ -222,6 +222,8 @@ try
         ENTLIB_ASSERT(tags->at(1llu)->at(0llu)->getString() == std::string("c"));
         ENTLIB_ASSERT(tags->at(1llu)->at(1llu)->size() == 1);
         ENTLIB_ASSERT(tags->at(1llu)->at(1llu)->at(0llu)->getString() == std::string("2"));
+        // Test mapGet on map and set
+        ENTLIB_ASSERT(tags->mapGet("a")->at(1llu)->mapGet("1")->getString() == std::string("1"));
 
         // Test default value
         Ent::Component const* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
@@ -348,6 +350,11 @@ try
         heightObj->root.saveNode("test.HeightObj.node");
 
         testPrefabEntity(ent.get());
+        // Test mapErase in set of primitive
+        Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
+        Ent::Node* tags = pathNodeGD->root.at("Tags")->at("Tags");
+        auto primSet = tags->mapGet("a")->at(1llu);
+        ENTLIB_CHECK_EXCEPTION(primSet->mapErase("1"), Ent::BadArrayType);
 
         // Set Union type and override
         Ent::Component* cinematicGD = ent->getComponent("CinematicGD");
@@ -620,7 +627,13 @@ try
         ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(0llu)->getString() == std::string("1"));
         ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(1llu)->getString() == std::string("2"));
         ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(2llu)->getString() == std::string("3"));
-        ENTLIB_ASSERT(tags->mapGet("c") != nullptr);
+        // Test mapGet on map
+        auto cPair = tags->mapGet("c");
+        ENTLIB_ASSERT(cPair != nullptr);
+        ENTLIB_ASSERT(cPair->at(0llu)->getString() == std::string("c"));
+        // Test mapGet on set
+        auto cValueSet = cPair->at(1llu);
+        ENTLIB_ASSERT(cValueSet->mapGet("1")->getString() == std::string("1"));
 
         // TEST SubScene (without override)
         Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();

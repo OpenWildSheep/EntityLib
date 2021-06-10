@@ -2130,7 +2130,7 @@ static Ent::Node loadNode(
                                        Ent::EntityRef{String(_default->get<std::string>())};
 
         tl::optional<Ent::EntityRef> const supVal =
-            (_super != nullptr and _super->isSet()) ?
+            (_super != nullptr and not _super->hasDefaultValue()) ? // Keep the prefab value if there is
                 tl::optional<Ent::EntityRef>(_super->getEntityRef()) :
                 tl::optional<Ent::EntityRef>(tl::nullopt);
 

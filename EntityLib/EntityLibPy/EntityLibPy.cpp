@@ -413,7 +413,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("remove_component", &Entity::removeComponent)
         .def("get_component_types", &Entity::getComponentTypes)
         .def("get_components", &Entity::getComponents, py::return_value_policy::reference_internal)
-        .def("get_actorstates", [](Entity* ent) { ent->getActorStates(); }, py::return_value_policy::reference_internal)
+        .def("get_actorstates", [](Entity* ent) { return ent->getActorStates(); }, py::return_value_policy::reference_internal)
         .def(
             "get_subscene_component",
             [](Entity& e) { return e.getSubSceneComponent(); },

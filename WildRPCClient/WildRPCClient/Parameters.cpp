@@ -25,6 +25,30 @@ typedef unsigned char u8;
 
 namespace WRPC
 {
+
+TypeInfo Type::Invalid(ContainerType_Scalar, ElementType_Invalid);
+TypeInfo Type::Boolean(ContainerType_Scalar, ElementType_Boolean);
+TypeInfo Type::Integer(ContainerType_Scalar, ElementType_Integer);
+TypeInfo Type::Float(ContainerType_Scalar, ElementType_Float);
+TypeInfo Type::Vector2(ContainerType_Scalar, ElementType_Vector2);
+TypeInfo Type::UInt3(ContainerType_Scalar, ElementType_UInt3);
+TypeInfo Type::Vector3(ContainerType_Scalar, ElementType_Vector3);
+TypeInfo Type::Quat(ContainerType_Scalar, ElementType_Quat);
+TypeInfo Type::Color(ContainerType_Scalar, ElementType_Color);
+TypeInfo Type::Position(ContainerType_Scalar, ElementType_Position);
+TypeInfo Type::String(ContainerType_Scalar, ElementType_String);
+TypeInfo Type::InvalidArray(ContainerType_Array, ElementType_Invalid);
+TypeInfo Type::BooleanArray(ContainerType_Array, ElementType_Boolean);
+TypeInfo Type::IntegerArray(ContainerType_Array, ElementType_Integer);
+TypeInfo Type::FloatArray(ContainerType_Array, ElementType_Float);
+TypeInfo Type::Vector2Array(ContainerType_Array, ElementType_Vector2);
+TypeInfo Type::UInt3Array(ContainerType_Array, ElementType_UInt3);
+TypeInfo Type::Vector3Array(ContainerType_Array, ElementType_Vector3);
+TypeInfo Type::QuatArray(ContainerType_Array, ElementType_Quat);
+TypeInfo Type::ColorArray(ContainerType_Array, ElementType_Color);
+TypeInfo Type::PositionArray(ContainerType_Array, ElementType_Position);
+TypeInfo Type::StringArray(ContainerType_Array, ElementType_String);
+
 // DECODING ------------------------------------------------------------------------
 
 struct Decoder

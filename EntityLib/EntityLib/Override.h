@@ -18,7 +18,7 @@ namespace Ent
         /// Override value comes from the instance.
         Override
     };
-    
+
     template <typename V>
     struct Override
     {
@@ -100,14 +100,12 @@ namespace Ent
         {
             switch (_location)
             {
-			case OverrideValueLocation::Default:
-                return defaultValue;
-			case OverrideValueLocation::Prefab:
+            case OverrideValueLocation::Default: return defaultValue;
+            case OverrideValueLocation::Prefab:
                 return hasPrefab ? tl::optional<V&>{prefabValue} : tl::nullopt;
             case OverrideValueLocation::Override:
                 return hasOverride ? tl::optional<V&>{overrideValue} : tl::nullopt;
-            default:
-                return tl::nullopt;
+            default: return tl::nullopt;
             }
         }
 
@@ -115,15 +113,22 @@ namespace Ent
         {
             switch (_location)
             {
-			case OverrideValueLocation::Default:
-                return defaultValue;
-			case OverrideValueLocation::Prefab:
+            case OverrideValueLocation::Default: return defaultValue;
+            case OverrideValueLocation::Prefab:
                 return hasPrefab ? tl::optional<V const&>{prefabValue} : tl::nullopt;
             case OverrideValueLocation::Override:
                 return hasOverride ? tl::optional<V const&>{overrideValue} : tl::nullopt;
-			default:
-                return tl::nullopt;
+            default: return tl::nullopt;
             }
+        }
+
+        V& getPrefab()
+        {
+            return hasPrefab ? prefabValue : defaultValue;
+        }
+        V const& getPrefab() const
+        {
+            return hasPrefab ? prefabValue : defaultValue;
         }
 
     public:

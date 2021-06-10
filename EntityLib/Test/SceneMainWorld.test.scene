@@ -42989,11 +42989,6 @@
                         "InstanceOf": "60_audio/entities/sound_entities/editor/entity/gpe_startmusic.entity",
                         "Name": "gpe@startmusic_001",
                         "Thumbnail": "01_common/metrics/metricbox/editor/thumbnail/metricbox.wthumb"
-                    },
-                    {
-                        "Components": [],
-                        "InstanceOf": "prefab.entity",
-                        "Name": "PlayerSpawner_"
                     }
                 ],
                 "File": "",

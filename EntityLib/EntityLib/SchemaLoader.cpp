@@ -77,7 +77,7 @@ void Ent::SchemaLoader::parseSchema(
             auto iter = m_schemaMap.find(fileName);
             if (iter == m_schemaMap.end())
             {
-                m_schemaMap[fileName] = loadJsonFile(m_schemaPath / fileName);
+                m_schemaMap[fileName] = loadJsonFile(m_schemaPath, fileName);
             }
             refRoot = &m_schemaMap[fileName];
         }
@@ -570,6 +570,19 @@ void Ent::SchemaLoader::readSchema(
         }
         void closeSubschema() override
         {
+            if (stack.size() > 1)
+            {
+                auto& lastSchema = stack.back()->get();
+                if (lastSchema.type == Ent::DataType::array)
+                {
+                    auto& lastMeta = lastSchema.meta.get<Ent::Subschema::ArrayMeta>();
+                    if (lastMeta.overridePolicy == "map")
+                    {
+                        lastSchema.singularItems->get().meta.get<Ent::Subschema::ArrayMeta>().isMapItem =
+                            true;
+                    }
+                }
+            }
             ENTLIB_DEBUG_PRINTF("%scloseSubschema\n", getTab());
         }
         void setMeta(Subschema::Meta meta, nlohmann::json user) override

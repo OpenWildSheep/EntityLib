@@ -17,6 +17,11 @@ namespace Ent
         }
     }
 
+    std::string formatErrorPath(std::filesystem::path const&, std::filesystem::path const& _rel)
+    {
+        return format(R"("%s")", _rel.generic_string().c_str());
+    }
+
     std::string convertANSIToUTF8(std::string const& message)
     {
         // CP_ACP is the system default Windows ANSI code page.
@@ -38,4 +43,31 @@ namespace Ent
         return result;
     }
 
+    static std::string makeWhatMessage(
+        std::string const& msg,
+        std::filesystem::path const& rootPath,
+        std::filesystem::path const& relPath,
+        std::error_code error)
+    {
+        return Ent::format(
+            R"msg(%s %s : %s)msg",
+            msg.c_str(),
+            Ent::convertANSIToUTF8(error.message()).c_str(),
+            Ent::formatErrorPath(rootPath, relPath).c_str());
+    }
+    FileSystemError::FileSystemError(
+        std::string const& msg,
+        std::filesystem::path const& rootPath,
+        std::filesystem::path const& relPath,
+        std::error_code error)
+        : std::runtime_error(makeWhatMessage(msg, rootPath, relPath, error))
+    {
+    }
+    FileSystemError::FileSystemError(
+        std::string const& msg,
+        std::filesystem::path const& rootPath,
+        std::filesystem::path const& relPath)
+        : FileSystemError(msg, rootPath, relPath, std::make_error_code(static_cast<std::errc>(errno)))
+    {
+    }
 } // namespace Ent

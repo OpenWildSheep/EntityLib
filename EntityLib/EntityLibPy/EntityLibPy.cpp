@@ -361,7 +361,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("dumps", [](Node* node, OverrideValueSource source, bool superKeyIsType)
              {
                  return node->toJson(source, superKeyIsType).dump(4);
-             }, 
+             },
              "source"_a = OverrideValueSource::Override, "superKeyIsType"_a = false);
 
     pyComponent

@@ -1,6 +1,5 @@
 #pragma once
 
-#pragma warning(push, 0)
 #include <cstdio>
 #include <exception>
 #include <string>
@@ -8,7 +7,7 @@
 #include <memory>
 #include <vector>
 #include <stdexcept>
-#pragma warning(pop)
+#include <filesystem>
 
 #ifdef ENTLIB_STATIC
 #define ENTLIB_DLLEXPORT
@@ -78,7 +77,10 @@ namespace Ent
     void logicError(char const* _file, long _line, char const* _message, Args&&... args)
     {
         log(_file, _line, stderr, "ERROR : ", _message, std::forward<Args>(args)...);
-        terminate();
+        if (_file != nullptr) // Avoid C4702 unreachable code
+        {
+            terminate();
+        }
     }
 } // namespace Ent
 
@@ -391,6 +393,8 @@ namespace Ent
 
     std::string convertANSIToUTF8(std::string const& message);
 
+    std::string formatErrorPath(std::filesystem::path const& _base, std::filesystem::path const& _rel);
+
     struct InvalidKey : std::logic_error
     {
         template <typename Map>
@@ -432,4 +436,19 @@ namespace Ent
 
 #define AT(MAP, KEY) ::Ent::at(MAP, KEY, __FILE__, __LINE__, __func__)
     /// @endcond
+
+    struct FileSystemError : public std::runtime_error
+    {
+        FileSystemError(
+            std::string const& msg,
+            std::filesystem::path const& rootPath,
+            std::filesystem::path const& relPath,
+            std::error_code error);
+
+        /// This ctor will use the errno as error_code
+        FileSystemError(
+            std::string const& msg,
+            std::filesystem::path const& rootPath,
+            std::filesystem::path const& relPath);
+    };
 } // namespace Ent

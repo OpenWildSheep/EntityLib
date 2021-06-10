@@ -68,16 +68,18 @@ bool Ent::Array::mapErase(Map::KeyType const& _key)
 
 Ent::Node* Ent::Array::mapGet(Map::KeyType const& _key)
 {
-    ENTLIB_ASSERT(m_data.is<Map>());
+    ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only mapGet on map or set");
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
     return const_cast<Ent::Node*>(std::as_const(*this).m_data.get<Map>().get(_key));
 }
 Ent::Node const* Ent::Array::mapGet(Map::KeyType const& _key) const
 {
+    ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only mapGet on map or set");
     return m_data.get<Map>().get(_key);
 }
 Ent::Node* Ent::Array::mapInsert(Map::KeyType const& _key)
 {
+    ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only mapInsert on map or set");
     return m_data.get<Map>().insert(_key);
 }
 
@@ -89,6 +91,10 @@ bool Ent::Array::hasKey() const
 
 bool Ent::Array::isTuple() const
 {
+    if (not m_data.is<Vector>())
+    {
+        return false;
+    }
     return m_data.get<Vector>().isTuple();
 }
 
@@ -107,12 +113,13 @@ Ent::Node* Ent::Array::initAdd(OverrideValueLocation loc, Node _node)
 
 Ent::Node* Ent::Array::mapInitInsert(OverrideValueLocation _loc, Map::KeyType _key, Node _node)
 {
+    ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only mapInsert on map or set");
     return m_data.get<Map>().insert(_loc, std::move(_key), std::move(_node));
 }
 
 std::vector<Ent::Node const*> Ent::Array::getItemsWithRemoved() const
 {
-    ENTLIB_ASSERT(m_data.is<Map>());
+    ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only getItemsWithRemoved on map or set");
     return m_data.get<Map>().getItemsWithRemoved();
 }
 
@@ -143,7 +150,7 @@ bool Ent::Array::hasDefaultValue() const
 
 void Ent::Array::pop()
 {
-    ENTLIB_ASSERT(not hasKey());
+    ENTLIB_ASSERT_MSG(m_data.is<Vector>(), "Can only 'pop' on simple array");
     m_data.get<Vector>().pop();
 }
 
@@ -174,6 +181,7 @@ Ent::Array Ent::Array::makeInstanceOf() const
 
 void Ent::Array::arraySetSize(Override<size_t> _size)
 {
+    ENTLIB_ASSERT_MSG(m_data.is<Vector>(), "Can only 'arraySetSize' on simple array");
     m_data.get<Vector>().setSize(_size);
 }
 

@@ -1740,10 +1740,6 @@ struct MergeMapOverride
         auto&& meta = _nodeSchema.meta.get<Ent::Subschema::ArrayMeta>();
         bool const ordered = meta.ordered;
 
-        uint64_t defaultElementCount = 0;
-        uint64_t prefabAdditionalElementCount = 0;
-        int instanceAdditionalElementCount = 0;
-
         // Make a map key=>item of the instance array
         using KeyType = std::remove_reference_t<decltype(getKeyJson(json()))>;
         std::map<KeyType, json const*> instancePropMap;
@@ -1773,16 +1769,6 @@ struct MergeMapOverride
             for (Ent::Node const* subSuper : _super->getItems())
             {
                 json const* subDefault = _default == nullptr ? nullptr : &_default->at(index);
-                if (subDefault != nullptr)
-                {
-                    // item was added in default
-                    defaultElementCount++;
-                }
-                else
-                {
-                    // item was added in prefab
-                    prefabAdditionalElementCount++;
-                }
                 KeyType key = getKeyNode(subSuper);
                 auto loc = subDefault != nullptr ? OverrideValueLocation::Default :
                                                    OverrideValueLocation::Prefab;
@@ -1797,7 +1783,6 @@ struct MergeMapOverride
                     else
                     {
                         result.emplace_back(key, NodeWrapper{std::move(tmpNode), loc, true});
-                        --instanceAdditionalElementCount;
                     }
                     instancePropMap.erase(key); // Later we need to know which item are NOT in the prefab
                 }
@@ -1813,7 +1798,6 @@ struct MergeMapOverride
         }
         else if (_default != nullptr)
         {
-            defaultElementCount = _default->size();
             size_t index = 0;
             // Load all Nodes from the _default (overriden or not)
             for (json const& subDefault : *_default)
@@ -1823,19 +1807,10 @@ struct MergeMapOverride
                 {
                     Ent::Node tmpNode = entlib->loadNode(
                         _nodeSchema.singularItems->get(), *instancePropMap[key], nullptr, &subDefault);
-                    if (not doRemove(*instancePropMap[key]))
-                    {
-                        result.emplace_back(
-                            key,
-                            NodeWrapper{std::move(tmpNode), OverrideValueLocation::Default, false});
-                    }
-                    else
-                    {
-                        result.emplace_back(
-                            key,
-                            NodeWrapper{std::move(tmpNode), OverrideValueLocation::Default, true});
-                        --instanceAdditionalElementCount;
-                    }
+                    bool const isRemoved = doRemove(*instancePropMap[key]);
+                    result.emplace_back(
+                        key,
+                        NodeWrapper{std::move(tmpNode), OverrideValueLocation::Default, isRemoved});
                     instancePropMap.erase(key); // Later we need to know which item are NOT in the prefab
                 }
                 else // Not overriden
@@ -1861,7 +1836,6 @@ struct MergeMapOverride
                     auto node = entlib->loadNode(_nodeSchema.singularItems->get(), item, nullptr);
                     result.emplace_back(
                         key, NodeWrapper{std::move(node), OverrideValueLocation::Override, false});
-                    instanceAdditionalElementCount++;
                 }
                 // else? New but removed => Let's ignore them.
             }

@@ -165,6 +165,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Array.cpp" />
     <ClCompile Include="ComponentMerge.cpp" />
     <ClCompile Include="EntityLib.cpp">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EnableAllWarnings</WarningLevel>
@@ -174,18 +175,24 @@
     </ClCompile>
     <ClCompile Include="EntityLibCore.cpp" />
     <ClCompile Include="include\Schema.cpp" />
+    <ClCompile Include="Map.cpp" />
     <ClCompile Include="SchemaLoader.cpp" />
     <ClCompile Include="Tools.cpp" />
     <ClCompile Include="ValidJson.cpp" />
+    <ClCompile Include="Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Array.h" />
     <ClInclude Include="include\ComponentMerge.h" />
     <ClInclude Include="include\EntityLib.h" />
     <ClInclude Include="include\EntityLibCore.h" />
     <ClInclude Include="include\Schema.h" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="Override.h" />
     <ClInclude Include="SchemaLoader.h" />
     <ClInclude Include="Tools.h" />
     <ClInclude Include="ValidJson.h" />
+    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="external\mapbox\NATVIS\Variant.natvis" />

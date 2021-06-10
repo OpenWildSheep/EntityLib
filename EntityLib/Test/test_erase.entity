@@ -1,52 +1,62 @@
 {
-    "Color": [
-        27,
-        177,
-        27,
-        255
-    ],
-    "ActorStates":[
+    "ActorStates": [
         {
-            "className": "ActionChosen",
-            "classData":{
-                "ExitRequired": true
-            }
+            "classData": null,
+            "className": "ActionCinematic"
         },
         {
-            "className": "ActionCinematic",
-            "classData":{
-                "Type": 13
-            }
+            "classData": {
+                "ExitRequired": true
+            },
+            "className": "ActionChosen"
+        },
+        {
+            "classData": {},
+            "className": "ActionClamberRise"
         }
-    ],	
+    ],
+    "Color": [
+        27.0,
+        177.0,
+        27.0,
+        255.0
+    ],
     "Components": [
         {
             "Data": {
                 "Faction": "Plouf",
                 "ScriptList": [
-                    "a1", "b2", null ]
+                    "a1",
+                    "b2",
+                    null
+                ]
             },
             "Type": "SystemicCreature",
             "Version": 1
         },
         {
-            "Version": 1,
-            "Type": "PathNodeGD",
             "Data": {
                 "Radius": 30.0,
                 "Tags": {
                     "Tags": [
+                        [
+                            "A",
+                            []
+                        ],
                         [
                             "a",
                             []
                         ],
                         [
                             "b",
-                            ["1", "2"]
+                            [
+                                "1",
+                                "2"
+                            ]
                         ],
                         [
                             "c",
-                            ["1", "3"]
+                            null
                         ],
                         [
                             "d",
@@ -54,17 +64,28 @@
                         ]
                     ]
                 }
-            }
-        }, {
+            },
+            "Type": "PathNodeGD",
+            "Version": 1
+        },
+        {
             "Data": {
                 "InstanceOf": "test.StickToTerrain.node",
                 "NormalRatio": 0.6
             },
             "Type": "StickToTerrain",
             "Version": 1
+        },
+        {
+            "Data": null,
+            "Type": "SubScene"
+        },
+        {
+            "Data": null,
+            "Type": "TransformGD"
         }
     ],
     "InstanceOf": "prefab.entity",
-	"Thumbnail": "prout",
-    "Name": "PlayerSpawner_"
+    "Name": "PlayerSpawner_",
+    "Thumbnail": "prout"
 }

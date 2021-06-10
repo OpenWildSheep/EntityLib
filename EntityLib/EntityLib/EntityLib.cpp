@@ -23,18 +23,12 @@ using namespace nlohmann;
 
 // char schemaPath[2048] = {};
 
-static Ent::Node loadNode(
-    Ent::EntityLib const* _entlib,
-    Ent::Subschema const& _nodeSchema,
-    json const& _data,
-    Ent::Node const* _super,
-    json const* _default = nullptr);
 static std::unique_ptr<Ent::Scene> loadScene(
     Ent::EntityLib const& _entLib,
     Ent::ComponentsSchema const& _schema,
     json const& _entities,
     Ent::Scene const* _super);
-static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _scene);
+static json saveScene(Ent::Scene const& _scene);
 
 namespace Ent
 {
@@ -43,7 +37,7 @@ namespace Ent
     static Ent::Node makeDefaultColorField(EntityLib const& _entlib)
     {
         Ent::Subschema const& colorSchema = AT(_entlib.schema.schema.allDefinitions, colorSchemaName);
-        return loadNode(&_entlib, colorSchema, json(), nullptr);
+        return _entlib.loadNode(colorSchema, json(), nullptr);
     }
 
     EntityLib::EntityLib(std::filesystem::path _rootPath, bool _doMergeComponents)
@@ -142,7 +136,7 @@ namespace Ent
         }
     }
 
-    Node* Union::setUnionType(char const* _type)
+    Node* Union::setUnionType(EntityLib const& _entlib, char const* _type)
     {
         if (getUnionType() != _type)
         {
@@ -150,7 +144,7 @@ namespace Ent
             // TODO : Loïc - low prio - Find a way to get the super.
             //   It could be hard because we are no more in the loading phase, so the super is
             //   now delete.
-            wrapper = loadNode(nullptr, *subTypeSchema, json(), nullptr);
+            wrapper = _entlib.loadNode(*subTypeSchema, json(), nullptr);
             wrapper->at(metaData->typeField.c_str())->setString(_type);
         }
         return getUnionData();
@@ -262,7 +256,7 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            return value.get<Array>().data[_index].get();
+            return value.get<Array>().at(_index);
         }
         throw BadType();
     }
@@ -276,7 +270,7 @@ namespace Ent
         }
         if (value.is<Array>())
         {
-            return value.get<Array>().data[_index].get();
+            return value.get<Array>().at(_index);
         }
         throw BadType();
     }
@@ -284,7 +278,7 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            return value.get<Array>().data.size();
+            return value.get<Array>().size();
         }
         throw BadType();
     }
@@ -293,7 +287,7 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            return value.get<Array>().arraySize.getRaw(_location);
+            return value.get<Array>().getRawSize(_location);
         }
         throw BadType();
     }
@@ -337,7 +331,7 @@ namespace Ent
     {
         if (value.is<Union>())
         {
-            return value.get<Union>().setUnionType(_type);
+            return value.get<Union>().setUnionType(*getEntityLib(), _type);
         }
         throw BadType();
     }
@@ -475,9 +469,7 @@ namespace Ent
 
         bool operator()(Array const& _arr) const
         {
-            return this->operator()(_arr.arraySize)
-                   && std::all_of(
-                       begin(_arr.data), end(_arr.data), std::mem_fn(&Node::hasDefaultValue));
+            return _arr.hasDefaultValue();
         }
 
         bool operator()(Object const& _obj) const
@@ -516,14 +508,7 @@ namespace Ent
 
         Node operator()(Array const& _arr) const
         {
-            Array out;
-            for (auto&& item : _arr.data)
-            {
-                out.data.emplace_back(make_value<Node>(item->detach()));
-            }
-            out.arraySize = _arr.arraySize.detach();
-            ENTLIB_ASSERT(out.arraySize.get() == out.data.size());
-            return Node(std::move(out), schema);
+            return Node(_arr.detach(), schema);
         }
 
         Node operator()(Object const& _obj) const
@@ -571,14 +556,7 @@ namespace Ent
 
         Node operator()(Array const& _arr) const
         {
-            Array out;
-            for (auto&& item : _arr.data)
-            {
-                out.data.emplace_back(make_value<Node>(item->makeInstanceOf()));
-            }
-            out.arraySize = _arr.arraySize.makeInstanceOf();
-            ENTLIB_ASSERT(out.arraySize.get() == out.data.size());
-            return Node(std::move(out), schema);
+            return Node(_arr.makeInstanceOf(), schema);
         }
 
         Node operator()(Object const& _obj) const
@@ -744,12 +722,7 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            std::vector<Node const*> items;
-            for (auto&& n : value.get<Array>().data)
-            {
-                items.push_back(n.get());
-            }
-            return items;
+            return value.get<Array>().getItems();
         }
         throw BadType();
     }
@@ -758,14 +731,12 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            if (SubschemaRef const* itemSchema = schema->singularItems.get())
+            auto& arr = value.get<Array>();
+            if (arr.hasKey())
             {
-                auto& arrayRoot = value.get<Array>();
-                arrayRoot.data.emplace_back(
-                    make_value<Node>(loadNode(nullptr, itemSchema->get(), json(), nullptr)));
-                arrayRoot.arraySize.set(arrayRoot.arraySize.get() + 1);
-                return value.get<Array>().data.back().get();
+                throw BadArrayType("Can't 'push' in a map or set. Use 'mapInsert'.");
             }
+            return arr.arrayPush();
         }
         throw BadType();
     }
@@ -773,14 +744,16 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            if (schema->singularItems != nullptr)
+            auto&& arr = value.get<Array>();
+            if (arr.hasKey())
             {
-                auto& arrayRoot = value.get<Array>();
-                ENTLIB_ASSERT(not arrayRoot.data.empty());
-                arrayRoot.data.pop_back();
-                arrayRoot.arraySize.set(arrayRoot.arraySize.get() - 1);
-                return;
+                throw BadArrayType("Can't call 'pop' on map/set array");
             }
+            if (arr.isTuple())
+            {
+                throw BadArrayType("Can't call 'pop' on pair/tuple");
+            }
+            arr.pop();
         }
         throw BadType();
     }
@@ -789,9 +762,12 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            auto& arrayRoot = value.get<Array>();
-            arrayRoot.data.clear();
-            arrayRoot.arraySize.set(0);
+            auto&& arr = value.get<Array>();
+            if (arr.isTuple())
+            {
+                throw BadArrayType("Can't call 'clear' on pair/tuple");
+            }
+            arr.clear();
         }
         else
         {
@@ -803,9 +779,78 @@ namespace Ent
     {
         if (value.is<Array>())
         {
-            return value.get<Array>().data.empty();
+            return value.get<Array>().empty();
         }
         throw BadType();
+    }
+
+    bool Node::mapErase(char const* _key)
+    {
+        checkMap("mapErase");
+        if (not value.get<Array>().canErase())
+        {
+            throw BadArrayType(format("Can call 'mapErase' only on map and set of union").c_str());
+        }
+        return value.get<Array>().mapErase(_key);
+    }
+
+    Node* Node::mapGet(char const* _key)
+    {
+        checkMap("mapGet");
+        return value.get<Array>().mapGet(_key);
+    }
+    Node const* Node::mapGet(char const* _key) const
+    {
+        checkMap("mapGet");
+        return value.get<Array>().mapGet(_key);
+    }
+    bool Node::mapErase(int64_t _key)
+    {
+        checkMap("mapErase");
+        return value.get<Array>().mapErase(_key);
+    }
+    Node* Node::mapGet(int64_t _key)
+    {
+        checkMap("mapGet");
+        return value.get<Array>().mapGet(_key);
+    }
+    Node const* Node::mapGet(int64_t _key) const
+    {
+        checkMap("mapGet");
+        return value.get<Array>().mapGet(_key);
+    }
+
+    Node const* Node::mapInsert(int64_t _key)
+    {
+        checkMap("mapInsert");
+        return value.get<Array>().mapInsert(_key);
+    }
+
+    Node const* Node::mapInsert(char const* _key)
+    {
+        checkMap("mapInsert");
+        return value.get<Array>().mapInsert(_key);
+    }
+
+    void Node::checkMap(char const* _calledMethod) const
+    {
+        if (not value.is<Array>())
+        {
+            throw BadType();
+        }
+        if (not value.get<Array>().hasKey())
+        {
+            throw BadArrayType(format("Can call '%s' only on map/set", _calledMethod).c_str());
+        }
+    }
+
+    bool Node::isMapOrSet() const
+    {
+        if (not value.is<Array>())
+        {
+            return false;
+        }
+        return value.get<Array>().hasKey();
     }
 
     struct IsDefault
@@ -963,13 +1008,7 @@ namespace Ent
 
         void operator()(Array const& _arr) const
         {
-            prof.addMem("Array::data", _arr.data.capacity() * sizeof(_arr.data.front()));
-            for (auto&& item : _arr.data)
-            {
-                item->computeMemory(prof);
-                prof.addMem("Array::data::value_ptr", sizeof(Ent::Node));
-            }
-            prof.addNodes(_arr.data.size());
+            return _arr.computeMemory(prof);
         }
 
         void operator()(Object const& _obj) const
@@ -1006,7 +1045,7 @@ namespace Ent
 
         auto relPath = getEntityLib()->getRelativePath(_prefabNodePath).generic_u8string();
         json nodeData = loadJsonFile(getEntityLib()->getAbsolutePath(_prefabNodePath));
-        Node prefabNode = loadNode(getEntityLib(), *getSchema(), nodeData, nullptr);
+        Node prefabNode = getEntityLib()->loadNode(*getSchema(), nodeData, nullptr);
         (*this) = prefabNode.makeInstanceOf();
         value.get<Object>().instanceOf.set(relPath);
     }
@@ -1017,7 +1056,7 @@ namespace Ent
         {
             throw BadType();
         }
-        (*this) = loadNode(getEntityLib(), *getSchema(), json(), nullptr);
+        (*this) = getEntityLib()->loadNode(*getSchema(), json(), nullptr);
         value.get<Object>().instanceOf.unset();
     }
 
@@ -1074,7 +1113,7 @@ namespace Ent
     {
         Ent::Subschema const& actorStatesSchema =
             AT(_entlib.schema.schema.allDefinitions, actorStatesSchemaName);
-        return Node{Array{}, &actorStatesSchema};
+        return Node{Array{&_entlib, &actorStatesSchema}, &actorStatesSchema};
     }
 
     Entity::Entity(EntityLib const& _entlib)
@@ -1092,6 +1131,7 @@ namespace Ent
         EntityLib const& _entlib,
         Override<String> _name,
         std::map<std::string, Component> _components,
+        std::set<std::string> _removedComponents,
         std::unique_ptr<SubSceneComponent> _subSceneComponent,
         Node _actorStates,
         Node _color,
@@ -1102,6 +1142,7 @@ namespace Ent
         : entlib(&_entlib)
         , name(std::move(_name))
         , components(std::move(_components))
+        , removedComponents(std::move(_removedComponents))
         , subSceneComponent(std::move(_subSceneComponent))
         , actorStates(std::move(_actorStates))
         , color(std::move(_color))
@@ -1131,6 +1172,7 @@ namespace Ent
             *entlib,
             name,
             std::move(instComponents),
+            removedComponents,
             std::move(instSubSceneComponent),
             actorStates,
             color,
@@ -1217,7 +1259,8 @@ namespace Ent
         }
         Ent::Subschema const& compSchema = *AT(entlib->schema.components, _type);
         Ent::Component comp{
-            json(), false, _type, loadNode(entlib, compSchema, json(), nullptr), 1, components.size()};
+            json(), false, _type, entlib->loadNode(compSchema, json(), nullptr), 1, components.size()};
+        removedComponents.erase(_type);
         auto iter_bool = components.emplace(_type, std::move(comp));
         return &(iter_bool.first->second);
     }
@@ -1234,7 +1277,16 @@ namespace Ent
     void Entity::removeComponent(char const* _type)
     {
         // TODO : Use dependencies
-        components.erase(_type);
+        auto iter = components.find(_type);
+        if (iter != end(components))
+        {
+            Component const& comp = iter->second;
+            if (comp.hasPrefab)
+            {
+                removedComponents.insert(_type);
+            }
+            components.erase(iter);
+        }
     }
 
     std::vector<char const*> Entity::getComponentTypes() const
@@ -1275,6 +1327,7 @@ namespace Ent
         if (subSceneComponent == nullptr)
         {
             subSceneComponent = std::make_unique<SubSceneComponent>();
+            removedComponents.erase("SubScene");
         }
         return &(*subSceneComponent);
     }
@@ -1284,6 +1337,7 @@ namespace Ent
         if (subSceneComponent != nullptr)
         {
             subSceneComponent.reset();
+            removedComponents.insert("SubScene");
         }
     }
 
@@ -1305,6 +1359,7 @@ namespace Ent
             *entlib,
             name.makeInstanceOf(),
             std::move(instComponents),
+            std::set<std::string>{},
             std::move(instSubSceneComponent),
             actorStates.makeInstanceOf(),
             color.makeInstanceOf(),
@@ -1674,20 +1729,16 @@ struct MergeMapOverride
     Ent::EntityLib const* entlib;
 
     // Merge the instance array/map/set with the prefab array/map/set and return the resulting Ent::Array
-    template <typename GetKeyJson, typename GetKeyNode>
+    template <typename GetKeyJson, typename GetKeyNode, typename DoRemoveElement>
     Ent::Array operator()(
         GetKeyJson&& getKeyJson, ///< Function to get the key in the json (instance)
-        GetKeyNode&& getKeyNode ///< Function to get the key in the Node (prefab)
-    )
+        GetKeyNode&& getKeyNode, ///< Function to get the key in the Node (prefab)
+        DoRemoveElement&& doRemove)
     {
         using namespace Ent;
 
         auto&& meta = _nodeSchema.meta.get<Ent::Subschema::ArrayMeta>();
         bool const ordered = meta.ordered;
-
-        uint64_t defaultElementCount = 0;
-        uint64_t prefabAdditionalElementCount = 0;
-        uint64_t instanceAdditionalElementCount = 0;
 
         // Make a map key=>item of the instance array
         using KeyType = std::remove_reference_t<decltype(getKeyJson(json()))>;
@@ -1696,7 +1747,21 @@ struct MergeMapOverride
         {
             instancePropMap.emplace(getKeyJson(item), &item);
         }
-        std::vector<std::pair<KeyType, Node>> result;
+        struct NodeWrapper
+        {
+            //TODO : Add default values when C++17
+            Node node;
+            OverrideValueLocation loc;
+            bool removed;
+
+            NodeWrapper(Node _node, OverrideValueLocation _loc, bool _removed)
+                : node(std::move(_node))
+                , loc(_loc)
+                , removed(_removed)
+            {
+            }
+        };
+        std::vector<std::pair<KeyType, NodeWrapper>> result;
         if (_super != nullptr)
         {
             size_t index = 0;
@@ -1704,41 +1769,35 @@ struct MergeMapOverride
             for (Ent::Node const* subSuper : _super->getItems())
             {
                 json const* subDefault = _default == nullptr ? nullptr : &_default->at(index);
-                if (subDefault != nullptr)
-                {
-                    // item was added in default
-                    defaultElementCount++;
-                }
-                else
-                {
-                    // item was added in prefab
-                    prefabAdditionalElementCount++;
-                }
                 KeyType key = getKeyNode(subSuper);
+                auto loc = subDefault != nullptr ? OverrideValueLocation::Default :
+                                                   OverrideValueLocation::Prefab;
                 if (instancePropMap.count(key)) // Overriden in instance
                 {
-                    Ent::Node tmpNode = loadNode(
-                        entlib,
-                        _nodeSchema.singularItems->get(),
-                        *instancePropMap[key],
-                        subSuper,
-                        subDefault);
-                    result.emplace_back(key, std::move(tmpNode));
+                    Ent::Node tmpNode = entlib->loadNode(
+                        _nodeSchema.singularItems->get(), *instancePropMap[key], subSuper, subDefault);
+                    if (not doRemove(*instancePropMap[key]))
+                    {
+                        result.emplace_back(key, NodeWrapper{std::move(tmpNode), loc, false});
+                    }
+                    else
+                    {
+                        result.emplace_back(key, NodeWrapper{std::move(tmpNode), loc, true});
+                    }
                     instancePropMap.erase(key); // Later we need to know which item are NOT in the prefab
                 }
                 else // Not overriden
                 {
-                    Ent::Node tmpNode = loadNode(
-                        entlib, _nodeSchema.singularItems->get(), json(), subSuper, subDefault);
+                    Ent::Node tmpNode = entlib->loadNode(
+                        _nodeSchema.singularItems->get(), json(), subSuper, subDefault);
                     ENTLIB_ASSERT(tmpNode.hasOverride() == false);
-                    result.emplace_back(key, std::move(tmpNode));
+                    result.emplace_back(key, NodeWrapper{std::move(tmpNode), loc, false});
                 }
                 ++index;
             }
         }
         else if (_default != nullptr)
         {
-            defaultElementCount = _default->size();
             size_t index = 0;
             // Load all Nodes from the _default (overriden or not)
             for (json const& subDefault : *_default)
@@ -1746,21 +1805,21 @@ struct MergeMapOverride
                 json const& key = getKeyJson(subDefault);
                 if (instancePropMap.count(key)) // Overriden in instance
                 {
-                    Ent::Node tmpNode = loadNode(
-                        entlib,
-                        _nodeSchema.singularItems->get(),
-                        *instancePropMap[key],
-                        nullptr,
-                        &subDefault);
-                    result.emplace_back(key, std::move(tmpNode));
+                    Ent::Node tmpNode = entlib->loadNode(
+                        _nodeSchema.singularItems->get(), *instancePropMap[key], nullptr, &subDefault);
+                    bool const isRemoved = doRemove(*instancePropMap[key]);
+                    result.emplace_back(
+                        key,
+                        NodeWrapper{std::move(tmpNode), OverrideValueLocation::Default, isRemoved});
                     instancePropMap.erase(key); // Later we need to know which item are NOT in the prefab
                 }
                 else // Not overriden
                 {
-                    Ent::Node tmpNode = loadNode(
-                        entlib, _nodeSchema.singularItems->get(), json(), nullptr, &subDefault);
+                    Ent::Node tmpNode = entlib->loadNode(
+                        _nodeSchema.singularItems->get(), json(), nullptr, &subDefault);
                     ENTLIB_ASSERT(tmpNode.hasOverride() == false);
-                    result.emplace_back(key, std::move(tmpNode));
+                    result.emplace_back(
+                        key, NodeWrapper{std::move(tmpNode), OverrideValueLocation::Default, false});
                 }
                 ++index;
             }
@@ -1772,9 +1831,13 @@ struct MergeMapOverride
             auto key = getKeyJson(item);
             if (instancePropMap.count(key))
             {
-                result.emplace_back(
-                    key, loadNode(entlib, _nodeSchema.singularItems->get(), item, nullptr));
-                instanceAdditionalElementCount++;
+                if (not doRemove(*instancePropMap[key]))
+                {
+                    auto node = entlib->loadNode(_nodeSchema.singularItems->get(), item, nullptr);
+                    result.emplace_back(
+                        key, NodeWrapper{std::move(node), OverrideValueLocation::Override, false});
+                }
+                // else? New but removed => Let's ignore them.
             }
         }
         if (ordered)
@@ -1783,31 +1846,32 @@ struct MergeMapOverride
                 return std::get<0>(a) < std::get<0>(b);
             });
         }
-        Ent::Array arr;
+        Ent::Array arr{entlib, &_nodeSchema};
         for (auto const& key_node : result)
         {
-            arr.data.emplace_back(make_value<Ent::Node>(std::move(std::get<1>(key_node))));
+            auto&& key = std::get<0>(key_node);
+            auto&& node = std::get<1>(key_node);
+            if (arr.mapGet(key) != nullptr)
+            {
+                std::stringstream ss;
+                ss << "Twice the same key in map : " << key;
+                throw InvalidJsonData(ss.str().c_str());
+            }
+            arr.mapInitInsert(node.loc, key, std::move(node.node));
+            if (node.removed)
+            {
+                arr.mapErase(KeyType(key));
+            }
         }
-        const auto prefabArraySize =
-            prefabAdditionalElementCount > 0 ?
-                tl::optional<uint64_t>{defaultElementCount + prefabAdditionalElementCount} :
-                tl::nullopt;
-        const auto instanceArraySize = instanceAdditionalElementCount > 0 ?
-                                           tl::optional<uint64_t>{
-                                               defaultElementCount + prefabAdditionalElementCount
-                                               + instanceAdditionalElementCount} :
-                                           tl::nullopt;
-        arr.arraySize = Override<uint64_t>{defaultElementCount, prefabArraySize, instanceArraySize};
         return arr;
     }
 };
 
-static Ent::Node loadNode(
-    Ent::EntityLib const* _entlib,
+Ent::Node Ent::EntityLib::loadNode(
     Ent::Subschema const& _nodeSchema,
     json const& _data,
     Ent::Node const* _super,
-    json const* _default)
+    json const* _default) const
 {
     ENTLIB_ASSERT(_super == nullptr or &_nodeSchema == _super->getSchema());
 
@@ -1897,9 +1961,9 @@ static Ent::Node loadNode(
         if (InstanceOfIter != _data.end())
         {
             auto nodeFileName = InstanceOfIter->get<std::string>();
-            json nodeData = loadJsonFile(_entlib->getAbsolutePath(nodeFileName));
+            json nodeData = loadJsonFile(getAbsolutePath(nodeFileName));
             // Do not inherit from _super since the override of InstanceOf reset the Entity
-            prefabNode = loadNode(_entlib, _nodeSchema, nodeData, nullptr, _default);
+            prefabNode = loadNode(_nodeSchema, nodeData, nullptr, _default);
             _super = &prefabNode;
             Ent::Override<String> tmplPath("", tl::nullopt, InstanceOfIter->get<std::string>());
             object.instanceOf = std::move(tmplPath);
@@ -1919,7 +1983,7 @@ static Ent::Node loadNode(
             json const* defaultProp = schemaDefault != nullptr ? schemaDefault : refDefault;
             json const emptyJson;
             json const& prop = _data.count(name) != 0 ? _data.at(name) : emptyJson;
-            Ent::Node tmpNode = loadNode(_entlib, *propSchemaRef, prop, superProp, defaultProp);
+            Ent::Node tmpNode = loadNode(*propSchemaRef, prop, superProp, defaultProp);
             object.nodes.emplace_back(name.c_str(), std::move(tmpNode));
         }
         std::sort(begin(object), end(object), Ent::CompObject());
@@ -1928,7 +1992,8 @@ static Ent::Node loadNode(
     break;
     case Ent::DataType::array:
     {
-        Ent::Array arr;
+        Ent::Array arr(this, &_nodeSchema);
+        auto&& meta = _nodeSchema.meta.get<Ent::Subschema::ArrayMeta>();
         size_t index = 0;
         if (_nodeSchema.singularItems)
         {
@@ -1944,46 +2009,60 @@ static Ent::Node loadNode(
                                                       &_default->at(index) :
                                                       nullptr;
                         Ent::Node tmpNode = loadNode(
-                            _entlib, _nodeSchema.singularItems->get(), json(), subSuper, defaultItem);
-                        arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
+                            _nodeSchema.singularItems->get(), json(), subSuper, defaultItem);
+                        auto loc = defaultItem == nullptr ? Ent::OverrideValueLocation::Prefab :
+                                                            Ent::OverrideValueLocation::Default;
+                        arr.initAdd(loc, std::move(tmpNode));
                         ++index;
                     }
-                    tl::optional<uint64_t> prefabArraySize =
-                        defaultArraySize == _super->size() ? tl::nullopt :
-                                                             tl::optional<uint64_t>{_super->size()};
-                    arr.arraySize =
-                        Ent::Override<uint64_t>(defaultArraySize, prefabArraySize, tl::nullopt);
+                    if (not arr.hasKey())
+                    {
+                        tl::optional<uint64_t> prefabArraySize =
+                            defaultArraySize == _super->size() ?
+                                tl::nullopt :
+                                tl::optional<uint64_t>{_super->size()};
+                        arr.arraySetSize(Ent::Override<uint64_t>(
+                            defaultArraySize, prefabArraySize, tl::nullopt));
+                    }
                 }
                 else if (_default != nullptr)
                 {
                     for (json const& subDefault : *_default)
                     {
-                        Ent::Node tmpNode = loadNode(
-                            _entlib, _nodeSchema.singularItems->get(), json(), nullptr, &subDefault);
-                        arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
+                        auto& itemSchema = _nodeSchema.singularItems->get();
+                        Ent::Node tmpNode = loadNode(itemSchema, json(), nullptr, &subDefault);
+                        arr.initAdd(Ent::OverrideValueLocation::Default, std::move(tmpNode));
                         ++index;
                     }
-                    arr.arraySize =
-                        Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt);
+                    if (not arr.hasKey())
+                    {
+                        arr.arraySetSize(
+                            Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt));
+                    }
                 }
                 else
                 {
                     for (size_t i = 0; i < _nodeSchema.minItems; ++i)
                     {
                         Ent::Node tmpNode =
-                            loadNode(_entlib, _nodeSchema.singularItems->get(), json(), nullptr);
-                        arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
+                            loadNode(_nodeSchema.singularItems->get(), json(), nullptr);
+                        arr.initAdd(Ent::OverrideValueLocation::Default, std::move(tmpNode));
                         ++index;
                     }
-                    arr.arraySize =
-                        Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt);
+                    if (not arr.hasKey())
+                    {
+                        arr.arraySetSize(
+                            Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt));
+                    }
                 }
             }
             else // If it is a singularItems and there is _data, we have to use the overridePolicy
             {
-                auto&& meta = _nodeSchema.meta.get<Ent::Subschema::ArrayMeta>();
                 using namespace Ent;
-                MergeMapOverride mergeMapOverride{_nodeSchema, _data, _super, _default, _entlib};
+                MergeMapOverride mergeMapOverride{_nodeSchema, _data, _super, _default, this};
+                auto doRemoveDefault = [](json const&) {
+                    return false;
+                };
                 switch (hash(meta.overridePolicy))
                 {
                 case "map"_hash:
@@ -1993,6 +2072,9 @@ static Ent::Node loadNode(
                     // and can be string, double or integer
                     // meta.ordered means the items have to be sorted by the key
                     Ent::DataType keyType = _nodeSchema.singularItems->get().linearItems->at(0)->type;
+                    auto doRemove = [](json const& item) {
+                        return item[1].is_null();
+                    };
 #pragma warning(push)
 #pragma warning(disable : 4061) // There are switches with missing cases. This is wanted.
                     switch (keyType)
@@ -2000,24 +2082,29 @@ static Ent::Node loadNode(
                     case Ent::DataType::string:
                         arr = mergeMapOverride(
                             [](json const& item) { return item[0].get<std::string>(); },
-                            [](Node const* tmplItem) { return tmplItem->at(0llu)->getString(); });
+                            [](Node const* tmplItem) { return tmplItem->at(0llu)->getString(); },
+                            doRemove);
+
                         break;
                     case Ent::DataType::entityRef:
                         arr = mergeMapOverride(
                             [](json const& item) { return item[0].get<std::string>(); },
                             [](Node const* tmplItem) {
                                 return tmplItem->at(0llu)->getEntityRef().entityPath;
-                            });
+                            },
+                            doRemove);
                         break;
                     case Ent::DataType::number:
                         arr = mergeMapOverride(
                             [](json const& item) { return item[0].get<double>(); },
-                            [](Node const* tmplItem) { return tmplItem->at(0llu)->getFloat(); });
+                            [](Node const* tmplItem) { return tmplItem->at(0llu)->getFloat(); },
+                            doRemove);
                         break;
                     case Ent::DataType::integer:
                         arr = mergeMapOverride(
                             [](json const& item) { return item[0].get<int64_t>(); },
-                            [](Node const* tmplItem) { return tmplItem->at(0llu)->getInt(); });
+                            [](Node const* tmplItem) { return tmplItem->at(0llu)->getInt(); },
+                            doRemove);
                         break;
                     default:
                         throw std::runtime_error("Unknown key type in map " + _nodeSchema.name);
@@ -2036,27 +2123,38 @@ static Ent::Node loadNode(
                     {
                         auto const& unionMeta =
                             _nodeSchema.singularItems->get().meta.get<Ent::Subschema::UnionMeta>();
+                        auto doRemoveUnion = [unionMeta](json const& item) {
+                            return item[unionMeta.dataField].is_null();
+                        };
                         arr = mergeMapOverride(
                             [&unionMeta](json const& item) {
                                 return item[unionMeta.typeField].get<std::string>();
                             },
-                            [](Node const* subSuper) { return subSuper->getUnionType(); });
+                            [](Node const* subSuper) { return subSuper->getUnionType(); },
+                            doRemoveUnion);
                     }
                     break;
                     case Ent::DataType::string: // The key is the item itself
                         arr = mergeMapOverride(
                             [](json const& item) { return item.get<std::string>(); },
-                            [](Node const* tmplItem) { return tmplItem->getString(); });
+                            [&](Node const* tmplItem) {
+                                ENTLIB_ASSERT(
+                                    tmplItem->getSchema() == &_nodeSchema.singularItems->get());
+                                return tmplItem->getString();
+                            },
+                            doRemoveDefault);
                         break;
                     case Ent::DataType::number: // The key is the item itself
                         arr = mergeMapOverride(
                             [](json const& item) { return item.get<double>(); },
-                            [](Node const* tmplItem) { return tmplItem->getFloat(); });
+                            [](Node const* tmplItem) { return tmplItem->getFloat(); },
+                            doRemoveDefault);
                         break;
                     case Ent::DataType::integer: // The key is the item itself
                         arr = mergeMapOverride(
                             [](json const& item) { return item.get<int64_t>(); },
-                            [](Node const* tmplItem) { return tmplItem->getInt(); });
+                            [](Node const* tmplItem) { return tmplItem->getInt(); },
+                            doRemoveDefault);
                         break;
                     default:
                         throw std::runtime_error("Unknown key type in set " + _nodeSchema.name);
@@ -2075,9 +2173,13 @@ static Ent::Node loadNode(
                             (_default != nullptr and (_default->size() > index)) ?
                                 &_default->at(index) :
                                 nullptr;
-                        Ent::Node tmpNode = loadNode(
-                            _entlib, _nodeSchema.singularItems->get(), item, subSuper, subDefault);
-                        arr.data.emplace_back(make_value<Ent::Node>(std::move(tmpNode)));
+                        Ent::Node tmpNode =
+                            loadNode(_nodeSchema.singularItems->get(), item, subSuper, subDefault);
+                        bool const isDefault = (index < defaultArraySize) or subDefault != nullptr;
+                        auto loc = isDefault           ? Ent::OverrideValueLocation::Default :
+                                   subSuper != nullptr ? Ent::OverrideValueLocation::Prefab :
+                                                         Ent::OverrideValueLocation::Override;
+                        arr.initAdd(loc, std::move(tmpNode));
                         ++index;
                     }
                     tl::optional<uint64_t> prefabArraySize =
@@ -2088,8 +2190,8 @@ static Ent::Node loadNode(
                     tl::optional<uint64_t> overrideArraySize =
                         _data.size() == sizeInPrefab ? tl::nullopt :
                                                        tl::optional<uint64_t>{_data.size()};
-                    arr.arraySize = Ent::Override<uint64_t>(
-                        defaultArraySize, prefabArraySize, overrideArraySize);
+                    arr.arraySetSize(Ent::Override<uint64_t>(
+                        defaultArraySize, prefabArraySize, overrideArraySize));
                 }
                 break;
                 default:
@@ -2112,14 +2214,13 @@ static Ent::Node loadNode(
                                              nullptr;
                 json const emptyJson;
                 json const& prop = _data.size() > index ? _data.at(index) : emptyJson;
-                Ent::Node tmpNode = loadNode(_entlib, *sub, prop, subSuper, subDefault);
-                arr.data.emplace_back(Ent::make_value<Ent::Node>(std::move(tmpNode)));
+                Ent::Node tmpNode = loadNode(*sub, prop, subSuper, subDefault);
+                arr.arrayInitPush(std::move(tmpNode));
                 ++index;
             }
             uint64_t defaultArraySize = _nodeSchema.linearItems->size();
-            arr.arraySize = Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt);
+            arr.arraySetSize(Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt));
         }
-        ENTLIB_ASSERT(arr.arraySize.get() == arr.data.size());
         result = Ent::Node(std::move(arr), &_nodeSchema);
     }
     break;
@@ -2210,7 +2311,7 @@ static Ent::Node loadNode(
                     superUnionDataWrapper == nullptr
                     or &schemaTocheck.get() == superUnionDataWrapper->getSchema());
                 Ent::Node dataNode =
-                    loadNode(_entlib, schemaTocheck.get(), _data, superUnionDataWrapper, _default);
+                    loadNode(schemaTocheck.get(), _data, superUnionDataWrapper, _default);
                 Ent::Union un{};
                 un.schema = &_nodeSchema;
                 un.wrapper = Ent::make_value<Ent::Node>(std::move(dataNode));
@@ -2290,22 +2391,74 @@ json Ent::EntityLib::dumpNode(
     {
         data = json::array();
         auto&& meta = _schema.meta.get<Ent::Subschema::ArrayMeta>();
-        for (Ent::Node const* item : _node.getItems())
+        bool const fullWrite = meta.isMapItem;
+        auto const& arr = _node.value.get<Ent::Array>();
+        if (arr.hasKey())
         {
-            if (item->matchValueSource(_dumpedValueSource))
+            for (auto& item : arr.getItemsWithRemoved())
             {
-                ENTLIB_ASSERT(item->getSchema() != nullptr);
-                json tmpNode = dumpNode(
-                    *item->getSchema(),
-                    *item,
-                    _dumpedValueSource,
-                    _superKeyIsTypeName,
-                    _entityRefPreProc);
-                data.emplace_back(std::move(tmpNode));
+                if (arr.isErased(arr.getChildKey(item)))
+                {
+                    if (_dumpedValueSource == OverrideValueSource::Override)
+                    {
+                        if (meta.overridePolicy == "map")
+                        {
+                            ENTLIB_ASSERT(item->getSchema() != nullptr);
+                            json tmpNode;
+                            tmpNode[0] = item->at(0llu)->toJson(
+                                _dumpedValueSource, _superKeyIsTypeName, _entityRefPreProc);
+                            tmpNode[1] = json();
+                            data.emplace_back(std::move(tmpNode));
+                        }
+                        else if (meta.overridePolicy == "set")
+                        {
+                            if (item->getSchema()->type != Ent::DataType::oneOf)
+                            {
+                                throw std::runtime_error(
+                                    R"(Can't write an erased element in a set of non-union)");
+                            }
+                            auto& unionMeta =
+                                item->getSchema()->meta.get<Ent::Subschema::UnionMeta>();
+                            char const* type = item->getUnionType();
+                            json tmpNode;
+                            tmpNode[unionMeta.typeField] = type;
+                            tmpNode[unionMeta.dataField] = json();
+                            data.emplace_back(std::move(tmpNode));
+                        }
+                    }
+                }
+                else if (item->matchValueSource(_dumpedValueSource) or fullWrite)
+                {
+                    ENTLIB_ASSERT(item->getSchema() != nullptr);
+                    json tmpNode = dumpNode(
+                        *item->getSchema(),
+                        *item,
+                        _dumpedValueSource,
+                        _superKeyIsTypeName,
+                        _entityRefPreProc);
+                    data.emplace_back(std::move(tmpNode));
+                }
             }
-            else if (meta.overridePolicy.empty())
+        }
+        else
+        {
+            for (auto& item : arr.getItems())
             {
-                data.emplace_back(json());
+                if (item->matchValueSource(_dumpedValueSource) or fullWrite)
+                {
+                    ENTLIB_ASSERT(item->getSchema() != nullptr);
+                    json tmpNode = dumpNode(
+                        *item->getSchema(),
+                        *item,
+                        _dumpedValueSource,
+                        _superKeyIsTypeName,
+                        _entityRefPreProc);
+                    data.emplace_back(std::move(tmpNode));
+                }
+                else
+                {
+                    data.emplace_back(json());
+                }
             }
         }
     }
@@ -2452,8 +2605,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     {
         Ent::Subschema const& colorSchema =
             AT(_entlib.schema.schema.allDefinitions, Ent::colorSchemaName);
-        ovColor = loadNode(
-            &_entlib,
+        ovColor = _entlib.loadNode(
             colorSchema,
             _entNode.at("Color"),
             _superEntityFromParentEntity != nullptr ? &_superEntityFromParentEntity->getColorValue() :
@@ -2467,11 +2619,11 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     // ActorStates
     Ent::Subschema const& actorStatesSchema =
         AT(_entlib.schema.schema.allDefinitions, Ent::actorStatesSchemaName);
-    Ent::Node ovActorStates(Ent::Array{}, &actorStatesSchema);
+    Ent::Node ovActorStates(Ent::Array{&_entlib, &actorStatesSchema}, &actorStatesSchema);
     if (_entNode.contains("ActorStates"))
     {
-        ovActorStates = loadNode(
-            &_entlib, actorStatesSchema, _entNode.at("ActorStates"), &superEntity->getActorStates());
+        ovActorStates = _entlib.loadNode(
+            actorStatesSchema, _entNode.at("ActorStates"), &superEntity->getActorStates());
     }
     else
     {
@@ -2479,6 +2631,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     }
 
     std::map<std::string, Ent::Component> components;
+    std::set<std::string> removedComponents;
     std::unique_ptr<Ent::SubSceneComponent> subSceneComponent;
     size_t index = 0;
     if (_entNode.count("Components") != 0)
@@ -2488,6 +2641,12 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         {
             auto const cmpType = compNode.at("Type").get<std::string>();
             json const& data = compNode.at("Data");
+            if (data.is_null())
+            {
+                removedComponents.insert(cmpType);
+                continue;
+            }
+
             if (cmpType == "SubScene")
             {
                 Ent::SubSceneComponent const* superComp = superEntity->getSubSceneComponent();
@@ -2532,11 +2691,8 @@ static std::unique_ptr<Ent::Entity> loadEntity(
                         rawData,
                         superComp != nullptr, // has a super component
                         cmpType,
-                        loadNode(
-                            &_entlib,
-                            compSchema,
-                            data,
-                            (superComp != nullptr ? &superComp->root : nullptr)),
+                        _entlib.loadNode(
+                            compSchema, data, (superComp != nullptr ? &superComp->root : nullptr)),
                         version,
                         index};
 
@@ -2550,6 +2706,10 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     for (auto const& type_comp : superEntity->getComponents())
     {
         auto const& cmpType = std::get<0>(type_comp);
+        if (removedComponents.count(cmpType) != 0)
+        {
+            continue;
+        }
         auto const& superComp = std::get<1>(type_comp);
         if (components.count(cmpType) == 0)
         {
@@ -2567,7 +2727,8 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     }
     {
         Ent::SubSceneComponent const* superComp = superEntity->getSubSceneComponent();
-        if (superComp != nullptr and subSceneComponent == nullptr)
+        if (superComp != nullptr and subSceneComponent == nullptr
+            and removedComponents.count("SubScene") == 0)
         {
             subSceneComponent = std::make_unique<Ent::SubSceneComponent>(
                 superComp->isEmbedded,
@@ -2580,6 +2741,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         _entlib,
         std::move(ovName),
         std::move(components),
+        std::move(removedComponents),
         std::move(subSceneComponent),
         std::move(ovActorStates),
         std::move(ovColor),
@@ -2771,7 +2933,7 @@ Ent::Node Ent::EntityLib::loadFileAsNode(
 {
     auto const absPath = getAbsolutePath(_path);
     json jsonData = loadJsonFile(absPath);
-    return loadNode(this, _schema, jsonData, nullptr, nullptr);
+    return loadNode(_schema, jsonData, nullptr, nullptr);
 }
 
 std::unique_ptr<Ent::Entity>
@@ -2802,59 +2964,58 @@ std::unique_ptr<Ent::Scene> Ent::EntityLib::loadLegacyScene(std::filesystem::pat
     return loadLegacySceneReadOnly(_scenePath)->clone();
 }
 
-static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& _entity)
+nlohmann::json Ent::Entity::saveEntity() const
 {
+    ComponentsSchema const& _schema = entlib->schema;
     json entNode;
 
     // Always save Name since it is use for override
-    entNode.emplace("Name", _entity.getNameValue().get().c_str());
+    entNode.emplace("Name", getNameValue().get().c_str());
 
-    if (_entity.getInstanceOfValue().isSet())
+    if (getInstanceOfValue().isSet())
     {
-        entNode.emplace("InstanceOf", _entity.getInstanceOfValue().get().c_str());
+        entNode.emplace("InstanceOf", getInstanceOfValue().get().c_str());
     }
 
-    Ent::Subschema const& colorSchema = AT(_schema.schema.allDefinitions, Ent::colorSchemaName);
-    if (_entity.getColorValue().hasOverride())
+    Subschema const& colorSchema = AT(_schema.schema.allDefinitions, colorSchemaName);
+    if (getColorValue().hasOverride())
     {
-        entNode.emplace("Color", Ent::EntityLib::dumpNode(colorSchema, _entity.getColorValue()));
+        entNode.emplace("Color", EntityLib::dumpNode(colorSchema, getColorValue()));
     }
 
-    if (_entity.getThumbnailValue().isSet())
+    if (getThumbnailValue().isSet())
     {
-        entNode.emplace("Thumbnail", _entity.getThumbnail());
+        entNode.emplace("Thumbnail", getThumbnail());
     }
 
-    if (_entity.getMaxActivationLevelValue().isSet())
+    if (getMaxActivationLevelValue().isSet())
     {
-        entNode.emplace(
-            "MaxActivationLevel", getActivationLevelString(_entity.getMaxActivationLevel()));
+        entNode.emplace("MaxActivationLevel", getActivationLevelString(getMaxActivationLevel()));
     }
 
     json& componentsNode = entNode["Components"] = json::array();
-    std::vector<Ent::Component const*> sortedComp;
-    for (auto&& type_comp : _entity.getComponents())
+    std::vector<Component const*> sortedComp;
+    for (auto&& type_comp : getComponents())
     {
         sortedComp.push_back(&std::get<1>(type_comp));
     }
-    Ent::Component subscenePlaceholder{json(), true, "SubScene", Ent::Node(), 1, 0};
-    if (Ent::SubSceneComponent const* subscene = _entity.getSubSceneComponent())
+    Component subscenePlaceholder{json(), true, "SubScene", Node(), 1, 0};
+    if (SubSceneComponent const* subscene = getSubSceneComponent())
     {
         subscenePlaceholder.index = subscene->index;
         sortedComp.push_back(&subscenePlaceholder);
     }
-    std::sort(
-        begin(sortedComp), end(sortedComp), [](Ent::Component const* cmp, Ent::Component const* cmp2) {
-            return cmp->index < cmp2->index;
-        });
-    for (Ent::Component const* comp : sortedComp)
+    std::sort(begin(sortedComp), end(sortedComp), [](Component const* cmp, Component const* cmp2) {
+        return cmp->index < cmp2->index;
+    });
+    for (Component const* comp : sortedComp)
     {
         if (comp->type == "SubScene")
         {
-            Ent::SubSceneComponent const* subscene = _entity.getSubSceneComponent();
+            SubSceneComponent const* subscene = getSubSceneComponent();
             ENTLIB_ASSERT(subscene != nullptr);
             bool const subsceneHasOverride = subscene->hasOverride();
-            bool const hasInstanceOf = _entity.getInstanceOf() != nullptr;
+            bool const hasInstanceOf = getInstanceOf() != nullptr;
             if ((subsceneHasOverride and hasInstanceOf) or not hasInstanceOf)
             {
                 json data;
@@ -2865,7 +3026,7 @@ static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& 
                 }
                 if (subscene->isEmbedded)
                 {
-                    data.emplace("Embedded", saveScene(_schema, *subscene->embedded)["Objects"]);
+                    data.emplace("Embedded", saveScene(*subscene->embedded)["Objects"]);
                 }
 
                 json compNode;
@@ -2881,17 +3042,22 @@ static json saveEntity(Ent::ComponentsSchema const& _schema, Ent::Entity const& 
             compNode.emplace("Version", comp->version);
             compNode.emplace("Type", comp->type);
             compNode.emplace(
-                "Data", Ent::EntityLib::dumpNode(*AT(_schema.components, comp->type), comp->root));
+                "Data", EntityLib::dumpNode(*AT(_schema.components, comp->type), comp->root));
 
             componentsNode.emplace_back(std::move(compNode));
         }
     }
-    Ent::Subschema const& actorStatesSchema =
-        AT(_schema.schema.allDefinitions, Ent::actorStatesSchemaName);
-    if (_entity.getActorStates().hasOverride())
+    for (auto const& type : removedComponents)
     {
-        entNode.emplace(
-            "ActorStates", Ent::EntityLib::dumpNode(actorStatesSchema, _entity.getActorStates()));
+        json compNode;
+        compNode.emplace("Type", type);
+        compNode.emplace("Data", json{});
+        componentsNode.emplace_back(std::move(compNode));
+    }
+    Subschema const& actorStatesSchema = AT(_schema.schema.allDefinitions, actorStatesSchemaName);
+    if (getActorStates().hasOverride())
+    {
+        entNode.emplace("ActorStates", EntityLib::dumpNode(actorStatesSchema, getActorStates()));
     }
     return entNode;
 }
@@ -2932,6 +3098,7 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
         *entlib,
         getNameValue().detach().makeOverridedInstanceOf(std::string(getName()) + "_detached"),
         std::move(detComponents),
+        std::set<std::string>{}, // removedComponents
         std::move(detSubSceneComponent),
         actorStates.detach(),
         std::move(detachedColor),
@@ -2962,7 +3129,7 @@ void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path con
             entityPath.generic_string().c_str());
         throw std::runtime_error(message.data());
     }
-    json document = ::saveEntity(schema, _entity);
+    json document = _entity.saveEntity();
     file << document.dump(4);
     file.close();
 
@@ -3053,7 +3220,7 @@ void Ent::EntityLib::clearCache()
     m_sceneCache.clear();
 }
 
-static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _scene)
+static json saveScene(Ent::Scene const& _scene)
 {
     json document;
 
@@ -3065,7 +3232,7 @@ static json saveScene(Ent::ComponentsSchema const& _schema, Ent::Scene const& _s
     {
         if (ent->hasOverride())
         {
-            objects.emplace_back(::saveEntity(_schema, *ent));
+            objects.emplace_back(ent->saveEntity());
         }
     }
 
@@ -3156,23 +3323,6 @@ bool Ent::SubSceneComponent::hasOverride() const
     //if (index.isSet())
     //    return true;
     return embedded != nullptr && embedded->hasOverride();
-}
-
-Ent::Array::Array()
-    : arraySize(0llu, tl::nullopt, tl::nullopt)
-{
-}
-
-bool Ent::Array::hasOverride() const
-{
-    return arraySize.isSet()
-           || std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasOverride));
-}
-
-bool Ent::Array::hasPrefabValue() const
-{
-    return arraySize.hasPrefab
-           || std::any_of(begin(data), end(data), std::mem_fn(&Ent::Node::hasPrefabValue));
 }
 
 /// \endcond

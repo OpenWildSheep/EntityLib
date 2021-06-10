@@ -2399,31 +2399,35 @@ json Ent::EntityLib::dumpNode(
             {
                 if (arr.isErased(arr.getChildKey(item)))
                 {
-                    if (meta.overridePolicy == "map")
+                    if (_dumpedValueSource == OverrideValueSource::Override)
                     {
-                        ENTLIB_ASSERT(item->getSchema() != nullptr);
-                        json tmpNode;
-                        tmpNode[0] = item->at(0llu)->toJson(
-                            _dumpedValueSource, _superKeyIsTypeName, _entityRefPreProc);
-                        tmpNode[1] = json();
-                        data.emplace_back(std::move(tmpNode));
-                    }
-                    else if (meta.overridePolicy == "set")
-                    {
-                        if (item->getSchema()->type != Ent::DataType::oneOf)
+                        if (meta.overridePolicy == "map")
                         {
-                            throw std::runtime_error(
-                                R"(Can't write an erased element in a set of non-union)");
+                            ENTLIB_ASSERT(item->getSchema() != nullptr);
+                            json tmpNode;
+                            tmpNode[0] = item->at(0llu)->toJson(
+                                _dumpedValueSource, _superKeyIsTypeName, _entityRefPreProc);
+                            tmpNode[1] = json();
+                            data.emplace_back(std::move(tmpNode));
                         }
-                        auto& unionMeta = item->getSchema()->meta.get<Ent::Subschema::UnionMeta>();
-                        char const* type = item->getUnionType();
-                        json tmpNode;
-                        tmpNode[unionMeta.typeField] = type;
-                        tmpNode[unionMeta.dataField] = json();
-                        data.emplace_back(std::move(tmpNode));
+                        else if (meta.overridePolicy == "set")
+                        {
+                            if (item->getSchema()->type != Ent::DataType::oneOf)
+                            {
+                                throw std::runtime_error(
+                                    R"(Can't write an erased element in a set of non-union)");
+                            }
+                            auto& unionMeta =
+                                item->getSchema()->meta.get<Ent::Subschema::UnionMeta>();
+                            char const* type = item->getUnionType();
+                            json tmpNode;
+                            tmpNode[unionMeta.typeField] = type;
+                            tmpNode[unionMeta.dataField] = json();
+                            data.emplace_back(std::move(tmpNode));
+                        }
                     }
                 }
-                else
+                else if (item->matchValueSource(_dumpedValueSource) or fullWrite)
                 {
                     ENTLIB_ASSERT(item->getSchema() != nullptr);
                     json tmpNode = dumpNode(

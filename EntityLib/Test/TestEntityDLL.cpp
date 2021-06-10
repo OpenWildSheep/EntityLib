@@ -790,6 +790,12 @@ try
     {
         EntityPtr ent = entlib.makeInstanceOf("test_erase.entity");
         test_erase(ent.get());
+        auto json = ent->getActorStates().toJson(Ent::OverrideValueSource::OverrideOrPrefab, true);
+        ENTLIB_ASSERT(json.size() == 3);
+        for (auto&& actState : json)
+        {
+            ENTLIB_ASSERT(actState["className"] != "ActionCinematic");
+        }
     }
     {
         EntityPtr ent = entlib.loadEntity("instance2.entity");

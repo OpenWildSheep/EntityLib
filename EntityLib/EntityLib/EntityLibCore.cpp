@@ -17,9 +17,11 @@ namespace Ent
         }
     }
 
-    std::string formatErrorPath(std::filesystem::path const&, std::filesystem::path const& _rel)
+    char const* formatErrorPath(std::filesystem::path const&, std::filesystem::path const& _rel)
     {
-        return format(R"("%s")", _rel.generic_string().c_str());
+        thread_local static char buffer[2048];
+        sprintf_s(buffer, sizeof(buffer), R"("%s")", _rel.generic_string().c_str());
+        return buffer;
     }
 
     std::string convertANSIToUTF8(std::string const& message)
@@ -43,45 +45,63 @@ namespace Ent
         return result;
     }
 
-    static std::string makeWhatMessage(
+    static char const* makeWhatMessage(
         std::string const& msg,
         std::filesystem::path const& rootPath,
         std::filesystem::path const& relPath,
         std::error_code error)
     {
-        return Ent::format(
+        static constexpr auto InitBuffSize = 4096;
+        thread_local static char buffer[InitBuffSize] = {0};
+        sprintf_s(
+            buffer,
+            InitBuffSize,
             R"msg(%s - %s : %s)msg",
             msg.c_str(),
             Ent::convertANSIToUTF8(error.message()).c_str(),
-            Ent::formatErrorPath(rootPath, relPath).c_str());
+            Ent::formatErrorPath(rootPath, relPath));
+        return buffer;
     }
 
-    EntLibException::EntLibException(char const* _message)
+    EntLibException::EntLibException(char const* _message) noexcept
         : std::runtime_error(_message)
     {
-        messages.emplace_back(_message);
+        addContextMessage(_message);
     }
-    EntLibException::EntLibException(std::string _message)
+    EntLibException::EntLibException(std::string const& _message) noexcept
         : std::runtime_error(_message)
     {
-        messages.push_back(std::move(_message));
+        addContextMessage(_message.c_str());
     }
-    void EntLibException::addContextMessage(std::string _message)
+    void EntLibException::addContextMessage(std::string const& _message) noexcept
     {
-        messages.push_back(std::move(_message));
+        addContextMessage(_message.c_str());
+    }
+
+    void EntLibException::addContextMessage(char const* message) noexcept
+    {
+        if (strcpy_s(rawContext.data() + rawContextSize, rawContext.size() - rawContextSize, message)
+            == 0)
+        {
+            context[contextSize] = rawContextSize;
+            ++contextSize;
+            rawContextSize += strlen(message) + 1;
+        }
     }
 
     const char* EntLibException::what() const noexcept
     {
-        static char buffer[4096] = {0};
+        static constexpr auto InitBuffSize = 4096;
+        thread_local static char buffer[InitBuffSize] = {0};
         bool first = true;
-        for (std::string const& msg : messages)
+        for (size_t i = 0; i < contextSize; ++i)
         {
+            auto message = rawContext.data() + context[i];
             if (!first)
             {
                 strcat_s(buffer, sizeof(buffer), "    - ");
             }
-            strcat_s(buffer, sizeof(buffer), msg.c_str());
+            strcat_s(buffer, sizeof(buffer), message);
             strcat_s(buffer, sizeof(buffer), "\n");
             first = false;
         }
@@ -103,4 +123,36 @@ namespace Ent
         : FileSystemError(msg, rootPath, relPath, std::make_error_code(static_cast<std::errc>(errno)))
     {
     }
+
+    BadType::BadType(char const* _message)
+        : EntLibException(_message == nullptr ? "Bad node type" : _message)
+    {
+    }
+
+    BadArrayType::BadArrayType(char const* _message)
+        : EntLibException(_message == nullptr ? "Bad array type" : _message)
+    {
+    }
+
+    MissingMetadata::MissingMetadata(char const* _schemaName)
+        : EntLibException(staticFormat("Metadata missing : %s", _schemaName))
+    {
+    }
+
+    BadUnionType::BadUnionType(char const* _type)
+        : EntLibException(staticFormat("Bad union type : %s", _type))
+    {
+    }
+
+    IllFormedSchema::IllFormedSchema(char const* _message)
+        : EntLibException(staticFormat("Ill-formed schema : %s", _message))
+    {
+    }
+
+    InvalidJsonData::InvalidJsonData(char const* _message)
+        : EntLibException(_message)
+    {
+    }
+
+    /// @cond PRIVATE
 } // namespace Ent

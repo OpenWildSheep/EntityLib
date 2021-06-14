@@ -2813,7 +2813,7 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
         catch (EntLibException& ex)
         {
             ex.addContextMessage(
-                format("loading : %s", formatErrorPath(rawdataPath, relPath).c_str()));
+                staticFormat("loading : %s", formatErrorPath(rawdataPath, relPath)));
             throw;
         }
     }
@@ -3113,7 +3113,7 @@ void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path con
         catch (EntLibException& ex)
         {
             ex.addContextMessage(
-                format("saving entity : %s", formatErrorPath(rawdataPath, _relEntityPath).c_str()));
+                staticFormat("saving entity : %s", formatErrorPath(rawdataPath, _relEntityPath)));
             throw;
         }
     }

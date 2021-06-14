@@ -8,6 +8,7 @@
 #include <vector>
 #include <stdexcept>
 #include <filesystem>
+#include <array>
 
 #ifdef ENTLIB_STATIC
 #define ENTLIB_DLLEXPORT
@@ -36,6 +37,17 @@ namespace Ent
         size_t const len = (size_t)snprintf(nullptr, 0, message, std::forward<Args>(args)...);
         std::string buffer(len, ' ');
         snprintf((char*)buffer.data(), len + 1, message, std::forward<Args>(args)...);
+        return buffer;
+    }
+
+    /// @brief printf in a local static buffer.
+    /// @warning Each call will change the buffer content.
+    ///             Do not use the output of staticFormat as inpout of staticFormat.
+    template <typename... Args>
+    char const* staticFormat(char const* message, Args&&... args)
+    {
+        thread_local static char buffer[2048];
+        sprintf_s(buffer, sizeof(buffer), message, std::forward<Args>(args)...);
         return buffer;
     }
 
@@ -393,7 +405,7 @@ namespace Ent
 
     std::string convertANSIToUTF8(std::string const& message);
 
-    std::string formatErrorPath(std::filesystem::path const& _base, std::filesystem::path const& _rel);
+    char const* formatErrorPath(std::filesystem::path const& _base, std::filesystem::path const& _rel);
 
     struct InvalidKey : std::logic_error
     {
@@ -441,10 +453,16 @@ namespace Ent
 
     struct EntLibException : std::runtime_error
     {
-        std::vector<std::string> messages;
-        EntLibException(char const* _message = nullptr);
-        EntLibException(std::string _message);
-        void addContextMessage(std::string _message);
+        static constexpr auto MaxContextLine = 10;
+        std::array<size_t, MaxContextLine> context = {};
+        std::array<char, 4096> rawContext = {};
+        size_t contextSize = 0;
+        size_t rawContextSize = 0;
+        EntLibException(char const* message) noexcept;
+        EntLibException(std::string const& _message) noexcept;
+        void addContextMessage(std::string const& _message) noexcept;
+        void addContextMessage(char const* message) noexcept;
+
         const char* what() const noexcept override;
     };
 

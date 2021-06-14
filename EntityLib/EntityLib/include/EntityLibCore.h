@@ -437,7 +437,57 @@ namespace Ent
 #define AT(MAP, KEY) ::Ent::at(MAP, KEY, __FILE__, __LINE__, __func__)
     /// @endcond
 
-    struct FileSystemError : public std::runtime_error
+    // ******************************** Exception declarations ************************************
+
+    struct EntLibException : std::runtime_error
+    {
+        std::vector<std::string> messages;
+        EntLibException(char const* _message = nullptr);
+        EntLibException(std::string _message);
+        void addContextMessage(std::string _message);
+        const char* what() const noexcept override;
+    };
+
+    /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
+    struct BadType : EntLibException
+    {
+        BadType(char const* _message = nullptr); ///< ctor
+    };
+
+    struct BadArrayType : EntLibException
+    {
+        BadArrayType(char const* _message = nullptr); ///< ctor
+    };
+
+    /// Exception thrown when a metadata is missing in the json schema
+    ///
+    /// Example : oneOf need className and classData
+    struct MissingMetadata : EntLibException
+    {
+        MissingMetadata(char const* _schemaName); ///< ctor
+    };
+
+    /// Exception thrown when trying to switch a Union to a type that woesn't exit
+    struct BadUnionType : EntLibException
+    {
+        /// ctor
+        BadUnionType(char const* _type ///< The type/className that doen't exist in this union
+        );
+    };
+
+    /// Exception thrown when a schema is ill-formed
+    struct IllFormedSchema : EntLibException
+    {
+        IllFormedSchema(char const* _message); ///< ctor
+    };
+
+    /// Exception thrown when some json data are invalid
+    struct InvalidJsonData : EntLibException
+    {
+        InvalidJsonData(char const* _message); ///< ctor
+    };
+
+    struct FileSystemError : EntLibException
     {
         FileSystemError(
             std::string const& msg,

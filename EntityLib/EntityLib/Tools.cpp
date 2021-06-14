@@ -33,9 +33,10 @@ json loadJsonFile(std::filesystem::path const& _root, std::filesystem::path cons
         );
         return doc;
     }
-    catch (...)
+    catch (Ent::EntLibException& ex)
     {
-        ENTLIB_LOG_ERROR("parsing file %s", Ent::formatErrorPath(_root, _rel).c_str());
+        ex.addContextMessage(
+            Ent::format("parsing file %s", Ent::formatErrorPath(_root, _rel).c_str()));
         throw;
     }
 }

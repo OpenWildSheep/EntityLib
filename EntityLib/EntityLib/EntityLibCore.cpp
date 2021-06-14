@@ -50,17 +50,50 @@ namespace Ent
         std::error_code error)
     {
         return Ent::format(
-            R"msg(%s %s : %s)msg",
+            R"msg(%s - %s : %s)msg",
             msg.c_str(),
             Ent::convertANSIToUTF8(error.message()).c_str(),
             Ent::formatErrorPath(rootPath, relPath).c_str());
     }
+
+    EntLibException::EntLibException(char const* _message)
+        : std::runtime_error(_message)
+    {
+        messages.emplace_back(_message);
+    }
+    EntLibException::EntLibException(std::string _message)
+        : std::runtime_error(_message)
+    {
+        messages.push_back(std::move(_message));
+    }
+    void EntLibException::addContextMessage(std::string _message)
+    {
+        messages.push_back(std::move(_message));
+    }
+
+    const char* EntLibException::what() const noexcept
+    {
+        static char buffer[4096] = {0};
+        bool first = true;
+        for (std::string const& msg : messages)
+        {
+            if (!first)
+            {
+                strcat_s(buffer, sizeof(buffer), "    - ");
+            }
+            strcat_s(buffer, sizeof(buffer), msg.c_str());
+            strcat_s(buffer, sizeof(buffer), "\n");
+            first = false;
+        }
+        return buffer;
+    }
+
     FileSystemError::FileSystemError(
         std::string const& msg,
         std::filesystem::path const& rootPath,
         std::filesystem::path const& relPath,
         std::error_code error)
-        : std::runtime_error(makeWhatMessage(msg, rootPath, relPath, error))
+        : EntLibException(makeWhatMessage(msg, rootPath, relPath, error))
     {
     }
     FileSystemError::FileSystemError(

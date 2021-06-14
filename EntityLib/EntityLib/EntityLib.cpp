@@ -2810,9 +2810,10 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
             auto iter_bool = cache.insert_or_assign(relPath, std::move(file));
             return std::get<0>(iter_bool)->second.data;
         }
-        catch (...)
+        catch (EntLibException& ex)
         {
-            ENTLIB_LOG_ERROR(R"(loading : %s)", formatErrorPath(rawdataPath, relPath).c_str());
+            ex.addContextMessage(
+                format("loading : %s", formatErrorPath(rawdataPath, relPath).c_str()));
             throw;
         }
     }
@@ -3109,10 +3110,10 @@ void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path con
         {
             validateEntity(schema.schema, toolsDir, document);
         }
-        catch (...)
+        catch (EntLibException& ex)
         {
-            ENTLIB_LOG_ERROR(
-                "saving entity : %s", formatErrorPath(rawdataPath, _relEntityPath).c_str());
+            ex.addContextMessage(
+                format("saving entity : %s", formatErrorPath(rawdataPath, _relEntityPath).c_str()));
             throw;
         }
     }

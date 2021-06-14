@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#define NOMINMAX
+#include <windows.h>
 #pragma warning(pop)
 
 #include <EntityLib.h>
@@ -122,6 +124,7 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
 int main(int argc, char** argv)
 try
 {
+    SetConsoleOutputCP(65001);
     bool doDisplayScene = false;
     bool doDisplaySubSchema = false;
     bool dumpNodes = false;
@@ -1130,6 +1133,25 @@ try
     // ******************* Test twice the same key in map *************************************
     {
         ENTLIB_CHECK_EXCEPTION(entlib.loadEntity("key_double.entity"), Ent::InvalidJsonData);
+    }
+
+    // ******************* Test the EntLibException ***********************************************
+    {
+        bool exceptionThrown = false;
+        try
+        {
+
+            entlib.loadScene("scene_with_invalid_entity.scene");
+        }
+        catch (std::runtime_error& ex)
+        {
+            exceptionThrown = true;
+            char const* what = ex.what();
+            ENTLIB_ASSERT(strstr(what, R"("this_entity_doesnt_exist.entity")") != nullptr);
+            ENTLIB_ASSERT(strstr(what, R"("scene_with_invalid_entity.scene")") != nullptr);
+            std::cout << what << std::endl;
+        }
+        ENTLIB_ASSERT(exceptionThrown);
     }
 
     // ******************* Test default color *****************************************************

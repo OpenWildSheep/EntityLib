@@ -1140,16 +1140,15 @@ try
         bool exceptionThrown = false;
         try
         {
-
             entlib.loadScene("scene_with_invalid_entity.scene");
         }
         catch (std::runtime_error& ex)
         {
             exceptionThrown = true;
             char const* what = ex.what();
+            std::cout << what << std::endl;
             ENTLIB_ASSERT(strstr(what, R"("this_entity_doesnt_exist.entity")") != nullptr);
             ENTLIB_ASSERT(strstr(what, R"("scene_with_invalid_entity.scene")") != nullptr);
-            std::cout << what << std::endl;
         }
         ENTLIB_ASSERT(exceptionThrown);
     }

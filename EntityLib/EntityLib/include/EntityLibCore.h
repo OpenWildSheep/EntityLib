@@ -7,8 +7,11 @@
 #include <memory>
 #include <vector>
 #include <stdexcept>
-#include <filesystem>
 #include <array>
+
+#pragma warning(push, 0)
+#include "../external/filesystem.hpp"
+#pragma warning(pop)
 
 #ifdef ENTLIB_STATIC
 #define ENTLIB_DLLEXPORT
@@ -405,7 +408,7 @@ namespace Ent
 
     std::string convertANSIToUTF8(std::string const& message);
 
-    char const* formatErrorPath(std::filesystem::path const& _base, std::filesystem::path const& _rel);
+    char const* formatPath(std::filesystem::path const& _base, std::filesystem::path const& _rel);
 
     struct InvalidKey : std::logic_error
     {
@@ -451,28 +454,40 @@ namespace Ent
 
     // ******************************** Exception declarations ************************************
 
-    struct EntLibException : std::runtime_error
+    struct Exception : std::runtime_error
     {
+        Exception(char const* _message = nullptr); ///< ctor
+    };
+
+    struct ContextException : Exception
+    {
+        std::exception_ptr exptr;
         static constexpr auto MaxContextLine = 10;
         std::array<size_t, MaxContextLine> context = {};
         std::array<char, 4096> rawContext = {};
         size_t contextSize = 0;
         size_t rawContextSize = 0;
-        EntLibException(char const* message) noexcept;
-        EntLibException(std::string const& _message) noexcept;
+        ContextException() noexcept;
+        ContextException(char const* _message) noexcept;
         void addContextMessage(std::string const& _message) noexcept;
         void addContextMessage(char const* message) noexcept;
 
         const char* what() const noexcept override;
     };
 
+    struct WrapperException : ContextException
+    {
+        std::exception_ptr exptr;
+        WrapperException(std::exception_ptr _exptr, char const* _message) noexcept;
+    };
+
     /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
-    struct BadType : EntLibException
+    struct BadType : ContextException
     {
         BadType(char const* _message = nullptr); ///< ctor
     };
 
-    struct BadArrayType : EntLibException
+    struct BadArrayType : ContextException
     {
         BadArrayType(char const* _message = nullptr); ///< ctor
     };
@@ -480,13 +495,13 @@ namespace Ent
     /// Exception thrown when a metadata is missing in the json schema
     ///
     /// Example : oneOf need className and classData
-    struct MissingMetadata : EntLibException
+    struct MissingMetadata : ContextException
     {
         MissingMetadata(char const* _schemaName); ///< ctor
     };
 
     /// Exception thrown when trying to switch a Union to a type that woesn't exit
-    struct BadUnionType : EntLibException
+    struct BadUnionType : ContextException
     {
         /// ctor
         BadUnionType(char const* _type ///< The type/className that doen't exist in this union
@@ -494,18 +509,21 @@ namespace Ent
     };
 
     /// Exception thrown when a schema is ill-formed
-    struct IllFormedSchema : EntLibException
+    struct IllFormedSchema : ContextException
     {
         IllFormedSchema(char const* _message); ///< ctor
     };
 
     /// Exception thrown when some json data are invalid
-    struct InvalidJsonData : EntLibException
+    struct InvalidJsonData : ContextException
     {
         InvalidJsonData(char const* _message); ///< ctor
     };
 
-    struct FileSystemError : EntLibException
+    /// Use FileSystemError rather than filesystem_error, since
+    ///     - It will convert the message charset into utf8
+    ///     - It will print the path as expected in Wild tools
+    struct FileSystemError : ContextException
     {
         FileSystemError(
             std::string const& msg,

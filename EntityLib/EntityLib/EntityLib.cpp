@@ -2751,7 +2751,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
 }
 
 /// Exception thrown when a method is called on legacy data (or vice versa)
-struct UnsupportedFormat : std::exception
+struct UnsupportedFormat : Ent::ContextException
 {
     UnsupportedFormat() = default;
 };
@@ -2810,11 +2810,16 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
             auto iter_bool = cache.insert_or_assign(relPath, std::move(file));
             return std::get<0>(iter_bool)->second.data;
         }
-        catch (EntLibException& ex)
+        catch (ContextException& ex)
         {
-            ex.addContextMessage(
-                staticFormat("loading : %s", formatErrorPath(rawdataPath, relPath)));
+            ex.addContextMessage(staticFormat("loading : %s", formatPath(rawdataPath, relPath)));
             throw;
+        }
+        catch (...)
+        {
+            throw WrapperException(
+                std::current_exception(),
+                staticFormat("loading : %s", formatPath(rawdataPath, relPath)));
         }
     }
     else
@@ -3110,11 +3115,17 @@ void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path con
         {
             validateEntity(schema.schema, toolsDir, document);
         }
-        catch (EntLibException& ex)
+        catch (ContextException& ex)
         {
             ex.addContextMessage(
-                staticFormat("saving entity : %s", formatErrorPath(rawdataPath, _relEntityPath)));
+                staticFormat("saving entity : %s", formatPath(rawdataPath, _relEntityPath)));
             throw;
+        }
+        catch (...)
+        {
+            throw WrapperException(
+                std::current_exception(),
+                staticFormat("saving entity : %s", formatPath(rawdataPath, _relEntityPath)));
         }
     }
 }

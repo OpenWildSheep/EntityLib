@@ -406,7 +406,7 @@ namespace Ent
         return value_ptr<T>(T(std::forward<Args>(args)...));
     }
 
-    std::string convertANSIToUTF8(std::string const& message);
+    std::string convertANSIToUTF8(std::string const& _message);
 
     char const* formatPath(std::filesystem::path const& _base, std::filesystem::path const& _rel);
 
@@ -459,26 +459,30 @@ namespace Ent
         Exception(char const* _message = nullptr); ///< ctor
     };
 
+    /// An exception allowing to catch + add info + rethrow
     struct ContextException : Exception
     {
-        std::exception_ptr exptr;
-        static constexpr auto MaxContextLine = 10;
-        std::array<size_t, MaxContextLine> context = {};
-        std::array<char, 4096> rawContext = {};
-        size_t contextSize = 0;
-        size_t rawContextSize = 0;
         ContextException() noexcept;
         ContextException(char const* _message) noexcept;
         void addContextMessage(std::string const& _message) noexcept;
-        void addContextMessage(char const* message) noexcept;
+        void addContextMessage(char const* _message) noexcept;
 
         const char* what() const noexcept override;
+
+    private:
+        static constexpr auto MaxContextLine = 10;
+        std::array<size_t, MaxContextLine> m_context = {};
+        std::array<char, 4096> m_rawContext = {};
+        size_t m_contextSize = 0;
+        size_t m_rawContextSize = 0;
     };
 
+    /// A ContextException which is wrapping an external
+    /// Usefull to add some context info on an exception which in not a ContextException
     struct WrapperException : ContextException
     {
         std::exception_ptr exptr;
-        WrapperException(std::exception_ptr _exptr, char const* _message) noexcept;
+        WrapperException(std::exception_ptr const& _exptr, char const* _message) noexcept;
     };
 
     /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
@@ -526,15 +530,15 @@ namespace Ent
     struct FileSystemError : ContextException
     {
         FileSystemError(
-            std::string const& msg,
-            std::filesystem::path const& rootPath,
-            std::filesystem::path const& relPath,
-            std::error_code error);
+            std::string const& _msg,
+            std::filesystem::path const& _rootPath,
+            std::filesystem::path const& _relPath,
+            std::error_code _error);
 
         /// This ctor will use the errno as error_code
         FileSystemError(
-            std::string const& msg,
-            std::filesystem::path const& rootPath,
-            std::filesystem::path const& relPath);
+            std::string const& _msg,
+            std::filesystem::path const& _rootPath,
+            std::filesystem::path const& _relPath);
     };
 } // namespace Ent

@@ -24,16 +24,16 @@ namespace Ent
         return buffer;
     }
 
-    std::string convertANSIToUTF8(std::string const& message)
+    std::string convertANSIToUTF8(std::string const& _message)
     {
         // CP_ACP is the system default Windows ANSI code page.
         // ANSI to utf16
         int convertResult =
-            MultiByteToWideChar(CP_ACP, 0, message.c_str(), (int)message.size(), nullptr, 0);
+            MultiByteToWideChar(CP_ACP, 0, _message.c_str(), (int)_message.size(), nullptr, 0);
         std::wstring wide;
         wide.resize((size_t)convertResult);
         MultiByteToWideChar(
-            CP_ACP, 0, message.c_str(), (int)message.size(), &wide[0], (int)wide.size());
+            CP_ACP, 0, _message.c_str(), (int)_message.size(), &wide[0], (int)wide.size());
         // utf16 to utf8
         convertResult = WideCharToMultiByte(
             CP_UTF8, 0, wide.c_str(), (int)wide.size(), nullptr, 0, nullptr, nullptr);
@@ -46,10 +46,10 @@ namespace Ent
     }
 
     static char const* makeWhatMessage(
-        std::string const& msg,
-        std::filesystem::path const& rootPath,
-        std::filesystem::path const& relPath,
-        std::error_code error)
+        std::string const& _msg,
+        std::filesystem::path const& _rootPath,
+        std::filesystem::path const& _relPath,
+        std::error_code _error)
     {
         static constexpr auto InitBuffSize = 4096;
         thread_local static char buffer[InitBuffSize] = {0};
@@ -57,9 +57,9 @@ namespace Ent
             buffer,
             InitBuffSize,
             R"msg(%s - %s : %s)msg",
-            msg.c_str(),
-            Ent::convertANSIToUTF8(error.message()).c_str(),
-            Ent::formatPath(rootPath, relPath));
+            _msg.c_str(),
+            Ent::convertANSIToUTF8(_error.message()).c_str(),
+            Ent::formatPath(_rootPath, _relPath));
         return buffer;
     }
 
@@ -83,14 +83,15 @@ namespace Ent
         addContextMessage(_message.c_str());
     }
 
-    void ContextException::addContextMessage(char const* message) noexcept
+    void ContextException::addContextMessage(char const* _message) noexcept
     {
-        if (strcpy_s(rawContext.data() + rawContextSize, rawContext.size() - rawContextSize, message)
+        if (strcpy_s(
+                m_rawContext.data() + m_rawContextSize, m_rawContext.size() - m_rawContextSize, _message)
             == 0)
         {
-            context[contextSize] = rawContextSize;
-            ++contextSize;
-            rawContextSize += strlen(message) + 1;
+            m_context[m_contextSize] = m_rawContextSize;
+            ++m_contextSize;
+            m_rawContextSize += strlen(_message) + 1;
         }
     }
 
@@ -99,9 +100,9 @@ namespace Ent
         static constexpr auto InitBuffSize = 4096;
         thread_local static char buffer[InitBuffSize] = {0};
         bool first = true;
-        for (size_t i = 0; i < contextSize; ++i)
+        for (size_t i = 0; i < m_contextSize; ++i)
         {
-            auto message = rawContext.data() + context[i];
+            auto message = m_rawContext.data() + m_context[i];
             if (!first)
             {
                 strcat_s(buffer, sizeof(buffer), "    - ");
@@ -113,7 +114,7 @@ namespace Ent
         return buffer;
     }
 
-    WrapperException::WrapperException(std::exception_ptr _exptr, char const* _message) noexcept
+    WrapperException::WrapperException(std::exception_ptr const& _exptr, char const* _message) noexcept
         : exptr(_exptr)
     {
         try
@@ -132,18 +133,19 @@ namespace Ent
     }
 
     FileSystemError::FileSystemError(
-        std::string const& msg,
-        std::filesystem::path const& rootPath,
-        std::filesystem::path const& relPath,
-        std::error_code error)
-        : ContextException(makeWhatMessage(msg, rootPath, relPath, error))
+        std::string const& _msg,
+        std::filesystem::path const& _rootPath,
+        std::filesystem::path const& _relPath,
+        std::error_code _error)
+        : ContextException(makeWhatMessage(_msg, _rootPath, _relPath, _error))
     {
     }
     FileSystemError::FileSystemError(
-        std::string const& msg,
-        std::filesystem::path const& rootPath,
-        std::filesystem::path const& relPath)
-        : FileSystemError(msg, rootPath, relPath, std::make_error_code(static_cast<std::errc>(errno)))
+        std::string const& _msg,
+        std::filesystem::path const& _rootPath,
+        std::filesystem::path const& _relPath)
+        : FileSystemError(
+            _msg, _rootPath, _relPath, std::make_error_code(static_cast<std::errc>(errno)))
     {
     }
 

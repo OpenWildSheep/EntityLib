@@ -491,7 +491,7 @@ namespace Ent
     {
         auto const written = sprintf_s(
             m_rawContext.data() + m_rawContextSize,
-            m_rawContext.size() - m_rawContextSize,
+            (m_rawContext.size() - m_rawContextSize) - 1,
             _message,
             std::forward<Args>(args)...);
         if (written != -1)
@@ -499,11 +499,8 @@ namespace Ent
             m_context[m_contextSize] = m_rawContextSize;
             ++m_contextSize;
             m_rawContextSize += written;
-            if (m_rawContextSize != m_rawContext.size())
-            {
-                m_rawContext[m_rawContextSize] = 0;
-                ++m_rawContextSize;
-            }
+            m_rawContext[m_rawContextSize] = 0;
+            ++m_rawContextSize;
         }
     }
 

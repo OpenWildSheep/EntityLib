@@ -123,7 +123,7 @@ namespace Ent
         }
         catch (std::exception& ex)
         {
-            addContextMessage(staticFormat("%s : %s", typeid(ex).name(), ex.what()));
+            addContextMessage("%s : %s", typeid(ex).name(), ex.what());
         }
         catch (...)
         {
@@ -160,17 +160,17 @@ namespace Ent
     }
 
     MissingMetadata::MissingMetadata(char const* _schemaName)
-        : ContextException(staticFormat("Metadata missing : %s", _schemaName))
+        : ContextException("Metadata missing : %s", _schemaName)
     {
     }
 
     BadUnionType::BadUnionType(char const* _type)
-        : ContextException(staticFormat("Bad union type : %s", _type))
+        : ContextException("Bad union type : %s", _type)
     {
     }
 
     IllFormedSchema::IllFormedSchema(char const* _message)
-        : ContextException(staticFormat("Ill-formed schema : %s", _message))
+        : ContextException("Ill-formed schema : %s", _message)
     {
     }
 

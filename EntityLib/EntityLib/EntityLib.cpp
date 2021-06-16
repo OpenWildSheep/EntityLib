@@ -2108,7 +2108,7 @@ Ent::Node Ent::EntityLib::loadNode(
                         break;
                     default:
                         throw ContextException(
-                            staticFormat("Unknown key type in map '%s'", _nodeSchema.name.c_str()));
+                            "Unknown key type in map '%s'", _nodeSchema.name.c_str());
                     }
                 }
                 break;
@@ -2159,7 +2159,7 @@ Ent::Node Ent::EntityLib::loadNode(
                         break;
                     default:
                         throw ContextException(
-                            staticFormat("Unknown key type in set '%s'", _nodeSchema.name.c_str()));
+                            "Unknown key type in set '%s'", _nodeSchema.name.c_str());
                     }
 #pragma warning(pop)
                 }
@@ -2197,10 +2197,10 @@ Ent::Node Ent::EntityLib::loadNode(
                 }
                 break;
                 default:
-                    throw ContextException(staticFormat(
-                        "Unknown key type (%s) in schema of %s",
+                    throw ContextException(
+                        "Unknown key type (%s) in schema of '%s'",
                         meta.overridePolicy.c_str(),
-                        _nodeSchema.name.c_str()));
+                        _nodeSchema.name.c_str());
                 }
             }
         }
@@ -2814,14 +2814,13 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
         }
         catch (ContextException& ex)
         {
-            ex.addContextMessage(staticFormat("loading : %s", formatPath(rawdataPath, relPath)));
+            ex.addContextMessage("loading : %s", formatPath(rawdataPath, relPath));
             throw;
         }
         catch (...)
         {
             throw WrapperException(
-                std::current_exception(),
-                staticFormat("loading : %s", formatPath(rawdataPath, relPath)));
+                std::current_exception(), "loading : %s", formatPath(rawdataPath, relPath));
         }
     }
     else
@@ -3119,15 +3118,15 @@ void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path con
         }
         catch (ContextException& ex)
         {
-            ex.addContextMessage(
-                staticFormat("saving entity : %s", formatPath(rawdataPath, _relEntityPath)));
+            ex.addContextMessage("saving entity : %s", formatPath(rawdataPath, _relEntityPath));
             throw;
         }
         catch (...)
         {
             throw WrapperException(
                 std::current_exception(),
-                staticFormat("saving entity : %s", formatPath(rawdataPath, _relEntityPath)));
+                "saving entity : %s",
+                formatPath(rawdataPath, _relEntityPath));
         }
     }
 }
@@ -3174,10 +3173,10 @@ std::filesystem::path Ent::EntityLib::getRelativePath(std::filesystem::path cons
             }
             else
             {
-                throw ContextException(staticFormat(
+                throw ContextException(
                     R"(_path %s in not inside rawdata "%s")",
                     formatPath(rawdataPath, _path),
-                    rawdataPath.generic_string().c_str()));
+                    rawdataPath.generic_string().c_str());
             }
         }
 

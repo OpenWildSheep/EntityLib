@@ -464,8 +464,19 @@ namespace Ent
     {
         ContextException() noexcept;
         ContextException(char const* _message) noexcept;
+        template <typename... Args>
+        ContextException(char const* message, Args&&... args)
+            : ContextException(staticFormat(message, std::forward<Args>(args)...))
+        {
+        }
+
         void addContextMessage(std::string const& _message) noexcept;
         void addContextMessage(char const* _message) noexcept;
+        template <typename... Args>
+        void addContextMessage(char const* message, Args&&... args)
+        {
+            addContextMessage(staticFormat(message, std::forward<Args>(args)...));
+        }
 
         const char* what() const noexcept override;
 
@@ -483,6 +494,11 @@ namespace Ent
     {
         std::exception_ptr exptr;
         WrapperException(std::exception_ptr const& _exptr, char const* _message) noexcept;
+        template <typename... Args>
+        WrapperException(std::exception_ptr const& _exptr, char const* _message, Args&&... args) noexcept
+            : WrapperException(_exptr, staticFormat(_message, std::forward<Args>(args)...))
+        {
+        }
     };
 
     /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType

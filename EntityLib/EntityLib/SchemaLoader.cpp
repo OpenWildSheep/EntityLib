@@ -94,15 +94,16 @@ void Ent::SchemaLoader::parseSchema(
         }
         catch (ContextException& ex)
         {
-            ex.addContextMessage(
-                staticFormat("Loading '%s' in file : %s", ref.c_str(), formatPath({}, fileName)));
+            ex.addContextMessage("Loading '%s' in file : %s", ref.c_str(), formatPath({}, fileName));
             throw;
         }
         catch (...)
         {
             throw WrapperException(
                 std::current_exception(),
-                staticFormat("Loading '%s' in file : %s", ref.c_str(), formatPath({}, fileName)));
+                "Loading '%s' in file : %s",
+                ref.c_str(),
+                formatPath({}, fileName));
         }
 
         vis.closeRef();

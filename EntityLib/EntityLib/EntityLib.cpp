@@ -2107,7 +2107,8 @@ Ent::Node Ent::EntityLib::loadNode(
                             doRemove);
                         break;
                     default:
-                        throw std::runtime_error("Unknown key type in map " + _nodeSchema.name);
+                        throw ContextException(
+                            staticFormat("Unknown key type in map '%s'", _nodeSchema.name.c_str()));
                     }
                 }
                 break;
@@ -2157,7 +2158,8 @@ Ent::Node Ent::EntityLib::loadNode(
                             doRemoveDefault);
                         break;
                     default:
-                        throw std::runtime_error("Unknown key type in set " + _nodeSchema.name);
+                        throw ContextException(
+                            staticFormat("Unknown key type in set '%s'", _nodeSchema.name.c_str()));
                     }
 #pragma warning(pop)
                 }
@@ -2195,7 +2197,7 @@ Ent::Node Ent::EntityLib::loadNode(
                 }
                 break;
                 default:
-                    throw std::runtime_error(format(
+                    throw ContextException(staticFormat(
                         "Unknown key type (%s) in schema of %s",
                         meta.overridePolicy.c_str(),
                         _nodeSchema.name.c_str()));
@@ -2414,7 +2416,7 @@ json Ent::EntityLib::dumpNode(
                         {
                             if (item->getSchema()->type != Ent::DataType::oneOf)
                             {
-                                throw std::runtime_error(
+                                throw ContextException(
                                     R"(Can't write an erased element in a set of non-union)");
                             }
                             auto& unionMeta =
@@ -3172,9 +3174,9 @@ std::filesystem::path Ent::EntityLib::getRelativePath(std::filesystem::path cons
             }
             else
             {
-                throw std::runtime_error(format(
-                    R"(_path "%s" in not inside rawdata "%s")",
-                    _path.generic_string().c_str(),
+                throw ContextException(staticFormat(
+                    R"(_path %s in not inside rawdata "%s")",
+                    formatPath(rawdataPath, _path),
                     rawdataPath.generic_string().c_str()));
             }
         }

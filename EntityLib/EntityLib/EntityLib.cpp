@@ -2753,7 +2753,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
 }
 
 /// Exception thrown when a method is called on legacy data (or vice versa)
-struct UnsupportedFormat : Ent::ContextException
+struct UnsupportedFormat : ContextException
 {
     UnsupportedFormat() = default;
 };

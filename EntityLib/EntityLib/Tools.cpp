@@ -33,14 +33,14 @@ json loadJsonFile(std::filesystem::path const& _root, std::filesystem::path cons
         );
         return doc;
     }
-    catch (Ent::ContextException& ex)
+    catch (ContextException& ex)
     {
         ex.addContextMessage("parsing file %s", Ent::formatPath(_root, _rel));
         throw;
     }
     catch (...)
     {
-        throw Ent::WrapperException(
+        throw WrapperException(
             std::current_exception(), "parsing file %s", Ent::formatPath(_root, _rel));
     }
 }

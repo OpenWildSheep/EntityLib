@@ -11,6 +11,7 @@
 
 #pragma warning(push, 0)
 #include "../external/filesystem.hpp"
+#include "../../../Core/WildShared/Exception.h"
 #pragma warning(pop)
 
 #ifdef ENTLIB_STATIC
@@ -459,79 +460,7 @@ namespace Ent
         Exception(char const* _message = nullptr); ///< ctor
     };
 
-    /// An exception allowing to catch + add info + rethrow
-    struct ContextException : Exception
-    {
-        ContextException() noexcept;
-        template <typename... Args>
-        ContextException(char const* message, Args&&... args) noexcept;
 
-        void addContextMessage(std::string const& _message) noexcept;
-        template <typename... Args>
-        void addContextMessage(char const* _message, Args&&... args) noexcept;
-
-        const char* what() const noexcept override;
-
-    private:
-        static constexpr auto MaxContextLine = 10;
-        std::array<size_t, MaxContextLine> m_context = {};
-        std::array<char, 4096> m_rawContext = {};
-        size_t m_contextSize = 0;
-        size_t m_rawContextSize = 0;
-    };
-
-    template <typename... Args>
-    ContextException::ContextException(char const* message, Args&&... args) noexcept
-    {
-        addContextMessage(message, std::forward<Args>(args)...);
-    }
-
-    template <typename... Args>
-    void ContextException::addContextMessage(char const* _message, Args&&... args) noexcept
-    {
-        auto const written = sprintf_s(
-            m_rawContext.data() + m_rawContextSize,
-            (m_rawContext.size() - m_rawContextSize) - 1,
-            _message,
-            std::forward<Args>(args)...);
-        if (written != -1)
-        {
-            m_context[m_contextSize] = m_rawContextSize;
-            ++m_contextSize;
-            m_rawContextSize += written;
-            m_rawContext[m_rawContextSize] = 0;
-            ++m_rawContextSize;
-        }
-    }
-
-    /// A ContextException which is wrapping an external
-    /// Usefull to add some context info on an exception which in not a ContextException
-    struct WrapperException : ContextException
-    {
-        std::exception_ptr exptr;
-        template <typename... Args>
-        WrapperException(std::exception_ptr const& _exptr, char const* _message, Args&&... args) noexcept;
-    };
-
-    template <typename... Args>
-    WrapperException::WrapperException(
-        std::exception_ptr const& _exptr, char const* _message, Args&&... args) noexcept
-        : exptr(_exptr)
-    {
-        try
-        {
-            std::rethrow_exception(exptr);
-        }
-        catch (std::exception& ex)
-        {
-            addContextMessage("%s : %s", typeid(ex).name(), ex.what());
-        }
-        catch (...)
-        {
-            addContextMessage("Unknown exception");
-        }
-        addContextMessage(_message, std::forward<Args>(args)...);
-    }
 
     /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
     struct BadType : ContextException

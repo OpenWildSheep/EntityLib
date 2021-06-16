@@ -68,35 +68,6 @@ namespace Ent
     {
     }
 
-    ContextException::ContextException() noexcept
-        : Exception()
-    {
-    }
-
-    void ContextException::addContextMessage(std::string const& _message) noexcept
-    {
-        addContextMessage(_message.c_str());
-    }
-
-    const char* ContextException::what() const noexcept
-    {
-        static constexpr auto InitBuffSize = 4096;
-        thread_local static char buffer[InitBuffSize] = {0};
-        bool first = true;
-        for (size_t i = 0; i < m_contextSize; ++i)
-        {
-            auto message = m_rawContext.data() + m_context[i];
-            if (!first)
-            {
-                strcat_s(buffer, sizeof(buffer), "    - ");
-            }
-            strcat_s(buffer, sizeof(buffer), message);
-            strcat_s(buffer, sizeof(buffer), "\n");
-            first = false;
-        }
-        return buffer;
-    }
-
     FileSystemError::FileSystemError(
         std::string const& _msg,
         std::filesystem::path const& _rootPath,

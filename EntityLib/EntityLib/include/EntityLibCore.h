@@ -463,20 +463,12 @@ namespace Ent
     struct ContextException : Exception
     {
         ContextException() noexcept;
-        ContextException(char const* _message) noexcept;
         template <typename... Args>
-        ContextException(char const* message, Args&&... args)
-            : ContextException(staticFormat(message, std::forward<Args>(args)...))
-        {
-        }
+        ContextException(char const* message, Args&&... args) noexcept;
 
         void addContextMessage(std::string const& _message) noexcept;
-        void addContextMessage(char const* _message) noexcept;
         template <typename... Args>
-        void addContextMessage(char const* message, Args&&... args)
-        {
-            addContextMessage(staticFormat(message, std::forward<Args>(args)...));
-        }
+        void addContextMessage(char const* _message, Args&&... args) noexcept;
 
         const char* what() const noexcept override;
 
@@ -488,18 +480,61 @@ namespace Ent
         size_t m_rawContextSize = 0;
     };
 
+    template <typename... Args>
+    ContextException::ContextException(char const* message, Args&&... args) noexcept
+    {
+        addContextMessage(message, std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    void ContextException::addContextMessage(char const* _message, Args&&... args) noexcept
+    {
+        auto const written = sprintf_s(
+            m_rawContext.data() + m_rawContextSize,
+            m_rawContext.size() - m_rawContextSize,
+            _message,
+            std::forward<Args>(args)...);
+        if (written != -1)
+        {
+            m_context[m_contextSize] = m_rawContextSize;
+            ++m_contextSize;
+            m_rawContextSize += written;
+            if (m_rawContextSize != m_rawContext.size())
+            {
+                m_rawContext[m_rawContextSize] = 0;
+                ++m_rawContextSize;
+            }
+        }
+    }
+
     /// A ContextException which is wrapping an external
     /// Usefull to add some context info on an exception which in not a ContextException
     struct WrapperException : ContextException
     {
         std::exception_ptr exptr;
-        WrapperException(std::exception_ptr const& _exptr, char const* _message) noexcept;
         template <typename... Args>
-        WrapperException(std::exception_ptr const& _exptr, char const* _message, Args&&... args) noexcept
-            : WrapperException(_exptr, staticFormat(_message, std::forward<Args>(args)...))
-        {
-        }
+        WrapperException(std::exception_ptr const& _exptr, char const* _message, Args&&... args) noexcept;
     };
+
+    template <typename... Args>
+    WrapperException::WrapperException(
+        std::exception_ptr const& _exptr, char const* _message, Args&&... args) noexcept
+        : exptr(_exptr)
+    {
+        try
+        {
+            std::rethrow_exception(exptr);
+        }
+        catch (std::exception& ex)
+        {
+            addContextMessage("%s : %s", typeid(ex).name(), ex.what());
+        }
+        catch (...)
+        {
+            addContextMessage("Unknown exception");
+        }
+        addContextMessage(_message, std::forward<Args>(args)...);
+    }
 
     /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
     struct BadType : ContextException

@@ -73,26 +73,9 @@ namespace Ent
     {
     }
 
-    ContextException::ContextException(char const* _message) noexcept
-    {
-        addContextMessage(_message);
-    }
-
     void ContextException::addContextMessage(std::string const& _message) noexcept
     {
         addContextMessage(_message.c_str());
-    }
-
-    void ContextException::addContextMessage(char const* _message) noexcept
-    {
-        if (strcpy_s(
-                m_rawContext.data() + m_rawContextSize, m_rawContext.size() - m_rawContextSize, _message)
-            == 0)
-        {
-            m_context[m_contextSize] = m_rawContextSize;
-            ++m_contextSize;
-            m_rawContextSize += strlen(_message) + 1;
-        }
     }
 
     const char* ContextException::what() const noexcept
@@ -112,24 +95,6 @@ namespace Ent
             first = false;
         }
         return buffer;
-    }
-
-    WrapperException::WrapperException(std::exception_ptr const& _exptr, char const* _message) noexcept
-        : exptr(_exptr)
-    {
-        try
-        {
-            std::rethrow_exception(exptr);
-        }
-        catch (std::exception& ex)
-        {
-            addContextMessage("%s : %s", typeid(ex).name(), ex.what());
-        }
-        catch (...)
-        {
-            addContextMessage("Unknown exception");
-        }
-        addContextMessage(_message);
     }
 
     FileSystemError::FileSystemError(

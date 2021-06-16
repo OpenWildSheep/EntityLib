@@ -907,10 +907,16 @@ namespace Ent
     json Node::toJson(
         OverrideValueSource _dumpedValueSource,
         bool _superKeyIsTypeName,
-        std::function<void(EntityRef&)> const& _entityRefPreProc) const
+        std::function<void(EntityRef&)> const& _entityRefPreProc,
+        bool _saveUnionIndex) const
     {
         return EntityLib::dumpNode(
-            *getSchema(), *this, _dumpedValueSource, _superKeyIsTypeName, _entityRefPreProc);
+            *getSchema(),
+            *this,
+            _dumpedValueSource,
+            _superKeyIsTypeName,
+            _entityRefPreProc,
+            _saveUnionIndex);
     }
 
     void Node::saveNode(std::filesystem::path const& _path) const

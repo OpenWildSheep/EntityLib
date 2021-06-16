@@ -284,7 +284,8 @@ namespace Ent
                 OverrideValueSource::Override, ///< Dump only fields with given value source
             bool _superKeyIsTypeName =
                 false, ///< Super sub-node are dumped using their type name for key instead of "Super"
-            std::function<void(EntityRef&)> const& _entityRefPreProc = {}) const;
+            std::function<void(EntityRef&)> const& _entityRefPreProc = {},
+            bool _saveUnionIndex = false) const;
 
         /// Save as a Node prebab
         void saveNode(std::filesystem::path const& path) const;

@@ -345,6 +345,16 @@ try
     {
         EntityPtr ent = entlib.loadEntity("prefab.entity");
 
+        // Test Variant
+        Ent::Component const* testArrays = ent->getComponent("TestArrays");
+        ENTLIB_ASSERT(testArrays->root.at("Variant")->getUnionData()->getFloat() == 3.1416);
+        nlohmann::json withoutIndex = testArrays->root.at("Variant")->toJson(
+            Ent::OverrideValueSource::OverrideOrPrefab, true, {}, false);
+        ENTLIB_ASSERT(withoutIndex.count("variantIndex") == 0);
+        nlohmann::json withIndex = testArrays->root.at("Variant")->toJson(
+            Ent::OverrideValueSource::OverrideOrPrefab, true, {}, true);
+        ENTLIB_ASSERT(withIndex.at("variantIndex") == 1);
+
         // Test saveNode
         Ent::Component const* heightObj = ent->getComponent("HeightObj");
         heightObj->root.saveNode("test.HeightObj.node");

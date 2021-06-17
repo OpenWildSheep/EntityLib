@@ -2,10 +2,10 @@
 
 #pragma warning(push, 0)
 #pragma warning(disable : 4996)
-#include "../Override.h"
 #include <vector>
 #include <memory>
 #include <map>
+#include <set>
 #include <array>
 
 #include "../../../external/mapbox/variant.hpp"
@@ -13,6 +13,12 @@
 #include "../external/filesystem.hpp"
 
 #include "../external/json.hpp" // TODO : Remove when the rawData in Component is no more useful
+#pragma warning(pop)
+
+#pragma warning(push)
+#pragma warning(disable : 4464)
+#include "../Override.h"
+#include "../Array.h"
 #pragma warning(pop)
 
 #include "Schema.h"
@@ -91,20 +97,6 @@ namespace Ent
         return obj.nodes.end();
     }
 
-    /// Content of a Node which has type Ent::DataType::array
-    struct Array
-    {
-        Array();
-
-        std::vector<value_ptr<Node>> data; ///< List of items of the array
-
-        Override<uint64_t> arraySize; ///< Size of the array, to keep track on array size changes
-
-        bool hasOverride() const;
-
-        bool hasPrefabValue() const;
-    };
-
     enum class ActivationLevel
     {
         Created,
@@ -125,7 +117,7 @@ namespace Ent
         char const* getUnionType() const; ///< Get the type inside the union
         /// @brief Change the type inside the union
         /// @pre type match with a type declared inside the json "oneOf"
-        Node* setUnionType(char const* _type);
+        Node* setUnionType(EntityLib const& _entlib, char const* _type);
 
         void computeMemory(MemoryProfiler& prof) const;
     };
@@ -205,6 +197,16 @@ namespace Ent
         void pop(); ///< @pre type==Ent::DataType::array. @brief Remove an item at the end of array
         void clear(); ///< @pre type==Ent::DataType::array. @brief Remove all items in array
         bool empty() const; ///< @pre type==Ent::DataType::array. @brief return true if array is empty
+        // Array - map
+        bool mapErase(char const* _key); ///< @pre isMapOrSet() @brief erase the item with _key or return false
+        Node* mapGet(char const* _key); ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
+        Node const* mapGet(char const* _key) const; ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
+        Node const* mapInsert(char const* _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
+        bool mapErase(int64_t _key); ///< @pre isMapOrSet() @brief Erase the item at the given _key
+        Node* mapGet(int64_t _key); ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
+        Node const* mapGet(int64_t _key) const; ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
+        Node const* mapInsert(int64_t _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
+        bool isMapOrSet() const; ///< @return true if type==Ent::DataType::array and overridePolicy is map or set
 
         // Union
         Node* getUnionData(); ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data
@@ -320,6 +322,7 @@ namespace Ent
         EntityLib* getEntityLib() const;
 
     private:
+        void checkMap(char const* _calledMethod) const; ///< Throw exception if not a set/map
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
         Value value; ///< Contains one of the types accepted by a Node
 
@@ -335,7 +338,7 @@ namespace Ent
         size_t version{}; ///< @todo remove?
         size_t index{}; ///< Useful to keep the componants order in the json file. To make diffs easier.
         DeleteCheck deleteCheck;
-        bool hasPrefab{}; ///< True if if override an other component (not just default)
+        bool hasPrefab{}; ///< True if it overrides an other component (not just default)
 
         Component(
             nlohmann::json _rawData,
@@ -447,6 +450,7 @@ namespace Ent
             EntityLib const& _entlib,
             Override<String> _name,
             std::map<std::string, Component> _components,
+            std::set<std::string> _removedComponents,
             std::unique_ptr<SubSceneComponent> _subSceneComponent,
             Node _actorStates = {},
             Node _color = {},
@@ -531,6 +535,10 @@ namespace Ent
         {
             return actorStates;
         }
+        Node& getActorStates()
+        {
+            return actorStates;
+        }
 
         /// @brief Make the Entity independent from its prefab (instanceOf)
         ///
@@ -589,11 +597,14 @@ namespace Ent
         /// @warning All Nodes into the Entity will be invalidated
         void setInstanceOf(std::string const& _prefab);
 
+        nlohmann::json saveEntity() const;
+
     private:
         void updateSubSceneOwner();
         EntityLib const* entlib{}; ///< Reference the entity lib to find the schema when needed
         Override<String> name; ///< Entity name
         std::map<std::string, Component> components; ///< All components of this Entity
+        std::set<std::string> removedComponents;
         std::unique_ptr<SubSceneComponent> subSceneComponent; ///< the optional SubScene Component
         Node actorStates; ///< All actorStates of this Entity
         Node color; ///< The optional Color of the Entity
@@ -760,7 +771,7 @@ namespace Ent
         /// @brief Create an Entity which instanciate an other.
         ///
         /// This allow to override some properties without change the prefab properties.
-        std::unique_ptr<Entity> makeInstanceOf(std::string _instanceOf ///< Path to the prefab Entity
+        std::unique_ptr<Entity> makeInstanceOf(std::string const& _instanceOf ///< Path to the prefab Entity
         ) const;
 
         struct EntityFile
@@ -781,6 +792,12 @@ namespace Ent
         std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
         /// @param _path : A file path absolute or relative but inside the rawdata path
         std::filesystem::path getRelativePath(std::filesystem::path const& _path) const;
+
+        Ent::Node loadNode(
+            Ent::Subschema const& _nodeSchema,
+            nlohmann::json const& _data,
+            Ent::Node const* _super,
+            nlohmann::json const* _default = nullptr) const;
 
     private:
         /// Load an Entity or a Scene, using the given cache

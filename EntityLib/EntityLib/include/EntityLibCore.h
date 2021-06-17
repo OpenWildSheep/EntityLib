@@ -78,7 +78,10 @@ namespace Ent
     void logicError(char const* _file, long _line, char const* _message, Args&&... args)
     {
         log(_file, _line, stderr, "ERROR : ", _message, std::forward<Args>(args)...);
-        terminate();
+        if (_file != nullptr) // Avoid C4702 unreachable code
+        {
+            terminate();
+        }
     }
 } // namespace Ent
 

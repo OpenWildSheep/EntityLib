@@ -200,6 +200,8 @@ try
         ENTLIB_ASSERT(actorState->getSchema()->getUnionNameField() == std::string("className"));
         ENTLIB_ASSERT(actorState->getSchema()->getUnionDataField() == std::string("classData"));
         Ent::Node const* climbEdge = actorState->getUnionData();
+        char const* climbEdgeType = actorState->getUnionType();
+        ENTLIB_ASSERT(strcmp(climbEdgeType, "ActionClimbEdge") == 0);
         ENTLIB_ASSERT(climbEdge != nullptr);
         Ent::Node const* exitRequired = climbEdge->at("locomotionMode");
         ENTLIB_ASSERT(exitRequired != nullptr);
@@ -215,11 +217,13 @@ try
         // Map and Set overridePolicy
         Ent::Component const* pathNodeGD = ent->getComponent("PathNodeGD");
         Ent::Node const* tags = pathNodeGD->root.at("Tags")->at("Tags");
-        ENTLIB_ASSERT(tags->size() == 2);
+        ENTLIB_ASSERT(tags->size() == 3);
         ENTLIB_ASSERT(tags->at(0llu)->at(0llu)->getString() == std::string("a"));
         ENTLIB_ASSERT(tags->at(1llu)->at(0llu)->getString() == std::string("c"));
         ENTLIB_ASSERT(tags->at(1llu)->at(1llu)->size() == 1);
         ENTLIB_ASSERT(tags->at(1llu)->at(1llu)->at(0llu)->getString() == std::string("2"));
+        // Test mapGet on map and set
+        ENTLIB_ASSERT(tags->mapGet("a")->mapGet("1")->getString() == std::string("1"));
 
         // Test default value
         Ent::Component const* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
@@ -235,7 +239,7 @@ try
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
         ENTLIB_ASSERT(heightObj->root.at("Subdivision")->isSet());
         ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isDefault());
-        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getDefaultInt() == 6);
+        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getDefaultInt() == 3);
         ENTLIB_ASSERT(
             heightObj->root.at("Subdivision")->getSchema()->userMeta["testUserMetatdata"].get<int>()
             == 42);
@@ -334,6 +338,7 @@ try
     {
         Ent::Entity ent(entlib);
         ent.setInstanceOf("prefab.entity");
+        ENTLIB_ASSERT(not ent.hasOverride());
         ENTLIB_ASSERT(ent.getInstanceOf() == std::string("prefab.entity"));
     }
 
@@ -345,6 +350,11 @@ try
         heightObj->root.saveNode("test.HeightObj.node");
 
         testPrefabEntity(ent.get());
+        // Test mapErase in set of primitive
+        Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
+        Ent::Node* tags = pathNodeGD->root.at("Tags")->at("Tags");
+        auto primSet = tags->mapGet("a");
+        ENTLIB_CHECK_EXCEPTION(primSet->mapErase("1"), Ent::BadArrayType);
 
         // Set Union type and override
         Ent::Component* cinematicGD = ent->getComponent("CinematicGD");
@@ -617,6 +627,11 @@ try
         ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(0llu)->getString() == std::string("1"));
         ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(1llu)->getString() == std::string("2"));
         ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(2llu)->getString() == std::string("3"));
+        // Test mapGet on map
+        auto cValueSet = tags->mapGet("c");
+        ENTLIB_ASSERT(cValueSet != nullptr);
+        // Test mapGet on set
+        ENTLIB_ASSERT(cValueSet->mapGet("1")->getString() == std::string("1"));
 
         // TEST SubScene (without override)
         Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();
@@ -700,6 +715,87 @@ try
 
         sysCreat->root.at("BehaviorState")->setString("Overrided");
         entlib.saveEntity(*ent, "instance.copy.entity");
+    }
+    auto test_erase = [](Ent::Entity* ent) {
+        Ent::Node& actorStates = ent->getActorStates();
+        Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
+        Ent::Node* tags = pathNodeGD->root.at("Tags")->at("Tags");
+
+        // Test erase in map (+save/load)
+        ENTLIB_ASSERT(tags->size() == 3);
+        ENTLIB_ASSERT(tags->mapGet("c") == nullptr);
+
+        // Test insert in map (+save/load)
+        auto e = tags->mapGet("A");
+        ENTLIB_ASSERT(e != nullptr);
+        ENTLIB_ASSERT(e->getDataType() == Ent::DataType::array);
+
+        // Test erase in union_set (+save/load)
+        ENTLIB_ASSERT(actorStates.mapGet("ActionCinematic") == nullptr);
+
+        // Test insert in union_set (+save/load)
+        ENTLIB_ASSERT(actorStates.mapGet("ActionClamberRise") != nullptr);
+
+        // Test remove component
+        ENTLIB_ASSERT(ent->getComponent("TransformGD") == nullptr);
+        ENTLIB_ASSERT(ent->getSubSceneComponent() == nullptr);
+    };
+
+    {
+        EntityPtr ent = entlib.loadEntity("instance.entity");
+        // Test erase in union_set
+        Ent::Node& actorStates = ent->getActorStates();
+        ENTLIB_ASSERT(actorStates.mapGet("ActionCinematic") != nullptr);
+        ENTLIB_ASSERT(actorStates.mapErase("ActionCinematic"));
+        ENTLIB_ASSERT(actorStates.mapGet("ActionCinematic") == nullptr);
+
+        // Test insert in union_set
+        ENTLIB_ASSERT(actorStates.mapInsert("ActionClamberRise") != nullptr);
+
+        // Test erase in map
+        Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
+        Ent::Node* tags = pathNodeGD->root.at("Tags")->at("Tags");
+        ENTLIB_ASSERT(tags->mapGet("c") != nullptr);
+        ENTLIB_ASSERT(tags->size() == 3);
+        ENTLIB_ASSERT(tags->mapErase("c"));
+        ENTLIB_ASSERT(tags->size() == 2);
+        ENTLIB_ASSERT(tags->mapGet("c") == nullptr);
+        ENTLIB_ASSERT(not tags->mapErase(2));
+
+        // Test insert in map
+        ENTLIB_ASSERT(tags->mapGet("A") == nullptr);
+        ENTLIB_ASSERT(tags->mapInsert("A") != nullptr);
+        auto items = tags->getItems();
+        ENTLIB_ASSERT(items.front()->at(0llu)->getString() == std::string("A")); // "A" should be first
+
+        // Test erase in Components
+        ENTLIB_ASSERT(ent->getComponent("TransformGD") != nullptr);
+        ent->removeComponent("TransformGD");
+        ENTLIB_ASSERT(ent->getComponent("TransformGD") == nullptr);
+
+        ENTLIB_ASSERT(ent->getComponent("SubScene") == nullptr);
+        ENTLIB_ASSERT(ent->getSubSceneComponent() != nullptr);
+        ent->removeSubSceneComponent();
+        ENTLIB_ASSERT(ent->getSubSceneComponent() == nullptr);
+
+        test_erase(ent.get());
+
+        entlib.saveEntity(*ent, "test_erase.entity");
+    }
+
+    {
+        EntityPtr ent = entlib.loadEntity("test_erase.entity");
+        test_erase(ent.get());
+    }
+    {
+        EntityPtr ent = entlib.makeInstanceOf("test_erase.entity");
+        test_erase(ent.get());
+        auto json = ent->getActorStates().toJson(Ent::OverrideValueSource::OverrideOrPrefab, true);
+        ENTLIB_ASSERT(json.size() == 3);
+        for (auto&& actState : json)
+        {
+            ENTLIB_ASSERT(actState["className"] != "ActionCinematic");
+        }
     }
     {
         EntityPtr ent = entlib.loadEntity("instance2.entity");
@@ -1007,6 +1103,7 @@ try
         EntityPtr ent = entlib.makeInstanceOf("entity-subscene.entity");
         auto subs = ent->getSubSceneComponent();
 
+        ENTLIB_ASSERT(not ent->hasOverride());
         ENTLIB_ASSERT(not empty(subs->embedded->getObjects()));
 
         auto&& allSubEntities = subs->embedded->getObjects();
@@ -1020,6 +1117,26 @@ try
         ENTLIB_ASSERT(not empty(ovrdSubs->embedded->getObjects()));
     }
 
+    {
+        auto ent = entlib.loadEntity(R"(Creature/my_creature_level2.entity)");
+        auto& subscene = ent->getSubSceneComponent()
+                             ->embedded->getEntity(0)
+                             ->getSubSceneComponent()
+                             ->embedded->getObjects();
+        ENTLIB_ASSERT(subscene.size() == 1);
+        ENTLIB_ASSERT(strcmp(subscene.front()->getName(), "default_level2") == 0);
+    }
+
+    // ******************* Test twice the same key in map *************************************
+    {
+        ENTLIB_CHECK_EXCEPTION(entlib.loadEntity("key_double.entity"), Ent::InvalidJsonData);
+    }
+
+    // ******************* Test default color *****************************************************
+    {
+        EntityPtr ent = std::make_unique<Ent::Entity>(entlib);
+        ENTLIB_ASSERT(ent->getColor() == (std::array<double, 4>{1., 1., 1., 1.}));
+    }
     // ********************************** Test load/save scene ************************************
     entlib.rawdataPath = "X:/RawData";
 
@@ -1051,7 +1168,7 @@ try
     scene->getObjects().front()->addComponent("BeamGeneratorGD")->root.getFieldNames();
     auto fieldNameCount =
         scene->getObjects().front()->addComponent("HeightObj")->root.getFieldNames().size();
-    ENTLIB_ASSERT(fieldNameCount == 6);
+    ENTLIB_ASSERT(fieldNameCount == 8);
 
     auto ep1Iter = std::find_if(
         begin(scene->getObjects()),

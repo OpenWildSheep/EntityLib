@@ -60,9 +60,11 @@ static std::string convertLink(std::string link)
     return link;
 }
 
-static json convertToInstanceSchema(Ent::Subschema const& tmplSchema);
+static json
+convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const* oneOfDataField = nullptr);
 
-static json convertToInstanceSchema(Ent::SubschemaRef const& tmplSchemaRef)
+static json
+convertToInstanceSchema(Ent::SubschemaRef const& tmplSchemaRef, char const* oneOfDataField = nullptr)
 {
     if (tmplSchemaRef.subSchemaOrRef.is<Ent::SubschemaRef::Ref>())
     {
@@ -71,10 +73,10 @@ static json convertToInstanceSchema(Ent::SubschemaRef const& tmplSchemaRef)
         instSchema.emplace("$ref", "#/definitions/" + convertLink(link));
         return instSchema;
     }
-    return convertToInstanceSchema(*tmplSchemaRef);
+    return convertToInstanceSchema(*tmplSchemaRef, oneOfDataField);
 }
 
-static json convertToInstanceSchema(Ent::Subschema const& tmplSchema)
+static json convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const* oneOfDataField)
 {
     json instSchema;
     instSchema["default"] = tmplSchema.defaultValue;
@@ -95,20 +97,34 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema)
         instSchema["minItems"] = tmplSchema.minItems;
     }
 
+    json nullType;
+    nullType["type"] = "null";
+
     std::array<char const*, static_cast<size_t>(Ent::DataType::COUNT)> typeToStr = {
         "null", "string", "number", "integer", "object", "array", "boolean", "string", "object"};
     instSchema["type"] = typeToStr[size_t(tmplSchema.type)];
     std::vector<char const*> requiredList;
     for (auto&& name_prop : tmplSchema.properties)
     {
-        instSchema["properties"][name_prop.first] = convertToInstanceSchema(name_prop.second);
+        if (oneOfDataField != nullptr and oneOfDataField == name_prop.first)
+        {
+            // Allow Data field in OneOf to be "null"
+            json oneOf;
+            oneOf.push_back(convertToInstanceSchema(name_prop.second));
+            oneOf.push_back(nullType);
+            json items;
+            items.emplace("oneOf", oneOf);
+            instSchema["properties"][name_prop.first] = items;
+        }
+        else
+        {
+            instSchema["properties"][name_prop.first] = convertToInstanceSchema(name_prop.second);
+        }
         if (name_prop.second->required)
         {
             requiredList.push_back(name_prop.first.c_str());
         }
     }
-    json nullType;
-    nullType["type"] = "null";
     if (tmplSchema.singularItems != nullptr)
     {
         json oneOf;
@@ -132,7 +148,8 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema)
     {
         for (auto&& prop : *tmplSchema.oneOf)
         {
-            instSchema["oneOf"].push_back(convertToInstanceSchema(prop));
+            instSchema["oneOf"].push_back(
+                convertToInstanceSchema(prop, tmplSchema.getUnionDataField()));
         }
     }
     if (not empty(requiredList))

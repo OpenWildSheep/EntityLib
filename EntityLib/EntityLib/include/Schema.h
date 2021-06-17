@@ -39,7 +39,12 @@ namespace Ent
     /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
     struct BadType : std::runtime_error
     {
-        BadType(); ///< ctor
+        BadType(char const* _message = nullptr); ///< ctor
+    };
+
+    struct BadArrayType : std::runtime_error
+    {
+        BadArrayType(char const* _message = nullptr); ///< ctor
     };
 
     /// Exception thrown when a metadata is missing in the json schema
@@ -62,6 +67,12 @@ namespace Ent
     struct IllFormedSchema : std::runtime_error
     {
         IllFormedSchema(char const* _message); ///< ctor
+    };
+
+    /// Exception thrown when some json data are invalid
+    struct InvalidJsonData : std::runtime_error
+    {
+        InvalidJsonData(char const* _message); ///< ctor
     };
 
     // *************************************** Subschema ******************************************
@@ -122,6 +133,7 @@ namespace Ent
         {
             std::string overridePolicy; ///< Policy used to override the array from the prefab
             bool ordered = true;
+            bool isMapItem = false; ///< Can't be discarded at write (neither null)
         };
         /// Store metadata for all schema which doesn't have specific field
         struct GenericMeta : BaseMeta

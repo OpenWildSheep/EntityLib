@@ -95,7 +95,7 @@ namespace Ent
         /// @throw BadType if the schema is not a oneOf
         /// @throw MissingMetadata if the schema doesn't have a meta className and classData
         /// @throw BadUnionType if \p _subtype is not listed in the oneOf field
-        Subschema const* getUnionTypeWrapper(char const* _subtype) const;
+        std::pair<Subschema const*, size_t> getUnionTypeWrapper(char const* _subtype) const;
         /// @endcond
 
         Schema* rootSchema{};
@@ -127,6 +127,7 @@ namespace Ent
         {
             std::string dataField; ///< Name of the field containing the data (ex : classData)
             std::string typeField; ///< Name of the field containing the type of the data (ex : className)
+            tl::optional<std::string> indexField; ///< Name of the field containing the index of the type
         };
         /// Store metadata for array type
         struct ArrayMeta : BaseMeta

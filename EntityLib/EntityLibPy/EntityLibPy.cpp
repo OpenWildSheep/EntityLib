@@ -221,7 +221,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readonly("is_signed", &Subschema::NumberMeta::isSigned);
     pySubschemaUnionMeta
         .def_readonly("data_field", &Subschema::UnionMeta::dataField)
-        .def_readonly("type_field", &Subschema::UnionMeta::typeField);
+        .def_readonly("type_field", &Subschema::UnionMeta::typeField)
+        .def_readonly("index_field", &Subschema::UnionMeta::indexField);
 
     pySubschema
         .def_readonly("type", &Subschema::type)

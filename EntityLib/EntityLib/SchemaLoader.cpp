@@ -136,6 +136,10 @@ Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
         {
             _meta.typeField = _data["unionTypeField"].get<std::string>();
         }
+        if (_data.count("unionIndexField") != 0u)
+        {
+            _meta.indexField = _data["unionIndexField"].get<std::string>();
+        }
     };
     const auto setArrayMetas = [&](Ent::Subschema::ArrayMeta& _meta) {
         _meta.overridePolicy = _data.value("overridePolicy", "");

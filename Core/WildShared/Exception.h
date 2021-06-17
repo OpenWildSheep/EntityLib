@@ -59,6 +59,8 @@ ContextException::ContextException(char const* message, Args&&... args) noexcept
 template <typename... Args>
 void ContextException::addContextMessage(char const* _message, Args&&... args) noexcept
 {
+    if (m_rawContext.size() == m_rawContextSize)
+        return;
     auto const written = sprintf_s(
         m_rawContext.data() + m_rawContextSize,
         (m_rawContext.size() - m_rawContextSize) - 1,
@@ -69,8 +71,8 @@ void ContextException::addContextMessage(char const* _message, Args&&... args) n
         m_context[m_contextSize] = m_rawContextSize;
         ++m_contextSize;
         m_rawContextSize += written;
-		m_rawContext[m_rawContextSize] = 0;
-		++m_rawContextSize;
+        m_rawContext[m_rawContextSize] = 0;
+        ++m_rawContextSize;
     }
 }
 

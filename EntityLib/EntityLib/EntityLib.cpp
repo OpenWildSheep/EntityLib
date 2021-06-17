@@ -2336,7 +2336,7 @@ Ent::Node Ent::EntityLib::loadNode(
                 un.schema = &_nodeSchema;
                 un.wrapper = Ent::make_value<Ent::Node>(std::move(dataNode));
                 un.metaData = &meta;
-                un.typeIndex = subSchemaIndex;
+                un.typeIndex = size_t(subSchemaIndex);
                 result = Ent::Node(std::move(un), &_nodeSchema);
                 typeFound = true;
                 break;

@@ -140,7 +140,8 @@ namespace Ent
     {
         if (getUnionType() != _type)
         {
-            Subschema const* subTypeSchema = schema->getUnionTypeWrapper(_type);
+            Subschema const* subTypeSchema{};
+            std::tie(subTypeSchema, typeIndex) = schema->getUnionTypeWrapper(_type);
             // TODO : Loïc - low prio - Find a way to get the super.
             //   It could be hard because we are no more in the loading phase, so the super is
             //   now delete.
@@ -323,6 +324,15 @@ namespace Ent
         if (value.is<Union>())
         {
             return value.get<Union>().getUnionType();
+        }
+        throw BadType();
+    }
+
+    size_t Node::getUnionTypeIndex() const
+    {
+        if (value.is<Union>())
+        {
+            return value.get<Union>().typeIndex;
         }
         throw BadType();
     }
@@ -529,6 +539,7 @@ namespace Ent
             detUnion.schema = _un.schema;
             detUnion.wrapper = _un.wrapper->detach();
             detUnion.metaData = _un.metaData;
+            detUnion.typeIndex = _un.typeIndex;
             return Node(std::move(detUnion), schema);
         }
     };
@@ -583,6 +594,7 @@ namespace Ent
                 detUnion.wrapper = _un.wrapper->makeInstanceOf();
             }
             detUnion.metaData = _un.metaData;
+            detUnion.typeIndex = _un.typeIndex;
             return Node(std::move(detUnion), schema);
         }
     };
@@ -895,10 +907,16 @@ namespace Ent
     json Node::toJson(
         OverrideValueSource _dumpedValueSource,
         bool _superKeyIsTypeName,
-        std::function<void(EntityRef&)> const& _entityRefPreProc) const
+        std::function<void(EntityRef&)> const& _entityRefPreProc,
+        bool _saveUnionIndex) const
     {
         return EntityLib::dumpNode(
-            *getSchema(), *this, _dumpedValueSource, _superKeyIsTypeName, _entityRefPreProc);
+            *getSchema(),
+            *this,
+            _dumpedValueSource,
+            _superKeyIsTypeName,
+            _entityRefPreProc,
+            _saveUnionIndex);
     }
 
     void Node::saveNode(std::filesystem::path const& _path) const
@@ -2318,6 +2336,7 @@ Ent::Node Ent::EntityLib::loadNode(
                 un.schema = &_nodeSchema;
                 un.wrapper = Ent::make_value<Ent::Node>(std::move(dataNode));
                 un.metaData = &meta;
+                un.typeIndex = subSchemaIndex;
                 result = Ent::Node(std::move(un), &_nodeSchema);
                 typeFound = true;
                 break;
@@ -2330,6 +2349,7 @@ Ent::Node Ent::EntityLib::loadNode(
             Ent::Union un;
             un.schema = &_nodeSchema;
             un.metaData = &meta;
+            un.typeIndex = 0;
             result = Ent::Node(std::move(un), &_nodeSchema);
         }
     }
@@ -2345,7 +2365,8 @@ json Ent::EntityLib::dumpNode(
     Node const& _node,
     OverrideValueSource _dumpedValueSource,
     bool _superKeyIsTypeName,
-    std::function<void(EntityRef&)> const& _entityRefPreProc)
+    std::function<void(EntityRef&)> const& _entityRefPreProc,
+    bool _saveUnionIndex)
 {
     json data;
     switch (_schema.type)
@@ -2426,6 +2447,10 @@ json Ent::EntityLib::dumpNode(
                             tmpNode[unionMeta.typeField] = type;
                             tmpNode[unionMeta.dataField] = json();
                             data.emplace_back(std::move(tmpNode));
+                            if (unionMeta.indexField.has_value() and _saveUnionIndex)
+                            {
+                                data[*unionMeta.indexField] = _node.getUnionTypeIndex();
+                            }
                         }
                     }
                 }
@@ -2487,6 +2512,10 @@ json Ent::EntityLib::dumpNode(
             _dumpedValueSource,
             _superKeyIsTypeName,
             _entityRefPreProc);
+        if (meta.indexField.has_value() and _saveUnionIndex)
+        {
+            data[*meta.indexField] = _node.getUnionTypeIndex();
+        }
     }
     break;
     case Ent::DataType::COUNT:

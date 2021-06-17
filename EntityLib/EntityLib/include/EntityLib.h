@@ -108,6 +108,7 @@ namespace Ent
     struct Union
     {
         Subschema const* schema = nullptr; ///< The schema of the object containing the oneOf field
+        size_t typeIndex = 0; ///< Index of the type
         value_ptr<Node> wrapper; ///< Node containing the className/classData
         Ent::Subschema::UnionMeta const* metaData = nullptr;
 
@@ -214,6 +215,9 @@ namespace Ent
         /// @brief Get the type inside the union
         /// @pre type==Ent::DataType::oneOf
         char const* getUnionType() const;
+        /// @brief Get the index of the type inside the union
+        /// @pre type==Ent::DataType::oneOf
+        size_t getUnionTypeIndex() const;
         /// @brief Change the type inside the union
         /// @pre type==Ent::DataType::oneOf
         /// @pre type match with a type declared inside the json "oneOf"
@@ -280,7 +284,8 @@ namespace Ent
                 OverrideValueSource::Override, ///< Dump only fields with given value source
             bool _superKeyIsTypeName =
                 false, ///< Super sub-node are dumped using their type name for key instead of "Super"
-            std::function<void(EntityRef&)> const& _entityRefPreProc = {}) const;
+            std::function<void(EntityRef&)> const& _entityRefPreProc = {},
+            bool _saveUnionIndex = false) const;
 
         /// Save as a Node prebab
         void saveNode(std::filesystem::path const& path) const;
@@ -766,7 +771,8 @@ namespace Ent
                 OverrideValueSource::Override, ///< Dump only fields with given value source
             bool _superKeyIsTypeName =
                 false, ///< Super sub-node are dumped using their type name for key instead of "Super"
-            std::function<void(EntityRef&)> const& _entityRefPreProc = {});
+            std::function<void(EntityRef&)> const& _entityRefPreProc = {},
+            bool _saveUnionIndex = false);
 
         /// @brief Create an Entity which instanciate an other.
         ///

@@ -209,6 +209,15 @@
                     ]
                 }
             }
+        }, {
+            "Data": {
+                "Variant": {
+                    "variantType": "float",
+                    "variantData": 3.1416
+                }
+            },
+            "Type": "TestArrays",
+            "Version": 1
         }
     ],
     "Name": "PlayerSpawner_"

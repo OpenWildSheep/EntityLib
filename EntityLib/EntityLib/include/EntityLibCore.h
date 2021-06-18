@@ -1,6 +1,5 @@
 #pragma once
 
-#pragma warning(push, 0)
 #include <cstdio>
 #include <exception>
 #include <string>
@@ -8,6 +7,11 @@
 #include <memory>
 #include <vector>
 #include <stdexcept>
+#include <array>
+
+#pragma warning(push, 0)
+#include "../external/filesystem.hpp"
+#include "../../../Core/WildShared/Exception.h"
 #pragma warning(pop)
 
 #ifdef ENTLIB_STATIC
@@ -37,6 +41,17 @@ namespace Ent
         size_t const len = (size_t)snprintf(nullptr, 0, message, std::forward<Args>(args)...);
         std::string buffer(len, ' ');
         snprintf((char*)buffer.data(), len + 1, message, std::forward<Args>(args)...);
+        return buffer;
+    }
+
+    /// @brief printf in a local static buffer.
+    /// @warning Each call will change the buffer content.
+    ///             Do not use the output of staticFormat as inpout of staticFormat.
+    template <typename... Args>
+    char const* staticFormat(char const* message, Args&&... args)
+    {
+        thread_local static char buffer[2048];
+        sprintf_s(buffer, sizeof(buffer), message, std::forward<Args>(args)...);
         return buffer;
     }
 
@@ -392,7 +407,9 @@ namespace Ent
         return value_ptr<T>(T(std::forward<Args>(args)...));
     }
 
-    std::string convertANSIToUTF8(std::string const& message);
+    std::string convertANSIToUTF8(std::string const& _message);
+
+    char const* formatPath(std::filesystem::path const& _base, std::filesystem::path const& _rel);
 
     struct InvalidKey : std::logic_error
     {
@@ -435,4 +452,70 @@ namespace Ent
 
 #define AT(MAP, KEY) ::Ent::at(MAP, KEY, __FILE__, __LINE__, __func__)
     /// @endcond
+
+    // ******************************** Exception declarations ************************************
+
+    struct Exception : std::runtime_error
+    {
+        Exception(char const* _message = nullptr); ///< ctor
+    };
+
+
+
+    /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
+    struct BadType : ContextException
+    {
+        BadType(char const* _message = nullptr); ///< ctor
+    };
+
+    struct BadArrayType : ContextException
+    {
+        BadArrayType(char const* _message = nullptr); ///< ctor
+    };
+
+    /// Exception thrown when a metadata is missing in the json schema
+    ///
+    /// Example : oneOf need className and classData
+    struct MissingMetadata : ContextException
+    {
+        MissingMetadata(char const* _schemaName); ///< ctor
+    };
+
+    /// Exception thrown when trying to switch a Union to a type that woesn't exit
+    struct BadUnionType : ContextException
+    {
+        /// ctor
+        BadUnionType(char const* _type ///< The type/className that doen't exist in this union
+        );
+    };
+
+    /// Exception thrown when a schema is ill-formed
+    struct IllFormedSchema : ContextException
+    {
+        IllFormedSchema(char const* _message); ///< ctor
+    };
+
+    /// Exception thrown when some json data are invalid
+    struct InvalidJsonData : ContextException
+    {
+        InvalidJsonData(char const* _message); ///< ctor
+    };
+
+    /// Use FileSystemError rather than filesystem_error, since
+    ///     - It will convert the message charset into utf8
+    ///     - It will print the path as expected in Wild tools
+    struct FileSystemError : ContextException
+    {
+        FileSystemError(
+            std::string const& _msg,
+            std::filesystem::path const& _rootPath,
+            std::filesystem::path const& _relPath,
+            std::error_code _error);
+
+        /// This ctor will use the errno as error_code
+        FileSystemError(
+            std::string const& _msg,
+            std::filesystem::path const& _rootPath,
+            std::filesystem::path const& _relPath);
+    };
 } // namespace Ent

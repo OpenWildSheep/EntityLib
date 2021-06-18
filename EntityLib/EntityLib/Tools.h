@@ -5,7 +5,7 @@
 #include "external/filesystem.hpp"
 #pragma warning(pop)
 
-nlohmann::json loadJsonFile(std::filesystem::path const& _path);
+nlohmann::json loadJsonFile(std::filesystem::path const& _root, std::filesystem::path const& _rel);
 
 namespace Ent
 {

@@ -55,9 +55,9 @@ void updateRefLinks(std::string const& _sourceFile, json& _node)
 
 json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
 {
-    json const runtimeCmps = loadJsonFile(_toolsDir / "WildPipeline/Schema/RuntimeComponents.json");
-    json const editionCmps = loadJsonFile(_toolsDir / "WildPipeline/Schema/EditionComponents.json");
-    json const dependencies = loadJsonFile(_toolsDir / "WildPipeline/Schema/Dependencies.json");
+    json const runtimeCmps = loadJsonFile(_toolsDir, "WildPipeline/Schema/RuntimeComponents.json");
+    json const editionCmps = loadJsonFile(_toolsDir, "WildPipeline/Schema/EditionComponents.json");
+    json const dependencies = loadJsonFile(_toolsDir, "WildPipeline/Schema/Dependencies.json");
 
     json const& runtimeCompSch = runtimeCmps.at("definitions");
     json const& editionCompSch = editionCmps.at("definitions");
@@ -185,8 +185,8 @@ void Ent::updateComponents(std::filesystem::path const& _toolsDir)
     std::ofstream file(mergedSchemaPath);
     if (not file.is_open())
     {
-        throw std::runtime_error(format(
-            R"(Can't open file for write: "%s")", mergedSchemaPath.generic_string().c_str()));
+        throw FileSystemError(
+            "Trying to open file for write", _toolsDir, mergedComponentsSchemaLocation);
     }
     file << sceneSch.dump(4);
 }

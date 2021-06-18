@@ -5,37 +5,6 @@
 
 namespace Ent
 {
-    BadType::BadType(char const* _message)
-        : std::runtime_error(_message == nullptr ? "Bad node type" : _message)
-    {
-    }
-
-    BadArrayType::BadArrayType(char const* _message)
-        : std::runtime_error(_message == nullptr ? "Bad array type" : _message)
-    {
-    }
-
-    MissingMetadata::MissingMetadata(char const* _schemaName)
-        : std::runtime_error(std::string("Metadata missing : ") + _schemaName)
-    {
-    }
-
-    BadUnionType::BadUnionType(char const* _type)
-        : std::runtime_error(std::string("Bad union type : ") + _type)
-    {
-    }
-
-    IllFormedSchema::IllFormedSchema(char const* _message)
-        : std::runtime_error(std::string("Ill-formed schema : ") + _message)
-    {
-    }
-
-    InvalidJsonData::InvalidJsonData(char const* _message)
-        : std::runtime_error(_message)
-    {
-    }
-
-    /// @cond PRIVATE
     std::pair<Subschema const*, size_t> Subschema::getUnionTypeWrapper(char const* _subtype) const
     {
         if (type != Ent::DataType::oneOf)

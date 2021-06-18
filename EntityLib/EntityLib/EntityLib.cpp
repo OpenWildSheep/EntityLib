@@ -56,7 +56,7 @@ namespace Ent
             loader.addInCache("MergedComponents.json", std::move(mergedComps));
         }
 
-        json schemaDocument = loadJsonFile(toolsDir / "WildPipeline/Schema/Scene-schema.json");
+        json schemaDocument = loadJsonFile(toolsDir, "WildPipeline/Schema/Scene-schema.json");
 
         loader.readSchema(&schema.schema, "Scene-schema.json", schemaDocument, schemaDocument);
         schema.schema.entityLib = this;
@@ -72,7 +72,7 @@ namespace Ent
             schema.components.emplace(compName, &compSchema);
         }
 
-        json dependencies = loadJsonFile(toolsDir / "WildPipeline/Schema/Dependencies.json");
+        json dependencies = loadJsonFile(toolsDir, "WildPipeline/Schema/Dependencies.json");
         for (json const& comp : dependencies["Dependencies"])
         {
             auto name = comp["className"].get<std::string>();
@@ -928,8 +928,8 @@ namespace Ent
         std::ofstream file(path);
         if (not file.is_open())
         {
-            throw std::runtime_error(
-                format(R"(Can't open file for write: "%s")", path.generic_string().c_str()));
+            throw FileSystemError(
+                "Trying to open file for write", getEntityLib()->rawdataPath, _path);
         }
         file << node.dump(4);
     }
@@ -1062,7 +1062,7 @@ namespace Ent
         }
 
         auto relPath = getEntityLib()->getRelativePath(_prefabNodePath).generic_u8string();
-        json nodeData = loadJsonFile(getEntityLib()->getAbsolutePath(_prefabNodePath));
+        json nodeData = loadJsonFile(getEntityLib()->rawdataPath, _prefabNodePath);
         Node prefabNode = getEntityLib()->loadNode(*getSchema(), nodeData, nullptr);
         (*this) = prefabNode.makeInstanceOf();
         value.get<Object>().instanceOf.set(relPath);
@@ -1979,7 +1979,7 @@ Ent::Node Ent::EntityLib::loadNode(
         if (InstanceOfIter != _data.end())
         {
             auto nodeFileName = InstanceOfIter->get<std::string>();
-            json nodeData = loadJsonFile(getAbsolutePath(nodeFileName));
+            json nodeData = loadJsonFile(rawdataPath, nodeFileName);
             // Do not inherit from _super since the override of InstanceOf reset the Entity
             prefabNode = loadNode(_nodeSchema, nodeData, nullptr, _default);
             _super = &prefabNode;
@@ -2125,7 +2125,8 @@ Ent::Node Ent::EntityLib::loadNode(
                             doRemove);
                         break;
                     default:
-                        throw std::runtime_error("Unknown key type in map " + _nodeSchema.name);
+                        throw ContextException(
+                            "Unknown key type in map '%s'", _nodeSchema.name.c_str());
                     }
                 }
                 break;
@@ -2175,7 +2176,8 @@ Ent::Node Ent::EntityLib::loadNode(
                             doRemoveDefault);
                         break;
                     default:
-                        throw std::runtime_error("Unknown key type in set " + _nodeSchema.name);
+                        throw ContextException(
+                            "Unknown key type in set '%s'", _nodeSchema.name.c_str());
                     }
 #pragma warning(pop)
                 }
@@ -2213,10 +2215,10 @@ Ent::Node Ent::EntityLib::loadNode(
                 }
                 break;
                 default:
-                    throw std::runtime_error(format(
-                        "Unknown key type (%s) in schema of %s",
+                    throw ContextException(
+                        "Unknown key type (%s) in schema of '%s'",
                         meta.overridePolicy.c_str(),
-                        _nodeSchema.name.c_str()));
+                        _nodeSchema.name.c_str());
                 }
             }
         }
@@ -2334,7 +2336,7 @@ Ent::Node Ent::EntityLib::loadNode(
                 un.schema = &_nodeSchema;
                 un.wrapper = Ent::make_value<Ent::Node>(std::move(dataNode));
                 un.metaData = &meta;
-                un.typeIndex = subSchemaIndex;
+                un.typeIndex = size_t(subSchemaIndex);
                 result = Ent::Node(std::move(un), &_nodeSchema);
                 typeFound = true;
                 break;
@@ -2435,7 +2437,7 @@ json Ent::EntityLib::dumpNode(
                         {
                             if (item->getSchema()->type != Ent::DataType::oneOf)
                             {
-                                throw std::runtime_error(
+                                throw ContextException(
                                     R"(Can't write an erased element in a set of non-union)");
                             }
                             auto& unionMeta =
@@ -2780,26 +2782,9 @@ static std::unique_ptr<Ent::Entity> loadEntity(
 }
 
 /// Exception thrown when a method is called on legacy data (or vice versa)
-struct UnsupportedFormat : std::exception
+struct UnsupportedFormat : ContextException
 {
     UnsupportedFormat() = default;
-};
-
-struct FileSystemError : public std::runtime_error
-{
-    static std::string makeWhatMessage(
-        std::string const& msg, std::filesystem::path const& path1, std::error_code error)
-    {
-        return Ent::format(
-            R"(%s %s : "%s")",
-            msg.c_str(),
-            Ent::convertANSIToUTF8(error.message()).c_str(),
-            path1.generic_string().c_str());
-    }
-    FileSystemError(std::string const& msg, std::filesystem::path const& path1, std::error_code error)
-        : std::runtime_error(makeWhatMessage(msg, path1, error))
-    {
-    }
 };
 
 template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
@@ -2817,13 +2802,7 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
     auto timestamp = std::filesystem::last_write_time(absPath, error);
     if (error)
     {
-        const auto msg = not std::filesystem::exists(absPath) ?
-                             format(R"(file doesn't exist: "%s")", absPath.generic_string().c_str()) :
-                             format(
-                                 R"(last_write_time(p): invalid argument: "%s" (%s))",
-                                 absPath.generic_string().c_str(),
-                                 error.message().c_str());
-        throw FileSystemError(msg, absPath, error);
+        throw FileSystemError("Trying to open file for read", rawdataPath, relPath, error);
     }
     auto iter = cache.find(relPath);
     if (iter == cache.end())
@@ -2842,7 +2821,7 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
     {
         try
         {
-            json document = loadJsonFile(absPath);
+            json document = loadJsonFile(rawdataPath, relPath);
             if (document.count("Objects") and typeid(Type) == typeid(Entity)
                 or (document.count("Name") or document.count("InstanceOf")
                     or document.count("Components"))
@@ -2862,10 +2841,15 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
             auto iter_bool = cache.insert_or_assign(relPath, std::move(file));
             return std::get<0>(iter_bool)->second.data;
         }
+        catch (ContextException& ex)
+        {
+            ex.addContextMessage("loading : %s", formatPath(rawdataPath, relPath));
+            throw;
+        }
         catch (...)
         {
-            ENTLIB_LOG_ERROR(R"(loading : "%s")", absPath.generic_string().c_str());
-            throw;
+            throw WrapperException(
+                std::current_exception(), "loading : %s", formatPath(rawdataPath, relPath));
         }
     }
     else
@@ -2960,8 +2944,7 @@ Ent::Node Ent::EntityLib::loadEntityAsNode(std::filesystem::path const& _entityP
 Ent::Node Ent::EntityLib::loadFileAsNode(
     std::filesystem::path const& _path, Ent::Subschema const& _schema) const
 {
-    auto const absPath = getAbsolutePath(_path);
-    json jsonData = loadJsonFile(absPath);
+    json jsonData = loadJsonFile(rawdataPath, _path);
     return loadNode(_schema, jsonData, nullptr, nullptr);
 }
 
@@ -3143,20 +3126,13 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string const& _
     return inst;
 }
 
-void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path const& _entityPath) const
+void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path const& _relEntityPath) const
 {
-    std::filesystem::path entityPath = getAbsolutePath(_entityPath);
+    std::filesystem::path entityPath = getAbsolutePath(_relEntityPath);
     std::ofstream file(entityPath);
     if (not file.is_open())
     {
-        constexpr size_t MessSize = 1024;
-        std::array<char, MessSize> message = {};
-        sprintf_s(
-            message.data(),
-            MessSize,
-            R"(Can't open file for write: "%s")",
-            entityPath.generic_string().c_str());
-        throw std::runtime_error(message.data());
+        throw FileSystemError("Trying to open file for write", rawdataPath, entityPath);
     }
     json document = _entity.saveEntity();
     file << document.dump(4);
@@ -3169,10 +3145,17 @@ void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path con
         {
             validateEntity(schema.schema, toolsDir, document);
         }
+        catch (ContextException& ex)
+        {
+            ex.addContextMessage("saving entity : %s", formatPath(rawdataPath, _relEntityPath));
+            throw;
+        }
         catch (...)
         {
-            ENTLIB_LOG_ERROR(R"(saving entity : "%s")", entityPath.generic_string().c_str());
-            throw;
+            throw WrapperException(
+                std::current_exception(),
+                "saving entity : %s",
+                formatPath(rawdataPath, _relEntityPath));
         }
     }
 }
@@ -3219,10 +3202,10 @@ std::filesystem::path Ent::EntityLib::getRelativePath(std::filesystem::path cons
             }
             else
             {
-                throw std::runtime_error(format(
-                    R"(_path "%s" in not inside rawdata "%s")",
-                    _path.generic_string().c_str(),
-                    rawdataPath.generic_string().c_str()));
+                throw ContextException(
+                    R"(_path %s in not inside rawdata "%s")",
+                    formatPath(rawdataPath, _path),
+                    rawdataPath.generic_string().c_str());
             }
         }
 

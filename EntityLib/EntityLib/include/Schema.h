@@ -34,47 +34,6 @@ namespace Ent
     using Null = std::nullptr_t;
     /// @endcond
 
-    // ******************************** Exception declarations ************************************
-
-    /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
-    struct BadType : std::runtime_error
-    {
-        BadType(char const* _message = nullptr); ///< ctor
-    };
-
-    struct BadArrayType : std::runtime_error
-    {
-        BadArrayType(char const* _message = nullptr); ///< ctor
-    };
-
-    /// Exception thrown when a metadata is missing in the json schema
-    ///
-    /// Example : oneOf need className and classData
-    struct MissingMetadata : std::runtime_error
-    {
-        MissingMetadata(char const* _schemaName); ///< ctor
-    };
-
-    /// Exception thrown when trying to switch a Union to a type that woesn't exit
-    struct BadUnionType : std::runtime_error
-    {
-        /// ctor
-        BadUnionType(char const* _type ///< The type/className that doen't exist in this union
-        );
-    };
-
-    /// Exception thrown when a schema is ill-formed
-    struct IllFormedSchema : std::runtime_error
-    {
-        IllFormedSchema(char const* _message); ///< ctor
-    };
-
-    /// Exception thrown when some json data are invalid
-    struct InvalidJsonData : std::runtime_error
-    {
-        InvalidJsonData(char const* _message); ///< ctor
-    };
-
     // *************************************** Subschema ******************************************
 
     struct SubschemaRef;

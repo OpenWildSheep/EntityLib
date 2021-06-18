@@ -1,0 +1,8 @@
+{
+    "Objects": [
+        {
+            "InstanceOf": "this_entity_doesnt_exist.entity",
+            "Name": "InstanceOfA"
+        }
+    ]
+}

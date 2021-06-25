@@ -363,7 +363,15 @@ PYBIND11_MODULE(EntityLibPy, ent)
              {
                  return node->toJson(source, superKeyIsType).dump(4);
              },
-             "source"_a = OverrideValueSource::Override, "superKeyIsType"_a = false);
+             "source"_a = OverrideValueSource::Override, "superKeyIsType"_a = false)
+        .def("map_erase", (bool (Node::*)(char const*))&Node::mapErase)
+        .def("map_erase", (bool (Node::*)(int64_t))&Node::mapErase)
+        .def("map_get", (Node* (Node::*)(char const*))&Node::mapGet)
+        .def("map_get", (Node* (Node::*)(int64_t))&Node::mapGet)
+        .def("map_insert", (Node const* (Node::*)(char const* _key))&Node::mapInsert)
+        .def("map_insert", (Node const* (Node::*)(int64_t _key))&Node::mapInsert)
+        .def("is_map_or_set", &Node::isMapOrSet)
+        ;
 
     pyComponent
         .def_readonly("type", &Component::type)
@@ -412,6 +420,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](Entity& e, char const* name) { return e.getComponent(name); },
             py::return_value_policy::reference_internal)
         .def("remove_component", &Entity::removeComponent)
+        .def("remove_subscene_component", &Entity::removeSubSceneComponent)
         .def("get_component_types", &Entity::getComponentTypes)
         .def("get_components", &Entity::getComponents, py::return_value_policy::reference_internal)
         .def("get_actorstates", [](Entity* ent) { return ent->getActorStates(); }, py::return_value_policy::reference_internal)

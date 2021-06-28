@@ -779,7 +779,10 @@ namespace Ent
             }
             arr.pop();
         }
-        throw BadType();
+        else
+        {
+            throw BadType();
+        }
     }
 
     void Node::clear()

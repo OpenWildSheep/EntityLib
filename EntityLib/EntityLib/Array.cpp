@@ -29,6 +29,11 @@ Ent::Map::KeyType Ent::Array::getChildKey(Ent::Node const* _child) const
     return Map::getChildKey(m_schema, _child);
 }
 
+Ent::DataType Ent::Array::getKeyType() const
+{
+    return Map::getKeyType(m_schema);
+}
+
 Ent::Node* Ent::Array::at(uint64_t _index)
 {
     return apply_visitor([_index](auto& a) { return a.at(_index); }, m_data);

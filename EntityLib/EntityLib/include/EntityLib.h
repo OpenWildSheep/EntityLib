@@ -208,6 +208,15 @@ namespace Ent
         Node const* mapGet(int64_t _key) const; ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
         Node const* mapInsert(int64_t _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
         bool isMapOrSet() const; ///< @return true if type==Ent::DataType::array and overridePolicy is map or set
+        DataType getKeyType() const; ///< @pre isMapOrSet() @return the Ent::DataType of the key
+        /// @pre isMapOrSet()
+        /// @pre getKeyType() == string or getKeyType() == entityRef
+        /// @return All keys of the map, as String
+        std::vector<String> getKeysString() const;
+        /// @pre isMapOrSet()
+        /// @pre getKeyType() == integer
+        /// @return All keys of the map, as int64_t
+        std::vector<int64_t> getKeysInt() const;
 
         // Union
         Node* getUnionData(); ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data

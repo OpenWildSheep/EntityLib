@@ -65,6 +65,36 @@ static void setChildKey(Ent::Subschema const* _arraySchema, Ent::Node* _child, E
     }
 }
 
+static Ent::DataType getKeyType(Ent::Subschema const* _arraySchema)
+{
+    auto&& meta = _arraySchema->meta.get<Ent::Subschema::ArrayMeta>();
+    using namespace Ent;
+    switch (hash(meta.overridePolicy))
+    {
+#pragma warning(push)
+#pragma warning(disable : 4061) // There are switches with missing cases. This is wanted.
+    case "map"_hash: return _arraySchema->singularItems->get().linearItems->at(0)->type; break;
+    case "set"_hash:
+    {
+        Ent::DataType const keyType = _arraySchema->singularItems->get().type;
+        switch (keyType)
+        {
+        case Ent::DataType::oneOf: return Ent::DataType::string;
+        case Ent::DataType::string: return Ent::DataType::string;
+        case Ent::DataType::integer: return Ent::DataType::integer;
+        default: throw ContextException("Unknown key type in set " + _arraySchema->name);
+        }
+#pragma warning(pop)
+    }
+    break;
+    default:
+        throw ContextException(
+            "Unknown key type (%s) in schema of %s",
+            meta.overridePolicy.c_str(),
+            _arraySchema->name.c_str());
+    }
+}
+
 static Ent::Map::KeyType getChildKey(Ent::Subschema const* _arraySchema, Ent::Node const* _child)
 {
     auto&& meta = _arraySchema->meta.get<Ent::Subschema::ArrayMeta>();
@@ -128,6 +158,11 @@ Ent::Map::Map(EntityLib const* _entlib, Subschema const* _schema)
 Ent::Map::KeyType Ent::Map::getChildKey(Subschema const* _schema, Ent::Node const* _child)
 {
     return ::getChildKey(_schema, _child);
+}
+
+Ent::DataType Ent::Map::getKeyType(Subschema const* _schema)
+{
+    return ::getKeyType(_schema);
 }
 
 bool Ent::Map::Element::hasOverride() const

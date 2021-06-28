@@ -865,6 +865,50 @@ namespace Ent
         return value.get<Array>().hasKey();
     }
 
+    DataType Node::getKeyType() const
+    {
+        checkMap("getKeyType");
+        return value.get<Array>().getKeyType();
+    }
+
+    std::vector<String> Node::getKeysString() const
+    {
+        checkMap("getKeysString");
+        auto const keyType = Node::getKeyType();
+        if (keyType != Ent::DataType::string and keyType != Ent::DataType::entityRef)
+        {
+            throw ContextException("Can't call 'getKeysString' if key is not string or entityRef");
+        }
+        Array const& arr = value.get<Array>();
+        auto const arrSize = arr.size();
+        std::vector<String> keys;
+        keys.reserve(arrSize);
+        for (size_t i = 0; i < arrSize; ++i)
+        {
+            keys.push_back(arr.getChildKey(arr.at(i)).get<String>());
+        }
+        return keys;
+    }
+
+    std::vector<int64_t> Node::getKeysInt() const
+    {
+        checkMap("getMapKeysInt");
+        auto const keyType = Node::getKeyType();
+        if (keyType != Ent::DataType::integer)
+        {
+            throw ContextException("Can't call 'getKeysInt' if key is not integer");
+        }
+        Array const& arr = value.get<Array>();
+        auto const arrSize = arr.size();
+        std::vector<int64_t> keys;
+        keys.reserve(arrSize);
+        for (size_t i = 0; i < arrSize; ++i)
+        {
+            keys.push_back(arr.getChildKey(arr.at(i)).get<int64_t>());
+        }
+        return keys;
+    }
+
     struct IsDefault
     {
         Subschema const* schema;

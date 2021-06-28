@@ -112,12 +112,20 @@ try:
         # Map and Set overridePolicy
         pathNodeGD = ent.get_component("PathNodeGD")
         tags = pathNodeGD.root.at("Tags").at("Tags")
-        assert(tags.size() == 2)
+        assert(tags.size() == 3)
         assert(tags.at(0).at(0).get_string() == "a")
         assert(tags.at(1).at(0).get_string() == "c")
         assert(tags.at(1).at(1).size() == 1)
         assert(tags.at(1).at(1).at(0).get_string() == "2")
 
+        # Test mapGet on map and set
+        assert(tags.map_get("a").map_get("1").value == "1")
+
+        assert(tags.get_key_type() == Ent.DataType.string)
+        keys = tags.get_keys()
+        assert(len(keys) == 3)
+        for k in keys:
+            assert tags.map_get(k) is not None
 
         # Test default value
         voxelSimulationGD = ent.get_component("VoxelSimulationGD")
@@ -727,12 +735,13 @@ try:
 
     scene.entities[0].add_component("BeamGeneratorGD").root.get_field_names()
     assert(
-        len(scene.entities[0].add_component("HeightObj").root.get_field_names()) == 5)
+        len(scene.entities[0].add_component("HeightObj").root.get_field_names()) == 8)
 
     ep1 = [ent for ent in scene.entities if ent.name == "EP1_"]
     assert (len(ep1) != 0)
     assert (ep1[0].get_subscene_component() is not None)
 
+    entlib.rawdata_path = os.getcwd()
     scene.add_entity(entlib.make_instance_of(os.path.normpath(os.getcwd() + "/prefab.entity")))
 
     print("save_scene")

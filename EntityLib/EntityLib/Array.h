@@ -14,6 +14,7 @@
 #include "Override.h"
 #include "Map.h"
 #include "Vector.h"
+#include "include/Schema.h"
 
 namespace Ent
 {
@@ -76,6 +77,8 @@ namespace Ent
         tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
 
         Ent::Map::KeyType getChildKey(Ent::Node const* _child) const;
+
+        Ent::DataType getKeyType() const;
 
         // **************************** For array initialization **********************************
         Node* initAdd(OverrideValueLocation, Node _node); ///< @pre This _node is not yet added

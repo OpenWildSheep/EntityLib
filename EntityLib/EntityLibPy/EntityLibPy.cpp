@@ -130,6 +130,23 @@ void setValue(Ent::Node& node, Value const& val)
     }
 }
 
+static mapbox::util::variant<std::vector<String>, std::vector<int64_t>> nodeGetKey(Node* _node)
+{
+    auto const type = _node->getKeyType();
+    if (type == Ent::DataType::string || type == Ent::DataType::entityRef)
+    {
+        return _node->getKeysString();
+    }
+    else if (type == Ent::DataType::integer)
+    {
+        return _node->getKeysInt();
+    }
+    else
+    {
+        throw std::runtime_error("Unexpected key type");
+    }
+}
+
 using namespace pybind11::literals;
 
 // clang-format off
@@ -366,11 +383,14 @@ PYBIND11_MODULE(EntityLibPy, ent)
              "source"_a = OverrideValueSource::Override, "superKeyIsType"_a = false)
         .def("map_erase", (bool (Node::*)(char const*))&Node::mapErase)
         .def("map_erase", (bool (Node::*)(int64_t))&Node::mapErase)
-        .def("map_get", (Node* (Node::*)(char const*))&Node::mapGet)
-        .def("map_get", (Node* (Node::*)(int64_t))&Node::mapGet)
-        .def("map_insert", (Node const* (Node::*)(char const* _key))&Node::mapInsert)
-        .def("map_insert", (Node const* (Node::*)(int64_t _key))&Node::mapInsert)
+        .def("map_get", (Node* (Node::*)(char const*))&Node::mapGet, py::return_value_policy::reference_internal)
+        .def("map_get", [](Node* node, Ent::String const& str){return node->mapGet(str.c_str());}, py::return_value_policy::reference_internal)
+        .def("map_get", (Node* (Node::*)(int64_t))&Node::mapGet, py::return_value_policy::reference_internal)
+        .def("map_insert", (Node const* (Node::*)(char const* _key))&Node::mapInsert, py::return_value_policy::reference_internal)
+        .def("map_insert", (Node const* (Node::*)(int64_t _key))&Node::mapInsert, py::return_value_policy::reference_internal)
         .def("is_map_or_set", &Node::isMapOrSet)
+        .def("get_key_type", &Node::getKeyType)
+        .def("get_keys", nodeGetKey)
         ;
 
     pyComponent

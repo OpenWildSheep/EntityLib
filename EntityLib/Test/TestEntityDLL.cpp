@@ -228,6 +228,14 @@ try
         // Test mapGet on map and set
         ENTLIB_ASSERT(tags->mapGet("a")->mapGet("1")->getString() == std::string("1"));
 
+        ENTLIB_ASSERT(tags->getKeyType() == Ent::DataType::string);
+        auto keys = tags->getKeysString();
+        ENTLIB_ASSERT(keys.size() == 3);
+        for (auto&& k : keys)
+        {
+            ENTLIB_ASSERT(tags->mapGet(k.c_str()) != nullptr);
+        }
+
         // Test default value
         Ent::Component const* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
         ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->getFloat() == 100.);

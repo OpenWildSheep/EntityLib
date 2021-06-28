@@ -11,6 +11,7 @@
 #pragma warning(pop)
 
 #include "include/EntityLibCore.h"
+#include "include/Schema.h"
 #include "Override.h"
 
 namespace Ent
@@ -64,6 +65,7 @@ namespace Ent
         Map makeInstanceOf() const;
         tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         static KeyType getChildKey(Subschema const* _schema, Ent::Node const* _child);
+        static DataType getKeyType(Subschema const* _schema);
 
     private:
         EntityLib const* m_entlib = nullptr;

@@ -489,3 +489,12 @@ void Ent::Map::computeMemory(MemoryProfiler& _prof) const
     _prof.addMem("Array::itemMap", m_itemMap.size() * sizeof(*m_itemMap.begin()));
     _prof.addNodes(m_items.size());
 }
+
+void Ent::Map::unset()
+{
+    for (auto& elt : m_items)
+    {
+        elt.isPresent.unset();
+        elt.node->unset();
+    }
+}

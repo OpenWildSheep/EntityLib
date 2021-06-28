@@ -460,8 +460,6 @@ namespace Ent
         Exception(char const* _message = nullptr); ///< ctor
     };
 
-
-
     /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
     struct BadType : ContextException
     {

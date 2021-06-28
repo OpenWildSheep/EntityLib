@@ -75,6 +75,8 @@ namespace Ent
         {
             return nodes.front();
         }
+
+        void unset();
     };
 
     inline auto begin(Object const& obj)
@@ -121,6 +123,8 @@ namespace Ent
         Node* setUnionType(EntityLib const& _entlib, char const* _type);
 
         void computeMemory(MemoryProfiler& prof) const;
+
+        void unset();
     };
 
     struct EntityRef
@@ -249,8 +253,8 @@ namespace Ent
         void setBool(bool _val); ///< @pre type==Ent::DataType::boolean. @brief Set the bool value
         void setEntityRef(EntityRef _entityRef); ///< @pre type==Ent::DataType::entityRef. @brief Set the Entity reference value
 
-        /// @brief Fallback the the prefab or default value. The value will not be saved in json.
-        /// @pre Ent::DataType is in {number, integer, boolean, string}
+        /// Fallback to the prefab or default value. The value will not be saved in json.
+        /// If the type is Array, Object or Union, \b unset will be applied recursively
         void unset();
 
         /// Check if the value is set explicitly (it override the prefab or default value)

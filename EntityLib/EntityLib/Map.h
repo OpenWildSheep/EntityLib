@@ -66,6 +66,7 @@ namespace Ent
         tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         static KeyType getChildKey(Subschema const* _schema, Ent::Node const* _child);
         static DataType getKeyType(Subschema const* _schema);
+        void unset();
 
     private:
         EntityLib const* m_entlib = nullptr;

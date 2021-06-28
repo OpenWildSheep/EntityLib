@@ -160,7 +160,22 @@ namespace Ent
         }
     }
 
+    void Union::unset()
+    {
+        wrapper->unset();
+        Subschema const* subTypeSchema{};
+        std::tie(subTypeSchema, typeIndex) = schema->getUnionTypeWrapper(getUnionType());
+    }
+
     // ************************************* Object ***********************************************
+
+    void Ent::Object::unset()
+    {
+        for (auto&& name_node : nodes)
+        {
+            name_node.second->unset();
+        }
+    }
 
     struct CompObject
     {
@@ -421,17 +436,14 @@ namespace Ent
 
     struct UnSet
     {
-        template <typename T>
-        void operator()(Override<T>& _ov) const
+        template <typename T> // Take all types with a unset method
+        auto operator()(T& _nodeInternal) const -> decltype(_nodeInternal.unset())
         {
-            _ov.unset();
+            return _nodeInternal.unset();
         }
 
-        template <typename U>
-        void operator()(U& _notOverride) const
+        void operator()(Null&) const
         {
-            (void*)&_notOverride;
-            throw BadType();
         }
     };
 

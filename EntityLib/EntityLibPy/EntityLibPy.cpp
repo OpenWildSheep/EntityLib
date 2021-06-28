@@ -454,7 +454,11 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("resolve_entityref", (Entity* (Entity::*)(const EntityRef&))&Entity::resolveEntityRef, py::return_value_policy::reference_internal)
         .def("detach_entity_from_prefab", [](Entity* ent) {
             return ent->detachEntityFromPrefab().release();
-        });
+        })
+        .def("dumps", [](Entity* entity)
+             {
+                 return entity->saveEntity().dump(4);
+             });
 
     pyScene
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk

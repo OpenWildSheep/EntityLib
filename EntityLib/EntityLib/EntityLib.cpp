@@ -1251,10 +1251,17 @@ namespace Ent
     }
     void Entity::setName(Ent::String _name)
     {
-        ENTLIB_ASSERT_MSG(
-            not hasASuper,
-            "A SubEntity of an instance which override a SubEntity in a prefab can't be renamed. "
-            "Check the canBeRenamed method.");
+        if (name.get() == _name)
+        {
+            return;
+        }
+        if (hasASuper)
+        {
+            throw ContextException(
+                "Setting name : %s. A SubEntity of an instance which override a SubEntity in a "
+                "prefab can't be renamed. Check the canBeRenamed method.",
+                _name.c_str());
+        }
         name.set(std::move(_name));
     }
     bool Entity::canBeRenamed() const

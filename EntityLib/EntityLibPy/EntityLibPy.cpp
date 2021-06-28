@@ -338,7 +338,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference_internal)
         .def(
             "push", [](Node* node) { return node->push(); }, py::return_value_policy::reference_internal)
-        .def("pop", [](Node* node) { return node->pop(); })
+        .def("pop", [](Node* node) { node->pop(); })
         .def("clear", [](Node* node) { return node->clear(); })
         .def("empty", [](Node* node) { return node->empty(); })
         .def("get_instance_of", [](Node* node) { return node->getInstanceOf(); })

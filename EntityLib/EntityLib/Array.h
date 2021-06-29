@@ -89,6 +89,8 @@ namespace Ent
         /// @pre not hasKey()
         Node* arrayInitPush(Node _node);
 
+        void applyAllValues(Array& _dest) const;
+
     private:
         void checkInvariants() const;
 

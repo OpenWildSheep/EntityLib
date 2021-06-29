@@ -612,7 +612,7 @@ try
         ENTLIB_ASSERT(scene->resolveEntityRef({"InstanceOfA/B/../../C"}) == &C);
     }
 
-    auto testInstanceOf = [](Ent::Entity const& ent) {
+    auto testInstanceOf = [](Ent::Entity const& ent, bool testIsSet = true, bool testPrefab = true) {
         // ActorStates
         Ent::Node const& actorStates = ent.getActorStates();
         ENTLIB_ASSERT(actorStates.getDataType() == Ent::DataType::array);
@@ -643,13 +643,13 @@ try
         Ent::Component const* pathNodeGD = ent.getComponent("PathNodeGD");
         Ent::Node const* tags = pathNodeGD->root.at("Tags")->at("Tags");
         ENTLIB_ASSERT(tags->size() == 3);
-        ENTLIB_ASSERT(tags->at(0llu)->at(0llu)->getString() == std::string("a"));
-        ENTLIB_ASSERT(tags->at(1llu)->at(0llu)->getString() == std::string("b"));
-        ENTLIB_ASSERT(tags->at(2llu)->at(0llu)->getString() == std::string("c"));
-        ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->size() == 3);
-        ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(0llu)->getString() == std::string("1"));
-        ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(1llu)->getString() == std::string("2"));
-        ENTLIB_ASSERT(tags->at(2llu)->at(1llu)->at(2llu)->getString() == std::string("3"));
+        ENTLIB_ASSERT(tags->mapGet("a") != nullptr);
+        ENTLIB_ASSERT(tags->mapGet("b") != nullptr);
+        ENTLIB_ASSERT(tags->mapGet("c") != nullptr);
+        ENTLIB_ASSERT(tags->mapGet("c")->size() == 3);
+        ENTLIB_ASSERT(tags->mapGet("c")->mapGet("1") != nullptr);
+        ENTLIB_ASSERT(tags->mapGet("c")->mapGet("2") != nullptr);
+        ENTLIB_ASSERT(tags->mapGet("c")->mapGet("3") != nullptr);
         // Test mapGet on map
         auto cValueSet = tags->mapGet("c");
         ENTLIB_ASSERT(cValueSet != nullptr);
@@ -662,25 +662,48 @@ try
         ENTLIB_ASSERT(subScene->isEmbedded);
         Ent::Entity const& subObj = *subScene->embedded->getObjects()[0];
         ENTLIB_ASSERT(subObj.getName() == std::string("EP1-Spout_LINK_001"));
-        ENTLIB_ASSERT(not subObj.getNameValue().isSet());
-        ENTLIB_ASSERT(not subObj.hasOverride());
+        if (testIsSet)
+        {
+            ENTLIB_ASSERT(not subObj.getNameValue().isSet());
+            ENTLIB_ASSERT(not subObj.hasOverride());
+        }
         Ent::Component const* netLink = subObj.getComponent("NetworkLink");
         ENTLIB_ASSERT(netLink != nullptr);
         ENTLIB_ASSERT(netLink->root.at("Source")->getString() == std::string(".EP1-Spout_"));
-        ENTLIB_ASSERT(netLink->root.at("Source")->isSet() == false);
         ENTLIB_ASSERT(netLink->root.at("Target")->getString() == std::string(".EP1-crook_"));
-        ENTLIB_ASSERT(netLink->root.at("Target")->isSet() == false);
+        if (testIsSet)
+        {
+            ENTLIB_ASSERT(netLink->root.at("Source")->isSet() == false);
+            ENTLIB_ASSERT(netLink->root.at("Target")->isSet() == false);
+        }
         Ent::Component const* trans = subObj.getComponent("TransformGD");
         ENTLIB_ASSERT(trans->root.at("Position")->at(0llu)->getFloat() == 0.0);
 
         // Test instanciation of a prefab Node
         Ent::Component const* stickToTerrain = ent.getComponent("StickToTerrain");
+        if (testPrefab)
+        {
+            ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
+            ENTLIB_ASSERT(
+                stickToTerrain->root.getInstanceOf() == std::string("test.StickToTerrain.node"));
+        }
         ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
         ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isSet() == false);
         ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isDefault() == false);
         ENTLIB_ASSERT(fabs(stickToTerrain->root.at("ZOffset")->getFloat() - 10.) < 0.0001);
     };
 
+    {
+        // Test applyToPrefab
+        EntityPtr ent = entlib.loadEntity("instance.entity");
+        auto prefabPath = ent->getInstanceOf();
+        auto prefab = entlib.loadEntity(prefabPath);
+        auto prefabOfPrefab = prefab->getInstanceOf();
+        ent->applyAllValues(*prefab);
+        ENTLIB_ASSERT(prefabOfPrefab == prefab->getInstanceOf());
+        entlib.saveEntity(*prefab, "prefab_updated.entity");
+        testInstanceOf(*prefab, false);
+    }
     {
         // Test read instance of
         EntityPtr ent = entlib.loadEntity("instance.entity");
@@ -822,7 +845,7 @@ try
     }
     {
         EntityPtr ent = entlib.loadEntity("instance2.entity");
-        testInstanceOf(*ent);
+        testInstanceOf(*ent, true, false);
     }
     auto testInstanceOverrideSubscene = [](Ent::Entity const& ent) {
         // TEST SubScene (with override)

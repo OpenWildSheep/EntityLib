@@ -167,6 +167,15 @@ namespace Ent
         std::tie(subTypeSchema, typeIndex) = schema->getUnionTypeWrapper(getUnionType());
     }
 
+    void Union::applyAllValues(Union& _dest) const
+    {
+        if (typeIndex != _dest.typeIndex)
+        {
+            _dest.setUnionType(*wrapper->getEntityLib(), getUnionType());
+        }
+        wrapper->applyAllValues(*_dest.wrapper);
+    }
+
     // ************************************* Object ***********************************************
 
     void Ent::Object::unset()
@@ -174,6 +183,14 @@ namespace Ent
         for (auto&& name_node : nodes)
         {
             name_node.second->unset();
+        }
+    }
+
+    void Ent::Object::applyAllValues(Object& _dest) const
+    {
+        for (size_t i = 0; i < nodes.size(); ++i)
+        {
+            nodes[i].second->applyAllValues(*_dest.nodes[i].second);
         }
     }
 
@@ -1142,6 +1159,27 @@ namespace Ent
         return schema->rootSchema->entityLib;
     }
 
+    struct ApplyToPrefab
+    {
+        Node::Value& dest;
+
+        template <typename T>
+        auto operator()(T const& _value) const -> decltype(_value.applyAllValues(dest.get<T>()))
+        {
+            _value.applyAllValues(dest.get<T>());
+        }
+
+        void operator()(Null const&) const
+        {
+        }
+    };
+
+    void Ent::Node::applyAllValues(Node& _dest) const
+    {
+        ENTLIB_ASSERT(schema == _dest.schema);
+        mapbox::util::apply_visitor(ApplyToPrefab{_dest.value}, value);
+    }
+
     void destroyAndFree(Node* ptr)
     {
         auto& pool = ptr->getSchema()->rootSchema->entityLib->nodePool;
@@ -1788,6 +1826,15 @@ namespace Ent
     void Scene::setOwnerEntity(Entity* entity)
     {
         ownerEntity = entity;
+    }
+
+    void Scene::applyAllValues(Scene& _dest) const
+    {
+        auto const minCommonSize = std::min(objects.size(), _dest.objects.size());
+        for (size_t i = 0; i < minCommonSize; ++i)
+        {
+            objects[i]->applyAllValues(*_dest.objects[i]);
+        }
     }
 
     void Scene::updateChildrenContext()
@@ -3140,6 +3187,67 @@ nlohmann::json Ent::Entity::saveEntity() const
     return entNode;
 }
 
+void Ent::Entity::applyToPrefab() const
+{
+    auto prefabPath = getInstanceOf();
+    if (prefabPath == nullptr)
+    {
+        throw ContextException("This entity has no prefab");
+    }
+    auto prefab = entlib->loadEntity(prefabPath);
+    applyAllValues(*prefab);
+    entlib->saveEntity(*prefab, prefabPath);
+}
+
+void Ent::Entity::applyAllValues(Entity& _dest) const
+{
+    name.applyAllValues(_dest.name);
+    thumbnail.applyAllValues(_dest.thumbnail);
+    maxActivationLevel.applyAllValues(_dest.maxActivationLevel);
+    actorStates.applyAllValues(_dest.actorStates);
+    color.applyAllValues(_dest.color);
+
+    for (auto&& name_comp : components)
+    {
+        auto&& cmpName = name_comp.first;
+        auto&& comp = name_comp.second;
+        auto cmpIter = _dest.components.find(cmpName);
+        if (cmpIter == _dest.components.end())
+        {
+            _dest.components.emplace(cmpName, comp);
+        }
+        else
+        {
+            comp.applyAllValues(cmpIter->second);
+        }
+    }
+    for (auto&& cmpName : removedComponents)
+    {
+        if (cmpName == "SubScene")
+        {
+            if (_dest.getSubSceneComponent() != nullptr)
+            {
+                _dest.removeSubSceneComponent();
+            }
+        }
+        if (_dest.getComponent(cmpName.c_str()) != nullptr)
+        {
+            _dest.removeComponent(cmpName.c_str());
+        }
+    }
+    if (subSceneComponent != nullptr)
+    {
+        if (_dest.subSceneComponent != nullptr)
+        {
+            subSceneComponent->applyAllValues(*_dest.subSceneComponent);
+        }
+        else
+        {
+            _dest.subSceneComponent = subSceneComponent->clone();
+        }
+    }
+}
+
 std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
 {
     std::map<std::string, Ent::Component> detComponents;
@@ -3390,6 +3498,14 @@ std::unique_ptr<Ent::Scene> Ent::SubSceneComponent::detachEmbedded()
         return scene;
     }
     return {};
+}
+
+void Ent::SubSceneComponent::applyAllValues(SubSceneComponent& _dest) const
+{
+    if (embedded != nullptr and _dest.embedded != nullptr)
+    {
+        embedded->applyAllValues(*_dest.embedded);
+    }
 }
 
 bool Ent::SubSceneComponent::hasOverride() const

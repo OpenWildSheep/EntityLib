@@ -498,3 +498,28 @@ void Ent::Map::unset()
         elt.node->unset();
     }
 }
+
+void Ent::Map::applyAllValues(Map& _dest) const
+{
+    for (auto& key_idx : m_itemMap)
+    {
+        auto&& key = std::get<0>(key_idx);
+        auto&& idx = std::get<1>(key_idx);
+        Element const& elt = m_items[idx];
+        auto prefabIter = _dest.m_itemMap.find(key);
+        if (prefabIter == _dest.m_itemMap.end())
+        {
+            if (elt.isPresent.get())
+            {
+                auto* newPrefabNode = _dest.insert(key);
+                elt.node->applyAllValues(*newPrefabNode);
+            }
+        }
+        else
+        {
+            Element& prefabElt = _dest.m_items[prefabIter->second];
+            elt.node->applyAllValues(*prefabElt.node);
+            elt.isPresent.applyAllValues(prefabElt.isPresent);
+        }
+    }
+}

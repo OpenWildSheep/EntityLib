@@ -77,6 +77,7 @@ namespace Ent
         }
 
         void unset();
+        void applyAllValues(Object& _dest) const;
     };
 
     inline auto begin(Object const& obj)
@@ -125,12 +126,19 @@ namespace Ent
         void computeMemory(MemoryProfiler& prof) const;
 
         void unset();
+
+        void applyAllValues(Union& _dest) const;
     };
 
     struct EntityRef
     {
         /// @brief string representation of this entity ref, works like a file path, always relative.
         String entityPath;
+
+        bool operator==(EntityRef const& _rho) const
+        {
+            return entityPath == _rho.entityPath;
+        }
     };
 
     /// @brief The possible source of an Override value
@@ -339,6 +347,8 @@ namespace Ent
 
         EntityLib* getEntityLib() const;
 
+        void applyAllValues(Node& _dest) const;
+
     private:
         void checkMap(char const* _calledMethod) const; ///< Throw exception if not a set/map
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
@@ -410,6 +420,12 @@ namespace Ent
         {
             return root.getSchema() && root.getSchema()->IsEditorOnly();
         }
+
+        void applyAllValues(Component& _dest) const
+        {
+            ENTLIB_ASSERT(type == _dest.type);
+            root.applyAllValues(_dest.root);
+        }
     };
 
     struct Scene;
@@ -455,6 +471,8 @@ namespace Ent
         /// @brief detach the Scene from this sub scene components, leaving the embedded sub scene empty
         /// @pre this SubScene is embedded, i.e. isEmbedded is true
         std::unique_ptr<Scene> detachEmbedded();
+
+        void applyAllValues(SubSceneComponent& _dest) const;
     };
 
     class EntityLib;
@@ -617,6 +635,9 @@ namespace Ent
 
         nlohmann::json saveEntity() const;
 
+        void applyToPrefab() const;
+        void applyAllValues(Entity& _dest) const;
+
     private:
         void updateSubSceneOwner();
         EntityLib const* entlib{}; ///< Reference the entity lib to find the schema when needed
@@ -694,12 +715,17 @@ namespace Ent
         {
             prof.addMem("Scene::objects", objects.capacity() * sizeof(objects.front()));
             for (auto&& entityPtr : objects)
+            {
                 entityPtr->computeMemory(prof);
+            }
         }
 
+        void applyAllValues(Scene& _dest) const;
+
     private:
-        Entity* ownerEntity = nullptr; ///< the entity owning this scene if it is embedded
         void updateChildrenContext();
+
+        Entity* ownerEntity = nullptr; ///< the entity owning this scene if it is embedded
         std::vector<std::unique_ptr<Entity>> objects; ///< All Ent::Entity of this Scene
     };
 
@@ -835,58 +861,6 @@ namespace Ent
     // *************************** Implem details - method bodies *********************************
 
     /// \cond PRIVATE
-    template <typename V>
-    V const& Override<V>::get() const
-    {
-        if (hasOverride)
-        {
-            return overrideValue;
-        }
-        if (hasPrefab)
-        {
-            return prefabValue;
-        }
-        return defaultValue;
-    }
-
-    template <typename V>
-    void Override<V>::set(V _newVal)
-    {
-        overrideValue = std::move(_newVal);
-        hasOverride = true;
-    }
-
-    template <typename V>
-    bool Override<V>::isSet() const
-    {
-        return hasOverride;
-    }
-
-    template <typename V>
-    void Override<V>::unset()
-    {
-        hasOverride = false;
-        overrideValue = {};
-    }
-
-    template <typename V>
-    Override<V> Override<V>::detach() const
-    {
-        if (hasOverride)
-            return Override<V>(defaultValue, V{}, overrideValue, false, hasOverride);
-        else
-            return Override<V>(defaultValue, V{}, prefabValue, false, hasPrefab);
-    }
-
-    template <typename V>
-    Override<V> Override<V>::makeInstanceOf() const
-    {
-        if (hasOverride)
-            return Override<V>(defaultValue, overrideValue, V{}, hasOverride, false);
-        else
-            return Override<V>(defaultValue, prefabValue, V{}, hasPrefab, false);
-    }
-
     struct Memory
     {
         MemoryProfiler* prof;
@@ -901,17 +875,6 @@ namespace Ent
             prof->addMem("Override<string>", str.capacity());
         }
     };
-
-    template <typename V>
-    void Override<V>::computeMemory(MemoryProfiler& prof) const
-    {
-        Memory compute{&prof};
-        compute(defaultValue);
-        if (hasPrefab)
-            compute(prefabValue);
-        if (hasOverride)
-            compute(overrideValue);
-    }
 
     size_t count(Object const& obj, char const* key);
     void emplace(Object& obj, std::pair<char const*, Node> const& value);

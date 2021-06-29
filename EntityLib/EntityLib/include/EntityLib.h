@@ -347,6 +347,7 @@ namespace Ent
 
         EntityLib* getEntityLib() const;
 
+        /// Take all values set in this and set them into \b _dest
         void applyAllValues(Node& _dest) const;
 
     private:
@@ -421,6 +422,8 @@ namespace Ent
             return root.getSchema() && root.getSchema()->IsEditorOnly();
         }
 
+        /// @brief Take all values set in this and set them into \b _dest
+        /// @pre \b _dest has the same component type than \b this
         void applyAllValues(Component& _dest) const
         {
             ENTLIB_ASSERT(type == _dest.type);
@@ -472,6 +475,7 @@ namespace Ent
         /// @pre this SubScene is embedded, i.e. isEmbedded is true
         std::unique_ptr<Scene> detachEmbedded();
 
+        /// @brief Take all values set in this and set them into \b _dest
         void applyAllValues(SubSceneComponent& _dest) const;
     };
 
@@ -635,7 +639,10 @@ namespace Ent
 
         nlohmann::json saveEntity() const;
 
+        /// Take all values set in \b this, set them into the prefab entity, and save the prefab
         void applyToPrefab() const;
+
+        /// @brief Take all values set in this and set them into \b _dest
         void applyAllValues(Entity& _dest) const;
 
     private:
@@ -720,6 +727,7 @@ namespace Ent
             }
         }
 
+        /// @brief Take all values set in this and set them into \b _dest
         void applyAllValues(Scene& _dest) const;
 
     private:

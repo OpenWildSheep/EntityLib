@@ -133,14 +133,15 @@ namespace Ent
 
         void applyAllValues(Override& _dest) const
         {
-            if (isSet())
+            if (!isSet() && !_dest.isSet()) // Both are unSet => Set only if needed
             {
-                _dest.unset();
                 if (!(_dest.get() == get()))
                 {
                     _dest.set(get());
                 }
             }
+            else
+                _dest.set(get());
         }
 
     public:

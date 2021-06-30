@@ -1,0 +1,293 @@
+{
+    "ActorStates": [
+        {
+            "classData": {
+                "locomotionMode": "crouch"
+            },
+            "className": "ActionClimbEdge"
+        },
+        {
+            "classData": {
+                "Type": 13
+            },
+            "className": "ActionCinematic"
+        },
+        {
+            "classData": {
+                "ExitRequired": true
+            },
+            "className": "ActionChosen"
+        }
+    ],
+    "Color": [
+        27.0,
+        177.0,
+        27.0,
+        255.0
+    ],
+    "Components": [
+        {
+            "Data": {
+                "Matrix": [
+                    0.9667,
+                    0.2557,
+                    -0.0137,
+                    -0.2556,
+                    0.9667,
+                    0.0084,
+                    0.0154,
+                    -0.0046,
+                    0.9999
+                ],
+                "Position": [
+                    105.2244,
+                    152.7811,
+                    29.6635
+                ]
+            },
+            "Type": "TransformGD",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "Tag": "ShamanPlayerSpawner",
+                "ThumbnailMesh": "02_creature/human/male/clothstrong/bodykai/CLOTH_Body.wbm",
+                "Type": "Spawner"
+            },
+            "Type": "NetworkNode",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "InstanceOf": "test.StickToTerrain.node",
+                "NormalRatio": 0.6
+            },
+            "Type": "StickToTerrain",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "BehaviorPath": "Pesto/Behavior/FSMDefaultBehavior.pesto",
+                "BehaviorState": "W/*at*/c//h",
+                "CanBeMaster": false,
+                "Faction": "Plouf",
+                "Inventory": "KaiWOLgrey",
+                "Invincible": false,
+                "Life": 1000.0,
+                "PlayerSpawn": true,
+                "ScriptList": [
+                    "a1",
+                    "b2",
+                    "c1"
+                ],
+                "Spawner": "ShamanPlayerSpawner.gd",
+                "UniqueID": "Shaman_male_Bobby",
+                "Warrior": false
+            },
+            "Type": "SystemicCreature",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "DisplaceNoiseList": [
+                    {
+                        "DisplaceDistance": 0.0,
+                        "LuminanceCenter": 0.0,
+                        "MapChannel": 51248,
+                        "MotifName": "",
+                        "MotifOffsetX": 0.0,
+                        "MotifOffsetY": 0.0,
+                        "MotifRotationZ": 0.0,
+                        "MotifSizeX": 0.0,
+                        "MotifSizeY": 0.0
+                    }
+                ],
+                "Subdivision": 0
+            },
+            "Type": "HeightObj",
+            "Version": 1
+        },
+        {
+            "Data": {},
+            "Type": "NetGD",
+            "Version": 1
+        },
+        {
+            "Data": {},
+            "Type": "SmoothScaleComponentGD",
+            "Version": 1
+        },
+        {
+            "Data": {},
+            "Type": "PhysicsGD",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "InSpiritWorld": false
+            },
+            "Type": "ActorGD",
+            "Version": 1
+        },
+        {
+            "Data": {},
+            "Type": "BeamGeneratorGD",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "ScriptEvents": [
+                    {
+                        "classData": {
+                            "EventName": "Toto"
+                        },
+                        "className": "CineEventTriggerEventHandlerPost"
+                    },
+                    {
+                        "classData": {
+                            "EventName": "Tutu"
+                        },
+                        "className": "CineEventTriggerEventHandlerPost"
+                    },
+                    {
+                        "classData": {
+                            "EventName": "Titi"
+                        },
+                        "className": "CineEventTriggerEventHandlerPost"
+                    }
+                ]
+            },
+            "Type": "CinematicGD",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "NonDisuptive": true,
+                "PrimitiveData": {
+                    "Height": 42.0,
+                    "Length": 0.0,
+                    "Width": 0.0
+                },
+                "PrimitiveType": "test"
+            },
+            "Type": "LDPrimitive",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "Embedded": [
+                    {
+                        "Color": [
+                            255.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Matrix": [
+                                        -0.0057,
+                                        -0.4374,
+                                        74.1085,
+                                        0.0,
+                                        0.8993,
+                                        36.0432,
+                                        -1.0,
+                                        0.0025,
+                                        -0.4247
+                                    ],
+                                    "Position": [
+                                        0.0,
+                                        0.0,
+                                        0.0
+                                    ]
+                                },
+                                "Type": "TransformGD",
+                                "Version": 1
+                            },
+                            {
+                                "Data": {
+                                    "Source": ".EP1-Spout_",
+                                    "Target": ".EP1-crook_",
+                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                },
+                                "Type": "NetworkLink",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "EP1-Spout_LINK_001"
+                    }
+                ],
+                "File": "",
+                "isEmbedded": true
+            },
+            "Type": "SubScene",
+            "Version": 1
+        },
+        {
+            "Data": {},
+            "Type": "VoxelSimulationGD",
+            "Version": 1
+        },
+        {
+            "Data": {},
+            "Type": "CharacterControllerGD",
+            "Version": 1
+        },
+        {
+            "Data": {},
+            "Type": "TestDefaultValues",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "Radius": 30.0,
+                "Tags": {
+                    "Tags": [
+                        [
+                            "a",
+                            [
+                                "1",
+                                "2"
+                            ]
+                        ],
+                        [
+                            "b",
+                            [
+                                "1",
+                                "2"
+                            ]
+                        ],
+                        [
+                            "c",
+                            [
+                                "1",
+                                "2",
+                                "3"
+                            ]
+                        ],
+                        [
+                            "d",
+                            null
+                        ]
+                    ]
+                }
+            },
+            "Type": "PathNodeGD",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "Variant": {
+                    "variantData": 3.1416,
+                    "variantType": "float"
+                }
+            },
+            "Type": "TestArrays",
+            "Version": 1
+        }
+    ],
+    "Name": "PlayerSpawner_",
+    "Thumbnail": "prout"
+}

@@ -884,6 +884,17 @@ namespace Ent
         }
     };
 
+    template <typename V>
+    void Override<V>::computeMemory(MemoryProfiler& prof) const
+    {
+        Memory compute{&prof};
+        compute(defaultValue);
+        if (hasPrefab)
+            compute(prefabValue);
+        if (hasOverride)
+            compute(overrideValue);
+    }
+
     size_t count(Object const& obj, char const* key);
     void emplace(Object& obj, std::pair<char const*, Node> const& value);
     Node const& at(Object const& obj, char const* key);

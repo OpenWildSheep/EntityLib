@@ -153,17 +153,6 @@ namespace Ent
     };
 
     template <typename V>
-    void Override<V>::computeMemory(MemoryProfiler& prof) const
-    {
-        Memory compute{&prof};
-        compute(defaultValue);
-        if (hasPrefab)
-            compute(prefabValue);
-        if (hasOverride)
-            compute(overrideValue);
-    }
-
-    template <typename V>
     V const& Override<V>::get() const
     {
         if (hasOverride)

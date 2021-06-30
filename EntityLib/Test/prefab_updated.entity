@@ -59,14 +59,6 @@
         },
         {
             "Data": {
-                "InstanceOf": "test.StickToTerrain.node",
-                "NormalRatio": 0.6
-            },
-            "Type": "StickToTerrain",
-            "Version": 1
-        },
-        {
-            "Data": {
                 "BehaviorPath": "Pesto/Behavior/FSMDefaultBehavior.pesto",
                 "BehaviorState": "W/*at*/c//h",
                 "CanBeMaster": false,
@@ -217,6 +209,25 @@
                             }
                         ],
                         "Name": "EP1-Spout_LINK_001"
+                    },
+                    {
+                        "Color": [
+                            255.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Source": "instance"
+                                },
+                                "Type": "NetworkLink",
+                                "Version": 1
+                            }
+                        ],
+                        "InstanceOf": "subentity2.entity",
+                        "Name": "EntityWithInstanceOf"
                     }
                 ],
                 "File": "",
@@ -285,6 +296,22 @@
                 }
             },
             "Type": "TestArrays",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "InstanceOf": "test.SeedPatch2.node",
+                "NoiseOffsetY": 3.0
+            },
+            "Type": "SeedPatch",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "InstanceOf": "test.StickToTerrain.node",
+                "NormalRatio": 0.6
+            },
+            "Type": "StickToTerrain",
             "Version": 1
         }
     ],

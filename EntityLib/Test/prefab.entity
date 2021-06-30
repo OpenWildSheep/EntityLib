@@ -172,6 +172,20 @@
                                 }
                             }
                         ]
+                    }, {
+                        "Name": "EntityWithInstanceOf",
+                        "Color": [255, 120, 220, 255],
+                        "Components": [{
+                                "Version": 1,
+                                "Type": "NetworkLink",
+                                "Data": {
+                                    "Source": ".EP1-Spout_",
+                                    "Target": ".EP1-crook_",
+                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                }
+                            }
+                        ],
+                        "InstanceOf": "subentity.entity"
                     }
                 ]
             }
@@ -217,6 +231,13 @@
                 }
             },
             "Type": "TestArrays",
+            "Version": 1
+        }, {
+            "Data": {
+                "InstanceOf": "test.SeedPatch.node",
+                "NoiseOffsetX" : 2
+            },
+            "Type": "SeedPatch",
             "Version": 1
         }
     ],

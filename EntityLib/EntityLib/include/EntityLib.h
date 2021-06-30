@@ -643,7 +643,7 @@ namespace Ent
         void applyToPrefab() const;
 
         /// @brief Take all values set in this and set them into \b _dest
-        void applyAllValues(Entity& _dest) const;
+        void applyAllValues(Entity& _dest, bool keepDestPrefab = false) const;
 
     private:
         void updateSubSceneOwner();

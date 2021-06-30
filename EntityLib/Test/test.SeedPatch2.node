@@ -1,0 +1,4 @@
+{
+    "$schema": "./EditionComponents.json#/definitions/SeedPatch",
+    "NoiseSizeY": 3
+}

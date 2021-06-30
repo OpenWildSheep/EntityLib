@@ -220,6 +220,14 @@
         },
         {
             "Data": {
+                "InstanceOf": "test.SeedPatch.node",
+                "NoiseOffsetX": 2.0
+            },
+            "Type": "SeedPatch",
+            "Version": 1
+        },
+        {
+            "Data": {
                 "TestRef": "EP1-Spout_LINK_001"
             },
             "Type": "TestEntityRef",

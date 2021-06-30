@@ -188,6 +188,10 @@ namespace Ent
 
     void Ent::Object::applyAllValues(Object& _dest) const
     {
+        ENTLIB_ASSERT(instanceOf.hasOverride == _dest.instanceOf.hasOverride);
+        ENTLIB_ASSERT(
+            not instanceOf.hasOverride or instanceOf.overrideValue == _dest.instanceOf.overrideValue);
+
         for (size_t i = 0; i < nodes.size(); ++i)
         {
             nodes[i].second->applyAllValues(*_dest.nodes[i].second);
@@ -1176,6 +1180,20 @@ namespace Ent
 
     void Ent::Node::applyAllValues(Node& _dest) const
     {
+        if (value.is<Object>())
+        {
+            auto const& object = value.get<Object>();
+            if (object.instanceOf.isSet()) // 'this' has an InstanceOf
+            {
+                if (_dest.getInstanceOf() == nullptr
+                    or strcmp(object.instanceOf.get().c_str(), _dest.getInstanceOf())
+                           != 0) // Not the same InstanceOf
+                {
+                    _dest.setInstanceOf(object.instanceOf.get().c_str());
+                }
+            }
+        }
+
         ENTLIB_ASSERT(schema == _dest.schema);
         mapbox::util::apply_visitor(ApplyToPrefab{_dest.value}, value);
     }
@@ -1830,10 +1848,39 @@ namespace Ent
 
     void Scene::applyAllValues(Scene& _dest) const
     {
-        auto const minCommonSize = std::min(objects.size(), _dest.objects.size());
-        for (size_t i = 0; i < minCommonSize; ++i)
+        std::map<std::string, Entity*> thisMap;
+        std::map<std::string, Entity*> destMap;
+        for (auto&& obj : objects)
         {
-            objects[i]->applyAllValues(*_dest.objects[i]);
+            thisMap.emplace(obj->getName(), obj.get());
+        }
+        for (auto&& obj : _dest.objects)
+        {
+            destMap.emplace(obj->getName(), obj.get());
+        }
+        for (auto&& name_ent : thisMap)
+        {
+            auto&& name = name_ent.first;
+            auto&& ent = name_ent.second;
+            auto destIter = destMap.find(name);
+            if (destIter == destMap.end()) // Entity just added
+            {
+                _dest.addEntity(ent->clone());
+            }
+            else // Preserved Entity
+            {
+                ent->applyAllValues(*destIter->second);
+            }
+        }
+        for (auto&& name_ent : destMap)
+        {
+            auto&& name = name_ent.first;
+            auto thisIter = thisMap.find(name);
+            if (thisIter == thisMap.end()) // Entity just removed
+            {
+                // TODO : Loïc - Mark this entity removed (when this feature is developed)
+                ENTLIB_ASSERT(false && "Can't handle removed entity for now");
+            }
         }
     }
 
@@ -3195,56 +3242,55 @@ void Ent::Entity::applyToPrefab() const
         throw ContextException("This entity has no prefab");
     }
     auto prefab = entlib->loadEntity(prefabPath);
-    applyAllValues(*prefab);
+    applyAllValues(*prefab, true);
     entlib->saveEntity(*prefab, prefabPath);
 }
 
-void Ent::Entity::applyAllValues(Entity& _dest) const
+void Ent::Entity::applyAllValues(Entity& _dest, bool keepDestPrefab) const
 {
+    if (not keepDestPrefab and instanceOf.isSet()) // 'this' has an InstanceOf
+    {
+        if (_dest.getInstanceOf() == nullptr
+            or strcmp(_dest.getInstanceOf(), getInstanceOf()) != 0) // Not the same InstanceOf
+        {
+            _dest.setInstanceOf(getInstanceOf());
+        }
+    }
+
     name.applyAllValues(_dest.name);
     thumbnail.applyAllValues(_dest.thumbnail);
     maxActivationLevel.applyAllValues(_dest.maxActivationLevel);
     actorStates.applyAllValues(_dest.actorStates);
     color.applyAllValues(_dest.color);
 
-    for (auto&& name_comp : components)
+    for (auto&& name_comp : getComponents())
     {
         auto&& cmpName = name_comp.first;
         auto&& comp = name_comp.second;
-        auto cmpIter = _dest.components.find(cmpName);
-        if (cmpIter == _dest.components.end())
+        // addComponent has no effect if the component exist
+        comp.applyAllValues(*_dest.addComponent(cmpName.c_str()));
+    }
+    std::vector<char const*> compToRemove;
+    for (auto&& name_comp : _dest.getComponents())
+    {
+        auto&& cmpName = name_comp.first;
+        if (getComponent(cmpName.c_str()) == nullptr) // Removed component
         {
-            _dest.components.emplace(cmpName, comp);
-        }
-        else
-        {
-            comp.applyAllValues(cmpIter->second);
+            compToRemove.push_back(cmpName.c_str());
         }
     }
-    for (auto&& cmpName : removedComponents)
+    if (auto subScene = getSubSceneComponent())
     {
-        if (cmpName == "SubScene")
-        {
-            if (_dest.getSubSceneComponent() != nullptr)
-            {
-                _dest.removeSubSceneComponent();
-            }
-        }
-        if (_dest.getComponent(cmpName.c_str()) != nullptr)
-        {
-            _dest.removeComponent(cmpName.c_str());
-        }
+        // addSubSceneComponent has no effect if the component exist
+        subScene->applyAllValues(*_dest.addSubSceneComponent());
     }
-    if (subSceneComponent != nullptr)
+    else if (auto destSubScene = _dest.getSubSceneComponent()) // Removed component
     {
-        if (_dest.subSceneComponent != nullptr)
-        {
-            subSceneComponent->applyAllValues(*_dest.subSceneComponent);
-        }
-        else
-        {
-            _dest.subSceneComponent = subSceneComponent->clone();
-        }
+        compToRemove.push_back("SubScene");
+    }
+    for (auto&& cmpName : compToRemove)
+    {
+        _dest.removeComponent(cmpName);
     }
 }
 

@@ -726,6 +726,9 @@ try
         ent->applyAllValues(*prefab, true);
         ENTLIB_ASSERT(prefabOfPrefab == prefab->getInstanceOf());
         entlib.saveEntity(*prefab, "prefab_updated.entity");
+        ent->setInstanceOf(prefabPath);
+        ENTLIB_ASSERT(not ent->hasOverride());
+
         testInstanceOf(*prefab, false);
     }
     {

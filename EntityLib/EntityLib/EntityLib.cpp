@@ -457,8 +457,8 @@ namespace Ent
 
     struct UnSet
     {
-        template <typename T> // Take all types with a unset method
-        auto operator()(T& _nodeInternal) const -> decltype(_nodeInternal.unset())
+        template <typename T>
+        void operator()(T& _nodeInternal) const
         {
             return _nodeInternal.unset();
         }
@@ -1537,6 +1537,7 @@ namespace Ent
         char const* normTmpl = prefab.c_str();
         std::shared_ptr<Ent::Entity const> templ = entlib->loadEntityReadOnly(normTmpl, nullptr);
         components.clear();
+        removedComponents.clear();
         for (auto const& type_comp : templ->getComponents())
         {
             auto const& cmpType = std::get<0>(type_comp);
@@ -3234,7 +3235,7 @@ nlohmann::json Ent::Entity::saveEntity() const
     return entNode;
 }
 
-void Ent::Entity::applyToPrefab() const
+void Ent::Entity::applyToPrefab()
 {
     auto prefabPath = getInstanceOf();
     if (prefabPath == nullptr)
@@ -3243,6 +3244,7 @@ void Ent::Entity::applyToPrefab() const
     }
     auto prefab = entlib->loadEntity(prefabPath);
     applyAllValues(*prefab, true);
+    setInstanceOf(prefabPath);
     entlib->saveEntity(*prefab, prefabPath);
 }
 

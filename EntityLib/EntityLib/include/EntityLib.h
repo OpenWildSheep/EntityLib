@@ -640,7 +640,7 @@ namespace Ent
         nlohmann::json saveEntity() const;
 
         /// Take all values set in \b this, set them into the prefab entity, and save the prefab
-        void applyToPrefab() const;
+        void applyToPrefab();
 
         /// @brief Take all values set in this and set them into \b _dest
         void applyAllValues(Entity& _dest, bool keepDestPrefab = false) const;

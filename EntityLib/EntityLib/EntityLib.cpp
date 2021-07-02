@@ -186,20 +186,20 @@ namespace Ent
         }
     }
 
-    // For Entity and Object. Decide to setInstanceOf or not depending on \b _copyMode
+    // For Entity and Object. Decide to resetInstanceOf or not depending on \b _copyMode
     template <typename T>
     void applyInstanceOfField(T const& _source, T& _dest, Ent::CopyMode _copyMode)
     {
         auto sourcePrefabPath = _source.getInstanceOfValue().get().c_str();
         if (_source.getInstanceOfValue().get() != _dest.getInstanceOfValue().get())
         {
-            _dest.setInstanceOf(sourcePrefabPath == nullptr ? "" : sourcePrefabPath);
+            _dest.resetInstanceOf(sourcePrefabPath == nullptr ? "" : sourcePrefabPath);
         }
         else if (_copyMode == CopyMode::CopyOverride)
         {
             if (_source.getInstanceOfValue().isSet() and not _dest.getInstanceOfValue().isSet())
             {
-                _dest.setInstanceOf(sourcePrefabPath == nullptr ? "" : sourcePrefabPath);
+                _dest.resetInstanceOf(sourcePrefabPath == nullptr ? "" : sourcePrefabPath);
             }
         }
     }
@@ -248,7 +248,7 @@ namespace Ent
         return out;
     }
 
-    void Ent::Object::setInstanceOf(char const* _prefabNodePath)
+    void Ent::Object::resetInstanceOf(char const* _prefabNodePath)
     {
         auto const* entlib = schema->rootSchema->entityLib;
         if (_prefabNodePath == nullptr or strlen(_prefabNodePath) == 0)
@@ -1179,16 +1179,16 @@ namespace Ent
 
     void Ent::Node::setInstanceOf(char const* _prefabNodePath)
     {
+        resetInstanceOf(_prefabNodePath);
+    }
+
+    void Ent::Node::resetInstanceOf(char const* _prefabNodePath)
+    {
         if (not value.is<Object>())
         {
             throw BadType();
         }
-
-        auto relPath = getEntityLib()->getRelativePath(_prefabNodePath).generic_u8string();
-        json nodeData = loadJsonFile(getEntityLib()->rawdataPath, _prefabNodePath);
-        Node prefabNode = getEntityLib()->loadNode(*getSchema(), nodeData, nullptr);
-        (*this) = prefabNode.makeInstanceOf();
-        value.get<Object>().instanceOf.set(relPath);
+        value.get<Object>().resetInstanceOf(_prefabNodePath);
     }
 
     void Ent::Node::resetInstanceOf()
@@ -1233,7 +1233,7 @@ namespace Ent
                     or strcmp(object.instanceOf.get().c_str(), _dest.getInstanceOf())
                            != 0) // Not the same InstanceOf
                 {
-                    _dest.setInstanceOf(object.instanceOf.get().c_str());
+                    _dest.resetInstanceOf(object.instanceOf.get().c_str());
                 }
             }
         }
@@ -1577,9 +1577,14 @@ namespace Ent
 
     void Entity::setInstanceOf(std::string const& _prefab)
     {
+        resetInstanceOf(_prefab.c_str());
+    }
+
+    void Entity::resetInstanceOf(char const* _prefab)
+    {
         std::shared_ptr<Ent::Entity const> templ;
         std::string prefab;
-        if (_prefab.empty())
+        if (_prefab == nullptr or strlen(_prefab) == 0)
         {
             templ = std::make_shared<Ent::Entity const>(*entlib);
         }
@@ -3282,7 +3287,7 @@ void Ent::Entity::applyToPrefab()
     auto prefab = entlib->loadEntity(prefabPath);
     // When the value is overridden is the source, we want to make it overridden in the dest => CopyOverride
     applyAllValuesButPrefab(*prefab, CopyMode::CopyOverride);
-    setInstanceOf(prefabPath); // Reset 'this' to a vanilla instance of prefab
+    resetInstanceOf(prefabPath); // Reset 'this' to a vanilla instance of prefab
     entlib->saveEntity(*prefab, prefabPath);
 }
 
@@ -3379,7 +3384,7 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
 std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string const& _instanceOf) const
 {
     std::unique_ptr<Ent::Entity> inst = std::make_unique<Ent::Entity>(*this);
-    inst->setInstanceOf(_instanceOf);
+    inst->resetInstanceOf(_instanceOf.c_str());
     return inst;
 }
 

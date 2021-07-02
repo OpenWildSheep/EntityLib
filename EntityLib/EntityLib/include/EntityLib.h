@@ -83,7 +83,7 @@ namespace Ent
         }
 
         void unset();
-        void setInstanceOf(char const* _prefabNodePath);
+        void resetInstanceOf(char const* _prefabNodePath);
         Object makeInstanceOf() const;
         Object detach() const;
         void applyAllValues(Object& _dest, CopyMode _copyMode) const;
@@ -306,11 +306,13 @@ namespace Ent
         Node makeInstanceOf() const;
         /// \endcond
 
+        /// @remark obsolete. Use resetInstanceOf
+        void setInstanceOf(char const* _prefabNodePath);
         /// Reset the Node to be an instance of the given \b _prefabNodePath
         ///
         /// @warning All sub-nodes into \b _node will be invalidated
         /// @param _prefabNodePath path to the prefab Node (relative to RawData)
-        void setInstanceOf(char const* _prefabNodePath);
+        void resetInstanceOf(char const* _prefabNodePath);
         void resetInstanceOf();
 
         bool hasDefaultValue() const; ///< false if something was set in instance or prefab
@@ -650,10 +652,12 @@ namespace Ent
             maxActivationLevel.computeMemory(prof);
         }
 
+        /// @remark obsolete. Use resetInstanceOf
+        void setInstanceOf(std::string const& _prefab);
         /// Reset the Entity to be an instance of the given \b _prefab
         ///
         /// @warning All Nodes into the Entity will be invalidated
-        void setInstanceOf(std::string const& _prefab);
+        void resetInstanceOf(char const* _prefab);
 
         nlohmann::json saveEntity() const;
 

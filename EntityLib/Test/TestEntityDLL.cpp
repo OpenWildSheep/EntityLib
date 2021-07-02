@@ -356,7 +356,7 @@ try
 
     {
         Ent::Entity ent(entlib);
-        ent.setInstanceOf("prefab.entity");
+        ent.resetInstanceOf("prefab.entity");
         ENTLIB_ASSERT(not ent.hasOverride());
         ENTLIB_ASSERT(ent.getInstanceOf() == std::string("prefab.entity"));
     }
@@ -726,7 +726,7 @@ try
         ent->applyAllValuesButPrefab(*prefab, Ent::CopyMode::CopyOverride);
         ENTLIB_ASSERT(prefabOfPrefab == prefab->getInstanceOf());
         entlib.saveEntity(*prefab, "prefab_updated.entity");
-        ent->setInstanceOf(prefabPath);
+        ent->resetInstanceOf(prefabPath);
         ENTLIB_ASSERT(not ent->hasOverride());
 
         testInstanceOf(*prefab, false);
@@ -1033,9 +1033,9 @@ try
         // Test instanciation of a prefab Node
         Ent::Component* stickToTerrain = instanceOf->addComponent("StickToTerrain");
         ENTLIB_CHECK_EXCEPTION(
-            stickToTerrain->root.setInstanceOf("C:/test.StickToTerrain.node"), std::runtime_error);
-        stickToTerrain->root.setInstanceOf("test.StickToTerrain.node");
-        stickToTerrain->root.setInstanceOf(
+            stickToTerrain->root.resetInstanceOf("C:/test.StickToTerrain.node"), std::runtime_error);
+        stickToTerrain->root.resetInstanceOf("test.StickToTerrain.node");
+        stickToTerrain->root.resetInstanceOf(
             (current_path() / "test.StickToTerrain.node").generic_u8string().c_str());
         ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
         stickToTerrain->root.at("NormalRatio")->setFloat(0.6);
@@ -1095,15 +1095,15 @@ try
     };
     testCreateInstanceOf("instance.create.entity");
     {
-        // Test setInstanceOf
+        // Test resetInstanceOf
         Ent::Entity instanceOf(entlib);
-        instanceOf.setInstanceOf("prefab.entity");
+        instanceOf.resetInstanceOf("prefab.entity");
         ENTLIB_ASSERT(instanceOf.getComponent("NetworkNode") != nullptr);
         instanceOf.getComponent("TransformGD")->root.getFieldNames();
 
         // Test instanciation of a prefab Node
         Ent::Component* stickToTerrain = instanceOf.addComponent("StickToTerrain");
-        stickToTerrain->root.setInstanceOf("test.StickToTerrain.node");
+        stickToTerrain->root.resetInstanceOf("test.StickToTerrain.node");
         stickToTerrain->root.at("NormalRatio")->setFloat(0.6);
 
         entlib.saveEntity(instanceOf, "setInstanceOf.entity");

@@ -143,15 +143,16 @@ namespace Ent
             {
             case CopyMode::CopyOverride:
                 if (isSet())
-                {
+                { // Report the override when there is one
                     _dest.set(get());
                 }
-                else if (!(get() == _dest.get()))
-                    _dest.set(get());
+                else if (get() != _dest.get())
+                    _dest.set(get()); // If no override, minimize modification in _dest
                 break;
             case CopyMode::MinimalOverride:
+                // Try to set a minimum of values
                 _dest.unset();
-                if (!(get() == _dest.get()))
+                if (get() != _dest.get())
                     _dest.set(get());
                 break;
             }

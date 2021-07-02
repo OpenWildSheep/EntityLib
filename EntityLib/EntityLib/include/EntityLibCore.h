@@ -199,6 +199,11 @@ namespace Ent
             return strcmp(str.get(), ot.str.get()) == 0;
         }
 
+        bool operator!=(String const& ot) const
+        {
+            return !(*this == ot);
+        }
+
         bool operator<(String const& ot) const
         {
             if (str == nullptr)

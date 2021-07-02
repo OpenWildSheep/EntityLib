@@ -186,12 +186,26 @@ namespace Ent
         }
     }
 
+    // For Entity and Object. Decide to setInstanceOf or not depending on \b _copyMode
+    template <typename T>
+    void applyInstanceOfField(T const& _source, T& _dest, Ent::CopyMode _copyMode)
+    {
+        if (_source.getInstanceOfValue().get() != _dest.getInstanceOfValue().get())
+        {
+            _dest.setInstanceOf(_source.getInstanceOfValue().get().c_str());
+        }
+        else if (_copyMode == CopyMode::CopyOverride)
+        {
+            if (_source.getInstanceOfValue().isSet() and not _dest.getInstanceOfValue().isSet())
+            {
+                _dest.setInstanceOf(_source.getInstanceOfValue().get().c_str());
+            }
+        }
+    }
+
     void Ent::Object::applyAllValues(Object& _dest, CopyMode _copyMode) const
     {
-        ENTLIB_ASSERT(instanceOf.hasOverride == _dest.instanceOf.hasOverride);
-        ENTLIB_ASSERT(
-            not instanceOf.hasOverride or instanceOf.overrideValue == _dest.instanceOf.overrideValue);
-
+        applyInstanceOfField(*this, _dest, _copyMode);
         for (size_t i = 0; i < nodes.size(); ++i)
         {
             nodes[i].second->applyAllValues(*_dest.nodes[i].second, _copyMode);
@@ -207,6 +221,50 @@ namespace Ent
             return strcmp(a.first, b.first) < 0;
         }
     };
+
+    Ent::Object Ent::Object::makeInstanceOf() const
+    {
+        Object out(schema);
+        out.instanceOf = instanceOf.makeInstanceOf();
+        out.nodes.reserve(size());
+        for (auto&& name_node : *this)
+        {
+            out.nodes.emplace_back(std::get<0>(name_node), std::get<1>(name_node)->makeInstanceOf());
+        }
+        std::sort(begin(out), end(out), CompObject());
+        return out;
+    }
+
+    Object Ent::Object::detach() const
+    {
+        Object out(schema);
+        out.nodes.reserve(size());
+        for (auto&& name_node : *this)
+        {
+            out.nodes.emplace_back(std::get<0>(name_node), std::get<1>(name_node)->detach());
+        }
+        std::sort(begin(out), end(out), CompObject());
+        return out;
+    }
+
+    void Ent::Object::setInstanceOf(char const* _prefabNodePath)
+    {
+        auto const* entlib = schema->rootSchema->entityLib;
+        if (_prefabNodePath == nullptr or strlen(_prefabNodePath) == 0)
+        {
+            Node prefabNode = entlib->loadNode(*schema, json{}, nullptr);
+            (*this) = prefabNode.GetRawValue().get<Object>().makeInstanceOf();
+            instanceOf.set("");
+        }
+        else
+        {
+            auto relPath = entlib->getRelativePath(_prefabNodePath).generic_u8string();
+            json nodeData = loadJsonFile(entlib->rawdataPath, _prefabNodePath);
+            Node prefabNode = entlib->loadNode(*schema, nodeData, nullptr);
+            (*this) = prefabNode.GetRawValue().get<Object>().makeInstanceOf();
+            instanceOf.set(relPath);
+        }
+    }
 
     size_t count(Object const& obj, char const* key)
     {
@@ -556,14 +614,7 @@ namespace Ent
 
         Node operator()(Object const& _obj) const
         {
-            Object out;
-            out.nodes.reserve(_obj.size());
-            for (auto&& name_node : _obj)
-            {
-                out.nodes.emplace_back(std::get<0>(name_node), std::get<1>(name_node)->detach());
-            }
-            std::sort(begin(out), end(out), CompObject());
-            return Node(std::move(out), schema);
+            return Node(_obj.detach(), schema);
         }
 
         Node operator()(Union const& _un) const
@@ -605,16 +656,7 @@ namespace Ent
 
         Node operator()(Object const& _obj) const
         {
-            Object out;
-            out.instanceOf = _obj.instanceOf.makeInstanceOf();
-            out.nodes.reserve(_obj.size());
-            for (auto&& name_node : _obj)
-            {
-                out.nodes.emplace_back(
-                    std::get<0>(name_node), std::get<1>(name_node)->makeInstanceOf());
-            }
-            std::sort(begin(out), end(out), CompObject());
-            return Node(std::move(out), schema);
+            return Node(_obj.makeInstanceOf(), schema);
         }
 
         Node operator()(Union const& _un) const
@@ -2134,7 +2176,7 @@ Ent::Node Ent::EntityLib::loadNode(
     break;
     case Ent::DataType::object:
     {
-        Ent::Object object;
+        Ent::Object object(&_nodeSchema);
         // Read the InstanceOf field
         Ent::Node prefabNode;
         auto InstanceOfIter = _data.find("InstanceOf");
@@ -3244,6 +3286,7 @@ void Ent::Entity::applyToPrefab()
         throw ContextException("This entity has no prefab");
     }
     auto prefab = entlib->loadEntity(prefabPath);
+    // When the value is overrided is the source, we want to make it overrided in the dest => CopyOverride
     applyAllValuesButPrefab(*prefab, CopyMode::CopyOverride);
     setInstanceOf(prefabPath);
     entlib->saveEntity(*prefab, prefabPath);
@@ -3251,14 +3294,7 @@ void Ent::Entity::applyToPrefab()
 
 void Ent::Entity::applyAllValues(Entity& _dest, CopyMode _copyMode) const
 {
-    if (instanceOf.isSet()) // 'this' has an InstanceOf
-    {
-        if (_dest.getInstanceOf() == nullptr
-            or strcmp(_dest.getInstanceOf(), getInstanceOf()) != 0) // Not the same InstanceOf
-        {
-            _dest.setInstanceOf(getInstanceOf());
-        }
-    }
+    applyInstanceOfField(*this, _dest, _copyMode);
     applyAllValuesButPrefab(_dest, _copyMode);
 }
 

@@ -63,6 +63,12 @@ namespace Ent
     /// Content of a Node which has type Ent::DataType::object
     struct Object
     {
+        Object(Subschema const* _schema)
+            : schema(_schema)
+        {
+        }
+
+        Subschema const* schema{};
         std::vector<std::pair<char const*, value_ptr<Node>>> nodes;
         Override<Ent::String> instanceOf;
 
@@ -77,7 +83,14 @@ namespace Ent
         }
 
         void unset();
+        void setInstanceOf(char const* _prefabNodePath);
+        Object makeInstanceOf() const;
+        Object detach() const;
         void applyAllValues(Object& _dest, CopyMode _copyMode) const;
+        Override<String> const& getInstanceOfValue() const
+        {
+            return instanceOf;
+        }
     };
 
     inline auto begin(Object const& obj)
@@ -138,6 +151,11 @@ namespace Ent
         bool operator==(EntityRef const& _rho) const
         {
             return entityPath == _rho.entityPath;
+        }
+
+        bool operator!=(EntityRef const& _rho) const
+        {
+            return !(*this == _rho);
         }
     };
 

@@ -459,6 +459,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("make_entityref", &Entity::makeEntityRef)
         .def("set_instance_of", &Entity::resetInstanceOf)
         .def("reset_instance_of", &Entity::resetInstanceOf)
+        .def("change_instance_of", &Entity::changeInstanceOf)
         .def("resolve_entityref", (Entity* (Entity::*)(const EntityRef&))&Entity::resolveEntityRef, py::return_value_policy::reference_internal)
         .def("detach_entity_from_prefab", [](Entity* ent) {
             return ent->detachEntityFromPrefab().release();

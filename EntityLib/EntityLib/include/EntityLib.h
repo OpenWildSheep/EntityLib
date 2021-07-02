@@ -659,6 +659,12 @@ namespace Ent
         /// @warning All Nodes into the Entity will be invalidated
         void resetInstanceOf(char const* _prefab);
 
+        /// @brief Change this Entity to be an instance of the given \b _newPrefab, keeping
+        /// all internal values the same.
+        /// A detached version of the entity will be identical before and after a call to this method.
+        /// @param _newPrefab the new prefab path
+        void changeInstanceOf(char const* _newPrefab);
+
         nlohmann::json saveEntity() const;
 
         /// Take all values set in \b this, set them into the prefab entity, and save the prefab

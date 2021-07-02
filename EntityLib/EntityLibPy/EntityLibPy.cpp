@@ -168,6 +168,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pyActivationLevel = py::enum_<ActivationLevel>(ent, "ActivationLevel");
     auto pyOverrideValueSource = py::enum_<OverrideValueSource>(ent, "OverrideValueSource");
     auto pyOverrideValueLocation = py::enum_<OverrideValueLocation>(ent, "OverrideValueLocation");
+    auto pyCopyMode = py::enum_<CopyMode>(ent, "CopyMode");
     auto pyPath = py::class_<std::filesystem::path>(ent, "path");
     auto pyEntString = py::class_<Ent::String>(ent, "String");
     auto pySubschema = py::class_<Subschema>(ent, "Subschema");
@@ -208,6 +209,11 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .value("Default", OverrideValueLocation::Default)
         .value("Prefab", OverrideValueLocation::Prefab)
         .value("Override", OverrideValueLocation::Override)
+        .export_values();
+
+    pyCopyMode
+        .value("CopyOverride", CopyMode::CopyOverride)
+        .value("MinimalOverride", CopyMode::MinimalOverride)
         .export_values();
 
     pyPath
@@ -454,6 +460,18 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("resolve_entityref", (Entity* (Entity::*)(const EntityRef&))&Entity::resolveEntityRef, py::return_value_policy::reference_internal)
         .def("detach_entity_from_prefab", [](Entity* ent) {
             return ent->detachEntityFromPrefab().release();
+        })
+        .def("clone", [](Entity* ent) {
+            return ent->clone().release();
+        })
+        .def("apply_to_prefab", [](Entity& ent) {
+            ent.applyToPrefab();
+        })
+        .def("apply_all_values", [](Entity& ent, Entity& dest, CopyMode copyMode) {
+            ent.applyAllValues(dest, copyMode);
+        })
+        .def("apply_all_values_but_prefab", [](Entity& ent, Entity& dest, CopyMode copyMode) {
+            ent.applyAllValuesButPrefab(dest, copyMode);
         })
         .def("dumps", [](Entity* entity)
              {

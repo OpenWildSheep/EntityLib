@@ -3243,14 +3243,14 @@ void Ent::Entity::applyToPrefab()
         throw ContextException("This entity has no prefab");
     }
     auto prefab = entlib->loadEntity(prefabPath);
-    applyAllValues(*prefab, true);
+    applyAllValuesButPrefab(*prefab);
     setInstanceOf(prefabPath);
     entlib->saveEntity(*prefab, prefabPath);
 }
 
-void Ent::Entity::applyAllValues(Entity& _dest, bool keepDestPrefab) const
+void Ent::Entity::applyAllValues(Entity& _dest) const
 {
-    if (not keepDestPrefab and instanceOf.isSet()) // 'this' has an InstanceOf
+    if (instanceOf.isSet()) // 'this' has an InstanceOf
     {
         if (_dest.getInstanceOf() == nullptr
             or strcmp(_dest.getInstanceOf(), getInstanceOf()) != 0) // Not the same InstanceOf
@@ -3258,7 +3258,11 @@ void Ent::Entity::applyAllValues(Entity& _dest, bool keepDestPrefab) const
             _dest.setInstanceOf(getInstanceOf());
         }
     }
+    applyAllValuesButPrefab(_dest);
+}
 
+void Ent::Entity::applyAllValuesButPrefab(Entity& _dest) const
+{
     name.applyAllValues(_dest.name);
     thumbnail.applyAllValues(_dest.thumbnail);
     maxActivationLevel.applyAllValues(_dest.maxActivationLevel);

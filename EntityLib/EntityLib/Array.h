@@ -89,7 +89,7 @@ namespace Ent
         /// @pre not hasKey()
         Node* arrayInitPush(Node _node);
 
-        void applyAllValues(Array& _dest) const;
+        void applyAllValues(Array& _dest, CopyMode _copyMode) const;
 
     private:
         void checkInvariants() const;

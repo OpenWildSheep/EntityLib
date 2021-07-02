@@ -499,7 +499,7 @@ void Ent::Map::unset()
     }
 }
 
-void Ent::Map::applyAllValues(Map& _dest) const
+void Ent::Map::applyAllValues(Map& _dest, CopyMode _copyMode) const
 {
     for (auto& key_idx : m_itemMap)
     {
@@ -512,14 +512,14 @@ void Ent::Map::applyAllValues(Map& _dest) const
             if (elt.isPresent.get())
             {
                 auto* newPrefabNode = _dest.insert(key);
-                elt.node->applyAllValues(*newPrefabNode);
+                elt.node->applyAllValues(*newPrefabNode, _copyMode);
             }
         }
         else
         {
             Element& prefabElt = _dest.m_items[prefabIter->second];
-            elt.node->applyAllValues(*prefabElt.node);
-            elt.isPresent.applyAllValues(prefabElt.isPresent);
+            elt.node->applyAllValues(*prefabElt.node, _copyMode);
+            elt.isPresent.applyAllValues(prefabElt.isPresent, _copyMode);
         }
     }
 }

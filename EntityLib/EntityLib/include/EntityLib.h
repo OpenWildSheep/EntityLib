@@ -77,7 +77,7 @@ namespace Ent
         }
 
         void unset();
-        void applyAllValues(Object& _dest) const;
+        void applyAllValues(Object& _dest, CopyMode _copyMode) const;
     };
 
     inline auto begin(Object const& obj)
@@ -127,7 +127,7 @@ namespace Ent
 
         void unset();
 
-        void applyAllValues(Union& _dest) const;
+        void applyAllValues(Union& _dest, CopyMode _copyMode) const;
     };
 
     struct EntityRef
@@ -348,7 +348,7 @@ namespace Ent
         EntityLib* getEntityLib() const;
 
         /// Take all values set in this and set them into \b _dest
-        void applyAllValues(Node& _dest) const;
+        void applyAllValues(Node& _dest, CopyMode _copyMode) const;
 
     private:
         void checkMap(char const* _calledMethod) const; ///< Throw exception if not a set/map
@@ -424,10 +424,10 @@ namespace Ent
 
         /// @brief Take all values set in this and set them into \b _dest
         /// @pre \b _dest has the same component type than \b this
-        void applyAllValues(Component& _dest) const
+        void applyAllValues(Component& _dest, CopyMode _copyMode) const
         {
             ENTLIB_ASSERT(type == _dest.type);
-            root.applyAllValues(_dest.root);
+            root.applyAllValues(_dest.root, _copyMode);
         }
     };
 
@@ -476,7 +476,7 @@ namespace Ent
         std::unique_ptr<Scene> detachEmbedded();
 
         /// @brief Take all values set in this and set them into \b _dest
-        void applyAllValues(SubSceneComponent& _dest) const;
+        void applyAllValues(SubSceneComponent& _dest, CopyMode _copyMode) const;
     };
 
     class EntityLib;
@@ -643,11 +643,11 @@ namespace Ent
         void applyToPrefab();
 
         /// @brief Take all values set in this and set them into \b _dest
-        void applyAllValues(Entity& _dest) const;
+        void applyAllValues(Entity& _dest, CopyMode _copyMode) const;
 
         /// @brief Take all values set in this and set them into \b _dest
         ///   BUT do not change the prefab of _dest
-        void applyAllValuesButPrefab(Entity& _dest) const;
+        void applyAllValuesButPrefab(Entity& _dest, CopyMode _copyMode) const;
 
     private:
         void updateSubSceneOwner();
@@ -732,7 +732,7 @@ namespace Ent
         }
 
         /// @brief Take all values set in this and set them into \b _dest
-        void applyAllValues(Scene& _dest) const;
+        void applyAllValues(Scene& _dest, CopyMode _copyMode) const;
 
     private:
         void updateChildrenContext();

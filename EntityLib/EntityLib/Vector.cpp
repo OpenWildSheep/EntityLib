@@ -189,7 +189,7 @@ void Ent::Vector::unset()
     m_data.resize(m_arraySize.get());
 }
 
-void Ent::Vector::applyAllValues(Vector& _dest) const
+void Ent::Vector::applyAllValues(Vector& _dest, CopyMode _copyMode) const
 {
     auto const minSize = std::min(size(), _dest.size());
     while (_dest.size() > size())
@@ -202,7 +202,7 @@ void Ent::Vector::applyAllValues(Vector& _dest) const
     }
     for (size_t i = 0; i < minSize; ++i)
     {
-        m_data[i]->applyAllValues(*_dest.m_data[i]);
+        m_data[i]->applyAllValues(*_dest.m_data[i], _copyMode);
     }
-    m_arraySize.applyAllValues(_dest.m_arraySize);
+    m_arraySize.applyAllValues(_dest.m_arraySize, _copyMode);
 }

@@ -201,12 +201,12 @@ Ent::Node* Ent::Array::arrayInitPush(Node _node)
     return m_data.get<Vector>().initPush(std::move(_node));
 }
 
-void Ent::Array::applyAllValues(Array& _dest) const
+void Ent::Array::applyAllValues(Array& _dest, CopyMode _copyMode) const
 {
     apply_visitor(
-        [pref = &_dest](auto&& a) {
+        [pref = &_dest, _copyMode](auto&& a) {
             using PrefabType = std::remove_cv_t<std::remove_reference_t<decltype(a)>>;
-            a.applyAllValues(pref->m_data.get<PrefabType>());
+            a.applyAllValues(pref->m_data.get<PrefabType>(), _copyMode);
         },
         m_data);
 }

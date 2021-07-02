@@ -723,7 +723,7 @@ try
         auto prefabPath = ent->getInstanceOf();
         auto prefab = entlib.loadEntity(prefabPath);
         auto prefabOfPrefab = prefab->getInstanceOf();
-        ent->applyAllValuesButPrefab(*prefab);
+        ent->applyAllValuesButPrefab(*prefab, Ent::CopyMode::CopyOverride);
         ENTLIB_ASSERT(prefabOfPrefab == prefab->getInstanceOf());
         entlib.saveEntity(*prefab, "prefab_updated.entity");
         ent->setInstanceOf(prefabPath);

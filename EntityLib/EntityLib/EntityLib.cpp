@@ -167,13 +167,13 @@ namespace Ent
         std::tie(subTypeSchema, typeIndex) = schema->getUnionTypeWrapper(getUnionType());
     }
 
-    void Union::applyAllValues(Union& _dest) const
+    void Union::applyAllValues(Union& _dest, CopyMode _copyMode) const
     {
         if (typeIndex != _dest.typeIndex)
         {
             _dest.setUnionType(*wrapper->getEntityLib(), getUnionType());
         }
-        wrapper->applyAllValues(*_dest.wrapper);
+        wrapper->applyAllValues(*_dest.wrapper, _copyMode);
     }
 
     // ************************************* Object ***********************************************
@@ -186,7 +186,7 @@ namespace Ent
         }
     }
 
-    void Ent::Object::applyAllValues(Object& _dest) const
+    void Ent::Object::applyAllValues(Object& _dest, CopyMode _copyMode) const
     {
         ENTLIB_ASSERT(instanceOf.hasOverride == _dest.instanceOf.hasOverride);
         ENTLIB_ASSERT(
@@ -194,7 +194,7 @@ namespace Ent
 
         for (size_t i = 0; i < nodes.size(); ++i)
         {
-            nodes[i].second->applyAllValues(*_dest.nodes[i].second);
+            nodes[i].second->applyAllValues(*_dest.nodes[i].second, _copyMode);
         }
     }
 
@@ -1166,11 +1166,12 @@ namespace Ent
     struct ApplyToPrefab
     {
         Node::Value& dest;
+        CopyMode copyMode;
 
         template <typename T>
-        auto operator()(T const& _value) const -> decltype(_value.applyAllValues(dest.get<T>()))
+        void operator()(T const& _value) const
         {
-            _value.applyAllValues(dest.get<T>());
+            _value.applyAllValues(dest.get<T>(), copyMode);
         }
 
         void operator()(Null const&) const
@@ -1178,7 +1179,7 @@ namespace Ent
         }
     };
 
-    void Ent::Node::applyAllValues(Node& _dest) const
+    void Ent::Node::applyAllValues(Node& _dest, CopyMode _copyMode) const
     {
         if (value.is<Object>())
         {
@@ -1195,7 +1196,7 @@ namespace Ent
         }
 
         ENTLIB_ASSERT(schema == _dest.schema);
-        mapbox::util::apply_visitor(ApplyToPrefab{_dest.value}, value);
+        mapbox::util::apply_visitor(ApplyToPrefab{_dest.value, _copyMode}, value);
     }
 
     void destroyAndFree(Node* ptr)
@@ -1847,7 +1848,7 @@ namespace Ent
         ownerEntity = entity;
     }
 
-    void Scene::applyAllValues(Scene& _dest) const
+    void Scene::applyAllValues(Scene& _dest, CopyMode _copyMode) const
     {
         std::map<std::string, Entity*> thisMap;
         std::map<std::string, Entity*> destMap;
@@ -1870,7 +1871,7 @@ namespace Ent
             }
             else // Preserved Entity
             {
-                ent->applyAllValues(*destIter->second);
+                ent->applyAllValues(*destIter->second, _copyMode);
             }
         }
         for (auto&& name_ent : destMap)
@@ -3243,12 +3244,12 @@ void Ent::Entity::applyToPrefab()
         throw ContextException("This entity has no prefab");
     }
     auto prefab = entlib->loadEntity(prefabPath);
-    applyAllValuesButPrefab(*prefab);
+    applyAllValuesButPrefab(*prefab, CopyMode::CopyOverride);
     setInstanceOf(prefabPath);
     entlib->saveEntity(*prefab, prefabPath);
 }
 
-void Ent::Entity::applyAllValues(Entity& _dest) const
+void Ent::Entity::applyAllValues(Entity& _dest, CopyMode _copyMode) const
 {
     if (instanceOf.isSet()) // 'this' has an InstanceOf
     {
@@ -3258,23 +3259,23 @@ void Ent::Entity::applyAllValues(Entity& _dest) const
             _dest.setInstanceOf(getInstanceOf());
         }
     }
-    applyAllValuesButPrefab(_dest);
+    applyAllValuesButPrefab(_dest, _copyMode);
 }
 
-void Ent::Entity::applyAllValuesButPrefab(Entity& _dest) const
+void Ent::Entity::applyAllValuesButPrefab(Entity& _dest, CopyMode _copyMode) const
 {
-    name.applyAllValues(_dest.name);
-    thumbnail.applyAllValues(_dest.thumbnail);
-    maxActivationLevel.applyAllValues(_dest.maxActivationLevel);
-    actorStates.applyAllValues(_dest.actorStates);
-    color.applyAllValues(_dest.color);
+    name.applyAllValues(_dest.name, _copyMode);
+    thumbnail.applyAllValues(_dest.thumbnail, _copyMode);
+    maxActivationLevel.applyAllValues(_dest.maxActivationLevel, _copyMode);
+    actorStates.applyAllValues(_dest.actorStates, _copyMode);
+    color.applyAllValues(_dest.color, _copyMode);
 
     for (auto&& name_comp : getComponents())
     {
         auto&& cmpName = name_comp.first;
         auto&& comp = name_comp.second;
         // addComponent has no effect if the component exist
-        comp.applyAllValues(*_dest.addComponent(cmpName.c_str()));
+        comp.applyAllValues(*_dest.addComponent(cmpName.c_str()), _copyMode);
     }
     std::vector<char const*> compToRemove;
     for (auto&& name_comp : _dest.getComponents())
@@ -3288,7 +3289,7 @@ void Ent::Entity::applyAllValuesButPrefab(Entity& _dest) const
     if (auto subScene = getSubSceneComponent())
     {
         // addSubSceneComponent has no effect if the component exist
-        subScene->applyAllValues(*_dest.addSubSceneComponent());
+        subScene->applyAllValues(*_dest.addSubSceneComponent(), _copyMode);
     }
     else if (auto destSubScene = _dest.getSubSceneComponent()) // Removed component
     {
@@ -3552,11 +3553,11 @@ std::unique_ptr<Ent::Scene> Ent::SubSceneComponent::detachEmbedded()
     return {};
 }
 
-void Ent::SubSceneComponent::applyAllValues(SubSceneComponent& _dest) const
+void Ent::SubSceneComponent::applyAllValues(SubSceneComponent& _dest, CopyMode _copyMode) const
 {
     if (embedded != nullptr and _dest.embedded != nullptr)
     {
-        embedded->applyAllValues(*_dest.embedded);
+        embedded->applyAllValues(*_dest.embedded, _copyMode);
     }
 }
 

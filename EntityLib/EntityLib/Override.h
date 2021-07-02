@@ -19,6 +19,12 @@ namespace Ent
         Override
     };
 
+    enum class CopyMode
+    {
+        CopyOverride, ///< Always override in dest when there is override in source
+        MinimalOverride ///< Do not override when values are identicals
+    };
+
     template <typename V>
     struct Override
     {
@@ -131,17 +137,24 @@ namespace Ent
             return hasPrefab ? prefabValue : defaultValue;
         }
 
-        void applyAllValues(Override& _dest) const
+        void applyAllValues(Override& _dest, CopyMode _copyMode) const
         {
-            if (!isSet() && !_dest.isSet()) // Both are unSet => Set only if needed
+            switch (_copyMode)
             {
-                if (!(_dest.get() == get()))
+            case CopyMode::CopyOverride:
+                if (isSet())
                 {
                     _dest.set(get());
                 }
+                else if (!(get() == _dest.get()))
+                    _dest.set(get());
+                break;
+            case CopyMode::MinimalOverride:
+                _dest.unset();
+                if (!(get() == _dest.get()))
+                    _dest.set(get());
+                break;
             }
-            else
-                _dest.set(get());
         }
 
     public:

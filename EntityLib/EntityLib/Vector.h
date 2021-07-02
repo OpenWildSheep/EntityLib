@@ -48,7 +48,7 @@ namespace Ent
         tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         void unset();
         void setSize(Override<size_t> _size);
-        void applyAllValues(Vector& _dest) const;
+        void applyAllValues(Vector& _dest, CopyMode _copyMode) const;
 
     private:
         EntityLib const* m_entlib = nullptr;

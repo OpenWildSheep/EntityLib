@@ -67,7 +67,7 @@ namespace Ent
         static KeyType getChildKey(Subschema const* _schema, Ent::Node const* _child);
         static DataType getKeyType(Subschema const* _schema);
         void unset();
-        void applyAllValues(Map& _dest) const;
+        void applyAllValues(Map& _dest, CopyMode _copyMode) const;
 
     private:
         EntityLib const* m_entlib = nullptr;

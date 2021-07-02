@@ -1892,40 +1892,25 @@ namespace Ent
 
     void Scene::applyAllValues(Scene& _dest, CopyMode _copyMode) const
     {
-        std::map<std::string, Entity*> thisMap;
         std::map<std::string, Entity*> destMap;
-        for (auto&& obj : objects)
-        {
-            thisMap.emplace(obj->getName(), obj.get());
-        }
         for (auto&& obj : _dest.objects)
         {
             destMap.emplace(obj->getName(), obj.get());
         }
-        for (auto&& name_ent : thisMap)
+        for (auto&& ent : objects)
         {
-            auto&& name = name_ent.first;
-            auto&& ent = name_ent.second;
-            auto destIter = destMap.find(name);
-            if (destIter == destMap.end()) // Entity just added
+            auto destIter = destMap.find(ent->getName());
+            if (destIter != destMap.end()) // Preserved Entity
+            {
+                ent->applyAllValues(*destIter->second, _copyMode);
+                destMap.erase(destIter);
+            }
+            else // Entity just added
             {
                 _dest.addEntity(ent->clone());
             }
-            else // Preserved Entity
-            {
-                ent->applyAllValues(*destIter->second, _copyMode);
-            }
         }
-        for (auto&& name_ent : destMap)
-        {
-            auto&& name = name_ent.first;
-            auto thisIter = thisMap.find(name);
-            if (thisIter == thisMap.end()) // Entity just removed
-            {
-                // TODO : Loïc - Mark this entity removed (when this feature is developed)
-                ENTLIB_ASSERT(false && "Can't handle removed entity for now");
-            }
-        }
+        ENTLIB_ASSERT_MSG(destMap.empty(), "Can't handle removed entities for now");
     }
 
     void Scene::updateChildrenContext()

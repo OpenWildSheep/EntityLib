@@ -3273,7 +3273,7 @@ void Ent::Entity::applyToPrefab()
     auto prefab = entlib->loadEntity(prefabPath);
     // When the value is overrided is the source, we want to make it overrided in the dest => CopyOverride
     applyAllValuesButPrefab(*prefab, CopyMode::CopyOverride);
-    setInstanceOf(prefabPath);
+    setInstanceOf(prefabPath); // Reset 'this' to a vanilla instance of prefab
     entlib->saveEntity(*prefab, prefabPath);
 }
 

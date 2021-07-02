@@ -190,15 +190,16 @@ namespace Ent
     template <typename T>
     void applyInstanceOfField(T const& _source, T& _dest, Ent::CopyMode _copyMode)
     {
+        auto sourcePrefabPath = _source.getInstanceOfValue().get().c_str();
         if (_source.getInstanceOfValue().get() != _dest.getInstanceOfValue().get())
         {
-            _dest.setInstanceOf(_source.getInstanceOfValue().get().c_str());
+            _dest.setInstanceOf(sourcePrefabPath == nullptr ? "" : sourcePrefabPath);
         }
         else if (_copyMode == CopyMode::CopyOverride)
         {
             if (_source.getInstanceOfValue().isSet() and not _dest.getInstanceOfValue().isSet())
             {
-                _dest.setInstanceOf(_source.getInstanceOfValue().get().c_str());
+                _dest.setInstanceOf(sourcePrefabPath == nullptr ? "" : sourcePrefabPath);
             }
         }
     }

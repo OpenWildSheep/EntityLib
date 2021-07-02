@@ -1576,9 +1576,17 @@ namespace Ent
 
     void Entity::setInstanceOf(std::string const& _prefab)
     {
-        std::string const prefab = entlib->getRelativePath(_prefab).generic_u8string();
-        char const* normTmpl = prefab.c_str();
-        std::shared_ptr<Ent::Entity const> templ = entlib->loadEntityReadOnly(normTmpl, nullptr);
+        std::shared_ptr<Ent::Entity const> templ;
+        std::string prefab;
+        if (_prefab.empty())
+        {
+            templ = std::make_shared<Ent::Entity const>(*entlib);
+        }
+        else
+        {
+            prefab = entlib->getRelativePath(_prefab).generic_u8string();
+            templ = entlib->loadEntityReadOnly(prefab.c_str(), nullptr);
+        }
         components.clear();
         removedComponents.clear();
         for (auto const& type_comp : templ->getComponents())
@@ -1603,7 +1611,7 @@ namespace Ent
         actorStates = templ->getActorStates().makeInstanceOf();
         color = templ->getColorValue().makeInstanceOf();
         thumbnail = templ->getThumbnailValue().makeInstanceOf();
-        instanceOf = templ->getInstanceOfValue().makeOverridedInstanceOf(normTmpl);
+        instanceOf = templ->getInstanceOfValue().makeOverridedInstanceOf(prefab.c_str());
         maxActivationLevel = templ->getMaxActivationLevelValue().makeInstanceOf();
 
         updateSubSceneOwner();

@@ -248,6 +248,11 @@ Ent::Node const* Ent::Map::get(KeyType const& _key) const
         return element.node.get();
 }
 
+Ent::Node* Ent::Map::get(KeyType const& _key)
+{
+    return const_cast<Ent::Node*>(std::as_const(*this).get(_key));
+}
+
 Ent::Node* Ent::Map::insert(KeyType const& _key)
 {
     auto iter = m_itemMap.find(_key);
@@ -501,25 +506,23 @@ void Ent::Map::unset()
 
 void Ent::Map::applyAllValues(Map& _dest, CopyMode _copyMode) const
 {
-    for (auto& key_idx : m_itemMap)
+    std::set<KeyType> removedDestKeys;
+    for (auto& destNode : _dest.getItems())
     {
-        auto&& key = std::get<0>(key_idx);
-        auto&& idx = std::get<1>(key_idx);
-        Element const& elt = m_items[idx];
-        auto prefabIter = _dest.m_itemMap.find(key);
-        if (prefabIter == _dest.m_itemMap.end())
-        {
-            if (elt.isPresent.get())
-            {
-                auto* newPrefabNode = _dest.insert(key);
-                elt.node->applyAllValues(*newPrefabNode, _copyMode);
-            }
-        }
-        else
-        {
-            Element& prefabElt = _dest.m_items[prefabIter->second];
-            elt.node->applyAllValues(*prefabElt.node, _copyMode);
-            elt.isPresent.applyAllValues(prefabElt.isPresent, _copyMode);
-        }
+        auto&& key = getChildKey(m_schema, destNode);
+        removedDestKeys.insert(key);
+    }
+
+    for (auto& sourceNode : getItems())
+    {
+        auto&& key = getChildKey(m_schema, sourceNode);
+        Node* destNode2 = _dest.insert(key); // 'insert' only get if the item exist
+        sourceNode->applyAllValues(*destNode2, _copyMode);
+        removedDestKeys.erase(key);
+    }
+
+    for (auto const& removedDestKey : removedDestKeys)
+    {
+        _dest.erase(removedDestKey);
     }
 }

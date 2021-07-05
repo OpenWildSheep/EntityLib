@@ -63,6 +63,12 @@ namespace Ent
     /// Content of a Node which has type Ent::DataType::object
     struct Object
     {
+        Object(Subschema const* _schema)
+            : schema(_schema)
+        {
+        }
+
+        Subschema const* schema{};
         std::vector<std::pair<char const*, value_ptr<Node>>> nodes;
         Override<Ent::String> instanceOf;
 
@@ -77,6 +83,14 @@ namespace Ent
         }
 
         void unset();
+        void resetInstanceOf(char const* _prefabNodePath);
+        Object makeInstanceOf() const;
+        Object detach() const;
+        void applyAllValues(Object& _dest, CopyMode _copyMode) const;
+        Override<String> const& getInstanceOfValue() const
+        {
+            return instanceOf;
+        }
     };
 
     inline auto begin(Object const& obj)
@@ -125,12 +139,24 @@ namespace Ent
         void computeMemory(MemoryProfiler& prof) const;
 
         void unset();
+
+        void applyAllValues(Union& _dest, CopyMode _copyMode) const;
     };
 
     struct EntityRef
     {
         /// @brief string representation of this entity ref, works like a file path, always relative.
         String entityPath;
+
+        bool operator==(EntityRef const& _rho) const
+        {
+            return entityPath == _rho.entityPath;
+        }
+
+        bool operator!=(EntityRef const& _rho) const
+        {
+            return !(*this == _rho);
+        }
     };
 
     /// @brief The possible source of an Override value
@@ -280,11 +306,13 @@ namespace Ent
         Node makeInstanceOf() const;
         /// \endcond
 
+        /// @remark obsolete. Use resetInstanceOf
+        void setInstanceOf(char const* _prefabNodePath);
         /// Reset the Node to be an instance of the given \b _prefabNodePath
         ///
         /// @warning All sub-nodes into \b _node will be invalidated
         /// @param _prefabNodePath path to the prefab Node (relative to RawData)
-        void setInstanceOf(char const* _prefabNodePath);
+        void resetInstanceOf(char const* _prefabNodePath);
         void resetInstanceOf();
 
         bool hasDefaultValue() const; ///< false if something was set in instance or prefab
@@ -338,6 +366,9 @@ namespace Ent
         void computeMemory(MemoryProfiler& prof) const;
 
         EntityLib* getEntityLib() const;
+
+        /// Take all values set in this and set them into \b _dest
+        void applyAllValues(Node& _dest, CopyMode _copyMode) const;
 
     private:
         void checkMap(char const* _calledMethod) const; ///< Throw exception if not a set/map
@@ -410,6 +441,14 @@ namespace Ent
         {
             return root.getSchema() && root.getSchema()->IsEditorOnly();
         }
+
+        /// @brief Take all values set in this and set them into \b _dest
+        /// @pre \b _dest has the same component type than \b this
+        void applyAllValues(Component& _dest, CopyMode _copyMode) const
+        {
+            ENTLIB_ASSERT(type == _dest.type);
+            root.applyAllValues(_dest.root, _copyMode);
+        }
     };
 
     struct Scene;
@@ -455,6 +494,9 @@ namespace Ent
         /// @brief detach the Scene from this sub scene components, leaving the embedded sub scene empty
         /// @pre this SubScene is embedded, i.e. isEmbedded is true
         std::unique_ptr<Scene> detachEmbedded();
+
+        /// @brief Take all values set in this and set them into \b _dest
+        void applyAllValues(SubSceneComponent& _dest, CopyMode _copyMode) const;
     };
 
     class EntityLib;
@@ -610,12 +652,30 @@ namespace Ent
             maxActivationLevel.computeMemory(prof);
         }
 
+        /// @remark obsolete. Use resetInstanceOf
+        void setInstanceOf(std::string const& _prefab);
         /// Reset the Entity to be an instance of the given \b _prefab
         ///
         /// @warning All Nodes into the Entity will be invalidated
-        void setInstanceOf(std::string const& _prefab);
+        void resetInstanceOf(char const* _prefab);
+
+        /// @brief Change this Entity to be an instance of the given \b _newPrefab, keeping
+        /// all internal values the same.
+        /// A detached version of the entity will be identical before and after a call to this method.
+        /// @param _newPrefab the new prefab path
+        void changeInstanceOf(char const* _newPrefab);
 
         nlohmann::json saveEntity() const;
+
+        /// Take all values set in \b this, set them into the prefab entity, and save the prefab
+        void applyToPrefab();
+
+        /// @brief Take all values set in this and set them into \b _dest
+        void applyAllValues(Entity& _dest, CopyMode _copyMode) const;
+
+        /// @brief Take all values set in this and set them into \b _dest
+        ///   BUT do not change the prefab of _dest
+        void applyAllValuesButPrefab(Entity& _dest, CopyMode _copyMode) const;
 
     private:
         void updateSubSceneOwner();
@@ -694,12 +754,18 @@ namespace Ent
         {
             prof.addMem("Scene::objects", objects.capacity() * sizeof(objects.front()));
             for (auto&& entityPtr : objects)
+            {
                 entityPtr->computeMemory(prof);
+            }
         }
 
+        /// @brief Take all values set in this and set them into \b _dest
+        void applyAllValues(Scene& _dest, CopyMode _copyMode) const;
+
     private:
-        Entity* ownerEntity = nullptr; ///< the entity owning this scene if it is embedded
         void updateChildrenContext();
+
+        Entity* ownerEntity = nullptr; ///< the entity owning this scene if it is embedded
         std::vector<std::unique_ptr<Entity>> objects; ///< All Ent::Entity of this Scene
     };
 
@@ -835,58 +901,6 @@ namespace Ent
     // *************************** Implem details - method bodies *********************************
 
     /// \cond PRIVATE
-    template <typename V>
-    V const& Override<V>::get() const
-    {
-        if (hasOverride)
-        {
-            return overrideValue;
-        }
-        if (hasPrefab)
-        {
-            return prefabValue;
-        }
-        return defaultValue;
-    }
-
-    template <typename V>
-    void Override<V>::set(V _newVal)
-    {
-        overrideValue = std::move(_newVal);
-        hasOverride = true;
-    }
-
-    template <typename V>
-    bool Override<V>::isSet() const
-    {
-        return hasOverride;
-    }
-
-    template <typename V>
-    void Override<V>::unset()
-    {
-        hasOverride = false;
-        overrideValue = {};
-    }
-
-    template <typename V>
-    Override<V> Override<V>::detach() const
-    {
-        if (hasOverride)
-            return Override<V>(defaultValue, V{}, overrideValue, false, hasOverride);
-        else
-            return Override<V>(defaultValue, V{}, prefabValue, false, hasPrefab);
-    }
-
-    template <typename V>
-    Override<V> Override<V>::makeInstanceOf() const
-    {
-        if (hasOverride)
-            return Override<V>(defaultValue, overrideValue, V{}, hasOverride, false);
-        else
-            return Override<V>(defaultValue, prefabValue, V{}, hasPrefab, false);
-    }
-
     struct Memory
     {
         MemoryProfiler* prof;

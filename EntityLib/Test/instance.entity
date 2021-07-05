@@ -62,6 +62,34 @@
             },
             "Type": "StickToTerrain",
             "Version": 1
+        }, {
+            "Data": {
+                "InstanceOf": "test.SeedPatch2.node",
+                "NoiseOffsetY" : 3
+            },
+            "Type": "SeedPatch",
+            "Version": 1
+        }, {
+            "Version": 1,
+            "Type": "SubScene",
+            "Data": {
+                "isEmbedded": true,
+                "File": "",
+                "Embedded": [{
+                        "Name": "EntityWithInstanceOf",
+                        "Color": [255, 120, 220, 255],
+                        "Components": [{
+                                "Version": 1,
+                                "Type": "NetworkLink",
+                                "Data": {
+                                    "Source": "instance"
+                                }
+                            }
+                        ],
+						"InstanceOf": "subentity2.entity"
+                    }
+                ]
+            }
         }
     ],
     "InstanceOf": "prefab.entity",

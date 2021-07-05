@@ -19,6 +19,12 @@ namespace Ent
         Override
     };
 
+    enum class CopyMode
+    {
+        CopyOverride, ///< Always override in dest when there is override in source
+        MinimalOverride ///< Do not override when values are identicals
+    };
+
     template <typename V>
     struct Override
     {
@@ -131,6 +137,27 @@ namespace Ent
             return hasPrefab ? prefabValue : defaultValue;
         }
 
+        void applyAllValues(Override& _dest, CopyMode _copyMode) const
+        {
+            switch (_copyMode)
+            {
+            case CopyMode::CopyOverride:
+                if (isSet())
+                { // Report the override when there is one
+                    _dest.set(get());
+                }
+                else if (get() != _dest.get())
+                    _dest.set(get()); // If no override, minimize modification in _dest
+                break;
+            case CopyMode::MinimalOverride:
+                // Try to set a minimum of values
+                _dest.unset();
+                if (get() != _dest.get())
+                    _dest.set(get());
+                break;
+            }
+        }
+
     public:
         V defaultValue{};
         V prefabValue{};
@@ -140,4 +167,55 @@ namespace Ent
         // DeleteCheck deleteCheck;
     };
 
+    template <typename V>
+    V const& Override<V>::get() const
+    {
+        if (hasOverride)
+        {
+            return overrideValue;
+        }
+        if (hasPrefab)
+        {
+            return prefabValue;
+        }
+        return defaultValue;
+    }
+
+    template <typename V>
+    void Override<V>::set(V _newVal)
+    {
+        overrideValue = std::move(_newVal);
+        hasOverride = true;
+    }
+
+    template <typename V>
+    bool Override<V>::isSet() const
+    {
+        return hasOverride;
+    }
+
+    template <typename V>
+    void Override<V>::unset()
+    {
+        hasOverride = false;
+        overrideValue = {};
+    }
+
+    template <typename V>
+    Override<V> Override<V>::detach() const
+    {
+        if (hasOverride)
+            return Override<V>(defaultValue, V{}, overrideValue, false, hasOverride);
+        else
+            return Override<V>(defaultValue, V{}, prefabValue, false, hasPrefab);
+    }
+
+    template <typename V>
+    Override<V> Override<V>::makeInstanceOf() const
+    {
+        if (hasOverride)
+            return Override<V>(defaultValue, overrideValue, V{}, hasOverride, false);
+        else
+            return Override<V>(defaultValue, prefabValue, V{}, hasPrefab, false);
+    }
 } // namespace Ent

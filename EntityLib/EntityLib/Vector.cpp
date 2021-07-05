@@ -188,3 +188,19 @@ void Ent::Vector::unset()
     m_arraySize.unset();
     m_data.resize(m_arraySize.get());
 }
+
+void Ent::Vector::applyAllValues(Vector& _dest, CopyMode _copyMode) const
+{
+    while (_dest.size() > size())
+    {
+        _dest.pop();
+    }
+    while (size() > _dest.size())
+    {
+        _dest.push();
+    }
+    for (size_t i = 0; i < size(); ++i)
+    {
+        m_data[i]->applyAllValues(*_dest.m_data[i], _copyMode);
+    }
+}

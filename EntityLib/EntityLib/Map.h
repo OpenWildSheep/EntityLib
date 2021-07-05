@@ -53,6 +53,7 @@ namespace Ent
 
         bool erase(KeyType const& _key);
         Node const* get(KeyType const& _key) const;
+        Node* get(KeyType const& _key);
         Ent::Node* insert(KeyType const& _key);
         bool isErased(KeyType const& _key) const;
         Ent::Node* insert(OverrideValueLocation _loc, KeyType _key, Node _node);
@@ -67,6 +68,7 @@ namespace Ent
         static KeyType getChildKey(Subschema const* _schema, Ent::Node const* _child);
         static DataType getKeyType(Subschema const* _schema);
         void unset();
+        void applyAllValues(Map& _dest, CopyMode _copyMode) const;
 
     private:
         EntityLib const* m_entlib = nullptr;

@@ -248,6 +248,11 @@ Ent::Node const* Ent::Map::get(KeyType const& _key) const
         return element.node.get();
 }
 
+Ent::Node* Ent::Map::get(KeyType const& _key)
+{
+    return const_cast<Ent::Node*>(std::as_const(*this).get(_key));
+}
+
 Ent::Node* Ent::Map::insert(KeyType const& _key)
 {
     auto iter = m_itemMap.find(_key);
@@ -496,5 +501,28 @@ void Ent::Map::unset()
     {
         elt.isPresent.unset();
         elt.node->unset();
+    }
+}
+
+void Ent::Map::applyAllValues(Map& _dest, CopyMode _copyMode) const
+{
+    std::set<KeyType> removedDestKeys;
+    for (auto& destNode : _dest.getItems())
+    {
+        auto&& key = getChildKey(m_schema, destNode);
+        removedDestKeys.insert(key);
+    }
+
+    for (auto& sourceNode : getItems())
+    {
+        auto&& key = getChildKey(m_schema, sourceNode);
+        Node* destNode2 = _dest.insert(key); // 'insert' only get if the item exist
+        sourceNode->applyAllValues(*destNode2, _copyMode);
+        removedDestKeys.erase(key);
+    }
+
+    for (auto const& removedDestKey : removedDestKeys)
+    {
+        _dest.erase(removedDestKey);
     }
 }

@@ -46,7 +46,7 @@ namespace Ent
         Subschema() = default;
         Subschema(Subschema const&) = delete;
         Subschema& operator=(Subschema const&) = delete;
-        Subschema(Subschema&&) = default;
+        Subschema(Subschema&&) noexcept = default;
         Subschema& operator=(Subschema&&) = default;
         DeleteCheck deleteCheck;
 

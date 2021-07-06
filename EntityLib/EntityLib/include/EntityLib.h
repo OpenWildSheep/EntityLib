@@ -837,7 +837,7 @@ namespace Ent
         std::unique_ptr<Scene> loadLegacyScene(std::filesystem::path const& _scenePath) const;
 
         /// Save the Entity at path _entityPath
-        void saveEntity(Entity const& _entity, std::filesystem::path const& _entityPath) const;
+        void saveEntity(Entity const& _entity, std::filesystem::path const& _relEntityPath) const;
 
         /// Save the Scene at path _scenePath
         void saveScene(Scene const& _scene, std::filesystem::path const& _scenePath) const;

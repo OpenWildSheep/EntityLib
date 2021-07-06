@@ -245,7 +245,9 @@ Ent::Node const* Ent::Map::get(KeyType const& _key) const
         return node->at(1llu);
     }
     else
+    {
         return element.node.get();
+    }
 }
 
 Ent::Node* Ent::Map::get(KeyType const& _key)
@@ -346,7 +348,6 @@ std::vector<Ent::Node const*> Ent::Map::getItems() const
     {
         for (auto const& key_index : m_itemMap)
         {
-            auto key = std::get<0>(key_index);
             auto index = std::get<1>(key_index);
             auto& elt = m_items[index];
             if (elt.isPresent.get())

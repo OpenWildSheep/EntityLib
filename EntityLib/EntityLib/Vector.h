@@ -6,7 +6,6 @@
 
 #pragma warning(push, 0)
 #pragma warning(disable : 4996)
-// #include "../external/optional.hpp"
 #include "../../../external/mapbox/variant.hpp"
 #pragma warning(pop)
 

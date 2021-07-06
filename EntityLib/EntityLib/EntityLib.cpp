@@ -958,7 +958,7 @@ namespace Ent
         {
             throw ContextException("Can't call 'getKeysString' if key is not string or entityRef");
         }
-        Array const& arr = value.get<Array>();
+        auto const& arr = value.get<Array>();
         auto const arrSize = arr.size();
         std::vector<String> keys;
         keys.reserve(arrSize);
@@ -977,7 +977,7 @@ namespace Ent
         {
             throw ContextException("Can't call 'getKeysInt' if key is not integer");
         }
-        Array const& arr = value.get<Array>();
+        auto const& arr = value.get<Array>();
         auto const arrSize = arr.size();
         std::vector<int64_t> keys;
         keys.reserve(arrSize);
@@ -2799,7 +2799,8 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     {
         instanceOf = _entNode.at("InstanceOf").get<std::string>();
         // Do not inherit from _superEntityFromParentEntity since the override of InstanceOf reset the Entity
-        superEntity = _entlib.loadEntityReadOnly(*instanceOf, nullptr).get();
+        auto superEntityShared = _entlib.loadEntityReadOnly(*instanceOf, nullptr);
+        superEntity = superEntityShared.get();
         ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
         std::filesystem::path instanceOfPath = *instanceOf;
         superIsInit = true;
@@ -2852,7 +2853,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
             _superEntityFromParentEntity != nullptr ? &_superEntityFromParentEntity->getColorValue() :
                                                       nullptr);
     }
-    else
+    else if (superEntity != nullptr)
     {
         ovColor = superEntity->getColorValue().makeInstanceOf();
     }

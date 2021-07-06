@@ -561,7 +561,7 @@ namespace Ent
         template <typename T>
         bool operator()(Override<T> const& _ov) const
         {
-            return (not _ov.hasPrefab) and (not _ov.hasOverride);
+            return (not _ov.hasPrefabValue()) and (not _ov.hasOverride());
         }
 
         bool operator()(Null const&) const
@@ -703,7 +703,7 @@ namespace Ent
 
         bool operator()(Object const& _obj) const
         {
-            if (_obj.instanceOf.hasOverride)
+            if (_obj.instanceOf.hasOverride())
             {
                 return true;
             }
@@ -735,7 +735,7 @@ namespace Ent
         template <typename T>
         bool operator()(Override<T> const& _ov) const
         {
-            return _ov.hasPrefab;
+            return _ov.hasPrefabValue();
         }
 
         bool operator()(Null const& _val) const
@@ -751,7 +751,7 @@ namespace Ent
 
         bool operator()(Object const& _obj) const
         {
-            if (_obj.instanceOf.hasPrefab)
+            if (_obj.instanceOf.hasPrefabValue())
             {
                 return true;
             }
@@ -995,7 +995,7 @@ namespace Ent
         template <typename T>
         bool operator()(Override<T> const& _ov) const
         {
-            return not _ov.hasPrefab and not _ov.hasOverride;
+            return not _ov.hasPrefabValue() and not _ov.hasOverride();
         }
 
         bool operator()(Null const& _val) const

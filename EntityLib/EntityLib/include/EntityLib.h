@@ -920,11 +920,11 @@ namespace Ent
     void Override<V>::computeMemory(MemoryProfiler& prof) const
     {
         Memory compute{&prof};
-        compute(defaultValue);
-        if (hasPrefab)
-            compute(prefabValue);
-        if (hasOverride)
-            compute(overrideValue);
+        compute(m_defaultValue);
+        if (hasPrefabValue())
+            compute(m_prefabValue);
+        if (hasOverride())
+            compute(m_overrideValue);
     }
 
     size_t count(Object const& obj, char const* key);

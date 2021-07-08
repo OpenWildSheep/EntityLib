@@ -46,7 +46,7 @@ namespace Ent
         Vector detach() const;
         Vector makeInstanceOf() const;
         tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
-
+        void unset();
         void setSize(Override<size_t> _size);
 
     private:

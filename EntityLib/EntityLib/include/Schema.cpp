@@ -5,38 +5,7 @@
 
 namespace Ent
 {
-    BadType::BadType(char const* _message)
-        : std::runtime_error(_message == nullptr ? "Bad node type" : _message)
-    {
-    }
-
-    BadArrayType::BadArrayType(char const* _message)
-        : std::runtime_error(_message == nullptr ? "Bad array type" : _message)
-    {
-    }
-
-    MissingMetadata::MissingMetadata(char const* _schemaName)
-        : std::runtime_error(std::string("Metadata missing : ") + _schemaName)
-    {
-    }
-
-    BadUnionType::BadUnionType(char const* _type)
-        : std::runtime_error(std::string("Bad union type : ") + _type)
-    {
-    }
-
-    IllFormedSchema::IllFormedSchema(char const* _message)
-        : std::runtime_error(std::string("Ill-formed schema : ") + _message)
-    {
-    }
-
-    InvalidJsonData::InvalidJsonData(char const* _message)
-        : std::runtime_error(_message)
-    {
-    }
-
-    /// @cond PRIVATE
-    Subschema const* Subschema::getUnionTypeWrapper(char const* _subtype) const
+    std::pair<Subschema const*, size_t> Subschema::getUnionTypeWrapper(char const* _subtype) const
     {
         if (type != Ent::DataType::oneOf)
         {
@@ -57,7 +26,7 @@ namespace Ent
         }
         else
         {
-            return &iter->get();
+            return {&iter->get(), iter - begin(*oneOf)};
         }
     }
     /// @endcond
@@ -65,7 +34,8 @@ namespace Ent
     Subschema const* Subschema::getUnionType(char const* _subtype) const
     {
         auto const& un = meta.get<UnionMeta>();
-        return &AT(getUnionTypeWrapper(_subtype)->properties, un.dataField).get();
+        auto schema = getUnionTypeWrapper(_subtype).first;
+        return &AT(schema->properties, un.dataField).get();
     }
 
     char const* Subschema::getUnionNameField() const

@@ -219,7 +219,7 @@ void Ent::validateScene(
     // valid the scene using schema
     strcpy_s(schemaPath, sizeof(schemaPath), (_toolsDir / "WildPipeline/Schema").u8string().c_str());
 
-    json schemaDocument = loadJsonFile(_toolsDir / sceneSchemaPath);
+    json schemaDocument = loadJsonFile(_toolsDir, sceneSchemaPath);
 
     json fullEntityInstanceSchema = convertToInstanceSchema(_schema, *_schema.root);
 
@@ -249,7 +249,7 @@ void Ent::validateEntity(
     // valid the scene using schema
     strcpy_s(schemaPath, sizeof(schemaPath), (_toolsDir / "WildPipeline/Schema").u8string().c_str());
 
-    json schemaDocument = loadJsonFile(_toolsDir / entitySchemaPath);
+    json schemaDocument = loadJsonFile(_toolsDir, entitySchemaPath);
 
     json fullSceneInstanceSchema = convertToInstanceSchema(
         _schema, AT(_schema.allDefinitions, "./Scene-schema.json#/definitions/Object"));

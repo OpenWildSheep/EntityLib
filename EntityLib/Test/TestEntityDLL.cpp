@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#define NOMINMAX
+#include <windows.h>
 #pragma warning(pop)
 
 #include <EntityLib.h>
@@ -122,6 +124,7 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
 int main(int argc, char** argv)
 try
 {
+    SetConsoleOutputCP(65001);
     bool doDisplayScene = false;
     bool doDisplaySubSchema = false;
     bool dumpNodes = false;
@@ -224,6 +227,14 @@ try
         ENTLIB_ASSERT(tags->at(1llu)->at(1llu)->at(0llu)->getString() == std::string("2"));
         // Test mapGet on map and set
         ENTLIB_ASSERT(tags->mapGet("a")->mapGet("1")->getString() == std::string("1"));
+
+        ENTLIB_ASSERT(tags->getKeyType() == Ent::DataType::string);
+        auto keys = tags->getKeysString();
+        ENTLIB_ASSERT(keys.size() == 3);
+        for (auto&& k : keys)
+        {
+            ENTLIB_ASSERT(tags->mapGet(k.c_str()) != nullptr);
+        }
 
         // Test default value
         Ent::Component const* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
@@ -345,6 +356,16 @@ try
     {
         EntityPtr ent = entlib.loadEntity("prefab.entity");
 
+        // Test Variant
+        Ent::Component const* testArrays = ent->getComponent("TestArrays");
+        ENTLIB_ASSERT(testArrays->root.at("Variant")->getUnionData()->getFloat() == 3.1416);
+        nlohmann::json withoutIndex = testArrays->root.at("Variant")->toJson(
+            Ent::OverrideValueSource::OverrideOrPrefab, true, {}, false);
+        ENTLIB_ASSERT(withoutIndex.count("variantIndex") == 0);
+        nlohmann::json withIndex = testArrays->root.at("Variant")->toJson(
+            Ent::OverrideValueSource::OverrideOrPrefab, true, {}, true);
+        ENTLIB_ASSERT(withIndex.at("variantIndex") == 1);
+
         // Test saveNode
         Ent::Component const* heightObj = ent->getComponent("HeightObj");
         heightObj->root.saveNode("test.HeightObj.node");
@@ -363,10 +384,12 @@ try
         ENTLIB_ASSERT(oneOfScripts2->getDataType() == Ent::DataType::oneOf);
         ENTLIB_ASSERT(
             oneOfScripts2->getUnionType() == std::string("CineEventTriggerEventHandlerPost"));
+        ENTLIB_ASSERT(oneOfScripts2->getUnionTypeIndex() == 7);
         oneOfScripts2->setUnionType("CineEventTestCurrentGameState");
         ENTLIB_CHECK_EXCEPTION(oneOfScripts2->setUnionType("ThisTypeDoesntExist"), Ent::BadUnionType);
         Ent::Node* testCurrentState = oneOfScripts2->getUnionData();
         ENTLIB_ASSERT(oneOfScripts2->getUnionType() == std::string("CineEventTestCurrentGameState"));
+        ENTLIB_ASSERT(oneOfScripts2->getUnionTypeIndex() == 1);
         auto fieldNames2 = testCurrentState->getFieldNames();
         ENTLIB_ASSERT(fieldNames2[0] == std::string("GameStateName"));
         ENTLIB_ASSERT(fieldNames2[1] == std::string("Super"));
@@ -1130,6 +1153,24 @@ try
     // ******************* Test twice the same key in map *************************************
     {
         ENTLIB_CHECK_EXCEPTION(entlib.loadEntity("key_double.entity"), Ent::InvalidJsonData);
+    }
+
+    // ******************* Test the EntLibException ***********************************************
+    {
+        bool exceptionThrown = false;
+        try
+        {
+            entlib.loadScene("scene_with_invalid_entity.scene");
+        }
+        catch (std::runtime_error& ex)
+        {
+            exceptionThrown = true;
+            char const* what = ex.what();
+            std::cout << what << std::endl;
+            ENTLIB_ASSERT(strstr(what, R"("this_entity_doesnt_exist.entity")") != nullptr);
+            ENTLIB_ASSERT(strstr(what, R"("scene_with_invalid_entity.scene")") != nullptr);
+        }
+        ENTLIB_ASSERT(exceptionThrown);
     }
 
     // ******************* Test default color *****************************************************

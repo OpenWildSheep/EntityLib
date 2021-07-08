@@ -14,6 +14,7 @@
 #include "Override.h"
 #include "Map.h"
 #include "Vector.h"
+#include "include/Schema.h"
 
 namespace Ent
 {
@@ -77,6 +78,10 @@ namespace Ent
 
         Ent::Map::KeyType getChildKey(Ent::Node const* _child) const;
 
+        Ent::DataType getKeyType() const;
+
+        void unset(); ///< Unset recursively all values overriden in instance (return to prefab values)
+
         // **************************** For array initialization **********************************
         Node* initAdd(OverrideValueLocation, Node _node); ///< @pre This _node is not yet added
         /// @pre hasKey() and the key doesn't exist in map
@@ -119,4 +124,8 @@ namespace Ent
             [_location](auto& a) { return a.getRawSize(_location); }, m_data);
     }
 
+    inline void Ent::Array::unset()
+    {
+        apply_visitor([&](auto& a) { a.unset(); }, m_data);
+    }
 } // namespace Ent

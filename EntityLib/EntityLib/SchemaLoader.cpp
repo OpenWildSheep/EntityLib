@@ -64,31 +64,47 @@ void Ent::SchemaLoader::parseSchema(
         }
         auto sharp = ref.find('#');
         auto fileName = ref.substr(0, sharp);
-        std::filesystem::path objectPath = ref.substr(sharp + 2);
+        try
+        {
+            std::filesystem::path objectPath = ref.substr(sharp + 2);
 
-        json const* refRoot{};
-        if (fileName.empty())
-        {
-            refRoot = &_fileRoot;
-            fileName = _filename;
-        }
-        else
-        {
-            auto iter = m_schemaMap.find(fileName);
-            if (iter == m_schemaMap.end())
+            json const* refRoot{};
+            if (fileName.empty())
             {
-                m_schemaMap[fileName] = loadJsonFile(m_schemaPath / fileName);
+                refRoot = &_fileRoot;
+                fileName = _filename;
             }
-            refRoot = &m_schemaMap[fileName];
+            else
+            {
+                auto iter = m_schemaMap.find(fileName);
+                if (iter == m_schemaMap.end())
+                {
+                    m_schemaMap[fileName] = loadJsonFile(m_schemaPath, fileName);
+                }
+                refRoot = &m_schemaMap[fileName];
+            }
+            json const* node = refRoot;
+            objectPath.make_preferred();
+            for (auto const& token :
+                 splitString(objectPath.string(), std::filesystem::path::preferred_separator))
+            {
+                node = &((*node).at(token));
+            }
+            parseSchemaNoRef(fileName, *refRoot, *node, vis, depth);
         }
-        json const* node = refRoot;
-        objectPath.make_preferred();
-        for (auto const& token :
-             splitString(objectPath.string(), std::filesystem::path::preferred_separator))
+        catch (ContextException& ex)
         {
-            node = &((*node).at(token));
+            ex.addContextMessage("Loading '%s' in file : %s", ref.c_str(), formatPath({}, fileName));
+            throw;
         }
-        parseSchemaNoRef(fileName, *refRoot, *node, vis, depth);
+        catch (...)
+        {
+            throw WrapperException(
+                std::current_exception(),
+                "Loading '%s' in file : %s",
+                ref.c_str(),
+                formatPath({}, fileName));
+        }
 
         vis.closeRef();
     }
@@ -135,6 +151,10 @@ Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
         if (_data.count("unionTypeField") != 0u)
         {
             _meta.typeField = _data["unionTypeField"].get<std::string>();
+        }
+        if (_data.count("unionIndexField") != 0u)
+        {
+            _meta.indexField = _data["unionIndexField"].get<std::string>();
         }
     };
     const auto setArrayMetas = [&](Ent::Subschema::ArrayMeta& _meta) {

@@ -178,3 +178,13 @@ size_t Ent::Vector::getPrefabSize() const
 {
     return m_arraySize.getPrefab();
 }
+
+void Ent::Vector::unset()
+{
+    for (auto& elt : m_data)
+    {
+        elt->unset();
+    }
+    m_arraySize.unset();
+    m_data.resize(m_arraySize.get());
+}

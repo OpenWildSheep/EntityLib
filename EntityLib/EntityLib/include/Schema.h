@@ -34,47 +34,6 @@ namespace Ent
     using Null = std::nullptr_t;
     /// @endcond
 
-    // ******************************** Exception declarations ************************************
-
-    /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
-    struct BadType : std::runtime_error
-    {
-        BadType(char const* _message = nullptr); ///< ctor
-    };
-
-    struct BadArrayType : std::runtime_error
-    {
-        BadArrayType(char const* _message = nullptr); ///< ctor
-    };
-
-    /// Exception thrown when a metadata is missing in the json schema
-    ///
-    /// Example : oneOf need className and classData
-    struct MissingMetadata : std::runtime_error
-    {
-        MissingMetadata(char const* _schemaName); ///< ctor
-    };
-
-    /// Exception thrown when trying to switch a Union to a type that woesn't exit
-    struct BadUnionType : std::runtime_error
-    {
-        /// ctor
-        BadUnionType(char const* _type ///< The type/className that doen't exist in this union
-        );
-    };
-
-    /// Exception thrown when a schema is ill-formed
-    struct IllFormedSchema : std::runtime_error
-    {
-        IllFormedSchema(char const* _message); ///< ctor
-    };
-
-    /// Exception thrown when some json data are invalid
-    struct InvalidJsonData : std::runtime_error
-    {
-        InvalidJsonData(char const* _message); ///< ctor
-    };
-
     // *************************************** Subschema ******************************************
 
     struct SubschemaRef;
@@ -95,7 +54,7 @@ namespace Ent
         /// @throw BadType if the schema is not a oneOf
         /// @throw MissingMetadata if the schema doesn't have a meta className and classData
         /// @throw BadUnionType if \p _subtype is not listed in the oneOf field
-        Subschema const* getUnionTypeWrapper(char const* _subtype) const;
+        std::pair<Subschema const*, size_t> getUnionTypeWrapper(char const* _subtype) const;
         /// @endcond
 
         Schema* rootSchema{};
@@ -127,6 +86,7 @@ namespace Ent
         {
             std::string dataField; ///< Name of the field containing the data (ex : classData)
             std::string typeField; ///< Name of the field containing the type of the data (ex : className)
+            tl::optional<std::string> indexField; ///< Name of the field containing the index of the type
         };
         /// Store metadata for array type
         struct ArrayMeta : BaseMeta

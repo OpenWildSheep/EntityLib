@@ -130,6 +130,23 @@ void setValue(Ent::Node& node, Value const& val)
     }
 }
 
+static mapbox::util::variant<std::vector<String>, std::vector<int64_t>> nodeGetKey(Node* _node)
+{
+    auto const type = _node->getKeyType();
+    if (type == Ent::DataType::string || type == Ent::DataType::entityRef)
+    {
+        return _node->getKeysString();
+    }
+    else if (type == Ent::DataType::integer)
+    {
+        return _node->getKeysInt();
+    }
+    else
+    {
+        throw std::runtime_error("Unexpected key type");
+    }
+}
+
 using namespace pybind11::literals;
 
 // clang-format off
@@ -221,7 +238,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readonly("is_signed", &Subschema::NumberMeta::isSigned);
     pySubschemaUnionMeta
         .def_readonly("data_field", &Subschema::UnionMeta::dataField)
-        .def_readonly("type_field", &Subschema::UnionMeta::typeField);
+        .def_readonly("type_field", &Subschema::UnionMeta::typeField)
+        .def_readonly("index_field", &Subschema::UnionMeta::indexField);
 
     pySubschema
         .def_readonly("type", &Subschema::type)
@@ -320,7 +338,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference_internal)
         .def(
             "push", [](Node* node) { return node->push(); }, py::return_value_policy::reference_internal)
-        .def("pop", [](Node* node) { return node->pop(); })
+        .def("pop", [](Node* node) { node->pop(); })
         .def("clear", [](Node* node) { return node->clear(); })
         .def("empty", [](Node* node) { return node->empty(); })
         .def("get_instance_of", [](Node* node) { return node->getInstanceOf(); })
@@ -362,7 +380,18 @@ PYBIND11_MODULE(EntityLibPy, ent)
              {
                  return node->toJson(source, superKeyIsType).dump(4);
              },
-             "source"_a = OverrideValueSource::Override, "superKeyIsType"_a = false);
+             "source"_a = OverrideValueSource::Override, "superKeyIsType"_a = false)
+        .def("map_erase", (bool (Node::*)(char const*))&Node::mapErase)
+        .def("map_erase", (bool (Node::*)(int64_t))&Node::mapErase)
+        .def("map_get", (Node* (Node::*)(char const*))&Node::mapGet, py::return_value_policy::reference_internal)
+        .def("map_get", [](Node* node, Ent::String const& str){return node->mapGet(str.c_str());}, py::return_value_policy::reference_internal)
+        .def("map_get", (Node* (Node::*)(int64_t))&Node::mapGet, py::return_value_policy::reference_internal)
+        .def("map_insert", (Node const* (Node::*)(char const* _key))&Node::mapInsert, py::return_value_policy::reference_internal)
+        .def("map_insert", (Node const* (Node::*)(int64_t _key))&Node::mapInsert, py::return_value_policy::reference_internal)
+        .def("is_map_or_set", &Node::isMapOrSet)
+        .def("get_key_type", &Node::getKeyType)
+        .def("get_keys", nodeGetKey)
+        ;
 
     pyComponent
         .def_readonly("type", &Component::type)
@@ -411,6 +440,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](Entity& e, char const* name) { return e.getComponent(name); },
             py::return_value_policy::reference_internal)
         .def("remove_component", &Entity::removeComponent)
+        .def("remove_subscene_component", &Entity::removeSubSceneComponent)
         .def("get_component_types", &Entity::getComponentTypes)
         .def("get_components", &Entity::getComponents, py::return_value_policy::reference_internal)
         .def("get_actorstates", [](Entity* ent) { return ent->getActorStates(); }, py::return_value_policy::reference_internal)
@@ -424,7 +454,11 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("resolve_entityref", (Entity* (Entity::*)(const EntityRef&))&Entity::resolveEntityRef, py::return_value_policy::reference_internal)
         .def("detach_entity_from_prefab", [](Entity* ent) {
             return ent->detachEntityFromPrefab().release();
-        });
+        })
+        .def("dumps", [](Entity* entity)
+             {
+                 return entity->saveEntity().dump(4);
+             });
 
     pyScene
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk

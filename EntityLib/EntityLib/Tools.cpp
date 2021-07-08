@@ -10,13 +10,13 @@ using namespace nlohmann;
 
 /// @cond PRIVATE
 
-json loadJsonFile(std::filesystem::path const& path)
+json loadJsonFile(std::filesystem::path const& _root, std::filesystem::path const& _rel)
 {
+    auto const path = _rel.is_absolute() ? _rel : _root / _rel;
     std::ifstream file(path, std::ios::binary | std::ios::ate);
     if (not file.is_open())
     {
-        throw std::runtime_error(
-            Ent::format(R"(Can't open file for read: "%s")", path.generic_string().c_str()));
+        throw Ent::FileSystemError("Trying to open file to read", _root, _rel);
     }
     try
     {
@@ -33,10 +33,15 @@ json loadJsonFile(std::filesystem::path const& path)
         );
         return doc;
     }
+    catch (ContextException& ex)
+    {
+        ex.addContextMessage("parsing file %s", Ent::formatPath(_root, _rel));
+        throw;
+    }
     catch (...)
     {
-        ENTLIB_LOG_ERROR(R"(parsing file "%s")", path.generic_string().c_str());
-        throw;
+        throw WrapperException(
+            std::current_exception(), "parsing file %s", Ent::formatPath(_root, _rel));
     }
 }
 

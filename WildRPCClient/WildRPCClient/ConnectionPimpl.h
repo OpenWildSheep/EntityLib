@@ -3,6 +3,8 @@
 #pragma warning(push, 0)
 #pragma warning(disable : 4355)
 #pragma warning(disable : 5204)
+#pragma warning(disable : 5039)
+#pragma warning(disable : 5220)
 #include <string>
 #include "external/asio/include/asio.hpp"
 #pragma warning(pop)

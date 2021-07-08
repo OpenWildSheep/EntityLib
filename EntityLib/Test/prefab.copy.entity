@@ -253,6 +253,16 @@
         },
         {
             "Data": {
+                "Variant": {
+                    "variantData": 3.1416,
+                    "variantType": "float"
+                }
+            },
+            "Type": "TestArrays",
+            "Version": 1
+        },
+        {
+            "Data": {
                 "TestRef": "EP1-Spout_LINK_001"
             },
             "Type": "TestEntityRef",

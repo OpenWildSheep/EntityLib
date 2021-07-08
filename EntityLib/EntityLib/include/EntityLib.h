@@ -75,6 +75,8 @@ namespace Ent
         {
             return nodes.front();
         }
+
+        void unset();
     };
 
     inline auto begin(Object const& obj)
@@ -108,6 +110,7 @@ namespace Ent
     struct Union
     {
         Subschema const* schema = nullptr; ///< The schema of the object containing the oneOf field
+        size_t typeIndex = 0; ///< Index of the type
         value_ptr<Node> wrapper; ///< Node containing the className/classData
         Ent::Subschema::UnionMeta const* metaData = nullptr;
 
@@ -120,6 +123,8 @@ namespace Ent
         Node* setUnionType(EntityLib const& _entlib, char const* _type);
 
         void computeMemory(MemoryProfiler& prof) const;
+
+        void unset();
     };
 
     struct EntityRef
@@ -207,6 +212,15 @@ namespace Ent
         Node const* mapGet(int64_t _key) const; ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
         Node const* mapInsert(int64_t _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
         bool isMapOrSet() const; ///< @return true if type==Ent::DataType::array and overridePolicy is map or set
+        DataType getKeyType() const; ///< @pre isMapOrSet() @return the Ent::DataType of the key
+        /// @pre isMapOrSet()
+        /// @pre getKeyType() == string or getKeyType() == entityRef
+        /// @return All keys of the map, as String
+        std::vector<String> getKeysString() const;
+        /// @pre isMapOrSet()
+        /// @pre getKeyType() == integer
+        /// @return All keys of the map, as int64_t
+        std::vector<int64_t> getKeysInt() const;
 
         // Union
         Node* getUnionData(); ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data
@@ -214,6 +228,9 @@ namespace Ent
         /// @brief Get the type inside the union
         /// @pre type==Ent::DataType::oneOf
         char const* getUnionType() const;
+        /// @brief Get the index of the type inside the union
+        /// @pre type==Ent::DataType::oneOf
+        size_t getUnionTypeIndex() const;
         /// @brief Change the type inside the union
         /// @pre type==Ent::DataType::oneOf
         /// @pre type match with a type declared inside the json "oneOf"
@@ -236,8 +253,8 @@ namespace Ent
         void setBool(bool _val); ///< @pre type==Ent::DataType::boolean. @brief Set the bool value
         void setEntityRef(EntityRef _entityRef); ///< @pre type==Ent::DataType::entityRef. @brief Set the Entity reference value
 
-        /// @brief Fallback the the prefab or default value. The value will not be saved in json.
-        /// @pre Ent::DataType is in {number, integer, boolean, string}
+        /// Fallback to the prefab or default value. The value will not be saved in json.
+        /// If the type is Array, Object or Union, \b unset will be applied recursively
         void unset();
 
         /// Check if the value is set explicitly (it override the prefab or default value)
@@ -280,7 +297,8 @@ namespace Ent
                 OverrideValueSource::Override, ///< Dump only fields with given value source
             bool _superKeyIsTypeName =
                 false, ///< Super sub-node are dumped using their type name for key instead of "Super"
-            std::function<void(EntityRef&)> const& _entityRefPreProc = {}) const;
+            std::function<void(EntityRef&)> const& _entityRefPreProc = {},
+            bool _saveUnionIndex = false) const;
 
         /// Save as a Node prebab
         void saveNode(std::filesystem::path const& path) const;
@@ -766,7 +784,8 @@ namespace Ent
                 OverrideValueSource::Override, ///< Dump only fields with given value source
             bool _superKeyIsTypeName =
                 false, ///< Super sub-node are dumped using their type name for key instead of "Super"
-            std::function<void(EntityRef&)> const& _entityRefPreProc = {});
+            std::function<void(EntityRef&)> const& _entityRefPreProc = {},
+            bool _saveUnionIndex = false);
 
         /// @brief Create an Entity which instanciate an other.
         ///

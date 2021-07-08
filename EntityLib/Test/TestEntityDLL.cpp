@@ -1227,8 +1227,7 @@ try
     // ********************************** Test load/save scene ************************************
     entlib.rawdataPath = "X:/RawData";
 
-    auto scene = entlib.loadScene("X:/RawData/22_World/SceneMainWorld/"
-                                  "SceneMainWorld_entitylib_unit_test.scene");
+    auto scene = entlib.loadScene("X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene");
 
     if (doDisplayScene)
     {
@@ -1257,17 +1256,10 @@ try
         scene->getObjects().front()->addComponent("HeightObj")->root.getFieldNames().size();
     ENTLIB_ASSERT(fieldNameCount == 8);
 
-    auto ep1Iter = std::find_if(
-        begin(scene->getObjects()),
-        end(scene->getObjects()),
-        [ep1 = std::string("EP1_")](auto&& ent) { return ent->getName() == ep1; });
-    ENTLIB_ASSERT(ep1Iter != end(scene->getObjects()));
-    ENTLIB_ASSERT((*ep1Iter)->getSubSceneComponent() != nullptr);
-
     entlib.rawdataPath = current_path();
     scene->addEntity(entlib.makeInstanceOf((current_path() / "prefab.entity").generic_u8string()));
 
-    entlib.saveScene(*scene, current_path() / "SceneMainWorld.test.scene");
+    entlib.saveScene(*scene, current_path() / "SceneWild.test.scene");
 
     auto const& addedEntity = scene->getObjects().back();
     Ent::Component const* cinematicCmp = addedEntity->getComponent("CinematicGD");

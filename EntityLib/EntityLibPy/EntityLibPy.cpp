@@ -410,12 +410,6 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "is_used_in_runtime", [](Component const& comp) { return comp.isUsedInRuntime(); });
 
     pySubSceneComponent
-        .def_readonly("is_embedded", &SubSceneComponent::isEmbedded)
-        .def_property(
-            "file",
-            [](SubSceneComponent const& sc) -> std::string { return sc.file.get(); },
-            [](SubSceneComponent& sc, std::string const& f) { return sc.file.set(f); })
-        .def("make_embedded", &SubSceneComponent::makeEmbedded)
         .def_property_readonly(
             "embedded",
             [](SubSceneComponent* comp) -> Scene& { return *comp->embedded; },

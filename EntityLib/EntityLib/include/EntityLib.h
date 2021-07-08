@@ -460,19 +460,13 @@ namespace Ent
     /// @todo : Make all fields private since this struct has some invariants
     struct SubSceneComponent
     {
-        bool isEmbedded = false; ///< If true, data are in embedded, else data are in file
-        Override<String> file; ///< Path to a .scene file, when isEmbedded is false
         size_t index = 0; ///< Useful to keep the components order in the json file
         std::unique_ptr<Scene> embedded; ///< Embedded Scene, when isEmbedded is true
 
         void computeMemory(MemoryProfiler& prof) const;
 
         /// @cond PRIVATE
-        explicit SubSceneComponent(
-            bool _isEmbedded = false,
-            Override<String> _file = {},
-            size_t _index = 0,
-            std::unique_ptr<Scene> _embedded = {});
+        explicit SubSceneComponent(size_t _index = 0, std::unique_ptr<Scene> _embedded = {});
         SubSceneComponent(SubSceneComponent const&) = delete;
         SubSceneComponent(SubSceneComponent&&) noexcept = delete;
         SubSceneComponent& operator=(SubSceneComponent const&) = delete;
@@ -481,10 +475,6 @@ namespace Ent
         /// @brief Create a SubSceneComponent which instanciate this one. (internal use only)
         std::unique_ptr<SubSceneComponent> makeInstanceOf() const;
         /// @endcond PRIVATE
-
-        /// Switch SubSceneComponent to embedded mode or to external mode
-        void makeEmbedded(bool _embedded ///< false to make extern (not embedded)
-        );
 
         /// @brief Recursively check if there is an override inside.
         bool hasOverride() const;

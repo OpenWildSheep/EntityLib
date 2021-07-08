@@ -229,9 +229,7 @@
                         "InstanceOf": "subentity2.entity",
                         "Name": "EntityWithInstanceOf"
                     }
-                ],
-                "File": "",
-                "isEmbedded": true
+                ]
             },
             "Type": "SubScene",
             "Version": 1

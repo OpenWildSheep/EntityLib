@@ -1264,30 +1264,13 @@ namespace Ent
     }
 
     // ********************************* SubSceneComponent ****************************************
-    SubSceneComponent::SubSceneComponent(
-        bool _isEmbedded, Override<String> _file, size_t _index, std::unique_ptr<Scene> _embedded)
-        : isEmbedded(_isEmbedded)
-        , file(std::move(_file))
-        , index(_index)
+    SubSceneComponent::SubSceneComponent(size_t _index, std::unique_ptr<Scene> _embedded)
+        : index(_index)
         , embedded(std::move(_embedded))
     {
-    }
-
-    void SubSceneComponent::makeEmbedded(bool _embedded)
-    {
-        isEmbedded = _embedded;
-        if (_embedded)
+        if (embedded == nullptr)
         {
-            if (embedded == nullptr)
-            {
-                embedded = std::make_unique<Scene>();
-                // TODO: 2020-11-27 @Seb : set embedded owner entity
-            }
-            file.set(std::string());
-        }
-        else
-        {
-            embedded.reset();
+            embedded = std::make_unique<Scene>();
         }
     }
 
@@ -1519,6 +1502,7 @@ namespace Ent
         {
             subSceneComponent = std::make_unique<SubSceneComponent>();
             removedComponents.erase("SubScene");
+            subSceneComponent->embedded->setOwnerEntity(this);
         }
         return &(*subSceneComponent);
     }
@@ -1687,11 +1671,7 @@ namespace Ent
     {
         if (auto* subScene = _entity->getSubSceneComponent())
         {
-            if (subScene->isEmbedded)
-            {
-                return subScene->embedded.get();
-            }
-            // TODO: major 2020-09-26 @Seb: else open non embedded subscene ?
+            return subScene->embedded.get();
         }
         return nullptr;
     }
@@ -1777,10 +1757,7 @@ namespace Ent
     {
         if (auto* subScene = getSubSceneComponent())
         {
-            if (subScene->isEmbedded)
-            {
-                subScene->embedded->setOwnerEntity(this);
-            }
+            subScene->embedded->setOwnerEntity(this);
         }
     }
 
@@ -2893,25 +2870,15 @@ static std::unique_ptr<Ent::Entity> loadEntity(
             {
                 Ent::SubSceneComponent const* superComp = superEntity->getSubSceneComponent();
 
-                Ent::Override<String> file =
-                    superComp != nullptr ? superComp->file : Ent::Override<String>(std::string());
-
                 auto fileInJson = (data.count("File") != 0) ?
                                       tl::optional<std::string>(data["File"].get<std::string>()) :
                                       tl::nullopt;
-                file = file.makeOverridedInstanceOf(fileInJson);
-                bool isEmbeddedInJson =
-                    (data.count("isEmbedded") != 0) ? data["isEmbedded"].get<bool>() : false;
-                auto subSceneComp =
-                    std::make_unique<Ent::SubSceneComponent>(isEmbeddedInJson, file, index);
-                if (subSceneComp->isEmbedded)
-                {
-                    subSceneComp->embedded = loadScene(
-                        _entlib,
-                        _schema,
-                        data["Embedded"],
-                        (superComp != nullptr ? superComp->embedded.get() : nullptr));
-                }
+                auto subSceneComp = std::make_unique<Ent::SubSceneComponent>(index);
+                subSceneComp->embedded = loadScene(
+                    _entlib,
+                    _schema,
+                    data["Embedded"],
+                    (superComp != nullptr ? superComp->embedded.get() : nullptr));
                 subSceneComponent = std::move(subSceneComp);
             }
             else
@@ -2973,10 +2940,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
             and removedComponents.count("SubScene") == 0)
         {
             subSceneComponent = std::make_unique<Ent::SubSceneComponent>(
-                superComp->isEmbedded,
-                superComp->file,
-                superComp->index,
-                superComp->embedded->makeInstanceOf());
+                superComp->index, superComp->embedded->makeInstanceOf());
         }
     }
     return std::make_unique<Ent::Entity>(
@@ -3242,15 +3206,7 @@ nlohmann::json Ent::Entity::saveEntity() const
             if ((subsceneHasOverride and hasInstanceOf) or not hasInstanceOf)
             {
                 json data;
-                data.emplace("isEmbedded", subscene->isEmbedded);
-                if (subscene->file.isSet())
-                {
-                    data.emplace("File", subscene->file.get().c_str());
-                }
-                if (subscene->isEmbedded)
-                {
-                    data.emplace("Embedded", saveScene(*subscene->embedded)["Objects"]);
-                }
+                data.emplace("Embedded", saveScene(*subscene->embedded)["Objects"]);
 
                 json compNode;
                 compNode.emplace("Version", comp->version);
@@ -3362,15 +3318,10 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
     if (SubSceneComponent const* subscene = getSubSceneComponent())
     {
         detSubSceneComponent = std::make_unique<SubSceneComponent>();
-        detSubSceneComponent->isEmbedded = subscene->isEmbedded;
-        detSubSceneComponent->file = subscene->file;
-        if (subscene->isEmbedded)
+        detSubSceneComponent->embedded = std::make_unique<Ent::Scene>();
+        for (std::unique_ptr<Ent::Entity> const& subEntity : subscene->embedded->getObjects())
         {
-            detSubSceneComponent->embedded = std::make_unique<Ent::Scene>();
-            for (std::unique_ptr<Ent::Entity> const& subEntity : subscene->embedded->getObjects())
-            {
-                detSubSceneComponent->embedded->addEntity(subEntity->detachEntityFromPrefab());
-            }
+            detSubSceneComponent->embedded->addEntity(subEntity->detachEntityFromPrefab());
         }
     }
 
@@ -3540,7 +3491,6 @@ void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const&
 
     // embed scene
     auto* subScene = sceneEntity.addSubSceneComponent();
-    subScene->makeEmbedded(true);
     for (auto&& entity : _scene.getObjects())
     {
         subScene->embedded->addEntity(entity->clone());
@@ -3552,7 +3502,6 @@ void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const&
 void Ent::SubSceneComponent::computeMemory(MemoryProfiler& prof) const
 {
     prof.currentComp.push_back("SubScene");
-    file.computeMemory(prof);
     if (embedded)
     {
         embedded->computeMemory(prof);
@@ -3567,7 +3516,7 @@ std::unique_ptr<Ent::SubSceneComponent> Ent::SubSceneComponent::makeInstanceOf()
     {
         instEmbedded = embedded->makeInstanceOf();
     }
-    return std::make_unique<SubSceneComponent>(isEmbedded, file, index, std::move(instEmbedded));
+    return std::make_unique<SubSceneComponent>(index, std::move(instEmbedded));
 }
 
 std::unique_ptr<Ent::SubSceneComponent> Ent::SubSceneComponent::clone() const
@@ -3577,23 +3526,19 @@ std::unique_ptr<Ent::SubSceneComponent> Ent::SubSceneComponent::clone() const
     {
         instEmbedded = embedded->clone();
     }
-    return std::make_unique<SubSceneComponent>(isEmbedded, file, index, std::move(instEmbedded));
+    return std::make_unique<SubSceneComponent>(index, std::move(instEmbedded));
 }
 
 std::unique_ptr<Ent::Scene> Ent::SubSceneComponent::detachEmbedded()
 {
-    if (isEmbedded)
-    {
-        auto scene = std::make_unique<Scene>();
-        std::swap(scene, embedded);
+    auto scene = std::make_unique<Scene>();
+    std::swap(scene, embedded);
 
-        // we don't to swap owners though
-        embedded->setOwnerEntity(scene->getOwnerEntity());
-        scene->setOwnerEntity(nullptr); // detached scene is not owned by any entity
+    // we don't to swap owners though
+    embedded->setOwnerEntity(scene->getOwnerEntity());
+    scene->setOwnerEntity(nullptr); // detached scene is not owned by any entity
 
-        return scene;
-    }
-    return {};
+    return scene;
 }
 
 void Ent::SubSceneComponent::applyAllValues(SubSceneComponent& _dest, CopyMode _copyMode) const

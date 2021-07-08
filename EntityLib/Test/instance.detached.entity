@@ -97,9 +97,7 @@
                         ],
                         "Name": "EntityWithInstanceOf_detached"
                     }
-                ],
-                "File": "",
-                "isEmbedded": true
+                ]
             },
             "Type": "SubScene",
             "Version": 1

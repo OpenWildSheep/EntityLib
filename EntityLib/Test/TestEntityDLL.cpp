@@ -457,7 +457,6 @@ try
             begin(originalSubEntities), end(originalSubEntities), begin(detachedSubEntities)));
 
         ent->removeSubSceneComponent();
-        ent->addSubSceneComponent()->makeEmbedded(true);
         entlib.saveEntity(*ent, "prefab.emptyembbeded.entity"); // to check the schema
 
         // TEST arrays default values
@@ -583,7 +582,6 @@ try
         ENTLIB_ASSERT(strcmp(instanceOfA.getName(), "InstanceOfA") == 0);
         Ent::SubSceneComponent* subSceneComp = instanceOfA.getSubSceneComponent();
         ENTLIB_ASSERT(subSceneComp != nullptr);
-        ENTLIB_ASSERT(subSceneComp->isEmbedded);
         ENTLIB_ASSERT(subSceneComp->embedded->getObjects().size() == 1);
         Ent::Entity& B = *subSceneComp->embedded->getObjects().front();
         ENTLIB_ASSERT(strcmp(B.getName(), "B") == 0);
@@ -667,7 +665,6 @@ try
         // TEST SubScene (without override)
         Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();
         ENTLIB_ASSERT(subScene != nullptr);
-        ENTLIB_ASSERT(subScene->isEmbedded);
         Ent::Entity const& subObj = *subScene->embedded->getObjects()[0];
         ENTLIB_ASSERT(subObj.getName() == std::string("EP1-Spout_LINK_001"));
         if (testIsSet)
@@ -878,7 +875,6 @@ try
         // TEST SubScene (with override)
         Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();
         ENTLIB_ASSERT(subScene != nullptr);
-        ENTLIB_ASSERT(subScene->isEmbedded);
         EntityPtr const& subObj = subScene->embedded->getObjects()[0];
         ENTLIB_ASSERT(subObj->getName() == std::string("EP1-Spout_LINK_001"));
 

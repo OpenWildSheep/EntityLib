@@ -63,9 +63,7 @@
                         ],
                         "Name": "EP1-Spout_LINK_001_added"
                     }
-                ],
-                "File": "",
-                "isEmbedded": true
+                ]
             },
             "Type": "SubScene",
             "Version": 1

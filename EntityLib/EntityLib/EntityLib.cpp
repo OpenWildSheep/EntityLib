@@ -3249,9 +3249,14 @@ void Ent::Entity::applyToPrefab()
         throw ContextException("This entity has no prefab");
     }
     auto prefab = entlib->loadEntity(prefabPath);
+    auto prefabName = prefab->name;
+    auto instanceName = name;
+
     // When the value is overridden is the source, we want to make it overridden in the dest => CopyOverride
     applyAllValuesButPrefab(*prefab, CopyMode::CopyOverride);
+    prefab->name = prefabName;
     resetInstanceOf(prefabPath); // Reset 'this' to a vanilla instance of prefab
+    name = instanceName;
     entlib->saveEntity(*prefab, prefabPath);
 }
 

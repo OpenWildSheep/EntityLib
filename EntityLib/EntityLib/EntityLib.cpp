@@ -1264,13 +1264,14 @@ namespace Ent
     }
 
     // ********************************* SubSceneComponent ****************************************
-    SubSceneComponent::SubSceneComponent(size_t _index, std::unique_ptr<Scene> _embedded)
+    SubSceneComponent::SubSceneComponent(
+        EntityLib const* _entlib, size_t _index, std::unique_ptr<Scene> _embedded)
         : index(_index)
         , embedded(std::move(_embedded))
     {
         if (embedded == nullptr)
         {
-            embedded = std::make_unique<Scene>();
+            embedded = std::make_unique<Scene>(_entlib);
         }
     }
 
@@ -1500,7 +1501,7 @@ namespace Ent
     {
         if (subSceneComponent == nullptr)
         {
-            subSceneComponent = std::make_unique<SubSceneComponent>();
+            subSceneComponent = std::make_unique<SubSceneComponent>(entlib);
             removedComponents.erase("SubScene");
             subSceneComponent->embedded->setOwnerEntity(this);
         }
@@ -1763,7 +1764,10 @@ namespace Ent
 
     // ********************************* Scene ***************************************************
 
-    Scene::Scene() = default;
+    Scene::Scene(EntityLib const* _entitylib)
+        : entlib(_entitylib)
+    {
+    }
 
     Scene::Scene(std::vector<std::unique_ptr<Entity>> _entities)
         : objects(std::move(_entities))
@@ -1843,7 +1847,7 @@ namespace Ent
     std::unique_ptr<Scene> Scene::makeInstanceOf() const
     {
         std::vector<std::unique_ptr<Entity>> instanceEntities;
-        auto scene = std::make_unique<Scene>();
+        auto scene = std::make_unique<Scene>(entlib);
         for (auto const& ent : objects)
         {
             instanceEntities.emplace_back(ent->makeInstanceOf());
@@ -1856,7 +1860,7 @@ namespace Ent
     std::unique_ptr<Scene> Scene::clone() const
     {
         std::vector<std::unique_ptr<Entity>> instanceEntities;
-        auto scene = std::make_unique<Scene>();
+        auto scene = std::make_unique<Scene>(entlib);
         for (auto const& ent : objects)
         {
             instanceEntities.emplace_back(ent->clone());
@@ -2873,7 +2877,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
                 auto fileInJson = (data.count("File") != 0) ?
                                       tl::optional<std::string>(data["File"].get<std::string>()) :
                                       tl::nullopt;
-                auto subSceneComp = std::make_unique<Ent::SubSceneComponent>(index);
+                auto subSceneComp = std::make_unique<Ent::SubSceneComponent>(&_entlib, index);
                 subSceneComp->embedded = loadScene(
                     _entlib,
                     _schema,
@@ -2940,7 +2944,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
             and removedComponents.count("SubScene") == 0)
         {
             subSceneComponent = std::make_unique<Ent::SubSceneComponent>(
-                superComp->index, superComp->embedded->makeInstanceOf());
+                &_entlib, superComp->index, superComp->embedded->makeInstanceOf());
         }
     }
     return std::make_unique<Ent::Entity>(
@@ -3046,7 +3050,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
     json const& _entities,
     Ent::Scene const* _super)
 {
-    auto scene = std::make_unique<Ent::Scene>();
+    auto scene = std::make_unique<Ent::Scene>(&_entLib);
 
     // Add all entities from super scene ...
     std::set<std::string> entFromSuper;
@@ -3322,8 +3326,8 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
     std::unique_ptr<SubSceneComponent> detSubSceneComponent;
     if (SubSceneComponent const* subscene = getSubSceneComponent())
     {
-        detSubSceneComponent = std::make_unique<SubSceneComponent>();
-        detSubSceneComponent->embedded = std::make_unique<Ent::Scene>();
+        detSubSceneComponent = std::make_unique<SubSceneComponent>(entlib);
+        detSubSceneComponent->embedded = std::make_unique<Ent::Scene>(entlib);
         for (std::unique_ptr<Ent::Entity> const& subEntity : subscene->embedded->getObjects())
         {
             detSubSceneComponent->embedded->addEntity(subEntity->detachEntityFromPrefab());
@@ -3516,27 +3520,23 @@ void Ent::SubSceneComponent::computeMemory(MemoryProfiler& prof) const
 
 std::unique_ptr<Ent::SubSceneComponent> Ent::SubSceneComponent::makeInstanceOf() const
 {
-    std::unique_ptr<Scene> instEmbedded;
-    if (embedded)
-    {
-        instEmbedded = embedded->makeInstanceOf();
-    }
-    return std::make_unique<SubSceneComponent>(index, std::move(instEmbedded));
+    ENTLIB_ASSERT(embedded != nullptr);
+    std::unique_ptr<Scene> instEmbedded = embedded->makeInstanceOf();
+    return std::make_unique<SubSceneComponent>(
+        embedded->getEntityLib(), index, std::move(instEmbedded));
 }
 
 std::unique_ptr<Ent::SubSceneComponent> Ent::SubSceneComponent::clone() const
 {
-    std::unique_ptr<Scene> instEmbedded;
-    if (embedded)
-    {
-        instEmbedded = embedded->clone();
-    }
-    return std::make_unique<SubSceneComponent>(index, std::move(instEmbedded));
+    ENTLIB_ASSERT(embedded != nullptr);
+    std::unique_ptr<Scene> instEmbedded = embedded->clone();
+    return std::make_unique<SubSceneComponent>(
+        embedded->getEntityLib(), index, std::move(instEmbedded));
 }
 
 std::unique_ptr<Ent::Scene> Ent::SubSceneComponent::detachEmbedded()
 {
-    auto scene = std::make_unique<Scene>();
+    auto scene = std::make_unique<Scene>(embedded->getEntityLib());
     std::swap(scene, embedded);
 
     // we don't to swap owners though

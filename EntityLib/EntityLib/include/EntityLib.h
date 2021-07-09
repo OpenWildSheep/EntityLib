@@ -466,7 +466,8 @@ namespace Ent
         void computeMemory(MemoryProfiler& prof) const;
 
         /// @cond PRIVATE
-        explicit SubSceneComponent(size_t _index = 0, std::unique_ptr<Scene> _embedded = {});
+        explicit SubSceneComponent(
+            EntityLib const* _entlib, size_t _index = 0, std::unique_ptr<Scene> _embedded = {});
         SubSceneComponent(SubSceneComponent const&) = delete;
         SubSceneComponent(SubSceneComponent&&) noexcept = delete;
         SubSceneComponent& operator=(SubSceneComponent const&) = delete;
@@ -687,7 +688,7 @@ namespace Ent
     struct Scene
     {
         /// Construct an empty Scene
-        Scene();
+        Scene(EntityLib const* _entlib);
         /// Construct a scene taking the ownership of a list of \p _entities
         Scene(std::vector<std::unique_ptr<Entity>> _entities);
 
@@ -752,9 +753,14 @@ namespace Ent
         /// @brief Take all values set in this and set them into \b _dest
         void applyAllValues(Scene& _dest, CopyMode _copyMode) const;
 
+        EntityLib const* getEntityLib() const
+        {
+            return entlib;
+        };
+
     private:
         void updateChildrenContext();
-
+        EntityLib const* entlib = nullptr;
         Entity* ownerEntity = nullptr; ///< the entity owning this scene if it is embedded
         std::vector<std::unique_ptr<Entity>> objects; ///< All Ent::Entity of this Scene
     };

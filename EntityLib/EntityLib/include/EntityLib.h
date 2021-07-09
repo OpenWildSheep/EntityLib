@@ -767,7 +767,8 @@ namespace Ent
         ComponentsSchema() = default;
         ComponentsSchema(ComponentsSchema const&) = delete;
         ComponentsSchema& operator=(ComponentsSchema const&) = delete;
-        std::map<std::string, Subschema*> components; ///< Schema of all possible Component s
+        std::map<std::string, Subschema*> components; ///< Schema of all possible Components
+        std::map<std::string, Subschema*> actorstates; ///< Schema of all possible Actorstates
         Schema schema; ///< Schemas of everything (object, enum...)
 
         /// @cond PRIVATE

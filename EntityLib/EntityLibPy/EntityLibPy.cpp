@@ -505,6 +505,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     pyComponentsSchema
         .def_readonly("components", &ComponentsSchema::components, py::return_value_policy::reference_internal)
+        .def_readonly("actorstates", &ComponentsSchema::actorstates, py::return_value_policy::reference_internal)
         .def_readonly("schema", &ComponentsSchema::schema, py::return_value_policy::reference_internal);
 
     pyColor

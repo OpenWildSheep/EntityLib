@@ -151,7 +151,7 @@ try
     bool const doMergeComponents = true;
 #endif
 
-    Ent::EntityLib entlib("X:/", doMergeComponents);
+    Ent::EntityLib entlib("X:/RawData/..", doMergeComponents);
     using namespace std::filesystem;
 
     entlib.rawdataPath = current_path(); // It is a hack to work in the working dir

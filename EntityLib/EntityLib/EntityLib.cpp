@@ -40,8 +40,37 @@ namespace Ent
         return _entlib.loadNode(colorSchema, json(), nullptr);
     }
 
+    // canonical or weakly_canonical find the original physic drive but we want to keep X:
+    // We also want to add '/' if the path is a letter (X:)
+    // We also want path with forward slashes
+    static std::filesystem::path very_weakly_canonical(std::filesystem::path const& _path)
+    {
+        std::filesystem::path c;
+        for (auto iter = _path.begin(), endIt = _path.end(); iter != endIt; ++iter)
+        {
+            if (iter->native() == L"..")
+            {
+                if (c.empty())
+                {
+                    c /= *iter;
+                }
+                else
+                    c = c.parent_path();
+            }
+            else if (iter->native() != L".")
+            {
+                c /= *iter;
+            }
+        }
+        if (c.native().back() == L':')
+        {
+            c = (c.native() + L'/');
+        }
+        return c.make_preferred();
+    }
+
     EntityLib::EntityLib(std::filesystem::path _rootPath, bool _doMergeComponents)
-        : rootPath(std::move(_rootPath)) // Read schema and dependencies
+        : rootPath(very_weakly_canonical(_rootPath)) // Read schema and dependencies
     {
         rawdataPath = getAbsolutePath(rootPath / "RawData");
         toolsDir = getAbsolutePath(rootPath / "Tools");
@@ -3401,17 +3430,13 @@ std::filesystem::path Ent::EntityLib::getAbsolutePath(std::filesystem::path cons
     if (_path.is_absolute())
     {
         std::filesystem::path absPath = _path;
-        absPath.make_preferred();
-        // canonical or weakly_canonical find the original physic drive but we want to keep X:
-        return absPath;
+        return very_weakly_canonical(absPath);
     }
     else
     {
         std::filesystem::path absPath = rawdataPath;
         absPath /= _path;
-        absPath.make_preferred();
-        // canonical or weakly_canonical find the original physic drive but we want to keep X:
-        return absPath;
+        return very_weakly_canonical(absPath);
     }
 }
 

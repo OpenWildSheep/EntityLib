@@ -1374,6 +1374,10 @@ namespace Ent
     {
         return not hasASuper;
     }
+    bool Entity::newInTheScene() const
+    {
+        return not hasASuper;
+    }
     void Entity::setCanBeRenamed(bool _can)
     {
         hasASuper = not _can;
@@ -1541,7 +1545,9 @@ namespace Ent
             color.makeInstanceOf(),
             thumbnail.makeInstanceOf(),
             instanceOf.makeInstanceOf(),
-            maxActivationLevel.makeInstanceOf());
+            maxActivationLevel.makeInstanceOf(),
+            true // It is an instance so it is not a new entity in the scene
+        );
     }
 
     bool Entity::hasOverride() const
@@ -1874,7 +1880,7 @@ namespace Ent
     {
         for (std::unique_ptr<Entity> const& ent : objects)
         {
-            if (ent->hasOverride())
+            if (ent->hasOverride() or ent->newInTheScene())
             {
                 return true;
             }
@@ -3472,7 +3478,7 @@ static json saveScene(Ent::Scene const& _scene)
 
     for (std::unique_ptr<Ent::Entity> const& ent : _scene.getObjects())
     {
-        if (ent->hasOverride())
+        if (ent->hasOverride() or ent->newInTheScene())
         {
             objects.emplace_back(ent->saveEntity());
         }

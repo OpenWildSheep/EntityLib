@@ -545,6 +545,7 @@ namespace Ent
         char const* getName() const; ///< Get the name of the component
         void setName(Ent::String _name); ///< Set the name of the component
         bool canBeRenamed() const; ///< A SubEntity of an instance which override a SubEntity in a prefab can't be renamed
+        bool newInTheScene() const; ///< This entity is new in this scene (But it can have an "InstanceOf")
         char const* getInstanceOf() const; ///< Name of the inherited prefab if there is one, or nullptr.
         /// Get the initial max activation level of the entity at runtime.
         ActivationLevel getMaxActivationLevel() const;

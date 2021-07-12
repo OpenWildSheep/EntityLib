@@ -786,6 +786,16 @@ try
         sysCreat->root.at("BehaviorState")->setString("Overrided");
         entlib.saveEntity(*ent, "instance.copy.entity");
     }
+    {
+        EntityPtr ent = std::make_unique<Ent::Entity>(entlib);
+        auto subscene = ent->addSubSceneComponent();
+        auto newUnique = std::move(std::make_unique<Ent::Entity>(entlib));
+        subscene->embedded->addEntity(std::move(newUnique));
+        entlib.saveEntity(*ent, "test_save_empty_entity.entity");
+
+        ent = entlib.loadEntity("test_save_empty_entity.entity");
+        ENTLIB_ASSERT(ent->getSubSceneComponent()->embedded->entityCount() == 1);
+    }
     auto test_erase = [](Ent::Entity* ent) {
         Ent::Node& actorStates = ent->getActorStates();
         Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");

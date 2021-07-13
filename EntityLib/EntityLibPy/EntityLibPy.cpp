@@ -423,7 +423,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         ;
 
     pyEntity
-        .def(py::init<EntityLib const&>())
+        .def(py::init<EntityLib const&, char const*>())
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
         .def("get_ptr", [](Entity* self) {return (intptr_t)self;})
         .def_static("from_ptr", [](intptr_t _ptr) {return (Entity*)_ptr;})
@@ -483,7 +483,31 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "add_entity",
             [](Scene* scene, Entity* ent) -> Entity*
             {
-                scene->addEntity(ent->clone()); return scene->getObjects().back().get();
+                return scene->addEntity(ent->clone());
+            }, py::return_value_policy::reference_internal)
+        .def(
+            "add_entity",
+            [](Scene* scene, char const* name) -> Entity*
+            {
+                return scene->addEntity(name);
+            }, py::return_value_policy::reference_internal)
+        .def(
+            "get_entity",
+            [](Scene* scene, char const* name) -> Entity*
+            {
+                return scene->getEntity(name);
+            }, py::return_value_policy::reference_internal)
+        .def(
+            "remove_entity",
+            [](Scene* scene, char const* name)
+            {
+                scene->removeEntity(name);
+            }, py::return_value_policy::reference_internal)
+        .def(
+            "rename_entity",
+            [](Scene* scene, char const* name, char const* newName)
+            {
+                scene->renameEntity(name, newName);
             }, py::return_value_policy::reference_internal)
         .def("resolve_entityref", &Scene::resolveEntityRef, py::return_value_policy::reference_internal)
         .def_property_readonly("owner_entity", &Scene::getOwnerEntity)
@@ -491,17 +515,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             static_cast<Entity*(Scene::*)(size_t)>(&Scene::getEntity),
             py::return_value_policy::reference_internal)
         .def_property_readonly("entity_count", &Scene::entityCount)
-        .def_property_readonly(
-            "entities",
-            [](Scene* scene) -> std::vector<Entity*> {
-                std::vector<Entity*> entities;
-                for (std::unique_ptr<Entity> const& ent : scene->getObjects())
-                {
-                    entities.push_back(ent.get());
-                }
-                return entities;
-            },
-            py::return_value_policy::reference_internal);
+        .def_property_readonly("entities", &Scene::getObjects);
 
     pyComponentsSchema
         .def_readonly("components", &ComponentsSchema::components, py::return_value_policy::reference_internal)

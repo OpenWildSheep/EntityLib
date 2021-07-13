@@ -521,4 +521,23 @@ namespace Ent
             std::filesystem::path const& _rootPath,
             std::filesystem::path const& _relPath);
     };
+
+    /// Exception thrown when some json data are invalid
+    struct CantRename : ContextException
+    {
+        CantRename(char const* _message) ///< ctor
+            : ContextException(_message)
+        {
+        }
+    };
+
+    /// Exception thrown when some json data are invalid
+    struct EmptyKey : ContextException
+    {
+        EmptyKey(char const* _message) ///< ctor
+            : ContextException(_message)
+        {
+        }
+    };
+
 } // namespace Ent

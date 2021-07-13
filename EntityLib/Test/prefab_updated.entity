@@ -230,6 +230,11 @@
                         "Name": "EntityWithInstanceOf"
                     },
                     {
+                        "Components": [],
+                        "InstanceOf": "subentity2.entity",
+                        "Name": "EntityWithInstanceOfButNoOverride"
+                    },
+                    {
                         "Color": [
                             255.0,
                             120.0,
@@ -260,11 +265,6 @@
                             }
                         ],
                         "Name": "TestSaveEntWithOverride"
-                    },
-                    {
-                        "Components": [],
-                        "InstanceOf": "subentity2.entity",
-                        "Name": "EntityWithInstanceOfButNoOverride"
                     }
                 ]
             },

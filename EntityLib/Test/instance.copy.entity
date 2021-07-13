@@ -87,6 +87,10 @@
             "Data": {
                 "Embedded": [
                     {
+                        "Components": [],
+                        "Name": "Entity"
+                    },
+                    {
                         "Color": [
                             255.0,
                             120.0,
@@ -106,6 +110,19 @@
                         "Name": "EntityWithInstanceOf"
                     },
                     {
+                        "Components": [],
+                        "InstanceOf": "subentity2.entity",
+                        "Name": "EntityWithInstanceOfButNoOverride"
+                    },
+                    {
+                        "Components": [],
+                        "Name": "PrettiestName"
+                    },
+                    {
+                        "Name": "TestRemove",
+                        "__removed__": true
+                    },
+                    {
                         "Components": [
                             {
                                 "Data": {
@@ -116,15 +133,6 @@
                             }
                         ],
                         "Name": "TestSaveEntWithOverride"
-                    },
-                    {
-                        "Components": [],
-                        "InstanceOf": "subentity2.entity",
-                        "Name": "EntityWithInstanceOfButNoOverride"
-                    },
-                    {
-                        "Components": [],
-                        "Name": ""
                     }
                 ]
             },

@@ -1304,7 +1304,7 @@ namespace Ent
         return Node{Array{&_entlib, &actorStatesSchema}, &actorStatesSchema};
     }
 
-    Entity::Entity(EntityLib const& _entlib)
+    Entity::Entity(EntityLib const& _entlib, char const* _name)
         : entlib(&_entlib)
         , name(std::string())
         , actorStates(Ent::makeDefaultActorStatesField(_entlib))
@@ -1313,6 +1313,10 @@ namespace Ent
         , instanceOf(std::string())
         , maxActivationLevel(Ent::ActivationLevel::Started)
     {
+        if (_name != nullptr)
+        {
+            name.set(_name);
+        }
     }
 
     Entity::Entity(
@@ -1388,8 +1392,25 @@ namespace Ent
                 "prefab can't be renamed. Check the canBeRenamed method.",
                 _name.c_str());
         }
-        name.set(std::move(_name));
+        if (parentScene != nullptr)
+        {
+            parentScene->renameEntity(name.get().c_str(), _name.c_str());
+        }
+        else
+        {
+            name.set(std::move(_name));
+        }
     }
+
+    void Entity::_setNameRaw(char const* _name)
+    {
+        if (strcmp(name.get().c_str(), _name) == 0)
+        {
+            return;
+        }
+        name.set(_name);
+    }
+
     bool Entity::canBeRenamed() const
     {
         return not hasASuper;
@@ -1604,7 +1625,7 @@ namespace Ent
         std::string prefab;
         if (_prefab == nullptr or strlen(_prefab) == 0)
         {
-            templ = std::make_shared<Ent::Entity const>(*entlib);
+            templ = std::make_shared<Ent::Entity const>(*entlib, nullptr);
         }
         else
         {
@@ -1706,15 +1727,6 @@ namespace Ent
         return nullptr;
     }
 
-    static Entity* findChild(Scene* _scene, const std::string& _name)
-    {
-        auto&& children = _scene->getObjects();
-        const auto found = std::find_if(children.begin(), children.end(), [&_name](auto& childPtr) {
-            return childPtr->getName() == _name;
-        });
-        return found == children.end() ? nullptr : found->get();
-    }
-
     /// @tparam E is Entity or Entity const.
     template <typename E>
     static E*
@@ -1742,7 +1754,7 @@ namespace Ent
                 // broken ref
                 return nullptr;
             }
-            _current = findChild(_down, head);
+            _current = _down->getEntity(head.c_str());
             _up = _down;
             _down = _current == nullptr ? nullptr : getSubScene(_current);
         }
@@ -1798,39 +1810,80 @@ namespace Ent
     {
     }
 
-    Scene::Scene(std::vector<std::unique_ptr<Entity>> _entities)
+    Scene::Scene(EntityMap _entities)
         : objects(std::move(_entities))
     {
         updateChildrenContext();
     }
 
-    void Scene::addEntity(std::unique_ptr<Entity>&& _entity)
+    Entity* Scene::addEntity(std::unique_ptr<Entity>&& _entity)
     {
         _entity->setParentScene(this);
-        objects.emplace_back(std::move(_entity));
+        auto name = _entity->getName();
+        if (name == nullptr or strlen(name) == 0)
+        {
+            throw EmptyKey("Entity without name in Scene::addEntity!");
+        }
+        auto& name_rem = objects.emplace(name, std::move(_entity), OverrideValueLocation::Override);
+        return name_rem.second.value.get();
     }
 
-    std::vector<std::unique_ptr<Entity>> const& Scene::getObjects() const
+    std::vector<Entity*> Scene::getObjects() const
     {
-        return objects;
+        std::vector<Entity*> entities;
+        for (auto&& name_ent : objects.map)
+        {
+            if (name_ent.second.isPresent.get())
+            {
+                entities.push_back(name_ent.second.value.get());
+            }
+        }
+        return entities;
     }
 
-    Entity const* Scene::getEntity(size_t index) const
+    Entity const* Scene::getEntity(size_t _index) const
     {
-        if (index >= objects.size())
+        if (_index >= objects.size())
         {
             return nullptr;
         }
-        return objects.at(index).get();
+        size_t index = 0;
+        for (auto&& key_val : objects.map)
+        {
+            if (key_val.second.isPresent.get())
+            {
+                if (index == _index)
+                {
+                    return key_val.second.value.get();
+                }
+                ++index;
+            }
+        }
+        return nullptr;
+    }
+
+    Entity* Scene::addEntity(char const* name)
+    {
+        if (name == nullptr or strlen(name) == 0)
+        {
+            throw EmptyKey("Entity without name in Scene::addEntity!");
+        }
+        return addEntity(std::make_unique<Ent::Entity>(*entlib, name));
     }
 
     Entity* Scene::getEntity(size_t index)
     {
-        if (index >= objects.size())
-        {
-            return nullptr;
-        }
-        return objects.at(index).get();
+        return const_cast<Entity*>(std::as_const(*this).getEntity(index));
+    }
+
+    Entity const* Scene::getEntity(char const* _name) const
+    {
+        return objects.at(_name);
+    }
+
+    Entity* Scene::getEntity(char const* _name)
+    {
+        return objects.at(_name);
     }
 
     size_t Scene::entityCount() const
@@ -1838,13 +1891,47 @@ namespace Ent
         return objects.size();
     }
 
+    void Scene::removeEntity(char const* _name)
+    {
+        objects.erase(_name);
+    }
+
+    void Scene::renameEntity(char const* _currentName, char const* _newName)
+    {
+        auto iter = objects.map.find(_currentName);
+        if (iter != objects.map.end())
+        {
+            if (not iter->second.value->canBeRenamed())
+            {
+                throw CantRename(staticFormat(
+                    "Can't rename '%s' to '%s'. A SubEntity of an instance which override a "
+                    "SubEntity in a prefab can't be renamed. Check the canBeRenamed method.",
+                    _currentName,
+                    _newName));
+            }
+
+            auto ent = std::move(iter->second.value);
+            objects.erase(_currentName);
+            ent->_setNameRaw(_newName);
+            objects.emplace(_newName, std::move(ent), Ent::OverrideValueLocation::Override);
+        }
+        else
+        {
+            throw CantRename(staticFormat(
+                "Can't rename %s to %s because it doesn't exist", _currentName, _newName));
+        }
+    }
+
     std::vector<std::unique_ptr<Entity>> Scene::releaseAllEntities()
     {
         std::vector<std::unique_ptr<Entity>> freeEntities;
-        for (auto&& ent : objects)
+        for (auto&& name_ent : objects.map)
         {
-            ent->setParentScene(nullptr);
-            freeEntities.emplace_back(std::move(ent));
+            if (name_ent.second.isPresent.get())
+            {
+                name_ent.second.value->setParentScene(nullptr);
+                freeEntities.emplace_back(std::move(name_ent.second.value));
+            }
         }
         objects.clear();
         return freeEntities;
@@ -1875,12 +1962,12 @@ namespace Ent
 
     std::unique_ptr<Scene> Scene::makeInstanceOf() const
     {
-        std::vector<std::unique_ptr<Entity>> instanceEntities;
+        EntityMap instanceEntities;
         auto scene = std::make_unique<Scene>(entlib);
-        for (auto const& ent : objects)
+        for (auto const& name_ent : objects.map)
         {
-            instanceEntities.emplace_back(ent->makeInstanceOf());
-            instanceEntities.back()->setParentScene(scene.get());
+            instanceEntities.map.emplace(name_ent.first, name_ent.second.makeInstanceOf());
+            instanceEntities.map[name_ent.first].value->setParentScene(scene.get());
         }
         scene->objects = std::move(instanceEntities);
         return scene;
@@ -1888,12 +1975,12 @@ namespace Ent
 
     std::unique_ptr<Scene> Scene::clone() const
     {
-        std::vector<std::unique_ptr<Entity>> instanceEntities;
+        EntityMap instanceEntities;
         auto scene = std::make_unique<Scene>(entlib);
-        for (auto const& ent : objects)
+        for (auto const& name_ent : objects.map)
         {
-            instanceEntities.emplace_back(ent->clone());
-            instanceEntities.back()->setParentScene(scene.get());
+            instanceEntities.map.emplace(name_ent.first, name_ent.second.clone());
+            instanceEntities.map[name_ent.first].value->setParentScene(scene.get());
         }
         scene->objects = std::move(instanceEntities);
         return scene;
@@ -1901,9 +1988,9 @@ namespace Ent
 
     bool Scene::hasOverride() const
     {
-        for (std::unique_ptr<Entity> const& ent : objects)
+        for (auto const& name_ent : objects.map)
         {
-            if (ent->hasOverride() or ent->newInTheScene())
+            if (name_ent.second.hasOverride())
             {
                 return true;
             }
@@ -1924,31 +2011,41 @@ namespace Ent
     void Scene::applyAllValues(Scene& _dest, CopyMode _copyMode) const
     {
         std::map<std::string, Entity*> destMap;
-        for (auto&& obj : _dest.objects)
+        for (auto&& name_obj : _dest.objects.map)
         {
-            destMap.emplace(obj->getName(), obj.get());
-        }
-        for (auto&& ent : objects)
-        {
-            auto destIter = destMap.find(ent->getName());
-            if (destIter != destMap.end()) // Preserved Entity
+            if (name_obj.second.isPresent.get())
             {
-                ent->applyAllValues(*destIter->second, _copyMode);
-                destMap.erase(destIter);
-            }
-            else // Entity just added
-            {
-                _dest.addEntity(ent->clone());
+                destMap.emplace(name_obj.first, name_obj.second.value.get());
             }
         }
-        ENTLIB_ASSERT_MSG(destMap.empty(), "Can't handle removed entities for now");
+        for (auto&& name_ent : objects.map)
+        {
+            if (name_ent.second.isPresent.get())
+            {
+                auto destIter = destMap.find(name_ent.first);
+                auto&& ent = name_ent.second.value;
+                if (destIter != destMap.end()) // Preserved Entity
+                {
+                    ent->applyAllValues(*destIter->second, _copyMode);
+                    destMap.erase(destIter);
+                }
+                else // Entity just added
+                {
+                    _dest.addEntity(ent->clone());
+                }
+            }
+        }
+        for (auto&& name_ent : destMap)
+        {
+            _dest.removeEntity(name_ent.first.c_str());
+        }
     }
 
     void Scene::updateChildrenContext()
     {
-        for (auto& childEntityPtr : objects)
+        for (auto& name_ent : objects.map)
         {
-            childEntityPtr->setParentScene(this);
+            name_ent.second.value->setParentScene(this);
         }
     }
 
@@ -2853,7 +2950,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     {
         ovInstanceOf = _superEntityFromParentEntity->getInstanceOfValue().makeInstanceOf();
     }
-    auto superEntityOfThisEntity = std::make_unique<Ent::Entity>(_entlib);
+    auto superEntityOfThisEntity = std::make_unique<Ent::Entity>(_entlib, "Prefab");
     ENTLIB_ASSERT(superEntityOfThisEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
     bool superIsInit = false;
     Ent::Entity const* superEntity = superEntityOfThisEntity.get();
@@ -3147,11 +3244,18 @@ Ent::Scene::loadScene(Ent::EntityLib const& _entLib, json const& _entities, Ent:
                     break;
                 }
             }
-            std::unique_ptr<Ent::Entity> ent =
-                (instEntNode == nullptr) ? superEnt->makeInstanceOf() :
-                                           ::loadEntity(_entLib, *instEntNode, superEnt.get());
+            bool const removed = instEntNode != nullptr and instEntNode->count("__removed__") != 0;
+            std::unique_ptr<Ent::Entity> ent = (instEntNode == nullptr) ?
+                                                   superEnt->makeInstanceOf() :
+                                                   ::loadEntity(_entLib, *instEntNode, superEnt);
+            auto entName = ent->getName();
+
             ent->setCanBeRenamed(false);
-            scene->addEntity(std::move(ent));
+            scene->objects.emplace(entName, std::move(ent), OverrideValueLocation::Prefab);
+            if (removed)
+            {
+                scene->removeEntity(entName);
+            }
         }
     }
 
@@ -3163,7 +3267,12 @@ Ent::Scene::loadScene(Ent::EntityLib const& _entLib, json const& _entities, Ent:
         {
             continue;
         }
+        if (entNode.count("__removed__") != 0) // Strange to remove a new entity. Let's ignore it.
+        {
+            continue;
+        }
         std::unique_ptr<Ent::Entity> ent = ::loadEntity(_entLib, entNode, nullptr);
+        ENTLIB_ASSERT(ent != nullptr);
         scene->addEntity(std::move(ent));
     }
 
@@ -3385,23 +3494,23 @@ void Ent::Entity::applyAllValuesButPrefab(Entity& _dest, CopyMode _copyMode) con
 std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
 {
     std::map<std::string, Ent::Component> detComponents;
-    size_t index = 0;
+    size_t cmpIndex = 0;
     for (auto const& type_comp : getComponents())
     {
         auto const& type = std::get<0>(type_comp);
         auto const& comp = std::get<1>(type_comp);
 
-        Ent::Component detachedComp{comp.rawData, false, type, comp.root.detach(), 1, index};
+        Ent::Component detachedComp{comp.rawData, false, type, comp.root.detach(), 1, cmpIndex};
 
         detComponents.emplace(type, std::move(detachedComp));
-        ++index;
+        ++cmpIndex;
     }
     std::unique_ptr<SubSceneComponent> detSubSceneComponent;
     if (SubSceneComponent const* subscene = getSubSceneComponent())
     {
         detSubSceneComponent = std::make_unique<SubSceneComponent>(entlib);
         detSubSceneComponent->embedded = std::make_unique<Ent::Scene>(entlib);
-        for (std::unique_ptr<Ent::Entity> const& subEntity : subscene->embedded->getObjects())
+        for (auto const& subEntity : subscene->embedded->getObjects())
         {
             detSubSceneComponent->embedded->addEntity(subEntity->detachEntityFromPrefab());
         }
@@ -3424,7 +3533,7 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
 
 std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string const& _instanceOf) const
 {
-    std::unique_ptr<Ent::Entity> inst = std::make_unique<Ent::Entity>(*this);
+    std::unique_ptr<Ent::Entity> inst = std::make_unique<Ent::Entity>(*this, nullptr);
     inst->resetInstanceOf(_instanceOf.c_str());
     return inst;
 }
@@ -3539,11 +3648,35 @@ json Ent::Scene::saveScene() const
     json& jsnObjects = document["Objects"];
     jsnObjects = json::array();
 
-    for (std::unique_ptr<Ent::Entity> const& ent : getObjects())
+    std::vector<EntityMap::value_type const*> orderedEntities;
+    orderedEntities.reserve(objects.map.size());
+    for (auto&& name_ent : objects.map)
     {
-        if (ent->hasOverride() or ent->newInTheScene())
+        orderedEntities.push_back(&name_ent);
+    }
+    std::stable_sort(
+        begin(orderedEntities),
+        end(orderedEntities),
+        [](EntityMap::value_type const* a, EntityMap::value_type const* b) {
+            return a->second.index < b->second.index; // Try to keep ordering
+            // return a->first < b->first; // reorder by entity name
+        });
+    for (auto const* name_ent : orderedEntities)
+    {
+        if (name_ent->second.isPresent.get())
         {
-            jsnObjects.emplace_back(ent->saveEntity());
+            if (name_ent->second.hasOverride())
+            {
+                jsnObjects.emplace_back(name_ent->second.value->saveEntity());
+            }
+        }
+        else if (name_ent->second.isPresent.getPrefab())
+        {
+            // isPresent is false but it was true in the prefab
+            json removedObj;
+            removedObj["Name"] = name_ent->first;
+            removedObj["__removed__"] = true;
+            jsnObjects.emplace_back(std::move(removedObj));
         }
     }
 
@@ -3552,9 +3685,8 @@ json Ent::Scene::saveScene() const
 
 void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const& _scenePath) const
 {
-    Ent::Entity sceneEntity{*this};
     // scene entity is named after scene base file name
-    sceneEntity.setName(_scenePath.stem().string());
+    Ent::Entity sceneEntity{*this, _scenePath.stem().string().c_str()};
 
     // generate relative wthumb path
     auto thumbNailPath = _scenePath.generic_string() + ".wthumb";

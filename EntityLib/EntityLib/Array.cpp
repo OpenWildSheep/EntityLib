@@ -61,8 +61,10 @@ bool Ent::Array::canErase() const
     {
         return false;
     }
-    // If it is a set, it has a singularItems. Can erase only if item is a oneOf.
-    return getSchema()->singularItems->get().type == Ent::DataType::oneOf;
+    // If it is a set, it has a singularItems.
+    // Can erase only if item is a oneOf or an Object with a keyField.
+    return getSchema()->singularItems->get().type == Ent::DataType::oneOf
+           or meta.keyField.has_value();
 }
 
 bool Ent::Array::mapErase(Map::KeyType const& _key)

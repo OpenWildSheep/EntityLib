@@ -292,6 +292,7 @@ namespace Ent
             json nodeData = loadJsonFile(entlib->rawdataPath, _prefabNodePath);
             Node prefabNode = entlib->loadNode(*schema, nodeData, nullptr);
             (*this) = prefabNode.GetRawValue().get<Object>().makeInstanceOf();
+            // TODO : Loïc - reset the keyField if there is one
             instanceOf.set(relPath);
         }
     }
@@ -2404,6 +2405,43 @@ Ent::Node Ent::EntityLib::loadNode(
                             [](Node const* tmplItem) { return tmplItem->getInt(); },
                             doRemoveDefault);
                         break;
+                    case Ent::DataType::object: // The key is a field in the item
+                        if (meta.keyField.has_value())
+                        {
+                            auto& keyProperty =
+                                *_nodeSchema.singularItems->get().properties[*meta.keyField];
+                            auto doRemoveSet = [](json const& item) {
+                                return item.value("__removed__", false);
+                            };
+                            switch (keyProperty.type)
+                            {
+                            case Ent::DataType::string:
+                                arr = mergeMapOverride(
+                                    [key = meta.keyField->c_str()](json const& item) {
+                                        return item.at(key).get<std::string>();
+                                    },
+                                    [key = meta.keyField->c_str()](Node const* tmplItem) {
+                                        return tmplItem->at(key)->getString();
+                                    },
+                                    doRemoveSet);
+                                break;
+                            case Ent::DataType::integer:
+                                arr = mergeMapOverride(
+                                    [key = meta.keyField->c_str()](json const& item) {
+                                        return item.at(key).get<int64_t>();
+                                    },
+                                    [key = meta.keyField->c_str()](Node const* tmplItem) {
+                                        return tmplItem->at(key)->getInt();
+                                    },
+                                    doRemoveSet);
+                                break;
+                            default:
+                                throw ContextException(
+                                    "Wrong type for keyField '%s'", meta.keyField->c_str());
+                            }
+                            break;
+                        }
+                        // [[fallthrough]]
                     default:
                         throw ContextException(
                             "Unknown key type in set '%s'", _nodeSchema.name.c_str());
@@ -2664,22 +2702,36 @@ json Ent::EntityLib::dumpNode(
                         }
                         else if (meta.overridePolicy == "set")
                         {
-                            if (item->getSchema()->type != Ent::DataType::oneOf)
+
+                            if (item->getSchema()->type == Ent::DataType::oneOf)
                             {
-                                throw ContextException(
-                                    R"(Can't write an erased element in a set of non-union)");
+                                auto& unionMeta =
+                                    item->getSchema()->meta.get<Ent::Subschema::UnionMeta>();
+                                char const* type = item->getUnionType();
+                                json tmpNode;
+                                tmpNode[unionMeta.typeField] = type;
+                                tmpNode[unionMeta.dataField] = json();
+                                data.emplace_back(std::move(tmpNode));
+                                if (unionMeta.indexField.has_value() and _saveUnionIndex)
+                                {
+                                    data[*unionMeta.indexField] = _node.getUnionTypeIndex();
+                                }
                             }
-                            auto& unionMeta =
-                                item->getSchema()->meta.get<Ent::Subschema::UnionMeta>();
-                            char const* type = item->getUnionType();
-                            json tmpNode;
-                            tmpNode[unionMeta.typeField] = type;
-                            tmpNode[unionMeta.dataField] = json();
-                            data.emplace_back(std::move(tmpNode));
-                            if (unionMeta.indexField.has_value() and _saveUnionIndex)
+                            else if (
+                                item->getSchema()->type == Ent::DataType::object
+                                and meta.keyField.has_value())
                             {
-                                data[*unionMeta.indexField] = _node.getUnionTypeIndex();
+                                json tmpNode;
+                                auto key = arr.getChildKey(item);
+                                mapbox::util::apply_visitor(
+                                    [&](auto&& k) { tmpNode[*meta.keyField] = k; }, key);
+                                tmpNode["__removed__"] = true;
+                                data.emplace_back(std::move(tmpNode));
+                                // [[fallthrough]]
                             }
+                            else
+                                throw ContextException("Can't write an erased element in a set of "
+                                                       "non-union");
                         }
                     }
                 }

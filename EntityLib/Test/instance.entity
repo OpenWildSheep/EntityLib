@@ -93,9 +93,28 @@
                     }
                 ]
             }
+        }, {
+            "Data": {
+                "SetOfObject": [{
+                        "Name": "A",
+                        "Value": "a"
+                    }, {
+                        "Name": "B",
+                        "Value": "b"
+                    }, {
+                        "Name": "E",
+                        "InstanceOf": "ObjectInSet.node"
+                    }, {
+                        "Name": "F",
+                        "Value": "f"
+                    }
+                ]
+            },
+            "Type": "TestSetOfObject",
+            "Version": 1
         }
     ],
     "InstanceOf": "prefab.entity",
-	"Thumbnail": "prout",
+    "Thumbnail": "prout",
     "Name": "PlayerSpawner_"
 }

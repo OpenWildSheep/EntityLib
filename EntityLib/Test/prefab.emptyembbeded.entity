@@ -235,6 +235,16 @@
                         "OldNode2",
                         {}
                     ]
+                ],
+                "SetOfObject": [
+                    {
+                        "Name": "C",
+                        "Value": "c"
+                    },
+                    {
+                        "Name": "D",
+                        "Value": "d"
+                    }
                 ]
             },
             "Type": "TestSetOfObject",

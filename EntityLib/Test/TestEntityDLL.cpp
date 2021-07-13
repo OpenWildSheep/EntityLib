@@ -826,6 +826,24 @@ try
             subsceneCmp->embedded->renameEntity("EntityWithInstanceOf", "EntityWithInstanceOf2"),
             Ent::CantRename);
 
+        // Test rename object in set
+        // - Possible
+        ENTLIB_ASSERT(
+            testSetOfObject->root.at("SetOfObject")->mapGet("A")->at("Value")->getString()
+            == std::string("a"));
+        testSetOfObject->root.at("SetOfObject")->mapRename("A", "A2");
+        ENTLIB_ASSERT(
+            testSetOfObject->root.at("SetOfObject")->mapGet("A2")->at("Value")->getString()
+            == std::string("a"));
+        ENTLIB_ASSERT(testSetOfObject->root.at("SetOfObject")->mapGet("A") == nullptr);
+        // - Not possible
+        ENTLIB_ASSERT(
+            testSetOfObject->root.at("SetOfObject")->mapGet("D")->at("Value")->getString()
+            == std::string("d"));
+        // TODO : decomment!!
+        ENTLIB_CHECK_EXCEPTION(
+            testSetOfObject->root.at("SetOfObject")->mapRename("D", "D2"), Ent::CantRename);
+
         // ****************************** Test hasASuper ******************************************
         // *************** ENTITY ***************
         auto subscene = ent->getSubSceneComponent();
@@ -1025,6 +1043,12 @@ try
         ENTLIB_ASSERT(
             subsceneCmp->embedded->getEntity("PrettiestName")->getName()
             == std::string("PrettiestName"));
+
+        // Test rename object in set
+        ENTLIB_ASSERT(
+            testSetOfObject->root.at("SetOfObject")->mapGet("A2")->at("Value")->getString()
+            == std::string("a"));
+        ENTLIB_ASSERT(testSetOfObject->root.at("SetOfObject")->mapGet("A") == nullptr);
 
         // ****************************** Test hasASuper ******************************************
         // *************** ENTITY ***************

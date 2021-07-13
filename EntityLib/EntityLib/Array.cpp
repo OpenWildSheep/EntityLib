@@ -90,6 +90,12 @@ Ent::Node* Ent::Array::mapInsert(Map::KeyType const& _key)
     return m_data.get<Map>().insert(_key);
 }
 
+Ent::Node* Ent::Array::mapRename(Map::KeyType const& _key, Map::KeyType const& _newKey)
+{
+    ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only mapRename on map or set");
+    return m_data.get<Map>().rename(_key, _newKey);
+}
+
 bool Ent::Array::hasKey() const
 {
     auto&& meta = m_schema->meta.get<Ent::Subschema::ArrayMeta>();

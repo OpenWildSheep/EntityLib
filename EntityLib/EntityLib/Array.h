@@ -46,6 +46,7 @@ namespace Ent
         Node* mapGet(Map::KeyType const& _key); ///< @return the item with _key, or nullptr
         Node const* mapGet(Map::KeyType const& _key) const; ///< @return the item with _key, or nullptr
         Node* mapInsert(Map::KeyType const& _key); ///< @pre hasKey(). @brief Insert a new item with _key
+        Node* mapRename(Map::KeyType const& _key, Map::KeyType const& _newKey);
 
         /// @return true if it is a map/set and the element with _key was removed
         bool isErased(Map::KeyType const& _key) const;

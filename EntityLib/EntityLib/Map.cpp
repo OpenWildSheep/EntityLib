@@ -309,6 +309,41 @@ Ent::Node* Ent::Map::insert(KeyType const& _key)
     return element.node.get();
 }
 
+Ent::Node* Ent::Map::rename(KeyType const& _key, KeyType const& _newkey)
+{
+    auto iter = m_itemMap.find(_key);
+    if (iter != m_itemMap.end())
+    {
+        auto idx = iter->second;
+        if (m_items[idx].isPresent.get())
+        {
+            auto const& overridePolicy = m_schema->meta.get<Subschema::ArrayMeta>().overridePolicy;
+            auto const itemIsObject = m_schema->singularItems->get().type == Ent::DataType::object;
+            if (itemIsObject and overridePolicy == "set"
+                and m_items[idx].node->GetRawValue().get<Object>().hasASuper)
+            {
+                throw CantRename(
+                    R"(Can't rename key because it override an item in prefab from parent entity)");
+            }
+            else
+            {
+                m_items[idx].isPresent.set(false);
+                auto clone = *m_items[idx].node;
+                setChildKey(m_schema, &clone, _newkey);
+                return insert(Ent::OverrideValueLocation::Override, _newkey, clone);
+            }
+        }
+        else
+        {
+            throw CantRename("Can't rename key because it was removed");
+        }
+    }
+    else
+    {
+        throw CantRename("Can't rename key because it doesn't exist");
+    }
+}
+
 bool Ent::Map::isErased(KeyType const& _key) const
 {
     auto iter = m_itemMap.find(_key);

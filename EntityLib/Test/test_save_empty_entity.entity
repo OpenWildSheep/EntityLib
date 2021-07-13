@@ -1,0 +1,17 @@
+{
+    "Components": [
+        {
+            "Data": {
+                "Embedded": [
+                    {
+                        "Components": [],
+                        "Name": ""
+                    }
+                ]
+            },
+            "Type": "SubScene",
+            "Version": 1
+        }
+    ],
+    "Name": ""
+}

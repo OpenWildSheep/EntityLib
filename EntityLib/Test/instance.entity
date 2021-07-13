@@ -86,7 +86,10 @@
                                 }
                             }
                         ],
-						"InstanceOf": "subentity2.entity"
+                        "InstanceOf": "subentity2.entity"
+                    }, {
+                        "Name": "EntityWithInstanceOfButNoOverride",
+                        "InstanceOf": "subentity2.entity"
                     }
                 ]
             }

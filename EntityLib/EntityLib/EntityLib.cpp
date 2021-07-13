@@ -1226,8 +1226,7 @@ namespace Ent
         {
             throw BadType();
         }
-        (*this) = getEntityLib()->loadNode(*getSchema(), json(), nullptr);
-        value.get<Object>().instanceOf.unset();
+        value.get<Object>().resetInstanceOf(nullptr);
     }
 
     void Ent::Entity::changeInstanceOf(char const* _newPrefab)
@@ -1581,9 +1580,9 @@ namespace Ent
 
     bool Entity::hasOverride() const
     {
-        // The override is done in comparison with the prefab so
-        //     the "InstanceOf" path itself is never considered as overrided.
-        if (name.isSet() or color.hasOverride() or thumbnail.isSet() or actorStates.hasOverride())
+        //    If "InstanceOf" is set, this entity "hasOverride"
+        if (name.isSet() or color.hasOverride() or thumbnail.isSet() or actorStates.hasOverride()
+            or instanceOf.hasOverride())
         {
             return true;
         }
@@ -1637,7 +1636,10 @@ namespace Ent
                     superComp.index,
                 });
         }
+        auto prevName = name;
         name = templ->getNameValue().makeInstanceOf();
+        if (not canBeRenamed()) // Name is the key to override entities, so it can't be changed
+            name.set(prevName.get());
         subSceneComponent = templ->getSubSceneComponent() != nullptr ?
                                 templ->getSubSceneComponent()->makeInstanceOf() :
                                 nullptr;
@@ -2210,7 +2212,8 @@ Ent::Node Ent::EntityLib::loadNode(
             prefabNode = loadNode(_nodeSchema, nodeData, nullptr, _default);
             _super = &prefabNode;
             Ent::Override<String> tmplPath("", tl::nullopt, InstanceOfIter->get<std::string>());
-            object.instanceOf = std::move(tmplPath);
+            object.instanceOf = prefabNode.value.get<Object>().instanceOf.makeOverridedInstanceOf(
+                InstanceOfIter->get<std::string>());
         }
 
         // Read the fields in schema
@@ -2805,7 +2808,11 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         _superEntityFromParentEntity == nullptr
         or _superEntityFromParentEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
 
-    tl::optional<std::string> instanceOf;
+    Ent::Override<String> ovInstanceOf;
+    if (_superEntityFromParentEntity != nullptr)
+    {
+        ovInstanceOf = _superEntityFromParentEntity->getInstanceOfValue().makeInstanceOf();
+    }
     auto superEntityOfThisEntity = std::make_unique<Ent::Entity>(_entlib);
     ENTLIB_ASSERT(superEntityOfThisEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
     bool superIsInit = false;
@@ -2813,12 +2820,12 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
     if (_entNode.count("InstanceOf") != 0)
     {
-        instanceOf = _entNode.at("InstanceOf").get<std::string>();
+        auto const prefabPath = _entNode.at("InstanceOf").get<std::string>();
         // Do not inherit from _superEntityFromParentEntity since the override of InstanceOf reset the Entity
-        auto superEntityShared = _entlib.loadEntityReadOnly(*instanceOf, nullptr);
+        auto superEntityShared = _entlib.loadEntityReadOnly(prefabPath.c_str(), nullptr);
+        ovInstanceOf = superEntityShared->getInstanceOfValue().makeOverridedInstanceOf(prefabPath);
         superEntity = superEntityShared.get();
         ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
-        std::filesystem::path instanceOfPath = *instanceOf;
         superIsInit = true;
     }
     ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
@@ -2843,7 +2850,6 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     Ent::Override<String> ovName = superName.makeOverridedInstanceOf(name);
 
     Ent::Override<String> superInstanceOf = superEntity->getInstanceOfValue();
-    Ent::Override<String> ovInstanceOf = superInstanceOf.makeOverridedInstanceOf(instanceOf);
 
     tl::optional<Ent::ActivationLevel> maxActivationLevel;
     if (_entNode.count("MaxActivationLevel") != 0)

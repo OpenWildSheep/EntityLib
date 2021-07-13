@@ -96,6 +96,35 @@
                             }
                         ],
                         "Name": "EntityWithInstanceOf_detached"
+                    },
+                    {
+                        "Color": [
+                            255.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [
+                            {
+                                "Data": {},
+                                "Type": "NetworkLink",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "TestSaveEntWithOverride_detached"
+                    },
+                    {
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Source": "subentity2",
+                                    "Target": "subentity2"
+                                },
+                                "Type": "NetworkLink",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "EntityWithInstanceOfButNoOverride_detached"
                     }
                 ]
             },
@@ -279,6 +308,22 @@
         {
             "Data": {},
             "Type": "TestDefaultValues",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "MapOfObject": [
+                    [
+                        "OldNode1",
+                        {}
+                    ],
+                    [
+                        "OldNode2",
+                        {}
+                    ]
+                ]
+            },
+            "Type": "TestSetOfObject",
             "Version": 1
         },
         {

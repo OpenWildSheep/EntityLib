@@ -228,6 +228,27 @@
                         ],
                         "InstanceOf": "subentity2.entity",
                         "Name": "EntityWithInstanceOf"
+                    },
+                    {
+                        "Color": [
+                            255.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [
+                            {
+                                "Data": {},
+                                "Type": "NetworkLink",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "TestSaveEntWithOverride"
+                    },
+                    {
+                        "Components": [],
+                        "InstanceOf": "subentity2.entity",
+                        "Name": "EntityWithInstanceOfButNoOverride"
                     }
                 ]
             },
@@ -310,6 +331,22 @@
                 "NormalRatio": 0.6
             },
             "Type": "StickToTerrain",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "MapOfObject": [
+                    [
+                        "OldNode1",
+                        {}
+                    ],
+                    [
+                        "OldNode2",
+                        {}
+                    ]
+                ]
+            },
+            "Type": "TestSetOfObject",
             "Version": 1
         }
     ],

@@ -193,7 +193,7 @@ try
         ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(absRef) == 1);
     }
 
-    static constexpr auto PrefabSubEntityCount = 2;
+    static constexpr auto PrefabSubEntityCount = 4;
 
     auto testPrefabEntity = [](Ent::Entity const* ent) {
         // ActorStates
@@ -357,7 +357,7 @@ try
     {
         Ent::Entity ent(entlib);
         ent.resetInstanceOf("prefab.entity");
-        ENTLIB_ASSERT(not ent.hasOverride());
+        ENTLIB_ASSERT(ent.hasOverride()); // resetInstanceOf does override the "instanceOf"
         ENTLIB_ASSERT(ent.getInstanceOf() == std::string("prefab.entity"));
     }
 
@@ -724,10 +724,26 @@ try
         ENTLIB_ASSERT(prefabOfPrefab == prefab->getInstanceOf());
         entlib.saveEntity(*prefab, "prefab_updated.entity");
         ent->resetInstanceOf(prefabPath);
-        ENTLIB_ASSERT(not ent->hasOverride());
+        ENTLIB_ASSERT(ent->hasOverride()); // resetInstanceOf does override the "instanceOf"
 
         testInstanceOf(*prefab, false);
     }
+
+    auto getEntityByName = [](Ent::Scene& scene, char const* name) -> Ent::Entity* {
+        auto&& objs = scene.getObjects();
+        auto iter = std::find_if(begin(objs), end(objs), [name](auto&& ent) {
+            return strcmp(ent->getName(), name) == 0;
+        });
+        if (iter != end(objs))
+        {
+            return iter->get();
+        }
+        else
+        {
+            return nullptr;
+        }
+    };
+
     {
         // Test read instance of
         EntityPtr ent = entlib.loadEntity("instance.entity");
@@ -782,6 +798,59 @@ try
 
         // TEST SubScene (without override)
         testInstanceOf(*ent);
+
+        // ****************************** Test hasASuper ******************************************
+        // *************** ENTITY ***************
+        auto subscene = ent->getSubSceneComponent();
+        // new entity
+        auto newEnt = std::make_unique<Ent::Entity>(entlib);
+        ENTLIB_ASSERT(newEnt->hasOverride() == false);
+        subscene->embedded->addEntity(std::move(newEnt));
+        // entity with override
+        auto entWithOverride = getEntityByName(*subscene->embedded, "TestSaveEntWithOverride");
+        ENTLIB_ASSERT(entWithOverride != nullptr);
+        auto networkLink = entWithOverride->getComponent("NetworkLink");
+        ENTLIB_ASSERT(networkLink != nullptr);
+        networkLink->root.at("ThumbnailMesh")->setString("DefaultLinkVisual.wbm");
+        ENTLIB_ASSERT(entWithOverride->hasOverride());
+        // entity with instanceOf overriden
+        auto entWithoutOverride =
+            getEntityByName(*subscene->embedded, "EntityWithInstanceOfButNoOverride");
+        entWithoutOverride->resetInstanceOf("subentity2.entity");
+        ENTLIB_ASSERT(entWithoutOverride->getInstanceOf() == std::string("subentity2.entity"));
+        ENTLIB_ASSERT(entWithoutOverride->hasOverride());
+        // *************** COMPONENT ***************
+        // new Component
+        auto comp = ent->addComponent("AnimationEventsGeneratorGD");
+        ENTLIB_ASSERT(ent->getComponent("AnimationEventsGeneratorGD") != nullptr);
+        ENTLIB_ASSERT(comp->hasOverride() == false);
+        // Component with override
+        ent->getComponent("VoxelSimulationGD")->root.at("LossBySecond")->setFloat(36.);
+        ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD") != nullptr);
+        ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD")->hasOverride());
+        // Component with instanceOf overriden
+        auto compWithInstOf = ent->getComponent("CharacterControllerGD");
+        compWithInstOf->root.resetInstanceOf("test.SeedPatch2.node");
+        ENTLIB_ASSERT(compWithInstOf->root.getInstanceOf() == std::string("test.SeedPatch2.node"));
+        ENTLIB_ASSERT(compWithInstOf->hasOverride());
+        // *************** NODE ***************
+        // new Node
+        auto setOfObject = ent->getComponent("TestSetOfObject");
+        ENTLIB_ASSERT(setOfObject);
+        auto mapTest = setOfObject->root.at("MapOfObject");
+        mapTest->mapInsert("NewNode");
+        ENTLIB_ASSERT(mapTest->mapGet("NewNode") != nullptr);
+        ENTLIB_ASSERT(mapTest->mapGet("NewNode")->hasOverride() == false);
+        // Node with override
+        mapTest->mapGet("OldNode1")->at("Value")->setString("overriden");
+        ENTLIB_ASSERT(
+            mapTest->mapGet("OldNode1")->at("Value")->getString() == std::string("overriden"));
+        ENTLIB_ASSERT(mapTest->mapGet("OldNode1")->hasOverride());
+        // Node with instanceOf overriden
+        mapTest->mapGet("OldNode2")->resetInstanceOf("OldNode2.MapOfObject.node");
+        auto val = mapTest->mapGet("OldNode2");
+        ENTLIB_ASSERT(val->at("Value")->getString() == std::string("overriden"));
+        ENTLIB_ASSERT(val->hasOverride());
 
         sysCreat->root.at("BehaviorState")->setString("Overrided");
         entlib.saveEntity(*ent, "instance.copy.entity");
@@ -916,6 +985,51 @@ try
         EntityPtr ent = entlib.loadEntity("instance.copy.entity");
         Ent::Component* sysCreat = ent->getComponent("SystemicCreature");
         ENTLIB_ASSERT(sysCreat != nullptr);
+
+        // ****************************** Test hasASuper ******************************************
+        // *************** ENTITY ***************
+        auto subscene = ent->getSubSceneComponent();
+        // new entity
+        auto ent2 = getEntityByName(*subscene->embedded, "");
+        ENTLIB_ASSERT(ent2 != nullptr);
+        ENTLIB_ASSERT(ent2->hasOverride()); // Name is always overriden since it is alway declared
+        // entity with override
+        ent2 = getEntityByName(*subscene->embedded, "TestSaveEntWithOverride");
+        ENTLIB_ASSERT(ent2 != nullptr);
+        ENTLIB_ASSERT(ent2->hasOverride());
+        // entity with instanceOf overriden
+        ent2 = getEntityByName(*subscene->embedded, "EntityWithInstanceOfButNoOverride");
+        ENTLIB_ASSERT(ent2 != nullptr);
+        ENTLIB_ASSERT(ent2->getInstanceOf() == std::string("subentity2.entity"));
+        ENTLIB_ASSERT(ent2->hasOverride());
+
+        // *************** COMPONENT ***************
+        // new Component
+        ENTLIB_ASSERT(ent->getComponent("AnimationEventsGeneratorGD") != nullptr);
+        ENTLIB_ASSERT(ent->getComponent("AnimationEventsGeneratorGD")->hasOverride() == false);
+        // Component with override
+        ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD") != nullptr);
+        ENTLIB_ASSERT(
+            ent->getComponent("VoxelSimulationGD")->root.at("LossBySecond")->getFloat() == 36.);
+        ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD")->hasOverride());
+        // Component with instanceOf overriden
+        auto compWithInstOf = ent->getComponent("CharacterControllerGD");
+        ENTLIB_ASSERT(compWithInstOf->root.getInstanceOf() == std::string("test.SeedPatch2.node"));
+        ENTLIB_ASSERT(compWithInstOf->hasOverride());
+        // *************** NODE ***************
+        // new Node
+        auto pathNodeGD = ent->getComponent("TestSetOfObject");
+        auto mapTest = pathNodeGD->root.at("MapOfObject");
+        ENTLIB_ASSERT(mapTest->mapGet("NewNode") != nullptr);
+        ENTLIB_ASSERT(mapTest->mapGet("NewNode")->hasOverride() == false);
+        // Node with override
+        ENTLIB_ASSERT(
+            mapTest->mapGet("OldNode1")->at("Value")->getString() == std::string("overriden"));
+        ENTLIB_ASSERT(mapTest->mapGet("OldNode1")->hasOverride());
+        // Node with instanceOf overriden
+        ENTLIB_ASSERT(
+            mapTest->mapGet("OldNode2")->at("Value")->getString() == std::string("overriden"));
+        ENTLIB_ASSERT(mapTest->mapGet("OldNode2")->hasOverride());
 
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent->getComponent("HeightObj");
@@ -1182,7 +1296,7 @@ try
         EntityPtr ent = entlib.makeInstanceOf("entity-subscene.entity");
         auto subs = ent->getSubSceneComponent();
 
-        ENTLIB_ASSERT(not ent->hasOverride());
+        ENTLIB_ASSERT(ent->hasOverride()); // makeInstanceOf does override the instanceOf
         ENTLIB_ASSERT(not empty(subs->embedded->getObjects()));
 
         auto&& allSubEntities = subs->embedded->getObjects();

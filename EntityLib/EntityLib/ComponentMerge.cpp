@@ -73,9 +73,9 @@ json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
     compList = json();
 
     auto isComponent = [](json const& node) {
-        if (node.count("properties"))
+        if (node.count("properties") != 0)
         {
-            if (node.at("properties").count("Super"))
+            if (node.at("properties").count("Super") != 0)
             {
                 auto ref = node.at("properties").at("Super").at("$ref").get<std::string>();
                 return ref.find("ComponentGD") != std::string::npos;

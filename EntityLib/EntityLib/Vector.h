@@ -6,7 +6,6 @@
 
 #pragma warning(push, 0)
 #pragma warning(disable : 4996)
-// #include "../external/optional.hpp"
 #include "../../../external/mapbox/variant.hpp"
 #pragma warning(pop)
 
@@ -48,6 +47,7 @@ namespace Ent
         tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         void unset();
         void setSize(Override<size_t> _size);
+        void applyAllValues(Vector& _dest, CopyMode _copyMode) const;
 
     private:
         EntityLib const* m_entlib = nullptr;

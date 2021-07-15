@@ -201,6 +201,16 @@ Ent::Node* Ent::Array::arrayInitPush(Node _node)
     return m_data.get<Vector>().initPush(std::move(_node));
 }
 
+void Ent::Array::applyAllValues(Array& _dest, CopyMode _copyMode) const
+{
+    apply_visitor(
+        [pref = &_dest, _copyMode](auto&& a) {
+            using PrefabType = std::remove_cv_t<std::remove_reference_t<decltype(a)>>;
+            a.applyAllValues(pref->m_data.get<PrefabType>(), _copyMode);
+        },
+        m_data);
+}
+
 Ent::Node* Ent::Array::arrayPush()
 {
     ENTLIB_ASSERT_MSG(not hasKey(), "Can't 'push' in a map or set. Use 'mapInsert'.");

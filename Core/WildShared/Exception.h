@@ -36,18 +36,16 @@ struct ContextException : ToolsException
     ContextException(char const* _message) noexcept;
     ContextException(std::string const& _message) noexcept;
     void addContextMessage(std::string const& _message) noexcept;
-    void addContextMessage(char const* _message) noexcept;
     template <typename... Args>
     void addContextMessage(char const* _message, Args&&... _args) noexcept;
 
     const char* what() const noexcept override;
 
 private:
-    static constexpr auto MaxContextLine = 10;
-    std::array<size_t, MaxContextLine> m_context = {};
-    std::array<char, 4096> m_rawContext = {};
-    size_t m_contextSize = 0;
-    size_t m_rawContextSize = 0;
+    // It is better to avoid allocation in error managment because it can lead to throw error above error
+    // BUT the json lib can generete some huge error messages and we need to forward them
+    // so for now we will use dynamic allocation.
+    std::vector<std::vector<char>> m_rawContext;
 };
 
 template <typename... Args>
@@ -59,20 +57,18 @@ ContextException::ContextException(char const* message, Args&&... args) noexcept
 template <typename... Args>
 void ContextException::addContextMessage(char const* _message, Args&&... args) noexcept
 {
-    if (m_rawContext.size() == m_rawContextSize)
-        return;
-    auto const written = sprintf_s(
-        m_rawContext.data() + m_rawContextSize,
-        (m_rawContext.size() - m_rawContextSize) - 1,
-        _message,
-        std::forward<Args>(args)...);
-    if (written != -1)
+    try
     {
-        m_context[m_contextSize] = m_rawContextSize;
-        ++m_contextSize;
-        m_rawContextSize += written;
-        m_rawContext[m_rawContextSize] = 0;
-        ++m_rawContextSize;
+        auto const written = snprintf(nullptr, 0, _message, std::forward<Args>(args)...);
+        m_rawContext.emplace_back(written + 1);
+        snprintf(
+            m_rawContext.back().data(),
+            m_rawContext.back().size(),
+            _message,
+            std::forward<Args>(args)...);
+    }
+    catch (std::bad_alloc&)
+    {
     }
 }
 
@@ -137,35 +133,29 @@ inline void ContextException::addContextMessage(std::string const& _message) noe
     addContextMessage(_message.c_str());
 }
 
-inline void ContextException::addContextMessage(char const* message) noexcept
-{
-    if (strcpy_s(
-            m_rawContext.data() + m_rawContextSize, m_rawContext.size() - m_rawContextSize, message)
-        == 0)
-    {
-        m_context[m_contextSize] = m_rawContextSize;
-        ++m_contextSize;
-        m_rawContextSize += strlen(message) + 1;
-    }
-}
-
 inline const char* ContextException::what() const noexcept
 {
-    static constexpr auto InitBuffSize = 4096;
-    thread_local static char buffer[InitBuffSize] = {0};
-    bool first = true;
-    for (size_t i = 0; i < m_contextSize; ++i)
+    thread_local static std::string buffer;
+    try
     {
-        auto message = m_rawContext.data() + m_context[i];
-        if (!first)
+
+        buffer.clear();
+        bool first = true;
+        for (auto& message : m_rawContext)
         {
-            strcat_s(buffer, sizeof(buffer), "    - ");
+            if (!first)
+            {
+                buffer += "    - ";
+            }
+            buffer += message.data();
+            buffer += "\n";
+            first = false;
         }
-        strcat_s(buffer, sizeof(buffer), message);
-        strcat_s(buffer, sizeof(buffer), "\n");
-        first = false;
     }
-    return buffer;
+    catch (std::bad_alloc&)
+    {
+    }
+    return buffer.data();
 }
 
 template <typename... Args>

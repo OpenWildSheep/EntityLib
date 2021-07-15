@@ -7,9 +7,23 @@
             "className": "ActionClimbEdge"
         },
         {
-            "classData": {},
+            "classData": {
+                "Type": 13
+            },
             "className": "ActionCinematic"
+        },
+        {
+            "classData": {
+                "ExitRequired": true
+            },
+            "className": "ActionChosen"
         }
+    ],
+    "Color": [
+        27.0,
+        177.0,
+        27.0,
+        255.0
     ],
     "Components": [
         {
@@ -48,15 +62,14 @@
                 "BehaviorPath": "Pesto/Behavior/FSMDefaultBehavior.pesto",
                 "BehaviorState": "W/*at*/c//h",
                 "CanBeMaster": false,
-                "Faction": "Shamans",
+                "Faction": "Plouf",
                 "Inventory": "KaiWOLgrey",
                 "Invincible": false,
                 "Life": 1000.0,
-                "Name": "Shamane_male",
                 "PlayerSpawn": true,
                 "ScriptList": [
                     "a1",
-                    "b1",
+                    "b2",
                     "c1"
                 ],
                 "Spawner": "ShamanPlayerSpawner.gd",
@@ -124,17 +137,15 @@
                     },
                     {
                         "classData": {
-                            "GameStateName": "Pouet!"
+                            "EventName": "Tutu"
                         },
-                        "className": "CineEventTestCurrentGameState"
+                        "className": "CineEventTriggerEventHandlerPost"
                     },
                     {
-                        "classData": {},
-                        "className": "CineEventTestCurrentGameState"
-                    },
-                    {
-                        "classData": {},
-                        "className": "CineEvent"
+                        "classData": {
+                            "EventName": "Titi"
+                        },
+                        "className": "CineEventTriggerEventHandlerPost"
                     }
                 ]
             },
@@ -209,15 +220,13 @@
                         "Components": [
                             {
                                 "Data": {
-                                    "Source": ".EP1-Spout_",
-                                    "Target": ".EP1-crook_",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                    "Source": "instance"
                                 },
                                 "Type": "NetworkLink",
                                 "Version": 1
                             }
                         ],
-                        "InstanceOf": "subentity.entity",
+                        "InstanceOf": "subentity2.entity",
                         "Name": "EntityWithInstanceOf"
                     }
                 ]
@@ -253,16 +262,23 @@
                             ]
                         ],
                         [
-                            "c",
+                            "b",
                             [
+                                "1",
                                 "2"
                             ]
                         ],
                         [
-                            "d",
+                            "c",
                             [
-                                "42"
+                                "1",
+                                "2",
+                                "3"
                             ]
+                        ],
+                        [
+                            "d",
+                            null
                         ]
                     ]
                 }
@@ -282,21 +298,21 @@
         },
         {
             "Data": {
-                "InstanceOf": "test.SeedPatch.node",
-                "NoiseOffsetX": 2.0
+                "InstanceOf": "test.SeedPatch2.node",
+                "NoiseOffsetY": 3.0
             },
             "Type": "SeedPatch",
             "Version": 1
         },
         {
             "Data": {
-                "TestRef": "EP1-Spout_LINK_001"
+                "InstanceOf": "test.StickToTerrain.node",
+                "NormalRatio": 0.6
             },
-            "Type": "TestEntityRef",
+            "Type": "StickToTerrain",
             "Version": 1
         }
     ],
-    "MaxActivationLevel": "InWorld",
     "Name": "PlayerSpawner_",
-    "Thumbnail": "TestThumbnail"
+    "Thumbnail": "prout"
 }

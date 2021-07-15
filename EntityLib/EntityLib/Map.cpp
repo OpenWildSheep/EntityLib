@@ -167,17 +167,18 @@ Ent::DataType Ent::Map::getKeyType(Subschema const* _schema)
 
 bool Ent::Map::Element::hasOverride() const
 {
-    return isPresent.hasOverride || node->hasOverride();
+    return isPresent.hasOverride() || node->hasOverride();
 }
 
 bool Ent::Map::Element::hasPrefabValue() const
 {
-    return isPresent.hasPrefab or node->hasPrefabValue();
+    return isPresent.hasPrefabValue() or node->hasPrefabValue();
 }
 
 bool Ent::Map::Element::hasDefaultValue() const
 {
-    return (not isPresent.hasPrefab and not isPresent.hasOverride) and node->hasDefaultValue();
+    return (not isPresent.hasPrefabValue() and not isPresent.hasOverride())
+           and node->hasDefaultValue();
 }
 
 bool Ent::Map::hasOverride() const
@@ -245,7 +246,14 @@ Ent::Node const* Ent::Map::get(KeyType const& _key) const
         return node->at(1llu);
     }
     else
+    {
         return element.node.get();
+    }
+}
+
+Ent::Node* Ent::Map::get(KeyType const& _key)
+{
+    return const_cast<Ent::Node*>(std::as_const(*this).get(_key));
 }
 
 Ent::Node* Ent::Map::insert(KeyType const& _key)
@@ -291,17 +299,11 @@ Ent::Node* Ent::Map::insert(OverrideValueLocation _loc, KeyType _key, Node _node
     {
     case OverrideValueLocation::Default:
     {
-        elt.isPresent.defaultValue = true;
+        elt.isPresent.setDefault(true);
         break;
     }
-    case OverrideValueLocation::Prefab:
-        elt.isPresent.prefabValue = true;
-        elt.isPresent.hasPrefab = true;
-        break;
-    case OverrideValueLocation::Override:
-        elt.isPresent.overrideValue = true;
-        elt.isPresent.hasOverride = true;
-        break;
+    case OverrideValueLocation::Prefab: elt.isPresent.setPrefab(true); break;
+    case OverrideValueLocation::Override: elt.isPresent.set(true); break;
     }
     m_itemMap.emplace(std::move(_key), m_items.size() - 1);
     checkInvariants();
@@ -341,7 +343,6 @@ std::vector<Ent::Node const*> Ent::Map::getItems() const
     {
         for (auto const& key_index : m_itemMap)
         {
-            auto key = std::get<0>(key_index);
             auto index = std::get<1>(key_index);
             auto& elt = m_items[index];
             if (elt.isPresent.get())
@@ -469,7 +470,7 @@ size_t Ent::Map::size() const
 size_t Ent::Map::getDefaultSize() const
 {
     return (size_t)std::count_if(
-        begin(m_items), end(m_items), [](Element const& d) { return d.isPresent.defaultValue; });
+        begin(m_items), end(m_items), [](Element const& d) { return d.isPresent.getDefault(); });
 }
 
 size_t Ent::Map::getPrefabSize() const
@@ -496,5 +497,28 @@ void Ent::Map::unset()
     {
         elt.isPresent.unset();
         elt.node->unset();
+    }
+}
+
+void Ent::Map::applyAllValues(Map& _dest, CopyMode _copyMode) const
+{
+    std::set<KeyType> removedDestKeys;
+    for (auto& destNode : _dest.getItems())
+    {
+        auto&& key = getChildKey(m_schema, destNode);
+        removedDestKeys.insert(key);
+    }
+
+    for (auto& sourceNode : getItems())
+    {
+        auto&& key = getChildKey(m_schema, sourceNode);
+        Node* destNode2 = _dest.insert(key); // 'insert' only get if the item exist
+        sourceNode->applyAllValues(*destNode2, _copyMode);
+        removedDestKeys.erase(key);
+    }
+
+    for (auto const& removedDestKey : removedDestKeys)
+    {
+        _dest.erase(removedDestKey);
     }
 }

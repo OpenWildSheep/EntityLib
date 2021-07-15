@@ -1,0 +1,12 @@
+{
+    "Components": [{
+			"Version": 1,
+			"Type": "NetworkLink",
+			"Data": {
+				"Source": "subentity2",
+				"Target": "subentity2"
+			}
+		}
+    ],
+    "Name": "EntityWithInstanceOf"
+}

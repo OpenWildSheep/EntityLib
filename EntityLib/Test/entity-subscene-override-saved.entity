@@ -15,9 +15,7 @@
                         ],
                         "Name": "wolf_skeleton_lush"
                     }
-                ],
-                "File": "",
-                "isEmbedded": true
+                ]
             },
             "Type": "SubScene",
             "Version": 1

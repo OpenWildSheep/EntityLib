@@ -36,15 +36,6 @@
         },
         {
             "Data": {
-                "Embedded": [],
-                "File": "",
-                "isEmbedded": true
-            },
-            "Type": "SubScene",
-            "Version": 1
-        },
-        {
-            "Data": {
                 "Tag": "ShamanPlayerSpawner",
                 "ThumbnailMesh": "02_creature/human/male/clothstrong/bodykai/CLOTH_Body.wbm",
                 "Type": "Spawner"
@@ -220,10 +211,22 @@
         },
         {
             "Data": {
+                "InstanceOf": "test.SeedPatch.node",
+                "NoiseOffsetX": 2.0
+            },
+            "Type": "SeedPatch",
+            "Version": 1
+        },
+        {
+            "Data": {
                 "TestRef": "EP1-Spout_LINK_001"
             },
             "Type": "TestEntityRef",
             "Version": 1
+        },
+        {
+            "Data": null,
+            "Type": "SubScene"
         }
     ],
     "MaxActivationLevel": "InWorld",

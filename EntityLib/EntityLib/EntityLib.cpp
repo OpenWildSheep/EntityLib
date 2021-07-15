@@ -167,6 +167,15 @@ namespace Ent
         std::tie(subTypeSchema, typeIndex) = schema->getUnionTypeWrapper(getUnionType());
     }
 
+    void Union::applyAllValues(Union& _dest, CopyMode _copyMode) const
+    {
+        if (typeIndex != _dest.typeIndex)
+        {
+            _dest.setUnionType(*wrapper->getEntityLib(), getUnionType());
+        }
+        wrapper->applyAllValues(*_dest.wrapper, _copyMode);
+    }
+
     // ************************************* Object ***********************************************
 
     void Ent::Object::unset()
@@ -174,6 +183,33 @@ namespace Ent
         for (auto&& name_node : nodes)
         {
             name_node.second->unset();
+        }
+    }
+
+    // For Entity and Object. Decide to resetInstanceOf or not depending on \b _copyMode
+    template <typename T>
+    void applyInstanceOfField(T const& _source, T& _dest, Ent::CopyMode _copyMode)
+    {
+        auto sourcePrefabPath = _source.getInstanceOfValue().get().c_str();
+        if (_source.getInstanceOfValue().get() != _dest.getInstanceOfValue().get())
+        {
+            _dest.resetInstanceOf(sourcePrefabPath == nullptr ? "" : sourcePrefabPath);
+        }
+        else if (_copyMode == CopyMode::CopyOverride)
+        {
+            if (_source.getInstanceOfValue().isSet() and not _dest.getInstanceOfValue().isSet())
+            {
+                _dest.resetInstanceOf(sourcePrefabPath == nullptr ? "" : sourcePrefabPath);
+            }
+        }
+    }
+
+    void Ent::Object::applyAllValues(Object& _dest, CopyMode _copyMode) const
+    {
+        applyInstanceOfField(*this, _dest, _copyMode);
+        for (size_t i = 0; i < nodes.size(); ++i)
+        {
+            nodes[i].second->applyAllValues(*_dest.nodes[i].second, _copyMode);
         }
     }
 
@@ -186,6 +222,50 @@ namespace Ent
             return strcmp(a.first, b.first) < 0;
         }
     };
+
+    Ent::Object Ent::Object::makeInstanceOf() const
+    {
+        Object out(schema);
+        out.instanceOf = instanceOf.makeInstanceOf();
+        out.nodes.reserve(size());
+        for (auto&& name_node : *this)
+        {
+            out.nodes.emplace_back(std::get<0>(name_node), std::get<1>(name_node)->makeInstanceOf());
+        }
+        std::sort(begin(out), end(out), CompObject());
+        return out;
+    }
+
+    Object Ent::Object::detach() const
+    {
+        Object out(schema);
+        out.nodes.reserve(size());
+        for (auto&& name_node : *this)
+        {
+            out.nodes.emplace_back(std::get<0>(name_node), std::get<1>(name_node)->detach());
+        }
+        std::sort(begin(out), end(out), CompObject());
+        return out;
+    }
+
+    void Ent::Object::resetInstanceOf(char const* _prefabNodePath)
+    {
+        auto const* entlib = schema->rootSchema->entityLib;
+        if (_prefabNodePath == nullptr or strlen(_prefabNodePath) == 0)
+        {
+            Node prefabNode = entlib->loadNode(*schema, json{}, nullptr);
+            (*this) = prefabNode.GetRawValue().get<Object>().makeInstanceOf();
+            instanceOf.set("");
+        }
+        else
+        {
+            auto relPath = entlib->getRelativePath(_prefabNodePath).generic_u8string();
+            json nodeData = loadJsonFile(entlib->rawdataPath, _prefabNodePath);
+            Node prefabNode = entlib->loadNode(*schema, nodeData, nullptr);
+            (*this) = prefabNode.GetRawValue().get<Object>().makeInstanceOf();
+            instanceOf.set(relPath);
+        }
+    }
 
     size_t count(Object const& obj, char const* key)
     {
@@ -436,8 +516,8 @@ namespace Ent
 
     struct UnSet
     {
-        template <typename T> // Take all types with a unset method
-        auto operator()(T& _nodeInternal) const -> decltype(_nodeInternal.unset())
+        template <typename T>
+        void operator()(T& _nodeInternal) const
         {
             return _nodeInternal.unset();
         }
@@ -481,7 +561,7 @@ namespace Ent
         template <typename T>
         bool operator()(Override<T> const& _ov) const
         {
-            return (not _ov.hasPrefab) and (not _ov.hasOverride);
+            return (not _ov.hasPrefabValue()) and (not _ov.hasOverride());
         }
 
         bool operator()(Null const&) const
@@ -535,14 +615,7 @@ namespace Ent
 
         Node operator()(Object const& _obj) const
         {
-            Object out;
-            out.nodes.reserve(_obj.size());
-            for (auto&& name_node : _obj)
-            {
-                out.nodes.emplace_back(std::get<0>(name_node), std::get<1>(name_node)->detach());
-            }
-            std::sort(begin(out), end(out), CompObject());
-            return Node(std::move(out), schema);
+            return Node(_obj.detach(), schema);
         }
 
         Node operator()(Union const& _un) const
@@ -584,16 +657,7 @@ namespace Ent
 
         Node operator()(Object const& _obj) const
         {
-            Object out;
-            out.instanceOf = _obj.instanceOf.makeInstanceOf();
-            out.nodes.reserve(_obj.size());
-            for (auto&& name_node : _obj)
-            {
-                out.nodes.emplace_back(
-                    std::get<0>(name_node), std::get<1>(name_node)->makeInstanceOf());
-            }
-            std::sort(begin(out), end(out), CompObject());
-            return Node(std::move(out), schema);
+            return Node(_obj.makeInstanceOf(), schema);
         }
 
         Node operator()(Union const& _un) const
@@ -639,7 +703,7 @@ namespace Ent
 
         bool operator()(Object const& _obj) const
         {
-            if (_obj.instanceOf.hasOverride)
+            if (_obj.instanceOf.hasOverride())
             {
                 return true;
             }
@@ -671,7 +735,7 @@ namespace Ent
         template <typename T>
         bool operator()(Override<T> const& _ov) const
         {
-            return _ov.hasPrefab;
+            return _ov.hasPrefabValue();
         }
 
         bool operator()(Null const& _val) const
@@ -687,7 +751,7 @@ namespace Ent
 
         bool operator()(Object const& _obj) const
         {
-            if (_obj.instanceOf.hasPrefab)
+            if (_obj.instanceOf.hasPrefabValue())
             {
                 return true;
             }
@@ -894,7 +958,7 @@ namespace Ent
         {
             throw ContextException("Can't call 'getKeysString' if key is not string or entityRef");
         }
-        Array const& arr = value.get<Array>();
+        auto const& arr = value.get<Array>();
         auto const arrSize = arr.size();
         std::vector<String> keys;
         keys.reserve(arrSize);
@@ -913,7 +977,7 @@ namespace Ent
         {
             throw ContextException("Can't call 'getKeysInt' if key is not integer");
         }
-        Array const& arr = value.get<Array>();
+        auto const& arr = value.get<Array>();
         auto const arrSize = arr.size();
         std::vector<int64_t> keys;
         keys.reserve(arrSize);
@@ -931,7 +995,7 @@ namespace Ent
         template <typename T>
         bool operator()(Override<T> const& _ov) const
         {
-            return not _ov.hasPrefab and not _ov.hasOverride;
+            return not _ov.hasPrefabValue() and not _ov.hasOverride();
         }
 
         bool operator()(Null const& _val) const
@@ -1115,16 +1179,16 @@ namespace Ent
 
     void Ent::Node::setInstanceOf(char const* _prefabNodePath)
     {
+        resetInstanceOf(_prefabNodePath);
+    }
+
+    void Ent::Node::resetInstanceOf(char const* _prefabNodePath)
+    {
         if (not value.is<Object>())
         {
             throw BadType();
         }
-
-        auto relPath = getEntityLib()->getRelativePath(_prefabNodePath).generic_u8string();
-        json nodeData = loadJsonFile(getEntityLib()->rawdataPath, _prefabNodePath);
-        Node prefabNode = getEntityLib()->loadNode(*getSchema(), nodeData, nullptr);
-        (*this) = prefabNode.makeInstanceOf();
-        value.get<Object>().instanceOf.set(relPath);
+        value.get<Object>().resetInstanceOf(_prefabNodePath);
     }
 
     void Ent::Node::resetInstanceOf()
@@ -1137,9 +1201,52 @@ namespace Ent
         value.get<Object>().instanceOf.unset();
     }
 
+    void Ent::Entity::changeInstanceOf(char const* _newPrefab)
+    {
+        const auto cloned = clone();
+        resetInstanceOf(_newPrefab);
+        cloned->applyAllValuesButPrefab(*this, CopyMode::MinimalOverride);
+    }
+
     EntityLib* Ent::Node::getEntityLib() const
     {
         return schema->rootSchema->entityLib;
+    }
+
+    struct ApplyToPrefab
+    {
+        Node::Value& dest;
+        CopyMode copyMode;
+
+        template <typename T>
+        void operator()(T const& _value) const
+        {
+            _value.applyAllValues(dest.get<T>(), copyMode);
+        }
+
+        void operator()(Null const&) const
+        {
+        }
+    };
+
+    void Ent::Node::applyAllValues(Node& _dest, CopyMode _copyMode) const
+    {
+        if (value.is<Object>())
+        {
+            auto const& object = value.get<Object>();
+            if (object.instanceOf.isSet()) // 'this' has an InstanceOf
+            {
+                if (_dest.getInstanceOf() == nullptr
+                    or strcmp(object.instanceOf.get().c_str(), _dest.getInstanceOf())
+                           != 0) // Not the same InstanceOf
+                {
+                    _dest.resetInstanceOf(object.instanceOf.get().c_str());
+                }
+            }
+        }
+
+        ENTLIB_ASSERT(schema == _dest.schema);
+        mapbox::util::apply_visitor(ApplyToPrefab{_dest.value, _copyMode}, value);
     }
 
     void destroyAndFree(Node* ptr)
@@ -1158,29 +1265,13 @@ namespace Ent
 
     // ********************************* SubSceneComponent ****************************************
     SubSceneComponent::SubSceneComponent(
-        bool _isEmbedded, Override<String> _file, size_t _index, std::unique_ptr<Scene> _embedded)
-        : isEmbedded(_isEmbedded)
-        , file(std::move(_file))
-        , index(_index)
+        EntityLib const* _entlib, size_t _index, std::unique_ptr<Scene> _embedded)
+        : index(_index)
         , embedded(std::move(_embedded))
     {
-    }
-
-    void SubSceneComponent::makeEmbedded(bool _embedded)
-    {
-        isEmbedded = _embedded;
-        if (_embedded)
+        if (embedded == nullptr)
         {
-            if (embedded == nullptr)
-            {
-                embedded = std::make_unique<Scene>();
-                // TODO: 2020-11-27 @Seb : set embedded owner entity
-            }
-            file.set(std::string());
-        }
-        else
-        {
-            embedded.reset();
+            embedded = std::make_unique<Scene>(_entlib);
         }
     }
 
@@ -1410,8 +1501,9 @@ namespace Ent
     {
         if (subSceneComponent == nullptr)
         {
-            subSceneComponent = std::make_unique<SubSceneComponent>();
+            subSceneComponent = std::make_unique<SubSceneComponent>(entlib);
             removedComponents.erase("SubScene");
+            subSceneComponent->embedded->setOwnerEntity(this);
         }
         return &(*subSceneComponent);
     }
@@ -1477,10 +1569,24 @@ namespace Ent
 
     void Entity::setInstanceOf(std::string const& _prefab)
     {
-        std::string const prefab = entlib->getRelativePath(_prefab).generic_u8string();
-        char const* normTmpl = prefab.c_str();
-        std::shared_ptr<Ent::Entity const> templ = entlib->loadEntityReadOnly(normTmpl, nullptr);
+        resetInstanceOf(_prefab.c_str());
+    }
+
+    void Entity::resetInstanceOf(char const* _prefab)
+    {
+        std::shared_ptr<Ent::Entity const> templ;
+        std::string prefab;
+        if (_prefab == nullptr or strlen(_prefab) == 0)
+        {
+            templ = std::make_shared<Ent::Entity const>(*entlib);
+        }
+        else
+        {
+            prefab = entlib->getRelativePath(_prefab).generic_u8string();
+            templ = entlib->loadEntityReadOnly(prefab.c_str(), nullptr);
+        }
         components.clear();
+        removedComponents.clear();
         for (auto const& type_comp : templ->getComponents())
         {
             auto const& cmpType = std::get<0>(type_comp);
@@ -1503,7 +1609,7 @@ namespace Ent
         actorStates = templ->getActorStates().makeInstanceOf();
         color = templ->getColorValue().makeInstanceOf();
         thumbnail = templ->getThumbnailValue().makeInstanceOf();
-        instanceOf = templ->getInstanceOfValue().makeOverridedInstanceOf(normTmpl);
+        instanceOf = templ->getInstanceOfValue().makeOverridedInstanceOf(prefab.c_str());
         maxActivationLevel = templ->getMaxActivationLevelValue().makeInstanceOf();
 
         updateSubSceneOwner();
@@ -1566,11 +1672,7 @@ namespace Ent
     {
         if (auto* subScene = _entity->getSubSceneComponent())
         {
-            if (subScene->isEmbedded)
-            {
-                return subScene->embedded.get();
-            }
-            // TODO: major 2020-09-26 @Seb: else open non embedded subscene ?
+            return subScene->embedded.get();
         }
         return nullptr;
     }
@@ -1656,16 +1758,16 @@ namespace Ent
     {
         if (auto* subScene = getSubSceneComponent())
         {
-            if (subScene->isEmbedded)
-            {
-                subScene->embedded->setOwnerEntity(this);
-            }
+            subScene->embedded->setOwnerEntity(this);
         }
     }
 
     // ********************************* Scene ***************************************************
 
-    Scene::Scene() = default;
+    Scene::Scene(EntityLib const* _entitylib)
+        : entlib(_entitylib)
+    {
+    }
 
     Scene::Scene(std::vector<std::unique_ptr<Entity>> _entities)
         : objects(std::move(_entities))
@@ -1745,7 +1847,7 @@ namespace Ent
     std::unique_ptr<Scene> Scene::makeInstanceOf() const
     {
         std::vector<std::unique_ptr<Entity>> instanceEntities;
-        auto scene = std::make_unique<Scene>();
+        auto scene = std::make_unique<Scene>(entlib);
         for (auto const& ent : objects)
         {
             instanceEntities.emplace_back(ent->makeInstanceOf());
@@ -1758,7 +1860,7 @@ namespace Ent
     std::unique_ptr<Scene> Scene::clone() const
     {
         std::vector<std::unique_ptr<Entity>> instanceEntities;
-        auto scene = std::make_unique<Scene>();
+        auto scene = std::make_unique<Scene>(entlib);
         for (auto const& ent : objects)
         {
             instanceEntities.emplace_back(ent->clone());
@@ -1788,6 +1890,29 @@ namespace Ent
     void Scene::setOwnerEntity(Entity* entity)
     {
         ownerEntity = entity;
+    }
+
+    void Scene::applyAllValues(Scene& _dest, CopyMode _copyMode) const
+    {
+        std::map<std::string, Entity*> destMap;
+        for (auto&& obj : _dest.objects)
+        {
+            destMap.emplace(obj->getName(), obj.get());
+        }
+        for (auto&& ent : objects)
+        {
+            auto destIter = destMap.find(ent->getName());
+            if (destIter != destMap.end()) // Preserved Entity
+            {
+                ent->applyAllValues(*destIter->second, _copyMode);
+                destMap.erase(destIter);
+            }
+            else // Entity just added
+            {
+                _dest.addEntity(ent->clone());
+            }
+        }
+        ENTLIB_ASSERT_MSG(destMap.empty(), "Can't handle removed entities for now");
     }
 
     void Scene::updateChildrenContext()
@@ -2038,7 +2163,7 @@ Ent::Node Ent::EntityLib::loadNode(
     break;
     case Ent::DataType::object:
     {
-        Ent::Object object;
+        Ent::Object object(&_nodeSchema);
         // Read the InstanceOf field
         Ent::Node prefabNode;
         auto InstanceOfIter = _data.find("InstanceOf");
@@ -2655,7 +2780,8 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     {
         instanceOf = _entNode.at("InstanceOf").get<std::string>();
         // Do not inherit from _superEntityFromParentEntity since the override of InstanceOf reset the Entity
-        superEntity = _entlib.loadEntityReadOnly(*instanceOf, nullptr).get();
+        auto superEntityShared = _entlib.loadEntityReadOnly(*instanceOf, nullptr);
+        superEntity = superEntityShared.get();
         ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
         std::filesystem::path instanceOfPath = *instanceOf;
         superIsInit = true;
@@ -2708,7 +2834,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
             _superEntityFromParentEntity != nullptr ? &_superEntityFromParentEntity->getColorValue() :
                                                       nullptr);
     }
-    else
+    else if (superEntity != nullptr)
     {
         ovColor = superEntity->getColorValue().makeInstanceOf();
     }
@@ -2748,25 +2874,15 @@ static std::unique_ptr<Ent::Entity> loadEntity(
             {
                 Ent::SubSceneComponent const* superComp = superEntity->getSubSceneComponent();
 
-                Ent::Override<String> file =
-                    superComp != nullptr ? superComp->file : Ent::Override<String>(std::string());
-
                 auto fileInJson = (data.count("File") != 0) ?
                                       tl::optional<std::string>(data["File"].get<std::string>()) :
                                       tl::nullopt;
-                file = file.makeOverridedInstanceOf(fileInJson);
-                bool isEmbeddedInJson =
-                    (data.count("isEmbedded") != 0) ? data["isEmbedded"].get<bool>() : false;
-                auto subSceneComp =
-                    std::make_unique<Ent::SubSceneComponent>(isEmbeddedInJson, file, index);
-                if (subSceneComp->isEmbedded)
-                {
-                    subSceneComp->embedded = loadScene(
-                        _entlib,
-                        _schema,
-                        data["Embedded"],
-                        (superComp != nullptr ? superComp->embedded.get() : nullptr));
-                }
+                auto subSceneComp = std::make_unique<Ent::SubSceneComponent>(&_entlib, index);
+                subSceneComp->embedded = loadScene(
+                    _entlib,
+                    _schema,
+                    data["Embedded"],
+                    (superComp != nullptr ? superComp->embedded.get() : nullptr));
                 subSceneComponent = std::move(subSceneComp);
             }
             else
@@ -2828,10 +2944,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
             and removedComponents.count("SubScene") == 0)
         {
             subSceneComponent = std::make_unique<Ent::SubSceneComponent>(
-                superComp->isEmbedded,
-                superComp->file,
-                superComp->index,
-                superComp->embedded->makeInstanceOf());
+                &_entlib, superComp->index, superComp->embedded->makeInstanceOf());
         }
     }
     return std::make_unique<Ent::Entity>(
@@ -2937,7 +3050,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
     json const& _entities,
     Ent::Scene const* _super)
 {
-    auto scene = std::make_unique<Ent::Scene>();
+    auto scene = std::make_unique<Ent::Scene>(&_entLib);
 
     // Add all entities from super scene ...
     std::set<std::string> entFromSuper;
@@ -3097,15 +3210,7 @@ nlohmann::json Ent::Entity::saveEntity() const
             if ((subsceneHasOverride and hasInstanceOf) or not hasInstanceOf)
             {
                 json data;
-                data.emplace("isEmbedded", subscene->isEmbedded);
-                if (subscene->file.isSet())
-                {
-                    data.emplace("File", subscene->file.get().c_str());
-                }
-                if (subscene->isEmbedded)
-                {
-                    data.emplace("Embedded", saveScene(*subscene->embedded)["Objects"]);
-                }
+                data.emplace("Embedded", saveScene(*subscene->embedded)["Objects"]);
 
                 json compNode;
                 compNode.emplace("Version", comp->version);
@@ -3140,6 +3245,70 @@ nlohmann::json Ent::Entity::saveEntity() const
     return entNode;
 }
 
+void Ent::Entity::applyToPrefab()
+{
+    auto prefabPath = getInstanceOf();
+    if (prefabPath == nullptr)
+    {
+        throw ContextException("This entity has no prefab");
+    }
+    auto prefab = entlib->loadEntity(prefabPath);
+    auto prefabName = prefab->name;
+    auto instanceName = name;
+
+    // When the value is overridden is the source, we want to make it overridden in the dest => CopyOverride
+    applyAllValuesButPrefab(*prefab, CopyMode::CopyOverride);
+    prefab->name = prefabName;
+    resetInstanceOf(prefabPath); // Reset 'this' to a vanilla instance of prefab
+    name = instanceName;
+    entlib->saveEntity(*prefab, prefabPath);
+}
+
+void Ent::Entity::applyAllValues(Entity& _dest, CopyMode _copyMode) const
+{
+    applyInstanceOfField(*this, _dest, _copyMode);
+    applyAllValuesButPrefab(_dest, _copyMode);
+}
+
+void Ent::Entity::applyAllValuesButPrefab(Entity& _dest, CopyMode _copyMode) const
+{
+    name.applyAllValues(_dest.name, _copyMode);
+    thumbnail.applyAllValues(_dest.thumbnail, _copyMode);
+    maxActivationLevel.applyAllValues(_dest.maxActivationLevel, _copyMode);
+    actorStates.applyAllValues(_dest.actorStates, _copyMode);
+    color.applyAllValues(_dest.color, _copyMode);
+
+    for (auto&& name_comp : getComponents())
+    {
+        auto&& cmpName = name_comp.first;
+        auto&& comp = name_comp.second;
+        // addComponent has no effect if the component exist
+        comp.applyAllValues(*_dest.addComponent(cmpName.c_str()), _copyMode);
+    }
+    std::vector<char const*> compToRemove;
+    for (auto&& name_comp : _dest.getComponents())
+    {
+        auto&& cmpName = name_comp.first;
+        if (getComponent(cmpName.c_str()) == nullptr) // Removed component
+        {
+            compToRemove.push_back(cmpName.c_str());
+        }
+    }
+    if (auto subScene = getSubSceneComponent())
+    {
+        // addSubSceneComponent has no effect if the component exist
+        subScene->applyAllValues(*_dest.addSubSceneComponent(), _copyMode);
+    }
+    else if (auto destSubScene = _dest.getSubSceneComponent()) // Removed component
+    {
+        compToRemove.push_back("SubScene");
+    }
+    for (auto&& cmpName : compToRemove)
+    {
+        _dest.removeComponent(cmpName);
+    }
+}
+
 std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
 {
     std::map<std::string, Ent::Component> detComponents;
@@ -3157,16 +3326,11 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
     std::unique_ptr<SubSceneComponent> detSubSceneComponent;
     if (SubSceneComponent const* subscene = getSubSceneComponent())
     {
-        detSubSceneComponent = std::make_unique<SubSceneComponent>();
-        detSubSceneComponent->isEmbedded = subscene->isEmbedded;
-        detSubSceneComponent->file = subscene->file;
-        if (subscene->isEmbedded)
+        detSubSceneComponent = std::make_unique<SubSceneComponent>(entlib);
+        detSubSceneComponent->embedded = std::make_unique<Ent::Scene>(entlib);
+        for (std::unique_ptr<Ent::Entity> const& subEntity : subscene->embedded->getObjects())
         {
-            detSubSceneComponent->embedded = std::make_unique<Ent::Scene>();
-            for (std::unique_ptr<Ent::Entity> const& subEntity : subscene->embedded->getObjects())
-            {
-                detSubSceneComponent->embedded->addEntity(subEntity->detachEntityFromPrefab());
-            }
+            detSubSceneComponent->embedded->addEntity(subEntity->detachEntityFromPrefab());
         }
     }
 
@@ -3188,7 +3352,7 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
 std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string const& _instanceOf) const
 {
     std::unique_ptr<Ent::Entity> inst = std::make_unique<Ent::Entity>(*this);
-    inst->setInstanceOf(_instanceOf);
+    inst->resetInstanceOf(_instanceOf.c_str());
     return inst;
 }
 
@@ -3336,7 +3500,6 @@ void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const&
 
     // embed scene
     auto* subScene = sceneEntity.addSubSceneComponent();
-    subScene->makeEmbedded(true);
     for (auto&& entity : _scene.getObjects())
     {
         subScene->embedded->addEntity(entity->clone());
@@ -3348,7 +3511,6 @@ void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const&
 void Ent::SubSceneComponent::computeMemory(MemoryProfiler& prof) const
 {
     prof.currentComp.push_back("SubScene");
-    file.computeMemory(prof);
     if (embedded)
     {
         embedded->computeMemory(prof);
@@ -3358,38 +3520,38 @@ void Ent::SubSceneComponent::computeMemory(MemoryProfiler& prof) const
 
 std::unique_ptr<Ent::SubSceneComponent> Ent::SubSceneComponent::makeInstanceOf() const
 {
-    std::unique_ptr<Scene> instEmbedded;
-    if (embedded)
-    {
-        instEmbedded = embedded->makeInstanceOf();
-    }
-    return std::make_unique<SubSceneComponent>(isEmbedded, file, index, std::move(instEmbedded));
+    ENTLIB_ASSERT(embedded != nullptr);
+    std::unique_ptr<Scene> instEmbedded = embedded->makeInstanceOf();
+    return std::make_unique<SubSceneComponent>(
+        embedded->getEntityLib(), index, std::move(instEmbedded));
 }
 
 std::unique_ptr<Ent::SubSceneComponent> Ent::SubSceneComponent::clone() const
 {
-    std::unique_ptr<Scene> instEmbedded;
-    if (embedded)
-    {
-        instEmbedded = embedded->clone();
-    }
-    return std::make_unique<SubSceneComponent>(isEmbedded, file, index, std::move(instEmbedded));
+    ENTLIB_ASSERT(embedded != nullptr);
+    std::unique_ptr<Scene> instEmbedded = embedded->clone();
+    return std::make_unique<SubSceneComponent>(
+        embedded->getEntityLib(), index, std::move(instEmbedded));
 }
 
 std::unique_ptr<Ent::Scene> Ent::SubSceneComponent::detachEmbedded()
 {
-    if (isEmbedded)
+    auto scene = std::make_unique<Scene>(embedded->getEntityLib());
+    std::swap(scene, embedded);
+
+    // we don't to swap owners though
+    embedded->setOwnerEntity(scene->getOwnerEntity());
+    scene->setOwnerEntity(nullptr); // detached scene is not owned by any entity
+
+    return scene;
+}
+
+void Ent::SubSceneComponent::applyAllValues(SubSceneComponent& _dest, CopyMode _copyMode) const
+{
+    if (embedded != nullptr and _dest.embedded != nullptr)
     {
-        auto scene = std::make_unique<Scene>();
-        std::swap(scene, embedded);
-
-        // we don't to swap owners though
-        embedded->setOwnerEntity(scene->getOwnerEntity());
-        scene->setOwnerEntity(nullptr); // detached scene is not owned by any entity
-
-        return scene;
+        embedded->applyAllValues(*_dest.embedded, _copyMode);
     }
-    return {};
 }
 
 bool Ent::SubSceneComponent::hasOverride() const

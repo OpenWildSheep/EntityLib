@@ -27,7 +27,7 @@ bool Ent::Vector::hasOverride() const
 
 bool Ent::Vector::hasPrefabValue() const
 {
-    return m_arraySize.hasPrefab
+    return m_arraySize.hasPrefabValue()
            || std::any_of(begin(m_data), end(m_data), std::mem_fn(&Ent::Node::hasPrefabValue));
 }
 
@@ -171,7 +171,7 @@ size_t Ent::Vector::size() const
 
 size_t Ent::Vector::getDefaultSize() const
 {
-    return m_arraySize.defaultValue;
+    return m_arraySize.getDefault();
 }
 
 size_t Ent::Vector::getPrefabSize() const
@@ -187,4 +187,20 @@ void Ent::Vector::unset()
     }
     m_arraySize.unset();
     m_data.resize(m_arraySize.get());
+}
+
+void Ent::Vector::applyAllValues(Vector& _dest, CopyMode _copyMode) const
+{
+    while (_dest.size() > size())
+    {
+        _dest.pop();
+    }
+    while (size() > _dest.size())
+    {
+        _dest.push();
+    }
+    for (size_t i = 0; i < size(); ++i)
+    {
+        m_data[i]->applyAllValues(*_dest.m_data[i], _copyMode);
+    }
 }

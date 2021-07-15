@@ -101,6 +101,20 @@ namespace Ent
             schema.components.emplace(compName, &compSchema);
         }
 
+        auto&& actorstateList = schema.schema.allDefinitions
+                                    .at("./RuntimeComponents.json#/definitions/"
+                                        "ResponsiblePointer<ActorState>")
+                                    .oneOf;
+
+        for (SubschemaRef& actorstate : *actorstateList)
+        {
+            auto&& actorstateName =
+                AT(actorstate->properties, "className")->constValue->get<std::string>();
+            auto&& actorstateSchema = *AT(actorstate->properties, "classData");
+            actorstateSchema.meta = actorstate->meta;
+            schema.actorstates.emplace(actorstateName, &actorstateSchema);
+        }
+
         json dependencies = loadJsonFile(toolsDir, "WildPipeline/Schema/Dependencies.json");
         for (json const& comp : dependencies["Dependencies"])
         {

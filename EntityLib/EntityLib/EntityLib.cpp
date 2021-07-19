@@ -2959,8 +2959,10 @@ static std::unique_ptr<Ent::Entity> loadEntity(
                                       tl::optional<std::string>(data["File"].get<std::string>()) :
                                       tl::nullopt;
                 auto subSceneComp = std::make_unique<Ent::SubSceneComponent>(&_entlib, index);
-                subSceneComp->embedded = _entlib.loadScene(
-                    data["Embedded"], (superComp != nullptr ? superComp->embedded.get() : nullptr));
+                subSceneComp->embedded = Ent::Scene::loadScene(
+                    _entlib,
+                    data["Embedded"],
+                    (superComp != nullptr ? superComp->embedded.get() : nullptr));
                 subSceneComponent = std::move(subSceneComp);
             }
             else
@@ -3122,9 +3124,10 @@ std::shared_ptr<Ent::Entity const> Ent::EntityLib::loadEntityReadOnly(
         _entityPath, m_entityCache, &validateEntity, &::loadEntity, _super);
 }
 
-std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(json const& _entities, Ent::Scene const* _super) const
+std::unique_ptr<Ent::Scene>
+Ent::Scene::loadScene(Ent::EntityLib const& _entLib, json const& _entities, Ent::Scene const* _super)
 {
-    auto scene = std::make_unique<Ent::Scene>(this);
+    auto scene = std::make_unique<Ent::Scene>(&_entLib);
 
     // Add all entities from super scene ...
     std::set<std::string> entFromSuper;
@@ -3144,9 +3147,9 @@ std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(json const& _entities, Ent
                     break;
                 }
             }
-            std::unique_ptr<Ent::Entity> ent = (instEntNode == nullptr) ?
-                                                   superEnt->makeInstanceOf() :
-                                                   ::loadEntity(*this, *instEntNode, superEnt.get());
+            std::unique_ptr<Ent::Entity> ent =
+                (instEntNode == nullptr) ? superEnt->makeInstanceOf() :
+                                           ::loadEntity(_entLib, *instEntNode, superEnt.get());
             ent->setCanBeRenamed(false);
             scene->addEntity(std::move(ent));
         }
@@ -3160,7 +3163,7 @@ std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(json const& _entities, Ent
         {
             continue;
         }
-        std::unique_ptr<Ent::Entity> ent = ::loadEntity(*this, entNode, nullptr);
+        std::unique_ptr<Ent::Entity> ent = ::loadEntity(_entLib, entNode, nullptr);
         scene->addEntity(std::move(ent));
     }
 
@@ -3177,7 +3180,7 @@ std::shared_ptr<Ent::Scene const>
 Ent::EntityLib::loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const
 {
     auto loadFunc = [](Ent::EntityLib const& _entLib, json const& _document, Ent::Scene const* _super) {
-        return _entLib.loadScene(_document.at("Objects"), _super);
+        return Scene::loadScene(_entLib, _document.at("Objects"), _super);
     };
 
     return loadEntityOrScene<Ent::Scene>(_scenePath, m_sceneCache, &validateScene, loadFunc, nullptr);

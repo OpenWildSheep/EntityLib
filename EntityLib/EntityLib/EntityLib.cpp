@@ -1117,6 +1117,11 @@ namespace Ent
         return getRawBool(OverrideValueLocation::Default).value();
     }
 
+    EntityRef Node::getDefaultEntityRef() const
+    {
+        return getRawEntityRef(OverrideValueLocation::Default).value();
+    }
+
     tl::optional<double> Node::getRawFloat(OverrideValueLocation _location) const
     {
         if (value.is<Override<double>>())
@@ -1159,6 +1164,16 @@ namespace Ent
         {
             auto boolValue = value.get<Override<bool>>().getRaw(_location);
             return boolValue.has_value() ? tl::optional<bool>{boolValue} : tl::nullopt;
+        }
+        throw BadType();
+    }
+
+    tl::optional<EntityRef> Node::getRawEntityRef(OverrideValueLocation _location) const
+    {
+        if (value.is<Override<EntityRef>>())
+        {
+            auto entityRefValue = value.get<Override<EntityRef>>().getRaw(_location);
+            return entityRefValue.has_value() ? tl::optional<EntityRef>{entityRefValue} : tl::nullopt;
         }
         throw BadType();
     }

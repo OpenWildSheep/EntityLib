@@ -335,6 +335,7 @@ namespace Ent
         int64_t getDefaultInt() const; ///< @pre integer. @brief Get the default value as int
         char const* getDefaultString() const; ///< @pre DataType == string. @brief Get the default value as string
         bool getDefaultBool() const; ///< @pre DataType == bool. @brief Get the default value as bool
+        EntityRef getDefaultEntityRef() const; ///< @pre DataType == EntityRef. @brief Get the default value as EntityRef
 
         /// @pre number or integer.
         /// @brief Get the raw Override value as double.
@@ -356,6 +357,11 @@ namespace Ent
         /// @param _location the desired Override value location.
         /// @return the bool value at the given Override value location.
         tl::optional<bool> getRawBool(OverrideValueLocation _location) const;
+        /// @pre DataType == EntityRef.
+        /// @brief Get the raw Override value as EntityRef.
+        /// @param _location the desired Override value location.
+        /// @return the EntityRef value at the given Override value location.
+        tl::optional<EntityRef> getRawEntityRef(OverrideValueLocation _location) const;
 
         /// Get the absolute full link of the Subschema type, or nullptr if the is no
         /// Example : "./RuntimeComponents.json#/definitions/VoxelSimulationGD"

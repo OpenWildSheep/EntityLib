@@ -1990,7 +1990,8 @@ namespace Ent
     {
         for (auto const& name_ent : objects.map)
         {
-            if (name_ent.second.hasOverride())
+            auto const& ent = name_ent.second;
+            if (ent.hasOverride() or ent.value->newInTheScene())
             {
                 return true;
             }

@@ -756,11 +756,6 @@ namespace Ent
 
         nlohmann::json saveScene() const;
 
-        static std::unique_ptr<Ent::Scene> loadScene(
-            Ent::EntityLib const& _entLib,
-            nlohmann::json const& _entities,
-            Ent::Scene const* _super);
-
         EntityLib const* getEntityLib() const
         {
             return entlib;
@@ -836,6 +831,9 @@ namespace Ent
 
         /// Load the Scene at path _scenePath
         std::unique_ptr<Scene> loadScene(std::filesystem::path const& _scenePath) const;
+
+        std::unique_ptr<Ent::Scene>
+        loadScene(nlohmann::json const& _entities, Ent::Scene const* _super) const;
 
         /// Load the Scene in legacy format at path _scenePath
         std::unique_ptr<Scene> loadLegacyScene(std::filesystem::path const& _scenePath) const;

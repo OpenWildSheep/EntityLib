@@ -291,8 +291,32 @@ namespace Ent
             auto relPath = entlib->getRelativePath(_prefabNodePath).generic_u8string();
             json nodeData = loadJsonFile(entlib->rawdataPath, _prefabNodePath);
             Node prefabNode = entlib->loadNode(*schema, nodeData, nullptr);
+            // Get the keyfield
+            tl::optional<Node> keyField;
+            for (auto&& name_field : nodes)
+            {
+                auto&& field = std::get<1>(name_field);
+                if (field->getSchema()->isKeyField)
+                {
+                    if (keyField.has_value())
+                        throw IllFormedSchema(
+                            R"(An Object is used in two set with different keyField)");
+                    keyField = *field;
+                }
+            }
             (*this) = prefabNode.GetRawValue().get<Object>().makeInstanceOf();
-            // TODO : Loïc - reset the keyField if there is one
+            // Set the keyField
+            if (keyField.has_value())
+            {
+                for (auto&& name_field : nodes)
+                {
+                    auto&& field = std::get<1>(name_field);
+                    if (field->getSchema()->isKeyField)
+                    {
+                        keyField->applyAllValues(*field, CopyMode::MinimalOverride);
+                    }
+                }
+            }
             instanceOf.set(relPath);
         }
     }

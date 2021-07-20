@@ -4,6 +4,7 @@
 
 #include "Override.h"
 #include "MemoryProfiler.h"
+#include "include/EntityLibCore.h"
 
 namespace Ent
 {
@@ -24,6 +25,7 @@ namespace Ent
                 : value(std::move(_value))
                 , isPresent(_isPresent)
             {
+                ENTLIB_ASSERT(value != nullptr);
             }
 
             Removable makeInstanceOf() const
@@ -77,16 +79,15 @@ namespace Ent
     Value* RemovableMap<Key, Value>::emplace(
         Key _key, std::unique_ptr<Value> _value, OverrideValueLocation _loc)
     {
-        Removable rem;
-        rem.value = std::move(_value);
-        rem.index = map.size();
-        // rem.isPresent.set(true);
+        Override<bool> isPresent;
         switch (_loc)
         {
-        case OverrideValueLocation::Default: rem.isPresent.setDefault(true); break;
-        case OverrideValueLocation::Prefab: rem.isPresent.setPrefab(true); break;
-        case OverrideValueLocation::Override: rem.isPresent.set(true); break;
+        case OverrideValueLocation::Default: isPresent.setDefault(true); break;
+        case OverrideValueLocation::Prefab: isPresent.setPrefab(true); break;
+        case OverrideValueLocation::Override: isPresent.set(true); break;
         }
+        Removable rem(std::move(_value), isPresent);
+        rem.index = map.size();
 
         return map.insert_or_assign(std::move(_key), std::move(rem)).first->second.value.get();
     }

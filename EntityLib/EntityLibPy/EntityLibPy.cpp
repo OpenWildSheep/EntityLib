@@ -58,6 +58,24 @@ Value getValue(Ent::Node& node)
     return Value();
 }
 
+Value getDefaultValue(Ent::Node& node)
+{
+    switch (node.getDataType())
+    {
+    case Ent::DataType::array:
+    case Ent::DataType::object:
+    case Ent::DataType::oneOf:
+    case Ent::DataType::null: return nullptr;
+    case Ent::DataType::boolean: return node.getDefaultBool();
+    case Ent::DataType::integer: return node.getDefaultInt();
+    case Ent::DataType::number: return node.getDefaultFloat();
+    case Ent::DataType::string: return std::string(node.getDefaultString());
+    case Ent::DataType::entityRef: return node.getDefaultEntityRef();
+    case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
+    }
+    return Value();
+}
+
 template <typename I, typename O>
 struct Converter
 {
@@ -366,6 +384,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("is_default", [](Node* node) { return node->isDefault(); })
         .def("get_type_name", [](Node* node) { return node->getTypeName(); })
         .def_property("value", getValue, setValue)
+        .def_property_readonly("default_value", getDefaultValue)
         .def("set_float", [](Node* node, double val) { return node->setFloat(val); })
         .def("set_int", [](Node* node, int64_t val) { return node->setInt(val); })
         .def("set_string", [](Node* node, char const* str) { return node->setString(str); })
@@ -444,7 +463,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("remove_subscene_component", &Entity::removeSubSceneComponent)
         .def("get_component_types", &Entity::getComponentTypes)
         .def("get_components", &Entity::getComponents, py::return_value_policy::reference_internal)
-        .def("get_actorstates", [](Entity* ent) { return ent->getActorStates(); }, py::return_value_policy::reference_internal)
+        .def("get_actorstates", [](Entity* ent) { return &ent->getActorStates(); }, py::return_value_policy::reference_internal)
         .def(
             "get_subscene_component",
             [](Entity& e) { return e.getSubSceneComponent(); },
@@ -519,6 +538,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     pyComponentsSchema
         .def_readonly("components", &ComponentsSchema::components, py::return_value_policy::reference_internal)
+        .def_readonly("actorstates", &ComponentsSchema::actorstates, py::return_value_policy::reference_internal)
         .def_readonly("schema", &ComponentsSchema::schema, py::return_value_policy::reference_internal);
 
     pyColor

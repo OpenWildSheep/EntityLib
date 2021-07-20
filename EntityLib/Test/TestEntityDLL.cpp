@@ -791,9 +791,10 @@ try
             ENTLIB_ASSERT(setOfObject->mapGet("F") != nullptr);
             ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Value")->getString() == std::string("f"));
             ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Name")->getString() == std::string("F"));
-            // setOfObject->mapGet("F")->resetInstanceOf("ObjectInSet.node");
-            // ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Value")->getString() == std::string("e2"));
-            // ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Name")->getString() == std::string("F"));
+            // Test resetInstanceOf with overriden key
+            setOfObject->mapGet("F")->resetInstanceOf("ObjectInSet.node");
+            ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Value")->getString() == std::string("e2"));
+            ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Name")->getString() == std::string("F"));
 
             // Test insert the __removed__ element get back the prefab values
             // insert => makeInstanceOf => __remove__ => insert
@@ -809,11 +810,6 @@ try
         ENTLIB_ASSERT(subsceneCmp->embedded->getObjects().size() == PrefabSubEntityCount);
         subsceneCmp->embedded->removeEntity("TestRemove");
         ENTLIB_ASSERT(subsceneCmp->embedded->getObjects().size() == PrefabSubEntityCount - 1);
-
-        // TODO : See in Ent::Object::resetInstanceOf
-        // setOfObject->mapGet("F")->resetInstanceOf("ObjectInSet.node");
-        // ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Value")->getString() == std::string("e2"));
-        // ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Name")->getString() == std::string("F"));
 
         // Test rename Entity
         // - Possible

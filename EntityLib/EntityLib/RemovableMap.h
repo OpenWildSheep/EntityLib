@@ -58,7 +58,7 @@ namespace Ent
         std::map<Key, Removable> map;
         using value_type = typename std::map<Key, Removable>::value_type;
 
-        auto& emplace(Key _key, std::unique_ptr<Value> _value, OverrideValueLocation _loc);
+        Value* emplace(Key _key, std::unique_ptr<Value> _value, OverrideValueLocation _loc);
 
         void erase(Key const& _key);
 
@@ -74,7 +74,7 @@ namespace Ent
     };
 
     template <typename Key, typename Value>
-    auto& RemovableMap<Key, Value>::emplace(
+    Value* RemovableMap<Key, Value>::emplace(
         Key _key, std::unique_ptr<Value> _value, OverrideValueLocation _loc)
     {
         Removable rem;
@@ -88,7 +88,7 @@ namespace Ent
         case OverrideValueLocation::Override: rem.isPresent.set(true); break;
         }
 
-        return (*map.insert_or_assign(std::move(_key), std::move(rem)).first);
+        return map.insert_or_assign(std::move(_key), std::move(rem)).first->second.value.get();
     }
 
     template <typename Key, typename Value>

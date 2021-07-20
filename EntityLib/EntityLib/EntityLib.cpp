@@ -1824,8 +1824,8 @@ namespace Ent
         {
             throw EmptyKey("Entity without name in Scene::addEntity!");
         }
-        auto& name_rem = objects.emplace(name, std::move(_entity), OverrideValueLocation::Override);
-        return name_rem.second.value.get();
+        auto* ent = objects.emplace(name, std::move(_entity), OverrideValueLocation::Override);
+        return ent;
     }
 
     std::vector<Entity*> Scene::getObjects() const

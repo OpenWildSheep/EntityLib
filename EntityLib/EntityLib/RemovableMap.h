@@ -105,7 +105,7 @@ namespace Ent
     Value const* RemovableMap<Key, Value>::at(Key const& key) const
     {
         auto iter = map.find(key);
-        if (iter != map.end())
+        if (iter != map.end() && iter->second.isPresent.get())
         {
             return iter->second.value.get();
         }

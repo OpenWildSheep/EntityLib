@@ -52,6 +52,23 @@ static void setChildKey(Ent::Subschema const* _arraySchema, Ent::Node* _child, E
         case Ent::DataType::string: _child->setString(_key.get<Ent::String>().c_str()); break;
         // The key is the item itself
         case Ent::DataType::integer: _child->setInt(_key.get<int64_t>()); break;
+        case Ent::DataType::object:
+            if (meta.keyField.has_value())
+            {
+                auto keyNode = _child->at(meta.keyField->c_str());
+                switch (keyNode->getDataType())
+                {
+                case Ent::DataType::string:
+                    keyNode->setString(_key.get<Ent::String>().c_str());
+                    break;
+                case Ent::DataType::integer: keyNode->setInt(_key.get<int64_t>()); break;
+                default:
+                    throw ContextException(
+                        "Can't use this type as key of a set : " + *meta.keyField);
+                }
+                break;
+            }
+            // [[fallthrough]]
         default: throw std::runtime_error("Can't use this type in a set : " + _arraySchema->name);
         }
 #pragma warning(pop)
@@ -136,7 +153,22 @@ static Ent::Map::KeyType getChildKey(Ent::Subschema const* _arraySchema, Ent::No
         // The key is the item itself
         case Ent::DataType::string: return String(_child->getString());
         case Ent::DataType::integer: return _child->getInt();
-        default: throw std::runtime_error("Unknown key type in set " + _arraySchema->name);
+        case Ent::DataType::object:
+            if (meta.keyField.has_value())
+            {
+                auto keyNode = _child->at(meta.keyField->c_str());
+                switch (keyNode->getDataType())
+                {
+                case Ent::DataType::string: return keyNode->getString(); break;
+                case Ent::DataType::integer: return keyNode->getInt(); break;
+                default:
+                    throw ContextException("Can't use this type as key of a set : " + *meta.keyField);
+                }
+                break;
+            }
+            // [[fallthrough]]
+
+        default: throw ContextException("Unknown key type in set " + _arraySchema->name);
         }
 #pragma warning(pop)
     }

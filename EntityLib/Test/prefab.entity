@@ -186,6 +186,15 @@
                             }
                         ],
                         "InstanceOf": "subentity.entity"
+                    },{
+                        "Name": "TestRemove",
+                        "Color": [255, 120, 220, 255],
+                        "Components": [{
+                                "Version": 1,
+                                "Type": "TransformGD",
+                                "Data": {}
+                            }
+                        ]
                     }, {
                         "Name": "TestSaveEntWithOverride",
                         "Color": [255, 120, 220, 255],
@@ -226,7 +235,7 @@
             "Type": "TestDefaultValues",
             "Version": 1
         }, {            
-		    "Version": 1,
+            "Version": 1,
             "Type": "PathNodeGD",
             "Data": {
                 "Radius": 30.0,
@@ -265,6 +274,14 @@
             "Version": 1
         }, {
             "Data": {
+                "SetOfObject": [{
+                        "Name": "C",
+                        "Value": "c"
+                    }, {
+                        "Name": "D",
+                        "Value": "d"
+                    }
+                ],
                 "MapOfObject":[
                     ["OldNode1", {}],
                     ["OldNode2", {}]

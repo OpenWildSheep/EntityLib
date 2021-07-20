@@ -107,6 +107,22 @@
                         "Components": [
                             {
                                 "Data": {},
+                                "Type": "TransformGD",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "TestRemove_detached"
+                    },
+                    {
+                        "Color": [
+                            255.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [
+                            {
+                                "Data": {},
                                 "Type": "NetworkLink",
                                 "Version": 1
                             }
@@ -321,6 +337,32 @@
                         "OldNode2",
                         {}
                     ]
+                ],
+                "SetOfObject": [
+                    {
+                        "Name": "A",
+                        "Value": "a"
+                    },
+                    {
+                        "Name": "B",
+                        "Value": "b"
+                    },
+                    {
+                        "Name": "C",
+                        "Value": "c"
+                    },
+                    {
+                        "Name": "D",
+                        "Value": "d"
+                    },
+                    {
+                        "Name": "E",
+                        "Value": "e2"
+                    },
+                    {
+                        "Name": "F",
+                        "Value": "f"
+                    }
                 ]
             },
             "Type": "TestSetOfObject",

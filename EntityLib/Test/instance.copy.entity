@@ -133,20 +133,6 @@
         },
         {
             "Data": {
-                "LossBySecond": 36.0
-            },
-            "Type": "VoxelSimulationGD",
-            "Version": 1
-        },
-        {
-            "Data": {
-                "InstanceOf": "test.SeedPatch2.node"
-            },
-            "Type": "CharacterControllerGD",
-            "Version": 1
-        },
-        {
-            "Data": {
                 "MapOfObject": [
                     [
                         "NewNode",
@@ -164,9 +150,41 @@
                             "InstanceOf": "OldNode2.MapOfObject.node"
                         }
                     ]
+                ],
+                "SetOfObject": [
+                    {
+                        "Name": "A",
+                        "Value": "a"
+                    },
+                    {
+                        "Name": "C",
+                        "__removed__": true
+                    },
+                    {
+                        "InstanceOf": "ObjectInSet.node",
+                        "Name": "E"
+                    },
+                    {
+                        "InstanceOf": "ObjectInSet.node",
+                        "Name": "F"
+                    }
                 ]
             },
             "Type": "TestSetOfObject",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "LossBySecond": 36.0
+            },
+            "Type": "VoxelSimulationGD",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "InstanceOf": "test.SeedPatch2.node"
+            },
+            "Type": "CharacterControllerGD",
             "Version": 1
         },
         {

@@ -193,7 +193,7 @@ try
         ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(absRef) == 1);
     }
 
-    static constexpr auto PrefabSubEntityCount = 4;
+    static constexpr auto PrefabSubEntityCount = 5;
 
     auto testPrefabEntity = [](Ent::Entity const* ent) {
         // ActorStates
@@ -799,6 +799,30 @@ try
         // TEST SubScene (without override)
         testInstanceOf(*ent);
 
+        Ent::Component* testSetOfObject = ent->getComponent("TestSetOfObject");
+        {
+            // Test remove object in set
+            auto* setOfObject = testSetOfObject->root.at("SetOfObject");
+            ENTLIB_ASSERT(setOfObject->size() == 6);
+            ENTLIB_ASSERT(setOfObject->mapErase("B"));
+            ENTLIB_ASSERT(setOfObject->mapGet("B") == nullptr);
+            ENTLIB_ASSERT(setOfObject->mapErase("C"));
+            ENTLIB_ASSERT(setOfObject->mapGet("C") == nullptr);
+            ENTLIB_ASSERT(setOfObject->size() == 4);
+
+            // Test override object in set (especially override name)
+            ENTLIB_ASSERT(setOfObject->mapGet("E") != nullptr);
+            ENTLIB_ASSERT(setOfObject->mapGet("E2") == nullptr);
+            ENTLIB_ASSERT(setOfObject->mapGet("E")->at("Value")->getString() == std::string("e2"));
+            ENTLIB_ASSERT(setOfObject->mapGet("E")->at("Name")->getString() == std::string("E"));
+            ENTLIB_ASSERT(setOfObject->mapGet("F") != nullptr);
+            ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Value")->getString() == std::string("f"));
+            ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Name")->getString() == std::string("F"));
+            setOfObject->mapGet("F")->resetInstanceOf("ObjectInSet.node");
+            ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Value")->getString() == std::string("e2"));
+            ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Name")->getString() == std::string("F"));
+        }
+
         // ****************************** Test hasASuper ******************************************
         // *************** ENTITY ***************
         auto subscene = ent->getSubSceneComponent();
@@ -985,6 +1009,19 @@ try
         EntityPtr ent = entlib.loadEntity("instance.copy.entity");
         Ent::Component* sysCreat = ent->getComponent("SystemicCreature");
         ENTLIB_ASSERT(sysCreat != nullptr);
+
+        // Test remove object in set
+        Ent::Component* testSetOfObject = ent->getComponent("TestSetOfObject");
+        auto* setOfObject = testSetOfObject->root.at("SetOfObject");
+        ENTLIB_ASSERT(setOfObject->mapGet("B") == nullptr);
+        ENTLIB_ASSERT(setOfObject->mapGet("C") == nullptr);
+        ENTLIB_ASSERT(setOfObject->size() == 4);
+
+        // Test override object in set (especially override name)
+        ENTLIB_ASSERT(setOfObject->mapGet("E") != nullptr);
+        ENTLIB_ASSERT(setOfObject->mapGet("E2") == nullptr);
+        ENTLIB_ASSERT(setOfObject->mapGet("E")->at("Value")->getString() == std::string("e2"));
+        ENTLIB_ASSERT(setOfObject->mapGet("E")->at("Name")->getString() == std::string("E"));
 
         // ****************************** Test hasASuper ******************************************
         // *************** ENTITY ***************

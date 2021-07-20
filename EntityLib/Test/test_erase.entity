@@ -85,6 +85,30 @@
             "Version": 1
         },
         {
+            "Data": {
+                "SetOfObject": [
+                    {
+                        "Name": "A",
+                        "Value": "a"
+                    },
+                    {
+                        "Name": "B",
+                        "Value": "b"
+                    },
+                    {
+                        "InstanceOf": "ObjectInSet.node",
+                        "Name": "E"
+                    },
+                    {
+                        "Name": "F",
+                        "Value": "f"
+                    }
+                ]
+            },
+            "Type": "TestSetOfObject",
+            "Version": 1
+        },
+        {
             "Data": null,
             "Type": "SubScene"
         },

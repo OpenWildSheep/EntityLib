@@ -318,7 +318,7 @@ Ent::Node* Ent::Map::rename(KeyType const& _key, KeyType const& _newkey)
     auto iter = m_itemMap.find(_key);
     if (iter != m_itemMap.end())
     {
-        auto idx = iter->second;
+        auto const idx = iter->second;
         if (m_items[idx].isPresent.get())
         {
             auto const& overridePolicy = m_schema->meta.get<Subschema::ArrayMeta>().overridePolicy;
@@ -338,7 +338,7 @@ Ent::Node* Ent::Map::rename(KeyType const& _key, KeyType const& _newkey)
                 // Change the elements order to keep the position in the array
                 std::swap(newNode, m_items[idx]); // swap the elements
                 std::swap(m_itemMap[_key], m_itemMap[_newkey]); // swap the indexes
-                return newNode.node.get();
+                return m_items[idx].node.get(); // The right elt is m_items[idx] since they have been swaped
             }
         }
         else

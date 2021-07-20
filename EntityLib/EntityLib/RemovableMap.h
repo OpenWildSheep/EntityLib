@@ -42,10 +42,6 @@ namespace Ent
             {
                 return value->hasPrefabValue() || isPresent.hasPrefabValue();
             }
-            bool hasDefaultValue() const
-            {
-                return value->hasDefaultValue() || isPresent.hasDefaultValue();
-            }
             Removable resetInstanceOf() const
             {
                 return Removable{value->resetInstanceOf(), isPresent.resetInstanceOf(), index};

@@ -206,12 +206,16 @@ namespace Ent
         bool mapErase(char const* _key); ///< @pre isMapOrSet() @brief erase the item with _key or return false
         Node* mapGet(char const* _key); ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
         Node const* mapGet(char const* _key) const; ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
-        Node const* mapInsert(char const* _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
+        Node* mapInsert(char const* _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
+        /// @brief Copy the _key Node into the _newkey Node. Will update the keyField to _newkey if relevant.
+        /// @pre The _key Node is not present in the prefab.
         Node* mapRename(char const* _key, char const* _newkey);
         bool mapErase(int64_t _key); ///< @pre isMapOrSet() @brief Erase the item at the given _key
         Node* mapGet(int64_t _key); ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
         Node const* mapGet(int64_t _key) const; ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
-        Node const* mapInsert(int64_t _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
+        Node* mapInsert(int64_t _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
+        /// @brief Copy the _key Node into the _newkey Node. Will update the keyField to _newkey if relevant.
+        /// @pre The _key Node is not present in the prefab.
         Node* mapRename(int64_t _key, int64_t _newkey);
         bool isMapOrSet() const; ///< @return true if type==Ent::DataType::array and overridePolicy is map or set
         DataType getKeyType() const; ///< @pre isMapOrSet() @return the Ent::DataType of the key

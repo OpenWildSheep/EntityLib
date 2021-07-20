@@ -932,13 +932,13 @@ namespace Ent
         return value.get<Array>().mapGet(_key);
     }
 
-    Node const* Node::mapInsert(int64_t _key)
+    Node* Node::mapInsert(int64_t _key)
     {
         checkMap("mapInsert");
         return value.get<Array>().mapInsert(_key);
     }
 
-    Node const* Node::mapInsert(char const* _key)
+    Node* Node::mapInsert(char const* _key)
     {
         checkMap("mapInsert");
         return value.get<Array>().mapInsert(_key);

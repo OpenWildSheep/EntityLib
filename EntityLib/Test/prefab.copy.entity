@@ -229,6 +229,27 @@
                         ],
                         "Components": [
                             {
+                                "Data": {
+                                    "Source": ".EP1-Spout_",
+                                    "Target": ".EP1-crook_",
+                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                },
+                                "Type": "NetworkLink",
+                                "Version": 1
+                            }
+                        ],
+                        "InstanceOf": "subentity.entity",
+                        "Name": "EntityWithInstanceOfButNoOverride"
+                    },
+                    {
+                        "Color": [
+                            255.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [
+                            {
                                 "Data": {},
                                 "Type": "TransformGD",
                                 "Version": 1
@@ -251,27 +272,6 @@
                             }
                         ],
                         "Name": "TestSaveEntWithOverride"
-                    },
-                    {
-                        "Color": [
-                            255.0,
-                            120.0,
-                            220.0,
-                            255.0
-                        ],
-                        "Components": [
-                            {
-                                "Data": {
-                                    "Source": ".EP1-Spout_",
-                                    "Target": ".EP1-crook_",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
-                                },
-                                "Type": "NetworkLink",
-                                "Version": 1
-                            }
-                        ],
-                        "InstanceOf": "subentity.entity",
-                        "Name": "EntityWithInstanceOfButNoOverride"
                     }
                 ]
             },
@@ -368,6 +368,10 @@
                     {
                         "Name": "D",
                         "Value": "d"
+                    },
+                    {
+                        "Name": "G",
+                        "Value": "g"
                     }
                 ]
             },

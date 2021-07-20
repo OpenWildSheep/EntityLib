@@ -63,8 +63,7 @@ static void setChildKey(Ent::Subschema const* _arraySchema, Ent::Node* _child, E
                     break;
                 case Ent::DataType::integer: keyNode->setInt(_key.get<int64_t>()); break;
                 default:
-                    throw ContextException(
-                        "Can't use this type as key of a set : " + *meta.keyField);
+                    throw ContextException("Can't use this type as key of a set : " + *meta.keyField);
                 }
                 break;
             }
@@ -304,6 +303,17 @@ Ent::Node* Ent::Map::insert(KeyType const& _key)
     if (not element.isPresent.get())
     {
         element.isPresent.set(true);
+        if (not element.isPresent.getPrefab())
+        {
+            // This element was removed in the prefab and re-insert in the instance
+            // So we will not get back the data from before the prefab.
+            auto key = getChildKey(m_schema, element.node.get());
+            (*element.node) = m_entlib->loadNode(*element.node->getSchema(), json{}, nullptr);
+            setChildKey(m_schema, element.node.get(), key);
+        }
+        // If the element was present in the prefab and remove in the instance,
+        // we have no way to express in the json that the element is reset,
+        // so we will keep the prefab data.
     }
     checkInvariants();
     return element.node.get();

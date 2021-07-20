@@ -1,0 +1,24 @@
+{
+    "Components": [
+        {
+            "Data": {
+                "SetOfObject": [
+                    {
+                        "Name": "B",
+                        "__removed__": true
+                    },
+                    {
+                        "Name": "C",
+                        "__removed__": true
+                    },
+                    {
+                        "Name": "G"
+                    }
+                ]
+            },
+            "Type": "TestSetOfObject",
+            "Version": 1
+        }
+    ],
+    "Name": "PlayerSpawner_"
+}

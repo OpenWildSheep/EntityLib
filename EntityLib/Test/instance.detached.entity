@@ -98,6 +98,19 @@
                         "Name": "EntityWithInstanceOf_detached"
                     },
                     {
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Source": "subentity2",
+                                    "Target": "subentity2"
+                                },
+                                "Type": "NetworkLink",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "EntityWithInstanceOfButNoOverride_detached"
+                    },
+                    {
                         "Color": [
                             255.0,
                             120.0,
@@ -128,19 +141,6 @@
                             }
                         ],
                         "Name": "TestSaveEntWithOverride_detached"
-                    },
-                    {
-                        "Components": [
-                            {
-                                "Data": {
-                                    "Source": "subentity2",
-                                    "Target": "subentity2"
-                                },
-                                "Type": "NetworkLink",
-                                "Version": 1
-                            }
-                        ],
-                        "Name": "EntityWithInstanceOfButNoOverride_detached"
                     }
                 ]
             },

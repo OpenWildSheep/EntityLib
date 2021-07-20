@@ -3651,7 +3651,7 @@ json Ent::Scene::saveScene() const
 
     std::vector<EntityMap::value_type const*> orderedEntities;
     orderedEntities.reserve(objects.map.size());
-    for (auto&& name_ent : objects.map)
+    for (auto& name_ent : objects.map)
     {
         orderedEntities.push_back(&name_ent);
     }
@@ -3660,7 +3660,6 @@ json Ent::Scene::saveScene() const
         end(orderedEntities),
         [](EntityMap::value_type const* a, EntityMap::value_type const* b) {
             return a->second.index < b->second.index; // Try to keep ordering
-            // return a->first < b->first; // reorder by entity name
         });
     for (auto const* name_ent : orderedEntities)
     {

@@ -791,10 +791,17 @@ try
             ENTLIB_ASSERT(setOfObject->mapGet("F") != nullptr);
             ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Value")->getString() == std::string("f"));
             ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Name")->getString() == std::string("F"));
-            // TODO : See in Ent::Object::resetInstanceOf
             // setOfObject->mapGet("F")->resetInstanceOf("ObjectInSet.node");
             // ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Value")->getString() == std::string("e2"));
             // ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Name")->getString() == std::string("F"));
+
+            // Test insert the __removed__ element get back the prefab values
+            // insert => makeInstanceOf => __remove__ => insert
+            //          => restore values since we dont know how to reset an element when saving
+            ENTLIB_ASSERT(setOfObject->mapGet("G") == nullptr);
+            ENTLIB_ASSERT(setOfObject->mapInsert("G"));
+            ENTLIB_ASSERT(setOfObject->mapGet("G")->at("Value")->getString() == std::string("g"));
+            setOfObject->mapErase("G");
         }
 
         // Test remove entity
@@ -881,7 +888,33 @@ try
 
         sysCreat->root.at("BehaviorState")->setString("Overrided");
         entlib.saveEntity(*ent, "instance.copy.entity");
+
+        {
+            auto instance3 = ent->makeInstanceOf();
+
+            Ent::Component* testSetOfObject3 = instance3->getComponent("TestSetOfObject");
+            auto* setOfObject3 = testSetOfObject3->root.at("SetOfObject");
+
+            // Test insert an element in an instance of the __removed__ one, do not resore the old values
+            // insert => makeInstanceOf => __remove__ => makeInstanceOf => insert
+            //          => do not restore values
+            ENTLIB_ASSERT(setOfObject3->mapGet("G") == nullptr);
+            ENTLIB_ASSERT(setOfObject3->mapInsert("G"));
+            ENTLIB_ASSERT(setOfObject3->mapGet("G")->at("Value")->getString() == std::string());
+            entlib.saveEntity(*instance3, "instance3.entity");
+        }
     }
+    {
+        EntityPtr ent = entlib.loadEntity("instance3.entity");
+        Ent::Component* testSetOfObject3 = ent->getComponent("TestSetOfObject");
+        auto* setOfObject3 = testSetOfObject3->root.at("SetOfObject");
+
+        // Test insert an element in an instance of the __removed__ one, do not resore the old values
+        // insert => makeInstanceOf => __remove__ => makeInstanceOf => insert
+        //          => do not restore values
+        ENTLIB_ASSERT(setOfObject3->mapGet("G")->at("Value")->getString() == std::string());
+    }
+
     auto test_erase = [](Ent::Entity* ent) {
         Ent::Node& actorStates = ent->getActorStates();
         Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
@@ -1015,6 +1048,13 @@ try
         ENTLIB_ASSERT(setOfObject->mapGet("E2") == nullptr);
         ENTLIB_ASSERT(setOfObject->mapGet("E")->at("Value")->getString() == std::string("e2"));
         ENTLIB_ASSERT(setOfObject->mapGet("E")->at("Name")->getString() == std::string("E"));
+
+        // Test insert the __removed__ element get back the prefab values
+        // insert => makeInstanceOf => __remove__ => insert
+        //          => restore values since we dont know how to reset an element when saving
+        ENTLIB_ASSERT(setOfObject->mapGet("G") == nullptr);
+        ENTLIB_ASSERT(setOfObject->mapInsert("G"));
+        ENTLIB_ASSERT(setOfObject->mapGet("G")->at("Value")->getString() == std::string("g"));
 
         // Test remove entity
         auto subsceneCmp = ent->getSubSceneComponent();

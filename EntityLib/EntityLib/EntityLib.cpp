@@ -1910,7 +1910,7 @@ namespace Ent
                     _newName));
             }
 
-            auto ent = std::move(iter->second.value);
+            auto ent = iter->second.value->clone(); // Avoid to let the value to nullptr
             objects.erase(_currentName);
             ent->_setNameRaw(_newName);
             objects.emplace(_newName, std::move(ent), Ent::OverrideValueLocation::Override);

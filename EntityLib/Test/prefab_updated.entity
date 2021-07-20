@@ -385,6 +385,10 @@
                     {
                         "Name": "F",
                         "Value": "f"
+                    },
+                    {
+                        "Name": "G",
+                        "__removed__": true
                     }
                 ]
             },

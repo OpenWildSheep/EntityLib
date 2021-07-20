@@ -165,8 +165,8 @@
                         "Name": "E"
                     },
                     {
-                        "Name": "F",
-                        "Value": "f"
+                        "InstanceOf": "ObjectInSet.node",
+                        "Name": "F"
                     }
                 ]
             },

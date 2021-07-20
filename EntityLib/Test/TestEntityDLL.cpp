@@ -818,10 +818,9 @@ try
             ENTLIB_ASSERT(setOfObject->mapGet("F") != nullptr);
             ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Value")->getString() == std::string("f"));
             ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Name")->getString() == std::string("F"));
-            // TODO : See in Ent::Object::resetInstanceOf
-            // setOfObject->mapGet("F")->resetInstanceOf("ObjectInSet.node");
-            // ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Value")->getString() == std::string("e2"));
-            // ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Name")->getString() == std::string("F"));
+            setOfObject->mapGet("F")->resetInstanceOf("ObjectInSet.node");
+            ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Value")->getString() == std::string("e2"));
+            ENTLIB_ASSERT(setOfObject->mapGet("F")->at("Name")->getString() == std::string("F"));
         }
 
         // ****************************** Test hasASuper ******************************************

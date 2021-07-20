@@ -760,6 +760,13 @@ namespace Ent
         /// @brief Take all values set in this and set them into \b _dest
         void applyAllValues(Scene& _dest, CopyMode _copyMode) const;
 
+        nlohmann::json saveScene() const;
+
+        static std::unique_ptr<Ent::Scene> loadScene(
+            Ent::EntityLib const& _entLib,
+            nlohmann::json const& _entities,
+            Ent::Scene const* _super);
+
         EntityLib const* getEntityLib() const
         {
             return entlib;

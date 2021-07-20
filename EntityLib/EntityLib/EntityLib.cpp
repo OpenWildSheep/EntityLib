@@ -21,15 +21,6 @@
 
 using namespace nlohmann;
 
-// char schemaPath[2048] = {};
-
-static std::unique_ptr<Ent::Scene> loadScene(
-    Ent::EntityLib const& _entLib,
-    Ent::ComponentsSchema const& _schema,
-    json const& _entities,
-    Ent::Scene const* _super);
-static json saveScene(Ent::Scene const& _scene);
-
 namespace Ent
 {
     char const* actorStatesSchemaName = "./Scene-schema.json#/definitions/ActorStates";
@@ -2904,10 +2895,7 @@ namespace
 } // namespace
 
 static std::unique_ptr<Ent::Entity> loadEntity(
-    Ent::EntityLib const& _entlib,
-    Ent::ComponentsSchema const& _schema,
-    json const& _entNode,
-    Ent::Entity const* _superEntityFromParentEntity)
+    Ent::EntityLib const& _entlib, json const& _entNode, Ent::Entity const* _superEntityFromParentEntity)
 {
     ENTLIB_ASSERT(
         _superEntityFromParentEntity == nullptr
@@ -3024,9 +3012,8 @@ static std::unique_ptr<Ent::Entity> loadEntity(
                                       tl::optional<std::string>(data["File"].get<std::string>()) :
                                       tl::nullopt;
                 auto subSceneComp = std::make_unique<Ent::SubSceneComponent>(&_entlib, index);
-                subSceneComp->embedded = loadScene(
+                subSceneComp->embedded = Ent::Scene::loadScene(
                     _entlib,
-                    _schema,
                     data["Embedded"],
                     (superComp != nullptr ? superComp->embedded.get() : nullptr));
                 subSceneComponent = std::move(subSceneComp);
@@ -3037,13 +3024,13 @@ static std::unique_ptr<Ent::Entity> loadEntity(
                 auto const version =
                     compNode.count("Version") != 0u ? compNode.at("Version").get<size_t>() : 0;
 
-                if (_schema.components.count(cmpType) == 0)
+                if (_entlib.schema.components.count(cmpType) == 0)
                 {
                     ENTLIB_LOG_ERROR("Unknown Component type : %s", cmpType.c_str());
                 }
                 else
                 {
-                    Ent::Subschema const& compSchema = *AT(_schema.components, cmpType);
+                    Ent::Subschema const& compSchema = *AT(_entlib.schema.components, cmpType);
                     json rawData = (superComp != nullptr ? superComp->rawData : json());
                     rawData.merge_patch(data);
                     Ent::Component comp{
@@ -3161,7 +3148,7 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
                 validate(schema.schema, toolsDir, document);
             }
 
-            std::unique_ptr<Type> entity = load(*this, schema, document, _super);
+            std::unique_ptr<Type> entity = load(*this, document, _super);
             auto file = typename Cache::mapped_type{std::move(entity), timestamp};
             auto iter_bool = cache.insert_or_assign(relPath, std::move(file));
             return std::get<0>(iter_bool)->second.data;
@@ -3190,11 +3177,8 @@ std::shared_ptr<Ent::Entity const> Ent::EntityLib::loadEntityReadOnly(
         _entityPath, m_entityCache, &validateEntity, &::loadEntity, _super);
 }
 
-static std::unique_ptr<Ent::Scene> loadScene(
-    Ent::EntityLib const& _entLib,
-    Ent::ComponentsSchema const& _schema,
-    json const& _entities,
-    Ent::Scene const* _super)
+std::unique_ptr<Ent::Scene>
+Ent::Scene::loadScene(Ent::EntityLib const& _entLib, json const& _entities, Ent::Scene const* _super)
 {
     auto scene = std::make_unique<Ent::Scene>(&_entLib);
 
@@ -3217,9 +3201,8 @@ static std::unique_ptr<Ent::Scene> loadScene(
                 }
             }
             std::unique_ptr<Ent::Entity> ent =
-                (instEntNode == nullptr) ?
-                    superEnt->makeInstanceOf() :
-                    ::loadEntity(_entLib, _schema, *instEntNode, superEnt.get());
+                (instEntNode == nullptr) ? superEnt->makeInstanceOf() :
+                                           ::loadEntity(_entLib, *instEntNode, superEnt.get());
             ent->setCanBeRenamed(false);
             scene->addEntity(std::move(ent));
         }
@@ -3233,7 +3216,7 @@ static std::unique_ptr<Ent::Scene> loadScene(
         {
             continue;
         }
-        std::unique_ptr<Ent::Entity> ent = ::loadEntity(_entLib, _schema, entNode, nullptr);
+        std::unique_ptr<Ent::Entity> ent = ::loadEntity(_entLib, entNode, nullptr);
         scene->addEntity(std::move(ent));
     }
 
@@ -3249,11 +3232,8 @@ Ent::EntityLib::loadSceneReadOnly(std::filesystem::path const& _scenePath) const
 std::shared_ptr<Ent::Scene const>
 Ent::EntityLib::loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const
 {
-    auto loadFunc = [](Ent::EntityLib const& _entLib,
-                       Ent::ComponentsSchema const& _schema,
-                       json const& _document,
-                       Ent::Scene const* _super) {
-        return ::loadScene(_entLib, _schema, _document.at("Objects"), _super);
+    auto loadFunc = [](Ent::EntityLib const& _entLib, json const& _document, Ent::Scene const* _super) {
+        return Scene::loadScene(_entLib, _document.at("Objects"), _super);
     };
 
     return loadEntityOrScene<Ent::Scene>(_scenePath, m_sceneCache, &validateScene, loadFunc, nullptr);
@@ -3356,7 +3336,7 @@ nlohmann::json Ent::Entity::saveEntity() const
             if ((subsceneHasOverride and hasInstanceOf) or not hasInstanceOf)
             {
                 json data;
-                data.emplace("Embedded", saveScene(*subscene->embedded)["Objects"]);
+                data.emplace("Embedded", subscene->embedded->saveScene()["Objects"]);
 
                 json compNode;
                 compNode.emplace("Version", comp->version);
@@ -3604,19 +3584,19 @@ void Ent::EntityLib::clearCache()
     m_sceneCache.clear();
 }
 
-static json saveScene(Ent::Scene const& _scene)
+json Ent::Scene::saveScene() const
 {
     json document;
 
     document.emplace("Version", 2);
-    json& objects = document["Objects"];
-    objects = json::array();
+    json& jsnObjects = document["Objects"];
+    jsnObjects = json::array();
 
-    for (std::unique_ptr<Ent::Entity> const& ent : _scene.getObjects())
+    for (std::unique_ptr<Ent::Entity> const& ent : getObjects())
     {
         if (ent->hasOverride() or ent->newInTheScene())
         {
-            objects.emplace_back(ent->saveEntity());
+            jsnObjects.emplace_back(ent->saveEntity());
         }
     }
 

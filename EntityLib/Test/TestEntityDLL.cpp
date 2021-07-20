@@ -831,7 +831,8 @@ try
         ENTLIB_ASSERT(
             testSetOfObject->root.at("SetOfObject")->mapGet("A")->at("Value")->getString()
             == std::string("a"));
-        testSetOfObject->root.at("SetOfObject")->mapRename("A", "A2");
+        testSetOfObject->root.at("SetOfObject")->mapRename("A", "A3");
+        testSetOfObject->root.at("SetOfObject")->mapRename("A3", "A2");
         ENTLIB_ASSERT(
             testSetOfObject->root.at("SetOfObject")->mapGet("A2")->at("Value")->getString()
             == std::string("a"));

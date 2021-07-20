@@ -71,6 +71,9 @@ namespace Ent
         void applyAllValues(Map& _dest, CopyMode _copyMode) const;
 
     private:
+        Element& insertImpl(KeyType const& _key);
+        Element& insertImpl(OverrideValueLocation _loc, KeyType _key, Node _node);
+
         EntityLib const* m_entlib = nullptr;
         Subschema const* m_schema = nullptr;
         std::vector<Element> m_items; ///< List of items of the array

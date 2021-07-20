@@ -287,9 +287,16 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "get_singular_items",
             [](Subschema const& s) -> SubschemaRef const* { return s.singularItems.get(); },
             py::return_value_policy::reference_internal)
+        .def_property_readonly(
+            "singular_items",
+            [](Subschema const& s) -> SubschemaRef const* { return s.singularItems.get(); },
+            py::return_value_policy::reference_internal)
         .def("has_singular_items", [](Subschema const& s) { return s.singularItems != nullptr; })
         .def(
             "get_linear_items",
+            [](Subschema const& s) -> std::vector<SubschemaRef> const& { return *s.linearItems; },
+            py::return_value_policy::reference_internal)
+        .def_property_readonly("linear_items",
             [](Subschema const& s) -> std::vector<SubschemaRef> const& { return *s.linearItems; },
             py::return_value_policy::reference_internal)
         .def(
@@ -400,6 +407,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "get_schema",
             [](Node* node) { return node->getSchema(); },
             py::return_value_policy::reference_internal)
+        .def_property_readonly(
+            "schema",
+            [](Node* node) { return node->getSchema(); },
+            py::return_value_policy::reference_internal)
         .def("unset", [](Node* node) { return node->unset(); })
         .def("is_set", [](Node* node) { return node->isSet(); })
         .def("dumps", [](Node* node, OverrideValueSource source, bool superKeyIsType)
@@ -417,6 +428,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("is_map_or_set", &Node::isMapOrSet)
         .def("get_key_type", &Node::getKeyType)
         .def("get_keys", nodeGetKey)
+        .def("apply_all_values", [](Node& self, Node& dest, CopyMode copyMode) {
+            self.applyAllValues(dest, copyMode);
+        })
         ;
 
     pyComponent

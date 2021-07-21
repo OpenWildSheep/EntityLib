@@ -56,6 +56,7 @@ namespace Ent
         Ent::Node* insert(KeyType const& _key);
         bool isErased(KeyType const& _key) const;
         Ent::Node* insert(OverrideValueLocation _loc, KeyType _key, Node _node);
+        Ent::Node* rename(KeyType const& _key, KeyType const& _newKey);
         void checkInvariants() const;
         std::vector<Node const*> getItemsWithRemoved() const;
         std::vector<Node const*> getItems() const;
@@ -70,6 +71,9 @@ namespace Ent
         void applyAllValues(Map& _dest, CopyMode _copyMode) const;
 
     private:
+        Element& insertImpl(KeyType const& _key);
+        Element& insertImpl(OverrideValueLocation _loc, KeyType _key, Node _node);
+
         EntityLib const* m_entlib = nullptr;
         Subschema const* m_schema = nullptr;
         std::vector<Element> m_items; ///< List of items of the array

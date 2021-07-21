@@ -970,16 +970,28 @@ namespace Ent
         return value.get<Array>().mapGet(_key);
     }
 
-    Node const* Node::mapInsert(int64_t _key)
+    Node* Node::mapInsert(int64_t _key)
     {
         checkMap("mapInsert");
         return value.get<Array>().mapInsert(_key);
     }
 
-    Node const* Node::mapInsert(char const* _key)
+    Node* Node::mapInsert(char const* _key)
     {
         checkMap("mapInsert");
         return value.get<Array>().mapInsert(_key);
+    }
+
+    Node* Node::mapRename(char const* _key, char const* _newkey)
+    {
+        checkMap("mapGet");
+        return value.get<Array>().mapRename(_key, _newkey);
+    }
+
+    Node* Node::mapRename(int64_t _key, int64_t _newkey)
+    {
+        checkMap("mapGet");
+        return value.get<Array>().mapRename(_key, _newkey);
     }
 
     void Node::checkMap(char const* _calledMethod) const
@@ -2347,6 +2359,8 @@ Ent::Node Ent::EntityLib::loadNode(
         // Read the InstanceOf field
         Ent::Node prefabNode;
         auto InstanceOfIter = _data.find("InstanceOf");
+        if (_super != nullptr)
+            object.hasASuper = true;
         if (InstanceOfIter != _data.end())
         {
             auto nodeFileName = InstanceOfIter->get<std::string>();

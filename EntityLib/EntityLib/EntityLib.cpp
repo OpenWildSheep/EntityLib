@@ -2877,12 +2877,15 @@ json Ent::EntityLib::dumpNode(
                                 item->getSchema()->type == Ent::DataType::object
                                 and meta.keyField.has_value())
                             {
-                                json tmpNode;
-                                auto key = arr.getChildKey(item);
-                                mapbox::util::apply_visitor(
-                                    [&](auto&& k) { tmpNode[*meta.keyField] = k; }, key);
-                                tmpNode["__removed__"] = true;
-                                data.emplace_back(std::move(tmpNode));
+                                if (item->GetRawValue().get<Object>().hasASuper)
+                                {
+                                    json tmpNode;
+                                    auto key = arr.getChildKey(item);
+                                    mapbox::util::apply_visitor(
+                                        [&](auto&& k) { tmpNode[*meta.keyField] = k; }, key);
+                                    tmpNode["__removed__"] = true;
+                                    data.emplace_back(std::move(tmpNode));
+                                }
                                 // [[fallthrough]]
                             }
                             else

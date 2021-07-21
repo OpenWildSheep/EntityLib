@@ -4,14 +4,6 @@
             "Data": {
                 "SetOfObject": [
                     {
-                        "Name": "B",
-                        "__removed__": true
-                    },
-                    {
-                        "Name": "C",
-                        "__removed__": true
-                    },
-                    {
                         "Name": "G"
                     }
                 ]

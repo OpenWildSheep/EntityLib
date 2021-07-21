@@ -182,6 +182,11 @@ namespace Ent
             return m_hasOverride;
         }
 
+        bool hasDefaultValue() const
+        {
+            return !hasPrefabValue() && !hasOverride();
+        }
+
         void setPrefab(V _newVal)
         {
             m_hasPrefab = true;

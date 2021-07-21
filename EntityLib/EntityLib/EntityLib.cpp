@@ -126,9 +126,14 @@ namespace Ent
 
     // ************************************ Union *************************************************
 
-    bool Ent::Union::hasOverride() const
+    bool Union::hasOverride() const
     {
         return wrapper->hasOverride();
+    }
+
+    bool Union::hasDefaultValue() const
+    {
+        return wrapper->hasDefaultValue();
     }
 
     Node* Union::getUnionData()
@@ -187,11 +192,13 @@ namespace Ent
 
     void Union::computeMemory(MemoryProfiler& prof) const
     {
+        prof.currentComp.push_back(getUnionType());
         if (wrapper)
         {
             wrapper->computeMemory(prof);
             prof.addMem("Union::wrapper", sizeof(Node));
         }
+        prof.currentComp.pop_back();
     }
 
     void Union::unset()
@@ -208,6 +215,35 @@ namespace Ent
             _dest.setUnionType(*wrapper->getEntityLib(), getUnionType());
         }
         wrapper->applyAllValues(*_dest.wrapper, _copyMode);
+    }
+
+    Union Union::detach() const
+    {
+        Union detUnion{};
+        detUnion.schema = schema;
+        detUnion.wrapper = wrapper->detach();
+        detUnion.metaData = metaData;
+        detUnion.typeIndex = typeIndex;
+        return detUnion;
+    }
+
+    Union Union::makeInstanceOf() const
+    {
+        Union detUnion{};
+        ENTLIB_ASSERT(schema != nullptr);
+        detUnion.schema = schema;
+        if (wrapper != nullptr)
+        {
+            detUnion.wrapper = wrapper->makeInstanceOf();
+        }
+        detUnion.metaData = metaData;
+        detUnion.typeIndex = typeIndex;
+        return detUnion;
+    }
+
+    bool Union::hasPrefabValue() const
+    {
+        return wrapper->hasPrefabValue();
     }
 
     // ************************************* Object ***********************************************
@@ -324,6 +360,50 @@ namespace Ent
             }
             instanceOf.set(relPath);
         }
+    }
+
+    bool Object::hasOverride() const
+    {
+        if (instanceOf.hasOverride())
+        {
+            return true;
+        }
+        for (auto&& name_node : nodes)
+        {
+            if (std::get<1>(name_node)->hasOverride())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool Object::hasPrefabValue() const
+    {
+        if (instanceOf.hasPrefabValue())
+        {
+            return true;
+        }
+        for (auto&& name_node : nodes)
+        {
+            if (std::get<1>(name_node)->hasPrefabValue())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void Object::computeMemory(MemoryProfiler& prof) const
+    {
+        prof.addMem("Object", nodes.capacity() * sizeof(front()));
+        instanceOf.computeMemory(prof);
+        for (auto&& name_node : nodes)
+        {
+            std::get<1>(name_node)->computeMemory(prof);
+            prof.addMem("Object::value_ptr", sizeof(Ent::Node));
+        }
+        prof.addNodes(size());
     }
 
     size_t count(Object const& obj, char const* key)
@@ -618,31 +698,14 @@ namespace Ent
         Subschema const* schema;
 
         template <typename T>
-        bool operator()(Override<T> const& _ov) const
+        bool operator()(T const& _ov) const
         {
-            return (not _ov.hasPrefabValue()) and (not _ov.hasOverride());
+            return _ov.hasDefaultValue();
         }
 
         bool operator()(Null const&) const
         {
             return false;
-        }
-
-        bool operator()(Array const& _arr) const
-        {
-            return _arr.hasDefaultValue();
-        }
-
-        bool operator()(Object const& _obj) const
-        {
-            return std::all_of(begin(_obj), end(_obj), [](auto&& name_node) {
-                return std::get<1>(name_node)->hasDefaultValue();
-            });
-        }
-
-        bool operator()(Union const& _un) const
-        {
-            return _un.wrapper->hasDefaultValue();
         }
     };
 
@@ -656,35 +719,14 @@ namespace Ent
         Subschema const* schema;
 
         template <typename T>
-        Node operator()(Override<T> const& _ov) const
+        Node operator()(T const& _ov) const
         {
             return Node(_ov.detach(), schema);
         }
 
-        Node operator()(Null const& _val) const
+        Node operator()(Null const&) const
         {
-            (void*)&_val; // Null contains nothing so it is not needed
             return Node(Null{}, schema);
-        }
-
-        Node operator()(Array const& _arr) const
-        {
-            return Node(_arr.detach(), schema);
-        }
-
-        Node operator()(Object const& _obj) const
-        {
-            return Node(_obj.detach(), schema);
-        }
-
-        Node operator()(Union const& _un) const
-        {
-            Union detUnion{};
-            detUnion.schema = _un.schema;
-            detUnion.wrapper = _un.wrapper->detach();
-            detUnion.metaData = _un.metaData;
-            detUnion.typeIndex = _un.typeIndex;
-            return Node(std::move(detUnion), schema);
         }
     };
 
@@ -698,39 +740,14 @@ namespace Ent
         Subschema const* schema;
 
         template <typename T>
-        Node operator()(Override<T> const& _ov) const
+        Node operator()(T const& _ov) const
         {
             return Node(_ov.makeInstanceOf(), schema);
         }
 
-        Node operator()(Null const& _val) const
+        Node operator()(Null const&) const
         {
-            (void*)&_val; // Null contains nothing so it is not needed
             return Node(Null{}, schema);
-        }
-
-        Node operator()(Array const& _arr) const
-        {
-            return Node(_arr.makeInstanceOf(), schema);
-        }
-
-        Node operator()(Object const& _obj) const
-        {
-            return Node(_obj.makeInstanceOf(), schema);
-        }
-
-        Node operator()(Union const& _un) const
-        {
-            Union detUnion{};
-            ENTLIB_ASSERT(_un.schema != nullptr);
-            detUnion.schema = _un.schema;
-            if (_un.wrapper != nullptr)
-            {
-                detUnion.wrapper = _un.wrapper->makeInstanceOf();
-            }
-            detUnion.metaData = _un.metaData;
-            detUnion.typeIndex = _un.typeIndex;
-            return Node(std::move(detUnion), schema);
         }
     };
 
@@ -744,41 +761,14 @@ namespace Ent
         Subschema const* schema;
 
         template <typename T>
-        bool operator()(Override<T> const& _ov) const
+        bool operator()(T const& _ov) const
         {
-            return _ov.isSet();
+            return _ov.hasOverride();
         }
 
-        bool operator()(Null const& _val) const
+        bool operator()(Null const&) const
         {
-            (void*)&_val; // Null contains nothing so it is not needed
             return false;
-        }
-
-        bool operator()(Array const& _arr) const
-        {
-            return _arr.hasOverride();
-        }
-
-        bool operator()(Object const& _obj) const
-        {
-            if (_obj.instanceOf.hasOverride())
-            {
-                return true;
-            }
-            for (auto&& name_node : _obj)
-            {
-                if (std::get<1>(name_node)->hasOverride())
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        bool operator()(Union const& _un) const
-        {
-            return _un.wrapper->hasOverride();
         }
     };
 
@@ -792,41 +782,14 @@ namespace Ent
         Subschema const* schema;
 
         template <typename T>
-        bool operator()(Override<T> const& _ov) const
+        bool operator()(T const& _ov) const
         {
             return _ov.hasPrefabValue();
         }
 
-        bool operator()(Null const& _val) const
+        bool operator()(Null const&) const
         {
-            (void*)&_val; // Null contains nothing so it is not needed
             return false;
-        }
-
-        bool operator()(Array const& _arr) const
-        {
-            return _arr.hasPrefabValue();
-        }
-
-        bool operator()(Object const& _obj) const
-        {
-            if (_obj.instanceOf.hasPrefabValue())
-            {
-                return true;
-            }
-            for (auto&& name_node : _obj)
-            {
-                if (std::get<1>(name_node)->hasPrefabValue())
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        bool operator()(Union const& _un) const
-        {
-            return _un.wrapper->hasPrefabValue();
         }
     };
 
@@ -1066,28 +1029,11 @@ namespace Ent
         template <typename T>
         bool operator()(Override<T> const& _ov) const
         {
-            return not _ov.hasPrefabValue() and not _ov.hasOverride();
+            return _ov.hasDefaultValue();
         }
 
-        bool operator()(Null const& _val) const
-        {
-            (void*)&_val; // Null contains nothing so it is not needed
-            return false;
-        }
-
-        bool operator()(Array const& _arr) const
-        {
-            (void*)&_arr;
-            return false;
-        }
-
-        bool operator()(Object const& _obj) const
-        {
-            (void*)&_obj;
-            return false;
-        }
-
-        bool operator()(Union const&) const
+        template <typename T>
+        bool operator()(T const&) const
         {
             return false;
         }
@@ -1224,37 +1170,13 @@ namespace Ent
     {
         MemoryProfiler& prof;
         template <typename T>
-        void operator()(Override<T> const& _ov) const
+        void operator()(T const& _ov) const
         {
             return _ov.computeMemory(prof);
         }
 
         void operator()(Null const&) const
         {
-        }
-
-        void operator()(Array const& _arr) const
-        {
-            return _arr.computeMemory(prof);
-        }
-
-        void operator()(Object const& _obj) const
-        {
-            prof.addMem("Object", _obj.nodes.capacity() * sizeof(_obj.front()));
-            _obj.instanceOf.computeMemory(prof);
-            for (auto&& name_node : _obj)
-            {
-                std::get<1>(name_node)->computeMemory(prof);
-                prof.addMem("Object::value_ptr", sizeof(Ent::Node));
-            }
-            prof.addNodes(_obj.size());
-        }
-
-        void operator()(Union const& _un) const
-        {
-            prof.currentComp.push_back(_un.getUnionType());
-            _un.computeMemory(prof);
-            prof.currentComp.pop_back();
         }
     };
 

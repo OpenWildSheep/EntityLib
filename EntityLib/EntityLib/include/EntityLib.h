@@ -65,6 +65,18 @@ namespace Ent
         {
             return instanceOf;
         }
+
+        bool hasDefaultValue() const
+        {
+            return std::all_of(nodes.begin(), nodes.end(), [](auto&& name_node) {
+                return std::get<1>(name_node)->hasDefaultValue();
+            });
+        }
+
+        bool hasOverride() const;
+        bool hasPrefabValue() const;
+
+        void computeMemory(MemoryProfiler& prof) const;
     };
 
     inline auto begin(Object const& obj)
@@ -103,6 +115,7 @@ namespace Ent
         Ent::Subschema::UnionMeta const* metaData = nullptr;
 
         bool hasOverride() const; ///< Recursively check if there is an override inside.
+        bool hasDefaultValue() const;
         Node* getUnionData(); ///< return the underlying data (The type is given by getUnionType)
         Node const* getUnionData() const; ///< return the underlying data (The type is given by getUnionType)
         char const* getUnionType() const; ///< Get the type inside the union
@@ -115,6 +128,12 @@ namespace Ent
         void unset();
 
         void applyAllValues(Union& _dest, CopyMode _copyMode) const;
+
+        Union detach() const;
+
+        Union makeInstanceOf() const;
+
+        bool hasPrefabValue() const;
     };
 
     struct EntityRef
@@ -315,7 +334,8 @@ namespace Ent
         int64_t getDefaultInt() const; ///< @pre integer. @brief Get the default value as int
         char const* getDefaultString() const; ///< @pre DataType == string. @brief Get the default value as string
         bool getDefaultBool() const; ///< @pre DataType == bool. @brief Get the default value as bool
-        EntityRef getDefaultEntityRef() const; ///< @pre DataType == EntityRef. @brief Get the default value as EntityRef
+        EntityRef getDefaultEntityRef()
+            const; ///< @pre DataType == EntityRef. @brief Get the default value as EntityRef
 
         /// @pre number or integer.
         /// @brief Get the raw Override value as double.

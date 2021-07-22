@@ -246,6 +246,16 @@ namespace Ent
         return wrapper->hasPrefabValue();
     }
 
+    void Ent::Union::setParentNode(Node* _parentNode)
+    {
+        wrapper->setParentNode(_parentNode);
+    }
+
+    void Ent::Union::checkParent(Node const* _parentNode) const
+    {
+        wrapper->checkParent(_parentNode);
+    }
+
     // ************************************* Object ***********************************************
 
     void Ent::Object::unset()
@@ -394,6 +404,22 @@ namespace Ent
         return false;
     }
 
+    void Ent::Object::setParentNode(Node* _parentNode)
+    {
+        for (auto&& [name, node] : nodes)
+        {
+            node->setParentNode(_parentNode);
+        }
+    }
+
+    void Ent::Object::checkParent(Node const* _parentNode) const
+    {
+        for (auto&& [name, node] : nodes)
+        {
+            node->checkParent(_parentNode);
+        }
+    }
+
     void Object::computeMemory(MemoryProfiler& prof) const
     {
         prof.addMem("Object", nodes.capacity() * sizeof(front()));
@@ -456,6 +482,103 @@ namespace Ent
         : schema(_schema)
         , value(std::move(val))
     {
+    }
+
+    Node::Node(Node const& _node)
+        : parentNode(_node.parentNode)
+        , schema(_node.schema)
+        , value(_node.value)
+    {
+        updateParents();
+    }
+    Node::Node(Node&& _node)
+        : parentNode(_node.parentNode)
+        , schema(_node.schema)
+        , value(std::move(_node.value))
+    {
+        updateParents();
+    }
+
+    Node& Node::operator=(Node const& _node)
+    {
+        parentNode = _node.parentNode;
+        schema = _node.schema;
+        value = _node.value;
+        updateParents();
+        return *this;
+    }
+    Node& Node::operator=(Node&& _node)
+    {
+        parentNode = _node.parentNode;
+        schema = _node.schema;
+        value = std::move(_node.value);
+        updateParents();
+        return *this;
+    }
+
+    struct UpdateParents
+    {
+        Node* parent;
+
+        template <typename T>
+        void operator()(T& _val) const
+        {
+            _val.setParentNode(parent);
+        }
+
+        template <typename T>
+        void operator()(Override<T>&) const
+        {
+        }
+
+        void operator()(Null&) const
+        {
+        }
+    };
+
+    void Node::updateParents()
+    {
+        mapbox::util::apply_visitor(UpdateParents{this}, value);
+    }
+
+    struct CheckParents
+    {
+        Node const* parent{};
+
+        template <typename T>
+        void operator()(T const& _val) const
+        {
+            _val.checkParent(parent);
+        }
+
+        template <typename T>
+        void operator()(Override<T> const&) const
+        {
+        }
+
+        void operator()(Null const&) const
+        {
+        }
+    };
+
+    void Node::checkParent(Node const* _parentNode) const
+    {
+        ENTLIB_ASSERT(parentNode == _parentNode);
+        mapbox::util::apply_visitor(CheckParents{this}, value);
+    }
+
+    Node* Node::getParentNode()
+    {
+        return parentNode;
+    }
+    Node const* Node::getParentNode() const
+    {
+        return parentNode;
+    }
+
+    void Node::setParentNode(Node* _parentNode)
+    {
+        parentNode = _parentNode;
     }
 
     DataType Node::getDataType() const

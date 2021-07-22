@@ -613,3 +613,19 @@ void Ent::Map::applyAllValues(Map& _dest, CopyMode _copyMode) const
         _dest.erase(removedDestKey);
     }
 }
+
+void Ent::Map::setParentNode(Node* _parentNode)
+{
+    for (auto& elt : m_items)
+    {
+        elt.node->setParentNode(_parentNode);
+    }
+}
+
+void Ent::Map::checkParent(Node const* _parentNode) const
+{
+    for (auto& elt : m_items)
+    {
+        elt.node->checkParent(_parentNode);
+    }
+}

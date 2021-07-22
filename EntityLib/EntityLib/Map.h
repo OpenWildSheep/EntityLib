@@ -69,6 +69,8 @@ namespace Ent
         static DataType getKeyType(Subschema const* _schema);
         void unset();
         void applyAllValues(Map& _dest, CopyMode _copyMode) const;
+        void setParentNode(Node* _parentNode);
+        void checkParent(Node const* _parentNode) const;
 
     private:
         Element& insertImpl(KeyType const& _key);

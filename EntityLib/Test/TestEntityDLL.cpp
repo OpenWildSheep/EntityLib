@@ -609,11 +609,14 @@ try
     auto testInstanceOf = [](Ent::Entity const& ent, bool testIsSet = true, bool testPrefab = true) {
         // ActorStates
         Ent::Node const& actorStates = ent.getActorStates();
+        auto actorStatesCopy = actorStates;
+        actorStatesCopy.checkParent(nullptr); // Check the parent of nodes is valid
         ENTLIB_ASSERT(actorStates.getDataType() == Ent::DataType::array);
         ENTLIB_ASSERT(actorStates.size() == 3);
         Ent::Node const* actorState = actorStates.at(0llu);
         ENTLIB_ASSERT(actorState != nullptr);
         Ent::Node const* climbEdge = actorState->getUnionData();
+        ENTLIB_ASSERT(climbEdge->getParentNode()->getParentNode() == actorState);
         ENTLIB_ASSERT(climbEdge != nullptr);
         Ent::Node const* exitRequired = climbEdge->at("locomotionMode");
         ENTLIB_ASSERT(exitRequired != nullptr);
@@ -636,7 +639,9 @@ try
         // Map and Set overridePolicy
         Ent::Component const* pathNodeGD = ent.getComponent("PathNodeGD");
         Ent::Node const* tags = pathNodeGD->root.at("Tags")->at("Tags");
+        ENTLIB_ASSERT(tags->getParentNode()->getParentNode() == &pathNodeGD->root);
         ENTLIB_ASSERT(tags->size() == 3);
+        ENTLIB_ASSERT(tags->mapGet("a")->getParentNode()->getParentNode() == tags);
         ENTLIB_ASSERT(tags->mapGet("a") != nullptr);
         ENTLIB_ASSERT(tags->mapGet("b") != nullptr);
         ENTLIB_ASSERT(tags->mapGet("c") != nullptr);

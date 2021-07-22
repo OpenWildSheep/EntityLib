@@ -388,9 +388,9 @@ namespace Ent
 
         Node* getParentNode();
         Node const* getParentNode() const;
-        void updateParents();
-        void checkParent(Node const* _parentNode) const;
-        void setParentNode(Node* _parentNode);
+        void updateParents(); ///< call setParentNode(this) on all subnodes
+        void checkParent(Node const* _parentNode) const; ///< Check that all subnode's parentNode point to this
+        void setParentNode(Node* _parentNode); ///< set the parentNode
 
     private:
         void checkMap(char const* _calledMethod) const; ///< Throw exception if not a set/map

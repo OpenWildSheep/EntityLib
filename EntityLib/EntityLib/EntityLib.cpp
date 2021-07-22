@@ -3422,21 +3422,24 @@ nlohmann::json Ent::Entity::saveEntity() const
 
 void Ent::Entity::applyToPrefab()
 {
-    auto prefabPath = getInstanceOf();
-    if (prefabPath == nullptr)
+    if (getInstanceOf() == nullptr)
     {
         throw ContextException("This entity has no prefab");
     }
+    std::string prefabPath = getInstanceOf();
     auto prefab = entlib->loadEntity(prefabPath);
     auto prefabName = prefab->name;
     auto instanceName = name;
 
     // When the value is overridden is the source, we want to make it overridden in the dest => CopyOverride
     applyAllValuesButPrefab(*prefab, CopyMode::CopyOverride);
+    // Asked by the maxscript team because they don't want to change the name this way
     prefab->name = prefabName;
-    resetInstanceOf(prefabPath); // Reset 'this' to a vanilla instance of prefab
+    // Need to save the prefab before "resetInstanceOf"
+    // because "resetInstanceOf" will use the new prefab
+    entlib->saveEntity(*prefab, prefabPath.c_str());
+    resetInstanceOf(prefabPath.c_str()); // Reset 'this' to a vanilla instance of prefab
     name = instanceName;
-    entlib->saveEntity(*prefab, prefabPath);
 }
 
 void Ent::Entity::applyAllValues(Entity& _dest, CopyMode _copyMode) const

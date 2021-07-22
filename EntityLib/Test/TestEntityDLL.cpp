@@ -704,17 +704,32 @@ try
 
     {
         // Test applyToPrefab
-        EntityPtr ent = entlib.loadEntity("instance.entity");
-        auto prefabPath = ent->getInstanceOf();
-        auto prefab = entlib.loadEntity(prefabPath);
-        auto prefabOfPrefab = prefab->getInstanceOf();
-        ent->applyAllValuesButPrefab(*prefab, Ent::CopyMode::CopyOverride);
-        ENTLIB_ASSERT(prefabOfPrefab == prefab->getInstanceOf());
-        entlib.saveEntity(*prefab, "prefab_updated.entity");
-        ent->resetInstanceOf(prefabPath);
-        ENTLIB_ASSERT(ent->hasOverride()); // resetInstanceOf does override the "instanceOf"
 
+        // Prepare data
+        EntityPtr ent = entlib.loadEntity("instance.entity");
+        auto entJson = ent->saveEntity();
+        entJson["InstanceOf"] = "prefab_updated.entity";
+        {
+            std::ofstream outEnt("instance_applied.entity");
+            outEnt << entJson.dump(4);
+        }
+        std::filesystem::copy_file(
+            "prefab.entity", "prefab_updated.entity", copy_options::overwrite_existing);
+
+        // Do the applyToPrefab
+        ent = entlib.loadEntity("instance_applied.entity");
+        ent->applyToPrefab();
+        entlib.saveEntity(*ent, "instance_applied.entity");
+        EntityPtr prefab = entlib.loadEntity("prefab_updated.entity");
+
+        // Test result
         testInstanceOf(*prefab, false);
+        testInstanceOf(*ent, false);
+        ENTLIB_ASSERT(ent->hasOverride()); // Because applyToPrefab set the old name
+
+        ent = entlib.loadEntity("instance_applied.entity");
+        testInstanceOf(*ent, false);
+        ENTLIB_ASSERT(ent->hasOverride()); // Because applyToPrefab set the old name
     }
 
     {

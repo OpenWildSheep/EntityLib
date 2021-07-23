@@ -1,7 +1,5 @@
 #pragma once
 
-#include <ciso646>
-
 #pragma warning(push)
 #pragma warning(disable : 4464)
 #include "../Override.h"
@@ -102,11 +100,16 @@ namespace Ent
         }
         else if (_copyMode == CopyMode::CopyOverride)
         {
-            if (_source.getInstanceOfValue().isSet() and not _dest.getInstanceOfValue().isSet())
+            if (_source.getInstanceOfValue().isSet() && !_dest.getInstanceOfValue().isSet())
             {
                 _dest.resetInstanceOf(sourcePrefabPath == nullptr ? "" : sourcePrefabPath);
             }
         }
     }
+
+    size_t count(Object const& obj, char const* key);
+    void emplace(Object& obj, std::pair<char const*, Node> const& value);
+    Node const& at(Object const& obj, char const* key);
+    Node& at(Object& obj, char const* key);
 
 } // namespace Ent

@@ -184,6 +184,7 @@
     <ClCompile Include="EntityLibCore.cpp" />
     <ClCompile Include="include\Schema.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Node.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="SchemaLoader.cpp" />
     <ClCompile Include="Tools.cpp" />
@@ -199,6 +200,7 @@
     <ClInclude Include="include\Schema.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MemoryProfiler.h" />
+    <ClInclude Include="Node.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Override.h" />
     <ClInclude Include="RemovableMap.h" />

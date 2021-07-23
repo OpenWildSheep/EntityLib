@@ -169,6 +169,15 @@ using namespace pybind11::literals;
 
 // clang-format off
 
+static Entity* anonymEntityCtor(EntityLib* _entlib)
+{
+    static std::atomic<size_t> count = 0;
+    auto val = ++count;
+    char buff[128];
+    sprintf_s(buff, "Anonymous%llu", val);
+    return new Entity(*_entlib, buff);
+}
+
 PYBIND11_MODULE(EntityLibPy, ent)
 {
     ent.doc() = "pybind11 for EntityLib";
@@ -459,6 +468,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     pyEntity
         .def(py::init<EntityLib const&, char const*>())
+        .def(py::init(&anonymEntityCtor))
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
         .def("get_ptr", [](Entity* self) {return (intptr_t)self;})
         .def_static("from_ptr", [](intptr_t _ptr) {return (Entity*)_ptr;})

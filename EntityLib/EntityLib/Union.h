@@ -1,10 +1,6 @@
 #pragma once
 
-#pragma warning(push)
-#pragma warning(disable : 4464)
 #include "Override.h"
-#pragma warning(pop)
-
 #include "include/Schema.h"
 
 namespace Ent

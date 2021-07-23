@@ -1,6 +1,7 @@
 #pragma once
 
 #pragma warning(push, 0)
+#pragma warning(disable : 4464)
 #include "../external/json.hpp"
 #include "../external/filesystem.hpp"
 #pragma warning(pop)

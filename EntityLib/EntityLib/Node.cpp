@@ -865,13 +865,6 @@ namespace Ent
         value.get<Object>().resetInstanceOf(nullptr);
     }
 
-    void Ent::Entity::changeInstanceOf(char const* _newPrefab)
-    {
-        const auto cloned = clone();
-        resetInstanceOf(_newPrefab);
-        cloned->applyAllValuesButPrefab(*this, CopyMode::MinimalOverride);
-    }
-
     EntityLib* Ent::Node::getEntityLib() const
     {
         return schema->rootSchema->entityLib;

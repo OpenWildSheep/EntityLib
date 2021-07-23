@@ -28,54 +28,27 @@ namespace Ent
             std::string _type,
             Node _root,
             size_t _version,
-            size_t _index)
-            : rawData(_rawData)
-            , type(std::move(_type))
-            , root(std::move(_root))
-            , version(_version)
-            , index(_index)
-            , hasPrefab(_hasPrefab)
-        {
-        }
+            size_t _index);
 
         /// \cond PRIVATE
         void computeMemory(MemoryProfiler& prof) const;
 
         /// Create a Component which is an "instance of" this one. With no override.
-        Component makeInstanceOf() const
-        {
-            return Component{rawData, true, type, root.makeInstanceOf(), version, index};
-        }
+        Component makeInstanceOf() const;
         /// \endcond
 
         /// @brief Recursively check if there is an override inside.
-        bool hasOverride() const
-        {
-            return root.hasOverride();
-        }
+        bool hasOverride() const;
         /// @brief Recursively check if values are at default value.
-        bool hasDefaultValue() const
-        {
-            return root.hasDefaultValue();
-        }
+        bool hasDefaultValue() const;
         /// Is this component used in runtime engine ?
-        bool isUsedInRuntime() const
-        {
-            return root.getSchema() && root.getSchema()->IsUsedInRuntime();
-        }
+        bool isUsedInRuntime() const;
         /// Is this component used in editors ?
-        bool isUsedInEditor() const
-        {
-            return root.getSchema() && root.getSchema()->IsEditorOnly();
-        }
+        bool isUsedInEditor() const;
 
         /// @brief Take all values set in this and set them into \b _dest
         /// @pre \b _dest has the same component type than \b this
-        void applyAllValues(Component& _dest, CopyMode _copyMode) const
-        {
-            ENTLIB_ASSERT(type == _dest.type);
-            root.applyAllValues(_dest.root, _copyMode);
-        }
+        void applyAllValues(Component& _dest, CopyMode _copyMode) const;
     };
 
 } // namespace Ent

@@ -5,12 +5,6 @@
 
 namespace Ent
 {
-    // ******************************** Implem details ********************************************
-
-    struct Node;
-
-    // *********************************** Scene/Entity/Component ****************************
-
     /// The properties of a given component
     struct Component
     {

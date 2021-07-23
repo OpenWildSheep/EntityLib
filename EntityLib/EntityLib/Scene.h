@@ -10,12 +10,8 @@
 
 namespace Ent
 {
-    // ******************************** Implem details ********************************************
-
     struct Node;
     struct Entity;
-
-    // *********************************** Scene/Entity ****************************
 
     /// Contain all data of a scene. (A list of Entity)
     struct Scene

@@ -9,11 +9,7 @@
 
 namespace Ent
 {
-    // ******************************** Implem details ********************************************
-
     struct Node;
-
-    /// \cond PRIVATE
 
     /// Content of a Node which has type Ent::DataType::object
     struct Object

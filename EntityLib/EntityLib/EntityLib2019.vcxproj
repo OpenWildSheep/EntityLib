@@ -184,8 +184,10 @@
     <ClCompile Include="EntityLibCore.cpp" />
     <ClCompile Include="include\Schema.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="SchemaLoader.cpp" />
     <ClCompile Include="Tools.cpp" />
+    <ClCompile Include="Union.cpp" />
     <ClCompile Include="ValidJson.cpp" />
     <ClCompile Include="Vector.cpp" />
   </ItemGroup>
@@ -197,10 +199,12 @@
     <ClInclude Include="include\Schema.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MemoryProfiler.h" />
+    <ClInclude Include="Object.h" />
     <ClInclude Include="Override.h" />
     <ClInclude Include="RemovableMap.h" />
     <ClInclude Include="SchemaLoader.h" />
     <ClInclude Include="Tools.h" />
+    <ClInclude Include="Union.h" />
     <ClInclude Include="ValidJson.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>

@@ -21,6 +21,8 @@
 #include "../RemovableMap.h"
 #include "../Array.h"
 #include "../MemoryProfiler.h"
+#include "../Union.h"
+#include "../Object.h"
 #pragma warning(pop)
 
 #include "Schema.h"
@@ -32,114 +34,12 @@ namespace Ent
     struct Node;
 
     /// \cond PRIVATE
-
-    /// Content of a Node which has type Ent::DataType::object
-    struct Object
-    {
-        Object(Subschema const* _schema)
-            : schema(_schema)
-        {
-        }
-
-        Subschema const* schema{};
-        std::vector<std::pair<char const*, value_ptr<Node>>> nodes;
-        Override<Ent::String> instanceOf;
-        bool hasASuper = false;
-
-        size_t size() const
-        {
-            return nodes.size();
-        }
-
-        auto front() const
-        {
-            return nodes.front();
-        }
-
-        void unset();
-        void resetInstanceOf(char const* _prefabNodePath);
-        Object makeInstanceOf() const;
-        Object detach() const;
-        void applyAllValues(Object& _dest, CopyMode _copyMode) const;
-        Override<String> const& getInstanceOfValue() const
-        {
-            return instanceOf;
-        }
-
-        bool hasDefaultValue() const
-        {
-            return std::all_of(nodes.begin(), nodes.end(), [](auto&& name_node) {
-                return std::get<1>(name_node)->hasDefaultValue();
-            });
-        }
-
-        bool hasOverride() const;
-        bool hasPrefabValue() const;
-
-        void computeMemory(MemoryProfiler& prof) const;
-
-        void setParentNode(Node* _parentNode);
-        void checkParent(Node const* _parentNode) const;
-    };
-
-    inline auto begin(Object const& obj)
-    {
-        return obj.nodes.begin();
-    }
-
-    inline auto end(Object const& obj)
-    {
-        return obj.nodes.end();
-    }
-
-    inline auto begin(Object& obj)
-    {
-        return obj.nodes.begin();
-    }
-
-    inline auto end(Object& obj)
-    {
-        return obj.nodes.end();
-    }
-
     enum class ActivationLevel
     {
         Created,
         InWorld,
         Loading,
         Started
-    };
-
-    struct Union
-    {
-        Subschema const* schema = nullptr; ///< The schema of the object containing the oneOf field
-        size_t typeIndex = 0; ///< Index of the type
-        value_ptr<Node> wrapper; ///< Node containing the className/classData
-        Ent::Subschema::UnionMeta const* metaData = nullptr;
-
-        bool hasOverride() const; ///< Recursively check if there is an override inside.
-        bool hasDefaultValue() const;
-        Node* getUnionData(); ///< return the underlying data (The type is given by getUnionType)
-        Node const* getUnionData() const; ///< return the underlying data (The type is given by getUnionType)
-        char const* getUnionType() const; ///< Get the type inside the union
-        /// @brief Change the type inside the union
-        /// @pre type match with a type declared inside the json "oneOf"
-        Node* setUnionType(EntityLib const& _entlib, char const* _type);
-
-        void computeMemory(MemoryProfiler& prof) const;
-
-        void unset();
-
-        void applyAllValues(Union& _dest, CopyMode _copyMode) const;
-
-        Union detach() const;
-
-        Union makeInstanceOf() const;
-
-        bool hasPrefabValue() const;
-
-        void setParentNode(Node* _parentNode);
-        void checkParent(Node const* _parentNode) const;
     };
 
     struct EntityRef

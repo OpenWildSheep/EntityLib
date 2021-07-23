@@ -1,44 +1,17 @@
 #pragma once
 
-#pragma warning(push, 0)
-#pragma warning(disable : 4996)
-//#include <vector>
 #include <memory>
-//#include <map>
-//#include <set>
-//#include <array>
-//
-//#include "../../../external/mapbox/variant.hpp"
-//#include "../external/optional.hpp"
-//#include "../external/filesystem.hpp"
-//
-//#include "../external/json.hpp" // TODO : Remove when the rawData in Component is no more useful
-#pragma warning(pop)
 
 #pragma warning(push)
 #pragma warning(disable : 4464)
 #include "../Override.h"
-//#include "../RemovableMap.h"
-//#include "../Array.h"
-//#include "../MemoryProfiler.h"
-//#include "../Union.h"
-//#include "../Object.h"
-//#include "../Node.h"
-//#include "../Component.h"
 #include "include/EntityLibCore.h"
 #include "Scene.h"
 #pragma warning(pop)
 
-// #include "include/Schema.h"
-
 namespace Ent
 {
-    // ******************************** Implem details ********************************************
-
     struct Node;
-
-    // *********************************** Scene/Entity ****************************
-
     struct Scene;
     struct MemoryProfiler;
     class EntityLib;

@@ -174,7 +174,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Array.cpp" />
+    <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentMerge.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityLib.cpp">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EnableAllWarnings</WarningLevel>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</TreatWarningAsError>
@@ -184,23 +186,35 @@
     <ClCompile Include="EntityLibCore.cpp" />
     <ClCompile Include="include\Schema.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Node.cpp" />
+    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SchemaLoader.cpp" />
+    <ClCompile Include="SubSceneComponent.cpp" />
     <ClCompile Include="Tools.cpp" />
+    <ClCompile Include="Union.cpp" />
     <ClCompile Include="ValidJson.cpp" />
     <ClCompile Include="Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Array.h" />
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="include\ComponentMerge.h" />
     <ClInclude Include="include\EntityLib.h" />
     <ClInclude Include="include\EntityLibCore.h" />
     <ClInclude Include="include\Schema.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MemoryProfiler.h" />
+    <ClInclude Include="Node.h" />
+    <ClInclude Include="Object.h" />
     <ClInclude Include="Override.h" />
     <ClInclude Include="RemovableMap.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="SchemaLoader.h" />
+    <ClInclude Include="SubSceneComponent.h" />
     <ClInclude Include="Tools.h" />
+    <ClInclude Include="Union.h" />
     <ClInclude Include="ValidJson.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>

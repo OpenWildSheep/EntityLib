@@ -2,6 +2,7 @@
 
 #pragma warning(push, 0)
 #include "../external/optional.hpp"
+#include "MemoryProfiler.h"
 #pragma warning(pop)
 
 namespace Ent
@@ -256,5 +257,31 @@ namespace Ent
             return Override<V>(m_defaultValue, m_overrideValue, V{}, m_hasOverride, false);
         else
             return Override<V>(m_defaultValue, m_prefabValue, V{}, m_hasPrefab, false);
+    }
+
+    struct Memory
+    {
+        MemoryProfiler* prof;
+
+        template <typename T>
+        void operator()(T) const
+        {
+        }
+
+        void operator()(std::string const& str) const
+        {
+            prof->addMem("Override<string>", str.capacity());
+        }
+    };
+
+    template <typename V>
+    void Override<V>::computeMemory(MemoryProfiler& prof) const
+    {
+        Memory compute{&prof};
+        compute(m_defaultValue);
+        if (hasPrefabValue())
+            compute(m_prefabValue);
+        if (hasOverride())
+            compute(m_overrideValue);
     }
 } // namespace Ent

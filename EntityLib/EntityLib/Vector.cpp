@@ -204,3 +204,19 @@ void Ent::Vector::applyAllValues(Vector& _dest, CopyMode _copyMode) const
         m_data[i]->applyAllValues(*_dest.m_data[i], _copyMode);
     }
 }
+
+void Ent::Vector::setParentNode(Node* _parentNode)
+{
+    for (auto& elt : m_data)
+    {
+        elt->setParentNode(_parentNode);
+    }
+}
+
+void Ent::Vector::checkParent(Node const* _parentNode) const
+{
+    for (auto& elt : m_data)
+    {
+        elt->checkParent(_parentNode);
+    }
+}

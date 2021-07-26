@@ -77,6 +77,9 @@ namespace Ent
         bool hasPrefabValue() const;
 
         void computeMemory(MemoryProfiler& prof) const;
+
+        void setParentNode(Node* _parentNode);
+        void checkParent(Node const* _parentNode) const;
     };
 
     inline auto begin(Object const& obj)
@@ -134,6 +137,9 @@ namespace Ent
         Union makeInstanceOf() const;
 
         bool hasPrefabValue() const;
+
+        void setParentNode(Node* _parentNode);
+        void checkParent(Node const* _parentNode) const;
     };
 
     struct EntityRef
@@ -189,6 +195,10 @@ namespace Ent
             Union>;
         Node() = default;
         Node(Value _val, Subschema const* _schema);
+        Node(Node const& _node);
+        Node(Node&& _node);
+        Node& operator=(Node const& _node);
+        Node& operator=(Node&& _node);
 
         /// @brief return the node containing the data and the type nodes (An element of the oneOf array)
         /// @pre type==Ent::DataType::oneOf
@@ -376,8 +386,16 @@ namespace Ent
         /// Take all values set in this and set them into \b _dest
         void applyAllValues(Node& _dest, CopyMode _copyMode) const;
 
+        Node* getParentNode();
+        Node const* getParentNode() const;
+        void updateParents(); ///< call setParentNode(this) on all subnodes
+        void checkParent(Node const* _parentNode) const; ///< Check that all subnode's parentNode point to this
+        void setParentNode(Node* _parentNode); ///< set the parentNode
+
     private:
         void checkMap(char const* _calledMethod) const; ///< Throw exception if not a set/map
+
+        Node* parentNode = nullptr;
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
         Value value; ///< Contains one of the types accepted by a Node
 

@@ -92,6 +92,9 @@ namespace Ent
 
         void applyAllValues(Array& _dest, CopyMode _copyMode) const;
 
+        void setParentNode(Node* _parentNode);
+        void checkParent(Node const* _parentNode) const;
+
     private:
         void checkInvariants() const;
 
@@ -131,4 +134,15 @@ namespace Ent
     {
         apply_visitor([&](auto& a) { a.unset(); }, m_data);
     }
+
+    inline void Ent::Array::setParentNode(Node* _parent)
+    {
+        apply_visitor([&](auto& a) { a.setParentNode(_parent); }, m_data);
+    }
+
+    inline void Ent::Array::checkParent(Node const* _parent) const
+    {
+        apply_visitor([&](auto& a) { a.checkParent(_parent); }, m_data);
+    }
+
 } // namespace Ent

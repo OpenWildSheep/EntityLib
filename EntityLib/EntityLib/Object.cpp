@@ -84,8 +84,10 @@ namespace Ent
                 if (field->getSchema()->isKeyField)
                 {
                     if (keyField.has_value())
+                    {
                         throw IllFormedSchema(
                             R"(An Object is used in two set with different keyField)");
+                    }
                     keyField = *field;
                 }
             }

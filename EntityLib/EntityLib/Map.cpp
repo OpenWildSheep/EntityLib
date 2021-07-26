@@ -67,7 +67,7 @@ static void setChildKey(Ent::Subschema const* _arraySchema, Ent::Node* _child, E
                 }
                 break;
             }
-            // [[fallthrough]]
+            [[fallthrough]];
         default: throw std::runtime_error("Can't use this type in a set : " + _arraySchema->name);
         }
 #pragma warning(pop)
@@ -165,8 +165,7 @@ static Ent::Map::KeyType getChildKey(Ent::Subschema const* _arraySchema, Ent::No
                 }
                 break;
             }
-            // [[fallthrough]]
-
+            [[fallthrough]];
         default: throw ContextException("Unknown key type in set " + _arraySchema->name);
         }
 #pragma warning(pop)
@@ -284,6 +283,7 @@ Ent::Node const* Ent::Map::get(KeyType const& _key) const
 
 Ent::Node* Ent::Map::get(KeyType const& _key)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
     return const_cast<Ent::Node*>(std::as_const(*this).get(_key));
 }
 
@@ -398,7 +398,7 @@ Ent::Map::Element& Ent::Map::insertImpl(OverrideValueLocation _loc, KeyType _key
 
 Ent::Node* Ent::Map::insert(OverrideValueLocation _loc, KeyType _key, Node _node)
 {
-    return insertImpl(_loc, _key, _node).node.get();
+    return insertImpl(_loc, std::move(_key), std::move(_node)).node.get();
 }
 
 std::vector<Ent::Node const*> Ent::Map::getItemsWithRemoved() const

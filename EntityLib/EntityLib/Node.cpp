@@ -25,7 +25,7 @@ namespace Ent
     {
         updateParents();
     }
-    Node::Node(Node&& _node)
+    Node::Node(Node&& _node) noexcept
         : parentNode(_node.parentNode)
         , schema(_node.schema)
         , value(std::move(_node.value))
@@ -35,13 +35,16 @@ namespace Ent
 
     Node& Node::operator=(Node const& _node)
     {
-        parentNode = _node.parentNode;
-        schema = _node.schema;
-        value = _node.value;
-        updateParents();
+        if (this != &_node)
+        {
+            parentNode = _node.parentNode;
+            schema = _node.schema;
+            value = _node.value;
+            updateParents();
+        }
         return *this;
     }
-    Node& Node::operator=(Node&& _node)
+    Node& Node::operator=(Node&& _node) noexcept
     {
         parentNode = _node.parentNode;
         schema = _node.schema;

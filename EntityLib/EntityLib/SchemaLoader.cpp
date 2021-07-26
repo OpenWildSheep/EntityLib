@@ -160,7 +160,7 @@ Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
     const auto setArrayMetas = [&](Ent::Subschema::ArrayMeta& _meta) {
         _meta.overridePolicy = _data.value("overridePolicy", "");
         _meta.ordered = _data.value("ordered", true);
-        if (_data.count("keyField"))
+        if (_data.count("keyField") != 0)
         {
             _meta.keyField = _data.at("keyField").get<std::string>();
         }

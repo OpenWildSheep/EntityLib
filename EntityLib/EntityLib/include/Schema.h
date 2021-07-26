@@ -46,8 +46,8 @@ namespace Ent
         Subschema() = default;
         Subschema(Subschema const&) = delete;
         Subschema& operator=(Subschema const&) = delete;
-        Subschema(Subschema&&) = default;
-        Subschema& operator=(Subschema&&) = default;
+        Subschema(Subschema&&) noexcept = default;
+        Subschema& operator=(Subschema&&) noexcept = default;
         DeleteCheck deleteCheck;
 
         /// @brief Get the Subschema related to the given \p _subtype (className)

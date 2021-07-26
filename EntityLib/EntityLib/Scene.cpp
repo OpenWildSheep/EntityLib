@@ -80,6 +80,7 @@ namespace Ent
 
     Entity* Scene::getEntity(size_t index)
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
         return const_cast<Entity*>(std::as_const(*this).getEntity(index));
     }
 

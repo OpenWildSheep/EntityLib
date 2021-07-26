@@ -66,9 +66,9 @@ namespace Ent
         Node() = default;
         Node(Value _val, Subschema const* _schema);
         Node(Node const& _node);
-        Node(Node&& _node);
+        Node(Node&& _node) noexcept;
         Node& operator=(Node const& _node);
-        Node& operator=(Node&& _node);
+        Node& operator=(Node&& _node) noexcept;
 
         /// @brief return the node containing the data and the type nodes (An element of the oneOf array)
         /// @pre type==Ent::DataType::oneOf

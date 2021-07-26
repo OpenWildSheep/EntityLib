@@ -37,20 +37,22 @@ namespace Ent
     static std::filesystem::path very_weakly_canonical(std::filesystem::path const& _path)
     {
         std::filesystem::path c;
-        for (auto iter = _path.begin(), endIt = _path.end(); iter != endIt; ++iter)
+        for (auto const& iter : _path)
         {
-            if (iter->native() == L"..")
+            if (iter.native() == L"..")
             {
                 if (c.empty())
                 {
-                    c /= *iter;
+                    c /= iter;
                 }
                 else
+                {
                     c = c.parent_path();
+                }
             }
-            else if (iter->native() != L".")
+            else if (iter.native() != L".")
             {
-                c /= *iter;
+                c /= iter;
             }
         }
         if (c.native().back() == L':')
@@ -60,7 +62,7 @@ namespace Ent
         return c.make_preferred();
     }
 
-    EntityLib::EntityLib(std::filesystem::path _rootPath, bool _doMergeComponents)
+    EntityLib::EntityLib(std::filesystem::path const& _rootPath, bool _doMergeComponents)
         : rootPath(very_weakly_canonical(_rootPath)) // Read schema and dependencies
     {
         rawdataPath = getAbsolutePath(rootPath / "RawData");
@@ -369,7 +371,9 @@ Ent::Node Ent::EntityLib::loadNode(
         Ent::Node prefabNode;
         auto InstanceOfIter = _data.find("InstanceOf");
         if (_super != nullptr)
+        {
             object.hasASuper = true;
+        }
         if (InstanceOfIter != _data.end())
         {
             auto nodeFileName = InstanceOfIter->get<std::string>();
@@ -606,7 +610,7 @@ Ent::Node Ent::EntityLib::loadNode(
                             }
                             break;
                         }
-                        // [[fallthrough]]
+                        [[fallthrough]];
                     default:
                         throw ContextException(
                             "Unknown key type in set '%s'", _nodeSchema.name.c_str());
@@ -898,8 +902,10 @@ json Ent::EntityLib::dumpNode(
                                 // [[fallthrough]]
                             }
                             else
-                                throw ContextException("Can't write an erased element in a set of "
-                                                       "non-union");
+                            {
+                                throw ContextException(
+                                    R"(Can't write an erased element in a set of non-union)");
+                            }
                         }
                     }
                 }
@@ -1659,8 +1665,7 @@ std::filesystem::path Ent::EntityLib::getAbsolutePath(std::filesystem::path cons
 {
     if (_path.is_absolute())
     {
-        std::filesystem::path absPath = _path;
-        return very_weakly_canonical(absPath);
+        return very_weakly_canonical(_path);
     }
     else
     {

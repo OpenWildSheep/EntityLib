@@ -23,7 +23,9 @@ namespace Ent
             std::get<1>(name_comp).computeMemory(prof);
         }
         if (subSceneComponent)
+        {
             subSceneComponent->computeMemory(prof);
+        }
         actorStates.computeMemory(prof);
         color.computeMemory(prof);
         thumbnail.computeMemory(prof);
@@ -397,7 +399,9 @@ namespace Ent
         auto prevName = name;
         name = templ->getNameValue().makeInstanceOf();
         if (not canBeRenamed()) // Name is the key to override entities, so it can't be changed
+        {
             name.set(prevName.get());
+        }
         subSceneComponent = templ->getSubSceneComponent() != nullptr ?
                                 templ->getSubSceneComponent()->makeInstanceOf() :
                                 nullptr;

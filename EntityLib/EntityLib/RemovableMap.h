@@ -55,8 +55,8 @@ namespace Ent
             }
         };
         RemovableMap() = default;
-        RemovableMap(RemovableMap&&) = default;
-        RemovableMap& operator=(RemovableMap&&) = default;
+        RemovableMap(RemovableMap&&) noexcept = default;
+        RemovableMap& operator=(RemovableMap&&) noexcept = default;
         std::map<Key, Removable> map;
         using value_type = typename std::map<Key, Removable>::value_type;
 

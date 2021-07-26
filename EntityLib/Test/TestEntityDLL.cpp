@@ -609,7 +609,7 @@ try
     auto testInstanceOf = [](Ent::Entity const& ent, bool testIsSet = true, bool testPrefab = true) {
         // ActorStates
         Ent::Node const& actorStates = ent.getActorStates();
-        auto actorStatesCopy = actorStates;
+        auto actorStatesCopy = actorStates; //NOLINT(performance-unnecessary-copy-initialization)
         actorStatesCopy.checkParent(nullptr); // Check the parent of nodes is valid
         ENTLIB_ASSERT(actorStates.getDataType() == Ent::DataType::array);
         ENTLIB_ASSERT(actorStates.size() == 3);

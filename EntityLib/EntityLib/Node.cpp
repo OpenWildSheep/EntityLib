@@ -22,6 +22,7 @@ namespace Ent
         : parentNode(_node.parentNode)
         , schema(_node.schema)
         , value(_node.value)
+        , addedInInstance(_node.addedInInstance)
     {
         updateParents();
     }
@@ -29,6 +30,7 @@ namespace Ent
         : parentNode(_node.parentNode)
         , schema(_node.schema)
         , value(std::move(_node.value))
+        , addedInInstance(_node.addedInInstance)
     {
         updateParents();
     }
@@ -40,6 +42,7 @@ namespace Ent
             parentNode = _node.parentNode;
             schema = _node.schema;
             value = _node.value;
+            addedInInstance = _node.addedInInstance;
             updateParents();
         }
         return *this;
@@ -49,6 +52,7 @@ namespace Ent
         parentNode = _node.parentNode;
         schema = _node.schema;
         value = std::move(_node.value);
+        addedInInstance = _node.addedInInstance;
         updateParents();
         return *this;
     }
@@ -434,6 +438,8 @@ namespace Ent
 
     bool Node::hasOverride() const
     {
+        if (addedInInstance)
+            return true;
         return mapbox::util::apply_visitor(HasOverride{schema}, value);
     }
 

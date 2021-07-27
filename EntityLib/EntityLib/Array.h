@@ -84,11 +84,11 @@ namespace Ent
         void unset(); ///< Unset recursively all values overriden in instance (return to prefab values)
 
         // **************************** For array initialization **********************************
-        Node* initAdd(OverrideValueLocation, Node _node); ///< @pre This _node is not yet added
+        Node* initAdd(OverrideValueLocation, Node _node, bool _addedInInstance); ///< @pre This _node is not yet added
         /// @pre hasKey() and the key doesn't exist in map
         Node* mapInitInsert(OverrideValueLocation, Map::KeyType _key, Node _node);
         /// @pre not hasKey()
-        Node* arrayInitPush(Node _node);
+        Node* arrayInitPush(Node _node, bool _addedInInstance);
 
         void applyAllValues(Array& _dest, CopyMode _copyMode) const;
 

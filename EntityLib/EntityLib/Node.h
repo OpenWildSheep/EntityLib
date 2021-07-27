@@ -262,12 +262,18 @@ namespace Ent
         void checkParent(Node const* _parentNode) const; ///< Check that all subnode's parentNode point to this
         void setParentNode(Node* _parentNode); ///< set the parentNode
 
+        void setAddedInInsance(bool _added)
+        {
+            addedInInstance = _added;
+        }
+
     private:
         void checkMap(char const* _calledMethod) const; ///< Throw exception if not a set/map
 
         Node* parentNode = nullptr;
         Subschema const* schema = nullptr; ///< The Node schema. To avoid to pass it to each call
         Value value; ///< Contains one of the types accepted by a Node
+        bool addedInInstance = false;
 
         friend EntityLib;
     };

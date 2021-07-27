@@ -251,6 +251,7 @@ bool Ent::Map::erase(KeyType const& _key)
     if (element.isPresent.get())
     {
         element.isPresent.set(false);
+        element.node->setAddedInInsance(false);
     }
     checkInvariants();
     return true;
@@ -303,6 +304,7 @@ Ent::Map::Element& Ent::Map::insertImpl(KeyType const& _key)
     if (not element.isPresent.get())
     {
         element.isPresent.set(true);
+        element.node->setAddedInInsance(true);
         if (not element.isPresent.getPrefab())
         {
             // This element was removed in the prefab and re-insert in the instance
@@ -343,6 +345,7 @@ Ent::Node* Ent::Map::rename(KeyType const& _key, KeyType const& _newkey)
             else
             {
                 m_items[idx].isPresent.set(false);
+                m_items[idx].node->setAddedInInsance(false);
                 auto clone = *m_items[idx].node;
                 setChildKey(m_schema, &clone, _newkey);
                 Element& newNode = insertImpl(Ent::OverrideValueLocation::Override, _newkey, clone);
@@ -483,6 +486,7 @@ void Ent::Map::clear()
     for (auto&& elt : m_items)
     {
         elt.isPresent.set(false);
+        elt.node->setAddedInInsance(false);
     }
     checkInvariants();
 }
@@ -588,6 +592,15 @@ void Ent::Map::unset()
     {
         elt.isPresent.unset();
         elt.node->unset();
+        elt.node->setAddedInInsance(false);
+        if (elt.isPresent.get() and elt.isPresent.hasDefaultValue())
+        {
+            elt.node->setAddedInInsance(true);
+        }
+        else
+        {
+            elt.node->setAddedInInsance(false);
+        }
     }
 }
 

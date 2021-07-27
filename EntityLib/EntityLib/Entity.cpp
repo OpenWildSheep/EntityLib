@@ -228,8 +228,10 @@ namespace Ent
         Ent::Component comp{
             false, _type, entlib->loadNode(compSchema, json(), nullptr), 1, components.size()};
         removedComponents.erase(_type);
-        auto iter_bool = components.emplace(_type, std::move(comp));
-        return &(iter_bool.first->second);
+        auto&& [iter, inserted] = components.emplace(_type, std::move(comp));
+        if (inserted)
+            iter->second.root.setAddedInInsance(true);
+        return &(iter->second);
     }
     Component const* Entity::getComponent(char const* _type) const
     {

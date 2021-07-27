@@ -246,6 +246,7 @@ struct MergeMapOverride
                 if (not doRemove(*instancePropMap[key]))
                 {
                     auto node = entlib->loadNode(_nodeSchema.singularItems->get(), item, nullptr);
+                    node.setAddedInInsance(true);
                     result.emplace_back(
                         key, NodeWrapper{std::move(node), OverrideValueLocation::Override, false});
                 }
@@ -429,7 +430,7 @@ Ent::Node Ent::EntityLib::loadNode(
                             _nodeSchema.singularItems->get(), json(), subSuper, defaultItem);
                         auto loc = defaultItem == nullptr ? Ent::OverrideValueLocation::Prefab :
                                                             Ent::OverrideValueLocation::Default;
-                        arr.initAdd(loc, std::move(tmpNode));
+                        arr.initAdd(loc, std::move(tmpNode), false);
                         ++index;
                     }
                     if (not arr.hasKey())
@@ -448,7 +449,7 @@ Ent::Node Ent::EntityLib::loadNode(
                     {
                         auto& itemSchema = _nodeSchema.singularItems->get();
                         Ent::Node tmpNode = loadNode(itemSchema, json(), nullptr, &subDefault);
-                        arr.initAdd(Ent::OverrideValueLocation::Default, std::move(tmpNode));
+                        arr.initAdd(Ent::OverrideValueLocation::Default, std::move(tmpNode), false);
                         ++index;
                     }
                     if (not arr.hasKey())
@@ -463,7 +464,7 @@ Ent::Node Ent::EntityLib::loadNode(
                     {
                         Ent::Node tmpNode =
                             loadNode(_nodeSchema.singularItems->get(), json(), nullptr);
-                        arr.initAdd(Ent::OverrideValueLocation::Default, std::move(tmpNode));
+                        arr.initAdd(Ent::OverrideValueLocation::Default, std::move(tmpNode), false);
                         ++index;
                     }
                     if (not arr.hasKey())
@@ -635,7 +636,7 @@ Ent::Node Ent::EntityLib::loadNode(
                         auto loc = isDefault           ? Ent::OverrideValueLocation::Default :
                                    subSuper != nullptr ? Ent::OverrideValueLocation::Prefab :
                                                          Ent::OverrideValueLocation::Override;
-                        arr.initAdd(loc, std::move(tmpNode));
+                        arr.initAdd(loc, std::move(tmpNode), subSuper == nullptr);
                         ++index;
                     }
                     tl::optional<uint64_t> prefabArraySize =
@@ -671,7 +672,7 @@ Ent::Node Ent::EntityLib::loadNode(
                 json const emptyJson;
                 json const& prop = _data.size() > index ? _data.at(index) : emptyJson;
                 Ent::Node tmpNode = loadNode(*sub, prop, subSuper, subDefault);
-                arr.arrayInitPush(std::move(tmpNode));
+                arr.arrayInitPush(std::move(tmpNode), subSuper == nullptr);
                 ++index;
             }
             uint64_t defaultArraySize = _nodeSchema.linearItems->size();

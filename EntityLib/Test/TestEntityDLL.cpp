@@ -464,6 +464,7 @@ try
         };
 
         Ent::Component* testDefaultValues = ent->addComponent("TestDefaultValues");
+        ENTLIB_ASSERT(testDefaultValues->root.hasOverride());
         mat33 = testDefaultValues->root.at("Matrix");
         testMat33();
         mat33 = testDefaultValues->root.at("Matrix2");
@@ -794,8 +795,13 @@ try
 
         Ent::Component* testSetOfObject = ent->getComponent("TestSetOfObject");
         {
-            // Test remove object in set
             auto* setOfObject = testSetOfObject->root.at("SetOfObject");
+
+            // Test hasOverride
+            ENTLIB_ASSERT(setOfObject->mapGet("C")->hasOverride() == false); // Already in prefab
+            ENTLIB_ASSERT(setOfObject->mapGet("A")->hasOverride()); // new in instance
+
+            // Test remove object in set
             ENTLIB_ASSERT(setOfObject->size() == 6);
             ENTLIB_ASSERT(setOfObject->mapErase("B"));
             ENTLIB_ASSERT(setOfObject->mapGet("B") == nullptr);
@@ -821,6 +827,7 @@ try
             //          => restore values since we dont know how to reset an element when saving
             ENTLIB_ASSERT(setOfObject->mapGet("G") == nullptr);
             ENTLIB_ASSERT(setOfObject->mapInsert("G"));
+            ENTLIB_ASSERT(setOfObject->mapGet("G")->hasOverride() == true);
             ENTLIB_ASSERT(setOfObject->mapGet("G")->at("Value")->getString() == std::string("g"));
             setOfObject->mapErase("G");
         }
@@ -892,7 +899,7 @@ try
         // new Component
         auto comp = ent->addComponent("AnimationEventsGeneratorGD");
         ENTLIB_ASSERT(ent->getComponent("AnimationEventsGeneratorGD") != nullptr);
-        ENTLIB_ASSERT(comp->hasOverride() == false);
+        ENTLIB_ASSERT(comp->hasOverride()); // A new item in an array in always override
         // Component with override
         ent->getComponent("VoxelSimulationGD")->root.at("LossBySecond")->setFloat(36.);
         ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD") != nullptr);
@@ -909,7 +916,8 @@ try
         auto mapTest = setOfObject->root.at("MapOfObject");
         mapTest->mapInsert("NewNode");
         ENTLIB_ASSERT(mapTest->mapGet("NewNode") != nullptr);
-        ENTLIB_ASSERT(mapTest->mapGet("NewNode")->hasOverride() == false);
+        ENTLIB_ASSERT(
+            mapTest->mapGet("NewNode")->hasOverride()); // Newly inserted noeds are always overriden
         // Node with override
         mapTest->mapGet("OldNode1")->at("Value")->setString("overriden");
         ENTLIB_ASSERT(
@@ -1125,9 +1133,9 @@ try
         ENTLIB_ASSERT(ent2->hasOverride());
 
         // *************** COMPONENT ***************
-        // new Component
+        // new Component (A new component is override true)
         ENTLIB_ASSERT(ent->getComponent("AnimationEventsGeneratorGD") != nullptr);
-        ENTLIB_ASSERT(ent->getComponent("AnimationEventsGeneratorGD")->hasOverride() == false);
+        ENTLIB_ASSERT(ent->getComponent("AnimationEventsGeneratorGD")->hasOverride());
         // Component with override
         ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD") != nullptr);
         ENTLIB_ASSERT(
@@ -1142,7 +1150,8 @@ try
         auto pathNodeGD = ent->getComponent("TestSetOfObject");
         auto mapTest = pathNodeGD->root.at("MapOfObject");
         ENTLIB_ASSERT(mapTest->mapGet("NewNode") != nullptr);
-        ENTLIB_ASSERT(mapTest->mapGet("NewNode")->hasOverride() == false);
+        // Newly inserted Nodes are overriden
+        ENTLIB_ASSERT(mapTest->mapGet("NewNode")->hasOverride());
         // Node with override
         ENTLIB_ASSERT(
             mapTest->mapGet("OldNode1")->at("Value")->getString() == std::string("overriden"));

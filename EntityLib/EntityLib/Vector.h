@@ -41,7 +41,7 @@ namespace Ent
         void clear();
         void computeMemory(MemoryProfiler& prof) const;
         Node* push();
-        Node* initPush(Node _node);
+        Node* initPush(Node _node, bool _addedInInstance);
         Vector detach() const;
         Vector makeInstanceOf() const;
         tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;

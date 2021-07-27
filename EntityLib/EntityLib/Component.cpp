@@ -14,6 +14,7 @@ namespace Ent
         , index(_index)
         , hasPrefab(_hasPrefab)
     {
+        root.setAddedInInsance(!_hasPrefab);
     }
 
     Component Component::makeInstanceOf() const

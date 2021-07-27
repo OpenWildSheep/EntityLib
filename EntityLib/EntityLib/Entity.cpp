@@ -226,7 +226,7 @@ namespace Ent
         }
         Ent::Subschema const& compSchema = *AT(entlib->schema.components, _type);
         Ent::Component comp{
-            json(), false, _type, entlib->loadNode(compSchema, json(), nullptr), 1, components.size()};
+            false, _type, entlib->loadNode(compSchema, json(), nullptr), 1, components.size()};
         removedComponents.erase(_type);
         auto iter_bool = components.emplace(_type, std::move(comp));
         return &(iter_bool.first->second);
@@ -388,7 +388,6 @@ namespace Ent
             components.emplace(
                 cmpType,
                 Ent::Component{
-                    superComp.rawData,
                     true,
                     cmpType,
                     superComp.root.makeInstanceOf(),

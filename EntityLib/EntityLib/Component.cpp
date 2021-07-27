@@ -7,15 +7,8 @@ using namespace nlohmann;
 
 namespace Ent
 {
-    Component::Component(
-        nlohmann::json _rawData,
-        bool _hasPrefab,
-        std::string _type,
-        Node _root,
-        size_t _version,
-        size_t _index)
-        : rawData(std::move(_rawData))
-        , type(std::move(_type))
+    Component::Component(bool _hasPrefab, std::string _type, Node _root, size_t _version, size_t _index)
+        : type(std::move(_type))
         , root(std::move(_root))
         , version(_version)
         , index(_index)
@@ -25,7 +18,7 @@ namespace Ent
 
     Component Component::makeInstanceOf() const
     {
-        return Component{rawData, true, type, root.makeInstanceOf(), version, index};
+        return Component{true, type, root.makeInstanceOf(), version, index};
     }
 
     bool Component::hasOverride() const

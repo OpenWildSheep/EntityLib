@@ -1161,10 +1161,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
                 else
                 {
                     Ent::Subschema const& compSchema = *AT(_entlib.schema.components, cmpType);
-                    json rawData = (superComp != nullptr ? superComp->rawData : json());
-                    rawData.merge_patch(data);
                     Ent::Component comp{
-                        rawData,
                         superComp != nullptr, // has a super component
                         cmpType,
                         _entlib.loadNode(
@@ -1190,12 +1187,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         if (components.count(cmpType) == 0)
         {
             Ent::Component comp{
-                superComp.rawData,
-                true,
-                cmpType,
-                superComp.root.makeInstanceOf(),
-                superComp.version,
-                superComp.index};
+                true, cmpType, superComp.root.makeInstanceOf(), superComp.version, superComp.index};
 
             components.emplace(cmpType, std::move(comp));
         }
@@ -1458,7 +1450,7 @@ nlohmann::json Ent::Entity::saveEntity() const
     {
         sortedComp.push_back(&std::get<1>(type_comp));
     }
-    Component subscenePlaceholder{json(), true, "SubScene", Node(), 1, 0};
+    Component subscenePlaceholder{true, "SubScene", Node(), 1, 0};
     if (SubSceneComponent const* subscene = getSubSceneComponent())
     {
         subscenePlaceholder.index = subscene->index;
@@ -1589,7 +1581,7 @@ std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
         auto const& type = std::get<0>(type_comp);
         auto const& comp = std::get<1>(type_comp);
 
-        Ent::Component detachedComp{comp.rawData, false, type, comp.root.detach(), 1, cmpIndex};
+        Ent::Component detachedComp{false, type, comp.root.detach(), 1, cmpIndex};
 
         detComponents.emplace(type, std::move(detachedComp));
         ++cmpIndex;

@@ -797,6 +797,33 @@ Ent::Node Ent::EntityLib::loadNode(
     return result;
 }
 
+static double round_n(double value, std::size_t multiplier)
+{
+    const auto scaled_value = value * static_cast<double>(multiplier);
+    return std::round(scaled_value) / static_cast<double>(multiplier);
+}
+
+static double truncFloat(float _val)
+{
+    if (not std::isnormal(_val))
+    {
+        return _val;
+    }
+
+    double result{};
+    for (size_t multiplier = 1; multiplier < 1'000'000'000'000'000; multiplier *= 10)
+    {
+        result = round_n(_val, multiplier);
+        if (float(result) == _val)
+        {
+            break;
+        }
+    }
+    ENTLIB_ASSERT(float(result) == _val);
+
+    return result;
+}
+
 json Ent::EntityLib::dumpNode(
     Subschema const& _schema,
     Node const& _node,
@@ -812,7 +839,16 @@ json Ent::EntityLib::dumpNode(
     case Ent::DataType::string: data = _node.getString(); break;
     case Ent::DataType::boolean: data = _node.getBool(); break;
     case Ent::DataType::integer: data = _node.getInt(); break;
-    case Ent::DataType::number: data = _node.getFloat(); break;
+    case Ent::DataType::number:
+        if (_node.getSchema()->meta.get<Subschema::NumberMeta>().bitDepth == 32)
+        {
+            data = truncFloat(static_cast<float>(_node.getFloat()));
+        }
+        else
+        {
+            data = _node.getFloat();
+        }
+        break;
     case Ent::DataType::object:
     {
         data = json::object();

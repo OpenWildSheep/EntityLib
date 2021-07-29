@@ -87,6 +87,8 @@ try:
         assert absRef in entlib.schema.schema.definitions
 
     ####################################################################################################################
+    PrefabSubEntityCount = 5
+
     def testPrefabEntity(ent: Ent.Entity):
         # ActorStates
         actorStates = ent.get_actorstates()
@@ -173,7 +175,7 @@ try:
         # TEST SubScene
         subScenecomp = ent.get_subscene_component()
         allSubEntities = subScenecomp.embedded.entities
-        assert(len(allSubEntities) == 1)
+        assert(len(allSubEntities) == PrefabSubEntityCount)
         assert(allSubEntities[0].name == "EP1-Spout_LINK_001")
         assert(allSubEntities[0].color[0] == 255)
 
@@ -293,7 +295,7 @@ try:
 
     subScenecomp = ent.get_subscene_component()
     allSubEntities = subScenecomp.embedded.entities
-    assert(len(allSubEntities) == 1)
+    assert(len(allSubEntities) == PrefabSubEntityCount)
     originalEnt = allSubEntities[0]
     assert(resolvedEntity is originalEnt)
 
@@ -313,15 +315,14 @@ try:
     """
     scene = entlib.load_scene("entity-references.scene")
     assert(len(scene.entities) == 2)
-    instanceOfA = scene.entities[0]
+    instanceOfA = scene.get_entity("InstanceOfA")
     assert(instanceOfA.name == "InstanceOfA")
     subSceneComp = instanceOfA.get_subscene_component()  # type: Ent.SubSceneComponent
     assert(subSceneComp is not None)
-    assert(subSceneComp.is_embedded)
     assert(len(subSceneComp.embedded.entities) == 1)
     B = subSceneComp.embedded.entities[0]
     assert(B.name == "B")
-    C = scene.entities[1]
+    C = scene.get_entity("C")
     assert(C.name == "C")
 
     # TEST entity ref creation
@@ -396,7 +397,6 @@ try:
         # TEST SubScene (without override)
         subScene = ent.get_subscene_component()  # type: Ent.SubSceneComponent
         assert(subScene is not None)
-        assert(subScene.is_embedded)
         subObj = subScene.embedded.entities[0]  # type: Ent.Entity
         assert(subObj.name == "EP1-Spout_LINK_001")
         assert(not subObj.has_override())
@@ -477,7 +477,6 @@ try:
         # TEST SubScene (with override)
         subScene = ent.get_subscene_component()
         assert(subScene is not None)
-        assert(subScene.is_embedded)
         subObj = subScene.embedded.entities[0]
         assert(subObj.name == "EP1-Spout_LINK_001")
 
@@ -707,7 +706,7 @@ try:
     entlib.rawdata_path = "X:/RawData"
     entlib.clear_cache()
     scene = entlib.load_scene_read_only(
-        "X:/RawData/22_World/SceneMainWorld/SceneMainWorld_entitylib_unit_test.scene")
+        "X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene")
     assert(len(entlib.get_entity_cache()) > 0)
     # assert (len(entlib.get_scene_cache()) > 0)
     # scene_cache = entlib.get_scene_cache()
@@ -737,17 +736,13 @@ try:
     assert(
         len(scene.entities[0].add_component("HeightObj").root.get_field_names()) == 8)
 
-    ep1 = [ent for ent in scene.entities if ent.name == "EP1_"]
-    assert (len(ep1) != 0)
-    assert (ep1[0].get_subscene_component() is not None)
-
     entlib.rawdata_path = os.getcwd()
     scene.add_entity(entlib.make_instance_of(os.path.normpath(os.getcwd() + "/prefab.entity")))
 
     print("save_scene")
     entlib.save_scene(scene, os.getcwd() + "/SceneMainWorld.test.scene")
 
-    added_entity = scene.entities[-1]
+    added_entity = scene.get_entity("PlayerSpawner_")
     cinematic_comp = added_entity.get_component("CinematicGD")
     assert (cinematic_comp is not None)
 

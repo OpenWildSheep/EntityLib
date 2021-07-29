@@ -467,8 +467,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         ;
 
     pyEntity
-        .def(py::init<EntityLib const&, char const*>())
-        .def(py::init(&anonymEntityCtor))
+        // 1 = this = constructed object.   2 = 1st arg = entlib.  (https://pybind11.readthedocs.io/en/stable/advanced/functions.html#keep-alive)
+        .def(py::init<EntityLib const&, char const*>(), py::keep_alive<1, 2>())
+        .def(py::init(&anonymEntityCtor), py::keep_alive<1, 2>())
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
         .def("get_ptr", [](Entity* self) {return (intptr_t)self;})
         .def_static("from_ptr", [](intptr_t _ptr) {return (Entity*)_ptr;})
@@ -621,6 +622,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](EntityLib* lib, std::string const& path) {
                 return lib->makeInstanceOf(path).release();
             },
+            py::keep_alive<0, 1>(), // py::keep_alive<0, 1> => Do not destroy EntityLib before Entity
             "instanceOf"_a);
 
     pyEntityRef

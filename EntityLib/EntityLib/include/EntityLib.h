@@ -87,6 +87,9 @@ namespace Ent
         std::unique_ptr<Entity> loadEntity(
             std::filesystem::path const& _entityPath, Ent::Entity const* _super = nullptr) const;
 
+        std::unique_ptr<Ent::Entity> loadEntityFromJson(
+            nlohmann::json const& _entNode, Ent::Entity const* _superEntityFromParentEntity) const;
+
         /// Load the Scene at path _scenePath
         std::unique_ptr<Scene> loadScene(std::filesystem::path const& _scenePath) const;
 

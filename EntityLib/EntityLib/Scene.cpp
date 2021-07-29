@@ -2,8 +2,13 @@
 
 #include <ciso646>
 
+#include "external/json.hpp"
+
 #include "Entity.h"
+#include "include/EntityLib.h"
 #include "Tools.h"
+
+using namespace nlohmann;
 
 namespace Ent
 {
@@ -256,5 +261,106 @@ namespace Ent
         {
             name_ent.second.value->setParentScene(this);
         }
+    }
+
+    std::unique_ptr<Scene>
+    Scene::loadScene(Ent::EntityLib const& _entLib, json const& _entities, Ent::Scene const* _super)
+    {
+        auto scene = std::make_unique<Ent::Scene>(&_entLib);
+
+        // Add all entities from super scene ...
+        std::set<std::string> entFromSuper;
+        if (_super != nullptr)
+        {
+            for (auto&& superEnt : _super->getObjects())
+            {
+                entFromSuper.insert(superEnt->getName());
+                json const* instEntNode = nullptr;
+                // ... and look if there is an override.
+                for (json const& entNode : _entities)
+                {
+                    auto const instEntName = entNode.at("Name").get<std::string>();
+                    if (superEnt->getName() == instEntName)
+                    {
+                        instEntNode = &entNode;
+                        break;
+                    }
+                }
+                bool const removed =
+                    instEntNode != nullptr and instEntNode->count("__removed__") != 0;
+                std::unique_ptr<Ent::Entity> ent =
+                    (instEntNode == nullptr) ? superEnt->makeInstanceOf() :
+                                               _entLib.loadEntityFromJson(*instEntNode, superEnt);
+                auto entName = ent->getName();
+
+                ent->setCanBeRenamed(false);
+                scene->objects.emplace(entName, std::move(ent), OverrideValueLocation::Prefab);
+                if (removed)
+                {
+                    scene->removeEntity(entName);
+                }
+            }
+        }
+
+        // Add new entities
+        for (json const& entNode : _entities)
+        {
+            auto const name = entNode.at("Name").get<std::string>();
+            if (entFromSuper.count(name) != 0)
+            {
+                continue;
+            }
+            if (entNode.count("__removed__") != 0) // Strange to remove a new entity. Let's ignore it.
+            {
+                continue;
+            }
+            std::unique_ptr<Ent::Entity> ent = _entLib.loadEntityFromJson(entNode, nullptr);
+            ENTLIB_ASSERT(ent != nullptr);
+            scene->addEntity(std::move(ent));
+        }
+
+        return scene;
+    }
+
+    json Ent::Scene::saveScene() const
+    {
+        json document;
+
+        document.emplace("Version", 2);
+        json& jsnObjects = document["Objects"];
+        jsnObjects = json::array();
+
+        std::vector<EntityMap::value_type const*> orderedEntities;
+        orderedEntities.reserve(objects.map.size());
+        for (auto& name_ent : objects.map)
+        {
+            orderedEntities.push_back(&name_ent);
+        }
+        std::stable_sort(
+            begin(orderedEntities),
+            end(orderedEntities),
+            [](EntityMap::value_type const* a, EntityMap::value_type const* b) {
+                return a->second.index < b->second.index; // Try to keep ordering
+            });
+        for (auto const* name_ent : orderedEntities)
+        {
+            if (name_ent->second.isPresent.get())
+            {
+                if (name_ent->second.hasOverride())
+                {
+                    jsnObjects.emplace_back(name_ent->second.value->saveEntity());
+                }
+            }
+            else if (name_ent->second.isPresent.getPrefab())
+            {
+                // isPresent is false but it was true in the prefab
+                json removedObj;
+                removedObj["Name"] = name_ent->first;
+                removedObj["__removed__"] = true;
+                jsnObjects.emplace_back(std::move(removedObj));
+            }
+        }
+
+        return document;
     }
 } // namespace Ent

@@ -24,7 +24,7 @@ using namespace nlohmann;
 namespace Ent
 {
     char const* actorStatesSchemaName = "./Scene-schema.json#/definitions/ActorStates";
-    static char const* colorSchemaName = "./RuntimeComponents.json#/definitions/Color";
+    char const* colorSchemaName = "./RuntimeComponents.json#/definitions/Color";
     char const* entitySchemaName = "./Scene-schema.json#/definitions/Object";
     char const* sceneSchemaName = "./Scene-schema.json#/definitions/Scene";
     Ent::Node makeDefaultColorField(EntityLib const& _entlib)
@@ -1140,31 +1140,10 @@ namespace
         }
         return Ent::ActivationLevel::Started;
     }
-
-    char const* getActivationLevelString(Ent::ActivationLevel _level)
-    {
-        if (_level == Ent::ActivationLevel::Created)
-        {
-            return "Created";
-        }
-        if (_level == Ent::ActivationLevel::Started)
-        {
-            return "Started";
-        }
-        if (_level == Ent::ActivationLevel::Loading)
-        {
-            return "Loading";
-        }
-        if (_level == Ent::ActivationLevel::InWorld)
-        {
-            return "InWorld";
-        }
-        return "Started";
-    }
 } // namespace
 
-static std::unique_ptr<Ent::Entity> loadEntity(
-    Ent::EntityLib const& _entlib, json const& _entNode, Ent::Entity const* _superEntityFromParentEntity)
+std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
+    json const& _entNode, Ent::Entity const* _superEntityFromParentEntity) const
 {
     ENTLIB_ASSERT(
         _superEntityFromParentEntity == nullptr
@@ -1175,7 +1154,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     {
         ovInstanceOf = _superEntityFromParentEntity->getInstanceOfValue().makeInstanceOf();
     }
-    auto superEntityOfThisEntity = std::make_unique<Ent::Entity>(_entlib, "Prefab");
+    auto superEntityOfThisEntity = std::make_unique<Ent::Entity>(*this, "Prefab");
     ENTLIB_ASSERT(superEntityOfThisEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
     bool superIsInit = false;
     Ent::Entity const* superEntity = superEntityOfThisEntity.get();
@@ -1184,7 +1163,7 @@ static std::unique_ptr<Ent::Entity> loadEntity(
     {
         auto const prefabPath = _entNode.at("InstanceOf").get<std::string>();
         // Do not inherit from _superEntityFromParentEntity since the override of InstanceOf reset the Entity
-        auto superEntityShared = _entlib.loadEntityReadOnly(prefabPath.c_str(), nullptr);
+        auto superEntityShared = loadEntityReadOnly(prefabPath.c_str(), nullptr);
         ovInstanceOf = superEntityShared->getInstanceOfValue().makeOverridedInstanceOf(prefabPath);
         superEntity = superEntityShared.get();
         ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
@@ -1226,12 +1205,11 @@ static std::unique_ptr<Ent::Entity> loadEntity(
         superActivationLevel.makeOverridedInstanceOf(maxActivationLevel);
 
     // Color
-    Ent::Node ovColor = Ent::makeDefaultColorField(_entlib);
+    Ent::Node ovColor = Ent::makeDefaultColorField(*this);
     if (_entNode.contains("Color"))
     {
-        Ent::Subschema const& colorSchema =
-            AT(_entlib.schema.schema.allDefinitions, Ent::colorSchemaName);
-        ovColor = _entlib.loadNode(
+        Ent::Subschema const& colorSchema = AT(schema.schema.allDefinitions, Ent::colorSchemaName);
+        ovColor = loadNode(
             colorSchema,
             _entNode.at("Color"),
             _superEntityFromParentEntity != nullptr ? &_superEntityFromParentEntity->getColorValue() :
@@ -1244,12 +1222,12 @@ static std::unique_ptr<Ent::Entity> loadEntity(
 
     // ActorStates
     Ent::Subschema const& actorStatesSchema =
-        AT(_entlib.schema.schema.allDefinitions, Ent::actorStatesSchemaName);
-    Ent::Node ovActorStates(Ent::Array{&_entlib, &actorStatesSchema}, &actorStatesSchema);
+        AT(schema.schema.allDefinitions, Ent::actorStatesSchemaName);
+    Ent::Node ovActorStates(Ent::Array{this, &actorStatesSchema}, &actorStatesSchema);
     if (_entNode.contains("ActorStates"))
     {
-        ovActorStates = _entlib.loadNode(
-            actorStatesSchema, _entNode.at("ActorStates"), &superEntity->getActorStates());
+        ovActorStates =
+            loadNode(actorStatesSchema, _entNode.at("ActorStates"), &superEntity->getActorStates());
     }
     else
     {
@@ -1280,9 +1258,9 @@ static std::unique_ptr<Ent::Entity> loadEntity(
                 auto fileInJson = (data.count("File") != 0) ?
                                       tl::optional<std::string>(data["File"].get<std::string>()) :
                                       tl::nullopt;
-                auto subSceneComp = std::make_unique<Ent::SubSceneComponent>(&_entlib, index);
+                auto subSceneComp = std::make_unique<Ent::SubSceneComponent>(this, index);
                 subSceneComp->embedded = Ent::Scene::loadScene(
-                    _entlib,
+                    *this,
                     data["Embedded"],
                     (superComp != nullptr ? superComp->embedded.get() : nullptr));
                 subSceneComponent = std::move(subSceneComp);
@@ -1293,17 +1271,17 @@ static std::unique_ptr<Ent::Entity> loadEntity(
                 auto const version =
                     compNode.count("Version") != 0u ? compNode.at("Version").get<size_t>() : 0;
 
-                if (_entlib.schema.components.count(cmpType) == 0)
+                if (schema.components.count(cmpType) == 0)
                 {
                     ENTLIB_LOG_ERROR("Unknown Component type : %s", cmpType.c_str());
                 }
                 else
                 {
-                    Ent::Subschema const& compSchema = *AT(_entlib.schema.components, cmpType);
+                    Ent::Subschema const& compSchema = *AT(schema.components, cmpType);
                     Ent::Component comp{
                         superComp != nullptr, // has a super component
                         cmpType,
-                        _entlib.loadNode(
+                        loadNode(
                             compSchema, data, (superComp != nullptr ? &superComp->root : nullptr)),
                         version,
                         index};
@@ -1338,11 +1316,11 @@ static std::unique_ptr<Ent::Entity> loadEntity(
             and removedComponents.count("SubScene") == 0)
         {
             subSceneComponent = std::make_unique<Ent::SubSceneComponent>(
-                &_entlib, superComp->index, superComp->embedded->makeInstanceOf());
+                this, superComp->index, superComp->embedded->makeInstanceOf());
         }
     }
     return std::make_unique<Ent::Entity>(
-        _entlib,
+        *this,
         std::move(ovName),
         std::move(components),
         std::move(removedComponents),
@@ -1435,65 +1413,7 @@ std::shared_ptr<Ent::Entity const> Ent::EntityLib::loadEntityReadOnly(
     std::filesystem::path const& _entityPath, Ent::Entity const* _super) const
 {
     return loadEntityOrScene<Ent::Entity>(
-        _entityPath, m_entityCache, &validateEntity, &::loadEntity, _super);
-}
-
-std::unique_ptr<Ent::Scene>
-Ent::Scene::loadScene(Ent::EntityLib const& _entLib, json const& _entities, Ent::Scene const* _super)
-{
-    auto scene = std::make_unique<Ent::Scene>(&_entLib);
-
-    // Add all entities from super scene ...
-    std::set<std::string> entFromSuper;
-    if (_super != nullptr)
-    {
-        for (auto&& superEnt : _super->getObjects())
-        {
-            entFromSuper.insert(superEnt->getName());
-            json const* instEntNode = nullptr;
-            // ... and look if there is an override.
-            for (json const& entNode : _entities)
-            {
-                auto const instEntName = entNode.at("Name").get<std::string>();
-                if (superEnt->getName() == instEntName)
-                {
-                    instEntNode = &entNode;
-                    break;
-                }
-            }
-            bool const removed = instEntNode != nullptr and instEntNode->count("__removed__") != 0;
-            std::unique_ptr<Ent::Entity> ent = (instEntNode == nullptr) ?
-                                                   superEnt->makeInstanceOf() :
-                                                   ::loadEntity(_entLib, *instEntNode, superEnt);
-            auto entName = ent->getName();
-
-            ent->setCanBeRenamed(false);
-            scene->objects.emplace(entName, std::move(ent), OverrideValueLocation::Prefab);
-            if (removed)
-            {
-                scene->removeEntity(entName);
-            }
-        }
-    }
-
-    // Add new entities
-    for (json const& entNode : _entities)
-    {
-        auto const name = entNode.at("Name").get<std::string>();
-        if (entFromSuper.count(name) != 0)
-        {
-            continue;
-        }
-        if (entNode.count("__removed__") != 0) // Strange to remove a new entity. Let's ignore it.
-        {
-            continue;
-        }
-        std::unique_ptr<Ent::Entity> ent = ::loadEntity(_entLib, entNode, nullptr);
-        ENTLIB_ASSERT(ent != nullptr);
-        scene->addEntity(std::move(ent));
-    }
-
-    return scene;
+        _entityPath, m_entityCache, &validateEntity, mem_fn(&EntityLib::loadEntityFromJson), _super);
 }
 
 std::shared_ptr<Ent::Scene const>
@@ -1551,203 +1471,6 @@ std::unique_ptr<Ent::Scene> Ent::EntityLib::loadScene(std::filesystem::path cons
 std::unique_ptr<Ent::Scene> Ent::EntityLib::loadLegacyScene(std::filesystem::path const& _scenePath) const
 {
     return loadLegacySceneReadOnly(_scenePath)->clone();
-}
-
-nlohmann::json Ent::Entity::saveEntity() const
-{
-    ComponentsSchema const& _schema = entlib->schema;
-    json entNode;
-
-    // Always save Name since it is use for override
-    entNode.emplace("Name", getNameValue().get().c_str());
-
-    if (getInstanceOfValue().isSet())
-    {
-        entNode.emplace("InstanceOf", getInstanceOfValue().get().c_str());
-    }
-
-    Subschema const& colorSchema = AT(_schema.schema.allDefinitions, colorSchemaName);
-    if (getColorValue().hasOverride())
-    {
-        entNode.emplace("Color", EntityLib::dumpNode(colorSchema, getColorValue()));
-    }
-
-    if (getThumbnailValue().isSet())
-    {
-        entNode.emplace("Thumbnail", getThumbnail());
-    }
-
-    if (getMaxActivationLevelValue().isSet())
-    {
-        entNode.emplace("MaxActivationLevel", getActivationLevelString(getMaxActivationLevel()));
-    }
-
-    json& componentsNode = entNode["Components"] = json::array();
-    std::vector<Component const*> sortedComp;
-    for (auto&& type_comp : getComponents())
-    {
-        sortedComp.push_back(&std::get<1>(type_comp));
-    }
-    Component subscenePlaceholder{true, "SubScene", Node(), 1, 0};
-    if (SubSceneComponent const* subscene = getSubSceneComponent())
-    {
-        subscenePlaceholder.index = subscene->index;
-        sortedComp.push_back(&subscenePlaceholder);
-    }
-    std::sort(begin(sortedComp), end(sortedComp), [](Component const* cmp, Component const* cmp2) {
-        return cmp->index < cmp2->index;
-    });
-    for (Component const* comp : sortedComp)
-    {
-        if (comp->type == "SubScene")
-        {
-            SubSceneComponent const* subscene = getSubSceneComponent();
-            ENTLIB_ASSERT(subscene != nullptr);
-            bool const subsceneHasOverride = subscene->hasOverride();
-            bool const hasInstanceOf = getInstanceOf() != nullptr;
-            if ((subsceneHasOverride and hasInstanceOf) or not hasInstanceOf)
-            {
-                json data;
-                data.emplace("Embedded", subscene->embedded->saveScene()["Objects"]);
-
-                json compNode;
-                compNode.emplace("Version", comp->version);
-                compNode.emplace("Type", comp->type);
-                compNode.emplace("Data", std::move(data));
-                componentsNode.emplace_back(std::move(compNode));
-            }
-        }
-        else if (not comp->hasPrefab or comp->root.hasOverride())
-        {
-            json compNode;
-            compNode.emplace("Version", comp->version);
-            compNode.emplace("Type", comp->type);
-            compNode.emplace(
-                "Data", EntityLib::dumpNode(*AT(_schema.components, comp->type), comp->root));
-
-            componentsNode.emplace_back(std::move(compNode));
-        }
-    }
-    for (auto const& type : removedComponents)
-    {
-        json compNode;
-        compNode.emplace("Type", type);
-        compNode.emplace("Data", json{});
-        componentsNode.emplace_back(std::move(compNode));
-    }
-    Subschema const& actorStatesSchema = AT(_schema.schema.allDefinitions, actorStatesSchemaName);
-    if (getActorStates().hasOverride())
-    {
-        entNode.emplace("ActorStates", EntityLib::dumpNode(actorStatesSchema, getActorStates()));
-    }
-    return entNode;
-}
-
-void Ent::Entity::applyToPrefab()
-{
-    if (getInstanceOf() == nullptr)
-    {
-        throw ContextException("This entity has no prefab");
-    }
-    std::string prefabPath = getInstanceOf();
-    auto prefab = entlib->loadEntity(prefabPath);
-    auto prefabName = prefab->name;
-    auto instanceName = name;
-
-    // When the value is overridden is the source, we want to make it overridden in the dest => CopyOverride
-    applyAllValuesButPrefab(*prefab, CopyMode::CopyOverride);
-    // Asked by the maxscript team because they don't want to change the name this way
-    prefab->name = prefabName;
-    // Need to save the prefab before "resetInstanceOf"
-    // because "resetInstanceOf" will use the new prefab
-    entlib->saveEntity(*prefab, prefabPath.c_str());
-    resetInstanceOf(prefabPath.c_str()); // Reset 'this' to a vanilla instance of prefab
-    name = instanceName;
-}
-
-void Ent::Entity::applyAllValues(Entity& _dest, CopyMode _copyMode) const
-{
-    applyInstanceOfField(*this, _dest, _copyMode);
-    applyAllValuesButPrefab(_dest, _copyMode);
-}
-
-void Ent::Entity::applyAllValuesButPrefab(Entity& _dest, CopyMode _copyMode) const
-{
-    name.applyAllValues(_dest.name, _copyMode);
-    thumbnail.applyAllValues(_dest.thumbnail, _copyMode);
-    maxActivationLevel.applyAllValues(_dest.maxActivationLevel, _copyMode);
-    actorStates.applyAllValues(_dest.actorStates, _copyMode);
-    color.applyAllValues(_dest.color, _copyMode);
-
-    for (auto&& name_comp : getComponents())
-    {
-        auto&& cmpName = name_comp.first;
-        auto&& comp = name_comp.second;
-        // addComponent has no effect if the component exist
-        comp.applyAllValues(*_dest.addComponent(cmpName.c_str()), _copyMode);
-    }
-    std::vector<char const*> compToRemove;
-    for (auto&& name_comp : _dest.getComponents())
-    {
-        auto&& cmpName = name_comp.first;
-        if (getComponent(cmpName.c_str()) == nullptr) // Removed component
-        {
-            compToRemove.push_back(cmpName.c_str());
-        }
-    }
-    if (auto subScene = getSubSceneComponent())
-    {
-        // addSubSceneComponent has no effect if the component exist
-        subScene->applyAllValues(*_dest.addSubSceneComponent(), _copyMode);
-    }
-    else if (auto destSubScene = _dest.getSubSceneComponent()) // Removed component
-    {
-        compToRemove.push_back("SubScene");
-    }
-    for (auto&& cmpName : compToRemove)
-    {
-        _dest.removeComponent(cmpName);
-    }
-}
-
-std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
-{
-    std::map<std::string, Ent::Component> detComponents;
-    size_t cmpIndex = 0;
-    for (auto const& type_comp : getComponents())
-    {
-        auto const& type = std::get<0>(type_comp);
-        auto const& comp = std::get<1>(type_comp);
-
-        Ent::Component detachedComp{false, type, comp.root.detach(), 1, cmpIndex};
-
-        detComponents.emplace(type, std::move(detachedComp));
-        ++cmpIndex;
-    }
-    std::unique_ptr<SubSceneComponent> detSubSceneComponent;
-    if (SubSceneComponent const* subscene = getSubSceneComponent())
-    {
-        detSubSceneComponent = std::make_unique<SubSceneComponent>(entlib);
-        detSubSceneComponent->embedded = std::make_unique<Ent::Scene>(entlib);
-        for (auto const& subEntity : subscene->embedded->getObjects())
-        {
-            detSubSceneComponent->embedded->addEntity(subEntity->detachEntityFromPrefab());
-        }
-    }
-
-    auto detachedColor = getColorValue().detach();
-    auto detachedMaxActivationLevel = getMaxActivationLevelValue().detach();
-    return std::make_unique<Ent::Entity>(
-        *entlib,
-        getNameValue().detach().makeOverridedInstanceOf(std::string(getName()) + "_detached"),
-        std::move(detComponents),
-        std::set<std::string>{}, // removedComponents
-        std::move(detSubSceneComponent),
-        actorStates.detach(),
-        std::move(detachedColor),
-        getThumbnailValue().detach(),
-        Override<String>{},
-        detachedMaxActivationLevel);
 }
 
 std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string const& _instanceOf) const
@@ -1856,48 +1579,6 @@ void Ent::EntityLib::clearCache()
 {
     m_entityCache.clear();
     m_sceneCache.clear();
-}
-
-json Ent::Scene::saveScene() const
-{
-    json document;
-
-    document.emplace("Version", 2);
-    json& jsnObjects = document["Objects"];
-    jsnObjects = json::array();
-
-    std::vector<EntityMap::value_type const*> orderedEntities;
-    orderedEntities.reserve(objects.map.size());
-    for (auto& name_ent : objects.map)
-    {
-        orderedEntities.push_back(&name_ent);
-    }
-    std::stable_sort(
-        begin(orderedEntities),
-        end(orderedEntities),
-        [](EntityMap::value_type const* a, EntityMap::value_type const* b) {
-            return a->second.index < b->second.index; // Try to keep ordering
-        });
-    for (auto const* name_ent : orderedEntities)
-    {
-        if (name_ent->second.isPresent.get())
-        {
-            if (name_ent->second.hasOverride())
-            {
-                jsnObjects.emplace_back(name_ent->second.value->saveEntity());
-            }
-        }
-        else if (name_ent->second.isPresent.getPrefab())
-        {
-            // isPresent is false but it was true in the prefab
-            json removedObj;
-            removedObj["Name"] = name_ent->first;
-            removedObj["__removed__"] = true;
-            jsnObjects.emplace_back(std::move(removedObj));
-        }
-    }
-
-    return document;
 }
 
 void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const& _scenePath) const

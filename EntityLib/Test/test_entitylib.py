@@ -290,6 +290,8 @@ try:
     assert(testEntityRef is not None)
     assert(testEntityRef.root.at("TestRef").is_set())
     entityRef = testEntityRef.root.at("TestRef").get_entityref()
+    val = testEntityRef.root.at("TestRef").value
+    assert entityRef.entity_path == val.entity_path
     resolvedEntity = ent.resolve_entityref(entityRef)
     assert(resolvedEntity is not None)
 
@@ -740,7 +742,7 @@ try:
     scene.add_entity(entlib.make_instance_of(os.path.normpath(os.getcwd() + "/prefab.entity")))
 
     print("save_scene")
-    entlib.save_scene(scene, os.getcwd() + "/SceneMainWorld.test.scene")
+    entlib.save_scene(scene, os.getcwd() + "/SceneWild.test.scene")
 
     added_entity = scene.get_entity("PlayerSpawner_")
     cinematic_comp = added_entity.get_component("CinematicGD")

@@ -399,7 +399,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_default_bool", [](Node* node) { return node->getDefaultBool(); })
         .def("is_default", [](Node* node) { return node->isDefault(); })
         .def("get_type_name", [](Node* node) { return node->getTypeName(); })
-        .def_property("value", getValue, setValue)
+        // properties are reference_internal by default, but "value" is a fake property since
+        // the Node doesn't own the returned variant.
+        .def_property("value", getValue, setValue, py::return_value_policy::copy)
         .def_property_readonly("default_value", getDefaultValue)
         .def("set_float", [](Node* node, double val) { return node->setFloat(val); })
         .def("set_int", [](Node* node, int64_t val) { return node->setInt(val); })

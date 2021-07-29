@@ -503,6 +503,23 @@ try
         testPrefabEntity(ent.get());
     }
     {
+        Ent::Node ent = entlib.loadFileAsNode("prefab.copy.entity", *entlib.getEntitySchema());
+        // TEST simple entity refs resolution
+        Ent::Node* testEntityRef = ent.at("Components")->mapGet("TestEntityRef")->getUnionData();
+        ENTLIB_ASSERT(testEntityRef != nullptr);
+        ENTLIB_ASSERT(testEntityRef->at("TestRef")->isSet());
+        Ent::EntityRef entityRef = testEntityRef->at("TestRef")->getEntityRef();
+        Ent::Node* resolvedEntity = entlib.resolveEntityRef(&ent, entityRef);
+        ENTLIB_ASSERT(resolvedEntity != nullptr);
+
+        Ent::Node* subScenecomp = ent.at("Components")->mapGet("SubScene")->getUnionData();
+        Ent::Node* allSubEntities = subScenecomp->at("Embedded");
+        ENTLIB_ASSERT(not allSubEntities->empty());
+        Ent::Node* originalEnt = allSubEntities->at(0llu);
+        ENTLIB_ASSERT(resolvedEntity == originalEnt);
+    }
+
+    {
         // Test write prefab
         EntityPtr ent = entlib.loadEntity("prefab.copy.entity");
 

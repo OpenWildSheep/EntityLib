@@ -24,7 +24,9 @@ using namespace nlohmann;
 namespace Ent
 {
     char const* actorStatesSchemaName = "./Scene-schema.json#/definitions/ActorStates";
-    char const* colorSchemaName = "./RuntimeComponents.json#/definitions/Color";
+    static char const* colorSchemaName = "./RuntimeComponents.json#/definitions/Color";
+    char const* entitySchemaName = "./Scene-schema.json#/definitions/Object";
+    char const* sceneSchemaName = "./Scene-schema.json#/definitions/Scene";
     Ent::Node makeDefaultColorField(EntityLib const& _entlib)
     {
         Ent::Subschema const& colorSchema = AT(_entlib.schema.schema.allDefinitions, colorSchemaName);
@@ -125,6 +127,106 @@ namespace Ent
     }
 
     EntityLib::~EntityLib() = default;
+
+    static Node const* getSubScene(Node const* _entity)
+    {
+        if (auto* subScene = _entity->at("Components")->mapGet("SubScene"))
+        {
+            return subScene->getUnionData()->at("Embedded");
+        }
+        return nullptr;
+    }
+
+    static Node const* resolveEntityRefRecursive(
+        Node const* _current, Node const* _up, Node const* _down, std::vector<std::string>& _path)
+    {
+        ENTLIB_ASSERT(_current->getSchema()->name == entitySchemaName);
+
+        auto& head = _path.front();
+
+        if (head == "..")
+        {
+            // go up in hierarchy
+            if (_up == nullptr)
+            {
+                // broken ref
+                return nullptr;
+            }
+            _current = _up->getParentNode()->getParentNode()->getParentNode()->getParentNode();
+            _down = _up;
+            _up = _current == nullptr ? nullptr : _current->getParentNode();
+        }
+        else if (head != ".")
+        {
+            // go down in child hierarchy named "head"
+            if (_down == nullptr)
+            {
+                // broken ref
+                return nullptr;
+            }
+            _current = _down->mapGet(head.c_str());
+            _up = _down;
+            _down = _current == nullptr ? nullptr : getSubScene(_current);
+        }
+        _path.erase(_path.begin());
+        if (_path.empty())
+        {
+            return _current;
+        }
+        return resolveEntityRefRecursive(_current, _up, _down, _path);
+    }
+
+    Node const* resolveEntityRefImpl(Node const* _current, const EntityRef& _entityRef)
+    {
+        if (_current->getSchema()->name != entitySchemaName)
+        {
+            throw ContextException("Can resolveEntityRef because the Node in not an Entity");
+        }
+        if (_entityRef.entityPath.empty())
+        {
+            // empty ref
+            return nullptr;
+        }
+
+        // split around '/'
+        std::vector<std::string> parts = splitString(_entityRef.entityPath.c_str(), '/');
+
+        Node const* down = getSubScene(_current);
+        Node const* up = _current->getParentNode();
+
+        return resolveEntityRefRecursive(_current, up, down, parts);
+    }
+
+    Node const* EntityLib::resolveEntityRef(Node const* _node, const EntityRef& _entityRef) const
+    {
+        return resolveEntityRefImpl(_node, _entityRef);
+    }
+
+    Node* EntityLib::resolveEntityRef(Node* _node, const EntityRef& _entityRef) const
+    {
+        return const_cast<Node*>(resolveEntityRefImpl(std::as_const(_node), _entityRef));
+    }
+
+    Subschema const* EntityLib::getSchema(char const* _schemaName) const
+    {
+        if (auto iter = schema.schema.allDefinitions.find(_schemaName);
+            iter != schema.schema.allDefinitions.end())
+        {
+            return &iter->second;
+        }
+        else
+            return nullptr;
+    }
+
+    Subschema const* EntityLib::getEntitySchema() const
+    {
+        return getSchema(entitySchemaName);
+    }
+
+    Subschema const* EntityLib::getSceneSchema() const
+    {
+        return getSchema(sceneSchemaName);
+    }
 
 } // namespace Ent
 
@@ -1412,8 +1514,7 @@ Ent::EntityLib::loadLegacySceneReadOnly(std::filesystem::path const& _scenePath)
 
 Ent::Node Ent::EntityLib::loadEntityAsNode(std::filesystem::path const& _entityPath) const
 {
-    Ent::Subschema const& entitySchema =
-        AT(schema.schema.allDefinitions, "./Scene-schema.json#/definitions/Object");
+    Ent::Subschema const& entitySchema = AT(schema.schema.allDefinitions, entitySchemaName);
     return loadFileAsNode(_entityPath, entitySchema);
 }
 

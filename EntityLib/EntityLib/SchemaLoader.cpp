@@ -622,14 +622,12 @@ void Ent::SchemaLoader::readSchema(
                                 lastMeta.keyField->c_str());
                         }
                         auto&& props = lastSchema.singularItems->get().properties;
-                        if (props.count(*lastMeta.keyField) == 0)
+                        if (props.count(*lastMeta.keyField))
                         {
-                            throw ContextException(
-                                "Invalid schema. keyField '%s' doesn't exist!",
-                                lastMeta.keyField->c_str());
+                            props.at(*lastMeta.keyField)->isKeyField = true;
                         }
-                        lastSchema.singularItems->get().properties.at(*lastMeta.keyField)->isKeyField =
-                            true;
+                        // The key can be absent when an object contain itself (like Entities).
+                        // Sometimes the object can be incomplete, but will be completed later.
                     }
                 }
             }

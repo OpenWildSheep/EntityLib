@@ -24,6 +24,9 @@ namespace Ent
 
     // ********************************** Static data *********************************************
 
+    extern char const* entitySchemaName;
+    extern char const* sceneSchemaName;
+
     /// Definition of all components
     struct ComponentsSchema
     {
@@ -137,6 +140,17 @@ namespace Ent
             nlohmann::json const& _data,
             Ent::Node const* _super,
             nlohmann::json const* _default = nullptr) const;
+
+        /// @brief Resolve an EntityRef relative to this Node/Entity.
+        /// Returns nullptr in case of failure.
+        Node const* resolveEntityRef(Node const* _node, const EntityRef& _entityRef) const;
+        /// @brief Resolve an EntityRef relative to this Node/Entity.
+        /// Returns nullptr in case of failure.
+        Node* resolveEntityRef(Node* _node, const EntityRef& _entityRef) const;
+
+        Subschema const* getSchema(char const* _schemaName) const;
+        Subschema const* getEntitySchema() const;
+        Subschema const* getSceneSchema() const;
 
     private:
         /// Load an Entity or a Scene, using the given cache

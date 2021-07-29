@@ -1289,8 +1289,11 @@ try
             (current_path() / "test.StickToTerrain.node").generic_u8string().c_str());
         ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
         stickToTerrain->root.at("NormalRatio")->setFloat(0.6);
+        stickToTerrain->root.at("precisionRadius")->setFloat(0.6e-15);
 
         ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
+        ENTLIB_ASSERT(
+            fabs(stickToTerrain->root.at("precisionRadius")->getFloat() - 0.6e-15) < 0.0000001);
         ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isSet() == false);
         ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isDefault() == false);
         ENTLIB_ASSERT(fabs(stickToTerrain->root.at("ZOffset")->getFloat() - 10.) < 0.0001);

@@ -797,10 +797,10 @@ Ent::Node Ent::EntityLib::loadNode(
     return result;
 }
 
-static double round_n(double value, std::size_t multiplier)
+static double round_n(double value, double multiplier)
 {
-    const auto scaled_value = value * static_cast<double>(multiplier);
-    return std::round(scaled_value) / static_cast<double>(multiplier);
+    const auto scaled_value = value * multiplier;
+    return std::round(scaled_value) / multiplier;
 }
 
 static double truncFloat(float _val)
@@ -811,9 +811,9 @@ static double truncFloat(float _val)
     }
 
     double result{};
-    for (size_t multiplier = 1; multiplier < 1'000'000'000'000'000; multiplier *= 10)
+    for (size_t multiplier = 0; multiplier < 100; ++multiplier)
     {
-        result = round_n(_val, multiplier);
+        result = round_n(_val, pow(10, multiplier));
         if (float(result) == _val)
         {
             break;

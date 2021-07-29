@@ -3,7 +3,8 @@
         {
             "Data": {
                 "InstanceOf": "test.StickToTerrain.node",
-                "NormalRatio": 0.6
+                "NormalRatio": 0.6,
+                "precisionRadius": 6e-16
             },
             "Type": "StickToTerrain",
             "Version": 1

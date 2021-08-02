@@ -58,7 +58,7 @@
             "Type": "BeamTargetGD",
             "Data": {
                 "HotspotType": "ride",
-                "Mode": "Possessing"
+                "Mode": "Creature"
             }
         },
         {

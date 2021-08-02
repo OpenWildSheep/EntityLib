@@ -480,13 +480,20 @@ Ent::Node Ent::EntityLib::loadNode(
         if (InstanceOfIter != _data.end())
         {
             auto nodeFileName = InstanceOfIter->get<std::string>();
-            json nodeData = loadJsonFile(rawdataPath, nodeFileName);
-            // Do not inherit from _super since the override of InstanceOf reset the Entity
-            prefabNode = loadNode(_nodeSchema, nodeData, nullptr, _default);
-            _super = &prefabNode;
-            Ent::Override<String> tmplPath("", tl::nullopt, InstanceOfIter->get<std::string>());
-            object.instanceOf = prefabNode.value.get<Object>().instanceOf.makeOverridedInstanceOf(
-                InstanceOfIter->get<std::string>());
+            if (not nodeFileName.empty())
+            {
+                json nodeData = loadJsonFile(rawdataPath, nodeFileName);
+                // Do not inherit from _super since the override of InstanceOf reset the Entity
+                prefabNode = loadNode(_nodeSchema, nodeData, nullptr, _default);
+                _super = &prefabNode;
+                object.instanceOf = prefabNode.value.get<Object>().instanceOf.makeOverridedInstanceOf(
+                    InstanceOfIter->get<std::string>());
+            }
+            else
+            {
+                _super = nullptr;
+                object.instanceOf = Ent::Override<String>("", tl::nullopt, "");
+            }
         }
 
         // Read the fields in schema
@@ -1162,12 +1169,21 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
     if (_entNode.count("InstanceOf") != 0)
     {
         auto const prefabPath = _entNode.at("InstanceOf").get<std::string>();
-        // Do not inherit from _superEntityFromParentEntity since the override of InstanceOf reset the Entity
-        auto superEntityShared = loadEntityReadOnly(prefabPath.c_str(), nullptr);
-        ovInstanceOf = superEntityShared->getInstanceOfValue().makeOverridedInstanceOf(prefabPath);
-        superEntity = superEntityShared.get();
-        ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
-        superIsInit = true;
+        if (not prefabPath.empty())
+        {
+            // Do not inherit from _superEntityFromParentEntity since the override of InstanceOf reset the Entity
+            auto superEntityShared = _entlib.loadEntityReadOnly(prefabPath.c_str(), nullptr);
+            ovInstanceOf =
+                superEntityShared->getInstanceOfValue().makeOverridedInstanceOf(prefabPath);
+            superEntity = superEntityShared.get();
+            ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
+            superIsInit = true;
+        }
+        else
+        {
+            _superEntityFromParentEntity = nullptr;
+            ovInstanceOf = Ent::Override<String>("", tl::nullopt, "");
+        }
     }
     ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
 

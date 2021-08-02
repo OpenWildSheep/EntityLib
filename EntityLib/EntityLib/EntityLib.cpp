@@ -1172,7 +1172,7 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
         if (not prefabPath.empty())
         {
             // Do not inherit from _superEntityFromParentEntity since the override of InstanceOf reset the Entity
-            auto superEntityShared = _entlib.loadEntityReadOnly(prefabPath.c_str(), nullptr);
+            auto superEntityShared = loadEntityReadOnly(prefabPath.c_str(), nullptr);
             ovInstanceOf =
                 superEntityShared->getInstanceOfValue().makeOverridedInstanceOf(prefabPath);
             superEntity = superEntityShared.get();

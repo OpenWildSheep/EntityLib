@@ -503,7 +503,9 @@ try
         testPrefabEntity(ent.get());
     }
     {
-        Ent::Node ent = entlib.loadFileAsNode("prefab.copy.entity", *entlib.getEntitySchema());
+        ENTLIB_ASSERT(entlib.getNodeCache().size() == 0);
+        Ent::Node ent = entlib.loadEntityAsNode("prefab.copy.entity");
+        ENTLIB_ASSERT(entlib.getNodeCache().size() == 1);
         // TEST simple entity refs resolution
         Ent::Node* testEntityRef = ent.at("Components")->mapGet("TestEntityRef")->getUnionData();
         ENTLIB_ASSERT(testEntityRef != nullptr);

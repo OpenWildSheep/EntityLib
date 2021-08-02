@@ -1422,6 +1422,17 @@ Ent::EntityLib::loadSceneReadOnly(std::filesystem::path const& _scenePath) const
     return loadScene(_scenePath);
 }
 
+std::shared_ptr<Ent::Node const> Ent::EntityLib::loadNodeReadOnly(
+    Ent::Subschema const& _nodeSchema, char const* _nodePath, Ent::Node const* _super) const
+{
+    auto loadFunc =
+        [&_nodeSchema](Ent::EntityLib const& _entLib, json const& _document, Ent::Node const* _super) {
+            return std::make_unique<Ent::Node>(_entLib.loadNode(_nodeSchema, _document, _super));
+        };
+
+    return loadEntityOrScene<Ent::Node>(_nodePath, m_nodeCache, &validateEntity, loadFunc, _super);
+}
+
 std::shared_ptr<Ent::Scene const>
 Ent::EntityLib::loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const
 {
@@ -1441,8 +1452,8 @@ Ent::Node Ent::EntityLib::loadEntityAsNode(std::filesystem::path const& _entityP
 Ent::Node Ent::EntityLib::loadFileAsNode(
     std::filesystem::path const& _path, Ent::Subschema const& _schema) const
 {
-    json jsonData = loadJsonFile(rawdataPath, _path);
-    return loadNode(_schema, jsonData, nullptr, nullptr);
+    auto node = loadNodeReadOnly(_schema, _path.string().c_str());
+    return *node;
 }
 
 std::unique_ptr<Ent::Entity>
@@ -1574,11 +1585,16 @@ std::map<std::filesystem::path, Ent::EntityLib::SceneFile> const& Ent::EntityLib
 {
     return m_sceneCache;
 }
+std::map<std::filesystem::path, Ent::EntityLib::NodeFile> const& Ent::EntityLib::getNodeCache() const
+{
+    return m_nodeCache;
+}
 
 void Ent::EntityLib::clearCache()
 {
     m_entityCache.clear();
     m_sceneCache.clear();
+    m_nodeCache.clear();
 }
 
 void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const& _scenePath) const

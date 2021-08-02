@@ -73,6 +73,12 @@ namespace Ent
         /// Load the Scene at path _scenePath then return a pointer to the cached data
         std::shared_ptr<Scene const> loadSceneReadOnly(std::filesystem::path const& _scenePath) const;
 
+        /// Load the Node at path _nodeSchema then return a pointer to the cached data
+        std::shared_ptr<Node const> loadNodeReadOnly(
+            Ent::Subschema const& _nodeSchema,
+            char const* _nodePath,
+            Ent::Node const* _super = nullptr) const;
+
         /// Load the Scene in legacy format at path _scenePath then return a pointer to the cached data
         std::shared_ptr<Scene const>
         loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const;
@@ -129,8 +135,14 @@ namespace Ent
             std::shared_ptr<Scene> data;
             std::filesystem::file_time_type time;
         };
+        struct NodeFile
+        {
+            std::shared_ptr<Node> data;
+            std::filesystem::file_time_type time;
+        };
         std::map<std::filesystem::path, EntityFile> const& getEntityCache() const;
         std::map<std::filesystem::path, SceneFile> const& getSceneCache() const;
+        std::map<std::filesystem::path, NodeFile> const& getNodeCache() const;
 
         void clearCache();
 
@@ -167,6 +179,7 @@ namespace Ent
 
         mutable std::map<std::filesystem::path, EntityFile> m_entityCache;
         mutable std::map<std::filesystem::path, SceneFile> m_sceneCache;
+        mutable std::map<std::filesystem::path, NodeFile> m_nodeCache;
     };
 
 } // namespace Ent

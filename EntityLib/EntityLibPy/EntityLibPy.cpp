@@ -348,6 +348,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pyEntityLib = py::class_<EntityLib>(ent, "EntityLib");
     auto pyEntityRef = py::class_<EntityRef>(ent, "EntityRef");
     auto pyEntityFile = py::class_<EntityLib::EntityFile>(ent, "EntityFile");
+    auto pyNodeFile = py::class_<EntityLib::NodeFile>(ent, "NodeFile");
     auto pySceneFile = py::class_<EntityLib::SceneFile>(ent, "SceneFile");
 
     pyNode
@@ -584,6 +585,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readwrite("rawdata_path", &EntityLib::rawdataPath) // unit-test need to write it
         .def_readonly("tools_dir", &EntityLib::toolsDir)
         .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference_internal)
+        .def("resolve_entityref",
+            (Node* (EntityLib::*)(Node*, const EntityRef&) const)&EntityLib::resolveEntityRef,
+            py::return_value_policy::reference_internal)
         .def_readonly(
             "component_dependencies",
             &EntityLib::componentDependencies,
@@ -611,6 +615,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](EntityLib* lib, std::string const& path) { return lib->loadSceneReadOnly(path); },
             py::keep_alive<0, 1>())
         .def(
+            "load_node_read_only",
+            &EntityLib::loadNodeReadOnly,
+            py::keep_alive<0, 1>())
+        .def(
             "load_legacy_scene_read_only",
             [](EntityLib* lib, std::string const& path) { return lib->loadLegacySceneReadOnly(path); },
             py::keep_alive<0, 1>())
@@ -618,7 +626,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("save_scene", &EntityLib::saveScene)
         .def("get_entity_cache", &EntityLib::getEntityCache, py::return_value_policy::reference_internal)
         .def("get_scene_cache", &EntityLib::getSceneCache, py::return_value_policy::reference_internal)
+        .def("get_node_cache", &EntityLib::getNodeCache, py::return_value_policy::reference_internal)
         .def("clear_cache", &EntityLib::clearCache)
+        .def("load_file_as_node", &EntityLib::loadFileAsNode, py::return_value_policy::reference_internal)
+        .def("load_entity_as_node", &EntityLib::loadEntityAsNode, py::return_value_policy::reference_internal)
         .def(
             "make_instance_of",
             [](EntityLib* lib, std::string const& path) {
@@ -646,6 +657,13 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](EntityLib::SceneFile* sceneF) { return sceneF->data.get(); },
             py::return_value_policy::reference_internal)
         .def_readonly("time", &EntityLib::SceneFile::time, py::return_value_policy::reference_internal);
+
+    pyNodeFile
+        .def_property_readonly(
+            "data",
+            [](EntityLib::NodeFile* entF) { return entF->data.get(); },
+            py::return_value_policy::reference_internal)
+        .def_readonly("time", &EntityLib::NodeFile::time, py::return_value_policy::reference_internal);
 
     py::register_exception<Ent::JsonValidation>(ent, "JsonValidation");
 }

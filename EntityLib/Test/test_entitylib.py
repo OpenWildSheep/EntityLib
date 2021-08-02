@@ -206,6 +206,24 @@ try:
     testPrefabEntity(ent)
 
     ####################################################################################################################
+    assert len(entlib.get_node_cache()) == 0
+    ent = entlib.load_entity_as_node("prefab.copy.entity")
+    assert len(entlib.get_node_cache()) == 1
+    # TEST simple entity refs resolution
+    testEntityRef = ent.at("Components").map_get("TestEntityRef").get_union_data()
+    assert testEntityRef is not None
+    assert testEntityRef.at("TestRef").is_set()
+    entityRef = testEntityRef.at("TestRef").get_entityref()
+    resolvedEntity = entlib.resolve_entityref(ent, entityRef)
+    assert resolvedEntity is not None
+
+    subScenecomp = ent.at("Components").map_get("SubScene").get_union_data()
+    allSubEntities = subScenecomp.at("Embedded")
+    assert not allSubEntities.empty()
+    originalEnt = allSubEntities.at(0)
+    assert resolvedEntity == originalEnt
+
+    ####################################################################################################################
     ent = entlib.load_entity("prefab.entity")  # type: Ent.Entity
 
     testPrefabEntity(ent)

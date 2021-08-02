@@ -1,0 +1,5 @@
+{
+    "Components": [],
+    "InstanceOf": "prefab_updated.entity",
+    "Name": "PlayerSpawner_"
+}

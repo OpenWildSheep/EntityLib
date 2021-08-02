@@ -48,6 +48,8 @@ namespace Ent
         void unset();
         void setSize(Override<size_t> _size);
         void applyAllValues(Vector& _dest, CopyMode _copyMode) const;
+        void setParentNode(Node* _parentNode);
+        void checkParent(Node const* _parentNode) const;
 
     private:
         EntityLib const* m_entlib = nullptr;

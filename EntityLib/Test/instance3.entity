@@ -1,0 +1,16 @@
+{
+    "Components": [
+        {
+            "Data": {
+                "SetOfObject": [
+                    {
+                        "Name": "G"
+                    }
+                ]
+            },
+            "Type": "TestSetOfObject",
+            "Version": 1
+        }
+    ],
+    "Name": "PlayerSpawner_"
+}

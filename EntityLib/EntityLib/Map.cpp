@@ -52,6 +52,22 @@ static void setChildKey(Ent::Subschema const* _arraySchema, Ent::Node* _child, E
         case Ent::DataType::string: _child->setString(_key.get<Ent::String>().c_str()); break;
         // The key is the item itself
         case Ent::DataType::integer: _child->setInt(_key.get<int64_t>()); break;
+        case Ent::DataType::object:
+            if (meta.keyField.has_value())
+            {
+                auto keyNode = _child->at(meta.keyField->c_str());
+                switch (keyNode->getDataType())
+                {
+                case Ent::DataType::string:
+                    keyNode->setString(_key.get<Ent::String>().c_str());
+                    break;
+                case Ent::DataType::integer: keyNode->setInt(_key.get<int64_t>()); break;
+                default:
+                    throw ContextException("Can't use this type as key of a set : " + *meta.keyField);
+                }
+                break;
+            }
+            [[fallthrough]];
         default: throw std::runtime_error("Can't use this type in a set : " + _arraySchema->name);
         }
 #pragma warning(pop)
@@ -136,7 +152,21 @@ static Ent::Map::KeyType getChildKey(Ent::Subschema const* _arraySchema, Ent::No
         // The key is the item itself
         case Ent::DataType::string: return String(_child->getString());
         case Ent::DataType::integer: return _child->getInt();
-        default: throw std::runtime_error("Unknown key type in set " + _arraySchema->name);
+        case Ent::DataType::object:
+            if (meta.keyField.has_value())
+            {
+                auto keyNode = _child->at(meta.keyField->c_str());
+                switch (keyNode->getDataType())
+                {
+                case Ent::DataType::string: return keyNode->getString(); break;
+                case Ent::DataType::integer: return keyNode->getInt(); break;
+                default:
+                    throw ContextException("Can't use this type as key of a set : " + *meta.keyField);
+                }
+                break;
+            }
+            [[fallthrough]];
+        default: throw ContextException("Unknown key type in set " + _arraySchema->name);
         }
 #pragma warning(pop)
     }
@@ -253,10 +283,11 @@ Ent::Node const* Ent::Map::get(KeyType const& _key) const
 
 Ent::Node* Ent::Map::get(KeyType const& _key)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
     return const_cast<Ent::Node*>(std::as_const(*this).get(_key));
 }
 
-Ent::Node* Ent::Map::insert(KeyType const& _key)
+Ent::Map::Element& Ent::Map::insertImpl(KeyType const& _key)
 {
     auto iter = m_itemMap.find(_key);
     if (iter == m_itemMap.end())
@@ -265,16 +296,71 @@ Ent::Node* Ent::Map::insert(KeyType const& _key)
         ENTLIB_ASSERT_MSG(itemSchema, "map/set expect a singularItems");
         auto newNode = m_entlib->loadNode(itemSchema->get(), json(), nullptr);
         setChildKey(m_schema, &newNode, _key);
-        return insert(OverrideValueLocation::Override, _key, std::move(newNode));
+        return insertImpl(OverrideValueLocation::Override, _key, std::move(newNode));
     }
     size_t index = iter->second;
     Element& element = m_items.at(index);
     if (not element.isPresent.get())
     {
         element.isPresent.set(true);
+        if (not element.isPresent.getPrefab())
+        {
+            // This element was removed in the prefab and re-insert in the instance
+            // So we will not get back the data from before the prefab.
+            auto key = getChildKey(m_schema, element.node.get());
+            (*element.node) = m_entlib->loadNode(*element.node->getSchema(), json{}, nullptr);
+            setChildKey(m_schema, element.node.get(), key);
+        }
+        // If the element was present in the prefab and remove in the instance,
+        // we have no way to express in the json that the element is reset,
+        // so we will keep the prefab data.
     }
     checkInvariants();
-    return element.node.get();
+    return element;
+}
+
+Ent::Node* Ent::Map::insert(KeyType const& _key)
+{
+    return insertImpl(_key).node.get();
+}
+
+Ent::Node* Ent::Map::rename(KeyType const& _key, KeyType const& _newkey)
+{
+    auto iter = m_itemMap.find(_key);
+    if (iter != m_itemMap.end())
+    {
+        auto const idx = iter->second;
+        if (m_items[idx].isPresent.get())
+        {
+            auto const& overridePolicy = m_schema->meta.get<Subschema::ArrayMeta>().overridePolicy;
+            auto const itemIsObject = m_schema->singularItems->get().type == Ent::DataType::object;
+            if (itemIsObject and overridePolicy == "set"
+                and m_items[idx].node->GetRawValue().get<Object>().hasASuper)
+            {
+                throw CantRename(
+                    R"(Can't rename key because it override an item in prefab from parent entity)");
+            }
+            else
+            {
+                m_items[idx].isPresent.set(false);
+                auto clone = *m_items[idx].node;
+                setChildKey(m_schema, &clone, _newkey);
+                Element& newNode = insertImpl(Ent::OverrideValueLocation::Override, _newkey, clone);
+                // Change the elements order to keep the position in the array
+                std::swap(newNode, m_items[idx]); // swap the elements
+                std::swap(m_itemMap[_key], m_itemMap[_newkey]); // swap the indexes
+                return m_items[idx].node.get(); // The right elt is m_items[idx] since they have been swaped
+            }
+        }
+        else
+        {
+            throw CantRename("Can't rename key because it was removed");
+        }
+    }
+    else
+    {
+        throw CantRename("Can't rename key because it doesn't exist");
+    }
 }
 
 bool Ent::Map::isErased(KeyType const& _key) const
@@ -287,7 +373,7 @@ bool Ent::Map::isErased(KeyType const& _key) const
     return not m_items.at(iter->second).isPresent.get();
 }
 
-Ent::Node* Ent::Map::insert(OverrideValueLocation _loc, KeyType _key, Node _node)
+Ent::Map::Element& Ent::Map::insertImpl(OverrideValueLocation _loc, KeyType _key, Node _node)
 {
     ENTLIB_ASSERT(get(_key) == nullptr);
     ENTLIB_ASSERT(m_itemMap.count(_key) == 0);
@@ -307,7 +393,12 @@ Ent::Node* Ent::Map::insert(OverrideValueLocation _loc, KeyType _key, Node _node
     }
     m_itemMap.emplace(std::move(_key), m_items.size() - 1);
     checkInvariants();
-    return elt.node.get();
+    return elt;
+}
+
+Ent::Node* Ent::Map::insert(OverrideValueLocation _loc, KeyType _key, Node _node)
+{
+    return insertImpl(_loc, std::move(_key), std::move(_node)).node.get();
 }
 
 std::vector<Ent::Node const*> Ent::Map::getItemsWithRemoved() const
@@ -520,5 +611,21 @@ void Ent::Map::applyAllValues(Map& _dest, CopyMode _copyMode) const
     for (auto const& removedDestKey : removedDestKeys)
     {
         _dest.erase(removedDestKey);
+    }
+}
+
+void Ent::Map::setParentNode(Node* _parentNode)
+{
+    for (auto& elt : m_items)
+    {
+        elt.node->setParentNode(_parentNode);
+    }
+}
+
+void Ent::Map::checkParent(Node const* _parentNode) const
+{
+    for (auto& elt : m_items)
+    {
+        elt.node->checkParent(_parentNode);
     }
 }

@@ -58,6 +58,24 @@ Value getValue(Ent::Node& node)
     return Value();
 }
 
+Value getDefaultValue(Ent::Node& node)
+{
+    switch (node.getDataType())
+    {
+    case Ent::DataType::array:
+    case Ent::DataType::object:
+    case Ent::DataType::oneOf:
+    case Ent::DataType::null: return nullptr;
+    case Ent::DataType::boolean: return node.getDefaultBool();
+    case Ent::DataType::integer: return node.getDefaultInt();
+    case Ent::DataType::number: return node.getDefaultFloat();
+    case Ent::DataType::string: return std::string(node.getDefaultString());
+    case Ent::DataType::entityRef: return node.getDefaultEntityRef();
+    case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
+    }
+    return Value();
+}
+
 template <typename I, typename O>
 struct Converter
 {
@@ -150,6 +168,15 @@ static mapbox::util::variant<std::vector<String>, std::vector<int64_t>> nodeGetK
 using namespace pybind11::literals;
 
 // clang-format off
+
+static Entity* anonymEntityCtor(EntityLib* _entlib)
+{
+    static std::atomic<size_t> count = 0;
+    auto val = ++count;
+    char buff[128];
+    sprintf_s(buff, "Anonymous%llu", val);
+    return new Entity(*_entlib, buff);
+}
 
 PYBIND11_MODULE(EntityLibPy, ent)
 {
@@ -269,9 +296,16 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "get_singular_items",
             [](Subschema const& s) -> SubschemaRef const* { return s.singularItems.get(); },
             py::return_value_policy::reference_internal)
+        .def_property_readonly(
+            "singular_items",
+            [](Subschema const& s) -> SubschemaRef const* { return s.singularItems.get(); },
+            py::return_value_policy::reference_internal)
         .def("has_singular_items", [](Subschema const& s) { return s.singularItems != nullptr; })
         .def(
             "get_linear_items",
+            [](Subschema const& s) -> std::vector<SubschemaRef> const& { return *s.linearItems; },
+            py::return_value_policy::reference_internal)
+        .def_property_readonly("linear_items",
             [](Subschema const& s) -> std::vector<SubschemaRef> const& { return *s.linearItems; },
             py::return_value_policy::reference_internal)
         .def(
@@ -366,6 +400,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("is_default", [](Node* node) { return node->isDefault(); })
         .def("get_type_name", [](Node* node) { return node->getTypeName(); })
         .def_property("value", getValue, setValue)
+        .def_property_readonly("default_value", getDefaultValue)
         .def("set_float", [](Node* node, double val) { return node->setFloat(val); })
         .def("set_int", [](Node* node, int64_t val) { return node->setInt(val); })
         .def("set_string", [](Node* node, char const* str) { return node->setString(str); })
@@ -381,6 +416,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "get_schema",
             [](Node* node) { return node->getSchema(); },
             py::return_value_policy::reference_internal)
+        .def_property_readonly(
+            "schema",
+            [](Node* node) { return node->getSchema(); },
+            py::return_value_policy::reference_internal)
         .def("unset", [](Node* node) { return node->unset(); })
         .def("is_set", [](Node* node) { return node->isSet(); })
         .def("dumps", [](Node* node, OverrideValueSource source, bool superKeyIsType)
@@ -390,14 +429,20 @@ PYBIND11_MODULE(EntityLibPy, ent)
              "source"_a = OverrideValueSource::Override, "superKeyIsType"_a = false)
         .def("map_erase", (bool (Node::*)(char const*))&Node::mapErase)
         .def("map_erase", (bool (Node::*)(int64_t))&Node::mapErase)
+        .def("map_rename", (Node* (Node::*)(char const*, char const*))&Node::mapRename, py::return_value_policy::reference_internal)
+        .def("map_rename", (Node* (Node::*)(int64_t, int64_t))&Node::mapRename, py::return_value_policy::reference_internal)
         .def("map_get", (Node* (Node::*)(char const*))&Node::mapGet, py::return_value_policy::reference_internal)
         .def("map_get", [](Node* node, Ent::String const& str){return node->mapGet(str.c_str());}, py::return_value_policy::reference_internal)
         .def("map_get", (Node* (Node::*)(int64_t))&Node::mapGet, py::return_value_policy::reference_internal)
-        .def("map_insert", (Node const* (Node::*)(char const* _key))&Node::mapInsert, py::return_value_policy::reference_internal)
-        .def("map_insert", (Node const* (Node::*)(int64_t _key))&Node::mapInsert, py::return_value_policy::reference_internal)
+        .def("map_insert", (Node* (Node::*)(char const* _key))&Node::mapInsert, py::return_value_policy::reference_internal)
+        .def("map_insert", (Node* (Node::*)(int64_t _key))&Node::mapInsert, py::return_value_policy::reference_internal)
         .def("is_map_or_set", &Node::isMapOrSet)
         .def("get_key_type", &Node::getKeyType)
         .def("get_keys", nodeGetKey)
+        .def_property_readonly("parent_node", (Node* (Node::*)())&Node::getParentNode, py::return_value_policy::reference_internal)
+        .def("apply_all_values", [](Node& self, Node& dest, CopyMode copyMode) {
+            self.applyAllValues(dest, copyMode);
+        })
         ;
 
     pyComponent
@@ -423,7 +468,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         ;
 
     pyEntity
-        .def(py::init<EntityLib const&>())
+        .def(py::init<EntityLib const&, char const*>())
+        .def(py::init(&anonymEntityCtor))
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
         .def("get_ptr", [](Entity* self) {return (intptr_t)self;})
         .def_static("from_ptr", [](intptr_t _ptr) {return (Entity*)_ptr;})
@@ -444,7 +490,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("remove_subscene_component", &Entity::removeSubSceneComponent)
         .def("get_component_types", &Entity::getComponentTypes)
         .def("get_components", &Entity::getComponents, py::return_value_policy::reference_internal)
-        .def("get_actorstates", [](Entity* ent) { return ent->getActorStates(); }, py::return_value_policy::reference_internal)
+        .def("get_actorstates", [](Entity* ent) { return &ent->getActorStates(); }, py::return_value_policy::reference_internal)
         .def(
             "get_subscene_component",
             [](Entity& e) { return e.getSubSceneComponent(); },
@@ -483,7 +529,31 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "add_entity",
             [](Scene* scene, Entity* ent) -> Entity*
             {
-                scene->addEntity(ent->clone()); return scene->getObjects().back().get();
+                return scene->addEntity(ent->clone());
+            }, py::return_value_policy::reference_internal)
+        .def(
+            "add_entity",
+            [](Scene* scene, char const* name) -> Entity*
+            {
+                return scene->addEntity(name);
+            }, py::return_value_policy::reference_internal)
+        .def(
+            "get_entity",
+            [](Scene* scene, char const* name) -> Entity*
+            {
+                return scene->getEntity(name);
+            }, py::return_value_policy::reference_internal)
+        .def(
+            "remove_entity",
+            [](Scene* scene, char const* name)
+            {
+                scene->removeEntity(name);
+            }, py::return_value_policy::reference_internal)
+        .def(
+            "rename_entity",
+            [](Scene* scene, char const* name, char const* newName)
+            {
+                scene->renameEntity(name, newName);
             }, py::return_value_policy::reference_internal)
         .def("resolve_entityref", &Scene::resolveEntityRef, py::return_value_policy::reference_internal)
         .def_property_readonly("owner_entity", &Scene::getOwnerEntity)
@@ -491,20 +561,11 @@ PYBIND11_MODULE(EntityLibPy, ent)
             static_cast<Entity*(Scene::*)(size_t)>(&Scene::getEntity),
             py::return_value_policy::reference_internal)
         .def_property_readonly("entity_count", &Scene::entityCount)
-        .def_property_readonly(
-            "entities",
-            [](Scene* scene) -> std::vector<Entity*> {
-                std::vector<Entity*> entities;
-                for (std::unique_ptr<Entity> const& ent : scene->getObjects())
-                {
-                    entities.push_back(ent.get());
-                }
-                return entities;
-            },
-            py::return_value_policy::reference_internal);
+        .def_property_readonly("entities", &Scene::getObjects);
 
     pyComponentsSchema
         .def_readonly("components", &ComponentsSchema::components, py::return_value_policy::reference_internal)
+        .def_readonly("actorstates", &ComponentsSchema::actorstates, py::return_value_policy::reference_internal)
         .def_readonly("schema", &ComponentsSchema::schema, py::return_value_policy::reference_internal);
 
     pyColor

@@ -87,6 +87,10 @@
             "Data": {
                 "Embedded": [
                     {
+                        "Components": [],
+                        "Name": "Entity"
+                    },
+                    {
                         "Color": [
                             255.0,
                             120.0,
@@ -104,10 +108,99 @@
                         ],
                         "InstanceOf": "subentity2.entity",
                         "Name": "EntityWithInstanceOf"
+                    },
+                    {
+                        "Components": [],
+                        "InstanceOf": "subentity2.entity",
+                        "Name": "EntityWithInstanceOfButNoOverride"
+                    },
+                    {
+                        "Components": [],
+                        "Name": "PrettiestName"
+                    },
+                    {
+                        "Name": "TestRemove",
+                        "__removed__": true
+                    },
+                    {
+                        "Components": [
+                            {
+                                "Data": {
+                                    "ThumbnailMesh": "DefaultLinkVisual.wbm"
+                                },
+                                "Type": "NetworkLink",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "TestSaveEntWithOverride"
                     }
                 ]
             },
             "Type": "SubScene",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "MapOfObject": [
+                    [
+                        "NewNode",
+                        {}
+                    ],
+                    [
+                        "OldNode1",
+                        {
+                            "Value": "overriden"
+                        }
+                    ],
+                    [
+                        "OldNode2",
+                        {
+                            "InstanceOf": "OldNode2.MapOfObject.node"
+                        }
+                    ]
+                ],
+                "SetOfObject": [
+                    {
+                        "Name": "A2",
+                        "Value": "a"
+                    },
+                    {
+                        "Name": "C",
+                        "__removed__": true
+                    },
+                    {
+                        "InstanceOf": "ObjectInSet.node",
+                        "Name": "E"
+                    },
+                    {
+                        "InstanceOf": "ObjectInSet.node",
+                        "Name": "F"
+                    },
+                    {
+                        "Name": "G"
+                    }
+                ]
+            },
+            "Type": "TestSetOfObject",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "LossBySecond": 36.0
+            },
+            "Type": "VoxelSimulationGD",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "InstanceOf": "test.SeedPatch2.node"
+            },
+            "Type": "CharacterControllerGD",
+            "Version": 1
+        },
+        {
+            "Data": {},
+            "Type": "AnimationEventsGeneratorGD",
             "Version": 1
         }
     ],

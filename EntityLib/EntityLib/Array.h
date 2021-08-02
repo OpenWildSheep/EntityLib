@@ -46,6 +46,7 @@ namespace Ent
         Node* mapGet(Map::KeyType const& _key); ///< @return the item with _key, or nullptr
         Node const* mapGet(Map::KeyType const& _key) const; ///< @return the item with _key, or nullptr
         Node* mapInsert(Map::KeyType const& _key); ///< @pre hasKey(). @brief Insert a new item with _key
+        Node* mapRename(Map::KeyType const& _key, Map::KeyType const& _newKey);
 
         /// @return true if it is a map/set and the element with _key was removed
         bool isErased(Map::KeyType const& _key) const;
@@ -91,6 +92,9 @@ namespace Ent
 
         void applyAllValues(Array& _dest, CopyMode _copyMode) const;
 
+        void setParentNode(Node* _parentNode);
+        void checkParent(Node const* _parentNode) const;
+
     private:
         void checkInvariants() const;
 
@@ -130,4 +134,15 @@ namespace Ent
     {
         apply_visitor([&](auto& a) { a.unset(); }, m_data);
     }
+
+    inline void Ent::Array::setParentNode(Node* _parent)
+    {
+        apply_visitor([&](auto& a) { a.setParentNode(_parent); }, m_data);
+    }
+
+    inline void Ent::Array::checkParent(Node const* _parent) const
+    {
+        apply_visitor([&](auto& a) { a.checkParent(_parent); }, m_data);
+    }
+
 } // namespace Ent

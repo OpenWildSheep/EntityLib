@@ -186,6 +186,39 @@
                             }
                         ],
                         "InstanceOf": "subentity.entity"
+                    },{
+                        "Name": "TestRemove",
+                        "Color": [255, 120, 220, 255],
+                        "Components": [{
+                                "Version": 1,
+                                "Type": "TransformGD",
+                                "Data": {}
+                            }
+                        ]
+                    }, {
+                        "Name": "TestSaveEntWithOverride",
+                        "Color": [255, 120, 220, 255],
+                        "Components": [{
+                                "Version": 1,
+                                "Type": "NetworkLink",
+                                "Data": {
+                                }
+                            }
+                        ]
+                    }, {
+                        "Name": "EntityWithInstanceOfButNoOverride",
+                        "Color": [255, 120, 220, 255],
+                        "Components": [{
+                                "Version": 1,
+                                "Type": "NetworkLink",
+                                "Data": {
+                                    "Source": ".EP1-Spout_",
+                                    "Target": ".EP1-crook_",
+                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                }
+                            }
+                        ],
+                        "InstanceOf": "subentity.entity"
                     }
                 ]
             }
@@ -202,7 +235,7 @@
             "Type": "TestDefaultValues",
             "Version": 1
         }, {            
-		    "Version": 1,
+            "Version": 1,
             "Type": "PathNodeGD",
             "Data": {
                 "Radius": 30.0,
@@ -238,6 +271,26 @@
                 "NoiseOffsetX" : 2
             },
             "Type": "SeedPatch",
+            "Version": 1
+        }, {
+            "Data": {
+                "SetOfObject": [{
+                        "Name": "C",
+                        "Value": "c"
+                    }, {
+                        "Name": "D",
+                        "Value": "d"
+                    }, {
+                        "Name": "G",
+                        "Value": "g"
+                    }
+                ],
+                "MapOfObject":[
+                    ["OldNode1", {}],
+                    ["OldNode2", {}]
+                ]
+            },
+            "Type": "TestSetOfObject",
             "Version": 1
         }
     ],

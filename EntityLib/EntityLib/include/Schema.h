@@ -46,8 +46,8 @@ namespace Ent
         Subschema() = default;
         Subschema(Subschema const&) = delete;
         Subschema& operator=(Subschema const&) = delete;
-        Subschema(Subschema&&) = default;
-        Subschema& operator=(Subschema&&) = default;
+        Subschema(Subschema&&) noexcept = default;
+        Subschema& operator=(Subschema&&) noexcept = default;
         DeleteCheck deleteCheck;
 
         /// @brief Get the Subschema related to the given \p _subtype (className)
@@ -66,6 +66,7 @@ namespace Ent
         tl::optional<std::vector<SubschemaRef>> oneOf; ///< This object have to match with one of thos schema (union)
         std::string name; ///< This is not a constraint. Just the name of the definition
         nlohmann::json userMeta;
+        bool isKeyField = false;
 
         // Meta informations
         /// Store metadata for any type
@@ -94,6 +95,7 @@ namespace Ent
             std::string overridePolicy; ///< Policy used to override the array from the prefab
             bool ordered = true;
             bool isMapItem = false; ///< Can't be discarded at write (neither null)
+            tl::optional<std::string> keyField;
         };
         /// Store metadata for all schema which doesn't have specific field
         struct GenericMeta : BaseMeta

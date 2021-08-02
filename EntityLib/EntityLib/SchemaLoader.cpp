@@ -160,6 +160,10 @@ Ent::Subschema::Meta parseMetaForType(json const& _data, Ent::DataType _type)
     const auto setArrayMetas = [&](Ent::Subschema::ArrayMeta& _meta) {
         _meta.overridePolicy = _data.value("overridePolicy", "");
         _meta.ordered = _data.value("ordered", true);
+        if (_data.count("keyField") != 0)
+        {
+            _meta.keyField = _data.at("keyField").get<std::string>();
+        }
     };
     switch (_type)
     {
@@ -598,7 +602,33 @@ void Ent::SchemaLoader::readSchema(
                     auto& lastMeta = lastSchema.meta.get<Ent::Subschema::ArrayMeta>();
                     if (lastMeta.overridePolicy == "map")
                     {
+                        if (lastSchema.singularItems == nullptr)
+                        {
+                            throw ContextException(
+                                "Invalid schema. 'map' override polocy is only valid with a "
+                                "singularItem array",
+                                lastMeta.keyField->c_str());
+                        }
                         lastSchema.singularItems->get().meta.get<Ent::Subschema::ArrayMeta>().isMapItem =
+                            true;
+                    }
+                    if (lastMeta.keyField.has_value())
+                    {
+                        if (lastSchema.singularItems == nullptr)
+                        {
+                            throw ContextException(
+                                "Invalid schema. keyField ('%s') meta data is only valid with a "
+                                "singularItem array",
+                                lastMeta.keyField->c_str());
+                        }
+                        auto&& props = lastSchema.singularItems->get().properties;
+                        if (props.count(*lastMeta.keyField) == 0)
+                        {
+                            throw ContextException(
+                                "Invalid schema. keyField '%s' doesn't exist!",
+                                lastMeta.keyField->c_str());
+                        }
+                        lastSchema.singularItems->get().properties.at(*lastMeta.keyField)->isKeyField =
                             true;
                     }
                 }

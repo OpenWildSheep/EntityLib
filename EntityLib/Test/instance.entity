@@ -86,13 +86,38 @@
                                 }
                             }
                         ],
-						"InstanceOf": "subentity2.entity"
+                        "InstanceOf": "subentity2.entity"
+                    }, {
+                        "Name": "EntityWithInstanceOfButNoOverride",
+                        "InstanceOf": "subentity2.entity"
                     }
                 ]
             }
+        }, {
+            "Data": {
+                "SetOfObject": [{
+                        "Name": "A",
+                        "Value": "a"
+                    }, {
+                        "Name": "B",
+                        "Value": "b"
+                    }, {
+                        "Name": "E",
+                        "InstanceOf": "ObjectInSet.node"
+                    }, {
+                        "Name": "F",
+                        "Value": "f"
+                    }, {
+                        "Name": "G",
+                        "__removed__": true
+                    }
+                ]
+            },
+            "Type": "TestSetOfObject",
+            "Version": 1
         }
     ],
     "InstanceOf": "prefab.entity",
-	"Thumbnail": "prout",
+    "Thumbnail": "prout",
     "Name": "PlayerSpawner_"
 }

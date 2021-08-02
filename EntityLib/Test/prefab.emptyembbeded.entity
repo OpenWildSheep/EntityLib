@@ -225,6 +225,36 @@
             "Version": 1
         },
         {
+            "Data": {
+                "MapOfObject": [
+                    [
+                        "OldNode1",
+                        {}
+                    ],
+                    [
+                        "OldNode2",
+                        {}
+                    ]
+                ],
+                "SetOfObject": [
+                    {
+                        "Name": "C",
+                        "Value": "c"
+                    },
+                    {
+                        "Name": "D",
+                        "Value": "d"
+                    },
+                    {
+                        "Name": "G",
+                        "Value": "g"
+                    }
+                ]
+            },
+            "Type": "TestSetOfObject",
+            "Version": 1
+        },
+        {
             "Data": null,
             "Type": "SubScene"
         }

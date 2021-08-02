@@ -219,6 +219,59 @@
                         ],
                         "InstanceOf": "subentity.entity",
                         "Name": "EntityWithInstanceOf"
+                    },
+                    {
+                        "Color": [
+                            255.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Source": ".EP1-Spout_",
+                                    "Target": ".EP1-crook_",
+                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                },
+                                "Type": "NetworkLink",
+                                "Version": 1
+                            }
+                        ],
+                        "InstanceOf": "subentity.entity",
+                        "Name": "EntityWithInstanceOfButNoOverride"
+                    },
+                    {
+                        "Color": [
+                            255.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [
+                            {
+                                "Data": {},
+                                "Type": "TransformGD",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "TestRemove"
+                    },
+                    {
+                        "Color": [
+                            255.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [
+                            {
+                                "Data": {},
+                                "Type": "NetworkLink",
+                                "Version": 1
+                            }
+                        ],
+                        "Name": "TestSaveEntWithOverride"
                     }
                 ]
             },
@@ -293,6 +346,36 @@
                 "TestRef": "EP1-Spout_LINK_001"
             },
             "Type": "TestEntityRef",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "MapOfObject": [
+                    [
+                        "OldNode1",
+                        {}
+                    ],
+                    [
+                        "OldNode2",
+                        {}
+                    ]
+                ],
+                "SetOfObject": [
+                    {
+                        "Name": "C",
+                        "Value": "c"
+                    },
+                    {
+                        "Name": "D",
+                        "Value": "d"
+                    },
+                    {
+                        "Name": "G",
+                        "Value": "g"
+                    }
+                ]
+            },
+            "Type": "TestSetOfObject",
             "Version": 1
         }
     ],

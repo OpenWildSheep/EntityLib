@@ -61,8 +61,10 @@ bool Ent::Array::canErase() const
     {
         return false;
     }
-    // If it is a set, it has a singularItems. Can erase only if item is a oneOf.
-    return getSchema()->singularItems->get().type == Ent::DataType::oneOf;
+    // If it is a set, it has a singularItems.
+    // Can erase only if item is a oneOf or an Object with a keyField.
+    return getSchema()->singularItems->get().type == Ent::DataType::oneOf
+           or meta.keyField.has_value();
 }
 
 bool Ent::Array::mapErase(Map::KeyType const& _key)
@@ -86,6 +88,12 @@ Ent::Node* Ent::Array::mapInsert(Map::KeyType const& _key)
 {
     ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only mapInsert on map or set");
     return m_data.get<Map>().insert(_key);
+}
+
+Ent::Node* Ent::Array::mapRename(Map::KeyType const& _key, Map::KeyType const& _newKey)
+{
+    ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only mapRename on map or set");
+    return m_data.get<Map>().rename(_key, _newKey);
 }
 
 bool Ent::Array::hasKey() const

@@ -475,7 +475,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(py::init(&anonymEntityCtor), py::keep_alive<1, 2>())
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
         .def("get_ptr", [](Entity* self) {return (intptr_t)self;})
-        .def_static("from_ptr", [](intptr_t _ptr) {return (Entity*)_ptr;})
+        .def_static("from_ptr", [](intptr_t _ptr) {return (Entity*)_ptr;}, py::return_value_policy::reference_internal)
         .def_property("name", &Entity::getName, &Entity::setName)
         .def_property_readonly("instance_of", &Entity::getInstanceOf)
         .def_property("thumbnail", &Entity::getThumbnail, &Entity::setThumbnail)
@@ -579,7 +579,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(py::init<std::string>())
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
         .def("get_ptr", [](EntityLib* self) {return (intptr_t)self;})
-        .def_static("from_ptr", [](intptr_t _ptr) {return (EntityLib*)_ptr;})
+        .def_static("from_ptr", [](intptr_t _ptr) {return (EntityLib*)_ptr;}, py::return_value_policy::reference_internal)
         .def_readwrite("validation_enabled", &EntityLib::validationEnabled)
         .def_readonly("root_path", &EntityLib::rootPath)
         .def_readwrite("rawdata_path", &EntityLib::rawdataPath) // unit-test need to write it

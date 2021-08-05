@@ -116,9 +116,7 @@ Ent::Node* Ent::Array::initAdd(OverrideValueLocation loc, Node _node, bool _adde
     if (hasKey())
     {
         auto key = getChildKey(&_node);
-        Ent::Node* node = m_data.get<Map>().insert(loc, key, std::move(_node));
-        node->setAddedInInsance(_addedInInstance);
-        return node;
+        return m_data.get<Map>().insert(loc, key, std::move(_node), _addedInInstance);
     }
     else
     {
@@ -126,10 +124,11 @@ Ent::Node* Ent::Array::initAdd(OverrideValueLocation loc, Node _node, bool _adde
     }
 }
 
-Ent::Node* Ent::Array::mapInitInsert(OverrideValueLocation _loc, Map::KeyType _key, Node _node)
+Ent::Node* Ent::Array::mapInitInsert(
+    OverrideValueLocation _loc, Map::KeyType _key, Node _node, bool _addedInInstance)
 {
     ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only mapInsert on map or set");
-    return m_data.get<Map>().insert(_loc, std::move(_key), std::move(_node));
+    return m_data.get<Map>().insert(_loc, std::move(_key), std::move(_node), _addedInInstance);
 }
 
 std::vector<Ent::Node const*> Ent::Array::getItemsWithRemoved() const

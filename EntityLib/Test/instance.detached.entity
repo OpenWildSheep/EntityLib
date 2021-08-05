@@ -270,6 +270,27 @@
         },
         {
             "Data": {
+                "Scripts": [
+                    {
+                        "DataSet": [
+                            {
+                                "Float": 7.0,
+                                "Name": "BlendDurationIn"
+                            },
+                            {
+                                "Float": 10.0,
+                                "Name": "BlendDurationOut"
+                            }
+                        ],
+                        "Path": "Pesto/Clouds/CloudStorm.pesto"
+                    }
+                ]
+            },
+            "Type": "ScriptComponentGD",
+            "Version": 1
+        },
+        {
+            "Data": {
                 "NoiseOffsetY": 3.0,
                 "NoiseSizeY": 3.0
             },

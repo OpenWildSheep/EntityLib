@@ -86,7 +86,7 @@ namespace Ent
         // **************************** For array initialization **********************************
         Node* initAdd(OverrideValueLocation, Node _node, bool _addedInInstance); ///< @pre This _node is not yet added
         /// @pre hasKey() and the key doesn't exist in map
-        Node* mapInitInsert(OverrideValueLocation, Map::KeyType _key, Node _node);
+        Node* mapInitInsert(OverrideValueLocation, Map::KeyType _key, Node _node, bool _addedInInstance);
         /// @pre not hasKey()
         Node* arrayInitPush(Node _node, bool _addedInInstance);
 

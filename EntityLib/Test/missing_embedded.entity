@@ -1,0 +1,9 @@
+{
+    "Components": [ {
+            "Version": 1,
+            "Type": "SubScene",
+            "Data": {}
+        }
+    ],
+    "Name": "MissingEmbedded"
+}

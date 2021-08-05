@@ -367,7 +367,10 @@ try
         ENTLIB_ASSERT(ent.hasOverride()); // resetInstanceOf does override the "instanceOf"
         ENTLIB_ASSERT(ent.getInstanceOf() == std::string("prefab.entity"));
     }
-
+    {
+        EntityPtr ent = entlib.loadEntity("missing_embedded.entity");
+        ENTLIB_ASSERT(ent->getComponents().empty());
+    }
     {
         EntityPtr ent = entlib.loadEntity("prefab.entity");
 
@@ -510,9 +513,9 @@ try
         testPrefabEntity(ent.get());
     }
     {
-        ENTLIB_ASSERT(entlib.getNodeCache().size() == 0);
+        auto const nodeCachesize = entlib.getNodeCache().size();
         Ent::Node ent = entlib.loadEntityAsNode("prefab.copy.entity");
-        ENTLIB_ASSERT(entlib.getNodeCache().size() == 1);
+        ENTLIB_ASSERT(entlib.getNodeCache().size() == nodeCachesize + 1);
         // TEST simple entity refs resolution
         Ent::Node* testEntityRef = ent.at("Components")->mapGet("TestEntityRef")->getUnionData();
         ENTLIB_ASSERT(testEntityRef != nullptr);
@@ -533,6 +536,13 @@ try
         EntityPtr ent = entlib.loadEntity("prefab.copy.entity");
 
         testPrefabEntity(ent.get());
+
+        // TEST Tuple hasOverride
+        Ent::Component* scriptComponentGD = ent->getComponent("ScriptComponentGD");
+        auto* scripts = scriptComponentGD->root.at("Scripts");
+        auto* wp = scripts->at(0llu)->at("DataSet")->at(0llu)->at("WorldPosition");
+        ENTLIB_ASSERT(wp->hasOverride() == false);
+        ENTLIB_ASSERT(wp->at(0llu)->hasOverride() == false);
 
         // TEST MaxActivationLevel
         ENTLIB_ASSERT(ent->getMaxActivationLevel() == Ent::ActivationLevel::InWorld);

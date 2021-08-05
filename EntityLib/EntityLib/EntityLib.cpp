@@ -275,7 +275,7 @@ struct MergeMapOverride
             {
             }
         };
-        std::vector<std::pair<KeyType, NodeWrapper>> result;
+        std::vector<std::tuple<KeyType, NodeWrapper, bool>> result; // bool => addedInInstance
         if (_super != nullptr)
         {
             size_t index = 0;
@@ -292,11 +292,11 @@ struct MergeMapOverride
                         _nodeSchema.singularItems->get(), *instancePropMap[key], subSuper, subDefault);
                     if (not doRemove(*instancePropMap[key]))
                     {
-                        result.emplace_back(key, NodeWrapper{std::move(tmpNode), loc, false});
+                        result.emplace_back(key, NodeWrapper{std::move(tmpNode), loc, false}, false);
                     }
                     else
                     {
-                        result.emplace_back(key, NodeWrapper{std::move(tmpNode), loc, true});
+                        result.emplace_back(key, NodeWrapper{std::move(tmpNode), loc, true}, false);
                     }
                     instancePropMap.erase(key); // Later we need to know which item are NOT in the prefab
                 }
@@ -305,7 +305,7 @@ struct MergeMapOverride
                     Ent::Node tmpNode = entlib->loadNode(
                         _nodeSchema.singularItems->get(), json(), subSuper, subDefault);
                     ENTLIB_ASSERT(tmpNode.hasOverride() == false);
-                    result.emplace_back(key, NodeWrapper{std::move(tmpNode), loc, false});
+                    result.emplace_back(key, NodeWrapper{std::move(tmpNode), loc, false}, false);
                 }
                 ++index;
             }
@@ -324,7 +324,8 @@ struct MergeMapOverride
                     bool const isRemoved = doRemove(*instancePropMap[key]);
                     result.emplace_back(
                         key,
-                        NodeWrapper{std::move(tmpNode), OverrideValueLocation::Default, isRemoved});
+                        NodeWrapper{std::move(tmpNode), OverrideValueLocation::Default, isRemoved},
+                        false);
                     instancePropMap.erase(key); // Later we need to know which item are NOT in the prefab
                 }
                 else // Not overriden
@@ -333,7 +334,9 @@ struct MergeMapOverride
                         _nodeSchema.singularItems->get(), json(), nullptr, &subDefault);
                     ENTLIB_ASSERT(tmpNode.hasOverride() == false);
                     result.emplace_back(
-                        key, NodeWrapper{std::move(tmpNode), OverrideValueLocation::Default, false});
+                        key,
+                        NodeWrapper{std::move(tmpNode), OverrideValueLocation::Default, false},
+                        false);
                 }
                 ++index;
             }
@@ -348,9 +351,10 @@ struct MergeMapOverride
                 if (not doRemove(*instancePropMap[key]))
                 {
                     auto node = entlib->loadNode(_nodeSchema.singularItems->get(), item, nullptr);
-                    node.setAddedInInsance(true);
                     result.emplace_back(
-                        key, NodeWrapper{std::move(node), OverrideValueLocation::Override, false});
+                        key,
+                        NodeWrapper{std::move(node), OverrideValueLocation::Override, false},
+                        true);
                 }
                 // else? New but removed => Let's ignore them.
             }
@@ -362,17 +366,15 @@ struct MergeMapOverride
             });
         }
         Ent::Array arr{entlib, &_nodeSchema};
-        for (auto const& key_node : result)
+        for (auto const& [key, node, addedInInstance] : result)
         {
-            auto&& key = std::get<0>(key_node);
-            auto&& node = std::get<1>(key_node);
             if (arr.mapGet(key) != nullptr)
             {
                 std::stringstream ss;
                 ss << "Twice the same key in map : " << key;
                 throw InvalidJsonData(ss.str().c_str());
             }
-            arr.mapInitInsert(node.loc, key, std::move(node.node));
+            arr.mapInitInsert(node.loc, key, std::move(node.node), addedInInstance);
             if (node.removed)
             {
                 arr.mapErase(KeyType(key));
@@ -781,7 +783,7 @@ Ent::Node Ent::EntityLib::loadNode(
                 json const emptyJson;
                 json const& prop = _data.size() > index ? _data.at(index) : emptyJson;
                 Ent::Node tmpNode = loadNode(*sub, prop, subSuper, subDefault);
-                arr.arrayInitPush(std::move(tmpNode), subSuper == nullptr);
+                arr.arrayInitPush(std::move(tmpNode), false); // It is a tuple, so the item is never new
                 ++index;
             }
             uint64_t defaultArraySize = _nodeSchema.linearItems->size();

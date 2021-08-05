@@ -257,6 +257,26 @@ bool Ent::Map::erase(KeyType const& _key)
     return true;
 }
 
+template <typename Elt> // Elt is Element or Element const
+static auto getEltValue(Ent::Subschema const* _schema, Elt& _element)
+    -> decltype(_element.node.get())
+{
+    if (not _element.isPresent.get())
+    {
+        return nullptr;
+    }
+    auto* node = _element.node.get();
+    auto const& overridePolicy = _schema->meta.get<Ent::Subschema::ArrayMeta>().overridePolicy;
+    if (overridePolicy == "map")
+    {
+        return node->at(1llu);
+    }
+    else
+    {
+        return _element.node.get();
+    }
+}
+
 Ent::Node const* Ent::Map::get(KeyType const& _key) const
 {
     auto iter = m_itemMap.find(_key);
@@ -266,20 +286,7 @@ Ent::Node const* Ent::Map::get(KeyType const& _key) const
     }
     size_t index = iter->second;
     Element const& element = m_items.at(index);
-    if (not element.isPresent.get())
-    {
-        return nullptr;
-    }
-    Ent::Node const* node = element.node.get();
-    auto const& overridePolicy = m_schema->meta.get<Subschema::ArrayMeta>().overridePolicy;
-    if (overridePolicy == "map")
-    {
-        return node->at(1llu);
-    }
-    else
-    {
-        return element.node.get();
-    }
+    return getEltValue(m_schema, element);
 }
 
 Ent::Node* Ent::Map::get(KeyType const& _key)
@@ -297,7 +304,10 @@ Ent::Map::Element& Ent::Map::insertImpl(KeyType const& _key)
         ENTLIB_ASSERT_MSG(itemSchema, "map/set expect a singularItems");
         auto newNode = m_entlib->loadNode(itemSchema->get(), json(), nullptr);
         setChildKey(m_schema, &newNode, _key);
-        return insertImpl(OverrideValueLocation::Override, _key, std::move(newNode));
+        auto& elt = insertImpl(OverrideValueLocation::Override, _key, std::move(newNode), true);
+        getEltValue(m_schema, elt)->setAddedInInsance(true);
+        elt.node->setAddedInInsance(true);
+        return elt;
     }
     size_t index = iter->second;
     Element& element = m_items.at(index);
@@ -348,7 +358,8 @@ Ent::Node* Ent::Map::rename(KeyType const& _key, KeyType const& _newkey)
                 m_items[idx].node->setAddedInInsance(false);
                 auto clone = *m_items[idx].node;
                 setChildKey(m_schema, &clone, _newkey);
-                Element& newNode = insertImpl(Ent::OverrideValueLocation::Override, _newkey, clone);
+                Element& newNode =
+                    insertImpl(Ent::OverrideValueLocation::Override, _newkey, clone, true);
                 // Change the elements order to keep the position in the array
                 std::swap(newNode, m_items[idx]); // swap the elements
                 std::swap(m_itemMap[_key], m_itemMap[_newkey]); // swap the indexes
@@ -376,7 +387,8 @@ bool Ent::Map::isErased(KeyType const& _key) const
     return not m_items.at(iter->second).isPresent.get();
 }
 
-Ent::Map::Element& Ent::Map::insertImpl(OverrideValueLocation _loc, KeyType _key, Node _node)
+Ent::Map::Element&
+Ent::Map::insertImpl(OverrideValueLocation _loc, KeyType _key, Node _node, bool _addedInInstance)
 {
     ENTLIB_ASSERT(get(_key) == nullptr);
     ENTLIB_ASSERT(m_itemMap.count(_key) == 0);
@@ -394,14 +406,16 @@ Ent::Map::Element& Ent::Map::insertImpl(OverrideValueLocation _loc, KeyType _key
     case OverrideValueLocation::Prefab: elt.isPresent.setPrefab(true); break;
     case OverrideValueLocation::Override: elt.isPresent.set(true); break;
     }
+    elt.node->setAddedInInsance(_addedInInstance);
+    getEltValue(m_schema, elt)->setAddedInInsance(_addedInInstance);
     m_itemMap.emplace(std::move(_key), m_items.size() - 1);
     checkInvariants();
     return elt;
 }
 
-Ent::Node* Ent::Map::insert(OverrideValueLocation _loc, KeyType _key, Node _node)
+Ent::Node* Ent::Map::insert(OverrideValueLocation _loc, KeyType _key, Node _node, bool _addedInInstance)
 {
-    return insertImpl(_loc, std::move(_key), std::move(_node)).node.get();
+    return insertImpl(_loc, std::move(_key), std::move(_node), _addedInInstance).node.get();
 }
 
 std::vector<Ent::Node const*> Ent::Map::getItemsWithRemoved() const

@@ -1279,7 +1279,7 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
                 auto subSceneComp = std::make_unique<Ent::SubSceneComponent>(this, index);
                 subSceneComp->embedded = Ent::Scene::loadScene(
                     *this,
-                    data["Embedded"],
+                    data.value("Embedded", json()),
                     (superComp != nullptr ? superComp->embedded.get() : nullptr));
                 subSceneComponent = std::move(subSceneComp);
             }

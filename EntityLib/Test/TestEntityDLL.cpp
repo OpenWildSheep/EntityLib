@@ -367,7 +367,10 @@ try
         ENTLIB_ASSERT(ent.hasOverride()); // resetInstanceOf does override the "instanceOf"
         ENTLIB_ASSERT(ent.getInstanceOf() == std::string("prefab.entity"));
     }
-
+    {
+        EntityPtr ent = entlib.loadEntity("missing_embedded.entity");
+        ENTLIB_ASSERT(ent->getComponents().empty());
+    }
     {
         EntityPtr ent = entlib.loadEntity("prefab.entity");
 

@@ -493,12 +493,19 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("remove_subscene_component", &Entity::removeSubSceneComponent)
         .def("get_component_types", &Entity::getComponentTypes)
         .def("get_components", &Entity::getComponents, py::return_value_policy::reference_internal)
+        .def_property_readonly("components",
+            &Entity::getComponents,
+            py::return_value_policy::reference_internal)
         .def("get_actorstates", [](Entity* ent) { return &ent->getActorStates(); }, py::return_value_policy::reference_internal)
+        .def_property_readonly("actorstates", [](Entity* ent) { return &ent->getActorStates(); }, py::return_value_policy::reference_internal)
         .def(
             "get_subscene_component",
             [](Entity& e) { return e.getSubSceneComponent(); },
             py::return_value_policy::reference_internal)
         .def("add_subscene_component", &Entity::addSubSceneComponent, py::return_value_policy::reference_internal)
+        .def_property_readonly("sub_scene_component",
+            [](Entity& e) { return e.getSubSceneComponent(); },
+            py::return_value_policy::reference_internal)
         .def("make_entityref", &Entity::makeEntityRef)
         .def("set_instance_of", &Entity::resetInstanceOf)
         .def("reset_instance_of", &Entity::resetInstanceOf)

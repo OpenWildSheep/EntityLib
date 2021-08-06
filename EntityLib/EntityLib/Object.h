@@ -11,6 +11,21 @@ namespace Ent
 {
     struct Node;
 
+    struct ObjField
+    {
+        char const* name = nullptr;
+        value_ptr<Node> node;
+        uint32_t fieldIdx = 0;
+    };
+
+    struct CompObject
+    {
+        bool operator()(ObjField const& a, ObjField const& b) const
+        {
+            return strcmp(a.name, b.name) < 0;
+        }
+    };
+
     /// Content of a Node which has type Ent::DataType::object
     struct Object
     {
@@ -20,8 +35,9 @@ namespace Ent
         }
 
         Subschema const* schema{};
-        std::vector<std::pair<char const*, value_ptr<Node>>> nodes;
+        std::vector<ObjField> nodes;
         Override<Ent::String> instanceOf;
+        uint32_t instanceOfFieldIndex = 0;
         bool hasASuper = false;
 
         size_t size() const
@@ -53,15 +69,19 @@ namespace Ent
 
         void setParentNode(Node* _parentNode);
         void checkParent(Node const* _parentNode) const;
-    };
 
-    struct CompObject
-    {
-        bool operator()(
-            std::pair<char const*, value_ptr<Node>> const& a,
-            std::pair<char const*, value_ptr<Node>> const& b) const
+        ObjField const& at(char const* key) const
         {
-            return strcmp(a.first, b.first) < 0;
+            auto range =
+                std::equal_range(begin(nodes), end(nodes), ObjField{key, nullptr, 0}, CompObject());
+            if (range.first == range.second)
+            {
+                throw std::logic_error(std::string("Bad key : ") + key);
+            }
+            else
+            {
+                return *range.first;
+            }
         }
     };
 

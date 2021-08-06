@@ -165,7 +165,7 @@ namespace Ent
         {
             auto iter = begin(value.get<Object>());
             std::advance(iter, _index);
-            return &(*iter->second);
+            return &(*iter->node);
         }
         if (value.is<Array>())
         {
@@ -478,7 +478,7 @@ namespace Ent
             std::vector<char const*> fields;
             for (auto&& f : value.get<Object>())
             {
-                fields.push_back(f.first);
+                fields.push_back(f.name);
             }
             return fields;
         }

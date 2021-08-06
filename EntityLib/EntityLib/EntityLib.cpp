@@ -479,6 +479,20 @@ Ent::Node Ent::EntityLib::loadNode(
         {
             object.hasASuper = true;
         }
+        auto getFieldIndex = [](json const& _data, json const& _field) {
+            int fieldIdx = 0;
+            for (auto& [key, value] : _data.items())
+            {
+                if (&value == &_field)
+                {
+                    return fieldIdx;
+                }
+                ++fieldIdx;
+            }
+            ENTLIB_LOGIC_ERROR("Can't find the field in the json object");
+            return 0;
+        };
+
         if (InstanceOfIter != _data.end())
         {
             auto nodeFileName = InstanceOfIter->get<std::string>();
@@ -488,6 +502,7 @@ Ent::Node Ent::EntityLib::loadNode(
                 // Do not inherit from _super since the override of InstanceOf reset the Entity
                 prefabNode = loadNode(_nodeSchema, nodeData, nullptr, _default);
                 _super = &prefabNode;
+                object.instanceOfFieldIndex = getFieldIndex(_data, *InstanceOfIter);
                 object.instanceOf = prefabNode.value.get<Object>().instanceOf.makeOverridedInstanceOf(
                     InstanceOfIter->get<std::string>());
             }
@@ -511,9 +526,15 @@ Ent::Node Ent::EntityLib::loadNode(
             // The less local default value has the priority
             json const* defaultProp = schemaDefault != nullptr ? schemaDefault : refDefault;
             json const emptyJson;
-            json const& prop = _data.count(name) != 0 ? _data.at(name) : emptyJson;
-            Ent::Node tmpNode = loadNode(*propSchemaRef, prop, superProp, defaultProp);
-            object.nodes.emplace_back(name.c_str(), std::move(tmpNode));
+            json const* prop = &emptyJson;
+            uint32_t fieldIdx = 0;
+            if (_data.count(name) != 0)
+            {
+                prop = &_data.at(name);
+                fieldIdx = getFieldIndex(_data, *prop);
+            }
+            Ent::Node tmpNode = loadNode(*propSchemaRef, *prop, superProp, defaultProp);
+            object.nodes.push_back(ObjField{name.c_str(), std::move(tmpNode), fieldIdx});
         }
         std::sort(begin(object), end(object), Ent::CompObject());
         result = Ent::Node(std::move(object), &_nodeSchema);
@@ -963,6 +984,14 @@ json Ent::EntityLib::dumpNode(
     case Ent::DataType::object:
     {
         data = json::object();
+        struct JsonField
+        {
+            char const* name = nullptr;
+            json data;
+            uint32_t index = 0;
+        };
+        std::vector<JsonField> fieldMap;
+        auto& internObj = _node.value.get<Object>();
         for (auto const& name_sub : _schema.properties)
         {
             auto&& name = std::get<0>(name_sub);
@@ -979,18 +1008,35 @@ json Ent::EntityLib::dumpNode(
                 if (_superKeyIsTypeName and name == "Super")
                 {
                     const auto* typeName = getRefTypeName(subNode->getTypeName());
-                    data[typeName] = std::move(subJson);
+                    auto const fieldIdx = internObj.at(name.c_str()).fieldIdx;
+                    fieldMap.push_back(JsonField{typeName, std::move(subJson), fieldIdx});
                 }
                 else
                 {
-                    data[name] = std::move(subJson);
+                    auto const fieldIdx = internObj.at(name.c_str()).fieldIdx;
+                    fieldMap.push_back(JsonField{name.c_str(), std::move(subJson), fieldIdx});
                 }
             }
         }
         if (_dumpedValueSource == OverrideValueSource::Override
             and _node.value.get<Ent::Object>().instanceOf.isSet())
         {
-            data["InstanceOf"] = _node.getInstanceOf();
+            fieldMap.push_back(
+                JsonField{"InstanceOf", _node.getInstanceOf(), internObj.instanceOfFieldIndex});
+        }
+        std::sort(begin(fieldMap), end(fieldMap), [](JsonField const& a, JsonField const& b) {
+            if (a.index != b.index)
+            {
+                return a.index < b.index;
+            }
+            else
+            {
+                return strcmp(a.name, b.name) < 0;
+            }
+        });
+        for (JsonField& field : fieldMap)
+        {
+            data[field.name] = std::move(field.data);
         }
     }
     break;

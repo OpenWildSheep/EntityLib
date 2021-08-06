@@ -296,8 +296,8 @@
         }, {
             "Data": {
                 "SetOfObject": [{
-                        "Name": "C",
-                        "Value": "c"
+                        "Value": "c",
+                        "Name": "C"
                     }, {
                         "Name": "D",
                         "Value": "d"

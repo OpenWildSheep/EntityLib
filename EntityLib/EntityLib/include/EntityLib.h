@@ -168,7 +168,7 @@ namespace Ent
         Subschema const* getSceneSchema() const;
 
         void setLogicErrorPolicy(LogicErrorPolicy _LogicErrorPolicy);
-        LogicErrorPolicy getLogicErrorPolicy();
+        LogicErrorPolicy getLogicErrorPolicy() const;
 
     private:
         /// Load an Entity or a Scene, using the given cache

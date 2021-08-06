@@ -239,7 +239,7 @@ namespace Ent
         Ent::s_LogicErrorPolicy = _LogicErrorPolicy;
     }
 
-    LogicErrorPolicy EntityLib::getLogicErrorPolicy()
+    LogicErrorPolicy EntityLib::getLogicErrorPolicy() const
     {
         return Ent::s_LogicErrorPolicy;
     }

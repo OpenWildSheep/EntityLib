@@ -643,7 +643,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("clear_cache", &EntityLib::clearCache)
         .def("load_file_as_node", &EntityLib::loadFileAsNode, py::return_value_policy::reference_internal)
         .def("load_entity_as_node", &EntityLib::loadEntityAsNode, py::return_value_policy::reference_internal)
-        .def_property("logic_error_policy", &EntityLib::getLogicErrorPolicy, &EntityLib::setLogicErrorPolicy)
+        .def_property(
+            "logic_error_policy",
+            [](EntityLib* lib){return lib->getLogicErrorPolicy();},
+            [](EntityLib* lib, LogicErrorPolicy err){lib->setLogicErrorPolicy(err);})
         .def(
             "make_instance_of",
             [](EntityLib* lib, std::string const& path) {

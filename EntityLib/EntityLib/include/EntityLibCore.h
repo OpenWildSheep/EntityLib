@@ -159,6 +159,7 @@ namespace Ent
         {
             if (state_ != State::VALID)
             {
+                // Can't throw in a destructor
                 ENTLIB_LOG_ERROR("In ~DeleteCheck() : state_ != State::VALID");
             }
             state_ = State::DELETED;

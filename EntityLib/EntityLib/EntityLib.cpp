@@ -496,7 +496,6 @@ Ent::Node Ent::EntityLib::loadNode(
                 ++fieldIdx;
             }
             ENTLIB_LOGIC_ERROR("Can't find the field in the json object");
-            return 0;
         };
 
         if (InstanceOfIter != _data.end())

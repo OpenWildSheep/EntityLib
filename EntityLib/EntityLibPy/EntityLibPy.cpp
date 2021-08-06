@@ -192,6 +192,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
      * but it just seemed safer in case we add new methods with new dependencies.
      */
     auto pyDataType = py::enum_<DataType>(ent, "DataType");
+    auto pyLogicErrorPolicy = py::enum_<LogicErrorPolicy>(ent, "LogicErrorPolicy");
     auto pyActivationLevel = py::enum_<ActivationLevel>(ent, "ActivationLevel");
     auto pyOverrideValueSource = py::enum_<OverrideValueSource>(ent, "OverrideValueSource");
     auto pyOverrideValueLocation = py::enum_<OverrideValueLocation>(ent, "OverrideValueLocation");
@@ -206,6 +207,11 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pySubschemaGenericMeta = py::class_<Subschema::GenericMeta>(ent, "Subschema_GenericMeta");
     auto pySubschemaNumberMeta = py::class_<Subschema::NumberMeta>(ent, "Subschema_NumberMeta");
     auto pySubschemaUnionMeta = py::class_<Subschema::UnionMeta>(ent, "Subschema_UnionMeta");
+
+    pyLogicErrorPolicy
+        .value("Terminate", LogicErrorPolicy::Terminate)
+        .value("Throw", LogicErrorPolicy::Throw)
+        .export_values();
 
     pyDataType
         .value("null", DataType::null)
@@ -637,6 +643,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("clear_cache", &EntityLib::clearCache)
         .def("load_file_as_node", &EntityLib::loadFileAsNode, py::return_value_policy::reference_internal)
         .def("load_entity_as_node", &EntityLib::loadEntityAsNode, py::return_value_policy::reference_internal)
+        .def_property("logic_error_policy", &EntityLib::getLogicErrorPolicy, &EntityLib::setLogicErrorPolicy)
         .def(
             "make_instance_of",
             [](EntityLib* lib, std::string const& path) {

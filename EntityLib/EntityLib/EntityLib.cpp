@@ -234,6 +234,16 @@ namespace Ent
         return getSchema(sceneSchemaName);
     }
 
+    void EntityLib::setLogicErrorPolicy(LogicErrorPolicy _LogicErrorPolicy)
+    {
+        Ent::s_LogicErrorPolicy = _LogicErrorPolicy;
+    }
+
+    LogicErrorPolicy EntityLib::getLogicErrorPolicy()
+    {
+        return Ent::s_LogicErrorPolicy;
+    }
+
 } // namespace Ent
 
 // ********************************** Load/Save ***********************************************

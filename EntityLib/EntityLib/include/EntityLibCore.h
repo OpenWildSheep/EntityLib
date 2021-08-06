@@ -93,6 +93,15 @@ namespace Ent
     {
         log(_file, _line, stderr, "ERROR : ", _message, std::forward<Args>(args)...);
     }
+
+    enum class LogicErrorPolicy
+    {
+        Terminate,
+        Throw
+    };
+
+    extern LogicErrorPolicy s_LogicErrorPolicy;
+
 } // namespace Ent
 
 /// Call it when a logic error (a bug) happen
@@ -101,7 +110,10 @@ namespace Ent
     do                                                                                             \
     {                                                                                              \
         ::Ent::logError(__FILE__, __LINE__, message, __VA_ARGS__);                                 \
-        terminate();                                                                               \
+        if (Ent::s_LogicErrorPolicy == Ent::LogicErrorPolicy::Terminate)                           \
+            terminate();                                                                           \
+        else                                                                                       \
+            throw std::logic_error(Ent::format(message, __VA_ARGS__));                             \
     } while (0)
 
 #define ENTLIB_LOG(message, ...)                                                                   \
@@ -145,7 +157,10 @@ namespace Ent
 
         ~DeleteCheck()
         {
-            ENTLIB_ASSERT(state_ == State::VALID);
+            if (state_ != State::VALID)
+            {
+                ENTLIB_LOG_ERROR("In ~DeleteCheck() : state_ != State::VALID");
+            }
             state_ = State::DELETED;
         }
     };

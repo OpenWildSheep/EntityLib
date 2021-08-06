@@ -140,6 +140,7 @@ namespace Ent
     static Node const* resolveEntityRefRecursive(
         Node const* _current, Node const* _up, Node const* _down, std::vector<std::string>& _path)
     {
+        ENTLIB_ASSERT(_current != nullptr);
         ENTLIB_ASSERT(_current->getSchema()->name == entitySchemaName);
 
         auto& head = _path.front();
@@ -197,13 +198,16 @@ namespace Ent
         return resolveEntityRefRecursive(_current, up, down, parts);
     }
 
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     Node const* EntityLib::resolveEntityRef(Node const* _node, const EntityRef& _entityRef) const
     {
         return resolveEntityRefImpl(_node, _entityRef);
     }
 
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     Node* EntityLib::resolveEntityRef(Node* _node, const EntityRef& _entityRef) const
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
         return const_cast<Node*>(resolveEntityRefImpl(std::as_const(_node), _entityRef));
     }
 
@@ -215,7 +219,9 @@ namespace Ent
             return &iter->second;
         }
         else
+        {
             return nullptr;
+        }
     }
 
     Subschema const* EntityLib::getEntitySchema() const

@@ -231,7 +231,9 @@ namespace Ent
         removedComponents.erase(_type);
         auto&& [iter, inserted] = components.emplace(_type, std::move(comp));
         if (inserted)
+        {
             iter->second.root.setAddedInInsance(true);
+        }
         return &(iter->second);
     }
     Component const* Entity::getComponent(char const* _type) const

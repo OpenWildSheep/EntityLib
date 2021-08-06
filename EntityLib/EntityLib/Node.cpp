@@ -439,7 +439,9 @@ namespace Ent
     bool Node::hasOverride() const
     {
         if (addedInInstance)
+        {
             return true;
+        }
         return mapbox::util::apply_visitor(HasOverride{schema}, value);
     }
 

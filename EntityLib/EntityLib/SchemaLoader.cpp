@@ -622,7 +622,7 @@ void Ent::SchemaLoader::readSchema(
                                 lastMeta.keyField->c_str());
                         }
                         auto&& props = lastSchema.singularItems->get().properties;
-                        if (props.count(*lastMeta.keyField))
+                        if (props.count(*lastMeta.keyField) != 0)
                         {
                             props.at(*lastMeta.keyField)->isKeyField = true;
                         }

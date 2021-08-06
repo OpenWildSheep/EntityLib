@@ -175,7 +175,7 @@ static Entity* anonymEntityCtor(EntityLib* _entlib)
     auto val = ++count;
     char buff[128];
     sprintf_s(buff, "Anonymous%llu", val);
-    return new Entity(*_entlib, buff);
+    return new Entity(*_entlib, buff); // NOLINT(cppcoreguidelines-owning-memory)
 }
 
 PYBIND11_MODULE(EntityLibPy, ent)

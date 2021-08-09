@@ -559,7 +559,6 @@ tl::optional<size_t> Ent::Map::getRawSize(OverrideValueLocation _location) const
     }
     }
     ENTLIB_LOGIC_ERROR("Unknown OverrideValueLocation : %d", _location);
-    return {};
 }
 
 Ent::Map::Element Ent::Map::Element::makeInstanceOf() const

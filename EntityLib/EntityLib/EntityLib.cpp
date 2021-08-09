@@ -234,6 +234,16 @@ namespace Ent
         return getSchema(sceneSchemaName);
     }
 
+    void EntityLib::setLogicErrorPolicy(LogicErrorPolicy _LogicErrorPolicy)
+    {
+        Ent::s_LogicErrorPolicy = _LogicErrorPolicy;
+    }
+
+    LogicErrorPolicy EntityLib::getLogicErrorPolicy() const
+    {
+        return Ent::s_LogicErrorPolicy;
+    }
+
 } // namespace Ent
 
 // ********************************** Load/Save ***********************************************
@@ -496,7 +506,6 @@ Ent::Node Ent::EntityLib::loadNode(
                 ++fieldIdx;
             }
             ENTLIB_LOGIC_ERROR("Can't find the field in the json object");
-            return 0;
         };
 
         if (InstanceOfIter != _data.end())

@@ -167,6 +167,9 @@ namespace Ent
         Subschema const* getEntitySchema() const;
         Subschema const* getSceneSchema() const;
 
+        void setLogicErrorPolicy(LogicErrorPolicy _LogicErrorPolicy);
+        LogicErrorPolicy getLogicErrorPolicy() const;
+
     private:
         /// Load an Entity or a Scene, using the given cache
         template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>

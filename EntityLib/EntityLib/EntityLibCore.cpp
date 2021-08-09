@@ -8,6 +8,8 @@
 
 namespace Ent
 {
+    LogicErrorPolicy s_LogicErrorPolicy = LogicErrorPolicy::Terminate;
+
     void fprintfImpl(FILE* file, char const* message)
     {
         fprintf(file, message);

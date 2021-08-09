@@ -377,7 +377,12 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](Node* node, size_t i) { return node->at(i); },
             py::return_value_policy::reference_internal,
             "In an Array, get the element by index")
+        .def(
+            "__getitem__",
+            [](Node* node, size_t i) { return node->at(i); },
+            py::return_value_policy::reference_internal)
         .def("size", [](Node* node) { return node->size(); })
+        .def("__len__", [](Node* node) { return node->size(); })
         .def("get_raw_size", &Node::getRawSize)
         .def(
             "get_items",
@@ -445,9 +450,14 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("map_get", (Node* (Node::*)(int64_t))&Node::mapGet, py::return_value_policy::reference_internal)
         .def("map_insert", (Node* (Node::*)(char const* _key))&Node::mapInsert, py::return_value_policy::reference_internal)
         .def("map_insert", (Node* (Node::*)(int64_t _key))&Node::mapInsert, py::return_value_policy::reference_internal)
+        .def("map_insert_instanceof", (Node* (Node::*)(char const* _key))&Node::mapInsertInstanceOf, py::return_value_policy::reference_internal)
+        .def("map_insert_instanceof", (Node* (Node::*)(int64_t _key))&Node::mapInsertInstanceOf, py::return_value_policy::reference_internal)
         .def("is_map_or_set", &Node::isMapOrSet)
         .def("get_key_type", &Node::getKeyType)
         .def("get_keys", nodeGetKey)
+        .def("save_node", &Node::saveNode)
+        .def("detach", &Node::detach)
+        .def("make_instance_of", &Node::makeInstanceOf)
         .def_property_readonly("parent_node", (Node* (Node::*)())&Node::getParentNode, py::return_value_policy::reference_internal)
         .def("apply_all_values", [](Node& self, Node& dest, CopyMode copyMode) {
             self.applyAllValues(dest, copyMode);
@@ -598,6 +608,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readwrite("rawdata_path", &EntityLib::rawdataPath) // unit-test need to write it
         .def_readonly("tools_dir", &EntityLib::toolsDir)
         .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference_internal)
+        .def("make_entityref", &EntityLib::makeEntityRef)
         .def("resolve_entityref",
             (Node* (EntityLib::*)(Node*, const EntityRef&) const)&EntityLib::resolveEntityRef,
             py::return_value_policy::reference_internal)
@@ -629,8 +640,14 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::keep_alive<0, 1>())
         .def(
             "load_node_read_only",
-            &EntityLib::loadNodeReadOnly,
-            py::keep_alive<0, 1>())
+            [](EntityLib* entlib, Subschema const* schema, char const* name){ return entlib->loadNodeReadOnly(*schema, name).get();},
+            py::return_value_policy::reference_internal
+        )
+        .def(
+            "load_node_entity_read_only",
+            [](EntityLib* entlib, char const* name){ return entlib->loadNodeEntityReadOnly(name).get();},
+            py::return_value_policy::reference_internal
+        )
         .def(
             "load_legacy_scene_read_only",
             [](EntityLib* lib, std::string const& path) { return lib->loadLegacySceneReadOnly(path); },
@@ -641,12 +658,20 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_scene_cache", &EntityLib::getSceneCache, py::return_value_policy::reference_internal)
         .def("get_node_cache", &EntityLib::getNodeCache, py::return_value_policy::reference_internal)
         .def("clear_cache", &EntityLib::clearCache)
-        .def("load_file_as_node", &EntityLib::loadFileAsNode, py::return_value_policy::reference_internal)
-        .def("load_entity_as_node", &EntityLib::loadEntityAsNode, py::return_value_policy::reference_internal)
+        .def("load_node_file", &EntityLib::loadFileAsNode, py::keep_alive<0, 1>())
+        .def("load_node_entity", &EntityLib::loadEntityAsNode, py::keep_alive<0, 1>())
         .def_property(
             "logic_error_policy",
             [](EntityLib* lib){return lib->getLogicErrorPolicy();},
             [](EntityLib* lib, LogicErrorPolicy err){lib->setLogicErrorPolicy(err);})
+        .def("load_node_scene", &EntityLib::loadSceneAsNode, py::keep_alive<0, 1>()) // py::keep_alive<0, 1> => Do not destroy EntityLib before Node
+        .def("make_node_instanceof", &EntityLib::makeNodeInstanceOf, py::keep_alive<0, 1>())
+        .def("make_entity_node_instanceof", &EntityLib::makeEntityNodeInstanceOf, py::keep_alive<0, 1>())
+        .def("make_node", &EntityLib::makeNode, py::keep_alive<0, 1>())
+        .def("make_entity_node", &EntityLib::makeEntityNode, py::keep_alive<0, 1>())
+        .def("save_node_as_entity", &EntityLib::saveNodeAsEntity)
+        .def("save_node_as_scene", &EntityLib::saveNodeAsScene)
+        .def("get_parent_entity", (Node*(EntityLib::*)(Node*))&EntityLib::getParentEntity, py::return_value_policy::reference_internal)
         .def(
             "make_instance_of",
             [](EntityLib* lib, std::string const& path) {

@@ -137,11 +137,41 @@ namespace Ent
         return nullptr;
     }
 
+    template <typename N> // N : Node or Node const
+    static N* getSceneParentEntity(N* _scene)
+    {
+        N* entity = nullptr;
+        ENTLIB_ASSERT(_scene->getDataType() == Ent::DataType::array);
+        // subSceneData can be null if rootScene was loaded with loadScene
+        if (auto subSceneData = _scene->getParentNode())
+        {
+            ENTLIB_ASSERT(subSceneData != nullptr);
+            ENTLIB_ASSERT(subSceneData->getDataType() == Ent::DataType::object);
+            auto subSceneCpnt = subSceneData->getParentNode(); // SubScene
+            ENTLIB_ASSERT(subSceneCpnt != nullptr);
+            ENTLIB_ASSERT(subSceneCpnt->getDataType() == Ent::DataType::object);
+            auto cpntUnion = subSceneCpnt->getParentNode(); // Component union
+            ENTLIB_ASSERT(cpntUnion != nullptr);
+            ENTLIB_ASSERT(cpntUnion->getDataType() == Ent::DataType::oneOf);
+            auto components = cpntUnion->getParentNode(); // "Components" property (array)
+            ENTLIB_ASSERT(components != nullptr);
+            ENTLIB_ASSERT(components->getDataType() == Ent::DataType::array);
+            entity = components->getParentNode(); // Entity
+            ENTLIB_ASSERT(entity != nullptr);
+            ENTLIB_ASSERT(entity->getDataType() == Ent::DataType::object);
+        }
+        ENTLIB_ASSERT_MSG(
+            entity == nullptr || entity->getSchema()->name == entitySchemaName,
+            "current has to be an Entity but is not!");
+        return entity;
+    }
+
     static Node const* resolveEntityRefRecursive(
         Node const* _current, Node const* _up, Node const* _down, std::vector<std::string>& _path)
     {
-        ENTLIB_ASSERT(_current != nullptr);
-        ENTLIB_ASSERT(_current->getSchema()->name == entitySchemaName);
+        ENTLIB_ASSERT_MSG(
+            _current == nullptr or _current->getSchema()->name == entitySchemaName,
+            "_current has to be an Entity but is not!");
 
         auto& head = _path.front();
 
@@ -153,7 +183,10 @@ namespace Ent
                 // broken ref
                 return nullptr;
             }
-            _current = _up->getParentNode()->getParentNode()->getParentNode()->getParentNode();
+            _current = getSceneParentEntity(_up);
+            ENTLIB_ASSERT_MSG(
+                _current == nullptr or _current->getSchema()->name == entitySchemaName,
+                "_current has to be an Entity but is not!");
             _down = _up;
             _up = _current == nullptr ? nullptr : _current->getParentNode();
         }
@@ -179,9 +212,10 @@ namespace Ent
 
     Node const* resolveEntityRefImpl(Node const* _current, const EntityRef& _entityRef)
     {
+        ENTLIB_ASSERT(_current != nullptr);
         if (_current->getSchema()->name != entitySchemaName)
         {
-            throw ContextException("Can resolveEntityRef because the Node in not an Entity");
+            throw ContextException("Can't resolveEntityRef because the Node in not an Entity");
         }
         if (_entityRef.entityPath.empty())
         {
@@ -201,14 +235,34 @@ namespace Ent
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     Node const* EntityLib::resolveEntityRef(Node const* _node, const EntityRef& _entityRef) const
     {
-        return resolveEntityRefImpl(_node, _entityRef);
+        if (_node->getDataType() == Ent::DataType::array) // This is a scene
+        {
+            if (_entityRef.entityPath.empty())
+            {
+                // empty ref
+                return nullptr;
+            }
+
+            // split around '/'
+            std::vector<std::string> parts = splitString(_entityRef.entityPath.c_str(), '/');
+
+            Node const* current = getSceneParentEntity(_node);
+            Node const* down = _node;
+            Node const* up = current == nullptr ? nullptr : current->getParentNode();
+
+            return resolveEntityRefRecursive(current, up, down, parts);
+        }
+        else
+        {
+            return resolveEntityRefImpl(_node, _entityRef);
+        }
     }
 
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     Node* EntityLib::resolveEntityRef(Node* _node, const EntityRef& _entityRef) const
     {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-        return const_cast<Node*>(resolveEntityRefImpl(std::as_const(_node), _entityRef));
+        return const_cast<Node*>(resolveEntityRef(static_cast<Node const*>(_node), _entityRef));
     }
 
     Subschema const* EntityLib::getSchema(char const* _schemaName) const
@@ -234,14 +288,81 @@ namespace Ent
         return getSchema(sceneSchemaName);
     }
 
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     void EntityLib::setLogicErrorPolicy(LogicErrorPolicy _LogicErrorPolicy)
     {
         Ent::s_LogicErrorPolicy = _LogicErrorPolicy;
     }
 
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     LogicErrorPolicy EntityLib::getLogicErrorPolicy() const
     {
         return Ent::s_LogicErrorPolicy;
+    }
+    static std::tuple<std::vector<std::string>, Node const*, Node const*>
+    getAbsolutePathReversed(Node const* _entity)
+    {
+        ENTLIB_ASSERT_MSG(
+            _entity->getSchema()->name == entitySchemaName,
+            "_entity has to be an Entity but is not!");
+        Node const* current = _entity;
+        Node const* rootEntity = nullptr;
+        Node const* rootScene = nullptr;
+        std::vector<std::string> path;
+        while (current != nullptr)
+        {
+            ENTLIB_ASSERT(current->getDataType() == Ent::DataType::object);
+            path.emplace_back(current->at("Name")->getString());
+            rootEntity = current;
+            rootScene = current->getParentNode();
+            current = nullptr;
+            if (rootScene != nullptr)
+            {
+                current = getSceneParentEntity(rootScene);
+            }
+            ENTLIB_ASSERT_MSG(
+                current == nullptr || current->getSchema()->name == entitySchemaName,
+                "current has to be an Entity but is not!");
+        }
+        return {std::move(path), rootEntity, rootScene};
+    }
+
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+    EntityRef EntityLib::makeEntityRef(Node const& _from, Node const& _to)
+    {
+        // get the two absolute path
+        auto&& thisPathInfos = getAbsolutePathReversed(&_from);
+        auto&& entityPathInfos = getAbsolutePathReversed(&_to);
+
+        Node const* thisRootEntity = std::get<1>(thisPathInfos);
+        Node const* entityRootEntity = std::get<1>(entityPathInfos);
+        Node const* thisRootScene = std::get<2>(thisPathInfos);
+        Node const* entityRootScene = std::get<2>(entityPathInfos);
+
+        // entities should either share a common root scene
+        // or a common root entity if they are in a .entity (i.e there is no root scene)
+        if (thisRootScene != entityRootScene
+            or thisRootEntity == nullptr and thisRootEntity != entityRootEntity)
+        {
+            // cannot reference unrelated entities
+            return {};
+        }
+
+        auto&& thisPath = std::get<0>(thisPathInfos);
+        auto&& entityPath = std::get<0>(entityPathInfos);
+
+        std::string relativePath = computeRelativePath(thisPath, std::move(entityPath), false);
+
+        return {std::move(relativePath)};
+    }
+
+    Node* EntityLib::getParentEntity(Node* _node)
+    {
+        return getSceneParentEntity(_node->getParentNode());
+    }
+    Node const* EntityLib::getParentEntity(Node const* _node)
+    {
+        return getSceneParentEntity(_node->getParentNode());
     }
 
 } // namespace Ent
@@ -362,17 +483,34 @@ struct MergeMapOverride
         for (auto const& item : _data)
         {
             auto key = getKeyJson(item);
-            if (instancePropMap.count(key))
+            auto keyToString = [&key]() {
+                std::stringstream ss;
+                ss << key;
+                return ss.str();
+            };
+            try
             {
-                if (not doRemove(*instancePropMap[key]))
+                if (instancePropMap.count(key))
                 {
-                    auto node = entlib->loadNode(_nodeSchema.singularItems->get(), item, nullptr);
-                    result.emplace_back(
-                        key,
-                        NodeWrapper{std::move(node), OverrideValueLocation::Override, false},
-                        true);
+                    if (not doRemove(*instancePropMap[key]))
+                    {
+                        auto node = entlib->loadNode(_nodeSchema.singularItems->get(), item, nullptr);
+                        result.emplace_back(
+                            key,
+                            NodeWrapper{std::move(node), OverrideValueLocation::Override, false},
+                            true);
+                    }
+                    // else? New but removed => Let's ignore them.
                 }
-                // else? New but removed => Let's ignore them.
+            }
+            catch (ContextException& ex)
+            {
+                ex.addContextMessage("key : %s", keyToString().c_str());
+                throw;
+            }
+            catch (...)
+            {
+                throw WrapperException(std::current_exception(), "key : %s", keyToString().c_str());
             }
         }
         if (ordered)
@@ -548,8 +686,20 @@ Ent::Node Ent::EntityLib::loadNode(
                 prop = &_data.at(name);
                 fieldIdx = getFieldIndex(_data, *prop);
             }
-            Ent::Node tmpNode = loadNode(*propSchemaRef, *prop, superProp, defaultProp);
-            object.nodes.push_back(ObjField{name.c_str(), std::move(tmpNode), fieldIdx});
+            try
+            {
+                Ent::Node tmpNode = loadNode(*propSchemaRef, *prop, superProp, defaultProp);
+                object.nodes.push_back(ObjField{name.c_str(), std::move(tmpNode), fieldIdx});
+            }
+            catch (ContextException& ex)
+            {
+                ex.addContextMessage("In property : %s", name.c_str());
+                throw;
+            }
+            catch (...)
+            {
+                throw WrapperException(std::current_exception(), "In property : %s", name.c_str());
+            }
         }
         std::sort(begin(object), end(object), Ent::CompObject());
         result = Ent::Node(std::move(object), &_nodeSchema);
@@ -1512,6 +1662,11 @@ std::shared_ptr<Ent::Node const> Ent::EntityLib::loadNodeReadOnly(
     return loadEntityOrScene<Ent::Node>(_nodePath, m_nodeCache, &validateEntity, loadFunc, _super);
 }
 
+std::shared_ptr<Ent::Node const> Ent::EntityLib::loadNodeEntityReadOnly(char const* _nodePath) const
+{
+    return loadNodeReadOnly(*getSchema(entitySchemaName), _nodePath);
+}
+
 std::shared_ptr<Ent::Scene const>
 Ent::EntityLib::loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const
 {
@@ -1526,6 +1681,26 @@ Ent::Node Ent::EntityLib::loadEntityAsNode(std::filesystem::path const& _entityP
 {
     Ent::Subschema const& entitySchema = AT(schema.schema.allDefinitions, entitySchemaName);
     return loadFileAsNode(_entityPath, entitySchema);
+}
+
+Ent::Node Ent::EntityLib::loadSceneAsNode(std::filesystem::path const& _scenePath) const
+{
+    Ent::Subschema const& entitySchema = AT(schema.schema.allDefinitions, entitySchemaName);
+    auto ent = loadNodeReadOnly(entitySchema, _scenePath.string().c_str());
+    if (auto* components = ent->at("Components"))
+    {
+        if (auto subscene = components->mapGet("SubScene"))
+        {
+            if (auto scene = subscene->getUnionData()->at("Embedded"))
+            {
+                return *scene;
+            }
+        }
+    }
+    Ent::Subschema const& sceneSchema = AT(schema.schema.allDefinitions, sceneSchemaName);
+    m_nodeCache.erase(getRelativePath(_scenePath));
+    auto scene = loadNodeReadOnly(sceneSchema, _scenePath.string().c_str());
+    return *(scene->at("Objects"));
 }
 
 Ent::Node Ent::EntityLib::loadFileAsNode(
@@ -1568,6 +1743,28 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string const& _
     std::unique_ptr<Ent::Entity> inst = std::make_unique<Ent::Entity>(*this, nullptr);
     inst->resetInstanceOf(_instanceOf.c_str());
     return inst;
+}
+
+Ent::Node Ent::EntityLib::makeNodeInstanceOf(char const* _schemaName, char const* _prefab) const
+{
+    Node node = makeNode(_schemaName);
+    node.resetInstanceOf(_prefab);
+    return node;
+}
+
+Ent::Node Ent::EntityLib::makeEntityNodeInstanceOf(char const* _prefab) const
+{
+    return makeNodeInstanceOf(entitySchemaName, _prefab);
+}
+
+Ent::Node Ent::EntityLib::makeNode(char const* _schemaName) const
+{
+    return loadNode(*getSchema(_schemaName), json(), nullptr);
+}
+
+Ent::Node Ent::EntityLib::makeEntityNode() const
+{
+    return makeNode(entitySchemaName);
 }
 
 void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path const& _relEntityPath) const
@@ -1700,6 +1897,16 @@ void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const&
     }
 
     saveEntity(sceneEntity, _scenePath);
+}
+
+void Ent::EntityLib::saveNodeAsEntity(Node const* _entity, char const* _relEntityPath) const
+{
+    _entity->saveNode(_relEntityPath);
+}
+
+void Ent::EntityLib::saveNodeAsScene(Node const* _scene, char const* _scenePath) const
+{
+    _scene->saveNode(_scenePath);
 }
 
 /// \endcond

@@ -1,8 +1,14 @@
 {
-    "Objects": [
-        {
-            "InstanceOf": "this_entity_doesnt_exist.entity",
-            "Name": "InstanceOfA"
+    "Components": [{
+            "Data": {
+                "Embedded": [{
+                        "InstanceOf": "this_entity_doesnt_exist.entity",
+                        "Name": "InstanceOfA"
+                    }
+                ]
+            },
+            "Type": "SubScene",
+            "Version": 1
         }
     ]
 }

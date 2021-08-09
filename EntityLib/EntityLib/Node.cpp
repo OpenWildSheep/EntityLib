@@ -19,7 +19,7 @@ namespace Ent
     }
 
     Node::Node(Node const& _node)
-        : parentNode(_node.parentNode)
+        : parentNode(nullptr)
         , schema(_node.schema)
         , value(_node.value)
         , addedInInstance(_node.addedInInstance)
@@ -27,7 +27,7 @@ namespace Ent
         updateParents();
     }
     Node::Node(Node&& _node) noexcept
-        : parentNode(_node.parentNode)
+        : parentNode(nullptr)
         , schema(_node.schema)
         , value(std::move(_node.value))
         , addedInInstance(_node.addedInInstance)
@@ -613,6 +613,15 @@ namespace Ent
         return value.get<Array>().mapInsert(_key);
     }
 
+    Node* Node::mapInsertInstanceOf(char const* _prefabPath)
+    {
+        checkMap("mapInsertInstanceOf");
+        auto prefab = getEntityLib()->loadNodeReadOnly(**getSchema()->singularItems, _prefabPath);
+        Node* newNode = value.get<Array>().mapInsert(value.get<Array>().getChildKey(prefab.get()));
+        newNode->resetInstanceOf(_prefabPath);
+        return newNode;
+    }
+
     Node* Node::mapRename(char const* _key, char const* _newkey)
     {
         checkMap("mapGet");
@@ -729,6 +738,10 @@ namespace Ent
 
     void Node::saveNode(std::filesystem::path const& _path) const
     {
+        if (getDataType() != DataType::object)
+        {
+            throw Ent::BadType("In saveNode, an object is expeted");
+        }
         json node = toJson();
         node["$schema"] = getSchema()->name;
 

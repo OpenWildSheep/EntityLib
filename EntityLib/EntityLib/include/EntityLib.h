@@ -144,6 +144,7 @@ namespace Ent
         /// Create a Node with the given _schemaName
         Node makeNode(char const* _schemaName) const;
 
+        /// Create a Node with the Entity's schema
         Node makeEntityNode() const;
 
         /// @brief Create an Entity which instanciate an other.

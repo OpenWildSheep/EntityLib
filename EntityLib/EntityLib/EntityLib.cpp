@@ -142,7 +142,7 @@ namespace Ent
     {
         N* entity = nullptr;
         ENTLIB_ASSERT(_scene->getDataType() == Ent::DataType::array);
-        // subSceneData can be null if rootScene was loaded with loadScene
+        // subSceneData can be null if rootScene was loaded with loadSceneAsNode
         if (auto subSceneData = _scene->getParentNode())
         {
             ENTLIB_ASSERT(subSceneData != nullptr);

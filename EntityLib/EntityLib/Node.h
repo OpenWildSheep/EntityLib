@@ -106,8 +106,9 @@ namespace Ent
         Node* mapGet(char const* _key); ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
         Node const* mapGet(char const* _key) const; ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
         Node* mapInsert(char const* _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
-        Node* mapInsertInstanceOf(
-            char const* _prefabPath); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
+        /// @pre isMapOrSet()
+        /// @brief Insert a new item at the given _key
+        Node* mapInsertInstanceOf(char const* _prefabPath);
         /// @brief Copy the _key Node into the _newkey Node. Will update the keyField to _newkey if relevant.
         /// @pre The _key Node is not present in the prefab.
         Node* mapRename(char const* _key, char const* _newkey);

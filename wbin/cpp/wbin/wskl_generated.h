@@ -210,7 +210,7 @@ struct Skl FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVectorOfTables(skeleton()) &&
            VerifyOffset(verifier, VT_SOURCEFILEINF) &&
            verifier.VerifyTable(sourceFileInf()) &&
-           VerifyOffsetRequired(verifier, VT_BLENDSHAPES) &&
+           VerifyOffset(verifier, VT_BLENDSHAPES) &&
            verifier.VerifyVector(blendShapes()) &&
            verifier.VerifyVectorOfTables(blendShapes()) &&
            verifier.EndTable();
@@ -241,7 +241,6 @@ struct SklBuilder {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Skl>(end);
     fbb_.Required(o, Skl::VT_SKELETON);
-    fbb_.Required(o, Skl::VT_BLENDSHAPES);
     return o;
   }
 };
@@ -353,7 +352,7 @@ inline flatbuffers::Offset<Skl> CreateSkl(flatbuffers::FlatBufferBuilder &_fbb, 
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const SklT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _skeleton = _fbb.CreateVector<flatbuffers::Offset<WBIN::BoneData>> (_o->skeleton.size(), [](size_t i, _VectorArgs *__va) { return CreateBoneData(*__va->__fbb, __va->__o->skeleton[i].get(), __va->__rehasher); }, &_va );
   auto _sourceFileInf = _o->sourceFileInf ? CreateSourceFileInf(_fbb, _o->sourceFileInf.get(), _rehasher) : 0;
-  auto _blendShapes = _fbb.CreateVector<flatbuffers::Offset<WBIN::BlendShapeData>> (_o->blendShapes.size(), [](size_t i, _VectorArgs *__va) { return CreateBlendShapeData(*__va->__fbb, __va->__o->blendShapes[i].get(), __va->__rehasher); }, &_va );
+  auto _blendShapes = _o->blendShapes.size() ? _fbb.CreateVector<flatbuffers::Offset<WBIN::BlendShapeData>> (_o->blendShapes.size(), [](size_t i, _VectorArgs *__va) { return CreateBlendShapeData(*__va->__fbb, __va->__o->blendShapes[i].get(), __va->__rehasher); }, &_va ) : 0;
   return WBIN::CreateSkl(
       _fbb,
       _skeleton,

@@ -79,12 +79,18 @@ namespace Ent
             char const* _nodePath,
             Ent::Node const* _super = nullptr) const;
 
+        /// Load the Node at path _nodeSchema then return a pointer to the cached data
+        std::shared_ptr<Node const> loadNodeEntityReadOnly(char const* _nodePath) const;
+
         /// Load the Scene in legacy format at path _scenePath then return a pointer to the cached data
         std::shared_ptr<Scene const>
         loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const;
 
         /// Load an entity file into a Node
         Node loadEntityAsNode(std::filesystem::path const& _entityPath) const;
+
+        /// Load a scene file into a Node
+        Node loadSceneAsNode(std::filesystem::path const& _scenePath) const;
 
         /// Load any entitylib file into a Node, giving a schema
         Node loadFileAsNode(std::filesystem::path const& _path, Ent::Subschema const& _schema) const;
@@ -108,6 +114,12 @@ namespace Ent
         /// Save the Scene at path _scenePath
         void saveScene(Scene const& _scene, std::filesystem::path const& _scenePath) const;
 
+        /// Save the Entity at path _entityPath
+        void saveNodeAsEntity(Node const* _entity, char const* _relEntityPath) const;
+
+        /// Save the Scene at path _scenePath
+        void saveNodeAsScene(Node const* _scene, char const* _scenePath) const;
+
         /// Dump the given Node with the given schema in json format
         static nlohmann::json dumpNode(
             Subschema const& _schema, ///< Schema for the Node
@@ -118,6 +130,22 @@ namespace Ent
                 false, ///< Super sub-node are dumped using their type name for key instead of "Super"
             std::function<void(EntityRef&)> const& _entityRefPreProc = {},
             bool _saveUnionIndex = false);
+
+        /// Instanciate the given _prefab Node
+        Node makeNodeInstanceOf(
+            char const* _schemaName, ///< Name of the schema
+            char const* _prefab ///< Path to the prefab Entity
+        ) const;
+
+        /// Instanciate the given _prefab Entity
+        Node makeEntityNodeInstanceOf(char const* _instanceOf ///< Path to the prefab Entity
+        ) const;
+
+        /// Create a Node with the given _schemaName
+        Node makeNode(char const* _schemaName) const;
+
+        /// Create a Node with the Entity's schema
+        Node makeEntityNode() const;
 
         /// @brief Create an Entity which instanciate an other.
         ///
@@ -169,6 +197,12 @@ namespace Ent
 
         void setLogicErrorPolicy(LogicErrorPolicy _LogicErrorPolicy);
         LogicErrorPolicy getLogicErrorPolicy() const;
+        /// @brief Compute the EntityRef going from the Entity _from, to the Entity _to
+        /// @pre _from and _to are Entity nodes
+        EntityRef makeEntityRef(Node const& _from, Node const& _to);
+
+        Node* getParentEntity(Node* _node); ///< Get the parent Entity Node
+        Node const* getParentEntity(Node const* _node); ///< Get the parent Entity Node
 
     private:
         /// Load an Entity or a Scene, using the given cache

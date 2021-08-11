@@ -651,9 +651,8 @@ Ent::Node Ent::EntityLib::loadNode(
             auto nodeFileName = InstanceOfIter->get<std::string>();
             if (not nodeFileName.empty())
             {
-                json nodeData = loadJsonFile(rawdataPath, nodeFileName);
                 // Do not inherit from _super since the override of InstanceOf reset the Entity
-                prefabNode = loadNode(_nodeSchema, nodeData, nullptr, _default);
+                prefabNode = loadFileAsNode(nodeFileName, _nodeSchema);
                 _super = &prefabNode;
                 object.instanceOfFieldIndex = getFieldIndex(_data, *InstanceOfIter);
                 object.instanceOf = prefabNode.value.get<Object>().instanceOf.makeOverridedInstanceOf(

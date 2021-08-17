@@ -521,7 +521,7 @@ void gencpp()
 #pragma once
 
 #include <EntityLib.h>
-#include "EntArray.h"
+#include "EntGenHelpers.h"
 
 namespace Ent
 {
@@ -604,7 +604,7 @@ namespace Ent
 } // Ent
 )cpp"};
 
-    std::ofstream output("cpp/EntityGen.h");
+    std::ofstream output("cpp/EntGen.h");
     tmpl.render(rootData, output);
 }
 

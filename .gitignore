@@ -12,6 +12,6 @@ x64
 /EntityLib/EntityLib/Debug
 /EntityLib/EntityLibPy/Debug
 /EntityLib/Test/Debug
-/EntityLib/EntGen/schemaOutput.json
-/EntityLib/EntGen/cpp/EntityGen.h
-/EntityLib/EntGen/py/entgen
+/EntityLib/EntLibAPIGenerator/schemaOutput.json
+/EntityLib/EntLibAPIGenerator/cpp/EntGen.h
+/EntityLib/EntLibAPIGenerator/py/entgen

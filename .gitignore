@@ -12,3 +12,5 @@ x64
 /EntityLib/EntityLib/Debug
 /EntityLib/EntityLibPy/Debug
 /EntityLib/Test/Debug
+/EntityLib/GenCpp/schemaOutput.json
+/EntityLib/GenCpp/cpp/EntityGen.h

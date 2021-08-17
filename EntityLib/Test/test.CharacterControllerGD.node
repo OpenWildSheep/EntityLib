@@ -1,0 +1,4 @@
+{
+    "$schema": "./RuntimeComponents.json#/definitions/CharacterControllerGD",
+    "NoiseSizeY": 3
+}

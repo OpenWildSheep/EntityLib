@@ -138,7 +138,7 @@ namespace Ent
         ) const;
 
         /// Instanciate the given _prefab Entity
-        Node makeEntityNodeInstanceOf(char const* _instanceOf ///< Path to the prefab Entity
+        Node makeEntityNodeInstanceOf(char const* _prefab ///< Path to the prefab Entity
         ) const;
 
         /// Create a Node with the given _schemaName

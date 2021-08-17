@@ -1,6 +1,6 @@
 
 import EntityLibPy
-from _helpers import *
+from entgen_helpers import *
 
 """
 class EntityRef(Primitive[EntityLibPy.EntityRef]):

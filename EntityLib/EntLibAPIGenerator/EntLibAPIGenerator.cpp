@@ -15,15 +15,6 @@
 #include "../EntityLib/external/json.hpp"
 #pragma warning(pop)
 
-// TODO
-//    Write C++ test code
-//    Propose API
-//    Generate C++ code with new type(tuple, union, map, set...)
-//    Complete API of helper types
-//    Use Instance like in old code
-//    Use Type ####Node rather than class like in old code
-//    test with one python file
-
 using namespace kainjow::mustache;
 using namespace nlohmann;
 
@@ -678,7 +669,7 @@ void genpy()
         mustache tmpl{R"py(
 ### /!\ This code is GENERATED! Do not modify it.
 
-from _helpers import *
+from entgen_helpers import *
 import EntityLibPy
 from entgen.common import *
 
@@ -738,7 +729,7 @@ class {{schema.display_type}}(EntityLibClass):
     mustache common{R"py(
 ### /!\ This code is GENERATED! Do not modify it.
 
-from _helpers import *
+from entgen_helpers import *
 import EntityLibPy
 
 {{#all_definitions}}{{/all_definitions}}

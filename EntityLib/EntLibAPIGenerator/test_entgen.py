@@ -1,7 +1,7 @@
 import os
 from typing import TypeVar, Type, Generic, Tuple
 from entgen._all import *
-from _helpers import *
+from entgen_helpers import *
 import EntityLibPy as Ent
 
 entlib = Ent.EntityLib("X:/")

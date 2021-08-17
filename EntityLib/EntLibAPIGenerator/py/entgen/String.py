@@ -1,6 +1,6 @@
 
 
-from _helpers import *
+from entgen_helpers import *
 
 """
 class String(Primitive[str]):

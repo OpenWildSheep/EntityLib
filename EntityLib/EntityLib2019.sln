@@ -20,12 +20,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UpdateSchemas", "UpdateSche
 		{69315629-1871-49B2-AE40-1C2337E5DCA0} = {69315629-1871-49B2-AE40-1C2337E5DCA0}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GenCpp", "GenCpp\GenCpp.vcxproj", "{C3FB78F1-3CCD-4591-95AF-C1A623416A17}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EntGen", "EntGen\EntGen.vcxproj", "{C3FB78F1-3CCD-4591-95AF-C1A623416A17}"
 	ProjectSection(ProjectDependencies) = postProject
 		{69315629-1871-49B2-AE40-1C2337E5DCA0} = {69315629-1871-49B2-AE40-1C2337E5DCA0}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestGenCpp", "TestGenCpp\TestGenCpp.vcxproj", "{9D1FF8F5-57EA-484C-AE6B-2CBFE897714D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestEntGen", "TestEntGen\TestEntGen.vcxproj", "{9D1FF8F5-57EA-484C-AE6B-2CBFE897714D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{69315629-1871-49B2-AE40-1C2337E5DCA0} = {69315629-1871-49B2-AE40-1C2337E5DCA0}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

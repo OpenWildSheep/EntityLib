@@ -1,4 +1,4 @@
-#include "../GenCpp/cpp/EntityGen.h"
+#include "../EntGen/cpp/EntityGen.h"
 #include <ciso646>
 #include <filesystem>
 

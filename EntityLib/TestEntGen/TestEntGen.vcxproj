@@ -19,11 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C3FB78F1-3CCD-4591-95AF-C1A623416A17}</ProjectGuid>
+    <ProjectGuid>{9D1FF8F5-57EA-484C-AE6B-2CBFE897714D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>UpdateSchemas</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>GenCpp</ProjectName>
+    <ProjectName>TestEntGen</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -166,11 +166,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GenCpp.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="cpp\EntArray.h" />
-    <ClInclude Include="cpp\EntityGen.h" />
+    <ClCompile Include="test_entgen.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

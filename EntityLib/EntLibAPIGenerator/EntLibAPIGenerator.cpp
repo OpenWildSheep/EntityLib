@@ -137,6 +137,16 @@ static json getSchemaType(Ent::Subschema const& schema)
         json type = makeNewType();
         json ref;
         ref["name"] = (char)toupper(name[0]) + std::string((name + 1));
+        if (name == std::string("String"))
+        {
+            ref["py_native"] = "str";
+            ref["cpp_native"] = "char const*";
+        }
+        else if (name == std::string("Int"))
+        {
+            ref["py_native"] = "int";
+            ref["cpp_native"] = "int64_t";
+        }
         type["ref"] = std::move(ref);
         return type;
     };
@@ -499,7 +509,7 @@ void gencpp()
     rootData["object_set_type"] =
         partial([]() { return R"cpp(Ent::Gen::ObjectSet<{{#type}}{{>display_type}}{{/type}}>)cpp"; });
     rootData["map_type"] = partial([]() {
-        return R"cpp(Ent::Gen::Map<{{#key_type}}{{>display_type}}{{/key_type}}, {{#value_type}}{{>display_type}}{{/value_type}}>)cpp";
+        return R"cpp(Ent::Gen::Map<{{key_type.ref.cpp_native}}, {{#value_type}}{{>display_type}}{{/value_type}}>)cpp";
     });
     rootData["display_type"] = partial([]() {
         return R"cpp({{#object_set}}{{>object_set_type}}{{/object_set}}{{#prim_set}}{{>prim_set_type}}{{/prim_set}}{{#map}}{{>map_type}}{{/map}}{{#ref}}Ent::Gen::{{name}}{{/ref}}{{#array}}Array<{{#type}}{{>display_type}}{{/type}}>{{/array}}{{#union_set}}UnionSet<{{#type}}{{>display_type}}{{/type}}>{{/union_set}}{{#tuple}}{{>tuple_type}}{{/tuple}}{{#comma}}, {{/comma}})cpp";
@@ -616,7 +626,7 @@ void genpy()
         root["display_type"] = partial([]() {
             return R"({{#object_set}}ObjectSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/object_set}})"
                    R"({{#prim_set}}PrimitiveSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/prim_set}})"
-                   R"({{#map}}Map[{{#value_type}}{{>display_type_comma}}{{/value_type}}]{{/map}})"
+                   R"({{#map}}Map[{{key_type.ref.py_native}}, {{#value_type}}{{>display_type_comma}}{{/value_type}}]{{/map}})"
                    R"({{#ref}}{{name}}{{/ref}})"
                    R"({{#array}}Array[{{#type}}{{>display_type_comma}}{{/type}}]{{/array}})"
                    R"({{#union_set}}UnionSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/union_set}})"
@@ -634,7 +644,7 @@ void genpy()
         root["type_ctor"] = partial([]() {
             return R"({{#object_set}}(lambda n: ObjectSet({{#type}}{{>type_ctor}}{{/type}}, n)){{/object_set}})"
                    R"({{#prim_set}}(lambda n: PrimitiveSet({{#type}}{{>type_ctor}}{{/type}}, n)){{/prim_set}})"
-                   R"({{#map}}(lambda n: Map({{#value_type}}{{>type_ctor}}{{/value_type}}, n)){{/map}})"
+                   R"({{#map}}(lambda n: Map({{key_type.ref.py_native}}, {{#value_type}}{{>type_ctor}}{{/value_type}}, n)){{/map}})"
                    R"({{#ref}}{{name}}{{/ref}})"
                    R"({{#array}}(lambda n: Array({{#type}}{{>type_ctor}}{{/type}}, n)){{/array}})"
                    R"({{#union_set}}(lambda n: UnionSet({{#type}}{{>type_ctor}}{{/type}}, n)){{/union_set}})"

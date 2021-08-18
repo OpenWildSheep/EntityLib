@@ -86,9 +86,9 @@ void main()
     auto pathNodeGD =
         ent.Components().get<PathNodeGD>(); // inferred type : PathNodeGD
     auto tags =
-        pathNodeGD.Tags().Tags(); // inferred type : Map<String, PrimitiveSet<String>>
+        pathNodeGD.Tags().Tags(); // inferred type : Map<char const*, PrimitiveSet<String>>
     static_assert(
-        std::is_same_v<decltype(tags), Map<String, PrimitiveSet<String>>>);
+        std::is_same_v<decltype(tags), Map<char const*, PrimitiveSet<String>>>);
     auto b = tags.get("b"); // inferred type : PrimitiveSet<String>
     tags.remove("c");
     auto c = tags.add("c"); // inferred type : PrimitiveSet<String>

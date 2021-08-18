@@ -417,53 +417,21 @@ namespace Ent
                 : Base(_node)
             {
             }
-            V get(size_t key)
+            V get(K key)
             {
                 return node->mapGet(key);
             }
-            V get(char const* key)
+            V operator[](K key)
             {
                 return node->mapGet(key);
             }
-            V get(std::string const& key)
-            {
-                return node->mapGet(key.c_str());
-            }
-            V operator[](size_t key)
-            {
-                return node->mapGet(key);
-            }
-            V operator[](char const* key)
-            {
-                return node->mapGet(key);
-            }
-            V operator[](std::string const& key)
-            {
-                return node->mapGet(key.c_str());
-            }
-            V add(size_t key)
+            V add(K key)
             {
                 return node->mapInsert(key);
             }
-            V add(char const* key)
-            {
-                return node->mapInsert(key);
-            }
-            V add(std::string const& key)
-            {
-                return node->mapInsert(key.c_str());
-            }
-            void remove(size_t key)
+            void remove(K key)
             {
                 node->mapErase(key);
-            }
-            void remove(char const* key)
-            {
-                node->mapErase(key);
-            }
-            void remove(std::string const& key)
-            {
-                node->mapErase(key.c_str());
             }
             size_t size() const
             {

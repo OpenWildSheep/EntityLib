@@ -69,10 +69,8 @@ assert isinstance(new_ent, Entity)
 
 # Test Map
 pathNodeGD = ent.Components.get(PathNodeGD)   # inferred type : PathNodeGD
-tags = pathNodeGD.Tags.Tags     # inferred type : Map[PrimitiveSet[String]]
+tags = pathNodeGD.Tags.Tags     # inferred type : Map[str, PrimitiveSet[String]]
 assert isinstance(tags, Map)
 b = tags.get("b")               # inferred type : PrimitiveSet[String]
 tags.remove("c")
 c = tags.add("c")               # inferred type : PrimitiveSet[String]
-
-

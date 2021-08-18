@@ -148,24 +148,27 @@ class ObjectSet(Base, Generic[T]):
         return self._node.size()
 
 
-class Map(Base, Generic[T]):
-    def __init__(self, item_ctor, node = None):  # type: (Callable[[Any], T], EntityLibPy.Node) -> None
+K = TypeVar("K")
+V = TypeVar("V")
+
+class Map(Base, Generic[K, V]):
+    def __init__(self, key_type, item_ctor, node = None):  # type: (Type[K], Callable[[Any], V], EntityLibPy.Node) -> None
         super().__init__(node)
         self._item_ctor = item_ctor
 
-    def __call__(self, node):  # type: (...) -> MapClass[T]
-       return  MapClass(self._item_ctor, node)
+    def __call__(self, node):       # type: (...) -> MapClass[K, V]
+       return  Map(self._item_ctor, node)
 
-    def get(self, key):
+    def get(self, key):             # type: (K) -> V
         return self._item_ctor(self._node.map_get(key))
 
     def add(self, key):
         return self._item_ctor(self._node.map_insert(key))
 
-    def remove(self, key):
+    def remove(self, key):          # type: (K) -> None
         self._node.map_erase(key)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key):     # type: (K) -> V
         return self._item_ctor(self._node.map_get(key))
 
     def __len__(self):

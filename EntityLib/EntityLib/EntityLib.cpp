@@ -1875,8 +1875,8 @@ void Ent::EntityLib::clearCache()
 void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const& _scenePath) const
 {
     // scene entity is named after scene base file name
-    Ent::Entity sceneEntity{*this, _scenePath.stem().string().c_str()};
-
+    auto name = _scenePath.stem().string();
+    
     // generate relative wthumb path
     auto thumbNailPath = _scenePath.generic_string() + ".wthumb";
     const auto genericRawdataPath = rawdataPath.generic_string();
@@ -1886,14 +1886,17 @@ void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const&
         const size_t offset = genericRawdataPath.size() + 1; // also strip the leading '/'
         thumbNailPath = thumbNailPath.substr(offset);
     }
-    sceneEntity.setThumbnail(thumbNailPath);
 
-    // embed scene
-    auto* subScene = sceneEntity.addSubSceneComponent();
-    for (auto&& entity : _scene.getObjects())
-    {
-        subScene->embedded->addEntity(entity->clone());
-    }
+    Entity sceneEntity(
+        *this,
+        {name},
+        {},
+        {},
+        std::make_unique<SubSceneComponent>(this, 0, _scene.clone()),
+        {},
+        {},
+        {thumbNailPath}
+        );
 
     saveEntity(sceneEntity, _scenePath);
 }

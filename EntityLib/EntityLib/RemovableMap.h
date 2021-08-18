@@ -20,21 +20,13 @@ namespace Ent
 
             // Removable() = default;
 
-            // TODO : Remove when C++17
-            explicit Removable(std::unique_ptr<Value> _value = {}, Override<bool> _isPresent = {})
-                : value(std::move(_value))
-                , isPresent(_isPresent)
-            {
-                ENTLIB_ASSERT(value != nullptr);
-            }
-
             Removable makeInstanceOf() const
             {
-                return Removable(value->makeInstanceOf(), isPresent.makeInstanceOf());
+                return Removable{value->makeInstanceOf(), isPresent.makeInstanceOf()};
             }
             Removable clone() const
             {
-                return Removable(value->clone(), isPresent.clone());
+                return Removable{value->clone(), isPresent.clone(), index};
             }
             bool hasOverride() const
             {
@@ -86,8 +78,7 @@ namespace Ent
         case OverrideValueLocation::Prefab: isPresent.setPrefab(true); break;
         case OverrideValueLocation::Override: isPresent.set(true); break;
         }
-        Removable rem(std::move(_value), isPresent);
-        rem.index = map.size();
+        Removable rem{std::move(_value), std::move(isPresent), map.size()};
 
         return map.insert_or_assign(std::move(_key), std::move(rem)).first->second.value.get();
     }

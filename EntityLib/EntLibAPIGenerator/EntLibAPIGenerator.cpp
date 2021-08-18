@@ -671,7 +671,6 @@ void genpy()
 
 from entgen_helpers import *
 import EntityLibPy
-from entgen.common import *
 
 {{#file_schema}}{{#schema.union_set}}{{schema.display_type}} = UnionSetClass
 {{/schema.union_set}}{{#schema.object_set}}
@@ -726,18 +725,54 @@ class {{schema.display_type}}(EntityLibClass):
 
     add_partials(rootData);
 
-    mustache common{R"py(
+    mustache allInline{R"py(
 ### /!\ This code is GENERATED! Do not modify it.
 
 from entgen_helpers import *
 import EntityLibPy
 
-{{#all_definitions}}{{/all_definitions}}
+{{#all_definitions}}{{#schema.union_set}}{{schema.display_type}} = UnionSetClass
+{{/schema.union_set}}{{#schema.object_set}}
+class {{schema.display_type_comma}}(UnionSetClass):
+    pass
+{{/schema.object_set}}{{#schema.prim_set}}
+class {{schema.display_type_comma}}(UnionSetClass):
+    pass
+{{/schema.prim_set}}{{/all_definitions}}
+
+{{#all_definitions}}{{#schema.alias}}{{schema.display_type}} = {{#type}}{{>type_ctor}}{{/type}}
+{{/schema.alias}}{{/all_definitions}}
+
+
+{{#all_definitions}}{{#schema.object}}
+
+class {{schema.display_type}}(EntityLibClass):
+{{#properties}}{{#type}}    @property
+    def {{prop_name}}(self): return {{>type_ctor}}(self._node.at("{{prop_name}}"))
+{{/type}}
+{{/properties}}    pass
+
+
+{{/schema.object}}{{#schema.union}}class {{schema.display_type}}(UnionClass):
+    pass
+
+
+{{/schema.union}}{{#schema.tuple}}class {{schema.display_type}}(TupleClass[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
+    def __init__(self, node : EntityLibPy.Node = None):
+        super().__init__((Int, Int, Float, Float, Float), node)
+
+{{#types}}    def get_{{index}}(self):  # type: () -> {{>display_type}}
+        return {{>type_ctor}}(self._node.at({{index}}))
+{{/types}}
+
+{{/schema.tuple}}{{/all_definitions}}
+
+Entity = Object
 
 )py"};
 
-    std::ofstream outputCommon("py/entgen/common.py");
-    common.render(rootData, outputCommon);
+    std::ofstream outputCommon("py/entgen/inline.py");
+    allInline.render(rootData, outputCommon);
 
     mustache all{R"py(
 ### /!\ This code is GENERATED! Do not modify it.

@@ -509,11 +509,12 @@ namespace Ent
                 : PropHelper<Bool, bool>(_node)
             {
             }
-            void set(bool value)
+            using PropHelper<Bool, bool>::operator=;
+            void set(bool value) const
             {
                 node->setBool(value);
             }
-            bool value() const
+            bool get() const
             {
                 return node->getBool();
             }
@@ -525,11 +526,12 @@ namespace Ent
                 : PropHelper<Int, int64_t>(_node)
             {
             }
-            void set(int64_t value)
+            using PropHelper<Int, int64_t>::operator=;
+            void set(int64_t value) const
             {
                 node->setInt(value);
             }
-            int64_t value() const
+            int64_t get() const
             {
                 return node->getInt();
             }
@@ -541,11 +543,12 @@ namespace Ent
                 : PropHelper<Float, double>(_node)
             {
             }
-            void set(double value)
+            using PropHelper<Float, double>::operator=;
+            void set(double value) const
             {
                 node->setFloat(value);
             }
-            double value()
+            double get() const
             {
                 return node->getFloat();
             }
@@ -557,20 +560,21 @@ namespace Ent
                 : PropHelper<String, char const*>(_node)
             {
             }
-            void set(char const* value)
+            using PropHelper<String, char const*>::operator=;
+            void set(char const* value) const
             {
                 node->setString(value);
             }
-            void set(std::string const& value)
+            void set(std::string const& value) const
             {
                 node->setString(value.c_str());
             }
-            char const* value() const
+            char const* get() const
             {
                 return node->getString();
             }
 
-            String& operator=(std::string const& value)
+            String const& operator=(std::string const& value) const
             {
                 set(value);
                 return *this;
@@ -583,11 +587,12 @@ namespace Ent
                 : PropHelper<EntityRef, Ent::EntityRef>(_node)
             {
             }
-            void set(Ent::EntityRef value)
+            using PropHelper<EntityRef, Ent::EntityRef>::operator=;
+            void set(Ent::EntityRef value) const
             {
                 node->setEntityRef(value);
             }
-            Ent::EntityRef value() const
+            Ent::EntityRef get() const
             {
                 return node->getEntityRef();
             }

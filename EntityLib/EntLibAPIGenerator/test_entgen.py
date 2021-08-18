@@ -1,7 +1,6 @@
 import os
-from typing import TypeVar, Type, Generic, Tuple
-from entgen._all import *
-from entgen_helpers import *
+# from entgen._all import *
+from entgen.inline import *
 import EntityLibPy as Ent
 
 entlib = Ent.EntityLib("X:/")
@@ -23,6 +22,10 @@ actorStateCreature = ent.ActorStates.add(ActorStateCreature)
 turret = components.add(TurretComponentGD)   # inferred type : TurretComponentGD
 assert isinstance(turret, TurretComponentGD)
 
+# Test fixed size array
+pos = ent.Components.get(TransformGD).Position  # inferred type : ArrayClass[Float]
+x = tgd.Position[0]                             # inferred type : Float
+
 # Test set of primitive
 side = turret.ReviveSideTargeted   # inferred type : PrimitiveSetClass[String]
 assert isinstance(side, PrimitiveSetClass)
@@ -32,11 +35,15 @@ turret.ReviveSideTargeted.add("cursed")
 assert isinstance(turret.ReviveSideTargeted["cursed"].value, str)
 assert turret.ReviveSideTargeted["cursed"].value == "cursed"
 # turret.ReviveSideTargeted.erase("cursed")
-turret.ReviveSideTargeted.add("sacred")  # inferred type : String
+sacred = turret.ReviveSideTargeted.add("sacred")  # inferred type : String
 # del turret.ReviveSideTargeted["sacred"]
 
 # Test primitive types
 assert ent.Name.value == "PlayerSpawner_"
+assert ent.Name.get() == "PlayerSpawner_"
+# ent.Name = "PlayerSpawner_2"  # Not possible
+ent.Name.set("PlayerSpawner_2")
+assert ent.Name.get() == "PlayerSpawner_2"
 assert ent.Name.is_set() is True
 ent.Name.unset()
 assert ent.Name.is_set() is False

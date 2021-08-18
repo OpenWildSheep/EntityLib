@@ -29,6 +29,11 @@ void main()
     static_assert(std::is_same_v<decltype(turret), TurretComponentGD>);
     heightObj = components.HeightObj(); // Keep this method??
 
+    // Test fixed size array
+    auto pos =
+        ent.Components().get<TransformGD>().Position(); // inferred type : Vector3
+    auto x = tgd.Position()[0]; // inferred type : Float
+
     // Test set of primitive
     auto side =
         turret.ReviveSideTargeted(); // inferred type : PrimitiveSet<String>
@@ -36,30 +41,36 @@ void main()
     turret.ReviveSideTargeted().add("neutral");
     turret.ReviveSideTargeted().add("cursed");
     // turret.ReviveSideTargeted.remove("neutral");
-    static_assert(std::is_same_v<
-                  decltype(turret.ReviveSideTargeted()["cursed"].value()),
-                  char const*>);
+    static_assert(
+        std::is_same_v<decltype(turret.ReviveSideTargeted()["cursed"].get()), char const*>);
     ENTLIB_ASSERT(
-        turret.ReviveSideTargeted()["cursed"].value() == std::string("cursed"));
-    // turret.ReviveSideTargeted.erase("cursed");
+        turret.ReviveSideTargeted()["cursed"].get() == std::string("cursed"));
     turret.ReviveSideTargeted().add("sacred"); // inferred type : String
     // del turret.ReviveSideTargeted["sacred"]
 
     // Test primitive types
-    ENTLIB_ASSERT(ent.Name().value() == std::string("PlayerSpawner_"));
+    ENTLIB_ASSERT(ent.Name().get() == std::string("PlayerSpawner_"));
+    ent.Name() = std::string("PlayerSpawner_2");
+    ent.Name().set(std::string("PlayerSpawner_2"));
+    ENTLIB_ASSERT(ent.Name().get() == std::string("PlayerSpawner_2"));
+    ent.Name() = "PlayerSpawner_3";
     ENTLIB_ASSERT(ent.Name().isSet());
     ent.Name().unset();
     ENTLIB_ASSERT(not ent.Name().isSet());
-    ENTLIB_ASSERT(heightObj.Subdivision().value() == 0);
+    ENTLIB_ASSERT(heightObj.Subdivision().get() == 0);
     auto displaceNoise0 =
         heightObj.DisplaceNoiseList()[0]; // inferred type : DisplaceNoiseListItem
-    ENTLIB_ASSERT(ent.Components().get<PathNodeGD>().Radius().value() == 30.0);
+    ENTLIB_ASSERT(ent.Components().get<PathNodeGD>().Radius().get() == 30.0);
+    ENTLIB_ASSERT(ent.Components().get<PathNodeGD>().Radius() == 30.0);
+    ent.Components().get<PathNodeGD>().Radius() = 20.0;
+    double rad = ent.Components().get<PathNodeGD>().Radius();
+    ENTLIB_ASSERT(rad == 20.0);
 
     // Test Tuple
     auto position = actorStateCreature.Position(); // inferred type : Position
     auto elt2_ = position.get<2>(); // inferred type : Float
     static_assert(std::is_same_v<decltype(elt2_), Float>);
-    auto val0 = position.get<0>().value(); // inferred type : int
+    auto val0 = position.get<0>().get(); // inferred type : int
     static_assert(std::is_same_v<decltype(val0), int64_t>);
     ENTLIB_ASSERT(position.size() == 5);
 

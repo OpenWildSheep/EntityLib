@@ -40,6 +40,9 @@ class Primitive(EntityLibClass, Generic[T]):
     def value(self):  # type: () -> T
         return self._item_type(self._node.value)
 
+    def get(self):  # type: () -> T
+        return self._item_type(self._node.value)
+
     def is_set(self): # type: (...) -> bool
         return self._node.is_set()
 
@@ -66,6 +69,8 @@ class Float(Primitive[float]):
         super().__init__(float, node)
     def __call__(self, node):  # type: (EntityLibPy.Node) -> Float
         return Float(node)
+    def set(self, val):  # type: (float) -> None
+        return self._node.set_float(val)
 
 
 class Int(Primitive[int]):
@@ -73,6 +78,8 @@ class Int(Primitive[int]):
         super().__init__(int, node)
     def __call__(self, node):  # type: (EntityLibPy.Node) -> Int
         return Int(node)
+    def set(self, val):  # type: (int) -> None
+        return self._node.set_int(val)
 
 
 class Bool(Primitive[bool]):
@@ -80,6 +87,8 @@ class Bool(Primitive[bool]):
         super().__init__(bool, node)
     def __call__(self, node):  # type: (EntityLibPy.Node) -> Bool
         return Bool(node)
+    def set(self, val):  # type: (bool) -> None
+        return self._node.set_bool(val)
 
 
 class String(Primitive[str]):
@@ -87,6 +96,8 @@ class String(Primitive[str]):
         super().__init__(str, node)
     def __call__(self, node):  # type: (EntityLibPy.Node) -> String
         return String(node)
+    def set(self, val):  # type: (str) -> None
+        return self._node.set_string(val)
 
 
 class EntityRef(Primitive[EntityLibPy.EntityRef]):
@@ -94,6 +105,8 @@ class EntityRef(Primitive[EntityLibPy.EntityRef]):
         super().__init__(EntityLibPy.EntityRef, node)
     def __call__(self, node):  # type: (EntityLibPy.Node) -> EntityRef
         return EntityRef(node)
+    def set(self, val):  # type: (EntityLibPy.EntityRef) -> None
+        return self._node.set_entityref(val)
 
 
 TComponent = TypeVar("TComponent")

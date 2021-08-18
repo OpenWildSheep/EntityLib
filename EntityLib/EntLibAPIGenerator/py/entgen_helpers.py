@@ -10,25 +10,17 @@ TODO_UnknownArray = None
 
 T = TypeVar("T")
 
-class Field(Generic[T]):
-    def __init__(self, node_ctor, node_name):  # type: (Callable[[Any], T], str) -> None
-        self.node_name = node_name
-        self.node_ctor = node_ctor
 
-    def get_node(self, obj):  # type: (EntityLibClass) -> EntityLibPy.Node
-        return obj._node.at(self.node_name)
-
-    def __get__(self, obj, cls):  # type: (...) -> T
-        # if not obj: return None  # quering the class field itself -> bypass the getter
-        return self.node_ctor(self.get_node(obj))
-
-
-class EntityLibClass(object):
+class Base(object):
     def __init__(self, node):
         self._node = node  # type: EntityLibPy.Node
 
+    @property
+    def node(self):
+        return self._node
 
-class Primitive(EntityLibClass, Generic[T]):
+
+class Primitive(Base, Generic[T]):
     def __init__(self, item_type, node = None):  # type: (Type[T], EntityLibPy.Node) -> None
         super().__init__(node)
         self._item_type = item_type
@@ -48,20 +40,6 @@ class Primitive(EntityLibClass, Generic[T]):
 
     def unset(self):
         return self._node.unset()
-
-"""
-Float = Primitive[float]
-make_Float = lambda n: Primitive(float, n)
-Int = Primitive[int]
-make_Int = lambda n: Primitive(int, n)
-Bool = Primitive[bool]
-make_Bool = lambda n: Primitive(bool, n)
-String = Primitive[str]
-make_String = lambda n: Primitive(str, n)
-EntityRef = Primitive[EntityLibPy.EntityRef]
-make_EntityRef = lambda n: Primitive(EntityLibPy.EntityRef, n)
-"""
-
 
 
 class Float(Primitive[float]):
@@ -111,7 +89,7 @@ class EntityRef(Primitive[EntityLibPy.EntityRef]):
 
 TComponent = TypeVar("TComponent")
 
-class UnionSetClass(EntityLibClass):
+class UnionSet(Base):
     def get(self, key_type):  # type: (Type[TComponent]) -> TComponent
         typename = key_type.__name__
         return key_type(self._node.map_get(typename).get_union_data())
@@ -121,7 +99,7 @@ class UnionSetClass(EntityLibClass):
         return key_type(self._node.map_insert(typename).get_union_data())
 
 
-class UnionClass(EntityLibClass):
+class Union(Base):
     @property
     def type(self):
         return self._node.get_union_type()
@@ -131,7 +109,7 @@ class UnionClass(EntityLibClass):
         return self._node.get_union_data()
 
 
-class ArrayClass(EntityLibClass, Generic[T]):
+class Array(Base, Generic[T]):
     def __init__(self, item_ctor, node = None):  # type: (Callable[[Any], T], EntityLibPy.Node) -> None
         super().__init__(node)
         self._item_ctor = item_ctor
@@ -146,13 +124,13 @@ class ArrayClass(EntityLibClass, Generic[T]):
         return self._node.size()
 
 
-class ObjectSetClass(EntityLibClass, Generic[T]):
+class ObjectSet(Base, Generic[T]):
     def __init__(self, item_ctor, node = None): # type: (Callable[[Any], T], EntityLibPy.Node) -> None
         super().__init__(node)
         self._item_ctor = item_ctor
 
     def __call__(self, node):  # type: (...) -> ObjectSetClass[T]
-       return  ObjectSetClass(self._item_ctor, node)
+       return  ObjectSet(self._item_ctor, node)
 
     def get(self, key): # type: (...) -> T
         return self._item_ctor(self._node.map_get(key))
@@ -170,7 +148,7 @@ class ObjectSetClass(EntityLibClass, Generic[T]):
         return self._node.size()
 
 
-class MapClass(EntityLibClass, Generic[T]):
+class Map(Base, Generic[T]):
     def __init__(self, item_ctor, node = None):  # type: (Callable[[Any], T], EntityLibPy.Node) -> None
         super().__init__(node)
         self._item_ctor = item_ctor
@@ -194,7 +172,7 @@ class MapClass(EntityLibClass, Generic[T]):
         return self._node.size()
 
 
-class PrimitiveSetClass(EntityLibClass, Generic[T]):
+class PrimitiveSet(Base, Generic[T]):
     def __init__(self, item_ctor, node = None):  # type: (Callable[[Any], T], EntityLibPy.Node) -> None
         super().__init__(node)
         self._item_ctor = item_ctor
@@ -225,7 +203,7 @@ class PrimitiveSetClass(EntityLibClass, Generic[T]):
 
 
 TTuple = TypeVar("TTuple", bound=Tuple)
-class TupleClass(EntityLibClass, Generic[TTuple]):
+class TupleNode(Base, Generic[TTuple]):
     def __init__(self, typelist, node = None): # type: (TTuple, EntityLibPy.Node) -> None
         super().__init__(node)
         self.typelist = typelist

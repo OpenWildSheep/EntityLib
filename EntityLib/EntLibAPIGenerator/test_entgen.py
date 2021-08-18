@@ -1,5 +1,4 @@
 import os
-# from entgen._all import *
 from entgen.inline import *
 import EntityLibPy as Ent
 
@@ -11,7 +10,7 @@ ent = Entity(entlib.load_node_entity(Ent.path("instance.entity")))
 # Test Object
 name = ent.Name  # inferred type : String
 assert isinstance(name, String)
-components = ent.Components  # inferred type : UnionSetClass
+components = ent.Components  # inferred type : UnionSet
 
 # Test Set of Union
 ss = components.get(SubScene)  # inferred type : SubScene
@@ -23,12 +22,12 @@ turret = components.add(TurretComponentGD)   # inferred type : TurretComponentGD
 assert isinstance(turret, TurretComponentGD)
 
 # Test fixed size array
-pos = ent.Components.get(TransformGD).Position  # inferred type : ArrayClass[Float]
+pos = ent.Components.get(TransformGD).Position  # inferred type : Array[Float]
 x = tgd.Position[0]                             # inferred type : Float
 
 # Test set of primitive
-side = turret.ReviveSideTargeted   # inferred type : PrimitiveSetClass[String]
-assert isinstance(side, PrimitiveSetClass)
+side = turret.ReviveSideTargeted   # inferred type : PrimitiveSet[String]
+assert isinstance(side, PrimitiveSet)
 turret.ReviveSideTargeted.add("neutral")
 turret.ReviveSideTargeted.add("cursed")
 # turret.ReviveSideTargeted.remove("neutral")
@@ -62,7 +61,7 @@ assert isinstance(val0, int)
 assert len(position) == 5
 
 # Test Set of Object
-subscene = ent.Components.get(SubScene).Embedded   # inferred type : ObjectSetClass[Object]
+subscene = ent.Components.get(SubScene).Embedded   # inferred type : ObjectSet[Object]
 subent = subscene["EntityWithInstanceOf"]          # inferred type : Object
 assert isinstance(subent, Entity)
 new_ent = subscene.add("NewEntity")                # inferred type : Object
@@ -70,10 +69,10 @@ assert isinstance(new_ent, Entity)
 
 # Test Map
 pathNodeGD = ent.Components.get(PathNodeGD)   # inferred type : PathNodeGD
-tags = pathNodeGD.Tags.Tags     # inferred type : MapClass[PrimitiveSetCLass[String]]
-assert isinstance(tags, MapClass)
-b = tags.get("b")               # inferred type : PrimitiveSetCLass[String]
+tags = pathNodeGD.Tags.Tags     # inferred type : Map[PrimitiveSet[String]]
+assert isinstance(tags, Map)
+b = tags.get("b")               # inferred type : PrimitiveSet[String]
 tags.remove("c")
-c = tags.add("c")               # inferred type : PrimitiveSetCLass[String]
+c = tags.add("c")               # inferred type : PrimitiveSet[String]
 
 

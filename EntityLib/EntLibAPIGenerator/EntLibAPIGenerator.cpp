@@ -125,7 +125,6 @@ static json makeNewType()
     type["tuple"] = false;
     type["union"] = false;
     type["map"] = false;
-    // type["primitive"] = false;
     return type;
 }
 
@@ -615,13 +614,13 @@ void genpy()
 
     auto add_partials = [](data& root) {
         root["display_type"] = partial([]() {
-            return R"({{#object_set}}ObjectSetClass[{{#type}}{{>display_type_comma}}{{/type}}]{{/object_set}})"
-                   R"({{#prim_set}}PrimitiveSetClass[{{#type}}{{>display_type_comma}}{{/type}}]{{/prim_set}})"
-                   R"({{#map}}MapClass[{{#value_type}}{{>display_type_comma}}{{/value_type}}]{{/map}})"
+            return R"({{#object_set}}ObjectSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/object_set}})"
+                   R"({{#prim_set}}PrimitiveSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/prim_set}})"
+                   R"({{#map}}Map[{{#value_type}}{{>display_type_comma}}{{/value_type}}]{{/map}})"
                    R"({{#ref}}{{name}}{{/ref}})"
-                   R"({{#array}}ArrayClass[{{#type}}{{>display_type_comma}}{{/type}}]{{/array}})"
-                   R"({{#union_set}}UnionSetClass[{{#type}}{{>display_type_comma}}{{/type}}]{{/union_set}})"
-                   R"({{#tuple}}Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]{{/tuple}})";
+                   R"({{#array}}Array[{{#type}}{{>display_type_comma}}{{/type}}]{{/array}})"
+                   R"({{#union_set}}UnionSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/union_set}})"
+                   R"({{#tuple}}TupleNode[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]{{/tuple}})";
         });
 
         root["display_type_comma"] = partial([]() {
@@ -633,13 +632,13 @@ void genpy()
                    R"({{#comma}}, {{/comma}})";
         });
         root["type_ctor"] = partial([]() {
-            return R"({{#object_set}}(lambda n: ObjectSetClass({{#type}}{{>type_ctor}}{{/type}}, n)){{/object_set}})"
-                   R"({{#prim_set}}(lambda n: PrimitiveSetClass({{#type}}{{>type_ctor}}{{/type}}, n)){{/prim_set}})"
-                   R"({{#map}}(lambda n: MapClass({{#value_type}}{{>type_ctor}}{{/value_type}}, n)){{/map}})"
+            return R"({{#object_set}}(lambda n: ObjectSet({{#type}}{{>type_ctor}}{{/type}}, n)){{/object_set}})"
+                   R"({{#prim_set}}(lambda n: PrimitiveSet({{#type}}{{>type_ctor}}{{/type}}, n)){{/prim_set}})"
+                   R"({{#map}}(lambda n: Map({{#value_type}}{{>type_ctor}}{{/value_type}}, n)){{/map}})"
                    R"({{#ref}}{{name}}{{/ref}})"
-                   R"({{#array}}(lambda n: ArrayClass({{#type}}{{>type_ctor}}{{/type}}, n)){{/array}})"
-                   R"({{#union_set}}(lambda n: UnionSetClass({{#type}}{{>type_ctor}}{{/type}}, n)){{/union_set}})"
-                   R"({{#tuple}}TupleClass{{/tuple}})";
+                   R"({{#array}}(lambda n: Array({{#type}}{{>type_ctor}}{{/type}}, n)){{/array}})"
+                   R"({{#union_set}}(lambda n: UnionSet({{#type}}{{>type_ctor}}{{/type}}, n)){{/union_set}})"
+                   R"({{#tuple}}TupleNode{{/tuple}})";
         });
         root["print_import"] = partial([]() {
             return R"({{#object_set}}{{#type}}{{>print_import}}{{/type}}{{/object_set}})"
@@ -672,12 +671,12 @@ void genpy()
 from entgen_helpers import *
 import EntityLibPy
 
-{{#file_schema}}{{#schema.union_set}}{{schema.display_type}} = UnionSetClass
+{{#file_schema}}{{#schema.union_set}}{{schema.display_type}} = UnionSet
 {{/schema.union_set}}{{#schema.object_set}}
-class {{schema.display_type_comma}}(UnionSetClass):
+class {{schema.display_type_comma}}(UnionSet):
     pass
 {{/schema.object_set}}{{#schema.prim_set}}
-class {{schema.display_type_comma}}(UnionSetClass):
+class {{schema.display_type_comma}}(UnionSet):
     pass
 {{/schema.prim_set}}{{/file_schema}}
 
@@ -689,18 +688,18 @@ class {{schema.display_type_comma}}(UnionSetClass):
 {{#properties}}{{#type}}{{>print_import}}{{/type}}
 {{/properties}}
 
-class {{schema.display_type}}(EntityLibClass):
+class {{schema.display_type}}(Base):
 {{#properties}}{{#type}}    @property
     def {{prop_name}}(self): return {{>type_ctor}}(self._node.at("{{prop_name}}"))
 {{/type}}
 {{/properties}}    pass
 
 
-{{/schema.object}}{{#schema.union}}class {{schema.display_type}}(UnionClass):
+{{/schema.object}}{{#schema.union}}class {{schema.display_type}}(Union):
     pass
 
 
-{{/schema.union}}{{#schema.tuple}}class {{schema.display_type}}(TupleClass[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
+{{/schema.union}}{{#schema.tuple}}class {{schema.display_type}}(TupleNode[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
     def __init__(self, node : EntityLibPy.Node = None):
         super().__init__((Int, Int, Float, Float, Float), node)
 
@@ -731,33 +730,31 @@ class {{schema.display_type}}(EntityLibClass):
 from entgen_helpers import *
 import EntityLibPy
 
-{{#all_definitions}}{{#schema.union_set}}{{schema.display_type}} = UnionSetClass
+{{#all_definitions}}{{#schema.union_set}}{{schema.display_type}} = UnionSet
 {{/schema.union_set}}{{#schema.object_set}}
-class {{schema.display_type_comma}}(UnionSetClass):
+class {{schema.display_type_comma}}(UnionSet):
     pass
 {{/schema.object_set}}{{#schema.prim_set}}
-class {{schema.display_type_comma}}(UnionSetClass):
+class {{schema.display_type_comma}}(UnionSet):
     pass
 {{/schema.prim_set}}{{/all_definitions}}
 
-{{#all_definitions}}{{#schema.alias}}{{schema.display_type}} = {{#type}}{{>type_ctor}}{{/type}}
+{{#all_definitions}}{{#schema.alias}}{{schema.display_type}} = {{#type}}{{>type_ctor}}{{/type}}  # alias
 {{/schema.alias}}{{/all_definitions}}
 
 
-{{#all_definitions}}{{#schema.object}}
-
-class {{schema.display_type}}(EntityLibClass):
+{{#all_definitions}}{{#schema.object}}class {{schema.display_type}}(Base):
 {{#properties}}{{#type}}    @property
     def {{prop_name}}(self): return {{>type_ctor}}(self._node.at("{{prop_name}}"))
 {{/type}}
 {{/properties}}    pass
 
 
-{{/schema.object}}{{#schema.union}}class {{schema.display_type}}(UnionClass):
+{{/schema.object}}{{#schema.union}}class {{schema.display_type}}(Union):
     pass
 
 
-{{/schema.union}}{{#schema.tuple}}class {{schema.display_type}}(TupleClass[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
+{{/schema.union}}{{#schema.tuple}}class {{schema.display_type}}(TupleNode[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
     def __init__(self, node : EntityLibPy.Node = None):
         super().__init__((Int, Int, Float, Float, Float), node)
 

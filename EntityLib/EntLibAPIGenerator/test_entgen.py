@@ -26,15 +26,16 @@ pos = ent.Components.get(TransformGD).Position  # inferred type : Array[Float]
 x = tgd.Position[0]                             # inferred type : Float
 
 # Test set of primitive
-side = turret.ReviveSideTargeted   # inferred type : PrimitiveSet[String]
+side = turret.ReviveSideTargeted   # inferred type : PrimitiveSet[ReviveSideTargetedItem_ReviveSide]
 assert isinstance(side, PrimitiveSet)
-turret.ReviveSideTargeted.add("neutral")
-turret.ReviveSideTargeted.add("cursed")
+turret.ReviveSideTargeted.add(ReviveSideTargetedItem_ReviveSide.neutral)
+turret.ReviveSideTargeted.add("cursed")  # Still posible with string
 # turret.ReviveSideTargeted.remove("neutral")
 assert isinstance(turret.ReviveSideTargeted["cursed"].value, str)
-assert turret.ReviveSideTargeted["cursed"].value == "cursed"
+assert turret.ReviveSideTargeted[ReviveSideTargetedItem_ReviveSide.cursed].value == \
+       ReviveSideTargetedItem_ReviveSide.cursed
 # turret.ReviveSideTargeted.erase("cursed")
-sacred = turret.ReviveSideTargeted.add("sacred")  # inferred type : String
+sacred = turret.ReviveSideTargeted.add(ReviveSideTargetedItem_ReviveSide.sacred)  # inferred type : String
 # del turret.ReviveSideTargeted["sacred"]
 
 # Test primitive types
@@ -74,3 +75,9 @@ assert isinstance(tags, Map)
 b = tags.get("b")               # inferred type : PrimitiveSet[String]
 tags.remove("c")
 c = tags.add("c")               # inferred type : PrimitiveSet[String]
+
+
+# other
+# scp = EntityStateCreatureProfile(None)
+# vm = scp.Profile.ValueMap
+# vm.get_0()   # Doesn't work yet

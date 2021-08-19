@@ -36,10 +36,11 @@ void main()
 
     // Test set of primitive
     auto side =
-        turret.ReviveSideTargeted(); // inferred type : PrimitiveSet<String>
-    static_assert(std::is_same_v<decltype(side), PrimitiveSet<String>>);
-    turret.ReviveSideTargeted().add("neutral");
-    turret.ReviveSideTargeted().add("cursed");
+        turret.ReviveSideTargeted(); // inferred type : PrimitiveSet<ReviveSideTargetedItem_ReviveSide>
+    static_assert(
+        std::is_same_v<decltype(side), PrimitiveSet<ReviveSideTargetedItem_ReviveSide>>);
+    turret.ReviveSideTargeted().add(ReviveSideTargetedItem_ReviveSide::neutral);
+    turret.ReviveSideTargeted().add("cursed"); // Still possible with string
     // turret.ReviveSideTargeted.remove("neutral");
     static_assert(
         std::is_same_v<decltype(turret.ReviveSideTargeted()["cursed"].get()), char const*>);

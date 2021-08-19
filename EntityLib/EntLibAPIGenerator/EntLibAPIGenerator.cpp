@@ -63,19 +63,36 @@ static std::string replaceAll(std::string link, std::string const& before, std::
     return link;
 }
 
+static std::string escapeName(std::string name)
+{
+    static std::set<std::string> cppKeywordTypes = {
+        "float", "bool", "from", "in", "None", "Type", "throw", "do"};
+
+    name = replaceAll(name, "::", "_");
+    name = replaceAll(name, "<", "_");
+    name = replaceAll(name, ">", "_");
+    name = replaceAll(name, ",", "_");
+    if (cppKeywordTypes.count(name) != 0)
+    {
+        return name + '_';
+    }
+    return name;
+}
+
 std::map<std::string, Ent::Subschema const*> allDefs;
 std::map<Ent::Subschema const*, std::string> schemaName;
 
 static void addDef(std::string const& name, Ent::Subschema const* def, std::string const& scope)
 {
-    if (allDefs.count(name) == 0)
+    auto escapedName = escapeName(name);
+    if (allDefs.count(escapedName) == 0)
     {
-        allDefs[name] = def;
-        schemaName[def] = name;
+        allDefs[escapedName] = def;
+        schemaName[def] = escapedName;
     }
     else
     {
-        std::string hint2 = scope + "_" + name;
+        std::string hint2 = escapeName(scope + "_" + name);
         while (allDefs.count(hint2) != 0)
         {
             hint2 = '_' + hint2;
@@ -83,21 +100,6 @@ static void addDef(std::string const& name, Ent::Subschema const* def, std::stri
         allDefs[hint2] = def;
         schemaName[def] = hint2;
     }
-}
-
-static std::set<std::string> cppKeywordTypes = {"float", "bool", "from", "in", "None"};
-
-static std::string escapeName(std::string name)
-{
-    name = replaceAll(name, "::", "_");
-    name = replaceAll(name, "<", "_");
-    name = replaceAll(name, ">", "_");
-    name = replaceAll(name, ",", "_");
-    if (cppKeywordTypes.count(name) != 0)
-    {
-        return "_" + name;
-    }
-    return name;
 }
 
 static std::string getRefTypeName(std::string link)
@@ -130,26 +132,40 @@ static json makeNewType()
 
 static json getSchemaRefType(Ent::SubschemaRef const& ref);
 
+auto prim = [](char const* name) {
+    json type = makeNewType();
+    json ref;
+    ref["name"] = (char)toupper(name[0]) + std::string((name + 1));
+    if (name == std::string("String"))
+    {
+        ref["py_native"] = "str";
+        ref["cpp_native"] = "char const*";
+    }
+    else if (name == std::string("Int"))
+    {
+        ref["py_native"] = "int";
+        ref["cpp_native"] = "int64_t";
+    }
+    type["ref"] = std::move(ref);
+    return type;
+};
+
+char const* primitiveName(Ent::DataType type)
+{
+    switch (type)
+    {
+    case Ent::DataType::boolean: return "Bool";
+    case Ent::DataType::integer: return "Int";
+    case Ent::DataType::number: return "Float";
+    case Ent::DataType::string: return "String";
+    case Ent::DataType::entityRef: return "EntityRef";
+    }
+    ENTLIB_LOGIC_ERROR("Unexpected DataType");
+}
+
 static json getSchemaType(Ent::Subschema const& schema)
 {
     json type = makeNewType();
-    auto prim = [](char const* name) {
-        json type = makeNewType();
-        json ref;
-        ref["name"] = (char)toupper(name[0]) + std::string((name + 1));
-        if (name == std::string("String"))
-        {
-            ref["py_native"] = "str";
-            ref["cpp_native"] = "char const*";
-        }
-        else if (name == std::string("Int"))
-        {
-            ref["py_native"] = "int";
-            ref["cpp_native"] = "int64_t";
-        }
-        type["ref"] = std::move(ref);
-        return type;
-    };
 
     switch (schema.type)
     {
@@ -237,11 +253,26 @@ static json getSchemaType(Ent::Subschema const& schema)
         type["ref"] = std::move(ref);
         return type;
     }
-    case Ent::DataType::boolean: return prim("Bool");
-    case Ent::DataType::integer: return prim("Int");
-    case Ent::DataType::number: return prim("Float");
-    case Ent::DataType::string: return prim("String");
-    case Ent::DataType::entityRef: return prim("EntityRef");
+    case Ent::DataType::boolean:
+    case Ent::DataType::integer:
+    case Ent::DataType::number:
+    case Ent::DataType::string:
+    case Ent::DataType::entityRef:
+        if (auto iter = schemaName.find(&schema); iter != schemaName.end())
+        {
+            std::string const& typeDispName = iter->second;
+            json ref;
+            ref["name"] = typeDispName;
+            type["ref"] = std::move(ref);
+            // It works because in the schema, Enums are always strings
+            type["ref"]["py_native"] = "str";
+            type["ref"]["cpp_native"] = "char const*";
+            return type;
+        }
+        else
+        {
+            return prim(primitiveName(schema.type));
+        }
     }
     return json{};
 }
@@ -277,6 +308,8 @@ static json getSchemaData(Ent::Subschema const& schema)
     defData["tuple"] = false;
     defData["union"] = false;
     defData["map"] = false;
+    defData["enum"] = false;
+
     switch (schema.type)
     {
     case Ent::DataType::array:
@@ -319,6 +352,13 @@ static json getSchemaData(Ent::Subschema const& schema)
                 defData["map"]["items"] = getSchemaRefType(*schema.singularItems);
                 break;
             }
+            else
+            {
+                json alias(json::value_t::object);
+                alias["type"] = getSchemaType(schema);
+                defData["alias"] = std::move(alias);
+                break;
+            }
         }
         else
         {
@@ -347,8 +387,21 @@ static json getSchemaData(Ent::Subschema const& schema)
     case Ent::DataType::number:
     case Ent::DataType::string:
     {
+        if (not schema.enumValues.empty())
+        {
+            json enumNode(json::value_t::object);
+            enumNode["type"] = prim("String");
+            for (auto&& val : schema.enumValues)
+            {
+                enumNode["values"].push_back(json::value_t::object);
+                enumNode["values"].back()["escaped_name"] = escapeName(val);
+                enumNode["values"].back()["name"] = val;
+            }
+            defData["enum"] = std::move(enumNode);
+            break;
+        }
         json alias(json::value_t::object);
-        alias["type"] = getSchemaType(schema);
+        alias["type"] = prim(primitiveName(schema.type));
         defData["alias"] = std::move(alias);
         break;
     }
@@ -422,6 +475,17 @@ static void giveNameToAnonymousObjectRef(
                         addDef(hint, &(*ref), hint2);
                     }
                 }
+            }
+        }
+        else if (not ref->enumValues.empty())
+        {
+            if (not ref->name.empty())
+            {
+                addDef(ref->name, &(*ref), hint);
+            }
+            else
+            {
+                addDef(hint, &(*ref), hint2);
             }
         }
         giveNameToAnonymousObject(*ref, hint, hint2);
@@ -532,7 +596,8 @@ namespace Ent
         struct {{schema.display_type}}; // Union{{/schema.union}}{{#schema.tuple}}
         using {{schema.display_type}} = {{>tuple_type}}; // Tuple{{/schema.tuple}}{{#schema.union_set}}
         struct {{schema.display_type}}; // union_set{{/schema.union_set}}{{#schema.object_set}}
-        struct {{schema.display_type}}; // object_set{{/schema.object_set}}{{/all_definitions}}
+        struct {{schema.display_type}}; // object_set{{/schema.object_set}}{{#schema.enum}}
+        struct {{schema.display_type}}; // enum{{/schema.enum}}{{/all_definitions}}
         {{#all_definitions}}{{#schema.alias}}
         using {{schema.display_type}} = {{#type}}{{>display_type}}{{/type}};{{/schema.alias}}{{/all_definitions}}
 
@@ -542,7 +607,13 @@ namespace Ent
 	        {{schema.display_type}}(Ent::Node* _node): Base(_node) {}
         {{#properties}}    {{#type}}{{>display_type}}{{/type}} {{prop_name}}() const;
         {{/properties}}
-        };{{/schema.object}}{{#schema.union}}
+        };{{/schema.object}}{{#schema.enum}}
+        struct {{schema.display_type}} : String // Enum
+        {
+	        {{schema.display_type}}(Ent::Node* _node): String(_node) {}
+            {{#values}}static constexpr char {{escaped_name}}[] = "{{name}}";
+            {{/values}}
+        };{{/schema.enum}}{{#schema.union}}
         struct {{schema.display_type}} : Base // Union
         {
 	        {{schema.display_type}}(Ent::Node* _node): Base(_node) {}
@@ -764,7 +835,13 @@ class {{schema.display_type_comma}}(UnionSet):
     pass
 
 
-{{/schema.union}}{{#schema.tuple}}class {{schema.display_type}}(TupleNode[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
+{{/schema.union}}{{#schema.enum}}class {{schema.display_type}}(String):  # Enum
+    {{#values}}{{escaped_name}} = "{{name}}"
+    {{/values}}
+    pass
+
+
+{{/schema.enum}}{{#schema.tuple}}class {{schema.display_type}}(TupleNode[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
     def __init__(self, node : EntityLibPy.Node = None):
         super().__init__((Int, Int, Float, Float, Float), node)
 

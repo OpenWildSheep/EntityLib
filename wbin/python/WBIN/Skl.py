@@ -60,7 +60,32 @@ class Skl(object):
             return obj
         return None
 
-def Start(builder): builder.StartObject(2)
+    # Skl
+    def BlendShapes(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
+            x = self._tab.Indirect(x)
+            from WBIN.BlendShapeData import BlendShapeData
+            obj = BlendShapeData()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # Skl
+    def BlendShapesLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # Skl
+    def BlendShapesIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        return o == 0
+
+def Start(builder): builder.StartObject(3)
 def SklStart(builder):
     """This method is deprecated. Please switch to Start."""
     return Start(builder)
@@ -76,10 +101,19 @@ def AddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlo
 def SklAddSourceFileInf(builder, sourceFileInf):
     """This method is deprecated. Please switch to AddSourceFileInf."""
     return AddSourceFileInf(builder, sourceFileInf)
+def AddBlendShapes(builder, blendShapes): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(blendShapes), 0)
+def SklAddBlendShapes(builder, blendShapes):
+    """This method is deprecated. Please switch to AddBlendShapes."""
+    return AddBlendShapes(builder, blendShapes)
+def StartBlendShapesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def SklStartBlendShapesVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartBlendShapesVector(builder, numElems)
 def End(builder): return builder.EndObject()
 def SklEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+import WBIN.BlendShapeData
 import WBIN.BoneData
 import WBIN.SourceFileInf
 try:
@@ -93,6 +127,7 @@ class SklT(object):
     def __init__(self):
         self.skeleton = None  # type: List[WBIN.BoneData.BoneDataT]
         self.sourceFileInf = None  # type: Optional[WBIN.SourceFileInf.SourceFileInfT]
+        self.blendShapes = None  # type: List[WBIN.BlendShapeData.BlendShapeDataT]
 
     @classmethod
     def InitFromBuf(cls, buf, pos):
@@ -120,6 +155,14 @@ class SklT(object):
                     self.skeleton.append(boneData_)
         if skl.SourceFileInf() is not None:
             self.sourceFileInf = WBIN.SourceFileInf.SourceFileInfT.InitFromObj(skl.SourceFileInf())
+        if not skl.BlendShapesIsNone():
+            self.blendShapes = []
+            for i in range(skl.BlendShapesLength()):
+                if skl.BlendShapes(i) is None:
+                    self.blendShapes.append(None)
+                else:
+                    blendShapeData_ = WBIN.BlendShapeData.BlendShapeDataT.InitFromObj(skl.BlendShapes(i))
+                    self.blendShapes.append(blendShapeData_)
 
     # SklT
     def Pack(self, builder):
@@ -133,10 +176,20 @@ class SklT(object):
             skeleton = builder.EndVector()
         if self.sourceFileInf is not None:
             sourceFileInf = self.sourceFileInf.Pack(builder)
+        if self.blendShapes is not None:
+            blendShapeslist = []
+            for i in range(len(self.blendShapes)):
+                blendShapeslist.append(self.blendShapes[i].Pack(builder))
+            StartBlendShapesVector(builder, len(self.blendShapes))
+            for i in reversed(range(len(self.blendShapes))):
+                builder.PrependUOffsetTRelative(blendShapeslist[i])
+            blendShapes = builder.EndVector()
         Start(builder)
         if self.skeleton is not None:
             AddSkeleton(builder, skeleton)
         if self.sourceFileInf is not None:
             AddSourceFileInf(builder, sourceFileInf)
+        if self.blendShapes is not None:
+            AddBlendShapes(builder, blendShapes)
         skl = End(builder)
         return skl

@@ -1,4 +1,5 @@
 from . import AABB
+from . import BlendShapeData
 from . import BoneData
 from . import BoneMatrix
 from . import BoneWeight

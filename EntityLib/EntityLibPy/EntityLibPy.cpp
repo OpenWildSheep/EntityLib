@@ -175,7 +175,7 @@ static Entity* anonymEntityCtor(EntityLib* _entlib)
     auto val = ++count;
     char buff[128];
     sprintf_s(buff, "Anonymous%llu", val);
-    return new Entity(*_entlib, buff);
+    return new Entity(*_entlib, buff); // NOLINT(cppcoreguidelines-owning-memory)
 }
 
 PYBIND11_MODULE(EntityLibPy, ent)
@@ -192,6 +192,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
      * but it just seemed safer in case we add new methods with new dependencies.
      */
     auto pyDataType = py::enum_<DataType>(ent, "DataType");
+    auto pyLogicErrorPolicy = py::enum_<LogicErrorPolicy>(ent, "LogicErrorPolicy");
     auto pyActivationLevel = py::enum_<ActivationLevel>(ent, "ActivationLevel");
     auto pyOverrideValueSource = py::enum_<OverrideValueSource>(ent, "OverrideValueSource");
     auto pyOverrideValueLocation = py::enum_<OverrideValueLocation>(ent, "OverrideValueLocation");
@@ -206,6 +207,11 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pySubschemaGenericMeta = py::class_<Subschema::GenericMeta>(ent, "Subschema_GenericMeta");
     auto pySubschemaNumberMeta = py::class_<Subschema::NumberMeta>(ent, "Subschema_NumberMeta");
     auto pySubschemaUnionMeta = py::class_<Subschema::UnionMeta>(ent, "Subschema_UnionMeta");
+
+    pyLogicErrorPolicy
+        .value("Terminate", LogicErrorPolicy::Terminate)
+        .value("Throw", LogicErrorPolicy::Throw)
+        .export_values();
 
     pyDataType
         .value("null", DataType::null)
@@ -348,6 +354,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pyEntityLib = py::class_<EntityLib>(ent, "EntityLib");
     auto pyEntityRef = py::class_<EntityRef>(ent, "EntityRef");
     auto pyEntityFile = py::class_<EntityLib::EntityFile>(ent, "EntityFile");
+    auto pyNodeFile = py::class_<EntityLib::NodeFile>(ent, "NodeFile");
     auto pySceneFile = py::class_<EntityLib::SceneFile>(ent, "SceneFile");
 
     pyNode
@@ -370,7 +377,12 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](Node* node, size_t i) { return node->at(i); },
             py::return_value_policy::reference_internal,
             "In an Array, get the element by index")
+        .def(
+            "__getitem__",
+            [](Node* node, size_t i) { return node->at(i); },
+            py::return_value_policy::reference_internal)
         .def("size", [](Node* node) { return node->size(); })
+        .def("__len__", [](Node* node) { return node->size(); })
         .def("get_raw_size", &Node::getRawSize)
         .def(
             "get_items",
@@ -399,7 +411,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_default_bool", [](Node* node) { return node->getDefaultBool(); })
         .def("is_default", [](Node* node) { return node->isDefault(); })
         .def("get_type_name", [](Node* node) { return node->getTypeName(); })
-        .def_property("value", getValue, setValue)
+        // properties are reference_internal by default, but "value" is a fake property since
+        // the Node doesn't own the returned variant.
+        .def_property("value", getValue, setValue, py::return_value_policy::copy)
         .def_property_readonly("default_value", getDefaultValue)
         .def("set_float", [](Node* node, double val) { return node->setFloat(val); })
         .def("set_int", [](Node* node, int64_t val) { return node->setInt(val); })
@@ -436,9 +450,14 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("map_get", (Node* (Node::*)(int64_t))&Node::mapGet, py::return_value_policy::reference_internal)
         .def("map_insert", (Node* (Node::*)(char const* _key))&Node::mapInsert, py::return_value_policy::reference_internal)
         .def("map_insert", (Node* (Node::*)(int64_t _key))&Node::mapInsert, py::return_value_policy::reference_internal)
+        .def("map_insert_instanceof", (Node* (Node::*)(char const* _key))&Node::mapInsertInstanceOf, py::return_value_policy::reference_internal)
+        .def("map_insert_instanceof", (Node* (Node::*)(int64_t _key))&Node::mapInsertInstanceOf, py::return_value_policy::reference_internal)
         .def("is_map_or_set", &Node::isMapOrSet)
         .def("get_key_type", &Node::getKeyType)
         .def("get_keys", nodeGetKey)
+        .def("save_node", &Node::saveNode)
+        .def("detach", &Node::detach)
+        .def("make_instance_of", &Node::makeInstanceOf)
         .def_property_readonly("parent_node", (Node* (Node::*)())&Node::getParentNode, py::return_value_policy::reference_internal)
         .def("apply_all_values", [](Node& self, Node& dest, CopyMode copyMode) {
             self.applyAllValues(dest, copyMode);
@@ -448,7 +467,6 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pyComponent
         .def_readonly("type", &Component::type)
         .def_readonly("root", &Component::root, py::return_value_policy::reference_internal)
-        .def_property_readonly("raw_data", [](Component const& comp) { return comp.rawData.dump(4); })
         .def_property_readonly(
             "is_used_in_editor", [](Component const& comp) { return comp.isUsedInEditor(); })
         .def_property_readonly(
@@ -468,11 +486,12 @@ PYBIND11_MODULE(EntityLibPy, ent)
         ;
 
     pyEntity
-        .def(py::init<EntityLib const&, char const*>())
-        .def(py::init(&anonymEntityCtor))
+        // 1 = this = constructed object.   2 = 1st arg = entlib.  (https://pybind11.readthedocs.io/en/stable/advanced/functions.html#keep-alive)
+        .def(py::init<EntityLib const&, char const*>(), py::keep_alive<1, 2>())
+        .def(py::init(&anonymEntityCtor), py::keep_alive<1, 2>())
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
         .def("get_ptr", [](Entity* self) {return (intptr_t)self;})
-        .def_static("from_ptr", [](intptr_t _ptr) {return (Entity*)_ptr;})
+        .def_static("from_ptr", [](intptr_t _ptr) {return (Entity*)_ptr;}, py::return_value_policy::reference_internal)
         .def_property("name", &Entity::getName, &Entity::setName)
         .def_property_readonly("instance_of", &Entity::getInstanceOf)
         .def_property("thumbnail", &Entity::getThumbnail, &Entity::setThumbnail)
@@ -490,12 +509,19 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("remove_subscene_component", &Entity::removeSubSceneComponent)
         .def("get_component_types", &Entity::getComponentTypes)
         .def("get_components", &Entity::getComponents, py::return_value_policy::reference_internal)
+        .def_property_readonly("components",
+            &Entity::getComponents,
+            py::return_value_policy::reference_internal)
         .def("get_actorstates", [](Entity* ent) { return &ent->getActorStates(); }, py::return_value_policy::reference_internal)
+        .def_property_readonly("actorstates", [](Entity* ent) { return &ent->getActorStates(); }, py::return_value_policy::reference_internal)
         .def(
             "get_subscene_component",
             [](Entity& e) { return e.getSubSceneComponent(); },
             py::return_value_policy::reference_internal)
         .def("add_subscene_component", &Entity::addSubSceneComponent, py::return_value_policy::reference_internal)
+        .def_property_readonly("sub_scene_component",
+            [](Entity& e) { return e.getSubSceneComponent(); },
+            py::return_value_policy::reference_internal)
         .def("make_entityref", &Entity::makeEntityRef)
         .def("set_instance_of", &Entity::resetInstanceOf)
         .def("reset_instance_of", &Entity::resetInstanceOf)
@@ -576,12 +602,16 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(py::init<std::string>())
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
         .def("get_ptr", [](EntityLib* self) {return (intptr_t)self;})
-        .def_static("from_ptr", [](intptr_t _ptr) {return (EntityLib*)_ptr;})
+        .def_static("from_ptr", [](intptr_t _ptr) {return (EntityLib*)_ptr;}, py::return_value_policy::reference_internal)
         .def_readwrite("validation_enabled", &EntityLib::validationEnabled)
         .def_readonly("root_path", &EntityLib::rootPath)
         .def_readwrite("rawdata_path", &EntityLib::rawdataPath) // unit-test need to write it
         .def_readonly("tools_dir", &EntityLib::toolsDir)
         .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference_internal)
+        .def("make_entityref", &EntityLib::makeEntityRef)
+        .def("resolve_entityref",
+            (Node* (EntityLib::*)(Node*, const EntityRef&) const)&EntityLib::resolveEntityRef,
+            py::return_value_policy::reference_internal)
         .def_readonly(
             "component_dependencies",
             &EntityLib::componentDependencies,
@@ -609,6 +639,16 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](EntityLib* lib, std::string const& path) { return lib->loadSceneReadOnly(path); },
             py::keep_alive<0, 1>())
         .def(
+            "load_node_read_only",
+            [](EntityLib* entlib, Subschema const* schema, char const* name){ return entlib->loadNodeReadOnly(*schema, name).get();},
+            py::return_value_policy::reference_internal
+        )
+        .def(
+            "load_node_entity_read_only",
+            [](EntityLib* entlib, char const* name){ return entlib->loadNodeEntityReadOnly(name).get();},
+            py::return_value_policy::reference_internal
+        )
+        .def(
             "load_legacy_scene_read_only",
             [](EntityLib* lib, std::string const& path) { return lib->loadLegacySceneReadOnly(path); },
             py::keep_alive<0, 1>())
@@ -616,12 +656,28 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("save_scene", &EntityLib::saveScene)
         .def("get_entity_cache", &EntityLib::getEntityCache, py::return_value_policy::reference_internal)
         .def("get_scene_cache", &EntityLib::getSceneCache, py::return_value_policy::reference_internal)
+        .def("get_node_cache", &EntityLib::getNodeCache, py::return_value_policy::reference_internal)
         .def("clear_cache", &EntityLib::clearCache)
+        .def("load_node_file", &EntityLib::loadFileAsNode, py::keep_alive<0, 1>())
+        .def("load_node_entity", &EntityLib::loadEntityAsNode, py::keep_alive<0, 1>())
+        .def_property(
+            "logic_error_policy",
+            [](EntityLib* lib){return lib->getLogicErrorPolicy();},
+            [](EntityLib* lib, LogicErrorPolicy err){lib->setLogicErrorPolicy(err);})
+        .def("load_node_scene", &EntityLib::loadSceneAsNode, py::keep_alive<0, 1>()) // py::keep_alive<0, 1> => Do not destroy EntityLib before Node
+        .def("make_node_instanceof", &EntityLib::makeNodeInstanceOf, py::keep_alive<0, 1>())
+        .def("make_entity_node_instanceof", &EntityLib::makeEntityNodeInstanceOf, py::keep_alive<0, 1>())
+        .def("make_node", &EntityLib::makeNode, py::keep_alive<0, 1>())
+        .def("make_entity_node", &EntityLib::makeEntityNode, py::keep_alive<0, 1>())
+        .def("save_node_as_entity", &EntityLib::saveNodeAsEntity)
+        .def("save_node_as_scene", &EntityLib::saveNodeAsScene)
+        .def("get_parent_entity", (Node*(EntityLib::*)(Node*))&EntityLib::getParentEntity, py::return_value_policy::reference_internal)
         .def(
             "make_instance_of",
             [](EntityLib* lib, std::string const& path) {
                 return lib->makeInstanceOf(path).release();
             },
+            py::keep_alive<0, 1>(), // py::keep_alive<0, 1> => Do not destroy EntityLib before Entity
             "instanceOf"_a);
 
     pyEntityRef
@@ -643,6 +699,13 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](EntityLib::SceneFile* sceneF) { return sceneF->data.get(); },
             py::return_value_policy::reference_internal)
         .def_readonly("time", &EntityLib::SceneFile::time, py::return_value_policy::reference_internal);
+
+    pyNodeFile
+        .def_property_readonly(
+            "data",
+            [](EntityLib::NodeFile* entF) { return entF->data.get(); },
+            py::return_value_policy::reference_internal)
+        .def_readonly("time", &EntityLib::NodeFile::time, py::return_value_policy::reference_internal);
 
     py::register_exception<Ent::JsonValidation>(ent, "JsonValidation");
 }

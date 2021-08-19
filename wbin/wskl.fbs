@@ -8,10 +8,16 @@ table BoneData
 	name:string (required); // zero terminated string (not preceded by size)
 }
 
+table BlendShapeData
+{
+	name:string (required);
+}
+
 table Skl
 {
 	skeleton:[BoneData] (required);
 	sourceFileInf:SourceFileInf;
+	blendShapes:[BlendShapeData];
 }
 
 root_type Skl;

@@ -265,6 +265,27 @@
             },
             "Type": "TestArrays",
             "Version": 1
+        },
+        {
+            "Version": 1,
+            "Type": "ScriptComponentGD",
+            "Data": {
+                "Scripts": [
+                    {
+                        "Path": "Pesto/Clouds/CloudStorm.pesto",
+                        "DataSet": [
+                            {
+                                "Name": "BlendDurationIn",
+                                "Float": 7.0
+                            },
+                            {
+                                "Name": "BlendDurationOut",
+                                "Float": 10.0
+                            }
+                        ]
+                    }
+                ]
+            }
         }, {
             "Data": {
                 "InstanceOf": "test.SeedPatch.node",
@@ -275,8 +296,8 @@
         }, {
             "Data": {
                 "SetOfObject": [{
-                        "Name": "C",
-                        "Value": "c"
+                        "Value": "c",
+                        "Name": "C"
                     }, {
                         "Name": "D",
                         "Value": "d"

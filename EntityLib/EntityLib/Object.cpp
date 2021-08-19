@@ -13,8 +13,8 @@ namespace Ent
 {
     bool Object::hasDefaultValue() const
     {
-        return std::all_of(nodes.begin(), nodes.end(), [](auto&& name_node) {
-            return std::get<1>(name_node)->hasDefaultValue();
+        return std::all_of(nodes.begin(), nodes.end(), [](ObjField const& field) {
+            return field.node->hasDefaultValue();
         });
     }
 
@@ -22,9 +22,9 @@ namespace Ent
 
     void Ent::Object::unset()
     {
-        for (auto&& name_node : nodes)
+        for (ObjField& field : nodes)
         {
-            name_node.second->unset();
+            field.node->unset();
         }
     }
 
@@ -33,7 +33,7 @@ namespace Ent
         applyInstanceOfField(*this, _dest, _copyMode);
         for (size_t i = 0; i < nodes.size(); ++i)
         {
-            nodes[i].second->applyAllValues(*_dest.nodes[i].second, _copyMode);
+            nodes[i].node->applyAllValues(*_dest.nodes[i].node, _copyMode);
         }
     }
 
@@ -42,9 +42,9 @@ namespace Ent
         Object out(schema);
         out.instanceOf = instanceOf.makeInstanceOf();
         out.nodes.reserve(size());
-        for (auto&& name_node : *this)
+        for (auto&& [name, node, fieldIdx] : *this)
         {
-            out.nodes.emplace_back(std::get<0>(name_node), std::get<1>(name_node)->makeInstanceOf());
+            out.nodes.push_back(ObjField{name, node->makeInstanceOf(), fieldIdx});
         }
         std::sort(begin(out), end(out), CompObject());
         return out;
@@ -54,9 +54,9 @@ namespace Ent
     {
         Object out(schema);
         out.nodes.reserve(size());
-        for (auto&& name_node : *this)
+        for (auto&& [name, node, fieldIdx] : *this)
         {
-            out.nodes.emplace_back(std::get<0>(name_node), std::get<1>(name_node)->detach());
+            out.nodes.emplace_back(ObjField{name, node->detach(), fieldIdx});
         }
         std::sort(begin(out), end(out), CompObject());
         return out;
@@ -78,9 +78,9 @@ namespace Ent
             Node prefabNode = entlib->loadNode(*schema, nodeData, nullptr);
             // Get the keyfield
             tl::optional<Node> keyField;
-            for (auto&& name_field : nodes)
+            for (ObjField& objfield : nodes)
             {
-                auto&& field = std::get<1>(name_field);
+                auto&& field = objfield.node;
                 if (field->getSchema()->isKeyField)
                 {
                     if (keyField.has_value())
@@ -95,9 +95,9 @@ namespace Ent
             // Set the keyField
             if (keyField.has_value())
             {
-                for (auto&& name_field : nodes)
+                for (ObjField& objfield : nodes)
                 {
-                    auto&& field = std::get<1>(name_field);
+                    auto&& field = objfield.node;
                     if (field->getSchema()->isKeyField)
                     {
                         keyField->applyAllValues(*field, CopyMode::MinimalOverride);
@@ -114,9 +114,9 @@ namespace Ent
         {
             return true;
         }
-        for (auto&& name_node : nodes)
+        for (ObjField const& field : nodes)
         {
-            if (std::get<1>(name_node)->hasOverride())
+            if (field.node->hasOverride())
             {
                 return true;
             }
@@ -130,9 +130,9 @@ namespace Ent
         {
             return true;
         }
-        for (auto&& name_node : nodes)
+        for (ObjField const& field : nodes)
         {
-            if (std::get<1>(name_node)->hasPrefabValue())
+            if (field.node->hasPrefabValue())
             {
                 return true;
             }
@@ -142,7 +142,7 @@ namespace Ent
 
     void Ent::Object::setParentNode(Node* _parentNode)
     {
-        for (auto&& [name, node] : nodes)
+        for (auto&& [name, node, fieldIndex] : nodes)
         {
             node->setParentNode(_parentNode);
         }
@@ -150,7 +150,7 @@ namespace Ent
 
     void Ent::Object::checkParent(Node const* _parentNode) const
     {
-        for (auto&& [name, node] : nodes)
+        for (auto&& [name, node, fieldIndex] : nodes)
         {
             node->checkParent(_parentNode);
         }
@@ -160,9 +160,9 @@ namespace Ent
     {
         prof.addMem("Object", nodes.capacity() * sizeof(front()));
         instanceOf.computeMemory(prof);
-        for (auto&& name_node : nodes)
+        for (ObjField const& field : nodes)
         {
-            std::get<1>(name_node)->computeMemory(prof);
+            field.node->computeMemory(prof);
             prof.addMem("Object::value_ptr", sizeof(Ent::Node));
         }
         prof.addNodes(size());
@@ -170,11 +170,10 @@ namespace Ent
 
     size_t count(Object const& obj, char const* key)
     {
-        auto range = std::equal_range(
-            begin(obj), end(obj), std::pair<char const*, value_ptr<Node>>{key, nullptr}, CompObject());
+        auto range = std::equal_range(begin(obj), end(obj), ObjField{key, nullptr, 0}, CompObject());
         return (size_t)std::distance(range.first, range.second);
     }
-    void emplace(Object& obj, std::pair<char const*, Node> const& value)
+    void emplace(Object& obj, ObjField const& value)
     {
         auto range = std::equal_range(begin(obj), end(obj), value, CompObject());
         if (range.first == range.second)
@@ -184,31 +183,27 @@ namespace Ent
     }
     Node const& at(Object const& obj, char const* key)
     {
-        auto range = std::equal_range(
-            begin(obj), end(obj), std::pair<char const*, value_ptr<Node>>{key, nullptr}, CompObject());
+        auto range = std::equal_range(begin(obj), end(obj), ObjField{key, nullptr, 0}, CompObject());
         if (range.first == range.second)
         {
             throw std::logic_error(std::string("Bad key : ") + key);
         }
         else
         {
-            return *range.first->second;
+            return *range.first->node;
         }
     }
     Node& at(Object& obj, char const* key)
     {
         auto range = std::equal_range(
-            begin(obj),
-            end(obj),
-            std::pair<char const*, value_ptr<Node>>{key, value_ptr<Node>()},
-            CompObject());
+            begin(obj), end(obj), ObjField{key, value_ptr<Node>(), 0}, CompObject());
         if (range.first == range.second)
         {
             throw std::logic_error(std::string("Bad key : ") + key);
         }
         else
         {
-            return *range.first->second;
+            return *range.first->node;
         }
     }
 } // namespace Ent

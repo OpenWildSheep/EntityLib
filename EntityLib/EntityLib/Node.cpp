@@ -19,16 +19,18 @@ namespace Ent
     }
 
     Node::Node(Node const& _node)
-        : parentNode(_node.parentNode)
+        : parentNode(nullptr)
         , schema(_node.schema)
         , value(_node.value)
+        , addedInInstance(_node.addedInInstance)
     {
         updateParents();
     }
     Node::Node(Node&& _node) noexcept
-        : parentNode(_node.parentNode)
+        : parentNode(nullptr)
         , schema(_node.schema)
         , value(std::move(_node.value))
+        , addedInInstance(_node.addedInInstance)
     {
         updateParents();
     }
@@ -40,6 +42,7 @@ namespace Ent
             parentNode = _node.parentNode;
             schema = _node.schema;
             value = _node.value;
+            addedInInstance = _node.addedInInstance;
             updateParents();
         }
         return *this;
@@ -49,6 +52,7 @@ namespace Ent
         parentNode = _node.parentNode;
         schema = _node.schema;
         value = std::move(_node.value);
+        addedInInstance = _node.addedInInstance;
         updateParents();
         return *this;
     }
@@ -161,7 +165,7 @@ namespace Ent
         {
             auto iter = begin(value.get<Object>());
             std::advance(iter, _index);
-            return &(*iter->second);
+            return &(*iter->node);
         }
         if (value.is<Array>())
         {
@@ -434,6 +438,10 @@ namespace Ent
 
     bool Node::hasOverride() const
     {
+        if (addedInInstance)
+        {
+            return true;
+        }
         return mapbox::util::apply_visitor(HasOverride{schema}, value);
     }
 
@@ -472,7 +480,7 @@ namespace Ent
             std::vector<char const*> fields;
             for (auto&& f : value.get<Object>())
             {
-                fields.push_back(f.first);
+                fields.push_back(f.name);
             }
             return fields;
         }
@@ -605,6 +613,15 @@ namespace Ent
         return value.get<Array>().mapInsert(_key);
     }
 
+    Node* Node::mapInsertInstanceOf(char const* _prefabPath)
+    {
+        checkMap("mapInsertInstanceOf");
+        auto prefab = getEntityLib()->loadNodeReadOnly(**getSchema()->singularItems, _prefabPath);
+        Node* newNode = value.get<Array>().mapInsert(value.get<Array>().getChildKey(prefab.get()));
+        newNode->resetInstanceOf(_prefabPath);
+        return newNode;
+    }
+
     Node* Node::mapRename(char const* _key, char const* _newkey)
     {
         checkMap("mapGet");
@@ -721,6 +738,10 @@ namespace Ent
 
     void Node::saveNode(std::filesystem::path const& _path) const
     {
+        if (getDataType() != DataType::object)
+        {
+            throw Ent::BadType("In saveNode, an object is expeted");
+        }
         json node = toJson();
         node["$schema"] = getSchema()->name;
 

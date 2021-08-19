@@ -111,23 +111,24 @@ bool Ent::Array::isTuple() const
     return m_data.get<Vector>().isTuple();
 }
 
-Ent::Node* Ent::Array::initAdd(OverrideValueLocation loc, Node _node)
+Ent::Node* Ent::Array::initAdd(OverrideValueLocation loc, Node _node, bool _addedInInstance)
 {
     if (hasKey())
     {
         auto key = getChildKey(&_node);
-        return m_data.get<Map>().insert(loc, key, std::move(_node));
+        return m_data.get<Map>().insert(loc, key, std::move(_node), _addedInInstance);
     }
     else
     {
-        return m_data.get<Vector>().initPush(std::move(_node));
+        return m_data.get<Vector>().initPush(std::move(_node), _addedInInstance);
     }
 }
 
-Ent::Node* Ent::Array::mapInitInsert(OverrideValueLocation _loc, Map::KeyType _key, Node _node)
+Ent::Node* Ent::Array::mapInitInsert(
+    OverrideValueLocation _loc, Map::KeyType _key, Node _node, bool _addedInInstance)
 {
     ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only mapInsert on map or set");
-    return m_data.get<Map>().insert(_loc, std::move(_key), std::move(_node));
+    return m_data.get<Map>().insert(_loc, std::move(_key), std::move(_node), _addedInInstance);
 }
 
 std::vector<Ent::Node const*> Ent::Array::getItemsWithRemoved() const
@@ -203,10 +204,10 @@ void Ent::Array::computeMemory(MemoryProfiler& _prof) const
     apply_visitor([&_prof](auto& a) { return a.computeMemory(_prof); }, m_data);
 }
 
-Ent::Node* Ent::Array::arrayInitPush(Node _node)
+Ent::Node* Ent::Array::arrayInitPush(Node _node, bool _addedInInstance)
 {
     ENTLIB_ASSERT_MSG(not hasKey(), "Can't 'push' in a map or set. Use 'mapInsert'.");
-    return m_data.get<Vector>().initPush(std::move(_node));
+    return m_data.get<Vector>().initPush(std::move(_node), _addedInInstance);
 }
 
 void Ent::Array::applyAllValues(Array& _dest, CopyMode _copyMode) const

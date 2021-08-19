@@ -8,7 +8,6 @@ namespace Ent
     /// The properties of a given component
     struct Component
     {
-        nlohmann::json rawData;
         std::string type; ///< Component type (ex : Transform, VisualGD, HeightObj ...)
         Node root; ///< Root node of the component. Always of type Ent::DataType::object
         size_t version{}; ///< @todo remove?
@@ -16,13 +15,7 @@ namespace Ent
         DeleteCheck deleteCheck;
         bool hasPrefab{}; ///< True if it overrides an other component (not just default)
 
-        Component(
-            nlohmann::json _rawData,
-            bool _hasPrefab,
-            std::string _type,
-            Node _root,
-            size_t _version,
-            size_t _index);
+        Component(bool _hasPrefab, std::string _type, Node _root, size_t _version, size_t _index);
 
         /// \cond PRIVATE
         void computeMemory(MemoryProfiler& prof) const;

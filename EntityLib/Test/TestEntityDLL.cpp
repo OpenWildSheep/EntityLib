@@ -154,6 +154,10 @@ try
     Ent::EntityLib entlib("X:/RawData/..", doMergeComponents);
     using namespace std::filesystem;
 
+    entlib.setLogicErrorPolicy(Ent::LogicErrorPolicy::Throw);
+    ENTLIB_CHECK_EXCEPTION(ENTLIB_LOGIC_ERROR("Test logic error"), std::logic_error);
+    entlib.setLogicErrorPolicy(Ent::LogicErrorPolicy::Terminate);
+
     entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
 #ifdef _DEBUG
     entlib.validationEnabled = false;
@@ -367,7 +371,10 @@ try
         ENTLIB_ASSERT(ent.hasOverride()); // resetInstanceOf does override the "instanceOf"
         ENTLIB_ASSERT(ent.getInstanceOf() == std::string("prefab.entity"));
     }
-
+    {
+        EntityPtr ent = entlib.loadEntity("missing_embedded.entity");
+        ENTLIB_ASSERT(ent->getComponents().empty());
+    }
     {
         EntityPtr ent = entlib.loadEntity("prefab.entity");
 
@@ -471,6 +478,7 @@ try
         };
 
         Ent::Component* testDefaultValues = ent->addComponent("TestDefaultValues");
+        ENTLIB_ASSERT(testDefaultValues->root.hasOverride());
         mat33 = testDefaultValues->root.at("Matrix");
         testMat33();
         mat33 = testDefaultValues->root.at("Matrix2");
@@ -509,10 +517,36 @@ try
         testPrefabEntity(ent.get());
     }
     {
+        auto const nodeCachesize = entlib.getNodeCache().size();
+        Ent::Node ent = entlib.loadEntityAsNode("prefab.copy.entity");
+        ENTLIB_ASSERT(entlib.getNodeCache().size() == nodeCachesize + 1);
+        // TEST simple entity refs resolution
+        Ent::Node* testEntityRef = ent.at("Components")->mapGet("TestEntityRef")->getUnionData();
+        ENTLIB_ASSERT(testEntityRef != nullptr);
+        ENTLIB_ASSERT(testEntityRef->at("TestRef")->isSet());
+        Ent::EntityRef entityRef = testEntityRef->at("TestRef")->getEntityRef();
+        Ent::Node* resolvedEntity = entlib.resolveEntityRef(&ent, entityRef);
+        ENTLIB_ASSERT(resolvedEntity != nullptr);
+
+        Ent::Node* subScenecomp = ent.at("Components")->mapGet("SubScene")->getUnionData();
+        Ent::Node* allSubEntities = subScenecomp->at("Embedded");
+        ENTLIB_ASSERT(not allSubEntities->empty());
+        Ent::Node* originalEnt = allSubEntities->at(0llu);
+        ENTLIB_ASSERT(resolvedEntity == originalEnt);
+    }
+
+    {
         // Test write prefab
         EntityPtr ent = entlib.loadEntity("prefab.copy.entity");
 
         testPrefabEntity(ent.get());
+
+        // TEST Tuple hasOverride
+        Ent::Component* scriptComponentGD = ent->getComponent("ScriptComponentGD");
+        auto* scripts = scriptComponentGD->root.at("Scripts");
+        auto* wp = scripts->at(0llu)->at("DataSet")->at(0llu)->at("WorldPosition");
+        ENTLIB_ASSERT(wp->hasOverride() == false);
+        ENTLIB_ASSERT(wp->at(0llu)->hasOverride() == false);
 
         // TEST MaxActivationLevel
         ENTLIB_ASSERT(ent->getMaxActivationLevel() == Ent::ActivationLevel::InWorld);
@@ -801,8 +835,13 @@ try
 
         Ent::Component* testSetOfObject = ent->getComponent("TestSetOfObject");
         {
-            // Test remove object in set
             auto* setOfObject = testSetOfObject->root.at("SetOfObject");
+
+            // Test hasOverride
+            ENTLIB_ASSERT(setOfObject->mapGet("C")->hasOverride() == false); // Already in prefab
+            ENTLIB_ASSERT(setOfObject->mapGet("A")->hasOverride()); // new in instance
+
+            // Test remove object in set
             ENTLIB_ASSERT(setOfObject->size() == 6);
             ENTLIB_ASSERT(setOfObject->mapErase("B"));
             ENTLIB_ASSERT(setOfObject->mapGet("B") == nullptr);
@@ -828,6 +867,7 @@ try
             //          => restore values since we dont know how to reset an element when saving
             ENTLIB_ASSERT(setOfObject->mapGet("G") == nullptr);
             ENTLIB_ASSERT(setOfObject->mapInsert("G"));
+            ENTLIB_ASSERT(setOfObject->mapGet("G")->hasOverride() == true);
             ENTLIB_ASSERT(setOfObject->mapGet("G")->at("Value")->getString() == std::string("g"));
             setOfObject->mapErase("G");
         }
@@ -899,7 +939,7 @@ try
         // new Component
         auto comp = ent->addComponent("AnimationEventsGeneratorGD");
         ENTLIB_ASSERT(ent->getComponent("AnimationEventsGeneratorGD") != nullptr);
-        ENTLIB_ASSERT(comp->hasOverride() == false);
+        ENTLIB_ASSERT(comp->hasOverride()); // A new item in an array in always override
         // Component with override
         ent->getComponent("VoxelSimulationGD")->root.at("LossBySecond")->setFloat(36.);
         ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD") != nullptr);
@@ -916,7 +956,8 @@ try
         auto mapTest = setOfObject->root.at("MapOfObject");
         mapTest->mapInsert("NewNode");
         ENTLIB_ASSERT(mapTest->mapGet("NewNode") != nullptr);
-        ENTLIB_ASSERT(mapTest->mapGet("NewNode")->hasOverride() == false);
+        ENTLIB_ASSERT(
+            mapTest->mapGet("NewNode")->hasOverride()); // Newly inserted noeds are always overriden
         // Node with override
         mapTest->mapGet("OldNode1")->at("Value")->setString("overriden");
         ENTLIB_ASSERT(
@@ -1132,9 +1173,9 @@ try
         ENTLIB_ASSERT(ent2->hasOverride());
 
         // *************** COMPONENT ***************
-        // new Component
+        // new Component (A new component is override true)
         ENTLIB_ASSERT(ent->getComponent("AnimationEventsGeneratorGD") != nullptr);
-        ENTLIB_ASSERT(ent->getComponent("AnimationEventsGeneratorGD")->hasOverride() == false);
+        ENTLIB_ASSERT(ent->getComponent("AnimationEventsGeneratorGD")->hasOverride());
         // Component with override
         ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD") != nullptr);
         ENTLIB_ASSERT(
@@ -1149,7 +1190,8 @@ try
         auto pathNodeGD = ent->getComponent("TestSetOfObject");
         auto mapTest = pathNodeGD->root.at("MapOfObject");
         ENTLIB_ASSERT(mapTest->mapGet("NewNode") != nullptr);
-        ENTLIB_ASSERT(mapTest->mapGet("NewNode")->hasOverride() == false);
+        // Newly inserted Nodes are overriden
+        ENTLIB_ASSERT(mapTest->mapGet("NewNode")->hasOverride());
         // Node with override
         ENTLIB_ASSERT(
             mapTest->mapGet("OldNode1")->at("Value")->getString() == std::string("overriden"));
@@ -1287,8 +1329,11 @@ try
             (current_path() / "test.StickToTerrain.node").generic_u8string().c_str());
         ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
         stickToTerrain->root.at("NormalRatio")->setFloat(0.6);
+        stickToTerrain->root.at("precisionRadius")->setFloat(0.6e-15);
 
         ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
+        ENTLIB_ASSERT(
+            fabs(stickToTerrain->root.at("precisionRadius")->getFloat() - 0.6e-15) < 0.0000001);
         ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isSet() == false);
         ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isDefault() == false);
         ENTLIB_ASSERT(fabs(stickToTerrain->root.at("ZOffset")->getFloat() - 10.) < 0.0001);

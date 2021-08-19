@@ -37,17 +37,19 @@ void main()
     // Test set of primitive
     auto side =
         turret.ReviveSideTargeted(); // inferred type : PrimitiveSet<ReviveSideTargetedItem_ReviveSide>
-    static_assert(
-        std::is_same_v<decltype(side), PrimitiveSet<ReviveSideTargetedItem_ReviveSide>>);
-    turret.ReviveSideTargeted().add(ReviveSideTargetedItem_ReviveSide::neutral);
-    turret.ReviveSideTargeted().add("cursed"); // Still possible with string
-    // turret.ReviveSideTargeted.remove("neutral");
-    static_assert(
-        std::is_same_v<decltype(turret.ReviveSideTargeted()["cursed"].get()), char const*>);
-    ENTLIB_ASSERT(
-        turret.ReviveSideTargeted()["cursed"].get() == std::string("cursed"));
-    turret.ReviveSideTargeted().add("sacred"); // inferred type : String
-    // del turret.ReviveSideTargeted["sacred"]
+    static_assert(std::is_same_v<decltype(side), PrimitiveSet<ReviveSideEnum>>);
+    turret.ReviveSideTargeted().add(ReviveSideEnum::neutral);
+    turret.ReviveSideTargeted().add(ReviveSideEnum::cursed);
+    // turret.ReviveSideTargeted.remove(ReviveSideEnum::neutral);
+    ENTLIB_ASSERT(turret.ReviveSideTargeted().count(ReviveSideEnum::cursed));
+    turret.ReviveSideTargeted().add(ReviveSideEnum::sacred); // inferred type : String
+
+    // Test Enum prop
+    auto mode =
+        ent.Components().add<BeamTargetGD>().Mode(); // inferred type : BeamStaffMode
+    mode = BeamStaffModeEnum::Hatching;
+    BeamStaffModeEnum enm = mode;
+    ENTLIB_ASSERT(enm == BeamStaffModeEnum::Hatching);
 
     // Test primitive types
     ENTLIB_ASSERT(ent.Name().get() == std::string("PlayerSpawner_"));
@@ -89,8 +91,20 @@ void main()
     auto tags =
         pathNodeGD.Tags().Tags(); // inferred type : Map<char const*, PrimitiveSet<String>>
     static_assert(
-        std::is_same_v<decltype(tags), Map<char const*, PrimitiveSet<String>>>);
+        std::is_same_v<decltype(tags), Map<char const*, PrimitiveSet<char const*>>>);
     auto b = tags.get("b"); // inferred type : PrimitiveSet<String>
     tags.remove("c");
     auto c = tags.add("c"); // inferred type : PrimitiveSet<String>
+
+    // Test Map with enum key
+    Map<RegenerationStateEnum, Array<sEnvStamp>> stamps =
+        ent.Components().add<EnvStampGD>().Stamps();
+    stamps.add(RegenerationStateEnum::Dead);
+    stamps.add(RegenerationStateEnum::Dead);
+    Array<sEnvStamp> deadArr = stamps.get(RegenerationStateEnum::Dead);
+    ENTLIB_ASSERT(deadArr.hasValue());
+    Array<sEnvStamp> lushArr = stamps.get(RegenerationStateEnum::Lush);
+    ENTLIB_ASSERT(not lushArr.hasValue());
+    stamps.remove(RegenerationStateEnum::Dead);
+    ENTLIB_ASSERT(not stamps.get(RegenerationStateEnum::Dead).hasValue());
 }

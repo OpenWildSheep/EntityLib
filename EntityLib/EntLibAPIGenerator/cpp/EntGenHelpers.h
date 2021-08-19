@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <optional>
 
 #include <EntityLib.h>
@@ -211,6 +212,12 @@ namespace Ent
             }
         };
 
+        template <typename V>
+        V toInternal(V value)
+        {
+            return value;
+        }
+
         template <typename T>
         struct PrimitiveSet : Base
         {
@@ -218,41 +225,13 @@ namespace Ent
                 : Base(_node)
             {
             }
-            T operator[](size_t i) const
+            void add(T key) const
             {
-                return get(i);
+                node->mapInsert(toInternal(key));
             }
-            T operator[](char const* str) const
+            bool count(T key) const
             {
-                return get(str);
-            }
-            T operator[](std::string const& str) const
-            {
-                return get(str);
-            }
-            T get(size_t i) const
-            {
-                return node->mapGet(i);
-            }
-            T get(char const* str) const
-            {
-                return node->mapGet(str);
-            }
-            T get(std::string const& str) const
-            {
-                return node->mapGet(str.c_str());
-            }
-            T add(size_t i) const
-            {
-                return node->mapInsert(i);
-            }
-            T add(char const* str) const
-            {
-                return node->mapInsert(str);
-            }
-            T add(std::string const& str) const
-            {
-                return node->mapInsert(str.c_str());
+                return node->mapGet(toInternal(key)) != nullptr;
             }
             size_t size() const
             {
@@ -270,67 +249,35 @@ namespace Ent
             }
         };
 
-        template <typename T>
+        template <typename K, typename O>
         struct ObjectSet : Base
         {
             ObjectSet(Ent::Node* _node)
                 : Base(_node)
             {
             }
-            T operator[](size_t key)
+            O operator[](K key)
             {
-                return node->mapGet(key);
+                return node->mapGet(toInternal(key));
             }
-            T operator[](char const* key) const
+            O get(K key)
             {
-                return node->mapGet(key);
+                return node->mapGet(toInternal(key));
             }
-            T operator[](std::string const& key) const
+            O add(K key) const
             {
-                return node->mapGet(key);
+                return node->mapInsert(toInternal(key));
             }
-            T get(size_t key)
+            void remove(K key) const
             {
-                return node->mapGet(key);
-            }
-            T get(char const* key) const
-            {
-                return node->mapGet(key);
-            }
-            T get(std::string const& key) const
-            {
-                return node->mapGet(key);
-            }
-            T add(size_t key) const
-            {
-                return node->mapInsert(key);
-            }
-            T add(char const* key) const
-            {
-                return node->mapInsert(key);
-            }
-            T add(std::string const& key) const
-            {
-                return node->mapInsert(key.c_str());
-            }
-            void remove(size_t key) const
-            {
-                node->mapErase(key);
-            }
-            void remove(char const* key) const
-            {
-                node->mapErase(key);
-            }
-            void remove(std::string const& key) const
-            {
-                node->mapErase(key.c_str());
+                node->mapErase(toInternal(key));
             }
             size_t size() const
             {
                 return node->size();
             }
 
-            std::vector<T> getItems()
+            std::vector<O> getItems()
             {
                 std::vector<T> items;
                 for (size_t i = 0; i < node->size(); ++i)
@@ -419,19 +366,19 @@ namespace Ent
             }
             V get(K key)
             {
-                return node->mapGet(key);
+                return node->mapGet(toInternal(key));
             }
             V operator[](K key)
             {
-                return node->mapGet(key);
+                return node->mapGet(toInternal(key));
             }
             V add(K key)
             {
-                return node->mapInsert(key);
+                return node->mapInsert(toInternal(key));
             }
             void remove(K key)
             {
-                node->mapErase(key);
+                node->mapErase(toInternal(key));
             }
             size_t size() const
             {
@@ -454,6 +401,7 @@ namespace Ent
         template <typename P, typename T>
         struct PropHelper : Base
         {
+            using InternalType = T;
             PropHelper(Ent::Node* _node)
                 : Base(_node)
             {
@@ -468,6 +416,31 @@ namespace Ent
             operator T() const
             {
                 return ((P const*)this)->get();
+            }
+        };
+
+        template <typename Child, typename E>
+        struct EnumPropHelper : PropHelper<Child, E>
+        {
+            using Enum = E;
+            EnumPropHelper(Ent::Node* _node)
+                : PropHelper<Child, Enum>(_node)
+            {
+            }
+            void set(Enum value) const
+            {
+                node->setString(toInternal(value));
+            }
+            Enum get() const
+            {
+                char const* str = node->getString();
+                auto iter = std::find(
+                    std::begin(Child::enumToString),
+                    std::end(Child::enumToString),
+                    std::string_view(str));
+                if (iter == std::end(Child::enumToString))
+                    throw std::runtime_error(std::string("Unkown enum string '") + str + "'");
+                return Enum(std::distance(std::begin(Child::enumToString), iter));
             }
         };
 

@@ -82,10 +82,12 @@ static std::string escapeName(std::string name)
 std::map<std::string, Ent::Subschema const*> allDefs;
 std::map<Ent::Subschema const*, std::string> schemaName;
 
-static void addDef(std::string const& name, Ent::Subschema const* def, std::string const& scope)
+// Enum type are defined several times. "overwrite" is used to merge them is one
+static void addDef(
+    std::string const& name, Ent::Subschema const* def, std::string const& scope, bool overwrite = false)
 {
     auto escapedName = escapeName(name);
-    if (allDefs.count(escapedName) == 0)
+    if (allDefs.count(escapedName) == 0 or overwrite)
     {
         allDefs[escapedName] = def;
         schemaName[def] = escapedName;
@@ -196,6 +198,9 @@ static json getSchemaType(Ent::Subschema const& schema)
                 {
                     json array;
                     array["type"] = getSchemaRefType(*schema.singularItems);
+                    auto keyFieldName = schema.meta.get<Ent::Subschema::ArrayMeta>().keyField;
+                    auto& keyField = schema.singularItems->get().properties.at(*keyFieldName);
+                    array["key_type"] = getSchemaRefType(keyField);
                     type["object_set"] = std::move(array);
                     return type;
                 }
@@ -265,8 +270,8 @@ static json getSchemaType(Ent::Subschema const& schema)
             ref["name"] = typeDispName;
             type["ref"] = std::move(ref);
             // It works because in the schema, Enums are always strings
-            type["ref"]["py_native"] = "str";
-            type["ref"]["cpp_native"] = "char const*";
+            type["ref"]["py_native"] = schema.name.empty() ? "str" : schema.name + "_enum";
+            type["ref"]["cpp_native"] = schema.name.empty() ? "char const*" : schema.name + "Enum";
             return type;
         }
         else
@@ -391,6 +396,8 @@ static json getSchemaData(Ent::Subschema const& schema)
         {
             json enumNode(json::value_t::object);
             enumNode["type"] = prim("String");
+            enumNode["type"]["ref"]["cpp_native"] = schema.name + "Enum";
+            enumNode["type"]["ref"]["py_native"] = schema.name + "Enum";
             for (auto&& val : schema.enumValues)
             {
                 enumNode["values"].push_back(json::value_t::object);
@@ -481,7 +488,9 @@ static void giveNameToAnonymousObjectRef(
         {
             if (not ref->name.empty())
             {
-                addDef(ref->name, &(*ref), hint);
+                // The same enum can be descibe several time
+                // TODO : Loïc : Fix the export of enums in Wild (Export each enum only one time, like classes)
+                addDef(ref->name, &(*ref), "", true);
             }
             else
             {
@@ -568,10 +577,11 @@ void gencpp()
     rootData["all_definitions"] = jsonToMustache(allDefinitions);
     rootData["tuple_type"] =
         partial([]() { return R"cpp(Ent::Gen::Tuple<{{#types}}{{>display_type}}{{/types}}>)cpp"; });
-    rootData["prim_set_type"] = partial(
-        []() { return R"cpp(Ent::Gen::PrimitiveSet<{{#type}}{{>display_type}}{{/type}}>)cpp"; });
-    rootData["object_set_type"] =
-        partial([]() { return R"cpp(Ent::Gen::ObjectSet<{{#type}}{{>display_type}}{{/type}}>)cpp"; });
+    rootData["prim_set_type"] =
+        partial([]() { return R"cpp(Ent::Gen::PrimitiveSet<{{type.ref.cpp_native}}>)cpp"; });
+    rootData["object_set_type"] = partial([]() {
+        return R"cpp(Ent::Gen::ObjectSet<{{key_type.ref.cpp_native}}, {{#type}}{{>display_type}}{{/type}}>)cpp";
+    });
     rootData["map_type"] = partial([]() {
         return R"cpp(Ent::Gen::Map<{{key_type.ref.cpp_native}}, {{#value_type}}{{>display_type}}{{/value_type}}>)cpp";
     });
@@ -597,7 +607,12 @@ namespace Ent
         using {{schema.display_type}} = {{>tuple_type}}; // Tuple{{/schema.tuple}}{{#schema.union_set}}
         struct {{schema.display_type}}; // union_set{{/schema.union_set}}{{#schema.object_set}}
         struct {{schema.display_type}}; // object_set{{/schema.object_set}}{{#schema.enum}}
-        struct {{schema.display_type}}; // enum{{/schema.enum}}{{/all_definitions}}
+        struct {{schema.display_type}}; // enum
+        enum class {{schema.display_type}}Enum
+        {
+            {{#values}}{{escaped_name}},
+            {{/values}}
+        };{{/schema.enum}}{{/all_definitions}}
         {{#all_definitions}}{{#schema.alias}}
         using {{schema.display_type}} = {{#type}}{{>display_type}}{{/type}};{{/schema.alias}}{{/all_definitions}}
 
@@ -608,12 +623,23 @@ namespace Ent
         {{#properties}}    {{#type}}{{>display_type}}{{/type}} {{prop_name}}() const;
         {{/properties}}
         };{{/schema.object}}{{#schema.enum}}
-        struct {{schema.display_type}} : String // Enum
+        struct {{schema.display_type}} : EnumPropHelper<{{schema.display_type}}, {{schema.display_type}}Enum> // Enum
         {
-	        {{schema.display_type}}(Ent::Node* _node): String(_node) {}
-            {{#values}}static constexpr char {{escaped_name}}[] = "{{name}}";
-            {{/values}}
-        };{{/schema.enum}}{{#schema.union}}
+            using Enum = {{schema.display_type}}Enum;
+            using PropHelper<{{schema.display_type}}, Enum>::operator=;
+	        {{schema.display_type}}(Ent::Node* _node): EnumPropHelper<{{schema.display_type}}, Enum>(_node) {}
+            static constexpr char* enumToString[] = {
+                {{#values}}"{{name}}",
+                {{/values}}
+            };
+        };
+        char const* toInternal({{schema.display_type}}Enum value)
+        {
+            if(size_t(value) >= std::size({{schema.display_type}}::enumToString))
+                throw std::runtime_error("Wrong enum value");
+            return {{schema.display_type}}::enumToString[size_t(value)];
+        }
+        {{/schema.enum}}{{#schema.union}}
         struct {{schema.display_type}} : Base // Union
         {
 	        {{schema.display_type}}(Ent::Node* _node): Base(_node) {}

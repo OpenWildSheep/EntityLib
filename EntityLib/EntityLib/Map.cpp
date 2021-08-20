@@ -667,7 +667,8 @@ std::vector<Ent::String> Ent::Map::getKeysString() const
     keys.reserve(m_items.size());
     for (auto& elt : m_items)
     {
-        keys.push_back(getChildKey(m_schema, elt.node.get()).get<Ent::String>());
+        if (elt.isPresent.get())
+            keys.push_back(getChildKey(m_schema, elt.node.get()).get<Ent::String>());
     }
     return keys;
 }
@@ -683,7 +684,8 @@ std::vector<int64_t> Ent::Map::getKeysInt() const
     keys.reserve(m_items.size());
     for (auto& elt : m_items)
     {
-        keys.push_back(getChildKey(m_schema, elt.node.get()).get<int64_t>());
+        if (elt.isPresent.get())
+            keys.push_back(getChildKey(m_schema, elt.node.get()).get<int64_t>());
     }
     return keys;
 }

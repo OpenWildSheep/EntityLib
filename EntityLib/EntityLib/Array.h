@@ -150,13 +150,13 @@ namespace Ent
 
     inline std::vector<String> Ent::Array::getKeysString() const
     {
-        ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only getItemsWithRemoved on map or set");
+        ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only getKeysString on map or set");
         return m_data.get<Map>().getKeysString();
     }
 
     inline std::vector<int64_t> Ent::Array::getKeysInt() const
     {
-        ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only getItemsWithRemoved on map or set");
+        ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only getKeysInt on map or set");
         return m_data.get<Map>().getKeysInt();
     }
 

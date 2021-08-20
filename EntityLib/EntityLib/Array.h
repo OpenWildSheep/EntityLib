@@ -95,6 +95,9 @@ namespace Ent
         void setParentNode(Node* _parentNode);
         void checkParent(Node const* _parentNode) const;
 
+        std::vector<String> getKeysString() const;
+        std::vector<int64_t> getKeysInt() const;
+
     private:
         void checkInvariants() const;
 
@@ -143,6 +146,18 @@ namespace Ent
     inline void Ent::Array::checkParent(Node const* _parent) const
     {
         apply_visitor([&](auto& a) { a.checkParent(_parent); }, m_data);
+    }
+
+    inline std::vector<String> Ent::Array::getKeysString() const
+    {
+        ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only getItemsWithRemoved on map or set");
+        return m_data.get<Map>().getKeysString();
+    }
+
+    inline std::vector<int64_t> Ent::Array::getKeysInt() const
+    {
+        ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only getItemsWithRemoved on map or set");
+        return m_data.get<Map>().getKeysInt();
     }
 
 } // namespace Ent

@@ -87,10 +87,19 @@ static void addDef(
     std::string const& name, Ent::Subschema const* def, std::string const& scope, bool overwrite = false)
 {
     auto escapedName = escapeName(name);
-    if (allDefs.count(escapedName) == 0 or overwrite)
+    if (allDefs.count(escapedName) == 0)
     {
         allDefs[escapedName] = def;
         schemaName[def] = escapedName;
+    }
+    else if (overwrite)
+    {
+        // Check if there is two enum at with the same name
+        if (def->enumValues != allDefs.at(escapedName)->enumValues)
+        {
+            fprintf(stderr, "Two enums with the same name!! %s", name.c_str());
+        }
+        schemaName[def] = escapedName; // Several def for the same name
     }
     else
     {
@@ -270,7 +279,7 @@ static json getSchemaType(Ent::Subschema const& schema)
             ref["name"] = typeDispName;
             type["ref"] = std::move(ref);
             // It works because in the schema, Enums are always strings
-            type["ref"]["py_native"] = schema.name.empty() ? "str" : schema.name + "_enum";
+            type["ref"]["py_native"] = schema.name.empty() ? "str" : schema.name + "Enum";
             type["ref"]["cpp_native"] = schema.name.empty() ? "char const*" : schema.name + "Enum";
             return type;
         }
@@ -398,11 +407,14 @@ static json getSchemaData(Ent::Subschema const& schema)
             enumNode["type"] = prim("String");
             enumNode["type"]["ref"]["cpp_native"] = schema.name + "Enum";
             enumNode["type"]["ref"]["py_native"] = schema.name + "Enum";
+            size_t idx = 0;
             for (auto&& val : schema.enumValues)
             {
                 enumNode["values"].push_back(json::value_t::object);
                 enumNode["values"].back()["escaped_name"] = escapeName(val);
                 enumNode["values"].back()["name"] = val;
+                enumNode["values"].back()["value"] = idx;
+                ++idx;
             }
             defData["enum"] = std::move(enumNode);
             break;
@@ -489,7 +501,7 @@ static void giveNameToAnonymousObjectRef(
             if (not ref->name.empty())
             {
                 // The same enum can be descibe several time
-                // TODO : Loïc : Fix the export of enums in Wild (Export each enum only one time, like classes)
+                // TODO : LoÃ¯c : Fix the export of enums in Wild (Export each enum only one time, like classes)
                 addDef(ref->name, &(*ref), "", true);
             }
             else
@@ -722,7 +734,7 @@ void genpy()
     auto add_partials = [](data& root) {
         root["display_type"] = partial([]() {
             return R"({{#object_set}}ObjectSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/object_set}})"
-                   R"({{#prim_set}}PrimitiveSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/prim_set}})"
+                   R"({{#prim_set}}PrimitiveSet[{{type.ref.cpp_native}}]{{/prim_set}})"
                    R"({{#map}}Map[{{key_type.ref.py_native}}, {{#value_type}}{{>display_type_comma}}{{/value_type}}]{{/map}})"
                    R"({{#ref}}{{name}}{{/ref}})"
                    R"({{#array}}Array[{{#type}}{{>display_type_comma}}{{/type}}]{{/array}})"
@@ -740,7 +752,7 @@ void genpy()
         });
         root["type_ctor"] = partial([]() {
             return R"({{#object_set}}(lambda n: ObjectSet({{#type}}{{>type_ctor}}{{/type}}, n)){{/object_set}})"
-                   R"({{#prim_set}}(lambda n: PrimitiveSet({{#type}}{{>type_ctor}}{{/type}}, n)){{/prim_set}})"
+                   R"({{#prim_set}}(lambda n: PrimitiveSet({{type.ref.py_native}}, n)){{/prim_set}})"
                    R"({{#map}}(lambda n: Map({{key_type.ref.py_native}}, {{#value_type}}{{>type_ctor}}{{/value_type}}, n)){{/map}})"
                    R"({{#ref}}{{name}}{{/ref}})"
                    R"({{#array}}(lambda n: Array({{#type}}{{>type_ctor}}{{/type}}, n)){{/array}})"
@@ -836,6 +848,7 @@ class {{schema.display_type}}(Base):
 
 from entgen_helpers import *
 import EntityLibPy
+from enum import Enum
 
 {{#all_definitions}}{{#schema.union_set}}{{schema.display_type}} = UnionSet
 {{/schema.union_set}}{{#schema.object_set}}
@@ -844,9 +857,13 @@ class {{schema.display_type_comma}}(UnionSet):
 {{/schema.object_set}}{{#schema.prim_set}}
 class {{schema.display_type_comma}}(UnionSet):
     pass
-{{/schema.prim_set}}{{/all_definitions}}
+{{/schema.prim_set}}{{#schema.enum}}
+class {{schema.display_type}}Enum(Enum):
+    {{#values}}{{escaped_name}} = "{{name}}"
+    {{/values}}
 
-{{#all_definitions}}{{#schema.alias}}{{schema.display_type}} = {{#type}}{{>type_ctor}}{{/type}}  # alias
+
+{{/schema.enum}}{{/all_definitions}}{{#all_definitions}}{{#schema.alias}}{{schema.display_type}} = {{#type}}{{>type_ctor}}{{/type}}  # alias
 {{/schema.alias}}{{/all_definitions}}
 
 
@@ -861,10 +878,15 @@ class {{schema.display_type_comma}}(UnionSet):
     pass
 
 
-{{/schema.union}}{{#schema.enum}}class {{schema.display_type}}(String):  # Enum
-    {{#values}}{{escaped_name}} = "{{name}}"
-    {{/values}}
-    pass
+{{/schema.union}}{{#schema.enum}}class {{schema.display_type}}(Primitive[{{schema.display_type}}Enum]):  # Enum
+    def __init__(self, node):
+        super().__init__({{schema.display_type}}Enum, node)
+    def __call__(self, node):  # type: (EntityLibPy.Node) -> {{schema.display_type}}
+        return {{schema.display_type}}(node)
+    def set(self, val):  # type: ({{schema.display_type}}Enum) -> None
+        return self._node.set_string(val.value)
+    def get(self):  # type: () -> T
+        return self._item_type(self._node.value)
 
 
 {{/schema.enum}}{{#schema.tuple}}class {{schema.display_type}}(TupleNode[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):

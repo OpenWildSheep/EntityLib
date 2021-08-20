@@ -26,23 +26,36 @@ pos = ent.Components.get(TransformGD).Position  # inferred type : Array[Float]
 x = tgd.Position[0]                             # inferred type : Float
 
 # Test set of primitive
-side = turret.ReviveSideTargeted   # inferred type : PrimitiveSet[ReviveSideTargetedItem_ReviveSide]
+side = turret.ReviveSideTargeted   # inferred type : PrimitiveSet[ReviveSideEnum]
 assert isinstance(side, PrimitiveSet)
-turret.ReviveSideTargeted.add(ReviveSideTargetedItem_ReviveSide.neutral)
-turret.ReviveSideTargeted.add("cursed")  # Still posible with string
+turret.ReviveSideTargeted.add(ReviveSideEnum.neutral)
+turret.ReviveSideTargeted.add(ReviveSideEnum.cursed)
 # turret.ReviveSideTargeted.remove("neutral")
-assert isinstance(turret.ReviveSideTargeted["cursed"].value, str)
-assert turret.ReviveSideTargeted[ReviveSideTargetedItem_ReviveSide.cursed].value == \
-       ReviveSideTargetedItem_ReviveSide.cursed
+assert turret.ReviveSideTargeted.count(ReviveSideEnum.cursed)
 # turret.ReviveSideTargeted.erase("cursed")
-sacred = turret.ReviveSideTargeted.add(ReviveSideTargetedItem_ReviveSide.sacred)  # inferred type : String
+turret.ReviveSideTargeted.add(ReviveSideEnum.sacred)  # inferred type : String
 # del turret.ReviveSideTargeted["sacred"]
+
+# Test Enum prop
+# Do we want that a property of type BeamStaffModeEnum:
+#     ent.Components.add(BeamTargetGD).Mode = BeamStaffModeEnum.Hatching
+#     mode = ent.Components.add(BeamTargetGD).Mode  # return BeamStaffModeEnum
+#     assert mode == BeamStaffModeEnum.Hatching
+# Or do we want an object to manipulate the Node:
+mode = ent.Components.add(BeamTargetGD).Mode  # inferred type: BeamStaffMode
+assert isinstance(mode, BeamStaffMode)
+mode.value = BeamStaffModeEnum.Hatching
+assert isinstance(mode, BeamStaffMode)
+enm = mode.value
+assert enm is BeamStaffModeEnum.Hatching
+
 
 # Test primitive types
 assert ent.Name.value == "PlayerSpawner_"
 assert ent.Name.get() == "PlayerSpawner_"
 # ent.Name = "PlayerSpawner_2"  # Not possible
 ent.Name.set("PlayerSpawner_2")
+ent.Name.value = "PlayerSpawner_2"
 assert ent.Name.get() == "PlayerSpawner_2"
 assert ent.Name.is_set() is True
 ent.Name.unset()
@@ -76,6 +89,16 @@ b = tags.get("b")               # inferred type : PrimitiveSet[String]
 tags.remove("c")
 c = tags.add("c")               # inferred type : PrimitiveSet[String]
 
+# Test Map with enum key
+stamps = ent.Components.add(EnvStampGD).Stamps
+stamps.add(RegenerationStateEnum.Dead)
+stamps.add(RegenerationStateEnum.Dead)
+deadArr = stamps.get(RegenerationStateEnum.Dead)
+assert deadArr.node is not None
+lushArr = stamps.get(RegenerationStateEnum.Lush)
+assert lushArr.node is None
+stamps.remove(RegenerationStateEnum.Dead)
+assert stamps.get(RegenerationStateEnum.Dead).node is None
 
 # other
 # scp = EntityStateCreatureProfile(None)

@@ -1,5 +1,6 @@
 MYPY = False
 from typing import TypeVar, Generic, Tuple, Type, Callable, Any
+from enum import Enum
 import EntityLibPy
 import inspect
 
@@ -30,7 +31,11 @@ class Primitive(Base, Generic[T]):
 
     @property
     def value(self):  # type: () -> T
-        return self._item_type(self._node.value)
+        return self.get()
+
+    @value.setter
+    def value(self, val):  # type: (T) -> None
+        self.set(val)
 
     def get(self):  # type: () -> T
         return self._item_type(self._node.value)
@@ -154,22 +159,30 @@ V = TypeVar("V")
 class Map(Base, Generic[K, V]):
     def __init__(self, key_type, item_ctor, node = None):  # type: (Type[K], Callable[[Any], V], EntityLibPy.Node) -> None
         super().__init__(node)
+        self._key_type = key_type
         self._item_ctor = item_ctor
 
     def __call__(self, node):       # type: (...) -> MapClass[K, V]
        return  Map(self._item_ctor, node)
 
+    def to_internal(self, key):  # type : (T) -> T
+        if issubclass(type(key), Enum):
+            return key.value
+        else:
+            return key
+
     def get(self, key):             # type: (K) -> V
-        return self._item_ctor(self._node.map_get(key))
+        return self._item_ctor(self._node.map_get(self.to_internal(key)))
 
     def add(self, key):
-        return self._item_ctor(self._node.map_insert(key))
+        assert type(key) == self._key_type
+        return self._item_ctor(self._node.map_insert(self.to_internal(key)))
 
     def remove(self, key):          # type: (K) -> None
-        self._node.map_erase(key)
+        self._node.map_erase(self.to_internal(key))
 
     def __getitem__(self, key):     # type: (K) -> V
-        return self._item_ctor(self._node.map_get(key))
+        return self._item_ctor(self._node.map_get(self.to_internal(key)))
 
     def __len__(self):
         return self._node.size()
@@ -181,19 +194,23 @@ class PrimitiveSet(Base, Generic[T]):
         self._item_ctor = item_ctor
 
     def __call__(self, node):  # type: (...) -> PrimitiveSetClass[T]
-       return  PrimitiveSetClass(self._item_ctor, node)
+       return  PrimitiveSet(self._item_ctor, node)
 
-    def get(self, key):  # type: (...) -> T
-        return self._item_ctor(self._node.map_get(key))
+    def to_internal(self, key):  # type : (T) -> T
+        if issubclass(type(key), Enum):
+            return key.value
+        else:
+            return key
 
-    def add(self, key):  # type: (...) -> T
-        return self._item_ctor(self._node.map_insert(key))
+    def add(self, key):  # type: (T) -> None
+        assert type(key) == self._item_ctor
+        self._node.map_insert(self.to_internal(key))
+
+    def count(self, key):  # type: (T) -> bool
+        return self._node.map_get(self.to_internal(key)) is not None
 
     # def remove(self, key):
     #    self._node.map_erase(key)
-
-    def __getitem__(self, key):  # type: (...) -> T
-        return self._item_ctor(self._node.map_get(key))
 
     def __len__(self):
         return self._node.size()

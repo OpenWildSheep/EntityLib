@@ -193,7 +193,7 @@
         },
         {
             "Data": {
-                "InstanceOf": "test.SeedPatch2.node"
+                "InstanceOf": "test.CharacterControllerGD.node"
             },
             "Type": "CharacterControllerGD",
             "Version": 1

@@ -519,7 +519,9 @@ try
     {
         auto const nodeCachesize = entlib.getNodeCache().size();
         Ent::Node ent = entlib.loadEntityAsNode("prefab.copy.entity");
-        ENTLIB_ASSERT(entlib.getNodeCache().size() == nodeCachesize + 1);
+        auto const newNodeCachesize = entlib.getNodeCache().size();
+        ENTLIB_ASSERT(
+            newNodeCachesize == nodeCachesize + 2); // "prefab.copy.entity" and "test.SeedPatch.node"
         // TEST simple entity refs resolution
         Ent::Node* testEntityRef = ent.at("Components")->mapGet("TestEntityRef")->getUnionData();
         ENTLIB_ASSERT(testEntityRef != nullptr);
@@ -946,8 +948,9 @@ try
         ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD")->hasOverride());
         // Component with instanceOf overriden
         auto compWithInstOf = ent->getComponent("CharacterControllerGD");
-        compWithInstOf->root.resetInstanceOf("test.SeedPatch2.node");
-        ENTLIB_ASSERT(compWithInstOf->root.getInstanceOf() == std::string("test.SeedPatch2.node"));
+        compWithInstOf->root.resetInstanceOf("test.CharacterControllerGD.node");
+        ENTLIB_ASSERT(
+            compWithInstOf->root.getInstanceOf() == std::string("test.CharacterControllerGD.node"));
         ENTLIB_ASSERT(compWithInstOf->hasOverride());
         // *************** NODE ***************
         // new Node
@@ -1183,7 +1186,8 @@ try
         ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD")->hasOverride());
         // Component with instanceOf overriden
         auto compWithInstOf = ent->getComponent("CharacterControllerGD");
-        ENTLIB_ASSERT(compWithInstOf->root.getInstanceOf() == std::string("test.SeedPatch2.node"));
+        ENTLIB_ASSERT(
+            compWithInstOf->root.getInstanceOf() == std::string("test.CharacterControllerGD.node"));
         ENTLIB_ASSERT(compWithInstOf->hasOverride());
         // *************** NODE ***************
         // new Node

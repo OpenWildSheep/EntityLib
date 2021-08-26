@@ -655,3 +655,37 @@ void Ent::Map::checkParent(Node const* _parentNode) const
         elt.node->checkParent(_parentNode);
     }
 }
+
+std::vector<Ent::String> Ent::Map::getKeysString() const
+{
+    auto const keyType = getKeyType(m_schema);
+    if (keyType != Ent::DataType::string and keyType != Ent::DataType::entityRef)
+    {
+        throw ContextException("Can't call 'getKeysString' if key is not string or entityRef");
+    }
+    std::vector<String> keys;
+    keys.reserve(m_items.size());
+    for (auto& elt : m_items)
+    {
+        if (elt.isPresent.get())
+            keys.push_back(getChildKey(m_schema, elt.node.get()).get<Ent::String>());
+    }
+    return keys;
+}
+
+std::vector<int64_t> Ent::Map::getKeysInt() const
+{
+    auto const keyType = getKeyType(m_schema);
+    if (keyType != Ent::DataType::integer)
+    {
+        throw ContextException("Can't call 'getKeysInt' if key is not integer");
+    }
+    std::vector<int64_t> keys;
+    keys.reserve(m_items.size());
+    for (auto& elt : m_items)
+    {
+        if (elt.isPresent.get())
+            keys.push_back(getChildKey(m_schema, elt.node.get()).get<int64_t>());
+    }
+    return keys;
+}

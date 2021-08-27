@@ -1481,13 +1481,9 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
         for (json const& compNode : componentsNode)
         {
             auto const cmpType = compNode.at("Type").get<std::string>();
-            if (componentTypes.find(cmpType) != componentTypes.end())
+            if (not componentTypes.insert(cmpType).second)
             {
                 ENTLIB_LOG_ERROR("Two Components of same type: %s", cmpType.c_str());
-            }
-            else
-            {
-                componentTypes.insert(cmpType);
             }
             json const& data = compNode.at("Data");
             if (data.is_null())

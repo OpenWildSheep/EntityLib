@@ -1472,6 +1472,7 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
 
     std::map<std::string, Ent::Component> components;
     std::set<std::string> removedComponents;
+    std::set<std::string> componentTypes;
     std::unique_ptr<Ent::SubSceneComponent> subSceneComponent;
     size_t index = 0;
     if (_entNode.count("Components") != 0)
@@ -1480,6 +1481,10 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
         for (json const& compNode : componentsNode)
         {
             auto const cmpType = compNode.at("Type").get<std::string>();
+            if (not componentTypes.insert(cmpType).second)
+            {
+                ENTLIB_LOG_ERROR("Two Components of same type: %s", cmpType.c_str());
+            }
             json const& data = compNode.at("Data");
             if (data.is_null())
             {

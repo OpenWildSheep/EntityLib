@@ -33,6 +33,17 @@ void main()
     auto pos =
         ent.Components().get<TransformGD>().Position(); // inferred type : Vector3
     auto x = tgd.Position()[0]; // inferred type : Float
+    // Copy point into Node
+    double arr[] = {1.f, 2.f, 3.f};
+    tgd.Position() = std::vector<double>{1.f, 2.f, 3.f};
+    tgd.Position() = std::array<double, 3>{1.f, 2.f, 3.f};
+    tgd.Position() = std::tuple{1.f, 2.f, 3.f};
+    tgd.Position() = std::initializer_list<double>{1.f, 2.f, 3.f};
+    tgd.Position() = arr;
+    // Copy Node into point
+    std::vector<double> v = tgd.Position();
+    std::array<double, 3> a = tgd.Position();
+    std::tuple<double, double, double> t = tgd.Position();
 
     // Test set of primitive
     auto side =

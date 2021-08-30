@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <tuple>
 #include <string_view>
 #include <optional>
 
@@ -49,6 +50,12 @@ namespace Ent
         {
             struct iterator
             {
+                using iterator_category = std::forward_iterator_tag;
+                using value_type = T;
+                using difference_type = size_t;
+                using pointer = std::optional<T>;
+                using reference = T;
+
                 Ent::Node* node;
                 size_t index;
 
@@ -115,6 +122,55 @@ namespace Ent
             void pop_back()
             {
                 node->pop();
+            }
+
+            template <typename T, std::size_t... Is>
+            void copyFromTuple(T const& rho, std::index_sequence<Is...>)
+            {
+                (operator[](Is).set(std::get<Is>(rho)), ...);
+            }
+
+            template <typename T>
+            Array& operator=(T const& rho)
+            {
+                ENT_IF_COMPILE(T, arr, std::get<0>(arr)) // tuple, c-style array and std::array
+                {
+                    if (std::tuple_size_v<T> != size())
+                        throw std::runtime_error(R"(Incompatible array size in 'Array::operator=')");
+                    copyFromTuple(rho, std::make_index_sequence<std::tuple_size_v<T>>{});
+                }
+                else ENT_IF_COMPILE(T, arr, std::size(arr)) // All other dynamic containers
+                {
+                    if (std::size(rho) != size())
+                        throw std::runtime_error(R"(Incompatible array size in 'Array::operator=')");
+                    std::copy(std::begin(rho), std::end(rho), begin());
+                }
+                else static_assert(false, "Unknown array type");
+                return *this;
+            }
+
+            template <typename T, std::size_t... Is>
+            void copyToTuple(T& point, std::index_sequence<Is...>)
+            {
+                ((std::get<Is>(point) = operator[](Is).get()), ...);
+            }
+
+            template <typename T>
+            operator T()
+            {
+                T result;
+                ENT_IF_COMPILE(T, arr, std::get<0>(arr)) // tuple, c-style array and std::array
+                {
+                    if (std::tuple_size_v<T> != size())
+                        throw std::runtime_error(R"(Incompatible array size in 'Array::operator=')");
+                    copyToTuple(result, std::make_index_sequence<std::tuple_size_v<T>>{});
+                }
+                else ENT_IF_COMPILE(T, arr, std::size(arr)) // All other dynamic containers
+                {
+                    std::copy(begin(), end(), std::back_inserter(result));
+                }
+                else static_assert(false, "Unknown array type");
+                return result;
             }
 
             /*std::vector<T> getItems()

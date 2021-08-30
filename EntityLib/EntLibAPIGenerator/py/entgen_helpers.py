@@ -129,6 +129,22 @@ class Array(Base, Generic[T]):
         return self._node.size()
 
 
+class PrimArray(Array[T], Generic[T]):
+    def set(self, values):  # type: ([T]) -> None
+        for i in range(self._node.size()):
+            self._node.at(i).value = values[i]
+
+    @property
+    def value(self):  # type: (...) -> [T]
+        return [self._node.at(i).value for i in range(self._node.size())]
+    @value.setter
+    def value(self, values):  # type: (...) -> [T]
+        self.set(values)
+
+    def __setitem__(self, idx, value):  # type: (int, ...) -> None
+        self._node.at(idx).value = value
+
+
 class ObjectSet(Base, Generic[T]):
     def __init__(self, item_ctor, node = None): # type: (Callable[[Any], T], EntityLibPy.Node) -> None
         super().__init__(node)

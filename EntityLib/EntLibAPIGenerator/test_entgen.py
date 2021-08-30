@@ -24,6 +24,15 @@ assert isinstance(turret, TurretComponentGD)
 # Test fixed size array
 pos = ent.Components.get(TransformGD).Position  # inferred type : Array[Float]
 x = tgd.Position[0]                             # inferred type : Float
+# Copy point into Node double
+tgd.Position = (1., 2., 3.)
+tgd.Position = [1., 2., 3.]
+# Copy Node into point
+v = tgd.Position.value
+assert v == [1., 2., 3.]
+tgd.Position.value = [4., 5., 6.]
+v = tgd.Position.value
+assert v == [4., 5., 6.]
 
 # Test set of primitive
 side = turret.ReviveSideTargeted   # inferred type : PrimitiveSet[ReviveSideEnum]
@@ -54,9 +63,12 @@ assert enm is BeamStaffModeEnum.Hatching
 assert ent.Name.value == "PlayerSpawner_"
 assert ent.Name.get() == "PlayerSpawner_"
 # ent.Name = "PlayerSpawner_2"  # Not possible
-ent.Name.set("PlayerSpawner_2")
+ent.Name.set("PlayerSpawner_3")
+assert ent.Name.get() == "PlayerSpawner_3"
 ent.Name.value = "PlayerSpawner_2"
 assert ent.Name.get() == "PlayerSpawner_2"
+ent.Name = "PlayerSpawner_4"
+assert ent.Name.get() == "PlayerSpawner_4"
 assert ent.Name.is_set() is True
 ent.Name.unset()
 assert ent.Name.is_set() is False

@@ -34,12 +34,13 @@ void main()
         ent.Components().get<TransformGD>().Position(); // inferred type : Vector3
     auto x = tgd.Position()[0]; // inferred type : Float
     // Copy point into Node
-    double arr[] = {1.f, 2.f, 3.f};
-    tgd.Position() = std::vector<double>{1.f, 2.f, 3.f};
-    tgd.Position() = std::array<double, 3>{1.f, 2.f, 3.f};
-    tgd.Position() = std::tuple{1.f, 2.f, 3.f};
-    tgd.Position() = std::initializer_list<double>{1.f, 2.f, 3.f};
+    double arr[] = {1., 2., 3.};
+    tgd.Position() = std::vector<double>{1., 2., 3.};
+    tgd.Position() = std::array<double, 3>{1., 2., 3.};
+    tgd.Position() = std::tuple{1., 2., 3.};
+    tgd.Position() = std::initializer_list<double>{1., 2., 3.};
     tgd.Position() = arr;
+    tgd.Position()[1] = 2.;
     // Copy Node into point
     std::vector<double> v = tgd.Position();
     std::array<double, 3> a = tgd.Position();

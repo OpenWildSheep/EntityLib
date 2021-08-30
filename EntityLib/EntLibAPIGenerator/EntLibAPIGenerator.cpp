@@ -131,6 +131,7 @@ static json makeNewType()
 {
     json type;
     type["array"] = false;
+    type["prim_array"] = false;
     type["union_set"] = false;
     type["object_set"] = false;
     type["prim_set"] = false;
@@ -157,9 +158,17 @@ auto prim = [](char const* name) {
         ref["py_native"] = "int";
         ref["cpp_native"] = "int64_t";
     }
+    ref["settable"] = true;
     type["ref"] = std::move(ref);
     return type;
 };
+
+static std::set<Ent::DataType> primitiveTypes = {
+    Ent::DataType::boolean,
+    Ent::DataType::integer,
+    Ent::DataType::number,
+    Ent::DataType::string,
+    Ent::DataType::entityRef};
 
 char const* primitiveName(Ent::DataType type)
 {
@@ -172,6 +181,18 @@ char const* primitiveName(Ent::DataType type)
     case Ent::DataType::entityRef: return "EntityRef";
     }
     ENTLIB_LOGIC_ERROR("Unexpected DataType");
+}
+
+static bool isPrimArray(Ent::Subschema const& ref)
+{
+    if (auto singularItems = ref.singularItems.get())
+    {
+        return primitiveTypes.count(singularItems->get().type) != 0;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 static json getSchemaType(Ent::Subschema const& schema)
@@ -233,10 +254,20 @@ static json getSchemaType(Ent::Subschema const& schema)
                 type["map"] = std::move(array);
                 return type;
             }
-            json array;
-            array["type"] = getSchemaRefType(*schema.singularItems);
-            type["array"] = std::move(array);
-            return type;
+            else if (isPrimArray(schema))
+            {
+                json array;
+                array["type"] = getSchemaRefType(*schema.singularItems);
+                type["prim_array"] = std::move(array);
+                return type;
+            }
+            else
+            {
+                json array;
+                array["type"] = getSchemaRefType(*schema.singularItems);
+                type["array"] = std::move(array);
+                return type;
+            }
         }
         else
         {
@@ -281,6 +312,7 @@ static json getSchemaType(Ent::Subschema const& schema)
             // It works because in the schema, Enums are always strings
             type["ref"]["py_native"] = schema.name.empty() ? "str" : schema.name + "Enum";
             type["ref"]["cpp_native"] = schema.name.empty() ? "char const*" : schema.name + "Enum";
+            type["ref"]["settable"] = true;
             return type;
         }
         else
@@ -303,6 +335,7 @@ static json getSchemaRefType(Ent::SubschemaRef const& ref)
         auto name = getRefTypeName(singItmRef);
         json typeref;
         typeref["name"] = name;
+        typeref["settable"] = isPrimArray(*ref) or primitiveTypes.count(ref->type) != 0;
         json type = makeNewType();
         type["ref"] = std::move(typeref);
         return type;
@@ -315,6 +348,7 @@ static json getSchemaData(Ent::Subschema const& schema)
     defData["alias"] = false;
     defData["object"] = false;
     defData["array"] = false;
+    defData["prim_array"] = false;
     defData["union_set"] = false;
     defData["object_set"] = false;
     defData["prim_set"] = false;
@@ -598,7 +632,7 @@ void gencpp()
         return R"cpp(Ent::Gen::Map<{{key_type.ref.cpp_native}}, {{#value_type}}{{>display_type}}{{/value_type}}>)cpp";
     });
     rootData["display_type"] = partial([]() {
-        return R"cpp({{#object_set}}{{>object_set_type}}{{/object_set}}{{#prim_set}}{{>prim_set_type}}{{/prim_set}}{{#map}}{{>map_type}}{{/map}}{{#ref}}Ent::Gen::{{name}}{{/ref}}{{#array}}Array<{{#type}}{{>display_type}}{{/type}}>{{/array}}{{#union_set}}UnionSet<{{#type}}{{>display_type}}{{/type}}>{{/union_set}}{{#tuple}}{{>tuple_type}}{{/tuple}}{{#comma}}, {{/comma}})cpp";
+        return R"cpp({{#object_set}}{{>object_set_type}}{{/object_set}}{{#prim_set}}{{>prim_set_type}}{{/prim_set}}{{#map}}{{>map_type}}{{/map}}{{#ref}}Ent::Gen::{{name}}{{/ref}}{{#array}}Array<{{#type}}{{>display_type}}{{/type}}>{{/array}}{{#prim_array}}PrimArray<{{#type}}{{>display_type}}{{/type}}>{{/prim_array}}{{#union_set}}UnionSet<{{#type}}{{>display_type}}{{/type}}>{{/union_set}}{{#tuple}}{{>tuple_type}}{{/tuple}}{{#comma}}, {{/comma}})cpp";
     });
 
     mustache tmpl{R"cpp(
@@ -738,6 +772,7 @@ void genpy()
                    R"({{#map}}Map[{{key_type.ref.py_native}}, {{#value_type}}{{>display_type_comma}}{{/value_type}}]{{/map}})"
                    R"({{#ref}}{{name}}{{/ref}})"
                    R"({{#array}}Array[{{#type}}{{>display_type_comma}}{{/type}}]{{/array}})"
+                   R"({{#prim_array}}PrimArray[{{#type}}{{>display_type_comma}}{{/type}}]{{/prim_array}})"
                    R"({{#union_set}}UnionSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/union_set}})"
                    R"({{#tuple}}TupleNode[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]{{/tuple}})";
         });
@@ -756,6 +791,7 @@ void genpy()
                    R"({{#map}}(lambda n: Map({{key_type.ref.py_native}}, {{#value_type}}{{>type_ctor}}{{/value_type}}, n)){{/map}})"
                    R"({{#ref}}{{name}}{{/ref}})"
                    R"({{#array}}(lambda n: Array({{#type}}{{>type_ctor}}{{/type}}, n)){{/array}})"
+                   R"({{#prim_array}}(lambda n: PrimArray({{#type}}{{>type_ctor}}{{/type}}, n)){{/prim_array}})"
                    R"({{#union_set}}(lambda n: UnionSet({{#type}}{{>type_ctor}}{{/type}}, n)){{/union_set}})"
                    R"({{#tuple}}TupleNode{{/tuple}})";
         });
@@ -765,7 +801,8 @@ void genpy()
                    R"({{#map}}{{#value_type}}{{>print_import}}{{/value_type}}{{/map}})"
                    R"({{#ref}}from entgen.{{name}} import *
 {{/ref}})"
-                   R"({{#array}}{{#type}}{{>print_import}}{{/type}}{{/array}})";
+                   R"({{#array}}{{#type}}{{>print_import}}{{/type}}{{/array}})"
+                   R"({{#prim_array}}{{#type}}{{>print_import}}{{/type}}{{/prim_array}})";
         });
     };
 
@@ -809,8 +846,13 @@ class {{schema.display_type_comma}}(UnionSet):
 
 class {{schema.display_type}}(Base):
 {{#properties}}{{#type}}    @property
-    def {{prop_name}}(self): return {{>type_ctor}}(self._node.at("{{prop_name}}"))
-{{/type}}
+    def {{prop_name}}(self): return {{>type_ctor}}(self._node.at("{{prop_name}}")){{#prim_array}}
+    @{{prop_name}}.setter
+    def {{prop_name}}(self, val): self.{{prop_name}}.set(val)
+{{/prim_array}}{{#ref.settable}}
+    @{{prop_name}}.setter
+    def {{prop_name}}(self, val): self.{{prop_name}}.set(val)
+{{/ref.settable}}{{/type}}
 {{/properties}}    pass
 
 
@@ -869,8 +911,13 @@ class {{schema.display_type}}Enum(Enum):
 
 {{#all_definitions}}{{#schema.object}}class {{schema.display_type}}(Base):
 {{#properties}}{{#type}}    @property
-    def {{prop_name}}(self): return {{>type_ctor}}(self._node.at("{{prop_name}}"))
-{{/type}}
+    def {{prop_name}}(self): return {{>type_ctor}}(self._node.at("{{prop_name}}")){{#prim_array}}
+    @{{prop_name}}.setter
+    def {{prop_name}}(self, val): self.{{prop_name}}.set(val)
+{{/prim_array}}{{#ref.settable}}
+    @{{prop_name}}.setter
+    def {{prop_name}}(self, val): self.{{prop_name}}.set(val)
+{{/ref.settable}}{{/type}}
 {{/properties}}    pass
 
 

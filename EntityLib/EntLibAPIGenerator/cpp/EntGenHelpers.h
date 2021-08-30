@@ -124,6 +124,25 @@ namespace Ent
                 node->pop();
             }
 
+            /*std::vector<T> getItems()
+            {
+                std::vector<T> items;
+                for (size_t i = 0; i < node->size(); ++i)
+                {
+                    items.emplace_back(node->at(i));
+                }
+                return items;
+            }*/
+        };
+
+        template <typename T>
+        struct PrimArray : Array<T>
+        {
+            PrimArray(Ent::Node* _node)
+                : Array(_node)
+            {
+            }
+
             template <typename T, std::size_t... Is>
             void copyFromTuple(T const& rho, std::index_sequence<Is...>)
             {
@@ -172,16 +191,6 @@ namespace Ent
                 else static_assert(false, "Unknown array type");
                 return result;
             }
-
-            /*std::vector<T> getItems()
-            {
-                std::vector<T> items;
-                for (size_t i = 0; i < node->size(); ++i)
-                {
-                    items.emplace_back(node->at(i));
-                }
-                return items;
-            }*/
         };
 
         template <typename T>

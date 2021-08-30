@@ -353,13 +353,15 @@ namespace Ent
 
         std::string relativePath = computeRelativePath(thisPath, std::move(entityPath), false);
 
-        return {std::move(relativePath)};
+        return {relativePath};
     }
 
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     Node* EntityLib::getParentEntity(Node* _node)
     {
         return getSceneParentEntity(_node->getParentNode());
     }
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     Node const* EntityLib::getParentEntity(Node const* _node)
     {
         return getSceneParentEntity(_node->getParentNode());
@@ -654,6 +656,12 @@ Ent::Node Ent::EntityLib::loadNode(
                 // Do not inherit from _super since the override of InstanceOf reset the Entity
                 prefabNode = loadFileAsNode(nodeFileName, _nodeSchema);
                 _super = &prefabNode;
+                if (_super->getSchema() != &_nodeSchema)
+                {
+                    throw ContextException(
+                        "File %s loaded with two different schemas",
+                        formatPath(rawdataPath, nodeFileName));
+                }
                 object.instanceOfFieldIndex = getFieldIndex(_data, *InstanceOfIter);
                 object.instanceOf = prefabNode.value.get<Object>().instanceOf.makeOverridedInstanceOf(
                     InstanceOfIter->get<std::string>());
@@ -1464,6 +1472,7 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
 
     std::map<std::string, Ent::Component> components;
     std::set<std::string> removedComponents;
+    std::set<std::string> componentTypes;
     std::unique_ptr<Ent::SubSceneComponent> subSceneComponent;
     size_t index = 0;
     if (_entNode.count("Components") != 0)
@@ -1472,6 +1481,10 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
         for (json const& compNode : componentsNode)
         {
             auto const cmpType = compNode.at("Type").get<std::string>();
+            if (not componentTypes.insert(cmpType).second)
+            {
+                ENTLIB_LOG_ERROR("Two Components of same type: %s", cmpType.c_str());
+            }
             json const& data = compNode.at("Data");
             if (data.is_null())
             {
@@ -1901,11 +1914,13 @@ void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const&
     saveEntity(sceneEntity, _scenePath);
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void Ent::EntityLib::saveNodeAsEntity(Node const* _entity, char const* _relEntityPath) const
 {
     _entity->saveNode(_relEntityPath);
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void Ent::EntityLib::saveNodeAsScene(Node const* _scene, char const* _scenePath) const
 {
     _scene->saveNode(_scenePath);

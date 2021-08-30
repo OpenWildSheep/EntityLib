@@ -93,7 +93,7 @@ namespace Ent
             }
             (*this) = prefabNode.GetRawValue().get<Object>().makeInstanceOf();
             // Set the keyField
-            if (keyField.has_value())
+            if (keyField.has_value() and keyField->isSet()) // Only report the previus ID if it is set
             {
                 for (ObjField& objfield : nodes)
                 {

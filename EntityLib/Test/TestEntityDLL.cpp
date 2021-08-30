@@ -251,7 +251,8 @@ try
 
         // Test default value
         Ent::Component const* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
-        ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->getFloat() == 100.);
+        ENTLIB_ASSERT(
+            voxelSimulationGD->root.at("TransmissionBySecond")->getFloat() == 3.402823466385289e+38);
         ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->isDefault());
         ENTLIB_ASSERT(
             voxelSimulationGD->root.getTypeName()

@@ -798,7 +798,7 @@ void genpy()
         root["print_import"] = partial([]() {
             return R"({{#object_set}}{{#type}}{{>print_import}}{{/type}}{{/object_set}})"
                    R"({{#prim_set}}{{#type}}{{>print_import}}{{/type}}{{/prim_set}})"
-                   R"({{#map}}{{#value_type}}{{>print_import}}{{/value_type}}{{/map}})"
+                   R"({{#map}}{{#value_type}}{{>print_import}}{{/value_type}}{{#key_type}}{{>print_import}}{{/key_type}}{{/map}})"
                    R"({{#ref}}from entgen.{{name}} import *
 {{/ref}})"
                    R"({{#array}}{{#type}}{{>print_import}}{{/type}}{{/array}})"
@@ -834,7 +834,13 @@ class {{schema.display_type_comma}}(UnionSet):
 {{/schema.object_set}}{{#schema.prim_set}}
 class {{schema.display_type_comma}}(UnionSet):
     pass
-{{/schema.prim_set}}{{/file_schema}}
+{{/schema.prim_set}}{{#schema.enum}}
+class {{schema.display_type}}Enum(Enum):
+    {{#values}}{{escaped_name}} = "{{name}}"
+    {{/values}}
+
+
+{{/schema.enum}}{{/file_schema}}
 
 {{#file_schema}}{{#schema.alias}}{{schema.display_type}} = {{#type}}{{>type_ctor}}{{/type}}
 {{/schema.alias}}{{/file_schema}}
@@ -860,7 +866,18 @@ class {{schema.display_type}}(Base):
     pass
 
 
-{{/schema.union}}{{#schema.tuple}}class {{schema.display_type}}(TupleNode[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
+{{/schema.union}}{{#schema.enum}}class {{schema.display_type}}(Primitive[{{schema.display_type}}Enum]):  # Enum
+    def __init__(self, node):
+        super().__init__({{schema.display_type}}Enum, node)
+    def __call__(self, node):  # type: (EntityLibPy.Node) -> {{schema.display_type}}
+        return {{schema.display_type}}(node)
+    def set(self, val):  # type: ({{schema.display_type}}Enum) -> None
+        return self._node.set_string(val.value)
+    def get(self):  # type: () -> T
+        return self._item_type(self._node.value)
+
+
+{{/schema.enum}}{{#schema.tuple}}class {{schema.display_type}}(TupleNode[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
     def __init__(self, node : EntityLibPy.Node = None):
         super().__init__((Int, Int, Float, Float, Float), node)
 

@@ -1,6 +1,20 @@
 import os
-from entgen.inline import *
+# from entgen.inline import *
+import entgen_helpers
+from entgen.Object import *
+from entgen.String import *
+from entgen.SubScene import *
+from entgen.TransformGD import *
+from entgen.HeightObj import *
+from entgen.ActorStateCreature import *
+from entgen.TurretComponentGD import *
+from entgen.BeamTargetGD import *
+from entgen.PathNodeGD import *
+from entgen.EnvStampGD import *
+
 import EntityLibPy as Ent
+
+Entity = Object
 
 entlib = Ent.EntityLib("X:/")
 entlib.rawdata_path = Ent.path(os.path.normpath(os.getcwd() + "/../Test"))

@@ -347,16 +347,16 @@ static json getSchemaData(Ent::Subschema const& schema)
     json defData;
     defData["alias"] = false;
     defData["object"] = false;
-    defData["array"] = false;
-    defData["prim_array"] = false;
     defData["union_set"] = false;
     defData["object_set"] = false;
-    defData["prim_set"] = false;
-    defData["ref"] = false;
     defData["tuple"] = false;
     defData["union"] = false;
     defData["map"] = false;
     defData["enum"] = false;
+    // defData["array"] = false; // Always an alias
+    // defData["prim_array"] = false; // Always an alias
+    // defData["prim_set"] = false;  // Always an alias
+    // defData["ref"] = false;   // A definition can't be a ref
 
     switch (schema.type)
     {
@@ -387,9 +387,10 @@ static json getSchemaData(Ent::Subschema const& schema)
                     || singularType == Ent::DataType::integer || singularType == Ent::DataType::number
                     || singularType == Ent::DataType::string)
                 {
-                    Ent::Subschema const& unionSchema = **schema.singularItems;
-                    defData["prim_set"] = getSchemaData(unionSchema);
-                    defData["prim_set"]["items"] = getSchemaRefType(*schema.singularItems);
+                    // A primitive set is a native type so it is just an alias
+                    json alias(json::value_t::object);
+                    alias["type"] = getSchemaType(schema);
+                    defData["alias"] = std::move(alias);
                     break;
                 }
             }
@@ -831,10 +832,7 @@ import EntityLibPy
 {{/schema.union_set}}{{#schema.object_set}}
 class {{schema.display_type_comma}}(UnionSet):
     pass
-{{/schema.object_set}}{{#schema.prim_set}}
-class {{schema.display_type_comma}}(UnionSet):
-    pass
-{{/schema.prim_set}}{{#schema.enum}}
+{{/schema.object_set}}{{#schema.enum}}
 class {{schema.display_type}}Enum(Enum):
     {{#values}}{{escaped_name}} = "{{name}}"
     {{/values}}
@@ -913,10 +911,7 @@ from enum import Enum
 {{/schema.union_set}}{{#schema.object_set}}
 class {{schema.display_type_comma}}(UnionSet):
     pass
-{{/schema.object_set}}{{#schema.prim_set}}
-class {{schema.display_type_comma}}(UnionSet):
-    pass
-{{/schema.prim_set}}{{#schema.enum}}
+{{/schema.object_set}}{{#schema.enum}}
 class {{schema.display_type}}Enum(Enum):
     {{#values}}{{escaped_name}} = "{{name}}"
     {{/values}}

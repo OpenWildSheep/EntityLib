@@ -18,6 +18,7 @@ from . import GVoxelVolume
 from . import HeightObj
 from . import MaterialRef
 from . import Matrix44
+from . import MeshEdges
 from . import PCloud
 from . import Phys
 from . import SeedPatch

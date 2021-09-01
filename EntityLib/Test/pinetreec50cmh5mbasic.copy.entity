@@ -247,13 +247,19 @@
         },
         {
             "Data": {
-                "Scripts": [
-                    {
-                        "Path": "Pesto/Tree/FXTreeWind.pesto"
-                    },
-                    {
-                        "Path": "Pesto/Fx/smartFx/FxLogTreeTransform_01.pesto"
-                    }
+                "ScriptsMap": [
+                    [
+                        "FXTreeWind",
+                        {
+                            "Path": "Pesto/Tree/FXTreeWind.pesto"
+                        }
+                    ],
+                    [
+                        "FxLogTreeTransform_01",
+                        {
+                            "Path": "Pesto/Fx/smartFx/FxLogTreeTransform_01.pesto"
+                        }
+                    ]
                 ]
             },
             "Type": "ScriptComponentGD",

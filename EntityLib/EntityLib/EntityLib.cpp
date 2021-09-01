@@ -1483,7 +1483,7 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
             auto const cmpType = compNode.at("Type").get<std::string>();
             if (not componentTypes.insert(cmpType).second)
             {
-                ENTLIB_LOG_ERROR("Two Components of same type: %s", cmpType.c_str());
+                throw DuplicateKey(Ent::format("Two Components of same type: '%s'", cmpType.c_str()));
             }
             json const& data = compNode.at("Data");
             if (data.is_null())
@@ -1889,7 +1889,7 @@ void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const&
 {
     // scene entity is named after scene base file name
     auto name = _scenePath.stem().string();
-    
+
     // generate relative wthumb path
     auto thumbNailPath = _scenePath.generic_string() + ".wthumb";
     const auto genericRawdataPath = rawdataPath.generic_string();

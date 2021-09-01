@@ -546,8 +546,10 @@ try
 
         // TEST Tuple hasOverride
         Ent::Component* scriptComponentGD = ent->getComponent("ScriptComponentGD");
-        auto* scripts = scriptComponentGD->root.at("Scripts");
-        auto* wp = scripts->at(0llu)->at("DataSet")->at(0llu)->at("WorldPosition");
+        auto* scripts = scriptComponentGD->root.at("ScriptsMap");
+        auto* cloudStorm = scripts->mapGet("CloudStorm");
+        ENTLIB_ASSERT(cloudStorm != nullptr);
+        auto* wp = cloudStorm->at("DataSet")->at(0llu)->at("WorldPosition");
         ENTLIB_ASSERT(wp->hasOverride() == false);
         ENTLIB_ASSERT(wp->at(0llu)->hasOverride() == false);
 

@@ -270,20 +270,22 @@
             "Version": 1,
             "Type": "ScriptComponentGD",
             "Data": {
-                "Scripts": [
-                    {
-                        "Path": "Pesto/Clouds/CloudStorm.pesto",
-                        "DataSet": [
-                            {
-                                "Name": "BlendDurationIn",
-                                "Float": 7.0
-                            },
-                            {
-                                "Name": "BlendDurationOut",
-                                "Float": 10.0
-                            }
-                        ]
-                    }
+                "ScriptsMap": [[
+                        "CloudStorm",
+                        {
+                            "Path": "Pesto/Clouds/CloudStorm.pesto",
+                            "DataSet": [
+                                {
+                                    "Name": "BlendDurationIn",
+                                    "Float": 7.0
+                                },
+                                {
+                                    "Name": "BlendDurationOut",
+                                    "Float": 10.0
+                                }
+                            ]
+                        }
+                    ]
                 ]
             }
         }, {

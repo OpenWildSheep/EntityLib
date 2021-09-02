@@ -1,6 +1,10 @@
 {
     "ActorStates": [
         {
+            "classData": {},
+            "className": "EntityStatePlayer"
+        },
+        {
             "classData": {
                 "ReviveLifeSigned": 13.0
             },

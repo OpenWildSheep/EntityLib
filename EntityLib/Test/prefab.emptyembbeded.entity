@@ -132,10 +132,7 @@
                         "classData": {},
                         "className": "CineEventTestCurrentGameState"
                     },
-                    {
-                        "classData": {},
-                        "className": "CineEventTriggerPlaySound"
-                    }
+                    {}
                 ]
             },
             "Type": "CinematicGD",
@@ -276,6 +273,18 @@
                 ]
             },
             "Type": "TestSetOfObject",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "UnionArray": [
+                    {}
+                ],
+                "UnionObjectArray": [
+                    {}
+                ]
+            },
+            "Type": "TestUnion",
             "Version": 1
         },
         {

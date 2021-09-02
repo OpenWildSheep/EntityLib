@@ -239,7 +239,7 @@ namespace Ent
     {
         if (value.is<Union>())
         {
-            return value.get<Union>().setUnionType(*getEntityLib(), _type);
+            return value.get<Union>().setUnionType(_type);
         }
         throw BadType();
     }

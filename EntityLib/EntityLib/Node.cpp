@@ -239,7 +239,7 @@ namespace Ent
     {
         if (value.is<Union>())
         {
-            return value.get<Union>().setUnionType(*getEntityLib(), _type);
+            return value.get<Union>().setUnionType(_type);
         }
         throw BadType();
     }
@@ -664,39 +664,13 @@ namespace Ent
     std::vector<String> Node::getKeysString() const
     {
         checkMap("getKeysString");
-        auto const keyType = Node::getKeyType();
-        if (keyType != Ent::DataType::string and keyType != Ent::DataType::entityRef)
-        {
-            throw ContextException("Can't call 'getKeysString' if key is not string or entityRef");
-        }
-        auto const& arr = value.get<Array>();
-        auto const arrSize = arr.size();
-        std::vector<String> keys;
-        keys.reserve(arrSize);
-        for (size_t i = 0; i < arrSize; ++i)
-        {
-            keys.push_back(arr.getChildKey(arr.at(i)).get<String>());
-        }
-        return keys;
+        return value.get<Array>().getKeysString();
     }
 
     std::vector<int64_t> Node::getKeysInt() const
     {
         checkMap("getMapKeysInt");
-        auto const keyType = Node::getKeyType();
-        if (keyType != Ent::DataType::integer)
-        {
-            throw ContextException("Can't call 'getKeysInt' if key is not integer");
-        }
-        auto const& arr = value.get<Array>();
-        auto const arrSize = arr.size();
-        std::vector<int64_t> keys;
-        keys.reserve(arrSize);
-        for (size_t i = 0; i < arrSize; ++i)
-        {
-            keys.push_back(arr.getChildKey(arr.at(i)).get<int64_t>());
-        }
-        return keys;
+        return value.get<Array>().getKeysInt();
     }
 
     struct IsDefault

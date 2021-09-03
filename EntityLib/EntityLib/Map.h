@@ -72,6 +72,9 @@ namespace Ent
         void setParentNode(Node* _parentNode);
         void checkParent(Node const* _parentNode) const;
 
+        std::vector<String> getKeysString() const;
+        std::vector<int64_t> getKeysInt() const;
+
     private:
         Element& insertImpl(KeyType const& _key);
         Element& insertImpl(OverrideValueLocation _loc, KeyType _key, Node _node, bool _addedInInstance);

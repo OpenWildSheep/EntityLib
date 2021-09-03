@@ -10,5 +10,5 @@
         }
     ],
     "InstanceOf": "prefab.entity",
-    "Name": "PlayerSpawner_"
+    "Name": "TestResetInstanceOf"
 }

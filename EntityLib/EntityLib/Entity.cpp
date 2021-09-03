@@ -402,7 +402,7 @@ namespace Ent
         }
         auto prevName = name;
         name = templ->getNameValue().makeInstanceOf();
-        if (not canBeRenamed()) // Name is the key to override entities, so it can't be changed
+        if (prevName.isSet()) // Only report the previus name if it is set
         {
             name.set(prevName.get());
         }

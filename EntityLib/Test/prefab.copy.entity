@@ -2,13 +2,13 @@
     "ActorStates": [
         {
             "classData": {
-                "locomotionMode": "crouch"
+                "ItemEntityRef": "tutu"
             },
-            "className": "ActionClimbEdge"
+            "className": "ActorStateHoldingItem"
         },
         {
             "classData": {},
-            "className": "ActionCinematic"
+            "className": "EntityStatePlayer"
         }
     ],
     "Components": [
@@ -132,10 +132,7 @@
                         "classData": {},
                         "className": "CineEventTestCurrentGameState"
                     },
-                    {
-                        "classData": {},
-                        "className": "CineEvent"
-                    }
+                    {}
                 ]
             },
             "Type": "CinematicGD",
@@ -229,27 +226,6 @@
                         ],
                         "Components": [
                             {
-                                "Data": {
-                                    "Source": ".EP1-Spout_",
-                                    "Target": ".EP1-crook_",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
-                                },
-                                "Type": "NetworkLink",
-                                "Version": 1
-                            }
-                        ],
-                        "InstanceOf": "subentity.entity",
-                        "Name": "EntityWithInstanceOfButNoOverride"
-                    },
-                    {
-                        "Color": [
-                            255.0,
-                            120.0,
-                            220.0,
-                            255.0
-                        ],
-                        "Components": [
-                            {
                                 "Data": {},
                                 "Type": "TransformGD",
                                 "Version": 1
@@ -272,6 +248,27 @@
                             }
                         ],
                         "Name": "TestSaveEntWithOverride"
+                    },
+                    {
+                        "Color": [
+                            255.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Source": ".EP1-Spout_",
+                                    "Target": ".EP1-crook_",
+                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                },
+                                "Type": "NetworkLink",
+                                "Version": 1
+                            }
+                        ],
+                        "InstanceOf": "subentity.entity",
+                        "Name": "EntityWithInstanceOfButNoOverride"
                     }
                 ]
             },
@@ -335,20 +332,23 @@
         },
         {
             "Data": {
-                "Scripts": [
-                    {
-                        "DataSet": [
-                            {
-                                "Float": 7.0,
-                                "Name": "BlendDurationIn"
-                            },
-                            {
-                                "Float": 10.0,
-                                "Name": "BlendDurationOut"
-                            }
-                        ],
-                        "Path": "Pesto/Clouds/CloudStorm.pesto"
-                    }
+                "ScriptsMap": [
+                    [
+                        "CloudStorm",
+                        {
+                            "DataSet": [
+                                {
+                                    "Float": 7.0,
+                                    "Name": "BlendDurationIn"
+                                },
+                                {
+                                    "Float": 10.0,
+                                    "Name": "BlendDurationOut"
+                                }
+                            ],
+                            "Path": "Pesto/Clouds/CloudStorm.pesto"
+                        }
+                    ]
                 ]
             },
             "Type": "ScriptComponentGD",
@@ -397,6 +397,18 @@
                 ]
             },
             "Type": "TestSetOfObject",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "UnionArray": [
+                    {}
+                ],
+                "UnionObjectArray": [
+                    {}
+                ]
+            },
+            "Type": "TestUnion",
             "Version": 1
         }
     ],

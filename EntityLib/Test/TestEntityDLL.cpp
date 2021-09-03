@@ -184,8 +184,8 @@ try
     Ent::Subschema const& scriptEventUnionSchema =
         cinematicGDSchema.properties.at("ScriptEvents")->singularItems->get();
     auto&& nameToTypeMap = scriptEventUnionSchema.getUnionTypesMap();
-    ENTLIB_ASSERT(size(nameToTypeMap) == 12);
-    ENTLIB_ASSERT(nameToTypeMap.count("CineEventTest") == 1);
+    ENTLIB_ASSERT(size(nameToTypeMap) == 9);
+    ENTLIB_ASSERT(nameToTypeMap.count("CineEventTestCurrentGameState") == 1);
     ENTLIB_ASSERT(nameToTypeMap.count("CineEventTriggerEventHandlerPost") == 1);
     ENTLIB_ASSERT(nameToTypeMap.count("CineEventTestEndCurrentSequence") == 1);
 
@@ -215,20 +215,17 @@ try
         ENTLIB_ASSERT(actorState != nullptr);
         ENTLIB_ASSERT(actorState->getSchema()->getUnionNameField() == std::string("className"));
         ENTLIB_ASSERT(actorState->getSchema()->getUnionDataField() == std::string("classData"));
-        Ent::Node const* climbEdge = actorState->getUnionData();
-        char const* climbEdgeType = actorState->getUnionType();
-        ENTLIB_ASSERT(strcmp(climbEdgeType, "ActionClimbEdge") == 0);
-        ENTLIB_ASSERT(climbEdge != nullptr);
-        Ent::Node const* exitRequired = climbEdge->at("locomotionMode");
+        Ent::Node const* actorStateDead = actorState->getUnionData();
+        char const* actorStateDeadType = actorState->getUnionType();
+        ENTLIB_ASSERT(strcmp(actorStateDeadType, "ActorStateHoldingItem") == 0);
+        ENTLIB_ASSERT(actorStateDead != nullptr);
+        Ent::Node const* exitRequired = actorStateDead->at("ItemEntityRef");
         ENTLIB_ASSERT(exitRequired != nullptr);
-        ENTLIB_ASSERT(exitRequired->getString() == std::string("crouch"));
-        Ent::Node const* actorState2 = actorStates.at(1llu);
-        ENTLIB_ASSERT(actorState2 != nullptr);
-        Ent::Node const* cinematic = actorState2->getUnionData();
-        ENTLIB_ASSERT(cinematic != nullptr);
-        Ent::Node const* type = cinematic->at("Type");
-        ENTLIB_ASSERT(type != nullptr);
-        ENTLIB_ASSERT(type->getInt() == -1);
+        ENTLIB_ASSERT(exitRequired->getEntityRef().entityPath == std::string("tutu"));
+        Ent::Node const* entityStatePlayer = actorStates.mapGet("EntityStatePlayer");
+        ENTLIB_ASSERT(entityStatePlayer != nullptr);
+        Ent::Node const* entityStatePlayerData = entityStatePlayer->getUnionData();
+        ENTLIB_ASSERT(entityStatePlayerData != nullptr);
 
         // Map and Set overridePolicy
         Ent::Component const* pathNodeGD = ent->getComponent("PathNodeGD");
@@ -251,7 +248,8 @@ try
 
         // Test default value
         Ent::Component const* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
-        ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->getFloat() == 100.);
+        ENTLIB_ASSERT(
+            voxelSimulationGD->root.at("TransmissionBySecond")->getFloat() == 3.402823466385289e+38);
         ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->isDefault());
         ENTLIB_ASSERT(
             voxelSimulationGD->root.getTypeName()
@@ -406,12 +404,12 @@ try
         ENTLIB_ASSERT(oneOfScripts2->getDataType() == Ent::DataType::oneOf);
         ENTLIB_ASSERT(
             oneOfScripts2->getUnionType() == std::string("CineEventTriggerEventHandlerPost"));
-        ENTLIB_ASSERT(oneOfScripts2->getUnionTypeIndex() == 7);
+        ENTLIB_ASSERT(oneOfScripts2->getUnionTypeIndex() == 5);
         oneOfScripts2->setUnionType("CineEventTestCurrentGameState");
         ENTLIB_CHECK_EXCEPTION(oneOfScripts2->setUnionType("ThisTypeDoesntExist"), Ent::BadUnionType);
         Ent::Node* testCurrentState = oneOfScripts2->getUnionData();
         ENTLIB_ASSERT(oneOfScripts2->getUnionType() == std::string("CineEventTestCurrentGameState"));
-        ENTLIB_ASSERT(oneOfScripts2->getUnionTypeIndex() == 1);
+        ENTLIB_ASSERT(oneOfScripts2->getUnionTypeIndex() == 0);
         auto fieldNames2 = testCurrentState->getFieldNames();
         ENTLIB_ASSERT(fieldNames2[0] == std::string("GameStateName"));
         ENTLIB_ASSERT(fieldNames2[1] == std::string("Super"));
@@ -427,7 +425,8 @@ try
         // Push in an array of Union
         Ent::Node const* oneOfScripts4 = scriptEvents->push();
         ENTLIB_ASSERT(oneOfScripts4->getDataType() == Ent::DataType::oneOf);
-        ENTLIB_ASSERT(oneOfScripts4->getUnionType() == std::string("CineEvent"));
+        // CineEventTestCurrentGameState is the first one
+        ENTLIB_ASSERT(oneOfScripts4->getUnionType() == std::string("CineEventTestCurrentGameState"));
         ENTLIB_ASSERT(scriptEvents->at(3llu) == oneOfScripts4);
 
         // TEST simple entity ref creation
@@ -439,6 +438,33 @@ try
         Ent::SubSceneComponent* subScenecomp = ent->getSubSceneComponent();
         auto&& allSubEntities = subScenecomp->embedded->getObjects();
         testEntityRef->root.at("TestRef")->setEntityRef(ent->makeEntityRef(*allSubEntities.front()));
+
+        // TEST Union not in Object
+        Ent::Component* testUnion = ent->addComponent("TestUnion");
+        Ent::Node* un = testUnion->root.at("Union");
+        un->unset();
+        ENTLIB_ASSERT(not un->hasOverride());
+        ENTLIB_ASSERT(un->getUnionType() == std::string("s32"));
+        un->setUnionType("float");
+        ENTLIB_ASSERT(un->hasOverride());
+        ENTLIB_ASSERT(un->getUnionType() == std::string("float"));
+        un->setUnionType("s32");
+        ENTLIB_ASSERT(un->hasOverride());
+        ENTLIB_ASSERT(un->getUnionType() == std::string("s32"));
+        un->unset();
+        ENTLIB_ASSERT(not un->hasOverride());
+        ENTLIB_ASSERT(un->getUnionType() == std::string("s32"));
+        // TEST Union not in Array
+        Ent::Node* unArr = testUnion->root.at("UnionArray");
+        Ent::Node* newUnion = unArr->push();
+        ENTLIB_ASSERT(not newUnion->getUnionData()->hasOverride());
+        ENTLIB_ASSERT(newUnion->getUnionType() == std::string("s32"));
+        // TEST Union not in Object in Array
+        unArr = testUnion->root.at("UnionObjectArray");
+        Ent::Node* obj = unArr->push();
+        newUnion = obj->at("Union");
+        ENTLIB_ASSERT(not newUnion->getUnionData()->hasOverride());
+        ENTLIB_ASSERT(newUnion->getUnionType() == std::string("s32"));
 
         // TEST MaxActivationLevel
         ent->setMaxActivationLevel(Ent::ActivationLevel::InWorld);
@@ -519,7 +545,9 @@ try
     {
         auto const nodeCachesize = entlib.getNodeCache().size();
         Ent::Node ent = entlib.loadEntityAsNode("prefab.copy.entity");
-        ENTLIB_ASSERT(entlib.getNodeCache().size() == nodeCachesize + 1);
+        auto const newNodeCachesize = entlib.getNodeCache().size();
+        ENTLIB_ASSERT(
+            newNodeCachesize == nodeCachesize + 2); // "prefab.copy.entity" and "test.SeedPatch.node"
         // TEST simple entity refs resolution
         Ent::Node* testEntityRef = ent.at("Components")->mapGet("TestEntityRef")->getUnionData();
         ENTLIB_ASSERT(testEntityRef != nullptr);
@@ -543,8 +571,10 @@ try
 
         // TEST Tuple hasOverride
         Ent::Component* scriptComponentGD = ent->getComponent("ScriptComponentGD");
-        auto* scripts = scriptComponentGD->root.at("Scripts");
-        auto* wp = scripts->at(0llu)->at("DataSet")->at(0llu)->at("WorldPosition");
+        auto* scripts = scriptComponentGD->root.at("ScriptsMap");
+        auto* cloudStorm = scripts->mapGet("CloudStorm");
+        ENTLIB_ASSERT(cloudStorm != nullptr);
+        auto* wp = cloudStorm->at("DataSet")->at(0llu)->at("WorldPosition");
         ENTLIB_ASSERT(wp->hasOverride() == false);
         ENTLIB_ASSERT(wp->at(0llu)->hasOverride() == false);
 
@@ -659,23 +689,23 @@ try
         Ent::Node const* climbEdge = actorState->getUnionData();
         ENTLIB_ASSERT(climbEdge->getParentNode()->getParentNode() == actorState);
         ENTLIB_ASSERT(climbEdge != nullptr);
-        Ent::Node const* exitRequired = climbEdge->at("locomotionMode");
+        Ent::Node const* exitRequired = climbEdge->at("ItemEntityRef");
         ENTLIB_ASSERT(exitRequired != nullptr);
-        ENTLIB_ASSERT(exitRequired->getString() == std::string("crouch"));
-        Ent::Node const* actorState2 = actorStates.at(1llu);
-        ENTLIB_ASSERT(actorState2 != nullptr);
-        Ent::Node const* cinematic = actorState2->getUnionData();
-        ENTLIB_ASSERT(cinematic != nullptr);
-        Ent::Node const* type = cinematic->at("Type");
-        ENTLIB_ASSERT(type != nullptr);
-        ENTLIB_ASSERT(type->getInt() == 13);
-        Ent::Node const* actorState3 = actorStates.at(2llu);
-        ENTLIB_ASSERT(actorState3 != nullptr);
-        Ent::Node const* chosen = actorState3->getUnionData();
-        ENTLIB_ASSERT(chosen != nullptr);
-        Ent::Node const* exitRequ = chosen->at("ExitRequired");
-        ENTLIB_ASSERT(exitRequ != nullptr);
-        ENTLIB_ASSERT(exitRequ->getBool() == true);
+        ENTLIB_ASSERT(exitRequired->getEntityRef().entityPath == std::string("tutu"));
+        Ent::Node const* dead = actorStates.mapGet("ActorStateDead");
+        ENTLIB_ASSERT(dead != nullptr);
+        Ent::Node const* deadData = dead->getUnionData();
+        ENTLIB_ASSERT(deadData != nullptr);
+        Ent::Node const* reviveLife = deadData->at("ReviveLifeSigned");
+        ENTLIB_ASSERT(reviveLife != nullptr);
+        ENTLIB_ASSERT(reviveLife->getFloat() == 13.);
+        Ent::Node const* actorStateHoldingItem = actorStates.mapGet("ActorStateHoldingItem");
+        ENTLIB_ASSERT(actorStateHoldingItem != nullptr);
+        Ent::Node const* actorStateHoldingItemData = actorStateHoldingItem->getUnionData();
+        ENTLIB_ASSERT(actorStateHoldingItemData != nullptr);
+        Ent::Node const* itemEntityRef = actorStateHoldingItemData->at("ItemEntityRef");
+        ENTLIB_ASSERT(itemEntityRef != nullptr);
+        ENTLIB_ASSERT(itemEntityRef->getEntityRef().entityPath == "tutu");
 
         // Map and Set overridePolicy
         Ent::Component const* pathNodeGD = ent.getComponent("PathNodeGD");
@@ -946,8 +976,9 @@ try
         ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD")->hasOverride());
         // Component with instanceOf overriden
         auto compWithInstOf = ent->getComponent("CharacterControllerGD");
-        compWithInstOf->root.resetInstanceOf("test.SeedPatch2.node");
-        ENTLIB_ASSERT(compWithInstOf->root.getInstanceOf() == std::string("test.SeedPatch2.node"));
+        compWithInstOf->root.resetInstanceOf("test.CharacterControllerGD.node");
+        ENTLIB_ASSERT(
+            compWithInstOf->root.getInstanceOf() == std::string("test.CharacterControllerGD.node"));
         ENTLIB_ASSERT(compWithInstOf->hasOverride());
         // *************** NODE ***************
         // new Node
@@ -1013,10 +1044,10 @@ try
         ENTLIB_ASSERT(e->getDataType() == Ent::DataType::array);
 
         // Test erase in union_set (+save/load)
-        ENTLIB_ASSERT(actorStates.mapGet("ActionCinematic") == nullptr);
+        ENTLIB_ASSERT(actorStates.mapGet("EntityStatePlayer") == nullptr);
 
         // Test insert in union_set (+save/load)
-        ENTLIB_ASSERT(actorStates.mapGet("ActionClamberRise") != nullptr);
+        ENTLIB_ASSERT(actorStates.mapGet("ActorStateAlive") != nullptr);
 
         // Test remove component
         ENTLIB_ASSERT(ent->getComponent("TransformGD") == nullptr);
@@ -1027,12 +1058,12 @@ try
         EntityPtr ent = entlib.loadEntity("instance.entity");
         // Test erase in union_set
         Ent::Node& actorStates = ent->getActorStates();
-        ENTLIB_ASSERT(actorStates.mapGet("ActionCinematic") != nullptr);
-        ENTLIB_ASSERT(actorStates.mapErase("ActionCinematic"));
-        ENTLIB_ASSERT(actorStates.mapGet("ActionCinematic") == nullptr);
+        ENTLIB_ASSERT(actorStates.mapGet("EntityStatePlayer") != nullptr);
+        ENTLIB_ASSERT(actorStates.mapErase("EntityStatePlayer"));
+        ENTLIB_ASSERT(actorStates.mapGet("EntityStatePlayer") == nullptr);
 
         // Test insert in union_set
-        ENTLIB_ASSERT(actorStates.mapInsert("ActionClamberRise") != nullptr);
+        ENTLIB_ASSERT(actorStates.mapInsert("ActorStateAlive") != nullptr);
 
         // Test erase in map
         Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
@@ -1076,7 +1107,7 @@ try
         ENTLIB_ASSERT(json.size() == 3);
         for (auto&& actState : json)
         {
-            ENTLIB_ASSERT(actState["className"] != "ActionCinematic");
+            ENTLIB_ASSERT(actState["className"] != "EntityStatePlayer");
         }
     }
     {
@@ -1183,7 +1214,8 @@ try
         ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD")->hasOverride());
         // Component with instanceOf overriden
         auto compWithInstOf = ent->getComponent("CharacterControllerGD");
-        ENTLIB_ASSERT(compWithInstOf->root.getInstanceOf() == std::string("test.SeedPatch2.node"));
+        ENTLIB_ASSERT(
+            compWithInstOf->root.getInstanceOf() == std::string("test.CharacterControllerGD.node"));
         ENTLIB_ASSERT(compWithInstOf->hasOverride());
         // *************** NODE ***************
         // new Node
@@ -1525,7 +1557,8 @@ try
     entlib.rawdataPath = "X:/RawData";
 
     ENTLIB_LOG("Loading SceneWild.scene...");
-    auto scene = entlib.loadScene("X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene");
+    // auto scene = entlib.loadScene("X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene");
+    auto scene = entlib.loadScene("20_scene/personal/simont/vfxGym/ScenevfxGym.scene");
     ENTLIB_LOG("Done");
 
     if (doDisplayScene)

@@ -553,6 +553,14 @@ namespace Ent
         }
     };
 
+    struct DuplicateKey : ContextException
+    {
+        DuplicateKey(std::string const& _message) ///< ctor
+            : ContextException(_message)
+        {
+        }
+    };
+
     /// Exception thrown when some json data are invalid
     struct EmptyKey : ContextException
     {

@@ -2,13 +2,13 @@
     "Thumbnail": "TestThumbnail",
     "ActorStates":[
         {
-            "className": "ActionClimbEdge",
+            "className": "ActorStateHoldingItem",
             "classData":{
-                "locomotionMode": "crouch"
+                "ItemEntityRef": "tutu"
             }
         },
         {
-            "className": "ActionCinematic",
+            "className": "EntityStatePlayer",
             "classData":{
             }
         }

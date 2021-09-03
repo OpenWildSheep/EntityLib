@@ -425,8 +425,8 @@ try
         // Push in an array of Union
         Ent::Node const* oneOfScripts4 = scriptEvents->push();
         ENTLIB_ASSERT(oneOfScripts4->getDataType() == Ent::DataType::oneOf);
-        // CineEventTriggerPlaySound is the last one
-        ENTLIB_ASSERT(oneOfScripts4->getUnionType() == std::string("CineEventTriggerPlaySound"));
+        // CineEventTestCurrentGameState is the first one
+        ENTLIB_ASSERT(oneOfScripts4->getUnionType() == std::string("CineEventTestCurrentGameState"));
         ENTLIB_ASSERT(scriptEvents->at(3llu) == oneOfScripts4);
 
         // TEST simple entity ref creation
@@ -438,6 +438,33 @@ try
         Ent::SubSceneComponent* subScenecomp = ent->getSubSceneComponent();
         auto&& allSubEntities = subScenecomp->embedded->getObjects();
         testEntityRef->root.at("TestRef")->setEntityRef(ent->makeEntityRef(*allSubEntities.front()));
+
+        // TEST Union not in Object
+        Ent::Component* testUnion = ent->addComponent("TestUnion");
+        Ent::Node* un = testUnion->root.at("Union");
+        un->unset();
+        ENTLIB_ASSERT(not un->hasOverride());
+        ENTLIB_ASSERT(un->getUnionType() == std::string("s32"));
+        un->setUnionType("float");
+        ENTLIB_ASSERT(un->hasOverride());
+        ENTLIB_ASSERT(un->getUnionType() == std::string("float"));
+        un->setUnionType("s32");
+        ENTLIB_ASSERT(un->hasOverride());
+        ENTLIB_ASSERT(un->getUnionType() == std::string("s32"));
+        un->unset();
+        ENTLIB_ASSERT(not un->hasOverride());
+        ENTLIB_ASSERT(un->getUnionType() == std::string("s32"));
+        // TEST Union not in Array
+        Ent::Node* unArr = testUnion->root.at("UnionArray");
+        Ent::Node* newUnion = unArr->push();
+        ENTLIB_ASSERT(not newUnion->getUnionData()->hasOverride());
+        ENTLIB_ASSERT(newUnion->getUnionType() == std::string("s32"));
+        // TEST Union not in Object in Array
+        unArr = testUnion->root.at("UnionObjectArray");
+        Ent::Node* obj = unArr->push();
+        newUnion = obj->at("Union");
+        ENTLIB_ASSERT(not newUnion->getUnionData()->hasOverride());
+        ENTLIB_ASSERT(newUnion->getUnionType() == std::string("s32"));
 
         // TEST MaxActivationLevel
         ent->setMaxActivationLevel(Ent::ActivationLevel::InWorld);
@@ -1530,7 +1557,8 @@ try
     entlib.rawdataPath = "X:/RawData";
 
     ENTLIB_LOG("Loading SceneWild.scene...");
-    auto scene = entlib.loadScene("X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene");
+    // auto scene = entlib.loadScene("X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene");
+    auto scene = entlib.loadScene("20_scene/personal/simont/vfxGym/ScenevfxGym.scene");
     ENTLIB_LOG("Done");
 
     if (doDisplayScene)

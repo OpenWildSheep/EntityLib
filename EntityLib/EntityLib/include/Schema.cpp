@@ -94,4 +94,11 @@ namespace Ent
         return result;
     }
 
+    char const* Subschema::getUnionDefaultTypeName() const
+    {
+        auto fieldName = getUnionNameField();
+        auto& typeSchema = oneOf->front()->properties.at(fieldName);
+        return typeSchema->constValue->get_ptr<nlohmann::json::string_t const*>()->c_str();
+    }
+
 } // namespace Ent

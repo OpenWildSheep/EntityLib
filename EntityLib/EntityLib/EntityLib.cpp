@@ -1766,13 +1766,15 @@ Ent::Node Ent::EntityLib::makeEntityNode() const
 void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path const& _relEntityPath) const
 {
     std::filesystem::path entityPath = getAbsolutePath(_relEntityPath);
+    std::stringstream buffer;
+    json document = _entity.saveEntity();
+    buffer << document.dump(4);
     std::ofstream file(entityPath);
     if (not file.is_open())
     {
         throw FileSystemError("Trying to open file for write", rawdataPath, entityPath);
     }
-    json document = _entity.saveEntity();
-    file << document.dump(4);
+    file << buffer.str();
     file.close();
 
     // Better to check after save because it is easiest to debug

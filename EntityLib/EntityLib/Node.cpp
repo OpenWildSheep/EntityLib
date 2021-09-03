@@ -1,6 +1,7 @@
 #include "Node.h"
 
 #include <fstream>
+#include <sstream>
 #include <ciso646>
 
 #include "external/json.hpp"
@@ -720,13 +721,15 @@ namespace Ent
         node["$schema"] = getSchema()->name;
 
         std::filesystem::path path = getEntityLib()->getAbsolutePath(_path);
+        std::stringstream buffer;
+        buffer << node.dump(4);
         std::ofstream file(path);
         if (not file.is_open())
         {
             throw FileSystemError(
                 "Trying to open file for write", getEntityLib()->rawdataPath, _path);
         }
-        file << node.dump(4);
+        file << buffer.str();
     }
 
     double Node::getDefaultFloat() const

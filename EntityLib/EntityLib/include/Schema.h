@@ -139,6 +139,8 @@ namespace Ent
         /// @throw MissingMetadata if the schema doesn't have a meta className and classData
         char const* getUnionDataField() const;
 
+        char const* getUnionDefaultTypeName() const;
+
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue = nlohmann::json;
         DefaultValue defaultValue; ///< @brief Contains the data according to the type

@@ -23,10 +23,10 @@ void main()
     auto tgd = ent.Components().get<TransformGD>(); // inferred type : TransformGD
     auto heightObj = components.get<HeightObj>();
     static_assert(std::is_same_v<decltype(heightObj), HeightObj>);
-    auto actorStateCreature = ent.ActorStates().add<ActorStateCreature>();
-    auto turret =
-        components.add<TurretComponentGD>(); // inferred type : TurretComponentGD
-    static_assert(std::is_same_v<decltype(turret), TurretComponentGD>);
+    auto actorStateCreature = ent.ActorStates().add<ActorStateBeingImmersed>();
+    auto unitTestCpt =
+        components.add<UnitTestComponent>(); // inferred type : TurretComponentGD
+    static_assert(std::is_same_v<decltype(unitTestCpt), UnitTestComponent>);
     heightObj = components.HeightObj(); // Keep this method??
 
     // Test fixed size array
@@ -48,13 +48,13 @@ void main()
 
     // Test set of primitive
     auto side =
-        turret.ReviveSideTargeted(); // inferred type : PrimitiveSet<ReviveSideTargetedItem_ReviveSide>
+        unitTestCpt.EnumSet(); // inferred type : PrimitiveSet<ReviveSideTargetedItem_ReviveSide>
     static_assert(std::is_same_v<decltype(side), PrimitiveSet<ReviveSideEnum>>);
-    turret.ReviveSideTargeted().add(ReviveSideEnum::neutral);
-    turret.ReviveSideTargeted().add(ReviveSideEnum::cursed);
+    unitTestCpt.EnumSet().add(ReviveSideEnum::neutral);
+    unitTestCpt.EnumSet().add(ReviveSideEnum::cursed);
     // turret.ReviveSideTargeted.remove(ReviveSideEnum::neutral);
-    ENTLIB_ASSERT(turret.ReviveSideTargeted().count(ReviveSideEnum::cursed));
-    turret.ReviveSideTargeted().add(ReviveSideEnum::sacred); // inferred type : String
+    ENTLIB_ASSERT(unitTestCpt.EnumSet().count(ReviveSideEnum::cursed));
+    unitTestCpt.EnumSet().add(ReviveSideEnum::sacred); // inferred type : String
 
     // Test Enum prop
     auto mode =
@@ -82,7 +82,7 @@ void main()
     ENTLIB_ASSERT(rad == 20.0);
 
     // Test Tuple
-    auto position = actorStateCreature.Position(); // inferred type : Position
+    auto position = unitTestCpt.Position(); // inferred type : Position
     auto elt2_ = position.get<2>(); // inferred type : Float
     static_assert(std::is_same_v<decltype(elt2_), Float>);
     auto val0 = position.get<0>().get(); // inferred type : int

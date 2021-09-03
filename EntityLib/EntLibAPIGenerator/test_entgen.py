@@ -6,8 +6,8 @@ from entgen.String import *
 from entgen.SubScene import *
 from entgen.TransformGD import *
 from entgen.HeightObj import *
-from entgen.ActorStateCreature import *
-from entgen.TurretComponentGD import *
+from entgen.ActorStateBeingImmersed import *
+from entgen.UnitTestComponent import *
 from entgen.BeamTargetGD import *
 from entgen.PathNodeGD import *
 from entgen.EnvStampGD import *
@@ -31,9 +31,9 @@ ss = components.get(SubScene)  # inferred type : SubScene
 tgd = ent.Components.get(TransformGD)  # inferred type : TransformGD
 heightObj = components.get(HeightObj)
 assert isinstance(heightObj, HeightObj)
-actorStateCreature = ent.ActorStates.add(ActorStateCreature)
-turret = components.add(TurretComponentGD)   # inferred type : TurretComponentGD
-assert isinstance(turret, TurretComponentGD)
+actorStateCreature = ent.ActorStates.add(ActorStateBeingImmersed)
+unitTestCpt = components.add(UnitTestComponent)   # inferred type : UnitTestComponent
+assert isinstance(unitTestCpt, UnitTestComponent)
 
 # Test fixed size array
 pos = ent.Components.get(TransformGD).Position  # inferred type : Array[Float]
@@ -49,15 +49,15 @@ v = tgd.Position.value
 assert v == [4., 5., 6.]
 
 # Test set of primitive
-side = turret.ReviveSideTargeted   # inferred type : PrimitiveSet[ReviveSideEnum]
+side = unitTestCpt.EnumSet   # inferred type : PrimitiveSet[ReviveSideEnum]
 assert isinstance(side, PrimitiveSet)
-turret.ReviveSideTargeted.add(ReviveSideEnum.neutral)
-turret.ReviveSideTargeted.add(ReviveSideEnum.cursed)
-# turret.ReviveSideTargeted.remove("neutral")
-assert turret.ReviveSideTargeted.count(ReviveSideEnum.cursed)
-# turret.ReviveSideTargeted.erase("cursed")
-turret.ReviveSideTargeted.add(ReviveSideEnum.sacred)  # inferred type : String
-# del turret.ReviveSideTargeted["sacred"]
+unitTestCpt.EnumSet.add(ReviveSideEnum.neutral)
+unitTestCpt.EnumSet.add(ReviveSideEnum.cursed)
+# unitTestCpt.EnumSet.remove("neutral")
+assert unitTestCpt.EnumSet.count(ReviveSideEnum.cursed)
+# unitTestCpt.EnumSet.erase("cursed")
+unitTestCpt.EnumSet.add(ReviveSideEnum.sacred)  # inferred type : String
+# del unitTestCpt.EnumSet["sacred"]
 
 # Test Enum prop
 # Do we want that a property of type BeamStaffModeEnum:
@@ -91,7 +91,7 @@ displaceNoise0 = heightObj.DisplaceNoiseList[0]  # inferred type : DisplaceNoise
 assert ent.Components.get(PathNodeGD).Radius.value == 30.0
 
 # Test Tuple
-position = actorStateCreature.Position   # inferred type : Position
+position = unitTestCpt.Position   # inferred type : Position
 elt2 = position[2]           # inferred type : Any   :‑(     (waiting for python 3.9)
 assert isinstance(elt2, Float)
 elt2_ = position.get_2()                 # inferred type : Float

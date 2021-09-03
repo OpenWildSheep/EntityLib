@@ -2,15 +2,9 @@
     "ActorStates": [
         {
             "classData": {
-                "Type": 13
+                "ReviveLifeSigned": 13.0
             },
-            "className": "ActionCinematic"
-        },
-        {
-            "classData": {
-                "ExitRequired": true
-            },
-            "className": "ActionChosen"
+            "className": "ActorStateDead"
         }
     ],
     "Color": [

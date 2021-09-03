@@ -2,13 +2,13 @@
     "ActorStates": [
         {
             "classData": {
-                "locomotionMode": "crouch"
+                "ItemEntityRef": "tutu"
             },
-            "className": "ActionClimbEdge"
+            "className": "ActorStateHoldingItem"
         },
         {
             "classData": {},
-            "className": "ActionCinematic"
+            "className": "EntityStatePlayer"
         }
     ],
     "Components": [
@@ -134,7 +134,7 @@
                     },
                     {
                         "classData": {},
-                        "className": "CineEvent"
+                        "className": "CineEventTriggerPlaySound"
                     }
                 ]
             },

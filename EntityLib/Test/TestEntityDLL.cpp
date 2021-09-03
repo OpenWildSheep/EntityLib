@@ -184,8 +184,8 @@ try
     Ent::Subschema const& scriptEventUnionSchema =
         cinematicGDSchema.properties.at("ScriptEvents")->singularItems->get();
     auto&& nameToTypeMap = scriptEventUnionSchema.getUnionTypesMap();
-    ENTLIB_ASSERT(size(nameToTypeMap) == 12);
-    ENTLIB_ASSERT(nameToTypeMap.count("CineEventTest") == 1);
+    ENTLIB_ASSERT(size(nameToTypeMap) == 9);
+    ENTLIB_ASSERT(nameToTypeMap.count("CineEventTestCurrentGameState") == 1);
     ENTLIB_ASSERT(nameToTypeMap.count("CineEventTriggerEventHandlerPost") == 1);
     ENTLIB_ASSERT(nameToTypeMap.count("CineEventTestEndCurrentSequence") == 1);
 
@@ -215,20 +215,17 @@ try
         ENTLIB_ASSERT(actorState != nullptr);
         ENTLIB_ASSERT(actorState->getSchema()->getUnionNameField() == std::string("className"));
         ENTLIB_ASSERT(actorState->getSchema()->getUnionDataField() == std::string("classData"));
-        Ent::Node const* climbEdge = actorState->getUnionData();
-        char const* climbEdgeType = actorState->getUnionType();
-        ENTLIB_ASSERT(strcmp(climbEdgeType, "ActionClimbEdge") == 0);
-        ENTLIB_ASSERT(climbEdge != nullptr);
-        Ent::Node const* exitRequired = climbEdge->at("locomotionMode");
+        Ent::Node const* actorStateDead = actorState->getUnionData();
+        char const* actorStateDeadType = actorState->getUnionType();
+        ENTLIB_ASSERT(strcmp(actorStateDeadType, "ActorStateHoldingItem") == 0);
+        ENTLIB_ASSERT(actorStateDead != nullptr);
+        Ent::Node const* exitRequired = actorStateDead->at("ItemEntityRef");
         ENTLIB_ASSERT(exitRequired != nullptr);
-        ENTLIB_ASSERT(exitRequired->getString() == std::string("crouch"));
-        Ent::Node const* actorState2 = actorStates.at(1llu);
-        ENTLIB_ASSERT(actorState2 != nullptr);
-        Ent::Node const* cinematic = actorState2->getUnionData();
-        ENTLIB_ASSERT(cinematic != nullptr);
-        Ent::Node const* type = cinematic->at("Type");
-        ENTLIB_ASSERT(type != nullptr);
-        ENTLIB_ASSERT(type->getInt() == -1);
+        ENTLIB_ASSERT(exitRequired->getEntityRef().entityPath == std::string("tutu"));
+        Ent::Node const* entityStatePlayer = actorStates.mapGet("EntityStatePlayer");
+        ENTLIB_ASSERT(entityStatePlayer != nullptr);
+        Ent::Node const* entityStatePlayerData = entityStatePlayer->getUnionData();
+        ENTLIB_ASSERT(entityStatePlayerData != nullptr);
 
         // Map and Set overridePolicy
         Ent::Component const* pathNodeGD = ent->getComponent("PathNodeGD");
@@ -407,12 +404,12 @@ try
         ENTLIB_ASSERT(oneOfScripts2->getDataType() == Ent::DataType::oneOf);
         ENTLIB_ASSERT(
             oneOfScripts2->getUnionType() == std::string("CineEventTriggerEventHandlerPost"));
-        ENTLIB_ASSERT(oneOfScripts2->getUnionTypeIndex() == 7);
+        ENTLIB_ASSERT(oneOfScripts2->getUnionTypeIndex() == 5);
         oneOfScripts2->setUnionType("CineEventTestCurrentGameState");
         ENTLIB_CHECK_EXCEPTION(oneOfScripts2->setUnionType("ThisTypeDoesntExist"), Ent::BadUnionType);
         Ent::Node* testCurrentState = oneOfScripts2->getUnionData();
         ENTLIB_ASSERT(oneOfScripts2->getUnionType() == std::string("CineEventTestCurrentGameState"));
-        ENTLIB_ASSERT(oneOfScripts2->getUnionTypeIndex() == 1);
+        ENTLIB_ASSERT(oneOfScripts2->getUnionTypeIndex() == 0);
         auto fieldNames2 = testCurrentState->getFieldNames();
         ENTLIB_ASSERT(fieldNames2[0] == std::string("GameStateName"));
         ENTLIB_ASSERT(fieldNames2[1] == std::string("Super"));
@@ -428,7 +425,8 @@ try
         // Push in an array of Union
         Ent::Node const* oneOfScripts4 = scriptEvents->push();
         ENTLIB_ASSERT(oneOfScripts4->getDataType() == Ent::DataType::oneOf);
-        ENTLIB_ASSERT(oneOfScripts4->getUnionType() == std::string("CineEvent"));
+        // CineEventTriggerPlaySound is the last one
+        ENTLIB_ASSERT(oneOfScripts4->getUnionType() == std::string("CineEventTriggerPlaySound"));
         ENTLIB_ASSERT(scriptEvents->at(3llu) == oneOfScripts4);
 
         // TEST simple entity ref creation
@@ -664,23 +662,23 @@ try
         Ent::Node const* climbEdge = actorState->getUnionData();
         ENTLIB_ASSERT(climbEdge->getParentNode()->getParentNode() == actorState);
         ENTLIB_ASSERT(climbEdge != nullptr);
-        Ent::Node const* exitRequired = climbEdge->at("locomotionMode");
+        Ent::Node const* exitRequired = climbEdge->at("ItemEntityRef");
         ENTLIB_ASSERT(exitRequired != nullptr);
-        ENTLIB_ASSERT(exitRequired->getString() == std::string("crouch"));
-        Ent::Node const* actorState2 = actorStates.at(1llu);
-        ENTLIB_ASSERT(actorState2 != nullptr);
-        Ent::Node const* cinematic = actorState2->getUnionData();
-        ENTLIB_ASSERT(cinematic != nullptr);
-        Ent::Node const* type = cinematic->at("Type");
-        ENTLIB_ASSERT(type != nullptr);
-        ENTLIB_ASSERT(type->getInt() == 13);
-        Ent::Node const* actorState3 = actorStates.at(2llu);
-        ENTLIB_ASSERT(actorState3 != nullptr);
-        Ent::Node const* chosen = actorState3->getUnionData();
-        ENTLIB_ASSERT(chosen != nullptr);
-        Ent::Node const* exitRequ = chosen->at("ExitRequired");
-        ENTLIB_ASSERT(exitRequ != nullptr);
-        ENTLIB_ASSERT(exitRequ->getBool() == true);
+        ENTLIB_ASSERT(exitRequired->getEntityRef().entityPath == std::string("tutu"));
+        Ent::Node const* dead = actorStates.mapGet("ActorStateDead");
+        ENTLIB_ASSERT(dead != nullptr);
+        Ent::Node const* deadData = dead->getUnionData();
+        ENTLIB_ASSERT(deadData != nullptr);
+        Ent::Node const* reviveLife = deadData->at("ReviveLifeSigned");
+        ENTLIB_ASSERT(reviveLife != nullptr);
+        ENTLIB_ASSERT(reviveLife->getFloat() == 13.);
+        Ent::Node const* actorStateHoldingItem = actorStates.mapGet("ActorStateHoldingItem");
+        ENTLIB_ASSERT(actorStateHoldingItem != nullptr);
+        Ent::Node const* actorStateHoldingItemData = actorStateHoldingItem->getUnionData();
+        ENTLIB_ASSERT(actorStateHoldingItemData != nullptr);
+        Ent::Node const* itemEntityRef = actorStateHoldingItemData->at("ItemEntityRef");
+        ENTLIB_ASSERT(itemEntityRef != nullptr);
+        ENTLIB_ASSERT(itemEntityRef->getEntityRef().entityPath == "tutu");
 
         // Map and Set overridePolicy
         Ent::Component const* pathNodeGD = ent.getComponent("PathNodeGD");
@@ -1019,10 +1017,10 @@ try
         ENTLIB_ASSERT(e->getDataType() == Ent::DataType::array);
 
         // Test erase in union_set (+save/load)
-        ENTLIB_ASSERT(actorStates.mapGet("ActionCinematic") == nullptr);
+        ENTLIB_ASSERT(actorStates.mapGet("EntityStatePlayer") == nullptr);
 
         // Test insert in union_set (+save/load)
-        ENTLIB_ASSERT(actorStates.mapGet("ActionClamberRise") != nullptr);
+        ENTLIB_ASSERT(actorStates.mapGet("ActorStateAlive") != nullptr);
 
         // Test remove component
         ENTLIB_ASSERT(ent->getComponent("TransformGD") == nullptr);
@@ -1033,12 +1031,12 @@ try
         EntityPtr ent = entlib.loadEntity("instance.entity");
         // Test erase in union_set
         Ent::Node& actorStates = ent->getActorStates();
-        ENTLIB_ASSERT(actorStates.mapGet("ActionCinematic") != nullptr);
-        ENTLIB_ASSERT(actorStates.mapErase("ActionCinematic"));
-        ENTLIB_ASSERT(actorStates.mapGet("ActionCinematic") == nullptr);
+        ENTLIB_ASSERT(actorStates.mapGet("EntityStatePlayer") != nullptr);
+        ENTLIB_ASSERT(actorStates.mapErase("EntityStatePlayer"));
+        ENTLIB_ASSERT(actorStates.mapGet("EntityStatePlayer") == nullptr);
 
         // Test insert in union_set
-        ENTLIB_ASSERT(actorStates.mapInsert("ActionClamberRise") != nullptr);
+        ENTLIB_ASSERT(actorStates.mapInsert("ActorStateAlive") != nullptr);
 
         // Test erase in map
         Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
@@ -1082,7 +1080,7 @@ try
         ENTLIB_ASSERT(json.size() == 3);
         for (auto&& actState : json)
         {
-            ENTLIB_ASSERT(actState["className"] != "ActionCinematic");
+            ENTLIB_ASSERT(actState["className"] != "EntityStatePlayer");
         }
     }
     {

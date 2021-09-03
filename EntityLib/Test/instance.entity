@@ -7,15 +7,14 @@
     ],
     "ActorStates":[
         {
-            "className": "ActionChosen",
+            "className": "ActorStateDead",
             "classData":{
-                "ExitRequired": true
+                "ReviveLifeSigned": 13
             }
         },
         {
-            "className": "ActionCinematic",
+            "className": "EntityStatePlayer",
             "classData":{
-                "Type": 13
             }
         }
     ],	

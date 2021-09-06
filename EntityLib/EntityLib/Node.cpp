@@ -903,7 +903,6 @@ namespace Ent
             }
         }
 
-        ENTLIB_ASSERT(schema == _dest.schema);
         mapbox::util::apply_visitor(ApplyToPrefab{_dest.value, _copyMode}, value);
     }
 

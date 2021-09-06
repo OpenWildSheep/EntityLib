@@ -328,6 +328,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     pySubschemaRef
         .def(py::init<>())
+        .def_property_readonly("sub_schema", [](SubschemaRef const& s) -> Subschema const& { return s.get(); },
+            py::return_value_policy::reference_internal)
         .def(
             "get",
             [](SubschemaRef const& s) -> Subschema const& { return s.get(); },

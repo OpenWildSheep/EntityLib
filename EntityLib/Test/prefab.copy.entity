@@ -132,7 +132,10 @@
                         "classData": {},
                         "className": "CineEventTestCurrentGameState"
                     },
-                    {}
+                    {
+                        "classData": {},
+                        "className": "CineEventTestCurrentGameState"
+                    }
                 ]
             },
             "Type": "CinematicGD",

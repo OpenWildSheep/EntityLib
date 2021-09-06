@@ -130,7 +130,8 @@ void setValue(Ent::Node& node, Value const& val)
     case Ent::DataType::array:
     case Ent::DataType::object:
     case Ent::DataType::oneOf:
-    case Ent::DataType::null: break;
+    case Ent::DataType::null:
+        break;
     case Ent::DataType::boolean:
         node.setBool(mapbox::util::apply_visitor(GetValue<bool>{}, val));
         break;
@@ -143,7 +144,9 @@ void setValue(Ent::Node& node, Value const& val)
     case Ent::DataType::string:
         node.setString(mapbox::util::apply_visitor(GetValue<std::string>{}, val).c_str());
         break;
-    case Ent::DataType::entityRef: node.setEntityRef({val.get<EntityRef>()}); break;
+    case Ent::DataType::entityRef:
+        node.setEntityRef({val.get<EntityRef>()});
+        break;
     case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
 }

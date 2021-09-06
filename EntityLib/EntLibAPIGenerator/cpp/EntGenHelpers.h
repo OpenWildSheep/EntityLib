@@ -139,7 +139,7 @@ namespace Ent
         struct PrimArray : Array<T>
         {
             PrimArray(Ent::Node* _node)
-                : Array(_node)
+                : Array<T>(_node)
             {
             }
 
@@ -150,45 +150,48 @@ namespace Ent
             }
 
             template <typename T>
-            Array& operator=(T const& rho)
+            struct What;
+
+            template <typename V>
+            Array<T>& operator=(V const& rho)
             {
-                ENT_IF_COMPILE(T, arr, std::get<0>(arr)) // tuple, c-style array and std::array
+                ENT_IF_COMPILE(V, arr, std::get<0>(arr)) // tuple, c-style array and std::array
                 {
-                    if (std::tuple_size_v<T> != size())
+                    if (std::tuple_size_v<V> != size())
                         throw std::runtime_error(R"(Incompatible array size in 'Array::operator=')");
-                    copyFromTuple(rho, std::make_index_sequence<std::tuple_size_v<T>>{});
+                    copyFromTuple(rho, std::make_index_sequence<std::tuple_size_v<V>>{});
                 }
-                else ENT_IF_COMPILE(T, arr, std::size(arr)) // All other dynamic containers
+                else ENT_IF_COMPILE(V, arr, std::size(arr)) // All other dynamic containers
                 {
                     if (std::size(rho) != size())
                         throw std::runtime_error(R"(Incompatible array size in 'Array::operator=')");
                     std::copy(std::begin(rho), std::end(rho), begin());
                 }
-                else static_assert(false, "Unknown array type");
+                else static_assert(sizeof(V) == 0, "Unknown array type");
                 return *this;
             }
 
-            template <typename T, std::size_t... Is>
-            void copyToTuple(T& point, std::index_sequence<Is...>)
+            template <typename V, std::size_t... Is>
+            void copyToTuple(V& point, std::index_sequence<Is...>)
             {
                 ((std::get<Is>(point) = operator[](Is).get()), ...);
             }
 
-            template <typename T>
-            operator T()
+            template <typename V>
+            operator V()
             {
-                T result;
-                ENT_IF_COMPILE(T, arr, std::get<0>(arr)) // tuple, c-style array and std::array
+                V result;
+                ENT_IF_COMPILE(V, arr, std::get<0>(arr)) // tuple, c-style array and std::array
                 {
-                    if (std::tuple_size_v<T> != size())
+                    if (std::tuple_size_v<V> != size())
                         throw std::runtime_error(R"(Incompatible array size in 'Array::operator=')");
-                    copyToTuple(result, std::make_index_sequence<std::tuple_size_v<T>>{});
+                    copyToTuple(result, std::make_index_sequence<std::tuple_size_v<V>>{});
                 }
-                else ENT_IF_COMPILE(T, arr, std::size(arr)) // All other dynamic containers
+                else ENT_IF_COMPILE(V, arr, std::size(arr)) // All other dynamic containers
                 {
                     std::copy(begin(), end(), std::back_inserter(result));
                 }
-                else static_assert(false, "Unknown array type");
+                else static_assert(sizeof(V) == 0, "Unknown array type");
                 return result;
             }
         };

@@ -4,7 +4,8 @@
 
 using namespace Ent::Gen;
 
-void main()
+int main()
+try
 {
     Ent::EntityLib entlib("X:/", true);
     entlib.rawdataPath =
@@ -119,4 +120,13 @@ void main()
     ENTLIB_ASSERT(not lushArr.hasValue());
     stamps.remove(RegenerationStateEnum::Dead);
     ENTLIB_ASSERT(not stamps.get(RegenerationStateEnum::Dead).hasValue());
+    return EXIT_SUCCESS;
+}
+catch (std::exception& ex)
+{
+    fprintf(stderr, ex.what());
+}
+catch (...)
+{
+    fprintf(stderr, "Exception thrown");
 }

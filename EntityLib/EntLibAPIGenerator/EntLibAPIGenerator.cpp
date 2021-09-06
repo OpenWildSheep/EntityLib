@@ -18,6 +18,10 @@
 using namespace kainjow::mustache;
 using namespace nlohmann;
 
+std::map<std::string, Ent::Subschema const*> allDefs;
+std::map<Ent::Subschema const*, std::string> schemaName;
+json allDefinitions(json::value_t::array);
+
 data jsonToMustache(json const& j)
 {
     switch (j.type())
@@ -36,7 +40,7 @@ data jsonToMustache(json const& j)
         data result(data::type::object);
         for (auto&& [k, v] : j.items())
         {
-            result.set(k.c_str(), jsonToMustache(v));
+            result.set(k, jsonToMustache(v));
         }
         return result;
     }
@@ -66,7 +70,7 @@ static std::string replaceAll(std::string link, std::string const& before, std::
 static std::string escapeName(std::string name)
 {
     static std::set<std::string> cppKeywordTypes = {
-        "float", "bool", "from", "in", "None", "Type", "throw", "do"};
+        "float", "bool", "from", "in", "None", "Type", "throw", "do", "default"};
 
     name = replaceAll(name, "::", "_");
     name = replaceAll(name, "<", "_");
@@ -78,9 +82,6 @@ static std::string escapeName(std::string name)
     }
     return name;
 }
-
-std::map<std::string, Ent::Subschema const*> allDefs;
-std::map<Ent::Subschema const*, std::string> schemaName;
 
 // Enum type are defined several times. "overwrite" is used to merge them is one
 static void addDef(
@@ -502,7 +503,7 @@ static json getSchemaData(Ent::Subschema const& schema)
 #pragma warning(disable : 4702)
 
 static void giveNameToAnonymousObject(
-    Ent::Subschema const& ref, std::string const& hint, std::string const& hint2);
+    Ent::Subschema const& subschema, std::string const& hint, std::string const& morehint);
 
 static void giveNameToAnonymousObjectRef(
     Ent::SubschemaRef const& ref, std::string const& hint, std::string const& hint2)
@@ -597,29 +598,6 @@ static void giveNameToAnonymousObject(
 
 void gencpp()
 {
-    Ent::EntityLib entlib("X:/", true);
-
-    for (auto& [defName, def] : entlib.schema.schema.allDefinitions)
-    {
-        addDef(getRefTypeName(defName), &def, "");
-    }
-
-    for (auto& [defName, def] : entlib.schema.schema.allDefinitions)
-    {
-        giveNameToAnonymousObject(def, getRefTypeName(defName), "");
-    }
-
-    json allDefinitions(json::value_t::array);
-    for (auto& [defName, def] : allDefs)
-    {
-        auto shortTypeName = getRefTypeName(defName.c_str());
-        json defData = getSchemaData(*def);
-        defData["display_type"] = shortTypeName;
-        json refSchema(json::value_t::object);
-        refSchema["schema"] = std::move(defData);
-        allDefinitions.push_back(refSchema);
-    }
-
     data rootData;
     rootData["all_definitions"] = jsonToMustache(allDefinitions);
     rootData["tuple_type"] =
@@ -633,7 +611,15 @@ void gencpp()
         return R"cpp(Ent::Gen::Map<{{key_type.ref.cpp_native}}, {{#value_type}}{{>display_type}}{{/value_type}}>)cpp";
     });
     rootData["display_type"] = partial([]() {
-        return R"cpp({{#object_set}}{{>object_set_type}}{{/object_set}}{{#prim_set}}{{>prim_set_type}}{{/prim_set}}{{#map}}{{>map_type}}{{/map}}{{#ref}}Ent::Gen::{{name}}{{/ref}}{{#array}}Array<{{#type}}{{>display_type}}{{/type}}>{{/array}}{{#prim_array}}PrimArray<{{#type}}{{>display_type}}{{/type}}>{{/prim_array}}{{#union_set}}UnionSet<{{#type}}{{>display_type}}{{/type}}>{{/union_set}}{{#tuple}}{{>tuple_type}}{{/tuple}}{{#comma}}, {{/comma}})cpp";
+        return R"({{#object_set}}{{>object_set_type}}{{/object_set}})"
+               R"({{#prim_set}}{{>prim_set_type}}{{/prim_set}})"
+               R"({{#map}}{{>map_type}}{{/map}})"
+               R"({{#ref}}Ent::Gen::{{name}}{{/ref}})"
+               R"({{#array}}Array<{{#type}}{{>display_type}}{{/type}}>{{/array}})"
+               R"({{#prim_array}}PrimArray<{{#type}}{{>display_type}}{{/type}}>{{/prim_array}})"
+               R"({{#union_set}}UnionSet<{{#type}}{{>display_type}}{{/type}}>{{/union_set}})"
+               R"({{#tuple}}{{>tuple_type}}{{/tuple}})"
+               R"({{#comma}}, {{/comma}})";
     });
 
     mustache tmpl{R"cpp(
@@ -754,18 +740,6 @@ namespace Ent
 
 void genpy()
 {
-    Ent::EntityLib entlib("X:/", true);
-
-    for (auto& [defName, def] : entlib.schema.schema.allDefinitions)
-    {
-        addDef(getRefTypeName(defName), &def, "");
-    }
-
-    for (auto& [defName, def] : entlib.schema.schema.allDefinitions)
-    {
-        giveNameToAnonymousObject(def, getRefTypeName(defName), "");
-    }
-
     auto add_partials = [](data& root) {
         root["display_type"] = partial([]() {
             return R"({{#object_set}}ObjectSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/object_set}})"
@@ -807,16 +781,8 @@ void genpy()
         });
     };
 
-    json allDefinitions(json::value_t::array);
-    for (auto& [defName, def] : allDefs)
+    for (json const& refSchema : allDefinitions)
     {
-        auto shortTypeName = getRefTypeName(defName.c_str());
-        json defData = getSchemaData(*def);
-        defData["display_type"] = shortTypeName;
-        json refSchema(json::value_t::object);
-        refSchema["schema"] = std::move(defData);
-        allDefinitions.push_back(refSchema);
-
         data rootData;
         rootData["file_schema"] = jsonToMustache(refSchema);
 
@@ -886,13 +852,9 @@ class {{schema.display_type}}(Base):
 {{/schema.tuple}}{{/file_schema}}
 
 )py"};
+        auto shortTypeName = refSchema["schema"]["display_type"].get<std::string>();
         std::ofstream output("py/entgen/" + shortTypeName + ".py");
         tmpl.render(rootData, output);
-    }
-
-    {
-        std::ofstream schemaOutput("schemaOutput.json");
-        schemaOutput << allDefinitions.dump(4);
     }
 
     data rootData;
@@ -982,9 +944,38 @@ Entity = Object
 int main()
 try
 {
+    Ent::EntityLib entlib("X:/", true);
+
+    // Add all first-level definitions in the dist
+    for (auto& [defName, def] : entlib.schema.schema.allDefinitions)
+    {
+        addDef(getRefTypeName(defName), &def, "");
+    }
+
+    // Add in the dict some inlined schema which will need a name (Types inside array, tuple or property)
+    for (auto& [defName, def] : entlib.schema.schema.allDefinitions)
+    {
+        giveNameToAnonymousObject(def, getRefTypeName(defName), "");
+    }
+
+    // Construct the full mustache json
+    for (auto& [defName, def] : allDefs)
+    {
+        auto shortTypeName = getRefTypeName(defName);
+        json defData = getSchemaData(*def);
+        defData["display_type"] = shortTypeName;
+        json refSchema(json::value_t::object);
+        refSchema["schema"] = std::move(defData);
+        allDefinitions.push_back(refSchema);
+    }
+
+    // Export the mustache json input (for debug purpose)
+    {
+        std::ofstream schemaOutput("schemaOutput.json");
+        schemaOutput << allDefinitions.dump(4);
+    }
+
     gencpp();
-    allDefs.clear();
-    schemaName.clear();
     genpy();
     return EXIT_SUCCESS;
 }

@@ -17,10 +17,21 @@
 
 using namespace kainjow::mustache;
 using namespace nlohmann;
+using namespace std::filesystem;
+
+constexpr auto overwrite = copy_options::overwrite_existing;
 
 std::map<std::string, Ent::Subschema const*> allDefs;
 std::map<Ent::Subschema const*, std::string> schemaName;
 json allDefinitions(json::value_t::array);
+
+std::ofstream openOfstream(std::filesystem::path const& _filepath)
+{
+    std::ofstream file;
+    file.exceptions(std::ios::badbit | std::ios::failbit | std::ios::eofbit | std::ios::goodbit);
+    file.open(_filepath);
+    return file;
+}
 
 data jsonToMustache(json const& j)
 {
@@ -85,32 +96,35 @@ static std::string escapeName(std::string name)
 
 // Enum type are defined several times. "overwrite" is used to merge them is one
 static void addDef(
-    std::string const& name, Ent::Subschema const* def, std::string const& scope, bool overwrite = false)
+    std::string const& _name,
+    Ent::Subschema const* _def,
+    std::string const& _scope,
+    bool _overwrite = false)
 {
-    auto escapedName = escapeName(name);
+    auto escapedName = escapeName(_name);
     if (allDefs.count(escapedName) == 0)
     {
-        allDefs[escapedName] = def;
-        schemaName[def] = escapedName;
+        allDefs[escapedName] = _def;
+        schemaName[_def] = escapedName;
     }
-    else if (overwrite)
+    else if (_overwrite)
     {
         // Check if there is two enum at with the same name
-        if (def->enumValues != allDefs.at(escapedName)->enumValues)
+        if (_def->enumValues != allDefs.at(escapedName)->enumValues)
         {
-            fprintf(stderr, "Two enums with the same name!! %s", name.c_str());
+            fprintf(stderr, "Two enums with the same name!! %s", _name.c_str());
         }
-        schemaName[def] = escapedName; // Several def for the same name
+        schemaName[_def] = escapedName; // Several def for the same name
     }
     else
     {
-        std::string hint2 = escapeName(scope + "_" + name);
+        std::string hint2 = escapeName(_scope + "_" + _name);
         while (allDefs.count(hint2) != 0)
         {
             hint2 = '_' + hint2;
         }
-        allDefs[hint2] = def;
-        schemaName[def] = hint2;
+        allDefs[hint2] = _def;
+        schemaName[_def] = hint2;
     }
 }
 
@@ -596,7 +610,7 @@ static void giveNameToAnonymousObject(
     }
 }
 
-void gencpp()
+void gencpp(std::filesystem::path const& resourcePath, std::filesystem::path const& destinationPath)
 {
     data rootData;
     rootData["all_definitions"] = jsonToMustache(allDefinitions);
@@ -734,12 +748,16 @@ namespace Ent
 } // Ent
 )cpp"};
 
-    std::ofstream output("cpp/EntGen.h");
+    create_directories(destinationPath);
+    std::ofstream output = openOfstream(destinationPath / "EntGen.h");
     tmpl.render(rootData, output);
+    copy_file(resourcePath / "EntGenHelpers.h", destinationPath / "EntGenHelpers.h", overwrite);
 }
 
-void genpy()
+void genpy(std::filesystem::path const& resourcePath, std::filesystem::path const& destinationPath)
 {
+    create_directories(destinationPath / "entgen");
+
     auto add_partials = [](data& root) {
         root["display_type"] = partial([]() {
             return R"({{#object_set}}ObjectSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/object_set}})"
@@ -853,7 +871,7 @@ class {{schema.display_type}}(Base):
 
 )py"};
         auto shortTypeName = refSchema["schema"]["display_type"].get<std::string>();
-        std::ofstream output("py/entgen/" + shortTypeName + ".py");
+        std::ofstream output = openOfstream(destinationPath / "entgen" / (shortTypeName + ".py"));
         tmpl.render(rootData, output);
     }
 
@@ -924,26 +942,49 @@ Entity = Object
 
 )py"};
 
-    std::ofstream outputCommon("py/entgen/inline.py");
+    std::ofstream outputCommon = openOfstream(destinationPath / "entgen/inline.py");
     allInline.render(rootData, outputCommon);
 
     mustache all{R"py(
 ### /!\ This code is GENERATED! Do not modify it.
 
-{{#all_definitions}}{{#schema.object}}from .{{schema.display_type}} import {{schema.display_type}}{{/schema.object}}
+from entgen_helpers import *
+
+{{#all_definitions}}{{#schema.object}}
+from .{{schema.display_type}} import *{{/schema.object}}{{#schema.enum}}
+from .{{schema.display_type}} import *{{/schema.enum}}
 {{/all_definitions}}
+from .Bool import *
+from .EntityRef import *
+from .Float import *
+from .Int import *
+from .String import *
 
 Entity = Object
 
 )py"};
 
-    std::ofstream outputAll("py/entgen/_all.py");
+    std::ofstream outputAll = openOfstream(destinationPath / "entgen/_all.py");
     all.render(rootData, outputAll);
+
+    copy_file(resourcePath / "entgen_helpers.py", destinationPath / "entgen_helpers.py", overwrite);
+    for (auto&& file : {"Bool.py", "EntityRef.py", "Float.py", "Int.py", "String.py"})
+    {
+        copy_file(resourcePath / "entgen" / file, destinationPath / "entgen" / file, overwrite);
+    }
 }
 
-int main()
+int main(int argc, char* argv[])
 try
 {
+    if (argc < 3)
+    {
+        fprintf(stderr, "Missing resourcesPath and destinationPath arguments");
+        return EXIT_FAILURE;
+    }
+    auto resourcePath = std::filesystem::path(argv[1]);
+    auto destinationPath = std::filesystem::path(argv[2]);
+
     Ent::EntityLib entlib("X:/", true);
 
     // Add all first-level definitions in the dist
@@ -971,12 +1012,12 @@ try
 
     // Export the mustache json input (for debug purpose)
     {
-        std::ofstream schemaOutput("schemaOutput.json");
+        std::ofstream schemaOutput = openOfstream(destinationPath / "schemaOutput.json");
         schemaOutput << allDefinitions.dump(4);
     }
 
-    gencpp();
-    genpy();
+    gencpp(resourcePath / "cpp", destinationPath / "cpp");
+    genpy(resourcePath / "py", destinationPath / "py");
     return EXIT_SUCCESS;
 }
 catch (std::exception& ex)

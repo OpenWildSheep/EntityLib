@@ -1,4 +1,4 @@
-#include "../EntLibAPIGenerator/cpp/EntGen.h"
+#include <EntGen.h>
 #include <ciso646>
 #include <filesystem>
 

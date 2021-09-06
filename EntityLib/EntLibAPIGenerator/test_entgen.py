@@ -1,6 +1,7 @@
 import os
-# from entgen.inline import *
 import entgen_helpers
+# from entgen.inline import *
+# from entgen._all import *
 from entgen.Object import *
 from entgen.String import *
 from entgen.SubScene import *

@@ -130,6 +130,10 @@ namespace Ent
 
     Node* Node::at(char const* _field)
     {
+        if (_field == nullptr)
+        {
+            throw NullPointerArgument("_field", "Node::at");
+        }
         if (value.is<Object>())
         {
             return &Ent::at(value.get<Object>(), _field);
@@ -138,6 +142,10 @@ namespace Ent
     }
     Node const* Node::at(char const* _field) const
     {
+        if (_field == nullptr)
+        {
+            throw NullPointerArgument("_field", "Node::at");
+        }
         if (value.is<Object>())
         {
             return &Ent::at(value.get<Object>(), _field);
@@ -146,6 +154,10 @@ namespace Ent
     }
     bool Node::count(char const* _field) const
     {
+        if (_field == nullptr)
+        {
+            throw NullPointerArgument("_field", "Node::count");
+        }
         if (value.is<Object>())
         {
             return Ent::count(value.get<Object>(), _field) != 0;
@@ -238,6 +250,10 @@ namespace Ent
 
     Node* Node::setUnionType(char const* _type)
     {
+        if (_type == nullptr)
+        {
+            throw NullPointerArgument("_type", "Node::setUnionType");
+        }
         if (value.is<Union>())
         {
             return value.get<Union>().setUnionType(_type);
@@ -306,6 +322,10 @@ namespace Ent
     }
     void Node::setString(char const* _val)
     {
+        if (_val == nullptr)
+        {
+            throw NullPointerArgument("_val", "Node::setString");
+        }
         value.get<Override<String>>().set(_val);
     }
     void Node::setBool(bool _val)
@@ -568,6 +588,10 @@ namespace Ent
 
     bool Node::mapErase(char const* _key)
     {
+        if (_key == nullptr)
+        {
+            throw NullPointerArgument("_key", "Node::mapErase");
+        }
         checkMap("mapErase");
         if (not value.get<Array>().canErase())
         {
@@ -578,11 +602,19 @@ namespace Ent
 
     Node* Node::mapGet(char const* _key)
     {
+        if (_key == nullptr)
+        {
+            throw NullPointerArgument("_key", "Node::mapGet");
+        }
         checkMap("mapGet");
         return value.get<Array>().mapGet(_key);
     }
     Node const* Node::mapGet(char const* _key) const
     {
+        if (_key == nullptr)
+        {
+            throw NullPointerArgument("_key", "Node::mapGet");
+        }
         checkMap("mapGet");
         return value.get<Array>().mapGet(_key);
     }
@@ -610,12 +642,20 @@ namespace Ent
 
     Node* Node::mapInsert(char const* _key)
     {
+        if (_key == nullptr)
+        {
+            throw NullPointerArgument("_key", "Node::mapInsert");
+        }
         checkMap("mapInsert");
         return value.get<Array>().mapInsert(_key);
     }
 
     Node* Node::mapInsertInstanceOf(char const* _prefabPath)
     {
+        if (_prefabPath == nullptr)
+        {
+            throw NullPointerArgument("_prefabPath", "Node::mapInsertInstanceOf");
+        }
         checkMap("mapInsertInstanceOf");
         auto prefab = getEntityLib()->loadNodeReadOnly(**getSchema()->singularItems, _prefabPath);
         Node* newNode = value.get<Array>().mapInsert(value.get<Array>().getChildKey(prefab.get()));
@@ -625,6 +665,14 @@ namespace Ent
 
     Node* Node::mapRename(char const* _key, char const* _newkey)
     {
+        if (_key == nullptr)
+        {
+            throw NullPointerArgument("_key", "Node::mapRename");
+        }
+        if (_newkey == nullptr)
+        {
+            throw NullPointerArgument("_newkey", "Node::mapRename");
+        }
         checkMap("mapGet");
         return value.get<Array>().mapRename(_key, _newkey);
     }
@@ -637,6 +685,7 @@ namespace Ent
 
     void Node::checkMap(char const* _calledMethod) const
     {
+        ENTLIB_ASSERT(_calledMethod != nullptr);
         if (not value.is<Array>())
         {
             throw BadType();

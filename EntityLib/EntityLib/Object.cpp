@@ -183,27 +183,10 @@ namespace Ent
     }
     Node const& at(Object const& obj, char const* key)
     {
-        auto range = std::equal_range(begin(obj), end(obj), ObjField{key, nullptr, 0}, CompObject());
-        if (range.first == range.second)
-        {
-            throw std::logic_error(std::string("Bad key : ") + key);
-        }
-        else
-        {
-            return *range.first->node;
-        }
+        return *obj.at(key).node;
     }
     Node& at(Object& obj, char const* key)
     {
-        auto range = std::equal_range(
-            begin(obj), end(obj), ObjField{key, value_ptr<Node>(), 0}, CompObject());
-        if (range.first == range.second)
-        {
-            throw std::logic_error(std::string("Bad key : ") + key);
-        }
-        else
-        {
-            return *range.first->node;
-        }
+        return *obj.at(key).node;
     }
 } // namespace Ent

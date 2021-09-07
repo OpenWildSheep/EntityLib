@@ -1305,7 +1305,11 @@ json Ent::EntityLib::dumpNode(
         auto&& meta = _schema.meta.get<Ent::Subschema::UnionMeta>();
         data = json::object();
         auto&& un = _node.GetRawValue().get<Union>();
-        if (un.hasOverride() or _forceWriteKey)
+        // If it has no indexField, it is a (Responsible)pointer type.
+        // The default (first) type is not explicited by the coder, so it can change accidentally.
+        // This is why it is better to always write the type. (And also Wild expect it)
+        auto const isPointerType = not meta.indexField.has_value();
+        if (un.hasOverride() or _forceWriteKey or isPointerType)
         {
             Ent::Node const* dataInsideUnion = _node.getUnionData();
             char const* type = _node.getUnionType();
@@ -1766,13 +1770,15 @@ Ent::Node Ent::EntityLib::makeEntityNode() const
 void Ent::EntityLib::saveEntity(Entity const& _entity, std::filesystem::path const& _relEntityPath) const
 {
     std::filesystem::path entityPath = getAbsolutePath(_relEntityPath);
+    std::stringstream buffer;
+    json document = _entity.saveEntity();
+    buffer << document.dump(4);
     std::ofstream file(entityPath);
     if (not file.is_open())
     {
         throw FileSystemError("Trying to open file for write", rawdataPath, entityPath);
     }
-    json document = _entity.saveEntity();
-    file << document.dump(4);
+    file << buffer.str();
     file.close();
 
     // Better to check after save because it is easiest to debug

@@ -570,4 +570,20 @@ namespace Ent
         }
     };
 
+    struct NullPointerArgument : ContextException
+    {
+        NullPointerArgument(char const* _argName, char const* funcName)
+            : ContextException("'%s' is null in function '%s'", _argName, funcName)
+        {
+        }
+    };
+
+    struct BadKey : ContextException
+    {
+        BadKey(char const* key, char const* funcName)
+            : ContextException("Unknown key '%s' in function '%s'", key, funcName)
+        {
+        }
+    };
+
 } // namespace Ent

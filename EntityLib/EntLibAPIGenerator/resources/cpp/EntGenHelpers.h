@@ -25,6 +25,11 @@ namespace Ent
                 return node != nullptr;
             }
 
+            bool isNull() const
+            {
+                return node == nullptr;
+            }
+
             bool isSet() const
             {
                 return node->isSet();
@@ -122,6 +127,10 @@ namespace Ent
             void pop_back()
             {
                 node->pop();
+            }
+            void clean()
+            {
+                node->clean();
             }
 
             /*std::vector<T> getItems()

@@ -169,8 +169,7 @@
     <ClCompile Include="EntLibAPIGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cpp\EntGen.h" />
-    <ClInclude Include="cpp\EntGenHelpers.h" />
+    <ClInclude Include="resources\cpp\EntGenHelpers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

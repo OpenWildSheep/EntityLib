@@ -20,6 +20,25 @@ class Base(object):
     def node(self):
         return self._node
 
+    @property
+    def is_null(self):
+        return self._node is None
+
+    @property
+    def is_set(self):
+        return self._node.is_set()
+
+    def unset(self):
+        return self._node.unset()
+
+    @property
+    def is_default(self):
+        return self._node.is_default()
+
+    @property
+    def has_default_value(self):
+        return self._node.has_default_value()
+
 
 class Primitive(Base, Generic[T]):
     def __init__(self, item_type, node = None):  # type: (Type[T], EntityLibPy.Node) -> None
@@ -123,6 +142,9 @@ class Array(Base, Generic[T]):
     def pop(self):
         return self._node.pop()
 
+    def clean(self):
+        return self._node.clean()
+
 
 class PrimArray(Array[T], Generic[T]):
     def set(self, values):  # type: (List[T]) -> None
@@ -132,6 +154,7 @@ class PrimArray(Array[T], Generic[T]):
     @property
     def value(self):  # type: (...) -> List[T]
         return [self._node.at(i).value for i in range(self._node.size())]
+
     @value.setter
     def value(self, values):  # type: (List[T]) -> None
         self.set(values)
@@ -154,6 +177,9 @@ class ObjectSet(Base, Generic[T]):
     def remove(self, key):
         self._node.map_erase(key)
 
+    def clean(self):
+        return self._node.clean()
+
     def __getitem__(self, key): # type: (...) -> T
         return self._item_ctor(self._node.map_get(key))
 
@@ -164,8 +190,9 @@ class ObjectSet(Base, Generic[T]):
 K = TypeVar("K")
 V = TypeVar("V")
 
+
 class Map(Base, Generic[K, V]):
-    def __init__(self, key_type, item_ctor, node = None):  # type: (Type[K], Callable[[Any], V], EntityLibPy.Node) -> None
+    def __init__(self, key_type, item_ctor, node=None):  # type: (Type[K], Callable[[Any], V], EntityLibPy.Node) -> None
         super(Map, self).__init__(node)
         self._key_type = key_type
         self._item_ctor = item_ctor
@@ -185,6 +212,9 @@ class Map(Base, Generic[K, V]):
 
     def remove(self, key):          # type: (K) -> None
         self._node.map_erase(self.to_internal(key))
+
+    def clean(self):
+        return self._node.clean()
 
     def __getitem__(self, key):     # type: (K) -> V
         return self._item_ctor(self._node.map_get(self.to_internal(key)))
@@ -232,6 +262,9 @@ class TupleNode(Base, Generic[TTuple]):
 
     def __getitem__(self, key):
         return self.typelist[key](self._node.at(key))
+
+    def __setitem__(self, key, value):
+        self._node.at(key).value = value
 
     def __len__(self):
         return self._node.size()

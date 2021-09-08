@@ -117,6 +117,12 @@ class Array(Base, Generic[T]):
     def __len__(self):
         return self._node.size()
 
+    def push(self):
+        return self._item_ctor(self._node.push())
+
+    def pop(self):
+        return self._node.pop()
+
 
 class PrimArray(Array[T], Generic[T]):
     def set(self, values):  # type: (List[T]) -> None

@@ -478,6 +478,7 @@ static json getSchemaData(Ent::Subschema const& schema)
     {
         json object(json::value_t::object);
         json properties(json::value_t::array);
+        std::set<json> includes;
         for (auto& [propName, propRef] : schema.properties)
         {
             json prop(json::value_t::object);
@@ -485,8 +486,10 @@ static json getSchemaData(Ent::Subschema const& schema)
             prop["prop_name"] = escapeName(propName);
             prop["type"] = std::move(propData);
             properties.push_back(prop);
+            includes.emplace(getSchemaRefType(propRef));
         }
         object["properties"] = std::move(properties);
+        object["includes"] = includes;
         defData["object"] = std::move(object);
         break;
     }
@@ -824,13 +827,14 @@ class {{schema.display_type}}Enum(Enum):
 
 {{/schema.enum}}{{/file_schema}}
 
-{{#file_schema}}{{#schema.alias}}{{schema.display_type}} = {{#type}}{{>type_ctor}}{{/type}}
-{{/schema.alias}}{{/file_schema}}
-
-
-{{#file_schema}}{{#schema.object}}
-{{#properties}}{{#type}}{{>print_import}}{{/type}}
-{{/properties}}
+{{#file_schema}}
+{{#schema.alias}}
+{{schema.display_type}} = {{#type}}{{>type_ctor}}{{/type}}{{/schema.alias}}{{/file_schema}}
+{{#file_schema}}
+{{#schema.object}}
+{{#includes}}
+{{>print_import}}
+{{/includes}}
 
 class {{schema.display_type}}(Base):
 {{#properties}}{{#type}}    @property

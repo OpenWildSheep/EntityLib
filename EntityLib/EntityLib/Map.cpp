@@ -333,7 +333,7 @@ Ent::Map::Element& Ent::Map::insertImpl(KeyType const& _key)
 
 Ent::Node* Ent::Map::insert(KeyType const& _key)
 {
-    return insertImpl(_key).node.get();
+    return getEltValue(m_schema, insertImpl(_key));
 }
 
 Ent::Node* Ent::Map::rename(KeyType const& _key, KeyType const& _newkey)
@@ -415,7 +415,8 @@ Ent::Map::insertImpl(OverrideValueLocation _loc, KeyType _key, Node _node, bool 
 
 Ent::Node* Ent::Map::insert(OverrideValueLocation _loc, KeyType _key, Node _node, bool _addedInInstance)
 {
-    return insertImpl(_loc, std::move(_key), std::move(_node), _addedInInstance).node.get();
+    return getEltValue(
+        m_schema, insertImpl(_loc, std::move(_key), std::move(_node), _addedInInstance));
 }
 
 std::vector<Ent::Node const*> Ent::Map::getItemsWithRemoved() const
@@ -629,7 +630,7 @@ void Ent::Map::applyAllValues(Map& _dest, CopyMode _copyMode) const
     for (auto& sourceNode : getItems())
     {
         auto&& key = getChildKey(m_schema, sourceNode);
-        Node* destNode2 = _dest.insert(key); // 'insert' only get if the item exist
+        Node* destNode2 = _dest.insertImpl(key).node.get(); // 'insert' only get if the item exist
         sourceNode->applyAllValues(*destNode2, _copyMode);
         removedDestKeys.erase(key);
     }

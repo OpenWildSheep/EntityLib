@@ -1000,6 +1000,13 @@ try
         ENTLIB_ASSERT(val->at("Value")->getString() == std::string("overriden"));
         ENTLIB_ASSERT(val->hasOverride());
 
+        // Test mapInsert in map
+        {
+            mapTest = setOfObject->root.at("MapOfObject");
+            auto newNode2 = mapTest->mapInsert("NewNode2");
+            ENTLIB_ASSERT(newNode2->getDataType() == Ent::DataType::object);
+        }
+
         sysCreat->root.at("BehaviorState")->setString("Overrided");
         entlib.saveEntity(*ent, "instance.copy.entity");
 

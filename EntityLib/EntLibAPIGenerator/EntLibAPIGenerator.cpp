@@ -7,6 +7,7 @@
 #include <set>
 #include <map>
 #include <optional>
+#include <regex>
 
 #pragma warning(push, 0)
 #include <iostream>
@@ -28,8 +29,12 @@ json allDefinitions(json::value_t::array);
 std::ofstream openOfstream(std::filesystem::path const& _filepath)
 {
     std::ofstream file;
-    file.exceptions(std::ios::badbit | std::ios::failbit | std::ios::eofbit | std::ios::goodbit);
+    file.exceptions(std::ios::badbit | std::ios::eofbit | std::ios::goodbit);
     file.open(_filepath);
+    if (not file.is_open())
+    {
+        throw FileSystemError("Trying to open file for write", std::filesystem::path(), _filepath);
+    }
     return file;
 }
 
@@ -78,11 +83,21 @@ static std::string replaceAll(std::string link, std::string const& before, std::
     return link;
 }
 
-static std::string escapeName(std::string name)
+static std::string escapeName(std::string _name)
 {
+    std::string name = _name;
     static std::set<std::string> cppKeywordTypes = {
         "float", "bool", "from", "in", "None", "Type", "throw", "do", "default"};
 
+    std::regex eastlNS(R"regex(eastl::(\w+))regex");
+    name = std::regex_replace(name, eastlNS, "$1");
+    std::regex vector(R"regex(vector\<(\w+)\>)regex");
+    std::string name2;
+    while (name2 != name)
+    {
+        name2 = std::regex_replace(name, vector, "$1Vec");
+        std::swap(name, name2);
+    }
     name = replaceAll(name, "::", "_");
     name = replaceAll(name, "<", "_");
     name = replaceAll(name, ">", "_");
@@ -1020,6 +1035,8 @@ try
         schemaOutput << allDefinitions.dump(4);
     }
 
+    std::filesystem::remove_all(destinationPath / "cpp");
+    std::filesystem::remove_all(destinationPath / "py");
     gencpp(resourcePath / "cpp", destinationPath / "cpp");
     genpy(resourcePath / "py", destinationPath / "py");
     return EXIT_SUCCESS;

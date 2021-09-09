@@ -1035,8 +1035,9 @@ try
         schemaOutput << allDefinitions.dump(4);
     }
 
-    std::filesystem::remove_all(destinationPath / "cpp");
-    std::filesystem::remove_all(destinationPath / "py");
+    std::error_code er;
+    std::filesystem::remove_all(destinationPath, er);
+    std::filesystem::create_directories(destinationPath);
     gencpp(resourcePath / "cpp", destinationPath / "cpp");
     genpy(resourcePath / "py", destinationPath / "py");
     return EXIT_SUCCESS;

@@ -1029,15 +1029,16 @@ try
         allDefinitions.push_back(refSchema);
     }
 
+    std::error_code er;
+    std::filesystem::remove_all(destinationPath, er);
+    std::filesystem::create_directories(destinationPath);
+
     // Export the mustache json input (for debug purpose)
     {
         std::ofstream schemaOutput = openOfstream(destinationPath / "schemaOutput.json");
         schemaOutput << allDefinitions.dump(4);
     }
 
-    std::error_code er;
-    std::filesystem::remove_all(destinationPath, er);
-    std::filesystem::create_directories(destinationPath);
     gencpp(resourcePath / "cpp", destinationPath / "cpp");
     genpy(resourcePath / "py", destinationPath / "py");
     return EXIT_SUCCESS;

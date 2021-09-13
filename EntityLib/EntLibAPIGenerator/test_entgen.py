@@ -1,7 +1,8 @@
 import os
 import entgen_helpers
-# from entgen.inline import *
+from entgen.inline import *
 # from entgen._all import *
+"""
 from entgen.Object import *
 from entgen.String import *
 from entgen.SubScene import *
@@ -12,6 +13,7 @@ from entgen.UnitTestComponent import *
 from entgen.BeamTargetGD import *
 from entgen.PathNodeGD import *
 from entgen.EnvStampGD import *
+"""
 
 import EntityLibPy as Ent
 
@@ -30,6 +32,8 @@ components = ent.Components  # inferred type : UnionSet
 # Test Set of Union
 ss = components.get(SubScene)  # inferred type : SubScene
 tgd = ent.Components.get(TransformGD)  # inferred type : TransformGD
+acgd = ent.Components.get(AnimationControllerGD)  # inferred type : TransformGD
+assert acgd is None
 heightObj = components.get(HeightObj)
 assert isinstance(heightObj, HeightObj)
 actorStateCreature = ent.ActorStates.add(ActorStateBeingImmersed)

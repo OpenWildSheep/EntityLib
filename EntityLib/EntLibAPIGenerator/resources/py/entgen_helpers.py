@@ -41,7 +41,7 @@ class Base(object):
 
 
 class Primitive(Base, Generic[T]):
-    def __init__(self, item_type, node = None):  # type: (Type[T], EntityLibPy.Node) -> None
+    def __init__(self, item_type, node=None):  # type: (Type[T], EntityLibPy.Node) -> None
         super(Primitive, self).__init__(node)
         self._item_type = item_type
 
@@ -56,7 +56,7 @@ class Primitive(Base, Generic[T]):
     def get(self):  # type: () -> T
         return self._item_type(self._node.value)
 
-    def is_set(self): # type: (...) -> bool
+    def is_set(self):  # type: (...) -> bool
         return self._node.is_set()
 
     def unset(self):
@@ -105,10 +105,15 @@ class EntityRef(Primitive[EntityLibPy.EntityRef]):
 
 TComponent = TypeVar("TComponent")
 
+
 class UnionSet(Base):
     def get(self, key_type):  # type: (Type[TComponent]) -> TComponent
         typename = key_type.__name__
-        return key_type(self._node.map_get(typename).get_union_data())
+        union = self._node.map_get(typename)
+        if union is None:
+            return None
+        else:
+            return key_type(union.get_union_data())
 
     def add(self, key_type):  # type: (Type[TComponent]) -> TComponent
         typename = key_type.__name__
@@ -126,11 +131,11 @@ class Union(Base):
 
 
 class Array(Base, Generic[T]):
-    def __init__(self, item_ctor, node = None):  # type: (Callable[[Any], T], EntityLibPy.Node) -> None
+    def __init__(self, item_ctor, node=None):  # type: (Callable[[Any], T], EntityLibPy.Node) -> None
         super(Array, self).__init__(node)
         self._item_ctor = item_ctor
 
-    def __getitem__(self, idx: int):
+    def __getitem__(self, idx):  # type: (int) -> T
         return self._item_ctor(self._node.at(idx))
 
     def __len__(self):
@@ -164,14 +169,14 @@ class PrimArray(Array[T], Generic[T]):
 
 
 class ObjectSet(Base, Generic[T]):
-    def __init__(self, item_ctor, node = None): # type: (Callable[[Any], T], EntityLibPy.Node) -> None
+    def __init__(self, item_ctor, node=None):  # type: (Callable[[Any], T], EntityLibPy.Node) -> None
         super(ObjectSet, self).__init__(node)
         self._item_ctor = item_ctor
 
-    def get(self, key): # type: (...) -> T
+    def get(self, key):  # type: (...) -> T
         return self._item_ctor(self._node.map_get(key))
 
-    def add(self, key): # type: (...) -> T
+    def add(self, key):  # type: (...) -> T
         return self._item_ctor(self._node.map_insert(key))
 
     def remove(self, key):
@@ -180,7 +185,7 @@ class ObjectSet(Base, Generic[T]):
     def clean(self):
         return self._node.clean()
 
-    def __getitem__(self, key): # type: (...) -> T
+    def __getitem__(self, key):  # type: (...) -> T
         return self._item_ctor(self._node.map_get(key))
 
     def __len__(self):
@@ -224,7 +229,7 @@ class Map(Base, Generic[K, V]):
 
 
 class PrimitiveSet(Base, Generic[T]):
-    def __init__(self, item_ctor, node = None):  # type: (Callable[[Any], T], EntityLibPy.Node) -> None
+    def __init__(self, item_ctor, node=None):  # type: (Callable[[Any], T], EntityLibPy.Node) -> None
         super(PrimitiveSet, self).__init__(node)
         self._item_ctor = item_ctor
 
@@ -256,7 +261,7 @@ class PrimitiveSet(Base, Generic[T]):
 
 TTuple = TypeVar("TTuple", bound=Tuple)
 class TupleNode(Base, Generic[TTuple]):
-    def __init__(self, typelist, node = None): # type: (TTuple, EntityLibPy.Node) -> None
+    def __init__(self, typelist, node=None):  # type: (TTuple, EntityLibPy.Node) -> None
         super(TupleNode, self).__init__(node)
         self.typelist = typelist
 

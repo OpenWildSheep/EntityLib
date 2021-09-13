@@ -879,7 +879,7 @@ class {{schema.display_type}}(Base):
 
 
 {{/schema.enum}}{{#schema.tuple}}class {{schema.display_type}}(TupleNode[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
-    def __init__(self, node : EntityLibPy.Node = None):
+    def __init__(self, node=None):  # type: (EntityLibPy.Node) -> None
         super().__init__((Int, Int, Float, Float, Float), node)
 
 {{#types}}    def get_{{index}}(self):  # type: () -> {{>display_type}}

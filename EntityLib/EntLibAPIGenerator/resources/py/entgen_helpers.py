@@ -16,6 +16,12 @@ class Base(object):
     def __init__(self, node):
         self._node = node  # type: EntityLibPy.Node
 
+    def __bool__(self):
+        return self._node is not Node
+
+    def __nonzero__(self):
+        return self._node is not Node
+    
     @property
     def node(self):
         return self._node
@@ -93,6 +99,9 @@ class String(Primitive[str]):
 
     def set(self, val):  # type: (str) -> None
         return self._node.set_string(val)
+
+    def __str__(self):
+        return self._node.value
 
 
 class EntityRef(Primitive[EntityLibPy.EntityRef]):
@@ -191,6 +200,10 @@ class ObjectSet(Base, Generic[T]):
     def __len__(self):
         return self._node.size()
 
+    def __iter__(self):
+        for item in self._node.get_items():
+            yield self._item_ctor(item)
+
 
 K = TypeVar("K")
 V = TypeVar("V")
@@ -227,6 +240,13 @@ class Map(Base, Generic[K, V]):
     def __len__(self):
         return self._node.size()
 
+    def get_keys(self):  # type: () -> [K]
+        return self._node.get_keys()
+
+    def __iter__(self):
+        for key in self._node.get_keys():
+            yield (key, self.get(key))
+
 
 class PrimitiveSet(Base, Generic[T]):
     def __init__(self, item_ctor, node=None):  # type: (Callable[[Any], T], EntityLibPy.Node) -> None
@@ -245,6 +265,10 @@ class PrimitiveSet(Base, Generic[T]):
 
     def count(self, key):  # type: (T) -> bool
         return self._node.map_get(self.to_internal(key)) is not None
+
+    def __iter__(self):
+        for item in self._node.get_items():
+            yield self._item_ctor(item.value)
 
     # def remove(self, key):
     #    self._node.map_erase(key)

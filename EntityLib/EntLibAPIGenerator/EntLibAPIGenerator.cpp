@@ -11,8 +11,8 @@
 
 #pragma warning(push, 0)
 #include <iostream>
+#include <mustache.hpp>
 #include "../EntityLib/external/filesystem.hpp"
-#include "external/Mustache/mustache.hpp"
 #include "../EntityLib/external/json.hpp"
 #pragma warning(pop)
 
@@ -38,14 +38,15 @@ std::ofstream openOfstream(std::filesystem::path const& _filepath)
     return file;
 }
 
-data jsonToMustache(json const& j)
+/// @brief Convert a json to a mustache data
+data jsonToMustache(json const& _input)
 {
-    switch (j.type())
+    switch (_input.type())
     {
     case json::value_t::array:
     {
         data result(data::type::list);
-        for (auto&& elt : j)
+        for (auto&& elt : _input)
         {
             result.push_back(jsonToMustache(elt));
         }
@@ -54,62 +55,64 @@ data jsonToMustache(json const& j)
     case json::value_t::object:
     {
         data result(data::type::object);
-        for (auto&& [k, v] : j.items())
+        for (auto&& [k, v] : _input.items())
         {
             result.set(k, jsonToMustache(v));
         }
         return result;
     }
-    case json::value_t::boolean: return data(j.get<bool>());
-    case json::value_t::number_float: return data(std::to_string(j.get<double>()));
-    case json::value_t::number_integer: return data(std::to_string(j.get<int64_t>()));
-    case json::value_t::number_unsigned: return data(std::to_string(j.get<uint64_t>()));
-    case json::value_t::string: return data(j.get<std::string>());
+    case json::value_t::boolean: return data(_input.get<bool>());
+    case json::value_t::number_float: return data(std::to_string(_input.get<double>()));
+    case json::value_t::number_integer: return data(std::to_string(_input.get<int64_t>()));
+    case json::value_t::number_unsigned: return data(std::to_string(_input.get<uint64_t>()));
+    case json::value_t::string: return data(_input.get<std::string>());
     }
     return data(false);
 }
 
-static std::string replaceAll(std::string link, std::string const& before, std::string const& after)
+/// @brief In _input, replace all occurences of _before by _after
+static std::string replaceAll(std::string _input, std::string const& _before, std::string const& _after)
 {
     size_t pos = 0;
     while (pos != std::string::npos)
     {
-        pos = link.find(before);
+        pos = _input.find(_before);
         if (pos != std::string::npos)
         {
-            link = link.substr(0, pos) + after + link.substr(pos + before.size());
+            _input = _input.substr(0, pos) + _after + _input.substr(pos + _before.size());
         }
     }
-    return link;
+    return _input;
 }
 
+/// @brief Transform _name to ensure it doesn't conflict with C++ or python keywords
 static std::string escapeName(std::string _name)
 {
-    std::string name = _name;
     static std::set<std::string> cppKeywordTypes = {
         "float", "bool", "from", "in", "None", "Type", "throw", "do", "default"};
 
     std::regex eastlNS(R"regex(eastl::(\w+))regex");
-    name = std::regex_replace(name, eastlNS, "$1");
+    _name = std::regex_replace(_name, eastlNS, "$1");
     std::regex vector(R"regex(vector\<(\w+)\>)regex");
     std::string name2;
-    while (name2 != name)
+    while (name2 != _name)
     {
-        name2 = std::regex_replace(name, vector, "$1Vec");
-        std::swap(name, name2);
+        name2 = std::regex_replace(_name, vector, "$1Vec");
+        std::swap(_name, name2);
     }
-    name = replaceAll(name, "::", "_");
-    name = replaceAll(name, "<", "_");
-    name = replaceAll(name, ">", "_");
-    name = replaceAll(name, ",", "_");
-    if (cppKeywordTypes.count(name) != 0)
+    _name = replaceAll(_name, "::", "_");
+    _name = replaceAll(_name, "<", "_");
+    _name = replaceAll(_name, ">", "_");
+    _name = replaceAll(_name, ",", "_");
+    if (cppKeywordTypes.count(_name) != 0)
     {
-        return name + '_';
+        return _name + '_';
     }
-    return name;
+    return _name;
 }
 
-// Enum type are defined several times. "overwrite" is used to merge them is one
+/// @brief Add a definition into allDefs/schemaName
+/// @remark Enum types are defined several times. "overwrite" is used to merge them is one
 static void addDef(
     std::string const& _name,
     Ent::Subschema const* _def,
@@ -124,7 +127,7 @@ static void addDef(
     }
     else if (_overwrite)
     {
-        // Check if there is two enum at with the same name
+        // Check if there is two enum with the same name
         if (_def->enumValues != allDefs.at(escapedName)->enumValues)
         {
             fprintf(stderr, "Two enums with the same name!! %s", _name.c_str());
@@ -143,22 +146,24 @@ static void addDef(
     }
 }
 
-static std::string getRefTypeName(std::string link)
+/// @brief Get a type name for a given _link
+static std::string getRefTypeName(std::string _link)
 {
-    link = escapeName(link);
+    _link = escapeName(_link);
 
     // Force to create the definition (do nothing if already exist)
     static char const* definitionsStr = "#/definitions/";
-    size_t pos = link.find(definitionsStr);
+    size_t pos = _link.find(definitionsStr);
     if (pos == std::string::npos)
     {
-        return link;
+        return _link;
     }
-    return link.substr(pos + strlen(definitionsStr));
+    return _link.substr(pos + strlen(definitionsStr));
 }
 
 static json makeNewType()
 {
+    // To avoid infinite loop in mustache, it is better that all fields are defined or false
     json type;
     type["array"] = false;
     type["prim_array"] = false;
@@ -172,18 +177,20 @@ static json makeNewType()
     return type;
 }
 
-static json getSchemaRefType(Ent::SubschemaRef const& ref);
+static json getSchemaRefType(Ent::SubschemaRef const& _ref);
 
-auto prim = [](char const* name) {
+/// @brief Make the description of a primitive type
+static json prim(char const* _name)
+{
     json type = makeNewType();
     json ref;
-    ref["name"] = (char)toupper(name[0]) + std::string((name + 1));
-    if (name == std::string("String"))
+    ref["name"] = (char)toupper(_name[0]) + std::string((_name + 1));
+    if (_name == std::string("String"))
     {
         ref["py_native"] = "str";
         ref["cpp_native"] = "char const*";
     }
-    else if (name == std::string("Int"))
+    else if (_name == std::string("Int"))
     {
         ref["py_native"] = "int";
         ref["cpp_native"] = "int64_t";
@@ -191,7 +198,7 @@ auto prim = [](char const* name) {
     ref["settable"] = true;
     type["ref"] = std::move(ref);
     return type;
-};
+}
 
 static std::set<Ent::DataType> primitiveTypes = {
     Ent::DataType::boolean,
@@ -200,9 +207,10 @@ static std::set<Ent::DataType> primitiveTypes = {
     Ent::DataType::string,
     Ent::DataType::entityRef};
 
-char const* primitiveName(Ent::DataType type)
+/// @brief Get the name of a given primitive _type
+char const* primitiveName(Ent::DataType _type)
 {
-    switch (type)
+    switch (_type)
     {
     case Ent::DataType::boolean: return "Bool";
     case Ent::DataType::integer: return "Int";
@@ -213,9 +221,10 @@ char const* primitiveName(Ent::DataType type)
     ENTLIB_LOGIC_ERROR("Unexpected DataType");
 }
 
-static bool isPrimArray(Ent::Subschema const& ref)
+/// @return true if it is an array of primitive type
+static bool isPrimArray(Ent::Subschema const& _ref)
 {
-    if (auto singularItems = ref.singularItems.get())
+    if (auto singularItems = _ref.singularItems.get())
     {
         return primitiveTypes.count(singularItems->get().type) != 0;
     }
@@ -225,30 +234,31 @@ static bool isPrimArray(Ent::Subschema const& ref)
     }
 }
 
-static json getSchemaType(Ent::Subschema const& schema)
+/// @brief Get a json describing the type of a given  _schema
+static json getSchemaType(Ent::Subschema const& _schema)
 {
     json type = makeNewType();
 
-    switch (schema.type)
+    switch (_schema.type)
     {
     case Ent::DataType::object:
     {
-        std::string typeDispName = schemaName[&schema];
+        std::string typeDispName = schemaName[&_schema];
         json ref;
         ref["name"] = typeDispName;
         type["ref"] = std::move(ref);
         return type;
     }
     case Ent::DataType::array:
-        if (schema.singularItems != nullptr)
+        if (_schema.singularItems != nullptr)
         {
-            auto const& meta = schema.meta.get<Ent::Subschema::ArrayMeta>();
+            auto const& meta = _schema.meta.get<Ent::Subschema::ArrayMeta>();
             if (meta.overridePolicy == "set")
             {
-                auto const singularType = (*schema.singularItems)->type;
+                auto const singularType = (*_schema.singularItems)->type;
                 if (singularType == Ent::DataType::oneOf)
                 {
-                    std::string typeDispName = schemaName.at(&schema);
+                    std::string typeDispName = schemaName.at(&_schema);
                     json ref;
                     ref["name"] = typeDispName;
                     type["ref"] = std::move(ref);
@@ -257,9 +267,9 @@ static json getSchemaType(Ent::Subschema const& schema)
                 else if (singularType == Ent::DataType::object)
                 {
                     json array;
-                    array["type"] = getSchemaRefType(*schema.singularItems);
-                    auto keyFieldName = schema.meta.get<Ent::Subschema::ArrayMeta>().keyField;
-                    auto& keyField = schema.singularItems->get().properties.at(*keyFieldName);
+                    array["type"] = getSchemaRefType(*_schema.singularItems);
+                    auto keyFieldName = _schema.meta.get<Ent::Subschema::ArrayMeta>().keyField;
+                    auto& keyField = _schema.singularItems->get().properties.at(*keyFieldName);
                     array["key_type"] = getSchemaRefType(keyField);
                     type["object_set"] = std::move(array);
                     return type;
@@ -270,7 +280,7 @@ static json getSchemaType(Ent::Subschema const& schema)
                     || singularType == Ent::DataType::string)
                 {
                     json array;
-                    array["type"] = getSchemaRefType(*schema.singularItems);
+                    array["type"] = getSchemaRefType(*_schema.singularItems);
                     type["prim_set"] = std::move(array);
                     return type;
                 }
@@ -278,23 +288,23 @@ static json getSchemaType(Ent::Subschema const& schema)
             else if (meta.overridePolicy == "map")
             {
                 json array;
-                auto& pair = *schema.singularItems;
+                auto& pair = *_schema.singularItems;
                 array["key_type"] = getSchemaRefType(pair->linearItems->at(0));
                 array["value_type"] = getSchemaRefType(pair->linearItems->at(1));
                 type["map"] = std::move(array);
                 return type;
             }
-            else if (isPrimArray(schema))
+            else if (isPrimArray(_schema))
             {
                 json array;
-                array["type"] = getSchemaRefType(*schema.singularItems);
+                array["type"] = getSchemaRefType(*_schema.singularItems);
                 type["prim_array"] = std::move(array);
                 return type;
             }
             else
             {
                 json array;
-                array["type"] = getSchemaRefType(*schema.singularItems);
+                array["type"] = getSchemaRefType(*_schema.singularItems);
                 type["array"] = std::move(array);
                 return type;
             }
@@ -305,10 +315,10 @@ static json getSchemaType(Ent::Subschema const& schema)
             json types(json::value_t::array);
             size_t index = 0;
 
-            for (auto& itemRef : *schema.linearItems)
+            for (auto& itemRef : *_schema.linearItems)
             {
                 auto subtype = getSchemaRefType(itemRef);
-                if (index != schema.linearItems->size() - 1)
+                if (index != _schema.linearItems->size() - 1)
                 {
                     subtype["comma"] = true;
                 }
@@ -320,59 +330,62 @@ static json getSchemaType(Ent::Subschema const& schema)
             type["tuple"] = std::move(tuple);
             return type;
         }
+        ENTLIB_LOGIC_ERROR("Unexpected fallthrough");
     case Ent::DataType::oneOf:
     {
-        std::string typeDispName = schemaName[&schema];
+        std::string typeDispName = schemaName[&_schema];
         json ref;
         ref["name"] = typeDispName;
         type["ref"] = std::move(ref);
         return type;
     }
-    case Ent::DataType::boolean:
-    case Ent::DataType::integer:
-    case Ent::DataType::number:
-    case Ent::DataType::string:
+    case Ent::DataType::boolean: [[fallthrough]];
+    case Ent::DataType::integer: [[fallthrough]];
+    case Ent::DataType::number: [[fallthrough]];
+    case Ent::DataType::string: [[fallthrough]];
     case Ent::DataType::entityRef:
-        if (auto iter = schemaName.find(&schema); iter != schemaName.end())
+        if (auto iter = schemaName.find(&_schema); iter != schemaName.end())
         {
             std::string const& typeDispName = iter->second;
             json ref;
             ref["name"] = typeDispName;
             type["ref"] = std::move(ref);
             // It works because in the schema, Enums are always strings
-            type["ref"]["py_native"] = schema.name.empty() ? "str" : schema.name + "Enum";
-            type["ref"]["cpp_native"] = schema.name.empty() ? "char const*" : schema.name + "Enum";
+            type["ref"]["py_native"] = _schema.name.empty() ? "str" : _schema.name + "Enum";
+            type["ref"]["cpp_native"] = _schema.name.empty() ? "char const*" : _schema.name + "Enum";
             type["ref"]["settable"] = true;
             return type;
         }
         else
         {
-            return prim(primitiveName(schema.type));
+            return prim(primitiveName(_schema.type));
         }
     }
     return json{};
 }
 
-static json getSchemaRefType(Ent::SubschemaRef const& ref)
+/// @brief Get a json describing the type of a given _ref
+static json getSchemaRefType(Ent::SubschemaRef const& _ref)
 {
-    if (ref.subSchemaOrRef.is<Ent::Subschema>())
+    if (_ref.subSchemaOrRef.is<Ent::Subschema>())
     {
-        return getSchemaType(*ref);
+        return getSchemaType(*_ref);
     }
     else
     {
-        std::string singItmRef = ref.subSchemaOrRef.get<Ent::SubschemaRef::Ref>().ref;
+        std::string singItmRef = _ref.subSchemaOrRef.get<Ent::SubschemaRef::Ref>().ref;
         auto name = getRefTypeName(singItmRef);
         json typeref;
         typeref["name"] = name;
-        typeref["settable"] = isPrimArray(*ref) or primitiveTypes.count(ref->type) != 0;
+        typeref["settable"] = isPrimArray(*_ref) or primitiveTypes.count(_ref->type) != 0;
         json type = makeNewType();
         type["ref"] = std::move(typeref);
         return type;
     }
 }
 
-static json getSchemaData(Ent::Subschema const& schema)
+/// @brief Get a json describing the data of a given _schema
+static json getSchemaData(Ent::Subschema const& _schema)
 {
     json defData;
     defData["alias"] = false;
@@ -383,33 +396,29 @@ static json getSchemaData(Ent::Subschema const& schema)
     defData["union"] = false;
     defData["map"] = false;
     defData["enum"] = false;
-    // defData["array"] = false; // Always an alias
-    // defData["prim_array"] = false; // Always an alias
-    // defData["prim_set"] = false;  // Always an alias
-    // defData["ref"] = false;   // A definition can't be a ref
 
-    switch (schema.type)
+    switch (_schema.type)
     {
     case Ent::DataType::array:
-        if (schema.singularItems != nullptr)
+        if (_schema.singularItems != nullptr)
         {
-            auto const& meta = schema.meta.get<Ent::Subschema::ArrayMeta>();
+            auto const& meta = _schema.meta.get<Ent::Subschema::ArrayMeta>();
             if (meta.overridePolicy == "set")
             {
-                auto const singularType = (*schema.singularItems)->type;
+                auto const singularType = (*_schema.singularItems)->type;
                 if (singularType == Ent::DataType::oneOf)
                 {
-                    Ent::Subschema const& unionSchema = **schema.singularItems;
+                    Ent::Subschema const& unionSchema = **_schema.singularItems;
                     defData["union_set"] = getSchemaData(unionSchema);
                     defData["union_set"]["items"]["union_set"] =
-                        getSchemaRefType(*schema.singularItems);
+                        getSchemaRefType(*_schema.singularItems);
                     break;
                 }
                 else if (singularType == Ent::DataType::object)
                 {
-                    Ent::Subschema const& unionSchema = **schema.singularItems;
+                    Ent::Subschema const& unionSchema = **_schema.singularItems;
                     defData["object_set"] = getSchemaData(unionSchema);
-                    defData["object_set"]["items"] = getSchemaRefType(*schema.singularItems);
+                    defData["object_set"]["items"] = getSchemaRefType(*_schema.singularItems);
                     break;
                 }
                 else if (
@@ -419,22 +428,22 @@ static json getSchemaData(Ent::Subschema const& schema)
                 {
                     // A primitive set is a native type so it is just an alias
                     json alias(json::value_t::object);
-                    alias["type"] = getSchemaType(schema);
+                    alias["type"] = getSchemaType(_schema);
                     defData["alias"] = std::move(alias);
                     break;
                 }
             }
             else if (meta.overridePolicy == "map")
             {
-                Ent::Subschema const& unionSchema = **schema.singularItems;
+                Ent::Subschema const& unionSchema = **_schema.singularItems;
                 defData["map"] = getSchemaData(unionSchema);
-                defData["map"]["items"] = getSchemaRefType(*schema.singularItems);
+                defData["map"]["items"] = getSchemaRefType(*_schema.singularItems);
                 break;
             }
             else
             {
                 json alias(json::value_t::object);
-                alias["type"] = getSchemaType(schema);
+                alias["type"] = getSchemaType(_schema);
                 defData["alias"] = std::move(alias);
                 break;
             }
@@ -445,10 +454,10 @@ static json getSchemaData(Ent::Subschema const& schema)
             json types(json::value_t::array);
             size_t index = 0;
 
-            for (auto& itemRef : *schema.linearItems)
+            for (auto& itemRef : *_schema.linearItems)
             {
                 auto subtype = getSchemaRefType(itemRef);
-                if (index != schema.linearItems->size() - 1)
+                if (index != _schema.linearItems->size() - 1)
                 {
                     subtype["comma"] = true;
                 }
@@ -460,20 +469,21 @@ static json getSchemaData(Ent::Subschema const& schema)
             defData["tuple"] = std::move(tuple);
             break;
         }
-    case Ent::DataType::boolean:
-    case Ent::DataType::entityRef:
-    case Ent::DataType::integer:
-    case Ent::DataType::number:
+        ENTLIB_LOGIC_ERROR("Unexpected fallthrough");
+    case Ent::DataType::boolean: [[fallthrough]];
+    case Ent::DataType::entityRef: [[fallthrough]];
+    case Ent::DataType::integer: [[fallthrough]];
+    case Ent::DataType::number: [[fallthrough]];
     case Ent::DataType::string:
     {
-        if (not schema.enumValues.empty())
+        if (not _schema.enumValues.empty())
         {
             json enumNode(json::value_t::object);
             enumNode["type"] = prim("String");
-            enumNode["type"]["ref"]["cpp_native"] = schema.name + "Enum";
-            enumNode["type"]["ref"]["py_native"] = schema.name + "Enum";
+            enumNode["type"]["ref"]["cpp_native"] = _schema.name + "Enum";
+            enumNode["type"]["ref"]["py_native"] = _schema.name + "Enum";
             size_t idx = 0;
-            for (auto&& val : schema.enumValues)
+            for (auto&& val : _schema.enumValues)
             {
                 enumNode["values"].push_back(json::value_t::object);
                 enumNode["values"].back()["escaped_name"] = escapeName(val);
@@ -485,7 +495,7 @@ static json getSchemaData(Ent::Subschema const& schema)
             break;
         }
         json alias(json::value_t::object);
-        alias["type"] = prim(primitiveName(schema.type));
+        alias["type"] = prim(primitiveName(_schema.type));
         defData["alias"] = std::move(alias);
         break;
     }
@@ -494,7 +504,7 @@ static json getSchemaData(Ent::Subschema const& schema)
         json object(json::value_t::object);
         json properties(json::value_t::array);
         std::set<json> includes;
-        for (auto& [propName, propRef] : schema.properties)
+        for (auto& [propName, propRef] : _schema.properties)
         {
             json prop(json::value_t::object);
             auto propData = getSchemaRefType(propRef);
@@ -512,8 +522,8 @@ static json getSchemaData(Ent::Subschema const& schema)
     {
         json union_(json::value_t::object);
         json types(json::value_t::array);
-        auto const& unionData = schema.meta.get<Ent::Subschema::UnionMeta>();
-        for (Ent::SubschemaRef const& ref : *schema.oneOf)
+        auto const& unionData = _schema.meta.get<Ent::Subschema::UnionMeta>();
+        for (Ent::SubschemaRef const& ref : *_schema.oneOf)
         {
             auto acceptedType =
                 ref.get().properties.at(unionData.typeField)->constValue->get<std::string>();
@@ -532,59 +542,65 @@ static json getSchemaData(Ent::Subschema const& schema)
     return defData;
 }
 
-#pragma warning(disable : 4702)
-
 static void giveNameToAnonymousObject(
-    Ent::Subschema const& subschema, std::string const& hint, std::string const& morehint);
+    Ent::Subschema const& _subschema, std::string const& _hint, std::string const& _morehint);
 
+/// @brief Add a named definition for an anonymous _ref
 static void giveNameToAnonymousObjectRef(
-    Ent::SubschemaRef const& ref, std::string const& hint, std::string const& hint2)
+    Ent::SubschemaRef const& _ref,
+    std::string const& _hint, ///< A string that could be the name
+    std::string const& _hint2 ///< A string that could be used to avoid conflict
+)
 {
-    if (ref.subSchemaOrRef.is<Ent::Subschema>())
+    if (_ref.subSchemaOrRef.is<Ent::Subschema>())
     {
-        if (ref->type == Ent::DataType::object)
+        if (_ref->type == Ent::DataType::object)
         {
-            addDef(hint, &(*ref), hint2);
+            addDef(_hint, &(*_ref), _hint2);
         }
-        else if (ref->type == Ent::DataType::oneOf)
+        else if (_ref->type == Ent::DataType::oneOf)
         {
-            addDef(hint, &(*ref), hint2);
+            addDef(_hint, &(*_ref), _hint2);
         }
-        else if (ref->type == Ent::DataType::array)
+        else if (_ref->type == Ent::DataType::array)
         {
-            if (ref->singularItems != nullptr)
+            if (_ref->singularItems != nullptr)
             {
-                auto const& meta = ref->meta.get<Ent::Subschema::ArrayMeta>();
+                auto const& meta = _ref->meta.get<Ent::Subschema::ArrayMeta>();
                 if (meta.overridePolicy == "set")
                 {
-                    if ((*ref->singularItems)->type == Ent::DataType::oneOf)
+                    if ((*_ref->singularItems)->type == Ent::DataType::oneOf)
                     {
-                        addDef(hint, &(*ref), hint2);
+                        addDef(_hint, &(*_ref), _hint2);
                     }
                 }
             }
         }
-        else if (not ref->enumValues.empty())
+        else if (not _ref->enumValues.empty())
         {
-            if (not ref->name.empty())
+            if (not _ref->name.empty())
             {
                 // The same enum can be descibe several time
                 // TODO : Loïc : Fix the export of enums in Wild (Export each enum only one time, like classes)
-                addDef(ref->name, &(*ref), "", true);
+                addDef(_ref->name, &(*_ref), "", true);
             }
             else
             {
-                addDef(hint, &(*ref), hint2);
+                addDef(_hint, &(*_ref), _hint2);
             }
         }
-        giveNameToAnonymousObject(*ref, hint, hint2);
+        giveNameToAnonymousObject(*_ref, _hint, _hint2);
     }
 }
 
+/// @brief Add a named definition for an anonymous _subschema
 static void giveNameToAnonymousObject(
-    Ent::Subschema const& subschema, std::string const& hint, std::string const& morehint)
+    Ent::Subschema const& _subschema,
+    std::string const& _hint, ///< A string that could be the name
+    std::string const& _morehint ///< A string that could be used to avoid conflict
+)
 {
-    switch (subschema.type)
+    switch (_subschema.type)
     {
     case Ent::DataType::boolean:
     case Ent::DataType::entityRef:
@@ -592,43 +608,44 @@ static void giveNameToAnonymousObject(
     case Ent::DataType::number:
     case Ent::DataType::string: return;
     case Ent::DataType::array:
-        if (subschema.linearItems.has_value())
+        if (_subschema.linearItems.has_value())
         {
             size_t index = 0;
-            for (auto& subref : *subschema.linearItems)
+            for (auto& subref : *_subschema.linearItems)
             {
-                giveNameToAnonymousObjectRef(subref, hint + "_" + char('A' + index), morehint);
+                giveNameToAnonymousObjectRef(subref, _hint + "_" + char('A' + index), _morehint);
             }
             ++index;
         }
-        if (subschema.singularItems != nullptr)
+        if (_subschema.singularItems != nullptr)
         {
-            giveNameToAnonymousObjectRef(*subschema.singularItems, hint + "Item", morehint);
+            giveNameToAnonymousObjectRef(*_subschema.singularItems, _hint + "Item", _morehint);
         }
         break;
     case Ent::DataType::oneOf:
     {
-        auto const& unionData = subschema.meta.get<Ent::Subschema::UnionMeta>();
-        for (Ent::SubschemaRef const& subref : *subschema.oneOf)
+        auto const& unionData = _subschema.meta.get<Ent::Subschema::UnionMeta>();
+        for (Ent::SubschemaRef const& subref : *_subschema.oneOf)
         {
             auto typeField = unionData.typeField.empty() ? "Type" : unionData.typeField;
             auto dataField = unionData.dataField.empty() ? "Data" : unionData.dataField;
             auto acceptedType = subref.get().properties.at(typeField)->constValue->get<std::string>();
             Ent::SubschemaRef const& subschemaref = subref.get().properties.at(dataField);
-            giveNameToAnonymousObjectRef(subschemaref, typeField, hint);
+            giveNameToAnonymousObjectRef(subschemaref, typeField, _hint);
         }
         break;
     }
     case Ent::DataType::object:
-        for (auto& [propName, propRef] : subschema.properties)
+        for (auto& [propName, propRef] : _subschema.properties)
         {
-            giveNameToAnonymousObjectRef(propRef, propName, hint);
+            giveNameToAnonymousObjectRef(propRef, propName, _hint);
         }
         break;
     }
 }
 
-void gencpp(std::filesystem::path const& resourcePath, std::filesystem::path const& destinationPath)
+/// @brief Generate the cpp EntGen API
+void gencpp(std::filesystem::path const& _resourcePath, std::filesystem::path const& _destinationPath)
 {
     data rootData;
     rootData["all_definitions"] = jsonToMustache(allDefinitions);
@@ -766,15 +783,16 @@ namespace Ent
 } // Ent
 )cpp"};
 
-    create_directories(destinationPath);
-    std::ofstream output = openOfstream(destinationPath / "EntGen.h");
+    create_directories(_destinationPath);
+    std::ofstream output = openOfstream(_destinationPath / "EntGen.h");
     tmpl.render(rootData, output);
-    copy_file(resourcePath / "EntGenHelpers.h", destinationPath / "EntGenHelpers.h", overwrite);
+    copy_file(_resourcePath / "EntGenHelpers.h", _destinationPath / "EntGenHelpers.h", overwrite);
 }
 
-void genpy(std::filesystem::path const& resourcePath, std::filesystem::path const& destinationPath)
+/// @brief Generate the python EntGen API
+void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path const& _destinationPath)
 {
-    create_directories(destinationPath / "entgen");
+    create_directories(_destinationPath / "entgen");
 
     auto add_partials = [](data& root) {
         root["display_type"] = partial([]() {
@@ -890,7 +908,7 @@ class {{schema.display_type}}(Base):
 
 )py"};
         auto shortTypeName = refSchema["schema"]["display_type"].get<std::string>();
-        std::ofstream output = openOfstream(destinationPath / "entgen" / (shortTypeName + ".py"));
+        std::ofstream output = openOfstream(_destinationPath / "entgen" / (shortTypeName + ".py"));
         tmpl.render(rootData, output);
     }
 
@@ -961,7 +979,7 @@ Entity = Object
 
 )py"};
 
-    std::ofstream outputCommon = openOfstream(destinationPath / "entgen/inline.py");
+    std::ofstream outputCommon = openOfstream(_destinationPath / "entgen/inline.py");
     allInline.render(rootData, outputCommon);
 
     mustache all{R"py(
@@ -983,13 +1001,13 @@ Entity = Object
 
 )py"};
 
-    std::ofstream outputAll = openOfstream(destinationPath / "entgen/_all.py");
+    std::ofstream outputAll = openOfstream(_destinationPath / "entgen/_all.py");
     all.render(rootData, outputAll);
 
-    copy_file(resourcePath / "entgen_helpers.py", destinationPath / "entgen_helpers.py", overwrite);
+    copy_file(_resourcePath / "entgen_helpers.py", _destinationPath / "entgen_helpers.py", overwrite);
     for (auto&& file : {"Bool.py", "EntityRef.py", "Float.py", "Int.py", "String.py"})
     {
-        copy_file(resourcePath / "entgen" / file, destinationPath / "entgen" / file, overwrite);
+        copy_file(_resourcePath / "entgen" / file, _destinationPath / "entgen" / file, overwrite);
     }
 }
 

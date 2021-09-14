@@ -205,6 +205,9 @@ class ObjectSet(Base, Generic[T]):
         for item in self._node.get_items():
             yield self._item_ctor(item)
 
+    def insert_instanceof(self, instance_path):
+        return self._item_ctor(self._node.map_insert_instanceof(instance_path))
+
 
 K = TypeVar("K")
 V = TypeVar("V")
@@ -307,3 +310,15 @@ class TupleNode(Base, Generic[TTuple]):
 class HelperObject(Base):
     def save(self, dest_file):
         self._node.save_node(dest_file)
+
+    def get_instance_of(self):  # type: () -> str
+        return self._node.get_instance_of()
+
+    def reset_instance_of(self, path):  # type: (str) -> None
+        self._node.reset_instance_of(path)
+
+    def change_instance_of(self, path):  # type: (str) -> None
+        self._node.change_instance_of(path)
+
+    def make_instance_of(self):
+        return self.__class__(self._node.make_instance_of())

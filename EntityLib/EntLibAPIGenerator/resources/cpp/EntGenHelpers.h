@@ -363,6 +363,11 @@ namespace Ent
                 }
                 return items;
             }
+
+            O insertInstanceOf(char const* _prefabPath)
+            {
+                return node->mapInsertInstanceOf(_prefabPath);
+            }
         };
 
         template <typename... Args>
@@ -526,6 +531,40 @@ namespace Ent
             HelperObject(Ent::Node* _node)
                 : Base(_node)
             {
+            }
+
+            /// path to the prefab Node
+            char const* getInstanceOf() const
+            {
+                return node->getInstanceOf();
+            }
+
+            /// Create a Node which is an "instance of" this one. With no override.
+            Node makeInstanceOf() const
+            {
+                return node->makeInstanceOf();
+            }
+
+            /// Reset the Node to be an instance of the given \b _prefabNodePath
+            ///
+            /// @warning All sub-nodes into \b _node will be invalidated
+            /// @param _prefabNodePath path to the prefab Node (relative to RawData)
+            void resetInstanceOf(char const* _prefabNodePath)
+            {
+                node->resetInstanceOf(_prefabNodePath);
+            }
+
+            void resetInstanceOf()
+            {
+                node->resetInstanceOf();
+            }
+
+            /// @brief Change this Entity to be an instance of the given \b _newPrefab, keeping
+            /// all internal values the same.
+            /// @param _newPrefab path to the new prefab
+            void changeInstanceOf(char const* _newPrefab)
+            {
+                node->changeInstanceOf(_newPrefab);
             }
 
             void save(std::filesystem::path const& _destFile)

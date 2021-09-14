@@ -396,6 +396,14 @@ static json getSchemaData(Ent::Subschema const& _schema)
     defData["union"] = false;
     defData["map"] = false;
     defData["enum"] = false;
+    if (not _schema.name.empty())
+    {
+        defData["schema_name"] = _schema.name;
+    }
+    else
+    {
+        defData["schema_name"] = false;
+    }
 
     switch (_schema.type)
     {
@@ -699,9 +707,16 @@ namespace Ent
         using {{schema.display_type}} = {{#type}}{{>display_type}}{{/type}};{{/schema.alias}}{{/all_definitions}}
 
         {{#all_definitions}}{{#schema.object}}
-        struct {{schema.display_type}} : Base // Object
+        struct {{schema.display_type}} : HelperObject // Object
         {
-	        {{schema.display_type}}(Ent::Node* _node): Base(_node) {}
+            {{schema.display_type}}(Ent::Node* _node): HelperObject(_node) {}
+            {{#schema.schema_name}}
+            static constexpr char schemaName[] = "{{.}}";
+            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            {{/schema.schema_name}}
         {{#properties}}    {{#type}}{{>display_type}}{{/type}} {{prop_name}}() const;
         {{/properties}}
         };{{/schema.object}}{{#schema.enum}}
@@ -710,6 +725,7 @@ namespace Ent
             using Enum = {{schema.display_type}}Enum;
             using PropHelper<{{schema.display_type}}, Enum>::operator=;
 	        {{schema.display_type}}(Ent::Node* _node): EnumPropHelper<{{schema.display_type}}, Enum>(_node) {}
+            {{#schema.schema_name}}static constexpr char schemaName[] = "{{.}}";{{/schema.schema_name}}
             static constexpr char* enumToString[] = {
                 {{#values}}"{{name}}",
                 {{/values}}
@@ -725,6 +741,7 @@ namespace Ent
         struct {{schema.display_type}} : Base // Union
         {
 	        {{schema.display_type}}(Ent::Node* _node): Base(_node) {}
+            {{#schema.schema_name}}static constexpr char schemaName[] = "{{.}}";{{/schema.schema_name}}
             char const* getType() const;{{#types}}
             {{#type}}{{>display_type}}{{/type}} {{name}}() const;
             {{#type}}{{>display_type}}{{/type}} set{{name}}() const;
@@ -736,6 +753,7 @@ namespace Ent
                 : UnionSetBase<{{schema.display_type}}>(_node)
             {
             }
+            {{#schema.schema_name}}static constexpr char schemaName[] = "{{.}}";{{/schema.schema_name}}
             char const* getType() const;{{#types}}
             {{#type}}{{>display_type}}{{/type}} {{name}}() const;
             {{#type}}{{>display_type}}{{/type}} add{{name}}() const;
@@ -851,6 +869,7 @@ import EntityLibPy
 {{#file_schema}}{{#schema.union_set}}{{schema.display_type}} = UnionSet
 {{/schema.union_set}}{{#schema.object_set}}
 class {{schema.display_type_comma}}(UnionSet):
+    {{#schema.schema_name}}schema_name = "{{.}}"{{/schema.schema_name}}
     pass
 {{/schema.object_set}}{{#schema.enum}}
 class {{schema.display_type}}Enum(Enum):
@@ -869,7 +888,13 @@ class {{schema.display_type}}Enum(Enum):
 {{>print_import}}
 {{/includes}}
 
-class {{schema.display_type}}(Base):
+class {{schema.display_type}}(HelperObject):
+{{#schema.schema_name}}
+    schema_name = "{{.}}"
+    @staticmethod
+    def load(entlib, sourcefile):
+        return entlib.load_node_file(sourcefile, entlib.get_schema({{schema.display_type}}.schema_name))
+{{/schema.schema_name}}
 {{#properties}}{{#type}}    @property
     def {{prop_name}}(self): return {{>type_ctor}}(self._node.at("{{prop_name}}")){{#prim_array}}
     @{{prop_name}}.setter
@@ -888,6 +913,7 @@ class {{schema.display_type}}(Base):
 {{/schema.union}}{{#schema.enum}}class {{schema.display_type}}(Primitive[{{schema.display_type}}Enum]):  # Enum
     def __init__(self, node):
         super().__init__({{schema.display_type}}Enum, node)
+    {{#schema.schema_name}}schema_name = "{{.}}"{{/schema.schema_name}}
     def __call__(self, node):  # type: (EntityLibPy.Node) -> {{schema.display_type}}
         return {{schema.display_type}}(node)
     def set(self, val):  # type: ({{schema.display_type}}Enum) -> None
@@ -899,6 +925,7 @@ class {{schema.display_type}}(Base):
 {{/schema.enum}}{{#schema.tuple}}class {{schema.display_type}}(TupleNode[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
     def __init__(self, node=None):  # type: (EntityLibPy.Node) -> None
         super().__init__((Int, Int, Float, Float, Float), node)
+    {{#schema.schema_name}}schema_name = "{{.}}"{{/schema.schema_name}}
 
 {{#types}}    def get_{{index}}(self):  # type: () -> {{>display_type}}
         return {{>type_ctor}}(self._node.at({{index}}))
@@ -927,6 +954,7 @@ from enum import Enum
 {{#all_definitions}}{{#schema.union_set}}{{schema.display_type}} = UnionSet
 {{/schema.union_set}}{{#schema.object_set}}
 class {{schema.display_type_comma}}(UnionSet):
+    {{#schema.schema_name}}schema_name = "{{.}}"{{/schema.schema_name}}
     pass
 {{/schema.object_set}}{{#schema.enum}}
 class {{schema.display_type}}Enum(Enum):
@@ -938,8 +966,13 @@ class {{schema.display_type}}Enum(Enum):
 {{/schema.alias}}{{/all_definitions}}
 
 
-{{#all_definitions}}{{#schema.object}}class {{schema.display_type}}(Base):
-{{#properties}}{{#type}}    @property
+{{#all_definitions}}{{#schema.object}}class {{schema.display_type}}(HelperObject):
+{{#schema.schema_name}}
+    schema_name = "{{.}}"
+    @staticmethod
+    def load(entlib, sourcefile):
+        return entlib.load_node_file(sourcefile, entlib.get_schema({{schema.display_type}}.schema_name))
+{{/schema.schema_name}}{{#properties}}{{#type}}    @property
     def {{prop_name}}(self): return {{>type_ctor}}(self._node.at("{{prop_name}}")){{#prim_array}}
     @{{prop_name}}.setter
     def {{prop_name}}(self, val): self.{{prop_name}}.set(val)
@@ -951,12 +984,14 @@ class {{schema.display_type}}Enum(Enum):
 
 
 {{/schema.object}}{{#schema.union}}class {{schema.display_type}}(Union):
+    {{#schema.schema_name}}schema_name = "{{.}}"{{/schema.schema_name}}
     pass
 
 
 {{/schema.union}}{{#schema.enum}}class {{schema.display_type}}(Primitive[{{schema.display_type}}Enum]):  # Enum
     def __init__(self, node):
         super().__init__({{schema.display_type}}Enum, node)
+    {{#schema.schema_name}}schema_name = "{{.}}"{{/schema.schema_name}}
     def __call__(self, node):  # type: (EntityLibPy.Node) -> {{schema.display_type}}
         return {{schema.display_type}}(node)
     def set(self, val):  # type: ({{schema.display_type}}Enum) -> None
@@ -968,6 +1003,7 @@ class {{schema.display_type}}Enum(Enum):
 {{/schema.enum}}{{#schema.tuple}}class {{schema.display_type}}(TupleNode[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
     def __init__(self, node : EntityLibPy.Node = None):
         super().__init__((Int, Int, Float, Float, Float), node)
+    {{#schema.schema_name}}schema_name = "{{.}}"{{/schema.schema_name}}
 
 {{#types}}    def get_{{index}}(self):  # type: () -> {{>display_type}}
         return {{>type_ctor}}(self._node.at({{index}}))

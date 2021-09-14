@@ -1,8 +1,9 @@
-MYPY = False
 from typing import TypeVar, Generic, Tuple, Type, Callable, Any
 from enum import Enum
 import EntityLibPy
 import inspect
+
+MYPY = False
 
 TODO_None = None
 TODO_Tuple = None
@@ -215,7 +216,8 @@ class Map(Base, Generic[K, V]):
         self._key_type = key_type
         self._item_ctor = item_ctor
 
-    def to_internal(self, key):  # type : (T) -> T
+    @staticmethod
+    def to_internal(key):  # type : (T) -> T
         if issubclass(type(key), Enum):
             return key.value
         else:
@@ -253,7 +255,8 @@ class PrimitiveSet(Base, Generic[T]):
         super(PrimitiveSet, self).__init__(node)
         self._item_ctor = item_ctor
 
-    def to_internal(self, key):  # type : (T) -> T
+    @staticmethod
+    def to_internal(key):  # type : (T) -> T
         if issubclass(type(key), Enum):
             return key.value
         else:
@@ -284,6 +287,8 @@ class PrimitiveSet(Base, Generic[T]):
 
 
 TTuple = TypeVar("TTuple", bound=Tuple)
+
+
 class TupleNode(Base, Generic[TTuple]):
     def __init__(self, typelist, node=None):  # type: (TTuple, EntityLibPy.Node) -> None
         super(TupleNode, self).__init__(node)
@@ -297,3 +302,8 @@ class TupleNode(Base, Generic[TTuple]):
 
     def __len__(self):
         return self._node.size()
+
+
+class HelperObject(Base):
+    def save(self, dest_file):
+        self._node.save_node(dest_file)

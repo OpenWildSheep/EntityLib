@@ -28,6 +28,11 @@ ent = Entity(entlib.load_node_entity(Ent.path("instance.entity")))
 name = ent.Name  # inferred type : String
 assert isinstance(name, String)
 components = ent.Components  # inferred type : UnionSet
+# load Object
+ent2node = Entity.load(entlib, "instance.entity")
+ent2 = Entity(ent2node)
+# save Object
+ent2.save("instance_test_save.entity")
 
 # Test Set of Union
 ss = components.get(SubScene)  # inferred type : SubScene

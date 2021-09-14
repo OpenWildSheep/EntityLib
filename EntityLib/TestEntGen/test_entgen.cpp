@@ -18,6 +18,11 @@ try
     auto name = ent.Name(); // inferred type : String
     static_assert(std::is_same_v<decltype(name), String>);
     auto components = ent.Components(); // inferred type : Components
+    // Object Load
+    Ent::Node ent2node = Entity::load(entlib, "instance.entity");
+    auto ent2 = Entity(&ent2node);
+    // Object save
+    ent2.save("instance_test_save.entity");
 
     // Test Set of Union
     auto ss = components.get<SubScene>(); // inferred type : SubScene

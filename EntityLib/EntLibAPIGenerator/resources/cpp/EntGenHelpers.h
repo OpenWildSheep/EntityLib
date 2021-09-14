@@ -521,6 +521,19 @@ namespace Ent
             }
         };
 
+        struct HelperObject : Base
+        {
+            HelperObject(Ent::Node* _node)
+                : Base(_node)
+            {
+            }
+
+            void save(std::filesystem::path const& _destFile)
+            {
+                node->saveNode(_destFile);
+            }
+        };
+
         struct Bool : PropHelper<Bool, bool>
         {
             Bool(Ent::Node* _node)

@@ -274,15 +274,25 @@
                         "CloudStorm",
                         {
                             "Path": "Pesto/Clouds/CloudStorm.pesto",
-                            "DataSet": [
-                                {
-                                    "Name": "BlendDurationIn",
-                                    "Float": 7.0
-                                },
-                                {
-                                    "Name": "BlendDurationOut",
-                                    "Float": 10.0
-                                }
+                            "DataMap": [
+                                [
+                                    "BlendDurationIn",
+                                    {
+                                        "Value": {
+                                            "variantData": 7.0,
+                                            "variantType": "float"
+                                        }
+                                    }
+                                ],
+                                [
+                                    "BlendDurationOut",
+                                    {
+                                        "Value": {
+                                            "variantData": 10.0,
+                                            "variantType": "float"
+                                        }
+                                    }
+                                ]
                             ]
                         }
                     ]

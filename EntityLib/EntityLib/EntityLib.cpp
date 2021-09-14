@@ -934,7 +934,9 @@ Ent::Node Ent::EntityLib::loadNode(
                         auto loc = isDefault           ? Ent::OverrideValueLocation::Default :
                                    subSuper != nullptr ? Ent::OverrideValueLocation::Prefab :
                                                          Ent::OverrideValueLocation::Override;
-                        arr.initAdd(loc, std::move(tmpNode), subSuper == nullptr);
+                        auto const addedInInstance =
+                            _super != nullptr ? subSuper == nullptr : index >= defaultArraySize;
+                        arr.initAdd(loc, std::move(tmpNode), addedInInstance);
                         ++index;
                     }
                     tl::optional<uint64_t> prefabArraySize =

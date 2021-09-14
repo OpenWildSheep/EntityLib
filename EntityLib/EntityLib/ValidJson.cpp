@@ -146,11 +146,21 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const
     }
     if (tmplSchema.oneOf.has_value())
     {
+        // In Union, write nothing, or at least a NameField
         for (auto&& prop : *tmplSchema.oneOf)
         {
             instSchema["oneOf"].push_back(
                 convertToInstanceSchema(prop, tmplSchema.getUnionDataField()));
+            instSchema["oneOf"].back()["required"] = {tmplSchema.getUnionNameField()};
+            // If there is a DataField, the NameField is mandatory
+            // because the validator need the NameField to validate the DataField
         }
+        // Allow to write empty object for Union
+        json emptyObject;
+        emptyObject["type"] = "object";
+        emptyObject["properties"][tmplSchema.getUnionNameField()] = false;
+        emptyObject["properties"][tmplSchema.getUnionDataField()] = false;
+        instSchema["oneOf"].push_back(emptyObject);
     }
     if (not empty(requiredList))
     {

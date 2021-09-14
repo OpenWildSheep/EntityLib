@@ -376,6 +376,13 @@ try
     {
         EntityPtr ent = entlib.loadEntity("prefab.entity");
 
+        // Test a fixed-size array is not "addedInInstance"
+        Ent::Component* trans = ent->getComponent("TransformGD");
+        ENTLIB_ASSERT(trans != nullptr);
+        trans->root.at("Position")->at(0llu)->setFloat(36.f);
+        trans->root.at("Position")->unset();
+        ENTLIB_ASSERT(not trans->root.at("Position")->hasOverride());
+
         // Test Variant
         Ent::Component const* testArrays = ent->getComponent("TestArrays");
         ENTLIB_ASSERT(testArrays->root.at("Variant")->getUnionData()->getFloat() == 3.1416);
@@ -570,11 +577,8 @@ try
         testPrefabEntity(ent.get());
 
         // TEST Tuple hasOverride
-        Ent::Component* scriptComponentGD = ent->getComponent("ScriptComponentGD");
-        auto* scripts = scriptComponentGD->root.at("ScriptsMap");
-        auto* cloudStorm = scripts->mapGet("CloudStorm");
-        ENTLIB_ASSERT(cloudStorm != nullptr);
-        auto* wp = cloudStorm->at("DataSet")->at(0llu)->at("WorldPosition");
+        Ent::Component* unitTestComponent = ent->addComponent("UnitTestComponent");
+        auto* wp = unitTestComponent->root.at("Position");
         ENTLIB_ASSERT(wp->hasOverride() == false);
         ENTLIB_ASSERT(wp->at(0llu)->hasOverride() == false);
 

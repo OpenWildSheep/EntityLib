@@ -24,11 +24,6 @@
                     0.0154,
                     -0.0046,
                     0.9999
-                ],
-                "Position": [
-                    105.2244,
-                    152.7811,
-                    29.6635
                 ]
             },
             "Type": "TransformGD",
@@ -215,15 +210,25 @@
                     [
                         "CloudStorm",
                         {
-                            "DataSet": [
-                                {
-                                    "Float": 7.0,
-                                    "Name": "BlendDurationIn"
-                                },
-                                {
-                                    "Float": 10.0,
-                                    "Name": "BlendDurationOut"
-                                }
+                            "DataMap": [
+                                [
+                                    "BlendDurationIn",
+                                    {
+                                        "Value": {
+                                            "variantData": 7.0,
+                                            "variantType": "float"
+                                        }
+                                    }
+                                ],
+                                [
+                                    "BlendDurationOut",
+                                    {
+                                        "Value": {
+                                            "variantData": 10.0,
+                                            "variantType": "float"
+                                        }
+                                    }
+                                ]
                             ],
                             "Path": "Pesto/Clouds/CloudStorm.pesto"
                         }

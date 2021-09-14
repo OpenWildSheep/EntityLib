@@ -197,6 +197,15 @@ namespace Ent
         void resetInstanceOf(char const* _prefabNodePath);
         void resetInstanceOf();
 
+        /// @brief Change this Entity to be an instance of the given \b _newPrefab, keeping
+        /// all internal values the same.
+        /// @param _newPrefab path to the new prefab
+        void changeInstanceOf(char const* _newPrefab);
+
+        /// @brief Take all values set in this and set them into \b _dest
+        ///   BUT do not change the prefab of _dest
+        void applyAllValuesButPrefab(Node& _dest, CopyMode _copyMode) const;
+
         bool hasDefaultValue() const; ///< false if something was set in instance or prefab
 
         bool isDefault() const; ///< true if the value was set in a prefab or in the instance

@@ -31,6 +31,11 @@ namespace Ent
     void Ent::Object::applyAllValues(Object& _dest, CopyMode _copyMode) const
     {
         applyInstanceOfField(*this, _dest, _copyMode);
+        applyAllValuesButPrefab(_dest, _copyMode);
+    }
+
+    void Ent::Object::applyAllValuesButPrefab(Object& _dest, CopyMode _copyMode) const
+    {
         for (size_t i = 0; i < nodes.size(); ++i)
         {
             nodes[i].node->applyAllValues(*_dest.nodes[i].node, _copyMode);

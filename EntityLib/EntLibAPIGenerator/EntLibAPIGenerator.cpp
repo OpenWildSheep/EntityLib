@@ -418,8 +418,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
                 {
                     Ent::Subschema const& unionSchema = **_schema.singularItems;
                     defData["union_set"] = getSchemaData(unionSchema);
-                    defData["union_set"]["items"]["union_set"] =
-                        getSchemaRefType(*_schema.singularItems);
+                    defData["union_set"]["items"] = getSchemaRefType(*_schema.singularItems);
                     break;
                 }
                 else if (singularType == Ent::DataType::object)
@@ -731,11 +730,16 @@ namespace Ent
                 {{/values}}
             };
         };
-        char const* toInternal({{schema.display_type}}Enum value)
+        char const* toString({{schema.display_type}}Enum value)
         {
             if(size_t(value) >= std::size({{schema.display_type}}::enumToString))
                 throw std::runtime_error("Wrong enum value");
             return {{schema.display_type}}::enumToString[size_t(value)];
+        }
+        char const* toInternal({{schema.display_type}}Enum value) { return toString(value); }
+        template<> {{schema.display_type}}Enum strToEnum<{{schema.display_type}}Enum>(char const* value)
+        {
+            return static_cast<{{schema.display_type}}Enum>(details::indexInEnum(value, {{schema.display_type}}::enumToString));
         }
         {{/schema.enum}}{{#schema.union}}
         struct {{schema.display_type}} : Base // Union
@@ -747,10 +751,10 @@ namespace Ent
             {{#type}}{{>display_type}}{{/type}} set{{name}}() const;
         {{/types}}
         };{{/schema.union}}{{#schema.union_set}}{{#union}}
-        struct {{schema.display_type}} : UnionSetBase<{{schema.display_type}}> // union_set
+        struct {{schema.display_type}} : UnionSetBase<{{items.ref.name}}> // union_set
         {
 	        {{schema.display_type}}(Ent::Node* _node)
-                : UnionSetBase<{{schema.display_type}}>(_node)
+                : UnionSetBase<{{items.ref.name}}>(_node)
             {
             }
             {{#schema.schema_name}}static constexpr char schemaName[] = "{{.}}";{{/schema.schema_name}}
@@ -788,11 +792,11 @@ namespace Ent
         }
         {{#types}}inline {{#type}}{{>display_type}}{{/type}} {{schema.display_type}}::{{name}}() const
         {
-	        return {{#type}}{{>display_type}}{{/type}}(get("{{name}}"));
+	        return {{#type}}{{>display_type}}{{/type}}(getSubNode("{{name}}"));
         }
         inline {{#type}}{{>display_type}}{{/type}} {{schema.display_type}}::add{{name}}() const
         {
-	        return {{#type}}{{>display_type}}{{/type}}(add("{{name}}"));
+	        return {{#type}}{{>display_type}}{{/type}}(addSubNode("{{name}}"));
         }
         {{/types}}
 {{/union}}{{/schema.union_set}}

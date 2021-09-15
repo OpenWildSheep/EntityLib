@@ -1,6 +1,7 @@
 #include <EntGen.h>
 #include <ciso646>
 #include <filesystem>
+#include <iostream>
 
 using namespace Ent::Gen;
 
@@ -26,6 +27,15 @@ try
 
     // Test Set of Union
     auto ss = components.get<SubScene>(); // inferred type : SubScene
+    for (Ent::String const& key : components.getKeys())
+    {
+        auto comp = components.get(key.c_str());
+        std::cout << comp.getType() << std::endl;
+    }
+    for (Component const& comp : components)
+    {
+        std::cout << comp.getType() << std::endl;
+    }
     auto tgd = ent.Components().get<TransformGD>(); // inferred type : TransformGD
     auto heightObj = components.get<HeightObj>();
     static_assert(std::is_same_v<decltype(heightObj), HeightObj>);
@@ -61,7 +71,11 @@ try
     // turret.ReviveSideTargeted.remove(ReviveSideEnum::neutral);
     ENTLIB_ASSERT(unitTestCpt.EnumSet().count(ReviveSideEnum::cursed));
     unitTestCpt.EnumSet().add(ReviveSideEnum::sacred); // inferred type : String
-
+    for (auto&& enm : unitTestCpt.EnumSet())
+    {
+        std::cout << toString(enm) << std::endl;
+        ENTLIB_ASSERT(unitTestCpt.EnumSet().count(enm));
+    }
     // Test Enum prop
     auto mode =
         ent.Components().add<BeamTargetGD>().Mode(); // inferred type : BeamStaffMode
@@ -102,6 +116,15 @@ try
     static_assert(std::is_same_v<decltype(subent), Entity>);
     auto new_ent = subscene.add("NewEntity"); // inferred type : Object
     static_assert(std::is_same_v<decltype(new_ent), Entity>);
+    for (auto&& entname : subscene.getKeys())
+    {
+        auto ent3 = subscene.get(entname.c_str());
+        static_assert(std::is_same_v<decltype(ent3), Object>);
+    }
+    for (auto ent3 : subscene)
+    {
+        static_assert(std::is_same_v<decltype(ent3), Object>);
+    }
 
     // Test Map
     auto pathNodeGD =
@@ -113,6 +136,15 @@ try
     auto b = tags.get("b"); // inferred type : PrimitiveSet<String>
     tags.remove("c");
     auto c = tags.add("c"); // inferred type : PrimitiveSet<String>
+    for (auto&& mapName : tags.getKeys())
+    {
+        auto set = tags.get(mapName.c_str());
+        static_assert(std::is_same_v<decltype(set), PrimitiveSet<char const*>>);
+    }
+    for (auto&& [setname, set] : tags)
+    {
+        static_assert(std::is_same_v<decltype(set), PrimitiveSet<char const*>>);
+    }
 
     // Test Map with enum key
     Map<RegenerationStateEnum, Array<sEnvStamp>> stamps =
@@ -123,6 +155,17 @@ try
     ENTLIB_ASSERT(deadArr.hasValue());
     Array<sEnvStamp> lushArr = stamps.get(RegenerationStateEnum::Lush);
     ENTLIB_ASSERT(not lushArr.hasValue());
+    for (auto&& stampname : stamps.getKeys())
+    {
+        auto stamp = stamps.get(stampname);
+        std::cout << toString(stampname) << std::endl;
+        static_assert(std::is_same_v<decltype(stamp), Array<sEnvStamp>>);
+    }
+    for (auto&& [stampname, stamp] : stamps)
+    {
+        std::cout << toString(stampname) << std::endl;
+        static_assert(std::is_same_v<decltype(stamp), Array<sEnvStamp>>);
+    }
     stamps.remove(RegenerationStateEnum::Dead);
     ENTLIB_ASSERT(not stamps.get(RegenerationStateEnum::Dead).hasValue());
     return EXIT_SUCCESS;
@@ -130,8 +173,10 @@ try
 catch (std::exception& ex)
 {
     fprintf(stderr, ex.what());
+    return EXIT_FAILURE;
 }
 catch (...)
 {
     fprintf(stderr, "Exception thrown");
+    return EXIT_FAILURE;
 }

@@ -4,6 +4,7 @@
 #include <tuple>
 #include <string_view>
 #include <optional>
+#include <type_traits>
 
 #include <EntityLib.h>
 
@@ -70,12 +71,6 @@ namespace Ent
                     return *this;
                 }
 
-                iterator& operator--()
-                {
-                    --index;
-                    return *this;
-                }
-
                 bool operator==(iterator const& rho) const
                 {
                     ENTLIB_ASSERT(node == rho.node);
@@ -132,16 +127,6 @@ namespace Ent
             {
                 node->clean();
             }
-
-            /*std::vector<T> getItems()
-            {
-                std::vector<T> items;
-                for (size_t i = 0; i < node->size(); ++i)
-                {
-                    items.emplace_back(node->at(i));
-                }
-                return items;
-            }*/
         };
 
         template <typename T>
@@ -217,18 +202,53 @@ namespace Ent
             return arr.end();
         }
 
-        template <typename T>
+        namespace details
+        {
+            template <typename K>
+            auto getKeys(Ent::Node* node)
+            {
+                if constexpr (std::is_enum_v<K>)
+                {
+                    std::vector<K> keys;
+                    for (auto&& k : node->getKeysString())
+                    {
+                        keys.push_back(strToEnum<K>(k.c_str()));
+                    }
+                    return keys;
+                }
+                else if constexpr (std::is_arithmetic_v<K>)
+                {
+                    return node->getKeysInt();
+                }
+                else
+                {
+                    return node->getKeysString();
+                }
+            }
+
+            template <typename A>
+            size_t indexInEnum(char const* value, A&& arr)
+            {
+                for (size_t idx = 0; idx < std::size(arr); ++idx)
+                {
+                    if (strcmp(arr[idx], value) == 0)
+                    {
+                        return idx;
+                    }
+                }
+                throw std::runtime_error("Wrong enum value");
+            }
+        } // namespace details
+
+        template <typename U>
         struct UnionSetBase : Base
         {
+            using Union = U;
             UnionSetBase(Ent::Node* _node)
                 : Base(_node)
             {
             }
-            Ent::Node* operator[](size_t i) const
-            {
-                return node->mapGet(i);
-            }
-            Ent::Node* operator[](char const* str) const
+            Union operator[](char const* str) const
             {
                 return node->mapGet(str);
             }
@@ -242,23 +262,27 @@ namespace Ent
                 else
                     return name.data() + colon + 1;
             }
-            Ent::Node* get(char const* str) const
+            Ent::Node* getSubNode(char const* str) const
             {
                 return node->mapGet(str)->getUnionData();
             }
             template <typename T>
             T get() const
             {
-                return get(getTypeName<T>());
+                return getSubNode(getTypeName<T>());
             }
-            Ent::Node* add(char const* str) const
+            Union get(char const* str) const
+            {
+                return node->mapGet(str);
+            }
+            Ent::Node* addSubNode(char const* str) const
             {
                 return node->mapInsert(str)->getUnionData();
             }
             template <typename T>
             T add() const
             {
-                return add(getTypeName<T>());
+                return addSubNode(getTypeName<T>());
             }
             void remove(char const* str) const
             {
@@ -278,22 +302,88 @@ namespace Ent
                 return node->size();
             }
 
-            std::vector<Ent::Node*> getItems() const
+            auto getKeys() const
             {
-                std::vector<Ent::Node*> items;
-                for (size_t i = 0; i < node->size(); ++i)
+                return details::getKeys<char const*>(node);
+            }
+
+            struct iterator
+            {
+                using iterator_category = std::forward_iterator_tag;
+                using value_type = Union;
+                using difference_type = size_t;
+                using pointer = std::optional<Union>;
+                using reference = Union;
+
+                Ent::Node* node = nullptr;
+                std::vector<Ent::String> keys;
+                size_t index = 0;
+
+                iterator& operator++()
                 {
-                    items.emplace_back(node->at(i));
+                    ++index;
+                    return *this;
                 }
-                return items;
+
+                bool operator==(iterator const& rho) const
+                {
+                    ENTLIB_ASSERT(node != nullptr);
+                    ENTLIB_ASSERT(rho.node == nullptr);
+                    return index == rho.index;
+                }
+
+                bool operator!=(iterator const& rho) const
+                {
+                    return !(*this == rho);
+                }
+
+                reference operator*() const
+                {
+                    return Union(node->mapGet(keys[index].c_str()));
+                }
+
+                pointer operator->() const
+                {
+                    return *(*this);
+                }
+            };
+
+            iterator begin() const
+            {
+                return iterator{node, node->getKeysString(), 0};
+            }
+
+            iterator end() const
+            {
+                return iterator{nullptr, {}, size()};
             }
         };
+
+        template <typename U>
+        auto begin(UnionSetBase<U> arr)
+        {
+            return arr.begin();
+        }
+
+        template <typename U>
+        auto end(UnionSetBase<U> arr)
+        {
+            return arr.end();
+        }
 
         template <typename V>
         V toInternal(V value)
         {
             return value;
         }
+
+        char const* toInternal(Ent::String const& value)
+        {
+            return value.c_str();
+        }
+
+        template <typename E>
+        E strToEnum(char const* in);
 
         template <typename T>
         struct PrimitiveSet : Base
@@ -315,16 +405,69 @@ namespace Ent
                 return node->size();
             }
 
-            std::vector<T> getItems()
+            struct iterator
             {
-                std::vector<T> items;
-                for (size_t i = 0; i < node->size(); ++i)
+                using iterator_category = std::forward_iterator_tag;
+                using value_type = T;
+                using difference_type = size_t;
+                using pointer = T const*;
+                using reference = T const&;
+
+                Ent::Node* node = nullptr;
+                std::vector<T> keys;
+                size_t index = 0;
+
+                iterator& operator++()
                 {
-                    items.emplace_back(node->at(i));
+                    ++index;
+                    return *this;
                 }
-                return items;
+
+                bool operator==(iterator const& rho) const
+                {
+                    ENTLIB_ASSERT(node != nullptr);
+                    ENTLIB_ASSERT(rho.node == nullptr);
+                    return index == rho.index;
+                }
+
+                bool operator!=(iterator const& rho) const
+                {
+                    return !(*this == rho);
+                }
+
+                reference operator*() const
+                {
+                    return keys[index];
+                }
+
+                pointer operator->() const
+                {
+                    return *(*this);
+                }
+            };
+
+            iterator begin() const
+            {
+                return iterator{node, details::getKeys<T>(node), 0};
+            }
+
+            iterator end() const
+            {
+                return iterator{nullptr, {}, size()};
             }
         };
+
+        template <typename U>
+        auto begin(PrimitiveSet<U> arr)
+        {
+            return arr.begin();
+        }
+
+        template <typename U>
+        auto end(PrimitiveSet<U> arr)
+        {
+            return arr.end();
+        }
 
         template <typename K, typename O>
         struct ObjectSet : Base
@@ -354,14 +497,60 @@ namespace Ent
                 return node->size();
             }
 
-            std::vector<O> getItems()
+            auto getKeys() const
             {
-                std::vector<T> items;
-                for (size_t i = 0; i < node->size(); ++i)
+                return details::getKeys<K>(node);
+            }
+
+            struct iterator
+            {
+                using iterator_category = std::forward_iterator_tag;
+                using value_type = O;
+                using difference_type = size_t;
+                using pointer = std::optional<O>;
+                using reference = O;
+
+                Ent::Node* node = nullptr;
+                decltype(details::getKeys<K>((Ent::Node*)nullptr)) keys;
+                size_t index = 0;
+
+                iterator& operator++()
                 {
-                    items.emplace_back(node->at(i));
+                    ++index;
+                    return *this;
                 }
-                return items;
+
+                bool operator==(iterator const& rho) const
+                {
+                    ENTLIB_ASSERT(node != nullptr);
+                    ENTLIB_ASSERT(rho.node == nullptr);
+                    return index == rho.index;
+                }
+
+                bool operator!=(iterator const& rho) const
+                {
+                    return !(*this == rho);
+                }
+
+                reference operator*() const
+                {
+                    return node->mapGet(toInternal(keys[index]));
+                }
+
+                pointer operator->() const
+                {
+                    return *(*this);
+                }
+            };
+
+            iterator begin() const
+            {
+                return iterator{node, getKeys(), 0};
+            }
+
+            iterator end() const
+            {
+                return iterator{nullptr, {}, size()};
             }
 
             O insertInstanceOf(char const* _prefabPath)
@@ -369,6 +558,18 @@ namespace Ent
                 return node->mapInsertInstanceOf(_prefabPath);
             }
         };
+
+        template <typename K, typename O>
+        auto begin(ObjectSet<K, O> const& arr)
+        {
+            return arr.begin();
+        }
+
+        template <typename K, typename O>
+        auto end(ObjectSet<K, O> const& arr)
+        {
+            return arr.end();
+        }
 
         template <typename... Args>
         struct Tuple : Base
@@ -393,55 +594,6 @@ namespace Ent
         template <typename K, typename V>
         struct Map : Base
         {
-            struct iterator
-            {
-                Ent::Node* node;
-                size_t index;
-
-                iterator& operator++()
-                {
-                    ++index;
-                    return *this;
-                }
-
-                iterator& operator--()
-                {
-                    --index;
-                    return *this;
-                }
-
-                bool operator==(iterator const& rho) const
-                {
-                    ENTLIB_ASSERT(node == rho.node);
-                    return index == rho.index;
-                }
-
-                bool operator!=(iterator const& rho) const
-                {
-                    return !(*this == rho);
-                }
-
-                Tuple<K, V> operator*() const
-                {
-                    return Tuple<K, V>(node->at(index));
-                }
-
-                std::optional<Tuple<K, V>> operator->() const
-                {
-                    return Tuple<K, V>(node->at(index));
-                }
-            };
-
-            iterator begin() const
-            {
-                return iterator{node, 0};
-            }
-
-            iterator end() const
-            {
-                return iterator{node, node->size()};
-            }
-
             Map(Ent::Node* _node)
                 : Base(_node)
             {
@@ -465,6 +617,75 @@ namespace Ent
             size_t size() const
             {
                 return node->size();
+            }
+
+            auto getKeys() const
+            {
+                return details::getKeys<K>(node);
+            }
+
+            struct iterator
+            {
+                using iterator_category = std::forward_iterator_tag;
+                using value_type = std::pair<K, V>;
+                using difference_type = size_t;
+                using pointer = std::optional<value_type>;
+                using reference = value_type;
+
+                Ent::Node* node = nullptr;
+                decltype(details::getKeys<K>((Ent::Node*)nullptr)) keys;
+                size_t index = 0;
+
+                iterator& operator++()
+                {
+                    ++index;
+                    return *this;
+                }
+
+                bool operator==(iterator const& rho) const
+                {
+                    ENTLIB_ASSERT(node != nullptr);
+                    ENTLIB_ASSERT(rho.node == nullptr);
+                    return index == rho.index;
+                }
+
+                bool operator!=(iterator const& rho) const
+                {
+                    return !(*this == rho);
+                }
+
+                reference operator*() const
+                {
+                    auto keyToView = [](auto const& key) {
+                        if constexpr (std::is_same_v<
+                                          std::remove_cv_t<std::remove_reference_t<decltype(key)>>,
+                                          Ent::String>)
+                        {
+                            return key.c_str();
+                        }
+                        else
+                        {
+                            return key;
+                        }
+                    };
+                    return std::pair(
+                        keyToView(keys[index]), V(node->mapGet(toInternal(keys[index]))));
+                }
+
+                pointer operator->() const
+                {
+                    return *(*this);
+                }
+            };
+
+            iterator begin() const
+            {
+                return iterator{node, getKeys(), 0};
+            }
+
+            iterator end() const
+            {
+                return iterator{nullptr, {}, size()};
             }
         };
 

@@ -92,12 +92,37 @@ static Ent::DataType getKeyType(Ent::Subschema const* _arraySchema)
     case "map"_hash: return _arraySchema->singularItems->get().linearItems->at(0)->type; break;
     case "set"_hash:
     {
-        Ent::DataType const keyType = _arraySchema->singularItems->get().type;
+        auto& elementSchema = _arraySchema->singularItems->get();
+        Ent::DataType const keyType = elementSchema.type;
         switch (keyType)
         {
         case Ent::DataType::oneOf: return Ent::DataType::string;
         case Ent::DataType::string: return Ent::DataType::string;
         case Ent::DataType::integer: return Ent::DataType::integer;
+        case Ent::DataType::object:
+        {
+            // If the element is an object, the map is actually a set of objects
+            // So we expect to find a keyField. The key type is the type of the keyfield.
+            if (meta.keyField.has_value())
+            {
+                auto& keyFieldSchema = elementSchema.properties[*meta.keyField];
+                switch (keyFieldSchema->type)
+                {
+                case Ent::DataType::oneOf: return Ent::DataType::string;
+                case Ent::DataType::string: return Ent::DataType::string;
+                case Ent::DataType::integer: return Ent::DataType::integer;
+                default:
+                    throw ContextException(
+                        "Unknown key type in set %s/%s",
+                        _arraySchema->name.c_str(),
+                        meta.keyField->c_str());
+                }
+            }
+            else
+            {
+                throw ContextException("Object set without keyField in " + _arraySchema->name);
+            }
+        }
         default: throw ContextException("Unknown key type in set " + _arraySchema->name);
         }
 #pragma warning(pop)

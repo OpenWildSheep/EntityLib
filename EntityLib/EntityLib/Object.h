@@ -72,16 +72,25 @@ namespace Ent
 
         ObjField const& at(char const* key) const
         {
+            if (key == nullptr)
+            {
+                throw NullPointerArgument("key", "");
+            }
             auto range =
                 std::equal_range(begin(nodes), end(nodes), ObjField{key, nullptr, 0}, CompObject());
             if (range.first == range.second)
             {
-                throw std::logic_error(std::string("Bad key : ") + key);
+                throw BadKey(key, "at");
             }
             else
             {
                 return *range.first;
             }
+        }
+
+        ObjField& at(char const* key)
+        {
+            return const_cast<ObjField&>(std::as_const(*this).at(key));
         }
     };
 

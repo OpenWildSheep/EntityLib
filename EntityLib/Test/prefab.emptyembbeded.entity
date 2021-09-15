@@ -2,13 +2,13 @@
     "ActorStates": [
         {
             "classData": {
-                "locomotionMode": "crouch"
+                "ItemEntityRef": "tutu"
             },
-            "className": "ActionClimbEdge"
+            "className": "ActorStateHoldingItem"
         },
         {
             "classData": {},
-            "className": "ActionCinematic"
+            "className": "EntityStatePlayer"
         }
     ],
     "Components": [
@@ -24,11 +24,6 @@
                     0.0154,
                     -0.0046,
                     0.9999
-                ],
-                "Position": [
-                    105.2244,
-                    152.7811,
-                    29.6635
                 ]
             },
             "Type": "TransformGD",
@@ -134,7 +129,7 @@
                     },
                     {
                         "classData": {},
-                        "className": "CineEvent"
+                        "className": "CineEventTestCurrentGameState"
                     }
                 ]
             },
@@ -211,20 +206,33 @@
         },
         {
             "Data": {
-                "Scripts": [
-                    {
-                        "DataSet": [
-                            {
-                                "Float": 7.0,
-                                "Name": "BlendDurationIn"
-                            },
-                            {
-                                "Float": 10.0,
-                                "Name": "BlendDurationOut"
-                            }
-                        ],
-                        "Path": "Pesto/Clouds/CloudStorm.pesto"
-                    }
+                "ScriptsMap": [
+                    [
+                        "CloudStorm",
+                        {
+                            "DataMap": [
+                                [
+                                    "BlendDurationIn",
+                                    {
+                                        "Value": {
+                                            "variantData": 7.0,
+                                            "variantType": "float"
+                                        }
+                                    }
+                                ],
+                                [
+                                    "BlendDurationOut",
+                                    {
+                                        "Value": {
+                                            "variantData": 10.0,
+                                            "variantType": "float"
+                                        }
+                                    }
+                                ]
+                            ],
+                            "Path": "Pesto/Clouds/CloudStorm.pesto"
+                        }
+                    ]
                 ]
             },
             "Type": "ScriptComponentGD",
@@ -273,6 +281,18 @@
                 ]
             },
             "Type": "TestSetOfObject",
+            "Version": 1
+        },
+        {
+            "Data": {
+                "UnionArray": [
+                    {}
+                ],
+                "UnionObjectArray": [
+                    {}
+                ]
+            },
+            "Type": "TestUnion",
             "Version": 1
         },
         {

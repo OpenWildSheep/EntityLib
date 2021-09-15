@@ -553,11 +553,35 @@ namespace Ent
         }
     };
 
+    struct DuplicateKey : ContextException
+    {
+        DuplicateKey(std::string const& _message) ///< ctor
+            : ContextException(_message)
+        {
+        }
+    };
+
     /// Exception thrown when some json data are invalid
     struct EmptyKey : ContextException
     {
         EmptyKey(char const* _message) ///< ctor
             : ContextException(_message)
+        {
+        }
+    };
+
+    struct NullPointerArgument : ContextException
+    {
+        NullPointerArgument(char const* _argName, char const* funcName)
+            : ContextException("'%s' is null in function '%s'", _argName, funcName)
+        {
+        }
+    };
+
+    struct BadKey : ContextException
+    {
+        BadKey(char const* key, char const* funcName)
+            : ContextException("Unknown key '%s' in function '%s'", key, funcName)
         {
         }
     };

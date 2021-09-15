@@ -129,7 +129,8 @@ namespace Ent
             bool _superKeyIsTypeName =
                 false, ///< Super sub-node are dumped using their type name for key instead of "Super"
             std::function<void(EntityRef&)> const& _entityRefPreProc = {},
-            bool _saveUnionIndex = false);
+            bool _saveUnionIndex = false,
+            bool _forceWriteKey = false);
 
         /// Instanciate the given _prefab Node
         Node makeNodeInstanceOf(

@@ -10,10 +10,20 @@ using namespace nlohmann;
 
 namespace Ent
 {
+    Union::Union(EntityLib const* _entityLib, Subschema const* _schema, Node&& _wrapper, size_t _typeIndex)
+        : entityLib(_entityLib)
+        , schema(_schema)
+        , typeIndex(_typeIndex)
+        , wrapper(make_value<Node>(_wrapper))
+        , metaData(&(schema->meta.get<Subschema::UnionMeta>()))
+    {
+        auto* typeNode = wrapper->at(metaData->typeField.c_str());
+        typeOverriden = typeNode->hasOverride();
+    }
 
     bool Union::hasOverride() const
     {
-        return wrapper->hasOverride();
+        return typeOverriden or wrapper->hasOverride();
     }
 
     bool Union::hasDefaultValue() const
@@ -48,10 +58,6 @@ namespace Ent
                 metaData->typeField.c_str());
             auto typeNode = wrapper->at(metaData->typeField.c_str());
             ENTLIB_ASSERT(typeNode);
-            ENTLIB_ASSERT_MSG(
-                not typeNode->hasDefaultValue(),
-                "In Union, the type-field (%s) is expected to be set",
-                metaData->typeField.c_str());
             return typeNode->getString();
         }
         else
@@ -60,19 +66,31 @@ namespace Ent
         }
     }
 
-    Node* Union::setUnionType(EntityLib const& _entlib, char const* _type)
+    Node* Union::resetUnionTypeWithoutOverride(char const* _type)
     {
-        if (getUnionType() != _type)
-        {
-            Subschema const* subTypeSchema{};
-            std::tie(subTypeSchema, typeIndex) = schema->getUnionTypeWrapper(_type);
-            // TODO : Loïc - low prio - Find a way to get the super.
-            //   It could be hard because we are no more in the loading phase, so the super is
-            //   now delete.
-            wrapper = _entlib.loadNode(*subTypeSchema, json(), nullptr);
-            wrapper->at(metaData->typeField.c_str())->setString(_type);
-        }
+        Subschema const* subTypeSchema{};
+        std::tie(subTypeSchema, typeIndex) = schema->getUnionTypeWrapper(_type);
+        // TODO : Loïc - low prio - Find a way to get the super.
+        //   It could be hard because we are no more in the loading phase, so the super is
+        //   now delete.
+        wrapper = entityLib->loadNode(*subTypeSchema, json(), nullptr);
+        typeOverriden = false;
         return getUnionData();
+    }
+
+    Node* Union::setUnionType(char const* _type)
+    {
+        if (_type != getUnionType())
+        {
+            auto* unionData = resetUnionTypeWithoutOverride(_type);
+            typeOverriden = true;
+            wrapper->at(schema->getUnionNameField())->setString(_type);
+            return unionData;
+        }
+        else
+        {
+            return getUnionData();
+        }
     }
 
     void Union::computeMemory(MemoryProfiler& prof) const
@@ -88,41 +106,31 @@ namespace Ent
 
     void Union::unset()
     {
-        wrapper->unset();
-        Subschema const* subTypeSchema{};
-        std::tie(subTypeSchema, typeIndex) = schema->getUnionTypeWrapper(getUnionType());
+        resetUnionTypeWithoutOverride(schema->getUnionDefaultTypeName());
     }
 
     void Union::applyAllValues(Union& _dest, CopyMode _copyMode) const
     {
         if (typeIndex != _dest.typeIndex)
         {
-            _dest.setUnionType(*wrapper->getEntityLib(), getUnionType());
+            _dest.setUnionType(getUnionType());
         }
         wrapper->applyAllValues(*_dest.wrapper, _copyMode);
     }
 
     Union Union::detach() const
     {
-        Union detUnion{};
-        detUnion.schema = schema;
-        detUnion.wrapper = wrapper->detach();
-        detUnion.metaData = metaData;
-        detUnion.typeIndex = typeIndex;
+        Union detUnion{entityLib, schema, wrapper->detach(), typeIndex};
+        detUnion.typeOverriden = true;
         return detUnion;
     }
 
     Union Union::makeInstanceOf() const
     {
-        Union detUnion{};
         ENTLIB_ASSERT(schema != nullptr);
-        detUnion.schema = schema;
-        if (wrapper != nullptr)
-        {
-            detUnion.wrapper = wrapper->makeInstanceOf();
-        }
-        detUnion.metaData = metaData;
-        detUnion.typeIndex = typeIndex;
+        ENTLIB_ASSERT(wrapper != nullptr);
+        Union detUnion{entityLib, schema, wrapper->makeInstanceOf(), typeIndex};
+        detUnion.typeOverriden = false;
         return detUnion;
     }
 

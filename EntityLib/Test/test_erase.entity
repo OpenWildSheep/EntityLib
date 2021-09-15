@@ -2,17 +2,17 @@
     "ActorStates": [
         {
             "classData": null,
-            "className": "ActionCinematic"
+            "className": "EntityStatePlayer"
         },
         {
             "classData": {
-                "ExitRequired": true
+                "ReviveLifeSigned": 13.0
             },
-            "className": "ActionChosen"
+            "className": "ActorStateDead"
         },
         {
             "classData": {},
-            "className": "ActionClamberRise"
+            "className": "ActorStateAlive"
         }
     ],
     "Color": [

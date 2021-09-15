@@ -2,13 +2,13 @@
     "Thumbnail": "TestThumbnail",
     "ActorStates":[
         {
-            "className": "ActionClimbEdge",
+            "className": "ActorStateHoldingItem",
             "classData":{
-                "locomotionMode": "crouch"
+                "ItemEntityRef": "tutu"
             }
         },
         {
-            "className": "ActionCinematic",
+            "className": "EntityStatePlayer",
             "classData":{
             }
         }
@@ -270,20 +270,32 @@
             "Version": 1,
             "Type": "ScriptComponentGD",
             "Data": {
-                "Scripts": [
-                    {
-                        "Path": "Pesto/Clouds/CloudStorm.pesto",
-                        "DataSet": [
-                            {
-                                "Name": "BlendDurationIn",
-                                "Float": 7.0
-                            },
-                            {
-                                "Name": "BlendDurationOut",
-                                "Float": 10.0
-                            }
-                        ]
-                    }
+                "ScriptsMap": [[
+                        "CloudStorm",
+                        {
+                            "Path": "Pesto/Clouds/CloudStorm.pesto",
+                            "DataMap": [
+                                [
+                                    "BlendDurationIn",
+                                    {
+                                        "Value": {
+                                            "variantData": 7.0,
+                                            "variantType": "float"
+                                        }
+                                    }
+                                ],
+                                [
+                                    "BlendDurationOut",
+                                    {
+                                        "Value": {
+                                            "variantData": 10.0,
+                                            "variantType": "float"
+                                        }
+                                    }
+                                ]
+                            ]
+                        }
+                    ]
                 ]
             }
         }, {

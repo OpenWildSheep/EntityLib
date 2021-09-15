@@ -1,16 +1,14 @@
 {
     "ActorStates": [
         {
-            "classData": {
-                "Type": 13
-            },
-            "className": "ActionCinematic"
+            "classData": {},
+            "className": "EntityStatePlayer"
         },
         {
             "classData": {
-                "ExitRequired": true
+                "ReviveLifeSigned": 13.0
             },
-            "className": "ActionChosen"
+            "className": "ActorStateDead"
         }
     ],
     "Color": [
@@ -87,10 +85,6 @@
             "Data": {
                 "Embedded": [
                     {
-                        "Components": [],
-                        "Name": "Entity"
-                    },
-                    {
                         "Color": [
                             255.0,
                             120.0,
@@ -115,10 +109,6 @@
                         "Name": "EntityWithInstanceOfButNoOverride"
                     },
                     {
-                        "Components": [],
-                        "Name": "PrettiestName"
-                    },
-                    {
                         "Name": "TestRemove",
                         "__removed__": true
                     },
@@ -133,6 +123,14 @@
                             }
                         ],
                         "Name": "TestSaveEntWithOverride"
+                    },
+                    {
+                        "Components": [],
+                        "Name": "PrettiestName"
+                    },
+                    {
+                        "Components": [],
+                        "Name": "Entity"
                     }
                 ]
             },

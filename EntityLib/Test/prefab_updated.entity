@@ -2,21 +2,19 @@
     "ActorStates": [
         {
             "classData": {
-                "locomotionMode": "crouch"
+                "ItemEntityRef": "tutu"
             },
-            "className": "ActionClimbEdge"
+            "className": "ActorStateHoldingItem"
+        },
+        {
+            "classData": {},
+            "className": "EntityStatePlayer"
         },
         {
             "classData": {
-                "Type": 13
+                "ReviveLifeSigned": 13.0
             },
-            "className": "ActionCinematic"
-        },
-        {
-            "classData": {
-                "ExitRequired": true
-            },
-            "className": "ActionChosen"
+            "className": "ActorStateDead"
         }
     ],
     "Color": [
@@ -230,11 +228,6 @@
                         "Name": "EntityWithInstanceOf"
                     },
                     {
-                        "Components": [],
-                        "InstanceOf": "subentity2.entity",
-                        "Name": "EntityWithInstanceOfButNoOverride"
-                    },
-                    {
                         "Color": [
                             255.0,
                             120.0,
@@ -265,6 +258,11 @@
                             }
                         ],
                         "Name": "TestSaveEntWithOverride"
+                    },
+                    {
+                        "Components": [],
+                        "InstanceOf": "subentity2.entity",
+                        "Name": "EntityWithInstanceOfButNoOverride"
                     }
                 ]
             },
@@ -335,20 +333,33 @@
         },
         {
             "Data": {
-                "Scripts": [
-                    {
-                        "DataSet": [
-                            {
-                                "Float": 7.0,
-                                "Name": "BlendDurationIn"
-                            },
-                            {
-                                "Float": 10.0,
-                                "Name": "BlendDurationOut"
-                            }
-                        ],
-                        "Path": "Pesto/Clouds/CloudStorm.pesto"
-                    }
+                "ScriptsMap": [
+                    [
+                        "CloudStorm",
+                        {
+                            "DataMap": [
+                                [
+                                    "BlendDurationIn",
+                                    {
+                                        "Value": {
+                                            "variantData": 7.0,
+                                            "variantType": "float"
+                                        }
+                                    }
+                                ],
+                                [
+                                    "BlendDurationOut",
+                                    {
+                                        "Value": {
+                                            "variantData": 10.0,
+                                            "variantType": "float"
+                                        }
+                                    }
+                                ]
+                            ],
+                            "Path": "Pesto/Clouds/CloudStorm.pesto"
+                        }
+                    ]
                 ]
             },
             "Type": "ScriptComponentGD",

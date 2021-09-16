@@ -20,8 +20,6 @@ using namespace kainjow::mustache;
 using namespace nlohmann;
 using namespace std::filesystem;
 
-constexpr auto overwrite = copy_options::overwrite_existing;
-
 std::map<std::string, Ent::Subschema const*> allDefs;
 std::map<Ent::Subschema const*, std::string> schemaName;
 json allDefinitions(json::value_t::array);
@@ -808,7 +806,7 @@ namespace Ent
     create_directories(_destinationPath);
     std::ofstream output = openOfstream(_destinationPath / "EntGen.h");
     tmpl.render(rootData, output);
-    copy_file(_resourcePath / "EntGenHelpers.h", _destinationPath / "EntGenHelpers.h", overwrite);
+    create_symlink(_resourcePath / "EntGenHelpers.h", _destinationPath / "EntGenHelpers.h");
 }
 
 /// @brief Generate the python EntGen API
@@ -1048,10 +1046,10 @@ Entity = Object
     std::ofstream outputAll = openOfstream(_destinationPath / "entgen/_all.py");
     all.render(rootData, outputAll);
 
-    copy_file(_resourcePath / "entgen_helpers.py", _destinationPath / "entgen_helpers.py", overwrite);
+    create_symlink(_resourcePath / "entgen_helpers.py", _destinationPath / "entgen_helpers.py");
     for (auto&& file : {"Bool.py", "EntityRef.py", "Float.py", "Int.py", "String.py"})
     {
-        copy_file(_resourcePath / "entgen" / file, _destinationPath / "entgen" / file, overwrite);
+        create_symlink(_resourcePath / "entgen" / file, _destinationPath / "entgen" / file);
     }
 }
 

@@ -151,21 +151,29 @@ void setValue(Ent::Node& node, Value const& val)
     }
 }
 
-static mapbox::util::variant<std::vector<String>, std::vector<int64_t>> nodeGetKey(Node* _node)
+static py::list nodeGetKey(Node* _node)
 {
     auto const type = _node->getKeyType();
+    py::list arr;
     if (type == Ent::DataType::string || type == Ent::DataType::entityRef)
     {
-        return _node->getKeysString();
+        for (auto const& key : _node->getKeysString())
+        {
+            arr.append(py::str(key.c_str()));
+        }
     }
     else if (type == Ent::DataType::integer)
     {
-        return _node->getKeysInt();
+        for (auto key : _node->getKeysInt())
+        {
+            arr.append(key);
+        }
     }
     else
     {
         throw std::runtime_error("Unexpected key type");
     }
+    return arr;
 }
 
 using namespace pybind11::literals;

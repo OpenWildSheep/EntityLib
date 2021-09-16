@@ -376,6 +376,12 @@ try
     {
         EntityPtr ent = entlib.loadEntity("prefab.entity");
 
+        auto setOfObject = ent->getComponent("TestSetOfObject");
+        ENTLIB_ASSERT(setOfObject);
+        auto mapTest = setOfObject->root.at("MapOfObject");
+        ENTLIB_ASSERT(mapTest->mapInsert("Should_not_appear_in_diff"));
+        ENTLIB_ASSERT(mapTest->mapErase("Should_not_appear_in_diff"));
+
         // Test a fixed-size array is not "addedInInstance"
         Ent::Component* trans = ent->getComponent("TransformGD");
         ENTLIB_ASSERT(trans != nullptr);
@@ -1019,6 +1025,10 @@ try
 
             Ent::Component* testSetOfObject3 = instance3->getComponent("TestSetOfObject");
             auto* setOfObject3 = testSetOfObject3->root.at("SetOfObject");
+
+            auto mapTest2 = testSetOfObject3->root.at("MapOfObject");
+            ENTLIB_ASSERT(mapTest2->mapInsert("Should_not_appear_in_diff"));
+            ENTLIB_ASSERT(mapTest2->mapErase("Should_not_appear_in_diff"));
 
             // Test insert an element in an instance of the __removed__ one, do not resore the old values
             // insert => makeInstanceOf => __remove__ => makeInstanceOf => insert

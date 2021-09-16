@@ -197,7 +197,14 @@ Ent::DataType Ent::Map::getKeyType(Subschema const* _schema)
 
 bool Ent::Map::Element::hasOverride() const
 {
-    return isPresent.hasOverride() || node->hasOverride();
+    if (isPresent.get())
+    {
+        return (not isPresent.getPrefab()) || node->hasOverride();
+    }
+    else
+    {
+        return isPresent.getPrefab();
+    }
 }
 
 bool Ent::Map::Element::hasPrefabValue() const
@@ -424,19 +431,29 @@ std::vector<Ent::Node const*> Ent::Map::getItemsWithRemoved() const
     std::vector<Node const*> result;
     result.reserve(m_items.size());
     auto&& meta = m_schema->meta.get<Ent::Subschema::ArrayMeta>();
+    auto notAGhostElement = [](Element const& elt) {
+        // Don't care of elements which has never existed
+        return elt.isPresent.get() or elt.isPresent.getPrefab();
+    };
     if (meta.ordered)
     {
         for (auto const& key_index : m_itemMap)
         {
             auto& elt = m_items[std::get<1>(key_index)];
-            result.push_back(elt.node.get());
+            if (notAGhostElement(elt))
+            {
+                result.push_back(elt.node.get());
+            }
         }
     }
     else
     {
         for (auto&& elt : m_items)
         {
-            result.push_back(elt.node.get());
+            if (notAGhostElement(elt))
+            {
+                result.push_back(elt.node.get());
+            }
         }
     }
     return result;

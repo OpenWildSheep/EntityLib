@@ -9,7 +9,6 @@ TODO_None = None
 TODO_Tuple = None
 TODO_UnknownArray = None
 
-
 T = TypeVar("T")
 
 
@@ -22,7 +21,7 @@ class Base(object):
 
     def __nonzero__(self):
         return self._node is not Node
-    
+
     @property
     def node(self):
         return self._node
@@ -116,7 +115,18 @@ class EntityRef(Primitive[EntityLibPy.EntityRef]):
 TComponent = TypeVar("TComponent")
 
 
-class UnionSet(Base):
+class UnionSet(Base, Generic[T]):
+    def __init__(self, union_type, node=None):  # type: (Type[T], EntityLibPy.Node) -> None
+        super(UnionSet, self).__init__(node)
+        self._union_type = union_type
+
+    def get_by_name(self, key_type):  # type: (str) -> EntityLibPy.Node
+        union = self._node.map_get(key_type)
+        if union is None:
+            return None
+        else:
+            return union.get_union_data()
+
     def get(self, key_type):  # type: (Type[TComponent]) -> TComponent
         typename = key_type.__name__
         union = self._node.map_get(typename)
@@ -128,6 +138,13 @@ class UnionSet(Base):
     def add(self, key_type):  # type: (Type[TComponent]) -> TComponent
         typename = key_type.__name__
         return key_type(self._node.map_insert(typename).get_union_data())
+
+    def keys(self):
+        return self._node.get_keys()
+
+    def __iter__(self):   # type: () -> EntityLibPy.Node
+        for item in self._node.get_items():
+            yield item.get_union_data()
 
 
 class Union(Base):
@@ -208,6 +225,9 @@ class ObjectSet(Base, Generic[T]):
     def insert_instanceof(self, instance_path):
         return self._item_ctor(self._node.map_insert_instanceof(instance_path))
 
+    def keys(self):
+        return self._node.get_keys()
+
 
 K = TypeVar("K")
 V = TypeVar("V")
@@ -226,31 +246,31 @@ class Map(Base, Generic[K, V]):
         else:
             return key
 
-    def get(self, key):             # type: (K) -> V
+    def get(self, key):  # type: (K) -> V
         return self._item_ctor(self._node.map_get(self.to_internal(key)))
 
     def add(self, key):
         assert type(key) == self._key_type
         return self._item_ctor(self._node.map_insert(self.to_internal(key)))
 
-    def remove(self, key):          # type: (K) -> None
+    def remove(self, key):  # type: (K) -> None
         self._node.map_erase(self.to_internal(key))
 
     def clean(self):
         return self._node.clean()
 
-    def __getitem__(self, key):     # type: (K) -> V
+    def __getitem__(self, key):  # type: (K) -> V
         return self._item_ctor(self._node.map_get(self.to_internal(key)))
 
     def __len__(self):
         return self._node.size()
 
-    def get_keys(self):  # type: () -> [K]
-        return self._node.get_keys()
+    def keys(self):  # type: () -> Array[K]
+        return [self._key_type(kv.at(0).value) for kv in self._node.get_items()]
 
-    def __iter__(self):
-        for key in self._node.get_keys():
-            yield (key, self.get(key))
+    def __iter__(self):  # type: () -> Iterator[Tuple[K, V]]
+        for key_value_node in self._node.get_items():
+            yield (self._key_type(key_value_node.at(0).value), self._item_ctor(key_value_node.at(1)))  # (K, V)
 
 
 class PrimitiveSet(Base, Generic[T]):

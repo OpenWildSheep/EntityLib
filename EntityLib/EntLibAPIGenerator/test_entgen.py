@@ -36,6 +36,13 @@ ent2.save("instance_test_save.entity")
 
 # Test Set of Union
 ss = components.get(SubScene)  # inferred type : SubScene
+for key in components.keys():
+    comp = components.get_by_name(key)
+    assert isinstance(key, EntityLibPy.String)
+    print(comp.schema.name)
+for comp in components:
+    assert isinstance(comp, EntityLibPy.Node)
+    print(comp.schema.name)
 tgd = ent.Components.get(TransformGD)  # inferred type : TransformGD
 acgd = ent.Components.get(AnimationControllerGD)  # inferred type : TransformGD
 assert acgd is None
@@ -68,6 +75,8 @@ assert unitTestCpt.EnumSet.count(ReviveSideEnum.cursed)
 # unitTestCpt.EnumSet.erase("cursed")
 unitTestCpt.EnumSet.add(ReviveSideEnum.sacred)  # inferred type : String
 # del unitTestCpt.EnumSet["sacred"]
+for enm in unitTestCpt.EnumSet:
+    print(enm)
 
 # Test Enum prop
 # Do we want that a property of type BeamStaffModeEnum:
@@ -116,6 +125,11 @@ subent = subscene["EntityWithInstanceOf"]          # inferred type : Object
 assert isinstance(subent, Entity)
 new_ent = subscene.add("NewEntity")                # inferred type : Object
 assert isinstance(new_ent, Entity)
+for entname in subscene.keys():
+    ent3 = subscene.get(entname)
+    assert isinstance(ent3, Entity)
+for ent3 in subscene:
+    assert isinstance(ent3, Entity)
 
 # Test Map
 pathNodeGD = ent.Components.get(PathNodeGD)   # inferred type : PathNodeGD
@@ -124,6 +138,11 @@ assert isinstance(tags, Map)
 b = tags.get("b")               # inferred type : PrimitiveSet[String]
 tags.remove("c")
 c = tags.add("c")               # inferred type : PrimitiveSet[String]
+for mapname in tags.keys():
+    set = tags.get(mapname)
+    assert isinstance(set, PrimitiveSet)
+for setname, set in tags:
+    assert isinstance(set, PrimitiveSet)
 
 # Test Map with enum key
 stamps = ent.Components.add(EnvStampGD).Stamps
@@ -133,6 +152,14 @@ deadArr = stamps.get(RegenerationStateEnum.Dead)
 assert deadArr.node is not None
 lushArr = stamps.get(RegenerationStateEnum.Lush)
 assert lushArr.node is None
+for stampname in stamps.keys():
+    stamp = stamps.get(stampname)
+    print(stampname)
+    assert isinstance(stamp, Array)
+for stampname, stamp in stamps:
+    print(stampname)
+    assert isinstance(stampname, RegenerationStateEnum)
+    assert isinstance(stamp, Array)
 stamps.remove(RegenerationStateEnum.Dead)
 assert stamps.get(RegenerationStateEnum.Dead).node is None
 

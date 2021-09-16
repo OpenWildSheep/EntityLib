@@ -843,7 +843,7 @@ void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path con
                    R"({{#ref}}{{name}}{{/ref}})"
                    R"({{#array}}(lambda n: Array({{#type}}{{>type_ctor}}{{/type}}, n)){{/array}})"
                    R"({{#prim_array}}(lambda n: PrimArray({{#type}}{{>type_ctor}}{{/type}}, n)){{/prim_array}})"
-                   R"({{#union_set}}(lambda n: UnionSet({{#type}}{{>type_ctor}}{{/type}}, n)){{/union_set}})"
+                   R"({{#union_set}}(lambda n: UnionSet({{#items}}{{>type_ctor}}{{/items}}, n)){{/union_set}})"
                    R"({{#tuple}}TupleNode{{/tuple}})";
         });
         root["print_import"] = partial([]() {
@@ -955,9 +955,8 @@ from entgen_helpers import *
 import EntityLibPy
 from enum import Enum
 
-{{#all_definitions}}{{#schema.union_set}}{{schema.display_type}} = UnionSet
-{{/schema.union_set}}{{#schema.object_set}}
-class {{schema.display_type_comma}}(UnionSet):
+{{#all_definitions}}{{#schema.object_set}}
+class {{schema.display_type_comma}}(ObjectSet):
     {{#schema.schema_name}}schema_name = "{{.}}"{{/schema.schema_name}}
     pass
 {{/schema.object_set}}{{#schema.enum}}
@@ -966,9 +965,14 @@ class {{schema.display_type}}Enum(Enum):
     {{/values}}
 
 
-{{/schema.enum}}{{/all_definitions}}{{#all_definitions}}{{#schema.alias}}{{schema.display_type}} = {{#type}}{{>type_ctor}}{{/type}}  # alias
+{{/schema.enum}}
+{{/all_definitions}}
+{{#all_definitions}}{{#schema.alias}}
+{{schema.display_type}} = {{#type}}{{>type_ctor}}{{/type}}  # alias
 {{/schema.alias}}{{/all_definitions}}
-
+{{#all_definitions}}{{#schema.union_set}}
+{{schema.display_type}} = (lambda n: UnionSet({{#items}}{{>type_ctor}}{{/items}}, n))
+{{/schema.union_set}}{{/all_definitions}}
 
 {{#all_definitions}}{{#schema.object}}class {{schema.display_type}}(HelperObject):
 {{#schema.schema_name}}

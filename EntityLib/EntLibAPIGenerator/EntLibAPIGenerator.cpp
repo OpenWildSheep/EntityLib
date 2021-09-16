@@ -854,29 +854,8 @@ void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path con
                    R"({{#array}}{{#type}}{{>print_import}}{{/type}}{{/array}})"
                    R"({{#prim_array}}{{#type}}{{>print_import}}{{/type}}{{/prim_array}})";
         });
-    };
-
-    for (json const& refSchema : allDefinitions)
-    {
-        data rootData;
-        rootData["file_schema"] = jsonToMustache(refSchema);
-
-        add_partials(rootData);
-
-        mustache tmpl{R"py(
-### /!\ This code is GENERATED! Do not modify it.
-
-from entgen_helpers import *
-import EntityLibPy
-
-{{#file_schema}}
-{{#schema}}
-{{#includes}}
-{{>print_import}}
-{{/includes}}
-
-
-{{#union_set}}
+        root["print_type_definition"] = partial([]() {
+            return R"py({{#schema}}{{#union_set}}
 {{schema.type_name}} = (lambda n: UnionSet({{#items}}{{>type_ctor}}{{/items}}, n))
 {{/union_set}}{{#object_set}}
 class {{schema.display_type_comma}}(ObjectSet):
@@ -888,12 +867,9 @@ class {{schema.type_name}}Enum(Enum):
     {{/values}}
 
 
-{{/enum}}
-
-{{#alias}}
-{{schema.type_name}} = {{#type}}{{>type_ctor}}{{/type}}{{/alias}}
-
-{{#object}}
+{{/enum}}{{#alias}}
+{{schema.type_name}} = {{#type}}{{>type_ctor}}{{/type}}
+{{/alias}}{{#object}}
 
 class {{schema.type_name}}(HelperObject):
 {{#schema.schema_name}}
@@ -913,11 +889,13 @@ class {{schema.type_name}}(HelperObject):
 {{/properties}}    pass
 
 
-{{/object}}{{#union}}class {{schema.type_name}}(Union):
+{{/object}}{{#union}}
+class {{schema.type_name}}(Union):
     pass
 
 
-{{/union}}{{#enum}}class {{schema.type_name}}(Primitive[{{schema.type_name}}Enum]):  # Enum
+{{/union}}{{#enum}}
+class {{schema.type_name}}(Primitive[{{schema.type_name}}Enum]):  # Enum
     def __init__(self, node):
         super().__init__({{schema.type_name}}Enum, node)
     {{#schema_name}}schema_name = "{{.}}"{{/schema_name}}
@@ -929,7 +907,8 @@ class {{schema.type_name}}(HelperObject):
         return self._item_type(self._node.value)
 
 
-{{/enum}}{{#tuple}}class {{type_name}}(TupleNode[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
+{{/enum}}{{#tuple}}
+class {{type_name}}(TupleNode[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
     def __init__(self, node=None):  # type: (EntityLibPy.Node) -> None
         super().__init__((Int, Int, Float, Float, Float), node)
     {{#schema_name}}schema_name = "{{.}}"{{/schema_name}}
@@ -938,8 +917,30 @@ class {{schema.type_name}}(HelperObject):
         return {{>type_ctor}}(self._node.at({{index}}))
 {{/types}}
 
-{{/tuple}}
-{{/schema}}
+{{/tuple}}{{/schema}})py";
+        });
+    };
+
+    for (json const& refSchema : allDefinitions)
+    {
+        data rootData;
+        rootData["file_schema"] = jsonToMustache(refSchema);
+
+        add_partials(rootData);
+
+        mustache tmpl{R"py(
+### /!\ This code is GENERATED! Do not modify it.
+
+from entgen_helpers import *
+import EntityLibPy
+
+{{#file_schema}}
+{{#schema}}{{#includes}}
+{{>print_import}}
+{{/includes}}{{/schema}}
+
+{{>print_type_definition}}
+
 {{/file_schema}}
 
 )py"};
@@ -960,69 +961,9 @@ from entgen_helpers import *
 import EntityLibPy
 from enum import Enum
 
-{{#all_definitions}}{{#schema.object_set}}
-class {{schema.display_type_comma}}(ObjectSet):
-    {{#schema.schema_name}}schema_name = "{{.}}"{{/schema.schema_name}}
-    pass
-{{/schema.object_set}}{{#schema.enum}}
-class {{schema.type_name}}Enum(Enum):
-    {{#values}}{{escaped_name}} = "{{name}}"
-    {{/values}}
-
-
-{{/schema.enum}}
+{{#all_definitions}}
+{{>print_type_definition}}
 {{/all_definitions}}
-{{#all_definitions}}{{#schema.alias}}
-{{schema.type_name}} = {{#type}}{{>type_ctor}}{{/type}}  # alias
-{{/schema.alias}}{{/all_definitions}}
-{{#all_definitions}}{{#schema.union_set}}
-{{schema.type_name}} = (lambda n: UnionSet({{#items}}{{>type_ctor}}{{/items}}, n))
-{{/schema.union_set}}{{/all_definitions}}
-
-{{#all_definitions}}{{#schema.object}}class {{schema.type_name}}(HelperObject):
-{{#schema.schema_name}}
-    schema_name = "{{.}}"
-    @staticmethod
-    def load(entlib, sourcefile):
-        return entlib.load_node_file(sourcefile, entlib.get_schema({{schema.type_name}}.schema_name))
-{{/schema.schema_name}}{{#properties}}{{#type}}    @property
-    def {{prop_name}}(self): return {{>type_ctor}}(self._node.at("{{prop_name}}")){{#prim_array}}
-    @{{prop_name}}.setter
-    def {{prop_name}}(self, val): self.{{prop_name}}.set(val)
-{{/prim_array}}{{#ref.settable}}
-    @{{prop_name}}.setter
-    def {{prop_name}}(self, val): self.{{prop_name}}.set(val)
-{{/ref.settable}}{{/type}}
-{{/properties}}    pass
-
-
-{{/schema.object}}{{#schema.union}}class {{schema.type_name}}(Union):
-    {{#schema.schema_name}}schema_name = "{{.}}"{{/schema.schema_name}}
-    pass
-
-
-{{/schema.union}}{{#schema.enum}}class {{schema.type_name}}(Primitive[{{schema.type_name}}Enum]):  # Enum
-    def __init__(self, node):
-        super().__init__({{schema.type_name}}Enum, node)
-    {{#schema.schema_name}}schema_name = "{{.}}"{{/schema.schema_name}}
-    def __call__(self, node):  # type: (EntityLibPy.Node) -> {{schema.type_name}}
-        return {{schema.type_name}}(node)
-    def set(self, val):  # type: ({{schema.type_name}}Enum) -> None
-        return self._node.set_string(val.value)
-    def get(self):  # type: () -> T
-        return self._item_type(self._node.value)
-
-
-{{/schema.enum}}{{#schema.tuple}}class {{schema.type_name}}(TupleNode[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
-    def __init__(self, node : EntityLibPy.Node = None):
-        super().__init__((Int, Int, Float, Float, Float), node)
-    {{#schema.schema_name}}schema_name = "{{.}}"{{/schema.schema_name}}
-
-{{#types}}    def get_{{index}}(self):  # type: () -> {{>display_type}}
-        return {{>type_ctor}}(self._node.at({{index}}))
-{{/types}}
-
-{{/schema.tuple}}{{/all_definitions}}
 
 Entity = Object
 

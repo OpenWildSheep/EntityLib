@@ -816,7 +816,7 @@ void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path con
     create_directories(_destinationPath / "entgen");
 
     auto add_partials = [](data& root) {
-        root["display_type"] = partial([]() {
+        root["display_type_hint"] = partial([]() {
             return R"({{#object_set}}ObjectSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/object_set}})"
                    R"({{#prim_set}}PrimitiveSet[{{type.ref.cpp_native}}]{{/prim_set}})"
                    R"({{#map}}Map[{{key_type.ref.py_native}}, {{#value_type}}{{>display_type_comma}}{{/value_type}}]{{/map}})"
@@ -824,11 +824,11 @@ void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path con
                    R"({{#array}}Array[{{#type}}{{>display_type_comma}}{{/type}}]{{/array}})"
                    R"({{#prim_array}}PrimArray[{{#type}}{{>display_type_comma}}{{/type}}]{{/prim_array}})"
                    R"({{#union_set}}UnionSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/union_set}})"
-                   R"({{#tuple}}TupleNode[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]{{/tuple}})";
+                   R"({{#tuple}}TupleNode[{{#types}}Type[{{>display_type_hint}}]{{#comma}}, {{/comma}}{{/types}}]{{/tuple}})";
         });
 
         root["display_type_comma"] = partial([]() {
-            return R"({{>display_type}})"
+            return R"({{>display_type_hint}})"
                    R"({{#comma}}, {{/comma}})";
         });
         root["type_ctor_comma"] = partial([]() {
@@ -908,12 +908,12 @@ class {{schema.type_name}}(Primitive[{{schema.type_name}}Enum]):  # Enum
 
 
 {{/enum}}{{#tuple}}
-class {{type_name}}(TupleNode[Tuple[{{#types}}Type[{{>display_type}}]{{#comma}}, {{/comma}}{{/types}}]]):
+class {{type_name}}(TupleNode[Tuple[{{#types}}Type[{{>display_type_hint}}]{{#comma}}, {{/comma}}{{/types}}]]):
     def __init__(self, node=None):  # type: (EntityLibPy.Node) -> None
         super().__init__((Int, Int, Float, Float, Float), node)
     {{#schema_name}}schema_name = "{{.}}"{{/schema_name}}
 
-{{#types}}    def get_{{index}}(self):  # type: () -> {{>display_type}}
+{{#types}}    def get_{{index}}(self):  # type: () -> {{>display_type_hint}}
         return {{>type_ctor}}(self._node.at({{index}}))
 {{/types}}
 

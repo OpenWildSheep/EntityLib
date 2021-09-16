@@ -417,6 +417,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
                     Ent::Subschema const& unionSchema = **_schema.singularItems;
                     defData["union_set"] = getSchemaData(unionSchema);
                     defData["union_set"]["items"] = getSchemaRefType(*_schema.singularItems);
+                    defData["includes"].emplace_back(getSchemaRefType(*_schema.singularItems));
                     break;
                 }
                 else if (singularType == Ent::DataType::object)
@@ -519,8 +520,8 @@ static json getSchemaData(Ent::Subschema const& _schema)
             includes.emplace(getSchemaRefType(propRef));
         }
         object["properties"] = std::move(properties);
-        object["includes"] = includes;
         defData["object"] = std::move(object);
+        defData["includes"] = includes;
         break;
     }
     case Ent::DataType::oneOf:
@@ -868,9 +869,17 @@ void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path con
 from entgen_helpers import *
 import EntityLibPy
 
-{{#file_schema}}{{#schema.union_set}}{{schema.display_type}} = UnionSet
+{{#file_schema.schema}}
+{{#includes}}
+{{>print_import}}
+{{/includes}}
+{{/file_schema.schema}}
+
+{{#file_schema}}
+{{#schema.union_set}}
+{{schema.display_type}} = (lambda n: UnionSet({{#items}}{{>type_ctor}}{{/items}}, n))
 {{/schema.union_set}}{{#schema.object_set}}
-class {{schema.display_type_comma}}(UnionSet):
+class {{schema.display_type_comma}}(ObjectSet):
     {{#schema.schema_name}}schema_name = "{{.}}"{{/schema.schema_name}}
     pass
 {{/schema.object_set}}{{#schema.enum}}
@@ -886,9 +895,6 @@ class {{schema.display_type}}Enum(Enum):
 {{schema.display_type}} = {{#type}}{{>type_ctor}}{{/type}}{{/schema.alias}}{{/file_schema}}
 {{#file_schema}}
 {{#schema.object}}
-{{#includes}}
-{{>print_import}}
-{{/includes}}
 
 class {{schema.display_type}}(HelperObject):
 {{#schema.schema_name}}

@@ -13,6 +13,7 @@ from entgen.UnitTestComponent import *
 from entgen.BeamTargetGD import *
 from entgen.PathNodeGD import *
 from entgen.EnvStampGD import *
+from entgen.AnimationControllerGD import *
 """
 
 import EntityLibPy as Ent
@@ -38,7 +39,7 @@ ent2.save("instance_test_save.entity")
 ss = components.get(SubScene)  # inferred type : SubScene
 for key in components.keys():
     comp = components.get_by_name(key)
-    assert isinstance(key, EntityLibPy.String)
+    assert isinstance(key, str)
     print(comp.schema.name)
 for comp in components:
     assert isinstance(comp, EntityLibPy.Node)

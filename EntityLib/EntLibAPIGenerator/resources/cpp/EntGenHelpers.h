@@ -511,7 +511,7 @@ namespace Ent
                 using reference = O;
 
                 Ent::Node* node = nullptr;
-                decltype(details::getKeys<K>((Ent::Node*)nullptr)) keys;
+                std::vector<Ent::Node*> items;
                 size_t index = 0;
 
                 iterator& operator++()
@@ -534,7 +534,7 @@ namespace Ent
 
                 reference operator*() const
                 {
-                    return node->mapGet(toInternal(keys[index]));
+                    return items[index];
                 }
 
                 pointer operator->() const
@@ -545,7 +545,7 @@ namespace Ent
 
             iterator begin() const
             {
-                return iterator{node, getKeys(), 0};
+                return iterator{node, node->getItems(), 0};
             }
 
             iterator end() const
@@ -633,7 +633,7 @@ namespace Ent
                 using reference = value_type;
 
                 Ent::Node* node = nullptr;
-                decltype(details::getKeys<K>((Ent::Node*)nullptr)) keys;
+                std::vector<Ent::Node*> items;
                 size_t index = 0;
 
                 iterator& operator++()
@@ -656,20 +656,21 @@ namespace Ent
 
                 reference operator*() const
                 {
-                    auto keyToView = [](auto const& key) {
-                        if constexpr (std::is_same_v<
-                                          std::remove_cv_t<std::remove_reference_t<decltype(key)>>,
-                                          Ent::String>)
+                    auto keyToView = [](Ent::Node* keynode) {
+                        if constexpr (std::is_enum_v<K>)
                         {
-                            return key.c_str();
+                            return strToEnum<K>(keynode->getString());
+                        }
+                        else if constexpr (std::is_same_v<K, char const*>)
+                        {
+                            return keynode->getString();
                         }
                         else
                         {
-                            return key;
+                            return keynode->getInt();
                         }
                     };
-                    return std::pair(
-                        keyToView(keys[index]), V(node->mapGet(toInternal(keys[index]))));
+                    return std::pair(keyToView(items[index]->at(0llu)), V(items[index]->at(1llu)));
                 }
 
                 pointer operator->() const
@@ -680,7 +681,7 @@ namespace Ent
 
             iterator begin() const
             {
-                return iterator{node, getKeys(), 0};
+                return iterator{node, node->getItems(), 0};
             }
 
             iterator end() const

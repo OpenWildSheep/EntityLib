@@ -526,6 +526,15 @@ namespace Ent
         throw BadType();
     }
 
+    std::vector<Node*> Node::getItems()
+    {
+        if (value.is<Array>())
+        {
+            return value.get<Array>().getItems();
+        }
+        throw BadType();
+    }
+
     Node* Node::push()
     {
         if (value.is<Array>())

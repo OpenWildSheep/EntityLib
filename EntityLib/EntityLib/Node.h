@@ -97,6 +97,7 @@ namespace Ent
         /// @return the array size at the given Override value location.
         tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         std::vector<Node const*> getItems() const; ///< @pre type==Ent::DataType::array. @brief Get all items
+        std::vector<Node*> getItems(); ///< @pre type==Ent::DataType::array. @brief Get all items
         Node* push(); ///< @pre type==Ent::DataType::array. @brief Add a new item at the end of array
         void pop(); ///< @pre type==Ent::DataType::array. @brief Remove an item at the end of array
         void clear(); ///< @pre type==Ent::DataType::array. @brief Remove all items in array

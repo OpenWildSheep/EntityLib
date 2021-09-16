@@ -139,6 +139,12 @@ std::vector<Ent::Node const*> Ent::Array::getItemsWithRemoved() const
 
 std::vector<Ent::Node const*> Ent::Array::getItems() const
 {
+    return apply_visitor(
+        [](auto&& a) -> std::vector<Ent::Node const*> { return a.getItems(); }, m_data);
+}
+
+std::vector<Ent::Node*> Ent::Array::getItems()
+{
     return apply_visitor([](auto& a) { return a.getItems(); }, m_data);
 }
 

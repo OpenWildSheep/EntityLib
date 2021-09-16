@@ -60,6 +60,7 @@ namespace Ent
         void checkInvariants() const;
         std::vector<Node const*> getItemsWithRemoved() const;
         std::vector<Node const*> getItems() const;
+        std::vector<Node*> getItems();
         void clear();
         void computeMemory(MemoryProfiler& _prof) const;
         Map detach() const;
@@ -78,6 +79,8 @@ namespace Ent
     private:
         Element& insertImpl(KeyType const& _key);
         Element& insertImpl(OverrideValueLocation _loc, KeyType _key, Node _node, bool _addedInInstance);
+        template <typename M>
+        static auto getItemsImpl(M* self);
 
         EntityLib const* m_entlib = nullptr;
         Subschema const* m_schema = nullptr;

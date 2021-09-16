@@ -151,21 +151,29 @@ void setValue(Ent::Node& node, Value const& val)
     }
 }
 
-static mapbox::util::variant<std::vector<String>, std::vector<int64_t>> nodeGetKey(Node* _node)
+static py::list nodeGetKey(Node* _node)
 {
     auto const type = _node->getKeyType();
+    py::list arr;
     if (type == Ent::DataType::string || type == Ent::DataType::entityRef)
     {
-        return _node->getKeysString();
+        for (auto const& key : _node->getKeysString())
+        {
+            arr.append(py::str(key.c_str()));
+        }
     }
     else if (type == Ent::DataType::integer)
     {
-        return _node->getKeysInt();
+        for (auto key : _node->getKeysInt())
+        {
+            arr.append(key);
+        }
     }
     else
     {
         throw std::runtime_error("Unexpected key type");
     }
+    return arr;
 }
 
 using namespace pybind11::literals;
@@ -448,13 +456,19 @@ PYBIND11_MODULE(EntityLibPy, ent)
              },
              "source"_a = OverrideValueSource::Override, "superKeyIsType"_a = false)
         .def("map_erase", (bool (Node::*)(char const*))&Node::mapErase)
+        .def("map_erase", [](Node* _node, Ent::String const& _key){ return _node->mapErase(_key.c_str()); })
         .def("map_erase", (bool (Node::*)(int64_t))&Node::mapErase)
         .def("map_rename", (Node* (Node::*)(char const*, char const*))&Node::mapRename, py::return_value_policy::reference_internal)
+        .def("map_rename", [](Node* _node, Ent::String const& _from, Ent::String const& _to)
+            {
+                return _node->mapRename(_from.c_str(), _to.c_str());
+            }, py::return_value_policy::reference_internal)
         .def("map_rename", (Node* (Node::*)(int64_t, int64_t))&Node::mapRename, py::return_value_policy::reference_internal)
         .def("map_get", (Node* (Node::*)(char const*))&Node::mapGet, py::return_value_policy::reference_internal)
         .def("map_get", [](Node* node, Ent::String const& str){return node->mapGet(str.c_str());}, py::return_value_policy::reference_internal)
         .def("map_get", (Node* (Node::*)(int64_t))&Node::mapGet, py::return_value_policy::reference_internal)
         .def("map_insert", (Node* (Node::*)(char const* _key))&Node::mapInsert, py::return_value_policy::reference_internal)
+        .def("map_insert", [](Node* _node, Ent::String const& _key){ return _node->mapInsert(_key.c_str()); }, py::return_value_policy::reference_internal)
         .def("map_insert", (Node* (Node::*)(int64_t _key))&Node::mapInsert, py::return_value_policy::reference_internal)
         .def("map_insert_instanceof", (Node* (Node::*)(char const* _key))&Node::mapInsertInstanceOf, py::return_value_policy::reference_internal)
         .def("map_insert_instanceof", (Node* (Node::*)(int64_t _key))&Node::mapInsertInstanceOf, py::return_value_policy::reference_internal)

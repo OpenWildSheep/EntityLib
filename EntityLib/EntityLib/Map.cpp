@@ -222,7 +222,14 @@ Ent::DataType Ent::Map::getKeyType(Subschema const* _schema)
 
 bool Ent::Map::Element::hasOverride() const
 {
-    return isPresent.hasOverride() || node->hasOverride();
+    if (isPresent.get())
+    {
+        return (not isPresent.getPrefab()) || node->hasOverride();
+    }
+    else
+    {
+        return isPresent.getPrefab();
+    }
 }
 
 bool Ent::Map::Element::hasPrefabValue() const
@@ -358,7 +365,7 @@ Ent::Map::Element& Ent::Map::insertImpl(KeyType const& _key)
 
 Ent::Node* Ent::Map::insert(KeyType const& _key)
 {
-    return insertImpl(_key).node.get();
+    return getEltValue(m_schema, insertImpl(_key));
 }
 
 Ent::Node* Ent::Map::rename(KeyType const& _key, KeyType const& _newkey)
@@ -440,7 +447,8 @@ Ent::Map::insertImpl(OverrideValueLocation _loc, KeyType _key, Node _node, bool 
 
 Ent::Node* Ent::Map::insert(OverrideValueLocation _loc, KeyType _key, Node _node, bool _addedInInstance)
 {
-    return insertImpl(_loc, std::move(_key), std::move(_node), _addedInInstance).node.get();
+    return getEltValue(
+        m_schema, insertImpl(_loc, std::move(_key), std::move(_node), _addedInInstance));
 }
 
 std::vector<Ent::Node const*> Ent::Map::getItemsWithRemoved() const
@@ -448,19 +456,29 @@ std::vector<Ent::Node const*> Ent::Map::getItemsWithRemoved() const
     std::vector<Node const*> result;
     result.reserve(m_items.size());
     auto&& meta = m_schema->meta.get<Ent::Subschema::ArrayMeta>();
+    auto notAGhostElement = [](Element const& elt) {
+        // Don't care of elements which has never existed
+        return elt.isPresent.get() or elt.isPresent.getPrefab();
+    };
     if (meta.ordered)
     {
         for (auto const& key_index : m_itemMap)
         {
             auto& elt = m_items[std::get<1>(key_index)];
-            result.push_back(elt.node.get());
+            if (notAGhostElement(elt))
+            {
+                result.push_back(elt.node.get());
+            }
         }
     }
     else
     {
         for (auto&& elt : m_items)
         {
-            result.push_back(elt.node.get());
+            if (notAGhostElement(elt))
+            {
+                result.push_back(elt.node.get());
+            }
         }
     }
     return result;
@@ -674,7 +692,7 @@ void Ent::Map::applyAllValues(Map& _dest, CopyMode _copyMode) const
     for (auto& sourceNode : getItems())
     {
         auto&& key = getChildKey(m_schema, sourceNode);
-        Node* destNode2 = _dest.insert(key); // 'insert' only get if the item exist
+        Node* destNode2 = _dest.insertImpl(key).node.get(); // 'insert' only get if the item exist
         sourceNode->applyAllValues(*destNode2, _copyMode);
         removedDestKeys.erase(key);
     }

@@ -145,6 +145,10 @@
                         {}
                     ],
                     [
+                        "NewNode2",
+                        {}
+                    ],
+                    [
                         "OldNode1",
                         {
                             "Value": "overriden"

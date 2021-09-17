@@ -111,19 +111,19 @@ try
 
     // Test Set of Object
     auto subscene =
-        ent.Components().get<SubScene>().Embedded(); // inferred type : ObjectSet<Object>
-    auto subent = subscene["EntityWithInstanceOf"]; // inferred type : Object
+        ent.Components().get<SubScene>().Embedded(); // inferred type : ObjectSet<Entity>
+    auto subent = subscene["EntityWithInstanceOf"]; // inferred type : Entity
     static_assert(std::is_same_v<decltype(subent), Entity>);
-    auto new_ent = subscene.add("NewEntity"); // inferred type : Object
+    auto new_ent = subscene.add("NewEntity"); // inferred type : Entity
     static_assert(std::is_same_v<decltype(new_ent), Entity>);
     for (auto&& entname : subscene.getKeys())
     {
         auto ent3 = subscene.get(entname.c_str());
-        static_assert(std::is_same_v<decltype(ent3), Object>);
+        static_assert(std::is_same_v<decltype(ent3), Entity>);
     }
     for (auto ent3 : subscene)
     {
-        static_assert(std::is_same_v<decltype(ent3), Object>);
+        static_assert(std::is_same_v<decltype(ent3), Entity>);
     }
 
     // Test Map

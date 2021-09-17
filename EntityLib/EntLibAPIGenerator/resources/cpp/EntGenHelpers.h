@@ -49,6 +49,12 @@ namespace Ent
             {
                 return node->hasDefaultValue();
             }
+
+            // Useful in if
+            explicit operator bool() const
+            {
+                return hasValue();
+            }
         };
 
         template <typename T>
@@ -168,7 +174,9 @@ namespace Ent
             template <typename V, std::size_t... Is>
             void copyToTuple(V& point, std::index_sequence<Is...>)
             {
-                ((std::get<Is>(point) = operator[](Is).get()), ...);
+                ((std::get<Is>(point) =
+                      static_cast<std::tuple_element_t<Is, V>>(operator[](Is).get())),
+                 ...);
             }
 
             template <typename V>
@@ -377,7 +385,7 @@ namespace Ent
             return value;
         }
 
-        char const* toInternal(Ent::String const& value)
+        inline char const* toInternal(Ent::String const& value)
         {
             return value.c_str();
         }
@@ -889,8 +897,5 @@ namespace Ent
                 return node->getEntityRef();
             }
         };
-
-        struct Object;
-        using Entity = ::Ent::Gen::Object;
     } // namespace Gen
 } // namespace Ent

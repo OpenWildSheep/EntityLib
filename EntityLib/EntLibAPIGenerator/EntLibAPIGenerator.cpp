@@ -117,6 +117,7 @@ static void addDef(
     std::string const& _scope,
     bool _overwrite = false)
 {
+    ENTLIB_ASSERT(_def->type != Ent::DataType::null);
     auto escapedName = escapeName(_name);
     if (allDefs.count(escapedName) == 0)
     {
@@ -282,6 +283,10 @@ static json getSchemaType(Ent::Subschema const& _schema)
                     type["prim_set"] = std::move(array);
                     return type;
                 }
+                else
+                {
+                    ENTLIB_LOGIC_ERROR("Unexpected singular type in set");
+                }
             }
             else if (meta.overridePolicy == "map")
             {
@@ -328,7 +333,6 @@ static json getSchemaType(Ent::Subschema const& _schema)
             type["tuple"] = std::move(tuple);
             return type;
         }
-        ENTLIB_LOGIC_ERROR("Unexpected fallthrough");
     case Ent::DataType::oneOf:
     {
         std::string typeDispName = schemaName[&_schema];
@@ -736,14 +740,14 @@ namespace Ent
                 {{/values}}
             };
         };
-        char const* toString({{schema.type_name}}Enum value)
+        inline char const* toString({{schema.type_name}}Enum value)
         {
             if(size_t(value) >= std::size({{schema.type_name}}::enumToString))
                 throw std::runtime_error("Wrong enum value");
             return {{schema.type_name}}::enumToString[size_t(value)];
         }
-        char const* toInternal({{schema.type_name}}Enum value) { return toString(value); }
-        template<> {{schema.type_name}}Enum strToEnum<{{schema.type_name}}Enum>(char const* value)
+        inline char const* toInternal({{schema.type_name}}Enum value) { return toString(value); }
+        template<> inline {{schema.type_name}}Enum strToEnum<{{schema.type_name}}Enum>(char const* value)
         {
             return static_cast<{{schema.type_name}}Enum>(details::indexInEnum(value, {{schema.type_name}}::enumToString));
         }
@@ -972,8 +976,6 @@ from enum import Enum
 {{>print_type_definition}}
 {{/all_definitions}}
 
-Entity = Object
-
 )py"};
 
     std::ofstream outputCommon = openOfstream(_destinationPath / "entgen/inline.py");
@@ -993,8 +995,6 @@ from .EntityRef import *
 from .Float import *
 from .Int import *
 from .String import *
-
-Entity = Object
 
 )py"};
 

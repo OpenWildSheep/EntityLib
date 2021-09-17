@@ -1,7 +1,7 @@
 import os
 import entgen_helpers
-from entgen.inline import *
-# from entgen._all import *
+# from entgen.inline import *
+from entgen._all import *
 """
 from entgen.Object import *
 from entgen.String import *
@@ -17,8 +17,6 @@ from entgen.AnimationControllerGD import *
 """
 
 import EntityLibPy as Ent
-
-Entity = Object
 
 entlib = Ent.EntityLib("X:/")
 entlib.rawdata_path = Ent.path(os.path.normpath(os.getcwd() + "/../Test"))
@@ -121,10 +119,10 @@ assert isinstance(val0, int)
 assert len(position) == 5
 
 # Test Set of Object
-subscene = ent.Components.get(SubScene).Embedded   # inferred type : ObjectSet[Object]
-subent = subscene["EntityWithInstanceOf"]          # inferred type : Object
+subscene = ent.Components.get(SubScene).Embedded   # inferred type : ObjectSet[Entity]
+subent = subscene["EntityWithInstanceOf"]          # inferred type : Entity
 assert isinstance(subent, Entity)
-new_ent = subscene.add("NewEntity")                # inferred type : Object
+new_ent = subscene.add("NewEntity")                # inferred type : Entity
 assert isinstance(new_ent, Entity)
 for entname in subscene.keys():
     ent3 = subscene.get(entname)
@@ -144,6 +142,11 @@ for mapname in tags.keys():
     assert isinstance(set, PrimitiveSet)
 for setname, set in tags:
     assert isinstance(set, PrimitiveSet)
+
+# Map of Object
+scriptComp = ent.Components.add(ScriptComponentGD)
+cmnDataMap = scriptComp.CommonDataMap
+newTV = cmnDataMap.add("newTV")
 
 # Test Map with enum key
 stamps = ent.Components.add(EnvStampGD).Stamps

@@ -25,7 +25,7 @@ namespace Ent
 {
     char const* actorStatesSchemaName = "./Scene-schema.json#/definitions/ActorStates";
     char const* colorSchemaName = "./RuntimeComponents.json#/definitions/Color";
-    char const* entitySchemaName = "./Scene-schema.json#/definitions/Object";
+    char const* entitySchemaName = "./Scene-schema.json#/definitions/Entity";
     char const* sceneSchemaName = "./Scene-schema.json#/definitions/Scene";
     Ent::Node makeDefaultColorField(EntityLib const& _entlib)
     {

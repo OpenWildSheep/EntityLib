@@ -92,12 +92,37 @@ static Ent::DataType getKeyType(Ent::Subschema const* _arraySchema)
     case "map"_hash: return _arraySchema->singularItems->get().linearItems->at(0)->type; break;
     case "set"_hash:
     {
-        Ent::DataType const keyType = _arraySchema->singularItems->get().type;
+        auto& elementSchema = _arraySchema->singularItems->get();
+        Ent::DataType const keyType = elementSchema.type;
         switch (keyType)
         {
         case Ent::DataType::oneOf: return Ent::DataType::string;
         case Ent::DataType::string: return Ent::DataType::string;
         case Ent::DataType::integer: return Ent::DataType::integer;
+        case Ent::DataType::object:
+        {
+            // If the element is an object, the map is actually a set of objects
+            // So we expect to find a keyField. The key type is the type of the keyfield.
+            if (meta.keyField.has_value())
+            {
+                auto& keyFieldSchema = elementSchema.properties[*meta.keyField];
+                switch (keyFieldSchema->type)
+                {
+                case Ent::DataType::oneOf: return Ent::DataType::string;
+                case Ent::DataType::string: return Ent::DataType::string;
+                case Ent::DataType::integer: return Ent::DataType::integer;
+                default:
+                    throw ContextException(
+                        "Unknown key type in set %s/%s",
+                        _arraySchema->name.c_str(),
+                        meta.keyField->c_str());
+                }
+            }
+            else
+            {
+                throw ContextException("Object set without keyField in " + _arraySchema->name);
+            }
+        }
         default: throw ContextException("Unknown key type in set " + _arraySchema->name);
         }
 #pragma warning(pop)
@@ -459,18 +484,28 @@ std::vector<Ent::Node const*> Ent::Map::getItemsWithRemoved() const
     return result;
 }
 
-std::vector<Ent::Node const*> Ent::Map::getItems() const
+template <typename M>
+auto Ent::Map::getItemsImpl(M* self)
 {
-    checkInvariants();
-    std::vector<Node const*> result;
-    result.reserve(m_items.size());
-    auto&& meta = m_schema->meta.get<Ent::Subschema::ArrayMeta>();
+    self->checkInvariants();
+    auto result = [] {
+        if constexpr (std::is_const_v<M>)
+        {
+            return std::vector<Ent::Node const*>{};
+        }
+        else
+        {
+            return std::vector<Ent::Node*>{};
+        }
+    }();
+    result.reserve(self->m_items.size());
+    auto&& meta = self->m_schema->meta.get<Ent::Subschema::ArrayMeta>();
     if (meta.ordered)
     {
-        for (auto const& key_index : m_itemMap)
+        for (auto const& key_index : self->m_itemMap)
         {
             auto index = std::get<1>(key_index);
-            auto& elt = m_items[index];
+            auto& elt = self->m_items[index];
             if (elt.isPresent.get())
             {
                 result.push_back(elt.node.get());
@@ -479,9 +514,9 @@ std::vector<Ent::Node const*> Ent::Map::getItems() const
     }
     else
     {
-        for (auto const& node : m_items)
+        for (auto&& node : self->m_items)
         {
-            auto key = ::getChildKey(m_schema, node.node.get());
+            auto key = ::getChildKey(self->m_schema, node.node.get());
             if (node.isPresent.get())
             {
                 result.push_back(node.node.get());
@@ -489,6 +524,16 @@ std::vector<Ent::Node const*> Ent::Map::getItems() const
         }
     }
     return result;
+}
+
+std::vector<Ent::Node*> Ent::Map::getItems()
+{
+    return getItemsImpl(this);
+}
+
+std::vector<Ent::Node const*> Ent::Map::getItems() const
+{
+    return getItemsImpl(this);
 }
 
 void Ent::Map::checkInvariants() const

@@ -55,6 +55,7 @@ namespace Ent
         Object makeInstanceOf() const;
         Object detach() const;
         void applyAllValues(Object& _dest, CopyMode _copyMode) const;
+        void applyAllValuesButPrefab(Object& _dest, CopyMode _copyMode) const;
         Override<String> const& getInstanceOfValue() const
         {
             return instanceOf;

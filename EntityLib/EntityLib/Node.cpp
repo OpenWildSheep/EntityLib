@@ -526,6 +526,15 @@ namespace Ent
         throw BadType();
     }
 
+    std::vector<Node*> Node::getItems()
+    {
+        if (value.is<Array>())
+        {
+            return value.get<Array>().getItems();
+        }
+        throw BadType();
+    }
+
     Node* Node::push()
     {
         if (value.is<Array>())
@@ -953,6 +962,22 @@ namespace Ent
         }
 
         mapbox::util::apply_visitor(ApplyToPrefab{_dest.value, _copyMode}, value);
+    }
+
+    void Ent::Node::applyAllValuesButPrefab(Node& _dest, CopyMode _copyMode) const
+    {
+        if (not value.is<Object>() or not _dest.value.is<Object>())
+        {
+            throw BadType();
+        }
+        value.get<Object>().applyAllValuesButPrefab(_dest.value.get<Object>(), _copyMode);
+    }
+
+    void Ent::Node::changeInstanceOf(char const* _newPrefab)
+    {
+        Node cloned = *this;
+        resetInstanceOf(_newPrefab);
+        cloned.applyAllValuesButPrefab(*this, CopyMode::MinimalOverride);
     }
 
     void destroyAndFree(Node* ptr)

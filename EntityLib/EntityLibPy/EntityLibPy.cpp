@@ -408,6 +408,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("empty", [](Node* node) { return node->empty(); })
         .def("get_instance_of", [](Node* node) { return node->getInstanceOf(); })
         .def("set_instance_of", [](Node* node, char const* _path){ node->resetInstanceOf(_path);})
+        .def("change_instance_of", [](Node* node, char const* _path){ node->changeInstanceOf(_path);})
         .def("reset_instance_of", [](Node* node, char const* _path){ node->resetInstanceOf(_path);})
         .def("get_float", [](Node* node) { return node->getFloat(); })
         .def("get_int", [](Node* node) { return node->getInt(); })
@@ -691,6 +692,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("save_node_as_entity", &EntityLib::saveNodeAsEntity)
         .def("save_node_as_scene", &EntityLib::saveNodeAsScene)
         .def("get_parent_entity", (Node*(EntityLib::*)(Node*))&EntityLib::getParentEntity, py::return_value_policy::reference_internal)
+        .def("get_schema", &EntityLib::getSchema, py::return_value_policy::reference_internal)
         .def(
             "make_instance_of",
             [](EntityLib* lib, std::string const& path) {

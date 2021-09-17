@@ -52,6 +52,7 @@ namespace Ent
         bool isErased(Map::KeyType const& _key) const;
 
         std::vector<Node const*> getItems() const; ///< Get all not removed items
+        std::vector<Node*> getItems(); ///< Get all not removed items
         std::vector<Node const*> getItemsWithRemoved() const; ///< Get all items with the removed ones
 
         void pop(); ///< @pre not hasKey() and not isTuple()

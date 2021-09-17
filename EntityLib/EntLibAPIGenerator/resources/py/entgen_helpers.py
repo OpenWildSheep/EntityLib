@@ -69,49 +69,6 @@ class Primitive(Base, Generic[T]):
         return self._node.unset()
 
 
-class Float(Primitive[float]):
-    def __init__(self, node):
-        super(Float, self).__init__(float, node)
-
-    def set(self, val):  # type: (float) -> None
-        return self._node.set_float(val)
-
-
-class Int(Primitive[int]):
-    def __init__(self, node):
-        super(Int, self).__init__(int, node)
-
-    def set(self, val):  # type: (int) -> None
-        return self._node.set_int(val)
-
-
-class Bool(Primitive[bool]):
-    def __init__(self, node):
-        super(Bool, self).__init__(bool, node)
-
-    def set(self, val):  # type: (bool) -> None
-        return self._node.set_bool(val)
-
-
-class String(Primitive[str]):
-    def __init__(self, node):
-        super(String, self).__init__(str, node)
-
-    def set(self, val):  # type: (str) -> None
-        return self._node.set_string(val)
-
-    def __str__(self):
-        return self._node.value
-
-
-class EntityRef(Primitive[EntityLibPy.EntityRef]):
-    def __init__(self, node):
-        super(EntityRef, self).__init__(EntityLibPy.EntityRef, node)
-
-    def set(self, val):  # type: (EntityLibPy.EntityRef) -> None
-        return self._node.set_entityref(val)
-
-
 TComponent = TypeVar("TComponent")
 
 

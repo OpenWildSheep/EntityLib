@@ -436,6 +436,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
                     json alias(json::value_t::object);
                     alias["type"] = getSchemaType(_schema);
                     defData["alias"] = std::move(alias);
+                    defData["includes"].emplace_back(getSchemaType(_schema));
                     break;
                 }
             }
@@ -451,6 +452,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
                 json alias(json::value_t::object);
                 alias["type"] = getSchemaType(_schema);
                 defData["alias"] = std::move(alias);
+                defData["includes"].emplace_back(getSchemaType(_schema));
                 break;
             }
         }
@@ -459,6 +461,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
             json tuple;
             json types(json::value_t::array);
             size_t index = 0;
+            std::set<json> includes;
 
             for (auto& itemRef : *_schema.linearItems)
             {
@@ -469,10 +472,12 @@ static json getSchemaData(Ent::Subschema const& _schema)
                 }
                 subtype["index"] = index;
                 types.push_back(subtype);
+                includes.emplace(getSchemaRefType(itemRef));
                 ++index;
             }
             tuple["types"] = std::move(types);
             defData["tuple"] = std::move(tuple);
+            defData["includes"] = includes;
             break;
         }
         ENTLIB_LOGIC_ERROR("Unexpected fallthrough");
@@ -501,8 +506,10 @@ static json getSchemaData(Ent::Subschema const& _schema)
             break;
         }
         json alias(json::value_t::object);
-        alias["type"] = prim(primitiveName(_schema.type));
+        auto primType = prim(primitiveName(_schema.type));
+        alias["type"] = primType;
         defData["alias"] = std::move(alias);
+        defData["includes"].emplace_back(primType);
         break;
     }
     case Ent::DataType::object:

@@ -174,7 +174,7 @@ namespace Ent
 
     char const* Entity::getInstanceOf() const
     {
-        return instanceOf.isDefault() ? nullptr : instanceOf.get().c_str();
+        return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
     }
 
     ActivationLevel Entity::getMaxActivationLevel() const

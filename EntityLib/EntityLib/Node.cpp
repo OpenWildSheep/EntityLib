@@ -526,7 +526,8 @@ namespace Ent
     {
         if (value.is<Object>())
         {
-            return value.get<Object>().instanceOf.get().c_str();
+            auto const& instanceOf = value.get<Object>().instanceOf;
+            return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
         }
         throw BadType();
     }

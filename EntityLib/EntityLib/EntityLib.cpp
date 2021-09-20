@@ -1169,11 +1169,11 @@ json Ent::EntityLib::dumpNode(
                 }
             }
         }
-        if (_dumpedValueSource == OverrideValueSource::Override
-            and _node.value.get<Ent::Object>().instanceOf.isSet())
+        auto const& instanceOf = _node.value.get<Ent::Object>().instanceOf;
+        if (_dumpedValueSource == OverrideValueSource::Override and instanceOf.isSet())
         {
             fieldMap.push_back(
-                JsonField{"InstanceOf", _node.getInstanceOf(), internObj.instanceOfFieldIndex});
+                JsonField{"InstanceOf", instanceOf.get(), internObj.instanceOfFieldIndex});
         }
         std::sort(begin(fieldMap), end(fieldMap), [](JsonField const& a, JsonField const& b) {
             if (a.index != b.index)

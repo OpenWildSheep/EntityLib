@@ -712,7 +712,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(py::init<>())
         .def(py::init<std::string>())
         .def_readwrite("entity_path", &EntityRef::entityPath)
-        .def("__str__", [](EntityRef* ref) { return (std::string)ref->entityPath; });
+        .def("__str__", [](EntityRef* ref) { return (std::string)ref->entityPath; })
+        .def("__eq__", [](EntityRef const& _lhs, EntityRef const& _rhs){ return _lhs.entityPath == _rhs.entityPath; })
+        .def("__lt__", [](EntityRef const& _lhs, EntityRef const& _rhs){ return _lhs.entityPath < _rhs.entityPath; });
 
     pyEntityFile
         .def_property_readonly(

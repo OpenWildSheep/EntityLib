@@ -80,7 +80,12 @@ namespace Ent
 
     Node* Union::setUnionType(char const* _type)
     {
-        if (_type != getUnionType())
+        if (_type == nullptr)
+        {
+            throw NullPointerArgument("_type", "Union::setUnionType");
+        }
+        auto unionType = getUnionType();
+        if (unionType == nullptr or strcmp(_type, unionType) != 0)
         {
             auto* unionData = resetUnionTypeWithoutOverride(_type);
             typeOverriden = true;

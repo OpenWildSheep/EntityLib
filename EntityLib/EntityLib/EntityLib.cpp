@@ -663,6 +663,11 @@ Ent::Node Ent::EntityLib::loadNode(
                 object.instanceOf = Ent::Override<String>("", tl::nullopt, "");
             }
         }
+        else if (_super != nullptr and _super->getInstanceOf() != nullptr)
+        {
+            // we inherit from the super's instanceOf
+            object.instanceOf = Ent::Override<String>("", _super->getInstanceOf(), tl::nullopt);
+        }
 
         // Read the fields in schema
         object.nodes.reserve(_nodeSchema.properties.size());

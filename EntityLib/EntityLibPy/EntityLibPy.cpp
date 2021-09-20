@@ -385,6 +385,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "In an Object, get the property by name")
         .def("count", [](Node* node, char const* field) { return node->count(field); })
         .def("get_field_names", &Node::getFieldNames)
+        .def_property_readonly("fields",
+            &Node::getFields,
+            py::return_value_policy::reference_internal)
         .def(
             "at",
             [](Node* node, size_t i) { return node->at(i); },
@@ -399,6 +402,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_raw_size", &Node::getRawSize)
         .def(
             "get_items",
+            [](Node* node) { return node->getItems(); },
+            py::return_value_policy::reference_internal)
+        .def_property_readonly(
+            "items",
             [](Node* node) { return node->getItems(); },
             py::return_value_policy::reference_internal)
         .def(
@@ -705,7 +712,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(py::init<>())
         .def(py::init<std::string>())
         .def_readwrite("entity_path", &EntityRef::entityPath)
-        .def("__str__", [](EntityRef* ref) { return (std::string)ref->entityPath; });
+        .def("__str__", [](EntityRef* ref) { return (std::string)ref->entityPath; })
+        .def("__eq__", [](EntityRef const& _lhs, EntityRef const& _rhs){ return _lhs.entityPath == _rhs.entityPath; })
+        .def("__lt__", [](EntityRef const& _lhs, EntityRef const& _rhs){ return _lhs.entityPath < _rhs.entityPath; });
 
     pyEntityFile
         .def_property_readonly(

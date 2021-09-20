@@ -85,6 +85,8 @@ namespace Ent
             const; ///< @pre type==Ent::DataType::object @brief true if a field with this name exist
         std::vector<char const*>
         getFieldNames() const; ///< @pre type==Ent::DataType::object @brief Get all field names
+        std::map<char const*, Node const*>
+        getFields() const; ///< @pre type==Ent::DataType::object @brief Get all fields
         char const* getInstanceOf() const; ///< @pre type==Ent::DataType::object @brief path to the tmpl Node
 
         // Array

@@ -385,6 +385,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "In an Object, get the property by name")
         .def("count", [](Node* node, char const* field) { return node->count(field); })
         .def("get_field_names", &Node::getFieldNames)
+        .def_property_readonly("fields",
+            &Node::getFields,
+            py::return_value_policy::reference_internal)
         .def(
             "at",
             [](Node* node, size_t i) { return node->at(i); },
@@ -399,6 +402,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_raw_size", &Node::getRawSize)
         .def(
             "get_items",
+            [](Node* node) { return node->getItems(); },
+            py::return_value_policy::reference_internal)
+        .def_property_readonly(
+            "items",
             [](Node* node) { return node->getItems(); },
             py::return_value_policy::reference_internal)
         .def(

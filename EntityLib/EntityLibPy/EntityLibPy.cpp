@@ -413,6 +413,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("pop", [](Node* node) { node->pop(); })
         .def("clear", [](Node* node) { return node->clear(); })
         .def("empty", [](Node* node) { return node->empty(); })
+        .def_property_readonly("instance_of", [](Node* node) { return node->getInstanceOf(); })
         .def("get_instance_of", [](Node* node) { return node->getInstanceOf(); })
         .def("set_instance_of", [](Node* node, char const* _path){ node->resetInstanceOf(_path);})
         .def("change_instance_of", [](Node* node, char const* _path){ node->changeInstanceOf(_path);})
@@ -445,7 +446,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "get_union_data",
             [](Node* node) { return node->getUnionData(); },
             py::return_value_policy::reference_internal)
+        .def_property_readonly("union_data", [](Node* node) { return node->getUnionData(); }, py::return_value_policy::reference_internal)
         .def("get_union_type", &Node::getUnionType, py::return_value_policy::reference_internal)
+        .def_property_readonly("union_type", &Node::getUnionType, py::return_value_policy::reference_internal)
         .def("set_union_type", &Node::setUnionType, py::return_value_policy::reference_internal)
         .def(
             "get_schema",

@@ -1494,7 +1494,8 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
                 auto fileInJson = (data.count("File") != 0) ?
                                       tl::optional<std::string>(data["File"].get<std::string>()) :
                                       tl::nullopt;
-                auto subSceneComp = std::make_unique<Ent::SubSceneComponent>(this, index);
+                auto subSceneComp =
+                    std::make_unique<Ent::SubSceneComponent>(this, superComp != nullptr, index);
                 subSceneComp->embedded = Ent::Scene::loadScene(
                     *this,
                     data.value("Embedded", json()),
@@ -1552,7 +1553,7 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
             and removedComponents.count("SubScene") == 0)
         {
             subSceneComponent = std::make_unique<Ent::SubSceneComponent>(
-                this, superComp->index, superComp->embedded->makeInstanceOf());
+                this, true, superComp->index, superComp->embedded->makeInstanceOf());
         }
     }
     return std::make_unique<Ent::Entity>(
@@ -1902,7 +1903,7 @@ void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const&
         {name},
         {},
         {},
-        std::make_unique<SubSceneComponent>(this, 0, _scene.clone()),
+        std::make_unique<SubSceneComponent>(this, false, 0, _scene.clone()),
         {},
         {},
         {thumbNailPath});

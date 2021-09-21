@@ -522,7 +522,7 @@ struct MergeMapOverride
             });
         }
         Ent::Array arr{entlib, &_nodeSchema};
-        for (auto const& [key, node, addedInInstance] : result)
+        for (auto& [key, node, addedInInstance] : result) // node have to be mutable to be moved
         {
             if (arr.mapGet(key) != nullptr)
             {
@@ -620,7 +620,7 @@ Ent::Node Ent::EntityLib::loadNode(
     {
         Ent::Object object(&_nodeSchema);
         // Read the InstanceOf field
-        Ent::Node prefabNode;
+        std::shared_ptr<Ent::Node const> prefabNode;
         auto InstanceOfIter = _data.find("InstanceOf");
         if (_super != nullptr)
         {
@@ -645,8 +645,8 @@ Ent::Node Ent::EntityLib::loadNode(
             if (not nodeFileName.empty())
             {
                 // Do not inherit from _super since the override of InstanceOf reset the Entity
-                prefabNode = loadFileAsNode(nodeFileName, _nodeSchema);
-                _super = &prefabNode;
+                prefabNode = loadNodeReadOnly(_nodeSchema, nodeFileName.c_str());
+                _super = prefabNode.get();
                 if (_super->getSchema() != &_nodeSchema)
                 {
                     throw ContextException(
@@ -654,8 +654,9 @@ Ent::Node Ent::EntityLib::loadNode(
                         formatPath(rawdataPath, nodeFileName));
                 }
                 object.instanceOfFieldIndex = getFieldIndex(_data, *InstanceOfIter);
-                object.instanceOf = prefabNode.value.get<Object>().instanceOf.makeOverridedInstanceOf(
-                    InstanceOfIter->get<std::string>());
+                object.instanceOf =
+                    prefabNode->value.get<Object>().instanceOf.makeOverridedInstanceOf(
+                        InstanceOfIter->get<std::string>());
             }
             else
             {
@@ -677,8 +678,14 @@ Ent::Node Ent::EntityLib::loadNode(
             std::string const& name = std::get<0>(name_sub);
             Ent::Node const* superProp = (_super != nullptr) ? _super->at(name.c_str()) : nullptr;
             json const* refDefault = propSchemaRef.getRefDefaultValues();
-            json const* schemaDefault =
-                (_default != nullptr) and _default->count(name) != 0 ? &_default->at(name) : nullptr;
+            json const* schemaDefault = nullptr;
+            if (_default != nullptr)
+            {
+                if (auto iter = _default->find(name); iter != _default->end())
+                {
+                    schemaDefault = &(*iter);
+                }
+            }
             // The less local default value has the priority
             json const* defaultProp = schemaDefault != nullptr ? schemaDefault : refDefault;
             json const emptyJson;
@@ -1042,7 +1049,8 @@ Ent::Node Ent::EntityLib::loadNode(
         for (Ent::SubschemaRef const& schemaTocheck : *_nodeSchema.oneOf)
         {
             ++subSchemaIndex;
-            if (schemaTocheck->properties.count(typeField) == 0)
+            auto propIter = schemaTocheck->properties.find(typeField);
+            if (propIter == schemaTocheck->properties.end())
             {
                 auto message = Ent::format(
                     "%dth subschema of %s has no typeField named '%s'",
@@ -1051,8 +1059,7 @@ Ent::Node Ent::EntityLib::loadNode(
                     typeField.c_str());
                 throw Ent::IllFormedSchema(message.c_str());
             }
-            auto&& schemaType =
-                AT(schemaTocheck->properties, typeField).get().constValue->get<std::string>();
+            auto&& schemaType = propIter->second.get().constValue->get<std::string>();
             if (schemaType == dataType)
             {
                 Ent::Node const* superUnionDataWrapper =

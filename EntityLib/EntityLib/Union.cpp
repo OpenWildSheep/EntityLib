@@ -14,7 +14,7 @@ namespace Ent
         : entityLib(_entityLib)
         , schema(_schema)
         , typeIndex(_typeIndex)
-        , wrapper(make_value<Node>(_wrapper))
+        , wrapper(make_value<Node>(std::move(_wrapper)))
         , metaData(&(schema->meta.get<Subschema::UnionMeta>()))
     {
         auto* typeNode = wrapper->at(metaData->typeField.c_str());

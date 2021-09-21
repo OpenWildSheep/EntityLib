@@ -539,20 +539,10 @@ struct MergeMapOverride
     }
 };
 
-Ent::Node Ent::EntityLib::loadNode(
-    Ent::Subschema const& _nodeSchema,
-    json const& _data,
-    Ent::Node const* _super,
-    json const* _default) const
+Ent::Node Ent::EntityLib::loadPrimitive(
+    Ent::Subschema const& _nodeSchema, json const& _data, Ent::Node const* _super, json const* _default)
 {
-    ENTLIB_ASSERT(_super == nullptr or &_nodeSchema == _super->getSchema());
-
     Ent::Node result;
-
-    if (_default == nullptr and not _nodeSchema.defaultValue.is_null())
-    {
-        _default = &_nodeSchema.defaultValue;
-    }
 
     switch (_nodeSchema.type)
     {
@@ -615,8 +605,24 @@ Ent::Node Ent::EntityLib::loadNode(
         result = Ent::Node(Ent::Override<double>(def, supVal, val), &_nodeSchema);
     }
     break;
-    case Ent::DataType::object:
+    case Ent::DataType::entityRef: [[fallthrough]];
+    case Ent::DataType::object: [[fallthrough]];
+    case Ent::DataType::array: [[fallthrough]];
+    case Ent::DataType::oneOf: [[fallthrough]];
+    case Ent::DataType::COUNT:
+    default: ENTLIB_LOGIC_ERROR("Invalid DataType"); break;
+    }
+    return result;
+}
+
+Ent::Node Ent::EntityLib::loadObject(
+    Ent::Subschema const& _nodeSchema,
+    json const& _data,
+    Ent::Node const* _super,
+    json const* _default) const
+{
     {
+        ENTLIB_ASSERT(_nodeSchema.type == DataType::object);
         Ent::Object object(&_nodeSchema);
         // Read the InstanceOf field
         std::shared_ptr<Ent::Node const> prefabNode;
@@ -711,11 +717,19 @@ Ent::Node Ent::EntityLib::loadNode(
             }
         }
         std::sort(begin(object), end(object), Ent::CompObject());
-        result = Ent::Node(std::move(object), &_nodeSchema);
+        return Ent::Node(std::move(object), &_nodeSchema);
     }
-    break;
-    case Ent::DataType::array:
+}
+
+Ent::Node Ent::EntityLib::loadArray(
+    Ent::Subschema const& _nodeSchema,
+    nlohmann::json const& _data,
+    Ent::Node const* _super,
+    nlohmann::json const* _default) const
+{
     {
+        ENTLIB_ASSERT(_nodeSchema.type == DataType::array);
+
         Ent::Array arr(this, &_nodeSchema);
         auto&& meta = _nodeSchema.meta.get<Ent::Subschema::ArrayMeta>();
         size_t index = 0;
@@ -988,11 +1002,16 @@ Ent::Node Ent::EntityLib::loadNode(
             uint64_t defaultArraySize = _nodeSchema.linearItems->size();
             arr.arraySetSize(Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt));
         }
-        result = Ent::Node(std::move(arr), &_nodeSchema);
+        return Ent::Node(std::move(arr), &_nodeSchema);
     }
-    break;
-    case Ent::DataType::entityRef:
+}
+
+Ent::Node Ent::EntityLib::loadEntityRef(
+    Ent::Subschema const& _nodeSchema, json const& _data, Ent::Node const* _super, json const* _default)
+{
     {
+        ENTLIB_ASSERT(_nodeSchema.type == DataType::entityRef);
+
         Ent::EntityRef const def = _default == nullptr ?
                                        Ent::EntityRef() :
                                        Ent::EntityRef{String(_default->get<std::string>())};
@@ -1009,11 +1028,21 @@ Ent::Node Ent::EntityLib::loadNode(
             refString.has_value() ? tl::optional<Ent::EntityRef>(Ent::EntityRef{refString.value()}) :
                                     tl::optional<Ent::EntityRef>(tl::nullopt);
 
-        result = Ent::Node(Ent::Override<Ent::EntityRef>(def, supVal, val), &_nodeSchema);
+        return Ent::Node(Ent::Override<Ent::EntityRef>(def, supVal, val), &_nodeSchema);
     }
-    break;
-    case Ent::DataType::oneOf:
+}
+
+Ent::Node Ent::EntityLib::loadUnion(
+    Ent::Subschema const& _nodeSchema,
+    json const& _data,
+    Ent::Node const* _super,
+    json const* _default) const
+{
     {
+        ENTLIB_ASSERT(_nodeSchema.type == DataType::oneOf);
+
+        Ent::Node result;
+
         auto&& meta = _nodeSchema.meta.get<Ent::Subschema::UnionMeta>();
         std::string const& typeField = meta.typeField;
         if (typeField.empty())
@@ -1070,7 +1099,6 @@ Ent::Node Ent::EntityLib::loadNode(
                 Ent::Union un{this, &_nodeSchema, std::move(dataNode), size_t(subSchemaIndex)};
                 result = Ent::Node(std::move(un), &_nodeSchema);
                 typeFound = true;
-                break;
             }
         }
         if (not typeFound)
@@ -1081,12 +1109,37 @@ Ent::Node Ent::EntityLib::loadNode(
             Ent::Union un(this, &_nodeSchema, std::move(dataNode), 0);
             result = Ent::Node(std::move(un), &_nodeSchema);
         }
+        return result;
     }
-    break;
-    case Ent::DataType::COUNT:
+}
+
+Ent::Node Ent::EntityLib::loadNode(
+    Ent::Subschema const& _nodeSchema,
+    json const& _data,
+    Ent::Node const* _super,
+    json const* _default) const
+{
+    ENTLIB_ASSERT(_super == nullptr or &_nodeSchema == _super->getSchema());
+
+    if (_default == nullptr and not _nodeSchema.defaultValue.is_null())
+    {
+        _default = &_nodeSchema.defaultValue;
+    }
+
+    switch (_nodeSchema.type)
+    {
+    case Ent::DataType::null: [[fallthrough]];
+    case Ent::DataType::string: [[fallthrough]];
+    case Ent::DataType::boolean: [[fallthrough]];
+    case Ent::DataType::integer: [[fallthrough]];
+    case Ent::DataType::number: return loadPrimitive(_nodeSchema, _data, _super, _default);
+    case Ent::DataType::entityRef: return loadEntityRef(_nodeSchema, _data, _super, _default);
+    case Ent::DataType::object: return loadObject(_nodeSchema, _data, _super, _default);
+    case Ent::DataType::array: return loadArray(_nodeSchema, _data, _super, _default);
+    case Ent::DataType::oneOf: return loadUnion(_nodeSchema, _data, _super, _default);
+    case Ent::DataType::COUNT: [[fallthrough]];
     default: ENTLIB_LOGIC_ERROR("Invalid DataType"); break;
     }
-    return result;
 }
 
 static double round_n(double value, double multiplier)

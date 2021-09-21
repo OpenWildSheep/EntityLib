@@ -441,8 +441,7 @@ struct MergeMapOverride
                 }
                 else // Not overriden
                 {
-                    Ent::Node tmpNode = entlib->loadNode(
-                        _nodeSchema.singularItems->get(), json(), subSuper, subDefault);
+                    Ent::Node tmpNode = subSuper->makeInstanceOf();
                     ENTLIB_ASSERT(tmpNode.hasOverride() == false);
                     result.emplace_back(key, NodeWrapper{std::move(tmpNode), loc, false}, false);
                 }
@@ -733,8 +732,7 @@ Ent::Node Ent::EntityLib::loadNode(
                         json const* defaultItem = (_default != nullptr and index < _default->size()) ?
                                                       &_default->at(index) :
                                                       nullptr;
-                        Ent::Node tmpNode = loadNode(
-                            _nodeSchema.singularItems->get(), json(), subSuper, defaultItem);
+                        Ent::Node tmpNode = subSuper->makeInstanceOf();
                         auto loc = defaultItem == nullptr ? Ent::OverrideValueLocation::Prefab :
                                                             Ent::OverrideValueLocation::Default;
                         arr.initAdd(loc, std::move(tmpNode), false);

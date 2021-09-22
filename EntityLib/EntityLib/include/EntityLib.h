@@ -239,12 +239,6 @@ namespace Ent
             Ent::Node const* _super,
             nlohmann::json const* _default = nullptr);
 
-        static Ent::Node loadEntityRef(
-            Ent::Subschema const& _nodeSchema,
-            nlohmann::json const& _data,
-            Ent::Node const* _super,
-            nlohmann::json const* _default = nullptr);
-
         mutable std::map<std::filesystem::path, EntityFile> m_entityCache;
         mutable std::map<std::filesystem::path, SceneFile> m_sceneCache;
         mutable std::map<std::filesystem::path, NodeFile> m_nodeCache;

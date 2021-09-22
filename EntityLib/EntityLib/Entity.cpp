@@ -174,7 +174,7 @@ namespace Ent
 
     char const* Entity::getInstanceOf() const
     {
-        return instanceOf.isDefault() ? nullptr : instanceOf.get().c_str();
+        return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
     }
 
     ActivationLevel Entity::getMaxActivationLevel() const
@@ -298,7 +298,7 @@ namespace Ent
     {
         if (subSceneComponent == nullptr)
         {
-            subSceneComponent = std::make_unique<SubSceneComponent>(entlib);
+            subSceneComponent = std::make_unique<SubSceneComponent>(entlib, false);
             removedComponents.erase("SubScene");
             subSceneComponent->embedded->setOwnerEntity(this);
         }
@@ -309,8 +309,11 @@ namespace Ent
     {
         if (subSceneComponent != nullptr)
         {
+            if (subSceneComponent->hasPrefab)
+            {
+                removedComponents.insert("SubScene");
+            }
             subSceneComponent.reset();
-            removedComponents.insert("SubScene");
         }
     }
 
@@ -638,19 +641,22 @@ namespace Ent
             if (comp->type == "SubScene")
             {
                 SubSceneComponent const* subscene = getSubSceneComponent();
-                ENTLIB_ASSERT(subscene != nullptr);
-                bool const subsceneHasOverride = subscene->hasOverride();
-                bool const hasInstanceOf = getInstanceOf() != nullptr;
-                if ((subsceneHasOverride and hasInstanceOf) or not hasInstanceOf)
+                if (not subscene->hasPrefab or subscene->hasOverride())
                 {
-                    json data;
-                    data.emplace("Embedded", subscene->embedded->saveScene()["Objects"]);
+                    ENTLIB_ASSERT(subscene != nullptr);
+                    bool const subsceneHasOverride = subscene->hasOverride();
+                    bool const hasInstanceOf = getInstanceOf() != nullptr;
+                    if ((subsceneHasOverride and hasInstanceOf) or not hasInstanceOf)
+                    {
+                        json data;
+                        data.emplace("Embedded", subscene->embedded->saveScene()["Objects"]);
 
-                    json compNode;
-                    compNode.emplace("Version", comp->version);
-                    compNode.emplace("Type", comp->type);
-                    compNode.emplace("Data", std::move(data));
-                    componentsNode.emplace_back(std::move(compNode));
+                        json compNode;
+                        compNode.emplace("Version", comp->version);
+                        compNode.emplace("Type", comp->type);
+                        compNode.emplace("Data", std::move(data));
+                        componentsNode.emplace_back(std::move(compNode));
+                    }
                 }
             }
             else if (not comp->hasPrefab or comp->root.hasOverride())
@@ -763,7 +769,7 @@ namespace Ent
         std::unique_ptr<SubSceneComponent> detSubSceneComponent;
         if (SubSceneComponent const* subscene = getSubSceneComponent())
         {
-            detSubSceneComponent = std::make_unique<SubSceneComponent>(entlib);
+            detSubSceneComponent = std::make_unique<SubSceneComponent>(entlib, false);
             detSubSceneComponent->embedded = std::make_unique<Ent::Scene>(entlib);
             for (auto const& subEntity : subscene->embedded->getObjects())
             {

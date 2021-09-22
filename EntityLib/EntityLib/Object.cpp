@@ -45,6 +45,7 @@ namespace Ent
     Ent::Object Ent::Object::makeInstanceOf() const
     {
         Object out(schema);
+        out.hasASuper = true;
         out.instanceOf = instanceOf.makeInstanceOf();
         out.nodes.reserve(size());
         for (auto&& [name, node, fieldIdx] : *this)

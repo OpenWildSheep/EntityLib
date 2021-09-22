@@ -508,11 +508,26 @@ namespace Ent
         throw BadType();
     }
 
+    std::map<char const*, Node const*> Node::getFields() const
+    {
+        if (value.is<Object>())
+        {
+            std::map<char const*, Node const*> fieldMap;
+            for (auto&& f : value.get<Object>())
+            {
+                fieldMap.emplace(f.name, f.node.get());
+            }
+            return fieldMap;
+        }
+        throw BadType();
+    }
+
     char const* Node::getInstanceOf() const
     {
         if (value.is<Object>())
         {
-            return value.get<Object>().instanceOf.get().c_str();
+            auto const& instanceOf = value.get<Object>().instanceOf;
+            return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
         }
         throw BadType();
     }

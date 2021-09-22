@@ -10,9 +10,10 @@
 namespace Ent
 {
     SubSceneComponent::SubSceneComponent(
-        EntityLib const* _entlib, size_t _index, std::unique_ptr<Scene> _embedded)
+        EntityLib const* _entlib, bool _hasPrefab, size_t _index, std::unique_ptr<Scene> _embedded)
         : index(_index)
         , embedded(std::move(_embedded))
+        , hasPrefab(_hasPrefab)
     {
         if (embedded == nullptr)
         {
@@ -35,7 +36,7 @@ namespace Ent
         ENTLIB_ASSERT(embedded != nullptr);
         std::unique_ptr<Scene> instEmbedded = embedded->makeInstanceOf();
         return std::make_unique<SubSceneComponent>(
-            embedded->getEntityLib(), index, std::move(instEmbedded));
+            embedded->getEntityLib(), true, index, std::move(instEmbedded));
     }
 
     std::unique_ptr<Ent::SubSceneComponent> Ent::SubSceneComponent::clone() const
@@ -43,7 +44,7 @@ namespace Ent
         ENTLIB_ASSERT(embedded != nullptr);
         std::unique_ptr<Scene> instEmbedded = embedded->clone();
         return std::make_unique<SubSceneComponent>(
-            embedded->getEntityLib(), index, std::move(instEmbedded));
+            embedded->getEntityLib(), hasPrefab, index, std::move(instEmbedded));
     }
 
     std::unique_ptr<Ent::Scene> Ent::SubSceneComponent::detachEmbedded()

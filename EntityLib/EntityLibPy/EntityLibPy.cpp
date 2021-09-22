@@ -385,6 +385,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "In an Object, get the property by name")
         .def("count", [](Node* node, char const* field) { return node->count(field); })
         .def("get_field_names", &Node::getFieldNames)
+        .def_property_readonly("fields",
+            &Node::getFields,
+            py::return_value_policy::reference_internal)
         .def(
             "at",
             [](Node* node, size_t i) { return node->at(i); },
@@ -401,11 +404,16 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "get_items",
             [](Node* node) { return node->getItems(); },
             py::return_value_policy::reference_internal)
+        .def_property_readonly(
+            "items",
+            [](Node* node) { return node->getItems(); },
+            py::return_value_policy::reference_internal)
         .def(
             "push", [](Node* node) { return node->push(); }, py::return_value_policy::reference_internal)
         .def("pop", [](Node* node) { node->pop(); })
         .def("clear", [](Node* node) { return node->clear(); })
         .def("empty", [](Node* node) { return node->empty(); })
+        .def_property_readonly("instance_of", [](Node* node) { return node->getInstanceOf(); })
         .def("get_instance_of", [](Node* node) { return node->getInstanceOf(); })
         .def("set_instance_of", [](Node* node, char const* _path){ node->resetInstanceOf(_path);})
         .def("change_instance_of", [](Node* node, char const* _path){ node->changeInstanceOf(_path);})
@@ -438,7 +446,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "get_union_data",
             [](Node* node) { return node->getUnionData(); },
             py::return_value_policy::reference_internal)
+        .def_property_readonly("union_data", [](Node* node) { return node->getUnionData(); }, py::return_value_policy::reference_internal)
         .def("get_union_type", &Node::getUnionType, py::return_value_policy::reference_internal)
+        .def_property_readonly("union_type", &Node::getUnionType, py::return_value_policy::reference_internal)
         .def("set_union_type", &Node::setUnionType, py::return_value_policy::reference_internal)
         .def(
             "get_schema",
@@ -705,7 +715,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(py::init<>())
         .def(py::init<std::string>())
         .def_readwrite("entity_path", &EntityRef::entityPath)
-        .def("__str__", [](EntityRef* ref) { return (std::string)ref->entityPath; });
+        .def("__str__", [](EntityRef* ref) { return (std::string)ref->entityPath; })
+        .def("__eq__", [](EntityRef const& _lhs, EntityRef const& _rhs){ return _lhs.entityPath == _rhs.entityPath; })
+        .def("__lt__", [](EntityRef const& _lhs, EntityRef const& _rhs){ return _lhs.entityPath < _rhs.entityPath; });
 
     pyEntityFile
         .def_property_readonly(

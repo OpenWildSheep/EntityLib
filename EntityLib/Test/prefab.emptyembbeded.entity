@@ -294,10 +294,6 @@
             },
             "Type": "TestUnion",
             "Version": 1
-        },
-        {
-            "Data": null,
-            "Type": "SubScene"
         }
     ],
     "MaxActivationLevel": "InWorld",

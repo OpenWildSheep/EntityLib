@@ -150,16 +150,14 @@ static Ent::Map::KeyType getChildKey(Ent::Subschema const* _arraySchema, Ent::No
         // meta.ordered means the items have to be sorted by the key
         ENTLIB_ASSERT(_child->getSchema()->linearItems.has_value());
         Ent::DataType keyType = _arraySchema->singularItems->get().linearItems->at(0)->type;
+        Ent::Node const* keyNode = _child->at(0llu);
 #pragma warning(push)
 #pragma warning(disable : 4061) // There are switches with missing cases. This is wanted.
         switch (keyType)
         {
-        case Ent::DataType::string:
-            ENTLIB_ASSERT(_child->at(0llu)->getString() != std::string());
-            return String(_child->at(0llu)->getString());
-        case Ent::DataType::entityRef:
-            return String(_child->at(0llu)->getEntityRef().entityPath.c_str());
-        case Ent::DataType::integer: return _child->at(0llu)->getInt();
+        case Ent::DataType::string: return String(keyNode->getString());
+        case Ent::DataType::entityRef: return String(keyNode->getEntityRef().entityPath.c_str());
+        case Ent::DataType::integer: return keyNode->getInt();
         default: throw std::runtime_error("Unknown key type in map " + _arraySchema->name);
         }
     }

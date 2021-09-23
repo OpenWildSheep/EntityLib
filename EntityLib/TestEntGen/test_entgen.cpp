@@ -96,7 +96,9 @@ try
     auto displaceNoise0 =
         heightObj.DisplaceNoiseList()[0]; // inferred type : DisplaceNoiseListItem
     ENTLIB_ASSERT(ent.Components().get<PathNodeGD>().Radius().get() == 30.0);
-    ENTLIB_ASSERT(ent.Components().get<PathNodeGD>().Radius() == 30.0);
+    ENTLIB_ASSERT(ent.Components().get<PathNodeGD>().Radius().toFloat() == 30.0f);
+    [[maybe_unused]] float rad2 =
+        ent.Components().get<PathNodeGD>().Radius().toFloat();
     ent.Components().get<PathNodeGD>().Radius() = 20.0;
     double rad = ent.Components().get<PathNodeGD>().Radius();
     ENTLIB_ASSERT(rad == 20.0);

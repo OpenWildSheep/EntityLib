@@ -5,6 +5,7 @@
 #include <string_view>
 #include <optional>
 #include <type_traits>
+#include <filesystem>
 
 #include <EntityLib.h>
 
@@ -54,6 +55,15 @@ namespace Ent
             explicit operator bool() const
             {
                 return hasValue();
+            }
+
+            bool operator==(std::nullptr_t) const
+            {
+                return isNull();
+            }
+            bool operator!=(std::nullptr_t) const
+            {
+                return !isNull();
             }
         };
 
@@ -146,7 +156,7 @@ namespace Ent
             template <typename T, std::size_t... Is>
             void copyFromTuple(T const& rho, std::index_sequence<Is...>)
             {
-                (operator[](Is).set(std::get<Is>(rho)), ...);
+                ((*this)[Is].set(std::get<Is>(rho)), ...);
             }
 
             template <typename T>
@@ -174,8 +184,7 @@ namespace Ent
             template <typename V, std::size_t... Is>
             void copyToTuple(V& point, std::index_sequence<Is...>)
             {
-                ((std::get<Is>(point) =
-                      static_cast<std::tuple_element_t<Is, V>>(operator[](Is).get())),
+                ((std::get<Is>(point) = static_cast<std::tuple_element_t<Is, V>>((*this)[Is].get())),
                  ...);
             }
 
@@ -209,6 +218,9 @@ namespace Ent
         {
             return arr.end();
         }
+
+        template <typename E>
+        E strToEnum(char const* in);
 
         namespace details
         {
@@ -394,9 +406,6 @@ namespace Ent
         {
             return value.c_str();
         }
-
-        template <typename E>
-        E strToEnum(char const* in);
 
         template <typename T>
         struct PrimitiveSet : Base
@@ -863,7 +872,7 @@ namespace Ent
                 return static_cast<float>(node->getFloat());
             }
 
-            float getFloat() const
+            float toFloat() const
             {
                 return static_cast<float>(node->getFloat());
             }
@@ -900,6 +909,11 @@ namespace Ent
             }
 
             operator std::string() const
+            {
+                return get();
+            }
+
+            operator std::filesystem::path() const
             {
                 return get();
             }

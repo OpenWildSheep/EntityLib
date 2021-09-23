@@ -735,7 +735,7 @@ namespace Ent
             using PropHelper<{{schema.type_name}}, Enum>::operator=;
             {{schema.type_name}}(Ent::Node* _node): EnumPropHelper<{{schema.type_name}}, Enum>(_node) {}
             {{#schema.schema_name}}static constexpr char schemaName[] = "{{.}}";{{/schema.schema_name}}
-            static constexpr char* enumToString[] = {
+            static constexpr char const* enumToString[] = {
                 {{#values}}"{{name}}",
                 {{/values}}
             };
@@ -818,7 +818,7 @@ namespace Ent
     create_directories(_destinationPath);
     std::ofstream output = openOfstream(_destinationPath / "EntGen.h");
     tmpl.render(rootData, output);
-    create_symlink(_resourcePath / "EntGenHelpers.h", _destinationPath / "EntGenHelpers.h");
+    copy_file(_resourcePath / "EntGenHelpers.h", _destinationPath / "EntGenHelpers.h");
 }
 
 /// @brief Generate the python EntGen API
@@ -1001,10 +1001,10 @@ from .String import *
     std::ofstream outputAll = openOfstream(_destinationPath / "entgen/_all.py");
     all.render(rootData, outputAll);
 
-    create_symlink(_resourcePath / "entgen_helpers.py", _destinationPath / "entgen_helpers.py");
+    copy_file(_resourcePath / "entgen_helpers.py", _destinationPath / "entgen_helpers.py");
     for (auto&& file : {"Bool.py", "EntityRef.py", "Float.py", "Int.py", "String.py"})
     {
-        create_symlink(_resourcePath / "entgen" / file, _destinationPath / "entgen" / file);
+        copy_file(_resourcePath / "entgen" / file, _destinationPath / "entgen" / file);
     }
 }
 

@@ -43,7 +43,7 @@ try
     auto unitTestCpt =
         components.add<UnitTestComponent>(); // inferred type : TurretComponentGD
     static_assert(std::is_same_v<decltype(unitTestCpt), UnitTestComponent>);
-    heightObj = components.HeightObj(); // Keep this method??
+    heightObj = *components.HeightObj(); // Keep this method??
 
     // Test fixed size array
     auto pos =

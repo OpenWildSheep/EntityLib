@@ -51,12 +51,6 @@ namespace Ent
                 return node->hasDefaultValue();
             }
 
-            // Useful in if
-            explicit operator bool() const
-            {
-                return hasValue();
-            }
-
             bool operator==(std::nullptr_t) const
             {
                 return isNull();
@@ -142,6 +136,10 @@ namespace Ent
             void clear()
             {
                 node->clear();
+            }
+            bool empty() const
+            {
+                return node->empty();
             }
         };
 

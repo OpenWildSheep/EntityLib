@@ -757,7 +757,7 @@ namespace Ent
             {{schema.type_name}}(Ent::Node* _node): Base(_node) {}
             {{#schema.schema_name}}static constexpr char schemaName[] = "{{.}}";{{/schema.schema_name}}
             char const* getType() const;{{#types}}
-            {{#type}}{{>display_type}}{{/type}} {{name}}() const;
+            std::optional<{{#type}}{{>display_type}}{{/type}}> {{name}}() const;
             {{#type}}{{>display_type}}{{/type}} set{{name}}() const;
         {{/types}}
         };{{/schema.union}}{{#schema.union_set}}{{#union}}
@@ -769,7 +769,7 @@ namespace Ent
             }
             {{#schema.schema_name}}static constexpr char schemaName[] = "{{.}}";{{/schema.schema_name}}
             char const* getType() const;{{#types}}
-            {{#type}}{{>display_type}}{{/type}} {{name}}() const;
+            std::optional<{{#type}}{{>display_type}}{{/type}}> {{name}}() const;
             {{#type}}{{>display_type}}{{/type}} add{{name}}() const;
         {{/types}}
         };{{/union}}{{/schema.union_set}}
@@ -786,9 +786,9 @@ namespace Ent
         {
             return node->getUnionType();
         }
-        {{#types}}inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::{{name}}() const
+        {{#types}}inline std::optional<{{#type}}{{>display_type}}{{/type}}> {{schema.type_name}}::{{name}}() const
         {
-            return {{#type}}{{>display_type}}{{/type}}(node->getUnionData());
+            return node->getUnionData() == nullptr? std::optional<{{#type}}{{>display_type}}{{/type}}>{}: std::optional<{{#type}}{{>display_type}}{{/type}}>(node->getUnionData());
         }
         inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::set{{name}}() const
         {
@@ -800,9 +800,10 @@ namespace Ent
         {
             return node->getUnionType();
         }
-        {{#types}}inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::{{name}}() const
+        {{#types}}inline std::optional<{{#type}}{{>display_type}}{{/type}}> {{schema.type_name}}::{{name}}() const
         {
-            return {{#type}}{{>display_type}}{{/type}}(getSubNode("{{name}}"));
+            auto sub = getSubNode("{{name}}");
+            return sub == nullptr? std::optional<{{#type}}{{>display_type}}{{/type}}>{}: std::optional<{{#type}}{{>display_type}}{{/type}}>(getSubNode("{{name}}"));
         }
         inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::add{{name}}() const
         {

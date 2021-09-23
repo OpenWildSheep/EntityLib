@@ -22,16 +22,6 @@ namespace Ent
             {
             }
 
-            bool hasValue() const
-            {
-                return node != nullptr;
-            }
-
-            bool isNull() const
-            {
-                return node == nullptr;
-            }
-
             bool isSet() const
             {
                 return node->isSet();
@@ -49,15 +39,6 @@ namespace Ent
             bool hasDefaultValue() const
             {
                 return node->hasDefaultValue();
-            }
-
-            bool operator==(std::nullptr_t) const
-            {
-                return isNull();
-            }
-            bool operator!=(std::nullptr_t) const
-            {
-                return !isNull();
             }
         };
 
@@ -909,6 +890,16 @@ namespace Ent
             operator std::string() const
             {
                 return get();
+            }
+
+            bool operator==(std::string const& value) const
+            {
+                return get() == value;
+            }
+
+            bool operator!=(std::string const& value) const
+            {
+                return get() != value;
             }
 
             operator std::filesystem::path() const

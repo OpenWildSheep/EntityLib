@@ -1607,7 +1607,7 @@ try
     scene->getObjects().front()->addComponent("BeamGeneratorGD")->root.getFieldNames();
     auto fieldNameCount =
         scene->getObjects().front()->addComponent("HeightObj")->root.getFieldNames().size();
-    ENTLIB_ASSERT(fieldNameCount == 8);
+    ENTLIB_ASSERT(fieldNameCount == 9);
 
     entlib.rawdataPath = current_path();
     scene->addEntity(entlib.makeInstanceOf((current_path() / "prefab.entity").generic_u8string()));

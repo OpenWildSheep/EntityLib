@@ -141,6 +141,7 @@ namespace Ent
     static N* getSceneParentEntity(N* _scene)
     {
         N* entity = nullptr;
+        ENTLIB_ASSERT(_scene != nullptr);
         ENTLIB_ASSERT(_scene->getDataType() == Ent::DataType::array);
         // subSceneData can be null if rootScene was loaded with loadSceneAsNode
         if (auto subSceneData = _scene->getParentNode())
@@ -159,10 +160,10 @@ namespace Ent
             entity = components->getParentNode(); // Entity
             ENTLIB_ASSERT(entity != nullptr);
             ENTLIB_ASSERT(entity->getDataType() == Ent::DataType::object);
+            ENTLIB_ASSERT_MSG(
+                entity == nullptr || entity->getSchema()->name == entitySchemaName,
+                "current has to be an Entity but is not!");
         }
-        ENTLIB_ASSERT_MSG(
-            entity == nullptr || entity->getSchema()->name == entitySchemaName,
-            "current has to be an Entity but is not!");
         return entity;
     }
 
@@ -359,7 +360,15 @@ namespace Ent
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     Node* EntityLib::getParentEntity(Node* _node)
     {
-        return getSceneParentEntity(_node->getParentNode());
+        ENTLIB_ASSERT_MSG(
+            _node == nullptr || _node->getSchema()->name == entitySchemaName,
+            "_node has to be an Entity but is not!");
+        if (auto parent = _node->getParentNode())
+        {
+            return getSceneParentEntity(parent);
+        }
+        else
+            return nullptr;
     }
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     Node const* EntityLib::getParentEntity(Node const* _node)

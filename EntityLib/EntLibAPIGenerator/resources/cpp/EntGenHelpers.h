@@ -123,15 +123,15 @@ namespace Ent
             }
             T push()
             {
-                return T(node->push(i));
+                return T(node->push());
             }
             void pop_back()
             {
                 node->pop();
             }
-            void clean()
+            void clear()
             {
-                node->clean();
+                node->clear();
             }
         };
 
@@ -157,15 +157,15 @@ namespace Ent
             {
                 ENT_IF_COMPILE(V, arr, std::get<0>(arr)) // tuple, c-style array and std::array
                 {
-                    if (std::tuple_size_v<V> != size())
+                    if (std::tuple_size_v<V> != this->size())
                         throw std::runtime_error(R"(Incompatible array size in 'Array::operator=')");
                     copyFromTuple(rho, std::make_index_sequence<std::tuple_size_v<V>>{});
                 }
                 else ENT_IF_COMPILE(V, arr, std::size(arr)) // All other dynamic containers
                 {
-                    if (std::size(rho) != size())
+                    if (std::size(rho) != this->size())
                         throw std::runtime_error(R"(Incompatible array size in 'Array::operator=')");
-                    std::copy(std::begin(rho), std::end(rho), begin());
+                    std::copy(std::begin(rho), std::end(rho), this->begin());
                 }
                 else static_assert(sizeof(V) == 0, "Unknown array type");
                 return *this;
@@ -185,13 +185,13 @@ namespace Ent
                 V result;
                 ENT_IF_COMPILE(V, arr, std::get<0>(arr)) // tuple, c-style array and std::array
                 {
-                    if (std::tuple_size_v<V> != size())
+                    if (std::tuple_size_v<V> != this->size())
                         throw std::runtime_error(R"(Incompatible array size in 'Array::operator=')");
                     copyToTuple(result, std::make_index_sequence<std::tuple_size_v<V>>{});
                 }
                 else ENT_IF_COMPILE(V, arr, std::size(arr)) // All other dynamic containers
                 {
-                    std::copy(begin(), end(), std::back_inserter(result));
+                    std::copy(this->begin(), this->end(), std::back_inserter(result));
                 }
                 else static_assert(sizeof(V) == 0, "Unknown array type");
                 return result;
@@ -272,7 +272,12 @@ namespace Ent
             }
             Ent::Node* getSubNode(char const* str) const
             {
-                return node->mapGet(str)->getUnionData();
+                if (auto nvp = node->mapGet(str))
+                {
+                    return nvp->getUnionData();
+                }
+                else
+                    return nullptr;
             }
             template <typename T>
             T get() const
@@ -741,11 +746,11 @@ namespace Ent
             }
             void set(Enum value) const
             {
-                node->setString(toInternal(value));
+                this->node->setString(toInternal(value));
             }
             Enum get() const
             {
-                char const* str = node->getString();
+                char const* str = this->node->getString();
                 auto iter = std::find(
                     std::begin(Child::enumToString),
                     std::end(Child::enumToString),
@@ -852,6 +857,16 @@ namespace Ent
             {
                 return node->getFloat();
             }
+
+            operator float() const
+            {
+                return static_cast<float>(node->getFloat());
+            }
+
+            float getFloat() const
+            {
+                return static_cast<float>(node->getFloat());
+            }
         };
 
         struct String : PropHelper<String, char const*>
@@ -873,11 +888,25 @@ namespace Ent
             {
                 return node->getString();
             }
+            char const* c_str() const
+            {
+                return node->getString();
+            }
 
             String const& operator=(std::string const& value) const
             {
                 set(value);
                 return *this;
+            }
+
+            operator std::string() const
+            {
+                return get();
+            }
+
+            bool empty() const
+            {
+                return strlen(get()) == 0;
             }
         };
 

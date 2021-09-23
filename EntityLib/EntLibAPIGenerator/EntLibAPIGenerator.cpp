@@ -788,7 +788,7 @@ namespace Ent
         }
         {{#types}}inline std::optional<{{#type}}{{>display_type}}{{/type}}> {{schema.type_name}}::{{name}}() const
         {
-            return node->getUnionData() == nullptr? std::optional<{{#type}}{{>display_type}}{{/type}}>{}: std::optional<{{#type}}{{>display_type}}{{/type}}>(node->getUnionData());
+            return strcmp(node->getUnionType(), "{{name}}") != 0? std::optional<{{#type}}{{>display_type}}{{/type}}>{}: std::optional<{{#type}}{{>display_type}}{{/type}}>(node->getUnionData());
         }
         inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::set{{name}}() const
         {

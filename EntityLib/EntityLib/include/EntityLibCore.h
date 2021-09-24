@@ -590,4 +590,12 @@ namespace Ent
         }
     };
 
+    template <typename V, typename F>
+    static constexpr auto doesCompile(F&&) -> decltype(std::is_invocable_v<F, V>)
+    {
+        return std::is_invocable_v<F, V>;
+    }
+
+#define ENT_IF_COMPILE(TYPE, PARAM, CODE)                                                          \
+    if constexpr (Ent::doesCompile<TYPE>([](auto&& PARAM) -> decltype(CODE) {}))
 } // namespace Ent

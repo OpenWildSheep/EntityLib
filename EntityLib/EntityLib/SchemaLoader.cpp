@@ -366,6 +366,14 @@ void Ent::SchemaLoader::parseSchemaNoRef(
     {
         // TODO required
     }
+    if (_data.count("title") != 0u)
+    {
+        vis.setTitle(_data["title"].get_ptr<json::string_t const*>()->c_str());
+    }
+    if (_data.count("description") != 0u)
+    {
+        vis.setDescription(_data["description"].get_ptr<json::string_t const*>()->c_str());
+    }
     if (_data.count("meta") != 0u)
     {
         if (!_data["meta"].is_object())
@@ -656,6 +664,16 @@ void Ent::SchemaLoader::readSchema(
                 subSchema.name.c_str(),
                 name.c_str());
             subSchema.name = std::move(name);
+        }
+        void setTitle(char const* _title) override
+        {
+            auto&& subSchema = stack.back()->get();
+            subSchema.title = _title;
+        }
+        void setDescription(char const* _description) override
+        {
+            auto&& subSchema = stack.back()->get();
+            subSchema.description = _description;
         }
     };
     FillSchema vis{globalSchema, stack};

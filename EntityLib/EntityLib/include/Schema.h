@@ -67,6 +67,8 @@ namespace Ent
         std::string name; ///< This is not a constraint. Just the name of the definition
         nlohmann::json userMeta;
         bool isKeyField = false;
+        std::string title;
+        std::string description;
 
         // Meta informations
         /// Store metadata for any type

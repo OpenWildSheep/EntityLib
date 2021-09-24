@@ -294,6 +294,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pySubschema
         .def_readonly("type", &Subschema::type)
         .def_readonly("name", &Subschema::name)
+        .def_readonly("title", &Subschema::title)
+        .def_readonly("description", &Subschema::description)
         .def_readonly("required", &Subschema::required)
         .def_readonly("properties", &Subschema::properties, py::return_value_policy::reference_internal)
         .def_readonly("max_items", &Subschema::maxItems)

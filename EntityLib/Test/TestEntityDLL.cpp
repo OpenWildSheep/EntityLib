@@ -376,6 +376,16 @@ try
     {
         EntityPtr ent = entlib.loadEntity("prefab.entity");
 
+        // Test title/description
+        {
+            auto rigodBodyCoeffSchema = ent->getComponent("CharacterControllerGD")
+                                            ->root.at("HeadCollisionData")
+                                            ->at("softCollisionRigidbodyCoeff")
+                                            ->getSchema();
+            ENTLIB_ASSERT(rigodBodyCoeffSchema->title.find("Rigidbody") != std::string::npos);
+            ENTLIB_ASSERT(rigodBodyCoeffSchema->description.find("rigidbody") != std::string::npos);
+        }
+
         auto setOfObject = ent->getComponent("TestSetOfObject");
         ENTLIB_ASSERT(setOfObject);
         auto mapTest = setOfObject->root.at("MapOfObject");

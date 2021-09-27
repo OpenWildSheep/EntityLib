@@ -247,9 +247,16 @@ namespace Ent
                 : Base(_node)
             {
             }
-            Union operator[](char const* str) const
+            std::optional<Union> operator[](char const* str) const
             {
-                return node->mapGet(str);
+                if (auto sub = node->mapGet(str))
+                {
+                    return sub;
+                }
+                else
+                {
+                    return std::nullopt;
+                }
             }
             template <typename T>
             static char const* getTypeName()
@@ -271,13 +278,27 @@ namespace Ent
                     return nullptr;
             }
             template <typename T>
-            T get() const
+            std::optional<T> get() const
             {
-                return getSubNode(getTypeName<T>());
+                if (auto sub = getSubNode(getTypeName<T>()))
+                {
+                    return sub;
+                }
+                else
+                {
+                    return std::nullopt;
+                }
             }
-            Union get(char const* str) const
+            std::optional<Union> get(char const* str) const
             {
-                return node->mapGet(str);
+                if (auto sub = node->mapGet(str))
+                {
+                    return sub;
+                }
+                else
+                {
+                    return std::nullopt;
+                }
             }
             Ent::Node* addSubNode(char const* str) const
             {
@@ -297,9 +318,9 @@ namespace Ent
             {
                 return remove(getTypeName<T>());
             }
-            Ent::Node* operator[](std::string const& str) const
+            std::optional<Union> operator[](std::string const& str) const
             {
-                return node->mapGet(str.c_str());
+                return get(str.c_str());
             }
             size_t size() const
             {
@@ -477,13 +498,27 @@ namespace Ent
                 : Base(_node)
             {
             }
-            O operator[](K key)
+            std::optional<O> operator[](K key)
             {
-                return node->mapGet(toInternal(key));
+                if (auto sub = node->mapGet(toInternal(key)))
+                {
+                    return sub;
+                }
+                else
+                {
+                    return std::nullopt;
+                }
             }
-            O get(K key)
+            std::optional<O> get(K key)
             {
-                return node->mapGet(toInternal(key));
+                if (auto sub = node->mapGet(toInternal(key)))
+                {
+                    return sub;
+                }
+                else
+                {
+                    return std::nullopt;
+                }
             }
             O add(K key) const
             {
@@ -599,13 +634,27 @@ namespace Ent
                 : Base(_node)
             {
             }
-            V get(K key)
+            std::optional<V> get(K key)
             {
-                return node->mapGet(toInternal(key));
+                if (auto sub = node->mapGet(toInternal(key)))
+                {
+                    return sub;
+                }
+                else
+                {
+                    return std::nullopt;
+                }
             }
-            V operator[](K key)
+            std::optional<V> operator[](K key)
             {
-                return node->mapGet(toInternal(key));
+                if (auto sub = node->mapGet(toInternal(key)))
+                {
+                    return sub;
+                }
+                else
+                {
+                    return std::nullopt;
+                }
             }
             V add(K key)
             {

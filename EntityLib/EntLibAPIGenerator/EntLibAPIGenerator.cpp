@@ -1033,6 +1033,7 @@ from .String import *
     }
 }
 
+// Used to make a topological sort to the generated types
 class Graph
 {
     std::map<std::string, std::vector<std::string>> adjlist;
@@ -1124,8 +1125,6 @@ try
     std::filesystem::remove_all(destinationPath, er);
     std::filesystem::create_directories(destinationPath);
 
-    Graph g;
-
     auto getTypeID = [](json const& type) {
         auto&& schema = type["schema"];
         if (schema.count("type_name") != 0)
@@ -1139,20 +1138,18 @@ try
         return std::string("Anonymous");
     };
 
-    // std::map<std::string, std::set<std::string>> dependencies;
-    // std::move(begin(allDefinitions), end(allDefinitions), std::back_inserter(defsArray));
+    // Transfert allDefinitions into nameToSchema
     std::map<std::string, json> nameToSchema;
     for (json& refSchema : allDefinitions)
     {
         nameToSchema.emplace(getTypeID(refSchema), std::move(refSchema));
     }
     allDefinitions.clear();
+
+    // Enter schema into the topological sorter
+    Graph g;
     for (auto const& [type_name, refSchema] : nameToSchema)
     {
-        if (type_name == "RegenerableVegetationGD")
-        {
-            printf("");
-        }
         if (refSchema["schema"].count("includes") != 0)
         {
             for (auto& include : refSchema["schema"]["includes"])
@@ -1176,7 +1173,11 @@ try
             }
         }
     }
+
+    // topological sort schema types
     g.topological_dfs();
+
+    // Transfert nameToSchema into allDefinitions
     for (auto& id : g.getOrder())
     {
         auto& schema = nameToSchema.at(id);

@@ -12,3 +12,5 @@ class String(Primitive[str]):
     def __str__(self):
         return self._node.value
 
+    def __len__(self):
+        return len(self._node.value)

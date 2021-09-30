@@ -725,6 +725,10 @@ namespace Ent
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
+            static Ent::Node create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
             {{/schema.schema_name}}
         {{#properties}}    {{#type}}{{>display_type}}{{/type}} {{prop_name}}() const;
         {{/properties}}
@@ -830,7 +834,7 @@ void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path con
     auto add_partials = [](data& root) {
         root["display_type_hint"] = partial([]() {
             return R"({{#object_set}}ObjectSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/object_set}})"
-                   R"({{#prim_set}}PrimitiveSet[{{type.ref.cpp_native}}]{{/prim_set}})"
+                   R"({{#prim_set}}PrimitiveSet[{{type.ref.py_native}}]{{/prim_set}})"
                    R"({{#map}}Map[{{key_type.ref.py_native}}, {{#value_type}}{{>display_type_comma}}{{/value_type}}]{{/map}})"
                    R"({{#ref}}{{name}}{{/ref}})"
                    R"({{#array}}Array[{{#type}}{{>display_type_comma}}{{/type}}]{{/array}})"
@@ -867,7 +871,8 @@ void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path con
                    R"({{#prim_array}}{{#type}}{{>print_import}}{{/type}}{{/prim_array}})";
         });
         root["print_type_definition"] = partial([]() {
-            return R"py({{#schema}}{{#union_set}}
+            return R"py(from EntityLibPy import Node
+{{#schema}}{{#union_set}}
 {{schema.type_name}} = (lambda n: UnionSet({{#items}}{{>type_ctor}}{{/items}}, n))
 {{/union_set}}{{#object_set}}
 class {{schema.display_type_comma}}(ObjectSet):
@@ -887,11 +892,17 @@ class {{schema.type_name}}(HelperObject):
 {{#schema.schema_name}}
     schema_name = "{{.}}"
     @staticmethod
-    def load(entlib, sourcefile):
-        return entlib.load_node_file(sourcefile, entlib.get_schema({{schema.type_name}}.schema_name))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->{{schema.type_name}}
+        return {{schema.type_name}}(entlib.load_node_file(sourcefile, entlib.get_schema({{schema.type_name}}.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->{{schema.type_name}}
+        return {{schema.type_name}}(entlib.make_node({{schema.type_name}}.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
 {{/schema.schema_name}}
 {{#properties}}{{#type}}    @property
-    def {{prop_name}}(self): return {{>type_ctor}}(self._node.at("{{prop_name}}")){{#prim_array}}
+    def {{prop_name}}(self):  # type: ()->{{>display_type_comma}}
+        return {{>type_ctor}}(self._node.at("{{prop_name}}")){{#prim_array}}
     @{{prop_name}}.setter
     def {{prop_name}}(self, val): self.{{prop_name}}.set(val)
 {{/prim_array}}{{#ref.settable}}
@@ -964,6 +975,15 @@ import EntityLibPy
     data rootData;
     rootData["all_definitions"] = jsonToMustache(allDefinitions);
 
+    rootData["primitives"] = data::type::list;
+    for (auto&& filename : {"Bool.py", "EntityRef.py", "Float.py", "Int.py", "String.py"})
+    {
+        std::ifstream primFile(_resourcePath / "entgen" / filename);
+        std::string data;
+        std::getline(primFile, data, char(0));
+        rootData["primitives"].push_back(data);
+    }
+
     add_partials(rootData);
 
     mustache allInline{R"py(
@@ -972,6 +992,10 @@ import EntityLibPy
 from entgen_helpers import *
 import EntityLibPy
 from enum import Enum
+
+{{#primitives}}
+{{.}}
+{{/primitives}}
 
 {{#all_definitions}}
 {{>print_type_definition}}
@@ -1008,6 +1032,57 @@ from .String import *
         copy_file(_resourcePath / "entgen" / file, _destinationPath / "entgen" / file);
     }
 }
+
+class Graph
+{
+    std::map<std::string, std::vector<std::string>> adjlist;
+    std::map<std::string, bool> vis;
+    std::vector<std::string> order;
+
+public:
+    std::vector<std::string> const& getOrder()
+    {
+        return order;
+    }
+
+    void addEdge(std::string const& u, std::string v)
+    {
+        adjlist[u].emplace_back(std::move(v));
+    }
+
+    void dfshelper(std::string const& u)
+    {
+        vis[u] = true;
+        for (auto const& i : adjlist[u])
+        {
+            if (!vis[i])
+            {
+                dfshelper(i);
+            }
+        }
+        order.push_back(u);
+    }
+
+    void topological_dfs()
+    {
+        for (auto&& [node, deps] : adjlist)
+        {
+            if (not vis[node])
+            {
+                dfshelper(node);
+            }
+        }
+        std::reverse(begin(order), end(order));
+    }
+
+    void print_order()
+    {
+        for (auto const& ele : order)
+        {
+            std::cout << ele << " -> ";
+        }
+    }
+};
 
 int main(int argc, char* argv[])
 try
@@ -1048,6 +1123,70 @@ try
     std::error_code er;
     std::filesystem::remove_all(destinationPath, er);
     std::filesystem::create_directories(destinationPath);
+
+    Graph g;
+
+    auto getTypeID = [](json const& type) {
+        auto&& schema = type["schema"];
+        if (schema.count("type_name") != 0)
+        {
+            return schema["type_name"].get<std::string>();
+        }
+        if (schema.count("schema_name") != 0)
+        {
+            return schema["schema_name"].get<std::string>();
+        }
+        return std::string("Anonymous");
+    };
+
+    // std::map<std::string, std::set<std::string>> dependencies;
+    // std::move(begin(allDefinitions), end(allDefinitions), std::back_inserter(defsArray));
+    std::map<std::string, json> nameToSchema;
+    for (json& refSchema : allDefinitions)
+    {
+        nameToSchema.emplace(getTypeID(refSchema), std::move(refSchema));
+    }
+    allDefinitions.clear();
+    for (auto const& [type_name, refSchema] : nameToSchema)
+    {
+        if (type_name == "RegenerableVegetationGD")
+        {
+            printf("");
+        }
+        if (refSchema["schema"].count("includes") != 0)
+        {
+            for (auto& include : refSchema["schema"]["includes"])
+            {
+                if (include["ref"].is_object())
+                {
+                    auto ref = include["ref"]["name"].get<std::string>();
+                    if (nameToSchema.count(ref) != 0)
+                    {
+                        g.addEdge(ref, type_name);
+                    }
+                }
+                else if (include["array"].is_object())
+                {
+                    auto ref = include["array"]["type"]["ref"]["name"].get<std::string>();
+                    if (nameToSchema.count(ref) != 0)
+                    {
+                        g.addEdge(ref, type_name);
+                    }
+                }
+            }
+        }
+    }
+    g.topological_dfs();
+    for (auto& id : g.getOrder())
+    {
+        auto& schema = nameToSchema.at(id);
+        allDefinitions.push_back(std::move(schema));
+        nameToSchema.erase(id);
+    }
+    for (auto&& [id, schema] : nameToSchema)
+    {
+        allDefinitions.push_back(std::move(schema));
+    }
 
     // Export the mustache json input (for debug purpose)
     {

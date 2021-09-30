@@ -564,9 +564,14 @@ Ent::Node Ent::EntityLib::loadPrimitive(
             // The default value is always the cons value
             def = _nodeSchema.constValue->get<std::string>();
         }
+        else if (_default == nullptr)
+        {
+            // If enum, the first string is the default
+            def = _nodeSchema.enumValues.empty() ? std::string() : _nodeSchema.enumValues.front();
+        }
         else
         {
-            def = _default == nullptr ? std::string() : _default->get<std::string>();
+            def = _default->get<std::string>();
         }
         tl::optional<std::string> const supVal =
             (_super != nullptr and not _super->hasDefaultValue()) ?

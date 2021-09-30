@@ -1,7 +1,10 @@
 import os
 import entgen_helpers
 # from entgen.inline import *
+from entgen.String import String
 from entgen._all import *
+from entgen_helpers import PrimArray
+
 """
 from entgen.Object import *
 from entgen.String import *
@@ -29,7 +32,7 @@ assert isinstance(name, String)
 components = ent.Components  # inferred type : UnionSet
 # load Object
 ent2node = Entity.load(entlib, "instance.entity")
-ent2 = Entity(ent2node)
+ent2 = Entity(ent2node.node)
 # save Object
 ent2.save("instance_test_save.entity")
 
@@ -63,6 +66,11 @@ assert v == [1., 2., 3.]
 tgd.Position.value = [4., 5., 6.]
 v = tgd.Position.value
 assert v == [4., 5., 6.]
+
+# prim array
+bonesStartPoints = ent.Components.get(BeamGeneratorGD).BonesStartPoints  # inferred type : PrimArray[String]
+# bonesStartPoints2 = ent.Components.get(RegenerableVegetationGD).VegetationPClouds[0].UsedVegetations  # inferred type : PrimArray[String]
+
 
 # Test set of primitive
 side = unitTestCpt.EnumSet   # inferred type : PrimitiveSet[ReviveSideEnum]
@@ -155,7 +163,7 @@ stamps.add(RegenerationStateEnum.Dead)
 deadArr = stamps.get(RegenerationStateEnum.Dead)
 assert deadArr.node is not None
 lushArr = stamps.get(RegenerationStateEnum.Lush)
-assert lushArr.node is None
+assert lushArr is None
 for stampname in stamps.keys():
     stamp = stamps.get(stampname)
     print(stampname)
@@ -165,7 +173,7 @@ for stampname, stamp in stamps:
     assert isinstance(stampname, RegenerationStateEnum)
     assert isinstance(stamp, Array)
 stamps.remove(RegenerationStateEnum.Dead)
-assert stamps.get(RegenerationStateEnum.Dead).node is None
+assert stamps.get(RegenerationStateEnum.Dead) is None
 
 # other
 # scp = EntityStateCreatureProfile(None)

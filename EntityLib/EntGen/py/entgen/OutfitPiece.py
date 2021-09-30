@@ -1,0 +1,33 @@
+
+### /!\ This code is GENERATED! Do not modify it.
+
+from entgen_helpers import *
+import EntityLibPy
+
+from entgen.OutfitPieceType import *
+from entgen.String import *
+from entgen.EntityRef import *
+
+
+class OutfitPiece(HelperObject):
+    schema_name = "./RuntimeComponents.json#/definitions/OutfitPiece"
+    @staticmethod
+    def load(entlib, sourcefile):
+        return entlib.load_node_file(sourcefile, entlib.get_schema(OutfitPiece.schema_name))
+    @property
+    def EntityRef(self): return EntityRef(self._node.at("EntityRef"))
+    @EntityRef.setter
+    def EntityRef(self, val): self.EntityRef.set(val)
+    @property
+    def Slot(self): return OutfitPieceType(self._node.at("Slot"))
+    @Slot.setter
+    def Slot(self, val): self.Slot.set(val)
+    @property
+    def _comment(self): return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+
+

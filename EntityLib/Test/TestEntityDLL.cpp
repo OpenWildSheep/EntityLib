@@ -339,7 +339,7 @@ try
         // Test default values related to a property of type class/struct.
         Ent::Component const* characterController = ent->getComponent("CharacterControllerGD");
         Ent::Node const* slideData = characterController->root.at("SlideData");
-        Ent::Node const* adherenceMin = slideData->at("adherenceMinDependingOnTheSlope");
+        Ent::Node const* adherenceMin = slideData->at("speedMediumCoeffIn");
         Ent::Node const* in = adherenceMin->at("in");
         ENTLIB_ASSERT(in->size() == 2);
         ENTLIB_ASSERT(in->at(0llu)->getFloat() == -1.);

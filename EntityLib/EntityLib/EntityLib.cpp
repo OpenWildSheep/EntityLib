@@ -1203,18 +1203,14 @@ json Ent::EntityLib::dumpNode(
         };
         std::vector<JsonField> fieldMap;
         auto& internObj = _node.value.get<Object>();
-        for (auto const& name_sub : _schema.properties)
+        for (auto const& [name, sub] : _schema.properties)
         {
-            auto&& name = std::get<0>(name_sub);
             Ent::Node const* subNode = _node.at(name.c_str());
-            if (subNode->matchValueSource(_dumpedValueSource))
+            // If the field isKeyField, write the field even if it is not overriden
+            if (subNode->matchValueSource(_dumpedValueSource) or sub.get().isKeyField)
             {
                 json subJson = dumpNode(
-                    *std::get<1>(name_sub),
-                    *subNode,
-                    _dumpedValueSource,
-                    _superKeyIsTypeName,
-                    _entityRefPreProc);
+                    *sub, *subNode, _dumpedValueSource, _superKeyIsTypeName, _entityRefPreProc);
                 // handle "Super" special key
                 if (_superKeyIsTypeName and name == "Super")
                 {

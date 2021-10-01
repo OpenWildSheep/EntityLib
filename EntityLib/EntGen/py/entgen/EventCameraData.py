@@ -9,102 +9,132 @@ from entgen.Bool import *
 from entgen.Float import *
 from entgen.Vector3 import *
 
+from EntityLibPy import Node
 
 class EventCameraData(HelperObject):
     schema_name = "./RuntimeComponents.json#/definitions/EventCameraData"
     @staticmethod
-    def load(entlib, sourcefile):
-        return entlib.load_node_file(sourcefile, entlib.get_schema(EventCameraData.schema_name))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EventCameraData
+        return EventCameraData(entlib.load_node_file(sourcefile, entlib.get_schema(EventCameraData.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EventCameraData
+        return EventCameraData(entlib.make_node(EventCameraData.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
     @property
-    def BlendCameraTime(self): return Float(self._node.at("BlendCameraTime"))
+    def BlendCameraTime(self):  # type: ()->Float
+        return Float(self._node.at("BlendCameraTime"))
     @BlendCameraTime.setter
     def BlendCameraTime(self, val): self.BlendCameraTime.set(val)
     @property
-    def CameraAimTriggerActor(self): return Bool(self._node.at("CameraAimTriggerActor"))
+    def CameraAimTriggerActor(self):  # type: ()->Bool
+        return Bool(self._node.at("CameraAimTriggerActor"))
     @CameraAimTriggerActor.setter
     def CameraAimTriggerActor(self, val): self.CameraAimTriggerActor.set(val)
     @property
-    def CameraOffsets(self): return (lambda n: Array(Vector3, n))(self._node.at("CameraOffsets"))
+    def CameraOffsets(self):  # type: ()->Array[Vector3]
+        return (lambda n: Array(Vector3, n))(self._node.at("CameraOffsets"))
     @property
-    def DOFFarStart(self): return Float(self._node.at("DOFFarStart"))
+    def DOFFarStart(self):  # type: ()->Float
+        return Float(self._node.at("DOFFarStart"))
     @DOFFarStart.setter
     def DOFFarStart(self, val): self.DOFFarStart.set(val)
     @property
-    def DOFFarStop(self): return Float(self._node.at("DOFFarStop"))
+    def DOFFarStop(self):  # type: ()->Float
+        return Float(self._node.at("DOFFarStop"))
     @DOFFarStop.setter
     def DOFFarStop(self, val): self.DOFFarStop.set(val)
     @property
-    def DOFMultiplier(self): return Float(self._node.at("DOFMultiplier"))
+    def DOFMultiplier(self):  # type: ()->Float
+        return Float(self._node.at("DOFMultiplier"))
     @DOFMultiplier.setter
     def DOFMultiplier(self, val): self.DOFMultiplier.set(val)
     @property
-    def DOFNearStart(self): return Float(self._node.at("DOFNearStart"))
+    def DOFNearStart(self):  # type: ()->Float
+        return Float(self._node.at("DOFNearStart"))
     @DOFNearStart.setter
     def DOFNearStart(self, val): self.DOFNearStart.set(val)
     @property
-    def DOFNearStop(self): return Float(self._node.at("DOFNearStop"))
+    def DOFNearStop(self):  # type: ()->Float
+        return Float(self._node.at("DOFNearStop"))
     @DOFNearStop.setter
     def DOFNearStop(self, val): self.DOFNearStop.set(val)
     @property
-    def DOFRelativeTarget(self): return Bool(self._node.at("DOFRelativeTarget"))
+    def DOFRelativeTarget(self):  # type: ()->Bool
+        return Bool(self._node.at("DOFRelativeTarget"))
     @DOFRelativeTarget.setter
     def DOFRelativeTarget(self, val): self.DOFRelativeTarget.set(val)
     @property
-    def EventCameraTime(self): return Float(self._node.at("EventCameraTime"))
+    def EventCameraTime(self):  # type: ()->Float
+        return Float(self._node.at("EventCameraTime"))
     @EventCameraTime.setter
     def EventCameraTime(self, val): self.EventCameraTime.set(val)
     @property
-    def FOV(self): return Float(self._node.at("FOV"))
+    def FOV(self):  # type: ()->Float
+        return Float(self._node.at("FOV"))
     @FOV.setter
     def FOV(self, val): self.FOV.set(val)
     @property
-    def FixedCam(self): return Bool(self._node.at("FixedCam"))
+    def FixedCam(self):  # type: ()->Bool
+        return Bool(self._node.at("FixedCam"))
     @FixedCam.setter
     def FixedCam(self, val): self.FixedCam.set(val)
     @property
-    def FollowCam(self): return Bool(self._node.at("FollowCam"))
+    def FollowCam(self):  # type: ()->Bool
+        return Bool(self._node.at("FollowCam"))
     @FollowCam.setter
     def FollowCam(self, val): self.FollowCam.set(val)
     @property
-    def FollowTarget(self): return Bool(self._node.at("FollowTarget"))
+    def FollowTarget(self):  # type: ()->Bool
+        return Bool(self._node.at("FollowTarget"))
     @FollowTarget.setter
     def FollowTarget(self, val): self.FollowTarget.set(val)
     @property
-    def OffsetsBlendTime(self): return Float(self._node.at("OffsetsBlendTime"))
+    def OffsetsBlendTime(self):  # type: ()->Float
+        return Float(self._node.at("OffsetsBlendTime"))
     @OffsetsBlendTime.setter
     def OffsetsBlendTime(self, val): self.OffsetsBlendTime.set(val)
     @property
-    def PositionsAngularBlend(self): return Bool(self._node.at("PositionsAngularBlend"))
+    def PositionsAngularBlend(self):  # type: ()->Bool
+        return Bool(self._node.at("PositionsAngularBlend"))
     @PositionsAngularBlend.setter
     def PositionsAngularBlend(self, val): self.PositionsAngularBlend.set(val)
     @property
-    def PositionsBlendTime(self): return Float(self._node.at("PositionsBlendTime"))
+    def PositionsBlendTime(self):  # type: ()->Float
+        return Float(self._node.at("PositionsBlendTime"))
     @PositionsBlendTime.setter
     def PositionsBlendTime(self, val): self.PositionsBlendTime.set(val)
     @property
-    def TargetOffsets(self): return (lambda n: Array(Vector3, n))(self._node.at("TargetOffsets"))
+    def TargetOffsets(self):  # type: ()->Array[Vector3]
+        return (lambda n: Array(Vector3, n))(self._node.at("TargetOffsets"))
     @property
-    def UseDOF(self): return Bool(self._node.at("UseDOF"))
+    def UseDOF(self):  # type: ()->Bool
+        return Bool(self._node.at("UseDOF"))
     @UseDOF.setter
     def UseDOF(self, val): self.UseDOF.set(val)
     @property
-    def UseOffsetsSpline(self): return Bool(self._node.at("UseOffsetsSpline"))
+    def UseOffsetsSpline(self):  # type: ()->Bool
+        return Bool(self._node.at("UseOffsetsSpline"))
     @UseOffsetsSpline.setter
     def UseOffsetsSpline(self, val): self.UseOffsetsSpline.set(val)
     @property
-    def UsePositionsSpline(self): return Bool(self._node.at("UsePositionsSpline"))
+    def UsePositionsSpline(self):  # type: ()->Bool
+        return Bool(self._node.at("UsePositionsSpline"))
     @UsePositionsSpline.setter
     def UsePositionsSpline(self, val): self.UsePositionsSpline.set(val)
     @property
-    def UseTriggerActorPosition(self): return Bool(self._node.at("UseTriggerActorPosition"))
+    def UseTriggerActorPosition(self):  # type: ()->Bool
+        return Bool(self._node.at("UseTriggerActorPosition"))
     @UseTriggerActorPosition.setter
     def UseTriggerActorPosition(self, val): self.UseTriggerActorPosition.set(val)
     @property
-    def UseTriggerActorSight(self): return Bool(self._node.at("UseTriggerActorSight"))
+    def UseTriggerActorSight(self):  # type: ()->Bool
+        return Bool(self._node.at("UseTriggerActorSight"))
     @UseTriggerActorSight.setter
     def UseTriggerActorSight(self, val): self.UseTriggerActorSight.set(val)
     @property
-    def _comment(self): return String(self._node.at("_comment"))
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     pass

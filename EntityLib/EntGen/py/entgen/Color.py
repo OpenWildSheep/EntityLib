@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.Float import *
 
+from EntityLibPy import Node
 Color = (lambda n: PrimArray(Float, n))
 
 

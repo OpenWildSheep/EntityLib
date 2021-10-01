@@ -14,44 +14,61 @@ from entgen.sPhysicsShapeCylinder import *
 from entgen.sPhysicsShapeMesh import *
 from entgen.sPhysicsShapeSphere import *
 
+from EntityLibPy import Node
 
 class sPhysicShape(HelperObject):
     schema_name = "./RuntimeComponents.json#/definitions/sPhysicShape"
     @staticmethod
-    def load(entlib, sourcefile):
-        return entlib.load_node_file(sourcefile, entlib.get_schema(sPhysicShape.schema_name))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->sPhysicShape
+        return sPhysicShape(entlib.load_node_file(sourcefile, entlib.get_schema(sPhysicShape.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->sPhysicShape
+        return sPhysicShape(entlib.make_node(sPhysicShape.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
     @property
-    def Box(self): return sPhysicsShapeBox(self._node.at("Box"))
+    def Box(self):  # type: ()->sPhysicsShapeBox
+        return sPhysicsShapeBox(self._node.at("Box"))
     @property
-    def Capsule(self): return sPhysicsShapeCapsule(self._node.at("Capsule"))
+    def Capsule(self):  # type: ()->sPhysicsShapeCapsule
+        return sPhysicsShapeCapsule(self._node.at("Capsule"))
     @property
-    def Cylinder(self): return sPhysicsShapeCylinder(self._node.at("Cylinder"))
+    def Cylinder(self):  # type: ()->sPhysicsShapeCylinder
+        return sPhysicsShapeCylinder(self._node.at("Cylinder"))
     @property
-    def Mesh(self): return sPhysicsShapeMesh(self._node.at("Mesh"))
+    def Mesh(self):  # type: ()->sPhysicsShapeMesh
+        return sPhysicsShapeMesh(self._node.at("Mesh"))
     @property
-    def PhysicsMaterial(self): return String(self._node.at("PhysicsMaterial"))
+    def PhysicsMaterial(self):  # type: ()->String
+        return String(self._node.at("PhysicsMaterial"))
     @PhysicsMaterial.setter
     def PhysicsMaterial(self, val): self.PhysicsMaterial.set(val)
     @property
-    def Sphere(self): return sPhysicsShapeSphere(self._node.at("Sphere"))
+    def Sphere(self):  # type: ()->sPhysicsShapeSphere
+        return sPhysicsShapeSphere(self._node.at("Sphere"))
     @property
-    def _comment(self): return String(self._node.at("_comment"))
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
-    def angles(self): return Vector3(self._node.at("angles"))
+    def angles(self):  # type: ()->Vector3
+        return Vector3(self._node.at("angles"))
     @angles.setter
     def angles(self, val): self.angles.set(val)
     @property
-    def orientation(self): return Quat(self._node.at("orientation"))
+    def orientation(self):  # type: ()->Quat
+        return Quat(self._node.at("orientation"))
     @orientation.setter
     def orientation(self, val): self.orientation.set(val)
     @property
-    def scale(self): return Float(self._node.at("scale"))
+    def scale(self):  # type: ()->Float
+        return Float(self._node.at("scale"))
     @scale.setter
     def scale(self, val): self.scale.set(val)
     @property
-    def translation(self): return Vector3(self._node.at("translation"))
+    def translation(self):  # type: ()->Vector3
+        return Vector3(self._node.at("translation"))
     @translation.setter
     def translation(self, val): self.translation.set(val)
     pass

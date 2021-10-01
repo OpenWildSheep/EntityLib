@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 
+from EntityLibPy import Node
 class ActorCategoryEnum(Enum):
     CATEGORY_All = "CATEGORY_All"
     CATEGORY_Action = "CATEGORY_Action"
@@ -17,6 +18,7 @@ class ActorCategoryEnum(Enum):
     CATEGORY_ActionDefault = "CATEGORY_ActionDefault"
     CATEGORY_ActionDie = "CATEGORY_ActionDie"
     CATEGORY_Environment = "CATEGORY_Environment"
+    CATEGORY_Fall = "CATEGORY_Fall"
     CATEGORY_Hint = "CATEGORY_Hint"
     CATEGORY_LookAt = "CATEGORY_LookAt"
     CATEGORY_ActionJump = "CATEGORY_ActionJump"

@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 
+from EntityLibPy import Node
 class MeshNavigationAllowedModeEnum(Enum):
     Never = "Never"
     PlayerOnly = "PlayerOnly"

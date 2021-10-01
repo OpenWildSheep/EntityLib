@@ -40,6 +40,11 @@ namespace Ent
             {
                 return node->hasDefaultValue();
             }
+
+            bool IsUsedInRuntime() const
+            {
+                return node->getSchema()->IsUsedInRuntime();
+            }
         };
 
         template <typename T>
@@ -327,6 +332,11 @@ namespace Ent
                 return node->size();
             }
 
+            bool empty() const
+            {
+                return node->empty();
+            }
+
             auto getKeys() const
             {
                 return details::getKeys<char const*>(node);
@@ -425,6 +435,11 @@ namespace Ent
             size_t size() const
             {
                 return node->size();
+            }
+
+            bool empty() const
+            {
+                return node->empty();
             }
 
             struct iterator
@@ -531,6 +546,11 @@ namespace Ent
             size_t size() const
             {
                 return node->size();
+            }
+
+            bool empty() const
+            {
+                return node->empty();
             }
 
             auto getKeys() const
@@ -667,6 +687,11 @@ namespace Ent
             size_t size() const
             {
                 return node->size();
+            }
+
+            bool empty() const
+            {
+                return node->empty();
             }
 
             auto getKeys() const

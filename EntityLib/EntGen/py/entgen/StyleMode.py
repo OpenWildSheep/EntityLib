@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 
+from EntityLibPy import Node
 class StyleModeEnum(Enum):
     default_ = "default"
     stick = "stick"

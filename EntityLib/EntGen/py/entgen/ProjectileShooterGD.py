@@ -9,18 +9,27 @@ from entgen.ComponentGD import *
 from entgen.ProjectileShooterData import *
 from entgen.String import *
 
+from EntityLibPy import Node
 
 class ProjectileShooterGD(HelperObject):
     schema_name = "./RuntimeComponents.json#/definitions/ProjectileShooterGD"
     @staticmethod
-    def load(entlib, sourcefile):
-        return entlib.load_node_file(sourcefile, entlib.get_schema(ProjectileShooterGD.schema_name))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->ProjectileShooterGD
+        return ProjectileShooterGD(entlib.load_node_file(sourcefile, entlib.get_schema(ProjectileShooterGD.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->ProjectileShooterGD
+        return ProjectileShooterGD(entlib.make_node(ProjectileShooterGD.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
     @property
-    def ProjectileShooterData(self): return (lambda n: Map(str, ProjectileShooterData, n))(self._node.at("ProjectileShooterData"))
+    def ProjectileShooterData(self):  # type: ()->Map[str, ProjectileShooterData]
+        return (lambda n: Map(str, ProjectileShooterData, n))(self._node.at("ProjectileShooterData"))
     @property
-    def Super(self): return ComponentGD(self._node.at("Super"))
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
     @property
-    def _comment(self): return String(self._node.at("_comment"))
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     pass

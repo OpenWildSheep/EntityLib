@@ -7,13 +7,16 @@ import EntityLibPy
 from entgen.String import *
 from entgen.MeshesItem import *
 
+from EntityLibPy import Node
 
 class RUNTIME_LODsItem(HelperObject):
 
     @property
-    def Meshes(self): return (lambda n: Array(MeshesItem, n))(self._node.at("Meshes"))
+    def Meshes(self):  # type: ()->Array[MeshesItem]
+        return (lambda n: Array(MeshesItem, n))(self._node.at("Meshes"))
     @property
-    def _comment(self): return String(self._node.at("_comment"))
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     pass

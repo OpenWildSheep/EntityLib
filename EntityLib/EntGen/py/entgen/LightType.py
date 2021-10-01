@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 
+from EntityLibPy import Node
 class LightTypeEnum(Enum):
     Omni = "Omni"
     Hemi = "Hemi"

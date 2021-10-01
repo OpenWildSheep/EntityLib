@@ -9,26 +9,37 @@ from entgen.Bool import *
 from entgen.ComponentGD import *
 from entgen.PrimitiveData import *
 
+from EntityLibPy import Node
 
 class LDPrimitive(HelperObject):
     schema_name = "./EditionComponents.json#/definitions/LDPrimitive"
     @staticmethod
-    def load(entlib, sourcefile):
-        return entlib.load_node_file(sourcefile, entlib.get_schema(LDPrimitive.schema_name))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->LDPrimitive
+        return LDPrimitive(entlib.load_node_file(sourcefile, entlib.get_schema(LDPrimitive.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->LDPrimitive
+        return LDPrimitive(entlib.make_node(LDPrimitive.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
     @property
-    def NonDisuptive(self): return Bool(self._node.at("NonDisuptive"))
+    def NonDisuptive(self):  # type: ()->Bool
+        return Bool(self._node.at("NonDisuptive"))
     @NonDisuptive.setter
     def NonDisuptive(self, val): self.NonDisuptive.set(val)
     @property
-    def PrimitiveData(self): return PrimitiveData(self._node.at("PrimitiveData"))
+    def PrimitiveData(self):  # type: ()->PrimitiveData
+        return PrimitiveData(self._node.at("PrimitiveData"))
     @property
-    def PrimitiveType(self): return String(self._node.at("PrimitiveType"))
+    def PrimitiveType(self):  # type: ()->String
+        return String(self._node.at("PrimitiveType"))
     @PrimitiveType.setter
     def PrimitiveType(self, val): self.PrimitiveType.set(val)
     @property
-    def Super(self): return ComponentGD(self._node.at("Super"))
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
     @property
-    def _comment(self): return String(self._node.at("_comment"))
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     pass

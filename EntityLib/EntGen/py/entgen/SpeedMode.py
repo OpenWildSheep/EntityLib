@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 
+from EntityLibPy import Node
 class SpeedModeEnum(Enum):
     speed0 = "speed0"
     speed1 = "speed1"

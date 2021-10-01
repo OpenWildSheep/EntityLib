@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.Component import *
 
+from EntityLibPy import Node
 Object_Components = (lambda n: UnionSet(Component, n))
 
 

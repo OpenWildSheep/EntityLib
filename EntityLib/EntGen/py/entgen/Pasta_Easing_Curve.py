@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 
+from EntityLibPy import Node
 class Pasta_Easing_CurveEnum(Enum):
     Linear = "Linear"
     EaseInSin = "EaseInSin"

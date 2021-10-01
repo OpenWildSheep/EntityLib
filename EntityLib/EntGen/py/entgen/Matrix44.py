@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.Float import *
 
+from EntityLibPy import Node
 Matrix44 = (lambda n: PrimArray(Float, n))
 
 

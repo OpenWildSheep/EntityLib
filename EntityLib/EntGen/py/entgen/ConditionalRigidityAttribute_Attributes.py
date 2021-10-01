@@ -7,22 +7,33 @@ import EntityLibPy
 from entgen.String import *
 from entgen.ConditionalRigidityAttribute_RigidityParameter import *
 
+from EntityLibPy import Node
 
 class ConditionalRigidityAttribute_Attributes(HelperObject):
     schema_name = "./RuntimeComponents.json#/definitions/ConditionalRigidityAttribute::Attributes"
     @staticmethod
-    def load(entlib, sourcefile):
-        return entlib.load_node_file(sourcefile, entlib.get_schema(ConditionalRigidityAttribute_Attributes.schema_name))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->ConditionalRigidityAttribute_Attributes
+        return ConditionalRigidityAttribute_Attributes(entlib.load_node_file(sourcefile, entlib.get_schema(ConditionalRigidityAttribute_Attributes.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->ConditionalRigidityAttribute_Attributes
+        return ConditionalRigidityAttribute_Attributes(entlib.make_node(ConditionalRigidityAttribute_Attributes.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
     @property
-    def DirectionAngular(self): return ConditionalRigidityAttribute_RigidityParameter(self._node.at("DirectionAngular"))
+    def DirectionAngular(self):  # type: ()->ConditionalRigidityAttribute_RigidityParameter
+        return ConditionalRigidityAttribute_RigidityParameter(self._node.at("DirectionAngular"))
     @property
-    def DirectionLinear(self): return ConditionalRigidityAttribute_RigidityParameter(self._node.at("DirectionLinear"))
+    def DirectionLinear(self):  # type: ()->ConditionalRigidityAttribute_RigidityParameter
+        return ConditionalRigidityAttribute_RigidityParameter(self._node.at("DirectionLinear"))
     @property
-    def OscillationAngular(self): return ConditionalRigidityAttribute_RigidityParameter(self._node.at("OscillationAngular"))
+    def OscillationAngular(self):  # type: ()->ConditionalRigidityAttribute_RigidityParameter
+        return ConditionalRigidityAttribute_RigidityParameter(self._node.at("OscillationAngular"))
     @property
-    def OscillationLinear(self): return ConditionalRigidityAttribute_RigidityParameter(self._node.at("OscillationLinear"))
+    def OscillationLinear(self):  # type: ()->ConditionalRigidityAttribute_RigidityParameter
+        return ConditionalRigidityAttribute_RigidityParameter(self._node.at("OscillationLinear"))
     @property
-    def _comment(self): return String(self._node.at("_comment"))
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     pass

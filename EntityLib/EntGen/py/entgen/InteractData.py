@@ -7,18 +7,26 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Float import *
 
+from EntityLibPy import Node
 
 class InteractData(HelperObject):
     schema_name = "./RuntimeComponents.json#/definitions/InteractData"
     @staticmethod
-    def load(entlib, sourcefile):
-        return entlib.load_node_file(sourcefile, entlib.get_schema(InteractData.schema_name))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->InteractData
+        return InteractData(entlib.load_node_file(sourcefile, entlib.get_schema(InteractData.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->InteractData
+        return InteractData(entlib.make_node(InteractData.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
     @property
-    def _comment(self): return String(self._node.at("_comment"))
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
-    def distance(self): return Float(self._node.at("distance"))
+    def distance(self):  # type: ()->Float
+        return Float(self._node.at("distance"))
     @distance.setter
     def distance(self, val): self.distance.set(val)
     pass

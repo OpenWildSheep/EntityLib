@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 
+from EntityLibPy import Node
 class GPETypeEnum(Enum):
     BendTree = "BendTree"
     Geyser = "Geyser"

@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, Tuple, Type, Callable, Any
+from typing import TypeVar, Generic, Tuple, Type, Callable, Any, Iterable
 from enum import Enum
 import EntityLibPy
 import inspect
@@ -13,22 +13,13 @@ T = TypeVar("T")
 
 
 class Base(object):
-    def __init__(self, node):
+    def __init__(self, node):  # type: (EntityLibPy.Node) -> None
+        assert isinstance(node, EntityLibPy.Node)
         self._node = node  # type: EntityLibPy.Node
-
-    def __bool__(self):
-        return self._node is not Node
-
-    def __nonzero__(self):
-        return self._node is not Node
 
     @property
     def node(self):
         return self._node
-
-    @property
-    def is_null(self):
-        return self._node is None
 
     @property
     def is_set(self):
@@ -44,6 +35,10 @@ class Base(object):
     @property
     def has_default_value(self):
         return self._node.has_default_value()
+
+    @property
+    def has_override(self):
+        return self._node.has_override()
 
 
 class Primitive(Base, Generic[T]):
@@ -92,14 +87,30 @@ class UnionSet(Base, Generic[T]):
         else:
             return key_type(union.get_union_data())
 
+    def erase(self, key_type):  # type: (Type[TComponent]) -> None
+        typename = key_type.__name__
+        self._node.map_erase(typename)
+
     def add(self, key_type):  # type: (Type[TComponent]) -> TComponent
         typename = key_type.__name__
         return key_type(self._node.map_insert(typename).get_union_data())
 
+    def clear(self):
+        return self._node.clear()
+
+    def empty(self):
+        return self._node.empty()
+
+    def __len__(self):
+        return self._node.size()
+
+    def size(self):
+        return self._node.size()
+
     def keys(self):
         return self._node.get_keys()
 
-    def __iter__(self):   # type: () -> EntityLibPy.Node
+    def __iter__(self):   # type: () -> Iterator[EntityLibPy.Node]
         for item in self._node.get_items():
             yield item.get_union_data()
 
@@ -122,7 +133,13 @@ class Array(Base, Generic[T]):
     def __getitem__(self, idx):  # type: (int) -> T
         return self._item_ctor(self._node.at(idx))
 
+    def empty(self):
+        return self._node.empty()
+
     def __len__(self):
+        return self._node.size()
+
+    def size(self):
         return self._node.size()
 
     def push(self):
@@ -131,8 +148,12 @@ class Array(Base, Generic[T]):
     def pop(self):
         return self._node.pop()
 
-    def clean(self):
-        return self._node.clean()
+    def clear(self):
+        return self._node.clear()
+
+    def __iter__(self):  # type: () -> Iterator[T]
+        for item in self._node.get_items():
+            yield self._item_ctor(item)		
 
 
 class PrimArray(Array[T], Generic[T]):
@@ -166,13 +187,19 @@ class ObjectSet(Base, Generic[T]):
     def remove(self, key):
         self._node.map_erase(key)
 
-    def clean(self):
-        return self._node.clean()
+    def clear(self):
+        return self._node.clear()
 
     def __getitem__(self, key):  # type: (...) -> T
         return self._item_ctor(self._node.map_get(key))
 
+    def empty(self):
+        return self._node.empty()
+
     def __len__(self):
+        return self._node.size()
+
+    def size(self):
         return self._node.size()
 
     def __iter__(self):
@@ -204,7 +231,8 @@ class Map(Base, Generic[K, V]):
             return key
 
     def get(self, key):  # type: (K) -> V
-        return self._item_ctor(self._node.map_get(self.to_internal(key)))
+        node = self._node.map_get(self.to_internal(key))
+        return None if node is None else self._item_ctor(node)
 
     def add(self, key):
         assert type(key) == self._key_type
@@ -213,13 +241,20 @@ class Map(Base, Generic[K, V]):
     def remove(self, key):  # type: (K) -> None
         self._node.map_erase(self.to_internal(key))
 
-    def clean(self):
-        return self._node.clean()
+    def clear(self):
+        return self._node.clear()
 
     def __getitem__(self, key):  # type: (K) -> V
-        return self._item_ctor(self._node.map_get(self.to_internal(key)))
+        node = self._node.map_get(self.to_internal(key))
+        return None if node is None else self._item_ctor(node)
+
+    def empty(self):
+        return self._node.empty()
 
     def __len__(self):
+        return self._node.size()
+
+    def size(self):
         return self._node.size()
 
     def keys(self):  # type: () -> Array[K]
@@ -256,7 +291,13 @@ class PrimitiveSet(Base, Generic[T]):
     # def remove(self, key):
     #    self._node.map_erase(key)
 
+    def empty(self):
+        return self._node.empty()
+
     def __len__(self):
+        return self._node.size()
+
+    def size(self):
         return self._node.size()
 
     # def erase(self, key):
@@ -283,6 +324,10 @@ class TupleNode(Base, Generic[TTuple]):
     def __len__(self):
         return self._node.size()
 
+    def size(self):
+        return self._node.size()
+
+
 
 class HelperObject(Base):
     def save(self, dest_file):
@@ -299,3 +344,6 @@ class HelperObject(Base):
 
     def make_instance_of(self):
         return self.__class__(self._node.make_instance_of())
+
+    def has_override(self):
+        return self._node.has_override()

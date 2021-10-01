@@ -9,22 +9,32 @@ from entgen.ComponentGD import *
 from entgen.Vector3 import *
 from entgen.sGameEffectTemplate import *
 
+from EntityLibPy import Node
 
 class GameEffectSpawnerGD(HelperObject):
     schema_name = "./RuntimeComponents.json#/definitions/GameEffectSpawnerGD"
     @staticmethod
-    def load(entlib, sourcefile):
-        return entlib.load_node_file(sourcefile, entlib.get_schema(GameEffectSpawnerGD.schema_name))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->GameEffectSpawnerGD
+        return GameEffectSpawnerGD(entlib.load_node_file(sourcefile, entlib.get_schema(GameEffectSpawnerGD.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->GameEffectSpawnerGD
+        return GameEffectSpawnerGD(entlib.make_node(GameEffectSpawnerGD.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
     @property
-    def GameEffectOffset(self): return Vector3(self._node.at("GameEffectOffset"))
+    def GameEffectOffset(self):  # type: ()->Vector3
+        return Vector3(self._node.at("GameEffectOffset"))
     @GameEffectOffset.setter
     def GameEffectOffset(self, val): self.GameEffectOffset.set(val)
     @property
-    def StartGameEffects(self): return (lambda n: Array(sGameEffectTemplate, n))(self._node.at("StartGameEffects"))
+    def StartGameEffects(self):  # type: ()->Array[sGameEffectTemplate]
+        return (lambda n: Array(sGameEffectTemplate, n))(self._node.at("StartGameEffects"))
     @property
-    def Super(self): return ComponentGD(self._node.at("Super"))
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
     @property
-    def _comment(self): return String(self._node.at("_comment"))
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     pass

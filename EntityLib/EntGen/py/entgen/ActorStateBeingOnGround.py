@@ -7,16 +7,24 @@ import EntityLibPy
 from entgen.String import *
 from entgen.ActorState import *
 
+from EntityLibPy import Node
 
 class ActorStateBeingOnGround(HelperObject):
     schema_name = "./RuntimeComponents.json#/definitions/ActorStateBeingOnGround"
     @staticmethod
-    def load(entlib, sourcefile):
-        return entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateBeingOnGround.schema_name))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateBeingOnGround
+        return ActorStateBeingOnGround(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateBeingOnGround.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->ActorStateBeingOnGround
+        return ActorStateBeingOnGround(entlib.make_node(ActorStateBeingOnGround.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
     @property
-    def Super(self): return ActorState(self._node.at("Super"))
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
     @property
-    def _comment(self): return String(self._node.at("_comment"))
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     pass

@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 
+from EntityLibPy import Node
 class OutfitPieceTypeEnum(Enum):
     OutfitPieceType_NONE = "OutfitPieceType_NONE"
     Head = "Head"

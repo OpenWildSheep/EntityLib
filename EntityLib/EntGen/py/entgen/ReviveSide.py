@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 
+from EntityLibPy import Node
 class ReviveSideEnum(Enum):
     neutral = "neutral"
     sacred = "sacred"

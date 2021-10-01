@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 
+from EntityLibPy import Node
 class SyncTempoModeEnum(Enum):
     None_ = "None"
     OnGrid = "OnGrid"

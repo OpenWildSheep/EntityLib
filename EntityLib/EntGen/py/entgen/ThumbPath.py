@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 
+from EntityLibPy import Node
 ThumbPath = String
 
 

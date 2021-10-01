@@ -7,6 +7,7 @@ import EntityLibPy
 from entgen.Int import *
 from entgen.Float import *
 
+from EntityLibPy import Node
 class Position(TupleNode[Tuple[Type[Int], Type[Int], Type[Float], Type[Float], Type[Float]]]):
     def __init__(self, node=None):  # type: (EntityLibPy.Node) -> None
         super().__init__((Int, Int, Float, Float, Float), node)

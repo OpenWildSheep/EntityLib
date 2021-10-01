@@ -8,28 +8,41 @@ from entgen.AttackType import *
 from entgen.String import *
 from entgen.AttackWeaponAbility import *
 
+from EntityLibPy import Node
 
 class AttackData(HelperObject):
     schema_name = "./RuntimeComponents.json#/definitions/AttackData"
     @staticmethod
-    def load(entlib, sourcefile):
-        return entlib.load_node_file(sourcefile, entlib.get_schema(AttackData.schema_name))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->AttackData
+        return AttackData(entlib.load_node_file(sourcefile, entlib.get_schema(AttackData.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->AttackData
+        return AttackData(entlib.make_node(AttackData.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
     @property
-    def DefaultAttackType(self): return AttackType(self._node.at("DefaultAttackType"))
+    def DefaultAttackType(self):  # type: ()->AttackType
+        return AttackType(self._node.at("DefaultAttackType"))
     @DefaultAttackType.setter
     def DefaultAttackType(self, val): self.DefaultAttackType.set(val)
     @property
-    def Hammer(self): return AttackWeaponAbility(self._node.at("Hammer"))
+    def Hammer(self):  # type: ()->AttackWeaponAbility
+        return AttackWeaponAbility(self._node.at("Hammer"))
     @property
-    def Knife(self): return AttackWeaponAbility(self._node.at("Knife"))
+    def Knife(self):  # type: ()->AttackWeaponAbility
+        return AttackWeaponAbility(self._node.at("Knife"))
     @property
-    def None_(self): return AttackWeaponAbility(self._node.at("None_"))
+    def None_(self):  # type: ()->AttackWeaponAbility
+        return AttackWeaponAbility(self._node.at("None_"))
     @property
-    def Stick(self): return AttackWeaponAbility(self._node.at("Stick"))
+    def Stick(self):  # type: ()->AttackWeaponAbility
+        return AttackWeaponAbility(self._node.at("Stick"))
     @property
-    def Sword(self): return AttackWeaponAbility(self._node.at("Sword"))
+    def Sword(self):  # type: ()->AttackWeaponAbility
+        return AttackWeaponAbility(self._node.at("Sword"))
     @property
-    def _comment(self): return String(self._node.at("_comment"))
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     pass

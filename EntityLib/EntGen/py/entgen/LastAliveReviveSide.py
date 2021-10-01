@@ -8,19 +8,23 @@ from entgen.ReviveSide import *
 from entgen.String import *
 from entgen.Bool import *
 
+from EntityLibPy import Node
 
 class LastAliveReviveSide(HelperObject):
 
     @property
-    def _comment(self): return String(self._node.at("_comment"))
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
-    def engaged(self): return Bool(self._node.at("engaged"))
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.at("engaged"))
     @engaged.setter
     def engaged(self, val): self.engaged.set(val)
     @property
-    def val(self): return ReviveSide(self._node.at("val"))
+    def val(self):  # type: ()->ReviveSide
+        return ReviveSide(self._node.at("val"))
     @val.setter
     def val(self, val): self.val.set(val)
     pass

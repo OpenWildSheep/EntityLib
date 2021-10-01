@@ -95,8 +95,8 @@ class UnionSet(Base, Generic[T]):
         typename = key_type.__name__
         return key_type(self._node.map_insert(typename).get_union_data())
 
-    def clean(self):
-        return self._node.clean()
+    def clear(self):
+        return self._node.clear()
 
     def empty(self):
         return self._node.empty()
@@ -187,8 +187,8 @@ class ObjectSet(Base, Generic[T]):
     def remove(self, key):
         self._node.map_erase(key)
 
-    def clean(self):
-        return self._node.clean()
+    def clear(self):
+        return self._node.clear()
 
     def __getitem__(self, key):  # type: (...) -> T
         return self._item_ctor(self._node.map_get(key))
@@ -241,8 +241,8 @@ class Map(Base, Generic[K, V]):
     def remove(self, key):  # type: (K) -> None
         self._node.map_erase(self.to_internal(key))
 
-    def clean(self):
-        return self._node.clean()
+    def clear(self):
+        return self._node.clear()
 
     def __getitem__(self, key):  # type: (K) -> V
         node = self._node.map_get(self.to_internal(key))

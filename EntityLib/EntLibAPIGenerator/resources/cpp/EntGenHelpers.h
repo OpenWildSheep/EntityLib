@@ -40,6 +40,11 @@ namespace Ent
             {
                 return node->hasDefaultValue();
             }
+
+            bool IsUsedInRuntime() const
+            {
+                return node->getSchema()->IsUsedInRuntime();
+            }
         };
 
         template <typename T>

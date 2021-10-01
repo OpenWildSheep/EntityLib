@@ -246,7 +246,7 @@ namespace Ent
 
         char const* c_str() const
         {
-            return str.get();
+            return str == nullptr? "": str.get();
         }
 
         size_t capacity() const
@@ -257,7 +257,9 @@ namespace Ent
         size_t size() const
         {
             if (str == nullptr)
+            {
                 return 0;
+            }
             return strlen(str.get());
         }
 
@@ -269,7 +271,9 @@ namespace Ent
         operator std::string() const
         {
             if (str == nullptr)
+            {
                 return std::string();
+            }
             return std::string(str.get());
         }
     };
@@ -586,4 +590,12 @@ namespace Ent
         }
     };
 
+    template <typename V, typename F>
+    static constexpr auto doesCompile(F&&) -> decltype(std::is_invocable_v<F, V>)
+    {
+        return std::is_invocable_v<F, V>;
+    }
+
+#define ENT_IF_COMPILE(TYPE, PARAM, CODE)                                                          \
+    if constexpr (Ent::doesCompile<TYPE>([](auto&& PARAM) -> decltype(CODE) {}))
 } // namespace Ent

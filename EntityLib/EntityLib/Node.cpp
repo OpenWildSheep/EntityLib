@@ -1,6 +1,7 @@
 #include "Node.h"
 
 #include <fstream>
+#include <sstream>
 #include <ciso646>
 
 #include "external/json.hpp"
@@ -507,16 +508,40 @@ namespace Ent
         throw BadType();
     }
 
+    std::map<char const*, Node const*> Node::getFields() const
+    {
+        if (value.is<Object>())
+        {
+            std::map<char const*, Node const*> fieldMap;
+            for (auto&& f : value.get<Object>())
+            {
+                fieldMap.emplace(f.name, f.node.get());
+            }
+            return fieldMap;
+        }
+        throw BadType();
+    }
+
     char const* Node::getInstanceOf() const
     {
         if (value.is<Object>())
         {
-            return value.get<Object>().instanceOf.get().c_str();
+            auto const& instanceOf = value.get<Object>().instanceOf;
+            return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
         }
         throw BadType();
     }
 
     std::vector<Node const*> Node::getItems() const
+    {
+        if (value.is<Array>())
+        {
+            return value.get<Array>().getItems();
+        }
+        throw BadType();
+    }
+
+    std::vector<Node*> Node::getItems()
     {
         if (value.is<Array>())
         {
@@ -769,13 +794,15 @@ namespace Ent
         node["$schema"] = getSchema()->name;
 
         std::filesystem::path path = getEntityLib()->getAbsolutePath(_path);
+        std::stringstream buffer;
+        buffer << node.dump(4);
         std::ofstream file(path);
         if (not file.is_open())
         {
             throw FileSystemError(
                 "Trying to open file for write", getEntityLib()->rawdataPath, _path);
         }
-        file << node.dump(4);
+        file << buffer.str();
     }
 
     double Node::getDefaultFloat() const
@@ -949,8 +976,23 @@ namespace Ent
             }
         }
 
-        ENTLIB_ASSERT(schema == _dest.schema);
         mapbox::util::apply_visitor(ApplyToPrefab{_dest.value, _copyMode}, value);
+    }
+
+    void Ent::Node::applyAllValuesButPrefab(Node& _dest, CopyMode _copyMode) const
+    {
+        if (not value.is<Object>() or not _dest.value.is<Object>())
+        {
+            throw BadType();
+        }
+        value.get<Object>().applyAllValuesButPrefab(_dest.value.get<Object>(), _copyMode);
+    }
+
+    void Ent::Node::changeInstanceOf(char const* _newPrefab)
+    {
+        Node cloned = *this;
+        resetInstanceOf(_newPrefab);
+        cloned.applyAllValuesButPrefab(*this, CopyMode::MinimalOverride);
     }
 
     void destroyAndFree(Node* ptr)

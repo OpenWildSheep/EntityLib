@@ -130,7 +130,8 @@ void setValue(Ent::Node& node, Value const& val)
     case Ent::DataType::array:
     case Ent::DataType::object:
     case Ent::DataType::oneOf:
-    case Ent::DataType::null: break;
+    case Ent::DataType::null:
+        break;
     case Ent::DataType::boolean:
         node.setBool(mapbox::util::apply_visitor(GetValue<bool>{}, val));
         break;
@@ -143,26 +144,36 @@ void setValue(Ent::Node& node, Value const& val)
     case Ent::DataType::string:
         node.setString(mapbox::util::apply_visitor(GetValue<std::string>{}, val).c_str());
         break;
-    case Ent::DataType::entityRef: node.setEntityRef({val.get<EntityRef>()}); break;
+    case Ent::DataType::entityRef:
+        node.setEntityRef({val.get<EntityRef>()});
+        break;
     case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
 }
 
-static mapbox::util::variant<std::vector<String>, std::vector<int64_t>> nodeGetKey(Node* _node)
+static py::list nodeGetKey(Node* _node)
 {
     auto const type = _node->getKeyType();
+    py::list arr;
     if (type == Ent::DataType::string || type == Ent::DataType::entityRef)
     {
-        return _node->getKeysString();
+        for (auto const& key : _node->getKeysString())
+        {
+            arr.append(py::str(key.c_str()));
+        }
     }
     else if (type == Ent::DataType::integer)
     {
-        return _node->getKeysInt();
+        for (auto key : _node->getKeysInt())
+        {
+            arr.append(key);
+        }
     }
     else
     {
         throw std::runtime_error("Unexpected key type");
     }
+    return arr;
 }
 
 using namespace pybind11::literals;
@@ -325,6 +336,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     pySubschemaRef
         .def(py::init<>())
+        .def_property_readonly("sub_schema", [](SubschemaRef const& s) -> Subschema const& { return s.get(); },
+            py::return_value_policy::reference_internal)
         .def(
             "get",
             [](SubschemaRef const& s) -> Subschema const& { return s.get(); },
@@ -372,6 +385,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "In an Object, get the property by name")
         .def("count", [](Node* node, char const* field) { return node->count(field); })
         .def("get_field_names", &Node::getFieldNames)
+        .def_property_readonly("fields",
+            &Node::getFields,
+            py::return_value_policy::reference_internal)
         .def(
             "at",
             [](Node* node, size_t i) { return node->at(i); },
@@ -388,13 +404,19 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "get_items",
             [](Node* node) { return node->getItems(); },
             py::return_value_policy::reference_internal)
+        .def_property_readonly(
+            "items",
+            [](Node* node) { return node->getItems(); },
+            py::return_value_policy::reference_internal)
         .def(
             "push", [](Node* node) { return node->push(); }, py::return_value_policy::reference_internal)
         .def("pop", [](Node* node) { node->pop(); })
         .def("clear", [](Node* node) { return node->clear(); })
         .def("empty", [](Node* node) { return node->empty(); })
+        .def_property_readonly("instance_of", [](Node* node) { return node->getInstanceOf(); })
         .def("get_instance_of", [](Node* node) { return node->getInstanceOf(); })
         .def("set_instance_of", [](Node* node, char const* _path){ node->resetInstanceOf(_path);})
+        .def("change_instance_of", [](Node* node, char const* _path){ node->changeInstanceOf(_path);})
         .def("reset_instance_of", [](Node* node, char const* _path){ node->resetInstanceOf(_path);})
         .def("get_float", [](Node* node) { return node->getFloat(); })
         .def("get_int", [](Node* node) { return node->getInt(); })
@@ -424,7 +446,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "get_union_data",
             [](Node* node) { return node->getUnionData(); },
             py::return_value_policy::reference_internal)
+        .def_property_readonly("union_data", [](Node* node) { return node->getUnionData(); }, py::return_value_policy::reference_internal)
         .def("get_union_type", &Node::getUnionType, py::return_value_policy::reference_internal)
+        .def_property_readonly("union_type", &Node::getUnionType, py::return_value_policy::reference_internal)
         .def("set_union_type", &Node::setUnionType, py::return_value_policy::reference_internal)
         .def(
             "get_schema",
@@ -442,13 +466,19 @@ PYBIND11_MODULE(EntityLibPy, ent)
              },
              "source"_a = OverrideValueSource::Override, "superKeyIsType"_a = false)
         .def("map_erase", (bool (Node::*)(char const*))&Node::mapErase)
+        .def("map_erase", [](Node* _node, Ent::String const& _key){ return _node->mapErase(_key.c_str()); })
         .def("map_erase", (bool (Node::*)(int64_t))&Node::mapErase)
         .def("map_rename", (Node* (Node::*)(char const*, char const*))&Node::mapRename, py::return_value_policy::reference_internal)
+        .def("map_rename", [](Node* _node, Ent::String const& _from, Ent::String const& _to)
+            {
+                return _node->mapRename(_from.c_str(), _to.c_str());
+            }, py::return_value_policy::reference_internal)
         .def("map_rename", (Node* (Node::*)(int64_t, int64_t))&Node::mapRename, py::return_value_policy::reference_internal)
         .def("map_get", (Node* (Node::*)(char const*))&Node::mapGet, py::return_value_policy::reference_internal)
         .def("map_get", [](Node* node, Ent::String const& str){return node->mapGet(str.c_str());}, py::return_value_policy::reference_internal)
         .def("map_get", (Node* (Node::*)(int64_t))&Node::mapGet, py::return_value_policy::reference_internal)
         .def("map_insert", (Node* (Node::*)(char const* _key))&Node::mapInsert, py::return_value_policy::reference_internal)
+        .def("map_insert", [](Node* _node, Ent::String const& _key){ return _node->mapInsert(_key.c_str()); }, py::return_value_policy::reference_internal)
         .def("map_insert", (Node* (Node::*)(int64_t _key))&Node::mapInsert, py::return_value_policy::reference_internal)
         .def("map_insert_instanceof", (Node* (Node::*)(char const* _key))&Node::mapInsertInstanceOf, py::return_value_policy::reference_internal)
         .def("map_insert_instanceof", (Node* (Node::*)(int64_t _key))&Node::mapInsertInstanceOf, py::return_value_policy::reference_internal)
@@ -672,6 +702,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("save_node_as_entity", &EntityLib::saveNodeAsEntity)
         .def("save_node_as_scene", &EntityLib::saveNodeAsScene)
         .def("get_parent_entity", (Node*(EntityLib::*)(Node*))&EntityLib::getParentEntity, py::return_value_policy::reference_internal)
+        .def("get_schema", &EntityLib::getSchema, py::return_value_policy::reference_internal)
         .def(
             "make_instance_of",
             [](EntityLib* lib, std::string const& path) {
@@ -684,7 +715,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(py::init<>())
         .def(py::init<std::string>())
         .def_readwrite("entity_path", &EntityRef::entityPath)
-        .def("__str__", [](EntityRef* ref) { return (std::string)ref->entityPath; });
+        .def("__str__", [](EntityRef* ref) { return (std::string)ref->entityPath; })
+        .def("__eq__", [](EntityRef const& _lhs, EntityRef const& _rhs){ return _lhs.entityPath == _rhs.entityPath; })
+        .def("__lt__", [](EntityRef const& _lhs, EntityRef const& _rhs){ return _lhs.entityPath < _rhs.entityPath; });
 
     pyEntityFile
         .def_property_readonly(

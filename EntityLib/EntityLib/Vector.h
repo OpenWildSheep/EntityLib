@@ -36,6 +36,7 @@ namespace Ent
         Node const* at(uint64_t _index) const;
         void checkInvariants() const;
         std::vector<Node const*> getItems() const;
+        std::vector<Node*> getItems();
         void pop();
         bool isTuple() const;
         void clear();

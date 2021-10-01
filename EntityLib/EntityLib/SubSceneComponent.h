@@ -25,12 +25,16 @@ namespace Ent
     {
         size_t index = 0; ///< Useful to keep the components order in the json file
         std::unique_ptr<Scene> embedded; ///< Embedded Scene, when isEmbedded is true
+        bool hasPrefab = false;
 
         void computeMemory(MemoryProfiler& prof) const;
 
         /// @cond PRIVATE
         explicit SubSceneComponent(
-            EntityLib const* _entlib, size_t _index = 0, std::unique_ptr<Scene> _embedded = {});
+            EntityLib const* _entlib,
+            bool _hasPrefab,
+            size_t _index = 0,
+            std::unique_ptr<Scene> _embedded = {});
         SubSceneComponent(SubSceneComponent const&) = delete;
         SubSceneComponent(SubSceneComponent&&) noexcept = delete;
         SubSceneComponent& operator=(SubSceneComponent const&) = delete;

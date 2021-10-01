@@ -3,6 +3,7 @@
 
 #include <set>
 #include <fstream>
+#include <sstream>
 #include <ciso646>
 
 #include "Tools.h"
@@ -182,11 +183,13 @@ void Ent::updateComponents(std::filesystem::path const& _toolsDir)
     json sceneSch = mergeComponents(_toolsDir);
     char const* mergedComponentsSchemaLocation = "WildPipeline/Schema/MergedComponents.json";
     auto mergedSchemaPath = _toolsDir / mergedComponentsSchemaLocation;
+    std::stringstream buffer;
+    buffer << sceneSch.dump(4);
     std::ofstream file(mergedSchemaPath);
     if (not file.is_open())
     {
         throw FileSystemError(
             "Trying to open file for write", _toolsDir, mergedComponentsSchemaLocation);
     }
-    file << sceneSch.dump(4);
+    file << buffer.str();
 }

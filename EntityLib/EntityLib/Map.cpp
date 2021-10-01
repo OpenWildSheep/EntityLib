@@ -92,12 +92,37 @@ static Ent::DataType getKeyType(Ent::Subschema const* _arraySchema)
     case "map"_hash: return _arraySchema->singularItems->get().linearItems->at(0)->type; break;
     case "set"_hash:
     {
-        Ent::DataType const keyType = _arraySchema->singularItems->get().type;
+        auto& elementSchema = _arraySchema->singularItems->get();
+        Ent::DataType const keyType = elementSchema.type;
         switch (keyType)
         {
         case Ent::DataType::oneOf: return Ent::DataType::string;
         case Ent::DataType::string: return Ent::DataType::string;
         case Ent::DataType::integer: return Ent::DataType::integer;
+        case Ent::DataType::object:
+        {
+            // If the element is an object, the map is actually a set of objects
+            // So we expect to find a keyField. The key type is the type of the keyfield.
+            if (meta.keyField.has_value())
+            {
+                auto& keyFieldSchema = elementSchema.properties[*meta.keyField];
+                switch (keyFieldSchema->type)
+                {
+                case Ent::DataType::oneOf: return Ent::DataType::string;
+                case Ent::DataType::string: return Ent::DataType::string;
+                case Ent::DataType::integer: return Ent::DataType::integer;
+                default:
+                    throw ContextException(
+                        "Unknown key type in set %s/%s",
+                        _arraySchema->name.c_str(),
+                        meta.keyField->c_str());
+                }
+            }
+            else
+            {
+                throw ContextException("Object set without keyField in " + _arraySchema->name);
+            }
+        }
         default: throw ContextException("Unknown key type in set " + _arraySchema->name);
         }
 #pragma warning(pop)
@@ -125,16 +150,14 @@ static Ent::Map::KeyType getChildKey(Ent::Subschema const* _arraySchema, Ent::No
         // meta.ordered means the items have to be sorted by the key
         ENTLIB_ASSERT(_child->getSchema()->linearItems.has_value());
         Ent::DataType keyType = _arraySchema->singularItems->get().linearItems->at(0)->type;
+        Ent::Node const* keyNode = _child->at(0llu);
 #pragma warning(push)
 #pragma warning(disable : 4061) // There are switches with missing cases. This is wanted.
         switch (keyType)
         {
-        case Ent::DataType::string:
-            ENTLIB_ASSERT(_child->at(0llu)->getString() != std::string());
-            return String(_child->at(0llu)->getString());
-        case Ent::DataType::entityRef:
-            return String(_child->at(0llu)->getEntityRef().entityPath.c_str());
-        case Ent::DataType::integer: return _child->at(0llu)->getInt();
+        case Ent::DataType::string: return String(keyNode->getString());
+        case Ent::DataType::entityRef: return String(keyNode->getEntityRef().entityPath.c_str());
+        case Ent::DataType::integer: return keyNode->getInt();
         default: throw std::runtime_error("Unknown key type in map " + _arraySchema->name);
         }
     }
@@ -197,7 +220,14 @@ Ent::DataType Ent::Map::getKeyType(Subschema const* _schema)
 
 bool Ent::Map::Element::hasOverride() const
 {
-    return isPresent.hasOverride() || node->hasOverride();
+    if (isPresent.get())
+    {
+        return (not isPresent.getPrefab()) || node->hasOverride();
+    }
+    else
+    {
+        return isPresent.getPrefab();
+    }
 }
 
 bool Ent::Map::Element::hasPrefabValue() const
@@ -333,7 +363,7 @@ Ent::Map::Element& Ent::Map::insertImpl(KeyType const& _key)
 
 Ent::Node* Ent::Map::insert(KeyType const& _key)
 {
-    return insertImpl(_key).node.get();
+    return getEltValue(m_schema, insertImpl(_key));
 }
 
 Ent::Node* Ent::Map::rename(KeyType const& _key, KeyType const& _newkey)
@@ -415,7 +445,8 @@ Ent::Map::insertImpl(OverrideValueLocation _loc, KeyType _key, Node _node, bool 
 
 Ent::Node* Ent::Map::insert(OverrideValueLocation _loc, KeyType _key, Node _node, bool _addedInInstance)
 {
-    return insertImpl(_loc, std::move(_key), std::move(_node), _addedInInstance).node.get();
+    return getEltValue(
+        m_schema, insertImpl(_loc, std::move(_key), std::move(_node), _addedInInstance));
 }
 
 std::vector<Ent::Node const*> Ent::Map::getItemsWithRemoved() const
@@ -423,36 +454,56 @@ std::vector<Ent::Node const*> Ent::Map::getItemsWithRemoved() const
     std::vector<Node const*> result;
     result.reserve(m_items.size());
     auto&& meta = m_schema->meta.get<Ent::Subschema::ArrayMeta>();
+    auto notAGhostElement = [](Element const& elt) {
+        // Don't care of elements which has never existed
+        return elt.isPresent.get() or elt.isPresent.getPrefab();
+    };
     if (meta.ordered)
     {
         for (auto const& key_index : m_itemMap)
         {
             auto& elt = m_items[std::get<1>(key_index)];
-            result.push_back(elt.node.get());
+            if (notAGhostElement(elt))
+            {
+                result.push_back(elt.node.get());
+            }
         }
     }
     else
     {
         for (auto&& elt : m_items)
         {
-            result.push_back(elt.node.get());
+            if (notAGhostElement(elt))
+            {
+                result.push_back(elt.node.get());
+            }
         }
     }
     return result;
 }
 
-std::vector<Ent::Node const*> Ent::Map::getItems() const
+template <typename M>
+auto Ent::Map::getItemsImpl(M* self)
 {
-    checkInvariants();
-    std::vector<Node const*> result;
-    result.reserve(m_items.size());
-    auto&& meta = m_schema->meta.get<Ent::Subschema::ArrayMeta>();
+    self->checkInvariants();
+    auto result = [] {
+        if constexpr (std::is_const_v<M>)
+        {
+            return std::vector<Ent::Node const*>{};
+        }
+        else
+        {
+            return std::vector<Ent::Node*>{};
+        }
+    }();
+    result.reserve(self->m_items.size());
+    auto&& meta = self->m_schema->meta.get<Ent::Subschema::ArrayMeta>();
     if (meta.ordered)
     {
-        for (auto const& key_index : m_itemMap)
+        for (auto const& key_index : self->m_itemMap)
         {
             auto index = std::get<1>(key_index);
-            auto& elt = m_items[index];
+            auto& elt = self->m_items[index];
             if (elt.isPresent.get())
             {
                 result.push_back(elt.node.get());
@@ -461,9 +512,9 @@ std::vector<Ent::Node const*> Ent::Map::getItems() const
     }
     else
     {
-        for (auto const& node : m_items)
+        for (auto&& node : self->m_items)
         {
-            auto key = ::getChildKey(m_schema, node.node.get());
+            auto key = ::getChildKey(self->m_schema, node.node.get());
             if (node.isPresent.get())
             {
                 result.push_back(node.node.get());
@@ -471,6 +522,16 @@ std::vector<Ent::Node const*> Ent::Map::getItems() const
         }
     }
     return result;
+}
+
+std::vector<Ent::Node*> Ent::Map::getItems()
+{
+    return getItemsImpl(this);
+}
+
+std::vector<Ent::Node const*> Ent::Map::getItems() const
+{
+    return getItemsImpl(this);
 }
 
 void Ent::Map::checkInvariants() const
@@ -629,7 +690,7 @@ void Ent::Map::applyAllValues(Map& _dest, CopyMode _copyMode) const
     for (auto& sourceNode : getItems())
     {
         auto&& key = getChildKey(m_schema, sourceNode);
-        Node* destNode2 = _dest.insert(key); // 'insert' only get if the item exist
+        Node* destNode2 = _dest.insertImpl(key).node.get(); // 'insert' only get if the item exist
         sourceNode->applyAllValues(*destNode2, _copyMode);
         removedDestKeys.erase(key);
     }

@@ -217,7 +217,8 @@
                                         "Value": {
                                             "variantData": 7.0,
                                             "variantType": "float"
-                                        }
+                                        },
+                                        "_comment": "This script makes us all happy"
                                     }
                                 ],
                                 [
@@ -294,10 +295,6 @@
             },
             "Type": "TestUnion",
             "Version": 1
-        },
-        {
-            "Data": null,
-            "Type": "SubScene"
         }
     ],
     "MaxActivationLevel": "InWorld",

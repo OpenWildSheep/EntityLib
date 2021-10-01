@@ -265,6 +265,11 @@ void Ent::SchemaLoader::parseSchemaNoRef(
             parseSchema(_filename, _rootFile, prop, vis, depth + 1);
             vis.closeProperty();
         }
+        // Add a _comment property on all objects
+        json prop = R"({"type" : "string"})"_json;
+        vis.openProperty("_comment");
+        parseSchema(_filename, _rootFile, prop, vis, depth + 1);
+        vis.closeProperty();
     }
     // default
     if (_data.count("default") != 0u)

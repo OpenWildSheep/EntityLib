@@ -85,6 +85,8 @@ namespace Ent
             const; ///< @pre type==Ent::DataType::object @brief true if a field with this name exist
         std::vector<char const*>
         getFieldNames() const; ///< @pre type==Ent::DataType::object @brief Get all field names
+        std::map<char const*, Node const*>
+        getFields() const; ///< @pre type==Ent::DataType::object @brief Get all fields
         char const* getInstanceOf() const; ///< @pre type==Ent::DataType::object @brief path to the tmpl Node
 
         // Array
@@ -97,6 +99,7 @@ namespace Ent
         /// @return the array size at the given Override value location.
         tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         std::vector<Node const*> getItems() const; ///< @pre type==Ent::DataType::array. @brief Get all items
+        std::vector<Node*> getItems(); ///< @pre type==Ent::DataType::array. @brief Get all items
         Node* push(); ///< @pre type==Ent::DataType::array. @brief Add a new item at the end of array
         void pop(); ///< @pre type==Ent::DataType::array. @brief Remove an item at the end of array
         void clear(); ///< @pre type==Ent::DataType::array. @brief Remove all items in array
@@ -196,6 +199,15 @@ namespace Ent
         /// @param _prefabNodePath path to the prefab Node (relative to RawData)
         void resetInstanceOf(char const* _prefabNodePath);
         void resetInstanceOf();
+
+        /// @brief Change this Entity to be an instance of the given \b _newPrefab, keeping
+        /// all internal values the same.
+        /// @param _newPrefab path to the new prefab
+        void changeInstanceOf(char const* _newPrefab);
+
+        /// @brief Take all values set in this and set them into \b _dest
+        ///   BUT do not change the prefab of _dest
+        void applyAllValuesButPrefab(Node& _dest, CopyMode _copyMode) const;
 
         bool hasDefaultValue() const; ///< false if something was set in instance or prefab
 

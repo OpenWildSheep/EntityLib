@@ -281,7 +281,8 @@
                                         "Value": {
                                             "variantData": 7.0,
                                             "variantType": "float"
-                                        }
+                                        },
+                                        "_comment": "This script makes us all happy"
                                     }
                                 ],
                                 [

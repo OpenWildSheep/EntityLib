@@ -14,7 +14,7 @@ namespace Ent
         : entityLib(_entityLib)
         , schema(_schema)
         , typeIndex(_typeIndex)
-        , wrapper(make_value<Node>(_wrapper))
+        , wrapper(make_value<Node>(std::move(_wrapper)))
         , metaData(&(schema->meta.get<Subschema::UnionMeta>()))
     {
         auto* typeNode = wrapper->at(metaData->typeField.c_str());
@@ -80,7 +80,12 @@ namespace Ent
 
     Node* Union::setUnionType(char const* _type)
     {
-        if (_type != getUnionType())
+        if (_type == nullptr)
+        {
+            throw NullPointerArgument("_type", "Union::setUnionType");
+        }
+        auto unionType = getUnionType();
+        if (unionType == nullptr or strcmp(_type, unionType) != 0)
         {
             auto* unionData = resetUnionTypeWithoutOverride(_type);
             typeOverriden = true;

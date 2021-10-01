@@ -62,12 +62,16 @@ bool Ent::Vector::isTuple() const
 std::vector<Ent::Node const*> Ent::Vector::getItems() const
 {
     checkInvariants();
-    std::vector<Node const*> result;
-    result.reserve(m_data.size());
-    for (auto&& node : m_data)
-    {
-        result.emplace_back(node.get());
-    }
+    std::vector<Node const*> result(m_data.size());
+    std::transform(begin(m_data), end(m_data), begin(result), [](auto& n) { return n.get(); });
+    return result;
+}
+
+std::vector<Ent::Node*> Ent::Vector::getItems()
+{
+    checkInvariants();
+    std::vector<Node*> result(m_data.size());
+    std::transform(begin(m_data), end(m_data), begin(result), [](auto& n) { return n.get(); });
     return result;
 }
 

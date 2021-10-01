@@ -2,7 +2,7 @@ import os
 import entgen_helpers
 # from entgen.inline import *
 from entgen.String import String
-from entgen._all import *
+from entgen.inline import *
 from entgen_helpers import PrimArray
 
 """

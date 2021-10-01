@@ -1027,6 +1027,8 @@ from .String import *
     all.render(rootData, outputAll);
 
     copy_file(_resourcePath / "entgen_helpers.py", _destinationPath / "entgen_helpers.py");
+    std::ofstream init1(_destinationPath / "__init__.py");
+    std::ofstream init2(_destinationPath / "entgen" / "__init__.py");
     for (auto&& file : {"Bool.py", "EntityRef.py", "Float.py", "Int.py", "String.py"})
     {
         copy_file(_resourcePath / "entgen" / file, _destinationPath / "entgen" / file);

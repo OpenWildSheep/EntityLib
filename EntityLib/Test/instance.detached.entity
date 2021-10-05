@@ -151,7 +151,146 @@
             "Version": 1
         },
         {
-            "Data": {},
+            "Data": {
+                "ClamberData": {
+                    "VerticalOrientationRatio": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    }
+                },
+                "FallData": {
+                    "DamagesPerHeightFall": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    }
+                },
+                "HeadCollisionData": {
+                    "slopeInfluence": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "speedInfluence": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "visualSmoothOut": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    }
+                },
+                "ImmersedData": {
+                    "depthMaxRange": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    }
+                },
+                "SlideData": {
+                    "adherenceRecoverSpeedDependingOnTheSlope": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "adherenceThresholdRequiredToKeepControl": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "speedMediumCoeffIn": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    }
+                },
+                "moveCapacityData": {
+                    "constraintDetectionAnticipation": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "constraintDetectionRadius": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "dropPlaneLegLenFactor": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "extirpateObstacleAcceleration": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "flyCentrifugalCoeff": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "orientationSpeedFly": {
+                        "rotationRollFromAngularSpeed": {
+                            "easing": {
+                                "variantData": "Linear",
+                                "variantType": "Pasta::Easing::Curve"
+                            }
+                        },
+                        "speedFactorFromSpeedSlow": {
+                            "easing": {
+                                "variantData": "Linear",
+                                "variantType": "Pasta::Easing::Curve"
+                            }
+                        }
+                    },
+                    "orientationSpeedGround": {
+                        "rotationRollFromAngularSpeed": {
+                            "easing": {
+                                "variantData": "Linear",
+                                "variantType": "Pasta::Easing::Curve"
+                            }
+                        },
+                        "speedFactorFromSpeedSlow": {
+                            "easing": {
+                                "variantData": "Linear",
+                                "variantType": "Pasta::Easing::Curve"
+                            }
+                        }
+                    },
+                    "orientationSpeedWater": {
+                        "rotationRollFromAngularSpeed": {
+                            "easing": {
+                                "variantData": "Linear",
+                                "variantType": "Pasta::Easing::Curve"
+                            }
+                        },
+                        "speedFactorFromSpeedSlow": {
+                            "easing": {
+                                "variantData": "Linear",
+                                "variantType": "Pasta::Easing::Curve"
+                            }
+                        }
+                    }
+                }
+            },
             "Type": "CharacterControllerGD",
             "Version": 1
         },

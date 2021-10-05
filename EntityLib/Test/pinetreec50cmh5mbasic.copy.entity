@@ -206,11 +206,6 @@
         },
         {
             "Data": {},
-            "Type": "SmallActorSpawnerGD",
-            "Version": 1
-        },
-        {
-            "Data": {},
             "Type": "NetGD",
             "Version": 1
         },

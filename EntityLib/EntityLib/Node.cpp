@@ -20,7 +20,7 @@ namespace Ent
         updateParents();
     }
 
-    Node::Node(Node const& _node)
+    /*Node::Node(Node const& _node)
         : parentNode(nullptr)
         , schema(_node.schema)
         , value(_node.value)
@@ -57,6 +57,16 @@ namespace Ent
         addedInInstance = _node.addedInInstance;
         updateParents();
         return *this;
+    }*/
+
+    std::unique_ptr<Node> Node::clone() const
+    {
+        auto newNode = std::make_unique<Node>(value, schema);
+        newNode->parentNode = parentNode;
+        newNode->addedInInstance = addedInInstance;
+        newNode->updateParents();
+        newNode->checkParent(parentNode);
+        return newNode;
     }
 
     struct UpdateParents
@@ -405,18 +415,18 @@ namespace Ent
         Subschema const* schema;
 
         template <typename T>
-        Node operator()(T const& _ov) const
+        std::unique_ptr<Node> operator()(T const& _ov) const
         {
-            return Node(_ov.detach(), schema);
+            return std::make_unique<Node>(_ov.detach(), schema);
         }
 
-        Node operator()(Null const&) const
+        std::unique_ptr<Node> operator()(Null const&) const
         {
-            return Node(Null{}, schema);
+            return std::make_unique<Node>(Null{}, schema);
         }
     };
 
-    Node Node::detach() const
+    std::unique_ptr<Node> Node::detach() const
     {
         return std::visit(Detach{schema}, value);
     }
@@ -426,18 +436,18 @@ namespace Ent
         Subschema const* schema;
 
         template <typename T>
-        Node operator()(T const& _ov) const
+        std::unique_ptr<Node> operator()(T const& _ov) const
         {
-            return Node(_ov.makeInstanceOf(), schema);
+            return std::make_unique<Node>(_ov.makeInstanceOf(), schema);
         }
 
-        Node operator()(Null const&) const
+        std::unique_ptr<Node> operator()(Null const&) const
         {
-            return Node(Null{}, schema);
+            return std::make_unique<Node>(Null{}, schema);
         }
     };
 
-    Node Node::makeInstanceOf() const
+    std::unique_ptr<Node> Node::makeInstanceOf() const
     {
         return std::visit(MakeInstanceOf{schema}, value);
     }
@@ -1008,9 +1018,9 @@ namespace Ent
 
     void Ent::Node::changeInstanceOf(char const* _newPrefab)
     {
-        Node cloned = *this;
+        auto cloned = clone();
         resetInstanceOf(_newPrefab);
-        cloned.applyAllValuesButPrefab(*this, CopyMode::MinimalOverride);
+        cloned->applyAllValuesButPrefab(*this, CopyMode::MinimalOverride);
     }
 
     void destroyAndFree(Node* ptr)

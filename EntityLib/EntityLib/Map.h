@@ -24,11 +24,23 @@ namespace Ent
         using KeyType = std::variant<String, int64_t>;
 
         explicit Map(EntityLib const* _entlib = nullptr, Subschema const* _schema = nullptr);
+        Map(Map const&);
+        Map(Map&&) = default;
+        Map& operator=(Map const&);
+        Map& operator=(Map&&) = default;
 
         struct Element
         {
-            value_ptr<Node> node;
+            std::unique_ptr<Node> node;
             Override<bool> isPresent;
+            Element(std::unique_ptr<Node> _node = {})
+                : node(std::move(_node))
+            {
+            }
+            Element(Element const&);
+            Element(Element&&) = default;
+            Element& operator=(Element const&);
+            Element& operator=(Element&&) = default;
 
             bool hasOverride() const;
             bool hasPrefabValue() const;
@@ -54,7 +66,11 @@ namespace Ent
         Node* get(KeyType const& _key);
         Ent::Node* insert(KeyType const& _key);
         bool isErased(KeyType const& _key) const;
-        Ent::Node* insert(OverrideValueLocation _loc, KeyType _key, Node _node, bool _addedInInstance);
+        Ent::Node* insert(
+            OverrideValueLocation _loc,
+            KeyType _key,
+            std::unique_ptr<Node> _node,
+            bool _addedInInstance);
         Ent::Node* rename(KeyType const& _key, KeyType const& _newKey);
         void checkInvariants() const;
         std::vector<Node const*> getItemsWithRemoved() const;
@@ -77,7 +93,11 @@ namespace Ent
 
     private:
         Element& insertImpl(KeyType const& _key);
-        Element& insertImpl(OverrideValueLocation _loc, KeyType _key, Node _node, bool _addedInInstance);
+        Element& insertImpl(
+            OverrideValueLocation _loc,
+            KeyType _key,
+            std::unique_ptr<Node> _node,
+            bool _addedInInstance);
         template <typename M>
         static auto getItemsImpl(M* self);
 

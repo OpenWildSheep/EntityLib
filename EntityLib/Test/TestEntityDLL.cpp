@@ -204,7 +204,7 @@ try
             "myseedpatchMarianne.seedpatchdata.node",
             entlib.schema.schema
                 .allDefinitions[R"(./EditionComponents.json#/definitions/SeedPatchDataList)"]);
-        node.saveNode("myseedpatchMarianne.seedpatchdata.copy.node");
+        node->saveNode("myseedpatchMarianne.seedpatchdata.copy.node");
     }
     auto testPrefabEntity = [](Ent::Entity const* ent) {
         // ActorStates
@@ -229,7 +229,7 @@ try
 
         // Map and Set overridePolicy
         Ent::Component const* pathNodeGD = ent->getComponent("PathNodeGD");
-        Ent::Node const* tags = pathNodeGD->root.at("Tags")->at("Tags");
+        Ent::Node const* tags = pathNodeGD->root->at("Tags")->at("Tags");
         ENTLIB_ASSERT(tags->size() == 3);
         ENTLIB_ASSERT(tags->at(0llu)->at(0llu)->getString() == std::string("a"));
         ENTLIB_ASSERT(tags->at(1llu)->at(0llu)->getString() == std::string("c"));
@@ -249,26 +249,26 @@ try
         // Test default value
         Ent::Component const* voxelSimulationGD = ent->getComponent("VoxelSimulationGD");
         ENTLIB_ASSERT(
-            voxelSimulationGD->root.at("TransmissionBySecond")->getFloat() == 3.402823466385289e+38);
-        ENTLIB_ASSERT(voxelSimulationGD->root.at("TransmissionBySecond")->isDefault());
+            voxelSimulationGD->root->at("TransmissionBySecond")->getFloat() == 3.402823466385289e+38);
+        ENTLIB_ASSERT(voxelSimulationGD->root->at("TransmissionBySecond")->isDefault());
         ENTLIB_ASSERT(
-            voxelSimulationGD->root.getTypeName()
+            voxelSimulationGD->root->getTypeName()
             == std::string("./RuntimeComponents.json#/definitions/VoxelSimulationGD"));
 
         // TEST read inherited values in inherited component
         Ent::Component const* heightObj = ent->getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
-        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
-        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->isSet());
-        ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isDefault());
-        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getDefaultInt() == 3);
+        ENTLIB_ASSERT(heightObj->root->at("Subdivision")->getInt() == 0);
+        ENTLIB_ASSERT(heightObj->root->at("Subdivision")->isSet());
+        ENTLIB_ASSERT(not heightObj->root->at("Subdivision")->isDefault());
+        ENTLIB_ASSERT(heightObj->root->at("Subdivision")->getDefaultInt() == 3);
         ENTLIB_ASSERT(
-            heightObj->root.at("Subdivision")->getSchema()->userMeta["testUserMetatdata"].get<int>()
+            heightObj->root->at("Subdivision")->getSchema()->userMeta["testUserMetatdata"].get<int>()
             == 42);
 
         ENTLIB_ASSERT(
-            heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
-        ENTLIB_ASSERT(heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
+            heightObj->root->at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
+        ENTLIB_ASSERT(heightObj->root->at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 
         // Test read Thumbnail
         ENTLIB_ASSERT(ent->getThumbnail() != nullptr);
@@ -279,22 +279,22 @@ try
         ENTLIB_ASSERT(sysCreat != nullptr);
 
         // TEST read setted values
-        ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Shamans")); // set
-        ENTLIB_ASSERT(sysCreat->root.at("Faction")->isSet()); // is set
-        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
-        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->isSet()); // is set
+        ENTLIB_ASSERT(sysCreat->root->at("Faction")->getString() == std::string("Shamans")); // set
+        ENTLIB_ASSERT(sysCreat->root->at("Faction")->isSet()); // is set
+        ENTLIB_ASSERT(sysCreat->root->at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
+        ENTLIB_ASSERT(sysCreat->root->at("Inventory")->isSet()); // is set
 
         // TEST comment
         ENTLIB_ASSERT(
-            sysCreat->root.at("BehaviorState")->getString() == std::string("W/*at*/c//h")); // set
+            sysCreat->root->at("BehaviorState")->getString() == std::string("W/*at*/c//h")); // set
 
         // TEST read array
-        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->isSet());
-        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->size() == 3);
+        ENTLIB_ASSERT(sysCreat->root->at("ScriptList")->isSet());
+        ENTLIB_ASSERT(sysCreat->root->at("ScriptList")->size() == 3);
 
         // TEST default values
-        ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
-        ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root->at("Burried")->getBool() == false); // default
+        ENTLIB_ASSERT(not sysCreat->root->at("Burried")->isSet()); // default
 
         // TEST SubScene
         Ent::SubSceneComponent const* subScenecomp = ent->getSubSceneComponent();
@@ -305,7 +305,7 @@ try
 
         // TEST union
         Ent::Component const* cinematicGD = ent->getComponent("CinematicGD");
-        Ent::Node const* scriptEvents = cinematicGD->root.at("ScriptEvents");
+        Ent::Node const* scriptEvents = cinematicGD->root->at("ScriptEvents");
         ENTLIB_ASSERT(scriptEvents->getDataType() == Ent::DataType::array);
 
         // Read Union type
@@ -328,17 +328,17 @@ try
 
         // TEST sub-object with non-default values
         Ent::Component const* ldprimitive = ent->getComponent("LDPrimitive");
-        Ent::Node const* primitiveData = ldprimitive->root.at("PrimitiveData");
+        Ent::Node const* primitiveData = ldprimitive->root->at("PrimitiveData");
         ENTLIB_ASSERT(primitiveData->at("Height")->getFloat() == 42.0);
 
         // TEST Default size for array is minItems
         Ent::Component const* physicsGD = ent->getComponent("PhysicsGD");
-        Ent::Node const* axisRestriction = physicsGD->root.at("AxisRestriction");
+        Ent::Node const* axisRestriction = physicsGD->root->at("AxisRestriction");
         ENTLIB_ASSERT(axisRestriction->size() == 3);
 
         // Test default values related to a property of type class/struct.
         Ent::Component const* characterController = ent->getComponent("CharacterControllerGD");
-        Ent::Node const* slideData = characterController->root.at("SlideData");
+        Ent::Node const* slideData = characterController->root->at("SlideData");
         Ent::Node const* adherenceMin = slideData->at("speedMediumCoeffIn");
         Ent::Node const* in = adherenceMin->at("in");
         ENTLIB_ASSERT(in->size() == 2);
@@ -348,7 +348,7 @@ try
         // Ensure that default values of property are not poluted by default values of pointer class
         Ent::Component const* testDefaultValues = ent->getComponent("TestDefaultValues");
         ENTLIB_ASSERT(testDefaultValues != nullptr);
-        Ent::Node const* propertyWithDefault = testDefaultValues->root.at("propertyWithDefault");
+        Ent::Node const* propertyWithDefault = testDefaultValues->root->at("propertyWithDefault");
         Ent::Node const* propertyWithDefault2 = propertyWithDefault->at("propertyWithDefault2");
         ENTLIB_ASSERT(propertyWithDefault2->at("A")->getInt() == 3);
         ENTLIB_ASSERT(propertyWithDefault2->at("B")->getInt() == 0);
@@ -358,9 +358,9 @@ try
 
         // Test Node's InstanceOf
         Ent::Component const* seedPatch = ent->getComponent("SeedPatch");
-        ENTLIB_ASSERT(seedPatch->root.at("NoiseSizeX")->getFloat() == 1.);
-        ENTLIB_ASSERT(seedPatch->root.at("NoiseSizeY")->getFloat() == 2.);
-        ENTLIB_ASSERT(seedPatch->root.at("NoiseOffsetX")->getFloat() == 2.);
+        ENTLIB_ASSERT(seedPatch->root->at("NoiseSizeX")->getFloat() == 1.);
+        ENTLIB_ASSERT(seedPatch->root->at("NoiseSizeY")->getFloat() == 2.);
+        ENTLIB_ASSERT(seedPatch->root->at("NoiseOffsetX")->getFloat() == 2.);
     };
 
     {
@@ -379,7 +379,7 @@ try
         // Test title/description
         {
             auto rigodBodyCoeffSchema = ent->getComponent("CharacterControllerGD")
-                                            ->root.at("HeadCollisionData")
+                                            ->root->at("HeadCollisionData")
                                             ->at("softCollisionRigidbodyCoeff")
                                             ->getSchema();
             ENTLIB_ASSERT(rigodBodyCoeffSchema->title.find("Rigidbody") != std::string::npos);
@@ -388,41 +388,41 @@ try
 
         auto setOfObject = ent->getComponent("TestSetOfObject");
         ENTLIB_ASSERT(setOfObject);
-        auto mapTest = setOfObject->root.at("MapOfObject");
+        auto mapTest = setOfObject->root->at("MapOfObject");
         ENTLIB_ASSERT(mapTest->mapInsert("Should_not_appear_in_diff"));
         ENTLIB_ASSERT(mapTest->mapErase("Should_not_appear_in_diff"));
 
         // Test a fixed-size array is not "addedInInstance"
         Ent::Component* trans = ent->getComponent("TransformGD");
         ENTLIB_ASSERT(trans != nullptr);
-        trans->root.at("Position")->at(0llu)->setFloat(36.f);
-        trans->root.at("Position")->unset();
-        ENTLIB_ASSERT(not trans->root.at("Position")->hasOverride());
+        trans->root->at("Position")->at(0llu)->setFloat(36.f);
+        trans->root->at("Position")->unset();
+        ENTLIB_ASSERT(not trans->root->at("Position")->hasOverride());
 
         // Test Variant
         Ent::Component const* testArrays = ent->getComponent("TestArrays");
-        ENTLIB_ASSERT(testArrays->root.at("Variant")->getUnionData()->getFloat() == 3.1416);
-        nlohmann::json withoutIndex = testArrays->root.at("Variant")->toJson(
+        ENTLIB_ASSERT(testArrays->root->at("Variant")->getUnionData()->getFloat() == 3.1416);
+        nlohmann::json withoutIndex = testArrays->root->at("Variant")->toJson(
             Ent::OverrideValueSource::OverrideOrPrefab, true, {}, false);
         ENTLIB_ASSERT(withoutIndex.count("variantIndex") == 0);
-        nlohmann::json withIndex = testArrays->root.at("Variant")->toJson(
+        nlohmann::json withIndex = testArrays->root->at("Variant")->toJson(
             Ent::OverrideValueSource::OverrideOrPrefab, true, {}, true);
         ENTLIB_ASSERT(withIndex.at("variantIndex") == 1);
 
         // Test saveNode
         Ent::Component const* heightObj = ent->getComponent("HeightObj");
-        heightObj->root.saveNode("test.HeightObj.node");
+        heightObj->root->saveNode("test.HeightObj.node");
 
         testPrefabEntity(ent.get());
         // Test mapErase in set of primitive
         Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
-        Ent::Node* tags = pathNodeGD->root.at("Tags")->at("Tags");
+        Ent::Node* tags = pathNodeGD->root->at("Tags")->at("Tags");
         auto primSet = tags->mapGet("a");
         ENTLIB_CHECK_EXCEPTION(primSet->mapErase("1"), Ent::BadArrayType);
 
         // Set Union type and override
         Ent::Component* cinematicGD = ent->getComponent("CinematicGD");
-        Ent::Node* scriptEvents = cinematicGD->root.at("ScriptEvents");
+        Ent::Node* scriptEvents = cinematicGD->root->at("ScriptEvents");
         Ent::Node* oneOfScripts2 = scriptEvents->at(1llu);
         ENTLIB_ASSERT(oneOfScripts2->getDataType() == Ent::DataType::oneOf);
         ENTLIB_ASSERT(
@@ -455,16 +455,16 @@ try
         // TEST simple entity ref creation
         Ent::Component* testEntityRef = ent->addComponent("TestEntityRef");
         ENTLIB_ASSERT(testEntityRef != nullptr);
-        ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->getEntityRef().entityPath.empty());
-        testEntityRef->root.at("TestRef")->setEntityRef(ent->makeEntityRef(*ent));
-        ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->getEntityRef().entityPath == ".");
+        ENTLIB_ASSERT(testEntityRef->root->at("TestRef")->getEntityRef().entityPath.empty());
+        testEntityRef->root->at("TestRef")->setEntityRef(ent->makeEntityRef(*ent));
+        ENTLIB_ASSERT(testEntityRef->root->at("TestRef")->getEntityRef().entityPath == ".");
         Ent::SubSceneComponent* subScenecomp = ent->getSubSceneComponent();
         auto&& allSubEntities = subScenecomp->embedded->getObjects();
-        testEntityRef->root.at("TestRef")->setEntityRef(ent->makeEntityRef(*allSubEntities.front()));
+        testEntityRef->root->at("TestRef")->setEntityRef(ent->makeEntityRef(*allSubEntities.front()));
 
         // TEST Union not in Object
         Ent::Component* testUnion = ent->addComponent("TestUnion");
-        Ent::Node* un = testUnion->root.at("Union");
+        Ent::Node* un = testUnion->root->at("Union");
         un->unset();
         ENTLIB_ASSERT(not un->hasOverride());
         ENTLIB_ASSERT(un->getUnionType() == std::string("s32"));
@@ -478,12 +478,12 @@ try
         ENTLIB_ASSERT(not un->hasOverride());
         ENTLIB_ASSERT(un->getUnionType() == std::string("s32"));
         // TEST Union not in Array
-        Ent::Node* unArr = testUnion->root.at("UnionArray");
+        Ent::Node* unArr = testUnion->root->at("UnionArray");
         Ent::Node* newUnion = unArr->push();
         ENTLIB_ASSERT(not newUnion->getUnionData()->hasOverride());
         ENTLIB_ASSERT(newUnion->getUnionType() == std::string("s32"));
         // TEST Union not in Object in Array
-        unArr = testUnion->root.at("UnionObjectArray");
+        unArr = testUnion->root->at("UnionObjectArray");
         Ent::Node* obj = unArr->push();
         newUnion = obj->at("Union");
         ENTLIB_ASSERT(not newUnion->getUnionData()->hasOverride());
@@ -493,9 +493,9 @@ try
         ent->setMaxActivationLevel(Ent::ActivationLevel::InWorld);
 
         Ent::Component* sysCreat = ent->getComponent("SystemicCreature");
-        ENTLIB_ASSERT(sysCreat->root.at("Name")->getString() == std::string()); // default
-        ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
-        sysCreat->root.at("Name")->setString("Shamane_male");
+        ENTLIB_ASSERT(sysCreat->root->at("Name")->getString() == std::string()); // default
+        ENTLIB_ASSERT(not sysCreat->root->at("Name")->isSet()); // default
+        sysCreat->root->at("Name")->setString("Shamane_male");
         entlib.saveEntity(*ent, "prefab.copy.entity");
 
         // TEST SubScene detach
@@ -513,7 +513,7 @@ try
         // TEST arrays default values
         ent->removeComponent("TransformGD");
         Ent::Component* transformGD = ent->addComponent("TransformGD");
-        Ent::Node* mat33 = transformGD->root.at("Matrix");
+        Ent::Node* mat33 = transformGD->root->at("Matrix");
         auto testMat33 = [&]() {
             ENTLIB_ASSERT(mat33->at(0llu)->getFloat() == 1.);
             ENTLIB_ASSERT(mat33->at(0llu)->getDefaultFloat() == 1.);
@@ -527,10 +527,10 @@ try
         };
 
         Ent::Component* testDefaultValues = ent->addComponent("TestDefaultValues");
-        ENTLIB_ASSERT(testDefaultValues->root.hasOverride());
-        mat33 = testDefaultValues->root.at("Matrix");
+        ENTLIB_ASSERT(testDefaultValues->root->hasOverride());
+        mat33 = testDefaultValues->root->at("Matrix");
         testMat33();
-        mat33 = testDefaultValues->root.at("Matrix2");
+        mat33 = testDefaultValues->root->at("Matrix2");
         ENTLIB_ASSERT(mat33->at(4llu)->getDefaultFloat() == 4.);
         ENTLIB_ASSERT(mat33->at(4llu)->getFloat() == 4.);
         ENTLIB_ASSERT(not mat33->at(4llu)->hasOverride());
@@ -546,7 +546,7 @@ try
                                          size_t defaultSize,
                                          tl::optional<size_t> prefabSize,
                                          tl::optional<size_t> overrideSize) {
-            Ent::Node const* node = comp->root.at(_arrayName);
+            Ent::Node const* node = comp->root->at(_arrayName);
             ENTLIB_ASSERT(node);
             ENTLIB_ASSERT(node->hasPrefabValue() == prefabSize.has_value());
             ENTLIB_ASSERT(node->hasOverride() == overrideSize.has_value());
@@ -567,19 +567,19 @@ try
     }
     {
         auto const nodeCachesize = entlib.getNodeCache().size();
-        Ent::Node ent = entlib.loadEntityAsNode("prefab.copy.entity");
+        auto ent = entlib.loadEntityAsNode("prefab.copy.entity");
         auto const newNodeCachesize = entlib.getNodeCache().size();
         ENTLIB_ASSERT(
             newNodeCachesize == nodeCachesize + 2); // "prefab.copy.entity" and "test.SeedPatch.node"
         // TEST simple entity refs resolution
-        Ent::Node* testEntityRef = ent.at("Components")->mapGet("TestEntityRef")->getUnionData();
+        Ent::Node* testEntityRef = ent->at("Components")->mapGet("TestEntityRef")->getUnionData();
         ENTLIB_ASSERT(testEntityRef != nullptr);
         ENTLIB_ASSERT(testEntityRef->at("TestRef")->isSet());
         Ent::EntityRef entityRef = testEntityRef->at("TestRef")->getEntityRef();
-        Ent::Node* resolvedEntity = entlib.resolveEntityRef(&ent, entityRef);
+        Ent::Node* resolvedEntity = entlib.resolveEntityRef(ent.get(), entityRef);
         ENTLIB_ASSERT(resolvedEntity != nullptr);
 
-        Ent::Node* subScenecomp = ent.at("Components")->mapGet("SubScene")->getUnionData();
+        Ent::Node* subScenecomp = ent->at("Components")->mapGet("SubScene")->getUnionData();
         Ent::Node* allSubEntities = subScenecomp->at("Embedded");
         ENTLIB_ASSERT(not allSubEntities->empty());
         Ent::Node* originalEnt = allSubEntities->at(0llu);
@@ -602,7 +602,7 @@ try
 
         // TEST Tuple hasOverride
         Ent::Component* unitTestComponent = ent->addComponent("UnitTestComponent");
-        auto* wp = unitTestComponent->root.at("Position");
+        auto* wp = unitTestComponent->root->at("Position");
         ENTLIB_ASSERT(wp->hasOverride() == false);
         ENTLIB_ASSERT(wp->at(0llu)->hasOverride() == false);
 
@@ -612,36 +612,36 @@ try
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent->getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
-        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
-        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->isSet());
+        ENTLIB_ASSERT(heightObj->root->at("Subdivision")->getInt() == 0);
+        ENTLIB_ASSERT(heightObj->root->at("Subdivision")->isSet());
         ENTLIB_ASSERT(
-            heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
-        ENTLIB_ASSERT(heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
+            heightObj->root->at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
+        ENTLIB_ASSERT(heightObj->root->at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 
         Ent::Component* sysCreat = ent->getComponent("SystemicCreature");
         ENTLIB_ASSERT(sysCreat != nullptr);
         // TEST read setted values
-        ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Shamans")); // set
-        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
+        ENTLIB_ASSERT(sysCreat->root->at("Faction")->getString() == std::string("Shamans")); // set
+        ENTLIB_ASSERT(sysCreat->root->at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
 
         // TEST read array
-        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->isSet());
-        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->size() == 3);
+        ENTLIB_ASSERT(sysCreat->root->at("ScriptList")->isSet());
+        ENTLIB_ASSERT(sysCreat->root->at("ScriptList")->size() == 3);
 
         // TEST default values unchanged
-        ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
-        ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root->at("Burried")->getBool() == false); // default
+        ENTLIB_ASSERT(not sysCreat->root->at("Burried")->isSet()); // default
 
         // TEST changed values
         ENTLIB_ASSERT(
-            sysCreat->root.at("Name")->getString() == std::string("Shamane_male")); // set. changed.
-        ENTLIB_ASSERT(sysCreat->root.at("Name")->isSet()); // set. changed.
+            sysCreat->root->at("Name")->getString() == std::string("Shamane_male")); // set. changed.
+        ENTLIB_ASSERT(sysCreat->root->at("Name")->isSet()); // set. changed.
 
         // TEST simple entity refs resolution
         Ent::Component* testEntityRef = ent->getComponent("TestEntityRef");
         ENTLIB_ASSERT(testEntityRef != nullptr);
-        ENTLIB_ASSERT(testEntityRef->root.at("TestRef")->isSet());
-        Ent::EntityRef entityRef = testEntityRef->root.at("TestRef")->getEntityRef();
+        ENTLIB_ASSERT(testEntityRef->root->at("TestRef")->isSet());
+        Ent::EntityRef entityRef = testEntityRef->root->at("TestRef")->getEntityRef();
         Ent::Entity* resolvedEntity = ent->resolveEntityRef(entityRef);
         ENTLIB_ASSERT(resolvedEntity != nullptr);
 
@@ -708,7 +708,8 @@ try
     auto testInstanceOf = [](Ent::Entity const& ent, bool testIsSet = true, bool testPrefab = true) {
         // ActorStates
         Ent::Node const& actorStates = ent.getActorStates();
-        auto actorStatesCopy = actorStates; //NOLINT(performance-unnecessary-copy-initialization)
+        actorStates.checkParent(nullptr); // Check the parent of nodes is valid
+        auto& actorStatesCopy = actorStates; //NOLINT(performance-unnecessary-copy-initialization)
         actorStatesCopy.checkParent(nullptr); // Check the parent of nodes is valid
         ENTLIB_ASSERT(actorStates.getDataType() == Ent::DataType::array);
         ENTLIB_ASSERT(actorStates.size() == 3);
@@ -737,8 +738,8 @@ try
 
         // Map and Set overridePolicy
         Ent::Component const* pathNodeGD = ent.getComponent("PathNodeGD");
-        Ent::Node const* tags = pathNodeGD->root.at("Tags")->at("Tags");
-        ENTLIB_ASSERT(tags->getParentNode()->getParentNode() == &pathNodeGD->root);
+        Ent::Node const* tags = pathNodeGD->root->at("Tags")->at("Tags");
+        ENTLIB_ASSERT(tags->getParentNode()->getParentNode() == pathNodeGD->root.get());
         ENTLIB_ASSERT(tags->size() == 3);
         ENTLIB_ASSERT(tags->mapGet("a")->getParentNode()->getParentNode() == tags);
         ENTLIB_ASSERT(tags->mapGet("a") != nullptr);
@@ -766,44 +767,44 @@ try
         }
         Ent::Component const* netLink = subObj.getComponent("NetworkLink");
         ENTLIB_ASSERT(netLink != nullptr);
-        ENTLIB_ASSERT(netLink->root.at("Source")->getString() == std::string(".EP1-Spout_"));
-        ENTLIB_ASSERT(netLink->root.at("Target")->getString() == std::string(".EP1-crook_"));
+        ENTLIB_ASSERT(netLink->root->at("Source")->getString() == std::string(".EP1-Spout_"));
+        ENTLIB_ASSERT(netLink->root->at("Target")->getString() == std::string(".EP1-crook_"));
         if (testIsSet)
         {
-            ENTLIB_ASSERT(netLink->root.at("Source")->isSet() == false);
-            ENTLIB_ASSERT(netLink->root.at("Target")->isSet() == false);
+            ENTLIB_ASSERT(netLink->root->at("Source")->isSet() == false);
+            ENTLIB_ASSERT(netLink->root->at("Target")->isSet() == false);
         }
         Ent::Component const* trans = subObj.getComponent("TransformGD");
-        ENTLIB_ASSERT(trans->root.at("Position")->at(0llu)->getFloat() == 0.0);
+        ENTLIB_ASSERT(trans->root->at("Position")->at(0llu)->getFloat() == 0.0);
 
         // "InstanceOf" in sub entitites
         auto& entityWithInstanceOf = *subScene->embedded->getEntity(R"(EntityWithInstanceOf)");
         ENTLIB_ASSERT(entityWithInstanceOf.getName() == std::string("EntityWithInstanceOf"));
         ENTLIB_ASSERT(entityWithInstanceOf.getInstanceOf() == std::string("subentity2.entity"));
         auto* networkLink = entityWithInstanceOf.getComponent("NetworkLink");
-        ENTLIB_ASSERT(networkLink->root.at("Source")->getString() == std::string("instance"));
-        ENTLIB_ASSERT(networkLink->root.at("Target")->getString() == std::string("subentity2"));
-        ENTLIB_ASSERT(networkLink->root.at("ThumbnailMesh")->getString() == std::string());
+        ENTLIB_ASSERT(networkLink->root->at("Source")->getString() == std::string("instance"));
+        ENTLIB_ASSERT(networkLink->root->at("Target")->getString() == std::string("subentity2"));
+        ENTLIB_ASSERT(networkLink->root->at("ThumbnailMesh")->getString() == std::string());
 
         // Test instanciation of a prefab Node
         Ent::Component const* stickToTerrain = ent.getComponent("StickToTerrain");
         if (testPrefab)
         {
-            ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
+            ENTLIB_ASSERT(stickToTerrain->root->getInstanceOf() != nullptr);
             ENTLIB_ASSERT(
-                stickToTerrain->root.getInstanceOf() == std::string("test.StickToTerrain.node"));
+                stickToTerrain->root->getInstanceOf() == std::string("test.StickToTerrain.node"));
         }
-        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
-        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isSet() == false);
-        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isDefault() == false);
-        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("ZOffset")->getFloat() - 10.) < 0.0001);
+        ENTLIB_ASSERT(fabs(stickToTerrain->root->at("NormalRatio")->getFloat() - 0.6) < 0.0001);
+        ENTLIB_ASSERT(stickToTerrain->root->at("ZOffset")->isSet() == false);
+        ENTLIB_ASSERT(stickToTerrain->root->at("ZOffset")->isDefault() == false);
+        ENTLIB_ASSERT(fabs(stickToTerrain->root->at("ZOffset")->getFloat() - 10.) < 0.0001);
 
         // Test Node's InstanceOf
         Ent::Component const* seedPatch = ent.getComponent("SeedPatch");
-        ENTLIB_ASSERT(seedPatch->root.at("NoiseSizeX")->isDefault());
-        ENTLIB_ASSERT(seedPatch->root.at("NoiseSizeY")->getFloat() == 3.);
-        ENTLIB_ASSERT(not seedPatch->root.at("NoiseOffsetX")->isSet());
-        ENTLIB_ASSERT(seedPatch->root.at("NoiseOffsetY")->getFloat() == 3.);
+        ENTLIB_ASSERT(seedPatch->root->at("NoiseSizeX")->isDefault());
+        ENTLIB_ASSERT(seedPatch->root->at("NoiseSizeY")->getFloat() == 3.);
+        ENTLIB_ASSERT(not seedPatch->root->at("NoiseOffsetX")->isSet());
+        ENTLIB_ASSERT(seedPatch->root->at("NoiseOffsetY")->getFloat() == 3.);
     };
 
     {
@@ -823,11 +824,16 @@ try
         // Do the applyToPrefab
         ent = entlib.loadEntity("instance_applied.entity");
         ent->applyToPrefab();
+        Ent::Node const& actorStates = ent->getActorStates();
+        actorStates.checkParent(nullptr); // Check the parent of nodes is valid
         entlib.saveEntity(*ent, "instance_applied.entity");
+        actorStates.checkParent(nullptr); // Check the parent of nodes is valid
         EntityPtr prefab = entlib.loadEntity("prefab_updated.entity");
+        actorStates.checkParent(nullptr); // Check the parent of nodes is valid
 
         // Test result
         testInstanceOf(*prefab, false);
+        actorStates.checkParent(nullptr); // Check the parent of nodes is valid
         testInstanceOf(*ent, false);
         ENTLIB_ASSERT(ent->hasOverride()); // Because applyToPrefab set the old name
 
@@ -845,55 +851,55 @@ try
         ENTLIB_ASSERT(ent->getColorValue().hasOverride());
 
         // TEST read overrided value
-        ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Plouf")); // Overrided
+        ENTLIB_ASSERT(sysCreat->root->at("Faction")->getString() == std::string("Plouf")); // Overrided
 
         // TEST read inherited values
         ENTLIB_ASSERT(
-            sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // Inherited
-        ENTLIB_ASSERT(sysCreat->root.at("Life")->getFloat() == 1000.); // Inherited
+            sysCreat->root->at("Inventory")->getString() == std::string("KaiWOLgrey")); // Inherited
+        ENTLIB_ASSERT(sysCreat->root->at("Life")->getFloat() == 1000.); // Inherited
 
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent->getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
-        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
-        ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isSet());
+        ENTLIB_ASSERT(heightObj->root->at("Subdivision")->getInt() == 0);
+        ENTLIB_ASSERT(not heightObj->root->at("Subdivision")->isSet());
         ENTLIB_ASSERT(
-            heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
+            heightObj->root->at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
         ENTLIB_ASSERT(
-            not heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
+            not heightObj->root->at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 
         // TEST read default value
-        ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // Inherited (from default)
-        ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root->at("Burried")->getBool() == false); // Inherited (from default)
+        ENTLIB_ASSERT(not sysCreat->root->at("Burried")->isSet()); // default
 
         // TEST read overrided in array
         ENTLIB_ASSERT(
-            sysCreat->root.at("ScriptList")->at(1)->getString() == std::string("b2")); // Overrided
-        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->at(1)->isSet()); // Overrided
+            sysCreat->root->at("ScriptList")->at(1)->getString() == std::string("b2")); // Overrided
+        ENTLIB_ASSERT(sysCreat->root->at("ScriptList")->at(1)->isSet()); // Overrided
         // TEST read Not overrided in array
         ENTLIB_ASSERT(
-            sysCreat->root.at("ScriptList")->at(2)->getString() == std::string("c1")); // not overrided
-        ENTLIB_ASSERT(not sysCreat->root.at("ScriptList")->at(2)->isSet()); // Not overrided
+            sysCreat->root->at("ScriptList")->at(2)->getString() == std::string("c1")); // not overrided
+        ENTLIB_ASSERT(not sysCreat->root->at("ScriptList")->at(2)->isSet()); // Not overrided
 
         // Programatically unset
-        sysCreat->root.at("ScriptList")->at(1)->unset();
+        sysCreat->root->at("ScriptList")->at(1)->unset();
         // Programatically set
-        sysCreat->root.at("ScriptList")->at(2)->setString("c2");
+        sysCreat->root->at("ScriptList")->at(2)->setString("c2");
 
         // TEST read array
-        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->isSet());
-        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->size() == 3);
+        ENTLIB_ASSERT(sysCreat->root->at("ScriptList")->isSet());
+        ENTLIB_ASSERT(sysCreat->root->at("ScriptList")->size() == 3);
 
         // TEST Extand array
-        sysCreat->root.at("ScriptList")->push()->setString("d2");
-        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->size() == 4);
+        sysCreat->root->at("ScriptList")->push()->setString("d2");
+        ENTLIB_ASSERT(sysCreat->root->at("ScriptList")->size() == 4);
 
         // TEST SubScene (without override)
         testInstanceOf(*ent);
 
         Ent::Component* testSetOfObject = ent->getComponent("TestSetOfObject");
         {
-            auto* setOfObject = testSetOfObject->root.at("SetOfObject");
+            auto* setOfObject = testSetOfObject->root->at("SetOfObject");
 
             // Test hasOverride
             ENTLIB_ASSERT(setOfObject->mapGet("C")->hasOverride() == false); // Already in prefab
@@ -957,21 +963,21 @@ try
         // Test rename object in set
         // - Possible
         ENTLIB_ASSERT(
-            testSetOfObject->root.at("SetOfObject")->mapGet("A")->at("Value")->getString()
+            testSetOfObject->root->at("SetOfObject")->mapGet("A")->at("Value")->getString()
             == std::string("a"));
-        testSetOfObject->root.at("SetOfObject")->mapRename("A", "A3");
-        testSetOfObject->root.at("SetOfObject")->mapRename("A3", "A2");
+        testSetOfObject->root->at("SetOfObject")->mapRename("A", "A3");
+        testSetOfObject->root->at("SetOfObject")->mapRename("A3", "A2");
         ENTLIB_ASSERT(
-            testSetOfObject->root.at("SetOfObject")->mapGet("A2")->at("Value")->getString()
+            testSetOfObject->root->at("SetOfObject")->mapGet("A2")->at("Value")->getString()
             == std::string("a"));
-        ENTLIB_ASSERT(testSetOfObject->root.at("SetOfObject")->mapGet("A") == nullptr);
+        ENTLIB_ASSERT(testSetOfObject->root->at("SetOfObject")->mapGet("A") == nullptr);
         // - Not possible
         ENTLIB_ASSERT(
-            testSetOfObject->root.at("SetOfObject")->mapGet("D")->at("Value")->getString()
+            testSetOfObject->root->at("SetOfObject")->mapGet("D")->at("Value")->getString()
             == std::string("d"));
         // TODO : decomment!!
         ENTLIB_CHECK_EXCEPTION(
-            testSetOfObject->root.at("SetOfObject")->mapRename("D", "D2"), Ent::CantRename);
+            testSetOfObject->root->at("SetOfObject")->mapRename("D", "D2"), Ent::CantRename);
 
         // ****************************** Test hasASuper ******************************************
         // *************** ENTITY ***************
@@ -985,7 +991,7 @@ try
         ENTLIB_ASSERT(entWithOverride != nullptr);
         auto networkLink = entWithOverride->getComponent("NetworkLink");
         ENTLIB_ASSERT(networkLink != nullptr);
-        networkLink->root.at("ThumbnailMesh")->setString("DefaultLinkVisual.wbm");
+        networkLink->root->at("ThumbnailMesh")->setString("DefaultLinkVisual.wbm");
         ENTLIB_ASSERT(entWithOverride->hasOverride());
         // entity with instanceOf overriden
         auto entWithoutOverride =
@@ -999,20 +1005,20 @@ try
         ENTLIB_ASSERT(ent->getComponent("AnimationEventsGeneratorGD") != nullptr);
         ENTLIB_ASSERT(comp->hasOverride()); // A new item in an array in always override
         // Component with override
-        ent->getComponent("VoxelSimulationGD")->root.at("LossBySecond")->setFloat(36.);
+        ent->getComponent("VoxelSimulationGD")->root->at("LossBySecond")->setFloat(36.);
         ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD") != nullptr);
         ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD")->hasOverride());
         // Component with instanceOf overriden
         auto compWithInstOf = ent->getComponent("CharacterControllerGD");
-        compWithInstOf->root.resetInstanceOf("test.CharacterControllerGD.node");
+        compWithInstOf->root->resetInstanceOf("test.CharacterControllerGD.node");
         ENTLIB_ASSERT(
-            compWithInstOf->root.getInstanceOf() == std::string("test.CharacterControllerGD.node"));
+            compWithInstOf->root->getInstanceOf() == std::string("test.CharacterControllerGD.node"));
         ENTLIB_ASSERT(compWithInstOf->hasOverride());
         // *************** NODE ***************
         // new Node
         auto setOfObject = ent->getComponent("TestSetOfObject");
         ENTLIB_ASSERT(setOfObject);
-        auto mapTest = setOfObject->root.at("MapOfObject");
+        auto mapTest = setOfObject->root->at("MapOfObject");
         mapTest->mapInsert("NewNode");
         ENTLIB_ASSERT(mapTest->mapGet("NewNode") != nullptr);
         ENTLIB_ASSERT(
@@ -1030,21 +1036,21 @@ try
 
         // Test mapInsert in map
         {
-            mapTest = setOfObject->root.at("MapOfObject");
+            mapTest = setOfObject->root->at("MapOfObject");
             auto newNode2 = mapTest->mapInsert("NewNode2");
             ENTLIB_ASSERT(newNode2->getDataType() == Ent::DataType::object);
         }
 
-        sysCreat->root.at("BehaviorState")->setString("Overrided");
+        sysCreat->root->at("BehaviorState")->setString("Overrided");
         entlib.saveEntity(*ent, "instance.copy.entity");
 
         {
             auto instance3 = ent->makeInstanceOf();
 
             Ent::Component* testSetOfObject3 = instance3->getComponent("TestSetOfObject");
-            auto* setOfObject3 = testSetOfObject3->root.at("SetOfObject");
+            auto* setOfObject3 = testSetOfObject3->root->at("SetOfObject");
 
-            auto mapTest2 = testSetOfObject3->root.at("MapOfObject");
+            auto mapTest2 = testSetOfObject3->root->at("MapOfObject");
             ENTLIB_ASSERT(mapTest2->mapInsert("Should_not_appear_in_diff"));
             ENTLIB_ASSERT(mapTest2->mapErase("Should_not_appear_in_diff"));
 
@@ -1060,7 +1066,7 @@ try
     {
         EntityPtr ent = entlib.loadEntity("instance3.entity");
         Ent::Component* testSetOfObject3 = ent->getComponent("TestSetOfObject");
-        auto* setOfObject3 = testSetOfObject3->root.at("SetOfObject");
+        auto* setOfObject3 = testSetOfObject3->root->at("SetOfObject");
 
         // Test insert an element in an instance of the __removed__ one, do not resore the old values
         // insert => makeInstanceOf => __remove__ => makeInstanceOf => insert
@@ -1071,7 +1077,7 @@ try
     auto test_erase = [](Ent::Entity* ent) {
         Ent::Node& actorStates = ent->getActorStates();
         Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
-        Ent::Node* tags = pathNodeGD->root.at("Tags")->at("Tags");
+        Ent::Node* tags = pathNodeGD->root->at("Tags")->at("Tags");
 
         // Test erase in map (+save/load)
         ENTLIB_ASSERT(tags->size() == 3);
@@ -1106,7 +1112,7 @@ try
 
         // Test erase in map
         Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
-        Ent::Node* tags = pathNodeGD->root.at("Tags")->at("Tags");
+        Ent::Node* tags = pathNodeGD->root->at("Tags")->at("Tags");
         ENTLIB_ASSERT(tags->mapGet("c") != nullptr);
         ENTLIB_ASSERT(tags->size() == 3);
         ENTLIB_ASSERT(tags->mapErase("c"));
@@ -1163,15 +1169,15 @@ try
         // Test an overrided Component
         Ent::Component const* netLink = subObj->getComponent("NetworkLink");
         ENTLIB_ASSERT(netLink != nullptr);
-        ENTLIB_ASSERT(netLink->root.at("Source")->getString() == std::string(".EP1-Spout_"));
-        ENTLIB_ASSERT(netLink->root.at("Source")->isSet() == false);
-        ENTLIB_ASSERT(netLink->root.at("Target")->getString() == std::string(".EP1-crook_2"));
-        ENTLIB_ASSERT(netLink->root.at("Target")->isSet());
+        ENTLIB_ASSERT(netLink->root->at("Source")->getString() == std::string(".EP1-Spout_"));
+        ENTLIB_ASSERT(netLink->root->at("Source")->isSet() == false);
+        ENTLIB_ASSERT(netLink->root->at("Target")->getString() == std::string(".EP1-crook_2"));
+        ENTLIB_ASSERT(netLink->root->at("Target")->isSet());
 
         // Test a not overrided Component
         Ent::Component const* trans = subObj->getComponent("TransformGD");
         ENTLIB_ASSERT(trans != nullptr);
-        ENTLIB_ASSERT(trans->root.at("Position")->at(0llu)->getFloat() == 0.0);
+        ENTLIB_ASSERT(trans->root->at("Position")->at(0llu)->getFloat() == 0.0);
     };
     {
         EntityPtr ent = entlib.loadEntity("instance_override_subscene.entity");
@@ -1191,7 +1197,7 @@ try
 
         // Test remove object in set
         Ent::Component* testSetOfObject = ent->getComponent("TestSetOfObject");
-        auto* setOfObject = testSetOfObject->root.at("SetOfObject");
+        auto* setOfObject = testSetOfObject->root->at("SetOfObject");
         ENTLIB_ASSERT(setOfObject->mapGet("B") == nullptr);
         ENTLIB_ASSERT(setOfObject->mapGet("C") == nullptr);
         ENTLIB_ASSERT(setOfObject->size() == 4);
@@ -1221,9 +1227,9 @@ try
 
         // Test rename object in set
         ENTLIB_ASSERT(
-            testSetOfObject->root.at("SetOfObject")->mapGet("A2")->at("Value")->getString()
+            testSetOfObject->root->at("SetOfObject")->mapGet("A2")->at("Value")->getString()
             == std::string("a"));
-        ENTLIB_ASSERT(testSetOfObject->root.at("SetOfObject")->mapGet("A") == nullptr);
+        ENTLIB_ASSERT(testSetOfObject->root->at("SetOfObject")->mapGet("A") == nullptr);
 
         // ****************************** Test hasASuper ******************************************
         // *************** ENTITY ***************
@@ -1249,17 +1255,17 @@ try
         // Component with override
         ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD") != nullptr);
         ENTLIB_ASSERT(
-            ent->getComponent("VoxelSimulationGD")->root.at("LossBySecond")->getFloat() == 36.);
+            ent->getComponent("VoxelSimulationGD")->root->at("LossBySecond")->getFloat() == 36.);
         ENTLIB_ASSERT(ent->getComponent("VoxelSimulationGD")->hasOverride());
         // Component with instanceOf overriden
         auto compWithInstOf = ent->getComponent("CharacterControllerGD");
         ENTLIB_ASSERT(
-            compWithInstOf->root.getInstanceOf() == std::string("test.CharacterControllerGD.node"));
+            compWithInstOf->root->getInstanceOf() == std::string("test.CharacterControllerGD.node"));
         ENTLIB_ASSERT(compWithInstOf->hasOverride());
         // *************** NODE ***************
         // new Node
         auto pathNodeGD = ent->getComponent("TestSetOfObject");
-        auto mapTest = pathNodeGD->root.at("MapOfObject");
+        auto mapTest = pathNodeGD->root->at("MapOfObject");
         ENTLIB_ASSERT(mapTest->mapGet("NewNode") != nullptr);
         // Newly inserted Nodes are overriden
         ENTLIB_ASSERT(mapTest->mapGet("NewNode")->hasOverride());
@@ -1275,48 +1281,49 @@ try
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent->getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
-        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
-        ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isSet());
+        ENTLIB_ASSERT(heightObj->root->at("Subdivision")->getInt() == 0);
+        ENTLIB_ASSERT(not heightObj->root->at("Subdivision")->isSet());
         ENTLIB_ASSERT(
-            heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
+            heightObj->root->at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
         ENTLIB_ASSERT(
-            not heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
+            not heightObj->root->at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 
         // TEST read overrided value
-        ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Plouf")); // Overrided
+        ENTLIB_ASSERT(sysCreat->root->at("Faction")->getString() == std::string("Plouf")); // Overrided
 
         // TEST read inherited values
         ENTLIB_ASSERT(
-            sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // Inherited
-        ENTLIB_ASSERT(sysCreat->root.at("Life")->getFloat() == 1000.); // Inherited
+            sysCreat->root->at("Inventory")->getString() == std::string("KaiWOLgrey")); // Inherited
+        ENTLIB_ASSERT(sysCreat->root->at("Life")->getFloat() == 1000.); // Inherited
 
         // TEST read default value
-        ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // Inherited (from default)
-        ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root->at("Burried")->getBool() == false); // Inherited (from default)
+        ENTLIB_ASSERT(not sysCreat->root->at("Burried")->isSet()); // default
 
         // TEST read programatically overrided in array
         ENTLIB_ASSERT(
-            sysCreat->root.at("ScriptList")->at(1)->getString()
+            sysCreat->root->at("ScriptList")->at(1)->getString()
             == std::string("b1")); // No more overrided
-        ENTLIB_ASSERT(not sysCreat->root.at("ScriptList")->at(1)->isSet()); // No more overrided
+        ENTLIB_ASSERT(not sysCreat->root->at("ScriptList")->at(1)->isSet()); // No more overrided
         // TEST read programatically unset in array
         ENTLIB_ASSERT(
-            sysCreat->root.at("ScriptList")->at(2)->getString() == std::string("c2")); // Overrided
-        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->at(2)->isSet()); // Overrided
+            sysCreat->root->at("ScriptList")->at(2)->getString() == std::string("c2")); // Overrided
+        ENTLIB_ASSERT(sysCreat->root->at("ScriptList")->at(2)->isSet()); // Overrided
 
         // TEST read programatically extand array
         ENTLIB_ASSERT(
-            sysCreat->root.at("ScriptList")->at(3)->getString() == std::string("d2")); // Overrided
-        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->at(3)->isSet()); // Overrided
+            sysCreat->root->at("ScriptList")->at(3)->getString() == std::string("d2")); // Overrided
+        ENTLIB_ASSERT(sysCreat->root->at("ScriptList")->at(3)->isSet()); // Overrided
 
         // TEST read extanded array
-        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->isSet());
-        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->size() == 4);
+        ENTLIB_ASSERT(sysCreat->root->at("ScriptList")->isSet());
+        ENTLIB_ASSERT(sysCreat->root->at("ScriptList")->size() == 4);
 
         // TEST override value from code
         ENTLIB_ASSERT(
-            sysCreat->root.at("BehaviorState")->getString() == std::string("Overrided")); // set. changed.
-        ENTLIB_ASSERT(sysCreat->root.at("BehaviorState")->isSet()); // set. changed.
+            sysCreat->root->at("BehaviorState")->getString()
+            == std::string("Overrided")); // set. changed.
+        ENTLIB_ASSERT(sysCreat->root->at("BehaviorState")->isSet()); // set. changed.
 
         testInstanceOf(*ent);
 
@@ -1335,27 +1342,27 @@ try
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent->getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
-        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
-        ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isSet());
-        ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->hasDefaultValue()); // Prefab has value
+        ENTLIB_ASSERT(heightObj->root->at("Subdivision")->getInt() == 0);
+        ENTLIB_ASSERT(not heightObj->root->at("Subdivision")->isSet());
+        ENTLIB_ASSERT(not heightObj->root->at("Subdivision")->hasDefaultValue()); // Prefab has value
         ENTLIB_ASSERT(
-            heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
+            heightObj->root->at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
         ENTLIB_ASSERT(
-            not heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
+            not heightObj->root->at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 
         // TEST default values
-        ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
-        ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
-        ENTLIB_ASSERT(sysCreat->root.at("Burried")->hasDefaultValue()); // default
-        ENTLIB_ASSERT(sysCreat->root.at("Name")->getString() == std::string()); // default
-        ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root->at("Burried")->getBool() == false); // default
+        ENTLIB_ASSERT(not sysCreat->root->at("Burried")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root->at("Burried")->hasDefaultValue()); // default
+        ENTLIB_ASSERT(sysCreat->root->at("Name")->getString() == std::string()); // default
+        ENTLIB_ASSERT(not sysCreat->root->at("Name")->isSet()); // default
 
         // TEST read setted values
-        ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Plouf")); // set
-        ENTLIB_ASSERT(not sysCreat->root.at("Faction")->hasDefaultValue()); // is set in instance
-        ENTLIB_ASSERT(sysCreat->root.at("Faction")->isSet()); // is set
-        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
-        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->isSet()); // is set
+        ENTLIB_ASSERT(sysCreat->root->at("Faction")->getString() == std::string("Plouf")); // set
+        ENTLIB_ASSERT(not sysCreat->root->at("Faction")->hasDefaultValue()); // is set in instance
+        ENTLIB_ASSERT(sysCreat->root->at("Faction")->isSet()); // is set
+        ENTLIB_ASSERT(sysCreat->root->at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
+        ENTLIB_ASSERT(sysCreat->root->at("Inventory")->isSet()); // is set
 
         entlib.saveEntity(*detached, "instance.detached.entity");
     }
@@ -1368,23 +1375,23 @@ try
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent->getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
-        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
-        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->isSet());
+        ENTLIB_ASSERT(heightObj->root->at("Subdivision")->getInt() == 0);
+        ENTLIB_ASSERT(heightObj->root->at("Subdivision")->isSet());
         ENTLIB_ASSERT(
-            heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
-        ENTLIB_ASSERT(heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
+            heightObj->root->at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
+        ENTLIB_ASSERT(heightObj->root->at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 
         // TEST default values
-        ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
-        ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
-        ENTLIB_ASSERT(sysCreat->root.at("Name")->getString() == std::string()); // default
-        ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root->at("Burried")->getBool() == false); // default
+        ENTLIB_ASSERT(not sysCreat->root->at("Burried")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root->at("Name")->getString() == std::string()); // default
+        ENTLIB_ASSERT(not sysCreat->root->at("Name")->isSet()); // default
 
         // TEST read setted values
-        ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Plouf")); // set
-        ENTLIB_ASSERT(sysCreat->root.at("Faction")->isSet()); // is set
-        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
-        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->isSet()); // is set
+        ENTLIB_ASSERT(sysCreat->root->at("Faction")->getString() == std::string("Plouf")); // set
+        ENTLIB_ASSERT(sysCreat->root->at("Faction")->isSet()); // is set
+        ENTLIB_ASSERT(sysCreat->root->at("Inventory")->getString() == std::string("KaiWOLgrey")); // set
+        ENTLIB_ASSERT(sysCreat->root->at("Inventory")->isSet()); // is set
     }
 
     {
@@ -1394,68 +1401,68 @@ try
         // Test instanciation of a prefab Node
         Ent::Component* stickToTerrain = instanceOf->addComponent("StickToTerrain");
         ENTLIB_CHECK_EXCEPTION(
-            stickToTerrain->root.resetInstanceOf("C:/test.StickToTerrain.node"), std::runtime_error);
-        stickToTerrain->root.resetInstanceOf("test.StickToTerrain.node");
-        stickToTerrain->root.resetInstanceOf(
+            stickToTerrain->root->resetInstanceOf("C:/test.StickToTerrain.node"), std::runtime_error);
+        stickToTerrain->root->resetInstanceOf("test.StickToTerrain.node");
+        stickToTerrain->root->resetInstanceOf(
             (current_path() / "test.StickToTerrain.node").generic_u8string().c_str());
-        ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
-        stickToTerrain->root.at("NormalRatio")->setFloat(0.6);
-        stickToTerrain->root.at("precisionRadius")->setFloat(0.6e-15);
+        ENTLIB_ASSERT(stickToTerrain->root->getInstanceOf() != nullptr);
+        stickToTerrain->root->at("NormalRatio")->setFloat(0.6);
+        stickToTerrain->root->at("precisionRadius")->setFloat(0.6e-15);
 
-        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
+        ENTLIB_ASSERT(fabs(stickToTerrain->root->at("NormalRatio")->getFloat() - 0.6) < 0.0001);
         ENTLIB_ASSERT(
-            fabs(stickToTerrain->root.at("precisionRadius")->getFloat() - 0.6e-15) < 0.0000001);
-        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isSet() == false);
-        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isDefault() == false);
-        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("ZOffset")->getFloat() - 10.) < 0.0001);
+            fabs(stickToTerrain->root->at("precisionRadius")->getFloat() - 0.6e-15) < 0.0000001);
+        ENTLIB_ASSERT(stickToTerrain->root->at("ZOffset")->isSet() == false);
+        ENTLIB_ASSERT(stickToTerrain->root->at("ZOffset")->isDefault() == false);
+        ENTLIB_ASSERT(fabs(stickToTerrain->root->at("ZOffset")->getFloat() - 10.) < 0.0001);
 
         ENTLIB_ASSERT(instanceOf->getComponent("NetworkNode") != nullptr);
-        instanceOf->getComponent("TransformGD")->root.getFieldNames();
+        instanceOf->getComponent("TransformGD")->root->getFieldNames();
         entlib.saveEntity(*instanceOf, "instance.create.entity");
     }
     auto testCreateInstanceOf = [&entlib](char const* _instancePath) {
         // Test read instance of
         EntityPtr ent = entlib.loadEntity(_instancePath);
 
-        ent->getComponent("TransformGD")->root.getFieldNames();
+        ent->getComponent("TransformGD")->root->getFieldNames();
 
         // Test instanciation of a prefab Node
         Ent::Component const* stickToTerrain = ent->getComponent("StickToTerrain");
-        ENTLIB_ASSERT(stickToTerrain->root.getInstanceOf() != nullptr);
-        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("NormalRatio")->getFloat() - 0.6) < 0.0001);
-        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isSet() == false);
-        ENTLIB_ASSERT(stickToTerrain->root.at("ZOffset")->isDefault() == false);
-        ENTLIB_ASSERT(fabs(stickToTerrain->root.at("ZOffset")->getFloat() - 10.) < 0.0001);
+        ENTLIB_ASSERT(stickToTerrain->root->getInstanceOf() != nullptr);
+        ENTLIB_ASSERT(fabs(stickToTerrain->root->at("NormalRatio")->getFloat() - 0.6) < 0.0001);
+        ENTLIB_ASSERT(stickToTerrain->root->at("ZOffset")->isSet() == false);
+        ENTLIB_ASSERT(stickToTerrain->root->at("ZOffset")->isDefault() == false);
+        ENTLIB_ASSERT(fabs(stickToTerrain->root->at("ZOffset")->getFloat() - 10.) < 0.0001);
 
         // TEST read inherited values in inherited component
         Ent::Component* heightObj = ent->getComponent("HeightObj");
         ENTLIB_ASSERT(heightObj != nullptr);
-        ENTLIB_ASSERT(heightObj->root.at("Subdivision")->getInt() == 0);
-        ENTLIB_ASSERT(not heightObj->root.at("Subdivision")->isSet());
+        ENTLIB_ASSERT(heightObj->root->at("Subdivision")->getInt() == 0);
+        ENTLIB_ASSERT(not heightObj->root->at("Subdivision")->isSet());
         ENTLIB_ASSERT(
-            heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
+            heightObj->root->at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->getInt() == 51248);
         ENTLIB_ASSERT(
-            not heightObj->root.at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
+            not heightObj->root->at("DisplaceNoiseList")->at(0llu)->at("MapChannel")->isSet());
 
         // Test read prefab
         Ent::Component* sysCreat = ent->getComponent("SystemicCreature");
         ENTLIB_ASSERT(sysCreat != nullptr);
 
         // TEST read setted values
-        ENTLIB_ASSERT(sysCreat->root.at("Faction")->getString() == std::string("Shamans"));
-        ENTLIB_ASSERT(not sysCreat->root.at("Faction")->isSet()); // Not overrided
-        ENTLIB_ASSERT(sysCreat->root.at("Inventory")->getString() == std::string("KaiWOLgrey"));
-        ENTLIB_ASSERT(not sysCreat->root.at("Inventory")->isSet()); // Not overrided
+        ENTLIB_ASSERT(sysCreat->root->at("Faction")->getString() == std::string("Shamans"));
+        ENTLIB_ASSERT(not sysCreat->root->at("Faction")->isSet()); // Not overrided
+        ENTLIB_ASSERT(sysCreat->root->at("Inventory")->getString() == std::string("KaiWOLgrey"));
+        ENTLIB_ASSERT(not sysCreat->root->at("Inventory")->isSet()); // Not overrided
 
         // TEST read array
-        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->isSet()); // Arrays are always set
-        ENTLIB_ASSERT(sysCreat->root.at("ScriptList")->size() == 3);
+        ENTLIB_ASSERT(sysCreat->root->at("ScriptList")->isSet()); // Arrays are always set
+        ENTLIB_ASSERT(sysCreat->root->at("ScriptList")->size() == 3);
 
         // TEST default values
-        ENTLIB_ASSERT(sysCreat->root.at("Burried")->getBool() == false); // default
-        ENTLIB_ASSERT(not sysCreat->root.at("Burried")->isSet()); // default
-        ENTLIB_ASSERT(sysCreat->root.at("Name")->getString() == std::string()); // default
-        ENTLIB_ASSERT(not sysCreat->root.at("Name")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root->at("Burried")->getBool() == false); // default
+        ENTLIB_ASSERT(not sysCreat->root->at("Burried")->isSet()); // default
+        ENTLIB_ASSERT(sysCreat->root->at("Name")->getString() == std::string()); // default
+        ENTLIB_ASSERT(not sysCreat->root->at("Name")->isSet()); // default
     };
     testCreateInstanceOf("instance.create.entity");
     {
@@ -1463,12 +1470,12 @@ try
         Ent::Entity instanceOf(entlib, "TestResetInstanceOf");
         instanceOf.resetInstanceOf("prefab.entity");
         ENTLIB_ASSERT(instanceOf.getComponent("NetworkNode") != nullptr);
-        instanceOf.getComponent("TransformGD")->root.getFieldNames();
+        instanceOf.getComponent("TransformGD")->root->getFieldNames();
 
         // Test instanciation of a prefab Node
         Ent::Component* stickToTerrain = instanceOf.addComponent("StickToTerrain");
-        stickToTerrain->root.resetInstanceOf("test.StickToTerrain.node");
-        stickToTerrain->root.at("NormalRatio")->setFloat(0.6);
+        stickToTerrain->root->resetInstanceOf("test.StickToTerrain.node");
+        stickToTerrain->root->at("NormalRatio")->setFloat(0.6);
 
         entlib.saveEntity(instanceOf, "setInstanceOf.entity");
     }
@@ -1544,7 +1551,7 @@ try
 
         subs->embedded->getEntity("wolf_skeleton_lush")
             ->addComponent("ActorGD")
-            ->root.at("InSpiritWorld")
+            ->root->at("InSpiritWorld")
             ->setBool(true);
         entlib.saveEntity(*ent, "entity-subscene-override-saved.entity");
 
@@ -1613,18 +1620,18 @@ try
             for (char const* type : ent->getComponentTypes())
             {
                 printfmt("    Type \"%s\"\n", type);
-                Ent::Node const& root = ent->getComponent(type)->root;
+                Ent::Node const& root = *ent->getComponent(type)->root;
                 printNode("", root, "      ");
             }
         }
     }
 
     Ent::Component* heightObj = scene->getObjects().front()->addComponent("HeightObj");
-    heightObj->root.at("DisplaceNoiseList")->push();
+    heightObj->root->at("DisplaceNoiseList")->push();
 
-    scene->getObjects().front()->addComponent("BeamGeneratorGD")->root.getFieldNames();
+    scene->getObjects().front()->addComponent("BeamGeneratorGD")->root->getFieldNames();
     auto fieldNameCount =
-        scene->getObjects().front()->addComponent("HeightObj")->root.getFieldNames().size();
+        scene->getObjects().front()->addComponent("HeightObj")->root->getFieldNames().size();
     ENTLIB_ASSERT(fieldNameCount == 9);
 
     entlib.rawdataPath = current_path();
@@ -1642,16 +1649,16 @@ try
         Ent::printfmt("dumpNode(Override):\n");
         Ent::printfmt(
             "%s\n",
-            cinematicCmp->root.toJson(Ent::OverrideValueSource::Override, true).dump(4).c_str());
+            cinematicCmp->root->toJson(Ent::OverrideValueSource::Override, true).dump(4).c_str());
 
         Ent::printfmt("dumpNode(OverrideOrPrefab):\n");
         Ent::printfmt(
             "%s\n",
-            cinematicCmp->root.toJson(Ent::OverrideValueSource::OverrideOrPrefab, true).dump(4).c_str());
+            cinematicCmp->root->toJson(Ent::OverrideValueSource::OverrideOrPrefab, true).dump(4).c_str());
 
         Ent::printfmt("dumpNode(Any):\n");
         Ent::printfmt(
-            "%s\n", cinematicCmp->root.toJson(Ent::OverrideValueSource::Any, true).dump(4).c_str());
+            "%s\n", cinematicCmp->root->toJson(Ent::OverrideValueSource::Any, true).dump(4).c_str());
     }
     Ent::printfmt("Done\n");
     return EXIT_SUCCESS;

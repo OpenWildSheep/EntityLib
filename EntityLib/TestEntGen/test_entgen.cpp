@@ -12,16 +12,16 @@ try
     entlib.rawdataPath =
         std::filesystem::canonical(std::filesystem::current_path() / "../Test");
 
-    Ent::Node entNode = entlib.loadEntityAsNode("instance.entity");
-    auto ent = Entity(&entNode);
+    auto entNode = entlib.loadEntityAsNode("instance.entity");
+    auto ent = Entity(entNode.get());
 
     // Test Object
     auto name = ent.Name(); // inferred type : String
     static_assert(std::is_same_v<decltype(name), String>);
     auto components = ent.Components(); // inferred type : Components
     // Object Load
-    Ent::Node ent2node = Entity::load(entlib, "instance.entity");
-    auto ent2 = Entity(&ent2node);
+    auto ent2node = Entity::load(entlib, "instance.entity");
+    auto ent2 = Entity(ent2node.get());
     // Object save
     ent2.save("instance_test_save.entity");
 

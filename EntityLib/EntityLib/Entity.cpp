@@ -16,18 +16,18 @@ namespace Ent
     void Entity::computeMemory(MemoryProfiler& prof) const
     {
         name.computeMemory(prof);
-        for (auto&& name_comp : components)
+        for (auto&& [cmpname, comp] : components)
         {
-            prof.addMem("Entity::components::value", sizeof(name_comp));
-            prof.addMem("Entity::components::key", sizeof(std::get<0>(name_comp).size()));
-            std::get<1>(name_comp).computeMemory(prof);
+            prof.addMem("Entity::components::value", sizeof(cmpname) + sizeof(comp));
+            prof.addMem("Entity::components::key", sizeof(cmpname.size()));
+            comp->computeMemory(prof);
         }
         if (subSceneComponent)
         {
             subSceneComponent->computeMemory(prof);
         }
-        actorStates.computeMemory(prof);
-        color.computeMemory(prof);
+        actorStates->computeMemory(prof);
+        color->computeMemory(prof);
         thumbnail.computeMemory(prof);
         instanceOf.computeMemory(prof);
         maxActivationLevel.computeMemory(prof);
@@ -43,14 +43,14 @@ namespace Ent
     extern char const* actorStatesSchemaName;
     extern char const* colorSchemaName;
 
-    static Ent::Node makeDefaultActorStatesField(EntityLib const& _entlib)
+    static std::unique_ptr<Node> makeDefaultActorStatesField(EntityLib const& _entlib)
     {
         Ent::Subschema const& actorStatesSchema =
             AT(_entlib.schema.schema.allDefinitions, actorStatesSchemaName);
-        return Node{Array{&_entlib, &actorStatesSchema}, &actorStatesSchema};
+        return std::make_unique<Node>(Array{&_entlib, &actorStatesSchema}, &actorStatesSchema);
     }
 
-    Ent::Node makeDefaultColorField(EntityLib const& _entlib);
+    std::unique_ptr<Node> makeDefaultColorField(EntityLib const& _entlib);
 
     Entity::Entity(EntityLib const& _entlib, char const* _name)
         : entlib(&_entlib)
@@ -70,11 +70,11 @@ namespace Ent
     Entity::Entity(
         EntityLib const& _entlib,
         Override<String> _name,
-        std::map<std::string, Component> _components,
+        std::map<std::string, std::unique_ptr<Component>> _components,
         std::set<std::string> _removedComponents,
         std::unique_ptr<SubSceneComponent> _subSceneComponent,
-        Node _actorStates,
-        Node _color,
+        std::unique_ptr<Node> _actorStates,
+        std::unique_ptr<Node> _color,
         Override<String> _thumbnail,
         Override<String> _instanceOf,
         Override<Ent::ActivationLevel> _maxActivationLevel,
@@ -96,12 +96,12 @@ namespace Ent
 
     std::unique_ptr<Entity> Entity::clone() const
     {
-        std::map<std::string, Component> instComponents;
+        std::map<std::string, std::unique_ptr<Component>> instComponents;
         std::unique_ptr<SubSceneComponent> instSubSceneComponent;
 
-        for (auto&& name_comp : components)
+        for (auto&& [cmpname, comp] : components)
         {
-            instComponents.emplace(name_comp.first, name_comp.second);
+            instComponents.emplace(cmpname, comp->clone());
         }
         if (subSceneComponent != nullptr)
         {
@@ -114,8 +114,8 @@ namespace Ent
             std::move(instComponents),
             removedComponents,
             std::move(instSubSceneComponent),
-            actorStates,
-            color,
+            actorStates->clone(),
+            color->clone(),
             thumbnail,
             instanceOf,
             maxActivationLevel);
@@ -200,7 +200,7 @@ namespace Ent
         std::array<double, 4> col{};
         for (size_t i = 0; i < 4; ++i)
         {
-            col[i] = color.at(i)->getFloat();
+            col[i] = color->at(i)->getFloat();
         }
         return col;
     }
@@ -208,7 +208,7 @@ namespace Ent
     {
         for (size_t i = 0; i < 4; ++i)
         {
-            color.at(i)->setFloat(_color[i]);
+            color->at(i)->setFloat(_color[i]);
         }
     }
     Component* Entity::addComponent(char const* _type)
@@ -226,25 +226,25 @@ namespace Ent
             }
         }
         Ent::Subschema const& compSchema = *AT(entlib->schema.components, _type);
-        Ent::Component comp{
-            false, _type, entlib->loadNode(compSchema, json(), nullptr), 1, components.size()};
+        auto comp = std::make_unique<Component>(
+            false, _type, entlib->loadNode(compSchema, json(), nullptr), 1, components.size());
         removedComponents.erase(_type);
         auto&& [iter, inserted] = components.emplace(_type, std::move(comp));
         if (inserted)
         {
-            iter->second.root.setAddedInInsance(true);
+            iter->second->root->setAddedInInsance(true);
         }
-        return &(iter->second);
+        return iter->second.get();
     }
     Component const* Entity::getComponent(char const* _type) const
     {
         auto iter = components.find(_type);
-        return iter == components.end() ? nullptr : &(iter->second);
+        return iter == components.end() ? nullptr : iter->second.get();
     }
     Component* Entity::getComponent(char const* _type)
     {
         auto iter = components.find(_type);
-        return iter == components.end() ? nullptr : &(iter->second);
+        return iter == components.end() ? nullptr : iter->second.get();
     }
     void Entity::removeComponent(char const* _type)
     {
@@ -252,7 +252,7 @@ namespace Ent
         auto iter = components.find(_type);
         if (iter != end(components))
         {
-            Component const& comp = iter->second;
+            Component const& comp = *iter->second;
             if (comp.hasPrefab)
             {
                 removedComponents.insert(_type);
@@ -271,7 +271,7 @@ namespace Ent
         return types;
     }
 
-    std::map<std::string, Component> const& Entity::getComponents() const
+    std::map<std::string, std::unique_ptr<Component>> const& Entity::getComponents() const
     {
         return components;
     }
@@ -319,12 +319,12 @@ namespace Ent
 
     std::unique_ptr<Entity> Entity::makeInstanceOf() const
     {
-        std::map<std::string, Component> instComponents;
+        std::map<std::string, std::unique_ptr<Component>> instComponents;
         std::unique_ptr<SubSceneComponent> instSubSceneComponent;
 
         for (auto&& name_comp : components)
         {
-            instComponents.emplace(name_comp.first, name_comp.second.makeInstanceOf());
+            instComponents.emplace(name_comp.first, name_comp.second->makeInstanceOf());
         }
         if (subSceneComponent != nullptr)
         {
@@ -337,8 +337,8 @@ namespace Ent
             std::move(instComponents),
             std::set<std::string>{},
             std::move(instSubSceneComponent),
-            actorStates.makeInstanceOf(),
-            color.makeInstanceOf(),
+            actorStates->makeInstanceOf(),
+            color->makeInstanceOf(),
             thumbnail.makeInstanceOf(),
             instanceOf.makeInstanceOf(),
             maxActivationLevel.makeInstanceOf(),
@@ -349,14 +349,14 @@ namespace Ent
     bool Entity::hasOverride() const
     {
         //    If "InstanceOf" is set, this entity "hasOverride"
-        if (name.isSet() or color.hasOverride() or thumbnail.isSet() or actorStates.hasOverride()
+        if (name.isSet() or color->hasOverride() or thumbnail.isSet() or actorStates->hasOverride()
             or instanceOf.hasOverride())
         {
             return true;
         }
         for (auto&& name_comp : components)
         {
-            if (name_comp.second.hasOverride())
+            if (name_comp.second->hasOverride())
             {
                 return true;
             }
@@ -386,22 +386,23 @@ namespace Ent
         {
             prefab = entlib->getRelativePath(_prefab).generic_u8string();
             templ = entlib->loadEntityReadOnly(prefab.c_str(), nullptr);
+            for (auto const& [cmpType, superComp] : templ->getComponents())
+            {
+                superComp->root->checkParent(nullptr);
+            }
         }
         components.clear();
         removedComponents.clear();
-        for (auto const& type_comp : templ->getComponents())
+        for (auto const& [cmpType, superComp] : templ->getComponents())
         {
-            auto const& cmpType = std::get<0>(type_comp);
-            auto const& superComp = std::get<1>(type_comp);
+            superComp->root->checkParent(nullptr);
+            auto inst = superComp->root->makeInstanceOf();
+            inst->checkParent(nullptr);
             components.emplace(
                 cmpType,
-                Ent::Component{
-                    true,
-                    cmpType,
-                    superComp.root.makeInstanceOf(),
-                    superComp.version,
-                    superComp.index,
-                });
+                std::make_unique<Component>(
+                    true, cmpType, std::move(inst), superComp->version, superComp->index));
+            components[cmpType]->root->checkParent(nullptr);
         }
         auto prevName = name;
         name = templ->getNameValue().makeInstanceOf();
@@ -623,11 +624,11 @@ namespace Ent
 
         json& componentsNode = entNode["Components"] = json::array();
         std::vector<Component const*> sortedComp;
-        for (auto&& type_comp : getComponents())
+        for (auto&& [type, comp] : getComponents())
         {
-            sortedComp.push_back(&std::get<1>(type_comp));
+            sortedComp.push_back(comp.get());
         }
-        Component subscenePlaceholder{true, "SubScene", Node(), 1, 0};
+        Component subscenePlaceholder{true, "SubScene", std::make_unique<Node>(), 1, 0};
         if (SubSceneComponent const* subscene = getSubSceneComponent())
         {
             subscenePlaceholder.index = subscene->index;
@@ -659,13 +660,13 @@ namespace Ent
                     }
                 }
             }
-            else if (not comp->hasPrefab or comp->root.hasOverride())
+            else if (not comp->hasPrefab or comp->root->hasOverride())
             {
                 json compNode;
                 compNode.emplace("Version", comp->version);
                 compNode.emplace("Type", comp->type);
                 compNode.emplace(
-                    "Data", EntityLib::dumpNode(*AT(_schema.components, comp->type), comp->root));
+                    "Data", EntityLib::dumpNode(*AT(_schema.components, comp->type), *comp->root));
 
                 componentsNode.emplace_back(std::move(compNode));
             }
@@ -718,15 +719,15 @@ namespace Ent
         name.applyAllValues(_dest.name, _copyMode);
         thumbnail.applyAllValues(_dest.thumbnail, _copyMode);
         maxActivationLevel.applyAllValues(_dest.maxActivationLevel, _copyMode);
-        actorStates.applyAllValues(_dest.actorStates, _copyMode);
-        color.applyAllValues(_dest.color, _copyMode);
+        actorStates->applyAllValues(*_dest.actorStates, _copyMode);
+        color->applyAllValues(*_dest.color, _copyMode);
 
         for (auto&& name_comp : getComponents())
         {
             auto&& cmpName = name_comp.first;
             auto&& comp = name_comp.second;
             // addComponent has no effect if the component exist
-            comp.applyAllValues(*_dest.addComponent(cmpName.c_str()), _copyMode);
+            comp->applyAllValues(*_dest.addComponent(cmpName.c_str()), _copyMode);
         }
         std::vector<char const*> compToRemove;
         for (auto&& name_comp : _dest.getComponents())
@@ -754,14 +755,12 @@ namespace Ent
 
     std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
     {
-        std::map<std::string, Ent::Component> detComponents;
+        std::map<std::string, std::unique_ptr<Component>> detComponents;
         size_t cmpIndex = 0;
-        for (auto const& type_comp : getComponents())
+        for (auto const& [type, comp] : getComponents())
         {
-            auto const& type = std::get<0>(type_comp);
-            auto const& comp = std::get<1>(type_comp);
-
-            Ent::Component detachedComp{false, type, comp.root.detach(), 1, cmpIndex};
+            auto detachedComp =
+                std::make_unique<Component>(false, type, comp->root->detach(), 1, cmpIndex);
 
             detComponents.emplace(type, std::move(detachedComp));
             ++cmpIndex;
@@ -785,7 +784,7 @@ namespace Ent
             std::move(detComponents),
             std::set<std::string>{}, // removedComponents
             std::move(detSubSceneComponent),
-            actorStates.detach(),
+            actorStates->detach(),
             std::move(detachedColor),
             getThumbnailValue().detach(),
             Override<String>{},

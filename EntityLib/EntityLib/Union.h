@@ -10,12 +10,20 @@ namespace Ent
 
     struct Union
     {
-        Union(EntityLib const* _entityLib, Subschema const* _schema, Node&& _wrapper, size_t _typeIndex);
+        Union(
+            EntityLib const* _entityLib,
+            Subschema const* _schema,
+            std::unique_ptr<Node> _wrapper,
+            size_t _typeIndex);
+        Union(Union const& _other);
+        Union(Union&&) = default;
+        Union& operator=(Union const& _other);
+        Union& operator=(Union&&) = default;
 
         EntityLib const* entityLib = nullptr;
         Subschema const* schema = nullptr; ///< The schema of the object containing the oneOf field
         size_t typeIndex = 0; ///< Index of the type
-        value_ptr<Node> wrapper; ///< Node containing the className/classData
+        std::unique_ptr<Node> wrapper; ///< Node containing the className/classData
         Ent::Subschema::UnionMeta const* metaData = nullptr;
 
         bool typeOverriden = false;
@@ -43,6 +51,8 @@ namespace Ent
 
         void setParentNode(Node* _parentNode);
         void checkParent(Node const* _parentNode) const;
+
+        std::unique_ptr<Union> clone() const;
 
     private:
         Node* resetUnionTypeWithoutOverride(char const* _type);

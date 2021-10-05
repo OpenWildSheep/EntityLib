@@ -126,6 +126,16 @@ void setValue(Ent::Node& node, Value const& val)
     }
 }
 
+std::map<std::string, Component*> getComponents(Entity const& e)
+{
+    std::map<std::string, Component*> components;
+    for (auto&& [name, compPtr] : e.getComponents())
+    {
+        components.emplace(name, compPtr.get());
+    }
+    return components;
+}
+
 static py::list nodeGetKey(Node* _node)
 {
     auto const type = _node->getKeyType();
@@ -476,7 +486,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     pyComponent
         .def_readonly("type", &Component::type)
-        .def_readonly("root", &Component::root, py::return_value_policy::reference_internal)
+        .def_property_readonly("root", [](Component const& comp){ return comp.root.get();}, py::return_value_policy::reference_internal)
         .def_property_readonly(
             "is_used_in_editor", [](Component const& comp) { return comp.isUsedInEditor(); })
         .def_property_readonly(
@@ -518,9 +528,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("remove_component", &Entity::removeComponent)
         .def("remove_subscene_component", &Entity::removeSubSceneComponent)
         .def("get_component_types", &Entity::getComponentTypes)
-        .def("get_components", &Entity::getComponents, py::return_value_policy::reference_internal)
+        .def("get_components", &getComponents, py::return_value_policy::reference_internal)
         .def_property_readonly("components",
-            &Entity::getComponents,
+            &getComponents,
             py::return_value_policy::reference_internal)
         .def("get_actorstates", [](Entity* ent) { return &ent->getActorStates(); }, py::return_value_policy::reference_internal)
         .def_property_readonly("actorstates", [](Entity* ent) { return &ent->getActorStates(); }, py::return_value_policy::reference_internal)

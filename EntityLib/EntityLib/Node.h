@@ -65,10 +65,6 @@ namespace Ent
             Union>;
         Node() = default;
         Node(Value _val, Subschema const* _schema);
-        Node(Node const& _node);
-        Node(Node&& _node) noexcept;
-        Node& operator=(Node const& _node);
-        Node& operator=(Node&& _node) noexcept;
 
         /// @brief return the node containing the data and the type nodes (An element of the oneOf array)
         /// @pre type==Ent::DataType::oneOf
@@ -185,10 +181,10 @@ namespace Ent
 
         /// \cond PRIVATE
         /// Create a Node with the same value but which doesn't rely on prefab.
-        Node detach() const;
+        std::unique_ptr<Node> detach() const;
 
         /// Create a Node which is an "instance of" this one. With no override.
-        Node makeInstanceOf() const;
+        std::unique_ptr<Node> makeInstanceOf() const;
         /// \endcond
 
         /// @remark obsolete. Use resetInstanceOf
@@ -283,7 +279,14 @@ namespace Ent
             addedInInstance = _added;
         }
 
+        std::unique_ptr<Node> clone() const;
+
     private:
+        Node(Node const& _node) = delete;
+        Node(Node&& _node) noexcept = delete;
+        Node& operator=(Node const& _node) = delete;
+        Node& operator=(Node&& _node) noexcept = delete;
+
         void checkMap(char const* _calledMethod) const; ///< Throw exception if not a set/map
 
         Node* parentNode = nullptr;

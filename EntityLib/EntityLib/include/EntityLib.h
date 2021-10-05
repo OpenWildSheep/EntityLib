@@ -87,13 +87,14 @@ namespace Ent
         loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const;
 
         /// Load an entity file into a Node
-        Node loadEntityAsNode(std::filesystem::path const& _entityPath) const;
+        std::unique_ptr<Node> loadEntityAsNode(std::filesystem::path const& _entityPath) const;
 
         /// Load a scene file into a Node
-        Node loadSceneAsNode(std::filesystem::path const& _scenePath) const;
+        std::unique_ptr<Node> loadSceneAsNode(std::filesystem::path const& _scenePath) const;
 
         /// Load any entitylib file into a Node, giving a schema
-        Node loadFileAsNode(std::filesystem::path const& _path, Ent::Subschema const& _schema) const;
+        std::unique_ptr<Node>
+        loadFileAsNode(std::filesystem::path const& _path, Ent::Subschema const& _schema) const;
 
         /// Load the Entity at path _entityPath
         std::unique_ptr<Entity> loadEntity(
@@ -133,20 +134,20 @@ namespace Ent
             bool _forceWriteKey = false);
 
         /// Instanciate the given _prefab Node
-        Node makeNodeInstanceOf(
+        std::unique_ptr<Node> makeNodeInstanceOf(
             char const* _schemaName, ///< Name of the schema
             char const* _prefab ///< Path to the prefab Entity
         ) const;
 
         /// Instanciate the given _prefab Entity
-        Node makeEntityNodeInstanceOf(char const* _prefab ///< Path to the prefab Entity
+        std::unique_ptr<Node> makeEntityNodeInstanceOf(char const* _prefab ///< Path to the prefab Entity
         ) const;
 
         /// Create a Node with the given _schemaName
-        Node makeNode(char const* _schemaName) const;
+        std::unique_ptr<Node> makeNode(char const* _schemaName) const;
 
         /// Create a Node with the Entity's schema
-        Node makeEntityNode() const;
+        std::unique_ptr<Node> makeEntityNode() const;
 
         /// @brief Create an Entity which instanciate an other.
         ///
@@ -179,7 +180,7 @@ namespace Ent
         /// @param _path : A file path absolute or relative but inside the rawdata path
         std::filesystem::path getRelativePath(std::filesystem::path const& _path) const;
 
-        Ent::Node loadNode(
+        std::unique_ptr<Ent::Node> loadNode(
             Ent::Subschema const& _nodeSchema,
             nlohmann::json const& _data,
             Ent::Node const* _super,
@@ -215,25 +216,25 @@ namespace Ent
             LoadFunc&& load,
             Type const* _super) const;
 
-        Ent::Node loadObject(
+        std::unique_ptr<Node> loadObject(
             Ent::Subschema const& _nodeSchema,
             nlohmann::json const& _data,
             Ent::Node const* _super,
             nlohmann::json const* _default = nullptr) const;
 
-        Ent::Node loadUnion(
+        std::unique_ptr<Node> loadUnion(
             Ent::Subschema const& _nodeSchema,
             nlohmann::json const& _data,
             Ent::Node const* _super,
             nlohmann::json const* _default = nullptr) const;
 
-        Ent::Node loadArray(
+        std::unique_ptr<Node> loadArray(
             Ent::Subschema const& _nodeSchema,
             nlohmann::json const& _data,
             Ent::Node const* _super,
             nlohmann::json const* _default = nullptr) const;
 
-        static Ent::Node loadPrimitive(
+        static std::unique_ptr<Node> loadPrimitive(
             Ent::Subschema const& _nodeSchema,
             nlohmann::json const& _data,
             Ent::Node const* _super,

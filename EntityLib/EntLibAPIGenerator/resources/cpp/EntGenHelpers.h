@@ -837,7 +837,7 @@ namespace Ent
             }
 
             /// Create a Node which is an "instance of" this one. With no override.
-            Node makeInstanceOf() const
+            std::unique_ptr<Node> makeInstanceOf() const
             {
                 return node->makeInstanceOf();
             }

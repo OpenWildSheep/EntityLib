@@ -26,6 +26,10 @@ namespace Ent
     struct Array
     {
         Array(EntityLib const* _entlib, Subschema const* _schema);
+        Array(Array const& _other) = default;
+        Array(Array&&) = default;
+        Array& operator=(Array const&) = default;
+        Array& operator=(Array&&) = default;
 
         bool hasOverride() const; ///< Recursively check if there is an override inside
         bool hasPrefabValue() const; ///< Recursively check if value is set in a prefab
@@ -85,11 +89,18 @@ namespace Ent
         void unset(); ///< Unset recursively all values overriden in instance (return to prefab values)
 
         // **************************** For array initialization **********************************
-        Node* initAdd(OverrideValueLocation, Node _node, bool _addedInInstance); ///< @pre This _node is not yet added
+        Node* initAdd(
+            OverrideValueLocation,
+            std::unique_ptr<Node> _node,
+            bool _addedInInstance); ///< @pre This _node is not yet added
         /// @pre hasKey() and the key doesn't exist in map
-        Node* mapInitInsert(OverrideValueLocation, Map::KeyType _key, Node _node, bool _addedInInstance);
+        Node* mapInitInsert(
+            OverrideValueLocation,
+            Map::KeyType _key,
+            std::unique_ptr<Node> _node,
+            bool _addedInInstance);
         /// @pre not hasKey()
-        Node* arrayInitPush(Node _node, bool _addedInInstance);
+        Node* arrayInitPush(std::unique_ptr<Node> _node, bool _addedInInstance);
 
         void applyAllValues(Array& _dest, CopyMode _copyMode) const;
 

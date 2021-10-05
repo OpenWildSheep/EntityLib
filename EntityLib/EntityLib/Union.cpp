@@ -10,15 +10,35 @@ using namespace nlohmann;
 
 namespace Ent
 {
-    Union::Union(EntityLib const* _entityLib, Subschema const* _schema, Node&& _wrapper, size_t _typeIndex)
+    Union::Union(
+        EntityLib const* _entityLib,
+        Subschema const* _schema,
+        std::unique_ptr<Node> _wrapper,
+        size_t _typeIndex)
         : entityLib(_entityLib)
         , schema(_schema)
         , typeIndex(_typeIndex)
-        , wrapper(make_value<Node>(std::move(_wrapper)))
+        , wrapper(std::move(_wrapper))
         , metaData(&(std::get<Subschema::UnionMeta>(schema->meta)))
     {
         auto* typeNode = wrapper->at(metaData->typeField.c_str());
         typeOverriden = typeNode->hasOverride();
+    }
+
+    Union::Union(Union const& _other)
+        : entityLib(_other.entityLib)
+        , schema(_other.schema)
+        , typeIndex(_other.typeIndex)
+        , wrapper(_other.wrapper->clone())
+        , metaData(_other.metaData)
+    {
+    }
+
+    Union& Union::operator=(Union const& _other)
+    {
+        Union tmp(_other);
+        std::swap(*this, tmp);
+        return *this;
     }
 
     bool Union::hasOverride() const
@@ -38,7 +58,7 @@ namespace Ent
 
     Node const* Union::getUnionData() const
     {
-        if (wrapper.has_value())
+        if (wrapper != nullptr)
         {
             return wrapper->at(metaData->dataField.c_str());
         }
@@ -50,7 +70,7 @@ namespace Ent
 
     char const* Union::getUnionType() const
     {
-        if (wrapper.has_value())
+        if (wrapper != nullptr)
         {
             ENTLIB_ASSERT_MSG(
                 wrapper->count(metaData->typeField.c_str()),
@@ -152,6 +172,11 @@ namespace Ent
     void Ent::Union::checkParent(Node const* _parentNode) const
     {
         wrapper->checkParent(_parentNode);
+    }
+
+    std::unique_ptr<Union> Ent::Union::clone() const
+    {
+        return std::make_unique<Union>(entityLib, schema, wrapper->clone(), typeIndex);
     }
 
 } // namespace Ent

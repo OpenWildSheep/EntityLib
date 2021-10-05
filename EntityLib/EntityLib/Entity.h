@@ -33,8 +33,8 @@ namespace Ent
             std::map<std::string, std::unique_ptr<Component>> _components,
             std::set<std::string> _removedComponents,
             std::unique_ptr<SubSceneComponent> _subSceneComponent,
-            std::unique_ptr<Node> _actorStates = {},
-            std::unique_ptr<Node> _color = {},
+            NodeUniquePtr _actorStates = {},
+            NodeUniquePtr _color = {},
             Override<String> _thumbnail = {},
             Override<String> _instanceOf = {},
             Override<ActivationLevel> _maxActivationLevel = {},
@@ -193,8 +193,8 @@ namespace Ent
         std::map<std::string, std::unique_ptr<Component>> components; ///< All components of this Entity
         std::set<std::string> removedComponents;
         std::unique_ptr<SubSceneComponent> subSceneComponent; ///< the optional SubScene Component
-        std::unique_ptr<Node> actorStates; ///< All actorStates of this Entity
-        std::unique_ptr<Node> color; ///< The optional Color of the Entity
+        NodeUniquePtr actorStates; ///< All actorStates of this Entity
+        NodeUniquePtr color; ///< The optional Color of the Entity
         Override<String> thumbnail; ///< Path to the thumbnail mesh (.wthumb)
         Override<String> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
         Override<ActivationLevel> maxActivationLevel; ///< Maximum activation level of this entity in runtime

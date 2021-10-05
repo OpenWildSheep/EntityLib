@@ -49,6 +49,8 @@ namespace Ent
     struct Subschema;
     class EntityLib;
 
+    struct Node;
+
     /// Property node. Can contains any type in Ent::DataType
     struct ENTLIB_DLLEXPORT Node
     {
@@ -63,7 +65,6 @@ namespace Ent
             Override<bool>,
             Override<EntityRef>,
             Union>;
-        Node() = default;
         Node(Value _val, Subschema const* _schema);
 
         /// @brief return the node containing the data and the type nodes (An element of the oneOf array)
@@ -181,10 +182,10 @@ namespace Ent
 
         /// \cond PRIVATE
         /// Create a Node with the same value but which doesn't rely on prefab.
-        std::unique_ptr<Node> detach() const;
+        NodeUniquePtr detach() const;
 
         /// Create a Node which is an "instance of" this one. With no override.
-        std::unique_ptr<Node> makeInstanceOf() const;
+        NodeUniquePtr makeInstanceOf() const;
         /// \endcond
 
         /// @remark obsolete. Use resetInstanceOf
@@ -279,7 +280,7 @@ namespace Ent
             addedInInstance = _added;
         }
 
-        std::unique_ptr<Node> clone() const;
+        NodeUniquePtr clone() const;
 
     private:
         Node(Node const& _node) = delete;

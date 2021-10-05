@@ -91,16 +91,13 @@ namespace Ent
         // **************************** For array initialization **********************************
         Node* initAdd(
             OverrideValueLocation,
-            std::unique_ptr<Node> _node,
+            NodeUniquePtr _node,
             bool _addedInInstance); ///< @pre This _node is not yet added
         /// @pre hasKey() and the key doesn't exist in map
         Node* mapInitInsert(
-            OverrideValueLocation,
-            Map::KeyType _key,
-            std::unique_ptr<Node> _node,
-            bool _addedInInstance);
+            OverrideValueLocation, Map::KeyType _key, NodeUniquePtr _node, bool _addedInInstance);
         /// @pre not hasKey()
-        Node* arrayInitPush(std::unique_ptr<Node> _node, bool _addedInInstance);
+        Node* arrayInitPush(NodeUniquePtr _node, bool _addedInInstance);
 
         void applyAllValues(Array& _dest, CopyMode _copyMode) const;
 

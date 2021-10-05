@@ -31,9 +31,9 @@ namespace Ent
 
         struct Element
         {
-            std::unique_ptr<Node> node;
+            NodeUniquePtr node;
             Override<bool> isPresent;
-            Element(std::unique_ptr<Node> _node = {})
+            Element(NodeUniquePtr _node = {})
                 : node(std::move(_node))
             {
             }
@@ -66,11 +66,8 @@ namespace Ent
         Node* get(KeyType const& _key);
         Ent::Node* insert(KeyType const& _key);
         bool isErased(KeyType const& _key) const;
-        Ent::Node* insert(
-            OverrideValueLocation _loc,
-            KeyType _key,
-            std::unique_ptr<Node> _node,
-            bool _addedInInstance);
+        Ent::Node*
+        insert(OverrideValueLocation _loc, KeyType _key, NodeUniquePtr _node, bool _addedInInstance);
         Ent::Node* rename(KeyType const& _key, KeyType const& _newKey);
         void checkInvariants() const;
         std::vector<Node const*> getItemsWithRemoved() const;
@@ -94,10 +91,7 @@ namespace Ent
     private:
         Element& insertImpl(KeyType const& _key);
         Element& insertImpl(
-            OverrideValueLocation _loc,
-            KeyType _key,
-            std::unique_ptr<Node> _node,
-            bool _addedInInstance);
+            OverrideValueLocation _loc, KeyType _key, NodeUniquePtr _node, bool _addedInInstance);
         template <typename M>
         static auto getItemsImpl(M* self);
 

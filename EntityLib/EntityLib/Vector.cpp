@@ -176,7 +176,7 @@ tl::optional<size_t> Ent::Vector::getRawSize(OverrideValueLocation _location) co
     return m_arraySize.getRaw(_location);
 }
 
-Ent::Node* Ent::Vector::initPush(std::unique_ptr<Node> _node, bool _addedInInstance)
+Ent::Node* Ent::Vector::initPush(NodeUniquePtr _node, bool _addedInInstance)
 {
     ENTLIB_ASSERT(
         m_schema->singularItems == nullptr

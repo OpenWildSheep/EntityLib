@@ -8,7 +8,7 @@ using namespace nlohmann;
 namespace Ent
 {
     Component::Component(
-        bool _hasPrefab, std::string _type, std::unique_ptr<Node> _root, size_t _version, size_t _index)
+        bool _hasPrefab, std::string _type, NodeUniquePtr _root, size_t _version, size_t _index)
         : type(std::move(_type))
         , root(std::move(_root))
         , version(_version)

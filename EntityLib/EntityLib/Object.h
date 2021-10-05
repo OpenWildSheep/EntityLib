@@ -14,10 +14,10 @@ namespace Ent
     struct ObjField
     {
         char const* name = nullptr;
-        std::unique_ptr<Node> node;
+        NodeUniquePtr node;
         uint32_t fieldIdx = 0;
 
-        ObjField(char const* _name = nullptr, std::unique_ptr<Node> _node = {}, uint32_t _fieldIdx = 0)
+        ObjField(char const* _name = nullptr, NodeUniquePtr _node = {}, uint32_t _fieldIdx = 0)
             : name(_name)
             , node(std::move(_node))
             , fieldIdx(_fieldIdx)

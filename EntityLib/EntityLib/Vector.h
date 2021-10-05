@@ -45,7 +45,7 @@ namespace Ent
         void clear();
         void computeMemory(MemoryProfiler& prof) const;
         Node* push();
-        Node* initPush(std::unique_ptr<Node> _node, bool _addedInInstance);
+        Node* initPush(NodeUniquePtr _node, bool _addedInInstance);
         Vector detach() const;
         Vector makeInstanceOf() const;
         std::unique_ptr<Vector> clone() const;
@@ -59,7 +59,7 @@ namespace Ent
     private:
         EntityLib const* m_entlib = nullptr;
         Subschema const* m_schema = nullptr;
-        std::vector<std::unique_ptr<Node>> m_data; ///< List of items of the array
+        std::vector<NodeUniquePtr> m_data; ///< List of items of the array
         Override<uint64_t> m_arraySize; ///< Size of the array, to keep track on array size changes
     };
 } // namespace Ent

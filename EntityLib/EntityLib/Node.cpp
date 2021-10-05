@@ -59,9 +59,9 @@ namespace Ent
         return *this;
     }*/
 
-    std::unique_ptr<Node> Node::clone() const
+    NodeUniquePtr Node::clone() const
     {
-        auto newNode = std::make_unique<Node>(value, schema);
+        auto newNode = getEntityLib()->newNode(value, schema);
         newNode->parentNode = parentNode;
         newNode->addedInInstance = addedInInstance;
         newNode->updateParents();
@@ -415,18 +415,18 @@ namespace Ent
         Subschema const* schema;
 
         template <typename T>
-        std::unique_ptr<Node> operator()(T const& _ov) const
+        NodeUniquePtr operator()(T const& _ov) const
         {
-            return std::make_unique<Node>(_ov.detach(), schema);
+            return schema->rootSchema->entityLib->newNode(_ov.detach(), schema);
         }
 
-        std::unique_ptr<Node> operator()(Null const&) const
+        NodeUniquePtr operator()(Null const&) const
         {
-            return std::make_unique<Node>(Null{}, schema);
+            return schema->rootSchema->entityLib->newNode(Null{}, schema);
         }
     };
 
-    std::unique_ptr<Node> Node::detach() const
+    NodeUniquePtr Node::detach() const
     {
         return std::visit(Detach{schema}, value);
     }
@@ -436,18 +436,18 @@ namespace Ent
         Subschema const* schema;
 
         template <typename T>
-        std::unique_ptr<Node> operator()(T const& _ov) const
+        NodeUniquePtr operator()(T const& _ov) const
         {
-            return std::make_unique<Node>(_ov.makeInstanceOf(), schema);
+            return schema->rootSchema->entityLib->newNode(_ov.makeInstanceOf(), schema);
         }
 
-        std::unique_ptr<Node> operator()(Null const&) const
+        NodeUniquePtr operator()(Null const&) const
         {
-            return std::make_unique<Node>(Null{}, schema);
+            return schema->rootSchema->entityLib->newNode(Null{}, schema);
         }
     };
 
-    std::unique_ptr<Node> Node::makeInstanceOf() const
+    NodeUniquePtr Node::makeInstanceOf() const
     {
         return std::visit(MakeInstanceOf{schema}, value);
     }

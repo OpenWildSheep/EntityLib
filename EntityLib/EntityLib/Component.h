@@ -9,18 +9,14 @@ namespace Ent
     struct Component
     {
         std::string type; ///< Component type (ex : Transform, VisualGD, HeightObj ...)
-        std::unique_ptr<Node> root; ///< Root node of the component. Always of type Ent::DataType::object
+        NodeUniquePtr root; ///< Root node of the component. Always of type Ent::DataType::object
         size_t version{}; ///< @todo remove?
         size_t index{}; ///< Useful to keep the componants order in the json file. To make diffs easier.
         DeleteCheck deleteCheck;
         bool hasPrefab{}; ///< True if it overrides an other component (not just default)
 
         Component(
-            bool _hasPrefab,
-            std::string _type,
-            std::unique_ptr<Node> _root,
-            size_t _version,
-            size_t _index);
+            bool _hasPrefab, std::string _type, NodeUniquePtr _root, size_t _version, size_t _index);
 
         std::unique_ptr<Component> clone();
 

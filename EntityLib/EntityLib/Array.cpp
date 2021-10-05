@@ -110,8 +110,7 @@ bool Ent::Array::isTuple() const
     return std::get<Vector>(m_data).isTuple();
 }
 
-Ent::Node*
-Ent::Array::initAdd(OverrideValueLocation loc, std::unique_ptr<Node> _node, bool _addedInInstance)
+Ent::Node* Ent::Array::initAdd(OverrideValueLocation loc, NodeUniquePtr _node, bool _addedInInstance)
 {
     if (hasKey())
     {
@@ -125,7 +124,7 @@ Ent::Array::initAdd(OverrideValueLocation loc, std::unique_ptr<Node> _node, bool
 }
 
 Ent::Node* Ent::Array::mapInitInsert(
-    OverrideValueLocation _loc, Map::KeyType _key, std::unique_ptr<Node> _node, bool _addedInInstance)
+    OverrideValueLocation _loc, Map::KeyType _key, NodeUniquePtr _node, bool _addedInInstance)
 {
     ENTLIB_ASSERT_MSG(std::holds_alternative<Map>(m_data), "Can only mapInsert on map or set");
     return std::get<Map>(m_data).insert(_loc, std::move(_key), std::move(_node), _addedInInstance);
@@ -211,7 +210,7 @@ void Ent::Array::computeMemory(MemoryProfiler& _prof) const
     std::visit([&_prof](auto& a) { return a.computeMemory(_prof); }, m_data);
 }
 
-Ent::Node* Ent::Array::arrayInitPush(std::unique_ptr<Node> _node, bool _addedInInstance)
+Ent::Node* Ent::Array::arrayInitPush(NodeUniquePtr _node, bool _addedInInstance)
 {
     ENTLIB_ASSERT_MSG(not hasKey(), "Can't 'push' in a map or set. Use 'mapInsert'.");
     return std::get<Vector>(m_data).initPush(std::move(_node), _addedInInstance);

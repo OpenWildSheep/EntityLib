@@ -101,7 +101,7 @@ namespace Ent
             json nodeData = loadJsonFile(entlib->rawdataPath, _prefabNodePath);
             auto prefabNode = entlib->loadNode(*schema, nodeData, nullptr);
             // Get the keyfield
-            std::unique_ptr<Node> keyField;
+            NodeUniquePtr keyField;
             for (ObjField& objfield : nodes)
             {
                 auto&& field = objfield.node;

@@ -27,7 +27,7 @@ namespace Ent
     char const* colorSchemaName = "./RuntimeComponents.json#/definitions/Color";
     char const* entitySchemaName = "./Scene-schema.json#/definitions/Entity";
     char const* sceneSchemaName = "./Scene-schema.json#/definitions/Scene";
-    std::unique_ptr<Node> makeDefaultColorField(EntityLib const& _entlib)
+    NodeUniquePtr makeDefaultColorField(EntityLib const& _entlib)
     {
         Ent::Subschema const& colorSchema = AT(_entlib.schema.schema.allDefinitions, colorSchemaName);
         return _entlib.loadNode(colorSchema, json(), nullptr);
@@ -412,11 +412,11 @@ struct MergeMapOverride
         struct NodeWrapper
         {
             //TODO : Add default values when C++17
-            std::unique_ptr<Node> node;
+            NodeUniquePtr node;
             OverrideValueLocation loc;
             bool removed;
 
-            NodeWrapper(std::unique_ptr<Node> _node, OverrideValueLocation _loc, bool _removed)
+            NodeWrapper(NodeUniquePtr _node, OverrideValueLocation _loc, bool _removed)
                 : node(std::move(_node))
                 , loc(_loc)
                 , removed(_removed)
@@ -549,13 +549,16 @@ struct MergeMapOverride
 };
 
 std::unique_ptr<Ent::Node> Ent::EntityLib::loadPrimitive(
-    Ent::Subschema const& _nodeSchema, json const& _data, Ent::Node const* _super, json const* _default)
+    Ent::Subschema const& _nodeSchema,
+    json const& _data,
+    Ent::Node const* _super,
+    json const* _default) const
 {
     std::unique_ptr<Ent::Node> result;
 
     switch (_nodeSchema.type)
     {
-    case Ent::DataType::null: result = std::make_unique<Node>(Ent::Null{}, &_nodeSchema); break;
+    case Ent::DataType::null: result = newNode(Ent::Null{}, &_nodeSchema); break;
     case Ent::DataType::string:
     {
         std::string def;
@@ -580,7 +583,7 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::loadPrimitive(
         tl::optional<std::string> const val =
             _data.is_string() ? tl::optional<std::string>(_data.get<std::string>()) :
                                 tl::optional<std::string>(tl::nullopt);
-        result = std::make_unique<Node>(Ent::Override<String>(def, supVal, val), &_nodeSchema);
+        result = newNode(Ent::Override<String>(def, supVal, val), &_nodeSchema);
     }
     break;
     case Ent::DataType::boolean:
@@ -591,7 +594,7 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::loadPrimitive(
                                               tl::optional<bool>(tl::nullopt);
         tl::optional<bool> const val = _data.is_boolean() ? tl::optional<bool>(_data.get<bool>()) :
                                                             tl::optional<bool>(tl::nullopt);
-        result = std::make_unique<Node>(Ent::Override<bool>(def, supVal, val), &_nodeSchema);
+        result = newNode(Ent::Override<bool>(def, supVal, val), &_nodeSchema);
     }
     break;
     case Ent::DataType::integer:
@@ -603,7 +606,7 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::loadPrimitive(
         tl::optional<int64_t> const val = _data.is_number_integer() or _data.is_number_unsigned() ?
                                               tl::optional<int64_t>(_data.get<int64_t>()) :
                                               tl::optional<int64_t>(tl::nullopt);
-        result = std::make_unique<Node>(Ent::Override<int64_t>(def, supVal, val), &_nodeSchema);
+        result = newNode(Ent::Override<int64_t>(def, supVal, val), &_nodeSchema);
     }
     break;
     case Ent::DataType::number:
@@ -616,7 +619,7 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::loadPrimitive(
             _data.is_number_float() or _data.is_number_integer() or _data.is_number_unsigned() ?
                 tl::optional<double>(_data.get<double>()) :
                 tl::optional<double>(tl::nullopt);
-        result = std::make_unique<Node>(Ent::Override<double>(def, supVal, val), &_nodeSchema);
+        result = newNode(Ent::Override<double>(def, supVal, val), &_nodeSchema);
     }
     break;
     case Ent::DataType::entityRef:
@@ -637,8 +640,7 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::loadPrimitive(
             refString.has_value() ? tl::optional<Ent::EntityRef>(Ent::EntityRef{refString.value()}) :
                                     tl::optional<Ent::EntityRef>(tl::nullopt);
 
-        result =
-            std::make_unique<Node>(Ent::Override<Ent::EntityRef>(def, supVal, val), &_nodeSchema);
+        result = newNode(Ent::Override<Ent::EntityRef>(def, supVal, val), &_nodeSchema);
     }
     break;
     case Ent::DataType::object: [[fallthrough]];
@@ -752,7 +754,7 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::loadObject(
             }
         }
         std::sort(begin(object), end(object), Ent::CompObject());
-        auto result = std::make_unique<Node>(std::move(object), &_nodeSchema);
+        auto result = newNode(std::move(object), &_nodeSchema);
         result->checkParent(nullptr);
         return result;
     }
@@ -1019,7 +1021,7 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::loadArray(
         uint64_t defaultArraySize = _nodeSchema.linearItems->size();
         arr.arraySetSize(Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt));
     }
-    return std::make_unique<Node>(std::move(arr), &_nodeSchema);
+    return newNode(std::move(arr), &_nodeSchema);
 }
 
 std::unique_ptr<Ent::Node> Ent::EntityLib::loadUnion(
@@ -1085,7 +1087,7 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::loadUnion(
                 or &schemaTocheck.get() == superUnionDataWrapper->getSchema());
             auto dataNode = loadNode(schemaTocheck.get(), _data, superUnionDataWrapper, _default);
             Ent::Union un{this, &_nodeSchema, std::move(dataNode), size_t(subSchemaIndex)};
-            result = std::make_unique<Node>(std::move(un), &_nodeSchema);
+            result = newNode(std::move(un), &_nodeSchema);
             typeFound = true;
         }
     }
@@ -1096,7 +1098,7 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::loadUnion(
         std::unique_ptr<Ent::Node> dataNode =
             loadNode(_nodeSchema.oneOf->front().get(), _data, nullptr, nullptr);
         Ent::Union un(this, &_nodeSchema, std::move(dataNode), 0);
-        result = std::make_unique<Node>(std::move(un), &_nodeSchema);
+        result = newNode(std::move(un), &_nodeSchema);
     }
     return result;
 }
@@ -1477,7 +1479,7 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
         superActivationLevel.makeOverridedInstanceOf(maxActivationLevel);
 
     // Color
-    std::unique_ptr<Node> ovColor = Ent::makeDefaultColorField(*this);
+    NodeUniquePtr ovColor = Ent::makeDefaultColorField(*this);
     if (_entNode.contains("Color"))
     {
         Ent::Subschema const& colorSchema = AT(schema.schema.allDefinitions, Ent::colorSchemaName);
@@ -1495,8 +1497,7 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
     // ActorStates
     Ent::Subschema const& actorStatesSchema =
         AT(schema.schema.allDefinitions, Ent::actorStatesSchemaName);
-    auto ovActorStates =
-        std::make_unique<Node>(Ent::Array(this, &actorStatesSchema), &actorStatesSchema);
+    auto ovActorStates = newNode(Ent::Array(this, &actorStatesSchema), &actorStatesSchema);
     if (_entNode.contains("ActorStates"))
     {
         ovActorStates =
@@ -1813,6 +1814,11 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::makeNode(char const* _schemaName) con
     return loadNode(*getSchema(_schemaName), json(), nullptr);
 }
 
+std::unique_ptr<Ent::Node> Ent::EntityLib::newNode(Node::Value val, Subschema const* _subschema) const
+{
+    return std::make_unique<Ent::Node>(std::move(val), _subschema);
+}
+
 std::unique_ptr<Ent::Node> Ent::EntityLib::makeEntityNode() const
 {
     return makeNode(entitySchemaName);
@@ -1949,7 +1955,7 @@ void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const&
         {},
         {},
         std::make_unique<SubSceneComponent>(this, false, 0, _scene.clone()),
-        std::make_unique<Node>(Array{this, &actorStatesSchema}, &actorStatesSchema),
+        newNode(Array{this, &actorStatesSchema}, &actorStatesSchema),
         Ent::makeDefaultColorField(*this),
         {thumbNailPath});
 

@@ -46,7 +46,7 @@ namespace Ent
     class ENTLIB_DLLEXPORT EntityLib
     {
     public:
-        Pool<Node> nodePool;
+        mutable Pool<Node> nodePool;
         /// @todo Make public attribute private?
         std::filesystem::path rootPath; ///< Path to the perforce root (X:/)
         std::filesystem::path rawdataPath; ///< Path to the RawData dir in the perforce root (X:/RawData)
@@ -87,13 +87,13 @@ namespace Ent
         loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const;
 
         /// Load an entity file into a Node
-        std::unique_ptr<Node> loadEntityAsNode(std::filesystem::path const& _entityPath) const;
+        NodeUniquePtr loadEntityAsNode(std::filesystem::path const& _entityPath) const;
 
         /// Load a scene file into a Node
-        std::unique_ptr<Node> loadSceneAsNode(std::filesystem::path const& _scenePath) const;
+        NodeUniquePtr loadSceneAsNode(std::filesystem::path const& _scenePath) const;
 
         /// Load any entitylib file into a Node, giving a schema
-        std::unique_ptr<Node>
+        NodeUniquePtr
         loadFileAsNode(std::filesystem::path const& _path, Ent::Subschema const& _schema) const;
 
         /// Load the Entity at path _entityPath
@@ -134,20 +134,22 @@ namespace Ent
             bool _forceWriteKey = false);
 
         /// Instanciate the given _prefab Node
-        std::unique_ptr<Node> makeNodeInstanceOf(
+        NodeUniquePtr makeNodeInstanceOf(
             char const* _schemaName, ///< Name of the schema
             char const* _prefab ///< Path to the prefab Entity
         ) const;
 
         /// Instanciate the given _prefab Entity
-        std::unique_ptr<Node> makeEntityNodeInstanceOf(char const* _prefab ///< Path to the prefab Entity
+        NodeUniquePtr makeEntityNodeInstanceOf(char const* _prefab ///< Path to the prefab Entity
         ) const;
 
         /// Create a Node with the given _schemaName
-        std::unique_ptr<Node> makeNode(char const* _schemaName) const;
+        NodeUniquePtr makeNode(char const* _schemaName) const;
+
+        NodeUniquePtr newNode(Node::Value val, Subschema const* _subschema) const;
 
         /// Create a Node with the Entity's schema
-        std::unique_ptr<Node> makeEntityNode() const;
+        NodeUniquePtr makeEntityNode() const;
 
         /// @brief Create an Entity which instanciate an other.
         ///
@@ -216,29 +218,29 @@ namespace Ent
             LoadFunc&& load,
             Type const* _super) const;
 
-        std::unique_ptr<Node> loadObject(
+        NodeUniquePtr loadObject(
             Ent::Subschema const& _nodeSchema,
             nlohmann::json const& _data,
             Ent::Node const* _super,
             nlohmann::json const* _default = nullptr) const;
 
-        std::unique_ptr<Node> loadUnion(
+        NodeUniquePtr loadUnion(
             Ent::Subschema const& _nodeSchema,
             nlohmann::json const& _data,
             Ent::Node const* _super,
             nlohmann::json const* _default = nullptr) const;
 
-        std::unique_ptr<Node> loadArray(
+        NodeUniquePtr loadArray(
             Ent::Subschema const& _nodeSchema,
             nlohmann::json const& _data,
             Ent::Node const* _super,
             nlohmann::json const* _default = nullptr) const;
 
-        static std::unique_ptr<Node> loadPrimitive(
+        NodeUniquePtr loadPrimitive(
             Ent::Subschema const& _nodeSchema,
             nlohmann::json const& _data,
             Ent::Node const* _super,
-            nlohmann::json const* _default = nullptr);
+            nlohmann::json const* _default = nullptr) const;
 
         mutable std::map<std::filesystem::path, EntityFile> m_entityCache;
         mutable std::map<std::filesystem::path, SceneFile> m_sceneCache;

@@ -451,7 +451,7 @@ bool Ent::Map::isErased(KeyType const& _key) const
 }
 
 Ent::Map::Element& Ent::Map::insertImpl(
-    OverrideValueLocation _loc, KeyType _key, std::unique_ptr<Node> _node, bool _addedInInstance)
+    OverrideValueLocation _loc, KeyType _key, NodeUniquePtr _node, bool _addedInInstance)
 {
     ENTLIB_ASSERT(get(_key) == nullptr);
     ENTLIB_ASSERT(m_itemMap.count(_key) == 0);
@@ -477,7 +477,7 @@ Ent::Map::Element& Ent::Map::insertImpl(
 }
 
 Ent::Node* Ent::Map::insert(
-    OverrideValueLocation _loc, KeyType _key, std::unique_ptr<Node> _node, bool _addedInInstance)
+    OverrideValueLocation _loc, KeyType _key, NodeUniquePtr _node, bool _addedInInstance)
 {
     return getEltValue(
         m_schema, insertImpl(_loc, std::move(_key), std::move(_node), _addedInInstance));

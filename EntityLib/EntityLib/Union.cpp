@@ -11,10 +11,7 @@ using namespace nlohmann;
 namespace Ent
 {
     Union::Union(
-        EntityLib const* _entityLib,
-        Subschema const* _schema,
-        std::unique_ptr<Node> _wrapper,
-        size_t _typeIndex)
+        EntityLib const* _entityLib, Subschema const* _schema, NodeUniquePtr _wrapper, size_t _typeIndex)
         : entityLib(_entityLib)
         , schema(_schema)
         , typeIndex(_typeIndex)

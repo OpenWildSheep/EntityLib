@@ -13,7 +13,7 @@ namespace Ent
         Union(
             EntityLib const* _entityLib,
             Subschema const* _schema,
-            std::unique_ptr<Node> _wrapper,
+            NodeUniquePtr _wrapper,
             size_t _typeIndex);
         Union(Union const& _other);
         Union(Union&&) = default;
@@ -23,7 +23,7 @@ namespace Ent
         EntityLib const* entityLib = nullptr;
         Subschema const* schema = nullptr; ///< The schema of the object containing the oneOf field
         size_t typeIndex = 0; ///< Index of the type
-        std::unique_ptr<Node> wrapper; ///< Node containing the className/classData
+        NodeUniquePtr wrapper; ///< Node containing the className/classData
         Ent::Subschema::UnionMeta const* metaData = nullptr;
 
         bool typeOverriden = false;

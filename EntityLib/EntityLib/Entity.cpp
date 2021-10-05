@@ -43,14 +43,14 @@ namespace Ent
     extern char const* actorStatesSchemaName;
     extern char const* colorSchemaName;
 
-    static std::unique_ptr<Node> makeDefaultActorStatesField(EntityLib const& _entlib)
+    static NodeUniquePtr makeDefaultActorStatesField(EntityLib const& _entlib)
     {
         Ent::Subschema const& actorStatesSchema =
             AT(_entlib.schema.schema.allDefinitions, actorStatesSchemaName);
-        return std::make_unique<Node>(Array{&_entlib, &actorStatesSchema}, &actorStatesSchema);
+        return _entlib.newNode(Array{&_entlib, &actorStatesSchema}, &actorStatesSchema);
     }
 
-    std::unique_ptr<Node> makeDefaultColorField(EntityLib const& _entlib);
+    NodeUniquePtr makeDefaultColorField(EntityLib const& _entlib);
 
     Entity::Entity(EntityLib const& _entlib, char const* _name)
         : entlib(&_entlib)
@@ -73,8 +73,8 @@ namespace Ent
         std::map<std::string, std::unique_ptr<Component>> _components,
         std::set<std::string> _removedComponents,
         std::unique_ptr<SubSceneComponent> _subSceneComponent,
-        std::unique_ptr<Node> _actorStates,
-        std::unique_ptr<Node> _color,
+        NodeUniquePtr _actorStates,
+        NodeUniquePtr _color,
         Override<String> _thumbnail,
         Override<String> _instanceOf,
         Override<Ent::ActivationLevel> _maxActivationLevel,
@@ -630,7 +630,8 @@ namespace Ent
         {
             sortedComp.push_back(comp.get());
         }
-        Component subscenePlaceholder{true, "SubScene", std::make_unique<Node>(), 1, 0};
+        Component subscenePlaceholder{
+            true, "SubScene", entlib->makeNode("./EditionComponents.json#/definitions/SubScene"), 1, 0};
         if (SubSceneComponent const* subscene = getSubSceneComponent())
         {
             subscenePlaceholder.index = subscene->index;

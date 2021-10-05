@@ -357,16 +357,19 @@ Ent::Node* Ent::Map::get(KeyType const& _key)
     return const_cast<Ent::Node*>(std::as_const(*this).get(_key));
 }
 
-Ent::Map::Element& Ent::Map::insertImpl(KeyType const& _key)
+Ent::Map::Element& Ent::Map::insertImpl(KeyType const& _key, NodeUniquePtr _newNode)
 {
     auto iter = m_itemMap.find(_key);
     if (iter == m_itemMap.end())
     {
         SubschemaRef const* itemSchema = m_schema->singularItems.get();
         ENTLIB_ASSERT_MSG(itemSchema, "map/set expect a singularItems");
-        auto newNode = m_entlib->loadNode(itemSchema->get(), json(), nullptr);
-        setChildKey(m_schema, newNode.get(), _key);
-        auto& elt = insertImpl(OverrideValueLocation::Override, _key, std::move(newNode), true);
+        if (_newNode == nullptr)
+        {
+            _newNode = m_entlib->loadNode(itemSchema->get(), json(), nullptr);
+        }
+        setChildKey(m_schema, _newNode.get(), _key);
+        auto& elt = insertImpl(OverrideValueLocation::Override, _key, std::move(_newNode), true);
         getEltValue(m_schema, elt)->setAddedInInsance(true);
         elt.node->setAddedInInsance(true);
         return elt;
@@ -396,6 +399,11 @@ Ent::Map::Element& Ent::Map::insertImpl(KeyType const& _key)
 Ent::Node* Ent::Map::insert(KeyType const& _key)
 {
     return getEltValue(m_schema, insertImpl(_key));
+}
+
+void Ent::Map::insert(KeyType const& _key, NodeUniquePtr _newNode)
+{
+    insertImpl(_key, std::move(_newNode));
 }
 
 Ent::Node* Ent::Map::rename(KeyType const& _key, KeyType const& _newkey)

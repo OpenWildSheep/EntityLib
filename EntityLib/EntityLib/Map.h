@@ -65,6 +65,7 @@ namespace Ent
         Node const* get(KeyType const& _key) const;
         Node* get(KeyType const& _key);
         Ent::Node* insert(KeyType const& _key);
+        void insert(KeyType const& _key, NodeUniquePtr _newNode);
         bool isErased(KeyType const& _key) const;
         Ent::Node*
         insert(OverrideValueLocation _loc, KeyType _key, NodeUniquePtr _node, bool _addedInInstance);
@@ -90,7 +91,7 @@ namespace Ent
         EntityLib const* getEntityLib() const;
 
     private:
-        Element& insertImpl(KeyType const& _key);
+        Element& insertImpl(KeyType const& _key, NodeUniquePtr _newNode = {});
         Element& insertImpl(
             OverrideValueLocation _loc, KeyType _key, NodeUniquePtr _node, bool _addedInInstance);
         template <typename M>

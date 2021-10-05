@@ -106,6 +106,8 @@ namespace Ent
         Node* mapGet(char const* _key); ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
         Node const* mapGet(char const* _key) const; ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
         Node* mapInsert(char const* _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
+        void mapInsert(char const* _key, NodeUniquePtr _newNode);
+        void mapInsert(int64_t _key, NodeUniquePtr _newNode);
         /// @pre isMapOrSet()
         /// @brief Insert a new item at the given _key
         Node* mapInsertInstanceOf(char const* _prefabPath);

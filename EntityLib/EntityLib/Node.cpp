@@ -694,6 +694,22 @@ namespace Ent
         return newNode;
     }
 
+    void Node::mapInsert(char const* _key, NodeUniquePtr _newNode)
+    {
+        if (_key == nullptr)
+        {
+            throw NullPointerArgument("_key", "Node::mapInsert");
+        }
+        checkMap("mapInsert");
+        std::get<Array>(value).mapInsert(_key, std::move(_newNode));
+    }
+
+    void Node::mapInsert(int64_t _key, NodeUniquePtr _newNode)
+    {
+        checkMap("mapInsert");
+        std::get<Array>(value).mapInsert(_key, std::move(_newNode));
+    }
+
     Node* Node::mapInsertInstanceOf(char const* _prefabPath)
     {
         if (_prefabPath == nullptr)

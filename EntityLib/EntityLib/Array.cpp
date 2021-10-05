@@ -89,6 +89,12 @@ Ent::Node* Ent::Array::mapInsert(Map::KeyType const& _key)
     return std::get<Map>(m_data).insert(_key);
 }
 
+void Ent::Array::mapInsert(Map::KeyType const& _key, NodeUniquePtr _newNode)
+{
+    ENTLIB_ASSERT_MSG(std::holds_alternative<Map>(m_data), "Can only mapInsert on map or set");
+    std::get<Map>(m_data).insert(_key, std::move(_newNode));
+}
+
 Ent::Node* Ent::Array::mapRename(Map::KeyType const& _key, Map::KeyType const& _newKey)
 {
     ENTLIB_ASSERT_MSG(std::holds_alternative<Map>(m_data), "Can only mapRename on map or set");

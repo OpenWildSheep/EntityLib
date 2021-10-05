@@ -185,7 +185,8 @@ bool Ent::Array::empty() const
 
 Ent::Array Ent::Array::detach() const
 {
-    Array result{nullptr, m_schema};
+    auto entitylib = std::visit([](auto& a) { return a.getEntityLib(); }, m_data);
+    Array result{entitylib, m_schema};
     result.m_data = std::visit([](auto& a) { return MapOrVector(a.detach()); }, m_data);
     result.checkInvariants();
     return result;
@@ -193,7 +194,8 @@ Ent::Array Ent::Array::detach() const
 
 Ent::Array Ent::Array::makeInstanceOf() const
 {
-    Array result{nullptr, m_schema};
+    auto entitylib = std::visit([](auto& a) { return a.getEntityLib(); }, m_data);
+    Array result{entitylib, m_schema};
     result.m_data = std::visit([](auto& a) { return MapOrVector(a.makeInstanceOf()); }, m_data);
     return result;
 }

@@ -602,7 +602,7 @@ void Ent::Map::clear()
 
 Ent::Map Ent::Map::detach() const
 {
-    Map result{nullptr, m_schema};
+    Map result{getEntityLib(), m_schema};
     for (auto const& elt : m_items)
     {
         if (elt.isPresent.get())
@@ -622,7 +622,7 @@ Ent::Map Ent::Map::detach() const
 Ent::Map Ent::Map::makeInstanceOf() const
 {
     checkInvariants();
-    Map result{nullptr, m_schema};
+    Map result{getEntityLib(), m_schema};
     for (auto const& elt : m_items)
     {
         auto key = ::getChildKey(m_schema, elt.node.get());
@@ -783,4 +783,9 @@ std::vector<int64_t> Ent::Map::getKeysInt() const
             keys.push_back(std::get<int64_t>(getChildKey(m_schema, elt.node.get())));
     }
     return keys;
+}
+
+Ent::EntityLib const* Ent::Map::getEntityLib() const
+{
+    return m_entlib;
 }

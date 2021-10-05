@@ -48,6 +48,7 @@ namespace Ent
         Node* initPush(NodeUniquePtr _node, bool _addedInInstance);
         Vector detach() const;
         Vector makeInstanceOf() const;
+        EntityLib const* getEntityLib() const;
         std::unique_ptr<Vector> clone() const;
         tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         void unset();

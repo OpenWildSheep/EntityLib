@@ -548,13 +548,13 @@ struct MergeMapOverride
     }
 };
 
-std::unique_ptr<Ent::Node> Ent::EntityLib::loadPrimitive(
+Ent::NodeUniquePtr Ent::EntityLib::loadPrimitive(
     Ent::Subschema const& _nodeSchema,
     json const& _data,
     Ent::Node const* _super,
     json const* _default) const
 {
-    std::unique_ptr<Ent::Node> result;
+    NodeUniquePtr result;
 
     switch (_nodeSchema.type)
     {
@@ -652,7 +652,7 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::loadPrimitive(
     return result;
 }
 
-std::unique_ptr<Ent::Node> Ent::EntityLib::loadObject(
+Ent::NodeUniquePtr Ent::EntityLib::loadObject(
     Ent::Subschema const& _nodeSchema,
     json const& _data,
     Ent::Node const* _super,
@@ -760,7 +760,7 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::loadObject(
     }
 }
 
-std::unique_ptr<Ent::Node> Ent::EntityLib::loadArray(
+Ent::NodeUniquePtr Ent::EntityLib::loadArray(
     Ent::Subschema const& _nodeSchema,
     nlohmann::json const& _data,
     Ent::Node const* _super,
@@ -1024,7 +1024,7 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::loadArray(
     return newNode(std::move(arr), &_nodeSchema);
 }
 
-std::unique_ptr<Ent::Node> Ent::EntityLib::loadUnion(
+Ent::NodeUniquePtr Ent::EntityLib::loadUnion(
     Ent::Subschema const& _nodeSchema,
     json const& _data,
     Ent::Node const* _super,
@@ -1032,7 +1032,7 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::loadUnion(
 {
     ENTLIB_ASSERT(_nodeSchema.type == DataType::oneOf);
 
-    std::unique_ptr<Ent::Node> result;
+    NodeUniquePtr result;
 
     auto&& meta = std::get<Ent::Subschema::UnionMeta>(_nodeSchema.meta);
     std::string const& typeField = meta.typeField;
@@ -1095,15 +1095,14 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::loadUnion(
     {
         ENTLIB_LOG_ERROR(
             "Can't find type %s in schema %s", dataType.c_str(), _nodeSchema.name.c_str());
-        std::unique_ptr<Ent::Node> dataNode =
-            loadNode(_nodeSchema.oneOf->front().get(), _data, nullptr, nullptr);
+        NodeUniquePtr dataNode = loadNode(_nodeSchema.oneOf->front().get(), _data, nullptr, nullptr);
         Ent::Union un(this, &_nodeSchema, std::move(dataNode), 0);
         result = newNode(std::move(un), &_nodeSchema);
     }
     return result;
 }
 
-std::unique_ptr<Ent::Node> Ent::EntityLib::loadNode(
+Ent::NodeUniquePtr Ent::EntityLib::loadNode(
     Ent::Subschema const& _nodeSchema,
     json const& _data,
     Ent::Node const* _super,
@@ -1668,7 +1667,7 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
                 validate(schema.schema, toolsDir, document);
             }
 
-            std::unique_ptr<Type> entity = load(*this, document, _super);
+            auto entity = load(*this, document, _super);
             auto file = typename Cache::mapped_type{std::move(entity), timestamp};
             auto iter_bool = cache.insert_or_assign(relPath, std::move(file));
             return std::get<0>(iter_bool)->second.data;
@@ -1729,13 +1728,13 @@ Ent::EntityLib::loadLegacySceneReadOnly(std::filesystem::path const& _scenePath)
     return loadEntityOrScene<Ent::Scene>(_scenePath, m_sceneCache, &validateScene, loadFunc, nullptr);
 }
 
-std::unique_ptr<Ent::Node> Ent::EntityLib::loadEntityAsNode(std::filesystem::path const& _entityPath) const
+Ent::NodeUniquePtr Ent::EntityLib::loadEntityAsNode(std::filesystem::path const& _entityPath) const
 {
     Ent::Subschema const& entitySchema = AT(schema.schema.allDefinitions, entitySchemaName);
     return loadFileAsNode(_entityPath, entitySchema);
 }
 
-std::unique_ptr<Ent::Node> Ent::EntityLib::loadSceneAsNode(std::filesystem::path const& _scenePath) const
+Ent::NodeUniquePtr Ent::EntityLib::loadSceneAsNode(std::filesystem::path const& _scenePath) const
 {
     Ent::Subschema const& entitySchema = AT(schema.schema.allDefinitions, entitySchemaName);
     auto ent = loadNodeReadOnly(entitySchema, _scenePath.string().c_str());
@@ -1755,7 +1754,7 @@ std::unique_ptr<Ent::Node> Ent::EntityLib::loadSceneAsNode(std::filesystem::path
     return scene->at("Objects")->clone();
 }
 
-std::unique_ptr<Ent::Node> Ent::EntityLib::loadFileAsNode(
+Ent::NodeUniquePtr Ent::EntityLib::loadFileAsNode(
     std::filesystem::path const& _path, Ent::Subschema const& _schema) const
 {
     return loadNodeReadOnly(_schema, _path.string().c_str())->clone();
@@ -1796,30 +1795,30 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::makeInstanceOf(std::string const& _
     return inst;
 }
 
-std::unique_ptr<Ent::Node>
-Ent::EntityLib::makeNodeInstanceOf(char const* _schemaName, char const* _prefab) const
+Ent::NodeUniquePtr Ent::EntityLib::makeNodeInstanceOf(char const* _schemaName, char const* _prefab) const
 {
     auto node = makeNode(_schemaName);
     node->resetInstanceOf(_prefab);
     return node;
 }
 
-std::unique_ptr<Ent::Node> Ent::EntityLib::makeEntityNodeInstanceOf(char const* _prefab) const
+Ent::NodeUniquePtr Ent::EntityLib::makeEntityNodeInstanceOf(char const* _prefab) const
 {
     return makeNodeInstanceOf(entitySchemaName, _prefab);
 }
 
-std::unique_ptr<Ent::Node> Ent::EntityLib::makeNode(char const* _schemaName) const
+Ent::NodeUniquePtr Ent::EntityLib::makeNode(char const* _schemaName) const
 {
     return loadNode(*getSchema(_schemaName), json(), nullptr);
 }
 
-std::unique_ptr<Ent::Node> Ent::EntityLib::newNode(Node::Value val, Subschema const* _subschema) const
+Ent::NodeUniquePtr Ent::EntityLib::newNode(Node::Value val, Subschema const* _subschema) const
 {
-    return std::make_unique<Ent::Node>(std::move(val), _subschema);
+    return std::unique_ptr<Ent::Node, NodeDeleter>(new (nodePool.alloc())
+                                                       Node(std::move(val), _subschema));
 }
 
-std::unique_ptr<Ent::Node> Ent::EntityLib::makeEntityNode() const
+Ent::NodeUniquePtr Ent::EntityLib::makeEntityNode() const
 {
     return makeNode(entitySchemaName);
 }

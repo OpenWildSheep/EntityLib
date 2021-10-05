@@ -139,7 +139,7 @@ void Ent::Vector::clear()
 
 Ent::Vector Ent::Vector::detach() const
 {
-    Vector result{nullptr, m_schema};
+    Vector result{getEntityLib(), m_schema};
     for (auto const& elt : m_data)
     {
         result.m_data.emplace_back(elt->detach());
@@ -151,7 +151,7 @@ Ent::Vector Ent::Vector::detach() const
 
 Ent::Vector Ent::Vector::makeInstanceOf() const
 {
-    Vector result{nullptr, m_schema};
+    Vector result{getEntityLib(), m_schema};
     for (auto const& elt : m_data)
     {
         result.m_data.emplace_back(elt->makeInstanceOf());
@@ -249,4 +249,9 @@ void Ent::Vector::checkParent(Node const* _parentNode) const
     {
         elt->checkParent(_parentNode);
     }
+}
+
+Ent::EntityLib const* Ent::Vector::getEntityLib() const
+{
+    return m_entlib;
 }

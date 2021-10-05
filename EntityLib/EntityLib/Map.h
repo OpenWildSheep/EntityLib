@@ -87,6 +87,7 @@ namespace Ent
 
         std::vector<String> getKeysString() const;
         std::vector<int64_t> getKeysInt() const;
+        EntityLib const* getEntityLib() const;
 
     private:
         Element& insertImpl(KeyType const& _key);

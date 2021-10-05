@@ -182,7 +182,7 @@ namespace Ent
         /// @param _path : A file path absolute or relative but inside the rawdata path
         std::filesystem::path getRelativePath(std::filesystem::path const& _path) const;
 
-        std::unique_ptr<Ent::Node> loadNode(
+        NodeUniquePtr loadNode(
             Ent::Subschema const& _nodeSchema,
             nlohmann::json const& _data,
             Ent::Node const* _super,

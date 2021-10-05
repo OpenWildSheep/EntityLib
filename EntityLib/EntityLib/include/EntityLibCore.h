@@ -312,6 +312,7 @@ namespace Ent
 
         void free(void* ptr)
         {
+            ENTLIB_ASSERT(allocatedCount > 0);
             --allocatedCount;
             freePtr.push_back(ptr);
         }
@@ -479,5 +480,13 @@ namespace Ent
     if constexpr (Ent::doesCompile<TYPE>([](auto&& PARAM) -> decltype(CODE) {}))
 
     struct Node;
-    using NodeUniquePtr = std::unique_ptr<Node>;
+    struct NodeDeleter
+    {
+        template <typename T>
+        void operator()(T* ptr) const
+        {
+            destroyAndFree(ptr);
+        }
+    };
+    using NodeUniquePtr = std::unique_ptr<Node, NodeDeleter>;
 } // namespace Ent

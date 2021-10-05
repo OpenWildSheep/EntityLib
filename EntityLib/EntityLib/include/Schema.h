@@ -4,8 +4,8 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <variant>
 
-#include "../../../external/mapbox/variant.hpp"
 #include "../external/optional.hpp"
 #include "../external/json.hpp"
 #pragma warning(pop)
@@ -104,7 +104,7 @@ namespace Ent
         {
         };
         /// Meta data for any type of Node
-        using Meta = mapbox::util::variant<GenericMeta, NumberMeta, UnionMeta, ArrayMeta>;
+        using Meta = std::variant<GenericMeta, NumberMeta, UnionMeta, ArrayMeta>;
         Meta meta; ///< Contains meta data for any type of Node
 
         // helper methods
@@ -187,7 +187,7 @@ namespace Ent
             DefaultValue defaultValue; ///< Additional default values (beside a "$ref")
         };
 
-        mapbox::util::variant<Null, Ref, Subschema> subSchemaOrRef;
+        std::variant<Null, Ref, Subschema> subSchemaOrRef;
         DeleteCheck deleteCheck;
         /// @endcond
 
@@ -202,9 +202,10 @@ namespace Ent
         /// Get the default values beside a "$ref", or nullptr
         DefaultValue const* getRefDefaultValues() const
         {
-            if (subSchemaOrRef.is<Ref>() && !subSchemaOrRef.get<Ref>().defaultValue.is_null())
+            if (std::holds_alternative<Ref>(subSchemaOrRef)
+                && !std::get<Ref>(subSchemaOrRef).defaultValue.is_null())
             {
-                return &subSchemaOrRef.get<Ref>().defaultValue;
+                return &std::get<Ref>(subSchemaOrRef).defaultValue;
             }
             else
             {
@@ -249,7 +250,7 @@ namespace Ent
 
     inline bool Subschema::IsDeprecated() const
     {
-        return mapbox::util::apply_visitor(
+        return std::visit(
             BasicFieldGetter{[](const Subschema::BaseMeta* _meta) {
                 return _meta->deprecated;
             }},
@@ -258,7 +259,7 @@ namespace Ent
 
     inline bool Subschema::IsUsedInEditor() const
     {
-        return mapbox::util::apply_visitor(
+        return std::visit(
             BasicFieldGetter{[](const Subschema::BaseMeta* _meta) {
                 return _meta->usedInEditor;
             }},
@@ -267,7 +268,7 @@ namespace Ent
 
     inline bool Subschema::IsUsedInRuntime() const
     {
-        return mapbox::util::apply_visitor(
+        return std::visit(
             BasicFieldGetter{[](const Subschema::BaseMeta* _meta) {
                 return _meta->usedInRuntime;
             }},
@@ -276,33 +277,33 @@ namespace Ent
 
     inline Subschema const& SubschemaRef::get() const
     {
-        if (subSchemaOrRef.is<Ref>())
+        if (std::holds_alternative<Ref>(subSchemaOrRef))
         {
-            Ref const& ref = subSchemaOrRef.get<Ref>();
+            Ref const& ref = std::get<Ref>(subSchemaOrRef);
             return AT(ref.schema->allDefinitions, ref.ref);
         }
-        else if (subSchemaOrRef.is<Subschema>())
-            return subSchemaOrRef.get<Subschema>();
+        else if (std::holds_alternative<Subschema>(subSchemaOrRef))
+            return std::get<Subschema>(subSchemaOrRef);
         else
         {
             ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
-            return subSchemaOrRef.get<Subschema>();
+            return std::get<Subschema>(subSchemaOrRef);
         }
     }
 
     inline Subschema& SubschemaRef::get()
     {
-        if (subSchemaOrRef.is<Ref>())
+        if (std::holds_alternative<Ref>(subSchemaOrRef))
         {
-            Ref const& ref = subSchemaOrRef.get<Ref>();
+            Ref const& ref = std::get<Ref>(subSchemaOrRef);
             return AT(ref.schema->allDefinitions, ref.ref);
         }
-        else if (subSchemaOrRef.is<Subschema>())
-            return subSchemaOrRef.get<Subschema>();
+        else if (std::holds_alternative<Subschema>(subSchemaOrRef))
+            return std::get<Subschema>(subSchemaOrRef);
         else
         {
             ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
-            return subSchemaOrRef.get<Subschema>();
+            return std::get<Subschema>(subSchemaOrRef);
         }
     }
 

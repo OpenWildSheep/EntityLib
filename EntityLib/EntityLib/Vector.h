@@ -5,8 +5,7 @@
 #include <algorithm>
 
 #pragma warning(push, 0)
-#pragma warning(disable : 4996)
-#include "../../../external/mapbox/variant.hpp"
+#include <variant>
 #pragma warning(pop)
 
 #include "include/EntityLibCore.h"

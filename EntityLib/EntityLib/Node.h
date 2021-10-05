@@ -53,7 +53,7 @@ namespace Ent
     struct ENTLIB_DLLEXPORT Node
     {
         /// @cond PRIVATE
-        using Value = mapbox::util::variant<
+        using Value = std::variant<
             Null,
             Override<String>,
             Override<double>,

@@ -12,22 +12,6 @@
 
 namespace pybind11::detail
 {
-    template <typename... Ts>
-    struct type_caster<mapbox::util::variant<Ts...>> : variant_caster<mapbox::util::variant<Ts...>>
-    {
-    };
-
-    // Specifies the function used to visit the variant -- `apply_visitor` instead of `visit`
-    template <>
-    struct visit_helper<mapbox::util::variant>
-    {
-        template <typename... Args>
-        static auto call(Args&&... args) -> decltype(mapbox::util::apply_visitor(args...))
-        {
-            return mapbox::util::apply_visitor(args...);
-        }
-    };
-
     // Use tj::optional like a std::optional
     template <typename T>
     struct type_caster<tl::optional<T>> : public optional_caster<tl::optional<T>>
@@ -38,7 +22,7 @@ namespace pybind11::detail
 namespace py = pybind11;
 using namespace Ent;
 
-using Value = mapbox::util::variant<Null, std::string, double, int64_t, bool, EntityRef>;
+using Value = std::variant<Null, std::string, double, int64_t, bool, EntityRef>;
 
 Value getValue(Ent::Node& node)
 {
@@ -130,23 +114,14 @@ void setValue(Ent::Node& node, Value const& val)
     case Ent::DataType::array:
     case Ent::DataType::object:
     case Ent::DataType::oneOf:
-    case Ent::DataType::null:
-        break;
-    case Ent::DataType::boolean:
-        node.setBool(mapbox::util::apply_visitor(GetValue<bool>{}, val));
-        break;
-    case Ent::DataType::integer:
-        node.setInt(mapbox::util::apply_visitor(GetValue<int64_t>{}, val));
-        break;
-    case Ent::DataType::number:
-        node.setFloat(mapbox::util::apply_visitor(GetValue<double>{}, val));
-        break;
+    case Ent::DataType::null: break;
+    case Ent::DataType::boolean: node.setBool(std::visit(GetValue<bool>{}, val)); break;
+    case Ent::DataType::integer: node.setInt(std::visit(GetValue<int64_t>{}, val)); break;
+    case Ent::DataType::number: node.setFloat(std::visit(GetValue<double>{}, val)); break;
     case Ent::DataType::string:
-        node.setString(mapbox::util::apply_visitor(GetValue<std::string>{}, val).c_str());
+        node.setString(std::visit(GetValue<std::string>{}, val).c_str());
         break;
-    case Ent::DataType::entityRef:
-        node.setEntityRef({val.get<EntityRef>()});
-        break;
+    case Ent::DataType::entityRef: node.setEntityRef({std::get<EntityRef>(val)}); break;
     case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
 }

@@ -74,7 +74,7 @@ namespace Ent
         if (_prefabNodePath == nullptr or strlen(_prefabNodePath) == 0)
         {
             Node prefabNode = entlib->loadNode(*schema, json{}, nullptr);
-            (*this) = prefabNode.GetRawValue().get<Object>().makeInstanceOf();
+            (*this) = std::get<Object>(prefabNode.GetRawValue()).makeInstanceOf();
             instanceOf.set("");
         }
         else
@@ -97,7 +97,7 @@ namespace Ent
                     keyField = *field;
                 }
             }
-            (*this) = prefabNode.GetRawValue().get<Object>().makeInstanceOf();
+            (*this) = std::get<Object>(prefabNode.GetRawValue()).makeInstanceOf();
             // Set the keyField
             if (keyField.has_value() and keyField->isSet()) // Only report the previus ID if it is set
             {

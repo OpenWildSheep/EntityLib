@@ -6,8 +6,8 @@
 
 #pragma warning(push, 0)
 #pragma warning(disable : 4996)
+#include <variant>
 #include "../external/optional.hpp"
-#include "../../../external/mapbox/variant.hpp"
 #pragma warning(pop)
 
 #include "include/EntityLibCore.h"
@@ -104,23 +104,23 @@ namespace Ent
 
         Subschema const* m_schema = nullptr;
 
-        using MapOrVector = mapbox::util::variant<Vector, Map>;
+        using MapOrVector = std::variant<Vector, Map>;
         MapOrVector m_data;
     };
 
     inline size_t Array::size() const
     {
-        return mapbox::util::apply_visitor([](auto& a) { return a.size(); }, m_data);
+        return std::visit([](auto& a) { return a.size(); }, m_data);
     }
 
     inline size_t Array::getDefaultSize() const
     {
-        return mapbox::util::apply_visitor([](auto& a) { return a.getDefaultSize(); }, m_data);
+        return std::visit([](auto& a) { return a.getDefaultSize(); }, m_data);
     }
 
     inline size_t Array::getPrefabSize() const
     {
-        return mapbox::util::apply_visitor([](auto& a) { return a.getPrefabSize(); }, m_data);
+        return std::visit([](auto& a) { return a.getPrefabSize(); }, m_data);
     }
 
     inline Subschema const* Array::getSchema() const
@@ -130,35 +130,35 @@ namespace Ent
 
     inline tl::optional<size_t> Array::getRawSize(OverrideValueLocation _location) const
     {
-        return mapbox::util::apply_visitor(
-            [_location](auto& a) { return a.getRawSize(_location); }, m_data);
+        return std::visit([_location](auto& a) { return a.getRawSize(_location); }, m_data);
     }
 
     inline void Ent::Array::unset()
     {
-        apply_visitor([&](auto& a) { a.unset(); }, m_data);
+        std::visit([&](auto& a) { a.unset(); }, m_data);
     }
 
     inline void Ent::Array::setParentNode(Node* _parent)
     {
-        apply_visitor([&](auto& a) { a.setParentNode(_parent); }, m_data);
+        std::visit([&](auto& a) { a.setParentNode(_parent); }, m_data);
     }
 
     inline void Ent::Array::checkParent(Node const* _parent) const
     {
-        apply_visitor([&](auto& a) { a.checkParent(_parent); }, m_data);
+        std::visit([&](auto& a) { a.checkParent(_parent); }, m_data);
     }
 
     inline std::vector<String> Ent::Array::getKeysString() const
     {
-        ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only getKeysString on map or set");
-        return m_data.get<Map>().getKeysString();
+        ENTLIB_ASSERT_MSG(
+            std::holds_alternative<Map>(m_data), "Can only getKeysString on map or set");
+        return std::get<Map>(m_data).getKeysString();
     }
 
     inline std::vector<int64_t> Ent::Array::getKeysInt() const
     {
-        ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only getKeysInt on map or set");
-        return m_data.get<Map>().getKeysInt();
+        ENTLIB_ASSERT_MSG(std::holds_alternative<Map>(m_data), "Can only getKeysInt on map or set");
+        return std::get<Map>(m_data).getKeysInt();
     }
 
 } // namespace Ent

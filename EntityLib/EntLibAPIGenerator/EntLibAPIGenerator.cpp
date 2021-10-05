@@ -251,7 +251,7 @@ static json getSchemaType(Ent::Subschema const& _schema)
     case Ent::DataType::array:
         if (_schema.singularItems != nullptr)
         {
-            auto const& meta = _schema.meta.get<Ent::Subschema::ArrayMeta>();
+            auto const& meta = std::get<Ent::Subschema::ArrayMeta>(_schema.meta);
             if (meta.overridePolicy == "set")
             {
                 auto const singularType = (*_schema.singularItems)->type;
@@ -267,7 +267,7 @@ static json getSchemaType(Ent::Subschema const& _schema)
                 {
                     json array;
                     array["type"] = getSchemaRefType(*_schema.singularItems);
-                    auto keyFieldName = _schema.meta.get<Ent::Subschema::ArrayMeta>().keyField;
+                    auto keyFieldName = std::get<Ent::Subschema::ArrayMeta>(_schema.meta).keyField;
                     auto& keyField = _schema.singularItems->get().properties.at(*keyFieldName);
                     array["key_type"] = getSchemaRefType(keyField);
                     type["object_set"] = std::move(array);
@@ -369,13 +369,13 @@ static json getSchemaType(Ent::Subschema const& _schema)
 /// @brief Get a json describing the type of a given _ref
 static json getSchemaRefType(Ent::SubschemaRef const& _ref)
 {
-    if (_ref.subSchemaOrRef.is<Ent::Subschema>())
+    if (std::holds_alternative<Ent::Subschema>(_ref.subSchemaOrRef))
     {
         return getSchemaType(*_ref);
     }
     else
     {
-        std::string singItmRef = _ref.subSchemaOrRef.get<Ent::SubschemaRef::Ref>().ref;
+        std::string singItmRef = std::get<Ent::SubschemaRef::Ref>(_ref.subSchemaOrRef).ref;
         auto name = getRefTypeName(singItmRef);
         json typeref;
         typeref["name"] = name;
@@ -412,7 +412,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
     case Ent::DataType::array:
         if (_schema.singularItems != nullptr)
         {
-            auto const& meta = _schema.meta.get<Ent::Subschema::ArrayMeta>();
+            auto const& meta = std::get<Ent::Subschema::ArrayMeta>(_schema.meta);
             if (meta.overridePolicy == "set")
             {
                 auto const singularType = (*_schema.singularItems)->type;
@@ -539,7 +539,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
     {
         json union_(json::value_t::object);
         json types(json::value_t::array);
-        auto const& unionData = _schema.meta.get<Ent::Subschema::UnionMeta>();
+        auto const& unionData = std::get<Ent::Subschema::UnionMeta>(_schema.meta);
         for (Ent::SubschemaRef const& ref : *_schema.oneOf)
         {
             auto acceptedType =
@@ -569,7 +569,7 @@ static void giveNameToAnonymousObjectRef(
     std::string const& _hint2 ///< A string that could be used to avoid conflict
 )
 {
-    if (_ref.subSchemaOrRef.is<Ent::Subschema>())
+    if (std::holds_alternative<Ent::Subschema>(_ref.subSchemaOrRef))
     {
         if (_ref->type == Ent::DataType::object)
         {
@@ -583,7 +583,7 @@ static void giveNameToAnonymousObjectRef(
         {
             if (_ref->singularItems != nullptr)
             {
-                auto const& meta = _ref->meta.get<Ent::Subschema::ArrayMeta>();
+                auto const& meta = std::get<Ent::Subschema::ArrayMeta>(_ref->meta);
                 if (meta.overridePolicy == "set")
                 {
                     if ((*_ref->singularItems)->type == Ent::DataType::oneOf)
@@ -641,7 +641,7 @@ static void giveNameToAnonymousObject(
         break;
     case Ent::DataType::oneOf:
     {
-        auto const& unionData = _subschema.meta.get<Ent::Subschema::UnionMeta>();
+        auto const& unionData = std::get<Ent::Subschema::UnionMeta>(_subschema.meta);
         for (Ent::SubschemaRef const& subref : *_subschema.oneOf)
         {
             auto typeField = unionData.typeField.empty() ? "Type" : unionData.typeField;

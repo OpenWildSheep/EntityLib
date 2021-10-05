@@ -9,7 +9,7 @@ using namespace nlohmann;
 
 static void setChildKey(Ent::Subschema const* _arraySchema, Ent::Node* _child, Ent::Map::KeyType _key)
 {
-    auto&& meta = _arraySchema->meta.get<Ent::Subschema::ArrayMeta>();
+    auto&& meta = std::get<Ent::Subschema::ArrayMeta>(_arraySchema->meta);
     using namespace Ent;
     switch (hash(meta.overridePolicy))
     {
@@ -27,12 +27,12 @@ static void setChildKey(Ent::Subschema const* _arraySchema, Ent::Node* _child, E
         switch (keyType)
         {
         case Ent::DataType::string:
-            _child->at(0llu)->setString(_key.get<Ent::String>().c_str());
+            _child->at(0llu)->setString(std::get<Ent::String>(_key).c_str());
             break;
         case Ent::DataType::entityRef:
-            _child->at(0llu)->setEntityRef(Ent::EntityRef{_key.get<Ent::String>()});
+            _child->at(0llu)->setEntityRef(Ent::EntityRef{std::get<Ent::String>(_key)});
             break;
-        case Ent::DataType::integer: _child->at(0llu)->setInt(_key.get<int64_t>()); break;
+        case Ent::DataType::integer: _child->at(0llu)->setInt(std::get<int64_t>(_key)); break;
         default:
             throw std::runtime_error("Can't use this type as key of a map : " + _arraySchema->name);
         }
@@ -47,11 +47,11 @@ static void setChildKey(Ent::Subschema const* _arraySchema, Ent::Node* _child, E
         switch (keyType)
         {
         // The key is the className string
-        case Ent::DataType::oneOf: _child->setUnionType(_key.get<Ent::String>().c_str()); break;
+        case Ent::DataType::oneOf: _child->setUnionType(std::get<Ent::String>(_key).c_str()); break;
         // The key is the item itself
-        case Ent::DataType::string: _child->setString(_key.get<Ent::String>().c_str()); break;
+        case Ent::DataType::string: _child->setString(std::get<Ent::String>(_key).c_str()); break;
         // The key is the item itself
-        case Ent::DataType::integer: _child->setInt(_key.get<int64_t>()); break;
+        case Ent::DataType::integer: _child->setInt(std::get<int64_t>(_key)); break;
         case Ent::DataType::object:
             if (meta.keyField.has_value())
             {
@@ -59,9 +59,9 @@ static void setChildKey(Ent::Subschema const* _arraySchema, Ent::Node* _child, E
                 switch (keyNode->getDataType())
                 {
                 case Ent::DataType::string:
-                    keyNode->setString(_key.get<Ent::String>().c_str());
+                    keyNode->setString(std::get<Ent::String>(_key).c_str());
                     break;
-                case Ent::DataType::integer: keyNode->setInt(_key.get<int64_t>()); break;
+                case Ent::DataType::integer: keyNode->setInt(std::get<int64_t>(_key)); break;
                 default:
                     throw ContextException("Can't use this type as key of a set : " + *meta.keyField);
                 }
@@ -83,7 +83,7 @@ static void setChildKey(Ent::Subschema const* _arraySchema, Ent::Node* _child, E
 
 static Ent::DataType getKeyType(Ent::Subschema const* _arraySchema)
 {
-    auto&& meta = _arraySchema->meta.get<Ent::Subschema::ArrayMeta>();
+    auto&& meta = std::get<Ent::Subschema::ArrayMeta>(_arraySchema->meta);
     using namespace Ent;
     switch (hash(meta.overridePolicy))
     {
@@ -138,7 +138,7 @@ static Ent::DataType getKeyType(Ent::Subschema const* _arraySchema)
 
 static Ent::Map::KeyType getChildKey(Ent::Subschema const* _arraySchema, Ent::Node const* _child)
 {
-    auto&& meta = _arraySchema->meta.get<Ent::Subschema::ArrayMeta>();
+    auto&& meta = std::get<Ent::Subschema::ArrayMeta>(_arraySchema->meta);
     using namespace Ent;
     switch (hash(meta.overridePolicy))
     {
@@ -296,7 +296,7 @@ static auto getEltValue(Ent::Subschema const* _schema, Elt& _element)
         return nullptr;
     }
     auto* node = _element.node.get();
-    auto const& overridePolicy = _schema->meta.get<Ent::Subschema::ArrayMeta>().overridePolicy;
+    auto const& overridePolicy = std::get<Ent::Subschema::ArrayMeta>(_schema->meta).overridePolicy;
     if (overridePolicy == "map")
     {
         return node->at(1llu);
@@ -374,10 +374,11 @@ Ent::Node* Ent::Map::rename(KeyType const& _key, KeyType const& _newkey)
         auto const idx = iter->second;
         if (m_items[idx].isPresent.get())
         {
-            auto const& overridePolicy = m_schema->meta.get<Subschema::ArrayMeta>().overridePolicy;
+            auto const& overridePolicy =
+                std::get<Subschema::ArrayMeta>(m_schema->meta).overridePolicy;
             auto const itemIsObject = m_schema->singularItems->get().type == Ent::DataType::object;
             if (itemIsObject and overridePolicy == "set"
-                and m_items[idx].node->GetRawValue().get<Object>().hasASuper)
+                and std::get<Object>(m_items[idx].node->GetRawValue()).hasASuper)
             {
                 throw CantRename(
                     R"(Can't rename key because it override an item in prefab from parent entity)");
@@ -453,7 +454,7 @@ std::vector<Ent::Node const*> Ent::Map::getItemsWithRemoved() const
 {
     std::vector<Node const*> result;
     result.reserve(m_items.size());
-    auto&& meta = m_schema->meta.get<Ent::Subschema::ArrayMeta>();
+    auto&& meta = std::get<Ent::Subschema::ArrayMeta>(m_schema->meta);
     auto notAGhostElement = [](Element const& elt) {
         // Don't care of elements which has never existed
         return elt.isPresent.get() or elt.isPresent.getPrefab();
@@ -497,7 +498,7 @@ auto Ent::Map::getItemsImpl(M* self)
         }
     }();
     result.reserve(self->m_items.size());
-    auto&& meta = self->m_schema->meta.get<Ent::Subschema::ArrayMeta>();
+    auto&& meta = std::get<Ent::Subschema::ArrayMeta>(self->m_schema->meta);
     if (meta.ordered)
     {
         for (auto const& key_index : self->m_itemMap)
@@ -537,7 +538,7 @@ std::vector<Ent::Node const*> Ent::Map::getItems() const
 void Ent::Map::checkInvariants() const
 {
     ENTLIB_ASSERT(m_schema->singularItems != nullptr);
-    auto const& overridePolicy = m_schema->meta.get<Subschema::ArrayMeta>().overridePolicy;
+    auto const& overridePolicy = std::get<Subschema::ArrayMeta>(m_schema->meta).overridePolicy;
     ENTLIB_ASSERT(overridePolicy == "map" or overridePolicy == "set");
     auto singItem = &m_schema->singularItems->get();
     for (auto& itm : m_items)
@@ -729,7 +730,7 @@ std::vector<Ent::String> Ent::Map::getKeysString() const
     for (auto& elt : m_items)
     {
         if (elt.isPresent.get())
-            keys.push_back(getChildKey(m_schema, elt.node.get()).get<Ent::String>());
+            keys.push_back(std::get<Ent::String>(getChildKey(m_schema, elt.node.get())));
     }
     return keys;
 }
@@ -746,7 +747,7 @@ std::vector<int64_t> Ent::Map::getKeysInt() const
     for (auto& elt : m_items)
     {
         if (elt.isPresent.get())
-            keys.push_back(getChildKey(m_schema, elt.node.get()).get<int64_t>());
+            keys.push_back(std::get<int64_t>(getChildKey(m_schema, elt.node.get())));
     }
     return keys;
 }

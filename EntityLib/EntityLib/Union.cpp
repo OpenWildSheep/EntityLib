@@ -15,7 +15,7 @@ namespace Ent
         , schema(_schema)
         , typeIndex(_typeIndex)
         , wrapper(make_value<Node>(std::move(_wrapper)))
-        , metaData(&(schema->meta.get<Subschema::UnionMeta>()))
+        , metaData(&(std::get<Subschema::UnionMeta>(schema->meta)))
     {
         auto* typeNode = wrapper->at(metaData->typeField.c_str());
         typeOverriden = typeNode->hasOverride();

@@ -399,7 +399,7 @@ struct MergeMapOverride
     {
         using namespace Ent;
 
-        auto&& meta = _nodeSchema.meta.get<Ent::Subschema::ArrayMeta>();
+        auto&& meta = std::get<Ent::Subschema::ArrayMeta>(_nodeSchema.meta);
         bool const ordered = meta.ordered;
 
         // Make a map key=>item of the instance array
@@ -694,8 +694,8 @@ Ent::Node Ent::EntityLib::loadObject(
                 }
                 object.instanceOfFieldIndex = getFieldIndex(_data, *InstanceOfIter);
                 object.instanceOf =
-                    prefabNode->value.get<Object>().instanceOf.makeOverridedInstanceOf(
-                        InstanceOfIter->get<std::string>());
+                    std::get<Object>(prefabNode->value)
+                        .instanceOf.makeOverridedInstanceOf(InstanceOfIter->get<std::string>());
             }
             else
             {
@@ -764,7 +764,7 @@ Ent::Node Ent::EntityLib::loadArray(
     ENTLIB_ASSERT(_nodeSchema.type == DataType::array);
 
     Ent::Array arr(this, &_nodeSchema);
-    auto&& meta = _nodeSchema.meta.get<Ent::Subschema::ArrayMeta>();
+    auto&& meta = std::get<Ent::Subschema::ArrayMeta>(_nodeSchema.meta);
     size_t index = 0;
     if (_nodeSchema.singularItems)
     {
@@ -862,12 +862,6 @@ Ent::Node Ent::EntityLib::loadArray(
                         },
                         doRemove);
                     break;
-                case Ent::DataType::number:
-                    arr = mergeMapOverride(
-                        [](json const& item) { return item[0].get<double>(); },
-                        [](Node const* tmplItem) { return tmplItem->at(0llu)->getFloat(); },
-                        doRemove);
-                    break;
                 case Ent::DataType::integer:
                     arr = mergeMapOverride(
                         [](json const& item) { return item[0].get<int64_t>(); },
@@ -892,7 +886,7 @@ Ent::Node Ent::EntityLib::loadArray(
                     char const* defaultTypeName =
                         _nodeSchema.singularItems->get().getUnionDefaultTypeName();
                     auto const& unionMeta =
-                        _nodeSchema.singularItems->get().meta.get<Ent::Subschema::UnionMeta>();
+                        std::get<Ent::Subschema::UnionMeta>(_nodeSchema.singularItems->get().meta);
                     auto doRemoveUnion = [unionMeta](json const& item) {
                         return item.count(unionMeta.dataField) != 0
                                and item[unionMeta.dataField].is_null();
@@ -912,12 +906,6 @@ Ent::Node Ent::EntityLib::loadArray(
                             ENTLIB_ASSERT(tmplItem->getSchema() == &_nodeSchema.singularItems->get());
                             return tmplItem->getString();
                         },
-                        doRemoveDefault);
-                    break;
-                case Ent::DataType::number: // The key is the item itself
-                    arr = mergeMapOverride(
-                        [](json const& item) { return item.get<double>(); },
-                        [](Node const* tmplItem) { return tmplItem->getFloat(); },
                         doRemoveDefault);
                     break;
                 case Ent::DataType::integer: // The key is the item itself
@@ -1041,7 +1029,7 @@ Ent::Node Ent::EntityLib::loadUnion(
 
     Ent::Node result;
 
-    auto&& meta = _nodeSchema.meta.get<Ent::Subschema::UnionMeta>();
+    auto&& meta = std::get<Ent::Subschema::UnionMeta>(_nodeSchema.meta);
     std::string const& typeField = meta.typeField;
     if (typeField.empty())
     {
@@ -1183,7 +1171,7 @@ json Ent::EntityLib::dumpNode(
     case Ent::DataType::boolean: data = _node.getBool(); break;
     case Ent::DataType::integer: data = _node.getInt(); break;
     case Ent::DataType::number:
-        if (_node.getSchema()->meta.get<Subschema::NumberMeta>().bitDepth == 32)
+        if (std::get<Subschema::NumberMeta>(_node.getSchema()->meta).bitDepth == 32)
         {
             data = truncFloat(static_cast<float>(_node.getFloat()));
         }
@@ -1202,7 +1190,7 @@ json Ent::EntityLib::dumpNode(
             uint32_t index = 0;
         };
         std::vector<JsonField> fieldMap;
-        auto& internObj = _node.value.get<Object>();
+        auto& internObj = std::get<Object>(_node.value);
         for (auto const& [name, sub] : _schema.properties)
         {
             Ent::Node const* subNode = _node.at(name.c_str());
@@ -1225,7 +1213,7 @@ json Ent::EntityLib::dumpNode(
                 }
             }
         }
-        auto const& instanceOf = _node.value.get<Ent::Object>().instanceOf;
+        auto const& instanceOf = std::get<Ent::Object>(_node.value).instanceOf;
         if (_dumpedValueSource == OverrideValueSource::Override and instanceOf.isSet())
         {
             fieldMap.push_back(
@@ -1250,9 +1238,9 @@ json Ent::EntityLib::dumpNode(
     case Ent::DataType::array:
     {
         data = json::array();
-        auto&& meta = _schema.meta.get<Ent::Subschema::ArrayMeta>();
+        auto&& meta = std::get<Ent::Subschema::ArrayMeta>(_schema.meta);
         bool const fullWrite = meta.isMapItem;
-        auto const& arr = _node.value.get<Ent::Array>();
+        auto const& arr = std::get<Ent::Array>(_node.value);
         if (arr.hasKey())
         {
             for (auto& item : arr.getItemsWithRemoved())
@@ -1276,7 +1264,7 @@ json Ent::EntityLib::dumpNode(
                             if (item->getSchema()->type == Ent::DataType::oneOf)
                             {
                                 auto& unionMeta =
-                                    item->getSchema()->meta.get<Ent::Subschema::UnionMeta>();
+                                    std::get<Ent::Subschema::UnionMeta>(item->getSchema()->meta);
                                 char const* type = item->getUnionType();
                                 json tmpNode;
                                 tmpNode[unionMeta.typeField] = type;
@@ -1291,12 +1279,11 @@ json Ent::EntityLib::dumpNode(
                                 item->getSchema()->type == Ent::DataType::object
                                 and meta.keyField.has_value())
                             {
-                                if (item->GetRawValue().get<Object>().hasASuper)
+                                if (std::get<Object>(item->GetRawValue()).hasASuper)
                                 {
                                     json tmpNode;
                                     auto key = arr.getChildKey(item);
-                                    mapbox::util::apply_visitor(
-                                        [&](auto&& k) { tmpNode[*meta.keyField] = k; }, key);
+                                    std::visit([&](auto&& k) { tmpNode[*meta.keyField] = k; }, key);
                                     tmpNode["__removed__"] = true;
                                     data.emplace_back(std::move(tmpNode));
                                 }
@@ -1360,9 +1347,9 @@ json Ent::EntityLib::dumpNode(
     break;
     case Ent::DataType::oneOf:
     {
-        auto&& meta = _schema.meta.get<Ent::Subschema::UnionMeta>();
+        auto&& meta = std::get<Ent::Subschema::UnionMeta>(_schema.meta);
         data = json::object();
-        auto&& un = _node.GetRawValue().get<Union>();
+        auto&& un = std::get<Union>(_node.GetRawValue());
         // If it has no indexField, it is a (Responsible)pointer type.
         // The default (first) type is not explicited by the coder, so it can change accidentally.
         // This is why it is better to always write the type. (And also Wild expect it)

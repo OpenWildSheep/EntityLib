@@ -5,8 +5,7 @@
 #include <algorithm>
 
 #pragma warning(push, 0)
-#pragma warning(disable : 4996)
-#include "../../../external/mapbox/variant.hpp"
+#include <variant>
 #pragma warning(pop)
 
 #include "include/EntityLibCore.h"
@@ -22,7 +21,7 @@ namespace Ent
     /// Storage of an Array which has the overridePolicy map or set
     struct Map
     {
-        using KeyType = mapbox::util::variant<String, int64_t>;
+        using KeyType = std::variant<String, int64_t>;
 
         explicit Map(EntityLib const* _entlib = nullptr, Subschema const* _schema = nullptr);
 

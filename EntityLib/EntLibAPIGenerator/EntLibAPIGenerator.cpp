@@ -1087,6 +1087,60 @@ public:
     }
 };
 
+std::set<std::string> getDependencies(std::map<std::string, json> const& nameToSchema, json const& include)
+{
+    std::set<std::string> deps;
+    if (include["ref"].is_object())
+    {
+        auto ref = include["ref"]["name"].get<std::string>();
+        if (nameToSchema.count(ref) != 0)
+        {
+            deps.insert(ref);
+        }
+    }
+    else if (include["array"].is_object())
+    {
+        deps.merge(getDependencies(nameToSchema, include["array"]["type"]));
+    }
+    else if (include["object_set"].is_object())
+    {
+        deps.merge(getDependencies(nameToSchema, include["object_set"]["type"]));
+        deps.merge(getDependencies(nameToSchema, include["object_set"]["key_type"]));
+    }
+    else if (include["map"].is_object())
+    {
+        deps.merge(getDependencies(nameToSchema, include["map"]["value_type"]));
+        deps.merge(getDependencies(nameToSchema, include["map"]["key_type"]));
+    }
+    else if (include["prim_array"].is_object())
+    {
+        deps.merge(getDependencies(nameToSchema, include["prim_array"]["type"]));
+    }
+    else if (include["prim_set"].is_object())
+    {
+        deps.merge(getDependencies(nameToSchema, include["prim_set"]["type"]));
+    }
+    else if (include["tuple"].is_object())
+    {
+        for (auto&& type : include["tuple"]["types"])
+        {
+            deps.merge(getDependencies(nameToSchema, type));
+        }
+    }
+    else if (include["union"].is_object())
+    {
+        for (auto&& type : include["union"]["types"])
+        {
+            deps.merge(getDependencies(nameToSchema, type["type"]));
+        }
+    }
+    else if (include["union_set"].is_object())
+    {
+        deps.merge(getDependencies(nameToSchema, include["union_set"]["items"]));
+    }
+    return deps;
+}
+
 int main(int argc, char* argv[])
 try
 {
@@ -1154,24 +1208,14 @@ try
     {
         if (refSchema["schema"].count("includes") != 0)
         {
-            for (auto& include : refSchema["schema"]["includes"])
+            std::set<std::string> deps;
+            for (auto&& include : refSchema["schema"]["includes"])
             {
-                if (include["ref"].is_object())
-                {
-                    auto ref = include["ref"]["name"].get<std::string>();
-                    if (nameToSchema.count(ref) != 0)
-                    {
-                        g.addEdge(ref, type_name);
-                    }
-                }
-                else if (include["array"].is_object())
-                {
-                    auto ref = include["array"]["type"]["ref"]["name"].get<std::string>();
-                    if (nameToSchema.count(ref) != 0)
-                    {
-                        g.addEdge(ref, type_name);
-                    }
-                }
+                deps.merge(getDependencies(nameToSchema, include));
+            }
+            for (auto&& ref : deps)
+            {
+                g.addEdge(ref, type_name);
             }
         }
     }

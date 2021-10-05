@@ -19,6 +19,7 @@ class LocomotionModeEnum(Enum):
     cinematic = "cinematic"
     ridden = "ridden"
     riddenfly = "riddenfly"
+    fight = "fight"
     clamber = "clamber"
     buried = "buried"
     count = "count"

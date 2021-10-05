@@ -12,8 +12,6 @@ from entgen.ComponentGD import *
 from entgen.Float import *
 from entgen.SoundEventMapping import *
 from entgen.String import *
-from entgen.String import *
-from entgen.String import *
 
 from EntityLibPy import Node
 
@@ -95,9 +93,6 @@ class SoundEmitterGD(HelperObject):
     @property
     def EventMapping(self):  # type: ()->SoundEventMapping
         return SoundEventMapping(self._node.at("EventMapping"))
-    @property
-    def ExplicitEventMapping(self):  # type: ()->Map[str, String]
-        return (lambda n: Map(str, String, n))(self._node.at("ExplicitEventMapping"))
     @property
     def InEvents(self):  # type: ()->PrimArray[String]
         return (lambda n: PrimArray(String, n))(self._node.at("InEvents"))

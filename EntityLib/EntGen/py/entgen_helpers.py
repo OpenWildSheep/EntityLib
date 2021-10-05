@@ -206,7 +206,7 @@ class ObjectSet(Base, Generic[T]):
         for item in self._node.get_items():
             yield self._item_ctor(item)
 
-    def insert_instanceof(self, instance_path):
+    def insert_instanceof(self, instance_path):  # type: (str) -> T
         return self._item_ctor(self._node.map_insert_instanceof(instance_path))
 
     def keys(self):

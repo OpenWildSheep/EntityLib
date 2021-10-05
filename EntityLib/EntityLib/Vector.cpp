@@ -255,3 +255,14 @@ Ent::EntityLib const* Ent::Vector::getEntityLib() const
 {
     return m_entlib;
 }
+
+std::vector<Ent::NodeUniquePtr> Ent::Vector::releaseAllElements()
+{
+    std::vector<NodeUniquePtr> releasedElts;
+    for (auto& elt : m_data)
+    {
+        releasedElts.push_back(std::move(elt));
+    }
+    clear();
+    return releasedElts;
+}

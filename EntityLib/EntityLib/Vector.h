@@ -56,6 +56,7 @@ namespace Ent
         void applyAllValues(Vector& _dest, CopyMode _copyMode) const;
         void setParentNode(Node* _parentNode);
         void checkParent(Node const* _parentNode) const;
+        std::vector<NodeUniquePtr> releaseAllElements();
 
     private:
         EntityLib const* m_entlib = nullptr;

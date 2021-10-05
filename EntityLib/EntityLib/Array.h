@@ -60,6 +60,8 @@ namespace Ent
         std::vector<Node*> getItems(); ///< Get all not removed items
         std::vector<Node const*> getItemsWithRemoved() const; ///< Get all items with the removed ones
 
+        std::vector<NodeUniquePtr> releaseAllElements();
+
         void pop(); ///< @pre not hasKey() and not isTuple()
 
         void clear(); ///< @pre not isTuple()
@@ -168,6 +170,11 @@ namespace Ent
     {
         ENTLIB_ASSERT_MSG(std::holds_alternative<Map>(m_data), "Can only getKeysInt on map or set");
         return std::get<Map>(m_data).getKeysInt();
+    }
+
+    inline std::vector<NodeUniquePtr> Ent::Array::releaseAllElements()
+    {
+        return std::visit([&](auto& a) { return a.releaseAllElements(); }, m_data);
     }
 
 } // namespace Ent

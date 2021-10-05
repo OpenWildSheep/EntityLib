@@ -131,6 +131,7 @@ namespace Ent
         /// @pre getKeyType() == integer
         /// @return All keys of the map, as int64_t
         std::vector<int64_t> getKeysInt() const;
+        std::vector<NodeUniquePtr> releaseAllElements();
 
         // Union
         Node* getUnionData(); ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data
@@ -207,6 +208,8 @@ namespace Ent
         /// @brief Take all values set in this and set them into \b _dest
         ///   BUT do not change the prefab of _dest
         void applyAllValuesButPrefab(Node& _dest, CopyMode _copyMode) const;
+
+        void applyToPrefab();
 
         bool hasDefaultValue() const; ///< false if something was set in instance or prefab
 

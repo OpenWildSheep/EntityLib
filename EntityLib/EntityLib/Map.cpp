@@ -797,3 +797,22 @@ Ent::EntityLib const* Ent::Map::getEntityLib() const
 {
     return m_entlib;
 }
+
+std::vector<Ent::NodeUniquePtr> Ent::Map::releaseAllElements()
+{
+    std::vector<NodeUniquePtr> releasedElts;
+    SubschemaRef const* itemSchema = m_schema->singularItems.get();
+    for (auto& elt : m_items)
+    {
+        if (elt.isPresent.get())
+        {
+            releasedElts.push_back(std::move(elt.node));
+            elt.isPresent.set(false);
+            elt.node = m_entlib->loadNode(itemSchema->get(), json(), nullptr);
+            elt.node->setAddedInInsance(false);
+        }
+    }
+    m_items.clear();
+    m_itemMap.clear();
+    return releasedElts;
+}

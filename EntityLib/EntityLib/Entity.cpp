@@ -92,6 +92,8 @@ namespace Ent
         , hasASuper(_hasASuper)
     {
         updateSubSceneOwner();
+        ENTLIB_ASSERT(actorStates != nullptr);
+        ENTLIB_ASSERT(color != nullptr);
     }
 
     std::unique_ptr<Entity> Entity::clone() const

@@ -1941,14 +1941,16 @@ void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const&
         thumbNailPath = thumbNailPath.substr(offset);
     }
 
+    Ent::Subschema const& actorStatesSchema = AT(schema.schema.allDefinitions, actorStatesSchemaName);
+
     Entity sceneEntity(
         *this,
         {name},
         {},
         {},
         std::make_unique<SubSceneComponent>(this, false, 0, _scene.clone()),
-        {},
-        {},
+        std::make_unique<Node>(Array{this, &actorStatesSchema}, &actorStatesSchema),
+        Ent::makeDefaultColorField(*this),
         {thumbNailPath});
 
     saveEntity(sceneEntity, _scenePath);

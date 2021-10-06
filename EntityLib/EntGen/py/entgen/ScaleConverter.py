@@ -30,7 +30,7 @@ class ScaleConverter(HelperObject):
         return variant_Pasta_Easing_Curve_string_(self._node.at("easing"))
     @property
     def in_(self):  # type: ()->Vector2
-        return Vector2(self._node.at("in_"))
+        return Vector2(self._node.at("in"))
     @in_.setter
     def in_(self, val): self.in_.set(val)
     @property

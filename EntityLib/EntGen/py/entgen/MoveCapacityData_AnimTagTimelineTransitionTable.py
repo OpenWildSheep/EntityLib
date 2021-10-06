@@ -27,7 +27,7 @@ class MoveCapacityData_AnimTagTimelineTransitionTable(HelperObject):
     def _comment(self, val): self._comment.set(val)
     @property
     def from_(self):  # type: ()->AnimTag
-        return AnimTag(self._node.at("from_"))
+        return AnimTag(self._node.at("from"))
     @from_.setter
     def from_(self, val): self.from_.set(val)
     @property

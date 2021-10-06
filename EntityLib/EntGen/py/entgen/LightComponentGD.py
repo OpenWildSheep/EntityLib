@@ -84,7 +84,7 @@ class LightComponentGD(HelperObject):
         return ComponentGD(self._node.at("Super"))
     @property
     def Type_(self):  # type: ()->LightType
-        return LightType(self._node.at("Type_"))
+        return LightType(self._node.at("Type"))
     @Type_.setter
     def Type_(self, val): self.Type_.set(val)
     @property

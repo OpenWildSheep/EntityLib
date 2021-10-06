@@ -9718,7 +9718,7 @@ namespace Ent
         }
         inline Ent::Gen::String ShootSequenceData::Type_() const
         {
-            return Ent::Gen::String(node->at("Type_"));
+            return Ent::Gen::String(node->at("Type"));
         }
         inline Ent::Gen::String ShootSequenceData::_comment() const
         {
@@ -9892,7 +9892,7 @@ namespace Ent
         }
         inline Ent::Gen::Vector2 ScaleConverter::in_() const
         {
-            return Ent::Gen::Vector2(node->at("in_"));
+            return Ent::Gen::Vector2(node->at("in"));
         }
         inline Ent::Gen::String ScaleConverter::inText() const
         {
@@ -10927,7 +10927,7 @@ namespace Ent
         }
         inline Ent::Gen::HotSpotType HotspotData::Type_() const
         {
-            return Ent::Gen::HotSpotType(node->at("Type_"));
+            return Ent::Gen::HotSpotType(node->at("Type"));
         }
         inline Ent::Gen::String HotspotData::_comment() const
         {
@@ -13156,7 +13156,7 @@ namespace Ent
         }
         inline Ent::Gen::String NetworkNode::Type_() const
         {
-            return Ent::Gen::String(node->at("Type_"));
+            return Ent::Gen::String(node->at("Type"));
         }
         inline Ent::Gen::String NetworkNode::_comment() const
         {
@@ -18108,7 +18108,7 @@ namespace Ent
         }
         inline Ent::Gen::LightType LightComponentGD::Type_() const
         {
-            return Ent::Gen::LightType(node->at("Type_"));
+            return Ent::Gen::LightType(node->at("Type"));
         }
         inline Ent::Gen::Bool LightComponentGD::VolumetricFog() const
         {
@@ -18694,7 +18694,7 @@ namespace Ent
         }
         inline Ent::Gen::CameraType CameraSetterGD::Type_() const
         {
-            return Ent::Gen::CameraType(node->at("Type_"));
+            return Ent::Gen::CameraType(node->at("Type"));
         }
         inline Ent::Gen::String CameraSetterGD::_comment() const
         {
@@ -19338,7 +19338,7 @@ namespace Ent
         }
         inline Ent::Gen::AttackWeaponAbility AttackData::None_() const
         {
-            return Ent::Gen::AttackWeaponAbility(node->at("None_"));
+            return Ent::Gen::AttackWeaponAbility(node->at("None"));
         }
         inline Ent::Gen::AttackWeaponAbility AttackData::Stick() const
         {
@@ -19628,7 +19628,7 @@ namespace Ent
         }
         inline Ent::Gen::AnimTag MoveCapacityData_AnimTagTimelineTransitionTable::from_() const
         {
-            return Ent::Gen::AnimTag(node->at("from_"));
+            return Ent::Gen::AnimTag(node->at("from"));
         }
         inline Array<Ent::Gen::MoveCapacityData_AnimTagTimelineTransitionItem> MoveCapacityData_AnimTagTimelineTransitionTable::transitions() const
         {

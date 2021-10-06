@@ -54,7 +54,7 @@ class HotspotData(HelperObject):
     def TargetEntityRef(self, val): self.TargetEntityRef.set(val)
     @property
     def Type_(self):  # type: ()->HotSpotType
-        return HotSpotType(self._node.at("Type_"))
+        return HotSpotType(self._node.at("Type"))
     @Type_.setter
     def Type_(self, val): self.Type_.set(val)
     @property

@@ -33,7 +33,7 @@ class AttackData(HelperObject):
         return AttackWeaponAbility(self._node.at("Knife"))
     @property
     def None_(self):  # type: ()->AttackWeaponAbility
-        return AttackWeaponAbility(self._node.at("None_"))
+        return AttackWeaponAbility(self._node.at("None"))
     @property
     def Stick(self):  # type: ()->AttackWeaponAbility
         return AttackWeaponAbility(self._node.at("Stick"))

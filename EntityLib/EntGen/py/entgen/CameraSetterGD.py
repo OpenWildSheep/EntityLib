@@ -36,7 +36,7 @@ class CameraSetterGD(HelperObject):
     def SwitchToType(self, val): self.SwitchToType.set(val)
     @property
     def Type_(self):  # type: ()->CameraType
-        return CameraType(self._node.at("Type_"))
+        return CameraType(self._node.at("Type"))
     @Type_.setter
     def Type_(self, val): self.Type_.set(val)
     @property

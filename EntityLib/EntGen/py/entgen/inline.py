@@ -1324,7 +1324,7 @@ class ShootSequenceData(HelperObject):
     def Param(self, val): self.Param.set(val)
     @property
     def Type_(self):  # type: ()->String
-        return String(self._node.at("Type_"))
+        return String(self._node.at("Type"))
     @Type_.setter
     def Type_(self, val): self.Type_.set(val)
     @property
@@ -1608,7 +1608,7 @@ class ScaleConverter(HelperObject):
         return variant_Pasta_Easing_Curve_string_(self._node.at("easing"))
     @property
     def in_(self):  # type: ()->Vector2
-        return Vector2(self._node.at("in_"))
+        return Vector2(self._node.at("in"))
     @in_.setter
     def in_(self, val): self.in_.set(val)
     @property
@@ -3371,7 +3371,7 @@ class HotspotData(HelperObject):
     def TargetEntityRef(self, val): self.TargetEntityRef.set(val)
     @property
     def Type_(self):  # type: ()->HotSpotType
-        return HotSpotType(self._node.at("Type_"))
+        return HotSpotType(self._node.at("Type"))
     @Type_.setter
     def Type_(self, val): self.Type_.set(val)
     @property
@@ -7141,7 +7141,7 @@ class NetworkNode(HelperObject):
     def ThumbnailMesh(self, val): self.ThumbnailMesh.set(val)
     @property
     def Type_(self):  # type: ()->String
-        return String(self._node.at("Type_"))
+        return String(self._node.at("Type"))
     @Type_.setter
     def Type_(self, val): self.Type_.set(val)
     @property
@@ -9266,7 +9266,7 @@ class LightComponentGD(HelperObject):
         return ComponentGD(self._node.at("Super"))
     @property
     def Type_(self):  # type: ()->LightType
-        return LightType(self._node.at("Type_"))
+        return LightType(self._node.at("Type"))
     @Type_.setter
     def Type_(self, val): self.Type_.set(val)
     @property
@@ -10308,7 +10308,7 @@ class CameraSetterGD(HelperObject):
     def SwitchToType(self, val): self.SwitchToType.set(val)
     @property
     def Type_(self):  # type: ()->CameraType
-        return CameraType(self._node.at("Type_"))
+        return CameraType(self._node.at("Type"))
     @Type_.setter
     def Type_(self, val): self.Type_.set(val)
     @property
@@ -11237,7 +11237,7 @@ class AttackData(HelperObject):
         return AttackWeaponAbility(self._node.at("Knife"))
     @property
     def None_(self):  # type: ()->AttackWeaponAbility
-        return AttackWeaponAbility(self._node.at("None_"))
+        return AttackWeaponAbility(self._node.at("None"))
     @property
     def Stick(self):  # type: ()->AttackWeaponAbility
         return AttackWeaponAbility(self._node.at("Stick"))
@@ -11796,7 +11796,7 @@ class MoveCapacityData_AnimTagTimelineTransitionTable(HelperObject):
     def _comment(self, val): self._comment.set(val)
     @property
     def from_(self):  # type: ()->AnimTag
-        return AnimTag(self._node.at("from_"))
+        return AnimTag(self._node.at("from"))
     @from_.setter
     def from_(self, val): self.from_.set(val)
     @property

@@ -26,7 +26,7 @@ class ShootSequenceData(HelperObject):
     def Param(self, val): self.Param.set(val)
     @property
     def Type_(self):  # type: ()->String
-        return String(self._node.at("Type_"))
+        return String(self._node.at("Type"))
     @Type_.setter
     def Type_(self, val): self.Type_.set(val)
     @property

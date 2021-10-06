@@ -525,7 +525,8 @@ static json getSchemaData(Ent::Subschema const& _schema)
         {
             json prop(json::value_t::object);
             auto propData = getSchemaRefType(propRef);
-            prop["prop_name"] = escapeName(propName);
+            prop["prop_name"] = propName;
+            prop["escaped_prop_name"] = escapeName(propName);
             prop["type"] = std::move(propData);
             properties.push_back(prop);
             includes.emplace(getSchemaRefType(propRef));
@@ -730,7 +731,7 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             {{/schema.schema_name}}
-        {{#properties}}    {{#type}}{{>display_type}}{{/type}} {{prop_name}}() const;
+        {{#properties}}    {{#type}}{{>display_type}}{{/type}} {{escaped_prop_name}}() const;
         {{/properties}}
         };{{/schema.object}}{{#schema.enum}}
         struct {{schema.type_name}} : EnumPropHelper<{{schema.type_name}}, {{schema.type_name}}Enum> // Enum
@@ -781,7 +782,7 @@ namespace Ent
 {{/all_definitions}}
 
         {{#all_definitions}}{{#schema.object}}// {{schema.type_name}}
-        {{#properties}}inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::{{prop_name}}() const
+        {{#properties}}inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::{{escaped_prop_name}}() const
         {
             return {{#type}}{{>display_type}}{{/type}}(node->at("{{prop_name}}"));
         }
@@ -901,13 +902,13 @@ class {{schema.type_name}}(HelperObject):
         self.node.save_node(destfile)
 {{/schema.schema_name}}
 {{#properties}}{{#type}}    @property
-    def {{prop_name}}(self):  # type: ()->{{>display_type_comma}}
+    def {{escaped_prop_name}}(self):  # type: ()->{{>display_type_comma}}
         return {{>type_ctor}}(self._node.at("{{prop_name}}")){{#prim_array}}
-    @{{prop_name}}.setter
-    def {{prop_name}}(self, val): self.{{prop_name}}.set(val)
+    @{{escaped_prop_name}}.setter
+    def {{escaped_prop_name}}(self, val): self.{{escaped_prop_name}}.set(val)
 {{/prim_array}}{{#ref.settable}}
-    @{{prop_name}}.setter
-    def {{prop_name}}(self, val): self.{{prop_name}}.set(val)
+    @{{escaped_prop_name}}.setter
+    def {{escaped_prop_name}}(self, val): self.{{escaped_prop_name}}.set(val)
 {{/ref.settable}}{{/type}}
 {{/properties}}    pass
 

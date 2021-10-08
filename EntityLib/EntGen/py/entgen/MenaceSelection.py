@@ -15,7 +15,7 @@ class MenaceSelectionEnum(Enum):
 
 class MenaceSelection(Primitive[MenaceSelectionEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(MenaceSelectionEnum, node)
+        super(MenaceSelection, self).__init__(MenaceSelectionEnum, node)
     schema_name = "MenaceSelection"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> MenaceSelection
         return MenaceSelection(node)

@@ -15,7 +15,7 @@ class ReviveSideEnum(Enum):
 
 class ReviveSide(Primitive[ReviveSideEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(ReviveSideEnum, node)
+        super(ReviveSide, self).__init__(ReviveSideEnum, node)
     schema_name = "ReviveSide"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> ReviveSide
         return ReviveSide(node)

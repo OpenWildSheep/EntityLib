@@ -17,7 +17,7 @@ class SpeedModeEnum(Enum):
 
 class SpeedMode(Primitive[SpeedModeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(SpeedModeEnum, node)
+        super(SpeedMode, self).__init__(SpeedModeEnum, node)
     schema_name = "SpeedMode"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> SpeedMode
         return SpeedMode(node)

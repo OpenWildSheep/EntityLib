@@ -15,7 +15,7 @@ class FluidTypeEnum(Enum):
 
 class FluidType(Primitive[FluidTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(FluidTypeEnum, node)
+        super(FluidType, self).__init__(FluidTypeEnum, node)
     schema_name = "FluidType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> FluidType
         return FluidType(node)

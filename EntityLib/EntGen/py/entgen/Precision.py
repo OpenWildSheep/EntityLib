@@ -18,7 +18,7 @@ class PrecisionEnum(Enum):
 
 class Precision(Primitive[PrecisionEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(PrecisionEnum, node)
+        super(Precision, self).__init__(PrecisionEnum, node)
     schema_name = "Precision"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> Precision
         return Precision(node)

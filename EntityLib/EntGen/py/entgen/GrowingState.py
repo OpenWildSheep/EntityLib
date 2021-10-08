@@ -18,7 +18,7 @@ class GrowingStateEnum(Enum):
 
 class GrowingState(Primitive[GrowingStateEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(GrowingStateEnum, node)
+        super(GrowingState, self).__init__(GrowingStateEnum, node)
     schema_name = "GrowingState"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> GrowingState
         return GrowingState(node)

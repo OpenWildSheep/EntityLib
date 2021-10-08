@@ -31,7 +31,7 @@ class PhysicsLayerEnum(Enum):
 
 class PhysicsLayer(Primitive[PhysicsLayerEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(PhysicsLayerEnum, node)
+        super(PhysicsLayer, self).__init__(PhysicsLayerEnum, node)
     schema_name = "PhysicsLayer"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> PhysicsLayer
         return PhysicsLayer(node)

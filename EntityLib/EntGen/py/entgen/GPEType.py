@@ -15,7 +15,7 @@ class GPETypeEnum(Enum):
 
 class GPEType(Primitive[GPETypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(GPETypeEnum, node)
+        super(GPEType, self).__init__(GPETypeEnum, node)
     schema_name = "GPEType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> GPEType
         return GPEType(node)

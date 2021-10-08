@@ -27,7 +27,7 @@ class LocomotionModeEnum(Enum):
 
 class LocomotionMode(Primitive[LocomotionModeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(LocomotionModeEnum, node)
+        super(LocomotionMode, self).__init__(LocomotionModeEnum, node)
     schema_name = "LocomotionMode"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> LocomotionMode
         return LocomotionMode(node)

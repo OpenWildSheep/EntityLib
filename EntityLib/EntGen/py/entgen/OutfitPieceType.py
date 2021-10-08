@@ -20,7 +20,7 @@ class OutfitPieceTypeEnum(Enum):
 
 class OutfitPieceType(Primitive[OutfitPieceTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(OutfitPieceTypeEnum, node)
+        super(OutfitPieceType, self).__init__(OutfitPieceTypeEnum, node)
     schema_name = "OutfitPieceType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> OutfitPieceType
         return OutfitPieceType(node)

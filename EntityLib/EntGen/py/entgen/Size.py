@@ -17,7 +17,7 @@ class SizeEnum(Enum):
 
 class Size(Primitive[SizeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(SizeEnum, node)
+        super(Size, self).__init__(SizeEnum, node)
     schema_name = "Size"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> Size
         return Size(node)

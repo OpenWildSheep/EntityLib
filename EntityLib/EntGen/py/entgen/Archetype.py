@@ -19,7 +19,7 @@ class ArchetypeEnum(Enum):
 
 class Archetype(Primitive[ArchetypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(ArchetypeEnum, node)
+        super(Archetype, self).__init__(ArchetypeEnum, node)
     schema_name = "Archetype"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> Archetype
         return Archetype(node)

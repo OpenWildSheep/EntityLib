@@ -15,7 +15,7 @@ class AnimTagTimelineTransitionEnum(Enum):
 
 class AnimTagTimelineTransition(Primitive[AnimTagTimelineTransitionEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(AnimTagTimelineTransitionEnum, node)
+        super(AnimTagTimelineTransition, self).__init__(AnimTagTimelineTransitionEnum, node)
     schema_name = "AnimTagTimelineTransition"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> AnimTagTimelineTransition
         return AnimTagTimelineTransition(node)

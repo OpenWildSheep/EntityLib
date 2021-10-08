@@ -20,7 +20,7 @@ class StyleModeEnum(Enum):
 
 class StyleMode(Primitive[StyleModeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(StyleModeEnum, node)
+        super(StyleMode, self).__init__(StyleModeEnum, node)
     schema_name = "StyleMode"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> StyleMode
         return StyleMode(node)

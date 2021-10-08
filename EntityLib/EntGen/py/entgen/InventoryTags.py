@@ -25,7 +25,7 @@ class InventoryTagsEnum(Enum):
 
 class InventoryTags(Primitive[InventoryTagsEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(InventoryTagsEnum, node)
+        super(InventoryTags, self).__init__(InventoryTagsEnum, node)
     schema_name = "InventoryTags"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> InventoryTags
         return InventoryTags(node)

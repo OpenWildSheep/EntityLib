@@ -25,7 +25,7 @@ class AttackTypeEnum(Enum):
 
 class AttackType(Primitive[AttackTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(AttackTypeEnum, node)
+        super(AttackType, self).__init__(AttackTypeEnum, node)
     schema_name = "AttackType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> AttackType
         return AttackType(node)

@@ -59,7 +59,7 @@ class SpecieEnum(Enum):
 
 class Specie(Primitive[SpecieEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(SpecieEnum, node)
+        super(Specie, self).__init__(SpecieEnum, node)
     schema_name = "Specie"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> Specie
         return Specie(node)

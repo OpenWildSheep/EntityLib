@@ -15,7 +15,7 @@ class MeshNavigationAllowedModeEnum(Enum):
 
 class MeshNavigationAllowedMode(Primitive[MeshNavigationAllowedModeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(MeshNavigationAllowedModeEnum, node)
+        super(MeshNavigationAllowedMode, self).__init__(MeshNavigationAllowedModeEnum, node)
     schema_name = "MeshNavigationAllowedMode"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> MeshNavigationAllowedMode
         return MeshNavigationAllowedMode(node)

@@ -35,7 +35,7 @@ class Pasta_Easing_CurveEnum(Enum):
 
 class Pasta_Easing_Curve(Primitive[Pasta_Easing_CurveEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(Pasta_Easing_CurveEnum, node)
+        super(Pasta_Easing_Curve, self).__init__(Pasta_Easing_CurveEnum, node)
     schema_name = "Pasta::Easing::Curve"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> Pasta_Easing_Curve
         return Pasta_Easing_Curve(node)

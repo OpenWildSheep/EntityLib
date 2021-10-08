@@ -16,7 +16,7 @@ class LightTypeEnum(Enum):
 
 class LightType(Primitive[LightTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(LightTypeEnum, node)
+        super(LightType, self).__init__(LightTypeEnum, node)
     schema_name = "LightType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> LightType
         return LightType(node)

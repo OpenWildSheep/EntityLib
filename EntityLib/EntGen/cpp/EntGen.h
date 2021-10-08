@@ -7984,6 +7984,7 @@ namespace Ent
             Ent::Gen::Float minFlapTime() const;
             Ent::Gen::Float minSpeedToSteerPitch() const;
             Ent::Gen::Float minTimeBetweenFlaps() const;
+            Ent::Gen::Float minimumDropTimeBeforeAClimbEdge() const;
             Ent::Gen::MoveCapacityData_OrientationSpeed orientationSpeedFly() const;
             Ent::Gen::MoveCapacityData_OrientationSpeed orientationSpeedGround() const;
             Ent::Gen::MoveCapacityData_OrientationSpeed orientationSpeedWater() const;
@@ -19810,6 +19811,10 @@ namespace Ent
         inline Ent::Gen::Float MoveCapacityData::minTimeBetweenFlaps() const
         {
             return Ent::Gen::Float(node->at("minTimeBetweenFlaps"));
+        }
+        inline Ent::Gen::Float MoveCapacityData::minimumDropTimeBeforeAClimbEdge() const
+        {
+            return Ent::Gen::Float(node->at("minimumDropTimeBeforeAClimbEdge"));
         }
         inline Ent::Gen::MoveCapacityData_OrientationSpeed MoveCapacityData::orientationSpeedFly() const
         {

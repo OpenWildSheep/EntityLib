@@ -21,7 +21,7 @@ class SyncTempoModeEnum(Enum):
 
 class SyncTempoMode(Primitive[SyncTempoModeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(SyncTempoModeEnum, node)
+        super(SyncTempoMode, self).__init__(SyncTempoModeEnum, node)
     schema_name = "SyncTempoMode"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> SyncTempoMode
         return SyncTempoMode(node)

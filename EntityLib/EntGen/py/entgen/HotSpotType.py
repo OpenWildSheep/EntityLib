@@ -34,7 +34,7 @@ class HotSpotTypeEnum(Enum):
 
 class HotSpotType(Primitive[HotSpotTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(HotSpotTypeEnum, node)
+        super(HotSpotType, self).__init__(HotSpotTypeEnum, node)
     schema_name = "HotSpotType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> HotSpotType
         return HotSpotType(node)

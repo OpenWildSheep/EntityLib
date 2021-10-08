@@ -47,7 +47,7 @@ class ActorCategoryEnum(Enum):
 
 class ActorCategory(Primitive[ActorCategoryEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(ActorCategoryEnum, node)
+        super(ActorCategory, self).__init__(ActorCategoryEnum, node)
     schema_name = "ActorCategory"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> ActorCategory
         return ActorCategory(node)

@@ -18,7 +18,7 @@ class PrimitiveColliderTypeEnum(Enum):
 
 class PrimitiveColliderType(Primitive[PrimitiveColliderTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(PrimitiveColliderTypeEnum, node)
+        super(PrimitiveColliderType, self).__init__(PrimitiveColliderTypeEnum, node)
     schema_name = "PrimitiveColliderType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> PrimitiveColliderType
         return PrimitiveColliderType(node)

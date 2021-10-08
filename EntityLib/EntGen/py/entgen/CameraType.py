@@ -28,7 +28,7 @@ class CameraTypeEnum(Enum):
 
 class CameraType(Primitive[CameraTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(CameraTypeEnum, node)
+        super(CameraType, self).__init__(CameraTypeEnum, node)
     schema_name = "CameraType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> CameraType
         return CameraType(node)

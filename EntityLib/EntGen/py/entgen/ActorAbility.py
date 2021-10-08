@@ -18,7 +18,7 @@ class ActorAbilityEnum(Enum):
 
 class ActorAbility(Primitive[ActorAbilityEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(ActorAbilityEnum, node)
+        super(ActorAbility, self).__init__(ActorAbilityEnum, node)
     schema_name = "ActorAbility"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> ActorAbility
         return ActorAbility(node)

@@ -14,7 +14,7 @@ class RegenSwitchBehaviorEnum(Enum):
 
 class RegenSwitchBehavior(Primitive[RegenSwitchBehaviorEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(RegenSwitchBehaviorEnum, node)
+        super(RegenSwitchBehavior, self).__init__(RegenSwitchBehaviorEnum, node)
     schema_name = "RegenSwitchBehavior"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> RegenSwitchBehavior
         return RegenSwitchBehavior(node)

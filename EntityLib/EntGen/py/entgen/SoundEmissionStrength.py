@@ -16,7 +16,7 @@ class SoundEmissionStrengthEnum(Enum):
 
 class SoundEmissionStrength(Primitive[SoundEmissionStrengthEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(SoundEmissionStrengthEnum, node)
+        super(SoundEmissionStrength, self).__init__(SoundEmissionStrengthEnum, node)
     schema_name = "SoundEmissionStrength"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> SoundEmissionStrength
         return SoundEmissionStrength(node)

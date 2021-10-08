@@ -38,7 +38,7 @@ class AnimTagEnum(Enum):
 
 class AnimTag(Primitive[AnimTagEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(AnimTagEnum, node)
+        super(AnimTag, self).__init__(AnimTagEnum, node)
     schema_name = "AnimTag"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> AnimTag
         return AnimTag(node)

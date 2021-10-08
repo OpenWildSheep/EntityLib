@@ -23,7 +23,7 @@ class BeamStaffModeEnum(Enum):
 
 class BeamStaffMode(Primitive[BeamStaffModeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(BeamStaffModeEnum, node)
+        super(BeamStaffMode, self).__init__(BeamStaffModeEnum, node)
     schema_name = "BeamStaffMode"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> BeamStaffMode
         return BeamStaffMode(node)

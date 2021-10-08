@@ -235,6 +235,11 @@ class MoveCapacityData(HelperObject):
     @minTimeBetweenFlaps.setter
     def minTimeBetweenFlaps(self, val): self.minTimeBetweenFlaps.set(val)
     @property
+    def minimumDropTimeBeforeAClimbEdge(self):  # type: ()->Float
+        return Float(self._node.at("minimumDropTimeBeforeAClimbEdge"))
+    @minimumDropTimeBeforeAClimbEdge.setter
+    def minimumDropTimeBeforeAClimbEdge(self, val): self.minimumDropTimeBeforeAClimbEdge.set(val)
+    @property
     def orientationSpeedFly(self):  # type: ()->MoveCapacityData_OrientationSpeed
         return MoveCapacityData_OrientationSpeed(self._node.at("orientationSpeedFly"))
     @property

@@ -15,7 +15,7 @@ class CinematicUpdateTypeEnum(Enum):
 
 class CinematicUpdateType(Primitive[CinematicUpdateTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(CinematicUpdateTypeEnum, node)
+        super(CinematicUpdateType, self).__init__(CinematicUpdateTypeEnum, node)
     schema_name = "CinematicUpdateType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> CinematicUpdateType
         return CinematicUpdateType(node)

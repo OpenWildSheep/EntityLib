@@ -61449,6 +61449,24 @@
                         }
                     },
                     {
+                        "escaped_prop_name": "minimumDropTimeBeforeAClimbEdge",
+                        "prop_name": "minimumDropTimeBeforeAClimbEdge",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "Float",
+                                "settable": true
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
                         "escaped_prop_name": "orientationSpeedFly",
                         "prop_name": "orientationSpeedFly",
                         "type": {

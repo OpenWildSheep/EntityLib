@@ -18,7 +18,7 @@ class RegenerationStateEnum(Enum):
 
 class RegenerationState(Primitive[RegenerationStateEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(RegenerationStateEnum, node)
+        super(RegenerationState, self).__init__(RegenerationStateEnum, node)
     schema_name = "RegenerationState"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> RegenerationState
         return RegenerationState(node)

@@ -15,7 +15,7 @@ class MaxActivationLevelEnum(Enum):
 
 class MaxActivationLevel(Primitive[MaxActivationLevelEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(MaxActivationLevelEnum, node)
+        super(MaxActivationLevel, self).__init__(MaxActivationLevelEnum, node)
     
     def __call__(self, node):  # type: (EntityLibPy.Node) -> MaxActivationLevel
         return MaxActivationLevel(node)

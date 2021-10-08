@@ -862,7 +862,7 @@ class SyncTempoModeEnum(Enum):
 
 class SyncTempoMode(Primitive[SyncTempoModeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(SyncTempoModeEnum, node)
+        super(SyncTempoMode, self).__init__(SyncTempoModeEnum, node)
     schema_name = "SyncTempoMode"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> SyncTempoMode
         return SyncTempoMode(node)
@@ -887,7 +887,7 @@ class StyleModeEnum(Enum):
 
 class StyleMode(Primitive[StyleModeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(StyleModeEnum, node)
+        super(StyleMode, self).__init__(StyleModeEnum, node)
     schema_name = "StyleMode"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> StyleMode
         return StyleMode(node)
@@ -1092,7 +1092,7 @@ class SpeedModeEnum(Enum):
 
 class SpeedMode(Primitive[SpeedModeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(SpeedModeEnum, node)
+        super(SpeedMode, self).__init__(SpeedModeEnum, node)
     schema_name = "SpeedMode"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> SpeedMode
         return SpeedMode(node)
@@ -1178,7 +1178,7 @@ class SpecieEnum(Enum):
 
 class Specie(Primitive[SpecieEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(SpecieEnum, node)
+        super(Specie, self).__init__(SpecieEnum, node)
     schema_name = "Specie"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> Specie
         return Specie(node)
@@ -1273,7 +1273,7 @@ class SoundEmissionStrengthEnum(Enum):
 
 class SoundEmissionStrength(Primitive[SoundEmissionStrengthEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(SoundEmissionStrengthEnum, node)
+        super(SoundEmissionStrength, self).__init__(SoundEmissionStrengthEnum, node)
     schema_name = "SoundEmissionStrength"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> SoundEmissionStrength
         return SoundEmissionStrength(node)
@@ -1295,7 +1295,7 @@ class SizeEnum(Enum):
 
 class Size(Primitive[SizeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(SizeEnum, node)
+        super(Size, self).__init__(SizeEnum, node)
     schema_name = "Size"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> Size
         return Size(node)
@@ -1664,7 +1664,7 @@ class ReviveSideEnum(Enum):
 
 class ReviveSide(Primitive[ReviveSideEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(ReviveSideEnum, node)
+        super(ReviveSide, self).__init__(ReviveSideEnum, node)
     schema_name = "ReviveSide"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> ReviveSide
         return ReviveSide(node)
@@ -1805,7 +1805,7 @@ class RegenerationStateEnum(Enum):
 
 class RegenerationState(Primitive[RegenerationStateEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(RegenerationStateEnum, node)
+        super(RegenerationState, self).__init__(RegenerationStateEnum, node)
     schema_name = "RegenerationState"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> RegenerationState
         return RegenerationState(node)
@@ -1824,7 +1824,7 @@ class RegenSwitchBehaviorEnum(Enum):
 
 class RegenSwitchBehavior(Primitive[RegenSwitchBehaviorEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(RegenSwitchBehaviorEnum, node)
+        super(RegenSwitchBehavior, self).__init__(RegenSwitchBehaviorEnum, node)
     schema_name = "RegenSwitchBehavior"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> RegenSwitchBehavior
         return RegenSwitchBehavior(node)
@@ -2197,7 +2197,7 @@ class PrimitiveColliderTypeEnum(Enum):
 
 class PrimitiveColliderType(Primitive[PrimitiveColliderTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(PrimitiveColliderTypeEnum, node)
+        super(PrimitiveColliderType, self).__init__(PrimitiveColliderTypeEnum, node)
     schema_name = "PrimitiveColliderType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> PrimitiveColliderType
         return PrimitiveColliderType(node)
@@ -2278,7 +2278,7 @@ class PrecisionEnum(Enum):
 
 class Precision(Primitive[PrecisionEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(PrecisionEnum, node)
+        super(Precision, self).__init__(PrecisionEnum, node)
     schema_name = "Precision"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> Precision
         return Precision(node)
@@ -2291,7 +2291,7 @@ class Precision(Primitive[PrecisionEnum]):  # Enum
 from EntityLibPy import Node
 class Position(TupleNode[Tuple[Type[Int], Type[Int], Type[Float], Type[Float], Type[Float]]]):
     def __init__(self, node=None):  # type: (EntityLibPy.Node) -> None
-        super().__init__((Int, Int, Float, Float, Float), node)
+        super(Position, self).__init__((Int, Int, Float, Float, Float), node)
     schema_name = "./RuntimeComponents.json#/definitions/Position"
 
     def get_0(self):  # type: () -> Int
@@ -2331,7 +2331,7 @@ class PhysicsLayerEnum(Enum):
 
 class PhysicsLayer(Primitive[PhysicsLayerEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(PhysicsLayerEnum, node)
+        super(PhysicsLayer, self).__init__(PhysicsLayerEnum, node)
     schema_name = "PhysicsLayer"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> PhysicsLayer
         return PhysicsLayer(node)
@@ -2356,7 +2356,7 @@ class OutfitPieceTypeEnum(Enum):
 
 class OutfitPieceType(Primitive[OutfitPieceTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(OutfitPieceTypeEnum, node)
+        super(OutfitPieceType, self).__init__(OutfitPieceTypeEnum, node)
     schema_name = "OutfitPieceType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> OutfitPieceType
         return OutfitPieceType(node)
@@ -2428,7 +2428,7 @@ class Object_MaxActivationLevelEnum(Enum):
 
 class Object_MaxActivationLevel(Primitive[Object_MaxActivationLevelEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(Object_MaxActivationLevelEnum, node)
+        super(Object_MaxActivationLevel, self).__init__(Object_MaxActivationLevelEnum, node)
     
     def __call__(self, node):  # type: (EntityLibPy.Node) -> Object_MaxActivationLevel
         return Object_MaxActivationLevel(node)
@@ -2666,7 +2666,7 @@ class MeshNavigationAllowedModeEnum(Enum):
 
 class MeshNavigationAllowedMode(Primitive[MeshNavigationAllowedModeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(MeshNavigationAllowedModeEnum, node)
+        super(MeshNavigationAllowedMode, self).__init__(MeshNavigationAllowedModeEnum, node)
     schema_name = "MeshNavigationAllowedMode"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> MeshNavigationAllowedMode
         return MeshNavigationAllowedMode(node)
@@ -2751,7 +2751,7 @@ class MenaceSelectionEnum(Enum):
 
 class MenaceSelection(Primitive[MenaceSelectionEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(MenaceSelectionEnum, node)
+        super(MenaceSelection, self).__init__(MenaceSelectionEnum, node)
     schema_name = "MenaceSelection"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> MenaceSelection
         return MenaceSelection(node)
@@ -2771,7 +2771,7 @@ class MaxActivationLevelEnum(Enum):
 
 class MaxActivationLevel(Primitive[MaxActivationLevelEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(MaxActivationLevelEnum, node)
+        super(MaxActivationLevel, self).__init__(MaxActivationLevelEnum, node)
     
     def __call__(self, node):  # type: (EntityLibPy.Node) -> MaxActivationLevel
         return MaxActivationLevel(node)
@@ -2862,7 +2862,7 @@ class LocomotionModeEnum(Enum):
 
 class LocomotionMode(Primitive[LocomotionModeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(LocomotionModeEnum, node)
+        super(LocomotionMode, self).__init__(LocomotionModeEnum, node)
     schema_name = "LocomotionMode"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> LocomotionMode
         return LocomotionMode(node)
@@ -2950,7 +2950,7 @@ class LightTypeEnum(Enum):
 
 class LightType(Primitive[LightTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(LightTypeEnum, node)
+        super(LightType, self).__init__(LightTypeEnum, node)
     schema_name = "LightType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> LightType
         return LightType(node)
@@ -3102,7 +3102,7 @@ class InventoryTagsEnum(Enum):
 
 class InventoryTags(Primitive[InventoryTagsEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(InventoryTagsEnum, node)
+        super(InventoryTags, self).__init__(InventoryTagsEnum, node)
     schema_name = "InventoryTags"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> InventoryTags
         return InventoryTags(node)
@@ -3289,7 +3289,7 @@ class HotSpotTypeEnum(Enum):
 
 class HotSpotType(Primitive[HotSpotTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(HotSpotTypeEnum, node)
+        super(HotSpotType, self).__init__(HotSpotTypeEnum, node)
     schema_name = "HotSpotType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> HotSpotType
         return HotSpotType(node)
@@ -3459,7 +3459,7 @@ class GrowingStateEnum(Enum):
 
 class GrowingState(Primitive[GrowingStateEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(GrowingStateEnum, node)
+        super(GrowingState, self).__init__(GrowingStateEnum, node)
     schema_name = "GrowingState"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> GrowingState
         return GrowingState(node)
@@ -3479,7 +3479,7 @@ class GPETypeEnum(Enum):
 
 class GPEType(Primitive[GPETypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(GPETypeEnum, node)
+        super(GPEType, self).__init__(GPETypeEnum, node)
     schema_name = "GPEType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> GPEType
         return GPEType(node)
@@ -3861,7 +3861,7 @@ class FluidTypeEnum(Enum):
 
 class FluidType(Primitive[FluidTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(FluidTypeEnum, node)
+        super(FluidType, self).__init__(FluidTypeEnum, node)
     schema_name = "FluidType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> FluidType
         return FluidType(node)
@@ -9535,7 +9535,7 @@ class CinematicUpdateTypeEnum(Enum):
 
 class CinematicUpdateType(Primitive[CinematicUpdateTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(CinematicUpdateTypeEnum, node)
+        super(CinematicUpdateType, self).__init__(CinematicUpdateTypeEnum, node)
     schema_name = "CinematicUpdateType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> CinematicUpdateType
         return CinematicUpdateType(node)
@@ -10271,7 +10271,7 @@ class CameraTypeEnum(Enum):
 
 class CameraType(Primitive[CameraTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(CameraTypeEnum, node)
+        super(CameraType, self).__init__(CameraTypeEnum, node)
     schema_name = "CameraType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> CameraType
         return CameraType(node)
@@ -10991,7 +10991,7 @@ class BeamStaffModeEnum(Enum):
 
 class BeamStaffMode(Primitive[BeamStaffModeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(BeamStaffModeEnum, node)
+        super(BeamStaffMode, self).__init__(BeamStaffModeEnum, node)
     schema_name = "BeamStaffMode"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> BeamStaffMode
         return BeamStaffMode(node)
@@ -11084,7 +11084,7 @@ class AttackTypeEnum(Enum):
 
 class AttackType(Primitive[AttackTypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(AttackTypeEnum, node)
+        super(AttackType, self).__init__(AttackTypeEnum, node)
     schema_name = "AttackType"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> AttackType
         return AttackType(node)
@@ -11266,7 +11266,7 @@ class ArchetypeEnum(Enum):
 
 class Archetype(Primitive[ArchetypeEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(ArchetypeEnum, node)
+        super(Archetype, self).__init__(ArchetypeEnum, node)
     schema_name = "Archetype"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> Archetype
         return Archetype(node)
@@ -11694,7 +11694,7 @@ class AnimTagTimelineTransitionEnum(Enum):
 
 class AnimTagTimelineTransition(Primitive[AnimTagTimelineTransitionEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(AnimTagTimelineTransitionEnum, node)
+        super(AnimTagTimelineTransition, self).__init__(AnimTagTimelineTransitionEnum, node)
     schema_name = "AnimTagTimelineTransition"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> AnimTagTimelineTransition
         return AnimTagTimelineTransition(node)
@@ -11737,7 +11737,7 @@ class AnimTagEnum(Enum):
 
 class AnimTag(Primitive[AnimTagEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(AnimTagEnum, node)
+        super(AnimTag, self).__init__(AnimTagEnum, node)
     schema_name = "AnimTag"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> AnimTag
         return AnimTag(node)
@@ -12025,6 +12025,11 @@ class MoveCapacityData(HelperObject):
         return Float(self._node.at("minTimeBetweenFlaps"))
     @minTimeBetweenFlaps.setter
     def minTimeBetweenFlaps(self, val): self.minTimeBetweenFlaps.set(val)
+    @property
+    def minimumDropTimeBeforeAClimbEdge(self):  # type: ()->Float
+        return Float(self._node.at("minimumDropTimeBeforeAClimbEdge"))
+    @minimumDropTimeBeforeAClimbEdge.setter
+    def minimumDropTimeBeforeAClimbEdge(self, val): self.minimumDropTimeBeforeAClimbEdge.set(val)
     @property
     def orientationSpeedFly(self):  # type: ()->MoveCapacityData_OrientationSpeed
         return MoveCapacityData_OrientationSpeed(self._node.at("orientationSpeedFly"))
@@ -13097,7 +13102,7 @@ class ActorCategoryEnum(Enum):
 
 class ActorCategory(Primitive[ActorCategoryEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(ActorCategoryEnum, node)
+        super(ActorCategory, self).__init__(ActorCategoryEnum, node)
     schema_name = "ActorCategory"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> ActorCategory
         return ActorCategory(node)
@@ -13288,7 +13293,7 @@ class ActorAbilityEnum(Enum):
 
 class ActorAbility(Primitive[ActorAbilityEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(ActorAbilityEnum, node)
+        super(ActorAbility, self).__init__(ActorAbilityEnum, node)
     schema_name = "ActorAbility"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> ActorAbility
         return ActorAbility(node)
@@ -13768,7 +13773,7 @@ class Pasta_Easing_CurveEnum(Enum):
 
 class Pasta_Easing_Curve(Primitive[Pasta_Easing_CurveEnum]):  # Enum
     def __init__(self, node):
-        super().__init__(Pasta_Easing_CurveEnum, node)
+        super(Pasta_Easing_Curve, self).__init__(Pasta_Easing_CurveEnum, node)
     schema_name = "Pasta::Easing::Curve"
     def __call__(self, node):  # type: (EntityLibPy.Node) -> Pasta_Easing_Curve
         return Pasta_Easing_Curve(node)

@@ -921,7 +921,7 @@ class {{schema.type_name}}(Union):
 {{/union}}{{#enum}}
 class {{schema.type_name}}(Primitive[{{schema.type_name}}Enum]):  # Enum
     def __init__(self, node):
-        super().__init__({{schema.type_name}}Enum, node)
+        super({{schema.type_name}}, self).__init__({{schema.type_name}}Enum, node)
     {{#schema_name}}schema_name = "{{.}}"{{/schema_name}}
     def __call__(self, node):  # type: (EntityLibPy.Node) -> {{schema.type_name}}
         return {{schema.type_name}}(node)
@@ -934,7 +934,7 @@ class {{schema.type_name}}(Primitive[{{schema.type_name}}Enum]):  # Enum
 {{/enum}}{{#tuple}}
 class {{type_name}}(TupleNode[Tuple[{{#types}}Type[{{>display_type_hint}}]{{#comma}}, {{/comma}}{{/types}}]]):
     def __init__(self, node=None):  # type: (EntityLibPy.Node) -> None
-        super().__init__((Int, Int, Float, Float, Float), node)
+        super({{type_name}}, self).__init__((Int, Int, Float, Float, Float), node)
     {{#schema_name}}schema_name = "{{.}}"{{/schema_name}}
 
 {{#types}}    def get_{{index}}(self):  # type: () -> {{>display_type_hint}}

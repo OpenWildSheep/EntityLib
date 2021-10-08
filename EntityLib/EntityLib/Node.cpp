@@ -559,7 +559,9 @@ namespace Ent
             {
                 throw BadArrayType("Can't 'push' in a map or set. Use 'mapInsert'.");
             }
-            return arr.arrayPush();
+            auto newNode = arr.arrayPush();
+            newNode->setParentNode(this);
+            return newNode;
         }
         throw BadType();
     }
@@ -661,7 +663,9 @@ namespace Ent
     Node* Node::mapInsert(int64_t _key)
     {
         checkMap("mapInsert");
-        return std::get<Array>(value).mapInsert(_key);
+        Node* newNode = std::get<Array>(value).mapInsert(_key);
+        newNode->setParentNode(this);
+        return newNode;
     }
 
     Node* Node::mapInsert(char const* _key)
@@ -671,7 +675,9 @@ namespace Ent
             throw NullPointerArgument("_key", "Node::mapInsert");
         }
         checkMap("mapInsert");
-        return std::get<Array>(value).mapInsert(_key);
+        Node* newNode = std::get<Array>(value).mapInsert(_key);
+        newNode->setParentNode(this);
+        return newNode;
     }
 
     Node* Node::mapInsertInstanceOf(char const* _prefabPath)
@@ -685,6 +691,7 @@ namespace Ent
         Node* newNode =
             std::get<Array>(value).mapInsert(std::get<Array>(value).getChildKey(prefab.get()));
         newNode->resetInstanceOf(_prefabPath);
+        newNode->setParentNode(this);
         return newNode;
     }
 
@@ -699,7 +706,9 @@ namespace Ent
             throw NullPointerArgument("_newkey", "Node::mapRename");
         }
         checkMap("mapGet");
-        return std::get<Array>(value).mapRename(_key, _newkey);
+        auto newNode = std::get<Array>(value).mapRename(_key, _newkey);
+        newNode->setParentNode(this);
+        return newNode;
     }
 
     Node* Node::mapRename(int64_t _key, int64_t _newkey)

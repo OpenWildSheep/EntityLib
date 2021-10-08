@@ -694,6 +694,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pyEntityRef
         .def(py::init<>())
         .def(py::init<std::string>())
+        .def(py::init<EntityRef const&>())
         .def_readwrite("entity_path", &EntityRef::entityPath)
         .def("__str__", [](EntityRef* ref) { return (std::string)ref->entityPath; })
         .def("__eq__", [](EntityRef const& _lhs, EntityRef const& _rhs){ return _lhs.entityPath == _rhs.entityPath; })

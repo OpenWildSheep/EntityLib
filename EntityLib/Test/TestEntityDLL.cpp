@@ -584,6 +584,10 @@ try
         ENTLIB_ASSERT(not allSubEntities->empty());
         Ent::Node* originalEnt = allSubEntities->at(0llu);
         ENTLIB_ASSERT(resolvedEntity == originalEnt);
+
+        auto newSubEnt = allSubEntities->mapInsert("prefab.entity");
+        newSubEnt->at("Name")->setString("newSubEnt");
+        ENTLIB_ASSERT(entlib.makeEntityRef(ent, *newSubEnt).entityPath == "newSubEnt");
     }
 
     {

@@ -588,6 +588,10 @@ try
         auto newSubEnt = allSubEntities->mapInsert("prefab.entity");
         newSubEnt->at("Name")->setString("newSubEnt");
         ENTLIB_ASSERT(entlib.makeEntityRef(ent, *newSubEnt).entityPath == "newSubEnt");
+
+        auto embedded = ent.at("Components")->mapGet("SubScene")->getUnionData()->at("Embedded");
+        auto insertedEnt = embedded->mapInsertInstanceOf("prefab.entity");
+        insertedEnt->checkParent(embedded);
     }
 
     {

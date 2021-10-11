@@ -17,6 +17,7 @@ namespace Ent
         : schema(_schema)
         , value(std::move(val))
     {
+        updateParents();
     }
 
     Node::Node(Node const& _node)
@@ -561,6 +562,7 @@ namespace Ent
             }
             auto newNode = arr.arrayPush();
             newNode->setParentNode(this);
+            newNode->updateParents();
             return newNode;
         }
         throw BadType();
@@ -665,6 +667,7 @@ namespace Ent
         checkMap("mapInsert");
         Node* newNode = std::get<Array>(value).mapInsert(_key);
         newNode->setParentNode(this);
+        newNode->updateParents();
         return newNode;
     }
 
@@ -677,6 +680,7 @@ namespace Ent
         checkMap("mapInsert");
         Node* newNode = std::get<Array>(value).mapInsert(_key);
         newNode->setParentNode(this);
+        newNode->updateParents();
         return newNode;
     }
 
@@ -692,6 +696,7 @@ namespace Ent
             std::get<Array>(value).mapInsert(std::get<Array>(value).getChildKey(prefab.get()));
         newNode->resetInstanceOf(_prefabPath);
         newNode->setParentNode(this);
+        newNode->updateParents();
         return newNode;
     }
 
@@ -708,6 +713,7 @@ namespace Ent
         checkMap("mapGet");
         auto newNode = std::get<Array>(value).mapRename(_key, _newkey);
         newNode->setParentNode(this);
+        newNode->updateParents();
         return newNode;
     }
 
@@ -938,6 +944,7 @@ namespace Ent
             throw BadType();
         }
         std::get<Object>(value).resetInstanceOf(_prefabNodePath);
+        std::get<Object>(value).setParentNode(this);
     }
 
     void Ent::Node::resetInstanceOf()

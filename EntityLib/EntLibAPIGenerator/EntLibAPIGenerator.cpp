@@ -776,6 +776,7 @@ namespace Ent
             char const* getType() const;{{#types}}
             std::optional<{{#type}}{{>display_type}}{{/type}}> {{name}}() const;
             {{#type}}{{>display_type}}{{/type}} add{{name}}() const;
+            void remove{{name}}() const;
         {{/types}}
         };{{/union}}{{/schema.union_set}}
 
@@ -813,6 +814,10 @@ namespace Ent
         inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::add{{name}}() const
         {
             return {{#type}}{{>display_type}}{{/type}}(addSubNode("{{name}}"));
+        }
+        inline void {{schema.type_name}}::remove{{name}}() const
+        {
+            node->mapErase("{{name}}");
         }
         {{/types}}
 {{/union}}{{/schema.union_set}}

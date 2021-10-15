@@ -2714,6 +2714,11 @@ class MeshNavigationBehaviorData(HelperObject):
     @MeshNavigationAllowedMode.setter
     def MeshNavigationAllowedMode(self, val): self.MeshNavigationAllowedMode.set(val)
     @property
+    def OrientationRateToPrepareToHoldingOnToNavigationMesh(self):  # type: ()->Float
+        return Float(self._node.at("OrientationRateToPrepareToHoldingOnToNavigationMesh"))
+    @OrientationRateToPrepareToHoldingOnToNavigationMesh.setter
+    def OrientationRateToPrepareToHoldingOnToNavigationMesh(self, val): self.OrientationRateToPrepareToHoldingOnToNavigationMesh.set(val)
+    @property
     def RayCastLengthLegFactor(self):  # type: ()->Float
         return Float(self._node.at("RayCastLengthLegFactor"))
     @RayCastLengthLegFactor.setter
@@ -2729,10 +2734,20 @@ class MeshNavigationBehaviorData(HelperObject):
     @RollAllowed.setter
     def RollAllowed(self, val): self.RollAllowed.set(val)
     @property
+    def SlopeAngleMinToAllowStickedLand(self):  # type: ()->Float
+        return Float(self._node.at("SlopeAngleMinToAllowStickedLand"))
+    @SlopeAngleMinToAllowStickedLand.setter
+    def SlopeAngleMinToAllowStickedLand(self, val): self.SlopeAngleMinToAllowStickedLand.set(val)
+    @property
     def StickToAnyNormalAllowed(self):  # type: ()->Bool
         return Bool(self._node.at("StickToAnyNormalAllowed"))
     @StickToAnyNormalAllowed.setter
     def StickToAnyNormalAllowed(self, val): self.StickToAnyNormalAllowed.set(val)
+    @property
+    def VerticalAngleMinToUseLandingTreeAnimation(self):  # type: ()->Float
+        return Float(self._node.at("VerticalAngleMinToUseLandingTreeAnimation"))
+    @VerticalAngleMinToUseLandingTreeAnimation.setter
+    def VerticalAngleMinToUseLandingTreeAnimation(self, val): self.VerticalAngleMinToUseLandingTreeAnimation.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
@@ -4562,6 +4577,34 @@ class VelocityObstacleGD(HelperObject):
 
 from EntityLibPy import Node
 
+class VegetationNavMeshTaggerGD(HelperObject):
+    schema_name = "./RuntimeComponents.json#/definitions/VegetationNavMeshTaggerGD"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->VegetationNavMeshTaggerGD
+        return VegetationNavMeshTaggerGD(entlib.load_node_file(sourcefile, entlib.get_schema(VegetationNavMeshTaggerGD.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->VegetationNavMeshTaggerGD
+        return VegetationNavMeshTaggerGD(entlib.make_node(VegetationNavMeshTaggerGD.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
+    @property
+    def UpdatePeriod(self):  # type: ()->Float
+        return Float(self._node.at("UpdatePeriod"))
+    @UpdatePeriod.setter
+    def UpdatePeriod(self, val): self.UpdatePeriod.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class UnifiedPhysicsDataGD(HelperObject):
     schema_name = "./RuntimeComponents.json#/definitions/UnifiedPhysicsDataGD"
     @staticmethod
@@ -5385,6 +5428,39 @@ class StaffVertebrasGD(HelperObject):
 
 from EntityLibPy import Node
 
+class SpiritAnimalGD(HelperObject):
+    schema_name = "./RuntimeComponents.json#/definitions/SpiritAnimalGD"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->SpiritAnimalGD
+        return SpiritAnimalGD(entlib.load_node_file(sourcefile, entlib.get_schema(SpiritAnimalGD.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->SpiritAnimalGD
+        return SpiritAnimalGD(entlib.make_node(SpiritAnimalGD.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def DeadDurationBeforeRevive(self):  # type: ()->Float
+        return Float(self._node.at("DeadDurationBeforeRevive"))
+    @DeadDurationBeforeRevive.setter
+    def DeadDurationBeforeRevive(self, val): self.DeadDurationBeforeRevive.set(val)
+    @property
+    def EntityRef(self):  # type: ()->EntityRef
+        return EntityRef(self._node.at("EntityRef"))
+    @EntityRef.setter
+    def EntityRef(self, val): self.EntityRef.set(val)
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class SoundEmitterGD(HelperObject):
     schema_name = "./RuntimeComponents.json#/definitions/SoundEmitterGD"
     @staticmethod
@@ -5960,25 +6036,20 @@ class ReviveEnergyGD(HelperObject):
     @EnergyMinNeutral.setter
     def EnergyMinNeutral(self, val): self.EnergyMinNeutral.set(val)
     @property
+    def HatchingCostsEnergy(self):  # type: ()->Bool
+        return Bool(self._node.at("HatchingCostsEnergy"))
+    @HatchingCostsEnergy.setter
+    def HatchingCostsEnergy(self, val): self.HatchingCostsEnergy.set(val)
+    @property
     def HatchingEnergyMinHysteresis(self):  # type: ()->Float
         return Float(self._node.at("HatchingEnergyMinHysteresis"))
     @HatchingEnergyMinHysteresis.setter
     def HatchingEnergyMinHysteresis(self, val): self.HatchingEnergyMinHysteresis.set(val)
     @property
-    def HatchingFightBackSpeedModifier(self):  # type: ()->Float
-        return Float(self._node.at("HatchingFightBackSpeedModifier"))
-    @HatchingFightBackSpeedModifier.setter
-    def HatchingFightBackSpeedModifier(self, val): self.HatchingFightBackSpeedModifier.set(val)
-    @property
     def HatchingMaxDuration(self):  # type: ()->Float
         return Float(self._node.at("HatchingMaxDuration"))
     @HatchingMaxDuration.setter
     def HatchingMaxDuration(self, val): self.HatchingMaxDuration.set(val)
-    @property
-    def HatchingMinDuration(self):  # type: ()->Float
-        return Float(self._node.at("HatchingMinDuration"))
-    @HatchingMinDuration.setter
-    def HatchingMinDuration(self, val): self.HatchingMinDuration.set(val)
     @property
     def InitEnergy(self):  # type: ()->Float
         return Float(self._node.at("InitEnergy"))
@@ -5995,13 +6066,13 @@ class ReviveEnergyGD(HelperObject):
     @MaxEnergy.setter
     def MaxEnergy(self, val): self.MaxEnergy.set(val)
     @property
-    def MaxWaitingTime(self):  # type: ()->Float
-        return Float(self._node.at("MaxWaitingTime"))
-    @MaxWaitingTime.setter
-    def MaxWaitingTime(self, val): self.MaxWaitingTime.set(val)
-    @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
+    @property
+    def TimeBetweenShot(self):  # type: ()->Float
+        return Float(self._node.at("TimeBetweenShot"))
+    @TimeBetweenShot.setter
+    def TimeBetweenShot(self, val): self.TimeBetweenShot.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
@@ -9359,6 +9430,11 @@ class BoidsGD(HelperObject):
         return Float(self._node.at("GhostDuration"))
     @GhostDuration.setter
     def GhostDuration(self, val): self.GhostDuration.set(val)
+    @property
+    def HackCanCreateHitRigidbody(self):  # type: ()->Bool
+        return Bool(self._node.at("HackCanCreateHitRigidbody"))
+    @HackCanCreateHitRigidbody.setter
+    def HackCanCreateHitRigidbody(self, val): self.HackCanCreateHitRigidbody.set(val)
     @property
     def HierarchyDistanceMultiplier(self):  # type: ()->Float
         return Float(self._node.at("HierarchyDistanceMultiplier"))
@@ -13097,6 +13173,7 @@ class ActorCategoryEnum(Enum):
     CATEGORY_EnergyRoot = "CATEGORY_EnergyRoot"
     CATEGORY_EnergySpout = "CATEGORY_EnergySpout"
     CATEGORY_GPE = "CATEGORY_GPE"
+    CATEGORY_Hatching = "CATEGORY_Hatching"
     ActorCategory_COUNT = "ActorCategory_COUNT"
 
 

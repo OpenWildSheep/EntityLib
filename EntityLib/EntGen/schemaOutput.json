@@ -12238,6 +12238,24 @@
                         }
                     },
                     {
+                        "escaped_prop_name": "OrientationRateToPrepareToHoldingOnToNavigationMesh",
+                        "prop_name": "OrientationRateToPrepareToHoldingOnToNavigationMesh",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "Float",
+                                "settable": true
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
                         "escaped_prop_name": "RayCastLengthLegFactor",
                         "prop_name": "RayCastLengthLegFactor",
                         "type": {
@@ -12292,6 +12310,24 @@
                         }
                     },
                     {
+                        "escaped_prop_name": "SlopeAngleMinToAllowStickedLand",
+                        "prop_name": "SlopeAngleMinToAllowStickedLand",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "Float",
+                                "settable": true
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
                         "escaped_prop_name": "StickToAnyNormalAllowed",
                         "prop_name": "StickToAnyNormalAllowed",
                         "type": {
@@ -12302,6 +12338,24 @@
                             "prim_set": false,
                             "ref": {
                                 "name": "Bool",
+                                "settable": true
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
+                        "escaped_prop_name": "VerticalAngleMinToUseLandingTreeAnimation",
+                        "prop_name": "VerticalAngleMinToUseLandingTreeAnimation",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "Float",
                                 "settable": true
                             },
                             "tuple": false,
@@ -20226,6 +20280,125 @@
                     "tuple": false,
                     "union": false,
                     "union_set": false
+                },
+                {
+                    "array": false,
+                    "map": false,
+                    "object_set": false,
+                    "prim_array": false,
+                    "prim_set": false,
+                    "ref": {
+                        "name": "Float",
+                        "settable": true
+                    },
+                    "tuple": false,
+                    "union": false,
+                    "union_set": false
+                }
+            ],
+            "map": false,
+            "object": {
+                "properties": [
+                    {
+                        "escaped_prop_name": "Super",
+                        "prop_name": "Super",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "ComponentGD",
+                                "settable": false
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
+                        "escaped_prop_name": "UpdatePeriod",
+                        "prop_name": "UpdatePeriod",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "Float",
+                                "settable": true
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
+                        "escaped_prop_name": "_comment",
+                        "prop_name": "_comment",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "cpp_native": "char const*",
+                                "name": "String",
+                                "py_native": "str",
+                                "settable": true
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    }
+                ]
+            },
+            "object_set": false,
+            "schema_name": "./RuntimeComponents.json#/definitions/VegetationNavMeshTaggerGD",
+            "tuple": false,
+            "type_name": "VegetationNavMeshTaggerGD",
+            "union": false,
+            "union_set": false
+        }
+    },
+    {
+        "schema": {
+            "alias": false,
+            "enum": false,
+            "includes": [
+                {
+                    "array": false,
+                    "map": false,
+                    "object_set": false,
+                    "prim_array": false,
+                    "prim_set": false,
+                    "ref": {
+                        "cpp_native": "char const*",
+                        "name": "String",
+                        "py_native": "str",
+                        "settable": true
+                    },
+                    "tuple": false,
+                    "union": false,
+                    "union_set": false
+                },
+                {
+                    "array": false,
+                    "map": false,
+                    "object_set": false,
+                    "prim_array": false,
+                    "prim_set": false,
+                    "ref": {
+                        "name": "ComponentGD",
+                        "settable": false
+                    },
+                    "tuple": false,
+                    "union": false,
+                    "union_set": false
                 }
             ],
             "map": false,
@@ -24118,6 +24291,157 @@
                     "prim_array": false,
                     "prim_set": false,
                     "ref": {
+                        "cpp_native": "char const*",
+                        "name": "String",
+                        "py_native": "str",
+                        "settable": true
+                    },
+                    "tuple": false,
+                    "union": false,
+                    "union_set": false
+                },
+                {
+                    "array": false,
+                    "map": false,
+                    "object_set": false,
+                    "prim_array": false,
+                    "prim_set": false,
+                    "ref": {
+                        "name": "ComponentGD",
+                        "settable": false
+                    },
+                    "tuple": false,
+                    "union": false,
+                    "union_set": false
+                },
+                {
+                    "array": false,
+                    "map": false,
+                    "object_set": false,
+                    "prim_array": false,
+                    "prim_set": false,
+                    "ref": {
+                        "name": "EntityRef",
+                        "settable": true
+                    },
+                    "tuple": false,
+                    "union": false,
+                    "union_set": false
+                },
+                {
+                    "array": false,
+                    "map": false,
+                    "object_set": false,
+                    "prim_array": false,
+                    "prim_set": false,
+                    "ref": {
+                        "name": "Float",
+                        "settable": true
+                    },
+                    "tuple": false,
+                    "union": false,
+                    "union_set": false
+                }
+            ],
+            "map": false,
+            "object": {
+                "properties": [
+                    {
+                        "escaped_prop_name": "DeadDurationBeforeRevive",
+                        "prop_name": "DeadDurationBeforeRevive",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "Float",
+                                "settable": true
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
+                        "escaped_prop_name": "EntityRef",
+                        "prop_name": "EntityRef",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "EntityRef",
+                                "settable": true
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
+                        "escaped_prop_name": "Super",
+                        "prop_name": "Super",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "ComponentGD",
+                                "settable": false
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
+                        "escaped_prop_name": "_comment",
+                        "prop_name": "_comment",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "cpp_native": "char const*",
+                                "name": "String",
+                                "py_native": "str",
+                                "settable": true
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    }
+                ]
+            },
+            "object_set": false,
+            "schema_name": "./RuntimeComponents.json#/definitions/SpiritAnimalGD",
+            "tuple": false,
+            "type_name": "SpiritAnimalGD",
+            "union": false,
+            "union_set": false
+        }
+    },
+    {
+        "schema": {
+            "alias": false,
+            "enum": false,
+            "includes": [
+                {
+                    "array": false,
+                    "map": false,
+                    "object_set": false,
+                    "prim_array": false,
+                    "prim_set": false,
+                    "ref": {
                         "cpp_native": "SyncTempoModeEnum",
                         "name": "SyncTempoMode",
                         "py_native": "SyncTempoModeEnum",
@@ -26977,6 +27301,20 @@
                     "prim_array": false,
                     "prim_set": false,
                     "ref": {
+                        "name": "Bool",
+                        "settable": true
+                    },
+                    "tuple": false,
+                    "union": false,
+                    "union_set": false
+                },
+                {
+                    "array": false,
+                    "map": false,
+                    "object_set": false,
+                    "prim_array": false,
+                    "prim_set": false,
+                    "ref": {
                         "name": "ComponentGD",
                         "settable": false
                     },
@@ -27021,6 +27359,24 @@
                         }
                     },
                     {
+                        "escaped_prop_name": "HatchingCostsEnergy",
+                        "prop_name": "HatchingCostsEnergy",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "Bool",
+                                "settable": true
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
                         "escaped_prop_name": "HatchingEnergyMinHysteresis",
                         "prop_name": "HatchingEnergyMinHysteresis",
                         "type": {
@@ -27039,44 +27395,8 @@
                         }
                     },
                     {
-                        "escaped_prop_name": "HatchingFightBackSpeedModifier",
-                        "prop_name": "HatchingFightBackSpeedModifier",
-                        "type": {
-                            "array": false,
-                            "map": false,
-                            "object_set": false,
-                            "prim_array": false,
-                            "prim_set": false,
-                            "ref": {
-                                "name": "Float",
-                                "settable": true
-                            },
-                            "tuple": false,
-                            "union": false,
-                            "union_set": false
-                        }
-                    },
-                    {
                         "escaped_prop_name": "HatchingMaxDuration",
                         "prop_name": "HatchingMaxDuration",
-                        "type": {
-                            "array": false,
-                            "map": false,
-                            "object_set": false,
-                            "prim_array": false,
-                            "prim_set": false,
-                            "ref": {
-                                "name": "Float",
-                                "settable": true
-                            },
-                            "tuple": false,
-                            "union": false,
-                            "union_set": false
-                        }
-                    },
-                    {
-                        "escaped_prop_name": "HatchingMinDuration",
-                        "prop_name": "HatchingMinDuration",
                         "type": {
                             "array": false,
                             "map": false,
@@ -27149,24 +27469,6 @@
                         }
                     },
                     {
-                        "escaped_prop_name": "MaxWaitingTime",
-                        "prop_name": "MaxWaitingTime",
-                        "type": {
-                            "array": false,
-                            "map": false,
-                            "object_set": false,
-                            "prim_array": false,
-                            "prim_set": false,
-                            "ref": {
-                                "name": "Float",
-                                "settable": true
-                            },
-                            "tuple": false,
-                            "union": false,
-                            "union_set": false
-                        }
-                    },
-                    {
                         "escaped_prop_name": "Super",
                         "prop_name": "Super",
                         "type": {
@@ -27178,6 +27480,24 @@
                             "ref": {
                                 "name": "ComponentGD",
                                 "settable": false
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
+                        "escaped_prop_name": "TimeBetweenShot",
+                        "prop_name": "TimeBetweenShot",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "Float",
+                                "settable": true
                             },
                             "tuple": false,
                             "union": false,
@@ -43813,6 +44133,23 @@
                         }
                     },
                     {
+                        "name": "VegetationNavMeshTaggerGD",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "VegetationNavMeshTaggerGD",
+                                "settable": false
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
                         "name": "ScriptComponentGD",
                         "type": {
                             "array": false,
@@ -44230,6 +44567,23 @@
                             "prim_set": false,
                             "ref": {
                                 "name": "RespawnPlaceGD",
+                                "settable": false
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
+                        "name": "SpiritAnimalGD",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "SpiritAnimalGD",
                                 "settable": false
                             },
                             "tuple": false,
@@ -46368,6 +46722,23 @@
                             }
                         },
                         {
+                            "name": "VegetationNavMeshTaggerGD",
+                            "type": {
+                                "array": false,
+                                "map": false,
+                                "object_set": false,
+                                "prim_array": false,
+                                "prim_set": false,
+                                "ref": {
+                                    "name": "VegetationNavMeshTaggerGD",
+                                    "settable": false
+                                },
+                                "tuple": false,
+                                "union": false,
+                                "union_set": false
+                            }
+                        },
+                        {
                             "name": "ScriptComponentGD",
                             "type": {
                                 "array": false,
@@ -46785,6 +47156,23 @@
                                 "prim_set": false,
                                 "ref": {
                                     "name": "RespawnPlaceGD",
+                                    "settable": false
+                                },
+                                "tuple": false,
+                                "union": false,
+                                "union_set": false
+                            }
+                        },
+                        {
+                            "name": "SpiritAnimalGD",
+                            "type": {
+                                "array": false,
+                                "map": false,
+                                "object_set": false,
+                                "prim_array": false,
+                                "prim_set": false,
+                                "ref": {
+                                    "name": "SpiritAnimalGD",
                                     "settable": false
                                 },
                                 "tuple": false,
@@ -48924,6 +49312,23 @@
                             }
                         },
                         {
+                            "name": "VegetationNavMeshTaggerGD",
+                            "type": {
+                                "array": false,
+                                "map": false,
+                                "object_set": false,
+                                "prim_array": false,
+                                "prim_set": false,
+                                "ref": {
+                                    "name": "VegetationNavMeshTaggerGD",
+                                    "settable": false
+                                },
+                                "tuple": false,
+                                "union": false,
+                                "union_set": false
+                            }
+                        },
+                        {
                             "name": "ScriptComponentGD",
                             "type": {
                                 "array": false,
@@ -49341,6 +49746,23 @@
                                 "prim_set": false,
                                 "ref": {
                                     "name": "RespawnPlaceGD",
+                                    "settable": false
+                                },
+                                "tuple": false,
+                                "union": false,
+                                "union_set": false
+                            }
+                        },
+                        {
+                            "name": "SpiritAnimalGD",
+                            "type": {
+                                "array": false,
+                                "map": false,
+                                "object_set": false,
+                                "prim_array": false,
+                                "prim_set": false,
+                                "ref": {
+                                    "name": "SpiritAnimalGD",
                                     "settable": false
                                 },
                                 "tuple": false,
@@ -50326,6 +50748,24 @@
                             "prim_set": false,
                             "ref": {
                                 "name": "Float",
+                                "settable": true
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
+                        "escaped_prop_name": "HackCanCreateHitRigidbody",
+                        "prop_name": "HackCanCreateHitRigidbody",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "Bool",
                                 "settable": true
                             },
                             "tuple": false,
@@ -66853,9 +67293,14 @@
                         "value": 34
                     },
                     {
+                        "escaped_name": "CATEGORY_Hatching",
+                        "name": "CATEGORY_Hatching",
+                        "value": 35
+                    },
+                    {
                         "escaped_name": "ActorCategory_COUNT",
                         "name": "ActorCategory_COUNT",
-                        "value": 35
+                        "value": 36
                     }
                 ]
             },

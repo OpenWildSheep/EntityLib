@@ -123,6 +123,7 @@ from .VoxelSimulationGD import *
 from .VolumeConstraintGD import *
 from .VisualGD import *
 from .VelocityObstacleGD import *
+from .VegetationNavMeshTaggerGD import *
 from .UnifiedPhysicsDataGD import *
 from .TriggerEventCameraGD import *
 from .TransformGD import *
@@ -139,6 +140,7 @@ from .SystemicCreature import *
 from .StickToTerrain import *
 from .StaticObjectGD import *
 from .StaffVertebrasGD import *
+from .SpiritAnimalGD import *
 from .SoundEmitterGD import *
 from .SoundAreaGD import *
 from .SoulSpotGD import *

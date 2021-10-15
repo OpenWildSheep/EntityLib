@@ -42,6 +42,7 @@ class ActorCategoryEnum(Enum):
     CATEGORY_EnergyRoot = "CATEGORY_EnergyRoot"
     CATEGORY_EnergySpout = "CATEGORY_EnergySpout"
     CATEGORY_GPE = "CATEGORY_GPE"
+    CATEGORY_Hatching = "CATEGORY_Hatching"
     ActorCategory_COUNT = "ActorCategory_COUNT"
 
 

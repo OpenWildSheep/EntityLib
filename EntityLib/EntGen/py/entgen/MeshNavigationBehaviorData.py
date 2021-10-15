@@ -47,6 +47,11 @@ class MeshNavigationBehaviorData(HelperObject):
     @MeshNavigationAllowedMode.setter
     def MeshNavigationAllowedMode(self, val): self.MeshNavigationAllowedMode.set(val)
     @property
+    def OrientationRateToPrepareToHoldingOnToNavigationMesh(self):  # type: ()->Float
+        return Float(self._node.at("OrientationRateToPrepareToHoldingOnToNavigationMesh"))
+    @OrientationRateToPrepareToHoldingOnToNavigationMesh.setter
+    def OrientationRateToPrepareToHoldingOnToNavigationMesh(self, val): self.OrientationRateToPrepareToHoldingOnToNavigationMesh.set(val)
+    @property
     def RayCastLengthLegFactor(self):  # type: ()->Float
         return Float(self._node.at("RayCastLengthLegFactor"))
     @RayCastLengthLegFactor.setter
@@ -62,10 +67,20 @@ class MeshNavigationBehaviorData(HelperObject):
     @RollAllowed.setter
     def RollAllowed(self, val): self.RollAllowed.set(val)
     @property
+    def SlopeAngleMinToAllowStickedLand(self):  # type: ()->Float
+        return Float(self._node.at("SlopeAngleMinToAllowStickedLand"))
+    @SlopeAngleMinToAllowStickedLand.setter
+    def SlopeAngleMinToAllowStickedLand(self, val): self.SlopeAngleMinToAllowStickedLand.set(val)
+    @property
     def StickToAnyNormalAllowed(self):  # type: ()->Bool
         return Bool(self._node.at("StickToAnyNormalAllowed"))
     @StickToAnyNormalAllowed.setter
     def StickToAnyNormalAllowed(self, val): self.StickToAnyNormalAllowed.set(val)
+    @property
+    def VerticalAngleMinToUseLandingTreeAnimation(self):  # type: ()->Float
+        return Float(self._node.at("VerticalAngleMinToUseLandingTreeAnimation"))
+    @VerticalAngleMinToUseLandingTreeAnimation.setter
+    def VerticalAngleMinToUseLandingTreeAnimation(self, val): self.VerticalAngleMinToUseLandingTreeAnimation.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

@@ -90,6 +90,11 @@ class BoidsGD(HelperObject):
     @GhostDuration.setter
     def GhostDuration(self, val): self.GhostDuration.set(val)
     @property
+    def HackCanCreateHitRigidbody(self):  # type: ()->Bool
+        return Bool(self._node.at("HackCanCreateHitRigidbody"))
+    @HackCanCreateHitRigidbody.setter
+    def HackCanCreateHitRigidbody(self, val): self.HackCanCreateHitRigidbody.set(val)
+    @property
     def HierarchyDistanceMultiplier(self):  # type: ()->Float
         return Float(self._node.at("HierarchyDistanceMultiplier"))
     @HierarchyDistanceMultiplier.setter

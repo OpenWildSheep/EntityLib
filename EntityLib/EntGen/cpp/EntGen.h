@@ -438,6 +438,7 @@ namespace Ent
         struct VolumeConstraintGD;
         struct VisualGD;
         struct VelocityObstacleGD;
+        struct VegetationNavMeshTaggerGD;
         struct UnifiedPhysicsDataGD;
         struct TriggerEventCameraGD;
         struct TransformGD;
@@ -454,6 +455,7 @@ namespace Ent
         struct StickToTerrain;
         struct StaticObjectGD;
         struct StaffVertebrasGD;
+        struct SpiritAnimalGD;
         struct SoundEmitterGD;
         struct SoundAreaGD;
         struct SoulSpotGD;
@@ -788,6 +790,7 @@ namespace Ent
             CATEGORY_EnergyRoot,
             CATEGORY_EnergySpout,
             CATEGORY_GPE,
+            CATEGORY_Hatching,
             ActorCategory_COUNT,
         };
         struct ConditionalRigidityAttribute_Conditions;
@@ -2511,10 +2514,13 @@ namespace Ent
             Ent::Gen::Float EdgeTransitionConstraintWallAngle() const;
             Ent::Gen::Float MaxNormalAngle() const;
             Ent::Gen::MeshNavigationAllowedMode MeshNavigationAllowedMode() const;
+            Ent::Gen::Float OrientationRateToPrepareToHoldingOnToNavigationMesh() const;
             Ent::Gen::Float RayCastLengthLegFactor() const;
             Ent::Gen::Float RayCastLengthSpeedFactor() const;
             Ent::Gen::Bool RollAllowed() const;
+            Ent::Gen::Float SlopeAngleMinToAllowStickedLand() const;
             Ent::Gen::Bool StickToAnyNormalAllowed() const;
+            Ent::Gen::Float VerticalAngleMinToUseLandingTreeAnimation() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -3496,6 +3502,23 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
+        struct VegetationNavMeshTaggerGD : HelperObject // Object
+        {
+            VegetationNavMeshTaggerGD(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/VegetationNavMeshTaggerGD";
+            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static Ent::Node create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ComponentGD Super() const;
+            Ent::Gen::Float UpdatePeriod() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct UnifiedPhysicsDataGD : HelperObject // Object
         {
             UnifiedPhysicsDataGD(Ent::Node* _node): HelperObject(_node) {}
@@ -3847,6 +3870,24 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
+        struct SpiritAnimalGD : HelperObject // Object
+        {
+            SpiritAnimalGD(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/SpiritAnimalGD";
+            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static Ent::Node create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float DeadDurationBeforeRevive() const;
+            Ent::Gen::EntityRef EntityRef() const;
+            Ent::Gen::ComponentGD Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct SoundEmitterGD : HelperObject // Object
         {
             SoundEmitterGD(Ent::Node* _node): HelperObject(_node) {}
@@ -4122,15 +4163,14 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::Float EnergyMinNeutral() const;
+            Ent::Gen::Bool HatchingCostsEnergy() const;
             Ent::Gen::Float HatchingEnergyMinHysteresis() const;
-            Ent::Gen::Float HatchingFightBackSpeedModifier() const;
             Ent::Gen::Float HatchingMaxDuration() const;
-            Ent::Gen::Float HatchingMinDuration() const;
             Ent::Gen::Float InitEnergy() const;
             Ent::Gen::ReviveSide InitReviveSide() const;
             Ent::Gen::Float MaxEnergy() const;
-            Ent::Gen::Float MaxWaitingTime() const;
             Ent::Gen::ComponentGD Super() const;
+            Ent::Gen::Float TimeBetweenShot() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -6056,6 +6096,8 @@ namespace Ent
             Ent::Gen::RagdollGD setRagdollGD() const;
             std::optional<Ent::Gen::AnimationPhysicsChainConstraintsGD> AnimationPhysicsChainConstraintsGD() const;
             Ent::Gen::AnimationPhysicsChainConstraintsGD setAnimationPhysicsChainConstraintsGD() const;
+            std::optional<Ent::Gen::VegetationNavMeshTaggerGD> VegetationNavMeshTaggerGD() const;
+            Ent::Gen::VegetationNavMeshTaggerGD setVegetationNavMeshTaggerGD() const;
             std::optional<Ent::Gen::ScriptComponentGD> ScriptComponentGD() const;
             Ent::Gen::ScriptComponentGD setScriptComponentGD() const;
             std::optional<Ent::Gen::FluidToRegenInjectorGD> FluidToRegenInjectorGD() const;
@@ -6106,6 +6148,8 @@ namespace Ent
             Ent::Gen::EnergyProbeGD setEnergyProbeGD() const;
             std::optional<Ent::Gen::RespawnPlaceGD> RespawnPlaceGD() const;
             Ent::Gen::RespawnPlaceGD setRespawnPlaceGD() const;
+            std::optional<Ent::Gen::SpiritAnimalGD> SpiritAnimalGD() const;
+            Ent::Gen::SpiritAnimalGD setSpiritAnimalGD() const;
             std::optional<Ent::Gen::OutfitWearerGD> OutfitWearerGD() const;
             Ent::Gen::OutfitWearerGD setOutfitWearerGD() const;
             std::optional<Ent::Gen::VoxelSimulationGD> VoxelSimulationGD() const;
@@ -6360,6 +6404,8 @@ namespace Ent
             Ent::Gen::RagdollGD addRagdollGD() const;
             std::optional<Ent::Gen::AnimationPhysicsChainConstraintsGD> AnimationPhysicsChainConstraintsGD() const;
             Ent::Gen::AnimationPhysicsChainConstraintsGD addAnimationPhysicsChainConstraintsGD() const;
+            std::optional<Ent::Gen::VegetationNavMeshTaggerGD> VegetationNavMeshTaggerGD() const;
+            Ent::Gen::VegetationNavMeshTaggerGD addVegetationNavMeshTaggerGD() const;
             std::optional<Ent::Gen::ScriptComponentGD> ScriptComponentGD() const;
             Ent::Gen::ScriptComponentGD addScriptComponentGD() const;
             std::optional<Ent::Gen::FluidToRegenInjectorGD> FluidToRegenInjectorGD() const;
@@ -6410,6 +6456,8 @@ namespace Ent
             Ent::Gen::EnergyProbeGD addEnergyProbeGD() const;
             std::optional<Ent::Gen::RespawnPlaceGD> RespawnPlaceGD() const;
             Ent::Gen::RespawnPlaceGD addRespawnPlaceGD() const;
+            std::optional<Ent::Gen::SpiritAnimalGD> SpiritAnimalGD() const;
+            Ent::Gen::SpiritAnimalGD addSpiritAnimalGD() const;
             std::optional<Ent::Gen::OutfitWearerGD> OutfitWearerGD() const;
             Ent::Gen::OutfitWearerGD addOutfitWearerGD() const;
             std::optional<Ent::Gen::VoxelSimulationGD> VoxelSimulationGD() const;
@@ -6664,6 +6712,8 @@ namespace Ent
             Ent::Gen::RagdollGD addRagdollGD() const;
             std::optional<Ent::Gen::AnimationPhysicsChainConstraintsGD> AnimationPhysicsChainConstraintsGD() const;
             Ent::Gen::AnimationPhysicsChainConstraintsGD addAnimationPhysicsChainConstraintsGD() const;
+            std::optional<Ent::Gen::VegetationNavMeshTaggerGD> VegetationNavMeshTaggerGD() const;
+            Ent::Gen::VegetationNavMeshTaggerGD addVegetationNavMeshTaggerGD() const;
             std::optional<Ent::Gen::ScriptComponentGD> ScriptComponentGD() const;
             Ent::Gen::ScriptComponentGD addScriptComponentGD() const;
             std::optional<Ent::Gen::FluidToRegenInjectorGD> FluidToRegenInjectorGD() const;
@@ -6714,6 +6764,8 @@ namespace Ent
             Ent::Gen::EnergyProbeGD addEnergyProbeGD() const;
             std::optional<Ent::Gen::RespawnPlaceGD> RespawnPlaceGD() const;
             Ent::Gen::RespawnPlaceGD addRespawnPlaceGD() const;
+            std::optional<Ent::Gen::SpiritAnimalGD> SpiritAnimalGD() const;
+            Ent::Gen::SpiritAnimalGD addSpiritAnimalGD() const;
             std::optional<Ent::Gen::OutfitWearerGD> OutfitWearerGD() const;
             Ent::Gen::OutfitWearerGD addOutfitWearerGD() const;
             std::optional<Ent::Gen::VoxelSimulationGD> VoxelSimulationGD() const;
@@ -6791,6 +6843,7 @@ namespace Ent
             Ent::Gen::EntityRef FullEntityPoolRef() const;
             Ent::Gen::Float GetBackToFlockingDuration() const;
             Ent::Gen::Float GhostDuration() const;
+            Ent::Gen::Bool HackCanCreateHitRigidbody() const;
             Ent::Gen::Float HierarchyDistanceMultiplier() const;
             Ent::Gen::Float InitialRadius() const;
             Ent::Gen::Float LightBrightness() const;
@@ -8635,6 +8688,7 @@ namespace Ent
                 "CATEGORY_EnergyRoot",
                 "CATEGORY_EnergySpout",
                 "CATEGORY_GPE",
+                "CATEGORY_Hatching",
                 "ActorCategory_COUNT",
             };
         };
@@ -10642,6 +10696,10 @@ namespace Ent
         {
             return Ent::Gen::MeshNavigationAllowedMode(node->at("MeshNavigationAllowedMode"));
         }
+        inline Ent::Gen::Float MeshNavigationBehaviorData::OrientationRateToPrepareToHoldingOnToNavigationMesh() const
+        {
+            return Ent::Gen::Float(node->at("OrientationRateToPrepareToHoldingOnToNavigationMesh"));
+        }
         inline Ent::Gen::Float MeshNavigationBehaviorData::RayCastLengthLegFactor() const
         {
             return Ent::Gen::Float(node->at("RayCastLengthLegFactor"));
@@ -10654,9 +10712,17 @@ namespace Ent
         {
             return Ent::Gen::Bool(node->at("RollAllowed"));
         }
+        inline Ent::Gen::Float MeshNavigationBehaviorData::SlopeAngleMinToAllowStickedLand() const
+        {
+            return Ent::Gen::Float(node->at("SlopeAngleMinToAllowStickedLand"));
+        }
         inline Ent::Gen::Bool MeshNavigationBehaviorData::StickToAnyNormalAllowed() const
         {
             return Ent::Gen::Bool(node->at("StickToAnyNormalAllowed"));
+        }
+        inline Ent::Gen::Float MeshNavigationBehaviorData::VerticalAngleMinToUseLandingTreeAnimation() const
+        {
+            return Ent::Gen::Float(node->at("VerticalAngleMinToUseLandingTreeAnimation"));
         }
         inline Ent::Gen::String MeshNavigationBehaviorData::_comment() const
         {
@@ -11607,6 +11673,19 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // VegetationNavMeshTaggerGD
+        inline Ent::Gen::ComponentGD VegetationNavMeshTaggerGD::Super() const
+        {
+            return Ent::Gen::ComponentGD(node->at("Super"));
+        }
+        inline Ent::Gen::Float VegetationNavMeshTaggerGD::UpdatePeriod() const
+        {
+            return Ent::Gen::Float(node->at("UpdatePeriod"));
+        }
+        inline Ent::Gen::String VegetationNavMeshTaggerGD::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // UnifiedPhysicsDataGD
         inline Ent::Gen::ComponentGD UnifiedPhysicsDataGD::Super() const
         {
@@ -12131,6 +12210,23 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // SpiritAnimalGD
+        inline Ent::Gen::Float SpiritAnimalGD::DeadDurationBeforeRevive() const
+        {
+            return Ent::Gen::Float(node->at("DeadDurationBeforeRevive"));
+        }
+        inline Ent::Gen::EntityRef SpiritAnimalGD::EntityRef() const
+        {
+            return Ent::Gen::EntityRef(node->at("EntityRef"));
+        }
+        inline Ent::Gen::ComponentGD SpiritAnimalGD::Super() const
+        {
+            return Ent::Gen::ComponentGD(node->at("Super"));
+        }
+        inline Ent::Gen::String SpiritAnimalGD::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // SoundEmitterGD
         inline Ent::Gen::Float SoundEmitterGD::ActivationDistance() const
         {
@@ -12469,21 +12565,17 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("EnergyMinNeutral"));
         }
+        inline Ent::Gen::Bool ReviveEnergyGD::HatchingCostsEnergy() const
+        {
+            return Ent::Gen::Bool(node->at("HatchingCostsEnergy"));
+        }
         inline Ent::Gen::Float ReviveEnergyGD::HatchingEnergyMinHysteresis() const
         {
             return Ent::Gen::Float(node->at("HatchingEnergyMinHysteresis"));
         }
-        inline Ent::Gen::Float ReviveEnergyGD::HatchingFightBackSpeedModifier() const
-        {
-            return Ent::Gen::Float(node->at("HatchingFightBackSpeedModifier"));
-        }
         inline Ent::Gen::Float ReviveEnergyGD::HatchingMaxDuration() const
         {
             return Ent::Gen::Float(node->at("HatchingMaxDuration"));
-        }
-        inline Ent::Gen::Float ReviveEnergyGD::HatchingMinDuration() const
-        {
-            return Ent::Gen::Float(node->at("HatchingMinDuration"));
         }
         inline Ent::Gen::Float ReviveEnergyGD::InitEnergy() const
         {
@@ -12497,13 +12589,13 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("MaxEnergy"));
         }
-        inline Ent::Gen::Float ReviveEnergyGD::MaxWaitingTime() const
-        {
-            return Ent::Gen::Float(node->at("MaxWaitingTime"));
-        }
         inline Ent::Gen::ComponentGD ReviveEnergyGD::Super() const
         {
             return Ent::Gen::ComponentGD(node->at("Super"));
+        }
+        inline Ent::Gen::Float ReviveEnergyGD::TimeBetweenShot() const
+        {
+            return Ent::Gen::Float(node->at("TimeBetweenShot"));
         }
         inline Ent::Gen::String ReviveEnergyGD::_comment() const
         {
@@ -15122,6 +15214,14 @@ namespace Ent
         {
             return Ent::Gen::AnimationPhysicsChainConstraintsGD(node->setUnionType("Component"));
         }
+        inline std::optional<Ent::Gen::VegetationNavMeshTaggerGD> Component::VegetationNavMeshTaggerGD() const
+        {
+            return strcmp(node->getUnionType(), "VegetationNavMeshTaggerGD") != 0? std::optional<Ent::Gen::VegetationNavMeshTaggerGD>{}: std::optional<Ent::Gen::VegetationNavMeshTaggerGD>(node->getUnionData());
+        }
+        inline Ent::Gen::VegetationNavMeshTaggerGD Component::setVegetationNavMeshTaggerGD() const
+        {
+            return Ent::Gen::VegetationNavMeshTaggerGD(node->setUnionType("Component"));
+        }
         inline std::optional<Ent::Gen::ScriptComponentGD> Component::ScriptComponentGD() const
         {
             return strcmp(node->getUnionType(), "ScriptComponentGD") != 0? std::optional<Ent::Gen::ScriptComponentGD>{}: std::optional<Ent::Gen::ScriptComponentGD>(node->getUnionData());
@@ -15321,6 +15421,14 @@ namespace Ent
         inline Ent::Gen::RespawnPlaceGD Component::setRespawnPlaceGD() const
         {
             return Ent::Gen::RespawnPlaceGD(node->setUnionType("Component"));
+        }
+        inline std::optional<Ent::Gen::SpiritAnimalGD> Component::SpiritAnimalGD() const
+        {
+            return strcmp(node->getUnionType(), "SpiritAnimalGD") != 0? std::optional<Ent::Gen::SpiritAnimalGD>{}: std::optional<Ent::Gen::SpiritAnimalGD>(node->getUnionData());
+        }
+        inline Ent::Gen::SpiritAnimalGD Component::setSpiritAnimalGD() const
+        {
+            return Ent::Gen::SpiritAnimalGD(node->setUnionType("Component"));
         }
         inline std::optional<Ent::Gen::OutfitWearerGD> Component::OutfitWearerGD() const
         {
@@ -16415,6 +16523,15 @@ namespace Ent
         {
             return Ent::Gen::AnimationPhysicsChainConstraintsGD(addSubNode("AnimationPhysicsChainConstraintsGD"));
         }
+        inline std::optional<Ent::Gen::VegetationNavMeshTaggerGD> Object_Components::VegetationNavMeshTaggerGD() const
+        {
+            auto sub = getSubNode("VegetationNavMeshTaggerGD");
+            return sub == nullptr? std::optional<Ent::Gen::VegetationNavMeshTaggerGD>{}: std::optional<Ent::Gen::VegetationNavMeshTaggerGD>(getSubNode("VegetationNavMeshTaggerGD"));
+        }
+        inline Ent::Gen::VegetationNavMeshTaggerGD Object_Components::addVegetationNavMeshTaggerGD() const
+        {
+            return Ent::Gen::VegetationNavMeshTaggerGD(addSubNode("VegetationNavMeshTaggerGD"));
+        }
         inline std::optional<Ent::Gen::ScriptComponentGD> Object_Components::ScriptComponentGD() const
         {
             auto sub = getSubNode("ScriptComponentGD");
@@ -16639,6 +16756,15 @@ namespace Ent
         inline Ent::Gen::RespawnPlaceGD Object_Components::addRespawnPlaceGD() const
         {
             return Ent::Gen::RespawnPlaceGD(addSubNode("RespawnPlaceGD"));
+        }
+        inline std::optional<Ent::Gen::SpiritAnimalGD> Object_Components::SpiritAnimalGD() const
+        {
+            auto sub = getSubNode("SpiritAnimalGD");
+            return sub == nullptr? std::optional<Ent::Gen::SpiritAnimalGD>{}: std::optional<Ent::Gen::SpiritAnimalGD>(getSubNode("SpiritAnimalGD"));
+        }
+        inline Ent::Gen::SpiritAnimalGD Object_Components::addSpiritAnimalGD() const
+        {
+            return Ent::Gen::SpiritAnimalGD(addSubNode("SpiritAnimalGD"));
         }
         inline std::optional<Ent::Gen::OutfitWearerGD> Object_Components::OutfitWearerGD() const
         {
@@ -17743,6 +17869,15 @@ namespace Ent
         {
             return Ent::Gen::AnimationPhysicsChainConstraintsGD(addSubNode("AnimationPhysicsChainConstraintsGD"));
         }
+        inline std::optional<Ent::Gen::VegetationNavMeshTaggerGD> Components::VegetationNavMeshTaggerGD() const
+        {
+            auto sub = getSubNode("VegetationNavMeshTaggerGD");
+            return sub == nullptr? std::optional<Ent::Gen::VegetationNavMeshTaggerGD>{}: std::optional<Ent::Gen::VegetationNavMeshTaggerGD>(getSubNode("VegetationNavMeshTaggerGD"));
+        }
+        inline Ent::Gen::VegetationNavMeshTaggerGD Components::addVegetationNavMeshTaggerGD() const
+        {
+            return Ent::Gen::VegetationNavMeshTaggerGD(addSubNode("VegetationNavMeshTaggerGD"));
+        }
         inline std::optional<Ent::Gen::ScriptComponentGD> Components::ScriptComponentGD() const
         {
             auto sub = getSubNode("ScriptComponentGD");
@@ -17968,6 +18103,15 @@ namespace Ent
         {
             return Ent::Gen::RespawnPlaceGD(addSubNode("RespawnPlaceGD"));
         }
+        inline std::optional<Ent::Gen::SpiritAnimalGD> Components::SpiritAnimalGD() const
+        {
+            auto sub = getSubNode("SpiritAnimalGD");
+            return sub == nullptr? std::optional<Ent::Gen::SpiritAnimalGD>{}: std::optional<Ent::Gen::SpiritAnimalGD>(getSubNode("SpiritAnimalGD"));
+        }
+        inline Ent::Gen::SpiritAnimalGD Components::addSpiritAnimalGD() const
+        {
+            return Ent::Gen::SpiritAnimalGD(addSubNode("SpiritAnimalGD"));
+        }
         inline std::optional<Ent::Gen::OutfitWearerGD> Components::OutfitWearerGD() const
         {
             auto sub = getSubNode("OutfitWearerGD");
@@ -18171,6 +18315,10 @@ namespace Ent
         inline Ent::Gen::Float BoidsGD::GhostDuration() const
         {
             return Ent::Gen::Float(node->at("GhostDuration"));
+        }
+        inline Ent::Gen::Bool BoidsGD::HackCanCreateHitRigidbody() const
+        {
+            return Ent::Gen::Bool(node->at("HackCanCreateHitRigidbody"));
         }
         inline Ent::Gen::Float BoidsGD::HierarchyDistanceMultiplier() const
         {

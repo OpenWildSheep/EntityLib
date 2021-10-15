@@ -1050,9 +1050,9 @@ namespace Ent
 
         auto* prefabPath = getInstanceOf();
         auto prefab = getEntityLib()->loadFileAsNode(prefabPath, *getSchema());
-        // TODO handle non-string keyField
         std::map<std::string, Map::KeyType> prefabsKeys;
         std::map<std::string, Map::KeyType> instanceKeys;
+        // Save keyFields values
         for (auto&& [fieldName, prop] : getSchema()->properties)
         {
             if (not prop->isKeyField)
@@ -1109,6 +1109,7 @@ namespace Ent
             }
         };
 
+        // Restore the keyFields values.
         // Asked by the maxscript team because they don't want to change the name this way
         for (auto&& [fieldName, prop] : getSchema()->properties)
         {

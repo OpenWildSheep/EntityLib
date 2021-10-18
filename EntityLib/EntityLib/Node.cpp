@@ -789,6 +789,15 @@ namespace Ent
         return std::get<Array>(value).getKeysInt();
     }
 
+    std::vector<NodeUniquePtr> Node::releaseAllElements()
+    {
+        if (getDataType() != DataType::array)
+        {
+            throw Ent::BadType("In releaseAllElements, an array is expeted");
+        }
+        return std::get<Array>(value).releaseAllElements();
+    }
+
     struct IsDefault
     {
         Subschema const* schema;
@@ -1030,6 +1039,91 @@ namespace Ent
             throw BadType();
         }
         std::get<Object>(value).applyAllValuesButPrefab(std::get<Object>(_dest.value), _copyMode);
+    }
+
+    void Ent::Node::applyToPrefab()
+    {
+        if (getInstanceOf() == nullptr)
+        {
+            throw ContextException("Called Ent::Node::applyToPrefab an a Node without prefab");
+        }
+
+        auto* prefabPath = getInstanceOf();
+        auto prefab = getEntityLib()->loadFileAsNode(prefabPath, *getSchema());
+        std::map<std::string, Map::KeyType> prefabsKeys;
+        std::map<std::string, Map::KeyType> instanceKeys;
+        // Save keyFields values
+        for (auto&& [fieldName, prop] : getSchema()->properties)
+        {
+            if (not prop->isKeyField)
+            {
+                continue;
+            }
+
+            if (prop->type == Ent::DataType::string)
+            {
+                prefabsKeys.emplace(fieldName, prefab->at(fieldName.c_str())->getString());
+                instanceKeys.emplace(fieldName, at(fieldName.c_str())->getString());
+            }
+            else if (prop->type == Ent::DataType::entityRef)
+            {
+                prefabsKeys.emplace(
+                    fieldName, prefab->at(fieldName.c_str())->getEntityRef().entityPath);
+                instanceKeys.emplace(fieldName, at(fieldName.c_str())->getEntityRef().entityPath);
+            }
+            else if (prop->type == Ent::DataType::integer)
+            {
+                prefabsKeys.emplace(fieldName, prefab->at(fieldName.c_str())->getInt());
+                instanceKeys.emplace(fieldName, at(fieldName.c_str())->getInt());
+            }
+            else
+            {
+                ENTLIB_LOGIC_ERROR("This key type is not accepted : %d", prop->type);
+            }
+        }
+
+        // When the value is overridden is the source, we want to make it overridden in the dest => CopyOverride
+        applyAllValuesButPrefab(*prefab, CopyMode::CopyOverride);
+
+        auto setToNode = [](Ent::Subschema const& prop,
+                            Node& node,
+                            String const& fieldName,
+                            std::map<std::string, Map::KeyType> const& keys) {
+            if (not prop.isKeyField)
+            {
+                return;
+            }
+            if (prop.type == Ent::DataType::string)
+            {
+                node.at(fieldName.c_str())
+                    ->setString(std::get<String>(keys.at(fieldName.c_str())).c_str());
+            }
+            else if (prop.type == Ent::DataType::entityRef)
+            {
+                node.at(fieldName.c_str())
+                    ->setEntityRef(EntityRef{std::get<String>(keys.at(fieldName.c_str()))});
+            }
+            else if (prop.type == Ent::DataType::integer)
+            {
+                node.at(fieldName.c_str())->setInt(std::get<int64_t>(keys.at(fieldName.c_str())));
+            }
+        };
+
+        // Restore the keyFields values.
+        // Asked by the maxscript team because they don't want to change the name this way
+        for (auto&& [fieldName, prop] : getSchema()->properties)
+        {
+            setToNode(*prop, *prefab, fieldName, prefabsKeys);
+        }
+        // Need to save the prefab before "resetInstanceOf"
+        // because "resetInstanceOf" will use the new prefab
+        prefab->saveNode(prefabPath);
+        resetInstanceOf(prefabPath); // Reset 'this' to a vanilla instance of prefab
+        // Override key fiels (Entity name) the the previous value
+        for (auto&& [fieldName, prop] : getSchema()->properties)
+        {
+            setToNode(*prop, *this, fieldName, instanceKeys);
+        }
     }
 
     void Ent::Node::changeInstanceOf(char const* _newPrefab)

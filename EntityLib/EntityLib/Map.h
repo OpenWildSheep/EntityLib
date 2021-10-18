@@ -85,6 +85,7 @@ namespace Ent
         void applyAllValues(Map& _dest, CopyMode _copyMode) const;
         void setParentNode(Node* _parentNode);
         void checkParent(Node const* _parentNode) const;
+        std::vector<NodeUniquePtr> releaseAllElements();
 
         std::vector<String> getKeysString() const;
         std::vector<int64_t> getKeysInt() const;

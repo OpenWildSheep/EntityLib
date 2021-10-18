@@ -722,11 +722,11 @@ namespace Ent
             {{schema.type_name}}(Ent::Node* _node): HelperObject(_node) {}
             {{#schema.schema_name}}
             static constexpr char schemaName[] = "{{.}}";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }

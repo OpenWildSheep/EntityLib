@@ -20,7 +20,7 @@ namespace Ent
         updateParents();
     }
 
-    Node::Node(Node const& _node)
+    /*Node::Node(Node const& _node)
         : parentNode(nullptr)
         , schema(_node.schema)
         , value(_node.value)
@@ -57,6 +57,16 @@ namespace Ent
         addedInInstance = _node.addedInInstance;
         updateParents();
         return *this;
+    }*/
+
+    NodeUniquePtr Node::clone() const
+    {
+        auto newNode = getEntityLib()->newNode(value, schema);
+        newNode->parentNode = parentNode;
+        newNode->addedInInstance = addedInInstance;
+        newNode->updateParents();
+        newNode->checkParent(parentNode);
+        return newNode;
     }
 
     struct UpdateParents
@@ -405,18 +415,18 @@ namespace Ent
         Subschema const* schema;
 
         template <typename T>
-        Node operator()(T const& _ov) const
+        NodeUniquePtr operator()(T const& _ov) const
         {
-            return Node(_ov.detach(), schema);
+            return schema->rootSchema->entityLib->newNode(_ov.detach(), schema);
         }
 
-        Node operator()(Null const&) const
+        NodeUniquePtr operator()(Null const&) const
         {
-            return Node(Null{}, schema);
+            return schema->rootSchema->entityLib->newNode(Null{}, schema);
         }
     };
 
-    Node Node::detach() const
+    NodeUniquePtr Node::detach() const
     {
         return std::visit(Detach{schema}, value);
     }
@@ -426,18 +436,18 @@ namespace Ent
         Subschema const* schema;
 
         template <typename T>
-        Node operator()(T const& _ov) const
+        NodeUniquePtr operator()(T const& _ov) const
         {
-            return Node(_ov.makeInstanceOf(), schema);
+            return schema->rootSchema->entityLib->newNode(_ov.makeInstanceOf(), schema);
         }
 
-        Node operator()(Null const&) const
+        NodeUniquePtr operator()(Null const&) const
         {
-            return Node(Null{}, schema);
+            return schema->rootSchema->entityLib->newNode(Null{}, schema);
         }
     };
 
-    Node Node::makeInstanceOf() const
+    NodeUniquePtr Node::makeInstanceOf() const
     {
         return std::visit(MakeInstanceOf{schema}, value);
     }
@@ -682,6 +692,22 @@ namespace Ent
         newNode->setParentNode(this);
         newNode->updateParents();
         return newNode;
+    }
+
+    void Node::mapInsert(char const* _key, NodeUniquePtr _newNode)
+    {
+        if (_key == nullptr)
+        {
+            throw NullPointerArgument("_key", "Node::mapInsert");
+        }
+        checkMap("mapInsert");
+        std::get<Array>(value).mapInsert(_key, std::move(_newNode));
+    }
+
+    void Node::mapInsert(int64_t _key, NodeUniquePtr _newNode)
+    {
+        checkMap("mapInsert");
+        std::get<Array>(value).mapInsert(_key, std::move(_newNode));
     }
 
     Node* Node::mapInsertInstanceOf(char const* _prefabPath)
@@ -1008,9 +1034,9 @@ namespace Ent
 
     void Ent::Node::changeInstanceOf(char const* _newPrefab)
     {
-        Node cloned = *this;
+        auto cloned = clone();
         resetInstanceOf(_newPrefab);
-        cloned.applyAllValuesButPrefab(*this, CopyMode::MinimalOverride);
+        cloned->applyAllValuesButPrefab(*this, CopyMode::MinimalOverride);
     }
 
     void destroyAndFree(Node* ptr)

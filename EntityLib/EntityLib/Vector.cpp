@@ -14,6 +14,29 @@ Ent::Vector::Vector(EntityLib const* _entlib, Subschema const* _schema)
 {
 }
 
+Ent::Vector::Vector(Vector const& _other)
+    : m_entlib(_other.m_entlib)
+    , m_schema(_other.m_schema)
+    // , m_data(_other.m_data)
+    , m_arraySize(_other.m_arraySize)
+
+{
+    m_data.reserve(_other.m_data.size());
+    for (auto& data : _other.m_data)
+    {
+        m_data.push_back(data->clone());
+    }
+}
+Ent::Vector& Ent::Vector::operator=(Vector const& _other)
+{
+    if (this != &_other)
+    {
+        Vector tmp(_other);
+        std::swap(tmp, *this);
+    }
+    return *this;
+}
+
 void Ent::Vector::setSize(Override<size_t> _size)
 {
     m_arraySize = _size;
@@ -116,7 +139,7 @@ void Ent::Vector::clear()
 
 Ent::Vector Ent::Vector::detach() const
 {
-    Vector result{nullptr, m_schema};
+    Vector result{getEntityLib(), m_schema};
     for (auto const& elt : m_data)
     {
         result.m_data.emplace_back(elt->detach());
@@ -128,7 +151,7 @@ Ent::Vector Ent::Vector::detach() const
 
 Ent::Vector Ent::Vector::makeInstanceOf() const
 {
-    Vector result{nullptr, m_schema};
+    Vector result{getEntityLib(), m_schema};
     for (auto const& elt : m_data)
     {
         result.m_data.emplace_back(elt->makeInstanceOf());
@@ -153,11 +176,12 @@ tl::optional<size_t> Ent::Vector::getRawSize(OverrideValueLocation _location) co
     return m_arraySize.getRaw(_location);
 }
 
-Ent::Node* Ent::Vector::initPush(Node _node, bool _addedInInstance)
+Ent::Node* Ent::Vector::initPush(NodeUniquePtr _node, bool _addedInInstance)
 {
     ENTLIB_ASSERT(
-        m_schema->singularItems == nullptr || (&m_schema->singularItems->get() == _node.getSchema()));
-    m_data.emplace_back(Ent::make_value<Node>(std::move(_node)));
+        m_schema->singularItems == nullptr
+        || (&m_schema->singularItems->get() == _node->getSchema()));
+    m_data.emplace_back(std::move(_node));
     m_arraySize.set(m_arraySize.get() + 1);
     auto node = m_data.back().get();
     node->setAddedInInsance(_addedInInstance);
@@ -225,4 +249,9 @@ void Ent::Vector::checkParent(Node const* _parentNode) const
     {
         elt->checkParent(_parentNode);
     }
+}
+
+Ent::EntityLib const* Ent::Vector::getEntityLib() const
+{
+    return m_entlib;
 }

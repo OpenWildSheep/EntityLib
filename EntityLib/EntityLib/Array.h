@@ -26,6 +26,10 @@ namespace Ent
     struct Array
     {
         Array(EntityLib const* _entlib, Subschema const* _schema);
+        Array(Array const& _other) = default;
+        Array(Array&&) = default;
+        Array& operator=(Array const&) = default;
+        Array& operator=(Array&&) = default;
 
         bool hasOverride() const; ///< Recursively check if there is an override inside
         bool hasPrefabValue() const; ///< Recursively check if value is set in a prefab
@@ -46,6 +50,7 @@ namespace Ent
         Node* mapGet(Map::KeyType const& _key); ///< @return the item with _key, or nullptr
         Node const* mapGet(Map::KeyType const& _key) const; ///< @return the item with _key, or nullptr
         Node* mapInsert(Map::KeyType const& _key); ///< @pre hasKey(). @brief Insert a new item with _key
+        void mapInsert(Map::KeyType const& _key, NodeUniquePtr _newNode);
         Node* mapRename(Map::KeyType const& _key, Map::KeyType const& _newKey);
 
         /// @return true if it is a map/set and the element with _key was removed
@@ -85,11 +90,15 @@ namespace Ent
         void unset(); ///< Unset recursively all values overriden in instance (return to prefab values)
 
         // **************************** For array initialization **********************************
-        Node* initAdd(OverrideValueLocation, Node _node, bool _addedInInstance); ///< @pre This _node is not yet added
+        Node* initAdd(
+            OverrideValueLocation,
+            NodeUniquePtr _node,
+            bool _addedInInstance); ///< @pre This _node is not yet added
         /// @pre hasKey() and the key doesn't exist in map
-        Node* mapInitInsert(OverrideValueLocation, Map::KeyType _key, Node _node, bool _addedInInstance);
+        Node* mapInitInsert(
+            OverrideValueLocation, Map::KeyType _key, NodeUniquePtr _node, bool _addedInInstance);
         /// @pre not hasKey()
-        Node* arrayInitPush(Node _node, bool _addedInInstance);
+        Node* arrayInitPush(NodeUniquePtr _node, bool _addedInInstance);
 
         void applyAllValues(Array& _dest, CopyMode _copyMode) const;
 

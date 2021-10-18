@@ -30,11 +30,11 @@ namespace Ent
         Entity(
             EntityLib const& _entlib,
             Override<String> _name,
-            std::map<std::string, Component> _components,
+            std::map<std::string, std::unique_ptr<Component>> _components,
             std::set<std::string> _removedComponents,
             std::unique_ptr<SubSceneComponent> _subSceneComponent,
-            Node _actorStates = {},
-            Node _color = {},
+            NodeUniquePtr _actorStates = {},
+            NodeUniquePtr _color = {},
             Override<String> _thumbnail = {},
             Override<String> _instanceOf = {},
             Override<ActivationLevel> _maxActivationLevel = {},
@@ -53,7 +53,7 @@ namespace Ent
 
         Node const& getColorValue() const
         {
-            return color;
+            return *color;
         }
 
         Override<String> const& getThumbnailValue() const
@@ -103,7 +103,7 @@ namespace Ent
         /// Get the list of all component types inside this Entity
         std::vector<char const*> getComponentTypes() const;
         /// Get an dictionary with all component where the key is the type, and the value a Component
-        std::map<std::string, Component> const& getComponents() const;
+        std::map<std::string, std::unique_ptr<Component>> const& getComponents() const;
         /// Get the special component SubScene or nullptr
         SubSceneComponent const* getSubSceneComponent() const;
         /// Get the special component SubScene or nullptr
@@ -118,11 +118,11 @@ namespace Ent
 
         Node const& getActorStates() const
         {
-            return actorStates;
+            return *actorStates;
         }
         Node& getActorStates()
         {
-            return actorStates;
+            return *actorStates;
         }
 
         /// @brief Make the Entity independent from its prefab (instanceOf)
@@ -190,11 +190,11 @@ namespace Ent
         void updateSubSceneOwner();
         EntityLib const* entlib{}; ///< Reference the entity lib to find the schema when needed
         Override<String> name; ///< Entity name
-        std::map<std::string, Component> components; ///< All components of this Entity
+        std::map<std::string, std::unique_ptr<Component>> components; ///< All components of this Entity
         std::set<std::string> removedComponents;
         std::unique_ptr<SubSceneComponent> subSceneComponent; ///< the optional SubScene Component
-        Node actorStates; ///< All actorStates of this Entity
-        Node color; ///< The optional Color of the Entity
+        NodeUniquePtr actorStates; ///< All actorStates of this Entity
+        NodeUniquePtr color; ///< The optional Color of the Entity
         Override<String> thumbnail; ///< Path to the thumbnail mesh (.wthumb)
         Override<String> instanceOf; ///< Path to the prefab if this is the instanciation of an other entity
         Override<ActivationLevel> maxActivationLevel; ///< Maximum activation level of this entity in runtime

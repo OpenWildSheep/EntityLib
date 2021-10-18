@@ -246,7 +246,7 @@ namespace Ent
 
         char const* c_str() const
         {
-            return str == nullptr? "": str.get();
+            return str == nullptr ? "" : str.get();
         }
 
         size_t capacity() const
@@ -312,131 +312,11 @@ namespace Ent
 
         void free(void* ptr)
         {
+            ENTLIB_ASSERT(allocatedCount > 0);
             --allocatedCount;
             freePtr.push_back(ptr);
         }
     };
-
-    /// @brief smart-pointer with deep-copy
-    ///
-    /// It is like a unique_ptr but copyable (deep-copy)
-    /// It is like an optional but heap allocated
-    /// It is like a vector with a size of 1
-    ///
-    /// This class is only for the Node type
-    template <typename T>
-    struct value_ptr
-    {
-        struct Deleter
-        {
-            void operator()(T* ptr) const
-            {
-                destroyAndFree(ptr);
-            }
-        };
-
-        std::unique_ptr<T, Deleter> ptr;
-
-        value_ptr() = default;
-        value_ptr(value_ptr const& ot)
-        {
-            *this = ot;
-        }
-
-        template <typename... Args>
-        void initPtr(Pool<T>& pool, Args&&... args)
-        {
-            ptr.reset(new (pool.alloc()) T(std::forward<Args>(args)...));
-        }
-
-        value_ptr(T const& data)
-        {
-            initPtr(getPool(&data), data);
-        }
-        explicit value_ptr(T const* data)
-        {
-            if (data != nullptr)
-                initPtr(getPool(data), *data);
-        }
-        value_ptr(T&& data)
-        {
-            initPtr(getPool(&data), std::move(data));
-        }
-        value_ptr(nullptr_t)
-        {
-        }
-        value_ptr& operator=(value_ptr const& ot)
-        {
-            if (ptr != nullptr)
-            {
-                if (ot.ptr != nullptr)
-                    *ptr = *ot.ptr;
-                else
-                    ptr.reset();
-            }
-            else
-            {
-                if (ot.ptr != nullptr)
-                    initPtr(getPool(ot.ptr.get()), *ot);
-            }
-            return *this;
-        }
-        value_ptr(value_ptr&& ot) = default;
-        value_ptr& operator=(value_ptr&& ot) = default;
-
-        ~value_ptr() = default;
-
-        T& operator*()
-        {
-            return *ptr;
-        }
-        T const& operator*() const
-        {
-            return *ptr;
-        }
-        T* operator->()
-        {
-            return ptr.get();
-        }
-        T const* operator->() const
-        {
-            return ptr.get();
-        }
-        T* get()
-        {
-            return ptr.get();
-        }
-        T const* get() const
-        {
-            return ptr.get();
-        }
-
-        bool operator==(nullptr_t) const
-        {
-            return ptr == nullptr;
-        }
-
-        bool operator!=(nullptr_t) const
-        {
-            return ptr != nullptr;
-        }
-
-        operator bool() const
-        {
-            return ptr == nullptr;
-        }
-
-        bool has_value() const
-        {
-            return ptr != nullptr;
-        }
-    };
-
-    template <typename T, typename... Args>
-    value_ptr<T> make_value(Args&&... args)
-    {
-        return value_ptr<T>(T(std::forward<Args>(args)...));
-    }
 
     std::string convertANSIToUTF8(std::string const& _message);
 
@@ -598,4 +478,15 @@ namespace Ent
 
 #define ENT_IF_COMPILE(TYPE, PARAM, CODE)                                                          \
     if constexpr (Ent::doesCompile<TYPE>([](auto&& PARAM) -> decltype(CODE) {}))
+
+    struct Node;
+    struct NodeDeleter
+    {
+        template <typename T>
+        void operator()(T* ptr) const
+        {
+            destroyAndFree(ptr);
+        }
+    };
+    using NodeUniquePtr = std::unique_ptr<Node, NodeDeleter>;
 } // namespace Ent

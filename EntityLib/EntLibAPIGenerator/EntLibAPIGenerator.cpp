@@ -1000,7 +1000,7 @@ import EntityLibPy
 from enum import Enum
 
 {{#primitives}}
-{{.}}
+{{{.}}}
 {{/primitives}}
 
 {{#all_definitions}}

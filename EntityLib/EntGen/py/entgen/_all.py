@@ -242,6 +242,7 @@ from .BittenGD import *
 from .BeamGeneratorGD import *
 from .AttackTriggerGD import *
 from .AssemblyGD import *
+from .AnimationTransformDriverGD import *
 from .AnimationRegenConstraintsGD import *
 from .AnimationPlaylistGD import *
 from .AnimationPhysicsChainConstraintsGD import *

@@ -3423,6 +3423,20 @@
                     "prim_array": false,
                     "prim_set": false,
                     "ref": {
+                        "name": "Bool",
+                        "settable": true
+                    },
+                    "tuple": false,
+                    "union": false,
+                    "union_set": false
+                },
+                {
+                    "array": false,
+                    "map": false,
+                    "object_set": false,
+                    "prim_array": false,
+                    "prim_set": false,
+                    "ref": {
                         "name": "Float",
                         "settable": true
                     },
@@ -3503,6 +3517,24 @@
                             "prim_set": false,
                             "ref": {
                                 "name": "Float",
+                                "settable": true
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
+                        "escaped_prop_name": "RimTerrain",
+                        "prop_name": "RimTerrain",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "Bool",
                                 "settable": true
                             },
                             "tuple": false,
@@ -41425,6 +41457,93 @@
                     "tuple": false,
                     "union": false,
                     "union_set": false
+                }
+            ],
+            "map": false,
+            "object": {
+                "properties": [
+                    {
+                        "escaped_prop_name": "Super",
+                        "prop_name": "Super",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "ComponentGD",
+                                "settable": false
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
+                        "escaped_prop_name": "_comment",
+                        "prop_name": "_comment",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "cpp_native": "char const*",
+                                "name": "String",
+                                "py_native": "str",
+                                "settable": true
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    }
+                ]
+            },
+            "object_set": false,
+            "schema_name": "./RuntimeComponents.json#/definitions/AnimationTransformDriverGD",
+            "tuple": false,
+            "type_name": "AnimationTransformDriverGD",
+            "union": false,
+            "union_set": false
+        }
+    },
+    {
+        "schema": {
+            "alias": false,
+            "enum": false,
+            "includes": [
+                {
+                    "array": false,
+                    "map": false,
+                    "object_set": false,
+                    "prim_array": false,
+                    "prim_set": false,
+                    "ref": {
+                        "cpp_native": "char const*",
+                        "name": "String",
+                        "py_native": "str",
+                        "settable": true
+                    },
+                    "tuple": false,
+                    "union": false,
+                    "union_set": false
+                },
+                {
+                    "array": false,
+                    "map": false,
+                    "object_set": false,
+                    "prim_array": false,
+                    "prim_set": false,
+                    "ref": {
+                        "name": "ComponentGD",
+                        "settable": false
+                    },
+                    "tuple": false,
+                    "union": false,
+                    "union_set": false
                 },
                 {
                     "array": false,
@@ -43887,6 +44006,23 @@
                             "prim_set": false,
                             "ref": {
                                 "name": "ClothAnimationGD",
+                                "settable": false
+                            },
+                            "tuple": false,
+                            "union": false,
+                            "union_set": false
+                        }
+                    },
+                    {
+                        "name": "AnimationTransformDriverGD",
+                        "type": {
+                            "array": false,
+                            "map": false,
+                            "object_set": false,
+                            "prim_array": false,
+                            "prim_set": false,
+                            "ref": {
+                                "name": "AnimationTransformDriverGD",
                                 "settable": false
                             },
                             "tuple": false,
@@ -46476,6 +46612,23 @@
                                 "prim_set": false,
                                 "ref": {
                                     "name": "ClothAnimationGD",
+                                    "settable": false
+                                },
+                                "tuple": false,
+                                "union": false,
+                                "union_set": false
+                            }
+                        },
+                        {
+                            "name": "AnimationTransformDriverGD",
+                            "type": {
+                                "array": false,
+                                "map": false,
+                                "object_set": false,
+                                "prim_array": false,
+                                "prim_set": false,
+                                "ref": {
+                                    "name": "AnimationTransformDriverGD",
                                     "settable": false
                                 },
                                 "tuple": false,
@@ -49074,6 +49227,23 @@
                             }
                         },
                         {
+                            "name": "AnimationTransformDriverGD",
+                            "type": {
+                                "array": false,
+                                "map": false,
+                                "object_set": false,
+                                "prim_array": false,
+                                "prim_set": false,
+                                "ref": {
+                                    "name": "AnimationTransformDriverGD",
+                                    "settable": false
+                                },
+                                "tuple": false,
+                                "union": false,
+                                "union_set": false
+                            }
+                        },
+                        {
                             "name": "CreatureGD",
                             "type": {
                                 "array": false,
@@ -51536,26 +51706,6 @@
             "map": false,
             "object": {
                 "properties": [
-                    {
-                        "escaped_prop_name": "ActorBone",
-                        "prop_name": "ActorBone",
-                        "type": {
-                            "array": false,
-                            "map": false,
-                            "object_set": false,
-                            "prim_array": false,
-                            "prim_set": false,
-                            "ref": {
-                                "cpp_native": "char const*",
-                                "name": "String",
-                                "py_native": "str",
-                                "settable": true
-                            },
-                            "tuple": false,
-                            "union": false,
-                            "union_set": false
-                        }
-                    },
                     {
                         "escaped_prop_name": "Anim",
                         "prop_name": "Anim",

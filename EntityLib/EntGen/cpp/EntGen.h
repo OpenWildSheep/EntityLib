@@ -557,6 +557,7 @@ namespace Ent
         struct BeamGeneratorGD;
         struct AttackTriggerGD;
         struct AssemblyGD;
+        struct AnimationTransformDriverGD;
         struct AnimationRegenConstraintsGD;
         struct AnimationPlaylistGD;
         struct AnimationPhysicsChainConstraintsGD;
@@ -927,11 +928,11 @@ namespace Ent
         {
             sPhysicsShapeSphere(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sPhysicsShapeSphere";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -943,11 +944,11 @@ namespace Ent
         {
             sPhysicsShapeMesh(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sPhysicsShapeMesh";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -959,11 +960,11 @@ namespace Ent
         {
             sPhysicsShapeCylinder(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sPhysicsShapeCylinder";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -976,11 +977,11 @@ namespace Ent
         {
             sPhysicsShapeCapsule(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sPhysicsShapeCapsule";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -993,11 +994,11 @@ namespace Ent
         {
             sJointFixedDesc(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sJointFixedDesc";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1008,11 +1009,11 @@ namespace Ent
         {
             sJointBallDesc(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sJointBallDesc";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1023,11 +1024,11 @@ namespace Ent
         {
             sGameEffectTemplate(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sGameEffectTemplate";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1041,11 +1042,11 @@ namespace Ent
         {
             sBoneInfluenceDataTemplate(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sBoneInfluenceDataTemplate";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1058,11 +1059,11 @@ namespace Ent
         {
             sNodeBoneInfluenceDataTemplate(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sNodeBoneInfluenceDataTemplate";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1085,11 +1086,11 @@ namespace Ent
         {
             sPhysicsShapeBox(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sPhysicsShapeBox";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1101,11 +1102,11 @@ namespace Ent
         {
             sEnvStamp(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sEnvStamp";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1132,11 +1133,11 @@ namespace Ent
         {
             sJointUniversalDesc(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sJointUniversalDesc";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1149,11 +1150,11 @@ namespace Ent
         {
             sJointSwingTwistDesc(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sJointSwingTwistDesc";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1166,11 +1167,11 @@ namespace Ent
         {
             sJointSliderDesc(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sJointSliderDesc";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1183,11 +1184,11 @@ namespace Ent
         {
             sJointHingeDesc(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sJointHingeDesc";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1200,11 +1201,11 @@ namespace Ent
         {
             VomitData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/VomitData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1230,11 +1231,11 @@ namespace Ent
         {
             TypedValue(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/TypedValue";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1248,11 +1249,11 @@ namespace Ent
         {
             TransitionNeighborData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/TransitionNeighborData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1266,11 +1267,11 @@ namespace Ent
         {
             TestPropertyDefaultValues(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/TestPropertyDefaultValues";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1283,11 +1284,11 @@ namespace Ent
         {
             TestPropertyDefaultValues2(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/TestPropertyDefaultValues2";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1300,11 +1301,11 @@ namespace Ent
         {
             Terrain_TerrainMeta(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/Terrain::TerrainMeta";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1312,6 +1313,7 @@ namespace Ent
             Ent::Gen::Float HeightScaleMeters() const;
             Ent::Gen::String Material() const;
             Ent::Gen::Float RegionWidthMeters() const;
+            Ent::Gen::Bool RimTerrain() const;
             Ent::Gen::Float SkirtScale() const;
             Ent::Gen::Float TexelsPerMeter() const;
             Ent::Gen::String _comment() const;
@@ -1321,11 +1323,11 @@ namespace Ent
         {
             TagsList(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/TagsList";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1398,11 +1400,11 @@ namespace Ent
         {
             StunData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/StunData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1428,11 +1430,11 @@ namespace Ent
         {
             StickToGround(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/StickToGround";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1445,11 +1447,11 @@ namespace Ent
         {
             StateGauge(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/StateGauge";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1463,11 +1465,11 @@ namespace Ent
         {
             StunGauge(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/StunGauge";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1584,11 +1586,11 @@ namespace Ent
         {
             SpawningParameter(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/SpawningParameter";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1604,11 +1606,11 @@ namespace Ent
         {
             SoundEventMapping(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/SoundEventMapping";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1675,11 +1677,11 @@ namespace Ent
         {
             ShootSequenceData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ShootSequenceData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1692,11 +1694,11 @@ namespace Ent
         {
             ShootData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ShootData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1730,11 +1732,11 @@ namespace Ent
         {
             SeedPatchData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/SeedPatchData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1756,11 +1758,11 @@ namespace Ent
         {
             SeedPatchDataList(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/SeedPatchDataList";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1772,11 +1774,11 @@ namespace Ent
         {
             ScriptPathAndDataSet(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ScriptPathAndDataSet";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1792,11 +1794,11 @@ namespace Ent
         {
             ScaleConverter(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ScaleConverter";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1812,11 +1814,11 @@ namespace Ent
         {
             ReviveSideData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ReviveSideData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1853,11 +1855,11 @@ namespace Ent
         {
             RevivedData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/RevivedData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -1880,11 +1882,11 @@ namespace Ent
         {
             ReviveSideEvent(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ReviveSideEvent";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2020,11 +2022,11 @@ namespace Ent
         {
             sPhysicsJointDesc(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sPhysicsJointDesc";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2048,11 +2050,11 @@ namespace Ent
         {
             sPhysicShape(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sPhysicShape";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2073,11 +2075,11 @@ namespace Ent
         {
             sRigidBodyDesc(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/sRigidBodyDesc";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2097,11 +2099,11 @@ namespace Ent
         {
             Transform3D(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/Transform3D";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2115,11 +2117,11 @@ namespace Ent
         {
             ProjectileShooterData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ProjectileShooterData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2131,11 +2133,11 @@ namespace Ent
         {
             ProgressSoundEventData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ProgressSoundEventData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2193,11 +2195,11 @@ namespace Ent
         {
             PredictionBehaviorDuration(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PredictionBehaviorDuration";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2211,11 +2213,11 @@ namespace Ent
         {
             PredictionBehaviorData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PredictionBehaviorData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2327,11 +2329,11 @@ namespace Ent
         {
             OutfitPiece(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/OutfitPiece";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2378,11 +2380,11 @@ namespace Ent
         {
             NavmeshGenerationParameters(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/NavmeshGenerationParameters";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2401,11 +2403,11 @@ namespace Ent
         {
             MoveCapacityData_OrientationSpeed(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/MoveCapacityData::OrientationSpeed";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2422,11 +2424,11 @@ namespace Ent
         {
             MountableSnapLine_ControlPoint(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/MountableSnapLine::ControlPoint";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2440,11 +2442,11 @@ namespace Ent
         {
             MountData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/MountData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2501,11 +2503,11 @@ namespace Ent
         {
             MeshNavigationBehaviorData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/MeshNavigationBehaviorData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2579,11 +2581,11 @@ namespace Ent
         {
             VolumeConstraintDataGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/VolumeConstraintDataGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2644,11 +2646,11 @@ namespace Ent
         {
             MoveCapacityData_ReachSpeed(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/MoveCapacityData::ReachSpeed";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2699,11 +2701,11 @@ namespace Ent
         {
             LifeAndDamageData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/LifeAndDamageData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2774,11 +2776,11 @@ namespace Ent
         {
             TaggedEntityRef(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/TaggedEntityRef";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2791,11 +2793,11 @@ namespace Ent
         {
             InteractData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/InteractData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2807,11 +2809,11 @@ namespace Ent
         {
             InputCollisionBehaviorData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/InputCollisionBehaviorData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2826,11 +2828,11 @@ namespace Ent
         {
             ImmersedBehaviorData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ImmersedBehaviorData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2892,11 +2894,11 @@ namespace Ent
         {
             PickableDistributorComponentData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PickableDistributorComponentData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2909,11 +2911,11 @@ namespace Ent
         {
             HotspotData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/HotspotData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -2931,11 +2933,11 @@ namespace Ent
         {
             HeadCollisionBehaviorData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/HeadCollisionBehaviorData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3009,11 +3011,11 @@ namespace Ent
         {
             FusionData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/FusionData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3028,11 +3030,11 @@ namespace Ent
         {
             FreezeData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/FreezeData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3048,11 +3050,11 @@ namespace Ent
         {
             ProjectileData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ProjectileData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3092,11 +3094,11 @@ namespace Ent
         {
             FluidVolumeComponentGD_SimulationParameters(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/FluidVolumeComponentGD::SimulationParameters";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3111,11 +3113,11 @@ namespace Ent
         {
             FluidVolumeComponentGD_HeightMapData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/FluidVolumeComponentGD::HeightMapData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3129,11 +3131,11 @@ namespace Ent
         {
             FluidVolumeComponentGD_FluidVolumeData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/FluidVolumeComponentGD::FluidVolumeData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3174,11 +3176,11 @@ namespace Ent
         {
             FloatRange(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/FloatRange";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3190,11 +3192,11 @@ namespace Ent
         {
             VegetationPCloudData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/VegetationPCloudData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3208,11 +3210,11 @@ namespace Ent
         {
             EventCameraData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EventCameraData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3246,11 +3248,11 @@ namespace Ent
         {
             EntityLODData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EntityLODData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3263,11 +3265,11 @@ namespace Ent
         {
             RegenData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/RegenData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3281,11 +3283,11 @@ namespace Ent
         {
             EDITOR_Mesh(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/EDITOR_Mesh";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3323,11 +3325,11 @@ namespace Ent
         {
             CreatureDangerousness(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CreatureDangerousness";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3340,11 +3342,11 @@ namespace Ent
         {
             ConditionalRigidityAttribute_RigidityParameter(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ConditionalRigidityAttribute::RigidityParameter";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3358,11 +3360,11 @@ namespace Ent
         {
             ConditionalRigidityAttribute_Attributes(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ConditionalRigidityAttribute::Attributes";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3377,11 +3379,11 @@ namespace Ent
         {
             ComponentGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ComponentGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3392,11 +3394,11 @@ namespace Ent
         {
             WorldScalePathFindGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/WorldScalePathFindGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3410,11 +3412,11 @@ namespace Ent
         {
             WildObject(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/WildObject";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3428,11 +3430,11 @@ namespace Ent
         {
             VoxelSimulationGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/VoxelSimulationGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3449,11 +3451,11 @@ namespace Ent
         {
             VolumeConstraintGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/VolumeConstraintGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3466,11 +3468,11 @@ namespace Ent
         {
             VisualGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./MergedComponents.json#/definitions/VisualGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3488,11 +3490,11 @@ namespace Ent
         {
             VelocityObstacleGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/VelocityObstacleGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3506,11 +3508,11 @@ namespace Ent
         {
             VegetationNavMeshTaggerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/VegetationNavMeshTaggerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3523,11 +3525,11 @@ namespace Ent
         {
             UnifiedPhysicsDataGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/UnifiedPhysicsDataGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3539,11 +3541,11 @@ namespace Ent
         {
             TriggerEventCameraGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/TriggerEventCameraGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3562,11 +3564,11 @@ namespace Ent
         {
             TransformGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./MergedComponents.json#/definitions/TransformGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3584,11 +3586,11 @@ namespace Ent
         {
             TestUnion(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/TestUnion";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3603,11 +3605,11 @@ namespace Ent
         {
             TestSetOfObject(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/TestSetOfObject";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3621,11 +3623,11 @@ namespace Ent
         {
             TestEntityRef(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/TestEntityRef";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3638,11 +3640,11 @@ namespace Ent
         {
             TestDefaultValues(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/TestDefaultValues";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3657,11 +3659,11 @@ namespace Ent
         {
             TestCreature(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/TestCreature";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3678,11 +3680,11 @@ namespace Ent
         {
             TestArrays(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/TestArrays";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3699,11 +3701,11 @@ namespace Ent
         {
             TerrainSurfaceObject(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/TerrainSurfaceObject";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3716,11 +3718,11 @@ namespace Ent
         {
             TerrainGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./MergedComponents.json#/definitions/TerrainGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3763,11 +3765,11 @@ namespace Ent
         {
             TeamGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/TeamGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3779,11 +3781,11 @@ namespace Ent
         {
             SystemicCreature(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/SystemicCreature";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3811,11 +3813,11 @@ namespace Ent
         {
             StickToTerrain(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/StickToTerrain";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3831,11 +3833,11 @@ namespace Ent
         {
             StaticObjectGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./MergedComponents.json#/definitions/StaticObjectGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3850,11 +3852,11 @@ namespace Ent
         {
             StaffVertebrasGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/StaffVertebrasGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3874,11 +3876,11 @@ namespace Ent
         {
             SpiritAnimalGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/SpiritAnimalGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3892,11 +3894,11 @@ namespace Ent
         {
             SoundEmitterGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/SoundEmitterGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3931,11 +3933,11 @@ namespace Ent
         {
             SoundAreaGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/SoundAreaGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3949,11 +3951,11 @@ namespace Ent
         {
             SoulSpotGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/SoulSpotGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3966,11 +3968,11 @@ namespace Ent
         {
             SoulRespawnOpportunityGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/SoulRespawnOpportunityGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -3988,11 +3990,11 @@ namespace Ent
         {
             SmoothScaleComponentGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/SmoothScaleComponentGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4004,11 +4006,11 @@ namespace Ent
         {
             SideMapGateGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/SideMapGateGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4021,11 +4023,11 @@ namespace Ent
         {
             ShapeshiftStatueGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ShapeshiftStatueGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4038,11 +4040,11 @@ namespace Ent
         {
             ShamanVisionGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ShamanVisionGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4054,11 +4056,11 @@ namespace Ent
         {
             ShamanItemGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ShamanItemGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4074,11 +4076,11 @@ namespace Ent
         {
             SensorControllerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/SensorControllerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4090,11 +4092,11 @@ namespace Ent
         {
             SeedPatch(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/SeedPatch";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4118,11 +4120,11 @@ namespace Ent
         {
             ScriptComponentGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ScriptComponentGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4136,11 +4138,11 @@ namespace Ent
         {
             ReviveSideSwitcherGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ReviveSideSwitcherGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4154,11 +4156,11 @@ namespace Ent
         {
             ReviveEnergyGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ReviveEnergyGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4178,11 +4180,11 @@ namespace Ent
         {
             RespawnPlaceGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/RespawnPlaceGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4195,11 +4197,11 @@ namespace Ent
         {
             RegenerableVegetationGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/RegenerableVegetationGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4215,11 +4217,11 @@ namespace Ent
         {
             RegenSwitcherGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/RegenSwitcherGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4234,11 +4236,11 @@ namespace Ent
         {
             RegenMeshGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/RegenMeshGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4257,11 +4259,11 @@ namespace Ent
         {
             RegenFXGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/RegenFXGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4273,11 +4275,11 @@ namespace Ent
         {
             RagdollGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/RagdollGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4290,11 +4292,11 @@ namespace Ent
         {
             QuickCreatureSwitchGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/QuickCreatureSwitchGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4307,11 +4309,11 @@ namespace Ent
         {
             ProtoComponentGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ProtoComponentGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4323,11 +4325,11 @@ namespace Ent
         {
             ProjectileShooterGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ProjectileShooterGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4340,11 +4342,11 @@ namespace Ent
         {
             PossessableGPEGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PossessableGPEGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4359,11 +4361,11 @@ namespace Ent
         {
             PlayerComponentGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PlayerComponentGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4375,11 +4377,11 @@ namespace Ent
         {
             PickableDistributorComponentGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PickableDistributorComponentGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4394,11 +4396,11 @@ namespace Ent
         {
             PickableComponentGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PickableComponentGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4411,11 +4413,11 @@ namespace Ent
         {
             PhysicsTriggerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PhysicsTriggerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4428,11 +4430,11 @@ namespace Ent
         {
             PhysicsMeshProviderGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PhysicsMeshProviderGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4445,11 +4447,11 @@ namespace Ent
         {
             PhysicsMeshDeformerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PhysicsMeshDeformerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4461,11 +4463,11 @@ namespace Ent
         {
             PhysicsGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./MergedComponents.json#/definitions/PhysicsGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4507,11 +4509,11 @@ namespace Ent
         {
             PhysicsDataGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./MergedComponents.json#/definitions/PhysicsDataGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4527,11 +4529,11 @@ namespace Ent
         {
             PerceiverGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PerceiverGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4553,11 +4555,11 @@ namespace Ent
         {
             PerceivableGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PerceivableGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4575,11 +4577,11 @@ namespace Ent
         {
             PathNodeGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PathNodeGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4593,11 +4595,11 @@ namespace Ent
         {
             PathMotionControllerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PathMotionControllerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4609,11 +4611,11 @@ namespace Ent
         {
             PathGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PathGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4626,11 +4628,11 @@ namespace Ent
         {
             PathBoneRigidBodyGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PathBoneRigidBodyGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4642,11 +4644,11 @@ namespace Ent
         {
             PathBoneInfluenceGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PathBoneInfluenceGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4659,11 +4661,11 @@ namespace Ent
         {
             PathBoneAnimGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/PathBoneAnimGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4675,11 +4677,11 @@ namespace Ent
         {
             OutfitWearerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/OutfitWearerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4694,11 +4696,11 @@ namespace Ent
         {
             OutfitGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/OutfitGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4719,11 +4721,11 @@ namespace Ent
         {
             NotVisibleInSubscene(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/NotVisibleInSubscene";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4735,11 +4737,11 @@ namespace Ent
         {
             NetworkNode(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/NetworkNode";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4754,11 +4756,11 @@ namespace Ent
         {
             NetworkLink(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/NetworkLink";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4775,11 +4777,11 @@ namespace Ent
         {
             NetGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/NetGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4791,11 +4793,11 @@ namespace Ent
         {
             MultiThumbnail(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/MultiThumbnail";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4808,11 +4810,11 @@ namespace Ent
         {
             MounterGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/MounterGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4825,11 +4827,11 @@ namespace Ent
         {
             MountableGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/MountableGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4843,11 +4845,11 @@ namespace Ent
         {
             MountIKControllerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/MountIKControllerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4860,11 +4862,11 @@ namespace Ent
         {
             MissionHolderGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/MissionHolderGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4877,11 +4879,11 @@ namespace Ent
         {
             MeshNavigationInfosGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/MeshNavigationInfosGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4893,11 +4895,11 @@ namespace Ent
         {
             Mesh(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/Mesh";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4910,11 +4912,11 @@ namespace Ent
         {
             LDPrimitive(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/LDPrimitive";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4929,11 +4931,11 @@ namespace Ent
         {
             ItemHolderGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ItemHolderGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4949,11 +4951,11 @@ namespace Ent
         {
             InventoryGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/InventoryGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4966,11 +4968,11 @@ namespace Ent
         {
             InfoboardRegistererGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/InfoboardRegistererGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -4983,11 +4985,11 @@ namespace Ent
         {
             HotspotsGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/HotspotsGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5000,11 +5002,11 @@ namespace Ent
         {
             HitTriggerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/HitTriggerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5016,11 +5018,11 @@ namespace Ent
         {
             HeightObj(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/HeightObj";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5039,11 +5041,11 @@ namespace Ent
         {
             HeightMapComponentGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/HeightMapComponentGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5061,11 +5063,11 @@ namespace Ent
         {
             HealthAreaGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/HealthAreaGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5082,11 +5084,11 @@ namespace Ent
         {
             HealerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/HealerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5098,11 +5100,11 @@ namespace Ent
         {
             HealTriggerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/HealTriggerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5114,11 +5116,11 @@ namespace Ent
         {
             HealPumpGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/HealPumpGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5134,11 +5136,11 @@ namespace Ent
         {
             GroundTypeSamplerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/GroundTypeSamplerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5151,11 +5153,11 @@ namespace Ent
         {
             GameEffectSpawnerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/GameEffectSpawnerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5169,11 +5171,11 @@ namespace Ent
         {
             FluidVolumeComponentGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/FluidVolumeComponentGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5186,11 +5188,11 @@ namespace Ent
         {
             FluidViewGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/FluidViewGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5202,11 +5204,11 @@ namespace Ent
         {
             FluidToRegenInjectorGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/FluidToRegenInjectorGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5221,11 +5223,11 @@ namespace Ent
         {
             FluidNavMeshTaggerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/FluidNavMeshTaggerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5240,11 +5242,11 @@ namespace Ent
         {
             FluidGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/FluidGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5258,11 +5260,11 @@ namespace Ent
         {
             FluidFXEntitySpawnerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/FluidFXEntitySpawnerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5277,11 +5279,11 @@ namespace Ent
         {
             FireSensorGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/FireSensorGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5293,11 +5295,11 @@ namespace Ent
         {
             EventTriggerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EventTriggerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5310,11 +5312,11 @@ namespace Ent
         {
             EventHandlerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EventHandlerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5326,11 +5328,11 @@ namespace Ent
         {
             EnvStampGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EnvStampGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5344,11 +5346,11 @@ namespace Ent
         {
             EnergySpoutGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EnergySpoutGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5366,11 +5368,11 @@ namespace Ent
         {
             EnergySourceGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EnergySourceGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5388,11 +5390,11 @@ namespace Ent
         {
             EnergyProbeGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EnergyProbeGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5404,11 +5406,11 @@ namespace Ent
         {
             EnergyPoolGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EnergyPoolGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5424,11 +5426,11 @@ namespace Ent
         {
             EnergyNetworkListenerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EnergyNetworkListenerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5440,11 +5442,11 @@ namespace Ent
         {
             EnergyDrainGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EnergyDrainGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5457,11 +5459,11 @@ namespace Ent
         {
             EnergyCrookGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EnergyCrookGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5476,11 +5478,11 @@ namespace Ent
         {
             DummyComponentGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/DummyComponentGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5492,11 +5494,11 @@ namespace Ent
         {
             DistanceTriggerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/DistanceTriggerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5510,11 +5512,11 @@ namespace Ent
         {
             FightDistanceTriggerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/FightDistanceTriggerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5526,11 +5528,11 @@ namespace Ent
         {
             DebugGridGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/DebugGridGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5544,11 +5546,11 @@ namespace Ent
         {
             CustomThumbnail(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/CustomThumbnail";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5561,11 +5563,11 @@ namespace Ent
         {
             CreatureUIGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CreatureUIGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5581,11 +5583,11 @@ namespace Ent
         {
             ConnectorGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ConnectorGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5597,11 +5599,11 @@ namespace Ent
         {
             ComponentWithProtoCodeGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ComponentWithProtoCodeGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5613,11 +5615,11 @@ namespace Ent
         {
             ClothAnimationGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ClothAnimationGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5636,11 +5638,11 @@ namespace Ent
         {
             ChildEntityPoolComponentGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ChildEntityPoolComponentGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5653,11 +5655,11 @@ namespace Ent
         {
             CharacterPlatformGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CharacterPlatformGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5669,11 +5671,11 @@ namespace Ent
         {
             CameraDataGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CameraDataGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5686,11 +5688,11 @@ namespace Ent
         {
             BreakableGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/BreakableGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5707,11 +5709,11 @@ namespace Ent
         {
             BittenGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/BittenGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5723,11 +5725,11 @@ namespace Ent
         {
             BeamGeneratorGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/BeamGeneratorGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5744,11 +5746,11 @@ namespace Ent
         {
             AttackTriggerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AttackTriggerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5760,11 +5762,27 @@ namespace Ent
         {
             AssemblyGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AssemblyGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ComponentGD Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct AnimationTransformDriverGD : HelperObject // Object
+        {
+            AnimationTransformDriverGD(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimationTransformDriverGD";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5776,11 +5794,11 @@ namespace Ent
         {
             AnimationRegenConstraintsGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimationRegenConstraintsGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5797,11 +5815,11 @@ namespace Ent
         {
             AnimationPlaylistGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimationPlaylistGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5816,11 +5834,11 @@ namespace Ent
         {
             AnimationPhysicsChainConstraintsGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimationPhysicsChainConstraintsGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5833,11 +5851,11 @@ namespace Ent
         {
             AnimationModelGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimationModelGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -5855,11 +5873,11 @@ namespace Ent
         {
             AnimationHitsConstraintsGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimationHitsConstraintsGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -6068,6 +6086,8 @@ namespace Ent
             Ent::Gen::EnergySourceGD setEnergySourceGD() const;
             std::optional<Ent::Gen::ClothAnimationGD> ClothAnimationGD() const;
             Ent::Gen::ClothAnimationGD setClothAnimationGD() const;
+            std::optional<Ent::Gen::AnimationTransformDriverGD> AnimationTransformDriverGD() const;
+            Ent::Gen::AnimationTransformDriverGD setAnimationTransformDriverGD() const;
             std::optional<Ent::Gen::CreatureGD> CreatureGD() const;
             Ent::Gen::CreatureGD setCreatureGD() const;
             std::optional<Ent::Gen::HitTriggerGD> HitTriggerGD() const;
@@ -6182,302 +6202,454 @@ namespace Ent
             char const* getType() const;
             std::optional<Ent::Gen::StaticObjectGD> StaticObjectGD() const;
             Ent::Gen::StaticObjectGD addStaticObjectGD() const;
+            void removeStaticObjectGD() const;
             std::optional<Ent::Gen::AnimationControllerGD> AnimationControllerGD() const;
             Ent::Gen::AnimationControllerGD addAnimationControllerGD() const;
+            void removeAnimationControllerGD() const;
             std::optional<Ent::Gen::PhysicsDataGD> PhysicsDataGD() const;
             Ent::Gen::PhysicsDataGD addPhysicsDataGD() const;
+            void removePhysicsDataGD() const;
             std::optional<Ent::Gen::VisualGD> VisualGD() const;
             Ent::Gen::VisualGD addVisualGD() const;
+            void removeVisualGD() const;
             std::optional<Ent::Gen::TransformGD> TransformGD() const;
             Ent::Gen::TransformGD addTransformGD() const;
+            void removeTransformGD() const;
             std::optional<Ent::Gen::TerrainGD> TerrainGD() const;
             Ent::Gen::TerrainGD addTerrainGD() const;
+            void removeTerrainGD() const;
             std::optional<Ent::Gen::PhysicsGD> PhysicsGD() const;
             Ent::Gen::PhysicsGD addPhysicsGD() const;
+            void removePhysicsGD() const;
             std::optional<Ent::Gen::CustomThumbnail> CustomThumbnail() const;
             Ent::Gen::CustomThumbnail addCustomThumbnail() const;
+            void removeCustomThumbnail() const;
             std::optional<Ent::Gen::HeightObj> HeightObj() const;
             Ent::Gen::HeightObj addHeightObj() const;
+            void removeHeightObj() const;
             std::optional<Ent::Gen::LDPrimitive> LDPrimitive() const;
             Ent::Gen::LDPrimitive addLDPrimitive() const;
+            void removeLDPrimitive() const;
             std::optional<Ent::Gen::Mesh> Mesh() const;
             Ent::Gen::Mesh addMesh() const;
+            void removeMesh() const;
             std::optional<Ent::Gen::MultiThumbnail> MultiThumbnail() const;
             Ent::Gen::MultiThumbnail addMultiThumbnail() const;
+            void removeMultiThumbnail() const;
             std::optional<Ent::Gen::NetworkLink> NetworkLink() const;
             Ent::Gen::NetworkLink addNetworkLink() const;
+            void removeNetworkLink() const;
             std::optional<Ent::Gen::NetworkNode> NetworkNode() const;
             Ent::Gen::NetworkNode addNetworkNode() const;
+            void removeNetworkNode() const;
             std::optional<Ent::Gen::NotVisibleInSubscene> NotVisibleInSubscene() const;
             Ent::Gen::NotVisibleInSubscene addNotVisibleInSubscene() const;
+            void removeNotVisibleInSubscene() const;
             std::optional<Ent::Gen::SeedPatch> SeedPatch() const;
             Ent::Gen::SeedPatch addSeedPatch() const;
+            void removeSeedPatch() const;
             std::optional<Ent::Gen::StickToTerrain> StickToTerrain() const;
             Ent::Gen::StickToTerrain addStickToTerrain() const;
+            void removeStickToTerrain() const;
             std::optional<Ent::Gen::SubScene> SubScene() const;
             Ent::Gen::SubScene addSubScene() const;
+            void removeSubScene() const;
             std::optional<Ent::Gen::SystemicCreature> SystemicCreature() const;
             Ent::Gen::SystemicCreature addSystemicCreature() const;
+            void removeSystemicCreature() const;
             std::optional<Ent::Gen::TerrainSurfaceObject> TerrainSurfaceObject() const;
             Ent::Gen::TerrainSurfaceObject addTerrainSurfaceObject() const;
+            void removeTerrainSurfaceObject() const;
             std::optional<Ent::Gen::TestArrays> TestArrays() const;
             Ent::Gen::TestArrays addTestArrays() const;
+            void removeTestArrays() const;
             std::optional<Ent::Gen::TestCreature> TestCreature() const;
             Ent::Gen::TestCreature addTestCreature() const;
+            void removeTestCreature() const;
             std::optional<Ent::Gen::TestDefaultValues> TestDefaultValues() const;
             Ent::Gen::TestDefaultValues addTestDefaultValues() const;
+            void removeTestDefaultValues() const;
             std::optional<Ent::Gen::TestEntityRef> TestEntityRef() const;
             Ent::Gen::TestEntityRef addTestEntityRef() const;
+            void removeTestEntityRef() const;
             std::optional<Ent::Gen::TestSetOfObject> TestSetOfObject() const;
             Ent::Gen::TestSetOfObject addTestSetOfObject() const;
+            void removeTestSetOfObject() const;
             std::optional<Ent::Gen::TestUnion> TestUnion() const;
             Ent::Gen::TestUnion addTestUnion() const;
+            void removeTestUnion() const;
             std::optional<Ent::Gen::UnitTestComponent> UnitTestComponent() const;
             Ent::Gen::UnitTestComponent addUnitTestComponent() const;
+            void removeUnitTestComponent() const;
             std::optional<Ent::Gen::WildObject> WildObject() const;
             Ent::Gen::WildObject addWildObject() const;
+            void removeWildObject() const;
             std::optional<Ent::Gen::EnergyCrookGD> EnergyCrookGD() const;
             Ent::Gen::EnergyCrookGD addEnergyCrookGD() const;
+            void removeEnergyCrookGD() const;
             std::optional<Ent::Gen::AIContextGD> AIContextGD() const;
             Ent::Gen::AIContextGD addAIContextGD() const;
+            void removeAIContextGD() const;
             std::optional<Ent::Gen::EventTriggerGD> EventTriggerGD() const;
             Ent::Gen::EventTriggerGD addEventTriggerGD() const;
+            void removeEventTriggerGD() const;
             std::optional<Ent::Gen::BeamGeneratorGD> BeamGeneratorGD() const;
             Ent::Gen::BeamGeneratorGD addBeamGeneratorGD() const;
+            void removeBeamGeneratorGD() const;
             std::optional<Ent::Gen::WorldScalePathFindGD> WorldScalePathFindGD() const;
             Ent::Gen::WorldScalePathFindGD addWorldScalePathFindGD() const;
+            void removeWorldScalePathFindGD() const;
             std::optional<Ent::Gen::NetGD> NetGD() const;
             Ent::Gen::NetGD addNetGD() const;
+            void removeNetGD() const;
             std::optional<Ent::Gen::BittenGD> BittenGD() const;
             Ent::Gen::BittenGD addBittenGD() const;
+            void removeBittenGD() const;
             std::optional<Ent::Gen::PathBoneAnimGD> PathBoneAnimGD() const;
             Ent::Gen::PathBoneAnimGD addPathBoneAnimGD() const;
+            void removePathBoneAnimGD() const;
             std::optional<Ent::Gen::AnimationRegenConstraintsGD> AnimationRegenConstraintsGD() const;
             Ent::Gen::AnimationRegenConstraintsGD addAnimationRegenConstraintsGD() const;
+            void removeAnimationRegenConstraintsGD() const;
             std::optional<Ent::Gen::HealPumpGD> HealPumpGD() const;
             Ent::Gen::HealPumpGD addHealPumpGD() const;
+            void removeHealPumpGD() const;
             std::optional<Ent::Gen::GroundTypeSamplerGD> GroundTypeSamplerGD() const;
             Ent::Gen::GroundTypeSamplerGD addGroundTypeSamplerGD() const;
+            void removeGroundTypeSamplerGD() const;
             std::optional<Ent::Gen::UnifiedPhysicsDataGD> UnifiedPhysicsDataGD() const;
             Ent::Gen::UnifiedPhysicsDataGD addUnifiedPhysicsDataGD() const;
+            void removeUnifiedPhysicsDataGD() const;
             std::optional<Ent::Gen::FluidGD> FluidGD() const;
             Ent::Gen::FluidGD addFluidGD() const;
+            void removeFluidGD() const;
             std::optional<Ent::Gen::ProjectileGD> ProjectileGD() const;
             Ent::Gen::ProjectileGD addProjectileGD() const;
+            void removeProjectileGD() const;
             std::optional<Ent::Gen::CameraSetterGD> CameraSetterGD() const;
             Ent::Gen::CameraSetterGD addCameraSetterGD() const;
+            void removeCameraSetterGD() const;
             std::optional<Ent::Gen::AssemblyGD> AssemblyGD() const;
             Ent::Gen::AssemblyGD addAssemblyGD() const;
+            void removeAssemblyGD() const;
             std::optional<Ent::Gen::SmoothScaleComponentGD> SmoothScaleComponentGD() const;
             Ent::Gen::SmoothScaleComponentGD addSmoothScaleComponentGD() const;
+            void removeSmoothScaleComponentGD() const;
             std::optional<Ent::Gen::FluidViewGD> FluidViewGD() const;
             Ent::Gen::FluidViewGD addFluidViewGD() const;
+            void removeFluidViewGD() const;
             std::optional<Ent::Gen::RegenMeshGD> RegenMeshGD() const;
             Ent::Gen::RegenMeshGD addRegenMeshGD() const;
+            void removeRegenMeshGD() const;
             std::optional<Ent::Gen::ReviveEnergyGD> ReviveEnergyGD() const;
             Ent::Gen::ReviveEnergyGD addReviveEnergyGD() const;
+            void removeReviveEnergyGD() const;
             std::optional<Ent::Gen::DebugGridGD> DebugGridGD() const;
             Ent::Gen::DebugGridGD addDebugGridGD() const;
+            void removeDebugGridGD() const;
             std::optional<Ent::Gen::ChildEntityPoolComponentGD> ChildEntityPoolComponentGD() const;
             Ent::Gen::ChildEntityPoolComponentGD addChildEntityPoolComponentGD() const;
+            void removeChildEntityPoolComponentGD() const;
             std::optional<Ent::Gen::ProtoComponentGD> ProtoComponentGD() const;
             Ent::Gen::ProtoComponentGD addProtoComponentGD() const;
+            void removeProtoComponentGD() const;
             std::optional<Ent::Gen::GameEffectSpawnerGD> GameEffectSpawnerGD() const;
             Ent::Gen::GameEffectSpawnerGD addGameEffectSpawnerGD() const;
+            void removeGameEffectSpawnerGD() const;
             std::optional<Ent::Gen::ClothGD> ClothGD() const;
             Ent::Gen::ClothGD addClothGD() const;
+            void removeClothGD() const;
             std::optional<Ent::Gen::FireSensorGD> FireSensorGD() const;
             Ent::Gen::FireSensorGD addFireSensorGD() const;
+            void removeFireSensorGD() const;
             std::optional<Ent::Gen::HealerGD> HealerGD() const;
             Ent::Gen::HealerGD addHealerGD() const;
+            void removeHealerGD() const;
             std::optional<Ent::Gen::AnimationLegsConstraintsGD> AnimationLegsConstraintsGD() const;
             Ent::Gen::AnimationLegsConstraintsGD addAnimationLegsConstraintsGD() const;
+            void removeAnimationLegsConstraintsGD() const;
             std::optional<Ent::Gen::PathBoneRigidBodyGD> PathBoneRigidBodyGD() const;
             Ent::Gen::PathBoneRigidBodyGD addPathBoneRigidBodyGD() const;
+            void removePathBoneRigidBodyGD() const;
             std::optional<Ent::Gen::FightDistanceTriggerGD> FightDistanceTriggerGD() const;
             Ent::Gen::FightDistanceTriggerGD addFightDistanceTriggerGD() const;
+            void removeFightDistanceTriggerGD() const;
             std::optional<Ent::Gen::SoulSpotGD> SoulSpotGD() const;
             Ent::Gen::SoulSpotGD addSoulSpotGD() const;
+            void removeSoulSpotGD() const;
             std::optional<Ent::Gen::HealTriggerGD> HealTriggerGD() const;
             Ent::Gen::HealTriggerGD addHealTriggerGD() const;
+            void removeHealTriggerGD() const;
             std::optional<Ent::Gen::AnimationTailConstraintsGD> AnimationTailConstraintsGD() const;
             Ent::Gen::AnimationTailConstraintsGD addAnimationTailConstraintsGD() const;
+            void removeAnimationTailConstraintsGD() const;
             std::optional<Ent::Gen::VolumeConstraintGD> VolumeConstraintGD() const;
             Ent::Gen::VolumeConstraintGD addVolumeConstraintGD() const;
+            void removeVolumeConstraintGD() const;
             std::optional<Ent::Gen::EnvStampGD> EnvStampGD() const;
             Ent::Gen::EnvStampGD addEnvStampGD() const;
+            void removeEnvStampGD() const;
             std::optional<Ent::Gen::FluidFXEntitySpawnerGD> FluidFXEntitySpawnerGD() const;
             Ent::Gen::FluidFXEntitySpawnerGD addFluidFXEntitySpawnerGD() const;
+            void removeFluidFXEntitySpawnerGD() const;
             std::optional<Ent::Gen::EnergyDrainGD> EnergyDrainGD() const;
             Ent::Gen::EnergyDrainGD addEnergyDrainGD() const;
+            void removeEnergyDrainGD() const;
             std::optional<Ent::Gen::AnimationEventsGeneratorGD> AnimationEventsGeneratorGD() const;
             Ent::Gen::AnimationEventsGeneratorGD addAnimationEventsGeneratorGD() const;
+            void removeAnimationEventsGeneratorGD() const;
             std::optional<Ent::Gen::MountableGD> MountableGD() const;
             Ent::Gen::MountableGD addMountableGD() const;
+            void removeMountableGD() const;
             std::optional<Ent::Gen::InfoboardRegistererGD> InfoboardRegistererGD() const;
             Ent::Gen::InfoboardRegistererGD addInfoboardRegistererGD() const;
+            void removeInfoboardRegistererGD() const;
             std::optional<Ent::Gen::EventHandlerGD> EventHandlerGD() const;
             Ent::Gen::EventHandlerGD addEventHandlerGD() const;
+            void removeEventHandlerGD() const;
             std::optional<Ent::Gen::SoulRespawnOpportunityGD> SoulRespawnOpportunityGD() const;
             Ent::Gen::SoulRespawnOpportunityGD addSoulRespawnOpportunityGD() const;
+            void removeSoulRespawnOpportunityGD() const;
             std::optional<Ent::Gen::HealthAreaGD> HealthAreaGD() const;
             Ent::Gen::HealthAreaGD addHealthAreaGD() const;
+            void removeHealthAreaGD() const;
             std::optional<Ent::Gen::SoundAreaGD> SoundAreaGD() const;
             Ent::Gen::SoundAreaGD addSoundAreaGD() const;
+            void removeSoundAreaGD() const;
             std::optional<Ent::Gen::PathBoneInfluenceGD> PathBoneInfluenceGD() const;
             Ent::Gen::PathBoneInfluenceGD addPathBoneInfluenceGD() const;
+            void removePathBoneInfluenceGD() const;
             std::optional<Ent::Gen::ComponentWithProtoCodeGD> ComponentWithProtoCodeGD() const;
             Ent::Gen::ComponentWithProtoCodeGD addComponentWithProtoCodeGD() const;
+            void removeComponentWithProtoCodeGD() const;
             std::optional<Ent::Gen::CharacterControllerGD> CharacterControllerGD() const;
             Ent::Gen::CharacterControllerGD addCharacterControllerGD() const;
+            void removeCharacterControllerGD() const;
             std::optional<Ent::Gen::PickableComponentGD> PickableComponentGD() const;
             Ent::Gen::PickableComponentGD addPickableComponentGD() const;
+            void removePickableComponentGD() const;
             std::optional<Ent::Gen::CameraDataGD> CameraDataGD() const;
             Ent::Gen::CameraDataGD addCameraDataGD() const;
+            void removeCameraDataGD() const;
             std::optional<Ent::Gen::RegenFXGD> RegenFXGD() const;
             Ent::Gen::RegenFXGD addRegenFXGD() const;
+            void removeRegenFXGD() const;
             std::optional<Ent::Gen::PhysicsMeshDeformerGD> PhysicsMeshDeformerGD() const;
             Ent::Gen::PhysicsMeshDeformerGD addPhysicsMeshDeformerGD() const;
+            void removePhysicsMeshDeformerGD() const;
             std::optional<Ent::Gen::AnimationHitsConstraintsGD> AnimationHitsConstraintsGD() const;
             Ent::Gen::AnimationHitsConstraintsGD addAnimationHitsConstraintsGD() const;
+            void removeAnimationHitsConstraintsGD() const;
             std::optional<Ent::Gen::FluidVolumeComponentGD> FluidVolumeComponentGD() const;
             Ent::Gen::FluidVolumeComponentGD addFluidVolumeComponentGD() const;
+            void removeFluidVolumeComponentGD() const;
             std::optional<Ent::Gen::RegenerableVegetationGD> RegenerableVegetationGD() const;
             Ent::Gen::RegenerableVegetationGD addRegenerableVegetationGD() const;
+            void removeRegenerableVegetationGD() const;
             std::optional<Ent::Gen::ShamanVisionGD> ShamanVisionGD() const;
             Ent::Gen::ShamanVisionGD addShamanVisionGD() const;
+            void removeShamanVisionGD() const;
             std::optional<Ent::Gen::CinematicGD> CinematicGD() const;
             Ent::Gen::CinematicGD addCinematicGD() const;
+            void removeCinematicGD() const;
             std::optional<Ent::Gen::ConnectorGD> ConnectorGD() const;
             Ent::Gen::ConnectorGD addConnectorGD() const;
+            void removeConnectorGD() const;
             std::optional<Ent::Gen::BeamTargetGD> BeamTargetGD() const;
             Ent::Gen::BeamTargetGD addBeamTargetGD() const;
+            void removeBeamTargetGD() const;
             std::optional<Ent::Gen::ActorGD> ActorGD() const;
             Ent::Gen::ActorGD addActorGD() const;
+            void removeActorGD() const;
             std::optional<Ent::Gen::CharacterPlatformGD> CharacterPlatformGD() const;
             Ent::Gen::CharacterPlatformGD addCharacterPlatformGD() const;
+            void removeCharacterPlatformGD() const;
             std::optional<Ent::Gen::ReviveSideSwitcherGD> ReviveSideSwitcherGD() const;
             Ent::Gen::ReviveSideSwitcherGD addReviveSideSwitcherGD() const;
+            void removeReviveSideSwitcherGD() const;
             std::optional<Ent::Gen::EnergyPoolGD> EnergyPoolGD() const;
             Ent::Gen::EnergyPoolGD addEnergyPoolGD() const;
+            void removeEnergyPoolGD() const;
             std::optional<Ent::Gen::PlayerComponentGD> PlayerComponentGD() const;
             Ent::Gen::PlayerComponentGD addPlayerComponentGD() const;
+            void removePlayerComponentGD() const;
             std::optional<Ent::Gen::HotspotsGD> HotspotsGD() const;
             Ent::Gen::HotspotsGD addHotspotsGD() const;
+            void removeHotspotsGD() const;
             std::optional<Ent::Gen::PathMotionControllerGD> PathMotionControllerGD() const;
             Ent::Gen::PathMotionControllerGD addPathMotionControllerGD() const;
+            void removePathMotionControllerGD() const;
             std::optional<Ent::Gen::CreatureAIGD> CreatureAIGD() const;
             Ent::Gen::CreatureAIGD addCreatureAIGD() const;
+            void removeCreatureAIGD() const;
             std::optional<Ent::Gen::CreatureUIGD> CreatureUIGD() const;
             Ent::Gen::CreatureUIGD addCreatureUIGD() const;
+            void removeCreatureUIGD() const;
             std::optional<Ent::Gen::SoundEmitterGD> SoundEmitterGD() const;
             Ent::Gen::SoundEmitterGD addSoundEmitterGD() const;
+            void removeSoundEmitterGD() const;
             std::optional<Ent::Gen::EnergySourceGD> EnergySourceGD() const;
             Ent::Gen::EnergySourceGD addEnergySourceGD() const;
+            void removeEnergySourceGD() const;
             std::optional<Ent::Gen::ClothAnimationGD> ClothAnimationGD() const;
             Ent::Gen::ClothAnimationGD addClothAnimationGD() const;
+            void removeClothAnimationGD() const;
+            std::optional<Ent::Gen::AnimationTransformDriverGD> AnimationTransformDriverGD() const;
+            Ent::Gen::AnimationTransformDriverGD addAnimationTransformDriverGD() const;
+            void removeAnimationTransformDriverGD() const;
             std::optional<Ent::Gen::CreatureGD> CreatureGD() const;
             Ent::Gen::CreatureGD addCreatureGD() const;
+            void removeCreatureGD() const;
             std::optional<Ent::Gen::HitTriggerGD> HitTriggerGD() const;
             Ent::Gen::HitTriggerGD addHitTriggerGD() const;
+            void removeHitTriggerGD() const;
             std::optional<Ent::Gen::ProjectileShooterGD> ProjectileShooterGD() const;
             Ent::Gen::ProjectileShooterGD addProjectileShooterGD() const;
+            void removeProjectileShooterGD() const;
             std::optional<Ent::Gen::LightComponentGD> LightComponentGD() const;
             Ent::Gen::LightComponentGD addLightComponentGD() const;
+            void removeLightComponentGD() const;
             std::optional<Ent::Gen::MounterGD> MounterGD() const;
             Ent::Gen::MounterGD addMounterGD() const;
+            void removeMounterGD() const;
             std::optional<Ent::Gen::AttackTriggerGD> AttackTriggerGD() const;
             Ent::Gen::AttackTriggerGD addAttackTriggerGD() const;
+            void removeAttackTriggerGD() const;
             std::optional<Ent::Gen::PossessableGPEGD> PossessableGPEGD() const;
             Ent::Gen::PossessableGPEGD addPossessableGPEGD() const;
+            void removePossessableGPEGD() const;
             std::optional<Ent::Gen::OutfitGD> OutfitGD() const;
             Ent::Gen::OutfitGD addOutfitGD() const;
+            void removeOutfitGD() const;
             std::optional<Ent::Gen::BreakableGD> BreakableGD() const;
             Ent::Gen::BreakableGD addBreakableGD() const;
+            void removeBreakableGD() const;
             std::optional<Ent::Gen::PathNodeGD> PathNodeGD() const;
             Ent::Gen::PathNodeGD addPathNodeGD() const;
+            void removePathNodeGD() const;
             std::optional<Ent::Gen::VelocityObstacleGD> VelocityObstacleGD() const;
             Ent::Gen::VelocityObstacleGD addVelocityObstacleGD() const;
+            void removeVelocityObstacleGD() const;
             std::optional<Ent::Gen::ShapeshiftStatueGD> ShapeshiftStatueGD() const;
             Ent::Gen::ShapeshiftStatueGD addShapeshiftStatueGD() const;
+            void removeShapeshiftStatueGD() const;
             std::optional<Ent::Gen::RagdollGD> RagdollGD() const;
             Ent::Gen::RagdollGD addRagdollGD() const;
+            void removeRagdollGD() const;
             std::optional<Ent::Gen::AnimationPhysicsChainConstraintsGD> AnimationPhysicsChainConstraintsGD() const;
             Ent::Gen::AnimationPhysicsChainConstraintsGD addAnimationPhysicsChainConstraintsGD() const;
+            void removeAnimationPhysicsChainConstraintsGD() const;
             std::optional<Ent::Gen::VegetationNavMeshTaggerGD> VegetationNavMeshTaggerGD() const;
             Ent::Gen::VegetationNavMeshTaggerGD addVegetationNavMeshTaggerGD() const;
+            void removeVegetationNavMeshTaggerGD() const;
             std::optional<Ent::Gen::ScriptComponentGD> ScriptComponentGD() const;
             Ent::Gen::ScriptComponentGD addScriptComponentGD() const;
+            void removeScriptComponentGD() const;
             std::optional<Ent::Gen::FluidToRegenInjectorGD> FluidToRegenInjectorGD() const;
             Ent::Gen::FluidToRegenInjectorGD addFluidToRegenInjectorGD() const;
+            void removeFluidToRegenInjectorGD() const;
             std::optional<Ent::Gen::PerceivableGD> PerceivableGD() const;
             Ent::Gen::PerceivableGD addPerceivableGD() const;
+            void removePerceivableGD() const;
             std::optional<Ent::Gen::InventoryGD> InventoryGD() const;
             Ent::Gen::InventoryGD addInventoryGD() const;
+            void removeInventoryGD() const;
             std::optional<Ent::Gen::ItemHolderGD> ItemHolderGD() const;
             Ent::Gen::ItemHolderGD addItemHolderGD() const;
+            void removeItemHolderGD() const;
             std::optional<Ent::Gen::PathGD> PathGD() const;
             Ent::Gen::PathGD addPathGD() const;
+            void removePathGD() const;
             std::optional<Ent::Gen::PerceiverGD> PerceiverGD() const;
             Ent::Gen::PerceiverGD addPerceiverGD() const;
+            void removePerceiverGD() const;
             std::optional<Ent::Gen::DummyComponentGD> DummyComponentGD() const;
             Ent::Gen::DummyComponentGD addDummyComponentGD() const;
+            void removeDummyComponentGD() const;
             std::optional<Ent::Gen::FluidNavMeshTaggerGD> FluidNavMeshTaggerGD() const;
             Ent::Gen::FluidNavMeshTaggerGD addFluidNavMeshTaggerGD() const;
+            void removeFluidNavMeshTaggerGD() const;
             std::optional<Ent::Gen::EnergySpoutGD> EnergySpoutGD() const;
             Ent::Gen::EnergySpoutGD addEnergySpoutGD() const;
+            void removeEnergySpoutGD() const;
             std::optional<Ent::Gen::PickableDistributorComponentGD> PickableDistributorComponentGD() const;
             Ent::Gen::PickableDistributorComponentGD addPickableDistributorComponentGD() const;
+            void removePickableDistributorComponentGD() const;
             std::optional<Ent::Gen::ShamanItemGD> ShamanItemGD() const;
             Ent::Gen::ShamanItemGD addShamanItemGD() const;
+            void removeShamanItemGD() const;
             std::optional<Ent::Gen::TeamGD> TeamGD() const;
             Ent::Gen::TeamGD addTeamGD() const;
+            void removeTeamGD() const;
             std::optional<Ent::Gen::PhysicsMeshProviderGD> PhysicsMeshProviderGD() const;
             Ent::Gen::PhysicsMeshProviderGD addPhysicsMeshProviderGD() const;
+            void removePhysicsMeshProviderGD() const;
             std::optional<Ent::Gen::SideMapGateGD> SideMapGateGD() const;
             Ent::Gen::SideMapGateGD addSideMapGateGD() const;
+            void removeSideMapGateGD() const;
             std::optional<Ent::Gen::HeightMapComponentGD> HeightMapComponentGD() const;
             Ent::Gen::HeightMapComponentGD addHeightMapComponentGD() const;
+            void removeHeightMapComponentGD() const;
             std::optional<Ent::Gen::MountIKControllerGD> MountIKControllerGD() const;
             Ent::Gen::MountIKControllerGD addMountIKControllerGD() const;
+            void removeMountIKControllerGD() const;
             std::optional<Ent::Gen::StaffVertebrasGD> StaffVertebrasGD() const;
             Ent::Gen::StaffVertebrasGD addStaffVertebrasGD() const;
+            void removeStaffVertebrasGD() const;
             std::optional<Ent::Gen::SensorControllerGD> SensorControllerGD() const;
             Ent::Gen::SensorControllerGD addSensorControllerGD() const;
+            void removeSensorControllerGD() const;
             std::optional<Ent::Gen::BoidsGD> BoidsGD() const;
             Ent::Gen::BoidsGD addBoidsGD() const;
+            void removeBoidsGD() const;
             std::optional<Ent::Gen::AnimationTreeConstraintsGD> AnimationTreeConstraintsGD() const;
             Ent::Gen::AnimationTreeConstraintsGD addAnimationTreeConstraintsGD() const;
+            void removeAnimationTreeConstraintsGD() const;
             std::optional<Ent::Gen::DistanceTriggerGD> DistanceTriggerGD() const;
             Ent::Gen::DistanceTriggerGD addDistanceTriggerGD() const;
+            void removeDistanceTriggerGD() const;
             std::optional<Ent::Gen::QuickCreatureSwitchGD> QuickCreatureSwitchGD() const;
             Ent::Gen::QuickCreatureSwitchGD addQuickCreatureSwitchGD() const;
+            void removeQuickCreatureSwitchGD() const;
             std::optional<Ent::Gen::EnergyProbeGD> EnergyProbeGD() const;
             Ent::Gen::EnergyProbeGD addEnergyProbeGD() const;
+            void removeEnergyProbeGD() const;
             std::optional<Ent::Gen::RespawnPlaceGD> RespawnPlaceGD() const;
             Ent::Gen::RespawnPlaceGD addRespawnPlaceGD() const;
+            void removeRespawnPlaceGD() const;
             std::optional<Ent::Gen::SpiritAnimalGD> SpiritAnimalGD() const;
             Ent::Gen::SpiritAnimalGD addSpiritAnimalGD() const;
+            void removeSpiritAnimalGD() const;
             std::optional<Ent::Gen::OutfitWearerGD> OutfitWearerGD() const;
             Ent::Gen::OutfitWearerGD addOutfitWearerGD() const;
+            void removeOutfitWearerGD() const;
             std::optional<Ent::Gen::VoxelSimulationGD> VoxelSimulationGD() const;
             Ent::Gen::VoxelSimulationGD addVoxelSimulationGD() const;
+            void removeVoxelSimulationGD() const;
             std::optional<Ent::Gen::AnimationModelGD> AnimationModelGD() const;
             Ent::Gen::AnimationModelGD addAnimationModelGD() const;
+            void removeAnimationModelGD() const;
             std::optional<Ent::Gen::TriggerEventCameraGD> TriggerEventCameraGD() const;
             Ent::Gen::TriggerEventCameraGD addTriggerEventCameraGD() const;
+            void removeTriggerEventCameraGD() const;
             std::optional<Ent::Gen::AnimationPlaylistGD> AnimationPlaylistGD() const;
             Ent::Gen::AnimationPlaylistGD addAnimationPlaylistGD() const;
+            void removeAnimationPlaylistGD() const;
             std::optional<Ent::Gen::MeshNavigationInfosGD> MeshNavigationInfosGD() const;
             Ent::Gen::MeshNavigationInfosGD addMeshNavigationInfosGD() const;
+            void removeMeshNavigationInfosGD() const;
             std::optional<Ent::Gen::PhysicsTriggerGD> PhysicsTriggerGD() const;
             Ent::Gen::PhysicsTriggerGD addPhysicsTriggerGD() const;
+            void removePhysicsTriggerGD() const;
             std::optional<Ent::Gen::EnergyNetworkListenerGD> EnergyNetworkListenerGD() const;
             Ent::Gen::EnergyNetworkListenerGD addEnergyNetworkListenerGD() const;
+            void removeEnergyNetworkListenerGD() const;
             std::optional<Ent::Gen::MissionHolderGD> MissionHolderGD() const;
             Ent::Gen::MissionHolderGD addMissionHolderGD() const;
+            void removeMissionHolderGD() const;
             std::optional<Ent::Gen::RegenSwitcherGD> RegenSwitcherGD() const;
             Ent::Gen::RegenSwitcherGD addRegenSwitcherGD() const;
+            void removeRegenSwitcherGD() const;
         };
 
         struct Components : UnionSetBase<Component> // union_set
@@ -6490,302 +6662,454 @@ namespace Ent
             char const* getType() const;
             std::optional<Ent::Gen::StaticObjectGD> StaticObjectGD() const;
             Ent::Gen::StaticObjectGD addStaticObjectGD() const;
+            void removeStaticObjectGD() const;
             std::optional<Ent::Gen::AnimationControllerGD> AnimationControllerGD() const;
             Ent::Gen::AnimationControllerGD addAnimationControllerGD() const;
+            void removeAnimationControllerGD() const;
             std::optional<Ent::Gen::PhysicsDataGD> PhysicsDataGD() const;
             Ent::Gen::PhysicsDataGD addPhysicsDataGD() const;
+            void removePhysicsDataGD() const;
             std::optional<Ent::Gen::VisualGD> VisualGD() const;
             Ent::Gen::VisualGD addVisualGD() const;
+            void removeVisualGD() const;
             std::optional<Ent::Gen::TransformGD> TransformGD() const;
             Ent::Gen::TransformGD addTransformGD() const;
+            void removeTransformGD() const;
             std::optional<Ent::Gen::TerrainGD> TerrainGD() const;
             Ent::Gen::TerrainGD addTerrainGD() const;
+            void removeTerrainGD() const;
             std::optional<Ent::Gen::PhysicsGD> PhysicsGD() const;
             Ent::Gen::PhysicsGD addPhysicsGD() const;
+            void removePhysicsGD() const;
             std::optional<Ent::Gen::CustomThumbnail> CustomThumbnail() const;
             Ent::Gen::CustomThumbnail addCustomThumbnail() const;
+            void removeCustomThumbnail() const;
             std::optional<Ent::Gen::HeightObj> HeightObj() const;
             Ent::Gen::HeightObj addHeightObj() const;
+            void removeHeightObj() const;
             std::optional<Ent::Gen::LDPrimitive> LDPrimitive() const;
             Ent::Gen::LDPrimitive addLDPrimitive() const;
+            void removeLDPrimitive() const;
             std::optional<Ent::Gen::Mesh> Mesh() const;
             Ent::Gen::Mesh addMesh() const;
+            void removeMesh() const;
             std::optional<Ent::Gen::MultiThumbnail> MultiThumbnail() const;
             Ent::Gen::MultiThumbnail addMultiThumbnail() const;
+            void removeMultiThumbnail() const;
             std::optional<Ent::Gen::NetworkLink> NetworkLink() const;
             Ent::Gen::NetworkLink addNetworkLink() const;
+            void removeNetworkLink() const;
             std::optional<Ent::Gen::NetworkNode> NetworkNode() const;
             Ent::Gen::NetworkNode addNetworkNode() const;
+            void removeNetworkNode() const;
             std::optional<Ent::Gen::NotVisibleInSubscene> NotVisibleInSubscene() const;
             Ent::Gen::NotVisibleInSubscene addNotVisibleInSubscene() const;
+            void removeNotVisibleInSubscene() const;
             std::optional<Ent::Gen::SeedPatch> SeedPatch() const;
             Ent::Gen::SeedPatch addSeedPatch() const;
+            void removeSeedPatch() const;
             std::optional<Ent::Gen::StickToTerrain> StickToTerrain() const;
             Ent::Gen::StickToTerrain addStickToTerrain() const;
+            void removeStickToTerrain() const;
             std::optional<Ent::Gen::SubScene> SubScene() const;
             Ent::Gen::SubScene addSubScene() const;
+            void removeSubScene() const;
             std::optional<Ent::Gen::SystemicCreature> SystemicCreature() const;
             Ent::Gen::SystemicCreature addSystemicCreature() const;
+            void removeSystemicCreature() const;
             std::optional<Ent::Gen::TerrainSurfaceObject> TerrainSurfaceObject() const;
             Ent::Gen::TerrainSurfaceObject addTerrainSurfaceObject() const;
+            void removeTerrainSurfaceObject() const;
             std::optional<Ent::Gen::TestArrays> TestArrays() const;
             Ent::Gen::TestArrays addTestArrays() const;
+            void removeTestArrays() const;
             std::optional<Ent::Gen::TestCreature> TestCreature() const;
             Ent::Gen::TestCreature addTestCreature() const;
+            void removeTestCreature() const;
             std::optional<Ent::Gen::TestDefaultValues> TestDefaultValues() const;
             Ent::Gen::TestDefaultValues addTestDefaultValues() const;
+            void removeTestDefaultValues() const;
             std::optional<Ent::Gen::TestEntityRef> TestEntityRef() const;
             Ent::Gen::TestEntityRef addTestEntityRef() const;
+            void removeTestEntityRef() const;
             std::optional<Ent::Gen::TestSetOfObject> TestSetOfObject() const;
             Ent::Gen::TestSetOfObject addTestSetOfObject() const;
+            void removeTestSetOfObject() const;
             std::optional<Ent::Gen::TestUnion> TestUnion() const;
             Ent::Gen::TestUnion addTestUnion() const;
+            void removeTestUnion() const;
             std::optional<Ent::Gen::UnitTestComponent> UnitTestComponent() const;
             Ent::Gen::UnitTestComponent addUnitTestComponent() const;
+            void removeUnitTestComponent() const;
             std::optional<Ent::Gen::WildObject> WildObject() const;
             Ent::Gen::WildObject addWildObject() const;
+            void removeWildObject() const;
             std::optional<Ent::Gen::EnergyCrookGD> EnergyCrookGD() const;
             Ent::Gen::EnergyCrookGD addEnergyCrookGD() const;
+            void removeEnergyCrookGD() const;
             std::optional<Ent::Gen::AIContextGD> AIContextGD() const;
             Ent::Gen::AIContextGD addAIContextGD() const;
+            void removeAIContextGD() const;
             std::optional<Ent::Gen::EventTriggerGD> EventTriggerGD() const;
             Ent::Gen::EventTriggerGD addEventTriggerGD() const;
+            void removeEventTriggerGD() const;
             std::optional<Ent::Gen::BeamGeneratorGD> BeamGeneratorGD() const;
             Ent::Gen::BeamGeneratorGD addBeamGeneratorGD() const;
+            void removeBeamGeneratorGD() const;
             std::optional<Ent::Gen::WorldScalePathFindGD> WorldScalePathFindGD() const;
             Ent::Gen::WorldScalePathFindGD addWorldScalePathFindGD() const;
+            void removeWorldScalePathFindGD() const;
             std::optional<Ent::Gen::NetGD> NetGD() const;
             Ent::Gen::NetGD addNetGD() const;
+            void removeNetGD() const;
             std::optional<Ent::Gen::BittenGD> BittenGD() const;
             Ent::Gen::BittenGD addBittenGD() const;
+            void removeBittenGD() const;
             std::optional<Ent::Gen::PathBoneAnimGD> PathBoneAnimGD() const;
             Ent::Gen::PathBoneAnimGD addPathBoneAnimGD() const;
+            void removePathBoneAnimGD() const;
             std::optional<Ent::Gen::AnimationRegenConstraintsGD> AnimationRegenConstraintsGD() const;
             Ent::Gen::AnimationRegenConstraintsGD addAnimationRegenConstraintsGD() const;
+            void removeAnimationRegenConstraintsGD() const;
             std::optional<Ent::Gen::HealPumpGD> HealPumpGD() const;
             Ent::Gen::HealPumpGD addHealPumpGD() const;
+            void removeHealPumpGD() const;
             std::optional<Ent::Gen::GroundTypeSamplerGD> GroundTypeSamplerGD() const;
             Ent::Gen::GroundTypeSamplerGD addGroundTypeSamplerGD() const;
+            void removeGroundTypeSamplerGD() const;
             std::optional<Ent::Gen::UnifiedPhysicsDataGD> UnifiedPhysicsDataGD() const;
             Ent::Gen::UnifiedPhysicsDataGD addUnifiedPhysicsDataGD() const;
+            void removeUnifiedPhysicsDataGD() const;
             std::optional<Ent::Gen::FluidGD> FluidGD() const;
             Ent::Gen::FluidGD addFluidGD() const;
+            void removeFluidGD() const;
             std::optional<Ent::Gen::ProjectileGD> ProjectileGD() const;
             Ent::Gen::ProjectileGD addProjectileGD() const;
+            void removeProjectileGD() const;
             std::optional<Ent::Gen::CameraSetterGD> CameraSetterGD() const;
             Ent::Gen::CameraSetterGD addCameraSetterGD() const;
+            void removeCameraSetterGD() const;
             std::optional<Ent::Gen::AssemblyGD> AssemblyGD() const;
             Ent::Gen::AssemblyGD addAssemblyGD() const;
+            void removeAssemblyGD() const;
             std::optional<Ent::Gen::SmoothScaleComponentGD> SmoothScaleComponentGD() const;
             Ent::Gen::SmoothScaleComponentGD addSmoothScaleComponentGD() const;
+            void removeSmoothScaleComponentGD() const;
             std::optional<Ent::Gen::FluidViewGD> FluidViewGD() const;
             Ent::Gen::FluidViewGD addFluidViewGD() const;
+            void removeFluidViewGD() const;
             std::optional<Ent::Gen::RegenMeshGD> RegenMeshGD() const;
             Ent::Gen::RegenMeshGD addRegenMeshGD() const;
+            void removeRegenMeshGD() const;
             std::optional<Ent::Gen::ReviveEnergyGD> ReviveEnergyGD() const;
             Ent::Gen::ReviveEnergyGD addReviveEnergyGD() const;
+            void removeReviveEnergyGD() const;
             std::optional<Ent::Gen::DebugGridGD> DebugGridGD() const;
             Ent::Gen::DebugGridGD addDebugGridGD() const;
+            void removeDebugGridGD() const;
             std::optional<Ent::Gen::ChildEntityPoolComponentGD> ChildEntityPoolComponentGD() const;
             Ent::Gen::ChildEntityPoolComponentGD addChildEntityPoolComponentGD() const;
+            void removeChildEntityPoolComponentGD() const;
             std::optional<Ent::Gen::ProtoComponentGD> ProtoComponentGD() const;
             Ent::Gen::ProtoComponentGD addProtoComponentGD() const;
+            void removeProtoComponentGD() const;
             std::optional<Ent::Gen::GameEffectSpawnerGD> GameEffectSpawnerGD() const;
             Ent::Gen::GameEffectSpawnerGD addGameEffectSpawnerGD() const;
+            void removeGameEffectSpawnerGD() const;
             std::optional<Ent::Gen::ClothGD> ClothGD() const;
             Ent::Gen::ClothGD addClothGD() const;
+            void removeClothGD() const;
             std::optional<Ent::Gen::FireSensorGD> FireSensorGD() const;
             Ent::Gen::FireSensorGD addFireSensorGD() const;
+            void removeFireSensorGD() const;
             std::optional<Ent::Gen::HealerGD> HealerGD() const;
             Ent::Gen::HealerGD addHealerGD() const;
+            void removeHealerGD() const;
             std::optional<Ent::Gen::AnimationLegsConstraintsGD> AnimationLegsConstraintsGD() const;
             Ent::Gen::AnimationLegsConstraintsGD addAnimationLegsConstraintsGD() const;
+            void removeAnimationLegsConstraintsGD() const;
             std::optional<Ent::Gen::PathBoneRigidBodyGD> PathBoneRigidBodyGD() const;
             Ent::Gen::PathBoneRigidBodyGD addPathBoneRigidBodyGD() const;
+            void removePathBoneRigidBodyGD() const;
             std::optional<Ent::Gen::FightDistanceTriggerGD> FightDistanceTriggerGD() const;
             Ent::Gen::FightDistanceTriggerGD addFightDistanceTriggerGD() const;
+            void removeFightDistanceTriggerGD() const;
             std::optional<Ent::Gen::SoulSpotGD> SoulSpotGD() const;
             Ent::Gen::SoulSpotGD addSoulSpotGD() const;
+            void removeSoulSpotGD() const;
             std::optional<Ent::Gen::HealTriggerGD> HealTriggerGD() const;
             Ent::Gen::HealTriggerGD addHealTriggerGD() const;
+            void removeHealTriggerGD() const;
             std::optional<Ent::Gen::AnimationTailConstraintsGD> AnimationTailConstraintsGD() const;
             Ent::Gen::AnimationTailConstraintsGD addAnimationTailConstraintsGD() const;
+            void removeAnimationTailConstraintsGD() const;
             std::optional<Ent::Gen::VolumeConstraintGD> VolumeConstraintGD() const;
             Ent::Gen::VolumeConstraintGD addVolumeConstraintGD() const;
+            void removeVolumeConstraintGD() const;
             std::optional<Ent::Gen::EnvStampGD> EnvStampGD() const;
             Ent::Gen::EnvStampGD addEnvStampGD() const;
+            void removeEnvStampGD() const;
             std::optional<Ent::Gen::FluidFXEntitySpawnerGD> FluidFXEntitySpawnerGD() const;
             Ent::Gen::FluidFXEntitySpawnerGD addFluidFXEntitySpawnerGD() const;
+            void removeFluidFXEntitySpawnerGD() const;
             std::optional<Ent::Gen::EnergyDrainGD> EnergyDrainGD() const;
             Ent::Gen::EnergyDrainGD addEnergyDrainGD() const;
+            void removeEnergyDrainGD() const;
             std::optional<Ent::Gen::AnimationEventsGeneratorGD> AnimationEventsGeneratorGD() const;
             Ent::Gen::AnimationEventsGeneratorGD addAnimationEventsGeneratorGD() const;
+            void removeAnimationEventsGeneratorGD() const;
             std::optional<Ent::Gen::MountableGD> MountableGD() const;
             Ent::Gen::MountableGD addMountableGD() const;
+            void removeMountableGD() const;
             std::optional<Ent::Gen::InfoboardRegistererGD> InfoboardRegistererGD() const;
             Ent::Gen::InfoboardRegistererGD addInfoboardRegistererGD() const;
+            void removeInfoboardRegistererGD() const;
             std::optional<Ent::Gen::EventHandlerGD> EventHandlerGD() const;
             Ent::Gen::EventHandlerGD addEventHandlerGD() const;
+            void removeEventHandlerGD() const;
             std::optional<Ent::Gen::SoulRespawnOpportunityGD> SoulRespawnOpportunityGD() const;
             Ent::Gen::SoulRespawnOpportunityGD addSoulRespawnOpportunityGD() const;
+            void removeSoulRespawnOpportunityGD() const;
             std::optional<Ent::Gen::HealthAreaGD> HealthAreaGD() const;
             Ent::Gen::HealthAreaGD addHealthAreaGD() const;
+            void removeHealthAreaGD() const;
             std::optional<Ent::Gen::SoundAreaGD> SoundAreaGD() const;
             Ent::Gen::SoundAreaGD addSoundAreaGD() const;
+            void removeSoundAreaGD() const;
             std::optional<Ent::Gen::PathBoneInfluenceGD> PathBoneInfluenceGD() const;
             Ent::Gen::PathBoneInfluenceGD addPathBoneInfluenceGD() const;
+            void removePathBoneInfluenceGD() const;
             std::optional<Ent::Gen::ComponentWithProtoCodeGD> ComponentWithProtoCodeGD() const;
             Ent::Gen::ComponentWithProtoCodeGD addComponentWithProtoCodeGD() const;
+            void removeComponentWithProtoCodeGD() const;
             std::optional<Ent::Gen::CharacterControllerGD> CharacterControllerGD() const;
             Ent::Gen::CharacterControllerGD addCharacterControllerGD() const;
+            void removeCharacterControllerGD() const;
             std::optional<Ent::Gen::PickableComponentGD> PickableComponentGD() const;
             Ent::Gen::PickableComponentGD addPickableComponentGD() const;
+            void removePickableComponentGD() const;
             std::optional<Ent::Gen::CameraDataGD> CameraDataGD() const;
             Ent::Gen::CameraDataGD addCameraDataGD() const;
+            void removeCameraDataGD() const;
             std::optional<Ent::Gen::RegenFXGD> RegenFXGD() const;
             Ent::Gen::RegenFXGD addRegenFXGD() const;
+            void removeRegenFXGD() const;
             std::optional<Ent::Gen::PhysicsMeshDeformerGD> PhysicsMeshDeformerGD() const;
             Ent::Gen::PhysicsMeshDeformerGD addPhysicsMeshDeformerGD() const;
+            void removePhysicsMeshDeformerGD() const;
             std::optional<Ent::Gen::AnimationHitsConstraintsGD> AnimationHitsConstraintsGD() const;
             Ent::Gen::AnimationHitsConstraintsGD addAnimationHitsConstraintsGD() const;
+            void removeAnimationHitsConstraintsGD() const;
             std::optional<Ent::Gen::FluidVolumeComponentGD> FluidVolumeComponentGD() const;
             Ent::Gen::FluidVolumeComponentGD addFluidVolumeComponentGD() const;
+            void removeFluidVolumeComponentGD() const;
             std::optional<Ent::Gen::RegenerableVegetationGD> RegenerableVegetationGD() const;
             Ent::Gen::RegenerableVegetationGD addRegenerableVegetationGD() const;
+            void removeRegenerableVegetationGD() const;
             std::optional<Ent::Gen::ShamanVisionGD> ShamanVisionGD() const;
             Ent::Gen::ShamanVisionGD addShamanVisionGD() const;
+            void removeShamanVisionGD() const;
             std::optional<Ent::Gen::CinematicGD> CinematicGD() const;
             Ent::Gen::CinematicGD addCinematicGD() const;
+            void removeCinematicGD() const;
             std::optional<Ent::Gen::ConnectorGD> ConnectorGD() const;
             Ent::Gen::ConnectorGD addConnectorGD() const;
+            void removeConnectorGD() const;
             std::optional<Ent::Gen::BeamTargetGD> BeamTargetGD() const;
             Ent::Gen::BeamTargetGD addBeamTargetGD() const;
+            void removeBeamTargetGD() const;
             std::optional<Ent::Gen::ActorGD> ActorGD() const;
             Ent::Gen::ActorGD addActorGD() const;
+            void removeActorGD() const;
             std::optional<Ent::Gen::CharacterPlatformGD> CharacterPlatformGD() const;
             Ent::Gen::CharacterPlatformGD addCharacterPlatformGD() const;
+            void removeCharacterPlatformGD() const;
             std::optional<Ent::Gen::ReviveSideSwitcherGD> ReviveSideSwitcherGD() const;
             Ent::Gen::ReviveSideSwitcherGD addReviveSideSwitcherGD() const;
+            void removeReviveSideSwitcherGD() const;
             std::optional<Ent::Gen::EnergyPoolGD> EnergyPoolGD() const;
             Ent::Gen::EnergyPoolGD addEnergyPoolGD() const;
+            void removeEnergyPoolGD() const;
             std::optional<Ent::Gen::PlayerComponentGD> PlayerComponentGD() const;
             Ent::Gen::PlayerComponentGD addPlayerComponentGD() const;
+            void removePlayerComponentGD() const;
             std::optional<Ent::Gen::HotspotsGD> HotspotsGD() const;
             Ent::Gen::HotspotsGD addHotspotsGD() const;
+            void removeHotspotsGD() const;
             std::optional<Ent::Gen::PathMotionControllerGD> PathMotionControllerGD() const;
             Ent::Gen::PathMotionControllerGD addPathMotionControllerGD() const;
+            void removePathMotionControllerGD() const;
             std::optional<Ent::Gen::CreatureAIGD> CreatureAIGD() const;
             Ent::Gen::CreatureAIGD addCreatureAIGD() const;
+            void removeCreatureAIGD() const;
             std::optional<Ent::Gen::CreatureUIGD> CreatureUIGD() const;
             Ent::Gen::CreatureUIGD addCreatureUIGD() const;
+            void removeCreatureUIGD() const;
             std::optional<Ent::Gen::SoundEmitterGD> SoundEmitterGD() const;
             Ent::Gen::SoundEmitterGD addSoundEmitterGD() const;
+            void removeSoundEmitterGD() const;
             std::optional<Ent::Gen::EnergySourceGD> EnergySourceGD() const;
             Ent::Gen::EnergySourceGD addEnergySourceGD() const;
+            void removeEnergySourceGD() const;
             std::optional<Ent::Gen::ClothAnimationGD> ClothAnimationGD() const;
             Ent::Gen::ClothAnimationGD addClothAnimationGD() const;
+            void removeClothAnimationGD() const;
+            std::optional<Ent::Gen::AnimationTransformDriverGD> AnimationTransformDriverGD() const;
+            Ent::Gen::AnimationTransformDriverGD addAnimationTransformDriverGD() const;
+            void removeAnimationTransformDriverGD() const;
             std::optional<Ent::Gen::CreatureGD> CreatureGD() const;
             Ent::Gen::CreatureGD addCreatureGD() const;
+            void removeCreatureGD() const;
             std::optional<Ent::Gen::HitTriggerGD> HitTriggerGD() const;
             Ent::Gen::HitTriggerGD addHitTriggerGD() const;
+            void removeHitTriggerGD() const;
             std::optional<Ent::Gen::ProjectileShooterGD> ProjectileShooterGD() const;
             Ent::Gen::ProjectileShooterGD addProjectileShooterGD() const;
+            void removeProjectileShooterGD() const;
             std::optional<Ent::Gen::LightComponentGD> LightComponentGD() const;
             Ent::Gen::LightComponentGD addLightComponentGD() const;
+            void removeLightComponentGD() const;
             std::optional<Ent::Gen::MounterGD> MounterGD() const;
             Ent::Gen::MounterGD addMounterGD() const;
+            void removeMounterGD() const;
             std::optional<Ent::Gen::AttackTriggerGD> AttackTriggerGD() const;
             Ent::Gen::AttackTriggerGD addAttackTriggerGD() const;
+            void removeAttackTriggerGD() const;
             std::optional<Ent::Gen::PossessableGPEGD> PossessableGPEGD() const;
             Ent::Gen::PossessableGPEGD addPossessableGPEGD() const;
+            void removePossessableGPEGD() const;
             std::optional<Ent::Gen::OutfitGD> OutfitGD() const;
             Ent::Gen::OutfitGD addOutfitGD() const;
+            void removeOutfitGD() const;
             std::optional<Ent::Gen::BreakableGD> BreakableGD() const;
             Ent::Gen::BreakableGD addBreakableGD() const;
+            void removeBreakableGD() const;
             std::optional<Ent::Gen::PathNodeGD> PathNodeGD() const;
             Ent::Gen::PathNodeGD addPathNodeGD() const;
+            void removePathNodeGD() const;
             std::optional<Ent::Gen::VelocityObstacleGD> VelocityObstacleGD() const;
             Ent::Gen::VelocityObstacleGD addVelocityObstacleGD() const;
+            void removeVelocityObstacleGD() const;
             std::optional<Ent::Gen::ShapeshiftStatueGD> ShapeshiftStatueGD() const;
             Ent::Gen::ShapeshiftStatueGD addShapeshiftStatueGD() const;
+            void removeShapeshiftStatueGD() const;
             std::optional<Ent::Gen::RagdollGD> RagdollGD() const;
             Ent::Gen::RagdollGD addRagdollGD() const;
+            void removeRagdollGD() const;
             std::optional<Ent::Gen::AnimationPhysicsChainConstraintsGD> AnimationPhysicsChainConstraintsGD() const;
             Ent::Gen::AnimationPhysicsChainConstraintsGD addAnimationPhysicsChainConstraintsGD() const;
+            void removeAnimationPhysicsChainConstraintsGD() const;
             std::optional<Ent::Gen::VegetationNavMeshTaggerGD> VegetationNavMeshTaggerGD() const;
             Ent::Gen::VegetationNavMeshTaggerGD addVegetationNavMeshTaggerGD() const;
+            void removeVegetationNavMeshTaggerGD() const;
             std::optional<Ent::Gen::ScriptComponentGD> ScriptComponentGD() const;
             Ent::Gen::ScriptComponentGD addScriptComponentGD() const;
+            void removeScriptComponentGD() const;
             std::optional<Ent::Gen::FluidToRegenInjectorGD> FluidToRegenInjectorGD() const;
             Ent::Gen::FluidToRegenInjectorGD addFluidToRegenInjectorGD() const;
+            void removeFluidToRegenInjectorGD() const;
             std::optional<Ent::Gen::PerceivableGD> PerceivableGD() const;
             Ent::Gen::PerceivableGD addPerceivableGD() const;
+            void removePerceivableGD() const;
             std::optional<Ent::Gen::InventoryGD> InventoryGD() const;
             Ent::Gen::InventoryGD addInventoryGD() const;
+            void removeInventoryGD() const;
             std::optional<Ent::Gen::ItemHolderGD> ItemHolderGD() const;
             Ent::Gen::ItemHolderGD addItemHolderGD() const;
+            void removeItemHolderGD() const;
             std::optional<Ent::Gen::PathGD> PathGD() const;
             Ent::Gen::PathGD addPathGD() const;
+            void removePathGD() const;
             std::optional<Ent::Gen::PerceiverGD> PerceiverGD() const;
             Ent::Gen::PerceiverGD addPerceiverGD() const;
+            void removePerceiverGD() const;
             std::optional<Ent::Gen::DummyComponentGD> DummyComponentGD() const;
             Ent::Gen::DummyComponentGD addDummyComponentGD() const;
+            void removeDummyComponentGD() const;
             std::optional<Ent::Gen::FluidNavMeshTaggerGD> FluidNavMeshTaggerGD() const;
             Ent::Gen::FluidNavMeshTaggerGD addFluidNavMeshTaggerGD() const;
+            void removeFluidNavMeshTaggerGD() const;
             std::optional<Ent::Gen::EnergySpoutGD> EnergySpoutGD() const;
             Ent::Gen::EnergySpoutGD addEnergySpoutGD() const;
+            void removeEnergySpoutGD() const;
             std::optional<Ent::Gen::PickableDistributorComponentGD> PickableDistributorComponentGD() const;
             Ent::Gen::PickableDistributorComponentGD addPickableDistributorComponentGD() const;
+            void removePickableDistributorComponentGD() const;
             std::optional<Ent::Gen::ShamanItemGD> ShamanItemGD() const;
             Ent::Gen::ShamanItemGD addShamanItemGD() const;
+            void removeShamanItemGD() const;
             std::optional<Ent::Gen::TeamGD> TeamGD() const;
             Ent::Gen::TeamGD addTeamGD() const;
+            void removeTeamGD() const;
             std::optional<Ent::Gen::PhysicsMeshProviderGD> PhysicsMeshProviderGD() const;
             Ent::Gen::PhysicsMeshProviderGD addPhysicsMeshProviderGD() const;
+            void removePhysicsMeshProviderGD() const;
             std::optional<Ent::Gen::SideMapGateGD> SideMapGateGD() const;
             Ent::Gen::SideMapGateGD addSideMapGateGD() const;
+            void removeSideMapGateGD() const;
             std::optional<Ent::Gen::HeightMapComponentGD> HeightMapComponentGD() const;
             Ent::Gen::HeightMapComponentGD addHeightMapComponentGD() const;
+            void removeHeightMapComponentGD() const;
             std::optional<Ent::Gen::MountIKControllerGD> MountIKControllerGD() const;
             Ent::Gen::MountIKControllerGD addMountIKControllerGD() const;
+            void removeMountIKControllerGD() const;
             std::optional<Ent::Gen::StaffVertebrasGD> StaffVertebrasGD() const;
             Ent::Gen::StaffVertebrasGD addStaffVertebrasGD() const;
+            void removeStaffVertebrasGD() const;
             std::optional<Ent::Gen::SensorControllerGD> SensorControllerGD() const;
             Ent::Gen::SensorControllerGD addSensorControllerGD() const;
+            void removeSensorControllerGD() const;
             std::optional<Ent::Gen::BoidsGD> BoidsGD() const;
             Ent::Gen::BoidsGD addBoidsGD() const;
+            void removeBoidsGD() const;
             std::optional<Ent::Gen::AnimationTreeConstraintsGD> AnimationTreeConstraintsGD() const;
             Ent::Gen::AnimationTreeConstraintsGD addAnimationTreeConstraintsGD() const;
+            void removeAnimationTreeConstraintsGD() const;
             std::optional<Ent::Gen::DistanceTriggerGD> DistanceTriggerGD() const;
             Ent::Gen::DistanceTriggerGD addDistanceTriggerGD() const;
+            void removeDistanceTriggerGD() const;
             std::optional<Ent::Gen::QuickCreatureSwitchGD> QuickCreatureSwitchGD() const;
             Ent::Gen::QuickCreatureSwitchGD addQuickCreatureSwitchGD() const;
+            void removeQuickCreatureSwitchGD() const;
             std::optional<Ent::Gen::EnergyProbeGD> EnergyProbeGD() const;
             Ent::Gen::EnergyProbeGD addEnergyProbeGD() const;
+            void removeEnergyProbeGD() const;
             std::optional<Ent::Gen::RespawnPlaceGD> RespawnPlaceGD() const;
             Ent::Gen::RespawnPlaceGD addRespawnPlaceGD() const;
+            void removeRespawnPlaceGD() const;
             std::optional<Ent::Gen::SpiritAnimalGD> SpiritAnimalGD() const;
             Ent::Gen::SpiritAnimalGD addSpiritAnimalGD() const;
+            void removeSpiritAnimalGD() const;
             std::optional<Ent::Gen::OutfitWearerGD> OutfitWearerGD() const;
             Ent::Gen::OutfitWearerGD addOutfitWearerGD() const;
+            void removeOutfitWearerGD() const;
             std::optional<Ent::Gen::VoxelSimulationGD> VoxelSimulationGD() const;
             Ent::Gen::VoxelSimulationGD addVoxelSimulationGD() const;
+            void removeVoxelSimulationGD() const;
             std::optional<Ent::Gen::AnimationModelGD> AnimationModelGD() const;
             Ent::Gen::AnimationModelGD addAnimationModelGD() const;
+            void removeAnimationModelGD() const;
             std::optional<Ent::Gen::TriggerEventCameraGD> TriggerEventCameraGD() const;
             Ent::Gen::TriggerEventCameraGD addTriggerEventCameraGD() const;
+            void removeTriggerEventCameraGD() const;
             std::optional<Ent::Gen::AnimationPlaylistGD> AnimationPlaylistGD() const;
             Ent::Gen::AnimationPlaylistGD addAnimationPlaylistGD() const;
+            void removeAnimationPlaylistGD() const;
             std::optional<Ent::Gen::MeshNavigationInfosGD> MeshNavigationInfosGD() const;
             Ent::Gen::MeshNavigationInfosGD addMeshNavigationInfosGD() const;
+            void removeMeshNavigationInfosGD() const;
             std::optional<Ent::Gen::PhysicsTriggerGD> PhysicsTriggerGD() const;
             Ent::Gen::PhysicsTriggerGD addPhysicsTriggerGD() const;
+            void removePhysicsTriggerGD() const;
             std::optional<Ent::Gen::EnergyNetworkListenerGD> EnergyNetworkListenerGD() const;
             Ent::Gen::EnergyNetworkListenerGD addEnergyNetworkListenerGD() const;
+            void removeEnergyNetworkListenerGD() const;
             std::optional<Ent::Gen::MissionHolderGD> MissionHolderGD() const;
             Ent::Gen::MissionHolderGD addMissionHolderGD() const;
+            void removeMissionHolderGD() const;
             std::optional<Ent::Gen::RegenSwitcherGD> RegenSwitcherGD() const;
             Ent::Gen::RegenSwitcherGD addRegenSwitcherGD() const;
+            void removeRegenSwitcherGD() const;
         };
 
 
@@ -6793,11 +7117,11 @@ namespace Ent
         {
             LightComponentGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/LightComponentGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -6822,11 +7146,11 @@ namespace Ent
         {
             BoidsGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/BoidsGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -6877,11 +7201,11 @@ namespace Ent
         {
             Collider(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/Collider";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -6919,15 +7243,14 @@ namespace Ent
         {
             CinematicSlot(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CinematicSlot";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::String ActorBone() const;
             Ent::Gen::String Anim() const;
             Ent::Gen::Bool CameraHolder() const;
             Ent::Gen::Bool CanBeInstanciated() const;
@@ -6950,11 +7273,11 @@ namespace Ent
         {
             Sequence(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/Sequence";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -6970,11 +7293,11 @@ namespace Ent
         {
             CinematicGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CinematicGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -6991,11 +7314,11 @@ namespace Ent
         {
             CineEvent(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CineEvent";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7007,11 +7330,11 @@ namespace Ent
         {
             CineEventTrigger(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CineEventTrigger";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7023,11 +7346,11 @@ namespace Ent
         {
             CineEventTriggerPlaySound(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CineEventTriggerPlaySound";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7040,11 +7363,11 @@ namespace Ent
         {
             CineEventTriggerPlaySequence(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CineEventTriggerPlaySequence";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7057,11 +7380,11 @@ namespace Ent
         {
             CineEventTriggerGameStateChange(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CineEventTriggerGameStateChange";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7074,11 +7397,11 @@ namespace Ent
         {
             CineEventTriggerEventHandlerPost(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CineEventTriggerEventHandlerPost";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7092,11 +7415,11 @@ namespace Ent
         {
             CineEventTest(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CineEventTest";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7109,11 +7432,11 @@ namespace Ent
         {
             CineEventTestWait(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CineEventTestWait";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7126,11 +7449,11 @@ namespace Ent
         {
             CineEventTestIsCanceled(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CineEventTestIsCanceled";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7142,11 +7465,11 @@ namespace Ent
         {
             CineEventTestInput(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CineEventTestInput";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7160,11 +7483,11 @@ namespace Ent
         {
             CineEventTestEndCurrentSequence(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CineEventTestEndCurrentSequence";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7176,11 +7499,11 @@ namespace Ent
         {
             CineEventTestCurrentGameState(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CineEventTestCurrentGameState";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7193,11 +7516,11 @@ namespace Ent
         {
             CharacterControllerSlideData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CharacterControllerSlideData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7220,11 +7543,11 @@ namespace Ent
         {
             CharacterControllerGroundNormalData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CharacterControllerGroundNormalData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7238,11 +7561,11 @@ namespace Ent
         {
             CharacterControllerFallData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CharacterControllerFallData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7257,11 +7580,11 @@ namespace Ent
         {
             CharacterControllerClamberData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CharacterControllerClamberData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7315,11 +7638,11 @@ namespace Ent
         {
             CameraSetterGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CameraSetterGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7334,11 +7657,11 @@ namespace Ent
         {
             CameraShakeData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CameraShakeData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7353,11 +7676,11 @@ namespace Ent
         {
             BiteData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/BiteData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7376,11 +7699,11 @@ namespace Ent
         {
             BehaviorScriptData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/BehaviorScriptData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7485,11 +7808,11 @@ namespace Ent
         {
             CreatureAIGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CreatureAIGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7543,11 +7866,11 @@ namespace Ent
         {
             BeamTargetGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/BeamTargetGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7602,11 +7925,11 @@ namespace Ent
         {
             AttackAbility(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AttackAbility";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7625,11 +7948,11 @@ namespace Ent
         {
             AttackWeaponAbility(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AttackWeaponAbility";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7654,11 +7977,11 @@ namespace Ent
         {
             AttackData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AttackData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7704,11 +8027,11 @@ namespace Ent
         {
             AnimationTreeConstraintsGD_GrowData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimationTreeConstraintsGD::GrowData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7724,11 +8047,11 @@ namespace Ent
         {
             AnimationTreeConstraintsGD_ForceData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimationTreeConstraintsGD::ForceData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7746,11 +8069,11 @@ namespace Ent
         {
             AnimationTreeConstraintsGD_BendData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimationTreeConstraintsGD::BendData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7768,11 +8091,11 @@ namespace Ent
         {
             AnimationTreeConstraintsGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimationTreeConstraintsGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7787,11 +8110,11 @@ namespace Ent
         {
             AnimationLegsConstraints_SlopeOffsetInfo(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimationLegsConstraints::SlopeOffsetInfo";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7805,11 +8128,11 @@ namespace Ent
         {
             AnimationLegsConstraintsGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimationLegsConstraintsGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7843,11 +8166,11 @@ namespace Ent
         {
             AnimationEventsGeneratorGD_TrackedBone(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimationEventsGeneratorGD::TrackedBone";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7861,11 +8184,11 @@ namespace Ent
         {
             AnimationEventsGeneratorGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimationEventsGeneratorGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7951,11 +8274,11 @@ namespace Ent
         {
             MoveCapacityData_AnimTagTimelineTransitionItem(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/MoveCapacityData::AnimTagTimelineTransitionItem";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7968,11 +8291,11 @@ namespace Ent
         {
             MoveCapacityData_AnimTagTimelineTransitionTable(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/MoveCapacityData::AnimTagTimelineTransitionTable";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -7985,11 +8308,11 @@ namespace Ent
         {
             MoveCapacityData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/MoveCapacityData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8063,11 +8386,11 @@ namespace Ent
         {
             CharacterControllerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CharacterControllerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8091,11 +8414,11 @@ namespace Ent
         {
             AnimMirroringSpecData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimMirroringSpecData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8109,11 +8432,11 @@ namespace Ent
         {
             AnimMirroringData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimMirroringData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8125,11 +8448,11 @@ namespace Ent
         {
             AnimationControllerGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./MergedComponents.json#/definitions/AnimationControllerGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8153,53 +8476,72 @@ namespace Ent
             char const* getType() const;
             std::optional<Ent::Gen::ActorStateAlive> ActorStateAlive() const;
             Ent::Gen::ActorStateAlive addActorStateAlive() const;
+            void removeActorStateAlive() const;
             std::optional<Ent::Gen::ActorStateBeingImmersed> ActorStateBeingImmersed() const;
             Ent::Gen::ActorStateBeingImmersed addActorStateBeingImmersed() const;
+            void removeActorStateBeingImmersed() const;
             std::optional<Ent::Gen::ActorStateBeingInAir> ActorStateBeingInAir() const;
             Ent::Gen::ActorStateBeingInAir addActorStateBeingInAir() const;
+            void removeActorStateBeingInAir() const;
             std::optional<Ent::Gen::ActorStateBeingOnGround> ActorStateBeingOnGround() const;
             Ent::Gen::ActorStateBeingOnGround addActorStateBeingOnGround() const;
+            void removeActorStateBeingOnGround() const;
             std::optional<Ent::Gen::ActorStateBuried> ActorStateBuried() const;
             Ent::Gen::ActorStateBuried addActorStateBuried() const;
+            void removeActorStateBuried() const;
             std::optional<Ent::Gen::ActorStateDead> ActorStateDead() const;
             Ent::Gen::ActorStateDead addActorStateDead() const;
+            void removeActorStateDead() const;
             std::optional<Ent::Gen::ActorStateHasNoBody> ActorStateHasNoBody() const;
             Ent::Gen::ActorStateHasNoBody addActorStateHasNoBody() const;
+            void removeActorStateHasNoBody() const;
             std::optional<Ent::Gen::ActorStateHoldingItem> ActorStateHoldingItem() const;
             Ent::Gen::ActorStateHoldingItem addActorStateHoldingItem() const;
+            void removeActorStateHoldingItem() const;
             std::optional<Ent::Gen::ActorStateInvincible> ActorStateInvincible() const;
             Ent::Gen::ActorStateInvincible addActorStateInvincible() const;
+            void removeActorStateInvincible() const;
             std::optional<Ent::Gen::ActorStateRegenerationFull> ActorStateRegenerationFull() const;
             Ent::Gen::ActorStateRegenerationFull addActorStateRegenerationFull() const;
+            void removeActorStateRegenerationFull() const;
             std::optional<Ent::Gen::ActorStateRegenerationLow> ActorStateRegenerationLow() const;
             Ent::Gen::ActorStateRegenerationLow addActorStateRegenerationLow() const;
+            void removeActorStateRegenerationLow() const;
             std::optional<Ent::Gen::ActorStateTeleport> ActorStateTeleport() const;
             Ent::Gen::ActorStateTeleport addActorStateTeleport() const;
+            void removeActorStateTeleport() const;
             std::optional<Ent::Gen::EntityStateBoidsHomePos> EntityStateBoidsHomePos() const;
             Ent::Gen::EntityStateBoidsHomePos addEntityStateBoidsHomePos() const;
+            void removeEntityStateBoidsHomePos() const;
             std::optional<Ent::Gen::EntityStateEnergyRootState> EntityStateEnergyRootState() const;
             Ent::Gen::EntityStateEnergyRootState addEntityStateEnergyRootState() const;
+            void removeEntityStateEnergyRootState() const;
             std::optional<Ent::Gen::EntityStateEnergySpoutState> EntityStateEnergySpoutState() const;
             Ent::Gen::EntityStateEnergySpoutState addEntityStateEnergySpoutState() const;
+            void removeEntityStateEnergySpoutState() const;
             std::optional<Ent::Gen::EntityStateForceCanBeTargeted> EntityStateForceCanBeTargeted() const;
             Ent::Gen::EntityStateForceCanBeTargeted addEntityStateForceCanBeTargeted() const;
+            void removeEntityStateForceCanBeTargeted() const;
             std::optional<Ent::Gen::EntityStateMask> EntityStateMask() const;
             Ent::Gen::EntityStateMask addEntityStateMask() const;
+            void removeEntityStateMask() const;
             std::optional<Ent::Gen::EntityStatePlayer> EntityStatePlayer() const;
             Ent::Gen::EntityStatePlayer addEntityStatePlayer() const;
+            void removeEntityStatePlayer() const;
             std::optional<Ent::Gen::EntityStateVoxelsVolume> EntityStateVoxelsVolume() const;
             Ent::Gen::EntityStateVoxelsVolume addEntityStateVoxelsVolume() const;
+            void removeEntityStateVoxelsVolume() const;
         };
 
         struct Object : HelperObject // Object
         {
             Object(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./Scene-schema.json#/definitions/Object";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8218,11 +8560,11 @@ namespace Ent
         {
             UnitTestComponent(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/UnitTestComponent";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8237,11 +8579,11 @@ namespace Ent
         {
             Entity(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./Scene-schema.json#/definitions/Entity";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8259,11 +8601,11 @@ namespace Ent
         {
             SubScene(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./EditionComponents.json#/definitions/SubScene";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8278,11 +8620,11 @@ namespace Ent
         {
             Scene(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./Scene-schema.json#/definitions/Scene";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8295,11 +8637,11 @@ namespace Ent
         {
             ActorStateTeleport_Inputs(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ActorStateTeleport::Inputs";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8314,11 +8656,11 @@ namespace Ent
         {
             ActorState(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ActorState";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8329,11 +8671,11 @@ namespace Ent
         {
             EntityStateVoxelsVolume(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EntityStateVoxelsVolume";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8346,11 +8688,11 @@ namespace Ent
         {
             EntityStatePlayer(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EntityStatePlayer";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8362,11 +8704,11 @@ namespace Ent
         {
             EntityStateMask(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EntityStateMask";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8379,11 +8721,11 @@ namespace Ent
         {
             EntityStateForceCanBeTargeted(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EntityStateForceCanBeTargeted";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8396,11 +8738,11 @@ namespace Ent
         {
             EntityStateEnergySpoutState(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EntityStateEnergySpoutState";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8414,11 +8756,11 @@ namespace Ent
         {
             EntityStateEnergyRootState(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EntityStateEnergyRootState";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8432,11 +8774,11 @@ namespace Ent
         {
             EntityStateBoidsHomePos(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/EntityStateBoidsHomePos";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8449,11 +8791,11 @@ namespace Ent
         {
             ActorStateTeleport(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ActorStateTeleport";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8466,11 +8808,11 @@ namespace Ent
         {
             ActorStateRegenerationLow(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ActorStateRegenerationLow";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8483,11 +8825,11 @@ namespace Ent
         {
             ActorStateRegenerationFull(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ActorStateRegenerationFull";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8499,11 +8841,11 @@ namespace Ent
         {
             ActorStateInvincible(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ActorStateInvincible";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8515,11 +8857,11 @@ namespace Ent
         {
             ActorStateHoldingItem(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ActorStateHoldingItem";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8533,11 +8875,11 @@ namespace Ent
         {
             ActorStateHasNoBody(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ActorStateHasNoBody";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8549,11 +8891,11 @@ namespace Ent
         {
             ActorStateDead(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ActorStateDead";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8567,11 +8909,11 @@ namespace Ent
         {
             ActorStateBuried(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ActorStateBuried";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8583,11 +8925,11 @@ namespace Ent
         {
             ActorStateBeingOnGround(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ActorStateBeingOnGround";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8599,11 +8941,11 @@ namespace Ent
         {
             ActorStateBeingInAir(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ActorStateBeingInAir";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8615,11 +8957,11 @@ namespace Ent
         {
             ActorStateBeingImmersed(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ActorStateBeingImmersed";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8631,11 +8973,11 @@ namespace Ent
         {
             ActorStateAlive(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ActorStateAlive";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8708,11 +9050,11 @@ namespace Ent
         {
             ConditionalRigidityAttribute_Conditions(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ConditionalRigidityAttribute::Conditions";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8728,11 +9070,11 @@ namespace Ent
         {
             ConditionalRigidityAttribute(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ConditionalRigidityAttribute";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8747,11 +9089,11 @@ namespace Ent
         {
             AnimationTailConstraintsGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AnimationTailConstraintsGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8805,11 +9147,11 @@ namespace Ent
         {
             AbilityData(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AbilityData";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8821,11 +9163,11 @@ namespace Ent
         {
             ActorGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ActorGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8852,11 +9194,11 @@ namespace Ent
         {
             ProjectileGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ProjectileGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8868,11 +9210,11 @@ namespace Ent
         {
             CreatureGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/CreatureGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8901,11 +9243,11 @@ namespace Ent
         {
             ClothGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/ClothGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8921,11 +9263,11 @@ namespace Ent
         {
             AIContextSlot(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AIContextSlot";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -8938,11 +9280,11 @@ namespace Ent
         {
             AIContextGD(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "./RuntimeComponents.json#/definitions/AIContextGD";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
-            static Ent::Node create(Ent::EntityLib& _entlib)
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
             {
                 return _entlib.makeNode(schemaName);
             }
@@ -9585,6 +9927,10 @@ namespace Ent
         inline Ent::Gen::Float Terrain_TerrainMeta::RegionWidthMeters() const
         {
             return Ent::Gen::Float(node->at("RegionWidthMeters"));
+        }
+        inline Ent::Gen::Bool Terrain_TerrainMeta::RimTerrain() const
+        {
+            return Ent::Gen::Bool(node->at("RimTerrain"));
         }
         inline Ent::Gen::Float Terrain_TerrainMeta::SkirtScale() const
         {
@@ -14208,6 +14554,15 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // AnimationTransformDriverGD
+        inline Ent::Gen::ComponentGD AnimationTransformDriverGD::Super() const
+        {
+            return Ent::Gen::ComponentGD(node->at("Super"));
+        }
+        inline Ent::Gen::String AnimationTransformDriverGD::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // AnimationRegenConstraintsGD
         inline Ent::Gen::Float AnimationRegenConstraintsGD::MaxDisplace() const
         {
@@ -15102,6 +15457,14 @@ namespace Ent
         {
             return Ent::Gen::ClothAnimationGD(node->setUnionType("Component"));
         }
+        inline std::optional<Ent::Gen::AnimationTransformDriverGD> Component::AnimationTransformDriverGD() const
+        {
+            return strcmp(node->getUnionType(), "AnimationTransformDriverGD") != 0? std::optional<Ent::Gen::AnimationTransformDriverGD>{}: std::optional<Ent::Gen::AnimationTransformDriverGD>(node->getUnionData());
+        }
+        inline Ent::Gen::AnimationTransformDriverGD Component::setAnimationTransformDriverGD() const
+        {
+            return Ent::Gen::AnimationTransformDriverGD(node->setUnionType("Component"));
+        }
         inline std::optional<Ent::Gen::CreatureGD> Component::CreatureGD() const
         {
             return strcmp(node->getUnionType(), "CreatureGD") != 0? std::optional<Ent::Gen::CreatureGD>{}: std::optional<Ent::Gen::CreatureGD>(node->getUnionData());
@@ -15524,6 +15887,10 @@ namespace Ent
         {
             return Ent::Gen::StaticObjectGD(addSubNode("StaticObjectGD"));
         }
+        inline void Object_Components::removeStaticObjectGD() const
+        {
+            node->mapErase("StaticObjectGD");
+        }
         inline std::optional<Ent::Gen::AnimationControllerGD> Object_Components::AnimationControllerGD() const
         {
             auto sub = getSubNode("AnimationControllerGD");
@@ -15532,6 +15899,10 @@ namespace Ent
         inline Ent::Gen::AnimationControllerGD Object_Components::addAnimationControllerGD() const
         {
             return Ent::Gen::AnimationControllerGD(addSubNode("AnimationControllerGD"));
+        }
+        inline void Object_Components::removeAnimationControllerGD() const
+        {
+            node->mapErase("AnimationControllerGD");
         }
         inline std::optional<Ent::Gen::PhysicsDataGD> Object_Components::PhysicsDataGD() const
         {
@@ -15542,6 +15913,10 @@ namespace Ent
         {
             return Ent::Gen::PhysicsDataGD(addSubNode("PhysicsDataGD"));
         }
+        inline void Object_Components::removePhysicsDataGD() const
+        {
+            node->mapErase("PhysicsDataGD");
+        }
         inline std::optional<Ent::Gen::VisualGD> Object_Components::VisualGD() const
         {
             auto sub = getSubNode("VisualGD");
@@ -15550,6 +15925,10 @@ namespace Ent
         inline Ent::Gen::VisualGD Object_Components::addVisualGD() const
         {
             return Ent::Gen::VisualGD(addSubNode("VisualGD"));
+        }
+        inline void Object_Components::removeVisualGD() const
+        {
+            node->mapErase("VisualGD");
         }
         inline std::optional<Ent::Gen::TransformGD> Object_Components::TransformGD() const
         {
@@ -15560,6 +15939,10 @@ namespace Ent
         {
             return Ent::Gen::TransformGD(addSubNode("TransformGD"));
         }
+        inline void Object_Components::removeTransformGD() const
+        {
+            node->mapErase("TransformGD");
+        }
         inline std::optional<Ent::Gen::TerrainGD> Object_Components::TerrainGD() const
         {
             auto sub = getSubNode("TerrainGD");
@@ -15568,6 +15951,10 @@ namespace Ent
         inline Ent::Gen::TerrainGD Object_Components::addTerrainGD() const
         {
             return Ent::Gen::TerrainGD(addSubNode("TerrainGD"));
+        }
+        inline void Object_Components::removeTerrainGD() const
+        {
+            node->mapErase("TerrainGD");
         }
         inline std::optional<Ent::Gen::PhysicsGD> Object_Components::PhysicsGD() const
         {
@@ -15578,6 +15965,10 @@ namespace Ent
         {
             return Ent::Gen::PhysicsGD(addSubNode("PhysicsGD"));
         }
+        inline void Object_Components::removePhysicsGD() const
+        {
+            node->mapErase("PhysicsGD");
+        }
         inline std::optional<Ent::Gen::CustomThumbnail> Object_Components::CustomThumbnail() const
         {
             auto sub = getSubNode("CustomThumbnail");
@@ -15586,6 +15977,10 @@ namespace Ent
         inline Ent::Gen::CustomThumbnail Object_Components::addCustomThumbnail() const
         {
             return Ent::Gen::CustomThumbnail(addSubNode("CustomThumbnail"));
+        }
+        inline void Object_Components::removeCustomThumbnail() const
+        {
+            node->mapErase("CustomThumbnail");
         }
         inline std::optional<Ent::Gen::HeightObj> Object_Components::HeightObj() const
         {
@@ -15596,6 +15991,10 @@ namespace Ent
         {
             return Ent::Gen::HeightObj(addSubNode("HeightObj"));
         }
+        inline void Object_Components::removeHeightObj() const
+        {
+            node->mapErase("HeightObj");
+        }
         inline std::optional<Ent::Gen::LDPrimitive> Object_Components::LDPrimitive() const
         {
             auto sub = getSubNode("LDPrimitive");
@@ -15604,6 +16003,10 @@ namespace Ent
         inline Ent::Gen::LDPrimitive Object_Components::addLDPrimitive() const
         {
             return Ent::Gen::LDPrimitive(addSubNode("LDPrimitive"));
+        }
+        inline void Object_Components::removeLDPrimitive() const
+        {
+            node->mapErase("LDPrimitive");
         }
         inline std::optional<Ent::Gen::Mesh> Object_Components::Mesh() const
         {
@@ -15614,6 +16017,10 @@ namespace Ent
         {
             return Ent::Gen::Mesh(addSubNode("Mesh"));
         }
+        inline void Object_Components::removeMesh() const
+        {
+            node->mapErase("Mesh");
+        }
         inline std::optional<Ent::Gen::MultiThumbnail> Object_Components::MultiThumbnail() const
         {
             auto sub = getSubNode("MultiThumbnail");
@@ -15622,6 +16029,10 @@ namespace Ent
         inline Ent::Gen::MultiThumbnail Object_Components::addMultiThumbnail() const
         {
             return Ent::Gen::MultiThumbnail(addSubNode("MultiThumbnail"));
+        }
+        inline void Object_Components::removeMultiThumbnail() const
+        {
+            node->mapErase("MultiThumbnail");
         }
         inline std::optional<Ent::Gen::NetworkLink> Object_Components::NetworkLink() const
         {
@@ -15632,6 +16043,10 @@ namespace Ent
         {
             return Ent::Gen::NetworkLink(addSubNode("NetworkLink"));
         }
+        inline void Object_Components::removeNetworkLink() const
+        {
+            node->mapErase("NetworkLink");
+        }
         inline std::optional<Ent::Gen::NetworkNode> Object_Components::NetworkNode() const
         {
             auto sub = getSubNode("NetworkNode");
@@ -15640,6 +16055,10 @@ namespace Ent
         inline Ent::Gen::NetworkNode Object_Components::addNetworkNode() const
         {
             return Ent::Gen::NetworkNode(addSubNode("NetworkNode"));
+        }
+        inline void Object_Components::removeNetworkNode() const
+        {
+            node->mapErase("NetworkNode");
         }
         inline std::optional<Ent::Gen::NotVisibleInSubscene> Object_Components::NotVisibleInSubscene() const
         {
@@ -15650,6 +16069,10 @@ namespace Ent
         {
             return Ent::Gen::NotVisibleInSubscene(addSubNode("NotVisibleInSubscene"));
         }
+        inline void Object_Components::removeNotVisibleInSubscene() const
+        {
+            node->mapErase("NotVisibleInSubscene");
+        }
         inline std::optional<Ent::Gen::SeedPatch> Object_Components::SeedPatch() const
         {
             auto sub = getSubNode("SeedPatch");
@@ -15658,6 +16081,10 @@ namespace Ent
         inline Ent::Gen::SeedPatch Object_Components::addSeedPatch() const
         {
             return Ent::Gen::SeedPatch(addSubNode("SeedPatch"));
+        }
+        inline void Object_Components::removeSeedPatch() const
+        {
+            node->mapErase("SeedPatch");
         }
         inline std::optional<Ent::Gen::StickToTerrain> Object_Components::StickToTerrain() const
         {
@@ -15668,6 +16095,10 @@ namespace Ent
         {
             return Ent::Gen::StickToTerrain(addSubNode("StickToTerrain"));
         }
+        inline void Object_Components::removeStickToTerrain() const
+        {
+            node->mapErase("StickToTerrain");
+        }
         inline std::optional<Ent::Gen::SubScene> Object_Components::SubScene() const
         {
             auto sub = getSubNode("SubScene");
@@ -15676,6 +16107,10 @@ namespace Ent
         inline Ent::Gen::SubScene Object_Components::addSubScene() const
         {
             return Ent::Gen::SubScene(addSubNode("SubScene"));
+        }
+        inline void Object_Components::removeSubScene() const
+        {
+            node->mapErase("SubScene");
         }
         inline std::optional<Ent::Gen::SystemicCreature> Object_Components::SystemicCreature() const
         {
@@ -15686,6 +16121,10 @@ namespace Ent
         {
             return Ent::Gen::SystemicCreature(addSubNode("SystemicCreature"));
         }
+        inline void Object_Components::removeSystemicCreature() const
+        {
+            node->mapErase("SystemicCreature");
+        }
         inline std::optional<Ent::Gen::TerrainSurfaceObject> Object_Components::TerrainSurfaceObject() const
         {
             auto sub = getSubNode("TerrainSurfaceObject");
@@ -15694,6 +16133,10 @@ namespace Ent
         inline Ent::Gen::TerrainSurfaceObject Object_Components::addTerrainSurfaceObject() const
         {
             return Ent::Gen::TerrainSurfaceObject(addSubNode("TerrainSurfaceObject"));
+        }
+        inline void Object_Components::removeTerrainSurfaceObject() const
+        {
+            node->mapErase("TerrainSurfaceObject");
         }
         inline std::optional<Ent::Gen::TestArrays> Object_Components::TestArrays() const
         {
@@ -15704,6 +16147,10 @@ namespace Ent
         {
             return Ent::Gen::TestArrays(addSubNode("TestArrays"));
         }
+        inline void Object_Components::removeTestArrays() const
+        {
+            node->mapErase("TestArrays");
+        }
         inline std::optional<Ent::Gen::TestCreature> Object_Components::TestCreature() const
         {
             auto sub = getSubNode("TestCreature");
@@ -15712,6 +16159,10 @@ namespace Ent
         inline Ent::Gen::TestCreature Object_Components::addTestCreature() const
         {
             return Ent::Gen::TestCreature(addSubNode("TestCreature"));
+        }
+        inline void Object_Components::removeTestCreature() const
+        {
+            node->mapErase("TestCreature");
         }
         inline std::optional<Ent::Gen::TestDefaultValues> Object_Components::TestDefaultValues() const
         {
@@ -15722,6 +16173,10 @@ namespace Ent
         {
             return Ent::Gen::TestDefaultValues(addSubNode("TestDefaultValues"));
         }
+        inline void Object_Components::removeTestDefaultValues() const
+        {
+            node->mapErase("TestDefaultValues");
+        }
         inline std::optional<Ent::Gen::TestEntityRef> Object_Components::TestEntityRef() const
         {
             auto sub = getSubNode("TestEntityRef");
@@ -15730,6 +16185,10 @@ namespace Ent
         inline Ent::Gen::TestEntityRef Object_Components::addTestEntityRef() const
         {
             return Ent::Gen::TestEntityRef(addSubNode("TestEntityRef"));
+        }
+        inline void Object_Components::removeTestEntityRef() const
+        {
+            node->mapErase("TestEntityRef");
         }
         inline std::optional<Ent::Gen::TestSetOfObject> Object_Components::TestSetOfObject() const
         {
@@ -15740,6 +16199,10 @@ namespace Ent
         {
             return Ent::Gen::TestSetOfObject(addSubNode("TestSetOfObject"));
         }
+        inline void Object_Components::removeTestSetOfObject() const
+        {
+            node->mapErase("TestSetOfObject");
+        }
         inline std::optional<Ent::Gen::TestUnion> Object_Components::TestUnion() const
         {
             auto sub = getSubNode("TestUnion");
@@ -15748,6 +16211,10 @@ namespace Ent
         inline Ent::Gen::TestUnion Object_Components::addTestUnion() const
         {
             return Ent::Gen::TestUnion(addSubNode("TestUnion"));
+        }
+        inline void Object_Components::removeTestUnion() const
+        {
+            node->mapErase("TestUnion");
         }
         inline std::optional<Ent::Gen::UnitTestComponent> Object_Components::UnitTestComponent() const
         {
@@ -15758,6 +16225,10 @@ namespace Ent
         {
             return Ent::Gen::UnitTestComponent(addSubNode("UnitTestComponent"));
         }
+        inline void Object_Components::removeUnitTestComponent() const
+        {
+            node->mapErase("UnitTestComponent");
+        }
         inline std::optional<Ent::Gen::WildObject> Object_Components::WildObject() const
         {
             auto sub = getSubNode("WildObject");
@@ -15766,6 +16237,10 @@ namespace Ent
         inline Ent::Gen::WildObject Object_Components::addWildObject() const
         {
             return Ent::Gen::WildObject(addSubNode("WildObject"));
+        }
+        inline void Object_Components::removeWildObject() const
+        {
+            node->mapErase("WildObject");
         }
         inline std::optional<Ent::Gen::EnergyCrookGD> Object_Components::EnergyCrookGD() const
         {
@@ -15776,6 +16251,10 @@ namespace Ent
         {
             return Ent::Gen::EnergyCrookGD(addSubNode("EnergyCrookGD"));
         }
+        inline void Object_Components::removeEnergyCrookGD() const
+        {
+            node->mapErase("EnergyCrookGD");
+        }
         inline std::optional<Ent::Gen::AIContextGD> Object_Components::AIContextGD() const
         {
             auto sub = getSubNode("AIContextGD");
@@ -15784,6 +16263,10 @@ namespace Ent
         inline Ent::Gen::AIContextGD Object_Components::addAIContextGD() const
         {
             return Ent::Gen::AIContextGD(addSubNode("AIContextGD"));
+        }
+        inline void Object_Components::removeAIContextGD() const
+        {
+            node->mapErase("AIContextGD");
         }
         inline std::optional<Ent::Gen::EventTriggerGD> Object_Components::EventTriggerGD() const
         {
@@ -15794,6 +16277,10 @@ namespace Ent
         {
             return Ent::Gen::EventTriggerGD(addSubNode("EventTriggerGD"));
         }
+        inline void Object_Components::removeEventTriggerGD() const
+        {
+            node->mapErase("EventTriggerGD");
+        }
         inline std::optional<Ent::Gen::BeamGeneratorGD> Object_Components::BeamGeneratorGD() const
         {
             auto sub = getSubNode("BeamGeneratorGD");
@@ -15802,6 +16289,10 @@ namespace Ent
         inline Ent::Gen::BeamGeneratorGD Object_Components::addBeamGeneratorGD() const
         {
             return Ent::Gen::BeamGeneratorGD(addSubNode("BeamGeneratorGD"));
+        }
+        inline void Object_Components::removeBeamGeneratorGD() const
+        {
+            node->mapErase("BeamGeneratorGD");
         }
         inline std::optional<Ent::Gen::WorldScalePathFindGD> Object_Components::WorldScalePathFindGD() const
         {
@@ -15812,6 +16303,10 @@ namespace Ent
         {
             return Ent::Gen::WorldScalePathFindGD(addSubNode("WorldScalePathFindGD"));
         }
+        inline void Object_Components::removeWorldScalePathFindGD() const
+        {
+            node->mapErase("WorldScalePathFindGD");
+        }
         inline std::optional<Ent::Gen::NetGD> Object_Components::NetGD() const
         {
             auto sub = getSubNode("NetGD");
@@ -15820,6 +16315,10 @@ namespace Ent
         inline Ent::Gen::NetGD Object_Components::addNetGD() const
         {
             return Ent::Gen::NetGD(addSubNode("NetGD"));
+        }
+        inline void Object_Components::removeNetGD() const
+        {
+            node->mapErase("NetGD");
         }
         inline std::optional<Ent::Gen::BittenGD> Object_Components::BittenGD() const
         {
@@ -15830,6 +16329,10 @@ namespace Ent
         {
             return Ent::Gen::BittenGD(addSubNode("BittenGD"));
         }
+        inline void Object_Components::removeBittenGD() const
+        {
+            node->mapErase("BittenGD");
+        }
         inline std::optional<Ent::Gen::PathBoneAnimGD> Object_Components::PathBoneAnimGD() const
         {
             auto sub = getSubNode("PathBoneAnimGD");
@@ -15838,6 +16341,10 @@ namespace Ent
         inline Ent::Gen::PathBoneAnimGD Object_Components::addPathBoneAnimGD() const
         {
             return Ent::Gen::PathBoneAnimGD(addSubNode("PathBoneAnimGD"));
+        }
+        inline void Object_Components::removePathBoneAnimGD() const
+        {
+            node->mapErase("PathBoneAnimGD");
         }
         inline std::optional<Ent::Gen::AnimationRegenConstraintsGD> Object_Components::AnimationRegenConstraintsGD() const
         {
@@ -15848,6 +16355,10 @@ namespace Ent
         {
             return Ent::Gen::AnimationRegenConstraintsGD(addSubNode("AnimationRegenConstraintsGD"));
         }
+        inline void Object_Components::removeAnimationRegenConstraintsGD() const
+        {
+            node->mapErase("AnimationRegenConstraintsGD");
+        }
         inline std::optional<Ent::Gen::HealPumpGD> Object_Components::HealPumpGD() const
         {
             auto sub = getSubNode("HealPumpGD");
@@ -15856,6 +16367,10 @@ namespace Ent
         inline Ent::Gen::HealPumpGD Object_Components::addHealPumpGD() const
         {
             return Ent::Gen::HealPumpGD(addSubNode("HealPumpGD"));
+        }
+        inline void Object_Components::removeHealPumpGD() const
+        {
+            node->mapErase("HealPumpGD");
         }
         inline std::optional<Ent::Gen::GroundTypeSamplerGD> Object_Components::GroundTypeSamplerGD() const
         {
@@ -15866,6 +16381,10 @@ namespace Ent
         {
             return Ent::Gen::GroundTypeSamplerGD(addSubNode("GroundTypeSamplerGD"));
         }
+        inline void Object_Components::removeGroundTypeSamplerGD() const
+        {
+            node->mapErase("GroundTypeSamplerGD");
+        }
         inline std::optional<Ent::Gen::UnifiedPhysicsDataGD> Object_Components::UnifiedPhysicsDataGD() const
         {
             auto sub = getSubNode("UnifiedPhysicsDataGD");
@@ -15874,6 +16393,10 @@ namespace Ent
         inline Ent::Gen::UnifiedPhysicsDataGD Object_Components::addUnifiedPhysicsDataGD() const
         {
             return Ent::Gen::UnifiedPhysicsDataGD(addSubNode("UnifiedPhysicsDataGD"));
+        }
+        inline void Object_Components::removeUnifiedPhysicsDataGD() const
+        {
+            node->mapErase("UnifiedPhysicsDataGD");
         }
         inline std::optional<Ent::Gen::FluidGD> Object_Components::FluidGD() const
         {
@@ -15884,6 +16407,10 @@ namespace Ent
         {
             return Ent::Gen::FluidGD(addSubNode("FluidGD"));
         }
+        inline void Object_Components::removeFluidGD() const
+        {
+            node->mapErase("FluidGD");
+        }
         inline std::optional<Ent::Gen::ProjectileGD> Object_Components::ProjectileGD() const
         {
             auto sub = getSubNode("ProjectileGD");
@@ -15892,6 +16419,10 @@ namespace Ent
         inline Ent::Gen::ProjectileGD Object_Components::addProjectileGD() const
         {
             return Ent::Gen::ProjectileGD(addSubNode("ProjectileGD"));
+        }
+        inline void Object_Components::removeProjectileGD() const
+        {
+            node->mapErase("ProjectileGD");
         }
         inline std::optional<Ent::Gen::CameraSetterGD> Object_Components::CameraSetterGD() const
         {
@@ -15902,6 +16433,10 @@ namespace Ent
         {
             return Ent::Gen::CameraSetterGD(addSubNode("CameraSetterGD"));
         }
+        inline void Object_Components::removeCameraSetterGD() const
+        {
+            node->mapErase("CameraSetterGD");
+        }
         inline std::optional<Ent::Gen::AssemblyGD> Object_Components::AssemblyGD() const
         {
             auto sub = getSubNode("AssemblyGD");
@@ -15910,6 +16445,10 @@ namespace Ent
         inline Ent::Gen::AssemblyGD Object_Components::addAssemblyGD() const
         {
             return Ent::Gen::AssemblyGD(addSubNode("AssemblyGD"));
+        }
+        inline void Object_Components::removeAssemblyGD() const
+        {
+            node->mapErase("AssemblyGD");
         }
         inline std::optional<Ent::Gen::SmoothScaleComponentGD> Object_Components::SmoothScaleComponentGD() const
         {
@@ -15920,6 +16459,10 @@ namespace Ent
         {
             return Ent::Gen::SmoothScaleComponentGD(addSubNode("SmoothScaleComponentGD"));
         }
+        inline void Object_Components::removeSmoothScaleComponentGD() const
+        {
+            node->mapErase("SmoothScaleComponentGD");
+        }
         inline std::optional<Ent::Gen::FluidViewGD> Object_Components::FluidViewGD() const
         {
             auto sub = getSubNode("FluidViewGD");
@@ -15928,6 +16471,10 @@ namespace Ent
         inline Ent::Gen::FluidViewGD Object_Components::addFluidViewGD() const
         {
             return Ent::Gen::FluidViewGD(addSubNode("FluidViewGD"));
+        }
+        inline void Object_Components::removeFluidViewGD() const
+        {
+            node->mapErase("FluidViewGD");
         }
         inline std::optional<Ent::Gen::RegenMeshGD> Object_Components::RegenMeshGD() const
         {
@@ -15938,6 +16485,10 @@ namespace Ent
         {
             return Ent::Gen::RegenMeshGD(addSubNode("RegenMeshGD"));
         }
+        inline void Object_Components::removeRegenMeshGD() const
+        {
+            node->mapErase("RegenMeshGD");
+        }
         inline std::optional<Ent::Gen::ReviveEnergyGD> Object_Components::ReviveEnergyGD() const
         {
             auto sub = getSubNode("ReviveEnergyGD");
@@ -15946,6 +16497,10 @@ namespace Ent
         inline Ent::Gen::ReviveEnergyGD Object_Components::addReviveEnergyGD() const
         {
             return Ent::Gen::ReviveEnergyGD(addSubNode("ReviveEnergyGD"));
+        }
+        inline void Object_Components::removeReviveEnergyGD() const
+        {
+            node->mapErase("ReviveEnergyGD");
         }
         inline std::optional<Ent::Gen::DebugGridGD> Object_Components::DebugGridGD() const
         {
@@ -15956,6 +16511,10 @@ namespace Ent
         {
             return Ent::Gen::DebugGridGD(addSubNode("DebugGridGD"));
         }
+        inline void Object_Components::removeDebugGridGD() const
+        {
+            node->mapErase("DebugGridGD");
+        }
         inline std::optional<Ent::Gen::ChildEntityPoolComponentGD> Object_Components::ChildEntityPoolComponentGD() const
         {
             auto sub = getSubNode("ChildEntityPoolComponentGD");
@@ -15964,6 +16523,10 @@ namespace Ent
         inline Ent::Gen::ChildEntityPoolComponentGD Object_Components::addChildEntityPoolComponentGD() const
         {
             return Ent::Gen::ChildEntityPoolComponentGD(addSubNode("ChildEntityPoolComponentGD"));
+        }
+        inline void Object_Components::removeChildEntityPoolComponentGD() const
+        {
+            node->mapErase("ChildEntityPoolComponentGD");
         }
         inline std::optional<Ent::Gen::ProtoComponentGD> Object_Components::ProtoComponentGD() const
         {
@@ -15974,6 +16537,10 @@ namespace Ent
         {
             return Ent::Gen::ProtoComponentGD(addSubNode("ProtoComponentGD"));
         }
+        inline void Object_Components::removeProtoComponentGD() const
+        {
+            node->mapErase("ProtoComponentGD");
+        }
         inline std::optional<Ent::Gen::GameEffectSpawnerGD> Object_Components::GameEffectSpawnerGD() const
         {
             auto sub = getSubNode("GameEffectSpawnerGD");
@@ -15982,6 +16549,10 @@ namespace Ent
         inline Ent::Gen::GameEffectSpawnerGD Object_Components::addGameEffectSpawnerGD() const
         {
             return Ent::Gen::GameEffectSpawnerGD(addSubNode("GameEffectSpawnerGD"));
+        }
+        inline void Object_Components::removeGameEffectSpawnerGD() const
+        {
+            node->mapErase("GameEffectSpawnerGD");
         }
         inline std::optional<Ent::Gen::ClothGD> Object_Components::ClothGD() const
         {
@@ -15992,6 +16563,10 @@ namespace Ent
         {
             return Ent::Gen::ClothGD(addSubNode("ClothGD"));
         }
+        inline void Object_Components::removeClothGD() const
+        {
+            node->mapErase("ClothGD");
+        }
         inline std::optional<Ent::Gen::FireSensorGD> Object_Components::FireSensorGD() const
         {
             auto sub = getSubNode("FireSensorGD");
@@ -16000,6 +16575,10 @@ namespace Ent
         inline Ent::Gen::FireSensorGD Object_Components::addFireSensorGD() const
         {
             return Ent::Gen::FireSensorGD(addSubNode("FireSensorGD"));
+        }
+        inline void Object_Components::removeFireSensorGD() const
+        {
+            node->mapErase("FireSensorGD");
         }
         inline std::optional<Ent::Gen::HealerGD> Object_Components::HealerGD() const
         {
@@ -16010,6 +16589,10 @@ namespace Ent
         {
             return Ent::Gen::HealerGD(addSubNode("HealerGD"));
         }
+        inline void Object_Components::removeHealerGD() const
+        {
+            node->mapErase("HealerGD");
+        }
         inline std::optional<Ent::Gen::AnimationLegsConstraintsGD> Object_Components::AnimationLegsConstraintsGD() const
         {
             auto sub = getSubNode("AnimationLegsConstraintsGD");
@@ -16018,6 +16601,10 @@ namespace Ent
         inline Ent::Gen::AnimationLegsConstraintsGD Object_Components::addAnimationLegsConstraintsGD() const
         {
             return Ent::Gen::AnimationLegsConstraintsGD(addSubNode("AnimationLegsConstraintsGD"));
+        }
+        inline void Object_Components::removeAnimationLegsConstraintsGD() const
+        {
+            node->mapErase("AnimationLegsConstraintsGD");
         }
         inline std::optional<Ent::Gen::PathBoneRigidBodyGD> Object_Components::PathBoneRigidBodyGD() const
         {
@@ -16028,6 +16615,10 @@ namespace Ent
         {
             return Ent::Gen::PathBoneRigidBodyGD(addSubNode("PathBoneRigidBodyGD"));
         }
+        inline void Object_Components::removePathBoneRigidBodyGD() const
+        {
+            node->mapErase("PathBoneRigidBodyGD");
+        }
         inline std::optional<Ent::Gen::FightDistanceTriggerGD> Object_Components::FightDistanceTriggerGD() const
         {
             auto sub = getSubNode("FightDistanceTriggerGD");
@@ -16036,6 +16627,10 @@ namespace Ent
         inline Ent::Gen::FightDistanceTriggerGD Object_Components::addFightDistanceTriggerGD() const
         {
             return Ent::Gen::FightDistanceTriggerGD(addSubNode("FightDistanceTriggerGD"));
+        }
+        inline void Object_Components::removeFightDistanceTriggerGD() const
+        {
+            node->mapErase("FightDistanceTriggerGD");
         }
         inline std::optional<Ent::Gen::SoulSpotGD> Object_Components::SoulSpotGD() const
         {
@@ -16046,6 +16641,10 @@ namespace Ent
         {
             return Ent::Gen::SoulSpotGD(addSubNode("SoulSpotGD"));
         }
+        inline void Object_Components::removeSoulSpotGD() const
+        {
+            node->mapErase("SoulSpotGD");
+        }
         inline std::optional<Ent::Gen::HealTriggerGD> Object_Components::HealTriggerGD() const
         {
             auto sub = getSubNode("HealTriggerGD");
@@ -16054,6 +16653,10 @@ namespace Ent
         inline Ent::Gen::HealTriggerGD Object_Components::addHealTriggerGD() const
         {
             return Ent::Gen::HealTriggerGD(addSubNode("HealTriggerGD"));
+        }
+        inline void Object_Components::removeHealTriggerGD() const
+        {
+            node->mapErase("HealTriggerGD");
         }
         inline std::optional<Ent::Gen::AnimationTailConstraintsGD> Object_Components::AnimationTailConstraintsGD() const
         {
@@ -16064,6 +16667,10 @@ namespace Ent
         {
             return Ent::Gen::AnimationTailConstraintsGD(addSubNode("AnimationTailConstraintsGD"));
         }
+        inline void Object_Components::removeAnimationTailConstraintsGD() const
+        {
+            node->mapErase("AnimationTailConstraintsGD");
+        }
         inline std::optional<Ent::Gen::VolumeConstraintGD> Object_Components::VolumeConstraintGD() const
         {
             auto sub = getSubNode("VolumeConstraintGD");
@@ -16072,6 +16679,10 @@ namespace Ent
         inline Ent::Gen::VolumeConstraintGD Object_Components::addVolumeConstraintGD() const
         {
             return Ent::Gen::VolumeConstraintGD(addSubNode("VolumeConstraintGD"));
+        }
+        inline void Object_Components::removeVolumeConstraintGD() const
+        {
+            node->mapErase("VolumeConstraintGD");
         }
         inline std::optional<Ent::Gen::EnvStampGD> Object_Components::EnvStampGD() const
         {
@@ -16082,6 +16693,10 @@ namespace Ent
         {
             return Ent::Gen::EnvStampGD(addSubNode("EnvStampGD"));
         }
+        inline void Object_Components::removeEnvStampGD() const
+        {
+            node->mapErase("EnvStampGD");
+        }
         inline std::optional<Ent::Gen::FluidFXEntitySpawnerGD> Object_Components::FluidFXEntitySpawnerGD() const
         {
             auto sub = getSubNode("FluidFXEntitySpawnerGD");
@@ -16090,6 +16705,10 @@ namespace Ent
         inline Ent::Gen::FluidFXEntitySpawnerGD Object_Components::addFluidFXEntitySpawnerGD() const
         {
             return Ent::Gen::FluidFXEntitySpawnerGD(addSubNode("FluidFXEntitySpawnerGD"));
+        }
+        inline void Object_Components::removeFluidFXEntitySpawnerGD() const
+        {
+            node->mapErase("FluidFXEntitySpawnerGD");
         }
         inline std::optional<Ent::Gen::EnergyDrainGD> Object_Components::EnergyDrainGD() const
         {
@@ -16100,6 +16719,10 @@ namespace Ent
         {
             return Ent::Gen::EnergyDrainGD(addSubNode("EnergyDrainGD"));
         }
+        inline void Object_Components::removeEnergyDrainGD() const
+        {
+            node->mapErase("EnergyDrainGD");
+        }
         inline std::optional<Ent::Gen::AnimationEventsGeneratorGD> Object_Components::AnimationEventsGeneratorGD() const
         {
             auto sub = getSubNode("AnimationEventsGeneratorGD");
@@ -16108,6 +16731,10 @@ namespace Ent
         inline Ent::Gen::AnimationEventsGeneratorGD Object_Components::addAnimationEventsGeneratorGD() const
         {
             return Ent::Gen::AnimationEventsGeneratorGD(addSubNode("AnimationEventsGeneratorGD"));
+        }
+        inline void Object_Components::removeAnimationEventsGeneratorGD() const
+        {
+            node->mapErase("AnimationEventsGeneratorGD");
         }
         inline std::optional<Ent::Gen::MountableGD> Object_Components::MountableGD() const
         {
@@ -16118,6 +16745,10 @@ namespace Ent
         {
             return Ent::Gen::MountableGD(addSubNode("MountableGD"));
         }
+        inline void Object_Components::removeMountableGD() const
+        {
+            node->mapErase("MountableGD");
+        }
         inline std::optional<Ent::Gen::InfoboardRegistererGD> Object_Components::InfoboardRegistererGD() const
         {
             auto sub = getSubNode("InfoboardRegistererGD");
@@ -16126,6 +16757,10 @@ namespace Ent
         inline Ent::Gen::InfoboardRegistererGD Object_Components::addInfoboardRegistererGD() const
         {
             return Ent::Gen::InfoboardRegistererGD(addSubNode("InfoboardRegistererGD"));
+        }
+        inline void Object_Components::removeInfoboardRegistererGD() const
+        {
+            node->mapErase("InfoboardRegistererGD");
         }
         inline std::optional<Ent::Gen::EventHandlerGD> Object_Components::EventHandlerGD() const
         {
@@ -16136,6 +16771,10 @@ namespace Ent
         {
             return Ent::Gen::EventHandlerGD(addSubNode("EventHandlerGD"));
         }
+        inline void Object_Components::removeEventHandlerGD() const
+        {
+            node->mapErase("EventHandlerGD");
+        }
         inline std::optional<Ent::Gen::SoulRespawnOpportunityGD> Object_Components::SoulRespawnOpportunityGD() const
         {
             auto sub = getSubNode("SoulRespawnOpportunityGD");
@@ -16144,6 +16783,10 @@ namespace Ent
         inline Ent::Gen::SoulRespawnOpportunityGD Object_Components::addSoulRespawnOpportunityGD() const
         {
             return Ent::Gen::SoulRespawnOpportunityGD(addSubNode("SoulRespawnOpportunityGD"));
+        }
+        inline void Object_Components::removeSoulRespawnOpportunityGD() const
+        {
+            node->mapErase("SoulRespawnOpportunityGD");
         }
         inline std::optional<Ent::Gen::HealthAreaGD> Object_Components::HealthAreaGD() const
         {
@@ -16154,6 +16797,10 @@ namespace Ent
         {
             return Ent::Gen::HealthAreaGD(addSubNode("HealthAreaGD"));
         }
+        inline void Object_Components::removeHealthAreaGD() const
+        {
+            node->mapErase("HealthAreaGD");
+        }
         inline std::optional<Ent::Gen::SoundAreaGD> Object_Components::SoundAreaGD() const
         {
             auto sub = getSubNode("SoundAreaGD");
@@ -16162,6 +16809,10 @@ namespace Ent
         inline Ent::Gen::SoundAreaGD Object_Components::addSoundAreaGD() const
         {
             return Ent::Gen::SoundAreaGD(addSubNode("SoundAreaGD"));
+        }
+        inline void Object_Components::removeSoundAreaGD() const
+        {
+            node->mapErase("SoundAreaGD");
         }
         inline std::optional<Ent::Gen::PathBoneInfluenceGD> Object_Components::PathBoneInfluenceGD() const
         {
@@ -16172,6 +16823,10 @@ namespace Ent
         {
             return Ent::Gen::PathBoneInfluenceGD(addSubNode("PathBoneInfluenceGD"));
         }
+        inline void Object_Components::removePathBoneInfluenceGD() const
+        {
+            node->mapErase("PathBoneInfluenceGD");
+        }
         inline std::optional<Ent::Gen::ComponentWithProtoCodeGD> Object_Components::ComponentWithProtoCodeGD() const
         {
             auto sub = getSubNode("ComponentWithProtoCodeGD");
@@ -16180,6 +16835,10 @@ namespace Ent
         inline Ent::Gen::ComponentWithProtoCodeGD Object_Components::addComponentWithProtoCodeGD() const
         {
             return Ent::Gen::ComponentWithProtoCodeGD(addSubNode("ComponentWithProtoCodeGD"));
+        }
+        inline void Object_Components::removeComponentWithProtoCodeGD() const
+        {
+            node->mapErase("ComponentWithProtoCodeGD");
         }
         inline std::optional<Ent::Gen::CharacterControllerGD> Object_Components::CharacterControllerGD() const
         {
@@ -16190,6 +16849,10 @@ namespace Ent
         {
             return Ent::Gen::CharacterControllerGD(addSubNode("CharacterControllerGD"));
         }
+        inline void Object_Components::removeCharacterControllerGD() const
+        {
+            node->mapErase("CharacterControllerGD");
+        }
         inline std::optional<Ent::Gen::PickableComponentGD> Object_Components::PickableComponentGD() const
         {
             auto sub = getSubNode("PickableComponentGD");
@@ -16198,6 +16861,10 @@ namespace Ent
         inline Ent::Gen::PickableComponentGD Object_Components::addPickableComponentGD() const
         {
             return Ent::Gen::PickableComponentGD(addSubNode("PickableComponentGD"));
+        }
+        inline void Object_Components::removePickableComponentGD() const
+        {
+            node->mapErase("PickableComponentGD");
         }
         inline std::optional<Ent::Gen::CameraDataGD> Object_Components::CameraDataGD() const
         {
@@ -16208,6 +16875,10 @@ namespace Ent
         {
             return Ent::Gen::CameraDataGD(addSubNode("CameraDataGD"));
         }
+        inline void Object_Components::removeCameraDataGD() const
+        {
+            node->mapErase("CameraDataGD");
+        }
         inline std::optional<Ent::Gen::RegenFXGD> Object_Components::RegenFXGD() const
         {
             auto sub = getSubNode("RegenFXGD");
@@ -16216,6 +16887,10 @@ namespace Ent
         inline Ent::Gen::RegenFXGD Object_Components::addRegenFXGD() const
         {
             return Ent::Gen::RegenFXGD(addSubNode("RegenFXGD"));
+        }
+        inline void Object_Components::removeRegenFXGD() const
+        {
+            node->mapErase("RegenFXGD");
         }
         inline std::optional<Ent::Gen::PhysicsMeshDeformerGD> Object_Components::PhysicsMeshDeformerGD() const
         {
@@ -16226,6 +16901,10 @@ namespace Ent
         {
             return Ent::Gen::PhysicsMeshDeformerGD(addSubNode("PhysicsMeshDeformerGD"));
         }
+        inline void Object_Components::removePhysicsMeshDeformerGD() const
+        {
+            node->mapErase("PhysicsMeshDeformerGD");
+        }
         inline std::optional<Ent::Gen::AnimationHitsConstraintsGD> Object_Components::AnimationHitsConstraintsGD() const
         {
             auto sub = getSubNode("AnimationHitsConstraintsGD");
@@ -16234,6 +16913,10 @@ namespace Ent
         inline Ent::Gen::AnimationHitsConstraintsGD Object_Components::addAnimationHitsConstraintsGD() const
         {
             return Ent::Gen::AnimationHitsConstraintsGD(addSubNode("AnimationHitsConstraintsGD"));
+        }
+        inline void Object_Components::removeAnimationHitsConstraintsGD() const
+        {
+            node->mapErase("AnimationHitsConstraintsGD");
         }
         inline std::optional<Ent::Gen::FluidVolumeComponentGD> Object_Components::FluidVolumeComponentGD() const
         {
@@ -16244,6 +16927,10 @@ namespace Ent
         {
             return Ent::Gen::FluidVolumeComponentGD(addSubNode("FluidVolumeComponentGD"));
         }
+        inline void Object_Components::removeFluidVolumeComponentGD() const
+        {
+            node->mapErase("FluidVolumeComponentGD");
+        }
         inline std::optional<Ent::Gen::RegenerableVegetationGD> Object_Components::RegenerableVegetationGD() const
         {
             auto sub = getSubNode("RegenerableVegetationGD");
@@ -16252,6 +16939,10 @@ namespace Ent
         inline Ent::Gen::RegenerableVegetationGD Object_Components::addRegenerableVegetationGD() const
         {
             return Ent::Gen::RegenerableVegetationGD(addSubNode("RegenerableVegetationGD"));
+        }
+        inline void Object_Components::removeRegenerableVegetationGD() const
+        {
+            node->mapErase("RegenerableVegetationGD");
         }
         inline std::optional<Ent::Gen::ShamanVisionGD> Object_Components::ShamanVisionGD() const
         {
@@ -16262,6 +16953,10 @@ namespace Ent
         {
             return Ent::Gen::ShamanVisionGD(addSubNode("ShamanVisionGD"));
         }
+        inline void Object_Components::removeShamanVisionGD() const
+        {
+            node->mapErase("ShamanVisionGD");
+        }
         inline std::optional<Ent::Gen::CinematicGD> Object_Components::CinematicGD() const
         {
             auto sub = getSubNode("CinematicGD");
@@ -16270,6 +16965,10 @@ namespace Ent
         inline Ent::Gen::CinematicGD Object_Components::addCinematicGD() const
         {
             return Ent::Gen::CinematicGD(addSubNode("CinematicGD"));
+        }
+        inline void Object_Components::removeCinematicGD() const
+        {
+            node->mapErase("CinematicGD");
         }
         inline std::optional<Ent::Gen::ConnectorGD> Object_Components::ConnectorGD() const
         {
@@ -16280,6 +16979,10 @@ namespace Ent
         {
             return Ent::Gen::ConnectorGD(addSubNode("ConnectorGD"));
         }
+        inline void Object_Components::removeConnectorGD() const
+        {
+            node->mapErase("ConnectorGD");
+        }
         inline std::optional<Ent::Gen::BeamTargetGD> Object_Components::BeamTargetGD() const
         {
             auto sub = getSubNode("BeamTargetGD");
@@ -16288,6 +16991,10 @@ namespace Ent
         inline Ent::Gen::BeamTargetGD Object_Components::addBeamTargetGD() const
         {
             return Ent::Gen::BeamTargetGD(addSubNode("BeamTargetGD"));
+        }
+        inline void Object_Components::removeBeamTargetGD() const
+        {
+            node->mapErase("BeamTargetGD");
         }
         inline std::optional<Ent::Gen::ActorGD> Object_Components::ActorGD() const
         {
@@ -16298,6 +17005,10 @@ namespace Ent
         {
             return Ent::Gen::ActorGD(addSubNode("ActorGD"));
         }
+        inline void Object_Components::removeActorGD() const
+        {
+            node->mapErase("ActorGD");
+        }
         inline std::optional<Ent::Gen::CharacterPlatformGD> Object_Components::CharacterPlatformGD() const
         {
             auto sub = getSubNode("CharacterPlatformGD");
@@ -16306,6 +17017,10 @@ namespace Ent
         inline Ent::Gen::CharacterPlatformGD Object_Components::addCharacterPlatformGD() const
         {
             return Ent::Gen::CharacterPlatformGD(addSubNode("CharacterPlatformGD"));
+        }
+        inline void Object_Components::removeCharacterPlatformGD() const
+        {
+            node->mapErase("CharacterPlatformGD");
         }
         inline std::optional<Ent::Gen::ReviveSideSwitcherGD> Object_Components::ReviveSideSwitcherGD() const
         {
@@ -16316,6 +17031,10 @@ namespace Ent
         {
             return Ent::Gen::ReviveSideSwitcherGD(addSubNode("ReviveSideSwitcherGD"));
         }
+        inline void Object_Components::removeReviveSideSwitcherGD() const
+        {
+            node->mapErase("ReviveSideSwitcherGD");
+        }
         inline std::optional<Ent::Gen::EnergyPoolGD> Object_Components::EnergyPoolGD() const
         {
             auto sub = getSubNode("EnergyPoolGD");
@@ -16324,6 +17043,10 @@ namespace Ent
         inline Ent::Gen::EnergyPoolGD Object_Components::addEnergyPoolGD() const
         {
             return Ent::Gen::EnergyPoolGD(addSubNode("EnergyPoolGD"));
+        }
+        inline void Object_Components::removeEnergyPoolGD() const
+        {
+            node->mapErase("EnergyPoolGD");
         }
         inline std::optional<Ent::Gen::PlayerComponentGD> Object_Components::PlayerComponentGD() const
         {
@@ -16334,6 +17057,10 @@ namespace Ent
         {
             return Ent::Gen::PlayerComponentGD(addSubNode("PlayerComponentGD"));
         }
+        inline void Object_Components::removePlayerComponentGD() const
+        {
+            node->mapErase("PlayerComponentGD");
+        }
         inline std::optional<Ent::Gen::HotspotsGD> Object_Components::HotspotsGD() const
         {
             auto sub = getSubNode("HotspotsGD");
@@ -16342,6 +17069,10 @@ namespace Ent
         inline Ent::Gen::HotspotsGD Object_Components::addHotspotsGD() const
         {
             return Ent::Gen::HotspotsGD(addSubNode("HotspotsGD"));
+        }
+        inline void Object_Components::removeHotspotsGD() const
+        {
+            node->mapErase("HotspotsGD");
         }
         inline std::optional<Ent::Gen::PathMotionControllerGD> Object_Components::PathMotionControllerGD() const
         {
@@ -16352,6 +17083,10 @@ namespace Ent
         {
             return Ent::Gen::PathMotionControllerGD(addSubNode("PathMotionControllerGD"));
         }
+        inline void Object_Components::removePathMotionControllerGD() const
+        {
+            node->mapErase("PathMotionControllerGD");
+        }
         inline std::optional<Ent::Gen::CreatureAIGD> Object_Components::CreatureAIGD() const
         {
             auto sub = getSubNode("CreatureAIGD");
@@ -16360,6 +17095,10 @@ namespace Ent
         inline Ent::Gen::CreatureAIGD Object_Components::addCreatureAIGD() const
         {
             return Ent::Gen::CreatureAIGD(addSubNode("CreatureAIGD"));
+        }
+        inline void Object_Components::removeCreatureAIGD() const
+        {
+            node->mapErase("CreatureAIGD");
         }
         inline std::optional<Ent::Gen::CreatureUIGD> Object_Components::CreatureUIGD() const
         {
@@ -16370,6 +17109,10 @@ namespace Ent
         {
             return Ent::Gen::CreatureUIGD(addSubNode("CreatureUIGD"));
         }
+        inline void Object_Components::removeCreatureUIGD() const
+        {
+            node->mapErase("CreatureUIGD");
+        }
         inline std::optional<Ent::Gen::SoundEmitterGD> Object_Components::SoundEmitterGD() const
         {
             auto sub = getSubNode("SoundEmitterGD");
@@ -16378,6 +17121,10 @@ namespace Ent
         inline Ent::Gen::SoundEmitterGD Object_Components::addSoundEmitterGD() const
         {
             return Ent::Gen::SoundEmitterGD(addSubNode("SoundEmitterGD"));
+        }
+        inline void Object_Components::removeSoundEmitterGD() const
+        {
+            node->mapErase("SoundEmitterGD");
         }
         inline std::optional<Ent::Gen::EnergySourceGD> Object_Components::EnergySourceGD() const
         {
@@ -16388,6 +17135,10 @@ namespace Ent
         {
             return Ent::Gen::EnergySourceGD(addSubNode("EnergySourceGD"));
         }
+        inline void Object_Components::removeEnergySourceGD() const
+        {
+            node->mapErase("EnergySourceGD");
+        }
         inline std::optional<Ent::Gen::ClothAnimationGD> Object_Components::ClothAnimationGD() const
         {
             auto sub = getSubNode("ClothAnimationGD");
@@ -16396,6 +17147,23 @@ namespace Ent
         inline Ent::Gen::ClothAnimationGD Object_Components::addClothAnimationGD() const
         {
             return Ent::Gen::ClothAnimationGD(addSubNode("ClothAnimationGD"));
+        }
+        inline void Object_Components::removeClothAnimationGD() const
+        {
+            node->mapErase("ClothAnimationGD");
+        }
+        inline std::optional<Ent::Gen::AnimationTransformDriverGD> Object_Components::AnimationTransformDriverGD() const
+        {
+            auto sub = getSubNode("AnimationTransformDriverGD");
+            return sub == nullptr? std::optional<Ent::Gen::AnimationTransformDriverGD>{}: std::optional<Ent::Gen::AnimationTransformDriverGD>(getSubNode("AnimationTransformDriverGD"));
+        }
+        inline Ent::Gen::AnimationTransformDriverGD Object_Components::addAnimationTransformDriverGD() const
+        {
+            return Ent::Gen::AnimationTransformDriverGD(addSubNode("AnimationTransformDriverGD"));
+        }
+        inline void Object_Components::removeAnimationTransformDriverGD() const
+        {
+            node->mapErase("AnimationTransformDriverGD");
         }
         inline std::optional<Ent::Gen::CreatureGD> Object_Components::CreatureGD() const
         {
@@ -16406,6 +17174,10 @@ namespace Ent
         {
             return Ent::Gen::CreatureGD(addSubNode("CreatureGD"));
         }
+        inline void Object_Components::removeCreatureGD() const
+        {
+            node->mapErase("CreatureGD");
+        }
         inline std::optional<Ent::Gen::HitTriggerGD> Object_Components::HitTriggerGD() const
         {
             auto sub = getSubNode("HitTriggerGD");
@@ -16414,6 +17186,10 @@ namespace Ent
         inline Ent::Gen::HitTriggerGD Object_Components::addHitTriggerGD() const
         {
             return Ent::Gen::HitTriggerGD(addSubNode("HitTriggerGD"));
+        }
+        inline void Object_Components::removeHitTriggerGD() const
+        {
+            node->mapErase("HitTriggerGD");
         }
         inline std::optional<Ent::Gen::ProjectileShooterGD> Object_Components::ProjectileShooterGD() const
         {
@@ -16424,6 +17200,10 @@ namespace Ent
         {
             return Ent::Gen::ProjectileShooterGD(addSubNode("ProjectileShooterGD"));
         }
+        inline void Object_Components::removeProjectileShooterGD() const
+        {
+            node->mapErase("ProjectileShooterGD");
+        }
         inline std::optional<Ent::Gen::LightComponentGD> Object_Components::LightComponentGD() const
         {
             auto sub = getSubNode("LightComponentGD");
@@ -16432,6 +17212,10 @@ namespace Ent
         inline Ent::Gen::LightComponentGD Object_Components::addLightComponentGD() const
         {
             return Ent::Gen::LightComponentGD(addSubNode("LightComponentGD"));
+        }
+        inline void Object_Components::removeLightComponentGD() const
+        {
+            node->mapErase("LightComponentGD");
         }
         inline std::optional<Ent::Gen::MounterGD> Object_Components::MounterGD() const
         {
@@ -16442,6 +17226,10 @@ namespace Ent
         {
             return Ent::Gen::MounterGD(addSubNode("MounterGD"));
         }
+        inline void Object_Components::removeMounterGD() const
+        {
+            node->mapErase("MounterGD");
+        }
         inline std::optional<Ent::Gen::AttackTriggerGD> Object_Components::AttackTriggerGD() const
         {
             auto sub = getSubNode("AttackTriggerGD");
@@ -16450,6 +17238,10 @@ namespace Ent
         inline Ent::Gen::AttackTriggerGD Object_Components::addAttackTriggerGD() const
         {
             return Ent::Gen::AttackTriggerGD(addSubNode("AttackTriggerGD"));
+        }
+        inline void Object_Components::removeAttackTriggerGD() const
+        {
+            node->mapErase("AttackTriggerGD");
         }
         inline std::optional<Ent::Gen::PossessableGPEGD> Object_Components::PossessableGPEGD() const
         {
@@ -16460,6 +17252,10 @@ namespace Ent
         {
             return Ent::Gen::PossessableGPEGD(addSubNode("PossessableGPEGD"));
         }
+        inline void Object_Components::removePossessableGPEGD() const
+        {
+            node->mapErase("PossessableGPEGD");
+        }
         inline std::optional<Ent::Gen::OutfitGD> Object_Components::OutfitGD() const
         {
             auto sub = getSubNode("OutfitGD");
@@ -16468,6 +17264,10 @@ namespace Ent
         inline Ent::Gen::OutfitGD Object_Components::addOutfitGD() const
         {
             return Ent::Gen::OutfitGD(addSubNode("OutfitGD"));
+        }
+        inline void Object_Components::removeOutfitGD() const
+        {
+            node->mapErase("OutfitGD");
         }
         inline std::optional<Ent::Gen::BreakableGD> Object_Components::BreakableGD() const
         {
@@ -16478,6 +17278,10 @@ namespace Ent
         {
             return Ent::Gen::BreakableGD(addSubNode("BreakableGD"));
         }
+        inline void Object_Components::removeBreakableGD() const
+        {
+            node->mapErase("BreakableGD");
+        }
         inline std::optional<Ent::Gen::PathNodeGD> Object_Components::PathNodeGD() const
         {
             auto sub = getSubNode("PathNodeGD");
@@ -16486,6 +17290,10 @@ namespace Ent
         inline Ent::Gen::PathNodeGD Object_Components::addPathNodeGD() const
         {
             return Ent::Gen::PathNodeGD(addSubNode("PathNodeGD"));
+        }
+        inline void Object_Components::removePathNodeGD() const
+        {
+            node->mapErase("PathNodeGD");
         }
         inline std::optional<Ent::Gen::VelocityObstacleGD> Object_Components::VelocityObstacleGD() const
         {
@@ -16496,6 +17304,10 @@ namespace Ent
         {
             return Ent::Gen::VelocityObstacleGD(addSubNode("VelocityObstacleGD"));
         }
+        inline void Object_Components::removeVelocityObstacleGD() const
+        {
+            node->mapErase("VelocityObstacleGD");
+        }
         inline std::optional<Ent::Gen::ShapeshiftStatueGD> Object_Components::ShapeshiftStatueGD() const
         {
             auto sub = getSubNode("ShapeshiftStatueGD");
@@ -16504,6 +17316,10 @@ namespace Ent
         inline Ent::Gen::ShapeshiftStatueGD Object_Components::addShapeshiftStatueGD() const
         {
             return Ent::Gen::ShapeshiftStatueGD(addSubNode("ShapeshiftStatueGD"));
+        }
+        inline void Object_Components::removeShapeshiftStatueGD() const
+        {
+            node->mapErase("ShapeshiftStatueGD");
         }
         inline std::optional<Ent::Gen::RagdollGD> Object_Components::RagdollGD() const
         {
@@ -16514,6 +17330,10 @@ namespace Ent
         {
             return Ent::Gen::RagdollGD(addSubNode("RagdollGD"));
         }
+        inline void Object_Components::removeRagdollGD() const
+        {
+            node->mapErase("RagdollGD");
+        }
         inline std::optional<Ent::Gen::AnimationPhysicsChainConstraintsGD> Object_Components::AnimationPhysicsChainConstraintsGD() const
         {
             auto sub = getSubNode("AnimationPhysicsChainConstraintsGD");
@@ -16522,6 +17342,10 @@ namespace Ent
         inline Ent::Gen::AnimationPhysicsChainConstraintsGD Object_Components::addAnimationPhysicsChainConstraintsGD() const
         {
             return Ent::Gen::AnimationPhysicsChainConstraintsGD(addSubNode("AnimationPhysicsChainConstraintsGD"));
+        }
+        inline void Object_Components::removeAnimationPhysicsChainConstraintsGD() const
+        {
+            node->mapErase("AnimationPhysicsChainConstraintsGD");
         }
         inline std::optional<Ent::Gen::VegetationNavMeshTaggerGD> Object_Components::VegetationNavMeshTaggerGD() const
         {
@@ -16532,6 +17356,10 @@ namespace Ent
         {
             return Ent::Gen::VegetationNavMeshTaggerGD(addSubNode("VegetationNavMeshTaggerGD"));
         }
+        inline void Object_Components::removeVegetationNavMeshTaggerGD() const
+        {
+            node->mapErase("VegetationNavMeshTaggerGD");
+        }
         inline std::optional<Ent::Gen::ScriptComponentGD> Object_Components::ScriptComponentGD() const
         {
             auto sub = getSubNode("ScriptComponentGD");
@@ -16540,6 +17368,10 @@ namespace Ent
         inline Ent::Gen::ScriptComponentGD Object_Components::addScriptComponentGD() const
         {
             return Ent::Gen::ScriptComponentGD(addSubNode("ScriptComponentGD"));
+        }
+        inline void Object_Components::removeScriptComponentGD() const
+        {
+            node->mapErase("ScriptComponentGD");
         }
         inline std::optional<Ent::Gen::FluidToRegenInjectorGD> Object_Components::FluidToRegenInjectorGD() const
         {
@@ -16550,6 +17382,10 @@ namespace Ent
         {
             return Ent::Gen::FluidToRegenInjectorGD(addSubNode("FluidToRegenInjectorGD"));
         }
+        inline void Object_Components::removeFluidToRegenInjectorGD() const
+        {
+            node->mapErase("FluidToRegenInjectorGD");
+        }
         inline std::optional<Ent::Gen::PerceivableGD> Object_Components::PerceivableGD() const
         {
             auto sub = getSubNode("PerceivableGD");
@@ -16558,6 +17394,10 @@ namespace Ent
         inline Ent::Gen::PerceivableGD Object_Components::addPerceivableGD() const
         {
             return Ent::Gen::PerceivableGD(addSubNode("PerceivableGD"));
+        }
+        inline void Object_Components::removePerceivableGD() const
+        {
+            node->mapErase("PerceivableGD");
         }
         inline std::optional<Ent::Gen::InventoryGD> Object_Components::InventoryGD() const
         {
@@ -16568,6 +17408,10 @@ namespace Ent
         {
             return Ent::Gen::InventoryGD(addSubNode("InventoryGD"));
         }
+        inline void Object_Components::removeInventoryGD() const
+        {
+            node->mapErase("InventoryGD");
+        }
         inline std::optional<Ent::Gen::ItemHolderGD> Object_Components::ItemHolderGD() const
         {
             auto sub = getSubNode("ItemHolderGD");
@@ -16576,6 +17420,10 @@ namespace Ent
         inline Ent::Gen::ItemHolderGD Object_Components::addItemHolderGD() const
         {
             return Ent::Gen::ItemHolderGD(addSubNode("ItemHolderGD"));
+        }
+        inline void Object_Components::removeItemHolderGD() const
+        {
+            node->mapErase("ItemHolderGD");
         }
         inline std::optional<Ent::Gen::PathGD> Object_Components::PathGD() const
         {
@@ -16586,6 +17434,10 @@ namespace Ent
         {
             return Ent::Gen::PathGD(addSubNode("PathGD"));
         }
+        inline void Object_Components::removePathGD() const
+        {
+            node->mapErase("PathGD");
+        }
         inline std::optional<Ent::Gen::PerceiverGD> Object_Components::PerceiverGD() const
         {
             auto sub = getSubNode("PerceiverGD");
@@ -16594,6 +17446,10 @@ namespace Ent
         inline Ent::Gen::PerceiverGD Object_Components::addPerceiverGD() const
         {
             return Ent::Gen::PerceiverGD(addSubNode("PerceiverGD"));
+        }
+        inline void Object_Components::removePerceiverGD() const
+        {
+            node->mapErase("PerceiverGD");
         }
         inline std::optional<Ent::Gen::DummyComponentGD> Object_Components::DummyComponentGD() const
         {
@@ -16604,6 +17460,10 @@ namespace Ent
         {
             return Ent::Gen::DummyComponentGD(addSubNode("DummyComponentGD"));
         }
+        inline void Object_Components::removeDummyComponentGD() const
+        {
+            node->mapErase("DummyComponentGD");
+        }
         inline std::optional<Ent::Gen::FluidNavMeshTaggerGD> Object_Components::FluidNavMeshTaggerGD() const
         {
             auto sub = getSubNode("FluidNavMeshTaggerGD");
@@ -16612,6 +17472,10 @@ namespace Ent
         inline Ent::Gen::FluidNavMeshTaggerGD Object_Components::addFluidNavMeshTaggerGD() const
         {
             return Ent::Gen::FluidNavMeshTaggerGD(addSubNode("FluidNavMeshTaggerGD"));
+        }
+        inline void Object_Components::removeFluidNavMeshTaggerGD() const
+        {
+            node->mapErase("FluidNavMeshTaggerGD");
         }
         inline std::optional<Ent::Gen::EnergySpoutGD> Object_Components::EnergySpoutGD() const
         {
@@ -16622,6 +17486,10 @@ namespace Ent
         {
             return Ent::Gen::EnergySpoutGD(addSubNode("EnergySpoutGD"));
         }
+        inline void Object_Components::removeEnergySpoutGD() const
+        {
+            node->mapErase("EnergySpoutGD");
+        }
         inline std::optional<Ent::Gen::PickableDistributorComponentGD> Object_Components::PickableDistributorComponentGD() const
         {
             auto sub = getSubNode("PickableDistributorComponentGD");
@@ -16630,6 +17498,10 @@ namespace Ent
         inline Ent::Gen::PickableDistributorComponentGD Object_Components::addPickableDistributorComponentGD() const
         {
             return Ent::Gen::PickableDistributorComponentGD(addSubNode("PickableDistributorComponentGD"));
+        }
+        inline void Object_Components::removePickableDistributorComponentGD() const
+        {
+            node->mapErase("PickableDistributorComponentGD");
         }
         inline std::optional<Ent::Gen::ShamanItemGD> Object_Components::ShamanItemGD() const
         {
@@ -16640,6 +17512,10 @@ namespace Ent
         {
             return Ent::Gen::ShamanItemGD(addSubNode("ShamanItemGD"));
         }
+        inline void Object_Components::removeShamanItemGD() const
+        {
+            node->mapErase("ShamanItemGD");
+        }
         inline std::optional<Ent::Gen::TeamGD> Object_Components::TeamGD() const
         {
             auto sub = getSubNode("TeamGD");
@@ -16648,6 +17524,10 @@ namespace Ent
         inline Ent::Gen::TeamGD Object_Components::addTeamGD() const
         {
             return Ent::Gen::TeamGD(addSubNode("TeamGD"));
+        }
+        inline void Object_Components::removeTeamGD() const
+        {
+            node->mapErase("TeamGD");
         }
         inline std::optional<Ent::Gen::PhysicsMeshProviderGD> Object_Components::PhysicsMeshProviderGD() const
         {
@@ -16658,6 +17538,10 @@ namespace Ent
         {
             return Ent::Gen::PhysicsMeshProviderGD(addSubNode("PhysicsMeshProviderGD"));
         }
+        inline void Object_Components::removePhysicsMeshProviderGD() const
+        {
+            node->mapErase("PhysicsMeshProviderGD");
+        }
         inline std::optional<Ent::Gen::SideMapGateGD> Object_Components::SideMapGateGD() const
         {
             auto sub = getSubNode("SideMapGateGD");
@@ -16666,6 +17550,10 @@ namespace Ent
         inline Ent::Gen::SideMapGateGD Object_Components::addSideMapGateGD() const
         {
             return Ent::Gen::SideMapGateGD(addSubNode("SideMapGateGD"));
+        }
+        inline void Object_Components::removeSideMapGateGD() const
+        {
+            node->mapErase("SideMapGateGD");
         }
         inline std::optional<Ent::Gen::HeightMapComponentGD> Object_Components::HeightMapComponentGD() const
         {
@@ -16676,6 +17564,10 @@ namespace Ent
         {
             return Ent::Gen::HeightMapComponentGD(addSubNode("HeightMapComponentGD"));
         }
+        inline void Object_Components::removeHeightMapComponentGD() const
+        {
+            node->mapErase("HeightMapComponentGD");
+        }
         inline std::optional<Ent::Gen::MountIKControllerGD> Object_Components::MountIKControllerGD() const
         {
             auto sub = getSubNode("MountIKControllerGD");
@@ -16684,6 +17576,10 @@ namespace Ent
         inline Ent::Gen::MountIKControllerGD Object_Components::addMountIKControllerGD() const
         {
             return Ent::Gen::MountIKControllerGD(addSubNode("MountIKControllerGD"));
+        }
+        inline void Object_Components::removeMountIKControllerGD() const
+        {
+            node->mapErase("MountIKControllerGD");
         }
         inline std::optional<Ent::Gen::StaffVertebrasGD> Object_Components::StaffVertebrasGD() const
         {
@@ -16694,6 +17590,10 @@ namespace Ent
         {
             return Ent::Gen::StaffVertebrasGD(addSubNode("StaffVertebrasGD"));
         }
+        inline void Object_Components::removeStaffVertebrasGD() const
+        {
+            node->mapErase("StaffVertebrasGD");
+        }
         inline std::optional<Ent::Gen::SensorControllerGD> Object_Components::SensorControllerGD() const
         {
             auto sub = getSubNode("SensorControllerGD");
@@ -16702,6 +17602,10 @@ namespace Ent
         inline Ent::Gen::SensorControllerGD Object_Components::addSensorControllerGD() const
         {
             return Ent::Gen::SensorControllerGD(addSubNode("SensorControllerGD"));
+        }
+        inline void Object_Components::removeSensorControllerGD() const
+        {
+            node->mapErase("SensorControllerGD");
         }
         inline std::optional<Ent::Gen::BoidsGD> Object_Components::BoidsGD() const
         {
@@ -16712,6 +17616,10 @@ namespace Ent
         {
             return Ent::Gen::BoidsGD(addSubNode("BoidsGD"));
         }
+        inline void Object_Components::removeBoidsGD() const
+        {
+            node->mapErase("BoidsGD");
+        }
         inline std::optional<Ent::Gen::AnimationTreeConstraintsGD> Object_Components::AnimationTreeConstraintsGD() const
         {
             auto sub = getSubNode("AnimationTreeConstraintsGD");
@@ -16720,6 +17628,10 @@ namespace Ent
         inline Ent::Gen::AnimationTreeConstraintsGD Object_Components::addAnimationTreeConstraintsGD() const
         {
             return Ent::Gen::AnimationTreeConstraintsGD(addSubNode("AnimationTreeConstraintsGD"));
+        }
+        inline void Object_Components::removeAnimationTreeConstraintsGD() const
+        {
+            node->mapErase("AnimationTreeConstraintsGD");
         }
         inline std::optional<Ent::Gen::DistanceTriggerGD> Object_Components::DistanceTriggerGD() const
         {
@@ -16730,6 +17642,10 @@ namespace Ent
         {
             return Ent::Gen::DistanceTriggerGD(addSubNode("DistanceTriggerGD"));
         }
+        inline void Object_Components::removeDistanceTriggerGD() const
+        {
+            node->mapErase("DistanceTriggerGD");
+        }
         inline std::optional<Ent::Gen::QuickCreatureSwitchGD> Object_Components::QuickCreatureSwitchGD() const
         {
             auto sub = getSubNode("QuickCreatureSwitchGD");
@@ -16738,6 +17654,10 @@ namespace Ent
         inline Ent::Gen::QuickCreatureSwitchGD Object_Components::addQuickCreatureSwitchGD() const
         {
             return Ent::Gen::QuickCreatureSwitchGD(addSubNode("QuickCreatureSwitchGD"));
+        }
+        inline void Object_Components::removeQuickCreatureSwitchGD() const
+        {
+            node->mapErase("QuickCreatureSwitchGD");
         }
         inline std::optional<Ent::Gen::EnergyProbeGD> Object_Components::EnergyProbeGD() const
         {
@@ -16748,6 +17668,10 @@ namespace Ent
         {
             return Ent::Gen::EnergyProbeGD(addSubNode("EnergyProbeGD"));
         }
+        inline void Object_Components::removeEnergyProbeGD() const
+        {
+            node->mapErase("EnergyProbeGD");
+        }
         inline std::optional<Ent::Gen::RespawnPlaceGD> Object_Components::RespawnPlaceGD() const
         {
             auto sub = getSubNode("RespawnPlaceGD");
@@ -16756,6 +17680,10 @@ namespace Ent
         inline Ent::Gen::RespawnPlaceGD Object_Components::addRespawnPlaceGD() const
         {
             return Ent::Gen::RespawnPlaceGD(addSubNode("RespawnPlaceGD"));
+        }
+        inline void Object_Components::removeRespawnPlaceGD() const
+        {
+            node->mapErase("RespawnPlaceGD");
         }
         inline std::optional<Ent::Gen::SpiritAnimalGD> Object_Components::SpiritAnimalGD() const
         {
@@ -16766,6 +17694,10 @@ namespace Ent
         {
             return Ent::Gen::SpiritAnimalGD(addSubNode("SpiritAnimalGD"));
         }
+        inline void Object_Components::removeSpiritAnimalGD() const
+        {
+            node->mapErase("SpiritAnimalGD");
+        }
         inline std::optional<Ent::Gen::OutfitWearerGD> Object_Components::OutfitWearerGD() const
         {
             auto sub = getSubNode("OutfitWearerGD");
@@ -16774,6 +17706,10 @@ namespace Ent
         inline Ent::Gen::OutfitWearerGD Object_Components::addOutfitWearerGD() const
         {
             return Ent::Gen::OutfitWearerGD(addSubNode("OutfitWearerGD"));
+        }
+        inline void Object_Components::removeOutfitWearerGD() const
+        {
+            node->mapErase("OutfitWearerGD");
         }
         inline std::optional<Ent::Gen::VoxelSimulationGD> Object_Components::VoxelSimulationGD() const
         {
@@ -16784,6 +17720,10 @@ namespace Ent
         {
             return Ent::Gen::VoxelSimulationGD(addSubNode("VoxelSimulationGD"));
         }
+        inline void Object_Components::removeVoxelSimulationGD() const
+        {
+            node->mapErase("VoxelSimulationGD");
+        }
         inline std::optional<Ent::Gen::AnimationModelGD> Object_Components::AnimationModelGD() const
         {
             auto sub = getSubNode("AnimationModelGD");
@@ -16792,6 +17732,10 @@ namespace Ent
         inline Ent::Gen::AnimationModelGD Object_Components::addAnimationModelGD() const
         {
             return Ent::Gen::AnimationModelGD(addSubNode("AnimationModelGD"));
+        }
+        inline void Object_Components::removeAnimationModelGD() const
+        {
+            node->mapErase("AnimationModelGD");
         }
         inline std::optional<Ent::Gen::TriggerEventCameraGD> Object_Components::TriggerEventCameraGD() const
         {
@@ -16802,6 +17746,10 @@ namespace Ent
         {
             return Ent::Gen::TriggerEventCameraGD(addSubNode("TriggerEventCameraGD"));
         }
+        inline void Object_Components::removeTriggerEventCameraGD() const
+        {
+            node->mapErase("TriggerEventCameraGD");
+        }
         inline std::optional<Ent::Gen::AnimationPlaylistGD> Object_Components::AnimationPlaylistGD() const
         {
             auto sub = getSubNode("AnimationPlaylistGD");
@@ -16810,6 +17758,10 @@ namespace Ent
         inline Ent::Gen::AnimationPlaylistGD Object_Components::addAnimationPlaylistGD() const
         {
             return Ent::Gen::AnimationPlaylistGD(addSubNode("AnimationPlaylistGD"));
+        }
+        inline void Object_Components::removeAnimationPlaylistGD() const
+        {
+            node->mapErase("AnimationPlaylistGD");
         }
         inline std::optional<Ent::Gen::MeshNavigationInfosGD> Object_Components::MeshNavigationInfosGD() const
         {
@@ -16820,6 +17772,10 @@ namespace Ent
         {
             return Ent::Gen::MeshNavigationInfosGD(addSubNode("MeshNavigationInfosGD"));
         }
+        inline void Object_Components::removeMeshNavigationInfosGD() const
+        {
+            node->mapErase("MeshNavigationInfosGD");
+        }
         inline std::optional<Ent::Gen::PhysicsTriggerGD> Object_Components::PhysicsTriggerGD() const
         {
             auto sub = getSubNode("PhysicsTriggerGD");
@@ -16828,6 +17784,10 @@ namespace Ent
         inline Ent::Gen::PhysicsTriggerGD Object_Components::addPhysicsTriggerGD() const
         {
             return Ent::Gen::PhysicsTriggerGD(addSubNode("PhysicsTriggerGD"));
+        }
+        inline void Object_Components::removePhysicsTriggerGD() const
+        {
+            node->mapErase("PhysicsTriggerGD");
         }
         inline std::optional<Ent::Gen::EnergyNetworkListenerGD> Object_Components::EnergyNetworkListenerGD() const
         {
@@ -16838,6 +17798,10 @@ namespace Ent
         {
             return Ent::Gen::EnergyNetworkListenerGD(addSubNode("EnergyNetworkListenerGD"));
         }
+        inline void Object_Components::removeEnergyNetworkListenerGD() const
+        {
+            node->mapErase("EnergyNetworkListenerGD");
+        }
         inline std::optional<Ent::Gen::MissionHolderGD> Object_Components::MissionHolderGD() const
         {
             auto sub = getSubNode("MissionHolderGD");
@@ -16847,6 +17811,10 @@ namespace Ent
         {
             return Ent::Gen::MissionHolderGD(addSubNode("MissionHolderGD"));
         }
+        inline void Object_Components::removeMissionHolderGD() const
+        {
+            node->mapErase("MissionHolderGD");
+        }
         inline std::optional<Ent::Gen::RegenSwitcherGD> Object_Components::RegenSwitcherGD() const
         {
             auto sub = getSubNode("RegenSwitcherGD");
@@ -16855,6 +17823,10 @@ namespace Ent
         inline Ent::Gen::RegenSwitcherGD Object_Components::addRegenSwitcherGD() const
         {
             return Ent::Gen::RegenSwitcherGD(addSubNode("RegenSwitcherGD"));
+        }
+        inline void Object_Components::removeRegenSwitcherGD() const
+        {
+            node->mapErase("RegenSwitcherGD");
         }
         // Components
         inline char const* Components::getType() const
@@ -16870,6 +17842,10 @@ namespace Ent
         {
             return Ent::Gen::StaticObjectGD(addSubNode("StaticObjectGD"));
         }
+        inline void Components::removeStaticObjectGD() const
+        {
+            node->mapErase("StaticObjectGD");
+        }
         inline std::optional<Ent::Gen::AnimationControllerGD> Components::AnimationControllerGD() const
         {
             auto sub = getSubNode("AnimationControllerGD");
@@ -16878,6 +17854,10 @@ namespace Ent
         inline Ent::Gen::AnimationControllerGD Components::addAnimationControllerGD() const
         {
             return Ent::Gen::AnimationControllerGD(addSubNode("AnimationControllerGD"));
+        }
+        inline void Components::removeAnimationControllerGD() const
+        {
+            node->mapErase("AnimationControllerGD");
         }
         inline std::optional<Ent::Gen::PhysicsDataGD> Components::PhysicsDataGD() const
         {
@@ -16888,6 +17868,10 @@ namespace Ent
         {
             return Ent::Gen::PhysicsDataGD(addSubNode("PhysicsDataGD"));
         }
+        inline void Components::removePhysicsDataGD() const
+        {
+            node->mapErase("PhysicsDataGD");
+        }
         inline std::optional<Ent::Gen::VisualGD> Components::VisualGD() const
         {
             auto sub = getSubNode("VisualGD");
@@ -16896,6 +17880,10 @@ namespace Ent
         inline Ent::Gen::VisualGD Components::addVisualGD() const
         {
             return Ent::Gen::VisualGD(addSubNode("VisualGD"));
+        }
+        inline void Components::removeVisualGD() const
+        {
+            node->mapErase("VisualGD");
         }
         inline std::optional<Ent::Gen::TransformGD> Components::TransformGD() const
         {
@@ -16906,6 +17894,10 @@ namespace Ent
         {
             return Ent::Gen::TransformGD(addSubNode("TransformGD"));
         }
+        inline void Components::removeTransformGD() const
+        {
+            node->mapErase("TransformGD");
+        }
         inline std::optional<Ent::Gen::TerrainGD> Components::TerrainGD() const
         {
             auto sub = getSubNode("TerrainGD");
@@ -16914,6 +17906,10 @@ namespace Ent
         inline Ent::Gen::TerrainGD Components::addTerrainGD() const
         {
             return Ent::Gen::TerrainGD(addSubNode("TerrainGD"));
+        }
+        inline void Components::removeTerrainGD() const
+        {
+            node->mapErase("TerrainGD");
         }
         inline std::optional<Ent::Gen::PhysicsGD> Components::PhysicsGD() const
         {
@@ -16924,6 +17920,10 @@ namespace Ent
         {
             return Ent::Gen::PhysicsGD(addSubNode("PhysicsGD"));
         }
+        inline void Components::removePhysicsGD() const
+        {
+            node->mapErase("PhysicsGD");
+        }
         inline std::optional<Ent::Gen::CustomThumbnail> Components::CustomThumbnail() const
         {
             auto sub = getSubNode("CustomThumbnail");
@@ -16932,6 +17932,10 @@ namespace Ent
         inline Ent::Gen::CustomThumbnail Components::addCustomThumbnail() const
         {
             return Ent::Gen::CustomThumbnail(addSubNode("CustomThumbnail"));
+        }
+        inline void Components::removeCustomThumbnail() const
+        {
+            node->mapErase("CustomThumbnail");
         }
         inline std::optional<Ent::Gen::HeightObj> Components::HeightObj() const
         {
@@ -16942,6 +17946,10 @@ namespace Ent
         {
             return Ent::Gen::HeightObj(addSubNode("HeightObj"));
         }
+        inline void Components::removeHeightObj() const
+        {
+            node->mapErase("HeightObj");
+        }
         inline std::optional<Ent::Gen::LDPrimitive> Components::LDPrimitive() const
         {
             auto sub = getSubNode("LDPrimitive");
@@ -16950,6 +17958,10 @@ namespace Ent
         inline Ent::Gen::LDPrimitive Components::addLDPrimitive() const
         {
             return Ent::Gen::LDPrimitive(addSubNode("LDPrimitive"));
+        }
+        inline void Components::removeLDPrimitive() const
+        {
+            node->mapErase("LDPrimitive");
         }
         inline std::optional<Ent::Gen::Mesh> Components::Mesh() const
         {
@@ -16960,6 +17972,10 @@ namespace Ent
         {
             return Ent::Gen::Mesh(addSubNode("Mesh"));
         }
+        inline void Components::removeMesh() const
+        {
+            node->mapErase("Mesh");
+        }
         inline std::optional<Ent::Gen::MultiThumbnail> Components::MultiThumbnail() const
         {
             auto sub = getSubNode("MultiThumbnail");
@@ -16968,6 +17984,10 @@ namespace Ent
         inline Ent::Gen::MultiThumbnail Components::addMultiThumbnail() const
         {
             return Ent::Gen::MultiThumbnail(addSubNode("MultiThumbnail"));
+        }
+        inline void Components::removeMultiThumbnail() const
+        {
+            node->mapErase("MultiThumbnail");
         }
         inline std::optional<Ent::Gen::NetworkLink> Components::NetworkLink() const
         {
@@ -16978,6 +17998,10 @@ namespace Ent
         {
             return Ent::Gen::NetworkLink(addSubNode("NetworkLink"));
         }
+        inline void Components::removeNetworkLink() const
+        {
+            node->mapErase("NetworkLink");
+        }
         inline std::optional<Ent::Gen::NetworkNode> Components::NetworkNode() const
         {
             auto sub = getSubNode("NetworkNode");
@@ -16986,6 +18010,10 @@ namespace Ent
         inline Ent::Gen::NetworkNode Components::addNetworkNode() const
         {
             return Ent::Gen::NetworkNode(addSubNode("NetworkNode"));
+        }
+        inline void Components::removeNetworkNode() const
+        {
+            node->mapErase("NetworkNode");
         }
         inline std::optional<Ent::Gen::NotVisibleInSubscene> Components::NotVisibleInSubscene() const
         {
@@ -16996,6 +18024,10 @@ namespace Ent
         {
             return Ent::Gen::NotVisibleInSubscene(addSubNode("NotVisibleInSubscene"));
         }
+        inline void Components::removeNotVisibleInSubscene() const
+        {
+            node->mapErase("NotVisibleInSubscene");
+        }
         inline std::optional<Ent::Gen::SeedPatch> Components::SeedPatch() const
         {
             auto sub = getSubNode("SeedPatch");
@@ -17004,6 +18036,10 @@ namespace Ent
         inline Ent::Gen::SeedPatch Components::addSeedPatch() const
         {
             return Ent::Gen::SeedPatch(addSubNode("SeedPatch"));
+        }
+        inline void Components::removeSeedPatch() const
+        {
+            node->mapErase("SeedPatch");
         }
         inline std::optional<Ent::Gen::StickToTerrain> Components::StickToTerrain() const
         {
@@ -17014,6 +18050,10 @@ namespace Ent
         {
             return Ent::Gen::StickToTerrain(addSubNode("StickToTerrain"));
         }
+        inline void Components::removeStickToTerrain() const
+        {
+            node->mapErase("StickToTerrain");
+        }
         inline std::optional<Ent::Gen::SubScene> Components::SubScene() const
         {
             auto sub = getSubNode("SubScene");
@@ -17022,6 +18062,10 @@ namespace Ent
         inline Ent::Gen::SubScene Components::addSubScene() const
         {
             return Ent::Gen::SubScene(addSubNode("SubScene"));
+        }
+        inline void Components::removeSubScene() const
+        {
+            node->mapErase("SubScene");
         }
         inline std::optional<Ent::Gen::SystemicCreature> Components::SystemicCreature() const
         {
@@ -17032,6 +18076,10 @@ namespace Ent
         {
             return Ent::Gen::SystemicCreature(addSubNode("SystemicCreature"));
         }
+        inline void Components::removeSystemicCreature() const
+        {
+            node->mapErase("SystemicCreature");
+        }
         inline std::optional<Ent::Gen::TerrainSurfaceObject> Components::TerrainSurfaceObject() const
         {
             auto sub = getSubNode("TerrainSurfaceObject");
@@ -17040,6 +18088,10 @@ namespace Ent
         inline Ent::Gen::TerrainSurfaceObject Components::addTerrainSurfaceObject() const
         {
             return Ent::Gen::TerrainSurfaceObject(addSubNode("TerrainSurfaceObject"));
+        }
+        inline void Components::removeTerrainSurfaceObject() const
+        {
+            node->mapErase("TerrainSurfaceObject");
         }
         inline std::optional<Ent::Gen::TestArrays> Components::TestArrays() const
         {
@@ -17050,6 +18102,10 @@ namespace Ent
         {
             return Ent::Gen::TestArrays(addSubNode("TestArrays"));
         }
+        inline void Components::removeTestArrays() const
+        {
+            node->mapErase("TestArrays");
+        }
         inline std::optional<Ent::Gen::TestCreature> Components::TestCreature() const
         {
             auto sub = getSubNode("TestCreature");
@@ -17058,6 +18114,10 @@ namespace Ent
         inline Ent::Gen::TestCreature Components::addTestCreature() const
         {
             return Ent::Gen::TestCreature(addSubNode("TestCreature"));
+        }
+        inline void Components::removeTestCreature() const
+        {
+            node->mapErase("TestCreature");
         }
         inline std::optional<Ent::Gen::TestDefaultValues> Components::TestDefaultValues() const
         {
@@ -17068,6 +18128,10 @@ namespace Ent
         {
             return Ent::Gen::TestDefaultValues(addSubNode("TestDefaultValues"));
         }
+        inline void Components::removeTestDefaultValues() const
+        {
+            node->mapErase("TestDefaultValues");
+        }
         inline std::optional<Ent::Gen::TestEntityRef> Components::TestEntityRef() const
         {
             auto sub = getSubNode("TestEntityRef");
@@ -17076,6 +18140,10 @@ namespace Ent
         inline Ent::Gen::TestEntityRef Components::addTestEntityRef() const
         {
             return Ent::Gen::TestEntityRef(addSubNode("TestEntityRef"));
+        }
+        inline void Components::removeTestEntityRef() const
+        {
+            node->mapErase("TestEntityRef");
         }
         inline std::optional<Ent::Gen::TestSetOfObject> Components::TestSetOfObject() const
         {
@@ -17086,6 +18154,10 @@ namespace Ent
         {
             return Ent::Gen::TestSetOfObject(addSubNode("TestSetOfObject"));
         }
+        inline void Components::removeTestSetOfObject() const
+        {
+            node->mapErase("TestSetOfObject");
+        }
         inline std::optional<Ent::Gen::TestUnion> Components::TestUnion() const
         {
             auto sub = getSubNode("TestUnion");
@@ -17094,6 +18166,10 @@ namespace Ent
         inline Ent::Gen::TestUnion Components::addTestUnion() const
         {
             return Ent::Gen::TestUnion(addSubNode("TestUnion"));
+        }
+        inline void Components::removeTestUnion() const
+        {
+            node->mapErase("TestUnion");
         }
         inline std::optional<Ent::Gen::UnitTestComponent> Components::UnitTestComponent() const
         {
@@ -17104,6 +18180,10 @@ namespace Ent
         {
             return Ent::Gen::UnitTestComponent(addSubNode("UnitTestComponent"));
         }
+        inline void Components::removeUnitTestComponent() const
+        {
+            node->mapErase("UnitTestComponent");
+        }
         inline std::optional<Ent::Gen::WildObject> Components::WildObject() const
         {
             auto sub = getSubNode("WildObject");
@@ -17112,6 +18192,10 @@ namespace Ent
         inline Ent::Gen::WildObject Components::addWildObject() const
         {
             return Ent::Gen::WildObject(addSubNode("WildObject"));
+        }
+        inline void Components::removeWildObject() const
+        {
+            node->mapErase("WildObject");
         }
         inline std::optional<Ent::Gen::EnergyCrookGD> Components::EnergyCrookGD() const
         {
@@ -17122,6 +18206,10 @@ namespace Ent
         {
             return Ent::Gen::EnergyCrookGD(addSubNode("EnergyCrookGD"));
         }
+        inline void Components::removeEnergyCrookGD() const
+        {
+            node->mapErase("EnergyCrookGD");
+        }
         inline std::optional<Ent::Gen::AIContextGD> Components::AIContextGD() const
         {
             auto sub = getSubNode("AIContextGD");
@@ -17130,6 +18218,10 @@ namespace Ent
         inline Ent::Gen::AIContextGD Components::addAIContextGD() const
         {
             return Ent::Gen::AIContextGD(addSubNode("AIContextGD"));
+        }
+        inline void Components::removeAIContextGD() const
+        {
+            node->mapErase("AIContextGD");
         }
         inline std::optional<Ent::Gen::EventTriggerGD> Components::EventTriggerGD() const
         {
@@ -17140,6 +18232,10 @@ namespace Ent
         {
             return Ent::Gen::EventTriggerGD(addSubNode("EventTriggerGD"));
         }
+        inline void Components::removeEventTriggerGD() const
+        {
+            node->mapErase("EventTriggerGD");
+        }
         inline std::optional<Ent::Gen::BeamGeneratorGD> Components::BeamGeneratorGD() const
         {
             auto sub = getSubNode("BeamGeneratorGD");
@@ -17148,6 +18244,10 @@ namespace Ent
         inline Ent::Gen::BeamGeneratorGD Components::addBeamGeneratorGD() const
         {
             return Ent::Gen::BeamGeneratorGD(addSubNode("BeamGeneratorGD"));
+        }
+        inline void Components::removeBeamGeneratorGD() const
+        {
+            node->mapErase("BeamGeneratorGD");
         }
         inline std::optional<Ent::Gen::WorldScalePathFindGD> Components::WorldScalePathFindGD() const
         {
@@ -17158,6 +18258,10 @@ namespace Ent
         {
             return Ent::Gen::WorldScalePathFindGD(addSubNode("WorldScalePathFindGD"));
         }
+        inline void Components::removeWorldScalePathFindGD() const
+        {
+            node->mapErase("WorldScalePathFindGD");
+        }
         inline std::optional<Ent::Gen::NetGD> Components::NetGD() const
         {
             auto sub = getSubNode("NetGD");
@@ -17166,6 +18270,10 @@ namespace Ent
         inline Ent::Gen::NetGD Components::addNetGD() const
         {
             return Ent::Gen::NetGD(addSubNode("NetGD"));
+        }
+        inline void Components::removeNetGD() const
+        {
+            node->mapErase("NetGD");
         }
         inline std::optional<Ent::Gen::BittenGD> Components::BittenGD() const
         {
@@ -17176,6 +18284,10 @@ namespace Ent
         {
             return Ent::Gen::BittenGD(addSubNode("BittenGD"));
         }
+        inline void Components::removeBittenGD() const
+        {
+            node->mapErase("BittenGD");
+        }
         inline std::optional<Ent::Gen::PathBoneAnimGD> Components::PathBoneAnimGD() const
         {
             auto sub = getSubNode("PathBoneAnimGD");
@@ -17184,6 +18296,10 @@ namespace Ent
         inline Ent::Gen::PathBoneAnimGD Components::addPathBoneAnimGD() const
         {
             return Ent::Gen::PathBoneAnimGD(addSubNode("PathBoneAnimGD"));
+        }
+        inline void Components::removePathBoneAnimGD() const
+        {
+            node->mapErase("PathBoneAnimGD");
         }
         inline std::optional<Ent::Gen::AnimationRegenConstraintsGD> Components::AnimationRegenConstraintsGD() const
         {
@@ -17194,6 +18310,10 @@ namespace Ent
         {
             return Ent::Gen::AnimationRegenConstraintsGD(addSubNode("AnimationRegenConstraintsGD"));
         }
+        inline void Components::removeAnimationRegenConstraintsGD() const
+        {
+            node->mapErase("AnimationRegenConstraintsGD");
+        }
         inline std::optional<Ent::Gen::HealPumpGD> Components::HealPumpGD() const
         {
             auto sub = getSubNode("HealPumpGD");
@@ -17202,6 +18322,10 @@ namespace Ent
         inline Ent::Gen::HealPumpGD Components::addHealPumpGD() const
         {
             return Ent::Gen::HealPumpGD(addSubNode("HealPumpGD"));
+        }
+        inline void Components::removeHealPumpGD() const
+        {
+            node->mapErase("HealPumpGD");
         }
         inline std::optional<Ent::Gen::GroundTypeSamplerGD> Components::GroundTypeSamplerGD() const
         {
@@ -17212,6 +18336,10 @@ namespace Ent
         {
             return Ent::Gen::GroundTypeSamplerGD(addSubNode("GroundTypeSamplerGD"));
         }
+        inline void Components::removeGroundTypeSamplerGD() const
+        {
+            node->mapErase("GroundTypeSamplerGD");
+        }
         inline std::optional<Ent::Gen::UnifiedPhysicsDataGD> Components::UnifiedPhysicsDataGD() const
         {
             auto sub = getSubNode("UnifiedPhysicsDataGD");
@@ -17220,6 +18348,10 @@ namespace Ent
         inline Ent::Gen::UnifiedPhysicsDataGD Components::addUnifiedPhysicsDataGD() const
         {
             return Ent::Gen::UnifiedPhysicsDataGD(addSubNode("UnifiedPhysicsDataGD"));
+        }
+        inline void Components::removeUnifiedPhysicsDataGD() const
+        {
+            node->mapErase("UnifiedPhysicsDataGD");
         }
         inline std::optional<Ent::Gen::FluidGD> Components::FluidGD() const
         {
@@ -17230,6 +18362,10 @@ namespace Ent
         {
             return Ent::Gen::FluidGD(addSubNode("FluidGD"));
         }
+        inline void Components::removeFluidGD() const
+        {
+            node->mapErase("FluidGD");
+        }
         inline std::optional<Ent::Gen::ProjectileGD> Components::ProjectileGD() const
         {
             auto sub = getSubNode("ProjectileGD");
@@ -17238,6 +18374,10 @@ namespace Ent
         inline Ent::Gen::ProjectileGD Components::addProjectileGD() const
         {
             return Ent::Gen::ProjectileGD(addSubNode("ProjectileGD"));
+        }
+        inline void Components::removeProjectileGD() const
+        {
+            node->mapErase("ProjectileGD");
         }
         inline std::optional<Ent::Gen::CameraSetterGD> Components::CameraSetterGD() const
         {
@@ -17248,6 +18388,10 @@ namespace Ent
         {
             return Ent::Gen::CameraSetterGD(addSubNode("CameraSetterGD"));
         }
+        inline void Components::removeCameraSetterGD() const
+        {
+            node->mapErase("CameraSetterGD");
+        }
         inline std::optional<Ent::Gen::AssemblyGD> Components::AssemblyGD() const
         {
             auto sub = getSubNode("AssemblyGD");
@@ -17256,6 +18400,10 @@ namespace Ent
         inline Ent::Gen::AssemblyGD Components::addAssemblyGD() const
         {
             return Ent::Gen::AssemblyGD(addSubNode("AssemblyGD"));
+        }
+        inline void Components::removeAssemblyGD() const
+        {
+            node->mapErase("AssemblyGD");
         }
         inline std::optional<Ent::Gen::SmoothScaleComponentGD> Components::SmoothScaleComponentGD() const
         {
@@ -17266,6 +18414,10 @@ namespace Ent
         {
             return Ent::Gen::SmoothScaleComponentGD(addSubNode("SmoothScaleComponentGD"));
         }
+        inline void Components::removeSmoothScaleComponentGD() const
+        {
+            node->mapErase("SmoothScaleComponentGD");
+        }
         inline std::optional<Ent::Gen::FluidViewGD> Components::FluidViewGD() const
         {
             auto sub = getSubNode("FluidViewGD");
@@ -17274,6 +18426,10 @@ namespace Ent
         inline Ent::Gen::FluidViewGD Components::addFluidViewGD() const
         {
             return Ent::Gen::FluidViewGD(addSubNode("FluidViewGD"));
+        }
+        inline void Components::removeFluidViewGD() const
+        {
+            node->mapErase("FluidViewGD");
         }
         inline std::optional<Ent::Gen::RegenMeshGD> Components::RegenMeshGD() const
         {
@@ -17284,6 +18440,10 @@ namespace Ent
         {
             return Ent::Gen::RegenMeshGD(addSubNode("RegenMeshGD"));
         }
+        inline void Components::removeRegenMeshGD() const
+        {
+            node->mapErase("RegenMeshGD");
+        }
         inline std::optional<Ent::Gen::ReviveEnergyGD> Components::ReviveEnergyGD() const
         {
             auto sub = getSubNode("ReviveEnergyGD");
@@ -17292,6 +18452,10 @@ namespace Ent
         inline Ent::Gen::ReviveEnergyGD Components::addReviveEnergyGD() const
         {
             return Ent::Gen::ReviveEnergyGD(addSubNode("ReviveEnergyGD"));
+        }
+        inline void Components::removeReviveEnergyGD() const
+        {
+            node->mapErase("ReviveEnergyGD");
         }
         inline std::optional<Ent::Gen::DebugGridGD> Components::DebugGridGD() const
         {
@@ -17302,6 +18466,10 @@ namespace Ent
         {
             return Ent::Gen::DebugGridGD(addSubNode("DebugGridGD"));
         }
+        inline void Components::removeDebugGridGD() const
+        {
+            node->mapErase("DebugGridGD");
+        }
         inline std::optional<Ent::Gen::ChildEntityPoolComponentGD> Components::ChildEntityPoolComponentGD() const
         {
             auto sub = getSubNode("ChildEntityPoolComponentGD");
@@ -17310,6 +18478,10 @@ namespace Ent
         inline Ent::Gen::ChildEntityPoolComponentGD Components::addChildEntityPoolComponentGD() const
         {
             return Ent::Gen::ChildEntityPoolComponentGD(addSubNode("ChildEntityPoolComponentGD"));
+        }
+        inline void Components::removeChildEntityPoolComponentGD() const
+        {
+            node->mapErase("ChildEntityPoolComponentGD");
         }
         inline std::optional<Ent::Gen::ProtoComponentGD> Components::ProtoComponentGD() const
         {
@@ -17320,6 +18492,10 @@ namespace Ent
         {
             return Ent::Gen::ProtoComponentGD(addSubNode("ProtoComponentGD"));
         }
+        inline void Components::removeProtoComponentGD() const
+        {
+            node->mapErase("ProtoComponentGD");
+        }
         inline std::optional<Ent::Gen::GameEffectSpawnerGD> Components::GameEffectSpawnerGD() const
         {
             auto sub = getSubNode("GameEffectSpawnerGD");
@@ -17328,6 +18504,10 @@ namespace Ent
         inline Ent::Gen::GameEffectSpawnerGD Components::addGameEffectSpawnerGD() const
         {
             return Ent::Gen::GameEffectSpawnerGD(addSubNode("GameEffectSpawnerGD"));
+        }
+        inline void Components::removeGameEffectSpawnerGD() const
+        {
+            node->mapErase("GameEffectSpawnerGD");
         }
         inline std::optional<Ent::Gen::ClothGD> Components::ClothGD() const
         {
@@ -17338,6 +18518,10 @@ namespace Ent
         {
             return Ent::Gen::ClothGD(addSubNode("ClothGD"));
         }
+        inline void Components::removeClothGD() const
+        {
+            node->mapErase("ClothGD");
+        }
         inline std::optional<Ent::Gen::FireSensorGD> Components::FireSensorGD() const
         {
             auto sub = getSubNode("FireSensorGD");
@@ -17346,6 +18530,10 @@ namespace Ent
         inline Ent::Gen::FireSensorGD Components::addFireSensorGD() const
         {
             return Ent::Gen::FireSensorGD(addSubNode("FireSensorGD"));
+        }
+        inline void Components::removeFireSensorGD() const
+        {
+            node->mapErase("FireSensorGD");
         }
         inline std::optional<Ent::Gen::HealerGD> Components::HealerGD() const
         {
@@ -17356,6 +18544,10 @@ namespace Ent
         {
             return Ent::Gen::HealerGD(addSubNode("HealerGD"));
         }
+        inline void Components::removeHealerGD() const
+        {
+            node->mapErase("HealerGD");
+        }
         inline std::optional<Ent::Gen::AnimationLegsConstraintsGD> Components::AnimationLegsConstraintsGD() const
         {
             auto sub = getSubNode("AnimationLegsConstraintsGD");
@@ -17364,6 +18556,10 @@ namespace Ent
         inline Ent::Gen::AnimationLegsConstraintsGD Components::addAnimationLegsConstraintsGD() const
         {
             return Ent::Gen::AnimationLegsConstraintsGD(addSubNode("AnimationLegsConstraintsGD"));
+        }
+        inline void Components::removeAnimationLegsConstraintsGD() const
+        {
+            node->mapErase("AnimationLegsConstraintsGD");
         }
         inline std::optional<Ent::Gen::PathBoneRigidBodyGD> Components::PathBoneRigidBodyGD() const
         {
@@ -17374,6 +18570,10 @@ namespace Ent
         {
             return Ent::Gen::PathBoneRigidBodyGD(addSubNode("PathBoneRigidBodyGD"));
         }
+        inline void Components::removePathBoneRigidBodyGD() const
+        {
+            node->mapErase("PathBoneRigidBodyGD");
+        }
         inline std::optional<Ent::Gen::FightDistanceTriggerGD> Components::FightDistanceTriggerGD() const
         {
             auto sub = getSubNode("FightDistanceTriggerGD");
@@ -17382,6 +18582,10 @@ namespace Ent
         inline Ent::Gen::FightDistanceTriggerGD Components::addFightDistanceTriggerGD() const
         {
             return Ent::Gen::FightDistanceTriggerGD(addSubNode("FightDistanceTriggerGD"));
+        }
+        inline void Components::removeFightDistanceTriggerGD() const
+        {
+            node->mapErase("FightDistanceTriggerGD");
         }
         inline std::optional<Ent::Gen::SoulSpotGD> Components::SoulSpotGD() const
         {
@@ -17392,6 +18596,10 @@ namespace Ent
         {
             return Ent::Gen::SoulSpotGD(addSubNode("SoulSpotGD"));
         }
+        inline void Components::removeSoulSpotGD() const
+        {
+            node->mapErase("SoulSpotGD");
+        }
         inline std::optional<Ent::Gen::HealTriggerGD> Components::HealTriggerGD() const
         {
             auto sub = getSubNode("HealTriggerGD");
@@ -17400,6 +18608,10 @@ namespace Ent
         inline Ent::Gen::HealTriggerGD Components::addHealTriggerGD() const
         {
             return Ent::Gen::HealTriggerGD(addSubNode("HealTriggerGD"));
+        }
+        inline void Components::removeHealTriggerGD() const
+        {
+            node->mapErase("HealTriggerGD");
         }
         inline std::optional<Ent::Gen::AnimationTailConstraintsGD> Components::AnimationTailConstraintsGD() const
         {
@@ -17410,6 +18622,10 @@ namespace Ent
         {
             return Ent::Gen::AnimationTailConstraintsGD(addSubNode("AnimationTailConstraintsGD"));
         }
+        inline void Components::removeAnimationTailConstraintsGD() const
+        {
+            node->mapErase("AnimationTailConstraintsGD");
+        }
         inline std::optional<Ent::Gen::VolumeConstraintGD> Components::VolumeConstraintGD() const
         {
             auto sub = getSubNode("VolumeConstraintGD");
@@ -17418,6 +18634,10 @@ namespace Ent
         inline Ent::Gen::VolumeConstraintGD Components::addVolumeConstraintGD() const
         {
             return Ent::Gen::VolumeConstraintGD(addSubNode("VolumeConstraintGD"));
+        }
+        inline void Components::removeVolumeConstraintGD() const
+        {
+            node->mapErase("VolumeConstraintGD");
         }
         inline std::optional<Ent::Gen::EnvStampGD> Components::EnvStampGD() const
         {
@@ -17428,6 +18648,10 @@ namespace Ent
         {
             return Ent::Gen::EnvStampGD(addSubNode("EnvStampGD"));
         }
+        inline void Components::removeEnvStampGD() const
+        {
+            node->mapErase("EnvStampGD");
+        }
         inline std::optional<Ent::Gen::FluidFXEntitySpawnerGD> Components::FluidFXEntitySpawnerGD() const
         {
             auto sub = getSubNode("FluidFXEntitySpawnerGD");
@@ -17436,6 +18660,10 @@ namespace Ent
         inline Ent::Gen::FluidFXEntitySpawnerGD Components::addFluidFXEntitySpawnerGD() const
         {
             return Ent::Gen::FluidFXEntitySpawnerGD(addSubNode("FluidFXEntitySpawnerGD"));
+        }
+        inline void Components::removeFluidFXEntitySpawnerGD() const
+        {
+            node->mapErase("FluidFXEntitySpawnerGD");
         }
         inline std::optional<Ent::Gen::EnergyDrainGD> Components::EnergyDrainGD() const
         {
@@ -17446,6 +18674,10 @@ namespace Ent
         {
             return Ent::Gen::EnergyDrainGD(addSubNode("EnergyDrainGD"));
         }
+        inline void Components::removeEnergyDrainGD() const
+        {
+            node->mapErase("EnergyDrainGD");
+        }
         inline std::optional<Ent::Gen::AnimationEventsGeneratorGD> Components::AnimationEventsGeneratorGD() const
         {
             auto sub = getSubNode("AnimationEventsGeneratorGD");
@@ -17454,6 +18686,10 @@ namespace Ent
         inline Ent::Gen::AnimationEventsGeneratorGD Components::addAnimationEventsGeneratorGD() const
         {
             return Ent::Gen::AnimationEventsGeneratorGD(addSubNode("AnimationEventsGeneratorGD"));
+        }
+        inline void Components::removeAnimationEventsGeneratorGD() const
+        {
+            node->mapErase("AnimationEventsGeneratorGD");
         }
         inline std::optional<Ent::Gen::MountableGD> Components::MountableGD() const
         {
@@ -17464,6 +18700,10 @@ namespace Ent
         {
             return Ent::Gen::MountableGD(addSubNode("MountableGD"));
         }
+        inline void Components::removeMountableGD() const
+        {
+            node->mapErase("MountableGD");
+        }
         inline std::optional<Ent::Gen::InfoboardRegistererGD> Components::InfoboardRegistererGD() const
         {
             auto sub = getSubNode("InfoboardRegistererGD");
@@ -17472,6 +18712,10 @@ namespace Ent
         inline Ent::Gen::InfoboardRegistererGD Components::addInfoboardRegistererGD() const
         {
             return Ent::Gen::InfoboardRegistererGD(addSubNode("InfoboardRegistererGD"));
+        }
+        inline void Components::removeInfoboardRegistererGD() const
+        {
+            node->mapErase("InfoboardRegistererGD");
         }
         inline std::optional<Ent::Gen::EventHandlerGD> Components::EventHandlerGD() const
         {
@@ -17482,6 +18726,10 @@ namespace Ent
         {
             return Ent::Gen::EventHandlerGD(addSubNode("EventHandlerGD"));
         }
+        inline void Components::removeEventHandlerGD() const
+        {
+            node->mapErase("EventHandlerGD");
+        }
         inline std::optional<Ent::Gen::SoulRespawnOpportunityGD> Components::SoulRespawnOpportunityGD() const
         {
             auto sub = getSubNode("SoulRespawnOpportunityGD");
@@ -17490,6 +18738,10 @@ namespace Ent
         inline Ent::Gen::SoulRespawnOpportunityGD Components::addSoulRespawnOpportunityGD() const
         {
             return Ent::Gen::SoulRespawnOpportunityGD(addSubNode("SoulRespawnOpportunityGD"));
+        }
+        inline void Components::removeSoulRespawnOpportunityGD() const
+        {
+            node->mapErase("SoulRespawnOpportunityGD");
         }
         inline std::optional<Ent::Gen::HealthAreaGD> Components::HealthAreaGD() const
         {
@@ -17500,6 +18752,10 @@ namespace Ent
         {
             return Ent::Gen::HealthAreaGD(addSubNode("HealthAreaGD"));
         }
+        inline void Components::removeHealthAreaGD() const
+        {
+            node->mapErase("HealthAreaGD");
+        }
         inline std::optional<Ent::Gen::SoundAreaGD> Components::SoundAreaGD() const
         {
             auto sub = getSubNode("SoundAreaGD");
@@ -17508,6 +18764,10 @@ namespace Ent
         inline Ent::Gen::SoundAreaGD Components::addSoundAreaGD() const
         {
             return Ent::Gen::SoundAreaGD(addSubNode("SoundAreaGD"));
+        }
+        inline void Components::removeSoundAreaGD() const
+        {
+            node->mapErase("SoundAreaGD");
         }
         inline std::optional<Ent::Gen::PathBoneInfluenceGD> Components::PathBoneInfluenceGD() const
         {
@@ -17518,6 +18778,10 @@ namespace Ent
         {
             return Ent::Gen::PathBoneInfluenceGD(addSubNode("PathBoneInfluenceGD"));
         }
+        inline void Components::removePathBoneInfluenceGD() const
+        {
+            node->mapErase("PathBoneInfluenceGD");
+        }
         inline std::optional<Ent::Gen::ComponentWithProtoCodeGD> Components::ComponentWithProtoCodeGD() const
         {
             auto sub = getSubNode("ComponentWithProtoCodeGD");
@@ -17526,6 +18790,10 @@ namespace Ent
         inline Ent::Gen::ComponentWithProtoCodeGD Components::addComponentWithProtoCodeGD() const
         {
             return Ent::Gen::ComponentWithProtoCodeGD(addSubNode("ComponentWithProtoCodeGD"));
+        }
+        inline void Components::removeComponentWithProtoCodeGD() const
+        {
+            node->mapErase("ComponentWithProtoCodeGD");
         }
         inline std::optional<Ent::Gen::CharacterControllerGD> Components::CharacterControllerGD() const
         {
@@ -17536,6 +18804,10 @@ namespace Ent
         {
             return Ent::Gen::CharacterControllerGD(addSubNode("CharacterControllerGD"));
         }
+        inline void Components::removeCharacterControllerGD() const
+        {
+            node->mapErase("CharacterControllerGD");
+        }
         inline std::optional<Ent::Gen::PickableComponentGD> Components::PickableComponentGD() const
         {
             auto sub = getSubNode("PickableComponentGD");
@@ -17544,6 +18816,10 @@ namespace Ent
         inline Ent::Gen::PickableComponentGD Components::addPickableComponentGD() const
         {
             return Ent::Gen::PickableComponentGD(addSubNode("PickableComponentGD"));
+        }
+        inline void Components::removePickableComponentGD() const
+        {
+            node->mapErase("PickableComponentGD");
         }
         inline std::optional<Ent::Gen::CameraDataGD> Components::CameraDataGD() const
         {
@@ -17554,6 +18830,10 @@ namespace Ent
         {
             return Ent::Gen::CameraDataGD(addSubNode("CameraDataGD"));
         }
+        inline void Components::removeCameraDataGD() const
+        {
+            node->mapErase("CameraDataGD");
+        }
         inline std::optional<Ent::Gen::RegenFXGD> Components::RegenFXGD() const
         {
             auto sub = getSubNode("RegenFXGD");
@@ -17562,6 +18842,10 @@ namespace Ent
         inline Ent::Gen::RegenFXGD Components::addRegenFXGD() const
         {
             return Ent::Gen::RegenFXGD(addSubNode("RegenFXGD"));
+        }
+        inline void Components::removeRegenFXGD() const
+        {
+            node->mapErase("RegenFXGD");
         }
         inline std::optional<Ent::Gen::PhysicsMeshDeformerGD> Components::PhysicsMeshDeformerGD() const
         {
@@ -17572,6 +18856,10 @@ namespace Ent
         {
             return Ent::Gen::PhysicsMeshDeformerGD(addSubNode("PhysicsMeshDeformerGD"));
         }
+        inline void Components::removePhysicsMeshDeformerGD() const
+        {
+            node->mapErase("PhysicsMeshDeformerGD");
+        }
         inline std::optional<Ent::Gen::AnimationHitsConstraintsGD> Components::AnimationHitsConstraintsGD() const
         {
             auto sub = getSubNode("AnimationHitsConstraintsGD");
@@ -17580,6 +18868,10 @@ namespace Ent
         inline Ent::Gen::AnimationHitsConstraintsGD Components::addAnimationHitsConstraintsGD() const
         {
             return Ent::Gen::AnimationHitsConstraintsGD(addSubNode("AnimationHitsConstraintsGD"));
+        }
+        inline void Components::removeAnimationHitsConstraintsGD() const
+        {
+            node->mapErase("AnimationHitsConstraintsGD");
         }
         inline std::optional<Ent::Gen::FluidVolumeComponentGD> Components::FluidVolumeComponentGD() const
         {
@@ -17590,6 +18882,10 @@ namespace Ent
         {
             return Ent::Gen::FluidVolumeComponentGD(addSubNode("FluidVolumeComponentGD"));
         }
+        inline void Components::removeFluidVolumeComponentGD() const
+        {
+            node->mapErase("FluidVolumeComponentGD");
+        }
         inline std::optional<Ent::Gen::RegenerableVegetationGD> Components::RegenerableVegetationGD() const
         {
             auto sub = getSubNode("RegenerableVegetationGD");
@@ -17598,6 +18894,10 @@ namespace Ent
         inline Ent::Gen::RegenerableVegetationGD Components::addRegenerableVegetationGD() const
         {
             return Ent::Gen::RegenerableVegetationGD(addSubNode("RegenerableVegetationGD"));
+        }
+        inline void Components::removeRegenerableVegetationGD() const
+        {
+            node->mapErase("RegenerableVegetationGD");
         }
         inline std::optional<Ent::Gen::ShamanVisionGD> Components::ShamanVisionGD() const
         {
@@ -17608,6 +18908,10 @@ namespace Ent
         {
             return Ent::Gen::ShamanVisionGD(addSubNode("ShamanVisionGD"));
         }
+        inline void Components::removeShamanVisionGD() const
+        {
+            node->mapErase("ShamanVisionGD");
+        }
         inline std::optional<Ent::Gen::CinematicGD> Components::CinematicGD() const
         {
             auto sub = getSubNode("CinematicGD");
@@ -17616,6 +18920,10 @@ namespace Ent
         inline Ent::Gen::CinematicGD Components::addCinematicGD() const
         {
             return Ent::Gen::CinematicGD(addSubNode("CinematicGD"));
+        }
+        inline void Components::removeCinematicGD() const
+        {
+            node->mapErase("CinematicGD");
         }
         inline std::optional<Ent::Gen::ConnectorGD> Components::ConnectorGD() const
         {
@@ -17626,6 +18934,10 @@ namespace Ent
         {
             return Ent::Gen::ConnectorGD(addSubNode("ConnectorGD"));
         }
+        inline void Components::removeConnectorGD() const
+        {
+            node->mapErase("ConnectorGD");
+        }
         inline std::optional<Ent::Gen::BeamTargetGD> Components::BeamTargetGD() const
         {
             auto sub = getSubNode("BeamTargetGD");
@@ -17634,6 +18946,10 @@ namespace Ent
         inline Ent::Gen::BeamTargetGD Components::addBeamTargetGD() const
         {
             return Ent::Gen::BeamTargetGD(addSubNode("BeamTargetGD"));
+        }
+        inline void Components::removeBeamTargetGD() const
+        {
+            node->mapErase("BeamTargetGD");
         }
         inline std::optional<Ent::Gen::ActorGD> Components::ActorGD() const
         {
@@ -17644,6 +18960,10 @@ namespace Ent
         {
             return Ent::Gen::ActorGD(addSubNode("ActorGD"));
         }
+        inline void Components::removeActorGD() const
+        {
+            node->mapErase("ActorGD");
+        }
         inline std::optional<Ent::Gen::CharacterPlatformGD> Components::CharacterPlatformGD() const
         {
             auto sub = getSubNode("CharacterPlatformGD");
@@ -17652,6 +18972,10 @@ namespace Ent
         inline Ent::Gen::CharacterPlatformGD Components::addCharacterPlatformGD() const
         {
             return Ent::Gen::CharacterPlatformGD(addSubNode("CharacterPlatformGD"));
+        }
+        inline void Components::removeCharacterPlatformGD() const
+        {
+            node->mapErase("CharacterPlatformGD");
         }
         inline std::optional<Ent::Gen::ReviveSideSwitcherGD> Components::ReviveSideSwitcherGD() const
         {
@@ -17662,6 +18986,10 @@ namespace Ent
         {
             return Ent::Gen::ReviveSideSwitcherGD(addSubNode("ReviveSideSwitcherGD"));
         }
+        inline void Components::removeReviveSideSwitcherGD() const
+        {
+            node->mapErase("ReviveSideSwitcherGD");
+        }
         inline std::optional<Ent::Gen::EnergyPoolGD> Components::EnergyPoolGD() const
         {
             auto sub = getSubNode("EnergyPoolGD");
@@ -17670,6 +18998,10 @@ namespace Ent
         inline Ent::Gen::EnergyPoolGD Components::addEnergyPoolGD() const
         {
             return Ent::Gen::EnergyPoolGD(addSubNode("EnergyPoolGD"));
+        }
+        inline void Components::removeEnergyPoolGD() const
+        {
+            node->mapErase("EnergyPoolGD");
         }
         inline std::optional<Ent::Gen::PlayerComponentGD> Components::PlayerComponentGD() const
         {
@@ -17680,6 +19012,10 @@ namespace Ent
         {
             return Ent::Gen::PlayerComponentGD(addSubNode("PlayerComponentGD"));
         }
+        inline void Components::removePlayerComponentGD() const
+        {
+            node->mapErase("PlayerComponentGD");
+        }
         inline std::optional<Ent::Gen::HotspotsGD> Components::HotspotsGD() const
         {
             auto sub = getSubNode("HotspotsGD");
@@ -17688,6 +19024,10 @@ namespace Ent
         inline Ent::Gen::HotspotsGD Components::addHotspotsGD() const
         {
             return Ent::Gen::HotspotsGD(addSubNode("HotspotsGD"));
+        }
+        inline void Components::removeHotspotsGD() const
+        {
+            node->mapErase("HotspotsGD");
         }
         inline std::optional<Ent::Gen::PathMotionControllerGD> Components::PathMotionControllerGD() const
         {
@@ -17698,6 +19038,10 @@ namespace Ent
         {
             return Ent::Gen::PathMotionControllerGD(addSubNode("PathMotionControllerGD"));
         }
+        inline void Components::removePathMotionControllerGD() const
+        {
+            node->mapErase("PathMotionControllerGD");
+        }
         inline std::optional<Ent::Gen::CreatureAIGD> Components::CreatureAIGD() const
         {
             auto sub = getSubNode("CreatureAIGD");
@@ -17706,6 +19050,10 @@ namespace Ent
         inline Ent::Gen::CreatureAIGD Components::addCreatureAIGD() const
         {
             return Ent::Gen::CreatureAIGD(addSubNode("CreatureAIGD"));
+        }
+        inline void Components::removeCreatureAIGD() const
+        {
+            node->mapErase("CreatureAIGD");
         }
         inline std::optional<Ent::Gen::CreatureUIGD> Components::CreatureUIGD() const
         {
@@ -17716,6 +19064,10 @@ namespace Ent
         {
             return Ent::Gen::CreatureUIGD(addSubNode("CreatureUIGD"));
         }
+        inline void Components::removeCreatureUIGD() const
+        {
+            node->mapErase("CreatureUIGD");
+        }
         inline std::optional<Ent::Gen::SoundEmitterGD> Components::SoundEmitterGD() const
         {
             auto sub = getSubNode("SoundEmitterGD");
@@ -17724,6 +19076,10 @@ namespace Ent
         inline Ent::Gen::SoundEmitterGD Components::addSoundEmitterGD() const
         {
             return Ent::Gen::SoundEmitterGD(addSubNode("SoundEmitterGD"));
+        }
+        inline void Components::removeSoundEmitterGD() const
+        {
+            node->mapErase("SoundEmitterGD");
         }
         inline std::optional<Ent::Gen::EnergySourceGD> Components::EnergySourceGD() const
         {
@@ -17734,6 +19090,10 @@ namespace Ent
         {
             return Ent::Gen::EnergySourceGD(addSubNode("EnergySourceGD"));
         }
+        inline void Components::removeEnergySourceGD() const
+        {
+            node->mapErase("EnergySourceGD");
+        }
         inline std::optional<Ent::Gen::ClothAnimationGD> Components::ClothAnimationGD() const
         {
             auto sub = getSubNode("ClothAnimationGD");
@@ -17742,6 +19102,23 @@ namespace Ent
         inline Ent::Gen::ClothAnimationGD Components::addClothAnimationGD() const
         {
             return Ent::Gen::ClothAnimationGD(addSubNode("ClothAnimationGD"));
+        }
+        inline void Components::removeClothAnimationGD() const
+        {
+            node->mapErase("ClothAnimationGD");
+        }
+        inline std::optional<Ent::Gen::AnimationTransformDriverGD> Components::AnimationTransformDriverGD() const
+        {
+            auto sub = getSubNode("AnimationTransformDriverGD");
+            return sub == nullptr? std::optional<Ent::Gen::AnimationTransformDriverGD>{}: std::optional<Ent::Gen::AnimationTransformDriverGD>(getSubNode("AnimationTransformDriverGD"));
+        }
+        inline Ent::Gen::AnimationTransformDriverGD Components::addAnimationTransformDriverGD() const
+        {
+            return Ent::Gen::AnimationTransformDriverGD(addSubNode("AnimationTransformDriverGD"));
+        }
+        inline void Components::removeAnimationTransformDriverGD() const
+        {
+            node->mapErase("AnimationTransformDriverGD");
         }
         inline std::optional<Ent::Gen::CreatureGD> Components::CreatureGD() const
         {
@@ -17752,6 +19129,10 @@ namespace Ent
         {
             return Ent::Gen::CreatureGD(addSubNode("CreatureGD"));
         }
+        inline void Components::removeCreatureGD() const
+        {
+            node->mapErase("CreatureGD");
+        }
         inline std::optional<Ent::Gen::HitTriggerGD> Components::HitTriggerGD() const
         {
             auto sub = getSubNode("HitTriggerGD");
@@ -17760,6 +19141,10 @@ namespace Ent
         inline Ent::Gen::HitTriggerGD Components::addHitTriggerGD() const
         {
             return Ent::Gen::HitTriggerGD(addSubNode("HitTriggerGD"));
+        }
+        inline void Components::removeHitTriggerGD() const
+        {
+            node->mapErase("HitTriggerGD");
         }
         inline std::optional<Ent::Gen::ProjectileShooterGD> Components::ProjectileShooterGD() const
         {
@@ -17770,6 +19155,10 @@ namespace Ent
         {
             return Ent::Gen::ProjectileShooterGD(addSubNode("ProjectileShooterGD"));
         }
+        inline void Components::removeProjectileShooterGD() const
+        {
+            node->mapErase("ProjectileShooterGD");
+        }
         inline std::optional<Ent::Gen::LightComponentGD> Components::LightComponentGD() const
         {
             auto sub = getSubNode("LightComponentGD");
@@ -17778,6 +19167,10 @@ namespace Ent
         inline Ent::Gen::LightComponentGD Components::addLightComponentGD() const
         {
             return Ent::Gen::LightComponentGD(addSubNode("LightComponentGD"));
+        }
+        inline void Components::removeLightComponentGD() const
+        {
+            node->mapErase("LightComponentGD");
         }
         inline std::optional<Ent::Gen::MounterGD> Components::MounterGD() const
         {
@@ -17788,6 +19181,10 @@ namespace Ent
         {
             return Ent::Gen::MounterGD(addSubNode("MounterGD"));
         }
+        inline void Components::removeMounterGD() const
+        {
+            node->mapErase("MounterGD");
+        }
         inline std::optional<Ent::Gen::AttackTriggerGD> Components::AttackTriggerGD() const
         {
             auto sub = getSubNode("AttackTriggerGD");
@@ -17796,6 +19193,10 @@ namespace Ent
         inline Ent::Gen::AttackTriggerGD Components::addAttackTriggerGD() const
         {
             return Ent::Gen::AttackTriggerGD(addSubNode("AttackTriggerGD"));
+        }
+        inline void Components::removeAttackTriggerGD() const
+        {
+            node->mapErase("AttackTriggerGD");
         }
         inline std::optional<Ent::Gen::PossessableGPEGD> Components::PossessableGPEGD() const
         {
@@ -17806,6 +19207,10 @@ namespace Ent
         {
             return Ent::Gen::PossessableGPEGD(addSubNode("PossessableGPEGD"));
         }
+        inline void Components::removePossessableGPEGD() const
+        {
+            node->mapErase("PossessableGPEGD");
+        }
         inline std::optional<Ent::Gen::OutfitGD> Components::OutfitGD() const
         {
             auto sub = getSubNode("OutfitGD");
@@ -17814,6 +19219,10 @@ namespace Ent
         inline Ent::Gen::OutfitGD Components::addOutfitGD() const
         {
             return Ent::Gen::OutfitGD(addSubNode("OutfitGD"));
+        }
+        inline void Components::removeOutfitGD() const
+        {
+            node->mapErase("OutfitGD");
         }
         inline std::optional<Ent::Gen::BreakableGD> Components::BreakableGD() const
         {
@@ -17824,6 +19233,10 @@ namespace Ent
         {
             return Ent::Gen::BreakableGD(addSubNode("BreakableGD"));
         }
+        inline void Components::removeBreakableGD() const
+        {
+            node->mapErase("BreakableGD");
+        }
         inline std::optional<Ent::Gen::PathNodeGD> Components::PathNodeGD() const
         {
             auto sub = getSubNode("PathNodeGD");
@@ -17832,6 +19245,10 @@ namespace Ent
         inline Ent::Gen::PathNodeGD Components::addPathNodeGD() const
         {
             return Ent::Gen::PathNodeGD(addSubNode("PathNodeGD"));
+        }
+        inline void Components::removePathNodeGD() const
+        {
+            node->mapErase("PathNodeGD");
         }
         inline std::optional<Ent::Gen::VelocityObstacleGD> Components::VelocityObstacleGD() const
         {
@@ -17842,6 +19259,10 @@ namespace Ent
         {
             return Ent::Gen::VelocityObstacleGD(addSubNode("VelocityObstacleGD"));
         }
+        inline void Components::removeVelocityObstacleGD() const
+        {
+            node->mapErase("VelocityObstacleGD");
+        }
         inline std::optional<Ent::Gen::ShapeshiftStatueGD> Components::ShapeshiftStatueGD() const
         {
             auto sub = getSubNode("ShapeshiftStatueGD");
@@ -17850,6 +19271,10 @@ namespace Ent
         inline Ent::Gen::ShapeshiftStatueGD Components::addShapeshiftStatueGD() const
         {
             return Ent::Gen::ShapeshiftStatueGD(addSubNode("ShapeshiftStatueGD"));
+        }
+        inline void Components::removeShapeshiftStatueGD() const
+        {
+            node->mapErase("ShapeshiftStatueGD");
         }
         inline std::optional<Ent::Gen::RagdollGD> Components::RagdollGD() const
         {
@@ -17860,6 +19285,10 @@ namespace Ent
         {
             return Ent::Gen::RagdollGD(addSubNode("RagdollGD"));
         }
+        inline void Components::removeRagdollGD() const
+        {
+            node->mapErase("RagdollGD");
+        }
         inline std::optional<Ent::Gen::AnimationPhysicsChainConstraintsGD> Components::AnimationPhysicsChainConstraintsGD() const
         {
             auto sub = getSubNode("AnimationPhysicsChainConstraintsGD");
@@ -17868,6 +19297,10 @@ namespace Ent
         inline Ent::Gen::AnimationPhysicsChainConstraintsGD Components::addAnimationPhysicsChainConstraintsGD() const
         {
             return Ent::Gen::AnimationPhysicsChainConstraintsGD(addSubNode("AnimationPhysicsChainConstraintsGD"));
+        }
+        inline void Components::removeAnimationPhysicsChainConstraintsGD() const
+        {
+            node->mapErase("AnimationPhysicsChainConstraintsGD");
         }
         inline std::optional<Ent::Gen::VegetationNavMeshTaggerGD> Components::VegetationNavMeshTaggerGD() const
         {
@@ -17878,6 +19311,10 @@ namespace Ent
         {
             return Ent::Gen::VegetationNavMeshTaggerGD(addSubNode("VegetationNavMeshTaggerGD"));
         }
+        inline void Components::removeVegetationNavMeshTaggerGD() const
+        {
+            node->mapErase("VegetationNavMeshTaggerGD");
+        }
         inline std::optional<Ent::Gen::ScriptComponentGD> Components::ScriptComponentGD() const
         {
             auto sub = getSubNode("ScriptComponentGD");
@@ -17886,6 +19323,10 @@ namespace Ent
         inline Ent::Gen::ScriptComponentGD Components::addScriptComponentGD() const
         {
             return Ent::Gen::ScriptComponentGD(addSubNode("ScriptComponentGD"));
+        }
+        inline void Components::removeScriptComponentGD() const
+        {
+            node->mapErase("ScriptComponentGD");
         }
         inline std::optional<Ent::Gen::FluidToRegenInjectorGD> Components::FluidToRegenInjectorGD() const
         {
@@ -17896,6 +19337,10 @@ namespace Ent
         {
             return Ent::Gen::FluidToRegenInjectorGD(addSubNode("FluidToRegenInjectorGD"));
         }
+        inline void Components::removeFluidToRegenInjectorGD() const
+        {
+            node->mapErase("FluidToRegenInjectorGD");
+        }
         inline std::optional<Ent::Gen::PerceivableGD> Components::PerceivableGD() const
         {
             auto sub = getSubNode("PerceivableGD");
@@ -17904,6 +19349,10 @@ namespace Ent
         inline Ent::Gen::PerceivableGD Components::addPerceivableGD() const
         {
             return Ent::Gen::PerceivableGD(addSubNode("PerceivableGD"));
+        }
+        inline void Components::removePerceivableGD() const
+        {
+            node->mapErase("PerceivableGD");
         }
         inline std::optional<Ent::Gen::InventoryGD> Components::InventoryGD() const
         {
@@ -17914,6 +19363,10 @@ namespace Ent
         {
             return Ent::Gen::InventoryGD(addSubNode("InventoryGD"));
         }
+        inline void Components::removeInventoryGD() const
+        {
+            node->mapErase("InventoryGD");
+        }
         inline std::optional<Ent::Gen::ItemHolderGD> Components::ItemHolderGD() const
         {
             auto sub = getSubNode("ItemHolderGD");
@@ -17922,6 +19375,10 @@ namespace Ent
         inline Ent::Gen::ItemHolderGD Components::addItemHolderGD() const
         {
             return Ent::Gen::ItemHolderGD(addSubNode("ItemHolderGD"));
+        }
+        inline void Components::removeItemHolderGD() const
+        {
+            node->mapErase("ItemHolderGD");
         }
         inline std::optional<Ent::Gen::PathGD> Components::PathGD() const
         {
@@ -17932,6 +19389,10 @@ namespace Ent
         {
             return Ent::Gen::PathGD(addSubNode("PathGD"));
         }
+        inline void Components::removePathGD() const
+        {
+            node->mapErase("PathGD");
+        }
         inline std::optional<Ent::Gen::PerceiverGD> Components::PerceiverGD() const
         {
             auto sub = getSubNode("PerceiverGD");
@@ -17940,6 +19401,10 @@ namespace Ent
         inline Ent::Gen::PerceiverGD Components::addPerceiverGD() const
         {
             return Ent::Gen::PerceiverGD(addSubNode("PerceiverGD"));
+        }
+        inline void Components::removePerceiverGD() const
+        {
+            node->mapErase("PerceiverGD");
         }
         inline std::optional<Ent::Gen::DummyComponentGD> Components::DummyComponentGD() const
         {
@@ -17950,6 +19415,10 @@ namespace Ent
         {
             return Ent::Gen::DummyComponentGD(addSubNode("DummyComponentGD"));
         }
+        inline void Components::removeDummyComponentGD() const
+        {
+            node->mapErase("DummyComponentGD");
+        }
         inline std::optional<Ent::Gen::FluidNavMeshTaggerGD> Components::FluidNavMeshTaggerGD() const
         {
             auto sub = getSubNode("FluidNavMeshTaggerGD");
@@ -17958,6 +19427,10 @@ namespace Ent
         inline Ent::Gen::FluidNavMeshTaggerGD Components::addFluidNavMeshTaggerGD() const
         {
             return Ent::Gen::FluidNavMeshTaggerGD(addSubNode("FluidNavMeshTaggerGD"));
+        }
+        inline void Components::removeFluidNavMeshTaggerGD() const
+        {
+            node->mapErase("FluidNavMeshTaggerGD");
         }
         inline std::optional<Ent::Gen::EnergySpoutGD> Components::EnergySpoutGD() const
         {
@@ -17968,6 +19441,10 @@ namespace Ent
         {
             return Ent::Gen::EnergySpoutGD(addSubNode("EnergySpoutGD"));
         }
+        inline void Components::removeEnergySpoutGD() const
+        {
+            node->mapErase("EnergySpoutGD");
+        }
         inline std::optional<Ent::Gen::PickableDistributorComponentGD> Components::PickableDistributorComponentGD() const
         {
             auto sub = getSubNode("PickableDistributorComponentGD");
@@ -17976,6 +19453,10 @@ namespace Ent
         inline Ent::Gen::PickableDistributorComponentGD Components::addPickableDistributorComponentGD() const
         {
             return Ent::Gen::PickableDistributorComponentGD(addSubNode("PickableDistributorComponentGD"));
+        }
+        inline void Components::removePickableDistributorComponentGD() const
+        {
+            node->mapErase("PickableDistributorComponentGD");
         }
         inline std::optional<Ent::Gen::ShamanItemGD> Components::ShamanItemGD() const
         {
@@ -17986,6 +19467,10 @@ namespace Ent
         {
             return Ent::Gen::ShamanItemGD(addSubNode("ShamanItemGD"));
         }
+        inline void Components::removeShamanItemGD() const
+        {
+            node->mapErase("ShamanItemGD");
+        }
         inline std::optional<Ent::Gen::TeamGD> Components::TeamGD() const
         {
             auto sub = getSubNode("TeamGD");
@@ -17994,6 +19479,10 @@ namespace Ent
         inline Ent::Gen::TeamGD Components::addTeamGD() const
         {
             return Ent::Gen::TeamGD(addSubNode("TeamGD"));
+        }
+        inline void Components::removeTeamGD() const
+        {
+            node->mapErase("TeamGD");
         }
         inline std::optional<Ent::Gen::PhysicsMeshProviderGD> Components::PhysicsMeshProviderGD() const
         {
@@ -18004,6 +19493,10 @@ namespace Ent
         {
             return Ent::Gen::PhysicsMeshProviderGD(addSubNode("PhysicsMeshProviderGD"));
         }
+        inline void Components::removePhysicsMeshProviderGD() const
+        {
+            node->mapErase("PhysicsMeshProviderGD");
+        }
         inline std::optional<Ent::Gen::SideMapGateGD> Components::SideMapGateGD() const
         {
             auto sub = getSubNode("SideMapGateGD");
@@ -18012,6 +19505,10 @@ namespace Ent
         inline Ent::Gen::SideMapGateGD Components::addSideMapGateGD() const
         {
             return Ent::Gen::SideMapGateGD(addSubNode("SideMapGateGD"));
+        }
+        inline void Components::removeSideMapGateGD() const
+        {
+            node->mapErase("SideMapGateGD");
         }
         inline std::optional<Ent::Gen::HeightMapComponentGD> Components::HeightMapComponentGD() const
         {
@@ -18022,6 +19519,10 @@ namespace Ent
         {
             return Ent::Gen::HeightMapComponentGD(addSubNode("HeightMapComponentGD"));
         }
+        inline void Components::removeHeightMapComponentGD() const
+        {
+            node->mapErase("HeightMapComponentGD");
+        }
         inline std::optional<Ent::Gen::MountIKControllerGD> Components::MountIKControllerGD() const
         {
             auto sub = getSubNode("MountIKControllerGD");
@@ -18030,6 +19531,10 @@ namespace Ent
         inline Ent::Gen::MountIKControllerGD Components::addMountIKControllerGD() const
         {
             return Ent::Gen::MountIKControllerGD(addSubNode("MountIKControllerGD"));
+        }
+        inline void Components::removeMountIKControllerGD() const
+        {
+            node->mapErase("MountIKControllerGD");
         }
         inline std::optional<Ent::Gen::StaffVertebrasGD> Components::StaffVertebrasGD() const
         {
@@ -18040,6 +19545,10 @@ namespace Ent
         {
             return Ent::Gen::StaffVertebrasGD(addSubNode("StaffVertebrasGD"));
         }
+        inline void Components::removeStaffVertebrasGD() const
+        {
+            node->mapErase("StaffVertebrasGD");
+        }
         inline std::optional<Ent::Gen::SensorControllerGD> Components::SensorControllerGD() const
         {
             auto sub = getSubNode("SensorControllerGD");
@@ -18048,6 +19557,10 @@ namespace Ent
         inline Ent::Gen::SensorControllerGD Components::addSensorControllerGD() const
         {
             return Ent::Gen::SensorControllerGD(addSubNode("SensorControllerGD"));
+        }
+        inline void Components::removeSensorControllerGD() const
+        {
+            node->mapErase("SensorControllerGD");
         }
         inline std::optional<Ent::Gen::BoidsGD> Components::BoidsGD() const
         {
@@ -18058,6 +19571,10 @@ namespace Ent
         {
             return Ent::Gen::BoidsGD(addSubNode("BoidsGD"));
         }
+        inline void Components::removeBoidsGD() const
+        {
+            node->mapErase("BoidsGD");
+        }
         inline std::optional<Ent::Gen::AnimationTreeConstraintsGD> Components::AnimationTreeConstraintsGD() const
         {
             auto sub = getSubNode("AnimationTreeConstraintsGD");
@@ -18066,6 +19583,10 @@ namespace Ent
         inline Ent::Gen::AnimationTreeConstraintsGD Components::addAnimationTreeConstraintsGD() const
         {
             return Ent::Gen::AnimationTreeConstraintsGD(addSubNode("AnimationTreeConstraintsGD"));
+        }
+        inline void Components::removeAnimationTreeConstraintsGD() const
+        {
+            node->mapErase("AnimationTreeConstraintsGD");
         }
         inline std::optional<Ent::Gen::DistanceTriggerGD> Components::DistanceTriggerGD() const
         {
@@ -18076,6 +19597,10 @@ namespace Ent
         {
             return Ent::Gen::DistanceTriggerGD(addSubNode("DistanceTriggerGD"));
         }
+        inline void Components::removeDistanceTriggerGD() const
+        {
+            node->mapErase("DistanceTriggerGD");
+        }
         inline std::optional<Ent::Gen::QuickCreatureSwitchGD> Components::QuickCreatureSwitchGD() const
         {
             auto sub = getSubNode("QuickCreatureSwitchGD");
@@ -18084,6 +19609,10 @@ namespace Ent
         inline Ent::Gen::QuickCreatureSwitchGD Components::addQuickCreatureSwitchGD() const
         {
             return Ent::Gen::QuickCreatureSwitchGD(addSubNode("QuickCreatureSwitchGD"));
+        }
+        inline void Components::removeQuickCreatureSwitchGD() const
+        {
+            node->mapErase("QuickCreatureSwitchGD");
         }
         inline std::optional<Ent::Gen::EnergyProbeGD> Components::EnergyProbeGD() const
         {
@@ -18094,6 +19623,10 @@ namespace Ent
         {
             return Ent::Gen::EnergyProbeGD(addSubNode("EnergyProbeGD"));
         }
+        inline void Components::removeEnergyProbeGD() const
+        {
+            node->mapErase("EnergyProbeGD");
+        }
         inline std::optional<Ent::Gen::RespawnPlaceGD> Components::RespawnPlaceGD() const
         {
             auto sub = getSubNode("RespawnPlaceGD");
@@ -18102,6 +19635,10 @@ namespace Ent
         inline Ent::Gen::RespawnPlaceGD Components::addRespawnPlaceGD() const
         {
             return Ent::Gen::RespawnPlaceGD(addSubNode("RespawnPlaceGD"));
+        }
+        inline void Components::removeRespawnPlaceGD() const
+        {
+            node->mapErase("RespawnPlaceGD");
         }
         inline std::optional<Ent::Gen::SpiritAnimalGD> Components::SpiritAnimalGD() const
         {
@@ -18112,6 +19649,10 @@ namespace Ent
         {
             return Ent::Gen::SpiritAnimalGD(addSubNode("SpiritAnimalGD"));
         }
+        inline void Components::removeSpiritAnimalGD() const
+        {
+            node->mapErase("SpiritAnimalGD");
+        }
         inline std::optional<Ent::Gen::OutfitWearerGD> Components::OutfitWearerGD() const
         {
             auto sub = getSubNode("OutfitWearerGD");
@@ -18120,6 +19661,10 @@ namespace Ent
         inline Ent::Gen::OutfitWearerGD Components::addOutfitWearerGD() const
         {
             return Ent::Gen::OutfitWearerGD(addSubNode("OutfitWearerGD"));
+        }
+        inline void Components::removeOutfitWearerGD() const
+        {
+            node->mapErase("OutfitWearerGD");
         }
         inline std::optional<Ent::Gen::VoxelSimulationGD> Components::VoxelSimulationGD() const
         {
@@ -18130,6 +19675,10 @@ namespace Ent
         {
             return Ent::Gen::VoxelSimulationGD(addSubNode("VoxelSimulationGD"));
         }
+        inline void Components::removeVoxelSimulationGD() const
+        {
+            node->mapErase("VoxelSimulationGD");
+        }
         inline std::optional<Ent::Gen::AnimationModelGD> Components::AnimationModelGD() const
         {
             auto sub = getSubNode("AnimationModelGD");
@@ -18138,6 +19687,10 @@ namespace Ent
         inline Ent::Gen::AnimationModelGD Components::addAnimationModelGD() const
         {
             return Ent::Gen::AnimationModelGD(addSubNode("AnimationModelGD"));
+        }
+        inline void Components::removeAnimationModelGD() const
+        {
+            node->mapErase("AnimationModelGD");
         }
         inline std::optional<Ent::Gen::TriggerEventCameraGD> Components::TriggerEventCameraGD() const
         {
@@ -18148,6 +19701,10 @@ namespace Ent
         {
             return Ent::Gen::TriggerEventCameraGD(addSubNode("TriggerEventCameraGD"));
         }
+        inline void Components::removeTriggerEventCameraGD() const
+        {
+            node->mapErase("TriggerEventCameraGD");
+        }
         inline std::optional<Ent::Gen::AnimationPlaylistGD> Components::AnimationPlaylistGD() const
         {
             auto sub = getSubNode("AnimationPlaylistGD");
@@ -18156,6 +19713,10 @@ namespace Ent
         inline Ent::Gen::AnimationPlaylistGD Components::addAnimationPlaylistGD() const
         {
             return Ent::Gen::AnimationPlaylistGD(addSubNode("AnimationPlaylistGD"));
+        }
+        inline void Components::removeAnimationPlaylistGD() const
+        {
+            node->mapErase("AnimationPlaylistGD");
         }
         inline std::optional<Ent::Gen::MeshNavigationInfosGD> Components::MeshNavigationInfosGD() const
         {
@@ -18166,6 +19727,10 @@ namespace Ent
         {
             return Ent::Gen::MeshNavigationInfosGD(addSubNode("MeshNavigationInfosGD"));
         }
+        inline void Components::removeMeshNavigationInfosGD() const
+        {
+            node->mapErase("MeshNavigationInfosGD");
+        }
         inline std::optional<Ent::Gen::PhysicsTriggerGD> Components::PhysicsTriggerGD() const
         {
             auto sub = getSubNode("PhysicsTriggerGD");
@@ -18174,6 +19739,10 @@ namespace Ent
         inline Ent::Gen::PhysicsTriggerGD Components::addPhysicsTriggerGD() const
         {
             return Ent::Gen::PhysicsTriggerGD(addSubNode("PhysicsTriggerGD"));
+        }
+        inline void Components::removePhysicsTriggerGD() const
+        {
+            node->mapErase("PhysicsTriggerGD");
         }
         inline std::optional<Ent::Gen::EnergyNetworkListenerGD> Components::EnergyNetworkListenerGD() const
         {
@@ -18184,6 +19753,10 @@ namespace Ent
         {
             return Ent::Gen::EnergyNetworkListenerGD(addSubNode("EnergyNetworkListenerGD"));
         }
+        inline void Components::removeEnergyNetworkListenerGD() const
+        {
+            node->mapErase("EnergyNetworkListenerGD");
+        }
         inline std::optional<Ent::Gen::MissionHolderGD> Components::MissionHolderGD() const
         {
             auto sub = getSubNode("MissionHolderGD");
@@ -18193,6 +19766,10 @@ namespace Ent
         {
             return Ent::Gen::MissionHolderGD(addSubNode("MissionHolderGD"));
         }
+        inline void Components::removeMissionHolderGD() const
+        {
+            node->mapErase("MissionHolderGD");
+        }
         inline std::optional<Ent::Gen::RegenSwitcherGD> Components::RegenSwitcherGD() const
         {
             auto sub = getSubNode("RegenSwitcherGD");
@@ -18201,6 +19778,10 @@ namespace Ent
         inline Ent::Gen::RegenSwitcherGD Components::addRegenSwitcherGD() const
         {
             return Ent::Gen::RegenSwitcherGD(addSubNode("RegenSwitcherGD"));
+        }
+        inline void Components::removeRegenSwitcherGD() const
+        {
+            node->mapErase("RegenSwitcherGD");
         }
         // LightComponentGD
         inline Ent::Gen::Vector3 LightComponentGD::AngleOffset() const
@@ -18442,10 +20023,6 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // CinematicSlot
-        inline Ent::Gen::String CinematicSlot::ActorBone() const
-        {
-            return Ent::Gen::String(node->at("ActorBone"));
-        }
         inline Ent::Gen::String CinematicSlot::Anim() const
         {
             return Ent::Gen::String(node->at("Anim"));
@@ -20170,6 +21747,10 @@ namespace Ent
         {
             return Ent::Gen::ActorStateAlive(addSubNode("ActorStateAlive"));
         }
+        inline void ActorStates::removeActorStateAlive() const
+        {
+            node->mapErase("ActorStateAlive");
+        }
         inline std::optional<Ent::Gen::ActorStateBeingImmersed> ActorStates::ActorStateBeingImmersed() const
         {
             auto sub = getSubNode("ActorStateBeingImmersed");
@@ -20178,6 +21759,10 @@ namespace Ent
         inline Ent::Gen::ActorStateBeingImmersed ActorStates::addActorStateBeingImmersed() const
         {
             return Ent::Gen::ActorStateBeingImmersed(addSubNode("ActorStateBeingImmersed"));
+        }
+        inline void ActorStates::removeActorStateBeingImmersed() const
+        {
+            node->mapErase("ActorStateBeingImmersed");
         }
         inline std::optional<Ent::Gen::ActorStateBeingInAir> ActorStates::ActorStateBeingInAir() const
         {
@@ -20188,6 +21773,10 @@ namespace Ent
         {
             return Ent::Gen::ActorStateBeingInAir(addSubNode("ActorStateBeingInAir"));
         }
+        inline void ActorStates::removeActorStateBeingInAir() const
+        {
+            node->mapErase("ActorStateBeingInAir");
+        }
         inline std::optional<Ent::Gen::ActorStateBeingOnGround> ActorStates::ActorStateBeingOnGround() const
         {
             auto sub = getSubNode("ActorStateBeingOnGround");
@@ -20196,6 +21785,10 @@ namespace Ent
         inline Ent::Gen::ActorStateBeingOnGround ActorStates::addActorStateBeingOnGround() const
         {
             return Ent::Gen::ActorStateBeingOnGround(addSubNode("ActorStateBeingOnGround"));
+        }
+        inline void ActorStates::removeActorStateBeingOnGround() const
+        {
+            node->mapErase("ActorStateBeingOnGround");
         }
         inline std::optional<Ent::Gen::ActorStateBuried> ActorStates::ActorStateBuried() const
         {
@@ -20206,6 +21799,10 @@ namespace Ent
         {
             return Ent::Gen::ActorStateBuried(addSubNode("ActorStateBuried"));
         }
+        inline void ActorStates::removeActorStateBuried() const
+        {
+            node->mapErase("ActorStateBuried");
+        }
         inline std::optional<Ent::Gen::ActorStateDead> ActorStates::ActorStateDead() const
         {
             auto sub = getSubNode("ActorStateDead");
@@ -20214,6 +21811,10 @@ namespace Ent
         inline Ent::Gen::ActorStateDead ActorStates::addActorStateDead() const
         {
             return Ent::Gen::ActorStateDead(addSubNode("ActorStateDead"));
+        }
+        inline void ActorStates::removeActorStateDead() const
+        {
+            node->mapErase("ActorStateDead");
         }
         inline std::optional<Ent::Gen::ActorStateHasNoBody> ActorStates::ActorStateHasNoBody() const
         {
@@ -20224,6 +21825,10 @@ namespace Ent
         {
             return Ent::Gen::ActorStateHasNoBody(addSubNode("ActorStateHasNoBody"));
         }
+        inline void ActorStates::removeActorStateHasNoBody() const
+        {
+            node->mapErase("ActorStateHasNoBody");
+        }
         inline std::optional<Ent::Gen::ActorStateHoldingItem> ActorStates::ActorStateHoldingItem() const
         {
             auto sub = getSubNode("ActorStateHoldingItem");
@@ -20232,6 +21837,10 @@ namespace Ent
         inline Ent::Gen::ActorStateHoldingItem ActorStates::addActorStateHoldingItem() const
         {
             return Ent::Gen::ActorStateHoldingItem(addSubNode("ActorStateHoldingItem"));
+        }
+        inline void ActorStates::removeActorStateHoldingItem() const
+        {
+            node->mapErase("ActorStateHoldingItem");
         }
         inline std::optional<Ent::Gen::ActorStateInvincible> ActorStates::ActorStateInvincible() const
         {
@@ -20242,6 +21851,10 @@ namespace Ent
         {
             return Ent::Gen::ActorStateInvincible(addSubNode("ActorStateInvincible"));
         }
+        inline void ActorStates::removeActorStateInvincible() const
+        {
+            node->mapErase("ActorStateInvincible");
+        }
         inline std::optional<Ent::Gen::ActorStateRegenerationFull> ActorStates::ActorStateRegenerationFull() const
         {
             auto sub = getSubNode("ActorStateRegenerationFull");
@@ -20250,6 +21863,10 @@ namespace Ent
         inline Ent::Gen::ActorStateRegenerationFull ActorStates::addActorStateRegenerationFull() const
         {
             return Ent::Gen::ActorStateRegenerationFull(addSubNode("ActorStateRegenerationFull"));
+        }
+        inline void ActorStates::removeActorStateRegenerationFull() const
+        {
+            node->mapErase("ActorStateRegenerationFull");
         }
         inline std::optional<Ent::Gen::ActorStateRegenerationLow> ActorStates::ActorStateRegenerationLow() const
         {
@@ -20260,6 +21877,10 @@ namespace Ent
         {
             return Ent::Gen::ActorStateRegenerationLow(addSubNode("ActorStateRegenerationLow"));
         }
+        inline void ActorStates::removeActorStateRegenerationLow() const
+        {
+            node->mapErase("ActorStateRegenerationLow");
+        }
         inline std::optional<Ent::Gen::ActorStateTeleport> ActorStates::ActorStateTeleport() const
         {
             auto sub = getSubNode("ActorStateTeleport");
@@ -20268,6 +21889,10 @@ namespace Ent
         inline Ent::Gen::ActorStateTeleport ActorStates::addActorStateTeleport() const
         {
             return Ent::Gen::ActorStateTeleport(addSubNode("ActorStateTeleport"));
+        }
+        inline void ActorStates::removeActorStateTeleport() const
+        {
+            node->mapErase("ActorStateTeleport");
         }
         inline std::optional<Ent::Gen::EntityStateBoidsHomePos> ActorStates::EntityStateBoidsHomePos() const
         {
@@ -20278,6 +21903,10 @@ namespace Ent
         {
             return Ent::Gen::EntityStateBoidsHomePos(addSubNode("EntityStateBoidsHomePos"));
         }
+        inline void ActorStates::removeEntityStateBoidsHomePos() const
+        {
+            node->mapErase("EntityStateBoidsHomePos");
+        }
         inline std::optional<Ent::Gen::EntityStateEnergyRootState> ActorStates::EntityStateEnergyRootState() const
         {
             auto sub = getSubNode("EntityStateEnergyRootState");
@@ -20286,6 +21915,10 @@ namespace Ent
         inline Ent::Gen::EntityStateEnergyRootState ActorStates::addEntityStateEnergyRootState() const
         {
             return Ent::Gen::EntityStateEnergyRootState(addSubNode("EntityStateEnergyRootState"));
+        }
+        inline void ActorStates::removeEntityStateEnergyRootState() const
+        {
+            node->mapErase("EntityStateEnergyRootState");
         }
         inline std::optional<Ent::Gen::EntityStateEnergySpoutState> ActorStates::EntityStateEnergySpoutState() const
         {
@@ -20296,6 +21929,10 @@ namespace Ent
         {
             return Ent::Gen::EntityStateEnergySpoutState(addSubNode("EntityStateEnergySpoutState"));
         }
+        inline void ActorStates::removeEntityStateEnergySpoutState() const
+        {
+            node->mapErase("EntityStateEnergySpoutState");
+        }
         inline std::optional<Ent::Gen::EntityStateForceCanBeTargeted> ActorStates::EntityStateForceCanBeTargeted() const
         {
             auto sub = getSubNode("EntityStateForceCanBeTargeted");
@@ -20304,6 +21941,10 @@ namespace Ent
         inline Ent::Gen::EntityStateForceCanBeTargeted ActorStates::addEntityStateForceCanBeTargeted() const
         {
             return Ent::Gen::EntityStateForceCanBeTargeted(addSubNode("EntityStateForceCanBeTargeted"));
+        }
+        inline void ActorStates::removeEntityStateForceCanBeTargeted() const
+        {
+            node->mapErase("EntityStateForceCanBeTargeted");
         }
         inline std::optional<Ent::Gen::EntityStateMask> ActorStates::EntityStateMask() const
         {
@@ -20314,6 +21955,10 @@ namespace Ent
         {
             return Ent::Gen::EntityStateMask(addSubNode("EntityStateMask"));
         }
+        inline void ActorStates::removeEntityStateMask() const
+        {
+            node->mapErase("EntityStateMask");
+        }
         inline std::optional<Ent::Gen::EntityStatePlayer> ActorStates::EntityStatePlayer() const
         {
             auto sub = getSubNode("EntityStatePlayer");
@@ -20323,6 +21968,10 @@ namespace Ent
         {
             return Ent::Gen::EntityStatePlayer(addSubNode("EntityStatePlayer"));
         }
+        inline void ActorStates::removeEntityStatePlayer() const
+        {
+            node->mapErase("EntityStatePlayer");
+        }
         inline std::optional<Ent::Gen::EntityStateVoxelsVolume> ActorStates::EntityStateVoxelsVolume() const
         {
             auto sub = getSubNode("EntityStateVoxelsVolume");
@@ -20331,6 +21980,10 @@ namespace Ent
         inline Ent::Gen::EntityStateVoxelsVolume ActorStates::addEntityStateVoxelsVolume() const
         {
             return Ent::Gen::EntityStateVoxelsVolume(addSubNode("EntityStateVoxelsVolume"));
+        }
+        inline void ActorStates::removeEntityStateVoxelsVolume() const
+        {
+            node->mapErase("EntityStateVoxelsVolume");
         }
         // Object
         inline Ent::Gen::ActorStates Object::ActorStates() const

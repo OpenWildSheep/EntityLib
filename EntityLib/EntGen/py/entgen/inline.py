@@ -13,7 +13,7 @@ class Bool(Primitive[bool]):
     def __init__(self, node):
         super(Bool, self).__init__(bool, node)
 
-    def set(self, val):  # type: (bool) -&gt; None
+    def set(self, val):  # type: (bool) -> None
         return self._node.set_bool(val)
 
 
@@ -24,7 +24,7 @@ class EntityRef(Primitive[EntityLibPy.EntityRef]):
     def __init__(self, node):
         super(EntityRef, self).__init__(EntityLibPy.EntityRef, node)
 
-    def set(self, val):  # type: (EntityLibPy.EntityRef) -&gt; None
+    def set(self, val):  # type: (EntityLibPy.EntityRef) -> None
         return self._node.set_entityref(val)
 
 
@@ -35,7 +35,7 @@ class Float(Primitive[float]):
     def __init__(self, node):
         super(Float, self).__init__(float, node)
 
-    def set(self, val):  # type: (float) -&gt; None
+    def set(self, val):  # type: (float) -> None
         return self._node.set_float(val)
 
 
@@ -47,7 +47,7 @@ class Int(Primitive[int]):
     def __init__(self, node):
         super(Int, self).__init__(int, node)
 
-    def set(self, val):  # type: (int) -&gt; None
+    def set(self, val):  # type: (int) -> None
         return self._node.set_int(val)
 
 
@@ -58,7 +58,7 @@ class String(Primitive[str]):
     def __init__(self, node):
         super(String, self).__init__(str, node)
 
-    def set(self, val):  # type: (str) -&gt; None
+    def set(self, val):  # type: (str) -> None
         return self._node.set_string(val)
 
     def __str__(self):
@@ -805,6 +805,11 @@ class Terrain_TerrainMeta(HelperObject):
         return Float(self._node.at("RegionWidthMeters"))
     @RegionWidthMeters.setter
     def RegionWidthMeters(self, val): self.RegionWidthMeters.set(val)
+    @property
+    def RimTerrain(self):  # type: ()->Bool
+        return Bool(self._node.at("RimTerrain"))
+    @RimTerrain.setter
+    def RimTerrain(self, val): self.RimTerrain.set(val)
     @property
     def SkirtScale(self):  # type: ()->Float
         return Float(self._node.at("SkirtScale"))
@@ -9066,6 +9071,29 @@ class AssemblyGD(HelperObject):
 
 from EntityLibPy import Node
 
+class AnimationTransformDriverGD(HelperObject):
+    schema_name = "./RuntimeComponents.json#/definitions/AnimationTransformDriverGD"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->AnimationTransformDriverGD
+        return AnimationTransformDriverGD(entlib.load_node_file(sourcefile, entlib.get_schema(AnimationTransformDriverGD.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->AnimationTransformDriverGD
+        return AnimationTransformDriverGD(entlib.make_node(AnimationTransformDriverGD.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class AnimationRegenConstraintsGD(HelperObject):
     schema_name = "./RuntimeComponents.json#/definitions/AnimationRegenConstraintsGD"
     @staticmethod
@@ -9633,11 +9661,6 @@ class CinematicSlot(HelperObject):
         return CinematicSlot(entlib.make_node(CinematicSlot.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
-    @property
-    def ActorBone(self):  # type: ()->String
-        return String(self._node.at("ActorBone"))
-    @ActorBone.setter
-    def ActorBone(self, val): self.ActorBone.set(val)
     @property
     def Anim(self):  # type: ()->String
         return String(self._node.at("Anim"))

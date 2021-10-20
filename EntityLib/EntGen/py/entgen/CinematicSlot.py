@@ -23,11 +23,6 @@ class CinematicSlot(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def ActorBone(self):  # type: ()->String
-        return String(self._node.at("ActorBone"))
-    @ActorBone.setter
-    def ActorBone(self, val): self.ActorBone.set(val)
-    @property
     def Anim(self):  # type: ()->String
         return String(self._node.at("Anim"))
     @Anim.setter

@@ -316,7 +316,7 @@ namespace Ent
             }
             void remove(char const* str) const
             {
-                return node->mapErase(str);
+                node->mapErase(str);
             }
             template <typename T>
             void remove() const
@@ -837,7 +837,7 @@ namespace Ent
             }
 
             /// Create a Node which is an "instance of" this one. With no override.
-            Node makeInstanceOf() const
+            NodeUniquePtr makeInstanceOf() const
             {
                 return node->makeInstanceOf();
             }

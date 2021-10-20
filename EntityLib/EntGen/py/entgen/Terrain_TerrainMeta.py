@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.Bool import *
 from entgen.Float import *
 
 from EntityLibPy import Node
@@ -39,6 +40,11 @@ class Terrain_TerrainMeta(HelperObject):
         return Float(self._node.at("RegionWidthMeters"))
     @RegionWidthMeters.setter
     def RegionWidthMeters(self, val): self.RegionWidthMeters.set(val)
+    @property
+    def RimTerrain(self):  # type: ()->Bool
+        return Bool(self._node.at("RimTerrain"))
+    @RimTerrain.setter
+    def RimTerrain(self, val): self.RimTerrain.set(val)
     @property
     def SkirtScale(self):  # type: ()->Float
         return Float(self._node.at("SkirtScale"))

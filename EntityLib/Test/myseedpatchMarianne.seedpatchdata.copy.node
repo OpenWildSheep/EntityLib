@@ -1,5 +1,5 @@
 {
-    "$schema": "./EditionComponents.json#/definitions/SeedPatchDataList",
+    "$schema": "./MergedComponents.json#/definitions/SeedPatchDataList",
     "Data": [
         {
             "NoiseName": "Clouds3",

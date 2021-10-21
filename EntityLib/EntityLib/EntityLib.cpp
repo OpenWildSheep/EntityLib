@@ -23,10 +23,10 @@ using namespace nlohmann;
 
 namespace Ent
 {
-    char const* actorStatesSchemaName = "./Scene-schema.json#/definitions/ActorStates";
-    char const* colorSchemaName = "./RuntimeComponents.json#/definitions/Color";
-    char const* entitySchemaName = "./Scene-schema.json#/definitions/Entity";
-    char const* sceneSchemaName = "./Scene-schema.json#/definitions/Scene";
+    char const* actorStatesSchemaName = "./MergedComponents.json#/definitions/ActorStates";
+    char const* colorSchemaName = "./MergedComponents.json#/definitions/Color";
+    char const* entitySchemaName = "./MergedComponents.json#/definitions/Entity";
+    char const* sceneSchemaName = "./MergedComponents.json#/definitions/Scene";
     NodeUniquePtr makeDefaultColorField(EntityLib const& _entlib)
     {
         Ent::Subschema const& colorSchema = AT(_entlib.schema.schema.allDefinitions, colorSchemaName);
@@ -80,9 +80,9 @@ namespace Ent
             loader.addInCache("MergedComponents.json", std::move(mergedComps));
         }
 
-        json schemaDocument = loadJsonFile(toolsDir, "WildPipeline/Schema/Scene-schema.json");
+        json schemaDocument = loadJsonFile(toolsDir, "WildPipeline/Schema/MergedComponents.json");
 
-        loader.readSchema(&schema.schema, "Scene-schema.json", schemaDocument, schemaDocument);
+        loader.readSchema(&schema.schema, "MergedComponents.json", schemaDocument, schemaDocument);
         schema.schema.entityLib = this;
 
         auto&& compList =
@@ -97,7 +97,7 @@ namespace Ent
         }
 
         auto&& actorstateList = schema.schema.allDefinitions
-                                    .at("./RuntimeComponents.json#/definitions/"
+                                    .at("./MergedComponents.json#/definitions/"
                                         "ResponsiblePointer<ActorState>")
                                     .oneOf;
 

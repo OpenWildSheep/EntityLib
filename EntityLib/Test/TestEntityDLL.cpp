@@ -175,11 +175,11 @@ try
     using EntityPtr = std::unique_ptr<Ent::Entity>;
 
     // Test $ref links in entlib.schema.schema.allDefinitions
-    char const* colorRef = "./RuntimeComponents.json#/definitions/Color";
+    char const* colorRef = "./MergedComponents.json#/definitions/Color";
     ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(colorRef) == 1);
 
     // Check Ent::Subschema::getUnionTypesMap
-    char const* cinematicGDRef = "./RuntimeComponents.json#/definitions/CinematicGD";
+    char const* cinematicGDRef = "./MergedComponents.json#/definitions/CinematicGD";
     Ent::Subschema const& cinematicGDSchema = entlib.schema.schema.allDefinitions.at(cinematicGDRef);
     Ent::Subschema const& scriptEventUnionSchema =
         cinematicGDSchema.properties.at("ScriptEvents")->singularItems->get();
@@ -203,7 +203,7 @@ try
         auto node = entlib.loadFileAsNode(
             "myseedpatchMarianne.seedpatchdata.node",
             entlib.schema.schema
-                .allDefinitions[R"(./EditionComponents.json#/definitions/SeedPatchDataList)"]);
+                .allDefinitions[R"(./MergedComponents.json#/definitions/SeedPatchDataList)"]);
         node->saveNode("myseedpatchMarianne.seedpatchdata.copy.node");
     }
     auto testPrefabEntity = [](Ent::Entity const* ent) {
@@ -253,7 +253,7 @@ try
         ENTLIB_ASSERT(voxelSimulationGD->root->at("TransmissionBySecond")->isDefault());
         ENTLIB_ASSERT(
             voxelSimulationGD->root->getTypeName()
-            == std::string("./RuntimeComponents.json#/definitions/VoxelSimulationGD"));
+            == std::string("./MergedComponents.json#/definitions/VoxelSimulationGD"));
 
         // TEST read inherited values in inherited component
         Ent::Component const* heightObj = ent->getComponent("HeightObj");
@@ -316,7 +316,7 @@ try
         ENTLIB_ASSERT(
             cineEvent->getTypeName()
             == std::string(
-                R"(./RuntimeComponents.json#/definitions/CineEventTriggerEventHandlerPost)"));
+                R"(./MergedComponents.json#/definitions/CineEventTriggerEventHandlerPost)"));
         auto fieldNames = cineEvent->getFieldNames();
         ENTLIB_ASSERT(fieldNames[1] == std::string("EventName"));
         ENTLIB_ASSERT(fieldNames[2] == std::string("Super"));

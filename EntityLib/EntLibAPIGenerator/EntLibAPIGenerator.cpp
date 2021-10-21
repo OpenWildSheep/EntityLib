@@ -285,7 +285,11 @@ static json getSchemaType(Ent::Subschema const& _schema)
                 }
                 else
                 {
-                    ENTLIB_LOGIC_ERROR("Unexpected singular type in set");
+                    // Don't know how to handle this kind of set, so let's keep it as a simple array
+                    json array;
+                    array["type"] = getSchemaRefType(*_schema.singularItems);
+                    type["array"] = std::move(array);
+                    return type;
                 }
             }
             else if (meta.overridePolicy == "map")
@@ -1037,7 +1041,10 @@ from .String import *
     std::ofstream init2(_destinationPath / "entgen" / "__init__.py");
     for (auto&& file : {"Bool.py", "EntityRef.py", "Float.py", "Int.py", "String.py"})
     {
-        copy_file(_resourcePath / "entgen" / file, _destinationPath / "entgen" / file);
+        copy_file(
+            _resourcePath / "entgen" / file,
+            _destinationPath / "entgen" / file,
+            copy_options::overwrite_existing);
     }
 }
 

@@ -721,7 +721,7 @@ namespace Ent
         {
             {{schema.type_name}}(Ent::Node* _node): HelperObject(_node) {}
             {{#schema.schema_name}}
-            static constexpr char schemaName[] = "{{.}}";
+            static constexpr char schemaName[] = "{{{.}}}";
             static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
@@ -739,7 +739,7 @@ namespace Ent
             using Enum = {{schema.type_name}}Enum;
             using PropHelper<{{schema.type_name}}, Enum>::operator=;
             {{schema.type_name}}(Ent::Node* _node): EnumPropHelper<{{schema.type_name}}, Enum>(_node) {}
-            {{#schema.schema_name}}static constexpr char schemaName[] = "{{.}}";{{/schema.schema_name}}
+            {{#schema.schema_name}}static constexpr char schemaName[] = "{{{.}}}";{{/schema.schema_name}}
             static constexpr char const* enumToString[] = {
                 {{#values}}"{{name}}",
                 {{/values}}
@@ -760,7 +760,7 @@ namespace Ent
         struct {{schema.type_name}} : Base // Union
         {
             {{schema.type_name}}(Ent::Node* _node): Base(_node) {}
-            {{#schema.schema_name}}static constexpr char schemaName[] = "{{.}}";{{/schema.schema_name}}
+            {{#schema.schema_name}}static constexpr char schemaName[] = "{{{.}}}";{{/schema.schema_name}}
             char const* getType() const;{{#types}}
             std::optional<{{#type}}{{>display_type}}{{/type}}> {{name}}() const;
             {{#type}}{{>display_type}}{{/type}} set{{name}}() const;
@@ -772,7 +772,7 @@ namespace Ent
                 : UnionSetBase<{{items.ref.name}}>(_node)
             {
             }
-            {{#schema.schema_name}}static constexpr char schemaName[] = "{{.}}";{{/schema.schema_name}}
+            {{#schema.schema_name}}static constexpr char schemaName[] = "{{{.}}}";{{/schema.schema_name}}
             char const* getType() const;{{#types}}
             std::optional<{{#type}}{{>display_type}}{{/type}}> {{name}}() const;
             {{#type}}{{>display_type}}{{/type}} add{{name}}() const;

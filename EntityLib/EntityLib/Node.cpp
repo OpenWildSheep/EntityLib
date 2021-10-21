@@ -842,7 +842,7 @@ namespace Ent
             throw Ent::BadType("In saveNode, an object is expeted");
         }
         json node = toJson();
-        node["$schema"] = getSchema()->name;
+        node["$schema"] = "./MergedComponents.json#/definitions/" + getSchema()->name;
 
         std::filesystem::path path = getEntityLib()->getAbsolutePath(_path);
         std::stringstream buffer;

@@ -333,7 +333,6 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference_internal);
 
     pySchema
-        .def_readonly("root", &Schema::root, py::return_value_policy::reference_internal)
         .def_readonly("definitions", &Schema::allDefinitions, py::return_value_policy::reference_internal);
 
     // ******************************************** EntityLib *************************************

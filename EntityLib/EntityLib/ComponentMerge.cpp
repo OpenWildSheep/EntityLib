@@ -57,6 +57,28 @@ void updateRefLinks(std::string const& _sourceFile, json& _node)
     }
 };
 
+bool isComponent(json const& mergedCompSch, json const& node)
+{
+    if (node.count("properties") != 0)
+    {
+        if (node.at("properties").count("Super") != 0)
+        {
+            auto ref = node.at("properties").at("Super").at("$ref").get<std::string>();
+            auto lastSlash = ref.find_last_of('/');
+            auto name = ref.substr(lastSlash + 1);
+            if (name == "ComponentGD")
+            {
+                return true;
+            }
+            else
+            {
+                return isComponent(mergedCompSch, mergedCompSch.at("definitions").at(name));
+            }
+        }
+    }
+    return false;
+}
+
 json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
 {
     json const runtimeCmps = loadJsonFile(_toolsDir, "WildPipeline/Schema/RuntimeComponents.json");
@@ -76,21 +98,6 @@ json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
 
     auto&& compList = mergedCompSch["definitions"]["Component"]["oneOf"];
     compList = json();
-    std::set<std::string> componentNames = {"ComponentGD"};
-
-    auto isComponent = [&componentNames](json const& node) {
-        if (node.count("properties") != 0)
-        {
-            if (node.at("properties").count("Super") != 0)
-            {
-                auto ref = node.at("properties").at("Super").at("$ref").get<std::string>();
-                auto lastSlash = ref.find_last_of('/');
-                auto name = ref.substr(lastSlash + 1);
-                return componentNames.count(name) != 0;
-            }
-        }
-        return false;
-    };
 
     // Looking for components with same name and merge them
     std::map<std::string, json const*> editionCompMap;
@@ -146,26 +153,21 @@ json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
         mergedCompSch["definitions"][name] = std::move(mergedDefinition);
     }
 
-    for (bool newComp = true; newComp; newComp = false)
+    for (auto&& [name, defs] : definitionsMap)
     {
-        for (auto&& [name, defs] : definitionsMap)
+        json& mergedDefinition = mergedCompSch["definitions"][name];
+
+        if (isComponent(mergedCompSch, mergedDefinition))
         {
-            json& mergedDefinition = mergedCompSch["definitions"][name];
+            // Make the component wrapper (containing "Type" and "Data" field)
+            json wrapper;
+            auto&& prop = wrapper["properties"];
+            prop["Type"]["const"] = name;
+            prop["Data"]["$ref"] = "#/definitions/" + name;
+            wrapper["meta"] = mergedDefinition["meta"];
 
-            if (isComponent(mergedDefinition))
-            {
-                // Make the component wrapper (containing "Type" and "Data" field)
-                json wrapper;
-                auto&& prop = wrapper["properties"];
-                prop["Type"]["const"] = name;
-                prop["Data"]["$ref"] = "#/definitions/" + name;
-                wrapper["meta"] = mergedDefinition["meta"];
-
-                // Add the component wrapper in the oneOf of Component (definitions/Component/oneOf)
-                compList.push_back(std::move(wrapper));
-                componentNames.emplace(name);
-                newComp = true;
-            }
+            // Add the component wrapper in the oneOf of Component (definitions/Component/oneOf)
+            compList.push_back(std::move(wrapper));
         }
     }
 

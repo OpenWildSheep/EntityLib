@@ -345,7 +345,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
      * NOTE: it wasn't strictly to pre-declare ALL classes to fix the issues we currently had,
      * but it just seemed safer in case we add new methods with new dependencies.
      */
-    auto pyNode = py::class_<Node>(ent, "Node");
+    auto pyNode = py::class_<Node, NodeUniquePtr>(ent, "Node");
     auto pyComponent = py::class_<Component>(ent, "Component");
     auto pySubSceneComponent = py::class_<SubSceneComponent>(ent, "SubSceneComponent");
     // Make python internally use shared_ptr for Entity and Scene

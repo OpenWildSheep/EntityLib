@@ -19,6 +19,8 @@ namespace Ent
     /// @throw JsonValidation when the Entity in invalid
     void validateEntity(
         Schema const& _schema, std::filesystem::path const& _toolsDir, nlohmann::json const& _entity);
+
+    nlohmann::json createValidationSchema(Ent::Schema const& schema);
 } // namespace Ent
 
 /// \endcond

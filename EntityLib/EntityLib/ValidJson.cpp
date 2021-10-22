@@ -180,6 +180,17 @@ static json convertToInstanceSchema(Ent::Schema const& schema, Ent::Subschema co
     return instSchema;
 }
 
+json Ent::createValidationSchema(Ent::Schema const& schema)
+{
+    json instSchema;
+    for (auto&& name_def : schema.allDefinitions)
+    {
+        auto const link = convertLink(name_def.first);
+        instSchema["definitions"][link] = convertToInstanceSchema(name_def.second);
+    }
+    return instSchema;
+}
+
 static json const* fetchDocument(const std::string& uri)
 {
     std::unique_ptr<json> fetchedRoot = std::make_unique<json>();

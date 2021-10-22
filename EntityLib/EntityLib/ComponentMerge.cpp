@@ -1,6 +1,7 @@
 #include "include/ComponentMerge.h"
 #include "include/EntityLibCore.h"
 #include "include/EntityLib.h"
+#include "ValidJson.h"
 
 #include <set>
 #include <fstream>
@@ -176,6 +177,44 @@ void Ent::updateComponents(std::filesystem::path const& _toolsDir)
         {
             throw FileSystemError(
                 "Trying to open file for write", _toolsDir, mergedComponentsSchemaLocation);
+        }
+        file << buffer.str();
+    }
+    auto allSingleSchemaPath = std::filesystem::path("WildPipeline/Schema/all");
+    std::filesystem::create_directories(_toolsDir / allSingleSchemaPath);
+    for (auto&& [name, defs] : sceneSch["definitions"].items())
+    {
+        auto escapedName = name;
+        std::replace(begin(escapedName), end(escapedName), ':', '_');
+        std::replace(begin(escapedName), end(escapedName), '>', '_');
+        std::replace(begin(escapedName), end(escapedName), '<', '_');
+        if (escapedName.size() < 256)
+        {
+            json singleSchema;
+            singleSchema["$ref"] = "../TextEditorsSchema.json#/definitions/" + escapedName;
+            escapedName += ".json";
+            auto singleSchemaPath = allSingleSchemaPath / escapedName;
+            std::stringstream buffer;
+            buffer << singleSchema.dump(4);
+            std::ofstream file(_toolsDir / singleSchemaPath);
+            if (not file.is_open())
+            {
+                throw FileSystemError("Trying to open file for write", _toolsDir, singleSchemaPath);
+            }
+            file << buffer.str();
+        }
+    }
+    Ent::EntityLib entlib(_toolsDir.parent_path());
+    json fullWildSchema = createValidationSchema(entlib.schema.schema);
+    {
+        char const* fullWildSchemaLocation = "WildPipeline/Schema/TextEditorsSchema.json";
+        std::stringstream buffer;
+        buffer << fullWildSchema.dump(4);
+
+        std::ofstream file(_toolsDir / fullWildSchemaLocation);
+        if (not file.is_open())
+        {
+            throw FileSystemError("Trying to open file for write", _toolsDir, fullWildSchemaLocation);
         }
         file << buffer.str();
     }

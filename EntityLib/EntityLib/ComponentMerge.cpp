@@ -123,9 +123,18 @@ json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
         defs.defintions.pop_back();
         for (auto* def : defs.defintions)
         {
+            printf("Merged type : %s\n", name.c_str());
             if (def->count("properties") != 0)
             {
-                mergedDefinition["properties"].update(def->at("properties"));
+                for (auto&& [pname, prop] : def->at("properties").items())
+                {
+                    if (mergedDefinition["properties"].count(pname))
+                        printf(
+                            "WARNING : The property %s/%s already exist!\n",
+                            name.c_str(),
+                            pname.c_str());
+                    mergedDefinition["properties"][pname] = prop;
+                }
             }
         }
         // Merge the meta data

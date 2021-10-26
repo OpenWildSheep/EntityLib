@@ -27,6 +27,7 @@ namespace Ent
         nlohmann::json const& _entity,
         char const* _rootName);
 
+    /// Create a validation schema for a given type
     nlohmann::json createValidationSchema(Ent::Schema const& schema);
 } // namespace Ent
 

@@ -180,6 +180,8 @@ void Ent::updateComponents(std::filesystem::path const& _toolsDir)
         }
         file << buffer.str();
     }
+    // Export all type schemas in the "all" subdirectory
+    // Actually each file only reference the "TextEditorsSchema.json" file.
     auto allSingleSchemaPath = std::filesystem::path("WildPipeline/Schema/all");
     std::filesystem::create_directories(_toolsDir / allSingleSchemaPath);
     for (auto&& [name, defs] : sceneSch["definitions"].items())
@@ -188,7 +190,7 @@ void Ent::updateComponents(std::filesystem::path const& _toolsDir)
         std::replace(begin(escapedName), end(escapedName), ':', '_');
         std::replace(begin(escapedName), end(escapedName), '>', '_');
         std::replace(begin(escapedName), end(escapedName), '<', '_');
-        if (escapedName.size() < 256)
+        if (escapedName.size() < 256) // Can't write filename longer than 255 characters
         {
             json singleSchema;
             singleSchema["$ref"] = "../TextEditorsSchema.json#/definitions/" + escapedName;
@@ -204,6 +206,7 @@ void Ent::updateComponents(std::filesystem::path const& _toolsDir)
             file << buffer.str();
         }
     }
+    // Write the "TextEditorsSchema.json" file. Containing all schema for all types.
     Ent::EntityLib entlib(_toolsDir.parent_path());
     json fullWildSchema = createValidationSchema(entlib.schema.schema);
     {

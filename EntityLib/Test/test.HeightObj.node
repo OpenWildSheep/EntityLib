@@ -1,5 +1,4 @@
 {
-    "$schema": "./MergedComponents.json#/definitions/HeightObj",
     "DisplaceNoiseList": [
         {
             "DisplaceDistance": 0.0,
@@ -13,5 +12,6 @@
             "MotifSizeY": 0.0
         }
     ],
-    "Subdivision": 0
+    "Subdivision": 0,
+    "schema_name": "HeightObj"
 }

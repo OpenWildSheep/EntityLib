@@ -594,9 +594,12 @@ void Ent::SchemaLoader::readSchema(
             ENTLIB_DEBUG_PRINTF("%sopenSubschema\n", getTab());
             CHECK_WHOLE_STACK;
             ENTLIB_ASSERT(std::holds_alternative<Null>(stack.back()->subSchemaOrRef));
-            Subschema subschema{};
-            subschema.rootSchema = globalSchema;
-            stack.back()->subSchemaOrRef = std::move(subschema);
+            if (std::holds_alternative<Null>(stack.back()->subSchemaOrRef))
+            {
+                Subschema subschema{};
+                subschema.rootSchema = globalSchema;
+                stack.back()->subSchemaOrRef = std::move(subschema);
+            }
             ENTLIB_DEBUG_PRINTF("%sopenSubschema2\n", getTab());
             CHECK_WHOLE_STACK;
         }

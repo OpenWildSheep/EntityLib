@@ -1,10 +1,10 @@
 {
-    "$schema": "./MergedComponents.json#/definitions/SeedPatchDataList",
     "Data": [
         {
             "NoiseName": "Clouds3",
             "SeedName": "HighlandBroom"
         }
     ],
-    "InstanceOf": ""
+    "InstanceOf": "",
+    "schema_name": "SeedPatchDataList"
 }

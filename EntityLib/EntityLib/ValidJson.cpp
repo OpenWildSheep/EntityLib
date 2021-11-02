@@ -52,11 +52,10 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
 
 static std::string convertLink(std::string link)
 {
-    std::replace(begin(link), end(link), '#', '_');
-    std::replace(begin(link), end(link), '/', '_');
-    std::replace(begin(link), end(link), ':', '_');
-    std::replace(begin(link), end(link), '.', '_');
-    std::replace(begin(link), end(link), '-', '_');
+    if (auto slash = link.find_last_of('/'); slash != std::string::npos)
+    {
+        link = link.substr(slash + 1);
+    }
     return link;
 }
 
@@ -79,7 +78,8 @@ convertToInstanceSchema(Ent::SubschemaRef const& tmplSchemaRef, char const* oneO
 static json convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const* oneOfDataField)
 {
     json instSchema;
-    instSchema["default"] = tmplSchema.defaultValue;
+    if (not tmplSchema.defaultValue.is_null())
+        instSchema["default"] = tmplSchema.defaultValue;
     if (tmplSchema.constValue.has_value())
     {
         instSchema["const"] = *tmplSchema.constValue;
@@ -104,25 +104,30 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const
         "null", "string", "number", "integer", "object", "array", "boolean", "string", "object"};
     instSchema["type"] = typeToStr[size_t(tmplSchema.type)];
     std::vector<char const*> requiredList;
-    for (auto&& name_prop : tmplSchema.properties)
+    for (auto&& [name, prop] : tmplSchema.properties)
     {
-        if (oneOfDataField != nullptr and oneOfDataField == name_prop.first)
+        if (oneOfDataField != nullptr and oneOfDataField == name)
         {
             // Allow Data field in OneOf to be "null"
             json oneOf;
-            oneOf.push_back(convertToInstanceSchema(name_prop.second));
+            oneOf.push_back(convertToInstanceSchema(prop));
             oneOf.push_back(nullType);
             json items;
             items.emplace("oneOf", oneOf);
-            instSchema["properties"][name_prop.first] = items;
+            instSchema["properties"][name] = items;
         }
         else
         {
-            instSchema["properties"][name_prop.first] = convertToInstanceSchema(name_prop.second);
+            instSchema["properties"][name] = convertToInstanceSchema(prop);
+            // Add property default values in the right place
+            if (prop.getRefDefaultValues() != nullptr and not prop.getRefDefaultValues()->is_null())
+            {
+                instSchema["default"][name] = *prop.getRefDefaultValues();
+            }
         }
-        if (name_prop.second->required)
+        if (prop->required)
         {
-            requiredList.push_back(name_prop.first.c_str());
+            requiredList.push_back(name.c_str());
         }
     }
     if (tmplSchema.singularItems != nullptr)
@@ -165,6 +170,11 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const
     if (not empty(requiredList))
     {
         instSchema["required"] = requiredList;
+    }
+    if (instSchema.count("properties"))
+    {
+        instSchema["properties"]["schema_name"]["type"] = "string";
+        instSchema["properties"]["InstanceOf"]["type"] = "string";
     }
     return instSchema;
 }

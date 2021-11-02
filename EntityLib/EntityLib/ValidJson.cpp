@@ -262,7 +262,7 @@ void Ent::validateEntity(
     json schemaDocument = loadJsonFile(_toolsDir, entitySchemaPath);
 
     json fullSceneInstanceSchema = convertToInstanceSchema(
-        _schema, AT(_schema.allDefinitions, "./Scene-schema.json#/definitions/Object"));
+        _schema, AT(_schema.allDefinitions, "./MergedComponents.json#/definitions/Entity"));
 
     // Parse the json schema into an internal schema format
     valijson::Schema vjSchema;

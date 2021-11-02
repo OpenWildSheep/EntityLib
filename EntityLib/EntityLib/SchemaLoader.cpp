@@ -576,12 +576,13 @@ void Ent::SchemaLoader::readSchema(
             char const* typeName = getRefTypeName(link);
             // Force to create the definition (do nothing if already exist)
             ENTLIB_ASSERT_MSG(typeName != nullptr, "Can't get type name in '%s'!!", link);
-            auto& subschema = globalSchema->allDefinitions[link];
-            subschema.name = link;
+            auto& subschema = globalSchema->allDefinitions[typeName];
+            ENTLIB_ASSERT(strlen(typeName) != 0);
+            subschema.name = typeName;
             subschema.rootSchema = globalSchema;
             auto& ref = stack.back()->subSchemaOrRef;
             ENTLIB_ASSERT(std::holds_alternative<Null>(ref));
-            ref = SubschemaRef::Ref{globalSchema, link};
+            ref = SubschemaRef::Ref{globalSchema, typeName};
         }
         void closeRef() override
         {
@@ -683,8 +684,8 @@ void Ent::SchemaLoader::readSchema(
         parseSchemaNoRef(_filename, _fileRoot, def, vis, 0);
         vis.closeSubschema();
 
-        auto& subschema = globalSchema->allDefinitions[absRef];
-        subschema.name = absRef;
+        auto& subschema = globalSchema->allDefinitions[name];
+        subschema.name = name;
         subschema.rootSchema = globalSchema;
         subschema = std::move(vis.stack.back()->get());
 

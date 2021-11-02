@@ -23,10 +23,10 @@ using namespace nlohmann;
 
 namespace Ent
 {
-    char const* actorStatesSchemaName = "./MergedComponents.json#/definitions/ActorStates";
-    char const* colorSchemaName = "./MergedComponents.json#/definitions/Color";
-    char const* entitySchemaName = "./MergedComponents.json#/definitions/Entity";
-    char const* sceneSchemaName = "./MergedComponents.json#/definitions/Scene";
+    char const* actorStatesSchemaName = "ActorStates";
+    char const* colorSchemaName = "Color";
+    char const* entitySchemaName = "Entity";
+    char const* sceneSchemaName = "Scene";
     NodeUniquePtr makeDefaultColorField(EntityLib const& _entlib)
     {
         Ent::Subschema const& colorSchema = AT(_entlib.schema.schema.allDefinitions, colorSchemaName);
@@ -85,8 +85,7 @@ namespace Ent
         loader.readSchema(&schema.schema, "MergedComponents.json", schemaDocument, schemaDocument);
         schema.schema.entityLib = this;
 
-        auto&& compList =
-            schema.schema.allDefinitions.at("./MergedComponents.json#/definitions/Component").oneOf;
+        auto&& compList = schema.schema.allDefinitions.at("Component").oneOf;
 
         for (SubschemaRef& comp : *compList)
         {
@@ -96,10 +95,8 @@ namespace Ent
             schema.components.emplace(compName, &compSchema);
         }
 
-        auto&& actorstateList = schema.schema.allDefinitions
-                                    .at("./MergedComponents.json#/definitions/"
-                                        "ResponsiblePointer<ActorState>")
-                                    .oneOf;
+        auto&& actorstateList =
+            schema.schema.allDefinitions.at("ResponsiblePointer<ActorState>").oneOf;
 
         for (SubschemaRef& actorstate : *actorstateList)
         {

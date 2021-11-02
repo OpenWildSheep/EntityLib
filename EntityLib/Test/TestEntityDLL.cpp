@@ -175,11 +175,11 @@ try
     using EntityPtr = std::unique_ptr<Ent::Entity>;
 
     // Test $ref links in entlib.schema.schema.allDefinitions
-    char const* colorRef = "./MergedComponents.json#/definitions/Color";
+    char const* colorRef = "Color";
     ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(colorRef) == 1);
 
     // Check Ent::Subschema::getUnionTypesMap
-    char const* cinematicGDRef = "./MergedComponents.json#/definitions/CinematicGD";
+    char const* cinematicGDRef = "CinematicGD";
     Ent::Subschema const& cinematicGDSchema = entlib.schema.schema.allDefinitions.at(cinematicGDRef);
     Ent::Subschema const& scriptEventUnionSchema =
         cinematicGDSchema.properties.at("ScriptEvents")->singularItems->get();
@@ -193,7 +193,8 @@ try
     for (auto&& name_schema : entlib.schema.components)
     {
         auto&& absRef = std::get<1>(name_schema)->name;
-        ENTLIB_ASSERT(absRef.find("./") == 0);
+        ENTLIB_ASSERT(absRef.find("./") == std::string::npos);
+        ENTLIB_ASSERT(absRef.find("#") == std::string::npos);
         ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(absRef) == 1);
     }
 
@@ -202,8 +203,7 @@ try
     {
         auto node = entlib.loadFileAsNode(
             "myseedpatchMarianne.seedpatchdata.node",
-            entlib.schema.schema
-                .allDefinitions[R"(./MergedComponents.json#/definitions/SeedPatchDataList)"]);
+            entlib.schema.schema.allDefinitions["SeedPatchDataList"]);
         node->saveNode("myseedpatchMarianne.seedpatchdata.copy.node");
     }
     auto testPrefabEntity = [](Ent::Entity const* ent) {
@@ -251,9 +251,7 @@ try
         ENTLIB_ASSERT(
             voxelSimulationGD->root->at("TransmissionBySecond")->getFloat() == 3.402823466385289e+38);
         ENTLIB_ASSERT(voxelSimulationGD->root->at("TransmissionBySecond")->isDefault());
-        ENTLIB_ASSERT(
-            voxelSimulationGD->root->getTypeName()
-            == std::string("./MergedComponents.json#/definitions/VoxelSimulationGD"));
+        ENTLIB_ASSERT(voxelSimulationGD->root->getTypeName() == std::string("VoxelSimulationGD"));
 
         // TEST read inherited values in inherited component
         Ent::Component const* heightObj = ent->getComponent("HeightObj");
@@ -313,10 +311,7 @@ try
         ENTLIB_ASSERT(oneOfScripts->getDataType() == Ent::DataType::oneOf);
         Ent::Node const* cineEvent = oneOfScripts->getUnionData();
         ENTLIB_ASSERT(cineEvent != nullptr);
-        ENTLIB_ASSERT(
-            cineEvent->getTypeName()
-            == std::string(
-                R"(./MergedComponents.json#/definitions/CineEventTriggerEventHandlerPost)"));
+        ENTLIB_ASSERT(cineEvent->getTypeName() == std::string("CineEventTriggerEventHandlerPost"));
         auto fieldNames = cineEvent->getFieldNames();
         ENTLIB_ASSERT(fieldNames[1] == std::string("EventName"));
         ENTLIB_ASSERT(fieldNames[2] == std::string("Super"));

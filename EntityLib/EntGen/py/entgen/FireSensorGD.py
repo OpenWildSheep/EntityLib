@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class FireSensorGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/FireSensorGD"
+    schema_name = "FireSensorGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->FireSensorGD
         return FireSensorGD(entlib.load_node_file(sourcefile, entlib.get_schema(FireSensorGD.schema_name)))

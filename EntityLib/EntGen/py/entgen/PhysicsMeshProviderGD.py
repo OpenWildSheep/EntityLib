@@ -11,7 +11,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class PhysicsMeshProviderGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/PhysicsMeshProviderGD"
+    schema_name = "PhysicsMeshProviderGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PhysicsMeshProviderGD
         return PhysicsMeshProviderGD(entlib.load_node_file(sourcefile, entlib.get_schema(PhysicsMeshProviderGD.schema_name)))

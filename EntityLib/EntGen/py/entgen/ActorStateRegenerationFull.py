@@ -10,7 +10,7 @@ from entgen.ActorState import *
 from EntityLibPy import Node
 
 class ActorStateRegenerationFull(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ActorStateRegenerationFull"
+    schema_name = "ActorStateRegenerationFull"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateRegenerationFull
         return ActorStateRegenerationFull(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateRegenerationFull.schema_name)))

@@ -22,7 +22,7 @@ from entgen.Vector3 import *
 from EntityLibPy import Node
 
 class CharacterControllerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CharacterControllerGD"
+    schema_name = "CharacterControllerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CharacterControllerGD
         return CharacterControllerGD(entlib.load_node_file(sourcefile, entlib.get_schema(CharacterControllerGD.schema_name)))

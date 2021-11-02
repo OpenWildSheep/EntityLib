@@ -11,7 +11,7 @@ from entgen.Entity import *
 from EntityLibPy import Node
 
 class Scene(HelperObject):
-    schema_name = "./Scene-schema.json#/definitions/Scene"
+    schema_name = "Scene"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->Scene
         return Scene(entlib.load_node_file(sourcefile, entlib.get_schema(Scene.schema_name)))

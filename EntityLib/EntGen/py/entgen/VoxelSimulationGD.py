@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class VoxelSimulationGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/VoxelSimulationGD"
+    schema_name = "VoxelSimulationGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->VoxelSimulationGD
         return VoxelSimulationGD(entlib.load_node_file(sourcefile, entlib.get_schema(VoxelSimulationGD.schema_name)))

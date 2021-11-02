@@ -11,7 +11,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class ItemHolderGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ItemHolderGD"
+    schema_name = "ItemHolderGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ItemHolderGD
         return ItemHolderGD(entlib.load_node_file(sourcefile, entlib.get_schema(ItemHolderGD.schema_name)))

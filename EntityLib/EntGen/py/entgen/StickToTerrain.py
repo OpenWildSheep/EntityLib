@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class StickToTerrain(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/StickToTerrain"
+    schema_name = "StickToTerrain"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->StickToTerrain
         return StickToTerrain(entlib.load_node_file(sourcefile, entlib.get_schema(StickToTerrain.schema_name)))

@@ -14,7 +14,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class BeamTargetGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/BeamTargetGD"
+    schema_name = "BeamTargetGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->BeamTargetGD
         return BeamTargetGD(entlib.load_node_file(sourcefile, entlib.get_schema(BeamTargetGD.schema_name)))

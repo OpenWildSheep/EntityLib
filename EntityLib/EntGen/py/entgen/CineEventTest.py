@@ -11,7 +11,7 @@ from entgen.CineEvent import *
 from EntityLibPy import Node
 
 class CineEventTest(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CineEventTest"
+    schema_name = "CineEventTest"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CineEventTest
         return CineEventTest(entlib.load_node_file(sourcefile, entlib.get_schema(CineEventTest.schema_name)))

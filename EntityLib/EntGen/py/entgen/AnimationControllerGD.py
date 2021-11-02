@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class AnimationControllerGD(HelperObject):
-    schema_name = "./MergedComponents.json#/definitions/AnimationControllerGD"
+    schema_name = "AnimationControllerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AnimationControllerGD
         return AnimationControllerGD(entlib.load_node_file(sourcefile, entlib.get_schema(AnimationControllerGD.schema_name)))

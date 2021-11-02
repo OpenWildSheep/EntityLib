@@ -11,7 +11,7 @@ from entgen.ListItem import *
 from EntityLibPy import Node
 
 class MultiThumbnail(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/MultiThumbnail"
+    schema_name = "MultiThumbnail"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->MultiThumbnail
         return MultiThumbnail(entlib.load_node_file(sourcefile, entlib.get_schema(MultiThumbnail.schema_name)))

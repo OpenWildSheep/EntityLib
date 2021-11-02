@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class ReviveSideEvent(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ReviveSideEvent"
+    schema_name = "ReviveSideEvent"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ReviveSideEvent
         return ReviveSideEvent(entlib.load_node_file(sourcefile, entlib.get_schema(ReviveSideEvent.schema_name)))

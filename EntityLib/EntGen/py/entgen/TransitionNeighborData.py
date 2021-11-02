@@ -10,7 +10,7 @@ from entgen.Int import *
 from EntityLibPy import Node
 
 class TransitionNeighborData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/TransitionNeighborData"
+    schema_name = "TransitionNeighborData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->TransitionNeighborData
         return TransitionNeighborData(entlib.load_node_file(sourcefile, entlib.get_schema(TransitionNeighborData.schema_name)))

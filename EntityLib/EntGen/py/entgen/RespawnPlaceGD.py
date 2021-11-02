@@ -11,7 +11,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class RespawnPlaceGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/RespawnPlaceGD"
+    schema_name = "RespawnPlaceGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->RespawnPlaceGD
         return RespawnPlaceGD(entlib.load_node_file(sourcefile, entlib.get_schema(RespawnPlaceGD.schema_name)))

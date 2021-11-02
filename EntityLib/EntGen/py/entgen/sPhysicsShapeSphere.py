@@ -10,7 +10,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class sPhysicsShapeSphere(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/sPhysicsShapeSphere"
+    schema_name = "sPhysicsShapeSphere"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->sPhysicsShapeSphere
         return sPhysicsShapeSphere(entlib.load_node_file(sourcefile, entlib.get_schema(sPhysicsShapeSphere.schema_name)))

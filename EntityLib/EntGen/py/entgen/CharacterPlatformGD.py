@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class CharacterPlatformGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CharacterPlatformGD"
+    schema_name = "CharacterPlatformGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CharacterPlatformGD
         return CharacterPlatformGD(entlib.load_node_file(sourcefile, entlib.get_schema(CharacterPlatformGD.schema_name)))

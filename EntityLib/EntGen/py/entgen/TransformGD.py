@@ -14,7 +14,7 @@ from entgen.Vector3 import *
 from EntityLibPy import Node
 
 class TransformGD(HelperObject):
-    schema_name = "./MergedComponents.json#/definitions/TransformGD"
+    schema_name = "TransformGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->TransformGD
         return TransformGD(entlib.load_node_file(sourcefile, entlib.get_schema(TransformGD.schema_name)))

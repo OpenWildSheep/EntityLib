@@ -12,7 +12,7 @@ from entgen.PrimitiveData import *
 from EntityLibPy import Node
 
 class LDPrimitive(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/LDPrimitive"
+    schema_name = "LDPrimitive"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->LDPrimitive
         return LDPrimitive(entlib.load_node_file(sourcefile, entlib.get_schema(LDPrimitive.schema_name)))

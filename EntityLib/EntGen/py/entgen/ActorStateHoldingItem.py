@@ -11,7 +11,7 @@ from entgen.EntityRef import *
 from EntityLibPy import Node
 
 class ActorStateHoldingItem(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ActorStateHoldingItem"
+    schema_name = "ActorStateHoldingItem"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateHoldingItem
         return ActorStateHoldingItem(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateHoldingItem.schema_name)))

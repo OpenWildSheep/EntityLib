@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class TerrainSurfaceObject(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/TerrainSurfaceObject"
+    schema_name = "TerrainSurfaceObject"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->TerrainSurfaceObject
         return TerrainSurfaceObject(entlib.load_node_file(sourcefile, entlib.get_schema(TerrainSurfaceObject.schema_name)))

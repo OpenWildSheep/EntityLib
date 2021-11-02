@@ -11,7 +11,7 @@ from entgen.sNodeBoneInfluenceDataTemplate import *
 from EntityLibPy import Node
 
 class PathBoneInfluenceGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/PathBoneInfluenceGD"
+    schema_name = "PathBoneInfluenceGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PathBoneInfluenceGD
         return PathBoneInfluenceGD(entlib.load_node_file(sourcefile, entlib.get_schema(PathBoneInfluenceGD.schema_name)))

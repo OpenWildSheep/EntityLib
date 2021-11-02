@@ -13,7 +13,7 @@ from entgen.VegetationPCloudData import *
 from EntityLibPy import Node
 
 class RegenerableVegetationGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/RegenerableVegetationGD"
+    schema_name = "RegenerableVegetationGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->RegenerableVegetationGD
         return RegenerableVegetationGD(entlib.load_node_file(sourcefile, entlib.get_schema(RegenerableVegetationGD.schema_name)))

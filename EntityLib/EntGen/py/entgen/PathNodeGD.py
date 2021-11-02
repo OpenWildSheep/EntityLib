@@ -12,7 +12,7 @@ from entgen.TagsList import *
 from EntityLibPy import Node
 
 class PathNodeGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/PathNodeGD"
+    schema_name = "PathNodeGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PathNodeGD
         return PathNodeGD(entlib.load_node_file(sourcefile, entlib.get_schema(PathNodeGD.schema_name)))

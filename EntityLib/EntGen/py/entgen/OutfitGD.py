@@ -16,7 +16,7 @@ from entgen.OutfitPiece import *
 from EntityLibPy import Node
 
 class OutfitGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/OutfitGD"
+    schema_name = "OutfitGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->OutfitGD
         return OutfitGD(entlib.load_node_file(sourcefile, entlib.get_schema(OutfitGD.schema_name)))

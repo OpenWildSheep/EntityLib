@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class MounterGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/MounterGD"
+    schema_name = "MounterGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->MounterGD
         return MounterGD(entlib.load_node_file(sourcefile, entlib.get_schema(MounterGD.schema_name)))

@@ -8,7 +8,7 @@ import EntityLibPy
 from EntityLibPy import Node
 
 class ComponentGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ComponentGD"
+    schema_name = "ComponentGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ComponentGD
         return ComponentGD(entlib.load_node_file(sourcefile, entlib.get_schema(ComponentGD.schema_name)))

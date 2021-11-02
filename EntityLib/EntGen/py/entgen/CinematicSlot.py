@@ -13,7 +13,7 @@ from entgen.Transform3D import *
 from EntityLibPy import Node
 
 class CinematicSlot(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CinematicSlot"
+    schema_name = "CinematicSlot"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CinematicSlot
         return CinematicSlot(entlib.load_node_file(sourcefile, entlib.get_schema(CinematicSlot.schema_name)))

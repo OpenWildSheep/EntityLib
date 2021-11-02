@@ -10,7 +10,7 @@ from entgen.Vector2 import *
 from EntityLibPy import Node
 
 class sJointUniversalDesc(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/sJointUniversalDesc"
+    schema_name = "sJointUniversalDesc"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->sJointUniversalDesc
         return sJointUniversalDesc(entlib.load_node_file(sourcefile, entlib.get_schema(sJointUniversalDesc.schema_name)))

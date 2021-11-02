@@ -10,7 +10,7 @@ from entgen.AnimMirroringSpecData import *
 from EntityLibPy import Node
 
 class AnimMirroringData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AnimMirroringData"
+    schema_name = "AnimMirroringData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AnimMirroringData
         return AnimMirroringData(entlib.load_node_file(sourcefile, entlib.get_schema(AnimMirroringData.schema_name)))

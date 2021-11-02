@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class LifeAndDamageData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/LifeAndDamageData"
+    schema_name = "LifeAndDamageData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->LifeAndDamageData
         return LifeAndDamageData(entlib.load_node_file(sourcefile, entlib.get_schema(LifeAndDamageData.schema_name)))

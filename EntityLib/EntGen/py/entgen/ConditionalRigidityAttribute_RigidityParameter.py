@@ -11,7 +11,7 @@ from entgen.ScaleConverter import *
 from EntityLibPy import Node
 
 class ConditionalRigidityAttribute_RigidityParameter(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ConditionalRigidityAttribute::RigidityParameter"
+    schema_name = "ConditionalRigidityAttribute::RigidityParameter"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ConditionalRigidityAttribute_RigidityParameter
         return ConditionalRigidityAttribute_RigidityParameter(entlib.load_node_file(sourcefile, entlib.get_schema(ConditionalRigidityAttribute_RigidityParameter.schema_name)))

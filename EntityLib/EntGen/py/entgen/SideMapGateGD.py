@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class SideMapGateGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/SideMapGateGD"
+    schema_name = "SideMapGateGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->SideMapGateGD
         return SideMapGateGD(entlib.load_node_file(sourcefile, entlib.get_schema(SideMapGateGD.schema_name)))

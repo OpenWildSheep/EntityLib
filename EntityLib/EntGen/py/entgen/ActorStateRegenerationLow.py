@@ -11,7 +11,7 @@ from entgen.Bool import *
 from EntityLibPy import Node
 
 class ActorStateRegenerationLow(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ActorStateRegenerationLow"
+    schema_name = "ActorStateRegenerationLow"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateRegenerationLow
         return ActorStateRegenerationLow(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateRegenerationLow.schema_name)))

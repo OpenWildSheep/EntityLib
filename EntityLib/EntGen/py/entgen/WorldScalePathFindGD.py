@@ -11,7 +11,7 @@ from entgen.NavmeshGenerationParameters import *
 from EntityLibPy import Node
 
 class WorldScalePathFindGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/WorldScalePathFindGD"
+    schema_name = "WorldScalePathFindGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->WorldScalePathFindGD
         return WorldScalePathFindGD(entlib.load_node_file(sourcefile, entlib.get_schema(WorldScalePathFindGD.schema_name)))

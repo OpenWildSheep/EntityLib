@@ -12,7 +12,7 @@ from entgen.FreezeData import *
 from EntityLibPy import Node
 
 class AttackAbility(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AttackAbility"
+    schema_name = "AttackAbility"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AttackAbility
         return AttackAbility(entlib.load_node_file(sourcefile, entlib.get_schema(AttackAbility.schema_name)))

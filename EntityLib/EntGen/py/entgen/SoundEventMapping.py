@@ -12,7 +12,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class SoundEventMapping(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/SoundEventMapping"
+    schema_name = "SoundEventMapping"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->SoundEventMapping
         return SoundEventMapping(entlib.load_node_file(sourcefile, entlib.get_schema(SoundEventMapping.schema_name)))

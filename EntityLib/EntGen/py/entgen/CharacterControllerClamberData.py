@@ -12,7 +12,7 @@ from entgen.ScaleConverter import *
 from EntityLibPy import Node
 
 class CharacterControllerClamberData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CharacterControllerClamberData"
+    schema_name = "CharacterControllerClamberData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CharacterControllerClamberData
         return CharacterControllerClamberData(entlib.load_node_file(sourcefile, entlib.get_schema(CharacterControllerClamberData.schema_name)))

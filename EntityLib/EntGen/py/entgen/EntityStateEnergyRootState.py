@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class EntityStateEnergyRootState(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EntityStateEnergyRootState"
+    schema_name = "EntityStateEnergyRootState"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateEnergyRootState
         return EntityStateEnergyRootState(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateEnergyRootState.schema_name)))

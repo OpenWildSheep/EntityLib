@@ -8,7 +8,7 @@ import EntityLibPy
 from EntityLibPy import Node
 
 class sJointFixedDesc(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/sJointFixedDesc"
+    schema_name = "sJointFixedDesc"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->sJointFixedDesc
         return sJointFixedDesc(entlib.load_node_file(sourcefile, entlib.get_schema(sJointFixedDesc.schema_name)))

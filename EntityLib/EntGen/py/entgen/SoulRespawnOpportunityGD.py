@@ -15,7 +15,7 @@ from entgen.Vector3 import *
 from EntityLibPy import Node
 
 class SoulRespawnOpportunityGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/SoulRespawnOpportunityGD"
+    schema_name = "SoulRespawnOpportunityGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->SoulRespawnOpportunityGD
         return SoulRespawnOpportunityGD(entlib.load_node_file(sourcefile, entlib.get_schema(SoulRespawnOpportunityGD.schema_name)))

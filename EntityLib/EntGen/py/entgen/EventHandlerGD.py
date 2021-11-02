@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class EventHandlerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EventHandlerGD"
+    schema_name = "EventHandlerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EventHandlerGD
         return EventHandlerGD(entlib.load_node_file(sourcefile, entlib.get_schema(EventHandlerGD.schema_name)))

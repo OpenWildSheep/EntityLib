@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class AnimationHitsConstraintsGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AnimationHitsConstraintsGD"
+    schema_name = "AnimationHitsConstraintsGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AnimationHitsConstraintsGD
         return AnimationHitsConstraintsGD(entlib.load_node_file(sourcefile, entlib.get_schema(AnimationHitsConstraintsGD.schema_name)))

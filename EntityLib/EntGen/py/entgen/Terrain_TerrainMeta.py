@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class Terrain_TerrainMeta(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/Terrain::TerrainMeta"
+    schema_name = "Terrain::TerrainMeta"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->Terrain_TerrainMeta
         return Terrain_TerrainMeta(entlib.load_node_file(sourcefile, entlib.get_schema(Terrain_TerrainMeta.schema_name)))

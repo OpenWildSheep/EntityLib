@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class VegetationNavMeshTaggerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/VegetationNavMeshTaggerGD"
+    schema_name = "VegetationNavMeshTaggerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->VegetationNavMeshTaggerGD
         return VegetationNavMeshTaggerGD(entlib.load_node_file(sourcefile, entlib.get_schema(VegetationNavMeshTaggerGD.schema_name)))

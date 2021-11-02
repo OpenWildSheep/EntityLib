@@ -12,7 +12,7 @@ from entgen.ScaleConverter import *
 from EntityLibPy import Node
 
 class ImmersedBehaviorData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ImmersedBehaviorData"
+    schema_name = "ImmersedBehaviorData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ImmersedBehaviorData
         return ImmersedBehaviorData(entlib.load_node_file(sourcefile, entlib.get_schema(ImmersedBehaviorData.schema_name)))

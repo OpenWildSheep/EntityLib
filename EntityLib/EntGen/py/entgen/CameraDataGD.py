@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class CameraDataGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CameraDataGD"
+    schema_name = "CameraDataGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CameraDataGD
         return CameraDataGD(entlib.load_node_file(sourcefile, entlib.get_schema(CameraDataGD.schema_name)))

@@ -12,7 +12,7 @@ from entgen.MountableSnapLine_ControlPoint import *
 from EntityLibPy import Node
 
 class MountableGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/MountableGD"
+    schema_name = "MountableGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->MountableGD
         return MountableGD(entlib.load_node_file(sourcefile, entlib.get_schema(MountableGD.schema_name)))

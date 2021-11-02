@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class MeshNavigationInfosGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/MeshNavigationInfosGD"
+    schema_name = "MeshNavigationInfosGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->MeshNavigationInfosGD
         return MeshNavigationInfosGD(entlib.load_node_file(sourcefile, entlib.get_schema(MeshNavigationInfosGD.schema_name)))

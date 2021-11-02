@@ -13,7 +13,7 @@ from entgen.RegenerationState import *
 from EntityLibPy import Node
 
 class EnvStampGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EnvStampGD"
+    schema_name = "EnvStampGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EnvStampGD
         return EnvStampGD(entlib.load_node_file(sourcefile, entlib.get_schema(EnvStampGD.schema_name)))

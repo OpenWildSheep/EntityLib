@@ -12,7 +12,7 @@ from entgen.EntityLODData import *
 from EntityLibPy import Node
 
 class RegenData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/RegenData"
+    schema_name = "RegenData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->RegenData
         return RegenData(entlib.load_node_file(sourcefile, entlib.get_schema(RegenData.schema_name)))

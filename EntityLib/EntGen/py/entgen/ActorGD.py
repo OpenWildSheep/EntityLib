@@ -21,7 +21,7 @@ from entgen.StunData import *
 from EntityLibPy import Node
 
 class ActorGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ActorGD"
+    schema_name = "ActorGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorGD
         return ActorGD(entlib.load_node_file(sourcefile, entlib.get_schema(ActorGD.schema_name)))

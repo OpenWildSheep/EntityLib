@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class PathBoneRigidBodyGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/PathBoneRigidBodyGD"
+    schema_name = "PathBoneRigidBodyGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PathBoneRigidBodyGD
         return PathBoneRigidBodyGD(entlib.load_node_file(sourcefile, entlib.get_schema(PathBoneRigidBodyGD.schema_name)))

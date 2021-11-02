@@ -11,7 +11,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class StaticObjectGD(HelperObject):
-    schema_name = "./MergedComponents.json#/definitions/StaticObjectGD"
+    schema_name = "StaticObjectGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->StaticObjectGD
         return StaticObjectGD(entlib.load_node_file(sourcefile, entlib.get_schema(StaticObjectGD.schema_name)))

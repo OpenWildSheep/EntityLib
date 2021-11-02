@@ -12,7 +12,7 @@ from entgen.Vector3 import *
 from EntityLibPy import Node
 
 class MountableSnapLine_ControlPoint(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/MountableSnapLine::ControlPoint"
+    schema_name = "MountableSnapLine::ControlPoint"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->MountableSnapLine_ControlPoint
         return MountableSnapLine_ControlPoint(entlib.load_node_file(sourcefile, entlib.get_schema(MountableSnapLine_ControlPoint.schema_name)))

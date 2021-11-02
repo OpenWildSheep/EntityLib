@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class PathBoneAnimGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/PathBoneAnimGD"
+    schema_name = "PathBoneAnimGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PathBoneAnimGD
         return PathBoneAnimGD(entlib.load_node_file(sourcefile, entlib.get_schema(PathBoneAnimGD.schema_name)))

@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class CharacterControllerGroundNormalData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CharacterControllerGroundNormalData"
+    schema_name = "CharacterControllerGroundNormalData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CharacterControllerGroundNormalData
         return CharacterControllerGroundNormalData(entlib.load_node_file(sourcefile, entlib.get_schema(CharacterControllerGroundNormalData.schema_name)))

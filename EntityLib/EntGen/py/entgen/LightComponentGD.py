@@ -15,7 +15,7 @@ from entgen.Vector3 import *
 from EntityLibPy import Node
 
 class LightComponentGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/LightComponentGD"
+    schema_name = "LightComponentGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->LightComponentGD
         return LightComponentGD(entlib.load_node_file(sourcefile, entlib.get_schema(LightComponentGD.schema_name)))

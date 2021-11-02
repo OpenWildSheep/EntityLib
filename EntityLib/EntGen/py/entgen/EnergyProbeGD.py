@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class EnergyProbeGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EnergyProbeGD"
+    schema_name = "EnergyProbeGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EnergyProbeGD
         return EnergyProbeGD(entlib.load_node_file(sourcefile, entlib.get_schema(EnergyProbeGD.schema_name)))

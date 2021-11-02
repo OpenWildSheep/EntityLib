@@ -10,7 +10,7 @@ from entgen.ConditionalRigidityAttribute_RigidityParameter import *
 from EntityLibPy import Node
 
 class ConditionalRigidityAttribute_Attributes(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ConditionalRigidityAttribute::Attributes"
+    schema_name = "ConditionalRigidityAttribute::Attributes"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ConditionalRigidityAttribute_Attributes
         return ConditionalRigidityAttribute_Attributes(entlib.load_node_file(sourcefile, entlib.get_schema(ConditionalRigidityAttribute_Attributes.schema_name)))

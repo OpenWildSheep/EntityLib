@@ -10,7 +10,7 @@ from entgen.ActorState import *
 from EntityLibPy import Node
 
 class ActorStateInvincible(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ActorStateInvincible"
+    schema_name = "ActorStateInvincible"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateInvincible
         return ActorStateInvincible(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateInvincible.schema_name)))

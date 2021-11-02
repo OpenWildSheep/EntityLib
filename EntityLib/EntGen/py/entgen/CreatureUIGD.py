@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class CreatureUIGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CreatureUIGD"
+    schema_name = "CreatureUIGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CreatureUIGD
         return CreatureUIGD(entlib.load_node_file(sourcefile, entlib.get_schema(CreatureUIGD.schema_name)))

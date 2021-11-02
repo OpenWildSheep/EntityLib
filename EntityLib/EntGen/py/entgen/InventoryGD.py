@@ -11,7 +11,7 @@ from entgen.TaggedEntityRef import *
 from EntityLibPy import Node
 
 class InventoryGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/InventoryGD"
+    schema_name = "InventoryGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->InventoryGD
         return InventoryGD(entlib.load_node_file(sourcefile, entlib.get_schema(InventoryGD.schema_name)))

@@ -11,7 +11,7 @@ from entgen.Vector3 import *
 from EntityLibPy import Node
 
 class AnimationLegsConstraints_SlopeOffsetInfo(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AnimationLegsConstraints::SlopeOffsetInfo"
+    schema_name = "AnimationLegsConstraints::SlopeOffsetInfo"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AnimationLegsConstraints_SlopeOffsetInfo
         return AnimationLegsConstraints_SlopeOffsetInfo(entlib.load_node_file(sourcefile, entlib.get_schema(AnimationLegsConstraints_SlopeOffsetInfo.schema_name)))

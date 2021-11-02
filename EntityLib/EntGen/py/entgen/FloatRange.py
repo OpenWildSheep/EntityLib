@@ -10,7 +10,7 @@ from entgen.Vector2 import *
 from EntityLibPy import Node
 
 class FloatRange(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/FloatRange"
+    schema_name = "FloatRange"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->FloatRange
         return FloatRange(entlib.load_node_file(sourcefile, entlib.get_schema(FloatRange.schema_name)))

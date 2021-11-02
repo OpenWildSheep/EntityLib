@@ -11,7 +11,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class MoveCapacityData_AnimTagTimelineTransitionItem(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/MoveCapacityData::AnimTagTimelineTransitionItem"
+    schema_name = "MoveCapacityData::AnimTagTimelineTransitionItem"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->MoveCapacityData_AnimTagTimelineTransitionItem
         return MoveCapacityData_AnimTagTimelineTransitionItem(entlib.load_node_file(sourcefile, entlib.get_schema(MoveCapacityData_AnimTagTimelineTransitionItem.schema_name)))

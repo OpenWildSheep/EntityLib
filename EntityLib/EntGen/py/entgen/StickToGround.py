@@ -9,7 +9,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class StickToGround(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/StickToGround"
+    schema_name = "StickToGround"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->StickToGround
         return StickToGround(entlib.load_node_file(sourcefile, entlib.get_schema(StickToGround.schema_name)))

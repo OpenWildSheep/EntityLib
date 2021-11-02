@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class MoveCapacityData_ReachSpeed(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/MoveCapacityData::ReachSpeed"
+    schema_name = "MoveCapacityData::ReachSpeed"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->MoveCapacityData_ReachSpeed
         return MoveCapacityData_ReachSpeed(entlib.load_node_file(sourcefile, entlib.get_schema(MoveCapacityData_ReachSpeed.schema_name)))

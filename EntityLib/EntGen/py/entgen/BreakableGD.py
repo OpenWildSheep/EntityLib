@@ -11,7 +11,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class BreakableGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/BreakableGD"
+    schema_name = "BreakableGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->BreakableGD
         return BreakableGD(entlib.load_node_file(sourcefile, entlib.get_schema(BreakableGD.schema_name)))

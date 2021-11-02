@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class AnimationTreeConstraintsGD_BendData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AnimationTreeConstraintsGD::BendData"
+    schema_name = "AnimationTreeConstraintsGD::BendData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AnimationTreeConstraintsGD_BendData
         return AnimationTreeConstraintsGD_BendData(entlib.load_node_file(sourcefile, entlib.get_schema(AnimationTreeConstraintsGD_BendData.schema_name)))

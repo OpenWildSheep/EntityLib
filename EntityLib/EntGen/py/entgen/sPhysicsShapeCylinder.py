@@ -10,7 +10,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class sPhysicsShapeCylinder(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/sPhysicsShapeCylinder"
+    schema_name = "sPhysicsShapeCylinder"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->sPhysicsShapeCylinder
         return sPhysicsShapeCylinder(entlib.load_node_file(sourcefile, entlib.get_schema(sPhysicsShapeCylinder.schema_name)))

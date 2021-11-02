@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class AnimationRegenConstraintsGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AnimationRegenConstraintsGD"
+    schema_name = "AnimationRegenConstraintsGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AnimationRegenConstraintsGD
         return AnimationRegenConstraintsGD(entlib.load_node_file(sourcefile, entlib.get_schema(AnimationRegenConstraintsGD.schema_name)))

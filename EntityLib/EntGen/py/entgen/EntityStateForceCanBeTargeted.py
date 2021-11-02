@@ -11,7 +11,7 @@ from entgen.Bool import *
 from EntityLibPy import Node
 
 class EntityStateForceCanBeTargeted(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EntityStateForceCanBeTargeted"
+    schema_name = "EntityStateForceCanBeTargeted"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateForceCanBeTargeted
         return EntityStateForceCanBeTargeted(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateForceCanBeTargeted.schema_name)))

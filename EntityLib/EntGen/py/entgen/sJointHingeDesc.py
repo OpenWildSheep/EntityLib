@@ -11,7 +11,7 @@ from entgen.Vector3 import *
 from EntityLibPy import Node
 
 class sJointHingeDesc(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/sJointHingeDesc"
+    schema_name = "sJointHingeDesc"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->sJointHingeDesc
         return sJointHingeDesc(entlib.load_node_file(sourcefile, entlib.get_schema(sJointHingeDesc.schema_name)))

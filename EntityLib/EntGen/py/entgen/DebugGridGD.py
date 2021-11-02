@@ -11,7 +11,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class DebugGridGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/DebugGridGD"
+    schema_name = "DebugGridGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->DebugGridGD
         return DebugGridGD(entlib.load_node_file(sourcefile, entlib.get_schema(DebugGridGD.schema_name)))

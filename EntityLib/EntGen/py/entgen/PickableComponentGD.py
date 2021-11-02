@@ -11,7 +11,7 @@ from entgen.ResponsiblePointer_ActorState_ import *
 from EntityLibPy import Node
 
 class PickableComponentGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/PickableComponentGD"
+    schema_name = "PickableComponentGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PickableComponentGD
         return PickableComponentGD(entlib.load_node_file(sourcefile, entlib.get_schema(PickableComponentGD.schema_name)))

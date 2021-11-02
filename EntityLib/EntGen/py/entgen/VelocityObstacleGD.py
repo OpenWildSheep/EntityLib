@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class VelocityObstacleGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/VelocityObstacleGD"
+    schema_name = "VelocityObstacleGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->VelocityObstacleGD
         return VelocityObstacleGD(entlib.load_node_file(sourcefile, entlib.get_schema(VelocityObstacleGD.schema_name)))

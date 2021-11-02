@@ -10,7 +10,7 @@ from entgen.ActorState import *
 from EntityLibPy import Node
 
 class ActorStateBeingOnGround(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ActorStateBeingOnGround"
+    schema_name = "ActorStateBeingOnGround"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateBeingOnGround
         return ActorStateBeingOnGround(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateBeingOnGround.schema_name)))

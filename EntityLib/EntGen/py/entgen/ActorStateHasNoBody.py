@@ -10,7 +10,7 @@ from entgen.ActorState import *
 from EntityLibPy import Node
 
 class ActorStateHasNoBody(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ActorStateHasNoBody"
+    schema_name = "ActorStateHasNoBody"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateHasNoBody
         return ActorStateHasNoBody(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateHasNoBody.schema_name)))

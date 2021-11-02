@@ -11,7 +11,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class PhysicsTriggerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/PhysicsTriggerGD"
+    schema_name = "PhysicsTriggerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PhysicsTriggerGD
         return PhysicsTriggerGD(entlib.load_node_file(sourcefile, entlib.get_schema(PhysicsTriggerGD.schema_name)))

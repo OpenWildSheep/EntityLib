@@ -13,7 +13,7 @@ from entgen.Components import *
 from EntityLibPy import Node
 
 class Entity(HelperObject):
-    schema_name = "./Scene-schema.json#/definitions/Entity"
+    schema_name = "Entity"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->Entity
         return Entity(entlib.load_node_file(sourcefile, entlib.get_schema(Entity.schema_name)))

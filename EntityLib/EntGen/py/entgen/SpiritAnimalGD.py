@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class SpiritAnimalGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/SpiritAnimalGD"
+    schema_name = "SpiritAnimalGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->SpiritAnimalGD
         return SpiritAnimalGD(entlib.load_node_file(sourcefile, entlib.get_schema(SpiritAnimalGD.schema_name)))

@@ -11,7 +11,7 @@ from entgen.Vector3 import *
 from EntityLibPy import Node
 
 class Transform3D(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/Transform3D"
+    schema_name = "Transform3D"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->Transform3D
         return Transform3D(entlib.load_node_file(sourcefile, entlib.get_schema(Transform3D.schema_name)))

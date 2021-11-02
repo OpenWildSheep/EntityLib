@@ -11,7 +11,7 @@ from entgen.AnimationEventsGeneratorGD_TrackedBone import *
 from EntityLibPy import Node
 
 class AnimationEventsGeneratorGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AnimationEventsGeneratorGD"
+    schema_name = "AnimationEventsGeneratorGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AnimationEventsGeneratorGD
         return AnimationEventsGeneratorGD(entlib.load_node_file(sourcefile, entlib.get_schema(AnimationEventsGeneratorGD.schema_name)))

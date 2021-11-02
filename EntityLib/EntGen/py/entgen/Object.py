@@ -14,7 +14,7 @@ from entgen.Object_Components import *
 from EntityLibPy import Node
 
 class Object(HelperObject):
-    schema_name = "./Scene-schema.json#/definitions/Object"
+    schema_name = "Object"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->Object
         return Object(entlib.load_node_file(sourcefile, entlib.get_schema(Object.schema_name)))

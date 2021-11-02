@@ -11,7 +11,7 @@ from entgen.Position import *
 from EntityLibPy import Node
 
 class EntityStateBoidsHomePos(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EntityStateBoidsHomePos"
+    schema_name = "EntityStateBoidsHomePos"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBoidsHomePos
         return EntityStateBoidsHomePos(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBoidsHomePos.schema_name)))

@@ -10,7 +10,7 @@ from entgen.ActorState import *
 from EntityLibPy import Node
 
 class ActorStateBeingImmersed(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ActorStateBeingImmersed"
+    schema_name = "ActorStateBeingImmersed"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateBeingImmersed
         return ActorStateBeingImmersed(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateBeingImmersed.schema_name)))

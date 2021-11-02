@@ -11,7 +11,7 @@ from EntityLibPy import Node
 class Position(TupleNode[Tuple[Type[Int], Type[Int], Type[Float], Type[Float], Type[Float]]]):
     def __init__(self, node=None):  # type: (EntityLibPy.Node) -> None
         super(Position, self).__init__((Int, Int, Float, Float, Float), node)
-    schema_name = "./RuntimeComponents.json#/definitions/Position"
+    schema_name = "Position"
 
     def get_0(self):  # type: () -> Int
         return Int(self._node.at(0))

@@ -10,7 +10,7 @@ from entgen.CineEventTrigger import *
 from EntityLibPy import Node
 
 class CineEventTriggerEventHandlerPost(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CineEventTriggerEventHandlerPost"
+    schema_name = "CineEventTriggerEventHandlerPost"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CineEventTriggerEventHandlerPost
         return CineEventTriggerEventHandlerPost(entlib.load_node_file(sourcefile, entlib.get_schema(CineEventTriggerEventHandlerPost.schema_name)))

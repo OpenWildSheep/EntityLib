@@ -14,7 +14,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class HeightMapComponentGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/HeightMapComponentGD"
+    schema_name = "HeightMapComponentGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->HeightMapComponentGD
         return HeightMapComponentGD(entlib.load_node_file(sourcefile, entlib.get_schema(HeightMapComponentGD.schema_name)))

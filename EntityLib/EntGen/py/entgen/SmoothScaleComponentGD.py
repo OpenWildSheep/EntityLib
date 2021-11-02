@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class SmoothScaleComponentGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/SmoothScaleComponentGD"
+    schema_name = "SmoothScaleComponentGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->SmoothScaleComponentGD
         return SmoothScaleComponentGD(entlib.load_node_file(sourcefile, entlib.get_schema(SmoothScaleComponentGD.schema_name)))

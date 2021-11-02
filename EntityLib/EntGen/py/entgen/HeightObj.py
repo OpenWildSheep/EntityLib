@@ -13,7 +13,7 @@ from entgen.DisplaceNoiseListItem import *
 from EntityLibPy import Node
 
 class HeightObj(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/HeightObj"
+    schema_name = "HeightObj"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->HeightObj
         return HeightObj(entlib.load_node_file(sourcefile, entlib.get_schema(HeightObj.schema_name)))

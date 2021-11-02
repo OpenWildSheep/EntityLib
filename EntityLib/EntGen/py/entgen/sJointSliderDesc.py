@@ -11,7 +11,7 @@ from entgen.Vector3 import *
 from EntityLibPy import Node
 
 class sJointSliderDesc(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/sJointSliderDesc"
+    schema_name = "sJointSliderDesc"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->sJointSliderDesc
         return sJointSliderDesc(entlib.load_node_file(sourcefile, entlib.get_schema(sJointSliderDesc.schema_name)))

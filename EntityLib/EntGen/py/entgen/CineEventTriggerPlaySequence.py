@@ -11,7 +11,7 @@ from entgen.CineEventTrigger import *
 from EntityLibPy import Node
 
 class CineEventTriggerPlaySequence(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CineEventTriggerPlaySequence"
+    schema_name = "CineEventTriggerPlaySequence"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CineEventTriggerPlaySequence
         return CineEventTriggerPlaySequence(entlib.load_node_file(sourcefile, entlib.get_schema(CineEventTriggerPlaySequence.schema_name)))

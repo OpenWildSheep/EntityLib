@@ -10,7 +10,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class sBoneInfluenceDataTemplate(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/sBoneInfluenceDataTemplate"
+    schema_name = "sBoneInfluenceDataTemplate"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->sBoneInfluenceDataTemplate
         return sBoneInfluenceDataTemplate(entlib.load_node_file(sourcefile, entlib.get_schema(sBoneInfluenceDataTemplate.schema_name)))

@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class NetworkNode(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/NetworkNode"
+    schema_name = "NetworkNode"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->NetworkNode
         return NetworkNode(entlib.load_node_file(sourcefile, entlib.get_schema(NetworkNode.schema_name)))

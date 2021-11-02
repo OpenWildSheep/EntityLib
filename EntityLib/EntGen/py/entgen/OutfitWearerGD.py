@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class OutfitWearerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/OutfitWearerGD"
+    schema_name = "OutfitWearerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->OutfitWearerGD
         return OutfitWearerGD(entlib.load_node_file(sourcefile, entlib.get_schema(OutfitWearerGD.schema_name)))

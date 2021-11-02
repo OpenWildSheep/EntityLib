@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class AttackTriggerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AttackTriggerGD"
+    schema_name = "AttackTriggerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AttackTriggerGD
         return AttackTriggerGD(entlib.load_node_file(sourcefile, entlib.get_schema(AttackTriggerGD.schema_name)))

@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class FluidViewGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/FluidViewGD"
+    schema_name = "FluidViewGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->FluidViewGD
         return FluidViewGD(entlib.load_node_file(sourcefile, entlib.get_schema(FluidViewGD.schema_name)))

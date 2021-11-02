@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class PathMotionControllerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/PathMotionControllerGD"
+    schema_name = "PathMotionControllerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PathMotionControllerGD
         return PathMotionControllerGD(entlib.load_node_file(sourcefile, entlib.get_schema(PathMotionControllerGD.schema_name)))

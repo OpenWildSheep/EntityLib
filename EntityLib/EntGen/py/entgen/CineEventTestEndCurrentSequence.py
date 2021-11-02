@@ -10,7 +10,7 @@ from entgen.CineEventTest import *
 from EntityLibPy import Node
 
 class CineEventTestEndCurrentSequence(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CineEventTestEndCurrentSequence"
+    schema_name = "CineEventTestEndCurrentSequence"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CineEventTestEndCurrentSequence
         return CineEventTestEndCurrentSequence(entlib.load_node_file(sourcefile, entlib.get_schema(CineEventTestEndCurrentSequence.schema_name)))

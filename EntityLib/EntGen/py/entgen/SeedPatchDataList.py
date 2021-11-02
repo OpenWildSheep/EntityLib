@@ -10,7 +10,7 @@ from entgen.SeedPatchData import *
 from EntityLibPy import Node
 
 class SeedPatchDataList(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/SeedPatchDataList"
+    schema_name = "SeedPatchDataList"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->SeedPatchDataList
         return SeedPatchDataList(entlib.load_node_file(sourcefile, entlib.get_schema(SeedPatchDataList.schema_name)))

@@ -10,7 +10,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class Collider(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/Collider"
+    schema_name = "Collider"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->Collider
         return Collider(entlib.load_node_file(sourcefile, entlib.get_schema(Collider.schema_name)))

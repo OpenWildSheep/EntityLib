@@ -14,7 +14,7 @@ from entgen.ShootSequenceData import *
 from EntityLibPy import Node
 
 class BehaviorScriptData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/BehaviorScriptData"
+    schema_name = "BehaviorScriptData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->BehaviorScriptData
         return BehaviorScriptData(entlib.load_node_file(sourcefile, entlib.get_schema(BehaviorScriptData.schema_name)))

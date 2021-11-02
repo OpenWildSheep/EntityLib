@@ -13,7 +13,7 @@ from entgen.RegenData import *
 from EntityLibPy import Node
 
 class RegenSwitcherGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/RegenSwitcherGD"
+    schema_name = "RegenSwitcherGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->RegenSwitcherGD
         return RegenSwitcherGD(entlib.load_node_file(sourcefile, entlib.get_schema(RegenSwitcherGD.schema_name)))

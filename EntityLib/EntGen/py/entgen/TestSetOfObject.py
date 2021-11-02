@@ -13,7 +13,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class TestSetOfObject(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/TestSetOfObject"
+    schema_name = "TestSetOfObject"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->TestSetOfObject
         return TestSetOfObject(entlib.load_node_file(sourcefile, entlib.get_schema(TestSetOfObject.schema_name)))

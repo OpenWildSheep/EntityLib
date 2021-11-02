@@ -13,7 +13,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class PerceivableGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/PerceivableGD"
+    schema_name = "PerceivableGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PerceivableGD
         return PerceivableGD(entlib.load_node_file(sourcefile, entlib.get_schema(PerceivableGD.schema_name)))

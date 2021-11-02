@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class HealthAreaGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/HealthAreaGD"
+    schema_name = "HealthAreaGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->HealthAreaGD
         return HealthAreaGD(entlib.load_node_file(sourcefile, entlib.get_schema(HealthAreaGD.schema_name)))

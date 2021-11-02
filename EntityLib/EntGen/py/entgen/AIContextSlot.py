@@ -10,7 +10,7 @@ from entgen.Int import *
 from EntityLibPy import Node
 
 class AIContextSlot(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AIContextSlot"
+    schema_name = "AIContextSlot"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AIContextSlot
         return AIContextSlot(entlib.load_node_file(sourcefile, entlib.get_schema(AIContextSlot.schema_name)))

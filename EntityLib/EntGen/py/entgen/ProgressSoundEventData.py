@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class ProgressSoundEventData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ProgressSoundEventData"
+    schema_name = "ProgressSoundEventData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ProgressSoundEventData
         return ProgressSoundEventData(entlib.load_node_file(sourcefile, entlib.get_schema(ProgressSoundEventData.schema_name)))

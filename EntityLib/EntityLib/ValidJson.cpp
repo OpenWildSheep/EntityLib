@@ -169,9 +169,9 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const
     return instSchema;
 }
 
-static json convertToInstanceSchema(Ent::Schema const& schema, Ent::Subschema const& root)
+json Ent::createValidationSchema(Ent::Schema const& schema)
 {
-    json instSchema = convertToInstanceSchema(root);
+    json instSchema;
     for (auto&& name_def : schema.allDefinitions)
     {
         auto const link = convertLink(name_def.first);
@@ -226,44 +226,28 @@ static std::string createMessageFromValidationResult(valijson::ValidationResults
 void Ent::validateScene(
     Schema const& _schema, std::filesystem::path const& _toolsDir, nlohmann::json const& _scene)
 {
-    // valid the scene using schema
-    strcpy_s(schemaPath, sizeof(schemaPath), (_toolsDir / "WildPipeline/Schema").u8string().c_str());
-
-    json schemaDocument = loadJsonFile(_toolsDir, sceneSchemaPath);
-
-    json fullEntityInstanceSchema =
-        convertToInstanceSchema(_schema, AT(_schema.allDefinitions, "Scene"));
-
-    // Parse the json schema into an internal schema format
-    valijson::Schema vjSchema;
-    valijson::SchemaParser parser;
-    parser.populateSchema(
-        valijson::adapters::NlohmannJsonAdapter(fullEntityInstanceSchema),
-        vjSchema,
-        fetchDocument,
-        freeDocument);
-
-    valijson::Validator validator;
-    valijson::adapters::NlohmannJsonAdapter myTargetAdapter(_scene);
-    valijson::ValidationResults result;
-    if (!validator.validate(vjSchema, myTargetAdapter, &result))
-    {
-        /// @todo un-comment soon
-        std::string message = createMessageFromValidationResult(result);
-        throw Ent::JsonValidation(filterError(message.c_str()));
-    }
+    validateJson(_schema, _toolsDir, _scene, "Scene");
 }
 
 void Ent::validateEntity(
     Schema const& _schema, std::filesystem::path const& _toolsDir, nlohmann::json const& _entity)
+{
+    validateJson(_schema, _toolsDir, _entity, "Entity");
+}
+
+void Ent::validateJson(
+    Schema const& _schema,
+    std::filesystem::path const& _toolsDir,
+    nlohmann::json const& _entity,
+    char const* rootName)
 {
     // valid the scene using schema
     strcpy_s(schemaPath, sizeof(schemaPath), (_toolsDir / "WildPipeline/Schema").u8string().c_str());
 
     json schemaDocument = loadJsonFile(_toolsDir, entitySchemaPath);
 
-    json fullSceneInstanceSchema =
-        convertToInstanceSchema(_schema, AT(_schema.allDefinitions, "Entity"));
+    json fullSceneInstanceSchema = createValidationSchema(_schema);
+    fullSceneInstanceSchema["$ref"] = std::string("#/definitions/") + rootName;
 
     // Parse the json schema into an internal schema format
     valijson::Schema vjSchema;

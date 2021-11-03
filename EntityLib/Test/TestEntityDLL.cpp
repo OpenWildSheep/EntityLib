@@ -206,6 +206,10 @@ try
                 .allDefinitions[R"(./EditionComponents.json#/definitions/SeedPatchDataList)"]);
         node->saveNode("myseedpatchMarianne.seedpatchdata.copy.node");
     }
+    {
+        auto node = entlib.loadFileAsNode("myseedpatchMarianne.seedpatchdata.node");
+        node->saveNode("myseedpatchMarianne.seedpatchdata.copy.node");
+    }
     auto testPrefabEntity = [](Ent::Entity const* ent) {
         // ActorStates
         Ent::Node const& actorStates = ent->getActorStates();

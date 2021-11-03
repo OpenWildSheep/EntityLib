@@ -1760,6 +1760,30 @@ Ent::NodeUniquePtr Ent::EntityLib::loadFileAsNode(
     return loadNodeReadOnly(_schema, _path.string().c_str())->clone();
 }
 
+Ent::NodeUniquePtr Ent::EntityLib::loadFileAsNode(std::filesystem::path const& _nodePath) const
+{
+    auto loadFunc =
+        [&_nodePath](Ent::EntityLib const& _entLib, json const& _document, Ent::Node const* _super) {
+            Ent::Subschema const* schema = nullptr;
+            if (auto schemaName = _document.find("$schema"); schemaName != _document.end())
+            {
+                schema = _entLib.getSchema(schemaName->get_ref<json::string_t const&>().c_str());
+            }
+            else if (auto schemaName2 = _document.find("schema_name"); schemaName2 != _document.end())
+            {
+                schema = _entLib.getSchema(schemaName2->get_ref<json::string_t const&>().c_str());
+            }
+            else
+            {
+                // Probably an old Entity file
+                schema = _entLib.getSchema(entitySchemaName);
+            }
+            return _entLib.loadNode(*schema, _document, _super);
+        };
+    return loadEntityOrScene<Ent::Node>(_nodePath, m_nodeCache, &validateEntity, loadFunc, nullptr)
+        ->clone();
+}
+
 std::unique_ptr<Ent::Entity>
 Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath, Ent::Entity const* _super) const
 {

@@ -91,6 +91,8 @@ namespace Ent
         std::vector<int64_t> getKeysInt() const;
         EntityLib const* getEntityLib() const;
 
+        NodeRef computeNodeRefToChild(Node const* child) const;
+
     private:
         Element& insertImpl(KeyType const& _key, NodeUniquePtr _newNode = {});
         Element& insertImpl(

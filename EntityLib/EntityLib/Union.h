@@ -54,6 +54,8 @@ namespace Ent
 
         std::unique_ptr<Union> clone() const;
 
+        NodeRef computeNodeRefToChild(Node const* child) const;
+
     private:
         Node* resetUnionTypeWithoutOverride(char const* _type);
     };

@@ -110,6 +110,8 @@ namespace Ent
         std::vector<String> getKeysString() const;
         std::vector<int64_t> getKeysInt() const;
 
+        NodeRef computeNodeRefToChild(Node const* child) const;
+
     private:
         void checkInvariants() const;
 
@@ -175,6 +177,11 @@ namespace Ent
     inline std::vector<NodeUniquePtr> Ent::Array::releaseAllElements()
     {
         return std::visit([&](auto& a) { return a.releaseAllElements(); }, m_data);
+    }
+
+    inline NodeRef Ent::Array::computeNodeRefToChild(Node const* child) const
+    {
+        return std::visit([child](auto& a) { return a.computeNodeRefToChild(child); }, m_data);
     }
 
 } // namespace Ent

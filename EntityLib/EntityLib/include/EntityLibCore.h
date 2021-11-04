@@ -489,4 +489,6 @@ namespace Ent
         }
     };
     using NodeUniquePtr = std::unique_ptr<Node, NodeDeleter>;
+
+    using NodeRef = std::string;
 } // namespace Ent

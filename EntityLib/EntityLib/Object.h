@@ -122,6 +122,8 @@ namespace Ent
         {
             return const_cast<ObjField&>(std::as_const(*this).at(key));
         }
+
+        NodeRef computeNodeRefToChild(Node const* child) const;
     };
 
     inline auto begin(Object const& obj)

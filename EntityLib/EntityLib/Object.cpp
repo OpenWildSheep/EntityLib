@@ -192,6 +192,18 @@ namespace Ent
         prof.addNodes(size());
     }
 
+    NodeRef Object::computeNodeRefToChild(Node const* child) const
+    {
+        for (auto& field : nodes)
+        {
+            if (child == field.node.get())
+            {
+                return field.name;
+            }
+        }
+        ENTLIB_LOGIC_ERROR("child is not a child of this Object");
+    }
+
     size_t count(Object const& obj, char const* key)
     {
         auto range = std::equal_range(begin(obj), end(obj), ObjField{key, nullptr, 0}, CompObject());

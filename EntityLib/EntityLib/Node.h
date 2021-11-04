@@ -287,6 +287,8 @@ namespace Ent
 
         NodeUniquePtr clone() const;
 
+        NodeRef getNodeRef() const;
+
     private:
         Node(Node const& _node) = delete;
         Node(Node&& _node) noexcept = delete;

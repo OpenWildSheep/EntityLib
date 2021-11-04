@@ -176,4 +176,10 @@ namespace Ent
         return std::make_unique<Union>(entityLib, schema, wrapper->clone(), typeIndex);
     }
 
+    NodeRef Union::computeNodeRefToChild(Node const* child) const
+    {
+        ENTLIB_ASSERT(getUnionData() == child);
+        return getUnionType();
+    }
+
 } // namespace Ent

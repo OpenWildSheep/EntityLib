@@ -7,6 +7,7 @@
 #include "external/json.hpp"
 
 #include "include/EntityLib.h"
+#include "Tools.h"
 
 using namespace nlohmann;
 
@@ -67,6 +68,68 @@ namespace Ent
         newNode->updateParents();
         newNode->checkParent(parentNode);
         return newNode;
+    }
+
+    static NodeRef computeParentToChildNodeRef(Node const* parent, Node const* child)
+    {
+        return std::visit(
+            [child](auto const& node) {
+                using NodeType = std::remove_const_t<std::remove_reference_t<decltype(node)>>;
+                // ENT_IF_COMPILE(decltype(node), node, node.computeNodeRefToChild(child))
+                if constexpr (
+                    std::is_same_v<
+                        NodeType,
+                        Object> or std::is_same_v<NodeType, Union> or std::is_same_v<NodeType, Array>)
+                {
+                    return node.computeNodeRefToChild(child);
+                }
+                else
+                {
+                    return NodeRef();
+                }
+            },
+            parent->GetRawValue());
+    }
+
+    NodeRef Node::getNodeRef() const
+    {
+        NodeRef nodeRef;
+        if (parentNode != nullptr)
+        {
+            bool isChildOfUnionSet = false;
+            Node const* usedParent = parentNode;
+            if (parentNode->parentNode != nullptr
+                and parentNode->parentNode->getDataType() == Ent::DataType::oneOf)
+            {
+                // Special case of Union.
+                // There is an intermediate wrapper Node which doesn't apear in the path.
+                if (parentNode->parentNode->parentNode != nullptr
+                    and parentNode->parentNode->parentNode->getDataType() == Ent::DataType::array
+                    and std::get<Ent::Subschema::ArrayMeta>(
+                            parentNode->parentNode->parentNode->getSchema()->meta)
+                                .overridePolicy
+                            == "set")
+                {
+                    // Special case of UnionSet.
+                    // Don't need to explicit the type of the Union since it is the key of the set
+                    isChildOfUnionSet = true;
+                    // usedParent = parentNode->parentNode->parentNode;
+                }
+                usedParent = parentNode->parentNode;
+            }
+            else
+            {
+                usedParent = parentNode;
+            }
+            nodeRef = usedParent->getNodeRef();
+            if (not isChildOfUnionSet)
+            {
+                if (not nodeRef.empty())
+                    nodeRef += '/';
+                nodeRef += computeParentToChildNodeRef(usedParent, this);
+            }
+        }
+        return nodeRef;
     }
 
     struct UpdateParents

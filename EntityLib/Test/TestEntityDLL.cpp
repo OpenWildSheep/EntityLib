@@ -206,6 +206,22 @@ try
             entlib.schema.schema.allDefinitions["SeedPatchDataList"]);
         node->saveNode("myseedpatchMarianne.seedpatchdata.copy.node");
     }
+    {
+        entlib.rawdataPath = "X:/RawData"; // It is a hack to work in the working dir
+        auto node = entlib.loadFileAsNode(
+            "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
+            "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
+            entlib.schema.schema.allDefinitions["Entity"]);
+        auto ent = node->at("Components")
+                       ->mapGet("SubScene")
+                       ->getUnionData()
+                       ->at("Embedded")
+                       ->mapGet("ShamanFullBlue_ent_001");
+        auto entpath = ent->getNodeRef();
+        ENTLIB_ASSERT(entpath == "Components/SubScene/Embedded/ShamanFullBlue_ent_001");
+        entlib.clearCache();
+        entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
+    }
     auto testPrefabEntity = [](Ent::Entity const* ent) {
         // ActorStates
         Ent::Node const& actorStates = ent->getActorStates();

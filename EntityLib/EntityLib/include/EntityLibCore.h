@@ -464,8 +464,9 @@ namespace Ent
 
     struct BadKey : ContextException
     {
-        BadKey(char const* key, char const* funcName)
-            : ContextException("Unknown key '%s' in function '%s'", key, funcName)
+        BadKey(char const* key, char const* funcName, char const* schemaName)
+            : ContextException(
+                "Unknown key '%s' in function '%s', in schema '%s'", key, funcName, schemaName)
         {
         }
     };

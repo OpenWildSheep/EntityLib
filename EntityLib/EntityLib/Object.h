@@ -14,8 +14,20 @@ namespace Ent
     struct ObjField
     {
         char const* name = nullptr;
-        value_ptr<Node> node;
+        NodeUniquePtr node;
         uint32_t fieldIdx = 0;
+
+        ObjField(char const* _name = nullptr, NodeUniquePtr _node = {}, uint32_t _fieldIdx = 0)
+            : name(_name)
+            , node(std::move(_node))
+            , fieldIdx(_fieldIdx)
+        {
+        }
+
+        ObjField(ObjField const&);
+        ObjField(ObjField&&) = default;
+        ObjField& operator=(ObjField const&);
+        ObjField& operator=(ObjField&&) = default;
     };
 
     struct CompObject
@@ -33,6 +45,23 @@ namespace Ent
             : schema(_schema)
         {
         }
+
+        Object(Object const& _other)
+            : schema(_other.schema)
+            , nodes(_other.nodes)
+            , instanceOf(_other.instanceOf)
+            , instanceOfFieldIndex(_other.instanceOfFieldIndex)
+            , hasASuper(_other.hasASuper)
+        {
+        }
+        Object(Object&&) = default;
+        Object& operator=(Object const& _other)
+        {
+            Object tmp(_other);
+            std::swap(*this, tmp);
+            return *this;
+        }
+        Object& operator=(Object&&) = default;
 
         Subschema const* schema{};
         std::vector<ObjField> nodes;

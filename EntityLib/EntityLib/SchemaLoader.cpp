@@ -366,6 +366,14 @@ void Ent::SchemaLoader::parseSchemaNoRef(
     {
         // TODO required
     }
+    if (_data.count("title") != 0u)
+    {
+        vis.setTitle(_data["title"].get_ptr<json::string_t const*>()->c_str());
+    }
+    if (_data.count("description") != 0u)
+    {
+        vis.setDescription(_data["description"].get_ptr<json::string_t const*>()->c_str());
+    }
     if (_data.count("meta") != 0u)
     {
         if (!_data["meta"].is_object())
@@ -519,7 +527,7 @@ void Ent::SchemaLoader::readSchema(
         void setRefDefaultValue(Subschema::DefaultValue val) override
         {
             CHECK_WHOLE_STACK;
-            stack.back()->subSchemaOrRef.get<SubschemaRef::Ref>().defaultValue = std::move(val);
+            std::get<SubschemaRef::Ref>(stack.back()->subSchemaOrRef).defaultValue = std::move(val);
         }
         void setLinearItem(size_t size) override
         {
@@ -578,7 +586,7 @@ void Ent::SchemaLoader::readSchema(
             subschema.name = link;
             subschema.rootSchema = globalSchema;
             auto& ref = stack.back()->subSchemaOrRef;
-            ENTLIB_ASSERT(ref.is<Null>());
+            ENTLIB_ASSERT(std::holds_alternative<Null>(ref));
             ref = SubschemaRef::Ref{globalSchema, link};
         }
         void closeRef() override
@@ -590,7 +598,7 @@ void Ent::SchemaLoader::readSchema(
         {
             ENTLIB_DEBUG_PRINTF("%sopenSubschema\n", getTab());
             CHECK_WHOLE_STACK;
-            ENTLIB_ASSERT(stack.back()->subSchemaOrRef.is<Null>());
+            ENTLIB_ASSERT(std::holds_alternative<Null>(stack.back()->subSchemaOrRef));
             Subschema subschema{};
             subschema.rootSchema = globalSchema;
             stack.back()->subSchemaOrRef = std::move(subschema);
@@ -604,7 +612,7 @@ void Ent::SchemaLoader::readSchema(
                 auto& lastSchema = stack.back()->get();
                 if (lastSchema.type == Ent::DataType::array)
                 {
-                    auto& lastMeta = lastSchema.meta.get<Ent::Subschema::ArrayMeta>();
+                    auto& lastMeta = std::get<Ent::Subschema::ArrayMeta>(lastSchema.meta);
                     if (lastMeta.overridePolicy == "map")
                     {
                         if (lastSchema.singularItems == nullptr)
@@ -614,8 +622,8 @@ void Ent::SchemaLoader::readSchema(
                                 "singularItem array",
                                 lastMeta.keyField->c_str());
                         }
-                        lastSchema.singularItems->get().meta.get<Ent::Subschema::ArrayMeta>().isMapItem =
-                            true;
+                        std::get<Ent::Subschema::ArrayMeta>(lastSchema.singularItems->get().meta)
+                            .isMapItem = true;
                     }
                     if (lastMeta.keyField.has_value())
                     {
@@ -656,6 +664,16 @@ void Ent::SchemaLoader::readSchema(
                 subSchema.name.c_str(),
                 name.c_str());
             subSchema.name = std::move(name);
+        }
+        void setTitle(char const* _title) override
+        {
+            auto&& subSchema = stack.back()->get();
+            subSchema.title = _title;
+        }
+        void setDescription(char const* _description) override
+        {
+            auto&& subSchema = stack.back()->get();
+            subSchema.description = _description;
         }
     };
     FillSchema vis{globalSchema, stack};

@@ -20,6 +20,24 @@ namespace Ent
 
     // ************************************* Object ***********************************************
 
+    Ent::ObjField::ObjField(ObjField const& _other)
+        : name(_other.name)
+        , node(_other.node->clone())
+        , fieldIdx(_other.fieldIdx)
+
+    {
+    }
+
+    ObjField& Ent::ObjField::operator=(ObjField const& _other)
+    {
+        if (&_other != this)
+        {
+            ObjField tmp(_other);
+            std::swap(tmp, *this);
+        }
+        return *this;
+    }
+
     void Ent::Object::unset()
     {
         for (ObjField& field : nodes)
@@ -73,33 +91,33 @@ namespace Ent
         auto const* entlib = schema->rootSchema->entityLib;
         if (_prefabNodePath == nullptr or strlen(_prefabNodePath) == 0)
         {
-            Node prefabNode = entlib->loadNode(*schema, json{}, nullptr);
-            (*this) = prefabNode.GetRawValue().get<Object>().makeInstanceOf();
+            auto prefabNode = entlib->loadNode(*schema, json{}, nullptr);
+            (*this) = std::get<Object>(prefabNode->GetRawValue()).makeInstanceOf();
             instanceOf.set("");
         }
         else
         {
             auto relPath = entlib->getRelativePath(_prefabNodePath).generic_u8string();
             json nodeData = loadJsonFile(entlib->rawdataPath, _prefabNodePath);
-            Node prefabNode = entlib->loadNode(*schema, nodeData, nullptr);
+            auto prefabNode = entlib->loadNode(*schema, nodeData, nullptr);
             // Get the keyfield
-            tl::optional<Node> keyField;
+            NodeUniquePtr keyField;
             for (ObjField& objfield : nodes)
             {
                 auto&& field = objfield.node;
                 if (field->getSchema()->isKeyField)
                 {
-                    if (keyField.has_value())
+                    if (keyField != nullptr)
                     {
                         throw IllFormedSchema(
                             R"(An Object is used in two set with different keyField)");
                     }
-                    keyField = *field;
+                    keyField = field->clone();
                 }
             }
-            (*this) = prefabNode.GetRawValue().get<Object>().makeInstanceOf();
+            (*this) = std::get<Object>(prefabNode->GetRawValue()).makeInstanceOf();
             // Set the keyField
-            if (keyField.has_value() and keyField->isSet()) // Only report the previus ID if it is set
+            if (keyField != nullptr and keyField->isSet()) // Only report the previus ID if it is set
             {
                 for (ObjField& objfield : nodes)
                 {

@@ -12,11 +12,11 @@ namespace Ent
             throw BadType();
         }
         std::string const subtype(_subtype);
-        if (not meta.is<UnionMeta>())
+        if (not std::holds_alternative<UnionMeta>(meta))
         {
             throw MissingMetadata(name.c_str());
         }
-        auto const& un = meta.get<UnionMeta>();
+        auto const& un = std::get<UnionMeta>(meta);
         auto iter = std::find_if(begin(*oneOf), end(*oneOf), [&](SubschemaRef const& ref) {
             return AT(ref->properties, un.typeField).get().constValue->get<std::string>() == subtype;
         });
@@ -33,7 +33,7 @@ namespace Ent
 
     Subschema const* Subschema::getUnionType(char const* _subtype) const
     {
-        auto const& un = meta.get<UnionMeta>();
+        auto const& un = std::get<UnionMeta>(meta);
         auto schema = getUnionTypeWrapper(_subtype).first;
         return &AT(schema->properties, un.dataField).get();
     }
@@ -44,12 +44,12 @@ namespace Ent
         {
             throw BadType();
         }
-        if (not meta.is<UnionMeta>())
+        if (not std::holds_alternative<UnionMeta>(meta))
         {
             throw MissingMetadata(name.c_str());
         }
 
-        auto const& unionData = meta.get<UnionMeta>();
+        auto const& unionData = std::get<UnionMeta>(meta);
         return unionData.typeField.c_str();
     }
 
@@ -59,12 +59,12 @@ namespace Ent
         {
             throw BadType();
         }
-        if (not meta.is<UnionMeta>())
+        if (not std::holds_alternative<UnionMeta>(meta))
         {
             throw MissingMetadata(name.c_str());
         }
 
-        auto const& unionData = meta.get<UnionMeta>();
+        auto const& unionData = std::get<UnionMeta>(meta);
         return unionData.dataField.c_str();
     }
 
@@ -74,14 +74,14 @@ namespace Ent
         {
             throw BadType();
         }
-        if (not meta.is<UnionMeta>())
+        if (not std::holds_alternative<UnionMeta>(meta))
         {
             throw MissingMetadata(name.c_str());
         }
 
         std::map<std::string, Subschema const*> result;
 
-        auto const& unionData = meta.get<UnionMeta>();
+        auto const& unionData = std::get<UnionMeta>(meta);
 
         for (SubschemaRef const& ref : *oneOf)
         {

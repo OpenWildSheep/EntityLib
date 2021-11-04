@@ -6,8 +6,8 @@
 
 #pragma warning(push, 0)
 #pragma warning(disable : 4996)
+#include <variant>
 #include "../external/optional.hpp"
-#include "../../../external/mapbox/variant.hpp"
 #pragma warning(pop)
 
 #include "include/EntityLibCore.h"
@@ -26,6 +26,10 @@ namespace Ent
     struct Array
     {
         Array(EntityLib const* _entlib, Subschema const* _schema);
+        Array(Array const& _other) = default;
+        Array(Array&&) = default;
+        Array& operator=(Array const&) = default;
+        Array& operator=(Array&&) = default;
 
         bool hasOverride() const; ///< Recursively check if there is an override inside
         bool hasPrefabValue() const; ///< Recursively check if value is set in a prefab
@@ -46,6 +50,7 @@ namespace Ent
         Node* mapGet(Map::KeyType const& _key); ///< @return the item with _key, or nullptr
         Node const* mapGet(Map::KeyType const& _key) const; ///< @return the item with _key, or nullptr
         Node* mapInsert(Map::KeyType const& _key); ///< @pre hasKey(). @brief Insert a new item with _key
+        void mapInsert(Map::KeyType const& _key, NodeUniquePtr _newNode);
         Node* mapRename(Map::KeyType const& _key, Map::KeyType const& _newKey);
 
         /// @return true if it is a map/set and the element with _key was removed
@@ -54,6 +59,8 @@ namespace Ent
         std::vector<Node const*> getItems() const; ///< Get all not removed items
         std::vector<Node*> getItems(); ///< Get all not removed items
         std::vector<Node const*> getItemsWithRemoved() const; ///< Get all items with the removed ones
+
+        std::vector<NodeUniquePtr> releaseAllElements();
 
         void pop(); ///< @pre not hasKey() and not isTuple()
 
@@ -85,11 +92,15 @@ namespace Ent
         void unset(); ///< Unset recursively all values overriden in instance (return to prefab values)
 
         // **************************** For array initialization **********************************
-        Node* initAdd(OverrideValueLocation, Node _node, bool _addedInInstance); ///< @pre This _node is not yet added
+        Node* initAdd(
+            OverrideValueLocation,
+            NodeUniquePtr _node,
+            bool _addedInInstance); ///< @pre This _node is not yet added
         /// @pre hasKey() and the key doesn't exist in map
-        Node* mapInitInsert(OverrideValueLocation, Map::KeyType _key, Node _node, bool _addedInInstance);
+        Node* mapInitInsert(
+            OverrideValueLocation, Map::KeyType _key, NodeUniquePtr _node, bool _addedInInstance);
         /// @pre not hasKey()
-        Node* arrayInitPush(Node _node, bool _addedInInstance);
+        Node* arrayInitPush(NodeUniquePtr _node, bool _addedInInstance);
 
         void applyAllValues(Array& _dest, CopyMode _copyMode) const;
 
@@ -104,23 +115,23 @@ namespace Ent
 
         Subschema const* m_schema = nullptr;
 
-        using MapOrVector = mapbox::util::variant<Vector, Map>;
+        using MapOrVector = std::variant<Vector, Map>;
         MapOrVector m_data;
     };
 
     inline size_t Array::size() const
     {
-        return mapbox::util::apply_visitor([](auto& a) { return a.size(); }, m_data);
+        return std::visit([](auto& a) { return a.size(); }, m_data);
     }
 
     inline size_t Array::getDefaultSize() const
     {
-        return mapbox::util::apply_visitor([](auto& a) { return a.getDefaultSize(); }, m_data);
+        return std::visit([](auto& a) { return a.getDefaultSize(); }, m_data);
     }
 
     inline size_t Array::getPrefabSize() const
     {
-        return mapbox::util::apply_visitor([](auto& a) { return a.getPrefabSize(); }, m_data);
+        return std::visit([](auto& a) { return a.getPrefabSize(); }, m_data);
     }
 
     inline Subschema const* Array::getSchema() const
@@ -130,35 +141,40 @@ namespace Ent
 
     inline tl::optional<size_t> Array::getRawSize(OverrideValueLocation _location) const
     {
-        return mapbox::util::apply_visitor(
-            [_location](auto& a) { return a.getRawSize(_location); }, m_data);
+        return std::visit([_location](auto& a) { return a.getRawSize(_location); }, m_data);
     }
 
     inline void Ent::Array::unset()
     {
-        apply_visitor([&](auto& a) { a.unset(); }, m_data);
+        std::visit([&](auto& a) { a.unset(); }, m_data);
     }
 
     inline void Ent::Array::setParentNode(Node* _parent)
     {
-        apply_visitor([&](auto& a) { a.setParentNode(_parent); }, m_data);
+        std::visit([&](auto& a) { a.setParentNode(_parent); }, m_data);
     }
 
     inline void Ent::Array::checkParent(Node const* _parent) const
     {
-        apply_visitor([&](auto& a) { a.checkParent(_parent); }, m_data);
+        std::visit([&](auto& a) { a.checkParent(_parent); }, m_data);
     }
 
     inline std::vector<String> Ent::Array::getKeysString() const
     {
-        ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only getKeysString on map or set");
-        return m_data.get<Map>().getKeysString();
+        ENTLIB_ASSERT_MSG(
+            std::holds_alternative<Map>(m_data), "Can only getKeysString on map or set");
+        return std::get<Map>(m_data).getKeysString();
     }
 
     inline std::vector<int64_t> Ent::Array::getKeysInt() const
     {
-        ENTLIB_ASSERT_MSG(m_data.is<Map>(), "Can only getKeysInt on map or set");
-        return m_data.get<Map>().getKeysInt();
+        ENTLIB_ASSERT_MSG(std::holds_alternative<Map>(m_data), "Can only getKeysInt on map or set");
+        return std::get<Map>(m_data).getKeysInt();
+    }
+
+    inline std::vector<NodeUniquePtr> Ent::Array::releaseAllElements()
+    {
+        return std::visit([&](auto& a) { return a.releaseAllElements(); }, m_data);
     }
 
 } // namespace Ent

@@ -442,11 +442,6 @@
         },
         {
             "Version": 1,
-            "Type": "SmallActorSpawnerGD",
-            "Data": {}
-        },
-        {
-            "Version": 1,
             "Type": "NetGD",
             "Data": {}
         },

@@ -251,7 +251,7 @@ static json getSchemaType(Ent::Subschema const& _schema)
     case Ent::DataType::array:
         if (_schema.singularItems != nullptr)
         {
-            auto const& meta = _schema.meta.get<Ent::Subschema::ArrayMeta>();
+            auto const& meta = std::get<Ent::Subschema::ArrayMeta>(_schema.meta);
             if (meta.overridePolicy == "set")
             {
                 auto const singularType = (*_schema.singularItems)->type;
@@ -267,7 +267,7 @@ static json getSchemaType(Ent::Subschema const& _schema)
                 {
                     json array;
                     array["type"] = getSchemaRefType(*_schema.singularItems);
-                    auto keyFieldName = _schema.meta.get<Ent::Subschema::ArrayMeta>().keyField;
+                    auto keyFieldName = std::get<Ent::Subschema::ArrayMeta>(_schema.meta).keyField;
                     auto& keyField = _schema.singularItems->get().properties.at(*keyFieldName);
                     array["key_type"] = getSchemaRefType(keyField);
                     type["object_set"] = std::move(array);
@@ -369,13 +369,13 @@ static json getSchemaType(Ent::Subschema const& _schema)
 /// @brief Get a json describing the type of a given _ref
 static json getSchemaRefType(Ent::SubschemaRef const& _ref)
 {
-    if (_ref.subSchemaOrRef.is<Ent::Subschema>())
+    if (std::holds_alternative<Ent::Subschema>(_ref.subSchemaOrRef))
     {
         return getSchemaType(*_ref);
     }
     else
     {
-        std::string singItmRef = _ref.subSchemaOrRef.get<Ent::SubschemaRef::Ref>().ref;
+        std::string singItmRef = std::get<Ent::SubschemaRef::Ref>(_ref.subSchemaOrRef).ref;
         auto name = getRefTypeName(singItmRef);
         json typeref;
         typeref["name"] = name;
@@ -412,7 +412,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
     case Ent::DataType::array:
         if (_schema.singularItems != nullptr)
         {
-            auto const& meta = _schema.meta.get<Ent::Subschema::ArrayMeta>();
+            auto const& meta = std::get<Ent::Subschema::ArrayMeta>(_schema.meta);
             if (meta.overridePolicy == "set")
             {
                 auto const singularType = (*_schema.singularItems)->type;
@@ -525,7 +525,8 @@ static json getSchemaData(Ent::Subschema const& _schema)
         {
             json prop(json::value_t::object);
             auto propData = getSchemaRefType(propRef);
-            prop["prop_name"] = escapeName(propName);
+            prop["prop_name"] = propName;
+            prop["escaped_prop_name"] = escapeName(propName);
             prop["type"] = std::move(propData);
             properties.push_back(prop);
             includes.emplace(getSchemaRefType(propRef));
@@ -539,7 +540,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
     {
         json union_(json::value_t::object);
         json types(json::value_t::array);
-        auto const& unionData = _schema.meta.get<Ent::Subschema::UnionMeta>();
+        auto const& unionData = std::get<Ent::Subschema::UnionMeta>(_schema.meta);
         for (Ent::SubschemaRef const& ref : *_schema.oneOf)
         {
             auto acceptedType =
@@ -569,7 +570,7 @@ static void giveNameToAnonymousObjectRef(
     std::string const& _hint2 ///< A string that could be used to avoid conflict
 )
 {
-    if (_ref.subSchemaOrRef.is<Ent::Subschema>())
+    if (std::holds_alternative<Ent::Subschema>(_ref.subSchemaOrRef))
     {
         if (_ref->type == Ent::DataType::object)
         {
@@ -583,7 +584,7 @@ static void giveNameToAnonymousObjectRef(
         {
             if (_ref->singularItems != nullptr)
             {
-                auto const& meta = _ref->meta.get<Ent::Subschema::ArrayMeta>();
+                auto const& meta = std::get<Ent::Subschema::ArrayMeta>(_ref->meta);
                 if (meta.overridePolicy == "set")
                 {
                     if ((*_ref->singularItems)->type == Ent::DataType::oneOf)
@@ -641,7 +642,7 @@ static void giveNameToAnonymousObject(
         break;
     case Ent::DataType::oneOf:
     {
-        auto const& unionData = _subschema.meta.get<Ent::Subschema::UnionMeta>();
+        auto const& unionData = std::get<Ent::Subschema::UnionMeta>(_subschema.meta);
         for (Ent::SubschemaRef const& subref : *_subschema.oneOf)
         {
             auto typeField = unionData.typeField.empty() ? "Type" : unionData.typeField;
@@ -720,13 +721,17 @@ namespace Ent
         {
             {{schema.type_name}}(Ent::Node* _node): HelperObject(_node) {}
             {{#schema.schema_name}}
-            static constexpr char schemaName[] = "{{.}}";
-            static Ent::Node load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static constexpr char schemaName[] = "{{{.}}}";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
             {{/schema.schema_name}}
-        {{#properties}}    {{#type}}{{>display_type}}{{/type}} {{prop_name}}() const;
+        {{#properties}}    {{#type}}{{>display_type}}{{/type}} {{escaped_prop_name}}() const;
         {{/properties}}
         };{{/schema.object}}{{#schema.enum}}
         struct {{schema.type_name}} : EnumPropHelper<{{schema.type_name}}, {{schema.type_name}}Enum> // Enum
@@ -734,7 +739,7 @@ namespace Ent
             using Enum = {{schema.type_name}}Enum;
             using PropHelper<{{schema.type_name}}, Enum>::operator=;
             {{schema.type_name}}(Ent::Node* _node): EnumPropHelper<{{schema.type_name}}, Enum>(_node) {}
-            {{#schema.schema_name}}static constexpr char schemaName[] = "{{.}}";{{/schema.schema_name}}
+            {{#schema.schema_name}}static constexpr char schemaName[] = "{{{.}}}";{{/schema.schema_name}}
             static constexpr char const* enumToString[] = {
                 {{#values}}"{{name}}",
                 {{/values}}
@@ -755,7 +760,7 @@ namespace Ent
         struct {{schema.type_name}} : Base // Union
         {
             {{schema.type_name}}(Ent::Node* _node): Base(_node) {}
-            {{#schema.schema_name}}static constexpr char schemaName[] = "{{.}}";{{/schema.schema_name}}
+            {{#schema.schema_name}}static constexpr char schemaName[] = "{{{.}}}";{{/schema.schema_name}}
             char const* getType() const;{{#types}}
             std::optional<{{#type}}{{>display_type}}{{/type}}> {{name}}() const;
             {{#type}}{{>display_type}}{{/type}} set{{name}}() const;
@@ -767,17 +772,18 @@ namespace Ent
                 : UnionSetBase<{{items.ref.name}}>(_node)
             {
             }
-            {{#schema.schema_name}}static constexpr char schemaName[] = "{{.}}";{{/schema.schema_name}}
+            {{#schema.schema_name}}static constexpr char schemaName[] = "{{{.}}}";{{/schema.schema_name}}
             char const* getType() const;{{#types}}
             std::optional<{{#type}}{{>display_type}}{{/type}}> {{name}}() const;
             {{#type}}{{>display_type}}{{/type}} add{{name}}() const;
+            void remove{{name}}() const;
         {{/types}}
         };{{/union}}{{/schema.union_set}}
 
 {{/all_definitions}}
 
         {{#all_definitions}}{{#schema.object}}// {{schema.type_name}}
-        {{#properties}}inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::{{prop_name}}() const
+        {{#properties}}inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::{{escaped_prop_name}}() const
         {
             return {{#type}}{{>display_type}}{{/type}}(node->at("{{prop_name}}"));
         }
@@ -809,6 +815,10 @@ namespace Ent
         {
             return {{#type}}{{>display_type}}{{/type}}(addSubNode("{{name}}"));
         }
+        inline void {{schema.type_name}}::remove{{name}}() const
+        {
+            node->mapErase("{{name}}");
+        }
         {{/types}}
 {{/union}}{{/schema.union_set}}
         {{/all_definitions}}
@@ -830,7 +840,7 @@ void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path con
     auto add_partials = [](data& root) {
         root["display_type_hint"] = partial([]() {
             return R"({{#object_set}}ObjectSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/object_set}})"
-                   R"({{#prim_set}}PrimitiveSet[{{type.ref.cpp_native}}]{{/prim_set}})"
+                   R"({{#prim_set}}PrimitiveSet[{{type.ref.py_native}}]{{/prim_set}})"
                    R"({{#map}}Map[{{key_type.ref.py_native}}, {{#value_type}}{{>display_type_comma}}{{/value_type}}]{{/map}})"
                    R"({{#ref}}{{name}}{{/ref}})"
                    R"({{#array}}Array[{{#type}}{{>display_type_comma}}{{/type}}]{{/array}})"
@@ -867,7 +877,8 @@ void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path con
                    R"({{#prim_array}}{{#type}}{{>print_import}}{{/type}}{{/prim_array}})";
         });
         root["print_type_definition"] = partial([]() {
-            return R"py({{#schema}}{{#union_set}}
+            return R"py(from EntityLibPy import Node
+{{#schema}}{{#union_set}}
 {{schema.type_name}} = (lambda n: UnionSet({{#items}}{{>type_ctor}}{{/items}}, n))
 {{/union_set}}{{#object_set}}
 class {{schema.display_type_comma}}(ObjectSet):
@@ -887,16 +898,22 @@ class {{schema.type_name}}(HelperObject):
 {{#schema.schema_name}}
     schema_name = "{{.}}"
     @staticmethod
-    def load(entlib, sourcefile):
-        return entlib.load_node_file(sourcefile, entlib.get_schema({{schema.type_name}}.schema_name))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->{{schema.type_name}}
+        return {{schema.type_name}}(entlib.load_node_file(sourcefile, entlib.get_schema({{schema.type_name}}.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->{{schema.type_name}}
+        return {{schema.type_name}}(entlib.make_node({{schema.type_name}}.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
 {{/schema.schema_name}}
 {{#properties}}{{#type}}    @property
-    def {{prop_name}}(self): return {{>type_ctor}}(self._node.at("{{prop_name}}")){{#prim_array}}
-    @{{prop_name}}.setter
-    def {{prop_name}}(self, val): self.{{prop_name}}.set(val)
+    def {{escaped_prop_name}}(self):  # type: ()->{{>display_type_comma}}
+        return {{>type_ctor}}(self._node.at("{{prop_name}}")){{#prim_array}}
+    @{{escaped_prop_name}}.setter
+    def {{escaped_prop_name}}(self, val): self.{{escaped_prop_name}}.set(val)
 {{/prim_array}}{{#ref.settable}}
-    @{{prop_name}}.setter
-    def {{prop_name}}(self, val): self.{{prop_name}}.set(val)
+    @{{escaped_prop_name}}.setter
+    def {{escaped_prop_name}}(self, val): self.{{escaped_prop_name}}.set(val)
 {{/ref.settable}}{{/type}}
 {{/properties}}    pass
 
@@ -909,7 +926,7 @@ class {{schema.type_name}}(Union):
 {{/union}}{{#enum}}
 class {{schema.type_name}}(Primitive[{{schema.type_name}}Enum]):  # Enum
     def __init__(self, node):
-        super().__init__({{schema.type_name}}Enum, node)
+        super({{schema.type_name}}, self).__init__({{schema.type_name}}Enum, node)
     {{#schema_name}}schema_name = "{{.}}"{{/schema_name}}
     def __call__(self, node):  # type: (EntityLibPy.Node) -> {{schema.type_name}}
         return {{schema.type_name}}(node)
@@ -922,7 +939,7 @@ class {{schema.type_name}}(Primitive[{{schema.type_name}}Enum]):  # Enum
 {{/enum}}{{#tuple}}
 class {{type_name}}(TupleNode[Tuple[{{#types}}Type[{{>display_type_hint}}]{{#comma}}, {{/comma}}{{/types}}]]):
     def __init__(self, node=None):  # type: (EntityLibPy.Node) -> None
-        super().__init__((Int, Int, Float, Float, Float), node)
+        super({{type_name}}, self).__init__((Int, Int, Float, Float, Float), node)
     {{#schema_name}}schema_name = "{{.}}"{{/schema_name}}
 
 {{#types}}    def get_{{index}}(self):  # type: () -> {{>display_type_hint}}
@@ -964,6 +981,15 @@ import EntityLibPy
     data rootData;
     rootData["all_definitions"] = jsonToMustache(allDefinitions);
 
+    rootData["primitives"] = data::type::list;
+    for (auto&& filename : {"Bool.py", "EntityRef.py", "Float.py", "Int.py", "String.py"})
+    {
+        std::ifstream primFile(_resourcePath / "entgen" / filename);
+        std::string data;
+        std::getline(primFile, data, char(0));
+        rootData["primitives"].push_back(data);
+    }
+
     add_partials(rootData);
 
     mustache allInline{R"py(
@@ -972,6 +998,10 @@ import EntityLibPy
 from entgen_helpers import *
 import EntityLibPy
 from enum import Enum
+
+{{#primitives}}
+{{{.}}}
+{{/primitives}}
 
 {{#all_definitions}}
 {{>print_type_definition}}
@@ -1003,10 +1033,118 @@ from .String import *
     all.render(rootData, outputAll);
 
     copy_file(_resourcePath / "entgen_helpers.py", _destinationPath / "entgen_helpers.py");
+    std::ofstream init1(_destinationPath / "__init__.py");
+    std::ofstream init2(_destinationPath / "entgen" / "__init__.py");
     for (auto&& file : {"Bool.py", "EntityRef.py", "Float.py", "Int.py", "String.py"})
     {
         copy_file(_resourcePath / "entgen" / file, _destinationPath / "entgen" / file);
     }
+}
+
+// Used to make a topological sort to the generated types
+class Graph
+{
+    std::map<std::string, std::vector<std::string>> adjlist;
+    std::map<std::string, bool> vis;
+    std::vector<std::string> order;
+
+public:
+    std::vector<std::string> const& getOrder()
+    {
+        return order;
+    }
+
+    void addEdge(std::string const& u, std::string v)
+    {
+        adjlist[u].emplace_back(std::move(v));
+    }
+
+    void dfshelper(std::string const& u)
+    {
+        vis[u] = true;
+        for (auto const& i : adjlist[u])
+        {
+            if (!vis[i])
+            {
+                dfshelper(i);
+            }
+        }
+        order.push_back(u);
+    }
+
+    void topological_dfs()
+    {
+        for (auto&& [node, deps] : adjlist)
+        {
+            if (not vis[node])
+            {
+                dfshelper(node);
+            }
+        }
+        std::reverse(begin(order), end(order));
+    }
+
+    void print_order()
+    {
+        for (auto const& ele : order)
+        {
+            std::cout << ele << " -> ";
+        }
+    }
+};
+
+std::set<std::string> getDependencies(std::map<std::string, json> const& nameToSchema, json const& include)
+{
+    std::set<std::string> deps;
+    if (include["ref"].is_object())
+    {
+        auto ref = include["ref"]["name"].get<std::string>();
+        if (nameToSchema.count(ref) != 0)
+        {
+            deps.insert(ref);
+        }
+    }
+    else if (include["array"].is_object())
+    {
+        deps.merge(getDependencies(nameToSchema, include["array"]["type"]));
+    }
+    else if (include["object_set"].is_object())
+    {
+        deps.merge(getDependencies(nameToSchema, include["object_set"]["type"]));
+        deps.merge(getDependencies(nameToSchema, include["object_set"]["key_type"]));
+    }
+    else if (include["map"].is_object())
+    {
+        deps.merge(getDependencies(nameToSchema, include["map"]["value_type"]));
+        deps.merge(getDependencies(nameToSchema, include["map"]["key_type"]));
+    }
+    else if (include["prim_array"].is_object())
+    {
+        deps.merge(getDependencies(nameToSchema, include["prim_array"]["type"]));
+    }
+    else if (include["prim_set"].is_object())
+    {
+        deps.merge(getDependencies(nameToSchema, include["prim_set"]["type"]));
+    }
+    else if (include["tuple"].is_object())
+    {
+        for (auto&& type : include["tuple"]["types"])
+        {
+            deps.merge(getDependencies(nameToSchema, type));
+        }
+    }
+    else if (include["union"].is_object())
+    {
+        for (auto&& type : include["union"]["types"])
+        {
+            deps.merge(getDependencies(nameToSchema, type["type"]));
+        }
+    }
+    else if (include["union_set"].is_object())
+    {
+        deps.merge(getDependencies(nameToSchema, include["union_set"]["items"]));
+    }
+    return deps;
 }
 
 int main(int argc, char* argv[])
@@ -1048,6 +1186,60 @@ try
     std::error_code er;
     std::filesystem::remove_all(destinationPath, er);
     std::filesystem::create_directories(destinationPath);
+
+    auto getTypeID = [](json const& type) {
+        auto&& schema = type["schema"];
+        if (schema.count("type_name") != 0)
+        {
+            return schema["type_name"].get<std::string>();
+        }
+        if (schema.count("schema_name") != 0)
+        {
+            return schema["schema_name"].get<std::string>();
+        }
+        return std::string("Anonymous");
+    };
+
+    // Transfert allDefinitions into nameToSchema
+    std::map<std::string, json> nameToSchema;
+    for (json& refSchema : allDefinitions)
+    {
+        nameToSchema.emplace(getTypeID(refSchema), std::move(refSchema));
+    }
+    allDefinitions.clear();
+
+    // Enter schema into the topological sorter
+    Graph g;
+    for (auto const& [type_name, refSchema] : nameToSchema)
+    {
+        if (refSchema["schema"].count("includes") != 0)
+        {
+            std::set<std::string> deps;
+            for (auto&& include : refSchema["schema"]["includes"])
+            {
+                deps.merge(getDependencies(nameToSchema, include));
+            }
+            for (auto&& ref : deps)
+            {
+                g.addEdge(ref, type_name);
+            }
+        }
+    }
+
+    // topological sort schema types
+    g.topological_dfs();
+
+    // Transfert nameToSchema into allDefinitions
+    for (auto& id : g.getOrder())
+    {
+        auto& schema = nameToSchema.at(id);
+        allDefinitions.push_back(std::move(schema));
+        nameToSchema.erase(id);
+    }
+    for (auto&& [id, schema] : nameToSchema)
+    {
+        allDefinitions.push_back(std::move(schema));
+    }
 
     // Export the mustache json input (for debug purpose)
     {

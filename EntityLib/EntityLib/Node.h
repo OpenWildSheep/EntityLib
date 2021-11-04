@@ -49,11 +49,13 @@ namespace Ent
     struct Subschema;
     class EntityLib;
 
+    struct Node;
+
     /// Property node. Can contains any type in Ent::DataType
     struct ENTLIB_DLLEXPORT Node
     {
         /// @cond PRIVATE
-        using Value = mapbox::util::variant<
+        using Value = std::variant<
             Null,
             Override<String>,
             Override<double>,
@@ -63,12 +65,7 @@ namespace Ent
             Override<bool>,
             Override<EntityRef>,
             Union>;
-        Node() = default;
         Node(Value _val, Subschema const* _schema);
-        Node(Node const& _node);
-        Node(Node&& _node) noexcept;
-        Node& operator=(Node const& _node);
-        Node& operator=(Node&& _node) noexcept;
 
         /// @brief return the node containing the data and the type nodes (An element of the oneOf array)
         /// @pre type==Ent::DataType::oneOf
@@ -109,6 +106,8 @@ namespace Ent
         Node* mapGet(char const* _key); ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
         Node const* mapGet(char const* _key) const; ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
         Node* mapInsert(char const* _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
+        void mapInsert(char const* _key, NodeUniquePtr _newNode);
+        void mapInsert(int64_t _key, NodeUniquePtr _newNode);
         /// @pre isMapOrSet()
         /// @brief Insert a new item at the given _key
         Node* mapInsertInstanceOf(char const* _prefabPath);
@@ -132,6 +131,7 @@ namespace Ent
         /// @pre getKeyType() == integer
         /// @return All keys of the map, as int64_t
         std::vector<int64_t> getKeysInt() const;
+        std::vector<NodeUniquePtr> releaseAllElements();
 
         // Union
         Node* getUnionData(); ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data
@@ -185,10 +185,10 @@ namespace Ent
 
         /// \cond PRIVATE
         /// Create a Node with the same value but which doesn't rely on prefab.
-        Node detach() const;
+        NodeUniquePtr detach() const;
 
         /// Create a Node which is an "instance of" this one. With no override.
-        Node makeInstanceOf() const;
+        NodeUniquePtr makeInstanceOf() const;
         /// \endcond
 
         /// @remark obsolete. Use resetInstanceOf
@@ -208,6 +208,8 @@ namespace Ent
         /// @brief Take all values set in this and set them into \b _dest
         ///   BUT do not change the prefab of _dest
         void applyAllValuesButPrefab(Node& _dest, CopyMode _copyMode) const;
+
+        void applyToPrefab();
 
         bool hasDefaultValue() const; ///< false if something was set in instance or prefab
 
@@ -283,7 +285,14 @@ namespace Ent
             addedInInstance = _added;
         }
 
+        NodeUniquePtr clone() const;
+
     private:
+        Node(Node const& _node) = delete;
+        Node(Node&& _node) noexcept = delete;
+        Node& operator=(Node const& _node) = delete;
+        Node& operator=(Node&& _node) noexcept = delete;
+
         void checkMap(char const* _calledMethod) const; ///< Throw exception if not a set/map
 
         Node* parentNode = nullptr;

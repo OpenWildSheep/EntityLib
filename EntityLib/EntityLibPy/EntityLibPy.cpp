@@ -12,22 +12,6 @@
 
 namespace pybind11::detail
 {
-    template <typename... Ts>
-    struct type_caster<mapbox::util::variant<Ts...>> : variant_caster<mapbox::util::variant<Ts...>>
-    {
-    };
-
-    // Specifies the function used to visit the variant -- `apply_visitor` instead of `visit`
-    template <>
-    struct visit_helper<mapbox::util::variant>
-    {
-        template <typename... Args>
-        static auto call(Args&&... args) -> decltype(mapbox::util::apply_visitor(args...))
-        {
-            return mapbox::util::apply_visitor(args...);
-        }
-    };
-
     // Use tj::optional like a std::optional
     template <typename T>
     struct type_caster<tl::optional<T>> : public optional_caster<tl::optional<T>>
@@ -38,7 +22,7 @@ namespace pybind11::detail
 namespace py = pybind11;
 using namespace Ent;
 
-using Value = mapbox::util::variant<Null, std::string, double, int64_t, bool, EntityRef>;
+using Value = std::variant<Null, std::string, double, int64_t, bool, EntityRef>;
 
 Value getValue(Ent::Node& node)
 {
@@ -130,25 +114,26 @@ void setValue(Ent::Node& node, Value const& val)
     case Ent::DataType::array:
     case Ent::DataType::object:
     case Ent::DataType::oneOf:
-    case Ent::DataType::null:
-        break;
-    case Ent::DataType::boolean:
-        node.setBool(mapbox::util::apply_visitor(GetValue<bool>{}, val));
-        break;
-    case Ent::DataType::integer:
-        node.setInt(mapbox::util::apply_visitor(GetValue<int64_t>{}, val));
-        break;
-    case Ent::DataType::number:
-        node.setFloat(mapbox::util::apply_visitor(GetValue<double>{}, val));
-        break;
+    case Ent::DataType::null: break;
+    case Ent::DataType::boolean: node.setBool(std::visit(GetValue<bool>{}, val)); break;
+    case Ent::DataType::integer: node.setInt(std::visit(GetValue<int64_t>{}, val)); break;
+    case Ent::DataType::number: node.setFloat(std::visit(GetValue<double>{}, val)); break;
     case Ent::DataType::string:
-        node.setString(mapbox::util::apply_visitor(GetValue<std::string>{}, val).c_str());
+        node.setString(std::visit(GetValue<std::string>{}, val).c_str());
         break;
-    case Ent::DataType::entityRef:
-        node.setEntityRef({val.get<EntityRef>()});
-        break;
+    case Ent::DataType::entityRef: node.setEntityRef({std::get<EntityRef>(val)}); break;
     case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
+}
+
+std::map<std::string, Component*> getComponents(Entity const& e)
+{
+    std::map<std::string, Component*> components;
+    for (auto&& [name, compPtr] : e.getComponents())
+    {
+        components.emplace(name, compPtr.get());
+    }
+    return components;
 }
 
 static py::list nodeGetKey(Node* _node)
@@ -294,10 +279,14 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pySubschema
         .def_readonly("type", &Subschema::type)
         .def_readonly("name", &Subschema::name)
+        .def_readonly("title", &Subschema::title)
+        .def_readonly("description", &Subschema::description)
         .def_readonly("required", &Subschema::required)
         .def_readonly("properties", &Subschema::properties, py::return_value_policy::reference_internal)
         .def_readonly("max_items", &Subschema::maxItems)
         .def_readonly("min_items", &Subschema::minItems)
+        .def_property_readonly("is_used_in_editor", &Subschema::IsUsedInEditor)
+        .def_property_readonly("is_used_in_runtime", &Subschema::IsUsedInRuntime)
         .def_readonly("one_of", &Subschema::oneOf, py::return_value_policy::reference_internal)
         .def_readonly("default_value", &Subschema::defaultValue, py::return_value_policy::reference_internal)
         .def_readonly("meta", &Subschema::meta, py::return_value_policy::reference_internal)
@@ -356,7 +345,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
      * NOTE: it wasn't strictly to pre-declare ALL classes to fix the issues we currently had,
      * but it just seemed safer in case we add new methods with new dependencies.
      */
-    auto pyNode = py::class_<Node>(ent, "Node");
+    auto pyNode = py::class_<Node, NodeUniquePtr>(ent, "Node");
     auto pyComponent = py::class_<Component>(ent, "Component");
     auto pySubSceneComponent = py::class_<SubSceneComponent>(ent, "SubSceneComponent");
     // Make python internally use shared_ptr for Entity and Scene
@@ -377,6 +366,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("has_override", &Node::hasOverride)
         .def("has_prefab_value", &Node::hasPrefabValue)
         .def("has_default_value", &Node::hasDefaultValue)
+        .def("get_entitylib", &Node::getEntityLib)
         .def_property_readonly("datatype", [](Node const* node) { return node->getDataType(); })
         .def(
             "at",
@@ -496,7 +486,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     pyComponent
         .def_readonly("type", &Component::type)
-        .def_readonly("root", &Component::root, py::return_value_policy::reference_internal)
+        .def_property_readonly("root", [](Component const& comp){ return comp.root.get();}, py::return_value_policy::reference_internal)
         .def_property_readonly(
             "is_used_in_editor", [](Component const& comp) { return comp.isUsedInEditor(); })
         .def_property_readonly(
@@ -538,9 +528,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("remove_component", &Entity::removeComponent)
         .def("remove_subscene_component", &Entity::removeSubSceneComponent)
         .def("get_component_types", &Entity::getComponentTypes)
-        .def("get_components", &Entity::getComponents, py::return_value_policy::reference_internal)
+        .def("get_components", &getComponents, py::return_value_policy::reference_internal)
         .def_property_readonly("components",
-            &Entity::getComponents,
+            &getComponents,
             py::return_value_policy::reference_internal)
         .def("get_actorstates", [](Entity* ent) { return &ent->getActorStates(); }, py::return_value_policy::reference_internal)
         .def_property_readonly("actorstates", [](Entity* ent) { return &ent->getActorStates(); }, py::return_value_policy::reference_internal)
@@ -714,6 +704,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pyEntityRef
         .def(py::init<>())
         .def(py::init<std::string>())
+        .def(py::init<EntityRef const&>())
         .def_readwrite("entity_path", &EntityRef::entityPath)
         .def("__str__", [](EntityRef* ref) { return (std::string)ref->entityPath; })
         .def("__eq__", [](EntityRef const& _lhs, EntityRef const& _rhs){ return _lhs.entityPath == _rhs.entityPath; })

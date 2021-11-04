@@ -5,8 +5,7 @@
 #include <algorithm>
 
 #pragma warning(push, 0)
-#pragma warning(disable : 4996)
-#include "../../../external/mapbox/variant.hpp"
+#include <variant>
 #pragma warning(pop)
 
 #include "include/EntityLibCore.h"
@@ -22,6 +21,10 @@ namespace Ent
     struct Vector
     {
         explicit Vector(EntityLib const* _entlib = nullptr, Subschema const* _schema = nullptr);
+        Vector(Vector const&);
+        Vector(Vector&&) = default;
+        Vector& operator=(Vector const&);
+        Vector& operator=(Vector&&) = default;
 
         size_t size() const;
 
@@ -42,20 +45,23 @@ namespace Ent
         void clear();
         void computeMemory(MemoryProfiler& prof) const;
         Node* push();
-        Node* initPush(Node _node, bool _addedInInstance);
+        Node* initPush(NodeUniquePtr _node, bool _addedInInstance);
         Vector detach() const;
         Vector makeInstanceOf() const;
+        EntityLib const* getEntityLib() const;
+        std::unique_ptr<Vector> clone() const;
         tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         void unset();
         void setSize(Override<size_t> _size);
         void applyAllValues(Vector& _dest, CopyMode _copyMode) const;
         void setParentNode(Node* _parentNode);
         void checkParent(Node const* _parentNode) const;
+        std::vector<NodeUniquePtr> releaseAllElements();
 
     private:
         EntityLib const* m_entlib = nullptr;
         Subschema const* m_schema = nullptr;
-        std::vector<value_ptr<Node>> m_data; ///< List of items of the array
+        std::vector<NodeUniquePtr> m_data; ///< List of items of the array
         Override<uint64_t> m_arraySize; ///< Size of the array, to keep track on array size changes
     };
 } // namespace Ent

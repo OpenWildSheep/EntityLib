@@ -66,10 +66,10 @@ convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const* oneOfDataF
 static json
 convertToInstanceSchema(Ent::SubschemaRef const& tmplSchemaRef, char const* oneOfDataField = nullptr)
 {
-    if (tmplSchemaRef.subSchemaOrRef.is<Ent::SubschemaRef::Ref>())
+    if (std::holds_alternative<Ent::SubschemaRef::Ref>(tmplSchemaRef.subSchemaOrRef))
     {
         json instSchema;
-        std::string link = tmplSchemaRef.subSchemaOrRef.get<Ent::SubschemaRef::Ref>().ref;
+        std::string link = std::get<Ent::SubschemaRef::Ref>(tmplSchemaRef.subSchemaOrRef).ref;
         instSchema.emplace("$ref", "#/definitions/" + convertLink(link));
         return instSchema;
     }

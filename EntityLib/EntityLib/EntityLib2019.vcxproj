@@ -155,9 +155,6 @@
     <ClInclude Include="ValidJson.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="external\mapbox\NATVIS\Variant.natvis" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

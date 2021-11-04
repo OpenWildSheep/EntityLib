@@ -208,8 +208,13 @@ try
     }
     {
         auto node = entlib.loadFileAsNode("myseedpatchMarianne.seedpatchdata.node");
+        // Check if not difference in schema name
         node->saveNode("myseedpatchMarianne.seedpatchdata.copy.node");
+        // Check if we can load an entity file without $schema
+        node = entlib.loadFileAsNode("prefab.entity");
+        ENTLIB_ASSERT(node->getSchema() == entlib.getSchema(Ent::entitySchemaName));
     }
+    entlib.clearCache();
     auto testPrefabEntity = [](Ent::Entity const* ent) {
         // ActorStates
         Ent::Node const& actorStates = ent->getActorStates();

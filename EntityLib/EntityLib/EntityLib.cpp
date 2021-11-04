@@ -1762,24 +1762,43 @@ Ent::NodeUniquePtr Ent::EntityLib::loadFileAsNode(
 
 Ent::NodeUniquePtr Ent::EntityLib::loadFileAsNode(std::filesystem::path const& _nodePath) const
 {
-    auto loadFunc =
-        [&_nodePath](Ent::EntityLib const& _entLib, json const& _document, Ent::Node const* _super) {
-            Ent::Subschema const* schema = nullptr;
-            if (auto schemaName = _document.find("$schema"); schemaName != _document.end())
+    auto loadFunc = [this, &_nodePath](
+                        Ent::EntityLib const& _entLib, json const& _document, Ent::Node const* _super) {
+        Ent::Subschema const* schema = nullptr;
+        if (auto schemaName = _document.find("$schema"); schemaName != _document.end())
+        {
+            // If $schema found, use it
+            schema = _entLib.getSchema(schemaName->get_ref<json::string_t const&>().c_str());
+        }
+        else if (auto schemaName2 = _document.find("schema_name"); schemaName2 != _document.end())
+        {
+            // If schema_name found, use it
+            schema = _entLib.getSchema(schemaName2->get_ref<json::string_t const&>().c_str());
+        }
+        else if (_nodePath.extension().string() == ".entity" or _nodePath.extension().string() == ".scene")
+        {
+            // If extention is entity or scene, we know it is an Entity
+            schema = _entLib.getSchema(entitySchemaName);
+        }
+        else
+        {
+            auto type = _nodePath.stem().extension().string(); // Get pre-extention
+            type.erase(type.begin()); // remove dot
+            for (auto const& [name, schema2] : this->schema.schema.allDefinitions)
             {
-                schema = _entLib.getSchema(schemaName->get_ref<json::string_t const&>().c_str());
+                if (strToLower(getRefTypeName(name.c_str())) == strToLower(type))
+                {
+                    schema = &schema2;
+                    break;
+                }
             }
-            else if (auto schemaName2 = _document.find("schema_name"); schemaName2 != _document.end())
-            {
-                schema = _entLib.getSchema(schemaName2->get_ref<json::string_t const&>().c_str());
-            }
-            else
-            {
-                // Probably an old Entity file
-                schema = _entLib.getSchema(entitySchemaName);
-            }
-            return _entLib.loadNode(*schema, _document, _super);
-        };
+        }
+        if (schema == nullptr)
+        {
+            throw UnknownSchema(_entLib.rawdataPath.string().c_str(), _nodePath.string().c_str());
+        }
+        return _entLib.loadNode(*schema, _document, _super);
+    };
     return loadEntityOrScene<Ent::Node>(_nodePath, m_nodeCache, &validateEntity, loadFunc, nullptr)
         ->clone();
 }

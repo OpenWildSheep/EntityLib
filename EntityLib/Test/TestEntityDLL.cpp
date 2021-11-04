@@ -208,11 +208,22 @@ try
     }
     {
         auto node = entlib.loadFileAsNode("myseedpatchMarianne.seedpatchdata.node");
-        // Check if not difference in schema name
+        // When there is a $schema field
         node->saveNode("myseedpatchMarianne.seedpatchdata.copy.node");
-        // Check if we can load an entity file without $schema
+        ENTLIB_ASSERT(
+            node->getSchema()
+            == entlib.getSchema("./EditionComponents.json#/definitions/SeedPatchDataList"));
+        // When it is an Entity without schema field
         node = entlib.loadFileAsNode("prefab.entity");
         ENTLIB_ASSERT(node->getSchema() == entlib.getSchema(Ent::entitySchemaName));
+        // No $schema but a right pre-extention
+        node = entlib.loadFileAsNode("test.CharacterControllerGD.node");
+        ENTLIB_ASSERT(
+            node->getSchema()
+            == entlib.getSchema("./RuntimeComponents.json#/definitions/CharacterControllerGD"));
+        // No $schema, no .entity, wrong pre-extention
+        ENTLIB_CHECK_EXCEPTION(
+            entlib.loadFileAsNode("test.ThisTypeDoesntExist.node"), Ent::UnknownSchema);
     }
     entlib.clearCache();
     auto testPrefabEntity = [](Ent::Entity const* ent) {

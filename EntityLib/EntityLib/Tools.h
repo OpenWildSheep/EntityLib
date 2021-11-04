@@ -59,5 +59,12 @@ namespace Ent
             return hasher<std::string>()(s);
         }
     } // namespace literals
+
+    inline std::string strToLower(std::string s)
+    {
+        std::transform(
+            s.begin(), s.end(), s.begin(), [](unsigned char c) { return char(std::tolower(c)); });
+        return s;
+    }
     /// @endcond PRIVATE
 } // namespace Ent

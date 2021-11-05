@@ -1765,34 +1765,46 @@ Ent::NodeUniquePtr Ent::EntityLib::loadFileAsNode(std::filesystem::path const& _
     auto loadFunc = [this, &_nodePath](
                         Ent::EntityLib const& _entLib, json const& _document, Ent::Node const* _super) {
         Ent::Subschema const* schema = nullptr;
+        std::string schemaFound;
+        bool tryToLower = false;
         if (auto schemaName = _document.find("$schema"); schemaName != _document.end())
         {
             // If $schema found, use it
-            schema = _entLib.getSchema(schemaName->get_ref<json::string_t const&>().c_str());
+            schemaFound = getRefTypeName(schemaName->get_ref<json::string_t const&>().c_str());
         }
         else if (auto schemaName2 = _document.find("schema_name"); schemaName2 != _document.end())
         {
             // If schema_name found, use it
-            schema = _entLib.getSchema(schemaName2->get_ref<json::string_t const&>().c_str());
+            schemaFound = getRefTypeName(schemaName2->get_ref<json::string_t const&>().c_str());
         }
         else if (_nodePath.extension().string() == ".entity" or _nodePath.extension().string() == ".scene")
         {
             // If extention is entity or scene, we know it is an Entity
-            schema = _entLib.getSchema(entitySchemaName);
+            schemaFound = "Entity";
         }
         else
         {
-            auto type = _nodePath.stem().extension().string(); // Get pre-extention
-            type.erase(type.begin()); // remove dot
-            for (auto const& [name, schema2] : this->schema.schema.allDefinitions)
+            // Search in filename
+            schemaFound = _nodePath.stem().extension().string(); // Get pre-extention
+            schemaFound.erase(schemaFound.begin()); // remove dot
+            schemaFound = strToLower(schemaFound);
+            tryToLower = true;
+        }
+        if (auto dotPos = schemaFound.find("."); dotPos != std::string::npos)
+        {
+            schemaFound.erase(dotPos);
+        }
+        for (auto const& [name, schema2] : this->schema.schema.allDefinitions)
+        {
+            // Try to lower only if the type was extracted from a file name
+            if ((tryToLower and strToLower(getRefTypeName(name.c_str())) == schemaFound)
+                or (not tryToLower and getRefTypeName(name.c_str()) == schemaFound))
             {
-                if (strToLower(getRefTypeName(name.c_str())) == strToLower(type))
-                {
-                    schema = &schema2;
-                    break;
-                }
+                schema = &schema2;
+                break;
             }
         }
+
         if (schema == nullptr)
         {
             throw UnknownSchema(_entLib.rawdataPath.string().c_str(), _nodePath.string().c_str());

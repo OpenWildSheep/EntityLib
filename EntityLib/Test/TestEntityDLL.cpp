@@ -207,9 +207,13 @@ try
         node->saveNode("myseedpatchMarianne.seedpatchdata.copy.node");
     }
     {
-        auto node = entlib.loadFileAsNode("myseedpatchMarianne.seedpatchdata.node");
         // When there is a $schema field
-        node->saveNode("myseedpatchMarianne.seedpatchdata.copy.node");
+        auto node = entlib.loadFileAsNode("myseedpatch_schema.node");
+        ENTLIB_ASSERT(
+            node->getSchema()
+            == entlib.getSchema("./EditionComponents.json#/definitions/SeedPatchDataList"));
+        // When there is a $schema field with different style
+        node = entlib.loadFileAsNode("myseedpatch_schema_style.node");
         ENTLIB_ASSERT(
             node->getSchema()
             == entlib.getSchema("./EditionComponents.json#/definitions/SeedPatchDataList"));
@@ -218,6 +222,11 @@ try
         ENTLIB_ASSERT(node->getSchema() == entlib.getSchema(Ent::entitySchemaName));
         // No $schema but a right pre-extention
         node = entlib.loadFileAsNode("test.CharacterControllerGD.node");
+        ENTLIB_ASSERT(
+            node->getSchema()
+            == entlib.getSchema("./RuntimeComponents.json#/definitions/CharacterControllerGD"));
+        // No $schema but pre-extention with bad case
+        node = entlib.loadFileAsNode("test_wrong_casse.chAracTercontrOlleRgd.nOde");
         ENTLIB_ASSERT(
             node->getSchema()
             == entlib.getSchema("./RuntimeComponents.json#/definitions/CharacterControllerGD"));

@@ -52,7 +52,7 @@ char const* Ent::getRefTypeName(char const* link)
     auto const defPos = strstr(link, definitionsStr);
     if (defPos == nullptr)
     {
-        return nullptr;
+        return link;
     }
     return defPos + strlen(definitionsStr);
 }

@@ -678,7 +678,16 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_scene_cache", &EntityLib::getSceneCache, py::return_value_policy::reference_internal)
         .def("get_node_cache", &EntityLib::getNodeCache, py::return_value_policy::reference_internal)
         .def("clear_cache", &EntityLib::clearCache)
-        .def("load_node_file", &EntityLib::loadFileAsNode, py::keep_alive<0, 1>())
+        .def("load_node_file",
+            [](EntityLib* lib, std::filesystem::path const& _path, Ent::Subschema const& _schema)
+            {
+                return lib->loadFileAsNode(_path, _schema);
+            }, py::keep_alive<0, 1>())
+        .def("load_node_file",
+            [](EntityLib* lib, char const* _path)
+            {
+                return lib->loadFileAsNode(_path);
+            }, py::keep_alive<0, 1>())
         .def("load_node_entity", &EntityLib::loadEntityAsNode, py::keep_alive<0, 1>())
         .def_property(
             "logic_error_policy",

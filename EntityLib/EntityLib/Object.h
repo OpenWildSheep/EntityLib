@@ -110,7 +110,7 @@ namespace Ent
                 std::equal_range(begin(nodes), end(nodes), ObjField{key, nullptr, 0}, CompObject());
             if (range.first == range.second)
             {
-                throw BadKey(key, "at");
+                throw BadKey(key, "at", schema->name.c_str());
             }
             else
             {

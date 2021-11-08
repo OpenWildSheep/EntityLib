@@ -48,13 +48,12 @@ json loadJsonFile(std::filesystem::path const& _root, std::filesystem::path cons
 char const* Ent::getRefTypeName(char const* link)
 {
     // Force to create the definition (do nothing if already exist)
-    static char const* definitionsStr = "#/definitions/";
-    auto const defPos = strstr(link, definitionsStr);
+    auto const defPos = strrchr(link, '/');
     if (defPos == nullptr)
     {
-        return nullptr;
+        return link;
     }
-    return defPos + strlen(definitionsStr);
+    return defPos + 1;
 }
 
 std::vector<std::string> Ent::splitString(const std::string& _str, char _delimiter, bool _keepEmptyToken)

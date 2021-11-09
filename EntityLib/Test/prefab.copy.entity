@@ -192,6 +192,7 @@
                                 "Version": 1
                             }
                         ],
+                        "InstanceOf": "test_prefab_history.entity",
                         "Name": "EP1-Spout_LINK_001"
                     },
                     {

@@ -155,6 +155,7 @@
                 "Embedded": [{
                         "Name": "EP1-Spout_LINK_001",
                         "Color": [255, 120, 220, 255],
+                        "InstanceOf": "test_prefab_history.entity",
                         "Components": [{
                                 "Version": 1,
                                 "Type": "TransformGD",

@@ -302,6 +302,14 @@ namespace Ent
         /// @brief Get the NodeRef from root to this
         NodeRef makeAbsoluteNodeRef() const;
 
+        struct PrefabInfo
+        {
+            String prefabPath;
+            NodeRef nodeRef;
+            Node const* node = nullptr;
+        };
+        std::vector<PrefabInfo> getPrefabHistory() const;
+
     private:
         Node(Node const& _node) = delete;
         Node(Node&& _node) noexcept = delete;

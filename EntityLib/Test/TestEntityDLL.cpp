@@ -207,6 +207,11 @@ try
         node->saveNode("myseedpatchMarianne.seedpatchdata.copy.node");
     }
     {
+        auto node =
+            entlib.loadFileAsNode("instance.entity", entlib.schema.schema.allDefinitions["Entity"]);
+        auto prefabHisto = node->getPrefabHistory();
+    }
+    {
         entlib.rawdataPath = "X:/RawData"; // It is a hack to work in the working dir
         auto node = entlib.loadFileAsNode(
             "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
@@ -220,6 +225,16 @@ try
         ENTLIB_ASSERT(entpath == nodeRef);
         entpath = node->makeAbsoluteNodeRef();
         ENTLIB_ASSERT(entpath == ".");
+
+        auto prefabHisto = ent->getPrefabHistory();
+        ENTLIB_ASSERT(prefabHisto.size() == 3);
+        ENTLIB_ASSERT(
+            prefabHisto[0].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
+        ENTLIB_ASSERT(
+            prefabHisto[1].prefabPath == "02_creature/human/male/entity/legacy/shaman_male.entity");
+        ENTLIB_ASSERT(
+            prefabHisto[2].prefabPath
+            == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
     }
     {
         auto node = entlib.loadFileAsNode(
@@ -231,6 +246,14 @@ try
         auto ent = node->resolveNodeRef(nodeRef);
         auto entpath = node->makeNodeRef(ent);
         ENTLIB_ASSERT(entpath == nodeRef);
+        auto prefabHisto = ent->getPrefabHistory();
+        ENTLIB_ASSERT(
+            prefabHisto[0].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
+        ENTLIB_ASSERT(
+            prefabHisto[1].prefabPath == "02_creature/human/male/entity/legacy/shaman_male.entity");
+        ENTLIB_ASSERT(
+            prefabHisto[2].prefabPath
+            == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
         entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
     }
     {
@@ -255,6 +278,21 @@ try
         auto strRef = R"(Components/ScriptComponentGD/CommonDataMap/Test/Value/string)";
         ENTLIB_ASSERT(node->makeNodeRef(stringUnionData) == strRef);
         ENTLIB_ASSERT(typedValueUnion->makeNodeRef(stringUnionData) == "string");
+
+        auto prefabHisto = ent->getPrefabHistory();
+        ENTLIB_ASSERT(prefabHisto.size() == 3);
+        ENTLIB_ASSERT(
+            std::all_of(begin(prefabHisto), end(prefabHisto), [](Ent::Node::PrefabInfo const& pi) {
+                return pi.node->getSchema()->name == "NetworkLink";
+            }));
+        ENTLIB_ASSERT(prefabHisto[0].nodeRef == ".");
+        ENTLIB_ASSERT(prefabHisto[1].nodeRef == "Components/NetworkLink");
+        ENTLIB_ASSERT(
+            prefabHisto[2].nodeRef
+            == "Components/SubScene/Embedded/EP1-Spout_LINK_001/Components/NetworkLink");
+        ENTLIB_ASSERT(prefabHisto[0].prefabPath == "test.NetworkLink.node");
+        ENTLIB_ASSERT(prefabHisto[1].prefabPath == "test_prefab_history.entity");
+        ENTLIB_ASSERT(prefabHisto[2].prefabPath == "prefab.entity");
     }
     entlib.clearCache();
     auto testPrefabEntity = [](Ent::Entity const* ent) {
@@ -615,8 +653,11 @@ try
         auto const nodeCachesize = entlib.getNodeCache().size();
         auto ent = entlib.loadEntityAsNode("prefab.copy.entity");
         auto const newNodeCachesize = entlib.getNodeCache().size();
-        ENTLIB_ASSERT(
-            newNodeCachesize == nodeCachesize + 2); // "prefab.copy.entity" and "test.SeedPatch.node"
+        // 3 files more in cache:
+        //     "test_prefab_history.entity"
+        //     "prefab.copy.entity"
+        //     "subentity.entity"
+        ENTLIB_ASSERT(newNodeCachesize == nodeCachesize + 3);
         // TEST simple entity refs resolution
         Ent::Node* testEntityRef = ent->at("Components")->mapGet("TestEntityRef")->getUnionData();
         ENTLIB_ASSERT(testEntityRef != nullptr);

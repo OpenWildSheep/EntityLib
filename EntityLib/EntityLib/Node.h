@@ -287,7 +287,20 @@ namespace Ent
 
         NodeUniquePtr clone() const;
 
-        NodeRef getNodeRef() const;
+        /// @brief Get the root Node of the document
+        Node const* getRootNode() const;
+
+        /// @brief Make a NodeRef going from this to _target
+        NodeRef makeNodeRef(Node const* _target) const;
+
+        /// @brief Get the target pointed by _nodeRef, starting from this
+        Node const* resolveNodeRef(char const* _nodeRef) const;
+
+        /// @brief Get the target pointed by _nodeRef, starting from this
+        Node* resolveNodeRef(char const* _nodeRef);
+
+        /// @brief Get the NodeRef from root to this
+        NodeRef makeAbsoluteNodeRef() const;
 
     private:
         Node(Node const& _node) = delete;

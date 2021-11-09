@@ -481,6 +481,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("apply_all_values", [](Node& self, Node& dest, CopyMode copyMode) {
             self.applyAllValues(dest, copyMode);
         })
+        .def_property_readonly("root_node", &Node::getRootNode, py::return_value_policy::reference_internal)
+        .def("make_noderef", &Node::makeNodeRef)
+        .def("resolve_noderef", (Node* (Node::*)(char const* _nodeRef))(&Node::resolveNodeRef), py::return_value_policy::reference_internal)
+        .def_property_readonly("absolute_noderef", &Node::makeAbsoluteNodeRef)
         ;
 
     pyComponent

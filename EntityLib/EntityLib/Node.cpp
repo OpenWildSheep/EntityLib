@@ -91,45 +91,179 @@ namespace Ent
             parent->GetRawValue());
     }
 
-    NodeRef Node::getNodeRef() const
+    Node const* Node::getRootNode() const
     {
-        NodeRef nodeRef;
-        if (parentNode != nullptr)
+        // Find the root Node
+        Node const* rootParent = this;
+        while (rootParent->parentNode != nullptr)
+        {
+            rootParent = rootParent->parentNode;
+        }
+        // Call makeNodeRef froml root Node
+        return rootParent;
+    }
+
+    static bool isUnionSet(Node const* node)
+    {
+        if (node == nullptr or node->getDataType() != Ent::DataType::array)
+        {
+            return false;
+        }
+        auto const* schema = node->getSchema();
+        return std::get<Ent::Subschema::ArrayMeta>(schema->meta).overridePolicy == "set"
+               and schema->singularItems->get().type == Ent::DataType::oneOf;
+    }
+
+    static bool isUnion(Node const* node)
+    {
+        return node != nullptr and node->getDataType() == Ent::DataType::oneOf;
+    }
+
+    static std::vector<std::string> makeNodeRefReversed(Node const* root, Node const* child)
+    {
+        std::vector<std::string> nodeRef;
+        if (child != root)
         {
             bool isChildOfUnionSet = false;
-            Node const* usedParent = parentNode;
-            if (parentNode->parentNode != nullptr
-                and parentNode->parentNode->getDataType() == Ent::DataType::oneOf)
+            Node const* usedParent{};
+            ENTLIB_ASSERT(child->getParentNode() != nullptr);
+            bool parentIsUnion = false;
+            if (isUnion(child->getParentNode()->getParentNode()))
             {
+                parentIsUnion = true;
                 // Special case of Union.
                 // There is an intermediate wrapper Node which doesn't apear in the path.
-                if (parentNode->parentNode->parentNode != nullptr
-                    and parentNode->parentNode->parentNode->getDataType() == Ent::DataType::array
-                    and std::get<Ent::Subschema::ArrayMeta>(
-                            parentNode->parentNode->parentNode->getSchema()->meta)
-                                .overridePolicy
-                            == "set")
+                if (child->getParentNode()->getParentNode() != root
+                    and isUnionSet(child->getParentNode()->getParentNode()->getParentNode()))
                 {
                     // Special case of UnionSet.
                     // Don't need to explicit the type of the Union since it is the key of the set
                     isChildOfUnionSet = true;
-                    // usedParent = parentNode->parentNode->parentNode;
                 }
-                usedParent = parentNode->parentNode;
+                usedParent = child->getParentNode()->getParentNode();
             }
             else
             {
-                usedParent = parentNode;
+                usedParent = child->getParentNode();
             }
-            nodeRef = usedParent->getNodeRef();
+            nodeRef = makeNodeRefReversed(root, usedParent);
             if (not isChildOfUnionSet)
             {
-                if (not nodeRef.empty())
-                    nodeRef += '/';
-                nodeRef += computeParentToChildNodeRef(usedParent, this);
+                nodeRef.insert(nodeRef.begin(), computeParentToChildNodeRef(usedParent, child));
             }
         }
         return nodeRef;
+    }
+
+    NodeRef Node::makeNodeRef(Node const* target) const
+    {
+        auto const* thisRoot = getRootNode();
+        auto const* targetRoot = target->getRootNode();
+        if (thisRoot != targetRoot)
+        {
+            throw ContextException("makeNodeRef called on unreleted nodes");
+        }
+        // get the two absolute path
+        auto&& thisPath = makeNodeRefReversed(thisRoot, this);
+        auto&& targetPath = makeNodeRefReversed(targetRoot, target);
+
+        // Get path from this to target
+        std::string relativePath =
+            computeRelativePath(std::move(thisPath), std::move(targetPath), false);
+
+        return relativePath;
+    }
+
+    Node const* Node::resolveNodeRef(char const* _nodeRef) const
+    {
+        auto tokenStart = _nodeRef;
+        auto nodeRefEnd = _nodeRef + strlen(_nodeRef);
+
+        auto tokenStop = strchr(tokenStart, '/');
+        if (tokenStop == nullptr)
+        {
+            tokenStop = nodeRefEnd;
+        }
+        Node const* current = this;
+
+        auto nextToken = [&] {
+            if (tokenStop == nodeRefEnd)
+            {
+                tokenStart = nodeRefEnd;
+            }
+            else
+            {
+                tokenStart = tokenStop + 1;
+                tokenStop = strchr(tokenStart, '/');
+                if (tokenStop == nullptr)
+                {
+                    tokenStop = nodeRefEnd;
+                }
+            }
+        };
+
+        for (; tokenStart != nodeRefEnd; nextToken())
+        {
+            auto token = std::string(tokenStart, tokenStop - tokenStart);
+            ENTLIB_ASSERT(not token.empty());
+            switch (current->getDataType())
+            {
+            case Ent::DataType::object:
+            {
+                current = current->at(token.c_str());
+                break;
+            }
+            case Ent::DataType::oneOf:
+            {
+                if (token != current->getUnionType())
+                {
+                    throw ContextException("Wrong union type. Path doesn't exist.");
+                }
+                current = current->getUnionData();
+                break;
+            }
+            case Ent::DataType::array:
+            {
+                if (current->isMapOrSet())
+                {
+                    if (current->getSchema()->singularItems->get().type == Ent::DataType::oneOf)
+                    {
+                        current = current->mapGet(token.c_str())->getUnionData();
+                    }
+                    else
+                    {
+                        current = current->mapGet(token.c_str());
+                    }
+                }
+                else
+                {
+                    auto const index = atoi(token.c_str());
+                    current = current->at(index);
+                }
+                break;
+            }
+            case Ent::DataType::null: [[fallthrough]];
+            case Ent::DataType::boolean: [[fallthrough]];
+            case Ent::DataType::entityRef: [[fallthrough]];
+            case Ent::DataType::integer: [[fallthrough]];
+            case Ent::DataType::number: [[fallthrough]];
+            case Ent::DataType::string: [[fallthrough]];
+            case Ent::DataType::COUNT: [[fallthrough]];
+            default: ENTLIB_LOGIC_ERROR("Unexpected DataType in Node::resolveNodeRef");
+            }
+        }
+        return current;
+    }
+
+    Node* Node::resolveNodeRef(char const* _nodeRef)
+    {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+        return const_cast<Node*>(std::as_const(*this).resolveNodeRef(_nodeRef));
+    }
+
+    NodeRef Node::makeAbsoluteNodeRef() const
+    {
+        return getRootNode()->makeNodeRef(this);
     }
 
     struct UpdateParents

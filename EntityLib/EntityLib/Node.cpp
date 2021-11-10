@@ -277,7 +277,7 @@ namespace Ent
     std::vector<Node::PrefabInfo> Node::getPrefabHistory() const
     {
         std::vector<Node::PrefabInfo> result;
-        // Find 1st prefab
+        // Going up to find the first prefab
         Node const* parent = this;
         while (parent != nullptr)
         {
@@ -291,7 +291,7 @@ namespace Ent
 
             parent = parent->getParentNode();
         }
-        if (parent != nullptr)
+        if (parent != nullptr) // A prefab has been found
         {
             auto* obj = std::get_if<Object>(&parent->value);
             if (not obj->instanceOf.get().empty())
@@ -303,6 +303,7 @@ namespace Ent
                 result = thisPrefab->getPrefabHistory();
                 result.push_back(Node::PrefabInfo{obj->instanceOf.get(), prefabToThis, thisPrefab});
             }
+            // If instanceOf is empty, keep result empty
         }
         return result;
     }

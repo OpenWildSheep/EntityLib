@@ -208,6 +208,10 @@ namespace Ent
         {
             // Get the child, using the token and the DataType
             auto token = std::string(tokenStart, tokenStop - tokenStart);
+            if (token == ".")
+            {
+                continue;
+            }
             ENTLIB_ASSERT(not token.empty());
             switch (current->getDataType())
             {

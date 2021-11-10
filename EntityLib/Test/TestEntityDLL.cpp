@@ -236,7 +236,7 @@ try
     }
     entlib.clearCache();
     {
-        entlib.rawdataPath = "X:/RawData"; // It is a hack to work in the working dir
+        entlib.rawdataPath = "X:/RawData"; // Work in rawdata
         auto node = entlib.loadFileAsNode(
             "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
             "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
@@ -260,7 +260,7 @@ try
         auto ent = node->resolveNodeRef(nodeRef);
         auto entpath = node->makeNodeRef(ent);
         ENTLIB_ASSERT(entpath == nodeRef);
-        entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
+        entlib.rawdataPath = current_path(); // Work in Test dir
     }
     {
         auto node =

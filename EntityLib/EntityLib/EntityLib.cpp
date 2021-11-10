@@ -1757,6 +1757,61 @@ Ent::NodeUniquePtr Ent::EntityLib::loadFileAsNode(
     return loadNodeReadOnly(_schema, _path.string().c_str())->clone();
 }
 
+Ent::NodeUniquePtr Ent::EntityLib::loadFileAsNode(std::filesystem::path const& _nodePath) const
+{
+    auto loadFunc = [this, &_nodePath](
+                        Ent::EntityLib const& _entLib, json const& _document, Ent::Node const* _super) {
+        Ent::Subschema const* schema = nullptr;
+        std::string schemaFound;
+        bool tryToLower = false;
+        if (auto schemaName = _document.find("$schema"); schemaName != _document.end())
+        {
+            // If $schema found, use it
+            schemaFound = getRefTypeName(schemaName->get_ref<json::string_t const&>().c_str());
+        }
+        else if (auto schemaName2 = _document.find("schema_name"); schemaName2 != _document.end())
+        {
+            // If schema_name found, use it
+            schemaFound = getRefTypeName(schemaName2->get_ref<json::string_t const&>().c_str());
+        }
+        else if (_nodePath.extension().string() == ".entity" or _nodePath.extension().string() == ".scene")
+        {
+            // If extention is entity or scene, we know it is an Entity
+            schemaFound = "Entity";
+        }
+        else
+        {
+            // Search in filename
+            schemaFound = _nodePath.stem().extension().string(); // Get pre-extention
+            schemaFound.erase(schemaFound.begin()); // remove dot
+            schemaFound = strToLower(schemaFound);
+            tryToLower = true;
+        }
+        if (auto dotPos = schemaFound.find("."); dotPos != std::string::npos)
+        {
+            schemaFound.erase(dotPos);
+        }
+        for (auto const& [name, schema2] : this->schema.schema.allDefinitions)
+        {
+            // Try to lower only if the type was extracted from a file name
+            if ((tryToLower and strToLower(getRefTypeName(name.c_str())) == schemaFound)
+                or (not tryToLower and getRefTypeName(name.c_str()) == schemaFound))
+            {
+                schema = &schema2;
+                break;
+            }
+        }
+
+        if (schema == nullptr)
+        {
+            throw UnknownSchema(_entLib.rawdataPath.string().c_str(), _nodePath.string().c_str());
+        }
+        return _entLib.loadNode(*schema, _document, _super);
+    };
+    return loadEntityOrScene<Ent::Node>(_nodePath, m_nodeCache, &validateEntity, loadFunc, nullptr)
+        ->clone();
+}
+
 std::unique_ptr<Ent::Entity>
 Ent::EntityLib::loadEntity(std::filesystem::path const& _entityPath, Ent::Entity const* _super) const
 {

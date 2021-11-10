@@ -192,11 +192,11 @@ namespace Ent
         prof.addNodes(size());
     }
 
-    NodeRef Object::computeNodeRefToChild(Node const* child) const
+    NodeRef Object::computeNodeRefToChild(Node const* _child) const
     {
         for (auto& field : nodes)
         {
-            if (child == field.node.get())
+            if (_child == field.node.get())
             {
                 return field.name;
             }

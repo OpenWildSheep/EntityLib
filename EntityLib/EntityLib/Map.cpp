@@ -830,12 +830,12 @@ struct KeyToString
     }
 };
 
-Ent::NodeRef Ent::Map::computeNodeRefToChild(Node const* child) const
+Ent::NodeRef Ent::Map::computeNodeRefToChild(Node const* _child) const
 {
     for (auto& [key, idx] : m_itemMap)
     {
         auto& item = m_items[idx];
-        if (item.isPresent.get() and getEltValue(m_schema, item) == child)
+        if (item.isPresent.get() and getEltValue(m_schema, item) == _child)
         {
             return std::visit(KeyToString{}, key);
         }

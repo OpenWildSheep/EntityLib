@@ -464,8 +464,34 @@ namespace Ent
 
     struct BadKey : ContextException
     {
-        BadKey(char const* key, char const* funcName)
-            : ContextException("Unknown key '%s' in function '%s'", key, funcName)
+        BadKey(char const* key, char const* funcName, char const* schemaName)
+            : ContextException(
+                "Unknown key '%s' in function '%s', in schema '%s'", key, funcName, schemaName)
+        {
+        }
+    };
+
+    struct UnknownSchema : ContextException
+    {
+        UnknownSchema(char const* rootPath, char const* filenameName)
+            : ContextException(
+                "Can't find schema of file %s", Ent::formatPath(rootPath, filenameName))
+        {
+        }
+    };
+
+    struct UnrelatedNodes : ContextException
+    {
+        UnrelatedNodes()
+            : ContextException("Nodes from different documents")
+        {
+        }
+    };
+
+    struct WrongPath : ContextException
+    {
+        WrongPath(char const* _message)
+            : ContextException(_message)
         {
         }
     };

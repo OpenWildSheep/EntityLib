@@ -361,7 +361,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pyNode
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
         .def("get_ptr", [](Node* self) {return (intptr_t)self;})
-        .def_static("from_ptr", [](intptr_t _ptr) {return (Node*)_ptr;})
+        .def_static("from_ptr", [](intptr_t _ptr) {return (Node*)_ptr;}, py::return_value_policy::reference_internal)
         .def("has_override", &Node::hasOverride)
         .def("has_prefab_value", &Node::hasPrefabValue)
         .def("has_default_value", &Node::hasDefaultValue)
@@ -573,7 +573,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pyScene
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
         .def("get_ptr", [](Scene* self) {return (intptr_t)self;})
-        .def_static("from_ptr", [](intptr_t _ptr) {return (Scene*)_ptr;})
+        .def_static("from_ptr", [](intptr_t _ptr) {return (Scene*)_ptr;}, py::return_value_policy::reference_internal)
         .def(
             "add_entity",
             [](Scene* scene, Entity* ent) -> Entity*
@@ -681,7 +681,16 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_scene_cache", &EntityLib::getSceneCache, py::return_value_policy::reference_internal)
         .def("get_node_cache", &EntityLib::getNodeCache, py::return_value_policy::reference_internal)
         .def("clear_cache", &EntityLib::clearCache)
-        .def("load_node_file", &EntityLib::loadFileAsNode, py::keep_alive<0, 1>())
+        .def("load_node_file",
+            [](EntityLib* lib, std::filesystem::path const& _path, Ent::Subschema const& _schema)
+            {
+                return lib->loadFileAsNode(_path, _schema);
+            }, py::keep_alive<0, 1>())
+        .def("load_node_file",
+            [](EntityLib* lib, char const* _path)
+            {
+                return lib->loadFileAsNode(_path);
+            }, py::keep_alive<0, 1>())
         .def("load_node_entity", &EntityLib::loadEntityAsNode, py::keep_alive<0, 1>())
         .def_property(
             "logic_error_policy",

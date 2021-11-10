@@ -267,12 +267,12 @@ std::vector<Ent::NodeUniquePtr> Ent::Vector::releaseAllElements()
     return releasedElts;
 }
 
-Ent::NodeRef Ent::Vector::computeNodeRefToChild(Node const* child) const
+Ent::NodeRef Ent::Vector::computeNodeRefToChild(Node const* _child) const
 {
     size_t i = 0;
     for (auto& subnode : this->getItems())
     {
-        if (child == subnode)
+        if (_child == subnode)
         {
             return format("%llu", i);
         }

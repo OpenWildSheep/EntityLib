@@ -470,6 +470,22 @@ namespace Ent
         }
     };
 
+    struct UnrelatedNodes : ContextException
+    {
+        UnrelatedNodes()
+            : ContextException("Nodes from different documents")
+        {
+        }
+    };
+
+    struct WrongPath : ContextException
+    {
+        WrongPath(char const* _message)
+            : ContextException(_message)
+        {
+        }
+    };
+
     template <typename V, typename F>
     static constexpr auto doesCompile(F&&) -> decltype(std::is_invocable_v<F, V>)
     {

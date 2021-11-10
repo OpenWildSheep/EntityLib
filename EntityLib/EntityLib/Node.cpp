@@ -70,36 +70,36 @@ namespace Ent
         return newNode;
     }
 
-    static NodeRef computeParentToChildNodeRef(Node const* parent, Node const* child)
+    // Get the NodeRef token to get the _child from the _parent
+    static NodeRef computeParentToChildNodeRef(Node const* _parent, Node const* _child)
     {
         return std::visit(
-            [child](auto const& node) {
-                using NodeType = std::remove_const_t<std::remove_reference_t<decltype(node)>>;
-                // ENT_IF_COMPILE(decltype(node), node, node.computeNodeRefToChild(child))
+            [_child](auto const& _node) -> NodeRef {
+                using NodeType = std::remove_const_t<std::remove_reference_t<decltype(_node)>>;
                 if constexpr (
                     std::is_same_v<
                         NodeType,
                         Object> or std::is_same_v<NodeType, Union> or std::is_same_v<NodeType, Array>)
                 {
-                    return node.computeNodeRefToChild(child);
+                    // Call computeNodeRefToChild on any container type
+                    return _node.computeNodeRefToChild(_child);
                 }
                 else
                 {
-                    return NodeRef();
+                    ENTLIB_LOGIC_ERROR(
+                        R"(In computeParentToChildNodeRef, parent have to contain child!)");
                 }
             },
-            parent->GetRawValue());
+            _parent->GetRawValue());
     }
 
     Node const* Node::getRootNode() const
     {
-        // Find the root Node
         Node const* rootParent = this;
         while (rootParent->parentNode != nullptr)
         {
             rootParent = rootParent->parentNode;
         }
-        // Call makeNodeRef froml root Node
         return rootParent;
     }
 
@@ -119,53 +119,54 @@ namespace Ent
         return node != nullptr and node->getDataType() == Ent::DataType::oneOf;
     }
 
-    static std::vector<std::string> makeNodeRefReversed(Node const* root, Node const* child)
+    // Get the path from _root to _child, but reversed.
+    static std::vector<std::string> makeNodeRefReversed(Node const* _root, Node const* _child)
     {
         std::vector<std::string> nodeRef;
-        if (child != root)
+        if (_child != _root)
         {
             bool isChildOfUnionSet = false;
             Node const* usedParent{};
-            ENTLIB_ASSERT(child->getParentNode() != nullptr);
-            bool parentIsUnion = false;
-            if (isUnion(child->getParentNode()->getParentNode()))
+            ENTLIB_ASSERT(_child->getParentNode() != nullptr);
+            if (isUnion(_child->getParentNode()->getParentNode()))
             {
-                parentIsUnion = true;
                 // Special case of Union.
                 // There is an intermediate wrapper Node which doesn't apear in the path.
-                if (child->getParentNode()->getParentNode() != root
-                    and isUnionSet(child->getParentNode()->getParentNode()->getParentNode()))
+                if (_child->getParentNode()->getParentNode() != _root
+                    and isUnionSet(_child->getParentNode()->getParentNode()->getParentNode()))
                 {
                     // Special case of UnionSet.
                     // Don't need to explicit the type of the Union since it is the key of the set
                     isChildOfUnionSet = true;
                 }
-                usedParent = child->getParentNode()->getParentNode();
+                usedParent = _child->getParentNode()->getParentNode();
             }
             else
             {
-                usedParent = child->getParentNode();
+                usedParent = _child->getParentNode();
             }
-            nodeRef = makeNodeRefReversed(root, usedParent);
+            // Get the path to parent
+            nodeRef = makeNodeRefReversed(_root, usedParent);
+            // Insert the path from parent to child at the begining
             if (not isChildOfUnionSet)
             {
-                nodeRef.insert(nodeRef.begin(), computeParentToChildNodeRef(usedParent, child));
+                nodeRef.insert(nodeRef.begin(), computeParentToChildNodeRef(usedParent, _child));
             }
         }
         return nodeRef;
     }
 
-    NodeRef Node::makeNodeRef(Node const* target) const
+    NodeRef Node::makeNodeRef(Node const* _target) const
     {
         auto const* thisRoot = getRootNode();
-        auto const* targetRoot = target->getRootNode();
+        auto const* targetRoot = _target->getRootNode();
         if (thisRoot != targetRoot)
         {
-            throw ContextException("makeNodeRef called on unreleted nodes");
+            throw UnrelatedNodes();
         }
         // get the two absolute path
         auto&& thisPath = makeNodeRefReversed(thisRoot, this);
-        auto&& targetPath = makeNodeRefReversed(targetRoot, target);
+        auto&& targetPath = makeNodeRefReversed(targetRoot, _target);
 
         // Get path from this to target
         std::string relativePath =
@@ -177,7 +178,7 @@ namespace Ent
     Node const* Node::resolveNodeRef(char const* _nodeRef) const
     {
         auto tokenStart = _nodeRef;
-        auto nodeRefEnd = _nodeRef + strlen(_nodeRef);
+        auto const nodeRefEnd = _nodeRef + strlen(_nodeRef);
 
         auto tokenStop = strchr(tokenStart, '/');
         if (tokenStop == nullptr)
@@ -186,7 +187,7 @@ namespace Ent
         }
         Node const* current = this;
 
-        auto nextToken = [&] {
+        auto nextToken = [&tokenStart, &tokenStop, nodeRefEnd] {
             if (tokenStop == nodeRefEnd)
             {
                 tokenStart = nodeRefEnd;
@@ -202,8 +203,10 @@ namespace Ent
             }
         };
 
+        // For each token in _nodeRef
         for (; tokenStart != nodeRefEnd; nextToken())
         {
+            // Get the child, using the token and the DataType
             auto token = std::string(tokenStart, tokenStop - tokenStart);
             ENTLIB_ASSERT(not token.empty());
             switch (current->getDataType())
@@ -217,7 +220,7 @@ namespace Ent
             {
                 if (token != current->getUnionType())
                 {
-                    throw ContextException("Wrong union type. Path doesn't exist.");
+                    throw WrongPath("Wrong union type. Path doesn't exist.");
                 }
                 current = current->getUnionData();
                 break;
@@ -228,15 +231,18 @@ namespace Ent
                 {
                     if (current->getSchema()->singularItems->get().type == Ent::DataType::oneOf)
                     {
+                        // current is UnionSet
                         current = current->mapGet(token.c_str())->getUnionData();
                     }
                     else
                     {
+                        // current is any other mep/set kind
                         current = current->mapGet(token.c_str());
                     }
                 }
                 else
                 {
+                    // current is an array
                     auto const index = atoi(token.c_str());
                     current = current->at(index);
                 }

@@ -34,7 +34,7 @@ namespace Ent
     Subschema const* Subschema::getUnionType(char const* _subtype) const
     {
         auto const& un = std::get<UnionMeta>(meta);
-        auto schema = getUnionTypeWrapper(_subtype).first;
+        auto [schema, index] = getUnionTypeWrapper(_subtype);
         return &AT(schema->properties, un.dataField).get();
     }
 

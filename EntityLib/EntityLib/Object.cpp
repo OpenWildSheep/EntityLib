@@ -68,7 +68,7 @@ namespace Ent
         out.nodes.reserve(size());
         for (auto&& [name, node, fieldIdx] : *this)
         {
-            out.nodes.push_back(ObjField{name, node->makeInstanceOf(), fieldIdx});
+            out.nodes.emplace_back(name, node->makeInstanceOf(), fieldIdx);
         }
         std::sort(begin(out), end(out), CompObject());
         return out;
@@ -80,7 +80,7 @@ namespace Ent
         out.nodes.reserve(size());
         for (auto&& [name, node, fieldIdx] : *this)
         {
-            out.nodes.emplace_back(ObjField{name, node->detach(), fieldIdx});
+            out.nodes.emplace_back(name, node->detach(), fieldIdx);
         }
         std::sort(begin(out), end(out), CompObject());
         return out;

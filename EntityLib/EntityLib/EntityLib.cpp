@@ -329,13 +329,8 @@ namespace Ent
     EntityRef EntityLib::makeEntityRef(Node const& _from, Node const& _to)
     {
         // get the two absolute path
-        auto&& thisPathInfos = getAbsolutePathReversed(&_from);
-        auto&& entityPathInfos = getAbsolutePathReversed(&_to);
-
-        Node const* thisRootEntity = std::get<1>(thisPathInfos);
-        Node const* entityRootEntity = std::get<1>(entityPathInfos);
-        Node const* thisRootScene = std::get<2>(thisPathInfos);
-        Node const* entityRootScene = std::get<2>(entityPathInfos);
+        auto&& [thisPath, thisRootEntity, thisRootScene] = getAbsolutePathReversed(&_from);
+        auto&& [entityPath, entityRootEntity, entityRootScene] = getAbsolutePathReversed(&_to);
 
         // entities should either share a common root scene
         // or a common root entity if they are in a .entity (i.e there is no root scene)
@@ -346,12 +341,9 @@ namespace Ent
             return {};
         }
 
-        auto&& thisPath = std::get<0>(thisPathInfos);
-        auto&& entityPath = std::get<0>(entityPathInfos);
-
         std::string relativePath = computeRelativePath(thisPath, std::move(entityPath), false);
 
-        return {relativePath};
+        return {std::move(relativePath)};
     }
 
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
@@ -711,10 +703,8 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
 
         // Read the fields in schema
         object.nodes.reserve(_nodeSchema.properties.size());
-        for (auto&& name_sub : _nodeSchema.properties)
+        for (auto&& [name, propSchemaRef] : _nodeSchema.properties)
         {
-            Ent::SubschemaRef const& propSchemaRef = std::get<1>(name_sub);
-            std::string const& name = std::get<0>(name_sub);
             Ent::Node const* superProp = (_super != nullptr) ? _super->at(name.c_str()) : nullptr;
             json const* refDefault = propSchemaRef.getRefDefaultValues();
             json const* schemaDefault = nullptr;
@@ -738,7 +728,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
             try
             {
                 auto tmpNode = loadNode(*propSchemaRef, *prop, superProp, defaultProp);
-                object.nodes.push_back(ObjField{name.c_str(), std::move(tmpNode), fieldIdx});
+                object.nodes.emplace_back(name.c_str(), std::move(tmpNode), fieldIdx);
             }
             catch (ContextException& ex)
             {
@@ -1189,6 +1179,14 @@ json Ent::EntityLib::dumpNode(
             char const* name = nullptr;
             json data;
             uint32_t index = 0;
+
+            // TODO : Remove when C++20
+            JsonField(char const* _name, json _data, uint32_t _index = 0)
+                : name(_name)
+                , data(std::move(_data))
+                , index(_index)
+            {
+            }
         };
         std::vector<JsonField> fieldMap;
         auto& internObj = std::get<Object>(_node.value);
@@ -1205,20 +1203,19 @@ json Ent::EntityLib::dumpNode(
                 {
                     const auto* typeName = getRefTypeName(subNode->getTypeName());
                     auto const fieldIdx = internObj.at(name.c_str()).fieldIdx;
-                    fieldMap.push_back(JsonField{typeName, std::move(subJson), fieldIdx});
+                    fieldMap.emplace_back(typeName, std::move(subJson), fieldIdx);
                 }
                 else
                 {
                     auto const fieldIdx = internObj.at(name.c_str()).fieldIdx;
-                    fieldMap.push_back(JsonField{name.c_str(), std::move(subJson), fieldIdx});
+                    fieldMap.emplace_back(name.c_str(), std::move(subJson), fieldIdx);
                 }
             }
         }
         auto const& instanceOf = std::get<Ent::Object>(_node.value).instanceOf;
         if (_dumpedValueSource == OverrideValueSource::Override and instanceOf.isSet())
         {
-            fieldMap.push_back(
-                JsonField{"InstanceOf", instanceOf.get(), internObj.instanceOfFieldIndex});
+            fieldMap.emplace_back("InstanceOf", instanceOf.get(), internObj.instanceOfFieldIndex);
         }
         std::sort(begin(fieldMap), end(fieldMap), [](JsonField const& a, JsonField const& b) {
             if (a.index != b.index)
@@ -1570,14 +1567,12 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
         }
     }
     // Add undeclared componants to be able to get values inside (They are full reference to prefab)
-    for (auto const& type_comp : superEntity->getComponents())
+    for (auto const& [cmpType, superComp] : superEntity->getComponents())
     {
-        auto const& cmpType = std::get<0>(type_comp);
         if (removedComponents.count(cmpType) != 0)
         {
             continue;
         }
-        auto const& superComp = std::get<1>(type_comp);
         if (components.count(cmpType) == 0)
         {
             auto comp = std::make_unique<Ent::Component>(
@@ -1666,8 +1661,8 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
 
             auto entity = load(*this, document, _super);
             auto file = typename Cache::mapped_type{std::move(entity), timestamp};
-            auto iter_bool = cache.insert_or_assign(relPath, std::move(file));
-            return std::get<0>(iter_bool)->second.data;
+            auto [newiter, inserted] = cache.insert_or_assign(relPath, std::move(file));
+            return newiter->second.data;
         }
         catch (ContextException& ex)
         {

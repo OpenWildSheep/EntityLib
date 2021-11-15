@@ -90,9 +90,9 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
     case Ent::DataType::number: Ent::printfmt("number\n"); break;
     case Ent::DataType::object:
         Ent::printfmt("object\n");
-        for (auto&& name_sub : subschema.properties)
+        for (auto&& [propname, sub] : subschema.properties)
         {
-            displaySubSchema(std::get<0>(name_sub), *std::get<1>(name_sub), indent + "  ");
+            displaySubSchema(propname, *sub, indent + "  ");
         }
         break;
     case Ent::DataType::string: Ent::printfmt("string\n"); break;
@@ -1600,9 +1600,9 @@ try
     // ******************************** Test iteration of schema **********************************
     if (doDisplaySubSchema)
     {
-        for (auto&& name_sub : entlib.schema.components)
+        for (auto&& [name, sub] : entlib.schema.components)
         {
-            displaySubSchema(std::get<0>(name_sub), *std::get<1>(name_sub), {});
+            displaySubSchema(name, *sub, {});
         }
     }
 

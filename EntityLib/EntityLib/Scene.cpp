@@ -177,10 +177,10 @@ namespace Ent
     {
         EntityMap instanceEntities;
         auto scene = std::make_unique<Scene>(entlib);
-        for (auto const& name_ent : objects.map)
+        for (auto const& [name, ent] : objects.map)
         {
-            instanceEntities.map.emplace(name_ent.first, name_ent.second.makeInstanceOf());
-            instanceEntities.map[name_ent.first].value->setParentScene(scene.get());
+            instanceEntities.map.emplace(name, ent.makeInstanceOf());
+            instanceEntities.map[name].value->setParentScene(scene.get());
         }
         scene->objects = std::move(instanceEntities);
         return scene;
@@ -190,10 +190,10 @@ namespace Ent
     {
         EntityMap instanceEntities;
         auto scene = std::make_unique<Scene>(entlib);
-        for (auto const& name_ent : objects.map)
+        for (auto const& [name, ent] : objects.map)
         {
-            instanceEntities.map.emplace(name_ent.first, name_ent.second.clone());
-            instanceEntities.map[name_ent.first].value->setParentScene(scene.get());
+            instanceEntities.map.emplace(name, ent.clone());
+            instanceEntities.map[name].value->setParentScene(scene.get());
         }
         scene->objects = std::move(instanceEntities);
         return scene;
@@ -225,19 +225,19 @@ namespace Ent
     void Scene::applyAllValues(Scene& _dest, CopyMode _copyMode) const
     {
         std::map<std::string, Entity*> destMap;
-        for (auto&& name_obj : _dest.objects.map)
+        for (auto&& [name, obj] : _dest.objects.map)
         {
-            if (name_obj.second.isPresent.get())
+            if (obj.isPresent.get())
             {
-                destMap.emplace(name_obj.first, name_obj.second.value.get());
+                destMap.emplace(name, obj.value.get());
             }
         }
-        for (auto&& name_ent : objects.map)
+        for (auto&& [name, rem] : objects.map)
         {
-            if (name_ent.second.isPresent.get())
+            if (rem.isPresent.get())
             {
-                auto destIter = destMap.find(name_ent.first);
-                auto&& ent = name_ent.second.value;
+                auto destIter = destMap.find(name);
+                auto&& ent = rem.value;
                 if (destIter != destMap.end()) // Preserved Entity
                 {
                     ent->applyAllValues(*destIter->second, _copyMode);
@@ -249,9 +249,9 @@ namespace Ent
                 }
             }
         }
-        for (auto&& name_ent : destMap)
+        for (auto&& [name, ent] : destMap)
         {
-            _dest.removeEntity(name_ent.first.c_str());
+            _dest.removeEntity(name.c_str());
         }
     }
 

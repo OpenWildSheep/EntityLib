@@ -309,6 +309,14 @@ namespace Ent
             String prefabPath; ///< Path to the prefab's file
             NodeRef nodeRef; ///< NodeRef from the prefab root the the pointed Node
             Node const* node = nullptr; ///< \b Read-only. Pointed Node in this prefab (if it exist).
+
+            // TODO : Remove when C++20
+            PrefabInfo(String _prefabPath, NodeRef _nodeRef, Node const* _node = nullptr)
+                : prefabPath(std::move(_prefabPath))
+                , nodeRef(std::move(_nodeRef))
+                , node(_node)
+            {
+            }
         };
         /// @brief Get the list of prefabs of the given node, in the order of application.
         std::vector<PrefabInfo> getPrefabHistory() const;

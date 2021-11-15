@@ -182,10 +182,10 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const
 json Ent::createValidationSchema(Ent::Schema const& schema)
 {
     json instSchema;
-    for (auto&& name_def : schema.allDefinitions)
+    for (auto&& [name, def] : schema.allDefinitions)
     {
-        auto const link = convertLink(name_def.first);
-        instSchema["definitions"][link] = convertToInstanceSchema(name_def.second);
+        auto const link = convertLink(name);
+        instSchema["definitions"][link] = convertToInstanceSchema(def);
     }
     return instSchema;
 }

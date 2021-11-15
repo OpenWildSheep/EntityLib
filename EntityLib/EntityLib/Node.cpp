@@ -239,9 +239,15 @@ namespace Ent
                         // current is UnionSet
                         current = current->mapGet(token.c_str())->getUnionData();
                     }
+                    else if (current->getKeyType() == Ent::DataType::integer)
+                    {
+                        // current is any other map/set kind, with an integer key
+                        auto const key = atoi(token.c_str());
+                        current = current->mapGet(key);
+                    }
                     else
                     {
-                        // current is any other mep/set kind
+                        // current is any other map/set kind, with a string, or EntityRef key
                         current = current->mapGet(token.c_str());
                     }
                 }

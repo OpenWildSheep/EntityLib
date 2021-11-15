@@ -173,7 +173,7 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const
     }
     if (instSchema.count("properties"))
     {
-        instSchema["properties"]["schema_name"]["type"] = "string";
+        instSchema["properties"]["$schema"]["type"] = "string";
         instSchema["properties"]["InstanceOf"]["type"] = "string";
     }
     return instSchema;

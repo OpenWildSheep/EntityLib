@@ -302,12 +302,15 @@ namespace Ent
         /// @brief Get the NodeRef from root to this
         NodeRef makeAbsoluteNodeRef() const;
 
+        /// Information about a prefab in the prefab history of a Node
+        /// @see Node::getPrefabHistory
         struct PrefabInfo
         {
-            String prefabPath;
-            NodeRef nodeRef;
-            Node const* node = nullptr;
+            String prefabPath; ///< Path to the prefab's file
+            NodeRef nodeRef; ///< NodeRef from the prefab root the the pointed Node
+            Node const* node = nullptr; ///< \b Read-only. Pointed Node in this prefab (if it exist).
         };
+        /// @brief Get the list of prefabs of the given node, in the order of application.
         std::vector<PrefabInfo> getPrefabHistory() const;
 
     private:

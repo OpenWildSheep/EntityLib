@@ -516,5 +516,18 @@ namespace Ent
     };
     using NodeUniquePtr = std::unique_ptr<Node, NodeDeleter>;
 
+    /// @brief Path to found a Node, from an other Node.
+    ///
+    /// Token are separated by slashes.
+    ///
+    /// Sample of how to get a sub entity : `Components/SubScene/Embedded/Wolf1`
+    /// - In an Object, the expected token is the field.
+    /// - In a Union, the expected token is the inner type of the Union.
+    /// - In an Array, the expected token is the index.
+    /// - In a Map or Set, the expected token is the key.
+    ///     - In a UnionSet, the key is the type. No need to explicit the Union type again.
+    ///         - ex : good : `Components/TransformGD/Position`
+    ///         - ex : bad : `Components/TransformGD/TransformGD/Position`
+    ///
     using NodeRef = std::string;
 } // namespace Ent

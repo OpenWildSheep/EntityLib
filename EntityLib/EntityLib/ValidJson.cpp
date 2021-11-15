@@ -79,7 +79,9 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const
 {
     json instSchema;
     if (not tmplSchema.defaultValue.is_null())
+    {
         instSchema["default"] = tmplSchema.defaultValue;
+    }
     if (tmplSchema.constValue.has_value())
     {
         instSchema["const"] = *tmplSchema.constValue;
@@ -171,7 +173,7 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const
     {
         instSchema["required"] = requiredList;
     }
-    if (instSchema.count("properties"))
+    if (instSchema.count("properties") != 0)
     {
         instSchema["properties"]["schema_name"]["type"] = "string";
         instSchema["properties"]["InstanceOf"]["type"] = "string";

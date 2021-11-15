@@ -25,7 +25,7 @@ namespace Ent
 
         explicit Map(EntityLib const* _entlib = nullptr, Subschema const* _schema = nullptr);
         Map(Map const&);
-        Map(Map&&) = default;
+        Map(Map&&) noexcept = default;
         Map& operator=(Map const&);
         Map& operator=(Map&&) = default;
 

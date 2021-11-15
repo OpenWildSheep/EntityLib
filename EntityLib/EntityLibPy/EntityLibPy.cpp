@@ -10,7 +10,6 @@
 
 /// @cond PRIVATE
 
-
 namespace py = pybind11;
 using namespace Ent;
 

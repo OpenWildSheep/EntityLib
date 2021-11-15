@@ -343,7 +343,7 @@ namespace Ent
 
         std::string relativePath = computeRelativePath(thisPath, std::move(entityPath), false);
 
-        return {std::move(relativePath)};
+        return {relativePath};
     }
 
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
@@ -357,7 +357,9 @@ namespace Ent
             return getSceneParentEntity(parent);
         }
         else
+        {
             return nullptr;
+        }
     }
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     Node const* EntityLib::getParentEntity(Node const* _node)
@@ -1782,7 +1784,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadFileAsNode(std::filesystem::path const& _
             schemaFound = strToLower(schemaFound);
             tryToLower = true;
         }
-        if (auto dotPos = schemaFound.find("."); dotPos != std::string::npos)
+        if (auto dotPos = schemaFound.find('.'); dotPos != std::string::npos)
         {
             schemaFound.erase(dotPos);
         }

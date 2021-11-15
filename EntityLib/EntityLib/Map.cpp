@@ -208,22 +208,9 @@ Ent::Map::Map(EntityLib const* _entlib, Subschema const* _schema)
 {
 }
 
-Ent::Map::Map(Map const& _other)
-    : m_entlib(_other.m_entlib)
-    , m_schema(_other.m_schema)
-    , m_items(_other.m_items)
-    , m_itemMap(_other.m_itemMap)
-{
-}
-Ent::Map& Ent::Map::operator=(Map const& _other)
-{
-    if (this != &_other)
-    {
-        Map tmp(_other);
-        std::swap(*this, tmp);
-    }
-    return *this;
-}
+Ent::Map::Map(Map const& _other) = default;
+
+Ent::Map& Ent::Map::operator=(Map const& _other) = default;
 
 Ent::Map::KeyType Ent::Map::getChildKey(Subschema const* _schema, Ent::Node const* _child)
 {
@@ -771,7 +758,9 @@ std::vector<Ent::String> Ent::Map::getKeysString() const
     for (auto& elt : m_items)
     {
         if (elt.isPresent.get())
+        {
             keys.push_back(std::get<Ent::String>(getChildKey(m_schema, elt.node.get())));
+        }
     }
     return keys;
 }
@@ -788,7 +777,9 @@ std::vector<int64_t> Ent::Map::getKeysInt() const
     for (auto& elt : m_items)
     {
         if (elt.isPresent.get())
+        {
             keys.push_back(std::get<int64_t>(getChildKey(m_schema, elt.node.get())));
+        }
     }
     return keys;
 }

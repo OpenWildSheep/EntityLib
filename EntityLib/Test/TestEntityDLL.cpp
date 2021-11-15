@@ -121,6 +121,7 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
         ENTLIB_ASSERT_MSG(exception_throw, "Exception not thrown!");                               \
     }
 
+// NOLINTNEXTLINE(readability-function-size)
 int main(int argc, char** argv)
 try
 {
@@ -194,7 +195,7 @@ try
     {
         auto&& absRef = std::get<1>(name_schema)->name;
         ENTLIB_ASSERT(absRef.find("./") == std::string::npos);
-        ENTLIB_ASSERT(absRef.find("#") == std::string::npos);
+        ENTLIB_ASSERT(absRef.find('#') == std::string::npos);
         ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(absRef) == 1);
     }
 

@@ -18,7 +18,7 @@ namespace Ent
         name.computeMemory(prof);
         for (auto&& [cmpname, comp] : components)
         {
-            prof.addMem("Entity::components::value", sizeof(cmpname) + sizeof(comp));
+            prof.addMem("Entity::components::value", sizeof(decltype(components)::value_type));
             prof.addMem("Entity::components::key", sizeof(cmpname.size()));
             comp->computeMemory(prof);
         }

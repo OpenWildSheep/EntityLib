@@ -97,7 +97,7 @@ namespace Ent
         loadFileAsNode(std::filesystem::path const& _path, Ent::Subschema const& _schema) const;
 
         /// Load any entitylib file into a Node, reading the schema name inside the file
-        NodeUniquePtr loadFileAsNode(std::filesystem::path const& _path) const;
+        NodeUniquePtr loadFileAsNode(std::filesystem::path const& _nodePath) const;
 
         /// Load the Entity at path _entityPath
         std::unique_ptr<Entity> loadEntity(

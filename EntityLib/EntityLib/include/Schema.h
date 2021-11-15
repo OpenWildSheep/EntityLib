@@ -105,7 +105,7 @@ namespace Ent
         };
         /// Meta data for any type of Node
         using Meta = std::variant<GenericMeta, NumberMeta, UnionMeta, ArrayMeta>;
-        Meta meta; ///< Contains meta data for any type of Node
+        Meta meta{}; ///< Contains meta data for any type of Node
 
         // helper methods
         bool IsDeprecated() const; ///< Is this node deprecated? (access to meta data)

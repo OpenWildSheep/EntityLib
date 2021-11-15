@@ -310,7 +310,7 @@ namespace Ent
                 NodeRef const prefabToThis = parent->makeNodeRef(this);
                 Node const* thisPrefab = prefab->resolveNodeRef(prefabToThis.c_str());
                 result = thisPrefab->getPrefabHistory();
-                result.push_back(Node::PrefabInfo{obj->instanceOf.get(), prefabToThis, thisPrefab});
+                result.emplace_back(obj->instanceOf.get(), prefabToThis, thisPrefab);
             }
             // If instanceOf is empty, keep result empty
         }

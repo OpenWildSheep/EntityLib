@@ -283,6 +283,40 @@ namespace Ent
         return getRootNode()->makeNodeRef(this);
     }
 
+    std::vector<Node::PrefabInfo> Node::getPrefabHistory() const
+    {
+        std::vector<Node::PrefabInfo> result;
+        // Going up to find the first prefab
+        Node const* parent = this;
+        while (parent != nullptr)
+        {
+            if (auto* obj = std::get_if<Object>(&parent->value))
+            {
+                if (obj->instanceOf.hasOverride())
+                {
+                    break;
+                }
+            }
+
+            parent = parent->getParentNode();
+        }
+        if (parent != nullptr) // A prefab has been found
+        {
+            auto* obj = std::get_if<Object>(&parent->value);
+            if (not obj->instanceOf.get().empty())
+            {
+                auto prefab =
+                    getEntityLib()->loadNodeReadOnly(*getSchema(), obj->instanceOf.get().c_str());
+                NodeRef const prefabToThis = parent->makeNodeRef(this);
+                Node const* thisPrefab = prefab->resolveNodeRef(prefabToThis.c_str());
+                result = thisPrefab->getPrefabHistory();
+                result.push_back(Node::PrefabInfo{obj->instanceOf.get(), prefabToThis, thisPrefab});
+            }
+            // If instanceOf is empty, keep result empty
+        }
+        return result;
+    }
+
     struct UpdateParents
     {
         Node* parent;

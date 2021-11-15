@@ -357,6 +357,13 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pyEntityFile = py::class_<EntityLib::EntityFile>(ent, "EntityFile");
     auto pyNodeFile = py::class_<EntityLib::NodeFile>(ent, "NodeFile");
     auto pySceneFile = py::class_<EntityLib::SceneFile>(ent, "SceneFile");
+    auto pyPrefabInfo = py::class_<Node::PrefabInfo>(ent, "Node_PrefabInfo");
+
+    pyPrefabInfo
+        .def_readonly("node", &Node::PrefabInfo::node)
+        .def_readonly("noderef", &Node::PrefabInfo::nodeRef)
+        .def_readonly("prefab_path", &Node::PrefabInfo::prefabPath)
+        ;
 
     pyNode
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
@@ -485,6 +492,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("make_noderef", &Node::makeNodeRef)
         .def("resolve_noderef", (Node* (Node::*)(char const* _nodeRef))(&Node::resolveNodeRef), py::return_value_policy::reference_internal)
         .def_property_readonly("absolute_noderef", &Node::makeAbsoluteNodeRef)
+        .def("get_prefab_history", &Node::getPrefabHistory)
         ;
 
     pyComponent

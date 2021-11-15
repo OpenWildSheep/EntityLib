@@ -8,9 +8,9 @@
 #include <vector>
 #include <stdexcept>
 #include <array>
+#include <filesystem>
 
 #pragma warning(push, 0)
-#include "../external/filesystem.hpp"
 #include "../../../Core/WildShared/Exception.h"
 #pragma warning(pop)
 

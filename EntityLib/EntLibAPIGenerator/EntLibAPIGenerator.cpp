@@ -8,11 +8,11 @@
 #include <map>
 #include <optional>
 #include <regex>
+#include <filesystem>
 
 #pragma warning(push, 0)
 #include <iostream>
 #include <mustache.hpp>
-#include "../EntityLib/external/filesystem.hpp"
 #include "../EntityLib/external/json.hpp"
 #pragma warning(pop)
 

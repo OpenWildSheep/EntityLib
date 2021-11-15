@@ -1,8 +1,9 @@
 #include <ComponentMerge.h>
 
+#include <filesystem>
+
 #pragma warning(push, 0)
 #include <iostream>
-#include "../EntityLib/external/filesystem.hpp"
 #pragma warning(pop)
 
 int main(int argc, char** argv)

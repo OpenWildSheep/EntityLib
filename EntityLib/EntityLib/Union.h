@@ -54,7 +54,8 @@ namespace Ent
 
         std::unique_ptr<Union> clone() const;
 
-        /// Get the child type
+        /// @brief Get the child type
+        /// @pre \b _child is actually the data contained by this Union
         NodeRef computeNodeRefToChild(Node const* _child) const;
 
     private:

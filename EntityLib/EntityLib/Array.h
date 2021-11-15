@@ -111,6 +111,7 @@ namespace Ent
         std::vector<int64_t> getKeysInt() const;
 
         /// Get the child name, in the array/map logic
+        /// @pre _child is a child field of this
         NodeRef computeNodeRefToChild(Node const* _child) const;
 
     private:

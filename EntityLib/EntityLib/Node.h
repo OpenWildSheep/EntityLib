@@ -94,7 +94,7 @@ namespace Ent
         /// @brief Get the raw Override value of the array size.
         /// @param _location the desired Override value location.
         /// @return the array size at the given Override value location.
-        tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
+        std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         std::vector<Node const*> getItems() const; ///< @pre type==Ent::DataType::array. @brief Get all items
         std::vector<Node*> getItems(); ///< @pre type==Ent::DataType::array. @brief Get all items
         Node* push(); ///< @pre type==Ent::DataType::array. @brief Add a new item at the end of array
@@ -239,27 +239,27 @@ namespace Ent
         /// @brief Get the raw Override value as double.
         /// @param _location the desired Override value location.
         /// @return the double value at the given Override value location.
-        tl::optional<double> getRawFloat(OverrideValueLocation _location) const;
+        std::optional<double> getRawFloat(OverrideValueLocation _location) const;
         /// @pre integer.
         /// @brief Get the raw Override value as int.
         /// @param _location the desired Override value location.
         /// @return the int value at the given Override value location.
-        tl::optional<int> getRawInt(OverrideValueLocation _location) const;
+        std::optional<int> getRawInt(OverrideValueLocation _location) const;
         /// @pre DataType == string.
         /// @brief Get the raw Override value as string.
         /// @param _location the desired Override value location.
         /// @return the string value at the given Override value location.
-        tl::optional<char const*> getRawString(OverrideValueLocation _location) const;
+        std::optional<char const*> getRawString(OverrideValueLocation _location) const;
         /// @pre DataType == bool.
         /// @brief Get the raw Override value as bool.
         /// @param _location the desired Override value location.
         /// @return the bool value at the given Override value location.
-        tl::optional<bool> getRawBool(OverrideValueLocation _location) const;
+        std::optional<bool> getRawBool(OverrideValueLocation _location) const;
         /// @pre DataType == EntityRef.
         /// @brief Get the raw Override value as EntityRef.
         /// @param _location the desired Override value location.
         /// @return the EntityRef value at the given Override value location.
-        tl::optional<EntityRef> getRawEntityRef(OverrideValueLocation _location) const;
+        std::optional<EntityRef> getRawEntityRef(OverrideValueLocation _location) const;
 
         /// Get the absolute full link of the Subschema type, or nullptr if the is no
         /// Example : "./RuntimeComponents.json#/definitions/VoxelSimulationGD"

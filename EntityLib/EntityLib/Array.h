@@ -3,11 +3,11 @@
 #include <cstdint>
 #include <map>
 #include <algorithm>
+#include <optional>
 
 #pragma warning(push, 0)
 #pragma warning(disable : 4996)
 #include <variant>
-#include "../external/optional.hpp"
 #pragma warning(pop)
 
 #include "include/EntityLibCore.h"
@@ -83,7 +83,7 @@ namespace Ent
 
         Subschema const* getSchema() const;
 
-        tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
+        std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
 
         Ent::Map::KeyType getChildKey(Ent::Node const* _child) const;
 
@@ -143,7 +143,7 @@ namespace Ent
         return m_schema;
     }
 
-    inline tl::optional<size_t> Array::getRawSize(OverrideValueLocation _location) const
+    inline std::optional<size_t> Array::getRawSize(OverrideValueLocation _location) const
     {
         return std::visit([_location](auto& a) { return a.getRawSize(_location); }, m_data);
     }

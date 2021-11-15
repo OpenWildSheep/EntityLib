@@ -565,49 +565,49 @@ Ent::NodeUniquePtr Ent::EntityLib::loadPrimitive(
         {
             def = _default->get<std::string>();
         }
-        tl::optional<std::string> const supVal =
+        std::optional<std::string> const supVal =
             (_super != nullptr and not _super->hasDefaultValue()) ?
-                tl::optional<std::string>(_super->getString()) :
-                tl::optional<std::string>(tl::nullopt);
-        tl::optional<std::string> const val =
-            _data.is_string() ? tl::optional<std::string>(_data.get<std::string>()) :
-                                tl::optional<std::string>(tl::nullopt);
+                std::optional<std::string>(_super->getString()) :
+                std::optional<std::string>(std::nullopt);
+        std::optional<std::string> const val =
+            _data.is_string() ? std::optional<std::string>(_data.get<std::string>()) :
+                                std::optional<std::string>(std::nullopt);
         result = newNode(Ent::Override<String>(def, supVal, val), &_nodeSchema);
     }
     break;
     case Ent::DataType::boolean:
     {
         bool const def = _default == nullptr ? bool{} : _default->get<bool>();
-        tl::optional<bool> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
-                                              tl::optional<bool>(_super->getBool()) :
-                                              tl::optional<bool>(tl::nullopt);
-        tl::optional<bool> const val = _data.is_boolean() ? tl::optional<bool>(_data.get<bool>()) :
-                                                            tl::optional<bool>(tl::nullopt);
+        std::optional<bool> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
+                                               std::optional<bool>(_super->getBool()) :
+                                               std::optional<bool>(std::nullopt);
+        std::optional<bool> const val = _data.is_boolean() ? std::optional<bool>(_data.get<bool>()) :
+                                                             std::optional<bool>(std::nullopt);
         result = newNode(Ent::Override<bool>(def, supVal, val), &_nodeSchema);
     }
     break;
     case Ent::DataType::integer:
     {
         int64_t const def = _default == nullptr ? int64_t{} : _default->get<int64_t>();
-        tl::optional<int64_t> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
-                                                 tl::optional<int64_t>(_super->getInt()) :
-                                                 tl::optional<int64_t>(tl::nullopt);
-        tl::optional<int64_t> const val = _data.is_number_integer() or _data.is_number_unsigned() ?
-                                              tl::optional<int64_t>(_data.get<int64_t>()) :
-                                              tl::optional<int64_t>(tl::nullopt);
+        std::optional<int64_t> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
+                                                  std::optional<int64_t>(_super->getInt()) :
+                                                  std::optional<int64_t>(std::nullopt);
+        std::optional<int64_t> const val = _data.is_number_integer() or _data.is_number_unsigned() ?
+                                               std::optional<int64_t>(_data.get<int64_t>()) :
+                                               std::optional<int64_t>(std::nullopt);
         result = newNode(Ent::Override<int64_t>(def, supVal, val), &_nodeSchema);
     }
     break;
     case Ent::DataType::number:
     {
         double const def = _default == nullptr ? double{} : _default->get<double>();
-        tl::optional<double> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
-                                                tl::optional<double>(_super->getFloat()) :
-                                                tl::optional<double>(tl::nullopt);
-        tl::optional<double> const val =
+        std::optional<double> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
+                                                 std::optional<double>(_super->getFloat()) :
+                                                 std::optional<double>(std::nullopt);
+        std::optional<double> const val =
             _data.is_number_float() or _data.is_number_integer() or _data.is_number_unsigned() ?
-                tl::optional<double>(_data.get<double>()) :
-                tl::optional<double>(tl::nullopt);
+                std::optional<double>(_data.get<double>()) :
+                std::optional<double>(std::nullopt);
         result = newNode(Ent::Override<double>(def, supVal, val), &_nodeSchema);
     }
     break;
@@ -617,17 +617,17 @@ Ent::NodeUniquePtr Ent::EntityLib::loadPrimitive(
                                        Ent::EntityRef() :
                                        Ent::EntityRef{String(_default->get<std::string>())};
 
-        tl::optional<Ent::EntityRef> const supVal =
+        std::optional<Ent::EntityRef> const supVal =
             (_super != nullptr and not _super->hasDefaultValue()) ? // Keep the prefab value if there is
-                tl::optional<Ent::EntityRef>(_super->getEntityRef()) :
-                tl::optional<Ent::EntityRef>(tl::nullopt);
+                std::optional<Ent::EntityRef>(_super->getEntityRef()) :
+                std::optional<Ent::EntityRef>(std::nullopt);
 
-        tl::optional<std::string> const refString =
-            _data.is_string() ? _data.get<std::string>() : tl::optional<std::string>(tl::nullopt);
+        std::optional<std::string> const refString =
+            _data.is_string() ? _data.get<std::string>() : std::optional<std::string>(std::nullopt);
 
-        tl::optional<Ent::EntityRef> const val =
-            refString.has_value() ? tl::optional<Ent::EntityRef>(Ent::EntityRef{refString.value()}) :
-                                    tl::optional<Ent::EntityRef>(tl::nullopt);
+        std::optional<Ent::EntityRef> const val =
+            refString.has_value() ? std::optional<Ent::EntityRef>(Ent::EntityRef{refString.value()}) :
+                                    std::optional<Ent::EntityRef>(std::nullopt);
 
         result = newNode(Ent::Override<Ent::EntityRef>(def, supVal, val), &_nodeSchema);
     }
@@ -692,13 +692,13 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
             else
             {
                 _super = nullptr;
-                object.instanceOf = Ent::Override<String>("", tl::nullopt, "");
+                object.instanceOf = Ent::Override<String>("", std::nullopt, "");
             }
         }
         else if (_super != nullptr and _super->getInstanceOf() != nullptr)
         {
             // we inherit from the super's instanceOf
-            object.instanceOf = Ent::Override<String>("", _super->getInstanceOf(), tl::nullopt);
+            object.instanceOf = Ent::Override<String>("", _super->getInstanceOf(), std::nullopt);
         }
 
         // Read the fields in schema
@@ -779,11 +779,11 @@ Ent::NodeUniquePtr Ent::EntityLib::loadArray(
                 }
                 if (not arr.hasKey())
                 {
-                    tl::optional<uint64_t> prefabArraySize =
-                        defaultArraySize == _super->size() ? tl::nullopt :
-                                                             tl::optional<uint64_t>{_super->size()};
+                    std::optional<uint64_t> prefabArraySize =
+                        defaultArraySize == _super->size() ? std::nullopt :
+                                                             std::optional<uint64_t>{_super->size()};
                     arr.arraySetSize(
-                        Ent::Override<uint64_t>(defaultArraySize, prefabArraySize, tl::nullopt));
+                        Ent::Override<uint64_t>(defaultArraySize, prefabArraySize, std::nullopt));
                 }
             }
             else if (_default != nullptr)
@@ -798,7 +798,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadArray(
                 if (not arr.hasKey())
                 {
                     arr.arraySetSize(
-                        Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt));
+                        Ent::Override<uint64_t>(defaultArraySize, std::nullopt, std::nullopt));
                 }
             }
             else
@@ -812,7 +812,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadArray(
                 if (not arr.hasKey())
                 {
                     arr.arraySetSize(
-                        Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt));
+                        Ent::Override<uint64_t>(defaultArraySize, std::nullopt, std::nullopt));
                 }
             }
         }
@@ -970,14 +970,14 @@ Ent::NodeUniquePtr Ent::EntityLib::loadArray(
                     arr.initAdd(loc, std::move(tmpNode), addedInInstance);
                     ++index;
                 }
-                tl::optional<uint64_t> prefabArraySize =
+                std::optional<uint64_t> prefabArraySize =
                     (_super != nullptr and _super->size() != defaultArraySize) ?
-                        tl::optional<uint64_t>{_super->size()} :
-                        tl::nullopt;
+                        std::optional<uint64_t>{_super->size()} :
+                        std::nullopt;
                 const uint64_t sizeInPrefab = prefabArraySize.value_or(defaultArraySize);
-                tl::optional<uint64_t> overrideArraySize = _data.size() == sizeInPrefab ?
-                                                               tl::nullopt :
-                                                               tl::optional<uint64_t>{_data.size()};
+                std::optional<uint64_t> overrideArraySize =
+                    _data.size() == sizeInPrefab ? std::nullopt :
+                                                   std::optional<uint64_t>{_data.size()};
                 arr.arraySetSize(
                     Ent::Override<uint64_t>(defaultArraySize, prefabArraySize, overrideArraySize));
             }
@@ -1006,7 +1006,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadArray(
             ++index;
         }
         uint64_t defaultArraySize = _nodeSchema.linearItems->size();
-        arr.arraySetSize(Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt));
+        arr.arraySetSize(Ent::Override<uint64_t>(defaultArraySize, std::nullopt, std::nullopt));
     }
     return newNode(std::move(arr), &_nodeSchema);
 }
@@ -1433,7 +1433,7 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
         else
         {
             _superEntityFromParentEntity = nullptr;
-            ovInstanceOf = Ent::Override<String>("", tl::nullopt, "");
+            ovInstanceOf = Ent::Override<String>("", std::nullopt, "");
         }
     }
     ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
@@ -1444,22 +1444,22 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
         ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
     }
 
-    tl::optional<std::string> const thumbnail = _entNode.count("Thumbnail") != 0 ?
-                                                    _entNode.at("Thumbnail").get<std::string>() :
-                                                    tl::optional<std::string>();
+    std::optional<std::string> const thumbnail = _entNode.count("Thumbnail") != 0 ?
+                                                     _entNode.at("Thumbnail").get<std::string>() :
+                                                     std::optional<std::string>();
     Ent::Override<String> superThumbnail = superEntity->getThumbnailValue();
     Ent::Override<String> ovThumbnail = superThumbnail.makeOverridedInstanceOf(thumbnail);
 
-    tl::optional<std::string> const name = _entNode.count("Name") != 0 ?
-                                               _entNode.at("Name").get<std::string>() :
-                                               tl::optional<std::string>();
+    std::optional<std::string> const name = _entNode.count("Name") != 0 ?
+                                                _entNode.at("Name").get<std::string>() :
+                                                std::optional<std::string>();
 
     Ent::Override<String> superName = superEntity->getNameValue();
     Ent::Override<String> ovName = superName.makeOverridedInstanceOf(name);
 
     Ent::Override<String> superInstanceOf = superEntity->getInstanceOfValue();
 
-    tl::optional<Ent::ActivationLevel> maxActivationLevel;
+    std::optional<Ent::ActivationLevel> maxActivationLevel;
     if (_entNode.count("MaxActivationLevel") != 0)
     {
         maxActivationLevel =
@@ -1528,8 +1528,8 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
                 Ent::SubSceneComponent const* superComp = superEntity->getSubSceneComponent();
 
                 auto fileInJson = (data.count("File") != 0) ?
-                                      tl::optional<std::string>(data["File"].get<std::string>()) :
-                                      tl::nullopt;
+                                      std::optional<std::string>(data["File"].get<std::string>()) :
+                                      std::nullopt;
                 auto subSceneComp =
                     std::make_unique<Ent::SubSceneComponent>(this, superComp != nullptr, index);
                 subSceneComp->embedded = Ent::Scene::loadScene(

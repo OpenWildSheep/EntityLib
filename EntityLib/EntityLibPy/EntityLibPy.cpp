@@ -10,14 +10,6 @@
 
 /// @cond PRIVATE
 
-namespace pybind11::detail
-{
-    // Use tj::optional like a std::optional
-    template <typename T>
-    struct type_caster<tl::optional<T>> : public optional_caster<tl::optional<T>>
-    {
-    };
-} // namespace pybind11::detail
 
 namespace py = pybind11;
 using namespace Ent;

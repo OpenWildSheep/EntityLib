@@ -640,7 +640,7 @@ Ent::Map Ent::Map::makeInstanceOf() const
     return result;
 }
 
-tl::optional<size_t> Ent::Map::getRawSize(OverrideValueLocation _location) const
+std::optional<size_t> Ent::Map::getRawSize(OverrideValueLocation _location) const
 {
     switch (_location)
     {
@@ -652,13 +652,13 @@ tl::optional<size_t> Ent::Map::getRawSize(OverrideValueLocation _location) const
     {
         auto prefabSize = getPrefabSize();
         auto defaultsize = getDefaultSize();
-        return (prefabSize == defaultsize) ? tl::optional<size_t>{} : prefabSize;
+        return (prefabSize == defaultsize) ? std::optional<size_t>{} : prefabSize;
     }
     case OverrideValueLocation::Override:
     {
         auto instanceSize = size();
         auto prefabsize = getPrefabSize();
-        return (instanceSize == prefabsize) ? tl::optional<size_t>{} : instanceSize;
+        return (instanceSize == prefabsize) ? std::optional<size_t>{} : instanceSize;
     }
     }
     ENTLIB_LOGIC_ERROR("Unknown OverrideValueLocation : %d", _location);

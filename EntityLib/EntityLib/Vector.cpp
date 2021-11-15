@@ -278,5 +278,5 @@ Ent::NodeRef Ent::Vector::computeNodeRefToChild(Node const* _child) const
         }
         ++i;
     }
-    ENTLIB_LOGIC_ERROR("child is not a child of this Vector");
+    ENTLIB_LOGIC_ERROR("_child is not a child of this Vector");
 }

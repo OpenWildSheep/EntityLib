@@ -201,7 +201,7 @@ namespace Ent
                 return field.name;
             }
         }
-        ENTLIB_LOGIC_ERROR("child is not a child of this Object");
+        ENTLIB_LOGIC_ERROR("_child is not a child of this Object");
     }
 
     size_t count(Object const& obj, char const* key)

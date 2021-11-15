@@ -840,5 +840,5 @@ Ent::NodeRef Ent::Map::computeNodeRefToChild(Node const* _child) const
             return std::visit(KeyToString{}, key);
         }
     }
-    ENTLIB_LOGIC_ERROR("child is not a child of this Map");
+    ENTLIB_LOGIC_ERROR("_child is not a child of this Map");
 }

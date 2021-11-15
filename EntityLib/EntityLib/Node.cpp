@@ -204,10 +204,11 @@ namespace Ent
         };
 
         // For each token in _nodeRef
+        std::string token;
         for (; tokenStart != nodeRefEnd; nextToken())
         {
             // Get the child, using the token and the DataType
-            auto token = std::string(tokenStart, tokenStop - tokenStart);
+            token.assign(tokenStart, tokenStop - tokenStart);
             if (token == ".")
             {
                 continue;

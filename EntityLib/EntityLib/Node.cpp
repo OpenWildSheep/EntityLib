@@ -7,6 +7,7 @@
 #include "external/json.hpp"
 
 #include "include/EntityLib.h"
+#include "Tools.h"
 
 using namespace nlohmann;
 
@@ -67,6 +68,219 @@ namespace Ent
         newNode->updateParents();
         newNode->checkParent(parentNode);
         return newNode;
+    }
+
+    // Get the NodeRef token to get the _child from the _parent
+    static NodeRef computeParentToChildNodeRef(Node const* _parent, Node const* _child)
+    {
+        return std::visit(
+            [_child](auto const& _node) -> NodeRef {
+                using NodeType = std::remove_const_t<std::remove_reference_t<decltype(_node)>>;
+                if constexpr (
+                    std::is_same_v<
+                        NodeType,
+                        Object> or std::is_same_v<NodeType, Union> or std::is_same_v<NodeType, Array>)
+                {
+                    // Call computeNodeRefToChild on any container type
+                    return _node.computeNodeRefToChild(_child);
+                }
+                else
+                {
+                    ENTLIB_LOGIC_ERROR(
+                        R"(In computeParentToChildNodeRef, parent have to contain child!)");
+                }
+            },
+            _parent->GetRawValue());
+    }
+
+    Node const* Node::getRootNode() const
+    {
+        Node const* rootParent = this;
+        while (rootParent->parentNode != nullptr)
+        {
+            rootParent = rootParent->parentNode;
+        }
+        return rootParent;
+    }
+
+    static bool isUnionSet(Node const* node)
+    {
+        if (node == nullptr or node->getDataType() != Ent::DataType::array)
+        {
+            return false;
+        }
+        auto const* schema = node->getSchema();
+        return std::get<Ent::Subschema::ArrayMeta>(schema->meta).overridePolicy == "set"
+               and schema->singularItems->get().type == Ent::DataType::oneOf;
+    }
+
+    static bool isUnion(Node const* node)
+    {
+        return node != nullptr and node->getDataType() == Ent::DataType::oneOf;
+    }
+
+    // Get the path from _root to _child, but reversed.
+    static std::vector<std::string> makeNodeRefReversed(Node const* _root, Node const* _child)
+    {
+        std::vector<std::string> nodeRef;
+        if (_child != _root)
+        {
+            bool isChildOfUnionSet = false;
+            Node const* usedParent{};
+            ENTLIB_ASSERT(_child->getParentNode() != nullptr);
+            if (isUnion(_child->getParentNode()->getParentNode()))
+            {
+                // Special case of Union.
+                // There is an intermediate wrapper Node which doesn't apear in the path.
+                if (_child->getParentNode()->getParentNode() != _root
+                    and isUnionSet(_child->getParentNode()->getParentNode()->getParentNode()))
+                {
+                    // Special case of UnionSet.
+                    // Don't need to explicit the type of the Union since it is the key of the set
+                    isChildOfUnionSet = true;
+                }
+                usedParent = _child->getParentNode()->getParentNode();
+            }
+            else
+            {
+                usedParent = _child->getParentNode();
+            }
+            // Get the path to parent
+            nodeRef = makeNodeRefReversed(_root, usedParent);
+            // Insert the path from parent to child at the begining
+            if (not isChildOfUnionSet)
+            {
+                nodeRef.insert(nodeRef.begin(), computeParentToChildNodeRef(usedParent, _child));
+            }
+        }
+        return nodeRef;
+    }
+
+    NodeRef Node::makeNodeRef(Node const* _target) const
+    {
+        auto const* thisRoot = getRootNode();
+        auto const* targetRoot = _target->getRootNode();
+        if (thisRoot != targetRoot)
+        {
+            throw UnrelatedNodes();
+        }
+        // get the two absolute path
+        auto&& thisPath = makeNodeRefReversed(thisRoot, this);
+        auto&& targetPath = makeNodeRefReversed(targetRoot, _target);
+
+        // Get path from this to target
+        std::string relativePath =
+            computeRelativePath(std::move(thisPath), std::move(targetPath), false);
+
+        return relativePath;
+    }
+
+    Node const* Node::resolveNodeRef(char const* _nodeRef) const
+    {
+        auto tokenStart = _nodeRef;
+        auto const nodeRefEnd = _nodeRef + strlen(_nodeRef);
+
+        auto tokenStop = strchr(tokenStart, '/');
+        if (tokenStop == nullptr)
+        {
+            tokenStop = nodeRefEnd;
+        }
+        Node const* current = this;
+
+        auto nextToken = [&tokenStart, &tokenStop, nodeRefEnd] {
+            if (tokenStop == nodeRefEnd)
+            {
+                tokenStart = nodeRefEnd;
+            }
+            else
+            {
+                tokenStart = tokenStop + 1;
+                tokenStop = strchr(tokenStart, '/');
+                if (tokenStop == nullptr)
+                {
+                    tokenStop = nodeRefEnd;
+                }
+            }
+        };
+
+        // For each token in _nodeRef
+        std::string token;
+        for (; tokenStart != nodeRefEnd; nextToken())
+        {
+            // Get the child, using the token and the DataType
+            token.assign(tokenStart, tokenStop - tokenStart);
+            if (token == ".")
+            {
+                continue;
+            }
+            ENTLIB_ASSERT(not token.empty());
+            switch (current->getDataType())
+            {
+            case Ent::DataType::object:
+            {
+                current = current->at(token.c_str());
+                break;
+            }
+            case Ent::DataType::oneOf:
+            {
+                if (token != current->getUnionType())
+                {
+                    throw WrongPath("Wrong union type. Path doesn't exist.");
+                }
+                current = current->getUnionData();
+                break;
+            }
+            case Ent::DataType::array:
+            {
+                if (current->isMapOrSet())
+                {
+                    if (current->getSchema()->singularItems->get().type == Ent::DataType::oneOf)
+                    {
+                        // current is UnionSet
+                        current = current->mapGet(token.c_str())->getUnionData();
+                    }
+                    else if (current->getKeyType() == Ent::DataType::integer)
+                    {
+                        // current is any other map/set kind, with an integer key
+                        auto const key = atoi(token.c_str());
+                        current = current->mapGet(key);
+                    }
+                    else
+                    {
+                        // current is any other map/set kind, with a string, or EntityRef key
+                        current = current->mapGet(token.c_str());
+                    }
+                }
+                else
+                {
+                    // current is an array
+                    auto const index = atoi(token.c_str());
+                    current = current->at(index);
+                }
+                break;
+            }
+            case Ent::DataType::null: [[fallthrough]];
+            case Ent::DataType::boolean: [[fallthrough]];
+            case Ent::DataType::entityRef: [[fallthrough]];
+            case Ent::DataType::integer: [[fallthrough]];
+            case Ent::DataType::number: [[fallthrough]];
+            case Ent::DataType::string: [[fallthrough]];
+            case Ent::DataType::COUNT: [[fallthrough]];
+            default: ENTLIB_LOGIC_ERROR("Unexpected DataType in Node::resolveNodeRef");
+            }
+        }
+        return current;
+    }
+
+    Node* Node::resolveNodeRef(char const* _nodeRef)
+    {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+        return const_cast<Node*>(std::as_const(*this).resolveNodeRef(_nodeRef));
+    }
+
+    NodeRef Node::makeAbsoluteNodeRef() const
+    {
+        return getRootNode()->makeNodeRef(this);
     }
 
     struct UpdateParents

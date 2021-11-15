@@ -235,6 +235,57 @@ try
             entlib.loadFileAsNode("test.ThisTypeDoesntExist.node"), Ent::UnknownSchema);
     }
     entlib.clearCache();
+    {
+        entlib.rawdataPath = "X:/RawData"; // Work in rawdata
+        auto node = entlib.loadFileAsNode(
+            "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
+            "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
+            entlib.schema.schema.allDefinitions["Entity"]);
+        auto nodeRef = "Components/SubScene/Embedded/ShamanFullBlue_ent_001";
+        auto ent = node->resolveNodeRef(nodeRef);
+        auto entpath = node->makeNodeRef(ent);
+        ENTLIB_ASSERT(entpath == nodeRef);
+        entpath = ent->makeAbsoluteNodeRef();
+        ENTLIB_ASSERT(entpath == nodeRef);
+        entpath = node->makeAbsoluteNodeRef();
+        ENTLIB_ASSERT(entpath == ".");
+    }
+    {
+        auto node = entlib.loadFileAsNode(
+            "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
+            "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
+            entlib.schema.schema.allDefinitions["Entity"]);
+        auto nodeRef =
+            R"(Components/SubScene/Embedded/ShamanFullBlue_ent_001/Components/TransformGD)";
+        auto ent = node->resolveNodeRef(nodeRef);
+        auto entpath = node->makeNodeRef(ent);
+        ENTLIB_ASSERT(entpath == nodeRef);
+        entlib.rawdataPath = current_path(); // Work in Test dir
+    }
+    {
+        auto node =
+            entlib.loadFileAsNode("instance.entity", entlib.schema.schema.allDefinitions["Entity"]);
+        auto nodeRef = R"(Components/SubScene/Embedded/EP1-Spout_LINK_001/Components/NetworkLink)";
+        auto ent = node->resolveNodeRef(nodeRef);
+        auto entpath = node->makeNodeRef(ent);
+        ENTLIB_ASSERT(entpath == nodeRef);
+        auto nullPath = ent->makeNodeRef(ent);
+        ENTLIB_ASSERT(nullPath.empty() or nullPath == ".");
+        // Test Union
+        auto typedValueUnion = node->at("Components")
+                                   ->mapInsert("ScriptComponentGD")
+                                   ->getUnionData()
+                                   ->at("CommonDataMap")
+                                   ->mapInsert("Test")
+                                   ->at("Value");
+        auto typeValueRef = R"(Components/ScriptComponentGD/CommonDataMap/Test/Value)";
+        ENTLIB_ASSERT(node->makeNodeRef(typedValueUnion) == typeValueRef);
+        auto stringUnionData = typedValueUnion->setUnionType("string");
+        auto strRef = R"(Components/ScriptComponentGD/CommonDataMap/Test/Value/string)";
+        ENTLIB_ASSERT(node->makeNodeRef(stringUnionData) == strRef);
+        ENTLIB_ASSERT(typedValueUnion->makeNodeRef(stringUnionData) == "string");
+    }
+    entlib.clearCache();
     auto testPrefabEntity = [](Ent::Entity const* ent) {
         // ActorStates
         Ent::Node const& actorStates = ent->getActorStates();

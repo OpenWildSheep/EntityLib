@@ -266,3 +266,17 @@ std::vector<Ent::NodeUniquePtr> Ent::Vector::releaseAllElements()
     clear();
     return releasedElts;
 }
+
+Ent::NodeRef Ent::Vector::computeNodeRefToChild(Node const* _child) const
+{
+    size_t i = 0;
+    for (auto& subnode : this->getItems())
+    {
+        if (_child == subnode)
+        {
+            return format("%llu", i);
+        }
+        ++i;
+    }
+    ENTLIB_LOGIC_ERROR("_child is not a child of this Vector");
+}

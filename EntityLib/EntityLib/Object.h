@@ -122,6 +122,10 @@ namespace Ent
         {
             return const_cast<ObjField&>(std::as_const(*this).at(key));
         }
+
+        /// Get the name of the field pointing to \b _child
+        /// @pre \b _child is a child field of this
+        NodeRef computeNodeRefToChild(Node const* _child) const;
     };
 
     inline auto begin(Object const& obj)

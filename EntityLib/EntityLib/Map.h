@@ -91,6 +91,10 @@ namespace Ent
         std::vector<int64_t> getKeysInt() const;
         EntityLib const* getEntityLib() const;
 
+        /// Get the key containing this \b _child node
+        /// @pre \b _child is a child field of this map
+        NodeRef computeNodeRefToChild(Node const* _child) const;
+
     private:
         Element& insertImpl(KeyType const& _key, NodeUniquePtr _newNode = {});
         Element& insertImpl(

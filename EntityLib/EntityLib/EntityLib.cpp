@@ -651,13 +651,17 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
 {
     {
         ENTLIB_ASSERT(_nodeSchema.type == DataType::object);
-        Ent::Object object(&_nodeSchema);
+        std::vector<ObjField> objNodes;
+        bool objHasASuper = false;
+        uint32_t objInstanceOfFieldIndex = 0;
+        Override<String> objInstanceOf;
+
         // Read the InstanceOf field
         std::shared_ptr<Ent::Node const> prefabNode;
         auto InstanceOfIter = _data.find("InstanceOf");
         if (_super != nullptr)
         {
-            object.hasASuper = true;
+            objHasASuper = true;
         }
         auto getFieldIndex = [](json const& _data, json const& _field) {
             int fieldIdx = 0;
@@ -686,25 +690,25 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
                         "File %s loaded with two different schemas",
                         formatPath(rawdataPath, nodeFileName));
                 }
-                object.instanceOfFieldIndex = getFieldIndex(_data, *InstanceOfIter);
-                object.instanceOf =
+                objInstanceOfFieldIndex = getFieldIndex(_data, *InstanceOfIter);
+                objInstanceOf =
                     std::get<Object>(prefabNode->value)
                         .instanceOf.makeOverridedInstanceOf(InstanceOfIter->get<std::string>());
             }
             else
             {
                 _super = nullptr;
-                object.instanceOf = Ent::Override<String>("", std::nullopt, "");
+                objInstanceOf = Ent::Override<String>("", std::nullopt, "");
             }
         }
         else if (_super != nullptr and _super->getInstanceOf() != nullptr)
         {
             // we inherit from the super's instanceOf
-            object.instanceOf = Ent::Override<String>("", _super->getInstanceOf(), std::nullopt);
+            objInstanceOf = Ent::Override<String>("", _super->getInstanceOf(), std::nullopt);
         }
 
         // Read the fields in schema
-        object.nodes.reserve(_nodeSchema.properties.size());
+        objNodes.reserve(_nodeSchema.properties.size());
         for (auto&& [name, propSchemaRef] : _nodeSchema.properties)
         {
             Ent::Node const* superProp = (_super != nullptr) ? _super->at(name.c_str()) : nullptr;
@@ -730,7 +734,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
             try
             {
                 auto tmpNode = loadNode(*propSchemaRef, *prop, superProp, defaultProp);
-                object.nodes.emplace_back(name.c_str(), std::move(tmpNode), fieldIdx);
+                objNodes.emplace_back(name.c_str(), std::move(tmpNode), fieldIdx);
             }
             catch (ContextException& ex)
             {
@@ -742,7 +746,8 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
                 throw WrapperException(std::current_exception(), "In property : %s", name.c_str());
             }
         }
-        std::sort(begin(object), end(object), Ent::CompObject());
+        std::sort(begin(objNodes), end(objNodes), Ent::CompObject());
+        Object object(&_nodeSchema, objNodes, objInstanceOf, objInstanceOfFieldIndex, objHasASuper);
         auto result = newNode(std::move(object), &_nodeSchema);
         result->checkParent(nullptr);
         return result;

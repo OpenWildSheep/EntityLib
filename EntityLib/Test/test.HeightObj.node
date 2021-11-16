@@ -1,4 +1,5 @@
 {
+    "$schema": "wildschema:/all/HeightObj.json",
     "DisplaceNoiseList": [
         {
             "DisplaceDistance": 0.0,
@@ -12,6 +13,5 @@
             "MotifSizeY": 0.0
         }
     ],
-    "Subdivision": 0,
-    "schema_name": "HeightObj"
+    "Subdivision": 0
 }

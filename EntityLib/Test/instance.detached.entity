@@ -194,7 +194,36 @@
                             "variantData": "Linear",
                             "variantType": "Pasta::Easing::Curve"
                         }
-                    }
+                    },
+                    "slowDowns": [
+                        [
+                            "lava",
+                            {
+                                "easing": {
+                                    "variantData": "Linear",
+                                    "variantType": "Pasta::Easing::Curve"
+                                }
+                            }
+                        ],
+                        [
+                            "mud",
+                            {
+                                "easing": {
+                                    "variantData": "Linear",
+                                    "variantType": "Pasta::Easing::Curve"
+                                }
+                            }
+                        ],
+                        [
+                            "water",
+                            {
+                                "easing": {
+                                    "variantData": "Linear",
+                                    "variantType": "Pasta::Easing::Curve"
+                                }
+                            }
+                        ]
+                    ]
                 },
                 "SlideData": {
                     "adherenceRecoverSpeedDependingOnTheSlope": {

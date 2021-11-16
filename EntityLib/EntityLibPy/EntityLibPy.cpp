@@ -481,6 +481,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("apply_all_values", [](Node& self, Node& dest, CopyMode copyMode) {
             self.applyAllValues(dest, copyMode);
         })
+        .def("apply_to_prefab", &Node::applyToPrefab)
         ;
 
     pyComponent

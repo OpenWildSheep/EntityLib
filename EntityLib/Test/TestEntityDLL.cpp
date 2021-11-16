@@ -209,27 +209,19 @@ try
     {
         // When there is a $schema field
         auto node = entlib.loadFileAsNode("myseedpatch_schema.node");
-        ENTLIB_ASSERT(
-            node->getSchema()
-            == entlib.getSchema("./EditionComponents.json#/definitions/SeedPatchDataList"));
+        ENTLIB_ASSERT(node->getSchema() == entlib.getSchema("SeedPatchDataList"));
         // When there is a $schema field with different style
         node = entlib.loadFileAsNode("myseedpatch_schema_style.node");
-        ENTLIB_ASSERT(
-            node->getSchema()
-            == entlib.getSchema("./EditionComponents.json#/definitions/SeedPatchDataList"));
+        ENTLIB_ASSERT(node->getSchema() == entlib.getSchema("SeedPatchDataList"));
         // When it is an Entity without schema field
         node = entlib.loadFileAsNode("prefab.entity");
         ENTLIB_ASSERT(node->getSchema() == entlib.getSchema(Ent::entitySchemaName));
         // No $schema but a right pre-extention
         node = entlib.loadFileAsNode("test.CharacterControllerGD.node");
-        ENTLIB_ASSERT(
-            node->getSchema()
-            == entlib.getSchema("./RuntimeComponents.json#/definitions/CharacterControllerGD"));
+        ENTLIB_ASSERT(node->getSchema() == entlib.getSchema("CharacterControllerGD"));
         // No $schema but pre-extention with bad case
         node = entlib.loadFileAsNode("test_wrong_casse.chAracTercontrOlleRgd.nOde");
-        ENTLIB_ASSERT(
-            node->getSchema()
-            == entlib.getSchema("./RuntimeComponents.json#/definitions/CharacterControllerGD"));
+        ENTLIB_ASSERT(node->getSchema() == entlib.getSchema("CharacterControllerGD"));
         // No $schema, no .entity, wrong pre-extention
         ENTLIB_CHECK_EXCEPTION(
             entlib.loadFileAsNode("test.ThisTypeDoesntExist.node"), Ent::UnknownSchema);

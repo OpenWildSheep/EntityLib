@@ -41,26 +41,25 @@ namespace Ent
     /// Content of a Node which has type Ent::DataType::object
     struct Object
     {
-        Object(Subschema const* _schema)
+        Object(
+            Subschema const* _schema,
+            std::vector<ObjField> _nodes,
+            Override<Ent::String> _instanceOf = {},
+            uint32_t _instanceOfFieldIndex = 0,
+            bool _hasASuper = false)
             : schema(_schema)
+            , nodes(std::move(_nodes))
+            , instanceOf(std::move(_instanceOf))
+            , instanceOfFieldIndex(_instanceOfFieldIndex)
+            , hasASuper(_hasASuper)
         {
+            ENTLIB_ASSERT(schema != nullptr);
+            ENTLIB_ASSERT(nodes.size() == schema->properties.size());
         }
 
-        Object(Object const& _other)
-            : schema(_other.schema)
-            , nodes(_other.nodes)
-            , instanceOf(_other.instanceOf)
-            , instanceOfFieldIndex(_other.instanceOfFieldIndex)
-            , hasASuper(_other.hasASuper)
-        {
-        }
+        Object(Object const& _other) = default;
         Object(Object&&) = default;
-        Object& operator=(Object const& _other)
-        {
-            Object tmp(_other);
-            std::swap(*this, tmp);
-            return *this;
-        }
+        Object& operator=(Object const& _other) = default;
         Object& operator=(Object&&) = default;
 
         Subschema const* schema{};

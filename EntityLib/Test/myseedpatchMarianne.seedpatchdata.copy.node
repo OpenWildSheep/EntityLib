@@ -1,10 +1,10 @@
 {
+    "$schema": "wildschema:all/SeedPatchDataList.json",
     "Data": [
         {
             "NoiseName": "Clouds3",
             "SeedName": "HighlandBroom"
         }
     ],
-    "InstanceOf": "",
-    "schema_name": "SeedPatchDataList"
+    "InstanceOf": ""
 }

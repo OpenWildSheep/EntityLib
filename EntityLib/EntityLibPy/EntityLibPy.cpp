@@ -493,6 +493,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("resolve_noderef", (Node* (Node::*)(char const* _nodeRef))(&Node::resolveNodeRef), py::return_value_policy::reference_internal)
         .def_property_readonly("absolute_noderef", &Node::makeAbsoluteNodeRef)
         .def("get_prefab_history", &Node::getPrefabHistory)
+        .def("apply_to_prefab", &Node::applyToPrefab)
         ;
 
     pyComponent

@@ -18,7 +18,7 @@ namespace Ent
         name.computeMemory(prof);
         for (auto&& [cmpname, comp] : components)
         {
-            prof.addMem("Entity::components::value", sizeof(cmpname) + sizeof(comp));
+            prof.addMem("Entity::components::value", sizeof(decltype(components)::value_type));
             prof.addMem("Entity::components::key", sizeof(cmpname.size()));
             comp->computeMemory(prof);
         }
@@ -266,9 +266,9 @@ namespace Ent
     std::vector<char const*> Entity::getComponentTypes() const
     {
         std::vector<char const*> types;
-        for (auto&& type_comp : components)
+        for (auto&& [type, comp] : components)
         {
-            types.push_back(type_comp.first.c_str());
+            types.push_back(type.c_str());
         }
         return types;
     }
@@ -324,9 +324,9 @@ namespace Ent
         std::map<std::string, std::unique_ptr<Component>> instComponents;
         std::unique_ptr<SubSceneComponent> instSubSceneComponent;
 
-        for (auto&& name_comp : components)
+        for (auto&& [cmpname, comp] : components)
         {
-            instComponents.emplace(name_comp.first, name_comp.second->makeInstanceOf());
+            instComponents.emplace(cmpname, comp->makeInstanceOf());
         }
         if (subSceneComponent != nullptr)
         {
@@ -450,13 +450,8 @@ namespace Ent
     EntityRef Entity::makeEntityRef(Entity& _entity)
     {
         // get the two absolute path
-        auto&& thisPathInfos = getAbsolutePathReversed(this);
-        auto&& entityPathInfos = getAbsolutePathReversed(&_entity);
-
-        Entity* thisRootEntity = std::get<1>(thisPathInfos);
-        Entity* entityRootEntity = std::get<1>(entityPathInfos);
-        Scene* thisRootScene = std::get<2>(thisPathInfos);
-        Scene* entityRootScene = std::get<2>(entityPathInfos);
+        auto&& [thisPath, thisRootEntity, thisRootScene] = getAbsolutePathReversed(this);
+        auto&& [entityPath, entityRootEntity, entityRootScene] = getAbsolutePathReversed(&_entity);
 
         // entities should either share a common root scene
         // or a common root entity if they are in a .entity (i.e there is no root scene)
@@ -466,9 +461,6 @@ namespace Ent
             // cannot reference unrelated entities
             return {};
         }
-
-        auto&& thisPath = std::get<0>(thisPathInfos);
-        auto&& entityPath = std::get<0>(entityPathInfos);
 
         std::string relativePath = computeRelativePath(thisPath, std::move(entityPath), false);
 
@@ -724,17 +716,14 @@ namespace Ent
         actorStates->applyAllValues(*_dest.actorStates, _copyMode);
         color->applyAllValues(*_dest.color, _copyMode);
 
-        for (auto&& name_comp : getComponents())
+        for (auto&& [cmpName, comp] : getComponents())
         {
-            auto&& cmpName = name_comp.first;
-            auto&& comp = name_comp.second;
             // addComponent has no effect if the component exist
             comp->applyAllValues(*_dest.addComponent(cmpName.c_str()), _copyMode);
         }
         std::vector<char const*> compToRemove;
-        for (auto&& name_comp : _dest.getComponents())
+        for (auto&& [cmpName, comp] : _dest.getComponents())
         {
-            auto&& cmpName = name_comp.first;
             if (getComponent(cmpName.c_str()) == nullptr) // Removed component
             {
                 compToRemove.push_back(cmpName.c_str());

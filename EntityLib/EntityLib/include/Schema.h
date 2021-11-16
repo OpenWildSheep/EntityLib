@@ -5,8 +5,8 @@
 #include <memory>
 #include <vector>
 #include <variant>
+#include <optional>
 
-#include "../external/optional.hpp"
 #include "../external/json.hpp"
 #pragma warning(pop)
 
@@ -63,7 +63,7 @@ namespace Ent
         std::map<std::string, SubschemaRef> properties; ///< If type == Ent::DataType::object, child properties
         size_t maxItems = size_t(-1); ///< Maximum size of the array. (inclusive) [min, max]
         size_t minItems = 0; ///< @brief Minimum size of an array
-        tl::optional<std::vector<SubschemaRef>> oneOf; ///< This object have to match with one of thos schema (union)
+        std::optional<std::vector<SubschemaRef>> oneOf; ///< This object have to match with one of thos schema (union)
         std::string name; ///< This is not a constraint. Just the name of the definition
         nlohmann::json userMeta;
         bool isKeyField = false;
@@ -89,7 +89,7 @@ namespace Ent
         {
             std::string dataField; ///< Name of the field containing the data (ex : classData)
             std::string typeField; ///< Name of the field containing the type of the data (ex : className)
-            tl::optional<std::string> indexField; ///< Name of the field containing the index of the type
+            std::optional<std::string> indexField; ///< Name of the field containing the index of the type
         };
         /// Store metadata for array type
         struct ArrayMeta : BaseMeta
@@ -97,7 +97,7 @@ namespace Ent
             std::string overridePolicy; ///< Policy used to override the array from the prefab
             bool ordered = true;
             bool isMapItem = false; ///< Can't be discarded at write (neither null)
-            tl::optional<std::string> keyField;
+            std::optional<std::string> keyField;
         };
         /// Store metadata for all schema which doesn't have specific field
         struct GenericMeta : BaseMeta
@@ -105,7 +105,7 @@ namespace Ent
         };
         /// Meta data for any type of Node
         using Meta = std::variant<GenericMeta, NumberMeta, UnionMeta, ArrayMeta>;
-        Meta meta; ///< Contains meta data for any type of Node
+        Meta meta{}; ///< Contains meta data for any type of Node
 
         // helper methods
         bool IsDeprecated() const; ///< Is this node deprecated? (access to meta data)
@@ -146,7 +146,7 @@ namespace Ent
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue = nlohmann::json;
         DefaultValue defaultValue; ///< @brief Contains the data according to the type
-        tl::optional<DefaultValue> constValue; ///< This property can only have this value
+        std::optional<DefaultValue> constValue; ///< This property can only have this value
 
         /// @brief Subschema of the unique type of item
         ///
@@ -159,7 +159,7 @@ namespace Ent
         /// If type == Ent::DataType::array,
         ///   If all items have a different type (LinearItem),
         ///     This is the description of each items
-        tl::optional<std::vector<SubschemaRef>> linearItems;
+        std::optional<std::vector<SubschemaRef>> linearItems;
         std::vector<std::string> enumValues; ///< List of all posible values for enum
     };
 

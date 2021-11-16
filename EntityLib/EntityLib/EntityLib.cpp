@@ -329,13 +329,8 @@ namespace Ent
     EntityRef EntityLib::makeEntityRef(Node const& _from, Node const& _to)
     {
         // get the two absolute path
-        auto&& thisPathInfos = getAbsolutePathReversed(&_from);
-        auto&& entityPathInfos = getAbsolutePathReversed(&_to);
-
-        Node const* thisRootEntity = std::get<1>(thisPathInfos);
-        Node const* entityRootEntity = std::get<1>(entityPathInfos);
-        Node const* thisRootScene = std::get<2>(thisPathInfos);
-        Node const* entityRootScene = std::get<2>(entityPathInfos);
+        auto&& [thisPath, thisRootEntity, thisRootScene] = getAbsolutePathReversed(&_from);
+        auto&& [entityPath, entityRootEntity, entityRootScene] = getAbsolutePathReversed(&_to);
 
         // entities should either share a common root scene
         // or a common root entity if they are in a .entity (i.e there is no root scene)
@@ -345,9 +340,6 @@ namespace Ent
             // cannot reference unrelated entities
             return {};
         }
-
-        auto&& thisPath = std::get<0>(thisPathInfos);
-        auto&& entityPath = std::get<0>(entityPathInfos);
 
         std::string relativePath = computeRelativePath(thisPath, std::move(entityPath), false);
 
@@ -365,7 +357,9 @@ namespace Ent
             return getSceneParentEntity(parent);
         }
         else
+        {
             return nullptr;
+        }
     }
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     Node const* EntityLib::getParentEntity(Node const* _node)
@@ -573,49 +567,49 @@ Ent::NodeUniquePtr Ent::EntityLib::loadPrimitive(
         {
             def = _default->get<std::string>();
         }
-        tl::optional<std::string> const supVal =
+        std::optional<std::string> const supVal =
             (_super != nullptr and not _super->hasDefaultValue()) ?
-                tl::optional<std::string>(_super->getString()) :
-                tl::optional<std::string>(tl::nullopt);
-        tl::optional<std::string> const val =
-            _data.is_string() ? tl::optional<std::string>(_data.get<std::string>()) :
-                                tl::optional<std::string>(tl::nullopt);
+                std::optional<std::string>(_super->getString()) :
+                std::optional<std::string>(std::nullopt);
+        std::optional<std::string> const val =
+            _data.is_string() ? std::optional<std::string>(_data.get<std::string>()) :
+                                std::optional<std::string>(std::nullopt);
         result = newNode(Ent::Override<String>(def, supVal, val), &_nodeSchema);
     }
     break;
     case Ent::DataType::boolean:
     {
         bool const def = _default == nullptr ? bool{} : _default->get<bool>();
-        tl::optional<bool> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
-                                              tl::optional<bool>(_super->getBool()) :
-                                              tl::optional<bool>(tl::nullopt);
-        tl::optional<bool> const val = _data.is_boolean() ? tl::optional<bool>(_data.get<bool>()) :
-                                                            tl::optional<bool>(tl::nullopt);
+        std::optional<bool> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
+                                               std::optional<bool>(_super->getBool()) :
+                                               std::optional<bool>(std::nullopt);
+        std::optional<bool> const val = _data.is_boolean() ? std::optional<bool>(_data.get<bool>()) :
+                                                             std::optional<bool>(std::nullopt);
         result = newNode(Ent::Override<bool>(def, supVal, val), &_nodeSchema);
     }
     break;
     case Ent::DataType::integer:
     {
         int64_t const def = _default == nullptr ? int64_t{} : _default->get<int64_t>();
-        tl::optional<int64_t> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
-                                                 tl::optional<int64_t>(_super->getInt()) :
-                                                 tl::optional<int64_t>(tl::nullopt);
-        tl::optional<int64_t> const val = _data.is_number_integer() or _data.is_number_unsigned() ?
-                                              tl::optional<int64_t>(_data.get<int64_t>()) :
-                                              tl::optional<int64_t>(tl::nullopt);
+        std::optional<int64_t> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
+                                                  std::optional<int64_t>(_super->getInt()) :
+                                                  std::optional<int64_t>(std::nullopt);
+        std::optional<int64_t> const val = _data.is_number_integer() or _data.is_number_unsigned() ?
+                                               std::optional<int64_t>(_data.get<int64_t>()) :
+                                               std::optional<int64_t>(std::nullopt);
         result = newNode(Ent::Override<int64_t>(def, supVal, val), &_nodeSchema);
     }
     break;
     case Ent::DataType::number:
     {
         double const def = _default == nullptr ? double{} : _default->get<double>();
-        tl::optional<double> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
-                                                tl::optional<double>(_super->getFloat()) :
-                                                tl::optional<double>(tl::nullopt);
-        tl::optional<double> const val =
+        std::optional<double> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
+                                                 std::optional<double>(_super->getFloat()) :
+                                                 std::optional<double>(std::nullopt);
+        std::optional<double> const val =
             _data.is_number_float() or _data.is_number_integer() or _data.is_number_unsigned() ?
-                tl::optional<double>(_data.get<double>()) :
-                tl::optional<double>(tl::nullopt);
+                std::optional<double>(_data.get<double>()) :
+                std::optional<double>(std::nullopt);
         result = newNode(Ent::Override<double>(def, supVal, val), &_nodeSchema);
     }
     break;
@@ -625,17 +619,17 @@ Ent::NodeUniquePtr Ent::EntityLib::loadPrimitive(
                                        Ent::EntityRef() :
                                        Ent::EntityRef{String(_default->get<std::string>())};
 
-        tl::optional<Ent::EntityRef> const supVal =
+        std::optional<Ent::EntityRef> const supVal =
             (_super != nullptr and not _super->hasDefaultValue()) ? // Keep the prefab value if there is
-                tl::optional<Ent::EntityRef>(_super->getEntityRef()) :
-                tl::optional<Ent::EntityRef>(tl::nullopt);
+                std::optional<Ent::EntityRef>(_super->getEntityRef()) :
+                std::optional<Ent::EntityRef>(std::nullopt);
 
-        tl::optional<std::string> const refString =
-            _data.is_string() ? _data.get<std::string>() : tl::optional<std::string>(tl::nullopt);
+        std::optional<std::string> const refString =
+            _data.is_string() ? _data.get<std::string>() : std::optional<std::string>(std::nullopt);
 
-        tl::optional<Ent::EntityRef> const val =
-            refString.has_value() ? tl::optional<Ent::EntityRef>(Ent::EntityRef{refString.value()}) :
-                                    tl::optional<Ent::EntityRef>(tl::nullopt);
+        std::optional<Ent::EntityRef> const val =
+            refString.has_value() ? std::optional<Ent::EntityRef>(Ent::EntityRef{refString.value()}) :
+                                    std::optional<Ent::EntityRef>(std::nullopt);
 
         result = newNode(Ent::Override<Ent::EntityRef>(def, supVal, val), &_nodeSchema);
     }
@@ -704,21 +698,19 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
             else
             {
                 _super = nullptr;
-                objInstanceOf = Ent::Override<String>("", tl::nullopt, "");
+                objInstanceOf = Ent::Override<String>("", std::nullopt, "");
             }
         }
         else if (_super != nullptr and _super->getInstanceOf() != nullptr)
         {
             // we inherit from the super's instanceOf
-            objInstanceOf = Ent::Override<String>("", _super->getInstanceOf(), tl::nullopt);
+            objInstanceOf = Ent::Override<String>("", _super->getInstanceOf(), std::nullopt);
         }
 
         // Read the fields in schema
         objNodes.reserve(_nodeSchema.properties.size());
-        for (auto&& name_sub : _nodeSchema.properties)
+        for (auto&& [name, propSchemaRef] : _nodeSchema.properties)
         {
-            Ent::SubschemaRef const& propSchemaRef = std::get<1>(name_sub);
-            std::string const& name = std::get<0>(name_sub);
             Ent::Node const* superProp = (_super != nullptr) ? _super->at(name.c_str()) : nullptr;
             json const* refDefault = propSchemaRef.getRefDefaultValues();
             json const* schemaDefault = nullptr;
@@ -742,7 +734,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
             try
             {
                 auto tmpNode = loadNode(*propSchemaRef, *prop, superProp, defaultProp);
-                objNodes.push_back(ObjField{name.c_str(), std::move(tmpNode), fieldIdx});
+                objNodes.emplace_back(name.c_str(), std::move(tmpNode), fieldIdx);
             }
             catch (ContextException& ex)
             {
@@ -794,11 +786,11 @@ Ent::NodeUniquePtr Ent::EntityLib::loadArray(
                 }
                 if (not arr.hasKey())
                 {
-                    tl::optional<uint64_t> prefabArraySize =
-                        defaultArraySize == _super->size() ? tl::nullopt :
-                                                             tl::optional<uint64_t>{_super->size()};
+                    std::optional<uint64_t> prefabArraySize =
+                        defaultArraySize == _super->size() ? std::nullopt :
+                                                             std::optional<uint64_t>{_super->size()};
                     arr.arraySetSize(
-                        Ent::Override<uint64_t>(defaultArraySize, prefabArraySize, tl::nullopt));
+                        Ent::Override<uint64_t>(defaultArraySize, prefabArraySize, std::nullopt));
                 }
             }
             else if (_default != nullptr)
@@ -813,7 +805,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadArray(
                 if (not arr.hasKey())
                 {
                     arr.arraySetSize(
-                        Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt));
+                        Ent::Override<uint64_t>(defaultArraySize, std::nullopt, std::nullopt));
                 }
             }
             else
@@ -827,7 +819,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadArray(
                 if (not arr.hasKey())
                 {
                     arr.arraySetSize(
-                        Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt));
+                        Ent::Override<uint64_t>(defaultArraySize, std::nullopt, std::nullopt));
                 }
             }
         }
@@ -985,14 +977,14 @@ Ent::NodeUniquePtr Ent::EntityLib::loadArray(
                     arr.initAdd(loc, std::move(tmpNode), addedInInstance);
                     ++index;
                 }
-                tl::optional<uint64_t> prefabArraySize =
+                std::optional<uint64_t> prefabArraySize =
                     (_super != nullptr and _super->size() != defaultArraySize) ?
-                        tl::optional<uint64_t>{_super->size()} :
-                        tl::nullopt;
+                        std::optional<uint64_t>{_super->size()} :
+                        std::nullopt;
                 const uint64_t sizeInPrefab = prefabArraySize.value_or(defaultArraySize);
-                tl::optional<uint64_t> overrideArraySize = _data.size() == sizeInPrefab ?
-                                                               tl::nullopt :
-                                                               tl::optional<uint64_t>{_data.size()};
+                std::optional<uint64_t> overrideArraySize =
+                    _data.size() == sizeInPrefab ? std::nullopt :
+                                                   std::optional<uint64_t>{_data.size()};
                 arr.arraySetSize(
                     Ent::Override<uint64_t>(defaultArraySize, prefabArraySize, overrideArraySize));
             }
@@ -1021,7 +1013,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadArray(
             ++index;
         }
         uint64_t defaultArraySize = _nodeSchema.linearItems->size();
-        arr.arraySetSize(Ent::Override<uint64_t>(defaultArraySize, tl::nullopt, tl::nullopt));
+        arr.arraySetSize(Ent::Override<uint64_t>(defaultArraySize, std::nullopt, std::nullopt));
     }
     return newNode(std::move(arr), &_nodeSchema);
 }
@@ -1194,6 +1186,14 @@ json Ent::EntityLib::dumpNode(
             char const* name = nullptr;
             json data;
             uint32_t index = 0;
+
+            // TODO : Remove when C++20
+            JsonField(char const* _name, json _data, uint32_t _index = 0)
+                : name(_name)
+                , data(std::move(_data))
+                , index(_index)
+            {
+            }
         };
         std::vector<JsonField> fieldMap;
         auto& internObj = std::get<Object>(_node.value);
@@ -1210,20 +1210,19 @@ json Ent::EntityLib::dumpNode(
                 {
                     const auto* typeName = getRefTypeName(subNode->getTypeName());
                     auto const fieldIdx = internObj.at(name.c_str()).fieldIdx;
-                    fieldMap.push_back(JsonField{typeName, std::move(subJson), fieldIdx});
+                    fieldMap.emplace_back(typeName, std::move(subJson), fieldIdx);
                 }
                 else
                 {
                     auto const fieldIdx = internObj.at(name.c_str()).fieldIdx;
-                    fieldMap.push_back(JsonField{name.c_str(), std::move(subJson), fieldIdx});
+                    fieldMap.emplace_back(name.c_str(), std::move(subJson), fieldIdx);
                 }
             }
         }
         auto const& instanceOf = std::get<Ent::Object>(_node.value).instanceOf;
         if (_dumpedValueSource == OverrideValueSource::Override and instanceOf.isSet())
         {
-            fieldMap.push_back(
-                JsonField{"InstanceOf", instanceOf.get(), internObj.instanceOfFieldIndex});
+            fieldMap.emplace_back("InstanceOf", instanceOf.get(), internObj.instanceOfFieldIndex);
         }
         std::sort(begin(fieldMap), end(fieldMap), [](JsonField const& a, JsonField const& b) {
             if (a.index != b.index)
@@ -1441,7 +1440,7 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
         else
         {
             _superEntityFromParentEntity = nullptr;
-            ovInstanceOf = Ent::Override<String>("", tl::nullopt, "");
+            ovInstanceOf = Ent::Override<String>("", std::nullopt, "");
         }
     }
     ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
@@ -1452,22 +1451,22 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
         ENTLIB_ASSERT(superEntity->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
     }
 
-    tl::optional<std::string> const thumbnail = _entNode.count("Thumbnail") != 0 ?
-                                                    _entNode.at("Thumbnail").get<std::string>() :
-                                                    tl::optional<std::string>();
+    std::optional<std::string> const thumbnail = _entNode.count("Thumbnail") != 0 ?
+                                                     _entNode.at("Thumbnail").get<std::string>() :
+                                                     std::optional<std::string>();
     Ent::Override<String> superThumbnail = superEntity->getThumbnailValue();
     Ent::Override<String> ovThumbnail = superThumbnail.makeOverridedInstanceOf(thumbnail);
 
-    tl::optional<std::string> const name = _entNode.count("Name") != 0 ?
-                                               _entNode.at("Name").get<std::string>() :
-                                               tl::optional<std::string>();
+    std::optional<std::string> const name = _entNode.count("Name") != 0 ?
+                                                _entNode.at("Name").get<std::string>() :
+                                                std::optional<std::string>();
 
     Ent::Override<String> superName = superEntity->getNameValue();
     Ent::Override<String> ovName = superName.makeOverridedInstanceOf(name);
 
     Ent::Override<String> superInstanceOf = superEntity->getInstanceOfValue();
 
-    tl::optional<Ent::ActivationLevel> maxActivationLevel;
+    std::optional<Ent::ActivationLevel> maxActivationLevel;
     if (_entNode.count("MaxActivationLevel") != 0)
     {
         maxActivationLevel =
@@ -1536,8 +1535,8 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
                 Ent::SubSceneComponent const* superComp = superEntity->getSubSceneComponent();
 
                 auto fileInJson = (data.count("File") != 0) ?
-                                      tl::optional<std::string>(data["File"].get<std::string>()) :
-                                      tl::nullopt;
+                                      std::optional<std::string>(data["File"].get<std::string>()) :
+                                      std::nullopt;
                 auto subSceneComp =
                     std::make_unique<Ent::SubSceneComponent>(this, superComp != nullptr, index);
                 subSceneComp->embedded = Ent::Scene::loadScene(
@@ -1575,14 +1574,12 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
         }
     }
     // Add undeclared componants to be able to get values inside (They are full reference to prefab)
-    for (auto const& type_comp : superEntity->getComponents())
+    for (auto const& [cmpType, superComp] : superEntity->getComponents())
     {
-        auto const& cmpType = std::get<0>(type_comp);
         if (removedComponents.count(cmpType) != 0)
         {
             continue;
         }
-        auto const& superComp = std::get<1>(type_comp);
         if (components.count(cmpType) == 0)
         {
             auto comp = std::make_unique<Ent::Component>(
@@ -1671,8 +1668,8 @@ std::shared_ptr<Type const> Ent::EntityLib::loadEntityOrScene(
 
             auto entity = load(*this, document, _super);
             auto file = typename Cache::mapped_type{std::move(entity), timestamp};
-            auto iter_bool = cache.insert_or_assign(relPath, std::move(file));
-            return std::get<0>(iter_bool)->second.data;
+            auto [newiter, inserted] = cache.insert_or_assign(relPath, std::move(file));
+            return newiter->second.data;
         }
         catch (ContextException& ex)
         {
@@ -1792,7 +1789,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadFileAsNode(std::filesystem::path const& _
             schemaFound = strToLower(schemaFound);
             tryToLower = true;
         }
-        if (auto dotPos = schemaFound.find("."); dotPos != std::string::npos)
+        if (auto dotPos = schemaFound.find('.'); dotPos != std::string::npos)
         {
             schemaFound.erase(dotPos);
         }

@@ -136,11 +136,13 @@ json Ent::mergeComponents(std::filesystem::path const& _toolsDir)
             {
                 for (auto&& [pname, prop] : def->at("properties").items())
                 {
-                    if (mergedDefinition["properties"].count(pname))
+                    if (mergedDefinition["properties"].count(pname) != 0)
+                    {
                         printf(
                             "WARNING : The property %s/%s already exist!\n",
                             name.c_str(),
                             pname.c_str());
+                    }
                     mergedDefinition["properties"][pname] = prop;
                 }
             }

@@ -90,9 +90,9 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
     case Ent::DataType::number: Ent::printfmt("number\n"); break;
     case Ent::DataType::object:
         Ent::printfmt("object\n");
-        for (auto&& name_sub : subschema.properties)
+        for (auto&& [propname, sub] : subschema.properties)
         {
-            displaySubSchema(std::get<0>(name_sub), *std::get<1>(name_sub), indent + "  ");
+            displaySubSchema(propname, *sub, indent + "  ");
         }
         break;
     case Ent::DataType::string: Ent::printfmt("string\n"); break;
@@ -121,6 +121,7 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
         ENTLIB_ASSERT_MSG(exception_throw, "Exception not thrown!");                               \
     }
 
+// NOLINTNEXTLINE(readability-function-size)
 int main(int argc, char** argv)
 try
 {
@@ -194,7 +195,7 @@ try
     {
         auto&& absRef = std::get<1>(name_schema)->name;
         ENTLIB_ASSERT(absRef.find("./") == std::string::npos);
-        ENTLIB_ASSERT(absRef.find("#") == std::string::npos);
+        ENTLIB_ASSERT(absRef.find('#') == std::string::npos);
         ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(absRef) == 1);
     }
 
@@ -649,8 +650,8 @@ try
         ENTLIB_ASSERT(comp);
         const auto testArrayMember = [&](char const* _arrayName,
                                          size_t defaultSize,
-                                         tl::optional<size_t> prefabSize,
-                                         tl::optional<size_t> overrideSize) {
+                                         std::optional<size_t> prefabSize,
+                                         std::optional<size_t> overrideSize) {
             Ent::Node const* node = comp->root->at(_arrayName);
             ENTLIB_ASSERT(node);
             ENTLIB_ASSERT(node->hasPrefabValue() == prefabSize.has_value());
@@ -660,9 +661,9 @@ try
             ENTLIB_ASSERT(node->getRawSize(Ent::OverrideValueLocation::Prefab) == prefabSize);
             ENTLIB_ASSERT(node->getRawSize(Ent::OverrideValueLocation::Override) == overrideSize);
         };
-        testArrayMember("DefaultValue", 2, tl::nullopt, tl::nullopt);
-        testArrayMember("PrefabValue", 2, 4, tl::nullopt);
-        testArrayMember("OverridedDefaultValue", 2, tl::nullopt, 3);
+        testArrayMember("DefaultValue", 2, std::nullopt, std::nullopt);
+        testArrayMember("PrefabValue", 2, 4, std::nullopt);
+        testArrayMember("OverridedDefaultValue", 2, std::nullopt, 3);
         testArrayMember("OverridedPrefabValue", 2, 4, 3);
     }
     {
@@ -1592,9 +1593,9 @@ try
     // ******************************** Test iteration of schema **********************************
     if (doDisplaySubSchema)
     {
-        for (auto&& name_sub : entlib.schema.components)
+        for (auto&& [name, sub] : entlib.schema.components)
         {
-            displaySubSchema(std::get<0>(name_sub), *std::get<1>(name_sub), {});
+            displaySubSchema(name, *sub, {});
         }
     }
 

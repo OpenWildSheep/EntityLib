@@ -50,7 +50,7 @@ namespace Ent
         Vector makeInstanceOf() const;
         EntityLib const* getEntityLib() const;
         std::unique_ptr<Vector> clone() const;
-        tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
+        std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         void unset();
         void setSize(Override<size_t> _size);
         void applyAllValues(Vector& _dest, CopyMode _copyMode) const;

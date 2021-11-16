@@ -171,7 +171,7 @@ void Ent::Vector::computeMemory(MemoryProfiler& prof) const
     prof.addNodes(m_data.size());
 }
 
-tl::optional<size_t> Ent::Vector::getRawSize(OverrideValueLocation _location) const
+std::optional<size_t> Ent::Vector::getRawSize(OverrideValueLocation _location) const
 {
     return m_arraySize.getRaw(_location);
 }

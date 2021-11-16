@@ -310,7 +310,7 @@ namespace Ent
                 NodeRef const prefabToThis = parent->makeNodeRef(this);
                 Node const* thisPrefab = prefab->resolveNodeRef(prefabToThis.c_str());
                 result = thisPrefab->getPrefabHistory();
-                result.push_back(Node::PrefabInfo{obj->instanceOf.get(), prefabToThis, thisPrefab});
+                result.emplace_back(obj->instanceOf.get(), prefabToThis, thisPrefab);
             }
             // If instanceOf is empty, keep result empty
         }
@@ -454,7 +454,7 @@ namespace Ent
         throw BadType();
     }
 
-    tl::optional<size_t> Node::getRawSize(OverrideValueLocation _location) const
+    std::optional<size_t> Node::getRawSize(OverrideValueLocation _location) const
     {
         if (std::holds_alternative<Array>(value))
         {
@@ -1127,7 +1127,7 @@ namespace Ent
         return getRawEntityRef(OverrideValueLocation::Default).value();
     }
 
-    tl::optional<double> Node::getRawFloat(OverrideValueLocation _location) const
+    std::optional<double> Node::getRawFloat(OverrideValueLocation _location) const
     {
         if (std::holds_alternative<Override<double>>(value))
         {
@@ -1137,48 +1137,50 @@ namespace Ent
         {
             auto intValue = std::get<Override<int64_t>>(value).getRaw(_location);
             return intValue.has_value() ?
-                       tl::optional<double>{static_cast<double>(intValue.value())} :
-                       tl::nullopt;
+                       std::optional<double>{static_cast<double>(intValue.value())} :
+                       std::nullopt;
         }
         throw BadType();
     }
 
-    tl::optional<int> Node::getRawInt(OverrideValueLocation _location) const
+    std::optional<int> Node::getRawInt(OverrideValueLocation _location) const
     {
         if (std::holds_alternative<Override<int64_t>>(value))
         {
-            return std::get<Override<int64_t>>(value).getRaw(_location);
+            auto opt = std::get<Override<int64_t>>(value).getRaw(_location);
+            return opt.has_value() ? std::optional(static_cast<int>(*opt)) : std::nullopt;
         }
         throw BadType();
     }
 
-    tl::optional<char const*> Node::getRawString(OverrideValueLocation _location) const
+    std::optional<char const*> Node::getRawString(OverrideValueLocation _location) const
     {
         if (std::holds_alternative<Override<String>>(value))
         {
             auto strValue = std::get<Override<String>>(value).getRaw(_location);
-            return strValue.has_value() ? tl::optional<char const*>{strValue.value().c_str()} :
-                                          tl::nullopt;
+            return strValue.has_value() ? std::optional<char const*>{strValue.value().get().c_str()} :
+                                          std::nullopt;
         }
         throw BadType();
     }
 
-    tl::optional<bool> Node::getRawBool(OverrideValueLocation _location) const
+    std::optional<bool> Node::getRawBool(OverrideValueLocation _location) const
     {
         if (std::holds_alternative<Override<bool>>(value))
         {
             auto boolValue = std::get<Override<bool>>(value).getRaw(_location);
-            return boolValue.has_value() ? tl::optional<bool>{boolValue} : tl::nullopt;
+            return boolValue.has_value() ? std::optional<bool>{boolValue} : std::nullopt;
         }
         throw BadType();
     }
 
-    tl::optional<EntityRef> Node::getRawEntityRef(OverrideValueLocation _location) const
+    std::optional<EntityRef> Node::getRawEntityRef(OverrideValueLocation _location) const
     {
         if (std::holds_alternative<Override<EntityRef>>(value))
         {
             auto entityRefValue = std::get<Override<EntityRef>>(value).getRaw(_location);
-            return entityRefValue.has_value() ? tl::optional<EntityRef>{entityRefValue} : tl::nullopt;
+            return entityRefValue.has_value() ? std::optional<EntityRef>{entityRefValue} :
+                                                std::nullopt;
         }
         throw BadType();
     }

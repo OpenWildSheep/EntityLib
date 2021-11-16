@@ -1,8 +1,9 @@
 #pragma once
 
+#include <filesystem>
+
 #pragma warning(push, 0)
 #include "../external/json.hpp"
-#include "../external/filesystem.hpp"
 #pragma warning(pop)
 
 /// \cond PRIVATE

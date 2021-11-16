@@ -79,7 +79,9 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const
 {
     json instSchema;
     if (not tmplSchema.defaultValue.is_null())
+    {
         instSchema["default"] = tmplSchema.defaultValue;
+    }
     if (tmplSchema.constValue.has_value())
     {
         instSchema["const"] = *tmplSchema.constValue;
@@ -171,7 +173,7 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const
     {
         instSchema["required"] = requiredList;
     }
-    if (instSchema.count("properties"))
+    if (instSchema.count("properties") != 0)
     {
         instSchema["properties"]["$schema"]["type"] = "string";
         instSchema["properties"]["InstanceOf"]["type"] = "string";
@@ -182,10 +184,10 @@ static json convertToInstanceSchema(Ent::Subschema const& tmplSchema, char const
 json Ent::createValidationSchema(Ent::Schema const& schema)
 {
     json instSchema;
-    for (auto&& name_def : schema.allDefinitions)
+    for (auto&& [name, def] : schema.allDefinitions)
     {
-        auto const link = convertLink(name_def.first);
-        instSchema["definitions"][link] = convertToInstanceSchema(name_def.second);
+        auto const link = convertLink(name);
+        instSchema["definitions"][link] = convertToInstanceSchema(def);
     }
     return instSchema;
 }

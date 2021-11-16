@@ -208,22 +208,9 @@ Ent::Map::Map(EntityLib const* _entlib, Subschema const* _schema)
 {
 }
 
-Ent::Map::Map(Map const& _other)
-    : m_entlib(_other.m_entlib)
-    , m_schema(_other.m_schema)
-    , m_items(_other.m_items)
-    , m_itemMap(_other.m_itemMap)
-{
-}
-Ent::Map& Ent::Map::operator=(Map const& _other)
-{
-    if (this != &_other)
-    {
-        Map tmp(_other);
-        std::swap(*this, tmp);
-    }
-    return *this;
-}
+Ent::Map::Map(Map const& _other) = default;
+
+Ent::Map& Ent::Map::operator=(Map const& _other) = default;
 
 Ent::Map::KeyType Ent::Map::getChildKey(Subschema const* _schema, Ent::Node const* _child)
 {
@@ -640,7 +627,7 @@ Ent::Map Ent::Map::makeInstanceOf() const
     return result;
 }
 
-tl::optional<size_t> Ent::Map::getRawSize(OverrideValueLocation _location) const
+std::optional<size_t> Ent::Map::getRawSize(OverrideValueLocation _location) const
 {
     switch (_location)
     {
@@ -652,13 +639,13 @@ tl::optional<size_t> Ent::Map::getRawSize(OverrideValueLocation _location) const
     {
         auto prefabSize = getPrefabSize();
         auto defaultsize = getDefaultSize();
-        return (prefabSize == defaultsize) ? tl::optional<size_t>{} : prefabSize;
+        return (prefabSize == defaultsize) ? std::optional<size_t>{} : prefabSize;
     }
     case OverrideValueLocation::Override:
     {
         auto instanceSize = size();
         auto prefabsize = getPrefabSize();
-        return (instanceSize == prefabsize) ? tl::optional<size_t>{} : instanceSize;
+        return (instanceSize == prefabsize) ? std::optional<size_t>{} : instanceSize;
     }
     }
     ENTLIB_LOGIC_ERROR("Unknown OverrideValueLocation : %d", _location);
@@ -771,7 +758,9 @@ std::vector<Ent::String> Ent::Map::getKeysString() const
     for (auto& elt : m_items)
     {
         if (elt.isPresent.get())
+        {
             keys.push_back(std::get<Ent::String>(getChildKey(m_schema, elt.node.get())));
+        }
     }
     return keys;
 }
@@ -788,7 +777,9 @@ std::vector<int64_t> Ent::Map::getKeysInt() const
     for (auto& elt : m_items)
     {
         if (elt.isPresent.get())
+        {
             keys.push_back(std::get<int64_t>(getChildKey(m_schema, elt.node.get())));
+        }
     }
     return keys;
 }

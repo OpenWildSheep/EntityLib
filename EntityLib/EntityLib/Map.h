@@ -25,7 +25,7 @@ namespace Ent
 
         explicit Map(EntityLib const* _entlib = nullptr, Subschema const* _schema = nullptr);
         Map(Map const&);
-        Map(Map&&) = default;
+        Map(Map&&) noexcept = default;
         Map& operator=(Map const&);
         Map& operator=(Map&&) = default;
 
@@ -78,7 +78,7 @@ namespace Ent
         void computeMemory(MemoryProfiler& _prof) const;
         Map detach() const;
         Map makeInstanceOf() const;
-        tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
+        std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         static KeyType getChildKey(Subschema const* _schema, Ent::Node const* _child);
         static DataType getKeyType(Subschema const* _schema);
         void unset();

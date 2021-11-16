@@ -8,11 +8,11 @@
 #include <map>
 #include <optional>
 #include <regex>
+#include <filesystem>
 
 #pragma warning(push, 0)
 #include <iostream>
 #include <mustache.hpp>
-#include "../EntityLib/external/filesystem.hpp"
 #include "../EntityLib/external/json.hpp"
 #pragma warning(pop)
 
@@ -104,7 +104,9 @@ static std::string escapeName(std::string _name)
     _name = replaceAll(_name, ",", "_");
     _name = replaceAll(_name, " ", "_");
     if (_name.front() >= '0' and _name.front() <= '9')
+    {
         _name = '_' + _name;
+    }
     if (cppKeywordTypes.count(_name) != 0)
     {
         return _name + '_';
@@ -123,7 +125,9 @@ static void addDef(
     ENTLIB_ASSERT(_def->type != Ent::DataType::null);
     // We already have a specific class for EntityRef so ignore the one from EditionComponents.json
     if (_name == "EntityRef")
+    {
         return;
+    }
     auto escapedName = escapeName(_name);
     if (allDefs.count(escapedName) == 0)
     {

@@ -23,10 +23,10 @@ using namespace nlohmann;
 
 namespace Ent
 {
-    char const* actorStatesSchemaName = "./Scene-schema.json#/definitions/ActorStates";
-    char const* colorSchemaName = "./RuntimeComponents.json#/definitions/Color";
-    char const* entitySchemaName = "./Scene-schema.json#/definitions/Entity";
-    char const* sceneSchemaName = "./Scene-schema.json#/definitions/Scene";
+    char const* actorStatesSchemaName = "ActorStates";
+    char const* colorSchemaName = "Color";
+    char const* entitySchemaName = "Entity";
+    char const* sceneSchemaName = "Scene";
     NodeUniquePtr makeDefaultColorField(EntityLib const& _entlib)
     {
         Ent::Subschema const& colorSchema = AT(_entlib.schema.schema.allDefinitions, colorSchemaName);
@@ -80,13 +80,12 @@ namespace Ent
             loader.addInCache("MergedComponents.json", std::move(mergedComps));
         }
 
-        json schemaDocument = loadJsonFile(toolsDir, "WildPipeline/Schema/Scene-schema.json");
+        json schemaDocument = loadJsonFile(toolsDir, "WildPipeline/Schema/MergedComponents.json");
 
-        loader.readSchema(&schema.schema, "Scene-schema.json", schemaDocument, schemaDocument);
+        loader.readSchema(&schema.schema, "MergedComponents.json", schemaDocument, schemaDocument);
         schema.schema.entityLib = this;
 
-        auto&& compList =
-            schema.schema.allDefinitions.at("./MergedComponents.json#/definitions/Component").oneOf;
+        auto&& compList = schema.schema.allDefinitions.at("Component").oneOf;
 
         for (SubschemaRef& comp : *compList)
         {
@@ -96,10 +95,8 @@ namespace Ent
             schema.components.emplace(compName, &compSchema);
         }
 
-        auto&& actorstateList = schema.schema.allDefinitions
-                                    .at("./RuntimeComponents.json#/definitions/"
-                                        "ResponsiblePointer<ActorState>")
-                                    .oneOf;
+        auto&& actorstateList =
+            schema.schema.allDefinitions.at("ResponsiblePointer<ActorState>").oneOf;
 
         for (SubschemaRef& actorstate : *actorstateList)
         {
@@ -660,13 +657,17 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
 {
     {
         ENTLIB_ASSERT(_nodeSchema.type == DataType::object);
-        Ent::Object object(&_nodeSchema);
+        std::vector<ObjField> objNodes;
+        bool objHasASuper = false;
+        uint32_t objInstanceOfFieldIndex = 0;
+        Override<String> objInstanceOf;
+
         // Read the InstanceOf field
         std::shared_ptr<Ent::Node const> prefabNode;
         auto InstanceOfIter = _data.find("InstanceOf");
         if (_super != nullptr)
         {
-            object.hasASuper = true;
+            objHasASuper = true;
         }
         auto getFieldIndex = [](json const& _data, json const& _field) {
             int fieldIdx = 0;
@@ -695,25 +696,25 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
                         "File %s loaded with two different schemas",
                         formatPath(rawdataPath, nodeFileName));
                 }
-                object.instanceOfFieldIndex = getFieldIndex(_data, *InstanceOfIter);
-                object.instanceOf =
+                objInstanceOfFieldIndex = getFieldIndex(_data, *InstanceOfIter);
+                objInstanceOf =
                     std::get<Object>(prefabNode->value)
                         .instanceOf.makeOverridedInstanceOf(InstanceOfIter->get<std::string>());
             }
             else
             {
                 _super = nullptr;
-                object.instanceOf = Ent::Override<String>("", tl::nullopt, "");
+                objInstanceOf = Ent::Override<String>("", tl::nullopt, "");
             }
         }
         else if (_super != nullptr and _super->getInstanceOf() != nullptr)
         {
             // we inherit from the super's instanceOf
-            object.instanceOf = Ent::Override<String>("", _super->getInstanceOf(), tl::nullopt);
+            objInstanceOf = Ent::Override<String>("", _super->getInstanceOf(), tl::nullopt);
         }
 
         // Read the fields in schema
-        object.nodes.reserve(_nodeSchema.properties.size());
+        objNodes.reserve(_nodeSchema.properties.size());
         for (auto&& name_sub : _nodeSchema.properties)
         {
             Ent::SubschemaRef const& propSchemaRef = std::get<1>(name_sub);
@@ -741,7 +742,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
             try
             {
                 auto tmpNode = loadNode(*propSchemaRef, *prop, superProp, defaultProp);
-                object.nodes.push_back(ObjField{name.c_str(), std::move(tmpNode), fieldIdx});
+                objNodes.push_back(ObjField{name.c_str(), std::move(tmpNode), fieldIdx});
             }
             catch (ContextException& ex)
             {
@@ -753,7 +754,8 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
                 throw WrapperException(std::current_exception(), "In property : %s", name.c_str());
             }
         }
-        std::sort(begin(object), end(object), Ent::CompObject());
+        std::sort(begin(objNodes), end(objNodes), Ent::CompObject());
+        Object object(&_nodeSchema, objNodes, objInstanceOf, objInstanceOfFieldIndex, objHasASuper);
         auto result = newNode(std::move(object), &_nodeSchema);
         result->checkParent(nullptr);
         return result;

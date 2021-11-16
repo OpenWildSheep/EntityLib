@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class TestArrays(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/TestArrays"
+    schema_name = "TestArrays"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->TestArrays
         return TestArrays(entlib.load_node_file(sourcefile, entlib.get_schema(TestArrays.schema_name)))

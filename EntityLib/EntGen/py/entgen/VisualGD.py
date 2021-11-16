@@ -14,7 +14,7 @@ from entgen.RUNTIME_LODsItem import *
 from EntityLibPy import Node
 
 class VisualGD(HelperObject):
-    schema_name = "./MergedComponents.json#/definitions/VisualGD"
+    schema_name = "VisualGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->VisualGD
         return VisualGD(entlib.load_node_file(sourcefile, entlib.get_schema(VisualGD.schema_name)))

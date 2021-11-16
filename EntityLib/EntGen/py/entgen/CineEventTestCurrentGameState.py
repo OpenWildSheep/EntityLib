@@ -10,7 +10,7 @@ from entgen.CineEventTest import *
 from EntityLibPy import Node
 
 class CineEventTestCurrentGameState(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CineEventTestCurrentGameState"
+    schema_name = "CineEventTestCurrentGameState"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CineEventTestCurrentGameState
         return CineEventTestCurrentGameState(entlib.load_node_file(sourcefile, entlib.get_schema(CineEventTestCurrentGameState.schema_name)))

@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class AnimationTreeConstraintsGD_ForceData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AnimationTreeConstraintsGD::ForceData"
+    schema_name = "AnimationTreeConstraintsGD::ForceData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AnimationTreeConstraintsGD_ForceData
         return AnimationTreeConstraintsGD_ForceData(entlib.load_node_file(sourcefile, entlib.get_schema(AnimationTreeConstraintsGD_ForceData.schema_name)))

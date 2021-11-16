@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class EntityLODData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EntityLODData"
+    schema_name = "EntityLODData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityLODData
         return EntityLODData(entlib.load_node_file(sourcefile, entlib.get_schema(EntityLODData.schema_name)))

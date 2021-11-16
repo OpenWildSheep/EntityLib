@@ -10,7 +10,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class InputCollisionBehaviorData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/InputCollisionBehaviorData"
+    schema_name = "InputCollisionBehaviorData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->InputCollisionBehaviorData
         return InputCollisionBehaviorData(entlib.load_node_file(sourcefile, entlib.get_schema(InputCollisionBehaviorData.schema_name)))

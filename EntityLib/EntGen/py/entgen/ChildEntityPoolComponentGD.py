@@ -11,7 +11,7 @@ from entgen.EntityRef import *
 from EntityLibPy import Node
 
 class ChildEntityPoolComponentGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ChildEntityPoolComponentGD"
+    schema_name = "ChildEntityPoolComponentGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ChildEntityPoolComponentGD
         return ChildEntityPoolComponentGD(entlib.load_node_file(sourcefile, entlib.get_schema(ChildEntityPoolComponentGD.schema_name)))

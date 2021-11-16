@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class RagdollGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/RagdollGD"
+    schema_name = "RagdollGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->RagdollGD
         return RagdollGD(entlib.load_node_file(sourcefile, entlib.get_schema(RagdollGD.schema_name)))

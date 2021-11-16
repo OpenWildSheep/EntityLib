@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class ConnectorGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ConnectorGD"
+    schema_name = "ConnectorGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ConnectorGD
         return ConnectorGD(entlib.load_node_file(sourcefile, entlib.get_schema(ConnectorGD.schema_name)))

@@ -11,7 +11,7 @@ from entgen.EntityRef import *
 from EntityLibPy import Node
 
 class ShapeshiftStatueGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ShapeshiftStatueGD"
+    schema_name = "ShapeshiftStatueGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ShapeshiftStatueGD
         return ShapeshiftStatueGD(entlib.load_node_file(sourcefile, entlib.get_schema(ShapeshiftStatueGD.schema_name)))

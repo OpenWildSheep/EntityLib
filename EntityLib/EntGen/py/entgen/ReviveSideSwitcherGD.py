@@ -13,7 +13,7 @@ from entgen.ReviveSide import *
 from EntityLibPy import Node
 
 class ReviveSideSwitcherGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ReviveSideSwitcherGD"
+    schema_name = "ReviveSideSwitcherGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ReviveSideSwitcherGD
         return ReviveSideSwitcherGD(entlib.load_node_file(sourcefile, entlib.get_schema(ReviveSideSwitcherGD.schema_name)))

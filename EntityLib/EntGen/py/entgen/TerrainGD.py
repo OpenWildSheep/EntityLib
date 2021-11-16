@@ -14,7 +14,7 @@ from entgen.Terrain_TerrainMeta import *
 from EntityLibPy import Node
 
 class TerrainGD(HelperObject):
-    schema_name = "./MergedComponents.json#/definitions/TerrainGD"
+    schema_name = "TerrainGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->TerrainGD
         return TerrainGD(entlib.load_node_file(sourcefile, entlib.get_schema(TerrainGD.schema_name)))

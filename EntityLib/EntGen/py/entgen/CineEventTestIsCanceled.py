@@ -10,7 +10,7 @@ from entgen.CineEventTest import *
 from EntityLibPy import Node
 
 class CineEventTestIsCanceled(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CineEventTestIsCanceled"
+    schema_name = "CineEventTestIsCanceled"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CineEventTestIsCanceled
         return CineEventTestIsCanceled(entlib.load_node_file(sourcefile, entlib.get_schema(CineEventTestIsCanceled.schema_name)))

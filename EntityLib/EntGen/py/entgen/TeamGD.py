@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class TeamGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/TeamGD"
+    schema_name = "TeamGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->TeamGD
         return TeamGD(entlib.load_node_file(sourcefile, entlib.get_schema(TeamGD.schema_name)))

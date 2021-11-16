@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class ShootData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ShootData"
+    schema_name = "ShootData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ShootData
         return ShootData(entlib.load_node_file(sourcefile, entlib.get_schema(ShootData.schema_name)))

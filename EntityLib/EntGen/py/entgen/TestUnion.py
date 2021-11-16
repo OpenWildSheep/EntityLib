@@ -13,7 +13,7 @@ from entgen.variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_ import 
 from EntityLibPy import Node
 
 class TestUnion(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/TestUnion"
+    schema_name = "TestUnion"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->TestUnion
         return TestUnion(entlib.load_node_file(sourcefile, entlib.get_schema(TestUnion.schema_name)))

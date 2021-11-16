@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class HealTriggerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/HealTriggerGD"
+    schema_name = "HealTriggerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->HealTriggerGD
         return HealTriggerGD(entlib.load_node_file(sourcefile, entlib.get_schema(HealTriggerGD.schema_name)))

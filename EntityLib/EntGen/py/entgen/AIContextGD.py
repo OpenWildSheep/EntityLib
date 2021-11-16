@@ -12,7 +12,7 @@ from entgen.AIContextSlot import *
 from EntityLibPy import Node
 
 class AIContextGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AIContextGD"
+    schema_name = "AIContextGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AIContextGD
         return AIContextGD(entlib.load_node_file(sourcefile, entlib.get_schema(AIContextGD.schema_name)))

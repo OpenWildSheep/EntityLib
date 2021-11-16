@@ -11,7 +11,7 @@ from entgen.EntityRef import *
 from EntityLibPy import Node
 
 class NetworkLink(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/NetworkLink"
+    schema_name = "NetworkLink"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->NetworkLink
         return NetworkLink(entlib.load_node_file(sourcefile, entlib.get_schema(NetworkLink.schema_name)))

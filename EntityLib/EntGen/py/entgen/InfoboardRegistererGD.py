@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class InfoboardRegistererGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/InfoboardRegistererGD"
+    schema_name = "InfoboardRegistererGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->InfoboardRegistererGD
         return InfoboardRegistererGD(entlib.load_node_file(sourcefile, entlib.get_schema(InfoboardRegistererGD.schema_name)))

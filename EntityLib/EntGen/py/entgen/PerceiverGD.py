@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class PerceiverGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/PerceiverGD"
+    schema_name = "PerceiverGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PerceiverGD
         return PerceiverGD(entlib.load_node_file(sourcefile, entlib.get_schema(PerceiverGD.schema_name)))

@@ -15,7 +15,7 @@ from entgen.Vector2 import *
 from EntityLibPy import Node
 
 class AnimationLegsConstraintsGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AnimationLegsConstraintsGD"
+    schema_name = "AnimationLegsConstraintsGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AnimationLegsConstraintsGD
         return AnimationLegsConstraintsGD(entlib.load_node_file(sourcefile, entlib.get_schema(AnimationLegsConstraintsGD.schema_name)))

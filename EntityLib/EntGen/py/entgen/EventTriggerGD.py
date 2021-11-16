@@ -11,7 +11,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class EventTriggerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EventTriggerGD"
+    schema_name = "EventTriggerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EventTriggerGD
         return EventTriggerGD(entlib.load_node_file(sourcefile, entlib.get_schema(EventTriggerGD.schema_name)))

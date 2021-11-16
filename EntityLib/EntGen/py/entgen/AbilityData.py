@@ -10,7 +10,7 @@ from entgen.ActorAbility import *
 from EntityLibPy import Node
 
 class AbilityData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AbilityData"
+    schema_name = "AbilityData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AbilityData
         return AbilityData(entlib.load_node_file(sourcefile, entlib.get_schema(AbilityData.schema_name)))

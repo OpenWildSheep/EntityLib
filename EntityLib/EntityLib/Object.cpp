@@ -62,28 +62,26 @@ namespace Ent
 
     Ent::Object Ent::Object::makeInstanceOf() const
     {
-        Object out(schema);
-        out.hasASuper = true;
-        out.instanceOf = instanceOf.makeInstanceOf();
-        out.nodes.reserve(size());
+        std::vector<ObjField> newnodes;
+        newnodes.reserve(size());
         for (auto&& [name, node, fieldIdx] : *this)
         {
-            out.nodes.push_back(ObjField{name, node->makeInstanceOf(), fieldIdx});
+            newnodes.emplace_back(name, node->makeInstanceOf(), fieldIdx);
         }
-        std::sort(begin(out), end(out), CompObject());
-        return out;
+        std::sort(begin(newnodes), end(newnodes), CompObject());
+        return Object(schema, std::move(newnodes), instanceOf.makeInstanceOf(), 0, true);
     }
 
     Object Ent::Object::detach() const
     {
-        Object out(schema);
-        out.nodes.reserve(size());
+        std::vector<ObjField> newnodes;
+        newnodes.reserve(size());
         for (auto&& [name, node, fieldIdx] : *this)
         {
-            out.nodes.emplace_back(ObjField{name, node->detach(), fieldIdx});
+            newnodes.emplace_back(name, node->detach(), fieldIdx);
         }
-        std::sort(begin(out), end(out), CompObject());
-        return out;
+        std::sort(begin(newnodes), end(newnodes), CompObject());
+        return Object(schema, std::move(newnodes));
     }
 
     void Ent::Object::resetInstanceOf(char const* _prefabNodePath)

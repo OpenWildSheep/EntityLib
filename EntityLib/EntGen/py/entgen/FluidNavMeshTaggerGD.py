@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class FluidNavMeshTaggerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/FluidNavMeshTaggerGD"
+    schema_name = "FluidNavMeshTaggerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->FluidNavMeshTaggerGD
         return FluidNavMeshTaggerGD(entlib.load_node_file(sourcefile, entlib.get_schema(FluidNavMeshTaggerGD.schema_name)))

@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class AnimationPhysicsChainConstraintsGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AnimationPhysicsChainConstraintsGD"
+    schema_name = "AnimationPhysicsChainConstraintsGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AnimationPhysicsChainConstraintsGD
         return AnimationPhysicsChainConstraintsGD(entlib.load_node_file(sourcefile, entlib.get_schema(AnimationPhysicsChainConstraintsGD.schema_name)))

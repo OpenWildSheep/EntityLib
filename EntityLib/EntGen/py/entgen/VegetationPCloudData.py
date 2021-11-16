@@ -11,7 +11,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class VegetationPCloudData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/VegetationPCloudData"
+    schema_name = "VegetationPCloudData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->VegetationPCloudData
         return VegetationPCloudData(entlib.load_node_file(sourcefile, entlib.get_schema(VegetationPCloudData.schema_name)))

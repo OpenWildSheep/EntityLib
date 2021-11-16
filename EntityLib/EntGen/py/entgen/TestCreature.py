@@ -11,7 +11,7 @@ from entgen.EntityRef import *
 from EntityLibPy import Node
 
 class TestCreature(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/TestCreature"
+    schema_name = "TestCreature"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->TestCreature
         return TestCreature(entlib.load_node_file(sourcefile, entlib.get_schema(TestCreature.schema_name)))

@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class HealPumpGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/HealPumpGD"
+    schema_name = "HealPumpGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->HealPumpGD
         return HealPumpGD(entlib.load_node_file(sourcefile, entlib.get_schema(HealPumpGD.schema_name)))

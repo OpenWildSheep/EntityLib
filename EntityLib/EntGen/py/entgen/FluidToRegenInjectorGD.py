@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class FluidToRegenInjectorGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/FluidToRegenInjectorGD"
+    schema_name = "FluidToRegenInjectorGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->FluidToRegenInjectorGD
         return FluidToRegenInjectorGD(entlib.load_node_file(sourcefile, entlib.get_schema(FluidToRegenInjectorGD.schema_name)))

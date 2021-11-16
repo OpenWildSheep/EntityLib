@@ -10,7 +10,7 @@ from entgen.PredictionBehaviorDuration import *
 from EntityLibPy import Node
 
 class PredictionBehaviorData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/PredictionBehaviorData"
+    schema_name = "PredictionBehaviorData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PredictionBehaviorData
         return PredictionBehaviorData(entlib.load_node_file(sourcefile, entlib.get_schema(PredictionBehaviorData.schema_name)))

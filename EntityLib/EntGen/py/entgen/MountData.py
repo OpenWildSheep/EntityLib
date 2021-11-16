@@ -10,7 +10,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class MountData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/MountData"
+    schema_name = "MountData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->MountData
         return MountData(entlib.load_node_file(sourcefile, entlib.get_schema(MountData.schema_name)))

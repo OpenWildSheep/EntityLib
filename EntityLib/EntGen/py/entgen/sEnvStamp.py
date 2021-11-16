@@ -13,7 +13,7 @@ from entgen.Vector3 import *
 from EntityLibPy import Node
 
 class sEnvStamp(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/sEnvStamp"
+    schema_name = "sEnvStamp"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->sEnvStamp
         return sEnvStamp(entlib.load_node_file(sourcefile, entlib.get_schema(sEnvStamp.schema_name)))

@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class RegenFXGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/RegenFXGD"
+    schema_name = "RegenFXGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->RegenFXGD
         return RegenFXGD(entlib.load_node_file(sourcefile, entlib.get_schema(RegenFXGD.schema_name)))

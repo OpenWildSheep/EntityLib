@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class StunData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/StunData"
+    schema_name = "StunData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->StunData
         return StunData(entlib.load_node_file(sourcefile, entlib.get_schema(StunData.schema_name)))

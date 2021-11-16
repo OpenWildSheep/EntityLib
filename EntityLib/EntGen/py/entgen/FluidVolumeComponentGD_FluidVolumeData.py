@@ -12,7 +12,7 @@ from entgen.Vector2 import *
 from EntityLibPy import Node
 
 class FluidVolumeComponentGD_FluidVolumeData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/FluidVolumeComponentGD::FluidVolumeData"
+    schema_name = "FluidVolumeComponentGD::FluidVolumeData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->FluidVolumeComponentGD_FluidVolumeData
         return FluidVolumeComponentGD_FluidVolumeData(entlib.load_node_file(sourcefile, entlib.get_schema(FluidVolumeComponentGD_FluidVolumeData.schema_name)))

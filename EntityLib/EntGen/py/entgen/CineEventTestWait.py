@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class CineEventTestWait(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CineEventTestWait"
+    schema_name = "CineEventTestWait"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CineEventTestWait
         return CineEventTestWait(entlib.load_node_file(sourcefile, entlib.get_schema(CineEventTestWait.schema_name)))

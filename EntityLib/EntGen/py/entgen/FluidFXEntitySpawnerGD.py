@@ -13,7 +13,7 @@ from entgen.SpawningParameter import *
 from EntityLibPy import Node
 
 class FluidFXEntitySpawnerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/FluidFXEntitySpawnerGD"
+    schema_name = "FluidFXEntitySpawnerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->FluidFXEntitySpawnerGD
         return FluidFXEntitySpawnerGD(entlib.load_node_file(sourcefile, entlib.get_schema(FluidFXEntitySpawnerGD.schema_name)))

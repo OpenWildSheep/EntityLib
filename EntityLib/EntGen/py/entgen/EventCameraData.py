@@ -12,7 +12,7 @@ from entgen.Vector3 import *
 from EntityLibPy import Node
 
 class EventCameraData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EventCameraData"
+    schema_name = "EventCameraData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EventCameraData
         return EventCameraData(entlib.load_node_file(sourcefile, entlib.get_schema(EventCameraData.schema_name)))

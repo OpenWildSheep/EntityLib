@@ -13,7 +13,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class VolumeConstraintDataGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/VolumeConstraintDataGD"
+    schema_name = "VolumeConstraintDataGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->VolumeConstraintDataGD
         return VolumeConstraintDataGD(entlib.load_node_file(sourcefile, entlib.get_schema(VolumeConstraintDataGD.schema_name)))

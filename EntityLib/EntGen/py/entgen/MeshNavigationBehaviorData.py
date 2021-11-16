@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class MeshNavigationBehaviorData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/MeshNavigationBehaviorData"
+    schema_name = "MeshNavigationBehaviorData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->MeshNavigationBehaviorData
         return MeshNavigationBehaviorData(entlib.load_node_file(sourcefile, entlib.get_schema(MeshNavigationBehaviorData.schema_name)))

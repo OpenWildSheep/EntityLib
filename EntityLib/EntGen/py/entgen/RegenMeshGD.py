@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class RegenMeshGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/RegenMeshGD"
+    schema_name = "RegenMeshGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->RegenMeshGD
         return RegenMeshGD(entlib.load_node_file(sourcefile, entlib.get_schema(RegenMeshGD.schema_name)))

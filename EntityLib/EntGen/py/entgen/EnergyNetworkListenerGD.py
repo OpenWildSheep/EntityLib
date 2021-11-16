@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class EnergyNetworkListenerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EnergyNetworkListenerGD"
+    schema_name = "EnergyNetworkListenerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EnergyNetworkListenerGD
         return EnergyNetworkListenerGD(entlib.load_node_file(sourcefile, entlib.get_schema(EnergyNetworkListenerGD.schema_name)))

@@ -10,7 +10,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class StateGauge(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/StateGauge"
+    schema_name = "StateGauge"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->StateGauge
         return StateGauge(entlib.load_node_file(sourcefile, entlib.get_schema(StateGauge.schema_name)))

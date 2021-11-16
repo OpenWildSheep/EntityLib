@@ -11,7 +11,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class SoulSpotGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/SoulSpotGD"
+    schema_name = "SoulSpotGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->SoulSpotGD
         return SoulSpotGD(entlib.load_node_file(sourcefile, entlib.get_schema(SoulSpotGD.schema_name)))

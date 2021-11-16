@@ -10,7 +10,7 @@ from entgen.ActorGD import *
 from EntityLibPy import Node
 
 class ProjectileGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ProjectileGD"
+    schema_name = "ProjectileGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ProjectileGD
         return ProjectileGD(entlib.load_node_file(sourcefile, entlib.get_schema(ProjectileGD.schema_name)))

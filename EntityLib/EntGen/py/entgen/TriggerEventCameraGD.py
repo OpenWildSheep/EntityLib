@@ -14,7 +14,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class TriggerEventCameraGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/TriggerEventCameraGD"
+    schema_name = "TriggerEventCameraGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->TriggerEventCameraGD
         return TriggerEventCameraGD(entlib.load_node_file(sourcefile, entlib.get_schema(TriggerEventCameraGD.schema_name)))

@@ -17,7 +17,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class PhysicsGD(HelperObject):
-    schema_name = "./MergedComponents.json#/definitions/PhysicsGD"
+    schema_name = "PhysicsGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PhysicsGD
         return PhysicsGD(entlib.load_node_file(sourcefile, entlib.get_schema(PhysicsGD.schema_name)))

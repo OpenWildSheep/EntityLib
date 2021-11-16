@@ -15,7 +15,7 @@ from entgen.StickToGround import *
 from EntityLibPy import Node
 
 class AnimationTailConstraintsGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AnimationTailConstraintsGD"
+    schema_name = "AnimationTailConstraintsGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AnimationTailConstraintsGD
         return AnimationTailConstraintsGD(entlib.load_node_file(sourcefile, entlib.get_schema(AnimationTailConstraintsGD.schema_name)))

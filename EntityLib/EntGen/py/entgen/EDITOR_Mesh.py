@@ -10,7 +10,7 @@ from entgen.Int import *
 from EntityLibPy import Node
 
 class EDITOR_Mesh(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/EDITOR_Mesh"
+    schema_name = "EDITOR_Mesh"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EDITOR_Mesh
         return EDITOR_Mesh(entlib.load_node_file(sourcefile, entlib.get_schema(EDITOR_Mesh.schema_name)))

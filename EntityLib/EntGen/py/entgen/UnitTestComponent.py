@@ -13,7 +13,7 @@ from entgen.ReviveSide import *
 from EntityLibPy import Node
 
 class UnitTestComponent(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/UnitTestComponent"
+    schema_name = "UnitTestComponent"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->UnitTestComponent
         return UnitTestComponent(entlib.load_node_file(sourcefile, entlib.get_schema(UnitTestComponent.schema_name)))

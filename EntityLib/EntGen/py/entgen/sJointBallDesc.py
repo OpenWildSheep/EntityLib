@@ -8,7 +8,7 @@ import EntityLibPy
 from EntityLibPy import Node
 
 class sJointBallDesc(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/sJointBallDesc"
+    schema_name = "sJointBallDesc"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->sJointBallDesc
         return sJointBallDesc(entlib.load_node_file(sourcefile, entlib.get_schema(sJointBallDesc.schema_name)))

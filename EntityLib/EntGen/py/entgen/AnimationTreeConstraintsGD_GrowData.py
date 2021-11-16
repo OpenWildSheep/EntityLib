@@ -12,7 +12,7 @@ from entgen.ProgressSoundEventData import *
 from EntityLibPy import Node
 
 class AnimationTreeConstraintsGD_GrowData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AnimationTreeConstraintsGD::GrowData"
+    schema_name = "AnimationTreeConstraintsGD::GrowData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AnimationTreeConstraintsGD_GrowData
         return AnimationTreeConstraintsGD_GrowData(entlib.load_node_file(sourcefile, entlib.get_schema(AnimationTreeConstraintsGD_GrowData.schema_name)))

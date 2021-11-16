@@ -10,7 +10,7 @@ from entgen.Int import *
 from EntityLibPy import Node
 
 class sGameEffectTemplate(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/sGameEffectTemplate"
+    schema_name = "sGameEffectTemplate"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->sGameEffectTemplate
         return sGameEffectTemplate(entlib.load_node_file(sourcefile, entlib.get_schema(sGameEffectTemplate.schema_name)))

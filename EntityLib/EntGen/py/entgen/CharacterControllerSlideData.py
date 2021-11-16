@@ -11,7 +11,7 @@ from entgen.ScaleConverter import *
 from EntityLibPy import Node
 
 class CharacterControllerSlideData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CharacterControllerSlideData"
+    schema_name = "CharacterControllerSlideData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CharacterControllerSlideData
         return CharacterControllerSlideData(entlib.load_node_file(sourcefile, entlib.get_schema(CharacterControllerSlideData.schema_name)))

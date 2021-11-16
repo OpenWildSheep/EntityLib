@@ -10,7 +10,7 @@ from entgen.EntityRef import *
 from EntityLibPy import Node
 
 class ProjectileShooterData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ProjectileShooterData"
+    schema_name = "ProjectileShooterData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ProjectileShooterData
         return ProjectileShooterData(entlib.load_node_file(sourcefile, entlib.get_schema(ProjectileShooterData.schema_name)))

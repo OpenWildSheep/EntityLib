@@ -10,7 +10,7 @@ from entgen.EntityRef import *
 from EntityLibPy import Node
 
 class ReviveSideData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ReviveSideData"
+    schema_name = "ReviveSideData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ReviveSideData
         return ReviveSideData(entlib.load_node_file(sourcefile, entlib.get_schema(ReviveSideData.schema_name)))

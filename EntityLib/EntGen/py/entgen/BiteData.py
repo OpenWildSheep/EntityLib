@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class BiteData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/BiteData"
+    schema_name = "BiteData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->BiteData
         return BiteData(entlib.load_node_file(sourcefile, entlib.get_schema(BiteData.schema_name)))

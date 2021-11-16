@@ -9,7 +9,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class sPhysicsShapeMesh(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/sPhysicsShapeMesh"
+    schema_name = "sPhysicsShapeMesh"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->sPhysicsShapeMesh
         return sPhysicsShapeMesh(entlib.load_node_file(sourcefile, entlib.get_schema(sPhysicsShapeMesh.schema_name)))

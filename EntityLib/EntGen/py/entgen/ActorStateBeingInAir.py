@@ -10,7 +10,7 @@ from entgen.ActorState import *
 from EntityLibPy import Node
 
 class ActorStateBeingInAir(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ActorStateBeingInAir"
+    schema_name = "ActorStateBeingInAir"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateBeingInAir
         return ActorStateBeingInAir(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateBeingInAir.schema_name)))

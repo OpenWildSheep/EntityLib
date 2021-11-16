@@ -16,7 +16,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class SoundEmitterGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/SoundEmitterGD"
+    schema_name = "SoundEmitterGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->SoundEmitterGD
         return SoundEmitterGD(entlib.load_node_file(sourcefile, entlib.get_schema(SoundEmitterGD.schema_name)))

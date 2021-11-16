@@ -11,7 +11,7 @@ from entgen.ActorStateTeleport_Inputs import *
 from EntityLibPy import Node
 
 class ActorStateTeleport(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ActorStateTeleport"
+    schema_name = "ActorStateTeleport"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateTeleport
         return ActorStateTeleport(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateTeleport.schema_name)))

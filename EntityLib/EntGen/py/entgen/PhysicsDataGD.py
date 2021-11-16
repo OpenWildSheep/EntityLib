@@ -14,7 +14,7 @@ from entgen.sRigidBodyDesc import *
 from EntityLibPy import Node
 
 class PhysicsDataGD(HelperObject):
-    schema_name = "./MergedComponents.json#/definitions/PhysicsDataGD"
+    schema_name = "PhysicsDataGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PhysicsDataGD
         return PhysicsDataGD(entlib.load_node_file(sourcefile, entlib.get_schema(PhysicsDataGD.schema_name)))

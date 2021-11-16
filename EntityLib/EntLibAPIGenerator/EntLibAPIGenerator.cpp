@@ -87,7 +87,7 @@ static std::string replaceAll(std::string _input, std::string const& _before, st
 static std::string escapeName(std::string _name)
 {
     static std::set<std::string> cppKeywordTypes = {
-        "float", "bool", "from", "in", "None", "Type", "throw", "do", "default"};
+        "float", "bool", "from", "in", "None", "Type", "throw", "do", "default", "class"};
 
     std::regex eastlNS(R"regex(eastl::(\w+))regex");
     _name = std::regex_replace(_name, eastlNS, "$1");
@@ -102,6 +102,9 @@ static std::string escapeName(std::string _name)
     _name = replaceAll(_name, "<", "_");
     _name = replaceAll(_name, ">", "_");
     _name = replaceAll(_name, ",", "_");
+    _name = replaceAll(_name, " ", "_");
+    if (_name.front() >= '0' and _name.front() <= '9')
+        _name = '_' + _name;
     if (cppKeywordTypes.count(_name) != 0)
     {
         return _name + '_';
@@ -118,6 +121,9 @@ static void addDef(
     bool _overwrite = false)
 {
     ENTLIB_ASSERT(_def->type != Ent::DataType::null);
+    // We already have a specific class for EntityRef so ignore the one from EditionComponents.json
+    if (_name == "EntityRef")
+        return;
     auto escapedName = escapeName(_name);
     if (allDefs.count(escapedName) == 0)
     {
@@ -285,7 +291,11 @@ static json getSchemaType(Ent::Subschema const& _schema)
                 }
                 else
                 {
-                    ENTLIB_LOGIC_ERROR("Unexpected singular type in set");
+                    // Don't know how to handle this kind of set, so let's keep it as a simple array
+                    json array;
+                    array["type"] = getSchemaRefType(*_schema.singularItems);
+                    type["array"] = std::move(array);
+                    return type;
                 }
             }
             else if (meta.overridePolicy == "map")
@@ -1037,7 +1047,10 @@ from .String import *
     std::ofstream init2(_destinationPath / "entgen" / "__init__.py");
     for (auto&& file : {"Bool.py", "EntityRef.py", "Float.py", "Int.py", "String.py"})
     {
-        copy_file(_resourcePath / "entgen" / file, _destinationPath / "entgen" / file);
+        copy_file(
+            _resourcePath / "entgen" / file,
+            _destinationPath / "entgen" / file,
+            copy_options::overwrite_existing);
     }
 }
 

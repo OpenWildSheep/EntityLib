@@ -14,7 +14,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class CreatureAIGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CreatureAIGD"
+    schema_name = "CreatureAIGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CreatureAIGD
         return CreatureAIGD(entlib.load_node_file(sourcefile, entlib.get_schema(CreatureAIGD.schema_name)))

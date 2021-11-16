@@ -15,7 +15,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class HotspotData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/HotspotData"
+    schema_name = "HotspotData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->HotspotData
         return HotspotData(entlib.load_node_file(sourcefile, entlib.get_schema(HotspotData.schema_name)))

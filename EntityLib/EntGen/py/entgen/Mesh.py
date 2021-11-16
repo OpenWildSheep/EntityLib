@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class Mesh(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/Mesh"
+    schema_name = "Mesh"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->Mesh
         return Mesh(entlib.load_node_file(sourcefile, entlib.get_schema(Mesh.schema_name)))

@@ -14,7 +14,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class ShamanItemGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ShamanItemGD"
+    schema_name = "ShamanItemGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ShamanItemGD
         return ShamanItemGD(entlib.load_node_file(sourcefile, entlib.get_schema(ShamanItemGD.schema_name)))

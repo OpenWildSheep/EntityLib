@@ -12,7 +12,7 @@ from entgen.Vector2 import *
 from EntityLibPy import Node
 
 class VomitData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/VomitData"
+    schema_name = "VomitData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->VomitData
         return VomitData(entlib.load_node_file(sourcefile, entlib.get_schema(VomitData.schema_name)))

@@ -12,7 +12,7 @@ from entgen.ReviveSideEvent import *
 from EntityLibPy import Node
 
 class EntityStateEnergySpoutState(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EntityStateEnergySpoutState"
+    schema_name = "EntityStateEnergySpoutState"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateEnergySpoutState
         return EntityStateEnergySpoutState(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateEnergySpoutState.schema_name)))

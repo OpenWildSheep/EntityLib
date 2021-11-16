@@ -10,7 +10,7 @@ from entgen.Bool import *
 from EntityLibPy import Node
 
 class CineEvent(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CineEvent"
+    schema_name = "CineEvent"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CineEvent
         return CineEvent(entlib.load_node_file(sourcefile, entlib.get_schema(CineEvent.schema_name)))

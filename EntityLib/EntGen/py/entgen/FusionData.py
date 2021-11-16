@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class FusionData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/FusionData"
+    schema_name = "FusionData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->FusionData
         return FusionData(entlib.load_node_file(sourcefile, entlib.get_schema(FusionData.schema_name)))

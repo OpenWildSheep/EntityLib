@@ -10,7 +10,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class FluidVolumeComponentGD_SimulationParameters(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/FluidVolumeComponentGD::SimulationParameters"
+    schema_name = "FluidVolumeComponentGD::SimulationParameters"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->FluidVolumeComponentGD_SimulationParameters
         return FluidVolumeComponentGD_SimulationParameters(entlib.load_node_file(sourcefile, entlib.get_schema(FluidVolumeComponentGD_SimulationParameters.schema_name)))

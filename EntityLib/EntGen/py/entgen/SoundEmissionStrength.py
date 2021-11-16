@@ -4,26 +4,30 @@
 from entgen_helpers import *
 import EntityLibPy
 
+from entgen.SoundEmissionStrength import *
+from entgen.String import *
+from entgen.Bool import *
 
 from EntityLibPy import Node
-class SoundEmissionStrengthEnum(Enum):
-    none = "none"
-    low = "low"
-    medium = "medium"
-    high = "high"
-    SoundEmissionStrength_COUNT = "SoundEmissionStrength_COUNT"
 
+class soundEmissionStrength(HelperObject):
 
-class SoundEmissionStrength(Primitive[SoundEmissionStrengthEnum]):  # Enum
-    def __init__(self, node):
-        super(SoundEmissionStrength, self).__init__(SoundEmissionStrengthEnum, node)
-    schema_name = "SoundEmissionStrength"
-    def __call__(self, node):  # type: (EntityLibPy.Node) -> SoundEmissionStrength
-        return SoundEmissionStrength(node)
-    def set(self, val):  # type: (SoundEmissionStrengthEnum) -> None
-        return self._node.set_string(val.value)
-    def get(self):  # type: () -> T
-        return self._item_type(self._node.value)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.at("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->SoundEmissionStrength
+        return SoundEmissionStrength(self._node.at("val"))
+    @val.setter
+    def val(self, val): self.val.set(val)
+    pass
 
 
 

@@ -10,7 +10,7 @@ from entgen.Vector2 import *
 from EntityLibPy import Node
 
 class FluidVolumeComponentGD_HeightMapData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/FluidVolumeComponentGD::HeightMapData"
+    schema_name = "FluidVolumeComponentGD::HeightMapData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->FluidVolumeComponentGD_HeightMapData
         return FluidVolumeComponentGD_HeightMapData(entlib.load_node_file(sourcefile, entlib.get_schema(FluidVolumeComponentGD_HeightMapData.schema_name)))

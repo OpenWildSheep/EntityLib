@@ -10,7 +10,7 @@ from entgen.CineEventTrigger import *
 from EntityLibPy import Node
 
 class CineEventTriggerGameStateChange(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CineEventTriggerGameStateChange"
+    schema_name = "CineEventTriggerGameStateChange"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CineEventTriggerGameStateChange
         return CineEventTriggerGameStateChange(entlib.load_node_file(sourcefile, entlib.get_schema(CineEventTriggerGameStateChange.schema_name)))

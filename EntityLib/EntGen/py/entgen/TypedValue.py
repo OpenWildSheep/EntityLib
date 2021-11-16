@@ -10,7 +10,7 @@ from entgen.variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_str
 from EntityLibPy import Node
 
 class TypedValue(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/TypedValue"
+    schema_name = "TypedValue"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->TypedValue
         return TypedValue(entlib.load_node_file(sourcefile, entlib.get_schema(TypedValue.schema_name)))

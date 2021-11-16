@@ -10,7 +10,7 @@ from entgen.AttackAbility import *
 from EntityLibPy import Node
 
 class AttackWeaponAbility(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AttackWeaponAbility"
+    schema_name = "AttackWeaponAbility"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AttackWeaponAbility
         return AttackWeaponAbility(entlib.load_node_file(sourcefile, entlib.get_schema(AttackWeaponAbility.schema_name)))

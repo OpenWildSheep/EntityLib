@@ -11,7 +11,7 @@ from entgen.ThumbPath import *
 from EntityLibPy import Node
 
 class CustomThumbnail(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/CustomThumbnail"
+    schema_name = "CustomThumbnail"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CustomThumbnail
         return CustomThumbnail(entlib.load_node_file(sourcefile, entlib.get_schema(CustomThumbnail.schema_name)))

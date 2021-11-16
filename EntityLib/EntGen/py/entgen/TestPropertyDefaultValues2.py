@@ -10,7 +10,7 @@ from entgen.TestPropertyDefaultValues import *
 from EntityLibPy import Node
 
 class TestPropertyDefaultValues2(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/TestPropertyDefaultValues2"
+    schema_name = "TestPropertyDefaultValues2"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->TestPropertyDefaultValues2
         return TestPropertyDefaultValues2(entlib.load_node_file(sourcefile, entlib.get_schema(TestPropertyDefaultValues2.schema_name)))

@@ -11,7 +11,7 @@ from entgen.eventStringHash import *
 from EntityLibPy import Node
 
 class FreezeData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/FreezeData"
+    schema_name = "FreezeData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->FreezeData
         return FreezeData(entlib.load_node_file(sourcefile, entlib.get_schema(FreezeData.schema_name)))

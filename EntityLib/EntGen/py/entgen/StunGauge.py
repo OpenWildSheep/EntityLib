@@ -10,7 +10,7 @@ from entgen.StateGauge import *
 from EntityLibPy import Node
 
 class StunGauge(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/StunGauge"
+    schema_name = "StunGauge"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->StunGauge
         return StunGauge(entlib.load_node_file(sourcefile, entlib.get_schema(StunGauge.schema_name)))

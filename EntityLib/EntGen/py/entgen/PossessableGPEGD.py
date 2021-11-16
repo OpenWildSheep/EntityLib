@@ -11,7 +11,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class PossessableGPEGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/PossessableGPEGD"
+    schema_name = "PossessableGPEGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PossessableGPEGD
         return PossessableGPEGD(entlib.load_node_file(sourcefile, entlib.get_schema(PossessableGPEGD.schema_name)))

@@ -10,7 +10,7 @@ from entgen.CineEventTrigger import *
 from EntityLibPy import Node
 
 class CineEventTriggerPlaySound(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CineEventTriggerPlaySound"
+    schema_name = "CineEventTriggerPlaySound"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CineEventTriggerPlaySound
         return CineEventTriggerPlaySound(entlib.load_node_file(sourcefile, entlib.get_schema(CineEventTriggerPlaySound.schema_name)))

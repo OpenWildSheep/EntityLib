@@ -175,11 +175,11 @@ try
     using EntityPtr = std::unique_ptr<Ent::Entity>;
 
     // Test $ref links in entlib.schema.schema.allDefinitions
-    char const* colorRef = "./RuntimeComponents.json#/definitions/Color";
+    char const* colorRef = "Color";
     ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(colorRef) == 1);
 
     // Check Ent::Subschema::getUnionTypesMap
-    char const* cinematicGDRef = "./RuntimeComponents.json#/definitions/CinematicGD";
+    char const* cinematicGDRef = "CinematicGD";
     Ent::Subschema const& cinematicGDSchema = entlib.schema.schema.allDefinitions.at(cinematicGDRef);
     Ent::Subschema const& scriptEventUnionSchema =
         cinematicGDSchema.properties.at("ScriptEvents")->singularItems->get();
@@ -193,7 +193,8 @@ try
     for (auto&& name_schema : entlib.schema.components)
     {
         auto&& absRef = std::get<1>(name_schema)->name;
-        ENTLIB_ASSERT(absRef.find("./") == 0);
+        ENTLIB_ASSERT(absRef.find("./") == std::string::npos);
+        ENTLIB_ASSERT(absRef.find("#") == std::string::npos);
         ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(absRef) == 1);
     }
 
@@ -202,34 +203,25 @@ try
     {
         auto node = entlib.loadFileAsNode(
             "myseedpatchMarianne.seedpatchdata.node",
-            entlib.schema.schema
-                .allDefinitions[R"(./EditionComponents.json#/definitions/SeedPatchDataList)"]);
+            entlib.schema.schema.allDefinitions["SeedPatchDataList"]);
         node->saveNode("myseedpatchMarianne.seedpatchdata.copy.node");
     }
     {
         // When there is a $schema field
         auto node = entlib.loadFileAsNode("myseedpatch_schema.node");
-        ENTLIB_ASSERT(
-            node->getSchema()
-            == entlib.getSchema("./EditionComponents.json#/definitions/SeedPatchDataList"));
+        ENTLIB_ASSERT(node->getSchema() == entlib.getSchema("SeedPatchDataList"));
         // When there is a $schema field with different style
         node = entlib.loadFileAsNode("myseedpatch_schema_style.node");
-        ENTLIB_ASSERT(
-            node->getSchema()
-            == entlib.getSchema("./EditionComponents.json#/definitions/SeedPatchDataList"));
+        ENTLIB_ASSERT(node->getSchema() == entlib.getSchema("SeedPatchDataList"));
         // When it is an Entity without schema field
         node = entlib.loadFileAsNode("prefab.entity");
         ENTLIB_ASSERT(node->getSchema() == entlib.getSchema(Ent::entitySchemaName));
         // No $schema but a right pre-extention
         node = entlib.loadFileAsNode("test.CharacterControllerGD.node");
-        ENTLIB_ASSERT(
-            node->getSchema()
-            == entlib.getSchema("./RuntimeComponents.json#/definitions/CharacterControllerGD"));
+        ENTLIB_ASSERT(node->getSchema() == entlib.getSchema("CharacterControllerGD"));
         // No $schema but pre-extention with bad case
         node = entlib.loadFileAsNode("test_wrong_casse.chAracTercontrOlleRgd.nOde");
-        ENTLIB_ASSERT(
-            node->getSchema()
-            == entlib.getSchema("./RuntimeComponents.json#/definitions/CharacterControllerGD"));
+        ENTLIB_ASSERT(node->getSchema() == entlib.getSchema("CharacterControllerGD"));
         // No $schema, no .entity, wrong pre-extention
         ENTLIB_CHECK_EXCEPTION(
             entlib.loadFileAsNode("test.ThisTypeDoesntExist.node"), Ent::UnknownSchema);
@@ -280,9 +272,7 @@ try
         ENTLIB_ASSERT(
             voxelSimulationGD->root->at("TransmissionBySecond")->getFloat() == 3.402823466385289e+38);
         ENTLIB_ASSERT(voxelSimulationGD->root->at("TransmissionBySecond")->isDefault());
-        ENTLIB_ASSERT(
-            voxelSimulationGD->root->getTypeName()
-            == std::string("./RuntimeComponents.json#/definitions/VoxelSimulationGD"));
+        ENTLIB_ASSERT(voxelSimulationGD->root->getTypeName() == std::string("VoxelSimulationGD"));
 
         // TEST read inherited values in inherited component
         Ent::Component const* heightObj = ent->getComponent("HeightObj");
@@ -342,10 +332,7 @@ try
         ENTLIB_ASSERT(oneOfScripts->getDataType() == Ent::DataType::oneOf);
         Ent::Node const* cineEvent = oneOfScripts->getUnionData();
         ENTLIB_ASSERT(cineEvent != nullptr);
-        ENTLIB_ASSERT(
-            cineEvent->getTypeName()
-            == std::string(
-                R"(./RuntimeComponents.json#/definitions/CineEventTriggerEventHandlerPost)"));
+        ENTLIB_ASSERT(cineEvent->getTypeName() == std::string("CineEventTriggerEventHandlerPost"));
         auto fieldNames = cineEvent->getFieldNames();
         ENTLIB_ASSERT(fieldNames[1] == std::string("EventName"));
         ENTLIB_ASSERT(fieldNames[2] == std::string("Super"));

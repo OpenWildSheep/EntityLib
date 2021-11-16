@@ -13,7 +13,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class AnimationTreeConstraintsGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/AnimationTreeConstraintsGD"
+    schema_name = "AnimationTreeConstraintsGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->AnimationTreeConstraintsGD
         return AnimationTreeConstraintsGD(entlib.load_node_file(sourcefile, entlib.get_schema(AnimationTreeConstraintsGD.schema_name)))

@@ -11,7 +11,7 @@ from entgen.EntityRef import *
 from EntityLibPy import Node
 
 class PickableDistributorComponentData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/PickableDistributorComponentData"
+    schema_name = "PickableDistributorComponentData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PickableDistributorComponentData
         return PickableDistributorComponentData(entlib.load_node_file(sourcefile, entlib.get_schema(PickableDistributorComponentData.schema_name)))

@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class DummyComponentGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/DummyComponentGD"
+    schema_name = "DummyComponentGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->DummyComponentGD
         return DummyComponentGD(entlib.load_node_file(sourcefile, entlib.get_schema(DummyComponentGD.schema_name)))

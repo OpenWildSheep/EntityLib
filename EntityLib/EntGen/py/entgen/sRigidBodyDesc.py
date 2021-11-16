@@ -15,7 +15,7 @@ from entgen.sPhysicShape import *
 from EntityLibPy import Node
 
 class sRigidBodyDesc(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/sRigidBodyDesc"
+    schema_name = "sRigidBodyDesc"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->sRigidBodyDesc
         return sRigidBodyDesc(entlib.load_node_file(sourcefile, entlib.get_schema(sRigidBodyDesc.schema_name)))

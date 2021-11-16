@@ -12,7 +12,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class ClothGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ClothGD"
+    schema_name = "ClothGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ClothGD
         return ClothGD(entlib.load_node_file(sourcefile, entlib.get_schema(ClothGD.schema_name)))

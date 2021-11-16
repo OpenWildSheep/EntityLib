@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class WildObject(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/WildObject"
+    schema_name = "WildObject"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->WildObject
         return WildObject(entlib.load_node_file(sourcefile, entlib.get_schema(WildObject.schema_name)))

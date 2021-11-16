@@ -14,7 +14,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class RevivedData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/RevivedData"
+    schema_name = "RevivedData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->RevivedData
         return RevivedData(entlib.load_node_file(sourcefile, entlib.get_schema(RevivedData.schema_name)))

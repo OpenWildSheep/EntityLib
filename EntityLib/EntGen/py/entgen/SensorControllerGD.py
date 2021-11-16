@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class SensorControllerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/SensorControllerGD"
+    schema_name = "SensorControllerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->SensorControllerGD
         return SensorControllerGD(entlib.load_node_file(sourcefile, entlib.get_schema(SensorControllerGD.schema_name)))

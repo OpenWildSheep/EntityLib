@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class NotVisibleInSubscene(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/NotVisibleInSubscene"
+    schema_name = "NotVisibleInSubscene"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->NotVisibleInSubscene
         return NotVisibleInSubscene(entlib.load_node_file(sourcefile, entlib.get_schema(NotVisibleInSubscene.schema_name)))

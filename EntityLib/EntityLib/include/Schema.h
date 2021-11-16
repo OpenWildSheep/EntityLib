@@ -223,7 +223,6 @@ namespace Ent
         Schema() = default;
         Schema(Schema const&) = delete;
         Schema& operator=(Schema const&) = delete;
-        SubschemaRef root; ///< Root Schema : Schema of the scene
         std::map<std::string, Subschema> allDefinitions; ///< Definition of everything, by type name
         EntityLib* entityLib = nullptr;
 

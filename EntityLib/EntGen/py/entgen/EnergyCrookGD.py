@@ -12,7 +12,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class EnergyCrookGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EnergyCrookGD"
+    schema_name = "EnergyCrookGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EnergyCrookGD
         return EnergyCrookGD(entlib.load_node_file(sourcefile, entlib.get_schema(EnergyCrookGD.schema_name)))

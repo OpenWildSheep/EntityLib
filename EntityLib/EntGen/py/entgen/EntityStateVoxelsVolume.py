@@ -10,7 +10,7 @@ from entgen.ActorState import *
 from EntityLibPy import Node
 
 class EntityStateVoxelsVolume(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EntityStateVoxelsVolume"
+    schema_name = "EntityStateVoxelsVolume"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateVoxelsVolume
         return EntityStateVoxelsVolume(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateVoxelsVolume.schema_name)))

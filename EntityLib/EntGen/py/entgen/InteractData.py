@@ -10,7 +10,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class InteractData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/InteractData"
+    schema_name = "InteractData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->InteractData
         return InteractData(entlib.load_node_file(sourcefile, entlib.get_schema(InteractData.schema_name)))

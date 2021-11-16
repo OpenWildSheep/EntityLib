@@ -13,7 +13,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class BeamGeneratorGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/BeamGeneratorGD"
+    schema_name = "BeamGeneratorGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->BeamGeneratorGD
         return BeamGeneratorGD(entlib.load_node_file(sourcefile, entlib.get_schema(BeamGeneratorGD.schema_name)))

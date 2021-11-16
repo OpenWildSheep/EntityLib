@@ -630,8 +630,7 @@ namespace Ent
         {
             sortedComp.push_back(comp.get());
         }
-        Component subscenePlaceholder{
-            true, "SubScene", entlib->makeNode("./EditionComponents.json#/definitions/SubScene"), 1, 0};
+        Component subscenePlaceholder{true, "SubScene", entlib->makeNode("SubScene"), 1, 0};
         if (SubSceneComponent const* subscene = getSubSceneComponent())
         {
             subscenePlaceholder.index = subscene->index;

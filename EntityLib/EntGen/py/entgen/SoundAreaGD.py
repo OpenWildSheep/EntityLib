@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class SoundAreaGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/SoundAreaGD"
+    schema_name = "SoundAreaGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->SoundAreaGD
         return SoundAreaGD(entlib.load_node_file(sourcefile, entlib.get_schema(SoundAreaGD.schema_name)))

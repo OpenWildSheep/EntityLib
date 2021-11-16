@@ -10,7 +10,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class SpawningParameter(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/SpawningParameter"
+    schema_name = "SpawningParameter"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->SpawningParameter
         return SpawningParameter(entlib.load_node_file(sourcefile, entlib.get_schema(SpawningParameter.schema_name)))

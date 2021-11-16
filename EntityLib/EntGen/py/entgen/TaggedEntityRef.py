@@ -11,7 +11,7 @@ from entgen.InventoryTags import *
 from EntityLibPy import Node
 
 class TaggedEntityRef(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/TaggedEntityRef"
+    schema_name = "TaggedEntityRef"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->TaggedEntityRef
         return TaggedEntityRef(entlib.load_node_file(sourcefile, entlib.get_schema(TaggedEntityRef.schema_name)))

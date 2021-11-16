@@ -13,7 +13,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class StaffVertebrasGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/StaffVertebrasGD"
+    schema_name = "StaffVertebrasGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->StaffVertebrasGD
         return StaffVertebrasGD(entlib.load_node_file(sourcefile, entlib.get_schema(StaffVertebrasGD.schema_name)))

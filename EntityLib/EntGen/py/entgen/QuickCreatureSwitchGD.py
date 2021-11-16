@@ -11,7 +11,7 @@ from entgen.EntityRef import *
 from EntityLibPy import Node
 
 class QuickCreatureSwitchGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/QuickCreatureSwitchGD"
+    schema_name = "QuickCreatureSwitchGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->QuickCreatureSwitchGD
         return QuickCreatureSwitchGD(entlib.load_node_file(sourcefile, entlib.get_schema(QuickCreatureSwitchGD.schema_name)))

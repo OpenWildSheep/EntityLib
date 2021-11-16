@@ -11,7 +11,7 @@ from entgen.EntityRef import *
 from EntityLibPy import Node
 
 class OutfitPiece(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/OutfitPiece"
+    schema_name = "OutfitPiece"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->OutfitPiece
         return OutfitPiece(entlib.load_node_file(sourcefile, entlib.get_schema(OutfitPiece.schema_name)))

@@ -13,7 +13,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class SystemicCreature(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/SystemicCreature"
+    schema_name = "SystemicCreature"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->SystemicCreature
         return SystemicCreature(entlib.load_node_file(sourcefile, entlib.get_schema(SystemicCreature.schema_name)))

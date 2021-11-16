@@ -12,7 +12,7 @@ from entgen.CinematicSlot import *
 from EntityLibPy import Node
 
 class Sequence(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/Sequence"
+    schema_name = "Sequence"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->Sequence
         return Sequence(entlib.load_node_file(sourcefile, entlib.get_schema(Sequence.schema_name)))

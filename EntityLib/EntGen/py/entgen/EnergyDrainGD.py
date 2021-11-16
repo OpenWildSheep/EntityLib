@@ -11,7 +11,7 @@ from entgen.EntityRef import *
 from EntityLibPy import Node
 
 class EnergyDrainGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EnergyDrainGD"
+    schema_name = "EnergyDrainGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EnergyDrainGD
         return EnergyDrainGD(entlib.load_node_file(sourcefile, entlib.get_schema(EnergyDrainGD.schema_name)))

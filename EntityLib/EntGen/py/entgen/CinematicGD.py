@@ -15,7 +15,7 @@ from entgen.Sequence import *
 from EntityLibPy import Node
 
 class CinematicGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CinematicGD"
+    schema_name = "CinematicGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CinematicGD
         return CinematicGD(entlib.load_node_file(sourcefile, entlib.get_schema(CinematicGD.schema_name)))

@@ -15,7 +15,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class ProjectileData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ProjectileData"
+    schema_name = "ProjectileData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ProjectileData
         return ProjectileData(entlib.load_node_file(sourcefile, entlib.get_schema(ProjectileData.schema_name)))

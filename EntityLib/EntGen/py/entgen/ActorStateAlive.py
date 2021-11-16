@@ -13,7 +13,7 @@ from entgen.StunGauge import *
 from EntityLibPy import Node
 
 class ActorStateAlive(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ActorStateAlive"
+    schema_name = "ActorStateAlive"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateAlive
         return ActorStateAlive(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateAlive.schema_name)))

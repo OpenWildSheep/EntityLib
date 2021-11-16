@@ -333,7 +333,6 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference_internal);
 
     pySchema
-        .def_readonly("root", &Schema::root, py::return_value_policy::reference_internal)
         .def_readonly("definitions", &Schema::allDefinitions, py::return_value_policy::reference_internal);
 
     // ******************************************** EntityLib *************************************
@@ -362,7 +361,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pyNode
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
         .def("get_ptr", [](Node* self) {return (intptr_t)self;})
-        .def_static("from_ptr", [](intptr_t _ptr) {return (Node*)_ptr;})
+        .def_static("from_ptr", [](intptr_t _ptr) {return (Node*)_ptr;}, py::return_value_policy::reference_internal)
         .def("has_override", &Node::hasOverride)
         .def("has_prefab_value", &Node::hasPrefabValue)
         .def("has_default_value", &Node::hasDefaultValue)
@@ -482,6 +481,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("apply_all_values", [](Node& self, Node& dest, CopyMode copyMode) {
             self.applyAllValues(dest, copyMode);
         })
+        .def("apply_to_prefab", &Node::applyToPrefab)
         ;
 
     pyComponent
@@ -570,7 +570,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pyScene
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
         .def("get_ptr", [](Scene* self) {return (intptr_t)self;})
-        .def_static("from_ptr", [](intptr_t _ptr) {return (Scene*)_ptr;})
+        .def_static("from_ptr", [](intptr_t _ptr) {return (Scene*)_ptr;}, py::return_value_policy::reference_internal)
         .def(
             "add_entity",
             [](Scene* scene, Entity* ent) -> Entity*

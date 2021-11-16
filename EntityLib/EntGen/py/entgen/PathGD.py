@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class PathGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/PathGD"
+    schema_name = "PathGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->PathGD
         return PathGD(entlib.load_node_file(sourcefile, entlib.get_schema(PathGD.schema_name)))

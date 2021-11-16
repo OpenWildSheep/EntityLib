@@ -12,7 +12,7 @@ from entgen.sGameEffectTemplate import *
 from EntityLibPy import Node
 
 class GameEffectSpawnerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/GameEffectSpawnerGD"
+    schema_name = "GameEffectSpawnerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->GameEffectSpawnerGD
         return GameEffectSpawnerGD(entlib.load_node_file(sourcefile, entlib.get_schema(GameEffectSpawnerGD.schema_name)))

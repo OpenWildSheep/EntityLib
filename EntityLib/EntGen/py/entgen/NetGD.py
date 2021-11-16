@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class NetGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/NetGD"
+    schema_name = "NetGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->NetGD
         return NetGD(entlib.load_node_file(sourcefile, entlib.get_schema(NetGD.schema_name)))

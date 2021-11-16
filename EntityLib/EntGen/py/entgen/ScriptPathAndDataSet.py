@@ -13,7 +13,7 @@ from entgen.ScriptPathAndDataSet import *
 from EntityLibPy import Node
 
 class ScriptPathAndDataSet(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ScriptPathAndDataSet"
+    schema_name = "ScriptPathAndDataSet"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ScriptPathAndDataSet
         return ScriptPathAndDataSet(entlib.load_node_file(sourcefile, entlib.get_schema(ScriptPathAndDataSet.schema_name)))

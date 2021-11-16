@@ -12,7 +12,7 @@ from entgen.Entity import *
 from EntityLibPy import Node
 
 class SubScene(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/SubScene"
+    schema_name = "SubScene"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->SubScene
         return SubScene(entlib.load_node_file(sourcefile, entlib.get_schema(SubScene.schema_name)))

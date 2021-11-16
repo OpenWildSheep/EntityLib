@@ -10,7 +10,7 @@ from entgen.ActorState import *
 from EntityLibPy import Node
 
 class EntityStatePlayer(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EntityStatePlayer"
+    schema_name = "EntityStatePlayer"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStatePlayer
         return EntityStatePlayer(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStatePlayer.schema_name)))

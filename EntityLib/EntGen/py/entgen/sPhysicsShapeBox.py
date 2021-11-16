@@ -10,7 +10,7 @@ from entgen.Vector3 import *
 from EntityLibPy import Node
 
 class sPhysicsShapeBox(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/sPhysicsShapeBox"
+    schema_name = "sPhysicsShapeBox"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->sPhysicsShapeBox
         return sPhysicsShapeBox(entlib.load_node_file(sourcefile, entlib.get_schema(sPhysicsShapeBox.schema_name)))

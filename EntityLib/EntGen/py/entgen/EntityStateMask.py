@@ -10,7 +10,7 @@ from entgen.ActorState import *
 from EntityLibPy import Node
 
 class EntityStateMask(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/EntityStateMask"
+    schema_name = "EntityStateMask"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateMask
         return EntityStateMask(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateMask.schema_name)))

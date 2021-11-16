@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class SeedPatchData(HelperObject):
-    schema_name = "./EditionComponents.json#/definitions/SeedPatchData"
+    schema_name = "SeedPatchData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->SeedPatchData
         return SeedPatchData(entlib.load_node_file(sourcefile, entlib.get_schema(SeedPatchData.schema_name)))

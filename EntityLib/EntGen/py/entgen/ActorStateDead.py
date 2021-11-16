@@ -12,7 +12,7 @@ from entgen.LastAliveReviveSide import *
 from EntityLibPy import Node
 
 class ActorStateDead(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ActorStateDead"
+    schema_name = "ActorStateDead"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateDead
         return ActorStateDead(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateDead.schema_name)))

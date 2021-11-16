@@ -12,7 +12,7 @@ from entgen.String import *
 from EntityLibPy import Node
 
 class NavmeshGenerationParameters(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/NavmeshGenerationParameters"
+    schema_name = "NavmeshGenerationParameters"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->NavmeshGenerationParameters
         return NavmeshGenerationParameters(entlib.load_node_file(sourcefile, entlib.get_schema(NavmeshGenerationParameters.schema_name)))

@@ -10,7 +10,7 @@ from entgen.DistanceTriggerGD import *
 from EntityLibPy import Node
 
 class FightDistanceTriggerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/FightDistanceTriggerGD"
+    schema_name = "FightDistanceTriggerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->FightDistanceTriggerGD
         return FightDistanceTriggerGD(entlib.load_node_file(sourcefile, entlib.get_schema(FightDistanceTriggerGD.schema_name)))

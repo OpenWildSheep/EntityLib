@@ -13,7 +13,7 @@ from entgen.Vector3 import *
 from EntityLibPy import Node
 
 class HeadCollisionBehaviorData(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/HeadCollisionBehaviorData"
+    schema_name = "HeadCollisionBehaviorData"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->HeadCollisionBehaviorData
         return HeadCollisionBehaviorData(entlib.load_node_file(sourcefile, entlib.get_schema(HeadCollisionBehaviorData.schema_name)))

@@ -10,7 +10,7 @@ from entgen.Vector2 import *
 from EntityLibPy import Node
 
 class sJointSwingTwistDesc(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/sJointSwingTwistDesc"
+    schema_name = "sJointSwingTwistDesc"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->sJointSwingTwistDesc
         return sJointSwingTwistDesc(entlib.load_node_file(sourcefile, entlib.get_schema(sJointSwingTwistDesc.schema_name)))

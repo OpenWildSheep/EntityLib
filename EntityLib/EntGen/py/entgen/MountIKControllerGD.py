@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class MountIKControllerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/MountIKControllerGD"
+    schema_name = "MountIKControllerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->MountIKControllerGD
         return MountIKControllerGD(entlib.load_node_file(sourcefile, entlib.get_schema(MountIKControllerGD.schema_name)))

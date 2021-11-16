@@ -385,12 +385,8 @@ void Ent::SchemaLoader::parseSchemaNoRef(
         {
             if (currentType == DataType::null)
             {
-                std::string name = "Unnamed definition";
-                if (_data.count("name") != 0u)
-                {
-                    name = _data["name"].get<std::string>();
-                }
-                ENTLIB_LOGIC_ERROR("Unexpected json definition type (\"%s\")", name.c_str());
+                // Unions doesn't have "type" field in RuntimeComponents.json
+                setType(Ent::DataType::object);
             }
             vis.setMeta(
                 parseMetaForType(_data["meta"], currentType),
@@ -419,9 +415,7 @@ void Ent::SchemaLoader::parseSchemaNoRef(
 void Ent::SchemaLoader::readSchema(
     Schema* globalSchema, std::string const& _filename, json const& _fileRoot, json const& _data)
 {
-    Ent::SubschemaRef& schema = globalSchema->root;
-
-    std::vector<Ent::SubschemaRef*> stack{&schema};
+    std::vector<Ent::SubschemaRef*> stack;
     stack.reserve(1000);
 
     struct FillSchema : Visitor
@@ -582,12 +576,13 @@ void Ent::SchemaLoader::readSchema(
             char const* typeName = getRefTypeName(link);
             // Force to create the definition (do nothing if already exist)
             ENTLIB_ASSERT_MSG(typeName != nullptr, "Can't get type name in '%s'!!", link);
-            auto& subschema = globalSchema->allDefinitions[link];
-            subschema.name = link;
+            auto& subschema = globalSchema->allDefinitions[typeName];
+            ENTLIB_ASSERT(strlen(typeName) != 0);
+            subschema.name = typeName;
             subschema.rootSchema = globalSchema;
             auto& ref = stack.back()->subSchemaOrRef;
             ENTLIB_ASSERT(std::holds_alternative<Null>(ref));
-            ref = SubschemaRef::Ref{globalSchema, link};
+            ref = SubschemaRef::Ref{globalSchema, typeName};
         }
         void closeRef() override
         {
@@ -599,9 +594,12 @@ void Ent::SchemaLoader::readSchema(
             ENTLIB_DEBUG_PRINTF("%sopenSubschema\n", getTab());
             CHECK_WHOLE_STACK;
             ENTLIB_ASSERT(std::holds_alternative<Null>(stack.back()->subSchemaOrRef));
-            Subschema subschema{};
-            subschema.rootSchema = globalSchema;
-            stack.back()->subSchemaOrRef = std::move(subschema);
+            if (std::holds_alternative<Null>(stack.back()->subSchemaOrRef))
+            {
+                Subschema subschema{};
+                subschema.rootSchema = globalSchema;
+                stack.back()->subSchemaOrRef = std::move(subschema);
+            }
             ENTLIB_DEBUG_PRINTF("%sopenSubschema2\n", getTab());
             CHECK_WHOLE_STACK;
         }
@@ -678,7 +676,30 @@ void Ent::SchemaLoader::readSchema(
     };
     FillSchema vis{globalSchema, stack};
 
-    parseSchema(_filename, _fileRoot, _data, vis, 0);
+    // Parse all definitions
+    for (auto& [name, def] : _data["definitions"].items())
+    {
+        Ent::SubschemaRef ref;
+        vis.stack.push_back(&ref);
+        auto absRef = "./" + _filename + "#/definitions/" + name;
+        parsedRef.insert(absRef);
+        vis.openSubschema();
+        parseSchemaNoRef(_filename, _fileRoot, def, vis, 0);
+        vis.closeSubschema();
+
+        auto& subschema = globalSchema->allDefinitions[name];
+        subschema.name = name;
+        subschema.rootSchema = globalSchema;
+        subschema = std::move(vis.stack.back()->get());
+
+        vis.stack.pop_back();
+    }
+
+    // Add names
+    for (auto&& [name, def] : globalSchema->allDefinitions)
+    {
+        def.name = name;
+    }
 }
 
 /// \endcond

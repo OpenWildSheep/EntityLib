@@ -10,7 +10,7 @@ from entgen.ComponentGD import *
 from EntityLibPy import Node
 
 class GroundTypeSamplerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/GroundTypeSamplerGD"
+    schema_name = "GroundTypeSamplerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->GroundTypeSamplerGD
         return GroundTypeSamplerGD(entlib.load_node_file(sourcefile, entlib.get_schema(GroundTypeSamplerGD.schema_name)))

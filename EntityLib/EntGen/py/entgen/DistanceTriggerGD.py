@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class DistanceTriggerGD(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/DistanceTriggerGD"
+    schema_name = "DistanceTriggerGD"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->DistanceTriggerGD
         return DistanceTriggerGD(entlib.load_node_file(sourcefile, entlib.get_schema(DistanceTriggerGD.schema_name)))

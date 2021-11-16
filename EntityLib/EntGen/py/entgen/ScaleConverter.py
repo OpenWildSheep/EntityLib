@@ -11,7 +11,7 @@ from entgen.variant_Pasta_Easing_Curve_string_ import *
 from EntityLibPy import Node
 
 class ScaleConverter(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ScaleConverter"
+    schema_name = "ScaleConverter"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ScaleConverter
         return ScaleConverter(entlib.load_node_file(sourcefile, entlib.get_schema(ScaleConverter.schema_name)))

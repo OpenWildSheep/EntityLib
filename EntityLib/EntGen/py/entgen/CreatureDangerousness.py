@@ -11,7 +11,7 @@ from entgen.Float import *
 from EntityLibPy import Node
 
 class CreatureDangerousness(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/CreatureDangerousness"
+    schema_name = "CreatureDangerousness"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->CreatureDangerousness
         return CreatureDangerousness(entlib.load_node_file(sourcefile, entlib.get_schema(CreatureDangerousness.schema_name)))

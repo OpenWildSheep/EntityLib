@@ -8,7 +8,7 @@ import EntityLibPy
 from EntityLibPy import Node
 
 class ActorState(HelperObject):
-    schema_name = "./RuntimeComponents.json#/definitions/ActorState"
+    schema_name = "ActorState"
     @staticmethod
     def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorState
         return ActorState(entlib.load_node_file(sourcefile, entlib.get_schema(ActorState.schema_name)))

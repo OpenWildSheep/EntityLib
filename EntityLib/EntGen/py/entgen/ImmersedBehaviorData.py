@@ -8,6 +8,8 @@ from entgen.String import *
 from entgen.Bool import *
 from entgen.Float import *
 from entgen.ScaleConverter import *
+from entgen.ScaleConverter import *
+from entgen.FluidType import *
 
 from EntityLibPy import Node
 
@@ -59,6 +61,9 @@ class ImmersedBehaviorData(HelperObject):
         return Float(self._node.at("reachSurfaceAccelerationCoeff"))
     @reachSurfaceAccelerationCoeff.setter
     def reachSurfaceAccelerationCoeff(self, val): self.reachSurfaceAccelerationCoeff.set(val)
+    @property
+    def slowDowns(self):  # type: ()->Map[FluidTypeEnum, ScaleConverter]
+        return (lambda n: Map(FluidTypeEnum, ScaleConverter, n))(self._node.at("slowDowns"))
     pass
 
 

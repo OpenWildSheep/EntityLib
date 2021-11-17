@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ActorState import *
+from entgen.Bool import *
 from entgen.Float import *
 
 from EntityLibPy import Node
@@ -30,6 +31,11 @@ class EntityStateBeingOnSpike(HelperObject):
         return Float(self._node.at("SpikeDamage"))
     @SpikeDamage.setter
     def SpikeDamage(self, val): self.SpikeDamage.set(val)
+    @property
+    def SpikeEject(self):  # type: ()->Bool
+        return Bool(self._node.at("SpikeEject"))
+    @SpikeEject.setter
+    def SpikeEject(self, val): self.SpikeEject.set(val)
     @property
     def SpikeImpact(self):  # type: ()->Float
         return Float(self._node.at("SpikeImpact"))

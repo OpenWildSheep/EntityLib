@@ -6,7 +6,6 @@ import EntityLibPy
 
 from entgen.FluidType import *
 from entgen.String import *
-from entgen.Bool import *
 from entgen.Float import *
 from entgen.Vector2 import *
 
@@ -52,11 +51,6 @@ class FluidData(HelperObject):
         return FluidType(self._node.at("type"))
     @type.setter
     def type(self, val): self.type.set(val)
-    @property
-    def useHalfShape(self):  # type: ()->Bool
-        return Bool(self._node.at("useHalfShape"))
-    @useHalfShape.setter
-    def useHalfShape(self, val): self.useHalfShape.set(val)
     pass
 
 

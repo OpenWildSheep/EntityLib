@@ -70,6 +70,7 @@ from .ShootSequenceData import *
 from .ShootData import *
 from .SetOfObjectItem import *
 from .SeedPatchData import *
+from .SeedPatchDataMap import *
 from .SeedPatchDataList import *
 from .ScriptPathAndDataSet import *
 from .ScaleFactor import *
@@ -223,7 +224,6 @@ from .InterpolationMethod import *
 from .TrailProperties import *
 from .InteractData import *
 from .InputCollisionBehaviorData import *
-from .ImmersedBehaviorData import *
 from .ID import *
 from .PhysicsReplicateData import *
 from .HotSpotType import *
@@ -279,6 +279,7 @@ from .FluidVolumeComponentGD_SimulationParameters import *
 from .FluidVolumeComponentGD_HeightMapData import *
 from .FluidVolumeComponentGD_FluidVolumeData import *
 from .FluidType import *
+from .ImmersedBehaviorData import *
 from .FluidData import *
 from .FloatRange import *
 from .VegetationPCloudData import *
@@ -598,6 +599,7 @@ from .EntityStateTreeSwitchTransition import *
 from .EntityStateTreeMetamorphosisUsingScale import *
 from .EntityStateTreeMetamorphosis import *
 from .EntityStateTooDeep import *
+from .EntityStateTakeDamageOnMount import *
 from .EntityStateStrafeDodge import *
 from .EntityStateStickedLand import *
 from .EntityStateSpiritAnimalBeingCalled import *
@@ -655,6 +657,7 @@ from .EntityStateDamageLand import *
 from .EntityStateCreatureProfile import *
 from .EntityStateCreatureHatching import *
 from .EntityStateCreateSoul import *
+from .EntityStateCombat import *
 from .EntityStateClassicLand import *
 from .EntityStateClassicDodge import *
 from .EntityStateCanNotBePerceived import *

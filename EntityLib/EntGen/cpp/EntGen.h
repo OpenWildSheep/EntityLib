@@ -215,6 +215,7 @@ namespace Ent
         struct ShootData;
         struct SetOfObjectItem;
         struct SeedPatchData;
+        struct SeedPatchDataMap;
         struct SeedPatchDataList;
         struct ScriptPathAndDataSet;
         struct ScaleFactor;
@@ -541,7 +542,6 @@ namespace Ent
         struct TrailProperties;
         struct InteractData;
         struct InputCollisionBehaviorData;
-        struct ImmersedBehaviorData;
         struct ID;
         struct PhysicsReplicateData;
         struct HotSpotType; // enum
@@ -667,6 +667,7 @@ namespace Ent
             mud,
             FluidType_COUNT,
         };
+        struct ImmersedBehaviorData;
         struct FluidData;
         struct FloatRange;
         struct VegetationPCloudData;
@@ -1200,6 +1201,7 @@ namespace Ent
         struct EntityStateTreeMetamorphosisUsingScale;
         struct EntityStateTreeMetamorphosis;
         struct EntityStateTooDeep;
+        struct EntityStateTakeDamageOnMount;
         struct EntityStateStrafeDodge;
         struct EntityStateStickedLand;
         struct EntityStateSpiritAnimalBeingCalled;
@@ -1257,6 +1259,7 @@ namespace Ent
         struct EntityStateCreatureProfile;
         struct EntityStateCreatureHatching;
         struct EntityStateCreateSoul;
+        struct EntityStateCombat;
         struct EntityStateClassicLand;
         struct EntityStateClassicDodge;
         struct EntityStateCanNotBePerceived;
@@ -3172,6 +3175,22 @@ namespace Ent
             Ent::Gen::Float NoiseSizeX() const;
             Ent::Gen::Float NoiseSizeY() const;
             Ent::Gen::String SeedName() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct SeedPatchDataMap : HelperObject // Object
+        {
+            SeedPatchDataMap(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "SeedPatchDataMap";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Map<char const*, Ent::Gen::SeedPatchData> Data() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -6023,28 +6042,6 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
-        struct ImmersedBehaviorData : HelperObject // Object
-        {
-            ImmersedBehaviorData(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "ImmersedBehaviorData";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::String _comment() const;
-            Ent::Gen::Float depth() const;
-            Ent::Gen::Float depthHysteresisCoeff() const;
-            Ent::Gen::ScaleConverter depthMaxRange() const;
-            Ent::Gen::Float flotation() const;
-            Ent::Gen::Bool isAllowed() const;
-            Ent::Gen::Float minTooDeepPushSpeed() const;
-            Ent::Gen::Float reachSurfaceAccelerationCoeff() const;
-        };
-
         struct ID : HelperObject // Object
         {
             ID(Ent::Node* _node): HelperObject(_node) {}
@@ -6623,7 +6620,6 @@ namespace Ent
             Ent::Gen::Float pitchMaxAngleToJump() const;
             Ent::Gen::Float pitchMinAngleToJump() const;
             Ent::Gen::ScaleConverter reachSurfaceAcceleration() const;
-            Ent::Gen::ScaleConverter slowDown() const;
             Ent::Gen::Float speedZMinToJump() const;
         };
 
@@ -7163,6 +7159,29 @@ namespace Ent
             return static_cast<FluidTypeEnum>(details::indexInEnum(value, FluidType::enumToString));
         }
 
+        struct ImmersedBehaviorData : HelperObject // Object
+        {
+            ImmersedBehaviorData(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "ImmersedBehaviorData";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::String _comment() const;
+            Ent::Gen::Float depth() const;
+            Ent::Gen::Float depthHysteresisCoeff() const;
+            Ent::Gen::ScaleConverter depthMaxRange() const;
+            Ent::Gen::Float flotation() const;
+            Ent::Gen::Bool isAllowed() const;
+            Ent::Gen::Float minTooDeepPushSpeed() const;
+            Ent::Gen::Float reachSurfaceAccelerationCoeff() const;
+            Ent::Gen::Map<FluidTypeEnum, Ent::Gen::ScaleConverter> slowDowns() const;
+        };
+
         struct FluidData : HelperObject // Object
         {
             FluidData(Ent::Node* _node): HelperObject(_node) {}
@@ -7181,7 +7200,6 @@ namespace Ent
             Ent::Gen::Vector2 flow() const;
             Ent::Gen::Float level() const;
             Ent::Gen::FluidType type() const;
-            Ent::Gen::Bool useHalfShape() const;
         };
 
         struct FloatRange : HelperObject // Object
@@ -8993,6 +9011,7 @@ namespace Ent
             Ent::Gen::String SeedName() const;
             Ent::Gen::Bool SeedOverride() const;
             Ent::Gen::SeedPatchDataList SeedPatchDataList() const;
+            Ent::Gen::SeedPatchDataMap SeedPatchDataMap() const;
             Ent::Gen::Int Subdivision() const;
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String _comment() const;
@@ -15008,6 +15027,22 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
+        struct EntityStateTakeDamageOnMount : HelperObject // Object
+        {
+            EntityStateTakeDamageOnMount(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateTakeDamageOnMount";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct EntityStateStrafeDodge : HelperObject // Object
         {
             EntityStateStrafeDodge(Ent::Node* _node): HelperObject(_node) {}
@@ -15935,6 +15970,22 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
+        struct EntityStateCombat : HelperObject // Object
+        {
+            EntityStateCombat(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateCombat";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct EntityStateClassicLand : HelperObject // Object
         {
             EntityStateClassicLand(Ent::Node* _node): HelperObject(_node) {}
@@ -16030,6 +16081,7 @@ namespace Ent
             }
             Ent::Gen::Float SpikeCooldown() const;
             Ent::Gen::Float SpikeDamage() const;
+            Ent::Gen::Bool SpikeEject() const;
             Ent::Gen::Float SpikeImpact() const;
             Ent::Gen::ActorState Super() const;
             Ent::Gen::String _comment() const;
@@ -20496,6 +20548,8 @@ namespace Ent
             Ent::Gen::Int DisplacementMapSize() const;
             Ent::Gen::Int EnableAsyncPipelineCreation() const;
             Ent::Gen::Int EnableColorCorrection() const;
+            Ent::Gen::Int EnableComputeForDeferredLighting() const;
+            Ent::Gen::Int EnableComputeForUnderWater() const;
             Ent::Gen::Int EnableDepthOfField() const;
             Ent::Gen::Int EnableLensFlare() const;
             Ent::Gen::Int EnableMotionBlur() const;
@@ -20551,6 +20605,7 @@ namespace Ent
             Ent::Gen::RenderManager_RenderConfig PC() const;
             Ent::Gen::RenderManager_RenderConfig PS4() const;
             Ent::Gen::RenderManager_RenderConfig PS4Neo() const;
+            Ent::Gen::RenderManager_RenderConfig PS5() const;
             Ent::Gen::Bool RenderToWindow() const;
             Ent::Gen::Int ResolutionX() const;
             Ent::Gen::Int ResolutionY() const;
@@ -22911,6 +22966,15 @@ namespace Ent
             return Ent::Gen::String(node->at("SeedName"));
         }
         inline Ent::Gen::String SeedPatchData::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // SeedPatchDataMap
+        inline Ent::Gen::Map<char const*, Ent::Gen::SeedPatchData> SeedPatchDataMap::Data() const
+        {
+            return Ent::Gen::Map<char const*, Ent::Gen::SeedPatchData>(node->at("Data"));
+        }
+        inline Ent::Gen::String SeedPatchDataMap::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -25504,39 +25568,6 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
-        // ImmersedBehaviorData
-        inline Ent::Gen::String ImmersedBehaviorData::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        inline Ent::Gen::Float ImmersedBehaviorData::depth() const
-        {
-            return Ent::Gen::Float(node->at("depth"));
-        }
-        inline Ent::Gen::Float ImmersedBehaviorData::depthHysteresisCoeff() const
-        {
-            return Ent::Gen::Float(node->at("depthHysteresisCoeff"));
-        }
-        inline Ent::Gen::ScaleConverter ImmersedBehaviorData::depthMaxRange() const
-        {
-            return Ent::Gen::ScaleConverter(node->at("depthMaxRange"));
-        }
-        inline Ent::Gen::Float ImmersedBehaviorData::flotation() const
-        {
-            return Ent::Gen::Float(node->at("flotation"));
-        }
-        inline Ent::Gen::Bool ImmersedBehaviorData::isAllowed() const
-        {
-            return Ent::Gen::Bool(node->at("isAllowed"));
-        }
-        inline Ent::Gen::Float ImmersedBehaviorData::minTooDeepPushSpeed() const
-        {
-            return Ent::Gen::Float(node->at("minTooDeepPushSpeed"));
-        }
-        inline Ent::Gen::Float ImmersedBehaviorData::reachSurfaceAccelerationCoeff() const
-        {
-            return Ent::Gen::Float(node->at("reachSurfaceAccelerationCoeff"));
-        }
         // ID
         // PhysicsReplicateData
         inline Ent::Gen::Vector3 PhysicsReplicateData::AngularV() const
@@ -26048,10 +26079,6 @@ namespace Ent
         inline Ent::Gen::ScaleConverter GameImmersionData::reachSurfaceAcceleration() const
         {
             return Ent::Gen::ScaleConverter(node->at("reachSurfaceAcceleration"));
-        }
-        inline Ent::Gen::ScaleConverter GameImmersionData::slowDown() const
-        {
-            return Ent::Gen::ScaleConverter(node->at("slowDown"));
         }
         inline Ent::Gen::Float GameImmersionData::speedZMinToJump() const
         {
@@ -26690,6 +26717,43 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // ImmersedBehaviorData
+        inline Ent::Gen::String ImmersedBehaviorData::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Ent::Gen::Float ImmersedBehaviorData::depth() const
+        {
+            return Ent::Gen::Float(node->at("depth"));
+        }
+        inline Ent::Gen::Float ImmersedBehaviorData::depthHysteresisCoeff() const
+        {
+            return Ent::Gen::Float(node->at("depthHysteresisCoeff"));
+        }
+        inline Ent::Gen::ScaleConverter ImmersedBehaviorData::depthMaxRange() const
+        {
+            return Ent::Gen::ScaleConverter(node->at("depthMaxRange"));
+        }
+        inline Ent::Gen::Float ImmersedBehaviorData::flotation() const
+        {
+            return Ent::Gen::Float(node->at("flotation"));
+        }
+        inline Ent::Gen::Bool ImmersedBehaviorData::isAllowed() const
+        {
+            return Ent::Gen::Bool(node->at("isAllowed"));
+        }
+        inline Ent::Gen::Float ImmersedBehaviorData::minTooDeepPushSpeed() const
+        {
+            return Ent::Gen::Float(node->at("minTooDeepPushSpeed"));
+        }
+        inline Ent::Gen::Float ImmersedBehaviorData::reachSurfaceAccelerationCoeff() const
+        {
+            return Ent::Gen::Float(node->at("reachSurfaceAccelerationCoeff"));
+        }
+        inline Ent::Gen::Map<FluidTypeEnum, Ent::Gen::ScaleConverter> ImmersedBehaviorData::slowDowns() const
+        {
+            return Ent::Gen::Map<FluidTypeEnum, Ent::Gen::ScaleConverter>(node->at("slowDowns"));
+        }
         // FluidData
         inline Ent::Gen::String FluidData::_comment() const
         {
@@ -26714,10 +26778,6 @@ namespace Ent
         inline Ent::Gen::FluidType FluidData::type() const
         {
             return Ent::Gen::FluidType(node->at("type"));
-        }
-        inline Ent::Gen::Bool FluidData::useHalfShape() const
-        {
-            return Ent::Gen::Bool(node->at("useHalfShape"));
         }
         // FloatRange
         inline Ent::Gen::Vector2 FloatRange::MinMax() const
@@ -29050,6 +29110,10 @@ namespace Ent
         inline Ent::Gen::SeedPatchDataList SeedPatch::SeedPatchDataList() const
         {
             return Ent::Gen::SeedPatchDataList(node->at("SeedPatchDataList"));
+        }
+        inline Ent::Gen::SeedPatchDataMap SeedPatch::SeedPatchDataMap() const
+        {
+            return Ent::Gen::SeedPatchDataMap(node->at("SeedPatchDataMap"));
         }
         inline Ent::Gen::Int SeedPatch::Subdivision() const
         {
@@ -40199,6 +40263,15 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // EntityStateTakeDamageOnMount
+        inline Ent::Gen::ActorState EntityStateTakeDamageOnMount::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateTakeDamageOnMount::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // EntityStateStrafeDodge
         inline Ent::Gen::ActorState EntityStateStrafeDodge::Super() const
         {
@@ -40772,6 +40845,15 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // EntityStateCombat
+        inline Ent::Gen::ActorState EntityStateCombat::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateCombat::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // EntityStateClassicLand
         inline Ent::Gen::ActorState EntityStateClassicLand::Super() const
         {
@@ -40829,6 +40911,10 @@ namespace Ent
         inline Ent::Gen::Float EntityStateBeingOnSpike::SpikeDamage() const
         {
             return Ent::Gen::Float(node->at("SpikeDamage"));
+        }
+        inline Ent::Gen::Bool EntityStateBeingOnSpike::SpikeEject() const
+        {
+            return Ent::Gen::Bool(node->at("SpikeEject"));
         }
         inline Ent::Gen::Float EntityStateBeingOnSpike::SpikeImpact() const
         {
@@ -44462,6 +44548,14 @@ namespace Ent
         {
             return Ent::Gen::Int(node->at("EnableColorCorrection"));
         }
+        inline Ent::Gen::Int RenderManager_RenderConfig::EnableComputeForDeferredLighting() const
+        {
+            return Ent::Gen::Int(node->at("EnableComputeForDeferredLighting"));
+        }
+        inline Ent::Gen::Int RenderManager_RenderConfig::EnableComputeForUnderWater() const
+        {
+            return Ent::Gen::Int(node->at("EnableComputeForUnderWater"));
+        }
         inline Ent::Gen::Int RenderManager_RenderConfig::EnableDepthOfField() const
         {
             return Ent::Gen::Int(node->at("EnableDepthOfField"));
@@ -44626,6 +44720,10 @@ namespace Ent
         inline Ent::Gen::RenderManager_RenderConfig RenderManager::PS4Neo() const
         {
             return Ent::Gen::RenderManager_RenderConfig(node->at("PS4Neo"));
+        }
+        inline Ent::Gen::RenderManager_RenderConfig RenderManager::PS5() const
+        {
+            return Ent::Gen::RenderManager_RenderConfig(node->at("PS5"));
         }
         inline Ent::Gen::Bool RenderManager::RenderToWindow() const
         {

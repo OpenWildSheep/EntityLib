@@ -85,6 +85,9 @@ class RenderManager(HelperObject):
     def PS4Neo(self):  # type: ()->RenderManager_RenderConfig
         return RenderManager_RenderConfig(self._node.at("PS4Neo"))
     @property
+    def PS5(self):  # type: ()->RenderManager_RenderConfig
+        return RenderManager_RenderConfig(self._node.at("PS5"))
+    @property
     def RenderToWindow(self):  # type: ()->Bool
         return Bool(self._node.at("RenderToWindow"))
     @RenderToWindow.setter

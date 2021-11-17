@@ -47,6 +47,16 @@ class RenderManager_RenderConfig(HelperObject):
     @EnableColorCorrection.setter
     def EnableColorCorrection(self, val): self.EnableColorCorrection.set(val)
     @property
+    def EnableComputeForDeferredLighting(self):  # type: ()->Int
+        return Int(self._node.at("EnableComputeForDeferredLighting"))
+    @EnableComputeForDeferredLighting.setter
+    def EnableComputeForDeferredLighting(self, val): self.EnableComputeForDeferredLighting.set(val)
+    @property
+    def EnableComputeForUnderWater(self):  # type: ()->Int
+        return Int(self._node.at("EnableComputeForUnderWater"))
+    @EnableComputeForUnderWater.setter
+    def EnableComputeForUnderWater(self, val): self.EnableComputeForUnderWater.set(val)
+    @property
     def EnableDepthOfField(self):  # type: ()->Int
         return Int(self._node.at("EnableDepthOfField"))
     @EnableDepthOfField.setter

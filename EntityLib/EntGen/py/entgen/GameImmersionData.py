@@ -54,9 +54,6 @@ class GameImmersionData(HelperObject):
     def reachSurfaceAcceleration(self):  # type: ()->ScaleConverter
         return ScaleConverter(self._node.at("reachSurfaceAcceleration"))
     @property
-    def slowDown(self):  # type: ()->ScaleConverter
-        return ScaleConverter(self._node.at("slowDown"))
-    @property
     def speedZMinToJump(self):  # type: ()->Float
         return Float(self._node.at("speedZMinToJump"))
     @speedZMinToJump.setter

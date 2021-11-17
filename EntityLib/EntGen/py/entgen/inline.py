@@ -2433,6 +2433,29 @@ class SeedPatchData(HelperObject):
 
 from EntityLibPy import Node
 
+class SeedPatchDataMap(HelperObject):
+    schema_name = "SeedPatchDataMap"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->SeedPatchDataMap
+        return SeedPatchDataMap(entlib.load_node_file(sourcefile, entlib.get_schema(SeedPatchDataMap.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->SeedPatchDataMap
+        return SeedPatchDataMap(entlib.make_node(SeedPatchDataMap.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Data(self):  # type: ()->Map[str, SeedPatchData]
+        return (lambda n: Map(str, SeedPatchData, n))(self._node.at("Data"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class SeedPatchDataList(HelperObject):
     schema_name = "SeedPatchDataList"
     @staticmethod
@@ -7302,59 +7325,6 @@ class InputCollisionBehaviorData(HelperObject):
 
 from EntityLibPy import Node
 
-class ImmersedBehaviorData(HelperObject):
-    schema_name = "ImmersedBehaviorData"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ImmersedBehaviorData
-        return ImmersedBehaviorData(entlib.load_node_file(sourcefile, entlib.get_schema(ImmersedBehaviorData.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->ImmersedBehaviorData
-        return ImmersedBehaviorData(entlib.make_node(ImmersedBehaviorData.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    @property
-    def depth(self):  # type: ()->Float
-        return Float(self._node.at("depth"))
-    @depth.setter
-    def depth(self, val): self.depth.set(val)
-    @property
-    def depthHysteresisCoeff(self):  # type: ()->Float
-        return Float(self._node.at("depthHysteresisCoeff"))
-    @depthHysteresisCoeff.setter
-    def depthHysteresisCoeff(self, val): self.depthHysteresisCoeff.set(val)
-    @property
-    def depthMaxRange(self):  # type: ()->ScaleConverter
-        return ScaleConverter(self._node.at("depthMaxRange"))
-    @property
-    def flotation(self):  # type: ()->Float
-        return Float(self._node.at("flotation"))
-    @flotation.setter
-    def flotation(self, val): self.flotation.set(val)
-    @property
-    def isAllowed(self):  # type: ()->Bool
-        return Bool(self._node.at("isAllowed"))
-    @isAllowed.setter
-    def isAllowed(self, val): self.isAllowed.set(val)
-    @property
-    def minTooDeepPushSpeed(self):  # type: ()->Float
-        return Float(self._node.at("minTooDeepPushSpeed"))
-    @minTooDeepPushSpeed.setter
-    def minTooDeepPushSpeed(self, val): self.minTooDeepPushSpeed.set(val)
-    @property
-    def reachSurfaceAccelerationCoeff(self):  # type: ()->Float
-        return Float(self._node.at("reachSurfaceAccelerationCoeff"))
-    @reachSurfaceAccelerationCoeff.setter
-    def reachSurfaceAccelerationCoeff(self, val): self.reachSurfaceAccelerationCoeff.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
 class ID(HelperObject):
 
     pass
@@ -8374,9 +8344,6 @@ class GameImmersionData(HelperObject):
     @property
     def reachSurfaceAcceleration(self):  # type: ()->ScaleConverter
         return ScaleConverter(self._node.at("reachSurfaceAcceleration"))
-    @property
-    def slowDown(self):  # type: ()->ScaleConverter
-        return ScaleConverter(self._node.at("slowDown"))
     @property
     def speedZMinToJump(self):  # type: ()->Float
         return Float(self._node.at("speedZMinToJump"))
@@ -9494,6 +9461,62 @@ class FluidType(Primitive[FluidTypeEnum]):  # Enum
 
 from EntityLibPy import Node
 
+class ImmersedBehaviorData(HelperObject):
+    schema_name = "ImmersedBehaviorData"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->ImmersedBehaviorData
+        return ImmersedBehaviorData(entlib.load_node_file(sourcefile, entlib.get_schema(ImmersedBehaviorData.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->ImmersedBehaviorData
+        return ImmersedBehaviorData(entlib.make_node(ImmersedBehaviorData.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def depth(self):  # type: ()->Float
+        return Float(self._node.at("depth"))
+    @depth.setter
+    def depth(self, val): self.depth.set(val)
+    @property
+    def depthHysteresisCoeff(self):  # type: ()->Float
+        return Float(self._node.at("depthHysteresisCoeff"))
+    @depthHysteresisCoeff.setter
+    def depthHysteresisCoeff(self, val): self.depthHysteresisCoeff.set(val)
+    @property
+    def depthMaxRange(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("depthMaxRange"))
+    @property
+    def flotation(self):  # type: ()->Float
+        return Float(self._node.at("flotation"))
+    @flotation.setter
+    def flotation(self, val): self.flotation.set(val)
+    @property
+    def isAllowed(self):  # type: ()->Bool
+        return Bool(self._node.at("isAllowed"))
+    @isAllowed.setter
+    def isAllowed(self, val): self.isAllowed.set(val)
+    @property
+    def minTooDeepPushSpeed(self):  # type: ()->Float
+        return Float(self._node.at("minTooDeepPushSpeed"))
+    @minTooDeepPushSpeed.setter
+    def minTooDeepPushSpeed(self, val): self.minTooDeepPushSpeed.set(val)
+    @property
+    def reachSurfaceAccelerationCoeff(self):  # type: ()->Float
+        return Float(self._node.at("reachSurfaceAccelerationCoeff"))
+    @reachSurfaceAccelerationCoeff.setter
+    def reachSurfaceAccelerationCoeff(self, val): self.reachSurfaceAccelerationCoeff.set(val)
+    @property
+    def slowDowns(self):  # type: ()->Map[FluidTypeEnum, ScaleConverter]
+        return (lambda n: Map(FluidTypeEnum, ScaleConverter, n))(self._node.at("slowDowns"))
+    pass
+
+
+from EntityLibPy import Node
+
 class FluidData(HelperObject):
     schema_name = "FluidData"
     @staticmethod
@@ -9534,11 +9557,6 @@ class FluidData(HelperObject):
         return FluidType(self._node.at("type"))
     @type.setter
     def type(self, val): self.type.set(val)
-    @property
-    def useHalfShape(self):  # type: ()->Bool
-        return Bool(self._node.at("useHalfShape"))
-    @useHalfShape.setter
-    def useHalfShape(self, val): self.useHalfShape.set(val)
     pass
 
 
@@ -13424,6 +13442,9 @@ class SeedPatch(HelperObject):
     @property
     def SeedPatchDataList(self):  # type: ()->SeedPatchDataList
         return SeedPatchDataList(self._node.at("SeedPatchDataList"))
+    @property
+    def SeedPatchDataMap(self):  # type: ()->SeedPatchDataMap
+        return SeedPatchDataMap(self._node.at("SeedPatchDataMap"))
     @property
     def Subdivision(self):  # type: ()->Int
         return Int(self._node.at("Subdivision"))
@@ -23236,6 +23257,29 @@ class EntityStateTooDeep(HelperObject):
 
 from EntityLibPy import Node
 
+class EntityStateTakeDamageOnMount(HelperObject):
+    schema_name = "EntityStateTakeDamageOnMount"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateTakeDamageOnMount
+        return EntityStateTakeDamageOnMount(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateTakeDamageOnMount.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateTakeDamageOnMount
+        return EntityStateTakeDamageOnMount(entlib.make_node(EntityStateTakeDamageOnMount.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class EntityStateStrafeDodge(HelperObject):
     schema_name = "EntityStateStrafeDodge"
     @staticmethod
@@ -24612,6 +24656,29 @@ class EntityStateCreateSoul(HelperObject):
 
 from EntityLibPy import Node
 
+class EntityStateCombat(HelperObject):
+    schema_name = "EntityStateCombat"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateCombat
+        return EntityStateCombat(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateCombat.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateCombat
+        return EntityStateCombat(entlib.make_node(EntityStateCombat.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class EntityStateClassicLand(HelperObject):
     schema_name = "EntityStateClassicLand"
     @staticmethod
@@ -24750,6 +24817,11 @@ class EntityStateBeingOnSpike(HelperObject):
         return Float(self._node.at("SpikeDamage"))
     @SpikeDamage.setter
     def SpikeDamage(self, val): self.SpikeDamage.set(val)
+    @property
+    def SpikeEject(self):  # type: ()->Bool
+        return Bool(self._node.at("SpikeEject"))
+    @SpikeEject.setter
+    def SpikeEject(self, val): self.SpikeEject.set(val)
     @property
     def SpikeImpact(self):  # type: ()->Float
         return Float(self._node.at("SpikeImpact"))
@@ -32216,6 +32288,16 @@ class RenderManager_RenderConfig(HelperObject):
     @EnableColorCorrection.setter
     def EnableColorCorrection(self, val): self.EnableColorCorrection.set(val)
     @property
+    def EnableComputeForDeferredLighting(self):  # type: ()->Int
+        return Int(self._node.at("EnableComputeForDeferredLighting"))
+    @EnableComputeForDeferredLighting.setter
+    def EnableComputeForDeferredLighting(self, val): self.EnableComputeForDeferredLighting.set(val)
+    @property
+    def EnableComputeForUnderWater(self):  # type: ()->Int
+        return Int(self._node.at("EnableComputeForUnderWater"))
+    @EnableComputeForUnderWater.setter
+    def EnableComputeForUnderWater(self, val): self.EnableComputeForUnderWater.set(val)
+    @property
     def EnableDepthOfField(self):  # type: ()->Int
         return Int(self._node.at("EnableDepthOfField"))
     @EnableDepthOfField.setter
@@ -32425,6 +32507,9 @@ class RenderManager(HelperObject):
     @property
     def PS4Neo(self):  # type: ()->RenderManager_RenderConfig
         return RenderManager_RenderConfig(self._node.at("PS4Neo"))
+    @property
+    def PS5(self):  # type: ()->RenderManager_RenderConfig
+        return RenderManager_RenderConfig(self._node.at("PS5"))
     @property
     def RenderToWindow(self):  # type: ()->Bool
         return Bool(self._node.at("RenderToWindow"))

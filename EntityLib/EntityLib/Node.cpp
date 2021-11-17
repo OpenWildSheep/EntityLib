@@ -65,7 +65,6 @@ namespace Ent
         newNode->parentNode = parentNode;
         newNode->addedInInstance = addedInInstance;
         newNode->updateParents();
-        newNode->checkParent(parentNode);
         return newNode;
     }
 

@@ -90,7 +90,9 @@ namespace Ent
         // TODO : Loïc - low prio - Find a way to get the super.
         //   It could be hard because we are no more in the loading phase, so the super is
         //   now delete.
+        Node* parent = wrapper->getParentNode();
         wrapper = entityLib->loadNode(*subTypeSchema, json(), nullptr);
+        wrapper->setParentNode(parent);
         typeOverriden = false;
         return getUnionData();
     }

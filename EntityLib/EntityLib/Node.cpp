@@ -118,6 +118,19 @@ namespace Ent
         return node != nullptr and node->getDataType() == Ent::DataType::oneOf;
     }
 
+    static bool isMap(Node const* node)
+    {
+        if (node != nullptr and node->getDataType() == Ent::DataType::array)
+        {
+            auto const& meta = std::get<Ent::Subschema::ArrayMeta>(node->getSchema()->meta);
+            return meta.overridePolicy == "map";
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     // Get the path from _root to _child, but reversed.
     static std::vector<std::string> makeNodeRefReversed(Node const* _root, Node const* _child)
     {
@@ -138,6 +151,12 @@ namespace Ent
                     // Don't need to explicit the type of the Union since it is the key of the set
                     isChildOfUnionSet = true;
                 }
+                usedParent = _child->getParentNode()->getParentNode();
+            }
+            else if (isMap(_child->getParentNode()->getParentNode()))
+            {
+                // Special case of Map.
+                // There is an intermediate pair Node which doesn't appear in the path.
                 usedParent = _child->getParentNode()->getParentNode();
             }
             else
@@ -936,7 +955,6 @@ namespace Ent
         }
         checkMap("mapInsert");
         Node* newNode = std::get<Array>(value).mapInsert(_key);
-        newNode->setParentNode(this);
         newNode->updateParents();
         return newNode;
     }

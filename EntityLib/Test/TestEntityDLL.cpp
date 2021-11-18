@@ -315,6 +315,7 @@ try
         ENTLIB_ASSERT(prefabHisto[0].prefabPath == "test.NetworkLink.node");
         ENTLIB_ASSERT(prefabHisto[1].prefabPath == "test_prefab_history.entity");
         ENTLIB_ASSERT(prefabHisto[2].prefabPath == "prefab.entity");
+        node->checkParent(nullptr);
     }
     entlib.clearCache();
     auto testPrefabEntity = [](Ent::Entity const* ent) {
@@ -495,7 +496,10 @@ try
         auto setOfObject = ent->getComponent("TestSetOfObject");
         ENTLIB_ASSERT(setOfObject);
         auto mapTest = setOfObject->root->at("MapOfObject");
-        ENTLIB_ASSERT(mapTest->mapInsert("Should_not_appear_in_diff"));
+        auto testParent = mapTest->mapInsert("Should_not_appear_in_diff");
+        ENTLIB_ASSERT(testParent);
+        ENTLIB_ASSERT(testParent->getParentNode()->getSchema()->linearItems.has_value());
+        ENTLIB_ASSERT(testParent->getParentNode()->getParentNode()->isMapOrSet());
         ENTLIB_ASSERT(mapTest->mapErase("Should_not_appear_in_diff"));
 
         // Test a fixed-size array is not "addedInInstance"
@@ -524,6 +528,7 @@ try
         Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
         Ent::Node* tags = pathNodeGD->root->at("Tags")->at("Tags");
         auto primSet = tags->mapGet("a");
+        ENTLIB_ASSERT(primSet->getParentNode()->getParentNode()->isMapOrSet());
         ENTLIB_CHECK_EXCEPTION(primSet->mapErase("1"), Ent::BadArrayType);
 
         // Set Union type and override

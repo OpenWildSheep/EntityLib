@@ -106,6 +106,7 @@ namespace Ent
         Subschema const* m_schema = nullptr;
         std::vector<Element> m_items; ///< List of items of the array
         std::map<KeyType, size_t> m_itemMap;
+        Node* m_parentNode = nullptr;
     };
 
 } // namespace Ent

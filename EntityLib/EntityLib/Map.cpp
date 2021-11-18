@@ -359,6 +359,7 @@ Ent::Map::Element& Ent::Map::insertImpl(KeyType const& _key, NodeUniquePtr _newN
         auto& elt = insertImpl(OverrideValueLocation::Override, _key, std::move(_newNode), true);
         getEltValue(m_schema, elt)->setAddedInInsance(true);
         elt.node->setAddedInInsance(true);
+        elt.node->setParentNode(m_parentNode);
         return elt;
     }
     size_t index = iter->second;
@@ -373,6 +374,7 @@ Ent::Map::Element& Ent::Map::insertImpl(KeyType const& _key, NodeUniquePtr _newN
             // So we will not get back the data from before the prefab.
             auto key = getChildKey(m_schema, element.node.get());
             element.node = m_entlib->loadNode(*element.node->getSchema(), json{}, nullptr);
+            element.node->setParentNode(m_parentNode);
             setChildKey(m_schema, element.node.get(), key);
         }
         // If the element was present in the prefab and remove in the instance,
@@ -732,6 +734,7 @@ void Ent::Map::applyAllValues(Map& _dest, CopyMode _copyMode) const
 
 void Ent::Map::setParentNode(Node* _parentNode)
 {
+    m_parentNode = _parentNode;
     for (auto& elt : m_items)
     {
         elt.node->setParentNode(_parentNode);

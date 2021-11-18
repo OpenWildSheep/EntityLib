@@ -747,9 +747,9 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
             }
         }
         std::sort(begin(objNodes), end(objNodes), Ent::CompObject());
-        Object object(&_nodeSchema, objNodes, objInstanceOf, objInstanceOfFieldIndex, objHasASuper);
+        Object object(
+            &_nodeSchema, std::move(objNodes), objInstanceOf, objInstanceOfFieldIndex, objHasASuper);
         auto result = newNode(std::move(object), &_nodeSchema);
-        result->checkParent(nullptr);
         return result;
     }
 }

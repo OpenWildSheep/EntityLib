@@ -1167,15 +1167,15 @@ std::set<std::string> getDependencies(std::map<std::string, json> const& nameToS
 int main(int argc, char* argv[])
 try
 {
-    if (argc < 3)
+    if (argc < 4)
     {
-        fprintf(stderr, "Missing resourcesPath and destinationPath arguments");
+        fprintf(stderr, "Missing resourcesPath and destinationPath, and p4_root arguments");
         return EXIT_FAILURE;
     }
     auto resourcePath = std::filesystem::path(argv[1]);
     auto destinationPath = std::filesystem::path(argv[2]);
 
-    Ent::EntityLib entlib("X:/", true);
+    Ent::EntityLib entlib(argv[3], true);
 
     // Add all first-level definitions in the dist
     for (auto& [defName, def] : entlib.schema.schema.allDefinitions)
@@ -1266,6 +1266,8 @@ try
 
     gencpp(resourcePath / "cpp", destinationPath / "cpp");
     genpy(resourcePath / "py", destinationPath / "py");
+
+    std::cout << "EntGen generation done" << std::endl;
     return EXIT_SUCCESS;
 }
 catch (std::exception& ex)

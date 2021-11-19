@@ -90,7 +90,7 @@ namespace Ent
         if (_prefabNodePath == nullptr or strlen(_prefabNodePath) == 0)
         {
             auto prefabNode = entlib->loadNode(*schema, json{}, nullptr);
-            (*this) = std::get<Object>(prefabNode->GetRawValue()).makeInstanceOf();
+            (*this) = std::get<ObjectPtr>(prefabNode->GetRawValue())->makeInstanceOf();
             instanceOf.set("");
         }
         else
@@ -113,7 +113,7 @@ namespace Ent
                     keyField = field->clone();
                 }
             }
-            (*this) = std::get<Object>(prefabNode->GetRawValue()).makeInstanceOf();
+            (*this) = std::get<ObjectPtr>(prefabNode->GetRawValue())->makeInstanceOf();
             // Set the keyField
             if (keyField != nullptr and keyField->isSet()) // Only report the previus ID if it is set
             {

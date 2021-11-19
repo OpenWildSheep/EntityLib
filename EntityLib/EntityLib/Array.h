@@ -122,6 +122,7 @@ namespace Ent
         using MapOrVector = std::variant<Vector, Map>;
         MapOrVector m_data;
     };
+    using ArrayPtr = std::unique_ptr<Array>;
 
     inline size_t Array::size() const
     {

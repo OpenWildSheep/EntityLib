@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../external/json.hpp" // TODO : Remove when the rawData in Component is no more useful
-#include "../Node.h"
+#include "external/json.hpp" // TODO : Remove when the rawData in Component is no more useful
+#include "Node.h"
 
 namespace Ent
 {

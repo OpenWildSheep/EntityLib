@@ -2,7 +2,7 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4464)
-#include "../Override.h"
+#include "Override.h"
 #pragma warning(pop)
 
 #include "include/Schema.h"
@@ -126,6 +126,7 @@ namespace Ent
         /// @pre \b _child is a child field of this
         NodeRef computeNodeRefToChild(Node const* _child) const;
     };
+    using ObjectPtr = std::unique_ptr<Object>;
 
     inline auto begin(Object const& obj)
     {

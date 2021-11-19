@@ -407,7 +407,7 @@ Ent::Node* Ent::Map::rename(KeyType const& _key, KeyType const& _newkey)
                 std::get<Subschema::ArrayMeta>(m_schema->meta).overridePolicy;
             auto const itemIsObject = m_schema->singularItems->get().type == Ent::DataType::object;
             if (itemIsObject and overridePolicy == "set"
-                and std::get<Object>(m_items[idx].node->GetRawValue()).hasASuper)
+                and std::get<ObjectPtr>(m_items[idx].node->GetRawValue())->hasASuper)
             {
                 throw CantRename(
                     R"(Can't rename key because it override an item in prefab from parent entity)");

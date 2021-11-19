@@ -4,7 +4,7 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4464)
-#include "../Override.h"
+#include "Override.h"
 #include "include/EntityLibCore.h"
 #include "Scene.h"
 #pragma warning(pop)

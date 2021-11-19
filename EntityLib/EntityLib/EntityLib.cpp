@@ -692,8 +692,8 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
                 }
                 objInstanceOfFieldIndex = getFieldIndex(_data, *InstanceOfIter);
                 objInstanceOf =
-                    std::get<Object>(prefabNode->value)
-                        .instanceOf.makeOverridedInstanceOf(InstanceOfIter->get<std::string>());
+                    std::get<ObjectPtr>(prefabNode->value)
+                        ->instanceOf.makeOverridedInstanceOf(InstanceOfIter->get<std::string>());
             }
             else
             {
@@ -749,7 +749,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadObject(
         std::sort(begin(objNodes), end(objNodes), Ent::CompObject());
         Object object(
             &_nodeSchema, std::move(objNodes), objInstanceOf, objInstanceOfFieldIndex, objHasASuper);
-        auto result = newNode(std::move(object), &_nodeSchema);
+        auto result = newNode(std::make_unique<Object>(std::move(object)), &_nodeSchema);
         return result;
     }
 }
@@ -1015,7 +1015,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadArray(
         uint64_t defaultArraySize = _nodeSchema.linearItems->size();
         arr.arraySetSize(Ent::Override<uint64_t>(defaultArraySize, std::nullopt, std::nullopt));
     }
-    return newNode(std::move(arr), &_nodeSchema);
+    return newNode(std::make_unique<Array>(std::move(arr)), &_nodeSchema);
 }
 
 Ent::NodeUniquePtr Ent::EntityLib::loadUnion(
@@ -1081,7 +1081,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadUnion(
                 or &schemaTocheck.get() == superUnionDataWrapper->getSchema());
             auto dataNode = loadNode(schemaTocheck.get(), _data, superUnionDataWrapper, _default);
             Ent::Union un{this, &_nodeSchema, std::move(dataNode), size_t(subSchemaIndex)};
-            result = newNode(std::move(un), &_nodeSchema);
+            result = newNode(std::make_unique<Union>(std::move(un)), &_nodeSchema);
             typeFound = true;
         }
     }
@@ -1091,7 +1091,7 @@ Ent::NodeUniquePtr Ent::EntityLib::loadUnion(
             "Can't find type %s in schema %s", dataType.c_str(), _nodeSchema.name.c_str());
         NodeUniquePtr dataNode = loadNode(_nodeSchema.oneOf->front().get(), _data, nullptr, nullptr);
         Ent::Union un(this, &_nodeSchema, std::move(dataNode), 0);
-        result = newNode(std::move(un), &_nodeSchema);
+        result = newNode(std::make_unique<Union>(std::move(un)), &_nodeSchema);
     }
     return result;
 }
@@ -1196,7 +1196,7 @@ json Ent::EntityLib::dumpNode(
             }
         };
         std::vector<JsonField> fieldMap;
-        auto& internObj = std::get<Object>(_node.value);
+        auto& internObj = std::get<ObjectPtr>(_node.value);
         for (auto const& [name, sub] : _schema.properties)
         {
             Ent::Node const* subNode = _node.at(name.c_str());
@@ -1209,20 +1209,20 @@ json Ent::EntityLib::dumpNode(
                 if (_superKeyIsTypeName and name == "Super")
                 {
                     const auto* typeName = getRefTypeName(subNode->getTypeName());
-                    auto const fieldIdx = internObj.at(name.c_str()).fieldIdx;
+                    auto const fieldIdx = internObj->at(name.c_str()).fieldIdx;
                     fieldMap.emplace_back(typeName, std::move(subJson), fieldIdx);
                 }
                 else
                 {
-                    auto const fieldIdx = internObj.at(name.c_str()).fieldIdx;
+                    auto const fieldIdx = internObj->at(name.c_str()).fieldIdx;
                     fieldMap.emplace_back(name.c_str(), std::move(subJson), fieldIdx);
                 }
             }
         }
-        auto const& instanceOf = std::get<Ent::Object>(_node.value).instanceOf;
+        auto const& instanceOf = std::get<Ent::ObjectPtr>(_node.value)->instanceOf;
         if (_dumpedValueSource == OverrideValueSource::Override and instanceOf.isSet())
         {
-            fieldMap.emplace_back("InstanceOf", instanceOf.get(), internObj.instanceOfFieldIndex);
+            fieldMap.emplace_back("InstanceOf", instanceOf.get(), internObj->instanceOfFieldIndex);
         }
         std::sort(begin(fieldMap), end(fieldMap), [](JsonField const& a, JsonField const& b) {
             if (a.index != b.index)
@@ -1245,7 +1245,7 @@ json Ent::EntityLib::dumpNode(
         data = json::array();
         auto&& meta = std::get<Ent::Subschema::ArrayMeta>(_schema.meta);
         bool const fullWrite = meta.isMapItem;
-        auto const& arr = std::get<Ent::Array>(_node.value);
+        auto const& arr = *std::get<Ent::ArrayPtr>(_node.value);
         if (arr.hasKey())
         {
             for (auto& item : arr.getItemsWithRemoved())
@@ -1284,7 +1284,7 @@ json Ent::EntityLib::dumpNode(
                                 item->getSchema()->type == Ent::DataType::object
                                 and meta.keyField.has_value())
                             {
-                                if (std::get<Object>(item->GetRawValue()).hasASuper)
+                                if (std::get<ObjectPtr>(item->GetRawValue())->hasASuper)
                                 {
                                     json tmpNode;
                                     auto key = arr.getChildKey(item);
@@ -1354,7 +1354,7 @@ json Ent::EntityLib::dumpNode(
     {
         auto&& meta = std::get<Ent::Subschema::UnionMeta>(_schema.meta);
         data = json::object();
-        auto&& un = std::get<Union>(_node.GetRawValue());
+        auto&& un = *std::get<UnionPtr>(_node.GetRawValue());
         // If it has no indexField, it is a (Responsible)pointer type.
         // The default (first) type is not explicited by the coder, so it can change accidentally.
         // This is why it is better to always write the type. (And also Wild expect it)
@@ -1497,7 +1497,8 @@ std::unique_ptr<Ent::Entity> Ent::EntityLib::loadEntityFromJson(
     // ActorStates
     Ent::Subschema const& actorStatesSchema =
         AT(schema.schema.allDefinitions, Ent::actorStatesSchemaName);
-    auto ovActorStates = newNode(Ent::Array(this, &actorStatesSchema), &actorStatesSchema);
+    auto ovActorStates =
+        newNode(std::make_unique<Ent::Array>(this, &actorStatesSchema), &actorStatesSchema);
     if (_entNode.contains("ActorStates"))
     {
         ovActorStates =
@@ -2008,7 +2009,7 @@ void Ent::EntityLib::saveScene(Scene const& _scene, std::filesystem::path const&
         {},
         {},
         std::make_unique<SubSceneComponent>(this, false, 0, _scene.clone()),
-        newNode(Array{this, &actorStatesSchema}, &actorStatesSchema),
+        newNode(std::make_unique<Array>(this, &actorStatesSchema), &actorStatesSchema),
         Ent::makeDefaultColorField(*this),
         {thumbNailPath});
 

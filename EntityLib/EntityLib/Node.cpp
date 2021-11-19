@@ -60,9 +60,27 @@ namespace Ent
         return *this;
     }*/
 
+    Node::Value copyValue(Node::Value const& value)
+    {
+        return std::visit(
+            [](auto&& typedvalue) {
+                using Type = std::remove_const_t<std::remove_reference_t<decltype(typedvalue)>>;
+                if constexpr (std::is_same_v<Type, ArrayPtr> or std::is_same_v<Type, UnionPtr> or std::is_same_v<Type, ObjectPtr>)
+                {
+                    using EltType = typename Type::element_type;
+                    return Node::Value(std::make_unique<EltType>(*typedvalue));
+                }
+                else
+                {
+                    return Node::Value(typedvalue);
+                }
+            },
+            value);
+    }
+
     NodeUniquePtr Node::clone() const
     {
-        auto newNode = getEntityLib()->newNode(value, schema);
+        auto newNode = getEntityLib()->newNode(copyValue(value), schema);
         newNode->parentNode = parentNode;
         newNode->addedInInstance = addedInInstance;
         newNode->updateParents();
@@ -78,10 +96,10 @@ namespace Ent
                 if constexpr (
                     std::is_same_v<
                         NodeType,
-                        Object> or std::is_same_v<NodeType, Union> or std::is_same_v<NodeType, Array>)
+                        ObjectPtr> or std::is_same_v<NodeType, UnionPtr> or std::is_same_v<NodeType, ArrayPtr>)
                 {
                     // Call computeNodeRefToChild on any container type
-                    return _node.computeNodeRefToChild(_child);
+                    return _node->computeNodeRefToChild(_child);
                 }
                 else
                 {
@@ -308,9 +326,9 @@ namespace Ent
         Node const* parent = this;
         while (parent != nullptr)
         {
-            if (auto* obj = std::get_if<Object>(&parent->value))
+            if (auto* obj = std::get_if<ObjectPtr>(&parent->value))
             {
-                if (obj->instanceOf.hasOverride())
+                if ((*obj)->instanceOf.hasOverride())
                 {
                     break;
                 }
@@ -320,7 +338,7 @@ namespace Ent
         }
         if (parent != nullptr) // A prefab has been found
         {
-            auto* obj = std::get_if<Object>(&parent->value);
+            auto* obj = std::get_if<ObjectPtr>(&parent->value)->get();
             if (not obj->instanceOf.get().empty())
             {
                 auto prefab =
@@ -342,7 +360,7 @@ namespace Ent
         template <typename T>
         void operator()(T& _val) const
         {
-            _val.setParentNode(parent);
+            _val->setParentNode(parent);
         }
 
         template <typename T>
@@ -367,7 +385,7 @@ namespace Ent
         template <typename T>
         void operator()(T const& _val) const
         {
-            _val.checkParent(parent);
+            _val->checkParent(parent);
         }
 
         template <typename T>
@@ -411,9 +429,9 @@ namespace Ent
         {
             throw NullPointerArgument("_field", "Node::at");
         }
-        if (std::holds_alternative<Object>(value))
+        if (std::holds_alternative<ObjectPtr>(value))
         {
-            return &Ent::at(std::get<Object>(value), _field);
+            return &Ent::at(*std::get<ObjectPtr>(value), _field);
         }
         throw BadType();
     }
@@ -423,9 +441,9 @@ namespace Ent
         {
             throw NullPointerArgument("_field", "Node::at");
         }
-        if (std::holds_alternative<Object>(value))
+        if (std::holds_alternative<ObjectPtr>(value))
         {
-            return &Ent::at(std::get<Object>(value), _field);
+            return &Ent::at(*std::get<ObjectPtr>(value), _field);
         }
         throw BadType();
     }
@@ -435,92 +453,92 @@ namespace Ent
         {
             throw NullPointerArgument("_field", "Node::count");
         }
-        if (std::holds_alternative<Object>(value))
+        if (std::holds_alternative<ObjectPtr>(value))
         {
-            return Ent::count(std::get<Object>(value), _field) != 0;
+            return Ent::count(*std::get<ObjectPtr>(value), _field) != 0;
         }
         throw BadType();
     }
     Node* Node::at(size_t _index)
     {
-        if (std::holds_alternative<Array>(value))
+        if (std::holds_alternative<ArrayPtr>(value))
         {
-            return std::get<Array>(value).at(_index);
+            return std::get<ArrayPtr>(value)->at(_index);
         }
         throw BadType();
     }
     Node const* Node::at(size_t _index) const
     {
-        if (std::holds_alternative<Object>(value))
+        if (std::holds_alternative<ObjectPtr>(value))
         {
-            auto iter = begin(std::get<Object>(value));
+            auto iter = begin(*std::get<ObjectPtr>(value));
             std::advance(iter, _index);
             return &(*iter->node);
         }
-        if (std::holds_alternative<Array>(value))
+        if (std::holds_alternative<ArrayPtr>(value))
         {
-            return std::get<Array>(value).at(_index);
+            return std::get<ArrayPtr>(value)->at(_index);
         }
         throw BadType();
     }
     size_t Node::size() const
     {
-        if (std::holds_alternative<Array>(value))
+        if (std::holds_alternative<ArrayPtr>(value))
         {
-            return std::get<Array>(value).size();
+            return std::get<ArrayPtr>(value)->size();
         }
         throw BadType();
     }
 
     std::optional<size_t> Node::getRawSize(OverrideValueLocation _location) const
     {
-        if (std::holds_alternative<Array>(value))
+        if (std::holds_alternative<ArrayPtr>(value))
         {
-            return std::get<Array>(value).getRawSize(_location);
+            return std::get<ArrayPtr>(value)->getRawSize(_location);
         }
         throw BadType();
     }
 
     Node const* Node::getUnionDataWrapper() const
     {
-        if (std::holds_alternative<Union>(value))
+        if (std::holds_alternative<UnionPtr>(value))
         {
-            return std::get<Union>(value).wrapper.get();
+            return std::get<UnionPtr>(value)->wrapper.get();
         }
         throw BadType();
     }
 
     Node* Node::getUnionData()
     {
-        if (std::holds_alternative<Union>(value))
+        if (std::holds_alternative<UnionPtr>(value))
         {
-            return std::get<Union>(value).getUnionData();
+            return std::get<UnionPtr>(value)->getUnionData();
         }
         throw BadType();
     }
     Node const* Node::getUnionData() const
     {
-        if (std::holds_alternative<Union>(value))
+        if (std::holds_alternative<UnionPtr>(value))
         {
-            return std::get<Union>(value).getUnionData();
+            return std::get<UnionPtr>(value)->getUnionData();
         }
         throw BadType();
     }
 
     char const* Node::getUnionType() const
     {
-        if (std::holds_alternative<Union>(value))
+        if (std::holds_alternative<UnionPtr>(value))
         {
-            return std::get<Union>(value).getUnionType();
+            return std::get<UnionPtr>(value)->getUnionType();
         }
         throw BadType();
     }
 
     size_t Node::getUnionTypeIndex() const
     {
-        if (std::holds_alternative<Union>(value))
+        if (std::holds_alternative<UnionPtr>(value))
         {
-            return std::get<Union>(value).typeIndex;
+            return std::get<UnionPtr>(value)->typeIndex;
         }
         throw BadType();
     }
@@ -531,9 +549,9 @@ namespace Ent
         {
             throw NullPointerArgument("_type", "Node::setUnionType");
         }
-        if (std::holds_alternative<Union>(value))
+        if (std::holds_alternative<UnionPtr>(value))
         {
-            return std::get<Union>(value).setUnionType(_type);
+            return std::get<UnionPtr>(value)->setUnionType(_type);
         }
         throw BadType();
     }
@@ -618,6 +636,12 @@ namespace Ent
     struct UnSet
     {
         template <typename T>
+        void operator()(std::unique_ptr<T>& _nodeInternal) const
+        {
+            return _nodeInternal->unset();
+        }
+
+        template <typename T>
         void operator()(T& _nodeInternal) const
         {
             return _nodeInternal.unset();
@@ -660,6 +684,11 @@ namespace Ent
         Subschema const* schema;
 
         template <typename T>
+        bool operator()(std::unique_ptr<T> const& _ov) const
+        {
+            return _ov->hasDefaultValue();
+        }
+        template <typename T>
         bool operator()(T const& _ov) const
         {
             return _ov.hasDefaultValue();
@@ -679,6 +708,12 @@ namespace Ent
     struct Detach
     {
         Subschema const* schema;
+
+        template <typename T>
+        NodeUniquePtr operator()(std::unique_ptr<T> const& _ov) const
+        {
+            return schema->rootSchema->entityLib->newNode(std::make_unique<T>(_ov->detach()), schema);
+        }
 
         template <typename T>
         NodeUniquePtr operator()(T const& _ov) const
@@ -702,6 +737,13 @@ namespace Ent
         Subschema const* schema;
 
         template <typename T>
+        NodeUniquePtr operator()(std::unique_ptr<T> const& _ov) const
+        {
+            return schema->rootSchema->entityLib->newNode(
+                std::make_unique<T>(_ov->makeInstanceOf()), schema);
+        }
+
+        template <typename T>
         NodeUniquePtr operator()(T const& _ov) const
         {
             return schema->rootSchema->entityLib->newNode(_ov.makeInstanceOf(), schema);
@@ -721,6 +763,12 @@ namespace Ent
     struct HasOverride
     {
         Subschema const* schema;
+
+        template <typename T>
+        bool operator()(std::unique_ptr<T> const& _ov) const
+        {
+            return _ov->hasOverride();
+        }
 
         template <typename T>
         bool operator()(T const& _ov) const
@@ -748,6 +796,12 @@ namespace Ent
         Subschema const* schema;
 
         template <typename T>
+        bool operator()(std::unique_ptr<T> const& _ov) const
+        {
+            return _ov->hasPrefabValue();
+        }
+
+        template <typename T>
         bool operator()(T const& _ov) const
         {
             return _ov.hasPrefabValue();
@@ -773,10 +827,10 @@ namespace Ent
 
     std::vector<char const*> Node::getFieldNames() const
     {
-        if (std::holds_alternative<Object>(value))
+        if (std::holds_alternative<ObjectPtr>(value))
         {
             std::vector<char const*> fields;
-            for (auto&& f : std::get<Object>(value))
+            for (auto&& f : *std::get<ObjectPtr>(value))
             {
                 fields.push_back(f.name);
             }
@@ -787,10 +841,10 @@ namespace Ent
 
     std::map<char const*, Node const*> Node::getFields() const
     {
-        if (std::holds_alternative<Object>(value))
+        if (std::holds_alternative<ObjectPtr>(value))
         {
             std::map<char const*, Node const*> fieldMap;
-            for (auto&& f : std::get<Object>(value))
+            for (auto&& f : *std::get<ObjectPtr>(value))
             {
                 fieldMap.emplace(f.name, f.node.get());
             }
@@ -801,9 +855,9 @@ namespace Ent
 
     char const* Node::getInstanceOf() const
     {
-        if (std::holds_alternative<Object>(value))
+        if (std::holds_alternative<ObjectPtr>(value))
         {
-            auto const& instanceOf = std::get<Object>(value).instanceOf;
+            auto const& instanceOf = std::get<ObjectPtr>(value)->instanceOf;
             return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
         }
         throw BadType();
@@ -811,27 +865,27 @@ namespace Ent
 
     std::vector<Node const*> Node::getItems() const
     {
-        if (std::holds_alternative<Array>(value))
+        if (std::holds_alternative<ArrayPtr>(value))
         {
-            return std::get<Array>(value).getItems();
+            return std::as_const<Array>(*std::get<ArrayPtr>(value)).getItems();
         }
         throw BadType();
     }
 
     std::vector<Node*> Node::getItems()
     {
-        if (std::holds_alternative<Array>(value))
+        if (std::holds_alternative<ArrayPtr>(value))
         {
-            return std::get<Array>(value).getItems();
+            return std::get<ArrayPtr>(value)->getItems();
         }
         throw BadType();
     }
 
     Node* Node::push()
     {
-        if (std::holds_alternative<Array>(value))
+        if (std::holds_alternative<ArrayPtr>(value))
         {
-            auto& arr = std::get<Array>(value);
+            auto& arr = *std::get<ArrayPtr>(value);
             if (arr.hasKey())
             {
                 throw BadArrayType("Can't 'push' in a map or set. Use 'mapInsert'.");
@@ -845,9 +899,9 @@ namespace Ent
     }
     void Node::pop()
     {
-        if (std::holds_alternative<Array>(value))
+        if (std::holds_alternative<ArrayPtr>(value))
         {
-            auto&& arr = std::get<Array>(value);
+            auto&& arr = *std::get<ArrayPtr>(value);
             if (arr.hasKey())
             {
                 throw BadArrayType("Can't call 'pop' on map/set array");
@@ -866,9 +920,9 @@ namespace Ent
 
     void Node::clear()
     {
-        if (std::holds_alternative<Array>(value))
+        if (std::holds_alternative<ArrayPtr>(value))
         {
-            auto&& arr = std::get<Array>(value);
+            auto&& arr = *std::get<ArrayPtr>(value);
             if (arr.isTuple())
             {
                 throw BadArrayType("Can't call 'clear' on pair/tuple");
@@ -883,9 +937,9 @@ namespace Ent
 
     bool Node::empty() const
     {
-        if (std::holds_alternative<Array>(value))
+        if (std::holds_alternative<ArrayPtr>(value))
         {
-            return std::get<Array>(value).empty();
+            return std::get<ArrayPtr>(value)->empty();
         }
         throw BadType();
     }
@@ -897,11 +951,11 @@ namespace Ent
             throw NullPointerArgument("_key", "Node::mapErase");
         }
         checkMap("mapErase");
-        if (not std::get<Array>(value).canErase())
+        if (not std::get<ArrayPtr>(value)->canErase())
         {
             throw BadArrayType(format("Can call 'mapErase' only on map and set of union").c_str());
         }
-        return std::get<Array>(value).mapErase(_key);
+        return std::get<ArrayPtr>(value)->mapErase(_key);
     }
 
     Node* Node::mapGet(char const* _key)
@@ -911,7 +965,7 @@ namespace Ent
             throw NullPointerArgument("_key", "Node::mapGet");
         }
         checkMap("mapGet");
-        return std::get<Array>(value).mapGet(_key);
+        return std::get<ArrayPtr>(value)->mapGet(_key);
     }
     Node const* Node::mapGet(char const* _key) const
     {
@@ -920,28 +974,28 @@ namespace Ent
             throw NullPointerArgument("_key", "Node::mapGet");
         }
         checkMap("mapGet");
-        return std::get<Array>(value).mapGet(_key);
+        return std::get<ArrayPtr>(value)->mapGet(_key);
     }
     bool Node::mapErase(int64_t _key)
     {
         checkMap("mapErase");
-        return std::get<Array>(value).mapErase(_key);
+        return std::get<ArrayPtr>(value)->mapErase(_key);
     }
     Node* Node::mapGet(int64_t _key)
     {
         checkMap("mapGet");
-        return std::get<Array>(value).mapGet(_key);
+        return std::get<ArrayPtr>(value)->mapGet(_key);
     }
     Node const* Node::mapGet(int64_t _key) const
     {
         checkMap("mapGet");
-        return std::get<Array>(value).mapGet(_key);
+        return std::get<ArrayPtr>(value)->mapGet(_key);
     }
 
     Node* Node::mapInsert(int64_t _key)
     {
         checkMap("mapInsert");
-        Node* newNode = std::get<Array>(value).mapInsert(_key);
+        Node* newNode = std::get<ArrayPtr>(value)->mapInsert(_key);
         newNode->setParentNode(this);
         newNode->updateParents();
         return newNode;
@@ -954,7 +1008,7 @@ namespace Ent
             throw NullPointerArgument("_key", "Node::mapInsert");
         }
         checkMap("mapInsert");
-        Node* newNode = std::get<Array>(value).mapInsert(_key);
+        Node* newNode = std::get<ArrayPtr>(value)->mapInsert(_key);
         newNode->updateParents();
         return newNode;
     }
@@ -966,13 +1020,13 @@ namespace Ent
             throw NullPointerArgument("_key", "Node::mapInsert");
         }
         checkMap("mapInsert");
-        std::get<Array>(value).mapInsert(_key, std::move(_newNode));
+        std::get<ArrayPtr>(value)->mapInsert(_key, std::move(_newNode));
     }
 
     void Node::mapInsert(int64_t _key, NodeUniquePtr _newNode)
     {
         checkMap("mapInsert");
-        std::get<Array>(value).mapInsert(_key, std::move(_newNode));
+        std::get<ArrayPtr>(value)->mapInsert(_key, std::move(_newNode));
     }
 
     Node* Node::mapInsertInstanceOf(char const* _prefabPath)
@@ -983,8 +1037,8 @@ namespace Ent
         }
         checkMap("mapInsertInstanceOf");
         auto prefab = getEntityLib()->loadNodeReadOnly(**getSchema()->singularItems, _prefabPath);
-        Node* newNode =
-            std::get<Array>(value).mapInsert(std::get<Array>(value).getChildKey(prefab.get()));
+        Node* newNode = std::get<ArrayPtr>(value)->mapInsert(
+            std::get<ArrayPtr>(value)->getChildKey(prefab.get()));
         newNode->resetInstanceOf(_prefabPath);
         newNode->setParentNode(this);
         newNode->updateParents();
@@ -1002,7 +1056,7 @@ namespace Ent
             throw NullPointerArgument("_newkey", "Node::mapRename");
         }
         checkMap("mapGet");
-        auto newNode = std::get<Array>(value).mapRename(_key, _newkey);
+        auto newNode = std::get<ArrayPtr>(value)->mapRename(_key, _newkey);
         newNode->setParentNode(this);
         newNode->updateParents();
         return newNode;
@@ -1011,17 +1065,17 @@ namespace Ent
     Node* Node::mapRename(int64_t _key, int64_t _newkey)
     {
         checkMap("mapGet");
-        return std::get<Array>(value).mapRename(_key, _newkey);
+        return std::get<ArrayPtr>(value)->mapRename(_key, _newkey);
     }
 
     void Node::checkMap(char const* _calledMethod) const
     {
         ENTLIB_ASSERT(_calledMethod != nullptr);
-        if (not std::holds_alternative<Array>(value))
+        if (not std::holds_alternative<ArrayPtr>(value))
         {
             throw BadType();
         }
-        if (not std::get<Array>(value).hasKey())
+        if (not std::get<ArrayPtr>(value)->hasKey())
         {
             throw BadArrayType(format("Can call '%s' only on map/set", _calledMethod).c_str());
         }
@@ -1029,29 +1083,29 @@ namespace Ent
 
     bool Node::isMapOrSet() const
     {
-        if (not std::holds_alternative<Array>(value))
+        if (not std::holds_alternative<ArrayPtr>(value))
         {
             return false;
         }
-        return std::get<Array>(value).hasKey();
+        return std::get<ArrayPtr>(value)->hasKey();
     }
 
     DataType Node::getKeyType() const
     {
         checkMap("getKeyType");
-        return std::get<Array>(value).getKeyType();
+        return std::get<ArrayPtr>(value)->getKeyType();
     }
 
     std::vector<String> Node::getKeysString() const
     {
         checkMap("getKeysString");
-        return std::get<Array>(value).getKeysString();
+        return std::get<ArrayPtr>(value)->getKeysString();
     }
 
     std::vector<int64_t> Node::getKeysInt() const
     {
         checkMap("getMapKeysInt");
-        return std::get<Array>(value).getKeysInt();
+        return std::get<ArrayPtr>(value)->getKeysInt();
     }
 
     std::vector<NodeUniquePtr> Node::releaseAllElements()
@@ -1060,7 +1114,7 @@ namespace Ent
         {
             throw Ent::BadType("In releaseAllElements, an array is expeted");
         }
-        return std::get<Array>(value).releaseAllElements();
+        return std::get<ArrayPtr>(value)->releaseAllElements();
     }
 
     struct IsDefault
@@ -1219,6 +1273,13 @@ namespace Ent
     struct ComputeMem
     {
         MemoryProfiler& prof;
+
+        template <typename T>
+        void operator()(std::unique_ptr<T> const& _ov) const
+        {
+            return _ov->computeMemory(prof);
+        }
+
         template <typename T>
         void operator()(T const& _ov) const
         {
@@ -1242,21 +1303,21 @@ namespace Ent
 
     void Ent::Node::resetInstanceOf(char const* _prefabNodePath)
     {
-        if (not std::holds_alternative<Object>(value))
+        if (not std::holds_alternative<ObjectPtr>(value))
         {
             throw BadType();
         }
-        std::get<Object>(value).resetInstanceOf(_prefabNodePath);
-        std::get<Object>(value).setParentNode(this);
+        std::get<ObjectPtr>(value)->resetInstanceOf(_prefabNodePath);
+        std::get<ObjectPtr>(value)->setParentNode(this);
     }
 
     void Ent::Node::resetInstanceOf()
     {
-        if (not std::holds_alternative<Object>(value))
+        if (not std::holds_alternative<ObjectPtr>(value))
         {
             throw BadType();
         }
-        std::get<Object>(value).resetInstanceOf(nullptr);
+        std::get<ObjectPtr>(value)->resetInstanceOf(nullptr);
     }
 
     EntityLib* Ent::Node::getEntityLib() const
@@ -1268,6 +1329,12 @@ namespace Ent
     {
         Node::Value& dest;
         CopyMode copyMode;
+
+        template <typename T>
+        void operator()(std::unique_ptr<T> const& _value) const
+        {
+            _value->applyAllValues(*std::get<std::unique_ptr<T>>(dest), copyMode);
+        }
 
         template <typename T>
         void operator()(T const& _value) const
@@ -1282,9 +1349,9 @@ namespace Ent
 
     void Ent::Node::applyAllValues(Node& _dest, CopyMode _copyMode) const
     {
-        if (std::holds_alternative<Object>(value))
+        if (std::holds_alternative<ObjectPtr>(value))
         {
-            auto const& object = std::get<Object>(value);
+            auto const& object = *std::get<ObjectPtr>(value);
             if (object.instanceOf.isSet()) // 'this' has an InstanceOf
             {
                 if (_dest.getInstanceOf() == nullptr
@@ -1301,12 +1368,13 @@ namespace Ent
 
     void Ent::Node::applyAllValuesButPrefab(Node& _dest, CopyMode _copyMode) const
     {
-        if (not std::holds_alternative<Object>(value)
-            or not std::holds_alternative<Object>(_dest.value))
+        if (not std::holds_alternative<ObjectPtr>(value)
+            or not std::holds_alternative<ObjectPtr>(_dest.value))
         {
             throw BadType();
         }
-        std::get<Object>(value).applyAllValuesButPrefab(std::get<Object>(_dest.value), _copyMode);
+        std::get<ObjectPtr>(value)->applyAllValuesButPrefab(
+            *std::get<ObjectPtr>(_dest.value), _copyMode);
     }
 
     void Ent::Node::applyToPrefab()

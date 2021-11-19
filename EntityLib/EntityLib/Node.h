@@ -2,10 +2,10 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4464)
-#include "../Override.h"
-#include "../Array.h"
-#include "../Union.h"
-#include "../Object.h"
+#include "Override.h"
+#include "Array.h"
+#include "Union.h"
+#include "Object.h"
 #pragma warning(pop)
 
 #include "include/Schema.h"
@@ -60,11 +60,11 @@ namespace Ent
             Override<String>,
             Override<double>,
             Override<int64_t>,
-            Object,
-            Array,
+            ObjectPtr,
+            ArrayPtr,
             Override<bool>,
             Override<EntityRef>,
-            Union>;
+            UnionPtr>;
         Node(Value _val, Subschema const* _schema);
 
         /// @brief return the node containing the data and the type nodes (An element of the oneOf array)

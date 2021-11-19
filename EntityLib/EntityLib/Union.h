@@ -61,4 +61,5 @@ namespace Ent
     private:
         Node* resetUnionTypeWithoutOverride(char const* _type);
     };
+    using UnionPtr = std::unique_ptr<Union>;
 } // namespace Ent

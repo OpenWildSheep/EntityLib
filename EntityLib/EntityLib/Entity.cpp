@@ -47,7 +47,8 @@ namespace Ent
     {
         Ent::Subschema const& actorStatesSchema =
             AT(_entlib.schema.schema.allDefinitions, actorStatesSchemaName);
-        return _entlib.newNode(Array{&_entlib, &actorStatesSchema}, &actorStatesSchema);
+        return _entlib.newNode(
+            std::make_unique<Array>(&_entlib, &actorStatesSchema), &actorStatesSchema);
     }
 
     NodeUniquePtr makeDefaultColorField(EntityLib const& _entlib);

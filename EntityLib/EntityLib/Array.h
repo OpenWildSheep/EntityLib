@@ -85,9 +85,9 @@ namespace Ent
 
         std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
 
-        Ent::Map::KeyType getChildKey(Ent::Node const* _child) const;
+        Map::KeyType getChildKey(Node const* _child) const;
 
-        Ent::DataType getKeyType() const;
+        DataType getKeyType() const;
 
         void unset(); ///< Unset recursively all values overriden in instance (return to prefab values)
 
@@ -149,40 +149,40 @@ namespace Ent
         return std::visit([_location](auto& a) { return a.getRawSize(_location); }, m_data);
     }
 
-    inline void Ent::Array::unset()
+    inline void Array::unset()
     {
         std::visit([&](auto& a) { a.unset(); }, m_data);
     }
 
-    inline void Ent::Array::setParentNode(Node* _parent)
+    inline void Array::setParentNode(Node* _parent)
     {
         std::visit([&](auto& a) { a.setParentNode(_parent); }, m_data);
     }
 
-    inline void Ent::Array::checkParent(Node const* _parent) const
+    inline void Array::checkParent(Node const* _parent) const
     {
         std::visit([&](auto& a) { a.checkParent(_parent); }, m_data);
     }
 
-    inline std::vector<String> Ent::Array::getKeysString() const
+    inline std::vector<String> Array::getKeysString() const
     {
         ENTLIB_ASSERT_MSG(
             std::holds_alternative<Map>(m_data), "Can only getKeysString on map or set");
         return std::get<Map>(m_data).getKeysString();
     }
 
-    inline std::vector<int64_t> Ent::Array::getKeysInt() const
+    inline std::vector<int64_t> Array::getKeysInt() const
     {
         ENTLIB_ASSERT_MSG(std::holds_alternative<Map>(m_data), "Can only getKeysInt on map or set");
         return std::get<Map>(m_data).getKeysInt();
     }
 
-    inline std::vector<NodeUniquePtr> Ent::Array::releaseAllElements()
+    inline std::vector<NodeUniquePtr> Array::releaseAllElements()
     {
         return std::visit([&](auto& a) { return a.releaseAllElements(); }, m_data);
     }
 
-    inline NodeRef Ent::Array::computeNodeRefToChild(Node const* _child) const
+    inline NodeRef Array::computeNodeRefToChild(Node const* _child) const
     {
         return std::visit([_child](auto& a) { return a.computeNodeRefToChild(_child); }, m_data);
     }

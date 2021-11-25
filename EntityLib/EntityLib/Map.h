@@ -64,12 +64,12 @@ namespace Ent
         bool erase(KeyType const& _key);
         Node const* get(KeyType const& _key) const;
         Node* get(KeyType const& _key);
-        Ent::Node* insert(KeyType const& _key);
+        Node* insert(KeyType const& _key);
         void insert(KeyType const& _key, NodeUniquePtr _newNode);
         bool isErased(KeyType const& _key) const;
-        Ent::Node*
+        Node*
         insert(OverrideValueLocation _loc, KeyType _key, NodeUniquePtr _node, bool _addedInInstance);
-        Ent::Node* rename(KeyType const& _key, KeyType const& _newKey);
+        Node* rename(KeyType const& _key, KeyType const& _newKey);
         void checkInvariants() const;
         std::vector<Node const*> getItemsWithRemoved() const;
         std::vector<Node const*> getItems() const;
@@ -79,7 +79,7 @@ namespace Ent
         Map detach() const;
         Map makeInstanceOf() const;
         std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
-        static KeyType getChildKey(Subschema const* _schema, Ent::Node const* _child);
+        static KeyType getChildKey(Subschema const* _schema, Node const* _child);
         static DataType getKeyType(Subschema const* _schema);
         void unset();
         void applyAllValues(Map& _dest, CopyMode _copyMode) const;

@@ -33,7 +33,7 @@ namespace Ent
         maxActivationLevel.computeMemory(prof);
     }
 
-    void Ent::Entity::changeInstanceOf(char const* _newPrefab)
+    void Entity::changeInstanceOf(char const* _newPrefab)
     {
         const auto cloned = clone();
         resetInstanceOf(_newPrefab);
@@ -45,7 +45,7 @@ namespace Ent
 
     static NodeUniquePtr makeDefaultActorStatesField(EntityLib const& _entlib)
     {
-        Ent::Subschema const& actorStatesSchema =
+        Subschema const& actorStatesSchema =
             AT(_entlib.schema.schema.allDefinitions, actorStatesSchemaName);
         return _entlib.newNode(
             std::make_unique<Array>(&_entlib, &actorStatesSchema), &actorStatesSchema);
@@ -56,11 +56,11 @@ namespace Ent
     Entity::Entity(EntityLib const& _entlib, char const* _name)
         : entlib(&_entlib)
         , name(std::string())
-        , actorStates(Ent::makeDefaultActorStatesField(_entlib))
-        , color(Ent::makeDefaultColorField(_entlib))
+        , actorStates(makeDefaultActorStatesField(_entlib))
+        , color(makeDefaultColorField(_entlib))
         , thumbnail(std::string())
         , instanceOf(std::string())
-        , maxActivationLevel(Ent::ActivationLevel::Started)
+        , maxActivationLevel(ActivationLevel::Started)
     {
         if (_name != nullptr)
         {
@@ -78,7 +78,7 @@ namespace Ent
         NodeUniquePtr _color,
         Override<String> _thumbnail,
         Override<String> _instanceOf,
-        Override<Ent::ActivationLevel> _maxActivationLevel,
+        Override<ActivationLevel> _maxActivationLevel,
         bool _hasASuper)
         : entlib(&_entlib)
         , name(std::move(_name))
@@ -130,7 +130,7 @@ namespace Ent
     {
         return name.get().c_str();
     }
-    void Entity::setName(Ent::String _name)
+    void Entity::setName(String _name)
     {
         if (name.get() == _name)
         {
@@ -194,7 +194,7 @@ namespace Ent
     {
         return thumbnail.isDefault() ? nullptr : thumbnail.get().c_str();
     }
-    void Entity::setThumbnail(Ent::String _thumbPath)
+    void Entity::setThumbnail(String _thumbPath)
     {
         thumbnail.set(std::move(_thumbPath));
     }
@@ -228,7 +228,7 @@ namespace Ent
                 addComponent(dep.c_str());
             }
         }
-        Ent::Subschema const& compSchema = *AT(entlib->schema.components, _type);
+        Subschema const& compSchema = *AT(entlib->schema.components, _type);
         auto comp = std::make_unique<Component>(
             false, _type, entlib->loadNode(compSchema, json(), nullptr), 1, components.size());
         removedComponents.erase(_type);
@@ -379,11 +379,11 @@ namespace Ent
 
     void Entity::resetInstanceOf(char const* _prefab)
     {
-        std::shared_ptr<Ent::Entity const> templ;
+        std::shared_ptr<Entity const> templ;
         std::string prefab;
         if (_prefab == nullptr or strlen(_prefab) == 0)
         {
-            templ = std::make_shared<Ent::Entity const>(*entlib, nullptr);
+            templ = std::make_shared<Entity const>(*entlib, nullptr);
         }
         else
         {
@@ -567,28 +567,28 @@ namespace Ent
         }
     }
 
-    static char const* getActivationLevelString(Ent::ActivationLevel _level)
+    static char const* getActivationLevelString(ActivationLevel _level)
     {
-        if (_level == Ent::ActivationLevel::Created)
+        if (_level == ActivationLevel::Created)
         {
             return "Created";
         }
-        if (_level == Ent::ActivationLevel::Started)
+        if (_level == ActivationLevel::Started)
         {
             return "Started";
         }
-        if (_level == Ent::ActivationLevel::Loading)
+        if (_level == ActivationLevel::Loading)
         {
             return "Loading";
         }
-        if (_level == Ent::ActivationLevel::InWorld)
+        if (_level == ActivationLevel::InWorld)
         {
             return "InWorld";
         }
         return "Started";
     }
 
-    nlohmann::json Ent::Entity::saveEntity() const
+    nlohmann::json Entity::saveEntity() const
     {
         ComponentsSchema const& _schema = entlib->schema;
         json entNode;
@@ -681,7 +681,7 @@ namespace Ent
         return entNode;
     }
 
-    void Ent::Entity::applyToPrefab()
+    void Entity::applyToPrefab()
     {
         if (getInstanceOf() == nullptr)
         {
@@ -703,13 +703,13 @@ namespace Ent
         name = instanceName;
     }
 
-    void Ent::Entity::applyAllValues(Entity& _dest, CopyMode _copyMode) const
+    void Entity::applyAllValues(Entity& _dest, CopyMode _copyMode) const
     {
         applyInstanceOfField(*this, _dest, _copyMode);
         applyAllValuesButPrefab(_dest, _copyMode);
     }
 
-    void Ent::Entity::applyAllValuesButPrefab(Entity& _dest, CopyMode _copyMode) const
+    void Entity::applyAllValuesButPrefab(Entity& _dest, CopyMode _copyMode) const
     {
         name.applyAllValues(_dest.name, _copyMode);
         thumbnail.applyAllValues(_dest.thumbnail, _copyMode);
@@ -745,7 +745,7 @@ namespace Ent
         }
     }
 
-    std::unique_ptr<Ent::Entity> Ent::Entity::detachEntityFromPrefab() const
+    std::unique_ptr<Entity> Entity::detachEntityFromPrefab() const
     {
         std::map<std::string, std::unique_ptr<Component>> detComponents;
         size_t cmpIndex = 0;
@@ -761,7 +761,7 @@ namespace Ent
         if (SubSceneComponent const* subscene = getSubSceneComponent())
         {
             detSubSceneComponent = std::make_unique<SubSceneComponent>(entlib, false);
-            detSubSceneComponent->embedded = std::make_unique<Ent::Scene>(entlib);
+            detSubSceneComponent->embedded = std::make_unique<Scene>(entlib);
             for (auto const& subEntity : subscene->embedded->getObjects())
             {
                 detSubSceneComponent->embedded->addEntity(subEntity->detachEntityFromPrefab());
@@ -770,7 +770,7 @@ namespace Ent
 
         auto detachedColor = getColorValue().detach();
         auto detachedMaxActivationLevel = getMaxActivationLevelValue().detach();
-        return std::make_unique<Ent::Entity>(
+        return std::make_unique<Entity>(
             *entlib,
             getNameValue().detach().makeOverridedInstanceOf(std::string(getName()) + "_detached"),
             std::move(detComponents),

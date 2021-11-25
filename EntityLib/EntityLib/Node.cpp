@@ -122,25 +122,25 @@ namespace Ent
 
     static bool isUnionSet(Node const* node)
     {
-        if (node == nullptr or node->getDataType() != Ent::DataType::array)
+        if (node == nullptr or node->getDataType() != DataType::array)
         {
             return false;
         }
         auto const* schema = node->getSchema();
-        return std::get<Ent::Subschema::ArrayMeta>(schema->meta).overridePolicy == "set"
-               and schema->singularItems->get().type == Ent::DataType::oneOf;
+        return std::get<Subschema::ArrayMeta>(schema->meta).overridePolicy == "set"
+               and schema->singularItems->get().type == DataType::oneOf;
     }
 
     static bool isUnion(Node const* node)
     {
-        return node != nullptr and node->getDataType() == Ent::DataType::oneOf;
+        return node != nullptr and node->getDataType() == DataType::oneOf;
     }
 
     static bool isMap(Node const* node)
     {
-        if (node != nullptr and node->getDataType() == Ent::DataType::array)
+        if (node != nullptr and node->getDataType() == DataType::array)
         {
-            auto const& meta = std::get<Ent::Subschema::ArrayMeta>(node->getSchema()->meta);
+            auto const& meta = std::get<Subschema::ArrayMeta>(node->getSchema()->meta);
             return meta.overridePolicy == "map";
         }
         else
@@ -252,12 +252,12 @@ namespace Ent
             ENTLIB_ASSERT(not token.empty());
             switch (current->getDataType())
             {
-            case Ent::DataType::object:
+            case DataType::object:
             {
                 current = current->at(token.c_str());
                 break;
             }
-            case Ent::DataType::oneOf:
+            case DataType::oneOf:
             {
                 if (token != current->getUnionType())
                 {
@@ -266,16 +266,16 @@ namespace Ent
                 current = current->getUnionData();
                 break;
             }
-            case Ent::DataType::array:
+            case DataType::array:
             {
                 if (current->isMapOrSet())
                 {
-                    if (current->getSchema()->singularItems->get().type == Ent::DataType::oneOf)
+                    if (current->getSchema()->singularItems->get().type == DataType::oneOf)
                     {
                         // current is UnionSet
                         current = current->mapGet(token.c_str())->getUnionData();
                     }
-                    else if (current->getKeyType() == Ent::DataType::integer)
+                    else if (current->getKeyType() == DataType::integer)
                     {
                         // current is any other map/set kind, with an integer key
                         auto const key = atoi(token.c_str());
@@ -295,13 +295,13 @@ namespace Ent
                 }
                 break;
             }
-            case Ent::DataType::null: [[fallthrough]];
-            case Ent::DataType::boolean: [[fallthrough]];
-            case Ent::DataType::entityRef: [[fallthrough]];
-            case Ent::DataType::integer: [[fallthrough]];
-            case Ent::DataType::number: [[fallthrough]];
-            case Ent::DataType::string: [[fallthrough]];
-            case Ent::DataType::COUNT: [[fallthrough]];
+            case DataType::null: [[fallthrough]];
+            case DataType::boolean: [[fallthrough]];
+            case DataType::entityRef: [[fallthrough]];
+            case DataType::integer: [[fallthrough]];
+            case DataType::number: [[fallthrough]];
+            case DataType::string: [[fallthrough]];
+            case DataType::COUNT: [[fallthrough]];
             default: ENTLIB_LOGIC_ERROR("Unexpected DataType in Node::resolveNodeRef");
             }
         }
@@ -1112,7 +1112,7 @@ namespace Ent
     {
         if (getDataType() != DataType::array)
         {
-            throw Ent::BadType("In releaseAllElements, an array is expeted");
+            throw BadType("In releaseAllElements, an array is expeted");
         }
         return std::get<ArrayPtr>(value)->releaseAllElements();
     }
@@ -1158,7 +1158,7 @@ namespace Ent
     {
         if (getDataType() != DataType::object)
         {
-            throw Ent::BadType("In saveNode, an object is expeted");
+            throw BadType("In saveNode, an object is expeted");
         }
         json node = toJson();
         constexpr char const* schemaFormat = "wildschema:/all/%s.json";
@@ -1296,12 +1296,12 @@ namespace Ent
         std::visit(ComputeMem{prof}, value);
     }
 
-    void Ent::Node::setInstanceOf(char const* _prefabNodePath)
+    void Node::setInstanceOf(char const* _prefabNodePath)
     {
         resetInstanceOf(_prefabNodePath);
     }
 
-    void Ent::Node::resetInstanceOf(char const* _prefabNodePath)
+    void Node::resetInstanceOf(char const* _prefabNodePath)
     {
         if (not std::holds_alternative<ObjectPtr>(value))
         {
@@ -1311,7 +1311,7 @@ namespace Ent
         std::get<ObjectPtr>(value)->setParentNode(this);
     }
 
-    void Ent::Node::resetInstanceOf()
+    void Node::resetInstanceOf()
     {
         if (not std::holds_alternative<ObjectPtr>(value))
         {
@@ -1320,7 +1320,7 @@ namespace Ent
         std::get<ObjectPtr>(value)->resetInstanceOf(nullptr);
     }
 
-    EntityLib* Ent::Node::getEntityLib() const
+    EntityLib* Node::getEntityLib() const
     {
         return schema->rootSchema->entityLib;
     }
@@ -1347,7 +1347,7 @@ namespace Ent
         }
     };
 
-    void Ent::Node::applyAllValues(Node& _dest, CopyMode _copyMode) const
+    void Node::applyAllValues(Node& _dest, CopyMode _copyMode) const
     {
         if (std::holds_alternative<ObjectPtr>(value))
         {
@@ -1366,7 +1366,7 @@ namespace Ent
         std::visit(ApplyToPrefab{_dest.value, _copyMode}, value);
     }
 
-    void Ent::Node::applyAllValuesButPrefab(Node& _dest, CopyMode _copyMode) const
+    void Node::applyAllValuesButPrefab(Node& _dest, CopyMode _copyMode) const
     {
         if (not std::holds_alternative<ObjectPtr>(value)
             or not std::holds_alternative<ObjectPtr>(_dest.value))
@@ -1377,11 +1377,11 @@ namespace Ent
             *std::get<ObjectPtr>(_dest.value), _copyMode);
     }
 
-    void Ent::Node::applyToPrefab()
+    void Node::applyToPrefab()
     {
         if (getInstanceOf() == nullptr)
         {
-            throw ContextException("Called Ent::Node::applyToPrefab an a Node without prefab");
+            throw ContextException("Called Node::applyToPrefab an a Node without prefab");
         }
 
         auto* prefabPath = getInstanceOf();
@@ -1396,18 +1396,18 @@ namespace Ent
                 continue;
             }
 
-            if (prop->type == Ent::DataType::string)
+            if (prop->type == DataType::string)
             {
                 prefabsKeys.emplace(fieldName, prefab->at(fieldName.c_str())->getString());
                 instanceKeys.emplace(fieldName, at(fieldName.c_str())->getString());
             }
-            else if (prop->type == Ent::DataType::entityRef)
+            else if (prop->type == DataType::entityRef)
             {
                 prefabsKeys.emplace(
                     fieldName, prefab->at(fieldName.c_str())->getEntityRef().entityPath);
                 instanceKeys.emplace(fieldName, at(fieldName.c_str())->getEntityRef().entityPath);
             }
-            else if (prop->type == Ent::DataType::integer)
+            else if (prop->type == DataType::integer)
             {
                 prefabsKeys.emplace(fieldName, prefab->at(fieldName.c_str())->getInt());
                 instanceKeys.emplace(fieldName, at(fieldName.c_str())->getInt());
@@ -1421,7 +1421,7 @@ namespace Ent
         // When the value is overridden is the source, we want to make it overridden in the dest => CopyOverride
         applyAllValuesButPrefab(*prefab, CopyMode::CopyOverride);
 
-        auto setToNode = [](Ent::Subschema const& prop,
+        auto setToNode = [](Subschema const& prop,
                             Node& node,
                             String const& fieldName,
                             std::map<std::string, Map::KeyType> const& keys) {
@@ -1429,17 +1429,17 @@ namespace Ent
             {
                 return;
             }
-            if (prop.type == Ent::DataType::string)
+            if (prop.type == DataType::string)
             {
                 node.at(fieldName.c_str())
                     ->setString(std::get<String>(keys.at(fieldName.c_str())).c_str());
             }
-            else if (prop.type == Ent::DataType::entityRef)
+            else if (prop.type == DataType::entityRef)
             {
                 node.at(fieldName.c_str())
                     ->setEntityRef(EntityRef{std::get<String>(keys.at(fieldName.c_str()))});
             }
-            else if (prop.type == Ent::DataType::integer)
+            else if (prop.type == DataType::integer)
             {
                 node.at(fieldName.c_str())->setInt(std::get<int64_t>(keys.at(fieldName.c_str())));
             }
@@ -1462,7 +1462,7 @@ namespace Ent
         }
     }
 
-    void Ent::Node::changeInstanceOf(char const* _newPrefab)
+    void Node::changeInstanceOf(char const* _newPrefab)
     {
         auto cloned = clone();
         resetInstanceOf(_newPrefab);

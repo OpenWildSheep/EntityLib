@@ -474,8 +474,7 @@ namespace Ent
     struct UnknownSchema : ContextException
     {
         UnknownSchema(char const* rootPath, char const* filenameName)
-            : ContextException(
-                "Can't find schema of file %s", Ent::formatPath(rootPath, filenameName))
+            : ContextException("Can't find schema of file %s", formatPath(rootPath, filenameName))
         {
         }
     };

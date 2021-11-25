@@ -6,10 +6,10 @@
 #include "external/json.hpp"
 #pragma warning(pop)
 
-nlohmann::json loadJsonFile(std::filesystem::path const& _root, std::filesystem::path const& _rel);
-
 namespace Ent
 {
+    nlohmann::json loadJsonFile(std::filesystem::path const& _root, std::filesystem::path const& _rel);
+
     /// @cond PRIVATE
     /// @brief Given a link to a definition, get the name of the definition.
     ///

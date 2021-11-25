@@ -60,8 +60,8 @@ namespace Ent
             InitBuffSize,
             R"msg(%s - %s : %s)msg",
             _msg.c_str(),
-            Ent::convertANSIToUTF8(_error.message()).c_str(),
-            Ent::formatPath(_rootPath, _relPath));
+            convertANSIToUTF8(_error.message()).c_str(),
+            formatPath(_rootPath, _relPath));
         return buffer;
     }
 

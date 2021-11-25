@@ -163,17 +163,17 @@ namespace Ent
         return wrapper->hasPrefabValue();
     }
 
-    void Ent::Union::setParentNode(Node* _parentNode)
+    void Union::setParentNode(Node* _parentNode)
     {
         wrapper->setParentNode(_parentNode);
     }
 
-    void Ent::Union::checkParent(Node const* _parentNode) const
+    void Union::checkParent(Node const* _parentNode) const
     {
         wrapper->checkParent(_parentNode);
     }
 
-    std::unique_ptr<Union> Ent::Union::clone() const
+    std::unique_ptr<Union> Union::clone() const
     {
         return std::make_unique<Union>(entityLib, schema, wrapper->clone(), typeIndex);
     }

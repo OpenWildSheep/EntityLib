@@ -80,7 +80,7 @@ namespace Ent
         {
             throw EmptyKey("Entity without name in Scene::addEntity!");
         }
-        return addEntity(std::make_unique<Ent::Entity>(*entlib, name));
+        return addEntity(std::make_unique<Entity>(*entlib, name));
     }
 
     Entity* Scene::getEntity(size_t index)
@@ -126,7 +126,7 @@ namespace Ent
             auto ent = iter->second.value->clone(); // Avoid to let the value to nullptr
             objects.erase(_currentName);
             ent->_setNameRaw(_newName);
-            objects.emplace(_newName, std::move(ent), Ent::OverrideValueLocation::Override);
+            objects.emplace(_newName, std::move(ent), OverrideValueLocation::Override);
         }
         else
         {
@@ -264,9 +264,9 @@ namespace Ent
     }
 
     std::unique_ptr<Scene>
-    Scene::loadScene(Ent::EntityLib const& _entLib, json const& _entities, Ent::Scene const* _super)
+    Scene::loadScene(EntityLib const& _entLib, json const& _entities, Scene const* _super)
     {
-        auto scene = std::make_unique<Ent::Scene>(&_entLib);
+        auto scene = std::make_unique<Scene>(&_entLib);
 
         // Add all entities from super scene ...
         std::set<std::string> entFromSuper;
@@ -288,9 +288,9 @@ namespace Ent
                 }
                 bool const removed =
                     instEntNode != nullptr and instEntNode->count("__removed__") != 0;
-                std::unique_ptr<Ent::Entity> ent =
-                    (instEntNode == nullptr) ? superEnt->makeInstanceOf() :
-                                               _entLib.loadEntityFromJson(*instEntNode, superEnt);
+                std::unique_ptr<Entity> ent = (instEntNode == nullptr) ?
+                                                  superEnt->makeInstanceOf() :
+                                                  _entLib.loadEntityFromJson(*instEntNode, superEnt);
                 auto entName = ent->getName();
 
                 ent->setCanBeRenamed(false);
@@ -314,7 +314,7 @@ namespace Ent
             {
                 continue;
             }
-            std::unique_ptr<Ent::Entity> ent = _entLib.loadEntityFromJson(entNode, nullptr);
+            std::unique_ptr<Entity> ent = _entLib.loadEntityFromJson(entNode, nullptr);
             ENTLIB_ASSERT(ent != nullptr);
             scene->addEntity(std::move(ent));
         }
@@ -322,7 +322,7 @@ namespace Ent
         return scene;
     }
 
-    json Ent::Scene::saveScene() const
+    json Scene::saveScene() const
     {
         json document;
 

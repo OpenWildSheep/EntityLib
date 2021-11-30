@@ -182,7 +182,10 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
             instSchema["properties"]["$schema"]["type"] = "string";
             instSchema["properties"]["InstanceOf"]["type"] = "string";
         }
-        instSchema["additionalProperties"] = false;
+        if (tmplSchema.type == DataType::object)
+        {
+            instSchema["additionalProperties"] = false;
+        }
         return instSchema;
     }
 

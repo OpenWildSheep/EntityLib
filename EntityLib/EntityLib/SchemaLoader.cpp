@@ -54,6 +54,16 @@ namespace Ent
                 vis.setRefDefaultValue(def);
             }
 
+            if (auto titleIter = _data.find("title"); titleIter != _data.end())
+            {
+                vis.setRefTitle(titleIter->get_ref<json::string_t const&>());
+            }
+
+            if (auto descrIter = _data.find("description"); descrIter != _data.end())
+            {
+                vis.setRefDescription(descrIter->get_ref<json::string_t const&>());
+            }
+
             if (parsedRef.count(absRef) != 0) // Was already parsed
             {
                 vis.closeRef();
@@ -526,6 +536,17 @@ namespace Ent
             {
                 CHECK_WHOLE_STACK;
                 std::get<SubschemaRef::Ref>(stack.back()->subSchemaOrRef).defaultValue =
+                    std::move(val);
+            }
+            void setRefTitle(std::string val) override
+            {
+                CHECK_WHOLE_STACK;
+                std::get<SubschemaRef::Ref>(stack.back()->subSchemaOrRef).title = std::move(val);
+            }
+            void setRefDescription(std::string val) override
+            {
+                CHECK_WHOLE_STACK;
+                std::get<SubschemaRef::Ref>(stack.back()->subSchemaOrRef).description =
                     std::move(val);
             }
             void setLinearItem(size_t size) override

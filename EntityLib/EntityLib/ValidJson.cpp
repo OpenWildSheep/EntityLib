@@ -71,8 +71,19 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
         if (std::holds_alternative<SubschemaRef::Ref>(tmplSchemaRef.subSchemaOrRef))
         {
             json instSchema;
-            std::string link = std::get<SubschemaRef::Ref>(tmplSchemaRef.subSchemaOrRef).ref;
-            instSchema.emplace("$ref", "#/definitions/" + convertLink(link));
+            auto&& ref = std::get<SubschemaRef::Ref>(tmplSchemaRef.subSchemaOrRef);
+            instSchema.emplace("$ref", "#/definitions/" + convertLink(ref.ref));
+            // Some fields are reference to other types ($ref)
+            // but they are allowed to contains a title and a description
+            // which override the linked type values.
+            if (not ref.title.empty())
+            {
+                instSchema["title"] = ref.title;
+            }
+            if (not ref.description.empty())
+            {
+                instSchema["description"] = ref.description;
+            }
             return instSchema;
         }
         return convertToInstanceSchema(*tmplSchemaRef, oneOfDataField);
@@ -185,6 +196,14 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
         if (tmplSchema.type == DataType::object)
         {
             instSchema["additionalProperties"] = false;
+        }
+        if (not tmplSchema.title.empty())
+        {
+            instSchema["title"] = tmplSchema.title;
+        }
+        if (not tmplSchema.description.empty())
+        {
+            instSchema["description"] = tmplSchema.description;
         }
         return instSchema;
     }

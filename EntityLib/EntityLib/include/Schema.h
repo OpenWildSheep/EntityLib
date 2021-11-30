@@ -185,6 +185,8 @@ namespace Ent
             Schema* schema; //!< Schema of the referenced object
             std::string ref; //!< Name of the referenced object
             DefaultValue defaultValue; ///< Additional default values (beside a "$ref")
+            std::string title;
+            std::string description;
         };
 
         std::variant<Null, Ref, Subschema> subSchemaOrRef;

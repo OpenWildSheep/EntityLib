@@ -1,4 +1,5 @@
 from . import AABB
+from . import BlendShape
 from . import BlendShapeData
 from . import BoneData
 from . import BoneMatrix
@@ -27,6 +28,7 @@ from . import Skl
 from . import SourceFileInf
 from . import Stamp
 from . import StampCloud
+from . import TargetShape
 from . import Thumb
 from . import TSO
 from . import UInt3

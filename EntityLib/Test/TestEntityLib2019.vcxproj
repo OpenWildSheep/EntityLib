@@ -85,7 +85,7 @@
       <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>ENTLIB_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -96,6 +96,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -112,6 +113,13 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4324;4251;4996;4625;4626;4820;4710;4711;4571;4514;4774</DisableSpecificWarnings>
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4324;4251;4996;4625;4626;4820;4710;4711;4571;4514;4774</DisableSpecificWarnings>
     </ClCompile>
+    <ClCompile Include="TestNodeHandler.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\external\mapbox\NATVIS\Variant.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TestNodeHandler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

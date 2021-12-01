@@ -101,7 +101,15 @@ namespace Ent
                 for (auto const& token :
                      splitString(objectPath.string(), std::filesystem::path::preferred_separator))
                 {
-                    node = &((*node).at(token));
+                    if (auto iter = node->find(token.c_str()); iter != node->end())
+                    {
+                        node = &(*iter);
+                        ENTLIB_ASSERT(node->is_object());
+                    }
+                    else
+                    {
+                        ENTLIB_LOGIC_ERROR("Schema error");
+                    }
                 }
                 parseSchemaNoRef(fileName, *refRoot, *node, vis, depth);
             }
@@ -134,6 +142,10 @@ namespace Ent
     {
         const auto setBaseMetas = [&](Subschema::BaseMeta* _meta)
         {
+            if (_data.is_null())
+            {
+                return;
+            }
             if (_data.count("editor") != 0u)
             {
                 _meta->usedInEditor = _data["editor"].get<bool>();
@@ -150,6 +162,10 @@ namespace Ent
 
         const auto setNumberMetas = [&](Subschema::NumberMeta& _meta)
         {
+            if (_data.is_null())
+            {
+                return;
+            }
             if (_data.count("bitdepth") != 0u)
             {
                 _meta.bitDepth = _data["bitdepth"].get<uint32_t>();
@@ -161,6 +177,10 @@ namespace Ent
         };
         const auto setUnionMetas = [&](Subschema::UnionMeta& _meta)
         {
+            if (_data.is_null())
+            {
+                return;
+            }
             if (_data.count("unionDataField") != 0u)
             {
                 _meta.dataField = _data["unionDataField"].get<std::string>();
@@ -176,8 +196,14 @@ namespace Ent
         };
         const auto setArrayMetas = [&](Subschema::ArrayMeta& _meta)
         {
-            _meta.overridePolicy = _data.value("overridePolicy", "");
-            _meta.ordered = _data.value("ordered", true);
+            if (_data.is_null())
+            {
+                return;
+            }
+            auto ovPol = _data.find("overridePolicy");
+            _meta.overridePolicy = ovPol != _data.end() ? ovPol->get_ref<std::string const&>() : "";
+            auto ordered = _data.find("ordered");
+            _meta.ordered = ordered != _data.end() ? ordered->get<bool>() : true;
             if (_data.count("keyField") != 0)
             {
                 _meta.keyField = _data.at("keyField").get<std::string>();
@@ -276,10 +302,8 @@ namespace Ent
         if (_data.count("properties") != 0u)
         {
             setType(DataType::object);
-            for (auto&& name_prop : _data["properties"].items())
+            for (auto&& [propName, prop] : _data["properties"].items())
             {
-                auto const& propName = name_prop.key();
-                auto const& prop = name_prop.value();
                 vis.openProperty(propName.c_str());
                 parseSchema(_filename, _rootFile, prop, vis, depth + 1);
                 vis.closeProperty();
@@ -755,11 +779,23 @@ namespace Ent
             vis.openSubschema();
             parseSchemaNoRef(_filename, _fileRoot, def, vis, 0);
             vis.closeSubschema();
+            if (vis.stack.back()->get().oneOf.has_value())
+            {
+                ENTLIB_ASSERT(
+                    vis.stack.back()->get().unionTypeMap.size()
+                    == vis.stack.back()->get().oneOf->size());
+            }
 
             auto& subschema = globalSchema->allDefinitions[name];
             subschema.name = name;
             subschema.rootSchema = globalSchema;
+            if (vis.stack.back()->get().oneOf.has_value())
+                ENTLIB_ASSERT(
+                    vis.stack.back()->get().unionTypeMap.size()
+                    == vis.stack.back()->get().oneOf->size());
             subschema = std::move(vis.stack.back()->get());
+            if (subschema.oneOf.has_value())
+                ENTLIB_ASSERT(subschema.unionTypeMap.size() == subschema.oneOf->size());
 
             vis.stack.pop_back();
         }

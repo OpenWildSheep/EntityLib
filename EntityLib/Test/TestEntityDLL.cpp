@@ -10,6 +10,8 @@
 #include <EntityLib.h>
 #include <ComponentMerge.h>
 
+#include "TestNodeHandler.h"
+
 static void printNode(char const* name, Ent::Node const& node, std::string const& tab)
 {
     using namespace Ent;
@@ -156,15 +158,21 @@ try
     using namespace std::filesystem;
 
     entlib.setLogicErrorPolicy(Ent::LogicErrorPolicy::Throw);
-    ENTLIB_CHECK_EXCEPTION(ENTLIB_LOGIC_ERROR("Test logic error"), std::logic_error);
+    // ENTLIB_CHECK_EXCEPTION(ENTLIB_LOGIC_ERROR("Test logic error"), std::logic_error);
     entlib.setLogicErrorPolicy(Ent::LogicErrorPolicy::Terminate);
 
     entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
 #ifdef _DEBUG
     entlib.validationEnabled = false;
 #else
-    entlib.validationEnabled = true;
+    entlib.validationEnabled = false;
 #endif
+
+    testNodeHandler(entlib);
+    if (argc != 0)
+    {
+        return EXIT_SUCCESS;
+    }
 
     ENTLIB_ASSERT(Ent::format("Toto %d", 37) == "Toto 37");
 

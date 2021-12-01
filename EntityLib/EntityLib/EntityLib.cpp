@@ -367,7 +367,41 @@ namespace Ent
         return getSceneParentEntity(_node->getParentNode());
     }
 
-    // ********************************** Load/Save ***********************************************
+    nlohmann::json& EntityLib::readJsonFile(char const* _filepath, bool canonicalize)
+    {
+        std::filesystem::path const filepath =
+            canonicalize ? very_weakly_canonical(_filepath) : _filepath;
+        if (auto iter = m_jsonDatabase.find(filepath); iter != m_jsonDatabase.end())
+        {
+            return iter->second;
+        }
+        else
+        {
+            std::ifstream ifstr(rawdataPath / filepath);
+            if (not ifstr.is_open())
+            {
+                throw ContextException("Can't open %s for read", filepath.string().c_str());
+            }
+            std::string filedata;
+            std::getline(ifstr, filedata, char(0));
+            nlohmann::json d = Ent::loadJsonFile(rawdataPath, filepath);
+            return m_jsonDatabase.emplace(filepath, std::move(d)).first->second;
+        }
+    }
+
+    void EntityLib::saveJsonFile(nlohmann::json const* doc, char const* _filepath)
+    {
+        std::filesystem::path const filepath = very_weakly_canonical(_filepath);
+        // if (auto iter = m_jsonDatabase.find(filepath); iter != m_jsonDatabase.end())
+        {
+            std::ofstream ofs(rawdataPath / filepath);
+            if (not ofs.is_open())
+            {
+                throw ContextException("Can't open %s for write", filepath.string().c_str());
+            }
+            ofs << *doc;
+        }
+    }
 
     struct MergeMapOverride
     {

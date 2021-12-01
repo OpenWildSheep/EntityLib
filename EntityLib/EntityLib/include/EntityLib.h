@@ -208,6 +208,9 @@ namespace Ent
         Node* getParentEntity(Node* _node); ///< Get the parent Entity Node
         Node const* getParentEntity(Node const* _node); ///< Get the parent Entity Node
 
+        nlohmann::json& readJsonFile(char const* _filepath, bool canonicalize = true);
+        void saveJsonFile(nlohmann::json const* doc, char const* _filepath);
+
     private:
         /// Load an Entity or a Scene, using the given cache
         template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
@@ -245,6 +248,14 @@ namespace Ent
         mutable std::map<std::filesystem::path, EntityFile> m_entityCache;
         mutable std::map<std::filesystem::path, SceneFile> m_sceneCache;
         mutable std::map<std::filesystem::path, NodeFile> m_nodeCache;
+        struct HashPath
+        {
+            auto operator()(std::filesystem::path const& p) const
+            {
+                return std::filesystem::hash_value(p);
+            }
+        };
+        mutable std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> m_jsonDatabase;
     };
 
 } // namespace Ent

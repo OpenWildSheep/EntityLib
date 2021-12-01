@@ -111,11 +111,14 @@ namespace Ent
 
     bool Array::isTuple() const
     {
-        if (not std::holds_alternative<Vector>(m_data))
+        if (auto* vec = std::get_if<Vector>(&m_data))
+        {
+            return vec->isTuple();
+        }
+        else
         {
             return false;
         }
-        return std::get<Vector>(m_data).isTuple();
     }
 
     Node* Array::initAdd(OverrideValueLocation loc, NodeUniquePtr _node, bool _addedInInstance)

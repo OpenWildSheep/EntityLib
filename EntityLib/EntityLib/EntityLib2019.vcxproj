@@ -87,7 +87,7 @@
       <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>nsvp_CONFIG_COMPARE_POINTERS;ENTLIB_LOADSCHEMA;ENTLIB_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -100,6 +100,7 @@
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
       <ExternalTemplatesDiagnostics>false</ExternalTemplatesDiagnostics>
       <ConformanceMode>true</ConformanceMode>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -115,6 +116,7 @@
     <ClCompile Include="Array.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentMerge.cpp" />
+    <ClCompile Include="Cursor.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityLib.cpp">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EnableAllWarnings</WarningLevel>
@@ -123,6 +125,8 @@
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</TreatWarningAsError>
     </ClCompile>
     <ClCompile Include="EntityLibCore.cpp" />
+    <ClCompile Include="EntVisitor.cpp" />
+    <ClCompile Include="FileCursor.cpp" />
     <ClCompile Include="include\Schema.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Node.cpp" />
@@ -140,8 +144,12 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="include\ComponentMerge.h" />
+    <ClInclude Include="include\CopyNode.h" />
+    <ClInclude Include="include\Cursor.h" />
     <ClInclude Include="include\EntityLib.h" />
     <ClInclude Include="include\EntityLibCore.h" />
+    <ClInclude Include="include\EntVisitor.h" />
+    <ClInclude Include="include\FileCursor.h" />
     <ClInclude Include="include\Schema.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MemoryProfiler.h" />
@@ -156,6 +164,10 @@
     <ClInclude Include="Union.h" />
     <ClInclude Include="ValidJson.h" />
     <ClInclude Include="Vector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\external\mapbox\NATVIS\Variant.natvis" />
+    <Natvis Include="external\mapbox\NATVIS\Variant.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

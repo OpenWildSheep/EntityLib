@@ -469,7 +469,7 @@ namespace Ent
                 lastLayer.defaultVal->enterArrayItem(_index);
                 newLayer.defaultVal = lastLayer.defaultVal;
             }
-            else if (instance.getPropertyDefaultValue()) // If there is property default, use them
+            else if (instance.getPropertyDefaultValue() != nullptr) // If there is property default, use them
             {
                 newLayer.defaultStorage = std::make_unique<FileCursor>(
                     subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue());
@@ -632,21 +632,12 @@ namespace Ent
             {
                 auto* node = lastLayer.defaultVal->back();
                 ENTLIB_DBG_ASSERT(node->is_array());
-                for (size_t i = 0; i < node->size(); ++i)
+                for (auto const& k_v : *node)
                 {
                     ENTLIB_DBG_ASSERT(node->is_array());
-                    auto key = enterArrayItem(i).enterArrayItem(0llu).getString();
-                    exit().exit();
+                    auto& key = k_v[0llu].get_ref<std::string const&>();
                     ENTLIB_DBG_ASSERT(node->is_array());
-                    if (enterArrayItem(i).enterArrayItem(1llu).isNull())
-                    {
-                        keys.erase(key);
-                    }
-                    else
-                    {
-                        keys.insert(key);
-                    }
-                    exit().exit();
+                    keys.insert(key.c_str());
                     ENTLIB_DBG_ASSERT(node->is_array());
                 }
             }
@@ -658,9 +649,9 @@ namespace Ent
                 {
                     ENTLIB_DBG_ASSERT(node->is_array());
                     auto key = enterArrayItem(i).enterArrayItem(0llu).getString();
-                    exit().exit();
+                    exit();
                     ENTLIB_DBG_ASSERT(node->is_array());
-                    if (enterArrayItem(i).enterArrayItem(1llu).isNull())
+                    if (enterArrayItem(1llu).isNull())
                     {
                         keys.erase(key);
                     }

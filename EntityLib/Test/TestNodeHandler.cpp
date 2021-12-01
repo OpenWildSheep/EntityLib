@@ -746,14 +746,14 @@ void testNodeHandler(Ent::EntityLib& entlib)
         //std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         //std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;
     }
-    /*{
+    {
         entlib.rawdataPath = "X:/RawData";
         std::cout << "Read SceneWild.scene with LazyLib" << std::endl;
         clock_t start = clock();
-        NodeHandler expl(
+        Cursor expl(
             &entlib,
             entlib.getSchema(entitySchemaName),
-            &entlib.getJsonFile(R"(X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene)"));
+            R"(X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene)");
         clock_t end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
 
@@ -765,9 +765,9 @@ void testNodeHandler(Ent::EntityLib& entlib)
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Compare both" << std::endl;
         start = clock();
-        CompareNode compare(&ent);
-        visit(expl, 0, compare);
+        CompareNode comparator(expl, ent.get());
+        visit(expl, 0, comparator);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
-    }*/
+    }
 }

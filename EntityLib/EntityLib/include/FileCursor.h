@@ -39,6 +39,8 @@ namespace Ent
         std::vector<Layer> layers;
         nlohmann::json* rootDoc = nullptr;
 
+        FileCursor() = default;
+
         FileCursor(Ent::Subschema const* _schema, char const* filePath, nlohmann::json* _document)
         {
             filePath = filePath;

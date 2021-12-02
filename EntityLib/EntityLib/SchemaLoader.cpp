@@ -732,9 +732,9 @@ namespace Ent
                     }
                 }
                 {
-                    auto& lastSchema = stack.back()->get();
+                auto& lastSchema = stack.back()->get();
                     finalizeSubschema(lastSchema);
-                }
+                    }
                 ENTLIB_DEBUG_PRINTF("%scloseSubschema\n", getTab());
             }
             void setMeta(Subschema::Meta meta, nlohmann::json user) override

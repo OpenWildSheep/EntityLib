@@ -422,13 +422,13 @@ public:
 
 size_t countNodes(Node* node)
 {
-    size_t nodeCount = 1;
+    size_t nodeCount = 0;
     switch (node->getDataType())
     {
-    case Ent::DataType::null: break;
-    case Ent::DataType::string: break;
-    case Ent::DataType::number: break;
-    case Ent::DataType::integer: break;
+    case Ent::DataType::null: ++nodeCount; break;
+    case Ent::DataType::string: ++nodeCount; break;
+    case Ent::DataType::number: ++nodeCount; break;
+    case Ent::DataType::integer: ++nodeCount; break;
     case Ent::DataType::object:
         for (auto&& [name, prop] : node->getSchema()->properties)
         {
@@ -513,8 +513,8 @@ size_t countNodes(Node* node)
         }
     }
     break;
-    case Ent::DataType::boolean: break;
-    case Ent::DataType::entityRef: break;
+    case Ent::DataType::boolean: ++nodeCount; break;
+    case Ent::DataType::entityRef: ++nodeCount; break;
     case Ent::DataType::oneOf: nodeCount += countNodes(node->getUnionData()); break;
     case Ent::DataType::COUNT:
     default: ENTLIB_LOGIC_ERROR("Unexpected datatype");
@@ -730,22 +730,16 @@ void testNodeHandler(Ent::EntityLib& entlib)
         std::cout << "Travserse SceneWild.scene with LazyLib" << std::endl;
         start = clock();
         visit(expl, 0, visitor);
-        //visit(expl, 0, visitor);
-        //visit(expl, 0, visitor);
-        //visit(expl, 0, visitor);
-        //visit(expl, 0, visitor);
+        visit(expl, 0, visitor);
+        visit(expl, 0, visitor);
+        visit(expl, 0, visitor);
+        visit(expl, 0, visitor);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
-        // std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;
-
-        //visitor = PrimitiveCounterVisitor{};
-        //std::cout << "Travserse SceneWild.scene with LazyLib" << std::endl;
-        //start = clock();
-        //visit(expl, 0, visitor);
-        //end = clock();
-        //std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
-        //std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;
+        std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;
     }
+    bool testCompare = false;
+    if (testCompare)
     {
         entlib.rawdataPath = "X:/RawData";
         std::cout << "Read SceneWild.scene with LazyLib" << std::endl;
@@ -763,6 +757,14 @@ void testNodeHandler(Ent::EntityLib& entlib)
             entlib.loadEntityAsNode(R"(X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene)");
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
+
+        std::cout << "Travserse SceneWild.scene with NodeLib" << std::endl;
+        start = clock();
+        auto nodeCount = countNodes(ent.get());
+        end = clock();
+        std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
+        std::cout << "Primitive count : " << nodeCount << std::endl;
+
         std::cout << "Compare both" << std::endl;
         start = clock();
         CompareNode comparator(expl, ent.get());

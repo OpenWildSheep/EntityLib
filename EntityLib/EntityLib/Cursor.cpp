@@ -18,9 +18,10 @@ namespace Ent
         {
             return lastLayer.prefab->getFloat();
         }
-        else if (lastLayer.defaultVal != nullptr and lastLayer.defaultVal->isSet())
+        else if (auto* defaultVal = lastLayer.getDefault();
+                 defaultVal != nullptr and defaultVal->isSet())
         {
-            return lastLayer.defaultVal->getFloat();
+            return defaultVal->getFloat();
         }
         else
         {
@@ -38,9 +39,10 @@ namespace Ent
         {
             return lastLayer.prefab->getInt();
         }
-        else if (lastLayer.defaultVal != nullptr and lastLayer.defaultVal->isSet())
+        else if (auto* defaultVal = lastLayer.getDefault();
+                 defaultVal != nullptr and defaultVal->isSet())
         {
-            return lastLayer.defaultVal->getInt();
+            return defaultVal->getInt();
         }
         else
         {
@@ -58,9 +60,10 @@ namespace Ent
         {
             return lastLayer.prefab->getString();
         }
-        else if (lastLayer.defaultVal != nullptr and lastLayer.defaultVal->isSet())
+        else if (auto* defaultVal = lastLayer.getDefault();
+                 defaultVal != nullptr and defaultVal->isSet())
         {
-            return lastLayer.defaultVal->getString();
+            return defaultVal->getString();
         }
         else if (not getSchema()->enumValues.empty())
         {
@@ -82,9 +85,10 @@ namespace Ent
         {
             return lastLayer.prefab->getBool();
         }
-        else if (lastLayer.defaultVal != nullptr and lastLayer.defaultVal->isSet())
+        else if (auto* defaultVal = lastLayer.getDefault();
+                 defaultVal != nullptr and defaultVal->isSet())
         {
-            return lastLayer.defaultVal->getBool();
+            return defaultVal->getBool();
         }
         else
         {
@@ -102,9 +106,10 @@ namespace Ent
         {
             return lastLayer.prefab->getEntityRef();
         }
-        else if (lastLayer.defaultVal != nullptr and lastLayer.defaultVal->isSet())
+        else if (auto* defaultVal = lastLayer.getDefault();
+                 defaultVal != nullptr and defaultVal->isSet())
         {
-            return lastLayer.defaultVal->getEntityRef();
+            return defaultVal->getEntityRef();
         }
         else
         {

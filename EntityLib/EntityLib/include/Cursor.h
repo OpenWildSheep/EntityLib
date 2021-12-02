@@ -19,10 +19,32 @@ namespace Ent
         {
             Cursor* prefab = nullptr;
             std::unique_ptr<Cursor> prefabsStorage;
-            FileCursor* defaultVal = nullptr;
-            std::unique_ptr<FileCursor> defaultStorage;
+            int defaultVal = 1; // 1 == undefined
+            FileCursor defaultStorage;
             size_t arraySize = 0;
             bool isDefault = false;
+            FileCursor* getDefault()
+            {
+                if (defaultVal == 1)
+                {
+                    return nullptr;
+                }
+                else
+                {
+                    return &(this + defaultVal)->defaultStorage;
+                }
+            }
+            FileCursor const* getDefault() const
+            {
+                if (defaultVal == 1)
+                {
+                    return nullptr;
+                }
+                else
+                {
+                    return &(this + defaultVal)->defaultStorage;
+                }
+            }
         };
         std::vector<Layer> layers;
 
@@ -46,9 +68,9 @@ namespace Ent
             ///////////////////////////////////////////////////////////////////////////////////////
             // DO NOT COMIT THIS const_cast !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             ///////////////////////////////////////////////////////////////////////////////////////
-            newLayer.defaultStorage = std::make_unique<FileCursor>(
-                _schema, nullptr, const_cast<nlohmann::json*>(&_schema->defaultValue));
-            newLayer.defaultVal = newLayer.defaultStorage.get();
+            newLayer.defaultStorage = {
+                _schema, nullptr, const_cast<nlohmann::json*>(&_schema->defaultValue)};
+            newLayer.defaultVal = 0;
             //[[maybe_unused]] auto type = _document->GetType();
             //ENTLIB_DBG_ASSERT(_document->is_object());
             auto doc = instance.back();
@@ -139,8 +161,8 @@ namespace Ent
             Layer newLayer;
             auto& lastLayer = layers.back();
             ENTLIB_DBG_ASSERT(
-                lastLayer.defaultVal == nullptr
-                or lastLayer.defaultVal->getSchema()->type == Ent::DataType::object);
+                lastLayer.getDefault() == nullptr
+                or lastLayer.getDefault()->getSchema()->type == Ent::DataType::object);
             instance.enterObjectField(_field, _fieldRef);
             auto* subschema = instance.getSchema();
             if (not isDefault())
@@ -156,18 +178,18 @@ namespace Ent
                 }
             }
             bool defaultFound = false;
-            if (lastLayer.defaultVal != nullptr
-                and lastLayer.defaultVal->isSet()) // If there is default, enter in
+            auto* defaultVal = lastLayer.getDefault();
+            if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
             {
-                lastLayer.defaultVal->enterObjectField(_field, _fieldRef);
-                if (lastLayer.defaultVal->isSet())
+                defaultVal->enterObjectField(_field, _fieldRef);
+                if (defaultVal->isSet())
                 {
                     defaultFound = true;
-                    newLayer.defaultVal = lastLayer.defaultVal;
+                    newLayer.defaultVal = lastLayer.defaultVal - 1;
                 }
                 else
                 {
-                    lastLayer.defaultVal->exit();
+                    defaultVal->exit();
                 }
             }
             if (not defaultFound)
@@ -175,15 +197,14 @@ namespace Ent
                 auto propDefVal = instance.getPropertyDefaultValue();
                 if (propDefVal) // If there is property default, use them
                 {
-                    newLayer.defaultStorage = std::make_unique<FileCursor>(
-                        subschema, nullptr, (nlohmann::json*)propDefVal);
-                    newLayer.defaultVal = newLayer.defaultStorage.get();
+                    newLayer.defaultStorage = {subschema, nullptr, (nlohmann::json*)propDefVal};
+                    newLayer.defaultVal = 0;
                 }
                 else if (not subschema->defaultValue.is_null())
                 {
-                    newLayer.defaultStorage = std::make_unique<FileCursor>(
-                        subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
-                    newLayer.defaultVal = newLayer.defaultStorage.get();
+                    newLayer.defaultStorage = {
+                        subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
+                    newLayer.defaultVal = 0;
                 }
             }
             comitNewLayer(std::move(newLayer));
@@ -200,17 +221,17 @@ namespace Ent
             auto& lastLayer = layers.back();
             instance.enterUnionData(type);
             auto* subschema = instance.getSchema();
-            if (lastLayer.defaultVal != nullptr
-                and lastLayer.defaultVal->isSet()) // If there is default, enter in
+            auto* defaultVal = lastLayer.getDefault();
+            if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
             {
-                lastLayer.defaultVal->enterUnionData(type);
-                newLayer.defaultVal = lastLayer.defaultVal;
+                defaultVal->enterUnionData(type);
+                newLayer.defaultVal = lastLayer.defaultVal - 1;
             }
             else // Une type default
             {
-                newLayer.defaultStorage = std::make_unique<FileCursor>(
-                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
-                newLayer.defaultVal = newLayer.defaultStorage.get();
+                newLayer.defaultStorage = {
+                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
+                newLayer.defaultVal = 0;
             }
             if (not isDefault())
             {
@@ -248,23 +269,23 @@ namespace Ent
                     }
                 }
             }
-            if (lastLayer.defaultVal != nullptr
-                and lastLayer.defaultVal->isSet()) // If there is default, enter in
+            auto* defaultVal = lastLayer.getDefault();
+            if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
             {
-                lastLayer.defaultVal->enterUnionSetItem(_field, subschema);
-                newLayer.defaultVal = lastLayer.defaultVal;
+                defaultVal->enterUnionSetItem(_field, subschema);
+                newLayer.defaultVal = lastLayer.defaultVal - 1;
             }
             else if (instance.getPropertyDefaultValue()) // If there is property default, use them
             {
-                newLayer.defaultStorage = std::make_unique<FileCursor>(
-                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue());
-                newLayer.defaultVal = newLayer.defaultStorage.get();
+                newLayer.defaultStorage = {
+                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue()};
+                newLayer.defaultVal = 0;
             }
             else // Une type default
             {
-                newLayer.defaultStorage = std::make_unique<FileCursor>(
-                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
-                newLayer.defaultVal = newLayer.defaultStorage.get();
+                newLayer.defaultStorage = {
+                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
+                newLayer.defaultVal = 0;
             }
             comitNewLayer(std::move(newLayer));
             return *this;
@@ -277,23 +298,23 @@ namespace Ent
             auto& lastLayer = layers.back();
             instance.enterObjectSetItem(_field);
             auto* subschema = instance.getSchema();
-            if (lastLayer.defaultVal != nullptr
-                and lastLayer.defaultVal->isSet()) // If there is default, enter in
+            auto* defaultVal = lastLayer.getDefault();
+            if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
             {
-                lastLayer.defaultVal->enterObjectSetItem(_field);
-                newLayer.defaultVal = lastLayer.defaultVal;
+                defaultVal->enterObjectSetItem(_field);
+                newLayer.defaultVal = lastLayer.defaultVal - 1;
             }
             else if (instance.getPropertyDefaultValue()) // If there is property default, use them
             {
-                newLayer.defaultStorage = std::make_unique<FileCursor>(
-                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue());
-                newLayer.defaultVal = newLayer.defaultStorage.get();
+                newLayer.defaultStorage = {
+                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue()};
+                newLayer.defaultVal = 0;
             }
             else // Une type default
             {
-                newLayer.defaultStorage = std::make_unique<FileCursor>(
-                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
-                newLayer.defaultVal = newLayer.defaultStorage.get();
+                newLayer.defaultStorage = {
+                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
+                newLayer.defaultVal = 0;
             }
             if (not isDefault())
             {
@@ -318,23 +339,23 @@ namespace Ent
             auto& lastLayer = layers.back();
             instance.enterObjectSetItem(_field);
             auto* subschema = instance.getSchema();
-            if (lastLayer.defaultVal != nullptr
-                and lastLayer.defaultVal->isSet()) // If there is default, enter in
+            auto* defaultVal = lastLayer.getDefault();
+            if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
             {
-                lastLayer.defaultVal->enterObjectSetItem(_field);
-                newLayer.defaultVal = lastLayer.defaultVal;
+                defaultVal->enterObjectSetItem(_field);
+                newLayer.defaultVal = lastLayer.defaultVal - 1;
             }
             else if (instance.getPropertyDefaultValue()) // If there is property default, use them
             {
-                newLayer.defaultStorage = std::make_unique<FileCursor>(
-                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue());
-                newLayer.defaultVal = newLayer.defaultStorage.get();
+                newLayer.defaultStorage = {
+                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue()};
+                newLayer.defaultVal = 0;
             }
             else // Une type default
             {
-                newLayer.defaultStorage = std::make_unique<FileCursor>(
-                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
-                newLayer.defaultVal = newLayer.defaultStorage.get();
+                newLayer.defaultStorage = {
+                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
+                newLayer.defaultVal = 0;
             }
             if (not isDefault())
             {
@@ -359,23 +380,23 @@ namespace Ent
             auto& lastLayer = layers.back();
             instance.enterMapItem(_field);
             auto* subschema = instance.getSchema();
-            if (lastLayer.defaultVal != nullptr
-                and lastLayer.defaultVal->isSet()) // If there is default, enter in
+            auto* defaultVal = lastLayer.getDefault();
+            if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
             {
-                lastLayer.defaultVal->enterMapItem(_field);
-                newLayer.defaultVal = lastLayer.defaultVal;
+                defaultVal->enterMapItem(_field);
+                newLayer.defaultVal = lastLayer.defaultVal - 1;
             }
             else if (instance.getPropertyDefaultValue()) // If there is property default, use them
             {
-                newLayer.defaultStorage = std::make_unique<FileCursor>(
-                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue());
-                newLayer.defaultVal = newLayer.defaultStorage.get();
+                newLayer.defaultStorage = {
+                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue()};
+                newLayer.defaultVal = 0;
             }
             else // Une type default
             {
-                newLayer.defaultStorage = std::make_unique<FileCursor>(
-                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
-                newLayer.defaultVal = newLayer.defaultStorage.get();
+                newLayer.defaultStorage = {
+                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
+                newLayer.defaultVal = 0;
             }
             if (not isDefault())
             {
@@ -400,23 +421,23 @@ namespace Ent
             auto& lastLayer = layers.back();
             instance.enterMapItem(_field);
             auto* subschema = instance.getSchema();
-            if (lastLayer.defaultVal != nullptr
-                and lastLayer.defaultVal->isSet()) // If there is default, enter in
+            auto* defaultVal = lastLayer.getDefault();
+            if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
             {
-                lastLayer.defaultVal->enterMapItem(_field);
-                newLayer.defaultVal = lastLayer.defaultVal;
+                defaultVal->enterMapItem(_field);
+                newLayer.defaultVal = lastLayer.defaultVal - 1;
             }
             else if (instance.getPropertyDefaultValue()) // If there is property default, use them
             {
-                newLayer.defaultStorage = std::make_unique<FileCursor>(
-                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue());
-                newLayer.defaultVal = newLayer.defaultStorage.get();
+                newLayer.defaultStorage = {
+                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue()};
+                newLayer.defaultVal = 0;
             }
             else // Une type default
             {
-                newLayer.defaultStorage = std::make_unique<FileCursor>(
-                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
-                newLayer.defaultVal = newLayer.defaultStorage.get();
+                newLayer.defaultStorage = {
+                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
+                newLayer.defaultVal = 0;
             }
             if (not isDefault())
             {
@@ -463,23 +484,23 @@ namespace Ent
                     }
                 }
             }
-            if (lastLayer.defaultVal != nullptr
-                and lastLayer.defaultVal->isSet()) // If there is default, enter in
+            auto* defaultVal = lastLayer.getDefault();
+            if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
             {
-                lastLayer.defaultVal->enterArrayItem(_index);
-                newLayer.defaultVal = lastLayer.defaultVal;
+                defaultVal->enterArrayItem(_index);
+                newLayer.defaultVal = lastLayer.defaultVal - 1;
             }
             else if (instance.getPropertyDefaultValue() != nullptr) // If there is property default, use them
             {
-                newLayer.defaultStorage = std::make_unique<FileCursor>(
-                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue());
-                newLayer.defaultVal = newLayer.defaultStorage.get();
+                newLayer.defaultStorage = {
+                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue()};
+                newLayer.defaultVal = 0;
             }
             else // Une type default
             {
-                newLayer.defaultStorage = std::make_unique<FileCursor>(
-                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
-                newLayer.defaultVal = newLayer.defaultStorage.get();
+                newLayer.defaultStorage = {
+                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
+                newLayer.defaultVal = 0;
             }
             comitNewLayer(std::move(newLayer));
             return *this;
@@ -499,9 +520,9 @@ namespace Ent
                     return type2;
                 }
             }
-            else if (lastLayer.defaultVal != nullptr)
+            else if (auto* defaultVal = lastLayer.getDefault())
             {
-                if (char const* type3 = lastLayer.defaultVal->getUnionType())
+                if (char const* type3 = defaultVal->getUnionType())
                 {
                     return type3;
                 }
@@ -520,8 +541,8 @@ namespace Ent
             ENTLIB_DBG_ASSERT(layers.size() == instance.layers.size());
             [[maybe_unused]] auto& lastLayer = layers.back();
             ENTLIB_DBG_ASSERT(
-                lastLayer.defaultVal == nullptr
-                or lastLayer.defaultVal->getSchema()->type == instance.getSchema()->type);
+                lastLayer.getDefault() == nullptr
+                or lastLayer.getDefault()->getSchema()->type == instance.getSchema()->type);
             if (layers.back().prefab != nullptr)
             {
                 ENTLIB_DBG_ASSERT(layers.back().prefab != (void*)0xdddddddddddddddd);
@@ -548,16 +569,17 @@ namespace Ent
             {
                 lastLayer.prefab->exit();
             }
-            if (lastLayer.defaultVal != nullptr and not lastLayer.defaultVal->layers.empty())
+            auto* defaultVal = lastLayer.getDefault();
+            if (defaultVal != nullptr and not defaultVal->layers.empty())
             {
-                lastLayer.defaultVal->exit();
+                defaultVal->exit();
             }
             layers.pop_back();
 #ifdef _DEBUG
             ENTLIB_DBG_ASSERT(layersCount == layers.size() + 1);
             ENTLIB_DBG_ASSERT(
-                prevLayer.defaultVal == nullptr
-                or prevLayer.defaultVal->getSchema()->type == prevSchema.base->type);
+                prevLayer.getDefault() == nullptr
+                or prevLayer.getDefault()->getSchema()->type == prevSchema.base->type);
 #endif
             checkInvariants();
             return *this;
@@ -609,9 +631,10 @@ namespace Ent
                 {
                     return lastLayer.prefab->size();
                 }
-                else if (lastLayer.defaultVal != nullptr and lastLayer.defaultVal->isSet())
+                else if (auto* defaultVal = lastLayer.getDefault();
+                         defaultVal != nullptr and defaultVal->isSet())
                 {
-                    return lastLayer.defaultVal->back()->size();
+                    return defaultVal->back()->size();
                 }
                 else
                 {
@@ -628,9 +651,10 @@ namespace Ent
             {
                 keys = lastLayer.prefab->getMapKeysString();
             }
-            else if (lastLayer.defaultVal != nullptr and lastLayer.defaultVal->isSet()) // If there is default, enter in
+            else if (auto* defaultVal = lastLayer.getDefault();
+                     defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
             {
-                auto* node = lastLayer.defaultVal->back();
+                auto* node = defaultVal->back();
                 ENTLIB_DBG_ASSERT(node->is_array());
                 for (auto const& k_v : *node)
                 {

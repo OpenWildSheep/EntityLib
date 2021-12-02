@@ -23,6 +23,20 @@ namespace Ent
             FileCursor defaultStorage;
             size_t arraySize = 0;
             bool isDefault = false;
+            void setDefault(Ent::Subschema const* _schema, char const* filePath, nlohmann::json* _document)
+            {
+                defaultStorage.init(_schema, filePath, _document);
+                defaultVal = 0;
+            }
+            void clear()
+            {
+                prefab = nullptr;
+                // prefabsStorage.reset();
+                defaultVal = 1; // 1 == undefined
+                defaultStorage.clear();
+                arraySize = 0;
+                isDefault = false;
+            }
             FileCursor* getDefault()
             {
                 if (defaultVal == 1)
@@ -46,7 +60,33 @@ namespace Ent
                 }
             }
         };
-        std::vector<Layer> layers;
+        std::vector<Layer> layers_;
+        size_t layerCount = 0;
+        Layer& allocLayer()
+        {
+            if (layers_.size() < layerCount + 1)
+            {
+                return layers_.emplace_back();
+            }
+            Layer& newLayer = layers_[layerCount];
+            newLayer.clear();
+            return newLayer;
+        }
+
+        void validNewLayer()
+        {
+            ++layerCount;
+        }
+
+        Layer& getLastLayer()
+        {
+            return layers_[layerCount - 1];
+        }
+
+        Layer const& getLastLayer() const
+        {
+            return layers_[layerCount - 1];
+        }
 
         Cursor(Cursor const&) = delete;
         Cursor& operator=(Cursor const&) = delete;
@@ -58,41 +98,57 @@ namespace Ent
             Ent::Subschema const* _schema,
             char const* _filename,
             nlohmann::json* _doc)
-            // : schema({_schema})
-            : m_entityLib(_entityLib)
-            , instance(_schema, _filename, _doc)
         {
+            init(_entityLib, _schema, _filename, _doc);
+        }
+        void init(
+            EntityLib* _entityLib,
+            Ent::Subschema const* _schema,
+            char const* _filename,
+            nlohmann::json* _doc)
+        {
+            m_entityLib = _entityLib;
+            instance.init(_schema, _filename, _doc);
+
             ENTLIB_ASSERT(_schema != nullptr);
-            // layers.reserve(100);
-            Layer newLayer;
+            // layers_.resize(10);
+            layerCount = 0;
+            Layer& newLayer = allocLayer();
             ///////////////////////////////////////////////////////////////////////////////////////
             // DO NOT COMIT THIS const_cast !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             ///////////////////////////////////////////////////////////////////////////////////////
-            newLayer.defaultStorage = {
-                _schema, nullptr, const_cast<nlohmann::json*>(&_schema->defaultValue)};
-            newLayer.defaultVal = 0;
+            newLayer.setDefault(
+                _schema, nullptr, const_cast<nlohmann::json*>(&_schema->defaultValue));
             //[[maybe_unused]] auto type = _document->GetType();
             //ENTLIB_DBG_ASSERT(_document->is_object());
-            auto doc = instance.back();
+            auto* doc = instance.back();
             if (auto member = doc->find("InstanceOf"); member != doc->end())
             {
                 if (auto const& prefabPath = member->get_ref<std::string const&>();
                     prefabPath.size() > 0)
                 {
-                    newLayer.prefabsStorage =
-                        std::make_unique<Cursor>(m_entityLib, _schema, prefabPath.c_str());
+                    if (newLayer.prefabsStorage == nullptr)
+                        newLayer.prefabsStorage =
+                            std::make_unique<Cursor>(m_entityLib, _schema, prefabPath.c_str());
+                    else
+                        newLayer.prefabsStorage->init(m_entityLib, _schema, prefabPath.c_str());
                     newLayer.prefab = newLayer.prefabsStorage.get();
                     ENTLIB_ASSERT(newLayer.prefab != (void*)0xdddddddddddddddd);
                 }
             }
             newLayer.isDefault = false;
-            layers.emplace_back(std::move(newLayer));
+            validNewLayer();
             checkInvariants();
         }
 
-        Cursor(EntityLib* _entityLib, Ent::Subschema const* _schema, char const* _filename)
-            : Cursor(_entityLib, _schema, _filename, &_entityLib->readJsonFile(_filename))
+        void init(EntityLib* _entityLib, Ent::Subschema const* _schema, char const* _filename)
         {
+            init(_entityLib, _schema, _filename, &_entityLib->readJsonFile(_filename));
+        }
+
+        Cursor(EntityLib* _entityLib, Ent::Subschema const* _schema, char const* _filename)
+        {
+            init(_entityLib, _schema, _filename, &_entityLib->readJsonFile(_filename));
         }
 
         void save(char const* _filename = nullptr) const
@@ -102,7 +158,7 @@ namespace Ent
 
         bool isDefaultImpl() const
         {
-            auto& newLayer = layers.back();
+            auto& newLayer = getLastLayer();
             if (instance.isSet())
             {
                 return false;
@@ -128,7 +184,7 @@ namespace Ent
 
         bool isDefault() const
         {
-            return layers.back().isDefault;
+            return getLastLayer().isDefault;
         }
 
         bool loadInstanceOf(Layer& newLayer)
@@ -142,8 +198,11 @@ namespace Ent
                     if (auto const& prefabPath = member->get_ref<std::string const&>();
                         prefabPath.size() > 0)
                     {
-                        newLayer.prefabsStorage =
-                            std::make_unique<Cursor>(m_entityLib, subschema, prefabPath.c_str());
+                        if (newLayer.prefabsStorage == nullptr)
+                            newLayer.prefabsStorage =
+                                std::make_unique<Cursor>(m_entityLib, subschema, prefabPath.c_str());
+                        else
+                            newLayer.prefabsStorage->init(m_entityLib, subschema, prefabPath.c_str());
                         newLayer.prefab = newLayer.prefabsStorage.get();
                         ENTLIB_ASSERT(newLayer.prefab != (void*)0xdddddddddddddddd);
                     }
@@ -156,10 +215,9 @@ namespace Ent
         Cursor& enterObjectField(char const* _field, SubschemaRef const* _fieldRef = nullptr)
         {
             checkInvariants();
-            auto const layersCount = layers.size();
             ENTLIB_DBG_ASSERT(getDataType() == Ent::DataType::object);
-            Layer newLayer;
-            auto& lastLayer = layers.back();
+            Layer& newLayer = allocLayer();
+            auto& lastLayer = getLastLayer();
             ENTLIB_DBG_ASSERT(
                 lastLayer.getDefault() == nullptr
                 or lastLayer.getDefault()->getSchema()->type == Ent::DataType::object);
@@ -197,18 +255,15 @@ namespace Ent
                 auto propDefVal = instance.getPropertyDefaultValue();
                 if (propDefVal) // If there is property default, use them
                 {
-                    newLayer.defaultStorage = {subschema, nullptr, (nlohmann::json*)propDefVal};
-                    newLayer.defaultVal = 0;
+                    newLayer.setDefault(subschema, nullptr, (nlohmann::json*)propDefVal);
                 }
                 else if (not subschema->defaultValue.is_null())
                 {
-                    newLayer.defaultStorage = {
-                        subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
-                    newLayer.defaultVal = 0;
+                    newLayer.setDefault(
+                        subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
                 }
             }
-            comitNewLayer(std::move(newLayer));
-            ENTLIB_DBG_ASSERT(layersCount == layers.size() - 1);
+            comitNewLayer(newLayer);
             return *this;
         }
 
@@ -217,8 +272,8 @@ namespace Ent
             checkInvariants();
             if (type == nullptr)
                 type = getUnionType();
-            Layer newLayer;
-            auto& lastLayer = layers.back();
+            Layer& newLayer = allocLayer();
+            auto& lastLayer = getLastLayer();
             instance.enterUnionData(type);
             auto* subschema = instance.getSchema();
             auto* defaultVal = lastLayer.getDefault();
@@ -229,9 +284,7 @@ namespace Ent
             }
             else // Une type default
             {
-                newLayer.defaultStorage = {
-                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
-                newLayer.defaultVal = 0;
+                newLayer.setDefault(subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
             }
             if (not isDefault())
             {
@@ -245,15 +298,15 @@ namespace Ent
                     }
                 }
             }
-            comitNewLayer(std::move(newLayer));
+            comitNewLayer(newLayer);
             return *this;
         }
 
         Cursor& enterUnionSetItem(char const* _field, Subschema const* _dataSchema = nullptr)
         {
             checkInvariants();
-            Layer newLayer;
-            auto& lastLayer = layers.back();
+            Layer& newLayer = allocLayer();
+            auto& lastLayer = getLastLayer();
             instance.enterUnionSetItem(_field, _dataSchema);
             auto* subschema = instance.getSchema();
             ENTLIB_DBG_ASSERT(_dataSchema == nullptr or subschema == _dataSchema);
@@ -277,25 +330,22 @@ namespace Ent
             }
             else if (instance.getPropertyDefaultValue()) // If there is property default, use them
             {
-                newLayer.defaultStorage = {
-                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue()};
-                newLayer.defaultVal = 0;
+                newLayer.setDefault(
+                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue());
             }
             else // Une type default
             {
-                newLayer.defaultStorage = {
-                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
-                newLayer.defaultVal = 0;
+                newLayer.setDefault(subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
             }
-            comitNewLayer(std::move(newLayer));
+            comitNewLayer(newLayer);
             return *this;
         }
 
         Cursor& enterObjectSetItem(char const* _field)
         {
             checkInvariants();
-            Layer newLayer;
-            auto& lastLayer = layers.back();
+            Layer& newLayer = allocLayer();
+            auto& lastLayer = getLastLayer();
             instance.enterObjectSetItem(_field);
             auto* subschema = instance.getSchema();
             auto* defaultVal = lastLayer.getDefault();
@@ -306,15 +356,12 @@ namespace Ent
             }
             else if (instance.getPropertyDefaultValue()) // If there is property default, use them
             {
-                newLayer.defaultStorage = {
-                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue()};
-                newLayer.defaultVal = 0;
+                newLayer.setDefault(
+                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue());
             }
             else // Une type default
             {
-                newLayer.defaultStorage = {
-                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
-                newLayer.defaultVal = 0;
+                newLayer.setDefault(subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
             }
             if (not isDefault())
             {
@@ -328,15 +375,15 @@ namespace Ent
                     }
                 }
             }
-            comitNewLayer(std::move(newLayer));
+            comitNewLayer(newLayer);
             return *this;
         }
 
         Cursor& enterObjectSetItem(int64_t _field)
         {
             checkInvariants();
-            Layer newLayer;
-            auto& lastLayer = layers.back();
+            Layer& newLayer = allocLayer();
+            auto& lastLayer = getLastLayer();
             instance.enterObjectSetItem(_field);
             auto* subschema = instance.getSchema();
             auto* defaultVal = lastLayer.getDefault();
@@ -347,15 +394,12 @@ namespace Ent
             }
             else if (instance.getPropertyDefaultValue()) // If there is property default, use them
             {
-                newLayer.defaultStorage = {
-                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue()};
-                newLayer.defaultVal = 0;
+                newLayer.setDefault(
+                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue());
             }
             else // Une type default
             {
-                newLayer.defaultStorage = {
-                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
-                newLayer.defaultVal = 0;
+                newLayer.setDefault(subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
             }
             if (not isDefault())
             {
@@ -369,15 +413,15 @@ namespace Ent
                     }
                 }
             }
-            comitNewLayer(std::move(newLayer));
+            comitNewLayer(newLayer);
             return *this;
         }
 
         Cursor& enterMapItem(char const* _field)
         {
             checkInvariants();
-            Layer newLayer;
-            auto& lastLayer = layers.back();
+            Layer& newLayer = allocLayer();
+            auto& lastLayer = getLastLayer();
             instance.enterMapItem(_field);
             auto* subschema = instance.getSchema();
             auto* defaultVal = lastLayer.getDefault();
@@ -388,15 +432,12 @@ namespace Ent
             }
             else if (instance.getPropertyDefaultValue()) // If there is property default, use them
             {
-                newLayer.defaultStorage = {
-                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue()};
-                newLayer.defaultVal = 0;
+                newLayer.setDefault(
+                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue());
             }
             else // Une type default
             {
-                newLayer.defaultStorage = {
-                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
-                newLayer.defaultVal = 0;
+                newLayer.setDefault(subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
             }
             if (not isDefault())
             {
@@ -410,15 +451,15 @@ namespace Ent
                     }
                 }
             }
-            comitNewLayer(std::move(newLayer));
+            comitNewLayer(newLayer);
             return *this;
         }
 
         Cursor& enterMapItem(int64_t _field)
         {
             checkInvariants();
-            Layer newLayer;
-            auto& lastLayer = layers.back();
+            Layer& newLayer = allocLayer();
+            auto& lastLayer = getLastLayer();
             instance.enterMapItem(_field);
             auto* subschema = instance.getSchema();
             auto* defaultVal = lastLayer.getDefault();
@@ -429,15 +470,12 @@ namespace Ent
             }
             else if (instance.getPropertyDefaultValue()) // If there is property default, use them
             {
-                newLayer.defaultStorage = {
-                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue()};
-                newLayer.defaultVal = 0;
+                newLayer.setDefault(
+                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue());
             }
             else // Une type default
             {
-                newLayer.defaultStorage = {
-                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
-                newLayer.defaultVal = 0;
+                newLayer.setDefault(subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
             }
             if (not isDefault())
             {
@@ -451,24 +489,26 @@ namespace Ent
                     }
                 }
             }
-            comitNewLayer(std::move(newLayer));
+            comitNewLayer(newLayer);
             return *this;
         }
 
-        void comitNewLayer(Layer newLayer)
+        void comitNewLayer(Layer& newLayer)
         {
             pushDefault(newLayer);
-            layers.emplace_back(std::move(newLayer));
+            validNewLayer();
             if (instance.getSchema()->type == Ent::DataType::array)
-                layers.back().arraySize = size();
+            {
+                getLastLayer().arraySize = size();
+            }
             checkInvariants();
         }
 
         Cursor& enterArrayItem(size_t _index)
         {
             checkInvariants();
-            Layer newLayer;
-            auto& lastLayer = layers.back();
+            Layer& newLayer = allocLayer();
+            auto& lastLayer = getLastLayer();
             ENTLIB_DBG_ASSERT(instance.getSchema()->type == Ent::DataType::array);
             instance.enterArrayItem(_index);
             auto* subschema = instance.getSchema();
@@ -492,23 +532,20 @@ namespace Ent
             }
             else if (instance.getPropertyDefaultValue() != nullptr) // If there is property default, use them
             {
-                newLayer.defaultStorage = {
-                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue()};
-                newLayer.defaultVal = 0;
+                newLayer.setDefault(
+                    subschema, nullptr, (nlohmann::json*)instance.getPropertyDefaultValue());
             }
             else // Une type default
             {
-                newLayer.defaultStorage = {
-                    subschema, nullptr, (nlohmann::json*)&subschema->defaultValue};
-                newLayer.defaultVal = 0;
+                newLayer.setDefault(subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
             }
-            comitNewLayer(std::move(newLayer));
+            comitNewLayer(newLayer);
             return *this;
         }
 
         char const* getUnionType()
         {
-            auto& lastLayer = layers.back();
+            auto& lastLayer = getLastLayer();
             if (char const* type = instance.getUnionType())
             {
                 return type;
@@ -533,20 +570,20 @@ namespace Ent
         void checkInvariants() const
         {
 #ifdef _DEBUG
-            ENTLIB_DBG_ASSERT(not layers.empty());
-            ENTLIB_DBG_ASSERT(instance.layers.back().schema.base != nullptr);
+            ENTLIB_DBG_ASSERT(layerCount != 0);
+            ENTLIB_DBG_ASSERT(instance.last_layer().schema.base != nullptr);
             //ENTLIB_DBG_ASSERT(
             //    (layers.empty() and instance.additionalPath.empty())
             //    or layers.size() == (instance.additionalPath.size() + 1));
-            ENTLIB_DBG_ASSERT(layers.size() == instance.layers.size());
-            [[maybe_unused]] auto& lastLayer = layers.back();
+            ENTLIB_DBG_ASSERT(layerCount == instance.layerCount);
+            [[maybe_unused]] auto& lastLayer = getLastLayer();
             ENTLIB_DBG_ASSERT(
                 lastLayer.getDefault() == nullptr
                 or lastLayer.getDefault()->getSchema()->type == instance.getSchema()->type);
-            if (layers.back().prefab != nullptr)
+            if (getLastLayer().prefab != nullptr)
             {
-                ENTLIB_DBG_ASSERT(layers.back().prefab != (void*)0xdddddddddddddddd);
-                layers.back().prefab->checkInvariants();
+                ENTLIB_DBG_ASSERT(getLastLayer().prefab != (void*)0xdddddddddddddddd);
+                getLastLayer().prefab->checkInvariants();
             }
 #endif
         }
@@ -554,29 +591,29 @@ namespace Ent
         Cursor& exit()
         {
 #ifdef _DEBUG
-            auto layersCount = layers.size();
-            ENTLIB_DBG_ASSERT(layers.size() > 0);
-            auto& prevLayer = layers[layers.size() - 2];
-            auto& prevSchema = instance.layers[instance.layers.size() - 2].schema;
+            auto layersCount = layerCount;
+            ENTLIB_DBG_ASSERT(layerCount > 0);
+            auto& prevLayer = layers_[layerCount - 2];
+            auto& prevSchema = instance.before_last_layer().schema;
 #endif
             checkInvariants();
-            auto& lastLayer = layers.back();
+            auto& lastLayer = getLastLayer();
             //ENTLIB_DBG_ASSERT(
             //    prevLayer.default == nullptr
             //    or prevLayer.default->schema.back().base->type == prevSchema.base->type);
             instance.exit();
-            if (lastLayer.prefab != nullptr and not(lastLayer.prefab->layers.size() < 2))
+            if (lastLayer.prefab != nullptr and not(lastLayer.prefab->layerCount < 2))
             {
                 lastLayer.prefab->exit();
             }
             auto* defaultVal = lastLayer.getDefault();
-            if (defaultVal != nullptr and not defaultVal->layers.empty())
+            if (defaultVal != nullptr and not defaultVal->layerCount() == 0)
             {
                 defaultVal->exit();
             }
-            layers.pop_back();
+            --layerCount; // leuers.pop_back()
 #ifdef _DEBUG
-            ENTLIB_DBG_ASSERT(layersCount == layers.size() + 1);
+            ENTLIB_DBG_ASSERT(layersCount == layerCount + 1);
             ENTLIB_DBG_ASSERT(
                 prevLayer.getDefault() == nullptr
                 or prevLayer.getDefault()->getSchema()->type == prevSchema.base->type);
@@ -614,8 +651,8 @@ namespace Ent
 
         size_t size() const
         {
-            auto& lastLayer = layers.back();
-            auto& jsonExplLayer = instance.layers.back();
+            auto& lastLayer = getLastLayer();
+            auto& jsonExplLayer = instance.last_layer();
             auto* schema = jsonExplLayer.schema.base;
             if (schema->linearItems.has_value())
             {
@@ -645,7 +682,7 @@ namespace Ent
 
         std::set<char const*, CmpStr> getMapKeysString()
         {
-            auto& lastLayer = layers.back();
+            auto& lastLayer = getLastLayer();
             std::set<char const*, CmpStr> keys;
             if (lastLayer.prefab != nullptr)
             {
@@ -691,7 +728,7 @@ namespace Ent
         }
         bool isNull() const
         {
-            auto& lastLayer = layers.back();
+            auto& lastLayer = getLastLayer();
             if (instance.isSetInternal())
             {
                 return instance.isNull();
@@ -707,7 +744,7 @@ namespace Ent
         }
         std::set<int64_t> getMapKeysInt()
         {
-            auto& lastLayer = layers.back();
+            auto& lastLayer = getLastLayer();
             std::set<int64_t> keys;
             if (lastLayer.prefab != nullptr)
             {
@@ -733,7 +770,7 @@ namespace Ent
         }
         std::set<int64_t> getPrimSetKeysInt()
         {
-            auto& lastLayer = layers.back();
+            auto& lastLayer = getLastLayer();
             std::set<int64_t> keys;
             if (instance.isSet())
             {
@@ -760,7 +797,7 @@ namespace Ent
                     exit();
                 }
             }
-            auto& lastLayer = layers.back();
+            auto& lastLayer = getLastLayer();
             if (lastLayer.prefab != nullptr)
             {
                 ENTLIB_ASSERT(lastLayer.prefab != (void*)0xdddddddddddddddd);
@@ -771,7 +808,7 @@ namespace Ent
 
         std::map<char const*, Subschema const*, CmpStr> getUnionSetKeysString()
         {
-            auto& lastLayer = layers.back();
+            auto& lastLayer = getLastLayer();
             std::map<char const*, Subschema const*, CmpStr> keys;
             if (lastLayer.prefab != nullptr)
             {
@@ -804,7 +841,7 @@ namespace Ent
 
         std::set<char const*, CmpStr> getObjectSetKeysString()
         {
-            auto& lastLayer = layers.back();
+            auto& lastLayer = getLastLayer();
             auto const& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
             std::set<char const*, CmpStr> keys;
             if (lastLayer.prefab != nullptr)
@@ -834,7 +871,7 @@ namespace Ent
 
         std::set<int64_t> getObjectSetKeysInt()
         {
-            auto& lastLayer = layers.back();
+            auto& lastLayer = getLastLayer();
             auto const& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
             std::set<int64_t> keys;
             if (instance.isSet())
@@ -874,17 +911,17 @@ namespace Ent
         void buildPath()
         {
             auto firstNotSet = std::find_if(
-                begin(instance.layers), end(instance.layers), [](FileCursor::Layer const& l) {
+                instance.layerBegin(), instance.layerEnd(), [](FileCursor::Layer const& l) {
                     return l.values == nullptr;
                 });
-            ENTLIB_ASSERT(firstNotSet != begin(instance.layers));
-            auto firstNotSetIdx = std::distance(begin(instance.layers), firstNotSet);
+            ENTLIB_ASSERT(firstNotSet != instance.layerBegin());
+            auto firstNotSetIdx = std::distance(instance.layerBegin(), firstNotSet);
             auto lastSet = firstNotSet;
             --lastSet;
-            auto endIter = end(instance.layers);
+            auto endIter = instance.layerEnd();
             for (; firstNotSet != endIter; ++lastSet, ++firstNotSet, ++firstNotSetIdx)
             {
-                size_t arraySize = layers[firstNotSetIdx - 1].arraySize;
+                size_t arraySize = layers_[firstNotSetIdx - 1].arraySize;
                 instance.setLayer(*lastSet, *firstNotSet, arraySize);
                 ENTLIB_ASSERT(firstNotSet->values != nullptr);
             }
@@ -941,7 +978,7 @@ namespace Ent
                     }
                 }
             }
-            auto& lastLayer = layers.back();
+            auto& lastLayer = getLastLayer();
             if (lastLayer.prefab != nullptr)
             {
                 return lastLayer.prefab->countPrimSetKey(key);
@@ -962,7 +999,7 @@ namespace Ent
                     }
                 }
             }
-            auto& lastLayer = layers.back();
+            auto& lastLayer = getLastLayer();
             if (lastLayer.prefab != nullptr)
             {
                 return lastLayer.prefab->countPrimSetKey(key);

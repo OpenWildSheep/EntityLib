@@ -9,7 +9,7 @@ namespace Ent
 
     double Cursor::getFloat() const
     {
-        auto& lastLayer = layers.back();
+        auto& lastLayer = getLastLayer();
         if (isSet())
         {
             return instance.getFloat();
@@ -30,7 +30,7 @@ namespace Ent
     }
     int64_t Cursor::getInt() const
     {
-        auto& lastLayer = layers.back();
+        auto& lastLayer = getLastLayer();
         if (isSet())
         {
             return instance.getInt();
@@ -51,7 +51,7 @@ namespace Ent
     }
     char const* Cursor::getString() const
     {
-        auto& lastLayer = layers.back();
+        auto& lastLayer = getLastLayer();
         if (isSet())
         {
             return instance.getString();
@@ -76,7 +76,7 @@ namespace Ent
     }
     bool Cursor::getBool() const
     {
-        auto& lastLayer = layers.back();
+        auto& lastLayer = getLastLayer();
         if (isSet())
         {
             return instance.getBool();
@@ -97,7 +97,7 @@ namespace Ent
     }
     EntityRef Cursor::getEntityRef() const
     {
-        auto& lastLayer = layers.back();
+        auto& lastLayer = getLastLayer();
         if (isSet())
         {
             return instance.getEntityRef();

@@ -699,6 +699,8 @@ void testNodeHandler(Ent::EntityLib& entlib)
         visit(expl, 0, copier);
         entlib.saveJsonFile(&newDoc, "instance.prout2.entity");
     }
+    bool testLoading = true;
+    if (testLoading)
     {
         entlib.rawdataPath = "X:/RawData";
         std::cout << "Read SceneWild.scene with LazyLib" << std::endl;
@@ -732,8 +734,8 @@ void testNodeHandler(Ent::EntityLib& entlib)
         visit(expl, 0, visitor);
         visit(expl, 0, visitor);
         visit(expl, 0, visitor);
-        visit(expl, 0, visitor);
-        visit(expl, 0, visitor);
+        // visit(expl, 0, visitor);
+        // visit(expl, 0, visitor);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;

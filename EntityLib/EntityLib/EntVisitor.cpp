@@ -151,7 +151,8 @@ namespace Ent
         case Ent::DataType::number: visitor.floatNode(); break;
         case Ent::DataType::string: visitor.stringNode(); break;
         case Ent::DataType::entityRef: visitor.entityRefNode(); break;
-        case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
+        case Ent::DataType::COUNT:
+        default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
         }
     }
 } // namespace Ent

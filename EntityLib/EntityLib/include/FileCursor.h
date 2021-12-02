@@ -44,18 +44,60 @@ namespace Ent
         FileCursor(Ent::Subschema const* _schema, char const* filePath, nlohmann::json* _document)
         {
             filePath = filePath;
-            layers.reserve(100);
+            layers.reserve(30);
             auto& newLayer = layers.emplace_back();
             newLayer.schema = Schema{{_schema}};
             newLayer.values = _document;
         }
 
-        /*FileCursor(
-            Ent::Subschema const* _schema, char const* filePath, nlohmann::json* _document)
-            : FileCursor(_schema, filePath, static_cast<nlohmann::json*>(_document))
+        void init(Ent::Subschema const* _schema, char const* _filePath, nlohmann::json* _document)
         {
-            rootDoc = _document;
-        }*/
+            if (_filePath == nullptr)
+            {
+                filePath.clear();
+            }
+            else
+            {
+                filePath = _filePath;
+            }
+            rootDoc = nullptr;
+            layers.clear();
+            auto& newLayer = layers.emplace_back();
+            newLayer.schema = Schema{{_schema}};
+            newLayer.values = _document;
+        }
+
+        Layer* layerBegin()
+        {
+            return &layers.front();
+        }
+
+        Layer* layerEnd()
+        {
+            return (&layers.back()) + 1;
+        }
+
+        Layer& last_layer()
+        {
+            return layers.back();
+        }
+
+        Layer const& last_layer() const
+        {
+            return layers.back();
+        }
+
+        size_t layerCount() const
+        {
+            return layers.size();
+        }
+
+        void clear()
+        {
+            filePath.clear();
+            rootDoc = nullptr;
+            layers.clear();
+        }
 
         FileCursor(Ent::Subschema const* _schema, char const* filePath)
             : FileCursor(_schema, filePath, &_schema->rootSchema->entityLib->readJsonFile(filePath))

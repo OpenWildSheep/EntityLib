@@ -730,10 +730,11 @@ void testNodeHandler(Ent::EntityLib& entlib)
         //std::cout << "Compare Nodes" << std::endl;
         PrimitiveCounterVisitor visitor;
         std::cout << "Travserse SceneWild.scene with LazyLib" << std::endl;
+        visit(expl, 0, visitor); // Ensure files are already open
         start = clock();
         visit(expl, 0, visitor);
-        visit(expl, 0, visitor);
-        visit(expl, 0, visitor);
+        // visit(expl, 0, visitor);
+        // visit(expl, 0, visitor);
         // visit(expl, 0, visitor);
         // visit(expl, 0, visitor);
         end = clock();

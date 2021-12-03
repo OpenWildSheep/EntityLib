@@ -121,6 +121,11 @@ class MoveCapacityData(HelperObject):
     @crashPreventionSafeguardFactor.setter
     def crashPreventionSafeguardFactor(self, val): self.crashPreventionSafeguardFactor.set(val)
     @property
+    def defaultWorldUpSpeedFactor(self):  # type: ()->Float
+        return Float(self._node.at("defaultWorldUpSpeedFactor"))
+    @defaultWorldUpSpeedFactor.setter
+    def defaultWorldUpSpeedFactor(self, val): self.defaultWorldUpSpeedFactor.set(val)
+    @property
     def doubleJump(self):  # type: ()->Bool
         return Bool(self._node.at("doubleJump"))
     @doubleJump.setter

@@ -93,16 +93,6 @@ class GameManager(HelperObject):
     @GamePadAimThreshold.setter
     def GamePadAimThreshold(self, val): self.GamePadAimThreshold.set(val)
     @property
-    def GamePadCameraAxisInvertX(self):  # type: ()->Bool
-        return Bool(self._node.at("GamePadCameraAxisInvertX"))
-    @GamePadCameraAxisInvertX.setter
-    def GamePadCameraAxisInvertX(self, val): self.GamePadCameraAxisInvertX.set(val)
-    @property
-    def GamePadCameraAxisInvertY(self):  # type: ()->Bool
-        return Bool(self._node.at("GamePadCameraAxisInvertY"))
-    @GamePadCameraAxisInvertY.setter
-    def GamePadCameraAxisInvertY(self, val): self.GamePadCameraAxisInvertY.set(val)
-    @property
     def GamePadNavigationData(self):  # type: ()->GamePadNavigationData
         return GamePadNavigationData(self._node.at("GamePadNavigationData"))
     @property

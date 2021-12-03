@@ -17,6 +17,7 @@ from entgen.ActionStateArbiter_StateAllDecisionPass import *
 from entgen.ActionStateArbiter_StateCategoryDecisionPass import *
 from entgen.ActionStateArbiter_StateOrderPass import *
 from entgen.ActionStateArbiter_StateStateDecisionPass import *
+from entgen.ActorCategory import *
 
 from EntityLibPy import Node
 
@@ -45,6 +46,11 @@ class ActionStateArbiter(HelperObject):
     @property
     def CategoryCategory(self):  # type: ()->ActionStateArbiter_CategoryCategoryDecisionPass
         return ActionStateArbiter_CategoryCategoryDecisionPass(self._node.at("CategoryCategory"))
+    @property
+    def CategoryNeedingRelay(self):  # type: ()->PrimArray[ActorCategory]
+        return (lambda n: PrimArray(ActorCategory, n))(self._node.at("CategoryNeedingRelay"))
+    @CategoryNeedingRelay.setter
+    def CategoryNeedingRelay(self, val): self.CategoryNeedingRelay.set(val)
     @property
     def CategoryOrder(self):  # type: ()->ActionStateArbiter_CategoryOrderPass
         return ActionStateArbiter_CategoryOrderPass(self._node.at("CategoryOrder"))

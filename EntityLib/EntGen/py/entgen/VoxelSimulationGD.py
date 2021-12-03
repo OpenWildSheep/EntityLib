@@ -21,6 +21,11 @@ class VoxelSimulationGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def EDITOR_voxelSize(self):  # type: ()->Float
+        return Float(self._node.at("EDITOR_voxelSize"))
+    @EDITOR_voxelSize.setter
+    def EDITOR_voxelSize(self, val): self.EDITOR_voxelSize.set(val)
+    @property
     def FilePath(self):  # type: ()->String
         return String(self._node.at("FilePath"))
     @FilePath.setter

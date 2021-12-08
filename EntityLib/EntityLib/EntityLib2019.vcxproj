@@ -144,12 +144,12 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="include\ComponentMerge.h" />
-    <ClInclude Include="include\CopyNode.h" />
-    <ClInclude Include="include\Cursor.h" />
     <ClInclude Include="include\EntityLib.h" />
     <ClInclude Include="include\EntityLibCore.h" />
-    <ClInclude Include="include\EntVisitor.h" />
-    <ClInclude Include="include\FileCursor.h" />
+    <ClInclude Include="include\EntityLib\CopyNode.h" />
+    <ClInclude Include="include\EntityLib\Cursor.h" />
+    <ClInclude Include="include\EntityLib\EntVisitor.h" />
+    <ClInclude Include="include\EntityLib\FileCursor.h" />
     <ClInclude Include="include\Schema.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MemoryProfiler.h" />

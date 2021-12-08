@@ -1,11 +1,16 @@
 #pragma once
 
-#include "EntityLib.h"
+#include "../EntityLib.h"
 #include <variant>
 #include <ciso646>
 #include "../Tools.h"
 #include "FileCursor.h"
+
+#pragma push_macro("RAH_NAMESPACE")
+#undef RAH_NAMESPACE
+#define RAH_NAMESPACE rah
 #include "../external/rah.hpp"
+#pragma pop_macro("RAH_NAMESPACE")
 
 namespace Ent
 {
@@ -21,7 +26,7 @@ namespace Ent
             int defaultVal = 1; // 1 == undefined
             FileCursor defaultStorage;
             size_t arraySize = 0;
-            bool isDefault = false;
+            bool isDefault = false; // Cache for isDefault()
             void setDefault(
                 Ent::Subschema const* _schema, char const* filePath, nlohmann::json* _document);
             void clear();
@@ -92,19 +97,27 @@ namespace Ent
 
         DataType getMapKeyType() const;
 
-        size_t size() const;
+        size_t size();
+        bool contains(Key const& _key);
+        size_t arraySize();
+        bool empty();
 
-        std::set<char const*, CmpStr> getMapKeysString();
         bool isNull() const;
+        std::set<char const*, CmpStr> getMapKeysString();
         std::set<int64_t> getMapKeysInt();
         std::set<int64_t> getPrimSetKeysInt();
         std::set<char const*, CmpStr> getPrimSetKeysString();
-
         std::map<char const*, Subschema const*, CmpStr> getUnionSetKeysString();
-
         std::set<char const*, CmpStr> getObjectSetKeysString();
-
         std::set<int64_t> getObjectSetKeysInt();
+
+        bool getMapContains(char const*);
+        bool getMapContains(int64_t);
+        bool getPrimSetContains(char const*);
+        bool getPrimSetContains(int64_t);
+        bool getUnionSetContains(char const*);
+        bool getObjectSetContains(char const*);
+        bool getObjectSetContains(int64_t);
 
         bool isSet() const;
 

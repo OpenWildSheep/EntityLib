@@ -1,4 +1,4 @@
-#include "include/Cursor.h"
+#include "include/EntityLib/Cursor.h"
 
 namespace Ent
 {
@@ -43,6 +43,13 @@ namespace Ent
     {
         return m_instance.isSet();
     }
+
+    // Identical to isDefault
+    //bool Cursor::hasDefaultValue() const
+    //{
+    //    return not m_instance.isSet() and (m_layers.back().prefab == nullptr
+    //           or m_layers.back().prefab->isSet());
+    //}
 
     double Cursor::getFloat() const
     {
@@ -588,7 +595,7 @@ namespace Ent
         _validNewLayer();
         if (m_instance.getSchema()->type == Ent::DataType::array)
         {
-            _getLastLayer().arraySize = size();
+            _getLastLayer().arraySize = arraySize();
         }
         checkInvariants();
     }
@@ -664,7 +671,7 @@ namespace Ent
         //ENTLIB_DBG_ASSERT(
         //    (layers.empty() and m_instance.additionalPath.empty())
         //    or layers.size() == (m_instance.additionalPath.size() + 1));
-        ENTLIB_DBG_ASSERT(m_layerCount == m_instance.m_layerCount);
+        ENTLIB_DBG_ASSERT(m_layerCount == m_instance.layerCount());
         [[maybe_unused]] auto& lastLayer = _getLastLayer();
         ENTLIB_DBG_ASSERT(
             lastLayer.getDefault() == nullptr
@@ -683,7 +690,7 @@ namespace Ent
         auto layersCount = m_layerCount;
         ENTLIB_DBG_ASSERT(m_layerCount > 0);
         auto& prevLayer = m_layers[m_layerCount - 2];
-        auto& prevSchema = m_instance.before_last_layer().schema;
+        auto& prevSchema = (m_instance.layerEnd() - 2)->schema;
 #endif
         checkInvariants();
         auto& lastLayer = _getLastLayer();
@@ -726,7 +733,7 @@ namespace Ent
         return m_instance.getSchema()->singularItems->get().linearItems->at(0)->type;
     }
 
-    size_t Cursor::size() const
+    size_t Cursor::arraySize()
     {
         auto& lastLayer = _getLastLayer();
         auto& jsonExplLayer = m_instance.lastLayer();
@@ -743,7 +750,7 @@ namespace Ent
             }
             else if (lastLayer.prefab != nullptr)
             {
-                return lastLayer.prefab->size();
+                return lastLayer.prefab->arraySize();
             }
             else if (auto* defaultVal = lastLayer.getDefault();
                      defaultVal != nullptr and defaultVal->isSet())
@@ -755,6 +762,146 @@ namespace Ent
                 return schema->minItems;
             }
         }
+    }
+
+    size_t Cursor::size()
+    {
+        auto& jsonExplLayer = m_instance.lastLayer();
+        auto* schema = jsonExplLayer.schema.base;
+        if (schema->linearItems.has_value())
+        {
+            return schema->linearItems->size();
+        }
+        else
+        {
+            switch (schema->type)
+            {
+            case Ent::DataType::object: return schema->properties.size();
+            case Ent::DataType::oneOf: return 1;
+            case Ent::DataType::array:
+            {
+                auto meta = std::get<Ent::Subschema::ArrayMeta>(schema->meta);
+                switch (hash(meta.overridePolicy))
+                {
+                case "map"_hash:
+                    switch (getMapKeyType())
+                    {
+                    case Ent::DataType::string: return getMapKeysString().size();
+                    case Ent::DataType::integer: return getMapKeysInt().size();
+                    default: ENTLIB_LOGIC_ERROR("Unexpected key type");
+                    }
+                    break;
+                case "set"_hash:
+                {
+                    auto& itemType = schema->singularItems.get()->get();
+                    switch (itemType.type)
+                    {
+                    case Ent::DataType::integer: return getPrimSetKeysInt().size();
+                    case Ent::DataType::string: return getPrimSetKeysString().size();
+                    case Ent::DataType::oneOf: return getUnionSetKeysString().size();
+                    case Ent::DataType::object:
+                        auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
+                        switch (keyFieldSchema.type)
+                        {
+                        case Ent::DataType::string: return getObjectSetKeysString().size();
+                        case Ent::DataType::integer: return getObjectSetKeysInt().size();
+                        default: ENTLIB_LOGIC_ERROR("Unexpected key type");
+                        }
+                        break;
+                    }
+                }
+                break;
+                case ""_hash: return arraySize();
+                default: ENTLIB_LOGIC_ERROR("override policy!");
+                }
+            }
+            break;
+            case Ent::DataType::null: return 0;
+            case Ent::DataType::boolean: return 0;
+            case Ent::DataType::integer: return 0;
+            case Ent::DataType::number: return 0;
+            case Ent::DataType::string: return 0;
+            case Ent::DataType::entityRef: return 0;
+            case Ent::DataType::COUNT:
+            default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
+            }
+        }
+        ENTLIB_LOGIC_ERROR("Unexpected DataType!");
+    }
+
+    bool Cursor::contains(Key const& _key)
+    {
+        auto& jsonExplLayer = m_instance.lastLayer();
+        auto* schema = jsonExplLayer.schema.base;
+        if (schema->linearItems.has_value())
+        {
+            return false; // Not a map/set
+        }
+        else
+        {
+            switch (schema->type)
+            {
+            case Ent::DataType::object:
+                return schema->properties.count(std::get<std::string>(_key));
+            case Ent::DataType::oneOf: return getUnionType() == std::get<std::string>(_key);
+            case Ent::DataType::array:
+            {
+                auto meta = std::get<Ent::Subschema::ArrayMeta>(schema->meta);
+                switch (hash(meta.overridePolicy))
+                {
+                case "map"_hash:
+                    switch (getMapKeyType())
+                    {
+                    case Ent::DataType::string: return getMapContains(std::get<std::string>(_key).c_str());
+                    case Ent::DataType::integer: return getMapContains(std::get<size_t>(_key));
+                    default: ENTLIB_LOGIC_ERROR("Unexpected key type");
+                    }
+                    break;
+                case "set"_hash:
+                {
+                    auto& itemType = schema->singularItems.get()->get();
+                    switch (itemType.type)
+                    {
+                    case Ent::DataType::integer: return getPrimSetContains(std::get<size_t>(_key));
+                    case Ent::DataType::string:
+                        return getPrimSetContains(std::get<std::string>(_key).c_str());
+                    case Ent::DataType::oneOf:
+                        return getUnionSetContains(std::get<std::string>(_key).c_str());
+                    case Ent::DataType::object:
+                        auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
+                        switch (keyFieldSchema.type)
+                        {
+                        case Ent::DataType::string:
+                            return getObjectSetContains(std::get<std::string>(_key).c_str());
+                        case Ent::DataType::integer:
+                            return getObjectSetContains(std::get<size_t>(_key));
+                        default: ENTLIB_LOGIC_ERROR("Unexpected key type");
+                        }
+                        break;
+                    }
+                }
+                break;
+                case ""_hash: return false;
+                default: ENTLIB_LOGIC_ERROR("override policy!");
+                }
+            }
+            break;
+            case Ent::DataType::null: return false;
+            case Ent::DataType::boolean: return false;
+            case Ent::DataType::integer: return false;
+            case Ent::DataType::number: return false;
+            case Ent::DataType::string: return false;
+            case Ent::DataType::entityRef: return false;
+            case Ent::DataType::COUNT:
+            default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
+            }
+        }
+        ENTLIB_LOGIC_ERROR("Unexpected DataType!");
+    }
+
+    bool Cursor::empty()
+    {
+        return size() == 0;
     }
 
     std::set<char const*, CmpStr> Cursor::getMapKeysString()
@@ -803,6 +950,7 @@ namespace Ent
         }
         return keys;
     }
+
     bool Cursor::isNull() const
     {
         auto& lastLayer = _getLastLayer();
@@ -852,7 +1000,7 @@ namespace Ent
         std::set<int64_t> keys;
         if (m_instance.isSet())
         {
-            for (size_t i = 0; i < size(); ++i)
+            for (size_t i = 0; i < arraySize(); ++i)
             {
                 keys.insert(enterArrayItem(i).getInt());
                 exit();
@@ -869,7 +1017,7 @@ namespace Ent
         std::set<char const*, CmpStr> keys;
         if (m_instance.isSet())
         {
-            for (size_t i = 0; i < size(); ++i)
+            for (size_t i = 0; i < arraySize(); ++i)
             {
                 keys.insert(enterArrayItem(i).getString());
                 exit();
@@ -894,7 +1042,7 @@ namespace Ent
         }
         if (m_instance.isSet())
         {
-            for (size_t i = 0; i < size(); ++i)
+            for (size_t i = 0; i < arraySize(); ++i)
             {
 #ifdef _DEBUG
                 auto* instanceSize = m_instance.back();
@@ -930,7 +1078,7 @@ namespace Ent
         }
         if (m_instance.isSet())
         {
-            for (size_t i = 0; i < size(); ++i)
+            for (size_t i = 0; i < arraySize(); ++i)
             {
                 enterArrayItem(i);
                 if (m_instance.isSet() and m_instance.back()->count("__removed__") != 0)
@@ -956,7 +1104,7 @@ namespace Ent
         std::set<int64_t> keys;
         if (m_instance.isSet())
         {
-            for (size_t i = 0; i < size(); ++i)
+            for (size_t i = 0; i < arraySize(); ++i)
             {
                 enterArrayItem(i);
                 if (m_instance.isSet() and m_instance.back()->count("__removed__") != 0)
@@ -978,6 +1126,36 @@ namespace Ent
         }
         return keys;
     }
+
+    bool Cursor::getMapContains(char const* _key)
+    {
+        return getMapKeysString().count(_key);
+    }
+    bool Cursor::getMapContains(int64_t _key)
+    {
+        return getMapKeysInt().count(_key);
+    }
+    bool Cursor::getPrimSetContains(char const* _key)
+    {
+        return getPrimSetKeysString().count(_key) != 0;
+    }
+    bool Cursor::getPrimSetContains(int64_t _key)
+    {
+        return getPrimSetKeysInt().count(_key) != 0;
+    }
+    bool Cursor::getUnionSetContains(char const* _key)
+    {
+        return getUnionSetKeysString().count(_key) != 0;
+    }
+    bool Cursor::getObjectSetContains(char const* _key)
+    {
+        return getObjectSetKeysString().count(_key) != 0;
+    }
+    bool Cursor::getObjectSetContains(int64_t _key)
+    {
+        return getObjectSetKeysInt().count(_key) != 0;
+    }
+
 
     void Cursor::_buildPath()
     {
@@ -1039,7 +1217,7 @@ namespace Ent
     {
         if (m_instance.isSet())
         {
-            for (size_t i = 0; i < size(); ++i)
+            for (size_t i = 0; i < arraySize(); ++i)
             {
                 bool const equal = strcmp(enterArrayItem(i).getString(), key) == 0;
                 exit();
@@ -1060,7 +1238,7 @@ namespace Ent
     {
         if (m_instance.isSet())
         {
-            for (size_t i = 0; i < size(); ++i)
+            for (size_t i = 0; i < arraySize(); ++i)
             {
                 bool const equal = enterArrayItem(i).getInt() == key;
                 exit();

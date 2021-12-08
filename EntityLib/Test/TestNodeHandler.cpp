@@ -4,9 +4,11 @@
 #include <fstream>
 #include <variant>
 #include <iostream>
+#include <stack>
 
-#include <EntVisitor.h>
-#include <CopyNode.h>
+#include <EntityLib/EntVisitor.h>
+#include <EntityLib/CopyNode.h>
+#include <EntityLib/DumpNode.h>
 
 using namespace Ent;
 
@@ -216,6 +218,7 @@ public:
     }
     virtual void inMap()
     {
+        ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         switch (expl.getMapKeyType())
         {
         case Ent::DataType::string:
@@ -250,6 +253,7 @@ public:
     }
     virtual void inPrimSet(Ent::DataType)
     {
+        ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         auto& itemType = expl.getSchema()->singularItems.get()->get();
         switch (itemType.type)
         {
@@ -284,6 +288,7 @@ public:
     }
     virtual void inUnionSet()
     {
+        ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         ENTLIB_ASSERT(nodes.back()->getSchema() == expl.getSchema());
         ENTLIB_ASSERT(nodes.back()->getKeysString().size() == expl.getUnionSetKeysString().size());
     }
@@ -303,6 +308,7 @@ public:
     }
     virtual void inObjectSet()
     {
+        ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         switch (nodes.back()->getKeyType())
         {
         case Ent::DataType::string:
@@ -335,6 +341,7 @@ public:
     }
     virtual void inArray()
     {
+        ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         if (nodes.back()->size() != expl.size())
             expl.size();
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
@@ -535,6 +542,10 @@ void testNodeHandler(Ent::EntityLib& entlib)
         ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeX").getFloat() == 1.f);
         simpleObject.exit();
         ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeY").getFloat() == 2.f);
+        simpleObject.exit();
+        DumpNode dumper(simpleObject);
+        Ent::visit(simpleObject, dumper);
+        std::cout << dumper.getResult().dump(4);
     }
     {
         std::ifstream ifstr("test.SeedPatch.node");
@@ -689,14 +700,14 @@ void testNodeHandler(Ent::EntityLib& entlib)
         CompareNode compare(expl, ent.get());
         std::cout << "Visit all" << std::endl;
         start = clock();
-        visit(expl, 0, compare);
+        visit(expl, compare);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
 
         nlohmann::json newDoc = nlohmann::json::object();
         Cursor destExpl(&entlib, expl.getSchema(), "", &newDoc);
         CopyNode copier(expl, destExpl);
-        visit(expl, 0, copier);
+        visit(expl, copier);
         entlib.saveJsonFile(&newDoc, "instance.prout2.entity");
     }
     bool testLoading = true;
@@ -730,9 +741,9 @@ void testNodeHandler(Ent::EntityLib& entlib)
         //std::cout << "Compare Nodes" << std::endl;
         PrimitiveCounterVisitor visitor;
         std::cout << "Travserse SceneWild.scene with LazyLib" << std::endl;
-        visit(expl, 0, visitor); // Ensure files are already open
+        visit(expl, visitor); // Ensure files are already open
         start = clock();
-        visit(expl, 0, visitor);
+        visit(expl, visitor);
         // visit(expl, 0, visitor);
         // visit(expl, 0, visitor);
         // visit(expl, 0, visitor);
@@ -771,7 +782,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
         std::cout << "Compare both" << std::endl;
         start = clock();
         CompareNode comparator(expl, ent.get());
-        visit(expl, 0, comparator);
+        visit(expl, comparator);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
     }

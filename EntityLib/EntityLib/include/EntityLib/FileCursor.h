@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EntityLib.h"
+#include "../EntityLib.h"
 #include <variant>
 #include <ciso646>
 #include "../Tools.h"

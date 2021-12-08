@@ -1,8 +1,8 @@
-#include "include/EntVisitor.h"
+#include "include/EntityLib/EntVisitor.h"
 
 namespace Ent
 {
-    void visit(Cursor& expl, size_t tab, NodeVisitor& visitor)
+    void visit(Cursor& expl, NodeVisitor& visitor, size_t tab)
     {
         auto getTab = [&] {
             return std::string(tab * 4, ' ');
@@ -17,7 +17,7 @@ namespace Ent
                 expl.enterObjectField(name.c_str(), &schemaref);
                 visitor.inObjectField(name.c_str(), expl);
                 expl.checkInvariants();
-                visit(expl, tab + 1, visitor);
+                visit(expl, visitor, tab + 1);
                 expl.checkInvariants();
                 visitor.outObjectField();
                 expl.exit();
@@ -28,7 +28,7 @@ namespace Ent
         case Ent::DataType::oneOf:
             visitor.inUnion(expl.getUnionType());
             expl.enterUnionData();
-            visit(expl, tab + 1, visitor);
+            visit(expl, visitor, tab + 1);
             visitor.outUnion();
             expl.exit();
             break;
@@ -46,7 +46,7 @@ namespace Ent
                     {
                         expl.enterMapItem(key);
                         visitor.inMapElement(key);
-                        visit(expl, tab + 1, visitor);
+                        visit(expl, visitor, tab + 1);
                         visitor.outMapElement();
                         expl.exit();
                     }
@@ -56,7 +56,7 @@ namespace Ent
                     {
                         expl.enterMapItem(key);
                         visitor.inMapElement(key);
-                        visit(expl, tab + 1, visitor);
+                        visit(expl, visitor, tab + 1);
                         visitor.outMapElement();
                         expl.exit();
                     }
@@ -92,7 +92,7 @@ namespace Ent
                     {
                         expl.enterUnionSetItem(name, schema);
                         visitor.inUnionSetElement(name);
-                        visit(expl, tab + 1, visitor);
+                        visit(expl, visitor, tab + 1);
                         visitor.outUnionSetElement();
                         expl.exit();
                     }
@@ -108,7 +108,7 @@ namespace Ent
                         {
                             expl.enterObjectSetItem(key);
                             visitor.inObjectSetElement(key);
-                            visit(expl, tab + 1, visitor);
+                            visit(expl, visitor, tab + 1);
                             visitor.outObjectSetElement();
                             expl.exit();
                         }
@@ -118,7 +118,7 @@ namespace Ent
                         {
                             expl.enterObjectSetItem(key);
                             visitor.inObjectSetElement(key);
-                            visit(expl, tab + 1, visitor);
+                            visit(expl, visitor, tab + 1);
                             visitor.outObjectSetElement();
                             expl.exit();
                         }
@@ -136,7 +136,7 @@ namespace Ent
                 {
                     expl.enterArrayItem(i);
                     visitor.inArrayElement(i);
-                    visit(expl, tab + 1, visitor);
+                    visit(expl, visitor, tab + 1);
                     visitor.outArrayElement();
                     expl.exit();
                 }

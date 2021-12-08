@@ -7,6 +7,12 @@ namespace Ent
     class NodeVisitor
     {
     public:
+        NodeVisitor() = default;
+        NodeVisitor(NodeVisitor const&) = delete;
+        NodeVisitor(NodeVisitor&&) = delete;
+        NodeVisitor& operator=(NodeVisitor const&) = delete;
+        NodeVisitor& operator=(NodeVisitor&&) = delete;
+
         virtual void inObject()
         {
         }
@@ -111,5 +117,5 @@ namespace Ent
         }
     };
 
-    void visit(Cursor& expl, size_t tab, NodeVisitor& visitor);
+    void visit(Cursor& expl, NodeVisitor& visitor, size_t tab = 0);
 } // namespace Ent

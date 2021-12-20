@@ -76,7 +76,7 @@ namespace Ent
         /// @endcond
 
         char const* getName() const; ///< Get the name of the component
-        void setName(Ent::String _name); ///< Set the name of the component
+        void setName(String _name); ///< Set the name of the component
         bool canBeRenamed() const; ///< A SubEntity of an instance which override a SubEntity in a prefab can't be renamed
         bool newInTheScene() const; ///< This entity is new in this scene (But it can have an "InstanceOf")
         char const* getInstanceOf() const; ///< Name of the inherited prefab if there is one, or nullptr.
@@ -85,7 +85,7 @@ namespace Ent
         /// Set the initial max activation level of the entity at runtime.
         void setMaxActivationLevel(ActivationLevel _level);
         char const* getThumbnail() const; ///< Get the Thumbnail path, or nullptr.
-        void setThumbnail(Ent::String _thumbPath); ///< Set the Thumbnail path
+        void setThumbnail(String _thumbPath); ///< Set the Thumbnail path
         std::array<double, 4> getColor() const; ///< Get the color of the is one, or nullptr.
         void setColor(std::array<double, 4> _color); ///< Set the color RGBA 8bit
 

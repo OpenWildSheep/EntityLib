@@ -152,11 +152,11 @@ namespace Ent
     template <typename Key, typename Value>
     void RemovableMap<Key, Value>::computeMemory(MemoryProfiler& prof) const
     {
-        for (auto&& k_v : map)
+        for (auto&& [key, value] : map)
         {
-            prof.addMem("RemovableMap_pair", sizeof(k_v));
-            prof.addMem("RemovableMap_key", std::get<0>(k_v).capacity());
-            std::get<1>(k_v).computeMemory(prof);
+            prof.addMem("RemovableMap_pair", sizeof(decltype(map)::value_type));
+            prof.addMem("RemovableMap_key", key.capacity());
+            value.computeMemory(prof);
         }
     }
 

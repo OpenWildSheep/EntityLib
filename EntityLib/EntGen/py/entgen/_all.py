@@ -70,6 +70,7 @@ from .ShootSequenceData import *
 from .ShootData import *
 from .SetOfObjectItem import *
 from .SeedPatchData import *
+from .SeedPatchDataMap import *
 from .SeedPatchDataList import *
 from .ScriptPathAndDataSet import *
 from .ScaleFactor import *
@@ -223,7 +224,6 @@ from .InterpolationMethod import *
 from .TrailProperties import *
 from .InteractData import *
 from .InputCollisionBehaviorData import *
-from .ImmersedBehaviorData import *
 from .ID import *
 from .PhysicsReplicateData import *
 from .HotSpotType import *
@@ -279,12 +279,15 @@ from .FluidVolumeComponentGD_SimulationParameters import *
 from .FluidVolumeComponentGD_HeightMapData import *
 from .FluidVolumeComponentGD_FluidVolumeData import *
 from .FluidType import *
+from .ImmersedBehaviorData import *
 from .FluidData import *
 from .FloatRange import *
 from .VegetationPCloudData import *
+from .TaggingVegetation import *
 from .SmallActorSpawnRuleData import *
 from .SmallActorSpawnPointData import *
 from .FadeDuration import *
+from .FadeDelay import *
 from .FactionSpecieRelationData import *
 from .FactionRelationData import *
 from .FactionData import *
@@ -374,6 +377,7 @@ from .SideMapGateGD import *
 from .ShapeshiftStatueGD import *
 from .ShamanVisionGD import *
 from .ShamanItemGD import *
+from .SensorVoxelsGD import *
 from .SensorControllerGD import *
 from .SeedPatch import *
 from .ScriptComponentGD import *
@@ -411,6 +415,7 @@ from .NotVisibleInSubscene import *
 from .NetworkNode import *
 from .NetworkLink import *
 from .NetGD import *
+from .NavMeshRasterizerGD import *
 from .MultiThumbnail import *
 from .MounterGD import *
 from .MountableGD import *
@@ -445,6 +450,7 @@ from .EnvStampGD import *
 from .EnergySpoutGD import *
 from .EnergySourceGD import *
 from .EnergyProbeGD import *
+from .EnergyPoolTaggerGD import *
 from .EnergyPoolGD import *
 from .EnergyNetworkListenerGD import *
 from .EnergyDrainGD import *
@@ -598,8 +604,12 @@ from .EntityStateTreeSwitchTransition import *
 from .EntityStateTreeMetamorphosisUsingScale import *
 from .EntityStateTreeMetamorphosis import *
 from .EntityStateTooDeep import *
+from .EntityStateTakeDamageOnMount import *
 from .EntityStateStrafeDodge import *
 from .EntityStateStickedLand import *
+from .EntityStateSpiritAttacked import *
+from .EntityStateSpiritAttack import *
+from .EntityStateSpiritAnimalSoulForm import *
 from .EntityStateSpiritAnimalBeingCalled import *
 from .EntityStateSpiritAnimalActive import *
 from .EntityStateSpeedLimiter import *
@@ -628,12 +638,14 @@ from .EntityStateLateralLand import *
 from .EntityStateLateralDodge import *
 from .EntityStateJumpHeightMultiplier import *
 from .EntityStateInconvertible import *
+from .EntityStateImmersedJump import *
 from .EntityStateHintNone import *
 from .EntityStateHintLight import *
 from .EntityStateHintFull import *
 from .EntityStateHideOut import *
 from .EntityStateHideIn import *
 from .EntityStateHide import *
+from .EntityStateGroundedJump import *
 from .EntityStateForceCanBeTargeted import *
 from .EntityStateFastRun import *
 from .EntityStateFallSafe import *
@@ -655,6 +667,7 @@ from .EntityStateDamageLand import *
 from .EntityStateCreatureProfile import *
 from .EntityStateCreatureHatching import *
 from .EntityStateCreateSoul import *
+from .EntityStateCombat import *
 from .EntityStateClassicLand import *
 from .EntityStateClassicDodge import *
 from .EntityStateCanNotBePerceived import *
@@ -665,7 +678,9 @@ from .EntityStateBeingBlockedByVine import *
 from .EntityStateAttackCharge import *
 from .EntityStateAskStaffGuide import *
 from .EntityStateApplyExtraLife import *
+from .EntityStateAirControl import *
 from .EntityStateAimAt import *
+from .EntityStateAerialJump import *
 from .ActorStateVomiting import *
 from .ActorStateTryUpgradeShamanStaff import *
 from .ActorStateTryEquipShamanStaff import *
@@ -721,7 +736,6 @@ from .ActorStateHoldingItem import *
 from .ActorStateHitEnergyWall import *
 from .ActorStateHeld import *
 from .ActorStateHasNoBody import *
-from .ActorStateFreeFall import *
 from .ActorStateForceAgainstSlope import *
 from .ActorStateFluidSlowDown import *
 from .ActorStateFlockingRigidbodyBeingActive import *
@@ -930,6 +944,7 @@ from .EntityGDRef import *
 from .FadeEffect import *
 from .FlyingPathParameters import *
 from .GRC import *
+from .GVoxelVolumeCollection import *
 from .Game_Voxel import *
 from .IMatchMakerApi import *
 from .IOnlineApi import *

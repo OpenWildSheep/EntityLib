@@ -35,6 +35,16 @@ class CameraManager(HelperObject):
     @AnglesLevels.setter
     def AnglesLevels(self, val): self.AnglesLevels.set(val)
     @property
+    def CameraControlAxisInvertX(self):  # type: ()->Bool
+        return Bool(self._node.at("CameraControlAxisInvertX"))
+    @CameraControlAxisInvertX.setter
+    def CameraControlAxisInvertX(self, val): self.CameraControlAxisInvertX.set(val)
+    @property
+    def CameraControlAxisInvertY(self):  # type: ()->Bool
+        return Bool(self._node.at("CameraControlAxisInvertY"))
+    @CameraControlAxisInvertY.setter
+    def CameraControlAxisInvertY(self, val): self.CameraControlAxisInvertY.set(val)
+    @property
     def DistanceFromTopPosition(self):  # type: ()->Vector2
         return Vector2(self._node.at("DistanceFromTopPosition"))
     @DistanceFromTopPosition.setter

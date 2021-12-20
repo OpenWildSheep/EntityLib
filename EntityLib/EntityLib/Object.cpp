@@ -20,7 +20,7 @@ namespace Ent
 
     // ************************************* Object ***********************************************
 
-    Ent::ObjField::ObjField(ObjField const& _other)
+    ObjField::ObjField(ObjField const& _other)
         : name(_other.name)
         , node(_other.node->clone())
         , fieldIdx(_other.fieldIdx)
@@ -28,7 +28,7 @@ namespace Ent
     {
     }
 
-    ObjField& Ent::ObjField::operator=(ObjField const& _other)
+    ObjField& ObjField::operator=(ObjField const& _other)
     {
         if (&_other != this)
         {
@@ -38,7 +38,7 @@ namespace Ent
         return *this;
     }
 
-    void Ent::Object::unset()
+    void Object::unset()
     {
         for (ObjField& field : nodes)
         {
@@ -46,13 +46,13 @@ namespace Ent
         }
     }
 
-    void Ent::Object::applyAllValues(Object& _dest, CopyMode _copyMode) const
+    void Object::applyAllValues(Object& _dest, CopyMode _copyMode) const
     {
         applyInstanceOfField(*this, _dest, _copyMode);
         applyAllValuesButPrefab(_dest, _copyMode);
     }
 
-    void Ent::Object::applyAllValuesButPrefab(Object& _dest, CopyMode _copyMode) const
+    void Object::applyAllValuesButPrefab(Object& _dest, CopyMode _copyMode) const
     {
         for (size_t i = 0; i < nodes.size(); ++i)
         {
@@ -60,7 +60,7 @@ namespace Ent
         }
     }
 
-    Ent::Object Ent::Object::makeInstanceOf() const
+    Object Object::makeInstanceOf() const
     {
         std::vector<ObjField> newnodes;
         newnodes.reserve(size());
@@ -72,7 +72,7 @@ namespace Ent
         return Object(schema, std::move(newnodes), instanceOf.makeInstanceOf(), 0, true);
     }
 
-    Object Ent::Object::detach() const
+    Object Object::detach() const
     {
         std::vector<ObjField> newnodes;
         newnodes.reserve(size());
@@ -84,13 +84,13 @@ namespace Ent
         return Object(schema, std::move(newnodes));
     }
 
-    void Ent::Object::resetInstanceOf(char const* _prefabNodePath)
+    void Object::resetInstanceOf(char const* _prefabNodePath)
     {
         auto const* entlib = schema->rootSchema->entityLib;
         if (_prefabNodePath == nullptr or strlen(_prefabNodePath) == 0)
         {
             auto prefabNode = entlib->loadNode(*schema, json{}, nullptr);
-            (*this) = std::get<Object>(prefabNode->GetRawValue()).makeInstanceOf();
+            (*this) = std::get<ObjectPtr>(prefabNode->GetRawValue())->makeInstanceOf();
             instanceOf.set("");
         }
         else
@@ -113,7 +113,7 @@ namespace Ent
                     keyField = field->clone();
                 }
             }
-            (*this) = std::get<Object>(prefabNode->GetRawValue()).makeInstanceOf();
+            (*this) = std::get<ObjectPtr>(prefabNode->GetRawValue())->makeInstanceOf();
             // Set the keyField
             if (keyField != nullptr and keyField->isSet()) // Only report the previus ID if it is set
             {
@@ -162,7 +162,7 @@ namespace Ent
         return false;
     }
 
-    void Ent::Object::setParentNode(Node* _parentNode)
+    void Object::setParentNode(Node* _parentNode)
     {
         for (auto&& [name, node, fieldIndex] : nodes)
         {
@@ -170,7 +170,7 @@ namespace Ent
         }
     }
 
-    void Ent::Object::checkParent(Node const* _parentNode) const
+    void Object::checkParent(Node const* _parentNode) const
     {
         for (auto&& [name, node, fieldIndex] : nodes)
         {
@@ -185,9 +185,21 @@ namespace Ent
         for (ObjField const& field : nodes)
         {
             field.node->computeMemory(prof);
-            prof.addMem("Object::value_ptr", sizeof(Ent::Node));
+            prof.addMem("Object::value_ptr", sizeof(Node));
         }
         prof.addNodes(size());
+    }
+
+    NodeRef Object::computeNodeRefToChild(Node const* _child) const
+    {
+        for (auto& field : nodes)
+        {
+            if (_child == field.node.get())
+            {
+                return field.name;
+            }
+        }
+        ENTLIB_LOGIC_ERROR("_child is not a child of this Object");
     }
 
     size_t count(Object const& obj, char const* key)

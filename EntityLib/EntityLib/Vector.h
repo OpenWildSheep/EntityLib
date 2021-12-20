@@ -50,13 +50,15 @@ namespace Ent
         Vector makeInstanceOf() const;
         EntityLib const* getEntityLib() const;
         std::unique_ptr<Vector> clone() const;
-        tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
+        std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         void unset();
         void setSize(Override<size_t> _size);
         void applyAllValues(Vector& _dest, CopyMode _copyMode) const;
         void setParentNode(Node* _parentNode);
         void checkParent(Node const* _parentNode) const;
         std::vector<NodeUniquePtr> releaseAllElements();
+        /// Get the child index as a string
+        NodeRef computeNodeRefToChild(Node const* child) const;
 
     private:
         EntityLib const* m_entlib = nullptr;

@@ -2,7 +2,7 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4464)
-#include "../Override.h"
+#include "Override.h"
 #pragma warning(pop)
 
 #include "include/Schema.h"
@@ -121,7 +121,12 @@ namespace Ent
         {
             return const_cast<ObjField&>(std::as_const(*this).at(key));
         }
+
+        /// Get the name of the field pointing to \b _child
+        /// @pre \b _child is a child field of this
+        NodeRef computeNodeRefToChild(Node const* _child) const;
     };
+    using ObjectPtr = std::unique_ptr<Object>;
 
     inline auto begin(Object const& obj)
     {

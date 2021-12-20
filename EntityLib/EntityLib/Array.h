@@ -3,11 +3,11 @@
 #include <cstdint>
 #include <map>
 #include <algorithm>
+#include <optional>
 
 #pragma warning(push, 0)
 #pragma warning(disable : 4996)
 #include <variant>
-#include "../external/optional.hpp"
 #pragma warning(pop)
 
 #include "include/EntityLibCore.h"
@@ -83,11 +83,11 @@ namespace Ent
 
         Subschema const* getSchema() const;
 
-        tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
+        std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
 
-        Ent::Map::KeyType getChildKey(Ent::Node const* _child) const;
+        Map::KeyType getChildKey(Node const* _child) const;
 
-        Ent::DataType getKeyType() const;
+        DataType getKeyType() const;
 
         void unset(); ///< Unset recursively all values overriden in instance (return to prefab values)
 
@@ -110,6 +110,10 @@ namespace Ent
         std::vector<String> getKeysString() const;
         std::vector<int64_t> getKeysInt() const;
 
+        /// Get the child name, in the array/map logic
+        /// @pre _child is a child field of this
+        NodeRef computeNodeRefToChild(Node const* _child) const;
+
     private:
         void checkInvariants() const;
 
@@ -118,6 +122,7 @@ namespace Ent
         using MapOrVector = std::variant<Vector, Map>;
         MapOrVector m_data;
     };
+    using ArrayPtr = std::unique_ptr<Array>;
 
     inline size_t Array::size() const
     {
@@ -139,42 +144,47 @@ namespace Ent
         return m_schema;
     }
 
-    inline tl::optional<size_t> Array::getRawSize(OverrideValueLocation _location) const
+    inline std::optional<size_t> Array::getRawSize(OverrideValueLocation _location) const
     {
         return std::visit([_location](auto& a) { return a.getRawSize(_location); }, m_data);
     }
 
-    inline void Ent::Array::unset()
+    inline void Array::unset()
     {
         std::visit([&](auto& a) { a.unset(); }, m_data);
     }
 
-    inline void Ent::Array::setParentNode(Node* _parent)
+    inline void Array::setParentNode(Node* _parent)
     {
         std::visit([&](auto& a) { a.setParentNode(_parent); }, m_data);
     }
 
-    inline void Ent::Array::checkParent(Node const* _parent) const
+    inline void Array::checkParent(Node const* _parent) const
     {
         std::visit([&](auto& a) { a.checkParent(_parent); }, m_data);
     }
 
-    inline std::vector<String> Ent::Array::getKeysString() const
+    inline std::vector<String> Array::getKeysString() const
     {
         ENTLIB_ASSERT_MSG(
             std::holds_alternative<Map>(m_data), "Can only getKeysString on map or set");
         return std::get<Map>(m_data).getKeysString();
     }
 
-    inline std::vector<int64_t> Ent::Array::getKeysInt() const
+    inline std::vector<int64_t> Array::getKeysInt() const
     {
         ENTLIB_ASSERT_MSG(std::holds_alternative<Map>(m_data), "Can only getKeysInt on map or set");
         return std::get<Map>(m_data).getKeysInt();
     }
 
-    inline std::vector<NodeUniquePtr> Ent::Array::releaseAllElements()
+    inline std::vector<NodeUniquePtr> Array::releaseAllElements()
     {
         return std::visit([&](auto& a) { return a.releaseAllElements(); }, m_data);
+    }
+
+    inline NodeRef Array::computeNodeRefToChild(Node const* _child) const
+    {
+        return std::visit([_child](auto& a) { return a.computeNodeRefToChild(_child); }, m_data);
     }
 
 } // namespace Ent

@@ -25,7 +25,7 @@ namespace Ent
 
         explicit Map(EntityLib const* _entlib = nullptr, Subschema const* _schema = nullptr);
         Map(Map const&);
-        Map(Map&&) = default;
+        Map(Map&&) noexcept = default;
         Map& operator=(Map const&);
         Map& operator=(Map&&) = default;
 
@@ -64,12 +64,12 @@ namespace Ent
         bool erase(KeyType const& _key);
         Node const* get(KeyType const& _key) const;
         Node* get(KeyType const& _key);
-        Ent::Node* insert(KeyType const& _key);
+        Node* insert(KeyType const& _key);
         void insert(KeyType const& _key, NodeUniquePtr _newNode);
         bool isErased(KeyType const& _key) const;
-        Ent::Node*
+        Node*
         insert(OverrideValueLocation _loc, KeyType _key, NodeUniquePtr _node, bool _addedInInstance);
-        Ent::Node* rename(KeyType const& _key, KeyType const& _newKey);
+        Node* rename(KeyType const& _key, KeyType const& _newKey);
         void checkInvariants() const;
         std::vector<Node const*> getItemsWithRemoved() const;
         std::vector<Node const*> getItems() const;
@@ -78,8 +78,8 @@ namespace Ent
         void computeMemory(MemoryProfiler& _prof) const;
         Map detach() const;
         Map makeInstanceOf() const;
-        tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
-        static KeyType getChildKey(Subschema const* _schema, Ent::Node const* _child);
+        std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
+        static KeyType getChildKey(Subschema const* _schema, Node const* _child);
         static DataType getKeyType(Subschema const* _schema);
         void unset();
         void applyAllValues(Map& _dest, CopyMode _copyMode) const;
@@ -90,6 +90,10 @@ namespace Ent
         std::vector<String> getKeysString() const;
         std::vector<int64_t> getKeysInt() const;
         EntityLib const* getEntityLib() const;
+
+        /// Get the key containing this \b _child node
+        /// @pre \b _child is a child field of this map
+        NodeRef computeNodeRefToChild(Node const* _child) const;
 
     private:
         Element& insertImpl(KeyType const& _key, NodeUniquePtr _newNode = {});
@@ -102,6 +106,7 @@ namespace Ent
         Subschema const* m_schema = nullptr;
         std::vector<Element> m_items; ///< List of items of the array
         std::map<KeyType, size_t> m_itemMap;
+        Node* m_parentNode = nullptr;
     };
 
 } // namespace Ent

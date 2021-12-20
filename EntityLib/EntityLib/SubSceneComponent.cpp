@@ -21,7 +21,7 @@ namespace Ent
         }
     }
 
-    void Ent::SubSceneComponent::computeMemory(MemoryProfiler& prof) const
+    void SubSceneComponent::computeMemory(MemoryProfiler& prof) const
     {
         prof.currentComp.push_back("SubScene");
         if (embedded)
@@ -31,7 +31,7 @@ namespace Ent
         prof.currentComp.pop_back();
     }
 
-    std::unique_ptr<Ent::SubSceneComponent> Ent::SubSceneComponent::makeInstanceOf() const
+    std::unique_ptr<SubSceneComponent> SubSceneComponent::makeInstanceOf() const
     {
         ENTLIB_ASSERT(embedded != nullptr);
         std::unique_ptr<Scene> instEmbedded = embedded->makeInstanceOf();
@@ -39,7 +39,7 @@ namespace Ent
             embedded->getEntityLib(), true, index, std::move(instEmbedded));
     }
 
-    std::unique_ptr<Ent::SubSceneComponent> Ent::SubSceneComponent::clone() const
+    std::unique_ptr<SubSceneComponent> SubSceneComponent::clone() const
     {
         ENTLIB_ASSERT(embedded != nullptr);
         std::unique_ptr<Scene> instEmbedded = embedded->clone();
@@ -47,7 +47,7 @@ namespace Ent
             embedded->getEntityLib(), hasPrefab, index, std::move(instEmbedded));
     }
 
-    std::unique_ptr<Ent::Scene> Ent::SubSceneComponent::detachEmbedded()
+    std::unique_ptr<Scene> SubSceneComponent::detachEmbedded()
     {
         auto scene = std::make_unique<Scene>(embedded->getEntityLib());
         std::swap(scene, embedded);
@@ -59,7 +59,7 @@ namespace Ent
         return scene;
     }
 
-    void Ent::SubSceneComponent::applyAllValues(SubSceneComponent& _dest, CopyMode _copyMode) const
+    void SubSceneComponent::applyAllValues(SubSceneComponent& _dest, CopyMode _copyMode) const
     {
         if (embedded != nullptr and _dest.embedded != nullptr)
         {
@@ -67,7 +67,7 @@ namespace Ent
         }
     }
 
-    bool Ent::SubSceneComponent::hasOverride() const
+    bool SubSceneComponent::hasOverride() const
     {
         //if (isEmbedded.isSet())
         //    return true;

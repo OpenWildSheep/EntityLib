@@ -32,6 +32,21 @@ class SpiritAnimalGD(HelperObject):
     @EntityRef.setter
     def EntityRef(self, val): self.EntityRef.set(val)
     @property
+    def SoulCooldownFromDeath(self):  # type: ()->Float
+        return Float(self._node.at("SoulCooldownFromDeath"))
+    @SoulCooldownFromDeath.setter
+    def SoulCooldownFromDeath(self, val): self.SoulCooldownFromDeath.set(val)
+    @property
+    def SoulCooldownFromSpiritAttack(self):  # type: ()->Float
+        return Float(self._node.at("SoulCooldownFromSpiritAttack"))
+    @SoulCooldownFromSpiritAttack.setter
+    def SoulCooldownFromSpiritAttack(self, val): self.SoulCooldownFromSpiritAttack.set(val)
+    @property
+    def SpiritAttackHoldDuration(self):  # type: ()->Float
+        return Float(self._node.at("SpiritAttackHoldDuration"))
+    @SpiritAttackHoldDuration.setter
+    def SpiritAttackHoldDuration(self, val): self.SpiritAttackHoldDuration.set(val)
+    @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
     @property

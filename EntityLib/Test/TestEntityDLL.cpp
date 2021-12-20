@@ -90,9 +90,9 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
     case Ent::DataType::number: Ent::printfmt("number\n"); break;
     case Ent::DataType::object:
         Ent::printfmt("object\n");
-        for (auto&& name_sub : subschema.properties)
+        for (auto&& [propname, sub] : subschema.properties)
         {
-            displaySubSchema(std::get<0>(name_sub), *std::get<1>(name_sub), indent + "  ");
+            displaySubSchema(propname, *sub, indent + "  ");
         }
         break;
     case Ent::DataType::string: Ent::printfmt("string\n"); break;
@@ -121,6 +121,7 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
         ENTLIB_ASSERT_MSG(exception_throw, "Exception not thrown!");                               \
     }
 
+// NOLINTNEXTLINE(readability-function-size)
 int main(int argc, char** argv)
 try
 {
@@ -194,7 +195,7 @@ try
     {
         auto&& absRef = std::get<1>(name_schema)->name;
         ENTLIB_ASSERT(absRef.find("./") == std::string::npos);
-        ENTLIB_ASSERT(absRef.find("#") == std::string::npos);
+        ENTLIB_ASSERT(absRef.find('#') == std::string::npos);
         ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(absRef) == 1);
     }
 
@@ -225,6 +226,96 @@ try
         // No $schema, no .entity, wrong pre-extention
         ENTLIB_CHECK_EXCEPTION(
             entlib.loadFileAsNode("test.ThisTypeDoesntExist.node"), Ent::UnknownSchema);
+    }
+    entlib.clearCache();
+    {
+        auto node =
+            entlib.loadFileAsNode("instance.entity", entlib.schema.schema.allDefinitions["Entity"]);
+        auto prefabHisto = node->getPrefabHistory();
+    }
+    {
+        entlib.rawdataPath = "X:/RawData"; // It is a hack to work in the working dir
+        auto node = entlib.loadFileAsNode(
+            "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
+            "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
+            entlib.schema.schema.allDefinitions["Entity"]);
+        auto nodeRef = "Components/SubScene/Embedded/ShamanFullBlue_ent_001";
+        auto ent = node->resolveNodeRef(nodeRef);
+        auto entpath = node->makeNodeRef(ent);
+        ENTLIB_ASSERT(entpath == nodeRef);
+        entpath = ent->makeAbsoluteNodeRef();
+        ENTLIB_ASSERT(entpath == nodeRef);
+        entpath = node->makeAbsoluteNodeRef();
+        ENTLIB_ASSERT(entpath == ".");
+
+        auto prefabHisto = ent->getPrefabHistory();
+        ENTLIB_ASSERT(prefabHisto.size() == 3);
+        ENTLIB_ASSERT(
+            prefabHisto[0].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
+        ENTLIB_ASSERT(
+            prefabHisto[1].prefabPath == "02_creature/human/male/entity/legacy/shaman_male.entity");
+        ENTLIB_ASSERT(
+            prefabHisto[2].prefabPath
+            == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
+    }
+    {
+        auto node = entlib.loadFileAsNode(
+            "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
+            "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
+            entlib.schema.schema.allDefinitions["Entity"]);
+        auto nodeRef =
+            R"(Components/SubScene/Embedded/ShamanFullBlue_ent_001/Components/TransformGD)";
+        auto ent = node->resolveNodeRef(nodeRef);
+        auto entpath = node->makeNodeRef(ent);
+        ENTLIB_ASSERT(entpath == nodeRef);
+        auto prefabHisto = ent->getPrefabHistory();
+        ENTLIB_ASSERT(
+            prefabHisto[0].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
+        ENTLIB_ASSERT(
+            prefabHisto[1].prefabPath == "02_creature/human/male/entity/legacy/shaman_male.entity");
+        ENTLIB_ASSERT(
+            prefabHisto[2].prefabPath
+            == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
+        entlib.rawdataPath = current_path(); // Work in Test dir
+    }
+    {
+        auto node =
+            entlib.loadFileAsNode("instance.entity", entlib.schema.schema.allDefinitions["Entity"]);
+        auto nodeRef = R"(Components/SubScene/Embedded/EP1-Spout_LINK_001/Components/NetworkLink)";
+        auto ent = node->resolveNodeRef(nodeRef);
+        auto entpath = node->makeNodeRef(ent);
+        ENTLIB_ASSERT(entpath == nodeRef);
+        auto nullPath = ent->makeNodeRef(ent);
+        ENTLIB_ASSERT(nullPath.empty() or nullPath == ".");
+        // Test Union
+        auto typedValueUnion = node->at("Components")
+                                   ->mapInsert("ScriptComponentGD")
+                                   ->getUnionData()
+                                   ->at("CommonDataMap")
+                                   ->mapInsert("Test")
+                                   ->at("Value");
+        auto typeValueRef = R"(Components/ScriptComponentGD/CommonDataMap/Test/Value)";
+        ENTLIB_ASSERT(node->makeNodeRef(typedValueUnion) == typeValueRef);
+        auto stringUnionData = typedValueUnion->setUnionType("string");
+        auto strRef = R"(Components/ScriptComponentGD/CommonDataMap/Test/Value/string)";
+        ENTLIB_ASSERT(node->makeNodeRef(stringUnionData) == strRef);
+        ENTLIB_ASSERT(typedValueUnion->makeNodeRef(stringUnionData) == "string");
+
+        auto prefabHisto = ent->getPrefabHistory();
+        ENTLIB_ASSERT(prefabHisto.size() == 3);
+        ENTLIB_ASSERT(
+            std::all_of(begin(prefabHisto), end(prefabHisto), [](Ent::Node::PrefabInfo const& pi) {
+                return pi.node->getSchema()->name == "NetworkLink";
+            }));
+        ENTLIB_ASSERT(prefabHisto[0].nodeRef == ".");
+        ENTLIB_ASSERT(prefabHisto[1].nodeRef == "Components/NetworkLink");
+        ENTLIB_ASSERT(
+            prefabHisto[2].nodeRef
+            == "Components/SubScene/Embedded/EP1-Spout_LINK_001/Components/NetworkLink");
+        ENTLIB_ASSERT(prefabHisto[0].prefabPath == "test.NetworkLink.node");
+        ENTLIB_ASSERT(prefabHisto[1].prefabPath == "test_prefab_history.entity");
+        ENTLIB_ASSERT(prefabHisto[2].prefabPath == "prefab.entity");
+        node->checkParent(nullptr);
     }
     entlib.clearCache();
     auto testPrefabEntity = [](Ent::Entity const* ent) {
@@ -405,7 +496,10 @@ try
         auto setOfObject = ent->getComponent("TestSetOfObject");
         ENTLIB_ASSERT(setOfObject);
         auto mapTest = setOfObject->root->at("MapOfObject");
-        ENTLIB_ASSERT(mapTest->mapInsert("Should_not_appear_in_diff"));
+        auto testParent = mapTest->mapInsert("Should_not_appear_in_diff");
+        ENTLIB_ASSERT(testParent);
+        ENTLIB_ASSERT(testParent->getParentNode()->getSchema()->linearItems.has_value());
+        ENTLIB_ASSERT(testParent->getParentNode()->getParentNode()->isMapOrSet());
         ENTLIB_ASSERT(mapTest->mapErase("Should_not_appear_in_diff"));
 
         // Test a fixed-size array is not "addedInInstance"
@@ -434,6 +528,7 @@ try
         Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
         Ent::Node* tags = pathNodeGD->root->at("Tags")->at("Tags");
         auto primSet = tags->mapGet("a");
+        ENTLIB_ASSERT(primSet->getParentNode()->getParentNode()->isMapOrSet());
         ENTLIB_CHECK_EXCEPTION(primSet->mapErase("1"), Ent::BadArrayType);
 
         // Set Union type and override
@@ -560,8 +655,8 @@ try
         ENTLIB_ASSERT(comp);
         const auto testArrayMember = [&](char const* _arrayName,
                                          size_t defaultSize,
-                                         tl::optional<size_t> prefabSize,
-                                         tl::optional<size_t> overrideSize) {
+                                         std::optional<size_t> prefabSize,
+                                         std::optional<size_t> overrideSize) {
             Ent::Node const* node = comp->root->at(_arrayName);
             ENTLIB_ASSERT(node);
             ENTLIB_ASSERT(node->hasPrefabValue() == prefabSize.has_value());
@@ -571,9 +666,9 @@ try
             ENTLIB_ASSERT(node->getRawSize(Ent::OverrideValueLocation::Prefab) == prefabSize);
             ENTLIB_ASSERT(node->getRawSize(Ent::OverrideValueLocation::Override) == overrideSize);
         };
-        testArrayMember("DefaultValue", 2, tl::nullopt, tl::nullopt);
-        testArrayMember("PrefabValue", 2, 4, tl::nullopt);
-        testArrayMember("OverridedDefaultValue", 2, tl::nullopt, 3);
+        testArrayMember("DefaultValue", 2, std::nullopt, std::nullopt);
+        testArrayMember("PrefabValue", 2, 4, std::nullopt);
+        testArrayMember("OverridedDefaultValue", 2, std::nullopt, 3);
         testArrayMember("OverridedPrefabValue", 2, 4, 3);
     }
     {
@@ -585,8 +680,11 @@ try
         auto const nodeCachesize = entlib.getNodeCache().size();
         auto ent = entlib.loadEntityAsNode("prefab.copy.entity");
         auto const newNodeCachesize = entlib.getNodeCache().size();
-        ENTLIB_ASSERT(
-            newNodeCachesize == nodeCachesize + 2); // "prefab.copy.entity" and "test.SeedPatch.node"
+        // 3 files more in cache:
+        //     "test_prefab_history.entity"
+        //     "prefab.copy.entity"
+        //     "subentity.entity"
+        ENTLIB_ASSERT(newNodeCachesize == nodeCachesize + 3);
         // TEST simple entity refs resolution
         Ent::Node* testEntityRef = ent->at("Components")->mapGet("TestEntityRef")->getUnionData();
         ENTLIB_ASSERT(testEntityRef != nullptr);
@@ -1500,9 +1598,9 @@ try
     // ******************************** Test iteration of schema **********************************
     if (doDisplaySubSchema)
     {
-        for (auto&& name_sub : entlib.schema.components)
+        for (auto&& [name, sub] : entlib.schema.components)
         {
-            displaySubSchema(std::get<0>(name_sub), *std::get<1>(name_sub), {});
+            displaySubSchema(name, *sub, {});
         }
     }
 

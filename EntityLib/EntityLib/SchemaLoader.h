@@ -1,10 +1,10 @@
 #pragma once
 
 #include <set>
+#include <filesystem>
 
 #pragma warning(push, 0)
 #include "../external/json.hpp"
-#include "../external/filesystem.hpp"
 #pragma warning(pop)
 
 #include "include/Schema.h"
@@ -51,6 +51,8 @@ namespace Ent
             virtual void addEnumValue(char const*) = 0;
             virtual void setDefaultValue(Subschema::DefaultValue) = 0;
             virtual void setRefDefaultValue(Subschema::DefaultValue) = 0;
+            virtual void setRefTitle(std::string) = 0;
+            virtual void setRefDescription(std::string) = 0;
             virtual void setConstValue(Subschema::DefaultValue) = 0;
             virtual void setOneOf(size_t) = 0;
             virtual void openOneOfItem(size_t) = 0;

@@ -9,14 +9,14 @@ from entgen.ActorState import *
 
 from EntityLibPy import Node
 
-class ActorStateFreeFall(HelperObject):
-    schema_name = "ActorStateFreeFall"
+class EntityStateTakeDamageOnMount(HelperObject):
+    schema_name = "EntityStateTakeDamageOnMount"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateFreeFall
-        return ActorStateFreeFall(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateFreeFall.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateTakeDamageOnMount
+        return EntityStateTakeDamageOnMount(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateTakeDamageOnMount.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->ActorStateFreeFall
-        return ActorStateFreeFall(entlib.make_node(ActorStateFreeFall.schema_name))
+    def create(entlib):  # type: (EntityLib)->EntityStateTakeDamageOnMount
+        return EntityStateTakeDamageOnMount(entlib.make_node(EntityStateTakeDamageOnMount.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

@@ -16,7 +16,7 @@ try
     auto ent = Entity(entNode.get());
 
     // Test Object
-    auto name = ent.Name(); // inferred type : String
+    [[maybe_unused]] auto name = ent.Name(); // inferred type : String
     static_assert(std::is_same_v<decltype(name), String>);
     auto components = ent.Components(); // inferred type : Components
     // Object Load
@@ -26,7 +26,8 @@ try
     ent2.save("instance_test_save.entity");
 
     // Test Set of Union
-    auto ss = components.get<SubScene>(); // inferred type : SubScene
+    [[maybe_unused]] auto ss =
+        components.get<SubScene>(); // inferred type : SubScene
     for (Ent::String const& key : components.getKeys())
     {
         auto comp = components.get(key.c_str());
@@ -41,7 +42,8 @@ try
     auto heightObj = components.get<HeightObj>();
     static_assert(
         std::is_same_v<std::remove_reference_t<decltype(*heightObj)>, HeightObj>);
-    auto actorStateCreature = ent.ActorStates().add<ActorStateBeingImmersed>();
+    [[maybe_unused]] auto actorStateCreature =
+        ent.ActorStates().add<ActorStateBeingImmersed>();
     auto unitTestCpt =
         components.add<UnitTestComponent>(); // inferred type : TurretComponentGD
     static_assert(std::is_same_v<decltype(unitTestCpt), UnitTestComponent>);
@@ -50,7 +52,7 @@ try
     // Test fixed size array
     auto pos =
         ent.Components().get<TransformGD>()->Position(); // inferred type : Vector3
-    auto x = tgd->Position()[0]; // inferred type : Float
+    [[maybe_unused]] auto x = tgd->Position()[0]; // inferred type : Float
     // Copy point into Node
     double arr[] = {1., 2., 3.};
     tgd->Position() = std::vector<double>{1., 2., 3.};
@@ -61,11 +63,11 @@ try
     tgd->Position()[1] = 2.;
     // Copy Node into point
     std::vector<double> v = tgd->Position();
-    std::array<double, 3> a = tgd->Position();
-    std::tuple<double, double, double> t = tgd->Position();
+    [[maybe_unused]] std::array<double, 3> a = tgd->Position();
+    [[maybe_unused]] std::tuple<double, double, double> t = tgd->Position();
 
     // Test set of primitive
-    auto side =
+    [[maybe_unused]] auto side =
         unitTestCpt.EnumSet(); // inferred type : PrimitiveSet<ReviveSideTargetedItem_ReviveSide>
     static_assert(std::is_same_v<decltype(side), PrimitiveSet<ReviveSideEnum>>);
     unitTestCpt.EnumSet().add(ReviveSideEnum::neutral);
@@ -95,7 +97,7 @@ try
     ent.Name().unset();
     ENTLIB_ASSERT(not ent.Name().isSet());
     ENTLIB_ASSERT(heightObj->Subdivision().get() == 0);
-    auto displaceNoise0 =
+    [[maybe_unused]] auto displaceNoise0 =
         heightObj->DisplaceNoiseList()[0]; // inferred type : DisplaceNoiseListItem
     ENTLIB_ASSERT(ent.Components().get<PathNodeGD>()->Radius().get() == 30.0);
     ENTLIB_ASSERT(ent.Components().get<PathNodeGD>()->Radius().toFloat() == 30.0f);
@@ -107,25 +109,27 @@ try
 
     // Test Tuple
     auto position = unitTestCpt.Position(); // inferred type : Position
-    auto elt2_ = position.get<2>(); // inferred type : Float
+    [[maybe_unused]] auto elt2_ = position.get<2>(); // inferred type : Float
     static_assert(std::is_same_v<decltype(elt2_), Float>);
-    auto val0 = position.get<0>().get(); // inferred type : int
+    [[maybe_unused]] auto val0 = position.get<0>().get(); // inferred type : int
     static_assert(std::is_same_v<decltype(val0), int64_t>);
     ENTLIB_ASSERT(position.size() == 5);
 
     // Test Set of Object
     auto subscene =
         ent.Components().get<SubScene>()->Embedded(); // inferred type : ObjectSet<Entity>
-    auto subent = subscene["EntityWithInstanceOf"]; // inferred type : Entity
+    [[maybe_unused]] auto subent =
+        subscene["EntityWithInstanceOf"]; // inferred type : Entity
     static_assert(std::is_same_v<decltype(subent), std::optional<Entity>>);
-    auto new_ent = subscene.add("NewEntity"); // inferred type : Entity
+    [[maybe_unused]] auto new_ent =
+        subscene.add("NewEntity"); // inferred type : Entity
     static_assert(std::is_same_v<decltype(new_ent), Entity>);
     for (auto&& entname : subscene.getKeys())
     {
-        auto ent3 = subscene.get(entname.c_str());
+        [[maybe_unused]] auto ent3 = subscene.get(entname.c_str());
         static_assert(std::is_same_v<decltype(ent3), std::optional<Entity>>);
     }
-    for (auto ent3 : subscene)
+    for ([[maybe_unused]] auto ent3 : subscene)
     {
         static_assert(std::is_same_v<decltype(ent3), Entity>);
     }
@@ -137,12 +141,14 @@ try
         pathNodeGD->Tags().Tags(); // inferred type : Map<char const*, PrimitiveSet<String>>
     static_assert(
         std::is_same_v<decltype(tags), Map<char const*, PrimitiveSet<char const*>>>);
-    auto b = tags.get("b"); // inferred type : PrimitiveSet<String>
+    [[maybe_unused]] auto b =
+        tags.get("b"); // inferred type : PrimitiveSet<String>
     tags.remove("c");
-    auto c = tags.add("c"); // inferred type : PrimitiveSet<String>
+    [[maybe_unused]] auto c =
+        tags.add("c"); // inferred type : PrimitiveSet<String>
     for (auto&& mapName : tags.getKeys())
     {
-        auto set = tags.get(mapName.c_str());
+        [[maybe_unused]] auto set = tags.get(mapName.c_str());
         static_assert(
             std::is_same_v<decltype(set), std::optional<PrimitiveSet<char const*>>>);
     }
@@ -164,7 +170,7 @@ try
     ENTLIB_ASSERT(not lushArr.has_value());
     for (auto&& stampname : stamps.getKeys())
     {
-        auto stamp = stamps.get(stampname);
+        [[maybe_unused]] auto stamp = stamps.get(stampname);
         std::cout << toString(stampname) << std::endl;
         static_assert(
             std::is_same_v<decltype(stamp), std::optional<Array<sEnvStamp>>>);

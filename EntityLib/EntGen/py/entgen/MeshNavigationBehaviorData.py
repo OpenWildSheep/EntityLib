@@ -22,6 +22,11 @@ class MeshNavigationBehaviorData(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def DeltaAngleMinToPrepareToHoldingOnToNavigationMesh(self):  # type: ()->Float
+        return Float(self._node.at("DeltaAngleMinToPrepareToHoldingOnToNavigationMesh"))
+    @DeltaAngleMinToPrepareToHoldingOnToNavigationMesh.setter
+    def DeltaAngleMinToPrepareToHoldingOnToNavigationMesh(self, val): self.DeltaAngleMinToPrepareToHoldingOnToNavigationMesh.set(val)
+    @property
     def EdgeTransitionConstraintAllowed(self):  # type: ()->Bool
         return Bool(self._node.at("EdgeTransitionConstraintAllowed"))
     @EdgeTransitionConstraintAllowed.setter

@@ -57,6 +57,9 @@ class SoundManager(HelperObject):
     @AmbienceProbePerLayerCount.setter
     def AmbienceProbePerLayerCount(self, val): self.AmbienceProbePerLayerCount.set(val)
     @property
+    def AmbienceTagMapping(self):  # type: ()->Map[str, String]
+        return (lambda n: Map(str, String, n))(self._node.at("AmbienceTagMapping"))
+    @property
     def BiomeSoundBank(self):  # type: ()->SoundManager_BiomeSoundBank
         return SoundManager_BiomeSoundBank(self._node.at("BiomeSoundBank"))
     @property
@@ -608,6 +611,9 @@ class SoundManager(HelperObject):
     @Switch_Ground_Prefix.setter
     def Switch_Ground_Prefix(self, val): self.Switch_Ground_Prefix.set(val)
     @property
+    def TagColors(self):  # type: ()->Map[str, Color]
+        return (lambda n: Map(str, Color, n))(self._node.at("TagColors"))
+    @property
     def UnderWaterBank(self):  # type: ()->String
         return String(self._node.at("UnderWaterBank"))
     @UnderWaterBank.setter
@@ -625,9 +631,6 @@ class SoundManager(HelperObject):
     @property
     def VegetationTagMapping(self):  # type: ()->Map[str, String]
         return (lambda n: Map(str, String, n))(self._node.at("VegetationTagMapping"))
-    @property
-    def VegetationTypeColors(self):  # type: ()->Map[str, Color]
-        return (lambda n: Map(str, Color, n))(self._node.at("VegetationTypeColors"))
     @property
     def VerticalUnderWaterOffset(self):  # type: ()->Float
         return Float(self._node.at("VerticalUnderWaterOffset"))

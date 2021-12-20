@@ -80,7 +80,7 @@ namespace Ent
         {
             throw EmptyKey("Entity without name in Scene::addEntity!");
         }
-        return addEntity(std::make_unique<Ent::Entity>(*entlib, name));
+        return addEntity(std::make_unique<Entity>(*entlib, name));
     }
 
     Entity* Scene::getEntity(size_t index)
@@ -126,7 +126,7 @@ namespace Ent
             auto ent = iter->second.value->clone(); // Avoid to let the value to nullptr
             objects.erase(_currentName);
             ent->_setNameRaw(_newName);
-            objects.emplace(_newName, std::move(ent), Ent::OverrideValueLocation::Override);
+            objects.emplace(_newName, std::move(ent), OverrideValueLocation::Override);
         }
         else
         {
@@ -177,10 +177,10 @@ namespace Ent
     {
         EntityMap instanceEntities;
         auto scene = std::make_unique<Scene>(entlib);
-        for (auto const& name_ent : objects.map)
+        for (auto const& [name, ent] : objects.map)
         {
-            instanceEntities.map.emplace(name_ent.first, name_ent.second.makeInstanceOf());
-            instanceEntities.map[name_ent.first].value->setParentScene(scene.get());
+            instanceEntities.map.emplace(name, ent.makeInstanceOf());
+            instanceEntities.map[name].value->setParentScene(scene.get());
         }
         scene->objects = std::move(instanceEntities);
         return scene;
@@ -190,10 +190,10 @@ namespace Ent
     {
         EntityMap instanceEntities;
         auto scene = std::make_unique<Scene>(entlib);
-        for (auto const& name_ent : objects.map)
+        for (auto const& [name, ent] : objects.map)
         {
-            instanceEntities.map.emplace(name_ent.first, name_ent.second.clone());
-            instanceEntities.map[name_ent.first].value->setParentScene(scene.get());
+            instanceEntities.map.emplace(name, ent.clone());
+            instanceEntities.map[name].value->setParentScene(scene.get());
         }
         scene->objects = std::move(instanceEntities);
         return scene;
@@ -225,19 +225,19 @@ namespace Ent
     void Scene::applyAllValues(Scene& _dest, CopyMode _copyMode) const
     {
         std::map<std::string, Entity*> destMap;
-        for (auto&& name_obj : _dest.objects.map)
+        for (auto&& [name, obj] : _dest.objects.map)
         {
-            if (name_obj.second.isPresent.get())
+            if (obj.isPresent.get())
             {
-                destMap.emplace(name_obj.first, name_obj.second.value.get());
+                destMap.emplace(name, obj.value.get());
             }
         }
-        for (auto&& name_ent : objects.map)
+        for (auto&& [name, rem] : objects.map)
         {
-            if (name_ent.second.isPresent.get())
+            if (rem.isPresent.get())
             {
-                auto destIter = destMap.find(name_ent.first);
-                auto&& ent = name_ent.second.value;
+                auto destIter = destMap.find(name);
+                auto&& ent = rem.value;
                 if (destIter != destMap.end()) // Preserved Entity
                 {
                     ent->applyAllValues(*destIter->second, _copyMode);
@@ -249,9 +249,9 @@ namespace Ent
                 }
             }
         }
-        for (auto&& name_ent : destMap)
+        for (auto&& [name, ent] : destMap)
         {
-            _dest.removeEntity(name_ent.first.c_str());
+            _dest.removeEntity(name.c_str());
         }
     }
 
@@ -264,9 +264,9 @@ namespace Ent
     }
 
     std::unique_ptr<Scene>
-    Scene::loadScene(Ent::EntityLib const& _entLib, json const& _entities, Ent::Scene const* _super)
+    Scene::loadScene(EntityLib const& _entLib, json const& _entities, Scene const* _super)
     {
-        auto scene = std::make_unique<Ent::Scene>(&_entLib);
+        auto scene = std::make_unique<Scene>(&_entLib);
 
         // Add all entities from super scene ...
         std::set<std::string> entFromSuper;
@@ -288,9 +288,9 @@ namespace Ent
                 }
                 bool const removed =
                     instEntNode != nullptr and instEntNode->count("__removed__") != 0;
-                std::unique_ptr<Ent::Entity> ent =
-                    (instEntNode == nullptr) ? superEnt->makeInstanceOf() :
-                                               _entLib.loadEntityFromJson(*instEntNode, superEnt);
+                std::unique_ptr<Entity> ent = (instEntNode == nullptr) ?
+                                                  superEnt->makeInstanceOf() :
+                                                  _entLib.loadEntityFromJson(*instEntNode, superEnt);
                 auto entName = ent->getName();
 
                 ent->setCanBeRenamed(false);
@@ -314,7 +314,7 @@ namespace Ent
             {
                 continue;
             }
-            std::unique_ptr<Ent::Entity> ent = _entLib.loadEntityFromJson(entNode, nullptr);
+            std::unique_ptr<Entity> ent = _entLib.loadEntityFromJson(entNode, nullptr);
             ENTLIB_ASSERT(ent != nullptr);
             scene->addEntity(std::move(ent));
         }
@@ -322,7 +322,7 @@ namespace Ent
         return scene;
     }
 
-    json Ent::Scene::saveScene() const
+    json Scene::saveScene() const
     {
         json document;
 

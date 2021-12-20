@@ -68,16 +68,14 @@ namespace Ent
 
         /// Load the Entity at path _entityPath then return a pointer to the cached data
         std::shared_ptr<Entity const> loadEntityReadOnly(
-            std::filesystem::path const& _entityPath, Ent::Entity const* _super = nullptr) const;
+            std::filesystem::path const& _entityPath, Entity const* _super = nullptr) const;
 
         /// Load the Scene at path _scenePath then return a pointer to the cached data
         std::shared_ptr<Scene const> loadSceneReadOnly(std::filesystem::path const& _scenePath) const;
 
         /// Load the Node at path _nodeSchema then return a pointer to the cached data
         std::shared_ptr<Node const> loadNodeReadOnly(
-            Ent::Subschema const& _nodeSchema,
-            char const* _nodePath,
-            Ent::Node const* _super = nullptr) const;
+            Subschema const& _nodeSchema, char const* _nodePath, Node const* _super = nullptr) const;
 
         /// Load the Node at path _nodeSchema then return a pointer to the cached data
         std::shared_ptr<Node const> loadNodeEntityReadOnly(char const* _nodePath) const;
@@ -93,18 +91,17 @@ namespace Ent
         NodeUniquePtr loadSceneAsNode(std::filesystem::path const& _scenePath) const;
 
         /// Load any entitylib file into a Node, giving a schema
-        NodeUniquePtr
-        loadFileAsNode(std::filesystem::path const& _path, Ent::Subschema const& _schema) const;
+        NodeUniquePtr loadFileAsNode(std::filesystem::path const& _path, Subschema const& _schema) const;
 
         /// Load any entitylib file into a Node, reading the schema name inside the file
-        NodeUniquePtr loadFileAsNode(std::filesystem::path const& _path) const;
+        NodeUniquePtr loadFileAsNode(std::filesystem::path const& _nodePath) const;
 
         /// Load the Entity at path _entityPath
-        std::unique_ptr<Entity> loadEntity(
-            std::filesystem::path const& _entityPath, Ent::Entity const* _super = nullptr) const;
+        std::unique_ptr<Entity>
+        loadEntity(std::filesystem::path const& _entityPath, Entity const* _super = nullptr) const;
 
-        std::unique_ptr<Ent::Entity> loadEntityFromJson(
-            nlohmann::json const& _entNode, Ent::Entity const* _superEntityFromParentEntity) const;
+        std::unique_ptr<Entity> loadEntityFromJson(
+            nlohmann::json const& _entNode, Entity const* _superEntityFromParentEntity) const;
 
         /// Load the Scene at path _scenePath
         std::unique_ptr<Scene> loadScene(std::filesystem::path const& _scenePath) const;
@@ -186,9 +183,9 @@ namespace Ent
         std::filesystem::path getRelativePath(std::filesystem::path const& _path) const;
 
         NodeUniquePtr loadNode(
-            Ent::Subschema const& _nodeSchema,
+            Subschema const& _nodeSchema,
             nlohmann::json const& _data,
-            Ent::Node const* _super,
+            Node const* _super,
             nlohmann::json const* _default = nullptr) const;
 
         /// @brief Resolve an EntityRef relative to this Node/Entity.
@@ -222,27 +219,27 @@ namespace Ent
             Type const* _super) const;
 
         NodeUniquePtr loadObject(
-            Ent::Subschema const& _nodeSchema,
+            Subschema const& _nodeSchema,
             nlohmann::json const& _data,
-            Ent::Node const* _super,
+            Node const* _super,
             nlohmann::json const* _default = nullptr) const;
 
         NodeUniquePtr loadUnion(
-            Ent::Subschema const& _nodeSchema,
+            Subschema const& _nodeSchema,
             nlohmann::json const& _data,
-            Ent::Node const* _super,
+            Node const* _super,
             nlohmann::json const* _default = nullptr) const;
 
         NodeUniquePtr loadArray(
-            Ent::Subschema const& _nodeSchema,
+            Subschema const& _nodeSchema,
             nlohmann::json const& _data,
-            Ent::Node const* _super,
+            Node const* _super,
             nlohmann::json const* _default = nullptr) const;
 
         NodeUniquePtr loadPrimitive(
-            Ent::Subschema const& _nodeSchema,
+            Subschema const& _nodeSchema,
             nlohmann::json const& _data,
-            Ent::Node const* _super,
+            Node const* _super,
             nlohmann::json const* _default = nullptr) const;
 
         mutable std::map<std::filesystem::path, EntityFile> m_entityCache;

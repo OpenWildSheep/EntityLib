@@ -7,6 +7,8 @@ import EntityLibPy
 from entgen.String import *
 from entgen.ComponentGD import *
 from entgen.Float import *
+from entgen.Vector3 import *
+from entgen.TaggingVegetation import *
 
 from EntityLibPy import Node
 
@@ -21,8 +23,16 @@ class VegetationNavMeshTaggerGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def BoundingBoxMargin(self):  # type: ()->Vector3
+        return Vector3(self._node.at("BoundingBoxMargin"))
+    @BoundingBoxMargin.setter
+    def BoundingBoxMargin(self, val): self.BoundingBoxMargin.set(val)
+    @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
+    @property
+    def TaggingVegetation(self):  # type: ()->Array[TaggingVegetation]
+        return (lambda n: Array(TaggingVegetation, n))(self._node.at("TaggingVegetation"))
     @property
     def UpdatePeriod(self):  # type: ()->Float
         return Float(self._node.at("UpdatePeriod"))

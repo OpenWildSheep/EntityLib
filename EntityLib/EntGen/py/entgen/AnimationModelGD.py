@@ -8,6 +8,9 @@ from entgen.String import *
 from entgen.Bool import *
 from entgen.ComponentGD import *
 from entgen.Float import *
+from entgen.Float import *
+from entgen.SpeedMode import *
+from entgen.LocomotionMode import *
 
 from EntityLibPy import Node
 
@@ -29,6 +32,9 @@ class AnimationModelGD(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    @property
+    def additionalSpeedDebug(self):  # type: ()->Map[LocomotionModeEnum, Map[SpeedModeEnum, Float]]
+        return (lambda n: Map(LocomotionModeEnum, (lambda n: Map(SpeedModeEnum, Float, n)), n))(self._node.at("additionalSpeedDebug"))
     @property
     def isLandAnimDriven(self):  # type: ()->Bool
         return Bool(self._node.at("isLandAnimDriven"))

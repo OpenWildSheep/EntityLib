@@ -7,7 +7,7 @@ namespace Ent
 {
     std::pair<Subschema const*, size_t> Subschema::getUnionTypeWrapper(char const* _subtype) const
     {
-        if (type != Ent::DataType::oneOf)
+        if (type != DataType::oneOf)
         {
             throw BadType();
         }
@@ -34,13 +34,13 @@ namespace Ent
     Subschema const* Subschema::getUnionType(char const* _subtype) const
     {
         auto const& un = std::get<UnionMeta>(meta);
-        auto schema = getUnionTypeWrapper(_subtype).first;
+        auto [schema, index] = getUnionTypeWrapper(_subtype);
         return &AT(schema->properties, un.dataField).get();
     }
 
     char const* Subschema::getUnionNameField() const
     {
-        if (type != Ent::DataType::oneOf)
+        if (type != DataType::oneOf)
         {
             throw BadType();
         }
@@ -55,7 +55,7 @@ namespace Ent
 
     char const* Subschema::getUnionDataField() const
     {
-        if (type != Ent::DataType::oneOf)
+        if (type != DataType::oneOf)
         {
             throw BadType();
         }
@@ -70,7 +70,7 @@ namespace Ent
 
     std::map<std::string, Subschema const*> Subschema::getUnionTypesMap() const
     {
-        if (type != Ent::DataType::oneOf)
+        if (type != DataType::oneOf)
         {
             throw BadType();
         }

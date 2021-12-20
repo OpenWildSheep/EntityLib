@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ComponentInput import *
+from entgen.FadeDelay import *
 from entgen.FadeDuration import *
 from entgen.OutfitWearerComponentInput_ReviveSide import *
 from entgen.OutfitWearerComponentInput_ReviveState import *
@@ -23,6 +24,9 @@ class OutfitWearerComponentInput(HelperObject):
         return OutfitWearerComponentInput(entlib.make_node(OutfitWearerComponentInput.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def FadeDelay(self):  # type: ()->FadeDelay
+        return FadeDelay(self._node.at("FadeDelay"))
     @property
     def FadeDuration(self):  # type: ()->FadeDuration
         return FadeDuration(self._node.at("FadeDuration"))

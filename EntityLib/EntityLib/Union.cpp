@@ -90,7 +90,9 @@ namespace Ent
         // TODO : Loïc - low prio - Find a way to get the super.
         //   It could be hard because we are no more in the loading phase, so the super is
         //   now delete.
+        Node* parent = wrapper->getParentNode();
         wrapper = entityLib->loadNode(*subTypeSchema, json(), nullptr);
+        wrapper->setParentNode(parent);
         typeOverriden = false;
         return getUnionData();
     }
@@ -161,19 +163,25 @@ namespace Ent
         return wrapper->hasPrefabValue();
     }
 
-    void Ent::Union::setParentNode(Node* _parentNode)
+    void Union::setParentNode(Node* _parentNode)
     {
         wrapper->setParentNode(_parentNode);
     }
 
-    void Ent::Union::checkParent(Node const* _parentNode) const
+    void Union::checkParent(Node const* _parentNode) const
     {
         wrapper->checkParent(_parentNode);
     }
 
-    std::unique_ptr<Union> Ent::Union::clone() const
+    std::unique_ptr<Union> Union::clone() const
     {
         return std::make_unique<Union>(entityLib, schema, wrapper->clone(), typeIndex);
+    }
+
+    NodeRef Union::computeNodeRefToChild(Node const* _child) const
+    {
+        ENTLIB_ASSERT(getUnionData() == _child);
+        return getUnionType();
     }
 
 } // namespace Ent

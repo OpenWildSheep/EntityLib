@@ -1,7 +1,9 @@
 #pragma once
 
+#include <optional>
+#include <string>
+
 #pragma warning(push, 0)
-#include "../external/optional.hpp"
 #include "MemoryProfiler.h"
 #pragma warning(pop)
 
@@ -34,7 +36,7 @@ namespace Ent
             , m_hasOverride(false)
         {
         }
-        Override(V _defaultValue, tl::optional<V> _prefabValue, tl::optional<V> _overrideValue)
+        Override(V _defaultValue, std::optional<V> _prefabValue, std::optional<V> _overrideValue)
             : m_defaultValue(std::move(_defaultValue))
         {
             m_hasPrefab = _prefabValue.has_value();
@@ -87,7 +89,7 @@ namespace Ent
         }
 
         /// makeInstanceOf, then set a value
-        Override<V> makeOverridedInstanceOf(tl::optional<V> _overrideValue) const
+        Override<V> makeOverridedInstanceOf(std::optional<V> _overrideValue) const
         {
             Override<V> result = makeInstanceOf();
             result.m_hasOverride = _overrideValue.has_value();
@@ -108,29 +110,34 @@ namespace Ent
 
         // bool hasOverride() const;
 
-        tl::optional<V&> getRaw(OverrideValueLocation _location)
+        std::optional<std::reference_wrapper<V>> getRaw(OverrideValueLocation _location)
         {
             switch (_location)
             {
             case OverrideValueLocation::Default: return m_defaultValue;
             case OverrideValueLocation::Prefab:
-                return m_hasPrefab ? tl::optional<V&>{m_prefabValue} : tl::nullopt;
+                return m_hasPrefab ? std::optional<std::reference_wrapper<V>>{m_prefabValue} :
+                                     std::nullopt;
             case OverrideValueLocation::Override:
-                return m_hasOverride ? tl::optional<V&>{m_overrideValue} : tl::nullopt;
-            default: return tl::nullopt;
+                return m_hasOverride ? std::optional<std::reference_wrapper<V>>{m_overrideValue} :
+                                       std::nullopt;
+            default: return std::nullopt;
             }
         }
 
-        tl::optional<V const&> getRaw(OverrideValueLocation _location) const
+        std::optional<std::reference_wrapper<V const>> getRaw(OverrideValueLocation _location) const
         {
             switch (_location)
             {
             case OverrideValueLocation::Default: return m_defaultValue;
             case OverrideValueLocation::Prefab:
-                return m_hasPrefab ? tl::optional<V const&>{m_prefabValue} : tl::nullopt;
+                return m_hasPrefab ? std::optional<std::reference_wrapper<V const>>{m_prefabValue} :
+                                     std::nullopt;
             case OverrideValueLocation::Override:
-                return m_hasOverride ? tl::optional<V const&>{m_overrideValue} : tl::nullopt;
-            default: return tl::nullopt;
+                return m_hasOverride ?
+                           std::optional<std::reference_wrapper<V const>>{m_overrideValue} :
+                           std::nullopt;
+            default: return std::nullopt;
             }
         }
 

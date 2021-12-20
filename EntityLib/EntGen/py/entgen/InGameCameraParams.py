@@ -306,6 +306,16 @@ class InGameCameraParams(HelperObject):
     @FightSpeedRationImpactCoeff.setter
     def FightSpeedRationImpactCoeff(self, val): self.FightSpeedRationImpactCoeff.set(val)
     @property
+    def JoyAccelerationBoostChangingSideH(self):  # type: ()->Float
+        return Float(self._node.at("JoyAccelerationBoostChangingSideH"))
+    @JoyAccelerationBoostChangingSideH.setter
+    def JoyAccelerationBoostChangingSideH(self, val): self.JoyAccelerationBoostChangingSideH.set(val)
+    @property
+    def JoyAccelerationBoostChangingSideV(self):  # type: ()->Float
+        return Float(self._node.at("JoyAccelerationBoostChangingSideV"))
+    @JoyAccelerationBoostChangingSideV.setter
+    def JoyAccelerationBoostChangingSideV(self, val): self.JoyAccelerationBoostChangingSideV.set(val)
+    @property
     def JoyAccelerationH(self):  # type: ()->Float
         return Float(self._node.at("JoyAccelerationH"))
     @JoyAccelerationH.setter
@@ -325,6 +335,12 @@ class InGameCameraParams(HelperObject):
         return Float(self._node.at("JoyDecelerationV"))
     @JoyDecelerationV.setter
     def JoyDecelerationV(self, val): self.JoyDecelerationV.set(val)
+    @property
+    def JoyRotationScaleConverterH(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("JoyRotationScaleConverterH"))
+    @property
+    def JoyRotationScaleConverterV(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("JoyRotationScaleConverterV"))
     @property
     def JoySpeedFactor(self):  # type: ()->Float
         return Float(self._node.at("JoySpeedFactor"))

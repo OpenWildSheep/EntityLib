@@ -13,6 +13,7 @@ class ActorCategoryEnum(Enum):
     CATEGORY_ActionAttack = "CATEGORY_ActionAttack"
     CATEGORY_Attitude = "CATEGORY_Attitude"
     CATEGORY_Context = "CATEGORY_Context"
+    CATEGORY_Control = "CATEGORY_Control"
     CATEGORY_ActionCosmetic = "CATEGORY_ActionCosmetic"
     CATEGORY_ActionDamage = "CATEGORY_ActionDamage"
     CATEGORY_ActionDefault = "CATEGORY_ActionDefault"

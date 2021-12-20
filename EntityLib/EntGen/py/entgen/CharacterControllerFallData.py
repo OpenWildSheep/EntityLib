@@ -21,6 +21,21 @@ class CharacterControllerFallData(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def AirControlBrake(self):  # type: ()->Float
+        return Float(self._node.at("AirControlBrake"))
+    @AirControlBrake.setter
+    def AirControlBrake(self, val): self.AirControlBrake.set(val)
+    @property
+    def AirControlSmooth(self):  # type: ()->Float
+        return Float(self._node.at("AirControlSmooth"))
+    @AirControlSmooth.setter
+    def AirControlSmooth(self, val): self.AirControlSmooth.set(val)
+    @property
+    def AirControlSpeed(self):  # type: ()->Float
+        return Float(self._node.at("AirControlSpeed"))
+    @AirControlSpeed.setter
+    def AirControlSpeed(self, val): self.AirControlSpeed.set(val)
+    @property
     def DamagesPerHeightFall(self):  # type: ()->ScaleConverter
         return ScaleConverter(self._node.at("DamagesPerHeightFall"))
     @property

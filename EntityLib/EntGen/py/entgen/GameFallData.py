@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.Float import *
+from entgen.ScaleConverter import *
 
 from EntityLibPy import Node
 
@@ -25,10 +26,18 @@ class GameFallData(HelperObject):
     @Acceleration.setter
     def Acceleration(self, val): self.Acceleration.set(val)
     @property
-    def ControlAcceleration(self):  # type: ()->Float
-        return Float(self._node.at("ControlAcceleration"))
-    @ControlAcceleration.setter
-    def ControlAcceleration(self, val): self.ControlAcceleration.set(val)
+    def AirControlBrakeAngleMin(self):  # type: ()->Float
+        return Float(self._node.at("AirControlBrakeAngleMin"))
+    @AirControlBrakeAngleMin.setter
+    def AirControlBrakeAngleMin(self, val): self.AirControlBrakeAngleMin.set(val)
+    @property
+    def AirControlDirection(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("AirControlDirection"))
+    @property
+    def AirControlSpeedAngleMax(self):  # type: ()->Float
+        return Float(self._node.at("AirControlSpeedAngleMax"))
+    @AirControlSpeedAngleMax.setter
+    def AirControlSpeedAngleMax(self, val): self.AirControlSpeedAngleMax.set(val)
     @property
     def Friction(self):  # type: ()->Float
         return Float(self._node.at("Friction"))

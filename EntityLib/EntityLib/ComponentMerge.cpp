@@ -208,19 +208,19 @@ namespace Ent
             std::replace(begin(escapedName), end(escapedName), ':', '_');
             std::replace(begin(escapedName), end(escapedName), '>', '_');
             std::replace(begin(escapedName), end(escapedName), '<', '_');
-            if (escapedName.size() < 256) // Can't write filename longer than 255 characters
+            auto const relativeSchemaPath = allSingleSchemaPath / (escapedName + ".json");
+            auto const schemaPath = _toolsDir / relativeSchemaPath;
+            if (schemaPath.native().size() < 255) // Can't write filename longer than 255 characters
             {
                 json singleSchema;
                 singleSchema["$ref"] = "../TextEditorsSchema.json#/definitions/" + escapedName;
-                escapedName += ".json";
-                auto singleSchemaPath = allSingleSchemaPath / escapedName;
                 std::stringstream buffer;
                 buffer << singleSchema.dump(4);
-                std::ofstream file(_toolsDir / singleSchemaPath);
+                std::ofstream file(schemaPath);
                 if (not file.is_open())
                 {
                     throw FileSystemError(
-                        "Trying to open file for write", _toolsDir, singleSchemaPath);
+                        "Trying to open file for write", _toolsDir, relativeSchemaPath);
                 }
                 file << buffer.str();
             }

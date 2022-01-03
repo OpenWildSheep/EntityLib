@@ -252,27 +252,30 @@ namespace Ent
     inline bool Subschema::IsDeprecated() const
     {
         return std::visit(
-            BasicFieldGetter{[](const Subschema::BaseMeta* _meta) {
-                return _meta->deprecated;
-            }},
+            BasicFieldGetter{[](const Subschema::BaseMeta* _meta)
+                             {
+                                 return _meta->deprecated;
+                             }},
             meta);
     }
 
     inline bool Subschema::IsUsedInEditor() const
     {
         return std::visit(
-            BasicFieldGetter{[](const Subschema::BaseMeta* _meta) {
-                return _meta->usedInEditor;
-            }},
+            BasicFieldGetter{[](const Subschema::BaseMeta* _meta)
+                             {
+                                 return _meta->usedInEditor;
+                             }},
             meta);
     }
 
     inline bool Subschema::IsUsedInRuntime() const
     {
         return std::visit(
-            BasicFieldGetter{[](const Subschema::BaseMeta* _meta) {
-                return _meta->usedInRuntime;
-            }},
+            BasicFieldGetter{[](const Subschema::BaseMeta* _meta)
+                             {
+                                 return _meta->usedInRuntime;
+                             }},
             meta);
     }
 

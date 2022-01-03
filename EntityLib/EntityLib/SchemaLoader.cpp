@@ -132,7 +132,8 @@ namespace Ent
 
     Subschema::Meta parseMetaForType(json const& _data, DataType _type)
     {
-        const auto setBaseMetas = [&](Subschema::BaseMeta* _meta) {
+        const auto setBaseMetas = [&](Subschema::BaseMeta* _meta)
+        {
             if (_data.count("editor") != 0u)
             {
                 _meta->usedInEditor = _data["editor"].get<bool>();
@@ -147,7 +148,8 @@ namespace Ent
             }
         };
 
-        const auto setNumberMetas = [&](Subschema::NumberMeta& _meta) {
+        const auto setNumberMetas = [&](Subschema::NumberMeta& _meta)
+        {
             if (_data.count("bitdepth") != 0u)
             {
                 _meta.bitDepth = _data["bitdepth"].get<uint32_t>();
@@ -157,7 +159,8 @@ namespace Ent
                 _meta.isSigned = _data["signed"].get<bool>();
             }
         };
-        const auto setUnionMetas = [&](Subschema::UnionMeta& _meta) {
+        const auto setUnionMetas = [&](Subschema::UnionMeta& _meta)
+        {
             if (_data.count("unionDataField") != 0u)
             {
                 _meta.dataField = _data["unionDataField"].get<std::string>();
@@ -171,7 +174,8 @@ namespace Ent
                 _meta.indexField = _data["unionIndexField"].get<std::string>();
             }
         };
-        const auto setArrayMetas = [&](Subschema::ArrayMeta& _meta) {
+        const auto setArrayMetas = [&](Subschema::ArrayMeta& _meta)
+        {
             _meta.overridePolicy = _data.value("overridePolicy", "");
             _meta.ordered = _data.value("ordered", true);
             if (_data.count("keyField") != 0)
@@ -222,7 +226,8 @@ namespace Ent
         std::string const& _filename, json const& _rootFile, json const& _data, Visitor& vis, int depth)
     {
         DataType currentType = DataType::null;
-        const auto setType = [&](DataType _type) {
+        const auto setType = [&](DataType _type)
+        {
             currentType = _type;
             vis.setType(_type);
         };

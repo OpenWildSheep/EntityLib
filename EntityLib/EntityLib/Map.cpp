@@ -490,7 +490,8 @@ namespace Ent
         std::vector<Node const*> result;
         result.reserve(m_items.size());
         auto&& meta = std::get<Subschema::ArrayMeta>(m_schema->meta);
-        auto notAGhostElement = [](Element const& elt) {
+        auto notAGhostElement = [](Element const& elt)
+        {
             // Don't care of elements which has never existed
             return elt.isPresent.get() or elt.isPresent.getPrefab();
         };
@@ -522,7 +523,8 @@ namespace Ent
     auto Map::getItemsImpl(M* self)
     {
         self->checkInvariants();
-        auto result = [] {
+        auto result = []
+        {
             if constexpr (std::is_const_v<M>)
             {
                 return std::vector<Node const*>{};

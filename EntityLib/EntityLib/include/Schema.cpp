@@ -17,9 +17,13 @@ namespace Ent
             throw MissingMetadata(name.c_str());
         }
         auto const& un = std::get<UnionMeta>(meta);
-        auto iter = std::find_if(begin(*oneOf), end(*oneOf), [&](SubschemaRef const& ref) {
-            return AT(ref->properties, un.typeField).get().constValue->get<std::string>() == subtype;
-        });
+        auto iter = std::find_if(
+            begin(*oneOf),
+            end(*oneOf),
+            [&](SubschemaRef const& ref) {
+                return AT(ref->properties, un.typeField).get().constValue->get<std::string>()
+                       == subtype;
+            });
         if (iter == end(*oneOf))
         {
             throw BadUnionType(_subtype);

@@ -114,9 +114,10 @@ namespace Ent
     template <typename Key, typename Value>
     size_t RemovableMap<Key, Value>::size() const
     {
-        return (size_t)std::count_if(begin(map), end(map), [](auto&& name_removable) {
-            return name_removable.second.isPresent.get();
-        });
+        return (size_t)std::count_if(
+            begin(map),
+            end(map),
+            [](auto&& name_removable) { return name_removable.second.isPresent.get(); });
     }
 
     template <typename Key, typename Value>

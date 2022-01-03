@@ -490,7 +490,8 @@ namespace Ent
             for (auto const& item : _data)
             {
                 auto key = getKeyJson(item);
-                auto keyToString = [&key]() {
+                auto keyToString = [&key]()
+                {
                     std::stringstream ss;
                     ss << key;
                     return ss.str();
@@ -524,9 +525,10 @@ namespace Ent
             }
             if (ordered)
             {
-                std::sort(begin(result), end(result), [](auto&& a, auto&& b) {
-                    return std::get<0>(a) < std::get<0>(b);
-                });
+                std::sort(
+                    begin(result),
+                    end(result),
+                    [](auto&& a, auto&& b) { return std::get<0>(a) < std::get<0>(b); });
             }
             Array arr{entlib, &_nodeSchema};
             for (auto& [key, node, addedInInstance] : result) // node have to be mutable to be moved
@@ -670,7 +672,8 @@ namespace Ent
             {
                 objHasASuper = true;
             }
-            auto getFieldIndex = [](json const& _data, json const& _field) {
+            auto getFieldIndex = [](json const& _data, json const& _field)
+            {
                 int fieldIdx = 0;
                 for (auto& [key, value] : _data.items())
                 {
@@ -836,7 +839,8 @@ namespace Ent
             {
                 using namespace Ent;
                 MergeMapOverride mergeMapOverride{_nodeSchema, _data, _super, _default, this};
-                auto doRemoveDefault = [](json const&) {
+                auto doRemoveDefault = [](json const&)
+                {
                     return false;
                 };
                 switch (hash(meta.overridePolicy))
@@ -848,7 +852,8 @@ namespace Ent
                     // and can be string, double or integer
                     // meta.ordered means the items have to be sorted by the key
                     DataType keyType = _nodeSchema.singularItems->get().linearItems->at(0)->type;
-                    auto doRemove = [](json const& item) {
+                    auto doRemove = [](json const& item)
+                    {
                         return item[1].is_null();
                     };
 #pragma warning(push)
@@ -865,9 +870,8 @@ namespace Ent
                     case DataType::entityRef:
                         arr = mergeMapOverride(
                             [](json const& item) { return item[0].get<std::string>(); },
-                            [](Node const* tmplItem) {
-                                return tmplItem->at(0llu)->getEntityRef().entityPath;
-                            },
+                            [](Node const* tmplItem)
+                            { return tmplItem->at(0llu)->getEntityRef().entityPath; },
                             doRemove);
                         break;
                     case DataType::integer:
@@ -896,14 +900,14 @@ namespace Ent
                             _nodeSchema.singularItems->get().getUnionDefaultTypeName();
                         auto const& unionMeta =
                             std::get<Subschema::UnionMeta>(_nodeSchema.singularItems->get().meta);
-                        auto doRemoveUnion = [unionMeta](json const& item) {
+                        auto doRemoveUnion = [unionMeta](json const& item)
+                        {
                             return item.count(unionMeta.dataField) != 0
                                    and item[unionMeta.dataField].is_null();
                         };
                         arr = mergeMapOverride(
-                            [&unionMeta, defaultTypeName](json const& item) {
-                                return item.value(unionMeta.typeField, defaultTypeName);
-                            },
+                            [&unionMeta, defaultTypeName](json const& item)
+                            { return item.value(unionMeta.typeField, defaultTypeName); },
                             [](Node const* subSuper) { return subSuper->getUnionType(); },
                             doRemoveUnion);
                     }
@@ -911,7 +915,8 @@ namespace Ent
                     case DataType::string: // The key is the item itself
                         arr = mergeMapOverride(
                             [](json const& item) { return item.get<std::string>(); },
-                            [&](Node const* tmplItem) {
+                            [&](Node const* tmplItem)
+                            {
                                 ENTLIB_ASSERT(
                                     tmplItem->getSchema() == &_nodeSchema.singularItems->get());
                                 return tmplItem->getString();
@@ -929,29 +934,26 @@ namespace Ent
                         {
                             auto& keyProperty =
                                 *_nodeSchema.singularItems->get().properties[*meta.keyField];
-                            auto doRemoveSet = [](json const& item) {
+                            auto doRemoveSet = [](json const& item)
+                            {
                                 return item.value("__removed__", false);
                             };
                             switch (keyProperty.type)
                             {
                             case DataType::string:
                                 arr = mergeMapOverride(
-                                    [key = meta.keyField->c_str()](json const& item) {
-                                        return item.at(key).get<std::string>();
-                                    },
-                                    [key = meta.keyField->c_str()](Node const* tmplItem) {
-                                        return tmplItem->at(key)->getString();
-                                    },
+                                    [key = meta.keyField->c_str()](json const& item)
+                                    { return item.at(key).get<std::string>(); },
+                                    [key = meta.keyField->c_str()](Node const* tmplItem)
+                                    { return tmplItem->at(key)->getString(); },
                                     doRemoveSet);
                                 break;
                             case DataType::integer:
                                 arr = mergeMapOverride(
-                                    [key = meta.keyField->c_str()](json const& item) {
-                                        return item.at(key).get<int64_t>();
-                                    },
-                                    [key = meta.keyField->c_str()](Node const* tmplItem) {
-                                        return tmplItem->at(key)->getInt();
-                                    },
+                                    [key = meta.keyField->c_str()](json const& item)
+                                    { return item.at(key).get<int64_t>(); },
+                                    [key = meta.keyField->c_str()](Node const* tmplItem)
+                                    { return tmplItem->at(key)->getInt(); },
                                     doRemoveSet);
                                 break;
                             default:
@@ -1234,16 +1236,20 @@ namespace Ent
                 fieldMap.emplace_back(
                     "InstanceOf", instanceOf.get(), internObj->instanceOfFieldIndex);
             }
-            std::sort(begin(fieldMap), end(fieldMap), [](JsonField const& a, JsonField const& b) {
-                if (a.index != b.index)
+            std::sort(
+                begin(fieldMap),
+                end(fieldMap),
+                [](JsonField const& a, JsonField const& b)
                 {
-                    return a.index < b.index;
-                }
-                else
-                {
-                    return strcmp(a.name, b.name) < 0;
-                }
-            });
+                    if (a.index != b.index)
+                    {
+                        return a.index < b.index;
+                    }
+                    else
+                    {
+                        return strcmp(a.name, b.name) < 0;
+                    }
+                });
             for (JsonField& field : fieldMap)
             {
                 data[field.name] = std::move(field.data);
@@ -1724,8 +1730,9 @@ namespace Ent
     std::shared_ptr<Node const> EntityLib::loadNodeReadOnly(
         Subschema const& _nodeSchema, char const* _nodePath, Node const* _super) const
     {
-        auto loadFunc = [&_nodeSchema](
-                            EntityLib const& _entLib, json const& _document, Node const* _super) {
+        auto loadFunc =
+            [&_nodeSchema](EntityLib const& _entLib, json const& _document, Node const* _super)
+        {
             return _entLib.loadNode(_nodeSchema, _document, _super);
         };
 
@@ -1740,7 +1747,8 @@ namespace Ent
     std::shared_ptr<Scene const>
     EntityLib::loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const
     {
-        auto loadFunc = [](EntityLib const& _entLib, json const& _document, Scene const* _super) {
+        auto loadFunc = [](EntityLib const& _entLib, json const& _document, Scene const* _super)
+        {
             return Scene::loadScene(_entLib, _document.at("Objects"), _super);
         };
 
@@ -1781,8 +1789,9 @@ namespace Ent
 
     NodeUniquePtr EntityLib::loadFileAsNode(std::filesystem::path const& _nodePath) const
     {
-        auto loadFunc = [this, &_nodePath](
-                            EntityLib const& _entLib, json const& _document, Node const* _super) {
+        auto loadFunc =
+            [this, &_nodePath](EntityLib const& _entLib, json const& _document, Node const* _super)
+        {
             Subschema const* schema = nullptr;
             std::string schemaFound;
             bool tryToLower = false;

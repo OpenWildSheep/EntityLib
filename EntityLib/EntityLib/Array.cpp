@@ -230,7 +230,8 @@ namespace Ent
     void Array::applyAllValues(Array& _dest, CopyMode _copyMode) const
     {
         std::visit(
-            [pref = &_dest, _copyMode](auto&& a) {
+            [pref = &_dest, _copyMode](auto&& a)
+            {
                 using PrefabType = std::remove_cv_t<std::remove_reference_t<decltype(a)>>;
                 a.applyAllValues(std::get<PrefabType>(pref->m_data), _copyMode);
             },

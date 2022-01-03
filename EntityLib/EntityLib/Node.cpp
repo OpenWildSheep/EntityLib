@@ -63,7 +63,8 @@ namespace Ent
     Node::Value copyValue(Node::Value const& value)
     {
         return std::visit(
-            [](auto&& typedvalue) {
+            [](auto&& typedvalue)
+            {
                 using Type = std::remove_const_t<std::remove_reference_t<decltype(typedvalue)>>;
                 if constexpr (std::is_same_v<Type, ArrayPtr> or std::is_same_v<Type, UnionPtr> or std::is_same_v<Type, ObjectPtr>)
                 {
@@ -91,7 +92,8 @@ namespace Ent
     static NodeRef computeParentToChildNodeRef(Node const* _parent, Node const* _child)
     {
         return std::visit(
-            [_child](auto const& _node) -> NodeRef {
+            [_child](auto const& _node) -> NodeRef
+            {
                 using NodeType = std::remove_const_t<std::remove_reference_t<decltype(_node)>>;
                 if constexpr (
                     std::is_same_v<
@@ -223,7 +225,8 @@ namespace Ent
         }
         Node const* current = this;
 
-        auto nextToken = [&tokenStart, &tokenStop, nodeRefEnd] {
+        auto nextToken = [&tokenStart, &tokenStop, nodeRefEnd]
+        {
             if (tokenStop == nodeRefEnd)
             {
                 tokenStart = nodeRefEnd;
@@ -1424,7 +1427,8 @@ namespace Ent
         auto setToNode = [](Subschema const& prop,
                             Node& node,
                             String const& fieldName,
-                            std::map<std::string, Map::KeyType> const& keys) {
+                            std::map<std::string, Map::KeyType> const& keys)
+        {
             if (not prop.isKeyField)
             {
                 return;

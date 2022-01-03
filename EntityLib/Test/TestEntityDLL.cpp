@@ -303,10 +303,11 @@ try
 
         auto prefabHisto = ent->getPrefabHistory();
         ENTLIB_ASSERT(prefabHisto.size() == 3);
-        ENTLIB_ASSERT(
-            std::all_of(begin(prefabHisto), end(prefabHisto), [](Ent::Node::PrefabInfo const& pi) {
-                return pi.node->getSchema()->name == "NetworkLink";
-            }));
+        ENTLIB_ASSERT(std::all_of(
+            begin(prefabHisto),
+            end(prefabHisto),
+            [](Ent::Node::PrefabInfo const& pi)
+            { return pi.node->getSchema()->name == "NetworkLink"; }));
         ENTLIB_ASSERT(prefabHisto[0].nodeRef == ".");
         ENTLIB_ASSERT(prefabHisto[1].nodeRef == "Components/NetworkLink");
         ENTLIB_ASSERT(
@@ -318,7 +319,8 @@ try
         node->checkParent(nullptr);
     }
     entlib.clearCache();
-    auto testPrefabEntity = [](Ent::Entity const* ent) {
+    auto testPrefabEntity = [](Ent::Entity const* ent)
+    {
         // ActorStates
         Ent::Node const& actorStates = ent->getActorStates();
         ENTLIB_ASSERT(actorStates.getDataType() == Ent::DataType::array);
@@ -625,7 +627,8 @@ try
         ent->removeComponent("TransformGD");
         Ent::Component* transformGD = ent->addComponent("TransformGD");
         Ent::Node* mat33 = transformGD->root->at("Matrix");
-        auto testMat33 = [&]() {
+        auto testMat33 = [&]()
+        {
             ENTLIB_ASSERT(mat33->at(0llu)->getFloat() == 1.);
             ENTLIB_ASSERT(mat33->at(0llu)->getDefaultFloat() == 1.);
             ENTLIB_ASSERT(mat33->at(1llu)->getFloat() == 0.);
@@ -656,7 +659,8 @@ try
         const auto testArrayMember = [&](char const* _arrayName,
                                          size_t defaultSize,
                                          std::optional<size_t> prefabSize,
-                                         std::optional<size_t> overrideSize) {
+                                         std::optional<size_t> overrideSize)
+        {
             Ent::Node const* node = comp->root->at(_arrayName);
             ENTLIB_ASSERT(node);
             ENTLIB_ASSERT(node->hasPrefabValue() == prefabSize.has_value());
@@ -819,7 +823,8 @@ try
         ENTLIB_ASSERT(scene->resolveEntityRef({"InstanceOfA/B/../../C"}) == &C);
     }
 
-    auto testInstanceOf = [](Ent::Entity const& ent, bool testIsSet = true, bool testPrefab = true) {
+    auto testInstanceOf = [](Ent::Entity const& ent, bool testIsSet = true, bool testPrefab = true)
+    {
         // ActorStates
         Ent::Node const& actorStates = ent.getActorStates();
         actorStates.checkParent(nullptr); // Check the parent of nodes is valid
@@ -1188,7 +1193,8 @@ try
         ENTLIB_ASSERT(setOfObject3->mapGet("G")->at("Value")->getString() == std::string());
     }
 
-    auto test_erase = [](Ent::Entity* ent) {
+    auto test_erase = [](Ent::Entity* ent)
+    {
         Ent::Node& actorStates = ent->getActorStates();
         Ent::Component* pathNodeGD = ent->getComponent("PathNodeGD");
         Ent::Node* tags = pathNodeGD->root->at("Tags")->at("Tags");
@@ -1273,7 +1279,8 @@ try
         EntityPtr ent = entlib.loadEntity("instance2.entity");
         testInstanceOf(*ent, true, false);
     }
-    auto testInstanceOverrideSubscene = [](Ent::Entity const& ent) {
+    auto testInstanceOverrideSubscene = [](Ent::Entity const& ent)
+    {
         // TEST SubScene (with override)
         Ent::SubSceneComponent const* subScene = ent.getSubSceneComponent();
         ENTLIB_ASSERT(subScene != nullptr);
@@ -1534,7 +1541,8 @@ try
         instanceOf->getComponent("TransformGD")->root->getFieldNames();
         entlib.saveEntity(*instanceOf, "instance.create.entity");
     }
-    auto testCreateInstanceOf = [&entlib](char const* _instancePath) {
+    auto testCreateInstanceOf = [&entlib](char const* _instancePath)
+    {
         // Test read instance of
         EntityPtr ent = entlib.loadEntity(_instancePath);
 
@@ -1616,7 +1624,8 @@ try
     }
 
     // ******************* Test the override of an entity in a SubScene ***************************
-    auto testOverrideSubEntity = [](Ent::Entity const& ent) {
+    auto testOverrideSubEntity = [](Ent::Entity const& ent)
+    {
         Ent::SubSceneComponent const* subScenecomp = ent.getSubSceneComponent();
         auto&& allSubEntities = subScenecomp->embedded->getObjects();
         ENTLIB_ASSERT(allSubEntities.size() == PrefabSubEntityCount);
@@ -1632,7 +1641,8 @@ try
     }
 
     // ******************* Test the add of an entity in a SubScene *****************************
-    auto testAddSubEntity = [](Ent::Entity const& ent) {
+    auto testAddSubEntity = [](Ent::Entity const& ent)
+    {
         Ent::SubSceneComponent const* subScenecomp = ent.getSubSceneComponent();
         auto&& allSubEntities = subScenecomp->embedded->getObjects();
         ENTLIB_ASSERT(allSubEntities.size() == PrefabSubEntityCount + 1);

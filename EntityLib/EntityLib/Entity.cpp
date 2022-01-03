@@ -629,9 +629,10 @@ namespace Ent
             subscenePlaceholder.index = subscene->index;
             sortedComp.push_back(&subscenePlaceholder);
         }
-        std::sort(begin(sortedComp), end(sortedComp), [](Component const* cmp, Component const* cmp2) {
-            return cmp->index < cmp2->index;
-        });
+        std::sort(
+            begin(sortedComp),
+            end(sortedComp),
+            [](Component const* cmp, Component const* cmp2) { return cmp->index < cmp2->index; });
         for (Component const* comp : sortedComp)
         {
             if (comp->type == "SubScene")

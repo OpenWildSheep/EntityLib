@@ -339,7 +339,8 @@ namespace Ent
         std::stable_sort(
             begin(orderedEntities),
             end(orderedEntities),
-            [](EntityMap::value_type const* a, EntityMap::value_type const* b) {
+            [](EntityMap::value_type const* a, EntityMap::value_type const* b)
+            {
                 return a->second.index < b->second.index; // Try to keep ordering
             });
         for (auto const* name_ent : orderedEntities)

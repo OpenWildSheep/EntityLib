@@ -852,8 +852,9 @@ namespace Ent
                 case "map"_hash:
                     switch (getMapKeyType())
                     {
-                    case Ent::DataType::string: return getMapContains(std::get<std::string>(_key).c_str());
-                    case Ent::DataType::integer: return getMapContains(std::get<size_t>(_key));
+                    case Ent::DataType::string:
+                        return mapContains(std::get<std::string>(_key).c_str());
+                    case Ent::DataType::integer: return mapContains(std::get<size_t>(_key));
                     default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                     }
                     break;
@@ -862,19 +863,19 @@ namespace Ent
                     auto& itemType = schema->singularItems.get()->get();
                     switch (itemType.type)
                     {
-                    case Ent::DataType::integer: return getPrimSetContains(std::get<size_t>(_key));
+                    case Ent::DataType::integer: return primSetContains(std::get<size_t>(_key));
                     case Ent::DataType::string:
-                        return getPrimSetContains(std::get<std::string>(_key).c_str());
+                        return primSetContains(std::get<std::string>(_key).c_str());
                     case Ent::DataType::oneOf:
-                        return getUnionSetContains(std::get<std::string>(_key).c_str());
+                        return unionSetContains(std::get<std::string>(_key).c_str());
                     case Ent::DataType::object:
                         auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                         switch (keyFieldSchema.type)
                         {
                         case Ent::DataType::string:
-                            return getObjectSetContains(std::get<std::string>(_key).c_str());
+                            return objectSetContains(std::get<std::string>(_key).c_str());
                         case Ent::DataType::integer:
-                            return getObjectSetContains(std::get<size_t>(_key));
+                            return objectSetContains(std::get<size_t>(_key));
                         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                         }
                         break;
@@ -1127,42 +1128,41 @@ namespace Ent
         return keys;
     }
 
-    bool Cursor::getMapContains(char const* _key)
+    bool Cursor::mapContains(char const* _key)
     {
         return getMapKeysString().count(_key);
     }
-    bool Cursor::getMapContains(int64_t _key)
+    bool Cursor::mapContains(int64_t _key)
     {
         return getMapKeysInt().count(_key);
     }
-    bool Cursor::getPrimSetContains(char const* _key)
+    bool Cursor::primSetContains(char const* _key)
     {
         return getPrimSetKeysString().count(_key) != 0;
     }
-    bool Cursor::getPrimSetContains(int64_t _key)
+    bool Cursor::primSetContains(int64_t _key)
     {
         return getPrimSetKeysInt().count(_key) != 0;
     }
-    bool Cursor::getUnionSetContains(char const* _key)
+    bool Cursor::unionSetContains(char const* _key)
     {
         return getUnionSetKeysString().count(_key) != 0;
     }
-    bool Cursor::getObjectSetContains(char const* _key)
+    bool Cursor::objectSetContains(char const* _key)
     {
         return getObjectSetKeysString().count(_key) != 0;
     }
-    bool Cursor::getObjectSetContains(int64_t _key)
+    bool Cursor::objectSetContains(int64_t _key)
     {
         return getObjectSetKeysInt().count(_key) != 0;
     }
 
-
     void Cursor::_buildPath()
     {
         auto firstNotSet = std::find_if(
-            m_instance.layerBegin(), m_instance.layerEnd(), [](FileCursor::Layer const& l) {
-                return l.values == nullptr;
-            });
+            m_instance.layerBegin(),
+            m_instance.layerEnd(),
+            [](FileCursor::Layer const& l) { return l.values == nullptr; });
         ENTLIB_ASSERT(firstNotSet != m_instance.layerBegin());
         auto firstNotSetIdx = std::distance(m_instance.layerBegin(), firstNotSet);
         auto lastSet = firstNotSet;

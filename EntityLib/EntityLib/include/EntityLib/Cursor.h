@@ -86,9 +86,9 @@ namespace Ent
 
         auto getFieldNames() const
         {
-            return m_instance.getSchema()->properties | rah::view::transform([](auto&& field_schema) {
-                       return std::get<0>(field_schema).c_str();
-                   });
+            return m_instance.getSchema()->properties
+                   | rah::view::transform([](auto&& field_schema)
+                                          { return std::get<0>(field_schema).c_str(); });
         }
 
         std::unordered_map<std::string, SubschemaRef> const& getFields() const;
@@ -111,13 +111,13 @@ namespace Ent
         std::set<char const*, CmpStr> getObjectSetKeysString();
         std::set<int64_t> getObjectSetKeysInt();
 
-        bool getMapContains(char const*);
-        bool getMapContains(int64_t);
-        bool getPrimSetContains(char const*);
-        bool getPrimSetContains(int64_t);
-        bool getUnionSetContains(char const*);
-        bool getObjectSetContains(char const*);
-        bool getObjectSetContains(int64_t);
+        bool mapContains(char const*);
+        bool mapContains(int64_t);
+        bool primSetContains(char const*);
+        bool primSetContains(int64_t);
+        bool unionSetContains(char const*);
+        bool objectSetContains(char const*);
+        bool objectSetContains(int64_t);
 
         bool isSet() const;
 

@@ -26,7 +26,7 @@ try
     sprintf_s(editCmd, sizeof(editCmd), R"(p4 edit "%s/%s")", argv[1], textEditorSchemaPath);
     system(editCmd);
 
-    sprintf_s(editCmd, sizeof(editCmd), R"(p4 edit "%s/%s")", argv[1], allSingleSchemaPath);
+    sprintf_s(editCmd, sizeof(editCmd), R"(p4 delete "%s/%s")", argv[1], allSingleSchemaPath);
     system(editCmd);
 
     Ent::updateComponents(argv[1]);

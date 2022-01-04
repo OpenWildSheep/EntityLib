@@ -1099,16 +1099,16 @@ namespace Ent
         return std::get<ArrayPtr>(value)->getKeyType();
     }
 
-    std::vector<String> Node::getKeysString() const
+    std::vector<String> Node::getKeysString(bool _forceSort) const
     {
         checkMap("getKeysString");
-        return std::get<ArrayPtr>(value)->getKeysString();
+        return std::get<ArrayPtr>(value)->getKeysString(_forceSort);
     }
 
-    std::vector<int64_t> Node::getKeysInt() const
+    std::vector<int64_t> Node::getKeysInt(bool _forceSort) const
     {
         checkMap("getMapKeysInt");
-        return std::get<ArrayPtr>(value)->getKeysInt();
+        return std::get<ArrayPtr>(value)->getKeysInt(_forceSort);
     }
 
     std::vector<NodeUniquePtr> Node::releaseAllElements()

@@ -126,11 +126,11 @@ namespace Ent
         /// @pre isMapOrSet()
         /// @pre getKeyType() == string or getKeyType() == entityRef
         /// @return All keys of the map, as String
-        std::vector<String> getKeysString() const;
+        std::vector<String> getKeysString(bool _forceSort = false) const;
         /// @pre isMapOrSet()
         /// @pre getKeyType() == integer
         /// @return All keys of the map, as int64_t
-        std::vector<int64_t> getKeysInt() const;
+        std::vector<int64_t> getKeysInt(bool _forceSort = false) const;
         std::vector<NodeUniquePtr> releaseAllElements();
 
         // Union

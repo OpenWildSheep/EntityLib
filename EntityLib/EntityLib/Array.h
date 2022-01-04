@@ -107,8 +107,8 @@ namespace Ent
         void setParentNode(Node* _parentNode);
         void checkParent(Node const* _parentNode) const;
 
-        std::vector<String> getKeysString() const;
-        std::vector<int64_t> getKeysInt() const;
+        std::vector<String> getKeysString(bool _forceSort) const;
+        std::vector<int64_t> getKeysInt(bool _forceSort) const;
 
         /// Get the child name, in the array/map logic
         /// @pre _child is a child field of this
@@ -164,17 +164,17 @@ namespace Ent
         std::visit([&](auto& a) { a.checkParent(_parent); }, m_data);
     }
 
-    inline std::vector<String> Array::getKeysString() const
+    inline std::vector<String> Array::getKeysString(bool _forceSort) const
     {
         ENTLIB_ASSERT_MSG(
             std::holds_alternative<Map>(m_data), "Can only getKeysString on map or set");
-        return std::get<Map>(m_data).getKeysString();
+        return std::get<Map>(m_data).getKeysString(_forceSort);
     }
 
-    inline std::vector<int64_t> Array::getKeysInt() const
+    inline std::vector<int64_t> Array::getKeysInt(bool _forceSort) const
     {
         ENTLIB_ASSERT_MSG(std::holds_alternative<Map>(m_data), "Can only getKeysInt on map or set");
-        return std::get<Map>(m_data).getKeysInt();
+        return std::get<Map>(m_data).getKeysInt(_forceSort);
     }
 
     inline std::vector<NodeUniquePtr> Array::releaseAllElements()

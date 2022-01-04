@@ -756,7 +756,7 @@ namespace Ent
         }
     }
 
-    std::vector<String> Map::getKeysString() const
+    std::vector<String> Map::getKeysString(bool _forceSort) const
     {
         auto const keyType = getKeyType(m_schema);
         if (keyType != DataType::string and keyType != DataType::entityRef)
@@ -765,17 +765,31 @@ namespace Ent
         }
         std::vector<String> keys;
         keys.reserve(m_items.size());
-        for (auto& elt : m_items)
+        if (_forceSort)
         {
-            if (elt.isPresent.get())
+            for (auto& [key, idx] : m_itemMap)
             {
-                keys.push_back(std::get<String>(getChildKey(m_schema, elt.node.get())));
+                auto& item = m_items[idx];
+                if (item.isPresent.get())
+                {
+                    keys.push_back(std::get<String>(getChildKey(m_schema, item.node.get())));
+                }
+            }
+        }
+        else
+        {
+            for (auto& elt : m_items)
+            {
+                if (elt.isPresent.get())
+                {
+                    keys.push_back(std::get<String>(getChildKey(m_schema, elt.node.get())));
+                }
             }
         }
         return keys;
     }
 
-    std::vector<int64_t> Map::getKeysInt() const
+    std::vector<int64_t> Map::getKeysInt(bool _forceSort) const
     {
         auto const keyType = getKeyType(m_schema);
         if (keyType != DataType::integer)
@@ -784,11 +798,25 @@ namespace Ent
         }
         std::vector<int64_t> keys;
         keys.reserve(m_items.size());
-        for (auto& elt : m_items)
+        if (_forceSort)
         {
-            if (elt.isPresent.get())
+            for (auto& [key, idx] : m_itemMap)
             {
-                keys.push_back(std::get<int64_t>(getChildKey(m_schema, elt.node.get())));
+                auto& item = m_items[idx];
+                if (item.isPresent.get())
+                {
+                    keys.push_back(std::get<int64_t>(getChildKey(m_schema, item.node.get())));
+                }
+            }
+        }
+        else
+        {
+            for (auto& elt : m_items)
+            {
+                if (elt.isPresent.get())
+                {
+                    keys.push_back(std::get<int64_t>(getChildKey(m_schema, elt.node.get())));
+                }
             }
         }
         return keys;

@@ -152,4 +152,43 @@ namespace Ent
         default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
         }
     }
+
+    void visit(Cursor& _expl, Visitor& _visitor)
+    {
+        switch (_expl.getDataType())
+        {
+        case Ent::DataType::object: _visitor.inObject(); break;
+        case Ent::DataType::oneOf: _visitor.inUnion(_expl.getUnionType()); break;
+        case Ent::DataType::array:
+        {
+            auto meta = std::get<Ent::Subschema::ArrayMeta>(_expl.getSchema()->meta);
+            switch (hash(meta.overridePolicy))
+            {
+            case "map"_hash: _visitor.inMap(); break;
+            case "set"_hash:
+            {
+                auto& itemType = _expl.getSchema()->singularItems.get()->get();
+                switch (itemType.type)
+                {
+                case Ent::DataType::integer:
+                case Ent::DataType::string: _visitor.inPrimSet(itemType.type); break;
+                case Ent::DataType::oneOf: _visitor.inUnionSet(); break;
+                case Ent::DataType::object: _visitor.inObjectSet(); break;
+                }
+            }
+            break;
+            case ""_hash: _visitor.inArray(); break;
+            }
+        }
+        break;
+        case Ent::DataType::null: _visitor.nullNode(); break;
+        case Ent::DataType::boolean: _visitor.boolNode(); break;
+        case Ent::DataType::integer: _visitor.intNode(); break;
+        case Ent::DataType::number: _visitor.floatNode(); break;
+        case Ent::DataType::string: _visitor.stringNode(); break;
+        case Ent::DataType::entityRef: _visitor.entityRefNode(); break;
+        case Ent::DataType::COUNT:
+        default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
+        }
+    }
 } // namespace Ent

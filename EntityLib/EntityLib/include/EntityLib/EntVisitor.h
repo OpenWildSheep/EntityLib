@@ -120,4 +120,57 @@ namespace Ent
     };
 
     void visitRecursive(Cursor& _expl, RecursiveVisitor& _visitor, bool _sortFields);
+
+    class Visitor
+    {
+    public:
+        Visitor() = default;
+        virtual ~Visitor() = default;
+        Visitor(Visitor const&) = delete;
+        Visitor(Visitor&&) = delete;
+        Visitor& operator=(Visitor const&) = delete;
+        Visitor& operator=(Visitor&&) = delete;
+
+        virtual void inObject()
+        {
+        }
+        virtual void inUnion([[maybe_unused]] char const* _type)
+        {
+        }
+        virtual void inMap()
+        {
+        }
+        virtual void inPrimSet([[maybe_unused]] Ent::DataType _dataType)
+        {
+        }
+        virtual void inUnionSet()
+        {
+        }
+        virtual void inObjectSet()
+        {
+        }
+        virtual void inArray()
+        {
+        }
+        virtual void nullNode()
+        {
+        }
+        virtual void boolNode()
+        {
+        }
+        virtual void intNode()
+        {
+        }
+        virtual void floatNode()
+        {
+        }
+        virtual void stringNode()
+        {
+        }
+        virtual void entityRefNode()
+        {
+        }
+    };
+
+    void visit(Cursor& _expl, Visitor& _visitor);
 } // namespace Ent

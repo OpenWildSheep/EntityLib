@@ -395,35 +395,35 @@ class PrimitiveCounterVisitor : public RecursiveVisitor
 public:
     size_t primitiveCount = 0;
 
-    virtual void key(char const*)
+    void key(char const*) override
     {
         ++primitiveCount;
     }
-    virtual void key(int64_t)
+    void key(int64_t) override
     {
         ++primitiveCount;
     }
-    virtual void nullNode()
+    void nullNode() override
     {
         ++primitiveCount;
     }
-    virtual void boolNode()
+    void boolNode() override
     {
         ++primitiveCount;
     }
-    virtual void intNode()
+    void intNode() override
     {
         ++primitiveCount;
     }
-    virtual void floatNode()
+    void floatNode() override
     {
         ++primitiveCount;
     }
-    virtual void stringNode()
+    void stringNode() override
     {
         ++primitiveCount;
     }
-    virtual void entityRefNode()
+    void entityRefNode() override
     {
         ++primitiveCount;
     }
@@ -534,6 +534,13 @@ size_t countNodes(Node* node)
 void testNodeHandler(Ent::EntityLib& entlib)
 {
     {
+        auto storage = nlohmann::json::object();
+        Ent::Cursor quickCreatureSwitchEntity(&entlib, entlib.getEntitySchema(), nullptr, &storage);
+        quickCreatureSwitchEntity.enterObjectField("Name");
+        quickCreatureSwitchEntity.setString("Debug Quick Creatures Switch");
+        quickCreatureSwitchEntity.exit();
+    }
+    {
         std::ifstream ifstr("test.SeedPatch.node");
         std::string filedata;
         std::getline(ifstr, filedata, char(0));
@@ -547,7 +554,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
         simpleObject.exit();
         DumpNode dumper(simpleObject);
         Ent::visitRecursive(simpleObject, dumper, true);
-        std::cout << dumper.getResult().dump(4);
+        std::cout << dumper.getResult().dump(4) << std::endl;
     }
     {
         std::ifstream ifstr("test.SeedPatch.node");
@@ -680,6 +687,22 @@ void testNodeHandler(Ent::EntityLib& entlib)
         ori3.setFloat(2.);
         ENTLIB_ASSERT(ori3.getFloat() == 2.);
         expl.exit().exit().exit().exit();
+        expl.enterObjectField("Components").enterUnionSetItem("SoundAreaGD");
+        ENTLIB_ASSERT(expl.isSet() == false);
+        ENTLIB_ASSERT(expl.isDefault() == true);
+        expl.exit().exit();
+        expl.enterObjectField("Components");
+        auto keys = expl.getUnionSetKeysString();
+        keys = expl.getUnionSetKeysString();
+        expl.exit();
+        expl.enterObjectField("Components").enterUnionSetItem("StaffVertebrasGD");
+        ENTLIB_ASSERT(expl.isSet() == false);
+        ENTLIB_ASSERT(expl.isDefault() == true);
+        expl.exit().exit();
+        expl.enterObjectField("Components");
+        keys = expl.getUnionSetKeysString();
+        expl.exit();
+
         expl.save("instance.prout.entity");
 
         // PrintNode printer;
@@ -690,6 +713,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
         //visit(expl, 0, compare);
         DumpNode dumper(expl);
         Ent::visitRecursive(expl, dumper, true);
+        std::cout << dumper.getResult().dump(4) << std::endl;
     }
     {
         // entlib.rawdataPath = "X:/RawData";
@@ -712,7 +736,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
         Cursor destExpl(&entlib, expl.getSchema(), "", &newDoc);
         CopyNode copier(expl, destExpl);
         Ent::visitRecursive(expl, copier, true);
-        entlib.saveJsonFile(&newDoc, "instance.prout2.entity");
+        entlib.saveJsonFile(&newDoc, "instance.cursor.entity");
     }
     bool testLoading = true;
     if (testLoading)
@@ -727,25 +751,34 @@ void testNodeHandler(Ent::EntityLib& entlib)
         clock_t end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
 
-        /*std::cout << "Read SceneKOM.scene with NodeLib" << std::endl;
-        start = clock();
-        auto ent =
-            entlib.loadEntityAsNode(R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
-        end = clock();
-        std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;*/
+        {
+            std::cout << "Copy SceneKOM.scene with LazyLib" << std::endl;
+            nlohmann::json newDoc = nlohmann::json::object();
+            Cursor destExpl(&entlib, expl.getSchema(), "", &newDoc);
+            CopyNode copier(expl, destExpl);
+            visitRecursive(expl, copier, true);
+            std::cout << "Save SceneKOM.scene with LazyLib" << std::endl;
+            entlib.saveJsonFile(&newDoc, "SceneKOM.scene");
+        }
 
-        /*std::cout << "Travserse SceneKOM.scene with NodeLib" << std::endl;
+        std::cout << "Read SceneKOM.scene with NodeLib" << std::endl;
         start = clock();
-        traverseNode(&ent);
+        auto ent = entlib.loadEntityAsNode(
+            R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
-        std::cout << "Primitive count : " << nodeCount << std::endl;*/
+
+        std::cout << "Travserse SceneKOM.scene with NodeLib" << std::endl;
+        start = clock();
+        auto nodeCount = countNodes(ent.get());
+        end = clock();
+        std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
+        std::cout << "Primitive count : " << nodeCount << std::endl;
 
         //CompareNode visitor(expl, &ent);
         //std::cout << "Compare Nodes" << std::endl;
         PrimitiveCounterVisitor visitor;
         std::cout << "Travserse SceneKOM.scene with LazyLib" << std::endl;
-        Ent::visitRecursive(expl, visitor, true); // Ensure files are already open
         start = clock();
         Ent::visitRecursive(expl, visitor, true);
         // visit(expl, 0, visitor);

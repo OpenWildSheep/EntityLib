@@ -377,13 +377,6 @@ namespace Ent
         }
         else
         {
-            std::ifstream ifstr(rawdataPath / filepath);
-            if (not ifstr.is_open())
-            {
-                throw ContextException("Can't open %s for read", filepath.string().c_str());
-            }
-            std::string filedata;
-            std::getline(ifstr, filedata, char(0));
             nlohmann::json d = Ent::loadJsonFile(rawdataPath, filepath);
             return m_jsonDatabase.emplace(filepath, std::move(d)).first->second;
         }

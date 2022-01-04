@@ -157,29 +157,6 @@ try
     Ent::EntityLib entlib("X:/RawData/..", doMergeComponents);
     using namespace std::filesystem;
 
-    {
-        entlib.validationEnabled = false;
-        ENTLIB_LOG("Loading SceneKOM.scene as Node...");
-        auto start2 = clock();
-        auto sceneNode = entlib.loadEntityAsNode(
-            // R"(X:\RawData\01_World\SimpleWild\SceneSimpleWild.scene)");
-            //R"(X:/RawData/20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
-            R"(X:/RawData/01_World\Wild\scenewild\editor\SceneWild.scene)");
-        ENTLIB_LOG("Done");
-        printf("Duration : %f\n", float(clock() - start2) / CLOCKS_PER_SEC);
-    }
-    constexpr auto nodesize = sizeof(Ent::Node);
-    constexpr auto mapsize = sizeof(Ent::Map);
-    constexpr auto unsize = sizeof(Ent::Union);
-    constexpr auto arraysize = sizeof(Ent::Array);
-    constexpr auto vecsize = sizeof(Ent::Vector);
-    constexpr auto objsize = sizeof(Ent::Object);
-    constexpr auto ovstrsize = sizeof(Ent::Override<Ent::String>);
-
-    if (&entlib != nullptr)
-        return EXIT_SUCCESS;
-    
-
     entlib.setLogicErrorPolicy(Ent::LogicErrorPolicy::Throw);
     // ENTLIB_CHECK_EXCEPTION(ENTLIB_LOGIC_ERROR("Test logic error"), std::logic_error);
     entlib.setLogicErrorPolicy(Ent::LogicErrorPolicy::Terminate);

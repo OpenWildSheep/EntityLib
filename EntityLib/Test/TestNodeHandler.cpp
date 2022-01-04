@@ -689,7 +689,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
     }
     {
         // entlib.rawdataPath = "X:/RawData";
-        std::cout << "Read SceneWild.scene with LazyLib" << std::endl;
+        std::cout << "Read SceneKOM.scene with LazyLib" << std::endl;
         clock_t start = clock();
         Cursor expl(&entlib, entlib.getSchema(entitySchemaName), "instance.entity");
         clock_t end = clock();
@@ -714,23 +714,23 @@ void testNodeHandler(Ent::EntityLib& entlib)
     if (testLoading)
     {
         entlib.rawdataPath = "X:/RawData";
-        std::cout << "Read SceneWild.scene with LazyLib" << std::endl;
+        std::cout << "Read SceneKOM.scene with LazyLib" << std::endl;
         clock_t start = clock();
         Cursor expl(
             &entlib,
             entlib.getSchema(entitySchemaName),
-            R"(X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene)");
+            R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
         clock_t end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
 
-        /*std::cout << "Read SceneWild.scene with NodeLib" << std::endl;
+        /*std::cout << "Read SceneKOM.scene with NodeLib" << std::endl;
         start = clock();
         auto ent =
-            entlib.loadEntityAsNode(R"(X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene)");
+            entlib.loadEntityAsNode(R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;*/
 
-        /*std::cout << "Travserse SceneWild.scene with NodeLib" << std::endl;
+        /*std::cout << "Travserse SceneKOM.scene with NodeLib" << std::endl;
         start = clock();
         traverseNode(&ent);
         end = clock();
@@ -740,7 +740,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
         //CompareNode visitor(expl, &ent);
         //std::cout << "Compare Nodes" << std::endl;
         PrimitiveCounterVisitor visitor;
-        std::cout << "Travserse SceneWild.scene with LazyLib" << std::endl;
+        std::cout << "Travserse SceneKOM.scene with LazyLib" << std::endl;
         visit(expl, visitor); // Ensure files are already open
         start = clock();
         visit(expl, visitor);
@@ -756,23 +756,23 @@ void testNodeHandler(Ent::EntityLib& entlib)
     if (testCompare)
     {
         entlib.rawdataPath = "X:/RawData";
-        std::cout << "Read SceneWild.scene with LazyLib" << std::endl;
+        std::cout << "Read SceneKOM.scene with LazyLib" << std::endl;
         clock_t start = clock();
         Cursor expl(
             &entlib,
             entlib.getSchema(entitySchemaName),
-            R"(X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene)");
+            R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
         clock_t end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
 
-        std::cout << "Read SceneWild.scene with NodeLib" << std::endl;
+        std::cout << "Read SceneKOM.scene with NodeLib" << std::endl;
         start = clock();
-        auto ent =
-            entlib.loadEntityAsNode(R"(X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene)");
+        auto ent = entlib.loadEntityAsNode(
+            R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
 
-        std::cout << "Travserse SceneWild.scene with NodeLib" << std::endl;
+        std::cout << "Travserse SceneKOM.scene with NodeLib" << std::endl;
         start = clock();
         auto nodeCount = countNodes(ent.get());
         end = clock();

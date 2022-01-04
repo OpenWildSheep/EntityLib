@@ -1,11 +1,11 @@
 #pragma once
 
-#include "EntVisitor.h"
+#include <EntityLib/EntVisitor.h>
 
 namespace Ent
 {
 
-class DumpNode : public NodeVisitor
+    class DumpNode : public NodeVisitor
     {
         Cursor& expl;
         nlohmann::json result;

@@ -8,7 +8,7 @@
 
 #include <EntityLib/EntVisitor.h>
 #include <EntityLib/CopyNode.h>
-#include <EntityLib/DumpNode.h>
+#include "DumpNode.h"
 
 using namespace Ent;
 

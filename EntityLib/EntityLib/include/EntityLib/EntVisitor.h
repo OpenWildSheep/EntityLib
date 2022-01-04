@@ -27,7 +27,7 @@ namespace Ent
         virtual void outObject()
         {
         }
-        virtual void inUnion(char const*)
+        virtual void inUnion([[maybe_unused]] char const* _type)
         {
         }
         virtual void outUnion()
@@ -39,28 +39,28 @@ namespace Ent
         virtual void outMap()
         {
         }
-        virtual void inMapElement(char const*)
+        virtual void inMapElement([[maybe_unused]] char const* _key)
         {
         }
-        virtual void inMapElement(int64_t)
+        virtual void inMapElement([[maybe_unused]] int64_t _key)
         {
         }
         virtual void outMapElement()
         {
         }
-        virtual void inPrimSet(Ent::DataType)
+        virtual void inPrimSet([[maybe_unused]] Ent::DataType _dataType)
         {
         }
-        virtual void inArrayElement(size_t)
+        virtual void inArrayElement([[maybe_unused]] size_t _key)
         {
         }
         virtual void outArrayElement()
         {
         }
-        virtual void key(char const*)
+        virtual void key([[maybe_unused]] char const* _key)
         {
         }
-        virtual void key(int64_t)
+        virtual void key([[maybe_unused]] int64_t _key)
         {
         }
         virtual void outPrimSet()
@@ -69,7 +69,7 @@ namespace Ent
         virtual void inUnionSet()
         {
         }
-        virtual void inUnionSetElement(char const*)
+        virtual void inUnionSetElement([[maybe_unused]] char const* _type)
         {
         }
         virtual void outUnionSetElement()
@@ -84,10 +84,10 @@ namespace Ent
         virtual void outObjectSet()
         {
         }
-        virtual void inObjectSetElement(char const*)
+        virtual void inObjectSetElement([[maybe_unused]] char const* _key)
         {
         }
-        virtual void inObjectSetElement(int64_t)
+        virtual void inObjectSetElement([[maybe_unused]] int64_t _key)
         {
         }
         virtual void outObjectSetElement()
@@ -119,5 +119,5 @@ namespace Ent
         }
     };
 
-    void visitRecursive(Cursor& expl, RecursiveVisitor& visitor, bool sortFields);
+    void visitRecursive(Cursor& _expl, RecursiveVisitor& _visitor, bool _sortFields);
 } // namespace Ent

@@ -16,116 +16,120 @@ namespace Ent
             , dest(_dest)
         {
         }
-        virtual void inObject()
+        void inObject() override
         {
             // ENTLIB_ASSERT(nodes.back()->getFieldNames().size() == expl.get);
         }
-        bool inObjectField(char const* key) override
+        bool inObjectField(char const* _key) override
         {
-            dest.enterObjectField(key);
+            dest.enterObjectField(_key);
             return true;
         }
-        void outObjectField(char const*) override
+        void outObjectField([[maybe_unused]] char const* _key) override
         {
             dest.exit();
         }
-        virtual void outObject()
+        void outObject() override
         {
         }
-        virtual void inUnion(char const* type)
+        void inUnion(char const* _type) override
         {
             if (source.isSet())
-                dest.setUnionType(type);
-            dest.enterUnionData(type);
+            {
+                dest.setUnionType(_type);
+            }
+            dest.enterUnionData(_type);
         }
-        virtual void outUnion()
+        void outUnion() override
         {
             dest.exit();
         }
-        virtual void inMap()
+        void inMap() override
         {
         }
-        virtual void outMap()
+        void outMap() override
         {
         }
-        virtual void inMapElement(char const* key)
+        void inMapElement(char const* _key) override
         {
-            dest.enterMapItem(key);
+            dest.enterMapItem(_key);
         }
-        virtual void inMapElement(int64_t key)
+        void inMapElement(int64_t _key) override
         {
-            dest.enterMapItem(key);
+            dest.enterMapItem(_key);
         }
-        virtual void outMapElement()
-        {
-            dest.exit();
-        }
-        virtual void inPrimSet(Ent::DataType)
-        {
-        }
-        virtual void inArrayElement(size_t i)
-        {
-            dest.enterArrayItem(i);
-        }
-        virtual void outArrayElement()
+        void outMapElement() override
         {
             dest.exit();
         }
-        virtual void key([[maybe_unused]] char const* key)
-        {
-            dest.insertPrimSetKey(key);
-        }
-        virtual void key([[maybe_unused]] int64_t key)
-        {
-            dest.insertPrimSetKey(key);
-        }
-        virtual void outPrimSet()
+        void inPrimSet([[maybe_unused]] Ent::DataType _dataType) override
         {
         }
-        virtual void inUnionSet()
+        void inArrayElement(size_t _index) override
         {
+            dest.enterArrayItem(_index);
         }
-        virtual void inUnionSetElement(char const* type)
-        {
-            dest.enterUnionSetItem(type);
-        }
-        virtual void outUnionSetElement()
+        void outArrayElement() override
         {
             dest.exit();
         }
-        virtual void outUnionSet()
+        void key(char const* _key) override
+        {
+            dest.insertPrimSetKey(_key);
+        }
+        void key(int64_t _key) override
+        {
+            dest.insertPrimSetKey(_key);
+        }
+        void outPrimSet() override
         {
         }
-        virtual void inObjectSet()
+        void inUnionSet() override
         {
         }
-        virtual void outObjectSet()
+        void inUnionSetElement(char const* _type) override
         {
+            dest.enterUnionSetItem(_type);
         }
-        virtual void inObjectSetElement(char const* key)
-        {
-            dest.enterObjectSetItem(key);
-        }
-        virtual void inObjectSetElement(int64_t key)
-        {
-            dest.enterObjectSetItem(key);
-        }
-        virtual void outObjectSetElement()
+        void outUnionSetElement() override
         {
             dest.exit();
         }
-        virtual void inArray()
+        void outUnionSet() override
+        {
+        }
+        void inObjectSet() override
+        {
+        }
+        void outObjectSet() override
+        {
+        }
+        void inObjectSetElement(char const* _key) override
+        {
+            dest.enterObjectSetItem(_key);
+        }
+        void inObjectSetElement(int64_t _key) override
+        {
+            dest.enterObjectSetItem(_key);
+        }
+        void outObjectSetElement() override
+        {
+            dest.exit();
+        }
+        void inArray() override
         {
             if (source.isSet())
+            {
                 dest.setSize(source.size());
+            }
         }
-        virtual void outArray()
+        void outArray() override
         {
         }
-        virtual void nullNode()
+        void nullNode() override
         {
         }
-        virtual void boolNode()
+        void boolNode() override
         {
             if (source.isSet())
             {
@@ -140,7 +144,7 @@ namespace Ent
                 }
             }
         }
-        virtual void intNode()
+        void intNode() override
         {
             if (source.isSet())
             {
@@ -155,7 +159,7 @@ namespace Ent
                 }
             }
         }
-        virtual void floatNode()
+        void floatNode() override
         {
             if (source.isSet())
             {
@@ -170,7 +174,7 @@ namespace Ent
                 }
             }
         }
-        virtual void stringNode()
+        void stringNode() override
         {
             if (source.isSet())
             {
@@ -185,7 +189,7 @@ namespace Ent
                 }
             }
         }
-        virtual void entityRefNode()
+        void entityRefNode() override
         {
             if (source.isSet())
             {

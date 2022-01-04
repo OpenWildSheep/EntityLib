@@ -2,152 +2,152 @@
 
 namespace Ent
 {
-    void visitRecursive(Cursor& expl, RecursiveVisitor& visitor, bool sortFields)
+    void visitRecursive(Cursor& _expl, RecursiveVisitor& _visitor, bool sortFields)
     {
-        switch (expl.getDataType())
+        switch (_expl.getDataType())
         {
         case Ent::DataType::object:
         {
-            visitor.inObject();
-            for (auto&& [name, schemaref] : expl.getSchema()->properties)
+            _visitor.inObject();
+            for (auto&& [name, schemaref] : _expl.getSchema()->properties)
             {
-                expl.enterObjectField(name.c_str(), &schemaref);
-                if (visitor.inObjectField(name.c_str()))
+                _expl.enterObjectField(name.c_str(), &schemaref);
+                if (_visitor.inObjectField(name.c_str()))
                 {
-                    visitRecursive(expl, visitor, sortFields);
-                    visitor.outObjectField(name.c_str());
+                    visitRecursive(_expl, _visitor, sortFields);
+                    _visitor.outObjectField(name.c_str());
                 }
-                expl.exit();
+                _expl.exit();
             }
-            visitor.outObject();
+            _visitor.outObject();
             break;
         }
         case Ent::DataType::oneOf:
-            visitor.inUnion(expl.getUnionType());
-            expl.enterUnionData();
-            visitRecursive(expl, visitor, sortFields);
-            visitor.outUnion();
-            expl.exit();
+            _visitor.inUnion(_expl.getUnionType());
+            _expl.enterUnionData();
+            visitRecursive(_expl, _visitor, sortFields);
+            _visitor.outUnion();
+            _expl.exit();
             break;
         case Ent::DataType::array:
         {
-            auto meta = std::get<Ent::Subschema::ArrayMeta>(expl.getSchema()->meta);
+            auto meta = std::get<Ent::Subschema::ArrayMeta>(_expl.getSchema()->meta);
             switch (hash(meta.overridePolicy))
             {
             case "map"_hash:
-                visitor.inMap();
-                switch (expl.getMapKeyType())
+                _visitor.inMap();
+                switch (_expl.getMapKeyType())
                 {
                 case Ent::DataType::string:
-                    for (char const* key : expl.getMapKeysString())
+                    for (char const* key : _expl.getMapKeysString())
                     {
-                        expl.enterMapItem(key);
-                        visitor.inMapElement(key);
-                        visitRecursive(expl, visitor, sortFields);
-                        visitor.outMapElement();
-                        expl.exit();
+                        _expl.enterMapItem(key);
+                        _visitor.inMapElement(key);
+                        visitRecursive(_expl, _visitor, sortFields);
+                        _visitor.outMapElement();
+                        _expl.exit();
                     }
                     break;
                 case Ent::DataType::integer:
-                    for (int64_t key : expl.getMapKeysInt())
+                    for (int64_t key : _expl.getMapKeysInt())
                     {
-                        expl.enterMapItem(key);
-                        visitor.inMapElement(key);
-                        visitRecursive(expl, visitor, sortFields);
-                        visitor.outMapElement();
-                        expl.exit();
+                        _expl.enterMapItem(key);
+                        _visitor.inMapElement(key);
+                        visitRecursive(_expl, _visitor, sortFields);
+                        _visitor.outMapElement();
+                        _expl.exit();
                     }
                     break;
                 default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                 }
-                visitor.outMap();
+                _visitor.outMap();
                 break;
             case "set"_hash:
             {
-                auto& itemType = expl.getSchema()->singularItems.get()->get();
+                auto& itemType = _expl.getSchema()->singularItems->get();
                 switch (itemType.type)
                 {
                 case Ent::DataType::integer:
-                    visitor.inPrimSet(itemType.type);
-                    for (int64_t key : expl.getPrimSetKeysInt())
+                    _visitor.inPrimSet(itemType.type);
+                    for (int64_t key : _expl.getPrimSetKeysInt())
                     {
-                        visitor.key(key);
+                        _visitor.key(key);
                     }
-                    visitor.outPrimSet();
+                    _visitor.outPrimSet();
                     break;
                 case Ent::DataType::string:
-                    visitor.inPrimSet(itemType.type);
-                    for (char const* key : expl.getPrimSetKeysString())
+                    _visitor.inPrimSet(itemType.type);
+                    for (char const* key : _expl.getPrimSetKeysString())
                     {
-                        visitor.key(key);
+                        _visitor.key(key);
                     }
-                    visitor.outPrimSet();
+                    _visitor.outPrimSet();
                     break;
                 case Ent::DataType::oneOf:
-                    visitor.inUnionSet();
-                    for (auto&& [name, schema] : expl.getUnionSetKeysString())
+                    _visitor.inUnionSet();
+                    for (auto&& [name, schema] : _expl.getUnionSetKeysString())
                     {
-                        expl.enterUnionSetItem(name, schema);
-                        visitor.inUnionSetElement(name);
-                        visitRecursive(expl, visitor, sortFields);
-                        visitor.outUnionSetElement();
-                        expl.exit();
+                        _expl.enterUnionSetItem(name, schema);
+                        _visitor.inUnionSetElement(name);
+                        visitRecursive(_expl, _visitor, sortFields);
+                        _visitor.outUnionSetElement();
+                        _expl.exit();
                     }
-                    visitor.outUnionSet();
+                    _visitor.outUnionSet();
                     break;
                 case Ent::DataType::object:
-                    visitor.inObjectSet();
+                    _visitor.inObjectSet();
                     auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                     switch (keyFieldSchema.type)
                     {
                     case Ent::DataType::string:
-                        for (auto&& key : expl.getObjectSetKeysString())
+                        for (auto&& key : _expl.getObjectSetKeysString())
                         {
-                            expl.enterObjectSetItem(key);
-                            visitor.inObjectSetElement(key);
-                            visitRecursive(expl, visitor, sortFields);
-                            visitor.outObjectSetElement();
-                            expl.exit();
+                            _expl.enterObjectSetItem(key);
+                            _visitor.inObjectSetElement(key);
+                            visitRecursive(_expl, _visitor, sortFields);
+                            _visitor.outObjectSetElement();
+                            _expl.exit();
                         }
                         break;
                     case Ent::DataType::integer:
-                        for (auto&& key : expl.getObjectSetKeysInt())
+                        for (auto&& key : _expl.getObjectSetKeysInt())
                         {
-                            expl.enterObjectSetItem(key);
-                            visitor.inObjectSetElement(key);
-                            visitRecursive(expl, visitor, sortFields);
-                            visitor.outObjectSetElement();
-                            expl.exit();
+                            _expl.enterObjectSetItem(key);
+                            _visitor.inObjectSetElement(key);
+                            visitRecursive(_expl, _visitor, sortFields);
+                            _visitor.outObjectSetElement();
+                            _expl.exit();
                         }
                         break;
                     default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                     }
-                    visitor.outObjectSet();
+                    _visitor.outObjectSet();
                     break;
                 }
             }
             break;
             case ""_hash:
-                visitor.inArray();
-                for (size_t i = 0; i < expl.size(); ++i)
+                _visitor.inArray();
+                for (size_t i = 0; i < _expl.size(); ++i)
                 {
-                    expl.enterArrayItem(i);
-                    visitor.inArrayElement(i);
-                    visitRecursive(expl, visitor, sortFields);
-                    visitor.outArrayElement();
-                    expl.exit();
+                    _expl.enterArrayItem(i);
+                    _visitor.inArrayElement(i);
+                    visitRecursive(_expl, _visitor, sortFields);
+                    _visitor.outArrayElement();
+                    _expl.exit();
                 }
-                visitor.outArray();
+                _visitor.outArray();
                 break;
             }
         }
         break;
-        case Ent::DataType::null: visitor.nullNode(); break;
-        case Ent::DataType::boolean: visitor.boolNode(); break;
-        case Ent::DataType::integer: visitor.intNode(); break;
-        case Ent::DataType::number: visitor.floatNode(); break;
-        case Ent::DataType::string: visitor.stringNode(); break;
-        case Ent::DataType::entityRef: visitor.entityRefNode(); break;
+        case Ent::DataType::null: _visitor.nullNode(); break;
+        case Ent::DataType::boolean: _visitor.boolNode(); break;
+        case Ent::DataType::integer: _visitor.intNode(); break;
+        case Ent::DataType::number: _visitor.floatNode(); break;
+        case Ent::DataType::string: _visitor.stringNode(); break;
+        case Ent::DataType::entityRef: _visitor.entityRefNode(); break;
         case Ent::DataType::COUNT:
         default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
         }

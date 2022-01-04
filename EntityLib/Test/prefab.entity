@@ -43,6 +43,9 @@
         }, {
             "Type": "StaffVertebrasGD"
         }, {
+            "Type": "StaffVertebrasGD",
+            "Version": 1
+        }, {
             "Data": {
                 "BehaviorModifierTagList": [],
                 "BehaviorPath": "Pesto/Behavior/FSMDefaultBehavior.pesto",

@@ -181,11 +181,15 @@ namespace Ent
                 {
                     if (typeIter->get_ref<std::string const&>() == _field)
                     {
-                        auto newValue = &item[dataField];
+                        nlohmann::json* newValue = nullptr;
+                        if (auto dataIter = item.find(dataField); dataIter != item.end())
+                        {
+                            newValue = &(*dataIter);
+                        }
                         if (newLayer.schema.base->type == Ent::DataType::string
                             or newLayer.schema.base->type == Ent::DataType::entityRef)
                         {
-                            ENTLIB_DBG_ASSERT(newValue->is_string());
+                            ENTLIB_DBG_ASSERT(newValue == nullptr or newValue->is_string());
                         }
 
                         // Item found!
@@ -195,6 +199,7 @@ namespace Ent
                 }
             }
         }
+        ENTLIB_ASSERT(newLayer.schema.base != nullptr);
         m_layers.push_back(newLayer);
         return *this;
     }

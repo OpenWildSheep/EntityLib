@@ -688,10 +688,12 @@ void testNodeHandler(Ent::EntityLib& entlib)
         //auto ent = entlib.loadEntityAsNode("instance.entity");
         //CompareNode compare(&ent);
         //visit(expl, 0, compare);
+        DumpNode dumper(expl);
+        Ent::visitRecursive(expl, dumper, true);
     }
     {
         // entlib.rawdataPath = "X:/RawData";
-        std::cout << "Read SceneKOM.scene with LazyLib" << std::endl;
+        std::cout << "Read instance.entity with LazyLib" << std::endl;
         clock_t start = clock();
         Cursor expl(&entlib, entlib.getSchema(entitySchemaName), "instance.entity");
         clock_t end = clock();

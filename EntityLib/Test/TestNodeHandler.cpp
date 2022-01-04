@@ -12,7 +12,7 @@
 
 using namespace Ent;
 
-class PrintNode : public NodeVisitor
+class PrintNode : public RecursiveVisitor
 {
     Cursor& expl;
     size_t tab = 0;
@@ -32,13 +32,14 @@ public:
     {
         ++tab;
     }
-    void inObjectField(char const* key, Cursor const&) override
+    bool inObjectField(char const* key) override
     {
         // std::cout << "dksflghjdfjg" << getTab() << '"' << key << "\": " << std::endl;
         std::cout << getTab() << '"' << key << "\": " << std::endl;
         ++tab;
+        return true;
     }
-    void outObjectField() override
+    void outObjectField([[maybe_unused]] char const* _key) override
     {
         --tab;
     }
@@ -169,7 +170,7 @@ public:
     }
 };
 
-class CompareNode : public NodeVisitor
+class CompareNode : public RecursiveVisitor
 {
     Cursor& expl;
     std::vector<Node*> nodes;
@@ -184,12 +185,13 @@ public:
     {
         // ENTLIB_ASSERT(nodes.back()->getFieldNames().size() == expl.get);
     }
-    virtual void inObjectField(char const* key, Cursor const&)
+    virtual bool inObjectField(char const* key)
     {
         nodes.push_back(nodes.back()->at(key));
         ENTLIB_ASSERT(nodes.back() != nullptr);
+        return true;
     }
-    virtual void outObjectField()
+    virtual void outObjectField([[maybe_unused]] char const* _key)
     {
         nodes.pop_back();
     }
@@ -388,7 +390,7 @@ public:
     }
 };
 
-class PrimitiveCounterVisitor : public NodeVisitor
+class PrimitiveCounterVisitor : public RecursiveVisitor
 {
 public:
     size_t primitiveCount = 0;
@@ -544,7 +546,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
         ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeY").getFloat() == 2.f);
         simpleObject.exit();
         DumpNode dumper(simpleObject);
-        Ent::visit(simpleObject, dumper);
+        Ent::visitRecursive(simpleObject, dumper, true);
         std::cout << dumper.getResult().dump(4);
     }
     {
@@ -700,14 +702,14 @@ void testNodeHandler(Ent::EntityLib& entlib)
         CompareNode compare(expl, ent.get());
         std::cout << "Visit all" << std::endl;
         start = clock();
-        visit(expl, compare);
+        Ent::visitRecursive(expl, compare, true);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
 
         nlohmann::json newDoc = nlohmann::json::object();
         Cursor destExpl(&entlib, expl.getSchema(), "", &newDoc);
         CopyNode copier(expl, destExpl);
-        visit(expl, copier);
+        Ent::visitRecursive(expl, copier, true);
         entlib.saveJsonFile(&newDoc, "instance.prout2.entity");
     }
     bool testLoading = true;
@@ -741,9 +743,9 @@ void testNodeHandler(Ent::EntityLib& entlib)
         //std::cout << "Compare Nodes" << std::endl;
         PrimitiveCounterVisitor visitor;
         std::cout << "Travserse SceneKOM.scene with LazyLib" << std::endl;
-        visit(expl, visitor); // Ensure files are already open
+        Ent::visitRecursive(expl, visitor, true); // Ensure files are already open
         start = clock();
-        visit(expl, visitor);
+        Ent::visitRecursive(expl, visitor, true);
         // visit(expl, 0, visitor);
         // visit(expl, 0, visitor);
         // visit(expl, 0, visitor);
@@ -752,7 +754,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;
     }
-    bool testCompare = false;
+    bool testCompare = true;
     if (testCompare)
     {
         entlib.rawdataPath = "X:/RawData";
@@ -782,7 +784,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
         std::cout << "Compare both" << std::endl;
         start = clock();
         CompareNode comparator(expl, ent.get());
-        visit(expl, comparator);
+        Ent::visitRecursive(expl, comparator, true);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
     }

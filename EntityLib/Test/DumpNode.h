@@ -5,7 +5,7 @@
 namespace Ent
 {
 
-    class DumpNode : public NodeVisitor
+    class DumpNode : public RecursiveVisitor
     {
         Cursor& expl;
         nlohmann::json result;
@@ -34,11 +34,12 @@ namespace Ent
         {
             _getNode() = json::object();
         }
-        void inObjectField(char const* key, Cursor const&) override
+        bool inObjectField(char const* key) override
         {
             jsonNode.push(&(_getNode()[key]));
+            return true;
         }
-        void outObjectField() override
+        void outObjectField(char const*) override
         {
             jsonNode.pop();
         }

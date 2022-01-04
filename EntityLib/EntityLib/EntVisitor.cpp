@@ -2,33 +2,30 @@
 
 namespace Ent
 {
-    void visit(Cursor& expl, NodeVisitor& visitor, size_t tab)
+    void visitRecursive(Cursor& expl, RecursiveVisitor& visitor, bool sortFields, size_t tab)
     {
-        auto getTab = [&] {
-            return std::string(tab * 4, ' ');
-        };
         switch (expl.getDataType())
         {
         case Ent::DataType::object:
+        {
             visitor.inObject();
             for (auto&& [name, schemaref] : expl.getSchema()->properties)
             {
-                expl.checkInvariants();
                 expl.enterObjectField(name.c_str(), &schemaref);
-                visitor.inObjectField(name.c_str(), expl);
-                expl.checkInvariants();
-                visit(expl, visitor, tab + 1);
-                expl.checkInvariants();
-                visitor.outObjectField();
+                if (visitor.inObjectField(name.c_str()))
+                {
+                    visitRecursive(expl, visitor, sortFields, tab + 1);
+                    visitor.outObjectField(name.c_str());
+                }
                 expl.exit();
-                expl.checkInvariants();
             }
             visitor.outObject();
             break;
+        }
         case Ent::DataType::oneOf:
             visitor.inUnion(expl.getUnionType());
             expl.enterUnionData();
-            visit(expl, visitor, tab + 1);
+            visitRecursive(expl, visitor, sortFields, tab + 1);
             visitor.outUnion();
             expl.exit();
             break;
@@ -46,7 +43,7 @@ namespace Ent
                     {
                         expl.enterMapItem(key);
                         visitor.inMapElement(key);
-                        visit(expl, visitor, tab + 1);
+                        visitRecursive(expl, visitor, sortFields, tab + 1);
                         visitor.outMapElement();
                         expl.exit();
                     }
@@ -56,7 +53,7 @@ namespace Ent
                     {
                         expl.enterMapItem(key);
                         visitor.inMapElement(key);
-                        visit(expl, visitor, tab + 1);
+                        visitRecursive(expl, visitor, sortFields, tab + 1);
                         visitor.outMapElement();
                         expl.exit();
                     }
@@ -92,7 +89,7 @@ namespace Ent
                     {
                         expl.enterUnionSetItem(name, schema);
                         visitor.inUnionSetElement(name);
-                        visit(expl, visitor, tab + 1);
+                        visitRecursive(expl, visitor, sortFields, tab + 1);
                         visitor.outUnionSetElement();
                         expl.exit();
                     }
@@ -108,7 +105,7 @@ namespace Ent
                         {
                             expl.enterObjectSetItem(key);
                             visitor.inObjectSetElement(key);
-                            visit(expl, visitor, tab + 1);
+                            visitRecursive(expl, visitor, sortFields, tab + 1);
                             visitor.outObjectSetElement();
                             expl.exit();
                         }
@@ -118,7 +115,7 @@ namespace Ent
                         {
                             expl.enterObjectSetItem(key);
                             visitor.inObjectSetElement(key);
-                            visit(expl, visitor, tab + 1);
+                            visitRecursive(expl, visitor, sortFields, tab + 1);
                             visitor.outObjectSetElement();
                             expl.exit();
                         }
@@ -136,7 +133,7 @@ namespace Ent
                 {
                     expl.enterArrayItem(i);
                     visitor.inArrayElement(i);
-                    visit(expl, visitor, tab + 1);
+                    visitRecursive(expl, visitor, sortFields, tab + 1);
                     visitor.outArrayElement();
                     expl.exit();
                 }

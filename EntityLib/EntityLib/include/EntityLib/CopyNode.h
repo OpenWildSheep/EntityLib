@@ -5,7 +5,7 @@
 namespace Ent
 {
 
-    class CopyNode : public NodeVisitor
+    class CopyNode : public RecursiveVisitor
     {
         Cursor& source;
         Cursor& dest;
@@ -20,11 +20,12 @@ namespace Ent
         {
             // ENTLIB_ASSERT(nodes.back()->getFieldNames().size() == expl.get);
         }
-        virtual void inObjectField(char const* key, Cursor const&)
+        bool inObjectField(char const* key) override
         {
             dest.enterObjectField(key);
+            return true;
         }
-        virtual void outObjectField()
+        void outObjectField(char const*) override
         {
             dest.exit();
         }

@@ -4,22 +4,24 @@
 
 namespace Ent
 {
-    class NodeVisitor
+    class RecursiveVisitor
     {
     public:
-        NodeVisitor() = default;
-        NodeVisitor(NodeVisitor const&) = delete;
-        NodeVisitor(NodeVisitor&&) = delete;
-        NodeVisitor& operator=(NodeVisitor const&) = delete;
-        NodeVisitor& operator=(NodeVisitor&&) = delete;
+        RecursiveVisitor() = default;
+        virtual ~RecursiveVisitor() = default;
+        RecursiveVisitor(RecursiveVisitor const&) = delete;
+        RecursiveVisitor(RecursiveVisitor&&) = delete;
+        RecursiveVisitor& operator=(RecursiveVisitor const&) = delete;
+        RecursiveVisitor& operator=(RecursiveVisitor&&) = delete;
 
         virtual void inObject()
         {
         }
-        virtual void inObjectField(char const*, Cursor const&)
+        virtual bool inObjectField([[maybe_unused]] char const* _key)
         {
+            return true;
         }
-        virtual void outObjectField()
+        virtual void outObjectField([[maybe_unused]] char const* _key)
         {
         }
         virtual void outObject()
@@ -117,5 +119,5 @@ namespace Ent
         }
     };
 
-    void visit(Cursor& expl, NodeVisitor& visitor, size_t tab = 0);
+    void visitRecursive(Cursor& expl, RecursiveVisitor& visitor, bool sortFields, size_t tab = 0);
 } // namespace Ent

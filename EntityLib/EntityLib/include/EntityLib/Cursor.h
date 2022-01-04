@@ -5,7 +5,8 @@
 
 #include "FileCursor.h"
 
-#pragma warning(push, 0)
+#pragma warning(push)
+#pragma warning(disable : 4464)
 #include "../EntityLib.h"
 #include "../Tools.h"
 #pragma push_macro("RAH_NAMESPACE")
@@ -80,7 +81,7 @@ namespace Ent
         {
             return m_instance.getSchema()->properties
                    | entrah::view::transform([](auto&& field_schema)
-                                          { return std::get<0>(field_schema).c_str(); });
+                                             { return std::get<0>(field_schema).c_str(); });
         }
 
         std::unordered_map<std::string, SubschemaRef> const& getFields() const;

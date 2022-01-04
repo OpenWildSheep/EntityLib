@@ -1,9 +1,13 @@
 #pragma once
 
-#include "../EntityLib.h"
 #include <variant>
 #include <ciso646>
+
+#pragma warning(push)
+#pragma warning(disable : 4464)
+#include "../EntityLib.h"
 #include "../Tools.h"
+#pragma warning(pop)
 
 namespace Ent
 {
@@ -26,7 +30,7 @@ namespace Ent
         };
         struct Layer
         {
-            Schema schema;
+            Schema schema{};
             nlohmann::json* values{};
             Key additionalPath;
         };
@@ -40,6 +44,10 @@ namespace Ent
         Layer* layerBegin();
 
         Layer* layerEnd();
+
+        Layer const* layerBegin() const;
+
+        Layer const* layerEnd() const;
 
         Layer& lastLayer();
 
@@ -106,14 +114,6 @@ namespace Ent
         void setUnionType(char const* type);
         double getFloat() const;
         int64_t getInt() const;
-        //size_t size(size_t layerIndex = size_t(-1)) const
-        //{
-        //    if (layerIndex == size_t(-1))
-        //    {
-        //        layerIndex = m_layers.size() - 1;
-        //    }
-        //    return m_layers[layerIndex].values->size();
-        //}
         char const* getString() const;
         bool getBool() const;
         EntityRef getEntityRef() const;

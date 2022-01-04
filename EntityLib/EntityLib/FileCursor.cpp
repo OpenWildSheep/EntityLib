@@ -40,6 +40,16 @@ namespace Ent
         return (&m_layers.back()) + 1;
     }
 
+    FileCursor::Layer const* FileCursor::layerBegin() const
+    {
+        return &m_layers.front();
+    }
+
+    FileCursor::Layer const* FileCursor::layerEnd() const
+    {
+        return (&m_layers.back()) + 1;
+    }
+
     FileCursor::Layer& FileCursor::lastLayer()
     {
         return m_layers.back();
@@ -413,7 +423,15 @@ namespace Ent
     {
         char const* unionType = getUnionType();
         auto& lastLayer = m_layers.back();
-        auto dataSchema = lastLayer.schema.base->getUnionType(unionType);
+        Ent::Subschema const* dataSchema = nullptr;
+        try
+        {
+            dataSchema = lastLayer.schema.base->getUnionType(unionType);
+        }
+        catch (BadUnionType&) // This unionType doesn't exist
+        {
+            return {};
+        }
         auto unionSchema = lastLayer.schema.base;
         if (isSet())
         {

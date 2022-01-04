@@ -210,23 +210,28 @@ namespace Ent
         newLayer.setDefault(_schema, nullptr, const_cast<nlohmann::json*>(&_schema->defaultValue));
         //[[maybe_unused]] auto type = _document->GetType();
         //ENTLIB_DBG_ASSERT(_document->is_object());
+        ENTLIB_ASSERT(_doc != nullptr);
+        ENTLIB_ASSERT(_doc->is_object());
         auto* doc = m_instance.back();
-        if (auto member = doc->find("InstanceOf"); member != doc->end())
+        if (not doc->is_null())
         {
-            if (auto const& prefabPath = member->get_ref<std::string const&>();
-                not prefabPath.empty())
+            if (auto member = doc->find("InstanceOf"); member != doc->end())
             {
-                if (newLayer.prefabsStorage == nullptr)
+                if (auto const& prefabPath = member->get_ref<std::string const&>();
+                    not prefabPath.empty())
                 {
-                    newLayer.prefabsStorage =
-                        std::make_unique<Cursor>(m_entityLib, _schema, prefabPath.c_str());
+                    if (newLayer.prefabsStorage == nullptr)
+                    {
+                        newLayer.prefabsStorage =
+                            std::make_unique<Cursor>(m_entityLib, _schema, prefabPath.c_str());
+                    }
+                    else
+                    {
+                        newLayer.prefabsStorage->init(m_entityLib, _schema, prefabPath.c_str());
+                    }
+                    newLayer.prefab = newLayer.prefabsStorage.get();
+                    ENTLIB_ASSERT(newLayer.prefab != (void*)0xdddddddddddddddd);
                 }
-                else
-                {
-                    newLayer.prefabsStorage->init(m_entityLib, _schema, prefabPath.c_str());
-                }
-                newLayer.prefab = newLayer.prefabsStorage.get();
-                ENTLIB_ASSERT(newLayer.prefab != (void*)0xdddddddddddddddd);
             }
         }
         newLayer.isDefault = false;
@@ -277,7 +282,7 @@ namespace Ent
 
     bool Cursor::isDefault() const
     {
-        return _getLastLayer().isDefault;
+        return isDefaultImpl();
     }
 
     bool Cursor::_loadInstanceOf(Layer& newLayer)
@@ -320,16 +325,14 @@ namespace Ent
             or lastLayer.getDefault()->getSchema()->type == Ent::DataType::object);
         m_instance.enterObjectField(_field, _fieldRef);
         auto* subschema = m_instance.getSchema();
-        if (not isDefault())
+        if (not _loadInstanceOf(newLayer))
         {
-            if (not _loadInstanceOf(newLayer))
+            if (lastLayer.prefab != nullptr)
             {
-                if (lastLayer.prefab != nullptr)
-                {
-                    lastLayer.prefab->enterObjectField(_field, _fieldRef);
-                    newLayer.prefab = lastLayer.prefab;
-                    ENTLIB_ASSERT(newLayer.prefab != (void*)0xdddddddddddddddd);
-                }
+                ENTLIB_ASSERT(lastLayer.prefab->m_entityLib != nullptr);
+                lastLayer.prefab->enterObjectField(_field, _fieldRef);
+                newLayer.prefab = lastLayer.prefab;
+                ENTLIB_ASSERT(newLayer.prefab != (void*)0xdddddddddddddddd);
             }
         }
         bool defaultFound = false;
@@ -365,6 +368,7 @@ namespace Ent
 
     Cursor& Cursor::enterUnionData(char const* type)
     {
+        ENTLIB_ASSERT(getSchema()->type == Ent::DataType::oneOf);
         checkInvariants();
         if (type == nullptr)
         {
@@ -639,8 +643,17 @@ namespace Ent
         return *this;
     }
 
+    char const* Cursor::getInstanceOf()
+    {
+        enterObjectField("InstanceOf");
+        char const* instanceOf = getString();
+        exit();
+        return instanceOf[0] == 0 ? nullptr : instanceOf;
+    }
+
     char const* Cursor::getUnionType()
     {
+        ENTLIB_ASSERT(getSchema()->type == Ent::DataType::oneOf);
         auto& lastLayer = _getLastLayer();
         if (char const* type = m_instance.getUnionType())
         {
@@ -661,6 +674,12 @@ namespace Ent
             }
         }
         return getSchema()->getUnionDefaultTypeName();
+    }
+
+    size_t Cursor::getUnionTypeIndex()
+    {
+        auto type = getUnionType();
+        return AT(getSchema()->unionTypeMap, type).index;
     }
 
     void Cursor::checkInvariants() const
@@ -691,6 +710,8 @@ namespace Ent
         ENTLIB_DBG_ASSERT(m_layerCount > 0);
         auto& prevLayer = m_layers[m_layerCount - 2];
         auto& prevSchema = (m_instance.layerEnd() - 2)->schema;
+        ENTLIB_DBG_ASSERT((m_instance.layerEnd() - 1)->schema.base != nullptr);
+        ENTLIB_DBG_ASSERT(prevSchema.base != nullptr);
 #endif
         checkInvariants();
         auto& lastLayer = _getLastLayer();
@@ -726,6 +747,11 @@ namespace Ent
     Subschema const* Cursor::getSchema() const
     {
         return m_instance.getSchema();
+    }
+
+    char const* Cursor::getTypeName() const
+    {
+        return getSchema()->name.c_str();
     }
 
     DataType Cursor::getMapKeyType() const
@@ -1049,7 +1075,8 @@ namespace Ent
                 auto* instanceSize = m_instance.back();
 #endif
                 auto [unionSchema, unionValue] = m_instance.enterArrayItem(i).getUnionData();
-                bool const isNull = unionValue != nullptr ? unionValue->is_null() : false;
+                bool const isNull = unionSchema == nullptr
+                                    or (unionValue != nullptr ? unionValue->is_null() : false);
                 // bool const isNull = m_instance.enterArrayItem(i).enterUnionData().isNull();
                 // Subschema const* unionSchema = m_instance.getSchema();
                 // m_instance.exit();
@@ -1159,6 +1186,7 @@ namespace Ent
 
     void Cursor::_buildPath()
     {
+        checkInvariants();
         auto firstNotSet = std::find_if(
             m_instance.layerBegin(),
             m_instance.layerEnd(),
@@ -1175,6 +1203,7 @@ namespace Ent
             ENTLIB_ASSERT(firstNotSet->values != nullptr);
         }
         // ENTLIB_ASSERT(m_instance.back() != nullptr);
+        checkInvariants();
     }
     void Cursor::setSize(size_t size)
     {
@@ -1212,6 +1241,10 @@ namespace Ent
     {
         _buildPath();
         m_instance.setUnionType(type);
+    }
+    void Cursor::buildPath()
+    {
+        _buildPath();
     }
     bool Cursor::countPrimSetKey(char const* key)
     {
@@ -1271,4 +1304,10 @@ namespace Ent
             m_instance.pushBack(key);
         }
     }
+
+    nlohmann::json* Cursor::GetRawValue()
+    {
+        return m_instance.back();
+    }
+
 } // namespace Ent

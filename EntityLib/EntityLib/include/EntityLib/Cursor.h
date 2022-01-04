@@ -1,43 +1,32 @@
 #pragma once
 
-#include "../EntityLib.h"
 #include <variant>
 #include <ciso646>
-#include "../Tools.h"
+
 #include "FileCursor.h"
 
+#pragma warning(push, 0)
+#include "../EntityLib.h"
+#include "../Tools.h"
 #pragma push_macro("RAH_NAMESPACE")
 #undef RAH_NAMESPACE
-#define RAH_NAMESPACE rah
+#define RAH_NAMESPACE entrah
 #include "../external/rah.hpp"
 #pragma pop_macro("RAH_NAMESPACE")
+#pragma warning(pop)
 
 namespace Ent
 {
     struct ENTLIB_DLLEXPORT Cursor
     {
-    private:
-        using Key = std::variant<std::string, size_t>;
-        using NodeRef = std::vector<Key>;
-        struct Layer
-        {
-            Cursor* prefab = nullptr;
-            std::unique_ptr<Cursor> prefabsStorage;
-            int defaultVal = 1; // 1 == undefined
-            FileCursor defaultStorage;
-            size_t arraySize = 0;
-            bool isDefault = false; // Cache for isDefault()
-            void setDefault(
-                Ent::Subschema const* _schema, char const* filePath, nlohmann::json* _document);
-            void clear();
-            FileCursor* getDefault();
-            FileCursor const* getDefault() const;
-        };
-
     public:
+        using Key = std::variant<std::string, size_t>;
+
         Cursor();
         Cursor(Cursor const&) = delete;
         Cursor& operator=(Cursor const&) = delete;
+        Cursor(Cursor&&) = delete;
+        Cursor& operator=(Cursor&&) = delete;
         Cursor(
             EntityLib* _entityLib,
             Ent::Subschema const* _schema,
@@ -76,7 +65,10 @@ namespace Ent
 
         Cursor& enterArrayItem(size_t _index);
 
+        char const* getInstanceOf();
+
         char const* getUnionType();
+        size_t getUnionTypeIndex();
 
         void checkInvariants() const;
 
@@ -87,13 +79,15 @@ namespace Ent
         auto getFieldNames() const
         {
             return m_instance.getSchema()->properties
-                   | rah::view::transform([](auto&& field_schema)
+                   | entrah::view::transform([](auto&& field_schema)
                                           { return std::get<0>(field_schema).c_str(); });
         }
 
         std::unordered_map<std::string, SubschemaRef> const& getFields() const;
 
         Subschema const* getSchema() const;
+
+        char const* getTypeName() const;
 
         DataType getMapKeyType() const;
 
@@ -103,6 +97,7 @@ namespace Ent
         bool empty();
 
         bool isNull() const;
+
         std::set<char const*, CmpStr> getMapKeysString();
         std::set<int64_t> getMapKeysInt();
         std::set<int64_t> getPrimSetKeysInt();
@@ -136,12 +131,33 @@ namespace Ent
         void setBool(bool value);
         void setEntityRef(EntityRef const& value);
         void setUnionType(char const* type);
+        // Build path but not set any value. Usefull for UnionSet items
+        void buildPath();
         bool countPrimSetKey(char const* key);
         bool countPrimSetKey(int64_t key);
         void insertPrimSetKey(char const* key);
         void insertPrimSetKey(int64_t key);
 
+        nlohmann::json* GetRawValue();
+
+        Cursor* getPrefab();
+
     private:
+        using NodeRef = std::vector<Key>;
+        struct Layer
+        {
+            Cursor* prefab = nullptr;
+            std::unique_ptr<Cursor> prefabsStorage;
+            int defaultVal = 1; // 1 == undefined
+            FileCursor defaultStorage;
+            size_t arraySize = 0;
+            bool isDefault = false; // Cache for isDefault()
+            void setDefault(
+                Ent::Subschema const* _schema, char const* filePath, nlohmann::json* _document);
+            void clear();
+            FileCursor* getDefault();
+            FileCursor const* getDefault() const;
+        };
         void _pushDefault(Layer& newLayer) const;
         bool _loadInstanceOf(Layer& newLayer);
         void _comitNewLayer(Layer& newLayer);
@@ -156,4 +172,9 @@ namespace Ent
         std::vector<Layer> m_layers;
         size_t m_layerCount = 0;
     };
+
+    inline Cursor* Cursor::getPrefab()
+    {
+        return _getLastLayer().prefab;
+    }
 } // namespace Ent

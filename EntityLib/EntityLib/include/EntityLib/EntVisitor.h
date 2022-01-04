@@ -119,5 +119,5 @@ namespace Ent
         }
     };
 
-    void visitRecursive(Cursor& expl, RecursiveVisitor& visitor, bool sortFields, size_t tab = 0);
+    void visitRecursive(Cursor& expl, RecursiveVisitor& visitor, bool sortFields);
 } // namespace Ent

@@ -153,6 +153,7 @@ namespace Ent
             }
         }
         // m_layers.push_back(std::move(newLayer));
+        ENTLIB_DBG_ASSERT(lastLayer.schema.base != nullptr);
         return *this;
     }
 
@@ -247,6 +248,7 @@ namespace Ent
                 }
             }
         }
+        ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
         m_layers.push_back(newLayer);
         return *this;
     }
@@ -285,6 +287,7 @@ namespace Ent
                 }
             }
         }
+        ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
         m_layers.push_back(newLayer);
         return *this;
     }
@@ -319,6 +322,7 @@ namespace Ent
                 }
             }
         }
+        ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
         m_layers.push_back(newLayer);
         return *this;
     }
@@ -351,6 +355,7 @@ namespace Ent
                 }
             }
         }
+        ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
         m_layers.push_back(newLayer);
         return *this;
     }
@@ -392,6 +397,7 @@ namespace Ent
                 }
             }
         }
+        ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
         m_layers.push_back(newLayer);
         return *this;
     }
@@ -515,6 +521,7 @@ namespace Ent
 
     void FileCursor::setLayer(Layer& lastSet, Layer& firstNotSet, size_t arraySize)
     {
+        ENTLIB_DBG_ASSERT(int(lastSet.values->type()) < int(nlohmann::json::value_t::discarded));
         switch (lastSet.schema.base->type)
         {
         case Ent::DataType::object:
@@ -545,6 +552,7 @@ namespace Ent
         break;
         case Ent::DataType::array:
         {
+            ENTLIB_DBG_ASSERT(lastSet.values->type() == nlohmann::json::value_t::array);
             auto meta = std::get<Ent::Subschema::ArrayMeta>(lastSet.schema.base->meta);
             auto& itemType = lastSet.schema.base->singularItems->get();
             switch (hash(meta.overridePolicy))
@@ -636,6 +644,7 @@ namespace Ent
                     }
                     default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                     }
+                    ENTLIB_DBG_ASSERT(lastSet.values->type() == nlohmann::json::value_t::array);
                     lastSet.values->push_back(object);
                     firstNotSet.values = &(*lastSet.values)[(*lastSet.values).size() - 1];
                     ENTLIB_ASSERT(firstNotSet.values != nullptr);

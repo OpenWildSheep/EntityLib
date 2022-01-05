@@ -154,7 +154,7 @@ namespace Ent
             size_t arraySize = 0;
             bool isDefault = false; // Cache for isDefault()
             void setDefault(
-                Ent::Subschema const* _schema, char const* filePath, nlohmann::json* _document);
+                Ent::Subschema const* _schema, char const* filePath, nlohmann::json const* _document);
             void clear();
             FileCursor* getDefault();
             FileCursor const* getDefault() const;

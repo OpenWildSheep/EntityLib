@@ -1680,7 +1680,9 @@ namespace Ent
         auto const absPath = getAbsolutePath(_path);
         std::filesystem::path relPath = std::filesystem::relative(absPath, rawdataPath);
         if (relPath.empty() || (*relPath.begin() == ".."))
+        {
             relPath = absPath;
+        }
         bool reload = false;
         auto error = std::error_code{};
         auto timestamp = std::filesystem::last_write_time(absPath, error);

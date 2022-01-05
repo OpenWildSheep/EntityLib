@@ -55,7 +55,7 @@ namespace Ent
 
         size_t layerCount() const;
 
-        void clear();
+        void reinit(); // Reset FileCursor without freeing memory
 
         FileCursor(Ent::Subschema const* _schema, char const* m_filePath);
 

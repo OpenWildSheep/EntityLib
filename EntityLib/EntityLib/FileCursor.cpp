@@ -65,7 +65,7 @@ namespace Ent
         return m_layers.size();
     }
 
-    void FileCursor::clear()
+    void FileCursor::reinit()
     {
         m_filePath.clear();
         m_rootDoc = nullptr;
@@ -698,40 +698,40 @@ namespace Ent
 
     void FileCursor::setSize(size_t size)
     {
-        if (m_layers.back().values->is_null())
+        if (lastLayer().values->is_null())
         {
-            (*m_layers.back().values) = nlohmann::json::array();
+            (*lastLayer().values) = nlohmann::json::array();
         }
-        while (size > m_layers.back().values->size())
+        while (size > lastLayer().values->size())
         {
-            m_layers.back().values->emplace_back();
+            lastLayer().values->emplace_back();
         }
-        while (size < m_layers.back().values->size())
+        while (size < lastLayer().values->size())
         {
-            m_layers.back().values->erase(m_layers.back().values->size() - 1);
+            lastLayer().values->erase(lastLayer().values->size() - 1);
         }
     }
     void FileCursor::setFloat(double value)
     {
-        *m_layers.back().values = value;
+        *lastLayer().values = value;
     }
     void FileCursor::setInt(int64_t value)
     {
-        *m_layers.back().values = value;
+        *lastLayer().values = value;
     }
     void FileCursor::setString(char const* value)
     {
         ENTLIB_ASSERT(value != nullptr);
         // ENTLIB_ASSERT(back() != nullptr);
-        *m_layers.back().values = value;
+        *lastLayer().values = value;
     }
     void FileCursor::setBool(bool value)
     {
-        *m_layers.back().values = value;
+        *lastLayer().values = value;
     }
     void FileCursor::setEntityRef(EntityRef const& value)
     {
-        *m_layers.back().values = value.entityPath;
+        *lastLayer().values = value.entityPath;
     }
     nlohmann::json& FileCursor::getOrCreate(nlohmann::json& val, char const* field)
     {
@@ -751,7 +751,7 @@ namespace Ent
     }
     void FileCursor::setUnionType(char const* type)
     {
-        auto& wrapper = (*m_layers.back().values);
+        auto& wrapper = (*lastLayer().values);
         auto dataFieldName = getSchema()->getUnionDataField();
         auto nameFieldName = getSchema()->getUnionNameField();
         auto& nameField = getOrCreate(wrapper, nameFieldName);

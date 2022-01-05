@@ -167,7 +167,7 @@ namespace Ent
             case "map"_hash: _visitor.inMap(); break;
             case "set"_hash:
             {
-                auto& itemType = _expl.getSchema()->singularItems.get()->get();
+                auto& itemType = _expl.getSchema()->singularItems->get();
                 switch (itemType.type)
                 {
                 case Ent::DataType::integer:

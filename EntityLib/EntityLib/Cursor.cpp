@@ -3,16 +3,18 @@
 namespace Ent
 {
     void Cursor::Layer::setDefault(
-        Ent::Subschema const* _schema, char const* filePath, nlohmann::json* _document)
+        Ent::Subschema const* _schema, char const* filePath, nlohmann::json const* _document)
     {
-        defaultStorage.init(_schema, filePath, _document);
+        // Loïc : To fix this aweful const_cast, FileCursor need a const version 'ConstFileCursor'.
+        // This is a "not-so-easy" task just to remove a const_cast so it is not a priority I guess.
+        defaultStorage.init(_schema, filePath, const_cast<nlohmann::json*>(_document));
         defaultVal = 0;
     }
     void Cursor::Layer::clear()
     {
         prefab = nullptr;
         defaultVal = 1; // 1 == undefined
-        defaultStorage.clear();
+        defaultStorage.reinit();
         arraySize = 0;
         isDefault = false;
     }
@@ -204,10 +206,7 @@ namespace Ent
         // m_layers.resize(10);
         m_layerCount = 0;
         Layer& newLayer = _allocLayer();
-        ///////////////////////////////////////////////////////////////////////////////////////
-        // DO NOT COMIT THIS const_cast !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ///////////////////////////////////////////////////////////////////////////////////////
-        newLayer.setDefault(_schema, nullptr, const_cast<nlohmann::json*>(&_schema->defaultValue));
+        newLayer.setDefault(_schema, nullptr, &_schema->defaultValue);
         //[[maybe_unused]] auto type = _document->GetType();
         //ENTLIB_DBG_ASSERT(_document->is_object());
         ENTLIB_ASSERT(_doc != nullptr);
@@ -355,11 +354,11 @@ namespace Ent
             auto propDefVal = m_instance.getPropertyDefaultValue();
             if (propDefVal != nullptr) // If there is property default, use them
             {
-                newLayer.setDefault(subschema, nullptr, (nlohmann::json*)propDefVal);
+                newLayer.setDefault(subschema, nullptr, propDefVal);
             }
             else if (not subschema->defaultValue.is_null())
             {
-                newLayer.setDefault(subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
+                newLayer.setDefault(subschema, nullptr, &subschema->defaultValue);
             }
         }
         _comitNewLayer(newLayer);
@@ -386,7 +385,7 @@ namespace Ent
         }
         else // Une type default
         {
-            newLayer.setDefault(subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
+            newLayer.setDefault(subschema, nullptr, &subschema->defaultValue);
         }
         if (not isDefault())
         {
@@ -432,12 +431,11 @@ namespace Ent
         }
         else if (auto* propDefVal = m_instance.getPropertyDefaultValue()) // If there is property default, use them
         {
-            newLayer.setDefault(subschema, nullptr, const_cast<nlohmann::json*>(propDefVal));
+            newLayer.setDefault(subschema, nullptr, propDefVal);
         }
         else // Une type default
         {
-            newLayer.setDefault(
-                subschema, nullptr, const_cast<nlohmann::json*>(&subschema->defaultValue));
+            newLayer.setDefault(subschema, nullptr, &subschema->defaultValue);
         }
         _comitNewLayer(newLayer);
         return *this;
@@ -458,12 +456,11 @@ namespace Ent
         }
         else if (auto* propDefVal = m_instance.getPropertyDefaultValue()) // If there is property default, use them
         {
-            newLayer.setDefault(subschema, nullptr, const_cast<nlohmann::json*>(propDefVal));
+            newLayer.setDefault(subschema, nullptr, propDefVal);
         }
         else // Une type default
         {
-            newLayer.setDefault(
-                subschema, nullptr, const_cast<nlohmann::json*>(&subschema->defaultValue));
+            newLayer.setDefault(subschema, nullptr, &subschema->defaultValue);
         }
         if (not isDefault())
         {
@@ -496,12 +493,11 @@ namespace Ent
         }
         else if (auto* propDefVal = m_instance.getPropertyDefaultValue()) // If there is property default, use them
         {
-            newLayer.setDefault(subschema, nullptr, const_cast<nlohmann::json*>(propDefVal));
+            newLayer.setDefault(subschema, nullptr, propDefVal);
         }
         else // Une type default
         {
-            newLayer.setDefault(
-                subschema, nullptr, const_cast<nlohmann::json*>(&subschema->defaultValue));
+            newLayer.setDefault(subschema, nullptr, &subschema->defaultValue);
         }
         if (not isDefault())
         {
@@ -534,11 +530,11 @@ namespace Ent
         }
         else if (auto* propDefVal = m_instance.getPropertyDefaultValue()) // If there is property default, use them
         {
-            newLayer.setDefault(subschema, nullptr, (nlohmann::json*)propDefVal);
+            newLayer.setDefault(subschema, nullptr, propDefVal);
         }
         else // Une type default
         {
-            newLayer.setDefault(subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
+            newLayer.setDefault(subschema, nullptr, &subschema->defaultValue);
         }
         if (not isDefault())
         {
@@ -571,11 +567,11 @@ namespace Ent
         }
         else if (auto* propDefVal = m_instance.getPropertyDefaultValue()) // If there is property default, use them
         {
-            newLayer.setDefault(subschema, nullptr, (nlohmann::json*)propDefVal);
+            newLayer.setDefault(subschema, nullptr, propDefVal);
         }
         else // Une type default
         {
-            newLayer.setDefault(subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
+            newLayer.setDefault(subschema, nullptr, &subschema->defaultValue);
         }
         if (not isDefault())
         {
@@ -632,12 +628,11 @@ namespace Ent
         }
         else if (m_instance.getPropertyDefaultValue() != nullptr) // If there is property default, use them
         {
-            newLayer.setDefault(
-                subschema, nullptr, (nlohmann::json*)m_instance.getPropertyDefaultValue());
+            newLayer.setDefault(subschema, nullptr, m_instance.getPropertyDefaultValue());
         }
         else // Une type default
         {
-            newLayer.setDefault(subschema, nullptr, (nlohmann::json*)&subschema->defaultValue);
+            newLayer.setDefault(subschema, nullptr, &subschema->defaultValue);
         }
         _comitNewLayer(newLayer);
         return *this;
@@ -819,7 +814,7 @@ namespace Ent
                     break;
                 case "set"_hash:
                 {
-                    auto& itemType = schema->singularItems.get()->get();
+                    auto& itemType = schema->singularItems->get();
                     switch (itemType.type)
                     {
                     case Ent::DataType::integer: return getPrimSetKeysInt().size();
@@ -886,7 +881,7 @@ namespace Ent
                     break;
                 case "set"_hash:
                 {
-                    auto& itemType = schema->singularItems.get()->get();
+                    auto& itemType = schema->singularItems->get();
                     switch (itemType.type)
                     {
                     case Ent::DataType::integer: return primSetContains(std::get<size_t>(_key));
@@ -1157,11 +1152,11 @@ namespace Ent
 
     bool Cursor::mapContains(char const* _key)
     {
-        return getMapKeysString().count(_key);
+        return getMapKeysString().count(_key) != 0;
     }
     bool Cursor::mapContains(int64_t _key)
     {
-        return getMapKeysInt().count(_key);
+        return getMapKeysInt().count(_key) != 0;
     }
     bool Cursor::primSetContains(char const* _key)
     {

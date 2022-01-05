@@ -177,6 +177,11 @@ namespace Ent
         std::map<std::filesystem::path, EntityFile> const& getEntityCache() const;
         std::map<std::filesystem::path, SceneFile> const& getSceneCache() const;
         std::map<std::filesystem::path, NodeFile> const& getNodeCache() const;
+        struct HashPath
+        {
+            auto operator()(std::filesystem::path const& p) const;
+        };
+        std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> const& getJsonDatabase() const;
 
         void clearCache();
 
@@ -250,13 +255,6 @@ namespace Ent
         mutable std::map<std::filesystem::path, EntityFile> m_entityCache;
         mutable std::map<std::filesystem::path, SceneFile> m_sceneCache;
         mutable std::map<std::filesystem::path, NodeFile> m_nodeCache;
-        struct HashPath
-        {
-            auto operator()(std::filesystem::path const& p) const
-            {
-                return std::filesystem::hash_value(p);
-            }
-        };
         mutable std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> m_jsonDatabase;
     };
 

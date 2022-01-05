@@ -2099,11 +2099,23 @@ namespace Ent
         return m_nodeCache;
     }
 
+    auto EntityLib::HashPath::operator()(std::filesystem::path const& p) const
+    {
+        return std::filesystem::hash_value(p);
+    }
+
+    std::unordered_map<std::filesystem::path, nlohmann::json, EntityLib::HashPath> const&
+    EntityLib::getJsonDatabase() const
+    {
+        return m_jsonDatabase;
+    }
+
     void EntityLib::clearCache()
     {
         m_entityCache.clear();
         m_sceneCache.clear();
         m_nodeCache.clear();
+        m_jsonDatabase.clear();
     }
 
     void EntityLib::saveScene(Scene const& _scene, std::filesystem::path const& _scenePath) const

@@ -615,8 +615,41 @@ namespace Ent
                 ENTLIB_ASSERT(std::holds_alternative<Null>(ref));
                 ref = SubschemaRef::Ref{globalSchema, typeName};
             }
+
+            void finalizeSubschema(Subschema& lastSchema)
+            {
+                if (not lastSchema.unionTypeMap.empty())
+                {
+                    return;
+                }
+                // Fill the Subschema::unionTypeMap
+                if (lastSchema.type == DataType::oneOf)
+                {
+                    if (auto const* un = std::get_if<Subschema::UnionMeta>(&lastSchema.meta))
+                    {
+                        size_t index = 0;
+                        for (SubschemaRef const& wrapperSchema : *lastSchema.oneOf)
+                        {
+                            Subschema::UnionSubTypeInfo info{};
+                            info.wrapperSchema = &wrapperSchema.get();
+                            info.index = index;
+                            info.dataSchema = &info.wrapperSchema->properties.at(un->dataField).get();
+                            auto& typeSchema = info.wrapperSchema->properties.at(un->typeField).get();
+                            auto const& typeName =
+                                typeSchema.constValue->get_ref<std::string const&>();
+                            lastSchema.unionTypeMap.emplace(typeName.c_str(), info);
+                            ++index;
+                        }
+                        ENTLIB_ASSERT(lastSchema.unionTypeMap.size() == lastSchema.oneOf->size());
+                    }
+                }
+            }
+
             void closeRef() override
             {
+                auto& lastSchema = stack.back()->get();
+                finalizeSubschema(lastSchema);
+
                 CHECK_WHOLE_STACK;
                 ENTLIB_DEBUG_PRINTF("%scloseRef\n", getTab());
             }
@@ -673,6 +706,10 @@ namespace Ent
                             // Sometimes the object can be incomplete, but will be completed later.
                         }
                     }
+                }
+                {
+                    auto& lastSchema = stack.back()->get();
+                    finalizeSubschema(lastSchema);
                 }
                 ENTLIB_DEBUG_PRINTF("%scloseSubschema\n", getTab());
             }

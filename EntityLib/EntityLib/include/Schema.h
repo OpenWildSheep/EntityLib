@@ -70,6 +70,15 @@ namespace Ent
         std::string title;
         std::string description;
 
+        struct UnionSubTypeInfo
+        {
+            Subschema const* wrapperSchema = nullptr;
+            Subschema const* dataSchema = nullptr;
+            size_t index = 0;
+        };
+        /// @brief Fast lookup in union types
+        std::map<std::string, UnionSubTypeInfo> unionTypeMap;
+
         // Meta informations
         /// Store metadata for any type
         struct BaseMeta

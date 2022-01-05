@@ -217,8 +217,8 @@ try
     }
     {
         entlib.rawdataPath = "X:/RawData";
-        entlib.validFile(
-            "01_World/SimpleWild/Objects/PlaceHolderTree/editor/entity/placeholdertree.entity");
+        entlib.validFile("01_World/SimpleWild/Objects/PlaceHolderTree/editor/entity/"
+                         "placeholdertree.entity");
         entlib.rawdataPath = current_path();
     }
     {

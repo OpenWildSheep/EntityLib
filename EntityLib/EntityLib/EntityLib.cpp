@@ -1934,7 +1934,6 @@ namespace Ent
         validateJson(schema.schema, toolsDir, doc, schemaFound.c_str());
     }
 
-
     std::unique_ptr<Entity>
     EntityLib::loadEntity(std::filesystem::path const& _entityPath, Entity const* _super) const
     {

@@ -169,10 +169,7 @@ try
 #endif
 
     testNodeHandler(entlib);
-    if (argc != 0)
-    {
-        return EXIT_SUCCESS;
-    }
+    entlib.rawdataPath = current_path();
 
     ENTLIB_ASSERT(Ent::format("Toto %d", 37) == "Toto 37");
 

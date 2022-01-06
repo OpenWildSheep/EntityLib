@@ -468,6 +468,11 @@
             "Type": "StaffVertebrasGD"
         },
         {
+            "Data": {},
+            "Type": "StaffVertebrasGD",
+            "Version": 1
+        },
+        {
             "Data": {
                 "NormalRatio": 0.6,
                 "ZOffset": 10.0

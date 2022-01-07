@@ -1541,7 +1541,7 @@ namespace Ent
                 {
                     throw DuplicateKey(format("Two Components of same type: '%s'", cmpType.c_str()));
                 }
-                json const& data = compNode.at("Data");
+                json const& data = compNode.value("Data", json::object());
                 if (data.is_null())
                 {
                     removedComponents.insert(cmpType);

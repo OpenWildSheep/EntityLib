@@ -54,6 +54,10 @@
             "Type": "NetworkNode"
         },
         {
+            "Data": {},
+            "Type": "StaffVertebrasGD"
+        },
+        {
             "Data": {
                 "BehaviorPath": "Pesto/Behavior/FSMDefaultBehavior.pesto",
                 "BehaviorState": "W/*at*/c//h",

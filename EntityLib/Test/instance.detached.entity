@@ -463,6 +463,10 @@
             "Type": "SmoothScaleComponentGD"
         },
         {
+            "Data": {},
+            "Type": "StaffVertebrasGD"
+        },
+        {
             "Data": {
                 "NormalRatio": 0.6,
                 "ZOffset": 10.0

@@ -12,11 +12,9 @@
                 "ScriptList": [
                     "a1", "b2", null ]
             },
-            "Type": "SystemicCreature",
-            "Version": 1
+            "Type": "SystemicCreature"
         },
 		{
-			"Version": 1,
 			"Type": "SubScene",
 			"Data": {
 				"isEmbedded": true,
@@ -27,7 +25,6 @@
 						"Color": [255,120,220,255],
 						"Components": [
 							{
-								"Version": 1,
 								"Type": "NetworkLink",
 								"Data": {
 									"Target": ".EP1-crook_2"

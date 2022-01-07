@@ -326,7 +326,6 @@ namespace Ent
     {
         json document;
 
-        document.emplace("Version", 2);
         json& jsnObjects = document["Objects"];
         jsnObjects = json::array();
 

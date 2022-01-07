@@ -4,11 +4,9 @@
             "Data": {
                 "Faction": "Plouf"
             },
-            "Type": "SystemicCreature",
-            "Version": 1
+            "Type": "SystemicCreature"
         },
         {
-            "Version": 1,
             "Type": "PathNodeGD",
             "Data": {
                 "Radius": 30.0
@@ -17,8 +15,7 @@
             "Data": {
                 "NormalRatio": 0.6
             },
-            "Type": "StickToTerrain",
-            "Version": 1
+            "Type": "StickToTerrain"
         }
     ],
     "InstanceOf": "instance.entity"

@@ -8,8 +8,7 @@
                 "SklLush": "wolf_skeleton_lush",
                 "SklNeutral": "wolf_skeleton_neutral"
             },
-            "Type": "TestCreature",
-            "Version": 1
+            "Type": "TestCreature"
         },
         {
             "Data": {
@@ -35,8 +34,7 @@
                                         3.814697265625e-06
                                     ]
                                 },
-                                "Type": "TransformGD",
-                                "Version": 1
+                                "Type": "TransformGD"
                             }
                         ],
                         "Name": "wolf_skeleton_lush",
@@ -63,8 +61,7 @@
                                         0.0
                                     ]
                                 },
-                                "Type": "TransformGD",
-                                "Version": 1
+                                "Type": "TransformGD"
                             }
                         ],
                         "Name": "wolf_skeleton_neutral",
@@ -91,8 +88,7 @@
                                         0.0
                                     ]
                                 },
-                                "Type": "TransformGD",
-                                "Version": 1
+                                "Type": "TransformGD"
                             }
                         ],
                         "Name": "wolf_skeleton_fire",
@@ -119,8 +115,7 @@
                                         -7.62939453125e-06
                                     ]
                                 },
-                                "Type": "TransformGD",
-                                "Version": 1
+                                "Type": "TransformGD"
                             }
                         ],
                         "Name": "wolf_full_lush",
@@ -147,8 +142,7 @@
                                         0.0
                                     ]
                                 },
-                                "Type": "TransformGD",
-                                "Version": 1
+                                "Type": "TransformGD"
                             }
                         ],
                         "Name": "wolf_full_fire",
@@ -158,8 +152,7 @@
                 "File": "",
                 "isEmbedded": true
             },
-            "Type": "SubScene",
-            "Version": 1
+            "Type": "SubScene"
         }
     ],
     "Name": "entity-subscene"

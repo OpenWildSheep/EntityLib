@@ -15,11 +15,9 @@
 					null
 				]
 			},
-			"Type": "SystemicCreature",
-			"Version": 1
+			"Type": "SystemicCreature"
 		},
 		{
-			"Version": 1,
 			"Type": "SubScene",
 			"Data": {
 				"isEmbedded": true,
@@ -36,7 +34,6 @@
 						],
 						"Components": [
 							{
-								"Version": 1,
 								"Type": "TransformGD",
 								"Data": {
 									"Matrix": [
@@ -58,7 +55,6 @@
 								}
 							},
 							{
-								"Version": 1,
 								"Type": "NetworkLink",
 								"Data": {
 									"Source": ".EP1-Spout_",

@@ -15,11 +15,9 @@
 					null
 				]
 			},
-			"Type": "SystemicCreature",
-			"Version": 1
+			"Type": "SystemicCreature"
 		},
 		{
-			"Version": 1,
 			"Type": "SubScene",
 			"Data": {
 				"isEmbedded": true,

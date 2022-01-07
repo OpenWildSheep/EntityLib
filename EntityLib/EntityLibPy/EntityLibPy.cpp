@@ -194,6 +194,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pySubschemaGenericMeta = py::class_<Subschema::GenericMeta>(ent, "Subschema_GenericMeta");
     auto pySubschemaNumberMeta = py::class_<Subschema::NumberMeta>(ent, "Subschema_NumberMeta");
     auto pySubschemaUnionMeta = py::class_<Subschema::UnionMeta>(ent, "Subschema_UnionMeta");
+    auto pySubschemaUnionSubTypeInfo = py::class_<Subschema::UnionSubTypeInfo>(ent, "Subschema_UnionSubTypeInfo");
 
     pyLogicErrorPolicy
         .value("Terminate", LogicErrorPolicy::Terminate)
@@ -266,6 +267,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readonly("data_field", &Subschema::UnionMeta::dataField)
         .def_readonly("type_field", &Subschema::UnionMeta::typeField)
         .def_readonly("index_field", &Subschema::UnionMeta::indexField);
+    pySubschemaUnionSubTypeInfo
+        .def_readonly("data_schema", &Subschema::UnionSubTypeInfo::dataSchema)
+        .def_readonly("wrapper_schema", &Subschema::UnionSubTypeInfo::wrapperSchema)
+        .def_readonly("index", &Subschema::UnionSubTypeInfo::index);
 
     pySubschema
         .def_readonly("type", &Subschema::type)
@@ -276,6 +281,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readonly("properties", &Subschema::properties, py::return_value_policy::reference_internal)
         .def_readonly("max_items", &Subschema::maxItems)
         .def_readonly("min_items", &Subschema::minItems)
+        .def_readonly("union_type_map", &Subschema::unionTypeMap)
         .def_property_readonly("is_used_in_editor", &Subschema::IsUsedInEditor)
         .def_property_readonly("is_used_in_runtime", &Subschema::IsUsedInRuntime)
         .def_readonly("one_of", &Subschema::oneOf, py::return_value_policy::reference_internal)

@@ -15,7 +15,8 @@
                     null
                 ]
             },
-            "Type": "SystemicCreature"
+            "Type": "SystemicCreature",
+            "Version": 1
         },
         {
             "Data": {
@@ -47,7 +48,8 @@
                                         0.0
                                     ]
                                 },
-                                "Type": "TransformGD"
+                                "Type": "TransformGD",
+                                "Version": 1
                             },
                             {
                                 "Data": {
@@ -55,14 +57,16 @@
                                     "Target": ".EP1-crook_",
                                     "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
                                 },
-                                "Type": "NetworkLink"
+                                "Type": "NetworkLink",
+                                "Version": 1
                             }
                         ],
                         "Name": "EP1-Spout_LINK_001_added"
                     }
                 ]
             },
-            "Type": "SubScene"
+            "Type": "SubScene",
+            "Version": 1
         }
     ],
     "InstanceOf": "prefab.entity",

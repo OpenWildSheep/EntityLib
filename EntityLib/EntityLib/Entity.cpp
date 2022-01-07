@@ -649,6 +649,7 @@ namespace Ent
                         data.emplace("Embedded", subscene->embedded->saveScene()["Objects"]);
 
                         json compNode;
+                        compNode.emplace("Version", comp->version);
                         compNode.emplace("Type", comp->type);
                         compNode.emplace("Data", std::move(data));
                         componentsNode.emplace_back(std::move(compNode));
@@ -658,6 +659,7 @@ namespace Ent
             else if (not comp->hasPrefab or comp->root->hasOverride())
             {
                 json compNode;
+                compNode.emplace("Version", comp->version);
                 compNode.emplace("Type", comp->type);
                 compNode.emplace(
                     "Data", EntityLib::dumpNode(*AT(_schema.components, comp->type), *comp->root));

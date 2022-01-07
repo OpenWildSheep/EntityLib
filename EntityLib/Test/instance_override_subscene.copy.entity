@@ -15,7 +15,8 @@
                     null
                 ]
             },
-            "Type": "SystemicCreature"
+            "Type": "SystemicCreature",
+            "Version": 1
         },
         {
             "Data": {
@@ -32,14 +33,16 @@
                                 "Data": {
                                     "Target": ".EP1-crook_2"
                                 },
-                                "Type": "NetworkLink"
+                                "Type": "NetworkLink",
+                                "Version": 1
                             }
                         ],
                         "Name": "EP1-Spout_LINK_001"
                     }
                 ]
             },
-            "Type": "SubScene"
+            "Type": "SubScene",
+            "Version": 1
         }
     ],
     "InstanceOf": "prefab.entity",

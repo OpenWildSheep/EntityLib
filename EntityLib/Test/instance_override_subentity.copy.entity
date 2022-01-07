@@ -15,7 +15,8 @@
                     null
                 ]
             },
-            "Type": "SystemicCreature"
+            "Type": "SystemicCreature",
+            "Version": 1
         },
         {
             "Data": {
@@ -32,7 +33,8 @@
                     }
                 ]
             },
-            "Type": "SubScene"
+            "Type": "SubScene",
+            "Version": 1
         }
     ],
     "InstanceOf": "prefab.entity",

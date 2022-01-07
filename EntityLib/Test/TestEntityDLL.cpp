@@ -163,7 +163,7 @@ try
 #ifdef _DEBUG
     entlib.validationEnabled = false;
 #else
-    entlib.validationEnabled = false;
+    entlib.validationEnabled = true;
 #endif
 
     ENTLIB_ASSERT(Ent::format("Toto %d", 37) == "Toto 37");

@@ -5,7 +5,8 @@
                 "EDITOR_skeleton": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/editor/skeleton/pinetreec50cmh5mbasic.wskl",
                 "skeleton": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/skeleton/pinetreec50cmh5mbasic.skl"
             },
-            "Type": "AnimationControllerGD"
+            "Type": "AnimationControllerGD",
+            "Version": 1
         },
         {
             "Data": {
@@ -39,22 +40,26 @@
                     }
                 }
             },
-            "Type": "AnimationTreeConstraintsGD"
+            "Type": "AnimationTreeConstraintsGD",
+            "Version": 1
         },
         {
             "Data": {
                 "HotspotType": "ride",
                 "Mode": "Creature"
             },
-            "Type": "BeamTargetGD"
+            "Type": "BeamTargetGD",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "CameraDataGD"
+            "Type": "CameraDataGD",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "HotspotsGD"
+            "Type": "HotspotsGD",
+            "Version": 1
         },
         {
             "Data": {
@@ -71,18 +76,21 @@
                 "PhysicsMaterial": "Climbable",
                 "Walkable": true
             },
-            "Type": "PhysicsGD"
+            "Type": "PhysicsGD",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "PhysicsMeshProviderGD"
+            "Type": "PhysicsMeshProviderGD",
+            "Version": 1
         },
         {
             "Data": {
                 "GPEActorStateName": "ActorStateBendingTree",
                 "GPEType": "BendTree"
             },
-            "Type": "PossessableGPEGD"
+            "Type": "PossessableGPEGD",
+            "Version": 1
         },
         {
             "Data": {
@@ -101,7 +109,8 @@
                     ]
                 ]
             },
-            "Type": "ScriptComponentGD"
+            "Type": "ScriptComponentGD",
+            "Version": 1
         },
         {
             "Data": {
@@ -177,35 +186,43 @@
                 ],
                 "VisualResourcePath": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/visual/pinetreec50cmh5mbasic.grc"
             },
-            "Type": "VisualGD"
+            "Type": "VisualGD",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "EventHandlerGD"
+            "Type": "EventHandlerGD",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "TransformGD"
+            "Type": "TransformGD",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "ActorGD"
+            "Type": "ActorGD",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "NetGD"
+            "Type": "NetGD",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "UnifiedPhysicsDataGD"
+            "Type": "UnifiedPhysicsDataGD",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "PhysicsMeshDeformerGD"
+            "Type": "PhysicsMeshDeformerGD",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "HealerGD"
+            "Type": "HealerGD",
+            "Version": 1
         }
     ],
     "Name": "Tree_PineTreeC50cmH5mBasic",

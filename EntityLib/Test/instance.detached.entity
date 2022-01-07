@@ -28,7 +28,8 @@
             "Data": {
                 "InSpiritWorld": false
             },
-            "Type": "ActorGD"
+            "Type": "ActorGD",
+            "Version": 1
         },
         {
             "Data": {
@@ -47,7 +48,8 @@
                                     "Target": ".EP1-crook_",
                                     "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
                                 },
-                                "Type": "NetworkLink"
+                                "Type": "NetworkLink",
+                                "Version": 1
                             },
                             {
                                 "Data": {
@@ -68,7 +70,8 @@
                                         0.0
                                     ]
                                 },
-                                "Type": "TransformGD"
+                                "Type": "TransformGD",
+                                "Version": 1
                             }
                         ],
                         "Name": "EP1-Spout_LINK_001_detached"
@@ -86,7 +89,8 @@
                                     "Source": "instance",
                                     "Target": "subentity2"
                                 },
-                                "Type": "NetworkLink"
+                                "Type": "NetworkLink",
+                                "Version": 1
                             }
                         ],
                         "Name": "EntityWithInstanceOf_detached"
@@ -98,7 +102,8 @@
                                     "Source": "subentity2",
                                     "Target": "subentity2"
                                 },
-                                "Type": "NetworkLink"
+                                "Type": "NetworkLink",
+                                "Version": 1
                             }
                         ],
                         "Name": "EntityWithInstanceOfButNoOverride_detached"
@@ -113,7 +118,8 @@
                         "Components": [
                             {
                                 "Data": {},
-                                "Type": "TransformGD"
+                                "Type": "TransformGD",
+                                "Version": 1
                             }
                         ],
                         "Name": "TestRemove_detached"
@@ -128,18 +134,21 @@
                         "Components": [
                             {
                                 "Data": {},
-                                "Type": "NetworkLink"
+                                "Type": "NetworkLink",
+                                "Version": 1
                             }
                         ],
                         "Name": "TestSaveEntWithOverride_detached"
                     }
                 ]
             },
-            "Type": "SubScene"
+            "Type": "SubScene",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "BeamGeneratorGD"
+            "Type": "BeamGeneratorGD",
+            "Version": 1
         },
         {
             "Data": {
@@ -311,7 +320,8 @@
                     }
                 }
             },
-            "Type": "CharacterControllerGD"
+            "Type": "CharacterControllerGD",
+            "Version": 1
         },
         {
             "Data": {
@@ -336,7 +346,8 @@
                     }
                 ]
             },
-            "Type": "CinematicGD"
+            "Type": "CinematicGD",
+            "Version": 1
         },
         {
             "Data": {
@@ -355,7 +366,8 @@
                 ],
                 "Subdivision": 0
             },
-            "Type": "HeightObj"
+            "Type": "HeightObj",
+            "Version": 1
         },
         {
             "Data": {
@@ -367,11 +379,13 @@
                 },
                 "PrimitiveType": "test"
             },
-            "Type": "LDPrimitive"
+            "Type": "LDPrimitive",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "NetGD"
+            "Type": "NetGD",
+            "Version": 1
         },
         {
             "Data": {
@@ -379,7 +393,8 @@
                 "ThumbnailMesh": "02_creature/human/male/clothstrong/bodykai/CLOTH_Body.wbm",
                 "Type": "Spawner"
             },
-            "Type": "NetworkNode"
+            "Type": "NetworkNode",
+            "Version": 1
         },
         {
             "Data": {
@@ -411,11 +426,13 @@
                     ]
                 }
             },
-            "Type": "PathNodeGD"
+            "Type": "PathNodeGD",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "PhysicsGD"
+            "Type": "PhysicsGD",
+            "Version": 1
         },
         {
             "Data": {
@@ -449,25 +466,29 @@
                     ]
                 ]
             },
-            "Type": "ScriptComponentGD"
+            "Type": "ScriptComponentGD",
+            "Version": 1
         },
         {
             "Data": {
                 "NoiseOffsetY": 3.0,
                 "NoiseSizeY": 3.0
             },
-            "Type": "SeedPatch"
+            "Type": "SeedPatch",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "SmoothScaleComponentGD"
+            "Type": "SmoothScaleComponentGD",
+            "Version": 1
         },
         {
             "Data": {
                 "NormalRatio": 0.6,
                 "ZOffset": 10.0
             },
-            "Type": "StickToTerrain"
+            "Type": "StickToTerrain",
+            "Version": 1
         },
         {
             "Data": {
@@ -488,7 +509,8 @@
                 "UniqueID": "Shaman_male_Bobby",
                 "Warrior": false
             },
-            "Type": "SystemicCreature"
+            "Type": "SystemicCreature",
+            "Version": 1
         },
         {
             "Data": {
@@ -497,11 +519,13 @@
                     "variantType": "float"
                 }
             },
-            "Type": "TestArrays"
+            "Type": "TestArrays",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "TestDefaultValues"
+            "Type": "TestDefaultValues",
+            "Version": 1
         },
         {
             "Data": {
@@ -542,7 +566,8 @@
                     }
                 ]
             },
-            "Type": "TestSetOfObject"
+            "Type": "TestSetOfObject",
+            "Version": 1
         },
         {
             "Data": {
@@ -563,11 +588,13 @@
                     29.6635
                 ]
             },
-            "Type": "TransformGD"
+            "Type": "TransformGD",
+            "Version": 1
         },
         {
             "Data": {},
-            "Type": "VoxelSimulationGD"
+            "Type": "VoxelSimulationGD",
+            "Version": 1
         }
     ],
     "Name": "PlayerSpawner__detached",

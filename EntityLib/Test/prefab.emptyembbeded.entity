@@ -26,8 +26,7 @@
                     0.9999
                 ]
             },
-            "Type": "TransformGD",
-            "Version": 1
+            "Type": "TransformGD"
         },
         {
             "Data": {
@@ -35,8 +34,7 @@
                 "ThumbnailMesh": "02_creature/human/male/clothstrong/bodykai/CLOTH_Body.wbm",
                 "Type": "Spawner"
             },
-            "Type": "NetworkNode",
-            "Version": 1
+            "Type": "NetworkNode"
         },
         {
             "Data": {
@@ -58,8 +56,7 @@
                 "UniqueID": "Shaman_male_Bobby",
                 "Warrior": false
             },
-            "Type": "SystemicCreature",
-            "Version": 1
+            "Type": "SystemicCreature"
         },
         {
             "Data": {
@@ -78,35 +75,29 @@
                 ],
                 "Subdivision": 0
             },
-            "Type": "HeightObj",
-            "Version": 1
+            "Type": "HeightObj"
         },
         {
             "Data": {},
-            "Type": "NetGD",
-            "Version": 1
+            "Type": "NetGD"
         },
         {
             "Data": {},
-            "Type": "SmoothScaleComponentGD",
-            "Version": 1
+            "Type": "SmoothScaleComponentGD"
         },
         {
             "Data": {},
-            "Type": "PhysicsGD",
-            "Version": 1
+            "Type": "PhysicsGD"
         },
         {
             "Data": {
                 "InSpiritWorld": false
             },
-            "Type": "ActorGD",
-            "Version": 1
+            "Type": "ActorGD"
         },
         {
             "Data": {},
-            "Type": "BeamGeneratorGD",
-            "Version": 1
+            "Type": "BeamGeneratorGD"
         },
         {
             "Data": {
@@ -133,8 +124,7 @@
                     }
                 ]
             },
-            "Type": "CinematicGD",
-            "Version": 1
+            "Type": "CinematicGD"
         },
         {
             "Data": {
@@ -146,23 +136,19 @@
                 },
                 "PrimitiveType": "test"
             },
-            "Type": "LDPrimitive",
-            "Version": 1
+            "Type": "LDPrimitive"
         },
         {
             "Data": {},
-            "Type": "VoxelSimulationGD",
-            "Version": 1
+            "Type": "VoxelSimulationGD"
         },
         {
             "Data": {},
-            "Type": "CharacterControllerGD",
-            "Version": 1
+            "Type": "CharacterControllerGD"
         },
         {
             "Data": {},
-            "Type": "TestDefaultValues",
-            "Version": 1
+            "Type": "TestDefaultValues"
         },
         {
             "Data": {
@@ -191,8 +177,7 @@
                     ]
                 }
             },
-            "Type": "PathNodeGD",
-            "Version": 1
+            "Type": "PathNodeGD"
         },
         {
             "Data": {
@@ -201,8 +186,7 @@
                     "variantType": "float"
                 }
             },
-            "Type": "TestArrays",
-            "Version": 1
+            "Type": "TestArrays"
         },
         {
             "Data": {
@@ -236,23 +220,20 @@
                     ]
                 ]
             },
-            "Type": "ScriptComponentGD",
-            "Version": 1
+            "Type": "ScriptComponentGD"
         },
         {
             "Data": {
                 "InstanceOf": "test.SeedPatch.node",
                 "NoiseOffsetX": 2.0
             },
-            "Type": "SeedPatch",
-            "Version": 1
+            "Type": "SeedPatch"
         },
         {
             "Data": {
                 "TestRef": "EP1-Spout_LINK_001"
             },
-            "Type": "TestEntityRef",
-            "Version": 1
+            "Type": "TestEntityRef"
         },
         {
             "Data": {
@@ -281,8 +262,7 @@
                     }
                 ]
             },
-            "Type": "TestSetOfObject",
-            "Version": 1
+            "Type": "TestSetOfObject"
         },
         {
             "Data": {
@@ -293,8 +273,7 @@
                     {}
                 ]
             },
-            "Type": "TestUnion",
-            "Version": 1
+            "Type": "TestUnion"
         }
     ],
     "MaxActivationLevel": "InWorld",

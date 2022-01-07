@@ -31,8 +31,7 @@
                     null
                 ]
             },
-            "Type": "SystemicCreature",
-            "Version": 1
+            "Type": "SystemicCreature"
         },
         {
             "Data": {
@@ -65,24 +64,21 @@
                     ]
                 }
             },
-            "Type": "PathNodeGD",
-            "Version": 1
+            "Type": "PathNodeGD"
         },
         {
             "Data": {
                 "InstanceOf": "test.StickToTerrain.node",
                 "NormalRatio": 0.6
             },
-            "Type": "StickToTerrain",
-            "Version": 1
+            "Type": "StickToTerrain"
         },
         {
             "Data": {
                 "InstanceOf": "test.SeedPatch2.node",
                 "NoiseOffsetY": 3.0
             },
-            "Type": "SeedPatch",
-            "Version": 1
+            "Type": "SeedPatch"
         },
         {
             "Data": {
@@ -109,8 +105,7 @@
                     }
                 ]
             },
-            "Type": "TestSetOfObject",
-            "Version": 1
+            "Type": "TestSetOfObject"
         },
         {
             "Data": null,

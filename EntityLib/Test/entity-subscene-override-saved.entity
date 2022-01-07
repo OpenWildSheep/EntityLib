@@ -9,16 +9,14 @@
                                 "Data": {
                                     "InSpiritWorld": true
                                 },
-                                "Type": "ActorGD",
-                                "Version": 1
+                                "Type": "ActorGD"
                             }
                         ],
                         "Name": "wolf_skeleton_lush"
                     }
                 ]
             },
-            "Type": "SubScene",
-            "Version": 1
+            "Type": "SubScene"
         }
     ],
     "InstanceOf": "entity-subscene.entity",

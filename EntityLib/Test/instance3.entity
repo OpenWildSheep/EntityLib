@@ -8,8 +8,7 @@
                     }
                 ]
             },
-            "Type": "TestSetOfObject",
-            "Version": 1
+            "Type": "TestSetOfObject"
         }
     ],
     "Name": "PlayerSpawner_"

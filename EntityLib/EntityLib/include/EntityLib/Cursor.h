@@ -84,8 +84,6 @@ namespace Ent
                                              { return std::get<0>(field_schema).c_str(); });
         }
 
-        std::unordered_map<std::string, SubschemaRef> const& getFields() const;
-
         Subschema const* getSchema() const;
 
         char const* getTypeName() const;

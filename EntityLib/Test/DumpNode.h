@@ -1,6 +1,6 @@
 #pragma once
 
-#include <EntityLib/EntVisitor.h>
+#include <EntityLib/Visitor.h>
 
 namespace Ent
 {

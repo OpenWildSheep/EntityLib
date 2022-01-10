@@ -6,7 +6,7 @@
 #include <iostream>
 #include <stack>
 
-#include <EntityLib/EntVisitor.h>
+#include <EntityLib/Visitor.h>
 #include <EntityLib/CopyNode.h>
 #include "DumpNode.h"
 

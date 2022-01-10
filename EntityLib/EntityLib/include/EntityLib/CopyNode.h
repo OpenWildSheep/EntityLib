@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EntVisitor.h"
+#include "Visitor.h"
 
 namespace Ent
 {

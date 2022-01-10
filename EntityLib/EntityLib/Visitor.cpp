@@ -1,4 +1,4 @@
-#include "include/EntityLib/EntVisitor.h"
+#include "include/EntityLib/Visitor.h"
 
 namespace Ent
 {

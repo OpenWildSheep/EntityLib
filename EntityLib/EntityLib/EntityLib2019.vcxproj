@@ -124,7 +124,6 @@
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</TreatWarningAsError>
     </ClCompile>
     <ClCompile Include="EntityLibCore.cpp" />
-    <ClCompile Include="EntVisitor.cpp" />
     <ClCompile Include="FileCursor.cpp" />
     <ClCompile Include="include\Schema.cpp" />
     <ClCompile Include="Map.cpp" />
@@ -137,6 +136,7 @@
     <ClCompile Include="Union.cpp" />
     <ClCompile Include="ValidJson.cpp" />
     <ClCompile Include="Vector.cpp" />
+    <ClCompile Include="Visitor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Array.h" />
@@ -147,8 +147,8 @@
     <ClInclude Include="include\EntityLibCore.h" />
     <ClInclude Include="include\EntityLib\CopyNode.h" />
     <ClInclude Include="include\EntityLib\Cursor.h" />
-    <ClInclude Include="include\EntityLib\EntVisitor.h" />
     <ClInclude Include="include\EntityLib\FileCursor.h" />
+    <ClInclude Include="include\EntityLib\Visitor.h" />
     <ClInclude Include="include\Schema.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MemoryProfiler.h" />

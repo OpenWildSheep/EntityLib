@@ -5,8 +5,9 @@ namespace Ent
     void Cursor::Layer::setDefault(
         Ent::Subschema const* _schema, char const* filePath, nlohmann::json const* _document)
     {
-        // Loïc : To fix this aweful const_cast, FileCursor need a const version 'ConstFileCursor'.
+        // LoÃ¯c : To fix this aweful const_cast, FileCursor need a const version 'ConstFileCursor'.
         // This is a "not-so-easy" task just to remove a const_cast so it is not a priority I guess.
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
         defaultStorage.init(_schema, filePath, const_cast<nlohmann::json*>(_document));
         defaultVal = 0;
     }
@@ -863,7 +864,7 @@ namespace Ent
             switch (schema->type)
             {
             case Ent::DataType::object:
-                return schema->properties.count(std::get<std::string>(_key));
+                return schema->properties.count(std::get<std::string>(_key)) != 0;
             case Ent::DataType::oneOf: return getUnionType() == std::get<std::string>(_key);
             case Ent::DataType::array:
             {

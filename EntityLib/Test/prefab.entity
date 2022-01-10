@@ -41,8 +41,6 @@
             },
             "Type": "NetworkNode"
         }, {
-            "Type": "StaffVertebrasGD"
-        }, {
             "Type": "StaffVertebrasGD",
             "Version": 1
         }, {

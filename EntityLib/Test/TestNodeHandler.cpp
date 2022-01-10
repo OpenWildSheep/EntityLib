@@ -620,11 +620,11 @@ void testNodeHandler(Ent::EntityLib& entlib)
         expl.exit().exit().exit();
         std::cout << expl.enterObjectField("Components")
                          .enterUnionSetItem("TransformGD")
-                         .enterObjectField("Matrix")
-                         .enterArrayItem(3llu)
+                         .enterObjectField("Position")
+                         .enterArrayItem(0llu)
                          .getFloat()
                   << std::endl;
-        ENTLIB_ASSERT(expl.getFloat() == -0.2556);
+        ENTLIB_ASSERT(expl.getFloat() == 105.2244);
         expl.exit().exit().exit();
         ENTLIB_ASSERT(
             expl.enterUnionSetItem("SubScene")
@@ -655,13 +655,13 @@ void testNodeHandler(Ent::EntityLib& entlib)
                          .getFloat()
                   << std::endl;
         expl.exit().exit().exit().exit();
-        auto mat3 = expl.enterObjectField("Components")
+        auto pos2 = expl.enterObjectField("Components")
                         .enterUnionSetItem("TransformGD")
-                        .enterObjectField("Matrix")
-                        .enterArrayItem(3llu)
+                        .enterObjectField("Position")
+                        .enterArrayItem(2llu)
                         .getFloat();
         expl.exit().exit().exit().exit();
-        ENTLIB_ASSERT(fabs(mat3 - -0.2556) < FLT_EPSILON);
+        ENTLIB_ASSERT(fabs(pos2 - 29.6635) < FLT_EPSILON);
         ENTLIB_ASSERT(
             expl.enterObjectField("Components")
                 .enterUnionSetItem("SubScene")
@@ -683,7 +683,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
                          .enterObjectField("Orientation")
                          .enterArrayItem(3llu);
 
-        ENTLIB_ASSERT(ori3.getFloat() == 1.);
+        ENTLIB_ASSERT(fabs(ori3.getFloat() - 0.9916236400604248) < FLT_EPSILON);
         ori3.setFloat(2.);
         ENTLIB_ASSERT(ori3.getFloat() == 2.);
         expl.exit().exit().exit().exit();

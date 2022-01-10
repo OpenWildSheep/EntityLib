@@ -1735,8 +1735,15 @@ namespace Ent
         {
             return _entLib.loadNode(_nodeSchema, _document, _super);
         };
-
-        return loadEntityOrScene<Node>(_nodePath, m_nodeCache, &validateEntity, loadFunc, _super);
+        auto validate = [&_nodeSchema](
+                            Schema const& _schema,
+                            std::filesystem::path const& _toolsDir,
+                            nlohmann::json const& _entity)
+        {
+            // Validate with the right type of the Node
+            return validateJson(_schema, _toolsDir, _entity, _nodeSchema.name.c_str());
+        };
+        return loadEntityOrScene<Node>(_nodePath, m_nodeCache, validate, loadFunc, _super);
     }
 
     std::shared_ptr<Node const> EntityLib::loadNodeEntityReadOnly(char const* _nodePath) const
@@ -1837,10 +1844,17 @@ namespace Ent
             {
                 throw UnknownSchema(_entLib.rawdataPath.string().c_str(), _nodePath.string().c_str());
             }
+            if (validationEnabled)
+            {
+                // Validate with the right type of the Node
+                validateJson(
+                    _entLib.schema.schema, _entLib.toolsDir, _document, schema->name.c_str());
+            }
             return _entLib.loadNode(*schema, _document, _super);
         };
-        return loadEntityOrScene<Node>(_nodePath, m_nodeCache, &validateEntity, loadFunc, nullptr)
-            ->clone();
+        auto validate = [](Schema const&, std::filesystem::path const&, nlohmann::json const&) {
+        };
+        return loadEntityOrScene<Node>(_nodePath, m_nodeCache, validate, loadFunc, nullptr)->clone();
     }
 
     std::unique_ptr<Entity>

@@ -60,7 +60,7 @@ namespace Ent
         Schema* rootSchema{};
         DataType type = DataType::null; ///< type of this Subschema. @see Ent::DataType
         bool required = false; ///< Is this property required?
-        std::unordered_map<std::string, SubschemaRef> properties; ///< If type == Ent::DataType::object, child properties
+        std::map<std::string, SubschemaRef> properties; ///< If type == Ent::DataType::object, child properties
         size_t maxItems = size_t(-1); ///< Maximum size of the array. (inclusive) [min, max]
         size_t minItems = 0; ///< @brief Minimum size of an array
         std::optional<std::vector<SubschemaRef>> oneOf; ///< This object have to match with one of thos schema (union)
@@ -191,12 +191,11 @@ namespace Ent
         /// Make this private
         struct Ref
         {
-            Schema* schema = nullptr; //!< Sortcut to the global schema
+            Schema* schema; //!< Schema of the referenced object
             std::string ref; //!< Name of the referenced object
             DefaultValue defaultValue; ///< Additional default values (beside a "$ref")
             std::string title;
             std::string description;
-            mutable Subschema* cache = nullptr;
         };
 
         std::variant<Null, Ref, Subschema> subSchemaOrRef;
@@ -214,14 +213,15 @@ namespace Ent
         /// Get the default values beside a "$ref", or nullptr
         DefaultValue const* getRefDefaultValues() const
         {
-            if (auto* ref = std::get_if<Ref>(&subSchemaOrRef))
+            if (std::holds_alternative<Ref>(subSchemaOrRef)
+                && !std::get<Ref>(subSchemaOrRef).defaultValue.is_null())
             {
-                if (!ref->defaultValue.is_null())
-                {
-                    return &ref->defaultValue;
-                }
+                return &std::get<Ref>(subSchemaOrRef).defaultValue;
             }
-            return nullptr;
+            else
+            {
+                return nullptr;
+            }
         }
     };
 
@@ -234,7 +234,7 @@ namespace Ent
         Schema() = default;
         Schema(Schema const&) = delete;
         Schema& operator=(Schema const&) = delete;
-        std::unordered_map<std::string, Subschema> allDefinitions; ///< Definition of everything, by type name
+        std::map<std::string, Subschema> allDefinitions; ///< Definition of everything, by type name
         EntityLib* entityLib = nullptr;
 
         /// @cond PRIVATE
@@ -290,23 +290,13 @@ namespace Ent
 
     inline Subschema const& SubschemaRef::get() const
     {
-        if (Ref const* ref = std::get_if<Ref>(&subSchemaOrRef))
+        if (std::holds_alternative<Ref>(subSchemaOrRef))
         {
-            if (ref->cache != nullptr)
-            {
-                return *ref->cache;
-            }
-            else
-            {
-                auto& subschema = AT(ref->schema->allDefinitions, ref->ref);
-                ref->cache = &subschema;
-                return subschema;
-            }
+            Ref const& ref = std::get<Ref>(subSchemaOrRef);
+            return AT(ref.schema->allDefinitions, ref.ref);
         }
-        else if (auto* subSchema = std::get_if<Subschema>(&subSchemaOrRef))
-        {
-            return *subSchema;
-        }
+        else if (std::holds_alternative<Subschema>(subSchemaOrRef))
+            return std::get<Subschema>(subSchemaOrRef);
         else
         {
             ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
@@ -316,7 +306,18 @@ namespace Ent
 
     inline Subschema& SubschemaRef::get()
     {
-        return const_cast<Subschema&>(std::as_const(*this).get());
+        if (std::holds_alternative<Ref>(subSchemaOrRef))
+        {
+            Ref const& ref = std::get<Ref>(subSchemaOrRef);
+            return AT(ref.schema->allDefinitions, ref.ref);
+        }
+        else if (std::holds_alternative<Subschema>(subSchemaOrRef))
+            return std::get<Subschema>(subSchemaOrRef);
+        else
+        {
+            ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
+            return std::get<Subschema>(subSchemaOrRef);
+        }
     }
 
     inline Subschema const& SubschemaRef::operator*() const

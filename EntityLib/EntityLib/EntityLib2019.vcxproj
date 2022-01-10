@@ -87,7 +87,7 @@
       <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <Optimization>Full</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>nsvp_CONFIG_COMPARE_POINTERS;ENTLIB_LOADSCHEMA;ENTLIB_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -100,7 +100,6 @@
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
       <ExternalTemplatesDiagnostics>false</ExternalTemplatesDiagnostics>
       <ConformanceMode>true</ConformanceMode>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,10 +163,6 @@
     <ClInclude Include="Union.h" />
     <ClInclude Include="ValidJson.h" />
     <ClInclude Include="Vector.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="..\..\external\mapbox\NATVIS\Variant.natvis" />
-    <Natvis Include="external\mapbox\NATVIS\Variant.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

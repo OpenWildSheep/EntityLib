@@ -385,15 +385,12 @@ namespace Ent
     void EntityLib::saveJsonFile(nlohmann::json const* doc, char const* _filepath)
     {
         std::filesystem::path const filepath = very_weakly_canonical(_filepath);
-        // if (auto iter = m_jsonDatabase.find(filepath); iter != m_jsonDatabase.end())
+        std::ofstream ofs(rawdataPath / filepath);
+        if (not ofs.is_open())
         {
-            std::ofstream ofs(rawdataPath / filepath);
-            if (not ofs.is_open())
-            {
-                throw ContextException("Can't open %s for write", filepath.string().c_str());
-            }
-            ofs << *doc;
+            throw ContextException("Can't open %s for write", filepath.string().c_str());
         }
+        ofs << *doc;
     }
 
     struct MergeMapOverride
@@ -1680,9 +1677,7 @@ namespace Ent
         auto const absPath = getAbsolutePath(_path);
         std::filesystem::path relPath = std::filesystem::relative(absPath, rawdataPath);
         if (relPath.empty() || (*relPath.begin() == ".."))
-        {
             relPath = absPath;
-        }
         bool reload = false;
         auto error = std::error_code{};
         auto timestamp = std::filesystem::last_write_time(absPath, error);
@@ -1884,56 +1879,6 @@ namespace Ent
         auto validate = [](Schema const&, std::filesystem::path const&, nlohmann::json const&) {
         };
         return loadEntityOrScene<Node>(_nodePath, m_nodeCache, validate, loadFunc, nullptr)->clone();
-    }
-
-    void EntityLib::validFile(std::filesystem::path const& _nodePath) const
-    {
-        auto doc = loadJsonFile(rawdataPath, _nodePath);
-        std::string schemaFound;
-        bool tryToLower = false;
-        if (auto schemaName = doc.find("$schema"); schemaName != doc.end())
-        {
-            // If $schema found, use it
-            schemaFound = getRefTypeName(schemaName->get_ref<json::string_t const&>().c_str());
-        }
-        else if (auto schemaName2 = doc.find("schema_name"); schemaName2 != doc.end())
-        {
-            // If schema_name found, use it
-            schemaFound = getRefTypeName(schemaName2->get_ref<json::string_t const&>().c_str());
-        }
-        else if (_nodePath.extension().string() == ".entity" or _nodePath.extension().string() == ".scene")
-        {
-            // If extention is entity or scene, we know it is an Entity
-            schemaFound = "Entity";
-        }
-        else
-        {
-            // Search in filename
-            schemaFound = _nodePath.stem().extension().string(); // Get pre-extention
-            schemaFound.erase(schemaFound.begin()); // remove dot
-            schemaFound = strToLower(schemaFound);
-            tryToLower = true;
-        }
-        if (auto dotPos = schemaFound.find('.'); dotPos != std::string::npos)
-        {
-            schemaFound.erase(dotPos);
-        }
-        for (auto const& [name, schema2] : this->schema.schema.allDefinitions)
-        {
-            // Try to lower only if the type was extracted from a file name
-            if ((tryToLower and strToLower(getRefTypeName(name.c_str())) == schemaFound)
-                or (not tryToLower and getRefTypeName(name.c_str()) == schemaFound))
-            {
-                schemaFound = name;
-                break;
-            }
-        }
-
-        if (schemaFound.empty())
-        {
-            throw UnknownSchema(rawdataPath.string().c_str(), _nodePath.string().c_str());
-        }
-        validateJson(schema.schema, toolsDir, doc, schemaFound.c_str());
     }
 
     std::unique_ptr<Entity>

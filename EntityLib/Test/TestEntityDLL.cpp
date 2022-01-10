@@ -158,18 +158,21 @@ try
     using namespace std::filesystem;
 
     entlib.setLogicErrorPolicy(Ent::LogicErrorPolicy::Throw);
-    // ENTLIB_CHECK_EXCEPTION(ENTLIB_LOGIC_ERROR("Test logic error"), std::logic_error);
+    ENTLIB_CHECK_EXCEPTION(ENTLIB_LOGIC_ERROR("Test logic error"), std::logic_error);
     entlib.setLogicErrorPolicy(Ent::LogicErrorPolicy::Terminate);
 
     entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
 #ifdef _DEBUG
     entlib.validationEnabled = false;
 #else
-    entlib.validationEnabled = false;
+    entlib.validationEnabled = true;
 #endif
 
+    auto prevValidationEnabled = entlib.validationEnabled;
+    entlib.validationEnabled = false;
     testNodeHandler(entlib);
     entlib.rawdataPath = current_path();
+    entlib.validationEnabled = prevValidationEnabled;
 
     ENTLIB_ASSERT(Ent::format("Toto %d", 37) == "Toto 37");
 
@@ -207,18 +210,6 @@ try
     static constexpr auto PrefabSubEntityCount = 5;
 
     {
-        auto pref = entlib.loadFileAsNode("prefab.entity");
-        auto inst = pref->makeInstanceOf();
-        inst->applyAllValuesButPrefab(*pref, Ent::CopyMode::CopyOverride);
-        entlib.saveNodeAsEntity(pref.get(), "prefab2.entity");
-    }
-    {
-        entlib.rawdataPath = "X:/RawData";
-        entlib.validFile("01_World/SimpleWild/Objects/PlaceHolderTree/editor/entity/"
-                         "placeholdertree.entity");
-        entlib.rawdataPath = current_path();
-    }
-    {
         auto node = entlib.loadFileAsNode(
             "myseedpatchMarianne.seedpatchdata.node",
             entlib.schema.schema.allDefinitions["SeedPatchDataList"]);
@@ -251,7 +242,6 @@ try
         auto prefabHisto = node->getPrefabHistory();
     }
     // Temporarily disable validation to read some RawData files
-    auto prevValidationEnabled = entlib.validationEnabled;
     entlib.validationEnabled = false;
     {
         entlib.rawdataPath = "X:/RawData"; // It is a hack to work in the working dir

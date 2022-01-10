@@ -711,7 +711,6 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("save_node_as_scene", &EntityLib::saveNodeAsScene)
         .def("get_parent_entity", (Node*(EntityLib::*)(Node*))&EntityLib::getParentEntity, py::return_value_policy::reference_internal)
         .def("get_schema", &EntityLib::getSchema, py::return_value_policy::reference_internal)
-        .def("valid_file", &EntityLib::validFile)
         .def(
             "make_instance_of",
             [](EntityLib* lib, std::string const& path) {

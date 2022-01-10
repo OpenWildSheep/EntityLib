@@ -39,14 +39,13 @@ namespace Ent
         {
             throw BadType();
         }
-        if (auto* unionData = std::get_if<UnionMeta>(&meta))
-        {
-            return unionData->typeField.c_str();
-        }
-        else
+        if (not std::holds_alternative<UnionMeta>(meta))
         {
             throw MissingMetadata(name.c_str());
         }
+
+        auto const& unionData = std::get<UnionMeta>(meta);
+        return unionData.typeField.c_str();
     }
 
     char const* Subschema::getUnionDataField() const
@@ -55,14 +54,13 @@ namespace Ent
         {
             throw BadType();
         }
-        if (auto const* unionData = std::get_if<UnionMeta>(&meta))
-        {
-            return unionData->dataField.c_str();
-        }
-        else
+        if (not std::holds_alternative<UnionMeta>(meta))
         {
             throw MissingMetadata(name.c_str());
         }
+
+        auto const& unionData = std::get<UnionMeta>(meta);
+        return unionData.dataField.c_str();
     }
 
     std::map<std::string, Subschema const*> Subschema::getUnionTypesMap() const
@@ -71,23 +69,24 @@ namespace Ent
         {
             throw BadType();
         }
-        if (auto const* unionData = std::get_if<UnionMeta>(&meta))
-        {
-            std::map<std::string, Subschema const*> result;
-            for (SubschemaRef const& ref : *oneOf)
-            {
-                auto acceptedType =
-                    AT(ref.get().properties, unionData->typeField)->constValue->get<std::string>();
-                Subschema const& schema = AT(ref.get().properties, unionData->dataField).get();
-                result.emplace(std::move(acceptedType), &schema);
-            }
-
-            return result;
-        }
-        else
+        if (not std::holds_alternative<UnionMeta>(meta))
         {
             throw MissingMetadata(name.c_str());
         }
+
+        std::map<std::string, Subschema const*> result;
+
+        auto const& unionData = std::get<UnionMeta>(meta);
+
+        for (SubschemaRef const& ref : *oneOf)
+        {
+            auto acceptedType =
+                AT(ref.get().properties, unionData.typeField)->constValue->get<std::string>();
+            Subschema const& schema = AT(ref.get().properties, unionData.dataField).get();
+            result.emplace(std::move(acceptedType), &schema);
+        }
+
+        return result;
     }
 
     char const* Subschema::getUnionDefaultTypeName() const

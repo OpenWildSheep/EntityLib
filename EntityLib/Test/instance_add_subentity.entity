@@ -1,17 +1,17 @@
 {
-	"Color": [
-		27,
-		177,
-		27,
-		255
-	],
-	"Components": [
-		{
-			"Data": {
-				"Faction": "Plouf",
-				"ScriptList": [
-					"a1",
-					"b2",
+    "Color": [
+        27,
+        177,
+        27,
+        255
+    ],
+    "Components": [
+        {
+            "Data": {
+                "Faction": "Plouf",
+                "ScriptList": [
+                    "a1",
+                    "b2",
 					null
 				]
 			},
@@ -20,21 +20,21 @@
 		{
 			"Type": "SubScene",
 			"Data": {
-				"isEmbedded": true,
-				"File": "",
-				"Embedded": [
-					{
-						"Name": "EP1-Spout_LINK_001_added",
-						"Color": [
-							44,
-							120,
-							220,
-							255
-						],
-						"Components": [
-							{
-								"Type": "TransformGD",
-								"Data": {
+                "isEmbedded": true,
+                "File": "",
+                "Embedded": [
+                    {
+                        "Name": "EP1-Spout_LINK_001_added",
+                        "Color": [
+                            44,
+                            120,
+                            220,
+                            255
+                        ],
+                        "Components": [
+                            {
+                                "Type": "TransformGD",
+                                "Data": {
 									"Orientation": [
 										-0.15823428332805634,
 										0.6910317540168762,
@@ -51,23 +51,23 @@
 										1.000032663345337,
 										82.40972137451172
 									]
-								}
-							},
-							{
-								"Type": "NetworkLink",
-								"Data": {
-									"Source": ".EP1-Spout_",
-									"Target": ".EP1-crook_",
-									"ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
-								}
-							}
-						]
-					}
-				]
-			}
-		}
-	],
-	"InstanceOf": "prefab.entity",
-	"Thumbnail": "prout",
-	"Name": "PlayerSpawner_"
+                                }
+                            },
+                            {
+                                "Type": "NetworkLink",
+                                "Data": {
+                                    "Source": ".EP1-Spout_",
+                                    "Target": ".EP1-crook_",
+                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "InstanceOf": "prefab.entity",
+    "Thumbnail": "prout",
+    "Name": "PlayerSpawner_"
 }

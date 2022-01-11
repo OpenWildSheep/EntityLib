@@ -105,13 +105,13 @@ namespace Ent
         std::set<char const*, CmpStr> getObjectSetKeysString();
         std::set<int64_t> getObjectSetKeysInt();
 
-        bool mapContains(char const*);
-        bool mapContains(int64_t);
-        bool primSetContains(char const*);
-        bool primSetContains(int64_t);
-        bool unionSetContains(char const*);
-        bool objectSetContains(char const*);
-        bool objectSetContains(int64_t);
+        bool mapContains(char const* _key);
+        bool mapContains(int64_t _key);
+        bool primSetContains(char const* _key);
+        bool primSetContains(int64_t _key);
+        bool unionSetContains(char const* _key);
+        bool objectSetContains(char const* _key);
+        bool objectSetContains(int64_t _key);
 
         bool isSet() const;
 
@@ -124,20 +124,20 @@ namespace Ent
         /// @pre type==Ent::DataType::entityRef. @brief Get the value as an Entity reference
         EntityRef getEntityRef() const;
 
-        void setSize(size_t size);
+        void setSize(size_t _size);
 
-        void setFloat(double value);
-        void setInt(int64_t value);
-        void setString(char const* value);
-        void setBool(bool value);
-        void setEntityRef(EntityRef const& value);
-        void setUnionType(char const* type);
+        void setFloat(double _value);
+        void setInt(int64_t _value);
+        void setString(char const* _value);
+        void setBool(bool _value);
+        void setEntityRef(EntityRef const& _value);
+        void setUnionType(char const* _type);
         // Build path but not set any value. Usefull for UnionSet items
         void buildPath();
-        bool countPrimSetKey(char const* key);
-        bool countPrimSetKey(int64_t key);
-        void insertPrimSetKey(char const* key);
-        void insertPrimSetKey(int64_t key);
+        bool countPrimSetKey(char const* _key);
+        bool countPrimSetKey(int64_t _key);
+        void insertPrimSetKey(char const* _key);
+        void insertPrimSetKey(int64_t _key);
 
         nlohmann::json* GetRawValue();
 
@@ -153,21 +153,21 @@ namespace Ent
             size_t arraySize = 0;
             bool isDefault = false; // Cache for isDefault()
             void setDefault(
-                Ent::Subschema const* _schema, char const* filePath, nlohmann::json const* _document);
+                Ent::Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
             void clear();
             FileCursor* getDefault();
             FileCursor const* getDefault() const;
         };
-        void _pushDefault(Layer& newLayer) const;
-        bool _loadInstanceOf(Layer& newLayer);
-        void _comitNewLayer(Layer& newLayer);
+        void _pushDefault(Layer& _newLayer) const;
+        bool _loadInstanceOf(Layer& _newLayer);
+        void _comitNewLayer(Layer& _newLayer);
         void _validNewLayer();
         Layer& _allocLayer();
         Layer& _getLastLayer();
         Layer const& _getLastLayer() const;
         void _buildPath();
         template <typename K, typename E>
-        bool _countPrimSetKeyImpl(K key, E&& _isEqual);
+        bool _countPrimSetKeyImpl(K _key, E&& _isEqual);
         template <typename E>
         Cursor& _enterItem(E&& _enter);
 

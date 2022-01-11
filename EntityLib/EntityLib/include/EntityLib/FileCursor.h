@@ -57,11 +57,11 @@ namespace Ent
 
         void reinit(); // Reset FileCursor without freeing memory
 
-        FileCursor(Ent::Subschema const* _schema, char const* m_filePath);
+        FileCursor(Ent::Subschema const* _schema, char const* _filePath);
 
-        void pushBack(char const* key);
+        void pushBack(char const* _key);
 
-        void pushBack(int64_t key);
+        void pushBack(int64_t _key);
 
         void save(char const* _filename = nullptr) const;
 
@@ -88,7 +88,7 @@ namespace Ent
 
         FileCursor& enterMapItem(int64_t _field);
 
-        FileCursor& enterArrayItem(size_t index);
+        FileCursor& enterArrayItem(size_t _index);
 
         char const* getUnionType() const;
 
@@ -102,18 +102,18 @@ namespace Ent
 
         nlohmann::json const* getPropertyDefaultValue() const;
 
-        static void setLayer(Layer& lastSet, Layer& firstNotSet, size_t arraySize);
+        static void setLayer(Layer& _lastSet, Layer& _firstNotSet, size_t _arraySize);
 
-        void setSize(size_t size);
+        void setSize(size_t _size);
         template <typename T>
-        void set(T&& value);
-        void setFloat(double value);
-        void setInt(int64_t value);
-        void setString(char const* value);
-        void setBool(bool value);
-        void setEntityRef(EntityRef const& value);
-        static nlohmann::json& getOrCreate(nlohmann::json& val, char const* field);
-        void setUnionType(char const* type);
+        void set(T&& _value);
+        void setFloat(double _value);
+        void setInt(int64_t _value);
+        void setString(char const* _value);
+        void setBool(bool _value);
+        void setEntityRef(EntityRef const& _value);
+        static nlohmann::json& getOrCreate(nlohmann::json& _val, char const* _field);
+        void setUnionType(char const* _type);
         template <typename T>
         T get() const;
         double getFloat() const;

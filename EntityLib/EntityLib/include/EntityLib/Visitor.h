@@ -7,8 +7,8 @@ namespace Ent
     class RecursiveVisitor
     {
     public:
-        RecursiveVisitor() = default;
-        virtual ~RecursiveVisitor() = default;
+        RecursiveVisitor();
+        virtual ~RecursiveVisitor();
         RecursiveVisitor(RecursiveVisitor const&) = delete;
         RecursiveVisitor(RecursiveVisitor&&) = delete;
         RecursiveVisitor& operator=(RecursiveVisitor const&) = delete;
@@ -124,8 +124,8 @@ namespace Ent
     class Visitor
     {
     public:
-        Visitor() = default;
-        virtual ~Visitor() = default;
+        Visitor();
+        virtual ~Visitor();
         Visitor(Visitor const&) = delete;
         Visitor(Visitor&&) = delete;
         Visitor& operator=(Visitor const&) = delete;

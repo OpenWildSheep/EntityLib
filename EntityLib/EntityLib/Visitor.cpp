@@ -2,6 +2,9 @@
 
 namespace Ent
 {
+    RecursiveVisitor::RecursiveVisitor() = default;
+    RecursiveVisitor ::~RecursiveVisitor() = default;
+
     void visitRecursive(Cursor& _expl, RecursiveVisitor& _visitor, bool sortFields)
     {
         switch (_expl.getDataType())
@@ -152,6 +155,9 @@ namespace Ent
         default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
         }
     }
+
+    Visitor::Visitor() = default;
+    Visitor::~Visitor() = default;
 
     void visit(Cursor& _expl, Visitor& _visitor)
     {

@@ -4,9 +4,9 @@ namespace Ent
 {
     FileCursor::FileCursor() = default;
 
-    FileCursor::FileCursor(Ent::Subschema const* _schema, char const* m_filePath, nlohmann::json* _document)
+    FileCursor::FileCursor(Ent::Subschema const* _schema, char const* _filePath, nlohmann::json* _document)
     {
-        m_filePath = m_filePath;
+        m_filePath = _filePath;
         m_layers.reserve(30);
         auto& newLayer = m_layers.emplace_back();
         newLayer.schema = Schema{{_schema}};
@@ -72,19 +72,19 @@ namespace Ent
         m_layers.clear();
     }
 
-    FileCursor::FileCursor(Ent::Subschema const* _schema, char const* m_filePath)
-        : FileCursor(_schema, m_filePath, &_schema->rootSchema->entityLib->readJsonFile(m_filePath))
+    FileCursor::FileCursor(Ent::Subschema const* _schema, char const* _filePath)
+        : FileCursor(_schema, _filePath, &_schema->rootSchema->entityLib->readJsonFile(_filePath))
     {
     }
 
-    void FileCursor::pushBack(char const* key)
+    void FileCursor::pushBack(char const* _key)
     {
-        back()->push_back(key);
+        back()->push_back(_key);
     }
 
-    void FileCursor::pushBack(int64_t key)
+    void FileCursor::pushBack(int64_t _key)
     {
-        back()->push_back(key);
+        back()->push_back(_key);
     }
 
     void FileCursor::save(char const* _filename) const
@@ -321,7 +321,7 @@ namespace Ent
             { return _node.get<int64_t>() == _field; });
     }
 
-    FileCursor& FileCursor::enterArrayItem(size_t index)
+    FileCursor& FileCursor::enterArrayItem(size_t _index)
     {
         Layer newLayer;
         auto& lastLayer = m_layers.back();
@@ -334,19 +334,19 @@ namespace Ent
         else
         {
             ENTLIB_DBG_ASSERT(lastLayer.schema.base->linearItems.has_value());
-            if (index >= lastLayer.schema.base->linearItems->size())
+            if (_index >= lastLayer.schema.base->linearItems->size())
             {
                 throw ContextException("Out of range in tuple");
             }
-            auto& subschema = lastLayer.schema.base->linearItems->at(index).get();
+            auto& subschema = lastLayer.schema.base->linearItems->at(_index).get();
             newLayer.schema = Schema{&subschema, nullptr};
         }
-        newLayer.additionalPath = index;
+        newLayer.additionalPath = _index;
         if (auto lastNode = back())
         {
-            if (lastNode->size() > index)
+            if (lastNode->size() > _index)
             {
-                auto newValue = &(*lastNode)[index];
+                auto newValue = &(*lastNode)[_index];
                 // if (not newValue->is_null())
                 {
                     if (newLayer.schema.base->type == Ent::DataType::string
@@ -480,112 +480,113 @@ namespace Ent
         return m_layers.back().schema.propDefVal;
     }
 
-    void FileCursor::setLayer(Layer& lastSet, Layer& firstNotSet, size_t arraySize)
+    void FileCursor::setLayer(Layer& _lastSet, Layer& _firstNotSet, size_t _arraySize)
     {
-        ENTLIB_DBG_ASSERT(int(lastSet.values->type()) < int(nlohmann::json::value_t::discarded));
-        switch (lastSet.schema.base->type)
+        ENTLIB_DBG_ASSERT(int(_lastSet.values->type()) < int(nlohmann::json::value_t::discarded));
+        switch (_lastSet.schema.base->type)
         {
         case Ent::DataType::object:
         {
-            if (lastSet.values->is_null())
+            if (_lastSet.values->is_null())
             {
-                (*lastSet.values) = nlohmann::json::object();
+                (*_lastSet.values) = nlohmann::json::object();
             }
-            auto fieldName = std::get<char const*>(firstNotSet.additionalPath);
+            auto fieldName = std::get<char const*>(_firstNotSet.additionalPath);
             // lastSet.values->SetObject();
-            (*lastSet.values)[fieldName] = {};
-            firstNotSet.values = &(*lastSet.values)[fieldName];
+            (*_lastSet.values)[fieldName] = {};
+            _firstNotSet.values = &(*_lastSet.values)[fieldName];
         }
         break;
         case Ent::DataType::oneOf:
         {
-            if (lastSet.values->is_null())
+            if (_lastSet.values->is_null())
             {
-                (*lastSet.values) = nlohmann::json::object();
+                (*_lastSet.values) = nlohmann::json::object();
             }
-            auto fieldName = std::get<char const*>(firstNotSet.additionalPath);
-            auto typeField = lastSet.schema.base->getUnionNameField();
-            auto dataField = lastSet.schema.base->getUnionDataField();
-            (*lastSet.values)[typeField] = fieldName;
-            (*lastSet.values)[dataField] = {};
-            firstNotSet.values = &(*lastSet.values)[dataField];
+            auto fieldName = std::get<char const*>(_firstNotSet.additionalPath);
+            auto typeField = _lastSet.schema.base->getUnionNameField();
+            auto dataField = _lastSet.schema.base->getUnionDataField();
+            (*_lastSet.values)[typeField] = fieldName;
+            (*_lastSet.values)[dataField] = {};
+            _firstNotSet.values = &(*_lastSet.values)[dataField];
         }
         break;
         case Ent::DataType::array:
         {
             ENTLIB_DBG_ASSERT(lastSet.values->type() == nlohmann::json::value_t::array);
-            auto meta = std::get<Ent::Subschema::ArrayMeta>(lastSet.schema.base->meta);
-            auto& itemType = lastSet.schema.base->singularItems->get();
+            auto meta = std::get<Ent::Subschema::ArrayMeta>(_lastSet.schema.base->meta);
+            auto& itemType = _lastSet.schema.base->singularItems->get();
             switch (hash(meta.overridePolicy))
             {
             case "map"_hash:
-                if (lastSet.values->is_null())
+                if (_lastSet.values->is_null())
                 {
-                    (*lastSet.values) = nlohmann::json::array();
+                    (*_lastSet.values) = nlohmann::json::array();
                 }
                 switch (itemType.linearItems->at(0)->type)
                 {
                 case Ent::DataType::string:
                 {
-                    auto key = std::get<char const*>(firstNotSet.additionalPath);
+                    auto key = std::get<char const*>(_firstNotSet.additionalPath);
                     auto pairNode = nlohmann::json::array();
                     pairNode.push_back(key);
                     pairNode.emplace_back();
-                    lastSet.values->push_back(std::move(pairNode));
-                    firstNotSet.values = &(*lastSet.values)[(*lastSet.values).size() - 1][1];
+                    _lastSet.values->push_back(std::move(pairNode));
+                    _firstNotSet.values = &(*_lastSet.values)[(*_lastSet.values).size() - 1][1];
                 }
-                    ENTLIB_ASSERT(firstNotSet.values != nullptr);
+                    ENTLIB_ASSERT(_firstNotSet.values != nullptr);
                     break;
                 case Ent::DataType::integer:
                 {
-                    auto key = std::get<size_t>(firstNotSet.additionalPath);
+                    auto key = std::get<size_t>(_firstNotSet.additionalPath);
                     auto pairNode = nlohmann::json::array();
                     pairNode.push_back(key);
                     pairNode.emplace_back();
-                    lastSet.values->push_back(std::move(pairNode));
-                    firstNotSet.values = &(*lastSet.values)[(*lastSet.values).size() - 1][1];
+                    _lastSet.values->push_back(std::move(pairNode));
+                    _firstNotSet.values = &(*_lastSet.values)[(*_lastSet.values).size() - 1][1];
                 }
-                    ENTLIB_ASSERT(firstNotSet.values != nullptr);
+                    ENTLIB_ASSERT(_firstNotSet.values != nullptr);
                     break;
                 default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                 }
                 break;
             case "set"_hash:
             {
-                if (lastSet.values->is_null())
+                if (_lastSet.values->is_null())
                 {
-                    (*lastSet.values) = nlohmann::json::array();
+                    (*_lastSet.values) = nlohmann::json::array();
                 }
                 switch (itemType.type)
                 {
                 case Ent::DataType::integer: // integer set
                 {
-                    auto key = std::get<size_t>(firstNotSet.additionalPath);
-                    lastSet.values->push_back(key);
+                    auto key = std::get<size_t>(_firstNotSet.additionalPath);
+                    _lastSet.values->push_back(key);
                 }
-                    ENTLIB_ASSERT(firstNotSet.values != nullptr);
+                    ENTLIB_ASSERT(_firstNotSet.values != nullptr);
                     break;
                 case Ent::DataType::string: // String set
                 {
-                    auto key = std::get<char const*>(firstNotSet.additionalPath);
-                    lastSet.values->push_back(key);
+                    auto key = std::get<char const*>(_firstNotSet.additionalPath);
+                    _lastSet.values->push_back(key);
                 }
-                    ENTLIB_ASSERT(firstNotSet.values != nullptr);
+                    ENTLIB_ASSERT(_firstNotSet.values != nullptr);
                     break;
                 case Ent::DataType::oneOf: // UnionSet
                 {
                     auto wrapper = nlohmann::json::object();
-                    auto fieldName = std::get<char const*>(firstNotSet.additionalPath);
-                    auto unionSchema = &lastSet.schema.base->singularItems->get();
+                    auto fieldName = std::get<char const*>(_firstNotSet.additionalPath);
+                    auto unionSchema = &_lastSet.schema.base->singularItems->get();
                     auto typeField = unionSchema->getUnionNameField();
                     auto dataField = unionSchema->getUnionDataField();
                     wrapper[typeField] = fieldName;
                     wrapper[dataField] = {};
-                    lastSet.values->push_back(std::move(wrapper));
-                    firstNotSet.values = &(*lastSet.values)[(*lastSet.values).size() - 1][dataField];
-                }
-                    ENTLIB_ASSERT(firstNotSet.values != nullptr);
+                    _lastSet.values->push_back(std::move(wrapper));
+                    _firstNotSet.values =
+                        &(*_lastSet.values)[(*_lastSet.values).size() - 1][dataField];
+                    ENTLIB_ASSERT(_firstNotSet.values != nullptr);
                     break;
+                }
                 case Ent::DataType::object: // Object Set
                     auto object = nlohmann::json::object();
                     auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
@@ -593,43 +594,43 @@ namespace Ent
                     {
                     case Ent::DataType::string:
                     {
-                        auto key = std::get<char const*>(firstNotSet.additionalPath);
+                        auto key = std::get<char const*>(_firstNotSet.additionalPath);
                         object[*meta.keyField] = key;
                         break;
                     }
                     case Ent::DataType::integer:
                     {
-                        auto key = std::get<size_t>(firstNotSet.additionalPath);
+                        auto key = std::get<size_t>(_firstNotSet.additionalPath);
                         object[*meta.keyField] = key;
                         break;
                     }
                     default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                     }
                     ENTLIB_DBG_ASSERT(lastSet.values->type() == nlohmann::json::value_t::array);
-                    lastSet.values->push_back(object);
-                    firstNotSet.values = &(*lastSet.values)[(*lastSet.values).size() - 1];
-                    ENTLIB_ASSERT(firstNotSet.values != nullptr);
+                    _lastSet.values->push_back(object);
+                    _firstNotSet.values = &(*_lastSet.values)[(*_lastSet.values).size() - 1];
+                    ENTLIB_ASSERT(_firstNotSet.values != nullptr);
                     break;
                 }
             }
             break;
             case ""_hash:
             {
-                if (lastSet.values->is_null())
+                if (_lastSet.values->is_null())
                 {
-                    (*lastSet.values) = nlohmann::json::array();
+                    (*_lastSet.values) = nlohmann::json::array();
                 }
-                while (lastSet.values->size() < arraySize)
+                while (_lastSet.values->size() < _arraySize)
                 {
-                    lastSet.values->emplace_back();
+                    _lastSet.values->emplace_back();
                 }
-                while (lastSet.values->size() > arraySize)
+                while (_lastSet.values->size() > _arraySize)
                 {
-                    lastSet.values->erase(lastSet.values->size() - 1);
+                    _lastSet.values->erase(_lastSet.values->size() - 1);
                 }
-                auto index = std::get<size_t>(firstNotSet.additionalPath);
-                firstNotSet.values = &(*lastSet.values)[index];
-                ENTLIB_ASSERT(firstNotSet.values != nullptr);
+                auto index = std::get<size_t>(_firstNotSet.additionalPath);
+                _firstNotSet.values = &(*_lastSet.values)[index];
+                ENTLIB_ASSERT(_firstNotSet.values != nullptr);
             }
             break;
             }
@@ -643,79 +644,79 @@ namespace Ent
         case Ent::DataType::entityRef: [[fallthrough]];
         case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Unexpected DataType");
         }
-        if (firstNotSet.values->is_null())
+        if (_firstNotSet.values->is_null())
         {
-            if (firstNotSet.schema.base->type == Ent::DataType::array)
+            if (_firstNotSet.schema.base->type == Ent::DataType::array)
             {
-                *firstNotSet.values = nlohmann::json::array();
+                *_firstNotSet.values = nlohmann::json::array();
             }
-            else if (firstNotSet.schema.base->type == Ent::DataType::object)
+            else if (_firstNotSet.schema.base->type == Ent::DataType::object)
             {
-                *firstNotSet.values = nlohmann::json::object();
+                *_firstNotSet.values = nlohmann::json::object();
             }
         }
-        ENTLIB_ASSERT(firstNotSet.values != nullptr);
+        ENTLIB_ASSERT(_firstNotSet.values != nullptr);
     }
 
-    void FileCursor::setSize(size_t size)
+    void FileCursor::setSize(size_t _size)
     {
         if (lastLayer().values->is_null())
         {
             (*lastLayer().values) = nlohmann::json::array();
         }
-        while (size > lastLayer().values->size())
+        while (_size > lastLayer().values->size())
         {
             lastLayer().values->emplace_back();
         }
-        while (size < lastLayer().values->size())
+        while (_size < lastLayer().values->size())
         {
             lastLayer().values->erase(lastLayer().values->size() - 1);
         }
     }
     template <typename T>
-    void FileCursor::set(T&& value)
+    void FileCursor::set(T&& _value)
     {
         if constexpr (std::is_same_v<std::remove_const_t<std::remove_reference_t<T>>, EntityRef>)
         {
-            *lastLayer().values = value.entityPath;
+            *lastLayer().values = _value.entityPath;
         }
         else
         {
-            *lastLayer().values = std::forward<T>(value);
+            *lastLayer().values = std::forward<T>(_value);
         }
     }
 
-    void FileCursor::setFloat(double value)
+    void FileCursor::setFloat(double _value)
     {
-        set(value);
+        set(_value);
     }
-    void FileCursor::setInt(int64_t value)
+    void FileCursor::setInt(int64_t _value)
     {
-        set(value);
+        set(_value);
     }
-    void FileCursor::setString(char const* value)
+    void FileCursor::setString(char const* _value)
     {
-        ENTLIB_ASSERT(value != nullptr);
-        set(value);
+        ENTLIB_ASSERT(_value != nullptr);
+        set(_value);
     }
-    void FileCursor::setBool(bool value)
+    void FileCursor::setBool(bool _value)
     {
-        set(value);
+        set(_value);
     }
-    void FileCursor::setEntityRef(EntityRef const& value)
+    void FileCursor::setEntityRef(EntityRef const& _value)
     {
-        set(value);
+        set(_value);
     }
-    nlohmann::json& FileCursor::getOrCreate(nlohmann::json& val, char const* field)
+    nlohmann::json& FileCursor::getOrCreate(nlohmann::json& _val, char const* _field)
     {
-        if (auto iter = val.find(field); iter != val.end())
+        if (auto iter = _val.find(_field); iter != _val.end())
         {
             return *iter;
         }
         else
         {
-            val[field] = {};
-            return val[field];
+            _val[_field] = {};
+            return _val[_field];
         }
     }
     void FileCursor::setUnionType(char const* type)

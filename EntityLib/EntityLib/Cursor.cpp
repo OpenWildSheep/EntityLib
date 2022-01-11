@@ -3,12 +3,12 @@
 namespace Ent
 {
     void Cursor::Layer::setDefault(
-        Ent::Subschema const* _schema, char const* filePath, nlohmann::json const* _document)
+        Ent::Subschema const* _schema, char const* _filePath, nlohmann::json const* _document)
     {
         // Loïc : To fix this aweful const_cast, FileCursor need a const version 'ConstFileCursor'.
         // This is a "not-so-easy" task just to remove a const_cast so it is not a priority I guess.
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-        defaultStorage.init(_schema, filePath, const_cast<nlohmann::json*>(_document));
+        defaultStorage.init(_schema, _filePath, const_cast<nlohmann::json*>(_document));
         defaultVal = 0;
     }
     void Cursor::Layer::clear()
@@ -21,6 +21,7 @@ namespace Ent
     }
     FileCursor* Cursor::Layer::getDefault()
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
         return const_cast<FileCursor*>(std::as_const(*this).getDefault());
     }
     FileCursor const* Cursor::Layer::getDefault() const
@@ -199,15 +200,15 @@ namespace Ent
         return true;
     }
 
-    void Cursor::_pushDefault(Layer& newLayer) const
+    void Cursor::_pushDefault(Layer& _newLayer) const
     {
-        if (newLayer.isDefault)
+        if (_newLayer.isDefault)
         {
-            newLayer.isDefault = true;
+            _newLayer.isDefault = true;
         }
         else
         {
-            newLayer.isDefault = isDefaultImpl();
+            _newLayer.isDefault = isDefaultImpl();
         }
     }
 
@@ -216,7 +217,7 @@ namespace Ent
         return isDefaultImpl();
     }
 
-    bool Cursor::_loadInstanceOf(Layer& newLayer)
+    bool Cursor::_loadInstanceOf(Layer& _newLayer)
     {
         auto* subschema = m_instance.getSchema();
         if (subschema->type == Ent::DataType::object and m_instance.isSet())
@@ -227,17 +228,17 @@ namespace Ent
                 if (auto const& prefabPath = member->get_ref<std::string const&>();
                     not prefabPath.empty())
                 {
-                    if (newLayer.prefabsStorage == nullptr)
+                    if (_newLayer.prefabsStorage == nullptr)
                     {
-                        newLayer.prefabsStorage =
+                        _newLayer.prefabsStorage =
                             std::make_unique<Cursor>(m_entityLib, subschema, prefabPath.c_str());
                     }
                     else
                     {
-                        newLayer.prefabsStorage->init(m_entityLib, subschema, prefabPath.c_str());
+                        _newLayer.prefabsStorage->init(m_entityLib, subschema, prefabPath.c_str());
                     }
-                    newLayer.prefab = newLayer.prefabsStorage.get();
-                    ENTLIB_ASSERT(newLayer.prefab != (void*)0xdddddddddddddddd);
+                    _newLayer.prefab = _newLayer.prefabsStorage.get();
+                    ENTLIB_ASSERT(_newLayer.prefab != (void*)0xdddddddddddddddd);
                 }
                 return true;
             }
@@ -297,14 +298,14 @@ namespace Ent
         return *this;
     }
 
-    Cursor& Cursor::enterUnionData(char const* type)
+    Cursor& Cursor::enterUnionData(char const* _type)
     {
         ENTLIB_ASSERT(getSchema()->type == Ent::DataType::oneOf);
-        if (type == nullptr)
+        if (_type == nullptr)
         {
-            type = getUnionType();
+            _type = getUnionType();
         }
-        return _enterItem([type](auto&& _cur) { _cur.enterUnionData(type); });
+        return _enterItem([_type](auto&& _cur) { _cur.enterUnionData(_type); });
     }
 
     Cursor& Cursor::enterUnionSetItem(char const* _field, Subschema const* _dataSchema)
@@ -376,9 +377,9 @@ namespace Ent
         return _enterItem([_field](auto&& _cur) { _cur.enterMapItem(_field); });
     }
 
-    void Cursor::_comitNewLayer(Layer& newLayer)
+    void Cursor::_comitNewLayer(Layer& _newLayer)
     {
-        _pushDefault(newLayer);
+        _pushDefault(_newLayer);
         _validNewLayer();
         if (m_instance.getSchema()->type == Ent::DataType::array)
         {
@@ -987,42 +988,42 @@ namespace Ent
         // ENTLIB_ASSERT(m_instance.back() != nullptr);
         checkInvariants();
     }
-    void Cursor::setSize(size_t size)
+    void Cursor::setSize(size_t _size)
     {
         _buildPath();
-        m_instance.setSize(size);
+        m_instance.setSize(_size);
     }
 
-    void Cursor::setFloat(double value)
+    void Cursor::setFloat(double _value)
     {
         _buildPath();
-        m_instance.setFloat(value);
+        m_instance.setFloat(_value);
     }
-    void Cursor::setInt(int64_t value)
+    void Cursor::setInt(int64_t _value)
     {
         _buildPath();
-        m_instance.setInt(value);
+        m_instance.setInt(_value);
     }
-    void Cursor::setString(char const* value)
+    void Cursor::setString(char const* _value)
     {
-        ENTLIB_ASSERT(value != nullptr);
+        ENTLIB_ASSERT(_value != nullptr);
         _buildPath();
-        m_instance.setString(value);
+        m_instance.setString(_value);
     }
-    void Cursor::setBool(bool value)
+    void Cursor::setBool(bool _value)
     {
         _buildPath();
-        m_instance.setBool(value);
+        m_instance.setBool(_value);
     }
-    void Cursor::setEntityRef(EntityRef const& value)
+    void Cursor::setEntityRef(EntityRef const& _value)
     {
         _buildPath();
-        m_instance.setEntityRef(value);
+        m_instance.setEntityRef(_value);
     }
-    void Cursor::setUnionType(char const* type)
+    void Cursor::setUnionType(char const* _type)
     {
         _buildPath();
-        m_instance.setUnionType(type);
+        m_instance.setUnionType(_type);
     }
     void Cursor::buildPath()
     {
@@ -1030,14 +1031,14 @@ namespace Ent
     }
 
     template <typename K, typename E>
-    bool Cursor::_countPrimSetKeyImpl(K key, E&& _isEqual)
+    bool Cursor::_countPrimSetKeyImpl(K _key, E&& _isEqual)
     {
         if (m_instance.isSet())
         {
             for (size_t i = 0; i < arraySize(); ++i)
             {
                 enterArrayItem(i);
-                bool const equal = _isEqual(key);
+                bool const equal = _isEqual(_key);
                 exit();
                 if (equal)
                 {
@@ -1048,7 +1049,7 @@ namespace Ent
         auto& lastLayer = _getLastLayer();
         if (lastLayer.prefab != nullptr)
         {
-            return lastLayer.prefab->countPrimSetKey(key);
+            return lastLayer.prefab->countPrimSetKey(_key);
         }
         return false;
     }
@@ -1062,20 +1063,20 @@ namespace Ent
     {
         return _countPrimSetKeyImpl(_key, [this](int64_t _key) { return getInt() == _key; });
     }
-    void Cursor::insertPrimSetKey(char const* key)
+    void Cursor::insertPrimSetKey(char const* _key)
     {
-        if (not countPrimSetKey(key))
+        if (not countPrimSetKey(_key))
         {
             _buildPath();
-            m_instance.pushBack(key);
+            m_instance.pushBack(_key);
         }
     }
-    void Cursor::insertPrimSetKey(int64_t key)
+    void Cursor::insertPrimSetKey(int64_t _key)
     {
-        if (not countPrimSetKey(key))
+        if (not countPrimSetKey(_key))
         {
             _buildPath();
-            m_instance.pushBack(key);
+            m_instance.pushBack(_key);
         }
     }
 

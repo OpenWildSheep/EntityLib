@@ -17,12 +17,7 @@
                         "Components": [
                             {
                                 "Data": {
-                                    "Matrix": [
-                                        1.0,
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        1.0,
+                                    "Orientation": [
                                         0.0,
                                         0.0,
                                         0.0,
@@ -44,12 +39,7 @@
                         "Components": [
                             {
                                 "Data": {
-                                    "Matrix": [
-                                        1.0,
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        1.0,
+                                    "Orientation": [
                                         0.0,
                                         0.0,
                                         0.0,
@@ -71,12 +61,7 @@
                         "Components": [
                             {
                                 "Data": {
-                                    "Matrix": [
-                                        1.0,
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        1.0,
+                                    "Orientation": [
                                         0.0,
                                         0.0,
                                         0.0,
@@ -98,12 +83,7 @@
                         "Components": [
                             {
                                 "Data": {
-                                    "Matrix": [
-                                        1.0,
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        1.0,
+                                    "Orientation": [
                                         0.0,
                                         0.0,
                                         0.0,
@@ -125,12 +105,7 @@
                         "Components": [
                             {
                                 "Data": {
-                                    "Matrix": [
-                                        1.0,
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        1.0,
+                                    "Orientation": [
                                         0.0,
                                         0.0,
                                         0.0,

@@ -4,7 +4,7 @@
         {
             "className": "ActorStateAlive",
             "classData":{
-                "locomotionMode": "crouch"
+                "Life": 12
             }
         },
         {

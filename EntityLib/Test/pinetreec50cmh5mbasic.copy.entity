@@ -1,8 +1,13 @@
 {
     "Components": [
         {
+            "Data": {},
+            "Type": "TransformGD"
+        },
+        {
             "Data": {
                 "EDITOR_skeleton": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/editor/skeleton/pinetreec50cmh5mbasic.wskl",
+                "animDatabase": "03_Environment/Tree/Pine/Tree/PineTreeC50cmH5mBasic/Animation",
                 "skeleton": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/skeleton/pinetreec50cmh5mbasic.skl"
             },
             "Type": "AnimationControllerGD"
@@ -44,30 +49,151 @@
         {
             "Data": {
                 "HotspotType": "ride",
-                "Mode": "Creature"
+                "Mode": "PossessingGPE"
             },
             "Type": "BeamTargetGD"
         },
         {
-            "Data": {},
+            "Data": {
+                "CameraDataResourcePath": "01_Common/CameraParams/Resources/pinetreec50cmh5mbasic_entity.cameradata"
+            },
             "Type": "CameraDataGD"
         },
         {
-            "Data": {},
+            "Data": {
+                "HotspotsMap": [
+                    [
+                        "CenterPineTreeC50cmH5mBasicBone04",
+                        {
+                            "Bone": "PineTreeC50cmH5mBasicBone04",
+                            "Type": "center"
+                        }
+                    ],
+                    [
+                        "RidePineTreeC50cmH5mBasicBone04",
+                        {
+                            "Bone": "PineTreeC50cmH5mBasicBone04",
+                            "Type": "ride"
+                        }
+                    ],
+                    [
+                        "Spawnlife",
+                        {
+                            "Offset": [
+                                0.0,
+                                0.0,
+                                5.0
+                            ],
+                            "Orientation": [
+                                -0.7071068,
+                                null,
+                                null,
+                                0.7071068
+                            ],
+                            "Type": "spawnlife"
+                        }
+                    ],
+                    [
+                        "SpawnlifePineTreeC50cmH5mBasicBone04",
+                        {
+                            "Bone": "PineTreeC50cmH5mBasicBone04",
+                            "Offset": [
+                                0.1,
+                                0.0,
+                                0.0
+                            ],
+                            "Orientation": [
+                                null,
+                                0.7071068,
+                                null,
+                                0.7071068
+                            ],
+                            "Type": "spawnlife"
+                        }
+                    ],
+                    [
+                        "Spawnlife_2",
+                        {
+                            "Offset": [
+                                0.0,
+                                2.0,
+                                0.0
+                            ],
+                            "Orientation": [
+                                -0.7071068,
+                                null,
+                                null,
+                                0.7071068
+                            ],
+                            "Type": "spawnlife"
+                        }
+                    ],
+                    [
+                        "Spawnlife_3",
+                        {
+                            "Offset": [
+                                2.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Orientation": [
+                                -0.7071068,
+                                null,
+                                null,
+                                0.7071068
+                            ],
+                            "Type": "spawnlife"
+                        }
+                    ],
+                    [
+                        "Spawnlife_4",
+                        {
+                            "Offset": [
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Type": "spawnlife"
+                        }
+                    ],
+                    [
+                        "Spawnlife_5",
+                        {
+                            "Offset": [
+                                0.0,
+                                3.0,
+                                0.0
+                            ],
+                            "Type": "spawnlife"
+                        }
+                    ],
+                    [
+                        "Spawnlife_6",
+                        {
+                            "Offset": [
+                                0.0,
+                                -3.0,
+                                0.0
+                            ],
+                            "Type": "spawnlife"
+                        }
+                    ]
+                ]
+            },
             "Type": "HotspotsGD"
         },
         {
             "Data": {
                 "CameraIgnored": true,
                 "EDITOR_MeshColliders": [
-                    "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/editor/phys/pinetreec50cmh5mbasic_phys_walkable_tiny_small_medium_big.wphys"
+                    "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/editor/phys/pinetreec50cmh5mbasic_phys_walkable_cameraignored_tiny_small_medium_big_enormous.wphys"
                 ],
-                "EDITOR_NavMeshStamper": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/editor/phys/pinetreec50cmh5mbasic_phys_navmesh_tiny_small_medium_big.wphys",
+                "EDITOR_NavMeshStamper": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/editor/phys/pinetreec50cmh5mbasic_navmesh_tiny_small_medium_big.wphys",
                 "MeshColliders": [
-                    "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/phys/pinetreec50cmh5mbasic_phys_walkable_tiny_small_medium_big.phys"
+                    "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/phys/pinetreec50cmh5mbasic_walkable_cameraignored_tiny_small_medium_big.phys"
                 ],
                 "MotionType": "Fixed",
-                "NavMeshStamper": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/phys/pinetreec50cmh5mbasic_phys_navmesh_tiny_small_medium_big.phys",
+                "NavMeshStamper": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/phys/pinetreec50cmh5mbasic_navmesh_tiny_small_medium_big.phys",
                 "PhysicsMaterial": "Climbable",
                 "Walkable": true
             },
@@ -80,7 +206,8 @@
         {
             "Data": {
                 "GPEActorStateName": "ActorStateBendingTree",
-                "GPEType": "BendTree"
+                "GPEType": "BendTree",
+                "HotspotName": "RidePineTreeC50cmH5mBasicBone04"
             },
             "Type": "PossessableGPEGD"
         },
@@ -185,14 +312,6 @@
         },
         {
             "Data": {},
-            "Type": "TransformGD"
-        },
-        {
-            "Data": {},
-            "Type": "ActorGD"
-        },
-        {
-            "Data": {},
             "Type": "NetGD"
         },
         {
@@ -209,5 +328,5 @@
         }
     ],
     "Name": "Tree_PineTreeC50cmH5mBasic",
-    "Thumbnail": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/pinetreec50cmh5mbasic.wthumb"
+    "Thumbnail": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/editor/thumbnail/pinetreec50cmh5mbasic.wthumb"
 }

@@ -8,6 +8,7 @@ from entgen.FluidType import *
 from entgen.String import *
 from entgen.Float import *
 from entgen.Vector2 import *
+from entgen.Vector3 import *
 
 from EntityLibPy import Node
 
@@ -46,6 +47,11 @@ class FluidData(HelperObject):
         return Float(self._node.at("level"))
     @level.setter
     def level(self, val): self.level.set(val)
+    @property
+    def normal(self):  # type: ()->Vector3
+        return Vector3(self._node.at("normal"))
+    @normal.setter
+    def normal(self, val): self.normal.set(val)
     @property
     def type(self):  # type: ()->FluidType
         return FluidType(self._node.at("type"))

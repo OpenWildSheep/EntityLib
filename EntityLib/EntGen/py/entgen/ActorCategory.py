@@ -38,7 +38,6 @@ class ActorCategoryEnum(Enum):
     CATEGORY_Health = "CATEGORY_Health"
     CATEGORY_HealthAlive = "CATEGORY_HealthAlive"
     CATEGORY_HealthDead = "CATEGORY_HealthDead"
-    CATEGORY_Regeneration = "CATEGORY_Regeneration"
     CATEGORY_EntitySwitchTransition = "CATEGORY_EntitySwitchTransition"
     CATEGORY_EnergyRoot = "CATEGORY_EnergyRoot"
     CATEGORY_EnergySpout = "CATEGORY_EnergySpout"

@@ -731,7 +731,8 @@ namespace Ent
 
                 reference operator*() const
                 {
-                    auto keyToView = [](Ent::Node* keynode) {
+                    auto keyToView = [](Ent::Node* keynode)
+                    {
                         if constexpr (std::is_enum_v<K>)
                         {
                             return strToEnum<K>(keynode->getString());

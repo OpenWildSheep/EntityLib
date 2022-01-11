@@ -6,6 +6,8 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ActorState import *
+from entgen.Bool import *
+from entgen.Float import *
 from entgen.Vector3 import *
 
 from EntityLibPy import Node
@@ -20,6 +22,21 @@ class ActionPropelled(HelperObject):
         return ActionPropelled(entlib.make_node(ActionPropelled.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def AirControlMultiplier(self):  # type: ()->Float
+        return Float(self._node.at("AirControlMultiplier"))
+    @AirControlMultiplier.setter
+    def AirControlMultiplier(self, val): self.AirControlMultiplier.set(val)
+    @property
+    def FallHeightProtection(self):  # type: ()->Float
+        return Float(self._node.at("FallHeightProtection"))
+    @FallHeightProtection.setter
+    def FallHeightProtection(self, val): self.FallHeightProtection.set(val)
+    @property
+    def InstantVisualOrientation(self):  # type: ()->Bool
+        return Bool(self._node.at("InstantVisualOrientation"))
+    @InstantVisualOrientation.setter
+    def InstantVisualOrientation(self, val): self.InstantVisualOrientation.set(val)
     @property
     def PropelForce(self):  # type: ()->Vector3
         return Vector3(self._node.at("PropelForce"))

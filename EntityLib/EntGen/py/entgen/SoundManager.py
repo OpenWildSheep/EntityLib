@@ -9,6 +9,7 @@ from entgen.Int import *
 from entgen.Bool import *
 from entgen.Float import *
 from entgen.Manager import *
+from entgen.ScaleConverter import *
 from entgen.SoundManager_BiomeSoundBank import *
 from entgen.String import *
 from entgen.String import *
@@ -156,6 +157,9 @@ class SoundManager(HelperObject):
         return Bool(self._node.at("ListenerOnFreeCam"))
     @ListenerOnFreeCam.setter
     def ListenerOnFreeCam(self, val): self.ListenerOnFreeCam.set(val)
+    @property
+    def OcclusionPlayerSpeedInfluenceSettings(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("OcclusionPlayerSpeedInfluenceSettings"))
     @property
     def OutWaterEvent(self):  # type: ()->String
         return String(self._node.at("OutWaterEvent"))

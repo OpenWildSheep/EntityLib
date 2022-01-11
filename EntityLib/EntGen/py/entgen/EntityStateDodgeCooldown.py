@@ -9,14 +9,14 @@ from entgen.ActorState import *
 
 from EntityLibPy import Node
 
-class EntityStateSpawnedSoul(HelperObject):
-    schema_name = "EntityStateSpawnedSoul"
+class EntityStateDodgeCooldown(HelperObject):
+    schema_name = "EntityStateDodgeCooldown"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateSpawnedSoul
-        return EntityStateSpawnedSoul(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateSpawnedSoul.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateDodgeCooldown
+        return EntityStateDodgeCooldown(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateDodgeCooldown.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->EntityStateSpawnedSoul
-        return EntityStateSpawnedSoul(entlib.make_node(EntityStateSpawnedSoul.schema_name))
+    def create(entlib):  # type: (EntityLib)->EntityStateDodgeCooldown
+        return EntityStateDodgeCooldown(entlib.make_node(EntityStateDodgeCooldown.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

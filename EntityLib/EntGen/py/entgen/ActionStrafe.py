@@ -8,7 +8,6 @@ from entgen.String import *
 from entgen.ActorState import *
 from entgen.Bool import *
 from entgen.Float import *
-from entgen.Quat import *
 from entgen.Vector3 import *
 
 from EntityLibPy import Node
@@ -36,11 +35,6 @@ class ActionStrafe(HelperObject):
         return Bool(self._node.at("changeAnimationAllowed"))
     @changeAnimationAllowed.setter
     def changeAnimationAllowed(self, val): self.changeAnimationAllowed.set(val)
-    @property
-    def orientation(self):  # type: ()->Quat
-        return Quat(self._node.at("orientation"))
-    @orientation.setter
-    def orientation(self, val): self.orientation.set(val)
     @property
     def speedrequired(self):  # type: ()->Float
         return Float(self._node.at("speedrequired"))

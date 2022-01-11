@@ -11,7 +11,7 @@ from entgen.ComponentGD import *
 from entgen.Float import *
 from entgen.Matrix33 import *
 from entgen.SeedPatchDataList import *
-from entgen.SeedPatchDataMap import *
+from entgen.SeedPatchDatas import *
 
 from EntityLibPy import Node
 
@@ -79,8 +79,8 @@ class SeedPatch(HelperObject):
     def SeedPatchDataList(self):  # type: ()->SeedPatchDataList
         return SeedPatchDataList(self._node.at("SeedPatchDataList"))
     @property
-    def SeedPatchDataMap(self):  # type: ()->SeedPatchDataMap
-        return SeedPatchDataMap(self._node.at("SeedPatchDataMap"))
+    def SeedPatchDatas(self):  # type: ()->SeedPatchDatas
+        return SeedPatchDatas(self._node.at("SeedPatchDatas"))
     @property
     def Subdivision(self):  # type: ()->Int
         return Int(self._node.at("Subdivision"))

@@ -9,14 +9,14 @@ from entgen.ActorState import *
 
 from EntityLibPy import Node
 
-class ActionFusion(HelperObject):
-    schema_name = "ActionFusion"
+class EntityStateConstrainedMove(HelperObject):
+    schema_name = "EntityStateConstrainedMove"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ActionFusion
-        return ActionFusion(entlib.load_node_file(sourcefile, entlib.get_schema(ActionFusion.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateConstrainedMove
+        return EntityStateConstrainedMove(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateConstrainedMove.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->ActionFusion
-        return ActionFusion(entlib.make_node(ActionFusion.schema_name))
+    def create(entlib):  # type: (EntityLib)->EntityStateConstrainedMove
+        return EntityStateConstrainedMove(entlib.make_node(EntityStateConstrainedMove.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

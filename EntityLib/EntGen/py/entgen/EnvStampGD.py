@@ -8,7 +8,7 @@ from entgen.String import *
 from entgen.ComponentGD import *
 from entgen.Float import *
 from entgen.sEnvStamp import *
-from entgen.RegenerationState import *
+from entgen.EnergySide import *
 
 from EntityLibPy import Node
 
@@ -28,8 +28,8 @@ class EnvStampGD(HelperObject):
     @RegenStateChangeDuration.setter
     def RegenStateChangeDuration(self, val): self.RegenStateChangeDuration.set(val)
     @property
-    def Stamps(self):  # type: ()->Map[RegenerationStateEnum, Array[sEnvStamp]]
-        return (lambda n: Map(RegenerationStateEnum, (lambda n: Array(sEnvStamp, n)), n))(self._node.at("Stamps"))
+    def Stamps(self):  # type: ()->Map[EnergySideEnum, Array[sEnvStamp]]
+        return (lambda n: Map(EnergySideEnum, (lambda n: Array(sEnvStamp, n)), n))(self._node.at("Stamps"))
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))

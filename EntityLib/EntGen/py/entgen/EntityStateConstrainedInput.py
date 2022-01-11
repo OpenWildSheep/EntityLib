@@ -9,14 +9,14 @@ from entgen.ActorState import *
 
 from EntityLibPy import Node
 
-class ActorStateRegenerationFull(HelperObject):
-    schema_name = "ActorStateRegenerationFull"
+class EntityStateConstrainedInput(HelperObject):
+    schema_name = "EntityStateConstrainedInput"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateRegenerationFull
-        return ActorStateRegenerationFull(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateRegenerationFull.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateConstrainedInput
+        return EntityStateConstrainedInput(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateConstrainedInput.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->ActorStateRegenerationFull
-        return ActorStateRegenerationFull(entlib.make_node(ActorStateRegenerationFull.schema_name))
+    def create(entlib):  # type: (EntityLib)->EntityStateConstrainedInput
+        return EntityStateConstrainedInput(entlib.make_node(EntityStateConstrainedInput.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

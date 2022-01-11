@@ -43,6 +43,9 @@ class InGameCameraObservationParams(HelperObject):
     def shoulder(self):  # type: ()->InGameCameraParams
         return InGameCameraParams(self._node.at("shoulder"))
     @property
+    def strongattack(self):  # type: ()->InGameCameraParams
+        return InGameCameraParams(self._node.at("strongattack"))
+    @property
     def thirdperson(self):  # type: ()->InGameCameraParams
         return InGameCameraParams(self._node.at("thirdperson"))
     @property

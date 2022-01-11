@@ -9,14 +9,14 @@ from entgen.ActorState import *
 
 from EntityLibPy import Node
 
-class ActorStateAliveSoul(HelperObject):
-    schema_name = "ActorStateAliveSoul"
+class EntityStateWallRun(HelperObject):
+    schema_name = "EntityStateWallRun"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateAliveSoul
-        return ActorStateAliveSoul(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateAliveSoul.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateWallRun
+        return EntityStateWallRun(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateWallRun.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->ActorStateAliveSoul
-        return ActorStateAliveSoul(entlib.make_node(ActorStateAliveSoul.schema_name))
+    def create(entlib):  # type: (EntityLib)->EntityStateWallRun
+        return EntityStateWallRun(entlib.make_node(EntityStateWallRun.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

@@ -6,7 +6,6 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ComponentInput import *
-from entgen.Energy import *
 from entgen.LastValidedReviveSide import *
 from entgen.ReviveEnergyComponentInput_ReviveSide import *
 
@@ -22,9 +21,6 @@ class ReviveEnergyComponentInput(HelperObject):
         return ReviveEnergyComponentInput(entlib.make_node(ReviveEnergyComponentInput.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
-    @property
-    def Energy(self):  # type: ()->Energy
-        return Energy(self._node.at("Energy"))
     @property
     def LastValidedReviveSide(self):  # type: ()->LastValidedReviveSide
         return LastValidedReviveSide(self._node.at("LastValidedReviveSide"))

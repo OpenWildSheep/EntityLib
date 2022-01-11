@@ -9,14 +9,14 @@ from entgen.ActorState import *
 
 from EntityLibPy import Node
 
-class ActorStateVomiting(HelperObject):
-    schema_name = "ActorStateVomiting"
+class EntityStateParryCooldown(HelperObject):
+    schema_name = "EntityStateParryCooldown"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateVomiting
-        return ActorStateVomiting(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateVomiting.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateParryCooldown
+        return EntityStateParryCooldown(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateParryCooldown.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->ActorStateVomiting
-        return ActorStateVomiting(entlib.make_node(ActorStateVomiting.schema_name))
+    def create(entlib):  # type: (EntityLib)->EntityStateParryCooldown
+        return EntityStateParryCooldown(entlib.make_node(EntityStateParryCooldown.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

@@ -7,7 +7,6 @@ import EntityLibPy
 from entgen.ReviveSide import *
 from entgen.String import *
 from entgen.ActorState import *
-from entgen.Float import *
 
 from EntityLibPy import Node
 
@@ -21,11 +20,6 @@ class EntityStateEnergyRootState(HelperObject):
         return EntityStateEnergyRootState(entlib.make_node(EntityStateEnergyRootState.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
-    @property
-    def Energy(self):  # type: ()->Float
-        return Float(self._node.at("Energy"))
-    @Energy.setter
-    def Energy(self, val): self.Energy.set(val)
     @property
     def ReviveSide(self):  # type: ()->ReviveSide
         return ReviveSide(self._node.at("ReviveSide"))

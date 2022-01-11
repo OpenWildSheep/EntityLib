@@ -9,14 +9,14 @@ from entgen.ActorState import *
 
 from EntityLibPy import Node
 
-class EntityStateReviveFullCreature(HelperObject):
-    schema_name = "EntityStateReviveFullCreature"
+class EntityStateFailingOrder(HelperObject):
+    schema_name = "EntityStateFailingOrder"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateReviveFullCreature
-        return EntityStateReviveFullCreature(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateReviveFullCreature.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateFailingOrder
+        return EntityStateFailingOrder(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateFailingOrder.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->EntityStateReviveFullCreature
-        return EntityStateReviveFullCreature(entlib.make_node(EntityStateReviveFullCreature.schema_name))
+    def create(entlib):  # type: (EntityLib)->EntityStateFailingOrder
+        return EntityStateFailingOrder(entlib.make_node(EntityStateFailingOrder.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

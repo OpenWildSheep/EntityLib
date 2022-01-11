@@ -10,7 +10,6 @@ from entgen.BiteData import *
 from entgen.Bool import *
 from entgen.CreatureDangerousness import *
 from entgen.Float import *
-from entgen.FusionData import *
 from entgen.InteractData import *
 from entgen.MountData import *
 from entgen.RevivedData import *
@@ -33,16 +32,6 @@ class CreatureGD(HelperObject):
         return Bool(self._node.at("DisableLookAt"))
     @DisableLookAt.setter
     def DisableLookAt(self, val): self.DisableLookAt.set(val)
-    @property
-    def DivePitchAngleMax(self):  # type: ()->Float
-        return Float(self._node.at("DivePitchAngleMax"))
-    @DivePitchAngleMax.setter
-    def DivePitchAngleMax(self, val): self.DivePitchAngleMax.set(val)
-    @property
-    def DivePitchAngleMin(self):  # type: ()->Float
-        return Float(self._node.at("DivePitchAngleMin"))
-    @DivePitchAngleMin.setter
-    def DivePitchAngleMin(self, val): self.DivePitchAngleMin.set(val)
     @property
     def FlyPitchAngleMax(self):  # type: ()->Float
         return Float(self._node.at("FlyPitchAngleMax"))
@@ -74,6 +63,11 @@ class CreatureGD(HelperObject):
     @IsStaff.setter
     def IsStaff(self, val): self.IsStaff.set(val)
     @property
+    def LifeMax(self):  # type: ()->Float
+        return Float(self._node.at("LifeMax"))
+    @LifeMax.setter
+    def LifeMax(self, val): self.LifeMax.set(val)
+    @property
     def SpawnSoulIfNoEnemy(self):  # type: ()->Bool
         return Bool(self._node.at("SpawnSoulIfNoEnemy"))
     @SpawnSoulIfNoEnemy.setter
@@ -95,9 +89,6 @@ class CreatureGD(HelperObject):
     @property
     def dangerousnessData(self):  # type: ()->CreatureDangerousness
         return CreatureDangerousness(self._node.at("dangerousnessData"))
-    @property
-    def fusionData(self):  # type: ()->FusionData
-        return FusionData(self._node.at("fusionData"))
     @property
     def interactData(self):  # type: ()->InteractData
         return InteractData(self._node.at("interactData"))

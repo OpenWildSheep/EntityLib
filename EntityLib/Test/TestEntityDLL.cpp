@@ -233,6 +233,9 @@ try
             entlib.loadFileAsNode("instance.entity", entlib.schema.schema.allDefinitions["Entity"]);
         auto prefabHisto = node->getPrefabHistory();
     }
+    // Temporarily disable validation to read some RawData files
+    auto prevValidationEnabled = entlib.validationEnabled;
+    entlib.validationEnabled = false;
     {
         entlib.rawdataPath = "X:/RawData"; // It is a hack to work in the working dir
         auto node = entlib.loadFileAsNode(
@@ -278,6 +281,7 @@ try
             == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
         entlib.rawdataPath = current_path(); // Work in Test dir
     }
+    entlib.validationEnabled = prevValidationEnabled;
     {
         auto node =
             entlib.loadFileAsNode("instance.entity", entlib.schema.schema.allDefinitions["Entity"]);
@@ -1728,6 +1732,7 @@ try
 
     ENTLIB_LOG("Loading SceneWild.scene...");
     // auto scene = entlib.loadScene("X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene");
+    entlib.validationEnabled = false;
     auto scene = entlib.loadScene("20_scene/personal/simont/vfxGym/ScenevfxGym.scene");
     ENTLIB_LOG("Done");
 

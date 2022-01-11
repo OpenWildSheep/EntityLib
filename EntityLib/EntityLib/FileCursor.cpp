@@ -215,7 +215,8 @@ namespace Ent
         return *this;
     }
 
-    FileCursor& FileCursor::enterObjectSetItem(char const* _field)
+    template <typename K, typename C>
+    FileCursor& FileCursor::_enterObjectSetItemImpl(K _field, C&& _equalKey)
     {
         Layer newLayer;
         auto& lastLayer = m_layers.back();
@@ -232,7 +233,7 @@ namespace Ent
             {
                 if (auto typeIter = item.find(keyFieldName); typeIter != item.end())
                 {
-                    if (typeIter->get_ref<std::string const&>() == _field)
+                    if (_equalKey(*typeIter, _field))
                     {
                         auto newValue = &item;
                         if (newLayer.schema.base->type == Ent::DataType::string
@@ -251,48 +252,25 @@ namespace Ent
         ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
         m_layers.push_back(newLayer);
         return *this;
+    }
+
+    FileCursor& FileCursor::enterObjectSetItem(char const* _field)
+    {
+        return _enterObjectSetItemImpl(
+            _field,
+            [](nlohmann::json const& _node, char const* _key)
+            { return _node.get_ref<std::string const&>() == _key; });
     }
 
     FileCursor& FileCursor::enterObjectSetItem(int64_t _field)
     {
-        Layer newLayer;
-        auto& lastLayer = m_layers.back();
-
-        auto& objectSchema = lastLayer.schema.base->singularItems->get();
-        auto keyFieldName =
-            std::get<Subschema::ArrayMeta>(lastLayer.schema.base->meta).keyField->c_str();
-        newLayer.schema = Schema{&objectSchema, nullptr};
-        newLayer.additionalPath = _field;
-
-        if (isSet())
-        {
-            auto lastNode = lastLayer.values;
-            for (auto& item : *lastNode)
-            {
-                if (auto typeIter = item.find(keyFieldName); typeIter != item.end())
-                {
-                    if (typeIter->get<int64_t>() == _field)
-                    {
-                        auto newValue = &item;
-                        if (newLayer.schema.base->type == Ent::DataType::string
-                            or newLayer.schema.base->type == Ent::DataType::entityRef)
-                        {
-                            ENTLIB_DBG_ASSERT(newValue->is_string());
-                        }
-
-                        // Item found!
-                        newLayer.values = newValue;
-                        break;
-                    }
-                }
-            }
-        }
-        ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
-        m_layers.push_back(newLayer);
-        return *this;
+        return _enterObjectSetItemImpl(
+            _field,
+            [](nlohmann::json const& _node, int64_t _key) { return _node.get<int64_t>() == _key; });
     }
 
-    FileCursor& FileCursor::enterMapItem(char const* _field)
+    template <typename K, typename E>
+    FileCursor& FileCursor::_enterMapItemImpl(K _field, E&& _isEqual)
     {
         Layer newLayer;
         auto& lastLayer = m_layers.back();
@@ -307,7 +285,7 @@ namespace Ent
             for (auto& item : *lastNode)
             {
                 auto& key = item[0];
-                if (key.get_ref<std::string const&>() == _field)
+                if (_isEqual(key, _field))
                 {
                     auto newValue = &item[1];
                     if (lastLayer.schema.base->type == Ent::DataType::string
@@ -327,37 +305,20 @@ namespace Ent
         return *this;
     }
 
+    FileCursor& FileCursor::enterMapItem(char const* _field)
+    {
+        return _enterMapItemImpl(
+            _field,
+            [](nlohmann::json const& _node, char const* _field)
+            { return _node.get_ref<std::string const&>() == _field; });
+    }
+
     FileCursor& FileCursor::enterMapItem(int64_t _field)
     {
-        Layer newLayer;
-        auto& lastLayer = m_layers.back();
-        auto& pairSchema = lastLayer.schema.base->singularItems->get();
-        newLayer.schema = Schema{&pairSchema.linearItems->at(1).get(), nullptr};
-        newLayer.additionalPath = _field;
-
-        if (isSet())
-        {
-            auto lastNode = lastLayer.values;
-            for (auto& item : *lastNode)
-            {
-                auto& key = item[0];
-                if (key.get<int64_t>() == _field)
-                {
-                    auto newValue = &item[1];
-                    if (newLayer.schema.base->type == Ent::DataType::string
-                        or newLayer.schema.base->type == Ent::DataType::entityRef)
-                    {
-                        ENTLIB_DBG_ASSERT(newValue->is_string());
-                    }
-                    // Item found!
-                    newLayer.values = newValue;
-                    break;
-                }
-            }
-        }
-        ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
-        m_layers.push_back(newLayer);
-        return *this;
+        return _enterMapItemImpl(
+            _field,
+            [](nlohmann::json const& _node, int64_t _field)
+            { return _node.get<int64_t>() == _field; });
     }
 
     FileCursor& FileCursor::enterArrayItem(size_t index)
@@ -711,34 +672,42 @@ namespace Ent
             lastLayer().values->erase(lastLayer().values->size() - 1);
         }
     }
+    template <typename T>
+    void FileCursor::set(T&& value)
+    {
+        if constexpr (std::is_same_v<std::remove_const_t<std::remove_reference_t<T>>, EntityRef>)
+        {
+            *lastLayer().values = value.entityPath;
+        }
+        else
+        {
+            *lastLayer().values = std::forward<T>(value);
+        }
+    }
+
     void FileCursor::setFloat(double value)
     {
-        *lastLayer().values = value;
+        set(value);
     }
     void FileCursor::setInt(int64_t value)
     {
-        *lastLayer().values = value;
+        set(value);
     }
     void FileCursor::setString(char const* value)
     {
         ENTLIB_ASSERT(value != nullptr);
-        // ENTLIB_ASSERT(back() != nullptr);
-        *lastLayer().values = value;
+        set(value);
     }
     void FileCursor::setBool(bool value)
     {
-        *lastLayer().values = value;
+        set(value);
     }
     void FileCursor::setEntityRef(EntityRef const& value)
     {
-        *lastLayer().values = value.entityPath;
+        set(value);
     }
     nlohmann::json& FileCursor::getOrCreate(nlohmann::json& val, char const* field)
     {
-        //if (val.is_null())
-        //{
-        //    val = nlohmann::json::object();
-        //}
         if (auto iter = val.find(field); iter != val.end())
         {
             return *iter;
@@ -758,32 +727,42 @@ namespace Ent
         nameField = type;
         getOrCreate(wrapper, dataFieldName);
     }
+
+    template <typename T>
+    T FileCursor::get() const
+    {
+        if constexpr (std::is_same_v<T, const char*>)
+        {
+            return back()->get_ref<std::string const&>().c_str();
+        }
+        else if constexpr (std::is_same_v<std::remove_const_t<std::remove_reference_t<T>>, EntityRef>)
+        {
+            return EntityRef{getString()};
+        }
+        else
+        {
+            return back()->get<T>();
+        }
+    }
+
     double FileCursor::getFloat() const
     {
-        return back()->get<double>();
+        return get<double>();
     }
     int64_t FileCursor::getInt() const
     {
-        return back()->get<int64_t>();
+        return get<int64_t>();
     }
-    //size_t size(size_t layerIndex = size_t(-1)) const
-    //{
-    //    if (layerIndex == size_t(-1))
-    //    {
-    //        layerIndex = m_layers.size() - 1;
-    //    }
-    //    return m_layers[layerIndex].values->size();
-    //}
     char const* FileCursor::getString() const
     {
-        return back()->get_ref<std::string const&>().c_str();
+        return get<char const*>();
     }
     bool FileCursor::getBool() const
     {
-        return back()->get<bool>();
+        return get<bool>();
     }
     EntityRef FileCursor::getEntityRef() const
     {
-        return EntityRef{back()->get_ref<std::string const&>()};
+        return get<EntityRef>();
     }
 } // namespace Ent

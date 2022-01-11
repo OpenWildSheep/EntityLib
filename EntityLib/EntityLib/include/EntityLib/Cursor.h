@@ -115,6 +115,8 @@ namespace Ent
 
         bool isSet() const;
 
+        template <typename V>
+        V get() const;
         double getFloat() const;
         int64_t getInt() const; ///< @pre integer. @brief Get the value as int
         char const* getString() const; ///< @pre Ent::DataType == string. @brief Get the value as string
@@ -142,7 +144,6 @@ namespace Ent
         Cursor* getPrefab();
 
     private:
-        using NodeRef = std::vector<Key>;
         struct Layer
         {
             Cursor* prefab = nullptr;
@@ -165,6 +166,10 @@ namespace Ent
         Layer& _getLastLayer();
         Layer const& _getLastLayer() const;
         void _buildPath();
+        template <typename K, typename E>
+        bool _countPrimSetKeyImpl(K key, E&& _isEqual);
+        template <typename E>
+        Cursor& _enterItem(E&& _enter);
 
         EntityLib* m_entityLib = nullptr;
         FileCursor m_instance;

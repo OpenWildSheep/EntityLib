@@ -105,6 +105,8 @@ namespace Ent
         static void setLayer(Layer& lastSet, Layer& firstNotSet, size_t arraySize);
 
         void setSize(size_t size);
+        template <typename T>
+        void set(T&& value);
         void setFloat(double value);
         void setInt(int64_t value);
         void setString(char const* value);
@@ -112,6 +114,8 @@ namespace Ent
         void setEntityRef(EntityRef const& value);
         static nlohmann::json& getOrCreate(nlohmann::json& val, char const* field);
         void setUnionType(char const* type);
+        template <typename T>
+        T get() const;
         double getFloat() const;
         int64_t getInt() const;
         char const* getString() const;
@@ -119,6 +123,11 @@ namespace Ent
         EntityRef getEntityRef() const;
 
     private:
+        template <typename K, typename C>
+        FileCursor& _enterObjectSetItemImpl(K _field, C&& _equalKey);
+        template <typename K, typename E>
+        FileCursor& _enterMapItemImpl(K _field, E&& _isEqual);
+
         std::string m_filePath;
         std::vector<Layer> m_layers;
         nlohmann::json* m_rootDoc = nullptr;

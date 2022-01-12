@@ -69,9 +69,10 @@ namespace Ent
 
         nlohmann::json const* back() const;
 
-        // IsSet but can be null
-        bool isSetInternal() const;
+        /// Check if this Node exist
+        bool isSetOrNull() const;
 
+        /// Check if this Node exist and is NOT null
         bool isSet() const;
 
         bool isNull() const;

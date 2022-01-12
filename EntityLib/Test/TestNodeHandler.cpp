@@ -290,9 +290,11 @@ public:
     }
     virtual void inUnionSet()
     {
+        auto a = nodes.back()->getKeysString();
+        auto b = expl.getUnionSetKeysString();
+        ENTLIB_ASSERT(a.size() == b.size());
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         ENTLIB_ASSERT(nodes.back()->getSchema() == expl.getSchema());
-        ENTLIB_ASSERT(nodes.back()->getKeysString().size() == expl.getUnionSetKeysString().size());
     }
     virtual void inUnionSetElement(char const* type)
     {

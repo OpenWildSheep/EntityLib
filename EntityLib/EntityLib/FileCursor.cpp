@@ -103,8 +103,7 @@ namespace Ent
         return isSet() ? m_layers.back().values : nullptr;
     }
 
-    // IsSet but can be null
-    bool FileCursor::isSetInternal() const
+    bool FileCursor::isSetOrNull() const
     {
         return m_layers.back().values != nullptr;
     }
@@ -152,7 +151,6 @@ namespace Ent
                 newLayer.values = newValue;
             }
         }
-        // m_layers.push_back(std::move(newLayer));
         ENTLIB_DBG_ASSERT(lastLayer.schema.base != nullptr);
         return *this;
     }
@@ -347,15 +345,12 @@ namespace Ent
             if (lastNode->size() > _index)
             {
                 auto newValue = &(*lastNode)[_index];
-                // if (not newValue->is_null())
+                if (newLayer.schema.base->type == Ent::DataType::string
+                    or newLayer.schema.base->type == Ent::DataType::entityRef)
                 {
-                    if (newLayer.schema.base->type == Ent::DataType::string
-                        or newLayer.schema.base->type == Ent::DataType::entityRef)
-                    {
-                        ENTLIB_DBG_ASSERT(newValue->is_string() or newValue->is_null());
-                    }
-                    newLayer.values = newValue;
+                    ENTLIB_DBG_ASSERT(newValue->is_string() or newValue->is_null());
                 }
+                newLayer.values = newValue;
             }
         }
         ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
@@ -458,15 +453,6 @@ namespace Ent
     FileCursor& FileCursor::exit()
     {
         m_layers.pop_back();
-        //ENTLIB_DBG_ASSERT(schema.size() > 0);
-        //ENTLIB_DBG_ASSERT(schema.size() == (additionalPath.size() + 1));
-        //schema.pop_back();
-        //if (isSetInternal())
-        //{
-        //    values.pop_back();
-        //}
-        //if (not schema.empty())
-        //    additionalPath.pop_back();
         return *this;
     }
 
@@ -492,7 +478,6 @@ namespace Ent
                 (*_lastSet.values) = nlohmann::json::object();
             }
             auto fieldName = std::get<char const*>(_firstNotSet.additionalPath);
-            // lastSet.values->SetObject();
             (*_lastSet.values)[fieldName] = {};
             _firstNotSet.values = &(*_lastSet.values)[fieldName];
         }

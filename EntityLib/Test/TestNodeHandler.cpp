@@ -580,19 +580,19 @@ void testNodeHandler(Ent::EntityLib& entlib)
     {
         FileCursor expl(entlib.getSchema(entitySchemaName), "prefab.entity");
         expl.enterObjectField("Name");
-        if (auto value = expl.back())
+        if (auto value = expl.getRawJson())
         {
             std::cout << value->get_ref<std::string const&>() << std::endl;
         }
         expl.exit();
         expl.enterObjectField("Components").enterUnionSetItem("NetworkNode").enterObjectField("Type");
-        if (auto value = expl.back())
+        if (auto value = expl.getRawJson())
         {
             std::cout << value->get_ref<std::string const&>().c_str() << std::endl;
         }
         expl.exit().exit();
         expl.enterUnionSetItem("TransformGD").enterObjectField("Matrix").enterArrayItem(3);
-        if (auto value = expl.back())
+        if (auto value = expl.getRawJson())
         {
             std::cout << value->get<double>() << std::endl;
         }
@@ -601,7 +601,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
             .enterObjectField("Embedded")
             .enterObjectSetItem("EP1-Spout_LINK_001")
             .enterObjectField("Name");
-        if (auto value = expl.back())
+        if (auto value = expl.getRawJson())
         {
             std::cout << value->get_ref<std::string const&>() << std::endl;
         }

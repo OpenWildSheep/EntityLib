@@ -15,7 +15,7 @@ namespace Ent
     {
         prefab = nullptr;
         defaultVal = 1; // 1 == undefined
-        defaultStorage.reinit();
+        defaultStorage.reset();
         arraySize = 0;
     }
     FileCursor* Cursor::Layer::getDefault()
@@ -143,7 +143,7 @@ namespace Ent
         //ENTLIB_DBG_ASSERT(_document->is_object());
         ENTLIB_ASSERT(_doc != nullptr);
         ENTLIB_ASSERT(_doc->is_object());
-        auto* doc = m_instance.back();
+        auto* doc = m_instance.getRawJson();
         if (not doc->is_null())
         {
             if (auto member = doc->find("InstanceOf"); member != doc->end())
@@ -203,7 +203,7 @@ namespace Ent
         auto* subschema = m_instance.getSchema();
         if (subschema->type == Ent::DataType::object and m_instance.isSet())
         {
-            auto* doc = m_instance.back();
+            auto* doc = m_instance.getRawJson();
             if (auto member = doc->find("InstanceOf"); member != doc->end())
             {
                 if (auto const& prefabPath = member->get_ref<std::string const&>();
@@ -544,7 +544,7 @@ namespace Ent
             else if (auto* defaultVal = lastLayer.getDefault();
                      defaultVal != nullptr and defaultVal->isSet())
             {
-                return defaultVal->back()->size();
+                return defaultVal->getRawJson()->size();
             }
             else
             {
@@ -705,7 +705,7 @@ namespace Ent
         else if (auto* defaultVal = lastLayer.getDefault();
                  defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
         {
-            auto* node = defaultVal->back();
+            auto* node = defaultVal->getRawJson();
             ENTLIB_DBG_ASSERT(node->is_array());
             for (auto const& k_v : *node)
             {
@@ -718,7 +718,7 @@ namespace Ent
         }
         if (m_instance.isSet())
         {
-            auto* node = m_instance.back();
+            auto* node = m_instance.getRawJson();
             ENTLIB_DBG_ASSERT(node->is_array());
             for (size_t i = 0; i < node->size(); ++i)
             {
@@ -767,7 +767,7 @@ namespace Ent
         }
         if (m_instance.isSet())
         {
-            auto const arraySize = m_instance.back()->size();
+            auto const arraySize = m_instance.getRawJson()->size();
             for (size_t i = 0; i < arraySize; ++i)
             {
                 auto key = enterArrayItem(i).enterArrayItem(0llu).getInt();
@@ -837,13 +837,10 @@ namespace Ent
 #ifdef _DEBUG
                 auto* instanceSize = m_instance.back();
 #endif
-                auto [unionSchema, unionValue] = m_instance.enterArrayItem(i).getUnionData();
-                bool const isNull = unionSchema == nullptr
-                                    or (unionValue != nullptr ? unionValue->is_null() : false);
-                // bool const isNull = m_instance.enterArrayItem(i).enterUnionData().isNull();
-                // Subschema const* unionSchema = m_instance.getSchema();
-                // m_instance.exit();
-                if (isNull)
+                m_instance.enterArrayItem(i);
+                auto unionSchema = m_instance.getUnionSchema();
+                bool const isRemoved = (unionSchema == nullptr) or m_instance.isUnionRemoved();
+                if (isRemoved)
                 {
                     keys.erase(m_instance.getUnionType());
                 }
@@ -872,7 +869,7 @@ namespace Ent
             for (size_t i = 0; i < arraySize(); ++i)
             {
                 enterArrayItem(i);
-                if (m_instance.isSet() and m_instance.back()->count("__removed__") != 0)
+                if (m_instance.isSet() and m_instance.getRawJson()->count("__removed__") != 0)
                 {
                     keys.erase(enterObjectField(meta.keyField->c_str()).getString());
                     exit();
@@ -898,7 +895,7 @@ namespace Ent
             for (size_t i = 0; i < arraySize(); ++i)
             {
                 enterArrayItem(i);
-                if (m_instance.isSet() and m_instance.back()->count("__removed__") != 0)
+                if (m_instance.isSet() and m_instance.getRawJson()->count("__removed__") != 0)
                 {
                     keys.erase(enterObjectField(meta.keyField->c_str()).getInt());
                     exit();
@@ -963,7 +960,8 @@ namespace Ent
         for (; firstNotSet != endIter; ++lastSet, ++firstNotSet, ++firstNotSetIdx)
         {
             size_t arraySize = m_layers[firstNotSetIdx - 1].arraySize;
-            FileCursor::setLayer(*lastSet, *firstNotSet, arraySize);
+            firstNotSet->values = FileCursor::createChildNode(
+                *lastSet, firstNotSet->additionalPath, *firstNotSet->schema.base, arraySize);
             ENTLIB_ASSERT(firstNotSet->values != nullptr);
         }
         // ENTLIB_ASSERT(m_instance.back() != nullptr);
@@ -1052,9 +1050,9 @@ namespace Ent
         }
     }
 
-    nlohmann::json* Cursor::GetRawValue()
+    nlohmann::json const* Cursor::_getRawJson()
     {
-        return m_instance.back();
+        return m_instance.getRawJson();
     }
 
 } // namespace Ent

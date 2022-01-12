@@ -151,7 +151,7 @@ namespace Ent
         void insertPrimSetKey(char const* _key); ///< Insert _key in the set (or do nothing if already in)
         void insertPrimSetKey(int64_t _key); ///< Insert _key in the set (or do nothing if already in)
 
-        nlohmann::json* GetRawValue(); ///< Get the underlying json node of the instance
+        nlohmann::json const* _getRawJson(); ///< Get the underlying json node of the instance
 
         Cursor* getPrefab(); ///< Get the Cursor of the prefab
 

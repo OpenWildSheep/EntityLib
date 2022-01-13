@@ -8,7 +8,6 @@
 
 #include <EntityLib/Visitor.h>
 #include <EntityLib/CopyNode.h>
-#include "DumpNode.h"
 
 using namespace Ent;
 
@@ -554,9 +553,6 @@ void testNodeHandler(Ent::EntityLib& entlib)
         simpleObject.exit();
         ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeY").getFloat() == 2.f);
         simpleObject.exit();
-        DumpNode dumper(simpleObject);
-        Ent::visitRecursive(simpleObject, dumper);
-        std::cout << dumper.getResult().dump(4) << std::endl;
     }
     {
         std::ifstream ifstr("test.SeedPatch.node");
@@ -706,19 +702,8 @@ void testNodeHandler(Ent::EntityLib& entlib)
         expl.exit();
 
         expl.save("instance.prout.entity");
-
-        // PrintNode printer;
-        // visit(expl, 0, printer);
-
-        //auto ent = entlib.loadEntityAsNode("instance.entity");
-        //CompareNode compare(&ent);
-        //visit(expl, 0, compare);
-        DumpNode dumper(expl);
-        Ent::visitRecursive(expl, dumper);
-        std::cout << dumper.getResult().dump(4) << std::endl;
     }
     {
-        // entlib.rawdataPath = "X:/RawData";
         std::cout << "Read instance.entity with LazyLib" << std::endl;
         clock_t start = clock();
         Cursor expl(&entlib, entlib.getSchema(entitySchemaName), "instance.entity");
@@ -736,7 +721,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
 
         nlohmann::json newDoc = nlohmann::json::object();
         Cursor destExpl(&entlib, expl.getSchema(), "", &newDoc);
-        CopyNode copier(expl, destExpl);
+        CopyToEmptyNode copier(expl, destExpl);
         Ent::visitRecursive(expl, copier);
         entlib.saveJsonFile(&newDoc, "instance.cursor.entity");
     }
@@ -757,7 +742,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
             std::cout << "Copy SceneKOM.scene with LazyLib" << std::endl;
             nlohmann::json newDoc = nlohmann::json::object();
             Cursor destExpl(&entlib, expl.getSchema(), "", &newDoc);
-            CopyNode copier(expl, destExpl);
+            CopyToEmptyNode copier(expl, destExpl);
             visitRecursive(expl, copier);
             std::cout << "Save SceneKOM.scene with LazyLib" << std::endl;
             entlib.saveJsonFile(&newDoc, "SceneKOM.scene");

@@ -10,7 +10,7 @@
 #include <EntityLib.h>
 #include <ComponentMerge.h>
 
-#include "TestNodeHandler.h"
+#include "TestCursor.h"
 
 static void printNode(char const* name, Ent::Node const& node, std::string const& tab)
 {
@@ -170,7 +170,7 @@ try
 
     auto prevValidationEnabled = entlib.validationEnabled;
     entlib.validationEnabled = false;
-    testNodeHandler(entlib);
+    testCursor(entlib);
     entlib.rawdataPath = current_path();
     entlib.validationEnabled = prevValidationEnabled;
 

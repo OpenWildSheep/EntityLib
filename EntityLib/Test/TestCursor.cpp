@@ -1,4 +1,4 @@
-#include "TestNodeHandler.h"
+#include "TestCursor.h"
 #include <EntityLib.h>
 #include <../Tools.h>
 #include <fstream>
@@ -532,7 +532,7 @@ size_t countNodes(Node* node)
     return nodeCount;
 }
 
-void testNodeHandler(Ent::EntityLib& entlib)
+void testCursor(Ent::EntityLib& entlib)
 {
     {
         auto storage = nlohmann::json::object();
@@ -571,39 +571,6 @@ void testNodeHandler(Ent::EntityLib& entlib)
         ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeX").getFloat() == 2.);
         simpleObject.exit();
         ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeY").getFloat() == 2.f);
-        // ENTLIB_ASSERT(simpleObject.at("NoiseOffsetX").getFloat() == 0.f);
-    }
-    {
-        FileCursor expl(entlib.getSchema(entitySchemaName), "prefab.entity");
-        expl.enterObjectField("Name");
-        if (auto value = expl.getRawJson())
-        {
-            std::cout << value->get_ref<std::string const&>() << std::endl;
-        }
-        expl.exit();
-        expl.enterObjectField("Components").enterUnionSetItem("NetworkNode").enterObjectField("Type");
-        if (auto value = expl.getRawJson())
-        {
-            std::cout << value->get_ref<std::string const&>().c_str() << std::endl;
-        }
-        expl.exit().exit();
-        expl.enterUnionSetItem("TransformGD").enterObjectField("Matrix").enterArrayItem(3);
-        if (auto value = expl.getRawJson())
-        {
-            std::cout << value->get<double>() << std::endl;
-        }
-        expl.exit().exit().exit();
-        expl.enterUnionSetItem("SubScene")
-            .enterObjectField("Embedded")
-            .enterObjectSetItem("EP1-Spout_LINK_001")
-            .enterObjectField("Name");
-        if (auto value = expl.getRawJson())
-        {
-            std::cout << value->get_ref<std::string const&>() << std::endl;
-        }
-        //NodeHandler entity(entlib.getSchema(entitySchemaName), &d);
-        //ENTLIB_ASSERT(entity.at("Name").getString() != nullptr);
-        //ENTLIB_ASSERT(entity.at("Name").getString() == std::string("PlayerSpawner_"));
     }
     {
         Cursor expl(&entlib, entlib.getSchema(entitySchemaName), "prefab.entity");
@@ -762,16 +729,10 @@ void testNodeHandler(Ent::EntityLib& entlib)
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << nodeCount << std::endl;
 
-        //CompareNode visitor(expl, &ent);
-        //std::cout << "Compare Nodes" << std::endl;
         PrimitiveCounterVisitor visitor;
         std::cout << "Travserse SceneKOM.scene with LazyLib" << std::endl;
         start = clock();
         Ent::visitRecursive(expl, visitor);
-        // visit(expl, 0, visitor);
-        // visit(expl, 0, visitor);
-        // visit(expl, 0, visitor);
-        // visit(expl, 0, visitor);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;

@@ -3,4 +3,4 @@
 
 using namespace Ent;
 
-void testNodeHandler(Ent::EntityLib& entlib);
+void testCursor(Ent::EntityLib& entlib);

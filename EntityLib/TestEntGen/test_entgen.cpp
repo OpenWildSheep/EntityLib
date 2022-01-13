@@ -158,15 +158,14 @@ try
     }
 
     // Test Map with enum key
-    Map<RegenerationStateEnum, Array<sEnvStamp>> stamps =
+    Map<EnergySideEnum, Array<sEnvStamp>> stamps =
         ent.Components().add<EnvStampGD>().Stamps();
-    stamps.add(RegenerationStateEnum::Dead);
-    stamps.add(RegenerationStateEnum::Dead);
+    stamps.add(EnergySideEnum::corrupted);
+    stamps.add(EnergySideEnum::corrupted);
     std::optional<Array<sEnvStamp>> deadArr =
-        stamps.get(RegenerationStateEnum::Dead);
+        stamps.get(EnergySideEnum::corrupted);
     ENTLIB_ASSERT(deadArr.has_value());
-    std::optional<Array<sEnvStamp>> lushArr =
-        stamps.get(RegenerationStateEnum::Lush);
+    std::optional<Array<sEnvStamp>> lushArr = stamps.get(EnergySideEnum::lush);
     ENTLIB_ASSERT(not lushArr.has_value());
     for (auto&& stampname : stamps.getKeys())
     {
@@ -180,8 +179,8 @@ try
         std::cout << toString(stampname) << std::endl;
         static_assert(std::is_same_v<decltype(stamp), Array<sEnvStamp>>);
     }
-    stamps.remove(RegenerationStateEnum::Dead);
-    ENTLIB_ASSERT(not stamps.get(RegenerationStateEnum::Dead).has_value());
+    stamps.remove(EnergySideEnum::corrupted);
+    ENTLIB_ASSERT(not stamps.get(EnergySideEnum::corrupted).has_value());
     return EXIT_SUCCESS;
 }
 catch (std::exception& ex)

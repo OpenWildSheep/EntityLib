@@ -13,6 +13,7 @@
 
 namespace Ent
 {
+    /// Navigate and extract data from .node(.entity/.scene) files, taking care of overriding rules
     struct ENTLIB_DLLEXPORT Cursor
     {
     public:

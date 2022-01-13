@@ -555,7 +555,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
         ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeY").getFloat() == 2.f);
         simpleObject.exit();
         DumpNode dumper(simpleObject);
-        Ent::visitRecursive(simpleObject, dumper, true);
+        Ent::visitRecursive(simpleObject, dumper);
         std::cout << dumper.getResult().dump(4) << std::endl;
     }
     {
@@ -714,7 +714,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
         //CompareNode compare(&ent);
         //visit(expl, 0, compare);
         DumpNode dumper(expl);
-        Ent::visitRecursive(expl, dumper, true);
+        Ent::visitRecursive(expl, dumper);
         std::cout << dumper.getResult().dump(4) << std::endl;
     }
     {
@@ -730,14 +730,14 @@ void testNodeHandler(Ent::EntityLib& entlib)
         CompareNode compare(expl, ent.get());
         std::cout << "Visit all" << std::endl;
         start = clock();
-        Ent::visitRecursive(expl, compare, true);
+        Ent::visitRecursive(expl, compare);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
 
         nlohmann::json newDoc = nlohmann::json::object();
         Cursor destExpl(&entlib, expl.getSchema(), "", &newDoc);
         CopyNode copier(expl, destExpl);
-        Ent::visitRecursive(expl, copier, true);
+        Ent::visitRecursive(expl, copier);
         entlib.saveJsonFile(&newDoc, "instance.cursor.entity");
     }
     bool testLoading = true;
@@ -758,7 +758,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
             nlohmann::json newDoc = nlohmann::json::object();
             Cursor destExpl(&entlib, expl.getSchema(), "", &newDoc);
             CopyNode copier(expl, destExpl);
-            visitRecursive(expl, copier, true);
+            visitRecursive(expl, copier);
             std::cout << "Save SceneKOM.scene with LazyLib" << std::endl;
             entlib.saveJsonFile(&newDoc, "SceneKOM.scene");
         }
@@ -782,7 +782,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
         PrimitiveCounterVisitor visitor;
         std::cout << "Travserse SceneKOM.scene with LazyLib" << std::endl;
         start = clock();
-        Ent::visitRecursive(expl, visitor, true);
+        Ent::visitRecursive(expl, visitor);
         // visit(expl, 0, visitor);
         // visit(expl, 0, visitor);
         // visit(expl, 0, visitor);
@@ -821,7 +821,7 @@ void testNodeHandler(Ent::EntityLib& entlib)
         std::cout << "Compare both" << std::endl;
         start = clock();
         CompareNode comparator(expl, ent.get());
-        Ent::visitRecursive(expl, comparator, true);
+        Ent::visitRecursive(expl, comparator);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
     }

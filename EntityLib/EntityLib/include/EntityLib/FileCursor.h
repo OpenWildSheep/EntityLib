@@ -1,3 +1,4 @@
+/// @cond PRIVATE
 #pragma once
 
 #include <variant>
@@ -20,6 +21,9 @@ namespace Ent
         }
     };
 
+    /// Navigate and extract data from .node(.entity/.scene) files
+    ///
+    /// @remark FileCursor know nothing about prefab ("InstanceOf"). It only know about one file.
     struct ENTLIB_DLLEXPORT FileCursor
     {
         using Key = std::variant<char const*, size_t>;
@@ -176,3 +180,4 @@ namespace Ent
     };
 
 } // namespace Ent
+/// @endcond

@@ -527,9 +527,9 @@ namespace Ent
                     pairNode.emplace_back();
                     _lastLayer.values->push_back(std::move(pairNode));
                     newLayerJson = &(*_lastLayer.values)[(*_lastLayer.values).size() - 1][1];
-                }
                     ENTLIB_ASSERT(newLayerJson != nullptr);
                     break;
+                }
                 case Ent::DataType::integer:
                 {
                     auto key = std::get<size_t>(_childName);
@@ -538,9 +538,9 @@ namespace Ent
                     pairNode.emplace_back();
                     _lastLayer.values->push_back(std::move(pairNode));
                     newLayerJson = &(*_lastLayer.values)[(*_lastLayer.values).size() - 1][1];
-                }
                     ENTLIB_ASSERT(newLayerJson != nullptr);
                     break;
+                }
                 default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                 }
                 break;
@@ -556,16 +556,16 @@ namespace Ent
                 {
                     auto key = std::get<size_t>(_childName);
                     _lastLayer.values->push_back(key);
-                }
                     ENTLIB_ASSERT(newLayerJson != nullptr);
                     break;
+                }
                 case Ent::DataType::string: // String set
                 {
                     auto key = std::get<char const*>(_childName);
                     _lastLayer.values->push_back(key);
-                }
                     ENTLIB_ASSERT(newLayerJson != nullptr);
                     break;
+                }
                 case Ent::DataType::oneOf: // UnionSet
                 {
                     auto wrapper = nlohmann::json::object();
@@ -605,8 +605,8 @@ namespace Ent
                     ENTLIB_ASSERT(newLayerJson != nullptr);
                     break;
                 }
+                break;
             }
-            break;
             case ""_hash:
             {
                 if (_lastLayer.values->is_null())
@@ -624,8 +624,8 @@ namespace Ent
                 auto index = std::get<size_t>(_childName);
                 newLayerJson = &(*_lastLayer.values)[index];
                 ENTLIB_ASSERT(newLayerJson != nullptr);
+                break;
             }
-            break;
             }
         }
         break;
@@ -637,6 +637,7 @@ namespace Ent
         case Ent::DataType::entityRef: [[fallthrough]];
         case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Unexpected DataType");
         }
+        ENTLIB_ASSERT(newLayerJson != nullptr);
         if (newLayerJson->is_null())
         {
             if (_newLayerSchema.type == Ent::DataType::array)
@@ -649,8 +650,6 @@ namespace Ent
             }
         }
         return newLayerJson;
-        //_firstNotSet.values = newLayerJson;
-        //ENTLIB_ASSERT(_firstNotSet.values != nullptr);
     }
 
     void FileCursor::setSize(size_t _size)

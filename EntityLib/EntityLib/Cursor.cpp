@@ -289,15 +289,15 @@ namespace Ent
         return _enterItem([_type](auto&& _cur) { _cur.enterUnionData(_type); });
     }
 
-    Cursor& Cursor::enterUnionSetItem(char const* _field, Subschema const* _dataSchema)
+    Cursor& Cursor::enterUnionSetItem(char const* _type, Subschema const* _dataSchema)
     {
         if (_dataSchema == nullptr)
         {
             _dataSchema =
-                m_instance.getSchema()->singularItems->get().unionTypeMap.at(_field).dataSchema;
+                m_instance.getSchema()->singularItems->get().unionTypeMap.at(_type).dataSchema;
         }
-        return _enterItem([_field, _dataSchema](auto&& _cur)
-                          { _cur.enterUnionSetItem(_field, _dataSchema); });
+        return _enterItem([_type, _dataSchema](auto&& _cur)
+                          { _cur.enterUnionSetItem(_type, _dataSchema); });
     }
 
     template <typename E>
@@ -338,19 +338,19 @@ namespace Ent
         return *this;
     }
 
-    Cursor& Cursor::enterObjectSetItem(char const* _field)
+    Cursor& Cursor::enterObjectSetItem(char const* _key)
     {
-        return _enterItem([_field](auto&& _cur) { _cur.enterObjectSetItem(_field); });
+        return _enterItem([_key](auto&& _cur) { _cur.enterObjectSetItem(_key); });
     }
 
-    Cursor& Cursor::enterObjectSetItem(int64_t _field)
+    Cursor& Cursor::enterObjectSetItem(int64_t _key)
     {
-        return _enterItem([_field](auto&& _cur) { _cur.enterObjectSetItem(_field); });
+        return _enterItem([_key](auto&& _cur) { _cur.enterObjectSetItem(_key); });
     }
 
-    Cursor& Cursor::enterMapItem(char const* _field)
+    Cursor& Cursor::enterMapItem(char const* _key)
     {
-        return _enterItem([_field](auto&& _cur) { _cur.enterMapItem(_field); });
+        return _enterItem([_key](auto&& _cur) { _cur.enterMapItem(_key); });
     }
 
     Cursor& Cursor::enterMapItem(int64_t _field)

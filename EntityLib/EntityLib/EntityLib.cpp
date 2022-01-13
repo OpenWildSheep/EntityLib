@@ -896,8 +896,6 @@ namespace Ent
                     {
                     case DataType::oneOf: // The key is the className string
                     {
-                        char const* defaultTypeName =
-                            _nodeSchema.singularItems->get().getUnionDefaultTypeName();
                         auto const& unionMeta =
                             std::get<Subschema::UnionMeta>(_nodeSchema.singularItems->get().meta);
                         auto doRemoveUnion = [unionMeta](json const& item)
@@ -906,8 +904,18 @@ namespace Ent
                                    and item[unionMeta.dataField].is_null();
                         };
                         arr = mergeMapOverride(
-                            [&unionMeta, defaultTypeName](json const& item)
-                            { return item.value(unionMeta.typeField, defaultTypeName); },
+                            [&unionMeta](json const& item)
+                            {
+                                if (auto iter = item.find(unionMeta.typeField); iter != item.end())
+                                {
+                                    return iter->get_ref<std::string const&>();
+                                }
+                                else
+                                {
+                                    throw BadUnionType(
+                                        format("Missing field %s", unionMeta.typeField.c_str()).c_str());
+                                }
+                            },
                             [](Node const* subSuper) { return subSuper->getUnionType(); },
                             doRemoveUnion);
                     }

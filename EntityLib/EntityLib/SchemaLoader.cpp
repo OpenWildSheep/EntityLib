@@ -616,7 +616,7 @@ namespace Ent
                 ref = SubschemaRef::Ref{globalSchema, typeName};
             }
 
-            static void finalizeSubschema(Subschema& lastSchema)
+            void finalizeSubschema(Subschema& lastSchema)
             {
                 if (not lastSchema.unionTypeMap.empty())
                 {

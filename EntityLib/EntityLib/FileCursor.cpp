@@ -410,7 +410,7 @@ namespace Ent
                 if (unionSchema->type == Ent::DataType::string
                     or unionSchema->type == Ent::DataType::entityRef)
                 {
-                    ENTLIB_DBG_ASSERT(newValue->is_string());
+                    ENTLIB_DBG_ASSERT(unionValue->is_string());
                 }
                 return unionValue->is_null();
             }
@@ -507,7 +507,7 @@ namespace Ent
         break;
         case Ent::DataType::array:
         {
-            ENTLIB_DBG_ASSERT(lastSet.values->type() == nlohmann::json::value_t::array);
+            ENTLIB_DBG_ASSERT(_lastLayer.values->type() == nlohmann::json::value_t::array);
             auto meta = std::get<Ent::Subschema::ArrayMeta>(_lastLayer.schema.base->meta);
             auto& itemType = _lastLayer.schema.base->singularItems->get();
             switch (hash(meta.overridePolicy))
@@ -599,7 +599,7 @@ namespace Ent
                     }
                     default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                     }
-                    ENTLIB_DBG_ASSERT(lastSet.values->type() == nlohmann::json::value_t::array);
+                    ENTLIB_DBG_ASSERT(_lastLayer.values->type() == nlohmann::json::value_t::array);
                     _lastLayer.values->push_back(object);
                     newLayerJson = &(*_lastLayer.values)[(*_lastLayer.values).size() - 1];
                     ENTLIB_ASSERT(newLayerJson != nullptr);

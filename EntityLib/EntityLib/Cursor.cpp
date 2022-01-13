@@ -835,7 +835,7 @@ namespace Ent
             for (size_t i = 0; i < arraySize(); ++i)
             {
 #ifdef _DEBUG
-                auto* instanceSize = m_instance.back();
+                auto* instanceSize = m_instance.getRawJson();
 #endif
                 m_instance.enterArrayItem(i);
                 auto unionSchema = m_instance.getUnionSchema();
@@ -849,7 +849,7 @@ namespace Ent
                     keys.emplace(m_instance.getUnionType(), unionSchema);
                 }
                 m_instance.exit();
-                ENTLIB_DBG_ASSERT(instanceSize == m_instance.back());
+                ENTLIB_DBG_ASSERT(instanceSize == m_instance.getRawJson());
             }
         }
         return keys;

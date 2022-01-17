@@ -242,6 +242,7 @@ namespace Ent
         struct ResponsiblePointer_CineEvent_; // Union
         struct ResponsiblePointer_AnalyticsObserverInterface_;
         struct ResponsiblePointer_ActorState_; // Union
+        struct RegenerationManager_EnergyAreaSetting;
         struct RegenSwitchBehavior; // enum
         enum class RegenSwitchBehaviorEnum
         {
@@ -412,7 +413,6 @@ namespace Ent
         struct WaterManager;
         struct VoxelSimulationManager;
         struct VisualManager;
-        struct VelocityObstaclesManager;
         struct VegetationManager;
         struct TrailManager;
         struct TerrainManager;
@@ -425,7 +425,6 @@ namespace Ent
         struct ResourceDebugger;
         struct ReloadManager;
         struct RegionManager;
-        struct RegenerationManager;
         struct RecastPathFindManager;
         struct RPCServerManager;
         struct RPCMarshallingTests;
@@ -589,6 +588,19 @@ namespace Ent
             degrowing,
             GrowingState_COUNT,
         };
+        struct GroupAvoidanceEnum; // enum
+        enum class GroupAvoidanceEnumEnum
+        {
+            lush,
+            corrupted,
+            tiny,
+            small,
+            medium,
+            big,
+            enormous,
+            GroupAvoidanceEnum_COUNT,
+        };
+        struct VelocityObstaclesManager;
         struct GroundTypeData;
         struct GeometryStamper;
         struct ZoneStamper;
@@ -635,6 +647,7 @@ namespace Ent
             PossessFlocking,
             GPEType_COUNT,
         };
+        struct FurProperties;
         struct FreezeData;
         struct ForceBlendInReachRequired;
         struct ForceBlendIn;
@@ -672,6 +685,14 @@ namespace Ent
         struct EntityLODData;
         struct RegenData;
         struct EntityID;
+        struct EnergyValue; // enum
+        enum class EnergyValueEnum
+        {
+            corrupted_strong,
+            corrupted,
+            lush,
+            lush_strong,
+        };
         struct EnergySide; // enum
         enum class EnergySideEnum
         {
@@ -680,6 +701,15 @@ namespace Ent
             corrupted,
         };
         struct TaggingVegetation;
+        struct EnergyIntensity; // enum
+        enum class EnergyIntensityEnum
+        {
+            normal,
+            strong,
+            COUNT,
+        };
+        struct RegenerationManager;
+        struct EnergyPoolGD_EnergyArea;
         struct Enabled;
         struct EDITOR_Mesh;
         struct EDITOR_LODsItem;
@@ -818,6 +848,7 @@ namespace Ent
         struct HealPumpGD;
         struct GroundTypeSamplerGD;
         struct GameEffectSpawnerGD;
+        struct FurComponentGD;
         struct FluidVolumeComponentGD;
         struct FluidViewGD;
         struct FluidToRegenInjectorGD;
@@ -3559,6 +3590,23 @@ namespace Ent
             Ent::Gen::EntityStateVoxelsVolume setEntityStateVoxelsVolume() const;
         };
 
+        struct RegenerationManager_EnergyAreaSetting : HelperObject // Object
+        {
+            RegenerationManager_EnergyAreaSetting(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "RegenerationManager::EnergyAreaSetting";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float RegenValue() const;
+            Ent::Gen::Float SmoothMargin() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct RegenSwitchBehavior : EnumPropHelper<RegenSwitchBehavior, RegenSwitchBehaviorEnum> // Enum
         {
             using Enum = RegenSwitchBehaviorEnum;
@@ -4918,35 +4966,6 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
-        struct VelocityObstaclesManager : HelperObject // Object
-        {
-            VelocityObstaclesManager(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "VelocityObstaclesManager";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::Float AcceptableAccelerationForAvoidance() const;
-            Ent::Gen::Bool Active() const;
-            Ent::Gen::Float AvoidanceRadiusAdaptabilityFactor() const;
-            Ent::Gen::Float RunningSpeed() const;
-            Ent::Gen::Int SimMaxNeighbors() const;
-            Ent::Gen::Float SimMaxSpeed() const;
-            Ent::Gen::Float SimNeighborDist() const;
-            Ent::Gen::Float SimPrefSpeedFactor() const;
-            Ent::Gen::Float SimRadius() const;
-            Ent::Gen::Int SimSlowDownWhenAvoiding() const;
-            Ent::Gen::Float SimTimeHorizon() const;
-            Ent::Gen::Float SimTimeHorizonObst() const;
-            Ent::Gen::Manager Super() const;
-            Ent::Gen::Float WalkingSpeed() const;
-            Ent::Gen::String _comment() const;
-        };
-
         struct VegetationManager : HelperObject // Object
         {
             VegetationManager(Ent::Node* _node): HelperObject(_node) {}
@@ -5166,30 +5185,6 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::Manager Super() const;
-            Ent::Gen::String _comment() const;
-        };
-
-        struct RegenerationManager : HelperObject // Object
-        {
-            RegenerationManager(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "RegenerationManager";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::Float DefaultLostRatio() const;
-            Ent::Gen::Float DefaultMaxLossPerSecond() const;
-            Ent::Gen::Float DefaultMaxTransmissionPerSecond() const;
-            Ent::Gen::Float DefaultTransmittedRatio() const;
-            Ent::Gen::Float EnergyMaxValue() const;
-            Ent::Gen::Float EvaporationDecreaseSpeed() const;
-            Ent::Gen::Float EvaporationMaxValue() const;
-            Ent::Gen::Float InjectedEvaporationMultiplier() const;
             Ent::Gen::Manager Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -6330,6 +6325,65 @@ namespace Ent
             return static_cast<GrowingStateEnum>(details::indexInEnum(value, GrowingState::enumToString));
         }
 
+        struct GroupAvoidanceEnum : EnumPropHelper<GroupAvoidanceEnum, GroupAvoidanceEnumEnum> // Enum
+        {
+            using Enum = GroupAvoidanceEnumEnum;
+            using PropHelper<GroupAvoidanceEnum, Enum>::operator=;
+            GroupAvoidanceEnum(Ent::Node* _node): EnumPropHelper<GroupAvoidanceEnum, Enum>(_node) {}
+            static constexpr char schemaName[] = "GroupAvoidanceEnum";
+            static constexpr char const* enumToString[] = {
+                "lush",
+                "corrupted",
+                "tiny",
+                "small",
+                "medium",
+                "big",
+                "enormous",
+                "GroupAvoidanceEnum_COUNT",
+            };
+        };
+        inline char const* toString(GroupAvoidanceEnumEnum value)
+        {
+            if(size_t(value) >= std::size(GroupAvoidanceEnum::enumToString))
+                throw std::runtime_error("Wrong enum value");
+            return GroupAvoidanceEnum::enumToString[size_t(value)];
+        }
+        inline char const* toInternal(GroupAvoidanceEnumEnum value) { return toString(value); }
+        template<> inline GroupAvoidanceEnumEnum strToEnum<GroupAvoidanceEnumEnum>(char const* value)
+        {
+            return static_cast<GroupAvoidanceEnumEnum>(details::indexInEnum(value, GroupAvoidanceEnum::enumToString));
+        }
+
+        struct VelocityObstaclesManager : HelperObject // Object
+        {
+            VelocityObstaclesManager(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "VelocityObstaclesManager";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float AcceptableAccelerationForAvoidance() const;
+            Ent::Gen::Bool Active() const;
+            Ent::Gen::Float AvoidanceRadiusAdaptabilityFactor() const;
+            Ent::Gen::Map<SizeEnum, PrimArray<Ent::Gen::GroupAvoidanceEnum>> GroupsAvoidanceIgnoredBySize() const;
+            Ent::Gen::Float RunningSpeed() const;
+            Ent::Gen::Int SimMaxNeighbors() const;
+            Ent::Gen::Float SimMaxSpeed() const;
+            Ent::Gen::Float SimNeighborDist() const;
+            Ent::Gen::Float SimPrefSpeedFactor() const;
+            Ent::Gen::Float SimRadius() const;
+            Ent::Gen::Int SimSlowDownWhenAvoiding() const;
+            Ent::Gen::Float SimTimeHorizon() const;
+            Ent::Gen::Float SimTimeHorizonObst() const;
+            Ent::Gen::Manager Super() const;
+            Ent::Gen::Float WalkingSpeed() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct GroundTypeData : HelperObject // Object
         {
             GroundTypeData(Ent::Node* _node): HelperObject(_node) {}
@@ -7068,6 +7122,27 @@ namespace Ent
             return static_cast<GPETypeEnum>(details::indexInEnum(value, GPEType::enumToString));
         }
 
+        struct FurProperties : HelperObject // Object
+        {
+            FurProperties(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "FurProperties";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float FinsMaskUScale() const;
+            Ent::Gen::Int FinsTextureArrayIndex() const;
+            Ent::Gen::Float Roughness() const;
+            Ent::Gen::Float Stiffness() const;
+            Ent::Gen::Float Thickness() const;
+            Ent::Gen::Float Weight() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct FreezeData : HelperObject // Object
         {
             FreezeData(Ent::Node* _node): HelperObject(_node) {}
@@ -7615,6 +7690,31 @@ namespace Ent
         
         };
 
+        struct EnergyValue : EnumPropHelper<EnergyValue, EnergyValueEnum> // Enum
+        {
+            using Enum = EnergyValueEnum;
+            using PropHelper<EnergyValue, Enum>::operator=;
+            EnergyValue(Ent::Node* _node): EnumPropHelper<EnergyValue, Enum>(_node) {}
+            static constexpr char schemaName[] = "EnergyValue";
+            static constexpr char const* enumToString[] = {
+                "corrupted_strong",
+                "corrupted",
+                "lush",
+                "lush_strong",
+            };
+        };
+        inline char const* toString(EnergyValueEnum value)
+        {
+            if(size_t(value) >= std::size(EnergyValue::enumToString))
+                throw std::runtime_error("Wrong enum value");
+            return EnergyValue::enumToString[size_t(value)];
+        }
+        inline char const* toInternal(EnergyValueEnum value) { return toString(value); }
+        template<> inline EnergyValueEnum strToEnum<EnergyValueEnum>(char const* value)
+        {
+            return static_cast<EnergyValueEnum>(details::indexInEnum(value, EnergyValue::enumToString));
+        }
+
         struct EnergySide : EnumPropHelper<EnergySide, EnergySideEnum> // Enum
         {
             using Enum = EnergySideEnum;
@@ -7655,6 +7755,76 @@ namespace Ent
             Ent::Gen::Float RequiredRatio() const;
             Ent::Gen::EnergySide TaggedState() const;
             PrimArray<Ent::Gen::String> VegetationTags() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EnergyIntensity : EnumPropHelper<EnergyIntensity, EnergyIntensityEnum> // Enum
+        {
+            using Enum = EnergyIntensityEnum;
+            using PropHelper<EnergyIntensity, Enum>::operator=;
+            EnergyIntensity(Ent::Node* _node): EnumPropHelper<EnergyIntensity, Enum>(_node) {}
+            static constexpr char schemaName[] = "EnergyIntensity";
+            static constexpr char const* enumToString[] = {
+                "normal",
+                "strong",
+                "COUNT",
+            };
+        };
+        inline char const* toString(EnergyIntensityEnum value)
+        {
+            if(size_t(value) >= std::size(EnergyIntensity::enumToString))
+                throw std::runtime_error("Wrong enum value");
+            return EnergyIntensity::enumToString[size_t(value)];
+        }
+        inline char const* toInternal(EnergyIntensityEnum value) { return toString(value); }
+        template<> inline EnergyIntensityEnum strToEnum<EnergyIntensityEnum>(char const* value)
+        {
+            return static_cast<EnergyIntensityEnum>(details::indexInEnum(value, EnergyIntensity::enumToString));
+        }
+
+        struct RegenerationManager : HelperObject // Object
+        {
+            RegenerationManager(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "RegenerationManager";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::EnergyValue BackgroundEnergyValue() const;
+            Ent::Gen::Float DefaultLostRatio() const;
+            Ent::Gen::Float DefaultMaxLossPerSecond() const;
+            Ent::Gen::Float DefaultMaxTransmissionPerSecond() const;
+            Ent::Gen::Float DefaultTransmittedRatio() const;
+            Ent::Gen::Map<EnergyIntensityEnum, Ent::Gen::RegenerationManager_EnergyAreaSetting> EnergyAreaSettingsMap() const;
+            Ent::Gen::Float EnergyMaxValue() const;
+            Ent::Gen::Float EnergyStrongValueThreshold() const;
+            Ent::Gen::Float EvaporationDecreaseSpeed() const;
+            Ent::Gen::Float EvaporationMaxValue() const;
+            Ent::Gen::Float InjectedEvaporationMultiplier() const;
+            Ent::Gen::Manager Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EnergyPoolGD_EnergyArea : HelperObject // Object
+        {
+            EnergyPoolGD_EnergyArea(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EnergyPoolGD::EnergyArea";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Vector3 CenterOffset() const;
+            Ent::Gen::EnergyIntensity Intensity() const;
+            Ent::Gen::Int Priority() const;
+            Ent::Gen::Float Radius() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -10290,6 +10460,23 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
+        struct FurComponentGD : HelperObject // Object
+        {
+            FurComponentGD(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "FurComponentGD";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::FurProperties Properties() const;
+            Ent::Gen::ComponentGD Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct FluidVolumeComponentGD : HelperObject // Object
         {
             FluidVolumeComponentGD(Ent::Node* _node): HelperObject(_node) {}
@@ -10537,6 +10724,7 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
+            Array<Ent::Gen::EnergyPoolGD_EnergyArea> EnergyAreas() const;
             Ent::Gen::Bool FactionOverride() const;
             PrimArray<Ent::Gen::String> RegenEffectsOnConversion() const;
             Ent::Gen::ComponentGD Super() const;
@@ -11125,6 +11313,8 @@ namespace Ent
             Ent::Gen::FluidViewGD setFluidViewGD() const;
             std::optional<Ent::Gen::FluidVolumeComponentGD> FluidVolumeComponentGD() const;
             Ent::Gen::FluidVolumeComponentGD setFluidVolumeComponentGD() const;
+            std::optional<Ent::Gen::FurComponentGD> FurComponentGD() const;
+            Ent::Gen::FurComponentGD setFurComponentGD() const;
             std::optional<Ent::Gen::GameEffectSpawnerGD> GameEffectSpawnerGD() const;
             Ent::Gen::GameEffectSpawnerGD setGameEffectSpawnerGD() const;
             std::optional<Ent::Gen::GroundTypeSamplerGD> GroundTypeSamplerGD() const;
@@ -11503,6 +11693,9 @@ namespace Ent
             std::optional<Ent::Gen::FluidVolumeComponentGD> FluidVolumeComponentGD() const;
             Ent::Gen::FluidVolumeComponentGD addFluidVolumeComponentGD() const;
             void removeFluidVolumeComponentGD() const;
+            std::optional<Ent::Gen::FurComponentGD> FurComponentGD() const;
+            Ent::Gen::FurComponentGD addFurComponentGD() const;
+            void removeFurComponentGD() const;
             std::optional<Ent::Gen::GameEffectSpawnerGD> GameEffectSpawnerGD() const;
             Ent::Gen::GameEffectSpawnerGD addGameEffectSpawnerGD() const;
             void removeGameEffectSpawnerGD() const;
@@ -11981,6 +12174,9 @@ namespace Ent
             std::optional<Ent::Gen::FluidVolumeComponentGD> FluidVolumeComponentGD() const;
             Ent::Gen::FluidVolumeComponentGD addFluidVolumeComponentGD() const;
             void removeFluidVolumeComponentGD() const;
+            std::optional<Ent::Gen::FurComponentGD> FurComponentGD() const;
+            Ent::Gen::FurComponentGD addFurComponentGD() const;
+            void removeFurComponentGD() const;
             std::optional<Ent::Gen::GameEffectSpawnerGD> GameEffectSpawnerGD() const;
             Ent::Gen::GameEffectSpawnerGD addGameEffectSpawnerGD() const;
             void removeGameEffectSpawnerGD() const;
@@ -20885,6 +21081,7 @@ namespace Ent
             Ent::Gen::Int EnableComputeForUnderWater() const;
             Ent::Gen::Int EnableDepthOfField() const;
             Ent::Gen::Int EnableLensFlare() const;
+            Ent::Gen::Int EnableMTR() const;
             Ent::Gen::Int EnableMotionBlur() const;
             Ent::Gen::Int EnableNonBlockingDrawUpdates() const;
             Ent::Gen::Int EnableSSAO() const;
@@ -23823,6 +24020,19 @@ namespace Ent
         {
             return Ent::Gen::EntityStateVoxelsVolume(node->setUnionType("ResponsiblePointer_ActorState_"));
         }
+        // RegenerationManager_EnergyAreaSetting
+        inline Ent::Gen::Float RegenerationManager_EnergyAreaSetting::RegenValue() const
+        {
+            return Ent::Gen::Float(node->at("RegenValue"));
+        }
+        inline Ent::Gen::Float RegenerationManager_EnergyAreaSetting::SmoothMargin() const
+        {
+            return Ent::Gen::Float(node->at("SmoothMargin"));
+        }
+        inline Ent::Gen::String RegenerationManager_EnergyAreaSetting::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // RegenMeshBone
         inline Ent::Gen::String RegenMeshBone::BoneName() const
         {
@@ -25010,67 +25220,6 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
-        // VelocityObstaclesManager
-        inline Ent::Gen::Float VelocityObstaclesManager::AcceptableAccelerationForAvoidance() const
-        {
-            return Ent::Gen::Float(node->at("AcceptableAccelerationForAvoidance"));
-        }
-        inline Ent::Gen::Bool VelocityObstaclesManager::Active() const
-        {
-            return Ent::Gen::Bool(node->at("Active"));
-        }
-        inline Ent::Gen::Float VelocityObstaclesManager::AvoidanceRadiusAdaptabilityFactor() const
-        {
-            return Ent::Gen::Float(node->at("AvoidanceRadiusAdaptabilityFactor"));
-        }
-        inline Ent::Gen::Float VelocityObstaclesManager::RunningSpeed() const
-        {
-            return Ent::Gen::Float(node->at("RunningSpeed"));
-        }
-        inline Ent::Gen::Int VelocityObstaclesManager::SimMaxNeighbors() const
-        {
-            return Ent::Gen::Int(node->at("SimMaxNeighbors"));
-        }
-        inline Ent::Gen::Float VelocityObstaclesManager::SimMaxSpeed() const
-        {
-            return Ent::Gen::Float(node->at("SimMaxSpeed"));
-        }
-        inline Ent::Gen::Float VelocityObstaclesManager::SimNeighborDist() const
-        {
-            return Ent::Gen::Float(node->at("SimNeighborDist"));
-        }
-        inline Ent::Gen::Float VelocityObstaclesManager::SimPrefSpeedFactor() const
-        {
-            return Ent::Gen::Float(node->at("SimPrefSpeedFactor"));
-        }
-        inline Ent::Gen::Float VelocityObstaclesManager::SimRadius() const
-        {
-            return Ent::Gen::Float(node->at("SimRadius"));
-        }
-        inline Ent::Gen::Int VelocityObstaclesManager::SimSlowDownWhenAvoiding() const
-        {
-            return Ent::Gen::Int(node->at("SimSlowDownWhenAvoiding"));
-        }
-        inline Ent::Gen::Float VelocityObstaclesManager::SimTimeHorizon() const
-        {
-            return Ent::Gen::Float(node->at("SimTimeHorizon"));
-        }
-        inline Ent::Gen::Float VelocityObstaclesManager::SimTimeHorizonObst() const
-        {
-            return Ent::Gen::Float(node->at("SimTimeHorizonObst"));
-        }
-        inline Ent::Gen::Manager VelocityObstaclesManager::Super() const
-        {
-            return Ent::Gen::Manager(node->at("Super"));
-        }
-        inline Ent::Gen::Float VelocityObstaclesManager::WalkingSpeed() const
-        {
-            return Ent::Gen::Float(node->at("WalkingSpeed"));
-        }
-        inline Ent::Gen::String VelocityObstaclesManager::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
         // VegetationManager
         inline Ent::Gen::Float VegetationManager::BuryDepth() const
         {
@@ -25300,47 +25449,6 @@ namespace Ent
             return Ent::Gen::Manager(node->at("Super"));
         }
         inline Ent::Gen::String RegionManager::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        // RegenerationManager
-        inline Ent::Gen::Float RegenerationManager::DefaultLostRatio() const
-        {
-            return Ent::Gen::Float(node->at("DefaultLostRatio"));
-        }
-        inline Ent::Gen::Float RegenerationManager::DefaultMaxLossPerSecond() const
-        {
-            return Ent::Gen::Float(node->at("DefaultMaxLossPerSecond"));
-        }
-        inline Ent::Gen::Float RegenerationManager::DefaultMaxTransmissionPerSecond() const
-        {
-            return Ent::Gen::Float(node->at("DefaultMaxTransmissionPerSecond"));
-        }
-        inline Ent::Gen::Float RegenerationManager::DefaultTransmittedRatio() const
-        {
-            return Ent::Gen::Float(node->at("DefaultTransmittedRatio"));
-        }
-        inline Ent::Gen::Float RegenerationManager::EnergyMaxValue() const
-        {
-            return Ent::Gen::Float(node->at("EnergyMaxValue"));
-        }
-        inline Ent::Gen::Float RegenerationManager::EvaporationDecreaseSpeed() const
-        {
-            return Ent::Gen::Float(node->at("EvaporationDecreaseSpeed"));
-        }
-        inline Ent::Gen::Float RegenerationManager::EvaporationMaxValue() const
-        {
-            return Ent::Gen::Float(node->at("EvaporationMaxValue"));
-        }
-        inline Ent::Gen::Float RegenerationManager::InjectedEvaporationMultiplier() const
-        {
-            return Ent::Gen::Float(node->at("InjectedEvaporationMultiplier"));
-        }
-        inline Ent::Gen::Manager RegenerationManager::Super() const
-        {
-            return Ent::Gen::Manager(node->at("Super"));
-        }
-        inline Ent::Gen::String RegenerationManager::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -26256,6 +26364,71 @@ namespace Ent
         {
             return Ent::Gen::ScaleConverter(node->at("visualSmoothOut"));
         }
+        // VelocityObstaclesManager
+        inline Ent::Gen::Float VelocityObstaclesManager::AcceptableAccelerationForAvoidance() const
+        {
+            return Ent::Gen::Float(node->at("AcceptableAccelerationForAvoidance"));
+        }
+        inline Ent::Gen::Bool VelocityObstaclesManager::Active() const
+        {
+            return Ent::Gen::Bool(node->at("Active"));
+        }
+        inline Ent::Gen::Float VelocityObstaclesManager::AvoidanceRadiusAdaptabilityFactor() const
+        {
+            return Ent::Gen::Float(node->at("AvoidanceRadiusAdaptabilityFactor"));
+        }
+        inline Ent::Gen::Map<SizeEnum, PrimArray<Ent::Gen::GroupAvoidanceEnum>> VelocityObstaclesManager::GroupsAvoidanceIgnoredBySize() const
+        {
+            return Ent::Gen::Map<SizeEnum, PrimArray<Ent::Gen::GroupAvoidanceEnum>>(node->at("GroupsAvoidanceIgnoredBySize"));
+        }
+        inline Ent::Gen::Float VelocityObstaclesManager::RunningSpeed() const
+        {
+            return Ent::Gen::Float(node->at("RunningSpeed"));
+        }
+        inline Ent::Gen::Int VelocityObstaclesManager::SimMaxNeighbors() const
+        {
+            return Ent::Gen::Int(node->at("SimMaxNeighbors"));
+        }
+        inline Ent::Gen::Float VelocityObstaclesManager::SimMaxSpeed() const
+        {
+            return Ent::Gen::Float(node->at("SimMaxSpeed"));
+        }
+        inline Ent::Gen::Float VelocityObstaclesManager::SimNeighborDist() const
+        {
+            return Ent::Gen::Float(node->at("SimNeighborDist"));
+        }
+        inline Ent::Gen::Float VelocityObstaclesManager::SimPrefSpeedFactor() const
+        {
+            return Ent::Gen::Float(node->at("SimPrefSpeedFactor"));
+        }
+        inline Ent::Gen::Float VelocityObstaclesManager::SimRadius() const
+        {
+            return Ent::Gen::Float(node->at("SimRadius"));
+        }
+        inline Ent::Gen::Int VelocityObstaclesManager::SimSlowDownWhenAvoiding() const
+        {
+            return Ent::Gen::Int(node->at("SimSlowDownWhenAvoiding"));
+        }
+        inline Ent::Gen::Float VelocityObstaclesManager::SimTimeHorizon() const
+        {
+            return Ent::Gen::Float(node->at("SimTimeHorizon"));
+        }
+        inline Ent::Gen::Float VelocityObstaclesManager::SimTimeHorizonObst() const
+        {
+            return Ent::Gen::Float(node->at("SimTimeHorizonObst"));
+        }
+        inline Ent::Gen::Manager VelocityObstaclesManager::Super() const
+        {
+            return Ent::Gen::Manager(node->at("Super"));
+        }
+        inline Ent::Gen::Float VelocityObstaclesManager::WalkingSpeed() const
+        {
+            return Ent::Gen::Float(node->at("WalkingSpeed"));
+        }
+        inline Ent::Gen::String VelocityObstaclesManager::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // GroundTypeData
         inline Ent::Gen::Float GroundTypeData::GrainRangeMax() const
         {
@@ -27014,6 +27187,35 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // FurProperties
+        inline Ent::Gen::Float FurProperties::FinsMaskUScale() const
+        {
+            return Ent::Gen::Float(node->at("FinsMaskUScale"));
+        }
+        inline Ent::Gen::Int FurProperties::FinsTextureArrayIndex() const
+        {
+            return Ent::Gen::Int(node->at("FinsTextureArrayIndex"));
+        }
+        inline Ent::Gen::Float FurProperties::Roughness() const
+        {
+            return Ent::Gen::Float(node->at("Roughness"));
+        }
+        inline Ent::Gen::Float FurProperties::Stiffness() const
+        {
+            return Ent::Gen::Float(node->at("Stiffness"));
+        }
+        inline Ent::Gen::Float FurProperties::Thickness() const
+        {
+            return Ent::Gen::Float(node->at("Thickness"));
+        }
+        inline Ent::Gen::Float FurProperties::Weight() const
+        {
+            return Ent::Gen::Float(node->at("Weight"));
+        }
+        inline Ent::Gen::String FurProperties::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // FreezeData
         inline Ent::Gen::String FreezeData::_comment() const
         {
@@ -27681,6 +27883,80 @@ namespace Ent
             return PrimArray<Ent::Gen::String>(node->at("VegetationTags"));
         }
         inline Ent::Gen::String TaggingVegetation::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // RegenerationManager
+        inline Ent::Gen::EnergyValue RegenerationManager::BackgroundEnergyValue() const
+        {
+            return Ent::Gen::EnergyValue(node->at("BackgroundEnergyValue"));
+        }
+        inline Ent::Gen::Float RegenerationManager::DefaultLostRatio() const
+        {
+            return Ent::Gen::Float(node->at("DefaultLostRatio"));
+        }
+        inline Ent::Gen::Float RegenerationManager::DefaultMaxLossPerSecond() const
+        {
+            return Ent::Gen::Float(node->at("DefaultMaxLossPerSecond"));
+        }
+        inline Ent::Gen::Float RegenerationManager::DefaultMaxTransmissionPerSecond() const
+        {
+            return Ent::Gen::Float(node->at("DefaultMaxTransmissionPerSecond"));
+        }
+        inline Ent::Gen::Float RegenerationManager::DefaultTransmittedRatio() const
+        {
+            return Ent::Gen::Float(node->at("DefaultTransmittedRatio"));
+        }
+        inline Ent::Gen::Map<EnergyIntensityEnum, Ent::Gen::RegenerationManager_EnergyAreaSetting> RegenerationManager::EnergyAreaSettingsMap() const
+        {
+            return Ent::Gen::Map<EnergyIntensityEnum, Ent::Gen::RegenerationManager_EnergyAreaSetting>(node->at("EnergyAreaSettingsMap"));
+        }
+        inline Ent::Gen::Float RegenerationManager::EnergyMaxValue() const
+        {
+            return Ent::Gen::Float(node->at("EnergyMaxValue"));
+        }
+        inline Ent::Gen::Float RegenerationManager::EnergyStrongValueThreshold() const
+        {
+            return Ent::Gen::Float(node->at("EnergyStrongValueThreshold"));
+        }
+        inline Ent::Gen::Float RegenerationManager::EvaporationDecreaseSpeed() const
+        {
+            return Ent::Gen::Float(node->at("EvaporationDecreaseSpeed"));
+        }
+        inline Ent::Gen::Float RegenerationManager::EvaporationMaxValue() const
+        {
+            return Ent::Gen::Float(node->at("EvaporationMaxValue"));
+        }
+        inline Ent::Gen::Float RegenerationManager::InjectedEvaporationMultiplier() const
+        {
+            return Ent::Gen::Float(node->at("InjectedEvaporationMultiplier"));
+        }
+        inline Ent::Gen::Manager RegenerationManager::Super() const
+        {
+            return Ent::Gen::Manager(node->at("Super"));
+        }
+        inline Ent::Gen::String RegenerationManager::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EnergyPoolGD_EnergyArea
+        inline Ent::Gen::Vector3 EnergyPoolGD_EnergyArea::CenterOffset() const
+        {
+            return Ent::Gen::Vector3(node->at("CenterOffset"));
+        }
+        inline Ent::Gen::EnergyIntensity EnergyPoolGD_EnergyArea::Intensity() const
+        {
+            return Ent::Gen::EnergyIntensity(node->at("Intensity"));
+        }
+        inline Ent::Gen::Int EnergyPoolGD_EnergyArea::Priority() const
+        {
+            return Ent::Gen::Int(node->at("Priority"));
+        }
+        inline Ent::Gen::Float EnergyPoolGD_EnergyArea::Radius() const
+        {
+            return Ent::Gen::Float(node->at("Radius"));
+        }
+        inline Ent::Gen::String EnergyPoolGD_EnergyArea::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -30866,6 +31142,19 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // FurComponentGD
+        inline Ent::Gen::FurProperties FurComponentGD::Properties() const
+        {
+            return Ent::Gen::FurProperties(node->at("Properties"));
+        }
+        inline Ent::Gen::ComponentGD FurComponentGD::Super() const
+        {
+            return Ent::Gen::ComponentGD(node->at("Super"));
+        }
+        inline Ent::Gen::String FurComponentGD::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // FluidVolumeComponentGD
         inline Ent::Gen::FluidVolumeComponentGD_FluidVolumeData FluidVolumeComponentGD::FluidVolume() const
         {
@@ -31092,6 +31381,10 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // EnergyPoolGD
+        inline Array<Ent::Gen::EnergyPoolGD_EnergyArea> EnergyPoolGD::EnergyAreas() const
+        {
+            return Array<Ent::Gen::EnergyPoolGD_EnergyArea>(node->at("EnergyAreas"));
+        }
         inline Ent::Gen::Bool EnergyPoolGD::FactionOverride() const
         {
             return Ent::Gen::Bool(node->at("FactionOverride"));
@@ -31990,6 +32283,14 @@ namespace Ent
         inline Ent::Gen::FluidVolumeComponentGD Component::setFluidVolumeComponentGD() const
         {
             return Ent::Gen::FluidVolumeComponentGD(node->setUnionType("Component"));
+        }
+        inline std::optional<Ent::Gen::FurComponentGD> Component::FurComponentGD() const
+        {
+            return strcmp(node->getUnionType(), "FurComponentGD") != 0? std::optional<Ent::Gen::FurComponentGD>{}: std::optional<Ent::Gen::FurComponentGD>(node->getUnionData());
+        }
+        inline Ent::Gen::FurComponentGD Component::setFurComponentGD() const
+        {
+            return Ent::Gen::FurComponentGD(node->setUnionType("Component"));
         }
         inline std::optional<Ent::Gen::GameEffectSpawnerGD> Component::GameEffectSpawnerGD() const
         {
@@ -33523,6 +33824,19 @@ namespace Ent
         inline void Object_Components::removeFluidVolumeComponentGD() const
         {
             node->mapErase("FluidVolumeComponentGD");
+        }
+        inline std::optional<Ent::Gen::FurComponentGD> Object_Components::FurComponentGD() const
+        {
+            auto sub = getSubNode("FurComponentGD");
+            return sub == nullptr? std::optional<Ent::Gen::FurComponentGD>{}: std::optional<Ent::Gen::FurComponentGD>(getSubNode("FurComponentGD"));
+        }
+        inline Ent::Gen::FurComponentGD Object_Components::addFurComponentGD() const
+        {
+            return Ent::Gen::FurComponentGD(addSubNode("FurComponentGD"));
+        }
+        inline void Object_Components::removeFurComponentGD() const
+        {
+            node->mapErase("FurComponentGD");
         }
         inline std::optional<Ent::Gen::GameEffectSpawnerGD> Object_Components::GameEffectSpawnerGD() const
         {
@@ -35556,6 +35870,19 @@ namespace Ent
         inline void Components::removeFluidVolumeComponentGD() const
         {
             node->mapErase("FluidVolumeComponentGD");
+        }
+        inline std::optional<Ent::Gen::FurComponentGD> Components::FurComponentGD() const
+        {
+            auto sub = getSubNode("FurComponentGD");
+            return sub == nullptr? std::optional<Ent::Gen::FurComponentGD>{}: std::optional<Ent::Gen::FurComponentGD>(getSubNode("FurComponentGD"));
+        }
+        inline Ent::Gen::FurComponentGD Components::addFurComponentGD() const
+        {
+            return Ent::Gen::FurComponentGD(addSubNode("FurComponentGD"));
+        }
+        inline void Components::removeFurComponentGD() const
+        {
+            node->mapErase("FurComponentGD");
         }
         inline std::optional<Ent::Gen::GameEffectSpawnerGD> Components::GameEffectSpawnerGD() const
         {
@@ -45089,6 +45416,10 @@ namespace Ent
         inline Ent::Gen::Int RenderManager_RenderConfig::EnableLensFlare() const
         {
             return Ent::Gen::Int(node->at("EnableLensFlare"));
+        }
+        inline Ent::Gen::Int RenderManager_RenderConfig::EnableMTR() const
+        {
+            return Ent::Gen::Int(node->at("EnableMTR"));
         }
         inline Ent::Gen::Int RenderManager_RenderConfig::EnableMotionBlur() const
         {

@@ -2860,6 +2860,36 @@ class ResponsiblePointer_ActorState_(Union):
 
 
 from EntityLibPy import Node
+
+class RegenerationManager_EnergyAreaSetting(HelperObject):
+    schema_name = "RegenerationManager::EnergyAreaSetting"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->RegenerationManager_EnergyAreaSetting
+        return RegenerationManager_EnergyAreaSetting(entlib.load_node_file(sourcefile, entlib.get_schema(RegenerationManager_EnergyAreaSetting.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->RegenerationManager_EnergyAreaSetting
+        return RegenerationManager_EnergyAreaSetting(entlib.make_node(RegenerationManager_EnergyAreaSetting.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def RegenValue(self):  # type: ()->Float
+        return Float(self._node.at("RegenValue"))
+    @RegenValue.setter
+    def RegenValue(self, val): self.RegenValue.set(val)
+    @property
+    def SmoothMargin(self):  # type: ()->Float
+        return Float(self._node.at("SmoothMargin"))
+    @SmoothMargin.setter
+    def SmoothMargin(self, val): self.SmoothMargin.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
 class RegenSwitchBehaviorEnum(Enum):
     CrossFade = "CrossFade"
     CrossMetamorphosis = "CrossMetamorphosis"
@@ -5284,94 +5314,6 @@ class VisualManager(HelperObject):
 
 from EntityLibPy import Node
 
-class VelocityObstaclesManager(HelperObject):
-    schema_name = "VelocityObstaclesManager"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->VelocityObstaclesManager
-        return VelocityObstaclesManager(entlib.load_node_file(sourcefile, entlib.get_schema(VelocityObstaclesManager.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->VelocityObstaclesManager
-        return VelocityObstaclesManager(entlib.make_node(VelocityObstaclesManager.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def AcceptableAccelerationForAvoidance(self):  # type: ()->Float
-        return Float(self._node.at("AcceptableAccelerationForAvoidance"))
-    @AcceptableAccelerationForAvoidance.setter
-    def AcceptableAccelerationForAvoidance(self, val): self.AcceptableAccelerationForAvoidance.set(val)
-    @property
-    def Active(self):  # type: ()->Bool
-        return Bool(self._node.at("Active"))
-    @Active.setter
-    def Active(self, val): self.Active.set(val)
-    @property
-    def AvoidanceRadiusAdaptabilityFactor(self):  # type: ()->Float
-        return Float(self._node.at("AvoidanceRadiusAdaptabilityFactor"))
-    @AvoidanceRadiusAdaptabilityFactor.setter
-    def AvoidanceRadiusAdaptabilityFactor(self, val): self.AvoidanceRadiusAdaptabilityFactor.set(val)
-    @property
-    def RunningSpeed(self):  # type: ()->Float
-        return Float(self._node.at("RunningSpeed"))
-    @RunningSpeed.setter
-    def RunningSpeed(self, val): self.RunningSpeed.set(val)
-    @property
-    def SimMaxNeighbors(self):  # type: ()->Int
-        return Int(self._node.at("SimMaxNeighbors"))
-    @SimMaxNeighbors.setter
-    def SimMaxNeighbors(self, val): self.SimMaxNeighbors.set(val)
-    @property
-    def SimMaxSpeed(self):  # type: ()->Float
-        return Float(self._node.at("SimMaxSpeed"))
-    @SimMaxSpeed.setter
-    def SimMaxSpeed(self, val): self.SimMaxSpeed.set(val)
-    @property
-    def SimNeighborDist(self):  # type: ()->Float
-        return Float(self._node.at("SimNeighborDist"))
-    @SimNeighborDist.setter
-    def SimNeighborDist(self, val): self.SimNeighborDist.set(val)
-    @property
-    def SimPrefSpeedFactor(self):  # type: ()->Float
-        return Float(self._node.at("SimPrefSpeedFactor"))
-    @SimPrefSpeedFactor.setter
-    def SimPrefSpeedFactor(self, val): self.SimPrefSpeedFactor.set(val)
-    @property
-    def SimRadius(self):  # type: ()->Float
-        return Float(self._node.at("SimRadius"))
-    @SimRadius.setter
-    def SimRadius(self, val): self.SimRadius.set(val)
-    @property
-    def SimSlowDownWhenAvoiding(self):  # type: ()->Int
-        return Int(self._node.at("SimSlowDownWhenAvoiding"))
-    @SimSlowDownWhenAvoiding.setter
-    def SimSlowDownWhenAvoiding(self, val): self.SimSlowDownWhenAvoiding.set(val)
-    @property
-    def SimTimeHorizon(self):  # type: ()->Float
-        return Float(self._node.at("SimTimeHorizon"))
-    @SimTimeHorizon.setter
-    def SimTimeHorizon(self, val): self.SimTimeHorizon.set(val)
-    @property
-    def SimTimeHorizonObst(self):  # type: ()->Float
-        return Float(self._node.at("SimTimeHorizonObst"))
-    @SimTimeHorizonObst.setter
-    def SimTimeHorizonObst(self, val): self.SimTimeHorizonObst.set(val)
-    @property
-    def Super(self):  # type: ()->Manager
-        return Manager(self._node.at("Super"))
-    @property
-    def WalkingSpeed(self):  # type: ()->Float
-        return Float(self._node.at("WalkingSpeed"))
-    @WalkingSpeed.setter
-    def WalkingSpeed(self, val): self.WalkingSpeed.set(val)
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
 class VegetationManager(HelperObject):
     schema_name = "VegetationManager"
     @staticmethod
@@ -5790,69 +5732,6 @@ class RegionManager(HelperObject):
         return RegionManager(entlib.make_node(RegionManager.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
-    @property
-    def Super(self):  # type: ()->Manager
-        return Manager(self._node.at("Super"))
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
-class RegenerationManager(HelperObject):
-    schema_name = "RegenerationManager"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->RegenerationManager
-        return RegenerationManager(entlib.load_node_file(sourcefile, entlib.get_schema(RegenerationManager.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->RegenerationManager
-        return RegenerationManager(entlib.make_node(RegenerationManager.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def DefaultLostRatio(self):  # type: ()->Float
-        return Float(self._node.at("DefaultLostRatio"))
-    @DefaultLostRatio.setter
-    def DefaultLostRatio(self, val): self.DefaultLostRatio.set(val)
-    @property
-    def DefaultMaxLossPerSecond(self):  # type: ()->Float
-        return Float(self._node.at("DefaultMaxLossPerSecond"))
-    @DefaultMaxLossPerSecond.setter
-    def DefaultMaxLossPerSecond(self, val): self.DefaultMaxLossPerSecond.set(val)
-    @property
-    def DefaultMaxTransmissionPerSecond(self):  # type: ()->Float
-        return Float(self._node.at("DefaultMaxTransmissionPerSecond"))
-    @DefaultMaxTransmissionPerSecond.setter
-    def DefaultMaxTransmissionPerSecond(self, val): self.DefaultMaxTransmissionPerSecond.set(val)
-    @property
-    def DefaultTransmittedRatio(self):  # type: ()->Float
-        return Float(self._node.at("DefaultTransmittedRatio"))
-    @DefaultTransmittedRatio.setter
-    def DefaultTransmittedRatio(self, val): self.DefaultTransmittedRatio.set(val)
-    @property
-    def EnergyMaxValue(self):  # type: ()->Float
-        return Float(self._node.at("EnergyMaxValue"))
-    @EnergyMaxValue.setter
-    def EnergyMaxValue(self, val): self.EnergyMaxValue.set(val)
-    @property
-    def EvaporationDecreaseSpeed(self):  # type: ()->Float
-        return Float(self._node.at("EvaporationDecreaseSpeed"))
-    @EvaporationDecreaseSpeed.setter
-    def EvaporationDecreaseSpeed(self, val): self.EvaporationDecreaseSpeed.set(val)
-    @property
-    def EvaporationMaxValue(self):  # type: ()->Float
-        return Float(self._node.at("EvaporationMaxValue"))
-    @EvaporationMaxValue.setter
-    def EvaporationMaxValue(self, val): self.EvaporationMaxValue.set(val)
-    @property
-    def InjectedEvaporationMultiplier(self):  # type: ()->Float
-        return Float(self._node.at("InjectedEvaporationMultiplier"))
-    @InjectedEvaporationMultiplier.setter
-    def InjectedEvaporationMultiplier(self, val): self.InjectedEvaporationMultiplier.set(val)
     @property
     def Super(self):  # type: ()->Manager
         return Manager(self._node.at("Super"))
@@ -7787,6 +7666,121 @@ class GrowingState(Primitive[GrowingStateEnum]):  # Enum
 
 
 from EntityLibPy import Node
+class GroupAvoidanceEnumEnum(Enum):
+    lush = "lush"
+    corrupted = "corrupted"
+    tiny = "tiny"
+    small = "small"
+    medium = "medium"
+    big = "big"
+    enormous = "enormous"
+    GroupAvoidanceEnum_COUNT = "GroupAvoidanceEnum_COUNT"
+
+
+class GroupAvoidanceEnum(Primitive[GroupAvoidanceEnumEnum]):  # Enum
+    def __init__(self, node):
+        super(GroupAvoidanceEnum, self).__init__(GroupAvoidanceEnumEnum, node)
+    schema_name = "GroupAvoidanceEnum"
+    def __call__(self, node):  # type: (EntityLibPy.Node) -> GroupAvoidanceEnum
+        return GroupAvoidanceEnum(node)
+    def set(self, val):  # type: (GroupAvoidanceEnumEnum) -> None
+        return self._node.set_string(val.value)
+    def get(self):  # type: () -> T
+        return self._item_type(self._node.value)
+
+
+from EntityLibPy import Node
+
+class VelocityObstaclesManager(HelperObject):
+    schema_name = "VelocityObstaclesManager"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->VelocityObstaclesManager
+        return VelocityObstaclesManager(entlib.load_node_file(sourcefile, entlib.get_schema(VelocityObstaclesManager.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->VelocityObstaclesManager
+        return VelocityObstaclesManager(entlib.make_node(VelocityObstaclesManager.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def AcceptableAccelerationForAvoidance(self):  # type: ()->Float
+        return Float(self._node.at("AcceptableAccelerationForAvoidance"))
+    @AcceptableAccelerationForAvoidance.setter
+    def AcceptableAccelerationForAvoidance(self, val): self.AcceptableAccelerationForAvoidance.set(val)
+    @property
+    def Active(self):  # type: ()->Bool
+        return Bool(self._node.at("Active"))
+    @Active.setter
+    def Active(self, val): self.Active.set(val)
+    @property
+    def AvoidanceRadiusAdaptabilityFactor(self):  # type: ()->Float
+        return Float(self._node.at("AvoidanceRadiusAdaptabilityFactor"))
+    @AvoidanceRadiusAdaptabilityFactor.setter
+    def AvoidanceRadiusAdaptabilityFactor(self, val): self.AvoidanceRadiusAdaptabilityFactor.set(val)
+    @property
+    def GroupsAvoidanceIgnoredBySize(self):  # type: ()->Map[SizeEnum, PrimArray[GroupAvoidanceEnum]]
+        return (lambda n: Map(SizeEnum, (lambda n: PrimArray(GroupAvoidanceEnum, n)), n))(self._node.at("GroupsAvoidanceIgnoredBySize"))
+    @property
+    def RunningSpeed(self):  # type: ()->Float
+        return Float(self._node.at("RunningSpeed"))
+    @RunningSpeed.setter
+    def RunningSpeed(self, val): self.RunningSpeed.set(val)
+    @property
+    def SimMaxNeighbors(self):  # type: ()->Int
+        return Int(self._node.at("SimMaxNeighbors"))
+    @SimMaxNeighbors.setter
+    def SimMaxNeighbors(self, val): self.SimMaxNeighbors.set(val)
+    @property
+    def SimMaxSpeed(self):  # type: ()->Float
+        return Float(self._node.at("SimMaxSpeed"))
+    @SimMaxSpeed.setter
+    def SimMaxSpeed(self, val): self.SimMaxSpeed.set(val)
+    @property
+    def SimNeighborDist(self):  # type: ()->Float
+        return Float(self._node.at("SimNeighborDist"))
+    @SimNeighborDist.setter
+    def SimNeighborDist(self, val): self.SimNeighborDist.set(val)
+    @property
+    def SimPrefSpeedFactor(self):  # type: ()->Float
+        return Float(self._node.at("SimPrefSpeedFactor"))
+    @SimPrefSpeedFactor.setter
+    def SimPrefSpeedFactor(self, val): self.SimPrefSpeedFactor.set(val)
+    @property
+    def SimRadius(self):  # type: ()->Float
+        return Float(self._node.at("SimRadius"))
+    @SimRadius.setter
+    def SimRadius(self, val): self.SimRadius.set(val)
+    @property
+    def SimSlowDownWhenAvoiding(self):  # type: ()->Int
+        return Int(self._node.at("SimSlowDownWhenAvoiding"))
+    @SimSlowDownWhenAvoiding.setter
+    def SimSlowDownWhenAvoiding(self, val): self.SimSlowDownWhenAvoiding.set(val)
+    @property
+    def SimTimeHorizon(self):  # type: ()->Float
+        return Float(self._node.at("SimTimeHorizon"))
+    @SimTimeHorizon.setter
+    def SimTimeHorizon(self, val): self.SimTimeHorizon.set(val)
+    @property
+    def SimTimeHorizonObst(self):  # type: ()->Float
+        return Float(self._node.at("SimTimeHorizonObst"))
+    @SimTimeHorizonObst.setter
+    def SimTimeHorizonObst(self, val): self.SimTimeHorizonObst.set(val)
+    @property
+    def Super(self):  # type: ()->Manager
+        return Manager(self._node.at("Super"))
+    @property
+    def WalkingSpeed(self):  # type: ()->Float
+        return Float(self._node.at("WalkingSpeed"))
+    @WalkingSpeed.setter
+    def WalkingSpeed(self, val): self.WalkingSpeed.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
 
 class GroundTypeData(HelperObject):
     schema_name = "GroundTypeData"
@@ -9198,6 +9192,56 @@ class GPEType(Primitive[GPETypeEnum]):  # Enum
 
 from EntityLibPy import Node
 
+class FurProperties(HelperObject):
+    schema_name = "FurProperties"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->FurProperties
+        return FurProperties(entlib.load_node_file(sourcefile, entlib.get_schema(FurProperties.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->FurProperties
+        return FurProperties(entlib.make_node(FurProperties.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def FinsMaskUScale(self):  # type: ()->Float
+        return Float(self._node.at("FinsMaskUScale"))
+    @FinsMaskUScale.setter
+    def FinsMaskUScale(self, val): self.FinsMaskUScale.set(val)
+    @property
+    def FinsTextureArrayIndex(self):  # type: ()->Int
+        return Int(self._node.at("FinsTextureArrayIndex"))
+    @FinsTextureArrayIndex.setter
+    def FinsTextureArrayIndex(self, val): self.FinsTextureArrayIndex.set(val)
+    @property
+    def Roughness(self):  # type: ()->Float
+        return Float(self._node.at("Roughness"))
+    @Roughness.setter
+    def Roughness(self, val): self.Roughness.set(val)
+    @property
+    def Stiffness(self):  # type: ()->Float
+        return Float(self._node.at("Stiffness"))
+    @Stiffness.setter
+    def Stiffness(self, val): self.Stiffness.set(val)
+    @property
+    def Thickness(self):  # type: ()->Float
+        return Float(self._node.at("Thickness"))
+    @Thickness.setter
+    def Thickness(self, val): self.Thickness.set(val)
+    @property
+    def Weight(self):  # type: ()->Float
+        return Float(self._node.at("Weight"))
+    @Weight.setter
+    def Weight(self, val): self.Weight.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class FreezeData(HelperObject):
     schema_name = "FreezeData"
     @staticmethod
@@ -10329,6 +10373,26 @@ class EntityID(HelperObject):
 
 
 from EntityLibPy import Node
+class EnergyValueEnum(Enum):
+    corrupted_strong = "corrupted_strong"
+    corrupted = "corrupted"
+    lush = "lush"
+    lush_strong = "lush_strong"
+
+
+class EnergyValue(Primitive[EnergyValueEnum]):  # Enum
+    def __init__(self, node):
+        super(EnergyValue, self).__init__(EnergyValueEnum, node)
+    schema_name = "EnergyValue"
+    def __call__(self, node):  # type: (EntityLibPy.Node) -> EnergyValue
+        return EnergyValue(node)
+    def set(self, val):  # type: (EnergyValueEnum) -> None
+        return self._node.set_string(val.value)
+    def get(self):  # type: () -> T
+        return self._item_type(self._node.value)
+
+
+from EntityLibPy import Node
 class EnergySideEnum(Enum):
     none = "none"
     lush = "lush"
@@ -10377,6 +10441,141 @@ class TaggingVegetation(HelperObject):
         return (lambda n: PrimArray(String, n))(self._node.at("VegetationTags"))
     @VegetationTags.setter
     def VegetationTags(self, val): self.VegetationTags.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+class EnergyIntensityEnum(Enum):
+    normal = "normal"
+    strong = "strong"
+    COUNT = "COUNT"
+
+
+class EnergyIntensity(Primitive[EnergyIntensityEnum]):  # Enum
+    def __init__(self, node):
+        super(EnergyIntensity, self).__init__(EnergyIntensityEnum, node)
+    schema_name = "EnergyIntensity"
+    def __call__(self, node):  # type: (EntityLibPy.Node) -> EnergyIntensity
+        return EnergyIntensity(node)
+    def set(self, val):  # type: (EnergyIntensityEnum) -> None
+        return self._node.set_string(val.value)
+    def get(self):  # type: () -> T
+        return self._item_type(self._node.value)
+
+
+from EntityLibPy import Node
+
+class RegenerationManager(HelperObject):
+    schema_name = "RegenerationManager"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->RegenerationManager
+        return RegenerationManager(entlib.load_node_file(sourcefile, entlib.get_schema(RegenerationManager.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->RegenerationManager
+        return RegenerationManager(entlib.make_node(RegenerationManager.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def BackgroundEnergyValue(self):  # type: ()->EnergyValue
+        return EnergyValue(self._node.at("BackgroundEnergyValue"))
+    @BackgroundEnergyValue.setter
+    def BackgroundEnergyValue(self, val): self.BackgroundEnergyValue.set(val)
+    @property
+    def DefaultLostRatio(self):  # type: ()->Float
+        return Float(self._node.at("DefaultLostRatio"))
+    @DefaultLostRatio.setter
+    def DefaultLostRatio(self, val): self.DefaultLostRatio.set(val)
+    @property
+    def DefaultMaxLossPerSecond(self):  # type: ()->Float
+        return Float(self._node.at("DefaultMaxLossPerSecond"))
+    @DefaultMaxLossPerSecond.setter
+    def DefaultMaxLossPerSecond(self, val): self.DefaultMaxLossPerSecond.set(val)
+    @property
+    def DefaultMaxTransmissionPerSecond(self):  # type: ()->Float
+        return Float(self._node.at("DefaultMaxTransmissionPerSecond"))
+    @DefaultMaxTransmissionPerSecond.setter
+    def DefaultMaxTransmissionPerSecond(self, val): self.DefaultMaxTransmissionPerSecond.set(val)
+    @property
+    def DefaultTransmittedRatio(self):  # type: ()->Float
+        return Float(self._node.at("DefaultTransmittedRatio"))
+    @DefaultTransmittedRatio.setter
+    def DefaultTransmittedRatio(self, val): self.DefaultTransmittedRatio.set(val)
+    @property
+    def EnergyAreaSettingsMap(self):  # type: ()->Map[EnergyIntensityEnum, RegenerationManager_EnergyAreaSetting]
+        return (lambda n: Map(EnergyIntensityEnum, RegenerationManager_EnergyAreaSetting, n))(self._node.at("EnergyAreaSettingsMap"))
+    @property
+    def EnergyMaxValue(self):  # type: ()->Float
+        return Float(self._node.at("EnergyMaxValue"))
+    @EnergyMaxValue.setter
+    def EnergyMaxValue(self, val): self.EnergyMaxValue.set(val)
+    @property
+    def EnergyStrongValueThreshold(self):  # type: ()->Float
+        return Float(self._node.at("EnergyStrongValueThreshold"))
+    @EnergyStrongValueThreshold.setter
+    def EnergyStrongValueThreshold(self, val): self.EnergyStrongValueThreshold.set(val)
+    @property
+    def EvaporationDecreaseSpeed(self):  # type: ()->Float
+        return Float(self._node.at("EvaporationDecreaseSpeed"))
+    @EvaporationDecreaseSpeed.setter
+    def EvaporationDecreaseSpeed(self, val): self.EvaporationDecreaseSpeed.set(val)
+    @property
+    def EvaporationMaxValue(self):  # type: ()->Float
+        return Float(self._node.at("EvaporationMaxValue"))
+    @EvaporationMaxValue.setter
+    def EvaporationMaxValue(self, val): self.EvaporationMaxValue.set(val)
+    @property
+    def InjectedEvaporationMultiplier(self):  # type: ()->Float
+        return Float(self._node.at("InjectedEvaporationMultiplier"))
+    @InjectedEvaporationMultiplier.setter
+    def InjectedEvaporationMultiplier(self, val): self.InjectedEvaporationMultiplier.set(val)
+    @property
+    def Super(self):  # type: ()->Manager
+        return Manager(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EnergyPoolGD_EnergyArea(HelperObject):
+    schema_name = "EnergyPoolGD::EnergyArea"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EnergyPoolGD_EnergyArea
+        return EnergyPoolGD_EnergyArea(entlib.load_node_file(sourcefile, entlib.get_schema(EnergyPoolGD_EnergyArea.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EnergyPoolGD_EnergyArea
+        return EnergyPoolGD_EnergyArea(entlib.make_node(EnergyPoolGD_EnergyArea.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def CenterOffset(self):  # type: ()->Vector3
+        return Vector3(self._node.at("CenterOffset"))
+    @CenterOffset.setter
+    def CenterOffset(self, val): self.CenterOffset.set(val)
+    @property
+    def Intensity(self):  # type: ()->EnergyIntensity
+        return EnergyIntensity(self._node.at("Intensity"))
+    @Intensity.setter
+    def Intensity(self, val): self.Intensity.set(val)
+    @property
+    def Priority(self):  # type: ()->Int
+        return Int(self._node.at("Priority"))
+    @Priority.setter
+    def Priority(self, val): self.Priority.set(val)
+    @property
+    def Radius(self):  # type: ()->Float
+        return Float(self._node.at("Radius"))
+    @Radius.setter
+    def Radius(self, val): self.Radius.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
@@ -15806,6 +16005,32 @@ class GameEffectSpawnerGD(HelperObject):
 
 from EntityLibPy import Node
 
+class FurComponentGD(HelperObject):
+    schema_name = "FurComponentGD"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->FurComponentGD
+        return FurComponentGD(entlib.load_node_file(sourcefile, entlib.get_schema(FurComponentGD.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->FurComponentGD
+        return FurComponentGD(entlib.make_node(FurComponentGD.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Properties(self):  # type: ()->FurProperties
+        return FurProperties(self._node.at("Properties"))
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class FluidVolumeComponentGD(HelperObject):
     schema_name = "FluidVolumeComponentGD"
     @staticmethod
@@ -16244,6 +16469,9 @@ class EnergyPoolGD(HelperObject):
         return EnergyPoolGD(entlib.make_node(EnergyPoolGD.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def EnergyAreas(self):  # type: ()->Array[EnergyPoolGD_EnergyArea]
+        return (lambda n: Array(EnergyPoolGD_EnergyArea, n))(self._node.at("EnergyAreas"))
     @property
     def FactionOverride(self):  # type: ()->Bool
         return Bool(self._node.at("FactionOverride"))
@@ -32399,6 +32627,11 @@ class RenderManager_RenderConfig(HelperObject):
         return Int(self._node.at("EnableLensFlare"))
     @EnableLensFlare.setter
     def EnableLensFlare(self, val): self.EnableLensFlare.set(val)
+    @property
+    def EnableMTR(self):  # type: ()->Int
+        return Int(self._node.at("EnableMTR"))
+    @EnableMTR.setter
+    def EnableMTR(self, val): self.EnableMTR.set(val)
     @property
     def EnableMotionBlur(self):  # type: ()->Int
         return Int(self._node.at("EnableMotionBlur"))

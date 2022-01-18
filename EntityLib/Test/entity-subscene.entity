@@ -123,9 +123,7 @@
                         "Name": "wolf_full_fire",
                         "Thumbnail": "02_Creature/Wolf/MALE/cloththin/BodyWolfBlack/cloth_body.wthumb"
                     }
-                ],
-                "File": "",
-                "isEmbedded": true
+                ]
             },
             "Type": "SubScene"
         }

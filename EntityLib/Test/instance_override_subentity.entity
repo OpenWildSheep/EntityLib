@@ -20,8 +20,6 @@
 		{
 			"Type": "SubScene",
 			"Data": {
-				"isEmbedded": true,
-				"File": "",
 				"Embedded": [
 					{
 						"Name": "EP1-Spout_LINK_001",

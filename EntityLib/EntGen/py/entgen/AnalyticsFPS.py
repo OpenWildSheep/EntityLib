@@ -20,10 +20,15 @@ class AnalyticsFPS(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def Interval(self):  # type: ()->Float
-        return Float(self._node.at("Interval"))
-    @Interval.setter
-    def Interval(self, val): self.Interval.set(val)
+    def TeleportationDistance(self):  # type: ()->Float
+        return Float(self._node.at("TeleportationDistance"))
+    @TeleportationDistance.setter
+    def TeleportationDistance(self, val): self.TeleportationDistance.set(val)
+    @property
+    def TeleportationInterval(self):  # type: ()->Float
+        return Float(self._node.at("TeleportationInterval"))
+    @TeleportationInterval.setter
+    def TeleportationInterval(self, val): self.TeleportationInterval.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

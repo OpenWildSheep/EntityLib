@@ -1231,6 +1231,7 @@ namespace Ent
         };
         struct ActorState;
         struct EntityStateWallRunJump;
+        struct EntityStateWallRunDrop;
         struct EntityStateWallRun;
         struct EntityStateVoxelsVolume;
         struct EntityStateUndergroundCavity;
@@ -1674,6 +1675,8 @@ namespace Ent
             levitatemove,
             aim,
             wallrun,
+            wallrunjump,
+            wallrundrop,
             aimcharge,
             aimcharged,
             aimflow,
@@ -8623,6 +8626,11 @@ namespace Ent
             }
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String _comment() const;
+            Ent::Gen::Float dropAirControlDelay() const;
+            Ent::Gen::Float dropCoyoteJumpMaxTime() const;
+            Ent::Gen::Float dropTrajectoryRotationYaw() const;
+            Ent::Gen::Float dropVisualRotationYawRateFactor() const;
+            Ent::Gen::Float jumpRiseMinCoeffToEnter() const;
             Ent::Gen::Float jumpTrajectoryRotationYaw() const;
             Ent::Gen::Float jumpVisualRotationYawRateFactor() const;
             Ent::Gen::Float probeLengthCoeff() const;
@@ -8640,7 +8648,7 @@ namespace Ent
             Ent::Gen::Float runSlopeAngleHysteresis() const;
             Ent::Gen::Float runSlopeAngleMax() const;
             Ent::Gen::Float runSlopeAngleMin() const;
-            Ent::Gen::Float runTrajectoryRotationPitch() const;
+            Ent::Gen::String runTrajectoryRotationPitchCurveResourcePath() const;
             Ent::Gen::Float runTrajectoryRotationYaw() const;
             Ent::Gen::Float runVerticalSpeedNormMaxToEnter() const;
             Ent::Gen::Float runVerticalSpeedNormMinToEnter() const;
@@ -15060,6 +15068,7 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::String _comment() const;
+            Ent::Gen::String collection() const;
             Ent::Gen::String database() const;
             Ent::Gen::String uri() const;
         };
@@ -15176,7 +15185,6 @@ namespace Ent
             Ent::Gen::ActorStates ActorStates() const;
             Ent::Gen::Color Color() const;
             Ent::Gen::Object_Components Components() const;
-            Ent::Gen::String InstanceOf() const;
             Ent::Gen::Object_MaxActivationLevel MaxActivationLevel() const;
             Ent::Gen::String Name() const;
             Ent::Gen::String Thumbnail() const;
@@ -15218,7 +15226,6 @@ namespace Ent
             Ent::Gen::ActorStates ActorStates() const;
             Ent::Gen::Color Color() const;
             Ent::Gen::Components Components() const;
-            Ent::Gen::String InstanceOf() const;
             Ent::Gen::MaxActivationLevel MaxActivationLevel() const;
             Ent::Gen::String Name() const;
             Ent::Gen::String Thumbnail() const;
@@ -15238,10 +15245,8 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::ObjectSet<char const*, Ent::Gen::Entity> Embedded() const;
-            Ent::Gen::String File() const;
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String _comment() const;
-            Ent::Gen::Bool isEmbedded() const;
         };
 
         struct Scene : HelperObject // Object
@@ -15367,6 +15372,22 @@ namespace Ent
         {
             EntityStateWallRunJump(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "EntityStateWallRunJump";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EntityStateWallRunDrop : HelperObject // Object
+        {
+            EntityStateWallRunDrop(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateWallRunDrop";
             static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
@@ -20475,6 +20496,8 @@ namespace Ent
                 "levitatemove",
                 "aim",
                 "wallrun",
+                "wallrunjump",
+                "wallrundrop",
                 "aimcharge",
                 "aimcharged",
                 "aimflow",
@@ -21298,7 +21321,8 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::Float Interval() const;
+            Ent::Gen::Float TeleportationDistance() const;
+            Ent::Gen::Float TeleportationInterval() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -22141,15 +22165,15 @@ namespace Ent
         }
         inline Ent::Gen::String variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::setstring() const
         {
-            return Ent::Gen::String(node->setUnionType("variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Ent::Gen::String(node->setUnionType("string"));
         }
         inline std::optional<Ent::Gen::Bool> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::bool_() const
         {
-            return strcmp(node->getUnionType(), "bool_") != 0? std::optional<Ent::Gen::Bool>{}: std::optional<Ent::Gen::Bool>(node->getUnionData());
+            return strcmp(node->getUnionType(), "bool") != 0? std::optional<Ent::Gen::Bool>{}: std::optional<Ent::Gen::Bool>(node->getUnionData());
         }
         inline Ent::Gen::Bool variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::setbool_() const
         {
-            return Ent::Gen::Bool(node->setUnionType("variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Ent::Gen::Bool(node->setUnionType("bool"));
         }
         inline std::optional<Ent::Gen::Int> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::s32() const
         {
@@ -22157,15 +22181,15 @@ namespace Ent
         }
         inline Ent::Gen::Int variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::sets32() const
         {
-            return Ent::Gen::Int(node->setUnionType("variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Ent::Gen::Int(node->setUnionType("s32"));
         }
         inline std::optional<Ent::Gen::Float> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::float_() const
         {
-            return strcmp(node->getUnionType(), "float_") != 0? std::optional<Ent::Gen::Float>{}: std::optional<Ent::Gen::Float>(node->getUnionData());
+            return strcmp(node->getUnionType(), "float") != 0? std::optional<Ent::Gen::Float>{}: std::optional<Ent::Gen::Float>(node->getUnionData());
         }
         inline Ent::Gen::Float variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::setfloat_() const
         {
-            return Ent::Gen::Float(node->setUnionType("variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Ent::Gen::Float(node->setUnionType("float"));
         }
         inline std::optional<Ent::Gen::Vector2> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::Vector2() const
         {
@@ -22173,7 +22197,7 @@ namespace Ent
         }
         inline Ent::Gen::Vector2 variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::setVector2() const
         {
-            return Ent::Gen::Vector2(node->setUnionType("variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Ent::Gen::Vector2(node->setUnionType("Vector2"));
         }
         inline std::optional<Ent::Gen::Vector3> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::Vector3() const
         {
@@ -22181,7 +22205,7 @@ namespace Ent
         }
         inline Ent::Gen::Vector3 variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::setVector3() const
         {
-            return Ent::Gen::Vector3(node->setUnionType("variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Ent::Gen::Vector3(node->setUnionType("Vector3"));
         }
         inline std::optional<Ent::Gen::Position> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::Position() const
         {
@@ -22189,63 +22213,63 @@ namespace Ent
         }
         inline Ent::Gen::Position variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::setPosition() const
         {
-            return Ent::Gen::Position(node->setUnionType("variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Ent::Gen::Position(node->setUnionType("Position"));
         }
         inline std::optional<PrimArray<Ent::Gen::String>> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::stringVec() const
         {
-            return strcmp(node->getUnionType(), "stringVec") != 0? std::optional<PrimArray<Ent::Gen::String>>{}: std::optional<PrimArray<Ent::Gen::String>>(node->getUnionData());
+            return strcmp(node->getUnionType(), "vector<string>") != 0? std::optional<PrimArray<Ent::Gen::String>>{}: std::optional<PrimArray<Ent::Gen::String>>(node->getUnionData());
         }
         inline PrimArray<Ent::Gen::String> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::setstringVec() const
         {
-            return PrimArray<Ent::Gen::String>(node->setUnionType("variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return PrimArray<Ent::Gen::String>(node->setUnionType("vector<string>"));
         }
         inline std::optional<PrimArray<Ent::Gen::Bool>> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::boolVec() const
         {
-            return strcmp(node->getUnionType(), "boolVec") != 0? std::optional<PrimArray<Ent::Gen::Bool>>{}: std::optional<PrimArray<Ent::Gen::Bool>>(node->getUnionData());
+            return strcmp(node->getUnionType(), "vector<bool>") != 0? std::optional<PrimArray<Ent::Gen::Bool>>{}: std::optional<PrimArray<Ent::Gen::Bool>>(node->getUnionData());
         }
         inline PrimArray<Ent::Gen::Bool> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::setboolVec() const
         {
-            return PrimArray<Ent::Gen::Bool>(node->setUnionType("variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return PrimArray<Ent::Gen::Bool>(node->setUnionType("vector<bool>"));
         }
         inline std::optional<PrimArray<Ent::Gen::Int>> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::s32Vec() const
         {
-            return strcmp(node->getUnionType(), "s32Vec") != 0? std::optional<PrimArray<Ent::Gen::Int>>{}: std::optional<PrimArray<Ent::Gen::Int>>(node->getUnionData());
+            return strcmp(node->getUnionType(), "vector<s32>") != 0? std::optional<PrimArray<Ent::Gen::Int>>{}: std::optional<PrimArray<Ent::Gen::Int>>(node->getUnionData());
         }
         inline PrimArray<Ent::Gen::Int> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::sets32Vec() const
         {
-            return PrimArray<Ent::Gen::Int>(node->setUnionType("variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return PrimArray<Ent::Gen::Int>(node->setUnionType("vector<s32>"));
         }
         inline std::optional<PrimArray<Ent::Gen::Float>> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::floatVec() const
         {
-            return strcmp(node->getUnionType(), "floatVec") != 0? std::optional<PrimArray<Ent::Gen::Float>>{}: std::optional<PrimArray<Ent::Gen::Float>>(node->getUnionData());
+            return strcmp(node->getUnionType(), "vector<float>") != 0? std::optional<PrimArray<Ent::Gen::Float>>{}: std::optional<PrimArray<Ent::Gen::Float>>(node->getUnionData());
         }
         inline PrimArray<Ent::Gen::Float> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::setfloatVec() const
         {
-            return PrimArray<Ent::Gen::Float>(node->setUnionType("variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return PrimArray<Ent::Gen::Float>(node->setUnionType("vector<float>"));
         }
         inline std::optional<Array<Ent::Gen::Vector2>> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::Vector2Vec() const
         {
-            return strcmp(node->getUnionType(), "Vector2Vec") != 0? std::optional<Array<Ent::Gen::Vector2>>{}: std::optional<Array<Ent::Gen::Vector2>>(node->getUnionData());
+            return strcmp(node->getUnionType(), "vector<Vector2>") != 0? std::optional<Array<Ent::Gen::Vector2>>{}: std::optional<Array<Ent::Gen::Vector2>>(node->getUnionData());
         }
         inline Array<Ent::Gen::Vector2> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::setVector2Vec() const
         {
-            return Array<Ent::Gen::Vector2>(node->setUnionType("variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Array<Ent::Gen::Vector2>(node->setUnionType("vector<Vector2>"));
         }
         inline std::optional<Array<Ent::Gen::Vector3>> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::Vector3Vec() const
         {
-            return strcmp(node->getUnionType(), "Vector3Vec") != 0? std::optional<Array<Ent::Gen::Vector3>>{}: std::optional<Array<Ent::Gen::Vector3>>(node->getUnionData());
+            return strcmp(node->getUnionType(), "vector<Vector3>") != 0? std::optional<Array<Ent::Gen::Vector3>>{}: std::optional<Array<Ent::Gen::Vector3>>(node->getUnionData());
         }
         inline Array<Ent::Gen::Vector3> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::setVector3Vec() const
         {
-            return Array<Ent::Gen::Vector3>(node->setUnionType("variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Array<Ent::Gen::Vector3>(node->setUnionType("vector<Vector3>"));
         }
         inline std::optional<Array<Ent::Gen::Position>> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::PositionVec() const
         {
-            return strcmp(node->getUnionType(), "PositionVec") != 0? std::optional<Array<Ent::Gen::Position>>{}: std::optional<Array<Ent::Gen::Position>>(node->getUnionData());
+            return strcmp(node->getUnionType(), "vector<Position>") != 0? std::optional<Array<Ent::Gen::Position>>{}: std::optional<Array<Ent::Gen::Position>>(node->getUnionData());
         }
         inline Array<Ent::Gen::Position> variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_::setPositionVec() const
         {
-            return Array<Ent::Gen::Position>(node->setUnionType("variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Array<Ent::Gen::Position>(node->setUnionType("vector<Position>"));
         }
         // variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_
         inline char const* variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::getType() const
@@ -22258,15 +22282,15 @@ namespace Ent
         }
         inline Ent::Gen::String variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::setstring() const
         {
-            return Ent::Gen::String(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Ent::Gen::String(node->setUnionType("string"));
         }
         inline std::optional<Ent::Gen::Bool> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::bool_() const
         {
-            return strcmp(node->getUnionType(), "bool_") != 0? std::optional<Ent::Gen::Bool>{}: std::optional<Ent::Gen::Bool>(node->getUnionData());
+            return strcmp(node->getUnionType(), "bool") != 0? std::optional<Ent::Gen::Bool>{}: std::optional<Ent::Gen::Bool>(node->getUnionData());
         }
         inline Ent::Gen::Bool variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::setbool_() const
         {
-            return Ent::Gen::Bool(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Ent::Gen::Bool(node->setUnionType("bool"));
         }
         inline std::optional<Ent::Gen::Int> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::s32() const
         {
@@ -22274,15 +22298,15 @@ namespace Ent
         }
         inline Ent::Gen::Int variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::sets32() const
         {
-            return Ent::Gen::Int(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Ent::Gen::Int(node->setUnionType("s32"));
         }
         inline std::optional<Ent::Gen::Float> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::float_() const
         {
-            return strcmp(node->getUnionType(), "float_") != 0? std::optional<Ent::Gen::Float>{}: std::optional<Ent::Gen::Float>(node->getUnionData());
+            return strcmp(node->getUnionType(), "float") != 0? std::optional<Ent::Gen::Float>{}: std::optional<Ent::Gen::Float>(node->getUnionData());
         }
         inline Ent::Gen::Float variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::setfloat_() const
         {
-            return Ent::Gen::Float(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Ent::Gen::Float(node->setUnionType("float"));
         }
         inline std::optional<Ent::Gen::EntityRef> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::EntityRef() const
         {
@@ -22290,7 +22314,7 @@ namespace Ent
         }
         inline Ent::Gen::EntityRef variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::setEntityRef() const
         {
-            return Ent::Gen::EntityRef(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Ent::Gen::EntityRef(node->setUnionType("EntityRef"));
         }
         inline std::optional<Ent::Gen::Vector2> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::Vector2() const
         {
@@ -22298,7 +22322,7 @@ namespace Ent
         }
         inline Ent::Gen::Vector2 variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::setVector2() const
         {
-            return Ent::Gen::Vector2(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Ent::Gen::Vector2(node->setUnionType("Vector2"));
         }
         inline std::optional<Ent::Gen::Vector3> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::Vector3() const
         {
@@ -22306,7 +22330,7 @@ namespace Ent
         }
         inline Ent::Gen::Vector3 variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::setVector3() const
         {
-            return Ent::Gen::Vector3(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Ent::Gen::Vector3(node->setUnionType("Vector3"));
         }
         inline std::optional<Ent::Gen::Position> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::Position() const
         {
@@ -22314,71 +22338,71 @@ namespace Ent
         }
         inline Ent::Gen::Position variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::setPosition() const
         {
-            return Ent::Gen::Position(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Ent::Gen::Position(node->setUnionType("Position"));
         }
         inline std::optional<PrimArray<Ent::Gen::String>> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::stringVec() const
         {
-            return strcmp(node->getUnionType(), "stringVec") != 0? std::optional<PrimArray<Ent::Gen::String>>{}: std::optional<PrimArray<Ent::Gen::String>>(node->getUnionData());
+            return strcmp(node->getUnionType(), "vector<string>") != 0? std::optional<PrimArray<Ent::Gen::String>>{}: std::optional<PrimArray<Ent::Gen::String>>(node->getUnionData());
         }
         inline PrimArray<Ent::Gen::String> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::setstringVec() const
         {
-            return PrimArray<Ent::Gen::String>(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return PrimArray<Ent::Gen::String>(node->setUnionType("vector<string>"));
         }
         inline std::optional<PrimArray<Ent::Gen::Bool>> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::boolVec() const
         {
-            return strcmp(node->getUnionType(), "boolVec") != 0? std::optional<PrimArray<Ent::Gen::Bool>>{}: std::optional<PrimArray<Ent::Gen::Bool>>(node->getUnionData());
+            return strcmp(node->getUnionType(), "vector<bool>") != 0? std::optional<PrimArray<Ent::Gen::Bool>>{}: std::optional<PrimArray<Ent::Gen::Bool>>(node->getUnionData());
         }
         inline PrimArray<Ent::Gen::Bool> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::setboolVec() const
         {
-            return PrimArray<Ent::Gen::Bool>(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return PrimArray<Ent::Gen::Bool>(node->setUnionType("vector<bool>"));
         }
         inline std::optional<PrimArray<Ent::Gen::Int>> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::s32Vec() const
         {
-            return strcmp(node->getUnionType(), "s32Vec") != 0? std::optional<PrimArray<Ent::Gen::Int>>{}: std::optional<PrimArray<Ent::Gen::Int>>(node->getUnionData());
+            return strcmp(node->getUnionType(), "vector<s32>") != 0? std::optional<PrimArray<Ent::Gen::Int>>{}: std::optional<PrimArray<Ent::Gen::Int>>(node->getUnionData());
         }
         inline PrimArray<Ent::Gen::Int> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::sets32Vec() const
         {
-            return PrimArray<Ent::Gen::Int>(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return PrimArray<Ent::Gen::Int>(node->setUnionType("vector<s32>"));
         }
         inline std::optional<PrimArray<Ent::Gen::Float>> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::floatVec() const
         {
-            return strcmp(node->getUnionType(), "floatVec") != 0? std::optional<PrimArray<Ent::Gen::Float>>{}: std::optional<PrimArray<Ent::Gen::Float>>(node->getUnionData());
+            return strcmp(node->getUnionType(), "vector<float>") != 0? std::optional<PrimArray<Ent::Gen::Float>>{}: std::optional<PrimArray<Ent::Gen::Float>>(node->getUnionData());
         }
         inline PrimArray<Ent::Gen::Float> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::setfloatVec() const
         {
-            return PrimArray<Ent::Gen::Float>(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return PrimArray<Ent::Gen::Float>(node->setUnionType("vector<float>"));
         }
         inline std::optional<PrimArray<Ent::Gen::EntityRef>> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::EntityRefVec() const
         {
-            return strcmp(node->getUnionType(), "EntityRefVec") != 0? std::optional<PrimArray<Ent::Gen::EntityRef>>{}: std::optional<PrimArray<Ent::Gen::EntityRef>>(node->getUnionData());
+            return strcmp(node->getUnionType(), "vector<EntityRef>") != 0? std::optional<PrimArray<Ent::Gen::EntityRef>>{}: std::optional<PrimArray<Ent::Gen::EntityRef>>(node->getUnionData());
         }
         inline PrimArray<Ent::Gen::EntityRef> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::setEntityRefVec() const
         {
-            return PrimArray<Ent::Gen::EntityRef>(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return PrimArray<Ent::Gen::EntityRef>(node->setUnionType("vector<EntityRef>"));
         }
         inline std::optional<Array<Ent::Gen::Vector2>> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::Vector2Vec() const
         {
-            return strcmp(node->getUnionType(), "Vector2Vec") != 0? std::optional<Array<Ent::Gen::Vector2>>{}: std::optional<Array<Ent::Gen::Vector2>>(node->getUnionData());
+            return strcmp(node->getUnionType(), "vector<Vector2>") != 0? std::optional<Array<Ent::Gen::Vector2>>{}: std::optional<Array<Ent::Gen::Vector2>>(node->getUnionData());
         }
         inline Array<Ent::Gen::Vector2> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::setVector2Vec() const
         {
-            return Array<Ent::Gen::Vector2>(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Array<Ent::Gen::Vector2>(node->setUnionType("vector<Vector2>"));
         }
         inline std::optional<Array<Ent::Gen::Vector3>> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::Vector3Vec() const
         {
-            return strcmp(node->getUnionType(), "Vector3Vec") != 0? std::optional<Array<Ent::Gen::Vector3>>{}: std::optional<Array<Ent::Gen::Vector3>>(node->getUnionData());
+            return strcmp(node->getUnionType(), "vector<Vector3>") != 0? std::optional<Array<Ent::Gen::Vector3>>{}: std::optional<Array<Ent::Gen::Vector3>>(node->getUnionData());
         }
         inline Array<Ent::Gen::Vector3> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::setVector3Vec() const
         {
-            return Array<Ent::Gen::Vector3>(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Array<Ent::Gen::Vector3>(node->setUnionType("vector<Vector3>"));
         }
         inline std::optional<Array<Ent::Gen::Position>> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::PositionVec() const
         {
-            return strcmp(node->getUnionType(), "PositionVec") != 0? std::optional<Array<Ent::Gen::Position>>{}: std::optional<Array<Ent::Gen::Position>>(node->getUnionData());
+            return strcmp(node->getUnionType(), "vector<Position>") != 0? std::optional<Array<Ent::Gen::Position>>{}: std::optional<Array<Ent::Gen::Position>>(node->getUnionData());
         }
         inline Array<Ent::Gen::Position> variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_::setPositionVec() const
         {
-            return Array<Ent::Gen::Position>(node->setUnionType("variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_"));
+            return Array<Ent::Gen::Position>(node->setUnionType("vector<Position>"));
         }
         // variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_
         inline char const* variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::getType() const
@@ -22391,23 +22415,23 @@ namespace Ent
         }
         inline Ent::Gen::Int variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::sets32() const
         {
-            return Ent::Gen::Int(node->setUnionType("variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_"));
+            return Ent::Gen::Int(node->setUnionType("s32"));
         }
         inline std::optional<Ent::Gen::Float> variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::float_() const
         {
-            return strcmp(node->getUnionType(), "float_") != 0? std::optional<Ent::Gen::Float>{}: std::optional<Ent::Gen::Float>(node->getUnionData());
+            return strcmp(node->getUnionType(), "float") != 0? std::optional<Ent::Gen::Float>{}: std::optional<Ent::Gen::Float>(node->getUnionData());
         }
         inline Ent::Gen::Float variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::setfloat_() const
         {
-            return Ent::Gen::Float(node->setUnionType("variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_"));
+            return Ent::Gen::Float(node->setUnionType("float"));
         }
         inline std::optional<Ent::Gen::Bool> variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::bool_() const
         {
-            return strcmp(node->getUnionType(), "bool_") != 0? std::optional<Ent::Gen::Bool>{}: std::optional<Ent::Gen::Bool>(node->getUnionData());
+            return strcmp(node->getUnionType(), "bool") != 0? std::optional<Ent::Gen::Bool>{}: std::optional<Ent::Gen::Bool>(node->getUnionData());
         }
         inline Ent::Gen::Bool variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::setbool_() const
         {
-            return Ent::Gen::Bool(node->setUnionType("variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_"));
+            return Ent::Gen::Bool(node->setUnionType("bool"));
         }
         inline std::optional<Ent::Gen::String> variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::string() const
         {
@@ -22415,7 +22439,7 @@ namespace Ent
         }
         inline Ent::Gen::String variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::setstring() const
         {
-            return Ent::Gen::String(node->setUnionType("variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_"));
+            return Ent::Gen::String(node->setUnionType("string"));
         }
         inline std::optional<Ent::Gen::Vector2> variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::Vector2() const
         {
@@ -22423,7 +22447,7 @@ namespace Ent
         }
         inline Ent::Gen::Vector2 variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::setVector2() const
         {
-            return Ent::Gen::Vector2(node->setUnionType("variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_"));
+            return Ent::Gen::Vector2(node->setUnionType("Vector2"));
         }
         inline std::optional<Ent::Gen::Vector3> variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::Vector3() const
         {
@@ -22431,7 +22455,7 @@ namespace Ent
         }
         inline Ent::Gen::Vector3 variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::setVector3() const
         {
-            return Ent::Gen::Vector3(node->setUnionType("variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_"));
+            return Ent::Gen::Vector3(node->setUnionType("Vector3"));
         }
         inline std::optional<Ent::Gen::Quat> variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::Quat() const
         {
@@ -22439,7 +22463,7 @@ namespace Ent
         }
         inline Ent::Gen::Quat variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::setQuat() const
         {
-            return Ent::Gen::Quat(node->setUnionType("variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_"));
+            return Ent::Gen::Quat(node->setUnionType("Quat"));
         }
         inline std::optional<Ent::Gen::Position> variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::Position() const
         {
@@ -22447,7 +22471,7 @@ namespace Ent
         }
         inline Ent::Gen::Position variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::setPosition() const
         {
-            return Ent::Gen::Position(node->setUnionType("variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_"));
+            return Ent::Gen::Position(node->setUnionType("Position"));
         }
         // variant_Pasta_Easing_Curve_string_
         inline char const* variant_Pasta_Easing_Curve_string_::getType() const
@@ -22456,11 +22480,11 @@ namespace Ent
         }
         inline std::optional<Ent::Gen::Pasta_Easing_Curve> variant_Pasta_Easing_Curve_string_::Pasta_Easing_Curve() const
         {
-            return strcmp(node->getUnionType(), "Pasta_Easing_Curve") != 0? std::optional<Ent::Gen::Pasta_Easing_Curve>{}: std::optional<Ent::Gen::Pasta_Easing_Curve>(node->getUnionData());
+            return strcmp(node->getUnionType(), "Pasta::Easing::Curve") != 0? std::optional<Ent::Gen::Pasta_Easing_Curve>{}: std::optional<Ent::Gen::Pasta_Easing_Curve>(node->getUnionData());
         }
         inline Ent::Gen::Pasta_Easing_Curve variant_Pasta_Easing_Curve_string_::setPasta_Easing_Curve() const
         {
-            return Ent::Gen::Pasta_Easing_Curve(node->setUnionType("variant_Pasta_Easing_Curve_string_"));
+            return Ent::Gen::Pasta_Easing_Curve(node->setUnionType("Pasta::Easing::Curve"));
         }
         inline std::optional<Ent::Gen::String> variant_Pasta_Easing_Curve_string_::string() const
         {
@@ -22468,7 +22492,7 @@ namespace Ent
         }
         inline Ent::Gen::String variant_Pasta_Easing_Curve_string_::setstring() const
         {
-            return Ent::Gen::String(node->setUnionType("variant_Pasta_Easing_Curve_string_"));
+            return Ent::Gen::String(node->setUnionType("string"));
         }
         // usePerception
         inline Ent::Gen::String usePerception::_comment() const
@@ -23796,7 +23820,7 @@ namespace Ent
         }
         inline Ent::Gen::CineEventTestCurrentGameState ResponsiblePointer_CineEvent_::setCineEventTestCurrentGameState() const
         {
-            return Ent::Gen::CineEventTestCurrentGameState(node->setUnionType("ResponsiblePointer_CineEvent_"));
+            return Ent::Gen::CineEventTestCurrentGameState(node->setUnionType("CineEventTestCurrentGameState"));
         }
         inline std::optional<Ent::Gen::CineEventTestEndCurrentSequence> ResponsiblePointer_CineEvent_::CineEventTestEndCurrentSequence() const
         {
@@ -23804,7 +23828,7 @@ namespace Ent
         }
         inline Ent::Gen::CineEventTestEndCurrentSequence ResponsiblePointer_CineEvent_::setCineEventTestEndCurrentSequence() const
         {
-            return Ent::Gen::CineEventTestEndCurrentSequence(node->setUnionType("ResponsiblePointer_CineEvent_"));
+            return Ent::Gen::CineEventTestEndCurrentSequence(node->setUnionType("CineEventTestEndCurrentSequence"));
         }
         inline std::optional<Ent::Gen::CineEventTestInput> ResponsiblePointer_CineEvent_::CineEventTestInput() const
         {
@@ -23812,7 +23836,7 @@ namespace Ent
         }
         inline Ent::Gen::CineEventTestInput ResponsiblePointer_CineEvent_::setCineEventTestInput() const
         {
-            return Ent::Gen::CineEventTestInput(node->setUnionType("ResponsiblePointer_CineEvent_"));
+            return Ent::Gen::CineEventTestInput(node->setUnionType("CineEventTestInput"));
         }
         inline std::optional<Ent::Gen::CineEventTestIsCanceled> ResponsiblePointer_CineEvent_::CineEventTestIsCanceled() const
         {
@@ -23820,7 +23844,7 @@ namespace Ent
         }
         inline Ent::Gen::CineEventTestIsCanceled ResponsiblePointer_CineEvent_::setCineEventTestIsCanceled() const
         {
-            return Ent::Gen::CineEventTestIsCanceled(node->setUnionType("ResponsiblePointer_CineEvent_"));
+            return Ent::Gen::CineEventTestIsCanceled(node->setUnionType("CineEventTestIsCanceled"));
         }
         inline std::optional<Ent::Gen::CineEventTestWait> ResponsiblePointer_CineEvent_::CineEventTestWait() const
         {
@@ -23828,7 +23852,7 @@ namespace Ent
         }
         inline Ent::Gen::CineEventTestWait ResponsiblePointer_CineEvent_::setCineEventTestWait() const
         {
-            return Ent::Gen::CineEventTestWait(node->setUnionType("ResponsiblePointer_CineEvent_"));
+            return Ent::Gen::CineEventTestWait(node->setUnionType("CineEventTestWait"));
         }
         inline std::optional<Ent::Gen::CineEventTriggerEventHandlerPost> ResponsiblePointer_CineEvent_::CineEventTriggerEventHandlerPost() const
         {
@@ -23836,7 +23860,7 @@ namespace Ent
         }
         inline Ent::Gen::CineEventTriggerEventHandlerPost ResponsiblePointer_CineEvent_::setCineEventTriggerEventHandlerPost() const
         {
-            return Ent::Gen::CineEventTriggerEventHandlerPost(node->setUnionType("ResponsiblePointer_CineEvent_"));
+            return Ent::Gen::CineEventTriggerEventHandlerPost(node->setUnionType("CineEventTriggerEventHandlerPost"));
         }
         inline std::optional<Ent::Gen::CineEventTriggerGameStateChange> ResponsiblePointer_CineEvent_::CineEventTriggerGameStateChange() const
         {
@@ -23844,7 +23868,7 @@ namespace Ent
         }
         inline Ent::Gen::CineEventTriggerGameStateChange ResponsiblePointer_CineEvent_::setCineEventTriggerGameStateChange() const
         {
-            return Ent::Gen::CineEventTriggerGameStateChange(node->setUnionType("ResponsiblePointer_CineEvent_"));
+            return Ent::Gen::CineEventTriggerGameStateChange(node->setUnionType("CineEventTriggerGameStateChange"));
         }
         inline std::optional<Ent::Gen::CineEventTriggerPlaySequence> ResponsiblePointer_CineEvent_::CineEventTriggerPlaySequence() const
         {
@@ -23852,7 +23876,7 @@ namespace Ent
         }
         inline Ent::Gen::CineEventTriggerPlaySequence ResponsiblePointer_CineEvent_::setCineEventTriggerPlaySequence() const
         {
-            return Ent::Gen::CineEventTriggerPlaySequence(node->setUnionType("ResponsiblePointer_CineEvent_"));
+            return Ent::Gen::CineEventTriggerPlaySequence(node->setUnionType("CineEventTriggerPlaySequence"));
         }
         inline std::optional<Ent::Gen::CineEventTriggerPlaySound> ResponsiblePointer_CineEvent_::CineEventTriggerPlaySound() const
         {
@@ -23860,7 +23884,7 @@ namespace Ent
         }
         inline Ent::Gen::CineEventTriggerPlaySound ResponsiblePointer_CineEvent_::setCineEventTriggerPlaySound() const
         {
-            return Ent::Gen::CineEventTriggerPlaySound(node->setUnionType("ResponsiblePointer_CineEvent_"));
+            return Ent::Gen::CineEventTriggerPlaySound(node->setUnionType("CineEventTriggerPlaySound"));
         }
         // ResponsiblePointer_AnalyticsObserverInterface_
         // ResponsiblePointer_ActorState_
@@ -23874,7 +23898,7 @@ namespace Ent
         }
         inline Ent::Gen::ActorStateAlive ResponsiblePointer_ActorState_::setActorStateAlive() const
         {
-            return Ent::Gen::ActorStateAlive(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::ActorStateAlive(node->setUnionType("ActorStateAlive"));
         }
         inline std::optional<Ent::Gen::ActorStateBeingImmersed> ResponsiblePointer_ActorState_::ActorStateBeingImmersed() const
         {
@@ -23882,7 +23906,7 @@ namespace Ent
         }
         inline Ent::Gen::ActorStateBeingImmersed ResponsiblePointer_ActorState_::setActorStateBeingImmersed() const
         {
-            return Ent::Gen::ActorStateBeingImmersed(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::ActorStateBeingImmersed(node->setUnionType("ActorStateBeingImmersed"));
         }
         inline std::optional<Ent::Gen::ActorStateBeingInAir> ResponsiblePointer_ActorState_::ActorStateBeingInAir() const
         {
@@ -23890,7 +23914,7 @@ namespace Ent
         }
         inline Ent::Gen::ActorStateBeingInAir ResponsiblePointer_ActorState_::setActorStateBeingInAir() const
         {
-            return Ent::Gen::ActorStateBeingInAir(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::ActorStateBeingInAir(node->setUnionType("ActorStateBeingInAir"));
         }
         inline std::optional<Ent::Gen::ActorStateBeingOnGround> ResponsiblePointer_ActorState_::ActorStateBeingOnGround() const
         {
@@ -23898,7 +23922,7 @@ namespace Ent
         }
         inline Ent::Gen::ActorStateBeingOnGround ResponsiblePointer_ActorState_::setActorStateBeingOnGround() const
         {
-            return Ent::Gen::ActorStateBeingOnGround(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::ActorStateBeingOnGround(node->setUnionType("ActorStateBeingOnGround"));
         }
         inline std::optional<Ent::Gen::ActorStateBuried> ResponsiblePointer_ActorState_::ActorStateBuried() const
         {
@@ -23906,7 +23930,7 @@ namespace Ent
         }
         inline Ent::Gen::ActorStateBuried ResponsiblePointer_ActorState_::setActorStateBuried() const
         {
-            return Ent::Gen::ActorStateBuried(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::ActorStateBuried(node->setUnionType("ActorStateBuried"));
         }
         inline std::optional<Ent::Gen::ActorStateDead> ResponsiblePointer_ActorState_::ActorStateDead() const
         {
@@ -23914,7 +23938,7 @@ namespace Ent
         }
         inline Ent::Gen::ActorStateDead ResponsiblePointer_ActorState_::setActorStateDead() const
         {
-            return Ent::Gen::ActorStateDead(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::ActorStateDead(node->setUnionType("ActorStateDead"));
         }
         inline std::optional<Ent::Gen::ActorStateHasNoBody> ResponsiblePointer_ActorState_::ActorStateHasNoBody() const
         {
@@ -23922,7 +23946,7 @@ namespace Ent
         }
         inline Ent::Gen::ActorStateHasNoBody ResponsiblePointer_ActorState_::setActorStateHasNoBody() const
         {
-            return Ent::Gen::ActorStateHasNoBody(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::ActorStateHasNoBody(node->setUnionType("ActorStateHasNoBody"));
         }
         inline std::optional<Ent::Gen::ActorStateHoldingItem> ResponsiblePointer_ActorState_::ActorStateHoldingItem() const
         {
@@ -23930,7 +23954,7 @@ namespace Ent
         }
         inline Ent::Gen::ActorStateHoldingItem ResponsiblePointer_ActorState_::setActorStateHoldingItem() const
         {
-            return Ent::Gen::ActorStateHoldingItem(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::ActorStateHoldingItem(node->setUnionType("ActorStateHoldingItem"));
         }
         inline std::optional<Ent::Gen::ActorStateInvincible> ResponsiblePointer_ActorState_::ActorStateInvincible() const
         {
@@ -23938,7 +23962,7 @@ namespace Ent
         }
         inline Ent::Gen::ActorStateInvincible ResponsiblePointer_ActorState_::setActorStateInvincible() const
         {
-            return Ent::Gen::ActorStateInvincible(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::ActorStateInvincible(node->setUnionType("ActorStateInvincible"));
         }
         inline std::optional<Ent::Gen::ActorStateTeleport> ResponsiblePointer_ActorState_::ActorStateTeleport() const
         {
@@ -23946,7 +23970,7 @@ namespace Ent
         }
         inline Ent::Gen::ActorStateTeleport ResponsiblePointer_ActorState_::setActorStateTeleport() const
         {
-            return Ent::Gen::ActorStateTeleport(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::ActorStateTeleport(node->setUnionType("ActorStateTeleport"));
         }
         inline std::optional<Ent::Gen::EntityStateBoidsHomePos> ResponsiblePointer_ActorState_::EntityStateBoidsHomePos() const
         {
@@ -23954,7 +23978,7 @@ namespace Ent
         }
         inline Ent::Gen::EntityStateBoidsHomePos ResponsiblePointer_ActorState_::setEntityStateBoidsHomePos() const
         {
-            return Ent::Gen::EntityStateBoidsHomePos(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::EntityStateBoidsHomePos(node->setUnionType("EntityStateBoidsHomePos"));
         }
         inline std::optional<Ent::Gen::EntityStateChargeMode> ResponsiblePointer_ActorState_::EntityStateChargeMode() const
         {
@@ -23962,7 +23986,7 @@ namespace Ent
         }
         inline Ent::Gen::EntityStateChargeMode ResponsiblePointer_ActorState_::setEntityStateChargeMode() const
         {
-            return Ent::Gen::EntityStateChargeMode(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::EntityStateChargeMode(node->setUnionType("EntityStateChargeMode"));
         }
         inline std::optional<Ent::Gen::EntityStateEnergyRootState> ResponsiblePointer_ActorState_::EntityStateEnergyRootState() const
         {
@@ -23970,7 +23994,7 @@ namespace Ent
         }
         inline Ent::Gen::EntityStateEnergyRootState ResponsiblePointer_ActorState_::setEntityStateEnergyRootState() const
         {
-            return Ent::Gen::EntityStateEnergyRootState(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::EntityStateEnergyRootState(node->setUnionType("EntityStateEnergyRootState"));
         }
         inline std::optional<Ent::Gen::EntityStateEnergySpoutState> ResponsiblePointer_ActorState_::EntityStateEnergySpoutState() const
         {
@@ -23978,7 +24002,7 @@ namespace Ent
         }
         inline Ent::Gen::EntityStateEnergySpoutState ResponsiblePointer_ActorState_::setEntityStateEnergySpoutState() const
         {
-            return Ent::Gen::EntityStateEnergySpoutState(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::EntityStateEnergySpoutState(node->setUnionType("EntityStateEnergySpoutState"));
         }
         inline std::optional<Ent::Gen::EntityStateForceCanBeTargeted> ResponsiblePointer_ActorState_::EntityStateForceCanBeTargeted() const
         {
@@ -23986,7 +24010,7 @@ namespace Ent
         }
         inline Ent::Gen::EntityStateForceCanBeTargeted ResponsiblePointer_ActorState_::setEntityStateForceCanBeTargeted() const
         {
-            return Ent::Gen::EntityStateForceCanBeTargeted(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::EntityStateForceCanBeTargeted(node->setUnionType("EntityStateForceCanBeTargeted"));
         }
         inline std::optional<Ent::Gen::EntityStateMask> ResponsiblePointer_ActorState_::EntityStateMask() const
         {
@@ -23994,7 +24018,7 @@ namespace Ent
         }
         inline Ent::Gen::EntityStateMask ResponsiblePointer_ActorState_::setEntityStateMask() const
         {
-            return Ent::Gen::EntityStateMask(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::EntityStateMask(node->setUnionType("EntityStateMask"));
         }
         inline std::optional<Ent::Gen::EntityStatePlayer> ResponsiblePointer_ActorState_::EntityStatePlayer() const
         {
@@ -24002,7 +24026,7 @@ namespace Ent
         }
         inline Ent::Gen::EntityStatePlayer ResponsiblePointer_ActorState_::setEntityStatePlayer() const
         {
-            return Ent::Gen::EntityStatePlayer(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::EntityStatePlayer(node->setUnionType("EntityStatePlayer"));
         }
         inline std::optional<Ent::Gen::EntityStateSpiritAnimalActive> ResponsiblePointer_ActorState_::EntityStateSpiritAnimalActive() const
         {
@@ -24010,7 +24034,7 @@ namespace Ent
         }
         inline Ent::Gen::EntityStateSpiritAnimalActive ResponsiblePointer_ActorState_::setEntityStateSpiritAnimalActive() const
         {
-            return Ent::Gen::EntityStateSpiritAnimalActive(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::EntityStateSpiritAnimalActive(node->setUnionType("EntityStateSpiritAnimalActive"));
         }
         inline std::optional<Ent::Gen::EntityStateVoxelsVolume> ResponsiblePointer_ActorState_::EntityStateVoxelsVolume() const
         {
@@ -24018,7 +24042,7 @@ namespace Ent
         }
         inline Ent::Gen::EntityStateVoxelsVolume ResponsiblePointer_ActorState_::setEntityStateVoxelsVolume() const
         {
-            return Ent::Gen::EntityStateVoxelsVolume(node->setUnionType("ResponsiblePointer_ActorState_"));
+            return Ent::Gen::EntityStateVoxelsVolume(node->setUnionType("EntityStateVoxelsVolume"));
         }
         // RegenerationManager_EnergyAreaSetting
         inline Ent::Gen::Float RegenerationManager_EnergyAreaSetting::RegenValue() const
@@ -28917,6 +28941,26 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        inline Ent::Gen::Float WallRunGD::dropAirControlDelay() const
+        {
+            return Ent::Gen::Float(node->at("dropAirControlDelay"));
+        }
+        inline Ent::Gen::Float WallRunGD::dropCoyoteJumpMaxTime() const
+        {
+            return Ent::Gen::Float(node->at("dropCoyoteJumpMaxTime"));
+        }
+        inline Ent::Gen::Float WallRunGD::dropTrajectoryRotationYaw() const
+        {
+            return Ent::Gen::Float(node->at("dropTrajectoryRotationYaw"));
+        }
+        inline Ent::Gen::Float WallRunGD::dropVisualRotationYawRateFactor() const
+        {
+            return Ent::Gen::Float(node->at("dropVisualRotationYawRateFactor"));
+        }
+        inline Ent::Gen::Float WallRunGD::jumpRiseMinCoeffToEnter() const
+        {
+            return Ent::Gen::Float(node->at("jumpRiseMinCoeffToEnter"));
+        }
         inline Ent::Gen::Float WallRunGD::jumpTrajectoryRotationYaw() const
         {
             return Ent::Gen::Float(node->at("jumpTrajectoryRotationYaw"));
@@ -28985,9 +29029,9 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("runSlopeAngleMin"));
         }
-        inline Ent::Gen::Float WallRunGD::runTrajectoryRotationPitch() const
+        inline Ent::Gen::String WallRunGD::runTrajectoryRotationPitchCurveResourcePath() const
         {
-            return Ent::Gen::Float(node->at("runTrajectoryRotationPitch"));
+            return Ent::Gen::String(node->at("runTrajectoryRotationPitchCurveResourcePath"));
         }
         inline Ent::Gen::Float WallRunGD::runTrajectoryRotationYaw() const
         {
@@ -31842,7 +31886,7 @@ namespace Ent
         }
         inline Ent::Gen::AIContextGD Component::setAIContextGD() const
         {
-            return Ent::Gen::AIContextGD(node->setUnionType("Component"));
+            return Ent::Gen::AIContextGD(node->setUnionType("AIContextGD"));
         }
         inline std::optional<Ent::Gen::ActorGD> Component::ActorGD() const
         {
@@ -31850,7 +31894,7 @@ namespace Ent
         }
         inline Ent::Gen::ActorGD Component::setActorGD() const
         {
-            return Ent::Gen::ActorGD(node->setUnionType("Component"));
+            return Ent::Gen::ActorGD(node->setUnionType("ActorGD"));
         }
         inline std::optional<Ent::Gen::AnimationControllerGD> Component::AnimationControllerGD() const
         {
@@ -31858,7 +31902,7 @@ namespace Ent
         }
         inline Ent::Gen::AnimationControllerGD Component::setAnimationControllerGD() const
         {
-            return Ent::Gen::AnimationControllerGD(node->setUnionType("Component"));
+            return Ent::Gen::AnimationControllerGD(node->setUnionType("AnimationControllerGD"));
         }
         inline std::optional<Ent::Gen::AnimationEventsGeneratorGD> Component::AnimationEventsGeneratorGD() const
         {
@@ -31866,7 +31910,7 @@ namespace Ent
         }
         inline Ent::Gen::AnimationEventsGeneratorGD Component::setAnimationEventsGeneratorGD() const
         {
-            return Ent::Gen::AnimationEventsGeneratorGD(node->setUnionType("Component"));
+            return Ent::Gen::AnimationEventsGeneratorGD(node->setUnionType("AnimationEventsGeneratorGD"));
         }
         inline std::optional<Ent::Gen::AnimationGenericConstraintsGD> Component::AnimationGenericConstraintsGD() const
         {
@@ -31874,7 +31918,7 @@ namespace Ent
         }
         inline Ent::Gen::AnimationGenericConstraintsGD Component::setAnimationGenericConstraintsGD() const
         {
-            return Ent::Gen::AnimationGenericConstraintsGD(node->setUnionType("Component"));
+            return Ent::Gen::AnimationGenericConstraintsGD(node->setUnionType("AnimationGenericConstraintsGD"));
         }
         inline std::optional<Ent::Gen::AnimationHitsConstraintsGD> Component::AnimationHitsConstraintsGD() const
         {
@@ -31882,7 +31926,7 @@ namespace Ent
         }
         inline Ent::Gen::AnimationHitsConstraintsGD Component::setAnimationHitsConstraintsGD() const
         {
-            return Ent::Gen::AnimationHitsConstraintsGD(node->setUnionType("Component"));
+            return Ent::Gen::AnimationHitsConstraintsGD(node->setUnionType("AnimationHitsConstraintsGD"));
         }
         inline std::optional<Ent::Gen::AnimationLegsConstraintsGD> Component::AnimationLegsConstraintsGD() const
         {
@@ -31890,7 +31934,7 @@ namespace Ent
         }
         inline Ent::Gen::AnimationLegsConstraintsGD Component::setAnimationLegsConstraintsGD() const
         {
-            return Ent::Gen::AnimationLegsConstraintsGD(node->setUnionType("Component"));
+            return Ent::Gen::AnimationLegsConstraintsGD(node->setUnionType("AnimationLegsConstraintsGD"));
         }
         inline std::optional<Ent::Gen::AnimationModelGD> Component::AnimationModelGD() const
         {
@@ -31898,7 +31942,7 @@ namespace Ent
         }
         inline Ent::Gen::AnimationModelGD Component::setAnimationModelGD() const
         {
-            return Ent::Gen::AnimationModelGD(node->setUnionType("Component"));
+            return Ent::Gen::AnimationModelGD(node->setUnionType("AnimationModelGD"));
         }
         inline std::optional<Ent::Gen::AnimationPhysicsChainConstraintsGD> Component::AnimationPhysicsChainConstraintsGD() const
         {
@@ -31906,7 +31950,7 @@ namespace Ent
         }
         inline Ent::Gen::AnimationPhysicsChainConstraintsGD Component::setAnimationPhysicsChainConstraintsGD() const
         {
-            return Ent::Gen::AnimationPhysicsChainConstraintsGD(node->setUnionType("Component"));
+            return Ent::Gen::AnimationPhysicsChainConstraintsGD(node->setUnionType("AnimationPhysicsChainConstraintsGD"));
         }
         inline std::optional<Ent::Gen::AnimationPlaylistGD> Component::AnimationPlaylistGD() const
         {
@@ -31914,7 +31958,7 @@ namespace Ent
         }
         inline Ent::Gen::AnimationPlaylistGD Component::setAnimationPlaylistGD() const
         {
-            return Ent::Gen::AnimationPlaylistGD(node->setUnionType("Component"));
+            return Ent::Gen::AnimationPlaylistGD(node->setUnionType("AnimationPlaylistGD"));
         }
         inline std::optional<Ent::Gen::AnimationRegenConstraintsGD> Component::AnimationRegenConstraintsGD() const
         {
@@ -31922,7 +31966,7 @@ namespace Ent
         }
         inline Ent::Gen::AnimationRegenConstraintsGD Component::setAnimationRegenConstraintsGD() const
         {
-            return Ent::Gen::AnimationRegenConstraintsGD(node->setUnionType("Component"));
+            return Ent::Gen::AnimationRegenConstraintsGD(node->setUnionType("AnimationRegenConstraintsGD"));
         }
         inline std::optional<Ent::Gen::AnimationTailConstraintsGD> Component::AnimationTailConstraintsGD() const
         {
@@ -31930,7 +31974,7 @@ namespace Ent
         }
         inline Ent::Gen::AnimationTailConstraintsGD Component::setAnimationTailConstraintsGD() const
         {
-            return Ent::Gen::AnimationTailConstraintsGD(node->setUnionType("Component"));
+            return Ent::Gen::AnimationTailConstraintsGD(node->setUnionType("AnimationTailConstraintsGD"));
         }
         inline std::optional<Ent::Gen::AnimationTransformDriverGD> Component::AnimationTransformDriverGD() const
         {
@@ -31938,7 +31982,7 @@ namespace Ent
         }
         inline Ent::Gen::AnimationTransformDriverGD Component::setAnimationTransformDriverGD() const
         {
-            return Ent::Gen::AnimationTransformDriverGD(node->setUnionType("Component"));
+            return Ent::Gen::AnimationTransformDriverGD(node->setUnionType("AnimationTransformDriverGD"));
         }
         inline std::optional<Ent::Gen::AnimationTreeConstraintsGD> Component::AnimationTreeConstraintsGD() const
         {
@@ -31946,7 +31990,7 @@ namespace Ent
         }
         inline Ent::Gen::AnimationTreeConstraintsGD Component::setAnimationTreeConstraintsGD() const
         {
-            return Ent::Gen::AnimationTreeConstraintsGD(node->setUnionType("Component"));
+            return Ent::Gen::AnimationTreeConstraintsGD(node->setUnionType("AnimationTreeConstraintsGD"));
         }
         inline std::optional<Ent::Gen::AssemblyGD> Component::AssemblyGD() const
         {
@@ -31954,7 +31998,7 @@ namespace Ent
         }
         inline Ent::Gen::AssemblyGD Component::setAssemblyGD() const
         {
-            return Ent::Gen::AssemblyGD(node->setUnionType("Component"));
+            return Ent::Gen::AssemblyGD(node->setUnionType("AssemblyGD"));
         }
         inline std::optional<Ent::Gen::AttackTriggerGD> Component::AttackTriggerGD() const
         {
@@ -31962,7 +32006,7 @@ namespace Ent
         }
         inline Ent::Gen::AttackTriggerGD Component::setAttackTriggerGD() const
         {
-            return Ent::Gen::AttackTriggerGD(node->setUnionType("Component"));
+            return Ent::Gen::AttackTriggerGD(node->setUnionType("AttackTriggerGD"));
         }
         inline std::optional<Ent::Gen::BeamGeneratorGD> Component::BeamGeneratorGD() const
         {
@@ -31970,7 +32014,7 @@ namespace Ent
         }
         inline Ent::Gen::BeamGeneratorGD Component::setBeamGeneratorGD() const
         {
-            return Ent::Gen::BeamGeneratorGD(node->setUnionType("Component"));
+            return Ent::Gen::BeamGeneratorGD(node->setUnionType("BeamGeneratorGD"));
         }
         inline std::optional<Ent::Gen::BeamTargetGD> Component::BeamTargetGD() const
         {
@@ -31978,7 +32022,7 @@ namespace Ent
         }
         inline Ent::Gen::BeamTargetGD Component::setBeamTargetGD() const
         {
-            return Ent::Gen::BeamTargetGD(node->setUnionType("Component"));
+            return Ent::Gen::BeamTargetGD(node->setUnionType("BeamTargetGD"));
         }
         inline std::optional<Ent::Gen::BittenGD> Component::BittenGD() const
         {
@@ -31986,7 +32030,7 @@ namespace Ent
         }
         inline Ent::Gen::BittenGD Component::setBittenGD() const
         {
-            return Ent::Gen::BittenGD(node->setUnionType("Component"));
+            return Ent::Gen::BittenGD(node->setUnionType("BittenGD"));
         }
         inline std::optional<Ent::Gen::BoidsGD> Component::BoidsGD() const
         {
@@ -31994,7 +32038,7 @@ namespace Ent
         }
         inline Ent::Gen::BoidsGD Component::setBoidsGD() const
         {
-            return Ent::Gen::BoidsGD(node->setUnionType("Component"));
+            return Ent::Gen::BoidsGD(node->setUnionType("BoidsGD"));
         }
         inline std::optional<Ent::Gen::BreakableGD> Component::BreakableGD() const
         {
@@ -32002,7 +32046,7 @@ namespace Ent
         }
         inline Ent::Gen::BreakableGD Component::setBreakableGD() const
         {
-            return Ent::Gen::BreakableGD(node->setUnionType("Component"));
+            return Ent::Gen::BreakableGD(node->setUnionType("BreakableGD"));
         }
         inline std::optional<Ent::Gen::CameraDataGD> Component::CameraDataGD() const
         {
@@ -32010,7 +32054,7 @@ namespace Ent
         }
         inline Ent::Gen::CameraDataGD Component::setCameraDataGD() const
         {
-            return Ent::Gen::CameraDataGD(node->setUnionType("Component"));
+            return Ent::Gen::CameraDataGD(node->setUnionType("CameraDataGD"));
         }
         inline std::optional<Ent::Gen::CameraSetterGD> Component::CameraSetterGD() const
         {
@@ -32018,7 +32062,7 @@ namespace Ent
         }
         inline Ent::Gen::CameraSetterGD Component::setCameraSetterGD() const
         {
-            return Ent::Gen::CameraSetterGD(node->setUnionType("Component"));
+            return Ent::Gen::CameraSetterGD(node->setUnionType("CameraSetterGD"));
         }
         inline std::optional<Ent::Gen::CharacterControllerGD> Component::CharacterControllerGD() const
         {
@@ -32026,7 +32070,7 @@ namespace Ent
         }
         inline Ent::Gen::CharacterControllerGD Component::setCharacterControllerGD() const
         {
-            return Ent::Gen::CharacterControllerGD(node->setUnionType("Component"));
+            return Ent::Gen::CharacterControllerGD(node->setUnionType("CharacterControllerGD"));
         }
         inline std::optional<Ent::Gen::CharacterPlatformGD> Component::CharacterPlatformGD() const
         {
@@ -32034,7 +32078,7 @@ namespace Ent
         }
         inline Ent::Gen::CharacterPlatformGD Component::setCharacterPlatformGD() const
         {
-            return Ent::Gen::CharacterPlatformGD(node->setUnionType("Component"));
+            return Ent::Gen::CharacterPlatformGD(node->setUnionType("CharacterPlatformGD"));
         }
         inline std::optional<Ent::Gen::ChildEntityPoolComponentGD> Component::ChildEntityPoolComponentGD() const
         {
@@ -32042,7 +32086,7 @@ namespace Ent
         }
         inline Ent::Gen::ChildEntityPoolComponentGD Component::setChildEntityPoolComponentGD() const
         {
-            return Ent::Gen::ChildEntityPoolComponentGD(node->setUnionType("Component"));
+            return Ent::Gen::ChildEntityPoolComponentGD(node->setUnionType("ChildEntityPoolComponentGD"));
         }
         inline std::optional<Ent::Gen::CinematicGD> Component::CinematicGD() const
         {
@@ -32050,7 +32094,7 @@ namespace Ent
         }
         inline Ent::Gen::CinematicGD Component::setCinematicGD() const
         {
-            return Ent::Gen::CinematicGD(node->setUnionType("Component"));
+            return Ent::Gen::CinematicGD(node->setUnionType("CinematicGD"));
         }
         inline std::optional<Ent::Gen::ClothAnimationGD> Component::ClothAnimationGD() const
         {
@@ -32058,7 +32102,7 @@ namespace Ent
         }
         inline Ent::Gen::ClothAnimationGD Component::setClothAnimationGD() const
         {
-            return Ent::Gen::ClothAnimationGD(node->setUnionType("Component"));
+            return Ent::Gen::ClothAnimationGD(node->setUnionType("ClothAnimationGD"));
         }
         inline std::optional<Ent::Gen::ClothGD> Component::ClothGD() const
         {
@@ -32066,7 +32110,7 @@ namespace Ent
         }
         inline Ent::Gen::ClothGD Component::setClothGD() const
         {
-            return Ent::Gen::ClothGD(node->setUnionType("Component"));
+            return Ent::Gen::ClothGD(node->setUnionType("ClothGD"));
         }
         inline std::optional<Ent::Gen::ComponentWithProtoCodeGD> Component::ComponentWithProtoCodeGD() const
         {
@@ -32074,7 +32118,7 @@ namespace Ent
         }
         inline Ent::Gen::ComponentWithProtoCodeGD Component::setComponentWithProtoCodeGD() const
         {
-            return Ent::Gen::ComponentWithProtoCodeGD(node->setUnionType("Component"));
+            return Ent::Gen::ComponentWithProtoCodeGD(node->setUnionType("ComponentWithProtoCodeGD"));
         }
         inline std::optional<Ent::Gen::ConnectorGD> Component::ConnectorGD() const
         {
@@ -32082,7 +32126,7 @@ namespace Ent
         }
         inline Ent::Gen::ConnectorGD Component::setConnectorGD() const
         {
-            return Ent::Gen::ConnectorGD(node->setUnionType("Component"));
+            return Ent::Gen::ConnectorGD(node->setUnionType("ConnectorGD"));
         }
         inline std::optional<Ent::Gen::CreatureAIGD> Component::CreatureAIGD() const
         {
@@ -32090,7 +32134,7 @@ namespace Ent
         }
         inline Ent::Gen::CreatureAIGD Component::setCreatureAIGD() const
         {
-            return Ent::Gen::CreatureAIGD(node->setUnionType("Component"));
+            return Ent::Gen::CreatureAIGD(node->setUnionType("CreatureAIGD"));
         }
         inline std::optional<Ent::Gen::CreatureGD> Component::CreatureGD() const
         {
@@ -32098,7 +32142,7 @@ namespace Ent
         }
         inline Ent::Gen::CreatureGD Component::setCreatureGD() const
         {
-            return Ent::Gen::CreatureGD(node->setUnionType("Component"));
+            return Ent::Gen::CreatureGD(node->setUnionType("CreatureGD"));
         }
         inline std::optional<Ent::Gen::CreatureUIGD> Component::CreatureUIGD() const
         {
@@ -32106,7 +32150,7 @@ namespace Ent
         }
         inline Ent::Gen::CreatureUIGD Component::setCreatureUIGD() const
         {
-            return Ent::Gen::CreatureUIGD(node->setUnionType("Component"));
+            return Ent::Gen::CreatureUIGD(node->setUnionType("CreatureUIGD"));
         }
         inline std::optional<Ent::Gen::CustomThumbnail> Component::CustomThumbnail() const
         {
@@ -32114,7 +32158,7 @@ namespace Ent
         }
         inline Ent::Gen::CustomThumbnail Component::setCustomThumbnail() const
         {
-            return Ent::Gen::CustomThumbnail(node->setUnionType("Component"));
+            return Ent::Gen::CustomThumbnail(node->setUnionType("CustomThumbnail"));
         }
         inline std::optional<Ent::Gen::DebugGridGD> Component::DebugGridGD() const
         {
@@ -32122,7 +32166,7 @@ namespace Ent
         }
         inline Ent::Gen::DebugGridGD Component::setDebugGridGD() const
         {
-            return Ent::Gen::DebugGridGD(node->setUnionType("Component"));
+            return Ent::Gen::DebugGridGD(node->setUnionType("DebugGridGD"));
         }
         inline std::optional<Ent::Gen::DistanceTriggerGD> Component::DistanceTriggerGD() const
         {
@@ -32130,7 +32174,7 @@ namespace Ent
         }
         inline Ent::Gen::DistanceTriggerGD Component::setDistanceTriggerGD() const
         {
-            return Ent::Gen::DistanceTriggerGD(node->setUnionType("Component"));
+            return Ent::Gen::DistanceTriggerGD(node->setUnionType("DistanceTriggerGD"));
         }
         inline std::optional<Ent::Gen::DummyComponentGD> Component::DummyComponentGD() const
         {
@@ -32138,7 +32182,7 @@ namespace Ent
         }
         inline Ent::Gen::DummyComponentGD Component::setDummyComponentGD() const
         {
-            return Ent::Gen::DummyComponentGD(node->setUnionType("Component"));
+            return Ent::Gen::DummyComponentGD(node->setUnionType("DummyComponentGD"));
         }
         inline std::optional<Ent::Gen::EnergyCrookGD> Component::EnergyCrookGD() const
         {
@@ -32146,7 +32190,7 @@ namespace Ent
         }
         inline Ent::Gen::EnergyCrookGD Component::setEnergyCrookGD() const
         {
-            return Ent::Gen::EnergyCrookGD(node->setUnionType("Component"));
+            return Ent::Gen::EnergyCrookGD(node->setUnionType("EnergyCrookGD"));
         }
         inline std::optional<Ent::Gen::EnergyDrainGD> Component::EnergyDrainGD() const
         {
@@ -32154,7 +32198,7 @@ namespace Ent
         }
         inline Ent::Gen::EnergyDrainGD Component::setEnergyDrainGD() const
         {
-            return Ent::Gen::EnergyDrainGD(node->setUnionType("Component"));
+            return Ent::Gen::EnergyDrainGD(node->setUnionType("EnergyDrainGD"));
         }
         inline std::optional<Ent::Gen::EnergyNetworkListenerGD> Component::EnergyNetworkListenerGD() const
         {
@@ -32162,7 +32206,7 @@ namespace Ent
         }
         inline Ent::Gen::EnergyNetworkListenerGD Component::setEnergyNetworkListenerGD() const
         {
-            return Ent::Gen::EnergyNetworkListenerGD(node->setUnionType("Component"));
+            return Ent::Gen::EnergyNetworkListenerGD(node->setUnionType("EnergyNetworkListenerGD"));
         }
         inline std::optional<Ent::Gen::EnergyPoolGD> Component::EnergyPoolGD() const
         {
@@ -32170,7 +32214,7 @@ namespace Ent
         }
         inline Ent::Gen::EnergyPoolGD Component::setEnergyPoolGD() const
         {
-            return Ent::Gen::EnergyPoolGD(node->setUnionType("Component"));
+            return Ent::Gen::EnergyPoolGD(node->setUnionType("EnergyPoolGD"));
         }
         inline std::optional<Ent::Gen::EnergyPoolTaggerGD> Component::EnergyPoolTaggerGD() const
         {
@@ -32178,7 +32222,7 @@ namespace Ent
         }
         inline Ent::Gen::EnergyPoolTaggerGD Component::setEnergyPoolTaggerGD() const
         {
-            return Ent::Gen::EnergyPoolTaggerGD(node->setUnionType("Component"));
+            return Ent::Gen::EnergyPoolTaggerGD(node->setUnionType("EnergyPoolTaggerGD"));
         }
         inline std::optional<Ent::Gen::EnergySourceGD> Component::EnergySourceGD() const
         {
@@ -32186,7 +32230,7 @@ namespace Ent
         }
         inline Ent::Gen::EnergySourceGD Component::setEnergySourceGD() const
         {
-            return Ent::Gen::EnergySourceGD(node->setUnionType("Component"));
+            return Ent::Gen::EnergySourceGD(node->setUnionType("EnergySourceGD"));
         }
         inline std::optional<Ent::Gen::EnergySpoutGD> Component::EnergySpoutGD() const
         {
@@ -32194,7 +32238,7 @@ namespace Ent
         }
         inline Ent::Gen::EnergySpoutGD Component::setEnergySpoutGD() const
         {
-            return Ent::Gen::EnergySpoutGD(node->setUnionType("Component"));
+            return Ent::Gen::EnergySpoutGD(node->setUnionType("EnergySpoutGD"));
         }
         inline std::optional<Ent::Gen::EnvStampGD> Component::EnvStampGD() const
         {
@@ -32202,7 +32246,7 @@ namespace Ent
         }
         inline Ent::Gen::EnvStampGD Component::setEnvStampGD() const
         {
-            return Ent::Gen::EnvStampGD(node->setUnionType("Component"));
+            return Ent::Gen::EnvStampGD(node->setUnionType("EnvStampGD"));
         }
         inline std::optional<Ent::Gen::EventHandlerGD> Component::EventHandlerGD() const
         {
@@ -32210,7 +32254,7 @@ namespace Ent
         }
         inline Ent::Gen::EventHandlerGD Component::setEventHandlerGD() const
         {
-            return Ent::Gen::EventHandlerGD(node->setUnionType("Component"));
+            return Ent::Gen::EventHandlerGD(node->setUnionType("EventHandlerGD"));
         }
         inline std::optional<Ent::Gen::EventTriggerGD> Component::EventTriggerGD() const
         {
@@ -32218,7 +32262,7 @@ namespace Ent
         }
         inline Ent::Gen::EventTriggerGD Component::setEventTriggerGD() const
         {
-            return Ent::Gen::EventTriggerGD(node->setUnionType("Component"));
+            return Ent::Gen::EventTriggerGD(node->setUnionType("EventTriggerGD"));
         }
         inline std::optional<Ent::Gen::FightDistanceTriggerGD> Component::FightDistanceTriggerGD() const
         {
@@ -32226,7 +32270,7 @@ namespace Ent
         }
         inline Ent::Gen::FightDistanceTriggerGD Component::setFightDistanceTriggerGD() const
         {
-            return Ent::Gen::FightDistanceTriggerGD(node->setUnionType("Component"));
+            return Ent::Gen::FightDistanceTriggerGD(node->setUnionType("FightDistanceTriggerGD"));
         }
         inline std::optional<Ent::Gen::FireSensorGD> Component::FireSensorGD() const
         {
@@ -32234,7 +32278,7 @@ namespace Ent
         }
         inline Ent::Gen::FireSensorGD Component::setFireSensorGD() const
         {
-            return Ent::Gen::FireSensorGD(node->setUnionType("Component"));
+            return Ent::Gen::FireSensorGD(node->setUnionType("FireSensorGD"));
         }
         inline std::optional<Ent::Gen::FluidFXEntitySpawnerGD> Component::FluidFXEntitySpawnerGD() const
         {
@@ -32242,7 +32286,7 @@ namespace Ent
         }
         inline Ent::Gen::FluidFXEntitySpawnerGD Component::setFluidFXEntitySpawnerGD() const
         {
-            return Ent::Gen::FluidFXEntitySpawnerGD(node->setUnionType("Component"));
+            return Ent::Gen::FluidFXEntitySpawnerGD(node->setUnionType("FluidFXEntitySpawnerGD"));
         }
         inline std::optional<Ent::Gen::FluidGD> Component::FluidGD() const
         {
@@ -32250,7 +32294,7 @@ namespace Ent
         }
         inline Ent::Gen::FluidGD Component::setFluidGD() const
         {
-            return Ent::Gen::FluidGD(node->setUnionType("Component"));
+            return Ent::Gen::FluidGD(node->setUnionType("FluidGD"));
         }
         inline std::optional<Ent::Gen::FluidNavMeshTaggerGD> Component::FluidNavMeshTaggerGD() const
         {
@@ -32258,7 +32302,7 @@ namespace Ent
         }
         inline Ent::Gen::FluidNavMeshTaggerGD Component::setFluidNavMeshTaggerGD() const
         {
-            return Ent::Gen::FluidNavMeshTaggerGD(node->setUnionType("Component"));
+            return Ent::Gen::FluidNavMeshTaggerGD(node->setUnionType("FluidNavMeshTaggerGD"));
         }
         inline std::optional<Ent::Gen::FluidToRegenInjectorGD> Component::FluidToRegenInjectorGD() const
         {
@@ -32266,7 +32310,7 @@ namespace Ent
         }
         inline Ent::Gen::FluidToRegenInjectorGD Component::setFluidToRegenInjectorGD() const
         {
-            return Ent::Gen::FluidToRegenInjectorGD(node->setUnionType("Component"));
+            return Ent::Gen::FluidToRegenInjectorGD(node->setUnionType("FluidToRegenInjectorGD"));
         }
         inline std::optional<Ent::Gen::FluidViewGD> Component::FluidViewGD() const
         {
@@ -32274,7 +32318,7 @@ namespace Ent
         }
         inline Ent::Gen::FluidViewGD Component::setFluidViewGD() const
         {
-            return Ent::Gen::FluidViewGD(node->setUnionType("Component"));
+            return Ent::Gen::FluidViewGD(node->setUnionType("FluidViewGD"));
         }
         inline std::optional<Ent::Gen::FluidVolumeComponentGD> Component::FluidVolumeComponentGD() const
         {
@@ -32282,7 +32326,7 @@ namespace Ent
         }
         inline Ent::Gen::FluidVolumeComponentGD Component::setFluidVolumeComponentGD() const
         {
-            return Ent::Gen::FluidVolumeComponentGD(node->setUnionType("Component"));
+            return Ent::Gen::FluidVolumeComponentGD(node->setUnionType("FluidVolumeComponentGD"));
         }
         inline std::optional<Ent::Gen::FurComponentGD> Component::FurComponentGD() const
         {
@@ -32290,7 +32334,7 @@ namespace Ent
         }
         inline Ent::Gen::FurComponentGD Component::setFurComponentGD() const
         {
-            return Ent::Gen::FurComponentGD(node->setUnionType("Component"));
+            return Ent::Gen::FurComponentGD(node->setUnionType("FurComponentGD"));
         }
         inline std::optional<Ent::Gen::GameEffectSpawnerGD> Component::GameEffectSpawnerGD() const
         {
@@ -32298,7 +32342,7 @@ namespace Ent
         }
         inline Ent::Gen::GameEffectSpawnerGD Component::setGameEffectSpawnerGD() const
         {
-            return Ent::Gen::GameEffectSpawnerGD(node->setUnionType("Component"));
+            return Ent::Gen::GameEffectSpawnerGD(node->setUnionType("GameEffectSpawnerGD"));
         }
         inline std::optional<Ent::Gen::GroundTypeSamplerGD> Component::GroundTypeSamplerGD() const
         {
@@ -32306,7 +32350,7 @@ namespace Ent
         }
         inline Ent::Gen::GroundTypeSamplerGD Component::setGroundTypeSamplerGD() const
         {
-            return Ent::Gen::GroundTypeSamplerGD(node->setUnionType("Component"));
+            return Ent::Gen::GroundTypeSamplerGD(node->setUnionType("GroundTypeSamplerGD"));
         }
         inline std::optional<Ent::Gen::HealPumpGD> Component::HealPumpGD() const
         {
@@ -32314,7 +32358,7 @@ namespace Ent
         }
         inline Ent::Gen::HealPumpGD Component::setHealPumpGD() const
         {
-            return Ent::Gen::HealPumpGD(node->setUnionType("Component"));
+            return Ent::Gen::HealPumpGD(node->setUnionType("HealPumpGD"));
         }
         inline std::optional<Ent::Gen::HealTriggerGD> Component::HealTriggerGD() const
         {
@@ -32322,7 +32366,7 @@ namespace Ent
         }
         inline Ent::Gen::HealTriggerGD Component::setHealTriggerGD() const
         {
-            return Ent::Gen::HealTriggerGD(node->setUnionType("Component"));
+            return Ent::Gen::HealTriggerGD(node->setUnionType("HealTriggerGD"));
         }
         inline std::optional<Ent::Gen::HealerGD> Component::HealerGD() const
         {
@@ -32330,7 +32374,7 @@ namespace Ent
         }
         inline Ent::Gen::HealerGD Component::setHealerGD() const
         {
-            return Ent::Gen::HealerGD(node->setUnionType("Component"));
+            return Ent::Gen::HealerGD(node->setUnionType("HealerGD"));
         }
         inline std::optional<Ent::Gen::HealthAreaGD> Component::HealthAreaGD() const
         {
@@ -32338,7 +32382,7 @@ namespace Ent
         }
         inline Ent::Gen::HealthAreaGD Component::setHealthAreaGD() const
         {
-            return Ent::Gen::HealthAreaGD(node->setUnionType("Component"));
+            return Ent::Gen::HealthAreaGD(node->setUnionType("HealthAreaGD"));
         }
         inline std::optional<Ent::Gen::HeightMapComponentGD> Component::HeightMapComponentGD() const
         {
@@ -32346,7 +32390,7 @@ namespace Ent
         }
         inline Ent::Gen::HeightMapComponentGD Component::setHeightMapComponentGD() const
         {
-            return Ent::Gen::HeightMapComponentGD(node->setUnionType("Component"));
+            return Ent::Gen::HeightMapComponentGD(node->setUnionType("HeightMapComponentGD"));
         }
         inline std::optional<Ent::Gen::HeightObj> Component::HeightObj() const
         {
@@ -32354,7 +32398,7 @@ namespace Ent
         }
         inline Ent::Gen::HeightObj Component::setHeightObj() const
         {
-            return Ent::Gen::HeightObj(node->setUnionType("Component"));
+            return Ent::Gen::HeightObj(node->setUnionType("HeightObj"));
         }
         inline std::optional<Ent::Gen::HitTriggerGD> Component::HitTriggerGD() const
         {
@@ -32362,7 +32406,7 @@ namespace Ent
         }
         inline Ent::Gen::HitTriggerGD Component::setHitTriggerGD() const
         {
-            return Ent::Gen::HitTriggerGD(node->setUnionType("Component"));
+            return Ent::Gen::HitTriggerGD(node->setUnionType("HitTriggerGD"));
         }
         inline std::optional<Ent::Gen::HotspotsGD> Component::HotspotsGD() const
         {
@@ -32370,7 +32414,7 @@ namespace Ent
         }
         inline Ent::Gen::HotspotsGD Component::setHotspotsGD() const
         {
-            return Ent::Gen::HotspotsGD(node->setUnionType("Component"));
+            return Ent::Gen::HotspotsGD(node->setUnionType("HotspotsGD"));
         }
         inline std::optional<Ent::Gen::InfoboardRegistererGD> Component::InfoboardRegistererGD() const
         {
@@ -32378,7 +32422,7 @@ namespace Ent
         }
         inline Ent::Gen::InfoboardRegistererGD Component::setInfoboardRegistererGD() const
         {
-            return Ent::Gen::InfoboardRegistererGD(node->setUnionType("Component"));
+            return Ent::Gen::InfoboardRegistererGD(node->setUnionType("InfoboardRegistererGD"));
         }
         inline std::optional<Ent::Gen::InventoryGD> Component::InventoryGD() const
         {
@@ -32386,7 +32430,7 @@ namespace Ent
         }
         inline Ent::Gen::InventoryGD Component::setInventoryGD() const
         {
-            return Ent::Gen::InventoryGD(node->setUnionType("Component"));
+            return Ent::Gen::InventoryGD(node->setUnionType("InventoryGD"));
         }
         inline std::optional<Ent::Gen::ItemHolderGD> Component::ItemHolderGD() const
         {
@@ -32394,7 +32438,7 @@ namespace Ent
         }
         inline Ent::Gen::ItemHolderGD Component::setItemHolderGD() const
         {
-            return Ent::Gen::ItemHolderGD(node->setUnionType("Component"));
+            return Ent::Gen::ItemHolderGD(node->setUnionType("ItemHolderGD"));
         }
         inline std::optional<Ent::Gen::LDPrimitive> Component::LDPrimitive() const
         {
@@ -32402,7 +32446,7 @@ namespace Ent
         }
         inline Ent::Gen::LDPrimitive Component::setLDPrimitive() const
         {
-            return Ent::Gen::LDPrimitive(node->setUnionType("Component"));
+            return Ent::Gen::LDPrimitive(node->setUnionType("LDPrimitive"));
         }
         inline std::optional<Ent::Gen::LightComponentGD> Component::LightComponentGD() const
         {
@@ -32410,7 +32454,7 @@ namespace Ent
         }
         inline Ent::Gen::LightComponentGD Component::setLightComponentGD() const
         {
-            return Ent::Gen::LightComponentGD(node->setUnionType("Component"));
+            return Ent::Gen::LightComponentGD(node->setUnionType("LightComponentGD"));
         }
         inline std::optional<Ent::Gen::Mesh> Component::Mesh() const
         {
@@ -32418,7 +32462,7 @@ namespace Ent
         }
         inline Ent::Gen::Mesh Component::setMesh() const
         {
-            return Ent::Gen::Mesh(node->setUnionType("Component"));
+            return Ent::Gen::Mesh(node->setUnionType("Mesh"));
         }
         inline std::optional<Ent::Gen::MeshNavigationInfosGD> Component::MeshNavigationInfosGD() const
         {
@@ -32426,7 +32470,7 @@ namespace Ent
         }
         inline Ent::Gen::MeshNavigationInfosGD Component::setMeshNavigationInfosGD() const
         {
-            return Ent::Gen::MeshNavigationInfosGD(node->setUnionType("Component"));
+            return Ent::Gen::MeshNavigationInfosGD(node->setUnionType("MeshNavigationInfosGD"));
         }
         inline std::optional<Ent::Gen::MissionHolderGD> Component::MissionHolderGD() const
         {
@@ -32434,7 +32478,7 @@ namespace Ent
         }
         inline Ent::Gen::MissionHolderGD Component::setMissionHolderGD() const
         {
-            return Ent::Gen::MissionHolderGD(node->setUnionType("Component"));
+            return Ent::Gen::MissionHolderGD(node->setUnionType("MissionHolderGD"));
         }
         inline std::optional<Ent::Gen::MountIKControllerGD> Component::MountIKControllerGD() const
         {
@@ -32442,7 +32486,7 @@ namespace Ent
         }
         inline Ent::Gen::MountIKControllerGD Component::setMountIKControllerGD() const
         {
-            return Ent::Gen::MountIKControllerGD(node->setUnionType("Component"));
+            return Ent::Gen::MountIKControllerGD(node->setUnionType("MountIKControllerGD"));
         }
         inline std::optional<Ent::Gen::MountableGD> Component::MountableGD() const
         {
@@ -32450,7 +32494,7 @@ namespace Ent
         }
         inline Ent::Gen::MountableGD Component::setMountableGD() const
         {
-            return Ent::Gen::MountableGD(node->setUnionType("Component"));
+            return Ent::Gen::MountableGD(node->setUnionType("MountableGD"));
         }
         inline std::optional<Ent::Gen::MounterGD> Component::MounterGD() const
         {
@@ -32458,7 +32502,7 @@ namespace Ent
         }
         inline Ent::Gen::MounterGD Component::setMounterGD() const
         {
-            return Ent::Gen::MounterGD(node->setUnionType("Component"));
+            return Ent::Gen::MounterGD(node->setUnionType("MounterGD"));
         }
         inline std::optional<Ent::Gen::MultiThumbnail> Component::MultiThumbnail() const
         {
@@ -32466,7 +32510,7 @@ namespace Ent
         }
         inline Ent::Gen::MultiThumbnail Component::setMultiThumbnail() const
         {
-            return Ent::Gen::MultiThumbnail(node->setUnionType("Component"));
+            return Ent::Gen::MultiThumbnail(node->setUnionType("MultiThumbnail"));
         }
         inline std::optional<Ent::Gen::NavMeshRasterizerGD> Component::NavMeshRasterizerGD() const
         {
@@ -32474,7 +32518,7 @@ namespace Ent
         }
         inline Ent::Gen::NavMeshRasterizerGD Component::setNavMeshRasterizerGD() const
         {
-            return Ent::Gen::NavMeshRasterizerGD(node->setUnionType("Component"));
+            return Ent::Gen::NavMeshRasterizerGD(node->setUnionType("NavMeshRasterizerGD"));
         }
         inline std::optional<Ent::Gen::NavMeshStamperGD> Component::NavMeshStamperGD() const
         {
@@ -32482,7 +32526,7 @@ namespace Ent
         }
         inline Ent::Gen::NavMeshStamperGD Component::setNavMeshStamperGD() const
         {
-            return Ent::Gen::NavMeshStamperGD(node->setUnionType("Component"));
+            return Ent::Gen::NavMeshStamperGD(node->setUnionType("NavMeshStamperGD"));
         }
         inline std::optional<Ent::Gen::NetGD> Component::NetGD() const
         {
@@ -32490,7 +32534,7 @@ namespace Ent
         }
         inline Ent::Gen::NetGD Component::setNetGD() const
         {
-            return Ent::Gen::NetGD(node->setUnionType("Component"));
+            return Ent::Gen::NetGD(node->setUnionType("NetGD"));
         }
         inline std::optional<Ent::Gen::NetworkLink> Component::NetworkLink() const
         {
@@ -32498,7 +32542,7 @@ namespace Ent
         }
         inline Ent::Gen::NetworkLink Component::setNetworkLink() const
         {
-            return Ent::Gen::NetworkLink(node->setUnionType("Component"));
+            return Ent::Gen::NetworkLink(node->setUnionType("NetworkLink"));
         }
         inline std::optional<Ent::Gen::NetworkNode> Component::NetworkNode() const
         {
@@ -32506,7 +32550,7 @@ namespace Ent
         }
         inline Ent::Gen::NetworkNode Component::setNetworkNode() const
         {
-            return Ent::Gen::NetworkNode(node->setUnionType("Component"));
+            return Ent::Gen::NetworkNode(node->setUnionType("NetworkNode"));
         }
         inline std::optional<Ent::Gen::NotVisibleInSubscene> Component::NotVisibleInSubscene() const
         {
@@ -32514,7 +32558,7 @@ namespace Ent
         }
         inline Ent::Gen::NotVisibleInSubscene Component::setNotVisibleInSubscene() const
         {
-            return Ent::Gen::NotVisibleInSubscene(node->setUnionType("Component"));
+            return Ent::Gen::NotVisibleInSubscene(node->setUnionType("NotVisibleInSubscene"));
         }
         inline std::optional<Ent::Gen::OutfitGD> Component::OutfitGD() const
         {
@@ -32522,7 +32566,7 @@ namespace Ent
         }
         inline Ent::Gen::OutfitGD Component::setOutfitGD() const
         {
-            return Ent::Gen::OutfitGD(node->setUnionType("Component"));
+            return Ent::Gen::OutfitGD(node->setUnionType("OutfitGD"));
         }
         inline std::optional<Ent::Gen::OutfitWearerGD> Component::OutfitWearerGD() const
         {
@@ -32530,7 +32574,7 @@ namespace Ent
         }
         inline Ent::Gen::OutfitWearerGD Component::setOutfitWearerGD() const
         {
-            return Ent::Gen::OutfitWearerGD(node->setUnionType("Component"));
+            return Ent::Gen::OutfitWearerGD(node->setUnionType("OutfitWearerGD"));
         }
         inline std::optional<Ent::Gen::PathBoneAnimGD> Component::PathBoneAnimGD() const
         {
@@ -32538,7 +32582,7 @@ namespace Ent
         }
         inline Ent::Gen::PathBoneAnimGD Component::setPathBoneAnimGD() const
         {
-            return Ent::Gen::PathBoneAnimGD(node->setUnionType("Component"));
+            return Ent::Gen::PathBoneAnimGD(node->setUnionType("PathBoneAnimGD"));
         }
         inline std::optional<Ent::Gen::PathBoneInfluenceGD> Component::PathBoneInfluenceGD() const
         {
@@ -32546,7 +32590,7 @@ namespace Ent
         }
         inline Ent::Gen::PathBoneInfluenceGD Component::setPathBoneInfluenceGD() const
         {
-            return Ent::Gen::PathBoneInfluenceGD(node->setUnionType("Component"));
+            return Ent::Gen::PathBoneInfluenceGD(node->setUnionType("PathBoneInfluenceGD"));
         }
         inline std::optional<Ent::Gen::PathBoneRigidBodyGD> Component::PathBoneRigidBodyGD() const
         {
@@ -32554,7 +32598,7 @@ namespace Ent
         }
         inline Ent::Gen::PathBoneRigidBodyGD Component::setPathBoneRigidBodyGD() const
         {
-            return Ent::Gen::PathBoneRigidBodyGD(node->setUnionType("Component"));
+            return Ent::Gen::PathBoneRigidBodyGD(node->setUnionType("PathBoneRigidBodyGD"));
         }
         inline std::optional<Ent::Gen::PathGD> Component::PathGD() const
         {
@@ -32562,7 +32606,7 @@ namespace Ent
         }
         inline Ent::Gen::PathGD Component::setPathGD() const
         {
-            return Ent::Gen::PathGD(node->setUnionType("Component"));
+            return Ent::Gen::PathGD(node->setUnionType("PathGD"));
         }
         inline std::optional<Ent::Gen::PathMotionControllerGD> Component::PathMotionControllerGD() const
         {
@@ -32570,7 +32614,7 @@ namespace Ent
         }
         inline Ent::Gen::PathMotionControllerGD Component::setPathMotionControllerGD() const
         {
-            return Ent::Gen::PathMotionControllerGD(node->setUnionType("Component"));
+            return Ent::Gen::PathMotionControllerGD(node->setUnionType("PathMotionControllerGD"));
         }
         inline std::optional<Ent::Gen::PathNodeGD> Component::PathNodeGD() const
         {
@@ -32578,7 +32622,7 @@ namespace Ent
         }
         inline Ent::Gen::PathNodeGD Component::setPathNodeGD() const
         {
-            return Ent::Gen::PathNodeGD(node->setUnionType("Component"));
+            return Ent::Gen::PathNodeGD(node->setUnionType("PathNodeGD"));
         }
         inline std::optional<Ent::Gen::PerceivableGD> Component::PerceivableGD() const
         {
@@ -32586,7 +32630,7 @@ namespace Ent
         }
         inline Ent::Gen::PerceivableGD Component::setPerceivableGD() const
         {
-            return Ent::Gen::PerceivableGD(node->setUnionType("Component"));
+            return Ent::Gen::PerceivableGD(node->setUnionType("PerceivableGD"));
         }
         inline std::optional<Ent::Gen::PerceiverGD> Component::PerceiverGD() const
         {
@@ -32594,7 +32638,7 @@ namespace Ent
         }
         inline Ent::Gen::PerceiverGD Component::setPerceiverGD() const
         {
-            return Ent::Gen::PerceiverGD(node->setUnionType("Component"));
+            return Ent::Gen::PerceiverGD(node->setUnionType("PerceiverGD"));
         }
         inline std::optional<Ent::Gen::PhysicsDataGD> Component::PhysicsDataGD() const
         {
@@ -32602,7 +32646,7 @@ namespace Ent
         }
         inline Ent::Gen::PhysicsDataGD Component::setPhysicsDataGD() const
         {
-            return Ent::Gen::PhysicsDataGD(node->setUnionType("Component"));
+            return Ent::Gen::PhysicsDataGD(node->setUnionType("PhysicsDataGD"));
         }
         inline std::optional<Ent::Gen::PhysicsGD> Component::PhysicsGD() const
         {
@@ -32610,7 +32654,7 @@ namespace Ent
         }
         inline Ent::Gen::PhysicsGD Component::setPhysicsGD() const
         {
-            return Ent::Gen::PhysicsGD(node->setUnionType("Component"));
+            return Ent::Gen::PhysicsGD(node->setUnionType("PhysicsGD"));
         }
         inline std::optional<Ent::Gen::PhysicsMeshDeformerGD> Component::PhysicsMeshDeformerGD() const
         {
@@ -32618,7 +32662,7 @@ namespace Ent
         }
         inline Ent::Gen::PhysicsMeshDeformerGD Component::setPhysicsMeshDeformerGD() const
         {
-            return Ent::Gen::PhysicsMeshDeformerGD(node->setUnionType("Component"));
+            return Ent::Gen::PhysicsMeshDeformerGD(node->setUnionType("PhysicsMeshDeformerGD"));
         }
         inline std::optional<Ent::Gen::PhysicsMeshProviderGD> Component::PhysicsMeshProviderGD() const
         {
@@ -32626,7 +32670,7 @@ namespace Ent
         }
         inline Ent::Gen::PhysicsMeshProviderGD Component::setPhysicsMeshProviderGD() const
         {
-            return Ent::Gen::PhysicsMeshProviderGD(node->setUnionType("Component"));
+            return Ent::Gen::PhysicsMeshProviderGD(node->setUnionType("PhysicsMeshProviderGD"));
         }
         inline std::optional<Ent::Gen::PhysicsTriggerGD> Component::PhysicsTriggerGD() const
         {
@@ -32634,7 +32678,7 @@ namespace Ent
         }
         inline Ent::Gen::PhysicsTriggerGD Component::setPhysicsTriggerGD() const
         {
-            return Ent::Gen::PhysicsTriggerGD(node->setUnionType("Component"));
+            return Ent::Gen::PhysicsTriggerGD(node->setUnionType("PhysicsTriggerGD"));
         }
         inline std::optional<Ent::Gen::PickableComponentGD> Component::PickableComponentGD() const
         {
@@ -32642,7 +32686,7 @@ namespace Ent
         }
         inline Ent::Gen::PickableComponentGD Component::setPickableComponentGD() const
         {
-            return Ent::Gen::PickableComponentGD(node->setUnionType("Component"));
+            return Ent::Gen::PickableComponentGD(node->setUnionType("PickableComponentGD"));
         }
         inline std::optional<Ent::Gen::PickableDistributorComponentGD> Component::PickableDistributorComponentGD() const
         {
@@ -32650,7 +32694,7 @@ namespace Ent
         }
         inline Ent::Gen::PickableDistributorComponentGD Component::setPickableDistributorComponentGD() const
         {
-            return Ent::Gen::PickableDistributorComponentGD(node->setUnionType("Component"));
+            return Ent::Gen::PickableDistributorComponentGD(node->setUnionType("PickableDistributorComponentGD"));
         }
         inline std::optional<Ent::Gen::PlayerComponentGD> Component::PlayerComponentGD() const
         {
@@ -32658,7 +32702,7 @@ namespace Ent
         }
         inline Ent::Gen::PlayerComponentGD Component::setPlayerComponentGD() const
         {
-            return Ent::Gen::PlayerComponentGD(node->setUnionType("Component"));
+            return Ent::Gen::PlayerComponentGD(node->setUnionType("PlayerComponentGD"));
         }
         inline std::optional<Ent::Gen::PossessableGPEGD> Component::PossessableGPEGD() const
         {
@@ -32666,7 +32710,7 @@ namespace Ent
         }
         inline Ent::Gen::PossessableGPEGD Component::setPossessableGPEGD() const
         {
-            return Ent::Gen::PossessableGPEGD(node->setUnionType("Component"));
+            return Ent::Gen::PossessableGPEGD(node->setUnionType("PossessableGPEGD"));
         }
         inline std::optional<Ent::Gen::ProjectileGD> Component::ProjectileGD() const
         {
@@ -32674,7 +32718,7 @@ namespace Ent
         }
         inline Ent::Gen::ProjectileGD Component::setProjectileGD() const
         {
-            return Ent::Gen::ProjectileGD(node->setUnionType("Component"));
+            return Ent::Gen::ProjectileGD(node->setUnionType("ProjectileGD"));
         }
         inline std::optional<Ent::Gen::ProjectileShooterGD> Component::ProjectileShooterGD() const
         {
@@ -32682,7 +32726,7 @@ namespace Ent
         }
         inline Ent::Gen::ProjectileShooterGD Component::setProjectileShooterGD() const
         {
-            return Ent::Gen::ProjectileShooterGD(node->setUnionType("Component"));
+            return Ent::Gen::ProjectileShooterGD(node->setUnionType("ProjectileShooterGD"));
         }
         inline std::optional<Ent::Gen::ProtoComponentGD> Component::ProtoComponentGD() const
         {
@@ -32690,7 +32734,7 @@ namespace Ent
         }
         inline Ent::Gen::ProtoComponentGD Component::setProtoComponentGD() const
         {
-            return Ent::Gen::ProtoComponentGD(node->setUnionType("Component"));
+            return Ent::Gen::ProtoComponentGD(node->setUnionType("ProtoComponentGD"));
         }
         inline std::optional<Ent::Gen::QuickCreatureSwitchGD> Component::QuickCreatureSwitchGD() const
         {
@@ -32698,7 +32742,7 @@ namespace Ent
         }
         inline Ent::Gen::QuickCreatureSwitchGD Component::setQuickCreatureSwitchGD() const
         {
-            return Ent::Gen::QuickCreatureSwitchGD(node->setUnionType("Component"));
+            return Ent::Gen::QuickCreatureSwitchGD(node->setUnionType("QuickCreatureSwitchGD"));
         }
         inline std::optional<Ent::Gen::RagdollGD> Component::RagdollGD() const
         {
@@ -32706,7 +32750,7 @@ namespace Ent
         }
         inline Ent::Gen::RagdollGD Component::setRagdollGD() const
         {
-            return Ent::Gen::RagdollGD(node->setUnionType("Component"));
+            return Ent::Gen::RagdollGD(node->setUnionType("RagdollGD"));
         }
         inline std::optional<Ent::Gen::RegenFXGD> Component::RegenFXGD() const
         {
@@ -32714,7 +32758,7 @@ namespace Ent
         }
         inline Ent::Gen::RegenFXGD Component::setRegenFXGD() const
         {
-            return Ent::Gen::RegenFXGD(node->setUnionType("Component"));
+            return Ent::Gen::RegenFXGD(node->setUnionType("RegenFXGD"));
         }
         inline std::optional<Ent::Gen::RegenMeshGD> Component::RegenMeshGD() const
         {
@@ -32722,7 +32766,7 @@ namespace Ent
         }
         inline Ent::Gen::RegenMeshGD Component::setRegenMeshGD() const
         {
-            return Ent::Gen::RegenMeshGD(node->setUnionType("Component"));
+            return Ent::Gen::RegenMeshGD(node->setUnionType("RegenMeshGD"));
         }
         inline std::optional<Ent::Gen::RegenSwitcherGD> Component::RegenSwitcherGD() const
         {
@@ -32730,7 +32774,7 @@ namespace Ent
         }
         inline Ent::Gen::RegenSwitcherGD Component::setRegenSwitcherGD() const
         {
-            return Ent::Gen::RegenSwitcherGD(node->setUnionType("Component"));
+            return Ent::Gen::RegenSwitcherGD(node->setUnionType("RegenSwitcherGD"));
         }
         inline std::optional<Ent::Gen::RegenerableVegetationGD> Component::RegenerableVegetationGD() const
         {
@@ -32738,7 +32782,7 @@ namespace Ent
         }
         inline Ent::Gen::RegenerableVegetationGD Component::setRegenerableVegetationGD() const
         {
-            return Ent::Gen::RegenerableVegetationGD(node->setUnionType("Component"));
+            return Ent::Gen::RegenerableVegetationGD(node->setUnionType("RegenerableVegetationGD"));
         }
         inline std::optional<Ent::Gen::RespawnPlaceGD> Component::RespawnPlaceGD() const
         {
@@ -32746,7 +32790,7 @@ namespace Ent
         }
         inline Ent::Gen::RespawnPlaceGD Component::setRespawnPlaceGD() const
         {
-            return Ent::Gen::RespawnPlaceGD(node->setUnionType("Component"));
+            return Ent::Gen::RespawnPlaceGD(node->setUnionType("RespawnPlaceGD"));
         }
         inline std::optional<Ent::Gen::ReviveEnergyGD> Component::ReviveEnergyGD() const
         {
@@ -32754,7 +32798,7 @@ namespace Ent
         }
         inline Ent::Gen::ReviveEnergyGD Component::setReviveEnergyGD() const
         {
-            return Ent::Gen::ReviveEnergyGD(node->setUnionType("Component"));
+            return Ent::Gen::ReviveEnergyGD(node->setUnionType("ReviveEnergyGD"));
         }
         inline std::optional<Ent::Gen::ReviveSideSwitcherGD> Component::ReviveSideSwitcherGD() const
         {
@@ -32762,7 +32806,7 @@ namespace Ent
         }
         inline Ent::Gen::ReviveSideSwitcherGD Component::setReviveSideSwitcherGD() const
         {
-            return Ent::Gen::ReviveSideSwitcherGD(node->setUnionType("Component"));
+            return Ent::Gen::ReviveSideSwitcherGD(node->setUnionType("ReviveSideSwitcherGD"));
         }
         inline std::optional<Ent::Gen::ScriptComponentGD> Component::ScriptComponentGD() const
         {
@@ -32770,7 +32814,7 @@ namespace Ent
         }
         inline Ent::Gen::ScriptComponentGD Component::setScriptComponentGD() const
         {
-            return Ent::Gen::ScriptComponentGD(node->setUnionType("Component"));
+            return Ent::Gen::ScriptComponentGD(node->setUnionType("ScriptComponentGD"));
         }
         inline std::optional<Ent::Gen::SeedPatch> Component::SeedPatch() const
         {
@@ -32778,7 +32822,7 @@ namespace Ent
         }
         inline Ent::Gen::SeedPatch Component::setSeedPatch() const
         {
-            return Ent::Gen::SeedPatch(node->setUnionType("Component"));
+            return Ent::Gen::SeedPatch(node->setUnionType("SeedPatch"));
         }
         inline std::optional<Ent::Gen::SensorControllerGD> Component::SensorControllerGD() const
         {
@@ -32786,7 +32830,7 @@ namespace Ent
         }
         inline Ent::Gen::SensorControllerGD Component::setSensorControllerGD() const
         {
-            return Ent::Gen::SensorControllerGD(node->setUnionType("Component"));
+            return Ent::Gen::SensorControllerGD(node->setUnionType("SensorControllerGD"));
         }
         inline std::optional<Ent::Gen::SensorVoxelsGD> Component::SensorVoxelsGD() const
         {
@@ -32794,7 +32838,7 @@ namespace Ent
         }
         inline Ent::Gen::SensorVoxelsGD Component::setSensorVoxelsGD() const
         {
-            return Ent::Gen::SensorVoxelsGD(node->setUnionType("Component"));
+            return Ent::Gen::SensorVoxelsGD(node->setUnionType("SensorVoxelsGD"));
         }
         inline std::optional<Ent::Gen::ShamanItemGD> Component::ShamanItemGD() const
         {
@@ -32802,7 +32846,7 @@ namespace Ent
         }
         inline Ent::Gen::ShamanItemGD Component::setShamanItemGD() const
         {
-            return Ent::Gen::ShamanItemGD(node->setUnionType("Component"));
+            return Ent::Gen::ShamanItemGD(node->setUnionType("ShamanItemGD"));
         }
         inline std::optional<Ent::Gen::ShamanVisionGD> Component::ShamanVisionGD() const
         {
@@ -32810,7 +32854,7 @@ namespace Ent
         }
         inline Ent::Gen::ShamanVisionGD Component::setShamanVisionGD() const
         {
-            return Ent::Gen::ShamanVisionGD(node->setUnionType("Component"));
+            return Ent::Gen::ShamanVisionGD(node->setUnionType("ShamanVisionGD"));
         }
         inline std::optional<Ent::Gen::ShapeshiftStatueGD> Component::ShapeshiftStatueGD() const
         {
@@ -32818,7 +32862,7 @@ namespace Ent
         }
         inline Ent::Gen::ShapeshiftStatueGD Component::setShapeshiftStatueGD() const
         {
-            return Ent::Gen::ShapeshiftStatueGD(node->setUnionType("Component"));
+            return Ent::Gen::ShapeshiftStatueGD(node->setUnionType("ShapeshiftStatueGD"));
         }
         inline std::optional<Ent::Gen::SideMapGateGD> Component::SideMapGateGD() const
         {
@@ -32826,7 +32870,7 @@ namespace Ent
         }
         inline Ent::Gen::SideMapGateGD Component::setSideMapGateGD() const
         {
-            return Ent::Gen::SideMapGateGD(node->setUnionType("Component"));
+            return Ent::Gen::SideMapGateGD(node->setUnionType("SideMapGateGD"));
         }
         inline std::optional<Ent::Gen::SmoothScaleComponentGD> Component::SmoothScaleComponentGD() const
         {
@@ -32834,7 +32878,7 @@ namespace Ent
         }
         inline Ent::Gen::SmoothScaleComponentGD Component::setSmoothScaleComponentGD() const
         {
-            return Ent::Gen::SmoothScaleComponentGD(node->setUnionType("Component"));
+            return Ent::Gen::SmoothScaleComponentGD(node->setUnionType("SmoothScaleComponentGD"));
         }
         inline std::optional<Ent::Gen::SoulRespawnOpportunityGD> Component::SoulRespawnOpportunityGD() const
         {
@@ -32842,7 +32886,7 @@ namespace Ent
         }
         inline Ent::Gen::SoulRespawnOpportunityGD Component::setSoulRespawnOpportunityGD() const
         {
-            return Ent::Gen::SoulRespawnOpportunityGD(node->setUnionType("Component"));
+            return Ent::Gen::SoulRespawnOpportunityGD(node->setUnionType("SoulRespawnOpportunityGD"));
         }
         inline std::optional<Ent::Gen::SoundAreaGD> Component::SoundAreaGD() const
         {
@@ -32850,7 +32894,7 @@ namespace Ent
         }
         inline Ent::Gen::SoundAreaGD Component::setSoundAreaGD() const
         {
-            return Ent::Gen::SoundAreaGD(node->setUnionType("Component"));
+            return Ent::Gen::SoundAreaGD(node->setUnionType("SoundAreaGD"));
         }
         inline std::optional<Ent::Gen::SoundEmitterGD> Component::SoundEmitterGD() const
         {
@@ -32858,7 +32902,7 @@ namespace Ent
         }
         inline Ent::Gen::SoundEmitterGD Component::setSoundEmitterGD() const
         {
-            return Ent::Gen::SoundEmitterGD(node->setUnionType("Component"));
+            return Ent::Gen::SoundEmitterGD(node->setUnionType("SoundEmitterGD"));
         }
         inline std::optional<Ent::Gen::SpiritAnimalGD> Component::SpiritAnimalGD() const
         {
@@ -32866,7 +32910,7 @@ namespace Ent
         }
         inline Ent::Gen::SpiritAnimalGD Component::setSpiritAnimalGD() const
         {
-            return Ent::Gen::SpiritAnimalGD(node->setUnionType("Component"));
+            return Ent::Gen::SpiritAnimalGD(node->setUnionType("SpiritAnimalGD"));
         }
         inline std::optional<Ent::Gen::StaffVertebrasGD> Component::StaffVertebrasGD() const
         {
@@ -32874,7 +32918,7 @@ namespace Ent
         }
         inline Ent::Gen::StaffVertebrasGD Component::setStaffVertebrasGD() const
         {
-            return Ent::Gen::StaffVertebrasGD(node->setUnionType("Component"));
+            return Ent::Gen::StaffVertebrasGD(node->setUnionType("StaffVertebrasGD"));
         }
         inline std::optional<Ent::Gen::StaticObjectGD> Component::StaticObjectGD() const
         {
@@ -32882,7 +32926,7 @@ namespace Ent
         }
         inline Ent::Gen::StaticObjectGD Component::setStaticObjectGD() const
         {
-            return Ent::Gen::StaticObjectGD(node->setUnionType("Component"));
+            return Ent::Gen::StaticObjectGD(node->setUnionType("StaticObjectGD"));
         }
         inline std::optional<Ent::Gen::StickToTerrain> Component::StickToTerrain() const
         {
@@ -32890,7 +32934,7 @@ namespace Ent
         }
         inline Ent::Gen::StickToTerrain Component::setStickToTerrain() const
         {
-            return Ent::Gen::StickToTerrain(node->setUnionType("Component"));
+            return Ent::Gen::StickToTerrain(node->setUnionType("StickToTerrain"));
         }
         inline std::optional<Ent::Gen::StrongAttackGD> Component::StrongAttackGD() const
         {
@@ -32898,7 +32942,7 @@ namespace Ent
         }
         inline Ent::Gen::StrongAttackGD Component::setStrongAttackGD() const
         {
-            return Ent::Gen::StrongAttackGD(node->setUnionType("Component"));
+            return Ent::Gen::StrongAttackGD(node->setUnionType("StrongAttackGD"));
         }
         inline std::optional<Ent::Gen::SubScene> Component::SubScene() const
         {
@@ -32906,7 +32950,7 @@ namespace Ent
         }
         inline Ent::Gen::SubScene Component::setSubScene() const
         {
-            return Ent::Gen::SubScene(node->setUnionType("Component"));
+            return Ent::Gen::SubScene(node->setUnionType("SubScene"));
         }
         inline std::optional<Ent::Gen::SubSceneContainerGD> Component::SubSceneContainerGD() const
         {
@@ -32914,7 +32958,7 @@ namespace Ent
         }
         inline Ent::Gen::SubSceneContainerGD Component::setSubSceneContainerGD() const
         {
-            return Ent::Gen::SubSceneContainerGD(node->setUnionType("Component"));
+            return Ent::Gen::SubSceneContainerGD(node->setUnionType("SubSceneContainerGD"));
         }
         inline std::optional<Ent::Gen::SystemicCreature> Component::SystemicCreature() const
         {
@@ -32922,7 +32966,7 @@ namespace Ent
         }
         inline Ent::Gen::SystemicCreature Component::setSystemicCreature() const
         {
-            return Ent::Gen::SystemicCreature(node->setUnionType("Component"));
+            return Ent::Gen::SystemicCreature(node->setUnionType("SystemicCreature"));
         }
         inline std::optional<Ent::Gen::TeamGD> Component::TeamGD() const
         {
@@ -32930,7 +32974,7 @@ namespace Ent
         }
         inline Ent::Gen::TeamGD Component::setTeamGD() const
         {
-            return Ent::Gen::TeamGD(node->setUnionType("Component"));
+            return Ent::Gen::TeamGD(node->setUnionType("TeamGD"));
         }
         inline std::optional<Ent::Gen::TerrainGD> Component::TerrainGD() const
         {
@@ -32938,7 +32982,7 @@ namespace Ent
         }
         inline Ent::Gen::TerrainGD Component::setTerrainGD() const
         {
-            return Ent::Gen::TerrainGD(node->setUnionType("Component"));
+            return Ent::Gen::TerrainGD(node->setUnionType("TerrainGD"));
         }
         inline std::optional<Ent::Gen::TerrainSurfaceObject> Component::TerrainSurfaceObject() const
         {
@@ -32946,7 +32990,7 @@ namespace Ent
         }
         inline Ent::Gen::TerrainSurfaceObject Component::setTerrainSurfaceObject() const
         {
-            return Ent::Gen::TerrainSurfaceObject(node->setUnionType("Component"));
+            return Ent::Gen::TerrainSurfaceObject(node->setUnionType("TerrainSurfaceObject"));
         }
         inline std::optional<Ent::Gen::TestArrays> Component::TestArrays() const
         {
@@ -32954,7 +32998,7 @@ namespace Ent
         }
         inline Ent::Gen::TestArrays Component::setTestArrays() const
         {
-            return Ent::Gen::TestArrays(node->setUnionType("Component"));
+            return Ent::Gen::TestArrays(node->setUnionType("TestArrays"));
         }
         inline std::optional<Ent::Gen::TestCreature> Component::TestCreature() const
         {
@@ -32962,7 +33006,7 @@ namespace Ent
         }
         inline Ent::Gen::TestCreature Component::setTestCreature() const
         {
-            return Ent::Gen::TestCreature(node->setUnionType("Component"));
+            return Ent::Gen::TestCreature(node->setUnionType("TestCreature"));
         }
         inline std::optional<Ent::Gen::TestDefaultValues> Component::TestDefaultValues() const
         {
@@ -32970,7 +33014,7 @@ namespace Ent
         }
         inline Ent::Gen::TestDefaultValues Component::setTestDefaultValues() const
         {
-            return Ent::Gen::TestDefaultValues(node->setUnionType("Component"));
+            return Ent::Gen::TestDefaultValues(node->setUnionType("TestDefaultValues"));
         }
         inline std::optional<Ent::Gen::TestEntityRef> Component::TestEntityRef() const
         {
@@ -32978,7 +33022,7 @@ namespace Ent
         }
         inline Ent::Gen::TestEntityRef Component::setTestEntityRef() const
         {
-            return Ent::Gen::TestEntityRef(node->setUnionType("Component"));
+            return Ent::Gen::TestEntityRef(node->setUnionType("TestEntityRef"));
         }
         inline std::optional<Ent::Gen::TestSetOfObject> Component::TestSetOfObject() const
         {
@@ -32986,7 +33030,7 @@ namespace Ent
         }
         inline Ent::Gen::TestSetOfObject Component::setTestSetOfObject() const
         {
-            return Ent::Gen::TestSetOfObject(node->setUnionType("Component"));
+            return Ent::Gen::TestSetOfObject(node->setUnionType("TestSetOfObject"));
         }
         inline std::optional<Ent::Gen::TestUnion> Component::TestUnion() const
         {
@@ -32994,7 +33038,7 @@ namespace Ent
         }
         inline Ent::Gen::TestUnion Component::setTestUnion() const
         {
-            return Ent::Gen::TestUnion(node->setUnionType("Component"));
+            return Ent::Gen::TestUnion(node->setUnionType("TestUnion"));
         }
         inline std::optional<Ent::Gen::TransformGD> Component::TransformGD() const
         {
@@ -33002,7 +33046,7 @@ namespace Ent
         }
         inline Ent::Gen::TransformGD Component::setTransformGD() const
         {
-            return Ent::Gen::TransformGD(node->setUnionType("Component"));
+            return Ent::Gen::TransformGD(node->setUnionType("TransformGD"));
         }
         inline std::optional<Ent::Gen::TriggerEventCameraGD> Component::TriggerEventCameraGD() const
         {
@@ -33010,7 +33054,7 @@ namespace Ent
         }
         inline Ent::Gen::TriggerEventCameraGD Component::setTriggerEventCameraGD() const
         {
-            return Ent::Gen::TriggerEventCameraGD(node->setUnionType("Component"));
+            return Ent::Gen::TriggerEventCameraGD(node->setUnionType("TriggerEventCameraGD"));
         }
         inline std::optional<Ent::Gen::UnifiedPhysicsDataGD> Component::UnifiedPhysicsDataGD() const
         {
@@ -33018,7 +33062,7 @@ namespace Ent
         }
         inline Ent::Gen::UnifiedPhysicsDataGD Component::setUnifiedPhysicsDataGD() const
         {
-            return Ent::Gen::UnifiedPhysicsDataGD(node->setUnionType("Component"));
+            return Ent::Gen::UnifiedPhysicsDataGD(node->setUnionType("UnifiedPhysicsDataGD"));
         }
         inline std::optional<Ent::Gen::UnitTestComponent> Component::UnitTestComponent() const
         {
@@ -33026,7 +33070,7 @@ namespace Ent
         }
         inline Ent::Gen::UnitTestComponent Component::setUnitTestComponent() const
         {
-            return Ent::Gen::UnitTestComponent(node->setUnionType("Component"));
+            return Ent::Gen::UnitTestComponent(node->setUnionType("UnitTestComponent"));
         }
         inline std::optional<Ent::Gen::VegetationNavMeshTaggerGD> Component::VegetationNavMeshTaggerGD() const
         {
@@ -33034,7 +33078,7 @@ namespace Ent
         }
         inline Ent::Gen::VegetationNavMeshTaggerGD Component::setVegetationNavMeshTaggerGD() const
         {
-            return Ent::Gen::VegetationNavMeshTaggerGD(node->setUnionType("Component"));
+            return Ent::Gen::VegetationNavMeshTaggerGD(node->setUnionType("VegetationNavMeshTaggerGD"));
         }
         inline std::optional<Ent::Gen::VelocityObstacleGD> Component::VelocityObstacleGD() const
         {
@@ -33042,7 +33086,7 @@ namespace Ent
         }
         inline Ent::Gen::VelocityObstacleGD Component::setVelocityObstacleGD() const
         {
-            return Ent::Gen::VelocityObstacleGD(node->setUnionType("Component"));
+            return Ent::Gen::VelocityObstacleGD(node->setUnionType("VelocityObstacleGD"));
         }
         inline std::optional<Ent::Gen::VisualGD> Component::VisualGD() const
         {
@@ -33050,7 +33094,7 @@ namespace Ent
         }
         inline Ent::Gen::VisualGD Component::setVisualGD() const
         {
-            return Ent::Gen::VisualGD(node->setUnionType("Component"));
+            return Ent::Gen::VisualGD(node->setUnionType("VisualGD"));
         }
         inline std::optional<Ent::Gen::VolumeConstraintGD> Component::VolumeConstraintGD() const
         {
@@ -33058,7 +33102,7 @@ namespace Ent
         }
         inline Ent::Gen::VolumeConstraintGD Component::setVolumeConstraintGD() const
         {
-            return Ent::Gen::VolumeConstraintGD(node->setUnionType("Component"));
+            return Ent::Gen::VolumeConstraintGD(node->setUnionType("VolumeConstraintGD"));
         }
         inline std::optional<Ent::Gen::VoxelSimulationGD> Component::VoxelSimulationGD() const
         {
@@ -33066,7 +33110,7 @@ namespace Ent
         }
         inline Ent::Gen::VoxelSimulationGD Component::setVoxelSimulationGD() const
         {
-            return Ent::Gen::VoxelSimulationGD(node->setUnionType("Component"));
+            return Ent::Gen::VoxelSimulationGD(node->setUnionType("VoxelSimulationGD"));
         }
         inline std::optional<Ent::Gen::WallRunGD> Component::WallRunGD() const
         {
@@ -33074,7 +33118,7 @@ namespace Ent
         }
         inline Ent::Gen::WallRunGD Component::setWallRunGD() const
         {
-            return Ent::Gen::WallRunGD(node->setUnionType("Component"));
+            return Ent::Gen::WallRunGD(node->setUnionType("WallRunGD"));
         }
         inline std::optional<Ent::Gen::WildObject> Component::WildObject() const
         {
@@ -33082,7 +33126,7 @@ namespace Ent
         }
         inline Ent::Gen::WildObject Component::setWildObject() const
         {
-            return Ent::Gen::WildObject(node->setUnionType("Component"));
+            return Ent::Gen::WildObject(node->setUnionType("WildObject"));
         }
         inline std::optional<Ent::Gen::WorldScalePathFindGD> Component::WorldScalePathFindGD() const
         {
@@ -33090,7 +33134,7 @@ namespace Ent
         }
         inline Ent::Gen::WorldScalePathFindGD Component::setWorldScalePathFindGD() const
         {
-            return Ent::Gen::WorldScalePathFindGD(node->setUnionType("Component"));
+            return Ent::Gen::WorldScalePathFindGD(node->setUnionType("WorldScalePathFindGD"));
         }
         // Object_Components
         inline char const* Object_Components::getType() const
@@ -40501,6 +40545,10 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        inline Ent::Gen::String AnalyticsManager_MongoDBConnection::collection() const
+        {
+            return Ent::Gen::String(node->at("collection"));
+        }
         inline Ent::Gen::String AnalyticsManager_MongoDBConnection::database() const
         {
             return Ent::Gen::String(node->at("database"));
@@ -40816,10 +40864,6 @@ namespace Ent
         {
             return Ent::Gen::Object_Components(node->at("Components"));
         }
-        inline Ent::Gen::String Object::InstanceOf() const
-        {
-            return Ent::Gen::String(node->at("InstanceOf"));
-        }
         inline Ent::Gen::Object_MaxActivationLevel Object::MaxActivationLevel() const
         {
             return Ent::Gen::Object_MaxActivationLevel(node->at("MaxActivationLevel"));
@@ -40874,10 +40918,6 @@ namespace Ent
         {
             return Ent::Gen::Components(node->at("Components"));
         }
-        inline Ent::Gen::String Entity::InstanceOf() const
-        {
-            return Ent::Gen::String(node->at("InstanceOf"));
-        }
         inline Ent::Gen::MaxActivationLevel Entity::MaxActivationLevel() const
         {
             return Ent::Gen::MaxActivationLevel(node->at("MaxActivationLevel"));
@@ -40899,10 +40939,6 @@ namespace Ent
         {
             return Ent::Gen::ObjectSet<char const*, Ent::Gen::Entity>(node->at("Embedded"));
         }
-        inline Ent::Gen::String SubScene::File() const
-        {
-            return Ent::Gen::String(node->at("File"));
-        }
         inline Ent::Gen::ComponentGD SubScene::Super() const
         {
             return Ent::Gen::ComponentGD(node->at("Super"));
@@ -40910,10 +40946,6 @@ namespace Ent
         inline Ent::Gen::String SubScene::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
-        }
-        inline Ent::Gen::Bool SubScene::isEmbedded() const
-        {
-            return Ent::Gen::Bool(node->at("isEmbedded"));
         }
         // Scene
         inline Ent::Gen::ObjectSet<char const*, Ent::Gen::Entity> Scene::Objects() const
@@ -41010,6 +41042,15 @@ namespace Ent
             return Ent::Gen::ActorState(node->at("Super"));
         }
         inline Ent::Gen::String EntityStateWallRunJump::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EntityStateWallRunDrop
+        inline Ent::Gen::ActorState EntityStateWallRunDrop::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateWallRunDrop::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -45776,9 +45817,13 @@ namespace Ent
         }
         // ActorStateStack
         // AnalyticsFPS
-        inline Ent::Gen::Float AnalyticsFPS::Interval() const
+        inline Ent::Gen::Float AnalyticsFPS::TeleportationDistance() const
         {
-            return Ent::Gen::Float(node->at("Interval"));
+            return Ent::Gen::Float(node->at("TeleportationDistance"));
+        }
+        inline Ent::Gen::Float AnalyticsFPS::TeleportationInterval() const
+        {
+            return Ent::Gen::Float(node->at("TeleportationInterval"));
         }
         inline Ent::Gen::String AnalyticsFPS::_comment() const
         {

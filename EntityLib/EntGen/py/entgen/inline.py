@@ -12217,6 +12217,31 @@ class WallRunGD(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
+    def dropAirControlDelay(self):  # type: ()->Float
+        return Float(self._node.at("dropAirControlDelay"))
+    @dropAirControlDelay.setter
+    def dropAirControlDelay(self, val): self.dropAirControlDelay.set(val)
+    @property
+    def dropCoyoteJumpMaxTime(self):  # type: ()->Float
+        return Float(self._node.at("dropCoyoteJumpMaxTime"))
+    @dropCoyoteJumpMaxTime.setter
+    def dropCoyoteJumpMaxTime(self, val): self.dropCoyoteJumpMaxTime.set(val)
+    @property
+    def dropTrajectoryRotationYaw(self):  # type: ()->Float
+        return Float(self._node.at("dropTrajectoryRotationYaw"))
+    @dropTrajectoryRotationYaw.setter
+    def dropTrajectoryRotationYaw(self, val): self.dropTrajectoryRotationYaw.set(val)
+    @property
+    def dropVisualRotationYawRateFactor(self):  # type: ()->Float
+        return Float(self._node.at("dropVisualRotationYawRateFactor"))
+    @dropVisualRotationYawRateFactor.setter
+    def dropVisualRotationYawRateFactor(self, val): self.dropVisualRotationYawRateFactor.set(val)
+    @property
+    def jumpRiseMinCoeffToEnter(self):  # type: ()->Float
+        return Float(self._node.at("jumpRiseMinCoeffToEnter"))
+    @jumpRiseMinCoeffToEnter.setter
+    def jumpRiseMinCoeffToEnter(self, val): self.jumpRiseMinCoeffToEnter.set(val)
+    @property
     def jumpTrajectoryRotationYaw(self):  # type: ()->Float
         return Float(self._node.at("jumpTrajectoryRotationYaw"))
     @jumpTrajectoryRotationYaw.setter
@@ -12302,10 +12327,10 @@ class WallRunGD(HelperObject):
     @runSlopeAngleMin.setter
     def runSlopeAngleMin(self, val): self.runSlopeAngleMin.set(val)
     @property
-    def runTrajectoryRotationPitch(self):  # type: ()->Float
-        return Float(self._node.at("runTrajectoryRotationPitch"))
-    @runTrajectoryRotationPitch.setter
-    def runTrajectoryRotationPitch(self, val): self.runTrajectoryRotationPitch.set(val)
+    def runTrajectoryRotationPitchCurveResourcePath(self):  # type: ()->String
+        return String(self._node.at("runTrajectoryRotationPitchCurveResourcePath"))
+    @runTrajectoryRotationPitchCurveResourcePath.setter
+    def runTrajectoryRotationPitchCurveResourcePath(self, val): self.runTrajectoryRotationPitchCurveResourcePath.set(val)
     @property
     def runTrajectoryRotationYaw(self):  # type: ()->Float
         return Float(self._node.at("runTrajectoryRotationYaw"))
@@ -22853,6 +22878,11 @@ class AnalyticsManager_MongoDBConnection(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
+    def collection(self):  # type: ()->String
+        return String(self._node.at("collection"))
+    @collection.setter
+    def collection(self, val): self.collection.set(val)
+    @property
     def database(self):  # type: ()->String
         return String(self._node.at("database"))
     @database.setter
@@ -22957,11 +22987,6 @@ class Object(HelperObject):
     def Components(self):  # type: ()->Object_Components
         return Object_Components(self._node.at("Components"))
     @property
-    def InstanceOf(self):  # type: ()->String
-        return String(self._node.at("InstanceOf"))
-    @InstanceOf.setter
-    def InstanceOf(self, val): self.InstanceOf.set(val)
-    @property
     def MaxActivationLevel(self):  # type: ()->Object_MaxActivationLevel
         return Object_MaxActivationLevel(self._node.at("MaxActivationLevel"))
     @MaxActivationLevel.setter
@@ -23045,11 +23070,6 @@ class Entity(HelperObject):
     def Components(self):  # type: ()->Components
         return Components(self._node.at("Components"))
     @property
-    def InstanceOf(self):  # type: ()->String
-        return String(self._node.at("InstanceOf"))
-    @InstanceOf.setter
-    def InstanceOf(self, val): self.InstanceOf.set(val)
-    @property
     def MaxActivationLevel(self):  # type: ()->MaxActivationLevel
         return MaxActivationLevel(self._node.at("MaxActivationLevel"))
     @MaxActivationLevel.setter
@@ -23088,11 +23108,6 @@ class SubScene(HelperObject):
     def Embedded(self):  # type: ()->ObjectSet[Entity]
         return (lambda n: ObjectSet(Entity, n))(self._node.at("Embedded"))
     @property
-    def File(self):  # type: ()->String
-        return String(self._node.at("File"))
-    @File.setter
-    def File(self, val): self.File.set(val)
-    @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
     @property
@@ -23100,11 +23115,6 @@ class SubScene(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
-    @property
-    def isEmbedded(self):  # type: ()->Bool
-        return Bool(self._node.at("isEmbedded"))
-    @isEmbedded.setter
-    def isEmbedded(self, val): self.isEmbedded.set(val)
     pass
 
 
@@ -23312,6 +23322,29 @@ class EntityStateWallRunJump(HelperObject):
     @staticmethod
     def create(entlib):  # type: (EntityLib)->EntityStateWallRunJump
         return EntityStateWallRunJump(entlib.make_node(EntityStateWallRunJump.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateWallRunDrop(HelperObject):
+    schema_name = "EntityStateWallRunDrop"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateWallRunDrop
+        return EntityStateWallRunDrop(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateWallRunDrop.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateWallRunDrop
+        return EntityStateWallRunDrop(entlib.make_node(EntityStateWallRunDrop.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
@@ -31013,6 +31046,8 @@ class ActionModeEnum(Enum):
     levitatemove = "levitatemove"
     aim = "aim"
     wallrun = "wallrun"
+    wallrunjump = "wallrunjump"
+    wallrundrop = "wallrundrop"
     aimcharge = "aimcharge"
     aimcharged = "aimcharged"
     aimflow = "aimflow"
@@ -33174,10 +33209,15 @@ class AnalyticsFPS(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def Interval(self):  # type: ()->Float
-        return Float(self._node.at("Interval"))
-    @Interval.setter
-    def Interval(self, val): self.Interval.set(val)
+    def TeleportationDistance(self):  # type: ()->Float
+        return Float(self._node.at("TeleportationDistance"))
+    @TeleportationDistance.setter
+    def TeleportationDistance(self, val): self.TeleportationDistance.set(val)
+    @property
+    def TeleportationInterval(self):  # type: ()->Float
+        return Float(self._node.at("TeleportationInterval"))
+    @TeleportationInterval.setter
+    def TeleportationInterval(self, val): self.TeleportationInterval.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

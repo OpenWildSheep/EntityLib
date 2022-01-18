@@ -614,6 +614,7 @@ from .ActorStateFlockingChangingParams_Params import *
 from .ActorStateArbiterDecision import *
 from .ActorState import *
 from .EntityStateWallRunJump import *
+from .EntityStateWallRunDrop import *
 from .EntityStateWallRun import *
 from .EntityStateVoxelsVolume import *
 from .EntityStateUndergroundCavity import *

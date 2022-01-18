@@ -30,6 +30,31 @@ class WallRunGD(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
+    def dropAirControlDelay(self):  # type: ()->Float
+        return Float(self._node.at("dropAirControlDelay"))
+    @dropAirControlDelay.setter
+    def dropAirControlDelay(self, val): self.dropAirControlDelay.set(val)
+    @property
+    def dropCoyoteJumpMaxTime(self):  # type: ()->Float
+        return Float(self._node.at("dropCoyoteJumpMaxTime"))
+    @dropCoyoteJumpMaxTime.setter
+    def dropCoyoteJumpMaxTime(self, val): self.dropCoyoteJumpMaxTime.set(val)
+    @property
+    def dropTrajectoryRotationYaw(self):  # type: ()->Float
+        return Float(self._node.at("dropTrajectoryRotationYaw"))
+    @dropTrajectoryRotationYaw.setter
+    def dropTrajectoryRotationYaw(self, val): self.dropTrajectoryRotationYaw.set(val)
+    @property
+    def dropVisualRotationYawRateFactor(self):  # type: ()->Float
+        return Float(self._node.at("dropVisualRotationYawRateFactor"))
+    @dropVisualRotationYawRateFactor.setter
+    def dropVisualRotationYawRateFactor(self, val): self.dropVisualRotationYawRateFactor.set(val)
+    @property
+    def jumpRiseMinCoeffToEnter(self):  # type: ()->Float
+        return Float(self._node.at("jumpRiseMinCoeffToEnter"))
+    @jumpRiseMinCoeffToEnter.setter
+    def jumpRiseMinCoeffToEnter(self, val): self.jumpRiseMinCoeffToEnter.set(val)
+    @property
     def jumpTrajectoryRotationYaw(self):  # type: ()->Float
         return Float(self._node.at("jumpTrajectoryRotationYaw"))
     @jumpTrajectoryRotationYaw.setter
@@ -115,10 +140,10 @@ class WallRunGD(HelperObject):
     @runSlopeAngleMin.setter
     def runSlopeAngleMin(self, val): self.runSlopeAngleMin.set(val)
     @property
-    def runTrajectoryRotationPitch(self):  # type: ()->Float
-        return Float(self._node.at("runTrajectoryRotationPitch"))
-    @runTrajectoryRotationPitch.setter
-    def runTrajectoryRotationPitch(self, val): self.runTrajectoryRotationPitch.set(val)
+    def runTrajectoryRotationPitchCurveResourcePath(self):  # type: ()->String
+        return String(self._node.at("runTrajectoryRotationPitchCurveResourcePath"))
+    @runTrajectoryRotationPitchCurveResourcePath.setter
+    def runTrajectoryRotationPitchCurveResourcePath(self, val): self.runTrajectoryRotationPitchCurveResourcePath.set(val)
     @property
     def runTrajectoryRotationYaw(self):  # type: ()->Float
         return Float(self._node.at("runTrajectoryRotationYaw"))

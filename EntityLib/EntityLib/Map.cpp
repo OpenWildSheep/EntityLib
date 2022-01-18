@@ -1,6 +1,7 @@
 #include "Map.h"
 
 #include <ciso646>
+#include <set>
 
 #include "include/EntityLib.h"
 #include "Tools.h"

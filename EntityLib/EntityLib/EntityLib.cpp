@@ -1408,242 +1408,6 @@ namespace Ent
         return data;
     }
 
-    namespace
-    {
-        ActivationLevel parseActivationLevel(const std::string& _name)
-        {
-            if (_name == "Created")
-            {
-                return ActivationLevel::Created;
-            }
-            if (_name == "Started")
-            {
-                return ActivationLevel::Started;
-            }
-            if (_name == "Loading")
-            {
-                return ActivationLevel::Loading;
-            }
-            if (_name == "InWorld")
-            {
-                return ActivationLevel::InWorld;
-            }
-            return ActivationLevel::Started;
-        }
-    } // namespace
-
-    std::unique_ptr<Entity> EntityLib::loadEntityFromJson(
-        json const& _entNode, Entity const* _superEntityFromParentEntity) const
-    {
-        ENTLIB_ASSERT(
-            _superEntityFromParentEntity == nullptr
-            or _superEntityFromParentEntity->deleteCheck.state_ == DeleteCheck::State::VALID);
-
-        Override<String> ovInstanceOf;
-        if (_superEntityFromParentEntity != nullptr)
-        {
-            ovInstanceOf = _superEntityFromParentEntity->getInstanceOfValue().makeInstanceOf();
-        }
-        auto superEntityOfThisEntity = std::make_unique<Entity>(*this, "Prefab");
-        ENTLIB_ASSERT(superEntityOfThisEntity->deleteCheck.state_ == DeleteCheck::State::VALID);
-        bool superIsInit = false;
-        Entity const* superEntity = superEntityOfThisEntity.get();
-        ENTLIB_ASSERT(superEntity->deleteCheck.state_ == DeleteCheck::State::VALID);
-        if (_entNode.count("InstanceOf") != 0)
-        {
-            auto const prefabPath = _entNode.at("InstanceOf").get<std::string>();
-            if (not prefabPath.empty())
-            {
-                // Do not inherit from _superEntityFromParentEntity since the override of InstanceOf reset the Entity
-                auto superEntityShared = loadEntityReadOnly(prefabPath.c_str(), nullptr);
-                ovInstanceOf =
-                    superEntityShared->getInstanceOfValue().makeOverridedInstanceOf(prefabPath);
-                superEntity = superEntityShared.get();
-                ENTLIB_ASSERT(superEntity->deleteCheck.state_ == DeleteCheck::State::VALID);
-                superIsInit = true;
-            }
-            else
-            {
-                _superEntityFromParentEntity = nullptr;
-                ovInstanceOf = Override<String>("", std::nullopt, "");
-            }
-        }
-        ENTLIB_ASSERT(superEntity->deleteCheck.state_ == DeleteCheck::State::VALID);
-
-        if (not superIsInit and _superEntityFromParentEntity != nullptr)
-        {
-            superEntity = _superEntityFromParentEntity;
-            ENTLIB_ASSERT(superEntity->deleteCheck.state_ == DeleteCheck::State::VALID);
-        }
-
-        std::optional<std::string> const thumbnail =
-            _entNode.count("Thumbnail") != 0 ? _entNode.at("Thumbnail").get<std::string>() :
-                                               std::optional<std::string>();
-        Override<String> superThumbnail = superEntity->getThumbnailValue();
-        Override<String> ovThumbnail = superThumbnail.makeOverridedInstanceOf(thumbnail);
-
-        std::optional<std::string> const name = _entNode.count("Name") != 0 ?
-                                                    _entNode.at("Name").get<std::string>() :
-                                                    std::optional<std::string>();
-
-        Override<String> superName = superEntity->getNameValue();
-        Override<String> ovName = superName.makeOverridedInstanceOf(name);
-
-        Override<String> superInstanceOf = superEntity->getInstanceOfValue();
-
-        std::optional<ActivationLevel> maxActivationLevel;
-        if (_entNode.count("MaxActivationLevel") != 0)
-        {
-            maxActivationLevel =
-                parseActivationLevel(_entNode.at("MaxActivationLevel").get<std::string>());
-        }
-        Override<ActivationLevel> superActivationLevel =
-            superEntity != nullptr ? superEntity->getMaxActivationLevelValue() :
-                                     Override<ActivationLevel>{ActivationLevel::Started};
-        Override<ActivationLevel> ovMaxActivationLevel =
-            superActivationLevel.makeOverridedInstanceOf(maxActivationLevel);
-
-        // Color
-        NodeUniquePtr ovColor = makeDefaultColorField(*this);
-        if (_entNode.contains("Color"))
-        {
-            Subschema const& colorSchema = AT(schema.schema.allDefinitions, colorSchemaName);
-            ovColor = loadNode(
-                colorSchema,
-                _entNode.at("Color"),
-                _superEntityFromParentEntity != nullptr ?
-                    &_superEntityFromParentEntity->getColorValue() :
-                    nullptr);
-        }
-        else if (superEntity != nullptr)
-        {
-            ovColor = superEntity->getColorValue().makeInstanceOf();
-        }
-
-        // ActorStates
-        Subschema const& actorStatesSchema = AT(schema.schema.allDefinitions, actorStatesSchemaName);
-        auto ovActorStates =
-            newNode(std::make_unique<Array>(this, &actorStatesSchema), &actorStatesSchema);
-        if (_entNode.contains("ActorStates"))
-        {
-            ovActorStates = loadNode(
-                actorStatesSchema, _entNode.at("ActorStates"), &superEntity->getActorStates());
-        }
-        else
-        {
-            ovActorStates = superEntity->getActorStates().makeInstanceOf();
-        }
-
-        std::map<std::string, std::unique_ptr<Component>> components;
-        std::set<std::string> removedComponents;
-        std::set<std::string> componentTypes;
-        std::unique_ptr<SubSceneComponent> subSceneComponent;
-        size_t index = 0;
-        if (_entNode.count("Components") != 0)
-        {
-            json const& componentsNode = _entNode.at("Components");
-            for (json const& compNode : componentsNode)
-            {
-                auto const cmpType = compNode.at("Type").get<std::string>();
-                if (not componentTypes.insert(cmpType).second)
-                {
-                    throw DuplicateKey(format("Two Components of same type: '%s'", cmpType.c_str()));
-                }
-                json const& data = compNode.value("Data", json::object());
-                if (data.is_null())
-                {
-                    removedComponents.insert(cmpType);
-                    continue;
-                }
-
-                if (cmpType == "SubScene")
-                {
-                    SubSceneComponent const* superComp = superEntity->getSubSceneComponent();
-
-                    auto fileInJson =
-                        (data.count("File") != 0) ?
-                            std::optional<std::string>(data["File"].get<std::string>()) :
-                            std::nullopt;
-                    auto subSceneComp =
-                        std::make_unique<SubSceneComponent>(this, superComp != nullptr, index);
-                    subSceneComp->embedded = Scene::loadScene(
-                        *this,
-                        data.value("Embedded", json()),
-                        (superComp != nullptr ? superComp->embedded.get() : nullptr));
-                    subSceneComponent = std::move(subSceneComp);
-                }
-                else
-                {
-                    Component const* superComp = superEntity->getComponent(cmpType.c_str());
-                    auto const version =
-                        compNode.count("Version") != 0u ? compNode.at("Version").get<size_t>() : 0;
-
-                    if (schema.components.count(cmpType) == 0)
-                    {
-                        ENTLIB_LOG_ERROR("Unknown Component type : %s", cmpType.c_str());
-                    }
-                    else
-                    {
-                        Subschema const& compSchema = *AT(schema.components, cmpType);
-                        auto comp = std::make_unique<Component>(
-                            superComp != nullptr, // has a super component
-                            cmpType,
-                            loadNode(
-                                compSchema,
-                                data,
-                                (superComp != nullptr ? superComp->root.get() : nullptr)),
-                            version,
-                            index);
-
-                        comp->root->checkParent(nullptr);
-                        components.emplace(cmpType, std::move(comp));
-                    }
-                }
-                ++index;
-            }
-        }
-        // Add undeclared componants to be able to get values inside (They are full reference to prefab)
-        for (auto const& [cmpType, superComp] : superEntity->getComponents())
-        {
-            if (removedComponents.count(cmpType) != 0)
-            {
-                continue;
-            }
-            if (components.count(cmpType) == 0)
-            {
-                auto comp = std::make_unique<Component>(
-                    true,
-                    cmpType,
-                    superComp->root->makeInstanceOf(),
-                    superComp->version,
-                    superComp->index);
-
-                components.emplace(cmpType, std::move(comp));
-            }
-            ++index;
-        }
-        {
-            SubSceneComponent const* superComp = superEntity->getSubSceneComponent();
-            if (superComp != nullptr and subSceneComponent == nullptr
-                and removedComponents.count("SubScene") == 0)
-            {
-                subSceneComponent = std::make_unique<SubSceneComponent>(
-                    this, true, superComp->index, superComp->embedded->makeInstanceOf());
-            }
-        }
-        return std::make_unique<Entity>(
-            *this,
-            std::move(ovName),
-            std::move(components),
-            std::move(removedComponents),
-            std::move(subSceneComponent),
-            std::move(ovActorStates),
-            std::move(ovColor),
-            std::move(ovThumbnail),
-            std::move(ovInstanceOf),
-            ovMaxActivationLevel);
-    }
-
     /// Exception thrown when a method is called on legacy data (or vice versa)
     struct UnsupportedFormat : ContextException
     {
@@ -1661,7 +1425,9 @@ namespace Ent
         auto const absPath = getAbsolutePath(_path);
         std::filesystem::path relPath = std::filesystem::relative(absPath, rawdataPath);
         if (relPath.empty() || (*relPath.begin() == ".."))
+        {
             relPath = absPath;
+        }
         bool reload = false;
         auto error = std::error_code{};
         auto timestamp = std::filesystem::last_write_time(absPath, error);
@@ -1687,15 +1453,6 @@ namespace Ent
             try
             {
                 json document = loadJsonFile(rawdataPath, relPath);
-                if (document.count("Objects") and typeid(Type) == typeid(Entity)
-                    or (document.count("Name") or document.count("InstanceOf")
-                        or document.count("Components"))
-                           and typeid(Type) == typeid(Scene))
-                {
-                    // we are trying to load a legacy scene through loadScene method
-                    // or a new Scene format through loadLegacyScene method
-                    throw UnsupportedFormat();
-                }
                 if (validationEnabled)
                 {
                     validate(schema.schema, toolsDir, document);
@@ -1723,18 +1480,6 @@ namespace Ent
         }
     }
 
-    std::shared_ptr<Entity const> EntityLib::loadEntityReadOnly(
-        std::filesystem::path const& _entityPath, Entity const* _super) const
-    {
-        return loadEntityOrScene<Entity>(
-            _entityPath, m_entityCache, &validateEntity, mem_fn(&EntityLib::loadEntityFromJson), _super);
-    }
-
-    std::shared_ptr<Scene const> EntityLib::loadSceneReadOnly(std::filesystem::path const& _scenePath) const
-    {
-        return loadScene(_scenePath);
-    }
-
     std::shared_ptr<Node const> EntityLib::loadNodeReadOnly(
         Subschema const& _nodeSchema, char const* _nodePath, Node const* _super) const
     {
@@ -1757,17 +1502,6 @@ namespace Ent
     std::shared_ptr<Node const> EntityLib::loadNodeEntityReadOnly(char const* _nodePath) const
     {
         return loadNodeReadOnly(*getSchema(entitySchemaName), _nodePath);
-    }
-
-    std::shared_ptr<Scene const>
-    EntityLib::loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const
-    {
-        auto loadFunc = [](EntityLib const& _entLib, json const& _document, Scene const* _super)
-        {
-            return Scene::loadScene(_entLib, _document.at("Objects"), _super);
-        };
-
-        return loadEntityOrScene<Scene>(_scenePath, m_sceneCache, &validateScene, loadFunc, nullptr);
     }
 
     NodeUniquePtr EntityLib::loadEntityAsNode(std::filesystem::path const& _entityPath) const
@@ -1865,41 +1599,6 @@ namespace Ent
         return loadEntityOrScene<Node>(_nodePath, m_nodeCache, validate, loadFunc, nullptr)->clone();
     }
 
-    std::unique_ptr<Entity>
-    EntityLib::loadEntity(std::filesystem::path const& _entityPath, Entity const* _super) const
-    {
-        return loadEntityReadOnly(_entityPath, _super)->clone();
-    }
-
-    std::unique_ptr<Scene> EntityLib::loadScene(std::filesystem::path const& _scenePath) const
-    {
-        try
-        {
-            auto entity = loadEntity(_scenePath);
-            if (auto* subScene = entity->getSubSceneComponent())
-            {
-                return subScene->detachEmbedded();
-            }
-            return {};
-        }
-        catch (const UnsupportedFormat&)
-        {
-            return loadLegacyScene(_scenePath);
-        }
-    }
-
-    std::unique_ptr<Scene> EntityLib::loadLegacyScene(std::filesystem::path const& _scenePath) const
-    {
-        return loadLegacySceneReadOnly(_scenePath)->clone();
-    }
-
-    std::unique_ptr<Entity> EntityLib::makeInstanceOf(std::string const& _instanceOf) const
-    {
-        std::unique_ptr<Entity> inst = std::make_unique<Entity>(*this, nullptr);
-        inst->resetInstanceOf(_instanceOf.c_str());
-        return inst;
-    }
-
     NodeUniquePtr EntityLib::makeNodeInstanceOf(char const* _schemaName, char const* _prefab) const
     {
         auto node = makeNode(_schemaName);
@@ -1926,42 +1625,6 @@ namespace Ent
     NodeUniquePtr EntityLib::makeEntityNode() const
     {
         return makeNode(entitySchemaName);
-    }
-
-    void EntityLib::saveEntity(Entity const& _entity, std::filesystem::path const& _relEntityPath) const
-    {
-        std::filesystem::path entityPath = getAbsolutePath(_relEntityPath);
-        std::stringstream buffer;
-        json document = _entity.saveEntity();
-        buffer << document.dump(4);
-        std::ofstream file(entityPath);
-        if (not file.is_open())
-        {
-            throw FileSystemError("Trying to open file for write", rawdataPath, entityPath);
-        }
-        file << buffer.str();
-        file.close();
-
-        // Better to check after save because it is easiest to debug
-        if (validationEnabled)
-        {
-            try
-            {
-                validateEntity(schema.schema, toolsDir, document);
-            }
-            catch (ContextException& ex)
-            {
-                ex.addContextMessage("saving entity : %s", formatPath(rawdataPath, _relEntityPath));
-                throw;
-            }
-            catch (...)
-            {
-                throw WrapperException(
-                    std::current_exception(),
-                    "saving entity : %s",
-                    formatPath(rawdataPath, _relEntityPath));
-            }
-        }
     }
 
     std::filesystem::path EntityLib::getAbsolutePath(std::filesystem::path const& _path) const
@@ -2016,14 +1679,6 @@ namespace Ent
         }
     }
 
-    std::map<std::filesystem::path, EntityLib::EntityFile> const& EntityLib::getEntityCache() const
-    {
-        return m_entityCache;
-    }
-    std::map<std::filesystem::path, EntityLib::SceneFile> const& EntityLib::getSceneCache() const
-    {
-        return m_sceneCache;
-    }
     std::map<std::filesystem::path, EntityLib::NodeFile> const& EntityLib::getNodeCache() const
     {
         return m_nodeCache;
@@ -2031,39 +1686,7 @@ namespace Ent
 
     void EntityLib::clearCache()
     {
-        m_entityCache.clear();
-        m_sceneCache.clear();
         m_nodeCache.clear();
-    }
-
-    void EntityLib::saveScene(Scene const& _scene, std::filesystem::path const& _scenePath) const
-    {
-        // scene entity is named after scene base file name
-        auto name = _scenePath.stem().string();
-
-        // generate relative wthumb path
-        auto thumbNailPath = _scenePath.generic_string() + ".wthumb";
-        const auto genericRawdataPath = rawdataPath.generic_string();
-        const auto pos = thumbNailPath.find(genericRawdataPath);
-        if (pos == 0)
-        {
-            const size_t offset = genericRawdataPath.size() + 1; // also strip the leading '/'
-            thumbNailPath = thumbNailPath.substr(offset);
-        }
-
-        Subschema const& actorStatesSchema = AT(schema.schema.allDefinitions, actorStatesSchemaName);
-
-        Entity sceneEntity(
-            *this,
-            {name},
-            {},
-            {},
-            std::make_unique<SubSceneComponent>(this, false, 0, _scene.clone()),
-            newNode(std::make_unique<Array>(this, &actorStatesSchema), &actorStatesSchema),
-            makeDefaultColorField(*this),
-            {thumbNailPath});
-
-        saveEntity(sceneEntity, _scenePath);
     }
 
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)

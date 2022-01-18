@@ -308,9 +308,13 @@ namespace Ent
         {
             element.isPresent.set(false);
             element.node->setAddedInInsance(false);
+            checkInvariants();
+            return true;
         }
-        checkInvariants();
-        return true;
+        else
+        {
+            return false;
+        }
     }
 
     template <typename Elt> // Elt is Element or Element const

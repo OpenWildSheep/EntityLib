@@ -34,11 +34,6 @@ class Entity(HelperObject):
     def Components(self):  # type: ()->Components
         return Components(self._node.at("Components"))
     @property
-    def InstanceOf(self):  # type: ()->String
-        return String(self._node.at("InstanceOf"))
-    @InstanceOf.setter
-    def InstanceOf(self, val): self.InstanceOf.set(val)
-    @property
     def MaxActivationLevel(self):  # type: ()->MaxActivationLevel
         return MaxActivationLevel(self._node.at("MaxActivationLevel"))
     @MaxActivationLevel.setter

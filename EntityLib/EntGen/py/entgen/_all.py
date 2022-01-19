@@ -87,6 +87,7 @@ from .ReviveSide import *
 from .ReviveSideEvent import *
 from .ReviveEnergyComponentInput_ReviveSide import *
 from .ResponsiblePointer_AnalyticsObserverInterface_ import *
+from .RegenerationManager_EnergyAreaSetting import *
 from .RegenSwitchBehavior import *
 from .RegenMeshBone import *
 from .RegenMeshBoneNeighbours import *
@@ -160,7 +161,6 @@ from .WaveManager import *
 from .WaterManager import *
 from .VoxelSimulationManager import *
 from .VisualManager import *
-from .VelocityObstaclesManager import *
 from .VegetationManager import *
 from .TrailManager import *
 from .TerrainManager import *
@@ -173,7 +173,6 @@ from .SceneManager import *
 from .ResourceDebugger import *
 from .ReloadManager import *
 from .RegionManager import *
-from .RegenerationManager import *
 from .RecastPathFindManager import *
 from .RPCServerManager import *
 from .RPCMarshallingTests import *
@@ -234,6 +233,8 @@ from .HeightGrid import *
 from .NavMeshSet import *
 from .HeadCollisionBehaviorData import *
 from .GrowingState import *
+from .GroupAvoidanceEnum import *
+from .VelocityObstaclesManager import *
 from .GroundTypeData import *
 from .GeometryStamper import *
 from .ZoneStamper import *
@@ -273,6 +274,7 @@ from .GameClockManager import *
 from .GameBiteData import *
 from .GameBeamSnapData import *
 from .GPEType import *
+from .FurProperties import *
 from .FreezeData import *
 from .ForceBlendInReachRequired import *
 from .ForceBlendIn import *
@@ -303,8 +305,12 @@ from .EntityStateChargeMode_EntityStateChargeModeInputs import *
 from .EntityLODData import *
 from .RegenData import *
 from .EntityID import *
+from .EnergyValue import *
 from .EnergySide import *
 from .TaggingVegetation import *
+from .EnergyIntensity import *
+from .RegenerationManager import *
+from .EnergyPoolGD_EnergyArea import *
 from .Enabled import *
 from .EDITOR_Mesh import *
 from .EDITOR_LODsItem import *
@@ -443,6 +449,7 @@ from .HealTriggerGD import *
 from .HealPumpGD import *
 from .GroundTypeSamplerGD import *
 from .GameEffectSpawnerGD import *
+from .FurComponentGD import *
 from .FluidVolumeComponentGD import *
 from .FluidViewGD import *
 from .FluidToRegenInjectorGD import *
@@ -607,6 +614,7 @@ from .ActorStateFlockingChangingParams_Params import *
 from .ActorStateArbiterDecision import *
 from .ActorState import *
 from .EntityStateWallRunJump import *
+from .EntityStateWallRunDrop import *
 from .EntityStateWallRun import *
 from .EntityStateVoxelsVolume import *
 from .EntityStateUndergroundCavity import *

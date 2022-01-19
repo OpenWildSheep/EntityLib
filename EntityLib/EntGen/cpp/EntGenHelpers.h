@@ -36,6 +36,11 @@ namespace Ent
                 return node->isDefault();
             }
 
+            bool hasOverride() const
+            {
+                return node->hasOverride();
+            }
+
             bool hasDefaultValue() const
             {
                 return node->hasDefaultValue();
@@ -44,6 +49,16 @@ namespace Ent
             bool IsUsedInRuntime() const
             {
                 return node->getSchema()->IsUsedInRuntime();
+            }
+
+            Ent::Subschema const* getSchema() const
+            {
+                return node->getSchema();
+            }
+
+            Ent::DataType getDataType() const
+            {
+                return node->getSchema()->type;
             }
         };
 
@@ -314,12 +329,12 @@ namespace Ent
             {
                 return addSubNode(getTypeName<T>());
             }
-            void remove(char const* str) const
+            bool remove(char const* str) const
             {
-                node->mapErase(str);
+                return node->mapErase(str);
             }
             template <typename T>
-            void remove() const
+            bool remove() const
             {
                 return remove(getTypeName<T>());
             }
@@ -335,6 +350,10 @@ namespace Ent
             bool empty() const
             {
                 return node->empty();
+            }
+            void clear()
+            {
+                node->clear();
             }
 
             auto getKeys() const
@@ -539,9 +558,9 @@ namespace Ent
             {
                 return node->mapInsert(toInternal(key));
             }
-            void remove(K key) const
+            bool remove(K key) const
             {
-                node->mapErase(toInternal(key));
+                return node->mapErase(toInternal(key));
             }
             size_t size() const
             {
@@ -551,6 +570,11 @@ namespace Ent
             bool empty() const
             {
                 return node->empty();
+            }
+
+            void clear()
+            {
+                return node->clear();
             }
 
             auto getKeys() const
@@ -680,9 +704,9 @@ namespace Ent
             {
                 return node->mapInsert(toInternal(key));
             }
-            void remove(K key)
+            bool remove(K key)
             {
-                node->mapErase(toInternal(key));
+                return node->mapErase(toInternal(key));
             }
             size_t size() const
             {
@@ -692,6 +716,11 @@ namespace Ent
             bool empty() const
             {
                 return node->empty();
+            }
+
+            void clear()
+            {
+                node->clear();
             }
 
             auto getKeys() const
@@ -886,6 +915,10 @@ namespace Ent
             {
                 return node->getBool();
             }
+            bool getDefault() const
+            {
+                return node->getDefaultBool();
+            }
         };
 
         struct Int : PropHelper<Int, int64_t>
@@ -903,6 +936,10 @@ namespace Ent
             {
                 return node->getInt();
             }
+            int64_t getDefault() const
+            {
+                return node->getDefaultInt();
+            }
         };
 
         struct Float : PropHelper<Float, double>
@@ -919,6 +956,10 @@ namespace Ent
             double get() const
             {
                 return node->getFloat();
+            }
+            double getDefault() const
+            {
+                return node->getDefaultFloat();
             }
 
             operator float() const
@@ -954,6 +995,10 @@ namespace Ent
             char const* c_str() const
             {
                 return node->getString();
+            }
+            char const* getDefault() const
+            {
+                return node->getDefaultString();
             }
 
             String const& operator=(std::string const& value) const
@@ -1002,6 +1047,10 @@ namespace Ent
             Ent::EntityRef get() const
             {
                 return node->getEntityRef();
+            }
+            Ent::EntityRef getDefault() const
+            {
+                return node->getDefaultEntityRef();
             }
         };
     } // namespace Gen

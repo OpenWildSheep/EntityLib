@@ -2,6 +2,7 @@
 
 #include <variant>
 #include <ciso646>
+#include <set>
 
 #include "FileCursor.h"
 

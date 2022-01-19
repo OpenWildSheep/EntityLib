@@ -97,6 +97,8 @@ class ActionModeEnum(Enum):
     levitatemove = "levitatemove"
     aim = "aim"
     wallrun = "wallrun"
+    wallrunjump = "wallrunjump"
+    wallrundrop = "wallrundrop"
     aimcharge = "aimcharge"
     aimcharged = "aimcharged"
     aimflow = "aimflow"

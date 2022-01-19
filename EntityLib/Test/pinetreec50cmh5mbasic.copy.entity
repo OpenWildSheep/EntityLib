@@ -1,4 +1,5 @@
 {
+    "$schema": "wildschema:/all/Entity.json",
     "Components": [
         {
             "Data": {},

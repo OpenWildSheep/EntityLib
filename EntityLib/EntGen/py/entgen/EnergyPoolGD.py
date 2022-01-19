@@ -8,6 +8,7 @@ from entgen.String import *
 from entgen.Bool import *
 from entgen.ComponentGD import *
 from entgen.String import *
+from entgen.EnergyPoolGD_EnergyArea import *
 
 from EntityLibPy import Node
 
@@ -21,6 +22,9 @@ class EnergyPoolGD(HelperObject):
         return EnergyPoolGD(entlib.make_node(EnergyPoolGD.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def EnergyAreas(self):  # type: ()->Array[EnergyPoolGD_EnergyArea]
+        return (lambda n: Array(EnergyPoolGD_EnergyArea, n))(self._node.at("EnergyAreas"))
     @property
     def FactionOverride(self):  # type: ()->Bool
         return Bool(self._node.at("FactionOverride"))

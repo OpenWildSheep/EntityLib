@@ -24,6 +24,11 @@ class AnalyticsManager_MongoDBConnection(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
+    def collection(self):  # type: ()->String
+        return String(self._node.at("collection"))
+    @collection.setter
+    def collection(self, val): self.collection.set(val)
+    @property
     def database(self):  # type: ()->String
         return String(self._node.at("database"))
     @database.setter

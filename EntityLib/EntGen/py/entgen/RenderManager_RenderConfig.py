@@ -67,6 +67,11 @@ class RenderManager_RenderConfig(HelperObject):
     @EnableLensFlare.setter
     def EnableLensFlare(self, val): self.EnableLensFlare.set(val)
     @property
+    def EnableMTR(self):  # type: ()->Int
+        return Int(self._node.at("EnableMTR"))
+    @EnableMTR.setter
+    def EnableMTR(self, val): self.EnableMTR.set(val)
+    @property
     def EnableMotionBlur(self):  # type: ()->Int
         return Int(self._node.at("EnableMotionBlur"))
     @EnableMotionBlur.setter

@@ -1,5 +1,4 @@
 from . import AABB
-from . import AreaMesh
 from . import BlendShape
 from . import BlendShapeData
 from . import BoneData
@@ -22,6 +21,7 @@ from . import GVoxelVolume
 from . import HeightObj
 from . import MaterialRef
 from . import Matrix44
+from . import Mesh
 from . import MeshEdges
 from . import PCloud
 from . import Phys

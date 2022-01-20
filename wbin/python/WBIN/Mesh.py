@@ -6,25 +6,25 @@ import flatbuffers
 from flatbuffers.compat import import_numpy
 np = import_numpy()
 
-class AreaMesh(object):
+class Mesh(object):
     __slots__ = ['_tab']
 
     @classmethod
     def GetRootAs(cls, buf, offset=0):
         n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
-        x = AreaMesh()
+        x = Mesh()
         x.Init(buf, n + offset)
         return x
 
     @classmethod
-    def GetRootAsAreaMesh(cls, buf, offset=0):
+    def GetRootAsMesh(cls, buf, offset=0):
         """This method is deprecated. Please switch to GetRootAs."""
         return cls.GetRootAs(buf, offset)
-    # AreaMesh
+    # Mesh
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
-    # AreaMesh
+    # Mesh
     def Position(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
@@ -36,15 +36,15 @@ class AreaMesh(object):
         return None
 
 def Start(builder): builder.StartObject(1)
-def AreaMeshStart(builder):
+def MeshStart(builder):
     """This method is deprecated. Please switch to Start."""
     return Start(builder)
 def AddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(position), 0)
-def AreaMeshAddPosition(builder, position):
+def MeshAddPosition(builder, position):
     """This method is deprecated. Please switch to AddPosition."""
     return AddPosition(builder, position)
 def End(builder): return builder.EndObject()
-def AreaMeshEnd(builder):
+def MeshEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
 import WBIN.Float3Channel
@@ -53,37 +53,37 @@ try:
 except:
     pass
 
-class AreaMeshT(object):
+class MeshT(object):
 
-    # AreaMeshT
+    # MeshT
     def __init__(self):
         self.position = None  # type: Optional[WBIN.Float3Channel.Float3ChannelT]
 
     @classmethod
     def InitFromBuf(cls, buf, pos):
-        areaMesh = AreaMesh()
-        areaMesh.Init(buf, pos)
-        return cls.InitFromObj(areaMesh)
+        mesh = Mesh()
+        mesh.Init(buf, pos)
+        return cls.InitFromObj(mesh)
 
     @classmethod
-    def InitFromObj(cls, areaMesh):
-        x = AreaMeshT()
-        x._UnPack(areaMesh)
+    def InitFromObj(cls, mesh):
+        x = MeshT()
+        x._UnPack(mesh)
         return x
 
-    # AreaMeshT
-    def _UnPack(self, areaMesh):
-        if areaMesh is None:
+    # MeshT
+    def _UnPack(self, mesh):
+        if mesh is None:
             return
-        if areaMesh.Position() is not None:
-            self.position = WBIN.Float3Channel.Float3ChannelT.InitFromObj(areaMesh.Position())
+        if mesh.Position() is not None:
+            self.position = WBIN.Float3Channel.Float3ChannelT.InitFromObj(mesh.Position())
 
-    # AreaMeshT
+    # MeshT
     def Pack(self, builder):
         if self.position is not None:
             position = self.position.Pack(builder)
         Start(builder)
         if self.position is not None:
             AddPosition(builder, position)
-        areaMesh = End(builder)
-        return areaMesh
+        mesh = End(builder)
+        return mesh

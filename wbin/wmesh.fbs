@@ -2,10 +2,10 @@ include "wbin.fbs";
 
 namespace WBIN;
 
-table AreaMesh
+table Mesh
 {
 	position:Float3Channel (required);
 }
 
-root_type AreaMesh;
+root_type Mesh;
 

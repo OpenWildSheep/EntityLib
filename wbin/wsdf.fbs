@@ -14,7 +14,7 @@ table floatval // 32 bits
 
 table doubleval // 64 bits
 {
-	values: [double] (required); // This is a 3D array of float (x, y, z)
+	values: [double] (required); // This is a 3D array of double (x, y, z)
 }
 
 union SDFValues

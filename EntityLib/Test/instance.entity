@@ -67,8 +67,6 @@
         }, {
             "Type": "SubScene",
             "Data": {
-                "isEmbedded": true,
-                "File": "",
                 "Embedded": [{
                         "Name": "EntityWithInstanceOf",
                         "Color": [255, 120, 220, 255],

@@ -22,8 +22,7 @@
                         ],
                         "Name": "default_level2"
                     }
-                ],
-                "isEmbedded": true
+                ]
             },
             "Type": "SubScene"
         }

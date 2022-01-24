@@ -27,8 +27,7 @@
                         "InstanceOf": "Creature/my_inventory_level2.entity",
                         "Name": "inventory"
                     }
-                ],
-                "isEmbedded": true
+                ]
             },
             "Type": "SubScene"
         }

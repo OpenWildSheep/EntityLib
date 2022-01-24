@@ -9,6 +9,8 @@ from entgen.Int import *
 from entgen.Bool import *
 from entgen.Float import *
 from entgen.Manager import *
+from entgen.GroupAvoidanceEnum import *
+from entgen.Size import *
 
 from EntityLibPy import Node
 
@@ -37,6 +39,9 @@ class VelocityObstaclesManager(HelperObject):
         return Float(self._node.at("AvoidanceRadiusAdaptabilityFactor"))
     @AvoidanceRadiusAdaptabilityFactor.setter
     def AvoidanceRadiusAdaptabilityFactor(self, val): self.AvoidanceRadiusAdaptabilityFactor.set(val)
+    @property
+    def GroupsAvoidanceIgnoredBySize(self):  # type: ()->Map[SizeEnum, PrimArray[GroupAvoidanceEnum]]
+        return (lambda n: Map(SizeEnum, (lambda n: PrimArray(GroupAvoidanceEnum, n)), n))(self._node.at("GroupsAvoidanceIgnoredBySize"))
     @property
     def RunningSpeed(self):  # type: ()->Float
         return Float(self._node.at("RunningSpeed"))

@@ -21,9 +21,7 @@
                             }
                         ]
                     }
-                ],
-                "File": "",
-                "isEmbedded": true
+                ]
             },
             "Type": "SubScene"
         }

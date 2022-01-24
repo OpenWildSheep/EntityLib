@@ -1,4 +1,5 @@
 {
+    "$schema": "wildschema:/all/Entity.json",
     "ActorStates": [
         {
             "classData": {
@@ -26,10 +27,136 @@
     "Components": [
         {
             "Data": {
+                "Orientation": [
+                    -0.0032736328,
+                    -0.00733923,
+                    -0.12891139,
+                    0.99162364
+                ],
+                "Position": [
+                    105.2244,
+                    152.7811,
+                    29.6635
+                ],
+                "Scale": [
+                    1.0000386,
+                    0.99995625,
+                    1.0000291
+                ]
+            },
+            "Type": "TransformGD"
+        },
+        {
+            "Data": {
+                "Tag": "ShamanPlayerSpawner",
+                "ThumbnailMesh": "02_creature/human/male/clothstrong/bodykai/CLOTH_Body.wbm",
+                "Type": "Spawner"
+            },
+            "Type": "NetworkNode"
+        },
+        {
+            "Data": {},
+            "Type": "StaffVertebrasGD"
+        },
+        {
+            "Data": {
+                "BehaviorPath": "Pesto/Behavior/FSMDefaultBehavior.pesto",
+                "BehaviorState": "W/*at*/c//h",
+                "CanBeMaster": false,
+                "Faction": "Plouf",
+                "Inventory": "KaiWOLgrey",
+                "Invincible": false,
+                "Life": 1000.0,
+                "PlayerSpawn": true,
+                "ScriptList": [
+                    "a1",
+                    "b2",
+                    "c1"
+                ],
+                "Spawner": "ShamanPlayerSpawner.gd",
+                "UniqueID": "Shaman_male_Bobby",
+                "Warrior": false
+            },
+            "Type": "SystemicCreature"
+        },
+        {
+            "Data": {
+                "DisplaceNoiseList": [
+                    {
+                        "DisplaceDistance": 0.0,
+                        "LuminanceCenter": 0.0,
+                        "MapChannel": 51248,
+                        "MotifName": "",
+                        "MotifOffsetX": 0.0,
+                        "MotifOffsetY": 0.0,
+                        "MotifRotationZ": 0.0,
+                        "MotifSizeX": 0.0,
+                        "MotifSizeY": 0.0
+                    }
+                ],
+                "Subdivision": 0
+            },
+            "Type": "HeightObj"
+        },
+        {
+            "Data": {},
+            "Type": "NetGD"
+        },
+        {
+            "Data": {},
+            "Type": "SmoothScaleComponentGD"
+        },
+        {
+            "Data": {},
+            "Type": "PhysicsGD"
+        },
+        {
+            "Data": {
                 "FactionName": "2254016666",
                 "InSpiritWorld": false
             },
             "Type": "ActorGD"
+        },
+        {
+            "Data": {},
+            "Type": "BeamGeneratorGD"
+        },
+        {
+            "Data": {
+                "ScriptEvents": [
+                    {
+                        "classData": {
+                            "EventName": "Toto"
+                        },
+                        "className": "CineEventTriggerEventHandlerPost"
+                    },
+                    {
+                        "classData": {
+                            "EventName": "Tutu"
+                        },
+                        "className": "CineEventTriggerEventHandlerPost"
+                    },
+                    {
+                        "classData": {
+                            "EventName": "Titi"
+                        },
+                        "className": "CineEventTriggerEventHandlerPost"
+                    }
+                ]
+            },
+            "Type": "CinematicGD"
+        },
+        {
+            "Data": {
+                "NonDisuptive": true,
+                "PrimitiveData": {
+                    "Height": 42.0,
+                    "Length": 0.0,
+                    "Width": 0.0
+                },
+                "PrimitiveType": "test"
+            },
+            "Type": "LDPrimitive"
         },
         {
             "Data": {
@@ -72,7 +199,7 @@
                                 "Type": "TransformGD"
                             }
                         ],
-                        "Name": "EP1-Spout_LINK_001_detached"
+                        "Name": "EP1-Spout_LINK_001"
                     },
                     {
                         "Color": [
@@ -90,7 +217,7 @@
                                 "Type": "NetworkLink"
                             }
                         ],
-                        "Name": "EntityWithInstanceOf_detached"
+                        "Name": "EntityWithInstanceOf"
                     },
                     {
                         "Components": [
@@ -102,7 +229,7 @@
                                 "Type": "NetworkLink"
                             }
                         ],
-                        "Name": "EntityWithInstanceOfButNoOverride_detached"
+                        "Name": "EntityWithInstanceOfButNoOverride"
                     },
                     {
                         "Color": [
@@ -117,7 +244,7 @@
                                 "Type": "TransformGD"
                             }
                         ],
-                        "Name": "TestRemove_detached"
+                        "Name": "TestRemove"
                     },
                     {
                         "Color": [
@@ -132,7 +259,7 @@
                                 "Type": "NetworkLink"
                             }
                         ],
-                        "Name": "TestSaveEntWithOverride_detached"
+                        "Name": "TestSaveEntWithOverride"
                     }
                 ]
             },
@@ -140,7 +267,7 @@
         },
         {
             "Data": {},
-            "Type": "BeamGeneratorGD"
+            "Type": "VoxelSimulationGD"
         },
         {
             "Data": {
@@ -315,72 +442,8 @@
             "Type": "CharacterControllerGD"
         },
         {
-            "Data": {
-                "ScriptEvents": [
-                    {
-                        "classData": {
-                            "EventName": "Toto"
-                        },
-                        "className": "CineEventTriggerEventHandlerPost"
-                    },
-                    {
-                        "classData": {
-                            "EventName": "Tutu"
-                        },
-                        "className": "CineEventTriggerEventHandlerPost"
-                    },
-                    {
-                        "classData": {
-                            "EventName": "Titi"
-                        },
-                        "className": "CineEventTriggerEventHandlerPost"
-                    }
-                ]
-            },
-            "Type": "CinematicGD"
-        },
-        {
-            "Data": {
-                "DisplaceNoiseList": [
-                    {
-                        "DisplaceDistance": 0.0,
-                        "LuminanceCenter": 0.0,
-                        "MapChannel": 51248,
-                        "MotifName": "",
-                        "MotifOffsetX": 0.0,
-                        "MotifOffsetY": 0.0,
-                        "MotifRotationZ": 0.0,
-                        "MotifSizeX": 0.0,
-                        "MotifSizeY": 0.0
-                    }
-                ],
-                "Subdivision": 0
-            },
-            "Type": "HeightObj"
-        },
-        {
-            "Data": {
-                "NonDisuptive": true,
-                "PrimitiveData": {
-                    "Height": 42.0,
-                    "Length": 0.0,
-                    "Width": 0.0
-                },
-                "PrimitiveType": "test"
-            },
-            "Type": "LDPrimitive"
-        },
-        {
             "Data": {},
-            "Type": "NetGD"
-        },
-        {
-            "Data": {
-                "Tag": "ShamanPlayerSpawner",
-                "ThumbnailMesh": "02_creature/human/male/clothstrong/bodykai/CLOTH_Body.wbm",
-                "Type": "Spawner"
-            },
-            "Type": "NetworkNode"
+            "Type": "TestDefaultValues"
         },
         {
             "Data": {
@@ -415,8 +478,13 @@
             "Type": "PathNodeGD"
         },
         {
-            "Data": {},
-            "Type": "PhysicsGD"
+            "Data": {
+                "Variant": {
+                    "variantData": 3.1416,
+                    "variantType": "float"
+                }
+            },
+            "Type": "TestArrays"
         },
         {
             "Data": {
@@ -458,55 +526,6 @@
                 "NoiseSizeY": 3.0
             },
             "Type": "SeedPatch"
-        },
-        {
-            "Data": {},
-            "Type": "SmoothScaleComponentGD"
-        },
-        {
-            "Data": {},
-            "Type": "StaffVertebrasGD"
-        },
-        {
-            "Data": {
-                "NormalRatio": 0.6,
-                "ZOffset": 10.0
-            },
-            "Type": "StickToTerrain"
-        },
-        {
-            "Data": {
-                "BehaviorPath": "Pesto/Behavior/FSMDefaultBehavior.pesto",
-                "BehaviorState": "W/*at*/c//h",
-                "CanBeMaster": false,
-                "Faction": "Plouf",
-                "Inventory": "KaiWOLgrey",
-                "Invincible": false,
-                "Life": 1000.0,
-                "PlayerSpawn": true,
-                "ScriptList": [
-                    "a1",
-                    "b2",
-                    "c1"
-                ],
-                "Spawner": "ShamanPlayerSpawner.gd",
-                "UniqueID": "Shaman_male_Bobby",
-                "Warrior": false
-            },
-            "Type": "SystemicCreature"
-        },
-        {
-            "Data": {
-                "Variant": {
-                    "variantData": 3.1416,
-                    "variantType": "float"
-                }
-            },
-            "Type": "TestArrays"
-        },
-        {
-            "Data": {},
-            "Type": "TestDefaultValues"
         },
         {
             "Data": {
@@ -551,30 +570,12 @@
         },
         {
             "Data": {
-                "Orientation": [
-                    -0.0032736328,
-                    -0.00733923,
-                    -0.12891139,
-                    0.99162364
-                ],
-                "Position": [
-                    105.2244,
-                    152.7811,
-                    29.6635
-                ],
-                "Scale": [
-                    1.0000386,
-                    0.99995625,
-                    1.0000291
-                ]
+                "NormalRatio": 0.6,
+                "ZOffset": 10.0
             },
-            "Type": "TransformGD"
-        },
-        {
-            "Data": {},
-            "Type": "VoxelSimulationGD"
+            "Type": "StickToTerrain"
         }
     ],
-    "Name": "PlayerSpawner__detached",
+    "Name": "PlayerSpawner_",
     "Thumbnail": "prout"
 }

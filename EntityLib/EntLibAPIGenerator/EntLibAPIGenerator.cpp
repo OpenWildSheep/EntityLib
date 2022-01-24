@@ -561,7 +561,8 @@ static json getSchemaData(Ent::Subschema const& _schema)
                 ref.get().properties.at(unionData.typeField)->constValue->get<std::string>();
             Ent::SubschemaRef const& subschema = ref.get().properties.at(unionData.dataField);
             json wrapper(json::value_t::object);
-            wrapper["name"] = escapeName(acceptedType);
+            wrapper["escaped_name"] = escapeName(acceptedType);
+            wrapper["name"] = acceptedType;
             wrapper["type"] = getSchemaRefType(subschema);
             types.push_back(wrapper);
         }
@@ -782,8 +783,8 @@ namespace Ent
             {{schema.type_name}}(Ent::Node* _node): Base(_node) {}
             {{#schema.schema_name}}static constexpr char schemaName[] = "{{{.}}}";{{/schema.schema_name}}
             char const* getType() const;{{#types}}
-            std::optional<{{#type}}{{>display_type}}{{/type}}> {{name}}() const;
-            {{#type}}{{>display_type}}{{/type}} set{{name}}() const;
+            std::optional<{{#type}}{{>display_type}}{{/type}}> {{escaped_name}}() const;
+            {{#type}}{{>display_type}}{{/type}} set{{escaped_name}}() const;
         {{/types}}
         };{{/schema.union}}{{#schema.union_set}}{{#union}}
         struct {{schema.type_name}} : UnionSetBase<{{items.ref.name}}> // union_set
@@ -812,13 +813,13 @@ namespace Ent
         {
             return node->getUnionType();
         }
-        {{#types}}inline std::optional<{{#type}}{{>display_type}}{{/type}}> {{schema.type_name}}::{{name}}() const
+        {{#types}}inline std::optional<{{#type}}{{>display_type}}{{/type}}> {{schema.type_name}}::{{escaped_name}}() const
         {
-            return strcmp(node->getUnionType(), "{{name}}") != 0? std::optional<{{#type}}{{>display_type}}{{/type}}>{}: std::optional<{{#type}}{{>display_type}}{{/type}}>(node->getUnionData());
+            return strcmp(node->getUnionType(), "{{{name}}}") != 0? std::optional<{{#type}}{{>display_type}}{{/type}}>{}: std::optional<{{#type}}{{>display_type}}{{/type}}>(node->getUnionData());
         }
-        inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::set{{name}}() const
+        inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::set{{escaped_name}}() const
         {
-            return {{#type}}{{>display_type}}{{/type}}(node->setUnionType("{{schema.type_name}}"));
+            return {{#type}}{{>display_type}}{{/type}}(node->setUnionType("{{{name}}}"));
         }
         {{/types}}
 {{/schema.union}}{{#schema.union_set}}{{#union}}// {{schema.type_name}}

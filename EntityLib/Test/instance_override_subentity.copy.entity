@@ -1,4 +1,5 @@
 {
+    "$schema": "wildschema:/all/Entity.json",
     "Color": [
         27.0,
         177.0,
@@ -27,7 +28,6 @@
                             220.0,
                             255.0
                         ],
-                        "Components": [],
                         "Name": "EP1-Spout_LINK_001"
                     }
                 ]

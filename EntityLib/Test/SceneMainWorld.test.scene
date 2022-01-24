@@ -277,9 +277,7 @@
                                             ],
                                             "Name": "EP1_LINK_001"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -392,9 +390,7 @@
                                             ],
                                             "Name": "EP1-Crook_LINK_001"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -500,9 +496,7 @@
                                             ],
                                             "Name": "EP1-DrainRoot_LINK_001"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -765,9 +759,7 @@
                                             ],
                                             "Name": "EP2_LINK_001"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -880,9 +872,7 @@
                                             ],
                                             "Name": "EP2-Crook_LINK_001"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -983,9 +973,7 @@
                                             ],
                                             "Name": "EP2-DrainRoot_LINK_001"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -1213,9 +1201,7 @@
                                             ],
                                             "Name": "EP3_LINK_001"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -1316,9 +1302,7 @@
                                             ],
                                             "Name": "EP3-DrainRoot_LINK_001"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -1431,9 +1415,7 @@
                                             ],
                                             "Name": "EP3-Crook_LINK_001"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -1534,9 +1516,7 @@
                                             ],
                                             "Name": "EP4_LINK_001"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -1649,9 +1629,7 @@
                                             ],
                                             "Name": "EP4_LINK_002"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -1752,9 +1730,7 @@
                                             ],
                                             "Name": "EP4-DrainRoot_LINK_001"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -10281,9 +10257,7 @@
                                             ],
                                             "Name": "EP1-Crook_LINK_002"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -10398,9 +10372,7 @@
                                             ],
                                             "Name": "EP1-Crook_LINK_003"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -10515,9 +10487,7 @@
                                             ],
                                             "Name": "EP1-Crook_LINK_004"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -10632,9 +10602,7 @@
                                             ],
                                             "Name": "EP1-Crook_LINK_005"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -10749,9 +10717,7 @@
                                             ],
                                             "Name": "EP1-Crook_LINK_006"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -10866,9 +10832,7 @@
                                             ],
                                             "Name": "EP1-Crook_LINK_007"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -10983,9 +10947,7 @@
                                             ],
                                             "Name": "EP1-Crook_LINK_008"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -11100,9 +11062,7 @@
                                             ],
                                             "Name": "EP1-Crook_LINK_009"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -11217,9 +11177,7 @@
                                             ],
                                             "Name": "EP1-Crook_LINK_010"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -11334,9 +11292,7 @@
                                             ],
                                             "Name": "EP2-Crook_LINK_002"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -11446,9 +11402,7 @@
                                             ],
                                             "Name": "EP2-Crook_LINK_003"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -11563,9 +11517,7 @@
                                             ],
                                             "Name": "EP2-Crook_LINK_004"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -11675,9 +11627,7 @@
                                             ],
                                             "Name": "EP2-Crook_LINK_005"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -11792,9 +11742,7 @@
                                             ],
                                             "Name": "EP2-Crook_LINK_006"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -11909,9 +11857,7 @@
                                             ],
                                             "Name": "EP2-Crook_LINK_007"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -12021,9 +11967,7 @@
                                             ],
                                             "Name": "EP2-Crook_LINK_008"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -12133,9 +12077,7 @@
                                             ],
                                             "Name": "EP3-Crook_LINK_002"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -12250,9 +12192,7 @@
                                             ],
                                             "Name": "EP3-Crook_LINK_003"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -12367,9 +12307,7 @@
                                             ],
                                             "Name": "EP3-Crook_LINK_004"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -12484,9 +12422,7 @@
                                             ],
                                             "Name": "EP3-Crook_LINK_005"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -12601,9 +12537,7 @@
                                             ],
                                             "Name": "EP3-Crook_LINK_006"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -12713,9 +12647,7 @@
                                             ],
                                             "Name": "EP3-Crook_LINK_007"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -12830,9 +12762,7 @@
                                             ],
                                             "Name": "EP3-Crook_LINK_008"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -12942,9 +12872,7 @@
                                             ],
                                             "Name": "EP3-Crook_LINK_009"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -13059,9 +12987,7 @@
                                             ],
                                             "Name": "EP3-Crook_LINK_010"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -37938,9 +37864,7 @@
                                             ],
                                             "Name": "EP4_LINK_003"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -38050,9 +37974,7 @@
                                             ],
                                             "Name": "EP4_LINK_004"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -38167,9 +38089,7 @@
                                             ],
                                             "Name": "EP4_LINK_005"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -38279,9 +38199,7 @@
                                             ],
                                             "Name": "EP4_LINK_006"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -38396,9 +38314,7 @@
                                             ],
                                             "Name": "EP4_LINK_007"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -38513,9 +38429,7 @@
                                             ],
                                             "Name": "EP4_LINK_008"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -38630,9 +38544,7 @@
                                             ],
                                             "Name": "EP4_LINK_009"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -40333,9 +40245,7 @@
                                             ],
                                             "Name": "EP5_LINK_001"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -40436,9 +40346,7 @@
                                             ],
                                             "Name": "EP5-Drainroot_LINK_001"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -40553,9 +40461,7 @@
                                             ],
                                             "Name": "EP5-crook_LINK_001"
                                         }
-                                    ],
-                                    "File": "",
-                                    "isEmbedded": true
+                                    ]
                                 },
                                 "Type": "SubScene"
                             }
@@ -41018,9 +40924,7 @@
                         "Name": "gpe@startmusic_001",
                         "Thumbnail": "01_common/metrics/metricbox/editor/thumbnail/metricbox.wthumb"
                     }
-                ],
-                "File": "",
-                "isEmbedded": true
+                ]
             },
             "Type": "SubScene"
         }

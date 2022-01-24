@@ -1,6 +1,7 @@
 #include "Map.h"
 
 #include <ciso646>
+#include <set>
 
 #include "include/EntityLib.h"
 #include "Tools.h"
@@ -308,9 +309,13 @@ namespace Ent
         {
             element.isPresent.set(false);
             element.node->setAddedInInsance(false);
+            checkInvariants();
+            return true;
         }
-        checkInvariants();
-        return true;
+        else
+        {
+            return false;
+        }
     }
 
     template <typename Elt> // Elt is Element or Element const

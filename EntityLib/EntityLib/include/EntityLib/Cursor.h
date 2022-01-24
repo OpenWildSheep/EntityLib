@@ -157,6 +157,8 @@ namespace Ent
 
         Cursor* getPrefab(); ///< Get the Cursor of the prefab
 
+        size_t getStackSize() const;  ///< Get the stack size (count of "enter" since the root)
+
     private:
         struct Layer
         {
@@ -201,5 +203,10 @@ namespace Ent
     inline Cursor* Cursor::getPrefab()
     {
         return _getLastLayer().prefab;
+    }
+
+    inline size_t Cursor::getStackSize() const
+    {
+        return m_layerCount;
     }
 } // namespace Ent

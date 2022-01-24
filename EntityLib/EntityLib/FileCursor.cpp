@@ -128,9 +128,16 @@ namespace Ent
         ENTLIB_DBG_ASSERT(lastLayer.schema.base->type == Ent::DataType::object);
         if (_fieldRef == nullptr)
         {
-            auto propIter = lastLayer.schema.base->properties.find(_field);
-            _field = propIter->first.c_str(); // Convert _field to static string
-            _fieldRef = &propIter->second;
+            auto& properties = lastLayer.schema.base->properties;
+            if (auto propIter = properties.find(_field); propIter != properties.end())
+            {
+                _field = propIter->first.c_str(); // Convert _field to static string
+                _fieldRef = &propIter->second;
+            }
+            else
+            {
+                throw Ent::BadKey(_field, __func__, lastLayer.schema.base->name.c_str());
+            }
         }
         newLayer.additionalPath = _field;
         Subschema const* subschema = &(_fieldRef->get());

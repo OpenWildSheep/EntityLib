@@ -8,6 +8,8 @@
 
 #include <EntityLib/Visitor.h>
 #include <EntityLib/CopyNode.h>
+#include <EntityLib/Cursor.h>
+#include <EntityLib/CursorRestore.h>
 
 using namespace Ent;
 
@@ -568,21 +570,23 @@ void testCursor(Ent::EntityLib& entlib)
         simpleObject.exit();
         simpleObject.enterObjectField("NoiseSizeX").setFloat(2.);
         simpleObject.exit();
-        ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeX").getFloat() == 2.);
-        simpleObject.exit();
+        ENTLIB_ASSERT(CursorRestore(simpleObject)->enterObjectField("NoiseSizeX").getFloat() == 2.);
         ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeY").getFloat() == 2.f);
     }
     {
         Cursor expl(&entlib, entlib.getSchema(entitySchemaName), "prefab.entity");
-        ENTLIB_ASSERT(expl.enterObjectField("Name").getString() == std::string("PlayerSpawner_"));
-        expl.exit();
         ENTLIB_ASSERT(
-            expl.enterObjectField("Components")
-                .enterUnionSetItem("NetworkNode")
-                .enterObjectField("Type")
-                .getString()
-            == std::string("Spawner"));
-        expl.exit().exit().exit();
+            CursorRestore(expl)->enterObjectField("Name").getString()
+            == std::string("PlayerSpawner_"));
+        {
+            CursorRestore restoreEntity(expl);
+            ENTLIB_ASSERT(
+                expl.enterObjectField("Components")
+                    .enterUnionSetItem("NetworkNode")
+                    .enterObjectField("Type")
+                    .getString()
+                == std::string("Spawner"));
+        }
         std::cout << expl.enterObjectField("Components")
                          .enterUnionSetItem("TransformGD")
                          .enterObjectField("Position")

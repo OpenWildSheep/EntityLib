@@ -293,8 +293,29 @@ namespace Ent
     {
         if (_dataSchema == nullptr)
         {
-            _dataSchema =
-                m_instance.getSchema()->singularItems->get().unionTypeMap.at(_type).dataSchema;
+            auto& singularItems = m_instance.getSchema()->singularItems;
+            if (singularItems != nullptr)
+            {
+                Ent::Subschema const& unionSchema = singularItems->get();
+                if (unionSchema.type != Ent::DataType::oneOf)
+                {
+                    throw Ent::BadType("Cursor::enterUnionSetItem : Not an UnionSet");
+                }
+                auto& unionTypeMap = unionSchema.unionTypeMap;
+                if (auto iter = unionTypeMap.find(_type); iter != unionTypeMap.end())
+                {
+                    _dataSchema = iter->second.dataSchema;
+                }
+                else
+                {
+                    throw Ent::BadKey(
+                        _type, "Cursor::enterUnionSetItem", m_instance.getSchema()->name.c_str());
+                }
+            }
+            else
+            {
+                throw Ent::BadType("Cursor::enterUnionSetItem : Not an UnionSet");
+            }
         }
         return _enterItem([_type, _dataSchema](auto&& _cur)
                           { _cur.enterUnionSetItem(_type, _dataSchema); });
@@ -408,7 +429,12 @@ namespace Ent
 
     char const* Cursor::getInstanceOf()
     {
-        enterObjectField("InstanceOf");
+        // The field InstanceOf is not a field of objects, so we have to fake it.
+        Ent::Subschema schema;
+        schema.type = Ent::DataType::string;
+        Ent::SubschemaRef ref;
+        ref.subSchemaOrRef = std::move(schema);
+        enterObjectField("InstanceOf", &ref);
         char const* instanceOf = getString();
         exit();
         return instanceOf[0] == 0 ? nullptr : instanceOf;

@@ -115,6 +115,7 @@
     <ClCompile Include="Array.cpp" />
     <ClCompile Include="ComponentMerge.cpp" />
     <ClCompile Include="Cursor.cpp" />
+    <ClCompile Include="CursorRestore.cpp" />
     <ClCompile Include="EntityLib.cpp">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EnableAllWarnings</WarningLevel>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</TreatWarningAsError>
@@ -141,6 +142,7 @@
     <ClInclude Include="include\EntityLibCore.h" />
     <ClInclude Include="include\EntityLib\CopyNode.h" />
     <ClInclude Include="include\EntityLib\Cursor.h" />
+    <ClInclude Include="include\EntityLib\CursorRestore.h" />
     <ClInclude Include="include\EntityLib\FileCursor.h" />
     <ClInclude Include="include\EntityLib\Visitor.h" />
     <ClInclude Include="include\Schema.h" />

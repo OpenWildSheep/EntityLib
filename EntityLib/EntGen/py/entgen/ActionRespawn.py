@@ -4,7 +4,7 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.ReviveSide import *
+from entgen.EnergySide import *
 from entgen.String import *
 from entgen.ActorState import *
 from entgen.Bool import *
@@ -39,8 +39,8 @@ class ActionRespawn(HelperObject):
     def respawnPosition(self):  # type: ()->Position
         return Position(self._node.at("respawnPosition"))
     @property
-    def respawnSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("respawnSide"))
+    def respawnSide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("respawnSide"))
     @respawnSide.setter
     def respawnSide(self, val): self.respawnSide.set(val)
     pass

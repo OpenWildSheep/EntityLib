@@ -13,6 +13,7 @@ namespace Ent
         struct variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_; // Union
         struct variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_; // Union
         struct variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_; // Union
+        struct variant_ShapeSDF_ShapeSphere_ShapeBox_; // Union
         struct variant_Pasta_Easing_Curve_string_; // Union
         struct usePerception;
         struct sPhysicsShapeSphere;
@@ -228,7 +229,6 @@ namespace Ent
         struct RigidBodyMeshNavigation;
         struct FluidRigidbodyUserData;
         struct RevivedData;
-        struct ReviveSideData;
         struct ReviveSide; // enum
         enum class ReviveSideEnum
         {
@@ -237,8 +237,6 @@ namespace Ent
             cursed,
             ReviveSide_COUNT,
         };
-        struct ReviveSideEvent;
-        struct ReviveEnergyComponentInput_ReviveSide;
         struct ResponsiblePointer_CineEvent_; // Union
         struct ResponsiblePointer_AnalyticsObserverInterface_;
         struct ResponsiblePointer_ActorState_; // Union
@@ -273,6 +271,9 @@ namespace Ent
         struct ProjectileShooterData;
         struct ProjectileData;
         struct ProgressSoundEventData;
+        struct PrimitiveShape;
+        struct ShapeSphere;
+        struct ShapeBox;
         struct PrimitiveData;
         struct PrimitiveColliderType; // enum
         enum class PrimitiveColliderTypeEnum
@@ -491,8 +492,6 @@ namespace Ent
         struct LifeAndDamageData;
         struct Life;
         struct LedgePositionInfo;
-        struct LastValidedReviveSide;
-        struct LastAliveReviveSide;
         struct JumpHeightMultiplier;
         struct Invincible;
         struct InventoryTags; // enum
@@ -501,9 +500,8 @@ namespace Ent
             outfit,
             item,
             default_,
-            neutral,
-            sacred,
-            cursed,
+            lush,
+            corrupted,
             soul,
             disguise,
             soulfreedflying,
@@ -679,8 +677,6 @@ namespace Ent
         struct EventCameraData;
         struct EntityStateSet;
         struct PlayerState;
-        struct EntityStateRevive_Inputs;
-        struct EntityStateCreatureHatching_Inputs;
         struct EntityStateChargeMode_EntityStateChargeModeInputs;
         struct EntityLODData;
         struct RegenData;
@@ -693,14 +689,20 @@ namespace Ent
             lush,
             lush_strong,
         };
+        struct EnergySideData;
         struct EnergySide; // enum
         enum class EnergySideEnum
         {
             none,
             lush,
             corrupted,
+            EnergySide_COUNT,
         };
         struct TaggingVegetation;
+        struct ReviveEnergyComponentInput_EnergySide;
+        struct EntityStateRevive_Inputs;
+        struct EntityStateCreatureHatching_Inputs;
+        struct EnergySideEvent;
         struct EnergyIntensity; // enum
         enum class EnergyIntensityEnum
         {
@@ -725,8 +727,6 @@ namespace Ent
         struct CreatureProfile__CreatureProfileFact;
         struct CreatureProfile;
         struct CreatureDangerousness;
-        struct CreatureComponentInput_ReviveSide;
-        struct CreatureComponentInput_LastAliveReviveSide;
         struct ConstrainedInputData;
         struct ConditionalRigidityAttribute_RigidityParameter;
         struct ConditionalRigidityAttribute_Attributes;
@@ -791,7 +791,6 @@ namespace Ent
         struct SensorControllerGD;
         struct SeedPatch;
         struct ScriptComponentGD;
-        struct ReviveSideSwitcherGD;
         struct ReviveEnergyGD;
         struct RespawnPlaceGD;
         struct RegenerableVegetationGD;
@@ -861,6 +860,7 @@ namespace Ent
         struct EnvStampGD;
         struct EnergySpoutGD;
         struct EnergySourceGD;
+        struct EnergySideSwitcherGD;
         struct EnergyPoolTaggerGD;
         struct EnergyPoolGD;
         struct EnergyNetworkListenerGD;
@@ -1292,7 +1292,7 @@ namespace Ent
         struct EntityStateExtraLife;
         struct EntityStateEnterSideMapRequest;
         struct EntityStateEnergySpoutState;
-        struct EntityStateEnergyRootState;
+        struct EntityStateEnergySide;
         struct EntityStateEnergyRootHatching;
         struct EntityStateEnergyRootAbortHatching;
         struct EntityStateEjectedLand;
@@ -1309,6 +1309,8 @@ namespace Ent
         struct EntityStateCombat;
         struct EntityStateClassicLand;
         struct EntityStateClassicDodge;
+        struct EntityStateChargingJump;
+        struct EntityStateChargedJump;
         struct EntityStateChargeMode;
         struct EntityStateCanNotBePerceived;
         struct EntityStateCallAndMountSpiritAnimal;
@@ -1393,7 +1395,7 @@ namespace Ent
         struct ActorStateCreature;
         struct ActorStateConvertWithFlow;
         struct ActorStateChargeSpendLife;
-        struct ActorStateChangeReviveSide;
+        struct ActorStateChangeEnergySide;
         struct ActorStateCatapultedLand;
         struct ActorStateCatapulted;
         struct ActorStateCallingFollower;
@@ -1541,6 +1543,7 @@ namespace Ent
             CATEGORY_EntitySwitchTransition,
             CATEGORY_EnergyRoot,
             CATEGORY_EnergySpout,
+            CATEGORY_Energy,
             CATEGORY_GPE,
             CATEGORY_Hatching,
             ActorCategory_COUNT,
@@ -1628,6 +1631,9 @@ namespace Ent
             jump,
             jumpoff,
             doublejump,
+            jumpcharging,
+            jumpcharged,
+            longjump,
             regenerate,
             drift,
             wait,
@@ -1724,6 +1730,8 @@ namespace Ent
         struct InGameCameraParams;
         struct InGameCameraObservationParams;
         struct InGameCameraData;
+        struct ChargedJumpAnimation;
+        struct ChargedJumpGD;
         struct BoidParams;
         struct AnimationModelComponentInput_ActionMode;
         struct AnimationModelComponentInput;
@@ -1830,6 +1838,7 @@ namespace Ent
         struct SceneNode;
         struct SceneNodeGraph;
         struct Sensor;
+        struct ShapeSDF;
         struct SmallActorSpawnRuleExchangeData;
         struct TagInfo;
         struct Team_PlayerData;
@@ -1854,7 +1863,7 @@ namespace Ent
         using Matrix22 = PrimArray<Ent::Gen::Float>;
         using Matrix32 = PrimArray<Ent::Gen::Float>;
         using StringHash = Ent::Gen::String;
-        using Vector3i = PrimArray<Ent::Gen::Float>;
+        using Vector3i = PrimArray<Ent::Gen::Int>;
 
         struct variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_ : Base // Union
         {
@@ -1951,6 +1960,19 @@ namespace Ent
             Ent::Gen::Quat setQuat() const;
             std::optional<Ent::Gen::Position> Position() const;
             Ent::Gen::Position setPosition() const;
+        };
+
+        struct variant_ShapeSDF_ShapeSphere_ShapeBox_ : Base // Union
+        {
+            variant_ShapeSDF_ShapeSphere_ShapeBox_(Ent::Node* _node): Base(_node) {}
+            static constexpr char schemaName[] = "eastl::variant<ShapeSDF,ShapeSphere,ShapeBox>";
+            char const* getType() const;
+            std::optional<Ent::Gen::ShapeSDF> ShapeSDF() const;
+            Ent::Gen::ShapeSDF setShapeSDF() const;
+            std::optional<Ent::Gen::ShapeSphere> ShapeSphere() const;
+            Ent::Gen::ShapeSphere setShapeSphere() const;
+            std::optional<Ent::Gen::ShapeBox> ShapeBox() const;
+            Ent::Gen::ShapeBox setShapeBox() const;
         };
 
         struct variant_Pasta_Easing_Curve_string_ : Base // Union
@@ -3441,22 +3463,6 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
-        struct ReviveSideData : HelperObject // Object
-        {
-            ReviveSideData(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "ReviveSideData";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::EntityRef EntityRef() const;
-            Ent::Gen::String _comment() const;
-        };
-
         struct ReviveSide : EnumPropHelper<ReviveSide, ReviveSideEnum> // Enum
         {
             using Enum = ReviveSideEnum;
@@ -3481,32 +3487,6 @@ namespace Ent
         {
             return static_cast<ReviveSideEnum>(details::indexInEnum(value, ReviveSide::enumToString));
         }
-
-        struct ReviveSideEvent : HelperObject // Object
-        {
-            ReviveSideEvent(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "ReviveSideEvent";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::Float ElapsedTime() const;
-            Ent::Gen::ReviveSide ReviveSide() const;
-            Ent::Gen::String _comment() const;
-        };
-
-        struct ReviveEnergyComponentInput_ReviveSide : HelperObject // Object
-        {
-            ReviveEnergyComponentInput_ReviveSide(Ent::Node* _node): HelperObject(_node) {}
-            
-            Ent::Gen::String _comment() const;
-            Ent::Gen::Bool engaged() const;
-            Ent::Gen::ReviveSide val() const;
-        };
 
         struct ResponsiblePointer_CineEvent_ : Base // Union
         {
@@ -3577,8 +3557,8 @@ namespace Ent
             Ent::Gen::EntityStateBoidsHomePos setEntityStateBoidsHomePos() const;
             std::optional<Ent::Gen::EntityStateChargeMode> EntityStateChargeMode() const;
             Ent::Gen::EntityStateChargeMode setEntityStateChargeMode() const;
-            std::optional<Ent::Gen::EntityStateEnergyRootState> EntityStateEnergyRootState() const;
-            Ent::Gen::EntityStateEnergyRootState setEntityStateEnergyRootState() const;
+            std::optional<Ent::Gen::EntityStateEnergySide> EntityStateEnergySide() const;
+            Ent::Gen::EntityStateEnergySide setEntityStateEnergySide() const;
             std::optional<Ent::Gen::EntityStateEnergySpoutState> EntityStateEnergySpoutState() const;
             Ent::Gen::EntityStateEnergySpoutState setEntityStateEnergySpoutState() const;
             std::optional<Ent::Gen::EntityStateForceCanBeTargeted> EntityStateForceCanBeTargeted() const;
@@ -4092,6 +4072,57 @@ namespace Ent
             Ent::Gen::String IncreaseEventName() const;
             Ent::Gen::Float IncreaseStartThreshold() const;
             Ent::Gen::Float IncreaseStopThreshold() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct PrimitiveShape : HelperObject // Object
+        {
+            PrimitiveShape(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "PrimitiveShape";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float SDFPadding() const;
+            Ent::Gen::Float SDFVoxelSize() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct ShapeSphere : HelperObject // Object
+        {
+            ShapeSphere(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "ShapeSphere";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float Radius() const;
+            Ent::Gen::PrimitiveShape Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct ShapeBox : HelperObject // Object
+        {
+            ShapeBox(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "ShapeBox";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Vector3 Size() const;
+            Ent::Gen::PrimitiveShape Super() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -5892,24 +5923,6 @@ namespace Ent
         
         };
 
-        struct LastValidedReviveSide : HelperObject // Object
-        {
-            LastValidedReviveSide(Ent::Node* _node): HelperObject(_node) {}
-            
-            Ent::Gen::String _comment() const;
-            Ent::Gen::Bool engaged() const;
-            Ent::Gen::ReviveSide val() const;
-        };
-
-        struct LastAliveReviveSide : HelperObject // Object
-        {
-            LastAliveReviveSide(Ent::Node* _node): HelperObject(_node) {}
-            
-            Ent::Gen::String _comment() const;
-            Ent::Gen::Bool engaged() const;
-            Ent::Gen::ReviveSide val() const;
-        };
-
         struct JumpHeightMultiplier : HelperObject // Object
         {
             JumpHeightMultiplier(Ent::Node* _node): HelperObject(_node) {}
@@ -5938,9 +5951,8 @@ namespace Ent
                 "outfit",
                 "item",
                 "default",
-                "neutral",
-                "sacred",
-                "cursed",
+                "lush",
+                "corrupted",
                 "soul",
                 "disguise",
                 "soulfreedflying",
@@ -7600,41 +7612,6 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
-        struct EntityStateRevive_Inputs : HelperObject // Object
-        {
-            EntityStateRevive_Inputs(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "EntityStateRevive::Inputs";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::Float Life() const;
-            Ent::Gen::ReviveSide ReviveSide() const;
-            Ent::Gen::String _comment() const;
-        };
-
-        struct EntityStateCreatureHatching_Inputs : HelperObject // Object
-        {
-            EntityStateCreatureHatching_Inputs(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "EntityStateCreatureHatching::Inputs";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::Bool ForceSuccess() const;
-            Ent::Gen::MinReviveRatio MinReviveRatio() const;
-            Ent::Gen::ReviveSide ReviveSide() const;
-            Ent::Gen::String _comment() const;
-        };
-
         struct EntityStateChargeMode_EntityStateChargeModeInputs : HelperObject // Object
         {
             EntityStateChargeMode_EntityStateChargeModeInputs(Ent::Node* _node): HelperObject(_node) {}
@@ -7718,6 +7695,22 @@ namespace Ent
             return static_cast<EnergyValueEnum>(details::indexInEnum(value, EnergyValue::enumToString));
         }
 
+        struct EnergySideData : HelperObject // Object
+        {
+            EnergySideData(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EnergySideData";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::EntityRef EntityRef() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct EnergySide : EnumPropHelper<EnergySide, EnergySideEnum> // Enum
         {
             using Enum = EnergySideEnum;
@@ -7728,6 +7721,7 @@ namespace Ent
                 "none",
                 "lush",
                 "corrupted",
+                "EnergySide_COUNT",
             };
         };
         inline char const* toString(EnergySideEnum value)
@@ -7758,6 +7752,67 @@ namespace Ent
             Ent::Gen::Float RequiredRatio() const;
             Ent::Gen::EnergySide TaggedState() const;
             PrimArray<Ent::Gen::String> VegetationTags() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct ReviveEnergyComponentInput_EnergySide : HelperObject // Object
+        {
+            ReviveEnergyComponentInput_EnergySide(Ent::Node* _node): HelperObject(_node) {}
+            
+            Ent::Gen::String _comment() const;
+            Ent::Gen::Bool engaged() const;
+            Ent::Gen::EnergySide val() const;
+        };
+
+        struct EntityStateRevive_Inputs : HelperObject // Object
+        {
+            EntityStateRevive_Inputs(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateRevive::Inputs";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::EnergySide EnergySide() const;
+            Ent::Gen::Float Life() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EntityStateCreatureHatching_Inputs : HelperObject // Object
+        {
+            EntityStateCreatureHatching_Inputs(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateCreatureHatching::Inputs";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::EnergySide EnergySide() const;
+            Ent::Gen::Bool ForceSuccess() const;
+            Ent::Gen::MinReviveRatio MinReviveRatio() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EnergySideEvent : HelperObject // Object
+        {
+            EnergySideEvent(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EnergySideEvent";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float ElapsedTime() const;
+            Ent::Gen::EnergySide EnergySide() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -7824,10 +7879,10 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::Vector3 CenterOffset() const;
             Ent::Gen::EnergyIntensity Intensity() const;
+            Ent::Gen::Vector3 Offset() const;
             Ent::Gen::Int Priority() const;
-            Ent::Gen::Float Radius() const;
+            Ent::Gen::variant_ShapeSDF_ShapeSphere_ShapeBox_ Shape() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -8136,24 +8191,6 @@ namespace Ent
             Ent::Gen::Float multiplierWhenInjured() const;
         };
 
-        struct CreatureComponentInput_ReviveSide : HelperObject // Object
-        {
-            CreatureComponentInput_ReviveSide(Ent::Node* _node): HelperObject(_node) {}
-            
-            Ent::Gen::String _comment() const;
-            Ent::Gen::Bool engaged() const;
-            Ent::Gen::ReviveSide val() const;
-        };
-
-        struct CreatureComponentInput_LastAliveReviveSide : HelperObject // Object
-        {
-            CreatureComponentInput_LastAliveReviveSide(Ent::Node* _node): HelperObject(_node) {}
-            
-            Ent::Gen::String _comment() const;
-            Ent::Gen::Bool engaged() const;
-            Ent::Gen::ReviveSide val() const;
-        };
-
         struct ConstrainedInputData : HelperObject // Object
         {
             ConstrainedInputData(Ent::Node* _node): HelperObject(_node) {}
@@ -8353,8 +8390,7 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::LastValidedReviveSide LastValidedReviveSide() const;
-            Ent::Gen::ReviveEnergyComponentInput_ReviveSide ReviveSide() const;
+            Ent::Gen::ReviveEnergyComponentInput_EnergySide EnergySide() const;
             Ent::Gen::ComponentInput Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -9228,7 +9264,7 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::ReviveSide ForceReviveSide() const;
+            Ent::Gen::EnergySide ForceEnergySide() const;
             Ent::Gen::Int MaxDensityCount() const;
             Ent::Gen::Float MaxDensityRadius() const;
             Ent::Gen::Vector3 Offset() const;
@@ -9318,7 +9354,6 @@ namespace Ent
             }
             PrimArray<Ent::Gen::String> BoneNames() const;
             Ent::Gen::EntityRef OppositeItemEntityRef() const;
-            Ent::Gen::ReviveSide ReviveSide() const;
             Ent::Gen::Int StartPartCount() const;
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String _comment() const;
@@ -9404,24 +9439,6 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
-        struct ReviveSideSwitcherGD : HelperObject // Object
-        {
-            ReviveSideSwitcherGD(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "ReviveSideSwitcherGD";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::EntityRef ReviveEnergyEntityRef() const;
-            Ent::Gen::Map<ReviveSideEnum, Ent::Gen::ReviveSideData> ReviveSideData() const;
-            Ent::Gen::ComponentGD Super() const;
-            Ent::Gen::String _comment() const;
-        };
-
         struct ReviveEnergyGD : HelperObject // Object
         {
             ReviveEnergyGD(Ent::Node* _node): HelperObject(_node) {}
@@ -9436,7 +9453,7 @@ namespace Ent
             }
             Ent::Gen::Float HatchingCost() const;
             Ent::Gen::Float HatchingDuration() const;
-            Ent::Gen::ReviveSide InitReviveSide() const;
+            Ent::Gen::EnergySide InitEnergySide() const;
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -10373,7 +10390,7 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::Float EnergyRestorationRate() const;
-            Ent::Gen::ReviveSide FactionSide() const;
+            Ent::Gen::EnergySide FactionSide() const;
             Ent::Gen::Float LifeRestorationRate() const;
             Ent::Gen::Float Radius() const;
             Ent::Gen::Float ReviveRestorationRate() const;
@@ -10694,12 +10711,30 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
+            Ent::Gen::EnergySide EnergySide() const;
             Ent::Gen::Float MaxBuffDuration() const;
             Ent::Gen::Float NearbyReactionRadius() const;
             Ent::Gen::Float Radius() const;
             Ent::Gen::Float RefreshFrequency() const;
-            Ent::Gen::ReviveSide ReviveSide() const;
             Ent::Gen::String SourceRegenEffectName() const;
+            Ent::Gen::ComponentGD Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EnergySideSwitcherGD : HelperObject // Object
+        {
+            EnergySideSwitcherGD(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EnergySideSwitcherGD";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Map<EnergySideEnum, Ent::Gen::EnergySideData> EnergySideData() const;
+            Ent::Gen::EntityRef ReviveEnergyEntityRef() const;
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -11259,6 +11294,8 @@ namespace Ent
             Ent::Gen::CharacterControllerGD setCharacterControllerGD() const;
             std::optional<Ent::Gen::CharacterPlatformGD> CharacterPlatformGD() const;
             Ent::Gen::CharacterPlatformGD setCharacterPlatformGD() const;
+            std::optional<Ent::Gen::ChargedJumpGD> ChargedJumpGD() const;
+            Ent::Gen::ChargedJumpGD setChargedJumpGD() const;
             std::optional<Ent::Gen::ChildEntityPoolComponentGD> ChildEntityPoolComponentGD() const;
             Ent::Gen::ChildEntityPoolComponentGD setChildEntityPoolComponentGD() const;
             std::optional<Ent::Gen::CinematicGD> CinematicGD() const;
@@ -11295,6 +11332,8 @@ namespace Ent
             Ent::Gen::EnergyPoolGD setEnergyPoolGD() const;
             std::optional<Ent::Gen::EnergyPoolTaggerGD> EnergyPoolTaggerGD() const;
             Ent::Gen::EnergyPoolTaggerGD setEnergyPoolTaggerGD() const;
+            std::optional<Ent::Gen::EnergySideSwitcherGD> EnergySideSwitcherGD() const;
+            Ent::Gen::EnergySideSwitcherGD setEnergySideSwitcherGD() const;
             std::optional<Ent::Gen::EnergySourceGD> EnergySourceGD() const;
             Ent::Gen::EnergySourceGD setEnergySourceGD() const;
             std::optional<Ent::Gen::EnergySpoutGD> EnergySpoutGD() const;
@@ -11439,8 +11478,6 @@ namespace Ent
             Ent::Gen::RespawnPlaceGD setRespawnPlaceGD() const;
             std::optional<Ent::Gen::ReviveEnergyGD> ReviveEnergyGD() const;
             Ent::Gen::ReviveEnergyGD setReviveEnergyGD() const;
-            std::optional<Ent::Gen::ReviveSideSwitcherGD> ReviveSideSwitcherGD() const;
-            Ent::Gen::ReviveSideSwitcherGD setReviveSideSwitcherGD() const;
             std::optional<Ent::Gen::ScriptComponentGD> ScriptComponentGD() const;
             Ent::Gen::ScriptComponentGD setScriptComponentGD() const;
             std::optional<Ent::Gen::SeedPatch> SeedPatch() const;
@@ -11608,6 +11645,9 @@ namespace Ent
             std::optional<Ent::Gen::CharacterPlatformGD> CharacterPlatformGD() const;
             Ent::Gen::CharacterPlatformGD addCharacterPlatformGD() const;
             void removeCharacterPlatformGD() const;
+            std::optional<Ent::Gen::ChargedJumpGD> ChargedJumpGD() const;
+            Ent::Gen::ChargedJumpGD addChargedJumpGD() const;
+            void removeChargedJumpGD() const;
             std::optional<Ent::Gen::ChildEntityPoolComponentGD> ChildEntityPoolComponentGD() const;
             Ent::Gen::ChildEntityPoolComponentGD addChildEntityPoolComponentGD() const;
             void removeChildEntityPoolComponentGD() const;
@@ -11662,6 +11702,9 @@ namespace Ent
             std::optional<Ent::Gen::EnergyPoolTaggerGD> EnergyPoolTaggerGD() const;
             Ent::Gen::EnergyPoolTaggerGD addEnergyPoolTaggerGD() const;
             void removeEnergyPoolTaggerGD() const;
+            std::optional<Ent::Gen::EnergySideSwitcherGD> EnergySideSwitcherGD() const;
+            Ent::Gen::EnergySideSwitcherGD addEnergySideSwitcherGD() const;
+            void removeEnergySideSwitcherGD() const;
             std::optional<Ent::Gen::EnergySourceGD> EnergySourceGD() const;
             Ent::Gen::EnergySourceGD addEnergySourceGD() const;
             void removeEnergySourceGD() const;
@@ -11878,9 +11921,6 @@ namespace Ent
             std::optional<Ent::Gen::ReviveEnergyGD> ReviveEnergyGD() const;
             Ent::Gen::ReviveEnergyGD addReviveEnergyGD() const;
             void removeReviveEnergyGD() const;
-            std::optional<Ent::Gen::ReviveSideSwitcherGD> ReviveSideSwitcherGD() const;
-            Ent::Gen::ReviveSideSwitcherGD addReviveSideSwitcherGD() const;
-            void removeReviveSideSwitcherGD() const;
             std::optional<Ent::Gen::ScriptComponentGD> ScriptComponentGD() const;
             Ent::Gen::ScriptComponentGD addScriptComponentGD() const;
             void removeScriptComponentGD() const;
@@ -12089,6 +12129,9 @@ namespace Ent
             std::optional<Ent::Gen::CharacterPlatformGD> CharacterPlatformGD() const;
             Ent::Gen::CharacterPlatformGD addCharacterPlatformGD() const;
             void removeCharacterPlatformGD() const;
+            std::optional<Ent::Gen::ChargedJumpGD> ChargedJumpGD() const;
+            Ent::Gen::ChargedJumpGD addChargedJumpGD() const;
+            void removeChargedJumpGD() const;
             std::optional<Ent::Gen::ChildEntityPoolComponentGD> ChildEntityPoolComponentGD() const;
             Ent::Gen::ChildEntityPoolComponentGD addChildEntityPoolComponentGD() const;
             void removeChildEntityPoolComponentGD() const;
@@ -12143,6 +12186,9 @@ namespace Ent
             std::optional<Ent::Gen::EnergyPoolTaggerGD> EnergyPoolTaggerGD() const;
             Ent::Gen::EnergyPoolTaggerGD addEnergyPoolTaggerGD() const;
             void removeEnergyPoolTaggerGD() const;
+            std::optional<Ent::Gen::EnergySideSwitcherGD> EnergySideSwitcherGD() const;
+            Ent::Gen::EnergySideSwitcherGD addEnergySideSwitcherGD() const;
+            void removeEnergySideSwitcherGD() const;
             std::optional<Ent::Gen::EnergySourceGD> EnergySourceGD() const;
             Ent::Gen::EnergySourceGD addEnergySourceGD() const;
             void removeEnergySourceGD() const;
@@ -12359,9 +12405,6 @@ namespace Ent
             std::optional<Ent::Gen::ReviveEnergyGD> ReviveEnergyGD() const;
             Ent::Gen::ReviveEnergyGD addReviveEnergyGD() const;
             void removeReviveEnergyGD() const;
-            std::optional<Ent::Gen::ReviveSideSwitcherGD> ReviveSideSwitcherGD() const;
-            Ent::Gen::ReviveSideSwitcherGD addReviveSideSwitcherGD() const;
-            void removeReviveSideSwitcherGD() const;
             std::optional<Ent::Gen::ScriptComponentGD> ScriptComponentGD() const;
             Ent::Gen::ScriptComponentGD addScriptComponentGD() const;
             void removeScriptComponentGD() const;
@@ -13415,9 +13458,7 @@ namespace Ent
             Ent::Gen::CanTakeHit CanTakeHit() const;
             Ent::Gen::DeltaTimeFactor DeltaTimeFactor() const;
             Ent::Gen::Invincible Invincible() const;
-            Ent::Gen::CreatureComponentInput_LastAliveReviveSide LastAliveReviveSide() const;
             Ent::Gen::Life Life() const;
-            Ent::Gen::CreatureComponentInput_ReviveSide ReviveSide() const;
             Ent::Gen::ComponentInput Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -15147,9 +15188,9 @@ namespace Ent
             std::optional<Ent::Gen::EntityStateChargeMode> EntityStateChargeMode() const;
             Ent::Gen::EntityStateChargeMode addEntityStateChargeMode() const;
             void removeEntityStateChargeMode() const;
-            std::optional<Ent::Gen::EntityStateEnergyRootState> EntityStateEnergyRootState() const;
-            Ent::Gen::EntityStateEnergyRootState addEntityStateEnergyRootState() const;
-            void removeEntityStateEnergyRootState() const;
+            std::optional<Ent::Gen::EntityStateEnergySide> EntityStateEnergySide() const;
+            Ent::Gen::EntityStateEnergySide addEntityStateEnergySide() const;
+            void removeEntityStateEnergySide() const;
             std::optional<Ent::Gen::EntityStateEnergySpoutState> EntityStateEnergySpoutState() const;
             Ent::Gen::EntityStateEnergySpoutState addEntityStateEnergySpoutState() const;
             void removeEntityStateEnergySpoutState() const;
@@ -15815,8 +15856,8 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
+            Ent::Gen::EnergySide EnergySide() const;
             Ent::Gen::Float Life() const;
-            Ent::Gen::ReviveSide ReviveSide() const;
             Ent::Gen::ActorState Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -16365,16 +16406,15 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::ReviveSide ReviveSide() const;
-            Array<Ent::Gen::ReviveSideEvent> ReviveSideEvents() const;
+            Array<Ent::Gen::EnergySideEvent> EnergySideEvents() const;
             Ent::Gen::ActorState Super() const;
             Ent::Gen::String _comment() const;
         };
 
-        struct EntityStateEnergyRootState : HelperObject // Object
+        struct EntityStateEnergySide : HelperObject // Object
         {
-            EntityStateEnergyRootState(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "EntityStateEnergyRootState";
+            EntityStateEnergySide(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateEnergySide";
             static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
@@ -16383,7 +16423,7 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::ReviveSide ReviveSide() const;
+            Ent::Gen::EnergySide EnergySide() const;
             Ent::Gen::ActorState Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -16635,6 +16675,38 @@ namespace Ent
         {
             EntityStateClassicDodge(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "EntityStateClassicDodge";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EntityStateChargingJump : HelperObject // Object
+        {
+            EntityStateChargingJump(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateChargingJump";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EntityStateChargedJump : HelperObject // Object
+        {
+            EntityStateChargedJump(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateChargedJump";
             static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
@@ -16989,7 +17061,7 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::ReviveSide ReviveSide() const;
+            Ent::Gen::EnergySide EnergySide() const;
             Ent::Gen::ActorState Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -17961,8 +18033,6 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::LastAliveReviveSide LastAliveReviveSide() const;
-            Ent::Gen::Float ReviveLifeSigned() const;
             Ent::Gen::ActorState Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -18017,10 +18087,10 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
-        struct ActorStateChangeReviveSide : HelperObject // Object
+        struct ActorStateChangeEnergySide : HelperObject // Object
         {
-            ActorStateChangeReviveSide(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "ActorStateChangeReviveSide";
+            ActorStateChangeEnergySide(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "ActorStateChangeEnergySide";
             static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
@@ -18029,7 +18099,7 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::ReviveSide ReviveSide() const;
+            Ent::Gen::EnergySide EnergySide() const;
             Ent::Gen::ActorState Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -18437,7 +18507,6 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::Float Life() const;
-            Ent::Gen::ReviveSide ReviveSide() const;
             Ent::Gen::StunGauge StunGauge() const;
             Ent::Gen::ActorState Super() const;
             Ent::Gen::String _comment() const;
@@ -18805,7 +18874,7 @@ namespace Ent
             Ent::Gen::String _comment() const;
             Ent::Gen::Bool respawnDone() const;
             Ent::Gen::Position respawnPosition() const;
-            Ent::Gen::ReviveSide respawnSide() const;
+            Ent::Gen::EnergySide respawnSide() const;
         };
 
         struct ActionRagdoll : HelperObject // Object
@@ -19887,6 +19956,7 @@ namespace Ent
                 "CATEGORY_EntitySwitchTransition",
                 "CATEGORY_EnergyRoot",
                 "CATEGORY_EnergySpout",
+                "CATEGORY_Energy",
                 "CATEGORY_GPE",
                 "CATEGORY_Hatching",
                 "ActorCategory_COUNT",
@@ -20449,6 +20519,9 @@ namespace Ent
                 "jump",
                 "jumpoff",
                 "doublejump",
+                "jumpcharging",
+                "jumpcharged",
+                "longjump",
                 "regenerate",
                 "drift",
                 "wait",
@@ -20725,6 +20798,41 @@ namespace Ent
             Array<Ent::Gen::CameraSoundEvent> soundEvents() const;
             Ent::Gen::InGameCameraObservationParams standup() const;
             Ent::Gen::InGameCameraObservationParams swim() const;
+        };
+
+        struct ChargedJumpAnimation : HelperObject // Object
+        {
+            ChargedJumpAnimation(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "ChargedJumpAnimation";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::String _comment() const;
+            Ent::Gen::ActionMode animActionMode() const;
+            Ent::Gen::ScaleConverter scaleByPower() const;
+        };
+
+        struct ChargedJumpGD : HelperObject // Object
+        {
+            ChargedJumpGD(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "ChargedJumpGD";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ComponentGD Super() const;
+            Ent::Gen::String _comment() const;
+            Array<Ent::Gen::ChargedJumpAnimation> chargedJumpAnimations() const;
+            Ent::Gen::Float chargingDecelerationFactor() const;
         };
 
         struct BoidParams : HelperObject // Object
@@ -21953,6 +22061,22 @@ namespace Ent
         
         };
 
+        struct ShapeSDF : HelperObject // Object
+        {
+            ShapeSDF(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "ShapeSDF";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::String Path() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct SmallActorSpawnRuleExchangeData : HelperObject // Object
         {
             SmallActorSpawnRuleExchangeData(Ent::Node* _node): HelperObject(_node) {}
@@ -22472,6 +22596,35 @@ namespace Ent
         inline Ent::Gen::Position variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_::setPosition() const
         {
             return Ent::Gen::Position(node->setUnionType("Position"));
+        }
+        // variant_ShapeSDF_ShapeSphere_ShapeBox_
+        inline char const* variant_ShapeSDF_ShapeSphere_ShapeBox_::getType() const
+        {
+            return node->getUnionType();
+        }
+        inline std::optional<Ent::Gen::ShapeSDF> variant_ShapeSDF_ShapeSphere_ShapeBox_::ShapeSDF() const
+        {
+            return strcmp(node->getUnionType(), "ShapeSDF") != 0? std::optional<Ent::Gen::ShapeSDF>{}: std::optional<Ent::Gen::ShapeSDF>(node->getUnionData());
+        }
+        inline Ent::Gen::ShapeSDF variant_ShapeSDF_ShapeSphere_ShapeBox_::setShapeSDF() const
+        {
+            return Ent::Gen::ShapeSDF(node->setUnionType("ShapeSDF"));
+        }
+        inline std::optional<Ent::Gen::ShapeSphere> variant_ShapeSDF_ShapeSphere_ShapeBox_::ShapeSphere() const
+        {
+            return strcmp(node->getUnionType(), "ShapeSphere") != 0? std::optional<Ent::Gen::ShapeSphere>{}: std::optional<Ent::Gen::ShapeSphere>(node->getUnionData());
+        }
+        inline Ent::Gen::ShapeSphere variant_ShapeSDF_ShapeSphere_ShapeBox_::setShapeSphere() const
+        {
+            return Ent::Gen::ShapeSphere(node->setUnionType("ShapeSphere"));
+        }
+        inline std::optional<Ent::Gen::ShapeBox> variant_ShapeSDF_ShapeSphere_ShapeBox_::ShapeBox() const
+        {
+            return strcmp(node->getUnionType(), "ShapeBox") != 0? std::optional<Ent::Gen::ShapeBox>{}: std::optional<Ent::Gen::ShapeBox>(node->getUnionData());
+        }
+        inline Ent::Gen::ShapeBox variant_ShapeSDF_ShapeSphere_ShapeBox_::setShapeBox() const
+        {
+            return Ent::Gen::ShapeBox(node->setUnionType("ShapeBox"));
         }
         // variant_Pasta_Easing_Curve_string_
         inline char const* variant_Pasta_Easing_Curve_string_::getType() const
@@ -23774,41 +23927,6 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
-        // ReviveSideData
-        inline Ent::Gen::EntityRef ReviveSideData::EntityRef() const
-        {
-            return Ent::Gen::EntityRef(node->at("EntityRef"));
-        }
-        inline Ent::Gen::String ReviveSideData::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        // ReviveSideEvent
-        inline Ent::Gen::Float ReviveSideEvent::ElapsedTime() const
-        {
-            return Ent::Gen::Float(node->at("ElapsedTime"));
-        }
-        inline Ent::Gen::ReviveSide ReviveSideEvent::ReviveSide() const
-        {
-            return Ent::Gen::ReviveSide(node->at("ReviveSide"));
-        }
-        inline Ent::Gen::String ReviveSideEvent::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        // ReviveEnergyComponentInput_ReviveSide
-        inline Ent::Gen::String ReviveEnergyComponentInput_ReviveSide::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        inline Ent::Gen::Bool ReviveEnergyComponentInput_ReviveSide::engaged() const
-        {
-            return Ent::Gen::Bool(node->at("engaged"));
-        }
-        inline Ent::Gen::ReviveSide ReviveEnergyComponentInput_ReviveSide::val() const
-        {
-            return Ent::Gen::ReviveSide(node->at("val"));
-        }
         // ResponsiblePointer_CineEvent_
         inline char const* ResponsiblePointer_CineEvent_::getType() const
         {
@@ -23988,13 +24106,13 @@ namespace Ent
         {
             return Ent::Gen::EntityStateChargeMode(node->setUnionType("EntityStateChargeMode"));
         }
-        inline std::optional<Ent::Gen::EntityStateEnergyRootState> ResponsiblePointer_ActorState_::EntityStateEnergyRootState() const
+        inline std::optional<Ent::Gen::EntityStateEnergySide> ResponsiblePointer_ActorState_::EntityStateEnergySide() const
         {
-            return strcmp(node->getUnionType(), "EntityStateEnergyRootState") != 0? std::optional<Ent::Gen::EntityStateEnergyRootState>{}: std::optional<Ent::Gen::EntityStateEnergyRootState>(node->getUnionData());
+            return strcmp(node->getUnionType(), "EntityStateEnergySide") != 0? std::optional<Ent::Gen::EntityStateEnergySide>{}: std::optional<Ent::Gen::EntityStateEnergySide>(node->getUnionData());
         }
-        inline Ent::Gen::EntityStateEnergyRootState ResponsiblePointer_ActorState_::setEntityStateEnergyRootState() const
+        inline Ent::Gen::EntityStateEnergySide ResponsiblePointer_ActorState_::setEntityStateEnergySide() const
         {
-            return Ent::Gen::EntityStateEnergyRootState(node->setUnionType("EntityStateEnergyRootState"));
+            return Ent::Gen::EntityStateEnergySide(node->setUnionType("EntityStateEnergySide"));
         }
         inline std::optional<Ent::Gen::EntityStateEnergySpoutState> ResponsiblePointer_ActorState_::EntityStateEnergySpoutState() const
         {
@@ -24629,6 +24747,45 @@ namespace Ent
             return Ent::Gen::Float(node->at("IncreaseStopThreshold"));
         }
         inline Ent::Gen::String ProgressSoundEventData::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // PrimitiveShape
+        inline Ent::Gen::Float PrimitiveShape::SDFPadding() const
+        {
+            return Ent::Gen::Float(node->at("SDFPadding"));
+        }
+        inline Ent::Gen::Float PrimitiveShape::SDFVoxelSize() const
+        {
+            return Ent::Gen::Float(node->at("SDFVoxelSize"));
+        }
+        inline Ent::Gen::String PrimitiveShape::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // ShapeSphere
+        inline Ent::Gen::Float ShapeSphere::Radius() const
+        {
+            return Ent::Gen::Float(node->at("Radius"));
+        }
+        inline Ent::Gen::PrimitiveShape ShapeSphere::Super() const
+        {
+            return Ent::Gen::PrimitiveShape(node->at("Super"));
+        }
+        inline Ent::Gen::String ShapeSphere::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // ShapeBox
+        inline Ent::Gen::Vector3 ShapeBox::Size() const
+        {
+            return Ent::Gen::Vector3(node->at("Size"));
+        }
+        inline Ent::Gen::PrimitiveShape ShapeBox::Super() const
+        {
+            return Ent::Gen::PrimitiveShape(node->at("Super"));
+        }
+        inline Ent::Gen::String ShapeBox::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -26049,32 +26206,6 @@ namespace Ent
             return Ent::Gen::Float(node->at("val"));
         }
         // LedgePositionInfo
-        // LastValidedReviveSide
-        inline Ent::Gen::String LastValidedReviveSide::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        inline Ent::Gen::Bool LastValidedReviveSide::engaged() const
-        {
-            return Ent::Gen::Bool(node->at("engaged"));
-        }
-        inline Ent::Gen::ReviveSide LastValidedReviveSide::val() const
-        {
-            return Ent::Gen::ReviveSide(node->at("val"));
-        }
-        // LastAliveReviveSide
-        inline Ent::Gen::String LastAliveReviveSide::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        inline Ent::Gen::Bool LastAliveReviveSide::engaged() const
-        {
-            return Ent::Gen::Bool(node->at("engaged"));
-        }
-        inline Ent::Gen::ReviveSide LastAliveReviveSide::val() const
-        {
-            return Ent::Gen::ReviveSide(node->at("val"));
-        }
         // JumpHeightMultiplier
         inline Ent::Gen::String JumpHeightMultiplier::_comment() const
         {
@@ -27819,36 +27950,6 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
-        // EntityStateRevive_Inputs
-        inline Ent::Gen::Float EntityStateRevive_Inputs::Life() const
-        {
-            return Ent::Gen::Float(node->at("Life"));
-        }
-        inline Ent::Gen::ReviveSide EntityStateRevive_Inputs::ReviveSide() const
-        {
-            return Ent::Gen::ReviveSide(node->at("ReviveSide"));
-        }
-        inline Ent::Gen::String EntityStateRevive_Inputs::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        // EntityStateCreatureHatching_Inputs
-        inline Ent::Gen::Bool EntityStateCreatureHatching_Inputs::ForceSuccess() const
-        {
-            return Ent::Gen::Bool(node->at("ForceSuccess"));
-        }
-        inline Ent::Gen::MinReviveRatio EntityStateCreatureHatching_Inputs::MinReviveRatio() const
-        {
-            return Ent::Gen::MinReviveRatio(node->at("MinReviveRatio"));
-        }
-        inline Ent::Gen::ReviveSide EntityStateCreatureHatching_Inputs::ReviveSide() const
-        {
-            return Ent::Gen::ReviveSide(node->at("ReviveSide"));
-        }
-        inline Ent::Gen::String EntityStateCreatureHatching_Inputs::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
         // EntityStateChargeMode_EntityStateChargeModeInputs
         inline Ent::Gen::MoveCapacityData_OrientationSpeed EntityStateChargeMode_EntityStateChargeModeInputs::AngularSpeed() const
         {
@@ -27889,6 +27990,15 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // EntityID
+        // EnergySideData
+        inline Ent::Gen::EntityRef EnergySideData::EntityRef() const
+        {
+            return Ent::Gen::EntityRef(node->at("EntityRef"));
+        }
+        inline Ent::Gen::String EnergySideData::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // TaggingVegetation
         inline Ent::Gen::FloatRange TaggingVegetation::RegenRange() const
         {
@@ -27907,6 +28017,62 @@ namespace Ent
             return PrimArray<Ent::Gen::String>(node->at("VegetationTags"));
         }
         inline Ent::Gen::String TaggingVegetation::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // ReviveEnergyComponentInput_EnergySide
+        inline Ent::Gen::String ReviveEnergyComponentInput_EnergySide::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Ent::Gen::Bool ReviveEnergyComponentInput_EnergySide::engaged() const
+        {
+            return Ent::Gen::Bool(node->at("engaged"));
+        }
+        inline Ent::Gen::EnergySide ReviveEnergyComponentInput_EnergySide::val() const
+        {
+            return Ent::Gen::EnergySide(node->at("val"));
+        }
+        // EntityStateRevive_Inputs
+        inline Ent::Gen::EnergySide EntityStateRevive_Inputs::EnergySide() const
+        {
+            return Ent::Gen::EnergySide(node->at("EnergySide"));
+        }
+        inline Ent::Gen::Float EntityStateRevive_Inputs::Life() const
+        {
+            return Ent::Gen::Float(node->at("Life"));
+        }
+        inline Ent::Gen::String EntityStateRevive_Inputs::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EntityStateCreatureHatching_Inputs
+        inline Ent::Gen::EnergySide EntityStateCreatureHatching_Inputs::EnergySide() const
+        {
+            return Ent::Gen::EnergySide(node->at("EnergySide"));
+        }
+        inline Ent::Gen::Bool EntityStateCreatureHatching_Inputs::ForceSuccess() const
+        {
+            return Ent::Gen::Bool(node->at("ForceSuccess"));
+        }
+        inline Ent::Gen::MinReviveRatio EntityStateCreatureHatching_Inputs::MinReviveRatio() const
+        {
+            return Ent::Gen::MinReviveRatio(node->at("MinReviveRatio"));
+        }
+        inline Ent::Gen::String EntityStateCreatureHatching_Inputs::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EnergySideEvent
+        inline Ent::Gen::Float EnergySideEvent::ElapsedTime() const
+        {
+            return Ent::Gen::Float(node->at("ElapsedTime"));
+        }
+        inline Ent::Gen::EnergySide EnergySideEvent::EnergySide() const
+        {
+            return Ent::Gen::EnergySide(node->at("EnergySide"));
+        }
+        inline Ent::Gen::String EnergySideEvent::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -27964,21 +28130,21 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // EnergyPoolGD_EnergyArea
-        inline Ent::Gen::Vector3 EnergyPoolGD_EnergyArea::CenterOffset() const
-        {
-            return Ent::Gen::Vector3(node->at("CenterOffset"));
-        }
         inline Ent::Gen::EnergyIntensity EnergyPoolGD_EnergyArea::Intensity() const
         {
             return Ent::Gen::EnergyIntensity(node->at("Intensity"));
+        }
+        inline Ent::Gen::Vector3 EnergyPoolGD_EnergyArea::Offset() const
+        {
+            return Ent::Gen::Vector3(node->at("Offset"));
         }
         inline Ent::Gen::Int EnergyPoolGD_EnergyArea::Priority() const
         {
             return Ent::Gen::Int(node->at("Priority"));
         }
-        inline Ent::Gen::Float EnergyPoolGD_EnergyArea::Radius() const
+        inline Ent::Gen::variant_ShapeSDF_ShapeSphere_ShapeBox_ EnergyPoolGD_EnergyArea::Shape() const
         {
-            return Ent::Gen::Float(node->at("Radius"));
+            return Ent::Gen::variant_ShapeSDF_ShapeSphere_ShapeBox_(node->at("Shape"));
         }
         inline Ent::Gen::String EnergyPoolGD_EnergyArea::_comment() const
         {
@@ -28567,32 +28733,6 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("multiplierWhenInjured"));
         }
-        // CreatureComponentInput_ReviveSide
-        inline Ent::Gen::String CreatureComponentInput_ReviveSide::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        inline Ent::Gen::Bool CreatureComponentInput_ReviveSide::engaged() const
-        {
-            return Ent::Gen::Bool(node->at("engaged"));
-        }
-        inline Ent::Gen::ReviveSide CreatureComponentInput_ReviveSide::val() const
-        {
-            return Ent::Gen::ReviveSide(node->at("val"));
-        }
-        // CreatureComponentInput_LastAliveReviveSide
-        inline Ent::Gen::String CreatureComponentInput_LastAliveReviveSide::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        inline Ent::Gen::Bool CreatureComponentInput_LastAliveReviveSide::engaged() const
-        {
-            return Ent::Gen::Bool(node->at("engaged"));
-        }
-        inline Ent::Gen::ReviveSide CreatureComponentInput_LastAliveReviveSide::val() const
-        {
-            return Ent::Gen::ReviveSide(node->at("val"));
-        }
         // ConstrainedInputData
         inline Ent::Gen::ScaleConverter ConstrainedInputData::ConstrainedDirectionCoeff() const
         {
@@ -28733,13 +28873,9 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // ReviveEnergyComponentInput
-        inline Ent::Gen::LastValidedReviveSide ReviveEnergyComponentInput::LastValidedReviveSide() const
+        inline Ent::Gen::ReviveEnergyComponentInput_EnergySide ReviveEnergyComponentInput::EnergySide() const
         {
-            return Ent::Gen::LastValidedReviveSide(node->at("LastValidedReviveSide"));
-        }
-        inline Ent::Gen::ReviveEnergyComponentInput_ReviveSide ReviveEnergyComponentInput::ReviveSide() const
-        {
-            return Ent::Gen::ReviveEnergyComponentInput_ReviveSide(node->at("ReviveSide"));
+            return Ent::Gen::ReviveEnergyComponentInput_EnergySide(node->at("EnergySide"));
         }
         inline Ent::Gen::ComponentInput ReviveEnergyComponentInput::Super() const
         {
@@ -29864,9 +30000,9 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // SoulRespawnOpportunityGD
-        inline Ent::Gen::ReviveSide SoulRespawnOpportunityGD::ForceReviveSide() const
+        inline Ent::Gen::EnergySide SoulRespawnOpportunityGD::ForceEnergySide() const
         {
-            return Ent::Gen::ReviveSide(node->at("ForceReviveSide"));
+            return Ent::Gen::EnergySide(node->at("ForceEnergySide"));
         }
         inline Ent::Gen::Int SoulRespawnOpportunityGD::MaxDensityCount() const
         {
@@ -29948,10 +30084,6 @@ namespace Ent
         inline Ent::Gen::EntityRef ShamanItemGD::OppositeItemEntityRef() const
         {
             return Ent::Gen::EntityRef(node->at("OppositeItemEntityRef"));
-        }
-        inline Ent::Gen::ReviveSide ShamanItemGD::ReviveSide() const
-        {
-            return Ent::Gen::ReviveSide(node->at("ReviveSide"));
         }
         inline Ent::Gen::Int ShamanItemGD::StartPartCount() const
         {
@@ -30065,23 +30197,6 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
-        // ReviveSideSwitcherGD
-        inline Ent::Gen::EntityRef ReviveSideSwitcherGD::ReviveEnergyEntityRef() const
-        {
-            return Ent::Gen::EntityRef(node->at("ReviveEnergyEntityRef"));
-        }
-        inline Ent::Gen::Map<ReviveSideEnum, Ent::Gen::ReviveSideData> ReviveSideSwitcherGD::ReviveSideData() const
-        {
-            return Ent::Gen::Map<ReviveSideEnum, Ent::Gen::ReviveSideData>(node->at("ReviveSideData"));
-        }
-        inline Ent::Gen::ComponentGD ReviveSideSwitcherGD::Super() const
-        {
-            return Ent::Gen::ComponentGD(node->at("Super"));
-        }
-        inline Ent::Gen::String ReviveSideSwitcherGD::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
         // ReviveEnergyGD
         inline Ent::Gen::Float ReviveEnergyGD::HatchingCost() const
         {
@@ -30091,9 +30206,9 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("HatchingDuration"));
         }
-        inline Ent::Gen::ReviveSide ReviveEnergyGD::InitReviveSide() const
+        inline Ent::Gen::EnergySide ReviveEnergyGD::InitEnergySide() const
         {
-            return Ent::Gen::ReviveSide(node->at("InitReviveSide"));
+            return Ent::Gen::EnergySide(node->at("InitEnergySide"));
         }
         inline Ent::Gen::ComponentGD ReviveEnergyGD::Super() const
         {
@@ -31089,9 +31204,9 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("EnergyRestorationRate"));
         }
-        inline Ent::Gen::ReviveSide HealthAreaGD::FactionSide() const
+        inline Ent::Gen::EnergySide HealthAreaGD::FactionSide() const
         {
-            return Ent::Gen::ReviveSide(node->at("FactionSide"));
+            return Ent::Gen::EnergySide(node->at("FactionSide"));
         }
         inline Ent::Gen::Float HealthAreaGD::LifeRestorationRate() const
         {
@@ -31383,6 +31498,10 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // EnergySourceGD
+        inline Ent::Gen::EnergySide EnergySourceGD::EnergySide() const
+        {
+            return Ent::Gen::EnergySide(node->at("EnergySide"));
+        }
         inline Ent::Gen::Float EnergySourceGD::MaxBuffDuration() const
         {
             return Ent::Gen::Float(node->at("MaxBuffDuration"));
@@ -31399,10 +31518,6 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("RefreshFrequency"));
         }
-        inline Ent::Gen::ReviveSide EnergySourceGD::ReviveSide() const
-        {
-            return Ent::Gen::ReviveSide(node->at("ReviveSide"));
-        }
         inline Ent::Gen::String EnergySourceGD::SourceRegenEffectName() const
         {
             return Ent::Gen::String(node->at("SourceRegenEffectName"));
@@ -31412,6 +31527,23 @@ namespace Ent
             return Ent::Gen::ComponentGD(node->at("Super"));
         }
         inline Ent::Gen::String EnergySourceGD::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EnergySideSwitcherGD
+        inline Ent::Gen::Map<EnergySideEnum, Ent::Gen::EnergySideData> EnergySideSwitcherGD::EnergySideData() const
+        {
+            return Ent::Gen::Map<EnergySideEnum, Ent::Gen::EnergySideData>(node->at("EnergySideData"));
+        }
+        inline Ent::Gen::EntityRef EnergySideSwitcherGD::ReviveEnergyEntityRef() const
+        {
+            return Ent::Gen::EntityRef(node->at("ReviveEnergyEntityRef"));
+        }
+        inline Ent::Gen::ComponentGD EnergySideSwitcherGD::Super() const
+        {
+            return Ent::Gen::ComponentGD(node->at("Super"));
+        }
+        inline Ent::Gen::String EnergySideSwitcherGD::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -32080,6 +32212,14 @@ namespace Ent
         {
             return Ent::Gen::CharacterPlatformGD(node->setUnionType("CharacterPlatformGD"));
         }
+        inline std::optional<Ent::Gen::ChargedJumpGD> Component::ChargedJumpGD() const
+        {
+            return strcmp(node->getUnionType(), "ChargedJumpGD") != 0? std::optional<Ent::Gen::ChargedJumpGD>{}: std::optional<Ent::Gen::ChargedJumpGD>(node->getUnionData());
+        }
+        inline Ent::Gen::ChargedJumpGD Component::setChargedJumpGD() const
+        {
+            return Ent::Gen::ChargedJumpGD(node->setUnionType("ChargedJumpGD"));
+        }
         inline std::optional<Ent::Gen::ChildEntityPoolComponentGD> Component::ChildEntityPoolComponentGD() const
         {
             return strcmp(node->getUnionType(), "ChildEntityPoolComponentGD") != 0? std::optional<Ent::Gen::ChildEntityPoolComponentGD>{}: std::optional<Ent::Gen::ChildEntityPoolComponentGD>(node->getUnionData());
@@ -32223,6 +32363,14 @@ namespace Ent
         inline Ent::Gen::EnergyPoolTaggerGD Component::setEnergyPoolTaggerGD() const
         {
             return Ent::Gen::EnergyPoolTaggerGD(node->setUnionType("EnergyPoolTaggerGD"));
+        }
+        inline std::optional<Ent::Gen::EnergySideSwitcherGD> Component::EnergySideSwitcherGD() const
+        {
+            return strcmp(node->getUnionType(), "EnergySideSwitcherGD") != 0? std::optional<Ent::Gen::EnergySideSwitcherGD>{}: std::optional<Ent::Gen::EnergySideSwitcherGD>(node->getUnionData());
+        }
+        inline Ent::Gen::EnergySideSwitcherGD Component::setEnergySideSwitcherGD() const
+        {
+            return Ent::Gen::EnergySideSwitcherGD(node->setUnionType("EnergySideSwitcherGD"));
         }
         inline std::optional<Ent::Gen::EnergySourceGD> Component::EnergySourceGD() const
         {
@@ -32799,14 +32947,6 @@ namespace Ent
         inline Ent::Gen::ReviveEnergyGD Component::setReviveEnergyGD() const
         {
             return Ent::Gen::ReviveEnergyGD(node->setUnionType("ReviveEnergyGD"));
-        }
-        inline std::optional<Ent::Gen::ReviveSideSwitcherGD> Component::ReviveSideSwitcherGD() const
-        {
-            return strcmp(node->getUnionType(), "ReviveSideSwitcherGD") != 0? std::optional<Ent::Gen::ReviveSideSwitcherGD>{}: std::optional<Ent::Gen::ReviveSideSwitcherGD>(node->getUnionData());
-        }
-        inline Ent::Gen::ReviveSideSwitcherGD Component::setReviveSideSwitcherGD() const
-        {
-            return Ent::Gen::ReviveSideSwitcherGD(node->setUnionType("ReviveSideSwitcherGD"));
         }
         inline std::optional<Ent::Gen::ScriptComponentGD> Component::ScriptComponentGD() const
         {
@@ -33466,6 +33606,19 @@ namespace Ent
         {
             node->mapErase("CharacterPlatformGD");
         }
+        inline std::optional<Ent::Gen::ChargedJumpGD> Object_Components::ChargedJumpGD() const
+        {
+            auto sub = getSubNode("ChargedJumpGD");
+            return sub == nullptr? std::optional<Ent::Gen::ChargedJumpGD>{}: std::optional<Ent::Gen::ChargedJumpGD>(getSubNode("ChargedJumpGD"));
+        }
+        inline Ent::Gen::ChargedJumpGD Object_Components::addChargedJumpGD() const
+        {
+            return Ent::Gen::ChargedJumpGD(addSubNode("ChargedJumpGD"));
+        }
+        inline void Object_Components::removeChargedJumpGD() const
+        {
+            node->mapErase("ChargedJumpGD");
+        }
         inline std::optional<Ent::Gen::ChildEntityPoolComponentGD> Object_Components::ChildEntityPoolComponentGD() const
         {
             auto sub = getSubNode("ChildEntityPoolComponentGD");
@@ -33699,6 +33852,19 @@ namespace Ent
         inline void Object_Components::removeEnergyPoolTaggerGD() const
         {
             node->mapErase("EnergyPoolTaggerGD");
+        }
+        inline std::optional<Ent::Gen::EnergySideSwitcherGD> Object_Components::EnergySideSwitcherGD() const
+        {
+            auto sub = getSubNode("EnergySideSwitcherGD");
+            return sub == nullptr? std::optional<Ent::Gen::EnergySideSwitcherGD>{}: std::optional<Ent::Gen::EnergySideSwitcherGD>(getSubNode("EnergySideSwitcherGD"));
+        }
+        inline Ent::Gen::EnergySideSwitcherGD Object_Components::addEnergySideSwitcherGD() const
+        {
+            return Ent::Gen::EnergySideSwitcherGD(addSubNode("EnergySideSwitcherGD"));
+        }
+        inline void Object_Components::removeEnergySideSwitcherGD() const
+        {
+            node->mapErase("EnergySideSwitcherGD");
         }
         inline std::optional<Ent::Gen::EnergySourceGD> Object_Components::EnergySourceGD() const
         {
@@ -34636,19 +34802,6 @@ namespace Ent
         {
             node->mapErase("ReviveEnergyGD");
         }
-        inline std::optional<Ent::Gen::ReviveSideSwitcherGD> Object_Components::ReviveSideSwitcherGD() const
-        {
-            auto sub = getSubNode("ReviveSideSwitcherGD");
-            return sub == nullptr? std::optional<Ent::Gen::ReviveSideSwitcherGD>{}: std::optional<Ent::Gen::ReviveSideSwitcherGD>(getSubNode("ReviveSideSwitcherGD"));
-        }
-        inline Ent::Gen::ReviveSideSwitcherGD Object_Components::addReviveSideSwitcherGD() const
-        {
-            return Ent::Gen::ReviveSideSwitcherGD(addSubNode("ReviveSideSwitcherGD"));
-        }
-        inline void Object_Components::removeReviveSideSwitcherGD() const
-        {
-            node->mapErase("ReviveSideSwitcherGD");
-        }
         inline std::optional<Ent::Gen::ScriptComponentGD> Object_Components::ScriptComponentGD() const
         {
             auto sub = getSubNode("ScriptComponentGD");
@@ -35512,6 +35665,19 @@ namespace Ent
         {
             node->mapErase("CharacterPlatformGD");
         }
+        inline std::optional<Ent::Gen::ChargedJumpGD> Components::ChargedJumpGD() const
+        {
+            auto sub = getSubNode("ChargedJumpGD");
+            return sub == nullptr? std::optional<Ent::Gen::ChargedJumpGD>{}: std::optional<Ent::Gen::ChargedJumpGD>(getSubNode("ChargedJumpGD"));
+        }
+        inline Ent::Gen::ChargedJumpGD Components::addChargedJumpGD() const
+        {
+            return Ent::Gen::ChargedJumpGD(addSubNode("ChargedJumpGD"));
+        }
+        inline void Components::removeChargedJumpGD() const
+        {
+            node->mapErase("ChargedJumpGD");
+        }
         inline std::optional<Ent::Gen::ChildEntityPoolComponentGD> Components::ChildEntityPoolComponentGD() const
         {
             auto sub = getSubNode("ChildEntityPoolComponentGD");
@@ -35745,6 +35911,19 @@ namespace Ent
         inline void Components::removeEnergyPoolTaggerGD() const
         {
             node->mapErase("EnergyPoolTaggerGD");
+        }
+        inline std::optional<Ent::Gen::EnergySideSwitcherGD> Components::EnergySideSwitcherGD() const
+        {
+            auto sub = getSubNode("EnergySideSwitcherGD");
+            return sub == nullptr? std::optional<Ent::Gen::EnergySideSwitcherGD>{}: std::optional<Ent::Gen::EnergySideSwitcherGD>(getSubNode("EnergySideSwitcherGD"));
+        }
+        inline Ent::Gen::EnergySideSwitcherGD Components::addEnergySideSwitcherGD() const
+        {
+            return Ent::Gen::EnergySideSwitcherGD(addSubNode("EnergySideSwitcherGD"));
+        }
+        inline void Components::removeEnergySideSwitcherGD() const
+        {
+            node->mapErase("EnergySideSwitcherGD");
         }
         inline std::optional<Ent::Gen::EnergySourceGD> Components::EnergySourceGD() const
         {
@@ -36681,19 +36860,6 @@ namespace Ent
         inline void Components::removeReviveEnergyGD() const
         {
             node->mapErase("ReviveEnergyGD");
-        }
-        inline std::optional<Ent::Gen::ReviveSideSwitcherGD> Components::ReviveSideSwitcherGD() const
-        {
-            auto sub = getSubNode("ReviveSideSwitcherGD");
-            return sub == nullptr? std::optional<Ent::Gen::ReviveSideSwitcherGD>{}: std::optional<Ent::Gen::ReviveSideSwitcherGD>(getSubNode("ReviveSideSwitcherGD"));
-        }
-        inline Ent::Gen::ReviveSideSwitcherGD Components::addReviveSideSwitcherGD() const
-        {
-            return Ent::Gen::ReviveSideSwitcherGD(addSubNode("ReviveSideSwitcherGD"));
-        }
-        inline void Components::removeReviveSideSwitcherGD() const
-        {
-            node->mapErase("ReviveSideSwitcherGD");
         }
         inline std::optional<Ent::Gen::ScriptComponentGD> Components::ScriptComponentGD() const
         {
@@ -38686,17 +38852,9 @@ namespace Ent
         {
             return Ent::Gen::Invincible(node->at("Invincible"));
         }
-        inline Ent::Gen::CreatureComponentInput_LastAliveReviveSide CreatureComponentInput::LastAliveReviveSide() const
-        {
-            return Ent::Gen::CreatureComponentInput_LastAliveReviveSide(node->at("LastAliveReviveSide"));
-        }
         inline Ent::Gen::Life CreatureComponentInput::Life() const
         {
             return Ent::Gen::Life(node->at("Life"));
-        }
-        inline Ent::Gen::CreatureComponentInput_ReviveSide CreatureComponentInput::ReviveSide() const
-        {
-            return Ent::Gen::CreatureComponentInput_ReviveSide(node->at("ReviveSide"));
         }
         inline Ent::Gen::ComponentInput CreatureComponentInput::Super() const
         {
@@ -40760,18 +40918,18 @@ namespace Ent
         {
             node->mapErase("EntityStateChargeMode");
         }
-        inline std::optional<Ent::Gen::EntityStateEnergyRootState> ActorStates::EntityStateEnergyRootState() const
+        inline std::optional<Ent::Gen::EntityStateEnergySide> ActorStates::EntityStateEnergySide() const
         {
-            auto sub = getSubNode("EntityStateEnergyRootState");
-            return sub == nullptr? std::optional<Ent::Gen::EntityStateEnergyRootState>{}: std::optional<Ent::Gen::EntityStateEnergyRootState>(getSubNode("EntityStateEnergyRootState"));
+            auto sub = getSubNode("EntityStateEnergySide");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStateEnergySide>{}: std::optional<Ent::Gen::EntityStateEnergySide>(getSubNode("EntityStateEnergySide"));
         }
-        inline Ent::Gen::EntityStateEnergyRootState ActorStates::addEntityStateEnergyRootState() const
+        inline Ent::Gen::EntityStateEnergySide ActorStates::addEntityStateEnergySide() const
         {
-            return Ent::Gen::EntityStateEnergyRootState(addSubNode("EntityStateEnergyRootState"));
+            return Ent::Gen::EntityStateEnergySide(addSubNode("EntityStateEnergySide"));
         }
-        inline void ActorStates::removeEntityStateEnergyRootState() const
+        inline void ActorStates::removeEntityStateEnergySide() const
         {
-            node->mapErase("EntityStateEnergyRootState");
+            node->mapErase("EntityStateEnergySide");
         }
         inline std::optional<Ent::Gen::EntityStateEnergySpoutState> ActorStates::EntityStateEnergySpoutState() const
         {
@@ -41292,13 +41450,13 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // EntityStateRaise
+        inline Ent::Gen::EnergySide EntityStateRaise::EnergySide() const
+        {
+            return Ent::Gen::EnergySide(node->at("EnergySide"));
+        }
         inline Ent::Gen::Float EntityStateRaise::Life() const
         {
             return Ent::Gen::Float(node->at("Life"));
-        }
-        inline Ent::Gen::ReviveSide EntityStateRaise::ReviveSide() const
-        {
-            return Ent::Gen::ReviveSide(node->at("ReviveSide"));
         }
         inline Ent::Gen::ActorState EntityStateRaise::Super() const
         {
@@ -41622,13 +41780,9 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // EntityStateEnergySpoutState
-        inline Ent::Gen::ReviveSide EntityStateEnergySpoutState::ReviveSide() const
+        inline Array<Ent::Gen::EnergySideEvent> EntityStateEnergySpoutState::EnergySideEvents() const
         {
-            return Ent::Gen::ReviveSide(node->at("ReviveSide"));
-        }
-        inline Array<Ent::Gen::ReviveSideEvent> EntityStateEnergySpoutState::ReviveSideEvents() const
-        {
-            return Array<Ent::Gen::ReviveSideEvent>(node->at("ReviveSideEvents"));
+            return Array<Ent::Gen::EnergySideEvent>(node->at("EnergySideEvents"));
         }
         inline Ent::Gen::ActorState EntityStateEnergySpoutState::Super() const
         {
@@ -41638,16 +41792,16 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
-        // EntityStateEnergyRootState
-        inline Ent::Gen::ReviveSide EntityStateEnergyRootState::ReviveSide() const
+        // EntityStateEnergySide
+        inline Ent::Gen::EnergySide EntityStateEnergySide::EnergySide() const
         {
-            return Ent::Gen::ReviveSide(node->at("ReviveSide"));
+            return Ent::Gen::EnergySide(node->at("EnergySide"));
         }
-        inline Ent::Gen::ActorState EntityStateEnergyRootState::Super() const
+        inline Ent::Gen::ActorState EntityStateEnergySide::Super() const
         {
             return Ent::Gen::ActorState(node->at("Super"));
         }
-        inline Ent::Gen::String EntityStateEnergyRootState::_comment() const
+        inline Ent::Gen::String EntityStateEnergySide::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -41804,6 +41958,24 @@ namespace Ent
             return Ent::Gen::ActorState(node->at("Super"));
         }
         inline Ent::Gen::String EntityStateClassicDodge::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EntityStateChargingJump
+        inline Ent::Gen::ActorState EntityStateChargingJump::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateChargingJump::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EntityStateChargedJump
+        inline Ent::Gen::ActorState EntityStateChargedJump::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateChargedJump::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -42028,9 +42200,9 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // ActorStateSoulWaitingToRespawn
-        inline Ent::Gen::ReviveSide ActorStateSoulWaitingToRespawn::ReviveSide() const
+        inline Ent::Gen::EnergySide ActorStateSoulWaitingToRespawn::EnergySide() const
         {
-            return Ent::Gen::ReviveSide(node->at("ReviveSide"));
+            return Ent::Gen::EnergySide(node->at("EnergySide"));
         }
         inline Ent::Gen::ActorState ActorStateSoulWaitingToRespawn::Super() const
         {
@@ -42616,14 +42788,6 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // ActorStateDead
-        inline Ent::Gen::LastAliveReviveSide ActorStateDead::LastAliveReviveSide() const
-        {
-            return Ent::Gen::LastAliveReviveSide(node->at("LastAliveReviveSide"));
-        }
-        inline Ent::Gen::Float ActorStateDead::ReviveLifeSigned() const
-        {
-            return Ent::Gen::Float(node->at("ReviveLifeSigned"));
-        }
         inline Ent::Gen::ActorState ActorStateDead::Super() const
         {
             return Ent::Gen::ActorState(node->at("Super"));
@@ -42667,16 +42831,16 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
-        // ActorStateChangeReviveSide
-        inline Ent::Gen::ReviveSide ActorStateChangeReviveSide::ReviveSide() const
+        // ActorStateChangeEnergySide
+        inline Ent::Gen::EnergySide ActorStateChangeEnergySide::EnergySide() const
         {
-            return Ent::Gen::ReviveSide(node->at("ReviveSide"));
+            return Ent::Gen::EnergySide(node->at("EnergySide"));
         }
-        inline Ent::Gen::ActorState ActorStateChangeReviveSide::Super() const
+        inline Ent::Gen::ActorState ActorStateChangeEnergySide::Super() const
         {
             return Ent::Gen::ActorState(node->at("Super"));
         }
-        inline Ent::Gen::String ActorStateChangeReviveSide::_comment() const
+        inline Ent::Gen::String ActorStateChangeEnergySide::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -42924,10 +43088,6 @@ namespace Ent
         inline Ent::Gen::Float ActorStateAlive::Life() const
         {
             return Ent::Gen::Float(node->at("Life"));
-        }
-        inline Ent::Gen::ReviveSide ActorStateAlive::ReviveSide() const
-        {
-            return Ent::Gen::ReviveSide(node->at("ReviveSide"));
         }
         inline Ent::Gen::StunGauge ActorStateAlive::StunGauge() const
         {
@@ -43187,9 +43347,9 @@ namespace Ent
         {
             return Ent::Gen::Position(node->at("respawnPosition"));
         }
-        inline Ent::Gen::ReviveSide ActionRespawn::respawnSide() const
+        inline Ent::Gen::EnergySide ActionRespawn::respawnSide() const
         {
-            return Ent::Gen::ReviveSide(node->at("respawnSide"));
+            return Ent::Gen::EnergySide(node->at("respawnSide"));
         }
         // ActionRagdoll
         inline Ent::Gen::Int ActionRagdoll::State() const
@@ -44835,6 +44995,36 @@ namespace Ent
         {
             return Ent::Gen::InGameCameraObservationParams(node->at("swim"));
         }
+        // ChargedJumpAnimation
+        inline Ent::Gen::String ChargedJumpAnimation::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Ent::Gen::ActionMode ChargedJumpAnimation::animActionMode() const
+        {
+            return Ent::Gen::ActionMode(node->at("animActionMode"));
+        }
+        inline Ent::Gen::ScaleConverter ChargedJumpAnimation::scaleByPower() const
+        {
+            return Ent::Gen::ScaleConverter(node->at("scaleByPower"));
+        }
+        // ChargedJumpGD
+        inline Ent::Gen::ComponentGD ChargedJumpGD::Super() const
+        {
+            return Ent::Gen::ComponentGD(node->at("Super"));
+        }
+        inline Ent::Gen::String ChargedJumpGD::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Array<Ent::Gen::ChargedJumpAnimation> ChargedJumpGD::chargedJumpAnimations() const
+        {
+            return Array<Ent::Gen::ChargedJumpAnimation>(node->at("chargedJumpAnimations"));
+        }
+        inline Ent::Gen::Float ChargedJumpGD::chargingDecelerationFactor() const
+        {
+            return Ent::Gen::Float(node->at("chargingDecelerationFactor"));
+        }
         // BoidParams
         inline Ent::Gen::Float BoidParams::Acceleration() const
         {
@@ -46148,6 +46338,15 @@ namespace Ent
         // SceneNode
         // SceneNodeGraph
         // Sensor
+        // ShapeSDF
+        inline Ent::Gen::String ShapeSDF::Path() const
+        {
+            return Ent::Gen::String(node->at("Path"));
+        }
+        inline Ent::Gen::String ShapeSDF::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // SmallActorSpawnRuleExchangeData
         inline Ent::Gen::String SmallActorSpawnRuleExchangeData::AudioEventName() const
         {

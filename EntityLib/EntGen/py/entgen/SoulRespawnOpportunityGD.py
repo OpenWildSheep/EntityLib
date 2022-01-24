@@ -4,7 +4,7 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.ReviveSide import *
+from entgen.EnergySide import *
 from entgen.Specie import *
 from entgen.String import *
 from entgen.Int import *
@@ -25,10 +25,10 @@ class SoulRespawnOpportunityGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def ForceReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ForceReviveSide"))
-    @ForceReviveSide.setter
-    def ForceReviveSide(self, val): self.ForceReviveSide.set(val)
+    def ForceEnergySide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("ForceEnergySide"))
+    @ForceEnergySide.setter
+    def ForceEnergySide(self, val): self.ForceEnergySide.set(val)
     @property
     def MaxDensityCount(self):  # type: ()->Int
         return Int(self._node.at("MaxDensityCount"))

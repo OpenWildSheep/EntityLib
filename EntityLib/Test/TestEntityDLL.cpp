@@ -836,8 +836,6 @@ try
         auto dead = actorStates.ActorStateDead();
         ENTLIB_ASSERT(dead.has_value());
         auto deadData = *dead;
-        auto reviveLife = deadData.ReviveLifeSigned();
-        ENTLIB_ASSERT(reviveLife.get() == 13.);
         auto actorStateHoldingItem = actorStates.ActorStateHoldingItem();
         ENTLIB_ASSERT(actorStateHoldingItem.has_value());
         auto itemEntityRef = actorStateHoldingItem->ItemEntityRef();

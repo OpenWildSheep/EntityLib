@@ -9,7 +9,6 @@
         {
             "className": "ActorStateDead",
             "classData":{
-                "ReviveLifeSigned": 13
             }
         },
         {

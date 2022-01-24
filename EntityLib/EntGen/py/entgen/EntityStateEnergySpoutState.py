@@ -4,10 +4,9 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.ReviveSide import *
 from entgen.String import *
 from entgen.ActorState import *
-from entgen.ReviveSideEvent import *
+from entgen.EnergySideEvent import *
 
 from EntityLibPy import Node
 
@@ -22,13 +21,8 @@ class EntityStateEnergySpoutState(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
-    @property
-    def ReviveSideEvents(self):  # type: ()->Array[ReviveSideEvent]
-        return (lambda n: Array(ReviveSideEvent, n))(self._node.at("ReviveSideEvents"))
+    def EnergySideEvents(self):  # type: ()->Array[EnergySideEvent]
+        return (lambda n: Array(EnergySideEvent, n))(self._node.at("EnergySideEvents"))
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))

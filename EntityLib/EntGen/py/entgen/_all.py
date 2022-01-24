@@ -82,10 +82,7 @@ from .RigidBodyUserDataDamage import *
 from .RigidBodyMeshNavigation import *
 from .FluidRigidbodyUserData import *
 from .RevivedData import *
-from .ReviveSideData import *
 from .ReviveSide import *
-from .ReviveSideEvent import *
-from .ReviveEnergyComponentInput_ReviveSide import *
 from .ResponsiblePointer_AnalyticsObserverInterface_ import *
 from .RegenerationManager_EnergyAreaSetting import *
 from .RegenSwitchBehavior import *
@@ -112,6 +109,9 @@ from .Transform3D import *
 from .ProjectileShooterData import *
 from .ProjectileData import *
 from .ProgressSoundEventData import *
+from .PrimitiveShape import *
+from .ShapeSphere import *
+from .ShapeBox import *
 from .PrimitiveData import *
 from .PrimitiveColliderType import *
 from .PredictionBehaviorDuration import *
@@ -212,8 +212,6 @@ from .Light import *
 from .LifeAndDamageData import *
 from .Life import *
 from .LedgePositionInfo import *
-from .LastValidedReviveSide import *
-from .LastAliveReviveSide import *
 from .JumpHeightMultiplier import *
 from .Invincible import *
 from .InventoryTags import *
@@ -299,15 +297,18 @@ from .MusicManager import *
 from .EventCameraData import *
 from .EntityStateSet import *
 from .PlayerState import *
-from .EntityStateRevive_Inputs import *
-from .EntityStateCreatureHatching_Inputs import *
 from .EntityStateChargeMode_EntityStateChargeModeInputs import *
 from .EntityLODData import *
 from .RegenData import *
 from .EntityID import *
 from .EnergyValue import *
+from .EnergySideData import *
 from .EnergySide import *
 from .TaggingVegetation import *
+from .ReviveEnergyComponentInput_EnergySide import *
+from .EntityStateRevive_Inputs import *
+from .EntityStateCreatureHatching_Inputs import *
+from .EnergySideEvent import *
 from .EnergyIntensity import *
 from .RegenerationManager import *
 from .EnergyPoolGD_EnergyArea import *
@@ -326,8 +327,6 @@ from .CreatureTypeData import *
 from .CreatureProfile__CreatureProfileFact import *
 from .CreatureProfile import *
 from .CreatureDangerousness import *
-from .CreatureComponentInput_ReviveSide import *
-from .CreatureComponentInput_LastAliveReviveSide import *
 from .ConstrainedInputData import *
 from .ConditionalRigidityAttribute_RigidityParameter import *
 from .ConditionalRigidityAttribute_Attributes import *
@@ -392,7 +391,6 @@ from .SensorVoxelsGD import *
 from .SensorControllerGD import *
 from .SeedPatch import *
 from .ScriptComponentGD import *
-from .ReviveSideSwitcherGD import *
 from .ReviveEnergyGD import *
 from .RespawnPlaceGD import *
 from .RegenerableVegetationGD import *
@@ -462,6 +460,7 @@ from .EventHandlerGD import *
 from .EnvStampGD import *
 from .EnergySpoutGD import *
 from .EnergySourceGD import *
+from .EnergySideSwitcherGD import *
 from .EnergyPoolTaggerGD import *
 from .EnergyPoolGD import *
 from .EnergyNetworkListenerGD import *
@@ -675,7 +674,7 @@ from .EntityStateFailingOrder import *
 from .EntityStateExtraLife import *
 from .EntityStateEnterSideMapRequest import *
 from .EntityStateEnergySpoutState import *
-from .EntityStateEnergyRootState import *
+from .EntityStateEnergySide import *
 from .EntityStateEnergyRootHatching import *
 from .EntityStateEnergyRootAbortHatching import *
 from .EntityStateEjectedLand import *
@@ -692,6 +691,8 @@ from .EntityStateConstrainedInput import *
 from .EntityStateCombat import *
 from .EntityStateClassicLand import *
 from .EntityStateClassicDodge import *
+from .EntityStateChargingJump import *
+from .EntityStateChargedJump import *
 from .EntityStateChargeMode import *
 from .EntityStateCanNotBePerceived import *
 from .EntityStateCallAndMountSpiritAnimal import *
@@ -776,7 +777,7 @@ from .ActorStateDead import *
 from .ActorStateCreature import *
 from .ActorStateConvertWithFlow import *
 from .ActorStateChargeSpendLife import *
-from .ActorStateChangeReviveSide import *
+from .ActorStateChangeEnergySide import *
 from .ActorStateCatapultedLand import *
 from .ActorStateCatapulted import *
 from .ActorStateCallingFollower import *
@@ -919,6 +920,8 @@ from .ActionMode import *
 from .InGameCameraParams import *
 from .InGameCameraObservationParams import *
 from .InGameCameraData import *
+from .ChargedJumpAnimation import *
+from .ChargedJumpGD import *
 from .BoidParams import *
 from .AnimationModelComponentInput_ActionMode import *
 from .AnimationModelComponentInput import *
@@ -979,6 +982,7 @@ from .ReplicaReplay import *
 from .SceneNode import *
 from .SceneNodeGraph import *
 from .Sensor import *
+from .ShapeSDF import *
 from .SmallActorSpawnRuleExchangeData import *
 from .TagInfo import *
 from .Team_PlayerData import *

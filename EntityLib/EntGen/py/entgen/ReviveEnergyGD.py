@@ -4,7 +4,7 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.ReviveSide import *
+from entgen.EnergySide import *
 from entgen.String import *
 from entgen.ComponentGD import *
 from entgen.Float import *
@@ -32,10 +32,10 @@ class ReviveEnergyGD(HelperObject):
     @HatchingDuration.setter
     def HatchingDuration(self, val): self.HatchingDuration.set(val)
     @property
-    def InitReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("InitReviveSide"))
-    @InitReviveSide.setter
-    def InitReviveSide(self, val): self.InitReviveSide.set(val)
+    def InitEnergySide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("InitEnergySide"))
+    @InitEnergySide.setter
+    def InitEnergySide(self, val): self.InitEnergySide.set(val)
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))

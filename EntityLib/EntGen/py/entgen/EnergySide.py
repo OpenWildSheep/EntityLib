@@ -10,6 +10,7 @@ class EnergySideEnum(Enum):
     none = "none"
     lush = "lush"
     corrupted = "corrupted"
+    EnergySide_COUNT = "EnergySide_COUNT"
 
 
 class EnergySide(Primitive[EnergySideEnum]):  # Enum

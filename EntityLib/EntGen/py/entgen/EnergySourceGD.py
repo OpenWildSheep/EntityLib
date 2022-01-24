@@ -4,7 +4,7 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.ReviveSide import *
+from entgen.EnergySide import *
 from entgen.String import *
 from entgen.ComponentGD import *
 from entgen.Float import *
@@ -21,6 +21,11 @@ class EnergySourceGD(HelperObject):
         return EnergySourceGD(entlib.make_node(EnergySourceGD.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def EnergySide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("EnergySide"))
+    @EnergySide.setter
+    def EnergySide(self, val): self.EnergySide.set(val)
     @property
     def MaxBuffDuration(self):  # type: ()->Float
         return Float(self._node.at("MaxBuffDuration"))
@@ -41,11 +46,6 @@ class EnergySourceGD(HelperObject):
         return Float(self._node.at("RefreshFrequency"))
     @RefreshFrequency.setter
     def RefreshFrequency(self, val): self.RefreshFrequency.set(val)
-    @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
     @property
     def SourceRegenEffectName(self):  # type: ()->String
         return String(self._node.at("SourceRegenEffectName"))

@@ -84,6 +84,11 @@ class variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_(Union):
 
 
 from EntityLibPy import Node
+class variant_ShapeSDF_ShapeSphere_ShapeBox_(Union):
+    pass
+
+
+from EntityLibPy import Node
 class variant_Pasta_Easing_Curve_string_(Union):
     pass
 
@@ -2738,31 +2743,6 @@ class RevivedData(HelperObject):
 
 
 from EntityLibPy import Node
-
-class ReviveSideData(HelperObject):
-    schema_name = "ReviveSideData"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ReviveSideData
-        return ReviveSideData(entlib.load_node_file(sourcefile, entlib.get_schema(ReviveSideData.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->ReviveSideData
-        return ReviveSideData(entlib.make_node(ReviveSideData.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def EntityRef(self):  # type: ()->EntityRef
-        return EntityRef(self._node.at("EntityRef"))
-    @EntityRef.setter
-    def EntityRef(self, val): self.EntityRef.set(val)
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Node
 class ReviveSideEnum(Enum):
     neutral = "neutral"
     sacred = "sacred"
@@ -2780,58 +2760,6 @@ class ReviveSide(Primitive[ReviveSideEnum]):  # Enum
         return self._node.set_string(val.value)
     def get(self):  # type: () -> T
         return self._item_type(self._node.value)
-
-
-from EntityLibPy import Node
-
-class ReviveSideEvent(HelperObject):
-    schema_name = "ReviveSideEvent"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ReviveSideEvent
-        return ReviveSideEvent(entlib.load_node_file(sourcefile, entlib.get_schema(ReviveSideEvent.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->ReviveSideEvent
-        return ReviveSideEvent(entlib.make_node(ReviveSideEvent.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def ElapsedTime(self):  # type: ()->Float
-        return Float(self._node.at("ElapsedTime"))
-    @ElapsedTime.setter
-    def ElapsedTime(self, val): self.ElapsedTime.set(val)
-    @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
-class ReviveEnergyComponentInput_ReviveSide(HelperObject):
-
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    @property
-    def engaged(self):  # type: ()->Bool
-        return Bool(self._node.at("engaged"))
-    @engaged.setter
-    def engaged(self, val): self.engaged.set(val)
-    @property
-    def val(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("val"))
-    @val.setter
-    def val(self, val): self.val.set(val)
-    pass
 
 
 from EntityLibPy import Node
@@ -3881,6 +3809,92 @@ class ProgressSoundEventData(HelperObject):
         return Float(self._node.at("IncreaseStopThreshold"))
     @IncreaseStopThreshold.setter
     def IncreaseStopThreshold(self, val): self.IncreaseStopThreshold.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class PrimitiveShape(HelperObject):
+    schema_name = "PrimitiveShape"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->PrimitiveShape
+        return PrimitiveShape(entlib.load_node_file(sourcefile, entlib.get_schema(PrimitiveShape.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->PrimitiveShape
+        return PrimitiveShape(entlib.make_node(PrimitiveShape.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def SDFPadding(self):  # type: ()->Float
+        return Float(self._node.at("SDFPadding"))
+    @SDFPadding.setter
+    def SDFPadding(self, val): self.SDFPadding.set(val)
+    @property
+    def SDFVoxelSize(self):  # type: ()->Float
+        return Float(self._node.at("SDFVoxelSize"))
+    @SDFVoxelSize.setter
+    def SDFVoxelSize(self, val): self.SDFVoxelSize.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class ShapeSphere(HelperObject):
+    schema_name = "ShapeSphere"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->ShapeSphere
+        return ShapeSphere(entlib.load_node_file(sourcefile, entlib.get_schema(ShapeSphere.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->ShapeSphere
+        return ShapeSphere(entlib.make_node(ShapeSphere.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Radius(self):  # type: ()->Float
+        return Float(self._node.at("Radius"))
+    @Radius.setter
+    def Radius(self, val): self.Radius.set(val)
+    @property
+    def Super(self):  # type: ()->PrimitiveShape
+        return PrimitiveShape(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class ShapeBox(HelperObject):
+    schema_name = "ShapeBox"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->ShapeBox
+        return ShapeBox(entlib.load_node_file(sourcefile, entlib.get_schema(ShapeBox.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->ShapeBox
+        return ShapeBox(entlib.make_node(ShapeBox.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Size(self):  # type: ()->Vector3
+        return Vector3(self._node.at("Size"))
+    @Size.setter
+    def Size(self, val): self.Size.set(val)
+    @property
+    def Super(self):  # type: ()->PrimitiveShape
+        return PrimitiveShape(self._node.at("Super"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
@@ -6941,50 +6955,6 @@ class LedgePositionInfo(HelperObject):
 
 from EntityLibPy import Node
 
-class LastValidedReviveSide(HelperObject):
-
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    @property
-    def engaged(self):  # type: ()->Bool
-        return Bool(self._node.at("engaged"))
-    @engaged.setter
-    def engaged(self, val): self.engaged.set(val)
-    @property
-    def val(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("val"))
-    @val.setter
-    def val(self, val): self.val.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
-class LastAliveReviveSide(HelperObject):
-
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    @property
-    def engaged(self):  # type: ()->Bool
-        return Bool(self._node.at("engaged"))
-    @engaged.setter
-    def engaged(self, val): self.engaged.set(val)
-    @property
-    def val(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("val"))
-    @val.setter
-    def val(self, val): self.val.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
 class JumpHeightMultiplier(HelperObject):
 
     @property
@@ -7032,9 +7002,8 @@ class InventoryTagsEnum(Enum):
     outfit = "outfit"
     item = "item"
     default_ = "default"
-    neutral = "neutral"
-    sacred = "sacred"
-    cursed = "cursed"
+    lush = "lush"
+    corrupted = "corrupted"
     soul = "soul"
     disguise = "disguise"
     soulfreedflying = "soulfreedflying"
@@ -10220,69 +10189,6 @@ class PlayerState(HelperObject):
 
 from EntityLibPy import Node
 
-class EntityStateRevive_Inputs(HelperObject):
-    schema_name = "EntityStateRevive::Inputs"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateRevive_Inputs
-        return EntityStateRevive_Inputs(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateRevive_Inputs.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->EntityStateRevive_Inputs
-        return EntityStateRevive_Inputs(entlib.make_node(EntityStateRevive_Inputs.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def Life(self):  # type: ()->Float
-        return Float(self._node.at("Life"))
-    @Life.setter
-    def Life(self, val): self.Life.set(val)
-    @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
-class EntityStateCreatureHatching_Inputs(HelperObject):
-    schema_name = "EntityStateCreatureHatching::Inputs"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateCreatureHatching_Inputs
-        return EntityStateCreatureHatching_Inputs(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateCreatureHatching_Inputs.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->EntityStateCreatureHatching_Inputs
-        return EntityStateCreatureHatching_Inputs(entlib.make_node(EntityStateCreatureHatching_Inputs.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def ForceSuccess(self):  # type: ()->Bool
-        return Bool(self._node.at("ForceSuccess"))
-    @ForceSuccess.setter
-    def ForceSuccess(self, val): self.ForceSuccess.set(val)
-    @property
-    def MinReviveRatio(self):  # type: ()->MinReviveRatio
-        return MinReviveRatio(self._node.at("MinReviveRatio"))
-    @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
 class EntityStateChargeMode_EntityStateChargeModeInputs(HelperObject):
     schema_name = "EntityStateChargeMode::EntityStateChargeModeInputs"
     @staticmethod
@@ -10393,10 +10299,36 @@ class EnergyValue(Primitive[EnergyValueEnum]):  # Enum
 
 
 from EntityLibPy import Node
+
+class EnergySideData(HelperObject):
+    schema_name = "EnergySideData"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EnergySideData
+        return EnergySideData(entlib.load_node_file(sourcefile, entlib.get_schema(EnergySideData.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EnergySideData
+        return EnergySideData(entlib.make_node(EnergySideData.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def EntityRef(self):  # type: ()->EntityRef
+        return EntityRef(self._node.at("EntityRef"))
+    @EntityRef.setter
+    def EntityRef(self, val): self.EntityRef.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
 class EnergySideEnum(Enum):
     none = "none"
     lush = "lush"
     corrupted = "corrupted"
+    EnergySide_COUNT = "EnergySide_COUNT"
 
 
 class EnergySide(Primitive[EnergySideEnum]):  # Enum
@@ -10441,6 +10373,121 @@ class TaggingVegetation(HelperObject):
         return (lambda n: PrimArray(String, n))(self._node.at("VegetationTags"))
     @VegetationTags.setter
     def VegetationTags(self, val): self.VegetationTags.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class ReviveEnergyComponentInput_EnergySide(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.at("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("val"))
+    @val.setter
+    def val(self, val): self.val.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateRevive_Inputs(HelperObject):
+    schema_name = "EntityStateRevive::Inputs"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateRevive_Inputs
+        return EntityStateRevive_Inputs(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateRevive_Inputs.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateRevive_Inputs
+        return EntityStateRevive_Inputs(entlib.make_node(EntityStateRevive_Inputs.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def EnergySide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("EnergySide"))
+    @EnergySide.setter
+    def EnergySide(self, val): self.EnergySide.set(val)
+    @property
+    def Life(self):  # type: ()->Float
+        return Float(self._node.at("Life"))
+    @Life.setter
+    def Life(self, val): self.Life.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateCreatureHatching_Inputs(HelperObject):
+    schema_name = "EntityStateCreatureHatching::Inputs"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateCreatureHatching_Inputs
+        return EntityStateCreatureHatching_Inputs(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateCreatureHatching_Inputs.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateCreatureHatching_Inputs
+        return EntityStateCreatureHatching_Inputs(entlib.make_node(EntityStateCreatureHatching_Inputs.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def EnergySide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("EnergySide"))
+    @EnergySide.setter
+    def EnergySide(self, val): self.EnergySide.set(val)
+    @property
+    def ForceSuccess(self):  # type: ()->Bool
+        return Bool(self._node.at("ForceSuccess"))
+    @ForceSuccess.setter
+    def ForceSuccess(self, val): self.ForceSuccess.set(val)
+    @property
+    def MinReviveRatio(self):  # type: ()->MinReviveRatio
+        return MinReviveRatio(self._node.at("MinReviveRatio"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EnergySideEvent(HelperObject):
+    schema_name = "EnergySideEvent"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EnergySideEvent
+        return EnergySideEvent(entlib.load_node_file(sourcefile, entlib.get_schema(EnergySideEvent.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EnergySideEvent
+        return EnergySideEvent(entlib.make_node(EnergySideEvent.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def ElapsedTime(self):  # type: ()->Float
+        return Float(self._node.at("ElapsedTime"))
+    @ElapsedTime.setter
+    def ElapsedTime(self, val): self.ElapsedTime.set(val)
+    @property
+    def EnergySide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("EnergySide"))
+    @EnergySide.setter
+    def EnergySide(self, val): self.EnergySide.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
@@ -10557,25 +10604,23 @@ class EnergyPoolGD_EnergyArea(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def CenterOffset(self):  # type: ()->Vector3
-        return Vector3(self._node.at("CenterOffset"))
-    @CenterOffset.setter
-    def CenterOffset(self, val): self.CenterOffset.set(val)
-    @property
     def Intensity(self):  # type: ()->EnergyIntensity
         return EnergyIntensity(self._node.at("Intensity"))
     @Intensity.setter
     def Intensity(self, val): self.Intensity.set(val)
+    @property
+    def Offset(self):  # type: ()->Vector3
+        return Vector3(self._node.at("Offset"))
+    @Offset.setter
+    def Offset(self, val): self.Offset.set(val)
     @property
     def Priority(self):  # type: ()->Int
         return Int(self._node.at("Priority"))
     @Priority.setter
     def Priority(self, val): self.Priority.set(val)
     @property
-    def Radius(self):  # type: ()->Float
-        return Float(self._node.at("Radius"))
-    @Radius.setter
-    def Radius(self, val): self.Radius.set(val)
+    def Shape(self):  # type: ()->variant_ShapeSDF_ShapeSphere_ShapeBox_
+        return variant_ShapeSDF_ShapeSphere_ShapeBox_(self._node.at("Shape"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
@@ -11447,50 +11492,6 @@ class CreatureDangerousness(HelperObject):
 
 from EntityLibPy import Node
 
-class CreatureComponentInput_ReviveSide(HelperObject):
-
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    @property
-    def engaged(self):  # type: ()->Bool
-        return Bool(self._node.at("engaged"))
-    @engaged.setter
-    def engaged(self, val): self.engaged.set(val)
-    @property
-    def val(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("val"))
-    @val.setter
-    def val(self, val): self.val.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
-class CreatureComponentInput_LastAliveReviveSide(HelperObject):
-
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    @property
-    def engaged(self):  # type: ()->Bool
-        return Bool(self._node.at("engaged"))
-    @engaged.setter
-    def engaged(self, val): self.engaged.set(val)
-    @property
-    def val(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("val"))
-    @val.setter
-    def val(self, val): self.val.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
 class ConstrainedInputData(HelperObject):
     schema_name = "ConstrainedInputData"
     @staticmethod
@@ -11793,11 +11794,8 @@ class ReviveEnergyComponentInput(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def LastValidedReviveSide(self):  # type: ()->LastValidedReviveSide
-        return LastValidedReviveSide(self._node.at("LastValidedReviveSide"))
-    @property
-    def ReviveSide(self):  # type: ()->ReviveEnergyComponentInput_ReviveSide
-        return ReviveEnergyComponentInput_ReviveSide(self._node.at("ReviveSide"))
+    def EnergySide(self):  # type: ()->ReviveEnergyComponentInput_EnergySide
+        return ReviveEnergyComponentInput_EnergySide(self._node.at("EnergySide"))
     @property
     def Super(self):  # type: ()->ComponentInput
         return ComponentInput(self._node.at("Super"))
@@ -13658,10 +13656,10 @@ class SoulRespawnOpportunityGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def ForceReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ForceReviveSide"))
-    @ForceReviveSide.setter
-    def ForceReviveSide(self, val): self.ForceReviveSide.set(val)
+    def ForceEnergySide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("ForceEnergySide"))
+    @ForceEnergySide.setter
+    def ForceEnergySide(self, val): self.ForceEnergySide.set(val)
     @property
     def MaxDensityCount(self):  # type: ()->Int
         return Int(self._node.at("MaxDensityCount"))
@@ -13822,11 +13820,6 @@ class ShamanItemGD(HelperObject):
         return EntityRef(self._node.at("OppositeItemEntityRef"))
     @OppositeItemEntityRef.setter
     def OppositeItemEntityRef(self, val): self.OppositeItemEntityRef.set(val)
-    @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
     @property
     def StartPartCount(self):  # type: ()->Int
         return Int(self._node.at("StartPartCount"))
@@ -14009,37 +14002,6 @@ class ScriptComponentGD(HelperObject):
 
 from EntityLibPy import Node
 
-class ReviveSideSwitcherGD(HelperObject):
-    schema_name = "ReviveSideSwitcherGD"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ReviveSideSwitcherGD
-        return ReviveSideSwitcherGD(entlib.load_node_file(sourcefile, entlib.get_schema(ReviveSideSwitcherGD.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->ReviveSideSwitcherGD
-        return ReviveSideSwitcherGD(entlib.make_node(ReviveSideSwitcherGD.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def ReviveEnergyEntityRef(self):  # type: ()->EntityRef
-        return EntityRef(self._node.at("ReviveEnergyEntityRef"))
-    @ReviveEnergyEntityRef.setter
-    def ReviveEnergyEntityRef(self, val): self.ReviveEnergyEntityRef.set(val)
-    @property
-    def ReviveSideData(self):  # type: ()->Map[ReviveSideEnum, ReviveSideData]
-        return (lambda n: Map(ReviveSideEnum, ReviveSideData, n))(self._node.at("ReviveSideData"))
-    @property
-    def Super(self):  # type: ()->ComponentGD
-        return ComponentGD(self._node.at("Super"))
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
 class ReviveEnergyGD(HelperObject):
     schema_name = "ReviveEnergyGD"
     @staticmethod
@@ -14061,10 +14023,10 @@ class ReviveEnergyGD(HelperObject):
     @HatchingDuration.setter
     def HatchingDuration(self, val): self.HatchingDuration.set(val)
     @property
-    def InitReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("InitReviveSide"))
-    @InitReviveSide.setter
-    def InitReviveSide(self, val): self.InitReviveSide.set(val)
+    def InitEnergySide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("InitEnergySide"))
+    @InitEnergySide.setter
+    def InitEnergySide(self, val): self.InitEnergySide.set(val)
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
@@ -15850,8 +15812,8 @@ class HealthAreaGD(HelperObject):
     @EnergyRestorationRate.setter
     def EnergyRestorationRate(self, val): self.EnergyRestorationRate.set(val)
     @property
-    def FactionSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("FactionSide"))
+    def FactionSide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("FactionSide"))
     @FactionSide.setter
     def FactionSide(self, val): self.FactionSide.set(val)
     @property
@@ -16419,6 +16381,11 @@ class EnergySourceGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def EnergySide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("EnergySide"))
+    @EnergySide.setter
+    def EnergySide(self, val): self.EnergySide.set(val)
+    @property
     def MaxBuffDuration(self):  # type: ()->Float
         return Float(self._node.at("MaxBuffDuration"))
     @MaxBuffDuration.setter
@@ -16439,15 +16406,41 @@ class EnergySourceGD(HelperObject):
     @RefreshFrequency.setter
     def RefreshFrequency(self, val): self.RefreshFrequency.set(val)
     @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
-    @property
     def SourceRegenEffectName(self):  # type: ()->String
         return String(self._node.at("SourceRegenEffectName"))
     @SourceRegenEffectName.setter
     def SourceRegenEffectName(self, val): self.SourceRegenEffectName.set(val)
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EnergySideSwitcherGD(HelperObject):
+    schema_name = "EnergySideSwitcherGD"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EnergySideSwitcherGD
+        return EnergySideSwitcherGD(entlib.load_node_file(sourcefile, entlib.get_schema(EnergySideSwitcherGD.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EnergySideSwitcherGD
+        return EnergySideSwitcherGD(entlib.make_node(EnergySideSwitcherGD.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def EnergySideData(self):  # type: ()->Map[EnergySideEnum, EnergySideData]
+        return (lambda n: Map(EnergySideEnum, EnergySideData, n))(self._node.at("EnergySideData"))
+    @property
+    def ReviveEnergyEntityRef(self):  # type: ()->EntityRef
+        return EntityRef(self._node.at("ReviveEnergyEntityRef"))
+    @ReviveEnergyEntityRef.setter
+    def ReviveEnergyEntityRef(self, val): self.ReviveEnergyEntityRef.set(val)
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
@@ -19646,14 +19639,8 @@ class CreatureComponentInput(HelperObject):
     def Invincible(self):  # type: ()->Invincible
         return Invincible(self._node.at("Invincible"))
     @property
-    def LastAliveReviveSide(self):  # type: ()->CreatureComponentInput_LastAliveReviveSide
-        return CreatureComponentInput_LastAliveReviveSide(self._node.at("LastAliveReviveSide"))
-    @property
     def Life(self):  # type: ()->Life
         return Life(self._node.at("Life"))
-    @property
-    def ReviveSide(self):  # type: ()->CreatureComponentInput_ReviveSide
-        return CreatureComponentInput_ReviveSide(self._node.at("ReviveSide"))
     @property
     def Super(self):  # type: ()->ComponentInput
         return ComponentInput(self._node.at("Super"))
@@ -23957,15 +23944,15 @@ class EntityStateRaise(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def EnergySide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("EnergySide"))
+    @EnergySide.setter
+    def EnergySide(self, val): self.EnergySide.set(val)
+    @property
     def Life(self):  # type: ()->Float
         return Float(self._node.at("Life"))
     @Life.setter
     def Life(self, val): self.Life.set(val)
-    @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))
@@ -24769,13 +24756,8 @@ class EntityStateEnergySpoutState(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
-    @property
-    def ReviveSideEvents(self):  # type: ()->Array[ReviveSideEvent]
-        return (lambda n: Array(ReviveSideEvent, n))(self._node.at("ReviveSideEvents"))
+    def EnergySideEvents(self):  # type: ()->Array[EnergySideEvent]
+        return (lambda n: Array(EnergySideEvent, n))(self._node.at("EnergySideEvents"))
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))
@@ -24789,21 +24771,21 @@ class EntityStateEnergySpoutState(HelperObject):
 
 from EntityLibPy import Node
 
-class EntityStateEnergyRootState(HelperObject):
-    schema_name = "EntityStateEnergyRootState"
+class EntityStateEnergySide(HelperObject):
+    schema_name = "EntityStateEnergySide"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateEnergyRootState
-        return EntityStateEnergyRootState(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateEnergyRootState.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateEnergySide
+        return EntityStateEnergySide(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateEnergySide.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->EntityStateEnergyRootState
-        return EntityStateEnergyRootState(entlib.make_node(EntityStateEnergyRootState.schema_name))
+    def create(entlib):  # type: (EntityLib)->EntityStateEnergySide
+        return EntityStateEnergySide(entlib.make_node(EntityStateEnergySide.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
+    def EnergySide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("EnergySide"))
+    @EnergySide.setter
+    def EnergySide(self, val): self.EnergySide.set(val)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))
@@ -25181,6 +25163,52 @@ class EntityStateClassicDodge(HelperObject):
     @staticmethod
     def create(entlib):  # type: (EntityLib)->EntityStateClassicDodge
         return EntityStateClassicDodge(entlib.make_node(EntityStateClassicDodge.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateChargingJump(HelperObject):
+    schema_name = "EntityStateChargingJump"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateChargingJump
+        return EntityStateChargingJump(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateChargingJump.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateChargingJump
+        return EntityStateChargingJump(entlib.make_node(EntityStateChargingJump.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateChargedJump(HelperObject):
+    schema_name = "EntityStateChargedJump"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateChargedJump
+        return EntityStateChargedJump(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateChargedJump.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateChargedJump
+        return EntityStateChargedJump(entlib.make_node(EntityStateChargedJump.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
@@ -25709,10 +25737,10 @@ class ActorStateSoulWaitingToRespawn(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
+    def EnergySide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("EnergySide"))
+    @EnergySide.setter
+    def EnergySide(self, val): self.EnergySide.set(val)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))
@@ -27145,14 +27173,6 @@ class ActorStateDead(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def LastAliveReviveSide(self):  # type: ()->LastAliveReviveSide
-        return LastAliveReviveSide(self._node.at("LastAliveReviveSide"))
-    @property
-    def ReviveLifeSigned(self):  # type: ()->Float
-        return Float(self._node.at("ReviveLifeSigned"))
-    @ReviveLifeSigned.setter
-    def ReviveLifeSigned(self, val): self.ReviveLifeSigned.set(val)
-    @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))
     @property
@@ -27242,21 +27262,21 @@ class ActorStateChargeSpendLife(HelperObject):
 
 from EntityLibPy import Node
 
-class ActorStateChangeReviveSide(HelperObject):
-    schema_name = "ActorStateChangeReviveSide"
+class ActorStateChangeEnergySide(HelperObject):
+    schema_name = "ActorStateChangeEnergySide"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateChangeReviveSide
-        return ActorStateChangeReviveSide(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateChangeReviveSide.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateChangeEnergySide
+        return ActorStateChangeEnergySide(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateChangeEnergySide.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->ActorStateChangeReviveSide
-        return ActorStateChangeReviveSide(entlib.make_node(ActorStateChangeReviveSide.schema_name))
+    def create(entlib):  # type: (EntityLib)->ActorStateChangeEnergySide
+        return ActorStateChangeEnergySide(entlib.make_node(ActorStateChangeEnergySide.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
+    def EnergySide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("EnergySide"))
+    @EnergySide.setter
+    def EnergySide(self, val): self.EnergySide.set(val)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))
@@ -27866,11 +27886,6 @@ class ActorStateAlive(HelperObject):
     @Life.setter
     def Life(self, val): self.Life.set(val)
     @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
-    @property
     def StunGauge(self):  # type: ()->StunGauge
         return StunGauge(self._node.at("StunGauge"))
     @property
@@ -28444,8 +28459,8 @@ class ActionRespawn(HelperObject):
     def respawnPosition(self):  # type: ()->Position
         return Position(self._node.at("respawnPosition"))
     @property
-    def respawnSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("respawnSide"))
+    def respawnSide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("respawnSide"))
     @respawnSide.setter
     def respawnSide(self, val): self.respawnSide.set(val)
     pass
@@ -30080,6 +30095,7 @@ class ActorCategoryEnum(Enum):
     CATEGORY_EntitySwitchTransition = "CATEGORY_EntitySwitchTransition"
     CATEGORY_EnergyRoot = "CATEGORY_EnergyRoot"
     CATEGORY_EnergySpout = "CATEGORY_EnergySpout"
+    CATEGORY_Energy = "CATEGORY_Energy"
     CATEGORY_GPE = "CATEGORY_GPE"
     CATEGORY_Hatching = "CATEGORY_Hatching"
     ActorCategory_COUNT = "ActorCategory_COUNT"
@@ -30999,6 +31015,9 @@ class ActionModeEnum(Enum):
     jump = "jump"
     jumpoff = "jumpoff"
     doublejump = "doublejump"
+    jumpcharging = "jumpcharging"
+    jumpcharged = "jumpcharged"
+    longjump = "longjump"
     regenerate = "regenerate"
     drift = "drift"
     wait = "wait"
@@ -31743,6 +31762,65 @@ class InGameCameraData(HelperObject):
     @property
     def swim(self):  # type: ()->InGameCameraObservationParams
         return InGameCameraObservationParams(self._node.at("swim"))
+    pass
+
+
+from EntityLibPy import Node
+
+class ChargedJumpAnimation(HelperObject):
+    schema_name = "ChargedJumpAnimation"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->ChargedJumpAnimation
+        return ChargedJumpAnimation(entlib.load_node_file(sourcefile, entlib.get_schema(ChargedJumpAnimation.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->ChargedJumpAnimation
+        return ChargedJumpAnimation(entlib.make_node(ChargedJumpAnimation.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def animActionMode(self):  # type: ()->ActionMode
+        return ActionMode(self._node.at("animActionMode"))
+    @animActionMode.setter
+    def animActionMode(self, val): self.animActionMode.set(val)
+    @property
+    def scaleByPower(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("scaleByPower"))
+    pass
+
+
+from EntityLibPy import Node
+
+class ChargedJumpGD(HelperObject):
+    schema_name = "ChargedJumpGD"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->ChargedJumpGD
+        return ChargedJumpGD(entlib.load_node_file(sourcefile, entlib.get_schema(ChargedJumpGD.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->ChargedJumpGD
+        return ChargedJumpGD(entlib.make_node(ChargedJumpGD.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def chargedJumpAnimations(self):  # type: ()->Array[ChargedJumpAnimation]
+        return (lambda n: Array(ChargedJumpAnimation, n))(self._node.at("chargedJumpAnimations"))
+    @property
+    def chargingDecelerationFactor(self):  # type: ()->Float
+        return Float(self._node.at("chargingDecelerationFactor"))
+    @chargingDecelerationFactor.setter
+    def chargingDecelerationFactor(self, val): self.chargingDecelerationFactor.set(val)
     pass
 
 
@@ -34152,6 +34230,31 @@ class Sensor(HelperObject):
 
 from EntityLibPy import Node
 
+class ShapeSDF(HelperObject):
+    schema_name = "ShapeSDF"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->ShapeSDF
+        return ShapeSDF(entlib.load_node_file(sourcefile, entlib.get_schema(ShapeSDF.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->ShapeSDF
+        return ShapeSDF(entlib.make_node(ShapeSDF.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Path(self):  # type: ()->String
+        return String(self._node.at("Path"))
+    @Path.setter
+    def Path(self, val): self.Path.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class SmallActorSpawnRuleExchangeData(HelperObject):
     schema_name = "SmallActorSpawnRuleExchangeData"
     @staticmethod
@@ -34288,7 +34391,7 @@ class Timer(HelperObject):
 
 
 from EntityLibPy import Node
-Vector3i = (lambda n: PrimArray(Float, n))
+Vector3i = (lambda n: PrimArray(Int, n))
 from EntityLibPy import Node
 
 class VegetationResourceData(HelperObject):

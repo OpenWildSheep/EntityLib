@@ -161,7 +161,6 @@ namespace Ent
                         newLayer.prefabsStorage->_init(m_entityLib, _schema, prefabPath.c_str());
                     }
                     newLayer.prefab = newLayer.prefabsStorage.get();
-                    ENTLIB_ASSERT(newLayer.prefab != (void*)0xdddddddddddddddd);
                 }
             }
         }
@@ -435,9 +434,44 @@ namespace Ent
         Ent::SubschemaRef ref;
         ref.subSchemaOrRef = std::move(schema);
         enterObjectField("InstanceOf", &ref);
+        if (not isSet())
+        {
+            exit();
+            return nullptr;
+        }
         char const* instanceOf = getString();
         exit();
         return instanceOf[0] == 0 ? nullptr : instanceOf;
+    }
+
+    void Cursor::setInstanceOf(char const* _instanceOf)
+    {
+        if (_instanceOf != nullptr)
+        {
+            // The field InstanceOf is not a field of objects, so we have to fake it.
+            Ent::Subschema schema;
+            schema.type = Ent::DataType::string;
+            Ent::SubschemaRef ref;
+            ref.subSchemaOrRef = std::move(schema);
+            enterObjectField("InstanceOf", &ref);
+            setString(_instanceOf);
+            exit();
+            auto& lastLayer = _getLastLayer();
+            if (lastLayer.prefabsStorage == nullptr)
+            {
+                lastLayer.prefabsStorage =
+                    std::make_unique<Cursor>(m_entityLib, getSchema(), _instanceOf);
+            }
+            else
+            {
+                lastLayer.prefabsStorage->_init(m_entityLib, getSchema(), _instanceOf);
+            }
+            if (lastLayer.prefab != nullptr)
+            {
+                lastLayer.prefab->exit();
+            }
+            lastLayer.prefab = lastLayer.prefabsStorage.get();
+        }
     }
 
     char const* Cursor::getUnionType()
@@ -504,9 +538,6 @@ namespace Ent
 #endif
         _checkInvariants();
         auto& lastLayer = _getLastLayer();
-        //ENTLIB_DBG_ASSERT(
-        //    prevLayer.default == nullptr
-        //    or prevLayer.default->schema.back().base->type == prevSchema.base->type);
         m_instance.exit();
         if (lastLayer.prefab != nullptr and not(lastLayer.prefab->m_layerCount < 2))
         {

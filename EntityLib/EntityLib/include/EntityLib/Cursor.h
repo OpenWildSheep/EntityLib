@@ -88,6 +88,10 @@ namespace Ent
         /// @pre It is an Object
         char const* getInstanceOf();
 
+        /// @brief Set the InstanceOf field which point the prefab of the object
+        /// @pre It is an Object
+        void setInstanceOf(char const* _instanceOf);
+
         /// @return The type of the Union
         /// @pre It is a Union
         char const* getUnionType();
@@ -157,7 +161,7 @@ namespace Ent
 
         Cursor* getPrefab(); ///< Get the Cursor of the prefab
 
-        size_t getStackSize() const;  ///< Get the stack size (count of "enter" since the root)
+        size_t getStackSize() const; ///< Get the stack size (count of "enter" since the root)
 
     private:
         struct Layer

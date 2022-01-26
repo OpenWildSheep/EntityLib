@@ -390,7 +390,7 @@ namespace Ent
         {
             throw ContextException("Can't open %s for write", filepath.string().c_str());
         }
-        ofs << *doc;
+        ofs << doc->dump(4);
     }
 
     struct MergeMapOverride

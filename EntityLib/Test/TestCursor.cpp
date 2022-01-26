@@ -83,17 +83,17 @@ public:
     {
         ++tab;
     }
-    virtual void inArrayElement(size_t)
+    void inArrayElement(size_t) override
     {
     }
-    virtual void outArrayElement()
+    void outArrayElement() override
     {
     }
-    virtual void key(char const* _key)
+    void key(char const* _key) override
     {
         std::cout << getTab() << '"' << _key << '"' << std::endl;
     }
-    virtual void key(int64_t _key)
+    void key(int64_t _key) override
     {
         std::cout << getTab() << _key << std::endl;
     }
@@ -182,24 +182,24 @@ public:
         , nodes({n})
     {
     }
-    virtual void inObject()
+    void inObject() override
     {
         // ENTLIB_ASSERT(nodes.back()->getFieldNames().size() == expl.get);
     }
-    virtual bool inObjectField(char const* key)
+    bool inObjectField(char const* key) override
     {
         nodes.push_back(nodes.back()->at(key));
         ENTLIB_ASSERT(nodes.back() != nullptr);
         return true;
     }
-    virtual void outObjectField([[maybe_unused]] char const* _key)
+    void outObjectField([[maybe_unused]] char const* _key) override
     {
         nodes.pop_back();
     }
-    virtual void outObject()
+    void outObject() override
     {
     }
-    virtual void inUnion(char const*)
+    void inUnion(char const*) override
     {
         //ENTLIB_ASSERT(strcmp(expl.getUnionType(), nodes.back()->getUnionType()) == 0);
         //ENTLIB_ASSERT(strcmp(nodes.back()->getUnionType(), type) == 0);
@@ -215,11 +215,11 @@ public:
         //expl.exit();
         ENTLIB_ASSERT(nodes.back() != nullptr);
     }
-    virtual void outUnion()
+    void outUnion() override
     {
         nodes.pop_back();
     }
-    virtual void inMap()
+    void inMap() override
     {
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         switch (expl.getMapKeyType())
@@ -237,24 +237,24 @@ public:
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
-    virtual void outMap()
+    void outMap() override
     {
     }
-    virtual void inMapElement(char const* key)
-    {
-        nodes.push_back(nodes.back()->mapGet(key));
-        ENTLIB_ASSERT(nodes.back() != nullptr);
-    }
-    virtual void inMapElement(int64_t key)
+    void inMapElement(char const* key) override
     {
         nodes.push_back(nodes.back()->mapGet(key));
         ENTLIB_ASSERT(nodes.back() != nullptr);
     }
-    virtual void outMapElement()
+    void inMapElement(int64_t key) override
+    {
+        nodes.push_back(nodes.back()->mapGet(key));
+        ENTLIB_ASSERT(nodes.back() != nullptr);
+    }
+    void outMapElement() override
     {
         nodes.pop_back();
     }
-    virtual void inPrimSet(Ent::DataType)
+    void inPrimSet(Ent::DataType) override
     {
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         auto& itemType = expl.getSchema()->singularItems.get()->get();
@@ -269,27 +269,27 @@ public:
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
-    virtual void inArrayElement(size_t i)
+    void inArrayElement(size_t i) override
     {
         nodes.push_back(nodes.back()->at(i));
         ENTLIB_ASSERT(nodes.back() != nullptr);
     }
-    virtual void outArrayElement()
+    void outArrayElement() override
     {
         nodes.pop_back();
     }
-    virtual void key(char const* key)
+    void key(char const* key) override
     {
         ENTLIB_ASSERT(nodes.back()->mapGet(key) != nullptr);
     }
-    virtual void key(int64_t key)
+    void key(int64_t key) override
     {
         ENTLIB_ASSERT(nodes.back()->mapGet(key) != nullptr);
     }
-    virtual void outPrimSet()
+    void outPrimSet() override
     {
     }
-    virtual void inUnionSet()
+    void inUnionSet() override
     {
         auto a = nodes.back()->getKeysString();
         auto b = expl.getUnionSetKeysString();
@@ -297,21 +297,21 @@ public:
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         ENTLIB_ASSERT(nodes.back()->getSchema() == expl.getSchema());
     }
-    virtual void inUnionSetElement(char const* type)
+    void inUnionSetElement(char const* type) override
     {
         auto union_ = nodes.back()->mapGet(type);
         ENTLIB_ASSERT(union_ != nullptr);
         nodes.push_back(union_->getUnionData());
         ENTLIB_ASSERT(nodes.back() != nullptr);
     }
-    virtual void outUnionSetElement()
+    void outUnionSetElement() override
     {
         nodes.pop_back();
     }
-    virtual void outUnionSet()
+    void outUnionSet() override
     {
     }
-    virtual void inObjectSet()
+    void inObjectSet() override
     {
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         switch (nodes.back()->getKeyType())
@@ -327,56 +327,56 @@ public:
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
-    virtual void outObjectSet()
+    void outObjectSet() override
     {
     }
-    virtual void inObjectSetElement(char const* key)
-    {
-        nodes.push_back(nodes.back()->mapGet(key));
-        ENTLIB_ASSERT(nodes.back() != nullptr);
-    }
-    virtual void inObjectSetElement(int64_t key)
+    void inObjectSetElement(char const* key) override
     {
         nodes.push_back(nodes.back()->mapGet(key));
         ENTLIB_ASSERT(nodes.back() != nullptr);
     }
-    virtual void outObjectSetElement()
+    void inObjectSetElement(int64_t key) override
+    {
+        nodes.push_back(nodes.back()->mapGet(key));
+        ENTLIB_ASSERT(nodes.back() != nullptr);
+    }
+    void outObjectSetElement() override
     {
         nodes.pop_back();
     }
-    virtual void inArray()
+    void inArray() override
     {
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         if (nodes.back()->size() != expl.size())
             expl.size();
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
     }
-    virtual void outArray()
+    void outArray() override
     {
     }
-    virtual void nullNode()
+    void nullNode() override
     {
     }
-    virtual void boolNode()
+    void boolNode() override
     {
         // std::cout << elt.getBool() << " " << nodes.back()->getBool() << std::endl;
         ENTLIB_ASSERT(expl.getBool() == nodes.back()->getBool());
     }
-    virtual void intNode()
+    void intNode() override
     {
         // std::cout << elt.getInt() << " " << nodes.back()->getInt() << std::endl;
         if (expl.getInt() != nodes.back()->getInt())
             expl.getInt();
         ENTLIB_ASSERT(expl.getInt() == nodes.back()->getInt());
     }
-    virtual void floatNode()
+    void floatNode() override
     {
         // std::cout << elt.getFloat() << " " << nodes.back()->getFloat() << std::endl;
         if (fabs(expl.getFloat() - nodes.back()->getFloat()) >= FLT_EPSILON)
             expl.getFloat();
         // ENTLIB_ASSERT(fabs(elt.getFloat() - nodes.back()->getFloat()) < FLT_EPSILON);
     }
-    virtual void stringNode()
+    void stringNode() override
     {
         if (strcmp(expl.getString(), nodes.back()->getString()) != 0)
         {
@@ -385,11 +385,222 @@ public:
         }
         ENTLIB_ASSERT(strcmp(expl.getString(), nodes.back()->getString()) == 0);
     }
-    virtual void entityRefNode()
+    void entityRefNode() override
     {
         //std::cout << elt.getEntityRef().entityPath.c_str() << " "
         //          << nodes.back()->getEntityRef().entityPath.c_str() << std::endl;
         ENTLIB_ASSERT(expl.getEntityRef() == nodes.back()->getEntityRef());
+    }
+};
+
+class CompareCursor : public RecursiveVisitor
+{
+    Cursor& expl;
+    Cursor& expl2;
+
+public:
+    CompareCursor(Cursor& _expl, Cursor& _expl2)
+        : expl(_expl)
+        , expl2(_expl2)
+    {
+    }
+    void inObject() override
+    {
+        if (expl.getPrefab())
+        {
+            ENTLIB_ASSERT(expl2.getPrefab());
+            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == expl2.getPrefab()->_getRawJson());
+        }
+        auto a = expl.getInstanceOf();
+        auto b = expl2.getInstanceOf();
+        ENTLIB_ASSERT(
+            (a == nullptr and b == nullptr)
+            or (a != nullptr and b != nullptr and a == std::string_view(b)));
+    }
+    bool inObjectField(char const* key) override
+    {
+        expl2.enterObjectField(key);
+        if (expl.getPrefab())
+        {
+            ENTLIB_ASSERT(expl2.getPrefab());
+            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == expl2.getPrefab()->_getRawJson());
+        }
+        return true;
+    }
+    void outObjectField([[maybe_unused]] char const* _key) override
+    {
+        expl2.exit();
+    }
+    void inUnion(char const* _type) override
+    {
+        expl2.enterUnionData(_type);
+    }
+    void outUnion() override
+    {
+        expl2.exit();
+    }
+    void inMap() override
+    {
+        ENTLIB_ASSERT(expl2.size() == expl.size());
+        switch (expl.getMapKeyType())
+        {
+        case Ent::DataType::string:
+            ENTLIB_ASSERT(expl2.getMapKeysString().size() == expl.getMapKeysString().size());
+            break;
+        case Ent::DataType::integer:
+            ENTLIB_ASSERT(expl2.getMapKeysInt().size() == expl.getMapKeysInt().size());
+            break;
+        default: ENTLIB_LOGIC_ERROR("Unexpected key type");
+        }
+    }
+    void inMapElement(char const* _key) override
+    {
+        expl2.enterMapItem(_key);
+    }
+    void inMapElement(int64_t _key) override
+    {
+        expl2.enterMapItem(_key);
+    }
+    void outMapElement() override
+    {
+        expl2.exit();
+    }
+    void inPrimSet(Ent::DataType) override
+    {
+        ENTLIB_ASSERT(expl2.size() == expl.size());
+        auto& itemType = expl.getSchema()->singularItems.get()->get();
+        switch (itemType.type)
+        {
+        case Ent::DataType::string:
+            ENTLIB_ASSERT(expl2.getPrimSetKeysString() == expl.getPrimSetKeysString());
+            break;
+        case Ent::DataType::integer:
+            ENTLIB_ASSERT(expl2.getPrimSetKeysInt() == expl.getPrimSetKeysInt());
+            break;
+        default: ENTLIB_LOGIC_ERROR("Unexpected key type");
+        }
+    }
+    void inArrayElement(size_t i) override
+    {
+        expl2.enterArrayItem(i);
+    }
+    void outArrayElement() override
+    {
+        expl2.exit();
+    }
+    void inUnionSet() override
+    {
+        if (expl.getPrefab())
+        {
+            ENTLIB_ASSERT(expl2.getPrefab());
+            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == expl2.getPrefab()->_getRawJson());
+        }
+        auto a = expl2.getUnionSetKeysString();
+        auto b = expl.getUnionSetKeysString();
+        ENTLIB_ASSERT(a.size() == b.size());
+        ENTLIB_ASSERT(expl2.getSchema() == expl.getSchema());
+        for (auto [name, type] : a)
+        {
+            ENTLIB_ASSERT(b.at(name) == type);
+        }
+    }
+    void inUnionSetElement(char const* _type) override
+    {
+        expl2.enterUnionSetItem(_type);
+    }
+    void outUnionSetElement() override
+    {
+        expl2.exit();
+    }
+    void inObjectSet() override
+    {
+        if (expl.getPrefab())
+        {
+            ENTLIB_ASSERT(expl2.getPrefab());
+            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == expl2.getPrefab()->_getRawJson());
+        }
+        ENTLIB_ASSERT(expl2.size() == expl.size());
+        switch (expl2.getObjectSetKeyType())
+        {
+        case Ent::DataType::string:
+        {
+            auto a = expl2.getObjectSetKeysString();
+            auto b = expl.getObjectSetKeysString();
+            ENTLIB_ASSERT(a.size() == b.size());
+            ENTLIB_ASSERT(expl2.getSchema() == expl.getSchema());
+            for (auto name : a)
+            {
+                ENTLIB_ASSERT(b.count(name));
+            }
+            break;
+        }
+        case Ent::DataType::integer:
+            ENTLIB_ASSERT(expl2.getObjectSetKeysInt() == expl.getObjectSetKeysInt());
+            break;
+        default: ENTLIB_LOGIC_ERROR("Unexpected key type");
+        }
+    }
+    void inObjectSetElement(char const* _key) override
+    {
+        expl2.enterObjectSetItem(_key);
+        if (expl.getPrefab())
+        {
+            ENTLIB_ASSERT(expl2.getPrefab());
+            auto a = expl.getPrefab()->_getRawJson();
+            auto b = expl2.getPrefab()->_getRawJson();
+            ENTLIB_ASSERT(a == b);
+        }
+    }
+    void inObjectSetElement(int64_t _key) override
+    {
+        expl2.enterObjectSetItem(_key);
+    }
+    void outObjectSetElement() override
+    {
+        expl2.exit();
+    }
+    void inArray() override
+    {
+        ENTLIB_ASSERT(expl2.size() == expl.size());
+    }
+    void nullNode() override
+    {
+        ENTLIB_ASSERT(expl2.getDataType() == Ent::DataType::null);
+    }
+    void boolNode() override
+    {
+        ENTLIB_ASSERT(expl.isSet() == expl2.isSet());
+        ENTLIB_ASSERT(expl.getBool() == expl2.getBool());
+    }
+    void intNode() override
+    {
+        ENTLIB_ASSERT(expl.isSet() == expl2.isSet());
+        ENTLIB_ASSERT(expl.getInt() == expl2.getInt());
+    }
+    void floatNode() override
+    {
+        ENTLIB_ASSERT(expl.isSet() == expl2.isSet());
+        if (expl.getFloat() != expl2.getFloat())
+        {
+            std::cout << expl.isSet() << " " << expl2.isSet() << std::endl;
+            std::cout << expl.getFloat() << " " << expl2.getFloat() << std::endl;
+            if (expl.getPrefab())
+            {
+                ENTLIB_ASSERT(expl2.getPrefab());
+                ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == expl2.getPrefab()->_getRawJson());
+            }
+        }
+        ENTLIB_ASSERT(expl.getFloat() == expl2.getFloat());
+    }
+    void stringNode() override
+    {
+        ENTLIB_ASSERT(expl.isSet() == expl2.isSet());
+        ENTLIB_ASSERT(expl.getString() == std::string_view(expl2.getString()));
+    }
+    void entityRefNode() override
+    {
+        ENTLIB_ASSERT(expl.isSet() == expl2.isSet());
+        ENTLIB_ASSERT(expl.getEntityRef() == expl2.getEntityRef());
     }
 };
 
@@ -715,6 +926,11 @@ void testCursor(Ent::EntityLib& entlib)
             Cursor destExpl(&entlib, expl.getSchema(), "", &newDoc);
             CopyToEmptyNode copier(expl, destExpl);
             visitRecursive(expl, copier);
+
+            std::cout << "CompareCursor SceneKOM.scene wth the clone" << std::endl;
+            CompareCursor comparator(expl, destExpl);
+            Ent::visitRecursive(expl, comparator);
+
             std::cout << "Save SceneKOM.scene with LazyLib" << std::endl;
             entlib.saveJsonFile(&newDoc, "SceneKOM.scene");
         }

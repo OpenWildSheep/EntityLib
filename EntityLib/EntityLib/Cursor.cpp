@@ -579,6 +579,20 @@ namespace Ent
         return m_instance.getSchema()->singularItems->get().linearItems->at(0)->type;
     }
 
+    DataType Cursor::getObjectSetKeyType() const
+    {
+        auto& schema = *m_instance.getSchema();
+        if (auto arrayMeta = std::get_if<Subschema::ArrayMeta>(&schema.meta))
+        {
+            if (arrayMeta->keyField.has_value())
+            {
+                return schema.singularItems->get().properties.at(*arrayMeta->keyField)->type;
+            }
+        }
+        throw Ent::BadType(Ent::staticFormat(
+            "In Cursor::getObjectSetKeyType : Expected ObjectSet. Got %s", schema.name.c_str()));
+    }
+
     size_t Cursor::arraySize()
     {
         auto& lastLayer = _getLastLayer();

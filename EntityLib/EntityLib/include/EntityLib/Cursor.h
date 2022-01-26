@@ -109,7 +109,8 @@ namespace Ent
 
         char const* getTypeName() const; ///< Get the Schema name of the curent Node
 
-        DataType getMapKeyType() const; ///< @pre Map/Set @brief Get the key type curent Map/Set
+        DataType getMapKeyType() const; ///< @pre Map @brief Get the key type curent Map
+        DataType getObjectSetKeyType() const; ///< @pre ObjectSet @brief Get the key type curent ObjectSet
 
         size_t size(); ///< @return the size the this Node whatever it is.
         bool contains(Key const& _key); ///< @pre map/set. @return true if it contains _key.

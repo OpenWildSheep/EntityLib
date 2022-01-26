@@ -213,7 +213,7 @@ namespace Ent
             if (schemaPath.native().size() < 255) // Can't write filename longer than 255 characters
             {
                 json singleSchema;
-                singleSchema["$ref"] = "../TextEditorsSchema.json#/definitions/" + escapedName;
+                singleSchema["$ref"] = "../TextEditorsSchema.json#/definitions/" + name;
                 std::stringstream buffer;
                 buffer << singleSchema.dump(4);
                 std::ofstream file(schemaPath);

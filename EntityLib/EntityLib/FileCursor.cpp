@@ -166,7 +166,13 @@ namespace Ent
     {
         Layer newLayer;
         auto& lastLayer = m_layers.back();
-        auto& unionSchema = lastLayer.schema.base->singularItems->get();
+        auto& schema = *lastLayer.schema.base;
+        if (schema.singularItems == nullptr)
+        {
+            throw BadArrayType(staticFormat(
+                "In Cursor::enterUnionSetItem, expected UnionSet. Got %s.", schema.name.c_str()));
+        }
+        auto& unionSchema = schema.singularItems->get();
         if (_dataSchema == nullptr)
         {
             if (auto iter = unionSchema.unionTypeMap.find(_field);
@@ -225,9 +231,22 @@ namespace Ent
     {
         Layer newLayer;
         auto& lastLayer = m_layers.back();
-        auto& objectSchema = lastLayer.schema.base->singularItems->get();
-        auto keyFieldName =
-            std::get<Subschema::ArrayMeta>(lastLayer.schema.base->meta).keyField->c_str();
+        auto& setSchema = *lastLayer.schema.base;
+        auto& objectSchema = setSchema.singularItems->get();
+        char const* keyFieldName = nullptr;
+        if (auto meta = std::get_if<Subschema::ArrayMeta>(&setSchema.meta))
+        {
+            if (meta->keyField.has_value())
+            {
+                keyFieldName = meta->keyField->c_str();
+            }
+        }
+        if (keyFieldName == nullptr)
+        {
+            throw BadArrayType(staticFormat(
+                "In Cursor::enterObjectSet. Expected an ObjectSet. Got %s", setSchema.name.c_str()));
+        }
+
         newLayer.schema = Schema{&objectSchema, nullptr};
         newLayer.additionalPath = _field;
 

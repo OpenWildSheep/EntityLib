@@ -186,11 +186,11 @@ namespace Ent
             FileCursor const* getDefault() const;
         };
         bool _loadInstanceOf(Layer& _newLayer);
-        void _comitNewLayer();
+        void _comitNewLayer(); ///< Increment the m_layerCount, the allocated layer is now on the top
         Layer& _allocLayer(); ///< Make a new "ghost" layers on the m_layers stack
         Layer& _getLastLayer();
         Layer const& _getLastLayer() const;
-        void _buildPath();
+        void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance
         template <typename K, typename E>
         bool _countPrimSetKeyImpl(K _key, E&& _isEqual);
         template <typename E>

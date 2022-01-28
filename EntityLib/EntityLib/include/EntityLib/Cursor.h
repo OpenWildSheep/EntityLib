@@ -84,12 +84,14 @@ namespace Ent
         Cursor& enterArrayItem(size_t _index ///< index of the targeted element
         );
 
-        /// @return The "InstanceOf" field. Or nullptr if there is no.
+        /// @return The "InstanceOf" field, an empty string if set to empty, or nullptr if unset.
         /// @pre It is an Object
         char const* getInstanceOf();
 
         /// @brief Set the InstanceOf field which point the prefab of the object
         /// @pre It is an Object
+        /// @pre _instanceOf != nullptr
+        /// @remark setInstanceOf("") mean explicitly set
         void setInstanceOf(char const* _instanceOf);
 
         /// @return The type of the Union

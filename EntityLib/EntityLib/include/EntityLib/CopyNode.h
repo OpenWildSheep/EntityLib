@@ -18,7 +18,10 @@ namespace Ent
         }
         void inObject() override
         {
-            m_dest.setInstanceOf(m_source.getInstanceOf());
+            if (auto instanceOf = m_source.getInstanceOf())
+            {
+                m_dest.setInstanceOf(instanceOf);
+            }
         }
         bool inObjectField(char const* _key) override
         {

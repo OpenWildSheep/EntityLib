@@ -428,22 +428,30 @@ namespace Ent
         }
         char const* instanceOf = getString();
         exit();
-        return instanceOf[0] == 0 ? nullptr : instanceOf;
+        return instanceOf;
     }
 
     void Cursor::setInstanceOf(char const* _instanceOf)
     {
-        if (_instanceOf != nullptr)
+        if (_instanceOf == nullptr)
         {
-            // The field InstanceOf is not a field of objects, so we have to fake it.
-            Ent::Subschema schema;
-            schema.type = Ent::DataType::string;
-            Ent::SubschemaRef ref;
-            ref.subSchemaOrRef = std::move(schema);
-            enterObjectField("InstanceOf", &ref);
-            setString(_instanceOf);
-            exit();
-            auto& lastLayer = _getLastLayer();
+            throw Ent::NullPointerArgument("_instanceOf", __func__);
+        }
+        // The field InstanceOf is not a field of objects, so we have to fake it.
+        Ent::Subschema schema;
+        schema.type = Ent::DataType::string;
+        Ent::SubschemaRef ref;
+        ref.subSchemaOrRef = std::move(schema);
+        enterObjectField("InstanceOf", &ref);
+        setString(_instanceOf);
+        exit();
+        auto& lastLayer = _getLastLayer();
+        if (lastLayer.prefab != nullptr)
+        {
+            lastLayer.prefab->exit();
+        }
+        if (strlen(_instanceOf) != 0)
+        {
             if (lastLayer.prefabsStorage == nullptr)
             {
                 lastLayer.prefabsStorage =
@@ -453,11 +461,11 @@ namespace Ent
             {
                 lastLayer.prefabsStorage->_init(m_entityLib, getSchema(), _instanceOf);
             }
-            if (lastLayer.prefab != nullptr)
-            {
-                lastLayer.prefab->exit();
-            }
             lastLayer.prefab = lastLayer.prefabsStorage.get();
+        }
+        else
+        {
+            lastLayer.prefab = nullptr;
         }
     }
 

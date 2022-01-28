@@ -106,9 +106,14 @@ namespace Ent
         return newLayer;
     }
 
-    void Cursor::_validNewLayer()
+    void Cursor::_comitNewLayer()
     {
         ++m_layerCount;
+        if (m_instance.getSchema()->type == Ent::DataType::array)
+        {
+            _getLastLayer().arraySize = arraySize();
+        }
+        _checkInvariants();
     }
 
     Cursor::Layer& Cursor::_getLastLayer()
@@ -161,8 +166,7 @@ namespace Ent
                 }
             }
         }
-        _validNewLayer();
-        _checkInvariants();
+        _comitNewLayer();
     }
 
     void Cursor::_init(EntityLib* _entityLib, Ent::Subschema const* _schema, char const* _filename)
@@ -370,16 +374,6 @@ namespace Ent
     Cursor& Cursor::enterMapItem(int64_t _field)
     {
         return _enterItem([_field](auto&& _cur) { _cur.enterMapItem(_field); });
-    }
-
-    void Cursor::_comitNewLayer()
-    {
-        _validNewLayer();
-        if (m_instance.getSchema()->type == Ent::DataType::array)
-        {
-            _getLastLayer().arraySize = arraySize();
-        }
-        _checkInvariants();
     }
 
     Cursor& Cursor::enterArrayItem(size_t _index)

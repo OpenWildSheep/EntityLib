@@ -165,14 +165,17 @@ namespace Ent
         size_t getStackSize() const; ///< Get the stack size (count of "enter" since the root)
 
     private:
+        /// A Layer is a level in the tree hierarchie.
+        /// When enter, a layer is added.
+        /// When exit, a layer is popped.
         struct Layer
         {
             Cursor* prefab = nullptr;
-            std::unique_ptr<Cursor> prefabsStorage;
+            std::unique_ptr<Cursor> prefabsStorage; ///< Used when this layer has an "InstanceOf"
             /// @brief offset of the defaultValue in m_layers
             /// @remark 0 = last, -1 = last - 1, 1 = undefined
             int defaultVal = 1;
-            FileCursor defaultStorage;
+            FileCursor defaultStorage; ///< Used to explore the defalt value in the schema
             size_t arraySize = 0;
             void setDefault(
                 Ent::Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
@@ -182,8 +185,7 @@ namespace Ent
         };
         bool _loadInstanceOf(Layer& _newLayer);
         void _comitNewLayer();
-        void _validNewLayer();
-        Layer& _allocLayer();
+        Layer& _allocLayer(); ///< Make a new "ghost" layers on the m_layers stack
         Layer& _getLastLayer();
         Layer const& _getLastLayer() const;
         void _buildPath();

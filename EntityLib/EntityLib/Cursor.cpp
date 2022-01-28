@@ -135,12 +135,9 @@ namespace Ent
         m_instance.init(_schema, _filename, _doc);
 
         ENTLIB_ASSERT(_schema != nullptr);
-        // m_layers.resize(10);
         m_layerCount = 0;
         Layer& newLayer = _allocLayer();
         newLayer.setDefault(_schema, nullptr, &_schema->defaultValue);
-        //[[maybe_unused]] auto type = _document->GetType();
-        //ENTLIB_DBG_ASSERT(_document->is_object());
         ENTLIB_ASSERT(_doc != nullptr);
         ENTLIB_ASSERT(_doc->is_object());
         auto* doc = m_instance.getRawJson();
@@ -218,7 +215,6 @@ namespace Ent
                         _newLayer.prefabsStorage->_init(m_entityLib, subschema, prefabPath.c_str());
                     }
                     _newLayer.prefab = _newLayer.prefabsStorage.get();
-                    ENTLIB_ASSERT(_newLayer.prefab != (void*)0xdddddddddddddddd);
                 }
                 return true;
             }
@@ -244,7 +240,6 @@ namespace Ent
                 ENTLIB_ASSERT(lastLayer.prefab->m_entityLib != nullptr);
                 lastLayer.prefab->enterObjectField(_field, _fieldRef);
                 newLayer.prefab = lastLayer.prefab;
-                ENTLIB_ASSERT(newLayer.prefab != (void*)0xdddddddddddddddd);
             }
         }
         bool defaultFound = false;
@@ -338,7 +333,7 @@ namespace Ent
         {
             newLayer.setDefault(subschema, nullptr, propDefVal);
         }
-        else // Une type default
+        else // Use type default
         {
             newLayer.setDefault(subschema, nullptr, &subschema->defaultValue);
         }
@@ -350,7 +345,6 @@ namespace Ent
                 {
                     _enter(*lastLayer.prefab);
                     newLayer.prefab = lastLayer.prefab;
-                    ENTLIB_ASSERT(newLayer.prefab != (void*)0xdddddddddddddddd);
                 }
             }
         }
@@ -404,7 +398,6 @@ namespace Ent
                 {
                     lastLayer.prefab->enterArrayItem(_index);
                     newLayer.prefab = lastLayer.prefab;
-                    ENTLIB_ASSERT(newLayer.prefab != (void*)0xdddddddddddddddd);
                 }
             }
         }
@@ -418,7 +411,7 @@ namespace Ent
         {
             newLayer.setDefault(subschema, nullptr, m_instance.getPropertyDefaultValue());
         }
-        else // Une type default
+        else // Use type default
         {
             newLayer.setDefault(subschema, nullptr, &subschema->defaultValue);
         }
@@ -510,9 +503,6 @@ namespace Ent
 #ifdef _DEBUG
         ENTLIB_DBG_ASSERT(m_layerCount != 0);
         ENTLIB_DBG_ASSERT(m_instance.lastLayer().schema.base != nullptr);
-        //ENTLIB_DBG_ASSERT(
-        //    (layers.empty() and m_instance.additionalPath.empty())
-        //    or layers.size() == (m_instance.additionalPath.size() + 1));
         ENTLIB_DBG_ASSERT(m_layerCount == m_instance.layerCount());
         [[maybe_unused]] auto& lastLayer = _getLastLayer();
         ENTLIB_DBG_ASSERT(
@@ -520,7 +510,6 @@ namespace Ent
             or lastLayer.getDefault()->getSchema()->type == m_instance.getSchema()->type);
         if (_getLastLayer().prefab != nullptr)
         {
-            ENTLIB_DBG_ASSERT(_getLastLayer().prefab != (void*)0xdddddddddddddddd);
             _getLastLayer().prefab->_checkInvariants();
         }
 #endif
@@ -548,7 +537,7 @@ namespace Ent
         {
             defaultVal->exit();
         }
-        --m_layerCount; // leuers.pop_back()
+        --m_layerCount;
 #ifdef _DEBUG
         ENTLIB_DBG_ASSERT(layersCount == m_layerCount + 1);
         ENTLIB_DBG_ASSERT(
@@ -632,59 +621,56 @@ namespace Ent
         {
             return schema->linearItems->size();
         }
-        else
+        switch (schema->type)
         {
-            switch (schema->type)
+        case Ent::DataType::object: return schema->properties.size();
+        case Ent::DataType::oneOf: return 1;
+        case Ent::DataType::array:
+        {
+            auto meta = std::get<Ent::Subschema::ArrayMeta>(schema->meta);
+            switch (hash(meta.overridePolicy))
             {
-            case Ent::DataType::object: return schema->properties.size();
-            case Ent::DataType::oneOf: return 1;
-            case Ent::DataType::array:
-            {
-                auto meta = std::get<Ent::Subschema::ArrayMeta>(schema->meta);
-                switch (hash(meta.overridePolicy))
+            case "map"_hash:
+                switch (getMapKeyType())
                 {
-                case "map"_hash:
-                    switch (getMapKeyType())
+                case Ent::DataType::string: return getMapKeysString().size();
+                case Ent::DataType::integer: return getMapKeysInt().size();
+                default: ENTLIB_LOGIC_ERROR("Unexpected key type");
+                }
+                break;
+            case "set"_hash:
+            {
+                auto& itemType = schema->singularItems->get();
+                switch (itemType.type)
+                {
+                case Ent::DataType::integer: return getPrimSetKeysInt().size();
+                case Ent::DataType::string: return getPrimSetKeysString().size();
+                case Ent::DataType::oneOf: return getUnionSetKeysString().size();
+                case Ent::DataType::object:
+                    auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
+                    switch (keyFieldSchema.type)
                     {
-                    case Ent::DataType::string: return getMapKeysString().size();
-                    case Ent::DataType::integer: return getMapKeysInt().size();
+                    case Ent::DataType::string: return getObjectSetKeysString().size();
+                    case Ent::DataType::integer: return getObjectSetKeysInt().size();
                     default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                     }
                     break;
-                case "set"_hash:
-                {
-                    auto& itemType = schema->singularItems->get();
-                    switch (itemType.type)
-                    {
-                    case Ent::DataType::integer: return getPrimSetKeysInt().size();
-                    case Ent::DataType::string: return getPrimSetKeysString().size();
-                    case Ent::DataType::oneOf: return getUnionSetKeysString().size();
-                    case Ent::DataType::object:
-                        auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
-                        switch (keyFieldSchema.type)
-                        {
-                        case Ent::DataType::string: return getObjectSetKeysString().size();
-                        case Ent::DataType::integer: return getObjectSetKeysInt().size();
-                        default: ENTLIB_LOGIC_ERROR("Unexpected key type");
-                        }
-                        break;
-                    }
-                }
-                break;
-                case ""_hash: return arraySize();
-                default: ENTLIB_LOGIC_ERROR("override policy!");
                 }
             }
             break;
-            case Ent::DataType::null: return 0;
-            case Ent::DataType::boolean: return 0;
-            case Ent::DataType::integer: return 0;
-            case Ent::DataType::number: return 0;
-            case Ent::DataType::string: return 0;
-            case Ent::DataType::entityRef: return 0;
-            case Ent::DataType::COUNT:
-            default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
+            case ""_hash: return arraySize();
+            default: ENTLIB_LOGIC_ERROR("override policy!");
             }
+        }
+        break;
+        case Ent::DataType::null: return 0;
+        case Ent::DataType::boolean: return 0;
+        case Ent::DataType::integer: return 0;
+        case Ent::DataType::number: return 0;
+        case Ent::DataType::string: return 0;
+        case Ent::DataType::entityRef: return 0;
+        case Ent::DataType::COUNT:
+        default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
         }
         ENTLIB_LOGIC_ERROR("Unexpected DataType!");
     }
@@ -697,65 +683,60 @@ namespace Ent
         {
             return false; // Not a map/set
         }
-        else
+        switch (schema->type)
         {
-            switch (schema->type)
+        case Ent::DataType::object:
+            return schema->properties.count(std::get<std::string>(_key)) != 0;
+        case Ent::DataType::oneOf: return getUnionType() == std::get<std::string>(_key);
+        case Ent::DataType::array:
+        {
+            auto meta = std::get<Ent::Subschema::ArrayMeta>(schema->meta);
+            switch (hash(meta.overridePolicy))
             {
-            case Ent::DataType::object:
-                return schema->properties.count(std::get<std::string>(_key)) != 0;
-            case Ent::DataType::oneOf: return getUnionType() == std::get<std::string>(_key);
-            case Ent::DataType::array:
-            {
-                auto meta = std::get<Ent::Subschema::ArrayMeta>(schema->meta);
-                switch (hash(meta.overridePolicy))
+            case "map"_hash:
+                switch (getMapKeyType())
                 {
-                case "map"_hash:
-                    switch (getMapKeyType())
+                case Ent::DataType::string: return mapContains(std::get<std::string>(_key).c_str());
+                case Ent::DataType::integer: return mapContains(std::get<size_t>(_key));
+                default: ENTLIB_LOGIC_ERROR("Unexpected key type");
+                }
+                break;
+            case "set"_hash:
+            {
+                auto& itemType = schema->singularItems->get();
+                switch (itemType.type)
+                {
+                case Ent::DataType::integer: return primSetContains(std::get<size_t>(_key));
+                case Ent::DataType::string:
+                    return primSetContains(std::get<std::string>(_key).c_str());
+                case Ent::DataType::oneOf:
+                    return unionSetContains(std::get<std::string>(_key).c_str());
+                case Ent::DataType::object:
+                    auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
+                    switch (keyFieldSchema.type)
                     {
                     case Ent::DataType::string:
-                        return mapContains(std::get<std::string>(_key).c_str());
-                    case Ent::DataType::integer: return mapContains(std::get<size_t>(_key));
+                        return objectSetContains(std::get<std::string>(_key).c_str());
+                    case Ent::DataType::integer: return objectSetContains(std::get<size_t>(_key));
                     default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                     }
                     break;
-                case "set"_hash:
-                {
-                    auto& itemType = schema->singularItems->get();
-                    switch (itemType.type)
-                    {
-                    case Ent::DataType::integer: return primSetContains(std::get<size_t>(_key));
-                    case Ent::DataType::string:
-                        return primSetContains(std::get<std::string>(_key).c_str());
-                    case Ent::DataType::oneOf:
-                        return unionSetContains(std::get<std::string>(_key).c_str());
-                    case Ent::DataType::object:
-                        auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
-                        switch (keyFieldSchema.type)
-                        {
-                        case Ent::DataType::string:
-                            return objectSetContains(std::get<std::string>(_key).c_str());
-                        case Ent::DataType::integer:
-                            return objectSetContains(std::get<size_t>(_key));
-                        default: ENTLIB_LOGIC_ERROR("Unexpected key type");
-                        }
-                        break;
-                    }
-                }
-                break;
-                case ""_hash: return false;
-                default: ENTLIB_LOGIC_ERROR("override policy!");
                 }
             }
             break;
-            case Ent::DataType::null: return false;
-            case Ent::DataType::boolean: return false;
-            case Ent::DataType::integer: return false;
-            case Ent::DataType::number: return false;
-            case Ent::DataType::string: return false;
-            case Ent::DataType::entityRef: return false;
-            case Ent::DataType::COUNT:
-            default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
+            case ""_hash: return false;
+            default: ENTLIB_LOGIC_ERROR("override policy!");
             }
+        }
+        break;
+        case Ent::DataType::null: return false;
+        case Ent::DataType::boolean: return false;
+        case Ent::DataType::integer: return false;
+        case Ent::DataType::number: return false;
+        case Ent::DataType::string: return false;
+        case Ent::DataType::entityRef: return false;
+        case Ent::DataType::COUNT:
+        default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
         }
         ENTLIB_LOGIC_ERROR("Unexpected DataType!");
     }
@@ -781,7 +762,7 @@ namespace Ent
             for (auto const& k_v : *node)
             {
                 ENTLIB_DBG_ASSERT(node->is_array());
-                auto& key = k_v[0llu].get_ref<std::string const&>();
+                auto& key = k_v[0].get_ref<std::string const&>();
                 ENTLIB_DBG_ASSERT(node->is_array());
                 keys.insert(key.c_str());
                 ENTLIB_DBG_ASSERT(node->is_array());
@@ -887,7 +868,6 @@ namespace Ent
         auto& lastLayer = _getLastLayer();
         if (lastLayer.prefab != nullptr)
         {
-            ENTLIB_ASSERT(lastLayer.prefab != (void*)0xdddddddddddddddd);
             keys.merge(lastLayer.prefab->getPrimSetKeysString());
         }
         return keys;
@@ -905,9 +885,6 @@ namespace Ent
         {
             for (size_t i = 0; i < arraySize(); ++i)
             {
-#ifdef _DEBUG
-                auto* instanceSize = m_instance.getRawJson();
-#endif
                 m_instance.enterArrayItem(i);
                 auto unionSchema = m_instance.getUnionSchema();
                 bool const isRemoved = (unionSchema == nullptr) or m_instance.isUnionRemoved();
@@ -920,7 +897,6 @@ namespace Ent
                     keys.emplace(m_instance.getUnionType(), unionSchema);
                 }
                 m_instance.exit();
-                ENTLIB_DBG_ASSERT(instanceSize == m_instance.getRawJson());
             }
         }
         return keys;
@@ -1035,7 +1011,6 @@ namespace Ent
                 *lastSet, firstNotSet->additionalPath, *firstNotSet->schema.base, arraySize);
             ENTLIB_ASSERT(firstNotSet->values != nullptr);
         }
-        // ENTLIB_ASSERT(m_instance.back() != nullptr);
         _checkInvariants();
     }
     void Cursor::setSize(size_t _size)

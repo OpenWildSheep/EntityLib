@@ -11,9 +11,14 @@ namespace Ent
         CursorRestore& operator=(CursorRestore const&) = delete;
         Cursor* operator->();
         Cursor& operator*();
-        void restore(); ///< Restore the cursor
+        /// @brief Restore the cursor
+        /// @pre m_cursor.getStackSize() >= m_stackSize
+        void restore();
 
     private:
+        /// @brief Restore the cursor
+        /// @pre m_cursor.getStackSize() >= m_stackSize
+        void _restoreNocheck();
         Cursor& m_cursor;
         size_t m_stackSize; ///< Stack size of the cursor at the time of constructor
     };

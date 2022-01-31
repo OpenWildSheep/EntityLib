@@ -4,19 +4,24 @@ namespace Ent
 {
     CursorRestore::~CursorRestore()
     {
-        restore();
+        ENTLIB_ASSERT_MSG_NOTHROW(
+            m_cursor.getStackSize() >= m_stackSize,
+            "cursor.exit() was called more than cursor.enter**() !");
+        _restoreNocheck();
     }
-    void CursorRestore::restore()
+    void CursorRestore::_restoreNocheck()
     {
-        if (m_cursor.getStackSize() < m_stackSize)
-        {
-            ::Ent::logError(__FILE__, __LINE__, "Used cursor.exit too much!");
-            terminate();
-        }
         while (m_cursor.getStackSize() > m_stackSize)
         {
             m_cursor.exit();
         }
+    }
+    void CursorRestore::restore()
+    {
+        ENTLIB_ASSERT_MSG(
+            m_cursor.getStackSize() >= m_stackSize,
+            "cursor.exit() was called more than cursor.enter**() !");
+        _restoreNocheck();
     }
 
 } // namespace Ent

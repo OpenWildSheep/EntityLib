@@ -167,7 +167,7 @@ namespace Ent
         size_t getStackSize() const; ///< Get the stack size (count of "enter" since the root)
 
     private:
-        /// A Layer is a level in the tree hierarchie.
+        /// A Layer is a level in the tree hierarchy.
         /// When enter, a layer is added.
         /// When exit, a layer is popped.
         struct Layer
@@ -185,9 +185,9 @@ namespace Ent
             FileCursor* getDefault();
             FileCursor const* getDefault() const;
         };
-        bool _loadInstanceOf(Layer& _newLayer);
-        void _comitNewLayer(); ///< Increment the m_layerCount, the allocated layer is now on the top
         Layer& _allocLayer(); ///< Make a new "ghost" layers on the m_layers stack
+        void _comitNewLayer(); ///< Increment the m_layerCount, the allocated layer is now on the top
+        bool _loadInstanceOf(Layer& _newLayer);
         Layer& _getLastLayer();
         Layer const& _getLastLayer() const;
         void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance

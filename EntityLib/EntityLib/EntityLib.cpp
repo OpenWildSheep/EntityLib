@@ -377,8 +377,8 @@ namespace Ent
         }
         else
         {
-            nlohmann::json d = Ent::loadJsonFile(rawdataPath, filepath);
-            return m_jsonDatabase.emplace(filepath, std::move(d)).first->second;
+            nlohmann::json data = Ent::loadJsonFile(rawdataPath, filepath);
+            return m_jsonDatabase.emplace(filepath, std::move(data)).first->second;
         }
     }
 

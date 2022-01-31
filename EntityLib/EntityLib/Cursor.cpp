@@ -145,27 +145,7 @@ namespace Ent
         newLayer.setDefault(_schema, nullptr, &_schema->defaultValue);
         ENTLIB_ASSERT(_doc != nullptr);
         ENTLIB_ASSERT(_doc->is_object());
-        auto* doc = m_instance.getRawJson();
-        if (not doc->is_null())
-        {
-            if (auto member = doc->find("InstanceOf"); member != doc->end())
-            {
-                if (auto const& prefabPath = member->get_ref<std::string const&>();
-                    not prefabPath.empty())
-                {
-                    if (newLayer.prefabsStorage == nullptr)
-                    {
-                        newLayer.prefabsStorage =
-                            std::make_unique<Cursor>(m_entityLib, _schema, prefabPath.c_str());
-                    }
-                    else
-                    {
-                        newLayer.prefabsStorage->_init(m_entityLib, _schema, prefabPath.c_str());
-                    }
-                    newLayer.prefab = newLayer.prefabsStorage.get();
-                }
-            }
-        }
+        _loadInstanceOf(newLayer);
         _comitNewLayer();
     }
 

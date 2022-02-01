@@ -5,7 +5,7 @@ namespace WBIN;
 table WMmesh
 {
 	position:Float3Channel (required);
-	materials:[uint] (required);
+	materials:[byte] (required);
 }
 
 root_type WMmesh;

@@ -17,7 +17,7 @@ struct WMmeshT;
 struct WMmeshT : public flatbuffers::NativeTable {
   typedef WMmesh TableType;
   std::unique_ptr<WBIN::Float3ChannelT> position{};
-  std::vector<uint32_t> materials{};
+  std::vector<int8_t> materials{};
 };
 
 struct WMmesh FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -33,11 +33,11 @@ struct WMmesh FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   WBIN::Float3Channel *mutable_position() {
     return GetPointer<WBIN::Float3Channel *>(VT_POSITION);
   }
-  const flatbuffers::Vector<uint32_t> *materials() const {
-    return GetPointer<const flatbuffers::Vector<uint32_t> *>(VT_MATERIALS);
+  const flatbuffers::Vector<int8_t> *materials() const {
+    return GetPointer<const flatbuffers::Vector<int8_t> *>(VT_MATERIALS);
   }
-  flatbuffers::Vector<uint32_t> *mutable_materials() {
-    return GetPointer<flatbuffers::Vector<uint32_t> *>(VT_MATERIALS);
+  flatbuffers::Vector<int8_t> *mutable_materials() {
+    return GetPointer<flatbuffers::Vector<int8_t> *>(VT_MATERIALS);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -59,7 +59,7 @@ struct WMmeshBuilder {
   void add_position(flatbuffers::Offset<WBIN::Float3Channel> position) {
     fbb_.AddOffset(WMmesh::VT_POSITION, position);
   }
-  void add_materials(flatbuffers::Offset<flatbuffers::Vector<uint32_t>> materials) {
+  void add_materials(flatbuffers::Offset<flatbuffers::Vector<int8_t>> materials) {
     fbb_.AddOffset(WMmesh::VT_MATERIALS, materials);
   }
   explicit WMmeshBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -78,7 +78,7 @@ struct WMmeshBuilder {
 inline flatbuffers::Offset<WMmesh> CreateWMmesh(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<WBIN::Float3Channel> position = 0,
-    flatbuffers::Offset<flatbuffers::Vector<uint32_t>> materials = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<int8_t>> materials = 0) {
   WMmeshBuilder builder_(_fbb);
   builder_.add_materials(materials);
   builder_.add_position(position);
@@ -88,8 +88,8 @@ inline flatbuffers::Offset<WMmesh> CreateWMmesh(
 inline flatbuffers::Offset<WMmesh> CreateWMmeshDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<WBIN::Float3Channel> position = 0,
-    const std::vector<uint32_t> *materials = nullptr) {
-  auto materials__ = materials ? _fbb.CreateVector<uint32_t>(*materials) : 0;
+    const std::vector<int8_t> *materials = nullptr) {
+  auto materials__ = materials ? _fbb.CreateVector<int8_t>(*materials) : 0;
   return WBIN::CreateWMmesh(
       _fbb,
       position,
@@ -108,7 +108,7 @@ inline void WMmesh::UnPackTo(WMmeshT *_o, const flatbuffers::resolver_function_t
   (void)_o;
   (void)_resolver;
   { auto _e = position(); if (_e) _o->position = std::unique_ptr<WBIN::Float3ChannelT>(_e->UnPack(_resolver)); }
-  { auto _e = materials(); if (_e) { _o->materials.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->materials[_i] = _e->Get(_i); } } }
+  { auto _e = materials(); if (_e) { _o->materials.resize(_e->size()); std::copy(_e->begin(), _e->end(), _o->materials.begin()); } }
 }
 
 inline flatbuffers::Offset<WMmesh> WMmesh::Pack(flatbuffers::FlatBufferBuilder &_fbb, const WMmeshT* _o, const flatbuffers::rehasher_function_t *_rehasher) {

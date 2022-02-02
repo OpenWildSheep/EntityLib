@@ -104,8 +104,9 @@ namespace Ent
 
 } // namespace Ent
 
-/// Call it when a logic error (a bug) happen
-/// format and print the message into stderr and call terminate
+/// Call it when a logic error (a bug) happen.
+/// Format and print the message into stderr then call terminate or throw
+///( depending on LogicErrorPolicy)
 #define ENTLIB_LOGIC_ERROR(message, ...)                                                           \
     do                                                                                             \
     {                                                                                              \
@@ -114,6 +115,17 @@ namespace Ent
             terminate();                                                                           \
         else                                                                                       \
             throw std::logic_error(Ent::format(message, __VA_ARGS__));                             \
+    } while (0)
+
+/// Call it when a logic error (a bug) happen in a destructor.
+/// Format and print the message into stderr then call terminate or not
+///( depending on LogicErrorPolicy)
+#define ENTLIB_LOGIC_ERROR_NOTHROW(message, ...)                                                   \
+    do                                                                                             \
+    {                                                                                              \
+        ::Ent::logError(__FILE__, __LINE__, message, __VA_ARGS__);                                 \
+        if (Ent::s_LogicErrorPolicy == Ent::LogicErrorPolicy::Terminate)                           \
+            terminate();                                                                           \
     } while (0)
 
 #define ENTLIB_LOG(message, ...)                                                                   \
@@ -128,9 +140,21 @@ namespace Ent
     else                                                                                           \
         (void)0
 
+#define ENTLIB_ASSERT_NOTHROW(expression)                                                          \
+    if (!(expression))                                                                             \
+        ENTLIB_LOGIC_ERROR_NOTHROW(#expression);                                                   \
+    else                                                                                           \
+        (void)0
+
 #define ENTLIB_ASSERT_MSG(expression, message, ...)                                                \
     if (!(expression))                                                                             \
         ENTLIB_LOGIC_ERROR(message, __VA_ARGS__);                                                  \
+    else                                                                                           \
+        (void)0
+
+#define ENTLIB_ASSERT_MSG_NOTHROW(expression, message, ...)                                        \
+    if (!(expression))                                                                             \
+        ENTLIB_LOGIC_ERROR_NOTHROW(message, __VA_ARGS__);                                          \
     else                                                                                           \
         (void)0
 

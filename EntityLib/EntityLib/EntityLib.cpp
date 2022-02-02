@@ -367,7 +367,31 @@ namespace Ent
         return getSceneParentEntity(_node->getParentNode());
     }
 
-    // ********************************** Load/Save ***********************************************
+    nlohmann::json& EntityLib::readJsonFile(char const* _filepath, bool canonicalize)
+    {
+        std::filesystem::path const filepath =
+            canonicalize ? very_weakly_canonical(_filepath) : _filepath;
+        if (auto iter = m_jsonDatabase.find(filepath); iter != m_jsonDatabase.end())
+        {
+            return iter->second;
+        }
+        else
+        {
+            nlohmann::json data = Ent::loadJsonFile(rawdataPath, filepath);
+            return m_jsonDatabase.emplace(filepath, std::move(data)).first->second;
+        }
+    }
+
+    void EntityLib::saveJsonFile(nlohmann::json const* doc, char const* _filepath)
+    {
+        std::filesystem::path const filepath = very_weakly_canonical(_filepath);
+        std::ofstream ofs(rawdataPath / filepath);
+        if (not ofs.is_open())
+        {
+            throw ContextException("Can't open %s for write", filepath.string().c_str());
+        }
+        ofs << doc->dump(4);
+    }
 
     struct MergeMapOverride
     {
@@ -1684,9 +1708,21 @@ namespace Ent
         return m_nodeCache;
     }
 
+    auto EntityLib::HashPath::operator()(std::filesystem::path const& p) const
+    {
+        return std::filesystem::hash_value(p);
+    }
+
+    std::unordered_map<std::filesystem::path, nlohmann::json, EntityLib::HashPath> const&
+    EntityLib::getJsonDatabase() const
+    {
+        return m_jsonDatabase;
+    }
+
     void EntityLib::clearCache()
     {
         m_nodeCache.clear();
+        m_jsonDatabase.clear();
     }
 
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)

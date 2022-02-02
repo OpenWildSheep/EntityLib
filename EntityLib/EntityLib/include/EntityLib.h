@@ -121,6 +121,11 @@ namespace Ent
             std::filesystem::file_time_type time;
         };
         std::map<std::filesystem::path, NodeFile> const& getNodeCache() const;
+        struct HashPath
+        {
+            auto operator()(std::filesystem::path const& p) const;
+        };
+        std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> const& getJsonDatabase() const;
 
         void clearCache();
 
@@ -153,6 +158,9 @@ namespace Ent
 
         Node* getParentEntity(Node* _node); ///< Get the parent Entity Node
         Node const* getParentEntity(Node const* _node); ///< Get the parent Entity Node
+
+        nlohmann::json& readJsonFile(char const* _filepath, bool canonicalize = true);
+        void saveJsonFile(nlohmann::json const* doc, char const* _filepath);
 
     private:
         /// Load an Entity or a Scene, using the given cache
@@ -189,6 +197,7 @@ namespace Ent
             nlohmann::json const* _default = nullptr) const;
 
         mutable std::map<std::filesystem::path, NodeFile> m_nodeCache;
+        mutable std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> m_jsonDatabase;
     };
 
 } // namespace Ent

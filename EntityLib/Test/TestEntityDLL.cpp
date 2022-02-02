@@ -12,6 +12,8 @@
 #include <EntGen.h>
 #include <ComponentMerge.h>
 
+#include "TestCursor.h"
+
 static void printNode(char const* name, Ent::Node const& node, std::string const& tab)
 {
     using namespace Ent;
@@ -168,6 +170,12 @@ try
     entlib.validationEnabled = true;
 #endif
 
+    auto prevValidationEnabled = entlib.validationEnabled;
+    entlib.validationEnabled = false;
+    testCursor(entlib);
+    entlib.rawdataPath = current_path();
+    entlib.validationEnabled = prevValidationEnabled;
+
     ENTLIB_ASSERT(Ent::format("Toto %d", 37) == "Toto 37");
 
     {
@@ -234,7 +242,6 @@ try
         auto prefabHisto = node->getPrefabHistory();
     }
     // Temporarily disable validation to read some RawData files
-    auto prevValidationEnabled = entlib.validationEnabled;
     entlib.validationEnabled = false;
     {
         entlib.rawdataPath = "X:/RawData"; // It is a hack to work in the working dir

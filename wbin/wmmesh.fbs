@@ -1,0 +1,12 @@
+include "wbin.fbs";
+
+namespace WBIN;
+
+table WMmesh
+{
+	position:Float3Channel (required);
+	materials:[byte] (required);
+}
+
+root_type WMmesh;
+

@@ -84,8 +84,12 @@ static std::string replaceAll(std::string _input, std::string const& _before, st
 }
 
 /// @brief Transform _name to ensure it doesn't conflict with C++ or python keywords
-static std::string escapeName(std::string _name)
+static std::string escapeName(std::string _name, std::string_view _toAvoid = {})
 {
+    if (_name == _toAvoid)
+    {
+        _name.push_back('_');
+    }
     static std::set<std::string> cppKeywordTypes = {
         "float", "bool", "from", "in", "None", "Type", "throw", "do", "default", "class"};
 
@@ -515,7 +519,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
             for (auto&& val : _schema.enumValues)
             {
                 enumNode["values"].push_back(json::value_t::object);
-                enumNode["values"].back()["escaped_name"] = escapeName(val);
+                enumNode["values"].back()["escaped_name"] = escapeName(val, _schema.name);
                 enumNode["values"].back()["name"] = val;
                 enumNode["values"].back()["value"] = idx;
                 ++idx;
@@ -540,7 +544,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
             json prop(json::value_t::object);
             auto propData = getSchemaRefType(propRef);
             prop["prop_name"] = propName;
-            prop["escaped_prop_name"] = escapeName(propName);
+            prop["escaped_prop_name"] = escapeName(propName, _schema.name);
             prop["type"] = std::move(propData);
             properties.push_back(prop);
             includes.emplace(getSchemaRefType(propRef));

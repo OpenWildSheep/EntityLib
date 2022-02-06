@@ -172,6 +172,12 @@ namespace Ent
         /// When exit, a layer is popped.
         struct Layer
         {
+            Layer() = default;
+            Layer(Layer const&) = delete;
+            Layer& operator=(Layer const&) = delete;
+            Layer(Layer&&) = default;
+            Layer& operator=(Layer&&) = default;
+            EntityLib* m_entityLib = nullptr;
             Cursor* prefab = nullptr;
             std::unique_ptr<Cursor> prefabsStorage; ///< Used when this layer has an "InstanceOf"
             /// @brief offset of the defaultValue in m_layers
@@ -184,10 +190,59 @@ namespace Ent
             void clear();
             FileCursor* getDefault();
             FileCursor const* getDefault() const;
+
+            /// @brief Enter in the given field of the object
+            /// @pre It is an object
+            Layer enterObjectField(
+                char const* _field, ///< field to enter in
+                SubschemaRef const* _fieldRef = nullptr ///< SubschemaRef of the field (For performance)
+            );
+            /// @brief Enter in the internal data of the union
+            /// @pre It is a Union
+            Layer enterUnionData(
+                char const* _type = nullptr ///< type of the internal data of the union
+            );
+            /// @brief Enter in the item of a UnionSet
+            /// @pre It is a UnionSet
+            Layer enterUnionSetItem(
+                char const* _type, ///< Type of the item
+                Subschema const* _dataSchema = nullptr ///< Schema of the item (For performance)
+            );
+            /// @brief Enter in the object of an ObjectSet
+            /// @pre It is an ObjectSet
+            Layer enterObjectSetItem(char const* _key ///< Key of the object
+            );
+            /// @brief Enter in the object of an ObjectSet
+            /// @pre It is an ObjectSet
+            Layer enterObjectSetItem(int64_t _key ///< Key of the object
+            );
+            /// @brief Enter in the value of an Map
+            /// @pre It is an Map
+            Layer enterMapItem(char const* _key ///< Key of the value
+            );
+            /// @brief Enter in the value of an Map
+            /// @pre It is an Map
+            Layer enterMapItem(int64_t _field ///< Key of the value
+            );
+            /// @brief Enter in the element of an Array
+            /// @pre It is an Array
+            Layer enterArrayItem(size_t _index ///< index of the targeted element
+            );
+            /// @return The type of the Union
+            /// @pre It is a Union
+            char const* getUnionType();
+            template <typename FC, typename C>
+            Layer _enterItem(FC&& _enterFileCursor, C&& _enterCursor);
+
+            void _checkInvariants() const;
+            bool _loadInstanceOf();
+            Subschema const* getSchema() const;
+            DataType getDataType() const;
+            /// @brief The Node is default if no values are set inside
+            bool isDefault() const;
         };
         Layer& _allocLayer(); ///< Make a new "ghost" layers on the m_layers stack
         void _comitNewLayer(); ///< Increment the m_layerCount, the allocated layer is now on the top
-        bool _loadInstanceOf(Layer& _newLayer);
         Layer& _getLastLayer();
         Layer const& _getLastLayer() const;
         void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance

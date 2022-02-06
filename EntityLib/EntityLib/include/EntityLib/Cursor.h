@@ -178,6 +178,7 @@ namespace Ent
             /// @remark 0 = last, -1 = last - 1, 1 = undefined
             std::optional<FileCursor> defaultStorage; ///< Used to explore the defalt value in the schema
             size_t arraySize = 0;
+            FileCursor instance;
             void setDefault(
                 Ent::Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
             void clear();
@@ -203,7 +204,6 @@ namespace Ent
         void _checkInvariants() const;
 
         EntityLib* m_entityLib = nullptr;
-        std::vector<FileCursor> m_instance;
         std::vector<Layer> m_layers;
         size_t m_layerCount = 0;
     };

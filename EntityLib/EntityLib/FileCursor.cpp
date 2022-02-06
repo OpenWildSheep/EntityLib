@@ -6,11 +6,12 @@ namespace Ent
 
     FileCursor::FileCursor(Ent::Subschema const* _schema, char const* _filePath, nlohmann::json* _document)
     {
-        m_filePath = _filePath;
-        m_layers.reserve(30);
-        auto& newLayer = m_layers.emplace_back();
-        newLayer.schema = Schema{{_schema}};
-        newLayer.values = _document;
+        if (_filePath != nullptr)
+        {
+            m_filePath = _filePath;
+        }
+        schema = Schema{{_schema}};
+        values = _document;
     }
 
     void FileCursor::init(Ent::Subschema const* _schema, char const* _filePath, nlohmann::json* _document)
@@ -23,53 +24,17 @@ namespace Ent
         {
             m_filePath = _filePath;
         }
-        m_rootDoc = nullptr;
-        m_layers.clear();
-        auto& newLayer = m_layers.emplace_back();
-        newLayer.schema = Schema{{_schema}};
-        newLayer.values = _document;
-    }
-
-    FileCursor::Layer* FileCursor::layerBegin()
-    {
-        return &m_layers.front();
-    }
-
-    FileCursor::Layer* FileCursor::layerEnd()
-    {
-        return (&m_layers.back()) + 1;
-    }
-
-    FileCursor::Layer const* FileCursor::layerBegin() const
-    {
-        return &m_layers.front();
-    }
-
-    FileCursor::Layer const* FileCursor::layerEnd() const
-    {
-        return (&m_layers.back()) + 1;
-    }
-
-    FileCursor::Layer& FileCursor::lastLayer()
-    {
-        return m_layers.back();
-    }
-
-    FileCursor::Layer const& FileCursor::lastLayer() const
-    {
-        return m_layers.back();
-    }
-
-    size_t FileCursor::layerCount() const
-    {
-        return m_layers.size();
+        schema = Schema{{_schema}};
+        values = _document;
+        additionalPath = {};
     }
 
     void FileCursor::reset()
     {
         m_filePath.clear();
-        m_rootDoc = nullptr;
-        m_layers.clear();
+        schema = Schema{};
+        values = {};
+        additionalPath = {};
     }
 
     FileCursor::FileCursor(Ent::Subschema const* _schema, char const* _filePath)
@@ -89,42 +54,42 @@ namespace Ent
 
     void FileCursor::save(char const* _filename) const
     {
-        m_layers.front().schema.base->rootSchema->entityLib->saveJsonFile(
-            m_layers.front().values, _filename != nullptr ? _filename : m_filePath.c_str());
+        schema.base->rootSchema->entityLib->saveJsonFile(
+            values, _filename != nullptr ? _filename : m_filePath.c_str());
     }
 
     nlohmann::json* FileCursor::_getRawJson()
     {
-        return isSet() ? m_layers.back().values : nullptr;
+        return isSet() ? values : nullptr;
     }
 
     nlohmann::json const* FileCursor::getRawJson() const
     {
-        return isSet() ? m_layers.back().values : nullptr;
+        return isSet() ? values : nullptr;
     }
 
     bool FileCursor::isSetOrNull() const
     {
-        return m_layers.back().values != nullptr;
+        return values != nullptr;
     }
 
     bool FileCursor::isSet() const
     {
-        auto* val = m_layers.back().values;
+        auto* val = values;
         return val != nullptr and not val->is_null();
     }
 
     bool FileCursor::isNull() const
     {
-        auto* val = m_layers.back().values;
+        auto* val = values;
         return val != nullptr and val->is_null();
     }
 
-    FileCursor& FileCursor::enterObjectField(char const* _field, SubschemaRef const* _fieldRef)
+    FileCursor FileCursor::enterObjectField(char const* _field, SubschemaRef const* _fieldRef)
     {
         bool const nodeIsSet = isSet();
-        Layer& newLayer = m_layers.emplace_back();
-        auto& lastLayer = *(m_layers.end() - 2);
+        FileCursor newLayer;
+        auto& lastLayer = *this;
         ENTLIB_DBG_ASSERT(lastLayer.schema.base->type == Ent::DataType::object);
         if (_fieldRef == nullptr)
         {
@@ -159,20 +124,20 @@ namespace Ent
             }
         }
         ENTLIB_DBG_ASSERT(lastLayer.schema.base != nullptr);
-        return *this;
+        return newLayer;
     }
 
-    FileCursor& FileCursor::enterUnionSetItem(char const* _field, Subschema const* _dataSchema)
+    FileCursor FileCursor::enterUnionSetItem(char const* _field, Subschema const* _dataSchema)
     {
-        Layer newLayer;
-        auto& lastLayer = m_layers.back();
-        auto& schema = *lastLayer.schema.base;
-        if (schema.singularItems == nullptr)
+        FileCursor newLayer;
+        auto& lastLayer = *this;
+        auto& lastschema = *lastLayer.schema.base;
+        if (lastschema.singularItems == nullptr)
         {
             throw BadArrayType(staticFormat(
-                "In Cursor::enterUnionSetItem, expected UnionSet. Got %s.", schema.name.c_str()));
+                "In Cursor::enterUnionSetItem, expected UnionSet. Got %s.", lastschema.name.c_str()));
         }
-        auto& unionSchema = schema.singularItems->get();
+        auto& unionSchema = lastschema.singularItems->get();
         if (_dataSchema == nullptr)
         {
             if (auto iter = unionSchema.unionTypeMap.find(_field);
@@ -222,15 +187,14 @@ namespace Ent
             }
         }
         ENTLIB_ASSERT(newLayer.schema.base != nullptr);
-        m_layers.push_back(newLayer);
-        return *this;
+        return newLayer;
     }
 
     template <typename K, typename C>
-    FileCursor& FileCursor::_enterObjectSetItemImpl(K _field, C&& _equalKey)
+    FileCursor FileCursor::_enterObjectSetItemImpl(K _field, C&& _equalKey)
     {
-        Layer newLayer;
-        auto& lastLayer = m_layers.back();
+        FileCursor newLayer;
+        auto& lastLayer = *this;
         auto& setSchema = *lastLayer.schema.base;
         auto& objectSchema = setSchema.singularItems->get();
         char const* keyFieldName = nullptr;
@@ -274,11 +238,10 @@ namespace Ent
             }
         }
         ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
-        m_layers.push_back(newLayer);
-        return *this;
+        return newLayer;
     }
 
-    FileCursor& FileCursor::enterObjectSetItem(char const* _field)
+    FileCursor FileCursor::enterObjectSetItem(char const* _field)
     {
         return _enterObjectSetItemImpl(
             _field,
@@ -286,7 +249,7 @@ namespace Ent
             { return _node.get_ref<std::string const&>() == _key; });
     }
 
-    FileCursor& FileCursor::enterObjectSetItem(int64_t _field)
+    FileCursor FileCursor::enterObjectSetItem(int64_t _field)
     {
         return _enterObjectSetItemImpl(
             _field,
@@ -294,10 +257,10 @@ namespace Ent
     }
 
     template <typename K, typename E>
-    FileCursor& FileCursor::_enterMapItemImpl(K _field, E&& _isEqual)
+    FileCursor FileCursor::_enterMapItemImpl(K _field, E&& _isEqual)
     {
-        Layer newLayer;
-        auto& lastLayer = m_layers.back();
+        FileCursor newLayer;
+        auto& lastLayer = *this;
 
         auto& pairSchema = lastLayer.schema.base->singularItems->get();
         newLayer.schema = Schema{&pairSchema.linearItems->at(1).get(), nullptr};
@@ -325,11 +288,10 @@ namespace Ent
             }
         }
         ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
-        m_layers.push_back(newLayer);
-        return *this;
+        return newLayer;
     }
 
-    FileCursor& FileCursor::enterMapItem(char const* _field)
+    FileCursor FileCursor::enterMapItem(char const* _field)
     {
         return _enterMapItemImpl(
             _field,
@@ -337,7 +299,7 @@ namespace Ent
             { return _node.get_ref<std::string const&>() == _field; });
     }
 
-    FileCursor& FileCursor::enterMapItem(int64_t _field)
+    FileCursor FileCursor::enterMapItem(int64_t _field)
     {
         return _enterMapItemImpl(
             _field,
@@ -345,10 +307,10 @@ namespace Ent
             { return _node.get<int64_t>() == _field; });
     }
 
-    FileCursor& FileCursor::enterArrayItem(size_t _index)
+    FileCursor FileCursor::enterArrayItem(size_t _index)
     {
-        Layer newLayer;
-        auto& lastLayer = m_layers.back();
+        FileCursor newLayer;
+        auto& lastLayer = *this;
         ENTLIB_DBG_ASSERT(lastLayer.schema.base->type == Ent::DataType::array);
         if (auto item = lastLayer.schema.base->singularItems.get())
         {
@@ -380,13 +342,12 @@ namespace Ent
             }
         }
         ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
-        m_layers.push_back(newLayer);
-        return *this;
+        return newLayer;
     }
 
     char const* FileCursor::getUnionType() const
     {
-        auto& lastLayer = m_layers.back();
+        auto& lastLayer = *this;
         if (isSet())
         {
             auto typeField = lastLayer.schema.base->getUnionNameField();
@@ -410,7 +371,7 @@ namespace Ent
     Ent::Subschema const* FileCursor::getUnionSchema() const
     {
         char const* unionType = getUnionType();
-        auto& lastLayer = m_layers.back();
+        auto& lastLayer = *this;
         try
         {
             return lastLayer.schema.base->getUnionType(unionType);
@@ -423,7 +384,7 @@ namespace Ent
 
     bool FileCursor::isUnionRemoved() const
     {
-        auto& lastLayer = m_layers.back();
+        auto& lastLayer = *this;
         auto unionSchema = lastLayer.schema.base;
         if (isSet())
         {
@@ -444,14 +405,14 @@ namespace Ent
         return false;
     }
 
-    FileCursor& FileCursor::enterUnionData(char const* _unionType)
+    FileCursor FileCursor::enterUnionData(char const* _unionType)
     {
         if (_unionType == nullptr)
         {
             _unionType = getUnionType();
         }
-        Layer newLayer;
-        auto& lastLayer = m_layers.back();
+        FileCursor newLayer;
+        auto& lastLayer = *this;
         auto dataSchema = lastLayer.schema.base->getUnionType(_unionType);
         auto unionSchema = lastLayer.schema.base;
         newLayer.additionalPath = _unionType;
@@ -476,28 +437,21 @@ namespace Ent
             }
         }
         newLayer.schema = Schema{dataSchema, nullptr};
-        m_layers.push_back(newLayer);
-        return *this;
-    }
-
-    FileCursor& FileCursor::exit()
-    {
-        m_layers.pop_back();
-        return *this;
+        return newLayer;
     }
 
     Subschema const* FileCursor::getSchema() const
     {
-        return m_layers.back().schema.base;
+        return schema.base;
     }
 
     nlohmann::json const* FileCursor::getPropertyDefaultValue() const
     {
-        return m_layers.back().schema.propDefVal;
+        return schema.propDefVal;
     }
 
     nlohmann::json* FileCursor::createChildNode(
-        Layer& _lastLayer,
+        FileCursor& _lastLayer,
         Ent::FileCursor::Key const& _childName,
         Ent::Subschema const& _newLayerSchema,
         size_t _arraySize)
@@ -680,17 +634,17 @@ namespace Ent
 
     void FileCursor::setSize(size_t _size)
     {
-        if (lastLayer().values->is_null())
+        if (values->is_null())
         {
-            (*lastLayer().values) = nlohmann::json::array();
+            (*values) = nlohmann::json::array();
         }
-        while (_size > lastLayer().values->size())
+        while (_size > values->size())
         {
-            lastLayer().values->emplace_back();
+            values->emplace_back();
         }
-        while (_size < lastLayer().values->size())
+        while (_size < values->size())
         {
-            lastLayer().values->erase(lastLayer().values->size() - 1);
+            values->erase(values->size() - 1);
         }
     }
     template <typename T>
@@ -698,11 +652,11 @@ namespace Ent
     {
         if constexpr (std::is_same_v<std::remove_const_t<std::remove_reference_t<T>>, EntityRef>)
         {
-            *lastLayer().values = _value.entityPath;
+            *values = _value.entityPath;
         }
         else
         {
-            *lastLayer().values = std::forward<T>(_value);
+            *values = std::forward<T>(_value);
         }
     }
 
@@ -729,7 +683,7 @@ namespace Ent
     }
     void FileCursor::setUnionType(char const* type)
     {
-        auto& wrapper = (*lastLayer().values);
+        auto& wrapper = (*values);
         auto dataFieldName = getSchema()->getUnionDataField();
         auto nameFieldName = getSchema()->getUnionNameField();
         wrapper[nameFieldName] = type;

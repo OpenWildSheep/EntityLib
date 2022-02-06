@@ -29,39 +29,22 @@ namespace Ent
         using Key = std::variant<char const*, size_t>;
         struct Schema
         {
-            Ent::Subschema const* base = nullptr;
+            Subschema const* base = nullptr;
             nlohmann::json const* propDefVal = nullptr; ///< Property default values
-        };
-        struct Layer
-        {
-            Schema schema{};
-            nlohmann::json* values{};
-            Key additionalPath;
         };
 
         FileCursor();
 
-        FileCursor(Ent::Subschema const* _schema, char const* _filePath);
+        FileCursor(Subschema const* _schema, char const* _filePath);
 
-        FileCursor(Ent::Subschema const* _schema, char const* m_filePath, nlohmann::json* _document);
+        FileCursor(
+            Subschema const* _schema,
+            char const* m_filePath,
+            nlohmann::json* _document);
 
-        void init(Ent::Subschema const* _schema, char const* _filePath, nlohmann::json* _document);
+        void init(Subschema const* _schema, char const* _filePath, nlohmann::json* _document);
 
         void reset(); ///< Reset FileCursor without freeing memory
-
-        Layer* layerBegin(); ///< begin iterator to the Layer range
-
-        Layer* layerEnd(); ///< (past-the-)end iterator to the Layer range
-
-        Layer const* layerBegin() const; ///< begin const-iterator to the Layer range
-
-        Layer const* layerEnd() const; ///< (past-the-)end const-iterator to the Layer range
-
-        Layer& lastLayer(); ///< Last layer of the layer range
-
-        Layer const& lastLayer() const; ///< Last layer (const) of the layer range
-
-        size_t layerCount() const; ///< count of layer
 
         void pushBack(char const* _key); ///< @pre json is an array. @brief Push back _key in json
 
@@ -84,48 +67,46 @@ namespace Ent
 
         /// @brief Enter in the given field of the object
         /// @pre It is an object
-        FileCursor& enterObjectField(char const* _field, SubschemaRef const* _fieldRef = nullptr);
+        [[nodiscard]] FileCursor enterObjectField(char const* _field, SubschemaRef const* _fieldRef = nullptr);
 
         /// @brief Enter in the item of a UnionSet
         /// @pre It is a UnionSet
-        FileCursor& enterUnionSetItem(char const* _field, Subschema const* _dataSchema = nullptr);
+        [[nodiscard]] FileCursor
+        enterUnionSetItem(char const* _field, Subschema const* _dataSchema = nullptr);
 
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        FileCursor& enterObjectSetItem(char const* _field);
+        [[nodiscard]] FileCursor enterObjectSetItem(char const* _field);
 
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        FileCursor& enterObjectSetItem(int64_t _field);
+        [[nodiscard]] FileCursor enterObjectSetItem(int64_t _field);
 
         /// @brief Enter in the value of a Map
         /// @pre It is an Map
-        FileCursor& enterMapItem(char const* _field);
+        [[nodiscard]] FileCursor enterMapItem(char const* _field);
 
         /// @brief Enter in the value of a Map
         /// @pre It is an Map
-        FileCursor& enterMapItem(int64_t _field);
+        [[nodiscard]] FileCursor enterMapItem(int64_t _field);
 
         /// @brief Enter in the element of an Array
         /// @pre It is an Array
-        FileCursor& enterArrayItem(size_t _index);
+        [[nodiscard]] FileCursor enterArrayItem(size_t _index);
 
         /// @return The type of the Union
         /// @pre It is a Union
         char const* getUnionType() const;
 
         /// @brief Get the schema of the union inner type
-        Ent::Subschema const* getUnionSchema() const;
+        Subschema const* getUnionSchema() const;
 
         /// Check if the union has to be removed from its parent container (A UnionSet)
         bool isUnionRemoved() const;
 
         /// @brief Enter in the internal data of the union
         /// @pre It is a Union
-        FileCursor& enterUnionData(char const* _unionType);
-
-        /// Used after "enter..." function. From an item, get back to the parent container.
-        FileCursor& exit();
+        [[nodiscard]] FileCursor enterUnionData(char const* _unionType);
 
         Subschema const* getSchema() const; ///< Get the Schema of the curent Node
 
@@ -140,9 +121,9 @@ namespace Ent
         /// @param _arraySize If the child is an array : Size of the array (from prefab)
         /// @return json pointer to the child node
         static nlohmann::json* createChildNode(
-            Layer& _lastLayer,
-            Ent::FileCursor::Key const& _childName,
-            Ent::Subschema const& _newLayerSchema,
+            FileCursor& _lastLayer,
+            FileCursor::Key const& _childName,
+            Subschema const& _newLayerSchema,
             size_t _arraySize);
 
         void setSize(size_t _size); ///< @pre type==array. @brief Set the size of the array.
@@ -150,10 +131,13 @@ namespace Ent
         void set(T&& _value); ///< @pre node os a primitive of type T. Set _value into the instance
         void setFloat(double _value); ///< @pre type==number. @brief Set _value in the instance
         void setInt(int64_t _value); ///< @pre type==integer. @brief Set _value in the instance
-        void setString(char const* _value); ///< @pre type==string. @brief Set _value in the instance
+        void setString(char const* _value);
+        ///< @pre type==string. @brief Set _value in the instance
         void setBool(bool _value); ///< @pre type==bool. @brief Set _value in the instance
-        void setEntityRef(EntityRef const& _value); ///< @pre type==entityref. @brief Set _value in the instance
-        void setUnionType(char const* _type); ///< @pre type==union. @brief Set inner type of the union
+        void setEntityRef(EntityRef const& _value);
+        ///< @pre type==entityref. @brief Set _value in the instance
+        void setUnionType(char const* _type);
+        ///< @pre type==union. @brief Set inner type of the union
         template <typename T>
         T get() const; ///< @pre Node is of type V. @brief Get the value in the given V type
         double getFloat() const; ///< @pre type==number. @brief Get the value as double
@@ -162,22 +146,23 @@ namespace Ent
         bool getBool() const; ///< @pre type==bool. @brief Get the value as bool
         EntityRef getEntityRef() const; ///< @pre type==entityref. @brief Get the value as entityref
 
+        Schema schema{};
+        nlohmann::json* values{};
+        Key additionalPath;
+
     private:
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
         template <typename K, typename C>
-        FileCursor& _enterObjectSetItemImpl(K _field, C&& _equalKey);
+        FileCursor _enterObjectSetItemImpl(K _field, C&& _equalKey);
         /// @brief Enter in the value of a Map
         /// @pre It is an Map
         template <typename K, typename E>
-        FileCursor& _enterMapItemImpl(K _field, E&& _isEqual);
+        FileCursor _enterMapItemImpl(K _field, E&& _isEqual);
         /// Get the mutable json node of the instance (or nullptr)
         nlohmann::json* _getRawJson();
 
         std::string m_filePath; ///< Path of the instance json file
-        std::vector<Layer> m_layers; ///< stack of the Layers
-        nlohmann::json* m_rootDoc = nullptr; ///< Root instance data
     };
-
 } // namespace Ent
 /// @endcond

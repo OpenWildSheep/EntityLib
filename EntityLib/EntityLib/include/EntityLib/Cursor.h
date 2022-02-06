@@ -176,8 +176,7 @@ namespace Ent
             std::unique_ptr<Cursor> prefabsStorage; ///< Used when this layer has an "InstanceOf"
             /// @brief offset of the defaultValue in m_layers
             /// @remark 0 = last, -1 = last - 1, 1 = undefined
-            int defaultVal = 1;
-            FileCursor defaultStorage; ///< Used to explore the defalt value in the schema
+            std::optional<FileCursor> defaultStorage; ///< Used to explore the defalt value in the schema
             size_t arraySize = 0;
             void setDefault(
                 Ent::Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
@@ -193,8 +192,8 @@ namespace Ent
         void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance
         template <typename K, typename E>
         bool _countPrimSetKeyImpl(K _key, E&& _isEqual);
-        template <typename E>
-        Cursor& _enterItem(E&& _enter);
+        template <typename FC, typename C>
+        Cursor& _enterItem(FC&& _enterFileCursor, C&& _enterCursor);
         void _init(
             EntityLib* _entityLib,
             Ent::Subschema const* _schema,
@@ -204,7 +203,7 @@ namespace Ent
         void _checkInvariants() const;
 
         EntityLib* m_entityLib = nullptr;
-        FileCursor m_instance;
+        std::vector<FileCursor> m_instance;
         std::vector<Layer> m_layers;
         size_t m_layerCount = 0;
     };

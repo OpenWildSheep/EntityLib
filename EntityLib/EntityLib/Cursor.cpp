@@ -83,13 +83,21 @@ namespace Ent
         return _getLastLayer().get<V>();
     }
 
-    double Cursor::getFloat() const
+    double Cursor::Layer::getFloat() const
     {
         return get<double>();
     }
-    int64_t Cursor::getInt() const
+    double Cursor::getFloat() const
+    {
+        return _getLastLayer().getFloat();
+    }
+    int64_t Cursor::Layer::getInt() const
     {
         return get<int64_t>();
+    }
+    int64_t Cursor::getInt() const
+    {
+        return _getLastLayer().get<int64_t>();
     }
     char const* Cursor::Layer::getString() const
     {
@@ -99,13 +107,21 @@ namespace Ent
     {
         return _getLastLayer().getString();
     }
-    bool Cursor::getBool() const
+    bool Cursor::Layer::getBool() const
     {
         return get<bool>();
     }
-    EntityRef Cursor::getEntityRef() const
+    bool Cursor::getBool() const
+    {
+        return _getLastLayer().getBool();
+    }
+    EntityRef Cursor::Layer::getEntityRef() const
     {
         return get<EntityRef>();
+    }
+    EntityRef Cursor::getEntityRef() const
+    {
+        return _getLastLayer().getEntityRef();
     }
 
     Cursor::Layer& Cursor::_allocLayer()
@@ -508,11 +524,11 @@ namespace Ent
             auto field = enterObjectField("InstanceOf", &ref);
             if (not field.isSet())
             {
-                exit();
+                field.exit();
                 return nullptr;
             }
             result = field.getString();
-            exit();
+            field.exit();
         }
         _checkInvariants();
         return result;
@@ -595,10 +611,15 @@ namespace Ent
         return _getLastLayer().getUnionType();
     }
 
-    size_t Cursor::getUnionTypeIndex()
+    size_t Cursor::Layer::getUnionTypeIndex()
     {
         auto type = getUnionType();
         return AT(getSchema()->unionTypeMap, type).index;
+    }
+
+    size_t Cursor::getUnionTypeIndex()
+    {
+        return _getLastLayer().getUnionTypeIndex();
     }
 
     void Cursor::Layer::_checkInvariants() const
@@ -611,6 +632,9 @@ namespace Ent
         if (prefab != nullptr)
         {
             prefab->_checkInvariants();
+            auto a = getSchema();
+            auto b = prefab->getSchema();
+            ENTLIB_ASSERT(a == b);
         }
 #endif
     }
@@ -621,6 +645,7 @@ namespace Ent
         ENTLIB_DBG_ASSERT(m_layerCount != 0);
         ENTLIB_DBG_ASSERT(_getLastLayer().instance.schema.base != nullptr);
         [[maybe_unused]] auto& lastLayer = _getLastLayer();
+        lastLayer._checkInvariants();
         ENTLIB_DBG_ASSERT(lastLayer.getSchema()->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
         ENTLIB_DBG_ASSERT(
             lastLayer.prefab == nullptr
@@ -635,7 +660,7 @@ namespace Ent
 #endif
     }
 
-    void Cursor::Layer::exit()
+    Cursor::Layer& Cursor::Layer::exit()
     {
         _checkInvariants();
         auto& lastLayer = *this;
@@ -643,7 +668,8 @@ namespace Ent
         {
             lastLayer.prefab->exit();
         }
-        _checkInvariants();
+        // _checkInvariants();
+        return *this;
     }
 
     Cursor& Cursor::exit()
@@ -690,19 +716,29 @@ namespace Ent
         return _getLastLayer().getSchema();
     }
 
-    char const* Cursor::getTypeName() const
+    char const* Cursor::Layer::getTypeName() const
     {
         return getSchema()->name.c_str();
     }
 
-    DataType Cursor::getMapKeyType() const
+    char const* Cursor::getTypeName() const
     {
-        return _getLastLayer().instance.getSchema()->singularItems->get().linearItems->at(0)->type;
+        return _getLastLayer().getTypeName();
     }
 
-    DataType Cursor::getObjectSetKeyType() const
+    DataType Cursor::Layer::getMapKeyType() const
     {
-        auto& schema = *_getLastLayer().instance.getSchema();
+        return instance.getSchema()->singularItems->get().linearItems->at(0)->type;
+    }
+
+    DataType Cursor::getMapKeyType() const
+    {
+        return _getLastLayer().getMapKeyType();
+    }
+
+    DataType Cursor::Layer::getObjectSetKeyType() const
+    {
+        auto& schema = *instance.getSchema();
         if (auto arrayMeta = std::get_if<Subschema::ArrayMeta>(&schema.meta))
         {
             if (arrayMeta->keyField.has_value())
@@ -714,9 +750,14 @@ namespace Ent
             "In Cursor::getObjectSetKeyType : Expected ObjectSet. Got %s", schema.name.c_str()));
     }
 
-    size_t Cursor::arraySize()
+    DataType Cursor::getObjectSetKeyType() const
     {
-        auto& lastLayer = _getLastLayer();
+        return _getLastLayer().getObjectSetKeyType();
+    }
+
+    size_t Cursor::Layer::arraySize()
+    {
+        auto& lastLayer = *this;
         auto& jsonExplLayer = lastLayer.instance;
         auto* schema = jsonExplLayer.schema.base;
         if (schema->linearItems.has_value())
@@ -743,6 +784,11 @@ namespace Ent
                 return schema->minItems;
             }
         }
+    }
+
+    size_t Cursor::arraySize()
+    {
+        return _getLastLayer().arraySize();
     }
 
     size_t Cursor::size()
@@ -806,6 +852,11 @@ namespace Ent
         }
         ENTLIB_LOGIC_ERROR("Unexpected DataType!");
     }
+
+    /*size_t Cursor::size()
+    {
+        return _getLastLayer().size();
+    }*/
 
     bool Cursor::contains(Key const& _key)
     {
@@ -873,14 +924,19 @@ namespace Ent
         ENTLIB_LOGIC_ERROR("Unexpected DataType!");
     }
 
+    /*bool Cursor::contains(Key const& _key)
+    {
+        return _getLastLayer().contains(_key);
+    }*/
+
     bool Cursor::empty()
     {
         return size() == 0;
     }
 
-    std::set<char const*, CmpStr> Cursor::getMapKeysString()
+    std::set<char const*, CmpStr> Cursor::Layer::getMapKeysString()
     {
-        auto& lastLayer = _getLastLayer();
+        auto& lastLayer = *this;
         std::set<char const*, CmpStr> keys;
         if (lastLayer.prefab != nullptr)
         {
@@ -907,10 +963,14 @@ namespace Ent
             for (size_t i = 0; i < node->size(); ++i)
             {
                 ENTLIB_DBG_ASSERT(node->is_array());
-                auto key = enterArrayItem(i).enterArrayItem(0llu).getString();
-                exit();
+                auto pairLayer = enterArrayItem(i);
+                auto keyLayer = pairLayer.enterArrayItem(0);
+                auto key = keyLayer.getString();
+                keyLayer.exit();
+                // exit();
                 ENTLIB_DBG_ASSERT(node->is_array());
-                if (enterArrayItem(1llu).isNull())
+                auto valueLayer = pairLayer.enterArrayItem(1llu);
+                if (valueLayer.isNull())
                 {
                     keys.erase(key);
                 }
@@ -918,16 +978,24 @@ namespace Ent
                 {
                     keys.insert(key);
                 }
-                exit().exit();
+                valueLayer.exit();
+                pairLayer.exit();
+                // exit().exit();
                 ENTLIB_DBG_ASSERT(node->is_array());
             }
         }
+        _checkInvariants();
         return keys;
     }
 
-    bool Cursor::isNull() const
+    std::set<char const*, CmpStr> Cursor::getMapKeysString()
     {
-        auto& lastLayer = _getLastLayer();
+        return _getLastLayer().getMapKeysString();
+    }
+
+    bool Cursor::Layer::isNull() const
+    {
+        auto& lastLayer = *this;
         if (lastLayer.instance.isSetOrNull())
         {
             return lastLayer.instance.isNull();
@@ -941,9 +1009,15 @@ namespace Ent
             return false;
         }
     }
-    std::set<int64_t> Cursor::getMapKeysInt()
+
+    bool Cursor::isNull() const
     {
-        auto& lastLayer = _getLastLayer();
+        return _getLastLayer().isNull();
+    }
+
+    std::set<int64_t> Cursor::Layer::getMapKeysInt()
+    {
+        auto& lastLayer = *this;
         std::set<int64_t> keys;
         if (lastLayer.prefab != nullptr)
         {
@@ -954,8 +1028,10 @@ namespace Ent
             auto const arraySize = lastLayer.instance.getRawJson()->size();
             for (size_t i = 0; i < arraySize; ++i)
             {
-                auto key = enterArrayItem(i).enterArrayItem(0llu).getInt();
-                if (exit().enterArrayItem(1llu).isNull())
+                auto pairLayer = enterArrayItem(i);
+                auto key = pairLayer.enterArrayItem(0llu).getInt();
+                exit();
+                if (pairLayer.enterArrayItem(1llu).isNull())
                 {
                     keys.erase(key);
                 }
@@ -968,9 +1044,15 @@ namespace Ent
         }
         return keys;
     }
-    std::set<int64_t> Cursor::getPrimSetKeysInt()
+
+    std::set<int64_t> Cursor::getMapKeysInt()
     {
-        auto& lastLayer = _getLastLayer();
+        return _getLastLayer().getMapKeysInt();
+    }
+
+    std::set<int64_t> Cursor::Layer::getPrimSetKeysInt()
+    {
+        auto& lastLayer = *this;
         std::set<int64_t> keys;
         if (lastLayer.instance.isSet())
         {
@@ -986,18 +1068,25 @@ namespace Ent
         }
         return keys;
     }
-    std::set<char const*, CmpStr> Cursor::getPrimSetKeysString()
+
+    std::set<int64_t> Cursor::getPrimSetKeysInt()
+    {
+        return _getLastLayer().getPrimSetKeysInt();
+    }
+
+    std::set<char const*, CmpStr> Cursor::Layer::getPrimSetKeysString()
     {
         std::set<char const*, CmpStr> keys;
-        if (_getLastLayer().instance.isSet())
+        if (instance.isSet())
         {
             for (size_t i = 0; i < arraySize(); ++i)
             {
-                keys.insert(enterArrayItem(i).getString());
-                exit();
+                auto keyLayer = enterArrayItem(i);
+                keys.insert(keyLayer.getString());
+                keyLayer.exit();
             }
         }
-        auto& lastLayer = _getLastLayer();
+        auto& lastLayer = *this;
         if (lastLayer.prefab != nullptr)
         {
             keys.merge(lastLayer.prefab->getPrimSetKeysString());
@@ -1005,9 +1094,14 @@ namespace Ent
         return keys;
     }
 
-    std::map<char const*, Subschema const*, CmpStr> Cursor::getUnionSetKeysString()
+    std::set<char const*, CmpStr> Cursor::getPrimSetKeysString()
     {
-        auto& lastLayer = _getLastLayer();
+        return _getLastLayer().getPrimSetKeysString();
+    }
+
+    std::map<char const*, Subschema const*, CmpStr> Cursor::Layer::getUnionSetKeysString()
+    {
+        auto& lastLayer = *this;
         std::map<char const*, Subschema const*, CmpStr> keys;
         if (lastLayer.prefab != nullptr)
         {
@@ -1033,57 +1127,79 @@ namespace Ent
         return keys;
     }
 
-    std::set<char const*, CmpStr> Cursor::getObjectSetKeysString()
+    std::map<char const*, Subschema const*, CmpStr> Cursor::getUnionSetKeysString()
     {
-        auto& lastLayer = _getLastLayer();
+        return _getLastLayer().getUnionSetKeysString();
+    }
+
+    std::set<char const*, CmpStr> Cursor::Layer::getObjectSetKeysString()
+    {
+        _checkInvariants();
+        auto& lastLayer = *this;
         auto const& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
         std::set<char const*, CmpStr> keys;
         if (lastLayer.prefab != nullptr)
         {
+            ENTLIB_ASSERT(
+                std::holds_alternative<Subschema::ArrayMeta>(lastLayer.prefab->getSchema()->meta));
             keys = lastLayer.prefab->getObjectSetKeysString();
         }
         if (lastLayer.instance.isSet())
         {
             for (size_t i = 0; i < arraySize(); ++i)
             {
-                enterArrayItem(i);
-                if (_getLastLayer().instance.isSet() and _getLastLayer().instance.getRawJson()->count("__removed__") != 0)
+                auto objectLayer = enterArrayItem(i);
+                if (objectLayer.instance.isSet()
+                    and objectLayer.instance.getRawJson()->count("__removed__") != 0)
                 {
-                    keys.erase(enterObjectField(meta.keyField->c_str()).getString());
-                    exit();
+                    auto fieldLayer = objectLayer.enterObjectField(meta.keyField->c_str());
+                    keys.erase(fieldLayer.getString());
+                    fieldLayer.exit();
+                    // exit();
                 }
                 else
                 {
-                    keys.insert(enterObjectField(meta.keyField->c_str()).getString());
-                    exit();
+                    auto fieldLayer = objectLayer.enterObjectField(meta.keyField->c_str());
+                    keys.insert(fieldLayer.getString());
+                    fieldLayer.exit();
+                    // exit();
                 }
-                exit();
+                objectLayer.exit();
+                // exit();
             }
         }
         return keys;
     }
 
-    std::set<int64_t> Cursor::getObjectSetKeysInt()
+    std::set<char const*, CmpStr> Cursor::getObjectSetKeysString()
     {
-        auto& lastLayer = _getLastLayer();
+        return _getLastLayer().getObjectSetKeysString();
+    }
+
+    std::set<int64_t> Cursor::Layer::getObjectSetKeysInt()
+    {
+        auto& lastLayer = *this;
         auto const& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
         std::set<int64_t> keys;
         if (lastLayer.instance.isSet())
         {
             for (size_t i = 0; i < arraySize(); ++i)
             {
-                enterArrayItem(i);
-                if (_getLastLayer().instance.isSet() and _getLastLayer().instance.getRawJson()->count("__removed__") != 0)
+                auto objLayer = enterArrayItem(i);
+                if (objLayer.instance.isSet()
+                    and objLayer.instance.getRawJson()->count("__removed__") != 0)
                 {
-                    keys.erase(enterObjectField(meta.keyField->c_str()).getInt());
-                    exit();
+                    auto field = enterObjectField(meta.keyField->c_str());
+                    keys.erase(field.getInt());
+                    field.exit();
                 }
                 else
                 {
-                    keys.insert(enterObjectField(meta.keyField->c_str()).getInt());
-                    exit();
+                    auto field = enterObjectField(meta.keyField->c_str());
+                    keys.insert(field.getInt());
+                    field.exit();
                 }
-                exit();
+                objLayer.exit();
             }
         }
         if (lastLayer.prefab != nullptr)
@@ -1093,34 +1209,81 @@ namespace Ent
         return keys;
     }
 
-    bool Cursor::mapContains(char const* _key)
+    std::set<int64_t> Cursor::getObjectSetKeysInt()
+    {
+        return _getLastLayer().getObjectSetKeysInt();
+    }
+
+    bool Cursor::Layer::mapContains(char const* _key)
     {
         return getMapKeysString().count(_key) != 0;
     }
-    bool Cursor::mapContains(int64_t _key)
+
+    bool Cursor::mapContains(char const* _key)
+    {
+        return _getLastLayer().mapContains(_key);
+    }
+
+    bool Cursor::Layer::mapContains(int64_t _key)
     {
         return getMapKeysInt().count(_key) != 0;
     }
-    bool Cursor::primSetContains(char const* _key)
+
+    bool Cursor::mapContains(int64_t _key)
+    {
+        return _getLastLayer().mapContains(_key);
+    }
+
+    bool Cursor::Layer::primSetContains(char const* _key)
     {
         return _countPrimSetKeyImpl(
-            _key, [this](char const* _key) { return strcmp(getString(), _key) == 0; });
+            _key,
+            [this](Layer& primLayer, char const* _key)
+            { return strcmp(primLayer.getString(), _key) == 0; });
     }
+
+    bool Cursor::primSetContains(char const* _key)
+    {
+        return _getLastLayer().primSetContains(_key);
+    }
+
+    bool Cursor::Layer::primSetContains(int64_t _key)
+    {
+        return _countPrimSetKeyImpl(
+            _key, [this](Layer& primLayer, int64_t _key) { return primLayer.getInt() == _key; });
+    }
+
     bool Cursor::primSetContains(int64_t _key)
     {
-        return _countPrimSetKeyImpl(_key, [this](int64_t _key) { return getInt() == _key; });
+        return _getLastLayer().primSetContains(_key);
     }
-    bool Cursor::unionSetContains(char const* _key)
+
+    bool Cursor::Layer::unionSetContains(char const* _key)
     {
         return getUnionSetKeysString().count(_key) != 0;
     }
-    bool Cursor::objectSetContains(char const* _key)
+
+    bool Cursor::unionSetContains(char const* _key)
+    {
+        return _getLastLayer().unionSetContains(_key);
+    }
+
+    bool Cursor::Layer::objectSetContains(char const* _key)
     {
         return getObjectSetKeysString().count(_key) != 0;
     }
-    bool Cursor::objectSetContains(int64_t _key)
+    bool Cursor::Layer::objectSetContains(int64_t _key)
     {
         return getObjectSetKeysInt().count(_key) != 0;
+    }
+
+    bool Cursor::objectSetContains(char const* _key)
+    {
+        return _getLastLayer().objectSetContains(_key);
+    }
+    bool Cursor::objectSetContains(int64_t _key)
+    {
+        return _getLastLayer().objectSetContains(_key);
     }
 
     void Cursor::_buildPath()
@@ -1192,27 +1355,33 @@ namespace Ent
     }
 
     template <typename K, typename E>
-    bool Cursor::_countPrimSetKeyImpl(K _key, E&& _isEqual)
+    bool Cursor::Layer::_countPrimSetKeyImpl(K _key, E&& _isEqual)
     {
-        if (_getLastLayer().instance.isSet())
+        if (instance.isSet())
         {
             for (size_t i = 0; i < arraySize(); ++i)
             {
-                enterArrayItem(i);
-                bool const equal = _isEqual(_key);
-                exit();
+                auto item = enterArrayItem(i);
+                bool const equal = _isEqual(item, _key);
+                item.exit();
                 if (equal)
                 {
                     return true;
                 }
             }
         }
-        auto& lastLayer = _getLastLayer();
+        auto& lastLayer = *this;
         if (lastLayer.prefab != nullptr)
         {
             return lastLayer.prefab->primSetContains(_key);
         }
         return false;
+    }
+
+    template <typename K, typename E>
+    bool Cursor::_countPrimSetKeyImpl(K _key, E&& _isEqual)
+    {
+        return _getLastLayer()._countPrimSetKeyImpl(_key, std::forward<E>(_isEqual));
     }
 
     void Cursor::insertPrimSetKey(char const* _key)
@@ -1232,9 +1401,14 @@ namespace Ent
         }
     }
 
+    nlohmann::json const* Cursor::Layer::_getRawJson()
+    {
+        return instance.getRawJson();
+    }
+
     nlohmann::json const* Cursor::_getRawJson()
     {
-        return _getLastLayer().instance.getRawJson();
+        return _getLastLayer()._getRawJson();
     }
 
     Cursor& Cursor::enterObjectField(char const* _key, struct Ent::SubschemaRef const* _schema)

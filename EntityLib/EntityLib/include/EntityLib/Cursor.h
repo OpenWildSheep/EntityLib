@@ -191,6 +191,9 @@ namespace Ent
             FileCursor* getDefault();
             FileCursor const* getDefault() const;
 
+            /// @brief The Node is default if no values are set inside
+            bool isDefault() const;
+
             /// @brief Enter in the given field of the object
             /// @pre It is an object
             Layer enterObjectField(
@@ -231,25 +234,66 @@ namespace Ent
             /// @return The "InstanceOf" field, an empty string if set to empty, or nullptr if unset.
             /// @pre It is an Object
             char const* getInstanceOf();
-            bool isSet() const; ///< Check if the Node is set in the instance
 
             /// @return The type of the Union
             /// @pre It is a Union
             char const* getUnionType();
-            template <typename FC, typename C>
-            Layer _enterItem(FC&& _enterFileCursor, C&& _enterCursor);
+            /// @return The index of the type of the Union
+            /// @pre It is a Union
+            size_t getUnionTypeIndex();
+            /// Used after "enter..." function. From an item, get back to the parent container.
+            Layer& exit();
+            DataType getDataType() const; ///< Get the DataType of a Node
+            Subschema const* getSchema() const; ///< Get the Schema of the curent Node
+            char const* getTypeName() const; ///< Get the Schema name of the curent Node
+
+            DataType getMapKeyType() const; ///< @pre Map @brief Get the key type curent Map
+            DataType getObjectSetKeyType() const; ///< @pre ObjectSet @brief Get the key type curent ObjectSet
+            // size_t size(); ///< @return the size the this Node whatever it is.
+            // bool contains(Key const& _key); ///< @pre map/set. @return true if it contains _key.
+            size_t arraySize(); ///< @return size of a simple array
+            // bool empty(); ///< Check if size() == 0
+            bool isNull() const; ///< @brief check if this Node is json null
+
+            std::set<char const*, CmpStr> getMapKeysString(); ///< Get map keys as strings
+            std::set<int64_t> getMapKeysInt(); ///< Get map keys as ints
+            std::set<int64_t> getPrimSetKeysInt(); ///< Get set elements as ints
+            std::set<char const*, CmpStr> getPrimSetKeysString(); ///< Get set elements as strings
+            /// Get UnionSet keys as strings
+            std::map<char const*, Subschema const*, CmpStr> getUnionSetKeysString();
+            std::set<char const*, CmpStr> getObjectSetKeysString(); ///< Get keys of objects as strings
+            std::set<int64_t> getObjectSetKeysInt(); ///< Get keys of objects as ints
+
+            bool mapContains(char const* _key); ///< Check if the map contains this _key
+            bool mapContains(int64_t _key); ///< Check if the map contains this _key
+            bool primSetContains(char const* _key); ///< Check if the set contains this _key
+            bool primSetContains(int64_t _key); ///< Check if the set contains this _key
+            bool unionSetContains(char const* _key); ///< Check if the UnionSet contains this _key
+            bool objectSetContains(char const* _key); ///< Check if the ObjectSet contains this _key
+            bool objectSetContains(int64_t _key); ///< Check if the ObjectSet contains this _key
+
+            bool isSet() const; ///< Check if the Node is set in the instance
 
             template <typename V>
             V get() const; ///< @pre Node is of type V. @brief Get the value in the given V type
+            double getFloat() const; ///< @pre type==number. @brief Get the value as double
+            int64_t getInt() const; ///< @pre type==integer. @brief Get the value as int
             char const* getString() const; ///< @pre type==string. @brief Get the value as string
+            bool getBool() const; ///< @pre type==boolean. @brief Get the value as bool
+            EntityRef getEntityRef() const; /// @pre type==entityRef. @brief Get the value as an Entity reference
+
+            nlohmann::json const* _getRawJson(); ///< Get the underlying json node of the instance
+
+            Cursor* getPrefab(); ///< Get the Cursor of the prefab
+
+            template <typename FC, typename C>
+            Layer _enterItem(FC&& _enterFileCursor, C&& _enterCursor);
 
             void _checkInvariants() const;
             bool _loadInstanceOf();
-            Subschema const* getSchema() const;
-            DataType getDataType() const;
-            /// @brief The Node is default if no values are set inside
-            bool isDefault() const;
-            void exit();
+
+            template <typename K, typename E>
+            bool _countPrimSetKeyImpl(K _key, E&& _isEqual);
         };
         Layer& _allocLayer(); ///< Make a new "ghost" layers on the m_layers stack
         void _comitNewLayer(); ///< Increment the m_layerCount, the allocated layer is now on the top
@@ -273,9 +317,14 @@ namespace Ent
         size_t m_layerCount = 0;
     };
 
+    inline Cursor* Cursor::Layer::getPrefab()
+    {
+        return prefab;
+    }
+
     inline Cursor* Cursor::getPrefab()
     {
-        return _getLastLayer().prefab;
+        return _getLastLayer().getPrefab();
     }
 
     inline size_t Cursor::getStackSize() const

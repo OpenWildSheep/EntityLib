@@ -90,9 +90,21 @@ namespace Ent
         // TODO : Loïc - low prio - Find a way to get the super.
         //   It could be hard because we are no more in the loading phase, so the super is
         //   now delete.
-        Node* parent = wrapper->getParentNode();
+        Node* unionNode = wrapper->getParentNode();
+        if (unionNode != nullptr)
+        {
+            Node* parrentNode = unionNode->getParentNode();
+            if (parrentNode != nullptr and parrentNode->getSchema()->type == Ent::DataType::array)
+            {
+                auto& meta = std::get<Subschema::ArrayMeta>(parrentNode->getSchema()->meta);
+                if (meta.overridePolicy == "set")
+                {
+                    throw Ent::BadType("Can't change union type inside a set of union");
+                }
+            }
+        }
         wrapper = entityLib->loadNode(*subTypeSchema, json(), nullptr);
-        wrapper->setParentNode(parent);
+        wrapper->setParentNode(unionNode);
         typeOverriden = false;
         return getUnionData();
     }

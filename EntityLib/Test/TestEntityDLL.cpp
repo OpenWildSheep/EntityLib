@@ -882,6 +882,10 @@ try
         auto trans = *subObj.Components().TransformGD();
         ENTLIB_ASSERT(trans.Position()[0].get() == 0.0);
 
+        // Test unset union in unionset
+        auto transGDUnion = subObj.Components().node->mapGet("TransformGD");
+        ENTLIB_CHECK_EXCEPTION(transGDUnion->unset(), Ent::BadType);
+
         // "InstanceOf" in sub entitites
         auto entityWithInstanceOf = *subScene->Embedded().get(R"(EntityWithInstanceOf)");
         ENTLIB_ASSERT(entityWithInstanceOf.Name() == std::string("EntityWithInstanceOf"));

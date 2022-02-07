@@ -385,8 +385,10 @@ namespace Ent
                 // So we will not get back the data from before the prefab.
                 auto key = getChildKey(m_schema, element.node.get());
                 element.node = m_entlib->loadNode(*element.node->getSchema(), json{}, nullptr);
-                element.node->setParentNode(m_parentNode);
                 setChildKey(m_schema, element.node.get(), key);
+                // Can't change the type of a union which is inside a unionset,
+                // so we move it in the parent after the "setChildKey".
+                element.node->setParentNode(m_parentNode);
             }
             // If the element was present in the prefab and remove in the instance,
             // we have no way to express in the json that the element is reset,

@@ -527,9 +527,9 @@ namespace Ent
         }
     }
 
-    size_t Cursor::size()
+    size_t Cursor::Layer::size()
     {
-        auto& jsonExplLayer = _getLastLayer().instance;
+        auto& jsonExplLayer = instance;
         auto* schema = jsonExplLayer.schema.base;
         if (schema->linearItems.has_value())
         {
@@ -589,14 +589,9 @@ namespace Ent
         ENTLIB_LOGIC_ERROR("Unexpected DataType!");
     }
 
-    /*size_t Cursor::size()
+    bool Cursor::Layer::contains(Key const& _key)
     {
-        return _getLastLayer().size();
-    }*/
-
-    bool Cursor::contains(Key const& _key)
-    {
-        auto& jsonExplLayer = _getLastLayer().instance;
+        auto& jsonExplLayer = instance;
         auto* schema = jsonExplLayer.schema.base;
         if (schema->linearItems.has_value())
         {
@@ -660,12 +655,7 @@ namespace Ent
         ENTLIB_LOGIC_ERROR("Unexpected DataType!");
     }
 
-    /*bool Cursor::contains(Key const& _key)
-    {
-        return _getLastLayer().contains(_key);
-    }*/
-
-    bool Cursor::empty()
+    bool Cursor::Layer::empty()
     {
         return size() == 0;
     }
@@ -1340,6 +1330,21 @@ namespace Ent
     size_t Cursor::arraySize()
     {
         return _getLastLayer().arraySize();
+    }
+
+    size_t Cursor::size()
+    {
+        return _getLastLayer().size();
+    }
+
+    bool Cursor::contains(Key const& _key)
+    {
+        return _getLastLayer().contains(_key);
+    }
+
+    bool Cursor::empty()
+    {
+        return _getLastLayer().empty();
     }
 
     std::set<char const*, CmpStr> Cursor::getMapKeysString()

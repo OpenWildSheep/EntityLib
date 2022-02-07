@@ -249,10 +249,10 @@ namespace Ent
 
             DataType getMapKeyType() const; ///< @pre Map @brief Get the key type curent Map
             DataType getObjectSetKeyType() const; ///< @pre ObjectSet @brief Get the key type curent ObjectSet
-            // size_t size(); ///< @return the size the this Node whatever it is.
-            // bool contains(Key const& _key); ///< @pre map/set. @return true if it contains _key.
+            size_t size(); ///< @return the size the this Node whatever it is.
+            bool contains(Key const& _key); ///< @pre map/set. @return true if it contains _key.
             size_t arraySize(); ///< @return size of a simple array
-            // bool empty(); ///< Check if size() == 0
+            bool empty(); ///< Check if size() == 0
             bool isNull() const; ///< @brief check if this Node is json null
 
             std::set<char const*, CmpStr> getMapKeysString(); ///< Get map keys as strings

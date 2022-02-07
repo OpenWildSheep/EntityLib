@@ -183,7 +183,7 @@ namespace Ent
             /// @brief offset of the defaultValue in m_layers
             /// @remark 0 = last, -1 = last - 1, 1 = undefined
             std::optional<FileCursor> defaultStorage; ///< Used to explore the defalt value in the schema
-            size_t arraySize = 0;
+            size_t m_arraySize = 0;
             FileCursor instance;
             void setDefault(
                 Ent::Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
@@ -228,11 +228,20 @@ namespace Ent
             /// @pre It is an Array
             Layer enterArrayItem(size_t _index ///< index of the targeted element
             );
+            /// @return The "InstanceOf" field, an empty string if set to empty, or nullptr if unset.
+            /// @pre It is an Object
+            char const* getInstanceOf();
+            bool isSet() const; ///< Check if the Node is set in the instance
+
             /// @return The type of the Union
             /// @pre It is a Union
             char const* getUnionType();
             template <typename FC, typename C>
             Layer _enterItem(FC&& _enterFileCursor, C&& _enterCursor);
+
+            template <typename V>
+            V get() const; ///< @pre Node is of type V. @brief Get the value in the given V type
+            char const* getString() const; ///< @pre type==string. @brief Get the value as string
 
             void _checkInvariants() const;
             bool _loadInstanceOf();
@@ -240,6 +249,7 @@ namespace Ent
             DataType getDataType() const;
             /// @brief The Node is default if no values are set inside
             bool isDefault() const;
+            void exit();
         };
         Layer& _allocLayer(); ///< Make a new "ghost" layers on the m_layers stack
         void _comitNewLayer(); ///< Increment the m_layerCount, the allocated layer is now on the top

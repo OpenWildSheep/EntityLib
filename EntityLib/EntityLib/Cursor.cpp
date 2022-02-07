@@ -14,7 +14,7 @@ namespace Ent
     {
         prefab = nullptr;
         defaultStorage.reset();
-        arraySize = 0;
+        m_arraySize = 0;
     }
     FileCursor* Cursor::Layer::getDefault()
     {
@@ -33,15 +33,20 @@ namespace Ent
         }
     }
 
+    bool Cursor::Layer::isSet() const
+    {
+        return instance.isSet();
+    }
+
     bool Cursor::isSet() const
     {
-        return _getLastLayer().instance.isSet();
+        return _getLastLayer().isSet();
     }
 
     template <typename V>
-    V Cursor::get() const
+    V Cursor::Layer::get() const
     {
-        auto& lastLayer = _getLastLayer();
+        auto& lastLayer = *this;
         if (isSet())
         {
             return lastLayer.instance.get<V>();
@@ -72,6 +77,12 @@ namespace Ent
         }
     }
 
+    template <typename V>
+    V Cursor::get() const
+    {
+        return _getLastLayer().get<V>();
+    }
+
     double Cursor::getFloat() const
     {
         return get<double>();
@@ -80,9 +91,13 @@ namespace Ent
     {
         return get<int64_t>();
     }
-    char const* Cursor::getString() const
+    char const* Cursor::Layer::getString() const
     {
         return get<char const*>();
+    }
+    char const* Cursor::getString() const
+    {
+        return _getLastLayer().getString();
     }
     bool Cursor::getBool() const
     {
@@ -109,7 +124,7 @@ namespace Ent
         ++m_layerCount;
         if (_getLastLayer().instance.getSchema()->type == Ent::DataType::array)
         {
-            _getLastLayer().arraySize = arraySize();
+            _getLastLayer().m_arraySize = arraySize();
         }
         _checkInvariants();
     }
@@ -213,6 +228,9 @@ namespace Ent
     Cursor::Layer Cursor::Layer::enterObjectField(char const* _field, SubschemaRef const* _fieldRef)
     {
         _checkInvariants();
+        ENTLIB_DBG_ASSERT(instance.schema.base->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
+        ENTLIB_DBG_ASSERT(
+            prefab == nullptr or prefab->getSchema()->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
         ENTLIB_DBG_ASSERT(getDataType() == Ent::DataType::object);
         Layer newLayer;
         auto& lastLayer = *this;
@@ -227,6 +245,9 @@ namespace Ent
             if (lastLayer.prefab != nullptr)
             {
                 ENTLIB_ASSERT(lastLayer.prefab->m_entityLib != nullptr);
+                ENTLIB_DBG_ASSERT(
+                    prefab->getSchema()->deleteCheck.state_
+                    == Ent::DeleteCheck::State::VALID);
                 lastLayer.prefab->enterObjectField(_field, _fieldRef);
                 newLayer.prefab = lastLayer.prefab;
             }
@@ -475,22 +496,34 @@ namespace Ent
         return *this;
     }
 
-    char const* Cursor::getInstanceOf()
+    char const* Cursor::Layer::getInstanceOf()
     {
         // The field InstanceOf is not a field of objects, so we have to fake it.
         Ent::Subschema schema;
         schema.type = Ent::DataType::string;
         Ent::SubschemaRef ref;
         ref.subSchemaOrRef = std::move(schema);
-        enterObjectField("InstanceOf", &ref);
-        if (not isSet())
+        char const* result = nullptr;
         {
+            auto field = enterObjectField("InstanceOf", &ref);
+            if (not field.isSet())
+            {
+                exit();
+                return nullptr;
+            }
+            result = field.getString();
             exit();
-            return nullptr;
         }
-        char const* instanceOf = getString();
-        exit();
-        return instanceOf;
+        _checkInvariants();
+        return result;
+    }
+
+    char const* Cursor::getInstanceOf()
+    {
+        char const* result = nullptr;
+        result = _getLastLayer().getInstanceOf();
+        _checkInvariants();
+        return result;
     }
 
     void Cursor::setInstanceOf(char const* _instanceOf)
@@ -529,6 +562,7 @@ namespace Ent
         {
             lastLayer.prefab = nullptr;
         }
+        _checkInvariants();
     }
 
     char const* Cursor::Layer::getUnionType()
@@ -587,6 +621,10 @@ namespace Ent
         ENTLIB_DBG_ASSERT(m_layerCount != 0);
         ENTLIB_DBG_ASSERT(_getLastLayer().instance.schema.base != nullptr);
         [[maybe_unused]] auto& lastLayer = _getLastLayer();
+        ENTLIB_DBG_ASSERT(lastLayer.getSchema()->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
+        ENTLIB_DBG_ASSERT(
+            lastLayer.prefab == nullptr
+            or lastLayer.prefab->getSchema()->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
         ENTLIB_DBG_ASSERT(
             lastLayer.getDefault() == nullptr
             or lastLayer.getDefault()->getSchema()->type == lastLayer.instance.getSchema()->type);
@@ -595,6 +633,17 @@ namespace Ent
             lastLayer.prefab->_checkInvariants();
         }
 #endif
+    }
+
+    void Cursor::Layer::exit()
+    {
+        _checkInvariants();
+        auto& lastLayer = *this;
+        if (lastLayer.prefab != nullptr and not(lastLayer.prefab->m_layerCount < 2))
+        {
+            lastLayer.prefab->exit();
+        }
+        _checkInvariants();
     }
 
     Cursor& Cursor::exit()
@@ -609,10 +658,7 @@ namespace Ent
 #endif
         _checkInvariants();
         auto& lastLayer = _getLastLayer();
-        if (lastLayer.prefab != nullptr and not(lastLayer.prefab->m_layerCount < 2))
-        {
-            lastLayer.prefab->exit();
-        }
+        lastLayer.exit();
         --m_layerCount;
 #ifdef _DEBUG
         ENTLIB_DBG_ASSERT(layersCount == m_layerCount + 1);
@@ -1091,7 +1137,7 @@ namespace Ent
         auto endIter = &_getLastLayer() + 1;
         for (; firstNotSet != endIter; ++lastSet, ++firstNotSet, ++firstNotSetIdx)
         {
-            size_t arraySize = m_layers[firstNotSetIdx - 1].arraySize;
+            size_t arraySize = m_layers[firstNotSetIdx - 1].m_arraySize;
             firstNotSet->instance.values = FileCursor::createChildNode(
                 lastSet->instance,
                 firstNotSet->instance.additionalPath,
@@ -1193,8 +1239,14 @@ namespace Ent
 
     Cursor& Cursor::enterObjectField(char const* _key, struct Ent::SubschemaRef const* _schema)
     {
+        _checkInvariants();
         auto& newLayer = _allocLayer();
-        newLayer = _getLastLayer().enterObjectField(_key, _schema);
+        auto& lastLayer = _getLastLayer();
+        ENTLIB_DBG_ASSERT(lastLayer.getSchema()->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
+        ENTLIB_DBG_ASSERT(
+            lastLayer.prefab == nullptr
+            or lastLayer.prefab->getSchema()->deleteCheck.state_ == Ent::DeleteCheck::State::VALID);
+        newLayer = lastLayer.enterObjectField(_key, _schema);
         _comitNewLayer();
         return *this;
     }

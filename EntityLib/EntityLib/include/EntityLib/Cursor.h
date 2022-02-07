@@ -162,29 +162,35 @@ namespace Ent
 
         nlohmann::json const* _getRawJson(); ///< Get the underlying json node of the instance
 
-        Cursor* getPrefab(); ///< Get the Cursor of the prefab
+        struct Layer;
+        Layer* getPrefab(); ///< Get the Cursor of the prefab
 
         size_t getStackSize() const; ///< Get the stack size (count of "enter" since the root)
 
-    private:
+        Layer& getLastRung();
+
         /// A Layer is a level in the tree hierarchy.
         /// When enter, a layer is added.
         /// When exit, a layer is popped.
         struct Layer
         {
             Layer() = default;
-            Layer(Layer const&) = delete;
-            Layer& operator=(Layer const&) = delete;
-            Layer(Layer&&) = default;
-            Layer& operator=(Layer&&) = default;
-            EntityLib* m_entityLib = nullptr;
-            Cursor* prefab = nullptr;
-            std::unique_ptr<Cursor> prefabsStorage; ///< Used when this layer has an "InstanceOf"
-            /// @brief offset of the defaultValue in m_layers
-            /// @remark 0 = last, -1 = last - 1, 1 = undefined
-            std::optional<FileCursor> defaultStorage; ///< Used to explore the defalt value in the schema
-            size_t m_arraySize = 0;
-            FileCursor instance;
+            Layer(
+                EntityLib* _entityLib,
+                Ent::Subschema const* _schema,
+                char const* _filename);
+            Layer(
+                EntityLib* _entityLib,
+                Ent::Subschema const* _schema,
+                char const* _filename,
+                nlohmann::json* _doc);
+            void _init(EntityLib* _entityLib, Ent::Subschema const* _schema, char const* _filename);
+            void _init(
+                EntityLib* _entityLib,
+                Ent::Subschema const* _schema,
+                char const* _filename,
+                nlohmann::json* _doc);
+
             void setDefault(
                 Ent::Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
             void clear();
@@ -196,40 +202,40 @@ namespace Ent
 
             /// @brief Enter in the given field of the object
             /// @pre It is an object
-            Layer enterObjectField(
+            [[nodiscard]] Layer enterObjectField(
                 char const* _field, ///< field to enter in
                 SubschemaRef const* _fieldRef = nullptr ///< SubschemaRef of the field (For performance)
             );
             /// @brief Enter in the internal data of the union
             /// @pre It is a Union
-            Layer enterUnionData(
+            [[nodiscard]] Layer enterUnionData(
                 char const* _type = nullptr ///< type of the internal data of the union
             );
             /// @brief Enter in the item of a UnionSet
             /// @pre It is a UnionSet
-            Layer enterUnionSetItem(
+            [[nodiscard]] Layer enterUnionSetItem(
                 char const* _type, ///< Type of the item
                 Subschema const* _dataSchema = nullptr ///< Schema of the item (For performance)
             );
             /// @brief Enter in the object of an ObjectSet
             /// @pre It is an ObjectSet
-            Layer enterObjectSetItem(char const* _key ///< Key of the object
+            [[nodiscard]] Layer enterObjectSetItem(char const* _key ///< Key of the object
             );
             /// @brief Enter in the object of an ObjectSet
             /// @pre It is an ObjectSet
-            Layer enterObjectSetItem(int64_t _key ///< Key of the object
+            [[nodiscard]] Layer enterObjectSetItem(int64_t _key ///< Key of the object
             );
             /// @brief Enter in the value of an Map
             /// @pre It is an Map
-            Layer enterMapItem(char const* _key ///< Key of the value
+            [[nodiscard]] Layer enterMapItem(char const* _key ///< Key of the value
             );
             /// @brief Enter in the value of an Map
             /// @pre It is an Map
-            Layer enterMapItem(int64_t _field ///< Key of the value
+            [[nodiscard]] Layer enterMapItem(int64_t _field ///< Key of the value
             );
             /// @brief Enter in the element of an Array
             /// @pre It is an Array
-            Layer enterArrayItem(size_t _index ///< index of the targeted element
+            [[nodiscard]] Layer enterArrayItem(size_t _index ///< index of the targeted element
             );
             /// @return The "InstanceOf" field, an empty string if set to empty, or nullptr if unset.
             /// @pre It is an Object
@@ -241,8 +247,6 @@ namespace Ent
             /// @return The index of the type of the Union
             /// @pre It is a Union
             size_t getUnionTypeIndex();
-            /// Used after "enter..." function. From an item, get back to the parent container.
-            Layer& exit();
             DataType getDataType() const; ///< Get the DataType of a Node
             Subschema const* getSchema() const; ///< Get the Schema of the curent Node
             char const* getTypeName() const; ///< Get the Schema name of the curent Node
@@ -284,17 +288,28 @@ namespace Ent
 
             nlohmann::json const* _getRawJson(); ///< Get the underlying json node of the instance
 
-            Cursor* getPrefab(); ///< Get the Cursor of the prefab
+            Layer* getPrefab(); ///< Get the Cursor of the prefab
 
-            template <typename FC, typename C>
-            Layer _enterItem(FC&& _enterFileCursor, C&& _enterCursor);
+            template <typename E>
+            [[nodiscard]] Layer _enterItem(E&& _enter);
 
             void _checkInvariants() const;
             bool _loadInstanceOf();
 
             template <typename K, typename E>
             bool _countPrimSetKeyImpl(K _key, E&& _isEqual);
+
+            EntityLib* m_entityLib = nullptr;
+            std::unique_ptr<Layer> prefab;
+            // std::unique_ptr<Cursor> prefabsStorage; ///< Used when this layer has an "InstanceOf"
+            /// @brief offset of the defaultValue in m_layers
+            /// @remark 0 = last, -1 = last - 1, 1 = undefined
+            std::optional<FileCursor> defaultStorage; ///< Used to explore the defalt value in the schema
+            size_t m_arraySize = 0;
+            FileCursor instance;
         };
+
+    private:
         Layer& _allocLayer(); ///< Make a new "ghost" layers on the m_layers stack
         void _comitNewLayer(); ///< Increment the m_layerCount, the allocated layer is now on the top
         Layer& _getLastLayer();
@@ -302,8 +317,6 @@ namespace Ent
         void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance
         template <typename K, typename E>
         bool _countPrimSetKeyImpl(K _key, E&& _isEqual);
-        template <typename FC, typename C>
-        Cursor& _enterItem(FC&& _enterFileCursor, C&& _enterCursor);
         void _init(
             EntityLib* _entityLib,
             Ent::Subschema const* _schema,
@@ -317,12 +330,12 @@ namespace Ent
         size_t m_layerCount = 0;
     };
 
-    inline Cursor* Cursor::Layer::getPrefab()
+    inline Cursor::Layer* Cursor::Layer::getPrefab()
     {
-        return prefab;
+        return prefab.get();
     }
 
-    inline Cursor* Cursor::getPrefab()
+    inline Cursor::Layer* Cursor::getPrefab()
     {
         return _getLastLayer().getPrefab();
     }
@@ -331,4 +344,10 @@ namespace Ent
     {
         return m_layerCount;
     }
+
+    inline Cursor::Layer& Cursor::getLastRung()
+    {
+        return _getLastLayer();
+    }
+
 } // namespace Ent

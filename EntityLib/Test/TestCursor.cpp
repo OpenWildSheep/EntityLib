@@ -805,9 +805,24 @@ void testCursor(Ent::EntityLib& entlib)
                          .getFloat()
                   << std::endl;
         ENTLIB_ASSERT(expl.getFloat() == 105.2244);
-        expl.exit().exit().exit();
+        expl.exit().exit().exit().exit();
+        auto& entityRung = expl.getLastRung();
+        auto floatA = entityRung.enterObjectField("Components")
+                          .enterUnionSetItem("TransformGD")
+                          .enterObjectField("Position")
+                          .enterArrayItem(0llu)
+                          .getFloat();
+        auto floatB = entityRung.enterObjectField("Components")
+                          .enterUnionSetItem("TransformGD")
+                          .enterObjectField("Position")
+                          .enterArrayItem(0llu)
+                          .getFloat();
+        ENTLIB_ASSERT(floatA == 105.2244);
+        ENTLIB_ASSERT(floatB == 105.2244);
+
         ENTLIB_ASSERT(
-            expl.enterUnionSetItem("SubScene")
+            expl.enterObjectField("Components")
+                .enterUnionSetItem("SubScene")
                 .enterObjectField("Embedded")
                 .enterObjectSetItem("EP1-Spout_LINK_001")
                 .enterObjectField("Name")
@@ -920,6 +935,8 @@ void testCursor(Ent::EntityLib& entlib)
         clock_t end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
 
+        bool testCopy = false;
+        if (testCopy)
         {
             std::cout << "Copy SceneKOM.scene with LazyLib" << std::endl;
             nlohmann::json newDoc = nlohmann::json::object();
@@ -935,6 +952,7 @@ void testCursor(Ent::EntityLib& entlib)
             entlib.saveJsonFile(&newDoc, "SceneKOM.scene");
         }
 
+        /*
         std::cout << "Read SceneKOM.scene with NodeLib" << std::endl;
         start = clock();
         auto ent = entlib.loadEntityAsNode(
@@ -948,16 +966,21 @@ void testCursor(Ent::EntityLib& entlib)
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << nodeCount << std::endl;
+        */
 
         PrimitiveCounterVisitor visitor;
         std::cout << "Travserse SceneKOM.scene with LazyLib" << std::endl;
         start = clock();
         Ent::visitRecursive(expl, visitor);
+        Ent::visitRecursive(expl, visitor);
+        Ent::visitRecursive(expl, visitor);
+        Ent::visitRecursive(expl, visitor);
+        Ent::visitRecursive(expl, visitor);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;
     }
-    bool testCompare = true;
+    bool testCompare = false;
     if (testCompare)
     {
         entlib.rawdataPath = "X:/RawData";

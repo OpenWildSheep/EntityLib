@@ -3,6 +3,7 @@
 #include <variant>
 #include <ciso646>
 #include <set>
+#include <deque>
 
 #include "FileCursor.h"
 
@@ -160,8 +161,6 @@ namespace Ent
         void insertPrimSetKey(char const* _key); ///< Insert _key in the set (or do nothing if already in)
         void insertPrimSetKey(int64_t _key); ///< Insert _key in the set (or do nothing if already in)
 
-        nlohmann::json const* _getRawJson(); ///< Get the underlying json node of the instance
-
         struct Layer;
         Layer* getPrefab(); ///< Get the Cursor of the prefab
 
@@ -177,16 +176,23 @@ namespace Ent
             Layer() = default;
             Layer(
                 EntityLib* _entityLib,
+                Layer* _parent,
                 Ent::Subschema const* _schema,
                 char const* _filename);
             Layer(
                 EntityLib* _entityLib,
+                Layer* _parent,
                 Ent::Subschema const* _schema,
                 char const* _filename,
                 nlohmann::json* _doc);
-            void _init(EntityLib* _entityLib, Ent::Subschema const* _schema, char const* _filename);
             void _init(
                 EntityLib* _entityLib,
+                Layer* _parent,
+                Ent::Subschema const* _schema,
+                char const* _filename);
+            void _init(
+                EntityLib* _entityLib,
+                Layer* _parent,
                 Ent::Subschema const* _schema,
                 char const* _filename,
                 nlohmann::json* _doc);
@@ -241,6 +247,12 @@ namespace Ent
             /// @pre It is an Object
             char const* getInstanceOf();
 
+            /// @brief Set the InstanceOf field which point the prefab of the object
+            /// @pre It is an Object
+            /// @pre _instanceOf != nullptr
+            /// @remark setInstanceOf("") mean explicitly set
+            void setInstanceOf(char const* _instanceOf);
+
             /// @return The type of the Union
             /// @pre It is a Union
             char const* getUnionType();
@@ -286,6 +298,19 @@ namespace Ent
             bool getBool() const; ///< @pre type==boolean. @brief Get the value as bool
             EntityRef getEntityRef() const; /// @pre type==entityRef. @brief Get the value as an Entity reference
 
+            void setSize(size_t _size); ///< @pre type==array. @brief Set the size of the array.
+
+            void setFloat(double _value); ///< @pre type==number. @brief Set _value in the instance
+            void setInt(int64_t _value); ///< @pre type==integer. @brief Set _value in the instance
+            void setString(char const* _value); ///< @pre type==string. @brief Set _value in the instance
+            void setBool(bool _value); ///< @pre type==bool. @brief Set _value in the instance
+            void setEntityRef(EntityRef const& _value); ///< @pre type==entityref. @brief Set _value in the instance
+            void setUnionType(char const* _type); ///< @pre type==union. @brief Set _value in the instance
+
+            void buildPath(); ///< Build json path but not set any value. Usefull for UnionSet items
+            void insertPrimSetKey(char const* _key); ///< Insert _key in the set (or do nothing if already in)
+            void insertPrimSetKey(int64_t _key); ///< Insert _key in the set (or do nothing if already in)
+
             nlohmann::json const* _getRawJson(); ///< Get the underlying json node of the instance
 
             Layer* getPrefab(); ///< Get the Cursor of the prefab
@@ -299,6 +324,8 @@ namespace Ent
             template <typename K, typename E>
             bool _countPrimSetKeyImpl(K _key, E&& _isEqual);
 
+            void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance
+
             EntityLib* m_entityLib = nullptr;
             std::unique_ptr<Layer> prefab;
             // std::unique_ptr<Cursor> prefabsStorage; ///< Used when this layer has an "InstanceOf"
@@ -307,6 +334,7 @@ namespace Ent
             std::optional<FileCursor> defaultStorage; ///< Used to explore the defalt value in the schema
             size_t m_arraySize = 0;
             FileCursor instance;
+            Layer* m_parent = nullptr;
         };
 
     private:
@@ -314,9 +342,6 @@ namespace Ent
         void _comitNewLayer(); ///< Increment the m_layerCount, the allocated layer is now on the top
         Layer& _getLastLayer();
         Layer const& _getLastLayer() const;
-        void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance
-        template <typename K, typename E>
-        bool _countPrimSetKeyImpl(K _key, E&& _isEqual);
         void _init(
             EntityLib* _entityLib,
             Ent::Subschema const* _schema,
@@ -326,7 +351,7 @@ namespace Ent
         void _checkInvariants() const;
 
         EntityLib* m_entityLib = nullptr;
-        std::vector<Layer> m_layers;
+        std::deque<Layer> m_layers;
         size_t m_layerCount = 0;
     };
 

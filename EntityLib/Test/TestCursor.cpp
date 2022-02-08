@@ -935,7 +935,7 @@ void testCursor(Ent::EntityLib& entlib)
         clock_t end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
 
-        bool testCopy = false;
+        bool testCopy = true;
         if (testCopy)
         {
             std::cout << "Copy SceneKOM.scene with LazyLib" << std::endl;
@@ -952,7 +952,6 @@ void testCursor(Ent::EntityLib& entlib)
             entlib.saveJsonFile(&newDoc, "SceneKOM.scene");
         }
 
-        /*
         std::cout << "Read SceneKOM.scene with NodeLib" << std::endl;
         start = clock();
         auto ent = entlib.loadEntityAsNode(
@@ -966,21 +965,20 @@ void testCursor(Ent::EntityLib& entlib)
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << nodeCount << std::endl;
-        */
 
         PrimitiveCounterVisitor visitor;
         std::cout << "Travserse SceneKOM.scene with LazyLib" << std::endl;
         start = clock();
         Ent::visitRecursive(expl, visitor);
-        Ent::visitRecursive(expl, visitor);
-        Ent::visitRecursive(expl, visitor);
-        Ent::visitRecursive(expl, visitor);
-        Ent::visitRecursive(expl, visitor);
+        //Ent::visitRecursive(expl, visitor);
+        //Ent::visitRecursive(expl, visitor);
+        //Ent::visitRecursive(expl, visitor);
+        //Ent::visitRecursive(expl, visitor);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;
     }
-    bool testCompare = false;
+    bool testCompare = true;
     if (testCompare)
     {
         entlib.rawdataPath = "X:/RawData";

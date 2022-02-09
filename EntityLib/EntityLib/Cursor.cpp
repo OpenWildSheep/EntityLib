@@ -1,5 +1,7 @@
 #include "include/EntityLib/Cursor.h"
 
+#include <utility>
+
 namespace Ent
 {
     Cursor::Layer::Layer(
@@ -16,6 +18,25 @@ namespace Ent
         nlohmann::json* _doc)
     {
         _init(_entityLib, _parent, _schema, _filename, _doc);
+    }
+
+    Cursor::Layer::Layer(Cursor::Layer const& _other)
+        : m_entityLib(_other.m_entityLib)
+        , m_arraySize(_other.m_arraySize)
+        , m_parent(_other.m_parent)
+        , instance(_other.instance)
+    {
+        if (_other.prefab != nullptr)
+        {
+            prefab = std::make_unique<Layer>(*_other.prefab);
+        }        
+    }
+    
+    Cursor::Layer& Cursor::Layer::operator = (Cursor::Layer const& _other)
+    {
+        Layer copy(_other);
+        std::swap(copy, *this);
+        return *this;
     }
 
     void Cursor::Layer::_init(

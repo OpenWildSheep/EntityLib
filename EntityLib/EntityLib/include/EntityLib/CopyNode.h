@@ -2,140 +2,142 @@
 
 #include "Visitor.h"
 
+#include <deque>
+
 namespace Ent
 {
     /// Deep copy from a Node to an empty Node
     class CopyToEmptyNode : public RecursiveVisitor
     {
-        Cursor& m_source;
-        Cursor& m_dest;
+        std::deque<Cursor::Layer> m_dest;
 
     public:
-        CopyToEmptyNode(Cursor& _source, Cursor& _dest)
-            : m_source(_source)
-            , m_dest(_dest)
+        CopyToEmptyNode(Cursor::Layer _dest)
+            : m_dest({std::move(_dest)})
         {
         }
-        void inObject() override
+        void inObject([[maybe_unused]] Cursor::Layer& m_source) override
         {
             if (auto instanceOf = m_source.getInstanceOf())
             {
-                m_dest.setInstanceOf(instanceOf);
+                m_dest.back().setInstanceOf(instanceOf);
             }
         }
-        bool inObjectField(char const* _key) override
+        bool inObjectField([[maybe_unused]] Cursor::Layer& m_source, char const* _key) override
         {
-            m_dest.enterObjectField(_key);
+            m_dest.push_back(m_dest.back().enterObjectField(_key));
             return true;
         }
-        void outObjectField([[maybe_unused]] char const* _key) override
+        void outObjectField(
+            [[maybe_unused]] Cursor::Layer& m_source,
+                            [[maybe_unused]] char const* _key) override
         {
-            m_dest.exit();
+            m_dest.pop_back();
         }
-        void inUnion(char const* _type) override
+        void inUnion([[maybe_unused]] Cursor::Layer& m_source, char const* _type) override
         {
             if (m_source.isSet())
             {
-                m_dest.setUnionType(_type);
+                m_dest.back().setUnionType(_type);
             }
-            m_dest.enterUnionData(_type);
+            m_dest.push_back(m_dest.back().enterUnionData(_type));
         }
-        void outUnion() override
+        void outUnion([[maybe_unused]] Cursor::Layer& m_source) override
         {
-            m_dest.exit();
+            m_dest.pop_back();
         }
-        void inMapElement(char const* _key) override
+        void inMapElement([[maybe_unused]] Cursor::Layer& m_source, char const* _key) override
         {
-            m_dest.enterMapItem(_key);
+            m_dest.push_back(m_dest.back().enterMapItem(_key));
         }
-        void inMapElement(int64_t _key) override
+        void inMapElement([[maybe_unused]] Cursor::Layer& m_source, int64_t _key) override
         {
-            m_dest.enterMapItem(_key);
+            m_dest.push_back(m_dest.back().enterMapItem(_key));
         }
-        void outMapElement() override
+        void outMapElement([[maybe_unused]] Cursor::Layer& m_source) override
         {
-            m_dest.exit();
+            m_dest.pop_back();
         }
-        void inArrayElement(size_t _index) override
+        void inArrayElement([[maybe_unused]] Cursor::Layer& m_source, size_t _index) override
         {
-            m_dest.enterArrayItem(_index);
+            m_dest.push_back(m_dest.back().enterArrayItem(_index));
         }
-        void outArrayElement() override
+        void outArrayElement([[maybe_unused]] Cursor::Layer& m_source) override
         {
-            m_dest.exit();
+            m_dest.pop_back();
         }
-        void key(char const* _key) override
+        void key([[maybe_unused]] Cursor::Layer& m_source, char const* _key) override
         {
-            m_dest.insertPrimSetKey(_key);
+            m_dest.back().insertPrimSetKey(_key);
         }
-        void key(int64_t _key) override
+        void key([[maybe_unused]] Cursor::Layer& m_source, int64_t _key) override
         {
-            m_dest.insertPrimSetKey(_key);
+            m_dest.back().insertPrimSetKey(_key);
         }
-        void inUnionSetElement(char const* _type) override
+        void inUnionSetElement([[maybe_unused]] Cursor::Layer& m_source, char const* _type) override
         {
-            m_dest.enterUnionSetItem(_type);
+            m_dest.push_back(m_dest.back().enterUnionSetItem(_type));
             if (m_source.isSet())
             {
-                m_dest.buildPath(); // Force it to set
-            }
-        }
-        void outUnionSetElement() override
-        {
-            m_dest.exit();
-        }
-        void inObjectSetElement(char const* _key) override
-        {
-            m_dest.enterObjectSetItem(_key);
-        }
-        void inObjectSetElement(int64_t _key) override
-        {
-            m_dest.enterObjectSetItem(_key);
-        }
-        void outObjectSetElement() override
-        {
-            m_dest.exit();
-        }
-        void inArray() override
-        {
-            if (m_source.isSet())
-            {
-                m_dest.setSize(m_source.size());
+                m_dest.back().buildPath(); // Force it to set
             }
         }
-        void boolNode() override
+        void outUnionSetElement([[maybe_unused]] Cursor::Layer& m_source) override
+        {
+            m_dest.pop_back();
+        }
+        void inObjectSetElement([[maybe_unused]] Cursor::Layer& m_source, char const* _key) override
+        {
+            m_dest.push_back(m_dest.back().enterObjectSetItem(_key));
+        }
+        void inObjectSetElement([[maybe_unused]] Cursor::Layer& m_source, int64_t _key) override
+        {
+            m_dest.push_back(m_dest.back().enterObjectSetItem(_key));
+        }
+        void outObjectSetElement([[maybe_unused]] Cursor::Layer& m_source) override
+        {
+            m_dest.pop_back();
+        }
+        void inArray([[maybe_unused]] Cursor::Layer& m_source) override
         {
             if (m_source.isSet())
             {
-                m_dest.setBool(m_source.getBool());
+                m_dest.back().setSize(m_source.size());
             }
         }
-        void intNode() override
+        void boolNode([[maybe_unused]] Cursor::Layer& m_source) override
         {
             if (m_source.isSet())
             {
-                m_dest.setInt(m_source.getInt());
+                m_dest.back().setBool(m_source.getBool());
             }
         }
-        void floatNode() override
+        void intNode([[maybe_unused]] Cursor::Layer& m_source) override
         {
             if (m_source.isSet())
             {
-                m_dest.setFloat(m_source.getFloat());
+                m_dest.back().setInt(m_source.getInt());
             }
         }
-        void stringNode() override
+        void floatNode([[maybe_unused]] Cursor::Layer& m_source) override
         {
             if (m_source.isSet())
             {
-                m_dest.setString(m_source.getString());
+                m_dest.back().setFloat(m_source.getFloat());
             }
         }
-        void entityRefNode() override
+        void stringNode([[maybe_unused]] Cursor::Layer& m_source) override
         {
             if (m_source.isSet())
             {
-                m_dest.setEntityRef(m_source.getEntityRef());
+                m_dest.back().setString(m_source.getString());
+            }
+        }
+        void entityRefNode([[maybe_unused]] Cursor::Layer& m_source) override
+        {
+            if (m_source.isSet())
+            {
+                m_dest.back().setEntityRef(m_source.getEntityRef());
             }
         }
     };

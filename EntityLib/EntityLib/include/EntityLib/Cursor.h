@@ -174,6 +174,10 @@ namespace Ent
         struct Layer
         {
             Layer() = default;
+            Layer(Layer const&);
+            Layer(Layer&&) = default;
+            Layer& operator=(Layer const&);
+            Layer& operator=(Layer&&) = default;
             Layer(
                 EntityLib* _entityLib,
                 Layer* _parent,

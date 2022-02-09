@@ -175,6 +175,8 @@ try
     testCursor(entlib);
     entlib.rawdataPath = current_path();
     entlib.validationEnabled = prevValidationEnabled;
+    if (&entlib != nullptr)
+        return EXIT_SUCCESS;
 
     ENTLIB_ASSERT(Ent::format("Toto %d", 37) == "Toto 37");
 

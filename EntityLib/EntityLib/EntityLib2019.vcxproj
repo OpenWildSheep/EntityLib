@@ -67,7 +67,7 @@
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <DisableSpecificWarnings>4365;4324;4251;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027;4623;4315;5045</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4365;4324;4251;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027;4623;4315;5045;5046</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
@@ -94,7 +94,7 @@
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <DisableSpecificWarnings>4365;4324;4251;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027;4623;4315;5045</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4365;4324;4251;4625;4626;4820;4710;4711;4714;4514;4774;4571;4868;5026;5027;4623;4315;5045;5046</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
@@ -115,7 +115,6 @@
     <ClCompile Include="Array.cpp" />
     <ClCompile Include="ComponentMerge.cpp" />
     <ClCompile Include="Cursor.cpp" />
-    <ClCompile Include="CursorRestore.cpp" />
     <ClCompile Include="EntityLib.cpp">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EnableAllWarnings</WarningLevel>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</TreatWarningAsError>
@@ -142,7 +141,6 @@
     <ClInclude Include="include\EntityLibCore.h" />
     <ClInclude Include="include\EntityLib\CopyNode.h" />
     <ClInclude Include="include\EntityLib\Cursor.h" />
-    <ClInclude Include="include\EntityLib\CursorRestore.h" />
     <ClInclude Include="include\EntityLib\FileCursor.h" />
     <ClInclude Include="include\EntityLib\Visitor.h" />
     <ClInclude Include="include\Schema.h" />

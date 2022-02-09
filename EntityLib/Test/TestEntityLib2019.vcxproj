@@ -67,7 +67,7 @@
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <DisableSpecificWarnings>4324;4251;4625;4626;4820;4710;4711;4571;4514;5026;5027;4623;4315</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4324;4251;4625;4626;4820;4710;4711;4571;4514;5026;5027;4623;4315;5046</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
@@ -92,7 +92,7 @@
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <DisableSpecificWarnings>4324;4251;4625;4626;4820;4710;4711;4571;4514;5026;5027;4623;4315</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4324;4251;4625;4626;4820;4710;4711;4571;4514;5026;5027;4623;4315;5046</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>

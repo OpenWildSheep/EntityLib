@@ -323,8 +323,7 @@
                                     "BlendDurationIn",
                                     {
                                         "Value": {
-                                            "variantData": 7.0,
-                                            "variantType": "float"
+                                            "InstanceOf": "BlendDurationIn.node"
                                         },
                                         "_comment": "This script makes us all happy"
                                     }

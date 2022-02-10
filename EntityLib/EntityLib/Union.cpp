@@ -5,18 +5,24 @@
 #include "external/json.hpp"
 
 #include "include/EntityLib.h"
+#include "Tools.h"
 
 using namespace nlohmann;
 
 namespace Ent
 {
     Union::Union(
-        EntityLib const* _entityLib, Subschema const* _schema, NodeUniquePtr _wrapper, size_t _typeIndex)
+        EntityLib const* _entityLib,
+        Subschema const* _schema,
+        NodeUniquePtr _wrapper,
+        size_t _typeIndex,
+        Override<Ent::String> _instanceOf)
         : entityLib(_entityLib)
         , schema(_schema)
         , typeIndex(_typeIndex)
         , wrapper(std::move(_wrapper))
         , metaData(&(std::get<Subschema::UnionMeta>(schema->meta)))
+        , instanceOf(std::move(_instanceOf))
     {
         auto* typeNode = wrapper->at(metaData->typeField.c_str());
         typeOverriden = typeNode->hasOverride();
@@ -28,6 +34,7 @@ namespace Ent
         , typeIndex(_other.typeIndex)
         , wrapper(_other.wrapper->clone())
         , metaData(_other.metaData)
+        , instanceOf(_other.instanceOf)
     {
     }
 
@@ -40,12 +47,12 @@ namespace Ent
 
     bool Union::hasOverride() const
     {
-        return typeOverriden or wrapper->hasOverride();
+        return typeOverriden or wrapper->hasOverride() or instanceOf.hasOverride();
     }
 
     bool Union::hasDefaultValue() const
     {
-        return wrapper->hasDefaultValue();
+        return wrapper->hasDefaultValue() and instanceOf.hasDefaultValue();
     }
 
     Node* Union::getUnionData()
@@ -156,7 +163,7 @@ namespace Ent
 
     Union Union::detach() const
     {
-        Union detUnion{entityLib, schema, wrapper->detach(), typeIndex};
+        Union detUnion{entityLib, schema, wrapper->detach(), typeIndex, {}};
         detUnion.typeOverriden = true;
         return detUnion;
     }
@@ -165,14 +172,15 @@ namespace Ent
     {
         ENTLIB_ASSERT(schema != nullptr);
         ENTLIB_ASSERT(wrapper != nullptr);
-        Union detUnion{entityLib, schema, wrapper->makeInstanceOf(), typeIndex};
+        Union detUnion{
+            entityLib, schema, wrapper->makeInstanceOf(), typeIndex, instanceOf.makeInstanceOf()};
         detUnion.typeOverriden = false;
         return detUnion;
     }
 
     bool Union::hasPrefabValue() const
     {
-        return wrapper->hasPrefabValue();
+        return wrapper->hasPrefabValue() or instanceOf.hasPrefabValue();
     }
 
     void Union::setParentNode(Node* _parentNode)
@@ -187,7 +195,7 @@ namespace Ent
 
     std::unique_ptr<Union> Union::clone() const
     {
-        return std::make_unique<Union>(entityLib, schema, wrapper->clone(), typeIndex);
+        return std::make_unique<Union>(entityLib, schema, wrapper->clone(), typeIndex, instanceOf);
     }
 
     NodeRef Union::computeNodeRefToChild(Node const* _child) const
@@ -196,4 +204,22 @@ namespace Ent
         return getUnionType();
     }
 
+    void Union::resetInstanceOf(char const* _prefabNodePath)
+    {
+        auto const* entlib = schema->rootSchema->entityLib;
+        if (_prefabNodePath == nullptr or strlen(_prefabNodePath) == 0)
+        {
+            auto prefabNode = entlib->loadNode(*schema, json{}, nullptr);
+            (*this) = std::get<UnionPtr>(prefabNode->GetRawValue())->makeInstanceOf();
+            instanceOf.set("");
+        }
+        else
+        {
+            auto relPath = entlib->getRelativePath(_prefabNodePath).generic_u8string();
+            json nodeData = loadJsonFile(entlib->rawdataPath, _prefabNodePath);
+            auto prefabNode = entlib->loadNode(*schema, nodeData, nullptr);
+            (*this) = std::get<UnionPtr>(prefabNode->GetRawValue())->makeInstanceOf();
+            instanceOf.set(relPath);
+        }
+    }
 } // namespace Ent

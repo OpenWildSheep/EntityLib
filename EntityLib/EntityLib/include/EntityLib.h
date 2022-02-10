@@ -176,7 +176,8 @@ namespace Ent
             Subschema const& _nodeSchema,
             nlohmann::json const& _data,
             Node const* _super,
-            nlohmann::json const* _default = nullptr) const;
+            nlohmann::json const* _default = nullptr,
+            bool _ignoreInstanceOf = false) const;
 
         NodeUniquePtr loadUnion(
             Subschema const& _nodeSchema,

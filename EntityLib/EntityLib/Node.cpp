@@ -858,9 +858,14 @@ namespace Ent
 
     char const* Node::getInstanceOf() const
     {
-        if (std::holds_alternative<ObjectPtr>(value))
+        if (auto object = std::get_if<ObjectPtr>(&value))
         {
-            auto const& instanceOf = std::get<ObjectPtr>(value)->instanceOf;
+            auto const& instanceOf = (*object)->instanceOf;
+            return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
+        }
+        if (auto unionPtr = std::get_if<UnionPtr>(&value))
+        {
+            auto const& instanceOf = (*unionPtr)->instanceOf;
             return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
         }
         throw BadType();
@@ -1306,12 +1311,20 @@ namespace Ent
 
     void Node::resetInstanceOf(char const* _prefabNodePath)
     {
-        if (not std::holds_alternative<ObjectPtr>(value))
+        if (auto objectPtr = std::get_if<ObjectPtr>(&value))
         {
-            throw BadType();
+            (*objectPtr)->resetInstanceOf(_prefabNodePath);
+            (*objectPtr)->setParentNode(this);
         }
-        std::get<ObjectPtr>(value)->resetInstanceOf(_prefabNodePath);
-        std::get<ObjectPtr>(value)->setParentNode(this);
+        else if (auto unionPtr = std::get_if<UnionPtr>(&value))
+        {
+            (*unionPtr)->resetInstanceOf(_prefabNodePath);
+            (*unionPtr)->setParentNode(this);
+        }
+        else
+        {
+            throw BadType(); 
+        }
     }
 
     void Node::resetInstanceOf()

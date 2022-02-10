@@ -181,7 +181,8 @@ namespace Ent
     bool Cursor::_loadInstanceOf(Layer& _newLayer)
     {
         auto* subschema = m_instance.getSchema();
-        if (subschema->type == Ent::DataType::object and m_instance.isSet())
+        if ((subschema->type == DataType::object or subschema->type == DataType::oneOf)
+            and m_instance.isSet())
         {
             auto* doc = m_instance.getRawJson();
             if (auto member = doc->find("InstanceOf"); member != doc->end())

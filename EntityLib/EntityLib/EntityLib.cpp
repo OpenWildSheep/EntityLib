@@ -679,67 +679,95 @@ namespace Ent
         return result;
     }
 
+    /// Get the index of the \b _field in the object \b _data
+    static int getFieldIndex(json const& _data, json const& _field)
+    {
+        int fieldIdx = 0;
+        for (auto& [key, value] : _data.items())
+        {
+            if (&value == &_field)
+            {
+                return fieldIdx;
+            }
+            ++fieldIdx;
+        }
+        ENTLIB_LOGIC_ERROR("Can't find the field in the json object");
+    }
+
+    /// @brief Load the prefab file pointed by the "InstanceOf" field
+    /// @return
+    ///     - The updated "InstanceOf" field
+    ///     - The loaded prefabNode (If there is an "InstanceOf" field)
+    ///     - The updated _super
+    ///     - The index of the "InstanceOf" field
+    template <typename UnderlyingType>
+    auto loadInstanceOf(
+        EntityLib const* _entlib,
+        Subschema const& _nodeSchema,
+        json const& _data,
+        Node const* _super,
+        bool _ignoreInstanceOfField)
+    {
+        Override<String> newInstanceOf;
+        std::shared_ptr<Node const> prefabNode;
+        uint32_t objInstanceOfFieldIndex = 0;
+        if (auto instanceOfIter = _data.find("InstanceOf");
+            not _ignoreInstanceOfField and instanceOfIter != _data.end())
+        {
+            auto nodeFileName = instanceOfIter->get<std::string>();
+            if (not nodeFileName.empty())
+            {
+                // Do not inherit from _super since the override of InstanceOf reset the Entity
+                prefabNode = _entlib->loadNodeReadOnly(_nodeSchema, nodeFileName.c_str());
+                _super = prefabNode.get();
+                if (_super->getSchema() != &_nodeSchema)
+                {
+                    throw ContextException(
+                        "File %s loaded with two different schemas",
+                        formatPath(_entlib->rawdataPath, nodeFileName));
+                }
+                objInstanceOfFieldIndex = getFieldIndex(_data, *instanceOfIter);
+                newInstanceOf =
+                    std::get<UnderlyingType>(prefabNode->GetRawValue())
+                        ->instanceOf.makeOverridedInstanceOf(instanceOfIter->get<std::string>());
+            }
+            else
+            {
+                _super = nullptr;
+                newInstanceOf = Override<String>("", std::nullopt, "");
+            }
+        }
+        else if (_super != nullptr and _super->getInstanceOf() != nullptr)
+        {
+            // we inherit from the super's instanceOf
+            newInstanceOf = Override<String>("", _super->getInstanceOf(), std::nullopt);
+        }
+        return std::tuple(newInstanceOf, prefabNode, _super, objInstanceOfFieldIndex);
+    }
+
     NodeUniquePtr EntityLib::loadObject(
-        Subschema const& _nodeSchema, json const& _data, Node const* _super, json const* _default) const
+        Subschema const& _nodeSchema,
+        json const& _data,
+        Node const* _super,
+        json const* _default,
+        bool _ignoreInstanceOf) const
     {
         {
             ENTLIB_ASSERT(_nodeSchema.type == DataType::object);
             std::vector<ObjField> objNodes;
             bool objHasASuper = false;
-            uint32_t objInstanceOfFieldIndex = 0;
-            Override<String> objInstanceOf;
 
             // Read the InstanceOf field
-            std::shared_ptr<Node const> prefabNode;
-            auto InstanceOfIter = _data.find("InstanceOf");
             if (_super != nullptr)
             {
                 objHasASuper = true;
             }
-            auto getFieldIndex = [](json const& _data, json const& _field)
-            {
-                int fieldIdx = 0;
-                for (auto& [key, value] : _data.items())
-                {
-                    if (&value == &_field)
-                    {
-                        return fieldIdx;
-                    }
-                    ++fieldIdx;
-                }
-                ENTLIB_LOGIC_ERROR("Can't find the field in the json object");
-            };
 
-            if (InstanceOfIter != _data.end())
-            {
-                auto nodeFileName = InstanceOfIter->get<std::string>();
-                if (not nodeFileName.empty())
-                {
-                    // Do not inherit from _super since the override of InstanceOf reset the Entity
-                    prefabNode = loadNodeReadOnly(_nodeSchema, nodeFileName.c_str());
-                    _super = prefabNode.get();
-                    if (_super->getSchema() != &_nodeSchema)
-                    {
-                        throw ContextException(
-                            "File %s loaded with two different schemas",
-                            formatPath(rawdataPath, nodeFileName));
-                    }
-                    objInstanceOfFieldIndex = getFieldIndex(_data, *InstanceOfIter);
-                    objInstanceOf =
-                        std::get<ObjectPtr>(prefabNode->value)
-                            ->instanceOf.makeOverridedInstanceOf(InstanceOfIter->get<std::string>());
-                }
-                else
-                {
-                    _super = nullptr;
-                    objInstanceOf = Override<String>("", std::nullopt, "");
-                }
-            }
-            else if (_super != nullptr and _super->getInstanceOf() != nullptr)
-            {
-                // we inherit from the super's instanceOf
-                objInstanceOf = Override<String>("", _super->getInstanceOf(), std::nullopt);
-            }
+            Override<String> objInstanceOf;
+            std::shared_ptr<Node const> prefabNode;
+            uint32_t objInstanceOfFieldIndex = 0;
+            std::tie(objInstanceOf, prefabNode, _super, objInstanceOfFieldIndex) =
+                loadInstanceOf<ObjectPtr>(this, _nodeSchema, _data, _super, _ignoreInstanceOf);
 
             // Read the fields in schema
             objNodes.reserve(_nodeSchema.properties.size());
@@ -1073,6 +1101,12 @@ namespace Ent
 
         NodeUniquePtr result;
 
+        std::shared_ptr<Node const> prefabNode;
+        Override<String> unionInstanceOf;
+        [[maybe_unused]] uint32_t objInstanceOfFieldIndex = 0;
+        std::tie(unionInstanceOf, prefabNode, _super, objInstanceOfFieldIndex) =
+            loadInstanceOf<UnionPtr>(this, _nodeSchema, _data, _super, false);
+
         auto&& meta = std::get<Subschema::UnionMeta>(_nodeSchema.meta);
         std::string const& typeField = meta.typeField;
         if (typeField.empty())
@@ -1124,8 +1158,16 @@ namespace Ent
                 ENTLIB_ASSERT(
                     superUnionDataWrapper == nullptr
                     or &schemaTocheck.get() == superUnionDataWrapper->getSchema());
-                auto dataNode = loadNode(schemaTocheck.get(), _data, superUnionDataWrapper, _default);
-                Union un{this, &_nodeSchema, std::move(dataNode), size_t(subSchemaIndex)};
+                // We know it is an object (the union wrapper)
+                // Dont need to loads the InstanceOf since it was already loaded at the Union level
+                auto dataNode =
+                    loadObject(schemaTocheck.get(), _data, superUnionDataWrapper, _default, true);
+                Union un{
+                    this,
+                    &_nodeSchema,
+                    std::move(dataNode),
+                    size_t(subSchemaIndex),
+                    std::move(unionInstanceOf)};
                 result = newNode(std::make_unique<Union>(std::move(un)), &_nodeSchema);
                 typeFound = true;
             }
@@ -1136,7 +1178,7 @@ namespace Ent
                 "Can't find type %s in schema %s", dataType.c_str(), _nodeSchema.name.c_str());
             NodeUniquePtr dataNode =
                 loadNode(_nodeSchema.oneOf->front().get(), _data, nullptr, nullptr);
-            Union un(this, &_nodeSchema, std::move(dataNode), 0);
+            Union un(this, &_nodeSchema, std::move(dataNode), 0, std::move(unionInstanceOf));
             result = newNode(std::make_unique<Union>(std::move(un)), &_nodeSchema);
         }
         return result;
@@ -1404,11 +1446,15 @@ namespace Ent
             auto&& meta = std::get<Subschema::UnionMeta>(_schema.meta);
             data = json::object();
             auto&& un = *std::get<UnionPtr>(_node.GetRawValue());
+            if (_dumpedValueSource == OverrideValueSource::Override and un.instanceOf.isSet())
+            {
+                data["InstanceOf"] = un.instanceOf.get();
+            }
             // If it has no indexField, it is a (Responsible)pointer type.
             // The default (first) type is not explicited by the coder, so it can change accidentally.
             // This is why it is better to always write the type. (And also Wild expect it)
             auto const isPointerType = not meta.indexField.has_value();
-            if (un.hasOverride() or _forceWriteKey or isPointerType)
+            if (un.typeOverriden or un.wrapper->hasOverride() or _forceWriteKey or isPointerType)
             {
                 Node const* dataInsideUnion = _node.getUnionData();
                 char const* type = _node.getUnionType();

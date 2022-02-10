@@ -14,7 +14,8 @@ namespace Ent
             EntityLib const* _entityLib,
             Subschema const* _schema,
             NodeUniquePtr _wrapper,
-            size_t _typeIndex);
+            size_t _typeIndex,
+            Override<Ent::String> _instanceOf);
         Union(Union const& _other);
         Union(Union&&) = default;
         Union& operator=(Union const& _other);
@@ -25,6 +26,7 @@ namespace Ent
         size_t typeIndex = 0; ///< Index of the type
         NodeUniquePtr wrapper; ///< Node containing the className/classData
         Ent::Subschema::UnionMeta const* metaData = nullptr;
+        Override<Ent::String> instanceOf;
 
         bool typeOverriden = false;
 
@@ -57,6 +59,8 @@ namespace Ent
         /// @brief Get the child type
         /// @pre \b _child is actually the data contained by this Union
         NodeRef computeNodeRefToChild(Node const* _child) const;
+
+        void resetInstanceOf(char const* _prefabNodePath);
 
     private:
         Node* resetUnionTypeWithoutOverride(char const* _type);

@@ -20,14 +20,12 @@ namespace Ent
         {
         }
         /// Called when entering in an object's field
-        virtual bool
-        inObjectField([[maybe_unused]] Layer& expl, [[maybe_unused]] char const* _key)
+        virtual bool inObjectField([[maybe_unused]] Layer& expl, [[maybe_unused]] char const* _key)
         {
             return true;
         }
         /// Called when exiting an object's field
-        virtual void
-        outObjectField([[maybe_unused]] Layer& expl, [[maybe_unused]] char const* _key)
+        virtual void outObjectField([[maybe_unused]] Layer& expl, [[maybe_unused]] char const* _key)
         {
         }
         /// Called when exiting an object
@@ -63,8 +61,7 @@ namespace Ent
         {
         }
         /// Called when entering in a Set of primitive
-        virtual void
-        inPrimSet([[maybe_unused]] Layer& expl, [[maybe_unused]] Ent::DataType _dataType)
+        virtual void inPrimSet([[maybe_unused]] Layer& expl, [[maybe_unused]] Ent::DataType _dataType)
         {
         }
         /// Called when entering in the element of an array
@@ -92,8 +89,7 @@ namespace Ent
         {
         }
         /// Called when entering in the element of a set of union
-        virtual void
-        inUnionSetElement([[maybe_unused]] Layer& expl, [[maybe_unused]] char const* _type)
+        virtual void inUnionSetElement([[maybe_unused]] Layer& expl, [[maybe_unused]] char const* _type)
         {
         }
         /// Called when exiting the element of a set of union
@@ -113,13 +109,11 @@ namespace Ent
         {
         }
         /// Called when entering in the child of a set of object
-        virtual void
-        inObjectSetElement([[maybe_unused]] Layer& expl, [[maybe_unused]] char const* _key)
+        virtual void inObjectSetElement([[maybe_unused]] Layer& expl, [[maybe_unused]] char const* _key)
         {
         }
         /// Called when entering in the child of a set of object
-        virtual void
-        inObjectSetElement([[maybe_unused]] Layer& expl, [[maybe_unused]] int64_t _key)
+        virtual void inObjectSetElement([[maybe_unused]] Layer& expl, [[maybe_unused]] int64_t _key)
         {
         }
         /// Called when exiting the child of a set of object

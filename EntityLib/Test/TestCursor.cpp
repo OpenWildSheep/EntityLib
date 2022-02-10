@@ -860,18 +860,16 @@ void testCursor(Ent::EntityLib& entlib)
                 .enterObjectField("ItemEntityRef")
                 .getString()
             == std::string("tutu"));
-        auto ori3 = prefab.enterObjectField("Components")
-                         .enterUnionSetItem("TransformGD")
-                         .enterObjectField("Orientation")
-                         .enterArrayItem(3llu);
-
+        auto components = prefab.enterObjectField("Components");
+        auto transformGD = components.enterUnionSetItem("TransformGD");
+        auto orientation = transformGD.enterObjectField("Orientation");
+        auto ori3 = orientation.enterArrayItem(3llu);
         ENTLIB_ASSERT(fabs(ori3.getFloat() - 0.9916236400604248) < FLT_EPSILON);
         ori3.setFloat(2.);
         ENTLIB_ASSERT(ori3.getFloat() == 2.);
         auto soundAreaGD = prefab.enterObjectField("Components").enterUnionSetItem("SoundAreaGD");
         ENTLIB_ASSERT(soundAreaGD.isSet() == false);
         ENTLIB_ASSERT(soundAreaGD.isDefault() == true);
-        auto components = prefab.enterObjectField("Components");
         auto keys = components.getUnionSetKeysString();
         keys = components.getUnionSetKeysString();
         auto staffVertebrasGD =
@@ -881,6 +879,15 @@ void testCursor(Ent::EntityLib& entlib)
         keys = components.getUnionSetKeysString();
 
         prefab.save("instance.prout.entity");
+        // Must not crash
+        Layer prefab2(&entlib, nullptr, entlib.getSchema(entitySchemaName), "instance.prout.entity");
+        auto comp2 = prefab2.enterObjectField("Components");
+        auto characterControllerGD = comp2.enterUnionSetItem("CharacterControllerGD");
+        auto clamberData = characterControllerGD.enterObjectField("ClamberData");
+        auto vertOriRatio = clamberData.enterObjectField("VerticalOrientationRatio");
+        auto in = vertOriRatio.enterObjectField("in");
+        auto in0 = in.enterArrayItem(0);
+        in0.setFloat(3.33);
     }
     {
         std::cout << "Read instance.entity with LazyLib" << std::endl;

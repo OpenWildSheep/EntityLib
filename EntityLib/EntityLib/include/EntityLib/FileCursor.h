@@ -29,20 +29,17 @@ namespace Ent
         using Key = std::variant<char const*, size_t>;
         struct Schema
         {
-            Subschema const* base = nullptr;
+            Ent::Subschema const* base = nullptr;
             nlohmann::json const* propDefVal = nullptr; ///< Property default values
         };
 
         FileCursor();
 
-        FileCursor(Subschema const* _schema, char const* _filePath);
+        FileCursor(Ent::Subschema const* _schema, char const* _filePath);
 
-        FileCursor(
-            Subschema const* _schema,
-            char const* m_filePath,
-            nlohmann::json* _document);
+        FileCursor(Ent::Subschema const* _schema, char const* m_filePath, nlohmann::json* _document);
 
-        void init(Subschema const* _schema, char const* _filePath, nlohmann::json* _document);
+        void init(Ent::Subschema const* _schema, char const* _filePath, nlohmann::json* _document);
 
         void reset(); ///< Reset FileCursor without freeing memory
 
@@ -67,46 +64,45 @@ namespace Ent
 
         /// @brief Enter in the given field of the object
         /// @pre It is an object
-        [[nodiscard]] FileCursor enterObjectField(char const* _field, SubschemaRef const* _fieldRef = nullptr);
+        FileCursor enterObjectField(char const* _field, SubschemaRef const* _fieldRef = nullptr);
 
         /// @brief Enter in the item of a UnionSet
         /// @pre It is a UnionSet
-        [[nodiscard]] FileCursor
-        enterUnionSetItem(char const* _field, Subschema const* _dataSchema = nullptr);
+        FileCursor enterUnionSetItem(char const* _field, Subschema const* _dataSchema = nullptr);
 
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] FileCursor enterObjectSetItem(char const* _field);
+        FileCursor enterObjectSetItem(char const* _field);
 
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] FileCursor enterObjectSetItem(int64_t _field);
+        FileCursor enterObjectSetItem(int64_t _field);
 
         /// @brief Enter in the value of a Map
         /// @pre It is an Map
-        [[nodiscard]] FileCursor enterMapItem(char const* _field);
+        FileCursor enterMapItem(char const* _field);
 
         /// @brief Enter in the value of a Map
         /// @pre It is an Map
-        [[nodiscard]] FileCursor enterMapItem(int64_t _field);
+        FileCursor enterMapItem(int64_t _field);
 
         /// @brief Enter in the element of an Array
         /// @pre It is an Array
-        [[nodiscard]] FileCursor enterArrayItem(size_t _index);
+        FileCursor enterArrayItem(size_t _index);
 
         /// @return The type of the Union
         /// @pre It is a Union
         char const* getUnionType() const;
 
         /// @brief Get the schema of the union inner type
-        Subschema const* getUnionSchema() const;
+        Ent::Subschema const* getUnionSchema() const;
 
         /// Check if the union has to be removed from its parent container (A UnionSet)
         bool isUnionRemoved() const;
 
         /// @brief Enter in the internal data of the union
         /// @pre It is a Union
-        [[nodiscard]] FileCursor enterUnionData(char const* _unionType);
+        FileCursor enterUnionData(char const* _unionType);
 
         Subschema const* getSchema() const; ///< Get the Schema of the curent Node
 
@@ -131,13 +127,10 @@ namespace Ent
         void set(T&& _value); ///< @pre node os a primitive of type T. Set _value into the instance
         void setFloat(double _value); ///< @pre type==number. @brief Set _value in the instance
         void setInt(int64_t _value); ///< @pre type==integer. @brief Set _value in the instance
-        void setString(char const* _value);
-        ///< @pre type==string. @brief Set _value in the instance
+        void setString(char const* _value); ///< @pre type==string. @brief Set _value in the instance
         void setBool(bool _value); ///< @pre type==bool. @brief Set _value in the instance
-        void setEntityRef(EntityRef const& _value);
-        ///< @pre type==entityref. @brief Set _value in the instance
-        void setUnionType(char const* _type);
-        ///< @pre type==union. @brief Set inner type of the union
+        void setEntityRef(EntityRef const& _value); ///< @pre type==entityref. @brief Set _value in the instance
+        void setUnionType(char const* _type); ///< @pre type==union. @brief Set inner type of the union
         template <typename T>
         T get() const; ///< @pre Node is of type V. @brief Get the value in the given V type
         double getFloat() const; ///< @pre type==number. @brief Get the value as double

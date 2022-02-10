@@ -24,6 +24,7 @@ namespace Ent
         using Key = std::variant<std::string, size_t>;
 
         Layer() = default;
+        ~Layer();
         Layer(Layer const&);
         Layer(Layer&&) = default;
         Layer& operator=(Layer const&);
@@ -183,7 +184,7 @@ namespace Ent
         /// @remark 0 = last, -1 = last - 1, 1 = undefined
         std::optional<FileCursor> defaultStorage; ///< Used to explore the defalt value in the schema
         size_t m_arraySize = 0;
-        FileCursor instance;
+        FileCursor m_instance;
         Layer* m_parent = nullptr;
     };
 

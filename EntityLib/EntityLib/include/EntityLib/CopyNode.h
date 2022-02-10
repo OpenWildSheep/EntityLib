@@ -28,9 +28,7 @@ namespace Ent
             m_dest.push_back(m_dest.back().enterObjectField(_key));
             return true;
         }
-        void outObjectField(
-            [[maybe_unused]] Layer& m_source,
-                            [[maybe_unused]] char const* _key) override
+        void outObjectField([[maybe_unused]] Layer& m_source, [[maybe_unused]] char const* _key) override
         {
             m_dest.pop_back();
         }

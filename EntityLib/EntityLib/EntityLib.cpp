@@ -1692,6 +1692,11 @@ namespace Ent
                                                       Node(std::move(val), _subschema));
     }
 
+    LayerUniquePtr EntityLib::newLayer() const
+    {
+        return LayerUniquePtr(new (layerPool.alloc()) Layer());
+    }
+
     NodeUniquePtr EntityLib::makeEntityNode() const
     {
         return makeNode(entitySchemaName);

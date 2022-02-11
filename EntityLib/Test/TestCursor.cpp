@@ -761,46 +761,46 @@ void testCursor(Ent::EntityLib& entlib)
         auto& d = entlib.readJsonFile("test.SeedPatch.node");
         auto& schema = d["$schema"].get_ref<nlohmann::json::string_t const&>();
         auto typeName = getRefTypeName(schema.c_str());
-        Layer seedPatch(&entlib, nullptr, entlib.getSchema(typeName), "test.SeedPatch.node", &d);
-        ENTLIB_ASSERT(seedPatch.enterObjectField("NoiseSizeX").getFloat() == 1.f);
-        ENTLIB_ASSERT(seedPatch.enterObjectField("NoiseSizeY").getFloat() == 2.f);
+        Layer simpleObject(&entlib, nullptr, entlib.getSchema(typeName), "test.SeedPatch.node", &d);
+        ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeX").getFloat() == 1.f);
+        ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeY").getFloat() == 2.f);
     }
     {
         std::ifstream ifstr("test.SeedPatch.node");
         std::string filedata;
         std::getline(ifstr, filedata, char(0));
         auto& d = entlib.readJsonFile("test.SeedPatch.node");
-        Layer seedPatch(
+        Layer simpleObject(
             &entlib,
             nullptr,
             entlib.getSchema(getRefTypeName(d["$schema"].get_ref<std::string const&>().c_str())),
             "test.SeedPatch.node",
             &d);
-        ENTLIB_ASSERT(seedPatch.enterObjectField("NoiseSizeX").getFloat() == 1.f);
-        seedPatch.enterObjectField("NoiseSizeX").setFloat(2.);
-        ENTLIB_ASSERT(seedPatch.enterObjectField("NoiseSizeX").getFloat() == 2.);
-        ENTLIB_ASSERT(seedPatch.enterObjectField("NoiseSizeY").getFloat() == 2.f);
+        ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeX").getFloat() == 1.f);
+        simpleObject.enterObjectField("NoiseSizeX").setFloat(2.);
+        ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeX").getFloat() == 2.);
+        ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeY").getFloat() == 2.f);
     }
     {
-        Layer prefab(&entlib, nullptr, entlib.getSchema(entitySchemaName), "prefab.entity");
-        ENTLIB_ASSERT(prefab.enterObjectField("Name").getString()
+        Layer expl(&entlib, nullptr, entlib.getSchema(entitySchemaName), "prefab.entity");
+        ENTLIB_ASSERT(expl.enterObjectField("Name").getString()
             == std::string("PlayerSpawner_"));
         {
             ENTLIB_ASSERT(
-                prefab.enterObjectField("Components")
+                expl.enterObjectField("Components")
                     .enterUnionSetItem("NetworkNode")
                     .enterObjectField("Type")
                     .getString()
                 == std::string("Spawner"));
         }
-        auto posX = prefab.enterObjectField("Components")
+        auto posX = expl.enterObjectField("Components")
                         .enterUnionSetItem("TransformGD")
                         .enterObjectField("Position")
                         .enterArrayItem(0llu);
         std::cout << posX.getFloat()
                   << std::endl;
         ENTLIB_ASSERT(posX.getFloat() == 105.2244);
-        auto& entityRung = prefab;
+        auto& entityRung = expl;
         auto floatA = entityRung.enterObjectField("Components")
                           .enterUnionSetItem("TransformGD")
                           .enterObjectField("Position")
@@ -815,7 +815,7 @@ void testCursor(Ent::EntityLib& entlib)
         ENTLIB_ASSERT(floatB == 105.2244);
 
         ENTLIB_ASSERT(
-            prefab.enterObjectField("Components")
+            expl.enterObjectField("Components")
                 .enterUnionSetItem("SubScene")
                 .enterObjectField("Embedded")
                 .enterObjectSetItem("EP1-Spout_LINK_001")
@@ -824,30 +824,30 @@ void testCursor(Ent::EntityLib& entlib)
             == std::string("EP1-Spout_LINK_001"));
     }
     {
-        Layer prefab(&entlib, nullptr, entlib.getSchema(entitySchemaName), "instance.entity");
-        ENTLIB_ASSERT(prefab.enterObjectField("Name").getString() == std::string("PlayerSpawner_"));
-        auto type = prefab.enterObjectField("Components").enterUnionSetItem("NetworkNode").enterObjectField("Type");
+        Layer expl(&entlib, nullptr, entlib.getSchema(entitySchemaName), "instance.entity");
+        ENTLIB_ASSERT(expl.enterObjectField("Name").getString() == std::string("PlayerSpawner_"));
+        auto type = expl.enterObjectField("Components").enterUnionSetItem("NetworkNode").enterObjectField("Type");
         std::cout << type.getString() << std::endl;
         ENTLIB_ASSERT(
-            prefab.enterObjectField("Components")
+            expl.enterObjectField("Components")
                 .enterUnionSetItem("NetworkNode")
                 .enterObjectField("Type")
                 .getString()
             == std::string("Spawner"));
-        std::cout << prefab.enterObjectField("Components")
+        std::cout << expl.enterObjectField("Components")
                          .enterUnionSetItem("TransformGD")
                          .enterObjectField("Matrix")
                          .enterArrayItem(3llu)
                          .getFloat()
                   << std::endl;
-        auto pos2 = prefab.enterObjectField("Components")
+        auto pos2 = expl.enterObjectField("Components")
                         .enterUnionSetItem("TransformGD")
                         .enterObjectField("Position")
                         .enterArrayItem(2llu)
                         .getFloat();
         ENTLIB_ASSERT(fabs(pos2 - 29.6635) < FLT_EPSILON);
         ENTLIB_ASSERT(
-            prefab.enterObjectField("Components")
+            expl.enterObjectField("Components")
                 .enterUnionSetItem("SubScene")
                 .enterObjectField("Embedded")
                 .enterObjectSetItem("EP1-Spout_LINK_001")
@@ -855,30 +855,30 @@ void testCursor(Ent::EntityLib& entlib)
                 .getString()
             == std::string("EP1-Spout_LINK_001"));
         ENTLIB_ASSERT(
-            prefab.enterObjectField("ActorStates")
+            expl.enterObjectField("ActorStates")
                 .enterUnionSetItem("ActorStateHoldingItem")
                 .enterObjectField("ItemEntityRef")
                 .getString()
             == std::string("tutu"));
-        auto components = prefab.enterObjectField("Components");
+        auto components = expl.enterObjectField("Components");
         auto transformGD = components.enterUnionSetItem("TransformGD");
         auto orientation = transformGD.enterObjectField("Orientation");
         auto ori3 = orientation.enterArrayItem(3llu);
         ENTLIB_ASSERT(fabs(ori3.getFloat() - 0.9916236400604248) < FLT_EPSILON);
         ori3.setFloat(2.);
         ENTLIB_ASSERT(ori3.getFloat() == 2.);
-        auto soundAreaGD = prefab.enterObjectField("Components").enterUnionSetItem("SoundAreaGD");
+        auto soundAreaGD = expl.enterObjectField("Components").enterUnionSetItem("SoundAreaGD");
         ENTLIB_ASSERT(soundAreaGD.isSet() == false);
         ENTLIB_ASSERT(soundAreaGD.isDefault() == true);
         auto keys = components.getUnionSetKeysString();
         keys = components.getUnionSetKeysString();
         auto staffVertebrasGD =
-            prefab.enterObjectField("Components").enterUnionSetItem("StaffVertebrasGD");
+            expl.enterObjectField("Components").enterUnionSetItem("StaffVertebrasGD");
         ENTLIB_ASSERT(staffVertebrasGD.isSet() == false);
         ENTLIB_ASSERT(staffVertebrasGD.isDefault() == true);
         keys = components.getUnionSetKeysString();
 
-        prefab.save("instance.prout.entity");
+        expl.save("instance.prout.entity");
         // Must not crash
         Layer prefab2(&entlib, nullptr, entlib.getSchema(entitySchemaName), "instance.prout.entity");
         auto comp2 = prefab2.enterObjectField("Components");
@@ -892,7 +892,7 @@ void testCursor(Ent::EntityLib& entlib)
     {
         std::cout << "Read instance.entity with LazyLib" << std::endl;
         clock_t start = clock();
-        Layer instance(&entlib, nullptr, entlib.getSchema(entitySchemaName), "instance.entity");
+        Layer expl(&entlib, nullptr, entlib.getSchema(entitySchemaName), "instance.entity");
         clock_t end = clock();
 
         auto ent = entlib.loadEntityAsNode(R"(instance.entity)");
@@ -901,14 +901,14 @@ void testCursor(Ent::EntityLib& entlib)
         CompareNode compare(ent.get());
         std::cout << "Visit all" << std::endl;
         start = clock();
-        Ent::visitRecursive(instance, compare);
+        Ent::visitRecursive(expl, compare);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
 
         nlohmann::json newDoc = nlohmann::json::object();
-        Layer destExpl(&entlib, nullptr, instance.getSchema(), "", &newDoc);
+        Layer destExpl(&entlib, nullptr, expl.getSchema(), "", &newDoc);
         CopyToEmptyNode copier(destExpl);
-        Ent::visitRecursive(instance, copier);
+        Ent::visitRecursive(expl, copier);
         entlib.saveJsonFile(&newDoc, "instance.cursor.entity");
     }
     bool testLoading = true;
@@ -917,7 +917,7 @@ void testCursor(Ent::EntityLib& entlib)
         entlib.rawdataPath = "X:/RawData";
         std::cout << "Read SceneKOM.scene with LazyLib" << std::endl;
         clock_t start = clock();
-        Layer scene(
+        Layer expl(
             &entlib,
             nullptr,
             entlib.getSchema(entitySchemaName),
@@ -930,18 +930,18 @@ void testCursor(Ent::EntityLib& entlib)
         {
             std::cout << "Copy SceneKOM.scene with LazyLib" << std::endl;
             nlohmann::json newDoc = nlohmann::json::object();
-            Layer destExpl(&entlib, nullptr, scene.getSchema(), "", &newDoc);
+            Layer destExpl(&entlib, nullptr, expl.getSchema(), "", &newDoc);
             CopyToEmptyNode copier(destExpl);
-            visitRecursive(scene, copier);
+            visitRecursive(expl, copier);
 
             std::cout << "CompareCursor SceneKOM.scene wth the clone" << std::endl;
             CompareCursor comparator(destExpl);
-            Ent::visitRecursive(scene, comparator);
+            Ent::visitRecursive(expl, comparator);
 
             std::cout << "Save SceneKOM.scene with LazyLib" << std::endl;
             entlib.saveJsonFile(&newDoc, "SceneKOM.scene");
         }
-
+        /*
         std::cout << "Read SceneKOM.scene with NodeLib" << std::endl;
         start = clock();
         auto ent = entlib.loadEntityAsNode(
@@ -955,11 +955,12 @@ void testCursor(Ent::EntityLib& entlib)
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << nodeCount << std::endl;
+        */
 
         PrimitiveCounterVisitor visitor;
         std::cout << "Travserse SceneKOM.scene with LazyLib" << std::endl;
         start = clock();
-        Ent::visitRecursive(scene, visitor);
+        Ent::visitRecursive(expl, visitor);
         //Ent::visitRecursive(expl, visitor);
         //Ent::visitRecursive(expl, visitor);
         //Ent::visitRecursive(expl, visitor);
@@ -968,7 +969,7 @@ void testCursor(Ent::EntityLib& entlib)
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;
     }
-    bool testCompare = true;
+    bool testCompare = false;
     if (testCompare)
     {
         entlib.rawdataPath = "X:/RawData";

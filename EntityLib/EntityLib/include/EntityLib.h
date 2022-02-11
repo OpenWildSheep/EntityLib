@@ -9,6 +9,7 @@
 #include "../Union.h"
 #include "../Object.h"
 #include "../Node.h"
+#include "EntityLib/Cursor.h"
 #pragma warning(pop)
 
 namespace Ent
@@ -41,6 +42,7 @@ namespace Ent
     {
     public:
         mutable Pool<Node> nodePool;
+        mutable Pool<Layer> layerPool;
         /// @todo Make public attribute private?
         std::filesystem::path rootPath; ///< Path to the perforce root (X:/)
         std::filesystem::path rawdataPath; ///< Path to the RawData dir in the perforce root (X:/RawData)
@@ -111,6 +113,8 @@ namespace Ent
         NodeUniquePtr makeNode(char const* _schemaName) const;
 
         NodeUniquePtr newNode(Node::Value val, Subschema const* _subschema) const;
+
+        LayerUniquePtr newLayer() const;
 
         /// Create a Node with the Entity's schema
         NodeUniquePtr makeEntityNode() const;

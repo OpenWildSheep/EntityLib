@@ -9,12 +9,13 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4464)
-#include "../EntityLib.h"
 #include "../Tools.h"
 #pragma warning(pop)
 
 namespace Ent
 {
+    class EntityLib;
+
     /// A Layer is a level in the tree hierarchy.
     /// When enter, a layer is added.
     /// When exit, a layer is popped.
@@ -178,7 +179,7 @@ namespace Ent
         void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance
 
         EntityLib* m_entityLib = nullptr;
-        std::unique_ptr<Layer> prefab;
+        LayerUniquePtr prefab;
         // std::unique_ptr<Cursor> prefabsStorage; ///< Used when this layer has an "InstanceOf"
         /// @brief offset of the defaultValue in m_layers
         /// @remark 0 = last, -1 = last - 1, 1 = undefined
@@ -192,5 +193,16 @@ namespace Ent
     {
         return prefab.get();
     }
+
+    constexpr size_t const DeletedLayer = 0x4AB7A80FFB4CD540;
+
+    inline Layer ::~Layer()
+    {
+        m_parent = (Layer*)DeletedLayer;
+    }
+
+    /// \cond PRIVATE
+    void destroyAndFree(Layer* ptr); ///< Internally used by the Node memory Pool
+    /// \endcond
 
 } // namespace Ent

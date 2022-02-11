@@ -539,6 +539,17 @@ namespace Ent
     };
     using NodeUniquePtr = std::unique_ptr<Node, NodeDeleter>;
 
+    struct Layer;
+    struct LayerDeleter
+    {
+        template <typename T>
+        void operator()(T* ptr) const
+        {
+            destroyAndFree(ptr);
+        }
+    };
+    using LayerUniquePtr = std::unique_ptr<Layer, LayerDeleter>;
+
     /// @brief Path to found a Node, from an other Node.
     ///
     /// Token are separated by slashes.
@@ -553,4 +564,21 @@ namespace Ent
     ///         - ex : bad : `Components/TransformGD/TransformGD/Position`
     ///
     using NodeRef = std::string;
+
+    struct EntityRef
+    {
+        /// @brief string representation of this entity ref, works like a file path, always relative.
+        String entityPath;
+
+        bool operator==(EntityRef const& _rho) const
+        {
+            return entityPath == _rho.entityPath;
+        }
+
+        bool operator!=(EntityRef const& _rho) const
+        {
+            return !(*this == _rho);
+        }
+    };
+
 } // namespace Ent

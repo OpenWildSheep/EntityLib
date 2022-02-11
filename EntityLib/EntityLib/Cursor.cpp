@@ -1,4 +1,5 @@
 #include "include/EntityLib/Cursor.h"
+#include "include/EntityLib.h"
 
 #include <utility>
 
@@ -95,17 +96,6 @@ namespace Ent
         return get<EntityRef>();
     }
 
-    constexpr size_t const DeletedLayer = 0x4AB7A80FFB4CD540;
-
-    Layer ::~Layer()
-    {
-        m_entityLib = {};
-        m_arraySize = {};
-        m_instance = {};
-        m_parent = (Layer*)DeletedLayer;
-        prefab = {};
-    }
-
     Layer::Layer(Layer const& _other)
         : m_entityLib(_other.m_entityLib)
         , m_arraySize(_other.m_arraySize)
@@ -114,7 +104,8 @@ namespace Ent
     {
         if (_other.prefab != nullptr)
         {
-            prefab = std::make_unique<Layer>(*_other.prefab);
+            prefab = m_entityLib->newLayer();
+            *prefab = *_other.prefab;
         }
     }
 
@@ -198,8 +189,8 @@ namespace Ent
                 {
                     if (prefab == nullptr)
                     {
-                        prefab = std::make_unique<Layer>(
-                            m_entityLib, this, subschema, prefabPath.c_str());
+                        prefab = m_entityLib->newLayer();
+                        *prefab = Layer(m_entityLib, this, subschema, prefabPath.c_str());
                     }
                     else
                     {
@@ -232,7 +223,7 @@ namespace Ent
                 ENTLIB_ASSERT(lastLayer.prefab->m_entityLib != nullptr);
                 if (newLayer.prefab == nullptr)
                 {
-                    newLayer.prefab = std::make_unique<Layer>();
+                    newLayer.prefab = m_entityLib->newLayer();
                 }
                 (*newLayer.prefab) = lastLayer.prefab->enterObjectField(_field, _fieldRef);
             }
@@ -336,7 +327,7 @@ namespace Ent
                 {
                     if (newLayer.prefab == nullptr)
                     {
-                        newLayer.prefab = std::make_unique<Layer>();
+                        newLayer.prefab = m_entityLib->newLayer();
                     }
                     (*newLayer.prefab) = _enter(*lastLayer.prefab);
                 }
@@ -386,7 +377,7 @@ namespace Ent
                 {
                     if (newLayer.prefab == nullptr)
                     {
-                        newLayer.prefab = std::make_unique<Layer>();
+                        newLayer.prefab = m_entityLib->newLayer();
                     }
                     (*newLayer.prefab) = lastLayer.prefab->enterArrayItem(_index);
                 }
@@ -445,8 +436,8 @@ namespace Ent
         {
             if (lastLayer.prefab == nullptr)
             {
-                lastLayer.prefab =
-                    std::make_unique<Layer>(m_entityLib, &lastLayer, getSchema(), _instanceOf);
+                lastLayer.prefab = m_entityLib->newLayer();
+                *lastLayer.prefab = Layer(m_entityLib, &lastLayer, getSchema(), _instanceOf);
             }
             else
             {
@@ -1062,5 +1053,12 @@ namespace Ent
     Subschema const* Layer::getSchema() const
     {
         return m_instance.getSchema();
+    }
+
+    void destroyAndFree(Layer* ptr)
+    {
+        auto& pool = ptr->m_entityLib->layerPool;
+        ptr->~Layer();
+        pool.free(ptr);
     }
 } // namespace Ent

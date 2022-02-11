@@ -1,5 +1,7 @@
 #include "include/EntityLib/FileCursor.h"
 
+#include "include/EntityLib.h"
+
 namespace Ent
 {
     FileCursor::FileCursor() = default;

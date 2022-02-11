@@ -6,7 +6,7 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4464)
-#include "../EntityLib.h"
+#include "../Schema.h"
 #include "../Tools.h"
 #pragma warning(pop)
 

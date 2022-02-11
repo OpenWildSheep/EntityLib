@@ -5,7 +5,8 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
-from entgen.Int import *
+from entgen.ResponsiblePointer_GameEffect_ import *
+from entgen.Vector3 import *
 
 from EntityLibPy import Node
 
@@ -20,20 +21,18 @@ class sGameEffectTemplate(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def BoneID(self):  # type: ()->Int
-        return Int(self._node.at("BoneID"))
-    @BoneID.setter
-    def BoneID(self, val): self.BoneID.set(val)
-    @property
     def BoneName(self):  # type: ()->String
         return String(self._node.at("BoneName"))
     @BoneName.setter
     def BoneName(self, val): self.BoneName.set(val)
     @property
-    def EffectName(self):  # type: ()->String
-        return String(self._node.at("EffectName"))
-    @EffectName.setter
-    def EffectName(self, val): self.EffectName.set(val)
+    def Effect(self):  # type: ()->ResponsiblePointer_GameEffect_
+        return ResponsiblePointer_GameEffect_(self._node.at("Effect"))
+    @property
+    def Offset(self):  # type: ()->Vector3
+        return Vector3(self._node.at("Offset"))
+    @Offset.setter
+    def Offset(self, val): self.Offset.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

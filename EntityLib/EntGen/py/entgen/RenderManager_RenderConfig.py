@@ -122,6 +122,11 @@ class RenderManager_RenderConfig(HelperObject):
     @LODDecimationFactor.setter
     def LODDecimationFactor(self, val): self.LODDecimationFactor.set(val)
     @property
+    def MaterialBank(self):  # type: ()->String
+        return String(self._node.at("MaterialBank"))
+    @MaterialBank.setter
+    def MaterialBank(self, val): self.MaterialBank.set(val)
+    @property
     def MaxActiveShadowLights(self):  # type: ()->Int
         return Int(self._node.at("MaxActiveShadowLights"))
     @MaxActiveShadowLights.setter

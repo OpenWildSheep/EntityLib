@@ -17,6 +17,7 @@ class BeamStaffModeEnum(Enum):
     SideMap = "SideMap"
     PickUp = "PickUp"
     Hatching = "Hatching"
+    SetRespawnPlaceAsCheckpoint = "SetRespawnPlaceAsCheckpoint"
     Any = "Any"
     BeamStaffMode_COUNT = "BeamStaffMode_COUNT"
 

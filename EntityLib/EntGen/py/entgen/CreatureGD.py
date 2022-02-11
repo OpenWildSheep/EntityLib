@@ -11,7 +11,6 @@ from entgen.Bool import *
 from entgen.CreatureDangerousness import *
 from entgen.Float import *
 from entgen.InteractData import *
-from entgen.MountData import *
 from entgen.RevivedData import *
 from entgen.SpeedFastMinDuration import *
 
@@ -92,9 +91,6 @@ class CreatureGD(HelperObject):
     @property
     def interactData(self):  # type: ()->InteractData
         return InteractData(self._node.at("interactData"))
-    @property
-    def mountData(self):  # type: ()->MountData
-        return MountData(self._node.at("mountData"))
     @property
     def revivedData(self):  # type: ()->RevivedData
         return RevivedData(self._node.at("revivedData"))

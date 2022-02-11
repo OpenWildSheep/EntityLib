@@ -436,6 +436,11 @@ class DebugDisplayFlags(HelperObject):
     @OpenEntityWindows.setter
     def OpenEntityWindows(self, val): self.OpenEntityWindows.set(val)
     @property
+    def UseTransformEditor(self):  # type: ()->Bool
+        return Bool(self._node.at("UseTransformEditor"))
+    @UseTransformEditor.setter
+    def UseTransformEditor(self, val): self.UseTransformEditor.set(val)
+    @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
     @_comment.setter

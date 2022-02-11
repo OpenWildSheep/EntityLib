@@ -44,6 +44,7 @@ class ActorCategoryEnum(Enum):
     CATEGORY_Energy = "CATEGORY_Energy"
     CATEGORY_GPE = "CATEGORY_GPE"
     CATEGORY_Hatching = "CATEGORY_Hatching"
+    CATEGORY_Respawn = "CATEGORY_Respawn"
     ActorCategory_COUNT = "ActorCategory_COUNT"
 
 

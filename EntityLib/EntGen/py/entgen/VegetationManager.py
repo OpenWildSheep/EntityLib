@@ -72,6 +72,11 @@ class VegetationManager(HelperObject):
     @GlobalDistanceMultiplier.setter
     def GlobalDistanceMultiplier(self, val): self.GlobalDistanceMultiplier.set(val)
     @property
+    def PreloadVegetation(self):  # type: ()->Bool
+        return Bool(self._node.at("PreloadVegetation"))
+    @PreloadVegetation.setter
+    def PreloadVegetation(self, val): self.PreloadVegetation.set(val)
+    @property
     def RegenInterpolation(self):  # type: ()->Bool
         return Bool(self._node.at("RegenInterpolation"))
     @RegenInterpolation.setter

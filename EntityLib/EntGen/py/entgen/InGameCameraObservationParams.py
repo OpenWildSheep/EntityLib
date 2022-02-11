@@ -37,9 +37,6 @@ class InGameCameraObservationParams(HelperObject):
     def motionconstraint(self):  # type: ()->InGameCameraParams
         return InGameCameraParams(self._node.at("motionconstraint"))
     @property
-    def purgatory(self):  # type: ()->InGameCameraParams
-        return InGameCameraParams(self._node.at("purgatory"))
-    @property
     def shoulder(self):  # type: ()->InGameCameraParams
         return InGameCameraParams(self._node.at("shoulder"))
     @property

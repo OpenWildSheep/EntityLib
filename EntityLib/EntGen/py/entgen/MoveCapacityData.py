@@ -76,6 +76,11 @@ class MoveCapacityData(HelperObject):
     @brakeDeceleration.setter
     def brakeDeceleration(self, val): self.brakeDeceleration.set(val)
     @property
+    def canUseCliffGrip(self):  # type: ()->Bool
+        return Bool(self._node.at("canUseCliffGrip"))
+    @canUseCliffGrip.setter
+    def canUseCliffGrip(self, val): self.canUseCliffGrip.set(val)
+    @property
     def capsuleBigRadius(self):  # type: ()->Float
         return Float(self._node.at("capsuleBigRadius"))
     @capsuleBigRadius.setter

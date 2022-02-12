@@ -72,6 +72,11 @@ class MeshNavigationBehaviorData(HelperObject):
     @RollAllowed.setter
     def RollAllowed(self, val): self.RollAllowed.set(val)
     @property
+    def SlopeAngleMinForWall(self):  # type: ()->Float
+        return Float(self._node.at("SlopeAngleMinForWall"))
+    @SlopeAngleMinForWall.setter
+    def SlopeAngleMinForWall(self, val): self.SlopeAngleMinForWall.set(val)
+    @property
     def SlopeAngleMinToAllowStickedLand(self):  # type: ()->Float
         return Float(self._node.at("SlopeAngleMinToAllowStickedLand"))
     @SlopeAngleMinToAllowStickedLand.setter
@@ -86,6 +91,16 @@ class MeshNavigationBehaviorData(HelperObject):
         return Float(self._node.at("VerticalAngleMinToUseLandingTreeAnimation"))
     @VerticalAngleMinToUseLandingTreeAnimation.setter
     def VerticalAngleMinToUseLandingTreeAnimation(self, val): self.VerticalAngleMinToUseLandingTreeAnimation.set(val)
+    @property
+    def WallFrontProbeLengthFactor(self):  # type: ()->Float
+        return Float(self._node.at("WallFrontProbeLengthFactor"))
+    @WallFrontProbeLengthFactor.setter
+    def WallFrontProbeLengthFactor(self, val): self.WallFrontProbeLengthFactor.set(val)
+    @property
+    def WallRepulseFactor(self):  # type: ()->Float
+        return Float(self._node.at("WallRepulseFactor"))
+    @WallRepulseFactor.setter
+    def WallRepulseFactor(self, val): self.WallRepulseFactor.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

@@ -9,6 +9,7 @@
 #include <EntityLib/Visitor.h>
 #include <EntityLib/CopyNode.h>
 #include <EntityLib/Cursor.h>
+#include <EntityLib/Handler.h>
 
 using namespace Ent;
 
@@ -370,12 +371,12 @@ public:
     }
     void floatNode(Layer& expl) override
     {
-        // std::cout << elt.getFloat() << " " << nodes.back()->getFloat() << std::endl;
+        // std::cout << elt.getFloat() << " " << nodes.back().getFloat() << std::endl;
         if (fabs(expl.getFloat() - nodes.back()->getFloat()) >= FLT_EPSILON)
         {
             expl.getFloat();
         }
-        // ENTLIB_ASSERT(fabs(elt.getFloat() - nodes.back()->getFloat()) < FLT_EPSILON);
+        // ENTLIB_ASSERT(fabs(elt.getFloat() - nodes.back().getFloat()) < FLT_EPSILON);
     }
     void stringNode(Layer& expl) override
     {
@@ -396,33 +397,54 @@ public:
 
 class CompareCursor : public RecursiveVisitor
 {
-    std::vector<Layer> expl2;
+    Layer* m_root = nullptr;
+    std::vector<LayerSharedPtr> expl2;
+
+    void push(LayerSharedPtr _layer)
+    {
+        expl2.push_back(std::move(_layer));
+    }
+    void pop()
+    {
+        expl2.pop_back();
+    }
+    Layer& back()
+    {
+        if (expl2.empty())
+        {
+            return *m_root;
+        }
+        else
+        {
+            return *expl2.back();
+        }
+    }
 
 public:
-    CompareCursor(Layer _expl2)
-        : expl2({std::move(_expl2)})
+    CompareCursor(Layer& _expl2)
+        : m_root(&_expl2)
     {
     }
     void inObject([[maybe_unused]] Layer& expl) override
     {
         if (expl.getPrefab())
         {
-            ENTLIB_ASSERT(expl2.back().getPrefab());
-            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == expl2.back().getPrefab()->_getRawJson());
+            ENTLIB_ASSERT(expl2.back()->getPrefab());
+            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == expl2.back()->getPrefab()->_getRawJson());
         }
         auto a = expl.getInstanceOf();
-        auto b = expl2.back().getInstanceOf();
+        auto b = expl2.back()->getInstanceOf();
         ENTLIB_ASSERT(
             (a == nullptr and b == nullptr)
             or (a != nullptr and b != nullptr and a == std::string_view(b)));
     }
     bool inObjectField([[maybe_unused]] Layer& expl, char const* key) override
     {
-        expl2.push_back(expl2.back().enterObjectField(key));
+        expl2.push_back(expl2.back()->enterObjectField(key));
         if (expl.getPrefab())
         {
-            ENTLIB_ASSERT(expl2.back().getPrefab());
-            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == expl2.back().getPrefab()->_getRawJson());
+            ENTLIB_ASSERT(expl2.back()->getPrefab());
+            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == expl2.back()->getPrefab()->_getRawJson());
         }
         return true;
     }
@@ -432,7 +454,7 @@ public:
     }
     void inUnion([[maybe_unused]] Layer& expl, char const* _type) override
     {
-        expl2.push_back(expl2.back().enterUnionData(_type));
+        expl2.push_back(expl2.back()->enterUnionData(_type));
     }
     void outUnion([[maybe_unused]] Layer& expl) override
     {
@@ -440,25 +462,25 @@ public:
     }
     void inMap([[maybe_unused]] Layer& expl) override
     {
-        ENTLIB_ASSERT(expl2.back().size() == expl.size());
+        ENTLIB_ASSERT(expl2.back()->size() == expl.size());
         switch (expl.getMapKeyType())
         {
         case Ent::DataType::string:
-            ENTLIB_ASSERT(expl2.back().getMapKeysString().size() == expl.getMapKeysString().size());
+            ENTLIB_ASSERT(expl2.back()->getMapKeysString().size() == expl.getMapKeysString().size());
             break;
         case Ent::DataType::integer:
-            ENTLIB_ASSERT(expl2.back().getMapKeysInt().size() == expl.getMapKeysInt().size());
+            ENTLIB_ASSERT(expl2.back()->getMapKeysInt().size() == expl.getMapKeysInt().size());
             break;
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
     void inMapElement([[maybe_unused]] Layer& expl, char const* _key) override
     {
-        expl2.push_back(expl2.back().enterMapItem(_key));
+        expl2.push_back(expl2.back()->enterMapItem(_key));
     }
     void inMapElement([[maybe_unused]] Layer& expl, int64_t _key) override
     {
-        expl2.push_back(expl2.back().enterMapItem(_key));
+        expl2.push_back(expl2.back()->enterMapItem(_key));
     }
     void outMapElement([[maybe_unused]] Layer& expl) override
     {
@@ -466,22 +488,22 @@ public:
     }
     void inPrimSet([[maybe_unused]] Layer& expl, Ent::DataType) override
     {
-        ENTLIB_ASSERT(expl2.back().size() == expl.size());
+        ENTLIB_ASSERT(expl2.back()->size() == expl.size());
         auto& itemType = expl.getSchema()->singularItems.get()->get();
         switch (itemType.type)
         {
         case Ent::DataType::string:
-            ENTLIB_ASSERT(expl2.back().getPrimSetKeysString() == expl.getPrimSetKeysString());
+            ENTLIB_ASSERT(expl2.back()->getPrimSetKeysString() == expl.getPrimSetKeysString());
             break;
         case Ent::DataType::integer:
-            ENTLIB_ASSERT(expl2.back().getPrimSetKeysInt() == expl.getPrimSetKeysInt());
+            ENTLIB_ASSERT(expl2.back()->getPrimSetKeysInt() == expl.getPrimSetKeysInt());
             break;
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
     void inArrayElement([[maybe_unused]] Layer& expl, size_t i) override
     {
-        expl2.push_back(expl2.back().enterArrayItem(i));
+        expl2.push_back(expl2.back()->enterArrayItem(i));
     }
     void outArrayElement([[maybe_unused]] Layer& expl) override
     {
@@ -491,13 +513,13 @@ public:
     {
         if (expl.getPrefab())
         {
-            ENTLIB_ASSERT(expl2.back().getPrefab());
-            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == expl2.back().getPrefab()->_getRawJson());
+            ENTLIB_ASSERT(expl2.back()->getPrefab());
+            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == expl2.back()->getPrefab()->_getRawJson());
         }
-        auto a = expl2.back().getUnionSetKeysString();
+        auto a = expl2.back()->getUnionSetKeysString();
         auto b = expl.getUnionSetKeysString();
         ENTLIB_ASSERT(a.size() == b.size());
-        ENTLIB_ASSERT(expl2.back().getSchema() == expl.getSchema());
+        ENTLIB_ASSERT(expl2.back()->getSchema() == expl.getSchema());
         for (auto [name, type] : a)
         {
             ENTLIB_ASSERT(b.at(name) == type);
@@ -505,7 +527,7 @@ public:
     }
     void inUnionSetElement([[maybe_unused]] Layer& expl, char const* _type) override
     {
-        expl2.push_back(expl2.back().enterUnionSetItem(_type));
+        expl2.push_back(expl2.back()->enterUnionSetItem(_type));
     }
     void outUnionSetElement([[maybe_unused]] Layer& expl) override
     {
@@ -515,18 +537,18 @@ public:
     {
         if (expl.getPrefab())
         {
-            ENTLIB_ASSERT(expl2.back().getPrefab());
-            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == expl2.back().getPrefab()->_getRawJson());
+            ENTLIB_ASSERT(expl2.back()->getPrefab());
+            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == expl2.back()->getPrefab()->_getRawJson());
         }
-        ENTLIB_ASSERT(expl2.back().size() == expl.size());
-        switch (expl2.back().getObjectSetKeyType())
+        ENTLIB_ASSERT(expl2.back()->size() == expl.size());
+        switch (expl2.back()->getObjectSetKeyType())
         {
         case Ent::DataType::string:
         {
-            auto a = expl2.back().getObjectSetKeysString();
+            auto a = expl2.back()->getObjectSetKeysString();
             auto b = expl.getObjectSetKeysString();
             ENTLIB_ASSERT(a.size() == b.size());
-            ENTLIB_ASSERT(expl2.back().getSchema() == expl.getSchema());
+            ENTLIB_ASSERT(expl2.back()->getSchema() == expl.getSchema());
             for (auto name : a)
             {
                 ENTLIB_ASSERT(b.count(name));
@@ -534,25 +556,25 @@ public:
             break;
         }
         case Ent::DataType::integer:
-            ENTLIB_ASSERT(expl2.back().getObjectSetKeysInt() == expl.getObjectSetKeysInt());
+            ENTLIB_ASSERT(expl2.back()->getObjectSetKeysInt() == expl.getObjectSetKeysInt());
             break;
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
     void inObjectSetElement([[maybe_unused]] Layer& expl, char const* _key) override
     {
-        expl2.push_back(expl2.back().enterObjectSetItem(_key));
+        expl2.push_back(expl2.back()->enterObjectSetItem(_key));
         if (expl.getPrefab())
         {
-            ENTLIB_ASSERT(expl2.back().getPrefab());
+            ENTLIB_ASSERT(expl2.back()->getPrefab());
             auto a = expl.getPrefab()->_getRawJson();
-            auto b = expl2.back().getPrefab()->_getRawJson();
+            auto b = expl2.back()->getPrefab()->_getRawJson();
             ENTLIB_ASSERT(a == b);
         }
     }
     void inObjectSetElement([[maybe_unused]] Layer& expl, int64_t _key) override
     {
-        expl2.push_back(expl2.back().enterObjectSetItem(_key));
+        expl2.push_back(expl2.back()->enterObjectSetItem(_key));
     }
     void outObjectSetElement([[maybe_unused]] Layer& expl) override
     {
@@ -560,47 +582,47 @@ public:
     }
     void inArray([[maybe_unused]] Layer& expl) override
     {
-        ENTLIB_ASSERT(expl2.back().size() == expl.size());
+        ENTLIB_ASSERT(expl2.back()->size() == expl.size());
     }
     void nullNode([[maybe_unused]] Layer& expl) override
     {
-        ENTLIB_ASSERT(expl2.back().getDataType() == Ent::DataType::null);
+        ENTLIB_ASSERT(expl2.back()->getDataType() == Ent::DataType::null);
     }
     void boolNode([[maybe_unused]] Layer& expl) override
     {
-        ENTLIB_ASSERT(expl.isSet() == expl2.back().isSet());
-        ENTLIB_ASSERT(expl.getBool() == expl2.back().getBool());
+        ENTLIB_ASSERT(expl.isSet() == expl2.back()->isSet());
+        ENTLIB_ASSERT(expl.getBool() == expl2.back()->getBool());
     }
     void intNode([[maybe_unused]] Layer& expl) override
     {
-        ENTLIB_ASSERT(expl.isSet() == expl2.back().isSet());
-        ENTLIB_ASSERT(expl.getInt() == expl2.back().getInt());
+        ENTLIB_ASSERT(expl.isSet() == expl2.back()->isSet());
+        ENTLIB_ASSERT(expl.getInt() == expl2.back()->getInt());
     }
     void floatNode([[maybe_unused]] Layer& expl) override
     {
-        ENTLIB_ASSERT(expl.isSet() == expl2.back().isSet());
-        if (expl.getFloat() != expl2.back().getFloat())
+        ENTLIB_ASSERT(expl.isSet() == expl2.back()->isSet());
+        if (expl.getFloat() != expl2.back()->getFloat())
         {
-            std::cout << expl.isSet() << " " << expl2.back().isSet() << std::endl;
-            std::cout << expl.getFloat() << " " << expl2.back().getFloat() << std::endl;
+            std::cout << expl.isSet() << " " << expl2.back()->isSet() << std::endl;
+            std::cout << expl.getFloat() << " " << expl2.back()->getFloat() << std::endl;
             if (expl.getPrefab())
             {
-                ENTLIB_ASSERT(expl2.back().getPrefab());
+                ENTLIB_ASSERT(expl2.back()->getPrefab());
                 ENTLIB_ASSERT(
-                    expl.getPrefab()->_getRawJson() == expl2.back().getPrefab()->_getRawJson());
+                    expl.getPrefab()->_getRawJson() == expl2.back()->getPrefab()->_getRawJson());
             }
         }
-        ENTLIB_ASSERT(expl.getFloat() == expl2.back().getFloat());
+        ENTLIB_ASSERT(expl.getFloat() == expl2.back()->getFloat());
     }
     void stringNode([[maybe_unused]] Layer& expl) override
     {
-        ENTLIB_ASSERT(expl.isSet() == expl2.back().isSet());
-        ENTLIB_ASSERT(expl.getString() == std::string_view(expl2.back().getString()));
+        ENTLIB_ASSERT(expl.isSet() == expl2.back()->isSet());
+        ENTLIB_ASSERT(expl.getString() == std::string_view(expl2.back()->getString()));
     }
     void entityRefNode([[maybe_unused]] Layer& expl) override
     {
-        ENTLIB_ASSERT(expl.isSet() == expl2.back().isSet());
-        ENTLIB_ASSERT(expl.getEntityRef() == expl2.back().getEntityRef());
+        ENTLIB_ASSERT(expl.isSet() == expl2.back()->isSet());
+        ENTLIB_ASSERT(expl.getEntityRef() == expl2.back()->getEntityRef());
     }
 };
 
@@ -749,7 +771,7 @@ void testCursor(Ent::EntityLib& entlib)
 {
     {
         auto storage = nlohmann::json::object();
-        Layer entity(
+        Handler entity(
             &entlib, nullptr, entlib.getEntitySchema(), nullptr, &storage);
         auto name = entity.enterObjectField("Name");
         name.setString("Debug Quick Creatures Switch");
@@ -761,7 +783,7 @@ void testCursor(Ent::EntityLib& entlib)
         auto& d = entlib.readJsonFile("test.SeedPatch.node");
         auto& schema = d["$schema"].get_ref<nlohmann::json::string_t const&>();
         auto typeName = getRefTypeName(schema.c_str());
-        Layer simpleObject(&entlib, nullptr, entlib.getSchema(typeName), "test.SeedPatch.node", &d);
+        Handler simpleObject(&entlib, nullptr, entlib.getSchema(typeName), "test.SeedPatch.node", &d);
         ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeX").getFloat() == 1.f);
         ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeY").getFloat() == 2.f);
     }
@@ -770,7 +792,7 @@ void testCursor(Ent::EntityLib& entlib)
         std::string filedata;
         std::getline(ifstr, filedata, char(0));
         auto& d = entlib.readJsonFile("test.SeedPatch.node");
-        Layer simpleObject(
+        Handler simpleObject(
             &entlib,
             nullptr,
             entlib.getSchema(getRefTypeName(d["$schema"].get_ref<std::string const&>().c_str())),
@@ -782,7 +804,7 @@ void testCursor(Ent::EntityLib& entlib)
         ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeY").getFloat() == 2.f);
     }
     {
-        Layer expl(&entlib, nullptr, entlib.getSchema(entitySchemaName), "prefab.entity");
+        Handler expl(&entlib, nullptr, entlib.getSchema(entitySchemaName), "prefab.entity");
         ENTLIB_ASSERT(expl.enterObjectField("Name").getString()
             == std::string("PlayerSpawner_"));
         {
@@ -824,7 +846,7 @@ void testCursor(Ent::EntityLib& entlib)
             == std::string("EP1-Spout_LINK_001"));
     }
     {
-        Layer expl(&entlib, nullptr, entlib.getSchema(entitySchemaName), "instance.entity");
+        Handler expl(&entlib, nullptr, entlib.getSchema(entitySchemaName), "instance.entity");
         ENTLIB_ASSERT(expl.enterObjectField("Name").getString() == std::string("PlayerSpawner_"));
         auto type = expl.enterObjectField("Components").enterUnionSetItem("NetworkNode").enterObjectField("Type");
         std::cout << type.getString() << std::endl;
@@ -880,7 +902,8 @@ void testCursor(Ent::EntityLib& entlib)
 
         expl.save("instance.prout.entity");
         // Must not crash
-        Layer prefab2(&entlib, nullptr, entlib.getSchema(entitySchemaName), "instance.prout.entity");
+        Handler prefab2(
+            &entlib, nullptr, entlib.getSchema(entitySchemaName), "instance.prout.entity");
         auto comp2 = prefab2.enterObjectField("Components");
         auto characterControllerGD = comp2.enterUnionSetItem("CharacterControllerGD");
         auto clamberData = characterControllerGD.enterObjectField("ClamberData");
@@ -892,7 +915,7 @@ void testCursor(Ent::EntityLib& entlib)
     {
         std::cout << "Read instance.entity with LazyLib" << std::endl;
         clock_t start = clock();
-        Layer expl(&entlib, nullptr, entlib.getSchema(entitySchemaName), "instance.entity");
+        Handler expl(&entlib, nullptr, entlib.getSchema(entitySchemaName), "instance.entity");
         clock_t end = clock();
 
         auto ent = entlib.loadEntityAsNode(R"(instance.entity)");
@@ -901,14 +924,14 @@ void testCursor(Ent::EntityLib& entlib)
         CompareNode compare(ent.get());
         std::cout << "Visit all" << std::endl;
         start = clock();
-        Ent::visitRecursive(expl, compare);
+        Ent::visitRecursive(*expl.m_layer, compare);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
 
         nlohmann::json newDoc = nlohmann::json::object();
-        Layer destExpl(&entlib, nullptr, expl.getSchema(), "", &newDoc);
-        CopyToEmptyNode copier(destExpl);
-        Ent::visitRecursive(expl, copier);
+        auto destExpl = entlib.newLayer(nullptr, expl.getSchema(), "", &newDoc);
+        CopyToEmptyNode copier(*destExpl);
+        Ent::visitRecursive(*expl.m_layer, copier);
         entlib.saveJsonFile(&newDoc, "instance.cursor.entity");
     }
     bool testLoading = true;
@@ -917,7 +940,7 @@ void testCursor(Ent::EntityLib& entlib)
         entlib.rawdataPath = "X:/RawData";
         std::cout << "Read SceneKOM.scene with LazyLib" << std::endl;
         clock_t start = clock();
-        Layer expl(
+        Handler expl(
             &entlib,
             nullptr,
             entlib.getSchema(entitySchemaName),
@@ -930,13 +953,13 @@ void testCursor(Ent::EntityLib& entlib)
         {
             std::cout << "Copy SceneKOM.scene with LazyLib" << std::endl;
             nlohmann::json newDoc = nlohmann::json::object();
-            Layer destExpl(&entlib, nullptr, expl.getSchema(), "", &newDoc);
-            CopyToEmptyNode copier(destExpl);
-            visitRecursive(expl, copier);
+            auto destExpl = entlib.newLayer(nullptr, expl.getSchema(), "", &newDoc);
+            CopyToEmptyNode copier(*destExpl);
+            visitRecursive(*expl.m_layer, copier);
 
             std::cout << "CompareCursor SceneKOM.scene wth the clone" << std::endl;
-            CompareCursor comparator(destExpl);
-            Ent::visitRecursive(expl, comparator);
+            CompareCursor comparator(*destExpl);
+            Ent::visitRecursive(*expl.m_layer, comparator);
 
             std::cout << "Save SceneKOM.scene with LazyLib" << std::endl;
             entlib.saveJsonFile(&newDoc, "SceneKOM.scene");
@@ -960,7 +983,7 @@ void testCursor(Ent::EntityLib& entlib)
         PrimitiveCounterVisitor visitor;
         std::cout << "Travserse SceneKOM.scene with LazyLib" << std::endl;
         start = clock();
-        Ent::visitRecursive(expl, visitor);
+        Ent::visitRecursive(*expl.m_layer, visitor);
         //Ent::visitRecursive(expl, visitor);
         //Ent::visitRecursive(expl, visitor);
         //Ent::visitRecursive(expl, visitor);
@@ -975,7 +998,7 @@ void testCursor(Ent::EntityLib& entlib)
         entlib.rawdataPath = "X:/RawData";
         std::cout << "Read SceneKOM.scene with LazyLib" << std::endl;
         clock_t start = clock();
-        Layer expl(
+        Handler expl(
             &entlib,
             nullptr,
             entlib.getSchema(entitySchemaName),
@@ -1000,7 +1023,7 @@ void testCursor(Ent::EntityLib& entlib)
         std::cout << "Compare both" << std::endl;
         start = clock();
         CompareNode comparator(ent.get());
-        Ent::visitRecursive(expl, comparator);
+        Ent::visitRecursive(*expl.m_layer, comparator);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
     }

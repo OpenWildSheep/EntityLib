@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.ActionMode import *
 from entgen.String import *
+from entgen.Float import *
 from entgen.ScaleConverter import *
 
 from EntityLibPy import Node
@@ -30,6 +31,16 @@ class ChargedJumpAnimation(HelperObject):
         return ActionMode(self._node.at("animActionMode"))
     @animActionMode.setter
     def animActionMode(self, val): self.animActionMode.set(val)
+    @property
+    def lerpFactorScaleXY(self):  # type: ()->Float
+        return Float(self._node.at("lerpFactorScaleXY"))
+    @lerpFactorScaleXY.setter
+    def lerpFactorScaleXY(self, val): self.lerpFactorScaleXY.set(val)
+    @property
+    def lerpFactorScaleZ(self):  # type: ()->Float
+        return Float(self._node.at("lerpFactorScaleZ"))
+    @lerpFactorScaleZ.setter
+    def lerpFactorScaleZ(self, val): self.lerpFactorScaleZ.set(val)
     @property
     def scaleByPower(self):  # type: ()->ScaleConverter
         return ScaleConverter(self._node.at("scaleByPower"))

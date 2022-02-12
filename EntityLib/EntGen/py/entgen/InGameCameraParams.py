@@ -437,6 +437,11 @@ class InGameCameraParams(HelperObject):
     @LockYawSpeedClose.setter
     def LockYawSpeedClose(self, val): self.LockYawSpeedClose.set(val)
     @property
+    def MotionConstraintLateralMode(self):  # type: ()->Bool
+        return Bool(self._node.at("MotionConstraintLateralMode"))
+    @MotionConstraintLateralMode.setter
+    def MotionConstraintLateralMode(self, val): self.MotionConstraintLateralMode.set(val)
+    @property
     def NearPlane(self):  # type: ()->Float
         return Float(self._node.at("NearPlane"))
     @NearPlane.setter

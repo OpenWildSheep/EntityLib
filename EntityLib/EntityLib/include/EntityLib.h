@@ -114,7 +114,13 @@ namespace Ent
 
         NodeUniquePtr newNode(Node::Value val, Subschema const* _subschema) const;
 
-        LayerUniquePtr newLayer() const;
+        LayerSharedPtr newLayer();
+        LayerSharedPtr newLayer(Layer const& _other);
+        LayerSharedPtr newLayer(
+            Layer* _parent,
+            Ent::Subschema const* _schema,
+            char const* _filename,
+            nlohmann::json* _doc);
 
         /// Create a Node with the Entity's schema
         NodeUniquePtr makeEntityNode() const;

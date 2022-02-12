@@ -1692,9 +1692,20 @@ namespace Ent
                                                       Node(std::move(val), _subschema));
     }
 
-    LayerUniquePtr EntityLib::newLayer() const
+    LayerSharedPtr EntityLib::newLayer()
     {
-        return LayerUniquePtr(new (layerPool.alloc()) Layer());
+        return LayerSharedPtr(new (layerPool.alloc()) Layer(), LayerDeleter{});
+    }
+
+    LayerSharedPtr EntityLib::newLayer(Layer const& _other)
+    {
+        return LayerSharedPtr(new (layerPool.alloc()) Layer(_other), LayerDeleter{});
+    }
+
+    LayerSharedPtr EntityLib::newLayer(
+        Layer* _parent, Ent::Subschema const* _schema, char const* _filename, nlohmann::json* _doc)
+    {
+        return LayerSharedPtr(new (layerPool.alloc()) Layer(this, _parent, _schema, _filename, _doc));
     }
 
     NodeUniquePtr EntityLib::makeEntityNode() const

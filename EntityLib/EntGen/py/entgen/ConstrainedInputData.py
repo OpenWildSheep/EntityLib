@@ -6,7 +6,6 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.Float import *
-from entgen.ScaleConverter import *
 
 from EntityLibPy import Node
 
@@ -20,9 +19,6 @@ class ConstrainedInputData(HelperObject):
         return ConstrainedInputData(entlib.make_node(ConstrainedInputData.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
-    @property
-    def ConstrainedDirectionCoeff(self):  # type: ()->ScaleConverter
-        return ScaleConverter(self._node.at("ConstrainedDirectionCoeff"))
     @property
     def DiagonalSpeedFactor(self):  # type: ()->Float
         return Float(self._node.at("DiagonalSpeedFactor"))

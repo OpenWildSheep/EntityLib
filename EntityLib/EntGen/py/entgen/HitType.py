@@ -9,7 +9,6 @@ from EntityLibPy import Node
 class HitTypeEnum(Enum):
     HitInstant = "HitInstant"
     HitPoison = "HitPoison"
-    HitDestroy = "HitDestroy"
     HitType_COUNT = "HitType_COUNT"
 
 

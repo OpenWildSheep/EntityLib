@@ -142,6 +142,7 @@
     <ClInclude Include="include\EntityLib\CopyNode.h" />
     <ClInclude Include="include\EntityLib\Cursor.h" />
     <ClInclude Include="include\EntityLib\FileCursor.h" />
+    <ClInclude Include="include\EntityLib\Handler.h" />
     <ClInclude Include="include\EntityLib\Visitor.h" />
     <ClInclude Include="include\Schema.h" />
     <ClInclude Include="Map.h" />

@@ -16,6 +16,8 @@ namespace Ent
 {
     class EntityLib;
 
+    using LayerSharedPtr = std::shared_ptr<Layer>;
+
     /// A Layer is a level in the tree hierarchy.
     /// When enter, a layer is added.
     /// When exit, a layer is popped.
@@ -60,40 +62,40 @@ namespace Ent
 
         /// @brief Enter in the given field of the object
         /// @pre It is an object
-        [[nodiscard]] Layer enterObjectField(
+        [[nodiscard]] LayerSharedPtr enterObjectField(
             char const* _field, ///< field to enter in
             SubschemaRef const* _fieldRef = nullptr ///< SubschemaRef of the field (For performance)
         );
         /// @brief Enter in the internal data of the union
         /// @pre It is a Union
-        [[nodiscard]] Layer enterUnionData(
+        [[nodiscard]] LayerSharedPtr enterUnionData(
             char const* _type = nullptr ///< type of the internal data of the union
         );
         /// @brief Enter in the item of a UnionSet
         /// @pre It is a UnionSet
-        [[nodiscard]] Layer enterUnionSetItem(
+        [[nodiscard]] LayerSharedPtr enterUnionSetItem(
             char const* _type, ///< Type of the item
             Subschema const* _dataSchema = nullptr ///< Schema of the item (For performance)
         );
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] Layer enterObjectSetItem(char const* _key ///< Key of the object
+        [[nodiscard]] LayerSharedPtr enterObjectSetItem(char const* _key ///< Key of the object
         );
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] Layer enterObjectSetItem(int64_t _key ///< Key of the object
+        [[nodiscard]] LayerSharedPtr enterObjectSetItem(int64_t _key ///< Key of the object
         );
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        [[nodiscard]] Layer enterMapItem(char const* _key ///< Key of the value
+        [[nodiscard]] LayerSharedPtr enterMapItem(char const* _key ///< Key of the value
         );
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        [[nodiscard]] Layer enterMapItem(int64_t _field ///< Key of the value
+        [[nodiscard]] LayerSharedPtr enterMapItem(int64_t _field ///< Key of the value
         );
         /// @brief Enter in the element of an Array
         /// @pre It is an Array
-        [[nodiscard]] Layer enterArrayItem(size_t _index ///< index of the targeted element
+        [[nodiscard]] LayerSharedPtr enterArrayItem(size_t _index ///< index of the targeted element
         );
         /// @return The "InstanceOf" field, an empty string if set to empty, or nullptr if unset.
         /// @pre It is an Object
@@ -168,7 +170,7 @@ namespace Ent
         Layer* getPrefab(); ///< Get the Cursor of the prefab
 
         template <typename E>
-        [[nodiscard]] Layer _enterItem(E&& _enter);
+        [[nodiscard]] LayerSharedPtr _enterItem(E&& _enter);
 
         void _checkInvariants() const;
         bool _loadInstanceOf();
@@ -179,7 +181,7 @@ namespace Ent
         void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance
 
         EntityLib* m_entityLib = nullptr;
-        LayerUniquePtr prefab;
+        LayerSharedPtr prefab;
         // std::unique_ptr<Cursor> prefabsStorage; ///< Used when this layer has an "InstanceOf"
         /// @brief offset of the defaultValue in m_layers
         /// @remark 0 = last, -1 = last - 1, 1 = undefined

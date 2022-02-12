@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.Float import *
 from entgen.MoveCapacityData_OrientationSpeed import *
 
 from EntityLibPy import Node
@@ -22,6 +23,11 @@ class EntityStateChargeMode_EntityStateChargeModeInputs(HelperObject):
     @property
     def AngularSpeed(self):  # type: ()->MoveCapacityData_OrientationSpeed
         return MoveCapacityData_OrientationSpeed(self._node.at("AngularSpeed"))
+    @property
+    def ForceMultiplier(self):  # type: ()->Float
+        return Float(self._node.at("ForceMultiplier"))
+    @ForceMultiplier.setter
+    def ForceMultiplier(self, val): self.ForceMultiplier.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

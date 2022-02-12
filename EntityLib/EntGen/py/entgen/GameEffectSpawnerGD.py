@@ -6,7 +6,6 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ComponentGD import *
-from entgen.Vector3 import *
 from entgen.sGameEffectTemplate import *
 
 from EntityLibPy import Node
@@ -21,11 +20,6 @@ class GameEffectSpawnerGD(HelperObject):
         return GameEffectSpawnerGD(entlib.make_node(GameEffectSpawnerGD.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
-    @property
-    def GameEffectOffset(self):  # type: ()->Vector3
-        return Vector3(self._node.at("GameEffectOffset"))
-    @GameEffectOffset.setter
-    def GameEffectOffset(self, val): self.GameEffectOffset.set(val)
     @property
     def StartGameEffects(self):  # type: ()->Array[sGameEffectTemplate]
         return (lambda n: Array(sGameEffectTemplate, n))(self._node.at("StartGameEffects"))

@@ -7,6 +7,7 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Float import *
 from entgen.Manager import *
+from entgen.RecastNavmeshGenerationParameters import *
 
 from EntityLibPy import Node
 
@@ -21,18 +22,31 @@ class NavMeshManager(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def GridMargin(self):  # type: ()->Float
-        return Float(self._node.at("GridMargin"))
-    @GridMargin.setter
-    def GridMargin(self, val): self.GridMargin.set(val)
+    def NavMeshMaxHeight(self):  # type: ()->Float
+        return Float(self._node.at("NavMeshMaxHeight"))
+    @NavMeshMaxHeight.setter
+    def NavMeshMaxHeight(self, val): self.NavMeshMaxHeight.set(val)
     @property
-    def GridSize(self):  # type: ()->Float
-        return Float(self._node.at("GridSize"))
-    @GridSize.setter
-    def GridSize(self, val): self.GridSize.set(val)
+    def NavMeshMaxSize(self):  # type: ()->Float
+        return Float(self._node.at("NavMeshMaxSize"))
+    @NavMeshMaxSize.setter
+    def NavMeshMaxSize(self, val): self.NavMeshMaxSize.set(val)
+    @property
+    def RecastParameters(self):  # type: ()->RecastNavmeshGenerationParameters
+        return RecastNavmeshGenerationParameters(self._node.at("RecastParameters"))
     @property
     def Super(self):  # type: ()->Manager
         return Manager(self._node.at("Super"))
+    @property
+    def TileMargin(self):  # type: ()->Float
+        return Float(self._node.at("TileMargin"))
+    @TileMargin.setter
+    def TileMargin(self, val): self.TileMargin.set(val)
+    @property
+    def TileSize(self):  # type: ()->Float
+        return Float(self._node.at("TileSize"))
+    @TileSize.setter
+    def TileSize(self, val): self.TileSize.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

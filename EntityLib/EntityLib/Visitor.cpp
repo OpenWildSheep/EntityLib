@@ -15,10 +15,10 @@ namespace Ent
             for (auto&& [name, schemaref] : _expl.getSchema()->properties)
             {
                 auto field = _expl.enterObjectField(name.c_str(), &schemaref);
-                if (_visitor.inObjectField(field, name.c_str()))
+                if (_visitor.inObjectField(*field, name.c_str()))
                 {
-                    visitRecursive(field, _visitor);
-                    _visitor.outObjectField(field, name.c_str());
+                    visitRecursive(*field, _visitor);
+                    _visitor.outObjectField(*field, name.c_str());
                 }
             }
             _visitor.outObject(_expl);
@@ -28,7 +28,7 @@ namespace Ent
         {
             _visitor.inUnion(_expl, _expl.getUnionType());
             auto data = _expl.enterUnionData();
-            visitRecursive(data, _visitor);
+            visitRecursive(*data, _visitor);
             _visitor.outUnion(_expl);
             break;
         }
@@ -45,18 +45,18 @@ namespace Ent
                     for (char const* key : _expl.getMapKeysString())
                     {
                         auto value = _expl.enterMapItem(key);
-                        _visitor.inMapElement(value, key);
-                        visitRecursive(value, _visitor);
-                        _visitor.outMapElement(value);
+                        _visitor.inMapElement(*value, key);
+                        visitRecursive(*value, _visitor);
+                        _visitor.outMapElement(*value);
                     }
                     break;
                 case Ent::DataType::integer:
                     for (int64_t key : _expl.getMapKeysInt())
                     {
                         auto value = _expl.enterMapItem(key);
-                        _visitor.inMapElement(value, key);
-                        visitRecursive(value, _visitor);
-                        _visitor.outMapElement(value);
+                        _visitor.inMapElement(*value, key);
+                        visitRecursive(*value, _visitor);
+                        _visitor.outMapElement(*value);
                     }
                     break;
                 default: ENTLIB_LOGIC_ERROR("Unexpected key type");
@@ -90,7 +90,7 @@ namespace Ent
                     {
                         auto data = _expl.enterUnionSetItem(name, schema);
                         _visitor.inUnionSetElement(_expl, name);
-                        visitRecursive(data, _visitor);
+                        visitRecursive(*data, _visitor);
                         _visitor.outUnionSetElement(_expl);
                     }
                     _visitor.outUnionSet(_expl);
@@ -104,18 +104,18 @@ namespace Ent
                         for (auto&& key : _expl.getObjectSetKeysString())
                         {
                             auto data = _expl.enterObjectSetItem(key);
-                            _visitor.inObjectSetElement(data, key);
-                            visitRecursive(data, _visitor);
-                            _visitor.outObjectSetElement(data);
+                            _visitor.inObjectSetElement(*data, key);
+                            visitRecursive(*data, _visitor);
+                            _visitor.outObjectSetElement(*data);
                         }
                         break;
                     case Ent::DataType::integer:
                         for (auto&& key : _expl.getObjectSetKeysInt())
                         {
                             auto data = _expl.enterObjectSetItem(key);
-                            _visitor.inObjectSetElement(data, key);
-                            visitRecursive(data, _visitor);
-                            _visitor.outObjectSetElement(data);
+                            _visitor.inObjectSetElement(*data, key);
+                            visitRecursive(*data, _visitor);
+                            _visitor.outObjectSetElement(*data);
                         }
                         break;
                     default: ENTLIB_LOGIC_ERROR("Unexpected key type");
@@ -130,9 +130,9 @@ namespace Ent
                 for (size_t i = 0; i < _expl.size(); ++i)
                 {
                     auto data = _expl.enterArrayItem(i);
-                    _visitor.inArrayElement(data, i);
-                    visitRecursive(data, _visitor);
-                    _visitor.outArrayElement(data);
+                    _visitor.inArrayElement(*data, i);
+                    visitRecursive(*data, _visitor);
+                    _visitor.outArrayElement(*data);
                 }
                 _visitor.outArray(_expl);
                 break;

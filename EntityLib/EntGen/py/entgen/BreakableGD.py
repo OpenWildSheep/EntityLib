@@ -7,6 +7,8 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Bool import *
 from entgen.ComponentGD import *
+from entgen.EntityRef import *
+from entgen.Float import *
 
 from EntityLibPy import Node
 
@@ -31,18 +33,33 @@ class BreakableGD(HelperObject):
     @BreakSoundEvent.setter
     def BreakSoundEvent(self, val): self.BreakSoundEvent.set(val)
     @property
-    def GameEffectOnBroken(self):  # type: ()->String
-        return String(self._node.at("GameEffectOnBroken"))
-    @GameEffectOnBroken.setter
-    def GameEffectOnBroken(self, val): self.GameEffectOnBroken.set(val)
+    def FadeoutDuration(self):  # type: ()->Float
+        return Float(self._node.at("FadeoutDuration"))
+    @FadeoutDuration.setter
+    def FadeoutDuration(self, val): self.FadeoutDuration.set(val)
     @property
-    def GameEffectOnDestruction(self):  # type: ()->String
-        return String(self._node.at("GameEffectOnDestruction"))
-    @GameEffectOnDestruction.setter
-    def GameEffectOnDestruction(self, val): self.GameEffectOnDestruction.set(val)
+    def GameEffectOnBreaking(self):  # type: ()->String
+        return String(self._node.at("GameEffectOnBreaking"))
+    @GameEffectOnBreaking.setter
+    def GameEffectOnBreaking(self, val): self.GameEffectOnBreaking.set(val)
+    @property
+    def MaxContactAngle(self):  # type: ()->Float
+        return Float(self._node.at("MaxContactAngle"))
+    @MaxContactAngle.setter
+    def MaxContactAngle(self, val): self.MaxContactAngle.set(val)
+    @property
+    def ParentEntity(self):  # type: ()->EntityRef
+        return EntityRef(self._node.at("ParentEntity"))
+    @ParentEntity.setter
+    def ParentEntity(self, val): self.ParentEntity.set(val)
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
+    @property
+    def TimeBeforeFade(self):  # type: ()->Float
+        return Float(self._node.at("TimeBeforeFade"))
+    @TimeBeforeFade.setter
+    def TimeBeforeFade(self, val): self.TimeBeforeFade.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

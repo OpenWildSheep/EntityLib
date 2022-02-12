@@ -548,7 +548,7 @@ namespace Ent
             destroyAndFree(ptr);
         }
     };
-    using LayerUniquePtr = std::unique_ptr<Layer, LayerDeleter>;
+    using LayerSharedPtr = std::shared_ptr<Layer>;
 
     /// @brief Path to found a Node, from an other Node.
     ///

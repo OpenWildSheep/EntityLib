@@ -1158,6 +1158,17 @@ namespace Ent
                 ENTLIB_ASSERT(
                     superUnionDataWrapper == nullptr
                     or &schemaTocheck.get() == superUnionDataWrapper->getSchema());
+                if (_default != nullptr)
+                {
+                    if (auto typeIsDefault = _default->find(typeField);
+                        typeIsDefault != _default->end())
+                    {
+                        if (typeIsDefault->get<std::string>() != schemaType)
+                        {
+                            _default = nullptr;
+                        }
+                    }
+                }
                 // We know it is an object (the union wrapper)
                 // Dont need to loads the InstanceOf since it was already loaded at the Union level
                 auto dataNode =

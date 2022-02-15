@@ -1090,6 +1090,17 @@ namespace Ent
                 ENTLIB_ASSERT(
                     superUnionDataWrapper == nullptr
                     or &schemaTocheck.get() == superUnionDataWrapper->getSchema());
+                if (_default != nullptr)
+                {
+                    if (auto typeIsDefault = _default->find(typeField);
+                        typeIsDefault != _default->end())
+                    {
+                        if (typeIsDefault->get<std::string>() != schemaType)
+                        {
+                            _default = nullptr;
+                        }
+                    }
+                }
                 auto dataNode = loadNode(schemaTocheck.get(), _data, superUnionDataWrapper, _default);
                 Union un{this, &_nodeSchema, std::move(dataNode), size_t(subSchemaIndex)};
                 result = newNode(std::make_unique<Union>(std::move(un)), &_nodeSchema);

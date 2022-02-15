@@ -441,7 +441,9 @@ namespace Ent
                 // Load all Nodes from the _super (overriden or not)
                 for (Node const* subSuper : _super->getItems())
                 {
-                    json const* subDefault = _default == nullptr ? nullptr : &_default->at(index);
+                    json const* subDefault = _default == nullptr       ? nullptr :
+                                             _default->size() <= index ? nullptr :
+                                                                         &_default->at(index);
                     KeyType key = getKeyNode(subSuper);
                     auto loc = subDefault != nullptr ? OverrideValueLocation::Default :
                                                        OverrideValueLocation::Prefab;
@@ -1160,10 +1162,10 @@ namespace Ent
                     or &schemaTocheck.get() == superUnionDataWrapper->getSchema());
                 if (_default != nullptr)
                 {
-                    if (auto typeIsDefault = _default->find(typeField);
-                        typeIsDefault != _default->end())
+                    if (auto typeInDefault = _default->find(typeField);
+                        typeInDefault != _default->end())
                     {
-                        if (typeIsDefault->get<std::string>() != schemaType)
+                        if (typeInDefault->get_ref<std::string const&>() != schemaType)
                         {
                             _default = nullptr;
                         }

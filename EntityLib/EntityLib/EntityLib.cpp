@@ -417,7 +417,9 @@ namespace Ent
                 // Load all Nodes from the _super (overriden or not)
                 for (Node const* subSuper : _super->getItems())
                 {
-                    json const* subDefault = _default == nullptr ? nullptr : &_default->at(index);
+                    json const* subDefault = _default == nullptr       ? nullptr :
+                                             _default->size() <= index ? nullptr :
+                                                                         &_default->at(index);
                     KeyType key = getKeyNode(subSuper);
                     auto loc = subDefault != nullptr ? OverrideValueLocation::Default :
                                                        OverrideValueLocation::Prefab;
@@ -1090,6 +1092,17 @@ namespace Ent
                 ENTLIB_ASSERT(
                     superUnionDataWrapper == nullptr
                     or &schemaTocheck.get() == superUnionDataWrapper->getSchema());
+                if (_default != nullptr)
+                {
+                    if (auto typeInDefault = _default->find(typeField);
+                        typeInDefault != _default->end())
+                    {
+                        if (typeInDefault->get_ref<std::string const&>() != schemaType)
+                        {
+                            _default = nullptr;
+                        }
+                    }
+                }
                 auto dataNode = loadNode(schemaTocheck.get(), _data, superUnionDataWrapper, _default);
                 Union un{this, &_nodeSchema, std::move(dataNode), size_t(subSchemaIndex)};
                 result = newNode(std::make_unique<Union>(std::move(un)), &_nodeSchema);

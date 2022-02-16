@@ -114,9 +114,17 @@ displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::
         {                                                                                          \
             exception_throw = true;                                                                \
         }                                                                                          \
+        catch (std::exception & ex)                                                                \
+        {                                                                                          \
+            ENTLIB_LOGIC_ERROR(                                                                    \
+                "Wrong exception thrown! Expected : '%s', got '%s'\n%s",                           \
+                #excep_type,                                                                       \
+                typeid(ex).name(),                                                                 \
+                ex.what());                                                                        \
+        }                                                                                          \
         catch (...)                                                                                \
         {                                                                                          \
-            ENTLIB_LOGIC_ERROR("Wrong exception thrown!");                                         \
+            ENTLIB_LOGIC_ERROR("Wrong exception thrown! Expected : %s");                           \
         }                                                                                          \
         ENTLIB_ASSERT_MSG(exception_throw, "Exception not thrown!");                               \
     }

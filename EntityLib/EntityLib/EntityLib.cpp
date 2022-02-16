@@ -1187,12 +1187,8 @@ namespace Ent
         }
         if (not typeFound)
         {
-            ENTLIB_LOG_ERROR(
-                "Can't find type %s in schema %s", dataType.c_str(), _nodeSchema.name.c_str());
-            NodeUniquePtr dataNode =
-                loadNode(_nodeSchema.oneOf->front().get(), _data, nullptr, nullptr);
-            Union un(this, &_nodeSchema, std::move(dataNode), 0, std::move(unionInstanceOf));
-            result = newNode(std::make_unique<Union>(std::move(un)), &_nodeSchema);
+            throw BadType(Ent::staticFormat(
+                "Can't find type %s in schema %s", dataType.c_str(), _nodeSchema.name.c_str()));
         }
         return result;
     }

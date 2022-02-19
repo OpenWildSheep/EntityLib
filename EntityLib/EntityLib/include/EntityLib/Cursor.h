@@ -21,7 +21,7 @@ namespace Ent
     /// A Layer is a level in the tree hierarchy.
     /// When enter, a layer is added.
     /// When exit, a layer is popped.
-    struct ENTLIB_DLLEXPORT Layer
+    struct ENTLIB_DLLEXPORT Layer : std::enable_shared_from_this<Layer>
     {
     public:
         using Key = std::variant<std::string, size_t>;
@@ -32,18 +32,25 @@ namespace Ent
         Layer(Layer&&) = default;
         Layer& operator=(Layer const&);
         Layer& operator=(Layer&&) = default;
-        Layer(EntityLib* _entityLib, Layer* _parent, Ent::Subschema const* _schema, char const* _filename);
         Layer(
             EntityLib* _entityLib,
-            Layer* _parent,
+            LayerSharedPtr _parent,
+            Ent::Subschema const* _schema,
+            char const* _filename);
+        Layer(
+            EntityLib* _entityLib,
+            LayerSharedPtr _parent,
             Ent::Subschema const* _schema,
             char const* _filename,
             nlohmann::json* _doc);
         void _init(
-            EntityLib* _entityLib, Layer* _parent, Ent::Subschema const* _schema, char const* _filename);
+            EntityLib* _entityLib,
+            LayerSharedPtr _parent,
+            Ent::Subschema const* _schema,
+            char const* _filename);
         void _init(
             EntityLib* _entityLib,
-            Layer* _parent,
+            LayerSharedPtr _parent,
             Ent::Subschema const* _schema,
             char const* _filename,
             nlohmann::json* _doc);
@@ -188,7 +195,8 @@ namespace Ent
         std::optional<FileCursor> defaultStorage; ///< Used to explore the defalt value in the schema
         size_t m_arraySize = 0;
         FileCursor m_instance;
-        Layer* m_parent = nullptr;
+        LayerSharedPtr m_parent;
+        DeleteCheck m_deleteCheck;
     };
 
     inline Layer* Layer::getPrefab()
@@ -197,12 +205,6 @@ namespace Ent
     }
 
     constexpr size_t const DeletedLayer = 0x4AB7A80FFB4CD540;
-
-    inline Layer ::~Layer()
-    {
-        m_parent = (Layer*)DeletedLayer;
-    }
-
     /// \cond PRIVATE
     void destroyAndFree(Layer* ptr); ///< Internally used by the Node memory Pool
     /// \endcond

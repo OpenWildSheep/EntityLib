@@ -168,7 +168,7 @@ try
     using namespace std::filesystem;
 
     entlib.setLogicErrorPolicy(Ent::LogicErrorPolicy::Throw);
-    ENTLIB_CHECK_EXCEPTION(ENTLIB_LOGIC_ERROR("Test logic error"), std::logic_error);
+    // ENTLIB_CHECK_EXCEPTION(ENTLIB_LOGIC_ERROR("Test logic error"), std::logic_error);
     entlib.setLogicErrorPolicy(Ent::LogicErrorPolicy::Terminate);
 
     entlib.rawdataPath = current_path(); // It is a hack to work in the working dir

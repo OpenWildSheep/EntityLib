@@ -9,7 +9,6 @@ namespace Ent
     /// Deep copy from a Node to an empty Node
     class CopyToEmptyNode : public RecursiveVisitor
     {
-        Layer* m_root = nullptr;
         std::vector<LayerSharedPtr> m_dest;
 
         void push(LayerSharedPtr _layer)
@@ -24,19 +23,12 @@ namespace Ent
 
         Layer& back()
         {
-            if (m_dest.empty())
-            {
-                return *m_root;
-            }
-            else
-            {
-                return *m_dest.back();
-            }
+            return *m_dest.back();
         }
 
     public:
-        CopyToEmptyNode(Layer& _dest)
-            : m_root(&_dest)
+        CopyToEmptyNode(LayerSharedPtr _dest)
+            : m_dest({std::move(_dest)})
         {
         }
         void inObject([[maybe_unused]] Layer& m_source) override

@@ -101,7 +101,7 @@ namespace Ent
     {
         if (_other.prefab != nullptr)
         {
-            prefab = m_entityLib->newLayer(*_other.prefab);
+            prefab = _other.prefab;
         }
     }
 
@@ -114,7 +114,7 @@ namespace Ent
 
     Layer::Layer(
         EntityLib* _entityLib,
-        Layer* _parent,
+        LayerSharedPtr _parent,
         Ent::Subschema const* _schema,
         char const* _filename,
         nlohmann::json* _doc)
@@ -122,15 +122,24 @@ namespace Ent
         _init(_entityLib, _parent, _schema, _filename, _doc);
     }
 
+    Layer::~Layer()
+    {
+        ENTLIB_ASSERT_NOTHROW(m_deleteCheck.state_ == DeleteCheck::State::VALID);
+        m_parent.reset();
+        prefab.reset();
+    }
+
     void Layer::_init(
         EntityLib* _entityLib,
-        Layer* _parent,
+        LayerSharedPtr _parent,
         Ent::Subschema const* _schema,
         char const* _filename,
         nlohmann::json* _doc)
     {
         if (_doc == nullptr)
+        {
             _doc = &_entityLib->readJsonFile(_filename);
+        }
         ENTLIB_ASSERT(_schema != nullptr);
         m_entityLib = _entityLib;
         m_parent = _parent;
@@ -143,13 +152,19 @@ namespace Ent
     }
 
     void Layer::_init(
-        EntityLib* _entityLib, Layer* _parent, Ent::Subschema const* _schema, char const* _filename)
+        EntityLib* _entityLib,
+        LayerSharedPtr _parent,
+        Ent::Subschema const* _schema,
+        char const* _filename)
     {
         _init(_entityLib, _parent, _schema, _filename, &_entityLib->readJsonFile(_filename));
     }
 
     Layer::Layer(
-        EntityLib* _entityLib, Layer* _parent, Ent::Subschema const* _schema, char const* _filename)
+        EntityLib* _entityLib,
+        LayerSharedPtr _parent,
+        Ent::Subschema const* _schema,
+        char const* _filename)
     {
         _init(_entityLib, _parent, _schema, _filename, &_entityLib->readJsonFile(_filename));
     }
@@ -185,15 +200,7 @@ namespace Ent
                 if (auto const& prefabPath = member->get_ref<std::string const&>();
                     not prefabPath.empty())
                 {
-                    if (prefab == nullptr)
-                    {
-                        prefab =
-                            m_entityLib->newLayer(this, subschema, prefabPath.c_str(), nullptr);
-                    }
-                    else
-                    {
-                        prefab->_init(m_entityLib, this, subschema, prefabPath.c_str());
-                    }
+                    prefab = m_entityLib->newLayer(nullptr, subschema, prefabPath.c_str(), nullptr);
                 }
                 return true;
             }
@@ -212,7 +219,7 @@ namespace Ent
             or lastLayer.getDefault()->getSchema()->type == Ent::DataType::object);
         newLayer->m_instance = lastLayer.m_instance.enterObjectField(_field, _fieldRef);
         newLayer->m_entityLib = m_entityLib;
-        newLayer->m_parent = this;
+        newLayer->m_parent = shared_from_this();
         auto* subschema = newLayer->getSchema();
         if (not newLayer->_loadInstanceOf())
         {
@@ -299,7 +306,7 @@ namespace Ent
         auto& lastLayer = *this;
         newLayer.m_entityLib = m_entityLib;
         newLayer.m_instance = _enter(lastLayer.m_instance);
-        newLayer.m_parent = this;
+        newLayer.m_parent = shared_from_this();
         auto* subschema = newLayer.getSchema();
         auto* defaultVal = lastLayer.getDefault();
         if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
@@ -359,7 +366,7 @@ namespace Ent
         auto& lastLayer = *this;
         ENTLIB_DBG_ASSERT(lastLayer.m_instance.getSchema()->type == Ent::DataType::array);
         newLayer.m_instance = lastLayer.m_instance.enterArrayItem(_index);
-        newLayer.m_parent = this;
+        newLayer.m_parent = shared_from_this();
         auto* subschema = newLayer.getSchema();
         if (not isDefault())
         {
@@ -422,15 +429,7 @@ namespace Ent
         auto& lastLayer = *this;
         if (strlen(_instanceOf) != 0)
         {
-            if (lastLayer.prefab == nullptr)
-            {
-                lastLayer.prefab = m_entityLib->newLayer();
-                *lastLayer.prefab = Layer(m_entityLib, &lastLayer, getSchema(), _instanceOf);
-            }
-            else
-            {
-                lastLayer.prefab->_init(m_entityLib, &lastLayer, getSchema(), _instanceOf);
-            }
+            lastLayer.prefab = m_entityLib->newLayer(nullptr, getSchema(), _instanceOf, nullptr);
         }
         else
         {
@@ -921,7 +920,7 @@ namespace Ent
     {
         _checkInvariants();
         std::vector<Layer*> allLayers;
-        for (Layer* iter = this; iter != nullptr; iter = iter->m_parent)
+        for (Layer* iter = this; iter != nullptr; iter = iter->m_parent.get())
         {
             ENTLIB_ASSERT(iter != (Layer*)DeletedLayer);
             allLayers.push_back(iter);
@@ -1043,7 +1042,7 @@ namespace Ent
         return m_instance.getSchema();
     }
 
-    void destroyAndFree(Layer* ptr)
+    void destroyAndFree([[maybe_unused]] Layer* ptr)
     {
         auto& pool = ptr->m_entityLib->layerPool;
         ptr->~Layer();

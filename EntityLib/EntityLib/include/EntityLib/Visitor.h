@@ -89,8 +89,7 @@ namespace Ent
         {
         }
         /// Called when entering in the element of a set of union
-        virtual void
-        inUnionSetElement([[maybe_unused]] Handler& expl, [[maybe_unused]] char const* _type)
+        virtual void inUnionSetElement([[maybe_unused]] Handler& expl, [[maybe_unused]] char const* _type)
         {
         }
         /// Called when exiting the element of a set of union
@@ -110,8 +109,7 @@ namespace Ent
         {
         }
         /// Called when entering in the child of a set of object
-        virtual void
-        inObjectSetElement([[maybe_unused]] Handler& expl, [[maybe_unused]] char const* _key)
+        virtual void inObjectSetElement([[maybe_unused]] Handler& expl, [[maybe_unused]] char const* _key)
         {
         }
         /// Called when entering in the child of a set of object

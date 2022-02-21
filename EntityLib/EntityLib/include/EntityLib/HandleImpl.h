@@ -16,43 +16,36 @@ namespace Ent
 {
     class EntityLib;
 
-    constexpr size_t const DeletedLayer = 0x4AB7A80FFB4CD540;
-
-    /// \cond PRIVATE
-    void destroyAndFree(HandlerImpl* ptr); ///< Internally used by the Node memory Pool
-    /// \endcond
+    struct Cursor;
 
     struct DecRef
     {
-        template <typename T>
-        void operator()(T* ptr)
+        template <typename C>
+        void operator()(C* _cursorPtr)
         {
-            decRef(ptr);
+            decRef(_cursorPtr);
         }
     };
 
-    using HandlerImplPtr = std::unique_ptr<HandlerImpl, DecRef>;
+    using HandlerImplPtr = std::unique_ptr<Cursor, DecRef>;
 
-    /// A HandlerImpl is a level in the tree hierarchy.
-    /// When enter, a layer is added.
-    /// When exit, a layer is popped.
-    struct ENTLIB_DLLEXPORT HandlerImpl // : std::enable_shared_from_this<HandlerImpl>
+    struct ENTLIB_DLLEXPORT Cursor
     {
     public:
         using Key = std::variant<std::string, size_t>;
 
-        HandlerImpl() = default;
-        ~HandlerImpl();
-        HandlerImpl(HandlerImpl const&) = delete;
-        HandlerImpl(HandlerImpl&&) = delete;
-        HandlerImpl& operator=(HandlerImpl const&) = delete;
-        HandlerImpl& operator=(HandlerImpl&&) = delete;
-        HandlerImpl(
+        Cursor() = default;
+        ~Cursor();
+        Cursor(Cursor const&) = delete;
+        Cursor(Cursor&&) = delete;
+        Cursor& operator=(Cursor const&) = delete;
+        Cursor& operator=(Cursor&&) = delete;
+        Cursor(
             EntityLib* _entityLib,
             HandlerImplPtr _parent,
             Ent::Subschema const* _schema,
             char const* _filename);
-        HandlerImpl(
+        Cursor(
             EntityLib* _entityLib,
             HandlerImplPtr _parent,
             Ent::Subschema const* _schema,
@@ -193,11 +186,11 @@ namespace Ent
             return HandlerImplPtr(this);
         }
 
-        HandlerImpl* getPrefab(); ///< Get the Cursor of the prefab
+        Cursor* getPrefab(); ///< Get the Cursor of the prefab
         nlohmann::json const* getRawJson(); ///< Get the underlying json node of the instance
 
     private:
-        friend void decRef(HandlerImpl* self);
+        friend void decRef(Cursor* self);
 
         template <typename E>
         [[nodiscard]] HandlerImplPtr _enterItem(E&& _enter);
@@ -220,7 +213,9 @@ namespace Ent
         DeleteCheck m_deleteCheck;
     };
 
-    inline HandlerImpl* HandlerImpl::getPrefab()
+    using HandlerImpl = Cursor;
+
+    inline Cursor* Cursor::getPrefab()
     {
         return prefab.get();
     }

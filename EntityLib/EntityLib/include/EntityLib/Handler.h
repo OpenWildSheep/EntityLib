@@ -31,7 +31,7 @@ namespace Ent
         }
         Handler(EntityLib* _entityLib, Ent::Subschema const* _schema, char const* _filename)
         {
-            m_self = _entityLib->newLayer(nullptr, _schema, _filename, nullptr);
+            m_self = _entityLib->newHandler(nullptr, _schema, _filename, nullptr);
         }
         Handler(
             EntityLib* _entityLib,
@@ -39,7 +39,7 @@ namespace Ent
             char const* _filename,
             nlohmann::json* _doc)
         {
-            m_self = _entityLib->newLayer(nullptr, _schema, _filename, _doc);
+            m_self = _entityLib->newHandler(nullptr, _schema, _filename, _doc);
         }
         ~Handler()
         {
@@ -343,7 +343,7 @@ namespace Ent
             return m_self->getPrefab() != nullptr;
         }
 
-        Handler getPrefab() ///< Get the Cursor of the prefab
+        Handler getPrefab() ///< Get the HandlerImpl of the prefab
         {
             if (auto prefab = m_self->getPrefab())
             {

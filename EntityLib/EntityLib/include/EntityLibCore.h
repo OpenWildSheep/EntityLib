@@ -539,17 +539,6 @@ namespace Ent
     };
     using NodeUniquePtr = std::unique_ptr<Node, NodeDeleter>;
 
-    struct HandlerImpl;
-    struct LayerDeleter
-    {
-        template <typename T>
-        void operator()(T* ptr) const
-        {
-            destroyAndFree(ptr);
-        }
-    };
-    // using HandlerImpl* = std::shared_ptr<HandlerImpl>;
-
     /// @brief Path to found a Node, from an other Node.
     ///
     /// Token are separated by slashes.

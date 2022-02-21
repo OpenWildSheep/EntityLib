@@ -42,7 +42,7 @@ namespace Ent
     {
     public:
         mutable Pool<Node> nodePool;
-        mutable Pool<HandlerImpl> layerPool;
+        mutable Pool<Cursor> layerPool;
         /// @todo Make public attribute private?
         std::filesystem::path rootPath; ///< Path to the perforce root (X:/)
         std::filesystem::path rawdataPath; ///< Path to the RawData dir in the perforce root (X:/RawData)
@@ -114,8 +114,8 @@ namespace Ent
 
         NodeUniquePtr newNode(Node::Value val, Subschema const* _subschema) const;
 
-        HandlerImplPtr newLayer();
-        HandlerImplPtr newLayer(
+        HandlerImplPtr newHandler();
+        HandlerImplPtr newHandler(
             HandlerImplPtr _parent,
             Ent::Subschema const* _schema,
             char const* _filename,

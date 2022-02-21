@@ -8,8 +8,8 @@
 
 #include <EntityLib/Visitor.h>
 #include <EntityLib/CopyNode.h>
-#include <EntityLib/Cursor.h>
-#include <EntityLib/HandlerRW.h>
+#include <EntityLib/HandleImpl.h>
+#include <EntityLib/Handler.h>
 
 using namespace Ent;
 
@@ -27,143 +27,143 @@ public:
     {
     }
 
-    void inObject([[maybe_unused]] HandlerRW& _expl) override
+    void inObject([[maybe_unused]] Handler& _expl) override
     {
         ++tab;
     }
-    bool inObjectField([[maybe_unused]] HandlerRW& _expl, char const* key) override
+    bool inObjectField([[maybe_unused]] Handler& _expl, char const* key) override
     {
         // std::cout << "dksflghjdfjg" << getTab() << '"' << key << "\": " << std::endl;
         std::cout << getTab() << '"' << key << "\": " << std::endl;
         ++tab;
         return true;
     }
-    void outObjectField([[maybe_unused]] HandlerRW& _expl, [[maybe_unused]] char const* _key) override
+    void outObjectField([[maybe_unused]] Handler& _expl, [[maybe_unused]] char const* _key) override
     {
         --tab;
     }
-    void outObject([[maybe_unused]] HandlerRW& _expl) override
+    void outObject([[maybe_unused]] Handler& _expl) override
     {
         --tab;
     }
-    void inUnion([[maybe_unused]] HandlerRW& _expl, char const* type) override
+    void inUnion([[maybe_unused]] Handler& _expl, char const* type) override
     {
         std::cout << getTab() << '"' << type << "\": " << std::endl;
         ++tab;
     }
-    void outUnion([[maybe_unused]] HandlerRW& _expl) override
+    void outUnion([[maybe_unused]] Handler& _expl) override
     {
         --tab;
     }
-    void inMap([[maybe_unused]] HandlerRW& _expl) override
+    void inMap([[maybe_unused]] Handler& _expl) override
     {
         ++tab;
     }
-    void outMap([[maybe_unused]] HandlerRW& _expl) override
+    void outMap([[maybe_unused]] Handler& _expl) override
     {
         --tab;
     }
-    void inMapElement([[maybe_unused]] HandlerRW& _expl, char const* key) override
+    void inMapElement([[maybe_unused]] Handler& _expl, char const* key) override
     {
         ++tab;
         std::cout << getTab() << '"' << key << "\": " << std::endl;
     }
-    void inMapElement([[maybe_unused]] HandlerRW& _expl, int64_t key) override
+    void inMapElement([[maybe_unused]] Handler& _expl, int64_t key) override
     {
         ++tab;
         std::cout << getTab() << key << ": " << std::endl;
     }
-    void outMapElement([[maybe_unused]] HandlerRW& _expl) override
+    void outMapElement([[maybe_unused]] Handler& _expl) override
     {
         --tab;
     }
-    void inPrimSet([[maybe_unused]] HandlerRW& _expl, Ent::DataType) override
+    void inPrimSet([[maybe_unused]] Handler& _expl, Ent::DataType) override
     {
         ++tab;
     }
-    void inArrayElement([[maybe_unused]] HandlerRW& _expl, size_t) override
+    void inArrayElement([[maybe_unused]] Handler& _expl, size_t) override
     {
     }
-    void outArrayElement([[maybe_unused]] HandlerRW& _expl) override
+    void outArrayElement([[maybe_unused]] Handler& _expl) override
     {
     }
-    void key([[maybe_unused]] HandlerRW& _expl, char const* _key) override
+    void key([[maybe_unused]] Handler& _expl, char const* _key) override
     {
         std::cout << getTab() << '"' << _key << '"' << std::endl;
     }
-    void key([[maybe_unused]] HandlerRW& _expl, int64_t _key) override
+    void key([[maybe_unused]] Handler& _expl, int64_t _key) override
     {
         std::cout << getTab() << _key << std::endl;
     }
-    void outPrimSet([[maybe_unused]] HandlerRW& _expl) override
+    void outPrimSet([[maybe_unused]] Handler& _expl) override
     {
         --tab;
     }
-    void inUnionSet([[maybe_unused]] HandlerRW& _expl) override
+    void inUnionSet([[maybe_unused]] Handler& _expl) override
     {
         ++tab;
     }
-    void inUnionSetElement([[maybe_unused]] HandlerRW& _expl, char const* key) override
+    void inUnionSetElement([[maybe_unused]] Handler& _expl, char const* key) override
     {
         std::cout << getTab() << '"' << key << '"' << std::endl;
         ++tab;
     }
-    void outUnionSetElement([[maybe_unused]] HandlerRW& _expl) override
+    void outUnionSetElement([[maybe_unused]] Handler& _expl) override
     {
         --tab;
     }
-    void outUnionSet([[maybe_unused]] HandlerRW& _expl) override
+    void outUnionSet([[maybe_unused]] Handler& _expl) override
     {
         --tab;
     }
-    void inObjectSet([[maybe_unused]] HandlerRW& _expl) override
+    void inObjectSet([[maybe_unused]] Handler& _expl) override
     {
         ++tab;
     }
-    void outObjectSet([[maybe_unused]] HandlerRW& _expl) override
+    void outObjectSet([[maybe_unused]] Handler& _expl) override
     {
         --tab;
     }
-    void inObjectSetElement([[maybe_unused]] HandlerRW& _expl, char const* key) override
+    void inObjectSetElement([[maybe_unused]] Handler& _expl, char const* key) override
     {
         std::cout << getTab() << '"' << key << '"' << std::endl;
     }
-    void inObjectSetElement([[maybe_unused]] HandlerRW& _expl, int64_t key) override
+    void inObjectSetElement([[maybe_unused]] Handler& _expl, int64_t key) override
     {
         std::cout << getTab() << key << std::endl;
     }
-    void outObjectSetElement([[maybe_unused]] HandlerRW& _expl) override
+    void outObjectSetElement([[maybe_unused]] Handler& _expl) override
     {
     }
-    void inArray([[maybe_unused]] HandlerRW& _expl) override
+    void inArray([[maybe_unused]] Handler& _expl) override
     {
         ++tab;
     }
-    void outArray([[maybe_unused]] HandlerRW& _expl) override
+    void outArray([[maybe_unused]] Handler& _expl) override
     {
         --tab;
     }
-    void nullNode([[maybe_unused]] HandlerRW& _expl) override
+    void nullNode([[maybe_unused]] Handler& _expl) override
     {
         std::cout << getTab() << "null" << std ::endl;
     }
-    void boolNode([[maybe_unused]] HandlerRW& _expl) override
+    void boolNode([[maybe_unused]] Handler& _expl) override
     {
         std::cout << getTab() << _expl.getBool() << std::endl;
     }
-    void intNode([[maybe_unused]] HandlerRW& _expl) override
+    void intNode([[maybe_unused]] Handler& _expl) override
     {
         std::cout << getTab() << _expl.getInt() << std::endl;
     }
-    void floatNode([[maybe_unused]] HandlerRW& _expl) override
+    void floatNode([[maybe_unused]] Handler& _expl) override
     {
         std::cout << getTab() << _expl.getFloat() << std::endl;
     }
-    void stringNode([[maybe_unused]] HandlerRW& _expl) override
+    void stringNode([[maybe_unused]] Handler& _expl) override
     {
         std::cout << getTab() << '"' << _expl.getString() << '"' << std::endl;
     }
-    void entityRefNode([[maybe_unused]] HandlerRW& _expl) override
+    void entityRefNode([[maybe_unused]] Handler& _expl) override
     {
         std::cout << getTab() << '"' << _expl.getEntityRef().entityPath.c_str() << '"' << std::endl;
     }
@@ -178,24 +178,24 @@ public:
         : nodes({n})
     {
     }
-    void inObject([[maybe_unused]] HandlerRW& expl) override
+    void inObject([[maybe_unused]] Handler& expl) override
     {
         // ENTLIB_ASSERT(nodes.back()->getFieldNames().size() == expl.get);
     }
-    bool inObjectField([[maybe_unused]] HandlerRW& expl, char const* key) override
+    bool inObjectField([[maybe_unused]] Handler& expl, char const* key) override
     {
         nodes.push_back(nodes.back()->at(key));
         ENTLIB_ASSERT(nodes.back() != nullptr);
         return true;
     }
-    void outObjectField([[maybe_unused]] HandlerRW& expl, [[maybe_unused]] char const* _key) override
+    void outObjectField([[maybe_unused]] Handler& expl, [[maybe_unused]] char const* _key) override
     {
         nodes.pop_back();
     }
-    void outObject([[maybe_unused]] HandlerRW& expl) override
+    void outObject([[maybe_unused]] Handler& expl) override
     {
     }
-    void inUnion([[maybe_unused]] HandlerRW& expl, char const*) override
+    void inUnion([[maybe_unused]] Handler& expl, char const*) override
     {
         //ENTLIB_ASSERT(strcmp(expl.getUnionType(), nodes.back()->getUnionType()) == 0);
         //ENTLIB_ASSERT(strcmp(nodes.back()->getUnionType(), type) == 0);
@@ -211,11 +211,11 @@ public:
         //expl.exit();
         ENTLIB_ASSERT(nodes.back() != nullptr);
     }
-    void outUnion([[maybe_unused]] HandlerRW& expl) override
+    void outUnion([[maybe_unused]] Handler& expl) override
     {
         nodes.pop_back();
     }
-    void inMap(HandlerRW& expl) override
+    void inMap(Handler& expl) override
     {
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         switch (expl.getMapKeyType())
@@ -233,24 +233,24 @@ public:
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
-    void outMap([[maybe_unused]] HandlerRW& expl) override
+    void outMap([[maybe_unused]] Handler& expl) override
     {
     }
-    void inMapElement([[maybe_unused]] HandlerRW& expl, char const* key) override
-    {
-        nodes.push_back(nodes.back()->mapGet(key));
-        ENTLIB_ASSERT(nodes.back() != nullptr);
-    }
-    void inMapElement([[maybe_unused]] HandlerRW& expl, int64_t key) override
+    void inMapElement([[maybe_unused]] Handler& expl, char const* key) override
     {
         nodes.push_back(nodes.back()->mapGet(key));
         ENTLIB_ASSERT(nodes.back() != nullptr);
     }
-    void outMapElement([[maybe_unused]] HandlerRW& expl) override
+    void inMapElement([[maybe_unused]] Handler& expl, int64_t key) override
+    {
+        nodes.push_back(nodes.back()->mapGet(key));
+        ENTLIB_ASSERT(nodes.back() != nullptr);
+    }
+    void outMapElement([[maybe_unused]] Handler& expl) override
     {
         nodes.pop_back();
     }
-    void inPrimSet(HandlerRW& expl, Ent::DataType) override
+    void inPrimSet(Handler& expl, Ent::DataType) override
     {
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         auto& itemType = expl.getSchema()->singularItems.get()->get();
@@ -265,27 +265,27 @@ public:
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
-    void inArrayElement([[maybe_unused]] HandlerRW& expl, size_t i) override
+    void inArrayElement([[maybe_unused]] Handler& expl, size_t i) override
     {
         nodes.push_back(nodes.back()->at(i));
         ENTLIB_ASSERT(nodes.back() != nullptr);
     }
-    void outArrayElement([[maybe_unused]] HandlerRW& expl) override
+    void outArrayElement([[maybe_unused]] Handler& expl) override
     {
         nodes.pop_back();
     }
-    void key([[maybe_unused]] HandlerRW& expl, char const* key) override
+    void key([[maybe_unused]] Handler& expl, char const* key) override
     {
         ENTLIB_ASSERT(nodes.back()->mapGet(key) != nullptr);
     }
-    void key([[maybe_unused]] HandlerRW& expl, int64_t key) override
+    void key([[maybe_unused]] Handler& expl, int64_t key) override
     {
         ENTLIB_ASSERT(nodes.back()->mapGet(key) != nullptr);
     }
-    void outPrimSet([[maybe_unused]] HandlerRW& expl) override
+    void outPrimSet([[maybe_unused]] Handler& expl) override
     {
     }
-    void inUnionSet(HandlerRW& expl) override
+    void inUnionSet(Handler& expl) override
     {
         auto a = nodes.back()->getKeysString();
         auto b = expl.getUnionSetKeysString();
@@ -293,21 +293,21 @@ public:
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         ENTLIB_ASSERT(nodes.back()->getSchema() == expl.getSchema());
     }
-    void inUnionSetElement([[maybe_unused]] HandlerRW& expl, char const* type) override
+    void inUnionSetElement([[maybe_unused]] Handler& expl, char const* type) override
     {
         auto union_ = nodes.back()->mapGet(type);
         ENTLIB_ASSERT(union_ != nullptr);
         nodes.push_back(union_->getUnionData());
         ENTLIB_ASSERT(nodes.back() != nullptr);
     }
-    void outUnionSetElement([[maybe_unused]] HandlerRW& expl) override
+    void outUnionSetElement([[maybe_unused]] Handler& expl) override
     {
         nodes.pop_back();
     }
-    void outUnionSet([[maybe_unused]] HandlerRW& expl) override
+    void outUnionSet([[maybe_unused]] Handler& expl) override
     {
     }
-    void inObjectSet(HandlerRW& expl) override
+    void inObjectSet(Handler& expl) override
     {
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         switch (nodes.back()->getKeyType())
@@ -323,24 +323,24 @@ public:
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
-    void outObjectSet([[maybe_unused]] HandlerRW& expl) override
+    void outObjectSet([[maybe_unused]] Handler& expl) override
     {
     }
-    void inObjectSetElement([[maybe_unused]] HandlerRW& expl, char const* key) override
-    {
-        nodes.push_back(nodes.back()->mapGet(key));
-        ENTLIB_ASSERT(nodes.back() != nullptr);
-    }
-    void inObjectSetElement([[maybe_unused]] HandlerRW& expl, int64_t key) override
+    void inObjectSetElement([[maybe_unused]] Handler& expl, char const* key) override
     {
         nodes.push_back(nodes.back()->mapGet(key));
         ENTLIB_ASSERT(nodes.back() != nullptr);
     }
-    void outObjectSetElement([[maybe_unused]] HandlerRW& expl) override
+    void inObjectSetElement([[maybe_unused]] Handler& expl, int64_t key) override
+    {
+        nodes.push_back(nodes.back()->mapGet(key));
+        ENTLIB_ASSERT(nodes.back() != nullptr);
+    }
+    void outObjectSetElement([[maybe_unused]] Handler& expl) override
     {
         nodes.pop_back();
     }
-    void inArray(HandlerRW& expl) override
+    void inArray(Handler& expl) override
     {
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         if (nodes.back()->size() != expl.size())
@@ -349,27 +349,27 @@ public:
         }
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
     }
-    void outArray([[maybe_unused]] HandlerRW& expl) override
+    void outArray([[maybe_unused]] Handler& expl) override
     {
     }
-    void nullNode([[maybe_unused]] HandlerRW& expl) override
+    void nullNode([[maybe_unused]] Handler& expl) override
     {
     }
-    void boolNode(HandlerRW& expl) override
+    void boolNode(Handler& expl) override
     {
         // std::cout << elt.getBool() << " " << nodes.back()->getBool() << std::endl;
         ENTLIB_ASSERT(expl.getBool() == nodes.back()->getBool());
     }
-    void intNode(HandlerRW& expl) override
+    void intNode(Handler& expl) override
     {
-        // std::cout << elt.getInt() << " " << nodes.back()->getInt() << std::endl;
         if (expl.getInt() != nodes.back()->getInt())
         {
+            std::cout << expl.getInt() << " " << nodes.back()->getInt() << std::endl;
             expl.getInt();
         }
         ENTLIB_ASSERT(expl.getInt() == nodes.back()->getInt());
     }
-    void floatNode(HandlerRW& expl) override
+    void floatNode(Handler& expl) override
     {
         // std::cout << elt.getFloat() << " " << nodes.back().getFloat() << std::endl;
         if (fabs(expl.getFloat() - nodes.back()->getFloat()) >= FLT_EPSILON)
@@ -378,7 +378,7 @@ public:
         }
         // ENTLIB_ASSERT(fabs(elt.getFloat() - nodes.back().getFloat()) < FLT_EPSILON);
     }
-    void stringNode(HandlerRW& expl) override
+    void stringNode(Handler& expl) override
     {
         if (strcmp(expl.getString(), nodes.back()->getString()) != 0)
         {
@@ -387,7 +387,7 @@ public:
         }
         ENTLIB_ASSERT(strcmp(expl.getString(), nodes.back()->getString()) == 0);
     }
-    void entityRefNode(HandlerRW& expl) override
+    void entityRefNode(Handler& expl) override
     {
         //std::cout << elt.getEntityRef().entityPath.c_str() << " "
         //          << nodes.back()->getEntityRef().entityPath.c_str() << std::endl;
@@ -397,10 +397,10 @@ public:
 
 class CompareCursor : public RecursiveVisitor
 {
-    HandlerRW* m_root = nullptr;
-    std::vector<HandlerRW> expl2;
+    Handler* m_root = nullptr;
+    std::vector<Handler> expl2;
 
-    void push(HandlerRW _layer)
+    void push(Handler _layer)
     {
         expl2.push_back(std::move(_layer));
     }
@@ -408,7 +408,7 @@ class CompareCursor : public RecursiveVisitor
     {
         expl2.pop_back();
     }
-    HandlerRW& back()
+    Handler& back()
     {
         if (expl2.empty())
         {
@@ -421,16 +421,16 @@ class CompareCursor : public RecursiveVisitor
     }
 
 public:
-    CompareCursor(HandlerRW& _expl2)
+    CompareCursor(Handler& _expl2)
         : m_root(&_expl2)
     {
     }
-    void inObject([[maybe_unused]] HandlerRW& expl) override
+    void inObject([[maybe_unused]] Handler& expl) override
     {
-        if (expl.getPrefab())
+        if (expl.hasPrefab())
         {
-            ENTLIB_ASSERT(back().getPrefab());
-            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == back().getPrefab()->_getRawJson());
+            ENTLIB_ASSERT(back().hasPrefab());
+            ENTLIB_ASSERT(expl.getPrefab()._getRawJson() == back().getPrefab()._getRawJson());
         }
         auto a = expl.getInstanceOf();
         auto b = back().getInstanceOf();
@@ -438,29 +438,29 @@ public:
             (a == nullptr and b == nullptr)
             or (a != nullptr and b != nullptr and a == std::string_view(b)));
     }
-    bool inObjectField([[maybe_unused]] HandlerRW& expl, char const* key) override
+    bool inObjectField([[maybe_unused]] Handler& expl, char const* key) override
     {
         expl2.push_back(back().enterObjectField(key));
-        if (expl.getPrefab())
+        if (expl.hasPrefab())
         {
-            ENTLIB_ASSERT(back().getPrefab());
-            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == back().getPrefab()->_getRawJson());
+            ENTLIB_ASSERT(back().hasPrefab());
+            ENTLIB_ASSERT(expl.getPrefab()._getRawJson() == back().getPrefab()._getRawJson());
         }
         return true;
     }
-    void outObjectField([[maybe_unused]] HandlerRW& expl, [[maybe_unused]] char const* _key) override
+    void outObjectField([[maybe_unused]] Handler& expl, [[maybe_unused]] char const* _key) override
     {
         expl2.pop_back();
     }
-    void inUnion([[maybe_unused]] HandlerRW& expl, char const* _type) override
+    void inUnion([[maybe_unused]] Handler& expl, char const* _type) override
     {
         expl2.push_back(back().enterUnionData(_type));
     }
-    void outUnion([[maybe_unused]] HandlerRW& expl) override
+    void outUnion([[maybe_unused]] Handler& expl) override
     {
         expl2.pop_back();
     }
-    void inMap([[maybe_unused]] HandlerRW& expl) override
+    void inMap([[maybe_unused]] Handler& expl) override
     {
         ENTLIB_ASSERT(back().size() == expl.size());
         switch (expl.getMapKeyType())
@@ -474,19 +474,19 @@ public:
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
-    void inMapElement([[maybe_unused]] HandlerRW& expl, char const* _key) override
+    void inMapElement([[maybe_unused]] Handler& expl, char const* _key) override
     {
         expl2.push_back(back().enterMapItem(_key));
     }
-    void inMapElement([[maybe_unused]] HandlerRW& expl, int64_t _key) override
+    void inMapElement([[maybe_unused]] Handler& expl, int64_t _key) override
     {
         expl2.push_back(back().enterMapItem(_key));
     }
-    void outMapElement([[maybe_unused]] HandlerRW& expl) override
+    void outMapElement([[maybe_unused]] Handler& expl) override
     {
         expl2.pop_back();
     }
-    void inPrimSet([[maybe_unused]] HandlerRW& expl, Ent::DataType) override
+    void inPrimSet([[maybe_unused]] Handler& expl, Ent::DataType) override
     {
         ENTLIB_ASSERT(back().size() == expl.size());
         auto& itemType = expl.getSchema()->singularItems.get()->get();
@@ -501,20 +501,20 @@ public:
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
-    void inArrayElement([[maybe_unused]] HandlerRW& expl, size_t i) override
+    void inArrayElement([[maybe_unused]] Handler& expl, size_t i) override
     {
         expl2.push_back(back().enterArrayItem(i));
     }
-    void outArrayElement([[maybe_unused]] HandlerRW& expl) override
+    void outArrayElement([[maybe_unused]] Handler& expl) override
     {
         expl2.pop_back();
     }
-    void inUnionSet([[maybe_unused]] HandlerRW& expl) override
+    void inUnionSet([[maybe_unused]] Handler& expl) override
     {
-        if (expl.getPrefab())
+        if (expl.hasPrefab())
         {
-            ENTLIB_ASSERT(back().getPrefab());
-            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == back().getPrefab()->_getRawJson());
+            ENTLIB_ASSERT(back().hasPrefab());
+            ENTLIB_ASSERT(expl.getPrefab()._getRawJson() == back().getPrefab()._getRawJson());
         }
         auto a = back().getUnionSetKeysString();
         auto b = expl.getUnionSetKeysString();
@@ -525,20 +525,20 @@ public:
             ENTLIB_ASSERT(b.at(name) == type);
         }
     }
-    void inUnionSetElement([[maybe_unused]] HandlerRW& expl, char const* _type) override
+    void inUnionSetElement([[maybe_unused]] Handler& expl, char const* _type) override
     {
         expl2.push_back(back().enterUnionSetItem(_type));
     }
-    void outUnionSetElement([[maybe_unused]] HandlerRW& expl) override
+    void outUnionSetElement([[maybe_unused]] Handler& expl) override
     {
         expl2.pop_back();
     }
-    void inObjectSet([[maybe_unused]] HandlerRW& expl) override
+    void inObjectSet([[maybe_unused]] Handler& expl) override
     {
-        if (expl.getPrefab())
+        if (expl.hasPrefab())
         {
-            ENTLIB_ASSERT(back().getPrefab());
-            ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == back().getPrefab()->_getRawJson());
+            ENTLIB_ASSERT(back().hasPrefab());
+            ENTLIB_ASSERT(expl.getPrefab()._getRawJson() == back().getPrefab()._getRawJson());
         }
         ENTLIB_ASSERT(back().size() == expl.size());
         switch (back().getObjectSetKeyType())
@@ -561,64 +561,64 @@ public:
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
-    void inObjectSetElement([[maybe_unused]] HandlerRW& expl, char const* _key) override
+    void inObjectSetElement([[maybe_unused]] Handler& expl, char const* _key) override
     {
         expl2.push_back(back().enterObjectSetItem(_key));
-        if (expl.getPrefab())
+        if (expl.hasPrefab())
         {
-            ENTLIB_ASSERT(back().getPrefab());
-            auto a = expl.getPrefab()->_getRawJson();
-            auto b = back().getPrefab()->_getRawJson();
+            ENTLIB_ASSERT(back().hasPrefab());
+            auto a = expl.getPrefab()._getRawJson();
+            auto b = back().getPrefab()._getRawJson();
             ENTLIB_ASSERT(a == b);
         }
     }
-    void inObjectSetElement([[maybe_unused]] HandlerRW& expl, int64_t _key) override
+    void inObjectSetElement([[maybe_unused]] Handler& expl, int64_t _key) override
     {
         expl2.push_back(back().enterObjectSetItem(_key));
     }
-    void outObjectSetElement([[maybe_unused]] HandlerRW& expl) override
+    void outObjectSetElement([[maybe_unused]] Handler& expl) override
     {
         expl2.pop_back();
     }
-    void inArray([[maybe_unused]] HandlerRW& expl) override
+    void inArray([[maybe_unused]] Handler& expl) override
     {
         ENTLIB_ASSERT(back().size() == expl.size());
     }
-    void nullNode([[maybe_unused]] HandlerRW& expl) override
+    void nullNode([[maybe_unused]] Handler& expl) override
     {
         ENTLIB_ASSERT(back().getDataType() == Ent::DataType::null);
     }
-    void boolNode([[maybe_unused]] HandlerRW& expl) override
+    void boolNode([[maybe_unused]] Handler& expl) override
     {
         ENTLIB_ASSERT(expl.isSet() == back().isSet());
         ENTLIB_ASSERT(expl.getBool() == back().getBool());
     }
-    void intNode([[maybe_unused]] HandlerRW& expl) override
+    void intNode([[maybe_unused]] Handler& expl) override
     {
         ENTLIB_ASSERT(expl.isSet() == back().isSet());
         ENTLIB_ASSERT(expl.getInt() == back().getInt());
     }
-    void floatNode([[maybe_unused]] HandlerRW& expl) override
+    void floatNode([[maybe_unused]] Handler& expl) override
     {
         ENTLIB_ASSERT(expl.isSet() == back().isSet());
         if (expl.getFloat() != back().getFloat())
         {
             std::cout << expl.isSet() << " " << back().isSet() << std::endl;
             std::cout << expl.getFloat() << " " << back().getFloat() << std::endl;
-            if (expl.getPrefab())
+            if (expl.hasPrefab())
             {
-                ENTLIB_ASSERT(back().getPrefab());
-                ENTLIB_ASSERT(expl.getPrefab()->_getRawJson() == back().getPrefab()->_getRawJson());
+                ENTLIB_ASSERT(back().hasPrefab());
+                ENTLIB_ASSERT(expl.getPrefab()._getRawJson() == back().getPrefab()._getRawJson());
             }
         }
         ENTLIB_ASSERT(expl.getFloat() == back().getFloat());
     }
-    void stringNode([[maybe_unused]] HandlerRW& expl) override
+    void stringNode([[maybe_unused]] Handler& expl) override
     {
         ENTLIB_ASSERT(expl.isSet() == back().isSet());
         ENTLIB_ASSERT(expl.getString() == std::string_view(back().getString()));
     }
-    void entityRefNode([[maybe_unused]] HandlerRW& expl) override
+    void entityRefNode([[maybe_unused]] Handler& expl) override
     {
         ENTLIB_ASSERT(expl.isSet() == back().isSet());
         ENTLIB_ASSERT(expl.getEntityRef() == back().getEntityRef());
@@ -630,35 +630,35 @@ class PrimitiveCounterVisitor : public RecursiveVisitor
 public:
     size_t primitiveCount = 0;
 
-    void key([[maybe_unused]] HandlerRW& _expl, char const*) override
+    void key([[maybe_unused]] Handler& _expl, char const*) override
     {
         ++primitiveCount;
     }
-    void key([[maybe_unused]] HandlerRW& _expl, int64_t) override
+    void key([[maybe_unused]] Handler& _expl, int64_t) override
     {
         ++primitiveCount;
     }
-    void nullNode([[maybe_unused]] HandlerRW& _expl) override
+    void nullNode([[maybe_unused]] Handler& _expl) override
     {
         ++primitiveCount;
     }
-    void boolNode([[maybe_unused]] HandlerRW& _expl) override
+    void boolNode([[maybe_unused]] Handler& _expl) override
     {
         ++primitiveCount;
     }
-    void intNode([[maybe_unused]] HandlerRW& _expl) override
+    void intNode([[maybe_unused]] Handler& _expl) override
     {
         ++primitiveCount;
     }
-    void floatNode([[maybe_unused]] HandlerRW& _expl) override
+    void floatNode([[maybe_unused]] Handler& _expl) override
     {
         ++primitiveCount;
     }
-    void stringNode([[maybe_unused]] HandlerRW& _expl) override
+    void stringNode([[maybe_unused]] Handler& _expl) override
     {
         ++primitiveCount;
     }
-    void entityRefNode([[maybe_unused]] HandlerRW& _expl) override
+    void entityRefNode([[maybe_unused]] Handler& _expl) override
     {
         ++primitiveCount;
     }
@@ -770,7 +770,7 @@ void testCursor(Ent::EntityLib& entlib)
 {
     {
         auto storage = nlohmann::json::object();
-        HandlerRW entity(&entlib, entlib.getEntitySchema(), nullptr, &storage);
+        Handler entity(&entlib, entlib.getEntitySchema(), nullptr, &storage);
         auto name = entity.enterObjectField("Name");
         name.setString("Debug Quick Creatures Switch");
     }
@@ -781,7 +781,7 @@ void testCursor(Ent::EntityLib& entlib)
         auto& d = entlib.readJsonFile("test.SeedPatch.node");
         auto& schema = d["$schema"].get_ref<nlohmann::json::string_t const&>();
         auto typeName = getRefTypeName(schema.c_str());
-        HandlerRW simpleObject(&entlib, entlib.getSchema(typeName), "test.SeedPatch.node", &d);
+        Handler simpleObject(&entlib, entlib.getSchema(typeName), "test.SeedPatch.node", &d);
         ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeX").getFloat() == 1.f);
         ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeY").getFloat() == 2.f);
     }
@@ -790,7 +790,7 @@ void testCursor(Ent::EntityLib& entlib)
         std::string filedata;
         std::getline(ifstr, filedata, char(0));
         auto& d = entlib.readJsonFile("test.SeedPatch.node");
-        HandlerRW simpleObject(
+        Handler simpleObject(
             &entlib,
             entlib.getSchema(getRefTypeName(d["$schema"].get_ref<std::string const&>().c_str())),
             "test.SeedPatch.node",
@@ -801,7 +801,7 @@ void testCursor(Ent::EntityLib& entlib)
         ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeY").getFloat() == 2.f);
     }
     {
-        HandlerRW expl(&entlib, entlib.getSchema(entitySchemaName), "prefab.entity");
+        Handler expl(&entlib, entlib.getSchema(entitySchemaName), "prefab.entity");
         ENTLIB_ASSERT(expl.enterObjectField("Name").getString() == std::string("PlayerSpawner_"));
         {
             ENTLIB_ASSERT(
@@ -841,7 +841,7 @@ void testCursor(Ent::EntityLib& entlib)
             == std::string("EP1-Spout_LINK_001"));
     }
     {
-        HandlerRW expl(&entlib, entlib.getSchema(entitySchemaName), "instance.entity");
+        Handler expl(&entlib, entlib.getSchema(entitySchemaName), "instance.entity");
         ENTLIB_ASSERT(expl.enterObjectField("Name").getString() == std::string("PlayerSpawner_"));
         auto type =
             expl.enterObjectField("Components").enterUnionSetItem("NetworkNode").enterObjectField("Type");
@@ -898,7 +898,7 @@ void testCursor(Ent::EntityLib& entlib)
 
         expl.save("instance.prout.entity");
         // Must not crash
-        HandlerRW prefab2(&entlib, entlib.getSchema(entitySchemaName), "instance.prout.entity");
+        Handler prefab2(&entlib, entlib.getSchema(entitySchemaName), "instance.prout.entity");
         auto comp2 = prefab2.enterObjectField("Components");
         auto characterControllerGD = comp2.enterUnionSetItem("CharacterControllerGD");
         auto clamberData = characterControllerGD.enterObjectField("ClamberData");
@@ -910,10 +910,10 @@ void testCursor(Ent::EntityLib& entlib)
     {
         std::cout << "Read instance.entity with LazyLib" << std::endl;
         clock_t start = clock();
-        HandlerRW expl(&entlib, entlib.getSchema(entitySchemaName), "instance.entity");
+        Handler expl(&entlib, entlib.getSchema(entitySchemaName), "prefab.entity");
         clock_t end = clock();
 
-        auto ent = entlib.loadEntityAsNode(R"(instance.entity)");
+        auto ent = entlib.loadEntityAsNode(R"(prefab.entity)");
 
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         CompareNode compare(ent.get());
@@ -924,7 +924,7 @@ void testCursor(Ent::EntityLib& entlib)
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
 
         nlohmann::json newDoc = nlohmann::json::object();
-        HandlerRW destExpl(&entlib, expl.getSchema(), "", &newDoc);
+        Handler destExpl(&entlib, expl.getSchema(), "", &newDoc);
         CopyToEmptyNode copier(destExpl);
         Ent::visitRecursive(expl, copier);
         entlib.saveJsonFile(&newDoc, "instance.cursor.entity");
@@ -935,7 +935,7 @@ void testCursor(Ent::EntityLib& entlib)
         entlib.rawdataPath = "X:/RawData";
         std::cout << "Read SceneKOM.scene with LazyLib" << std::endl;
         clock_t start = clock();
-        HandlerRW expl(
+        Handler expl(
             &entlib,
             entlib.getSchema(entitySchemaName),
             R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
@@ -947,7 +947,7 @@ void testCursor(Ent::EntityLib& entlib)
         {
             std::cout << "Copy SceneKOM.scene with LazyLib" << std::endl;
             nlohmann::json newDoc = nlohmann::json::object();
-            HandlerRW destExpl(&entlib, expl.getSchema(), "", &newDoc);
+            Handler destExpl(&entlib, expl.getSchema(), "", &newDoc);
             CopyToEmptyNode copier(destExpl);
             visitRecursive(expl, copier);
 
@@ -978,10 +978,10 @@ void testCursor(Ent::EntityLib& entlib)
         std::cout << "Travserse SceneKOM.scene with LazyLib" << std::endl;
         start = clock();
         Ent::visitRecursive(expl, visitor);
-        //Ent::visitRecursive(expl, visitor);
-        //Ent::visitRecursive(expl, visitor);
-        //Ent::visitRecursive(expl, visitor);
-        //Ent::visitRecursive(expl, visitor);
+        Ent::visitRecursive(expl, visitor);
+        Ent::visitRecursive(expl, visitor);
+        Ent::visitRecursive(expl, visitor);
+        Ent::visitRecursive(expl, visitor);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;
@@ -992,7 +992,7 @@ void testCursor(Ent::EntityLib& entlib)
         entlib.rawdataPath = "X:/RawData";
         std::cout << "Read SceneKOM.scene with LazyLib" << std::endl;
         clock_t start = clock();
-        HandlerRW expl(
+        Handler expl(
             &entlib,
             entlib.getSchema(entitySchemaName),
             R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");

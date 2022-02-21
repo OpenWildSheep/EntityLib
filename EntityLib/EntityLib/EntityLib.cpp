@@ -1705,28 +1705,21 @@ namespace Ent
                                                       Node(std::move(val), _subschema));
     }
 
-    LayerSharedPtr EntityLib::newLayer()
+    HandlerImplPtr EntityLib::newLayer()
     {
-        return LayerSharedPtr(new (layerPool.alloc()) Layer(), LayerDeleter{});
-        // return LayerSharedPtr(new Layer());
+        auto layer = new (layerPool.alloc()) HandlerImpl();
+        return layer->shared_from_this();
     }
 
-    LayerSharedPtr EntityLib::newLayer(Layer const& _other)
-    {
-        return LayerSharedPtr(new (layerPool.alloc()) Layer(_other), LayerDeleter{});
-        // return LayerSharedPtr(new Layer(_other));
-    }
-
-    LayerSharedPtr EntityLib::newLayer(
-        LayerSharedPtr _parent,
+    HandlerImplPtr EntityLib::newLayer(
+        HandlerImplPtr _parent,
         Ent::Subschema const* _schema,
         char const* _filename,
         nlohmann::json* _doc)
     {
-        return LayerSharedPtr(
-            new (layerPool.alloc()) Layer(this, std::move(_parent), _schema, _filename, _doc),
-            LayerDeleter{});
-        // return LayerSharedPtr(new Layer(this, _parent, _schema, _filename, _doc));
+        auto layer =
+            new (layerPool.alloc()) HandlerImpl(this, std::move(_parent), _schema, _filename, _doc);
+        return layer->shared_from_this();
     }
 
     NodeUniquePtr EntityLib::makeEntityNode() const

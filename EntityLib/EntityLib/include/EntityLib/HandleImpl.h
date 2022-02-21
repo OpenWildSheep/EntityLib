@@ -16,41 +16,56 @@ namespace Ent
 {
     class EntityLib;
 
-    using LayerSharedPtr = std::shared_ptr<Layer>;
+    constexpr size_t const DeletedLayer = 0x4AB7A80FFB4CD540;
 
-    /// A Layer is a level in the tree hierarchy.
+    /// \cond PRIVATE
+    void destroyAndFree(HandlerImpl* ptr); ///< Internally used by the Node memory Pool
+    /// \endcond
+
+    struct DecRef
+    {
+        template <typename T>
+        void operator()(T* ptr)
+        {
+            decRef(ptr);
+        }
+    };
+
+    using HandlerImplPtr = std::unique_ptr<HandlerImpl, DecRef>;
+
+    /// A HandlerImpl is a level in the tree hierarchy.
     /// When enter, a layer is added.
     /// When exit, a layer is popped.
-    struct ENTLIB_DLLEXPORT Layer : std::enable_shared_from_this<Layer>
+    struct ENTLIB_DLLEXPORT HandlerImpl // : std::enable_shared_from_this<HandlerImpl>
     {
     public:
         using Key = std::variant<std::string, size_t>;
 
-        Layer() = default;
-        ~Layer();
-        Layer(Layer const&);
-        Layer(Layer&&) = default;
-        Layer& operator=(Layer const&);
-        Layer& operator=(Layer&&) = default;
-        Layer(
+        HandlerImpl() = default;
+        ~HandlerImpl();
+        HandlerImpl(HandlerImpl const&) = delete;
+        HandlerImpl(HandlerImpl&&) = delete;
+        HandlerImpl& operator=(HandlerImpl const&) = delete;
+        HandlerImpl& operator=(HandlerImpl&&) = delete;
+        HandlerImpl(
             EntityLib* _entityLib,
-            LayerSharedPtr _parent,
+            HandlerImplPtr _parent,
             Ent::Subschema const* _schema,
             char const* _filename);
-        Layer(
+        HandlerImpl(
             EntityLib* _entityLib,
-            LayerSharedPtr _parent,
+            HandlerImplPtr _parent,
             Ent::Subschema const* _schema,
             char const* _filename,
             nlohmann::json* _doc);
         void _init(
             EntityLib* _entityLib,
-            LayerSharedPtr _parent,
+            HandlerImplPtr _parent,
             Ent::Subschema const* _schema,
             char const* _filename);
         void _init(
             EntityLib* _entityLib,
-            LayerSharedPtr _parent,
+            HandlerImplPtr _parent,
             Ent::Subschema const* _schema,
             char const* _filename,
             nlohmann::json* _doc);
@@ -69,40 +84,40 @@ namespace Ent
 
         /// @brief Enter in the given field of the object
         /// @pre It is an object
-        [[nodiscard]] LayerSharedPtr enterObjectField(
+        [[nodiscard]] HandlerImplPtr enterObjectField(
             char const* _field, ///< field to enter in
             SubschemaRef const* _fieldRef = nullptr ///< SubschemaRef of the field (For performance)
         );
         /// @brief Enter in the internal data of the union
         /// @pre It is a Union
-        [[nodiscard]] LayerSharedPtr enterUnionData(
+        [[nodiscard]] HandlerImplPtr enterUnionData(
             char const* _type = nullptr ///< type of the internal data of the union
         );
         /// @brief Enter in the item of a UnionSet
         /// @pre It is a UnionSet
-        [[nodiscard]] LayerSharedPtr enterUnionSetItem(
+        [[nodiscard]] HandlerImplPtr enterUnionSetItem(
             char const* _type, ///< Type of the item
             Subschema const* _dataSchema = nullptr ///< Schema of the item (For performance)
         );
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] LayerSharedPtr enterObjectSetItem(char const* _key ///< Key of the object
+        [[nodiscard]] HandlerImplPtr enterObjectSetItem(char const* _key ///< Key of the object
         );
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] LayerSharedPtr enterObjectSetItem(int64_t _key ///< Key of the object
+        [[nodiscard]] HandlerImplPtr enterObjectSetItem(int64_t _key ///< Key of the object
         );
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        [[nodiscard]] LayerSharedPtr enterMapItem(char const* _key ///< Key of the value
+        [[nodiscard]] HandlerImplPtr enterMapItem(char const* _key ///< Key of the value
         );
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        [[nodiscard]] LayerSharedPtr enterMapItem(int64_t _field ///< Key of the value
+        [[nodiscard]] HandlerImplPtr enterMapItem(int64_t _field ///< Key of the value
         );
         /// @brief Enter in the element of an Array
         /// @pre It is an Array
-        [[nodiscard]] LayerSharedPtr enterArrayItem(size_t _index ///< index of the targeted element
+        [[nodiscard]] HandlerImplPtr enterArrayItem(size_t _index ///< index of the targeted element
         );
         /// @return The "InstanceOf" field, an empty string if set to empty, or nullptr if unset.
         /// @pre It is an Object
@@ -172,12 +187,20 @@ namespace Ent
         void insertPrimSetKey(char const* _key); ///< Insert _key in the set (or do nothing if already in)
         void insertPrimSetKey(int64_t _key); ///< Insert _key in the set (or do nothing if already in)
 
-        nlohmann::json const* _getRawJson(); ///< Get the underlying json node of the instance
+        HandlerImplPtr shared_from_this()
+        {
+            ++m_refCount;
+            return HandlerImplPtr(this);
+        }
 
-        Layer* getPrefab(); ///< Get the Cursor of the prefab
+        HandlerImpl* getPrefab(); ///< Get the Cursor of the prefab
+        nlohmann::json const* getRawJson(); ///< Get the underlying json node of the instance
+
+    private:
+        friend void decRef(HandlerImpl* self);
 
         template <typename E>
-        [[nodiscard]] LayerSharedPtr _enterItem(E&& _enter);
+        [[nodiscard]] HandlerImplPtr _enterItem(E&& _enter);
 
         void _checkInvariants() const;
         bool _loadInstanceOf();
@@ -188,25 +211,18 @@ namespace Ent
         void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance
 
         EntityLib* m_entityLib = nullptr;
-        LayerSharedPtr prefab;
-        // std::unique_ptr<Cursor> prefabsStorage; ///< Used when this layer has an "InstanceOf"
-        /// @brief offset of the defaultValue in m_layers
-        /// @remark 0 = last, -1 = last - 1, 1 = undefined
+        HandlerImplPtr prefab = nullptr;
         std::optional<FileCursor> defaultStorage; ///< Used to explore the defalt value in the schema
         size_t m_arraySize = 0;
         FileCursor m_instance;
-        LayerSharedPtr m_parent;
+        HandlerImplPtr m_parent = nullptr;
+        size_t m_refCount = 0;
         DeleteCheck m_deleteCheck;
     };
 
-    inline Layer* Layer::getPrefab()
+    inline HandlerImpl* HandlerImpl::getPrefab()
     {
         return prefab.get();
     }
-
-    constexpr size_t const DeletedLayer = 0x4AB7A80FFB4CD540;
-    /// \cond PRIVATE
-    void destroyAndFree(Layer* ptr); ///< Internally used by the Node memory Pool
-    /// \endcond
 
 } // namespace Ent

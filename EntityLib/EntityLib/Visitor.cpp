@@ -5,7 +5,7 @@ namespace Ent
     RecursiveVisitor::RecursiveVisitor() = default;
     RecursiveVisitor ::~RecursiveVisitor() = default;
 
-    void visitRecursive(HandlerRW& _expl, RecursiveVisitor& _visitor)
+    void visitRecursive(Handler& _expl, RecursiveVisitor& _visitor)
     {
         switch (_expl.getDataType())
         {
@@ -153,7 +153,7 @@ namespace Ent
     Visitor::Visitor() = default;
     Visitor::~Visitor() = default;
 
-    void visit(HandlerRW& _expl, Visitor& _visitor)
+    void visit(Handler& _expl, Visitor& _visitor)
     {
         switch (_expl.getDataType())
         {

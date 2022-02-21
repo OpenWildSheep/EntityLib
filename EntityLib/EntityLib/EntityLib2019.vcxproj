@@ -114,7 +114,6 @@
   <ItemGroup>
     <ClCompile Include="Array.cpp" />
     <ClCompile Include="ComponentMerge.cpp" />
-    <ClCompile Include="Cursor.cpp" />
     <ClCompile Include="EntityLib.cpp">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EnableAllWarnings</WarningLevel>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</TreatWarningAsError>
@@ -123,6 +122,7 @@
     </ClCompile>
     <ClCompile Include="EntityLibCore.cpp" />
     <ClCompile Include="FileCursor.cpp" />
+    <ClCompile Include="HandleImpl.cpp" />
     <ClCompile Include="include\Schema.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Node.cpp" />
@@ -140,9 +140,9 @@
     <ClInclude Include="include\EntityLib.h" />
     <ClInclude Include="include\EntityLibCore.h" />
     <ClInclude Include="include\EntityLib\CopyNode.h" />
-    <ClInclude Include="include\EntityLib\Cursor.h" />
     <ClInclude Include="include\EntityLib\FileCursor.h" />
-    <ClInclude Include="include\EntityLib\HandlerRW.h" />
+    <ClInclude Include="include\EntityLib\HandleImpl.h" />
+    <ClInclude Include="include\EntityLib\Handler.h" />
     <ClInclude Include="include\EntityLib\Visitor.h" />
     <ClInclude Include="include\Schema.h" />
     <ClInclude Include="Map.h" />

@@ -1,11 +1,11 @@
-#include "include/EntityLib/Cursor.h"
+#include "include/EntityLib/HandleImpl.h"
 #include "include/EntityLib.h"
 
 #include <utility>
 
 namespace Ent
 {
-    void Layer::setDefault(
+    void HandlerImpl::setDefault(
         Ent::Subschema const* _schema, char const* _filePath, nlohmann::json const* _document)
     {
         // Loïc : To fix this aweful const_cast, FileCursor need a const version 'ConstFileCursor'.
@@ -13,18 +13,19 @@ namespace Ent
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
         defaultStorage = FileCursor{_schema, _filePath, const_cast<nlohmann::json*>(_document)};
     }
-    void Layer::clear()
+    void HandlerImpl::clear()
     {
-        prefab = nullptr;
+        prefab.reset();
+        m_parent.reset();
         defaultStorage.reset();
         m_arraySize = 0;
     }
-    FileCursor* Layer::getDefault()
+    FileCursor* HandlerImpl::getDefault()
     {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
         return const_cast<FileCursor*>(std::as_const(*this).getDefault());
     }
-    FileCursor const* Layer::getDefault() const
+    FileCursor const* HandlerImpl::getDefault() const
     {
         if (not defaultStorage.has_value())
         {
@@ -33,13 +34,13 @@ namespace Ent
         return &(*defaultStorage);
     }
 
-    bool Layer::isSet() const
+    bool HandlerImpl::isSet() const
     {
         return m_instance.isSet();
     }
 
     template <typename V>
-    V Layer::get() const
+    V HandlerImpl::get() const
     {
         auto& lastLayer = *this;
         if (isSet())
@@ -72,66 +73,47 @@ namespace Ent
         }
     }
 
-    double Layer::getFloat() const
+    double HandlerImpl::getFloat() const
     {
         return get<double>();
     }
-    int64_t Layer::getInt() const
+    int64_t HandlerImpl::getInt() const
     {
         return get<int64_t>();
     }
-    char const* Layer::getString() const
+    char const* HandlerImpl::getString() const
     {
         return get<char const*>();
     }
-    bool Layer::getBool() const
+    bool HandlerImpl::getBool() const
     {
         return get<bool>();
     }
-    EntityRef Layer::getEntityRef() const
+    EntityRef HandlerImpl::getEntityRef() const
     {
         return get<EntityRef>();
     }
 
-    Layer::Layer(Layer const& _other)
-        : m_entityLib(_other.m_entityLib)
-        , m_arraySize(_other.m_arraySize)
-        , m_instance(_other.m_instance)
-        , m_parent(_other.m_parent)
-    {
-        if (_other.prefab != nullptr)
-        {
-            prefab = _other.prefab;
-        }
-    }
-
-    Layer& Layer::operator=(Layer const& _other)
-    {
-        Layer copy(_other);
-        std::swap(copy, *this);
-        return *this;
-    }
-
-    Layer::Layer(
+    HandlerImpl::HandlerImpl(
         EntityLib* _entityLib,
-        LayerSharedPtr _parent,
+        HandlerImplPtr _parent,
         Ent::Subschema const* _schema,
         char const* _filename,
         nlohmann::json* _doc)
     {
-        _init(_entityLib, _parent, _schema, _filename, _doc);
+        _init(_entityLib, std::move(_parent), _schema, _filename, _doc);
     }
 
-    Layer::~Layer()
+    HandlerImpl::~HandlerImpl()
     {
         ENTLIB_ASSERT_NOTHROW(m_deleteCheck.state_ == DeleteCheck::State::VALID);
-        m_parent.reset();
         prefab.reset();
+        m_parent.reset();
     }
 
-    void Layer::_init(
+    void HandlerImpl::_init(
         EntityLib* _entityLib,
-        LayerSharedPtr _parent,
+        HandlerImplPtr _parent,
         Ent::Subschema const* _schema,
         char const* _filename,
         nlohmann::json* _doc)
@@ -142,7 +124,7 @@ namespace Ent
         }
         ENTLIB_ASSERT(_schema != nullptr);
         m_entityLib = _entityLib;
-        m_parent = _parent;
+        m_parent = std::move(_parent);
 
         setDefault(_schema, nullptr, &_schema->defaultValue);
         m_instance.init(_schema, _filename, _doc);
@@ -151,30 +133,32 @@ namespace Ent
         _loadInstanceOf();
     }
 
-    void Layer::_init(
+    void HandlerImpl::_init(
         EntityLib* _entityLib,
-        LayerSharedPtr _parent,
+        HandlerImplPtr _parent,
         Ent::Subschema const* _schema,
         char const* _filename)
     {
-        _init(_entityLib, _parent, _schema, _filename, &_entityLib->readJsonFile(_filename));
+        _init(
+            _entityLib, std::move(_parent), _schema, _filename, &_entityLib->readJsonFile(_filename));
     }
 
-    Layer::Layer(
+    HandlerImpl::HandlerImpl(
         EntityLib* _entityLib,
-        LayerSharedPtr _parent,
+        HandlerImplPtr _parent,
         Ent::Subschema const* _schema,
         char const* _filename)
     {
-        _init(_entityLib, _parent, _schema, _filename, &_entityLib->readJsonFile(_filename));
+        _init(
+            _entityLib, std::move(_parent), _schema, _filename, &_entityLib->readJsonFile(_filename));
     }
 
-    void Layer::save(char const* _filename) const
+    void HandlerImpl::save(char const* _filename) const
     {
         m_instance.save(_filename);
     }
 
-    bool Layer::isDefault() const
+    bool HandlerImpl::isDefault() const
     {
         auto& newLayer = *this;
         if (m_instance.isSet())
@@ -188,7 +172,7 @@ namespace Ent
         return true;
     }
 
-    bool Layer::_loadInstanceOf()
+    bool HandlerImpl::_loadInstanceOf()
     {
         auto* subschema = getSchema();
         if ((subschema->type == DataType::object or subschema->type == DataType::oneOf)
@@ -200,6 +184,7 @@ namespace Ent
                 if (auto const& prefabPath = member->get_ref<std::string const&>();
                     not prefabPath.empty())
                 {
+
                     prefab = m_entityLib->newLayer(nullptr, subschema, prefabPath.c_str(), nullptr);
                 }
                 return true;
@@ -208,12 +193,14 @@ namespace Ent
         return false;
     }
 
-    LayerSharedPtr Layer::enterObjectField(char const* _field, SubschemaRef const* _fieldRef)
+    HandlerImplPtr HandlerImpl::enterObjectField(char const* _field, SubschemaRef const* _fieldRef)
     {
         _checkInvariants();
         ENTLIB_DBG_ASSERT(getDataType() == Ent::DataType::object);
-        LayerSharedPtr newLayer = m_entityLib->newLayer();
+        auto newLayer = m_entityLib->newLayer();
         auto& lastLayer = *this;
+        ENTLIB_DBG_ASSERT(lastLayer.m_deleteCheck.state_ == DeleteCheck::State::VALID);
+        ENTLIB_DBG_ASSERT(lastLayer.getSchema()->type == Ent::DataType::object);
         ENTLIB_DBG_ASSERT(
             lastLayer.getDefault() == nullptr
             or lastLayer.getDefault()->getSchema()->type == Ent::DataType::object);
@@ -221,16 +208,19 @@ namespace Ent
         newLayer->m_entityLib = m_entityLib;
         newLayer->m_parent = shared_from_this();
         auto* subschema = newLayer->getSchema();
+        ENTLIB_DBG_ASSERT(lastLayer.getSchema()->type == Ent::DataType::object);
+        ENTLIB_DBG_ASSERT(lastLayer.m_deleteCheck.state_ == DeleteCheck::State::VALID);
         if (not newLayer->_loadInstanceOf())
         {
             if (lastLayer.prefab != nullptr)
             {
-                ENTLIB_ASSERT(lastLayer.prefab->m_entityLib != nullptr);
                 newLayer->prefab = lastLayer.prefab->enterObjectField(_field, _fieldRef);
             }
         }
         bool defaultFound = false;
         auto* defaultVal = lastLayer.getDefault();
+        ENTLIB_DBG_ASSERT(lastLayer.getSchema()->type == Ent::DataType::object);
+        ENTLIB_ASSERT(defaultVal == nullptr or defaultVal->getSchema() == lastLayer.getSchema());
         if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
         {
             auto const objectField = defaultVal->enterObjectField(_field, _fieldRef);
@@ -252,10 +242,11 @@ namespace Ent
                 newLayer->setDefault(subschema, nullptr, &subschema->defaultValue);
             }
         }
+        ENTLIB_DBG_ASSERT(getDataType() == Ent::DataType::object);
         return newLayer;
     }
 
-    LayerSharedPtr Layer::enterUnionData(char const* _type)
+    HandlerImplPtr HandlerImpl::enterUnionData(char const* _type)
     {
         ENTLIB_ASSERT(getSchema()->type == Ent::DataType::oneOf);
         if (_type == nullptr)
@@ -265,7 +256,7 @@ namespace Ent
         return _enterItem([_type](auto&& _cur) { return _cur.enterUnionData(_type); });
     }
 
-    LayerSharedPtr Layer::enterUnionSetItem(char const* _type, Subschema const* _dataSchema)
+    HandlerImplPtr HandlerImpl::enterUnionSetItem(char const* _type, Subschema const* _dataSchema)
     {
         if (_dataSchema == nullptr)
         {
@@ -298,11 +289,11 @@ namespace Ent
     }
 
     template <typename E>
-    LayerSharedPtr Layer::_enterItem(E&& _enter)
+    HandlerImplPtr HandlerImpl::_enterItem(E&& _enter)
     {
         _checkInvariants();
-        LayerSharedPtr newLayerPtr = m_entityLib->newLayer();
-        Layer& newLayer = *newLayerPtr;
+        auto newLayerPtr = m_entityLib->newLayer();
+        HandlerImpl& newLayer = *newLayerPtr;
         auto& lastLayer = *this;
         newLayer.m_entityLib = m_entityLib;
         newLayer.m_instance = _enter(lastLayer.m_instance);
@@ -337,31 +328,31 @@ namespace Ent
         return newLayerPtr;
     }
 
-    LayerSharedPtr Layer::enterObjectSetItem(char const* _key)
+    HandlerImplPtr HandlerImpl::enterObjectSetItem(char const* _key)
     {
         return _enterItem([_key](auto&& _cur) { return _cur.enterObjectSetItem(_key); });
     }
 
-    LayerSharedPtr Layer::enterObjectSetItem(int64_t _key)
+    HandlerImplPtr HandlerImpl::enterObjectSetItem(int64_t _key)
     {
         return _enterItem([_key](auto&& _cur) { return _cur.enterObjectSetItem(_key); });
     }
 
-    LayerSharedPtr Layer::enterMapItem(char const* _key)
+    HandlerImplPtr HandlerImpl::enterMapItem(char const* _key)
     {
         return _enterItem([_key](auto&& _cur) { return _cur.enterMapItem(_key); });
     }
 
-    LayerSharedPtr Layer::enterMapItem(int64_t _field)
+    HandlerImplPtr HandlerImpl::enterMapItem(int64_t _field)
     {
         return _enterItem([_field](auto&& _cur) { return _cur.enterMapItem(_field); });
     }
 
-    LayerSharedPtr Layer::enterArrayItem(size_t _index)
+    HandlerImplPtr HandlerImpl::enterArrayItem(size_t _index)
     {
         _checkInvariants();
-        LayerSharedPtr newLayerPtr = m_entityLib->newLayer();
-        Layer& newLayer = *newLayerPtr;
+        auto newLayerPtr = m_entityLib->newLayer();
+        HandlerImpl& newLayer = *newLayerPtr;
         newLayer.m_entityLib = m_entityLib;
         auto& lastLayer = *this;
         ENTLIB_DBG_ASSERT(lastLayer.m_instance.getSchema()->type == Ent::DataType::array);
@@ -394,7 +385,7 @@ namespace Ent
         return newLayerPtr;
     }
 
-    char const* Layer::getInstanceOf()
+    char const* HandlerImpl::getInstanceOf()
     {
         // The field InstanceOf is not a field of objects, so we have to fake it.
         Ent::Subschema schema;
@@ -403,7 +394,7 @@ namespace Ent
         ref.subSchemaOrRef = std::move(schema);
         char const* result = nullptr;
         {
-            auto field = enterObjectField("InstanceOf", &ref);
+            HandlerImplPtr field(enterObjectField("InstanceOf", &ref));
             if (not field->isSet())
             {
                 return nullptr;
@@ -414,7 +405,7 @@ namespace Ent
         return result;
     }
 
-    void Layer::setInstanceOf(char const* _instanceOf)
+    void HandlerImpl::setInstanceOf(char const* _instanceOf)
     {
         if (_instanceOf == nullptr)
         {
@@ -425,7 +416,7 @@ namespace Ent
         schema.type = Ent::DataType::string;
         Ent::SubschemaRef ref;
         ref.subSchemaOrRef = std::move(schema);
-        enterObjectField("InstanceOf", &ref)->setString(_instanceOf);
+        HandlerImplPtr(enterObjectField("InstanceOf", &ref))->setString(_instanceOf);
         auto& lastLayer = *this;
         if (strlen(_instanceOf) != 0)
         {
@@ -437,7 +428,7 @@ namespace Ent
         }
     }
 
-    char const* Layer::getUnionType()
+    char const* HandlerImpl::getUnionType()
     {
         ENTLIB_ASSERT(getSchema()->type == Ent::DataType::oneOf);
         auto& lastLayer = *this;
@@ -462,13 +453,13 @@ namespace Ent
         return getSchema()->getUnionDefaultTypeName();
     }
 
-    size_t Layer::getUnionTypeIndex()
+    size_t HandlerImpl::getUnionTypeIndex()
     {
         auto type = getUnionType();
         return AT(getSchema()->unionTypeMap, type).index;
     }
 
-    void Layer::_checkInvariants() const
+    void HandlerImpl::_checkInvariants() const
     {
 #ifdef _DEBUG
         ENTLIB_DBG_ASSERT(m_instance.schema.base != nullptr);
@@ -482,22 +473,22 @@ namespace Ent
 #endif
     }
 
-    DataType Layer::getDataType() const
+    DataType HandlerImpl::getDataType() const
     {
         return getSchema()->type;
     }
 
-    char const* Layer::getTypeName() const
+    char const* HandlerImpl::getTypeName() const
     {
         return getSchema()->name.c_str();
     }
 
-    DataType Layer::getMapKeyType() const
+    DataType HandlerImpl::getMapKeyType() const
     {
         return getSchema()->singularItems->get().linearItems->at(0)->type;
     }
 
-    DataType Layer::getObjectSetKeyType() const
+    DataType HandlerImpl::getObjectSetKeyType() const
     {
         auto& schema = *getSchema();
         if (auto arrayMeta = std::get_if<Subschema::ArrayMeta>(&schema.meta))
@@ -511,7 +502,7 @@ namespace Ent
             "In Cursor::getObjectSetKeyType : Expected ObjectSet. Got %s", schema.name.c_str()));
     }
 
-    size_t Layer::arraySize()
+    size_t HandlerImpl::arraySize()
     {
         auto& lastLayer = *this;
         auto& jsonExplLayer = lastLayer.m_instance;
@@ -542,7 +533,7 @@ namespace Ent
         }
     }
 
-    size_t Layer::size()
+    size_t HandlerImpl::size()
     {
         auto& jsonExplLayer = m_instance;
         auto* schema = jsonExplLayer.schema.base;
@@ -604,7 +595,7 @@ namespace Ent
         ENTLIB_LOGIC_ERROR("Unexpected DataType!");
     }
 
-    bool Layer::contains(Key const& _key)
+    bool HandlerImpl::contains(Key const& _key)
     {
         auto& jsonExplLayer = m_instance;
         auto* schema = jsonExplLayer.schema.base;
@@ -670,12 +661,12 @@ namespace Ent
         ENTLIB_LOGIC_ERROR("Unexpected DataType!");
     }
 
-    bool Layer::empty()
+    bool HandlerImpl::empty()
     {
         return size() == 0;
     }
 
-    std::set<char const*, CmpStr> Layer::getMapKeysString()
+    std::set<char const*, CmpStr> HandlerImpl::getMapKeysString()
     {
         auto& lastLayer = *this;
         std::set<char const*, CmpStr> keys;
@@ -721,7 +712,7 @@ namespace Ent
         return keys;
     }
 
-    bool Layer::isNull() const
+    bool HandlerImpl::isNull() const
     {
         auto& lastLayer = *this;
         if (lastLayer.m_instance.isSetOrNull())
@@ -737,7 +728,7 @@ namespace Ent
             return false;
         }
     }
-    std::set<int64_t> Layer::getMapKeysInt()
+    std::set<int64_t> HandlerImpl::getMapKeysInt()
     {
         auto& lastLayer = *this;
         std::set<int64_t> keys;
@@ -764,7 +755,7 @@ namespace Ent
         }
         return keys;
     }
-    std::set<int64_t> Layer::getPrimSetKeysInt()
+    std::set<int64_t> HandlerImpl::getPrimSetKeysInt()
     {
         auto& lastLayer = *this;
         std::set<int64_t> keys;
@@ -781,7 +772,7 @@ namespace Ent
         }
         return keys;
     }
-    std::set<char const*, CmpStr> Layer::getPrimSetKeysString()
+    std::set<char const*, CmpStr> HandlerImpl::getPrimSetKeysString()
     {
         std::set<char const*, CmpStr> keys;
         if (m_instance.isSet())
@@ -799,7 +790,7 @@ namespace Ent
         return keys;
     }
 
-    std::map<char const*, Subschema const*, CmpStr> Layer::getUnionSetKeysString()
+    std::map<char const*, Subschema const*, CmpStr> HandlerImpl::getUnionSetKeysString()
     {
         auto& lastLayer = *this;
         std::map<char const*, Subschema const*, CmpStr> keys;
@@ -827,7 +818,7 @@ namespace Ent
         return keys;
     }
 
-    std::set<char const*, CmpStr> Layer::getObjectSetKeysString()
+    std::set<char const*, CmpStr> HandlerImpl::getObjectSetKeysString()
     {
         auto& lastLayer = *this;
         auto const& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
@@ -855,7 +846,7 @@ namespace Ent
         return keys;
     }
 
-    std::set<int64_t> Layer::getObjectSetKeysInt()
+    std::set<int64_t> HandlerImpl::getObjectSetKeysInt()
     {
         auto& lastLayer = *this;
         auto const& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
@@ -883,53 +874,54 @@ namespace Ent
         return keys;
     }
 
-    bool Layer::mapContains(char const* _key)
+    bool HandlerImpl::mapContains(char const* _key)
     {
         return getMapKeysString().count(_key) != 0;
     }
-    bool Layer::mapContains(int64_t _key)
+    bool HandlerImpl::mapContains(int64_t _key)
     {
         return getMapKeysInt().count(_key) != 0;
     }
-    bool Layer::primSetContains(char const* _key)
+    bool HandlerImpl::primSetContains(char const* _key)
     {
         return _countPrimSetKeyImpl(
             _key,
-            [this](Layer& primLayer, char const* _key)
+            [this](HandlerImpl& primLayer, char const* _key)
             { return strcmp(primLayer.getString(), _key) == 0; });
     }
-    bool Layer::primSetContains(int64_t _key)
+    bool HandlerImpl::primSetContains(int64_t _key)
     {
         return _countPrimSetKeyImpl(
-            _key, [this](Layer& primLayer, int64_t _key) { return primLayer.getInt() == _key; });
+            _key,
+            [this](HandlerImpl& primLayer, int64_t _key) { return primLayer.getInt() == _key; });
     }
-    bool Layer::unionSetContains(char const* _key)
+    bool HandlerImpl::unionSetContains(char const* _key)
     {
         return getUnionSetKeysString().count(_key) != 0;
     }
-    bool Layer::objectSetContains(char const* _key)
+    bool HandlerImpl::objectSetContains(char const* _key)
     {
         return getObjectSetKeysString().count(_key) != 0;
     }
-    bool Layer::objectSetContains(int64_t _key)
+    bool HandlerImpl::objectSetContains(int64_t _key)
     {
         return getObjectSetKeysInt().count(_key) != 0;
     }
 
-    void Layer::_buildPath()
+    void HandlerImpl::_buildPath()
     {
         _checkInvariants();
-        std::vector<Layer*> allLayers;
-        for (Layer* iter = this; iter != nullptr; iter = iter->m_parent.get())
+        std::vector<HandlerImpl*> allLayers;
+        for (HandlerImpl* iter = this; iter != nullptr; iter = iter->m_parent.get())
         {
-            ENTLIB_ASSERT(iter != (Layer*)DeletedLayer);
+            ENTLIB_ASSERT(iter != (HandlerImpl*)DeletedLayer);
             allLayers.push_back(iter);
         }
         std::reverse(begin(allLayers), end(allLayers));
         auto firstNotSetIter = std::find_if(
             begin(allLayers),
             end(allLayers),
-            [](Layer const* l) { return l->m_instance.values == nullptr; });
+            [](HandlerImpl const* l) { return l->m_instance.values == nullptr; });
         ENTLIB_ASSERT(firstNotSetIter != allLayers.begin());
         auto firstNotSetIdx = std::distance(begin(allLayers), firstNotSetIter);
         ENTLIB_ASSERT(firstNotSetIdx <= ptrdiff_t(allLayers.size()));
@@ -950,50 +942,50 @@ namespace Ent
         ENTLIB_ASSERT(allLayers.back()->m_instance.values != nullptr);
         _checkInvariants();
     }
-    void Layer::setSize(size_t _size)
+    void HandlerImpl::setSize(size_t _size)
     {
         _buildPath();
         m_instance.setSize(_size);
     }
 
-    void Layer::setFloat(double _value)
+    void HandlerImpl::setFloat(double _value)
     {
         _buildPath();
         m_instance.setFloat(_value);
     }
-    void Layer::setInt(int64_t _value)
+    void HandlerImpl::setInt(int64_t _value)
     {
         _buildPath();
         m_instance.setInt(_value);
     }
-    void Layer::setString(char const* _value)
+    void HandlerImpl::setString(char const* _value)
     {
         ENTLIB_ASSERT(_value != nullptr);
         _buildPath();
         m_instance.setString(_value);
     }
-    void Layer::setBool(bool _value)
+    void HandlerImpl::setBool(bool _value)
     {
         _buildPath();
         m_instance.setBool(_value);
     }
-    void Layer::setEntityRef(EntityRef const& _value)
+    void HandlerImpl::setEntityRef(EntityRef const& _value)
     {
         _buildPath();
         m_instance.setEntityRef(_value);
     }
-    void Layer::setUnionType(char const* _type)
+    void HandlerImpl::setUnionType(char const* _type)
     {
         _buildPath();
         m_instance.setUnionType(_type);
     }
-    void Layer::buildPath()
+    void HandlerImpl::buildPath()
     {
         _buildPath();
     }
 
     template <typename K, typename E>
-    bool Layer::_countPrimSetKeyImpl(K _key, E&& _isEqual)
+    bool HandlerImpl::_countPrimSetKeyImpl(K _key, E&& _isEqual)
     {
         if (m_instance.isSet())
         {
@@ -1015,7 +1007,7 @@ namespace Ent
         return false;
     }
 
-    void Layer::insertPrimSetKey(char const* _key)
+    void HandlerImpl::insertPrimSetKey(char const* _key)
     {
         if (not primSetContains(_key))
         {
@@ -1023,7 +1015,7 @@ namespace Ent
             m_instance.pushBack(_key);
         }
     }
-    void Layer::insertPrimSetKey(int64_t _key)
+    void HandlerImpl::insertPrimSetKey(int64_t _key)
     {
         if (not primSetContains(_key))
         {
@@ -1032,20 +1024,28 @@ namespace Ent
         }
     }
 
-    nlohmann::json const* Layer::_getRawJson()
+    nlohmann::json const* HandlerImpl::getRawJson()
     {
         return m_instance.getRawJson();
     }
 
-    Subschema const* Layer::getSchema() const
+    Subschema const* HandlerImpl::getSchema() const
     {
         return m_instance.getSchema();
     }
 
-    void destroyAndFree([[maybe_unused]] Layer* ptr)
+    void decRef(HandlerImpl* self)
     {
-        auto& pool = ptr->m_entityLib->layerPool;
-        ptr->~Layer();
-        pool.free(ptr);
+        ENTLIB_ASSERT(self->m_refCount > 0);
+        ENTLIB_ASSERT(self->m_deleteCheck.state_ == DeleteCheck::State::VALID);
+        --self->m_refCount;
+        if (self->m_refCount == 0)
+        {
+            auto& pool = self->m_entityLib->layerPool;
+            self->~HandlerImpl();
+            pool.free(self);
+            self = nullptr;
+        }
     }
+
 } // namespace Ent

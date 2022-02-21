@@ -539,7 +539,7 @@ namespace Ent
     };
     using NodeUniquePtr = std::unique_ptr<Node, NodeDeleter>;
 
-    struct Layer;
+    struct HandlerImpl;
     struct LayerDeleter
     {
         template <typename T>
@@ -548,7 +548,7 @@ namespace Ent
             destroyAndFree(ptr);
         }
     };
-    using LayerSharedPtr = std::shared_ptr<Layer>;
+    // using HandlerImpl* = std::shared_ptr<HandlerImpl>;
 
     /// @brief Path to found a Node, from an other Node.
     ///

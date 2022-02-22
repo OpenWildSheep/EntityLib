@@ -192,6 +192,7 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
         {
             instSchema["properties"]["$schema"]["type"] = "string";
             instSchema["properties"]["InstanceOf"]["type"] = "string";
+            instSchema["properties"]["__removed__"]["type"] = "boolean";
         }
         if (tmplSchema.type == DataType::object)
         {

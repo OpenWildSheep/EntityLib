@@ -5,14 +5,17 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.Int import *
 from entgen.Bool import *
 from entgen.CameraShakeData import *
+from entgen.ConstrainedInputData import *
 from entgen.Float import *
 from entgen.FreezeData import *
 from entgen.GameAttackData import *
 from entgen.GameBeamSnapData import *
 from entgen.GameBiteData import *
 from entgen.GameDeathData import *
+from entgen.GameDodgeData import *
 from entgen.GameFallData import *
 from entgen.GameFeetCatchUpData import *
 from entgen.GameFluidData import *
@@ -21,6 +24,7 @@ from entgen.GameImmersionData import *
 from entgen.GameLODData import *
 from entgen.GamePadNavigationData import *
 from entgen.GamePadSpeedBehaviorData import *
+from entgen.GameParryData import *
 from entgen.GamePropelData import *
 from entgen.GameRespawnData import *
 from entgen.GameReviveData import *
@@ -63,8 +67,19 @@ class GameManager(HelperObject):
     def BiteData(self):  # type: ()->GameBiteData
         return GameBiteData(self._node.at("BiteData"))
     @property
+    def ConstrainedInputData(self):  # type: ()->ConstrainedInputData
+        return ConstrainedInputData(self._node.at("ConstrainedInputData"))
+    @property
     def DeathData(self):  # type: ()->GameDeathData
         return GameDeathData(self._node.at("DeathData"))
+    @property
+    def DefaultGamePadID(self):  # type: ()->Int
+        return Int(self._node.at("DefaultGamePadID"))
+    @DefaultGamePadID.setter
+    def DefaultGamePadID(self, val): self.DefaultGamePadID.set(val)
+    @property
+    def DodgeData(self):  # type: ()->GameDodgeData
+        return GameDodgeData(self._node.at("DodgeData"))
     @property
     def EnableSplashScreen(self):  # type: ()->Bool
         return Bool(self._node.at("EnableSplashScreen"))
@@ -159,10 +174,18 @@ class GameManager(HelperObject):
     @LockTargetScreenViewDistance.setter
     def LockTargetScreenViewDistance(self, val): self.LockTargetScreenViewDistance.set(val)
     @property
+    def Long_Press_Duration(self):  # type: ()->Float
+        return Float(self._node.at("Long Press Duration"))
+    @Long_Press_Duration.setter
+    def Long_Press_Duration(self, val): self.Long_Press_Duration.set(val)
+    @property
     def MountOnlyOnFollower(self):  # type: ()->Bool
         return Bool(self._node.at("MountOnlyOnFollower"))
     @MountOnlyOnFollower.setter
     def MountOnlyOnFollower(self, val): self.MountOnlyOnFollower.set(val)
+    @property
+    def ParryData(self):  # type: ()->GameParryData
+        return GameParryData(self._node.at("ParryData"))
     @property
     def PropelData(self):  # type: ()->GamePropelData
         return GamePropelData(self._node.at("PropelData"))

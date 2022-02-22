@@ -1,5 +1,5 @@
 {
-    "Components": [],
+    "$schema": "wildschema:/all/Entity.json",
     "InstanceOf": "prefab_updated.entity",
     "Name": "PlayerSpawner_"
 }

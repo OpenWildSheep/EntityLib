@@ -9,8 +9,7 @@
                     }
                 ]
             },
-            "Type": "SubScene",
-            "Version": 1
+            "Type": "SubScene"
         }
     ],
     "Name": ""

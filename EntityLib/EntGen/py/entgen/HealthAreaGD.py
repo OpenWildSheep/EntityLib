@@ -4,7 +4,7 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.ReviveSide import *
+from entgen.EnergySide import *
 from entgen.String import *
 from entgen.ComponentGD import *
 from entgen.Float import *
@@ -27,8 +27,8 @@ class HealthAreaGD(HelperObject):
     @EnergyRestorationRate.setter
     def EnergyRestorationRate(self, val): self.EnergyRestorationRate.set(val)
     @property
-    def FactionSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("FactionSide"))
+    def FactionSide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("FactionSide"))
     @FactionSide.setter
     def FactionSide(self, val): self.FactionSide.set(val)
     @property

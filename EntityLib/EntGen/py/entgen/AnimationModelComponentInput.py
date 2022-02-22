@@ -18,6 +18,7 @@ from entgen.ForceBlendIn import *
 from entgen.ForceBlendInReachRequired import *
 from entgen.PlayRatio import *
 from entgen.SpeedModeMax import *
+from entgen.SpeedScaleXY import *
 from entgen.VariantAllowed import *
 
 from EntityLibPy import Node
@@ -65,6 +66,9 @@ class AnimationModelComponentInput(HelperObject):
     @property
     def SpeedModeMax(self):  # type: ()->SpeedModeMax
         return SpeedModeMax(self._node.at("SpeedModeMax"))
+    @property
+    def SpeedScaleXY(self):  # type: ()->SpeedScaleXY
+        return SpeedScaleXY(self._node.at("SpeedScaleXY"))
     @property
     def StyleMode(self):  # type: ()->AnimationModelComponentInput_StyleMode
         return AnimationModelComponentInput_StyleMode(self._node.at("StyleMode"))

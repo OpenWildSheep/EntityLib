@@ -23,6 +23,11 @@ class AnalyticsManager(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def EnableAnalyticsTeleportation(self):  # type: ()->Bool
+        return Bool(self._node.at("EnableAnalyticsTeleportation"))
+    @EnableAnalyticsTeleportation.setter
+    def EnableAnalyticsTeleportation(self, val): self.EnableAnalyticsTeleportation.set(val)
+    @property
     def EnableEventLogger(self):  # type: ()->Bool
         return Bool(self._node.at("EnableEventLogger"))
     @EnableEventLogger.setter

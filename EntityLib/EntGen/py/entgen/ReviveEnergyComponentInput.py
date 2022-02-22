@@ -6,9 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ComponentInput import *
-from entgen.Energy import *
-from entgen.LastValidedReviveSide import *
-from entgen.ReviveEnergyComponentInput_ReviveSide import *
+from entgen.ReviveEnergyComponentInput_EnergySide import *
 
 from EntityLibPy import Node
 
@@ -23,14 +21,8 @@ class ReviveEnergyComponentInput(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def Energy(self):  # type: ()->Energy
-        return Energy(self._node.at("Energy"))
-    @property
-    def LastValidedReviveSide(self):  # type: ()->LastValidedReviveSide
-        return LastValidedReviveSide(self._node.at("LastValidedReviveSide"))
-    @property
-    def ReviveSide(self):  # type: ()->ReviveEnergyComponentInput_ReviveSide
-        return ReviveEnergyComponentInput_ReviveSide(self._node.at("ReviveSide"))
+    def EnergySide(self):  # type: ()->ReviveEnergyComponentInput_EnergySide
+        return ReviveEnergyComponentInput_EnergySide(self._node.at("EnergySide"))
     @property
     def Super(self):  # type: ()->ComponentInput
         return ComponentInput(self._node.at("Super"))

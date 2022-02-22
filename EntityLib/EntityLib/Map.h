@@ -87,8 +87,8 @@ namespace Ent
         void checkParent(Node const* _parentNode) const;
         std::vector<NodeUniquePtr> releaseAllElements();
 
-        std::vector<String> getKeysString() const;
-        std::vector<int64_t> getKeysInt() const;
+        std::vector<String> getKeysString(bool _forceSort) const;
+        std::vector<int64_t> getKeysInt(bool _forceSort) const;
         EntityLib const* getEntityLib() const;
 
         /// Get the key containing this \b _child node

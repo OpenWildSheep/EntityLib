@@ -1,7 +1,6 @@
 {
 	"Name": "EP1-Spout_LINK_001",
 	"Components": [{
-			"Version": 1,
 			"Type": "NetworkLink",
 			"Data": {
 				"InstanceOf": "test.NetworkLink.node"

@@ -84,8 +84,12 @@ static std::string replaceAll(std::string _input, std::string const& _before, st
 }
 
 /// @brief Transform _name to ensure it doesn't conflict with C++ or python keywords
-static std::string escapeName(std::string _name)
+static std::string escapeName(std::string _name, std::string_view _toAvoid = {})
 {
+    if (_name == _toAvoid)
+    {
+        _name.push_back('_');
+    }
     static std::set<std::string> cppKeywordTypes = {
         "float", "bool", "from", "in", "None", "Type", "throw", "do", "default", "class"};
 
@@ -515,7 +519,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
             for (auto&& val : _schema.enumValues)
             {
                 enumNode["values"].push_back(json::value_t::object);
-                enumNode["values"].back()["escaped_name"] = escapeName(val);
+                enumNode["values"].back()["escaped_name"] = escapeName(val, _schema.name);
                 enumNode["values"].back()["name"] = val;
                 enumNode["values"].back()["value"] = idx;
                 ++idx;
@@ -540,7 +544,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
             json prop(json::value_t::object);
             auto propData = getSchemaRefType(propRef);
             prop["prop_name"] = propName;
-            prop["escaped_prop_name"] = escapeName(propName);
+            prop["escaped_prop_name"] = escapeName(propName, _schema.name);
             prop["type"] = std::move(propData);
             properties.push_back(prop);
             includes.emplace(getSchemaRefType(propRef));
@@ -561,7 +565,8 @@ static json getSchemaData(Ent::Subschema const& _schema)
                 ref.get().properties.at(unionData.typeField)->constValue->get<std::string>();
             Ent::SubschemaRef const& subschema = ref.get().properties.at(unionData.dataField);
             json wrapper(json::value_t::object);
-            wrapper["name"] = escapeName(acceptedType);
+            wrapper["escaped_name"] = escapeName(acceptedType);
+            wrapper["name"] = acceptedType;
             wrapper["type"] = getSchemaRefType(subschema);
             types.push_back(wrapper);
         }
@@ -685,23 +690,29 @@ void gencpp(std::filesystem::path const& _resourcePath, std::filesystem::path co
         partial([]() { return R"cpp(Ent::Gen::Tuple<{{#types}}{{>display_type}}{{/types}}>)cpp"; });
     rootData["prim_set_type"] =
         partial([]() { return R"cpp(Ent::Gen::PrimitiveSet<{{type.ref.cpp_native}}>)cpp"; });
-    rootData["object_set_type"] = partial([]() {
-        return R"cpp(Ent::Gen::ObjectSet<{{key_type.ref.cpp_native}}, {{#type}}{{>display_type}}{{/type}}>)cpp";
-    });
-    rootData["map_type"] = partial([]() {
-        return R"cpp(Ent::Gen::Map<{{key_type.ref.cpp_native}}, {{#value_type}}{{>display_type}}{{/value_type}}>)cpp";
-    });
-    rootData["display_type"] = partial([]() {
-        return R"({{#object_set}}{{>object_set_type}}{{/object_set}})"
-               R"({{#prim_set}}{{>prim_set_type}}{{/prim_set}})"
-               R"({{#map}}{{>map_type}}{{/map}})"
-               R"({{#ref}}Ent::Gen::{{name}}{{/ref}})"
-               R"({{#array}}Array<{{#type}}{{>display_type}}{{/type}}>{{/array}})"
-               R"({{#prim_array}}PrimArray<{{#type}}{{>display_type}}{{/type}}>{{/prim_array}})"
-               R"({{#union_set}}UnionSet<{{#type}}{{>display_type}}{{/type}}>{{/union_set}})"
-               R"({{#tuple}}{{>tuple_type}}{{/tuple}})"
-               R"({{#comma}}, {{/comma}})";
-    });
+    rootData["object_set_type"] = partial(
+        []()
+        {
+            return R"cpp(Ent::Gen::ObjectSet<{{key_type.ref.cpp_native}}, {{#type}}{{>display_type}}{{/type}}>)cpp";
+        });
+    rootData["map_type"] = partial(
+        []()
+        {
+            return R"cpp(Ent::Gen::Map<{{key_type.ref.cpp_native}}, {{#value_type}}{{>display_type}}{{/value_type}}>)cpp";
+        });
+    rootData["display_type"] = partial(
+        []()
+        {
+            return R"({{#object_set}}{{>object_set_type}}{{/object_set}})"
+                   R"({{#prim_set}}{{>prim_set_type}}{{/prim_set}})"
+                   R"({{#map}}{{>map_type}}{{/map}})"
+                   R"({{#ref}}Ent::Gen::{{name}}{{/ref}})"
+                   R"({{#array}}Array<{{#type}}{{>display_type}}{{/type}}>{{/array}})"
+                   R"({{#prim_array}}PrimArray<{{#type}}{{>display_type}}{{/type}}>{{/prim_array}})"
+                   R"({{#union_set}}UnionSet<{{#type}}{{>display_type}}{{/type}}>{{/union_set}})"
+                   R"({{#tuple}}{{>tuple_type}}{{/tuple}})"
+                   R"({{#comma}}, {{/comma}})";
+        });
 
     mustache tmpl{R"cpp(
 // /!\ This code is GENERATED! Do not modify it.
@@ -776,8 +787,8 @@ namespace Ent
             {{schema.type_name}}(Ent::Node* _node): Base(_node) {}
             {{#schema.schema_name}}static constexpr char schemaName[] = "{{{.}}}";{{/schema.schema_name}}
             char const* getType() const;{{#types}}
-            std::optional<{{#type}}{{>display_type}}{{/type}}> {{name}}() const;
-            {{#type}}{{>display_type}}{{/type}} set{{name}}() const;
+            std::optional<{{#type}}{{>display_type}}{{/type}}> {{escaped_name}}() const;
+            {{#type}}{{>display_type}}{{/type}} set{{escaped_name}}() const;
         {{/types}}
         };{{/schema.union}}{{#schema.union_set}}{{#union}}
         struct {{schema.type_name}} : UnionSetBase<{{items.ref.name}}> // union_set
@@ -806,13 +817,13 @@ namespace Ent
         {
             return node->getUnionType();
         }
-        {{#types}}inline std::optional<{{#type}}{{>display_type}}{{/type}}> {{schema.type_name}}::{{name}}() const
+        {{#types}}inline std::optional<{{#type}}{{>display_type}}{{/type}}> {{schema.type_name}}::{{escaped_name}}() const
         {
-            return strcmp(node->getUnionType(), "{{name}}") != 0? std::optional<{{#type}}{{>display_type}}{{/type}}>{}: std::optional<{{#type}}{{>display_type}}{{/type}}>(node->getUnionData());
+            return strcmp(node->getUnionType(), "{{{name}}}") != 0? std::optional<{{#type}}{{>display_type}}{{/type}}>{}: std::optional<{{#type}}{{>display_type}}{{/type}}>(node->getUnionData());
         }
-        inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::set{{name}}() const
+        inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::set{{escaped_name}}() const
         {
-            return {{#type}}{{>display_type}}{{/type}}(node->setUnionType("{{schema.type_name}}"));
+            return {{#type}}{{>display_type}}{{/type}}(node->setUnionType("{{{name}}}"));
         }
         {{/types}}
 {{/schema.union}}{{#schema.union_set}}{{#union}}// {{schema.type_name}}
@@ -851,47 +862,60 @@ void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path con
 {
     create_directories(_destinationPath / "entgen");
 
-    auto add_partials = [](data& root) {
-        root["display_type_hint"] = partial([]() {
-            return R"({{#object_set}}ObjectSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/object_set}})"
-                   R"({{#prim_set}}PrimitiveSet[{{type.ref.py_native}}]{{/prim_set}})"
-                   R"({{#map}}Map[{{key_type.ref.py_native}}, {{#value_type}}{{>display_type_comma}}{{/value_type}}]{{/map}})"
-                   R"({{#ref}}{{name}}{{/ref}})"
-                   R"({{#array}}Array[{{#type}}{{>display_type_comma}}{{/type}}]{{/array}})"
-                   R"({{#prim_array}}PrimArray[{{#type}}{{>display_type_comma}}{{/type}}]{{/prim_array}})"
-                   R"({{#union_set}}UnionSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/union_set}})"
-                   R"({{#tuple}}TupleNode[{{#types}}Type[{{>display_type_hint}}]{{#comma}}, {{/comma}}{{/types}}]{{/tuple}})";
-        });
+    auto add_partials = [](data& root)
+    {
+        root["display_type_hint"] = partial(
+            []()
+            {
+                return R"({{#object_set}}ObjectSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/object_set}})"
+                       R"({{#prim_set}}PrimitiveSet[{{type.ref.py_native}}]{{/prim_set}})"
+                       R"({{#map}}Map[{{key_type.ref.py_native}}, {{#value_type}}{{>display_type_comma}}{{/value_type}}]{{/map}})"
+                       R"({{#ref}}{{name}}{{/ref}})"
+                       R"({{#array}}Array[{{#type}}{{>display_type_comma}}{{/type}}]{{/array}})"
+                       R"({{#prim_array}}PrimArray[{{#type}}{{>display_type_comma}}{{/type}}]{{/prim_array}})"
+                       R"({{#union_set}}UnionSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/union_set}})"
+                       R"({{#tuple}}TupleNode[{{#types}}Type[{{>display_type_hint}}]{{#comma}}, {{/comma}}{{/types}}]{{/tuple}})";
+            });
 
-        root["display_type_comma"] = partial([]() {
-            return R"({{>display_type_hint}})"
-                   R"({{#comma}}, {{/comma}})";
-        });
-        root["type_ctor_comma"] = partial([]() {
-            return R"({{>type_ctor}})"
-                   R"({{#comma}}, {{/comma}})";
-        });
-        root["type_ctor"] = partial([]() {
-            return R"({{#object_set}}(lambda n: ObjectSet({{#type}}{{>type_ctor}}{{/type}}, n)){{/object_set}})"
-                   R"({{#prim_set}}(lambda n: PrimitiveSet({{type.ref.py_native}}, n)){{/prim_set}})"
-                   R"({{#map}}(lambda n: Map({{key_type.ref.py_native}}, {{#value_type}}{{>type_ctor}}{{/value_type}}, n)){{/map}})"
-                   R"({{#ref}}{{name}}{{/ref}})"
-                   R"({{#array}}(lambda n: Array({{#type}}{{>type_ctor}}{{/type}}, n)){{/array}})"
-                   R"({{#prim_array}}(lambda n: PrimArray({{#type}}{{>type_ctor}}{{/type}}, n)){{/prim_array}})"
-                   R"({{#union_set}}(lambda n: UnionSet({{#items}}{{>type_ctor}}{{/items}}, n)){{/union_set}})"
-                   R"({{#tuple}}TupleNode{{/tuple}})";
-        });
-        root["print_import"] = partial([]() {
-            return R"({{#object_set}}{{#type}}{{>print_import}}{{/type}}{{/object_set}})"
-                   R"({{#prim_set}}{{#type}}{{>print_import}}{{/type}}{{/prim_set}})"
-                   R"({{#map}}{{#value_type}}{{>print_import}}{{/value_type}}{{#key_type}}{{>print_import}}{{/key_type}}{{/map}})"
-                   R"({{#ref}}from entgen.{{name}} import *
+        root["display_type_comma"] = partial(
+            []()
+            {
+                return R"({{>display_type_hint}})"
+                       R"({{#comma}}, {{/comma}})";
+            });
+        root["type_ctor_comma"] = partial(
+            []()
+            {
+                return R"({{>type_ctor}})"
+                       R"({{#comma}}, {{/comma}})";
+            });
+        root["type_ctor"] = partial(
+            []()
+            {
+                return R"({{#object_set}}(lambda n: ObjectSet({{#type}}{{>type_ctor}}{{/type}}, n)){{/object_set}})"
+                       R"({{#prim_set}}(lambda n: PrimitiveSet({{type.ref.py_native}}, n)){{/prim_set}})"
+                       R"({{#map}}(lambda n: Map({{key_type.ref.py_native}}, {{#value_type}}{{>type_ctor}}{{/value_type}}, n)){{/map}})"
+                       R"({{#ref}}{{name}}{{/ref}})"
+                       R"({{#array}}(lambda n: Array({{#type}}{{>type_ctor}}{{/type}}, n)){{/array}})"
+                       R"({{#prim_array}}(lambda n: PrimArray({{#type}}{{>type_ctor}}{{/type}}, n)){{/prim_array}})"
+                       R"({{#union_set}}(lambda n: UnionSet({{#items}}{{>type_ctor}}{{/items}}, n)){{/union_set}})"
+                       R"({{#tuple}}TupleNode{{/tuple}})";
+            });
+        root["print_import"] = partial(
+            []()
+            {
+                return R"({{#object_set}}{{#type}}{{>print_import}}{{/type}}{{/object_set}})"
+                       R"({{#prim_set}}{{#type}}{{>print_import}}{{/type}}{{/prim_set}})"
+                       R"({{#map}}{{#value_type}}{{>print_import}}{{/value_type}}{{#key_type}}{{>print_import}}{{/key_type}}{{/map}})"
+                       R"({{#ref}}from entgen.{{name}} import *
 {{/ref}})"
-                   R"({{#array}}{{#type}}{{>print_import}}{{/type}}{{/array}})"
-                   R"({{#prim_array}}{{#type}}{{>print_import}}{{/type}}{{/prim_array}})";
-        });
-        root["print_type_definition"] = partial([]() {
-            return R"py(from EntityLibPy import Node
+                       R"({{#array}}{{#type}}{{>print_import}}{{/type}}{{/array}})"
+                       R"({{#prim_array}}{{#type}}{{>print_import}}{{/type}}{{/prim_array}})";
+            });
+        root["print_type_definition"] = partial(
+            []()
+            {
+                return R"py(from EntityLibPy import Node
 {{#schema}}{{#union_set}}
 {{schema.type_name}} = (lambda n: UnionSet({{#items}}{{>type_ctor}}{{/items}}, n))
 {{/union_set}}{{#object_set}}
@@ -961,7 +985,7 @@ class {{type_name}}(TupleNode[Tuple[{{#types}}Type[{{>display_type_hint}}]{{#com
 {{/types}}
 
 {{/tuple}}{{/schema}})py";
-        });
+            });
     };
 
     for (json const& refSchema : allDefinitions)
@@ -1204,7 +1228,8 @@ try
     std::filesystem::remove_all(destinationPath, er);
     std::filesystem::create_directories(destinationPath);
 
-    auto getTypeID = [](json const& type) {
+    auto getTypeID = [](json const& type)
+    {
         auto&& schema = type["schema"];
         if (schema.count("type_name") != 0)
         {

@@ -4,7 +4,7 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.ReviveSide import *
+from entgen.EnergySide import *
 from entgen.String import *
 from entgen.ActorState import *
 
@@ -21,10 +21,10 @@ class ActorStateSoulWaitingToRespawn(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
+    def EnergySide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("EnergySide"))
+    @EnergySide.setter
+    def EnergySide(self, val): self.EnergySide.set(val)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))

@@ -7,9 +7,6 @@ import EntityLibPy
 from entgen.String import *
 from entgen.CanTakeHit import *
 from entgen.ComponentInput import *
-from entgen.CreatureComponentInput_LastAliveReviveSide import *
-from entgen.CreatureComponentInput_ReviveSide import *
-from entgen.CreatureComponentInput_ReviveState import *
 from entgen.DeltaTimeFactor import *
 from entgen.Invincible import *
 from entgen.Life import *
@@ -36,17 +33,8 @@ class CreatureComponentInput(HelperObject):
     def Invincible(self):  # type: ()->Invincible
         return Invincible(self._node.at("Invincible"))
     @property
-    def LastAliveReviveSide(self):  # type: ()->CreatureComponentInput_LastAliveReviveSide
-        return CreatureComponentInput_LastAliveReviveSide(self._node.at("LastAliveReviveSide"))
-    @property
     def Life(self):  # type: ()->Life
         return Life(self._node.at("Life"))
-    @property
-    def ReviveSide(self):  # type: ()->CreatureComponentInput_ReviveSide
-        return CreatureComponentInput_ReviveSide(self._node.at("ReviveSide"))
-    @property
-    def ReviveState(self):  # type: ()->CreatureComponentInput_ReviveState
-        return CreatureComponentInput_ReviveState(self._node.at("ReviveState"))
     @property
     def Super(self):  # type: ()->ComponentInput
         return ComponentInput(self._node.at("Super"))

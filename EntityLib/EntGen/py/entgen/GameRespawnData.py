@@ -6,7 +6,6 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.Float import *
-from entgen.TravelParams import *
 
 from EntityLibPy import Node
 
@@ -21,16 +20,10 @@ class GameRespawnData(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def GuardianTravelParams(self):  # type: ()->TravelParams
-        return TravelParams(self._node.at("GuardianTravelParams"))
-    @property
-    def IdleTimeBeforeRespawn(self):  # type: ()->Float
-        return Float(self._node.at("IdleTimeBeforeRespawn"))
-    @IdleTimeBeforeRespawn.setter
-    def IdleTimeBeforeRespawn(self, val): self.IdleTimeBeforeRespawn.set(val)
-    @property
-    def NonGuardianTravelParams(self):  # type: ()->TravelParams
-        return TravelParams(self._node.at("NonGuardianTravelParams"))
+    def SetRespawnPlaceAsCheckpointDuration(self):  # type: ()->Float
+        return Float(self._node.at("SetRespawnPlaceAsCheckpointDuration"))
+    @SetRespawnPlaceAsCheckpointDuration.setter
+    def SetRespawnPlaceAsCheckpointDuration(self, val): self.SetRespawnPlaceAsCheckpointDuration.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

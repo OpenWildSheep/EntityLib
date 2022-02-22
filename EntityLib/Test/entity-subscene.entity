@@ -8,8 +8,7 @@
                 "SklLush": "wolf_skeleton_lush",
                 "SklNeutral": "wolf_skeleton_neutral"
             },
-            "Type": "TestCreature",
-            "Version": 1
+            "Type": "TestCreature"
         },
         {
             "Data": {
@@ -18,12 +17,7 @@
                         "Components": [
                             {
                                 "Data": {
-                                    "Matrix": [
-                                        1.0,
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        1.0,
+                                    "Orientation": [
                                         0.0,
                                         0.0,
                                         0.0,
@@ -35,8 +29,7 @@
                                         3.814697265625e-06
                                     ]
                                 },
-                                "Type": "TransformGD",
-                                "Version": 1
+                                "Type": "TransformGD"
                             }
                         ],
                         "Name": "wolf_skeleton_lush",
@@ -46,12 +39,7 @@
                         "Components": [
                             {
                                 "Data": {
-                                    "Matrix": [
-                                        1.0,
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        1.0,
+                                    "Orientation": [
                                         0.0,
                                         0.0,
                                         0.0,
@@ -63,8 +51,7 @@
                                         0.0
                                     ]
                                 },
-                                "Type": "TransformGD",
-                                "Version": 1
+                                "Type": "TransformGD"
                             }
                         ],
                         "Name": "wolf_skeleton_neutral",
@@ -74,12 +61,7 @@
                         "Components": [
                             {
                                 "Data": {
-                                    "Matrix": [
-                                        1.0,
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        1.0,
+                                    "Orientation": [
                                         0.0,
                                         0.0,
                                         0.0,
@@ -91,8 +73,7 @@
                                         0.0
                                     ]
                                 },
-                                "Type": "TransformGD",
-                                "Version": 1
+                                "Type": "TransformGD"
                             }
                         ],
                         "Name": "wolf_skeleton_fire",
@@ -102,12 +83,7 @@
                         "Components": [
                             {
                                 "Data": {
-                                    "Matrix": [
-                                        1.0,
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        1.0,
+                                    "Orientation": [
                                         0.0,
                                         0.0,
                                         0.0,
@@ -119,8 +95,7 @@
                                         -7.62939453125e-06
                                     ]
                                 },
-                                "Type": "TransformGD",
-                                "Version": 1
+                                "Type": "TransformGD"
                             }
                         ],
                         "Name": "wolf_full_lush",
@@ -130,12 +105,7 @@
                         "Components": [
                             {
                                 "Data": {
-                                    "Matrix": [
-                                        1.0,
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        1.0,
+                                    "Orientation": [
                                         0.0,
                                         0.0,
                                         0.0,
@@ -147,19 +117,15 @@
                                         0.0
                                     ]
                                 },
-                                "Type": "TransformGD",
-                                "Version": 1
+                                "Type": "TransformGD"
                             }
                         ],
                         "Name": "wolf_full_fire",
                         "Thumbnail": "02_Creature/Wolf/MALE/cloththin/BodyWolfBlack/cloth_body.wthumb"
                     }
-                ],
-                "File": "",
-                "isEmbedded": true
+                ]
             },
-            "Type": "SubScene",
-            "Version": 1
+            "Type": "SubScene"
         }
     ],
     "Name": "entity-subscene"

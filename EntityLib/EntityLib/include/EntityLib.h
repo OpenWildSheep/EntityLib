@@ -9,18 +9,12 @@
 #include "../Union.h"
 #include "../Object.h"
 #include "../Node.h"
-#include "../Component.h"
-#include "../Scene.h"
-#include "../Entity.h"
-#include "../SubSceneComponent.h"
 #pragma warning(pop)
 
 namespace Ent
 {
     struct Node;
-    struct Scene;
     class EntityLib;
-    struct Entity;
 
     // ********************************** Static data *********************************************
 
@@ -66,23 +60,12 @@ namespace Ent
         DeleteCheck deleteCheck;
         /// @endcond
 
-        /// Load the Entity at path _entityPath then return a pointer to the cached data
-        std::shared_ptr<Entity const> loadEntityReadOnly(
-            std::filesystem::path const& _entityPath, Entity const* _super = nullptr) const;
-
-        /// Load the Scene at path _scenePath then return a pointer to the cached data
-        std::shared_ptr<Scene const> loadSceneReadOnly(std::filesystem::path const& _scenePath) const;
-
         /// Load the Node at path _nodeSchema then return a pointer to the cached data
         std::shared_ptr<Node const> loadNodeReadOnly(
             Subschema const& _nodeSchema, char const* _nodePath, Node const* _super = nullptr) const;
 
         /// Load the Node at path _nodeSchema then return a pointer to the cached data
         std::shared_ptr<Node const> loadNodeEntityReadOnly(char const* _nodePath) const;
-
-        /// Load the Scene in legacy format at path _scenePath then return a pointer to the cached data
-        std::shared_ptr<Scene const>
-        loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const;
 
         /// Load an entity file into a Node
         NodeUniquePtr loadEntityAsNode(std::filesystem::path const& _entityPath) const;
@@ -95,25 +78,6 @@ namespace Ent
 
         /// Load any entitylib file into a Node, reading the schema name inside the file
         NodeUniquePtr loadFileAsNode(std::filesystem::path const& _nodePath) const;
-
-        /// Load the Entity at path _entityPath
-        std::unique_ptr<Entity>
-        loadEntity(std::filesystem::path const& _entityPath, Entity const* _super = nullptr) const;
-
-        std::unique_ptr<Entity> loadEntityFromJson(
-            nlohmann::json const& _entNode, Entity const* _superEntityFromParentEntity) const;
-
-        /// Load the Scene at path _scenePath
-        std::unique_ptr<Scene> loadScene(std::filesystem::path const& _scenePath) const;
-
-        /// Load the Scene in legacy format at path _scenePath
-        std::unique_ptr<Scene> loadLegacyScene(std::filesystem::path const& _scenePath) const;
-
-        /// Save the Entity at path _entityPath
-        void saveEntity(Entity const& _entity, std::filesystem::path const& _relEntityPath) const;
-
-        /// Save the Scene at path _scenePath
-        void saveScene(Scene const& _scene, std::filesystem::path const& _scenePath) const;
 
         /// Save the Entity at path _entityPath
         void saveNodeAsEntity(Node const* _entity, char const* _relEntityPath) const;
@@ -151,30 +115,17 @@ namespace Ent
         /// Create a Node with the Entity's schema
         NodeUniquePtr makeEntityNode() const;
 
-        /// @brief Create an Entity which instanciate an other.
-        ///
-        /// This allow to override some properties without change the prefab properties.
-        std::unique_ptr<Entity> makeInstanceOf(std::string const& _instanceOf ///< Path to the prefab Entity
-        ) const;
-
-        struct EntityFile
-        {
-            std::shared_ptr<Entity> data;
-            std::filesystem::file_time_type time;
-        };
-        struct SceneFile
-        {
-            std::shared_ptr<Scene> data;
-            std::filesystem::file_time_type time;
-        };
         struct NodeFile
         {
             std::shared_ptr<Node> data;
             std::filesystem::file_time_type time;
         };
-        std::map<std::filesystem::path, EntityFile> const& getEntityCache() const;
-        std::map<std::filesystem::path, SceneFile> const& getSceneCache() const;
         std::map<std::filesystem::path, NodeFile> const& getNodeCache() const;
+        struct HashPath
+        {
+            auto operator()(std::filesystem::path const& p) const;
+        };
+        std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> const& getJsonDatabase() const;
 
         void clearCache();
 
@@ -208,6 +159,9 @@ namespace Ent
         Node* getParentEntity(Node* _node); ///< Get the parent Entity Node
         Node const* getParentEntity(Node const* _node); ///< Get the parent Entity Node
 
+        nlohmann::json& readJsonFile(char const* _filepath, bool canonicalize = true);
+        void saveJsonFile(nlohmann::json const* doc, char const* _filepath);
+
     private:
         /// Load an Entity or a Scene, using the given cache
         template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
@@ -222,7 +176,8 @@ namespace Ent
             Subschema const& _nodeSchema,
             nlohmann::json const& _data,
             Node const* _super,
-            nlohmann::json const* _default = nullptr) const;
+            nlohmann::json const* _default = nullptr,
+            bool _ignoreInstanceOf = false) const;
 
         NodeUniquePtr loadUnion(
             Subschema const& _nodeSchema,
@@ -242,9 +197,8 @@ namespace Ent
             Node const* _super,
             nlohmann::json const* _default = nullptr) const;
 
-        mutable std::map<std::filesystem::path, EntityFile> m_entityCache;
-        mutable std::map<std::filesystem::path, SceneFile> m_sceneCache;
         mutable std::map<std::filesystem::path, NodeFile> m_nodeCache;
+        mutable std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> m_jsonDatabase;
     };
 
 } // namespace Ent

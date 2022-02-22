@@ -11,6 +11,7 @@ from entgen.Bool import *
 from entgen.ComponentGD import *
 from entgen.Float import *
 from entgen.SoundEventMapping import *
+from entgen.SoundOcclusionData import *
 from entgen.String import *
 
 from EntityLibPy import Node
@@ -99,6 +100,9 @@ class SoundEmitterGD(HelperObject):
     @InEvents.setter
     def InEvents(self, val): self.InEvents.set(val)
     @property
+    def OcclusionData(self):  # type: ()->SoundOcclusionData
+        return SoundOcclusionData(self._node.at("OcclusionData"))
+    @property
     def OutEvents(self):  # type: ()->PrimArray[String]
         return (lambda n: PrimArray(String, n))(self._node.at("OutEvents"))
     @OutEvents.setter
@@ -116,6 +120,11 @@ class SoundEmitterGD(HelperObject):
         return SyncTempoMode(self._node.at("UnactivationSync"))
     @UnactivationSync.setter
     def UnactivationSync(self, val): self.UnactivationSync.set(val)
+    @property
+    def UseOcclusion(self):  # type: ()->Bool
+        return Bool(self._node.at("UseOcclusion"))
+    @UseOcclusion.setter
+    def UseOcclusion(self, val): self.UseOcclusion.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

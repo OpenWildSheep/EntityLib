@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.SpeedMode import *
 from entgen.String import *
+from entgen.Int import *
 from entgen.Bool import *
 from entgen.Float import *
 from entgen.MoveCapacityData_AnimTagTimelineTransitionTable import *
@@ -74,6 +75,11 @@ class MoveCapacityData(HelperObject):
         return Float(self._node.at("brakeDeceleration"))
     @brakeDeceleration.setter
     def brakeDeceleration(self, val): self.brakeDeceleration.set(val)
+    @property
+    def canUseCliffGrip(self):  # type: ()->Bool
+        return Bool(self._node.at("canUseCliffGrip"))
+    @canUseCliffGrip.setter
+    def canUseCliffGrip(self, val): self.canUseCliffGrip.set(val)
     @property
     def capsuleBigRadius(self):  # type: ()->Float
         return Float(self._node.at("capsuleBigRadius"))
@@ -244,6 +250,11 @@ class MoveCapacityData(HelperObject):
         return Float(self._node.at("minimumDropTimeBeforeAClimbEdge"))
     @minimumDropTimeBeforeAClimbEdge.setter
     def minimumDropTimeBeforeAClimbEdge(self, val): self.minimumDropTimeBeforeAClimbEdge.set(val)
+    @property
+    def nbAttackJump(self):  # type: ()->Int
+        return Int(self._node.at("nbAttackJump"))
+    @nbAttackJump.setter
+    def nbAttackJump(self, val): self.nbAttackJump.set(val)
     @property
     def orientationSpeedFly(self):  # type: ()->MoveCapacityData_OrientationSpeed
         return MoveCapacityData_OrientationSpeed(self._node.at("orientationSpeedFly"))

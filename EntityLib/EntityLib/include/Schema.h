@@ -70,6 +70,15 @@ namespace Ent
         std::string title;
         std::string description;
 
+        struct UnionSubTypeInfo
+        {
+            Subschema const* wrapperSchema = nullptr;
+            Subschema const* dataSchema = nullptr;
+            size_t index = 0;
+        };
+        /// @brief Fast lookup in union types
+        std::map<std::string, UnionSubTypeInfo> unionTypeMap;
+
         // Meta informations
         /// Store metadata for any type
         struct BaseMeta
@@ -252,27 +261,30 @@ namespace Ent
     inline bool Subschema::IsDeprecated() const
     {
         return std::visit(
-            BasicFieldGetter{[](const Subschema::BaseMeta* _meta) {
-                return _meta->deprecated;
-            }},
+            BasicFieldGetter{[](const Subschema::BaseMeta* _meta)
+                             {
+                                 return _meta->deprecated;
+                             }},
             meta);
     }
 
     inline bool Subschema::IsUsedInEditor() const
     {
         return std::visit(
-            BasicFieldGetter{[](const Subschema::BaseMeta* _meta) {
-                return _meta->usedInEditor;
-            }},
+            BasicFieldGetter{[](const Subschema::BaseMeta* _meta)
+                             {
+                                 return _meta->usedInEditor;
+                             }},
             meta);
     }
 
     inline bool Subschema::IsUsedInRuntime() const
     {
         return std::visit(
-            BasicFieldGetter{[](const Subschema::BaseMeta* _meta) {
-                return _meta->usedInRuntime;
-            }},
+            BasicFieldGetter{[](const Subschema::BaseMeta* _meta)
+                             {
+                                 return _meta->usedInRuntime;
+                             }},
             meta);
     }
 

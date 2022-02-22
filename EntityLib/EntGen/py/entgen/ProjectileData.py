@@ -7,7 +7,6 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Bool import *
 from entgen.Float import *
-from entgen.FreezeData import *
 from entgen.Vector3 import *
 from entgen.String import *
 from entgen.Float import *
@@ -64,9 +63,6 @@ class ProjectileData(HelperObject):
         return Float(self._node.at("explosionShockForce"))
     @explosionShockForce.setter
     def explosionShockForce(self, val): self.explosionShockForce.set(val)
-    @property
-    def freezeData(self):  # type: ()->FreezeData
-        return FreezeData(self._node.at("freezeData"))
     @property
     def gameEffectOnHit(self):  # type: ()->PrimArray[String]
         return (lambda n: PrimArray(String, n))(self._node.at("gameEffectOnHit"))

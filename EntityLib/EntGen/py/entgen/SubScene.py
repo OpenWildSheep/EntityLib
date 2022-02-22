@@ -5,7 +5,6 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
-from entgen.Bool import *
 from entgen.ComponentGD import *
 from entgen.Entity import *
 
@@ -25,11 +24,6 @@ class SubScene(HelperObject):
     def Embedded(self):  # type: ()->ObjectSet[Entity]
         return (lambda n: ObjectSet(Entity, n))(self._node.at("Embedded"))
     @property
-    def File(self):  # type: ()->String
-        return String(self._node.at("File"))
-    @File.setter
-    def File(self, val): self.File.set(val)
-    @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
     @property
@@ -37,11 +31,6 @@ class SubScene(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
-    @property
-    def isEmbedded(self):  # type: ()->Bool
-        return Bool(self._node.at("isEmbedded"))
-    @isEmbedded.setter
-    def isEmbedded(self, val): self.isEmbedded.set(val)
     pass
 
 

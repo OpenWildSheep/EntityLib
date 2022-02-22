@@ -4,7 +4,7 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.ReviveSide import *
+from entgen.EnergySide import *
 from entgen.String import *
 from entgen.Float import *
 
@@ -21,15 +21,15 @@ class EntityStateRevive_Inputs(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def EnergySide(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("EnergySide"))
+    @EnergySide.setter
+    def EnergySide(self, val): self.EnergySide.set(val)
+    @property
     def Life(self):  # type: ()->Float
         return Float(self._node.at("Life"))
     @Life.setter
     def Life(self, val): self.Life.set(val)
-    @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

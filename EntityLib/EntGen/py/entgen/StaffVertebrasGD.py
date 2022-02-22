@@ -7,7 +7,6 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Int import *
 from entgen.ComponentGD import *
-from entgen.VomitData import *
 from entgen.String import *
 
 from EntityLibPy import Node
@@ -60,9 +59,6 @@ class StaffVertebrasGD(HelperObject):
         return String(self._node.at("VertebraGRCPath4"))
     @VertebraGRCPath4.setter
     def VertebraGRCPath4(self, val): self.VertebraGRCPath4.set(val)
-    @property
-    def VomitData(self):  # type: ()->VomitData
-        return VomitData(self._node.at("VomitData"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

@@ -1,78 +1,71 @@
 {
-	"Color": [
-		27,
-		177,
-		27,
-		255
-	],
-	"Components": [
-		{
-			"Data": {
-				"Faction": "Plouf",
-				"ScriptList": [
-					"a1",
-					"b2",
+    "Color": [
+        27,
+        177,
+        27,
+        255
+    ],
+    "Components": [
+        {
+            "Data": {
+                "Faction": "Plouf",
+                "ScriptList": [
+                    "a1",
+                    "b2",
 					null
 				]
 			},
-			"Type": "SystemicCreature",
-			"Version": 1
+			"Type": "SystemicCreature"
 		},
 		{
-			"Version": 1,
 			"Type": "SubScene",
 			"Data": {
-				"isEmbedded": true,
-				"File": "",
-				"Embedded": [
-					{
-						"ElementID": 2,
-						"Name": "EP1-Spout_LINK_001_added",
-						"Color": [
-							44,
-							120,
-							220,
-							255
-						],
-						"Components": [
-							{
-								"Version": 1,
-								"Type": "TransformGD",
-								"Data": {
-									"Matrix": [
-										-0.0057,
-										-0.4374,
-										74.1085,
-										0.0,
-										0.8993,
-										36.0432,
-										-1.0,
-										0.0025,
-										-0.4247
+                "Embedded": [
+                    {
+                        "Name": "EP1-Spout_LINK_001_added",
+                        "Color": [
+                            44,
+                            120,
+                            220,
+                            255
+                        ],
+                        "Components": [
+                            {
+                                "Type": "TransformGD",
+                                "Data": {
+									"Orientation": [
+										-0.15823428332805634,
+										0.6910317540168762,
+										0.15914349257946014,
+										0.6871029734611511
 									],
 									"Position": [
 										0.0,
 										0.0,
 										0.0
+									],
+									"Scale": [
+										1.000016212463379,
+										1.000032663345337,
+										82.40972137451172
 									]
-								}
-							},
-							{
-								"Version": 1,
-								"Type": "NetworkLink",
-								"Data": {
-									"Source": ".EP1-Spout_",
-									"Target": ".EP1-crook_",
-									"ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
-								}
-							}
-						]
-					}
-				]
-			}
-		}
-	],
-	"InstanceOf": "prefab.entity",
-	"Thumbnail": "prout",
-	"Name": "PlayerSpawner_"
+                                }
+                            },
+                            {
+                                "Type": "NetworkLink",
+                                "Data": {
+                                    "Source": ".EP1-Spout_",
+                                    "Target": ".EP1-crook_",
+                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "InstanceOf": "prefab.entity",
+    "Thumbnail": "prout",
+    "Name": "PlayerSpawner_"
 }

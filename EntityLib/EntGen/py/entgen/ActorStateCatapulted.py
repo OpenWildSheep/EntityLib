@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ActorState import *
+from entgen.Float import *
 
 from EntityLibPy import Node
 
@@ -19,6 +20,16 @@ class ActorStateCatapulted(HelperObject):
         return ActorStateCatapulted(entlib.make_node(ActorStateCatapulted.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def AirControlMultiplier(self):  # type: ()->Float
+        return Float(self._node.at("AirControlMultiplier"))
+    @AirControlMultiplier.setter
+    def AirControlMultiplier(self, val): self.AirControlMultiplier.set(val)
+    @property
+    def FallHeightProtection(self):  # type: ()->Float
+        return Float(self._node.at("FallHeightProtection"))
+    @FallHeightProtection.setter
+    def FallHeightProtection(self, val): self.FallHeightProtection.set(val)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))

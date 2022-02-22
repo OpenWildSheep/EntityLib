@@ -7,6 +7,7 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Int import *
 from entgen.String import *
+from entgen.String import *
 
 from EntityLibPy import Node
 
@@ -35,6 +36,9 @@ class PhysicsMaterial(HelperObject):
         return String(self._node.at("Name"))
     @Name.setter
     def Name(self, val): self.Name.set(val)
+    @property
+    def Tags(self):  # type: ()->PrimitiveSet[str]
+        return (lambda n: PrimitiveSet(str, n))(self._node.at("Tags"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

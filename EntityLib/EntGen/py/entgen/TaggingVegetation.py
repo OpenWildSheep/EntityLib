@@ -4,7 +4,7 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.RegenerationState import *
+from entgen.EnergySide import *
 from entgen.String import *
 from entgen.Float import *
 from entgen.FloatRange import *
@@ -31,8 +31,8 @@ class TaggingVegetation(HelperObject):
     @RequiredRatio.setter
     def RequiredRatio(self, val): self.RequiredRatio.set(val)
     @property
-    def TaggedState(self):  # type: ()->RegenerationState
-        return RegenerationState(self._node.at("TaggedState"))
+    def TaggedState(self):  # type: ()->EnergySide
+        return EnergySide(self._node.at("TaggedState"))
     @TaggedState.setter
     def TaggedState(self, val): self.TaggedState.set(val)
     @property

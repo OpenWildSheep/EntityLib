@@ -4,9 +4,12 @@
 from entgen_helpers import *
 import EntityLibPy
 
+from entgen.EnergyValue import *
 from entgen.String import *
 from entgen.Float import *
 from entgen.Manager import *
+from entgen.RegenerationManager_EnergyAreaSetting import *
+from entgen.EnergyIntensity import *
 
 from EntityLibPy import Node
 
@@ -20,6 +23,11 @@ class RegenerationManager(HelperObject):
         return RegenerationManager(entlib.make_node(RegenerationManager.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def BackgroundEnergyValue(self):  # type: ()->EnergyValue
+        return EnergyValue(self._node.at("BackgroundEnergyValue"))
+    @BackgroundEnergyValue.setter
+    def BackgroundEnergyValue(self, val): self.BackgroundEnergyValue.set(val)
     @property
     def DefaultLostRatio(self):  # type: ()->Float
         return Float(self._node.at("DefaultLostRatio"))
@@ -41,10 +49,18 @@ class RegenerationManager(HelperObject):
     @DefaultTransmittedRatio.setter
     def DefaultTransmittedRatio(self, val): self.DefaultTransmittedRatio.set(val)
     @property
+    def EnergyAreaSettingsMap(self):  # type: ()->Map[EnergyIntensityEnum, RegenerationManager_EnergyAreaSetting]
+        return (lambda n: Map(EnergyIntensityEnum, RegenerationManager_EnergyAreaSetting, n))(self._node.at("EnergyAreaSettingsMap"))
+    @property
     def EnergyMaxValue(self):  # type: ()->Float
         return Float(self._node.at("EnergyMaxValue"))
     @EnergyMaxValue.setter
     def EnergyMaxValue(self, val): self.EnergyMaxValue.set(val)
+    @property
+    def EnergyStrongValueThreshold(self):  # type: ()->Float
+        return Float(self._node.at("EnergyStrongValueThreshold"))
+    @EnergyStrongValueThreshold.setter
+    def EnergyStrongValueThreshold(self, val): self.EnergyStrongValueThreshold.set(val)
     @property
     def EvaporationDecreaseSpeed(self):  # type: ()->Float
         return Float(self._node.at("EvaporationDecreaseSpeed"))

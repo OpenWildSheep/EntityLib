@@ -1,6 +1,5 @@
 {
     "Components": [{
-			"Version": 1,
 			"Type": "NetworkLink",
 			"Data": {
 				"Source": "subentity2",

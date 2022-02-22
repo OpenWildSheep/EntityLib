@@ -4,9 +4,9 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.Float import *
+from entgen.Int import *
 
 from EntityLibPy import Node
-Vector3i = (lambda n: PrimArray(Float, n))
+Vector3i = (lambda n: PrimArray(Int, n))
 
 

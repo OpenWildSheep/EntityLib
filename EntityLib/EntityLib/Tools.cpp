@@ -82,8 +82,8 @@ namespace Ent
         using PopRootFun = void (*)(std::vector<std::string>&);
         const auto popRoot =
             _leavesAreLast ?
-                static_cast<PopRootFun>(
-                    [](std::vector<std::string>& _path) { _path.erase(_path.begin()); }) :
+                static_cast<PopRootFun>([](std::vector<std::string>& _path)
+                                        { _path.erase(_path.begin()); }) :
                 static_cast<PopRootFun>([](std::vector<std::string>& _path) { _path.pop_back(); });
 
         using GetRootFun = std::string& (*)(std::vector<std::string>&);
@@ -110,7 +110,8 @@ namespace Ent
         }
 
         // then go forward to the target
-        const auto appendToPath = [&relativePath](std::string& _pathPart) {
+        const auto appendToPath = [&relativePath](std::string& _pathPart)
+        {
             relativePath << _pathPart << '/';
         };
         if (_leavesAreLast)

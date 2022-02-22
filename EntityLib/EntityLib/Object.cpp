@@ -13,9 +13,10 @@ namespace Ent
 {
     bool Object::hasDefaultValue() const
     {
-        return std::all_of(nodes.begin(), nodes.end(), [](ObjField const& field) {
-            return field.node->hasDefaultValue();
-        });
+        return std::all_of(
+            nodes.begin(),
+            nodes.end(),
+            [](ObjField const& field) { return field.node->hasDefaultValue(); });
     }
 
     // ************************************* Object ***********************************************

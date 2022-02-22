@@ -63,7 +63,8 @@ namespace Ent
     Node::Value copyValue(Node::Value const& value)
     {
         return std::visit(
-            [](auto&& typedvalue) {
+            [](auto&& typedvalue)
+            {
                 using Type = std::remove_const_t<std::remove_reference_t<decltype(typedvalue)>>;
                 if constexpr (std::is_same_v<Type, ArrayPtr> or std::is_same_v<Type, UnionPtr> or std::is_same_v<Type, ObjectPtr>)
                 {
@@ -91,7 +92,8 @@ namespace Ent
     static NodeRef computeParentToChildNodeRef(Node const* _parent, Node const* _child)
     {
         return std::visit(
-            [_child](auto const& _node) -> NodeRef {
+            [_child](auto const& _node) -> NodeRef
+            {
                 using NodeType = std::remove_const_t<std::remove_reference_t<decltype(_node)>>;
                 if constexpr (
                     std::is_same_v<
@@ -223,7 +225,8 @@ namespace Ent
         }
         Node const* current = this;
 
-        auto nextToken = [&tokenStart, &tokenStop, nodeRefEnd] {
+        auto nextToken = [&tokenStart, &tokenStop, nodeRefEnd]
+        {
             if (tokenStop == nodeRefEnd)
             {
                 tokenStart = nodeRefEnd;
@@ -855,9 +858,14 @@ namespace Ent
 
     char const* Node::getInstanceOf() const
     {
-        if (std::holds_alternative<ObjectPtr>(value))
+        if (auto object = std::get_if<ObjectPtr>(&value))
         {
-            auto const& instanceOf = std::get<ObjectPtr>(value)->instanceOf;
+            auto const& instanceOf = (*object)->instanceOf;
+            return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
+        }
+        if (auto unionPtr = std::get_if<UnionPtr>(&value))
+        {
+            auto const& instanceOf = (*unionPtr)->instanceOf;
             return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
         }
         throw BadType();
@@ -1096,16 +1104,16 @@ namespace Ent
         return std::get<ArrayPtr>(value)->getKeyType();
     }
 
-    std::vector<String> Node::getKeysString() const
+    std::vector<String> Node::getKeysString(bool _forceSort) const
     {
         checkMap("getKeysString");
-        return std::get<ArrayPtr>(value)->getKeysString();
+        return std::get<ArrayPtr>(value)->getKeysString(_forceSort);
     }
 
-    std::vector<int64_t> Node::getKeysInt() const
+    std::vector<int64_t> Node::getKeysInt(bool _forceSort) const
     {
         checkMap("getMapKeysInt");
-        return std::get<ArrayPtr>(value)->getKeysInt();
+        return std::get<ArrayPtr>(value)->getKeysInt(_forceSort);
     }
 
     std::vector<NodeUniquePtr> Node::releaseAllElements()
@@ -1303,12 +1311,20 @@ namespace Ent
 
     void Node::resetInstanceOf(char const* _prefabNodePath)
     {
-        if (not std::holds_alternative<ObjectPtr>(value))
+        if (auto objectPtr = std::get_if<ObjectPtr>(&value))
         {
-            throw BadType();
+            (*objectPtr)->resetInstanceOf(_prefabNodePath);
+            (*objectPtr)->setParentNode(this);
         }
-        std::get<ObjectPtr>(value)->resetInstanceOf(_prefabNodePath);
-        std::get<ObjectPtr>(value)->setParentNode(this);
+        else if (auto unionPtr = std::get_if<UnionPtr>(&value))
+        {
+            (*unionPtr)->resetInstanceOf(_prefabNodePath);
+            (*unionPtr)->setParentNode(this);
+        }
+        else
+        {
+            throw BadType(); 
+        }
     }
 
     void Node::resetInstanceOf()
@@ -1424,7 +1440,8 @@ namespace Ent
         auto setToNode = [](Subschema const& prop,
                             Node& node,
                             String const& fieldName,
-                            std::map<std::string, Map::KeyType> const& keys) {
+                            std::map<std::string, Map::KeyType> const& keys)
+        {
             if (not prop.isKeyField)
             {
                 return;

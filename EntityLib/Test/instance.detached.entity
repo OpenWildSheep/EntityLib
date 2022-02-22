@@ -1,4 +1,5 @@
 {
+    "$schema": "wildschema:/all/Entity.json",
     "ActorStates": [
         {
             "classData": {
@@ -11,9 +12,7 @@
             "className": "EntityStatePlayer"
         },
         {
-            "classData": {
-                "ReviveLifeSigned": 13.0
-            },
+            "classData": {},
             "className": "ActorStateDead"
         }
     ],
@@ -26,10 +25,136 @@
     "Components": [
         {
             "Data": {
+                "Orientation": [
+                    -0.0032736328,
+                    -0.00733923,
+                    -0.12891139,
+                    0.99162364
+                ],
+                "Position": [
+                    105.2244,
+                    152.7811,
+                    29.6635
+                ],
+                "Scale": [
+                    1.0000386,
+                    0.99995625,
+                    1.0000291
+                ]
+            },
+            "Type": "TransformGD"
+        },
+        {
+            "Data": {
+                "Tag": "ShamanPlayerSpawner",
+                "ThumbnailMesh": "02_creature/human/male/clothstrong/bodykai/CLOTH_Body.wbm",
+                "Type": "Spawner"
+            },
+            "Type": "NetworkNode"
+        },
+        {
+            "Data": {},
+            "Type": "StaffVertebrasGD"
+        },
+        {
+            "Data": {
+                "BehaviorPath": "Pesto/Behavior/FSMDefaultBehavior.pesto",
+                "BehaviorState": "W/*at*/c//h",
+                "CanBeMaster": false,
+                "Faction": "Plouf",
+                "Inventory": "KaiWOLgrey",
+                "Invincible": false,
+                "Life": 1000.0,
+                "PlayerSpawn": true,
+                "ScriptList": [
+                    "a1",
+                    "b2",
+                    "c1"
+                ],
+                "Spawner": "ShamanPlayerSpawner.gd",
+                "UniqueID": "Shaman_male_Bobby",
+                "Warrior": false
+            },
+            "Type": "SystemicCreature"
+        },
+        {
+            "Data": {
+                "DisplaceNoiseList": [
+                    {
+                        "DisplaceDistance": 0.0,
+                        "LuminanceCenter": 0.0,
+                        "MapChannel": 51248,
+                        "MotifName": "",
+                        "MotifOffsetX": 0.0,
+                        "MotifOffsetY": 0.0,
+                        "MotifRotationZ": 0.0,
+                        "MotifSizeX": 0.0,
+                        "MotifSizeY": 0.0
+                    }
+                ],
+                "Subdivision": 0
+            },
+            "Type": "HeightObj"
+        },
+        {
+            "Data": {},
+            "Type": "NetGD"
+        },
+        {
+            "Data": {},
+            "Type": "SmoothScaleComponentGD"
+        },
+        {
+            "Data": {},
+            "Type": "PhysicsGD"
+        },
+        {
+            "Data": {
+                "FactionName": "2254016666",
                 "InSpiritWorld": false
             },
-            "Type": "ActorGD",
-            "Version": 1
+            "Type": "ActorGD"
+        },
+        {
+            "Data": {},
+            "Type": "BeamGeneratorGD"
+        },
+        {
+            "Data": {
+                "ScriptEvents": [
+                    {
+                        "classData": {
+                            "EventName": "Toto"
+                        },
+                        "className": "CineEventTriggerEventHandlerPost"
+                    },
+                    {
+                        "classData": {
+                            "EventName": "Tutu"
+                        },
+                        "className": "CineEventTriggerEventHandlerPost"
+                    },
+                    {
+                        "classData": {
+                            "EventName": "Titi"
+                        },
+                        "className": "CineEventTriggerEventHandlerPost"
+                    }
+                ]
+            },
+            "Type": "CinematicGD"
+        },
+        {
+            "Data": {
+                "NonDisuptive": true,
+                "PrimitiveData": {
+                    "Height": 42.0,
+                    "Length": 0.0,
+                    "Width": 0.0
+                },
+                "PrimitiveType": "test"
+            },
+            "Type": "LDPrimitive"
         },
         {
             "Data": {
@@ -48,8 +173,7 @@
                                     "Target": ".EP1-crook_",
                                     "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
                                 },
-                                "Type": "NetworkLink",
-                                "Version": 1
+                                "Type": "NetworkLink"
                             },
                             {
                                 "Data": {
@@ -70,11 +194,10 @@
                                         0.0
                                     ]
                                 },
-                                "Type": "TransformGD",
-                                "Version": 1
+                                "Type": "TransformGD"
                             }
                         ],
-                        "Name": "EP1-Spout_LINK_001_detached"
+                        "Name": "EP1-Spout_LINK_001"
                     },
                     {
                         "Color": [
@@ -89,11 +212,10 @@
                                     "Source": "instance",
                                     "Target": "subentity2"
                                 },
-                                "Type": "NetworkLink",
-                                "Version": 1
+                                "Type": "NetworkLink"
                             }
                         ],
-                        "Name": "EntityWithInstanceOf_detached"
+                        "Name": "EntityWithInstanceOf"
                     },
                     {
                         "Components": [
@@ -102,11 +224,10 @@
                                     "Source": "subentity2",
                                     "Target": "subentity2"
                                 },
-                                "Type": "NetworkLink",
-                                "Version": 1
+                                "Type": "NetworkLink"
                             }
                         ],
-                        "Name": "EntityWithInstanceOfButNoOverride_detached"
+                        "Name": "EntityWithInstanceOfButNoOverride"
                     },
                     {
                         "Color": [
@@ -118,11 +239,10 @@
                         "Components": [
                             {
                                 "Data": {},
-                                "Type": "TransformGD",
-                                "Version": 1
+                                "Type": "TransformGD"
                             }
                         ],
-                        "Name": "TestRemove_detached"
+                        "Name": "TestRemove"
                     },
                     {
                         "Color": [
@@ -134,21 +254,18 @@
                         "Components": [
                             {
                                 "Data": {},
-                                "Type": "NetworkLink",
-                                "Version": 1
+                                "Type": "NetworkLink"
                             }
                         ],
-                        "Name": "TestSaveEntWithOverride_detached"
+                        "Name": "TestSaveEntWithOverride"
                     }
                 ]
             },
-            "Type": "SubScene",
-            "Version": 1
+            "Type": "SubScene"
         },
         {
             "Data": {},
-            "Type": "BeamGeneratorGD",
-            "Version": 1
+            "Type": "VoxelSimulationGD"
         },
         {
             "Data": {
@@ -320,81 +437,11 @@
                     }
                 }
             },
-            "Type": "CharacterControllerGD",
-            "Version": 1
-        },
-        {
-            "Data": {
-                "ScriptEvents": [
-                    {
-                        "classData": {
-                            "EventName": "Toto"
-                        },
-                        "className": "CineEventTriggerEventHandlerPost"
-                    },
-                    {
-                        "classData": {
-                            "EventName": "Tutu"
-                        },
-                        "className": "CineEventTriggerEventHandlerPost"
-                    },
-                    {
-                        "classData": {
-                            "EventName": "Titi"
-                        },
-                        "className": "CineEventTriggerEventHandlerPost"
-                    }
-                ]
-            },
-            "Type": "CinematicGD",
-            "Version": 1
-        },
-        {
-            "Data": {
-                "DisplaceNoiseList": [
-                    {
-                        "DisplaceDistance": 0.0,
-                        "LuminanceCenter": 0.0,
-                        "MapChannel": 51248,
-                        "MotifName": "",
-                        "MotifOffsetX": 0.0,
-                        "MotifOffsetY": 0.0,
-                        "MotifRotationZ": 0.0,
-                        "MotifSizeX": 0.0,
-                        "MotifSizeY": 0.0
-                    }
-                ],
-                "Subdivision": 0
-            },
-            "Type": "HeightObj",
-            "Version": 1
-        },
-        {
-            "Data": {
-                "NonDisuptive": true,
-                "PrimitiveData": {
-                    "Height": 42.0,
-                    "Length": 0.0,
-                    "Width": 0.0
-                },
-                "PrimitiveType": "test"
-            },
-            "Type": "LDPrimitive",
-            "Version": 1
+            "Type": "CharacterControllerGD"
         },
         {
             "Data": {},
-            "Type": "NetGD",
-            "Version": 1
-        },
-        {
-            "Data": {
-                "Tag": "ShamanPlayerSpawner",
-                "ThumbnailMesh": "02_creature/human/male/clothstrong/bodykai/CLOTH_Body.wbm",
-                "Type": "Spawner"
-            },
-            "Type": "NetworkNode",
-            "Version": 1
+            "Type": "TestDefaultValues"
         },
         {
             "Data": {
@@ -426,13 +473,16 @@
                     ]
                 }
             },
-            "Type": "PathNodeGD",
-            "Version": 1
+            "Type": "PathNodeGD"
         },
         {
-            "Data": {},
-            "Type": "PhysicsGD",
-            "Version": 1
+            "Data": {
+                "Variant": {
+                    "variantData": 3.1416,
+                    "variantType": "float"
+                }
+            },
+            "Type": "TestArrays"
         },
         {
             "Data": {
@@ -466,66 +516,14 @@
                     ]
                 ]
             },
-            "Type": "ScriptComponentGD",
-            "Version": 1
+            "Type": "ScriptComponentGD"
         },
         {
             "Data": {
                 "NoiseOffsetY": 3.0,
                 "NoiseSizeY": 3.0
             },
-            "Type": "SeedPatch",
-            "Version": 1
-        },
-        {
-            "Data": {},
-            "Type": "SmoothScaleComponentGD",
-            "Version": 1
-        },
-        {
-            "Data": {
-                "NormalRatio": 0.6,
-                "ZOffset": 10.0
-            },
-            "Type": "StickToTerrain",
-            "Version": 1
-        },
-        {
-            "Data": {
-                "BehaviorPath": "Pesto/Behavior/FSMDefaultBehavior.pesto",
-                "BehaviorState": "W/*at*/c//h",
-                "CanBeMaster": false,
-                "Faction": "Plouf",
-                "Inventory": "KaiWOLgrey",
-                "Invincible": false,
-                "Life": 1000.0,
-                "PlayerSpawn": true,
-                "ScriptList": [
-                    "a1",
-                    "b2",
-                    "c1"
-                ],
-                "Spawner": "ShamanPlayerSpawner.gd",
-                "UniqueID": "Shaman_male_Bobby",
-                "Warrior": false
-            },
-            "Type": "SystemicCreature",
-            "Version": 1
-        },
-        {
-            "Data": {
-                "Variant": {
-                    "variantData": 3.1416,
-                    "variantType": "float"
-                }
-            },
-            "Type": "TestArrays",
-            "Version": 1
-        },
-        {
-            "Data": {},
-            "Type": "TestDefaultValues",
-            "Version": 1
+            "Type": "SeedPatch"
         },
         {
             "Data": {
@@ -566,37 +564,16 @@
                     }
                 ]
             },
-            "Type": "TestSetOfObject",
-            "Version": 1
+            "Type": "TestSetOfObject"
         },
         {
             "Data": {
-                "Matrix": [
-                    0.9667,
-                    0.2557,
-                    -0.0137,
-                    -0.2556,
-                    0.9667,
-                    0.0084,
-                    0.0154,
-                    -0.0046,
-                    0.9999
-                ],
-                "Position": [
-                    105.2244,
-                    152.7811,
-                    29.6635
-                ]
+                "NormalRatio": 0.6,
+                "ZOffset": 10.0
             },
-            "Type": "TransformGD",
-            "Version": 1
-        },
-        {
-            "Data": {},
-            "Type": "VoxelSimulationGD",
-            "Version": 1
+            "Type": "StickToTerrain"
         }
     ],
-    "Name": "PlayerSpawner__detached",
+    "Name": "PlayerSpawner_",
     "Thumbnail": "prout"
 }

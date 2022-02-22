@@ -4,7 +4,6 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.ReviveSide import *
 from entgen.String import *
 from entgen.ActorState import *
 from entgen.Float import *
@@ -27,11 +26,6 @@ class ActorStateAlive(HelperObject):
         return Float(self._node.at("Life"))
     @Life.setter
     def Life(self, val): self.Life.set(val)
-    @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
     @property
     def StunGauge(self):  # type: ()->StunGauge
         return StunGauge(self._node.at("StunGauge"))

@@ -11,7 +11,6 @@ from entgen.String import *
 from entgen.Int import *
 from entgen.Bool import *
 from entgen.Float import *
-from entgen.FreezeData import *
 from entgen.Position import *
 from entgen.Vector3 import *
 
@@ -27,9 +26,6 @@ class BaseParameters(HelperObject):
         return BaseParameters(entlib.make_node(BaseParameters.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
-    @property
-    def FreezeData(self):  # type: ()->FreezeData
-        return FreezeData(self._node.at("FreezeData"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

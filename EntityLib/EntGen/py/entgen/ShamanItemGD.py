@@ -4,7 +4,6 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.ReviveSide import *
 from entgen.String import *
 from entgen.Int import *
 from entgen.ComponentGD import *
@@ -33,11 +32,6 @@ class ShamanItemGD(HelperObject):
         return EntityRef(self._node.at("OppositeItemEntityRef"))
     @OppositeItemEntityRef.setter
     def OppositeItemEntityRef(self, val): self.OppositeItemEntityRef.set(val)
-    @property
-    def ReviveSide(self):  # type: ()->ReviveSide
-        return ReviveSide(self._node.at("ReviveSide"))
-    @ReviveSide.setter
-    def ReviveSide(self, val): self.ReviveSide.set(val)
     @property
     def StartPartCount(self):  # type: ()->Int
         return Int(self._node.at("StartPartCount"))

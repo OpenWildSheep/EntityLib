@@ -7,16 +7,9 @@ import EntityLibPy
 
 from EntityLibPy import Node
 class AttackTypeEnum(Enum):
-    Short = "Short"
-    Long = "Long"
+    Normal = "Normal"
     Backward = "Backward"
     Charged = "Charged"
-    Distant = "Distant"
-    Push = "Push"
-    Unmount = "Unmount"
-    Dodge = "Dodge"
-    Uppercut = "Uppercut"
-    Landing = "Landing"
     JumpOnto = "JumpOnto"
     Bite = "Bite"
     Stomp = "Stomp"

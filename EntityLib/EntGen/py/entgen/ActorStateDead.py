@@ -6,8 +6,6 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ActorState import *
-from entgen.Float import *
-from entgen.LastAliveReviveSide import *
 
 from EntityLibPy import Node
 
@@ -21,14 +19,6 @@ class ActorStateDead(HelperObject):
         return ActorStateDead(entlib.make_node(ActorStateDead.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
-    @property
-    def LastAliveReviveSide(self):  # type: ()->LastAliveReviveSide
-        return LastAliveReviveSide(self._node.at("LastAliveReviveSide"))
-    @property
-    def ReviveLifeSigned(self):  # type: ()->Float
-        return Float(self._node.at("ReviveLifeSigned"))
-    @ReviveLifeSigned.setter
-    def ReviveLifeSigned(self, val): self.ReviveLifeSigned.set(val)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))

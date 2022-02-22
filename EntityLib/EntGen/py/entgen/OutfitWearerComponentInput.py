@@ -8,8 +8,6 @@ from entgen.String import *
 from entgen.ComponentInput import *
 from entgen.FadeDelay import *
 from entgen.FadeDuration import *
-from entgen.OutfitWearerComponentInput_ReviveSide import *
-from entgen.OutfitWearerComponentInput_ReviveState import *
 from entgen.InventoryTags import *
 
 from EntityLibPy import Node
@@ -35,12 +33,6 @@ class OutfitWearerComponentInput(HelperObject):
         return (lambda n: PrimArray(InventoryTags, n))(self._node.at("OutfitTags"))
     @OutfitTags.setter
     def OutfitTags(self, val): self.OutfitTags.set(val)
-    @property
-    def ReviveSide(self):  # type: ()->OutfitWearerComponentInput_ReviveSide
-        return OutfitWearerComponentInput_ReviveSide(self._node.at("ReviveSide"))
-    @property
-    def ReviveState(self):  # type: ()->OutfitWearerComponentInput_ReviveState
-        return OutfitWearerComponentInput_ReviveState(self._node.at("ReviveState"))
     @property
     def Super(self):  # type: ()->ComponentInput
         return ComponentInput(self._node.at("Super"))

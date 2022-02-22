@@ -6,7 +6,6 @@ import EntityLibPy
 
 from entgen.AttackType import *
 from entgen.String import *
-from entgen.AttackWeaponAbility import *
 
 from EntityLibPy import Node
 
@@ -25,21 +24,6 @@ class AttackData(HelperObject):
         return AttackType(self._node.at("DefaultAttackType"))
     @DefaultAttackType.setter
     def DefaultAttackType(self, val): self.DefaultAttackType.set(val)
-    @property
-    def Hammer(self):  # type: ()->AttackWeaponAbility
-        return AttackWeaponAbility(self._node.at("Hammer"))
-    @property
-    def Knife(self):  # type: ()->AttackWeaponAbility
-        return AttackWeaponAbility(self._node.at("Knife"))
-    @property
-    def None_(self):  # type: ()->AttackWeaponAbility
-        return AttackWeaponAbility(self._node.at("None"))
-    @property
-    def Stick(self):  # type: ()->AttackWeaponAbility
-        return AttackWeaponAbility(self._node.at("Stick"))
-    @property
-    def Sword(self):  # type: ()->AttackWeaponAbility
-        return AttackWeaponAbility(self._node.at("Sword"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

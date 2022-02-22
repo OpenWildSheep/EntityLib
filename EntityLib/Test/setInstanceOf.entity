@@ -1,12 +1,12 @@
 {
+    "$schema": "wildschema:/all/Entity.json",
     "Components": [
         {
             "Data": {
                 "InstanceOf": "test.StickToTerrain.node",
                 "NormalRatio": 0.6
             },
-            "Type": "StickToTerrain",
-            "Version": 1
+            "Type": "StickToTerrain"
         }
     ],
     "InstanceOf": "prefab.entity",

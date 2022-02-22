@@ -7,8 +7,8 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Bool import *
 from entgen.ComponentGD import *
-from entgen.Float import *
 from entgen.String import *
+from entgen.EnergyPoolGD_EnergyArea import *
 
 from EntityLibPy import Node
 
@@ -23,20 +23,13 @@ class EnergyPoolGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def DrainConnectionRadius(self):  # type: ()->Float
-        return Float(self._node.at("DrainConnectionRadius"))
-    @DrainConnectionRadius.setter
-    def DrainConnectionRadius(self, val): self.DrainConnectionRadius.set(val)
+    def EnergyAreas(self):  # type: ()->Array[EnergyPoolGD_EnergyArea]
+        return (lambda n: Array(EnergyPoolGD_EnergyArea, n))(self._node.at("EnergyAreas"))
     @property
     def FactionOverride(self):  # type: ()->Bool
         return Bool(self._node.at("FactionOverride"))
     @FactionOverride.setter
     def FactionOverride(self, val): self.FactionOverride.set(val)
-    @property
-    def ProbeDetectionRadius(self):  # type: ()->Float
-        return Float(self._node.at("ProbeDetectionRadius"))
-    @ProbeDetectionRadius.setter
-    def ProbeDetectionRadius(self, val): self.ProbeDetectionRadius.set(val)
     @property
     def RegenEffectsOnConversion(self):  # type: ()->PrimArray[String]
         return (lambda n: PrimArray(String, n))(self._node.at("RegenEffectsOnConversion"))

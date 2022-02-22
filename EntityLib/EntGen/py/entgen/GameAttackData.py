@@ -8,7 +8,12 @@ from entgen.String import *
 from entgen.Bool import *
 from entgen.Float import *
 from entgen.ScaleConverter import *
-from entgen.Float import *
+from entgen.AttackDamageData import *
+from entgen.String import *
+from entgen.AttackImpactData import *
+from entgen.String import *
+from entgen.CameraShakeData import *
+from entgen.String import *
 
 from EntityLibPy import Node
 
@@ -28,15 +33,14 @@ class GameAttackData(HelperObject):
     @AggressiveDuration.setter
     def AggressiveDuration(self, val): self.AggressiveDuration.set(val)
     @property
-    def AttackDamageValues(self):  # type: ()->PrimArray[Float]
-        return (lambda n: PrimArray(Float, n))(self._node.at("AttackDamageValues"))
-    @AttackDamageValues.setter
-    def AttackDamageValues(self, val): self.AttackDamageValues.set(val)
+    def AttackCameraShakeData(self):  # type: ()->Map[str, CameraShakeData]
+        return (lambda n: Map(str, CameraShakeData, n))(self._node.at("AttackCameraShakeData"))
     @property
-    def AttackImpactValues(self):  # type: ()->PrimArray[Float]
-        return (lambda n: PrimArray(Float, n))(self._node.at("AttackImpactValues"))
-    @AttackImpactValues.setter
-    def AttackImpactValues(self, val): self.AttackImpactValues.set(val)
+    def AttackDamageData(self):  # type: ()->Map[str, AttackDamageData]
+        return (lambda n: Map(str, AttackDamageData, n))(self._node.at("AttackDamageData"))
+    @property
+    def AttackImpactData(self):  # type: ()->Map[str, AttackImpactData]
+        return (lambda n: Map(str, AttackImpactData, n))(self._node.at("AttackImpactData"))
     @property
     def DashTargetImpulse(self):  # type: ()->ScaleConverter
         return ScaleConverter(self._node.at("DashTargetImpulse"))

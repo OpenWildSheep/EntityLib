@@ -11,22 +11,17 @@ namespace Ent
         {
             throw BadType();
         }
-        std::string const subtype(_subtype);
         if (not std::holds_alternative<UnionMeta>(meta))
         {
             throw MissingMetadata(name.c_str());
         }
-        auto const& un = std::get<UnionMeta>(meta);
-        auto iter = std::find_if(begin(*oneOf), end(*oneOf), [&](SubschemaRef const& ref) {
-            return AT(ref->properties, un.typeField).get().constValue->get<std::string>() == subtype;
-        });
-        if (iter == end(*oneOf))
+        if (auto iter = unionTypeMap.find(_subtype); iter != unionTypeMap.end())
         {
-            throw BadUnionType(_subtype);
+            return {iter->second.wrapperSchema, iter->second.index};
         }
         else
         {
-            return {&iter->get(), iter - begin(*oneOf)};
+            throw BadUnionType(_subtype);
         }
     }
     /// @endcond

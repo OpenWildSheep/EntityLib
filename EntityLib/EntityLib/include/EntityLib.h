@@ -60,6 +60,13 @@ namespace Ent
         EntityLib(EntityLib const&) = delete;
         EntityLib& operator=(EntityLib const&) = delete;
         DeleteCheck deleteCheck;
+
+        HandlerImplPtr newHandler();
+        HandlerImplPtr newHandler(
+            HandlerImplPtr _parent,
+            Ent::Subschema const* _schema,
+            char const* _filename,
+            nlohmann::json* _doc = nullptr);
         /// @endcond
 
         /// Load the Node at path _nodeSchema then return a pointer to the cached data
@@ -113,13 +120,6 @@ namespace Ent
         NodeUniquePtr makeNode(char const* _schemaName) const;
 
         NodeUniquePtr newNode(Node::Value val, Subschema const* _subschema) const;
-
-        HandlerImplPtr newHandler();
-        HandlerImplPtr newHandler(
-            HandlerImplPtr _parent,
-            Ent::Subschema const* _schema,
-            char const* _filename,
-            nlohmann::json* _doc = nullptr);
 
         /// Create a Node with the Entity's schema
         NodeUniquePtr makeEntityNode() const;

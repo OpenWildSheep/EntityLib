@@ -70,6 +70,11 @@ namespace Ent
         return isSet() ? values : nullptr;
     }
 
+    void FileCursor::setRawJson(nlohmann::json* _jsonNode)
+    {
+        values = _jsonNode;
+    }
+
     bool FileCursor::isSetOrNull() const
     {
         return values != nullptr;
@@ -729,4 +734,13 @@ namespace Ent
     {
         return get<EntityRef>();
     }
+    size_t FileCursor::size() const
+    {
+        return values->size();
+    }
+    FileCursor::Key const& FileCursor::getPathToken() const
+    {
+        return additionalPath;
+    }
+
 } // namespace Ent

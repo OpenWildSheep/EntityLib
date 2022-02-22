@@ -53,6 +53,8 @@ namespace Ent
         /// Get the const pointer json node
         nlohmann::json const* getRawJson() const;
 
+        void setRawJson(nlohmann::json* _jsonNode);
+
         /// Check if this Node exist
         bool isSetOrNull() const;
 
@@ -118,8 +120,8 @@ namespace Ent
         /// @return json pointer to the child node
         static nlohmann::json* createChildNode(
             FileCursor& _lastLayer,
-            FileCursor::Key const& _childName,
-            Subschema const& _newLayerSchema,
+            Ent::FileCursor::Key const& _childName,
+            Ent::Subschema const& _newLayerSchema,
             size_t _arraySize);
 
         void setSize(size_t _size); ///< @pre type==array. @brief Set the size of the array.
@@ -138,10 +140,9 @@ namespace Ent
         char const* getString() const; ///< @pre type==string. @brief Get the value as string
         bool getBool() const; ///< @pre type==bool. @brief Get the value as bool
         EntityRef getEntityRef() const; ///< @pre type==entityref. @brief Get the value as entityref
+        size_t size() const;
 
-        Schema schema{};
-        nlohmann::json* values{};
-        Key additionalPath;
+        Key const& getPathToken() const;
 
     private:
         /// @brief Enter in the object of an ObjectSet
@@ -156,6 +157,9 @@ namespace Ent
         nlohmann::json* _getRawJson();
 
         std::string m_filePath; ///< Path of the instance json file
+        Schema schema{};
+        nlohmann::json* values{};
+        Key additionalPath;
     };
 } // namespace Ent
 /// @endcond

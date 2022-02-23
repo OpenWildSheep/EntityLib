@@ -4,36 +4,36 @@
 
 namespace Ent
 {
-    struct ENTLIB_DLLEXPORT Handler
+    struct ENTLIB_DLLEXPORT Property
     {
     public:
         using Key = std::variant<std::string, size_t>;
 
-        Handler() = default;
-        Handler(Handler const& _other)
+        Property() = default;
+        Property(Property const& _other)
         {
             m_self = _other.m_self->shared_from_this();
         }
-        Handler& operator=(Handler const& _other)
+        Property& operator=(Property const& _other)
         {
-            Handler copy(_other);
+            Property copy(_other);
             std::swap(copy, *this);
             return *this;
         }
-        Handler(Handler&& _other)
+        Property(Property&& _other)
         {
             (*this) = std::move(_other);
         }
-        Handler& operator=(Handler&& _other)
+        Property& operator=(Property&& _other)
         {
             std::swap(m_self, _other.m_self);
             return *this;
         }
-        Handler(EntityLib* _entityLib, Ent::Subschema const* _schema, char const* _filename)
+        Property(EntityLib* _entityLib, Ent::Subschema const* _schema, char const* _filename)
         {
             m_self = _entityLib->newHandler(nullptr, _schema, _filename, nullptr);
         }
-        Handler(
+        Property(
             EntityLib* _entityLib,
             Ent::Subschema const* _schema,
             char const* _filename,
@@ -41,7 +41,7 @@ namespace Ent
         {
             m_self = _entityLib->newHandler(nullptr, _schema, _filename, _doc);
         }
-        ~Handler()
+        ~Property()
         {
             m_self = nullptr;
         }
@@ -65,65 +65,64 @@ namespace Ent
 
         /// @brief Enter in the given field of the object
         /// @pre It is an object
-        [[nodiscard]] Handler enterObjectField(
+        [[nodiscard]] Property enterObjectField(
             char const* _field, ///< field to enter in
             SubschemaRef const* _fieldRef = nullptr ///< SubschemaRef of the field (For performance)
         )
         {
-            ENTLIB_DBG_ASSERT(getLayer().m_deleteCheck.state_ == DeleteCheck::State::VALID);
-            return Handler(getPimpl().enterObjectField(_field, _fieldRef));
+            return Property(getPimpl().enterObjectField(_field, _fieldRef));
         }
         /// @brief Enter in the internal data of the union
         /// @pre It is a Union
-        [[nodiscard]] Handler enterUnionData(
+        [[nodiscard]] Property enterUnionData(
             char const* _type = nullptr ///< type of the internal data of the union
         )
         {
-            return Handler{getPimpl().enterUnionData(_type)};
+            return Property{getPimpl().enterUnionData(_type)};
         }
         /// @brief Enter in the item of a UnionSet
         /// @pre It is a UnionSet
-        [[nodiscard]] Handler enterUnionSetItem(
+        [[nodiscard]] Property enterUnionSetItem(
             char const* _type, ///< Type of the item
             Subschema const* _dataSchema = nullptr ///< Schema of the item (For performance)
         )
         {
-            return Handler{getPimpl().enterUnionSetItem(_type, _dataSchema)};
+            return Property{getPimpl().enterUnionSetItem(_type, _dataSchema)};
         }
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] Handler enterObjectSetItem(char const* _key ///< Key of the object
+        [[nodiscard]] Property enterObjectSetItem(char const* _key ///< Key of the object
         )
         {
-            return Handler{getPimpl().enterObjectSetItem(_key)};
+            return Property{getPimpl().enterObjectSetItem(_key)};
         }
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] Handler enterObjectSetItem(int64_t _key ///< Key of the object
+        [[nodiscard]] Property enterObjectSetItem(int64_t _key ///< Key of the object
         )
         {
-            return Handler{getPimpl().enterObjectSetItem(_key)};
+            return Property{getPimpl().enterObjectSetItem(_key)};
         }
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        [[nodiscard]] Handler enterMapItem(char const* _key ///< Key of the value
+        [[nodiscard]] Property enterMapItem(char const* _key ///< Key of the value
         )
         {
-            return Handler{getPimpl().enterMapItem(_key)};
+            return Property{getPimpl().enterMapItem(_key)};
         }
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        [[nodiscard]] Handler enterMapItem(int64_t _field ///< Key of the value
+        [[nodiscard]] Property enterMapItem(int64_t _field ///< Key of the value
         )
         {
-            return Handler{getPimpl().enterMapItem(_field)};
+            return Property{getPimpl().enterMapItem(_field)};
         }
         /// @brief Enter in the element of an Array
         /// @pre It is an Array
-        [[nodiscard]] Handler enterArrayItem(size_t _index ///< index of the targeted element
+        [[nodiscard]] Property enterArrayItem(size_t _index ///< index of the targeted element
         )
         {
-            return Handler{getPimpl().enterArrayItem(_index)};
+            return Property{getPimpl().enterArrayItem(_index)};
         }
         /// @return The "InstanceOf" field, an empty string if set to empty, or nullptr if unset.
         /// @pre It is an Object
@@ -343,20 +342,20 @@ namespace Ent
             return m_self->getPrefab() != nullptr;
         }
 
-        Handler getPrefab() ///< Get the HandlerImpl of the prefab
+        Property getPrefab() ///< Get the HandlerImpl of the prefab
         {
             if (auto prefab = m_self->getPrefab())
             {
-                return Handler(prefab->shared_from_this());
+                return Property(prefab->shared_from_this());
             }
             else
             {
-                return Handler();
+                return Property();
             }
         }
 
     private:
-        Handler(HandlerImplPtr _layer)
+        Property(HandlerImplPtr _layer)
         {
             m_self = std::move(_layer);
         }

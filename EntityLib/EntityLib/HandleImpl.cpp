@@ -448,7 +448,7 @@ namespace Ent
     void Cursor::_checkInvariants() const
     {
 #ifdef _DEBUG
-        ENTLIB_DBG_ASSERT(m_instance.schema.base != nullptr);
+        ENTLIB_DBG_ASSERT(m_instance.getSchema() != nullptr);
         ENTLIB_DBG_ASSERT(
             getDefault() == nullptr
             or getDefault()->getSchema()->type == m_instance.getSchema()->type);

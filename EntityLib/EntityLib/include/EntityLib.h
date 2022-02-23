@@ -42,7 +42,7 @@ namespace Ent
     {
     public:
         mutable Pool<Node> nodePool;
-        mutable Pool<Cursor> layerPool;
+        mutable Pool<Cursor> propertyPool;
         /// @todo Make public attribute private?
         std::filesystem::path rootPath; ///< Path to the perforce root (X:/)
         std::filesystem::path rawdataPath; ///< Path to the RawData dir in the perforce root (X:/RawData)
@@ -61,9 +61,9 @@ namespace Ent
         EntityLib& operator=(EntityLib const&) = delete;
         DeleteCheck deleteCheck;
 
-        HandlerImplPtr newHandler();
-        HandlerImplPtr newHandler(
-            HandlerImplPtr _parent,
+        PropImplPtr newPropImpl();
+        PropImplPtr newPropImpl(
+            PropImplPtr _parent,
             Ent::Subschema const* _schema,
             char const* _filename,
             nlohmann::json* _doc = nullptr);

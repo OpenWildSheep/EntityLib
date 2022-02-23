@@ -27,7 +27,7 @@ namespace Ent
         }
     };
 
-    using HandlerImplPtr = std::unique_ptr<Cursor, DecRef>;
+    using PropImplPtr = std::unique_ptr<Cursor, DecRef>;
 
     struct ENTLIB_DLLEXPORT Cursor
     {
@@ -42,23 +42,23 @@ namespace Ent
         Cursor& operator=(Cursor&&) = delete;
         Cursor(
             EntityLib* _entityLib,
-            HandlerImplPtr _parent,
+            PropImplPtr _parent,
             Ent::Subschema const* _schema,
             char const* _filename);
         Cursor(
             EntityLib* _entityLib,
-            HandlerImplPtr _parent,
+            PropImplPtr _parent,
             Ent::Subschema const* _schema,
             char const* _filename,
             nlohmann::json* _doc);
         void _init(
             EntityLib* _entityLib,
-            HandlerImplPtr _parent,
+            PropImplPtr _parent,
             Ent::Subschema const* _schema,
             char const* _filename);
         void _init(
             EntityLib* _entityLib,
-            HandlerImplPtr _parent,
+            PropImplPtr _parent,
             Ent::Subschema const* _schema,
             char const* _filename,
             nlohmann::json* _doc);
@@ -77,40 +77,40 @@ namespace Ent
 
         /// @brief Enter in the given field of the object
         /// @pre It is an object
-        [[nodiscard]] HandlerImplPtr enterObjectField(
+        [[nodiscard]] PropImplPtr enterObjectField(
             char const* _field, ///< field to enter in
             SubschemaRef const* _fieldRef = nullptr ///< SubschemaRef of the field (For performance)
         );
         /// @brief Enter in the internal data of the union
         /// @pre It is a Union
-        [[nodiscard]] HandlerImplPtr enterUnionData(
+        [[nodiscard]] PropImplPtr enterUnionData(
             char const* _type = nullptr ///< type of the internal data of the union
         );
         /// @brief Enter in the item of a UnionSet
         /// @pre It is a UnionSet
-        [[nodiscard]] HandlerImplPtr enterUnionSetItem(
+        [[nodiscard]] PropImplPtr enterUnionSetItem(
             char const* _type, ///< Type of the item
             Subschema const* _dataSchema = nullptr ///< Schema of the item (For performance)
         );
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] HandlerImplPtr enterObjectSetItem(char const* _key ///< Key of the object
+        [[nodiscard]] PropImplPtr enterObjectSetItem(char const* _key ///< Key of the object
         );
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] HandlerImplPtr enterObjectSetItem(int64_t _key ///< Key of the object
+        [[nodiscard]] PropImplPtr enterObjectSetItem(int64_t _key ///< Key of the object
         );
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        [[nodiscard]] HandlerImplPtr enterMapItem(char const* _key ///< Key of the value
+        [[nodiscard]] PropImplPtr enterMapItem(char const* _key ///< Key of the value
         );
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        [[nodiscard]] HandlerImplPtr enterMapItem(int64_t _field ///< Key of the value
+        [[nodiscard]] PropImplPtr enterMapItem(int64_t _field ///< Key of the value
         );
         /// @brief Enter in the element of an Array
         /// @pre It is an Array
-        [[nodiscard]] HandlerImplPtr enterArrayItem(size_t _index ///< index of the targeted element
+        [[nodiscard]] PropImplPtr enterArrayItem(size_t _index ///< index of the targeted element
         );
         /// @return The "InstanceOf" field, an empty string if set to empty, or nullptr if unset.
         /// @pre It is an Object
@@ -180,10 +180,10 @@ namespace Ent
         void insertPrimSetKey(char const* _key); ///< Insert _key in the set (or do nothing if already in)
         void insertPrimSetKey(int64_t _key); ///< Insert _key in the set (or do nothing if already in)
 
-        HandlerImplPtr shared_from_this()
+        PropImplPtr shared_from_this()
         {
             ++m_refCount;
-            return HandlerImplPtr(this);
+            return PropImplPtr(this);
         }
 
         Cursor* getPrefab(); ///< Get the Cursor of the prefab
@@ -193,7 +193,7 @@ namespace Ent
         friend void decRef(Cursor* self);
 
         template <typename E>
-        [[nodiscard]] HandlerImplPtr _enterItem(E&& _enter);
+        [[nodiscard]] PropImplPtr _enterItem(E&& _enter);
 
         void _checkInvariants() const;
         bool _loadInstanceOf();
@@ -204,16 +204,16 @@ namespace Ent
         void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance
 
         EntityLib* m_entityLib = nullptr;
-        HandlerImplPtr prefab = nullptr;
+        PropImplPtr prefab = nullptr;
         std::optional<FileCursor> defaultStorage; ///< Used to explore the defalt value in the schema
         size_t m_arraySize = 0;
         FileCursor m_instance;
-        HandlerImplPtr m_parent = nullptr;
+        PropImplPtr m_parent = nullptr;
         size_t m_refCount = 0;
         DeleteCheck m_deleteCheck;
     };
 
-    using HandlerImpl = Cursor;
+    using PropImpl = Cursor;
 
     inline Cursor* Cursor::getPrefab()
     {

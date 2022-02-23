@@ -31,7 +31,7 @@ namespace Ent
         }
         Property(EntityLib* _entityLib, Ent::Subschema const* _schema, char const* _filename)
         {
-            m_self = _entityLib->newHandler(nullptr, _schema, _filename, nullptr);
+            m_self = _entityLib->newPropImpl(nullptr, _schema, _filename, nullptr);
         }
         Property(
             EntityLib* _entityLib,
@@ -39,7 +39,7 @@ namespace Ent
             char const* _filename,
             nlohmann::json* _doc)
         {
-            m_self = _entityLib->newHandler(nullptr, _schema, _filename, _doc);
+            m_self = _entityLib->newPropImpl(nullptr, _schema, _filename, _doc);
         }
         ~Property()
         {
@@ -342,7 +342,7 @@ namespace Ent
             return m_self->getPrefab() != nullptr;
         }
 
-        Property getPrefab() ///< Get the HandlerImpl of the prefab
+        Property getPrefab() ///< Get the PropImpl of the prefab
         {
             if (auto prefab = m_self->getPrefab())
             {
@@ -355,20 +355,20 @@ namespace Ent
         }
 
     private:
-        Property(HandlerImplPtr _layer)
+        Property(PropImplPtr _prop)
         {
-            m_self = std::move(_layer);
+            m_self = std::move(_prop);
         }
 
-        HandlerImpl& getPimpl()
+        PropImpl& getPimpl()
         {
             return *m_self;
         }
-        HandlerImpl const& getPimpl() const
+        PropImpl const& getPimpl() const
         {
             return *m_self;
         }
 
-        HandlerImplPtr m_self{};
+        PropImplPtr m_self{};
     };
 } // namespace Ent

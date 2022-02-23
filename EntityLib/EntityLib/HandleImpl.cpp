@@ -96,7 +96,7 @@ namespace Ent
 
     Cursor::Cursor(
         EntityLib* _entityLib,
-        HandlerImplPtr _parent,
+        PropImplPtr _parent,
         Ent::Subschema const* _schema,
         char const* _filename,
         nlohmann::json* _doc)
@@ -113,7 +113,7 @@ namespace Ent
 
     void Cursor::_init(
         EntityLib* _entityLib,
-        HandlerImplPtr _parent,
+        PropImplPtr _parent,
         Ent::Subschema const* _schema,
         char const* _filename,
         nlohmann::json* _doc)
@@ -135,7 +135,7 @@ namespace Ent
 
     void Cursor::_init(
         EntityLib* _entityLib,
-        HandlerImplPtr _parent,
+        PropImplPtr _parent,
         Ent::Subschema const* _schema,
         char const* _filename)
     {
@@ -145,7 +145,7 @@ namespace Ent
 
     Cursor::Cursor(
         EntityLib* _entityLib,
-        HandlerImplPtr _parent,
+        PropImplPtr _parent,
         Ent::Subschema const* _schema,
         char const* _filename)
     {
@@ -184,7 +184,7 @@ namespace Ent
                 if (auto const& prefabPath = member->get_ref<std::string const&>();
                     not prefabPath.empty())
                 {
-                    prefab = m_entityLib->newHandler(nullptr, subschema, prefabPath.c_str(), nullptr);
+                    prefab = m_entityLib->newPropImpl(nullptr, subschema, prefabPath.c_str(), nullptr);
                 }
                 return true;
             }
@@ -192,11 +192,11 @@ namespace Ent
         return false;
     }
 
-    HandlerImplPtr Cursor::enterObjectField(char const* _field, SubschemaRef const* _fieldRef)
+    PropImplPtr Cursor::enterObjectField(char const* _field, SubschemaRef const* _fieldRef)
     {
         _checkInvariants();
         ENTLIB_DBG_ASSERT(getDataType() == Ent::DataType::object);
-        auto newLayer = m_entityLib->newHandler();
+        auto newLayer = m_entityLib->newPropImpl();
         auto& lastLayer = *this;
         ENTLIB_DBG_ASSERT(
             lastLayer.getDefault() == nullptr
@@ -238,7 +238,7 @@ namespace Ent
         return newLayer;
     }
 
-    HandlerImplPtr Cursor::enterUnionData(char const* _type)
+    PropImplPtr Cursor::enterUnionData(char const* _type)
     {
         ENTLIB_ASSERT(getSchema()->type == Ent::DataType::oneOf);
         if (_type == nullptr)
@@ -248,7 +248,7 @@ namespace Ent
         return _enterItem([_type](auto&& _cur) { return _cur.enterUnionData(_type); });
     }
 
-    HandlerImplPtr Cursor::enterUnionSetItem(char const* _type, Subschema const* _dataSchema)
+    PropImplPtr Cursor::enterUnionSetItem(char const* _type, Subschema const* _dataSchema)
     {
         if (_dataSchema == nullptr)
         {
@@ -281,10 +281,10 @@ namespace Ent
     }
 
     template <typename E>
-    HandlerImplPtr Cursor::_enterItem(E&& _enter)
+    PropImplPtr Cursor::_enterItem(E&& _enter)
     {
         _checkInvariants();
-        auto newLayerPtr = m_entityLib->newHandler();
+        auto newLayerPtr = m_entityLib->newPropImpl();
         Cursor& newLayer = *newLayerPtr;
         auto& lastLayer = *this;
         newLayer.m_entityLib = m_entityLib;
@@ -317,30 +317,30 @@ namespace Ent
         return newLayerPtr;
     }
 
-    HandlerImplPtr Cursor::enterObjectSetItem(char const* _key)
+    PropImplPtr Cursor::enterObjectSetItem(char const* _key)
     {
         return _enterItem([_key](auto&& _cur) { return _cur.enterObjectSetItem(_key); });
     }
 
-    HandlerImplPtr Cursor::enterObjectSetItem(int64_t _key)
+    PropImplPtr Cursor::enterObjectSetItem(int64_t _key)
     {
         return _enterItem([_key](auto&& _cur) { return _cur.enterObjectSetItem(_key); });
     }
 
-    HandlerImplPtr Cursor::enterMapItem(char const* _key)
+    PropImplPtr Cursor::enterMapItem(char const* _key)
     {
         return _enterItem([_key](auto&& _cur) { return _cur.enterMapItem(_key); });
     }
 
-    HandlerImplPtr Cursor::enterMapItem(int64_t _field)
+    PropImplPtr Cursor::enterMapItem(int64_t _field)
     {
         return _enterItem([_field](auto&& _cur) { return _cur.enterMapItem(_field); });
     }
 
-    HandlerImplPtr Cursor::enterArrayItem(size_t _index)
+    PropImplPtr Cursor::enterArrayItem(size_t _index)
     {
         _checkInvariants();
-        auto newLayerPtr = m_entityLib->newHandler();
+        auto newLayerPtr = m_entityLib->newPropImpl();
         Cursor& newLayer = *newLayerPtr;
         newLayer.m_entityLib = m_entityLib;
         auto& lastLayer = *this;
@@ -406,7 +406,7 @@ namespace Ent
         auto& lastLayer = *this;
         if (strlen(_instanceOf) != 0)
         {
-            lastLayer.prefab = m_entityLib->newHandler(nullptr, getSchema(), _instanceOf, nullptr);
+            lastLayer.prefab = m_entityLib->newPropImpl(nullptr, getSchema(), _instanceOf, nullptr);
         }
         else
         {
@@ -1024,7 +1024,7 @@ namespace Ent
         --self->m_refCount;
         if (self->m_refCount == 0)
         {
-            auto& pool = self->m_entityLib->layerPool;
+            auto& pool = self->m_entityLib->propertyPool;
             self->~Cursor();
             pool.free(self);
             self = nullptr;

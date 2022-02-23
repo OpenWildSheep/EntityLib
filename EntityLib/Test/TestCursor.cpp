@@ -400,9 +400,9 @@ class CompareCursor : public RecursiveVisitor
     Property* m_root = nullptr;
     std::vector<Property> expl2;
 
-    void push(Property _layer)
+    void push(Property _prop)
     {
-        expl2.push_back(std::move(_layer));
+        expl2.push_back(std::move(_prop));
     }
     void pop()
     {

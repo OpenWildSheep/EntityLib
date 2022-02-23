@@ -1701,21 +1701,18 @@ namespace Ent
                                                       Node(std::move(val), _subschema));
     }
 
-    HandlerImplPtr EntityLib::newHandler()
+    PropImplPtr EntityLib::newPropImpl()
     {
-        auto layer = new (layerPool.alloc()) Cursor();
-        return layer->shared_from_this();
+        auto property = new (propertyPool.alloc()) Cursor();
+        return property->shared_from_this();
     }
 
-    HandlerImplPtr EntityLib::newHandler(
-        HandlerImplPtr _parent,
-        Ent::Subschema const* _schema,
-        char const* _filename,
-        nlohmann::json* _doc)
+    PropImplPtr EntityLib::newPropImpl(
+        PropImplPtr _parent, Ent::Subschema const* _schema, char const* _filename, nlohmann::json* _doc)
     {
-        auto layer =
-            new (layerPool.alloc()) Cursor(this, std::move(_parent), _schema, _filename, _doc);
-        return layer->shared_from_this();
+        auto property =
+            new (propertyPool.alloc()) Cursor(this, std::move(_parent), _schema, _filename, _doc);
+        return property->shared_from_this();
     }
 
     NodeUniquePtr EntityLib::makeEntityNode() const

@@ -62,11 +62,6 @@ class CreatureGD(HelperObject):
     @IsStaff.setter
     def IsStaff(self, val): self.IsStaff.set(val)
     @property
-    def LifeMax(self):  # type: ()->Float
-        return Float(self._node.at("LifeMax"))
-    @LifeMax.setter
-    def LifeMax(self, val): self.LifeMax.set(val)
-    @property
     def SpawnSoulIfNoEnemy(self):  # type: ()->Bool
         return Bool(self._node.at("SpawnSoulIfNoEnemy"))
     @SpawnSoulIfNoEnemy.setter

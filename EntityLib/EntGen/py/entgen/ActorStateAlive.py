@@ -7,7 +7,6 @@ import EntityLibPy
 from entgen.String import *
 from entgen.ActorState import *
 from entgen.Float import *
-from entgen.StunGauge import *
 
 from EntityLibPy import Node
 
@@ -22,13 +21,10 @@ class ActorStateAlive(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def Life(self):  # type: ()->Float
-        return Float(self._node.at("Life"))
-    @Life.setter
-    def Life(self, val): self.Life.set(val)
-    @property
-    def StunGauge(self):  # type: ()->StunGauge
-        return StunGauge(self._node.at("StunGauge"))
+    def Damages(self):  # type: ()->Float
+        return Float(self._node.at("Damages"))
+    @Damages.setter
+    def Damages(self, val): self.Damages.set(val)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))

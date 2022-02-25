@@ -76,6 +76,11 @@ class MoveCapacityData(HelperObject):
     @brakeDeceleration.setter
     def brakeDeceleration(self, val): self.brakeDeceleration.set(val)
     @property
+    def canSpiritAttack(self):  # type: ()->Bool
+        return Bool(self._node.at("canSpiritAttack"))
+    @canSpiritAttack.setter
+    def canSpiritAttack(self, val): self.canSpiritAttack.set(val)
+    @property
     def canUseCliffGrip(self):  # type: ()->Bool
         return Bool(self._node.at("canUseCliffGrip"))
     @canUseCliffGrip.setter

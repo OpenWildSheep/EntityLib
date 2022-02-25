@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.EnergyValue import *
 from entgen.String import *
+from entgen.Int import *
 from entgen.Float import *
 from entgen.Manager import *
 from entgen.RegenerationManager_EnergyAreaSetting import *
@@ -76,6 +77,11 @@ class RegenerationManager(HelperObject):
         return Float(self._node.at("InjectedEvaporationMultiplier"))
     @InjectedEvaporationMultiplier.setter
     def InjectedEvaporationMultiplier(self, val): self.InjectedEvaporationMultiplier.set(val)
+    @property
+    def MaxDynamicRegenEffectCount(self):  # type: ()->Int
+        return Int(self._node.at("MaxDynamicRegenEffectCount"))
+    @MaxDynamicRegenEffectCount.setter
+    def MaxDynamicRegenEffectCount(self, val): self.MaxDynamicRegenEffectCount.set(val)
     @property
     def Super(self):  # type: ()->Manager
         return Manager(self._node.at("Super"))

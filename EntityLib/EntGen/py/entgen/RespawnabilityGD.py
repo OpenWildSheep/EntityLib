@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ComponentGD import *
+from entgen.RespawnState import *
 
 from EntityLibPy import Node
 
@@ -19,6 +20,9 @@ class RespawnabilityGD(HelperObject):
         return RespawnabilityGD(entlib.make_node(RespawnabilityGD.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def RespawnState(self):  # type: ()->RespawnState
+        return RespawnState(self._node.at("RespawnState"))
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))

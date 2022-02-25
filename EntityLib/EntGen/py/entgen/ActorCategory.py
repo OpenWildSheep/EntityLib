@@ -43,6 +43,7 @@ class ActorCategoryEnum(Enum):
     CATEGORY_EnergySpout = "CATEGORY_EnergySpout"
     CATEGORY_Energy = "CATEGORY_Energy"
     CATEGORY_GPE = "CATEGORY_GPE"
+    CATEGORY_SpiritAnimal = "CATEGORY_SpiritAnimal"
     CATEGORY_Hatching = "CATEGORY_Hatching"
     CATEGORY_Respawn = "CATEGORY_Respawn"
     ActorCategory_COUNT = "ActorCategory_COUNT"

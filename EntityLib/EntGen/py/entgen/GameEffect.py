@@ -7,6 +7,7 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Component import *
 from entgen.Float import *
+from entgen.RadiusChange import *
 
 from EntityLibPy import Node
 
@@ -35,6 +36,14 @@ class GameEffect(HelperObject):
         return Float(self._node.at("PerceptionDistance"))
     @PerceptionDistance.setter
     def PerceptionDistance(self, val): self.PerceptionDistance.set(val)
+    @property
+    def Radius(self):  # type: ()->Float
+        return Float(self._node.at("Radius"))
+    @Radius.setter
+    def Radius(self, val): self.Radius.set(val)
+    @property
+    def RadiusChange(self):  # type: ()->RadiusChange
+        return RadiusChange(self._node.at("RadiusChange"))
     @property
     def RadiusChangeDuration(self):  # type: ()->Float
         return Float(self._node.at("RadiusChangeDuration"))

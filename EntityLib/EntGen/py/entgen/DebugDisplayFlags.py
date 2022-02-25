@@ -301,6 +301,11 @@ class DebugDisplayFlags(HelperObject):
     @DisplayManagersInfos.setter
     def DisplayManagersInfos(self, val): self.DisplayManagersInfos.set(val)
     @property
+    def DisplayMaterialBank(self):  # type: ()->Bool
+        return Bool(self._node.at("DisplayMaterialBank"))
+    @DisplayMaterialBank.setter
+    def DisplayMaterialBank(self, val): self.DisplayMaterialBank.set(val)
+    @property
     def DisplayMeshRasterizerInfos(self):  # type: ()->Bool
         return Bool(self._node.at("DisplayMeshRasterizerInfos"))
     @DisplayMeshRasterizerInfos.setter

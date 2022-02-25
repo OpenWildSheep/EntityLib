@@ -9,7 +9,6 @@ from entgen.CanTakeHit import *
 from entgen.ComponentInput import *
 from entgen.DeltaTimeFactor import *
 from entgen.Invincible import *
-from entgen.Life import *
 
 from EntityLibPy import Node
 
@@ -32,9 +31,6 @@ class CreatureComponentInput(HelperObject):
     @property
     def Invincible(self):  # type: ()->Invincible
         return Invincible(self._node.at("Invincible"))
-    @property
-    def Life(self):  # type: ()->Life
-        return Life(self._node.at("Life"))
     @property
     def Super(self):  # type: ()->ComponentInput
         return ComponentInput(self._node.at("Super"))

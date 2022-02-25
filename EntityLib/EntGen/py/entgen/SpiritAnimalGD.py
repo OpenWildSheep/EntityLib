@@ -6,7 +6,6 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ComponentGD import *
-from entgen.EntityRef import *
 from entgen.Float import *
 
 from EntityLibPy import Node
@@ -26,11 +25,6 @@ class SpiritAnimalGD(HelperObject):
         return Float(self._node.at("DeadDurationBeforeRevive"))
     @DeadDurationBeforeRevive.setter
     def DeadDurationBeforeRevive(self, val): self.DeadDurationBeforeRevive.set(val)
-    @property
-    def EntityRef(self):  # type: ()->EntityRef
-        return EntityRef(self._node.at("EntityRef"))
-    @EntityRef.setter
-    def EntityRef(self, val): self.EntityRef.set(val)
     @property
     def SoulCooldownFromDeath(self):  # type: ()->Float
         return Float(self._node.at("SoulCooldownFromDeath"))

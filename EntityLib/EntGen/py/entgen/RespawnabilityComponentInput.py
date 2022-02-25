@@ -5,7 +5,9 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.CheckIsNotInCameraFrustrum import *
 from entgen.ComponentInput import *
+from entgen.MinDistanceToRespawnPosition import *
 
 from EntityLibPy import Node
 
@@ -19,6 +21,12 @@ class RespawnabilityComponentInput(HelperObject):
         return RespawnabilityComponentInput(entlib.make_node(RespawnabilityComponentInput.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def CheckIsNotInCameraFrustrum(self):  # type: ()->CheckIsNotInCameraFrustrum
+        return CheckIsNotInCameraFrustrum(self._node.at("CheckIsNotInCameraFrustrum"))
+    @property
+    def MinDistanceToRespawnPosition(self):  # type: ()->MinDistanceToRespawnPosition
+        return MinDistanceToRespawnPosition(self._node.at("MinDistanceToRespawnPosition"))
     @property
     def Super(self):  # type: ()->ComponentInput
         return ComponentInput(self._node.at("Super"))

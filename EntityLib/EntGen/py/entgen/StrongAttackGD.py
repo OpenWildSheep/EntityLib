@@ -6,7 +6,9 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ComponentGD import *
+from entgen.Float import *
 from entgen.ResponsiblePointer_ActorState_ import *
+from entgen.StrongAttackChargedData import *
 
 from EntityLibPy import Node
 
@@ -28,6 +30,19 @@ class StrongAttackGD(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    @property
+    def chargedDatas(self):  # type: ()->Array[StrongAttackChargedData]
+        return (lambda n: Array(StrongAttackChargedData, n))(self._node.at("chargedDatas"))
+    @property
+    def chargingDeceleration(self):  # type: ()->Float
+        return Float(self._node.at("chargingDeceleration"))
+    @chargingDeceleration.setter
+    def chargingDeceleration(self, val): self.chargingDeceleration.set(val)
+    @property
+    def chargingOrientationRate(self):  # type: ()->Float
+        return Float(self._node.at("chargingOrientationRate"))
+    @chargingOrientationRate.setter
+    def chargingOrientationRate(self, val): self.chargingOrientationRate.set(val)
     @property
     def strongAttackState(self):  # type: ()->ResponsiblePointer_ActorState_
         return ResponsiblePointer_ActorState_(self._node.at("strongAttackState"))

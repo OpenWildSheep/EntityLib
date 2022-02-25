@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ComponentGD import *
+from entgen.TaggedSDF import *
 
 from EntityLibPy import Node
 
@@ -22,6 +23,9 @@ class SensorVoxelsGD(HelperObject):
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
+    @property
+    def TaggedSDFs(self):  # type: ()->Array[TaggedSDF]
+        return (lambda n: Array(TaggedSDF, n))(self._node.at("TaggedSDFs"))
     @property
     def VoxelsDataPath(self):  # type: ()->String
         return String(self._node.at("VoxelsDataPath"))

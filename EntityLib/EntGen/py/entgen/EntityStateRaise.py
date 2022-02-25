@@ -22,15 +22,15 @@ class EntityStateRaise(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def Damages(self):  # type: ()->Float
+        return Float(self._node.at("Damages"))
+    @Damages.setter
+    def Damages(self, val): self.Damages.set(val)
+    @property
     def EnergySide(self):  # type: ()->EnergySide
         return EnergySide(self._node.at("EnergySide"))
     @EnergySide.setter
     def EnergySide(self, val): self.EnergySide.set(val)
-    @property
-    def Life(self):  # type: ()->Float
-        return Float(self._node.at("Life"))
-    @Life.setter
-    def Life(self, val): self.Life.set(val)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))

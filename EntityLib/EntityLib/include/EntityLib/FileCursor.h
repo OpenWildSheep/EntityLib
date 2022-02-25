@@ -2,7 +2,6 @@
 #pragma once
 
 #include <variant>
-#include <ciso646>
 
 #pragma warning(push)
 #pragma warning(disable : 4464)

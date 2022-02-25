@@ -1,7 +1,6 @@
 #pragma once
 
 #include <variant>
-#include <ciso646>
 #include <set>
 #include <deque>
 

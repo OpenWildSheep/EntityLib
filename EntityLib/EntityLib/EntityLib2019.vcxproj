@@ -121,7 +121,7 @@
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</TreatWarningAsError>
     </ClCompile>
     <ClCompile Include="EntityLibCore.cpp" />
-    <ClCompile Include="FileCursor.cpp" />
+    <ClCompile Include="FileProperty.cpp" />
     <ClCompile Include="include\Schema.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Node.cpp" />
@@ -140,7 +140,7 @@
     <ClInclude Include="include\EntityLib.h" />
     <ClInclude Include="include\EntityLibCore.h" />
     <ClInclude Include="include\EntityLib\CopyNode.h" />
-    <ClInclude Include="include\EntityLib\FileCursor.h" />
+    <ClInclude Include="include\EntityLib\FileProperty.h" />
     <ClInclude Include="include\EntityLib\Property.h" />
     <ClInclude Include="include\EntityLib\Visitor.h" />
     <ClInclude Include="include\Schema.h" />

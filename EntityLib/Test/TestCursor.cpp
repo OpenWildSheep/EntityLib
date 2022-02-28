@@ -195,13 +195,13 @@ public:
         //ENTLIB_ASSERT(strcmp(expl.getUnionType(), nodes.back()->getUnionType()) == 0);
         //ENTLIB_ASSERT(strcmp(nodes.back()->getUnionType(), type) == 0);
         nodes.push_back(nodes.back()->getUnionData());
-        // expl.enterUnionData();
+        // expl.getUnionData();
         // std::cout << "expl : UnionData : " << expl.getSchema()->name << std::endl;
         // std::cout << "inUnion : UnionData : " << nodes.back()->getSchema()->name << std::endl;
         //if (expl.getSchema()->name != nodes.back()->getSchema()->name)
         //{
         //    expl.exit();
-        //    expl.enterUnionData();
+        //    expl.getUnionData();
         //}
         //expl.exit();
         ENTLIB_ASSERT(nodes.back() != nullptr);
@@ -423,7 +423,7 @@ public:
     }
     bool inObjectField(Property& _prop, char const* key) override
     {
-        expl2 = expl2.enterObjectField(key);
+        expl2 = expl2.getObjectField(key);
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
@@ -437,7 +437,7 @@ public:
     }
     void inUnion([[maybe_unused]] Property& _prop, char const* _type) override
     {
-        expl2 = expl2.enterUnionData(_type);
+        expl2 = expl2.getUnionData(_type);
     }
     void outUnion([[maybe_unused]] Property& _prop) override
     {
@@ -459,11 +459,11 @@ public:
     }
     void inMapElement([[maybe_unused]] Property& _prop, char const* _key) override
     {
-        expl2 = expl2.enterMapItem(_key);
+        expl2 = expl2.getMapItem(_key);
     }
     void inMapElement([[maybe_unused]] Property& _prop, int64_t _key) override
     {
-        expl2 = expl2.enterMapItem(_key);
+        expl2 = expl2.getMapItem(_key);
     }
     void outMapElement([[maybe_unused]] Property& _prop) override
     {
@@ -486,7 +486,7 @@ public:
     }
     void inArrayElement([[maybe_unused]] Property& _prop, size_t i) override
     {
-        expl2 = expl2.enterArrayItem(i);
+        expl2 = expl2.getArrayItem(i);
     }
     void outArrayElement([[maybe_unused]] Property& _prop) override
     {
@@ -510,7 +510,7 @@ public:
     }
     void inUnionSetElement([[maybe_unused]] Property& _prop, char const* _type) override
     {
-        expl2 = expl2.enterUnionSetItem(_type);
+        expl2 = expl2.getUnionSetItem(_type);
     }
     void outUnionSetElement([[maybe_unused]] Property& _prop) override
     {
@@ -546,7 +546,7 @@ public:
     }
     void inObjectSetElement(Property& _prop, char const* _key) override
     {
-        expl2 = expl2.enterObjectSetItem(_key);
+        expl2 = expl2.getObjectSetItem(_key);
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
@@ -557,7 +557,7 @@ public:
     }
     void inObjectSetElement([[maybe_unused]] Property& _prop, int64_t _key) override
     {
-        expl2 = expl2.enterObjectSetItem(_key);
+        expl2 = expl2.getObjectSetItem(_key);
     }
     void outObjectSetElement([[maybe_unused]] Property& _prop) override
     {
@@ -754,7 +754,7 @@ void testCursor(Ent::EntityLib& entlib)
     {
         auto storage = nlohmann::json::object();
         Property entity(&entlib, entlib.getEntitySchema(), nullptr, &storage);
-        auto name = entity.enterObjectField("Name");
+        auto name = entity.getObjectField("Name");
         name.setString("Debug Quick Creatures Switch");
     }
     {
@@ -765,8 +765,8 @@ void testCursor(Ent::EntityLib& entlib)
         auto& schema = d["$schema"].get_ref<nlohmann::json::string_t const&>();
         auto typeName = getRefTypeName(schema.c_str());
         Property simpleObject(&entlib, entlib.getSchema(typeName), "test.SeedPatch.node", &d);
-        ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeX").getFloat() == 1.f);
-        ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeY").getFloat() == 2.f);
+        ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeX").getFloat() == 1.f);
+        ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeY").getFloat() == 2.f);
     }
     {
         std::ifstream ifstr("test.SeedPatch.node");
@@ -778,103 +778,98 @@ void testCursor(Ent::EntityLib& entlib)
             entlib.getSchema(getRefTypeName(d["$schema"].get_ref<std::string const&>().c_str())),
             "test.SeedPatch.node",
             &d);
-        ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeX").getFloat() == 1.f);
-        simpleObject.enterObjectField("NoiseSizeX").setFloat(2.);
-        ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeX").getFloat() == 2.);
-        ENTLIB_ASSERT(simpleObject.enterObjectField("NoiseSizeY").getFloat() == 2.f);
+        ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeX").getFloat() == 1.f);
+        simpleObject.getObjectField("NoiseSizeX").setFloat(2.);
+        ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeX").getFloat() == 2.);
+        ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeY").getFloat() == 2.f);
     }
     {
         Property expl(&entlib, entlib.getSchema(entitySchemaName), "prefab.entity");
-        ENTLIB_ASSERT(expl.enterObjectField("Name").getString() == std::string("PlayerSpawner_"));
+        ENTLIB_ASSERT(expl.getObjectField("Name").getString() == std::string("PlayerSpawner_"));
         {
             ENTLIB_ASSERT(
-                expl.enterObjectField("Components")
-                    .enterUnionSetItem("NetworkNode")
-                    .enterObjectField("Type")
+                expl.getObjectField("Components")
+                    .getUnionSetItem("NetworkNode")
+                    .getObjectField("Type")
                     .getString()
                 == std::string("Spawner"));
         }
-        auto posX = expl.enterObjectField("Components")
-                        .enterUnionSetItem("TransformGD")
-                        .enterObjectField("Position")
-                        .enterArrayItem(0llu);
+        auto posX = expl.getObjectField("Components")
+                        .getUnionSetItem("TransformGD")
+                        .getObjectField("Position")
+                        .getArrayItem(0llu);
         std::cout << posX.getFloat() << std::endl;
         ENTLIB_ASSERT(posX.getFloat() == 105.2244);
         auto& entityRung = expl;
-        auto floatA = entityRung.enterObjectField("Components")
-                          .enterUnionSetItem("TransformGD")
-                          .enterObjectField("Position")
-                          .enterArrayItem(0llu)
+        auto floatA = entityRung.getObjectField("Components")
+                          .getUnionSetItem("TransformGD")
+                          .getObjectField("Position")
+                          .getArrayItem(0llu)
                           .getFloat();
-        auto floatB = entityRung.enterObjectField("Components")
-                          .enterUnionSetItem("TransformGD")
-                          .enterObjectField("Position")
-                          .enterArrayItem(0llu)
+        auto floatB = entityRung.getObjectField("Components")
+                          .getUnionSetItem("TransformGD")
+                          .getObjectField("Position")
+                          .getArrayItem(0llu)
                           .getFloat();
         ENTLIB_ASSERT(floatA == 105.2244);
         ENTLIB_ASSERT(floatB == 105.2244);
 
         ENTLIB_ASSERT(
-            expl.enterObjectField("Components")
-                .enterUnionSetItem("SubScene")
-                .enterObjectField("Embedded")
-                .enterObjectSetItem("EP1-Spout_LINK_001")
-                .enterObjectField("Name")
+            expl.getObjectField("Components")
+                .getUnionSetItem("SubScene")
+                .getObjectField("Embedded")
+                .getObjectSetItem("EP1-Spout_LINK_001")
+                .getObjectField("Name")
                 .getString()
             == std::string("EP1-Spout_LINK_001"));
     }
     {
         Property expl(&entlib, entlib.getSchema(entitySchemaName), "instance.entity");
-        ENTLIB_ASSERT(expl.enterObjectField("Name").getString() == std::string("PlayerSpawner_"));
+        ENTLIB_ASSERT(expl.getObjectField("Name").getString() == std::string("PlayerSpawner_"));
         auto type =
-            expl.enterObjectField("Components").enterUnionSetItem("NetworkNode").enterObjectField("Type");
+            expl.getObjectField("Components").getUnionSetItem("NetworkNode").getObjectField("Type");
         std::cout << type.getString() << std::endl;
         ENTLIB_ASSERT(
-            expl.enterObjectField("Components")
-                .enterUnionSetItem("NetworkNode")
-                .enterObjectField("Type")
-                .getString()
+            expl.getObjectField("Components").getUnionSetItem("NetworkNode").getObjectField("Type").getString()
             == std::string("Spawner"));
-        std::cout << expl.enterObjectField("Components")
-                         .enterUnionSetItem("TransformGD")
-                         .enterObjectField("Matrix")
-                         .enterArrayItem(3llu)
+        std::cout << expl.getObjectField("Components")
+                         .getUnionSetItem("TransformGD")
+                         .getObjectField("Matrix")
+                         .getArrayItem(3llu)
                          .getFloat()
                   << std::endl;
-        auto pos2 = expl.enterObjectField("Components")
-                        .enterUnionSetItem("TransformGD")
-                        .enterObjectField("Position")
-                        .enterArrayItem(2llu)
+        auto pos2 = expl.getObjectField("Components")
+                        .getUnionSetItem("TransformGD")
+                        .getObjectField("Position")
+                        .getArrayItem(2llu)
                         .getFloat();
         ENTLIB_ASSERT(fabs(pos2 - 29.6635) < FLT_EPSILON);
         ENTLIB_ASSERT(
-            expl.enterObjectField("Components")
-                .enterUnionSetItem("SubScene")
-                .enterObjectField("Embedded")
-                .enterObjectSetItem("EP1-Spout_LINK_001")
-                .enterObjectField("Name")
+            expl.getObjectField("Components")
+                .getUnionSetItem("SubScene")
+                .getObjectField("Embedded")
+                .getObjectSetItem("EP1-Spout_LINK_001")
+                .getObjectField("Name")
                 .getString()
             == std::string("EP1-Spout_LINK_001"));
         ENTLIB_ASSERT(
-            expl.enterObjectField("ActorStates")
-                .enterUnionSetItem("ActorStateHoldingItem")
-                .enterObjectField("ItemEntityRef")
+            expl.getObjectField("ActorStates")
+                .getUnionSetItem("ActorStateHoldingItem")
+                .getObjectField("ItemEntityRef")
                 .getString()
             == std::string("tutu"));
-        auto components = expl.enterObjectField("Components");
-        auto ori3 = components.enterUnionSetItem("TransformGD")
-                        .enterObjectField("Orientation")
-                        .enterArrayItem(3llu);
+        auto components = expl.getObjectField("Components");
+        auto ori3 =
+            components.getUnionSetItem("TransformGD").getObjectField("Orientation").getArrayItem(3llu);
         ENTLIB_ASSERT(fabs(ori3.getFloat() - 0.9916236400604248) < FLT_EPSILON);
         ori3.setFloat(2.);
         ENTLIB_ASSERT(ori3.getFloat() == 2.);
-        auto soundAreaGD = expl.enterObjectField("Components").enterUnionSetItem("SoundAreaGD");
+        auto soundAreaGD = expl.getObjectField("Components").getUnionSetItem("SoundAreaGD");
         ENTLIB_ASSERT(soundAreaGD.isSet() == false);
         ENTLIB_ASSERT(soundAreaGD.isDefault() == true);
         auto keys = components.getUnionSetKeysString();
         keys = components.getUnionSetKeysString();
-        auto staffVertebrasGD =
-            expl.enterObjectField("Components").enterUnionSetItem("StaffVertebrasGD");
+        auto staffVertebrasGD = expl.getObjectField("Components").getUnionSetItem("StaffVertebrasGD");
         ENTLIB_ASSERT(staffVertebrasGD.isSet() == false);
         ENTLIB_ASSERT(staffVertebrasGD.isDefault() == true);
         keys = components.getUnionSetKeysString();
@@ -882,12 +877,12 @@ void testCursor(Ent::EntityLib& entlib)
         expl.save("instance.prout.entity");
         // Must not crash
         Property prefab2(&entlib, entlib.getSchema(entitySchemaName), "instance.prout.entity");
-        auto comp2 = prefab2.enterObjectField("Components");
-        auto characterControllerGD = comp2.enterUnionSetItem("CharacterControllerGD");
-        auto clamberData = characterControllerGD.enterObjectField("ClamberData");
-        auto vertOriRatio = clamberData.enterObjectField("VerticalOrientationRatio");
-        auto in = vertOriRatio.enterObjectField("in");
-        auto in0 = in.enterArrayItem(0);
+        auto comp2 = prefab2.getObjectField("Components");
+        auto characterControllerGD = comp2.getUnionSetItem("CharacterControllerGD");
+        auto clamberData = characterControllerGD.getObjectField("ClamberData");
+        auto vertOriRatio = clamberData.getObjectField("VerticalOrientationRatio");
+        auto in = vertOriRatio.getObjectField("in");
+        auto in0 = in.getArrayItem(0);
         in0.setFloat(3.33);
     }
     {

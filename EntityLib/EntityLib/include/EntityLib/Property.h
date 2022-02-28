@@ -49,64 +49,64 @@ namespace Ent
 
         /// @brief Enter in the given field of the object
         /// @pre It is an object
-        [[nodiscard]] Property enterObjectField(
+        [[nodiscard]] Property getObjectField(
             char const* _field, ///< field to enter in
             SubschemaRef const* _fieldRef = nullptr ///< SubschemaRef of the field (For performance)
         )
         {
-            return Property(getPimpl().enterObjectField(_field, _fieldRef));
+            return Property(getPimpl().getObjectField(_field, _fieldRef));
         }
         /// @brief Enter in the internal data of the union
         /// @pre It is a Union
-        [[nodiscard]] Property enterUnionData(
+        [[nodiscard]] Property getUnionData(
             char const* _type = nullptr ///< type of the internal data of the union
         )
         {
-            return Property{getPimpl().enterUnionData(_type)};
+            return Property{getPimpl().getUnionData(_type)};
         }
         /// @brief Enter in the item of a UnionSet
         /// @pre It is a UnionSet
-        [[nodiscard]] Property enterUnionSetItem(
+        [[nodiscard]] Property getUnionSetItem(
             char const* _type, ///< Type of the item
             Subschema const* _dataSchema = nullptr ///< Schema of the item (For performance)
         )
         {
-            return Property{getPimpl().enterUnionSetItem(_type, _dataSchema)};
+            return Property{getPimpl().getUnionSetItem(_type, _dataSchema)};
         }
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] Property enterObjectSetItem(char const* _key ///< Key of the object
+        [[nodiscard]] Property getObjectSetItem(char const* _key ///< Key of the object
         )
         {
-            return Property{getPimpl().enterObjectSetItem(_key)};
+            return Property{getPimpl().getObjectSetItem(_key)};
         }
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] Property enterObjectSetItem(int64_t _key ///< Key of the object
+        [[nodiscard]] Property getObjectSetItem(int64_t _key ///< Key of the object
         )
         {
-            return Property{getPimpl().enterObjectSetItem(_key)};
+            return Property{getPimpl().getObjectSetItem(_key)};
         }
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        [[nodiscard]] Property enterMapItem(char const* _key ///< Key of the value
+        [[nodiscard]] Property getMapItem(char const* _key ///< Key of the value
         )
         {
-            return Property{getPimpl().enterMapItem(_key)};
+            return Property{getPimpl().getMapItem(_key)};
         }
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        [[nodiscard]] Property enterMapItem(int64_t _field ///< Key of the value
+        [[nodiscard]] Property getMapItem(int64_t _field ///< Key of the value
         )
         {
-            return Property{getPimpl().enterMapItem(_field)};
+            return Property{getPimpl().getMapItem(_field)};
         }
         /// @brief Enter in the element of an Array
         /// @pre It is an Array
-        [[nodiscard]] Property enterArrayItem(size_t _index ///< index of the targeted element
+        [[nodiscard]] Property getArrayItem(size_t _index ///< index of the targeted element
         )
         {
-            return Property{getPimpl().enterArrayItem(_index)};
+            return Property{getPimpl().getArrayItem(_index)};
         }
         /// @return The "InstanceOf" field, an empty string if set to empty, or nullptr if unset.
         /// @pre It is an Object
@@ -340,7 +340,7 @@ namespace Ent
             }
         }
 
-        Property getParent() const  ///< Get the Property which own this one
+        Property getParent() const ///< Get the Property which own this one
         {
             return m_self->getParent();
         }

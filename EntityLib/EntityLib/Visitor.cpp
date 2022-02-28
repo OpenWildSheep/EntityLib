@@ -14,7 +14,7 @@ namespace Ent
             _visitor.inObject(_expl);
             for (auto&& [name, schemaref] : _expl.getSchema()->properties)
             {
-                auto field = _expl.enterObjectField(name.c_str(), &schemaref);
+                auto field = _expl.getObjectField(name.c_str(), &schemaref);
                 if (_visitor.inObjectField(field, name.c_str()))
                 {
                     visitRecursive(field, _visitor);
@@ -27,7 +27,7 @@ namespace Ent
         case Ent::DataType::oneOf:
         {
             _visitor.inUnion(_expl, _expl.getUnionType());
-            auto data = _expl.enterUnionData();
+            auto data = _expl.getUnionData();
             visitRecursive(data, _visitor);
             _visitor.outUnion(_expl);
             break;
@@ -44,7 +44,7 @@ namespace Ent
                 case Ent::DataType::string:
                     for (char const* key : _expl.getMapKeysString())
                     {
-                        auto value = _expl.enterMapItem(key);
+                        auto value = _expl.getMapItem(key);
                         _visitor.inMapElement(value, key);
                         visitRecursive(value, _visitor);
                         _visitor.outMapElement(value);
@@ -53,7 +53,7 @@ namespace Ent
                 case Ent::DataType::integer:
                     for (int64_t key : _expl.getMapKeysInt())
                     {
-                        auto value = _expl.enterMapItem(key);
+                        auto value = _expl.getMapItem(key);
                         _visitor.inMapElement(value, key);
                         visitRecursive(value, _visitor);
                         _visitor.outMapElement(value);
@@ -88,7 +88,7 @@ namespace Ent
                     _visitor.inUnionSet(_expl);
                     for (auto&& [name, schema] : _expl.getUnionSetKeysString())
                     {
-                        auto data = _expl.enterUnionSetItem(name, schema);
+                        auto data = _expl.getUnionSetItem(name, schema);
                         _visitor.inUnionSetElement(_expl, name);
                         visitRecursive(data, _visitor);
                         _visitor.outUnionSetElement(_expl);
@@ -103,7 +103,7 @@ namespace Ent
                     case Ent::DataType::string:
                         for (auto&& key : _expl.getObjectSetKeysString())
                         {
-                            auto data = _expl.enterObjectSetItem(key);
+                            auto data = _expl.getObjectSetItem(key);
                             _visitor.inObjectSetElement(data, key);
                             visitRecursive(data, _visitor);
                             _visitor.outObjectSetElement(data);
@@ -112,7 +112,7 @@ namespace Ent
                     case Ent::DataType::integer:
                         for (auto&& key : _expl.getObjectSetKeysInt())
                         {
-                            auto data = _expl.enterObjectSetItem(key);
+                            auto data = _expl.getObjectSetItem(key);
                             _visitor.inObjectSetElement(data, key);
                             visitRecursive(data, _visitor);
                             _visitor.outObjectSetElement(data);
@@ -129,7 +129,7 @@ namespace Ent
                 _visitor.inArray(_expl);
                 for (size_t i = 0; i < _expl.size(); ++i)
                 {
-                    auto data = _expl.enterArrayItem(i);
+                    auto data = _expl.getArrayItem(i);
                     _visitor.inArrayElement(data, i);
                     visitRecursive(data, _visitor);
                     _visitor.outArrayElement(data);

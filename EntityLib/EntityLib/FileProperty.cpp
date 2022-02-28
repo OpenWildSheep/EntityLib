@@ -1,12 +1,13 @@
-#include "include/EntityLib/FileCursor.h"
+#include "include/EntityLib/FileProperty.h"
 
 #include "include/EntityLib.h"
 
 namespace Ent
 {
-    FileCursor::FileCursor() = default;
+    FileProperty::FileProperty() = default;
 
-    FileCursor::FileCursor(Ent::Subschema const* _schema, char const* _filePath, nlohmann::json* _document)
+    FileProperty::FileProperty(
+        Ent::Subschema const* _schema, char const* _filePath, nlohmann::json* _document)
     {
         if (_filePath != nullptr)
         {
@@ -16,63 +17,63 @@ namespace Ent
         values = _document;
     }
 
-    FileCursor::FileCursor(Ent::Subschema const* _schema, char const* _filePath)
-        : FileCursor(_schema, _filePath, &_schema->rootSchema->entityLib->readJsonFile(_filePath))
+    FileProperty::FileProperty(Ent::Subschema const* _schema, char const* _filePath)
+        : FileProperty(_schema, _filePath, &_schema->rootSchema->entityLib->readJsonFile(_filePath))
     {
     }
 
-    void FileCursor::pushBack(char const* _key)
-    {
-        _getRawJson()->push_back(_key);
-    }
-
-    void FileCursor::pushBack(int64_t _key)
+    void FileProperty::pushBack(char const* _key)
     {
         _getRawJson()->push_back(_key);
     }
 
-    void FileCursor::save(char const* _filename) const
+    void FileProperty::pushBack(int64_t _key)
+    {
+        _getRawJson()->push_back(_key);
+    }
+
+    void FileProperty::save(char const* _filename) const
     {
         schema.base->rootSchema->entityLib->saveJsonFile(
             values, _filename != nullptr ? _filename : m_filePath.c_str());
     }
 
-    nlohmann::json* FileCursor::_getRawJson()
+    nlohmann::json* FileProperty::_getRawJson()
     {
         return isSet() ? values : nullptr;
     }
 
-    nlohmann::json const* FileCursor::getRawJson() const
+    nlohmann::json const* FileProperty::getRawJson() const
     {
         return isSet() ? values : nullptr;
     }
 
-    void FileCursor::setRawJson(nlohmann::json* _jsonNode)
+    void FileProperty::setRawJson(nlohmann::json* _jsonNode)
     {
         values = _jsonNode;
     }
 
-    bool FileCursor::isSetOrNull() const
+    bool FileProperty::isSetOrNull() const
     {
         return values != nullptr;
     }
 
-    bool FileCursor::isSet() const
+    bool FileProperty::isSet() const
     {
         auto* val = values;
         return val != nullptr and not val->is_null();
     }
 
-    bool FileCursor::isNull() const
+    bool FileProperty::isNull() const
     {
         auto* val = values;
         return val != nullptr and val->is_null();
     }
 
-    FileCursor FileCursor::enterObjectField(char const* _field, SubschemaRef const* _fieldRef)
+    FileProperty FileProperty::getObjectField(char const* _field, SubschemaRef const* _fieldRef)
     {
         bool const nodeIsSet = isSet();
-        FileCursor newLayer;
+        FileProperty newLayer;
         auto& lastLayer = *this;
         ENTLIB_DBG_ASSERT(lastLayer.schema.base->type == Ent::DataType::object);
         if (_fieldRef == nullptr)
@@ -111,9 +112,9 @@ namespace Ent
         return newLayer;
     }
 
-    FileCursor FileCursor::enterUnionSetItem(char const* _field, Subschema const* _dataSchema)
+    FileProperty FileProperty::getUnionSetItem(char const* _field, Subschema const* _dataSchema)
     {
-        FileCursor newLayer;
+        FileProperty newLayer;
         auto& lastLayer = *this;
         auto& lastschema = *lastLayer.schema.base;
         if (lastschema.singularItems == nullptr)
@@ -176,9 +177,9 @@ namespace Ent
     }
 
     template <typename K, typename C>
-    FileCursor FileCursor::_enterObjectSetItemImpl(K _field, C&& _equalKey)
+    FileProperty FileProperty::_enterObjectSetItemImpl(K _field, C&& _equalKey)
     {
-        FileCursor newLayer;
+        FileProperty newLayer;
         auto& lastLayer = *this;
         auto& setSchema = *lastLayer.schema.base;
         auto& objectSchema = setSchema.singularItems->get();
@@ -226,7 +227,7 @@ namespace Ent
         return newLayer;
     }
 
-    FileCursor FileCursor::enterObjectSetItem(char const* _field)
+    FileProperty FileProperty::getObjectSetItem(char const* _field)
     {
         return _enterObjectSetItemImpl(
             _field,
@@ -234,7 +235,7 @@ namespace Ent
             { return _node.get_ref<std::string const&>() == _key; });
     }
 
-    FileCursor FileCursor::enterObjectSetItem(int64_t _field)
+    FileProperty FileProperty::getObjectSetItem(int64_t _field)
     {
         return _enterObjectSetItemImpl(
             _field,
@@ -242,9 +243,9 @@ namespace Ent
     }
 
     template <typename K, typename E>
-    FileCursor FileCursor::_enterMapItemImpl(K _field, E&& _isEqual)
+    FileProperty FileProperty::_enterMapItemImpl(K _field, E&& _isEqual)
     {
-        FileCursor newLayer;
+        FileProperty newLayer;
         auto& lastLayer = *this;
 
         auto& pairSchema = lastLayer.schema.base->singularItems->get();
@@ -276,7 +277,7 @@ namespace Ent
         return newLayer;
     }
 
-    FileCursor FileCursor::enterMapItem(char const* _field)
+    FileProperty FileProperty::getMapItem(char const* _field)
     {
         return _enterMapItemImpl(
             _field,
@@ -284,7 +285,7 @@ namespace Ent
             { return _node.get_ref<std::string const&>() == _field; });
     }
 
-    FileCursor FileCursor::enterMapItem(int64_t _field)
+    FileProperty FileProperty::getMapItem(int64_t _field)
     {
         return _enterMapItemImpl(
             _field,
@@ -292,9 +293,9 @@ namespace Ent
             { return _node.get<int64_t>() == _field; });
     }
 
-    FileCursor FileCursor::enterArrayItem(size_t _index)
+    FileProperty FileProperty::getArrayItem(size_t _index)
     {
-        FileCursor newLayer;
+        FileProperty newLayer;
         auto& lastLayer = *this;
         ENTLIB_DBG_ASSERT(lastLayer.schema.base->type == Ent::DataType::array);
         if (auto item = lastLayer.schema.base->singularItems.get())
@@ -330,7 +331,7 @@ namespace Ent
         return newLayer;
     }
 
-    char const* FileCursor::getUnionType() const
+    char const* FileProperty::getUnionType() const
     {
         auto& lastLayer = *this;
         if (isSet())
@@ -353,7 +354,7 @@ namespace Ent
         }
     }
 
-    Ent::Subschema const* FileCursor::getUnionSchema() const
+    Ent::Subschema const* FileProperty::getUnionSchema() const
     {
         char const* unionType = getUnionType();
         auto& lastLayer = *this;
@@ -367,7 +368,7 @@ namespace Ent
         }
     }
 
-    bool FileCursor::isUnionRemoved() const
+    bool FileProperty::isUnionRemoved() const
     {
         auto& lastLayer = *this;
         auto unionSchema = lastLayer.schema.base;
@@ -390,13 +391,13 @@ namespace Ent
         return false;
     }
 
-    FileCursor FileCursor::enterUnionData(char const* _unionType)
+    FileProperty FileProperty::getUnionData(char const* _unionType)
     {
         if (_unionType == nullptr)
         {
             _unionType = getUnionType();
         }
-        FileCursor newLayer;
+        FileProperty newLayer;
         auto& lastLayer = *this;
         auto dataSchema = lastLayer.schema.base->getUnionType(_unionType);
         auto unionSchema = lastLayer.schema.base;
@@ -425,19 +426,19 @@ namespace Ent
         return newLayer;
     }
 
-    Subschema const* FileCursor::getSchema() const
+    Subschema const* FileProperty::getSchema() const
     {
         return schema.base;
     }
 
-    nlohmann::json const* FileCursor::getPropertyDefaultValue() const
+    nlohmann::json const* FileProperty::getPropertyDefaultValue() const
     {
         return schema.propDefVal;
     }
 
-    nlohmann::json* FileCursor::createChildNode(
-        FileCursor& _lastLayer,
-        Ent::FileCursor::Key const& _childName,
+    nlohmann::json* FileProperty::createChildNode(
+        FileProperty& _lastLayer,
+        Ent::FileProperty::Key const& _childName,
         Ent::Subschema const& _newLayerSchema,
         size_t _arraySize)
     {
@@ -617,7 +618,7 @@ namespace Ent
         return newLayerJson;
     }
 
-    void FileCursor::setSize(size_t _size)
+    void FileProperty::setSize(size_t _size)
     {
         if (values->is_null())
         {
@@ -633,7 +634,7 @@ namespace Ent
         }
     }
     template <typename T>
-    void FileCursor::set(T&& _value)
+    void FileProperty::set(T&& _value)
     {
         if constexpr (std::is_same_v<std::remove_const_t<std::remove_reference_t<T>>, EntityRef>)
         {
@@ -645,28 +646,28 @@ namespace Ent
         }
     }
 
-    void FileCursor::setFloat(double _value)
+    void FileProperty::setFloat(double _value)
     {
         set(_value);
     }
-    void FileCursor::setInt(int64_t _value)
+    void FileProperty::setInt(int64_t _value)
     {
         set(_value);
     }
-    void FileCursor::setString(char const* _value)
+    void FileProperty::setString(char const* _value)
     {
         ENTLIB_ASSERT(_value != nullptr);
         set(_value);
     }
-    void FileCursor::setBool(bool _value)
+    void FileProperty::setBool(bool _value)
     {
         set(_value);
     }
-    void FileCursor::setEntityRef(EntityRef const& _value)
+    void FileProperty::setEntityRef(EntityRef const& _value)
     {
         set(_value);
     }
-    void FileCursor::setUnionType(char const* type)
+    void FileProperty::setUnionType(char const* type)
     {
         auto& wrapper = (*values);
         auto dataFieldName = getSchema()->getUnionDataField();
@@ -676,7 +677,7 @@ namespace Ent
     }
 
     template <typename T>
-    T FileCursor::get() const
+    T FileProperty::get() const
     {
         if constexpr (std::is_same_v<T, const char*>)
         {
@@ -692,31 +693,31 @@ namespace Ent
         }
     }
 
-    double FileCursor::getFloat() const
+    double FileProperty::getFloat() const
     {
         return get<double>();
     }
-    int64_t FileCursor::getInt() const
+    int64_t FileProperty::getInt() const
     {
         return get<int64_t>();
     }
-    char const* FileCursor::getString() const
+    char const* FileProperty::getString() const
     {
         return get<char const*>();
     }
-    bool FileCursor::getBool() const
+    bool FileProperty::getBool() const
     {
         return get<bool>();
     }
-    EntityRef FileCursor::getEntityRef() const
+    EntityRef FileProperty::getEntityRef() const
     {
         return get<EntityRef>();
     }
-    size_t FileCursor::size() const
+    size_t FileProperty::size() const
     {
         return values->size();
     }
-    FileCursor::Key const& FileCursor::getPathToken() const
+    FileProperty::Key const& FileProperty::getPathToken() const
     {
         return additionalPath;
     }

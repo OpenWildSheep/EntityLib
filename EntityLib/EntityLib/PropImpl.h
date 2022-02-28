@@ -4,7 +4,7 @@
 #include <set>
 #include <deque>
 
-#include "include/EntityLib/FileCursor.h"
+#include "include/EntityLib/FileProperty.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4464)
@@ -15,11 +15,11 @@ namespace Ent
 {
     class EntityLib;
 
-    struct Cursor;
+    struct PropImpl;
 
     /// Functor used by PropImplPtr
     /// to decrement the refcounter on the unique_ptr destruction,
-    /// and delete the Cursor if refcount == 0.
+    /// and delete the PropImpl if refcount == 0.
     struct DecRef
     {
         template <typename C>
@@ -29,28 +29,28 @@ namespace Ent
         }
     };
 
-    /// smart pointer to a Cursor (use reference counting)
-    using PropImplPtr = std::unique_ptr<Cursor, DecRef>;
+    /// smart pointer to a PropImpl (use reference counting)
+    using PropImplPtr = std::unique_ptr<PropImpl, DecRef>;
 
     /// @brief Internal implementation of a Property
-    struct ENTLIB_DLLEXPORT Cursor
+    struct ENTLIB_DLLEXPORT PropImpl
     {
     public:
         using Key = std::variant<std::string, size_t>;
 
-        Cursor();
-        Cursor(Cursor const&) = delete;
-        Cursor& operator=(Cursor const&) = delete;
-        Cursor(Cursor&&) = delete;
-        Cursor& operator=(Cursor&&) = delete;
-        Cursor(
+        PropImpl();
+        PropImpl(PropImpl const&) = delete;
+        PropImpl& operator=(PropImpl const&) = delete;
+        PropImpl(PropImpl&&) = delete;
+        PropImpl& operator=(PropImpl&&) = delete;
+        PropImpl(
             EntityLib* _entityLib,
             PropImplPtr _parent,
             Ent::Subschema const* _schema, ///< Schema of the file to load
             char const* _filename,
             nlohmann::json* _doc);
 
-        Cursor(
+        PropImpl(
             EntityLib* _entityLib,
             PropImplPtr _parent,
             Ent::Subschema const* _schema, ///< Schema of the file to load
@@ -58,8 +58,8 @@ namespace Ent
 
         void
         setDefault(Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
-        FileCursor* getDefault();
-        FileCursor const* getDefault() const;
+        FileProperty* getDefault();
+        FileProperty const* getDefault() const;
 
         /// Save to _filename or to the source file
         void save(char const* _filename = nullptr) const;
@@ -69,40 +69,40 @@ namespace Ent
 
         /// @brief Enter in the given field of the object
         /// @pre It is an object
-        PropImplPtr enterObjectField(
+        PropImplPtr getObjectField(
             char const* _field, ///< field to enter in
             SubschemaRef const* _fieldRef = nullptr ///< SubschemaRef of the field (For performance)
         );
         /// @brief Enter in the internal data of the union
         /// @pre It is a Union
-        PropImplPtr enterUnionData(
+        PropImplPtr getUnionData(
             char const* _type = nullptr ///< type of the internal data of the union
         );
         /// @brief Enter in the item of a UnionSet
         /// @pre It is a UnionSet
-        PropImplPtr enterUnionSetItem(
+        PropImplPtr getUnionSetItem(
             char const* _type, ///< Type of the item
             Subschema const* _dataSchema = nullptr ///< Schema of the item (For performance)
         );
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        PropImplPtr enterObjectSetItem(char const* _key ///< Key of the object
+        PropImplPtr getObjectSetItem(char const* _key ///< Key of the object
         );
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        PropImplPtr enterObjectSetItem(int64_t _key ///< Key of the object
+        PropImplPtr getObjectSetItem(int64_t _key ///< Key of the object
         );
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        PropImplPtr enterMapItem(char const* _key ///< Key of the value
+        PropImplPtr getMapItem(char const* _key ///< Key of the value
         );
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        PropImplPtr enterMapItem(int64_t _field ///< Key of the value
+        PropImplPtr getMapItem(int64_t _field ///< Key of the value
         );
         /// @brief Enter in the element of an Array
         /// @pre It is an Array
-        PropImplPtr enterArrayItem(size_t _index ///< index of the targeted element
+        PropImplPtr getArrayItem(size_t _index ///< index of the targeted element
         );
         /// @return The "InstanceOf" field, an empty string if set to empty, or nullptr if unset.
         /// @pre It is an Object
@@ -176,19 +176,19 @@ namespace Ent
         void insertPrimSetKey(char const* _key); ///< Insert _key in the set (or do nothing if already in)
         void insertPrimSetKey(int64_t _key); ///< Insert _key in the set (or do nothing if already in)
 
-        Cursor* getPrefab(); ///< Get the Cursor of the prefab
+        PropImpl* getPrefab(); ///< Get the PropImpl of the prefab
         nlohmann::json const* getRawJson(); ///< Get the underlying json node of the instance
 
         PropImplPtr shared_from_this(); ///< Create a new smart pointer to this
 
-        PropImplPtr getParent() const; ///< Get the Cursor which created this one
+        PropImplPtr getParent() const; ///< Get the PropImpl which created this one
 
     private:
-        friend void decRef(Cursor* self);
+        friend void decRef(PropImpl* self);
 
         bool _loadInstanceOf();
-        Cursor& _getLastLayer();
-        Cursor const& _getLastLayer() const;
+        PropImpl& _getLastLayer();
+        PropImpl const& _getLastLayer() const;
         void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance
         template <typename K, typename E>
         bool _countPrimSetKeyImpl(K _key, E&& _isEqual);
@@ -198,15 +198,13 @@ namespace Ent
 
         EntityLib* m_entityLib = nullptr;
         PropImplPtr prefab = nullptr;
-        std::optional<FileCursor> defaultStorage; ///< Used to explore the defalt value in the schema
+        std::optional<FileProperty> defaultStorage; ///< Used to explore the defalt value in the schema
         size_t m_arraySize = 0;
-        FileCursor m_instance;
+        FileProperty m_instance;
         PropImplPtr m_parent = nullptr;
         size_t m_refCount = 0;
         DeleteCheck m_deleteCheck;
     };
-
-    using PropImpl = Cursor;
 
     inline PropImpl* PropImpl::getPrefab()
     {

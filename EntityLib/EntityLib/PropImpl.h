@@ -33,8 +33,7 @@ namespace Ent
     public:
         using Key = std::variant<std::string, size_t>;
 
-        Cursor() = default;
-        ~Cursor();
+        Cursor();
         Cursor(Cursor const&) = delete;
         Cursor(Cursor&&) = delete;
         Cursor& operator=(Cursor const&) = delete;
@@ -50,21 +49,9 @@ namespace Ent
             Ent::Subschema const* _schema,
             char const* _filename,
             nlohmann::json* _doc);
-        void _init(
-            EntityLib* _entityLib,
-            PropImplPtr _parent,
-            Ent::Subschema const* _schema,
-            char const* _filename);
-        void _init(
-            EntityLib* _entityLib,
-            PropImplPtr _parent,
-            Ent::Subschema const* _schema,
-            char const* _filename,
-            nlohmann::json* _doc);
 
         void setDefault(
             Ent::Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
-        void clear();
         FileCursor* getDefault();
         FileCursor const* getDefault() const;
 
@@ -201,6 +188,17 @@ namespace Ent
         bool _countPrimSetKeyImpl(K _key, E&& _isEqual);
 
         void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance
+
+        /// Function used temporarily to make PR easier
+        Cursor const& _getLastLayer() const
+        {
+            return *this;
+        }
+        /// Function used temporarily to make PR easier
+        Cursor& _getLastLayer()
+        {
+            return *this;
+        }
 
         EntityLib* m_entityLib = nullptr;
         PropImplPtr prefab = nullptr;

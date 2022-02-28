@@ -11,8 +11,8 @@ namespace Ent
 
         Property() = default;
         Property(Property const& _other)
+            : m_self(_other.m_self->shared_from_this())
         {
-            m_self = _other.m_self->shared_from_this();
         }
         Property& operator=(Property const& _other)
         {
@@ -20,35 +20,19 @@ namespace Ent
             std::swap(copy, *this);
             return *this;
         }
-        Property(Property&& _other)
-        {
-            (*this) = std::move(_other);
-        }
-        Property& operator=(Property&& _other)
-        {
-            std::swap(m_self, _other.m_self);
-            return *this;
-        }
+        Property(Property&& _other) noexcept = default;
+        Property& operator=(Property&& _other) noexcept = default;
         Property(EntityLib* _entityLib, Ent::Subschema const* _schema, char const* _filename)
+            : m_self(_entityLib->newPropImpl(nullptr, _schema, _filename, nullptr))
         {
-            m_self = _entityLib->newPropImpl(nullptr, _schema, _filename, nullptr);
         }
         Property(
             EntityLib* _entityLib,
             Ent::Subschema const* _schema,
             char const* _filename,
             nlohmann::json* _doc)
+            : m_self(_entityLib->newPropImpl(nullptr, _schema, _filename, _doc))
         {
-            m_self = _entityLib->newPropImpl(nullptr, _schema, _filename, _doc);
-        }
-        ~Property()
-        {
-            m_self = nullptr;
-        }
-
-        void clear()
-        {
-            getPimpl().clear();
         }
 
         /// Save to _filename or to the source file
@@ -332,17 +316,19 @@ namespace Ent
             return getPimpl().getRawJson();
         }
 
+        /// @brief Check if the Property is not nullptr inside (have to be true to call any method)
         bool hasValue() const
         {
             return m_self != nullptr;
         }
 
+        /// @brief Check if the Property has a "InstanceOf" declared and not empty
         bool hasPrefab() const
         {
             return m_self->getPrefab() != nullptr;
         }
 
-        Property getPrefab() ///< Get the PropImpl of the prefab
+        Property getPrefab() const ///< Get the prefab of the Property
         {
             if (auto prefab = m_self->getPrefab())
             {
@@ -356,8 +342,8 @@ namespace Ent
 
     private:
         Property(PropImplPtr _prop)
+            : m_self(std::move(_prop))
         {
-            m_self = std::move(_prop);
         }
 
         PropImpl& getPimpl()

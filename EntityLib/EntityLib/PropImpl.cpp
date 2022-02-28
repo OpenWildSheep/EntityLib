@@ -13,13 +13,7 @@ namespace Ent
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
         defaultStorage = FileCursor{_schema, _filePath, const_cast<nlohmann::json*>(_document)};
     }
-    void Cursor::clear()
-    {
-        prefab.reset();
-        m_parent.reset();
-        defaultStorage.reset();
-        m_arraySize = 0;
-    }
+
     FileCursor* Cursor::getDefault()
     {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
@@ -42,7 +36,7 @@ namespace Ent
     template <typename V>
     V Cursor::get() const
     {
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         if (isSet())
         {
             return m_instance.get<V>();
@@ -94,24 +88,9 @@ namespace Ent
         return get<EntityRef>();
     }
 
+    Cursor::Cursor() = default;
+
     Cursor::Cursor(
-        EntityLib* _entityLib,
-        PropImplPtr _parent,
-        Ent::Subschema const* _schema,
-        char const* _filename,
-        nlohmann::json* _doc)
-    {
-        _init(_entityLib, std::move(_parent), _schema, _filename, _doc);
-    }
-
-    Cursor::~Cursor()
-    {
-        ENTLIB_ASSERT_NOTHROW(m_deleteCheck.state_ == DeleteCheck::State::VALID);
-        prefab.reset();
-        m_parent.reset();
-    }
-
-    void Cursor::_init(
         EntityLib* _entityLib,
         PropImplPtr _parent,
         Ent::Subschema const* _schema,
@@ -133,18 +112,11 @@ namespace Ent
         _loadInstanceOf();
     }
 
-    void Cursor::_init(
-        EntityLib* _entityLib, PropImplPtr _parent, Ent::Subschema const* _schema, char const* _filename)
-    {
-        _init(
-            _entityLib, std::move(_parent), _schema, _filename, &_entityLib->readJsonFile(_filename));
-    }
-
     Cursor::Cursor(
         EntityLib* _entityLib, PropImplPtr _parent, Ent::Subschema const* _schema, char const* _filename)
+        : Cursor(
+            _entityLib, std::move(_parent), _schema, _filename, &_entityLib->readJsonFile(_filename))
     {
-        _init(
-            _entityLib, std::move(_parent), _schema, _filename, &_entityLib->readJsonFile(_filename));
     }
 
     void Cursor::save(char const* _filename) const
@@ -154,7 +126,7 @@ namespace Ent
 
     bool Cursor::isDefault() const
     {
-        auto& newLayer = *this;
+        auto& newLayer = _getLastLayer();
         if (m_instance.isSet())
         {
             return false;
@@ -168,7 +140,7 @@ namespace Ent
 
     bool Cursor::_loadInstanceOf()
     {
-        auto* subschema = getSchema();
+        auto* subschema = m_instance.getSchema();
         if ((subschema->type == DataType::object or subschema->type == DataType::oneOf)
             and m_instance.isSet())
         {
@@ -192,7 +164,7 @@ namespace Ent
         _checkInvariants();
         ENTLIB_DBG_ASSERT(getDataType() == Ent::DataType::object);
         auto newLayer = m_entityLib->newPropImpl();
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         ENTLIB_DBG_ASSERT(
             lastLayer.getDefault() == nullptr
             or lastLayer.getDefault()->getSchema()->type == Ent::DataType::object);
@@ -247,7 +219,7 @@ namespace Ent
     {
         if (_dataSchema == nullptr)
         {
-            auto& singularItems = getSchema()->singularItems;
+            auto& singularItems = m_instance.getSchema()->singularItems;
             if (singularItems != nullptr)
             {
                 Ent::Subschema const& unionSchema = singularItems->get();
@@ -281,7 +253,7 @@ namespace Ent
         _checkInvariants();
         auto newLayerPtr = m_entityLib->newPropImpl();
         Cursor& newLayer = *newLayerPtr;
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         newLayer.m_entityLib = m_entityLib;
         newLayer.m_instance = _enter(lastLayer.m_instance);
         newLayer.m_parent = shared_from_this();
@@ -338,7 +310,7 @@ namespace Ent
         auto newLayerPtr = m_entityLib->newPropImpl();
         Cursor& newLayer = *newLayerPtr;
         newLayer.m_entityLib = m_entityLib;
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         ENTLIB_DBG_ASSERT(lastLayer.m_instance.getSchema()->type == Ent::DataType::array);
         newLayer.m_instance = lastLayer.m_instance.enterArrayItem(_index);
         newLayer.m_parent = shared_from_this();
@@ -381,9 +353,8 @@ namespace Ent
         {
             return nullptr;
         }
-        char const* result = field->getString();
-        _checkInvariants();
-        return result;
+        char const* instanceOf = field->getString();
+        return instanceOf;
     }
 
     void Cursor::setInstanceOf(char const* _instanceOf)
@@ -398,7 +369,7 @@ namespace Ent
         Ent::SubschemaRef ref;
         ref.subSchemaOrRef = std::move(schema);
         enterObjectField("InstanceOf", &ref)->setString(_instanceOf);
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         if (strlen(_instanceOf) != 0)
         {
             lastLayer.prefab = m_entityLib->newPropImpl(nullptr, getSchema(), _instanceOf, nullptr);
@@ -412,7 +383,7 @@ namespace Ent
     char const* Cursor::getUnionType()
     {
         ENTLIB_ASSERT(getSchema()->type == Ent::DataType::oneOf);
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         if (char const* type = lastLayer.m_instance.getUnionType())
         {
             return type;
@@ -456,7 +427,12 @@ namespace Ent
 
     DataType Cursor::getDataType() const
     {
-        return getSchema()->type;
+        return m_instance.getSchema()->type;
+    }
+
+    Subschema const* Cursor::getSchema() const
+    {
+        return m_instance.getSchema();
     }
 
     char const* Cursor::getTypeName() const
@@ -466,12 +442,12 @@ namespace Ent
 
     DataType Cursor::getMapKeyType() const
     {
-        return getSchema()->singularItems->get().linearItems->at(0)->type;
+        return m_instance.getSchema()->singularItems->get().linearItems->at(0)->type;
     }
 
     DataType Cursor::getObjectSetKeyType() const
     {
-        auto& schema = *getSchema();
+        auto& schema = *m_instance.getSchema();
         if (auto arrayMeta = std::get_if<Subschema::ArrayMeta>(&schema.meta))
         {
             if (arrayMeta->keyField.has_value())
@@ -485,7 +461,7 @@ namespace Ent
 
     size_t Cursor::arraySize()
     {
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         auto& jsonExplLayer = lastLayer.m_instance;
         auto* schema = jsonExplLayer.getSchema();
         if (schema->linearItems.has_value())
@@ -649,7 +625,7 @@ namespace Ent
 
     std::set<char const*, CmpStr> Cursor::getMapKeysString()
     {
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         std::set<char const*, CmpStr> keys;
         if (lastLayer.prefab != nullptr)
         {
@@ -695,7 +671,7 @@ namespace Ent
 
     bool Cursor::isNull() const
     {
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         if (lastLayer.m_instance.isSetOrNull())
         {
             return lastLayer.m_instance.isNull();
@@ -711,7 +687,7 @@ namespace Ent
     }
     std::set<int64_t> Cursor::getMapKeysInt()
     {
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         std::set<int64_t> keys;
         if (lastLayer.prefab != nullptr)
         {
@@ -738,7 +714,7 @@ namespace Ent
     }
     std::set<int64_t> Cursor::getPrimSetKeysInt()
     {
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         std::set<int64_t> keys;
         if (lastLayer.m_instance.isSet())
         {
@@ -763,7 +739,7 @@ namespace Ent
                 keys.insert(enterArrayItem(i)->getString());
             }
         }
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         if (lastLayer.prefab != nullptr)
         {
             keys.merge(lastLayer.prefab->getPrimSetKeysString());
@@ -773,7 +749,7 @@ namespace Ent
 
     std::map<char const*, Subschema const*, CmpStr> Cursor::getUnionSetKeysString()
     {
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         std::map<char const*, Subschema const*, CmpStr> keys;
         if (lastLayer.prefab != nullptr)
         {
@@ -801,7 +777,7 @@ namespace Ent
 
     std::set<char const*, CmpStr> Cursor::getObjectSetKeysString()
     {
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         auto const& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
         std::set<char const*, CmpStr> keys;
         if (lastLayer.prefab != nullptr)
@@ -829,7 +805,7 @@ namespace Ent
 
     std::set<int64_t> Cursor::getObjectSetKeysInt()
     {
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         auto const& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
         std::set<int64_t> keys;
         if (lastLayer.m_instance.isSet())
@@ -977,7 +953,7 @@ namespace Ent
                 }
             }
         }
-        auto& lastLayer = *this;
+        auto& lastLayer = _getLastLayer();
         if (lastLayer.prefab != nullptr)
         {
             return lastLayer.prefab->primSetContains(_key);
@@ -1005,11 +981,6 @@ namespace Ent
     nlohmann::json const* Cursor::getRawJson()
     {
         return m_instance.getRawJson();
-    }
-
-    Subschema const* Cursor::getSchema() const
-    {
-        return m_instance.getSchema();
     }
 
     void decRef(Cursor* self)

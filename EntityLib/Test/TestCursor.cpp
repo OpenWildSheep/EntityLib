@@ -8,7 +8,6 @@
 
 #include <EntityLib/Visitor.h>
 #include <EntityLib/CopyNode.h>
-#include <EntityLib/HandleImpl.h>
 #include <EntityLib/Property.h>
 
 using namespace Ent;

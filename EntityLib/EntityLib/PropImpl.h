@@ -4,7 +4,7 @@
 #include <set>
 #include <deque>
 
-#include "FileCursor.h"
+#include "include/EntityLib/FileCursor.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4464)

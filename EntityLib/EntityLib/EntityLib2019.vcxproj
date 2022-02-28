@@ -122,11 +122,11 @@
     </ClCompile>
     <ClCompile Include="EntityLibCore.cpp" />
     <ClCompile Include="FileCursor.cpp" />
-    <ClCompile Include="HandleImpl.cpp" />
     <ClCompile Include="include\Schema.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="PropImpl.cpp" />
     <ClCompile Include="SchemaLoader.cpp" />
     <ClCompile Include="Tools.cpp" />
     <ClCompile Include="Union.cpp" />
@@ -141,7 +141,6 @@
     <ClInclude Include="include\EntityLibCore.h" />
     <ClInclude Include="include\EntityLib\CopyNode.h" />
     <ClInclude Include="include\EntityLib\FileCursor.h" />
-    <ClInclude Include="include\EntityLib\HandleImpl.h" />
     <ClInclude Include="include\EntityLib\Property.h" />
     <ClInclude Include="include\EntityLib\Visitor.h" />
     <ClInclude Include="include\Schema.h" />
@@ -150,6 +149,7 @@
     <ClInclude Include="Node.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Override.h" />
+    <ClInclude Include="PropImpl.h" />
     <ClInclude Include="RemovableMap.h" />
     <ClInclude Include="SchemaLoader.h" />
     <ClInclude Include="Tools.h" />

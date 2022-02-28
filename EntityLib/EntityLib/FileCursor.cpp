@@ -16,29 +16,6 @@ namespace Ent
         values = _document;
     }
 
-    void FileCursor::init(Ent::Subschema const* _schema, char const* _filePath, nlohmann::json* _document)
-    {
-        if (_filePath == nullptr)
-        {
-            m_filePath.clear();
-        }
-        else
-        {
-            m_filePath = _filePath;
-        }
-        schema = Schema{{_schema}};
-        values = _document;
-        additionalPath = {};
-    }
-
-    void FileCursor::reset()
-    {
-        m_filePath.clear();
-        schema = Schema{};
-        values = {};
-        additionalPath = {};
-    }
-
     FileCursor::FileCursor(Ent::Subschema const* _schema, char const* _filePath)
         : FileCursor(_schema, _filePath, &_schema->rootSchema->entityLib->readJsonFile(_filePath))
     {

@@ -38,10 +38,6 @@ namespace Ent
 
         FileCursor(Ent::Subschema const* _schema, char const* m_filePath, nlohmann::json* _document);
 
-        void init(Ent::Subschema const* _schema, char const* _filePath, nlohmann::json* _document);
-
-        void reset(); ///< Reset FileCursor without freeing memory
-
         void pushBack(char const* _key); ///< @pre json is an array. @brief Push back _key in json
 
         void pushBack(int64_t _key); ///< @pre json is an array. @brief Push back _key in json

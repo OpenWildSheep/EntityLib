@@ -1,4 +1,4 @@
-#include "include/EntityLib/HandleImpl.h"
+#include "PropImpl.h"
 #include "include/EntityLib.h"
 
 #include <utility>
@@ -127,27 +127,21 @@ namespace Ent
         m_parent = std::move(_parent);
 
         setDefault(_schema, nullptr, &_schema->defaultValue);
-        m_instance.init(_schema, _filename, _doc);
+        m_instance = FileCursor(_schema, _filename, _doc);
         ENTLIB_ASSERT(_doc != nullptr);
         ENTLIB_ASSERT(_doc->is_object());
         _loadInstanceOf();
     }
 
     void Cursor::_init(
-        EntityLib* _entityLib,
-        PropImplPtr _parent,
-        Ent::Subschema const* _schema,
-        char const* _filename)
+        EntityLib* _entityLib, PropImplPtr _parent, Ent::Subschema const* _schema, char const* _filename)
     {
         _init(
             _entityLib, std::move(_parent), _schema, _filename, &_entityLib->readJsonFile(_filename));
     }
 
     Cursor::Cursor(
-        EntityLib* _entityLib,
-        PropImplPtr _parent,
-        Ent::Subschema const* _schema,
-        char const* _filename)
+        EntityLib* _entityLib, PropImplPtr _parent, Ent::Subschema const* _schema, char const* _filename)
     {
         _init(
             _entityLib, std::move(_parent), _schema, _filename, &_entityLib->readJsonFile(_filename));
@@ -184,7 +178,8 @@ namespace Ent
                 if (auto const& prefabPath = member->get_ref<std::string const&>();
                     not prefabPath.empty())
                 {
-                    prefab = m_entityLib->newPropImpl(nullptr, subschema, prefabPath.c_str(), nullptr);
+                    prefab =
+                        m_entityLib->newPropImpl(nullptr, subschema, prefabPath.c_str(), nullptr);
                 }
                 return true;
             }

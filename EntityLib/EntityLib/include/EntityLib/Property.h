@@ -1,5 +1,5 @@
 #pragma once
-#include "HandleImpl.h"
+#include "../../PropImpl.h"
 #include "../EntityLib.h"
 
 namespace Ent

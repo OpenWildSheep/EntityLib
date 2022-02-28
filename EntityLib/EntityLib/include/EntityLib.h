@@ -9,7 +9,7 @@
 #include "../Union.h"
 #include "../Object.h"
 #include "../Node.h"
-#include "EntityLib/HandleImpl.h"
+#include "../PropImpl.h"
 #pragma warning(pop)
 
 namespace Ent

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <deque>
+#include <vector>
 
 #include "Visitor.h"
 #include "Property.h"
@@ -10,146 +10,148 @@ namespace Ent
     /// Deep copy from a Node to an empty Node
     class CopyToEmptyNode : public RecursiveVisitor
     {
-        Property* m_root = nullptr;
-        std::deque<Property> m_dest;
+        std::vector<Property> m_dest;
 
-        Property& back()
+        [[nodiscard]] Property& _back()
         {
-            if (m_dest.empty())
-            {
-                return *m_root;
-            }
-            else
-            {
-                return m_dest.back();
-            }
+            return m_dest.back();
+        }
+
+        void _push(Property _prop)
+        {
+            m_dest.push_back(std::move(_prop));
+        }
+
+        void _pop()
+        {
+            m_dest.pop_back();
         }
 
     public:
-        CopyToEmptyNode(Property& _dest)
-            : m_root(&_dest)
+        CopyToEmptyNode(Property _dest)
+            : m_dest({std::move(_dest)})
         {
         }
-        void inObject([[maybe_unused]] Property& m_source) override
+        void inObject(Property& m_source) override
         {
             if (auto instanceOf = m_source.getInstanceOf())
             {
-                back().setInstanceOf(instanceOf);
+                _back().setInstanceOf(instanceOf);
             }
         }
-        bool inObjectField([[maybe_unused]] Property& m_source, char const* _key) override
+        bool inObjectField(Property& m_source, char const* _key) override
         {
-            m_dest.push_back(back().enterObjectField(_key));
+            _push(_back().enterObjectField(_key));
             return true;
         }
-        void outObjectField([[maybe_unused]] Property& m_source, [[maybe_unused]] char const* _key) override
+        void outObjectField(Property& m_source, char const* _key) override
         {
-            m_dest.pop_back();
+            _pop();
         }
-        void inUnion([[maybe_unused]] Property& m_source, char const* _type) override
+        void inUnion(Property& m_source, char const* _type) override
         {
             if (m_source.isSet())
             {
-                back().setUnionType(_type);
+                _back().setUnionType(_type);
             }
-            m_dest.push_back(back().enterUnionData(_type));
+            _push(_back().enterUnionData(_type));
         }
-        void outUnion([[maybe_unused]] Property& m_source) override
+        void outUnion(Property& m_source) override
         {
-            m_dest.pop_back();
+            _pop();
         }
-        void inMapElement([[maybe_unused]] Property& m_source, char const* _key) override
+        void inMapElement(Property& m_source, char const* _key) override
         {
-            m_dest.push_back(back().enterMapItem(_key));
+            _push(_back().enterMapItem(_key));
         }
-        void inMapElement([[maybe_unused]] Property& m_source, int64_t _key) override
+        void inMapElement(Property& m_source, int64_t _key) override
         {
-            m_dest.push_back(back().enterMapItem(_key));
+            _push(_back().enterMapItem(_key));
         }
-        void outMapElement([[maybe_unused]] Property& m_source) override
+        void outMapElement(Property& m_source) override
         {
-            m_dest.pop_back();
+            _pop();
         }
-        void inArrayElement([[maybe_unused]] Property& m_source, size_t _index) override
+        void inArrayElement(Property& m_source, size_t _index) override
         {
-            m_dest.push_back(back().enterArrayItem(_index));
+            _push(_back().enterArrayItem(_index));
         }
-        void outArrayElement([[maybe_unused]] Property& m_source) override
+        void outArrayElement(Property& m_source) override
         {
-            m_dest.pop_back();
+            _pop();
         }
-        void key([[maybe_unused]] Property& m_source, char const* _key) override
+        void key(Property& m_source, char const* _key) override
         {
-            back().insertPrimSetKey(_key);
+            _back().insertPrimSetKey(_key);
         }
-        void key([[maybe_unused]] Property& m_source, int64_t _key) override
+        void key(Property& m_source, int64_t _key) override
         {
-            back().insertPrimSetKey(_key);
+            _back().insertPrimSetKey(_key);
         }
-        void inUnionSetElement([[maybe_unused]] Property& m_source, char const* _type) override
+        void inUnionSetElement(Property& m_source, char const* _type) override
         {
-            m_dest.push_back(back().enterUnionSetItem(_type));
+            _push(_back().enterUnionSetItem(_type));
             if (m_source.isSet())
             {
-                back().buildPath(); // Force it to set
-            }
-        }
-        void outUnionSetElement([[maybe_unused]] Property& m_source) override
-        {
-            m_dest.pop_back();
-        }
-        void inObjectSetElement([[maybe_unused]] Property& m_source, char const* _key) override
-        {
-            m_dest.push_back(back().enterObjectSetItem(_key));
-        }
-        void inObjectSetElement([[maybe_unused]] Property& m_source, int64_t _key) override
-        {
-            m_dest.push_back(back().enterObjectSetItem(_key));
-        }
-        void outObjectSetElement([[maybe_unused]] Property& m_source) override
-        {
-            m_dest.pop_back();
-        }
-        void inArray([[maybe_unused]] Property& m_source) override
-        {
-            if (m_source.isSet())
-            {
-                back().setSize(m_source.size());
+                _back().buildPath(); // Force it to set
             }
         }
-        void boolNode([[maybe_unused]] Property& m_source) override
+        void outUnionSetElement(Property& m_source) override
+        {
+            _pop();
+        }
+        void inObjectSetElement(Property& m_source, char const* _key) override
+        {
+            _push(_back().enterObjectSetItem(_key));
+        }
+        void inObjectSetElement(Property& m_source, int64_t _key) override
+        {
+            _push(_back().enterObjectSetItem(_key));
+        }
+        void outObjectSetElement(Property& m_source) override
+        {
+            _pop();
+        }
+        void inArray(Property& m_source) override
         {
             if (m_source.isSet())
             {
-                back().setBool(m_source.getBool());
+                _back().setSize(m_source.size());
             }
         }
-        void intNode([[maybe_unused]] Property& m_source) override
+        void boolNode(Property& m_source) override
         {
             if (m_source.isSet())
             {
-                back().setInt(m_source.getInt());
+                _back().setBool(m_source.getBool());
             }
         }
-        void floatNode([[maybe_unused]] Property& m_source) override
+        void intNode(Property& m_source) override
         {
             if (m_source.isSet())
             {
-                back().setFloat(m_source.getFloat());
+                _back().setInt(m_source.getInt());
             }
         }
-        void stringNode([[maybe_unused]] Property& m_source) override
+        void floatNode(Property& m_source) override
         {
             if (m_source.isSet())
             {
-                back().setString(m_source.getString());
+                _back().setFloat(m_source.getFloat());
             }
         }
-        void entityRefNode([[maybe_unused]] Property& m_source) override
+        void stringNode(Property& m_source) override
         {
             if (m_source.isSet())
             {
-                back().setEntityRef(m_source.getEntityRef());
+                _back().setString(m_source.getString());
+            }
+        }
+        void entityRefNode(Property& m_source) override
+        {
+            if (m_source.isSet())
+            {
+                _back().setEntityRef(m_source.getEntityRef());
             }
         }
     };

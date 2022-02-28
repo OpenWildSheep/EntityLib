@@ -161,9 +161,9 @@ namespace Ent
         {
             return getPimpl().size();
         }
-        bool contains([[maybe_unused]] Key const& _key) ///< @pre map/set. @return true if it contains _key.
+        bool contains(Key const& _key) ///< @pre map/set. @return true if it contains _key.
         {
-            return getPimpl().size();
+            return getPimpl().contains(_key);
         }
         size_t arraySize() ///< @return size of a simple array
         {
@@ -311,7 +311,7 @@ namespace Ent
             return getPimpl().insertPrimSetKey(_key);
         }
 
-        nlohmann::json const* _getRawJson() ///< Get the underlying json node of the instance
+        nlohmann::json const* getRawJson() ///< Get the underlying json node of the instance
         {
             return getPimpl().getRawJson();
         }

@@ -340,6 +340,11 @@ namespace Ent
             }
         }
 
+        Property getParent() const  ///< Get the Property which own this one
+        {
+            return m_self->getParent();
+        }
+
     private:
         Property(PropImplPtr _prop)
             : m_self(std::move(_prop))

@@ -22,149 +22,145 @@ class PrintNode : public RecursiveVisitor
     }
 
 public:
-    PrintNode()
-    {
-    }
-
-    void inObject([[maybe_unused]] Property& _expl) override
+    void inObject([[maybe_unused]] Property& _prop) override
     {
         ++tab;
     }
-    bool inObjectField([[maybe_unused]] Property& _expl, char const* key) override
+    bool inObjectField([[maybe_unused]] Property& _prop, char const* key) override
     {
         // std::cout << "dksflghjdfjg" << getTab() << '"' << key << "\": " << std::endl;
         std::cout << getTab() << '"' << key << "\": " << std::endl;
         ++tab;
         return true;
     }
-    void outObjectField([[maybe_unused]] Property& _expl, [[maybe_unused]] char const* _key) override
+    void outObjectField([[maybe_unused]] Property& _prop, [[maybe_unused]] char const* _key) override
     {
         --tab;
     }
-    void outObject([[maybe_unused]] Property& _expl) override
+    void outObject([[maybe_unused]] Property& _prop) override
     {
         --tab;
     }
-    void inUnion([[maybe_unused]] Property& _expl, char const* type) override
+    void inUnion([[maybe_unused]] Property& _prop, char const* type) override
     {
         std::cout << getTab() << '"' << type << "\": " << std::endl;
         ++tab;
     }
-    void outUnion([[maybe_unused]] Property& _expl) override
+    void outUnion([[maybe_unused]] Property& _prop) override
     {
         --tab;
     }
-    void inMap([[maybe_unused]] Property& _expl) override
+    void inMap([[maybe_unused]] Property& _prop) override
     {
         ++tab;
     }
-    void outMap([[maybe_unused]] Property& _expl) override
+    void outMap([[maybe_unused]] Property& _prop) override
     {
         --tab;
     }
-    void inMapElement([[maybe_unused]] Property& _expl, char const* key) override
+    void inMapElement([[maybe_unused]] Property& _prop, char const* key) override
     {
         ++tab;
         std::cout << getTab() << '"' << key << "\": " << std::endl;
     }
-    void inMapElement([[maybe_unused]] Property& _expl, int64_t key) override
+    void inMapElement([[maybe_unused]] Property& _prop, int64_t key) override
     {
         ++tab;
         std::cout << getTab() << key << ": " << std::endl;
     }
-    void outMapElement([[maybe_unused]] Property& _expl) override
+    void outMapElement([[maybe_unused]] Property& _prop) override
     {
         --tab;
     }
-    void inPrimSet([[maybe_unused]] Property& _expl, Ent::DataType) override
+    void inPrimSet([[maybe_unused]] Property& _prop, Ent::DataType) override
     {
         ++tab;
     }
-    void inArrayElement([[maybe_unused]] Property& _expl, size_t) override
+    void inArrayElement([[maybe_unused]] Property& _prop, size_t) override
     {
     }
-    void outArrayElement([[maybe_unused]] Property& _expl) override
+    void outArrayElement([[maybe_unused]] Property& _prop) override
     {
     }
-    void key([[maybe_unused]] Property& _expl, char const* _key) override
+    void key([[maybe_unused]] Property& _prop, char const* _key) override
     {
         std::cout << getTab() << '"' << _key << '"' << std::endl;
     }
-    void key([[maybe_unused]] Property& _expl, int64_t _key) override
+    void key([[maybe_unused]] Property& _prop, int64_t _key) override
     {
         std::cout << getTab() << _key << std::endl;
     }
-    void outPrimSet([[maybe_unused]] Property& _expl) override
+    void outPrimSet([[maybe_unused]] Property& _prop) override
     {
         --tab;
     }
-    void inUnionSet([[maybe_unused]] Property& _expl) override
+    void inUnionSet([[maybe_unused]] Property& _prop) override
     {
         ++tab;
     }
-    void inUnionSetElement([[maybe_unused]] Property& _expl, char const* key) override
+    void inUnionSetElement([[maybe_unused]] Property& _prop, char const* key) override
     {
         std::cout << getTab() << '"' << key << '"' << std::endl;
         ++tab;
     }
-    void outUnionSetElement([[maybe_unused]] Property& _expl) override
+    void outUnionSetElement([[maybe_unused]] Property& _prop) override
     {
         --tab;
     }
-    void outUnionSet([[maybe_unused]] Property& _expl) override
+    void outUnionSet([[maybe_unused]] Property& _prop) override
     {
         --tab;
     }
-    void inObjectSet([[maybe_unused]] Property& _expl) override
+    void inObjectSet([[maybe_unused]] Property& _prop) override
     {
         ++tab;
     }
-    void outObjectSet([[maybe_unused]] Property& _expl) override
+    void outObjectSet([[maybe_unused]] Property& _prop) override
     {
         --tab;
     }
-    void inObjectSetElement([[maybe_unused]] Property& _expl, char const* key) override
+    void inObjectSetElement([[maybe_unused]] Property& _prop, char const* key) override
     {
         std::cout << getTab() << '"' << key << '"' << std::endl;
     }
-    void inObjectSetElement([[maybe_unused]] Property& _expl, int64_t key) override
+    void inObjectSetElement([[maybe_unused]] Property& _prop, int64_t key) override
     {
         std::cout << getTab() << key << std::endl;
     }
-    void outObjectSetElement([[maybe_unused]] Property& _expl) override
+    void outObjectSetElement([[maybe_unused]] Property& _prop) override
     {
     }
-    void inArray([[maybe_unused]] Property& _expl) override
+    void inArray([[maybe_unused]] Property& _prop) override
     {
         ++tab;
     }
-    void outArray([[maybe_unused]] Property& _expl) override
+    void outArray([[maybe_unused]] Property& _prop) override
     {
         --tab;
     }
-    void nullNode([[maybe_unused]] Property& _expl) override
+    void nullNode([[maybe_unused]] Property& _prop) override
     {
         std::cout << getTab() << "null" << std ::endl;
     }
-    void boolNode([[maybe_unused]] Property& _expl) override
+    void boolNode(Property& _prop) override
     {
-        std::cout << getTab() << _expl.getBool() << std::endl;
+        std::cout << getTab() << _prop.getBool() << std::endl;
     }
-    void intNode([[maybe_unused]] Property& _expl) override
+    void intNode(Property& _prop) override
     {
-        std::cout << getTab() << _expl.getInt() << std::endl;
+        std::cout << getTab() << _prop.getInt() << std::endl;
     }
-    void floatNode([[maybe_unused]] Property& _expl) override
+    void floatNode(Property& _prop) override
     {
-        std::cout << getTab() << _expl.getFloat() << std::endl;
+        std::cout << getTab() << _prop.getFloat() << std::endl;
     }
-    void stringNode([[maybe_unused]] Property& _expl) override
+    void stringNode(Property& _prop) override
     {
-        std::cout << getTab() << '"' << _expl.getString() << '"' << std::endl;
+        std::cout << getTab() << '"' << _prop.getString() << '"' << std::endl;
     }
-    void entityRefNode([[maybe_unused]] Property& _expl) override
+    void entityRefNode(Property& _prop) override
     {
-        std::cout << getTab() << '"' << _expl.getEntityRef().entityPath.c_str() << '"' << std::endl;
+        std::cout << getTab() << '"' << _prop.getEntityRef().entityPath.c_str() << '"' << std::endl;
     }
 };
 
@@ -177,24 +173,24 @@ public:
         : nodes({n})
     {
     }
-    void inObject([[maybe_unused]] Property& expl) override
+    void inObject([[maybe_unused]] Property& _prop) override
     {
         // ENTLIB_ASSERT(nodes.back()->getFieldNames().size() == expl.get);
     }
-    bool inObjectField([[maybe_unused]] Property& expl, char const* key) override
+    bool inObjectField([[maybe_unused]] Property& _prop, char const* key) override
     {
         nodes.push_back(nodes.back()->at(key));
         ENTLIB_ASSERT(nodes.back() != nullptr);
         return true;
     }
-    void outObjectField([[maybe_unused]] Property& expl, [[maybe_unused]] char const* _key) override
+    void outObjectField([[maybe_unused]] Property& _prop, [[maybe_unused]] char const* _key) override
     {
         nodes.pop_back();
     }
-    void outObject([[maybe_unused]] Property& expl) override
+    void outObject([[maybe_unused]] Property& _prop) override
     {
     }
-    void inUnion([[maybe_unused]] Property& expl, char const*) override
+    void inUnion([[maybe_unused]] Property& _prop, char const*) override
     {
         //ENTLIB_ASSERT(strcmp(expl.getUnionType(), nodes.back()->getUnionType()) == 0);
         //ENTLIB_ASSERT(strcmp(nodes.back()->getUnionType(), type) == 0);
@@ -210,7 +206,7 @@ public:
         //expl.exit();
         ENTLIB_ASSERT(nodes.back() != nullptr);
     }
-    void outUnion([[maybe_unused]] Property& expl) override
+    void outUnion([[maybe_unused]] Property& _prop) override
     {
         nodes.pop_back();
     }
@@ -232,20 +228,20 @@ public:
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
-    void outMap([[maybe_unused]] Property& expl) override
+    void outMap([[maybe_unused]] Property& _prop) override
     {
     }
-    void inMapElement([[maybe_unused]] Property& expl, char const* key) override
-    {
-        nodes.push_back(nodes.back()->mapGet(key));
-        ENTLIB_ASSERT(nodes.back() != nullptr);
-    }
-    void inMapElement([[maybe_unused]] Property& expl, int64_t key) override
+    void inMapElement([[maybe_unused]] Property& _prop, char const* key) override
     {
         nodes.push_back(nodes.back()->mapGet(key));
         ENTLIB_ASSERT(nodes.back() != nullptr);
     }
-    void outMapElement([[maybe_unused]] Property& expl) override
+    void inMapElement([[maybe_unused]] Property& _prop, int64_t key) override
+    {
+        nodes.push_back(nodes.back()->mapGet(key));
+        ENTLIB_ASSERT(nodes.back() != nullptr);
+    }
+    void outMapElement([[maybe_unused]] Property& _prop) override
     {
         nodes.pop_back();
     }
@@ -264,24 +260,24 @@ public:
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
-    void inArrayElement([[maybe_unused]] Property& expl, size_t i) override
+    void inArrayElement([[maybe_unused]] Property& _prop, size_t i) override
     {
         nodes.push_back(nodes.back()->at(i));
         ENTLIB_ASSERT(nodes.back() != nullptr);
     }
-    void outArrayElement([[maybe_unused]] Property& expl) override
+    void outArrayElement([[maybe_unused]] Property& _prop) override
     {
         nodes.pop_back();
     }
-    void key([[maybe_unused]] Property& expl, char const* key) override
+    void key([[maybe_unused]] Property& _prop, char const* key) override
     {
         ENTLIB_ASSERT(nodes.back()->mapGet(key) != nullptr);
     }
-    void key([[maybe_unused]] Property& expl, int64_t key) override
+    void key([[maybe_unused]] Property& _prop, int64_t key) override
     {
         ENTLIB_ASSERT(nodes.back()->mapGet(key) != nullptr);
     }
-    void outPrimSet([[maybe_unused]] Property& expl) override
+    void outPrimSet([[maybe_unused]] Property& _prop) override
     {
     }
     void inUnionSet(Property& expl) override
@@ -292,18 +288,18 @@ public:
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         ENTLIB_ASSERT(nodes.back()->getSchema() == expl.getSchema());
     }
-    void inUnionSetElement([[maybe_unused]] Property& expl, char const* type) override
+    void inUnionSetElement([[maybe_unused]] Property& _prop, char const* type) override
     {
         auto union_ = nodes.back()->mapGet(type);
         ENTLIB_ASSERT(union_ != nullptr);
         nodes.push_back(union_->getUnionData());
         ENTLIB_ASSERT(nodes.back() != nullptr);
     }
-    void outUnionSetElement([[maybe_unused]] Property& expl) override
+    void outUnionSetElement([[maybe_unused]] Property& _prop) override
     {
         nodes.pop_back();
     }
-    void outUnionSet([[maybe_unused]] Property& expl) override
+    void outUnionSet([[maybe_unused]] Property& _prop) override
     {
     }
     void inObjectSet(Property& expl) override
@@ -322,20 +318,20 @@ public:
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
-    void outObjectSet([[maybe_unused]] Property& expl) override
+    void outObjectSet([[maybe_unused]] Property& _prop) override
     {
     }
-    void inObjectSetElement([[maybe_unused]] Property& expl, char const* key) override
-    {
-        nodes.push_back(nodes.back()->mapGet(key));
-        ENTLIB_ASSERT(nodes.back() != nullptr);
-    }
-    void inObjectSetElement([[maybe_unused]] Property& expl, int64_t key) override
+    void inObjectSetElement([[maybe_unused]] Property& _prop, char const* key) override
     {
         nodes.push_back(nodes.back()->mapGet(key));
         ENTLIB_ASSERT(nodes.back() != nullptr);
     }
-    void outObjectSetElement([[maybe_unused]] Property& expl) override
+    void inObjectSetElement([[maybe_unused]] Property& _prop, int64_t key) override
+    {
+        nodes.push_back(nodes.back()->mapGet(key));
+        ENTLIB_ASSERT(nodes.back() != nullptr);
+    }
+    void outObjectSetElement([[maybe_unused]] Property& _prop) override
     {
         nodes.pop_back();
     }
@@ -348,10 +344,10 @@ public:
         }
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
     }
-    void outArray([[maybe_unused]] Property& expl) override
+    void outArray([[maybe_unused]] Property& _prop) override
     {
     }
-    void nullNode([[maybe_unused]] Property& expl) override
+    void nullNode([[maybe_unused]] Property& _prop) override
     {
     }
     void boolNode(Property& expl) override
@@ -396,158 +392,146 @@ public:
 
 class CompareCursor : public RecursiveVisitor
 {
-    Property* m_root = nullptr;
-    std::vector<Property> expl2;
+    Property expl2;
 
     void push(Property _prop)
     {
-        expl2.push_back(std::move(_prop));
+        expl2 = std::move(_prop);
     }
     void pop()
     {
-        expl2.pop_back();
-    }
-    Property& back()
-    {
-        if (expl2.empty())
-        {
-            return *m_root;
-        }
-        else
-        {
-            return expl2.back();
-        }
+        expl2 = expl2.getParent();
     }
 
 public:
-    CompareCursor(Property& _expl2)
-        : m_root(&_expl2)
+    CompareCursor(Property _expl2)
+        : expl2(std::move(_expl2))
     {
     }
-    void inObject([[maybe_unused]] Property& expl) override
+    void inObject(Property& _prop) override
     {
-        if (expl.hasPrefab())
+        if (_prop.hasPrefab())
         {
-            ENTLIB_ASSERT(back().hasPrefab());
-            ENTLIB_ASSERT(expl.getPrefab()._getRawJson() == back().getPrefab()._getRawJson());
+            ENTLIB_ASSERT(expl2.hasPrefab());
+            ENTLIB_ASSERT(_prop.getPrefab()._getRawJson() == expl2.getPrefab()._getRawJson());
         }
-        auto a = expl.getInstanceOf();
-        auto b = back().getInstanceOf();
+        auto a = _prop.getInstanceOf();
+        auto b = expl2.getInstanceOf();
         ENTLIB_ASSERT(
             (a == nullptr and b == nullptr)
             or (a != nullptr and b != nullptr and a == std::string_view(b)));
     }
-    bool inObjectField([[maybe_unused]] Property& expl, char const* key) override
+    bool inObjectField(Property& _prop, char const* key) override
     {
-        expl2.push_back(back().enterObjectField(key));
-        if (expl.hasPrefab())
+        expl2 = expl2.enterObjectField(key);
+        if (_prop.hasPrefab())
         {
-            ENTLIB_ASSERT(back().hasPrefab());
-            ENTLIB_ASSERT(expl.getPrefab()._getRawJson() == back().getPrefab()._getRawJson());
+            ENTLIB_ASSERT(expl2.hasPrefab());
+            ENTLIB_ASSERT(_prop.getPrefab()._getRawJson() == expl2.getPrefab()._getRawJson());
         }
         return true;
     }
-    void outObjectField([[maybe_unused]] Property& expl, [[maybe_unused]] char const* _key) override
+    void outObjectField([[maybe_unused]] Property& _prop, [[maybe_unused]] char const* _key) override
     {
-        expl2.pop_back();
+        pop();
     }
-    void inUnion([[maybe_unused]] Property& expl, char const* _type) override
+    void inUnion([[maybe_unused]] Property& _prop, char const* _type) override
     {
-        expl2.push_back(back().enterUnionData(_type));
+        expl2 = expl2.enterUnionData(_type);
     }
-    void outUnion([[maybe_unused]] Property& expl) override
+    void outUnion([[maybe_unused]] Property& _prop) override
     {
-        expl2.pop_back();
+        pop();
     }
-    void inMap([[maybe_unused]] Property& expl) override
+    void inMap(Property& _prop) override
     {
-        ENTLIB_ASSERT(back().size() == expl.size());
-        switch (expl.getMapKeyType())
+        ENTLIB_ASSERT(expl2.size() == _prop.size());
+        switch (_prop.getMapKeyType())
         {
         case Ent::DataType::string:
-            ENTLIB_ASSERT(back().getMapKeysString().size() == expl.getMapKeysString().size());
+            ENTLIB_ASSERT(expl2.getMapKeysString().size() == _prop.getMapKeysString().size());
             break;
         case Ent::DataType::integer:
-            ENTLIB_ASSERT(back().getMapKeysInt().size() == expl.getMapKeysInt().size());
+            ENTLIB_ASSERT(expl2.getMapKeysInt().size() == _prop.getMapKeysInt().size());
             break;
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
-    void inMapElement([[maybe_unused]] Property& expl, char const* _key) override
+    void inMapElement([[maybe_unused]] Property& _prop, char const* _key) override
     {
-        expl2.push_back(back().enterMapItem(_key));
+        expl2 = expl2.enterMapItem(_key);
     }
-    void inMapElement([[maybe_unused]] Property& expl, int64_t _key) override
+    void inMapElement([[maybe_unused]] Property& _prop, int64_t _key) override
     {
-        expl2.push_back(back().enterMapItem(_key));
+        expl2 = expl2.enterMapItem(_key);
     }
-    void outMapElement([[maybe_unused]] Property& expl) override
+    void outMapElement([[maybe_unused]] Property& _prop) override
     {
-        expl2.pop_back();
+        pop();
     }
-    void inPrimSet([[maybe_unused]] Property& expl, Ent::DataType) override
+    void inPrimSet(Property& _prop, Ent::DataType) override
     {
-        ENTLIB_ASSERT(back().size() == expl.size());
-        auto& itemType = expl.getSchema()->singularItems.get()->get();
+        ENTLIB_ASSERT(expl2.size() == _prop.size());
+        auto& itemType = _prop.getSchema()->singularItems.get()->get();
         switch (itemType.type)
         {
         case Ent::DataType::string:
-            ENTLIB_ASSERT(back().getPrimSetKeysString() == expl.getPrimSetKeysString());
+            ENTLIB_ASSERT(expl2.getPrimSetKeysString() == _prop.getPrimSetKeysString());
             break;
         case Ent::DataType::integer:
-            ENTLIB_ASSERT(back().getPrimSetKeysInt() == expl.getPrimSetKeysInt());
+            ENTLIB_ASSERT(expl2.getPrimSetKeysInt() == _prop.getPrimSetKeysInt());
             break;
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
-    void inArrayElement([[maybe_unused]] Property& expl, size_t i) override
+    void inArrayElement([[maybe_unused]] Property& _prop, size_t i) override
     {
-        expl2.push_back(back().enterArrayItem(i));
+        expl2 = expl2.enterArrayItem(i);
     }
-    void outArrayElement([[maybe_unused]] Property& expl) override
+    void outArrayElement([[maybe_unused]] Property& _prop) override
     {
-        expl2.pop_back();
+        pop();
     }
-    void inUnionSet([[maybe_unused]] Property& expl) override
+    void inUnionSet(Property& _prop) override
     {
-        if (expl.hasPrefab())
+        if (_prop.hasPrefab())
         {
-            ENTLIB_ASSERT(back().hasPrefab());
-            ENTLIB_ASSERT(expl.getPrefab()._getRawJson() == back().getPrefab()._getRawJson());
+            ENTLIB_ASSERT(expl2.hasPrefab());
+            ENTLIB_ASSERT(_prop.getPrefab()._getRawJson() == expl2.getPrefab()._getRawJson());
         }
-        auto a = back().getUnionSetKeysString();
-        auto b = expl.getUnionSetKeysString();
+        auto a = expl2.getUnionSetKeysString();
+        auto b = _prop.getUnionSetKeysString();
         ENTLIB_ASSERT(a.size() == b.size());
-        ENTLIB_ASSERT(back().getSchema() == expl.getSchema());
+        ENTLIB_ASSERT(expl2.getSchema() == _prop.getSchema());
         for (auto [name, type] : a)
         {
             ENTLIB_ASSERT(b.at(name) == type);
         }
     }
-    void inUnionSetElement([[maybe_unused]] Property& expl, char const* _type) override
+    void inUnionSetElement([[maybe_unused]] Property& _prop, char const* _type) override
     {
-        expl2.push_back(back().enterUnionSetItem(_type));
+        expl2 = expl2.enterUnionSetItem(_type);
     }
-    void outUnionSetElement([[maybe_unused]] Property& expl) override
+    void outUnionSetElement([[maybe_unused]] Property& _prop) override
     {
-        expl2.pop_back();
+        pop();
     }
-    void inObjectSet([[maybe_unused]] Property& expl) override
+    void inObjectSet(Property& _prop) override
     {
-        if (expl.hasPrefab())
+        if (_prop.hasPrefab())
         {
-            ENTLIB_ASSERT(back().hasPrefab());
-            ENTLIB_ASSERT(expl.getPrefab()._getRawJson() == back().getPrefab()._getRawJson());
+            ENTLIB_ASSERT(expl2.hasPrefab());
+            ENTLIB_ASSERT(_prop.getPrefab()._getRawJson() == expl2.getPrefab()._getRawJson());
         }
-        ENTLIB_ASSERT(back().size() == expl.size());
-        switch (back().getObjectSetKeyType())
+        ENTLIB_ASSERT(expl2.size() == _prop.size());
+        switch (expl2.getObjectSetKeyType())
         {
         case Ent::DataType::string:
         {
-            auto a = back().getObjectSetKeysString();
-            auto b = expl.getObjectSetKeysString();
+            auto a = expl2.getObjectSetKeysString();
+            auto b = _prop.getObjectSetKeysString();
             ENTLIB_ASSERT(a.size() == b.size());
-            ENTLIB_ASSERT(back().getSchema() == expl.getSchema());
+            ENTLIB_ASSERT(expl2.getSchema() == _prop.getSchema());
             for (auto name : a)
             {
                 ENTLIB_ASSERT(b.count(name));
@@ -555,72 +539,72 @@ public:
             break;
         }
         case Ent::DataType::integer:
-            ENTLIB_ASSERT(back().getObjectSetKeysInt() == expl.getObjectSetKeysInt());
+            ENTLIB_ASSERT(expl2.getObjectSetKeysInt() == _prop.getObjectSetKeysInt());
             break;
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
         }
     }
-    void inObjectSetElement([[maybe_unused]] Property& expl, char const* _key) override
+    void inObjectSetElement(Property& _prop, char const* _key) override
     {
-        expl2.push_back(back().enterObjectSetItem(_key));
-        if (expl.hasPrefab())
+        expl2 = expl2.enterObjectSetItem(_key);
+        if (_prop.hasPrefab())
         {
-            ENTLIB_ASSERT(back().hasPrefab());
-            auto a = expl.getPrefab()._getRawJson();
-            auto b = back().getPrefab()._getRawJson();
+            ENTLIB_ASSERT(expl2.hasPrefab());
+            auto a = _prop.getPrefab()._getRawJson();
+            auto b = expl2.getPrefab()._getRawJson();
             ENTLIB_ASSERT(a == b);
         }
     }
-    void inObjectSetElement([[maybe_unused]] Property& expl, int64_t _key) override
+    void inObjectSetElement([[maybe_unused]] Property& _prop, int64_t _key) override
     {
-        expl2.push_back(back().enterObjectSetItem(_key));
+        expl2 = expl2.enterObjectSetItem(_key);
     }
-    void outObjectSetElement([[maybe_unused]] Property& expl) override
+    void outObjectSetElement([[maybe_unused]] Property& _prop) override
     {
-        expl2.pop_back();
+        pop();
     }
-    void inArray([[maybe_unused]] Property& expl) override
+    void inArray(Property& _prop) override
     {
-        ENTLIB_ASSERT(back().size() == expl.size());
+        ENTLIB_ASSERT(expl2.size() == _prop.size());
     }
-    void nullNode([[maybe_unused]] Property& expl) override
+    void nullNode([[maybe_unused]] Property& _prop) override
     {
-        ENTLIB_ASSERT(back().getDataType() == Ent::DataType::null);
+        ENTLIB_ASSERT(expl2.getDataType() == Ent::DataType::null);
     }
-    void boolNode([[maybe_unused]] Property& expl) override
+    void boolNode([[maybe_unused]] Property& _prop) override
     {
-        ENTLIB_ASSERT(expl.isSet() == back().isSet());
-        ENTLIB_ASSERT(expl.getBool() == back().getBool());
+        ENTLIB_ASSERT(_prop.isSet() == expl2.isSet());
+        ENTLIB_ASSERT(_prop.getBool() == expl2.getBool());
     }
-    void intNode([[maybe_unused]] Property& expl) override
+    void intNode([[maybe_unused]] Property& _prop) override
     {
-        ENTLIB_ASSERT(expl.isSet() == back().isSet());
-        ENTLIB_ASSERT(expl.getInt() == back().getInt());
+        ENTLIB_ASSERT(_prop.isSet() == expl2.isSet());
+        ENTLIB_ASSERT(_prop.getInt() == expl2.getInt());
     }
-    void floatNode([[maybe_unused]] Property& expl) override
+    void floatNode(Property& _prop) override
     {
-        ENTLIB_ASSERT(expl.isSet() == back().isSet());
-        if (expl.getFloat() != back().getFloat())
+        ENTLIB_ASSERT(_prop.isSet() == expl2.isSet());
+        if (_prop.getFloat() != expl2.getFloat())
         {
-            std::cout << expl.isSet() << " " << back().isSet() << std::endl;
-            std::cout << expl.getFloat() << " " << back().getFloat() << std::endl;
-            if (expl.hasPrefab())
+            std::cout << _prop.isSet() << " " << expl2.isSet() << std::endl;
+            std::cout << _prop.getFloat() << " " << expl2.getFloat() << std::endl;
+            if (_prop.hasPrefab())
             {
-                ENTLIB_ASSERT(back().hasPrefab());
-                ENTLIB_ASSERT(expl.getPrefab()._getRawJson() == back().getPrefab()._getRawJson());
+                ENTLIB_ASSERT(expl2.hasPrefab());
+                ENTLIB_ASSERT(_prop.getPrefab()._getRawJson() == expl2.getPrefab()._getRawJson());
             }
         }
-        ENTLIB_ASSERT(expl.getFloat() == back().getFloat());
+        ENTLIB_ASSERT(_prop.getFloat() == expl2.getFloat());
     }
-    void stringNode([[maybe_unused]] Property& expl) override
+    void stringNode([[maybe_unused]] Property& _prop) override
     {
-        ENTLIB_ASSERT(expl.isSet() == back().isSet());
-        ENTLIB_ASSERT(expl.getString() == std::string_view(back().getString()));
+        ENTLIB_ASSERT(_prop.isSet() == expl2.isSet());
+        ENTLIB_ASSERT(_prop.getString() == std::string_view(expl2.getString()));
     }
-    void entityRefNode([[maybe_unused]] Property& expl) override
+    void entityRefNode([[maybe_unused]] Property& _prop) override
     {
-        ENTLIB_ASSERT(expl.isSet() == back().isSet());
-        ENTLIB_ASSERT(expl.getEntityRef() == back().getEntityRef());
+        ENTLIB_ASSERT(_prop.isSet() == expl2.isSet());
+        ENTLIB_ASSERT(_prop.getEntityRef() == expl2.getEntityRef());
     }
 };
 
@@ -629,35 +613,35 @@ class PrimitiveCounterVisitor : public RecursiveVisitor
 public:
     size_t primitiveCount = 0;
 
-    void key([[maybe_unused]] Property& _expl, char const*) override
+    void key([[maybe_unused]] Property& _prop, char const*) override
     {
         ++primitiveCount;
     }
-    void key([[maybe_unused]] Property& _expl, int64_t) override
+    void key([[maybe_unused]] Property& _prop, int64_t) override
     {
         ++primitiveCount;
     }
-    void nullNode([[maybe_unused]] Property& _expl) override
+    void nullNode([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
-    void boolNode([[maybe_unused]] Property& _expl) override
+    void boolNode([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
-    void intNode([[maybe_unused]] Property& _expl) override
+    void intNode([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
-    void floatNode([[maybe_unused]] Property& _expl) override
+    void floatNode([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
-    void stringNode([[maybe_unused]] Property& _expl) override
+    void stringNode([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
-    void entityRefNode([[maybe_unused]] Property& _expl) override
+    void entityRefNode([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
@@ -878,9 +862,9 @@ void testCursor(Ent::EntityLib& entlib)
                 .getString()
             == std::string("tutu"));
         auto components = expl.enterObjectField("Components");
-        auto transformGD = components.enterUnionSetItem("TransformGD");
-        auto orientation = transformGD.enterObjectField("Orientation");
-        auto ori3 = orientation.enterArrayItem(3llu);
+        auto ori3 = components.enterUnionSetItem("TransformGD")
+                        .enterObjectField("Orientation")
+                        .enterArrayItem(3llu);
         ENTLIB_ASSERT(fabs(ori3.getFloat() - 0.9916236400604248) < FLT_EPSILON);
         ori3.setFloat(2.);
         ENTLIB_ASSERT(ori3.getFloat() == 2.);
@@ -909,10 +893,10 @@ void testCursor(Ent::EntityLib& entlib)
     {
         std::cout << "Read instance.entity with LazyLib" << std::endl;
         clock_t start = clock();
-        Property expl(&entlib, entlib.getSchema(entitySchemaName), "prefab.entity");
+        Property expl(&entlib, entlib.getSchema(entitySchemaName), "instance.entity");
         clock_t end = clock();
 
-        auto ent = entlib.loadEntityAsNode(R"(prefab.entity)");
+        auto ent = entlib.loadEntityAsNode(R"(instance.entity)");
 
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         CompareNode compare(ent.get());
@@ -941,7 +925,7 @@ void testCursor(Ent::EntityLib& entlib)
         clock_t end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
 
-        bool testCopy = false;
+        bool testCopy = true;
         if (testCopy)
         {
             std::cout << "Copy SceneKOM.scene with LazyLib" << std::endl;
@@ -957,7 +941,7 @@ void testCursor(Ent::EntityLib& entlib)
             std::cout << "Save SceneKOM.scene with LazyLib" << std::endl;
             entlib.saveJsonFile(&newDoc, "SceneKOM.scene");
         }
-        /*
+
         std::cout << "Read SceneKOM.scene with NodeLib" << std::endl;
         start = clock();
         auto ent = entlib.loadEntityAsNode(
@@ -971,21 +955,16 @@ void testCursor(Ent::EntityLib& entlib)
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << nodeCount << std::endl;
-        */
 
         PrimitiveCounterVisitor visitor;
         std::cout << "Travserse SceneKOM.scene with LazyLib" << std::endl;
         start = clock();
         Ent::visitRecursive(expl, visitor);
-        Ent::visitRecursive(expl, visitor);
-        Ent::visitRecursive(expl, visitor);
-        Ent::visitRecursive(expl, visitor);
-        Ent::visitRecursive(expl, visitor);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;
     }
-    bool testCompare = false;
+    bool testCompare = true;
     if (testCompare)
     {
         entlib.rawdataPath = "X:/RawData";

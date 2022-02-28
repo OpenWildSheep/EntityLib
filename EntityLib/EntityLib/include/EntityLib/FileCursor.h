@@ -119,6 +119,7 @@ namespace Ent
             Ent::Subschema const& _newLayerSchema,
             size_t _arraySize);
 
+        size_t size() const; ///< @pre type==array. @brief Get the size of the array.
         void setSize(size_t _size); ///< @pre type==array. @brief Set the size of the array.
         template <typename T>
         void set(T&& _value); ///< @pre node os a primitive of type T. Set _value into the instance
@@ -135,7 +136,6 @@ namespace Ent
         char const* getString() const; ///< @pre type==string. @brief Get the value as string
         bool getBool() const; ///< @pre type==bool. @brief Get the value as bool
         EntityRef getEntityRef() const; ///< @pre type==entityref. @brief Get the value as entityref
-        size_t size() const;
 
         Key const& getPathToken() const;
 

@@ -181,6 +181,8 @@ namespace Ent
 
         PropImplPtr shared_from_this(); ///< Create a new smart pointer to this
 
+        PropImplPtr getParent() const; ///< Get the Cursor which created this one
+
     private:
         friend void decRef(Cursor* self);
 
@@ -226,5 +228,14 @@ namespace Ent
     inline PropImpl& PropImpl::_getLastLayer()
     {
         return *this;
+    }
+
+    inline PropImplPtr PropImpl::getParent() const
+    {
+        if (m_parent != nullptr)
+        {
+            return m_parent->shared_from_this();
+        }
+        return {};
     }
 } // namespace Ent

@@ -1703,7 +1703,7 @@ namespace Ent
 
     PropImplPtr EntityLib::newPropImpl()
     {
-        auto property = new (propertyPool.alloc()) Cursor();
+        auto property = new (propertyPool.alloc()) PropImpl();
         return property->shared_from_this();
     }
 
@@ -1711,7 +1711,7 @@ namespace Ent
         PropImplPtr _parent, Ent::Subschema const* _schema, char const* _filename, nlohmann::json* _doc)
     {
         auto property =
-            new (propertyPool.alloc()) Cursor(this, std::move(_parent), _schema, _filename, _doc);
+            new (propertyPool.alloc()) PropImpl(this, std::move(_parent), _schema, _filename, _doc);
         return property->shared_from_this();
     }
 

@@ -119,7 +119,8 @@ namespace Ent
         if (lastschema.singularItems == nullptr)
         {
             throw BadArrayType(staticFormat(
-                "In Cursor::enterUnionSetItem, expected UnionSet. Got %s.", lastschema.name.c_str()));
+                "In Property::enterUnionSetItem, expected UnionSet. Got %s.",
+                lastschema.name.c_str()));
         }
         auto& unionSchema = lastschema.singularItems->get();
         if (_dataSchema == nullptr)
@@ -192,7 +193,7 @@ namespace Ent
         if (keyFieldName == nullptr)
         {
             throw BadArrayType(staticFormat(
-                "In Cursor::enterObjectSet. Expected an ObjectSet. Got %s", setSchema.name.c_str()));
+                "In Property::enterObjectSet. Expected an ObjectSet. Got %s", setSchema.name.c_str()));
         }
 
         newLayer.schema = Schema{&objectSchema, nullptr};

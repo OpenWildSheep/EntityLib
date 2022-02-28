@@ -42,7 +42,7 @@ namespace Ent
     {
     public:
         mutable Pool<Node> nodePool;
-        mutable Pool<Cursor> propertyPool;
+        mutable Pool<PropImpl> propertyPool;
         /// @todo Make public attribute private?
         std::filesystem::path rootPath; ///< Path to the perforce root (X:/)
         std::filesystem::path rawdataPath; ///< Path to the RawData dir in the perforce root (X:/RawData)

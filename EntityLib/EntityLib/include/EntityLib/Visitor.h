@@ -156,9 +156,9 @@ namespace Ent
         }
     };
 
-    /// Visit all the given _expl Cursor in depth, calling _visitor at each step
+    /// Visit all the given _expl Property in depth, calling _visitor at each step
     void visitRecursive(
-        Property& _expl, ///< Cursor to visit
+        Property& _expl, ///< Property to visit
         RecursiveVisitor& _visitor ///< RecursiveVisitor to call at each step
     );
 
@@ -226,9 +226,9 @@ namespace Ent
         }
     };
 
-    /// Visit all the given _expl Cursor in a shallow way
+    /// Visit all the given _expl Property in a shallow way
     void visit(
-        Property& _expl, ///< Cursor to visit
+        Property& _expl, ///< Property to visit
         Visitor& _visitor ///< The right method in _visitor will be called (according the the type in _expl)
     );
 } // namespace Ent

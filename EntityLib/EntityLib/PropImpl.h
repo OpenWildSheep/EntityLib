@@ -17,6 +17,9 @@ namespace Ent
 
     struct Cursor;
 
+    /// Functor used by PropImplPtr
+    /// to decrement the refcounter on the unique_ptr destruction,
+    /// and delete the Cursor if refcount == 0.
     struct DecRef
     {
         template <typename C>
@@ -26,8 +29,10 @@ namespace Ent
         }
     };
 
+    /// smart pointer to a Cursor (use reference counting)
     using PropImplPtr = std::unique_ptr<Cursor, DecRef>;
 
+    /// @brief Internal implementation of a Property
     struct ENTLIB_DLLEXPORT Cursor
     {
     public:
@@ -35,23 +40,24 @@ namespace Ent
 
         Cursor();
         Cursor(Cursor const&) = delete;
-        Cursor(Cursor&&) = delete;
         Cursor& operator=(Cursor const&) = delete;
+        Cursor(Cursor&&) = delete;
         Cursor& operator=(Cursor&&) = delete;
         Cursor(
             EntityLib* _entityLib,
             PropImplPtr _parent,
-            Ent::Subschema const* _schema,
-            char const* _filename);
-        Cursor(
-            EntityLib* _entityLib,
-            PropImplPtr _parent,
-            Ent::Subschema const* _schema,
+            Ent::Subschema const* _schema, ///< Schema of the file to load
             char const* _filename,
             nlohmann::json* _doc);
 
-        void setDefault(
-            Ent::Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
+        Cursor(
+            EntityLib* _entityLib,
+            PropImplPtr _parent,
+            Ent::Subschema const* _schema, ///< Schema of the file to load
+            char const* _filename);
+
+        void
+        setDefault(Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
         FileCursor* getDefault();
         FileCursor const* getDefault() const;
 
@@ -63,40 +69,40 @@ namespace Ent
 
         /// @brief Enter in the given field of the object
         /// @pre It is an object
-        [[nodiscard]] PropImplPtr enterObjectField(
+        PropImplPtr enterObjectField(
             char const* _field, ///< field to enter in
             SubschemaRef const* _fieldRef = nullptr ///< SubschemaRef of the field (For performance)
         );
         /// @brief Enter in the internal data of the union
         /// @pre It is a Union
-        [[nodiscard]] PropImplPtr enterUnionData(
+        PropImplPtr enterUnionData(
             char const* _type = nullptr ///< type of the internal data of the union
         );
         /// @brief Enter in the item of a UnionSet
         /// @pre It is a UnionSet
-        [[nodiscard]] PropImplPtr enterUnionSetItem(
+        PropImplPtr enterUnionSetItem(
             char const* _type, ///< Type of the item
             Subschema const* _dataSchema = nullptr ///< Schema of the item (For performance)
         );
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] PropImplPtr enterObjectSetItem(char const* _key ///< Key of the object
+        PropImplPtr enterObjectSetItem(char const* _key ///< Key of the object
         );
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] PropImplPtr enterObjectSetItem(int64_t _key ///< Key of the object
+        PropImplPtr enterObjectSetItem(int64_t _key ///< Key of the object
         );
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        [[nodiscard]] PropImplPtr enterMapItem(char const* _key ///< Key of the value
+        PropImplPtr enterMapItem(char const* _key ///< Key of the value
         );
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        [[nodiscard]] PropImplPtr enterMapItem(int64_t _field ///< Key of the value
+        PropImplPtr enterMapItem(int64_t _field ///< Key of the value
         );
         /// @brief Enter in the element of an Array
         /// @pre It is an Array
-        [[nodiscard]] PropImplPtr enterArrayItem(size_t _index ///< index of the targeted element
+        PropImplPtr enterArrayItem(size_t _index ///< index of the targeted element
         );
         /// @return The "InstanceOf" field, an empty string if set to empty, or nullptr if unset.
         /// @pre It is an Object
@@ -111,15 +117,19 @@ namespace Ent
         /// @return The type of the Union
         /// @pre It is a Union
         char const* getUnionType();
+
         /// @return The index of the type of the Union
         /// @pre It is a Union
         size_t getUnionTypeIndex();
         DataType getDataType() const; ///< Get the DataType of a Node
+
         Subschema const* getSchema() const; ///< Get the Schema of the curent Node
+
         char const* getTypeName() const; ///< Get the Schema name of the curent Node
 
         DataType getMapKeyType() const; ///< @pre Map @brief Get the key type curent Map
         DataType getObjectSetKeyType() const; ///< @pre ObjectSet @brief Get the key type curent ObjectSet
+
         size_t size(); ///< @return the size the this Node whatever it is.
         bool contains(Key const& _key); ///< @pre map/set. @return true if it contains _key.
         size_t arraySize(); ///< @return size of a simple array
@@ -166,39 +176,23 @@ namespace Ent
         void insertPrimSetKey(char const* _key); ///< Insert _key in the set (or do nothing if already in)
         void insertPrimSetKey(int64_t _key); ///< Insert _key in the set (or do nothing if already in)
 
-        PropImplPtr shared_from_this()
-        {
-            ++m_refCount;
-            return PropImplPtr(this);
-        }
-
         Cursor* getPrefab(); ///< Get the Cursor of the prefab
         nlohmann::json const* getRawJson(); ///< Get the underlying json node of the instance
+
+        PropImplPtr shared_from_this(); ///< Create a new smart pointer to this
 
     private:
         friend void decRef(Cursor* self);
 
-        template <typename E>
-        [[nodiscard]] PropImplPtr _enterItem(E&& _enter);
-
-        void _checkInvariants() const;
         bool _loadInstanceOf();
-
+        Cursor& _getLastLayer();
+        Cursor const& _getLastLayer() const;
+        void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance
         template <typename K, typename E>
         bool _countPrimSetKeyImpl(K _key, E&& _isEqual);
-
-        void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance
-
-        /// Function used temporarily to make PR easier
-        Cursor const& _getLastLayer() const
-        {
-            return *this;
-        }
-        /// Function used temporarily to make PR easier
-        Cursor& _getLastLayer()
-        {
-            return *this;
-        }
+        template <typename E>
+        PropImplPtr _enterItem(E&& _enter);
+        void _checkInvariants() const;
 
         EntityLib* m_entityLib = nullptr;
         PropImplPtr prefab = nullptr;
@@ -212,9 +206,25 @@ namespace Ent
 
     using PropImpl = Cursor;
 
-    inline Cursor* Cursor::getPrefab()
+    inline PropImpl* PropImpl::getPrefab()
     {
         return prefab.get();
     }
 
+    inline PropImplPtr PropImpl::shared_from_this()
+    {
+        ++m_refCount;
+        return PropImplPtr(this);
+    }
+
+    // Used temporarily to make the PR easier
+    inline PropImpl const& PropImpl::_getLastLayer() const
+    {
+        return *this;
+    }
+
+    inline PropImpl& PropImpl::_getLastLayer()
+    {
+        return *this;
+    }
 } // namespace Ent

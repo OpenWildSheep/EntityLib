@@ -1,8 +1,6 @@
 #include "PropImpl.h"
 #include "include/EntityLib.h"
 
-#include <utility>
-
 namespace Ent
 {
     void Cursor::setDefault(

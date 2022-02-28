@@ -413,7 +413,7 @@ public:
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
-            ENTLIB_ASSERT(_prop.getPrefab()._getRawJson() == expl2.getPrefab()._getRawJson());
+            ENTLIB_ASSERT(_prop.getPrefab().getRawJson() == expl2.getPrefab().getRawJson());
         }
         auto a = _prop.getInstanceOf();
         auto b = expl2.getInstanceOf();
@@ -427,7 +427,7 @@ public:
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
-            ENTLIB_ASSERT(_prop.getPrefab()._getRawJson() == expl2.getPrefab()._getRawJson());
+            ENTLIB_ASSERT(_prop.getPrefab().getRawJson() == expl2.getPrefab().getRawJson());
         }
         return true;
     }
@@ -497,7 +497,7 @@ public:
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
-            ENTLIB_ASSERT(_prop.getPrefab()._getRawJson() == expl2.getPrefab()._getRawJson());
+            ENTLIB_ASSERT(_prop.getPrefab().getRawJson() == expl2.getPrefab().getRawJson());
         }
         auto a = expl2.getUnionSetKeysString();
         auto b = _prop.getUnionSetKeysString();
@@ -521,7 +521,7 @@ public:
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
-            ENTLIB_ASSERT(_prop.getPrefab()._getRawJson() == expl2.getPrefab()._getRawJson());
+            ENTLIB_ASSERT(_prop.getPrefab().getRawJson() == expl2.getPrefab().getRawJson());
         }
         ENTLIB_ASSERT(expl2.size() == _prop.size());
         switch (expl2.getObjectSetKeyType())
@@ -550,8 +550,8 @@ public:
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
-            auto a = _prop.getPrefab()._getRawJson();
-            auto b = expl2.getPrefab()._getRawJson();
+            auto a = _prop.getPrefab().getRawJson();
+            auto b = expl2.getPrefab().getRawJson();
             ENTLIB_ASSERT(a == b);
         }
     }
@@ -591,7 +591,7 @@ public:
             if (_prop.hasPrefab())
             {
                 ENTLIB_ASSERT(expl2.hasPrefab());
-                ENTLIB_ASSERT(_prop.getPrefab()._getRawJson() == expl2.getPrefab()._getRawJson());
+                ENTLIB_ASSERT(_prop.getPrefab().getRawJson() == expl2.getPrefab().getRawJson());
             }
         }
         ENTLIB_ASSERT(_prop.getFloat() == expl2.getFloat());

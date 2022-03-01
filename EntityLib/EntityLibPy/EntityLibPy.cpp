@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <EntityLib.h>
+#include <EntityLib/Property.h>
 
 #pragma warning(push, 0)
 #include <pybind11/pybind11.h>
@@ -28,6 +29,24 @@ Value getValue(Ent::Node& node)
     case Ent::DataType::number: return node.getFloat();
     case Ent::DataType::string: return std::string(node.getString());
     case Ent::DataType::entityRef: return node.getEntityRef();
+    case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
+    }
+    return Value();
+}
+
+Value getPropValue(Ent::Property const& _prop)
+{
+    switch (_prop.getDataType())
+    {
+    case Ent::DataType::array:
+    case Ent::DataType::object:
+    case Ent::DataType::oneOf:
+    case Ent::DataType::null: return nullptr;
+    case Ent::DataType::boolean: return _prop.getBool();
+    case Ent::DataType::integer: return _prop.getInt();
+    case Ent::DataType::number: return _prop.getFloat();
+    case Ent::DataType::string: return std::string(_prop.getString());
+    case Ent::DataType::entityRef: return _prop.getEntityRef();
     case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
     return Value();
@@ -117,6 +136,25 @@ void setValue(Ent::Node& node, Value const& val)
     }
 }
 
+void setPropValue(Property& node, Value const& val)
+{
+    switch (node.getDataType())
+    {
+    case Ent::DataType::array:
+    case Ent::DataType::object:
+    case Ent::DataType::oneOf:
+    case Ent::DataType::null: break;
+    case Ent::DataType::boolean: node.setBool(std::visit(GetValue<bool>{}, val)); break;
+    case Ent::DataType::integer: node.setInt(std::visit(GetValue<int64_t>{}, val)); break;
+    case Ent::DataType::number: node.setFloat(std::visit(GetValue<double>{}, val)); break;
+    case Ent::DataType::string:
+        node.setString(std::visit(GetValue<std::string>{}, val).c_str());
+        break;
+    case Ent::DataType::entityRef: node.setEntityRef({std::get<EntityRef>(val)}); break;
+    case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
+    }
+}
+
 static py::list nodeGetKey(Node* _node)
 {
     auto const type = _node->getKeyType();
@@ -131,6 +169,83 @@ static py::list nodeGetKey(Node* _node)
     else if (type == Ent::DataType::integer)
     {
         for (auto key : _node->getKeysInt())
+        {
+            arr.append(key);
+        }
+    }
+    else
+    {
+        throw std::runtime_error("Unexpected key type");
+    }
+    return arr;
+}
+
+static py::list propMapGetKeys(Property& _prop)
+{
+    auto const type = _prop.getMapKeyType();
+    py::list arr;
+    if (type == Ent::DataType::string || type == Ent::DataType::entityRef)
+    {
+        for (auto const& key : _prop.getMapKeysString())
+        {
+            arr.append(py::str(key));
+        }
+    }
+    else if (type == Ent::DataType::integer)
+    {
+        for (auto key : _prop.getMapKeysInt())
+        {
+            arr.append(key);
+        }
+    }
+    else
+    {
+        throw std::runtime_error("Unexpected key type");
+    }
+    return arr;
+}
+
+static py::list propPrimSetGetKeys(Property& _prop)
+{
+    auto& type = _prop.getSchema()->singularItems->get().type;
+    py::list arr;
+    if (type == Ent::DataType::string || type == Ent::DataType::entityRef)
+    {
+        for (auto const& key : _prop.getPrimSetKeysString())
+        {
+            arr.append(py::str(key));
+        }
+    }
+    else if (type == Ent::DataType::integer)
+    {
+        for (auto key : _prop.getPrimSetKeysInt())
+        {
+            arr.append(key);
+        }
+    }
+    else
+    {
+        throw std::runtime_error("Unexpected key type");
+    }
+    return arr;
+}
+
+static py::list propObjSetGetKeys(Property& _prop)
+{
+    auto& itemType = _prop.getSchema()->singularItems->get();
+    auto meta = std::get<Ent::Subschema::ArrayMeta>(_prop.getSchema()->meta);
+    auto type = itemType.properties.at(*meta.keyField).get().type;
+    py::list arr;
+    if (type == Ent::DataType::string || type == Ent::DataType::entityRef)
+    {
+        for (auto const& key : _prop.getObjectSetKeysString())
+        {
+            arr.append(py::str(key));
+        }
+    }
+    else if (type == Ent::DataType::integer)
+    {
+        for (auto key : _prop.getObjectSetKeysInt())
         {
             arr.append(key);
         }
@@ -322,6 +437,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pyEntityRef = py::class_<EntityRef>(ent, "EntityRef");
     auto pyNodeFile = py::class_<EntityLib::NodeFile>(ent, "NodeFile");
     auto pyPrefabInfo = py::class_<Node::PrefabInfo>(ent, "Node_PrefabInfo");
+    auto pyProperty = py::class_<Property>(ent, "Property");
 
     pyPrefabInfo
         .def_readonly("node", &Node::PrefabInfo::node)
@@ -540,6 +656,65 @@ PYBIND11_MODULE(EntityLibPy, ent)
             [](EntityLib::NodeFile* entF) { return entF->data.get(); },
             py::return_value_policy::reference_internal)
         .def_readonly("time", &EntityLib::NodeFile::time, py::return_value_policy::reference_internal);
+
+    pyProperty
+        .def(py::init<EntityLib*, Ent::Subschema const*, char const*>())
+        .def(py::init<EntityLib*, Ent::Subschema const*, char const*, nlohmann::json*>())
+        .def("save", &Property::save)
+        .def_property_readonly("is_default", &Property::isDefault)
+        .def("get_object_field", &Property::getObjectField, py::arg("field"), py::arg("field_schema") = nullptr)
+        .def("get_union_data", &Property::getUnionData)
+        .def("get_unionset_item", &Property::getUnionSetItem, py::arg("type"), py::arg("schema") = nullptr)
+        .def("get_objectset_item", [](Property& _self, char const* _key){return _self.getObjectSetItem(_key);})
+        .def("get_objectset_item", [](Property& _self, int64_t _key){return _self.getObjectSetItem(_key);})
+        .def("get_map_item", [](Property& _self, char const* _key){return _self.getMapItem(_key);})
+        .def("get_map_item", [](Property& _self, int64_t _key){return _self.getMapItem(_key);})
+        .def("get_array_item", &Property::getArrayItem)
+        .def_property("instance_of", &Property::getInstanceOf, &Property::setInstanceOf)
+        .def_property_readonly("union_type", &Property::getUnionType) // or read/write ?
+        .def_property_readonly("data_type", &Property::getDataType)
+        .def_property_readonly("schema", &Property::getSchema, py::return_value_policy::reference_internal)
+        .def_property_readonly("type_name", &Property::getTypeName)
+        .def_property_readonly("map_key_type", &Property::getMapKeyType)
+        .def_property_readonly("objectset_key_type", &Property::getObjectSetKeyType)
+        .def_property("size", &Property::size, &Property::setSize)
+        .def("contains", &Property::contains)
+        .def_property_readonly("array_size", &Property::arraySize)
+        .def_property_readonly("empty", &Property::empty)
+        .def_property_readonly("is_null", &Property::isNull)
+        .def_property_readonly("map_keys", &propMapGetKeys)
+        .def_property_readonly("primset_keys", &propPrimSetGetKeys)
+        .def_property_readonly("unionset_keys", &Property::getUnionSetKeysString)
+        .def_property_readonly("objectset_keys", &propObjSetGetKeys)
+        .def("map_contains", [](Property& _self, char const* _key){return _self.mapContains(_key);})
+        .def("map_contains", [](Property& _self, int64_t _key){return _self.mapContains(_key);})
+        .def("primset_contains", [](Property& _self, char const* _key){return _self.primSetContains(_key);})
+        .def("primset_contains", [](Property& _self, int64_t _key){return _self.primSetContains(_key);})
+        .def("unionset_contains", [](Property& _self, char const* _key){return _self.unionSetContains(_key);})
+        .def("objectset_contains", [](Property& _self, char const* _key){return _self.objectSetContains(_key);})
+        .def("objectset_contains", [](Property& _self, int64_t _key){return _self.objectSetContains(_key);})
+        .def_property_readonly("is_set", &Property::isSet)
+        .def_property("value", getPropValue, setPropValue, py::return_value_policy::copy)
+        .def("get_float", &Property::getFloat)
+        .def("get_int", &Property::getInt)
+        .def("get_string", &Property::getString)
+        .def("get_bool", &Property::getBool)
+        .def("get_entityref", &Property::getEntityRef)
+        .def("set_float", &Property::setFloat)
+        .def("set_int", &Property::setInt)
+        .def("set_string", &Property::setString)
+        .def("set_bool", &Property::setBool)
+        .def("set_entityref", &Property::setEntityRef)
+        .def("set_union_type", &Property::setUnionType)
+        .def("build_path", &Property::buildPath)
+        .def("primset_insert", [](Property& _self, char const* _key){return _self.insertPrimSetKey(_key);})
+        .def("primset_insert", [](Property& _self, int64_t _key){return _self.insertPrimSetKey(_key);})
+        .def_property_readonly("raw_json", &Property::getRawJson)
+        .def_property_readonly("has_value", &Property::hasValue)
+        .def_property_readonly("has_prefab", &Property::hasPrefab)
+        .def_property_readonly("prefab", &Property::getPrefab)
+        .def_property_readonly("parent", &Property::getParent)
+        ;
 
     py::register_exception<Ent::JsonValidation>(ent, "JsonValidation");
 }

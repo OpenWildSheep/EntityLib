@@ -34,17 +34,15 @@ namespace Ent
     template <typename V>
     V PropImpl::get() const
     {
-        auto& lastLayer = _getLastLayer();
         if (isSet())
         {
             return m_instance.get<V>();
         }
-        else if (lastLayer.m_prefab != nullptr)
+        else if (m_prefab != nullptr)
         {
-            return lastLayer.m_prefab->get<V>();
+            return m_prefab->get<V>();
         }
-        else if (auto* defaultVal = lastLayer.getDefault();
-                 defaultVal != nullptr and defaultVal->isSet())
+        else if (auto* defaultVal = getDefault(); defaultVal != nullptr and defaultVal->isSet())
         {
             return defaultVal->get<V>();
         }
@@ -124,7 +122,7 @@ namespace Ent
 
     bool PropImpl::isDefault() const
     {
-        auto& newLayer = _getLastLayer();
+        auto& newLayer = *this;
         if (m_instance.isSet())
         {
             return false;
@@ -162,23 +160,21 @@ namespace Ent
         _checkInvariants();
         ENTLIB_DBG_ASSERT(getDataType() == Ent::DataType::object);
         auto newLayer = m_entityLib->newPropImpl();
-        auto& lastLayer = _getLastLayer();
         ENTLIB_DBG_ASSERT(
-            lastLayer.getDefault() == nullptr
-            or lastLayer.getDefault()->getSchema()->type == Ent::DataType::object);
-        newLayer->m_instance = lastLayer.m_instance.getObjectField(_field, _fieldRef);
+            getDefault() == nullptr or getDefault()->getSchema()->type == Ent::DataType::object);
+        newLayer->m_instance = m_instance.getObjectField(_field, _fieldRef);
         newLayer->m_entityLib = m_entityLib;
         newLayer->m_parent = shared_from_this();
         auto* subschema = newLayer->getSchema();
         if (not newLayer->_loadInstanceOf())
         {
-            if (lastLayer.m_prefab != nullptr)
+            if (m_prefab != nullptr)
             {
-                newLayer->m_prefab = lastLayer.m_prefab->getObjectField(_field, _fieldRef);
+                newLayer->m_prefab = m_prefab->getObjectField(_field, _fieldRef);
             }
         }
         bool defaultFound = false;
-        auto* defaultVal = lastLayer.getDefault();
+        auto* defaultVal = getDefault();
         if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
         {
             auto const objectField = defaultVal->getObjectField(_field, _fieldRef);
@@ -251,12 +247,11 @@ namespace Ent
         _checkInvariants();
         auto newLayerPtr = m_entityLib->newPropImpl();
         PropImpl& newLayer = *newLayerPtr;
-        auto& lastLayer = _getLastLayer();
         newLayer.m_entityLib = m_entityLib;
-        newLayer.m_instance = _enter(lastLayer.m_instance);
+        newLayer.m_instance = _enter(m_instance);
         newLayer.m_parent = shared_from_this();
         auto* subschema = newLayer.getSchema();
-        auto* defaultVal = lastLayer.getDefault();
+        auto* defaultVal = getDefault();
         if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
         {
             newLayer.m_default = _enter(*defaultVal);
@@ -273,9 +268,9 @@ namespace Ent
         {
             if (not newLayer._loadInstanceOf())
             {
-                if (lastLayer.m_prefab != nullptr)
+                if (m_prefab != nullptr)
                 {
-                    newLayer.m_prefab = _enter(*lastLayer.m_prefab);
+                    newLayer.m_prefab = _enter(*m_prefab);
                 }
             }
         }
@@ -308,22 +303,21 @@ namespace Ent
         auto newLayerPtr = m_entityLib->newPropImpl();
         PropImpl& newLayer = *newLayerPtr;
         newLayer.m_entityLib = m_entityLib;
-        auto& lastLayer = _getLastLayer();
-        ENTLIB_DBG_ASSERT(lastLayer.m_instance.getSchema()->type == Ent::DataType::array);
-        newLayer.m_instance = lastLayer.m_instance.getArrayItem(_index);
+        ENTLIB_DBG_ASSERT(m_instance.getSchema()->type == Ent::DataType::array);
+        newLayer.m_instance = m_instance.getArrayItem(_index);
         newLayer.m_parent = shared_from_this();
         auto* subschema = newLayer.getSchema();
         if (not isDefault())
         {
             if (not newLayer._loadInstanceOf())
             {
-                if (lastLayer.m_prefab != nullptr)
+                if (m_prefab != nullptr)
                 {
-                    newLayer.m_prefab = lastLayer.m_prefab->getArrayItem(_index);
+                    newLayer.m_prefab = m_prefab->getArrayItem(_index);
                 }
             }
         }
-        auto* defaultVal = lastLayer.getDefault();
+        auto* defaultVal = getDefault();
         if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
         {
             newLayer.m_default = defaultVal->getArrayItem(_index);
@@ -367,33 +361,31 @@ namespace Ent
         Ent::SubschemaRef ref;
         ref.subSchemaOrRef = std::move(schema);
         getObjectField("InstanceOf", &ref)->setString(_instanceOf);
-        auto& lastLayer = _getLastLayer();
         if (strlen(_instanceOf) != 0)
         {
-            lastLayer.m_prefab = m_entityLib->newPropImpl(nullptr, getSchema(), _instanceOf, nullptr);
+            m_prefab = m_entityLib->newPropImpl(nullptr, getSchema(), _instanceOf, nullptr);
         }
         else
         {
-            lastLayer.m_prefab = nullptr;
+            m_prefab = nullptr;
         }
     }
 
     char const* PropImpl::getUnionType()
     {
         ENTLIB_ASSERT(getSchema()->type == Ent::DataType::oneOf);
-        auto& lastLayer = _getLastLayer();
-        if (char const* type = lastLayer.m_instance.getUnionType())
+        if (char const* type = m_instance.getUnionType())
         {
             return type;
         }
-        else if (lastLayer.m_prefab != nullptr)
+        else if (m_prefab != nullptr)
         {
-            if (char const* type2 = lastLayer.m_prefab->getUnionType())
+            if (char const* type2 = m_prefab->getUnionType())
             {
                 return type2;
             }
         }
-        else if (auto* defaultVal = lastLayer.getDefault())
+        else if (auto* defaultVal = getDefault())
         {
             if (char const* type3 = defaultVal->getUnionType())
             {
@@ -416,9 +408,9 @@ namespace Ent
         ENTLIB_DBG_ASSERT(
             getDefault() == nullptr
             or getDefault()->getSchema()->type == m_instance.getSchema()->type);
-        if (prefab != nullptr)
+        if (m_prefab != nullptr)
         {
-            prefab->_checkInvariants();
+            m_prefab->_checkInvariants();
         }
 #endif
     }
@@ -459,8 +451,7 @@ namespace Ent
 
     size_t PropImpl::arraySize()
     {
-        auto& lastLayer = _getLastLayer();
-        auto& jsonExplLayer = lastLayer.m_instance;
+        auto& jsonExplLayer = m_instance;
         auto* schema = jsonExplLayer.getSchema();
         if (schema->linearItems.has_value())
         {
@@ -472,12 +463,11 @@ namespace Ent
             {
                 return jsonExplLayer.size();
             }
-            else if (lastLayer.m_prefab != nullptr)
+            else if (m_prefab != nullptr)
             {
-                return lastLayer.m_prefab->arraySize();
+                return m_prefab->arraySize();
             }
-            else if (auto* defaultVal = lastLayer.getDefault();
-                     defaultVal != nullptr and defaultVal->isSet())
+            else if (auto* defaultVal = getDefault(); defaultVal != nullptr and defaultVal->isSet())
             {
                 return defaultVal->getRawJson()->size();
             }
@@ -623,13 +613,12 @@ namespace Ent
 
     std::set<char const*, CmpStr> PropImpl::getMapKeysString()
     {
-        auto& lastLayer = _getLastLayer();
         std::set<char const*, CmpStr> keys;
-        if (lastLayer.m_prefab != nullptr)
+        if (m_prefab != nullptr)
         {
-            keys = lastLayer.m_prefab->getMapKeysString();
+            keys = m_prefab->getMapKeysString();
         }
-        else if (auto* defaultVal = lastLayer.getDefault();
+        else if (auto* defaultVal = getDefault();
                  defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
         {
             auto* node = defaultVal->getRawJson();
@@ -643,9 +632,9 @@ namespace Ent
                 ENTLIB_DBG_ASSERT(node->is_array());
             }
         }
-        if (lastLayer.m_instance.isSet())
+        if (m_instance.isSet())
         {
-            auto* node = lastLayer.m_instance.getRawJson();
+            auto* node = m_instance.getRawJson();
             ENTLIB_DBG_ASSERT(node->is_array());
             for (size_t i = 0; i < node->size(); ++i)
             {
@@ -669,14 +658,13 @@ namespace Ent
 
     bool PropImpl::isNull() const
     {
-        auto& lastLayer = _getLastLayer();
-        if (lastLayer.m_instance.isSetOrNull())
+        if (m_instance.isSetOrNull())
         {
-            return lastLayer.m_instance.isNull();
+            return m_instance.isNull();
         }
-        else if (lastLayer.m_prefab != nullptr)
+        else if (m_prefab != nullptr)
         {
-            return lastLayer.m_prefab->isNull();
+            return m_prefab->isNull();
         }
         else
         {
@@ -685,15 +673,14 @@ namespace Ent
     }
     std::set<int64_t> PropImpl::getMapKeysInt()
     {
-        auto& lastLayer = _getLastLayer();
         std::set<int64_t> keys;
-        if (lastLayer.m_prefab != nullptr)
+        if (m_prefab != nullptr)
         {
-            keys = lastLayer.m_prefab->getMapKeysInt();
+            keys = m_prefab->getMapKeysInt();
         }
-        if (lastLayer.m_instance.isSet())
+        if (m_instance.isSet())
         {
-            auto const arraySize = lastLayer.m_instance.getRawJson()->size();
+            auto const arraySize = m_instance.getRawJson()->size();
             for (size_t i = 0; i < arraySize; ++i)
             {
                 auto pairLayer = getArrayItem(i);
@@ -712,18 +699,17 @@ namespace Ent
     }
     std::set<int64_t> PropImpl::getPrimSetKeysInt()
     {
-        auto& lastLayer = _getLastLayer();
         std::set<int64_t> keys;
-        if (lastLayer.m_instance.isSet())
+        if (m_instance.isSet())
         {
             for (size_t i = 0; i < arraySize(); ++i)
             {
                 keys.insert(getArrayItem(i)->getInt());
             }
         }
-        if (lastLayer.m_prefab != nullptr)
+        if (m_prefab != nullptr)
         {
-            keys.merge(lastLayer.m_prefab->getPrimSetKeysInt());
+            keys.merge(m_prefab->getPrimSetKeysInt());
         }
         return keys;
     }
@@ -737,27 +723,25 @@ namespace Ent
                 keys.insert(getArrayItem(i)->getString());
             }
         }
-        auto& lastLayer = _getLastLayer();
-        if (lastLayer.m_prefab != nullptr)
+        if (m_prefab != nullptr)
         {
-            keys.merge(lastLayer.m_prefab->getPrimSetKeysString());
+            keys.merge(m_prefab->getPrimSetKeysString());
         }
         return keys;
     }
 
     std::map<char const*, Subschema const*, CmpStr> PropImpl::getUnionSetKeysString()
     {
-        auto& lastLayer = _getLastLayer();
         std::map<char const*, Subschema const*, CmpStr> keys;
-        if (lastLayer.m_prefab != nullptr)
+        if (m_prefab != nullptr)
         {
-            keys = lastLayer.m_prefab->getUnionSetKeysString();
+            keys = m_prefab->getUnionSetKeysString();
         }
-        if (lastLayer.m_instance.isSet())
+        if (m_instance.isSet())
         {
             for (size_t i = 0; i < arraySize(); ++i)
             {
-                auto arrayItem = lastLayer.m_instance.getArrayItem(i);
+                auto arrayItem = m_instance.getArrayItem(i);
                 auto unionSchema = arrayItem.getUnionSchema();
                 bool const isRemoved = (unionSchema == nullptr) or arrayItem.isUnionRemoved();
                 if (isRemoved)
@@ -775,14 +759,13 @@ namespace Ent
 
     std::set<char const*, CmpStr> PropImpl::getObjectSetKeysString()
     {
-        auto& lastLayer = _getLastLayer();
         auto const& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
         std::set<char const*, CmpStr> keys;
-        if (lastLayer.m_prefab != nullptr)
+        if (m_prefab != nullptr)
         {
-            keys = lastLayer.m_prefab->getObjectSetKeysString();
+            keys = m_prefab->getObjectSetKeysString();
         }
-        if (lastLayer.m_instance.isSet())
+        if (m_instance.isSet())
         {
             for (size_t i = 0; i < arraySize(); ++i)
             {
@@ -803,10 +786,9 @@ namespace Ent
 
     std::set<int64_t> PropImpl::getObjectSetKeysInt()
     {
-        auto& lastLayer = _getLastLayer();
         auto const& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
         std::set<int64_t> keys;
-        if (lastLayer.m_instance.isSet())
+        if (m_instance.isSet())
         {
             for (size_t i = 0; i < arraySize(); ++i)
             {
@@ -822,9 +804,9 @@ namespace Ent
                 }
             }
         }
-        if (lastLayer.m_prefab != nullptr)
+        if (m_prefab != nullptr)
         {
-            keys.merge(lastLayer.m_prefab->getObjectSetKeysInt());
+            keys.merge(m_prefab->getObjectSetKeysInt());
         }
         return keys;
     }
@@ -951,10 +933,9 @@ namespace Ent
                 }
             }
         }
-        auto& lastLayer = _getLastLayer();
-        if (lastLayer.m_prefab != nullptr)
+        if (m_prefab != nullptr)
         {
-            return lastLayer.m_prefab->primSetContains(_key);
+            return m_prefab->primSetContains(_key);
         }
         return false;
     }

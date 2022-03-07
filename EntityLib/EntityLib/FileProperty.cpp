@@ -75,11 +75,10 @@ namespace Ent
     {
         bool const nodeIsSet = isSet();
         FileProperty newLayer;
-        auto& lastLayer = *this;
-        ENTLIB_DBG_ASSERT(lastLayer.schema.base->type == DataType::object);
+        ENTLIB_DBG_ASSERT(m_schema.base->type == DataType::object);
         if (_fieldRef == nullptr)
         {
-            auto& properties = lastLayer.m_schema.base->properties;
+            auto& properties = m_schema.base->properties;
             if (auto propIter = properties.find(_field); propIter != properties.end())
             {
                 _field = propIter->first.c_str(); // Convert _field to static string
@@ -87,7 +86,7 @@ namespace Ent
             }
             else
             {
-                throw BadKey(_field, __func__, lastLayer.m_schema.base->name.c_str());
+                throw BadKey(_field, __func__, m_schema.base->name.c_str());
             }
         }
         newLayer.m_key = _field;
@@ -95,7 +94,7 @@ namespace Ent
         newLayer.m_schema = Schema{subschema, _fieldRef->getRefDefaultValues()};
         if (nodeIsSet)
         {
-            auto lastNode = lastLayer.m_values;
+            auto lastNode = m_values;
             ENTLIB_DBG_ASSERT(lastNode->is_object());
             if (auto memiter = lastNode->find(_field); memiter != lastNode->end())
             {
@@ -109,15 +108,14 @@ namespace Ent
                 newLayer.m_values = newValue;
             }
         }
-        ENTLIB_DBG_ASSERT(lastLayer.schema.base != nullptr);
+        ENTLIB_DBG_ASSERT(m_schema.base != nullptr);
         return newLayer;
     }
 
     FileProperty FileProperty::getUnionSetItem(char const* _field, Subschema const* _dataSchema)
     {
         FileProperty newLayer;
-        auto& lastLayer = *this;
-        auto& lastschema = *lastLayer.m_schema.base;
+        auto& lastschema = *m_schema.base;
         if (lastschema.singularItems == nullptr)
         {
             throw BadArrayType(staticFormat(
@@ -148,7 +146,7 @@ namespace Ent
         {
             auto typeField = unionSchema.getUnionNameField();
             auto dataField = unionSchema.getUnionDataField();
-            auto lastNode = lastLayer.m_values;
+            auto lastNode = m_values;
             for (auto& item : *lastNode)
             {
                 if (auto typeIter = item.find(typeField); typeIter != item.end())
@@ -181,8 +179,7 @@ namespace Ent
     FileProperty FileProperty::_enterObjectSetItemImpl(K _field, C&& _equalKey)
     {
         FileProperty newLayer;
-        auto& lastLayer = *this;
-        auto& setSchema = *lastLayer.m_schema.base;
+        auto& setSchema = *m_schema.base;
         auto& objectSchema = setSchema.singularItems->get();
         char const* keyFieldName = nullptr;
         if (auto meta = std::get_if<Subschema::ArrayMeta>(&setSchema.meta))
@@ -203,7 +200,7 @@ namespace Ent
 
         if (isSet())
         {
-            auto lastNode = lastLayer.m_values;
+            auto lastNode = m_values;
             for (auto& item : *lastNode)
             {
                 if (auto typeIter = item.find(keyFieldName); typeIter != item.end())
@@ -224,7 +221,7 @@ namespace Ent
                 }
             }
         }
-        ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
+        ENTLIB_DBG_ASSERT(newLayer.m_schema.base != nullptr);
         return newLayer;
     }
 
@@ -246,23 +243,22 @@ namespace Ent
     FileProperty FileProperty::_enterMapItemImpl(K _field, E&& _isEqual)
     {
         FileProperty newLayer;
-        auto& lastLayer = *this;
 
-        auto& pairSchema = lastLayer.m_schema.base->singularItems->get();
+        auto& pairSchema = m_schema.base->singularItems->get();
         newLayer.m_schema = Schema{&pairSchema.linearItems->at(1).get(), nullptr};
         newLayer.m_key = _field;
 
         if (isSet())
         {
-            auto lastNode = lastLayer.m_values;
+            auto lastNode = m_values;
             for (auto& item : *lastNode)
             {
                 auto& key = item[0];
                 if (_isEqual(key, _field))
                 {
                     auto newValue = &item[1];
-                    if (lastLayer.m_schema.base->type == DataType::string
-                        or lastLayer.m_schema.base->type == DataType::entityRef)
+                    if (m_schema.base->type == DataType::string
+                        or m_schema.base->type == DataType::entityRef)
                     {
                         ENTLIB_DBG_ASSERT(newValue->is_string());
                     }
@@ -273,7 +269,7 @@ namespace Ent
                 }
             }
         }
-        ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
+        ENTLIB_DBG_ASSERT(newLayer.m_schema.base != nullptr);
         return newLayer;
     }
 
@@ -294,21 +290,20 @@ namespace Ent
     FileProperty FileProperty::getArrayItem(size_t _index)
     {
         FileProperty newLayer;
-        auto& lastLayer = *this;
-        ENTLIB_DBG_ASSERT(lastLayer.schema.base->type == DataType::array);
-        if (auto item = lastLayer.m_schema.base->singularItems.get())
+        ENTLIB_DBG_ASSERT(m_schema.base->type == DataType::array);
+        if (auto item = m_schema.base->singularItems.get())
         {
             auto& subschema = item->get();
             newLayer.m_schema = Schema{&subschema, nullptr};
         }
         else
         {
-            ENTLIB_DBG_ASSERT(lastLayer.schema.base->linearItems.has_value());
-            if (_index >= lastLayer.m_schema.base->linearItems->size())
+            ENTLIB_DBG_ASSERT(m_schema.base->linearItems.has_value());
+            if (_index >= m_schema.base->linearItems->size())
             {
                 throw ContextException("Out of range in tuple");
             }
-            auto& subschema = lastLayer.m_schema.base->linearItems->at(_index).get();
+            auto& subschema = m_schema.base->linearItems->at(_index).get();
             newLayer.m_schema = Schema{&subschema, nullptr};
         }
         newLayer.m_key = _index;
@@ -325,17 +320,16 @@ namespace Ent
                 newLayer.m_values = newValue;
             }
         }
-        ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
+        ENTLIB_DBG_ASSERT(newLayer.m_schema.base != nullptr);
         return newLayer;
     }
 
     char const* FileProperty::getUnionType() const
     {
-        auto& lastLayer = *this;
         if (isSet())
         {
-            auto typeField = lastLayer.m_schema.base->getUnionNameField();
-            auto lastNode = lastLayer.m_values;
+            auto typeField = m_schema.base->getUnionNameField();
+            auto lastNode = m_values;
             ENTLIB_DBG_ASSERT(lastNode->is_object());
             if (auto memiter = lastNode->find(typeField); memiter != lastNode->end())
             {
@@ -355,10 +349,9 @@ namespace Ent
     Subschema const* FileProperty::getUnionSchema() const
     {
         char const* unionType = getUnionType();
-        auto& lastLayer = *this;
         try
         {
-            return lastLayer.m_schema.base->getUnionType(unionType);
+            return m_schema.base->getUnionType(unionType);
         }
         catch (BadUnionType&) // This unionType doesn't exist
         {
@@ -368,11 +361,10 @@ namespace Ent
 
     bool FileProperty::isUnionRemoved() const
     {
-        auto& lastLayer = *this;
-        auto unionSchema = lastLayer.m_schema.base;
+        auto unionSchema = m_schema.base;
         if (isSet())
         {
-            auto lastNode = lastLayer.m_values;
+            auto lastNode = m_values;
             ENTLIB_DBG_ASSERT(lastNode->is_object());
             auto dataField = unionSchema->getUnionDataField();
             if (auto memiter = lastNode->find(dataField); memiter != lastNode->end())
@@ -395,16 +387,15 @@ namespace Ent
             _unionType = getUnionType();
         }
         FileProperty newLayer;
-        auto& lastLayer = *this;
-        auto dataSchema = lastLayer.m_schema.base->getUnionType(_unionType);
-        auto unionSchema = lastLayer.m_schema.base;
+        auto dataSchema = m_schema.base->getUnionType(_unionType);
+        auto unionSchema = m_schema.base;
         newLayer.m_key = _unionType;
         if (isSet())
         {
             auto unionType = getUnionType();
             if (unionType != nullptr and strcmp(_unionType, unionType) == 0)
             {
-                auto lastNode = lastLayer.m_values;
+                auto lastNode = m_values;
                 ENTLIB_DBG_ASSERT(lastNode->is_object());
                 auto dataField = unionSchema->getUnionDataField();
                 if (auto memiter = lastNode->find(dataField); memiter != lastNode->end())
@@ -439,7 +430,7 @@ namespace Ent
         Subschema const& _newLayerSchema,
         size_t _arraySize)
     {
-        ENTLIB_DBG_ASSERT(int(_lastLayer.values->type()) < int(json::value_t::discarded));
+        ENTLIB_DBG_ASSERT(int(_lastLayer.m_values->type()) < int(json::value_t::discarded));
         json* newLayerJson = nullptr;
         switch (_lastLayer.m_schema.base->type)
         {
@@ -470,7 +461,7 @@ namespace Ent
         break;
         case DataType::array:
         {
-            ENTLIB_DBG_ASSERT(_lastLayer.values->type() == json::value_t::array);
+            ENTLIB_DBG_ASSERT(_lastLayer.m_values->type() == json::value_t::array);
             auto meta = std::get<Subschema::ArrayMeta>(_lastLayer.m_schema.base->meta);
             auto& itemType = _lastLayer.m_schema.base->singularItems->get();
             switch (hash(meta.overridePolicy))
@@ -563,7 +554,7 @@ namespace Ent
                     }
                     default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                     }
-                    ENTLIB_DBG_ASSERT(_lastLayer.values->type() == json::value_t::array);
+                    ENTLIB_DBG_ASSERT(_lastLayer.m_values->type() == json::value_t::array);
                     _lastLayer.m_values->push_back(object);
                     newLayerJson = &(*_lastLayer.m_values)[(*_lastLayer.m_values).size() - 1];
                     ENTLIB_ASSERT(newLayerJson != nullptr);

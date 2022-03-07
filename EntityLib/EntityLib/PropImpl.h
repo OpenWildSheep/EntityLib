@@ -187,8 +187,6 @@ namespace Ent
         friend void decRef(PropImpl* self);
 
         bool _loadInstanceOf();
-        PropImpl& _getLastLayer();
-        PropImpl const& _getLastLayer() const;
         void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance
         template <typename K, typename E>
         bool _countPrimSetKeyImpl(K _key, E&& _isEqual);
@@ -215,17 +213,6 @@ namespace Ent
     {
         ++m_refCount;
         return PropImplPtr(this);
-    }
-
-    // Used temporarily to make the PR easier
-    inline PropImpl const& PropImpl::_getLastLayer() const
-    {
-        return *this;
-    }
-
-    inline PropImpl& PropImpl::_getLastLayer()
-    {
-        return *this;
     }
 
     inline PropImplPtr PropImpl::getParent() const

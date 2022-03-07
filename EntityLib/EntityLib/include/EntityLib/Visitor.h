@@ -131,27 +131,27 @@ namespace Ent
         {
         }
         /// Called when entered in a null Node
-        virtual void nullNode([[maybe_unused]] Property& _prop)
+        virtual void nullProperty([[maybe_unused]] Property& _prop)
         {
         }
         /// Called when entered in a bool Node
-        virtual void boolNode([[maybe_unused]] Property& _prop)
+        virtual void boolProperty([[maybe_unused]] Property& _prop)
         {
         }
         /// Called when entered in a integer Node
-        virtual void intNode([[maybe_unused]] Property& _prop)
+        virtual void intProperty([[maybe_unused]] Property& _prop)
         {
         }
         /// Called when entered in a float Node
-        virtual void floatNode([[maybe_unused]] Property& _prop)
+        virtual void floatProperty([[maybe_unused]] Property& _prop)
         {
         }
         /// Called when entered in a string Node
-        virtual void stringNode([[maybe_unused]] Property& _prop)
+        virtual void stringProperty([[maybe_unused]] Property& _prop)
         {
         }
         /// Called when entered in a entityref Node
-        virtual void entityRefNode([[maybe_unused]] Property& _prop)
+        virtual void entityRefProperty([[maybe_unused]] Property& _prop)
         {
         }
     };
@@ -201,27 +201,27 @@ namespace Ent
         {
         }
         /// The node has the type null
-        virtual void nullNode()
+        virtual void nullProperty()
         {
         }
         /// The node has the type bool
-        virtual void boolNode()
+        virtual void boolProperty()
         {
         }
         /// The node has the type integer
-        virtual void intNode()
+        virtual void intProperty()
         {
         }
         /// The node has the type number
-        virtual void floatNode()
+        virtual void floatProperty()
         {
         }
         /// The node has the type string
-        virtual void stringNode()
+        virtual void stringProperty()
         {
         }
         /// The node has the type entityref
-        virtual void entityRefNode()
+        virtual void entityRefProperty()
         {
         }
     };

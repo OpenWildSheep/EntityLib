@@ -72,7 +72,7 @@ public:
     {
         --tab;
     }
-    void inPrimSet([[maybe_unused]] Property& _prop, Ent::DataType) override
+    void inPrimSet([[maybe_unused]] Property& _prop, DataType) override
     {
         ++tab;
     }
@@ -138,27 +138,27 @@ public:
     {
         --tab;
     }
-    void nullNode([[maybe_unused]] Property& _prop) override
+    void nullProperty([[maybe_unused]] Property& _prop) override
     {
         std::cout << getTab() << "null" << std ::endl;
     }
-    void boolNode(Property& _prop) override
+    void boolProperty(Property& _prop) override
     {
         std::cout << getTab() << _prop.getBool() << std::endl;
     }
-    void intNode(Property& _prop) override
+    void intProperty(Property& _prop) override
     {
         std::cout << getTab() << _prop.getInt() << std::endl;
     }
-    void floatNode(Property& _prop) override
+    void floatProperty(Property& _prop) override
     {
         std::cout << getTab() << _prop.getFloat() << std::endl;
     }
-    void stringNode(Property& _prop) override
+    void stringProperty(Property& _prop) override
     {
         std::cout << getTab() << '"' << _prop.getString() << '"' << std::endl;
     }
-    void entityRefNode(Property& _prop) override
+    void entityRefProperty(Property& _prop) override
     {
         std::cout << getTab() << '"' << _prop.getEntityRef().entityPath.c_str() << '"' << std::endl;
     }
@@ -215,13 +215,13 @@ public:
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         switch (expl.getMapKeyType())
         {
-        case Ent::DataType::string:
+        case DataType::string:
             if (nodes.back()->getKeysString().size() != expl.getMapKeysString().size())
                 std::cout << nodes.back()->getKeysString().size() << " "
                           << expl.getMapKeysString().size() << std::endl;
             ENTLIB_ASSERT(nodes.back()->getKeysString().size() == expl.getMapKeysString().size());
             break;
-        case Ent::DataType::integer:
+        case DataType::integer:
             ENTLIB_ASSERT(nodes.back()->getKeysInt().size() == expl.getMapKeysInt().size());
 
             break;
@@ -245,16 +245,16 @@ public:
     {
         nodes.pop_back();
     }
-    void inPrimSet(Property& expl, Ent::DataType) override
+    void inPrimSet(Property& expl, DataType) override
     {
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         auto& itemType = expl.getSchema()->singularItems.get()->get();
         switch (itemType.type)
         {
-        case Ent::DataType::string:
+        case DataType::string:
             ENTLIB_ASSERT(nodes.back()->getKeysString().size() == expl.getPrimSetKeysString().size());
             break;
-        case Ent::DataType::integer:
+        case DataType::integer:
             ENTLIB_ASSERT(nodes.back()->getKeysInt().size() == expl.getPrimSetKeysInt().size());
             break;
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
@@ -307,11 +307,11 @@ public:
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         switch (nodes.back()->getKeyType())
         {
-        case Ent::DataType::string:
+        case DataType::string:
             ENTLIB_ASSERT(
                 nodes.back()->getKeysString().size() == expl.getObjectSetKeysString().size());
             break;
-        case Ent::DataType::integer:
+        case DataType::integer:
             ENTLIB_ASSERT(nodes.back()->getKeysInt().size() == expl.getObjectSetKeysInt().size());
 
             break;
@@ -347,15 +347,15 @@ public:
     void outArray([[maybe_unused]] Property& _prop) override
     {
     }
-    void nullNode([[maybe_unused]] Property& _prop) override
+    void nullProperty([[maybe_unused]] Property& _prop) override
     {
     }
-    void boolNode(Property& expl) override
+    void boolProperty(Property& expl) override
     {
         // std::cout << elt.getBool() << " " << nodes.back()->getBool() << std::endl;
         ENTLIB_ASSERT(expl.getBool() == nodes.back()->getBool());
     }
-    void intNode(Property& expl) override
+    void intProperty(Property& expl) override
     {
         if (expl.getInt() != nodes.back()->getInt())
         {
@@ -364,7 +364,7 @@ public:
         }
         ENTLIB_ASSERT(expl.getInt() == nodes.back()->getInt());
     }
-    void floatNode(Property& expl) override
+    void floatProperty(Property& expl) override
     {
         // std::cout << elt.getFloat() << " " << nodes.back().getFloat() << std::endl;
         if (fabs(expl.getFloat() - nodes.back()->getFloat()) >= FLT_EPSILON)
@@ -373,7 +373,7 @@ public:
         }
         // ENTLIB_ASSERT(fabs(elt.getFloat() - nodes.back().getFloat()) < FLT_EPSILON);
     }
-    void stringNode(Property& expl) override
+    void stringProperty(Property& expl) override
     {
         if (strcmp(expl.getString(), nodes.back()->getString()) != 0)
         {
@@ -382,7 +382,7 @@ public:
         }
         ENTLIB_ASSERT(strcmp(expl.getString(), nodes.back()->getString()) == 0);
     }
-    void entityRefNode(Property& expl) override
+    void entityRefProperty(Property& expl) override
     {
         //std::cout << elt.getEntityRef().entityPath.c_str() << " "
         //          << nodes.back()->getEntityRef().entityPath.c_str() << std::endl;
@@ -448,10 +448,10 @@ public:
         ENTLIB_ASSERT(expl2.size() == _prop.size());
         switch (_prop.getMapKeyType())
         {
-        case Ent::DataType::string:
+        case DataType::string:
             ENTLIB_ASSERT(expl2.getMapKeysString().size() == _prop.getMapKeysString().size());
             break;
-        case Ent::DataType::integer:
+        case DataType::integer:
             ENTLIB_ASSERT(expl2.getMapKeysInt().size() == _prop.getMapKeysInt().size());
             break;
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
@@ -469,16 +469,16 @@ public:
     {
         pop();
     }
-    void inPrimSet(Property& _prop, Ent::DataType) override
+    void inPrimSet(Property& _prop, DataType) override
     {
         ENTLIB_ASSERT(expl2.size() == _prop.size());
         auto& itemType = _prop.getSchema()->singularItems.get()->get();
         switch (itemType.type)
         {
-        case Ent::DataType::string:
+        case DataType::string:
             ENTLIB_ASSERT(expl2.getPrimSetKeysString() == _prop.getPrimSetKeysString());
             break;
-        case Ent::DataType::integer:
+        case DataType::integer:
             ENTLIB_ASSERT(expl2.getPrimSetKeysInt() == _prop.getPrimSetKeysInt());
             break;
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
@@ -526,7 +526,7 @@ public:
         ENTLIB_ASSERT(expl2.size() == _prop.size());
         switch (expl2.getObjectSetKeyType())
         {
-        case Ent::DataType::string:
+        case DataType::string:
         {
             auto a = expl2.getObjectSetKeysString();
             auto b = _prop.getObjectSetKeysString();
@@ -538,7 +538,7 @@ public:
             }
             break;
         }
-        case Ent::DataType::integer:
+        case DataType::integer:
             ENTLIB_ASSERT(expl2.getObjectSetKeysInt() == _prop.getObjectSetKeysInt());
             break;
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
@@ -567,21 +567,21 @@ public:
     {
         ENTLIB_ASSERT(expl2.size() == _prop.size());
     }
-    void nullNode([[maybe_unused]] Property& _prop) override
+    void nullProperty([[maybe_unused]] Property& _prop) override
     {
-        ENTLIB_ASSERT(expl2.getDataType() == Ent::DataType::null);
+        ENTLIB_ASSERT(expl2.getDataType() == DataType::null);
     }
-    void boolNode([[maybe_unused]] Property& _prop) override
+    void boolProperty([[maybe_unused]] Property& _prop) override
     {
         ENTLIB_ASSERT(_prop.isSet() == expl2.isSet());
         ENTLIB_ASSERT(_prop.getBool() == expl2.getBool());
     }
-    void intNode([[maybe_unused]] Property& _prop) override
+    void intProperty([[maybe_unused]] Property& _prop) override
     {
         ENTLIB_ASSERT(_prop.isSet() == expl2.isSet());
         ENTLIB_ASSERT(_prop.getInt() == expl2.getInt());
     }
-    void floatNode(Property& _prop) override
+    void floatProperty(Property& _prop) override
     {
         ENTLIB_ASSERT(_prop.isSet() == expl2.isSet());
         if (_prop.getFloat() != expl2.getFloat())
@@ -596,12 +596,12 @@ public:
         }
         ENTLIB_ASSERT(_prop.getFloat() == expl2.getFloat());
     }
-    void stringNode([[maybe_unused]] Property& _prop) override
+    void stringProperty([[maybe_unused]] Property& _prop) override
     {
         ENTLIB_ASSERT(_prop.isSet() == expl2.isSet());
         ENTLIB_ASSERT(_prop.getString() == std::string_view(expl2.getString()));
     }
-    void entityRefNode([[maybe_unused]] Property& _prop) override
+    void entityRefProperty([[maybe_unused]] Property& _prop) override
     {
         ENTLIB_ASSERT(_prop.isSet() == expl2.isSet());
         ENTLIB_ASSERT(_prop.getEntityRef() == expl2.getEntityRef());
@@ -621,27 +621,27 @@ public:
     {
         ++primitiveCount;
     }
-    void nullNode([[maybe_unused]] Property& _prop) override
+    void nullProperty([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
-    void boolNode([[maybe_unused]] Property& _prop) override
+    void boolProperty([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
-    void intNode([[maybe_unused]] Property& _prop) override
+    void intProperty([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
-    void floatNode([[maybe_unused]] Property& _prop) override
+    void floatProperty([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
-    void stringNode([[maybe_unused]] Property& _prop) override
+    void stringProperty([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
-    void entityRefNode([[maybe_unused]] Property& _prop) override
+    void entityRefProperty([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
@@ -652,31 +652,31 @@ size_t countNodes(Node* node)
     size_t nodeCount = 0;
     switch (node->getDataType())
     {
-    case Ent::DataType::null: ++nodeCount; break;
-    case Ent::DataType::string: ++nodeCount; break;
-    case Ent::DataType::number: ++nodeCount; break;
-    case Ent::DataType::integer: ++nodeCount; break;
-    case Ent::DataType::object:
+    case DataType::null: ++nodeCount; break;
+    case DataType::string: ++nodeCount; break;
+    case DataType::number: ++nodeCount; break;
+    case DataType::integer: ++nodeCount; break;
+    case DataType::object:
         for (auto&& [name, prop] : node->getSchema()->properties)
         {
             nodeCount += countNodes(node->at(name.c_str()));
         }
         break;
-    case Ent::DataType::array:
+    case DataType::array:
     {
-        auto meta = std::get<Ent::Subschema::ArrayMeta>(node->getSchema()->meta);
+        auto meta = std::get<Subschema::ArrayMeta>(node->getSchema()->meta);
         switch (hash(meta.overridePolicy))
         {
         case "map"_hash:
             switch (node->getKeyType())
             {
-            case Ent::DataType::string:
+            case DataType::string:
                 for (auto&& key : node->getKeysString())
                 {
                     nodeCount += countNodes(node->mapGet(key.c_str()));
                 }
                 break;
-            case Ent::DataType::integer:
+            case DataType::integer:
                 for (int64_t key : node->getKeysInt())
                 {
                     nodeCount += countNodes(node->mapGet(key));
@@ -690,35 +690,35 @@ size_t countNodes(Node* node)
             auto& itemType = node->getSchema()->singularItems.get()->get();
             switch (itemType.type)
             {
-            case Ent::DataType::integer:
+            case DataType::integer:
                 for (int64_t key : node->getKeysInt())
                 {
                     nodeCount += countNodes(node->mapGet(key));
                 }
                 break;
-            case Ent::DataType::string:
+            case DataType::string:
                 for (auto&& key : node->getKeysString())
                 {
                     nodeCount += countNodes(node->mapGet(key.c_str()));
                 }
                 break;
-            case Ent::DataType::oneOf:
+            case DataType::oneOf:
                 for (auto&& type : node->getKeysString())
                 {
                     nodeCount += countNodes(node->mapGet(type.c_str())->getUnionData());
                 }
                 break;
-            case Ent::DataType::object:
+            case DataType::object:
                 auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                 switch (keyFieldSchema.type)
                 {
-                case Ent::DataType::string:
+                case DataType::string:
                     for (auto&& key : node->getKeysString())
                     {
                         nodeCount += countNodes(node->mapGet(key.c_str()));
                     }
                     break;
-                case Ent::DataType::integer:
+                case DataType::integer:
                     for (auto&& key : node->getKeysInt())
                     {
                         nodeCount += countNodes(node->mapGet(key));
@@ -740,16 +740,16 @@ size_t countNodes(Node* node)
         }
     }
     break;
-    case Ent::DataType::boolean: ++nodeCount; break;
-    case Ent::DataType::entityRef: ++nodeCount; break;
-    case Ent::DataType::oneOf: nodeCount += countNodes(node->getUnionData()); break;
-    case Ent::DataType::COUNT:
+    case DataType::boolean: ++nodeCount; break;
+    case DataType::entityRef: ++nodeCount; break;
+    case DataType::oneOf: nodeCount += countNodes(node->getUnionData()); break;
+    case DataType::COUNT:
     default: ENTLIB_LOGIC_ERROR("Unexpected datatype");
     }
     return nodeCount;
 }
 
-void testCursor(Ent::EntityLib& entlib)
+void testCursor(EntityLib& entlib)
 {
     {
         auto storage = nlohmann::json::object();
@@ -897,14 +897,14 @@ void testCursor(Ent::EntityLib& entlib)
         CompareNode compare(ent.get());
         std::cout << "Visit all" << std::endl;
         start = clock();
-        Ent::visitRecursive(expl, compare);
+        visitRecursive(expl, compare);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
 
         nlohmann::json newDoc = nlohmann::json::object();
         Property destExpl(&entlib, expl.getSchema(), "", &newDoc);
         CopyToEmptyNode copier(destExpl);
-        Ent::visitRecursive(expl, copier);
+        visitRecursive(expl, copier);
         entlib.saveJsonFile(&newDoc, "instance.cursor.entity");
     }
     bool testLoading = true;
@@ -931,7 +931,7 @@ void testCursor(Ent::EntityLib& entlib)
 
             std::cout << "CompareCursor SceneKOM.scene wth the clone" << std::endl;
             CompareCursor comparator(destExpl);
-            Ent::visitRecursive(expl, comparator);
+            visitRecursive(expl, comparator);
 
             std::cout << "Save SceneKOM.scene with LazyLib" << std::endl;
             entlib.saveJsonFile(&newDoc, "SceneKOM.scene");
@@ -954,7 +954,7 @@ void testCursor(Ent::EntityLib& entlib)
         PrimitiveCounterVisitor visitor;
         std::cout << "Travserse SceneKOM.scene with LazyLib" << std::endl;
         start = clock();
-        Ent::visitRecursive(expl, visitor);
+        visitRecursive(expl, visitor);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;
@@ -989,7 +989,7 @@ void testCursor(Ent::EntityLib& entlib)
         std::cout << "Compare both" << std::endl;
         start = clock();
         CompareNode comparator(ent.get());
-        Ent::visitRecursive(expl, comparator);
+        visitRecursive(expl, comparator);
         end = clock();
         std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
     }

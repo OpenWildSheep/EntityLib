@@ -164,7 +164,7 @@ namespace Ent
             getDefault() == nullptr or getDefault()->getSchema()->type == DataType::object);
         newLayer->m_instance = m_instance.getObjectField(_field, _fieldRef);
         newLayer->m_entityLib = m_entityLib;
-        newLayer->m_parent = shared_from_this();
+        newLayer->m_parent = sharedFromThis();
         auto* subschema = newLayer->getSchema();
         if (not newLayer->_loadInstanceOf())
         {
@@ -249,7 +249,7 @@ namespace Ent
         PropImpl& newLayer = *newLayerPtr;
         newLayer.m_entityLib = m_entityLib;
         newLayer.m_instance = _enter(m_instance);
-        newLayer.m_parent = shared_from_this();
+        newLayer.m_parent = sharedFromThis();
         auto* subschema = newLayer.getSchema();
         auto* defaultVal = getDefault();
         if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
@@ -305,7 +305,7 @@ namespace Ent
         newLayer.m_entityLib = m_entityLib;
         ENTLIB_DBG_ASSERT(m_instance.getSchema()->type == DataType::array);
         newLayer.m_instance = m_instance.getArrayItem(_index);
-        newLayer.m_parent = shared_from_this();
+        newLayer.m_parent = sharedFromThis();
         auto* subschema = newLayer.getSchema();
         if (not isDefault())
         {

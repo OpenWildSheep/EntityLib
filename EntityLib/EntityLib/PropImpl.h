@@ -179,7 +179,7 @@ namespace Ent
         PropImpl* getPrefab(); ///< Get the PropImpl of the prefab
         nlohmann::json const* getRawJson(); ///< Get the underlying json node of the instance
 
-        PropImplPtr shared_from_this(); ///< Create a new smart pointer to this
+        PropImplPtr sharedFromThis(); ///< Create a new smart pointer to this
 
         PropImplPtr getParent() const; ///< Get the PropImpl which created this one
 
@@ -209,7 +209,7 @@ namespace Ent
         return m_prefab.get();
     }
 
-    inline PropImplPtr PropImpl::shared_from_this()
+    inline PropImplPtr PropImpl::sharedFromThis()
     {
         ++m_refCount;
         return PropImplPtr(this);
@@ -219,7 +219,7 @@ namespace Ent
     {
         if (m_parent != nullptr)
         {
-            return m_parent->shared_from_this();
+            return m_parent->sharedFromThis();
         }
         return {};
     }

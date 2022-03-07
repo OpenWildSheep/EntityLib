@@ -1704,7 +1704,7 @@ namespace Ent
     PropImplPtr EntityLib::newPropImpl()
     {
         auto property = new (propertyPool.alloc()) PropImpl();
-        return property->shared_from_this();
+        return property->sharedFromThis();
     }
 
     PropImplPtr EntityLib::newPropImpl(
@@ -1712,7 +1712,7 @@ namespace Ent
     {
         auto property =
             new (propertyPool.alloc()) PropImpl(this, std::move(_parent), _schema, _filename, _doc);
-        return property->shared_from_this();
+        return property->sharedFromThis();
     }
 
     NodeUniquePtr EntityLib::makeEntityNode() const

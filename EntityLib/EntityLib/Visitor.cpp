@@ -139,12 +139,12 @@ namespace Ent
             }
         }
         break;
-        case Ent::DataType::null: _visitor.nullNode(_expl); break;
-        case Ent::DataType::boolean: _visitor.boolNode(_expl); break;
-        case Ent::DataType::integer: _visitor.intNode(_expl); break;
-        case Ent::DataType::number: _visitor.floatNode(_expl); break;
-        case Ent::DataType::string: _visitor.stringNode(_expl); break;
-        case Ent::DataType::entityRef: _visitor.entityRefNode(_expl); break;
+        case Ent::DataType::null: _visitor.nullProperty(_expl); break;
+        case Ent::DataType::boolean: _visitor.boolProperty(_expl); break;
+        case Ent::DataType::integer: _visitor.intProperty(_expl); break;
+        case Ent::DataType::number: _visitor.floatProperty(_expl); break;
+        case Ent::DataType::string: _visitor.stringProperty(_expl); break;
+        case Ent::DataType::entityRef: _visitor.entityRefProperty(_expl); break;
         case Ent::DataType::COUNT:
         default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
         }
@@ -181,12 +181,12 @@ namespace Ent
             }
         }
         break;
-        case Ent::DataType::null: _visitor.nullNode(); break;
-        case Ent::DataType::boolean: _visitor.boolNode(); break;
-        case Ent::DataType::integer: _visitor.intNode(); break;
-        case Ent::DataType::number: _visitor.floatNode(); break;
-        case Ent::DataType::string: _visitor.stringNode(); break;
-        case Ent::DataType::entityRef: _visitor.entityRefNode(); break;
+        case Ent::DataType::null: _visitor.nullProperty(); break;
+        case Ent::DataType::boolean: _visitor.boolProperty(); break;
+        case Ent::DataType::integer: _visitor.intProperty(); break;
+        case Ent::DataType::number: _visitor.floatProperty(); break;
+        case Ent::DataType::string: _visitor.stringProperty(); break;
+        case Ent::DataType::entityRef: _visitor.entityRefProperty(); break;
         case Ent::DataType::COUNT:
         default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
         }

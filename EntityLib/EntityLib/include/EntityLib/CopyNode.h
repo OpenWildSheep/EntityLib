@@ -119,35 +119,35 @@ namespace Ent
                 _back().setSize(m_source.size());
             }
         }
-        void boolNode(Property& m_source) override
+        void boolProperty(Property& m_source) override
         {
             if (m_source.isSet())
             {
                 _back().setBool(m_source.getBool());
             }
         }
-        void intNode(Property& m_source) override
+        void intProperty(Property& m_source) override
         {
             if (m_source.isSet())
             {
                 _back().setInt(m_source.getInt());
             }
         }
-        void floatNode(Property& m_source) override
+        void floatProperty(Property& m_source) override
         {
             if (m_source.isSet())
             {
                 _back().setFloat(m_source.getFloat());
             }
         }
-        void stringNode(Property& m_source) override
+        void stringProperty(Property& m_source) override
         {
             if (m_source.isSet())
             {
                 _back().setString(m_source.getString());
             }
         }
-        void entityRefNode(Property& m_source) override
+        void entityRefProperty(Property& m_source) override
         {
             if (m_source.isSet())
             {

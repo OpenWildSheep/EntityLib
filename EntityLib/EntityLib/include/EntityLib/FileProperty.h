@@ -28,15 +28,15 @@ namespace Ent
         using Key = std::variant<char const*, size_t>;
         struct Schema
         {
-            Ent::Subschema const* base = nullptr;
+            Subschema const* base = nullptr;
             nlohmann::json const* propDefVal = nullptr; ///< Property default values
         };
 
         FileProperty();
 
-        FileProperty(Ent::Subschema const* _schema, char const* _filePath);
+        FileProperty(Subschema const* _schema, char const* _filePath);
 
-        FileProperty(Ent::Subschema const* _schema, char const* m_filePath, nlohmann::json* _document);
+        FileProperty(Subschema const* _schema, char const* m_filePath, nlohmann::json* _document);
 
         void pushBack(char const* _key); ///< @pre json is an array. @brief Push back _key in json
 
@@ -92,7 +92,7 @@ namespace Ent
         char const* getUnionType() const;
 
         /// @brief Get the schema of the union inner type
-        Ent::Subschema const* getUnionSchema() const;
+        Subschema const* getUnionSchema() const;
 
         /// Check if the union has to be removed from its parent container (A UnionSet)
         bool isUnionRemoved() const;
@@ -115,8 +115,8 @@ namespace Ent
         /// @return json pointer to the child node
         static nlohmann::json* createChildNode(
             FileProperty& _lastLayer,
-            Ent::FileProperty::Key const& _childName,
-            Ent::Subschema const& _newLayerSchema,
+            Key const& _childName,
+            Subschema const& _newLayerSchema,
             size_t _arraySize);
 
         size_t size() const; ///< @pre type==array. @brief Get the size of the array.
@@ -152,9 +152,9 @@ namespace Ent
         nlohmann::json* _getRawJson();
 
         std::string m_filePath; ///< Path of the instance json file
-        Schema schema{};
-        nlohmann::json* values{};
-        Key additionalPath;
+        Schema m_schema{};
+        nlohmann::json* m_values{};
+        Key m_key;
     };
 } // namespace Ent
 /// @endcond

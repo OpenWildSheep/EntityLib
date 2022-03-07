@@ -9,7 +9,7 @@ namespace Ent
         // Loïc : To fix this aweful const_cast, FileProperty need a const version 'ConstFileCursor'.
         // This is a "not-so-easy" task just to remove a const_cast so it is not a priority I guess.
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-        defaultStorage = FileProperty{_schema, _filePath, const_cast<nlohmann::json*>(_document)};
+        m_default = FileProperty{_schema, _filePath, const_cast<nlohmann::json*>(_document)};
     }
 
     FileProperty* PropImpl::getDefault()
@@ -19,11 +19,11 @@ namespace Ent
     }
     FileProperty const* PropImpl::getDefault() const
     {
-        if (not defaultStorage.has_value())
+        if (not m_default.has_value())
         {
             return nullptr;
         }
-        return &(*defaultStorage);
+        return &(*m_default);
     }
 
     bool PropImpl::isSet() const
@@ -39,9 +39,9 @@ namespace Ent
         {
             return m_instance.get<V>();
         }
-        else if (lastLayer.prefab != nullptr)
+        else if (lastLayer.m_prefab != nullptr)
         {
-            return lastLayer.prefab->get<V>();
+            return lastLayer.m_prefab->get<V>();
         }
         else if (auto* defaultVal = lastLayer.getDefault();
                  defaultVal != nullptr and defaultVal->isSet())
@@ -129,9 +129,9 @@ namespace Ent
         {
             return false;
         }
-        if (newLayer.prefab != nullptr)
+        if (newLayer.m_prefab != nullptr)
         {
-            return newLayer.prefab->isDefault();
+            return newLayer.m_prefab->isDefault();
         }
         return true;
     }
@@ -148,7 +148,7 @@ namespace Ent
                 if (auto const& prefabPath = member->get_ref<std::string const&>();
                     not prefabPath.empty())
                 {
-                    prefab =
+                    m_prefab =
                         m_entityLib->newPropImpl(nullptr, subschema, prefabPath.c_str(), nullptr);
                 }
                 return true;
@@ -172,9 +172,9 @@ namespace Ent
         auto* subschema = newLayer->getSchema();
         if (not newLayer->_loadInstanceOf())
         {
-            if (lastLayer.prefab != nullptr)
+            if (lastLayer.m_prefab != nullptr)
             {
-                newLayer->prefab = lastLayer.prefab->getObjectField(_field, _fieldRef);
+                newLayer->m_prefab = lastLayer.m_prefab->getObjectField(_field, _fieldRef);
             }
         }
         bool defaultFound = false;
@@ -185,7 +185,7 @@ namespace Ent
             if (objectField.isSet())
             {
                 defaultFound = true;
-                newLayer->defaultStorage = std::move(objectField);
+                newLayer->m_default = std::move(objectField);
             }
         }
         if (not defaultFound)
@@ -259,7 +259,7 @@ namespace Ent
         auto* defaultVal = lastLayer.getDefault();
         if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
         {
-            newLayer.defaultStorage = _enter(*defaultVal);
+            newLayer.m_default = _enter(*defaultVal);
         }
         else if (auto* propDefVal = newLayer.m_instance.getPropertyDefaultValue()) // If there is property default, use them
         {
@@ -273,9 +273,9 @@ namespace Ent
         {
             if (not newLayer._loadInstanceOf())
             {
-                if (lastLayer.prefab != nullptr)
+                if (lastLayer.m_prefab != nullptr)
                 {
-                    newLayer.prefab = _enter(*lastLayer.prefab);
+                    newLayer.m_prefab = _enter(*lastLayer.m_prefab);
                 }
             }
         }
@@ -317,16 +317,16 @@ namespace Ent
         {
             if (not newLayer._loadInstanceOf())
             {
-                if (lastLayer.prefab != nullptr)
+                if (lastLayer.m_prefab != nullptr)
                 {
-                    newLayer.prefab = lastLayer.prefab->getArrayItem(_index);
+                    newLayer.m_prefab = lastLayer.m_prefab->getArrayItem(_index);
                 }
             }
         }
         auto* defaultVal = lastLayer.getDefault();
         if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
         {
-            newLayer.defaultStorage = defaultVal->getArrayItem(_index);
+            newLayer.m_default = defaultVal->getArrayItem(_index);
         }
         else if (newLayer.m_instance.getPropertyDefaultValue() != nullptr) // If there is property default, use them
         {
@@ -370,11 +370,11 @@ namespace Ent
         auto& lastLayer = _getLastLayer();
         if (strlen(_instanceOf) != 0)
         {
-            lastLayer.prefab = m_entityLib->newPropImpl(nullptr, getSchema(), _instanceOf, nullptr);
+            lastLayer.m_prefab = m_entityLib->newPropImpl(nullptr, getSchema(), _instanceOf, nullptr);
         }
         else
         {
-            lastLayer.prefab = nullptr;
+            lastLayer.m_prefab = nullptr;
         }
     }
 
@@ -386,9 +386,9 @@ namespace Ent
         {
             return type;
         }
-        else if (lastLayer.prefab != nullptr)
+        else if (lastLayer.m_prefab != nullptr)
         {
-            if (char const* type2 = lastLayer.prefab->getUnionType())
+            if (char const* type2 = lastLayer.m_prefab->getUnionType())
             {
                 return type2;
             }
@@ -472,9 +472,9 @@ namespace Ent
             {
                 return jsonExplLayer.size();
             }
-            else if (lastLayer.prefab != nullptr)
+            else if (lastLayer.m_prefab != nullptr)
             {
-                return lastLayer.prefab->arraySize();
+                return lastLayer.m_prefab->arraySize();
             }
             else if (auto* defaultVal = lastLayer.getDefault();
                      defaultVal != nullptr and defaultVal->isSet())
@@ -625,9 +625,9 @@ namespace Ent
     {
         auto& lastLayer = _getLastLayer();
         std::set<char const*, CmpStr> keys;
-        if (lastLayer.prefab != nullptr)
+        if (lastLayer.m_prefab != nullptr)
         {
-            keys = lastLayer.prefab->getMapKeysString();
+            keys = lastLayer.m_prefab->getMapKeysString();
         }
         else if (auto* defaultVal = lastLayer.getDefault();
                  defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
@@ -674,9 +674,9 @@ namespace Ent
         {
             return lastLayer.m_instance.isNull();
         }
-        else if (lastLayer.prefab != nullptr)
+        else if (lastLayer.m_prefab != nullptr)
         {
-            return lastLayer.prefab->isNull();
+            return lastLayer.m_prefab->isNull();
         }
         else
         {
@@ -687,9 +687,9 @@ namespace Ent
     {
         auto& lastLayer = _getLastLayer();
         std::set<int64_t> keys;
-        if (lastLayer.prefab != nullptr)
+        if (lastLayer.m_prefab != nullptr)
         {
-            keys = lastLayer.prefab->getMapKeysInt();
+            keys = lastLayer.m_prefab->getMapKeysInt();
         }
         if (lastLayer.m_instance.isSet())
         {
@@ -721,9 +721,9 @@ namespace Ent
                 keys.insert(getArrayItem(i)->getInt());
             }
         }
-        if (lastLayer.prefab != nullptr)
+        if (lastLayer.m_prefab != nullptr)
         {
-            keys.merge(lastLayer.prefab->getPrimSetKeysInt());
+            keys.merge(lastLayer.m_prefab->getPrimSetKeysInt());
         }
         return keys;
     }
@@ -738,9 +738,9 @@ namespace Ent
             }
         }
         auto& lastLayer = _getLastLayer();
-        if (lastLayer.prefab != nullptr)
+        if (lastLayer.m_prefab != nullptr)
         {
-            keys.merge(lastLayer.prefab->getPrimSetKeysString());
+            keys.merge(lastLayer.m_prefab->getPrimSetKeysString());
         }
         return keys;
     }
@@ -749,9 +749,9 @@ namespace Ent
     {
         auto& lastLayer = _getLastLayer();
         std::map<char const*, Subschema const*, CmpStr> keys;
-        if (lastLayer.prefab != nullptr)
+        if (lastLayer.m_prefab != nullptr)
         {
-            keys = lastLayer.prefab->getUnionSetKeysString();
+            keys = lastLayer.m_prefab->getUnionSetKeysString();
         }
         if (lastLayer.m_instance.isSet())
         {
@@ -778,9 +778,9 @@ namespace Ent
         auto& lastLayer = _getLastLayer();
         auto const& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
         std::set<char const*, CmpStr> keys;
-        if (lastLayer.prefab != nullptr)
+        if (lastLayer.m_prefab != nullptr)
         {
-            keys = lastLayer.prefab->getObjectSetKeysString();
+            keys = lastLayer.m_prefab->getObjectSetKeysString();
         }
         if (lastLayer.m_instance.isSet())
         {
@@ -822,9 +822,9 @@ namespace Ent
                 }
             }
         }
-        if (lastLayer.prefab != nullptr)
+        if (lastLayer.m_prefab != nullptr)
         {
-            keys.merge(lastLayer.prefab->getObjectSetKeysInt());
+            keys.merge(lastLayer.m_prefab->getObjectSetKeysInt());
         }
         return keys;
     }
@@ -952,9 +952,9 @@ namespace Ent
             }
         }
         auto& lastLayer = _getLastLayer();
-        if (lastLayer.prefab != nullptr)
+        if (lastLayer.m_prefab != nullptr)
         {
-            return lastLayer.prefab->primSetContains(_key);
+            return lastLayer.m_prefab->primSetContains(_key);
         }
         return false;
     }

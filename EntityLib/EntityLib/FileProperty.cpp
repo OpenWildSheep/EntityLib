@@ -2,22 +2,23 @@
 
 #include "include/EntityLib.h"
 
+using namespace nlohmann;
+
 namespace Ent
 {
     FileProperty::FileProperty() = default;
 
-    FileProperty::FileProperty(
-        Ent::Subschema const* _schema, char const* _filePath, nlohmann::json* _document)
+    FileProperty::FileProperty(Subschema const* _schema, char const* _filePath, json* _document)
     {
         if (_filePath != nullptr)
         {
             m_filePath = _filePath;
         }
-        schema = Schema{{_schema}};
-        values = _document;
+        m_schema = Schema{{_schema}};
+        m_values = _document;
     }
 
-    FileProperty::FileProperty(Ent::Subschema const* _schema, char const* _filePath)
+    FileProperty::FileProperty(Subschema const* _schema, char const* _filePath)
         : FileProperty(_schema, _filePath, &_schema->rootSchema->entityLib->readJsonFile(_filePath))
     {
     }
@@ -34,39 +35,39 @@ namespace Ent
 
     void FileProperty::save(char const* _filename) const
     {
-        schema.base->rootSchema->entityLib->saveJsonFile(
-            values, _filename != nullptr ? _filename : m_filePath.c_str());
+        m_schema.base->rootSchema->entityLib->saveJsonFile(
+            m_values, _filename != nullptr ? _filename : m_filePath.c_str());
     }
 
-    nlohmann::json* FileProperty::_getRawJson()
+    json* FileProperty::_getRawJson()
     {
-        return isSet() ? values : nullptr;
+        return isSet() ? m_values : nullptr;
     }
 
-    nlohmann::json const* FileProperty::getRawJson() const
+    json const* FileProperty::getRawJson() const
     {
-        return isSet() ? values : nullptr;
+        return isSet() ? m_values : nullptr;
     }
 
-    void FileProperty::setRawJson(nlohmann::json* _jsonNode)
+    void FileProperty::setRawJson(json* _jsonNode)
     {
-        values = _jsonNode;
+        m_values = _jsonNode;
     }
 
     bool FileProperty::isSetOrNull() const
     {
-        return values != nullptr;
+        return m_values != nullptr;
     }
 
     bool FileProperty::isSet() const
     {
-        auto* val = values;
+        auto* val = m_values;
         return val != nullptr and not val->is_null();
     }
 
     bool FileProperty::isNull() const
     {
-        auto* val = values;
+        auto* val = m_values;
         return val != nullptr and val->is_null();
     }
 
@@ -75,10 +76,10 @@ namespace Ent
         bool const nodeIsSet = isSet();
         FileProperty newLayer;
         auto& lastLayer = *this;
-        ENTLIB_DBG_ASSERT(lastLayer.schema.base->type == Ent::DataType::object);
+        ENTLIB_DBG_ASSERT(lastLayer.schema.base->type == DataType::object);
         if (_fieldRef == nullptr)
         {
-            auto& properties = lastLayer.schema.base->properties;
+            auto& properties = lastLayer.m_schema.base->properties;
             if (auto propIter = properties.find(_field); propIter != properties.end())
             {
                 _field = propIter->first.c_str(); // Convert _field to static string
@@ -86,26 +87,26 @@ namespace Ent
             }
             else
             {
-                throw Ent::BadKey(_field, __func__, lastLayer.schema.base->name.c_str());
+                throw BadKey(_field, __func__, lastLayer.m_schema.base->name.c_str());
             }
         }
-        newLayer.additionalPath = _field;
+        newLayer.m_key = _field;
         Subschema const* subschema = &(_fieldRef->get());
-        newLayer.schema = Schema{subschema, _fieldRef->getRefDefaultValues()};
+        newLayer.m_schema = Schema{subschema, _fieldRef->getRefDefaultValues()};
         if (nodeIsSet)
         {
-            auto lastNode = lastLayer.values;
+            auto lastNode = lastLayer.m_values;
             ENTLIB_DBG_ASSERT(lastNode->is_object());
             if (auto memiter = lastNode->find(_field); memiter != lastNode->end())
             {
                 auto newValue = &(*memiter);
-                if (newLayer.schema.base->type == Ent::DataType::string
-                    or newLayer.schema.base->type == Ent::DataType::entityRef)
+                if (newLayer.m_schema.base->type == DataType::string
+                    or newLayer.m_schema.base->type == DataType::entityRef)
                 {
                     ENTLIB_DBG_ASSERT(newValue->is_string());
                 }
 
-                newLayer.values = newValue;
+                newLayer.m_values = newValue;
             }
         }
         ENTLIB_DBG_ASSERT(lastLayer.schema.base != nullptr);
@@ -116,7 +117,7 @@ namespace Ent
     {
         FileProperty newLayer;
         auto& lastLayer = *this;
-        auto& lastschema = *lastLayer.schema.base;
+        auto& lastschema = *lastLayer.m_schema.base;
         if (lastschema.singularItems == nullptr)
         {
             throw BadArrayType(staticFormat(
@@ -129,7 +130,7 @@ namespace Ent
             if (auto iter = unionSchema.unionTypeMap.find(_field);
                 iter != unionSchema.unionTypeMap.end())
             {
-                newLayer.schema = Schema{iter->second.dataSchema, nullptr};
+                newLayer.m_schema = Schema{iter->second.dataSchema, nullptr};
                 _field = iter->first.c_str(); // Convert _field to a long living memory
             }
             else
@@ -139,40 +140,40 @@ namespace Ent
         }
         else
         {
-            newLayer.schema = Schema{_dataSchema, nullptr};
+            newLayer.m_schema = Schema{_dataSchema, nullptr};
         }
-        newLayer.additionalPath = _field;
+        newLayer.m_key = _field;
 
         if (isSet())
         {
             auto typeField = unionSchema.getUnionNameField();
             auto dataField = unionSchema.getUnionDataField();
-            auto lastNode = lastLayer.values;
+            auto lastNode = lastLayer.m_values;
             for (auto& item : *lastNode)
             {
                 if (auto typeIter = item.find(typeField); typeIter != item.end())
                 {
                     if (typeIter->get_ref<std::string const&>() == _field)
                     {
-                        nlohmann::json* newValue = nullptr;
+                        json* newValue = nullptr;
                         if (auto dataIter = item.find(dataField); dataIter != item.end())
                         {
                             newValue = &(*dataIter);
                         }
-                        if (newLayer.schema.base->type == Ent::DataType::string
-                            or newLayer.schema.base->type == Ent::DataType::entityRef)
+                        if (newLayer.m_schema.base->type == DataType::string
+                            or newLayer.m_schema.base->type == DataType::entityRef)
                         {
                             ENTLIB_DBG_ASSERT(newValue == nullptr or newValue->is_string());
                         }
 
                         // Item found!
-                        newLayer.values = newValue;
+                        newLayer.m_values = newValue;
                         break;
                     }
                 }
             }
         }
-        ENTLIB_ASSERT(newLayer.schema.base != nullptr);
+        ENTLIB_ASSERT(newLayer.m_schema.base != nullptr);
         return newLayer;
     }
 
@@ -181,7 +182,7 @@ namespace Ent
     {
         FileProperty newLayer;
         auto& lastLayer = *this;
-        auto& setSchema = *lastLayer.schema.base;
+        auto& setSchema = *lastLayer.m_schema.base;
         auto& objectSchema = setSchema.singularItems->get();
         char const* keyFieldName = nullptr;
         if (auto meta = std::get_if<Subschema::ArrayMeta>(&setSchema.meta))
@@ -197,12 +198,12 @@ namespace Ent
                 "In Property::enterObjectSet. Expected an ObjectSet. Got %s", setSchema.name.c_str()));
         }
 
-        newLayer.schema = Schema{&objectSchema, nullptr};
-        newLayer.additionalPath = _field;
+        newLayer.m_schema = Schema{&objectSchema, nullptr};
+        newLayer.m_key = _field;
 
         if (isSet())
         {
-            auto lastNode = lastLayer.values;
+            auto lastNode = lastLayer.m_values;
             for (auto& item : *lastNode)
             {
                 if (auto typeIter = item.find(keyFieldName); typeIter != item.end())
@@ -210,14 +211,14 @@ namespace Ent
                     if (_equalKey(*typeIter, _field))
                     {
                         auto newValue = &item;
-                        if (newLayer.schema.base->type == Ent::DataType::string
-                            or newLayer.schema.base->type == Ent::DataType::entityRef)
+                        if (newLayer.m_schema.base->type == DataType::string
+                            or newLayer.m_schema.base->type == DataType::entityRef)
                         {
                             ENTLIB_DBG_ASSERT(newValue->is_string());
                         }
 
                         // Item found!
-                        newLayer.values = newValue;
+                        newLayer.m_values = newValue;
                         break;
                     }
                 }
@@ -231,15 +232,14 @@ namespace Ent
     {
         return _enterObjectSetItemImpl(
             _field,
-            [](nlohmann::json const& _node, char const* _key)
+            [](json const& _node, char const* _key)
             { return _node.get_ref<std::string const&>() == _key; });
     }
 
     FileProperty FileProperty::getObjectSetItem(int64_t _field)
     {
         return _enterObjectSetItemImpl(
-            _field,
-            [](nlohmann::json const& _node, int64_t _key) { return _node.get<int64_t>() == _key; });
+            _field, [](json const& _node, int64_t _key) { return _node.get<int64_t>() == _key; });
     }
 
     template <typename K, typename E>
@@ -248,27 +248,27 @@ namespace Ent
         FileProperty newLayer;
         auto& lastLayer = *this;
 
-        auto& pairSchema = lastLayer.schema.base->singularItems->get();
-        newLayer.schema = Schema{&pairSchema.linearItems->at(1).get(), nullptr};
-        newLayer.additionalPath = _field;
+        auto& pairSchema = lastLayer.m_schema.base->singularItems->get();
+        newLayer.m_schema = Schema{&pairSchema.linearItems->at(1).get(), nullptr};
+        newLayer.m_key = _field;
 
         if (isSet())
         {
-            auto lastNode = lastLayer.values;
+            auto lastNode = lastLayer.m_values;
             for (auto& item : *lastNode)
             {
                 auto& key = item[0];
                 if (_isEqual(key, _field))
                 {
                     auto newValue = &item[1];
-                    if (lastLayer.schema.base->type == Ent::DataType::string
-                        or lastLayer.schema.base->type == Ent::DataType::entityRef)
+                    if (lastLayer.m_schema.base->type == DataType::string
+                        or lastLayer.m_schema.base->type == DataType::entityRef)
                     {
                         ENTLIB_DBG_ASSERT(newValue->is_string());
                     }
 
                     // Item found!
-                    newLayer.values = newValue;
+                    newLayer.m_values = newValue;
                     break;
                 }
             }
@@ -281,50 +281,48 @@ namespace Ent
     {
         return _enterMapItemImpl(
             _field,
-            [](nlohmann::json const& _node, char const* _field)
+            [](json const& _node, char const* _field)
             { return _node.get_ref<std::string const&>() == _field; });
     }
 
     FileProperty FileProperty::getMapItem(int64_t _field)
     {
         return _enterMapItemImpl(
-            _field,
-            [](nlohmann::json const& _node, int64_t _field)
-            { return _node.get<int64_t>() == _field; });
+            _field, [](json const& _node, int64_t _field) { return _node.get<int64_t>() == _field; });
     }
 
     FileProperty FileProperty::getArrayItem(size_t _index)
     {
         FileProperty newLayer;
         auto& lastLayer = *this;
-        ENTLIB_DBG_ASSERT(lastLayer.schema.base->type == Ent::DataType::array);
-        if (auto item = lastLayer.schema.base->singularItems.get())
+        ENTLIB_DBG_ASSERT(lastLayer.schema.base->type == DataType::array);
+        if (auto item = lastLayer.m_schema.base->singularItems.get())
         {
             auto& subschema = item->get();
-            newLayer.schema = Schema{&subschema, nullptr};
+            newLayer.m_schema = Schema{&subschema, nullptr};
         }
         else
         {
             ENTLIB_DBG_ASSERT(lastLayer.schema.base->linearItems.has_value());
-            if (_index >= lastLayer.schema.base->linearItems->size())
+            if (_index >= lastLayer.m_schema.base->linearItems->size())
             {
                 throw ContextException("Out of range in tuple");
             }
-            auto& subschema = lastLayer.schema.base->linearItems->at(_index).get();
-            newLayer.schema = Schema{&subschema, nullptr};
+            auto& subschema = lastLayer.m_schema.base->linearItems->at(_index).get();
+            newLayer.m_schema = Schema{&subschema, nullptr};
         }
-        newLayer.additionalPath = _index;
+        newLayer.m_key = _index;
         if (auto lastNode = _getRawJson())
         {
             if (lastNode->size() > _index)
             {
                 auto newValue = &(*lastNode)[_index];
-                if (newLayer.schema.base->type == Ent::DataType::string
-                    or newLayer.schema.base->type == Ent::DataType::entityRef)
+                if (newLayer.m_schema.base->type == DataType::string
+                    or newLayer.m_schema.base->type == DataType::entityRef)
                 {
                     ENTLIB_DBG_ASSERT(newValue->is_string() or newValue->is_null());
                 }
-                newLayer.values = newValue;
+                newLayer.m_values = newValue;
             }
         }
         ENTLIB_DBG_ASSERT(newLayer.schema.base != nullptr);
@@ -336,8 +334,8 @@ namespace Ent
         auto& lastLayer = *this;
         if (isSet())
         {
-            auto typeField = lastLayer.schema.base->getUnionNameField();
-            auto lastNode = lastLayer.values;
+            auto typeField = lastLayer.m_schema.base->getUnionNameField();
+            auto lastNode = lastLayer.m_values;
             ENTLIB_DBG_ASSERT(lastNode->is_object());
             if (auto memiter = lastNode->find(typeField); memiter != lastNode->end())
             {
@@ -354,13 +352,13 @@ namespace Ent
         }
     }
 
-    Ent::Subschema const* FileProperty::getUnionSchema() const
+    Subschema const* FileProperty::getUnionSchema() const
     {
         char const* unionType = getUnionType();
         auto& lastLayer = *this;
         try
         {
-            return lastLayer.schema.base->getUnionType(unionType);
+            return lastLayer.m_schema.base->getUnionType(unionType);
         }
         catch (BadUnionType&) // This unionType doesn't exist
         {
@@ -371,17 +369,16 @@ namespace Ent
     bool FileProperty::isUnionRemoved() const
     {
         auto& lastLayer = *this;
-        auto unionSchema = lastLayer.schema.base;
+        auto unionSchema = lastLayer.m_schema.base;
         if (isSet())
         {
-            auto lastNode = lastLayer.values;
+            auto lastNode = lastLayer.m_values;
             ENTLIB_DBG_ASSERT(lastNode->is_object());
             auto dataField = unionSchema->getUnionDataField();
             if (auto memiter = lastNode->find(dataField); memiter != lastNode->end())
             {
                 auto unionValue = &(*memiter);
-                if (unionSchema->type == Ent::DataType::string
-                    or unionSchema->type == Ent::DataType::entityRef)
+                if (unionSchema->type == DataType::string or unionSchema->type == DataType::entityRef)
                 {
                     ENTLIB_DBG_ASSERT(unionValue->is_string());
                 }
@@ -399,111 +396,111 @@ namespace Ent
         }
         FileProperty newLayer;
         auto& lastLayer = *this;
-        auto dataSchema = lastLayer.schema.base->getUnionType(_unionType);
-        auto unionSchema = lastLayer.schema.base;
-        newLayer.additionalPath = _unionType;
+        auto dataSchema = lastLayer.m_schema.base->getUnionType(_unionType);
+        auto unionSchema = lastLayer.m_schema.base;
+        newLayer.m_key = _unionType;
         if (isSet())
         {
             auto unionType = getUnionType();
             if (unionType != nullptr and strcmp(_unionType, unionType) == 0)
             {
-                auto lastNode = lastLayer.values;
+                auto lastNode = lastLayer.m_values;
                 ENTLIB_DBG_ASSERT(lastNode->is_object());
                 auto dataField = unionSchema->getUnionDataField();
                 if (auto memiter = lastNode->find(dataField); memiter != lastNode->end())
                 {
                     auto newValue = &(*memiter);
-                    if (unionSchema->type == Ent::DataType::string
-                        or unionSchema->type == Ent::DataType::entityRef)
+                    if (unionSchema->type == DataType::string
+                        or unionSchema->type == DataType::entityRef)
                     {
                         ENTLIB_DBG_ASSERT(newValue->is_string());
                     }
-                    newLayer.values = newValue;
+                    newLayer.m_values = newValue;
                 }
             }
         }
-        newLayer.schema = Schema{dataSchema, nullptr};
+        newLayer.m_schema = Schema{dataSchema, nullptr};
         return newLayer;
     }
 
     Subschema const* FileProperty::getSchema() const
     {
-        return schema.base;
+        return m_schema.base;
     }
 
-    nlohmann::json const* FileProperty::getPropertyDefaultValue() const
+    json const* FileProperty::getPropertyDefaultValue() const
     {
-        return schema.propDefVal;
+        return m_schema.propDefVal;
     }
 
-    nlohmann::json* FileProperty::createChildNode(
+    json* FileProperty::createChildNode(
         FileProperty& _lastLayer,
-        Ent::FileProperty::Key const& _childName,
-        Ent::Subschema const& _newLayerSchema,
+        Key const& _childName,
+        Subschema const& _newLayerSchema,
         size_t _arraySize)
     {
-        ENTLIB_DBG_ASSERT(int(_lastLayer.values->type()) < int(nlohmann::json::value_t::discarded));
-        nlohmann::json* newLayerJson = nullptr;
-        switch (_lastLayer.schema.base->type)
+        ENTLIB_DBG_ASSERT(int(_lastLayer.values->type()) < int(json::value_t::discarded));
+        json* newLayerJson = nullptr;
+        switch (_lastLayer.m_schema.base->type)
         {
-        case Ent::DataType::object:
+        case DataType::object:
         {
-            if (_lastLayer.values->is_null())
+            if (_lastLayer.m_values->is_null())
             {
-                (*_lastLayer.values) = nlohmann::json::object();
+                (*_lastLayer.m_values) = json::object();
             }
             auto fieldName = std::get<char const*>(_childName);
-            (*_lastLayer.values)[fieldName] = {};
-            newLayerJson = &(*_lastLayer.values)[fieldName];
+            (*_lastLayer.m_values)[fieldName] = {};
+            newLayerJson = &(*_lastLayer.m_values)[fieldName];
         }
         break;
-        case Ent::DataType::oneOf:
+        case DataType::oneOf:
         {
-            if (_lastLayer.values->is_null())
+            if (_lastLayer.m_values->is_null())
             {
-                (*_lastLayer.values) = nlohmann::json::object();
+                (*_lastLayer.m_values) = json::object();
             }
             auto fieldName = std::get<char const*>(_childName);
-            auto typeField = _lastLayer.schema.base->getUnionNameField();
-            auto dataField = _lastLayer.schema.base->getUnionDataField();
-            (*_lastLayer.values)[typeField] = fieldName;
-            (*_lastLayer.values)[dataField] = {};
-            newLayerJson = &(*_lastLayer.values)[dataField];
+            auto typeField = _lastLayer.m_schema.base->getUnionNameField();
+            auto dataField = _lastLayer.m_schema.base->getUnionDataField();
+            (*_lastLayer.m_values)[typeField] = fieldName;
+            (*_lastLayer.m_values)[dataField] = {};
+            newLayerJson = &(*_lastLayer.m_values)[dataField];
         }
         break;
-        case Ent::DataType::array:
+        case DataType::array:
         {
-            ENTLIB_DBG_ASSERT(_lastLayer.values->type() == nlohmann::json::value_t::array);
-            auto meta = std::get<Ent::Subschema::ArrayMeta>(_lastLayer.schema.base->meta);
-            auto& itemType = _lastLayer.schema.base->singularItems->get();
+            ENTLIB_DBG_ASSERT(_lastLayer.values->type() == json::value_t::array);
+            auto meta = std::get<Subschema::ArrayMeta>(_lastLayer.m_schema.base->meta);
+            auto& itemType = _lastLayer.m_schema.base->singularItems->get();
             switch (hash(meta.overridePolicy))
             {
             case "map"_hash:
-                if (_lastLayer.values->is_null())
+                if (_lastLayer.m_values->is_null())
                 {
-                    (*_lastLayer.values) = nlohmann::json::array();
+                    (*_lastLayer.m_values) = json::array();
                 }
                 switch (itemType.linearItems->at(0)->type)
                 {
-                case Ent::DataType::string:
+                case DataType::string:
                 {
                     auto key = std::get<char const*>(_childName);
-                    auto pairNode = nlohmann::json::array();
+                    auto pairNode = json::array();
                     pairNode.push_back(key);
                     pairNode.emplace_back();
-                    _lastLayer.values->push_back(std::move(pairNode));
-                    newLayerJson = &(*_lastLayer.values)[(*_lastLayer.values).size() - 1][1];
+                    _lastLayer.m_values->push_back(std::move(pairNode));
+                    newLayerJson = &(*_lastLayer.m_values)[(*_lastLayer.m_values).size() - 1][1];
                     ENTLIB_ASSERT(newLayerJson != nullptr);
                     break;
                 }
-                case Ent::DataType::integer:
+                case DataType::integer:
                 {
                     auto key = std::get<size_t>(_childName);
-                    auto pairNode = nlohmann::json::array();
+                    auto pairNode = json::array();
                     pairNode.push_back(key);
                     pairNode.emplace_back();
-                    _lastLayer.values->push_back(std::move(pairNode));
-                    newLayerJson = &(*_lastLayer.values)[(*_lastLayer.values).size() - 1][1];
+                    _lastLayer.m_values->push_back(std::move(pairNode));
+                    newLayerJson = &(*_lastLayer.m_values)[(*_lastLayer.m_values).size() - 1][1];
                     ENTLIB_ASSERT(newLayerJson != nullptr);
                     break;
                 }
@@ -512,52 +509,53 @@ namespace Ent
                 break;
             case "set"_hash:
             {
-                if (_lastLayer.values->is_null())
+                if (_lastLayer.m_values->is_null())
                 {
-                    (*_lastLayer.values) = nlohmann::json::array();
+                    (*_lastLayer.m_values) = json::array();
                 }
                 switch (itemType.type)
                 {
-                case Ent::DataType::integer: // integer set
+                case DataType::integer: // integer set
                 {
                     auto key = std::get<size_t>(_childName);
-                    _lastLayer.values->push_back(key);
+                    _lastLayer.m_values->push_back(key);
                     ENTLIB_ASSERT(newLayerJson != nullptr);
                     break;
                 }
-                case Ent::DataType::string: // String set
+                case DataType::string: // String set
                 {
                     auto key = std::get<char const*>(_childName);
-                    _lastLayer.values->push_back(key);
+                    _lastLayer.m_values->push_back(key);
                     ENTLIB_ASSERT(newLayerJson != nullptr);
                     break;
                 }
-                case Ent::DataType::oneOf: // UnionSet
+                case DataType::oneOf: // UnionSet
                 {
-                    auto wrapper = nlohmann::json::object();
+                    auto wrapper = json::object();
                     auto fieldName = std::get<char const*>(_childName);
-                    auto unionSchema = &_lastLayer.schema.base->singularItems->get();
+                    auto unionSchema = &_lastLayer.m_schema.base->singularItems->get();
                     auto typeField = unionSchema->getUnionNameField();
                     auto dataField = unionSchema->getUnionDataField();
                     wrapper[typeField] = fieldName;
                     wrapper[dataField] = {};
-                    _lastLayer.values->push_back(std::move(wrapper));
-                    newLayerJson = &(*_lastLayer.values)[(*_lastLayer.values).size() - 1][dataField];
+                    _lastLayer.m_values->push_back(std::move(wrapper));
+                    newLayerJson =
+                        &(*_lastLayer.m_values)[(*_lastLayer.m_values).size() - 1][dataField];
                     ENTLIB_ASSERT(newLayerJson != nullptr);
                     break;
                 }
-                case Ent::DataType::object: // Object Set
-                    auto object = nlohmann::json::object();
+                case DataType::object: // Object Set
+                    auto object = json::object();
                     auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                     switch (keyFieldSchema.type)
                     {
-                    case Ent::DataType::string:
+                    case DataType::string:
                     {
                         auto key = std::get<char const*>(_childName);
                         object[*meta.keyField] = key;
                         break;
                     }
-                    case Ent::DataType::integer:
+                    case DataType::integer:
                     {
                         auto key = std::get<size_t>(_childName);
                         object[*meta.keyField] = key;
@@ -565,9 +563,9 @@ namespace Ent
                     }
                     default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                     }
-                    ENTLIB_DBG_ASSERT(_lastLayer.values->type() == nlohmann::json::value_t::array);
-                    _lastLayer.values->push_back(object);
-                    newLayerJson = &(*_lastLayer.values)[(*_lastLayer.values).size() - 1];
+                    ENTLIB_DBG_ASSERT(_lastLayer.values->type() == json::value_t::array);
+                    _lastLayer.m_values->push_back(object);
+                    newLayerJson = &(*_lastLayer.m_values)[(*_lastLayer.m_values).size() - 1];
                     ENTLIB_ASSERT(newLayerJson != nullptr);
                     break;
                 }
@@ -575,44 +573,44 @@ namespace Ent
             }
             case ""_hash:
             {
-                if (_lastLayer.values->is_null())
+                if (_lastLayer.m_values->is_null())
                 {
-                    (*_lastLayer.values) = nlohmann::json::array();
+                    (*_lastLayer.m_values) = json::array();
                 }
-                while (_lastLayer.values->size() < _arraySize)
+                while (_lastLayer.m_values->size() < _arraySize)
                 {
-                    _lastLayer.values->emplace_back();
+                    _lastLayer.m_values->emplace_back();
                 }
-                while (_lastLayer.values->size() > _arraySize)
+                while (_lastLayer.m_values->size() > _arraySize)
                 {
-                    _lastLayer.values->erase(_lastLayer.values->size() - 1);
+                    _lastLayer.m_values->erase(_lastLayer.m_values->size() - 1);
                 }
                 auto index = std::get<size_t>(_childName);
-                newLayerJson = &(*_lastLayer.values)[index];
+                newLayerJson = &(*_lastLayer.m_values)[index];
                 ENTLIB_ASSERT(newLayerJson != nullptr);
                 break;
             }
             }
         }
         break;
-        case Ent::DataType::null: [[fallthrough]];
-        case Ent::DataType::string: [[fallthrough]];
-        case Ent::DataType::number: [[fallthrough]];
-        case Ent::DataType::integer: [[fallthrough]];
-        case Ent::DataType::boolean: [[fallthrough]];
-        case Ent::DataType::entityRef: [[fallthrough]];
-        case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Unexpected DataType");
+        case DataType::null: [[fallthrough]];
+        case DataType::string: [[fallthrough]];
+        case DataType::number: [[fallthrough]];
+        case DataType::integer: [[fallthrough]];
+        case DataType::boolean: [[fallthrough]];
+        case DataType::entityRef: [[fallthrough]];
+        case DataType::COUNT: ENTLIB_LOGIC_ERROR("Unexpected DataType");
         }
         ENTLIB_ASSERT(newLayerJson != nullptr);
         if (newLayerJson->is_null())
         {
-            if (_newLayerSchema.type == Ent::DataType::array)
+            if (_newLayerSchema.type == DataType::array)
             {
-                *newLayerJson = nlohmann::json::array();
+                *newLayerJson = json::array();
             }
-            else if (_newLayerSchema.type == Ent::DataType::object)
+            else if (_newLayerSchema.type == DataType::object)
             {
-                *newLayerJson = nlohmann::json::object();
+                *newLayerJson = json::object();
             }
         }
         return newLayerJson;
@@ -620,17 +618,17 @@ namespace Ent
 
     void FileProperty::setSize(size_t _size)
     {
-        if (values->is_null())
+        if (m_values->is_null())
         {
-            (*values) = nlohmann::json::array();
+            (*m_values) = json::array();
         }
-        while (_size > values->size())
+        while (_size > m_values->size())
         {
-            values->emplace_back();
+            m_values->emplace_back();
         }
-        while (_size < values->size())
+        while (_size < m_values->size())
         {
-            values->erase(values->size() - 1);
+            m_values->erase(m_values->size() - 1);
         }
     }
     template <typename T>
@@ -638,11 +636,11 @@ namespace Ent
     {
         if constexpr (std::is_same_v<std::remove_const_t<std::remove_reference_t<T>>, EntityRef>)
         {
-            *values = _value.entityPath;
+            *m_values = _value.entityPath;
         }
         else
         {
-            *values = std::forward<T>(_value);
+            *m_values = std::forward<T>(_value);
         }
     }
 
@@ -669,11 +667,11 @@ namespace Ent
     }
     void FileProperty::setUnionType(char const* type)
     {
-        auto& wrapper = (*values);
+        auto& wrapper = (*m_values);
         auto dataFieldName = getSchema()->getUnionDataField();
         auto nameFieldName = getSchema()->getUnionNameField();
         wrapper[nameFieldName] = type;
-        wrapper[dataFieldName] = nlohmann::json();
+        wrapper[dataFieldName] = json();
     }
 
     template <typename T>
@@ -715,11 +713,11 @@ namespace Ent
     }
     size_t FileProperty::size() const
     {
-        return values->size();
+        return m_values->size();
     }
     FileProperty::Key const& FileProperty::getPathToken() const
     {
-        return additionalPath;
+        return m_key;
     }
 
 } // namespace Ent

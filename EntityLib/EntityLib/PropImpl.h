@@ -46,14 +46,14 @@ namespace Ent
         PropImpl(
             EntityLib* _entityLib,
             PropImplPtr _parent,
-            Ent::Subschema const* _schema, ///< Schema of the file to load
+            Subschema const* _schema, ///< Schema of the file to load
             char const* _filename,
             nlohmann::json* _doc);
 
         PropImpl(
             EntityLib* _entityLib,
             PropImplPtr _parent,
-            Ent::Subschema const* _schema, ///< Schema of the file to load
+            Subschema const* _schema, ///< Schema of the file to load
             char const* _filename);
 
         void
@@ -197,8 +197,8 @@ namespace Ent
         void _checkInvariants() const;
 
         EntityLib* m_entityLib = nullptr;
-        PropImplPtr prefab = nullptr;
-        std::optional<FileProperty> defaultStorage; ///< Used to explore the defalt value in the schema
+        PropImplPtr m_prefab = nullptr;
+        std::optional<FileProperty> m_default; ///< Used to explore the defalt value in the schema
         size_t m_arraySize = 0;
         FileProperty m_instance;
         PropImplPtr m_parent = nullptr;
@@ -208,7 +208,7 @@ namespace Ent
 
     inline PropImpl* PropImpl::getPrefab()
     {
-        return prefab.get();
+        return m_prefab.get();
     }
 
     inline PropImplPtr PropImpl::shared_from_this()

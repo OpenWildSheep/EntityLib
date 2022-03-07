@@ -4,7 +4,7 @@
 namespace Ent
 {
     void PropImpl::setDefault(
-        Ent::Subschema const* _schema, char const* _filePath, nlohmann::json const* _document)
+        Subschema const* _schema, char const* _filePath, nlohmann::json const* _document)
     {
         // Loïc : To fix this aweful const_cast, FileProperty need a const version 'ConstFileCursor'.
         // This is a "not-so-easy" task just to remove a const_cast so it is not a priority I guess.
@@ -89,7 +89,7 @@ namespace Ent
     PropImpl::PropImpl(
         EntityLib* _entityLib,
         PropImplPtr _parent,
-        Ent::Subschema const* _schema,
+        Subschema const* _schema,
         char const* _filename,
         nlohmann::json* _doc)
     {
@@ -109,7 +109,7 @@ namespace Ent
     }
 
     PropImpl::PropImpl(
-        EntityLib* _entityLib, PropImplPtr _parent, Ent::Subschema const* _schema, char const* _filename)
+        EntityLib* _entityLib, PropImplPtr _parent, Subschema const* _schema, char const* _filename)
         : PropImpl(
             _entityLib, std::move(_parent), _schema, _filename, &_entityLib->readJsonFile(_filename))
     {
@@ -158,10 +158,10 @@ namespace Ent
     PropImplPtr PropImpl::getObjectField(char const* _field, SubschemaRef const* _fieldRef)
     {
         _checkInvariants();
-        ENTLIB_DBG_ASSERT(getDataType() == Ent::DataType::object);
+        ENTLIB_DBG_ASSERT(getDataType() == DataType::object);
         auto newLayer = m_entityLib->newPropImpl();
         ENTLIB_DBG_ASSERT(
-            getDefault() == nullptr or getDefault()->getSchema()->type == Ent::DataType::object);
+            getDefault() == nullptr or getDefault()->getSchema()->type == DataType::object);
         newLayer->m_instance = m_instance.getObjectField(_field, _fieldRef);
         newLayer->m_entityLib = m_entityLib;
         newLayer->m_parent = shared_from_this();
@@ -201,7 +201,7 @@ namespace Ent
 
     PropImplPtr PropImpl::getUnionData(char const* _type)
     {
-        ENTLIB_ASSERT(getSchema()->type == Ent::DataType::oneOf);
+        ENTLIB_ASSERT(getSchema()->type == DataType::oneOf);
         if (_type == nullptr)
         {
             _type = getUnionType();
@@ -216,10 +216,10 @@ namespace Ent
             auto& singularItems = m_instance.getSchema()->singularItems;
             if (singularItems != nullptr)
             {
-                Ent::Subschema const& unionSchema = singularItems->get();
-                if (unionSchema.type != Ent::DataType::oneOf)
+                Subschema const& unionSchema = singularItems->get();
+                if (unionSchema.type != DataType::oneOf)
                 {
-                    throw Ent::BadType("PropImpl::enterUnionSetItem : Not an UnionSet");
+                    throw BadType("PropImpl::enterUnionSetItem : Not an UnionSet");
                 }
                 auto& unionTypeMap = unionSchema.unionTypeMap;
                 if (auto iter = unionTypeMap.find(_type); iter != unionTypeMap.end())
@@ -228,13 +228,13 @@ namespace Ent
                 }
                 else
                 {
-                    throw Ent::BadKey(
+                    throw BadKey(
                         _type, "PropImpl::enterUnionSetItem", m_instance.getSchema()->name.c_str());
                 }
             }
             else
             {
-                throw Ent::BadType("PropImpl::enterUnionSetItem : Not an UnionSet");
+                throw BadType("PropImpl::enterUnionSetItem : Not an UnionSet");
             }
         }
         return _enterItem([_type, _dataSchema](auto&& _cur)
@@ -303,7 +303,7 @@ namespace Ent
         auto newLayerPtr = m_entityLib->newPropImpl();
         PropImpl& newLayer = *newLayerPtr;
         newLayer.m_entityLib = m_entityLib;
-        ENTLIB_DBG_ASSERT(m_instance.getSchema()->type == Ent::DataType::array);
+        ENTLIB_DBG_ASSERT(m_instance.getSchema()->type == DataType::array);
         newLayer.m_instance = m_instance.getArrayItem(_index);
         newLayer.m_parent = shared_from_this();
         auto* subschema = newLayer.getSchema();
@@ -336,9 +336,9 @@ namespace Ent
     char const* PropImpl::getInstanceOf()
     {
         // The field InstanceOf is not a field of objects, so we have to fake it.
-        Ent::Subschema schema;
-        schema.type = Ent::DataType::string;
-        Ent::SubschemaRef ref;
+        Subschema schema;
+        schema.type = DataType::string;
+        SubschemaRef ref;
         ref.subSchemaOrRef = std::move(schema);
         auto field = getObjectField("InstanceOf", &ref);
         if (not field->isSet())
@@ -353,12 +353,12 @@ namespace Ent
     {
         if (_instanceOf == nullptr)
         {
-            throw Ent::NullPointerArgument("_instanceOf", __func__);
+            throw NullPointerArgument("_instanceOf", __func__);
         }
         // The field InstanceOf is not a field of objects, so we have to fake it.
-        Ent::Subschema schema;
-        schema.type = Ent::DataType::string;
-        Ent::SubschemaRef ref;
+        Subschema schema;
+        schema.type = DataType::string;
+        SubschemaRef ref;
         ref.subSchemaOrRef = std::move(schema);
         getObjectField("InstanceOf", &ref)->setString(_instanceOf);
         if (strlen(_instanceOf) != 0)
@@ -373,7 +373,7 @@ namespace Ent
 
     char const* PropImpl::getUnionType()
     {
-        ENTLIB_ASSERT(getSchema()->type == Ent::DataType::oneOf);
+        ENTLIB_ASSERT(getSchema()->type == DataType::oneOf);
         if (char const* type = m_instance.getUnionType())
         {
             return type;
@@ -445,7 +445,7 @@ namespace Ent
                 return schema.singularItems->get().properties.at(*arrayMeta->keyField)->type;
             }
         }
-        throw Ent::BadType(Ent::staticFormat(
+        throw BadType(staticFormat(
             "In PropImpl::getObjectSetKeyType : Expected ObjectSet. Got %s", schema.name.c_str()));
     }
 
@@ -488,18 +488,18 @@ namespace Ent
         }
         switch (schema->type)
         {
-        case Ent::DataType::object: return schema->properties.size();
-        case Ent::DataType::oneOf: return 1;
-        case Ent::DataType::array:
+        case DataType::object: return schema->properties.size();
+        case DataType::oneOf: return 1;
+        case DataType::array:
         {
-            auto meta = std::get<Ent::Subschema::ArrayMeta>(schema->meta);
+            auto meta = std::get<Subschema::ArrayMeta>(schema->meta);
             switch (hash(meta.overridePolicy))
             {
             case "map"_hash:
                 switch (getMapKeyType())
                 {
-                case Ent::DataType::string: return getMapKeysString().size();
-                case Ent::DataType::integer: return getMapKeysInt().size();
+                case DataType::string: return getMapKeysString().size();
+                case DataType::integer: return getMapKeysInt().size();
                 default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                 }
                 break;
@@ -508,15 +508,15 @@ namespace Ent
                 auto& itemType = schema->singularItems->get();
                 switch (itemType.type)
                 {
-                case Ent::DataType::integer: return getPrimSetKeysInt().size();
-                case Ent::DataType::string: return getPrimSetKeysString().size();
-                case Ent::DataType::oneOf: return getUnionSetKeysString().size();
-                case Ent::DataType::object:
+                case DataType::integer: return getPrimSetKeysInt().size();
+                case DataType::string: return getPrimSetKeysString().size();
+                case DataType::oneOf: return getUnionSetKeysString().size();
+                case DataType::object:
                     auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                     switch (keyFieldSchema.type)
                     {
-                    case Ent::DataType::string: return getObjectSetKeysString().size();
-                    case Ent::DataType::integer: return getObjectSetKeysInt().size();
+                    case DataType::string: return getObjectSetKeysString().size();
+                    case DataType::integer: return getObjectSetKeysInt().size();
                     default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                     }
                     break;
@@ -528,13 +528,13 @@ namespace Ent
             }
         }
         break;
-        case Ent::DataType::null: return 0;
-        case Ent::DataType::boolean: return 0;
-        case Ent::DataType::integer: return 0;
-        case Ent::DataType::number: return 0;
-        case Ent::DataType::string: return 0;
-        case Ent::DataType::entityRef: return 0;
-        case Ent::DataType::COUNT:
+        case DataType::null: return 0;
+        case DataType::boolean: return 0;
+        case DataType::integer: return 0;
+        case DataType::number: return 0;
+        case DataType::string: return 0;
+        case DataType::entityRef: return 0;
+        case DataType::COUNT:
         default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
         }
         ENTLIB_LOGIC_ERROR("Unexpected DataType!");
@@ -550,19 +550,18 @@ namespace Ent
         }
         switch (schema->type)
         {
-        case Ent::DataType::object:
-            return schema->properties.count(std::get<std::string>(_key)) != 0;
-        case Ent::DataType::oneOf: return getUnionType() == std::get<std::string>(_key);
-        case Ent::DataType::array:
+        case DataType::object: return schema->properties.count(std::get<std::string>(_key)) != 0;
+        case DataType::oneOf: return getUnionType() == std::get<std::string>(_key);
+        case DataType::array:
         {
-            auto meta = std::get<Ent::Subschema::ArrayMeta>(schema->meta);
+            auto meta = std::get<Subschema::ArrayMeta>(schema->meta);
             switch (hash(meta.overridePolicy))
             {
             case "map"_hash:
                 switch (getMapKeyType())
                 {
-                case Ent::DataType::string: return mapContains(std::get<std::string>(_key).c_str());
-                case Ent::DataType::integer: return mapContains(std::get<size_t>(_key));
+                case DataType::string: return mapContains(std::get<std::string>(_key).c_str());
+                case DataType::integer: return mapContains(std::get<size_t>(_key));
                 default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                 }
                 break;
@@ -571,18 +570,16 @@ namespace Ent
                 auto& itemType = schema->singularItems->get();
                 switch (itemType.type)
                 {
-                case Ent::DataType::integer: return primSetContains(std::get<size_t>(_key));
-                case Ent::DataType::string:
-                    return primSetContains(std::get<std::string>(_key).c_str());
-                case Ent::DataType::oneOf:
-                    return unionSetContains(std::get<std::string>(_key).c_str());
-                case Ent::DataType::object:
+                case DataType::integer: return primSetContains(std::get<size_t>(_key));
+                case DataType::string: return primSetContains(std::get<std::string>(_key).c_str());
+                case DataType::oneOf: return unionSetContains(std::get<std::string>(_key).c_str());
+                case DataType::object:
                     auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                     switch (keyFieldSchema.type)
                     {
-                    case Ent::DataType::string:
+                    case DataType::string:
                         return objectSetContains(std::get<std::string>(_key).c_str());
-                    case Ent::DataType::integer: return objectSetContains(std::get<size_t>(_key));
+                    case DataType::integer: return objectSetContains(std::get<size_t>(_key));
                     default: ENTLIB_LOGIC_ERROR("Unexpected key type");
                     }
                     break;
@@ -594,13 +591,13 @@ namespace Ent
             }
         }
         break;
-        case Ent::DataType::null: return false;
-        case Ent::DataType::boolean: return false;
-        case Ent::DataType::integer: return false;
-        case Ent::DataType::number: return false;
-        case Ent::DataType::string: return false;
-        case Ent::DataType::entityRef: return false;
-        case Ent::DataType::COUNT:
+        case DataType::null: return false;
+        case DataType::boolean: return false;
+        case DataType::integer: return false;
+        case DataType::number: return false;
+        case DataType::string: return false;
+        case DataType::entityRef: return false;
+        case DataType::COUNT:
         default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
         }
         ENTLIB_LOGIC_ERROR("Unexpected DataType!");
@@ -759,7 +756,7 @@ namespace Ent
 
     std::set<char const*, CmpStr> PropImpl::getObjectSetKeysString()
     {
-        auto const& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
+        auto const& meta = std::get<Subschema::ArrayMeta>(getSchema()->meta);
         std::set<char const*, CmpStr> keys;
         if (m_prefab != nullptr)
         {
@@ -786,7 +783,7 @@ namespace Ent
 
     std::set<int64_t> PropImpl::getObjectSetKeysInt()
     {
-        auto const& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
+        auto const& meta = std::get<Subschema::ArrayMeta>(getSchema()->meta);
         std::set<int64_t> keys;
         if (m_instance.isSet())
         {

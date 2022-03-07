@@ -138,27 +138,27 @@ public:
     {
         --tab;
     }
-    void nullNode([[maybe_unused]] Property& _prop) override
+    void nullProperty([[maybe_unused]] Property& _prop) override
     {
         std::cout << getTab() << "null" << std ::endl;
     }
-    void boolNode(Property& _prop) override
+    void boolProperty(Property& _prop) override
     {
         std::cout << getTab() << _prop.getBool() << std::endl;
     }
-    void intNode(Property& _prop) override
+    void intProperty(Property& _prop) override
     {
         std::cout << getTab() << _prop.getInt() << std::endl;
     }
-    void floatNode(Property& _prop) override
+    void floatProperty(Property& _prop) override
     {
         std::cout << getTab() << _prop.getFloat() << std::endl;
     }
-    void stringNode(Property& _prop) override
+    void stringProperty(Property& _prop) override
     {
         std::cout << getTab() << '"' << _prop.getString() << '"' << std::endl;
     }
-    void entityRefNode(Property& _prop) override
+    void entityRefProperty(Property& _prop) override
     {
         std::cout << getTab() << '"' << _prop.getEntityRef().entityPath.c_str() << '"' << std::endl;
     }
@@ -347,15 +347,15 @@ public:
     void outArray([[maybe_unused]] Property& _prop) override
     {
     }
-    void nullNode([[maybe_unused]] Property& _prop) override
+    void nullProperty([[maybe_unused]] Property& _prop) override
     {
     }
-    void boolNode(Property& expl) override
+    void boolProperty(Property& expl) override
     {
         // std::cout << elt.getBool() << " " << nodes.back()->getBool() << std::endl;
         ENTLIB_ASSERT(expl.getBool() == nodes.back()->getBool());
     }
-    void intNode(Property& expl) override
+    void intProperty(Property& expl) override
     {
         if (expl.getInt() != nodes.back()->getInt())
         {
@@ -364,7 +364,7 @@ public:
         }
         ENTLIB_ASSERT(expl.getInt() == nodes.back()->getInt());
     }
-    void floatNode(Property& expl) override
+    void floatProperty(Property& expl) override
     {
         // std::cout << elt.getFloat() << " " << nodes.back().getFloat() << std::endl;
         if (fabs(expl.getFloat() - nodes.back()->getFloat()) >= FLT_EPSILON)
@@ -373,7 +373,7 @@ public:
         }
         // ENTLIB_ASSERT(fabs(elt.getFloat() - nodes.back().getFloat()) < FLT_EPSILON);
     }
-    void stringNode(Property& expl) override
+    void stringProperty(Property& expl) override
     {
         if (strcmp(expl.getString(), nodes.back()->getString()) != 0)
         {
@@ -382,7 +382,7 @@ public:
         }
         ENTLIB_ASSERT(strcmp(expl.getString(), nodes.back()->getString()) == 0);
     }
-    void entityRefNode(Property& expl) override
+    void entityRefProperty(Property& expl) override
     {
         //std::cout << elt.getEntityRef().entityPath.c_str() << " "
         //          << nodes.back()->getEntityRef().entityPath.c_str() << std::endl;
@@ -567,21 +567,21 @@ public:
     {
         ENTLIB_ASSERT(expl2.size() == _prop.size());
     }
-    void nullNode([[maybe_unused]] Property& _prop) override
+    void nullProperty([[maybe_unused]] Property& _prop) override
     {
         ENTLIB_ASSERT(expl2.getDataType() == Ent::DataType::null);
     }
-    void boolNode([[maybe_unused]] Property& _prop) override
+    void boolProperty([[maybe_unused]] Property& _prop) override
     {
         ENTLIB_ASSERT(_prop.isSet() == expl2.isSet());
         ENTLIB_ASSERT(_prop.getBool() == expl2.getBool());
     }
-    void intNode([[maybe_unused]] Property& _prop) override
+    void intProperty([[maybe_unused]] Property& _prop) override
     {
         ENTLIB_ASSERT(_prop.isSet() == expl2.isSet());
         ENTLIB_ASSERT(_prop.getInt() == expl2.getInt());
     }
-    void floatNode(Property& _prop) override
+    void floatProperty(Property& _prop) override
     {
         ENTLIB_ASSERT(_prop.isSet() == expl2.isSet());
         if (_prop.getFloat() != expl2.getFloat())
@@ -596,12 +596,12 @@ public:
         }
         ENTLIB_ASSERT(_prop.getFloat() == expl2.getFloat());
     }
-    void stringNode([[maybe_unused]] Property& _prop) override
+    void stringProperty([[maybe_unused]] Property& _prop) override
     {
         ENTLIB_ASSERT(_prop.isSet() == expl2.isSet());
         ENTLIB_ASSERT(_prop.getString() == std::string_view(expl2.getString()));
     }
-    void entityRefNode([[maybe_unused]] Property& _prop) override
+    void entityRefProperty([[maybe_unused]] Property& _prop) override
     {
         ENTLIB_ASSERT(_prop.isSet() == expl2.isSet());
         ENTLIB_ASSERT(_prop.getEntityRef() == expl2.getEntityRef());
@@ -621,27 +621,27 @@ public:
     {
         ++primitiveCount;
     }
-    void nullNode([[maybe_unused]] Property& _prop) override
+    void nullProperty([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
-    void boolNode([[maybe_unused]] Property& _prop) override
+    void boolProperty([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
-    void intNode([[maybe_unused]] Property& _prop) override
+    void intProperty([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
-    void floatNode([[maybe_unused]] Property& _prop) override
+    void floatProperty([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
-    void stringNode([[maybe_unused]] Property& _prop) override
+    void stringProperty([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }
-    void entityRefNode([[maybe_unused]] Property& _prop) override
+    void entityRefProperty([[maybe_unused]] Property& _prop) override
     {
         ++primitiveCount;
     }

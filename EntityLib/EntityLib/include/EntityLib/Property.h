@@ -11,7 +11,7 @@ namespace Ent
 
         Property() = default;
         Property(Property const& _other)
-            : m_self(_other.m_self->shared_from_this())
+            : m_self(_other.m_self->sharedFromThis())
         {
         }
         Property& operator=(Property const& _other)
@@ -332,7 +332,7 @@ namespace Ent
         {
             if (auto prefab = m_self->getPrefab())
             {
-                return Property(prefab->shared_from_this());
+                return Property(prefab->sharedFromThis());
             }
             else
             {

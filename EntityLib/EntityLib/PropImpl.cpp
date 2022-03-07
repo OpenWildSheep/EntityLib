@@ -168,7 +168,7 @@ namespace Ent
             or lastLayer.getDefault()->getSchema()->type == Ent::DataType::object);
         newLayer->m_instance = lastLayer.m_instance.enterObjectField(_field, _fieldRef);
         newLayer->m_entityLib = m_entityLib;
-        newLayer->m_parent = shared_from_this();
+        newLayer->m_parent = sharedFromThis();
         auto* subschema = newLayer->getSchema();
         if (not newLayer->_loadInstanceOf())
         {
@@ -254,7 +254,7 @@ namespace Ent
         auto& lastLayer = _getLastLayer();
         newLayer.m_entityLib = m_entityLib;
         newLayer.m_instance = _enter(lastLayer.m_instance);
-        newLayer.m_parent = shared_from_this();
+        newLayer.m_parent = sharedFromThis();
         auto* subschema = newLayer.getSchema();
         auto* defaultVal = lastLayer.getDefault();
         if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
@@ -311,7 +311,7 @@ namespace Ent
         auto& lastLayer = _getLastLayer();
         ENTLIB_DBG_ASSERT(lastLayer.m_instance.getSchema()->type == Ent::DataType::array);
         newLayer.m_instance = lastLayer.m_instance.enterArrayItem(_index);
-        newLayer.m_parent = shared_from_this();
+        newLayer.m_parent = sharedFromThis();
         auto* subschema = newLayer.getSchema();
         if (not isDefault())
         {

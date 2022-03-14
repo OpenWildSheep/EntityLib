@@ -1467,7 +1467,8 @@ namespace Ent
             // The default (first) type is not explicited by the coder, so it can change accidentally.
             // This is why it is better to always write the type. (And also Wild expect it)
             auto const isPointerType = not meta.indexField.has_value();
-            if (un.typeOverriden or un.wrapper->hasOverride() or _forceWriteKey or isPointerType)
+            auto const valueSourceAccepted = un.wrapper->matchValueSource(_dumpedValueSource);
+            if (un.typeOverriden or valueSourceAccepted or _forceWriteKey or isPointerType)
             {
                 Node const* dataInsideUnion = _node.getUnionData();
                 char const* type = _node.getUnionType();

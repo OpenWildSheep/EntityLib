@@ -9,6 +9,7 @@
 #include "../Union.h"
 #include "../Object.h"
 #include "../Node.h"
+#include "../PropImpl.h"
 #pragma warning(pop)
 
 namespace Ent
@@ -41,6 +42,7 @@ namespace Ent
     {
     public:
         mutable Pool<Node> nodePool;
+        mutable Pool<PropImpl> propertyPool;
         /// @todo Make public attribute private?
         std::filesystem::path rootPath; ///< Path to the perforce root (X:/)
         std::filesystem::path rawdataPath; ///< Path to the RawData dir in the perforce root (X:/RawData)
@@ -58,6 +60,13 @@ namespace Ent
         EntityLib(EntityLib const&) = delete;
         EntityLib& operator=(EntityLib const&) = delete;
         DeleteCheck deleteCheck;
+
+        PropImplPtr newPropImpl();
+        PropImplPtr newPropImpl(
+            PropImplPtr _parent,
+            Ent::Subschema const* _schema,
+            char const* _filename,
+            nlohmann::json* _doc = nullptr);
         /// @endcond
 
         /// Load the Node at path _nodeSchema then return a pointer to the cached data

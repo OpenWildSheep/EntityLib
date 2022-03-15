@@ -553,4 +553,21 @@ namespace Ent
     ///         - ex : bad : `Components/TransformGD/TransformGD/Position`
     ///
     using NodeRef = std::string;
+
+    struct EntityRef
+    {
+        /// @brief string representation of this entity ref, works like a file path, always relative.
+        String entityPath;
+
+        bool operator==(EntityRef const& _rho) const
+        {
+            return entityPath == _rho.entityPath;
+        }
+
+        bool operator!=(EntityRef const& _rho) const
+        {
+            return !(*this == _rho);
+        }
+    };
+
 } // namespace Ent

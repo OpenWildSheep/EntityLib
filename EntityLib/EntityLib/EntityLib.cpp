@@ -1702,6 +1702,20 @@ namespace Ent
                                                       Node(std::move(val), _subschema));
     }
 
+    PropImplPtr EntityLib::newPropImpl()
+    {
+        auto property = new (propertyPool.alloc()) PropImpl();
+        return property->sharedFromThis();
+    }
+
+    PropImplPtr EntityLib::newPropImpl(
+        PropImplPtr _parent, Ent::Subschema const* _schema, char const* _filename, nlohmann::json* _doc)
+    {
+        auto property =
+            new (propertyPool.alloc()) PropImpl(this, std::move(_parent), _schema, _filename, _doc);
+        return property->sharedFromThis();
+    }
+
     NodeUniquePtr EntityLib::makeEntityNode() const
     {
         return makeNode(entitySchemaName);

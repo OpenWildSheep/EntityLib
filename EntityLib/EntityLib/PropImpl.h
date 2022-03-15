@@ -1,20 +1,38 @@
 #pragma once
 
 #include <variant>
-#include <ciso646>
 #include <set>
+#include <deque>
 
-#include "FileCursor.h"
+#include "include/EntityLib/FileCursor.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4464)
-#include "../EntityLib.h"
 #include "../Tools.h"
 #pragma warning(pop)
 
 namespace Ent
 {
-    /// Navigate and extract data from .node(.entity/.scene) files, taking care of overriding rules
+    class EntityLib;
+
+    struct Cursor;
+
+    /// Functor used by PropImplPtr
+    /// to decrement the refcounter on the unique_ptr destruction,
+    /// and delete the Cursor if refcount == 0.
+    struct DecRef
+    {
+        template <typename C>
+        void operator()(C* _cursorPtr)
+        {
+            decRef(_cursorPtr);
+        }
+    };
+
+    /// smart pointer to a Cursor (use reference counting)
+    using PropImplPtr = std::unique_ptr<Cursor, DecRef>;
+
+    /// @brief Internal implementation of a Property
     struct ENTLIB_DLLEXPORT Cursor
     {
     public:
@@ -27,11 +45,21 @@ namespace Ent
         Cursor& operator=(Cursor&&) = delete;
         Cursor(
             EntityLib* _entityLib,
+            PropImplPtr _parent,
             Ent::Subschema const* _schema, ///< Schema of the file to load
             char const* _filename,
             nlohmann::json* _doc);
 
-        Cursor(EntityLib* _entityLib, Ent::Subschema const* _schema, char const* _filename);
+        Cursor(
+            EntityLib* _entityLib,
+            PropImplPtr _parent,
+            Ent::Subschema const* _schema, ///< Schema of the file to load
+            char const* _filename);
+
+        void
+        setDefault(Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
+        FileCursor* getDefault();
+        FileCursor const* getDefault() const;
 
         /// Save to _filename or to the source file
         void save(char const* _filename = nullptr) const;
@@ -41,49 +69,41 @@ namespace Ent
 
         /// @brief Enter in the given field of the object
         /// @pre It is an object
-        Cursor& enterObjectField(
+        PropImplPtr enterObjectField(
             char const* _field, ///< field to enter in
             SubschemaRef const* _fieldRef = nullptr ///< SubschemaRef of the field (For performance)
         );
-
         /// @brief Enter in the internal data of the union
         /// @pre It is a Union
-        Cursor& enterUnionData(
+        PropImplPtr enterUnionData(
             char const* _type = nullptr ///< type of the internal data of the union
         );
-
         /// @brief Enter in the item of a UnionSet
         /// @pre It is a UnionSet
-        Cursor& enterUnionSetItem(
+        PropImplPtr enterUnionSetItem(
             char const* _type, ///< Type of the item
             Subschema const* _dataSchema = nullptr ///< Schema of the item (For performance)
         );
-
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        Cursor& enterObjectSetItem(char const* _key ///< Key of the object
+        PropImplPtr enterObjectSetItem(char const* _key ///< Key of the object
         );
-
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        Cursor& enterObjectSetItem(int64_t _key ///< Key of the object
+        PropImplPtr enterObjectSetItem(int64_t _key ///< Key of the object
         );
-
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        Cursor& enterMapItem(char const* _key ///< Key of the value
+        PropImplPtr enterMapItem(char const* _key ///< Key of the value
         );
-
         /// @brief Enter in the value of an Map
         /// @pre It is an Map
-        Cursor& enterMapItem(int64_t _field ///< Key of the value
+        PropImplPtr enterMapItem(int64_t _field ///< Key of the value
         );
-
         /// @brief Enter in the element of an Array
         /// @pre It is an Array
-        Cursor& enterArrayItem(size_t _index ///< index of the targeted element
+        PropImplPtr enterArrayItem(size_t _index ///< index of the targeted element
         );
-
         /// @return The "InstanceOf" field, an empty string if set to empty, or nullptr if unset.
         /// @pre It is an Object
         char const* getInstanceOf();
@@ -101,10 +121,6 @@ namespace Ent
         /// @return The index of the type of the Union
         /// @pre It is a Union
         size_t getUnionTypeIndex();
-
-        /// Used after "enter..." function. From an item, get back to the parent container.
-        Cursor& exit();
-
         DataType getDataType() const; ///< Get the DataType of a Node
 
         Subschema const* getSchema() const; ///< Get the Schema of the curent Node
@@ -160,62 +176,66 @@ namespace Ent
         void insertPrimSetKey(char const* _key); ///< Insert _key in the set (or do nothing if already in)
         void insertPrimSetKey(int64_t _key); ///< Insert _key in the set (or do nothing if already in)
 
-        nlohmann::json const* _getRawJson(); ///< Get the underlying json node of the instance
-
         Cursor* getPrefab(); ///< Get the Cursor of the prefab
+        nlohmann::json const* getRawJson(); ///< Get the underlying json node of the instance
 
-        size_t getStackSize() const; ///< Get the stack size (count of "enter" since the root)
+        PropImplPtr sharedFromThis(); ///< Create a new smart pointer to this
+
+        PropImplPtr getParent() const; ///< Get the Cursor which created this one
 
     private:
-        /// A Layer is a level in the tree hierarchy.
-        /// When enter, a layer is added.
-        /// When exit, a layer is popped.
-        struct Layer
-        {
-            Cursor* prefab = nullptr;
-            std::unique_ptr<Cursor> prefabsStorage; ///< Used when this layer has an "InstanceOf"
-            /// @brief offset of the defaultValue in m_layers
-            /// @remark 0 = last, -1 = last - 1, 1 = undefined
-            int defaultVal = 1;
-            FileCursor defaultStorage; ///< Used to explore the defalt value in the schema
-            size_t arraySize = 0;
-            void setDefault(
-                Ent::Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
-            void clear();
-            FileCursor* getDefault();
-            FileCursor const* getDefault() const;
-        };
-        Layer& _allocLayer(); ///< Make a new "ghost" layers on the m_layers stack
-        void _comitNewLayer(); ///< Increment the m_layerCount, the allocated layer is now on the top
-        bool _loadInstanceOf(Layer& _newLayer);
-        Layer& _getLastLayer();
-        Layer const& _getLastLayer() const;
+        friend void decRef(Cursor* self);
+
+        bool _loadInstanceOf();
+        Cursor& _getLastLayer();
+        Cursor const& _getLastLayer() const;
         void _buildPath(); ///< At the cursor location, ensure the json nodes exists in m_instance
         template <typename K, typename E>
         bool _countPrimSetKeyImpl(K _key, E&& _isEqual);
         template <typename E>
-        Cursor& _enterItem(E&& _enter);
-        void _init(
-            EntityLib* _entityLib,
-            Ent::Subschema const* _schema,
-            char const* _filename,
-            nlohmann::json* _doc);
-        void _init(EntityLib* _entityLib, Ent::Subschema const* _schema, char const* _filename);
+        PropImplPtr _enterItem(E&& _enter);
         void _checkInvariants() const;
 
         EntityLib* m_entityLib = nullptr;
+        PropImplPtr prefab = nullptr;
+        std::optional<FileCursor> defaultStorage; ///< Used to explore the defalt value in the schema
+        size_t m_arraySize = 0;
         FileCursor m_instance;
-        std::vector<Layer> m_layers;
-        size_t m_layerCount = 0;
+        PropImplPtr m_parent = nullptr;
+        size_t m_refCount = 0;
+        DeleteCheck m_deleteCheck;
     };
 
-    inline Cursor* Cursor::getPrefab()
+    using PropImpl = Cursor;
+
+    inline PropImpl* PropImpl::getPrefab()
     {
-        return _getLastLayer().prefab;
+        return prefab.get();
     }
 
-    inline size_t Cursor::getStackSize() const
+    inline PropImplPtr PropImpl::sharedFromThis()
     {
-        return m_layerCount;
+        ++m_refCount;
+        return PropImplPtr(this);
+    }
+
+    // Used temporarily to make the PR easier
+    inline PropImpl const& PropImpl::_getLastLayer() const
+    {
+        return *this;
+    }
+
+    inline PropImpl& PropImpl::_getLastLayer()
+    {
+        return *this;
+    }
+
+    inline PropImplPtr PropImpl::getParent() const
+    {
+        if (m_parent != nullptr)
+        {
+            return m_parent->sharedFromThis();
+        }
+        return {};
     }
 } // namespace Ent

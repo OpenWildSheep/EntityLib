@@ -41,7 +41,7 @@ namespace Ent
         }
         bool inObjectField(Property& m_source, char const* _key) override
         {
-            _push(_back().enterObjectField(_key));
+            _push(_back().getObjectField(_key));
             return true;
         }
         void outObjectField(Property& m_source, char const* _key) override
@@ -54,7 +54,7 @@ namespace Ent
             {
                 _back().setUnionType(_type);
             }
-            _push(_back().enterUnionData(_type));
+            _push(_back().getUnionData(_type));
         }
         void outUnion(Property& m_source) override
         {
@@ -62,11 +62,11 @@ namespace Ent
         }
         void inMapElement(Property& m_source, char const* _key) override
         {
-            _push(_back().enterMapItem(_key));
+            _push(_back().getMapItem(_key));
         }
         void inMapElement(Property& m_source, int64_t _key) override
         {
-            _push(_back().enterMapItem(_key));
+            _push(_back().getMapItem(_key));
         }
         void outMapElement(Property& m_source) override
         {
@@ -74,7 +74,7 @@ namespace Ent
         }
         void inArrayElement(Property& m_source, size_t _index) override
         {
-            _push(_back().enterArrayItem(_index));
+            _push(_back().getArrayItem(_index));
         }
         void outArrayElement(Property& m_source) override
         {
@@ -90,7 +90,7 @@ namespace Ent
         }
         void inUnionSetElement(Property& m_source, char const* _type) override
         {
-            _push(_back().enterUnionSetItem(_type));
+            _push(_back().getUnionSetItem(_type));
             if (m_source.isSet())
             {
                 _back().buildPath(); // Force it to set
@@ -102,11 +102,11 @@ namespace Ent
         }
         void inObjectSetElement(Property& m_source, char const* _key) override
         {
-            _push(_back().enterObjectSetItem(_key));
+            _push(_back().getObjectSetItem(_key));
         }
         void inObjectSetElement(Property& m_source, int64_t _key) override
         {
-            _push(_back().enterObjectSetItem(_key));
+            _push(_back().getObjectSetItem(_key));
         }
         void outObjectSetElement(Property& m_source) override
         {

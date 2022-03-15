@@ -22,21 +22,21 @@ namespace Ent
 
     /// Navigate and extract data from .node(.entity/.scene) files
     ///
-    /// @remark FileCursor know nothing about prefab ("InstanceOf"). It only know about one file.
-    struct ENTLIB_DLLEXPORT FileCursor
+    /// @remark FileProperty know nothing about prefab ("InstanceOf"). It only know about one file.
+    struct ENTLIB_DLLEXPORT FileProperty
     {
         using Key = std::variant<char const*, size_t>;
         struct Schema
         {
-            Ent::Subschema const* base = nullptr;
+            Subschema const* base = nullptr;
             nlohmann::json const* propDefVal = nullptr; ///< Property default values
         };
 
-        FileCursor();
+        FileProperty();
 
-        FileCursor(Ent::Subschema const* _schema, char const* _filePath);
+        FileProperty(Subschema const* _schema, char const* _filePath);
 
-        FileCursor(Ent::Subschema const* _schema, char const* m_filePath, nlohmann::json* _document);
+        FileProperty(Subschema const* _schema, char const* m_filePath, nlohmann::json* _document);
 
         void pushBack(char const* _key); ///< @pre json is an array. @brief Push back _key in json
 
@@ -61,45 +61,45 @@ namespace Ent
 
         /// @brief Enter in the given field of the object
         /// @pre It is an object
-        FileCursor enterObjectField(char const* _field, SubschemaRef const* _fieldRef = nullptr);
+        FileProperty getObjectField(char const* _field, SubschemaRef const* _fieldRef = nullptr);
 
         /// @brief Enter in the item of a UnionSet
         /// @pre It is a UnionSet
-        FileCursor enterUnionSetItem(char const* _field, Subschema const* _dataSchema = nullptr);
+        FileProperty getUnionSetItem(char const* _field, Subschema const* _dataSchema = nullptr);
 
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        FileCursor enterObjectSetItem(char const* _field);
+        FileProperty getObjectSetItem(char const* _field);
 
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        FileCursor enterObjectSetItem(int64_t _field);
+        FileProperty getObjectSetItem(int64_t _field);
 
         /// @brief Enter in the value of a Map
         /// @pre It is an Map
-        FileCursor enterMapItem(char const* _field);
+        FileProperty getMapItem(char const* _field);
 
         /// @brief Enter in the value of a Map
         /// @pre It is an Map
-        FileCursor enterMapItem(int64_t _field);
+        FileProperty getMapItem(int64_t _field);
 
         /// @brief Enter in the element of an Array
         /// @pre It is an Array
-        FileCursor enterArrayItem(size_t _index);
+        FileProperty getArrayItem(size_t _index);
 
         /// @return The type of the Union
         /// @pre It is a Union
         char const* getUnionType() const;
 
         /// @brief Get the schema of the union inner type
-        Ent::Subschema const* getUnionSchema() const;
+        Subschema const* getUnionSchema() const;
 
         /// Check if the union has to be removed from its parent container (A UnionSet)
         bool isUnionRemoved() const;
 
         /// @brief Enter in the internal data of the union
         /// @pre It is a Union
-        FileCursor enterUnionData(char const* _unionType);
+        FileProperty getUnionData(char const* _unionType);
 
         Subschema const* getSchema() const; ///< Get the Schema of the curent Node
 
@@ -114,9 +114,9 @@ namespace Ent
         /// @param _arraySize If the child is an array : Size of the array (from prefab)
         /// @return json pointer to the child node
         static nlohmann::json* createChildNode(
-            FileCursor& _lastLayer,
-            Ent::FileCursor::Key const& _childName,
-            Ent::Subschema const& _newLayerSchema,
+            FileProperty& _lastLayer,
+            Key const& _childName,
+            Subschema const& _newLayerSchema,
             size_t _arraySize);
 
         size_t size() const; ///< @pre type==array. @brief Get the size of the array.
@@ -143,18 +143,18 @@ namespace Ent
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
         template <typename K, typename C>
-        FileCursor _enterObjectSetItemImpl(K _field, C&& _equalKey);
+        FileProperty _enterObjectSetItemImpl(K _field, C&& _equalKey);
         /// @brief Enter in the value of a Map
         /// @pre It is an Map
         template <typename K, typename E>
-        FileCursor _enterMapItemImpl(K _field, E&& _isEqual);
+        FileProperty _enterMapItemImpl(K _field, E&& _isEqual);
         /// Get the mutable json node of the instance (or nullptr)
         nlohmann::json* _getRawJson();
 
         std::string m_filePath; ///< Path of the instance json file
-        Schema schema{};
-        nlohmann::json* values{};
-        Key additionalPath;
+        Schema m_schema{};
+        nlohmann::json* m_values{};
+        Key m_key;
     };
 } // namespace Ent
 /// @endcond

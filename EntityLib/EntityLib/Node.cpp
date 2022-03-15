@@ -1323,7 +1323,7 @@ namespace Ent
         }
         else
         {
-            throw BadType(); 
+            throw BadType();
         }
     }
 

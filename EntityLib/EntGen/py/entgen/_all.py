@@ -74,14 +74,14 @@ from .ScaleFactor import *
 from .ScaleConverter import *
 from .RigidBodyUserData import *
 from .RigidBodyUserDataLedges import *
-from .RigidBodyUserDataDamage import *
-from .RigidBodyUserDataBreak import *
+from .RigidBodyUserDataImpact import *
 from .RigidBodyMeshNavigation import *
 from .FluidRigidbodyUserData import *
 from .RevivedData import *
 from .ReviveSide import *
 from .sGameEffectTemplate import *
 from .ResponsiblePointer_AnalyticsObserverInterface_ import *
+from .SpawnState import *
 from .RespawnState import *
 from .RegenerationManager_EnergyAreaSetting import *
 from .RegenSwitchBehavior import *
@@ -123,6 +123,7 @@ from .PrimitiveColliderType import *
 from .PredictionBehaviorDuration import *
 from .PredictionBehaviorData import *
 from .Precision import *
+from .constraintPlaneWorldPosition import *
 from .ProjectileTrajectory import *
 from .PlayRatio import *
 from .PhysicsMaterial import *
@@ -151,7 +152,7 @@ from .MoveCapacityData_OrientationSpeed import *
 from .MountableSnapLine_ControlPoint import *
 from .MountableData import *
 from .MinReviveRatio import *
-from .MinDistanceToRespawnPosition import *
+from .MinRespawnDistance import *
 from .MeshesItem import *
 from .RUNTIME_LODsItem import *
 from .MeshNavigationAllowedMode import *
@@ -226,6 +227,7 @@ from .InterpolationMethod import *
 from .TrailProperties import *
 from .InteractData import *
 from .InputCollisionBehaviorData import *
+from .InertiaTensor import *
 from .ImpactAndSolidityData import *
 from .ID import *
 from .PhysicsReplicateData import *
@@ -306,6 +308,7 @@ from .EventCameraData import *
 from .EntityStateSet import *
 from .PlayerState import *
 from .EntityStateMotionConstrained_Inputs import *
+from .EntityStateManageChildEntityPool_Inputs import *
 from .EntityStateIncapacitated_Inputs import *
 from .EntityStateChargeMode_EntityStateChargeModeInputs import *
 from .EntityLODData import *
@@ -352,8 +355,9 @@ from .StrongAttackComponentInput import *
 from .SoundEmitterComponentInput import *
 from .SmoothScaleComponentInput import *
 from .ReviveEnergyComponentInput import *
+from .RespawnabilityComponentInput import *
+from .PhysicsImpactMakerComponentInput import *
 from .PhysicsComponentInput import *
-from .PhysicsBreakerComponentInput import *
 from .PerceiverComponentInput import *
 from .PerceivableComponentInput import *
 from .OutfitWearerComponentInput import *
@@ -380,6 +384,7 @@ from .UnifiedPhysicsDataGD import *
 from .TriggerEventCameraGD import *
 from .TransformGD import *
 from .TestUnion import *
+from .TestTagsList import *
 from .TestSetOfObject import *
 from .TestEntityRef import *
 from .TestDefaultValues import *
@@ -426,12 +431,11 @@ from .PickableComponentGD import *
 from .PhysicsTriggerGD import *
 from .PhysicsMeshProviderGD import *
 from .PhysicsMeshDeformerGD import *
+from .PhysicsImpactMakerGD import *
 from .PhysicsGD import *
 from .PhysicsDataGD import *
-from .PhysicsBreakerGD import *
 from .PerceiverGD import *
 from .PerceivableGD import *
-from .PathNodeGD import *
 from .OutfitWearerGD import *
 from .OutfitGD import *
 from .NotVisibleInSubscene import *
@@ -452,6 +456,7 @@ from .LifeComponentGD import *
 from .LDPrimitive import *
 from .ItemHolderGD import *
 from .InventoryGD import *
+from .InterestPointGD import *
 from .InfoboardRegistererGD import *
 from .IncapacitateComponentGD import *
 from .HotspotsGD import *
@@ -551,8 +556,6 @@ from .CineEventTestIsCanceled import *
 from .CineEventTestInput import *
 from .CineEventTestEndCurrentSequence import *
 from .CineEventTestCurrentGameState import *
-from .CheckIsNotInCameraFrustrum import *
-from .RespawnabilityComponentInput import *
 from .CharacterControllerSlideData import *
 from .CharacterControllerGroundNormalData import *
 from .CharacterControllerFallData import *
@@ -594,6 +597,7 @@ from .Hit import *
 from .AutoRotationType import *
 from .AttitudeMode import *
 from .AttackType import *
+from .AttackPhysicsForceData import *
 from .AttackImpactData import *
 from .AttackData import *
 from .AttackDamageData import *
@@ -646,6 +650,7 @@ from .ActorStateTeleportWhileMovingInputs import *
 from .ActorStateFlockingChangingParams_Params import *
 from .ActorStateArbiterDecision import *
 from .ActorState import *
+from .EntityStateWaterfallEndJump import *
 from .EntityStateWallRunJump import *
 from .EntityStateWallRunDrop import *
 from .EntityStateWallRun import *
@@ -665,6 +670,8 @@ from .EntityStateStrongAttackCharged import *
 from .EntityStateStrongAttack import *
 from .EntityStateStrafeDodge import *
 from .EntityStateStickedLand import *
+from .EntityStateStalactiteReadyToFall import *
+from .EntityStateStalactiteFallen import *
 from .EntityStateSpiritAttacked import *
 from .EntityStateSpiritAttack import *
 from .EntityStateSpiritAnimalSoulForm import *
@@ -686,6 +693,8 @@ from .EntityStatePrepareToHoldingOnToNavigationMesh import *
 from .EntityStatePlungeLand import *
 from .EntityStatePlayer import *
 from .EntityStatePickableDistributor import *
+from .EntityStatePhysicsMove import *
+from .EntityStatePhysicsIdle import *
 from .EntityStateParryCooldown import *
 from .EntityStateParry import *
 from .EntityStateParried import *
@@ -696,6 +705,7 @@ from .EntityStateMineScaling import *
 from .EntityStateMineRespawning import *
 from .EntityStateMeditateToInteract import *
 from .EntityStateMask import *
+from .EntityStateManageChildEntityPool import *
 from .EntityStateLateralLand import *
 from .EntityStateLateralDodge import *
 from .EntityStateJumpHeightMultiplier import *
@@ -737,6 +747,8 @@ from .EntityStateConstrainedMove import *
 from .EntityStateConstrainedInput import *
 from .EntityStateCombat import *
 from .EntityStateCollectVertebrae import *
+from .EntityStateClimbWaterfallImpulse import *
+from .EntityStateClimbWaterfall import *
 from .EntityStateClassicLand import *
 from .EntityStateClassicDodge import *
 from .EntityStateChargingJump import *
@@ -880,6 +892,7 @@ from .ActionQuadStandUpStateIn import *
 from .ActionQuadStandUpState import *
 from .ActionPushed import *
 from .ActionPropelled import *
+from .ActionPlayAnim import *
 from .ActionPatinate import *
 from .ActionPathfindAndMove import *
 from .ActionOutfitSpecialState import *
@@ -972,7 +985,6 @@ from .BoidParams import *
 from .AnimationModelComponentInput_ActionMode import *
 from .AnimationModelComponentInput import *
 from .AnimTags import *
-from .ActionPlayAnim import *
 from .ActionEmote import *
 from .ActionAimProjectile import *
 from .ActionAttack_AttackOutputs import *
@@ -1020,7 +1032,6 @@ from .MeshShape import *
 from .NetRoot import *
 from .OutfitFadeParameter import *
 from .OwnershipModule import *
-from .PathPosition import *
 from .PhysicsNetworker import *
 from .PlayerManagerDebugger import *
 from .PointCloud import *

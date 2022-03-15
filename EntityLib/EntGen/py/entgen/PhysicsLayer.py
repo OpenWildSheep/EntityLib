@@ -24,7 +24,7 @@ class PhysicsLayerEnum(Enum):
     Body = "Body"
     Fluid = "Fluid"
     Hitable = "Hitable"
-    Breakable = "Breakable"
+    PhysicsGPE = "PhysicsGPE"
     None_ = "None"
     All = "All"
     PHYSICLAYER_COUNT = "PHYSICLAYER_COUNT"

@@ -39,6 +39,7 @@ class AnimAdditionalTagEnum(Enum):
     plunge = "plunge"
     lateralplunge = "lateralplunge"
     aerialplunge = "aerialplunge"
+    waterfall = "waterfall"
     AnimAdditionalTag_COUNT = "AnimAdditionalTag_COUNT"
 
 

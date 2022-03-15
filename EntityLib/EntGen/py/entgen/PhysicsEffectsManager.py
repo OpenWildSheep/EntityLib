@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.Float import *
 from entgen.Manager import *
 from entgen.PhysicsMaterial import *
 
@@ -20,6 +21,11 @@ class PhysicsEffectsManager(HelperObject):
         return PhysicsEffectsManager(entlib.make_node(PhysicsEffectsManager.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def GravityConstant(self):  # type: ()->Float
+        return Float(self._node.at("GravityConstant"))
+    @GravityConstant.setter
+    def GravityConstant(self, val): self.GravityConstant.set(val)
     @property
     def MaterialBank(self):  # type: ()->Array[PhysicsMaterial]
         return (lambda n: Array(PhysicsMaterial, n))(self._node.at("MaterialBank"))

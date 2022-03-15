@@ -228,8 +228,7 @@ namespace Ent
         struct ScaleConverter;
         struct RigidBodyUserData;
         struct RigidBodyUserDataLedges;
-        struct RigidBodyUserDataDamage;
-        struct RigidBodyUserDataBreak;
+        struct RigidBodyUserDataImpact;
         struct RigidBodyMeshNavigation;
         struct FluidRigidbodyUserData;
         struct RevivedData;
@@ -246,6 +245,7 @@ namespace Ent
         struct ResponsiblePointer_CineEvent_; // Union
         struct ResponsiblePointer_AnalyticsObserverInterface_;
         struct ResponsiblePointer_ActorState_; // Union
+        struct SpawnState;
         struct RespawnState;
         struct RegenerationManager_EnergyAreaSetting;
         struct RegenSwitchBehavior; // enum
@@ -254,6 +254,7 @@ namespace Ent
             CrossFade,
             CrossMetamorphosis,
             SequentialMetamorphosis,
+            InterruptibleSequentialMetamorphosis,
         };
         struct RegenMeshBone;
         struct RegenMeshBoneNeighbours;
@@ -320,6 +321,7 @@ namespace Ent
             lowest,
         };
         using Position = Ent::Gen::Tuple<Ent::Gen::Int, Ent::Gen::Int, Ent::Gen::Float, Ent::Gen::Float, Ent::Gen::Float>; // Tuple
+        struct constraintPlaneWorldPosition;
         struct ProjectileTrajectory;
         struct PlayRatio;
         struct PhysicsMaterial;
@@ -343,7 +345,7 @@ namespace Ent
             Body,
             Fluid,
             Hitable,
-            Breakable,
+            PhysicsGPE,
             None_,
             All,
             PHYSICLAYER_COUNT,
@@ -431,7 +433,7 @@ namespace Ent
         struct MountableSnapLine_ControlPoint;
         struct MountableData;
         struct MinReviveRatio;
-        struct MinDistanceToRespawnPosition;
+        struct MinRespawnDistance;
         struct MeshesItem;
         struct RUNTIME_LODsItem;
         struct MeshNavigationAllowedMode; // enum
@@ -566,6 +568,7 @@ namespace Ent
         struct TrailProperties;
         struct InteractData;
         struct InputCollisionBehaviorData;
+        struct InertiaTensor;
         struct ImpactAndSolidityData;
         struct ID;
         struct PhysicsReplicateData;
@@ -726,6 +729,7 @@ namespace Ent
         struct EntityStateSet;
         struct PlayerState;
         struct EntityStateMotionConstrained_Inputs;
+        struct EntityStateManageChildEntityPool_Inputs;
         struct EntityStateIncapacitated_Inputs;
         struct EntityStateChargeMode_EntityStateChargeModeInputs;
         struct EntityLODData;
@@ -792,8 +796,9 @@ namespace Ent
         struct SoundEmitterComponentInput;
         struct SmoothScaleComponentInput;
         struct ReviveEnergyComponentInput;
+        struct RespawnabilityComponentInput;
+        struct PhysicsImpactMakerComponentInput;
         struct PhysicsComponentInput;
-        struct PhysicsBreakerComponentInput;
         struct PerceiverComponentInput;
         struct PerceivableComponentInput;
         struct OutfitWearerComponentInput;
@@ -820,6 +825,7 @@ namespace Ent
         struct TriggerEventCameraGD;
         struct TransformGD;
         struct TestUnion;
+        struct TestTagsList;
         struct TestSetOfObject;
         struct TestEntityRef;
         struct TestDefaultValues;
@@ -866,12 +872,11 @@ namespace Ent
         struct PhysicsTriggerGD;
         struct PhysicsMeshProviderGD;
         struct PhysicsMeshDeformerGD;
+        struct PhysicsImpactMakerGD;
         struct PhysicsGD;
         struct PhysicsDataGD;
-        struct PhysicsBreakerGD;
         struct PerceiverGD;
         struct PerceivableGD;
-        struct PathNodeGD;
         struct OutfitWearerGD;
         struct OutfitGD;
         struct NotVisibleInSubscene;
@@ -892,6 +897,7 @@ namespace Ent
         struct LDPrimitive;
         struct ItemHolderGD;
         struct InventoryGD;
+        struct InterestPointGD;
         struct InfoboardRegistererGD;
         struct IncapacitateComponentGD;
         struct HotspotsGD;
@@ -1001,8 +1007,6 @@ namespace Ent
         struct CineEventTestInput;
         struct CineEventTestEndCurrentSequence;
         struct CineEventTestCurrentGameState;
-        struct CheckIsNotInCameraFrustrum;
-        struct RespawnabilityComponentInput;
         struct CharacterControllerSlideData;
         struct CharacterControllerGroundNormalData;
         struct CharacterControllerFallData;
@@ -1149,6 +1153,7 @@ namespace Ent
             Stomp,
             AttackType_COUNT,
         };
+        struct AttackPhysicsForceData;
         struct AttackImpactData;
         struct AttackData;
         struct AttackDamageData;
@@ -1278,6 +1283,7 @@ namespace Ent
             plunge,
             lateralplunge,
             aerialplunge,
+            waterfall,
             AnimAdditionalTag_COUNT,
         };
         struct StrongAttackChargedData;
@@ -1305,6 +1311,7 @@ namespace Ent
             ArbiterDecision_COUNT,
         };
         struct ActorState;
+        struct EntityStateWaterfallEndJump;
         struct EntityStateWallRunJump;
         struct EntityStateWallRunDrop;
         struct EntityStateWallRun;
@@ -1324,6 +1331,8 @@ namespace Ent
         struct EntityStateStrongAttack;
         struct EntityStateStrafeDodge;
         struct EntityStateStickedLand;
+        struct EntityStateStalactiteReadyToFall;
+        struct EntityStateStalactiteFallen;
         struct EntityStateSpiritAttacked;
         struct EntityStateSpiritAttack;
         struct EntityStateSpiritAnimalSoulForm;
@@ -1345,6 +1354,8 @@ namespace Ent
         struct EntityStatePlungeLand;
         struct EntityStatePlayer;
         struct EntityStatePickableDistributor;
+        struct EntityStatePhysicsMove;
+        struct EntityStatePhysicsIdle;
         struct EntityStateParryCooldown;
         struct EntityStateParry;
         struct EntityStateParried;
@@ -1355,6 +1366,7 @@ namespace Ent
         struct EntityStateMineRespawning;
         struct EntityStateMeditateToInteract;
         struct EntityStateMask;
+        struct EntityStateManageChildEntityPool;
         struct EntityStateLateralLand;
         struct EntityStateLateralDodge;
         struct EntityStateJumpHeightMultiplier;
@@ -1396,6 +1408,8 @@ namespace Ent
         struct EntityStateConstrainedInput;
         struct EntityStateCombat;
         struct EntityStateCollectVertebrae;
+        struct EntityStateClimbWaterfallImpulse;
+        struct EntityStateClimbWaterfall;
         struct EntityStateClassicLand;
         struct EntityStateClassicDodge;
         struct EntityStateChargingJump;
@@ -1539,6 +1553,7 @@ namespace Ent
         struct ActionQuadStandUpState;
         struct ActionPushed;
         struct ActionPropelled;
+        struct ActionPlayAnim;
         struct ActionPatinate;
         struct ActionPathfindAndMove;
         struct ActionOutfitSpecialState;
@@ -1831,7 +1846,6 @@ namespace Ent
         struct AnimationModelComponentInput_ActionMode;
         struct AnimationModelComponentInput;
         struct AnimTags;
-        struct ActionPlayAnim;
         struct ActionEmote;
         struct ActionAimProjectile;
         struct ActionAttack_AttackOutputs;
@@ -1898,7 +1912,6 @@ namespace Ent
         struct NetRoot;
         struct OutfitFadeParameter;
         struct OwnershipModule;
-        struct PathPosition;
         struct PhysicsNetworker;
         struct PlayerManagerDebugger;
         struct PointCloud;
@@ -3406,26 +3419,10 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
-        struct RigidBodyUserDataDamage : HelperObject // Object
+        struct RigidBodyUserDataImpact : HelperObject // Object
         {
-            RigidBodyUserDataDamage(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "RigidBodyUserDataDamage";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::RigidBodyUserData Super() const;
-            Ent::Gen::String _comment() const;
-        };
-
-        struct RigidBodyUserDataBreak : HelperObject // Object
-        {
-            RigidBodyUserDataBreak(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "RigidBodyUserDataBreak";
+            RigidBodyUserDataImpact(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "RigidBodyUserDataImpact";
             static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
@@ -4010,6 +4007,10 @@ namespace Ent
             Ent::Gen::EntityStateClassicDodge setEntityStateClassicDodge() const;
             std::optional<Ent::Gen::EntityStateClassicLand> EntityStateClassicLand() const;
             Ent::Gen::EntityStateClassicLand setEntityStateClassicLand() const;
+            std::optional<Ent::Gen::EntityStateClimbWaterfall> EntityStateClimbWaterfall() const;
+            Ent::Gen::EntityStateClimbWaterfall setEntityStateClimbWaterfall() const;
+            std::optional<Ent::Gen::EntityStateClimbWaterfallImpulse> EntityStateClimbWaterfallImpulse() const;
+            Ent::Gen::EntityStateClimbWaterfallImpulse setEntityStateClimbWaterfallImpulse() const;
             std::optional<Ent::Gen::EntityStateCollectVertebrae> EntityStateCollectVertebrae() const;
             Ent::Gen::EntityStateCollectVertebrae setEntityStateCollectVertebrae() const;
             std::optional<Ent::Gen::EntityStateCombat> EntityStateCombat() const;
@@ -4092,6 +4093,8 @@ namespace Ent
             Ent::Gen::EntityStateLateralDodge setEntityStateLateralDodge() const;
             std::optional<Ent::Gen::EntityStateLateralLand> EntityStateLateralLand() const;
             Ent::Gen::EntityStateLateralLand setEntityStateLateralLand() const;
+            std::optional<Ent::Gen::EntityStateManageChildEntityPool> EntityStateManageChildEntityPool() const;
+            Ent::Gen::EntityStateManageChildEntityPool setEntityStateManageChildEntityPool() const;
             std::optional<Ent::Gen::EntityStateMask> EntityStateMask() const;
             Ent::Gen::EntityStateMask setEntityStateMask() const;
             std::optional<Ent::Gen::EntityStateMeditateToInteract> EntityStateMeditateToInteract() const;
@@ -4112,6 +4115,10 @@ namespace Ent
             Ent::Gen::EntityStateParry setEntityStateParry() const;
             std::optional<Ent::Gen::EntityStateParryCooldown> EntityStateParryCooldown() const;
             Ent::Gen::EntityStateParryCooldown setEntityStateParryCooldown() const;
+            std::optional<Ent::Gen::EntityStatePhysicsIdle> EntityStatePhysicsIdle() const;
+            Ent::Gen::EntityStatePhysicsIdle setEntityStatePhysicsIdle() const;
+            std::optional<Ent::Gen::EntityStatePhysicsMove> EntityStatePhysicsMove() const;
+            Ent::Gen::EntityStatePhysicsMove setEntityStatePhysicsMove() const;
             std::optional<Ent::Gen::EntityStatePickableDistributor> EntityStatePickableDistributor() const;
             Ent::Gen::EntityStatePickableDistributor setEntityStatePickableDistributor() const;
             std::optional<Ent::Gen::EntityStatePlayer> EntityStatePlayer() const;
@@ -4154,6 +4161,10 @@ namespace Ent
             Ent::Gen::EntityStateSpiritAttack setEntityStateSpiritAttack() const;
             std::optional<Ent::Gen::EntityStateSpiritAttacked> EntityStateSpiritAttacked() const;
             Ent::Gen::EntityStateSpiritAttacked setEntityStateSpiritAttacked() const;
+            std::optional<Ent::Gen::EntityStateStalactiteFallen> EntityStateStalactiteFallen() const;
+            Ent::Gen::EntityStateStalactiteFallen setEntityStateStalactiteFallen() const;
+            std::optional<Ent::Gen::EntityStateStalactiteReadyToFall> EntityStateStalactiteReadyToFall() const;
+            Ent::Gen::EntityStateStalactiteReadyToFall setEntityStateStalactiteReadyToFall() const;
             std::optional<Ent::Gen::EntityStateStickedLand> EntityStateStickedLand() const;
             Ent::Gen::EntityStateStickedLand setEntityStateStickedLand() const;
             std::optional<Ent::Gen::EntityStateStrafeDodge> EntityStateStrafeDodge() const;
@@ -4192,6 +4203,17 @@ namespace Ent
             Ent::Gen::EntityStateWallRunDrop setEntityStateWallRunDrop() const;
             std::optional<Ent::Gen::EntityStateWallRunJump> EntityStateWallRunJump() const;
             Ent::Gen::EntityStateWallRunJump setEntityStateWallRunJump() const;
+            std::optional<Ent::Gen::EntityStateWaterfallEndJump> EntityStateWaterfallEndJump() const;
+            Ent::Gen::EntityStateWaterfallEndJump setEntityStateWaterfallEndJump() const;
+        };
+
+        struct SpawnState : HelperObject // Object
+        {
+            SpawnState(Ent::Node* _node): HelperObject(_node) {}
+            
+            Ent::Gen::String _comment() const;
+            Ent::Gen::Bool engaged() const;
+            Ent::Gen::ResponsiblePointer_ActorState_ val() const;
         };
 
         struct RespawnState : HelperObject // Object
@@ -4230,6 +4252,7 @@ namespace Ent
                 "CrossFade",
                 "CrossMetamorphosis",
                 "SequentialMetamorphosis",
+                "InterruptibleSequentialMetamorphosis",
             };
         };
         inline char const* toString(RegenSwitchBehaviorEnum value)
@@ -4996,6 +5019,15 @@ namespace Ent
         }
 
 
+        struct constraintPlaneWorldPosition : HelperObject // Object
+        {
+            constraintPlaneWorldPosition(Ent::Node* _node): HelperObject(_node) {}
+            
+            Ent::Gen::String _comment() const;
+            Ent::Gen::Bool engaged() const;
+            Ent::Gen::Position val() const;
+        };
+
         struct ProjectileTrajectory : HelperObject // Object
         {
             ProjectileTrajectory(Ent::Node* _node): HelperObject(_node) {}
@@ -5067,7 +5099,7 @@ namespace Ent
                 "Body",
                 "Fluid",
                 "Hitable",
-                "Breakable",
+                "PhysicsGPE",
                 "None",
                 "All",
                 "PHYSICLAYER_COUNT",
@@ -5527,9 +5559,9 @@ namespace Ent
             Ent::Gen::Float val() const;
         };
 
-        struct MinDistanceToRespawnPosition : HelperObject // Object
+        struct MinRespawnDistance : HelperObject // Object
         {
-            MinDistanceToRespawnPosition(Ent::Node* _node): HelperObject(_node) {}
+            MinRespawnDistance(Ent::Node* _node): HelperObject(_node) {}
             
             Ent::Gen::String _comment() const;
             Ent::Gen::Bool engaged() const;
@@ -6144,6 +6176,7 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
+            Ent::Gen::Float GravityConstant() const;
             Array<Ent::Gen::PhysicsMaterial> MaterialBank() const;
             Ent::Gen::Manager Super() const;
             Ent::Gen::String _comment() const;
@@ -6871,6 +6904,15 @@ namespace Ent
             Ent::Gen::Float FrontAngle() const;
             Ent::Gen::Float RadiusCoeff() const;
             Ent::Gen::String _comment() const;
+        };
+
+        struct InertiaTensor : HelperObject // Object
+        {
+            InertiaTensor(Ent::Node* _node): HelperObject(_node) {}
+            
+            Ent::Gen::String _comment() const;
+            Ent::Gen::Bool engaged() const;
+            Ent::Gen::Vector3 val() const;
         };
 
         struct ImpactAndSolidityData : HelperObject // Object
@@ -8105,10 +8147,15 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::String _comment() const;
+            Ent::Gen::Bool canClimbWaterfall() const;
+            Ent::Gen::Float constrainedToPlaneForce() const;
+            Ent::Gen::Float delayBetweenImpulses() const;
             Ent::Gen::Float depth() const;
             Ent::Gen::Float depthHysteresisCoeff() const;
             Ent::Gen::ScaleConverter depthMaxRange() const;
             Ent::Gen::Float flotation() const;
+            Ent::Gen::Float immersionEndWaterfallJump() const;
+            Ent::Gen::Float impulseForce() const;
             Ent::Gen::Bool isAllowed() const;
             Ent::Gen::Float minTooDeepPushSpeed() const;
             Ent::Gen::Float reachSurfaceAccelerationCoeff() const;
@@ -8128,9 +8175,12 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::String _comment() const;
+            Ent::Gen::constraintPlaneWorldPosition constraintPlaneWorldPosition() const;
             Ent::Gen::Float depth() const;
             Ent::Gen::Float energy() const;
-            Ent::Gen::Vector2 flow() const;
+            Ent::Gen::Vector3 fluidCurrent() const;
+            Ent::Gen::Bool hasDepthImpactOnControl() const;
+            Ent::Gen::Bool isWaterfall() const;
             Ent::Gen::Float level() const;
             Ent::Gen::Vector3 normal() const;
             Ent::Gen::FluidType type() const;
@@ -8444,6 +8494,25 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
+        struct EntityStateManageChildEntityPool_Inputs : HelperObject // Object
+        {
+            EntityStateManageChildEntityPool_Inputs(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateManageChildEntityPool::Inputs";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float DistanceMaxFromSpawner() const;
+            Ent::Gen::EntityRef SpawnerEntityRef() const;
+            Ent::Gen::Float UnspawnDelay() const;
+            Ent::Gen::Float UnspawnRadius() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct EntityStateIncapacitated_Inputs : HelperObject // Object
         {
             EntityStateIncapacitated_Inputs(Ent::Node* _node): HelperObject(_node) {}
@@ -8712,8 +8781,10 @@ namespace Ent
             Ent::Gen::Float EvaporationDecreaseSpeed() const;
             Ent::Gen::Float EvaporationMaxValue() const;
             Ent::Gen::Float InjectedEvaporationMultiplier() const;
+            Ent::Gen::Int MaxDispatchedRegenQueries() const;
             Ent::Gen::Int MaxDynamicRegenEffectCount() const;
             Ent::Gen::Manager Super() const;
+            Ent::Gen::Bool UseNewRegenSystem() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -9293,10 +9364,10 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
-        struct PhysicsComponentInput : HelperObject // Object
+        struct RespawnabilityComponentInput : HelperObject // Object
         {
-            PhysicsComponentInput(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "PhysicsComponentInput";
+            RespawnabilityComponentInput(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "RespawnabilityComponentInput";
             static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
@@ -9309,10 +9380,10 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
-        struct PhysicsBreakerComponentInput : HelperObject // Object
+        struct PhysicsImpactMakerComponentInput : HelperObject // Object
         {
-            PhysicsBreakerComponentInput(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "PhysicsBreakerComponentInput";
+            PhysicsImpactMakerComponentInput(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "PhysicsImpactMakerComponentInput";
             static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
@@ -9322,6 +9393,22 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::ForceMultiplier ForceMultiplier() const;
+            Ent::Gen::ComponentInput Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct PhysicsComponentInput : HelperObject // Object
+        {
+            PhysicsComponentInput(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "PhysicsComponentInput";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
             Ent::Gen::ComponentInput Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -9765,8 +9852,8 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::EventCameraData EventCameraData() const;
-            Ent::Gen::String PlayAnimBeforeTrigger() const;
-            PrimArray<Ent::Gen::String> PlayAnimsWhenTriggered() const;
+            PrimArray<Ent::Gen::String> PlayAnimBeforeTrigger() const;
+            Array<PrimArray<Ent::Gen::String>> PlayAnimsWhenTriggered() const;
             Ent::Gen::Float Radius() const;
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::Bool UseDuration() const;
@@ -9813,6 +9900,24 @@ namespace Ent
             Ent::Gen::variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_ Union() const;
             Array<Ent::Gen::variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_> UnionArray() const;
             Array<Ent::Gen::UnionObjectArrayItem> UnionObjectArray() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct TestTagsList : HelperObject // Object
+        {
+            TestTagsList(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "TestTagsList";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float Radius() const;
+            Ent::Gen::ComponentGD Super() const;
+            Ent::Gen::TagsList Tags() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -10438,8 +10543,11 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
+            Ent::Gen::Bool CheckIsInCameraFrustum() const;
+            Ent::Gen::MinRespawnDistance MinRespawnDistance() const;
             Ent::Gen::RespawnState RespawnState() const;
             Ent::Gen::ComponentGD Super() const;
+            Ent::Gen::Bool TargetIsNotInCameraFrustum() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -10726,6 +10834,32 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
+        struct PhysicsImpactMakerGD : HelperObject // Object
+        {
+            PhysicsImpactMakerGD(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "PhysicsImpactMakerGD";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float AttackAngle() const;
+            Ent::Gen::Bool BreakEverything() const;
+            Ent::Gen::ScaleConverter DamageAndImpactBySpeed() const;
+            Ent::Gen::String DamageTag() const;
+            Ent::Gen::Float DirectionInfluence() const;
+            Ent::Gen::Float DirectionUpdateThreshold() const;
+            Ent::Gen::ScaleConverter ForceBySpeed() const;
+            Ent::Gen::String HitImpactTag() const;
+            Ent::Gen::Float Restitution() const;
+            Ent::Gen::Float SmoothedSpeedControlRate() const;
+            Ent::Gen::ComponentGD Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct PhysicsGD : HelperObject // Object
         {
             PhysicsGD(Ent::Node* _node): HelperObject(_node) {}
@@ -10749,8 +10883,11 @@ namespace Ent
             Ent::Gen::Float EnergyLoss() const;
             Ent::Gen::Float Friction() const;
             Ent::Gen::Bool HasGravity() const;
+            Ent::Gen::InertiaTensor InertiaTensor() const;
             Ent::Gen::Float LinearDamping() const;
             Ent::Gen::Float Mass() const;
+            Ent::Gen::Float MaxAngularVelocity() const;
+            Ent::Gen::Float MaxLinearVelocity() const;
             PrimArray<Ent::Gen::String> MeshColliders() const;
             Ent::Gen::String MeshEdges() const;
             Ent::Gen::String MotionType() const;
@@ -10790,25 +10927,6 @@ namespace Ent
             Ent::Gen::String _comment() const;
             Array<Ent::Gen::sPhysicsJointDesc> joints() const;
             Array<Ent::Gen::sRigidBodyDesc> rigidBodies() const;
-        };
-
-        struct PhysicsBreakerGD : HelperObject // Object
-        {
-            PhysicsBreakerGD(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "PhysicsBreakerGD";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::Bool BreakEverything() const;
-            Ent::Gen::ScaleConverter ForceBySpeed() const;
-            Ent::Gen::Float SmoothedSpeedControlRate() const;
-            Ent::Gen::ComponentGD Super() const;
-            Ent::Gen::String _comment() const;
         };
 
         struct PerceiverGD : HelperObject // Object
@@ -10857,24 +10975,6 @@ namespace Ent
             Ent::Gen::SoundEmissionStrength m_soundRun() const;
             Ent::Gen::SoundEmissionStrength m_soundWalk() const;
             PrimArray<Ent::Gen::String> m_tags() const;
-        };
-
-        struct PathNodeGD : HelperObject // Object
-        {
-            PathNodeGD(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "PathNodeGD";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::Float Radius() const;
-            Ent::Gen::ComponentGD Super() const;
-            Ent::Gen::TagsList Tags() const;
-            Ent::Gen::String _comment() const;
         };
 
         struct OutfitWearerGD : HelperObject // Object
@@ -11246,6 +11346,24 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
+        struct InterestPointGD : HelperObject // Object
+        {
+            InterestPointGD(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "InterestPointGD";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float Radius() const;
+            Ent::Gen::ComponentGD Super() const;
+            Ent::Gen::TagsList Tags() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct InfoboardRegistererGD : HelperObject // Object
         {
             InfoboardRegistererGD(Ent::Node* _node): HelperObject(_node) {}
@@ -11569,6 +11687,10 @@ namespace Ent
             }
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String _comment() const;
+            Ent::Gen::Float constrainedPlaneOffset() const;
+            Ent::Gen::Vector3 fluidCurrent() const;
+            Ent::Gen::Bool hasDepthLimit() const;
+            Ent::Gen::Bool isWaterfall() const;
             Ent::Gen::FluidType type() const;
             Ent::Gen::Bool useHalfShape() const;
         };
@@ -12013,7 +12135,10 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
+            Ent::Gen::Bool AddStateAtStart() const;
+            Ent::Gen::Bool AttachToParent() const;
             PrimArray<Ent::Gen::EntityRef> EntityRefs() const;
+            Ent::Gen::SpawnState SpawnState() const;
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -12408,6 +12533,8 @@ namespace Ent
             Ent::Gen::IncapacitateComponentGD setIncapacitateComponentGD() const;
             std::optional<Ent::Gen::InfoboardRegistererGD> InfoboardRegistererGD() const;
             Ent::Gen::InfoboardRegistererGD setInfoboardRegistererGD() const;
+            std::optional<Ent::Gen::InterestPointGD> InterestPointGD() const;
+            Ent::Gen::InterestPointGD setInterestPointGD() const;
             std::optional<Ent::Gen::InventoryGD> InventoryGD() const;
             Ent::Gen::InventoryGD setInventoryGD() const;
             std::optional<Ent::Gen::ItemHolderGD> ItemHolderGD() const;
@@ -12450,18 +12577,16 @@ namespace Ent
             Ent::Gen::OutfitGD setOutfitGD() const;
             std::optional<Ent::Gen::OutfitWearerGD> OutfitWearerGD() const;
             Ent::Gen::OutfitWearerGD setOutfitWearerGD() const;
-            std::optional<Ent::Gen::PathNodeGD> PathNodeGD() const;
-            Ent::Gen::PathNodeGD setPathNodeGD() const;
             std::optional<Ent::Gen::PerceivableGD> PerceivableGD() const;
             Ent::Gen::PerceivableGD setPerceivableGD() const;
             std::optional<Ent::Gen::PerceiverGD> PerceiverGD() const;
             Ent::Gen::PerceiverGD setPerceiverGD() const;
-            std::optional<Ent::Gen::PhysicsBreakerGD> PhysicsBreakerGD() const;
-            Ent::Gen::PhysicsBreakerGD setPhysicsBreakerGD() const;
             std::optional<Ent::Gen::PhysicsDataGD> PhysicsDataGD() const;
             Ent::Gen::PhysicsDataGD setPhysicsDataGD() const;
             std::optional<Ent::Gen::PhysicsGD> PhysicsGD() const;
             Ent::Gen::PhysicsGD setPhysicsGD() const;
+            std::optional<Ent::Gen::PhysicsImpactMakerGD> PhysicsImpactMakerGD() const;
+            Ent::Gen::PhysicsImpactMakerGD setPhysicsImpactMakerGD() const;
             std::optional<Ent::Gen::PhysicsMeshDeformerGD> PhysicsMeshDeformerGD() const;
             Ent::Gen::PhysicsMeshDeformerGD setPhysicsMeshDeformerGD() const;
             std::optional<Ent::Gen::PhysicsMeshProviderGD> PhysicsMeshProviderGD() const;
@@ -12560,6 +12685,8 @@ namespace Ent
             Ent::Gen::TestEntityRef setTestEntityRef() const;
             std::optional<Ent::Gen::TestSetOfObject> TestSetOfObject() const;
             Ent::Gen::TestSetOfObject setTestSetOfObject() const;
+            std::optional<Ent::Gen::TestTagsList> TestTagsList() const;
+            Ent::Gen::TestTagsList setTestTagsList() const;
             std::optional<Ent::Gen::TestUnion> TestUnion() const;
             Ent::Gen::TestUnion setTestUnion() const;
             std::optional<Ent::Gen::TransformGD> TransformGD() const;
@@ -12815,6 +12942,9 @@ namespace Ent
             std::optional<Ent::Gen::InfoboardRegistererGD> InfoboardRegistererGD() const;
             Ent::Gen::InfoboardRegistererGD addInfoboardRegistererGD() const;
             void removeInfoboardRegistererGD() const;
+            std::optional<Ent::Gen::InterestPointGD> InterestPointGD() const;
+            Ent::Gen::InterestPointGD addInterestPointGD() const;
+            void removeInterestPointGD() const;
             std::optional<Ent::Gen::InventoryGD> InventoryGD() const;
             Ent::Gen::InventoryGD addInventoryGD() const;
             void removeInventoryGD() const;
@@ -12878,24 +13008,21 @@ namespace Ent
             std::optional<Ent::Gen::OutfitWearerGD> OutfitWearerGD() const;
             Ent::Gen::OutfitWearerGD addOutfitWearerGD() const;
             void removeOutfitWearerGD() const;
-            std::optional<Ent::Gen::PathNodeGD> PathNodeGD() const;
-            Ent::Gen::PathNodeGD addPathNodeGD() const;
-            void removePathNodeGD() const;
             std::optional<Ent::Gen::PerceivableGD> PerceivableGD() const;
             Ent::Gen::PerceivableGD addPerceivableGD() const;
             void removePerceivableGD() const;
             std::optional<Ent::Gen::PerceiverGD> PerceiverGD() const;
             Ent::Gen::PerceiverGD addPerceiverGD() const;
             void removePerceiverGD() const;
-            std::optional<Ent::Gen::PhysicsBreakerGD> PhysicsBreakerGD() const;
-            Ent::Gen::PhysicsBreakerGD addPhysicsBreakerGD() const;
-            void removePhysicsBreakerGD() const;
             std::optional<Ent::Gen::PhysicsDataGD> PhysicsDataGD() const;
             Ent::Gen::PhysicsDataGD addPhysicsDataGD() const;
             void removePhysicsDataGD() const;
             std::optional<Ent::Gen::PhysicsGD> PhysicsGD() const;
             Ent::Gen::PhysicsGD addPhysicsGD() const;
             void removePhysicsGD() const;
+            std::optional<Ent::Gen::PhysicsImpactMakerGD> PhysicsImpactMakerGD() const;
+            Ent::Gen::PhysicsImpactMakerGD addPhysicsImpactMakerGD() const;
+            void removePhysicsImpactMakerGD() const;
             std::optional<Ent::Gen::PhysicsMeshDeformerGD> PhysicsMeshDeformerGD() const;
             Ent::Gen::PhysicsMeshDeformerGD addPhysicsMeshDeformerGD() const;
             void removePhysicsMeshDeformerGD() const;
@@ -13043,6 +13170,9 @@ namespace Ent
             std::optional<Ent::Gen::TestSetOfObject> TestSetOfObject() const;
             Ent::Gen::TestSetOfObject addTestSetOfObject() const;
             void removeTestSetOfObject() const;
+            std::optional<Ent::Gen::TestTagsList> TestTagsList() const;
+            Ent::Gen::TestTagsList addTestTagsList() const;
+            void removeTestTagsList() const;
             std::optional<Ent::Gen::TestUnion> TestUnion() const;
             Ent::Gen::TestUnion addTestUnion() const;
             void removeTestUnion() const;
@@ -13511,6 +13641,9 @@ namespace Ent
             std::optional<Ent::Gen::InfoboardRegistererGD> InfoboardRegistererGD() const;
             Ent::Gen::InfoboardRegistererGD addInfoboardRegistererGD() const;
             void removeInfoboardRegistererGD() const;
+            std::optional<Ent::Gen::InterestPointGD> InterestPointGD() const;
+            Ent::Gen::InterestPointGD addInterestPointGD() const;
+            void removeInterestPointGD() const;
             std::optional<Ent::Gen::InventoryGD> InventoryGD() const;
             Ent::Gen::InventoryGD addInventoryGD() const;
             void removeInventoryGD() const;
@@ -13574,24 +13707,21 @@ namespace Ent
             std::optional<Ent::Gen::OutfitWearerGD> OutfitWearerGD() const;
             Ent::Gen::OutfitWearerGD addOutfitWearerGD() const;
             void removeOutfitWearerGD() const;
-            std::optional<Ent::Gen::PathNodeGD> PathNodeGD() const;
-            Ent::Gen::PathNodeGD addPathNodeGD() const;
-            void removePathNodeGD() const;
             std::optional<Ent::Gen::PerceivableGD> PerceivableGD() const;
             Ent::Gen::PerceivableGD addPerceivableGD() const;
             void removePerceivableGD() const;
             std::optional<Ent::Gen::PerceiverGD> PerceiverGD() const;
             Ent::Gen::PerceiverGD addPerceiverGD() const;
             void removePerceiverGD() const;
-            std::optional<Ent::Gen::PhysicsBreakerGD> PhysicsBreakerGD() const;
-            Ent::Gen::PhysicsBreakerGD addPhysicsBreakerGD() const;
-            void removePhysicsBreakerGD() const;
             std::optional<Ent::Gen::PhysicsDataGD> PhysicsDataGD() const;
             Ent::Gen::PhysicsDataGD addPhysicsDataGD() const;
             void removePhysicsDataGD() const;
             std::optional<Ent::Gen::PhysicsGD> PhysicsGD() const;
             Ent::Gen::PhysicsGD addPhysicsGD() const;
             void removePhysicsGD() const;
+            std::optional<Ent::Gen::PhysicsImpactMakerGD> PhysicsImpactMakerGD() const;
+            Ent::Gen::PhysicsImpactMakerGD addPhysicsImpactMakerGD() const;
+            void removePhysicsImpactMakerGD() const;
             std::optional<Ent::Gen::PhysicsMeshDeformerGD> PhysicsMeshDeformerGD() const;
             Ent::Gen::PhysicsMeshDeformerGD addPhysicsMeshDeformerGD() const;
             void removePhysicsMeshDeformerGD() const;
@@ -13739,6 +13869,9 @@ namespace Ent
             std::optional<Ent::Gen::TestSetOfObject> TestSetOfObject() const;
             Ent::Gen::TestSetOfObject addTestSetOfObject() const;
             void removeTestSetOfObject() const;
+            std::optional<Ent::Gen::TestTagsList> TestTagsList() const;
+            Ent::Gen::TestTagsList addTestTagsList() const;
+            void removeTestTagsList() const;
             std::optional<Ent::Gen::TestUnion> TestUnion() const;
             Ent::Gen::TestUnion addTestUnion() const;
             void removeTestUnion() const;
@@ -13795,6 +13928,7 @@ namespace Ent
             }
             Ent::Gen::Color Color() const;
             Ent::Gen::Float Duration() const;
+            Ent::Gen::String Icon() const;
             Ent::Gen::Vector2 ScreenPosition() const;
             Ent::Gen::String Text() const;
             Ent::Gen::Float TextScale() const;
@@ -14537,6 +14671,7 @@ namespace Ent
             Ent::Gen::Bool AnyButtonInput() const;
             Ent::Gen::Bool AnyJoyInput() const;
             Ent::Gen::CineEventTest Super() const;
+            Ent::Gen::Bool TriangleButtonInput() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -14570,33 +14705,6 @@ namespace Ent
             }
             Ent::Gen::String GameStateName() const;
             Ent::Gen::CineEventTest Super() const;
-            Ent::Gen::String _comment() const;
-        };
-
-        struct CheckIsNotInCameraFrustrum : HelperObject // Object
-        {
-            CheckIsNotInCameraFrustrum(Ent::Node* _node): HelperObject(_node) {}
-            
-            Ent::Gen::String _comment() const;
-            Ent::Gen::Bool engaged() const;
-            Ent::Gen::Bool val() const;
-        };
-
-        struct RespawnabilityComponentInput : HelperObject // Object
-        {
-            RespawnabilityComponentInput(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "RespawnabilityComponentInput";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::CheckIsNotInCameraFrustrum CheckIsNotInCameraFrustrum() const;
-            Ent::Gen::MinDistanceToRespawnPosition MinDistanceToRespawnPosition() const;
-            Ent::Gen::ComponentInput Super() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -15532,6 +15640,22 @@ namespace Ent
             return static_cast<AttackTypeEnum>(details::indexInEnum(value, AttackType::enumToString));
         }
 
+        struct AttackPhysicsForceData : HelperObject // Object
+        {
+            AttackPhysicsForceData(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "AttackPhysicsForceData";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::String _comment() const;
+            Ent::Gen::Float amount() const;
+        };
+
         struct AttackImpactData : HelperObject // Object
         {
             AttackImpactData(Ent::Node* _node): HelperObject(_node) {}
@@ -15596,6 +15720,7 @@ namespace Ent
             Ent::Gen::Map<char const*, Ent::Gen::CameraShakeData> AttackCameraShakeData() const;
             Ent::Gen::Map<char const*, Ent::Gen::AttackDamageData> AttackDamageData() const;
             Ent::Gen::Map<char const*, Ent::Gen::AttackImpactData> AttackImpactData() const;
+            Ent::Gen::Map<char const*, Ent::Gen::AttackPhysicsForceData> AttackPhysicsForceData() const;
             Ent::Gen::ScaleConverter DashTargetImpulse() const;
             Ent::Gen::Float ShapeAfterGlowTime() const;
             Ent::Gen::Float ShapeAnticipationTime() const;
@@ -16383,6 +16508,7 @@ namespace Ent
                 "plunge",
                 "lateralplunge",
                 "aerialplunge",
+                "waterfall",
                 "AnimAdditionalTag_COUNT",
             };
         };
@@ -17100,6 +17226,12 @@ namespace Ent
             std::optional<Ent::Gen::EntityStateClassicLand> EntityStateClassicLand() const;
             Ent::Gen::EntityStateClassicLand addEntityStateClassicLand() const;
             void removeEntityStateClassicLand() const;
+            std::optional<Ent::Gen::EntityStateClimbWaterfall> EntityStateClimbWaterfall() const;
+            Ent::Gen::EntityStateClimbWaterfall addEntityStateClimbWaterfall() const;
+            void removeEntityStateClimbWaterfall() const;
+            std::optional<Ent::Gen::EntityStateClimbWaterfallImpulse> EntityStateClimbWaterfallImpulse() const;
+            Ent::Gen::EntityStateClimbWaterfallImpulse addEntityStateClimbWaterfallImpulse() const;
+            void removeEntityStateClimbWaterfallImpulse() const;
             std::optional<Ent::Gen::EntityStateCollectVertebrae> EntityStateCollectVertebrae() const;
             Ent::Gen::EntityStateCollectVertebrae addEntityStateCollectVertebrae() const;
             void removeEntityStateCollectVertebrae() const;
@@ -17223,6 +17355,9 @@ namespace Ent
             std::optional<Ent::Gen::EntityStateLateralLand> EntityStateLateralLand() const;
             Ent::Gen::EntityStateLateralLand addEntityStateLateralLand() const;
             void removeEntityStateLateralLand() const;
+            std::optional<Ent::Gen::EntityStateManageChildEntityPool> EntityStateManageChildEntityPool() const;
+            Ent::Gen::EntityStateManageChildEntityPool addEntityStateManageChildEntityPool() const;
+            void removeEntityStateManageChildEntityPool() const;
             std::optional<Ent::Gen::EntityStateMask> EntityStateMask() const;
             Ent::Gen::EntityStateMask addEntityStateMask() const;
             void removeEntityStateMask() const;
@@ -17253,6 +17388,12 @@ namespace Ent
             std::optional<Ent::Gen::EntityStateParryCooldown> EntityStateParryCooldown() const;
             Ent::Gen::EntityStateParryCooldown addEntityStateParryCooldown() const;
             void removeEntityStateParryCooldown() const;
+            std::optional<Ent::Gen::EntityStatePhysicsIdle> EntityStatePhysicsIdle() const;
+            Ent::Gen::EntityStatePhysicsIdle addEntityStatePhysicsIdle() const;
+            void removeEntityStatePhysicsIdle() const;
+            std::optional<Ent::Gen::EntityStatePhysicsMove> EntityStatePhysicsMove() const;
+            Ent::Gen::EntityStatePhysicsMove addEntityStatePhysicsMove() const;
+            void removeEntityStatePhysicsMove() const;
             std::optional<Ent::Gen::EntityStatePickableDistributor> EntityStatePickableDistributor() const;
             Ent::Gen::EntityStatePickableDistributor addEntityStatePickableDistributor() const;
             void removeEntityStatePickableDistributor() const;
@@ -17316,6 +17457,12 @@ namespace Ent
             std::optional<Ent::Gen::EntityStateSpiritAttacked> EntityStateSpiritAttacked() const;
             Ent::Gen::EntityStateSpiritAttacked addEntityStateSpiritAttacked() const;
             void removeEntityStateSpiritAttacked() const;
+            std::optional<Ent::Gen::EntityStateStalactiteFallen> EntityStateStalactiteFallen() const;
+            Ent::Gen::EntityStateStalactiteFallen addEntityStateStalactiteFallen() const;
+            void removeEntityStateStalactiteFallen() const;
+            std::optional<Ent::Gen::EntityStateStalactiteReadyToFall> EntityStateStalactiteReadyToFall() const;
+            Ent::Gen::EntityStateStalactiteReadyToFall addEntityStateStalactiteReadyToFall() const;
+            void removeEntityStateStalactiteReadyToFall() const;
             std::optional<Ent::Gen::EntityStateStickedLand> EntityStateStickedLand() const;
             Ent::Gen::EntityStateStickedLand addEntityStateStickedLand() const;
             void removeEntityStateStickedLand() const;
@@ -17373,6 +17520,9 @@ namespace Ent
             std::optional<Ent::Gen::EntityStateWallRunJump> EntityStateWallRunJump() const;
             Ent::Gen::EntityStateWallRunJump addEntityStateWallRunJump() const;
             void removeEntityStateWallRunJump() const;
+            std::optional<Ent::Gen::EntityStateWaterfallEndJump> EntityStateWaterfallEndJump() const;
+            Ent::Gen::EntityStateWaterfallEndJump addEntityStateWaterfallEndJump() const;
+            void removeEntityStateWaterfallEndJump() const;
         };
 
         struct Object : HelperObject // Object
@@ -17571,6 +17721,22 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
         
+        };
+
+        struct EntityStateWaterfallEndJump : HelperObject // Object
+        {
+            EntityStateWaterfallEndJump(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateWaterfallEndJump";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
         };
 
         struct EntityStateWallRunJump : HelperObject // Object
@@ -17866,6 +18032,38 @@ namespace Ent
         {
             EntityStateStickedLand(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "EntityStateStickedLand";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EntityStateStalactiteReadyToFall : HelperObject // Object
+        {
+            EntityStateStalactiteReadyToFall(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateStalactiteReadyToFall";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EntityStateStalactiteFallen : HelperObject // Object
+        {
+            EntityStateStalactiteFallen(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateStalactiteFallen";
             static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
@@ -18219,6 +18417,41 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
+        struct EntityStatePhysicsMove : HelperObject // Object
+        {
+            EntityStatePhysicsMove(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStatePhysicsMove";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float AngularVelocityMultiplier() const;
+            Ent::Gen::Float CustomGravity() const;
+            Ent::Gen::Float ForceMultiplier() const;
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EntityStatePhysicsIdle : HelperObject // Object
+        {
+            EntityStatePhysicsIdle(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStatePhysicsIdle";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct EntityStateParryCooldown : HelperObject // Object
         {
             EntityStateParryCooldown(Ent::Node* _node): HelperObject(_node) {}
@@ -18377,6 +18610,23 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::String MaskMeshPath() const;
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EntityStateManageChildEntityPool : HelperObject // Object
+        {
+            EntityStateManageChildEntityPool(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateManageChildEntityPool";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::EntityStateManageChildEntityPool_Inputs Inputs() const;
             Ent::Gen::ActorState Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -19045,6 +19295,38 @@ namespace Ent
             Ent::Gen::ActorState Super() const;
             Ent::Gen::String _comment() const;
             Ent::Gen::Float meditationDuration() const;
+        };
+
+        struct EntityStateClimbWaterfallImpulse : HelperObject // Object
+        {
+            EntityStateClimbWaterfallImpulse(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateClimbWaterfallImpulse";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EntityStateClimbWaterfall : HelperObject // Object
+        {
+            EntityStateClimbWaterfall(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateClimbWaterfall";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
         };
 
         struct EntityStateClassicLand : HelperObject // Object
@@ -21382,6 +21664,24 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
+        struct ActionPlayAnim : HelperObject // Object
+        {
+            ActionPlayAnim(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "ActionPlayAnim";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float MaxTime() const;
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+            Ent::Gen::Bool exitRequired() const;
+        };
+
         struct ActionPatinate : HelperObject // Object
         {
             ActionPatinate(Ent::Node* _node): HelperObject(_node) {}
@@ -21959,8 +22259,6 @@ namespace Ent
             Ent::Gen::ActorState Super() const;
             Ent::Gen::String _comment() const;
             Ent::Gen::LedgePositionInfo ledgePosInfo() const;
-            Ent::Gen::LocomotionMode locomotionMode() const;
-            Ent::Gen::Bool wasFalling() const;
         };
 
         struct ActionClamberRise : HelperObject // Object
@@ -23321,32 +23619,6 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
-        struct ActionPlayAnim : HelperObject // Object
-        {
-            ActionPlayAnim(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "ActionPlayAnim";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::ActionMode ActionMode() const;
-            Ent::Gen::AnimAdditionalTag AddTag() const;
-            Ent::Gen::AnimTag AnimTag() const;
-            Ent::Gen::AttitudeMode AttitudeMode() const;
-            Ent::Gen::CarryMode CarryMode() const;
-            Ent::Gen::LocomotionMode LocomotionMode() const;
-            Ent::Gen::Float MaxTime() const;
-            Ent::Gen::SpeedMode SpeedMode() const;
-            Ent::Gen::StyleMode StyleMode() const;
-            Ent::Gen::ActorState Super() const;
-            Ent::Gen::String _comment() const;
-            Ent::Gen::Bool exitRequired() const;
-        };
-
         struct ActionEmote : HelperObject // Object
         {
             ActionEmote(Ent::Node* _node): HelperObject(_node) {}
@@ -23701,24 +23973,6 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::Float FollowAccelerationCoeff() const;
-            Ent::Gen::Float FollowCanStopMaxStateDuration() const;
-            Ent::Gen::Float FollowCanStopMaxTimeInExpandedZone() const;
-            Ent::Gen::Float FollowDecelerationCoeff() const;
-            Ent::Gen::Float FollowDeltaAngleTarget() const;
-            Ent::Gen::Float FollowHotspotRadius() const;
-            Ent::Gen::Float FollowHotspotSpace() const;
-            Ent::Gen::Float FollowRandomSpeedZoneInBeginCoeffMax() const;
-            Ent::Gen::Float FollowRandomSpeedZoneInBeginCoeffMin() const;
-            Ent::Gen::Float FollowRandomSpeedZoneInEndCoeffMax() const;
-            Ent::Gen::Float FollowRandomSpeedZoneInEndCoeffMin() const;
-            Ent::Gen::Float FollowRandomSynchroDelayMax() const;
-            Ent::Gen::Float FollowRandomSynchroDelayMin() const;
-            Ent::Gen::Float FollowSpeedChangeThreshold() const;
-            Ent::Gen::Float FollowSpeedZoneInBegin() const;
-            Ent::Gen::Float FollowSpeedZoneInEnd() const;
-            Ent::Gen::Float FollowSpeedZoneOutEnd() const;
-            Ent::Gen::Float FollowTargetDistRadiusFactor() const;
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String _comment() const;
             Ent::Gen::Float attackCircleRadius() const;
@@ -24267,22 +24521,6 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
         
-        };
-
-        struct PathPosition : HelperObject // Object
-        {
-            PathPosition(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "PathPosition";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::Float Ratio() const;
-            Ent::Gen::String _comment() const;
         };
 
         struct PhysicsNetworker : HelperObject // Object
@@ -26182,21 +26420,12 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
-        // RigidBodyUserDataDamage
-        inline Ent::Gen::RigidBodyUserData RigidBodyUserDataDamage::Super() const
+        // RigidBodyUserDataImpact
+        inline Ent::Gen::RigidBodyUserData RigidBodyUserDataImpact::Super() const
         {
             return Ent::Gen::RigidBodyUserData(node->at("Super"));
         }
-        inline Ent::Gen::String RigidBodyUserDataDamage::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        // RigidBodyUserDataBreak
-        inline Ent::Gen::RigidBodyUserData RigidBodyUserDataBreak::Super() const
-        {
-            return Ent::Gen::RigidBodyUserData(node->at("Super"));
-        }
-        inline Ent::Gen::String RigidBodyUserDataBreak::_comment() const
+        inline Ent::Gen::String RigidBodyUserDataImpact::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -28048,6 +28277,22 @@ namespace Ent
         {
             return Ent::Gen::EntityStateClassicLand(node->setUnionType("EntityStateClassicLand"));
         }
+        inline std::optional<Ent::Gen::EntityStateClimbWaterfall> ResponsiblePointer_ActorState_::EntityStateClimbWaterfall() const
+        {
+            return strcmp(node->getUnionType(), "EntityStateClimbWaterfall") != 0? std::optional<Ent::Gen::EntityStateClimbWaterfall>{}: std::optional<Ent::Gen::EntityStateClimbWaterfall>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStateClimbWaterfall ResponsiblePointer_ActorState_::setEntityStateClimbWaterfall() const
+        {
+            return Ent::Gen::EntityStateClimbWaterfall(node->setUnionType("EntityStateClimbWaterfall"));
+        }
+        inline std::optional<Ent::Gen::EntityStateClimbWaterfallImpulse> ResponsiblePointer_ActorState_::EntityStateClimbWaterfallImpulse() const
+        {
+            return strcmp(node->getUnionType(), "EntityStateClimbWaterfallImpulse") != 0? std::optional<Ent::Gen::EntityStateClimbWaterfallImpulse>{}: std::optional<Ent::Gen::EntityStateClimbWaterfallImpulse>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStateClimbWaterfallImpulse ResponsiblePointer_ActorState_::setEntityStateClimbWaterfallImpulse() const
+        {
+            return Ent::Gen::EntityStateClimbWaterfallImpulse(node->setUnionType("EntityStateClimbWaterfallImpulse"));
+        }
         inline std::optional<Ent::Gen::EntityStateCollectVertebrae> ResponsiblePointer_ActorState_::EntityStateCollectVertebrae() const
         {
             return strcmp(node->getUnionType(), "EntityStateCollectVertebrae") != 0? std::optional<Ent::Gen::EntityStateCollectVertebrae>{}: std::optional<Ent::Gen::EntityStateCollectVertebrae>(node->getUnionData());
@@ -28376,6 +28621,14 @@ namespace Ent
         {
             return Ent::Gen::EntityStateLateralLand(node->setUnionType("EntityStateLateralLand"));
         }
+        inline std::optional<Ent::Gen::EntityStateManageChildEntityPool> ResponsiblePointer_ActorState_::EntityStateManageChildEntityPool() const
+        {
+            return strcmp(node->getUnionType(), "EntityStateManageChildEntityPool") != 0? std::optional<Ent::Gen::EntityStateManageChildEntityPool>{}: std::optional<Ent::Gen::EntityStateManageChildEntityPool>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStateManageChildEntityPool ResponsiblePointer_ActorState_::setEntityStateManageChildEntityPool() const
+        {
+            return Ent::Gen::EntityStateManageChildEntityPool(node->setUnionType("EntityStateManageChildEntityPool"));
+        }
         inline std::optional<Ent::Gen::EntityStateMask> ResponsiblePointer_ActorState_::EntityStateMask() const
         {
             return strcmp(node->getUnionType(), "EntityStateMask") != 0? std::optional<Ent::Gen::EntityStateMask>{}: std::optional<Ent::Gen::EntityStateMask>(node->getUnionData());
@@ -28455,6 +28708,22 @@ namespace Ent
         inline Ent::Gen::EntityStateParryCooldown ResponsiblePointer_ActorState_::setEntityStateParryCooldown() const
         {
             return Ent::Gen::EntityStateParryCooldown(node->setUnionType("EntityStateParryCooldown"));
+        }
+        inline std::optional<Ent::Gen::EntityStatePhysicsIdle> ResponsiblePointer_ActorState_::EntityStatePhysicsIdle() const
+        {
+            return strcmp(node->getUnionType(), "EntityStatePhysicsIdle") != 0? std::optional<Ent::Gen::EntityStatePhysicsIdle>{}: std::optional<Ent::Gen::EntityStatePhysicsIdle>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStatePhysicsIdle ResponsiblePointer_ActorState_::setEntityStatePhysicsIdle() const
+        {
+            return Ent::Gen::EntityStatePhysicsIdle(node->setUnionType("EntityStatePhysicsIdle"));
+        }
+        inline std::optional<Ent::Gen::EntityStatePhysicsMove> ResponsiblePointer_ActorState_::EntityStatePhysicsMove() const
+        {
+            return strcmp(node->getUnionType(), "EntityStatePhysicsMove") != 0? std::optional<Ent::Gen::EntityStatePhysicsMove>{}: std::optional<Ent::Gen::EntityStatePhysicsMove>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStatePhysicsMove ResponsiblePointer_ActorState_::setEntityStatePhysicsMove() const
+        {
+            return Ent::Gen::EntityStatePhysicsMove(node->setUnionType("EntityStatePhysicsMove"));
         }
         inline std::optional<Ent::Gen::EntityStatePickableDistributor> ResponsiblePointer_ActorState_::EntityStatePickableDistributor() const
         {
@@ -28624,6 +28893,22 @@ namespace Ent
         {
             return Ent::Gen::EntityStateSpiritAttacked(node->setUnionType("EntityStateSpiritAttacked"));
         }
+        inline std::optional<Ent::Gen::EntityStateStalactiteFallen> ResponsiblePointer_ActorState_::EntityStateStalactiteFallen() const
+        {
+            return strcmp(node->getUnionType(), "EntityStateStalactiteFallen") != 0? std::optional<Ent::Gen::EntityStateStalactiteFallen>{}: std::optional<Ent::Gen::EntityStateStalactiteFallen>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStateStalactiteFallen ResponsiblePointer_ActorState_::setEntityStateStalactiteFallen() const
+        {
+            return Ent::Gen::EntityStateStalactiteFallen(node->setUnionType("EntityStateStalactiteFallen"));
+        }
+        inline std::optional<Ent::Gen::EntityStateStalactiteReadyToFall> ResponsiblePointer_ActorState_::EntityStateStalactiteReadyToFall() const
+        {
+            return strcmp(node->getUnionType(), "EntityStateStalactiteReadyToFall") != 0? std::optional<Ent::Gen::EntityStateStalactiteReadyToFall>{}: std::optional<Ent::Gen::EntityStateStalactiteReadyToFall>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStateStalactiteReadyToFall ResponsiblePointer_ActorState_::setEntityStateStalactiteReadyToFall() const
+        {
+            return Ent::Gen::EntityStateStalactiteReadyToFall(node->setUnionType("EntityStateStalactiteReadyToFall"));
+        }
         inline std::optional<Ent::Gen::EntityStateStickedLand> ResponsiblePointer_ActorState_::EntityStateStickedLand() const
         {
             return strcmp(node->getUnionType(), "EntityStateStickedLand") != 0? std::optional<Ent::Gen::EntityStateStickedLand>{}: std::optional<Ent::Gen::EntityStateStickedLand>(node->getUnionData());
@@ -28775,6 +29060,27 @@ namespace Ent
         inline Ent::Gen::EntityStateWallRunJump ResponsiblePointer_ActorState_::setEntityStateWallRunJump() const
         {
             return Ent::Gen::EntityStateWallRunJump(node->setUnionType("EntityStateWallRunJump"));
+        }
+        inline std::optional<Ent::Gen::EntityStateWaterfallEndJump> ResponsiblePointer_ActorState_::EntityStateWaterfallEndJump() const
+        {
+            return strcmp(node->getUnionType(), "EntityStateWaterfallEndJump") != 0? std::optional<Ent::Gen::EntityStateWaterfallEndJump>{}: std::optional<Ent::Gen::EntityStateWaterfallEndJump>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStateWaterfallEndJump ResponsiblePointer_ActorState_::setEntityStateWaterfallEndJump() const
+        {
+            return Ent::Gen::EntityStateWaterfallEndJump(node->setUnionType("EntityStateWaterfallEndJump"));
+        }
+        // SpawnState
+        inline Ent::Gen::String SpawnState::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Ent::Gen::Bool SpawnState::engaged() const
+        {
+            return Ent::Gen::Bool(node->at("engaged"));
+        }
+        inline Ent::Gen::ResponsiblePointer_ActorState_ SpawnState::val() const
+        {
+            return Ent::Gen::ResponsiblePointer_ActorState_(node->at("val"));
         }
         // RespawnState
         inline Ent::Gen::String RespawnState::_comment() const
@@ -29589,6 +29895,19 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // constraintPlaneWorldPosition
+        inline Ent::Gen::String constraintPlaneWorldPosition::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Ent::Gen::Bool constraintPlaneWorldPosition::engaged() const
+        {
+            return Ent::Gen::Bool(node->at("engaged"));
+        }
+        inline Ent::Gen::Position constraintPlaneWorldPosition::val() const
+        {
+            return Ent::Gen::Position(node->at("val"));
+        }
         // ProjectileTrajectory
         inline Ent::Gen::String ProjectileTrajectory::_comment() const
         {
@@ -29923,16 +30242,16 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("val"));
         }
-        // MinDistanceToRespawnPosition
-        inline Ent::Gen::String MinDistanceToRespawnPosition::_comment() const
+        // MinRespawnDistance
+        inline Ent::Gen::String MinRespawnDistance::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
-        inline Ent::Gen::Bool MinDistanceToRespawnPosition::engaged() const
+        inline Ent::Gen::Bool MinRespawnDistance::engaged() const
         {
             return Ent::Gen::Bool(node->at("engaged"));
         }
-        inline Ent::Gen::Float MinDistanceToRespawnPosition::val() const
+        inline Ent::Gen::Float MinRespawnDistance::val() const
         {
             return Ent::Gen::Float(node->at("val"));
         }
@@ -30473,6 +30792,10 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // PhysicsEffectsManager
+        inline Ent::Gen::Float PhysicsEffectsManager::GravityConstant() const
+        {
+            return Ent::Gen::Float(node->at("GravityConstant"));
+        }
         inline Array<Ent::Gen::PhysicsMaterial> PhysicsEffectsManager::MaterialBank() const
         {
             return Array<Ent::Gen::PhysicsMaterial>(node->at("MaterialBank"));
@@ -31075,6 +31398,19 @@ namespace Ent
         inline Ent::Gen::String InputCollisionBehaviorData::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
+        }
+        // InertiaTensor
+        inline Ent::Gen::String InertiaTensor::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Ent::Gen::Bool InertiaTensor::engaged() const
+        {
+            return Ent::Gen::Bool(node->at("engaged"));
+        }
+        inline Ent::Gen::Vector3 InertiaTensor::val() const
+        {
+            return Ent::Gen::Vector3(node->at("val"));
         }
         // ImpactAndSolidityData
         inline Ent::Gen::String ImpactAndSolidityData::_comment() const
@@ -32228,6 +32564,18 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        inline Ent::Gen::Bool ImmersedBehaviorData::canClimbWaterfall() const
+        {
+            return Ent::Gen::Bool(node->at("canClimbWaterfall"));
+        }
+        inline Ent::Gen::Float ImmersedBehaviorData::constrainedToPlaneForce() const
+        {
+            return Ent::Gen::Float(node->at("constrainedToPlaneForce"));
+        }
+        inline Ent::Gen::Float ImmersedBehaviorData::delayBetweenImpulses() const
+        {
+            return Ent::Gen::Float(node->at("delayBetweenImpulses"));
+        }
         inline Ent::Gen::Float ImmersedBehaviorData::depth() const
         {
             return Ent::Gen::Float(node->at("depth"));
@@ -32243,6 +32591,14 @@ namespace Ent
         inline Ent::Gen::Float ImmersedBehaviorData::flotation() const
         {
             return Ent::Gen::Float(node->at("flotation"));
+        }
+        inline Ent::Gen::Float ImmersedBehaviorData::immersionEndWaterfallJump() const
+        {
+            return Ent::Gen::Float(node->at("immersionEndWaterfallJump"));
+        }
+        inline Ent::Gen::Float ImmersedBehaviorData::impulseForce() const
+        {
+            return Ent::Gen::Float(node->at("impulseForce"));
         }
         inline Ent::Gen::Bool ImmersedBehaviorData::isAllowed() const
         {
@@ -32265,6 +32621,10 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        inline Ent::Gen::constraintPlaneWorldPosition FluidData::constraintPlaneWorldPosition() const
+        {
+            return Ent::Gen::constraintPlaneWorldPosition(node->at("constraintPlaneWorldPosition"));
+        }
         inline Ent::Gen::Float FluidData::depth() const
         {
             return Ent::Gen::Float(node->at("depth"));
@@ -32273,9 +32633,17 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("energy"));
         }
-        inline Ent::Gen::Vector2 FluidData::flow() const
+        inline Ent::Gen::Vector3 FluidData::fluidCurrent() const
         {
-            return Ent::Gen::Vector2(node->at("flow"));
+            return Ent::Gen::Vector3(node->at("fluidCurrent"));
+        }
+        inline Ent::Gen::Bool FluidData::hasDepthImpactOnControl() const
+        {
+            return Ent::Gen::Bool(node->at("hasDepthImpactOnControl"));
+        }
+        inline Ent::Gen::Bool FluidData::isWaterfall() const
+        {
+            return Ent::Gen::Bool(node->at("isWaterfall"));
         }
         inline Ent::Gen::Float FluidData::level() const
         {
@@ -32705,6 +33073,27 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // EntityStateManageChildEntityPool_Inputs
+        inline Ent::Gen::Float EntityStateManageChildEntityPool_Inputs::DistanceMaxFromSpawner() const
+        {
+            return Ent::Gen::Float(node->at("DistanceMaxFromSpawner"));
+        }
+        inline Ent::Gen::EntityRef EntityStateManageChildEntityPool_Inputs::SpawnerEntityRef() const
+        {
+            return Ent::Gen::EntityRef(node->at("SpawnerEntityRef"));
+        }
+        inline Ent::Gen::Float EntityStateManageChildEntityPool_Inputs::UnspawnDelay() const
+        {
+            return Ent::Gen::Float(node->at("UnspawnDelay"));
+        }
+        inline Ent::Gen::Float EntityStateManageChildEntityPool_Inputs::UnspawnRadius() const
+        {
+            return Ent::Gen::Float(node->at("UnspawnRadius"));
+        }
+        inline Ent::Gen::String EntityStateManageChildEntityPool_Inputs::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // EntityStateIncapacitated_Inputs
         inline Ent::Gen::Float EntityStateIncapacitated_Inputs::Time() const
         {
@@ -32889,6 +33278,10 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("InjectedEvaporationMultiplier"));
         }
+        inline Ent::Gen::Int RegenerationManager::MaxDispatchedRegenQueries() const
+        {
+            return Ent::Gen::Int(node->at("MaxDispatchedRegenQueries"));
+        }
         inline Ent::Gen::Int RegenerationManager::MaxDynamicRegenEffectCount() const
         {
             return Ent::Gen::Int(node->at("MaxDynamicRegenEffectCount"));
@@ -32896,6 +33289,10 @@ namespace Ent
         inline Ent::Gen::Manager RegenerationManager::Super() const
         {
             return Ent::Gen::Manager(node->at("Super"));
+        }
+        inline Ent::Gen::Bool RegenerationManager::UseNewRegenSystem() const
+        {
+            return Ent::Gen::Bool(node->at("UseNewRegenSystem"));
         }
         inline Ent::Gen::String RegenerationManager::_comment() const
         {
@@ -33716,25 +34113,34 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // RespawnabilityComponentInput
+        inline Ent::Gen::ComponentInput RespawnabilityComponentInput::Super() const
+        {
+            return Ent::Gen::ComponentInput(node->at("Super"));
+        }
+        inline Ent::Gen::String RespawnabilityComponentInput::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // PhysicsImpactMakerComponentInput
+        inline Ent::Gen::ForceMultiplier PhysicsImpactMakerComponentInput::ForceMultiplier() const
+        {
+            return Ent::Gen::ForceMultiplier(node->at("ForceMultiplier"));
+        }
+        inline Ent::Gen::ComponentInput PhysicsImpactMakerComponentInput::Super() const
+        {
+            return Ent::Gen::ComponentInput(node->at("Super"));
+        }
+        inline Ent::Gen::String PhysicsImpactMakerComponentInput::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // PhysicsComponentInput
         inline Ent::Gen::ComponentInput PhysicsComponentInput::Super() const
         {
             return Ent::Gen::ComponentInput(node->at("Super"));
         }
         inline Ent::Gen::String PhysicsComponentInput::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        // PhysicsBreakerComponentInput
-        inline Ent::Gen::ForceMultiplier PhysicsBreakerComponentInput::ForceMultiplier() const
-        {
-            return Ent::Gen::ForceMultiplier(node->at("ForceMultiplier"));
-        }
-        inline Ent::Gen::ComponentInput PhysicsBreakerComponentInput::Super() const
-        {
-            return Ent::Gen::ComponentInput(node->at("Super"));
-        }
-        inline Ent::Gen::String PhysicsBreakerComponentInput::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -34178,13 +34584,13 @@ namespace Ent
         {
             return Ent::Gen::EventCameraData(node->at("EventCameraData"));
         }
-        inline Ent::Gen::String TriggerEventCameraGD::PlayAnimBeforeTrigger() const
+        inline PrimArray<Ent::Gen::String> TriggerEventCameraGD::PlayAnimBeforeTrigger() const
         {
-            return Ent::Gen::String(node->at("PlayAnimBeforeTrigger"));
+            return PrimArray<Ent::Gen::String>(node->at("PlayAnimBeforeTrigger"));
         }
-        inline PrimArray<Ent::Gen::String> TriggerEventCameraGD::PlayAnimsWhenTriggered() const
+        inline Array<PrimArray<Ent::Gen::String>> TriggerEventCameraGD::PlayAnimsWhenTriggered() const
         {
-            return PrimArray<Ent::Gen::String>(node->at("PlayAnimsWhenTriggered"));
+            return Array<PrimArray<Ent::Gen::String>>(node->at("PlayAnimsWhenTriggered"));
         }
         inline Ent::Gen::Float TriggerEventCameraGD::Radius() const
         {
@@ -34261,6 +34667,23 @@ namespace Ent
             return Array<Ent::Gen::UnionObjectArrayItem>(node->at("UnionObjectArray"));
         }
         inline Ent::Gen::String TestUnion::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // TestTagsList
+        inline Ent::Gen::Float TestTagsList::Radius() const
+        {
+            return Ent::Gen::Float(node->at("Radius"));
+        }
+        inline Ent::Gen::ComponentGD TestTagsList::Super() const
+        {
+            return Ent::Gen::ComponentGD(node->at("Super"));
+        }
+        inline Ent::Gen::TagsList TestTagsList::Tags() const
+        {
+            return Ent::Gen::TagsList(node->at("Tags"));
+        }
+        inline Ent::Gen::String TestTagsList::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -35110,6 +35533,14 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // RespawnabilityGD
+        inline Ent::Gen::Bool RespawnabilityGD::CheckIsInCameraFrustum() const
+        {
+            return Ent::Gen::Bool(node->at("CheckIsInCameraFrustum"));
+        }
+        inline Ent::Gen::MinRespawnDistance RespawnabilityGD::MinRespawnDistance() const
+        {
+            return Ent::Gen::MinRespawnDistance(node->at("MinRespawnDistance"));
+        }
         inline Ent::Gen::RespawnState RespawnabilityGD::RespawnState() const
         {
             return Ent::Gen::RespawnState(node->at("RespawnState"));
@@ -35117,6 +35548,10 @@ namespace Ent
         inline Ent::Gen::ComponentGD RespawnabilityGD::Super() const
         {
             return Ent::Gen::ComponentGD(node->at("Super"));
+        }
+        inline Ent::Gen::Bool RespawnabilityGD::TargetIsNotInCameraFrustum() const
+        {
+            return Ent::Gen::Bool(node->at("TargetIsNotInCameraFrustum"));
         }
         inline Ent::Gen::String RespawnabilityGD::_comment() const
         {
@@ -35374,6 +35809,55 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // PhysicsImpactMakerGD
+        inline Ent::Gen::Float PhysicsImpactMakerGD::AttackAngle() const
+        {
+            return Ent::Gen::Float(node->at("AttackAngle"));
+        }
+        inline Ent::Gen::Bool PhysicsImpactMakerGD::BreakEverything() const
+        {
+            return Ent::Gen::Bool(node->at("BreakEverything"));
+        }
+        inline Ent::Gen::ScaleConverter PhysicsImpactMakerGD::DamageAndImpactBySpeed() const
+        {
+            return Ent::Gen::ScaleConverter(node->at("DamageAndImpactBySpeed"));
+        }
+        inline Ent::Gen::String PhysicsImpactMakerGD::DamageTag() const
+        {
+            return Ent::Gen::String(node->at("DamageTag"));
+        }
+        inline Ent::Gen::Float PhysicsImpactMakerGD::DirectionInfluence() const
+        {
+            return Ent::Gen::Float(node->at("DirectionInfluence"));
+        }
+        inline Ent::Gen::Float PhysicsImpactMakerGD::DirectionUpdateThreshold() const
+        {
+            return Ent::Gen::Float(node->at("DirectionUpdateThreshold"));
+        }
+        inline Ent::Gen::ScaleConverter PhysicsImpactMakerGD::ForceBySpeed() const
+        {
+            return Ent::Gen::ScaleConverter(node->at("ForceBySpeed"));
+        }
+        inline Ent::Gen::String PhysicsImpactMakerGD::HitImpactTag() const
+        {
+            return Ent::Gen::String(node->at("HitImpactTag"));
+        }
+        inline Ent::Gen::Float PhysicsImpactMakerGD::Restitution() const
+        {
+            return Ent::Gen::Float(node->at("Restitution"));
+        }
+        inline Ent::Gen::Float PhysicsImpactMakerGD::SmoothedSpeedControlRate() const
+        {
+            return Ent::Gen::Float(node->at("SmoothedSpeedControlRate"));
+        }
+        inline Ent::Gen::ComponentGD PhysicsImpactMakerGD::Super() const
+        {
+            return Ent::Gen::ComponentGD(node->at("Super"));
+        }
+        inline Ent::Gen::String PhysicsImpactMakerGD::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // PhysicsGD
         inline Ent::Gen::Bool PhysicsGD::AffectByHit() const
         {
@@ -35419,6 +35903,10 @@ namespace Ent
         {
             return Ent::Gen::Bool(node->at("HasGravity"));
         }
+        inline Ent::Gen::InertiaTensor PhysicsGD::InertiaTensor() const
+        {
+            return Ent::Gen::InertiaTensor(node->at("InertiaTensor"));
+        }
         inline Ent::Gen::Float PhysicsGD::LinearDamping() const
         {
             return Ent::Gen::Float(node->at("LinearDamping"));
@@ -35426,6 +35914,14 @@ namespace Ent
         inline Ent::Gen::Float PhysicsGD::Mass() const
         {
             return Ent::Gen::Float(node->at("Mass"));
+        }
+        inline Ent::Gen::Float PhysicsGD::MaxAngularVelocity() const
+        {
+            return Ent::Gen::Float(node->at("MaxAngularVelocity"));
+        }
+        inline Ent::Gen::Float PhysicsGD::MaxLinearVelocity() const
+        {
+            return Ent::Gen::Float(node->at("MaxLinearVelocity"));
         }
         inline PrimArray<Ent::Gen::String> PhysicsGD::MeshColliders() const
         {
@@ -35528,27 +36024,6 @@ namespace Ent
         {
             return Array<Ent::Gen::sRigidBodyDesc>(node->at("rigidBodies"));
         }
-        // PhysicsBreakerGD
-        inline Ent::Gen::Bool PhysicsBreakerGD::BreakEverything() const
-        {
-            return Ent::Gen::Bool(node->at("BreakEverything"));
-        }
-        inline Ent::Gen::ScaleConverter PhysicsBreakerGD::ForceBySpeed() const
-        {
-            return Ent::Gen::ScaleConverter(node->at("ForceBySpeed"));
-        }
-        inline Ent::Gen::Float PhysicsBreakerGD::SmoothedSpeedControlRate() const
-        {
-            return Ent::Gen::Float(node->at("SmoothedSpeedControlRate"));
-        }
-        inline Ent::Gen::ComponentGD PhysicsBreakerGD::Super() const
-        {
-            return Ent::Gen::ComponentGD(node->at("Super"));
-        }
-        inline Ent::Gen::String PhysicsBreakerGD::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
         // PerceiverGD
         inline Ent::Gen::ComponentGD PerceiverGD::Super() const
         {
@@ -35630,23 +36105,6 @@ namespace Ent
         inline PrimArray<Ent::Gen::String> PerceivableGD::m_tags() const
         {
             return PrimArray<Ent::Gen::String>(node->at("m_tags"));
-        }
-        // PathNodeGD
-        inline Ent::Gen::Float PathNodeGD::Radius() const
-        {
-            return Ent::Gen::Float(node->at("Radius"));
-        }
-        inline Ent::Gen::ComponentGD PathNodeGD::Super() const
-        {
-            return Ent::Gen::ComponentGD(node->at("Super"));
-        }
-        inline Ent::Gen::TagsList PathNodeGD::Tags() const
-        {
-            return Ent::Gen::TagsList(node->at("Tags"));
-        }
-        inline Ent::Gen::String PathNodeGD::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
         }
         // OutfitWearerGD
         inline Ent::Gen::EntityRef OutfitWearerGD::InventoryEntityRef() const
@@ -36024,6 +36482,23 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // InterestPointGD
+        inline Ent::Gen::Float InterestPointGD::Radius() const
+        {
+            return Ent::Gen::Float(node->at("Radius"));
+        }
+        inline Ent::Gen::ComponentGD InterestPointGD::Super() const
+        {
+            return Ent::Gen::ComponentGD(node->at("Super"));
+        }
+        inline Ent::Gen::TagsList InterestPointGD::Tags() const
+        {
+            return Ent::Gen::TagsList(node->at("Tags"));
+        }
+        inline Ent::Gen::String InterestPointGD::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // InfoboardRegistererGD
         inline Ent::Gen::String InfoboardRegistererGD::InfoboardName() const
         {
@@ -36333,6 +36808,22 @@ namespace Ent
         inline Ent::Gen::String FluidGD::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Ent::Gen::Float FluidGD::constrainedPlaneOffset() const
+        {
+            return Ent::Gen::Float(node->at("constrainedPlaneOffset"));
+        }
+        inline Ent::Gen::Vector3 FluidGD::fluidCurrent() const
+        {
+            return Ent::Gen::Vector3(node->at("fluidCurrent"));
+        }
+        inline Ent::Gen::Bool FluidGD::hasDepthLimit() const
+        {
+            return Ent::Gen::Bool(node->at("hasDepthLimit"));
+        }
+        inline Ent::Gen::Bool FluidGD::isWaterfall() const
+        {
+            return Ent::Gen::Bool(node->at("isWaterfall"));
         }
         inline Ent::Gen::FluidType FluidGD::type() const
         {
@@ -36735,9 +37226,21 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // ChildEntityPoolComponentGD
+        inline Ent::Gen::Bool ChildEntityPoolComponentGD::AddStateAtStart() const
+        {
+            return Ent::Gen::Bool(node->at("AddStateAtStart"));
+        }
+        inline Ent::Gen::Bool ChildEntityPoolComponentGD::AttachToParent() const
+        {
+            return Ent::Gen::Bool(node->at("AttachToParent"));
+        }
         inline PrimArray<Ent::Gen::EntityRef> ChildEntityPoolComponentGD::EntityRefs() const
         {
             return PrimArray<Ent::Gen::EntityRef>(node->at("EntityRefs"));
+        }
+        inline Ent::Gen::SpawnState ChildEntityPoolComponentGD::SpawnState() const
+        {
+            return Ent::Gen::SpawnState(node->at("SpawnState"));
         }
         inline Ent::Gen::ComponentGD ChildEntityPoolComponentGD::Super() const
         {
@@ -37577,6 +38080,14 @@ namespace Ent
         {
             return Ent::Gen::InfoboardRegistererGD(node->setUnionType("InfoboardRegistererGD"));
         }
+        inline std::optional<Ent::Gen::InterestPointGD> Component::InterestPointGD() const
+        {
+            return strcmp(node->getUnionType(), "InterestPointGD") != 0? std::optional<Ent::Gen::InterestPointGD>{}: std::optional<Ent::Gen::InterestPointGD>(node->getUnionData());
+        }
+        inline Ent::Gen::InterestPointGD Component::setInterestPointGD() const
+        {
+            return Ent::Gen::InterestPointGD(node->setUnionType("InterestPointGD"));
+        }
         inline std::optional<Ent::Gen::InventoryGD> Component::InventoryGD() const
         {
             return strcmp(node->getUnionType(), "InventoryGD") != 0? std::optional<Ent::Gen::InventoryGD>{}: std::optional<Ent::Gen::InventoryGD>(node->getUnionData());
@@ -37745,14 +38256,6 @@ namespace Ent
         {
             return Ent::Gen::OutfitWearerGD(node->setUnionType("OutfitWearerGD"));
         }
-        inline std::optional<Ent::Gen::PathNodeGD> Component::PathNodeGD() const
-        {
-            return strcmp(node->getUnionType(), "PathNodeGD") != 0? std::optional<Ent::Gen::PathNodeGD>{}: std::optional<Ent::Gen::PathNodeGD>(node->getUnionData());
-        }
-        inline Ent::Gen::PathNodeGD Component::setPathNodeGD() const
-        {
-            return Ent::Gen::PathNodeGD(node->setUnionType("PathNodeGD"));
-        }
         inline std::optional<Ent::Gen::PerceivableGD> Component::PerceivableGD() const
         {
             return strcmp(node->getUnionType(), "PerceivableGD") != 0? std::optional<Ent::Gen::PerceivableGD>{}: std::optional<Ent::Gen::PerceivableGD>(node->getUnionData());
@@ -37769,14 +38272,6 @@ namespace Ent
         {
             return Ent::Gen::PerceiverGD(node->setUnionType("PerceiverGD"));
         }
-        inline std::optional<Ent::Gen::PhysicsBreakerGD> Component::PhysicsBreakerGD() const
-        {
-            return strcmp(node->getUnionType(), "PhysicsBreakerGD") != 0? std::optional<Ent::Gen::PhysicsBreakerGD>{}: std::optional<Ent::Gen::PhysicsBreakerGD>(node->getUnionData());
-        }
-        inline Ent::Gen::PhysicsBreakerGD Component::setPhysicsBreakerGD() const
-        {
-            return Ent::Gen::PhysicsBreakerGD(node->setUnionType("PhysicsBreakerGD"));
-        }
         inline std::optional<Ent::Gen::PhysicsDataGD> Component::PhysicsDataGD() const
         {
             return strcmp(node->getUnionType(), "PhysicsDataGD") != 0? std::optional<Ent::Gen::PhysicsDataGD>{}: std::optional<Ent::Gen::PhysicsDataGD>(node->getUnionData());
@@ -37792,6 +38287,14 @@ namespace Ent
         inline Ent::Gen::PhysicsGD Component::setPhysicsGD() const
         {
             return Ent::Gen::PhysicsGD(node->setUnionType("PhysicsGD"));
+        }
+        inline std::optional<Ent::Gen::PhysicsImpactMakerGD> Component::PhysicsImpactMakerGD() const
+        {
+            return strcmp(node->getUnionType(), "PhysicsImpactMakerGD") != 0? std::optional<Ent::Gen::PhysicsImpactMakerGD>{}: std::optional<Ent::Gen::PhysicsImpactMakerGD>(node->getUnionData());
+        }
+        inline Ent::Gen::PhysicsImpactMakerGD Component::setPhysicsImpactMakerGD() const
+        {
+            return Ent::Gen::PhysicsImpactMakerGD(node->setUnionType("PhysicsImpactMakerGD"));
         }
         inline std::optional<Ent::Gen::PhysicsMeshDeformerGD> Component::PhysicsMeshDeformerGD() const
         {
@@ -38184,6 +38687,14 @@ namespace Ent
         inline Ent::Gen::TestSetOfObject Component::setTestSetOfObject() const
         {
             return Ent::Gen::TestSetOfObject(node->setUnionType("TestSetOfObject"));
+        }
+        inline std::optional<Ent::Gen::TestTagsList> Component::TestTagsList() const
+        {
+            return strcmp(node->getUnionType(), "TestTagsList") != 0? std::optional<Ent::Gen::TestTagsList>{}: std::optional<Ent::Gen::TestTagsList>(node->getUnionData());
+        }
+        inline Ent::Gen::TestTagsList Component::setTestTagsList() const
+        {
+            return Ent::Gen::TestTagsList(node->setUnionType("TestTagsList"));
         }
         inline std::optional<Ent::Gen::TestUnion> Component::TestUnion() const
         {
@@ -39243,6 +39754,19 @@ namespace Ent
         {
             node->mapErase("InfoboardRegistererGD");
         }
+        inline std::optional<Ent::Gen::InterestPointGD> Object_Components::InterestPointGD() const
+        {
+            auto sub = getSubNode("InterestPointGD");
+            return sub == nullptr? std::optional<Ent::Gen::InterestPointGD>{}: std::optional<Ent::Gen::InterestPointGD>(getSubNode("InterestPointGD"));
+        }
+        inline Ent::Gen::InterestPointGD Object_Components::addInterestPointGD() const
+        {
+            return Ent::Gen::InterestPointGD(addSubNode("InterestPointGD"));
+        }
+        inline void Object_Components::removeInterestPointGD() const
+        {
+            node->mapErase("InterestPointGD");
+        }
         inline std::optional<Ent::Gen::InventoryGD> Object_Components::InventoryGD() const
         {
             auto sub = getSubNode("InventoryGD");
@@ -39516,19 +40040,6 @@ namespace Ent
         {
             node->mapErase("OutfitWearerGD");
         }
-        inline std::optional<Ent::Gen::PathNodeGD> Object_Components::PathNodeGD() const
-        {
-            auto sub = getSubNode("PathNodeGD");
-            return sub == nullptr? std::optional<Ent::Gen::PathNodeGD>{}: std::optional<Ent::Gen::PathNodeGD>(getSubNode("PathNodeGD"));
-        }
-        inline Ent::Gen::PathNodeGD Object_Components::addPathNodeGD() const
-        {
-            return Ent::Gen::PathNodeGD(addSubNode("PathNodeGD"));
-        }
-        inline void Object_Components::removePathNodeGD() const
-        {
-            node->mapErase("PathNodeGD");
-        }
         inline std::optional<Ent::Gen::PerceivableGD> Object_Components::PerceivableGD() const
         {
             auto sub = getSubNode("PerceivableGD");
@@ -39555,19 +40066,6 @@ namespace Ent
         {
             node->mapErase("PerceiverGD");
         }
-        inline std::optional<Ent::Gen::PhysicsBreakerGD> Object_Components::PhysicsBreakerGD() const
-        {
-            auto sub = getSubNode("PhysicsBreakerGD");
-            return sub == nullptr? std::optional<Ent::Gen::PhysicsBreakerGD>{}: std::optional<Ent::Gen::PhysicsBreakerGD>(getSubNode("PhysicsBreakerGD"));
-        }
-        inline Ent::Gen::PhysicsBreakerGD Object_Components::addPhysicsBreakerGD() const
-        {
-            return Ent::Gen::PhysicsBreakerGD(addSubNode("PhysicsBreakerGD"));
-        }
-        inline void Object_Components::removePhysicsBreakerGD() const
-        {
-            node->mapErase("PhysicsBreakerGD");
-        }
         inline std::optional<Ent::Gen::PhysicsDataGD> Object_Components::PhysicsDataGD() const
         {
             auto sub = getSubNode("PhysicsDataGD");
@@ -39593,6 +40091,19 @@ namespace Ent
         inline void Object_Components::removePhysicsGD() const
         {
             node->mapErase("PhysicsGD");
+        }
+        inline std::optional<Ent::Gen::PhysicsImpactMakerGD> Object_Components::PhysicsImpactMakerGD() const
+        {
+            auto sub = getSubNode("PhysicsImpactMakerGD");
+            return sub == nullptr? std::optional<Ent::Gen::PhysicsImpactMakerGD>{}: std::optional<Ent::Gen::PhysicsImpactMakerGD>(getSubNode("PhysicsImpactMakerGD"));
+        }
+        inline Ent::Gen::PhysicsImpactMakerGD Object_Components::addPhysicsImpactMakerGD() const
+        {
+            return Ent::Gen::PhysicsImpactMakerGD(addSubNode("PhysicsImpactMakerGD"));
+        }
+        inline void Object_Components::removePhysicsImpactMakerGD() const
+        {
+            node->mapErase("PhysicsImpactMakerGD");
         }
         inline std::optional<Ent::Gen::PhysicsMeshDeformerGD> Object_Components::PhysicsMeshDeformerGD() const
         {
@@ -40230,6 +40741,19 @@ namespace Ent
         inline void Object_Components::removeTestSetOfObject() const
         {
             node->mapErase("TestSetOfObject");
+        }
+        inline std::optional<Ent::Gen::TestTagsList> Object_Components::TestTagsList() const
+        {
+            auto sub = getSubNode("TestTagsList");
+            return sub == nullptr? std::optional<Ent::Gen::TestTagsList>{}: std::optional<Ent::Gen::TestTagsList>(getSubNode("TestTagsList"));
+        }
+        inline Ent::Gen::TestTagsList Object_Components::addTestTagsList() const
+        {
+            return Ent::Gen::TestTagsList(addSubNode("TestTagsList"));
+        }
+        inline void Object_Components::removeTestTagsList() const
+        {
+            node->mapErase("TestTagsList");
         }
         inline std::optional<Ent::Gen::TestUnion> Object_Components::TestUnion() const
         {
@@ -41604,6 +42128,19 @@ namespace Ent
         {
             node->mapErase("InfoboardRegistererGD");
         }
+        inline std::optional<Ent::Gen::InterestPointGD> Components::InterestPointGD() const
+        {
+            auto sub = getSubNode("InterestPointGD");
+            return sub == nullptr? std::optional<Ent::Gen::InterestPointGD>{}: std::optional<Ent::Gen::InterestPointGD>(getSubNode("InterestPointGD"));
+        }
+        inline Ent::Gen::InterestPointGD Components::addInterestPointGD() const
+        {
+            return Ent::Gen::InterestPointGD(addSubNode("InterestPointGD"));
+        }
+        inline void Components::removeInterestPointGD() const
+        {
+            node->mapErase("InterestPointGD");
+        }
         inline std::optional<Ent::Gen::InventoryGD> Components::InventoryGD() const
         {
             auto sub = getSubNode("InventoryGD");
@@ -41877,19 +42414,6 @@ namespace Ent
         {
             node->mapErase("OutfitWearerGD");
         }
-        inline std::optional<Ent::Gen::PathNodeGD> Components::PathNodeGD() const
-        {
-            auto sub = getSubNode("PathNodeGD");
-            return sub == nullptr? std::optional<Ent::Gen::PathNodeGD>{}: std::optional<Ent::Gen::PathNodeGD>(getSubNode("PathNodeGD"));
-        }
-        inline Ent::Gen::PathNodeGD Components::addPathNodeGD() const
-        {
-            return Ent::Gen::PathNodeGD(addSubNode("PathNodeGD"));
-        }
-        inline void Components::removePathNodeGD() const
-        {
-            node->mapErase("PathNodeGD");
-        }
         inline std::optional<Ent::Gen::PerceivableGD> Components::PerceivableGD() const
         {
             auto sub = getSubNode("PerceivableGD");
@@ -41916,19 +42440,6 @@ namespace Ent
         {
             node->mapErase("PerceiverGD");
         }
-        inline std::optional<Ent::Gen::PhysicsBreakerGD> Components::PhysicsBreakerGD() const
-        {
-            auto sub = getSubNode("PhysicsBreakerGD");
-            return sub == nullptr? std::optional<Ent::Gen::PhysicsBreakerGD>{}: std::optional<Ent::Gen::PhysicsBreakerGD>(getSubNode("PhysicsBreakerGD"));
-        }
-        inline Ent::Gen::PhysicsBreakerGD Components::addPhysicsBreakerGD() const
-        {
-            return Ent::Gen::PhysicsBreakerGD(addSubNode("PhysicsBreakerGD"));
-        }
-        inline void Components::removePhysicsBreakerGD() const
-        {
-            node->mapErase("PhysicsBreakerGD");
-        }
         inline std::optional<Ent::Gen::PhysicsDataGD> Components::PhysicsDataGD() const
         {
             auto sub = getSubNode("PhysicsDataGD");
@@ -41954,6 +42465,19 @@ namespace Ent
         inline void Components::removePhysicsGD() const
         {
             node->mapErase("PhysicsGD");
+        }
+        inline std::optional<Ent::Gen::PhysicsImpactMakerGD> Components::PhysicsImpactMakerGD() const
+        {
+            auto sub = getSubNode("PhysicsImpactMakerGD");
+            return sub == nullptr? std::optional<Ent::Gen::PhysicsImpactMakerGD>{}: std::optional<Ent::Gen::PhysicsImpactMakerGD>(getSubNode("PhysicsImpactMakerGD"));
+        }
+        inline Ent::Gen::PhysicsImpactMakerGD Components::addPhysicsImpactMakerGD() const
+        {
+            return Ent::Gen::PhysicsImpactMakerGD(addSubNode("PhysicsImpactMakerGD"));
+        }
+        inline void Components::removePhysicsImpactMakerGD() const
+        {
+            node->mapErase("PhysicsImpactMakerGD");
         }
         inline std::optional<Ent::Gen::PhysicsMeshDeformerGD> Components::PhysicsMeshDeformerGD() const
         {
@@ -42592,6 +43116,19 @@ namespace Ent
         {
             node->mapErase("TestSetOfObject");
         }
+        inline std::optional<Ent::Gen::TestTagsList> Components::TestTagsList() const
+        {
+            auto sub = getSubNode("TestTagsList");
+            return sub == nullptr? std::optional<Ent::Gen::TestTagsList>{}: std::optional<Ent::Gen::TestTagsList>(getSubNode("TestTagsList"));
+        }
+        inline Ent::Gen::TestTagsList Components::addTestTagsList() const
+        {
+            return Ent::Gen::TestTagsList(addSubNode("TestTagsList"));
+        }
+        inline void Components::removeTestTagsList() const
+        {
+            node->mapErase("TestTagsList");
+        }
         inline std::optional<Ent::Gen::TestUnion> Components::TestUnion() const
         {
             auto sub = getSubNode("TestUnion");
@@ -42769,6 +43306,10 @@ namespace Ent
         inline Ent::Gen::Float UIMessage::Duration() const
         {
             return Ent::Gen::Float(node->at("Duration"));
+        }
+        inline Ent::Gen::String UIMessage::Icon() const
+        {
+            return Ent::Gen::String(node->at("Icon"));
         }
         inline Ent::Gen::Vector2 UIMessage::ScreenPosition() const
         {
@@ -44039,6 +44580,10 @@ namespace Ent
         {
             return Ent::Gen::CineEventTest(node->at("Super"));
         }
+        inline Ent::Gen::Bool CineEventTestInput::TriangleButtonInput() const
+        {
+            return Ent::Gen::Bool(node->at("TriangleButtonInput"));
+        }
         inline Ent::Gen::String CineEventTestInput::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
@@ -44062,36 +44607,6 @@ namespace Ent
             return Ent::Gen::CineEventTest(node->at("Super"));
         }
         inline Ent::Gen::String CineEventTestCurrentGameState::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        // CheckIsNotInCameraFrustrum
-        inline Ent::Gen::String CheckIsNotInCameraFrustrum::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        inline Ent::Gen::Bool CheckIsNotInCameraFrustrum::engaged() const
-        {
-            return Ent::Gen::Bool(node->at("engaged"));
-        }
-        inline Ent::Gen::Bool CheckIsNotInCameraFrustrum::val() const
-        {
-            return Ent::Gen::Bool(node->at("val"));
-        }
-        // RespawnabilityComponentInput
-        inline Ent::Gen::CheckIsNotInCameraFrustrum RespawnabilityComponentInput::CheckIsNotInCameraFrustrum() const
-        {
-            return Ent::Gen::CheckIsNotInCameraFrustrum(node->at("CheckIsNotInCameraFrustrum"));
-        }
-        inline Ent::Gen::MinDistanceToRespawnPosition RespawnabilityComponentInput::MinDistanceToRespawnPosition() const
-        {
-            return Ent::Gen::MinDistanceToRespawnPosition(node->at("MinDistanceToRespawnPosition"));
-        }
-        inline Ent::Gen::ComponentInput RespawnabilityComponentInput::Super() const
-        {
-            return Ent::Gen::ComponentInput(node->at("Super"));
-        }
-        inline Ent::Gen::String RespawnabilityComponentInput::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -44993,6 +45508,15 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // AttackPhysicsForceData
+        inline Ent::Gen::String AttackPhysicsForceData::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Ent::Gen::Float AttackPhysicsForceData::amount() const
+        {
+            return Ent::Gen::Float(node->at("amount"));
+        }
         // AttackImpactData
         inline Ent::Gen::String AttackImpactData::_comment() const
         {
@@ -45036,6 +45560,10 @@ namespace Ent
         inline Ent::Gen::Map<char const*, Ent::Gen::AttackImpactData> GameAttackData::AttackImpactData() const
         {
             return Ent::Gen::Map<char const*, Ent::Gen::AttackImpactData>(node->at("AttackImpactData"));
+        }
+        inline Ent::Gen::Map<char const*, Ent::Gen::AttackPhysicsForceData> GameAttackData::AttackPhysicsForceData() const
+        {
+            return Ent::Gen::Map<char const*, Ent::Gen::AttackPhysicsForceData>(node->at("AttackPhysicsForceData"));
         }
         inline Ent::Gen::ScaleConverter GameAttackData::DashTargetImpulse() const
         {
@@ -48877,6 +49405,32 @@ namespace Ent
         {
             node->mapErase("EntityStateClassicLand");
         }
+        inline std::optional<Ent::Gen::EntityStateClimbWaterfall> ActorStates::EntityStateClimbWaterfall() const
+        {
+            auto sub = getSubNode("EntityStateClimbWaterfall");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStateClimbWaterfall>{}: std::optional<Ent::Gen::EntityStateClimbWaterfall>(getSubNode("EntityStateClimbWaterfall"));
+        }
+        inline Ent::Gen::EntityStateClimbWaterfall ActorStates::addEntityStateClimbWaterfall() const
+        {
+            return Ent::Gen::EntityStateClimbWaterfall(addSubNode("EntityStateClimbWaterfall"));
+        }
+        inline void ActorStates::removeEntityStateClimbWaterfall() const
+        {
+            node->mapErase("EntityStateClimbWaterfall");
+        }
+        inline std::optional<Ent::Gen::EntityStateClimbWaterfallImpulse> ActorStates::EntityStateClimbWaterfallImpulse() const
+        {
+            auto sub = getSubNode("EntityStateClimbWaterfallImpulse");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStateClimbWaterfallImpulse>{}: std::optional<Ent::Gen::EntityStateClimbWaterfallImpulse>(getSubNode("EntityStateClimbWaterfallImpulse"));
+        }
+        inline Ent::Gen::EntityStateClimbWaterfallImpulse ActorStates::addEntityStateClimbWaterfallImpulse() const
+        {
+            return Ent::Gen::EntityStateClimbWaterfallImpulse(addSubNode("EntityStateClimbWaterfallImpulse"));
+        }
+        inline void ActorStates::removeEntityStateClimbWaterfallImpulse() const
+        {
+            node->mapErase("EntityStateClimbWaterfallImpulse");
+        }
         inline std::optional<Ent::Gen::EntityStateCollectVertebrae> ActorStates::EntityStateCollectVertebrae() const
         {
             auto sub = getSubNode("EntityStateCollectVertebrae");
@@ -49410,6 +49964,19 @@ namespace Ent
         {
             node->mapErase("EntityStateLateralLand");
         }
+        inline std::optional<Ent::Gen::EntityStateManageChildEntityPool> ActorStates::EntityStateManageChildEntityPool() const
+        {
+            auto sub = getSubNode("EntityStateManageChildEntityPool");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStateManageChildEntityPool>{}: std::optional<Ent::Gen::EntityStateManageChildEntityPool>(getSubNode("EntityStateManageChildEntityPool"));
+        }
+        inline Ent::Gen::EntityStateManageChildEntityPool ActorStates::addEntityStateManageChildEntityPool() const
+        {
+            return Ent::Gen::EntityStateManageChildEntityPool(addSubNode("EntityStateManageChildEntityPool"));
+        }
+        inline void ActorStates::removeEntityStateManageChildEntityPool() const
+        {
+            node->mapErase("EntityStateManageChildEntityPool");
+        }
         inline std::optional<Ent::Gen::EntityStateMask> ActorStates::EntityStateMask() const
         {
             auto sub = getSubNode("EntityStateMask");
@@ -49539,6 +50106,32 @@ namespace Ent
         inline void ActorStates::removeEntityStateParryCooldown() const
         {
             node->mapErase("EntityStateParryCooldown");
+        }
+        inline std::optional<Ent::Gen::EntityStatePhysicsIdle> ActorStates::EntityStatePhysicsIdle() const
+        {
+            auto sub = getSubNode("EntityStatePhysicsIdle");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStatePhysicsIdle>{}: std::optional<Ent::Gen::EntityStatePhysicsIdle>(getSubNode("EntityStatePhysicsIdle"));
+        }
+        inline Ent::Gen::EntityStatePhysicsIdle ActorStates::addEntityStatePhysicsIdle() const
+        {
+            return Ent::Gen::EntityStatePhysicsIdle(addSubNode("EntityStatePhysicsIdle"));
+        }
+        inline void ActorStates::removeEntityStatePhysicsIdle() const
+        {
+            node->mapErase("EntityStatePhysicsIdle");
+        }
+        inline std::optional<Ent::Gen::EntityStatePhysicsMove> ActorStates::EntityStatePhysicsMove() const
+        {
+            auto sub = getSubNode("EntityStatePhysicsMove");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStatePhysicsMove>{}: std::optional<Ent::Gen::EntityStatePhysicsMove>(getSubNode("EntityStatePhysicsMove"));
+        }
+        inline Ent::Gen::EntityStatePhysicsMove ActorStates::addEntityStatePhysicsMove() const
+        {
+            return Ent::Gen::EntityStatePhysicsMove(addSubNode("EntityStatePhysicsMove"));
+        }
+        inline void ActorStates::removeEntityStatePhysicsMove() const
+        {
+            node->mapErase("EntityStatePhysicsMove");
         }
         inline std::optional<Ent::Gen::EntityStatePickableDistributor> ActorStates::EntityStatePickableDistributor() const
         {
@@ -49813,6 +50406,32 @@ namespace Ent
         {
             node->mapErase("EntityStateSpiritAttacked");
         }
+        inline std::optional<Ent::Gen::EntityStateStalactiteFallen> ActorStates::EntityStateStalactiteFallen() const
+        {
+            auto sub = getSubNode("EntityStateStalactiteFallen");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStateStalactiteFallen>{}: std::optional<Ent::Gen::EntityStateStalactiteFallen>(getSubNode("EntityStateStalactiteFallen"));
+        }
+        inline Ent::Gen::EntityStateStalactiteFallen ActorStates::addEntityStateStalactiteFallen() const
+        {
+            return Ent::Gen::EntityStateStalactiteFallen(addSubNode("EntityStateStalactiteFallen"));
+        }
+        inline void ActorStates::removeEntityStateStalactiteFallen() const
+        {
+            node->mapErase("EntityStateStalactiteFallen");
+        }
+        inline std::optional<Ent::Gen::EntityStateStalactiteReadyToFall> ActorStates::EntityStateStalactiteReadyToFall() const
+        {
+            auto sub = getSubNode("EntityStateStalactiteReadyToFall");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStateStalactiteReadyToFall>{}: std::optional<Ent::Gen::EntityStateStalactiteReadyToFall>(getSubNode("EntityStateStalactiteReadyToFall"));
+        }
+        inline Ent::Gen::EntityStateStalactiteReadyToFall ActorStates::addEntityStateStalactiteReadyToFall() const
+        {
+            return Ent::Gen::EntityStateStalactiteReadyToFall(addSubNode("EntityStateStalactiteReadyToFall"));
+        }
+        inline void ActorStates::removeEntityStateStalactiteReadyToFall() const
+        {
+            node->mapErase("EntityStateStalactiteReadyToFall");
+        }
         inline std::optional<Ent::Gen::EntityStateStickedLand> ActorStates::EntityStateStickedLand() const
         {
             auto sub = getSubNode("EntityStateStickedLand");
@@ -50060,6 +50679,19 @@ namespace Ent
         {
             node->mapErase("EntityStateWallRunJump");
         }
+        inline std::optional<Ent::Gen::EntityStateWaterfallEndJump> ActorStates::EntityStateWaterfallEndJump() const
+        {
+            auto sub = getSubNode("EntityStateWaterfallEndJump");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStateWaterfallEndJump>{}: std::optional<Ent::Gen::EntityStateWaterfallEndJump>(getSubNode("EntityStateWaterfallEndJump"));
+        }
+        inline Ent::Gen::EntityStateWaterfallEndJump ActorStates::addEntityStateWaterfallEndJump() const
+        {
+            return Ent::Gen::EntityStateWaterfallEndJump(addSubNode("EntityStateWaterfallEndJump"));
+        }
+        inline void ActorStates::removeEntityStateWaterfallEndJump() const
+        {
+            node->mapErase("EntityStateWaterfallEndJump");
+        }
         // Object
         inline Ent::Gen::ActorStates Object::ActorStates() const
         {
@@ -50245,6 +50877,15 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // ActorState
+        // EntityStateWaterfallEndJump
+        inline Ent::Gen::ActorState EntityStateWaterfallEndJump::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateWaterfallEndJump::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // EntityStateWallRunJump
         inline Ent::Gen::ActorState EntityStateWallRunJump::Super() const
         {
@@ -50417,6 +51058,24 @@ namespace Ent
             return Ent::Gen::ActorState(node->at("Super"));
         }
         inline Ent::Gen::String EntityStateStickedLand::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EntityStateStalactiteReadyToFall
+        inline Ent::Gen::ActorState EntityStateStalactiteReadyToFall::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateStalactiteReadyToFall::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EntityStateStalactiteFallen
+        inline Ent::Gen::ActorState EntityStateStalactiteFallen::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateStalactiteFallen::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -50629,6 +51288,36 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // EntityStatePhysicsMove
+        inline Ent::Gen::Float EntityStatePhysicsMove::AngularVelocityMultiplier() const
+        {
+            return Ent::Gen::Float(node->at("AngularVelocityMultiplier"));
+        }
+        inline Ent::Gen::Float EntityStatePhysicsMove::CustomGravity() const
+        {
+            return Ent::Gen::Float(node->at("CustomGravity"));
+        }
+        inline Ent::Gen::Float EntityStatePhysicsMove::ForceMultiplier() const
+        {
+            return Ent::Gen::Float(node->at("ForceMultiplier"));
+        }
+        inline Ent::Gen::ActorState EntityStatePhysicsMove::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStatePhysicsMove::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EntityStatePhysicsIdle
+        inline Ent::Gen::ActorState EntityStatePhysicsIdle::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStatePhysicsIdle::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // EntityStateParryCooldown
         inline Ent::Gen::ActorState EntityStateParryCooldown::Super() const
         {
@@ -50724,6 +51413,19 @@ namespace Ent
             return Ent::Gen::ActorState(node->at("Super"));
         }
         inline Ent::Gen::String EntityStateMask::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EntityStateManageChildEntityPool
+        inline Ent::Gen::EntityStateManageChildEntityPool_Inputs EntityStateManageChildEntityPool::Inputs() const
+        {
+            return Ent::Gen::EntityStateManageChildEntityPool_Inputs(node->at("Inputs"));
+        }
+        inline Ent::Gen::ActorState EntityStateManageChildEntityPool::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateManageChildEntityPool::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -51135,6 +51837,24 @@ namespace Ent
         inline Ent::Gen::Float EntityStateCollectVertebrae::meditationDuration() const
         {
             return Ent::Gen::Float(node->at("meditationDuration"));
+        }
+        // EntityStateClimbWaterfallImpulse
+        inline Ent::Gen::ActorState EntityStateClimbWaterfallImpulse::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateClimbWaterfallImpulse::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EntityStateClimbWaterfall
+        inline Ent::Gen::ActorState EntityStateClimbWaterfall::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateClimbWaterfall::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
         }
         // EntityStateClassicLand
         inline Ent::Gen::ActorState EntityStateClassicLand::Super() const
@@ -52611,6 +53331,23 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // ActionPlayAnim
+        inline Ent::Gen::Float ActionPlayAnim::MaxTime() const
+        {
+            return Ent::Gen::Float(node->at("MaxTime"));
+        }
+        inline Ent::Gen::ActorState ActionPlayAnim::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String ActionPlayAnim::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Ent::Gen::Bool ActionPlayAnim::exitRequired() const
+        {
+            return Ent::Gen::Bool(node->at("exitRequired"));
+        }
         // ActionPatinate
         inline Ent::Gen::ActorState ActionPatinate::Super() const
         {
@@ -53001,14 +53738,6 @@ namespace Ent
         inline Ent::Gen::LedgePositionInfo ActionClimbEdge::ledgePosInfo() const
         {
             return Ent::Gen::LedgePositionInfo(node->at("ledgePosInfo"));
-        }
-        inline Ent::Gen::LocomotionMode ActionClimbEdge::locomotionMode() const
-        {
-            return Ent::Gen::LocomotionMode(node->at("locomotionMode"));
-        }
-        inline Ent::Gen::Bool ActionClimbEdge::wasFalling() const
-        {
-            return Ent::Gen::Bool(node->at("wasFalling"));
         }
         // ActionClamberRise
         inline Ent::Gen::ActorState ActionClamberRise::Super() const
@@ -54484,55 +55213,6 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
-        // ActionPlayAnim
-        inline Ent::Gen::ActionMode ActionPlayAnim::ActionMode() const
-        {
-            return Ent::Gen::ActionMode(node->at("ActionMode"));
-        }
-        inline Ent::Gen::AnimAdditionalTag ActionPlayAnim::AddTag() const
-        {
-            return Ent::Gen::AnimAdditionalTag(node->at("AddTag"));
-        }
-        inline Ent::Gen::AnimTag ActionPlayAnim::AnimTag() const
-        {
-            return Ent::Gen::AnimTag(node->at("AnimTag"));
-        }
-        inline Ent::Gen::AttitudeMode ActionPlayAnim::AttitudeMode() const
-        {
-            return Ent::Gen::AttitudeMode(node->at("AttitudeMode"));
-        }
-        inline Ent::Gen::CarryMode ActionPlayAnim::CarryMode() const
-        {
-            return Ent::Gen::CarryMode(node->at("CarryMode"));
-        }
-        inline Ent::Gen::LocomotionMode ActionPlayAnim::LocomotionMode() const
-        {
-            return Ent::Gen::LocomotionMode(node->at("LocomotionMode"));
-        }
-        inline Ent::Gen::Float ActionPlayAnim::MaxTime() const
-        {
-            return Ent::Gen::Float(node->at("MaxTime"));
-        }
-        inline Ent::Gen::SpeedMode ActionPlayAnim::SpeedMode() const
-        {
-            return Ent::Gen::SpeedMode(node->at("SpeedMode"));
-        }
-        inline Ent::Gen::StyleMode ActionPlayAnim::StyleMode() const
-        {
-            return Ent::Gen::StyleMode(node->at("StyleMode"));
-        }
-        inline Ent::Gen::ActorState ActionPlayAnim::Super() const
-        {
-            return Ent::Gen::ActorState(node->at("Super"));
-        }
-        inline Ent::Gen::String ActionPlayAnim::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        inline Ent::Gen::Bool ActionPlayAnim::exitRequired() const
-        {
-            return Ent::Gen::Bool(node->at("exitRequired"));
-        }
         // ActionEmote
         inline Ent::Gen::ActionMode ActionEmote::AnimAction() const
         {
@@ -55022,78 +55702,6 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // AIContextGD
-        inline Ent::Gen::Float AIContextGD::FollowAccelerationCoeff() const
-        {
-            return Ent::Gen::Float(node->at("FollowAccelerationCoeff"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowCanStopMaxStateDuration() const
-        {
-            return Ent::Gen::Float(node->at("FollowCanStopMaxStateDuration"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowCanStopMaxTimeInExpandedZone() const
-        {
-            return Ent::Gen::Float(node->at("FollowCanStopMaxTimeInExpandedZone"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowDecelerationCoeff() const
-        {
-            return Ent::Gen::Float(node->at("FollowDecelerationCoeff"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowDeltaAngleTarget() const
-        {
-            return Ent::Gen::Float(node->at("FollowDeltaAngleTarget"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowHotspotRadius() const
-        {
-            return Ent::Gen::Float(node->at("FollowHotspotRadius"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowHotspotSpace() const
-        {
-            return Ent::Gen::Float(node->at("FollowHotspotSpace"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowRandomSpeedZoneInBeginCoeffMax() const
-        {
-            return Ent::Gen::Float(node->at("FollowRandomSpeedZoneInBeginCoeffMax"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowRandomSpeedZoneInBeginCoeffMin() const
-        {
-            return Ent::Gen::Float(node->at("FollowRandomSpeedZoneInBeginCoeffMin"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowRandomSpeedZoneInEndCoeffMax() const
-        {
-            return Ent::Gen::Float(node->at("FollowRandomSpeedZoneInEndCoeffMax"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowRandomSpeedZoneInEndCoeffMin() const
-        {
-            return Ent::Gen::Float(node->at("FollowRandomSpeedZoneInEndCoeffMin"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowRandomSynchroDelayMax() const
-        {
-            return Ent::Gen::Float(node->at("FollowRandomSynchroDelayMax"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowRandomSynchroDelayMin() const
-        {
-            return Ent::Gen::Float(node->at("FollowRandomSynchroDelayMin"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowSpeedChangeThreshold() const
-        {
-            return Ent::Gen::Float(node->at("FollowSpeedChangeThreshold"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowSpeedZoneInBegin() const
-        {
-            return Ent::Gen::Float(node->at("FollowSpeedZoneInBegin"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowSpeedZoneInEnd() const
-        {
-            return Ent::Gen::Float(node->at("FollowSpeedZoneInEnd"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowSpeedZoneOutEnd() const
-        {
-            return Ent::Gen::Float(node->at("FollowSpeedZoneOutEnd"));
-        }
-        inline Ent::Gen::Float AIContextGD::FollowTargetDistRadiusFactor() const
-        {
-            return Ent::Gen::Float(node->at("FollowTargetDistRadiusFactor"));
-        }
         inline Ent::Gen::ComponentGD AIContextGD::Super() const
         {
             return Ent::Gen::ComponentGD(node->at("Super"));
@@ -55458,15 +56066,6 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // OwnershipModule
-        // PathPosition
-        inline Ent::Gen::Float PathPosition::Ratio() const
-        {
-            return Ent::Gen::Float(node->at("Ratio"));
-        }
-        inline Ent::Gen::String PathPosition::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
         // PhysicsNetworker
         // PlayerManagerDebugger
         inline Ent::Gen::String PlayerManagerDebugger::SaveServerURL() const

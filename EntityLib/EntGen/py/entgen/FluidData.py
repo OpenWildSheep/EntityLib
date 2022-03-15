@@ -6,9 +6,10 @@ import EntityLibPy
 
 from entgen.FluidType import *
 from entgen.String import *
+from entgen.Bool import *
 from entgen.Float import *
-from entgen.Vector2 import *
 from entgen.Vector3 import *
+from entgen.constraintPlaneWorldPosition import *
 
 from EntityLibPy import Node
 
@@ -28,6 +29,9 @@ class FluidData(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
+    def constraintPlaneWorldPosition(self):  # type: ()->constraintPlaneWorldPosition
+        return constraintPlaneWorldPosition(self._node.at("constraintPlaneWorldPosition"))
+    @property
     def depth(self):  # type: ()->Float
         return Float(self._node.at("depth"))
     @depth.setter
@@ -38,10 +42,20 @@ class FluidData(HelperObject):
     @energy.setter
     def energy(self, val): self.energy.set(val)
     @property
-    def flow(self):  # type: ()->Vector2
-        return Vector2(self._node.at("flow"))
-    @flow.setter
-    def flow(self, val): self.flow.set(val)
+    def fluidCurrent(self):  # type: ()->Vector3
+        return Vector3(self._node.at("fluidCurrent"))
+    @fluidCurrent.setter
+    def fluidCurrent(self, val): self.fluidCurrent.set(val)
+    @property
+    def hasDepthImpactOnControl(self):  # type: ()->Bool
+        return Bool(self._node.at("hasDepthImpactOnControl"))
+    @hasDepthImpactOnControl.setter
+    def hasDepthImpactOnControl(self, val): self.hasDepthImpactOnControl.set(val)
+    @property
+    def isWaterfall(self):  # type: ()->Bool
+        return Bool(self._node.at("isWaterfall"))
+    @isWaterfall.setter
+    def isWaterfall(self, val): self.isWaterfall.set(val)
     @property
     def level(self):  # type: ()->Float
         return Float(self._node.at("level"))

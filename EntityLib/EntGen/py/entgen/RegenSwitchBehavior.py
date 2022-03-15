@@ -10,6 +10,7 @@ class RegenSwitchBehaviorEnum(Enum):
     CrossFade = "CrossFade"
     CrossMetamorphosis = "CrossMetamorphosis"
     SequentialMetamorphosis = "SequentialMetamorphosis"
+    InterruptibleSequentialMetamorphosis = "InterruptibleSequentialMetamorphosis"
 
 
 class RegenSwitchBehavior(Primitive[RegenSwitchBehaviorEnum]):  # Enum

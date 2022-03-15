@@ -4,10 +4,8 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.LocomotionMode import *
 from entgen.String import *
 from entgen.ActorState import *
-from entgen.Bool import *
 from entgen.LedgePositionInfo import *
 
 from EntityLibPy import Node
@@ -33,16 +31,6 @@ class ActionClimbEdge(HelperObject):
     @property
     def ledgePosInfo(self):  # type: ()->LedgePositionInfo
         return LedgePositionInfo(self._node.at("ledgePosInfo"))
-    @property
-    def locomotionMode(self):  # type: ()->LocomotionMode
-        return LocomotionMode(self._node.at("locomotionMode"))
-    @locomotionMode.setter
-    def locomotionMode(self, val): self.locomotionMode.set(val)
-    @property
-    def wasFalling(self):  # type: ()->Bool
-        return Bool(self._node.at("wasFalling"))
-    @wasFalling.setter
-    def wasFalling(self, val): self.wasFalling.set(val)
     pass
 
 

@@ -34,6 +34,11 @@ class CineEventTestInput(HelperObject):
     def Super(self):  # type: ()->CineEventTest
         return CineEventTest(self._node.at("Super"))
     @property
+    def TriangleButtonInput(self):  # type: ()->Bool
+        return Bool(self._node.at("TriangleButtonInput"))
+    @TriangleButtonInput.setter
+    def TriangleButtonInput(self, val): self.TriangleButtonInput.set(val)
+    @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
     @_comment.setter

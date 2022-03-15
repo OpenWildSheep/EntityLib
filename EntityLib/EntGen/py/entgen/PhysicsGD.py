@@ -9,6 +9,7 @@ from entgen.String import *
 from entgen.Bool import *
 from entgen.ComponentGD import *
 from entgen.Float import *
+from entgen.InertiaTensor import *
 from entgen.Vector3 import *
 from entgen.PhysicsLayer import *
 from entgen.Size import *
@@ -82,6 +83,9 @@ class PhysicsGD(HelperObject):
     @HasGravity.setter
     def HasGravity(self, val): self.HasGravity.set(val)
     @property
+    def InertiaTensor(self):  # type: ()->InertiaTensor
+        return InertiaTensor(self._node.at("InertiaTensor"))
+    @property
     def LinearDamping(self):  # type: ()->Float
         return Float(self._node.at("LinearDamping"))
     @LinearDamping.setter
@@ -91,6 +95,16 @@ class PhysicsGD(HelperObject):
         return Float(self._node.at("Mass"))
     @Mass.setter
     def Mass(self, val): self.Mass.set(val)
+    @property
+    def MaxAngularVelocity(self):  # type: ()->Float
+        return Float(self._node.at("MaxAngularVelocity"))
+    @MaxAngularVelocity.setter
+    def MaxAngularVelocity(self, val): self.MaxAngularVelocity.set(val)
+    @property
+    def MaxLinearVelocity(self):  # type: ()->Float
+        return Float(self._node.at("MaxLinearVelocity"))
+    @MaxLinearVelocity.setter
+    def MaxLinearVelocity(self, val): self.MaxLinearVelocity.set(val)
     @property
     def MeshColliders(self):  # type: ()->PrimArray[String]
         return (lambda n: PrimArray(String, n))(self._node.at("MeshColliders"))

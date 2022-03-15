@@ -14,6 +14,7 @@ else:
 sys.path.append(entitylib_path)
 
 import EntityLibPy as Ent
+from entgen.inline import *
 
 
 def displaySubSchema(name: str, subschema: Ent.Subschema, indent: str):
@@ -66,24 +67,65 @@ try:
     entlib.validation_enabled = True
 
     ####################################################################################################################
+    # Test Property
+    expl = Ent.Property(entlib, entlib.get_schema(Entity.schema_name), "instance.entity")
+    assert(expl.get_object_field("Name").value == "PlayerSpawner_")
+    assert(expl
+           .get_object_field("Components")
+           .get_unionset_item("NetworkNode")
+           .get_object_field("Type")
+           .value == "Spawner")
+    posX = expl\
+        .get_object_field("Components")\
+        .get_unionset_item("TransformGD")\
+        .get_object_field("Position")\
+        .get_array_item(0)
+    print(posX.value)
+    assert(posX.value == 105.2244)
+    floatA = expl\
+        .get_object_field("Components")\
+        .get_unionset_item("TransformGD")\
+        .get_object_field("Position")\
+        .get_array_item(0)\
+        .get_float()
+    floatB = expl\
+        .get_object_field("Components")\
+        .get_unionset_item("TransformGD")\
+        .get_object_field("Position")\
+        .get_array_item(0)\
+        .get_float()
+    assert(floatA == 105.2244);
+    assert(floatB == 105.2244);
+
+    assert(expl
+           .get_object_field("Components")
+           .get_unionset_item("SubScene")
+           .get_object_field("Embedded")
+           .get_objectset_item("EP1-Spout_LINK_001")
+           .get_object_field("Name")
+           .value
+           == "EP1-Spout_LINK_001")
+
+    ####################################################################################################################
     # Test $ref links in entlib.schema.schema.allDefinitions
-    colorRef = "./RuntimeComponents.json#/definitions/Color"
+    colorRef = "Color"
     assert colorRef in entlib.schema.schema.definitions
 
     # Check Ent.Subschema.getUnionTypesMap
-    cinematicGDRef = "./RuntimeComponents.json#/definitions/CinematicGD"
+    cinematicGDRef = "CinematicGD"
     cinematicGDSchema = entlib.schema.schema.definitions[cinematicGDRef]
     scriptEventUnionSchema = cinematicGDSchema.properties["ScriptEvents"].get().get_singular_items().get()
     nameToTypeMap = scriptEventUnionSchema.get_union_types_dict()
-    assert len(nameToTypeMap) == 12
-    assert "CineEventTest" in nameToTypeMap
+    assert len(nameToTypeMap) == 9
+    assert "CineEventTestCurrentGameState" in nameToTypeMap
     assert "CineEventTriggerEventHandlerPost" in nameToTypeMap
     assert "CineEventTestEndCurrentSequence" in nameToTypeMap
 
     # Ensure that all components have a ref and is in entlib.schema.schema.allDefinitions
     for name, schema in entlib.schema.components.items():
         absRef = schema.name
-        assert absRef.find("./") == 0
+        assert absRef.find("./") == -1
+        assert absRef.find("#") == -1
         assert absRef in entlib.schema.schema.definitions
 
     ####################################################################################################################
@@ -100,16 +142,10 @@ try:
         assert actorState.get_schema().get_union_data_field() == "classData"
         climbEdge = actorState.get_union_data()
         assert(climbEdge != None)
-        exitRequired = climbEdge.at("locomotionMode")
-        assert(exitRequired != None)
-        assert(exitRequired.get_string() == "crouch")
         actorState2 = actorStates.at(1)
         assert(actorState2 != None)
         cinematic = actorState2.get_union_data()
         assert(cinematic != None)
-        type = cinematic.at("Type")
-        assert(type != None)
-        assert(type.get_int() == -1)
 
         # Map and Set overridePolicy
         pathNodeGD = ent.at("Components").map_get("PathNodeGD").get_union_data()
@@ -131,9 +167,9 @@ try:
 
         # Test default value
         voxelSimulationGD = ent.at("Components").map_get("VoxelSimulationGD").get_union_data()
-        assert(voxelSimulationGD.at("TransmissionBySecond").value == 100.)
+        assert(voxelSimulationGD.at("TransmissionBySecond").value == 3.402823466385289e+38)
         assert(voxelSimulationGD.at("TransmissionBySecond").is_default())
-        assert(voxelSimulationGD.get_type_name() == "./RuntimeComponents.json#/definitions/VoxelSimulationGD")
+        assert(voxelSimulationGD.get_type_name() == "VoxelSimulationGD")
 
         # TEST read inherited values in inherited component
         heightObj = ent.at("Components").map_get("HeightObj").get_union_data()
@@ -188,7 +224,7 @@ try:
         oneOfScripts = scriptEvents.at(0)  # type: Ent.Node
         assert(oneOfScripts.datatype == Ent.DataType.union)
         cineEvent = oneOfScripts.get_union_data()  # type: Ent.Node
-        assert(cineEvent.get_type_name() == "./RuntimeComponents.json#/definitions/CineEventTriggerEventHandlerPost")
+        assert(cineEvent.get_type_name() == "CineEventTriggerEventHandlerPost")
 
         nbEnt = cineEvent.at("EventName")  # type: Ent.Node
         assert(nbEnt is not None)
@@ -248,10 +284,10 @@ try:
     assert(oneOfScripts3.get_union_type() == "CineEventTriggerEventHandlerPost")
     oneOfScripts3.set_union_type("CineEventTestCurrentGameState")
 
-    # Push in an array of Union Ent.Node
+    # Push in an array of Union
     oneOfScripts4 = scriptEvents.push()
     assert(oneOfScripts4.datatype == Ent.DataType.union)
-    assert(oneOfScripts4.get_union_type() == "CineEvent")
+    assert(oneOfScripts4.get_union_type() == "CineEventTestCurrentGameState")
     assert(scriptEvents.at(3) == oneOfScripts4)
 
     # TEST simple entity ref creation
@@ -267,7 +303,7 @@ try:
     testEntityRef.at("TestRef").value = ref
 
     # TEST MaxActivationLevel
-    ent.at("MaxActivationLevel").value = Ent.ActivationLevel.InWorld.name
+    ent.at("MaxActivationLevel").value = "InWorld"
 
     sysCreat = ent.at("Components").map_get("SystemicCreature").get_union_data()
     sysCreat.at("Name").value = "Shamane_male"
@@ -386,23 +422,14 @@ try:
         assert(actorState is not None)
         climbEdge = actorState.get_union_data()
         assert(climbEdge is not None)
-        exitRequired = climbEdge.at("locomotionMode")
-        assert(exitRequired is not None)
-        assert(exitRequired.get_string() == "crouch")
         actorState2 = actorStates.at(1)
         assert(actorState2 is not None)
         cinematic = actorState2.get_union_data()
         assert(cinematic is not None)
-        type = cinematic.at("Type")
-        assert(type is not None)
-        assert(type.get_int() == 13)
         actorState3 = actorStates.at(2)
         assert(actorState3 is not None)
         chosen = actorState3.get_union_data()
         assert(chosen is not None)
-        exitRequ = chosen.at("ExitRequired")
-        assert(exitRequ is not None)
-        assert(exitRequ.get_bool() == True)
 
         # Map and Set overridePolicy
         pathNodeGD = ent.at("Components").map_get("PathNodeGD").get_union_data()
@@ -735,7 +762,8 @@ try:
     print("load_legacy_scene")
     entlib.rawdata_path = "X:/RawData"
     entlib.clear_cache()
-    scene_ent = entlib.load_node_entity_read_only("X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene")
+    entlib.validation_enabled = False
+    scene_ent = entlib.load_node_entity_read_only("X:/RawData/20_scene/personal/simont/vfxGym/ScenevfxGym.scene")
 
     scene = scene_ent.at("Components").map_get("SubScene").get_union_data().at("Embedded")
     assert(len(entlib.get_node_cache()) > 0)
@@ -767,7 +795,7 @@ try:
 
     scene.at(0).at("Components").map_insert("BeamGeneratorGD").get_union_data().get_field_names()
     assert(
-        len(scene.at(0).at("Components").map_insert("HeightObj").get_union_data().get_field_names()) == 8)
+        len(scene.at(0).at("Components").map_insert("HeightObj").get_union_data().get_field_names()) == 9)
 
     entlib.rawdata_path = os.getcwd()
     # scene.add_entity(entlib.make_instance_of(os.path.normpath(os.getcwd() + "/prefab.entity")))

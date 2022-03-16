@@ -903,7 +903,7 @@ void testCursor(EntityLib& entlib)
         Property destExpl(&entlib, expl.getSchema(), "", &newDoc);
         CopyToEmptyNode copier(destExpl);
         visitRecursive(expl, copier);
-        entlib.saveJsonFile(&newDoc, "instance.cursor.entity");
+        entlib.saveJsonFile(&newDoc, "instance.cursor.entity", "Entity");
     }
     bool testLoading = true;
     if (testLoading)
@@ -932,7 +932,7 @@ void testCursor(EntityLib& entlib)
             visitRecursive(expl, comparator);
 
             std::cout << "Save SceneKOM.scene with LazyLib" << std::endl;
-            entlib.saveJsonFile(&newDoc, "SceneKOM.scene");
+            entlib.saveJsonFile(&newDoc, "SceneKOM.scene", "Entity");
         }
 
         std::cout << "Read SceneKOM.scene with NodeLib" << std::endl;

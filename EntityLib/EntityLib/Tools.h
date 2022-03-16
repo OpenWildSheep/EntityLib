@@ -71,5 +71,8 @@ namespace Ent
 
     ///< Ensure a float to be print rounded in a json even if it is printed as a double
     double truncFloat(float _val);
+
+    constexpr char const* schemaFormat = "wildschema:/all/%s.json";
+
     /// @endcond PRIVATE
 } // namespace Ent

@@ -169,7 +169,7 @@ namespace Ent
         Node const* getParentEntity(Node const* _node); ///< Get the parent Entity Node
 
         nlohmann::json& readJsonFile(char const* _filepath);
-        void saveJsonFile(nlohmann::json const* doc, char const* _filepath);
+        void saveJsonFile(nlohmann::json const* doc, char const* _filepath, char const* _schema);
 
     private:
         /// Load an Entity or a Scene, using the given cache

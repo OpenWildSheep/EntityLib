@@ -381,7 +381,7 @@ namespace Ent
         }
     }
 
-    void EntityLib::saveJsonFile(nlohmann::json const* doc, char const* _filepath)
+    void EntityLib::saveJsonFile(json const* doc, char const* _filepath, char const* _schema)
     {
         std::filesystem::path const filepath = very_weakly_canonical(_filepath);
         std::ofstream ofs(rawdataPath / filepath);
@@ -389,7 +389,13 @@ namespace Ent
         {
             throw ContextException("Can't open %s for write", filepath.string().c_str());
         }
-        ofs << doc->dump(4);
+        json copy = *doc;
+        copy["$schema"] = format(schemaFormat, _schema);
+        ofs << copy.dump(4);
+        if (&(m_jsonDatabase[filepath]) != doc)
+        {
+            m_jsonDatabase[filepath] = *doc;
+        }
     }
 
     struct MergeMapOverride

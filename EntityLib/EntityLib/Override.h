@@ -5,6 +5,7 @@
 
 #pragma warning(push, 0)
 #include "MemoryProfiler.h"
+#include "include/EntityLibCore.h"
 #pragma warning(pop)
 
 namespace Ent
@@ -20,12 +21,6 @@ namespace Ent
         Prefab,
         /// Override value comes from the instance.
         Override
-    };
-
-    enum class CopyMode
-    {
-        CopyOverride, ///< Always override in dest when there is override in source
-        MinimalOverride ///< Do not override when values are identicals
     };
 
     template <typename V>

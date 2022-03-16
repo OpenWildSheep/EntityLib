@@ -570,4 +570,9 @@ namespace Ent
         }
     };
 
+    enum class CopyMode
+    {
+        CopyOverride, ///< Always override in dest when there is override in source
+        MinimalOverride ///< Do not override when values are identicals
+    };
 } // namespace Ent

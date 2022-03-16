@@ -141,5 +141,32 @@ namespace Ent
         return result;
     }
 
+    static double round_n(double value, double multiplier)
+    {
+        const auto scaled_value = value * multiplier;
+        return std::round(scaled_value) / multiplier;
+    }
+
+    double truncFloat(float _val)
+    {
+        if (not std::isnormal(_val))
+        {
+            return _val;
+        }
+
+        double result{};
+        for (size_t multiplier = 0; multiplier < 100; ++multiplier)
+        {
+            result = round_n(_val, pow(10, multiplier));
+            if (float(result) == _val)
+            {
+                break;
+            }
+        }
+        ENTLIB_ASSERT(float(result) == _val);
+
+        return result;
+    }
+
 } // namespace Ent
 /// @endcond PRIVATE

@@ -67,5 +67,8 @@ namespace Ent
             s.begin(), s.end(), s.begin(), [](unsigned char c) { return char(std::tolower(c)); });
         return s;
     }
+
+    ///< Ensure a float to be print rounded in a json even if it is printed as a double
+    double truncFloat(float _val);
     /// @endcond PRIVATE
 } // namespace Ent

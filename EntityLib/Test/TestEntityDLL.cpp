@@ -355,7 +355,7 @@ try
         ENTLIB_ASSERT(entityStatePlayerData.has_value());
 
         // Map and Set overridePolicy
-        auto pathNodeGD = ent.Components().PathNodeGD();
+        auto pathNodeGD = ent.Components().TestTagsList();
         auto tags = pathNodeGD->Tags().Tags();
         ENTLIB_ASSERT(tags.size() == 3);
         ENTLIB_ASSERT(tags.get("a").has_value());
@@ -538,7 +538,7 @@ try
 
         testPrefabEntity(ent);
         // Test mapErase in set of primitive
-        auto pathNodeGD = ent.Components().PathNodeGD();
+        auto pathNodeGD = ent.Components().TestTagsList();
         auto tags = pathNodeGD->Tags().Tags();
         auto primSet = tags.get("a");
         ENTLIB_ASSERT(primSet->node->getParentNode()->getParentNode()->isMapOrSet());
@@ -850,7 +850,7 @@ try
         ENTLIB_ASSERT(itemEntityRef.get().entityPath == "tutu");
 
         // Map and Set overridePolicy
-        auto pathNodeGD = *ent.Components().PathNodeGD();
+        auto pathNodeGD = *ent.Components().TestTagsList();
         auto tags = pathNodeGD.Tags().Tags();
         ENTLIB_ASSERT(tags.node->getParentNode()->getParentNode() == pathNodeGD.node);
         ENTLIB_ASSERT(tags.size() == 3);
@@ -1181,7 +1181,7 @@ try
     auto test_erase = [](Ent::Gen::Entity ent)
     {
         auto actorStates = ent.ActorStates();
-        auto pathNodeGD = *ent.Components().PathNodeGD();
+        auto pathNodeGD = *ent.Components().TestTagsList();
         auto tags = pathNodeGD.Tags().Tags();
 
         // Test erase in map (+save/load)
@@ -1218,7 +1218,7 @@ try
         actorStates.addActorStateAlive();
 
         // Test erase in map
-        auto pathNodeGD = *ent.Components().PathNodeGD();
+        auto pathNodeGD = *ent.Components().TestTagsList();
         auto tags = pathNodeGD.Tags().Tags();
         ENTLIB_ASSERT(tags.get("c").has_value());
         ENTLIB_ASSERT(tags.size() == 3);

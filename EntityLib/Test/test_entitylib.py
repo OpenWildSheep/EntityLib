@@ -148,7 +148,7 @@ try:
         assert(cinematic != None)
 
         # Map and Set overridePolicy
-        pathNodeGD = ent.at("Components").map_get("PathNodeGD").get_union_data()
+        pathNodeGD = ent.at("Components").map_get("TestTagsList").get_union_data()
         tags = pathNodeGD.at("Tags").at("Tags")
         assert(tags.size() == 3)
         assert(tags.at(0).at(0).get_string() == "a")
@@ -432,7 +432,7 @@ try:
         assert(chosen is not None)
 
         # Map and Set overridePolicy
-        pathNodeGD = ent.at("Components").map_get("PathNodeGD").get_union_data()
+        pathNodeGD = ent.at("Components").map_get("TestTagsList").get_union_data()
         tags = pathNodeGD.at("Tags").at("Tags")
         assert(tags.size() == 3)
         assert(tags.at(0).at(0).get_string() == "a")

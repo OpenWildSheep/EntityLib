@@ -91,11 +91,11 @@ try
     ENTLIB_ASSERT(heightObj->Subdivision().get() == 0);
     [[maybe_unused]] auto displaceNoise0 =
         heightObj->DisplaceNoiseList()[0]; // inferred type : DisplaceNoiseListItem
-    ENTLIB_ASSERT(ent.Components().get<PathNodeGD>()->Radius().get() == 30.0);
-    ENTLIB_ASSERT(ent.Components().get<PathNodeGD>()->Radius().toFloat() == 30.0f);
-    [[maybe_unused]] float rad2 = ent.Components().get<PathNodeGD>()->Radius().toFloat();
-    ent.Components().get<PathNodeGD>()->Radius() = 20.0;
-    double rad = ent.Components().get<PathNodeGD>()->Radius();
+    ENTLIB_ASSERT(ent.Components().get<TestTagsList>()->Radius().get() == 30.0);
+    ENTLIB_ASSERT(ent.Components().get<TestTagsList>()->Radius().toFloat() == 30.0f);
+    [[maybe_unused]] float rad2 = ent.Components().get<TestTagsList>()->Radius().toFloat();
+    ent.Components().get<TestTagsList>()->Radius() = 20.0;
+    double rad = ent.Components().get<TestTagsList>()->Radius();
     ENTLIB_ASSERT(rad == 20.0);
 
     // Test Tuple
@@ -123,7 +123,7 @@ try
     }
 
     // Test Map
-    auto pathNodeGD = ent.Components().get<PathNodeGD>(); // inferred type : PathNodeGD
+    auto pathNodeGD = ent.Components().get<TestTagsList>(); // inferred type : TestTagsList
     auto tags = pathNodeGD->Tags().Tags(); // inferred type : Map<char const*, PrimitiveSet<String>>
     static_assert(std::is_same_v<decltype(tags), Map<char const*, PrimitiveSet<char const*>>>);
     [[maybe_unused]] auto b = tags.get("b"); // inferred type : PrimitiveSet<String>

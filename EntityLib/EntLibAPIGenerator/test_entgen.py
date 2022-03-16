@@ -14,7 +14,7 @@ from entgen.HeightObj import *
 from entgen.ActorStateBeingImmersed import *
 from entgen.UnitTestComponent import *
 from entgen.BeamTargetGD import *
-from entgen.PathNodeGD import *
+from entgen.TestTagsList import *
 from entgen.EnvStampGD import *
 from entgen.AnimationControllerGD import *
 """
@@ -114,7 +114,7 @@ ent.Name.unset()
 assert ent.Name.is_set() is False
 assert heightObj.Subdivision.value == 0
 displaceNoise0 = heightObj.DisplaceNoiseList[0]  # inferred type : DisplaceNoiseListItem
-assert ent.Components.get(PathNodeGD).Radius.value == 30.0
+assert ent.Components.get(TestTagsList).Radius.value == 30.0
 
 # Test Tuple
 position = unitTestCpt.Position   # inferred type : Position
@@ -139,7 +139,7 @@ for ent3 in subscene:
     assert isinstance(ent3, Entity)
 
 # Test Map
-pathNodeGD = ent.Components.get(PathNodeGD)   # inferred type : PathNodeGD
+pathNodeGD = ent.Components.get(TestTagsList)   # inferred type : TestTagsList
 tags = pathNodeGD.Tags.Tags     # inferred type : Map[str, PrimitiveSet[String]]
 assert isinstance(tags, Map)
 b = tags.get("b")               # inferred type : PrimitiveSet[String]

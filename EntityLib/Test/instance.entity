@@ -27,7 +27,7 @@
             "Type": "SystemicCreature"
         },
         {
-            "Type": "PathNodeGD",
+            "Type": "TestTagsList",
             "Data": {
                 "Radius": 30.0,
                 "Tags": {

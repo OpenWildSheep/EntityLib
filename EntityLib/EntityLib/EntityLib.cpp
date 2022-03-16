@@ -1677,15 +1677,34 @@ namespace Ent
 
     PropImplPtr EntityLib::newPropImpl()
     {
-        auto property = new (propertyPool.alloc()) PropImpl();
+        PropImpl* property{};
+        auto mem = propertyPool.alloc();
+        try
+        {
+            property = new (mem) PropImpl();
+        }
+        catch (...)
+        {
+            propertyPool.free(mem);
+            throw;
+        }
         return property->sharedFromThis();
     }
 
     PropImplPtr EntityLib::newPropImpl(
         PropImplPtr _parent, Ent::Subschema const* _schema, char const* _filename, nlohmann::json* _doc)
     {
-        auto property =
-            new (propertyPool.alloc()) PropImpl(this, std::move(_parent), _schema, _filename, _doc);
+        PropImpl* property{};
+        auto mem = propertyPool.alloc();
+        try
+        {
+            property = new (mem) PropImpl(this, std::move(_parent), _schema, _filename, _doc);
+        }
+        catch (...)
+        {
+            propertyPool.free(mem);
+            throw;
+        }
         return property->sharedFromThis();
     }
 

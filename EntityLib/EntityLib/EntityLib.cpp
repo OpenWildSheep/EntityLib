@@ -367,10 +367,9 @@ namespace Ent
         return getSceneParentEntity(_node->getParentNode());
     }
 
-    nlohmann::json& EntityLib::readJsonFile(char const* _filepath, bool canonicalize)
+    nlohmann::json& EntityLib::readJsonFile(char const* _filepath)
     {
-        std::filesystem::path const filepath =
-            canonicalize ? very_weakly_canonical(_filepath) : _filepath;
+        std::filesystem::path const filepath = very_weakly_canonical(_filepath);
         if (auto iter = m_jsonDatabase.find(filepath); iter != m_jsonDatabase.end())
         {
             return iter->second;

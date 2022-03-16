@@ -168,7 +168,7 @@ namespace Ent
         Node* getParentEntity(Node* _node); ///< Get the parent Entity Node
         Node const* getParentEntity(Node const* _node); ///< Get the parent Entity Node
 
-        nlohmann::json& readJsonFile(char const* _filepath, bool canonicalize = true);
+        nlohmann::json& readJsonFile(char const* _filepath);
         void saveJsonFile(nlohmann::json const* doc, char const* _filepath);
 
     private:

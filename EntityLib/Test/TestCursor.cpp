@@ -763,8 +763,8 @@ void testCursor(EntityLib& entlib)
         std::getline(ifstr, filedata, char(0));
         auto& d = entlib.readJsonFile("test.SeedPatch.node");
         auto& schema = d["$schema"].get_ref<nlohmann::json::string_t const&>();
-        auto typeName = getRefTypeName(schema.c_str());
-        Property simpleObject(&entlib, entlib.getSchema(typeName), "test.SeedPatch.node", &d);
+        auto typeName = std::string(getRefTypeName(schema.c_str()));
+        Property simpleObject(&entlib, entlib.getSchema(typeName.c_str()), "test.SeedPatch.node", &d);
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeX").getFloat() == 1.f);
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeY").getFloat() == 2.f);
     }
@@ -773,11 +773,9 @@ void testCursor(EntityLib& entlib)
         std::string filedata;
         std::getline(ifstr, filedata, char(0));
         auto& d = entlib.readJsonFile("test.SeedPatch.node");
-        Property simpleObject(
-            &entlib,
-            entlib.getSchema(getRefTypeName(d["$schema"].get_ref<std::string const&>().c_str())),
-            "test.SeedPatch.node",
-            &d);
+        auto typeName =
+            std::string(getRefTypeName(d["$schema"].get_ref<std::string const&>().c_str()));
+        Property simpleObject(&entlib, entlib.getSchema(typeName.c_str()), "test.SeedPatch.node", &d);
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeX").getFloat() == 1.f);
         simpleObject.getObjectField("NoiseSizeX").setFloat(2.);
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeX").getFloat() == 2.);

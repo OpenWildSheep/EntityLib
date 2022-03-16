@@ -1275,7 +1275,7 @@ namespace Ent
                     // handle "Super" special key
                     if (_superKeyIsTypeName and name == "Super")
                     {
-                        const auto* typeName = getRefTypeName(subNode->getTypeName());
+                        const auto* typeName = subNode->getTypeName();
                         auto const fieldIdx = internObj->at(name.c_str()).fieldIdx;
                         fieldMap.emplace_back(typeName, std::move(subJson), fieldIdx);
                     }
@@ -1627,8 +1627,8 @@ namespace Ent
             for (auto const& [name, schema2] : this->schema.schema.allDefinitions)
             {
                 // Try to lower only if the type was extracted from a file name
-                if ((tryToLower and strToLower(getRefTypeName(name.c_str())) == schemaFound)
-                    or (not tryToLower and getRefTypeName(name.c_str()) == schemaFound))
+                if ((tryToLower and strToLower(name.c_str()) == schemaFound)
+                    or (not tryToLower and name.c_str() == schemaFound))
                 {
                     schema = &schema2;
                     break;

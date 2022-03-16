@@ -152,6 +152,9 @@ namespace Ent
 
         char const* getUnionDefaultTypeName() const;
 
+        /// @brief Get the type of the Key of a map or set
+        DataType getMapKeyType() const;
+
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue = nlohmann::json;
         DefaultValue defaultValue; ///< @brief Contains the data according to the type
@@ -288,6 +291,11 @@ namespace Ent
             meta);
     }
 
+    inline DataType Subschema::getMapKeyType() const
+    {
+        return singularItems->get().linearItems->at(0)->type;
+    }
+
     inline Subschema const& SubschemaRef::get() const
     {
         if (std::holds_alternative<Ref>(subSchemaOrRef))
@@ -296,7 +304,9 @@ namespace Ent
             return AT(ref.schema->allDefinitions, ref.ref);
         }
         else if (std::holds_alternative<Subschema>(subSchemaOrRef))
+        {
             return std::get<Subschema>(subSchemaOrRef);
+        }
         else
         {
             ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
@@ -312,7 +322,9 @@ namespace Ent
             return AT(ref.schema->allDefinitions, ref.ref);
         }
         else if (std::holds_alternative<Subschema>(subSchemaOrRef))
+        {
             return std::get<Subschema>(subSchemaOrRef);
+        }
         else
         {
             ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");

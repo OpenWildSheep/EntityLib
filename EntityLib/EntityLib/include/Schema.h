@@ -30,6 +30,25 @@ namespace Ent
         COUNT
     };
 
+    /// Detailed schema type.
+    /// Especially with array, which can be unionSet, map, objectSet, primitiveSet or simple array
+    enum class DataKind
+    {
+        string, ///< Contains a string
+        number, ///< Contains a number (real)
+        integer, ///< Contains an integer
+        object, ///< Contains a json object (it has properties)
+        array, ///< Contains an array . It can be singular (one type for all) or linear (one type per element)
+        boolean, ///< Contains a boolean value
+        entityRef, ///< Contains a string which is a path to an Entity
+        union_, ///< It is actually a union type, but union is a C keyword
+        unionSet,
+        map,
+        objectSet,
+        primitiveSet,
+        COUNT
+    };
+
     /// @cond PRIVATE
     using Null = std::nullptr_t;
     /// @endcond
@@ -154,6 +173,8 @@ namespace Ent
 
         /// @brief Get the type of the Key of a map or set
         DataType getMapKeyType() const;
+
+        DataKind getDataKind() const;
 
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue = nlohmann::json;

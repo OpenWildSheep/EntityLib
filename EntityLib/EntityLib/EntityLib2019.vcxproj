@@ -122,7 +122,7 @@
     </ClCompile>
     <ClCompile Include="EntityLibCore.cpp" />
     <ClCompile Include="FileProperty.cpp" />
-    <ClCompile Include="include\Schema.cpp" />
+    <ClCompile Include="Schema.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Object.cpp" />

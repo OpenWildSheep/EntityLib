@@ -36,7 +36,7 @@ namespace Ent
         {
             if (auto instanceOf = m_source.getInstanceOf())
             {
-                _back().setInstanceOf(instanceOf);
+                _back().changeInstanceOf(instanceOf);
             }
         }
         bool inObjectField([[maybe_unused]] Property& m_source, char const* _key) override

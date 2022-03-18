@@ -671,7 +671,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_map_item", [](Property& _self, char const* _key){return _self.getMapItem(_key);})
         .def("get_map_item", [](Property& _self, int64_t _key){return _self.getMapItem(_key);})
         .def("get_array_item", &Property::getArrayItem)
-        .def_property("instance_of", &Property::getInstanceOf, &Property::setInstanceOf)
+        .def_property("instance_of", &Property::getInstanceOf, &Property::changeInstanceOf)
         .def_property_readonly("union_type", &Property::getUnionType) // or read/write ?
         .def_property_readonly("data_type", &Property::getDataType)
         .def_property_readonly("schema", &Property::getSchema, py::return_value_policy::reference_internal)

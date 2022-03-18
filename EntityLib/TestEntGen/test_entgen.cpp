@@ -1,26 +1,26 @@
-#include <EntGen.h>
+#include <../cpp2/EntGen.h>
 #include <ciso646>
 #include <filesystem>
 #include <iostream>
 
-using namespace Ent::Gen;
+using namespace Ent::Gen2;
 
 int main()
 try
 {
     Ent::EntityLib entlib("X:/", true);
-    entlib.rawdataPath = std::filesystem::canonical(std::filesystem::current_path() / "../Test");
+    entlib.rawdataPath = canonical(std::filesystem::current_path() / "../Test");
 
-    auto entNode = entlib.loadEntityAsNode("instance.entity");
-    auto ent = Entity(entNode.get());
+    Ent::Property expl(
+        &entlib, entlib.getSchema(Entity::schemaName), "instance.entity");
+    auto ent = Entity(expl);
 
     // Test Object
     [[maybe_unused]] auto name = ent.Name(); // inferred type : String
     static_assert(std::is_same_v<decltype(name), String>);
     auto components = ent.Components(); // inferred type : Components
     // Object Load
-    auto ent2node = Entity::load(entlib, "instance.entity");
-    auto ent2 = Entity(ent2node.get());
+    auto ent2 = Entity::load(entlib, "instance.entity");
     // Object save
     ent2.save("instance_test_save.entity");
 
@@ -29,11 +29,11 @@ try
     for (Ent::String const& key : components.getKeys())
     {
         auto comp = components.get(key.c_str());
-        std::cout << comp->getType() << std::endl;
+        std::cout << comp->getTypeName() << std::endl;
     }
-    for (Component const& comp : components)
+    for (Ent::Property const& comp : components)
     {
-        std::cout << comp.getType() << std::endl;
+        std::cout << comp.getTypeName() << std::endl;
     }
     auto tgd = ent.Components().get<TransformGD>(); // inferred type : std::optional<TransformGD>
     auto heightObj = components.get<HeightObj>();
@@ -42,7 +42,7 @@ try
     auto unitTestCpt = components.add<UnitTestComponent>(); // inferred type : TurretComponentGD
     static_assert(std::is_same_v<decltype(unitTestCpt), UnitTestComponent>);
     heightObj = *components.HeightObj(); // Keep this method??
-
+    components.removeAnimationModelGD();
     // Test fixed size array
     auto pos = ent.Components().get<TransformGD>()->Position(); // inferred type : Vector3
     [[maybe_unused]] auto x = tgd->Position()[0]; // inferred type : Float
@@ -58,6 +58,8 @@ try
     std::vector<double> v = tgd->Position();
     [[maybe_unused]] std::array<double, 3> a = tgd->Position();
     [[maybe_unused]] std::tuple<double, double, double> t = tgd->Position();
+    tgd->Position().clear();
+    ENTLIB_ASSERT(tgd->Position().size() == 0);
 
     // Test set of primitive
     [[maybe_unused]] auto side =
@@ -65,7 +67,7 @@ try
     static_assert(std::is_same_v<decltype(side), PrimitiveSet<ReviveSideEnum>>);
     unitTestCpt.EnumSet().add(ReviveSideEnum::neutral);
     unitTestCpt.EnumSet().add(ReviveSideEnum::cursed);
-    // turret.ReviveSideTargeted.remove(ReviveSideEnum::neutral);
+    unitTestCpt.EnumSet().remove(ReviveSideEnum::neutral);
     ENTLIB_ASSERT(unitTestCpt.EnumSet().count(ReviveSideEnum::cursed));
     unitTestCpt.EnumSet().add(ReviveSideEnum::sacred); // inferred type : String
     for (auto&& enm : unitTestCpt.EnumSet())
@@ -114,7 +116,7 @@ try
     static_assert(std::is_same_v<decltype(new_ent), Entity>);
     for (auto&& entname : subscene.getKeys())
     {
-        [[maybe_unused]] auto ent3 = subscene.get(entname.c_str());
+        [[maybe_unused]] auto ent3 = subscene.get(entname);
         static_assert(std::is_same_v<decltype(ent3), std::optional<Entity>>);
     }
     for ([[maybe_unused]] auto ent3 : subscene)
@@ -131,7 +133,7 @@ try
     [[maybe_unused]] auto c = tags.add("c"); // inferred type : PrimitiveSet<String>
     for (auto&& mapName : tags.getKeys())
     {
-        [[maybe_unused]] auto set = tags.get(mapName.c_str());
+        [[maybe_unused]] auto set = tags.get(mapName);
         static_assert(std::is_same_v<decltype(set), std::optional<PrimitiveSet<char const*>>>);
     }
     for (auto&& [setname, set] : tags)

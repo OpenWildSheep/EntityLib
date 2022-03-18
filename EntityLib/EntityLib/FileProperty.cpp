@@ -1,5 +1,6 @@
 #include "include/EntityLib/FileProperty.h"
 
+#include <ciso646>
 #include "include/EntityLib.h"
 
 using namespace nlohmann;
@@ -35,11 +36,18 @@ namespace Ent
 
     void FileProperty::save(char const* _filename) const
     {
+        if (not m_values->is_object())
+        {
+            throw BadType(staticFormat(
+                "Can't save %s. Can only save object or union.", getSchema()->name.c_str()));
+        }
         m_schema.base->rootSchema->entityLib->saveJsonFile(
-            m_values, _filename != nullptr ? _filename : m_filePath.c_str(), m_schema.base->name.c_str());
+            m_values,
+            _filename != nullptr ? _filename : m_filePath.c_str(),
+            m_schema.base->name.c_str());
     }
 
-    json* FileProperty::_getRawJson()
+    json* FileProperty::_getRawJson() const
     {
         return isSet() ? m_values : nullptr;
     }
@@ -54,15 +62,14 @@ namespace Ent
         m_values = _jsonNode;
     }
 
-    bool FileProperty::isSetOrNull() const
+    bool FileProperty::hasJsonPointer() const
     {
         return m_values != nullptr;
     }
 
     bool FileProperty::isSet() const
     {
-        auto* val = m_values;
-        return val != nullptr and not val->is_null();
+        return m_values != nullptr and not m_values->is_null() and not isRemovedObject();
     }
 
     bool FileProperty::isNull() const
@@ -71,9 +78,8 @@ namespace Ent
         return val != nullptr and val->is_null();
     }
 
-    FileProperty FileProperty::getObjectField(char const* _field, SubschemaRef const* _fieldRef)
+    FileProperty FileProperty::getObjectField(char const* _field, SubschemaRef const* _fieldRef) const
     {
-        bool const nodeIsSet = isSet();
         FileProperty newLayer;
         ENTLIB_DBG_ASSERT(m_schema.base->type == DataType::object);
         if (_fieldRef == nullptr)
@@ -92,27 +98,20 @@ namespace Ent
         newLayer.m_key = _field;
         Subschema const* subschema = &(_fieldRef->get());
         newLayer.m_schema = Schema{subschema, _fieldRef->getRefDefaultValues()};
-        if (nodeIsSet)
+        if (hasJsonPointer() and not m_values->is_null())
         {
             auto lastNode = m_values;
             ENTLIB_DBG_ASSERT(lastNode->is_object());
             if (auto memiter = lastNode->find(_field); memiter != lastNode->end())
             {
-                auto newValue = &(*memiter);
-                if (newLayer.m_schema.base->type == DataType::string
-                    or newLayer.m_schema.base->type == DataType::entityRef)
-                {
-                    ENTLIB_DBG_ASSERT(newValue->is_string());
-                }
-
-                newLayer.m_values = newValue;
+                newLayer.m_values = &(*memiter);
             }
         }
         ENTLIB_DBG_ASSERT(m_schema.base != nullptr);
         return newLayer;
     }
 
-    FileProperty FileProperty::getUnionSetItem(char const* _field, Subschema const* _dataSchema)
+    FileProperty FileProperty::getUnionSetItem(char const* _key, Subschema const* _dataSchema) const
     {
         FileProperty newLayer;
         auto& lastschema = *m_schema.base;
@@ -125,48 +124,35 @@ namespace Ent
         auto& unionSchema = lastschema.singularItems->get();
         if (_dataSchema == nullptr)
         {
-            if (auto iter = unionSchema.unionTypeMap.find(_field);
+            if (auto iter = unionSchema.unionTypeMap.find(_key);
                 iter != unionSchema.unionTypeMap.end())
             {
                 newLayer.m_schema = Schema{iter->second.dataSchema, nullptr};
-                _field = iter->first.c_str(); // Convert _field to a long living memory
+                _key = iter->first.c_str(); // Convert _key to a long living memory
             }
             else
             {
-                throw ContextException("Unknown Union type : %s", _field);
+                throw ContextException("Unknown Union type : %s", _key);
             }
         }
         else
         {
             newLayer.m_schema = Schema{_dataSchema, nullptr};
         }
-        newLayer.m_key = _field;
+        newLayer.m_key = _key;
 
         if (isSet())
         {
-            auto typeField = unionSchema.getUnionNameField();
             auto dataField = unionSchema.getUnionDataField();
-            auto lastNode = m_values;
-            for (auto& item : *lastNode)
-            {
-                if (auto typeIter = item.find(typeField); typeIter != item.end())
-                {
-                    if (typeIter->get_ref<std::string const&>() == _field)
-                    {
-                        json* newValue = nullptr;
-                        if (auto dataIter = item.find(dataField); dataIter != item.end())
-                        {
-                            newValue = &(*dataIter);
-                        }
-                        if (newLayer.m_schema.base->type == DataType::string
-                            or newLayer.m_schema.base->type == DataType::entityRef)
-                        {
-                            ENTLIB_DBG_ASSERT(newValue == nullptr or newValue->is_string());
-                        }
 
-                        // Item found!
-                        newLayer.m_values = newValue;
-                        break;
+            if (auto jsonIter = _findUnionSetItem(_key, true); jsonIter != m_values->end())
+            {
+                newLayer.m_wrapper = &(*jsonIter);
+                if (auto dataIter = jsonIter->find(dataField); dataIter != jsonIter->end())
+                {
+                    if (not dataIter->is_null())
+                    { // Item found!
+                        newLayer.m_values = &(*dataIter);
                     }
                 }
             }
@@ -175,11 +161,12 @@ namespace Ent
         return newLayer;
     }
 
-    template <typename K, typename C>
-    FileProperty FileProperty::_enterObjectSetItemImpl(K _field, C&& _equalKey)
+    template <typename K>
+    FileProperty FileProperty::_enterObjectSetItemImpl(K _key) const
     {
         FileProperty newLayer;
         auto& setSchema = *m_schema.base;
+        ENTLIB_ASSERT(setSchema.type == DataType::array);
         auto& objectSchema = setSchema.singularItems->get();
         char const* keyFieldName = nullptr;
         if (auto meta = std::get_if<Subschema::ArrayMeta>(&setSchema.meta))
@@ -196,76 +183,50 @@ namespace Ent
         }
 
         newLayer.m_schema = Schema{&objectSchema, nullptr};
-        newLayer.m_key = _field;
+        newLayer.m_key = _key;
 
         if (isSet())
         {
-            auto lastNode = m_values;
-            for (auto& item : *lastNode)
+            if (auto jsonIter = _findObjectSetItem(_key, true); jsonIter != m_values->end())
             {
-                if (auto typeIter = item.find(keyFieldName); typeIter != item.end())
-                {
-                    if (_equalKey(*typeIter, _field))
-                    {
-                        auto newValue = &item;
-                        if (newLayer.m_schema.base->type == DataType::string
-                            or newLayer.m_schema.base->type == DataType::entityRef)
-                        {
-                            ENTLIB_DBG_ASSERT(newValue->is_string());
-                        }
-
-                        // Item found!
-                        newLayer.m_values = newValue;
-                        break;
-                    }
-                }
+                newLayer.m_values = &(*jsonIter);
             }
         }
         ENTLIB_DBG_ASSERT(newLayer.m_schema.base != nullptr);
         return newLayer;
     }
 
-    FileProperty FileProperty::getObjectSetItem(char const* _field)
+    FileProperty FileProperty::getObjectSetItem(char const* _key) const
     {
-        return _enterObjectSetItemImpl(
-            _field,
-            [](json const& _node, char const* _key)
-            { return _node.get_ref<std::string const&>() == _key; });
+        return _enterObjectSetItemImpl(_key);
     }
 
-    FileProperty FileProperty::getObjectSetItem(int64_t _field)
+    FileProperty FileProperty::getObjectSetItem(int64_t _key) const
     {
-        return _enterObjectSetItemImpl(
-            _field, [](json const& _node, int64_t _key) { return _node.get<int64_t>() == _key; });
+        return _enterObjectSetItemImpl(_key);
     }
 
-    template <typename K, typename E>
-    FileProperty FileProperty::_enterMapItemImpl(K _field, E&& _isEqual)
+    static bool mapRemoved(json const& _pair)
+    {
+        return _pair[1].is_null();
+    }
+
+    template <typename K>
+    FileProperty FileProperty::_enterMapItemImpl(K _key) const
     {
         FileProperty newLayer;
 
         auto& pairSchema = m_schema.base->singularItems->get();
         newLayer.m_schema = Schema{&pairSchema.linearItems->at(1).get(), nullptr};
-        newLayer.m_key = _field;
+        newLayer.m_key = _key;
 
         if (isSet())
         {
-            auto lastNode = m_values;
-            for (auto& item : *lastNode)
+            if (auto jsonIter = _findMapItem(_key, true); jsonIter != m_values->end())
             {
-                auto& key = item[0];
-                if (_isEqual(key, _field))
-                {
-                    auto newValue = &item[1];
-                    if (m_schema.base->type == DataType::string
-                        or m_schema.base->type == DataType::entityRef)
-                    {
-                        ENTLIB_DBG_ASSERT(newValue->is_string());
-                    }
-
-                    // Item found!
-                    newLayer.m_values = newValue;
-                    break;
+                if (not mapRemoved(*jsonIter))
+                { // Item found!
+                    newLayer.m_values = &(*jsonIter)[1];
                 }
             }
         }
@@ -273,21 +234,17 @@ namespace Ent
         return newLayer;
     }
 
-    FileProperty FileProperty::getMapItem(char const* _field)
+    FileProperty FileProperty::getMapItem(char const* _key) const
     {
-        return _enterMapItemImpl(
-            _field,
-            [](json const& _node, char const* _field)
-            { return _node.get_ref<std::string const&>() == _field; });
+        return _enterMapItemImpl(_key);
     }
 
-    FileProperty FileProperty::getMapItem(int64_t _field)
+    FileProperty FileProperty::getMapItem(int64_t _key) const
     {
-        return _enterMapItemImpl(
-            _field, [](json const& _node, int64_t _field) { return _node.get<int64_t>() == _field; });
+        return _enterMapItemImpl(_key);
     }
 
-    FileProperty FileProperty::getArrayItem(size_t _index)
+    FileProperty FileProperty::getArrayItem(size_t _index) const
     {
         FileProperty newLayer;
         ENTLIB_DBG_ASSERT(m_schema.base->type == DataType::array);
@@ -306,7 +263,7 @@ namespace Ent
             auto& subschema = m_schema.base->linearItems->at(_index).get();
             newLayer.m_schema = Schema{&subschema, nullptr};
         }
-        newLayer.m_key = _index;
+        newLayer.m_key = int64_t(_index);
         if (auto lastNode = _getRawJson())
         {
             if (lastNode->size() > _index)
@@ -335,15 +292,8 @@ namespace Ent
             {
                 return memiter->get_ref<std::string const&>().c_str();
             }
-            else
-            {
-                return nullptr;
-            }
         }
-        else
-        {
-            return nullptr;
-        }
+        return nullptr;
     }
 
     Subschema const* FileProperty::getUnionSchema() const
@@ -380,7 +330,7 @@ namespace Ent
         return false;
     }
 
-    FileProperty FileProperty::getUnionData(char const* _unionType)
+    FileProperty FileProperty::getUnionData(char const* _unionType) const
     {
         if (_unionType == nullptr)
         {
@@ -424,187 +374,201 @@ namespace Ent
         return m_schema.propDefVal;
     }
 
-    json* FileProperty::createChildNode(
-        FileProperty& _lastLayer,
-        Key const& _childName,
-        Subschema const& _newLayerSchema,
-        size_t _arraySize)
+    void FileProperty::createChildNode(FileProperty& _parent)
     {
-        ENTLIB_DBG_ASSERT(int(_lastLayer.m_values->type()) < int(json::value_t::discarded));
+        if (isRemovedObject())
+        {
+            unRemoveObject();
+            return;
+        }
+
+        if (m_wrapper != nullptr)
+        { // It is a Union in a UnionSet and the Union object is still declared in json
+            auto&& unionSchema = _parent.getSchema()->singularItems->get();
+            auto dataField = unionSchema.getUnionDataField();
+            // TODO : Change to default value according to type
+            setRawJson(&((*m_wrapper)[dataField] = nlohmann::json::object()));
+            return;
+        }
+
+        auto&& childName = getPathToken();
+
+        ENTLIB_DBG_ASSERT(int(_parent.m_values->type()) < int(json::value_t::discarded));
         json* newLayerJson = nullptr;
-        switch (_lastLayer.m_schema.base->type)
+        switch (_parent.m_schema.base->getDataKind())
         {
-        case DataType::object:
+        case DataKind::object:
         {
-            if (_lastLayer.m_values->is_null())
+            if (_parent.m_values->is_null())
             {
-                (*_lastLayer.m_values) = json::object();
+                (*_parent.m_values) = json::object();
             }
-            auto fieldName = std::get<char const*>(_childName);
-            (*_lastLayer.m_values)[fieldName] = {};
-            newLayerJson = &(*_lastLayer.m_values)[fieldName];
+            auto fieldName = std::get<char const*>(childName);
+            (*_parent.m_values)[fieldName] = {};
+            newLayerJson = &(*_parent.m_values)[fieldName];
         }
         break;
-        case DataType::oneOf:
+        case DataKind::union_:
         {
-            if (_lastLayer.m_values->is_null())
+            if (_parent.m_values->is_null())
             {
-                (*_lastLayer.m_values) = json::object();
+                (*_parent.m_values) = json::object();
             }
-            auto fieldName = std::get<char const*>(_childName);
-            auto typeField = _lastLayer.m_schema.base->getUnionNameField();
-            auto dataField = _lastLayer.m_schema.base->getUnionDataField();
-            (*_lastLayer.m_values)[typeField] = fieldName;
-            (*_lastLayer.m_values)[dataField] = {};
-            newLayerJson = &(*_lastLayer.m_values)[dataField];
+            auto fieldName = std::get<char const*>(childName);
+            auto typeField = _parent.m_schema.base->getUnionNameField();
+            auto dataField = _parent.m_schema.base->getUnionDataField();
+            (*_parent.m_values)[typeField] = fieldName;
+            (*_parent.m_values)[dataField] = {};
+            newLayerJson = &(*_parent.m_values)[dataField];
         }
         break;
-        case DataType::array:
+        case DataKind::map:
         {
-            ENTLIB_DBG_ASSERT(_lastLayer.m_values->type() == json::value_t::array);
-            auto meta = std::get<Subschema::ArrayMeta>(_lastLayer.m_schema.base->meta);
-            auto& itemType = _lastLayer.m_schema.base->singularItems->get();
-            switch (hash(meta.overridePolicy))
+            auto& itemType = _parent.m_schema.base->singularItems->get();
+            if (_parent.m_values->is_null())
             {
-            case "map"_hash:
-                if (_lastLayer.m_values->is_null())
-                {
-                    (*_lastLayer.m_values) = json::array();
-                }
-                switch (itemType.linearItems->at(0)->type)
-                {
-                case DataType::string:
-                {
-                    auto key = std::get<char const*>(_childName);
-                    auto pairNode = json::array();
-                    pairNode.push_back(key);
-                    pairNode.emplace_back();
-                    _lastLayer.m_values->push_back(std::move(pairNode));
-                    newLayerJson = &(*_lastLayer.m_values)[(*_lastLayer.m_values).size() - 1][1];
-                    ENTLIB_ASSERT(newLayerJson != nullptr);
-                    break;
-                }
-                case DataType::integer:
-                {
-                    auto key = std::get<size_t>(_childName);
-                    auto pairNode = json::array();
-                    pairNode.push_back(key);
-                    pairNode.emplace_back();
-                    _lastLayer.m_values->push_back(std::move(pairNode));
-                    newLayerJson = &(*_lastLayer.m_values)[(*_lastLayer.m_values).size() - 1][1];
-                    ENTLIB_ASSERT(newLayerJson != nullptr);
-                    break;
-                }
-                default: ENTLIB_LOGIC_ERROR("Unexpected key type");
-                }
-                break;
-            case "set"_hash:
+                (*_parent.m_values) = json::array();
+            }
+            switch (itemType.linearItems->at(0)->type)
             {
-                if (_lastLayer.m_values->is_null())
-                {
-                    (*_lastLayer.m_values) = json::array();
-                }
-                switch (itemType.type)
-                {
-                case DataType::integer: // integer set
-                {
-                    auto key = std::get<size_t>(_childName);
-                    _lastLayer.m_values->push_back(key);
-                    ENTLIB_ASSERT(newLayerJson != nullptr);
-                    break;
-                }
-                case DataType::string: // String set
-                {
-                    auto key = std::get<char const*>(_childName);
-                    _lastLayer.m_values->push_back(key);
-                    ENTLIB_ASSERT(newLayerJson != nullptr);
-                    break;
-                }
-                case DataType::oneOf: // UnionSet
-                {
-                    auto wrapper = json::object();
-                    auto fieldName = std::get<char const*>(_childName);
-                    auto unionSchema = &_lastLayer.m_schema.base->singularItems->get();
-                    auto typeField = unionSchema->getUnionNameField();
-                    auto dataField = unionSchema->getUnionDataField();
-                    wrapper[typeField] = fieldName;
-                    wrapper[dataField] = {};
-                    _lastLayer.m_values->push_back(std::move(wrapper));
-                    newLayerJson =
-                        &(*_lastLayer.m_values)[(*_lastLayer.m_values).size() - 1][dataField];
-                    ENTLIB_ASSERT(newLayerJson != nullptr);
-                    break;
-                }
-                case DataType::object: // Object Set
-                    auto object = json::object();
-                    auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
-                    switch (keyFieldSchema.type)
-                    {
-                    case DataType::string:
-                    {
-                        auto key = std::get<char const*>(_childName);
-                        object[*meta.keyField] = key;
-                        break;
-                    }
-                    case DataType::integer:
-                    {
-                        auto key = std::get<size_t>(_childName);
-                        object[*meta.keyField] = key;
-                        break;
-                    }
-                    default: ENTLIB_LOGIC_ERROR("Unexpected key type");
-                    }
-                    ENTLIB_DBG_ASSERT(_lastLayer.m_values->type() == json::value_t::array);
-                    _lastLayer.m_values->push_back(object);
-                    newLayerJson = &(*_lastLayer.m_values)[(*_lastLayer.m_values).size() - 1];
-                    ENTLIB_ASSERT(newLayerJson != nullptr);
-                    break;
-                }
+            case DataType::string:
+            {
+                auto key = std::get<char const*>(childName);
+                auto pairNode = json::array();
+                pairNode.push_back(key);
+                pairNode.emplace_back();
+                _parent.m_values->push_back(std::move(pairNode));
+                newLayerJson = &(*_parent.m_values)[(*_parent.m_values).size() - 1][1];
+                ENTLIB_ASSERT(newLayerJson != nullptr);
                 break;
             }
-            case ""_hash:
+            case DataType::integer:
             {
-                if (_lastLayer.m_values->is_null())
-                {
-                    (*_lastLayer.m_values) = json::array();
-                }
-                while (_lastLayer.m_values->size() < _arraySize)
-                {
-                    _lastLayer.m_values->emplace_back();
-                }
-                while (_lastLayer.m_values->size() > _arraySize)
-                {
-                    _lastLayer.m_values->erase(_lastLayer.m_values->size() - 1);
-                }
-                auto index = std::get<size_t>(_childName);
-                newLayerJson = &(*_lastLayer.m_values)[index];
+                auto key = std::get<int64_t>(childName);
+                auto pairNode = json::array();
+                pairNode.push_back(key);
+                pairNode.emplace_back();
+                _parent.m_values->push_back(std::move(pairNode));
+                newLayerJson = &(*_parent.m_values)[(*_parent.m_values).size() - 1][1];
+                ENTLIB_ASSERT(newLayerJson != nullptr);
+                break;
+            }
+            default: ENTLIB_LOGIC_ERROR("Unexpected key type");
+            }
+            break;
+        }
+        case DataKind::primitiveSet:
+        {
+            if (_parent.m_values->is_null())
+            {
+                (*_parent.m_values) = json::array();
+            }
+            auto& itemType = _parent.m_schema.base->singularItems->get();
+            switch (itemType.type)
+            {
+            case DataType::integer: // integer set
+            {
+                auto key = std::get<int64_t>(childName);
+                _parent.m_values->push_back(key);
+                ENTLIB_ASSERT(newLayerJson != nullptr);
+                break;
+            }
+            case DataType::string: // String set
+            {
+                auto key = std::get<char const*>(childName);
+                _parent.m_values->push_back(key);
                 ENTLIB_ASSERT(newLayerJson != nullptr);
                 break;
             }
             }
+            break;
         }
-        break;
-        case DataType::null: [[fallthrough]];
-        case DataType::string: [[fallthrough]];
-        case DataType::number: [[fallthrough]];
-        case DataType::integer: [[fallthrough]];
-        case DataType::boolean: [[fallthrough]];
-        case DataType::entityRef: [[fallthrough]];
-        case DataType::COUNT: ENTLIB_LOGIC_ERROR("Unexpected DataType");
+        case DataKind::unionSet:
+        {
+            if (_parent.m_values->is_null())
+            {
+                (*_parent.m_values) = json::array();
+            }
+            auto wrapper = json::object();
+            auto fieldName = std::get<char const*>(childName);
+            auto unionSchema = &_parent.m_schema.base->singularItems->get();
+            auto typeField = unionSchema->getUnionNameField();
+            auto dataField = unionSchema->getUnionDataField();
+            wrapper[dataField] = json::object(); // TODO : Change to default value according to type
+            wrapper[typeField] = fieldName;
+            _parent.m_values->push_back(std::move(wrapper));
+            newLayerJson = &(*_parent.m_values)[(*_parent.m_values).size() - 1][dataField];
+            ENTLIB_ASSERT(newLayerJson != nullptr);
+            break;
+        }
+        case DataKind::objectSet:
+        {
+            if (_parent.m_values->is_null())
+            {
+                (*_parent.m_values) = json::array();
+            }
+            auto meta = std::get<Subschema::ArrayMeta>(_parent.m_schema.base->meta);
+            auto& itemType = _parent.m_schema.base->singularItems->get();
+            auto object = json::object();
+            auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
+            switch (keyFieldSchema.type)
+            {
+            case DataType::string:
+            {
+                auto key = std::get<char const*>(childName);
+                object[*meta.keyField] = key;
+                break;
+            }
+            case DataType::integer:
+            {
+                auto key = std::get<int64_t>(childName);
+                object[*meta.keyField] = key;
+                break;
+            }
+            default: ENTLIB_LOGIC_ERROR("Unexpected key type");
+            }
+            ENTLIB_DBG_ASSERT(_parent.m_values->type() == json::value_t::array);
+            _parent.m_values->push_back(object);
+            newLayerJson = &(*_parent.m_values)[(*_parent.m_values).size() - 1];
+            ENTLIB_ASSERT(newLayerJson != nullptr);
+            break;
+        }
+        case DataKind::array:
+        {
+            ENTLIB_DBG_ASSERT(_parent.m_values->type() == json::value_t::array);
+            if (_parent.m_values->is_null())
+            {
+                (*_parent.m_values) = json::array();
+            }
+            auto index = std::get<int64_t>(childName);
+            while (int64_t(_parent.m_values->size()) <= index)
+            {
+                _parent.m_values->emplace_back();
+            }
+            newLayerJson = &(*_parent.m_values)[index];
+            ENTLIB_ASSERT(newLayerJson != nullptr);
+            break;
+        }
+        case DataKind::string: [[fallthrough]];
+        case DataKind::number: [[fallthrough]];
+        case DataKind::integer: [[fallthrough]];
+        case DataKind::boolean: [[fallthrough]];
+        case DataKind::entityRef: [[fallthrough]];
+        case DataKind::COUNT: ENTLIB_LOGIC_ERROR("Unexpected DataType");
         }
         ENTLIB_ASSERT(newLayerJson != nullptr);
         if (newLayerJson->is_null())
         {
-            if (_newLayerSchema.type == DataType::array)
+            if (getSchema()->type == DataType::array)
             {
                 *newLayerJson = json::array();
             }
-            else if (_newLayerSchema.type == DataType::object)
+            else if (getSchema()->type == DataType::object)
             {
                 *newLayerJson = json::object();
             }
         }
-        return newLayerJson;
+        setRawJson(newLayerJson);
     }
 
     void FileProperty::setSize(size_t _size)
@@ -628,6 +592,10 @@ namespace Ent
         if constexpr (std::is_same_v<std::remove_const_t<std::remove_reference_t<T>>, EntityRef>)
         {
             *m_values = _value.entityPath;
+        }
+        else if constexpr (std::is_same_v<std::remove_const_t<std::remove_reference_t<T>>, double>)
+        {
+            *m_values = truncFloat(static_cast<float>(_value));
         }
         else
         {
@@ -662,7 +630,7 @@ namespace Ent
         auto dataFieldName = getSchema()->getUnionDataField();
         auto nameFieldName = getSchema()->getUnionNameField();
         wrapper[nameFieldName] = type;
-        wrapper[dataFieldName] = json();
+        wrapper.erase(dataFieldName);
     }
 
     template <typename T>
@@ -709,6 +677,504 @@ namespace Ent
     FileProperty::Key const& FileProperty::getPathToken() const
     {
         return m_key;
+    }
+
+    template <typename K>
+    json::iterator FileProperty::_findPrimSetKey(K _key)
+    {
+        if (not isSet())
+        {
+            return m_values->end();
+        }
+        auto find = [this](auto&& _isEqual)
+        {
+            return std::find_if(m_values->begin(), m_values->end(), _isEqual);
+        };
+        if constexpr (std::is_same_v<K, char const*>)
+        {
+            return find([this, _key](json const& primLayer)
+                        { return primLayer.get_ref<std::string const&>() == _key; });
+        }
+        else
+        {
+            return find([this, _key](json const& primLayer)
+                        { return primLayer.get<int64_t>() == _key; });
+        }
+    }
+
+    template <typename V>
+    static bool compareJson(json const& _node, V _value)
+    {
+        if constexpr (std::is_same_v<V, char const*>)
+        {
+            return _node.get_ref<std::string const&>() == _value;
+        }
+        else
+        {
+            return _node.get<V>() == _value;
+        }
+    }
+
+    template <typename K, typename GetKey, typename IsRemoved>
+    json::iterator FileProperty::_findArrayItem(
+        bool _withRemoved, K _key, GetKey&& _getKey, IsRemoved&& _isRemoved) const
+    {
+        ENTLIB_DBG_ASSERT(isSet());
+        if (_withRemoved)
+        {
+            return std::find_if(
+                m_values->begin(),
+                m_values->end(),
+                [_getKey, _key](json const& _pair) { return compareJson(_getKey(_pair), _key); });
+        }
+        return std::find_if(
+            m_values->begin(),
+            m_values->end(),
+            [_getKey, _isRemoved, _key](json const& _pair)
+            { return compareJson(_getKey(_pair), _key) and not _isRemoved(_pair); });
+    }
+
+    json::iterator FileProperty::_findUnionSetItem(char const* _key, bool _withRemoved) const
+    {
+        auto dataField = getSchema()->singularItems->get().getUnionDataField();
+        auto typeField = getSchema()->singularItems->get().getUnionNameField();
+        return _findArrayItem(
+            _withRemoved,
+            _key,
+            [typeField](json const& _union) { return _union[typeField]; },
+            [dataField](json const& _union) { return _union[dataField].is_null(); });
+    }
+
+    template <typename K>
+    json::iterator FileProperty::_findMapItem(K _key, bool _withRemoved) const
+    {
+        return _findArrayItem(
+            _withRemoved, _key, [](json const& _pair) { return _pair[0]; }, mapRemoved);
+    }
+
+    static bool objectIsRemoved(json const& _object)
+    {
+        return _object.is_object() and _object.value("__removed__", false);
+    }
+
+    template <typename K>
+    json::iterator FileProperty::_findObjectSetItem(K _key, bool _withRemoved) const
+    {
+        auto&& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
+        ENTLIB_ASSERT(meta.keyField.has_value());
+        auto keyFieldName = meta.keyField->c_str();
+        return _findArrayItem(
+            _withRemoved,
+            _key,
+            [keyFieldName](json const& _object) { return _object[keyFieldName]; },
+            objectIsRemoved);
+    }
+
+    template <typename K>
+    bool FileProperty::_countPrimSetKeyImpl(K _key)
+    {
+        if (not isSet())
+        {
+            return false;
+        }
+        auto iter = _findPrimSetKey(_key);
+        return iter != m_values->end();
+    }
+
+    bool FileProperty::countPrimSetKey(char const* _key)
+    {
+        return _countPrimSetKeyImpl(_key);
+    }
+    bool FileProperty::countPrimSetKey(int64_t _key)
+    {
+        return _countPrimSetKeyImpl(_key);
+    }
+
+    void FileProperty::updateMapKeysString(std::set<char const*, CmpStr>& _keys, bool onlyRemoved) const
+    {
+        if (isSet())
+        {
+            auto* node = getRawJson();
+            ENTLIB_DBG_ASSERT(node->is_array());
+            for (auto& pair : *node)
+            {
+                auto key = pair[0].get_ref<std::string const&>().c_str();
+                bool const removed = mapRemoved(pair);
+                if (removed and not onlyRemoved)
+                {
+                    _keys.erase(key);
+                }
+                if (removed == onlyRemoved)
+                {
+                    _keys.insert(key);
+                }
+            }
+        }
+    }
+
+    void FileProperty::updateMapKeysInt(std::set<int64_t>& _keys, bool onlyRemoved) const
+    {
+        if (isSet())
+        {
+            auto* node = getRawJson();
+            ENTLIB_DBG_ASSERT(node->is_array());
+            for (auto& pair : *node)
+            {
+                auto key = pair[0].get<int64_t>();
+                bool const removed = mapRemoved(pair);
+                if (removed and not onlyRemoved)
+                {
+                    _keys.erase(key);
+                }
+                if (removed == onlyRemoved)
+                {
+                    _keys.insert(key);
+                }
+            }
+        }
+    }
+
+    void FileProperty::updatePrimSetKeysString(std::set<char const*, CmpStr>& _keys) const
+    {
+        if (isSet())
+        {
+            for (auto& prim : *getRawJson())
+            {
+                _keys.insert(prim.get_ref<std::string const&>().c_str());
+            }
+        }
+    }
+    void FileProperty::updatePrimSetKeysInt(std::set<int64_t>& _keys) const
+    {
+        if (isSet())
+        {
+            for (auto& prim : *getRawJson())
+            {
+                _keys.insert(prim.get<int64_t>());
+            }
+        }
+    }
+
+    void FileProperty::updateUnionSetKeysString(
+        std::map<char const*, Subschema const*, CmpStr>& _keys, bool onlyRemoved) const
+    {
+        if (isSet())
+        {
+            auto* node = getRawJson();
+            for (size_t i = 0; i < node->size(); ++i)
+            {
+                auto arrayItem = getArrayItem(i);
+                auto unionSchema = arrayItem.getUnionSchema();
+                bool const removed = (unionSchema == nullptr) or arrayItem.isUnionRemoved();
+                if (removed and not onlyRemoved)
+                {
+                    _keys.erase(arrayItem.getUnionType());
+                }
+                else if (removed == onlyRemoved)
+                {
+                    _keys.emplace(arrayItem.getUnionType(), unionSchema);
+                }
+            }
+        }
+    }
+
+    void FileProperty::updateObjectSetKeysString(
+        std::set<char const*, CmpStr>& _keys, bool onlyRemoved) const
+    {
+        if (isSet())
+        {
+            auto const& meta = std::get<Subschema::ArrayMeta>(getSchema()->meta);
+            for (auto& object : *getRawJson())
+            {
+                auto const& key = object.at(*meta.keyField).get_ref<std::string const&>();
+                auto const removed = objectIsRemoved(object);
+                if (removed and not onlyRemoved)
+                {
+                    _keys.erase(key.c_str());
+                }
+                else if (removed == onlyRemoved)
+                {
+                    _keys.insert(key.c_str());
+                }
+            }
+        }
+    }
+
+    void FileProperty::updateObjectSetKeysInt(std::set<int64_t>& _keys, bool onlyRemoved) const
+    {
+        if (isSet())
+        {
+            auto const& meta = std::get<Subschema::ArrayMeta>(getSchema()->meta);
+            for (auto& object : *getRawJson())
+            {
+                auto key = object.at(*meta.keyField).get<int64_t>();
+                auto const removed = objectIsRemoved(object);
+                if (removed and not onlyRemoved)
+                {
+                    _keys.erase(key);
+                }
+                else if (removed == onlyRemoved)
+                {
+                    _keys.insert(key);
+                }
+            }
+        }
+    }
+
+    std::set<char const*, CmpStr> FileProperty::getMapRemovedKeysString() const
+    {
+        std::set<char const*, CmpStr> removed;
+        updateMapKeysString(removed, true);
+        return removed;
+    }
+    std::set<int64_t> FileProperty::getMapRemovedKeysInt() const
+    {
+        std::set<int64_t> removed;
+        updateMapKeysInt(removed, true);
+        return removed;
+    }
+    std::map<char const*, Subschema const*, CmpStr> FileProperty::getUnionSetRemovedKeysString() const
+    {
+        std::map<char const*, Subschema const*, CmpStr> removed;
+        updateUnionSetKeysString(removed, true);
+        return removed;
+    }
+    std::set<char const*, CmpStr> FileProperty::getObjectSetRemovedKeysString() const
+    {
+        std::set<char const*, CmpStr> removed;
+        updateObjectSetKeysString(removed, true);
+        return removed;
+    }
+    std::set<int64_t> FileProperty::getObjectSetRemovedKeysInt() const
+    {
+        std::set<int64_t> removed;
+        updateObjectSetKeysInt(removed, true);
+        return removed;
+    }
+
+    template <typename K>
+    bool FileProperty::_erasePrimSetKeyImpl(K _key)
+    {
+        if (auto iter = _findPrimSetKey(_key); iter != m_values->end())
+        {
+            m_values->erase(iter);
+            return true;
+        }
+        return false;
+    }
+
+    bool FileProperty::erasePrimSetKey(char const* _key)
+    {
+        return _erasePrimSetKeyImpl(_key);
+    }
+    bool FileProperty::erasePrimSetKey(int64_t _key)
+    {
+        return _erasePrimSetKeyImpl(_key);
+    }
+
+    template <typename K, typename FindItem, typename IsRemoved, typename MaskRemoved, typename PushBack>
+    bool FileProperty::_eraseImpl(
+        K _key,
+        bool _isInPrefab,
+        FindItem&& _findItem,
+        IsRemoved&& _isRemoved,
+        MaskRemoved&& _markRemove,
+        PushBack&& _pushBack)
+    {
+        if (not _isInPrefab)
+        {
+            if (not isSet())
+            {
+                return false;
+            }
+            if (auto iter = _findItem(this, _key, _isInPrefab); iter != m_values->end())
+            {
+                auto const wasAlreadyRemoved = _isRemoved(*iter);
+                m_values->erase(iter);
+                return not wasAlreadyRemoved;
+            }
+            return false;
+        }
+        if (auto iter = _findItem(this, _key, _isInPrefab); iter != m_values->end())
+        {
+            if (_isRemoved(*iter))
+            {
+                return false;
+            }
+            _markRemove(*iter);
+        }
+        else
+        {
+            _pushBack(_key);
+        }
+        return true;
+    }
+
+    template <typename K>
+    bool FileProperty::_eraseObjectSetItemImpl(K _key, bool _isInPrefab)
+    {
+        auto&& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
+        auto keyFieldName = meta.keyField->c_str();
+        return _eraseImpl(
+            _key,
+            _isInPrefab,
+            std::mem_fn(&FileProperty::_findObjectSetItem<K>),
+            objectIsRemoved,
+            [](auto& node) { return node["__removed__"] = true; },
+            [this, keyFieldName](K _key) {
+                m_values->push_back(json::object({{keyFieldName, _key}, {"__removed__", true}}));
+            });
+    }
+
+    bool FileProperty::eraseObjectSetItem(char const* _key, bool _isInPrefab)
+    {
+        return _eraseObjectSetItemImpl(_key, _isInPrefab);
+    }
+    bool FileProperty::eraseObjectSetItem(int64_t _key, bool _isInPrefab)
+    {
+        return _eraseObjectSetItemImpl(_key, _isInPrefab);
+    }
+
+    bool FileProperty::eraseUnionSetItem(char const* _key, bool _isInPrefab)
+    {
+        auto dataField = getSchema()->singularItems->get().getUnionDataField();
+        auto typeField = getSchema()->singularItems->get().getUnionNameField();
+        auto isRemoved = [dataField](auto& node)
+        {
+            if (auto iter = node.find(dataField); iter != node.end())
+            {
+                return iter->is_null();
+            }
+            return false;
+        };
+        auto pushBack = [this, typeField, dataField](char const* _key)
+        {
+            auto& newUnion = m_values->emplace_back(json::object());
+            newUnion[typeField] = _key;
+            newUnion[dataField] = json();
+        };
+
+        return _eraseImpl(
+            _key,
+            _isInPrefab,
+            std::mem_fn(&FileProperty::_findUnionSetItem),
+            isRemoved,
+            [dataField](auto& node) { return node[dataField] = json(); },
+            pushBack);
+    }
+
+    template <typename K>
+    bool FileProperty::_eraseMapItemImpl(K _key, bool _isInPrefab)
+    {
+        auto pushBack = [this](K _key)
+        {
+            m_values->push_back(json::array({_key, json()}));
+        };
+
+        return _eraseImpl(
+            _key,
+            _isInPrefab,
+            std::mem_fn(&FileProperty::_findMapItem<K>),
+            mapRemoved,
+            [](auto& node) { node[1] = json(); },
+            pushBack);
+    }
+
+    bool FileProperty::eraseMapItem(char const* _key, bool _isInPrefab)
+    {
+        return _eraseMapItemImpl(_key, _isInPrefab);
+    }
+    bool FileProperty::eraseMapItem(int64_t _key, bool _isInPrefab)
+    {
+        return _eraseMapItemImpl(_key, _isInPrefab);
+    }
+
+    void FileProperty::unsetObjectField(FileProperty& _field)
+    {
+        if (not isSet())
+        {
+            return;
+        }
+        for (auto&& [key, data] : m_values->items())
+        {
+            if (_field.m_values == &data)
+            {
+                m_values->erase(key);
+                break;
+            }
+        }
+        _field.m_values = nullptr;
+    }
+
+    void FileProperty::unsetUnionData()
+    {
+        if (not isSet())
+        {
+            return;
+        }
+        auto const dataFieldName = getSchema()->getUnionDataField();
+        m_values->erase(dataFieldName);
+    }
+
+    void FileProperty::setToDefault(Subschema const* _parentSchema)
+    {
+        if (not isSet())
+        {
+            return;
+        }
+        switch (getSchema()->type)
+        {
+        case DataType::string: *m_values = std::string(); break;
+        case DataType::object:
+        {
+            json newObj = json::object();
+            if (auto arrayMeta = std::get_if<Subschema::ArrayMeta>(&_parentSchema->meta))
+            {
+                if (auto keyField = arrayMeta->keyField)
+                {
+                    auto keyFieldName = keyField->c_str();
+                    auto key = m_values->at(keyFieldName);
+                    *m_values = json::object({{keyFieldName, key}});
+                    break;
+                }
+            }
+            m_values->clear();
+            break;
+        }
+        case DataType::entityRef: *m_values = std::string(); break;
+        case DataType::array: *m_values = json::array(); break;
+        case DataType::boolean: *m_values = false; break;
+        case DataType::integer: *m_values = 0; break;
+        case DataType::null: *m_values = json(); break;
+        case DataType::number: *m_values = 0.; break;
+        case DataType::oneOf: *m_values = json::object(); break;
+        case DataType::COUNT:
+        default: ENTLIB_LOGIC_ERROR("Unexpected schema type");
+        }
+    }
+
+    void FileProperty::setToNull()
+    {
+        if (not isSet())
+        {
+            return;
+        }
+        *m_values = json();
+    }
+
+    bool FileProperty::isRemovedObject() const
+    {
+        return m_values != nullptr and objectIsRemoved(*m_values);
+    }
+
+    void FileProperty::unRemoveObject()
+    {
+        m_values->erase("__removed__");
+    }
+
+    char const* FileProperty::getFilePath()
+    {
+        return m_filePath.c_str();
     }
 
 } // namespace Ent

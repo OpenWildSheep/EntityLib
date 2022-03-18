@@ -763,8 +763,8 @@ void testCursor(EntityLib& entlib)
         std::getline(ifstr, filedata, char(0));
         auto& d = entlib.readJsonFile("test.SeedPatch.node");
         auto& schema = d["$schema"].get_ref<nlohmann::json::string_t const&>();
-        auto typeName = getRefTypeName(schema.c_str());
-        Property simpleObject(&entlib, entlib.getSchema(typeName), "test.SeedPatch.node", &d);
+        auto typeName = std::string(getRefTypeName(schema.c_str()));
+        Property simpleObject(&entlib, entlib.getSchema(typeName.c_str()), "test.SeedPatch.node", &d);
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeX").getFloat() == 1.f);
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeY").getFloat() == 2.f);
     }
@@ -773,11 +773,9 @@ void testCursor(EntityLib& entlib)
         std::string filedata;
         std::getline(ifstr, filedata, char(0));
         auto& d = entlib.readJsonFile("test.SeedPatch.node");
-        Property simpleObject(
-            &entlib,
-            entlib.getSchema(getRefTypeName(d["$schema"].get_ref<std::string const&>().c_str())),
-            "test.SeedPatch.node",
-            &d);
+        auto typeName =
+            std::string(getRefTypeName(d["$schema"].get_ref<std::string const&>().c_str()));
+        Property simpleObject(&entlib, entlib.getSchema(typeName.c_str()), "test.SeedPatch.node", &d);
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeX").getFloat() == 1.f);
         simpleObject.getObjectField("NoiseSizeX").setFloat(2.);
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeX").getFloat() == 2.);
@@ -905,7 +903,7 @@ void testCursor(EntityLib& entlib)
         Property destExpl(&entlib, expl.getSchema(), "", &newDoc);
         CopyToEmptyNode copier(destExpl);
         visitRecursive(expl, copier);
-        entlib.saveJsonFile(&newDoc, "instance.cursor.entity");
+        entlib.saveJsonFile(&newDoc, "instance.cursor.entity", "Entity");
     }
     bool testLoading = true;
     if (testLoading)
@@ -934,7 +932,7 @@ void testCursor(EntityLib& entlib)
             visitRecursive(expl, comparator);
 
             std::cout << "Save SceneKOM.scene with LazyLib" << std::endl;
-            entlib.saveJsonFile(&newDoc, "SceneKOM.scene");
+            entlib.saveJsonFile(&newDoc, "SceneKOM.scene", "Entity");
         }
 
         std::cout << "Read SceneKOM.scene with NodeLib" << std::endl;

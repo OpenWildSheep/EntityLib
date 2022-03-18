@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <string_view>
 
 #pragma warning(push, 0)
 #include "external/json.hpp"
@@ -14,7 +15,7 @@ namespace Ent
     /// @brief Given a link to a definition, get the name of the definition.
     ///
     /// Example : "./EditionComponents.json#/definitions/HeightObj" => "HeightObj"
-    char const* getRefTypeName(char const* link);
+    std::string_view getRefTypeName(char const* link);
 
     std::vector<std::string>
     splitString(const std::string& _str, char _delimiter, bool _keepEmptyToken = false);
@@ -67,5 +68,11 @@ namespace Ent
             s.begin(), s.end(), s.begin(), [](unsigned char c) { return char(std::tolower(c)); });
         return s;
     }
+
+    ///< Ensure a float to be print rounded in a json even if it is printed as a double
+    double truncFloat(float _val);
+
+    constexpr char const* schemaFormat = "wildschema:/all/%s.json";
+
     /// @endcond PRIVATE
 } // namespace Ent

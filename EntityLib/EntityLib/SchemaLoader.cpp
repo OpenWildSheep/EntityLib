@@ -604,11 +604,10 @@ namespace Ent
             {
                 CHECK_WHOLE_STACK;
                 ENTLIB_DEBUG_PRINTF("%sopenRef %s\n", getTab(), link);
-                char const* typeName = getRefTypeName(link);
+                auto typeName = std::string(getRefTypeName(link));
                 // Force to create the definition (do nothing if already exist)
-                ENTLIB_ASSERT_MSG(typeName != nullptr, "Can't get type name in '%s'!!", link);
                 auto& subschema = globalSchema->allDefinitions[typeName];
-                ENTLIB_ASSERT(strlen(typeName) != 0);
+                ENTLIB_ASSERT(not typeName.empty());
                 subschema.name = typeName;
                 subschema.rootSchema = globalSchema;
                 auto& ref = stack.back()->subSchemaOrRef;

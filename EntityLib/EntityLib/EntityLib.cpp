@@ -367,10 +367,9 @@ namespace Ent
         return getSceneParentEntity(_node->getParentNode());
     }
 
-    nlohmann::json& EntityLib::readJsonFile(char const* _filepath, bool canonicalize)
+    nlohmann::json& EntityLib::readJsonFile(char const* _filepath)
     {
-        std::filesystem::path const filepath =
-            canonicalize ? very_weakly_canonical(_filepath) : _filepath;
+        std::filesystem::path const filepath = very_weakly_canonical(_filepath);
         if (auto iter = m_jsonDatabase.find(filepath); iter != m_jsonDatabase.end())
         {
             return iter->second;
@@ -382,7 +381,7 @@ namespace Ent
         }
     }
 
-    void EntityLib::saveJsonFile(nlohmann::json const* doc, char const* _filepath)
+    void EntityLib::saveJsonFile(json const* doc, char const* _filepath, char const* _schema)
     {
         std::filesystem::path const filepath = very_weakly_canonical(_filepath);
         std::ofstream ofs(rawdataPath / filepath);
@@ -390,7 +389,13 @@ namespace Ent
         {
             throw ContextException("Can't open %s for write", filepath.string().c_str());
         }
-        ofs << doc->dump(4);
+        json copy = *doc;
+        copy["$schema"] = format(schemaFormat, _schema);
+        ofs << copy.dump(4);
+        if (&(m_jsonDatabase[filepath]) != doc)
+        {
+            m_jsonDatabase[filepath] = *doc;
+        }
     }
 
     struct MergeMapOverride
@@ -1219,33 +1224,6 @@ namespace Ent
         }
     }
 
-    static double round_n(double value, double multiplier)
-    {
-        const auto scaled_value = value * multiplier;
-        return std::round(scaled_value) / multiplier;
-    }
-
-    static double truncFloat(float _val)
-    {
-        if (not std::isnormal(_val))
-        {
-            return _val;
-        }
-
-        double result{};
-        for (size_t multiplier = 0; multiplier < 100; ++multiplier)
-        {
-            result = round_n(_val, pow(10, multiplier));
-            if (float(result) == _val)
-            {
-                break;
-            }
-        }
-        ENTLIB_ASSERT(float(result) == _val);
-
-        return result;
-    }
-
     json EntityLib::dumpNode(
         Subschema const& _schema,
         Node const& _node,
@@ -1302,7 +1280,7 @@ namespace Ent
                     // handle "Super" special key
                     if (_superKeyIsTypeName and name == "Super")
                     {
-                        const auto* typeName = getRefTypeName(subNode->getTypeName());
+                        const auto* typeName = subNode->getTypeName();
                         auto const fieldIdx = internObj->at(name.c_str()).fieldIdx;
                         fieldMap.emplace_back(typeName, std::move(subJson), fieldIdx);
                     }
@@ -1654,8 +1632,8 @@ namespace Ent
             for (auto const& [name, schema2] : this->schema.schema.allDefinitions)
             {
                 // Try to lower only if the type was extracted from a file name
-                if ((tryToLower and strToLower(getRefTypeName(name.c_str())) == schemaFound)
-                    or (not tryToLower and getRefTypeName(name.c_str()) == schemaFound))
+                if ((tryToLower and strToLower(name.c_str()) == schemaFound)
+                    or (not tryToLower and name.c_str() == schemaFound))
                 {
                     schema = &schema2;
                     break;
@@ -1704,15 +1682,34 @@ namespace Ent
 
     PropImplPtr EntityLib::newPropImpl()
     {
-        auto property = new (propertyPool.alloc()) PropImpl();
+        PropImpl* property{};
+        auto mem = propertyPool.alloc();
+        try
+        {
+            property = new (mem) PropImpl();
+        }
+        catch (...)
+        {
+            propertyPool.free(mem);
+            throw;
+        }
         return property->sharedFromThis();
     }
 
     PropImplPtr EntityLib::newPropImpl(
         PropImplPtr _parent, Ent::Subschema const* _schema, char const* _filename, nlohmann::json* _doc)
     {
-        auto property =
-            new (propertyPool.alloc()) PropImpl(this, std::move(_parent), _schema, _filename, _doc);
+        PropImpl* property{};
+        auto mem = propertyPool.alloc();
+        try
+        {
+            property = new (mem) PropImpl(this, std::move(_parent), _schema, _filename, _doc);
+        }
+        catch (...)
+        {
+            propertyPool.free(mem);
+            throw;
+        }
         return property->sharedFromThis();
     }
 

@@ -36,7 +36,7 @@ namespace Ent
     void FileProperty::save(char const* _filename) const
     {
         m_schema.base->rootSchema->entityLib->saveJsonFile(
-            m_values, _filename != nullptr ? _filename : m_filePath.c_str());
+            m_values, _filename != nullptr ? _filename : m_filePath.c_str(), m_schema.base->name.c_str());
     }
 
     json* FileProperty::_getRawJson()

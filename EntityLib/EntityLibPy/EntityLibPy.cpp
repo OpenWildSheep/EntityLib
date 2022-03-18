@@ -595,7 +595,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readwrite("rawdata_path", &EntityLib::rawdataPath) // unit-test need to write it
         .def_readonly("tools_dir", &EntityLib::toolsDir)
         .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference_internal)
-        .def("make_entityref", &EntityLib::makeEntityRef)
+        .def("make_entityref", (EntityRef (EntityLib::*)(Node const&, Node const&))&EntityLib::makeEntityRef)
+        .def("make_entityref", (EntityRef (EntityLib::*)(Property const&, Property const&))&EntityLib::makeEntityRef)
         .def("resolve_entityref",
             (Node* (EntityLib::*)(Node*, const EntityRef&) const)&EntityLib::resolveEntityRef,
             py::return_value_policy::reference_internal)

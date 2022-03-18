@@ -14,6 +14,10 @@ namespace Ent
             : m_self(_other.m_self->sharedFromThis())
         {
         }
+        Property(PropImplPtr _prop)
+            : m_self(std::move(_prop))
+        {
+        }
         Property& operator=(Property const& _other)
         {
             Property copy(_other);
@@ -342,20 +346,13 @@ namespace Ent
             return m_self->getParent();
         }
 
-    private:
-        Property(PropImplPtr _prop)
-            : m_self(std::move(_prop))
+        PropImpl& getPimpl() const
         {
+            return *m_self;
         }
 
-        PropImpl& getPimpl()
-        {
-            return *m_self;
-        }
-        PropImpl const& getPimpl() const
-        {
-            return *m_self;
-        }
+    private:
+
 
         PropImplPtr m_self{};
     };

@@ -16,6 +16,7 @@ namespace Ent
 {
     struct Node;
     class EntityLib;
+    struct Property;
 
     // ********************************** Static data *********************************************
 
@@ -164,6 +165,13 @@ namespace Ent
         /// @brief Compute the EntityRef going from the Entity _from, to the Entity _to
         /// @pre _from and _to are Entity nodes
         EntityRef makeEntityRef(Node const& _from, Node const& _to);
+
+        /// @brief Resolve an EntityRef relative to this Node/Entity.
+        /// Returns nullptr in case of failure.
+        Property resolveEntityRef(Property const& _node, const EntityRef& _entityRef) const;
+        /// @brief Compute the EntityRef going from the Entity _from, to the Entity _to
+        /// @pre _from and _to are Entity nodes
+        EntityRef makeEntityRef(Property const& _from, Property const& _to);
 
         Node* getParentEntity(Node* _node); ///< Get the parent Entity Node
         Node const* getParentEntity(Node const* _node); ///< Get the parent Entity Node

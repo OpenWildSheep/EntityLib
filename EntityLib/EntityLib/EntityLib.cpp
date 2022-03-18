@@ -556,6 +556,11 @@ namespace Ent
         }
     }
 
+    json& EntityLib::createTempJsonFile()
+    {
+        return *m_tempJsonFiles.emplace_back(std::make_unique<json>(json::object()));
+    }
+
     void EntityLib::saveJsonFile(json const* doc, char const* _filepath, char const* _schema)
     {
         std::filesystem::path const filepath = very_weakly_canonical(_filepath);

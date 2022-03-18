@@ -43,7 +43,7 @@ namespace Ent
         }
 
         /// @brief The Node is default if no values are set inside
-        bool isDefault()
+        bool isDefault() const
         {
             return getPimpl().isDefault();
         }
@@ -122,7 +122,7 @@ namespace Ent
         /// @remark setInstanceOf("") mean explicitly set
         void setInstanceOf(char const* _instanceOf)
         {
-            return getPimpl().setInstanceOf(_instanceOf);
+            return getPimpl().resetInstanceOf(_instanceOf);
         }
 
         /// @return The type of the Union
@@ -296,7 +296,7 @@ namespace Ent
         }
         void setUnionType(char const* _type) ///< @pre type==union. @brief Set _value in the instance
         {
-            return getPimpl().setUnionType(_type);
+            getPimpl().setUnionType(_type);
         }
 
         void buildPath() ///< Build json path but not set any value. Usefull for UnionSet items

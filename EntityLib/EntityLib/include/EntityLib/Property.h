@@ -252,6 +252,12 @@ namespace Ent
             return getPimpl().getObjectSetRemovedKeysInt();
         }
 
+        Property mapRename(char const* _current, char const* _new);
+        Property mapRename(int64_t _current, int64_t _new);
+        Property unionSetRename(char const* _current, char const* _new);
+        Property objectSetRename(char const* _current, char const* _new);
+        Property objectSetRename(int64_t _current, int64_t _new);
+
         bool mapContains(char const* _key) const ///< Check if the map contains this _key
         {
             return getPimpl().mapContains(_key);
@@ -534,6 +540,12 @@ namespace Ent
             return kind == DataKind::map || kind == DataKind::objectSet
                    || kind == DataKind::unionSet || kind == DataKind::primitiveSet;
         }
+
+        void copyInto(Property& _dest, CopyMode _copyMode);
+
+        Property detach();
+
+        void applyToPrefab();
 
         bool operator==(Property const& _rho) const
         {

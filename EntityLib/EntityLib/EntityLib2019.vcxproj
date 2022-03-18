@@ -126,6 +126,7 @@
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Property.cpp" />
     <ClCompile Include="PropImpl.cpp" />
     <ClCompile Include="SchemaLoader.cpp" />
     <ClCompile Include="Tools.cpp" />

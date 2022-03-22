@@ -655,7 +655,7 @@ namespace Ent
 
     bool PropImpl::isNull() const
     {
-        if (m_instance.isSetOrNull())
+        if (m_instance.hasJsonPointer())
         {
             return m_instance.isNull();
         }
@@ -767,8 +767,7 @@ namespace Ent
             for (size_t i = 0; i < arraySize(); ++i)
             {
                 auto objectLayer = getArrayItem(i);
-                if (objectLayer->m_instance.isSet()
-                    and objectLayer->m_instance.getRawJson()->count("__removed__") != 0)
+                if (objectLayer->m_instance.isRemovedObject())
                 {
                     keys.erase(objectLayer->getObjectField(meta.keyField->c_str())->getString());
                 }
@@ -853,7 +852,7 @@ namespace Ent
         auto firstNotSet = std::find_if(
             begin(allLayers),
             end(allLayers),
-            [](PropImpl const* l) { return not l->m_instance.isSetOrNull(); });
+            [](PropImpl const* l) { return not l->m_instance.isSet(); });
         ENTLIB_ASSERT(firstNotSet != allLayers.begin());
         auto firstNotSetIdx = std::distance(begin(allLayers), firstNotSet);
         ENTLIB_ASSERT(firstNotSetIdx <= ptrdiff_t(allLayers.size()));
@@ -862,14 +861,8 @@ namespace Ent
         auto endIter = allLayers.end();
         for (; firstNotSet != endIter; ++lastSet, ++firstNotSet, ++firstNotSetIdx)
         {
-            size_t arraySize = allLayers[firstNotSetIdx - 1]->m_arraySize;
-            auto* firstCursorNotSet = *firstNotSet;
-            firstCursorNotSet->m_instance.setRawJson(FileProperty::createChildNode(
-                (*lastSet)->m_instance,
-                firstCursorNotSet->m_instance.getPathToken(),
-                *firstCursorNotSet->m_instance.getSchema(),
-                arraySize));
-            ENTLIB_ASSERT(firstCursorNotSet->m_instance.isSetOrNull());
+            (*firstNotSet)->m_instance.createChildNode((*lastSet)->m_instance);
+            ENTLIB_ASSERT((*firstNotSet)->m_instance.hasJsonPointer());
         }
         _checkInvariants();
     }

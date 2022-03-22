@@ -177,6 +177,7 @@ namespace Ent
         Node const* getParentEntity(Node const* _node); ///< Get the parent Entity Node
 
         nlohmann::json& readJsonFile(char const* _filepath);
+        nlohmann::json& createTempJsonFile();
         void saveJsonFile(nlohmann::json const* doc, char const* _filepath, char const* _schema);
 
     private:
@@ -216,6 +217,7 @@ namespace Ent
 
         mutable std::map<std::filesystem::path, NodeFile> m_nodeCache;
         mutable std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> m_jsonDatabase;
+        mutable std::vector<std::unique_ptr<nlohmann::json>> m_tempJsonFiles;
     };
 
 } // namespace Ent

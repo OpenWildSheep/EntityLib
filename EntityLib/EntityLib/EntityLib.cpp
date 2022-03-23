@@ -542,6 +542,18 @@ namespace Ent
         return getSceneParentEntity(_node->getParentNode());
     }
 
+    std::optional<Property> EntityLib::getParentEntity(Property _node) const
+    {
+        if (auto parent = _node.getPimpl().getParent().get())
+        {
+            if (auto ptr = getSceneParentEntity(parent))
+            {
+                return ptr;
+            }
+        }
+        return std::nullopt;
+    }
+
     nlohmann::json& EntityLib::readJsonFile(char const* _filepath)
     {
         std::filesystem::path const filepath = very_weakly_canonical(_filepath);

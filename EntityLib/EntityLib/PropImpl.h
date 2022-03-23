@@ -130,13 +130,13 @@ namespace Ent
         [[nodiscard]] size_t getUnionTypeIndex();
         [[nodiscard]] DataType getDataType() const; ///< Get the DataType of a Node
 
-        [[nodiscard]] Subschema const* getSchema() const; ///< Get the Schema of the curent Node
+        [[nodiscard]] Subschema const* getSchema() const; ///< Get the Schema of the current Node
 
-        [[nodiscard]] char const* getTypeName() const; ///< Get the Schema name of the curent Node
+        [[nodiscard]] char const* getTypeName() const; ///< Get the Schema name of the current Node
 
-        [[nodiscard]] DataType getMapKeyType() const; ///< @pre Map @brief Get the key type curent Map
+        [[nodiscard]] DataType getMapKeyType() const; ///< @pre Map @brief Get the key type current Map
         [[nodiscard]] DataType
-        getObjectSetKeyType() const; ///< @pre ObjectSet @brief Get the key type curent ObjectSet
+        getObjectSetKeyType() const; ///< @pre ObjectSet @brief Get the key type current ObjectSet
 
         [[nodiscard]] size_t size(); ///< @return the size the this Node whatever it is.
         [[nodiscard]] bool contains(Key const& _key); ///< @pre map/set. @return true if it contains _key.
@@ -168,7 +168,7 @@ namespace Ent
         [[nodiscard]] bool objectSetContains(int64_t _key); ///< Check if the ObjectSet contains this _key
 
         [[nodiscard]] bool isSet() const; ///< Check if the Node is set in the instance
-        void unset();
+        void unset(); ///< Remove values in instance
 
         template <typename V>
         [[nodiscard]] V get() const; ///< @pre Node is of type V. @brief Get the value in the given V type

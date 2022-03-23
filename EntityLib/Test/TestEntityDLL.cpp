@@ -325,7 +325,7 @@ try
         ENTLIB_ASSERT(typedValueUnion->makeNodeRef(stringUnionData) == "string");
     }
     entlib.clearCache();
-    auto testPrefabEntity = [](Ent::Gen::Entity ent)
+    auto testPrefabEntity = [&entlib](Ent::Gen::Entity ent)
     {
         // ActorStates
         auto actorStates = ent.ActorStates();
@@ -411,6 +411,12 @@ try
         ENTLIB_ASSERT(allSubEntities.size() == PrefabSubEntityCount);
         ENTLIB_ASSERT(allSubEntities.get("EP1-Spout_LINK_001").has_value());
         ENTLIB_ASSERT(allSubEntities.get("EP1-Spout_LINK_001")->Color()[0llu].get() == 255.);
+
+        // TEST subScenecomp
+        auto subent = allSubEntities.get("EP1-Spout_LINK_001");
+        auto parent = entlib.getParentEntity(subent->getProperty());
+        ENTLIB_ASSERT(parent.has_value() and *parent == ent.getProperty());
+        ENTLIB_ASSERT(entlib.getParentEntity(ent.getProperty()).has_value() == false);
 
         // TEST union
         auto cinematicGD = ent.Components().CinematicGD();

@@ -11,7 +11,7 @@ namespace Ent
 
         Property() = default;
         Property(Property const& _other)
-            : m_self(_other.m_self->sharedFromThis())
+            : m_self(_other.m_self == nullptr ? nullptr : _other.m_self->sharedFromThis())
         {
         }
         Property(PropImplPtr _prop)
@@ -624,6 +624,26 @@ namespace Ent
                 return false;
             }
             return getRawJson() == _rho.getRawJson();
+        }
+
+        bool operator!=(Property const& _rho) const
+        {
+            return !(*this == _rho);
+        }
+
+        bool operator==(nullptr_t) const
+        {
+            return hasValue();
+        }
+
+        bool operator!=(nullptr_t) const
+        {
+            return !hasValue();
+        }
+
+        explicit operator bool() const
+        {
+            return hasValue();
         }
 
         [[nodiscard]] PropImpl& getPimpl() const

@@ -369,12 +369,12 @@ namespace Ent
                 getProperty().clear();
             }
 
-            [[nodiscard]] std::vector<char const*> getKeys()
+            [[nodiscard]] std::set<char const*> getKeys()
             {
-                std::vector<char const*> keys;
+                std::set<char const*> keys;
                 for (auto [key, schema] : getProperty().getUnionSetKeysString())
                 {
-                    keys.push_back(key);
+                    keys.insert(key);
                 }
                 return keys;
             }
@@ -604,7 +604,7 @@ namespace Ent
             {
                 return getProperty().eraseObjectSetItem(toInternal(key));
             }
-            [[nodiscard]] size_t size()
+            [[nodiscard]] size_t size() const
             {
                 return getProperty().size();
             }
@@ -619,7 +619,7 @@ namespace Ent
                 return getProperty().clear();
             }
 
-            [[nodiscard]] auto getKeys()
+            [[nodiscard]] auto getKeys() const
             {
                 if constexpr (std::is_enum_v<K> or std::is_same_v<K, char const*>)
                 {
@@ -672,7 +672,7 @@ namespace Ent
                 }
             };
 
-            [[nodiscard]] iterator begin()
+            [[nodiscard]] iterator begin() const
             {
                 std::vector<Property> subProps;
                 for (auto const& key : getKeys())
@@ -682,7 +682,7 @@ namespace Ent
                 return iterator{getProperty(), subProps, 0};
             }
 
-            [[nodiscard]] iterator end()
+            [[nodiscard]] iterator end() const
             {
                 return iterator{getProperty(), {}, size()};
             }
@@ -1083,9 +1083,15 @@ namespace Ent
                 return getProperty().getDefaultString();
             }
 
-            String const& operator=(std::string const& value)
+            String const& operator=(char const* value)
             {
                 set(value);
+                return *this;
+            }
+
+            String const& operator=(std::string const& value)
+            {
+                set(value.c_str());
                 return *this;
             }
 

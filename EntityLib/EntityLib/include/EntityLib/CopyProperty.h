@@ -42,22 +42,6 @@ namespace Ent
                 }
                 throw ContextException("Wrong OverrideValueSource given to CopyToEmptyNode");
             };
-            /* auto checkKeyField = [&]
-            {
-                if (m_dest.size() < 3)
-                {
-                    return true;
-                }
-                auto& grandParentProp = m_dest[m_dest.size() - 3];
-                auto grandParentKind = grandParentProp.getDataKind();
-                if (grandParentKind != DataKind::objectSet)
-                {
-                    return true;
-                }
-                auto const& meta = std::get<Subschema::ArrayMeta>(grandParentProp.getSchema()->meta);
-                meta.keyField;
-                return true;
-            };*/
             return !m_isKeyField && checkOVS();
         }
 

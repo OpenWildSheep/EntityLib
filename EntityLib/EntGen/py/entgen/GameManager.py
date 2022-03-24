@@ -15,7 +15,6 @@ from entgen.GameAttackData import *
 from entgen.GameBeamSnapData import *
 from entgen.GameBiteData import *
 from entgen.GameDeathData import *
-from entgen.GameDodgeData import *
 from entgen.GameFallData import *
 from entgen.GameFeetCatchUpData import *
 from entgen.GameFluidData import *
@@ -35,6 +34,8 @@ from entgen.Manager import *
 from entgen.ScaleConverter import *
 from entgen.Float import *
 from entgen.Size import *
+from entgen.Float import *
+from entgen.String import *
 from entgen.GameImmersionData import *
 
 from EntityLibPy import Node
@@ -67,19 +68,24 @@ class GameManager(HelperObject):
     def BiteData(self):  # type: ()->GameBiteData
         return GameBiteData(self._node.at("BiteData"))
     @property
+    def CameraParamsSmoothData(self):  # type: ()->Map[str, Float]
+        return (lambda n: Map(str, Float, n))(self._node.at("CameraParamsSmoothData"))
+    @property
     def ConstrainedInputData(self):  # type: ()->ConstrainedInputData
         return ConstrainedInputData(self._node.at("ConstrainedInputData"))
     @property
     def DeathData(self):  # type: ()->GameDeathData
         return GameDeathData(self._node.at("DeathData"))
     @property
+    def DefaultCameraParamsSmoothValue(self):  # type: ()->Float
+        return Float(self._node.at("DefaultCameraParamsSmoothValue"))
+    @DefaultCameraParamsSmoothValue.setter
+    def DefaultCameraParamsSmoothValue(self, val): self.DefaultCameraParamsSmoothValue.set(val)
+    @property
     def DefaultGamePadID(self):  # type: ()->Int
         return Int(self._node.at("DefaultGamePadID"))
     @DefaultGamePadID.setter
     def DefaultGamePadID(self, val): self.DefaultGamePadID.set(val)
-    @property
-    def DodgeData(self):  # type: ()->GameDodgeData
-        return GameDodgeData(self._node.at("DodgeData"))
     @property
     def EnableSplashScreen(self):  # type: ()->Bool
         return Bool(self._node.at("EnableSplashScreen"))

@@ -30,6 +30,25 @@ namespace Ent
         COUNT
     };
 
+    /// Detailed schema type.
+    /// Especially with array, which can be unionSet, map, objectSet, primitiveSet or simple array
+    enum class DataKind
+    {
+        string, ///< Contains a string
+        number, ///< Contains a number (real)
+        integer, ///< Contains an integer
+        object, ///< Contains a json object (it has properties)
+        array, ///< Contains an array . It can be singular (one type for all) or linear (one type per element)
+        boolean, ///< Contains a boolean value
+        entityRef, ///< Contains a string which is a path to an Entity
+        union_, ///< It is actually a union type, but union is a C keyword
+        unionSet,
+        map,
+        objectSet,
+        primitiveSet,
+        COUNT
+    };
+
     /// @cond PRIVATE
     using Null = std::nullptr_t;
     /// @endcond
@@ -152,6 +171,11 @@ namespace Ent
 
         char const* getUnionDefaultTypeName() const;
 
+        /// @brief Get the type of the Key of a map or set
+        DataType getMapKeyType() const;
+
+        DataKind getDataKind() const;
+
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue = nlohmann::json;
         DefaultValue defaultValue; ///< @brief Contains the data according to the type
@@ -223,6 +247,19 @@ namespace Ent
                 return nullptr;
             }
         }
+
+        char const* getDescription() const
+        {
+            if (auto ref = std::get_if<Ref>(&subSchemaOrRef))
+            {
+                return ref->description.c_str();
+            }
+            else if (auto schema = std::get_if<Subschema>(&subSchemaOrRef))
+            {
+                return schema->description.c_str();
+            }
+            return nullptr;
+        }
     };
 
     class EntityLib;
@@ -288,6 +325,11 @@ namespace Ent
             meta);
     }
 
+    inline DataType Subschema::getMapKeyType() const
+    {
+        return singularItems->get().linearItems->at(0)->type;
+    }
+
     inline Subschema const& SubschemaRef::get() const
     {
         if (std::holds_alternative<Ref>(subSchemaOrRef))
@@ -296,7 +338,9 @@ namespace Ent
             return AT(ref.schema->allDefinitions, ref.ref);
         }
         else if (std::holds_alternative<Subschema>(subSchemaOrRef))
+        {
             return std::get<Subschema>(subSchemaOrRef);
+        }
         else
         {
             ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
@@ -312,7 +356,9 @@ namespace Ent
             return AT(ref.schema->allDefinitions, ref.ref);
         }
         else if (std::holds_alternative<Subschema>(subSchemaOrRef))
+        {
             return std::get<Subschema>(subSchemaOrRef);
+        }
         else
         {
             ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");

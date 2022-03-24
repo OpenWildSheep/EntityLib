@@ -6,7 +6,6 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ActorState import *
-from entgen.Bool import *
 
 from EntityLibPy import Node
 
@@ -23,11 +22,6 @@ class ActionChangeMount(HelperObject):
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))
-    @property
-    def UseSlowMotion(self):  # type: ()->Bool
-        return Bool(self._node.at("UseSlowMotion"))
-    @UseSlowMotion.setter
-    def UseSlowMotion(self, val): self.UseSlowMotion.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

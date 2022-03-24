@@ -29,6 +29,21 @@ class ImmersedBehaviorData(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
+    def canClimbWaterfall(self):  # type: ()->Bool
+        return Bool(self._node.at("canClimbWaterfall"))
+    @canClimbWaterfall.setter
+    def canClimbWaterfall(self, val): self.canClimbWaterfall.set(val)
+    @property
+    def constrainedToPlaneForce(self):  # type: ()->Float
+        return Float(self._node.at("constrainedToPlaneForce"))
+    @constrainedToPlaneForce.setter
+    def constrainedToPlaneForce(self, val): self.constrainedToPlaneForce.set(val)
+    @property
+    def delayBetweenImpulses(self):  # type: ()->Float
+        return Float(self._node.at("delayBetweenImpulses"))
+    @delayBetweenImpulses.setter
+    def delayBetweenImpulses(self, val): self.delayBetweenImpulses.set(val)
+    @property
     def depth(self):  # type: ()->Float
         return Float(self._node.at("depth"))
     @depth.setter
@@ -46,6 +61,16 @@ class ImmersedBehaviorData(HelperObject):
         return Float(self._node.at("flotation"))
     @flotation.setter
     def flotation(self, val): self.flotation.set(val)
+    @property
+    def immersionEndWaterfallJump(self):  # type: ()->Float
+        return Float(self._node.at("immersionEndWaterfallJump"))
+    @immersionEndWaterfallJump.setter
+    def immersionEndWaterfallJump(self, val): self.immersionEndWaterfallJump.set(val)
+    @property
+    def impulseForce(self):  # type: ()->Float
+        return Float(self._node.at("impulseForce"))
+    @impulseForce.setter
+    def impulseForce(self, val): self.impulseForce.set(val)
     @property
     def isAllowed(self):  # type: ()->Bool
         return Bool(self._node.at("isAllowed"))

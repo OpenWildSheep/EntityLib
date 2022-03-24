@@ -1169,7 +1169,6 @@ namespace Ent
             throw BadType("In saveNode, an object is expeted");
         }
         json node = toJson();
-        constexpr char const* schemaFormat = "wildschema:/all/%s.json";
         node["$schema"] = format(schemaFormat, getSchema()->name.c_str());
 
         std::filesystem::path path = getEntityLib()->getAbsolutePath(_path);
@@ -1323,7 +1322,7 @@ namespace Ent
         }
         else
         {
-            throw BadType(); 
+            throw BadType();
         }
     }
 

@@ -107,6 +107,11 @@ class RenderManager_RenderConfig(HelperObject):
     @EnableUnderwaterPostEffect.setter
     def EnableUnderwaterPostEffect(self, val): self.EnableUnderwaterPostEffect.set(val)
     @property
+    def EnableVegetationDrawDatabase(self):  # type: ()->Int
+        return Int(self._node.at("EnableVegetationDrawDatabase"))
+    @EnableVegetationDrawDatabase.setter
+    def EnableVegetationDrawDatabase(self, val): self.EnableVegetationDrawDatabase.set(val)
+    @property
     def GlobalLODBias(self):  # type: ()->Float
         return Float(self._node.at("GlobalLODBias"))
     @GlobalLODBias.setter

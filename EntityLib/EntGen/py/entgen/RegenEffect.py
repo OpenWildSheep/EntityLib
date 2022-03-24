@@ -45,6 +45,11 @@ class RegenEffect(HelperObject):
     @InnerRadius.setter
     def InnerRadius(self, val): self.InnerRadius.set(val)
     @property
+    def Margin(self):  # type: ()->Float
+        return Float(self._node.at("Margin"))
+    @Margin.setter
+    def Margin(self, val): self.Margin.set(val)
+    @property
     def OuterMultiplier(self):  # type: ()->Float
         return Float(self._node.at("OuterMultiplier"))
     @OuterMultiplier.setter

@@ -8,7 +8,7 @@ from entgen.EnergyIntensity import *
 from entgen.String import *
 from entgen.Int import *
 from entgen.Vector3 import *
-from entgen.variant_ShapeSDF_ShapeSphere_ShapeBox_ import *
+from entgen.variant_MeshShape_ShapeSphere_ShapeBox_ import *
 
 from EntityLibPy import Node
 
@@ -38,8 +38,8 @@ class EnergyPoolGD_EnergyArea(HelperObject):
     @Priority.setter
     def Priority(self, val): self.Priority.set(val)
     @property
-    def Shape(self):  # type: ()->variant_ShapeSDF_ShapeSphere_ShapeBox_
-        return variant_ShapeSDF_ShapeSphere_ShapeBox_(self._node.at("Shape"))
+    def Shape(self):  # type: ()->variant_MeshShape_ShapeSphere_ShapeBox_
+        return variant_MeshShape_ShapeSphere_ShapeBox_(self._node.at("Shape"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

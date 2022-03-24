@@ -9,12 +9,14 @@
 #include "../Union.h"
 #include "../Object.h"
 #include "../Node.h"
+#include "../PropImpl.h"
 #pragma warning(pop)
 
 namespace Ent
 {
     struct Node;
     class EntityLib;
+    struct Property;
 
     // ********************************** Static data *********************************************
 
@@ -41,6 +43,7 @@ namespace Ent
     {
     public:
         mutable Pool<Node> nodePool;
+        mutable Pool<PropImpl> propertyPool;
         /// @todo Make public attribute private?
         std::filesystem::path rootPath; ///< Path to the perforce root (X:/)
         std::filesystem::path rawdataPath; ///< Path to the RawData dir in the perforce root (X:/RawData)
@@ -58,6 +61,13 @@ namespace Ent
         EntityLib(EntityLib const&) = delete;
         EntityLib& operator=(EntityLib const&) = delete;
         DeleteCheck deleteCheck;
+
+        PropImplPtr newPropImpl();
+        PropImplPtr newPropImpl(
+            PropImplPtr _parent,
+            Ent::Subschema const* _schema,
+            char const* _filename,
+            nlohmann::json* _doc = nullptr);
         /// @endcond
 
         /// Load the Node at path _nodeSchema then return a pointer to the cached data
@@ -156,11 +166,19 @@ namespace Ent
         /// @pre _from and _to are Entity nodes
         EntityRef makeEntityRef(Node const& _from, Node const& _to);
 
+        /// @brief Resolve an EntityRef relative to this Node/Entity.
+        /// Returns nullptr in case of failure.
+        Property resolveEntityRef(Property const& _node, const EntityRef& _entityRef) const;
+        /// @brief Compute the EntityRef going from the Entity _from, to the Entity _to
+        /// @pre _from and _to are Entity nodes
+        EntityRef makeEntityRef(Property const& _from, Property const& _to);
+
         Node* getParentEntity(Node* _node); ///< Get the parent Entity Node
         Node const* getParentEntity(Node const* _node); ///< Get the parent Entity Node
 
-        nlohmann::json& readJsonFile(char const* _filepath, bool canonicalize = true);
-        void saveJsonFile(nlohmann::json const* doc, char const* _filepath);
+        nlohmann::json& readJsonFile(char const* _filepath);
+        nlohmann::json& createTempJsonFile();
+        void saveJsonFile(nlohmann::json const* doc, char const* _filepath, char const* _schema);
 
     private:
         /// Load an Entity or a Scene, using the given cache
@@ -199,6 +217,7 @@ namespace Ent
 
         mutable std::map<std::filesystem::path, NodeFile> m_nodeCache;
         mutable std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> m_jsonDatabase;
+        mutable std::vector<std::unique_ptr<nlohmann::json>> m_tempJsonFiles;
     };
 
 } // namespace Ent

@@ -12,6 +12,8 @@ from entgen.AttackDamageData import *
 from entgen.String import *
 from entgen.AttackImpactData import *
 from entgen.String import *
+from entgen.AttackPhysicsForceData import *
+from entgen.String import *
 from entgen.CameraShakeData import *
 from entgen.String import *
 
@@ -41,6 +43,9 @@ class GameAttackData(HelperObject):
     @property
     def AttackImpactData(self):  # type: ()->Map[str, AttackImpactData]
         return (lambda n: Map(str, AttackImpactData, n))(self._node.at("AttackImpactData"))
+    @property
+    def AttackPhysicsForceData(self):  # type: ()->Map[str, AttackPhysicsForceData]
+        return (lambda n: Map(str, AttackPhysicsForceData, n))(self._node.at("AttackPhysicsForceData"))
     @property
     def DashTargetImpulse(self):  # type: ()->ScaleConverter
         return ScaleConverter(self._node.at("DashTargetImpulse"))

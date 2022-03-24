@@ -15,6 +15,7 @@
 
 #include "external/json.hpp"
 #include "ValidJson.h"
+#include "include/EntityLib/Property.h"
 #pragma warning(pop)
 
 /// \cond PRIVATE
@@ -134,6 +135,15 @@ namespace Ent
         return nullptr;
     }
 
+    static PropImplPtr getSubScene(PropImpl& _entity)
+    {
+        if (PropImplPtr subScene = _entity.getObjectField("Components")->getUnionSetItem("SubScene"))
+        {
+            return subScene->getObjectField("Embedded");
+        }
+        return nullptr;
+    }
+
     template <typename N> // N : Node or Node const
     static N* getSceneParentEntity(N* _scene)
     {
@@ -155,6 +165,29 @@ namespace Ent
             ENTLIB_ASSERT(components != nullptr);
             ENTLIB_ASSERT(components->getDataType() == DataType::array);
             entity = components->getParentNode(); // Entity
+            ENTLIB_ASSERT(entity != nullptr);
+            ENTLIB_ASSERT(entity->getDataType() == DataType::object);
+            ENTLIB_ASSERT_MSG(
+                entity == nullptr || entity->getSchema()->name == entitySchemaName,
+                "current has to be an Entity but is not!");
+        }
+        return entity;
+    }
+
+    static PropImplPtr getSceneParentEntity(PropImpl* _scene)
+    {
+        PropImplPtr entity;
+        ENTLIB_ASSERT(_scene != nullptr);
+        ENTLIB_ASSERT(_scene->getDataType() == DataType::array);
+        // subSceneData can be null if rootScene was loaded with loadSceneAsNode
+        if (auto subSceneCpnt = _scene->getParent())
+        {
+            ENTLIB_ASSERT(subSceneCpnt != nullptr);
+            ENTLIB_ASSERT(subSceneCpnt->getDataType() == DataType::object);
+            auto components = subSceneCpnt->getParent(); // Component union
+            ENTLIB_ASSERT(components != nullptr);
+            ENTLIB_ASSERT(components->getDataType() == DataType::array);
+            entity = components->getParent(); // Entity
             ENTLIB_ASSERT(entity != nullptr);
             ENTLIB_ASSERT(entity->getDataType() == DataType::object);
             ENTLIB_ASSERT_MSG(
@@ -208,6 +241,51 @@ namespace Ent
         return resolveEntityRefRecursive(_current, _up, _down, _path);
     }
 
+    static PropImplPtr resolveEntityRefRecursive(
+        PropImplPtr _current, PropImplPtr _up, PropImplPtr _down, std::vector<std::string>& _path)
+    {
+        ENTLIB_ASSERT_MSG(
+            _current == nullptr or _current->getSchema()->name == entitySchemaName,
+            "_current has to be an Entity but is not!");
+
+        auto& head = _path.front();
+
+        if (head == "..")
+        {
+            // go up in hierarchy
+            if (_up == nullptr)
+            {
+                // broken ref
+                return nullptr;
+            }
+            _current = getSceneParentEntity(_up.get());
+            ENTLIB_ASSERT_MSG(
+                _current == nullptr or _current->getSchema()->name == entitySchemaName,
+                "_current has to be an Entity but is not!");
+            _down = std::move(_up);
+            _up = _current == nullptr ? nullptr : _current->getParent();
+        }
+        else if (head != ".")
+        {
+            // go down in child hierarchy named "head"
+            if (_down == nullptr)
+            {
+                // broken ref
+                return nullptr;
+            }
+            _current = _down->getObjectSetItem(head.c_str());
+            _up = std::move(_down);
+            _down = _current == nullptr ? nullptr : getSubScene(*_current);
+        }
+        _path.erase(_path.begin());
+        if (_path.empty())
+        {
+            return _current;
+        }
+        return resolveEntityRefRecursive(
+            std::move(_current), std::move(_up), std::move(_down), _path);
+    }
+
     Node const* resolveEntityRefImpl(Node const* _current, const EntityRef& _entityRef)
     {
         ENTLIB_ASSERT(_current != nullptr);
@@ -228,6 +306,28 @@ namespace Ent
         Node const* up = _current->getParentNode();
 
         return resolveEntityRefRecursive(_current, up, down, parts);
+    }
+
+    static PropImplPtr resolveEntityRefImpl(PropImplPtr _current, const EntityRef& _entityRef)
+    {
+        ENTLIB_ASSERT(_current != nullptr);
+        if (_current->getSchema()->name != entitySchemaName)
+        {
+            throw ContextException("Can't resolveEntityRef because the Node in not an Entity");
+        }
+        if (_entityRef.entityPath.empty())
+        {
+            // empty ref
+            return nullptr;
+        }
+
+        // split around '/'
+        std::vector<std::string> parts = splitString(_entityRef.entityPath.c_str(), '/');
+
+        PropImplPtr down = getSubScene(*_current);
+        PropImplPtr up = _current->getParent();
+
+        return resolveEntityRefRecursive(std::move(_current), std::move(up), std::move(down), parts);
     }
 
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
@@ -325,12 +425,87 @@ namespace Ent
         return {std::move(path), rootEntity, rootScene};
     }
 
+    static std::tuple<std::vector<std::string>, PropImplPtr, PropImplPtr>
+    getAbsolutePathReversed(PropImplPtr _entity)
+    {
+        ENTLIB_ASSERT_MSG(
+            _entity->getSchema()->name == entitySchemaName,
+            "_entity has to be an Entity but is not!");
+        PropImplPtr current = std::move(_entity);
+        PropImplPtr rootEntity = nullptr;
+        PropImplPtr rootScene = nullptr;
+        std::vector<std::string> path;
+        while (current != nullptr)
+        {
+            ENTLIB_ASSERT(current->getDataType() == DataType::object);
+            path.emplace_back(current->getObjectField("Name")->getString());
+            rootScene = current->getParent();
+            rootEntity = std::move(current);
+            current = nullptr;
+            if (rootScene != nullptr)
+            {
+                current = getSceneParentEntity(rootScene.get());
+            }
+            ENTLIB_ASSERT_MSG(
+                current == nullptr || current->getSchema()->name == entitySchemaName,
+                "current has to be an Entity but is not!");
+        }
+        return {std::move(path), std::move(rootEntity), std::move(rootScene)};
+    }
+
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     EntityRef EntityLib::makeEntityRef(Node const& _from, Node const& _to)
     {
         // get the two absolute path
         auto&& [thisPath, thisRootEntity, thisRootScene] = getAbsolutePathReversed(&_from);
         auto&& [entityPath, entityRootEntity, entityRootScene] = getAbsolutePathReversed(&_to);
+
+        // entities should either share a common root scene
+        // or a common root entity if they are in a .entity (i.e there is no root scene)
+        if (thisRootScene != entityRootScene
+            or thisRootEntity == nullptr and thisRootEntity != entityRootEntity)
+        {
+            // cannot reference unrelated entities
+            return {};
+        }
+
+        std::string relativePath = computeRelativePath(thisPath, std::move(entityPath), false);
+
+        return {relativePath};
+    }
+
+    Property EntityLib::resolveEntityRef(Property const& _node, const EntityRef& _entityRef) const
+    {
+        if (_node.getDataType() == DataType::array) // This is a scene
+        {
+            if (_entityRef.entityPath.empty())
+            {
+                // empty ref
+                return Property();
+            }
+
+            // split around '/'
+            std::vector<std::string> parts = splitString(_entityRef.entityPath.c_str(), '/');
+
+            PropImplPtr current = getSceneParentEntity(&_node.getPimpl());
+            PropImplPtr down = _node.getPimpl().sharedFromThis();
+            PropImplPtr up = current == nullptr ? nullptr : current->getParent();
+
+            return Property(resolveEntityRefRecursive(
+                std::move(current), std::move(up), std::move(down), parts));
+        }
+        else
+        {
+            return Property(resolveEntityRefImpl(_node.getPimpl().sharedFromThis(), _entityRef));
+        }
+    }
+    EntityRef EntityLib::makeEntityRef(Property const& _from, Property const& _to)
+    {
+        // get the two absolute path
+        auto&& [thisPath, thisRootEntity, thisRootScene] =
+            getAbsolutePathReversed(_from.getPimpl().sharedFromThis());
+        auto&& [entityPath, entityRootEntity, entityRootScene] =
+            getAbsolutePathReversed(_to.getPimpl().sharedFromThis());
 
         // entities should either share a common root scene
         // or a common root entity if they are in a .entity (i.e there is no root scene)
@@ -367,10 +542,9 @@ namespace Ent
         return getSceneParentEntity(_node->getParentNode());
     }
 
-    nlohmann::json& EntityLib::readJsonFile(char const* _filepath, bool canonicalize)
+    nlohmann::json& EntityLib::readJsonFile(char const* _filepath)
     {
-        std::filesystem::path const filepath =
-            canonicalize ? very_weakly_canonical(_filepath) : _filepath;
+        std::filesystem::path const filepath = very_weakly_canonical(_filepath);
         if (auto iter = m_jsonDatabase.find(filepath); iter != m_jsonDatabase.end())
         {
             return iter->second;
@@ -382,7 +556,12 @@ namespace Ent
         }
     }
 
-    void EntityLib::saveJsonFile(nlohmann::json const* doc, char const* _filepath)
+    json& EntityLib::createTempJsonFile()
+    {
+        return *m_tempJsonFiles.emplace_back(std::make_unique<json>(json::object()));
+    }
+
+    void EntityLib::saveJsonFile(json const* doc, char const* _filepath, char const* _schema)
     {
         std::filesystem::path const filepath = very_weakly_canonical(_filepath);
         std::ofstream ofs(rawdataPath / filepath);
@@ -390,7 +569,13 @@ namespace Ent
         {
             throw ContextException("Can't open %s for write", filepath.string().c_str());
         }
-        ofs << doc->dump(4);
+        json copy = *doc;
+        copy["$schema"] = format(schemaFormat, _schema);
+        ofs << copy.dump(4);
+        if (&(m_jsonDatabase[filepath]) != doc)
+        {
+            m_jsonDatabase[filepath] = *doc;
+        }
     }
 
     struct MergeMapOverride
@@ -1187,12 +1372,8 @@ namespace Ent
         }
         if (not typeFound)
         {
-            ENTLIB_LOG_ERROR(
-                "Can't find type %s in schema %s", dataType.c_str(), _nodeSchema.name.c_str());
-            NodeUniquePtr dataNode =
-                loadNode(_nodeSchema.oneOf->front().get(), _data, nullptr, nullptr);
-            Union un(this, &_nodeSchema, std::move(dataNode), 0, std::move(unionInstanceOf));
-            result = newNode(std::make_unique<Union>(std::move(un)), &_nodeSchema);
+            throw BadType(Ent::staticFormat(
+                "Can't find type %s in schema %s", dataType.c_str(), _nodeSchema.name.c_str()));
         }
         return result;
     }
@@ -1221,33 +1402,6 @@ namespace Ent
         case DataType::COUNT: [[fallthrough]];
         default: ENTLIB_LOGIC_ERROR("Invalid DataType"); break;
         }
-    }
-
-    static double round_n(double value, double multiplier)
-    {
-        const auto scaled_value = value * multiplier;
-        return std::round(scaled_value) / multiplier;
-    }
-
-    static double truncFloat(float _val)
-    {
-        if (not std::isnormal(_val))
-        {
-            return _val;
-        }
-
-        double result{};
-        for (size_t multiplier = 0; multiplier < 100; ++multiplier)
-        {
-            result = round_n(_val, pow(10, multiplier));
-            if (float(result) == _val)
-            {
-                break;
-            }
-        }
-        ENTLIB_ASSERT(float(result) == _val);
-
-        return result;
     }
 
     json EntityLib::dumpNode(
@@ -1306,7 +1460,7 @@ namespace Ent
                     // handle "Super" special key
                     if (_superKeyIsTypeName and name == "Super")
                     {
-                        const auto* typeName = getRefTypeName(subNode->getTypeName());
+                        const auto* typeName = subNode->getTypeName();
                         auto const fieldIdx = internObj->at(name.c_str()).fieldIdx;
                         fieldMap.emplace_back(typeName, std::move(subJson), fieldIdx);
                     }
@@ -1658,8 +1812,8 @@ namespace Ent
             for (auto const& [name, schema2] : this->schema.schema.allDefinitions)
             {
                 // Try to lower only if the type was extracted from a file name
-                if ((tryToLower and strToLower(getRefTypeName(name.c_str())) == schemaFound)
-                    or (not tryToLower and getRefTypeName(name.c_str()) == schemaFound))
+                if ((tryToLower and strToLower(name.c_str()) == schemaFound)
+                    or (not tryToLower and name.c_str() == schemaFound))
                 {
                     schema = &schema2;
                     break;
@@ -1704,6 +1858,39 @@ namespace Ent
     {
         return std::unique_ptr<Node, NodeDeleter>(new (nodePool.alloc())
                                                       Node(std::move(val), _subschema));
+    }
+
+    PropImplPtr EntityLib::newPropImpl()
+    {
+        PropImpl* property{};
+        auto mem = propertyPool.alloc();
+        try
+        {
+            property = new (mem) PropImpl();
+        }
+        catch (...)
+        {
+            propertyPool.free(mem);
+            throw;
+        }
+        return property->sharedFromThis();
+    }
+
+    PropImplPtr EntityLib::newPropImpl(
+        PropImplPtr _parent, Ent::Subschema const* _schema, char const* _filename, nlohmann::json* _doc)
+    {
+        PropImpl* property{};
+        auto mem = propertyPool.alloc();
+        try
+        {
+            property = new (mem) PropImpl(this, std::move(_parent), _schema, _filename, _doc);
+        }
+        catch (...)
+        {
+            propertyPool.free(mem);
+            throw;
+        }
+        return property->sharedFromThis();
     }
 
     NodeUniquePtr EntityLib::makeEntityNode() const

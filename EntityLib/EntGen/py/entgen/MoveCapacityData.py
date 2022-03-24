@@ -76,6 +76,11 @@ class MoveCapacityData(HelperObject):
     @brakeDeceleration.setter
     def brakeDeceleration(self, val): self.brakeDeceleration.set(val)
     @property
+    def canSpiritAttack(self):  # type: ()->Bool
+        return Bool(self._node.at("canSpiritAttack"))
+    @canSpiritAttack.setter
+    def canSpiritAttack(self, val): self.canSpiritAttack.set(val)
+    @property
     def canUseCliffGrip(self):  # type: ()->Bool
         return Bool(self._node.at("canUseCliffGrip"))
     @canUseCliffGrip.setter
@@ -131,6 +136,11 @@ class MoveCapacityData(HelperObject):
         return Float(self._node.at("defaultWorldUpSpeedFactor"))
     @defaultWorldUpSpeedFactor.setter
     def defaultWorldUpSpeedFactor(self, val): self.defaultWorldUpSpeedFactor.set(val)
+    @property
+    def dodgeCooldownTime(self):  # type: ()->Float
+        return Float(self._node.at("dodgeCooldownTime"))
+    @dodgeCooldownTime.setter
+    def dodgeCooldownTime(self, val): self.dodgeCooldownTime.set(val)
     @property
     def doubleJump(self):  # type: ()->Bool
         return Bool(self._node.at("doubleJump"))

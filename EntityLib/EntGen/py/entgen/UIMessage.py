@@ -32,6 +32,11 @@ class UIMessage(HelperObject):
     @Duration.setter
     def Duration(self, val): self.Duration.set(val)
     @property
+    def Icon(self):  # type: ()->String
+        return String(self._node.at("Icon"))
+    @Icon.setter
+    def Icon(self, val): self.Icon.set(val)
+    @property
     def ScreenPosition(self):  # type: ()->Vector2
         return Vector2(self._node.at("ScreenPosition"))
     @ScreenPosition.setter

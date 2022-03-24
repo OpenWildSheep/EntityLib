@@ -10,6 +10,7 @@ from entgen.ComponentGD import *
 from entgen.EventCameraData import *
 from entgen.Float import *
 from entgen.String import *
+from entgen.String import *
 
 from EntityLibPy import Node
 
@@ -27,15 +28,13 @@ class TriggerEventCameraGD(HelperObject):
     def EventCameraData(self):  # type: ()->EventCameraData
         return EventCameraData(self._node.at("EventCameraData"))
     @property
-    def PlayAnimBeforeTrigger(self):  # type: ()->String
-        return String(self._node.at("PlayAnimBeforeTrigger"))
+    def PlayAnimBeforeTrigger(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.at("PlayAnimBeforeTrigger"))
     @PlayAnimBeforeTrigger.setter
     def PlayAnimBeforeTrigger(self, val): self.PlayAnimBeforeTrigger.set(val)
     @property
-    def PlayAnimsWhenTriggered(self):  # type: ()->PrimArray[String]
-        return (lambda n: PrimArray(String, n))(self._node.at("PlayAnimsWhenTriggered"))
-    @PlayAnimsWhenTriggered.setter
-    def PlayAnimsWhenTriggered(self, val): self.PlayAnimsWhenTriggered.set(val)
+    def PlayAnimsWhenTriggered(self):  # type: ()->Array[PrimArray[String]]
+        return (lambda n: Array((lambda n: PrimArray(String, n)), n))(self._node.at("PlayAnimsWhenTriggered"))
     @property
     def Radius(self):  # type: ()->Float
         return Float(self._node.at("Radius"))

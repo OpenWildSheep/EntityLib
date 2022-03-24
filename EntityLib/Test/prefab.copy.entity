@@ -301,7 +301,7 @@
                     ]
                 }
             },
-            "Type": "PathNodeGD"
+            "Type": "TestTagsList"
         },
         {
             "Data": {

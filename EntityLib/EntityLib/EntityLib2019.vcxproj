@@ -114,8 +114,6 @@
   <ItemGroup>
     <ClCompile Include="Array.cpp" />
     <ClCompile Include="ComponentMerge.cpp" />
-    <ClCompile Include="Cursor.cpp" />
-    <ClCompile Include="CursorRestore.cpp" />
     <ClCompile Include="EntityLib.cpp">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EnableAllWarnings</WarningLevel>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</TreatWarningAsError>
@@ -123,11 +121,12 @@
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</TreatWarningAsError>
     </ClCompile>
     <ClCompile Include="EntityLibCore.cpp" />
-    <ClCompile Include="FileCursor.cpp" />
-    <ClCompile Include="include\Schema.cpp" />
+    <ClCompile Include="FileProperty.cpp" />
+    <ClCompile Include="Schema.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="PropImpl.cpp" />
     <ClCompile Include="SchemaLoader.cpp" />
     <ClCompile Include="Tools.cpp" />
     <ClCompile Include="Union.cpp" />
@@ -141,9 +140,8 @@
     <ClInclude Include="include\EntityLib.h" />
     <ClInclude Include="include\EntityLibCore.h" />
     <ClInclude Include="include\EntityLib\CopyNode.h" />
-    <ClInclude Include="include\EntityLib\Cursor.h" />
-    <ClInclude Include="include\EntityLib\CursorRestore.h" />
-    <ClInclude Include="include\EntityLib\FileCursor.h" />
+    <ClInclude Include="include\EntityLib\FileProperty.h" />
+    <ClInclude Include="include\EntityLib\Property.h" />
     <ClInclude Include="include\EntityLib\Visitor.h" />
     <ClInclude Include="include\Schema.h" />
     <ClInclude Include="Map.h" />
@@ -151,6 +149,7 @@
     <ClInclude Include="Node.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Override.h" />
+    <ClInclude Include="PropImpl.h" />
     <ClInclude Include="RemovableMap.h" />
     <ClInclude Include="SchemaLoader.h" />
     <ClInclude Include="Tools.h" />

@@ -23,6 +23,11 @@ class VolumeConstraintDataGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def CameraConstraintLocalAxis(self):  # type: ()->Vector3
+        return Vector3(self._node.at("CameraConstraintLocalAxis"))
+    @CameraConstraintLocalAxis.setter
+    def CameraConstraintLocalAxis(self, val): self.CameraConstraintLocalAxis.set(val)
+    @property
     def Matrix(self):  # type: ()->Matrix44
         return Matrix44(self._node.at("Matrix"))
     @Matrix.setter

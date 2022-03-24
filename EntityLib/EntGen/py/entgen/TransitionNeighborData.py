@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.Float import *
 from entgen.Int import *
 
 from EntityLibPy import Node
@@ -29,6 +30,11 @@ class TransitionNeighborData(HelperObject):
         return (lambda n: PrimArray(Int, n))(self._node.at("Forward"))
     @Forward.setter
     def Forward(self, val): self.Forward.set(val)
+    @property
+    def TangentSize(self):  # type: ()->Float
+        return Float(self._node.at("TangentSize"))
+    @TangentSize.setter
+    def TangentSize(self, val): self.TangentSize.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

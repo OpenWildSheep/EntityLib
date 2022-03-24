@@ -13,7 +13,7 @@ from entgen.AttackData import *
 from entgen.Bool import *
 from entgen.ComponentGD import *
 from entgen.Float import *
-from entgen.LifeAndDamageData import *
+from entgen.ImpactAndSolidityData import *
 from entgen.ProjectileData import *
 from entgen.ShootData import *
 from entgen.StunData import *
@@ -80,8 +80,8 @@ class ActorGD(HelperObject):
     def attackData(self):  # type: ()->AttackData
         return AttackData(self._node.at("attackData"))
     @property
-    def lifeAndDamageData(self):  # type: ()->LifeAndDamageData
-        return LifeAndDamageData(self._node.at("lifeAndDamageData"))
+    def impactAndSolidityData(self):  # type: ()->ImpactAndSolidityData
+        return ImpactAndSolidityData(self._node.at("impactAndSolidityData"))
     @property
     def projectileData(self):  # type: ()->ProjectileData
         return ProjectileData(self._node.at("projectileData"))

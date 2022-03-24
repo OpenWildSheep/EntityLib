@@ -9,6 +9,7 @@ from entgen.Int import *
 from entgen.Bool import *
 from entgen.Float import *
 from entgen.Manager import *
+from entgen.RenderManager_DepthOfFieldConfig import *
 from entgen.RenderManager_RenderConfig import *
 from entgen.ScaleConverter import *
 
@@ -29,6 +30,9 @@ class RenderManager(HelperObject):
         return String(self._node.at("DecalMeshPath"))
     @DecalMeshPath.setter
     def DecalMeshPath(self, val): self.DecalMeshPath.set(val)
+    @property
+    def DepthOfField(self):  # type: ()->RenderManager_DepthOfFieldConfig
+        return RenderManager_DepthOfFieldConfig(self._node.at("DepthOfField"))
     @property
     def DisableMoveDrawOrigin(self):  # type: ()->Bool
         return Bool(self._node.at("DisableMoveDrawOrigin"))

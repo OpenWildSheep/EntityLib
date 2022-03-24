@@ -6,6 +6,8 @@ import EntityLibPy
 
 from entgen.EnergyValue import *
 from entgen.String import *
+from entgen.Int import *
+from entgen.Bool import *
 from entgen.Float import *
 from entgen.Manager import *
 from entgen.RegenerationManager_EnergyAreaSetting import *
@@ -77,8 +79,23 @@ class RegenerationManager(HelperObject):
     @InjectedEvaporationMultiplier.setter
     def InjectedEvaporationMultiplier(self, val): self.InjectedEvaporationMultiplier.set(val)
     @property
+    def MaxDispatchedRegenQueries(self):  # type: ()->Int
+        return Int(self._node.at("MaxDispatchedRegenQueries"))
+    @MaxDispatchedRegenQueries.setter
+    def MaxDispatchedRegenQueries(self, val): self.MaxDispatchedRegenQueries.set(val)
+    @property
+    def MaxDynamicRegenEffectCount(self):  # type: ()->Int
+        return Int(self._node.at("MaxDynamicRegenEffectCount"))
+    @MaxDynamicRegenEffectCount.setter
+    def MaxDynamicRegenEffectCount(self, val): self.MaxDynamicRegenEffectCount.set(val)
+    @property
     def Super(self):  # type: ()->Manager
         return Manager(self._node.at("Super"))
+    @property
+    def UseNewRegenSystem(self):  # type: ()->Bool
+        return Bool(self._node.at("UseNewRegenSystem"))
+    @UseNewRegenSystem.setter
+    def UseNewRegenSystem(self, val): self.UseNewRegenSystem.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

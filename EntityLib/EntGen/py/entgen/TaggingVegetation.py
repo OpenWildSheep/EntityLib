@@ -7,7 +7,7 @@ import EntityLibPy
 from entgen.EnergySide import *
 from entgen.String import *
 from entgen.Float import *
-from entgen.FloatRange import *
+from entgen.EnergyValue import *
 from entgen.String import *
 
 from EntityLibPy import Node
@@ -23,8 +23,10 @@ class TaggingVegetation(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def RegenRange(self):  # type: ()->FloatRange
-        return FloatRange(self._node.at("RegenRange"))
+    def EnergyValues(self):  # type: ()->PrimArray[EnergyValue]
+        return (lambda n: PrimArray(EnergyValue, n))(self._node.at("EnergyValues"))
+    @EnergyValues.setter
+    def EnergyValues(self, val): self.EnergyValues.set(val)
     @property
     def RequiredRatio(self):  # type: ()->Float
         return Float(self._node.at("RequiredRatio"))

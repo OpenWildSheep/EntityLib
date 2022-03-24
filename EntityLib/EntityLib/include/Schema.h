@@ -247,6 +247,19 @@ namespace Ent
                 return nullptr;
             }
         }
+
+        char const* getDescription() const
+        {
+            if (auto ref = std::get_if<Ref>(&subSchemaOrRef))
+            {
+                return ref->description.c_str();
+            }
+            else if (auto schema = std::get_if<Subschema>(&subSchemaOrRef))
+            {
+                return schema->description.c_str();
+            }
+            return nullptr;
+        }
     };
 
     class EntityLib;

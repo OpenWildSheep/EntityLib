@@ -6,6 +6,8 @@ table MeshEdges
 {
 	position:Float3Channel (required);
 	sourceFileInf:SourceFileInf;
+	EdgeToEdgeAngleMin:float;
+	EdgeToEdgeAngleMax:float;
 }
 
 root_type MeshEdges;

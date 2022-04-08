@@ -46,7 +46,21 @@ class MeshEdges(object):
             return obj
         return None
 
-def Start(builder): builder.StartObject(2)
+    # MeshEdges
+    def EdgeToEdgeAngleMin(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+        return 0.0
+
+    # MeshEdges
+    def EdgeToEdgeAngleMax(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+        return 0.0
+
+def Start(builder): builder.StartObject(4)
 def MeshEdgesStart(builder):
     """This method is deprecated. Please switch to Start."""
     return Start(builder)
@@ -58,6 +72,14 @@ def AddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlo
 def MeshEdgesAddSourceFileInf(builder, sourceFileInf):
     """This method is deprecated. Please switch to AddSourceFileInf."""
     return AddSourceFileInf(builder, sourceFileInf)
+def AddEdgeToEdgeAngleMin(builder, EdgeToEdgeAngleMin): builder.PrependFloat32Slot(2, EdgeToEdgeAngleMin, 0.0)
+def MeshEdgesAddEdgeToEdgeAngleMin(builder, EdgeToEdgeAngleMin):
+    """This method is deprecated. Please switch to AddEdgeToEdgeAngleMin."""
+    return AddEdgeToEdgeAngleMin(builder, EdgeToEdgeAngleMin)
+def AddEdgeToEdgeAngleMax(builder, EdgeToEdgeAngleMax): builder.PrependFloat32Slot(3, EdgeToEdgeAngleMax, 0.0)
+def MeshEdgesAddEdgeToEdgeAngleMax(builder, EdgeToEdgeAngleMax):
+    """This method is deprecated. Please switch to AddEdgeToEdgeAngleMax."""
+    return AddEdgeToEdgeAngleMax(builder, EdgeToEdgeAngleMax)
 def End(builder): return builder.EndObject()
 def MeshEdgesEnd(builder):
     """This method is deprecated. Please switch to End."""
@@ -75,6 +97,8 @@ class MeshEdgesT(object):
     def __init__(self):
         self.position = None  # type: Optional[WBIN.Float3Channel.Float3ChannelT]
         self.sourceFileInf = None  # type: Optional[WBIN.SourceFileInf.SourceFileInfT]
+        self.edgeToEdgeAngleMin = 0.0  # type: float
+        self.edgeToEdgeAngleMax = 0.0  # type: float
 
     @classmethod
     def InitFromBuf(cls, buf, pos):
@@ -96,6 +120,8 @@ class MeshEdgesT(object):
             self.position = WBIN.Float3Channel.Float3ChannelT.InitFromObj(meshEdges.Position())
         if meshEdges.SourceFileInf() is not None:
             self.sourceFileInf = WBIN.SourceFileInf.SourceFileInfT.InitFromObj(meshEdges.SourceFileInf())
+        self.edgeToEdgeAngleMin = meshEdges.EdgeToEdgeAngleMin()
+        self.edgeToEdgeAngleMax = meshEdges.EdgeToEdgeAngleMax()
 
     # MeshEdgesT
     def Pack(self, builder):
@@ -108,5 +134,7 @@ class MeshEdgesT(object):
             AddPosition(builder, position)
         if self.sourceFileInf is not None:
             AddSourceFileInf(builder, sourceFileInf)
+        AddEdgeToEdgeAngleMin(builder, self.edgeToEdgeAngleMin)
+        AddEdgeToEdgeAngleMax(builder, self.edgeToEdgeAngleMax)
         meshEdges = End(builder)
         return meshEdges

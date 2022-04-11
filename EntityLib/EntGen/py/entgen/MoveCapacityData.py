@@ -137,6 +137,11 @@ class MoveCapacityData(HelperObject):
     @defaultWorldUpSpeedFactor.setter
     def defaultWorldUpSpeedFactor(self, val): self.defaultWorldUpSpeedFactor.set(val)
     @property
+    def dodgeCooldownTime(self):  # type: ()->Float
+        return Float(self._node.at("dodgeCooldownTime"))
+    @dodgeCooldownTime.setter
+    def dodgeCooldownTime(self, val): self.dodgeCooldownTime.set(val)
+    @property
     def doubleJump(self):  # type: ()->Bool
         return Bool(self._node.at("doubleJump"))
     @doubleJump.setter

@@ -11,7 +11,7 @@ namespace Ent
 
         Property() = default;
         Property(Property const& _other)
-            : m_self(_other.m_self->sharedFromThis())
+            : m_self(_other.m_self == nullptr ? nullptr : _other.m_self->sharedFromThis())
         {
         }
         Property(PropImplPtr _prop)
@@ -42,22 +42,22 @@ namespace Ent
             getPimpl().save(_filename);
         }
 
-        /// @brief The Node is default if no values are set inside
-        bool isDefault() const
+        /// The Property is default if no values are set in the instance or a prefab
+        [[nodiscard]] bool isDefault() const
         {
             return getPimpl().isDefault();
         }
 
-        /// @brief Enter in the given field of the object
+        /// @brief Get the Property of a field of this object
         /// @pre It is an object
         [[nodiscard]] Property getObjectField(
-            char const* _field, ///< field to enter in
-            SubschemaRef const* _fieldRef = nullptr ///< SubschemaRef of the field (For performance)
+            char const* _field, ///< Name of the field to enter
+            SubschemaRef const* _fieldRef = nullptr ///< Schema of this field (for performance)
         ) const
         {
             return Property(getPimpl().getObjectField(_field, _fieldRef));
         }
-        /// @brief Enter in the internal data of the union
+        /// @brief Get the internal data of the union
         /// @pre It is a Union
         [[nodiscard]] Property getUnionData(
             char const* _type = nullptr ///< type of the internal data of the union
@@ -65,7 +65,7 @@ namespace Ent
         {
             return Property{getPimpl().getUnionData(_type)};
         }
-        /// @brief Enter in the item of a UnionSet
+        /// @brief Get an item in a UnionSet
         /// @pre It is a UnionSet
         [[nodiscard]] Property getUnionSetItem(
             char const* _type, ///< Type of the item
@@ -74,44 +74,45 @@ namespace Ent
         {
             return Property{getPimpl().getUnionSetItem(_type, _dataSchema)};
         }
-        /// @brief Enter in the object of an ObjectSet
+        /// @brief Get the object in an ObjectSet
         /// @pre It is an ObjectSet
         [[nodiscard]] Property getObjectSetItem(char const* _key ///< Key of the object
         ) const
         {
             return Property{getPimpl().getObjectSetItem(_key)};
         }
-        /// @brief Enter in the object of an ObjectSet
+        /// @brief Get the object in an ObjectSet
         /// @pre It is an ObjectSet
         [[nodiscard]] Property getObjectSetItem(int64_t _key ///< Key of the object
         ) const
         {
             return Property{getPimpl().getObjectSetItem(_key)};
         }
-        /// @brief Enter in the value of an Map
+        /// @brief Given a key, get the related value in a Map
         /// @pre It is an Map
         [[nodiscard]] Property getMapItem(char const* _key ///< Key of the value
         ) const
         {
             return Property{getPimpl().getMapItem(_key)};
         }
-        /// @brief Enter in the value of an Map
+        /// @brief Given a key, get the related value in a Map
         /// @pre It is an Map
         [[nodiscard]] Property getMapItem(int64_t _field ///< Key of the value
         ) const
         {
             return Property{getPimpl().getMapItem(_field)};
         }
-        /// @brief Enter in the element of an Array
+        /// @brief Get the element in a Array
         /// @pre It is an Array
         [[nodiscard]] Property getArrayItem(size_t _index ///< index of the targeted element
         ) const
         {
             return Property{getPimpl().getArrayItem(_index)};
         }
-        /// @return The "InstanceOf" field, an empty string if set to empty, or nullptr if unset.
+        /// @brief Get the "InstanceOf" field (path to prefab)
+        /// @remark Return an empty string if set to empty, or nullptr if unset.
         /// @pre It is an Object
-        char const* getInstanceOf() const
+        [[nodiscard]] char const* getInstanceOf() const
         {
             return getPimpl().getInstanceOf();
         }
@@ -125,7 +126,7 @@ namespace Ent
             return getPimpl().resetInstanceOf(_instanceOf);
         }
 
-        /// @brief Set the prefab (and reset keep overriden values)
+        /// @brief Set the prefab (and keep overriden values)
         /// @pre It is an Object
         /// @pre _instanceOf != nullptr
         /// @remark setInstanceOf("") mean explicitly set
@@ -134,120 +135,135 @@ namespace Ent
             return getPimpl().changeInstanceOf(_instanceOf);
         }
 
-        Property makeInstanceOf() const
+        /// @brief Create a new Property which is an instance of this one
+        [[nodiscard]] Property makeInstanceOf() const
         {
             return Property{getPimpl().makeInstanceOf()};
         }
 
         /// @return The type of the Union
         /// @pre It is a Union
-        char const* getUnionType() const
+        [[nodiscard]] char const* getUnionType() const
         {
             return getPimpl().getUnionType();
         }
         /// @return The index of the type of the Union
         /// @pre It is a Union
-        size_t getUnionTypeIndex() const
+        [[nodiscard]] size_t getUnionTypeIndex() const
         {
             return getPimpl().getUnionTypeIndex();
         }
-        DataType getDataType() const ///< Get the DataType of a Node
+        [[nodiscard]] DataType getDataType() const ///< Get the DataType of a Property
         {
             return getPimpl().getDataType();
         }
-        Subschema const* getSchema() const ///< Get the Schema of the curent Node
+        [[nodiscard]] Subschema const* getSchema() const ///< Get the Schema of the current Property
         {
             return getPimpl().getSchema();
         }
-        char const* getTypeName() const ///< Get the Schema name of the curent Node
+        [[nodiscard]] char const* getTypeName() const ///< Get the Schema name of the current Property
         {
             return getPimpl().getTypeName();
         }
 
-        DataType getMapKeyType() const ///< @pre Map @brief Get the key type curent Map
+        [[nodiscard]] DataType getMapKeyType() const ///< @pre Map @brief Get the key type current Map
         {
             return getPimpl().getMapKeyType();
         }
-        DataType getObjectSetKeyType() const ///< @pre ObjectSet @brief Get the key type curent ObjectSet
+        [[nodiscard]] DataType
+        getObjectSetKeyType() const ///< @pre ObjectSet @brief Get the key type current ObjectSet
         {
             return getPimpl().getObjectSetKeyType();
         }
-        size_t size() const ///< @return the size the this Node whatever it is.
+        [[nodiscard]] size_t size() const ///< @return the size the this Property whatever it is.
         {
             return getPimpl().size();
         }
-        Property push_back() const
+        /// @brief Push a new property in the array and return it
+        /// @pre array
+        [[nodiscard]] Property push_back() const
         {
             return getPimpl().push_back();
         }
-        bool contains(Key const& _key) const ///< @pre map/set. @return true if it contains _key.
+        [[nodiscard]] bool contains(Key const& _key) const ///< @pre map/set. @return true if it contains _key.
         {
             return getPimpl().contains(_key);
         }
-        size_t arraySize() const ///< @return size of a simple array
+        [[nodiscard]] size_t arraySize() const ///< @return size of a simple array
         {
             return getPimpl().arraySize();
         }
-        bool empty() const ///< Check if size() == 0
+        [[nodiscard]] bool empty() const ///< Check if size() == 0
         {
             return getPimpl().empty();
         }
-        void clear() const
+        [[nodiscard]] void clear() const ///< Make the array empty
         {
             getPimpl().clear();
         }
-        bool isNull() const ///< @brief check if this Node is json null
+        [[nodiscard]] bool isNull() const ///< @brief check if this Property is json null
         {
             return getPimpl().isNull();
         }
 
-        std::set<char const*, CmpStr> getMapKeysString() const ///< Get map keys as strings
+        [[nodiscard]] std::set<char const*, CmpStr> getMapKeysString() const ///< Get map keys as strings
         {
             return getPimpl().getMapKeysString();
         }
-        std::set<int64_t> getMapKeysInt() const ///< Get map keys as ints
+        [[nodiscard]] std::set<int64_t> getMapKeysInt() const ///< Get map keys as ints
         {
             return getPimpl().getMapKeysInt();
         }
-        std::set<int64_t> getPrimSetKeysInt() const ///< Get set elements as ints
+        [[nodiscard]] std::set<int64_t> getPrimSetKeysInt() const ///< Get set elements as ints
         {
             return getPimpl().getPrimSetKeysInt();
         }
-        std::set<char const*, CmpStr> getPrimSetKeysString() const ///< Get set elements as strings
+        [[nodiscard]] std::set<char const*, CmpStr> getPrimSetKeysString() const ///< Get set elements as strings
         {
             return getPimpl().getPrimSetKeysString();
         }
         /// Get UnionSet keys as strings
-        std::map<char const*, Subschema const*, CmpStr> getUnionSetKeysString() const
+        [[nodiscard]] std::map<char const*, Subschema const*, CmpStr> getUnionSetKeysString() const
         {
             return getPimpl().getUnionSetKeysString();
         }
-        std::set<char const*, CmpStr> getObjectSetKeysString() const ///< Get keys of objects as strings
+        [[nodiscard]] std::set<char const*, CmpStr>
+        getObjectSetKeysString() const ///< Get keys of objects as strings
         {
             return getPimpl().getObjectSetKeysString();
         }
-        std::set<int64_t> getObjectSetKeysInt() const ///< Get keys of objects as ints
+        [[nodiscard]] std::set<int64_t> getObjectSetKeysInt() const ///< Get keys of objects as ints
         {
             return getPimpl().getObjectSetKeysInt();
         }
 
-        std::set<char const*, CmpStr> getMapRemovedKeysString()
+        /// @brief Ket keys removed in the instance
+        /// @pre Is a Map with string keys
+        [[nodiscard]] std::set<char const*, CmpStr> getMapRemovedKeysString()
         {
             return getPimpl().getMapRemovedKeysString();
         }
-        std::set<int64_t> getMapRemovedKeysInt()
+        /// @brief Ket keys removed in the instance
+        /// @pre Is a Map with integer keys
+        [[nodiscard]] std::set<int64_t> getMapRemovedKeysInt()
         {
             return getPimpl().getMapRemovedKeysInt();
         }
-        std::map<char const*, Subschema const*, CmpStr> getUnionSetRemovedKeysString()
+        /// @brief Ket keys removed in the instance
+        /// @pre Is a UnionSet
+        [[nodiscard]] std::map<char const*, Subschema const*, CmpStr> getUnionSetRemovedKeysString()
         {
             return getPimpl().getUnionSetRemovedKeysString();
         }
-        std::set<char const*, CmpStr> getObjectSetRemovedKeysString()
+        /// @brief Ket keys removed in the instance
+        /// @pre Is an ObjectSet with string keys
+        [[nodiscard]] std::set<char const*, CmpStr> getObjectSetRemovedKeysString()
         {
             return getPimpl().getObjectSetRemovedKeysString();
         }
-        std::set<int64_t> getObjectSetRemovedKeysInt()
+        /// @brief Ket keys removed in the instance
+        /// @pre Is an ObjectSet with integer keys
+        [[nodiscard]] std::set<int64_t> getObjectSetRemovedKeysInt()
         {
             return getPimpl().getObjectSetRemovedKeysInt();
         }
@@ -258,70 +274,72 @@ namespace Ent
         Property objectSetRename(char const* _current, char const* _new);
         Property objectSetRename(int64_t _current, int64_t _new);
 
-        bool mapContains(char const* _key) const ///< Check if the map contains this _key
+        [[nodiscard]] bool mapContains(char const* _key) const ///< Check if the map contains this _key
         {
             return getPimpl().mapContains(_key);
         }
-        bool mapContains(int64_t _key) const ///< Check if the map contains this _key
+        [[nodiscard]] bool mapContains(int64_t _key) const ///< Check if the map contains this _key
         {
             return getPimpl().mapContains(_key);
         }
-        bool primSetContains(char const* _key) const ///< Check if the set contains this _key
+        [[nodiscard]] bool primSetContains(char const* _key) const ///< Check if the set contains this _key
         {
             return getPimpl().primSetContains(_key);
         }
-        bool primSetContains(int64_t _key) const ///< Check if the set contains this _key
+        [[nodiscard]] bool primSetContains(int64_t _key) const ///< Check if the set contains this _key
         {
             return getPimpl().primSetContains(_key);
         }
-        bool unionSetContains(char const* _key) const ///< Check if the UnionSet contains this _key
+        [[nodiscard]] bool unionSetContains(char const* _key) const ///< Check if the UnionSet contains this _key
         {
             return getPimpl().unionSetContains(_key);
         }
-        bool objectSetContains(char const* _key) const ///< Check if the ObjectSet contains this _key
+        [[nodiscard]] bool
+        objectSetContains(char const* _key) const ///< Check if the ObjectSet contains this _key
         {
             return getPimpl().objectSetContains(_key);
         }
-        bool objectSetContains(int64_t _key) const ///< Check if the ObjectSet contains this _key
+        [[nodiscard]] bool objectSetContains(int64_t _key) const ///< Check if the ObjectSet contains this _key
         {
             return getPimpl().objectSetContains(_key);
         }
 
-        bool isSet() const ///< Check if the Node is set in the instance
+        [[nodiscard]] bool isSet() const ///< Check if the Property is set in the instance
         {
             return getPimpl().isSet();
         }
-        bool hasOverride() const ///< Check if the Node is set in the instance
+        [[nodiscard]] bool hasOverride() const ///< Check if the Property is set in the instance
         {
             return getPimpl().isSet();
         }
-        void unset() const
+        void unset() const ///< Remove values in instance
         {
             return getPimpl().unset();
         }
 
         template <typename V>
-        V get() const ///< @pre Node is of type V. @brief Get the value in the given V type
+        [[nodiscard]] V get() const ///< @pre Property is of type V. @brief Get the value in the given V type
         {
-            return getPimpl().get();
+            return getPimpl().get<V>();
         }
-        double getFloat() const ///< @pre type==number. @brief Get the value as double
+        [[nodiscard]] double getFloat() const ///< @pre type==number. @brief Get the value as double
         {
             return getPimpl().getFloat();
         }
-        int64_t getInt() const ///< @pre type==integer. @brief Get the value as int
+        [[nodiscard]] int64_t getInt() const ///< @pre type==integer. @brief Get the value as int
         {
             return getPimpl().getInt();
         }
-        char const* getString() const ///< @pre type==string. @brief Get the value as string
+        [[nodiscard]] char const* getString() const ///< @pre type==string. @brief Get the value as string
         {
             return getPimpl().getString();
         }
-        bool getBool() const ///< @pre type==boolean. @brief Get the value as bool
+        [[nodiscard]] bool getBool() const ///< @pre type==boolean. @brief Get the value as bool
         {
             return getPimpl().getBool();
         }
-        EntityRef getEntityRef() const /// @pre type==entityRef. @brief Get the value as an Entity reference
+        [[nodiscard]] EntityRef
+        getEntityRef() const /// @pre type==entityRef. @brief Get the value as an Entity reference
         {
             return getPimpl().getEntityRef();
         }
@@ -368,141 +386,199 @@ namespace Ent
         {
             return getPimpl().insertPrimSetKey(_key);
         }
+        /// @brief Insert _key in the UnionSet (or do nothing if already in)
+        /// @pre is a UnionSet
+        /// @return The element with key _key
         Property insertUnionSetItem(char const* _key) const
         {
             return getPimpl().insertUnionSetItem(_key);
         }
+        /// @brief Insert _key in the ObjectSet (or do nothing if already in)
+        /// @pre is an ObjectSet
+        /// @return The element with key _key
         Property insertObjectSetItem(char const* _key) const
         {
             return getPimpl().insertObjectSetItem(_key);
         }
+        /// @brief Insert _key in the ObjectSet (or do nothing if already in)
+        /// @pre is an ObjectSet
+        /// @return The element with key _key
         Property insertObjectSetItem(int64_t _key) const
         {
             return getPimpl().insertObjectSetItem(_key);
         }
+        /// @brief Insert an element with the given prefab
+        ///
+        /// Will read the key in the prefab, then insert the key and change the prefab
+        ///
+        /// @pre is an ObjectSet
+        /// @return The element with prefab _prefabPath
         Property insertInstanceObjectSetItem(char const* _prefabPath) const
         {
             return getPimpl().insertInstanceObjectSetItem(_prefabPath);
         }
+        /// @brief Insert _key in the Map (or do nothing if already in)
+        /// @pre is a Map with string keys
+        /// @return The element with key _key
         Property insertMapItem(char const* _key) const
         {
             return getPimpl().insertMapItem(_key);
         }
+        /// @brief Insert _key in the Map (or do nothing if already in)
+        /// @pre is a Map with integer keys
+        /// @return The element with key _key
         Property insertMapItem(int64_t _key) const
         {
             return getPimpl().insertMapItem(_key);
         }
 
+        /// @brief Erase the item _key in the set of string
+        /// @pre is a set of string
+        /// @return true if an element was removed
         bool erasePrimSetKey(char const* _key) const
         {
             return getPimpl().erasePrimSetKey(_key);
         }
+        /// @brief Erase the item _key in the set of integer
+        /// @pre is a set of integer
+        /// @return true if an element was removed
         bool erasePrimSetKey(int64_t _key) const
         {
             return getPimpl().erasePrimSetKey(_key);
         }
+        /// @brief Erase the item _key in the ObjectSet
+        /// @pre is an ObjectSet
+        /// @return true if an element was removed
         bool eraseObjectSetItem(char const* _key) const
         {
             return getPimpl().eraseObjectSetItem(_key);
         }
+        /// @brief Erase the item _key in the ObjectSet
+        /// @pre is an ObjectSet
+        /// @return true if an element was removed
         bool eraseObjectSetItem(int64_t _key) const
         {
             return getPimpl().eraseObjectSetItem(_key);
         }
+        /// @brief Erase the item _key in the Map
+        /// @pre is an Map with string keys
+        /// @return true if an element was removed
         bool eraseMapItem(char const* _key) const
         {
             return getPimpl().eraseMapItem(_key);
         }
+        /// @brief Erase the item _key in the Map
+        /// @pre is an Map with integer keys
+        /// @return true if an element was removed
         bool eraseMapItem(int64_t _key) const
         {
             return getPimpl().eraseMapItem(_key);
         }
+        /// @brief Erase the item _key in the UnionSet
+        /// @pre is an UnionSet
+        /// @return true if an element was removed
         bool eraseUnionSetItem(char const* _key) const
         {
             return getPimpl().eraseUnionSetItem(_key);
         }
-        double getDefaultFloat() const
+
+        /// Get the default number
+        [[nodiscard]] double getDefaultFloat() const
         {
             return getPimpl().getDefaultFloat();
         }
-        int64_t getDefaultInt() const
+        /// Get the default integer
+        [[nodiscard]] int64_t getDefaultInt() const
         {
             return getPimpl().getDefaultInt();
         }
-        char const* getDefaultString() const
+        /// Get the default string
+        [[nodiscard]] char const* getDefaultString() const
         {
             return getPimpl().getDefaultString();
         }
-        bool getDefaultBool() const
+        /// Get the default bool
+        [[nodiscard]] bool getDefaultBool() const
         {
             return getPimpl().getDefaultBool();
         }
-        EntityRef getDefaultEntityRef() const
+        /// Get the default EntityRef
+        [[nodiscard]] EntityRef getDefaultEntityRef() const
         {
             return getPimpl().getDefaultEntityRef();
         }
-        size_t getDefaultSize() const
+        /// Get the default array size
+        [[nodiscard]] size_t getDefaultSize() const
         {
             return getPimpl().getDefaultSize();
         }
 
-        PropImplPtr getLastSetPrefab() const
+        /// Get the last prefab which is set
+        [[nodiscard]] PropImplPtr getLastSetPrefab() const
         {
             return getPimpl().getLastSetPrefab();
         }
-        bool hasPrefabValue() const
+        /// Check if the is a prefab value
+        [[nodiscard]] bool hasPrefabValue() const
         {
             return getPimpl().hasPrefabValue();
         }
-        double getPrefabFloat() const
+
+        /// Get the prefab number
+        [[nodiscard]] double getPrefabFloat() const
         {
             return getPimpl().getPrefabFloat();
         }
-        int64_t getPrefabInt() const
+        /// Get the prefab integer
+        [[nodiscard]] int64_t getPrefabInt() const
         {
             return getPimpl().getPrefabInt();
         }
-        char const* getPrefabString() const
+        /// Get the prefab string
+        [[nodiscard]] char const* getPrefabString() const
         {
             return getPimpl().getPrefabString();
         }
-        bool getPrefabBool() const
+        /// Get the prefab bool
+        [[nodiscard]] bool getPrefabBool() const
         {
             return getPimpl().getPrefabBool();
         }
-        EntityRef getPrefabEntityRef() const
+        /// Get the prefab EntityRef
+        [[nodiscard]] EntityRef getPrefabEntityRef() const
         {
             return getPimpl().getPrefabEntityRef();
         }
-        std::optional<size_t> getPrefabSize() const
+        /// Get the prefab size
+        [[nodiscard]] std::optional<size_t> getPrefabSize() const
         {
             return getPimpl().getPrefabSize();
         }
 
-        nlohmann::json const* getRawJson() const ///< Get the underlying json node of the instance
+        [[nodiscard]] nlohmann::json const* getRawJson() const ///< Get the underlying json node of the instance
         {
             return getPimpl().getRawJson();
         }
 
         /// @brief Check if the Property is not nullptr inside (have to be true to call any method)
-        bool hasValue() const
+        [[nodiscard]] bool hasValue() const
         {
             return m_self != nullptr;
         }
 
         /// @brief Check if the Property has a "InstanceOf" declared and not empty
-        bool hasPrefab() const
+        [[nodiscard]] bool hasPrefab() const
         {
             return m_self->getPrefab() != nullptr;
         }
 
-        std::vector<char const*>
+        [[nodiscard]] std::vector<char const*>
         getFieldNames() const ///< @pre type==Ent::DataType::object @brief Get all field names
         {
             return m_self->getFieldNames();
         }
 
-        Property getPrefab() const ///< Get the prefab of the Property
+        [[nodiscard]] Property getPrefab() const ///< Get the prefab of the Property
         {
             if (auto prefab = m_self->getPrefab())
             {
@@ -514,27 +590,28 @@ namespace Ent
             }
         }
 
-        Property getParent() const ///< Get the Property which own this one
+        [[nodiscard]] Property getParent() const ///< Get the Property which own this one
         {
             return m_self->getParent();
         }
 
-        EntityLib* getEntityLib() const
+        [[nodiscard]] EntityLib* getEntityLib() const
         {
             return m_self->getEntityLib();
         }
 
-        char const* getFilePath() const
+        [[nodiscard]] char const* getFilePath() const
         {
             return m_self->getFilePath();
         }
 
-        DataKind getDataKind() const
+        [[nodiscard]] DataKind getDataKind() const
         {
             return m_self->getDataKind();
         }
 
-        bool isMapOrSet() const
+        /// Return true if this is a Map or a Set
+        [[nodiscard]] bool isMapOrSet() const
         {
             auto const kind = getDataKind();
             return kind == DataKind::map || kind == DataKind::objectSet
@@ -543,11 +620,11 @@ namespace Ent
 
         void copyInto(Property& _dest, CopyMode _copyMode);
 
-        Property detach();
+        [[nodiscard]] Property detach();
 
         void applyToPrefab();
 
-        bool operator==(Property const& _rho) const
+        [[nodiscard]] bool operator==(Property const& _rho) const
         {
             if (!hasValue())
             {
@@ -560,7 +637,27 @@ namespace Ent
             return getRawJson() == _rho.getRawJson();
         }
 
-        PropImpl& getPimpl() const
+        bool operator!=(Property const& _rho) const
+        {
+            return !(*this == _rho);
+        }
+
+        bool operator==(nullptr_t) const
+        {
+            return hasValue();
+        }
+
+        bool operator!=(nullptr_t) const
+        {
+            return !hasValue();
+        }
+
+        explicit operator bool() const
+        {
+            return hasValue();
+        }
+
+        [[nodiscard]] PropImpl& getPimpl() const
         {
             return *m_self;
         }

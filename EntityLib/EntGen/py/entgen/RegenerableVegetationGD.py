@@ -6,7 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ComponentGD import *
-from entgen.FloatRange import *
+from entgen.EnergyValue import *
 from entgen.String import *
 from entgen.VegetationPCloudData import *
 
@@ -23,13 +23,15 @@ class RegenerableVegetationGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def EnergyValues(self):  # type: ()->PrimArray[EnergyValue]
+        return (lambda n: PrimArray(EnergyValue, n))(self._node.at("EnergyValues"))
+    @EnergyValues.setter
+    def EnergyValues(self, val): self.EnergyValues.set(val)
+    @property
     def PCloudPath(self):  # type: ()->String
         return String(self._node.at("PCloudPath"))
     @PCloudPath.setter
     def PCloudPath(self, val): self.PCloudPath.set(val)
-    @property
-    def RegenRange(self):  # type: ()->FloatRange
-        return FloatRange(self._node.at("RegenRange"))
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))

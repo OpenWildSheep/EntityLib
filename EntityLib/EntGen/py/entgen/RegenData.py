@@ -5,8 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
-from entgen.Float import *
-from entgen.FloatRange import *
+from entgen.EnergyValue import *
 from entgen.EntityLODData import *
 
 from EntityLibPy import Node
@@ -22,16 +21,13 @@ class RegenData(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def EnergyValues(self):  # type: ()->PrimArray[EnergyValue]
+        return (lambda n: PrimArray(EnergyValue, n))(self._node.at("EnergyValues"))
+    @EnergyValues.setter
+    def EnergyValues(self, val): self.EnergyValues.set(val)
+    @property
     def LODData(self):  # type: ()->Array[EntityLODData]
         return (lambda n: Array(EntityLODData, n))(self._node.at("LODData"))
-    @property
-    def RegenRange(self):  # type: ()->FloatRange
-        return FloatRange(self._node.at("RegenRange"))
-    @property
-    def RegenRangeHysteresis(self):  # type: ()->Float
-        return Float(self._node.at("RegenRangeHysteresis"))
-    @RegenRangeHysteresis.setter
-    def RegenRangeHysteresis(self, val): self.RegenRangeHysteresis.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

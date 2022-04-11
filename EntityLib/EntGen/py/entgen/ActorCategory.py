@@ -46,6 +46,8 @@ class ActorCategoryEnum(Enum):
     CATEGORY_SpiritAnimal = "CATEGORY_SpiritAnimal"
     CATEGORY_Hatching = "CATEGORY_Hatching"
     CATEGORY_Respawn = "CATEGORY_Respawn"
+    CATEGORY_Save = "CATEGORY_Save"
+    CATEGORY_Cinematic = "CATEGORY_Cinematic"
     ActorCategory_COUNT = "ActorCategory_COUNT"
 
 

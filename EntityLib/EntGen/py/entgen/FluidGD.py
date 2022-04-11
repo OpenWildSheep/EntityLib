@@ -24,6 +24,11 @@ class FluidGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def IsWaterPlane(self):  # type: ()->Bool
+        return Bool(self._node.at("IsWaterPlane"))
+    @IsWaterPlane.setter
+    def IsWaterPlane(self, val): self.IsWaterPlane.set(val)
+    @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
     @property

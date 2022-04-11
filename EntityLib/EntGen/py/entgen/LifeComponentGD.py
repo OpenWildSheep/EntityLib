@@ -27,6 +27,11 @@ class LifeComponentGD(HelperObject):
     @AttackCancelDamagesThreshold.setter
     def AttackCancelDamagesThreshold(self, val): self.AttackCancelDamagesThreshold.set(val)
     @property
+    def ClearDamagesWhenNoCombatAfterTime(self):  # type: ()->Float
+        return Float(self._node.at("ClearDamagesWhenNoCombatAfterTime"))
+    @ClearDamagesWhenNoCombatAfterTime.setter
+    def ClearDamagesWhenNoCombatAfterTime(self, val): self.ClearDamagesWhenNoCombatAfterTime.set(val)
+    @property
     def DamagesRecoverSpeed(self):  # type: ()->Float
         return Float(self._node.at("DamagesRecoverSpeed"))
     @DamagesRecoverSpeed.setter

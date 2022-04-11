@@ -18,6 +18,7 @@ class BeamStaffModeEnum(Enum):
     PickUp = "PickUp"
     Hatching = "Hatching"
     SetRespawnPlaceAsCheckpoint = "SetRespawnPlaceAsCheckpoint"
+    SetSavePoint = "SetSavePoint"
     Any = "Any"
     BeamStaffMode_COUNT = "BeamStaffMode_COUNT"
 

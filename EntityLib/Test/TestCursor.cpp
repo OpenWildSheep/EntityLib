@@ -340,7 +340,7 @@ public:
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         if (nodes.back()->size() != expl.size())
         {
-            expl.size();
+            [[maybe_unused]] auto size = expl.size();
         }
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
     }
@@ -360,7 +360,7 @@ public:
         if (expl.getInt() != nodes.back()->getInt())
         {
             std::cout << expl.getInt() << " " << nodes.back()->getInt() << std::endl;
-            expl.getInt();
+            [[maybe_unused]] auto val = expl.getInt();
         }
         ENTLIB_ASSERT(expl.getInt() == nodes.back()->getInt());
     }
@@ -369,7 +369,7 @@ public:
         // std::cout << elt.getFloat() << " " << nodes.back().getFloat() << std::endl;
         if (fabs(expl.getFloat() - nodes.back()->getFloat()) >= FLT_EPSILON)
         {
-            expl.getFloat();
+            [[maybe_unused]] auto val = expl.getFloat();
         }
         // ENTLIB_ASSERT(fabs(elt.getFloat() - nodes.back().getFloat()) < FLT_EPSILON);
     }
@@ -378,7 +378,7 @@ public:
         if (strcmp(expl.getString(), nodes.back()->getString()) != 0)
         {
             std::cout << expl.getString() << " " << nodes.back()->getString() << std::endl;
-            expl.getString();
+            [[maybe_unused]] auto val = expl.getString();
         }
         ENTLIB_ASSERT(strcmp(expl.getString(), nodes.back()->getString()) == 0);
     }

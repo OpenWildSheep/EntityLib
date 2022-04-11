@@ -36,15 +36,15 @@ namespace Ent
         {
             if (auto instanceOf = m_source.getInstanceOf())
             {
-                _back().setInstanceOf(instanceOf);
+                _back().changeInstanceOf(instanceOf);
             }
         }
-        bool inObjectField(Property& m_source, char const* _key) override
+        bool inObjectField([[maybe_unused]] Property& m_source, char const* _key) override
         {
             _push(_back().getObjectField(_key));
             return true;
         }
-        void outObjectField(Property& m_source, char const* _key) override
+        void outObjectField([[maybe_unused]] Property& m_source, [[maybe_unused]] char const* _key) override
         {
             _pop();
         }
@@ -56,35 +56,35 @@ namespace Ent
             }
             _push(_back().getUnionData(_type));
         }
-        void outUnion(Property& m_source) override
+        void outUnion([[maybe_unused]] Property& m_source) override
         {
             _pop();
         }
-        void inMapElement(Property& m_source, char const* _key) override
+        void inMapElement([[maybe_unused]] Property& m_source, char const* _key) override
         {
             _push(_back().getMapItem(_key));
         }
-        void inMapElement(Property& m_source, int64_t _key) override
+        void inMapElement([[maybe_unused]] Property& m_source, int64_t _key) override
         {
             _push(_back().getMapItem(_key));
         }
-        void outMapElement(Property& m_source) override
+        void outMapElement([[maybe_unused]] Property& m_source) override
         {
             _pop();
         }
-        void inArrayElement(Property& m_source, size_t _index) override
+        void inArrayElement([[maybe_unused]] Property& m_source, size_t _index) override
         {
             _push(_back().getArrayItem(_index));
         }
-        void outArrayElement(Property& m_source) override
+        void outArrayElement([[maybe_unused]] Property& m_source) override
         {
             _pop();
         }
-        void key(Property& m_source, char const* _key) override
+        void key([[maybe_unused]] Property& m_source, char const* _key) override
         {
             _back().insertPrimSetKey(_key);
         }
-        void key(Property& m_source, int64_t _key) override
+        void key([[maybe_unused]] Property& m_source, int64_t _key) override
         {
             _back().insertPrimSetKey(_key);
         }
@@ -96,19 +96,19 @@ namespace Ent
                 _back().buildPath(); // Force it to set
             }
         }
-        void outUnionSetElement(Property& m_source) override
+        void outUnionSetElement([[maybe_unused]] Property& m_source) override
         {
             _pop();
         }
-        void inObjectSetElement(Property& m_source, char const* _key) override
+        void inObjectSetElement([[maybe_unused]] Property& m_source, char const* _key) override
         {
             _push(_back().getObjectSetItem(_key));
         }
-        void inObjectSetElement(Property& m_source, int64_t _key) override
+        void inObjectSetElement([[maybe_unused]] Property& m_source, int64_t _key) override
         {
             _push(_back().getObjectSetItem(_key));
         }
-        void outObjectSetElement(Property& m_source) override
+        void outObjectSetElement([[maybe_unused]] Property& m_source) override
         {
             _pop();
         }

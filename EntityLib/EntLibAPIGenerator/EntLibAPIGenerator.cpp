@@ -857,6 +857,196 @@ namespace Ent
     copy_file(_resourcePath / "EntGenHelpers.h", _destinationPath / "EntGenHelpers.h");
 }
 
+/// @brief Generate the cpp EntGen API
+void gencppProp(std::filesystem::path const& _resourcePath, std::filesystem::path const& _destinationPath)
+{
+    data rootData;
+    rootData["all_definitions"] = jsonToMustache(allDefinitions);
+    rootData["tuple_type"] =
+        partial([]() { return R"cpp(Ent::Gen2::Tuple<{{#types}}{{>display_type}}{{/types}}>)cpp"; });
+    rootData["prim_set_type"] =
+        partial([]() { return R"cpp(Ent::Gen2::PrimitiveSet<{{type.ref.cpp_native}}>)cpp"; });
+    rootData["object_set_type"] = partial(
+        []()
+        {
+            return R"cpp(Ent::Gen2::ObjectSet<{{key_type.ref.cpp_native}}, {{#type}}{{>display_type}}{{/type}}>)cpp";
+        });
+    rootData["map_type"] = partial(
+        []()
+        {
+            return R"cpp(Ent::Gen2::Map<{{key_type.ref.cpp_native}}, {{#value_type}}{{>display_type}}{{/value_type}}>)cpp";
+        });
+    rootData["display_type"] = partial(
+        []()
+        {
+            return R"({{#object_set}}{{>object_set_type}}{{/object_set}})"
+                   R"({{#prim_set}}{{>prim_set_type}}{{/prim_set}})"
+                   R"({{#map}}{{>map_type}}{{/map}})"
+                   R"({{#ref}}Ent::Gen2::{{name}}{{/ref}})"
+                   R"({{#array}}Array<{{#type}}{{>display_type}}{{/type}}>{{/array}})"
+                   R"({{#prim_array}}PrimArray<{{#type}}{{>display_type}}{{/type}}>{{/prim_array}})"
+                   R"({{#union_set}}UnionSet<{{#type}}{{>display_type}}{{/type}}>{{/union_set}})"
+                   R"({{#tuple}}{{>tuple_type}}{{/tuple}})"
+                   R"({{#comma}}, {{/comma}})";
+        });
+
+    mustache tmpl{R"cpp(
+// /!\ This code is GENERATED! Do not modify it.
+
+#pragma once
+
+#include <EntityLib.h>
+#include "EntGenHelpers.h"
+
+namespace Ent
+{
+    namespace Gen2
+    {
+        {{#all_definitions}}{{#schema.object}}
+        struct {{schema.type_name}};{{/schema.object}}{{#schema.union}}
+        struct {{schema.type_name}}; // Union{{/schema.union}}{{#schema.tuple}}
+        using {{schema.type_name}} = {{>tuple_type}}; // Tuple{{/schema.tuple}}{{#schema.union_set}}
+        struct {{schema.type_name}}; // union_set{{/schema.union_set}}{{#schema.object_set}}
+        struct {{schema.type_name}}; // object_set{{/schema.object_set}}{{#schema.enum}}
+        struct {{schema.type_name}}; // enum
+        enum class {{schema.type_name}}Enum
+        {
+            {{#values}}{{escaped_name}},
+            {{/values}}
+        };{{/schema.enum}}{{/all_definitions}}
+        {{#all_definitions}}{{#schema.alias}}
+        using {{schema.type_name}} = {{#type}}{{>display_type}}{{/type}};{{/schema.alias}}{{/all_definitions}}
+
+        {{#all_definitions}}{{#schema.object}}
+        struct {{schema.type_name}} : HelperObject<{{schema.type_name}}> // Object
+        {
+            explicit {{schema.type_name}}(Ent::Property _node): HelperObject<{{schema.type_name}}>(std::move(_node)) {}
+            {{#schema.schema_name}}
+            static constexpr char schemaName[] = "{{{.}}}";
+            static {{schema.type_name}} load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return {{schema.type_name}}(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static {{schema.type_name}} loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return {{schema.type_name}}(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static {{schema.type_name}} create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return {{schema.type_name}}(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            {{schema.type_name}} makeInstanceOf()
+            {
+                return {{schema.type_name}}(getProperty().makeInstanceOf());
+            }
+            {{/schema.schema_name}}
+        {{#properties}}    {{#type}}{{>display_type}}{{/type}} {{escaped_prop_name}}() const;
+        {{/properties}}
+        };{{/schema.object}}{{#schema.enum}}
+        struct {{schema.type_name}} : EnumPropHelper<{{schema.type_name}}, {{schema.type_name}}Enum> // Enum
+        {
+            using Enum = {{schema.type_name}}Enum;
+            using PropHelper<{{schema.type_name}}, Enum>::operator=;
+            explicit {{schema.type_name}}(Ent::Property _node): EnumPropHelper<{{schema.type_name}}, Enum>(std::move(_node)) {}
+            {{#schema.schema_name}}static constexpr char schemaName[] = "{{{.}}}";{{/schema.schema_name}}
+            static constexpr char const* enumToString[] = {
+                {{#values}}"{{name}}",
+                {{/values}}
+            };
+        };
+        inline char const* toString({{schema.type_name}}Enum value)
+        {
+            if(size_t(value) >= std::size({{schema.type_name}}::enumToString))
+                throw std::runtime_error("Wrong enum value");
+            return {{schema.type_name}}::enumToString[size_t(value)];
+        }
+        inline char const* toInternal({{schema.type_name}}Enum value) { return toString(value); }
+        template<> inline {{schema.type_name}}Enum strToEnum<{{schema.type_name}}Enum>(char const* value)
+        {
+            return static_cast<{{schema.type_name}}Enum>(details::indexInEnum(value, {{schema.type_name}}::enumToString));
+        }
+        {{/schema.enum}}{{#schema.union}}
+        struct {{schema.type_name}} : Base // Union
+        {
+            explicit {{schema.type_name}}(Ent::Property _node): Base(std::move(_node)) {}
+            {{#schema.schema_name}}static constexpr char schemaName[] = "{{{.}}}";{{/schema.schema_name}}
+            char const* getType() const;{{#types}}
+            std::optional<{{#type}}{{>display_type}}{{/type}}> {{escaped_name}}();
+            {{#type}}{{>display_type}}{{/type}} set{{escaped_name}}();
+        {{/types}}
+        };{{/schema.union}}{{#schema.union_set}}{{#union}}
+        struct {{schema.type_name}} : UnionSetBase<{{items.ref.name}}> // union_set
+        {
+            explicit {{schema.type_name}}(Ent::Property _node)
+                : UnionSetBase<{{items.ref.name}}>(std::move(_node))
+            {
+            }
+            {{#schema.schema_name}}static constexpr char schemaName[] = "{{{.}}}";{{/schema.schema_name}}
+            char const* getType() const;{{#types}}
+            std::optional<{{#type}}{{>display_type}}{{/type}}> {{name}}();
+            {{#type}}{{>display_type}}{{/type}} add{{name}}();
+            void remove{{name}}();
+        {{/types}}
+        };{{/union}}{{/schema.union_set}}
+
+{{/all_definitions}}
+
+        {{#all_definitions}}{{#schema.object}}// {{schema.type_name}}
+        {{#properties}}inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::{{escaped_prop_name}}() const
+        {
+            return {{#type}}{{>display_type}}{{/type}}(getProperty().getObjectField("{{prop_name}}"));
+        }
+        {{/properties}}{{/schema.object}}{{#schema.union}}// {{schema.type_name}}
+        inline char const* {{schema.type_name}}::getType() const
+        {
+            return getProperty().getUnionType();
+        }
+        {{#types}}inline std::optional<{{#type}}{{>display_type}}{{/type}}> {{schema.type_name}}::{{escaped_name}}()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "{{{name}}}") != 0?
+                    std::optional<{{#type}}{{>display_type}}{{/type}}>{}:
+                    std::optional<{{#type}}{{>display_type}}{{/type}}>(getProperty().getUnionData());
+        }
+        inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::set{{escaped_name}}()
+        {
+            return {{#type}}{{>display_type}}{{/type}}(getProperty().setUnionType("{{{name}}}"));
+        }
+        {{/types}}
+{{/schema.union}}{{#schema.union_set}}{{#union}}// {{schema.type_name}}
+        inline char const* {{schema.type_name}}::getType() const
+        {
+            return getProperty().getUnionType();
+        }
+        {{#types}}inline std::optional<{{#type}}{{>display_type}}{{/type}}> {{schema.type_name}}::{{name}}()
+        {
+            return std::optional<{{#type}}{{>display_type}}{{/type}}>(getSubNode("{{name}}"));
+        }
+        inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::add{{name}}()
+        {
+            return {{#type}}{{>display_type}}{{/type}}(addSubNode("{{name}}"));
+        }
+        inline void {{schema.type_name}}::remove{{name}}()
+        {
+            getProperty().eraseUnionSetItem("{{name}}");
+        }
+        {{/types}}
+{{/union}}{{/schema.union_set}}
+        {{/all_definitions}}
+    } // Gen2
+} // Ent
+)cpp"};
+
+    create_directories(_destinationPath);
+    std::ofstream output = openOfstream(_destinationPath / "EntGen.h");
+    tmpl.render(rootData, output);
+    copy_file(_resourcePath / "EntGenHelpers.h", _destinationPath / "EntGenHelpers.h");
+}
+
 /// @brief Generate the python EntGen API
 void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path const& _destinationPath)
 {
@@ -1225,8 +1415,8 @@ try
     }
 
     std::error_code er;
-    std::filesystem::remove_all(destinationPath, er);
-    std::filesystem::create_directories(destinationPath);
+    remove_all(destinationPath, er);
+    create_directories(destinationPath);
 
     auto getTypeID = [](json const& type)
     {
@@ -1290,6 +1480,7 @@ try
     }
 
     gencpp(resourcePath / "cpp", destinationPath / "cpp");
+    gencppProp(resourcePath / "cpp2", destinationPath / "cpp2");
     genpy(resourcePath / "py", destinationPath / "py");
 
     std::cout << "EntGen generation done" << std::endl;

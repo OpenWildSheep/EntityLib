@@ -22,15 +22,15 @@ class FollowerCallEffect(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def AttackOrder(self):  # type: ()->Bool
-        return Bool(self._node.at("AttackOrder"))
-    @AttackOrder.setter
-    def AttackOrder(self, val): self.AttackOrder.set(val)
-    @property
     def CallType(self):  # type: ()->String
         return String(self._node.at("CallType"))
     @CallType.setter
     def CallType(self, val): self.CallType.set(val)
+    @property
+    def QuickOrder(self):  # type: ()->Bool
+        return Bool(self._node.at("QuickOrder"))
+    @QuickOrder.setter
+    def QuickOrder(self, val): self.QuickOrder.set(val)
     @property
     def Specie(self):  # type: ()->Specie
         return Specie(self._node.at("Specie"))

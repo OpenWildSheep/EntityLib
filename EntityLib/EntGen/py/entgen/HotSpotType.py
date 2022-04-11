@@ -17,6 +17,7 @@ class HotSpotTypeEnum(Enum):
     breakableweak = "breakableweak"
     camera = "camera"
     center = "center"
+    grab = "grab"
     head = "head"
     heal = "heal"
     ride = "ride"

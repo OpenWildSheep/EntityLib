@@ -7,6 +7,7 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Bool import *
 from entgen.ComponentGD import *
+from entgen.MinDistanceToRespawnPosition import *
 from entgen.MinRespawnDistance import *
 from entgen.RespawnState import *
 
@@ -28,6 +29,9 @@ class RespawnabilityGD(HelperObject):
     @CheckIsInCameraFrustum.setter
     def CheckIsInCameraFrustum(self, val): self.CheckIsInCameraFrustum.set(val)
     @property
+    def MinDistanceToRespawnPosition(self):  # type: ()->MinDistanceToRespawnPosition
+        return MinDistanceToRespawnPosition(self._node.at("MinDistanceToRespawnPosition"))
+    @property
     def MinRespawnDistance(self):  # type: ()->MinRespawnDistance
         return MinRespawnDistance(self._node.at("MinRespawnDistance"))
     @property
@@ -36,11 +40,6 @@ class RespawnabilityGD(HelperObject):
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
-    @property
-    def TargetIsNotInCameraFrustum(self):  # type: ()->Bool
-        return Bool(self._node.at("TargetIsNotInCameraFrustum"))
-    @TargetIsNotInCameraFrustum.setter
-    def TargetIsNotInCameraFrustum(self, val): self.TargetIsNotInCameraFrustum.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

@@ -162,6 +162,11 @@ class RenderManager_RenderConfig(HelperObject):
     @QualityDepthOfField.setter
     def QualityDepthOfField(self, val): self.QualityDepthOfField.set(val)
     @property
+    def RemoveTemporalNaNs(self):  # type: ()->Int
+        return Int(self._node.at("RemoveTemporalNaNs"))
+    @RemoveTemporalNaNs.setter
+    def RemoveTemporalNaNs(self, val): self.RemoveTemporalNaNs.set(val)
+    @property
     def RippleMapSize(self):  # type: ()->Int
         return Int(self._node.at("RippleMapSize"))
     @RippleMapSize.setter

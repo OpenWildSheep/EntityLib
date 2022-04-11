@@ -21,6 +21,11 @@ class EntityStateManageChildEntityPool_Inputs(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def DistanceMaxFromCamera(self):  # type: ()->Float
+        return Float(self._node.at("DistanceMaxFromCamera"))
+    @DistanceMaxFromCamera.setter
+    def DistanceMaxFromCamera(self, val): self.DistanceMaxFromCamera.set(val)
+    @property
     def DistanceMaxFromSpawner(self):  # type: ()->Float
         return Float(self._node.at("DistanceMaxFromSpawner"))
     @DistanceMaxFromSpawner.setter

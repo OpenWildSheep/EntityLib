@@ -7,6 +7,7 @@ import EntityLibPy
 from entgen.String import *
 from entgen.ComponentGD import *
 from entgen.Float import *
+from entgen.ScaleConverter import *
 from entgen.ChargedJumpAnimation import *
 
 from EntityLibPy import Node
@@ -30,6 +31,11 @@ class ChargedJumpGD(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
+    def bounceJumpTimeWindow(self):  # type: ()->Float
+        return Float(self._node.at("bounceJumpTimeWindow"))
+    @bounceJumpTimeWindow.setter
+    def bounceJumpTimeWindow(self, val): self.bounceJumpTimeWindow.set(val)
+    @property
     def chargedJumpAnimations(self):  # type: ()->Array[ChargedJumpAnimation]
         return (lambda n: Array(ChargedJumpAnimation, n))(self._node.at("chargedJumpAnimations"))
     @property
@@ -37,6 +43,9 @@ class ChargedJumpGD(HelperObject):
         return Float(self._node.at("chargingDecelerationFactor"))
     @chargingDecelerationFactor.setter
     def chargingDecelerationFactor(self, val): self.chargingDecelerationFactor.set(val)
+    @property
+    def nextJumpPowerByFallHeight(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("nextJumpPowerByFallHeight"))
     pass
 
 

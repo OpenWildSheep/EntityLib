@@ -6,7 +6,6 @@ import EntityLibPy
 
 from entgen.SyncTempoMode import *
 from entgen.String import *
-from entgen.Int import *
 from entgen.Bool import *
 from entgen.ComponentGD import *
 from entgen.Float import *
@@ -121,6 +120,11 @@ class SoundEmitterGD(HelperObject):
     @UnactivationSync.setter
     def UnactivationSync(self, val): self.UnactivationSync.set(val)
     @property
+    def UseLocalAltitudeRTPC(self):  # type: ()->Bool
+        return Bool(self._node.at("UseLocalAltitudeRTPC"))
+    @UseLocalAltitudeRTPC.setter
+    def UseLocalAltitudeRTPC(self, val): self.UseLocalAltitudeRTPC.set(val)
+    @property
     def UseOcclusion(self):  # type: ()->Bool
         return Bool(self._node.at("UseOcclusion"))
     @UseOcclusion.setter
@@ -135,11 +139,6 @@ class SoundEmitterGD(HelperObject):
         return Bool(self._node.at("dopplerActivated"))
     @dopplerActivated.setter
     def dopplerActivated(self, val): self.dopplerActivated.set(val)
-    @property
-    def relativeHeightPriority(self):  # type: ()->Int
-        return Int(self._node.at("relativeHeightPriority"))
-    @relativeHeightPriority.setter
-    def relativeHeightPriority(self, val): self.relativeHeightPriority.set(val)
     @property
     def sendSoundAreaEvents(self):  # type: ()->Bool
         return Bool(self._node.at("sendSoundAreaEvents"))

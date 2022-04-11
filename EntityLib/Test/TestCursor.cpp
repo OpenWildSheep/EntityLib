@@ -4,10 +4,9 @@
 #include <fstream>
 #include <variant>
 #include <iostream>
-#include <stack>
 
 #include <EntityLib/Visitor.h>
-#include <EntityLib/CopyNode.h>
+#include <EntityLib/CopyProperty.h>
 #include <EntityLib/Property.h>
 
 using namespace Ent;
@@ -901,7 +900,7 @@ void testCursor(EntityLib& entlib)
 
         nlohmann::json newDoc = nlohmann::json::object();
         Property destExpl(&entlib, expl.getSchema(), "", &newDoc);
-        CopyToEmptyNode copier(destExpl);
+        CopyProperty copier(destExpl, OverrideValueSource::OverrideOrPrefab, true);
         visitRecursive(expl, copier);
         entlib.saveJsonFile(&newDoc, "instance.cursor.entity", "Entity");
     }
@@ -924,15 +923,15 @@ void testCursor(EntityLib& entlib)
             std::cout << "Copy SceneKOM.scene with LazyLib" << std::endl;
             nlohmann::json newDoc = nlohmann::json::object();
             Property destExpl(&entlib, expl.getSchema(), "", &newDoc);
-            CopyToEmptyNode copier(destExpl);
+            CopyProperty copier(destExpl, OverrideValueSource::Override, true);
             visitRecursive(expl, copier);
+
+            std::cout << "Save SceneKOM.scene with LazyLib" << std::endl;
+            entlib.saveJsonFile(&newDoc, "SceneKOM.scene", expl.getSchema()->name.c_str());
 
             std::cout << "CompareCursor SceneKOM.scene wth the clone" << std::endl;
             CompareCursor comparator(destExpl);
             visitRecursive(expl, comparator);
-
-            std::cout << "Save SceneKOM.scene with LazyLib" << std::endl;
-            entlib.saveJsonFile(&newDoc, "SceneKOM.scene", "Entity");
         }
 
         std::cout << "Read SceneKOM.scene with NodeLib" << std::endl;

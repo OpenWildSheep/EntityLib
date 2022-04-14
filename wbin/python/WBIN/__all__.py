@@ -40,3 +40,4 @@ from . import TSO
 from . import UInt3
 from . import VertexBoneWeight
 from . import Vis
+from . import WMmesh

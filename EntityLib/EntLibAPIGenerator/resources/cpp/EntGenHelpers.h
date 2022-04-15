@@ -15,9 +15,9 @@ namespace Ent
     {
         struct Base
         {
-            Ent::Node* node{};
+            Node* node{};
 
-            Base(Ent::Node* _node)
+            Base(Node* _node)
                 : node(_node)
             {
             }
@@ -51,12 +51,12 @@ namespace Ent
                 return node->getSchema()->IsUsedInRuntime();
             }
 
-            Ent::Subschema const* getSchema() const
+            Subschema const* getSchema() const
             {
                 return node->getSchema();
             }
 
-            Ent::DataType getDataType() const
+            DataType getDataType() const
             {
                 return node->getSchema()->type;
             }
@@ -73,7 +73,7 @@ namespace Ent
                 using pointer = std::optional<T>;
                 using reference = T;
 
-                Ent::Node* node;
+                Node* node;
                 size_t index;
 
                 iterator& operator++()
@@ -114,7 +114,7 @@ namespace Ent
                 return iterator{node, node->size()};
             }
 
-            Array(Ent::Node* _node)
+            Array(Node* _node)
                 : Base(_node)
             {
             }
@@ -130,11 +130,11 @@ namespace Ent
             {
                 return T(node->push());
             }
-            void pop_back()
+            void pop_back() const
             {
                 node->pop();
             }
-            void clear()
+            void clear() const
             {
                 node->clear();
             }
@@ -147,7 +147,7 @@ namespace Ent
         template <typename T>
         struct PrimArray : Array<T>
         {
-            PrimArray(Ent::Node* _node)
+            PrimArray(Node* _node)
                 : Array<T>(_node)
             {
             }
@@ -167,13 +167,17 @@ namespace Ent
                 ENT_IF_COMPILE(V, arr, std::get<0>(arr)) // tuple, c-style array and std::array
                 {
                     if (std::tuple_size_v<V> != this->size())
+                    {
                         throw std::runtime_error(R"(Incompatible array size in 'Array::operator=')");
+                    }
                     copyFromTuple(rho, std::make_index_sequence<std::tuple_size_v<V>>{});
                 }
                 else ENT_IF_COMPILE(V, arr, std::size(arr)) // All other dynamic containers
                 {
                     if (std::size(rho) != this->size())
+                    {
                         throw std::runtime_error(R"(Incompatible array size in 'Array::operator=')");
+                    }
                     std::copy(std::begin(rho), std::end(rho), this->begin());
                 }
                 else static_assert(sizeof(V) == 0, "Unknown array type");
@@ -194,7 +198,9 @@ namespace Ent
                 ENT_IF_COMPILE(V, arr, std::get<0>(arr)) // tuple, c-style array and std::array
                 {
                     if (std::tuple_size_v<V> != this->size())
+                    {
                         throw std::runtime_error(R"(Incompatible array size in 'Array::operator=')");
+                    }
                     copyToTuple(result, std::make_index_sequence<std::tuple_size_v<V>>{});
                 }
                 else ENT_IF_COMPILE(V, arr, std::size(arr)) // All other dynamic containers
@@ -224,7 +230,7 @@ namespace Ent
         namespace details
         {
             template <typename K>
-            auto getKeys(Ent::Node* node)
+            auto getKeys(Node* node)
             {
                 if constexpr (std::is_enum_v<K>)
                 {
@@ -263,7 +269,7 @@ namespace Ent
         struct UnionSetBase : Base
         {
             using Union = U;
-            UnionSetBase(Ent::Node* _node)
+            UnionSetBase(Node* _node)
                 : Base(_node)
             {
             }
@@ -273,29 +279,27 @@ namespace Ent
                 {
                     return sub;
                 }
-                else
-                {
-                    return std::nullopt;
-                }
+                return std::nullopt;
             }
             template <typename T>
             static char const* getTypeName()
             {
-                std::string_view name = typeid(T).name();
-                auto colon = name.find_last_of(':');
+                std::string_view const name = typeid(T).name();
+                auto const colon = name.find_last_of(':');
                 if (colon == std::string_view::npos)
+                {
                     return name.data();
-                else
-                    return name.data() + colon + 1;
+                }
+                return name.data() + colon + 1;
             }
-            Ent::Node* getSubNode(char const* str) const
+
+            Node* getSubNode(char const* str) const
             {
-                if (auto nvp = node->mapGet(str))
+                if (auto const nvp = node->mapGet(str))
                 {
                     return nvp->getUnionData();
                 }
-                else
-                    return nullptr;
+                return nullptr;
             }
             template <typename T>
             std::optional<T> get() const
@@ -304,10 +308,7 @@ namespace Ent
                 {
                     return sub;
                 }
-                else
-                {
-                    return std::nullopt;
-                }
+                return std::nullopt;
             }
             std::optional<Union> get(char const* str) const
             {
@@ -315,12 +316,10 @@ namespace Ent
                 {
                     return sub;
                 }
-                else
-                {
-                    return std::nullopt;
-                }
+                return std::nullopt;
             }
-            Ent::Node* addSubNode(char const* str) const
+
+            Node* addSubNode(char const* str) const
             {
                 return node->mapInsert(str)->getUnionData();
             }
@@ -351,7 +350,7 @@ namespace Ent
             {
                 return node->empty();
             }
-            void clear()
+            void clear() const
             {
                 node->clear();
             }
@@ -369,8 +368,8 @@ namespace Ent
                 using pointer = std::optional<Union>;
                 using reference = Union;
 
-                Ent::Node* node = nullptr;
-                std::vector<Ent::String> keys;
+                Node* node = nullptr;
+                std::vector<String> keys;
                 size_t index = 0;
 
                 iterator& operator++()
@@ -431,7 +430,7 @@ namespace Ent
             return value;
         }
 
-        inline char const* toInternal(Ent::String const& value)
+        inline char const* toInternal(String const& value)
         {
             return value.c_str();
         }
@@ -439,7 +438,7 @@ namespace Ent
         template <typename T>
         struct PrimitiveSet : Base
         {
-            PrimitiveSet(Ent::Node* _node)
+            PrimitiveSet(Node* _node)
                 : Base(_node)
             {
             }
@@ -469,7 +468,7 @@ namespace Ent
                 using pointer = T const*;
                 using reference = T const&;
 
-                Ent::Node* node = nullptr;
+                Node* node = nullptr;
                 std::vector<T> keys;
                 size_t index = 0;
 
@@ -528,7 +527,7 @@ namespace Ent
         template <typename K, typename O>
         struct ObjectSet : Base
         {
-            ObjectSet(Ent::Node* _node)
+            ObjectSet(Node* _node)
                 : Base(_node)
             {
             }
@@ -538,10 +537,7 @@ namespace Ent
                 {
                     return sub;
                 }
-                else
-                {
-                    return std::nullopt;
-                }
+                return std::nullopt;
             }
             std::optional<O> get(K key)
             {
@@ -549,10 +545,7 @@ namespace Ent
                 {
                     return sub;
                 }
-                else
-                {
-                    return std::nullopt;
-                }
+                return std::nullopt;
             }
             O add(K key) const
             {
@@ -572,7 +565,7 @@ namespace Ent
                 return node->empty();
             }
 
-            void clear()
+            void clear() const
             {
                 return node->clear();
             }
@@ -590,8 +583,8 @@ namespace Ent
                 using pointer = std::optional<O>;
                 using reference = O;
 
-                Ent::Node* node = nullptr;
-                std::vector<Ent::Node*> items;
+                Node* node = nullptr;
+                std::vector<Node*> items;
                 size_t index = 0;
 
                 iterator& operator++()
@@ -654,18 +647,18 @@ namespace Ent
         template <typename... Args>
         struct Tuple : Base
         {
-            Tuple(Ent::Node* _node)
+            Tuple(Node* _node)
                 : Base(_node)
             {
             }
 
             template <auto I>
-            typename std::tuple_element_t<I, std::tuple<Args...>> get()
+            std::tuple_element_t<I, std::tuple<Args...>> get()
             {
-                return node->at(size_t(I));
+                return node->at(static_cast<size_t>(I));
             }
 
-            constexpr size_t size()
+            constexpr size_t size() const
             {
                 return std::tuple_size_v<std::tuple<Args...>>;
             }
@@ -674,7 +667,7 @@ namespace Ent
         template <typename K, typename V>
         struct Map : Base
         {
-            Map(Ent::Node* _node)
+            Map(Node* _node)
                 : Base(_node)
             {
             }
@@ -684,10 +677,7 @@ namespace Ent
                 {
                     return sub;
                 }
-                else
-                {
-                    return std::nullopt;
-                }
+                return std::nullopt;
             }
             std::optional<V> operator[](K key)
             {
@@ -695,10 +685,7 @@ namespace Ent
                 {
                     return sub;
                 }
-                else
-                {
-                    return std::nullopt;
-                }
+                return std::nullopt;
             }
             V add(K key)
             {
@@ -718,7 +705,7 @@ namespace Ent
                 return node->empty();
             }
 
-            void clear()
+            void clear() const
             {
                 node->clear();
             }
@@ -736,8 +723,8 @@ namespace Ent
                 using pointer = std::optional<value_type>;
                 using reference = value_type;
 
-                Ent::Node* node = nullptr;
-                std::vector<Ent::Node*> items;
+                Node* node = nullptr;
+                std::vector<Node*> items;
                 size_t index = 0;
 
                 iterator& operator++()
@@ -760,7 +747,7 @@ namespace Ent
 
                 reference operator*() const
                 {
-                    auto keyToView = [](Ent::Node* keynode)
+                    auto keyToView = [](Node* keynode)
                     {
                         if constexpr (std::is_enum_v<K>)
                         {
@@ -811,20 +798,20 @@ namespace Ent
         struct PropHelper : Base
         {
             using InternalType = T;
-            PropHelper(Ent::Node* _node)
+            PropHelper(Node* _node)
                 : Base(_node)
             {
             }
 
             PropHelper& operator=(T value)
             {
-                ((P const*)this)->set(value);
+                static_cast<P const*>(this)->set(value);
                 return *this;
             }
 
             operator T() const
             {
-                return ((P const*)this)->get();
+                return static_cast<P const*>(this)->get();
             }
         };
 
@@ -832,7 +819,7 @@ namespace Ent
         struct EnumPropHelper : PropHelper<Child, E>
         {
             using Enum = E;
-            EnumPropHelper(Ent::Node* _node)
+            EnumPropHelper(Node* _node)
                 : PropHelper<Child, Enum>(_node)
             {
             }
@@ -848,14 +835,16 @@ namespace Ent
                     std::end(Child::enumToString),
                     std::string_view(str));
                 if (iter == std::end(Child::enumToString))
+                {
                     throw std::runtime_error(std::string("Unkown enum string '") + str + "'");
+                }
                 return Enum(std::distance(std::begin(Child::enumToString), iter));
             }
         };
 
         struct HelperObject : Base
         {
-            HelperObject(Ent::Node* _node)
+            HelperObject(Node* _node)
                 : Base(_node)
             {
             }
@@ -876,12 +865,12 @@ namespace Ent
             ///
             /// @warning All sub-nodes into \b _node will be invalidated
             /// @param _prefabNodePath path to the prefab Node (relative to RawData)
-            void resetInstanceOf(char const* _prefabNodePath)
+            void resetInstanceOf(char const* _prefabNodePath) const
             {
                 node->resetInstanceOf(_prefabNodePath);
             }
 
-            void resetInstanceOf()
+            void resetInstanceOf() const
             {
                 node->resetInstanceOf();
             }
@@ -889,12 +878,12 @@ namespace Ent
             /// @brief Change this Entity to be an instance of the given \b _newPrefab, keeping
             /// all internal values the same.
             /// @param _newPrefab path to the new prefab
-            void changeInstanceOf(char const* _newPrefab)
+            void changeInstanceOf(char const* _newPrefab) const
             {
                 node->changeInstanceOf(_newPrefab);
             }
 
-            void save(std::filesystem::path const& _destFile)
+            void save(std::filesystem::path const& _destFile) const
             {
                 node->saveNode(_destFile);
             }
@@ -902,7 +891,7 @@ namespace Ent
 
         struct Bool : PropHelper<Bool, bool>
         {
-            Bool(Ent::Node* _node)
+            Bool(Node* _node)
                 : PropHelper<Bool, bool>(_node)
             {
             }
@@ -923,7 +912,7 @@ namespace Ent
 
         struct Int : PropHelper<Int, int64_t>
         {
-            Int(Ent::Node* _node)
+            Int(Node* _node)
                 : PropHelper<Int, int64_t>(_node)
             {
             }
@@ -944,7 +933,7 @@ namespace Ent
 
         struct Float : PropHelper<Float, double>
         {
-            Float(Ent::Node* _node)
+            Float(Node* _node)
                 : PropHelper<Float, double>(_node)
             {
             }
@@ -975,7 +964,7 @@ namespace Ent
 
         struct String : PropHelper<String, char const*>
         {
-            String(Ent::Node* _node)
+            String(Node* _node)
                 : PropHelper<String, char const*>(_node)
             {
             }
@@ -1035,7 +1024,7 @@ namespace Ent
 
         struct EntityRef : PropHelper<EntityRef, Ent::EntityRef>
         {
-            EntityRef(Ent::Node* _node)
+            EntityRef(Node* _node)
                 : PropHelper<EntityRef, Ent::EntityRef>(_node)
             {
             }

@@ -25,7 +25,7 @@ namespace Ent
             // meta.ordered means the items have to be sorted by the key
             ENTLIB_ASSERT(_child->getSchema()->linearItems.has_value());
             // ENTLIB_ASSERT(not _child->at(0llu)->hasDefaultValue); // Sometime there is a key in the default value
-            DataType keyType = _arraySchema->singularItems->get().linearItems->at(0)->type;
+            DataType const keyType = _arraySchema->singularItems->get().linearItems->at(0)->type;
 #pragma warning(push)
 #pragma warning(disable : 4061) // There are switches with missing cases. This is wanted.
             switch (keyType)
@@ -60,7 +60,7 @@ namespace Ent
             case DataType::object:
                 if (meta.keyField.has_value())
                 {
-                    auto keyNode = _child->at(meta.keyField->c_str());
+                    auto const keyNode = _child->at(meta.keyField->c_str());
                     switch (keyNode->getDataType())
                     {
                     case DataType::string:
@@ -125,10 +125,7 @@ namespace Ent
                             meta.keyField->c_str());
                     }
                 }
-                else
-                {
-                    throw ContextException("Object set without keyField in " + _arraySchema->name);
-                }
+                throw ContextException("Object set without keyField in " + _arraySchema->name);
             }
             default: throw ContextException("Unknown key type in set " + _arraySchema->name);
             }
@@ -156,7 +153,7 @@ namespace Ent
             // and can be string, double or integer
             // meta.ordered means the items have to be sorted by the key
             ENTLIB_ASSERT(_child->getSchema()->linearItems.has_value());
-            DataType keyType = _arraySchema->singularItems->get().linearItems->at(0)->type;
+            DataType const keyType = _arraySchema->singularItems->get().linearItems->at(0)->type;
             Node const* keyNode = _child->at(0llu);
 #pragma warning(push)
 #pragma warning(disable : 4061) // There are switches with missing cases. This is wanted.
@@ -185,7 +182,7 @@ namespace Ent
             case DataType::object:
                 if (meta.keyField.has_value())
                 {
-                    auto keyNode = _child->at(meta.keyField->c_str());
+                    auto const keyNode = _child->at(meta.keyField->c_str());
                     switch (keyNode->getDataType())
                     {
                     case DataType::string: return keyNode->getString(); break;
@@ -251,10 +248,7 @@ namespace Ent
         {
             return (not isPresent.getPrefab()) || node->hasOverride();
         }
-        else
-        {
-            return isPresent.getPrefab();
-        }
+        return isPresent.getPrefab();
     }
 
     bool Map::Element::hasPrefabValue() const
@@ -290,20 +284,17 @@ namespace Ent
         {
             return m_items[_index].node.get();
         }
-        else
-        {
-            return nullptr;
-        }
+        return nullptr;
     }
 
     bool Map::erase(KeyType const& _key)
     {
-        auto iter = m_itemMap.find(_key);
+        auto const iter = m_itemMap.find(_key);
         if (iter == m_itemMap.end())
         {
             return false;
         }
-        size_t index = iter->second;
+        size_t const index = iter->second;
         Element& element = m_items.at(index);
         if (element.isPresent.get())
         {
@@ -312,10 +303,7 @@ namespace Ent
             checkInvariants();
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     template <typename Elt> // Elt is Element or Element const
@@ -331,20 +319,17 @@ namespace Ent
         {
             return node->at(1llu);
         }
-        else
-        {
-            return _element.node.get();
-        }
+        return _element.node.get();
     }
 
     Node const* Map::get(KeyType const& _key) const
     {
-        auto iter = m_itemMap.find(_key);
+        auto const iter = m_itemMap.find(_key);
         if (iter == m_itemMap.end())
         {
             return nullptr;
         }
-        size_t index = iter->second;
+        size_t const index = iter->second;
         Element const& element = m_items.at(index);
         return getEltValue(m_schema, element);
     }
@@ -357,7 +342,7 @@ namespace Ent
 
     Map::Element& Map::insertImpl(KeyType const& _key, NodeUniquePtr _newNode)
     {
-        auto iter = m_itemMap.find(_key);
+        auto const iter = m_itemMap.find(_key);
         if (iter == m_itemMap.end())
         {
             SubschemaRef const* itemSchema = m_schema->singularItems.get();
@@ -373,7 +358,7 @@ namespace Ent
             elt.node->setParentNode(m_parentNode);
             return elt;
         }
-        size_t index = iter->second;
+        size_t const index = iter->second;
         Element& element = m_items.at(index);
         if (not element.isPresent.get())
         {
@@ -383,7 +368,7 @@ namespace Ent
             {
                 // This element was removed in the prefab and re-insert in the instance
                 // So we will not get back the data from before the prefab.
-                auto key = getChildKey(m_schema, element.node.get());
+                auto const key = getChildKey(m_schema, element.node.get());
                 element.node = m_entlib->loadNode(*element.node->getSchema(), json{}, nullptr);
                 setChildKey(m_schema, element.node.get(), key);
                 // Can't change the type of a union which is inside a unionset,
@@ -410,7 +395,7 @@ namespace Ent
 
     Node* Map::rename(KeyType const& _key, KeyType const& _newkey)
     {
-        auto iter = m_itemMap.find(_key);
+        auto const iter = m_itemMap.find(_key);
         if (iter != m_itemMap.end())
         {
             auto const idx = iter->second;
@@ -425,34 +410,25 @@ namespace Ent
                     throw CantRename(
                         R"(Can't rename key because it override an item in prefab from parent entity)");
                 }
-                else
-                {
-                    m_items[idx].isPresent.set(false);
-                    m_items[idx].node->setAddedInInsance(false);
-                    auto clone = m_items[idx].node->clone();
-                    setChildKey(m_schema, clone.get(), _newkey);
-                    Element& newNode =
-                        insertImpl(OverrideValueLocation::Override, _newkey, std::move(clone), true);
-                    // Change the elements order to keep the position in the array
-                    std::swap(newNode, m_items[idx]); // swap the elements
-                    std::swap(m_itemMap[_key], m_itemMap[_newkey]); // swap the indexes
-                    return m_items[idx].node.get(); // The right elt is m_items[idx] since they have been swaped
-                }
+                m_items[idx].isPresent.set(false);
+                m_items[idx].node->setAddedInInsance(false);
+                auto clone = m_items[idx].node->clone();
+                setChildKey(m_schema, clone.get(), _newkey);
+                Element& newNode =
+                    insertImpl(OverrideValueLocation::Override, _newkey, std::move(clone), true);
+                // Change the elements order to keep the position in the array
+                std::swap(newNode, m_items[idx]); // swap the elements
+                std::swap(m_itemMap[_key], m_itemMap[_newkey]); // swap the indexes
+                return m_items[idx].node.get(); // The right elt is m_items[idx] since they have been swaped
             }
-            else
-            {
-                throw CantRename("Can't rename key because it was removed");
-            }
+            throw CantRename("Can't rename key because it was removed");
         }
-        else
-        {
-            throw CantRename("Can't rename key because it doesn't exist");
-        }
+        throw CantRename("Can't rename key because it doesn't exist");
     }
 
     bool Map::isErased(KeyType const& _key) const
     {
-        auto iter = m_itemMap.find(_key);
+        auto const iter = m_itemMap.find(_key);
         if (iter == m_itemMap.end())
         {
             return false;
@@ -584,14 +560,14 @@ namespace Ent
         ENTLIB_ASSERT(m_schema->singularItems != nullptr);
         auto const& overridePolicy = std::get<Subschema::ArrayMeta>(m_schema->meta).overridePolicy;
         ENTLIB_ASSERT(overridePolicy == "map" or overridePolicy == "set");
-        auto singItem = &m_schema->singularItems->get();
+        auto const singItem = &m_schema->singularItems->get();
         for (auto& itm : m_items)
         {
             ENTLIB_ASSERT(singItem == itm.node->getSchema());
         }
         for (auto& key_item : m_itemMap)
         {
-            auto itemSchema = m_items.at(std::get<1>(key_item)).node->getSchema();
+            auto const itemSchema = m_items.at(std::get<1>(key_item)).node->getSchema();
             ENTLIB_ASSERT(singItem == itemSchema);
         }
     }
@@ -653,14 +629,14 @@ namespace Ent
         }
         case OverrideValueLocation::Prefab:
         {
-            auto prefabSize = getPrefabSize();
-            auto defaultsize = getDefaultSize();
+            auto const prefabSize = getPrefabSize();
+            auto const defaultsize = getDefaultSize();
             return (prefabSize == defaultsize) ? std::optional<size_t>{} : prefabSize;
         }
         case OverrideValueLocation::Override:
         {
-            auto instanceSize = size();
-            auto prefabsize = getPrefabSize();
+            auto const instanceSize = size();
+            auto const prefabsize = getPrefabSize();
             return (instanceSize == prefabsize) ? std::optional<size_t>{} : instanceSize;
         }
         }
@@ -677,20 +653,35 @@ namespace Ent
 
     size_t Map::size() const
     {
-        return (size_t)std::count_if(
-            begin(m_items), end(m_items), [](auto&& d) { return d.isPresent.get(); });
+        return static_cast<size_t>(std::count_if(
+            begin(m_items),
+            end(m_items),
+            [](auto&& d)
+            {
+                return d.isPresent.get();
+            }));
     }
 
     size_t Map::getDefaultSize() const
     {
-        return (size_t)std::count_if(
-            begin(m_items), end(m_items), [](Element const& d) { return d.isPresent.getDefault(); });
+        return static_cast<size_t>(std::count_if(
+            begin(m_items),
+            end(m_items),
+            [](Element const& d)
+            {
+                return d.isPresent.getDefault();
+            }));
     }
 
     size_t Map::getPrefabSize() const
     {
-        return (size_t)std::count_if(
-            begin(m_items), end(m_items), [](Element const& d) { return d.isPresent.getPrefab(); });
+        return static_cast<size_t>(std::count_if(
+            begin(m_items),
+            end(m_items),
+            [](Element const& d)
+            {
+                return d.isPresent.getPrefab();
+            }));
     }
 
     void Map::computeMemory(MemoryProfiler& _prof) const
@@ -726,13 +717,13 @@ namespace Ent
     void Map::applyAllValues(Map& _dest, CopyMode _copyMode) const
     {
         std::set<KeyType> removedDestKeys;
-        for (auto& destNode : _dest.getItems())
+        for (auto const& destNode : _dest.getItems())
         {
             auto&& key = getChildKey(m_schema, destNode);
             removedDestKeys.insert(key);
         }
 
-        for (auto& sourceNode : getItems())
+        for (auto const& sourceNode : getItems())
         {
             auto&& key = getChildKey(m_schema, sourceNode);
             Node* destNode2 = _dest.insertImpl(key).node.get(); // 'insert' only get if the item exist
@@ -749,7 +740,7 @@ namespace Ent
     void Map::setParentNode(Node* _parentNode)
     {
         m_parentNode = _parentNode;
-        for (auto& elt : m_items)
+        for (auto const& elt : m_items)
         {
             elt.node->setParentNode(_parentNode);
         }
@@ -855,12 +846,12 @@ namespace Ent
 
     struct KeyToString
     {
-        NodeRef operator()(String const& key)
+        NodeRef operator()(String const& key) const
         {
             return key.c_str();
         }
 
-        NodeRef operator()(int64_t const& key)
+        NodeRef operator()(int64_t const& key) const
         {
             return format("lli", key);
         }

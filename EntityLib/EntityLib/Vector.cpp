@@ -63,10 +63,7 @@ namespace Ent
         {
             return m_data[_index].get();
         }
-        else
-        {
-            return nullptr;
-        }
+        return nullptr;
     }
     Node const* Vector::at(uint64_t _index) const
     {
@@ -74,10 +71,7 @@ namespace Ent
         {
             return m_data[_index].get();
         }
-        else
-        {
-            return nullptr;
-        }
+        return nullptr;
     }
 
     bool Vector::isTuple() const
@@ -107,7 +101,7 @@ namespace Ent
         ENTLIB_ASSERT(m_data.size() == m_arraySize.get());
         if (m_schema->singularItems != nullptr)
         {
-            auto singItem = &m_schema->singularItems->get();
+            auto const singItem = &m_schema->singularItems->get();
             for (auto& itm : m_data)
             {
                 ENTLIB_ASSERT(singItem == itm->getSchema());
@@ -186,7 +180,7 @@ namespace Ent
             || (&m_schema->singularItems->get() == _node->getSchema()));
         m_data.emplace_back(std::move(_node));
         m_arraySize.set(m_arraySize.get() + 1);
-        auto node = m_data.back().get();
+        auto const node = m_data.back().get();
         node->setAddedInInsance(_addedInInstance);
         return node;
     }
@@ -214,7 +208,7 @@ namespace Ent
 
     void Vector::unset()
     {
-        for (auto& elt : m_data)
+        for (auto const& elt : m_data)
         {
             elt->unset();
         }
@@ -238,9 +232,9 @@ namespace Ent
         }
     }
 
-    void Vector::setParentNode(Node* _parentNode)
+    void Vector::setParentNode(Node* _parentNode) const
     {
-        for (auto& elt : m_data)
+        for (auto const& elt : m_data)
         {
             elt->setParentNode(_parentNode);
         }
@@ -273,7 +267,7 @@ namespace Ent
     NodeRef Vector::computeNodeRefToChild(Node const* _child) const
     {
         size_t i = 0;
-        for (auto& subnode : this->getItems())
+        for (auto const& subnode : this->getItems())
         {
             if (_child == subnode)
             {

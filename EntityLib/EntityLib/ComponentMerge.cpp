@@ -20,13 +20,13 @@ namespace Ent
     {
         switch (_node.type())
         {
-        case nlohmann::detail::value_t::null:
-        case nlohmann::detail::value_t::string:
-        case nlohmann::detail::value_t::boolean:
-        case nlohmann::detail::value_t::number_integer:
-        case nlohmann::detail::value_t::number_unsigned:
-        case nlohmann::detail::value_t::number_float: break;
-        case nlohmann::detail::value_t::object:
+        case detail::value_t::null:
+        case detail::value_t::string:
+        case detail::value_t::boolean:
+        case detail::value_t::number_integer:
+        case detail::value_t::number_unsigned:
+        case detail::value_t::number_float: break;
+        case detail::value_t::object:
         {
             for (auto& field : _node.items())
             {
@@ -34,7 +34,7 @@ namespace Ent
                 {
                     std::string link = field.value();
                     // Only keep the def name (no more external references)
-                    auto pos = link.find('#');
+                    auto const pos = link.find('#');
                     if (pos != std::string::npos)
                     {
                         link = link.substr(pos);
@@ -48,7 +48,7 @@ namespace Ent
             }
         }
         break;
-        case nlohmann::detail::value_t::array:
+        case detail::value_t::array:
         {
             for (auto& item : _node)
             {
@@ -56,8 +56,8 @@ namespace Ent
             }
         }
         break;
-        case nlohmann::detail::value_t::binary:
-        case nlohmann::detail::value_t::discarded: break;
+        case detail::value_t::binary:
+        case detail::value_t::discarded: break;
         }
     };
 
@@ -67,17 +67,14 @@ namespace Ent
         {
             if (node.at("properties").count("Super") != 0)
             {
-                auto ref = node.at("properties").at("Super").at("$ref").get<std::string>();
-                auto lastSlash = ref.find_last_of('/');
-                auto name = ref.substr(lastSlash + 1);
+                auto const ref = node.at("properties").at("Super").at("$ref").get<std::string>();
+                auto const lastSlash = ref.find_last_of('/');
+                auto const name = ref.substr(lastSlash + 1);
                 if (name == "ComponentGD")
                 {
                     return true;
                 }
-                else
-                {
-                    return isComponent(mergedCompSch, mergedCompSch.at("definitions").at(name));
-                }
+                return isComponent(mergedCompSch, mergedCompSch.at("definitions").at(name));
             }
         }
         return false;
@@ -185,7 +182,7 @@ namespace Ent
     void updateComponents(std::filesystem::path const& _toolsDir)
     {
         json sceneSch = mergeComponents(_toolsDir);
-        char const* mergedComponentsSchemaLocation = "WildPipeline/Schema/MergedComponents.json";
+        auto mergedComponentsSchemaLocation = "WildPipeline/Schema/MergedComponents.json";
         auto mergedSchemaPath = _toolsDir / mergedComponentsSchemaLocation;
         {
             std::stringstream buffer;
@@ -201,7 +198,7 @@ namespace Ent
         // Export all type schemas in the "all" subdirectory
         // Actually each file only reference the "TextEditorsSchema.json" file.
         auto allSingleSchemaPath = std::filesystem::path("WildPipeline/Schema/all");
-        std::filesystem::create_directories(_toolsDir / allSingleSchemaPath);
+        create_directories(_toolsDir / allSingleSchemaPath);
         for (auto&& [name, defs] : sceneSch["definitions"].items())
         {
             auto escapedName = name;
@@ -229,7 +226,7 @@ namespace Ent
         EntityLib entlib(_toolsDir.parent_path());
         json fullWildSchema = createValidationSchema(entlib.schema.schema);
         {
-            char const* fullWildSchemaLocation = "WildPipeline/Schema/TextEditorsSchema.json";
+            auto fullWildSchemaLocation = "WildPipeline/Schema/TextEditorsSchema.json";
             std::stringstream buffer;
             buffer << fullWildSchema.dump(4);
 

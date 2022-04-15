@@ -44,7 +44,7 @@ namespace Ent
         Object(
             Subschema const* _schema,
             std::vector<ObjField> _nodes,
-            Override<Ent::String> _instanceOf = {},
+            Override<String> _instanceOf = {},
             uint32_t _instanceOfFieldIndex = 0,
             bool _hasASuper = false)
             : schema(_schema)
@@ -64,7 +64,7 @@ namespace Ent
 
         Subschema const* schema{};
         std::vector<ObjField> nodes;
-        Override<Ent::String> instanceOf;
+        Override<String> instanceOf;
         uint32_t instanceOfFieldIndex = 0;
         bool hasASuper = false;
 
@@ -78,7 +78,7 @@ namespace Ent
             return nodes.front();
         }
 
-        void unset();
+        void unset() const;
         void resetInstanceOf(char const* _prefabNodePath);
         Object makeInstanceOf() const;
         Object detach() const;
@@ -105,16 +105,13 @@ namespace Ent
             {
                 throw NullPointerArgument("key", "");
             }
-            auto range =
+            auto const range =
                 std::equal_range(begin(nodes), end(nodes), ObjField{key, nullptr, 0}, CompObject());
             if (range.first == range.second)
             {
                 throw BadKey(key, "at", schema->name.c_str());
             }
-            else
-            {
-                return *range.first;
-            }
+            return *range.first;
         }
 
         ObjField& at(char const* key)
@@ -150,7 +147,7 @@ namespace Ent
 
     // For Entity and Object. Decide to resetInstanceOf or not depending on \b _copyMode
     template <typename T>
-    void applyInstanceOfField(T const& _source, T& _dest, Ent::CopyMode _copyMode)
+    void applyInstanceOfField(T const& _source, T& _dest, CopyMode _copyMode)
     {
         auto sourcePrefabPath = _source.getInstanceOfValue().get().c_str();
         if (_source.getInstanceOfValue().get() != _dest.getInstanceOfValue().get())

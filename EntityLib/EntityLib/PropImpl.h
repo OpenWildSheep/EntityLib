@@ -127,7 +127,7 @@ namespace Ent
 
         /// @return The index of the type of the Union
         /// @pre It is a Union
-        [[nodiscard]] size_t getUnionTypeIndex();
+        [[nodiscard]] size_t getUnionTypeIndex() const;
         [[nodiscard]] DataType getDataType() const; ///< Get the DataType of a Node
 
         [[nodiscard]] Subschema const* getSchema() const; ///< Get the Schema of the current Node
@@ -140,7 +140,7 @@ namespace Ent
 
         [[nodiscard]] size_t size(); ///< @return the size the this Node whatever it is.
         [[nodiscard]] bool contains(Key const& _key); ///< @pre map/set. @return true if it contains _key.
-        [[nodiscard]] size_t arraySize(); ///< @return size of a simple array
+        [[nodiscard]] size_t arraySize() const; ///< @return size of a simple array
         [[nodiscard]] bool empty(); ///< Check if size() == 0
         [[nodiscard]] bool isNull() const; ///< @brief check if this Node is json null
 
@@ -153,11 +153,11 @@ namespace Ent
         [[nodiscard]] std::set<char const*, CmpStr> getObjectSetKeysString(); ///< Get keys of objects as strings
         [[nodiscard]] std::set<int64_t> getObjectSetKeysInt(); ///< Get keys of objects as ints
 
-        [[nodiscard]] std::set<char const*, CmpStr> getMapRemovedKeysString();
-        [[nodiscard]] std::set<int64_t> getMapRemovedKeysInt();
-        [[nodiscard]] std::map<char const*, Subschema const*, CmpStr> getUnionSetRemovedKeysString();
-        [[nodiscard]] std::set<char const*, CmpStr> getObjectSetRemovedKeysString();
-        [[nodiscard]] std::set<int64_t> getObjectSetRemovedKeysInt();
+        [[nodiscard]] std::set<char const*, CmpStr> getMapRemovedKeysString() const;
+        [[nodiscard]] std::set<int64_t> getMapRemovedKeysInt() const;
+        [[nodiscard]] std::map<char const*, Subschema const*, CmpStr> getUnionSetRemovedKeysString() const;
+        [[nodiscard]] std::set<char const*, CmpStr> getObjectSetRemovedKeysString() const;
+        [[nodiscard]] std::set<int64_t> getObjectSetRemovedKeysInt() const;
 
         [[nodiscard]] bool mapContains(char const* _key); ///< Check if the map contains this _key
         [[nodiscard]] bool mapContains(int64_t _key); ///< Check if the map contains this _key
@@ -231,8 +231,8 @@ namespace Ent
         [[nodiscard]] std::vector<char const*>
         getFieldNames() const; ///< @pre type==Ent::DataType::object @brief Get all field names
 
-        [[nodiscard]] PropImpl* getPrefab(); ///< Get the PropImpl of the prefab
-        [[nodiscard]] nlohmann::json const* getRawJson(); ///< Get the underlying json node of the instance
+        [[nodiscard]] PropImpl* getPrefab() const; ///< Get the PropImpl of the prefab
+        [[nodiscard]] nlohmann::json const* getRawJson() const; ///< Get the underlying json node of the instance
 
         [[nodiscard]] PropImplPtr sharedFromThis(); ///< Create a new smart pointer to this
 
@@ -240,7 +240,7 @@ namespace Ent
 
         [[nodiscard]] EntityLib* getEntityLib() const;
 
-        [[nodiscard]] char const* getFilePath();
+        [[nodiscard]] char const* getFilePath() const;
 
         [[nodiscard]] DataKind getDataKind() const;
 
@@ -253,7 +253,7 @@ namespace Ent
         [[nodiscard]] bool _countPrimSetKeyImpl(K _key);
         template <typename E>
         [[nodiscard]] PropImplPtr _enterItem(E&& _enter);
-        void _checkInvariants() const;
+        void _checkInvariants();
         template <typename Container, typename F>
         [[nodiscard]] Container getKeys(F const& getKeysInFile);
 
@@ -267,7 +267,7 @@ namespace Ent
         DeleteCheck m_deleteCheck;
     };
 
-    inline PropImpl* PropImpl::getPrefab()
+    inline PropImpl* PropImpl::getPrefab() const
     {
         return m_prefab.get();
     }
@@ -292,7 +292,7 @@ namespace Ent
         return m_entityLib;
     }
 
-    inline char const* PropImpl::getFilePath()
+    inline char const* PropImpl::getFilePath() const
     {
         return m_instance.getFilePath();
     }

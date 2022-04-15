@@ -41,7 +41,7 @@ namespace Ent
                 return;
             }
             // Use absolute path to avoid name collision
-            auto absRef = (ref.front() == '#') ? ("./" + _filename + ref) : ref;
+            auto const absRef = (ref.front() == '#') ? ("./" + _filename + ref) : ref;
             vis.openRef(absRef.c_str());
 
             // default values beside a "$ref" are "special".
@@ -54,12 +54,12 @@ namespace Ent
                 vis.setRefDefaultValue(def);
             }
 
-            if (auto titleIter = _data.find("title"); titleIter != _data.end())
+            if (auto const titleIter = _data.find("title"); titleIter != _data.end())
             {
                 vis.setRefTitle(titleIter->get_ref<json::string_t const&>());
             }
 
-            if (auto descrIter = _data.find("description"); descrIter != _data.end())
+            if (auto const descrIter = _data.find("description"); descrIter != _data.end())
             {
                 vis.setRefDescription(descrIter->get_ref<json::string_t const&>());
             }
@@ -75,7 +75,7 @@ namespace Ent
             {
                 ref = ref.substr(strlen("./"));
             }
-            auto sharp = ref.find('#');
+            auto const sharp = ref.find('#');
             auto fileName = ref.substr(0, sharp);
             try
             {
@@ -89,7 +89,7 @@ namespace Ent
                 }
                 else
                 {
-                    auto iter = m_schemaMap.find(fileName);
+                    auto const iter = m_schemaMap.find(fileName);
                     if (iter == m_schemaMap.end())
                     {
                         m_schemaMap[fileName] = loadJsonFile(m_schemaPath, fileName);
@@ -132,7 +132,7 @@ namespace Ent
 
     Subschema::Meta parseMetaForType(json const& _data, DataType _type)
     {
-        const auto setBaseMetas = [&](Subschema::BaseMeta* _meta)
+        auto const setBaseMetas = [&](Subschema::BaseMeta* _meta)
         {
             if (_data.count("editor") != 0u)
             {
@@ -148,7 +148,7 @@ namespace Ent
             }
         };
 
-        const auto setNumberMetas = [&](Subschema::NumberMeta& _meta)
+        auto const setNumberMetas = [&](Subschema::NumberMeta& _meta)
         {
             if (_data.count("bitdepth") != 0u)
             {
@@ -159,7 +159,7 @@ namespace Ent
                 _meta.isSigned = _data["signed"].get<bool>();
             }
         };
-        const auto setUnionMetas = [&](Subschema::UnionMeta& _meta)
+        auto const setUnionMetas = [&](Subschema::UnionMeta& _meta)
         {
             if (_data.count("unionDataField") != 0u)
             {
@@ -174,7 +174,7 @@ namespace Ent
                 _meta.indexField = _data["unionIndexField"].get<std::string>();
             }
         };
-        const auto setArrayMetas = [&](Subschema::ArrayMeta& _meta)
+        auto const setArrayMetas = [&](Subschema::ArrayMeta& _meta)
         {
             _meta.overridePolicy = _data.value("overridePolicy", "");
             _meta.ordered = _data.value("ordered", true);
@@ -225,8 +225,8 @@ namespace Ent
     void SchemaLoader::parseSchemaNoRef(
         std::string const& _filename, json const& _rootFile, json const& _data, Visitor& vis, int depth)
     {
-        DataType currentType = DataType::null;
-        const auto setType = [&](DataType _type)
+        auto currentType = DataType::null;
+        auto const setType = [&](DataType _type)
         {
             currentType = _type;
             vis.setType(_type);
@@ -285,7 +285,7 @@ namespace Ent
                 vis.closeProperty();
             }
             // Add a _comment property on all objects
-            json prop = R"({"type" : "string"})"_json;
+            auto const prop = R"({"type" : "string"})"_json;
             vis.openProperty("_comment");
             parseSchema(_filename, _rootFile, prop, vis, depth + 1);
             vis.closeProperty();
@@ -297,16 +297,16 @@ namespace Ent
             vis.setDefaultValue(def);
             switch (def.type())
             {
-            case nlohmann::json::value_t::null: setType(DataType::null); break;
-            case nlohmann::json::value_t::object: setType(DataType::object); break;
-            case nlohmann::json::value_t::array: setType(DataType::array); break;
-            case nlohmann::json::value_t::binary:
-            case nlohmann::json::value_t::discarded: break;
-            case nlohmann::json::value_t::string: setType(DataType::string); break;
-            case nlohmann::json::value_t::boolean: setType(DataType::boolean); break;
-            case nlohmann::json::value_t::number_integer:
-            case nlohmann::json::value_t::number_unsigned: setType(DataType::integer); break;
-            case nlohmann::json::value_t::number_float: setType(DataType::number); break;
+            case json::value_t::null: setType(DataType::null); break;
+            case json::value_t::object: setType(DataType::object); break;
+            case json::value_t::array: setType(DataType::array); break;
+            case json::value_t::binary:
+            case json::value_t::discarded: break;
+            case json::value_t::string: setType(DataType::string); break;
+            case json::value_t::boolean: setType(DataType::boolean); break;
+            case json::value_t::number_integer:
+            case json::value_t::number_unsigned: setType(DataType::integer); break;
+            case json::value_t::number_float: setType(DataType::number); break;
             }
         }
         if (_data.count("const") != 0u)
@@ -315,16 +315,16 @@ namespace Ent
             vis.setConstValue(def);
             switch (def.type())
             {
-            case nlohmann::json::value_t::null: setType(DataType::null); break;
-            case nlohmann::json::value_t::object: setType(DataType::object); break;
-            case nlohmann::json::value_t::array: setType(DataType::array); break;
-            case nlohmann::json::value_t::binary:
-            case nlohmann::json::value_t::discarded: break;
-            case nlohmann::json::value_t::string: setType(DataType::string); break;
-            case nlohmann::json::value_t::boolean: setType(DataType::boolean); break;
-            case nlohmann::json::value_t::number_integer:
-            case nlohmann::json::value_t::number_unsigned: setType(DataType::integer); break;
-            case nlohmann::json::value_t::number_float: setType(DataType::number); break;
+            case json::value_t::null: setType(DataType::null); break;
+            case json::value_t::object: setType(DataType::object); break;
+            case json::value_t::array: setType(DataType::array); break;
+            case json::value_t::binary:
+            case json::value_t::discarded: break;
+            case json::value_t::string: setType(DataType::string); break;
+            case json::value_t::boolean: setType(DataType::boolean); break;
+            case json::value_t::number_integer:
+            case json::value_t::number_unsigned: setType(DataType::integer); break;
+            case json::value_t::number_float: setType(DataType::number); break;
             }
         }
         if (_data.count("items") != 0u)
@@ -332,7 +332,7 @@ namespace Ent
             setType(DataType::array);
             auto const& items = _data["items"];
             // items linear
-            if (items.type() == nlohmann::json::value_t::array)
+            if (items.type() == json::value_t::array)
             {
                 vis.setLinearItem(items.size());
                 for (size_t index = 0; index < items.size(); ++index)
@@ -343,7 +343,7 @@ namespace Ent
                 }
             }
             // items singular
-            else if (items.type() == nlohmann::json::value_t::object)
+            else if (items.type() == json::value_t::object)
             {
                 vis.openSingularItem();
                 parseSchema(_filename, _rootFile, items, vis, depth + 1);
@@ -400,17 +400,14 @@ namespace Ent
                 ENTLIB_LOGIC_ERROR(
                     "Unexpected json items type for \"meta\" : %s", _data["meta"].type_name());
             }
-            else
+            if (currentType == DataType::null)
             {
-                if (currentType == DataType::null)
-                {
-                    // Unions doesn't have "type" field in RuntimeComponents.json
-                    setType(DataType::object);
-                }
-                vis.setMeta(
-                    parseMetaForType(_data["meta"], currentType),
-                    _data["meta"].value("user", json::object()));
+                // Unions doesn't have "type" field in RuntimeComponents.json
+                setType(DataType::object);
             }
+            vis.setMeta(
+                parseMetaForType(_data["meta"], currentType),
+                _data["meta"].value("user", json::object()));
         }
         else if (currentType != DataType::null)
         {
@@ -455,9 +452,9 @@ namespace Ent
                 return tab.c_str();
             };
 
-            void checkWholeStack()
+            void checkWholeStack() const
             {
-                for (SubschemaRef* ref : stack)
+                for (SubschemaRef const* ref : stack)
                 {
                     ENTLIB_ASSERT(ref->deleteCheck.state_ == DeleteCheck::State::VALID);
                 }
@@ -604,7 +601,7 @@ namespace Ent
             {
                 CHECK_WHOLE_STACK;
                 ENTLIB_DEBUG_PRINTF("%sopenRef %s\n", getTab(), link);
-                auto typeName = std::string(getRefTypeName(link));
+                auto const typeName = std::string(getRefTypeName(link));
                 // Force to create the definition (do nothing if already exist)
                 auto& subschema = globalSchema->allDefinitions[typeName];
                 ENTLIB_ASSERT(not typeName.empty());
@@ -615,7 +612,7 @@ namespace Ent
                 ref = SubschemaRef::Ref{globalSchema, typeName};
             }
 
-            void finalizeSubschema(Subschema& lastSchema)
+            void finalizeSubschema(Subschema& lastSchema) const
             {
                 if (not lastSchema.unionTypeMap.empty())
                 {
@@ -670,10 +667,10 @@ namespace Ent
             {
                 if (stack.size() > 1)
                 {
-                    auto& lastSchema = stack.back()->get();
+                    auto const& lastSchema = stack.back()->get();
                     if (lastSchema.type == DataType::array)
                     {
-                        auto& lastMeta = std::get<Subschema::ArrayMeta>(lastSchema.meta);
+                        auto const& lastMeta = std::get<Subschema::ArrayMeta>(lastSchema.meta);
                         if (lastMeta.overridePolicy == "map")
                         {
                             if (lastSchema.singularItems == nullptr)
@@ -712,7 +709,7 @@ namespace Ent
                 }
                 ENTLIB_DEBUG_PRINTF("%scloseSubschema\n", getTab());
             }
-            void setMeta(Subschema::Meta meta, nlohmann::json user) override
+            void setMeta(Subschema::Meta meta, json user) override
             {
                 CHECK_WHOLE_STACK;
                 auto&& subSchema = stack.back()->get();

@@ -11,8 +11,7 @@ try
     Ent::EntityLib entlib("X:/", true);
     entlib.rawdataPath = canonical(std::filesystem::current_path() / "../Test");
 
-    Ent::Property expl(
-        &entlib, entlib.getSchema(Entity::schemaName), "instance.entity");
+    Ent::Property expl(&entlib, entlib.getSchema(Entity::schemaName), "instance.entity");
     auto ent = Entity(expl);
 
     // Test Object
@@ -48,7 +47,7 @@ try
     [[maybe_unused]] auto x = tgd->Position()[0]; // inferred type : Float
     // Copy point into Node
     double arr[] = {1., 2., 3.};
-    tgd->Position() = std::vector<double>{1., 2., 3.};
+    tgd->Position() = std::vector{1., 2., 3.};
     tgd->Position() = std::array<double, 3>{1., 2., 3.};
     tgd->Position() = std::tuple{1., 2., 3.};
     tgd->Position() = std::initializer_list<double>{1., 2., 3.};

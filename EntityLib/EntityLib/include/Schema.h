@@ -80,7 +80,8 @@ namespace Ent
         DataType type = DataType::null; ///< type of this Subschema. @see Ent::DataType
         bool required = false; ///< Is this property required?
         std::map<std::string, SubschemaRef> properties; ///< If type == Ent::DataType::object, child properties
-        size_t maxItems = size_t(-1); ///< Maximum size of the array. (inclusive) [min, max]
+        size_t maxItems =
+            static_cast<size_t>(-1); ///< Maximum size of the array. (inclusive) [min, max]
         size_t minItems = 0; ///< @brief Minimum size of an array
         std::optional<std::vector<SubschemaRef>> oneOf; ///< This object have to match with one of thos schema (union)
         std::string name; ///< This is not a constraint. Just the name of the definition
@@ -242,19 +243,16 @@ namespace Ent
             {
                 return &std::get<Ref>(subSchemaOrRef).defaultValue;
             }
-            else
-            {
-                return nullptr;
-            }
+            return nullptr;
         }
 
         char const* getDescription() const
         {
-            if (auto ref = std::get_if<Ref>(&subSchemaOrRef))
+            if (auto const ref = std::get_if<Ref>(&subSchemaOrRef))
             {
                 return ref->description.c_str();
             }
-            else if (auto schema = std::get_if<Subschema>(&subSchemaOrRef))
+            if (auto const schema = std::get_if<Subschema>(&subSchemaOrRef))
             {
                 return schema->description.c_str();
             }
@@ -286,10 +284,10 @@ namespace Ent
     /// variant visitor to get a specifique field in a Subschema::BaseMeta
     struct BasicFieldGetter
     {
-        std::function<bool(const Subschema::BaseMeta*)> _fieldSelector;
+        std::function<bool(Subschema::BaseMeta const*)> _fieldSelector;
 
         template <class MetaT>
-        bool operator()(const MetaT& _meta)
+        bool operator()(MetaT const& _meta)
         {
             return _fieldSelector(&_meta);
         }
@@ -298,7 +296,7 @@ namespace Ent
     inline bool Subschema::IsDeprecated() const
     {
         return std::visit(
-            BasicFieldGetter{[](const Subschema::BaseMeta* _meta)
+            BasicFieldGetter{[](BaseMeta const* _meta)
                              {
                                  return _meta->deprecated;
                              }},
@@ -308,7 +306,7 @@ namespace Ent
     inline bool Subschema::IsUsedInEditor() const
     {
         return std::visit(
-            BasicFieldGetter{[](const Subschema::BaseMeta* _meta)
+            BasicFieldGetter{[](BaseMeta const* _meta)
                              {
                                  return _meta->usedInEditor;
                              }},
@@ -318,7 +316,7 @@ namespace Ent
     inline bool Subschema::IsUsedInRuntime() const
     {
         return std::visit(
-            BasicFieldGetter{[](const Subschema::BaseMeta* _meta)
+            BasicFieldGetter{[](BaseMeta const* _meta)
                              {
                                  return _meta->usedInRuntime;
                              }},
@@ -337,15 +335,12 @@ namespace Ent
             Ref const& ref = std::get<Ref>(subSchemaOrRef);
             return AT(ref.schema->allDefinitions, ref.ref);
         }
-        else if (std::holds_alternative<Subschema>(subSchemaOrRef))
+        if (std::holds_alternative<Subschema>(subSchemaOrRef))
         {
             return std::get<Subschema>(subSchemaOrRef);
         }
-        else
-        {
-            ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
-            return std::get<Subschema>(subSchemaOrRef);
-        }
+        ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
+        return std::get<Subschema>(subSchemaOrRef);
     }
 
     inline Subschema& SubschemaRef::get()
@@ -355,15 +350,12 @@ namespace Ent
             Ref const& ref = std::get<Ref>(subSchemaOrRef);
             return AT(ref.schema->allDefinitions, ref.ref);
         }
-        else if (std::holds_alternative<Subschema>(subSchemaOrRef))
+        if (std::holds_alternative<Subschema>(subSchemaOrRef))
         {
             return std::get<Subschema>(subSchemaOrRef);
         }
-        else
-        {
-            ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
-            return std::get<Subschema>(subSchemaOrRef);
-        }
+        ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
+        return std::get<Subschema>(subSchemaOrRef);
     }
 
     inline Subschema const& SubschemaRef::operator*() const

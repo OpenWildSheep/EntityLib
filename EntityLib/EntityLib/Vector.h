@@ -54,7 +54,7 @@ namespace Ent
         void unset();
         void setSize(Override<size_t> _size);
         void applyAllValues(Vector& _dest, CopyMode _copyMode) const;
-        void setParentNode(Node* _parentNode);
+        void setParentNode(Node* _parentNode) const;
         void checkParent(Node const* _parentNode) const;
         std::vector<NodeUniquePtr> releaseAllElements();
         /// Get the child index as a string

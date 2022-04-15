@@ -101,8 +101,7 @@ namespace Ent
         {
             return iter->second.value.get();
         }
-        else
-            return nullptr;
+        return nullptr;
     }
 
     template <typename Key, typename Value>
@@ -114,10 +113,13 @@ namespace Ent
     template <typename Key, typename Value>
     size_t RemovableMap<Key, Value>::size() const
     {
-        return (size_t)std::count_if(
+        return static_cast<size_t>(std::count_if(
             begin(map),
             end(map),
-            [](auto&& name_removable) { return name_removable.second.isPresent.get(); });
+            [](auto&& name_removable)
+            {
+                return name_removable.second.isPresent.get();
+            }));
     }
 
     template <typename Key, typename Value>

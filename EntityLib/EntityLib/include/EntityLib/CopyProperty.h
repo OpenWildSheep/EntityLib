@@ -58,7 +58,7 @@ namespace Ent
             if (m_overrideValueSource == OverrideValueSource::Override
                 and (m_copyRootInstanceOf or m_dest.size() > 1))
             {
-                if (auto instanceOf = m_source.getInstanceOf())
+                if (auto const instanceOf = m_source.getInstanceOf())
                 {
                     _back().resetInstanceOf(instanceOf);
                 }
@@ -66,9 +66,10 @@ namespace Ent
         }
         bool inObjectField([[maybe_unused]] Property& m_source, char const* _key) override
         {
-            if (Property parentProp = m_source.getParent(); parentProp.hasValue())
+            if (Property const parentProp = m_source.getParent(); parentProp.hasValue())
             {
-                if (Property grandParentProp = parentProp.getParent(); grandParentProp.hasValue())
+                if (Property const grandParentProp = parentProp.getParent();
+                    grandParentProp.hasValue())
                 {
                     auto const grandParentKind = grandParentProp.getDataKind();
                     if (grandParentKind == DataKind::objectSet)

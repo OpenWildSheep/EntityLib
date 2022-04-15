@@ -82,29 +82,29 @@ namespace Ent
         std::vector<Node const*> getItems() const; ///< @pre type==Ent::DataType::array. @brief Get all items
         std::vector<Node*> getItems(); ///< @pre type==Ent::DataType::array. @brief Get all items
         Node* push(); ///< @pre type==Ent::DataType::array. @brief Add a new item at the end of array
-        void pop(); ///< @pre type==Ent::DataType::array. @brief Remove an item at the end of array
-        void clear(); ///< @pre type==Ent::DataType::array. @brief Remove all items in array
+        void pop() const; ///< @pre type==Ent::DataType::array. @brief Remove an item at the end of array
+        void clear() const; ///< @pre type==Ent::DataType::array. @brief Remove all items in array
         bool empty() const; ///< @pre type==Ent::DataType::array. @brief return true if array is empty
         // Array - map
-        bool mapErase(char const* _key); ///< @pre isMapOrSet() @brief erase the item with _key or return false
+        bool mapErase(char const* _key) const; ///< @pre isMapOrSet() @brief erase the item with _key or return false
         Node* mapGet(char const* _key); ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
         Node const* mapGet(char const* _key) const; ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
-        Node* mapInsert(char const* _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
-        void mapInsert(char const* _key, NodeUniquePtr _newNode);
-        void mapInsert(int64_t _key, NodeUniquePtr _newNode);
+        Node* mapInsert(char const* _key) const; ///< @pre isMapOrSet() @brief Insert a new item at the given _key
+        void mapInsert(char const* _key, NodeUniquePtr _newNode) const;
+        void mapInsert(int64_t _key, NodeUniquePtr _newNode) const;
         /// @pre isMapOrSet()
         /// @brief Insert a new item at the given _key
         Node* mapInsertInstanceOf(char const* _prefabPath);
         /// @brief Copy the _key Node into the _newkey Node. Will update the keyField to _newkey if relevant.
         /// @pre The _key Node is not present in the prefab.
         Node* mapRename(char const* _key, char const* _newkey);
-        bool mapErase(int64_t _key); ///< @pre isMapOrSet() @brief Erase the item at the given _key
+        bool mapErase(int64_t _key) const; ///< @pre isMapOrSet() @brief Erase the item at the given _key
         Node* mapGet(int64_t _key); ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
         Node const* mapGet(int64_t _key) const; ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
         Node* mapInsert(int64_t _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
         /// @brief Copy the _key Node into the _newkey Node. Will update the keyField to _newkey if relevant.
         /// @pre The _key Node is not present in the prefab.
-        Node* mapRename(int64_t _key, int64_t _newkey);
+        Node* mapRename(int64_t _key, int64_t _newkey) const;
         bool isMapOrSet() const; ///< @return true if type==Ent::DataType::array and overridePolicy is map or set
         DataType getKeyType() const; ///< @pre isMapOrSet() @return the Ent::DataType of the key
         /// @pre isMapOrSet()
@@ -115,7 +115,7 @@ namespace Ent
         /// @pre getKeyType() == integer
         /// @return All keys of the map, as int64_t
         std::vector<int64_t> getKeysInt(bool _forceSort = false) const;
-        std::vector<NodeUniquePtr> releaseAllElements();
+        std::vector<NodeUniquePtr> releaseAllElements() const;
 
         // Union
         Node* getUnionData(); ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data
@@ -129,7 +129,7 @@ namespace Ent
         /// @brief Change the type inside the union
         /// @pre type==Ent::DataType::oneOf
         /// @pre type match with a type declared inside the json "oneOf"
-        Node* setUnionType(char const* _type);
+        Node* setUnionType(char const* _type) const;
 
         // Value
         double getFloat() const; ///< @pre number or integer. @brief Get the value as double
@@ -139,7 +139,7 @@ namespace Ent
         EntityRef getEntityRef()
             const; ///< @pre type==Ent::DataType::entityRef. @brief Get the value as an Entity reference
 
-        const Value& GetRawValue()
+        Value const& GetRawValue()
             const; ///< returns a reference to the raw Value (variant) stored at this node. Useful to write visitors.
 
         void setFloat(double _val); ///< @pre type==Ent::DataType::number. @brief Set the double value
@@ -182,7 +182,7 @@ namespace Ent
         /// @warning All sub-nodes into \b _node will be invalidated
         /// @param _prefabNodePath path to the prefab Node (relative to RawData)
         void resetInstanceOf(char const* _prefabNodePath);
-        void resetInstanceOf();
+        void resetInstanceOf() const;
 
         /// @brief Change this Entity to be an instance of the given \b _newPrefab, keeping
         /// all internal values the same.

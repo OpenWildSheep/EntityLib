@@ -61,7 +61,7 @@ namespace Ent
         {
         }
         /// Called when entering in a Set of primitive
-        virtual void inPrimSet([[maybe_unused]] Property& _prop, [[maybe_unused]] Ent::DataType _dataType)
+        virtual void inPrimSet([[maybe_unused]] Property& _prop, [[maybe_unused]] DataType _dataType)
         {
         }
         /// Called when entering in the element of an array
@@ -185,7 +185,7 @@ namespace Ent
         {
         }
         /// The node is a set of primitive
-        virtual void inPrimSet([[maybe_unused]] Ent::DataType _dataType)
+        virtual void inPrimSet([[maybe_unused]] DataType _dataType)
         {
         }
         /// The node is a set of union

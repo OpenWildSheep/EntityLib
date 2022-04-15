@@ -239,40 +239,40 @@ namespace Ent
 
         /// @brief Ket keys removed in the instance
         /// @pre Is a Map with string keys
-        [[nodiscard]] std::set<char const*, CmpStr> getMapRemovedKeysString()
+        [[nodiscard]] std::set<char const*, CmpStr> getMapRemovedKeysString() const
         {
             return getPimpl().getMapRemovedKeysString();
         }
         /// @brief Ket keys removed in the instance
         /// @pre Is a Map with integer keys
-        [[nodiscard]] std::set<int64_t> getMapRemovedKeysInt()
+        [[nodiscard]] std::set<int64_t> getMapRemovedKeysInt() const
         {
             return getPimpl().getMapRemovedKeysInt();
         }
         /// @brief Ket keys removed in the instance
         /// @pre Is a UnionSet
-        [[nodiscard]] std::map<char const*, Subschema const*, CmpStr> getUnionSetRemovedKeysString()
+        [[nodiscard]] std::map<char const*, Subschema const*, CmpStr> getUnionSetRemovedKeysString() const
         {
             return getPimpl().getUnionSetRemovedKeysString();
         }
         /// @brief Ket keys removed in the instance
         /// @pre Is an ObjectSet with string keys
-        [[nodiscard]] std::set<char const*, CmpStr> getObjectSetRemovedKeysString()
+        [[nodiscard]] std::set<char const*, CmpStr> getObjectSetRemovedKeysString() const
         {
             return getPimpl().getObjectSetRemovedKeysString();
         }
         /// @brief Ket keys removed in the instance
         /// @pre Is an ObjectSet with integer keys
-        [[nodiscard]] std::set<int64_t> getObjectSetRemovedKeysInt()
+        [[nodiscard]] std::set<int64_t> getObjectSetRemovedKeysInt() const
         {
             return getPimpl().getObjectSetRemovedKeysInt();
         }
 
         Property mapRename(char const* _current, char const* _new);
-        Property mapRename(int64_t _current, int64_t _new);
-        Property unionSetRename(char const* _current, char const* _new);
-        Property objectSetRename(char const* _current, char const* _new);
-        Property objectSetRename(int64_t _current, int64_t _new);
+        Property mapRename(int64_t _current, int64_t _new) const;
+        Property unionSetRename(char const* _current, char const* _new) const;
+        Property objectSetRename(char const* _current, char const* _new) const;
+        Property objectSetRename(int64_t _current, int64_t _new) const;
 
         [[nodiscard]] bool mapContains(char const* _key) const ///< Check if the map contains this _key
         {
@@ -580,14 +580,11 @@ namespace Ent
 
         [[nodiscard]] Property getPrefab() const ///< Get the prefab of the Property
         {
-            if (auto prefab = m_self->getPrefab())
+            if (auto const prefab = m_self->getPrefab())
             {
                 return Property(prefab->sharedFromThis());
             }
-            else
-            {
-                return Property();
-            }
+            return Property();
         }
 
         [[nodiscard]] Property getParent() const ///< Get the Property which own this one

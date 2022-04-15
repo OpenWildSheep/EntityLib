@@ -114,7 +114,7 @@ namespace Ent
 
     Node const* Node::getRootNode() const
     {
-        Node const* rootParent = this;
+        auto rootParent = this;
         while (rootParent->parentNode != nullptr)
         {
             rootParent = rootParent->parentNode;
@@ -145,10 +145,7 @@ namespace Ent
             auto const& meta = std::get<Subschema::ArrayMeta>(node->getSchema()->meta);
             return meta.overridePolicy == "map";
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     // Get the path from _root to _child, but reversed.
@@ -223,7 +220,7 @@ namespace Ent
         {
             tokenStop = nodeRefEnd;
         }
-        Node const* current = this;
+        auto current = this;
 
         auto nextToken = [&tokenStart, &tokenStop, nodeRefEnd]
         {
@@ -324,9 +321,9 @@ namespace Ent
 
     std::vector<Node::PrefabInfo> Node::getPrefabHistory() const
     {
-        std::vector<Node::PrefabInfo> result;
+        std::vector<PrefabInfo> result;
         // Going up to find the first prefab
-        Node const* parent = this;
+        auto parent = this;
         while (parent != nullptr)
         {
             if (auto* obj = std::get_if<ObjectPtr>(&parent->value))
@@ -341,10 +338,10 @@ namespace Ent
         }
         if (parent != nullptr) // A prefab has been found
         {
-            auto* obj = std::get_if<ObjectPtr>(&parent->value)->get();
+            auto const* obj = std::get_if<ObjectPtr>(&parent->value)->get();
             if (not obj->instanceOf.get().empty())
             {
-                auto prefab =
+                auto const prefab =
                     getEntityLib()->loadNodeReadOnly(*getSchema(), obj->instanceOf.get().c_str());
                 NodeRef const prefabToThis = parent->makeNodeRef(this);
                 Node const* thisPrefab = prefab->resolveNodeRef(prefabToThis.c_str());
@@ -423,7 +420,7 @@ namespace Ent
 
     DataType Node::getDataType() const
     {
-        return (DataType)value.index();
+        return static_cast<DataType>(value.index());
     }
 
     Node* Node::at(char const* _field)
@@ -546,7 +543,7 @@ namespace Ent
         throw BadType();
     }
 
-    Node* Node::setUnionType(char const* _type)
+    Node* Node::setUnionType(char const* _type) const
     {
         if (_type == nullptr)
         {
@@ -605,7 +602,7 @@ namespace Ent
         throw BadType();
     }
 
-    const Node::Value& Node::GetRawValue() const
+    Node::Value const& Node::GetRawValue() const
     {
         return value;
     }
@@ -669,9 +666,8 @@ namespace Ent
         }
 
         template <typename U>
-        bool operator()(U const& _notOverride) const
+        bool operator()([[maybe_unused]] U const& _notOverride) const
         {
-            (void*)&_notOverride;
             // throw BadType();
             return true; // Object and Array are always considered as overrided
         }
@@ -858,12 +854,12 @@ namespace Ent
 
     char const* Node::getInstanceOf() const
     {
-        if (auto object = std::get_if<ObjectPtr>(&value))
+        if (auto const object = std::get_if<ObjectPtr>(&value))
         {
             auto const& instanceOf = (*object)->instanceOf;
             return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
         }
-        if (auto unionPtr = std::get_if<UnionPtr>(&value))
+        if (auto const unionPtr = std::get_if<UnionPtr>(&value))
         {
             auto const& instanceOf = (*unionPtr)->instanceOf;
             return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
@@ -898,14 +894,14 @@ namespace Ent
             {
                 throw BadArrayType("Can't 'push' in a map or set. Use 'mapInsert'.");
             }
-            auto newNode = arr.arrayPush();
+            auto const newNode = arr.arrayPush();
             newNode->setParentNode(this);
             newNode->updateParents();
             return newNode;
         }
         throw BadType();
     }
-    void Node::pop()
+    void Node::pop() const
     {
         if (std::holds_alternative<ArrayPtr>(value))
         {
@@ -926,7 +922,7 @@ namespace Ent
         }
     }
 
-    void Node::clear()
+    void Node::clear() const
     {
         if (std::holds_alternative<ArrayPtr>(value))
         {
@@ -952,7 +948,7 @@ namespace Ent
         throw BadType();
     }
 
-    bool Node::mapErase(char const* _key)
+    bool Node::mapErase(char const* _key) const
     {
         if (_key == nullptr)
         {
@@ -984,7 +980,7 @@ namespace Ent
         checkMap("mapGet");
         return std::get<ArrayPtr>(value)->mapGet(_key);
     }
-    bool Node::mapErase(int64_t _key)
+    bool Node::mapErase(int64_t _key) const
     {
         checkMap("mapErase");
         return std::get<ArrayPtr>(value)->mapErase(_key);
@@ -1009,7 +1005,7 @@ namespace Ent
         return newNode;
     }
 
-    Node* Node::mapInsert(char const* _key)
+    Node* Node::mapInsert(char const* _key) const
     {
         if (_key == nullptr)
         {
@@ -1021,7 +1017,7 @@ namespace Ent
         return newNode;
     }
 
-    void Node::mapInsert(char const* _key, NodeUniquePtr _newNode)
+    void Node::mapInsert(char const* _key, NodeUniquePtr _newNode) const
     {
         if (_key == nullptr)
         {
@@ -1031,7 +1027,7 @@ namespace Ent
         std::get<ArrayPtr>(value)->mapInsert(_key, std::move(_newNode));
     }
 
-    void Node::mapInsert(int64_t _key, NodeUniquePtr _newNode)
+    void Node::mapInsert(int64_t _key, NodeUniquePtr _newNode) const
     {
         checkMap("mapInsert");
         std::get<ArrayPtr>(value)->mapInsert(_key, std::move(_newNode));
@@ -1044,7 +1040,8 @@ namespace Ent
             throw NullPointerArgument("_prefabPath", "Node::mapInsertInstanceOf");
         }
         checkMap("mapInsertInstanceOf");
-        auto prefab = getEntityLib()->loadNodeReadOnly(**getSchema()->singularItems, _prefabPath);
+        auto const prefab =
+            getEntityLib()->loadNodeReadOnly(**getSchema()->singularItems, _prefabPath);
         Node* newNode = std::get<ArrayPtr>(value)->mapInsert(
             std::get<ArrayPtr>(value)->getChildKey(prefab.get()));
         newNode->resetInstanceOf(_prefabPath);
@@ -1064,13 +1061,13 @@ namespace Ent
             throw NullPointerArgument("_newkey", "Node::mapRename");
         }
         checkMap("mapGet");
-        auto newNode = std::get<ArrayPtr>(value)->mapRename(_key, _newkey);
+        auto const newNode = std::get<ArrayPtr>(value)->mapRename(_key, _newkey);
         newNode->setParentNode(this);
         newNode->updateParents();
         return newNode;
     }
 
-    Node* Node::mapRename(int64_t _key, int64_t _newkey)
+    Node* Node::mapRename(int64_t _key, int64_t _newkey) const
     {
         checkMap("mapGet");
         return std::get<ArrayPtr>(value)->mapRename(_key, _newkey);
@@ -1116,7 +1113,7 @@ namespace Ent
         return std::get<ArrayPtr>(value)->getKeysInt(_forceSort);
     }
 
-    std::vector<NodeUniquePtr> Node::releaseAllElements()
+    std::vector<NodeUniquePtr> Node::releaseAllElements() const
     {
         if (getDataType() != DataType::array)
         {
@@ -1171,7 +1168,7 @@ namespace Ent
         json node = toJson();
         node["$schema"] = format(schemaFormat, getSchema()->name.c_str());
 
-        std::filesystem::path path = getEntityLib()->getAbsolutePath(_path);
+        std::filesystem::path const path = getEntityLib()->getAbsolutePath(_path);
         std::stringstream buffer;
         buffer << node.dump(4);
         std::ofstream file(path);
@@ -1213,10 +1210,9 @@ namespace Ent
         }
         if (std::holds_alternative<Override<int64_t>>(value))
         {
-            auto intValue = std::get<Override<int64_t>>(value).getRaw(_location);
-            return intValue.has_value() ?
-                       std::optional<double>{static_cast<double>(intValue.value())} :
-                       std::nullopt;
+            auto const intValue = std::get<Override<int64_t>>(value).getRaw(_location);
+            return intValue.has_value() ? std::optional{static_cast<double>(intValue.value())} :
+                                          std::nullopt;
         }
         throw BadType();
     }
@@ -1225,7 +1221,7 @@ namespace Ent
     {
         if (std::holds_alternative<Override<int64_t>>(value))
         {
-            auto opt = std::get<Override<int64_t>>(value).getRaw(_location);
+            auto const opt = std::get<Override<int64_t>>(value).getRaw(_location);
             return opt.has_value() ? std::optional(static_cast<int>(*opt)) : std::nullopt;
         }
         throw BadType();
@@ -1235,8 +1231,8 @@ namespace Ent
     {
         if (std::holds_alternative<Override<String>>(value))
         {
-            auto strValue = std::get<Override<String>>(value).getRaw(_location);
-            return strValue.has_value() ? std::optional<char const*>{strValue.value().get().c_str()} :
+            auto const strValue = std::get<Override<String>>(value).getRaw(_location);
+            return strValue.has_value() ? std::optional{strValue.value().get().c_str()} :
                                           std::nullopt;
         }
         throw BadType();
@@ -1256,7 +1252,7 @@ namespace Ent
     {
         if (std::holds_alternative<Override<EntityRef>>(value))
         {
-            auto entityRefValue = std::get<Override<EntityRef>>(value).getRaw(_location);
+            auto const entityRefValue = std::get<Override<EntityRef>>(value).getRaw(_location);
             return entityRefValue.has_value() ? std::optional<EntityRef>{entityRefValue} :
                                                 std::nullopt;
         }
@@ -1310,12 +1306,12 @@ namespace Ent
 
     void Node::resetInstanceOf(char const* _prefabNodePath)
     {
-        if (auto objectPtr = std::get_if<ObjectPtr>(&value))
+        if (auto const objectPtr = std::get_if<ObjectPtr>(&value))
         {
             (*objectPtr)->resetInstanceOf(_prefabNodePath);
             (*objectPtr)->setParentNode(this);
         }
-        else if (auto unionPtr = std::get_if<UnionPtr>(&value))
+        else if (auto const unionPtr = std::get_if<UnionPtr>(&value))
         {
             (*unionPtr)->resetInstanceOf(_prefabNodePath);
             (*unionPtr)->setParentNode(this);
@@ -1326,7 +1322,7 @@ namespace Ent
         }
     }
 
-    void Node::resetInstanceOf()
+    void Node::resetInstanceOf() const
     {
         if (not std::holds_alternative<ObjectPtr>(value))
         {
@@ -1400,7 +1396,7 @@ namespace Ent
         }
 
         auto* prefabPath = getInstanceOf();
-        auto prefab = getEntityLib()->loadFileAsNode(prefabPath, *getSchema());
+        auto const prefab = getEntityLib()->loadFileAsNode(prefabPath, *getSchema());
         std::map<std::string, Map::KeyType> prefabsKeys;
         std::map<std::string, Map::KeyType> instanceKeys;
         // Save keyFields values
@@ -1480,7 +1476,7 @@ namespace Ent
 
     void Node::changeInstanceOf(char const* _newPrefab)
     {
-        auto cloned = clone();
+        auto const cloned = clone();
         resetInstanceOf(_newPrefab);
         cloned->applyAllValuesButPrefab(*this, CopyMode::MinimalOverride);
     }

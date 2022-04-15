@@ -38,9 +38,10 @@ namespace Ent
     template <typename... Args>
     std::string format(char const* message, Args&&... args)
     {
-        size_t const len = (size_t)snprintf(nullptr, 0, message, std::forward<Args>(args)...);
+        size_t const len =
+            static_cast<size_t>(snprintf(nullptr, 0, message, std::forward<Args>(args)...));
         std::string buffer(len, ' ');
-        snprintf((char*)buffer.data(), len + 1, message, std::forward<Args>(args)...);
+        snprintf(buffer.data(), len + 1, message, std::forward<Args>(args)...);
         return buffer;
     }
 
@@ -197,21 +198,23 @@ namespace Ent
         String() = default;
         String(char const* _str)
         {
-            auto len = strlen(_str);
+            auto const len = strlen(_str);
             str = std::make_unique<char[]>(len + 1);
             strcpy_s(str.get(), len + 1, _str);
         }
         String(std::string const& _str)
         {
-            auto len = _str.size();
+            auto const len = _str.size();
             str = std::make_unique<char[]>(len + 1);
             strcpy_s(str.get(), len + 1, _str.c_str());
         }
         String(String const& ot)
         {
             if (ot.str == nullptr)
+            {
                 return;
-            auto len = ot.size();
+            }
+            auto const len = ot.size();
             str = std::make_unique<char[]>(len + 1);
             strcpy_s(str.get(), len + 1, ot.str.get());
         }
@@ -223,7 +226,7 @@ namespace Ent
             }
             else
             {
-                auto len = ot.size();
+                auto const len = ot.size();
                 str = std::make_unique<char[]>(len + 1);
                 strcpy_s(str.get(), len + 1, ot.str.get());
             }
@@ -258,8 +261,7 @@ namespace Ent
                 {
                     return false;
                 }
-                else
-                    return true;
+                return true;
             }
             if (ot.str == nullptr)
             {
@@ -316,7 +318,7 @@ namespace Ent
         }
         size_t allocatedCount = 0;
         std::vector<void*> freePtr;
-        std::vector<std::vector<typename std::aligned_storage<sizeof(T), alignof(T)>::type>> buckets;
+        std::vector<std::vector<std::aligned_storage_t<sizeof(T), alignof(T)>>> buckets;
         void* alloc()
         {
             if (freePtr.empty())
@@ -349,7 +351,7 @@ namespace Ent
     struct InvalidKey : std::logic_error
     {
         template <typename Map>
-        std::string
+        static std::string
         makeError(Map const&, std::string const& key, char const* file, long line, char const* func)
         {
             return format(
@@ -380,9 +382,10 @@ namespace Ent
     {
         auto iter = map.find(key);
         if (iter != map.end())
+        {
             return iter->second;
-        else
-            throw InvalidKey(map, key, file, line, func);
+        }
+        throw InvalidKey(map, key, file, line, func);
     }
 
 #define AT(MAP, KEY) ::Ent::at(MAP, KEY, __FILE__, __LINE__, __func__)
@@ -520,7 +523,7 @@ namespace Ent
     };
 
     template <typename V, typename F>
-    static constexpr auto doesCompile(F&&) -> decltype(std::is_invocable_v<F, V>)
+    static constexpr decltype(std::is_invocable_v<F, V>) doesCompile(F&&)
     {
         return std::is_invocable_v<F, V>;
     }

@@ -412,7 +412,7 @@ namespace Ent
         return AT(getSchema()->unionTypeMap, type).index;
     }
 
-    void PropImpl::_checkInvariants()
+    void PropImpl::_checkInvariants() const
     {
 #ifdef _DEBUG
         ENTLIB_DBG_ASSERT(m_instance.getSchema() != nullptr);

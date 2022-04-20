@@ -393,7 +393,7 @@ namespace Ent
 
         auto&& childName = getPathToken();
 
-        ENTLIB_DBG_ASSERT(int(_parent.m_values->type()) < int(json::value_t::discarded));
+        ENTLIB_DBG_ASSERT(static_cast<int>(_parent.m_values->type()) < static_cast<int>(json::value_t::discarded));
         json* newLayerJson = nullptr;
         switch (_parent.m_schema.base->getDataKind())
         {

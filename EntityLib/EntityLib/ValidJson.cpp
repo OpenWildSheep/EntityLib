@@ -300,12 +300,12 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
             freeDocument);
 
         valijson::Validator validator;
-        valijson::adapters::NlohmannJsonAdapter myTargetAdapter(_entity);
+        valijson::adapters::NlohmannJsonAdapter const myTargetAdapter(_entity);
         valijson::ValidationResults result;
         if (!validator.validate(vjSchema, myTargetAdapter, &result))
         {
             /// @todo un-comment soon
-            std::string message = createMessageFromValidationResult(result);
+            std::string const message = createMessageFromValidationResult(result);
             throw JsonValidation(filterError(message.c_str()));
         }
     }

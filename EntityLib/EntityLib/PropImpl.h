@@ -253,7 +253,7 @@ namespace Ent
         [[nodiscard]] bool _countPrimSetKeyImpl(K _key);
         template <typename E>
         [[nodiscard]] PropImplPtr _enterItem(E&& _enter);
-        void _checkInvariants();
+        void _checkInvariants() const;
         template <typename Container, typename F>
         [[nodiscard]] Container getKeys(F const& getKeysInFile);
 

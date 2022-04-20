@@ -89,8 +89,8 @@ namespace Ent
 
     char const* Subschema::getUnionDefaultTypeName() const
     {
-        const auto* const fieldName = getUnionNameField();
-        const auto& typeSchema = oneOf->front()->properties.at(fieldName);
+        auto const* const fieldName = getUnionNameField();
+        auto const& typeSchema = oneOf->front()->properties.at(fieldName);
         return typeSchema->constValue->get_ptr<nlohmann::json::string_t const*>()->c_str();
     }
 

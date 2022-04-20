@@ -110,7 +110,7 @@ namespace Ent
 
     bool PropImpl::isDefault() const
     {
-        const auto& newLayer = *this;
+        auto const& newLayer = *this;
         if (m_instance.isSet())
         {
             return false;
@@ -124,11 +124,11 @@ namespace Ent
 
     bool PropImpl::_loadInstanceOf()
     {
-        const auto* subschema = m_instance.getSchema();
+        auto const* subschema = m_instance.getSchema();
         if ((subschema->type == DataType::object or subschema->type == DataType::oneOf)
             and m_instance.isSet())
         {
-            if (const auto* doc = m_instance.getRawJson())
+            if (auto const* doc = m_instance.getRawJson())
             {
                 if (auto const member = doc->find("InstanceOf"); member != doc->end())
                 {
@@ -154,7 +154,7 @@ namespace Ent
         newLayer->m_instance = m_instance.getObjectField(_field, _fieldRef);
         newLayer->m_entityLib = m_entityLib;
         newLayer->m_parent = sharedFromThis();
-        const auto* subschema = newLayer->getSchema();
+        auto const* subschema = newLayer->getSchema();
         if (not newLayer->_loadInstanceOf())
         {
             if (not m_instance.isRemovedObject() and m_prefab != nullptr)
@@ -163,7 +163,7 @@ namespace Ent
             }
         }
         bool defaultFound = false;
-        const auto& defaultVal = getDefault();
+        auto const& defaultVal = getDefault();
         if (defaultVal.isSet()) // If there is default, enter in
         {
             auto objectField = defaultVal.getObjectField(_field, _fieldRef);
@@ -175,7 +175,7 @@ namespace Ent
         }
         if (not defaultFound)
         {
-            const auto* const propDefVal = newLayer->m_instance.getPropertyDefaultValue();
+            auto const* const propDefVal = newLayer->m_instance.getPropertyDefaultValue();
             if (propDefVal != nullptr) // If there is property default, use them
             {
                 newLayer->setDefault(subschema, nullptr, propDefVal);
@@ -206,7 +206,7 @@ namespace Ent
     {
         if (_dataSchema == nullptr)
         {
-            const auto& singularItems = m_instance.getSchema()->singularItems;
+            auto const& singularItems = m_instance.getSchema()->singularItems;
             if (singularItems != nullptr)
             {
                 Subschema const& unionSchema = singularItems->get();
@@ -214,7 +214,7 @@ namespace Ent
                 {
                     throw BadType("PropImpl::enterUnionSetItem : Not an UnionSet");
                 }
-                const auto& unionTypeMap = unionSchema.unionTypeMap;
+                auto const& unionTypeMap = unionSchema.unionTypeMap;
                 if (auto const iter = unionTypeMap.find(_type); iter != unionTypeMap.end())
                 {
                     _dataSchema = iter->second.dataSchema;
@@ -243,13 +243,13 @@ namespace Ent
         newLayer.m_entityLib = m_entityLib;
         newLayer.m_instance = _enter(m_instance);
         newLayer.m_parent = sharedFromThis();
-        const auto* subschema = newLayer.getSchema();
-        const auto& defaultVal = getDefault();
+        auto const* subschema = newLayer.getSchema();
+        auto const& defaultVal = getDefault();
         if (defaultVal.isSet()) // If there is default, enter in
         {
             newLayer.m_default = _enter(defaultVal);
         }
-        else if (const auto* propDefVal = newLayer.m_instance.getPropertyDefaultValue()) // If there is property default, use them
+        else if (auto const* propDefVal = newLayer.m_instance.getPropertyDefaultValue()) // If there is property default, use them
         {
             newLayer.setDefault(subschema, nullptr, propDefVal);
         }
@@ -304,7 +304,7 @@ namespace Ent
         ENTLIB_DBG_ASSERT(m_instance.getSchema()->type == DataType::array);
         newLayer.m_instance = m_instance.getArrayItem(_index);
         newLayer.m_parent = sharedFromThis();
-        const auto* subschema = newLayer.getSchema();
+        auto const* subschema = newLayer.getSchema();
         if (not isDefault())
         {
             if (not newLayer._loadInstanceOf())
@@ -315,7 +315,7 @@ namespace Ent
                 }
             }
         }
-        const auto& defaultVal = getDefault();
+        auto const& defaultVal = getDefault();
         if (defaultVal.isSet()) // If there is default, enter in
         {
             newLayer.m_default = defaultVal.getArrayItem(_index);
@@ -408,7 +408,7 @@ namespace Ent
 
     size_t PropImpl::getUnionTypeIndex() const
     {
-        const auto* const type = getUnionType();
+        auto const* const type = getUnionType();
         return AT(getSchema()->unionTypeMap, type).index;
     }
 
@@ -446,8 +446,8 @@ namespace Ent
 
     DataType PropImpl::getObjectSetKeyType() const
     {
-        const auto& schema = *m_instance.getSchema();
-        if (const auto* const arrayMeta = std::get_if<Subschema::ArrayMeta>(&schema.meta))
+        auto const& schema = *m_instance.getSchema();
+        if (auto const* const arrayMeta = std::get_if<Subschema::ArrayMeta>(&schema.meta))
         {
             if (arrayMeta->keyField.has_value())
             {
@@ -461,7 +461,7 @@ namespace Ent
     size_t PropImpl::arraySize() const
     {
         auto const& jsonExplLayer = m_instance;
-        const auto* schema = jsonExplLayer.getSchema();
+        auto const* schema = jsonExplLayer.getSchema();
         if (schema->linearItems.has_value())
         {
             return schema->linearItems->size();
@@ -484,7 +484,7 @@ namespace Ent
     size_t PropImpl::size()
     {
         auto const& jsonExplLayer = m_instance;
-        const auto* schema = jsonExplLayer.getSchema();
+        auto const* schema = jsonExplLayer.getSchema();
         if (schema->linearItems.has_value())
         {
             return schema->linearItems->size();
@@ -546,7 +546,7 @@ namespace Ent
     bool PropImpl::contains(Key const& _key)
     {
         auto const& jsonExplLayer = m_instance;
-        const auto* schema = jsonExplLayer.getSchema();
+        auto const* schema = jsonExplLayer.getSchema();
         if (schema->linearItems.has_value())
         {
             return false; // Not a map/set
@@ -1085,7 +1085,7 @@ namespace Ent
         std::vector<PropImpl*> allLayers;
         if (m_parent != nullptr)
         {
-            const auto* const parentSchema = m_parent->getSchema();
+            auto const* const parentSchema = m_parent->getSchema();
             switch (parentSchema->getDataKind())
             {
             case DataKind::object: m_parent->m_instance.unsetObjectField(m_instance); break;

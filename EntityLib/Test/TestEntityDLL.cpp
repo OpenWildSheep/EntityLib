@@ -173,9 +173,9 @@ try
     EntityLib entlib("X:/RawData/..", doMergeComponents);
     using namespace std::filesystem;
 
-    Ent::EntityLib::setLogicErrorPolicy(LogicErrorPolicy::Throw);
+    EntityLib::setLogicErrorPolicy(LogicErrorPolicy::Throw);
     ENTLIB_CHECK_EXCEPTION(ENTLIB_LOGIC_ERROR("Test logic error"), std::logic_error);
-    Ent::EntityLib::setLogicErrorPolicy(LogicErrorPolicy::Terminate);
+    EntityLib::setLogicErrorPolicy(LogicErrorPolicy::Terminate);
 
     entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
 #ifdef _DEBUG
@@ -198,11 +198,11 @@ try
     }
 
     // Test $ref links in entlib.schema.schema.allDefinitions
-    const auto* colorRef = "Color";
+    auto const* colorRef = "Color";
     ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(colorRef) == 1);
 
     // Check Ent::Subschema::getUnionTypesMap
-    const auto* cinematicGDRef = "CinematicGD";
+    auto const* cinematicGDRef = "CinematicGD";
     Subschema const& cinematicGDSchema = entlib.schema.schema.allDefinitions.at(cinematicGDRef);
     Subschema const& scriptEventUnionSchema =
         cinematicGDSchema.properties.at("ScriptEvents")->singularItems->get();
@@ -261,7 +261,7 @@ try
             "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
             "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
             entlib.schema.schema.allDefinitions["Entity"]);
-        const auto* nodeRef = "Components/SubScene/Embedded/ShamanFullBlue_ent_001";
+        auto const* nodeRef = "Components/SubScene/Embedded/ShamanFullBlue_ent_001";
         auto* ent = node->resolveNodeRef(nodeRef);
         auto entpath = node->makeNodeRef(ent);
         ENTLIB_ASSERT(entpath == nodeRef);
@@ -285,7 +285,7 @@ try
             "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
             "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
             entlib.schema.schema.allDefinitions["Entity"]);
-        const auto* nodeRef =
+        auto const* nodeRef =
             R"(Components/SubScene/Embedded/ShamanFullBlue_ent_001/Components/TransformGD)";
         auto* ent = node->resolveNodeRef(nodeRef);
         auto entpath = node->makeNodeRef(ent);
@@ -304,7 +304,7 @@ try
     {
         auto node =
             entlib.loadFileAsNode("instance.entity", entlib.schema.schema.allDefinitions["Entity"]);
-        const auto* nodeRef =
+        auto const* nodeRef =
             R"(Components/SubScene/Embedded/EP1-Spout_LINK_001/Components/NetworkLink)";
         auto* ent = node->resolveNodeRef(nodeRef);
         auto entpath = node->makeNodeRef(ent);
@@ -318,10 +318,10 @@ try
                                     ->at("CommonDataMap")
                                     ->mapInsert("Test")
                                     ->at("Value");
-        const auto* typeValueRef = R"(Components/ScriptComponentGD/CommonDataMap/Test/Value)";
+        auto const* typeValueRef = R"(Components/ScriptComponentGD/CommonDataMap/Test/Value)";
         ENTLIB_ASSERT(node->makeNodeRef(typedValueUnion) == typeValueRef);
         auto* stringUnionData = typedValueUnion->setUnionType("string");
-        const auto* strRef = R"(Components/ScriptComponentGD/CommonDataMap/Test/Value/string)";
+        auto const* strRef = R"(Components/ScriptComponentGD/CommonDataMap/Test/Value/string)";
         ENTLIB_ASSERT(node->makeNodeRef(stringUnionData) == strRef);
         ENTLIB_ASSERT(typedValueUnion->makeNodeRef(stringUnionData) == "string");
     }
@@ -489,7 +489,7 @@ try
 
         // Test title/description
         {
-            const auto* rigodBodyCoeffSchema = ent.Components()
+            auto const* rigodBodyCoeffSchema = ent.Components()
                                                    .CharacterControllerGD()
                                                    ->HeadCollisionData()
                                                    .softCollisionRigidbodyCoeff()
@@ -822,7 +822,7 @@ try
             == C.getProperty());
     }
 
-    auto testInstanceOf = [](const Gen::Entity& ent, bool testIsSet = true, bool testPrefab = true)
+    auto testInstanceOf = [](Gen::Entity const& ent, bool testIsSet = true, bool testPrefab = true)
     {
         // ActorStates
         auto actorStates = ent.ActorStates();
@@ -886,7 +886,7 @@ try
         // "InstanceOf" in sub entitites
         auto entityWithInstanceOf = *subScene->Embedded().get(R"(EntityWithInstanceOf)");
         ENTLIB_ASSERT(entityWithInstanceOf.Name() == std::string("EntityWithInstanceOf"));
-        if (const auto* instOf = entityWithInstanceOf.getProperty().getInstanceOf())
+        if (auto const* instOf = entityWithInstanceOf.getProperty().getInstanceOf())
         {
             ENTLIB_ASSERT(instOf == std::string("subentity2.entity"));
         }
@@ -1181,7 +1181,7 @@ try
         ENTLIB_ASSERT(setOfObject3.get("G")->Value().get() == std::string());
     }
 
-    auto test_erase = [](const Gen::Entity& ent)
+    auto test_erase = [](Gen::Entity const& ent)
     {
         auto actorStates = ent.ActorStates();
         auto const pathNodeGD = *ent.Components().TestTagsList();
@@ -1256,7 +1256,7 @@ try
         auto ent = Gen::Entity::loadCopy(entlib, "instance2.entity");
         testInstanceOf(ent, true, false);
     }
-    auto testInstanceOverrideSubscene = [](const Gen::Entity& ent)
+    auto testInstanceOverrideSubscene = [](Gen::Entity const& ent)
     {
         // TEST SubScene (with override)
         auto const subScene = ent.Components().SubScene();
@@ -1579,7 +1579,7 @@ try
     }
 
     // ******************* Test the override of an entity in a SubScene ***************************
-    auto testOverrideSubEntity = [](const Gen::Entity& ent)
+    auto testOverrideSubEntity = [](Gen::Entity const& ent)
     {
         auto const subScenecomp = *ent.Components().SubScene();
         auto const allSubEntities = subScenecomp.Embedded();
@@ -1595,7 +1595,7 @@ try
     }
 
     // ******************* Test the add of an entity in a SubScene *****************************
-    auto testAddSubEntity = [](const Gen::Entity& ent)
+    auto testAddSubEntity = [](Gen::Entity const& ent)
     {
         auto const subScenecomp = *ent.Components().SubScene();
         auto const allSubEntities = subScenecomp.Embedded();

@@ -249,11 +249,11 @@ namespace Ent
 
         [[nodiscard]] char const* getDescription() const
         {
-            if (const auto* const ref = std::get_if<Ref>(&subSchemaOrRef))
+            if (auto const* const ref = std::get_if<Ref>(&subSchemaOrRef))
             {
                 return ref->description.c_str();
             }
-            if (const auto* const schema = std::get_if<Subschema>(&subSchemaOrRef))
+            if (auto const* const schema = std::get_if<Subschema>(&subSchemaOrRef))
             {
                 return schema->description.c_str();
             }

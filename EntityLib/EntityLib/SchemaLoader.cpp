@@ -630,7 +630,7 @@ namespace Ent
                             info.wrapperSchema = &wrapperSchema.get();
                             info.index = index;
                             info.dataSchema = &info.wrapperSchema->properties.at(un->dataField).get();
-                            const auto& typeSchema =
+                            auto const& typeSchema =
                                 info.wrapperSchema->properties.at(un->typeField).get();
                             auto const& typeName =
                                 typeSchema.constValue->get_ref<std::string const&>();

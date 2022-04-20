@@ -114,7 +114,7 @@ namespace Ent
 
     Node const* Node::getRootNode() const
     {
-        const auto* rootParent = this;
+        auto const* rootParent = this;
         while (rootParent->parentNode != nullptr)
         {
             rootParent = rootParent->parentNode;
@@ -212,15 +212,15 @@ namespace Ent
 
     Node const* Node::resolveNodeRef(char const* _nodeRef) const
     {
-        const auto* tokenStart = _nodeRef;
-        const auto* const nodeRefEnd = _nodeRef + strlen(_nodeRef);
+        auto const* tokenStart = _nodeRef;
+        auto const* const nodeRefEnd = _nodeRef + strlen(_nodeRef);
 
-        const auto* tokenStop = strchr(tokenStart, '/');
+        auto const* tokenStop = strchr(tokenStart, '/');
         if (tokenStop == nullptr)
         {
             tokenStop = nodeRefEnd;
         }
-        const auto* current = this;
+        auto const* current = this;
 
         auto nextToken = [&tokenStart, &tokenStop, nodeRefEnd]
         {
@@ -323,10 +323,10 @@ namespace Ent
     {
         std::vector<PrefabInfo> result;
         // Going up to find the first prefab
-        const auto* parent = this;
+        auto const* parent = this;
         while (parent != nullptr)
         {
-            if (const auto* obj = std::get_if<ObjectPtr>(&parent->value))
+            if (auto const* obj = std::get_if<ObjectPtr>(&parent->value))
             {
                 if ((*obj)->instanceOf.hasOverride())
                 {
@@ -854,12 +854,12 @@ namespace Ent
 
     char const* Node::getInstanceOf() const
     {
-        if (const auto* const object = std::get_if<ObjectPtr>(&value))
+        if (auto const* const object = std::get_if<ObjectPtr>(&value))
         {
             auto const& instanceOf = (*object)->instanceOf;
             return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
         }
-        if (const auto* const unionPtr = std::get_if<UnionPtr>(&value))
+        if (auto const* const unionPtr = std::get_if<UnionPtr>(&value))
         {
             auto const& instanceOf = (*unionPtr)->instanceOf;
             return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
@@ -1306,12 +1306,12 @@ namespace Ent
 
     void Node::resetInstanceOf(char const* _prefabNodePath)
     {
-        if (auto* const objectPtr = std::get_if<ObjectPtr>(&value))
+        if (auto const* const objectPtr = std::get_if<ObjectPtr>(&value))
         {
             (*objectPtr)->resetInstanceOf(_prefabNodePath);
             (*objectPtr)->setParentNode(this);
         }
-        else if (auto* const unionPtr = std::get_if<UnionPtr>(&value))
+        else if (auto const* const unionPtr = std::get_if<UnionPtr>(&value))
         {
             (*unionPtr)->resetInstanceOf(_prefabNodePath);
             (*unionPtr)->setParentNode(this);
@@ -1395,7 +1395,7 @@ namespace Ent
             throw ContextException("Called Node::applyToPrefab an a Node without prefab");
         }
 
-        const auto* prefabPath = getInstanceOf();
+        auto const* prefabPath = getInstanceOf();
         auto const prefab = getEntityLib()->loadFileAsNode(prefabPath, *getSchema());
         std::map<std::string, Map::KeyType> prefabsKeys;
         std::map<std::string, Map::KeyType> instanceKeys;

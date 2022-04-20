@@ -23,14 +23,14 @@ namespace Ent
     {
         // Have to remove removed items in arrays
         auto const prefabSource = getPrefab();
-        const auto* const prefabPath = prefabSource.getFilePath();
+        auto const* const prefabPath = prefabSource.getFilePath();
         auto& newJson = getEntityLib()->createTempJsonFile();
         newJson = getEntityLib()->readJsonFile(prefabPath);
         auto const clonedPrefab = Property(getEntityLib(), getSchema(), prefabPath, &newJson);
         CopyProperty copier(clonedPrefab, OverrideValueSource::Override, false);
         visitRecursive(*this, copier);
         clonedPrefab.save();
-        for (const auto* const field : getFieldNames())
+        for (auto const* const field : getFieldNames())
         {
             getObjectField(field).unset();
         }

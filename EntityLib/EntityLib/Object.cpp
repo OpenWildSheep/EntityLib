@@ -193,7 +193,7 @@ namespace Ent
 
     NodeRef Object::computeNodeRefToChild(Node const* _child) const
     {
-        for (const auto& field : nodes)
+        for (auto const& field : nodes)
         {
             if (_child == field.node.get())
             {

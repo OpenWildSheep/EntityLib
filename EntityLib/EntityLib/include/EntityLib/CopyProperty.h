@@ -58,7 +58,7 @@ namespace Ent
             if (m_overrideValueSource == OverrideValueSource::Override
                 and (m_copyRootInstanceOf or m_dest.size() > 1))
             {
-                if (const auto* const instanceOf = m_source.getInstanceOf())
+                if (auto const* const instanceOf = m_source.getInstanceOf())
                 {
                     _back().resetInstanceOf(instanceOf);
                 }
@@ -172,14 +172,14 @@ namespace Ent
                 switch (m_source.getMapKeyType())
                 {
                 case DataType::integer:
-                    for (const auto& removed : m_source.getMapRemovedKeysInt())
+                    for (auto const& removed : m_source.getMapRemovedKeysInt())
                     {
                         _back().eraseMapItem(removed);
                     }
                     break;
                 case DataType::string: [[fallthrough]];
                 case DataType::entityRef:
-                    for (const auto& removed : m_source.getMapRemovedKeysString())
+                    for (auto const& removed : m_source.getMapRemovedKeysString())
                     {
                         _back().eraseMapItem(removed);
                     }
@@ -195,14 +195,14 @@ namespace Ent
                 switch (m_source.getObjectSetKeyType())
                 {
                 case DataType::integer:
-                    for (const auto& removed : m_source.getObjectSetRemovedKeysInt())
+                    for (auto const& removed : m_source.getObjectSetRemovedKeysInt())
                     {
                         _back().eraseObjectSetItem(removed);
                     }
                     break;
                 case DataType::string: [[fallthrough]];
                 case DataType::entityRef:
-                    for (const auto& removed : m_source.getObjectSetRemovedKeysString())
+                    for (auto const& removed : m_source.getObjectSetRemovedKeysString())
                     {
                         _back().eraseObjectSetItem(removed);
                     }

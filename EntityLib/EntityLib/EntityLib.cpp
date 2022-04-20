@@ -128,7 +128,7 @@ namespace Ent
 
     static Node const* getSubScene(Node const* _entity)
     {
-        if (const auto* subScene = _entity->at("Components")->mapGet("SubScene"))
+        if (auto const* subScene = _entity->at("Components")->mapGet("SubScene"))
         {
             return subScene->getUnionData()->at("Embedded");
         }
@@ -531,7 +531,7 @@ namespace Ent
         return getSceneParentEntity(_node->getParentNode());
     }
 
-    std::optional<Property> EntityLib::getParentEntity(const Property& _node) const
+    std::optional<Property> EntityLib::getParentEntity(Property const& _node) const
     {
         if (auto* const parent = _node.getPimpl().getParent().get())
         {
@@ -1437,7 +1437,7 @@ namespace Ent
                 }
             };
             std::vector<JsonField> fieldMap;
-            const auto& internObj = std::get<ObjectPtr>(_node.value);
+            auto const& internObj = std::get<ObjectPtr>(_node.value);
             for (auto const& [name, sub] : _schema.properties)
             {
                 Node const* subNode = _node.at(name.c_str());
@@ -1511,7 +1511,7 @@ namespace Ent
 
                                 if (item->getSchema()->type == DataType::oneOf)
                                 {
-                                    const auto& unionMeta =
+                                    auto const& unionMeta =
                                         std::get<Subschema::UnionMeta>(item->getSchema()->meta);
                                     char const* type = item->getUnionType();
                                     json tmpNode;
@@ -1734,11 +1734,11 @@ namespace Ent
     {
         Subschema const& entitySchema = AT(schema.schema.allDefinitions, entitySchemaName);
         auto const ent = loadNodeReadOnly(entitySchema, _scenePath.string().c_str());
-        if (const auto* components = ent->at("Components"))
+        if (auto const* components = ent->at("Components"))
         {
-            if (const auto* const subscene = components->mapGet("SubScene"))
+            if (auto const* const subscene = components->mapGet("SubScene"))
             {
-                if (const auto* const scene = subscene->getUnionData()->at("Embedded"))
+                if (auto const* const scene = subscene->getUnionData()->at("Embedded"))
                 {
                     return scene->clone();
                 }

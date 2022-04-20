@@ -165,7 +165,7 @@ static std::string getRefTypeName(std::string _link)
     _link = escapeName(_link);
 
     // Force to create the definition (do nothing if already exist)
-    static const auto* definitionsStr = "#/definitions/";
+    static auto const* definitionsStr = "#/definitions/";
     size_t const pos = _link.find(definitionsStr);
     if (pos == std::string::npos)
     {
@@ -325,7 +325,7 @@ static json getSchemaType(Ent::Subschema const& _schema)
         json types(json::value_t::array);
         size_t index = 0;
 
-        for (const auto& itemRef : *_schema.linearItems)
+        for (auto const& itemRef : *_schema.linearItems)
         {
             auto subtype = getSchemaRefType(itemRef);
             if (index != _schema.linearItems->size() - 1)
@@ -469,7 +469,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
             size_t index = 0;
             std::set<json> includes;
 
-            for (const auto& itemRef : *_schema.linearItems)
+            for (auto const& itemRef : *_schema.linearItems)
             {
                 auto subtype = getSchemaRefType(itemRef);
                 if (index != _schema.linearItems->size() - 1)
@@ -523,7 +523,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
         json object(json::value_t::object);
         json properties(json::value_t::array);
         std::set<json> includes;
-        for (const auto& [propName, propRef] : _schema.properties)
+        for (auto const& [propName, propRef] : _schema.properties)
         {
             json prop(json::value_t::object);
             auto propData = getSchemaRefType(propRef);
@@ -632,7 +632,7 @@ static void giveNameToAnonymousObject(
         if (_subschema.linearItems.has_value())
         {
             size_t index = 0;
-            for (const auto& subref : *_subschema.linearItems)
+            for (auto const& subref : *_subschema.linearItems)
             {
                 giveNameToAnonymousObjectRef(
                     subref, _hint + "_" + static_cast<char>('A' + index), _morehint);
@@ -658,7 +658,7 @@ static void giveNameToAnonymousObject(
         break;
     }
     case Ent::DataType::object:
-        for (const auto& [propName, propRef] : _subschema.properties)
+        for (auto const& [propName, propRef] : _subschema.properties)
         {
             giveNameToAnonymousObjectRef(propRef, propName, _hint);
         }
@@ -1447,7 +1447,7 @@ try
     g.topological_dfs();
 
     // Transfert nameToSchema into allDefinitions
-    for (const auto& id : g.getOrder())
+    for (auto const& id : g.getOrder())
     {
         auto& schema = nameToSchema.at(id);
         allDefinitions.push_back(std::move(schema));

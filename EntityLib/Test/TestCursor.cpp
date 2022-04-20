@@ -379,7 +379,7 @@ public:
         if (strcmp(expl.getString(), nodes.back()->getString()) != 0)
         {
             std::cout << expl.getString() << " " << nodes.back()->getString() << std::endl;
-            [[maybe_unused]] const auto* val = expl.getString();
+            [[maybe_unused]] auto const* val = expl.getString();
         }
         ENTLIB_ASSERT(strcmp(expl.getString(), nodes.back()->getString()) == 0);
     }
@@ -416,8 +416,8 @@ public:
             ENTLIB_ASSERT(expl2.hasPrefab());
             ENTLIB_ASSERT(_prop.getPrefab().getRawJson() == expl2.getPrefab().getRawJson());
         }
-        const auto* const a = _prop.getInstanceOf();
-        const auto* const b = expl2.getInstanceOf();
+        auto const* const a = _prop.getInstanceOf();
+        auto const* const b = expl2.getInstanceOf();
         ENTLIB_ASSERT(
             (a == nullptr and b == nullptr)
             or (a != nullptr and b != nullptr and a == std::string_view(b)));
@@ -533,7 +533,7 @@ public:
             auto const b = _prop.getObjectSetKeysString();
             ENTLIB_ASSERT(a.size() == b.size());
             ENTLIB_ASSERT(expl2.getSchema() == _prop.getSchema());
-            for (const auto* name : a)
+            for (auto const* name : a)
             {
                 ENTLIB_ASSERT(b.count(name));
             }
@@ -551,8 +551,8 @@ public:
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
-            const auto* const a = _prop.getPrefab().getRawJson();
-            const auto* const b = expl2.getPrefab().getRawJson();
+            auto const* const a = _prop.getPrefab().getRawJson();
+            auto const* const b = expl2.getPrefab().getRawJson();
             ENTLIB_ASSERT(a == b);
         }
     }
@@ -763,7 +763,7 @@ void testCursor(EntityLib& entlib)
         std::string filedata;
         std::getline(ifstr, filedata, static_cast<char>(0));
         auto& d = entlib.readJsonFile("test.SeedPatch.node");
-        const auto& schema = d["$schema"].get_ref<nlohmann::json::string_t const&>();
+        auto const& schema = d["$schema"].get_ref<nlohmann::json::string_t const&>();
         auto typeName = std::string(getRefTypeName(schema.c_str()));
         Property simpleObject(&entlib, entlib.getSchema(typeName.c_str()), "test.SeedPatch.node", &d);
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeX").getFloat() == 1.f);

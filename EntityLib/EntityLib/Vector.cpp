@@ -25,7 +25,7 @@ namespace Ent
 
     {
         m_data.reserve(_other.m_data.size());
-        for (const auto& data : _other.m_data)
+        for (auto const& data : _other.m_data)
         {
             m_data.push_back(data->clone());
         }
@@ -102,7 +102,7 @@ namespace Ent
         if (m_schema->singularItems != nullptr)
         {
             auto* const singItem = &m_schema->singularItems->get();
-            for (const auto& itm : m_data)
+            for (auto const& itm : m_data)
             {
                 ENTLIB_ASSERT(singItem == itm->getSchema());
             }
@@ -242,7 +242,7 @@ namespace Ent
 
     void Vector::checkParent(Node const* _parentNode) const
     {
-        for (const auto& elt : m_data)
+        for (auto const& elt : m_data)
         {
             elt->checkParent(_parentNode);
         }

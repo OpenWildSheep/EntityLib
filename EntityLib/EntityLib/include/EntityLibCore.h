@@ -30,7 +30,7 @@ namespace Ent
     struct JsonValidation : std::runtime_error
     {
         /// Make a JsonValidation with the given _message
-        explicit JsonValidation(const std::string& _message)
+        explicit JsonValidation(std::string const& _message)
             : std::runtime_error(_message){};
     };
 

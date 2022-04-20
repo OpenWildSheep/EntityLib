@@ -97,7 +97,7 @@ namespace Ent
             Node* parrentNode = unionNode->getParentNode();
             if (parrentNode != nullptr and parrentNode->getSchema()->type == DataType::array)
             {
-                const auto& meta = std::get<Subschema::ArrayMeta>(parrentNode->getSchema()->meta);
+                auto const& meta = std::get<Subschema::ArrayMeta>(parrentNode->getSchema()->meta);
                 if (meta.overridePolicy == "set")
                 {
                     throw BadType("Can't change union type inside a set of union");
@@ -116,7 +116,7 @@ namespace Ent
         {
             throw NullPointerArgument("_type", "Union::setUnionType");
         }
-        const auto* const unionType = getUnionType();
+        auto const* const unionType = getUnionType();
         if (unionType == nullptr or strcmp(_type, unionType) != 0)
         {
             auto* unionData = resetUnionTypeWithoutOverride(_type);

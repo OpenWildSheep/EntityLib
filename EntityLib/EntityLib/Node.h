@@ -54,37 +54,41 @@ namespace Ent
         /// @brief return the node containing the data and the type nodes (An element of the oneOf array)
         /// @pre type==Ent::DataType::oneOf
         /// @remark For internal use
-        Node const* getUnionDataWrapper() const;
+        [[nodiscard]] Node const* getUnionDataWrapper() const;
         /// @endcond
 
-        DataType getDataType() const; ///< Type of this Node. @see Ent::DataType
+        [[nodiscard]] DataType getDataType() const; ///< Type of this Node. @see Ent::DataType
 
         // Object
         Node* at(char const* _field); ///< @pre type==Ent::DataType::object @brief Get the _field
         Node const* at(char const* _field) const; ///< @pre type==Ent::DataType::object  @brief Get the _field
         bool count(char const* _field)
             const; ///< @pre type==Ent::DataType::object @brief true if a field with this name exist
-        std::vector<char const*>
+        [[nodiscard]] std::vector<char const*>
         getFieldNames() const; ///< @pre type==Ent::DataType::object @brief Get all field names
-        std::map<char const*, Node const*>
+        [[nodiscard]] std::map<char const*, Node const*>
         getFields() const; ///< @pre type==Ent::DataType::object @brief Get all fields
-        char const* getInstanceOf() const; ///< @pre type==Ent::DataType::object @brief path to the tmpl Node
+        [[nodiscard]] char const*
+        getInstanceOf() const; ///< @pre type==Ent::DataType::object @brief path to the tmpl Node
 
         // Array
         Node* at(size_t _index); ///< @pre type==Ent::DataType::array. @brief Get the item at _index
-        Node const* at(size_t _index) const; ///< @pre type==Ent::DataType::array. @brief Get the item at _index
-        size_t size() const; ///< @pre type==Ent::DataType::array. @brief Get array size
+        [[nodiscard]] Node const*
+        at(size_t _index) const; ///< @pre type==Ent::DataType::array. @brief Get the item at _index
+        [[nodiscard]] size_t size() const; ///< @pre type==Ent::DataType::array. @brief Get array size
         /// @pre type==Ent::DataType::array.
         /// @brief Get the raw Override value of the array size.
         /// @param _location the desired Override value location.
         /// @return the array size at the given Override value location.
-        std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
-        std::vector<Node const*> getItems() const; ///< @pre type==Ent::DataType::array. @brief Get all items
+        [[nodiscard]] std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
+        [[nodiscard]] std::vector<Node const*>
+        getItems() const; ///< @pre type==Ent::DataType::array. @brief Get all items
         std::vector<Node*> getItems(); ///< @pre type==Ent::DataType::array. @brief Get all items
         Node* push(); ///< @pre type==Ent::DataType::array. @brief Add a new item at the end of array
         void pop() const; ///< @pre type==Ent::DataType::array. @brief Remove an item at the end of array
         void clear() const; ///< @pre type==Ent::DataType::array. @brief Remove all items in array
-        bool empty() const; ///< @pre type==Ent::DataType::array. @brief return true if array is empty
+        [[nodiscard]] bool
+        empty() const; ///< @pre type==Ent::DataType::array. @brief return true if array is empty
         // Array - map
         bool mapErase(char const* _key) const; ///< @pre isMapOrSet() @brief erase the item with _key or return false
         Node* mapGet(char const* _key); ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
@@ -98,48 +102,53 @@ namespace Ent
         /// @brief Copy the _key Node into the _newkey Node. Will update the keyField to _newkey if relevant.
         /// @pre The _key Node is not present in the prefab.
         Node* mapRename(char const* _key, char const* _newkey);
-        bool mapErase(int64_t _key) const; ///< @pre isMapOrSet() @brief Erase the item at the given _key
+        [[nodiscard]] bool
+        mapErase(int64_t _key) const; ///< @pre isMapOrSet() @brief Erase the item at the given _key
         Node* mapGet(int64_t _key); ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
-        Node const* mapGet(int64_t _key) const; ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
+        [[nodiscard]] Node const*
+        mapGet(int64_t _key) const; ///< @pre isMapOrSet() @brief Get the item with _key or nullptr
         Node* mapInsert(int64_t _key); ///< @pre isMapOrSet() @brief Insert a new item at the given _key
         /// @brief Copy the _key Node into the _newkey Node. Will update the keyField to _newkey if relevant.
         /// @pre The _key Node is not present in the prefab.
-        Node* mapRename(int64_t _key, int64_t _newkey) const;
-        bool isMapOrSet() const; ///< @return true if type==Ent::DataType::array and overridePolicy is map or set
-        DataType getKeyType() const; ///< @pre isMapOrSet() @return the Ent::DataType of the key
+        [[nodiscard]] Node* mapRename(int64_t _key, int64_t _newkey) const;
+        [[nodiscard]] bool isMapOrSet()
+            const; ///< @return true if type==Ent::DataType::array and overridePolicy is map or set
+        [[nodiscard]] DataType getKeyType() const; ///< @pre isMapOrSet() @return the Ent::DataType of the key
         /// @pre isMapOrSet()
         /// @pre getKeyType() == string or getKeyType() == entityRef
         /// @return All keys of the map, as String
-        std::vector<String> getKeysString(bool _forceSort = false) const;
+        [[nodiscard]] std::vector<String> getKeysString(bool _forceSort = false) const;
         /// @pre isMapOrSet()
         /// @pre getKeyType() == integer
         /// @return All keys of the map, as int64_t
-        std::vector<int64_t> getKeysInt(bool _forceSort = false) const;
-        std::vector<NodeUniquePtr> releaseAllElements() const;
+        [[nodiscard]] std::vector<int64_t> getKeysInt(bool _forceSort = false) const;
+        [[nodiscard]] std::vector<NodeUniquePtr> releaseAllElements() const;
 
         // Union
         Node* getUnionData(); ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data
-        Node const* getUnionData() const; ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data
+        [[nodiscard]] Node const*
+        getUnionData() const; ///< @pre type==Ent::DataType::oneOf. @brief return the underlying data
         /// @brief Get the type inside the union
         /// @pre type==Ent::DataType::oneOf
-        char const* getUnionType() const;
+        [[nodiscard]] char const* getUnionType() const;
         /// @brief Get the index of the type inside the union
         /// @pre type==Ent::DataType::oneOf
-        size_t getUnionTypeIndex() const;
+        [[nodiscard]] size_t getUnionTypeIndex() const;
         /// @brief Change the type inside the union
         /// @pre type==Ent::DataType::oneOf
         /// @pre type match with a type declared inside the json "oneOf"
         Node* setUnionType(char const* _type) const;
 
         // Value
-        double getFloat() const; ///< @pre number or integer. @brief Get the value as double
-        int64_t getInt() const; ///< @pre integer. @brief Get the value as int
-        char const* getString() const; ///< @pre Ent::DataType == string. @brief Get the value as string
-        bool getBool() const; ///< @pre type==Ent::DataType::boolean. @brief Get the value as bool
-        EntityRef getEntityRef()
+        [[nodiscard]] double getFloat() const; ///< @pre number or integer. @brief Get the value as double
+        [[nodiscard]] int64_t getInt() const; ///< @pre integer. @brief Get the value as int
+        [[nodiscard]] char const*
+        getString() const; ///< @pre Ent::DataType == string. @brief Get the value as string
+        [[nodiscard]] bool getBool() const; ///< @pre type==Ent::DataType::boolean. @brief Get the value as bool
+        [[nodiscard]] EntityRef getEntityRef()
             const; ///< @pre type==Ent::DataType::entityRef. @brief Get the value as an Entity reference
 
-        Value const& GetRawValue()
+        [[nodiscard]] Value const& GetRawValue()
             const; ///< returns a reference to the raw Value (variant) stored at this node. Useful to write visitors.
 
         void setFloat(double _val); ///< @pre type==Ent::DataType::number. @brief Set the double value
@@ -154,25 +163,25 @@ namespace Ent
 
         /// Check if the value is set explicitly (it override the prefab or default value)
         /// @remark return true when object or array
-        bool isSet() const;
+        [[nodiscard]] bool isSet() const;
 
         /// @brief Recursively check if there is an override inside.
         ///
         /// If there is no override, there is no need to save it.
-        bool hasOverride() const;
+        [[nodiscard]] bool hasOverride() const;
 
         /// @brief Recursively check if value is set in a prefab (overriden or not by this Node)
-        bool hasPrefabValue() const;
+        [[nodiscard]] bool hasPrefabValue() const;
 
         /// @brief Check recursively if this node content match the given value source.
-        bool matchValueSource(OverrideValueSource _source) const;
+        [[nodiscard]] bool matchValueSource(OverrideValueSource _source) const;
 
         /// \cond PRIVATE
         /// Create a Node with the same value but which doesn't rely on prefab.
-        NodeUniquePtr detach() const;
+        [[nodiscard]] NodeUniquePtr detach() const;
 
         /// Create a Node which is an "instance of" this one. With no override.
-        NodeUniquePtr makeInstanceOf() const;
+        [[nodiscard]] NodeUniquePtr makeInstanceOf() const;
         /// \endcond
 
         /// @remark obsolete. Use resetInstanceOf
@@ -195,9 +204,9 @@ namespace Ent
 
         void applyToPrefab();
 
-        bool hasDefaultValue() const; ///< false if something was set in instance or prefab
+        [[nodiscard]] bool hasDefaultValue() const; ///< false if something was set in instance or prefab
 
-        bool isDefault() const; ///< true if the value was set in a prefab or in the instance
+        [[nodiscard]] bool isDefault() const; ///< true if the value was set in a prefab or in the instance
 
         /// Dump this Node as a json value
         nlohmann::json toJson(
@@ -212,54 +221,57 @@ namespace Ent
         /// @pre Node is an Object
         void saveNode(std::filesystem::path const& path) const;
 
-        double getDefaultFloat() const; ///< @pre number or integer. @brief Get the default value as double
-        int64_t getDefaultInt() const; ///< @pre integer. @brief Get the default value as int
-        char const* getDefaultString() const; ///< @pre DataType == string. @brief Get the default value as string
-        bool getDefaultBool() const; ///< @pre DataType == bool. @brief Get the default value as bool
-        EntityRef getDefaultEntityRef()
+        [[nodiscard]] double
+        getDefaultFloat() const; ///< @pre number or integer. @brief Get the default value as double
+        [[nodiscard]] int64_t getDefaultInt() const; ///< @pre integer. @brief Get the default value as int
+        [[nodiscard]] char const*
+        getDefaultString() const; ///< @pre DataType == string. @brief Get the default value as string
+        [[nodiscard]] bool
+        getDefaultBool() const; ///< @pre DataType == bool. @brief Get the default value as bool
+        [[nodiscard]] EntityRef getDefaultEntityRef()
             const; ///< @pre DataType == EntityRef. @brief Get the default value as EntityRef
 
         /// @pre number or integer.
         /// @brief Get the raw Override value as double.
         /// @param _location the desired Override value location.
         /// @return the double value at the given Override value location.
-        std::optional<double> getRawFloat(OverrideValueLocation _location) const;
+        [[nodiscard]] std::optional<double> getRawFloat(OverrideValueLocation _location) const;
         /// @pre integer.
         /// @brief Get the raw Override value as int.
         /// @param _location the desired Override value location.
         /// @return the int value at the given Override value location.
-        std::optional<int> getRawInt(OverrideValueLocation _location) const;
+        [[nodiscard]] std::optional<int> getRawInt(OverrideValueLocation _location) const;
         /// @pre DataType == string.
         /// @brief Get the raw Override value as string.
         /// @param _location the desired Override value location.
         /// @return the string value at the given Override value location.
-        std::optional<char const*> getRawString(OverrideValueLocation _location) const;
+        [[nodiscard]] std::optional<char const*> getRawString(OverrideValueLocation _location) const;
         /// @pre DataType == bool.
         /// @brief Get the raw Override value as bool.
         /// @param _location the desired Override value location.
         /// @return the bool value at the given Override value location.
-        std::optional<bool> getRawBool(OverrideValueLocation _location) const;
+        [[nodiscard]] std::optional<bool> getRawBool(OverrideValueLocation _location) const;
         /// @pre DataType == EntityRef.
         /// @brief Get the raw Override value as EntityRef.
         /// @param _location the desired Override value location.
         /// @return the EntityRef value at the given Override value location.
-        std::optional<EntityRef> getRawEntityRef(OverrideValueLocation _location) const;
+        [[nodiscard]] std::optional<EntityRef> getRawEntityRef(OverrideValueLocation _location) const;
 
         /// Get the absolute full link of the Subschema type, or nullptr if the is no
         /// Example : "./RuntimeComponents.json#/definitions/VoxelSimulationGD"
-        char const* getTypeName() const;
+        [[nodiscard]] char const* getTypeName() const;
 
-        Subschema const* getSchema() const; ///< Get the Node schema.
+        [[nodiscard]] Subschema const* getSchema() const; ///< Get the Node schema.
 
         void computeMemory(MemoryProfiler& prof) const;
 
-        EntityLib* getEntityLib() const;
+        [[nodiscard]] EntityLib* getEntityLib() const;
 
         /// Take all values set in this and set them into \b _dest
         void applyAllValues(Node& _dest, CopyMode _copyMode) const;
 
         Node* getParentNode();
-        Node const* getParentNode() const;
+        [[nodiscard]] Node const* getParentNode() const;
         void updateParents(); ///< call setParentNode(this) on all subnodes
         void checkParent(Node const* _parentNode) const; ///< Check that all subnode's parentNode point to this
         void setParentNode(Node* _parentNode); ///< set the parentNode
@@ -269,10 +281,10 @@ namespace Ent
             addedInInstance = _added;
         }
 
-        NodeUniquePtr clone() const;
+        [[nodiscard]] NodeUniquePtr clone() const;
 
         /// @brief Get the root Node of the document
-        Node const* getRootNode() const;
+        [[nodiscard]] Node const* getRootNode() const;
 
         /// @brief Make a NodeRef going from this to _target
         NodeRef makeNodeRef(Node const* _target) const;
@@ -284,7 +296,7 @@ namespace Ent
         Node* resolveNodeRef(char const* _nodeRef);
 
         /// @brief Get the NodeRef from root to this
-        NodeRef makeAbsoluteNodeRef() const;
+        [[nodiscard]] NodeRef makeAbsoluteNodeRef() const;
 
         /// Information about a prefab in the prefab history of a Node
         /// @see Node::getPrefabHistory
@@ -294,7 +306,7 @@ namespace Ent
             NodeRef nodeRef; ///< NodeRef from the prefab root the the pointed Node
             Node const* node = nullptr; ///< \b Read-only. Pointed Node in this prefab (if it exist).
 
-            // TODO : Remove when C++20
+            // TODO(lolo): Remove when C++20
             PrefabInfo(String _prefabPath, NodeRef _nodeRef, Node const* _node = nullptr)
                 : prefabPath(std::move(_prefabPath))
                 , nodeRef(std::move(_nodeRef))
@@ -303,7 +315,7 @@ namespace Ent
             }
         };
         /// @brief Get the list of prefabs of the given node, in the order of application.
-        std::vector<PrefabInfo> getPrefabHistory() const;
+        [[nodiscard]] std::vector<PrefabInfo> getPrefabHistory() const;
 
     private:
         Node(Node const& _node) = delete;

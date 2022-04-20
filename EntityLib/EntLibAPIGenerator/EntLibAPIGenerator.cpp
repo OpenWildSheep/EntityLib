@@ -59,13 +59,13 @@ data jsonToMustache(json const& _input)
         }
         return result;
     }
-    case json::value_t::boolean: return data(_input.get<bool>());
+    case json::value_t::boolean: return {_input.get<bool>()};
     case json::value_t::number_float: return data(std::to_string(_input.get<double>()));
     case json::value_t::number_integer: return data(std::to_string(_input.get<int64_t>()));
     case json::value_t::number_unsigned: return data(std::to_string(_input.get<uint64_t>()));
     case json::value_t::string: return data(_input.get<std::string>());
     }
-    return data(false);
+    return {false};
 }
 
 /// @brief In _input, replace all occurences of _before by _after
@@ -165,7 +165,7 @@ static std::string getRefTypeName(std::string _link)
     _link = escapeName(_link);
 
     // Force to create the definition (do nothing if already exist)
-    static auto definitionsStr = "#/definitions/";
+    static const auto* definitionsStr = "#/definitions/";
     size_t const pos = _link.find(definitionsStr);
     if (pos == std::string::npos)
     {
@@ -237,7 +237,7 @@ char const* primitiveName(Ent::DataType _type)
 /// @return true if it is an array of primitive type
 static bool isPrimArray(Ent::Subschema const& _ref)
 {
-    if (auto const singularItems = _ref.singularItems.get())
+    if (auto* const singularItems = _ref.singularItems.get())
     {
         return primitiveTypes.count(singularItems->get().type) != 0;
     }
@@ -285,8 +285,7 @@ static json getSchemaType(Ent::Subschema const& _schema)
                     type["object_set"] = std::move(array);
                     return type;
                 }
-                if (
-                    singularType == Ent::DataType::boolean || singularType == Ent::DataType::entityRef
+                if (singularType == Ent::DataType::boolean || singularType == Ent::DataType::entityRef
                     || singularType == Ent::DataType::integer || singularType == Ent::DataType::number
                     || singularType == Ent::DataType::string)
                 {
@@ -326,7 +325,7 @@ static json getSchemaType(Ent::Subschema const& _schema)
         json types(json::value_t::array);
         size_t index = 0;
 
-        for (auto& itemRef : *_schema.linearItems)
+        for (const auto& itemRef : *_schema.linearItems)
         {
             auto subtype = getSchemaRefType(itemRef);
             if (index != _schema.linearItems->size() - 1)
@@ -435,8 +434,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
                     defData["object_set"]["items"] = getSchemaRefType(*_schema.singularItems);
                     break;
                 }
-                if (
-                    singularType == Ent::DataType::boolean || singularType == Ent::DataType::entityRef
+                if (singularType == Ent::DataType::boolean || singularType == Ent::DataType::entityRef
                     || singularType == Ent::DataType::integer || singularType == Ent::DataType::number
                     || singularType == Ent::DataType::string)
                 {
@@ -471,7 +469,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
             size_t index = 0;
             std::set<json> includes;
 
-            for (auto& itemRef : *_schema.linearItems)
+            for (const auto& itemRef : *_schema.linearItems)
             {
                 auto subtype = getSchemaRefType(itemRef);
                 if (index != _schema.linearItems->size() - 1)
@@ -525,7 +523,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
         json object(json::value_t::object);
         json properties(json::value_t::array);
         std::set<json> includes;
-        for (auto& [propName, propRef] : _schema.properties)
+        for (const auto& [propName, propRef] : _schema.properties)
         {
             json prop(json::value_t::object);
             auto propData = getSchemaRefType(propRef);
@@ -604,7 +602,7 @@ static void giveNameToAnonymousObjectRef(
             if (not _ref->name.empty())
             {
                 // The same enum can be descibe several time
-                // TODO : Loïc : Fix the export of enums in Wild (Export each enum only one time, like classes)
+                // TODO(lolo): Loïc : Fix the export of enums in Wild (Export each enum only one time, like classes)
                 addDef(_ref->name, &(*_ref), "", true);
             }
             else
@@ -634,9 +632,10 @@ static void giveNameToAnonymousObject(
         if (_subschema.linearItems.has_value())
         {
             size_t index = 0;
-            for (auto& subref : *_subschema.linearItems)
+            for (const auto& subref : *_subschema.linearItems)
             {
-                giveNameToAnonymousObjectRef(subref, _hint + "_" + static_cast<char>('A' + index), _morehint);
+                giveNameToAnonymousObjectRef(
+                    subref, _hint + "_" + static_cast<char>('A' + index), _morehint);
             }
             ++index;
         }
@@ -659,7 +658,7 @@ static void giveNameToAnonymousObject(
         break;
     }
     case Ent::DataType::object:
-        for (auto& [propName, propRef] : _subschema.properties)
+        for (const auto& [propName, propRef] : _subschema.properties)
         {
             giveNameToAnonymousObjectRef(propRef, propName, _hint);
         }
@@ -673,11 +672,9 @@ void gencpp(path const& _resourcePath, path const& _destinationPath)
     data rootData;
     rootData["all_definitions"] = jsonToMustache(allDefinitions);
     rootData["tuple_type"] =
-        partial([]
-            { return R"cpp(Ent::Gen::Tuple<{{#types}}{{>display_type}}{{/types}}>)cpp"; });
+        partial([] { return R"cpp(Ent::Gen::Tuple<{{#types}}{{>display_type}}{{/types}}>)cpp"; });
     rootData["prim_set_type"] =
-        partial([]
-            { return R"cpp(Ent::Gen::PrimitiveSet<{{type.ref.cpp_native}}>)cpp"; });
+        partial([] { return R"cpp(Ent::Gen::PrimitiveSet<{{type.ref.cpp_native}}>)cpp"; });
     rootData["object_set_type"] = partial(
         []
         {
@@ -851,11 +848,9 @@ void gencppProp(path const& _resourcePath, path const& _destinationPath)
     data rootData;
     rootData["all_definitions"] = jsonToMustache(allDefinitions);
     rootData["tuple_type"] =
-        partial([]
-            { return R"cpp(Ent::Gen2::Tuple<{{#types}}{{>display_type}}{{/types}}>)cpp"; });
+        partial([] { return R"cpp(Ent::Gen2::Tuple<{{#types}}{{>display_type}}{{/types}}>)cpp"; });
     rootData["prim_set_type"] =
-        partial([]
-            { return R"cpp(Ent::Gen2::PrimitiveSet<{{type.ref.cpp_native}}>)cpp"; });
+        partial([] { return R"cpp(Ent::Gen2::PrimitiveSet<{{type.ref.cpp_native}}>)cpp"; });
     rootData["object_set_type"] = partial(
         []
         {
@@ -1452,7 +1447,7 @@ try
     g.topological_dfs();
 
     // Transfert nameToSchema into allDefinitions
-    for (auto& id : g.getOrder())
+    for (const auto& id : g.getOrder())
     {
         auto& schema = nameToSchema.at(id);
         allDefinitions.push_back(std::move(schema));

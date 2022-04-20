@@ -19,9 +19,9 @@ try
         return EXIT_FAILURE;
     }
 
-    auto mergedCompSchemaPath = "WildPipeline/Schema/MergedComponents.json";
-    auto textEditorSchemaPath = "WildPipeline/Schema/TextEditorsSchema.json";
-    auto allSingleSchemaPath = "WildPipeline/Schema/all";
+    const auto* mergedCompSchemaPath = "WildPipeline/Schema/MergedComponents.json";
+    const auto* textEditorSchemaPath = "WildPipeline/Schema/TextEditorsSchema.json";
+    const auto* allSingleSchemaPath = "WildPipeline/Schema/all";
     char editCmd[1024];
     // Edit MergedComponents.json
     sprintf_s(editCmd, sizeof(editCmd), R"(p4 edit "%s/%s")", argv[1], mergedCompSchemaPath);

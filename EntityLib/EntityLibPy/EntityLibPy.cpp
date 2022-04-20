@@ -31,7 +31,7 @@ Value getValue(Node& node)
     case DataType::entityRef: return node.getEntityRef();
     case DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
-    return Value();
+    return {};
 }
 
 Value getPropValue(Property const& _prop)
@@ -49,7 +49,7 @@ Value getPropValue(Property const& _prop)
     case DataType::entityRef: return _prop.getEntityRef();
     case DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
-    return Value();
+    return {};
 }
 
 Value getDefaultValue(Node& node)
@@ -67,13 +67,13 @@ Value getDefaultValue(Node& node)
     case DataType::entityRef: return node.getDefaultEntityRef();
     case DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
-    return Value();
+    return {};
 }
 
 template <typename I, typename O>
 struct Converter
 {
-    O operator()(I const&) const
+    O operator()([[maybe_unused]] I const& _input) const
     {
         throw std::runtime_error(
             std::string("Can't convert") + typeid(I).name() + " to " + typeid(O).name());
@@ -592,8 +592,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readonly("tools_dir", &EntityLib::toolsDir)
         .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference_internal)
         .def("make_entityref", static_cast<EntityRef(EntityLib::*)(Node const&, Node const&) const>(&EntityLib::makeEntityRef))
-        .def("make_entityref", static_cast<EntityRef(EntityLib::*)(Property const&, Property const&) const>(&
-            EntityLib::makeEntityRef))
+        .def("make_entityref", static_cast<EntityRef(EntityLib::*)(Property const&, Property const&) const>(&EntityLib::makeEntityRef))
         .def("resolve_entityref",
             static_cast<Node*(EntityLib::*)(Node*, EntityRef const&) const>(&EntityLib::resolveEntityRef),
             py::return_value_policy::reference_internal)

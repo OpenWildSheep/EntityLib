@@ -31,34 +31,37 @@ namespace Ent
         Array& operator=(Array const&) = default;
         Array& operator=(Array&&) = default;
 
-        bool hasOverride() const; ///< Recursively check if there is an override inside
-        bool hasPrefabValue() const; ///< Recursively check if value is set in a prefab
-        bool hasDefaultValue() const; ///< Recursively check if nothing is set in prefab and instance
-        bool hasKey() const; ///< The elements have keys if the overridePolicy is a map or a set
-        bool isTuple() const; ///< @return true if the schema has linearItems
+        [[nodiscard]] bool hasOverride() const; ///< Recursively check if there is an override inside
+        [[nodiscard]] bool hasPrefabValue() const; ///< Recursively check if value is set in a prefab
+        [[nodiscard]] bool
+        hasDefaultValue() const; ///< Recursively check if nothing is set in prefab and instance
+        [[nodiscard]] bool hasKey() const; ///< The elements have keys if the overridePolicy is a map or a set
+        [[nodiscard]] bool isTuple() const; ///< @return true if the schema has linearItems
 
         Node* at(uint64_t _index); ///< Get the item at _index
-        Node const* at(uint64_t _index) const; ///< Get the item at _index
+        [[nodiscard]] Node const* at(uint64_t _index) const; ///< Get the item at _index
 
         Node* arrayPush(); ///< @pre not hasKey()
 
-        bool canErase() const; ///< Erase is allowed if it is a map or a set of union
+        [[nodiscard]] bool canErase() const; ///< Erase is allowed if it is a map or a set of union
 
         /// @brief Erase the item with _key, or return false
         /// @pre canErase()
         bool mapErase(Map::KeyType const& _key);
         Node* mapGet(Map::KeyType const& _key); ///< @return the item with _key, or nullptr
-        Node const* mapGet(Map::KeyType const& _key) const; ///< @return the item with _key, or nullptr
+        [[nodiscard]] Node const*
+        mapGet(Map::KeyType const& _key) const; ///< @return the item with _key, or nullptr
         Node* mapInsert(Map::KeyType const& _key); ///< @pre hasKey(). @brief Insert a new item with _key
         void mapInsert(Map::KeyType const& _key, NodeUniquePtr _newNode);
         Node* mapRename(Map::KeyType const& _key, Map::KeyType const& _newKey);
 
         /// @return true if it is a map/set and the element with _key was removed
-        bool isErased(Map::KeyType const& _key) const;
+        [[nodiscard]] bool isErased(Map::KeyType const& _key) const;
 
-        std::vector<Node const*> getItems() const; ///< Get all not removed items
+        [[nodiscard]] std::vector<Node const*> getItems() const; ///< Get all not removed items
         std::vector<Node*> getItems(); ///< Get all not removed items
-        std::vector<Node const*> getItemsWithRemoved() const; ///< Get all items with the removed ones
+        [[nodiscard]] std::vector<Node const*>
+        getItemsWithRemoved() const; ///< Get all items with the removed ones
 
         std::vector<NodeUniquePtr> releaseAllElements();
 
@@ -66,39 +69,42 @@ namespace Ent
 
         void clear(); ///< @pre not isTuple()
 
-        bool empty() const;
+        [[nodiscard]] bool empty() const;
 
-        Array detach() const;
-        Array makeInstanceOf() const;
+        [[nodiscard]] Array detach() const;
+        [[nodiscard]] Array makeInstanceOf() const;
 
         void arraySetSize(Override<size_t> _size);
 
         void computeMemory(MemoryProfiler& _prof) const;
 
-        size_t size() const;
+        [[nodiscard]] size_t size() const;
 
-        size_t getDefaultSize() const;
+        [[nodiscard]] size_t getDefaultSize() const;
 
-        size_t getPrefabSize() const;
+        [[nodiscard]] size_t getPrefabSize() const;
 
-        Subschema const* getSchema() const;
+        [[nodiscard]] Subschema const* getSchema() const;
 
-        std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
+        [[nodiscard]] std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
 
         Map::KeyType getChildKey(Node const* _child) const;
 
-        DataType getKeyType() const;
+        [[nodiscard]] DataType getKeyType() const;
 
         void unset(); ///< Unset recursively all values overriden in instance (return to prefab values)
 
         // **************************** For array initialization **********************************
         Node* initAdd(
-            OverrideValueLocation,
+            OverrideValueLocation /*loc*/,
             NodeUniquePtr _node,
             bool _addedInInstance); ///< @pre This _node is not yet added
         /// @pre hasKey() and the key doesn't exist in map
         Node* mapInitInsert(
-            OverrideValueLocation, Map::KeyType _key, NodeUniquePtr _node, bool _addedInInstance);
+            OverrideValueLocation /*_loc*/,
+            Map::KeyType _key,
+            NodeUniquePtr _node,
+            bool _addedInInstance);
         /// @pre not hasKey()
         Node* arrayInitPush(NodeUniquePtr _node, bool _addedInInstance);
 
@@ -107,8 +113,8 @@ namespace Ent
         void setParentNode(Node* _parentNode);
         void checkParent(Node const* _parentNode) const;
 
-        std::vector<String> getKeysString(bool _forceSort) const;
-        std::vector<int64_t> getKeysInt(bool _forceSort) const;
+        [[nodiscard]] std::vector<String> getKeysString(bool _forceSort) const;
+        [[nodiscard]] std::vector<int64_t> getKeysInt(bool _forceSort) const;
 
         /// Get the child name, in the array/map logic
         /// @pre _child is a child field of this

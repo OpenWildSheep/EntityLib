@@ -77,7 +77,7 @@ namespace Ent
                 wrapper->count(metaData->typeField.c_str()),
                 "Field %s not found in union",
                 metaData->typeField.c_str());
-            auto const typeNode = wrapper->at(metaData->typeField.c_str());
+            auto* const typeNode = wrapper->at(metaData->typeField.c_str());
             ENTLIB_ASSERT(typeNode);
             return typeNode->getString();
         }
@@ -88,7 +88,7 @@ namespace Ent
     {
         Subschema const* subTypeSchema{};
         std::tie(subTypeSchema, typeIndex) = schema->getUnionTypeWrapper(_type);
-        // TODO : Loïc - low prio - Find a way to get the super.
+        // TODO(lolo): Loïc - low prio - Find a way to get the super.
         //   It could be hard because we are no more in the loading phase, so the super is
         //   now delete.
         Node* unionNode = wrapper->getParentNode();
@@ -97,7 +97,7 @@ namespace Ent
             Node* parrentNode = unionNode->getParentNode();
             if (parrentNode != nullptr and parrentNode->getSchema()->type == DataType::array)
             {
-                auto& meta = std::get<Subschema::ArrayMeta>(parrentNode->getSchema()->meta);
+                const auto& meta = std::get<Subschema::ArrayMeta>(parrentNode->getSchema()->meta);
                 if (meta.overridePolicy == "set")
                 {
                     throw BadType("Can't change union type inside a set of union");
@@ -116,7 +116,7 @@ namespace Ent
         {
             throw NullPointerArgument("_type", "Union::setUnionType");
         }
-        auto const unionType = getUnionType();
+        const auto* const unionType = getUnionType();
         if (unionType == nullptr or strcmp(_type, unionType) != 0)
         {
             auto* unionData = resetUnionTypeWithoutOverride(_type);

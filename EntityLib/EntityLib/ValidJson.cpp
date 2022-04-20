@@ -29,7 +29,8 @@ namespace Ent
     static std::string filterError(char const* message)
     {
         // Remove messages to say that all other components doesn't match
-        std::regex const r(R"regex(Failed to validate against schema associated with property name \'Type\'\.
+        std::regex const r(
+            R"regex(Failed to validate against schema associated with property name \'Type\'\.
 In node \: \<root\>(\/\[Objects\]\/\[\d+\]|)\/\[Components\]\/\[\d+\]
 
 Failed to validate against child schema #\d+.
@@ -40,7 +41,8 @@ In node : \<root\>(\/\[Objects\]\/\[\d+\]|)\/\[Components\]\/\[\d+\]\/\[Type\]
 
 )regex");
         std::string const message2 = std::regex_replace(message, r, "");
-        std::regex const r2(R"regex(Failed to validate against schema associated with property name \'Type\'\.
+        std::regex const r2(
+            R"regex(Failed to validate against schema associated with property name \'Type\'\.
 In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/\[Embedded\]\/\[\d+\]|)\/\[Components\]\/\[\d+\]
 
 Failed to validate against child schema #\d+.
@@ -263,14 +265,12 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
         return fullMessage;
     }
 
-    void validateScene(
-        Schema const& _schema, std::filesystem::path const& _toolsDir, json const& _scene)
+    void validateScene(Schema const& _schema, std::filesystem::path const& _toolsDir, json const& _scene)
     {
         validateJson(_schema, _toolsDir, _scene, "Scene");
     }
 
-    void validateEntity(
-        Schema const& _schema, std::filesystem::path const& _toolsDir, json const& _entity)
+    void validateEntity(Schema const& _schema, std::filesystem::path const& _toolsDir, json const& _entity)
     {
         validateJson(_schema, _toolsDir, _entity, "Entity");
     }

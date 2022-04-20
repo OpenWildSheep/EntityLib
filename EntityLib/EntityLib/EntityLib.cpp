@@ -128,7 +128,7 @@ namespace Ent
 
     static Node const* getSubScene(Node const* _entity)
     {
-        if (auto* subScene = _entity->at("Components")->mapGet("SubScene"))
+        if (const auto* subScene = _entity->at("Components")->mapGet("SubScene"))
         {
             return subScene->getUnionData()->at("Embedded");
         }
@@ -137,7 +137,8 @@ namespace Ent
 
     static PropImplPtr getSubScene(PropImpl& _entity)
     {
-        if (PropImplPtr const subScene = _entity.getObjectField("Components")->getUnionSetItem("SubScene"))
+        if (PropImplPtr const subScene =
+                _entity.getObjectField("Components")->getUnionSetItem("SubScene"))
         {
             return subScene->getObjectField("Embedded");
         }
@@ -151,17 +152,17 @@ namespace Ent
         ENTLIB_ASSERT(_scene != nullptr);
         ENTLIB_ASSERT(_scene->getDataType() == DataType::array);
         // subSceneData can be null if rootScene was loaded with loadSceneAsNode
-        if (auto subSceneData = _scene->getParentNode())
+        if (auto* subSceneData = _scene->getParentNode())
         {
             ENTLIB_ASSERT(subSceneData != nullptr);
             ENTLIB_ASSERT(subSceneData->getDataType() == DataType::object);
-            auto subSceneCpnt = subSceneData->getParentNode(); // SubScene
+            auto* subSceneCpnt = subSceneData->getParentNode(); // SubScene
             ENTLIB_ASSERT(subSceneCpnt != nullptr);
             ENTLIB_ASSERT(subSceneCpnt->getDataType() == DataType::object);
-            auto cpntUnion = subSceneCpnt->getParentNode(); // Component union
+            auto* cpntUnion = subSceneCpnt->getParentNode(); // Component union
             ENTLIB_ASSERT(cpntUnion != nullptr);
             ENTLIB_ASSERT(cpntUnion->getDataType() == DataType::oneOf);
-            auto components = cpntUnion->getParentNode(); // "Components" property (array)
+            auto* components = cpntUnion->getParentNode(); // "Components" property (array)
             ENTLIB_ASSERT(components != nullptr);
             ENTLIB_ASSERT(components->getDataType() == DataType::array);
             entity = components->getParentNode(); // Entity
@@ -475,7 +476,7 @@ namespace Ent
             if (_entityRef.entityPath.empty())
             {
                 // empty ref
-                return Property();
+                return {};
             }
 
             // split around '/'
@@ -518,7 +519,7 @@ namespace Ent
         ENTLIB_ASSERT_MSG(
             _node == nullptr || _node->getSchema()->name == entitySchemaName,
             "_node has to be an Entity but is not!");
-        if (auto const parent = _node->getParentNode())
+        if (auto* const parent = _node->getParentNode())
         {
             return getSceneParentEntity(parent);
         }
@@ -530,13 +531,13 @@ namespace Ent
         return getSceneParentEntity(_node->getParentNode());
     }
 
-    std::optional<Property> EntityLib::getParentEntity(Property _node) const
+    std::optional<Property> EntityLib::getParentEntity(const Property& _node) const
     {
-        if (auto const parent = _node.getPimpl().getParent().get())
+        if (auto* const parent = _node.getPimpl().getParent().get())
         {
             if (auto ptr = getSceneParentEntity(parent))
             {
-                return ptr;
+                return Property{std::move(ptr)};
             }
         }
         return std::nullopt;
@@ -604,7 +605,7 @@ namespace Ent
             }
             struct NodeWrapper
             {
-                //TODO : Add default values when C++17
+                // TODO(lolo): Add default values when C++17
                 NodeUniquePtr node;
                 OverrideValueLocation loc;
                 bool removed;
@@ -786,9 +787,9 @@ namespace Ent
                 (_super != nullptr and not _super->hasDefaultValue()) ?
                     std::optional<std::string>(_super->getString()) :
                     std::optional<std::string>(std::nullopt);
-            std::optional<std::string> const val =
-                _data.is_string() ? std::optional(_data.get<std::string>()) :
-                                    std::optional<std::string>(std::nullopt);
+            std::optional<std::string> const val = _data.is_string() ?
+                                                       std::optional(_data.get<std::string>()) :
+                                                       std::optional<std::string>(std::nullopt);
             result = newNode(Override<String>(def, supVal, val), &_nodeSchema);
         }
         break;
@@ -798,9 +799,8 @@ namespace Ent
             std::optional<bool> const supVal = (_super != nullptr and not _super->hasDefaultValue()) ?
                                                    std::optional(_super->getBool()) :
                                                    std::optional<bool>(std::nullopt);
-            std::optional<bool> const val = _data.is_boolean() ?
-                                                std::optional(_data.get<bool>()) :
-                                                std::optional<bool>(std::nullopt);
+            std::optional<bool> const val = _data.is_boolean() ? std::optional(_data.get<bool>()) :
+                                                                 std::optional<bool>(std::nullopt);
             result = newNode(Override(def, supVal, val), &_nodeSchema);
         }
         break;
@@ -847,9 +847,9 @@ namespace Ent
                 _data.is_string() ? _data.get<std::string>() :
                                     std::optional<std::string>(std::nullopt);
 
-            std::optional<EntityRef> const val =
-                refString.has_value() ? std::optional(EntityRef{refString.value()}) :
-                                        std::optional<EntityRef>(std::nullopt);
+            std::optional<EntityRef> const val = refString.has_value() ?
+                                                     std::optional(EntityRef{refString.value()}) :
+                                                     std::optional<EntityRef>(std::nullopt);
 
             result = newNode(Override(def, supVal, val), &_nodeSchema);
         }
@@ -1002,10 +1002,7 @@ namespace Ent
     }
 
     NodeUniquePtr EntityLib::loadArray(
-        Subschema const& _nodeSchema,
-        json const& _data,
-        Node const* _super,
-        json const* _default) const
+        Subschema const& _nodeSchema, json const& _data, Node const* _super, json const* _default) const
     {
         ENTLIB_ASSERT(_nodeSchema.type == DataType::array);
 
@@ -1034,9 +1031,8 @@ namespace Ent
                     if (not arr.hasKey())
                     {
                         std::optional<uint64_t> prefabArraySize =
-                            defaultArraySize == _super->size() ?
-                                std::nullopt :
-                                std::optional{_super->size()};
+                            defaultArraySize == _super->size() ? std::nullopt :
+                                                                 std::optional{_super->size()};
                         arr.arraySetSize(
                             Override<uint64_t>(defaultArraySize, prefabArraySize, std::nullopt));
                     }
@@ -1142,7 +1138,8 @@ namespace Ent
                         arr = mergeMapOverride(
                             [&unionMeta](json const& item)
                             {
-                                if (auto const iter = item.find(unionMeta.typeField); iter != item.end())
+                                if (auto const iter = item.find(unionMeta.typeField);
+                                    iter != item.end())
                                 {
                                     return iter->get_ref<std::string const&>();
                                 }
@@ -1239,10 +1236,8 @@ namespace Ent
                             std::nullopt;
                     uint64_t const sizeInPrefab = prefabArraySize.value_or(defaultArraySize);
                     std::optional<uint64_t> overrideArraySize =
-                        _data.size() == sizeInPrefab ? std::nullopt :
-                                                       std::optional{_data.size()};
-                    arr.arraySetSize(
-                        Override(defaultArraySize, prefabArraySize, overrideArraySize));
+                        _data.size() == sizeInPrefab ? std::nullopt : std::optional{_data.size()};
+                    arr.arraySetSize(Override(defaultArraySize, prefabArraySize, overrideArraySize));
                 }
                 break;
                 default:
@@ -1366,8 +1361,7 @@ namespace Ent
         }
         if (not typeFound)
         {
-            throw BadType(
-                staticFormat(
+            throw BadType(staticFormat(
                 "Can't find type %s in schema %s", dataType.c_str(), _nodeSchema.name.c_str()));
         }
         return result;
@@ -1434,7 +1428,7 @@ namespace Ent
                 json data;
                 uint32_t index = 0;
 
-                // TODO : Remove when C++20
+                // TODO(lolo): Remove when C++20
                 JsonField(char const* _name, json _data, uint32_t _index = 0)
                     : name(_name)
                     , data(std::move(_data))
@@ -1443,7 +1437,7 @@ namespace Ent
                 }
             };
             std::vector<JsonField> fieldMap;
-            auto& internObj = std::get<ObjectPtr>(_node.value);
+            const auto& internObj = std::get<ObjectPtr>(_node.value);
             for (auto const& [name, sub] : _schema.properties)
             {
                 Node const* subNode = _node.at(name.c_str());
@@ -1517,7 +1511,7 @@ namespace Ent
 
                                 if (item->getSchema()->type == DataType::oneOf)
                                 {
-                                    auto& unionMeta =
+                                    const auto& unionMeta =
                                         std::get<Subschema::UnionMeta>(item->getSchema()->meta);
                                     char const* type = item->getUnionType();
                                     json tmpNode;
@@ -1715,10 +1709,9 @@ namespace Ent
         {
             return _entLib.loadNode(_nodeSchema, _document, _super);
         };
-        auto validate = [&_nodeSchema](
-                            Schema const& _schema,
-                            std::filesystem::path const& _toolsDir,
-                            json const& _entity)
+        auto validate =
+            [&_nodeSchema](
+                Schema const& _schema, std::filesystem::path const& _toolsDir, json const& _entity)
         {
             // Validate with the right type of the Node
             return validateJson(_schema, _toolsDir, _entity, _nodeSchema.name.c_str());
@@ -1741,11 +1734,11 @@ namespace Ent
     {
         Subschema const& entitySchema = AT(schema.schema.allDefinitions, entitySchemaName);
         auto const ent = loadNodeReadOnly(entitySchema, _scenePath.string().c_str());
-        if (auto* components = ent->at("Components"))
+        if (const auto* components = ent->at("Components"))
         {
-            if (auto const subscene = components->mapGet("SubScene"))
+            if (const auto* const subscene = components->mapGet("SubScene"))
             {
-                if (auto const scene = subscene->getUnionData()->at("Embedded"))
+                if (const auto* const scene = subscene->getUnionData()->at("Embedded"))
                 {
                     return scene->clone();
                 }
@@ -1776,7 +1769,8 @@ namespace Ent
                 // If $schema found, use it
                 schemaFound = getRefTypeName(schemaName->get_ref<json::string_t const&>().c_str());
             }
-            else if (auto const schemaName2 = _document.find("schema_name"); schemaName2 != _document.end())
+            else if (auto const schemaName2 = _document.find("schema_name");
+                     schemaName2 != _document.end())
             {
                 // If schema_name found, use it
                 schemaFound = getRefTypeName(schemaName2->get_ref<json::string_t const&>().c_str());
@@ -1801,8 +1795,8 @@ namespace Ent
             for (auto const& [name, schema2] : this->schema.schema.allDefinitions)
             {
                 // Try to lower only if the type was extracted from a file name
-                if ((tryToLower and strToLower(name.c_str()) == schemaFound)
-                    or (not tryToLower and name.c_str() == schemaFound))
+                if ((tryToLower and strToLower(name) == schemaFound)
+                    or (not tryToLower and name == schemaFound))
                 {
                     schema = &schema2;
                     break;
@@ -1852,7 +1846,7 @@ namespace Ent
     PropImplPtr EntityLib::newPropImpl() const
     {
         PropImpl* property{};
-        auto mem = propertyPool.alloc();
+        auto* mem = propertyPool.alloc();
         try
         {
             property = new (mem) PropImpl();
@@ -1869,7 +1863,7 @@ namespace Ent
         PropImplPtr _parent, Subschema const* _schema, char const* _filename, json* _doc)
     {
         PropImpl* property{};
-        auto mem = propertyPool.alloc();
+        auto* mem = propertyPool.alloc();
         try
         {
             property = new (mem) PropImpl(this, std::move(_parent), _schema, _filename, _doc);

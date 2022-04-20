@@ -383,7 +383,7 @@ namespace Ent
         }
         if (_data.count("required") != 0u)
         {
-            // TODO required
+            // TODO(lolo): required
         }
         if (_data.count("title") != 0u)
         {
@@ -421,7 +421,7 @@ namespace Ent
         }
     }
 
-// TODO Loïc : (Low prio) It could be good to use a real logger system. (like spdlog for example)
+    // TODO(lolo): Loïc : (Low prio) It could be good to use a real logger system. (like spdlog for example)
 #ifdef ENTLIB_DEBUG_READSCHEMA
 #define ENTLIB_DEBUG_PRINTF(message, ...) printf(message, __VA_ARGS__);
 #else
@@ -612,7 +612,7 @@ namespace Ent
                 ref = SubschemaRef::Ref{globalSchema, typeName};
             }
 
-            void finalizeSubschema(Subschema& lastSchema) const
+            static void finalizeSubschema(Subschema& lastSchema)
             {
                 if (not lastSchema.unionTypeMap.empty())
                 {
@@ -630,7 +630,8 @@ namespace Ent
                             info.wrapperSchema = &wrapperSchema.get();
                             info.index = index;
                             info.dataSchema = &info.wrapperSchema->properties.at(un->dataField).get();
-                            auto& typeSchema = info.wrapperSchema->properties.at(un->typeField).get();
+                            const auto& typeSchema =
+                                info.wrapperSchema->properties.at(un->typeField).get();
                             auto const& typeName =
                                 typeSchema.constValue->get_ref<std::string const&>();
                             lastSchema.unionTypeMap.emplace(typeName.c_str(), info);

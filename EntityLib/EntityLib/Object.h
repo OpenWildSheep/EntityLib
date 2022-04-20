@@ -17,16 +17,16 @@ namespace Ent
         NodeUniquePtr node;
         uint32_t fieldIdx = 0;
 
-        ObjField(char const* _name = nullptr, NodeUniquePtr _node = {}, uint32_t _fieldIdx = 0)
+        explicit ObjField(char const* _name = nullptr, NodeUniquePtr _node = {}, uint32_t _fieldIdx = 0)
             : name(_name)
             , node(std::move(_node))
             , fieldIdx(_fieldIdx)
         {
         }
 
-        ObjField(ObjField const&);
+        ObjField(ObjField const& _other);
         ObjField(ObjField&&) = default;
-        ObjField& operator=(ObjField const&);
+        ObjField& operator=(ObjField const& _other);
         ObjField& operator=(ObjField&&) = default;
     };
 
@@ -68,31 +68,32 @@ namespace Ent
         uint32_t instanceOfFieldIndex = 0;
         bool hasASuper = false;
 
-        size_t size() const
+        [[nodiscard]] size_t size() const
         {
             return nodes.size();
         }
 
-        auto& front() const
+        [[nodiscard]] auto& front() const
         {
             return nodes.front();
         }
 
         void unset() const;
         void resetInstanceOf(char const* _prefabNodePath);
-        Object makeInstanceOf() const;
-        Object detach() const;
+        [[nodiscard]] Object makeInstanceOf() const;
+        [[nodiscard]] Object detach() const;
         void applyAllValues(Object& _dest, CopyMode _copyMode) const;
         void applyAllValuesButPrefab(Object& _dest, CopyMode _copyMode) const;
-        Override<String> const& getInstanceOfValue() const
+
+        [[nodiscard]] Override<String> const& getInstanceOfValue() const
         {
             return instanceOf;
         }
 
-        bool hasDefaultValue() const;
+        [[nodiscard]] bool hasDefaultValue() const;
 
-        bool hasOverride() const;
-        bool hasPrefabValue() const;
+        [[nodiscard]] bool hasOverride() const;
+        [[nodiscard]] bool hasPrefabValue() const;
 
         void computeMemory(MemoryProfiler& prof) const;
 

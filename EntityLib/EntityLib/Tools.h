@@ -56,7 +56,7 @@ namespace Ent
     }
     inline namespace literals
     {
-        std::size_t constexpr operator"" _hash(char const* s, size_t)
+        std::size_t constexpr operator"" _hash(char const* s, [[maybe_unused]] size_t _size)
         {
             return hasher<std::string>()(s);
         }
@@ -65,7 +65,10 @@ namespace Ent
     inline std::string strToLower(std::string s)
     {
         std::transform(
-            s.begin(), s.end(), s.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+            s.begin(),
+            s.end(),
+            s.begin(),
+            [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
         return s;
     }
 

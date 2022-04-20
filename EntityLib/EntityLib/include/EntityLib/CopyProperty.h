@@ -30,7 +30,7 @@ namespace Ent
             m_dest.pop_back();
         }
 
-        bool doNeedCopy(Property const& _source) const
+        [[nodiscard]] bool doNeedCopy(Property const& _source) const
         {
             auto checkOVS = [this, &_source]
             {
@@ -58,7 +58,7 @@ namespace Ent
             if (m_overrideValueSource == OverrideValueSource::Override
                 and (m_copyRootInstanceOf or m_dest.size() > 1))
             {
-                if (auto const instanceOf = m_source.getInstanceOf())
+                if (const auto* const instanceOf = m_source.getInstanceOf())
                 {
                     _back().resetInstanceOf(instanceOf);
                 }
@@ -172,14 +172,14 @@ namespace Ent
                 switch (m_source.getMapKeyType())
                 {
                 case DataType::integer:
-                    for (auto& removed : m_source.getMapRemovedKeysInt())
+                    for (const auto& removed : m_source.getMapRemovedKeysInt())
                     {
                         _back().eraseMapItem(removed);
                     }
                     break;
                 case DataType::string: [[fallthrough]];
                 case DataType::entityRef:
-                    for (auto& removed : m_source.getMapRemovedKeysString())
+                    for (const auto& removed : m_source.getMapRemovedKeysString())
                     {
                         _back().eraseMapItem(removed);
                     }
@@ -195,14 +195,14 @@ namespace Ent
                 switch (m_source.getObjectSetKeyType())
                 {
                 case DataType::integer:
-                    for (auto& removed : m_source.getObjectSetRemovedKeysInt())
+                    for (const auto& removed : m_source.getObjectSetRemovedKeysInt())
                     {
                         _back().eraseObjectSetItem(removed);
                     }
                     break;
                 case DataType::string: [[fallthrough]];
                 case DataType::entityRef:
-                    for (auto& removed : m_source.getObjectSetRemovedKeysString())
+                    for (const auto& removed : m_source.getObjectSetRemovedKeysString())
                     {
                         _back().eraseObjectSetItem(removed);
                     }

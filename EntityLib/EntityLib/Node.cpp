@@ -114,7 +114,7 @@ namespace Ent
 
     Node const* Node::getRootNode() const
     {
-        auto rootParent = this;
+        const auto* rootParent = this;
         while (rootParent->parentNode != nullptr)
         {
             rootParent = rootParent->parentNode;
@@ -212,15 +212,15 @@ namespace Ent
 
     Node const* Node::resolveNodeRef(char const* _nodeRef) const
     {
-        auto tokenStart = _nodeRef;
-        auto const nodeRefEnd = _nodeRef + strlen(_nodeRef);
+        const auto* tokenStart = _nodeRef;
+        const auto* const nodeRefEnd = _nodeRef + strlen(_nodeRef);
 
-        auto tokenStop = strchr(tokenStart, '/');
+        const auto* tokenStop = strchr(tokenStart, '/');
         if (tokenStop == nullptr)
         {
             tokenStop = nodeRefEnd;
         }
-        auto current = this;
+        const auto* current = this;
 
         auto nextToken = [&tokenStart, &tokenStop, nodeRefEnd]
         {
@@ -323,10 +323,10 @@ namespace Ent
     {
         std::vector<PrefabInfo> result;
         // Going up to find the first prefab
-        auto parent = this;
+        const auto* parent = this;
         while (parent != nullptr)
         {
-            if (auto* obj = std::get_if<ObjectPtr>(&parent->value))
+            if (const auto* obj = std::get_if<ObjectPtr>(&parent->value))
             {
                 if ((*obj)->instanceOf.hasOverride())
                 {
@@ -364,11 +364,11 @@ namespace Ent
         }
 
         template <typename T>
-        void operator()(Override<T>&) const
+        void operator()([[maybe_unused]] Override<T>& _val) const
         {
         }
 
-        void operator()(Null&) const
+        void operator()([[maybe_unused]] Null& _val) const
         {
         }
     };
@@ -389,11 +389,11 @@ namespace Ent
         }
 
         template <typename T>
-        void operator()(Override<T> const&) const
+        void operator()([[maybe_unused]] Override<T> const& _val) const
         {
         }
 
-        void operator()(Null const&) const
+        void operator()([[maybe_unused]] Null const& _val) const
         {
         }
     };
@@ -647,7 +647,7 @@ namespace Ent
             return _nodeInternal.unset();
         }
 
-        void operator()(Null&) const
+        void operator()([[maybe_unused]] Null& _nodeInternal) const
         {
         }
     };
@@ -693,7 +693,7 @@ namespace Ent
             return _ov.hasDefaultValue();
         }
 
-        bool operator()(Null const&) const
+        bool operator()([[maybe_unused]] Null const& _ov) const
         {
             return false;
         }
@@ -720,7 +720,7 @@ namespace Ent
             return schema->rootSchema->entityLib->newNode(_ov.detach(), schema);
         }
 
-        NodeUniquePtr operator()(Null const&) const
+        NodeUniquePtr operator()([[maybe_unused]] Null const& _ov) const
         {
             return schema->rootSchema->entityLib->newNode(Null{}, schema);
         }
@@ -748,7 +748,7 @@ namespace Ent
             return schema->rootSchema->entityLib->newNode(_ov.makeInstanceOf(), schema);
         }
 
-        NodeUniquePtr operator()(Null const&) const
+        NodeUniquePtr operator()([[maybe_unused]] Null const& _ov) const
         {
             return schema->rootSchema->entityLib->newNode(Null{}, schema);
         }
@@ -775,7 +775,7 @@ namespace Ent
             return _ov.hasOverride();
         }
 
-        bool operator()(Null const&) const
+        bool operator()([[maybe_unused]] Null const& _ov) const
         {
             return false;
         }
@@ -806,7 +806,7 @@ namespace Ent
             return _ov.hasPrefabValue();
         }
 
-        bool operator()(Null const&) const
+        bool operator()([[maybe_unused]] Null const& _ov) const
         {
             return false;
         }
@@ -854,12 +854,12 @@ namespace Ent
 
     char const* Node::getInstanceOf() const
     {
-        if (auto const object = std::get_if<ObjectPtr>(&value))
+        if (const auto* const object = std::get_if<ObjectPtr>(&value))
         {
             auto const& instanceOf = (*object)->instanceOf;
             return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
         }
-        if (auto const unionPtr = std::get_if<UnionPtr>(&value))
+        if (const auto* const unionPtr = std::get_if<UnionPtr>(&value))
         {
             auto const& instanceOf = (*unionPtr)->instanceOf;
             return instanceOf.get().empty() ? nullptr : instanceOf.get().c_str();
@@ -894,7 +894,7 @@ namespace Ent
             {
                 throw BadArrayType("Can't 'push' in a map or set. Use 'mapInsert'.");
             }
-            auto const newNode = arr.arrayPush();
+            auto* const newNode = arr.arrayPush();
             newNode->setParentNode(this);
             newNode->updateParents();
             return newNode;
@@ -1133,7 +1133,7 @@ namespace Ent
         }
 
         template <typename T>
-        bool operator()(T const&) const
+        bool operator()([[maybe_unused]] T const& _ov) const
         {
             return false;
         }
@@ -1289,7 +1289,7 @@ namespace Ent
             return _ov.computeMemory(prof);
         }
 
-        void operator()(Null const&) const
+        void operator()([[maybe_unused]] Null const& _ov) const
         {
         }
     };
@@ -1306,12 +1306,12 @@ namespace Ent
 
     void Node::resetInstanceOf(char const* _prefabNodePath)
     {
-        if (auto const objectPtr = std::get_if<ObjectPtr>(&value))
+        if (auto* const objectPtr = std::get_if<ObjectPtr>(&value))
         {
             (*objectPtr)->resetInstanceOf(_prefabNodePath);
             (*objectPtr)->setParentNode(this);
         }
-        else if (auto const unionPtr = std::get_if<UnionPtr>(&value))
+        else if (auto* const unionPtr = std::get_if<UnionPtr>(&value))
         {
             (*unionPtr)->resetInstanceOf(_prefabNodePath);
             (*unionPtr)->setParentNode(this);
@@ -1353,7 +1353,7 @@ namespace Ent
             _value.applyAllValues(std::get<T>(dest), copyMode);
         }
 
-        void operator()(Null const&) const
+        void operator()([[maybe_unused]] Null const& _value) const
         {
         }
     };
@@ -1395,7 +1395,7 @@ namespace Ent
             throw ContextException("Called Node::applyToPrefab an a Node without prefab");
         }
 
-        auto* prefabPath = getInstanceOf();
+        const auto* prefabPath = getInstanceOf();
         auto const prefab = getEntityLib()->loadFileAsNode(prefabPath, *getSchema());
         std::map<std::string, Map::KeyType> prefabsKeys;
         std::map<std::string, Map::KeyType> instanceKeys;

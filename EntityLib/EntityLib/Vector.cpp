@@ -25,7 +25,7 @@ namespace Ent
 
     {
         m_data.reserve(_other.m_data.size());
-        for (auto& data : _other.m_data)
+        for (const auto& data : _other.m_data)
         {
             m_data.push_back(data->clone());
         }
@@ -101,8 +101,8 @@ namespace Ent
         ENTLIB_ASSERT(m_data.size() == m_arraySize.get());
         if (m_schema->singularItems != nullptr)
         {
-            auto const singItem = &m_schema->singularItems->get();
-            for (auto& itm : m_data)
+            auto* const singItem = &m_schema->singularItems->get();
+            for (const auto& itm : m_data)
             {
                 ENTLIB_ASSERT(singItem == itm->getSchema());
             }
@@ -180,7 +180,7 @@ namespace Ent
             || (&m_schema->singularItems->get() == _node->getSchema()));
         m_data.emplace_back(std::move(_node));
         m_arraySize.set(m_arraySize.get() + 1);
-        auto const node = m_data.back().get();
+        auto* const node = m_data.back().get();
         node->setAddedInInsance(_addedInInstance);
         return node;
     }
@@ -242,7 +242,7 @@ namespace Ent
 
     void Vector::checkParent(Node const* _parentNode) const
     {
-        for (auto& elt : m_data)
+        for (const auto& elt : m_data)
         {
             elt->checkParent(_parentNode);
         }

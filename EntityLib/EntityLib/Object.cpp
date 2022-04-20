@@ -70,7 +70,7 @@ namespace Ent
             newnodes.emplace_back(name, node->makeInstanceOf(), fieldIdx);
         }
         std::sort(begin(newnodes), end(newnodes), CompObject());
-        return Object(schema, std::move(newnodes), instanceOf.makeInstanceOf(), 0, true);
+        return {schema, std::move(newnodes), instanceOf.makeInstanceOf(), 0, true};
     }
 
     Object Object::detach() const
@@ -82,7 +82,7 @@ namespace Ent
             newnodes.emplace_back(name, node->detach(), fieldIdx);
         }
         std::sort(begin(newnodes), end(newnodes), CompObject());
-        return Object(schema, std::move(newnodes));
+        return {schema, std::move(newnodes)};
     }
 
     void Object::resetInstanceOf(char const* _prefabNodePath)
@@ -193,7 +193,7 @@ namespace Ent
 
     NodeRef Object::computeNodeRefToChild(Node const* _child) const
     {
-        for (auto& field : nodes)
+        for (const auto& field : nodes)
         {
             if (_child == field.node.get())
             {
@@ -205,7 +205,8 @@ namespace Ent
 
     size_t count(Object const& obj, char const* key)
     {
-        auto const range = std::equal_range(begin(obj), end(obj), ObjField{key, nullptr, 0}, CompObject());
+        auto const range =
+            std::equal_range(begin(obj), end(obj), ObjField{key, nullptr, 0}, CompObject());
         return static_cast<size_t>(std::distance(range.first, range.second));
     }
     void emplace(Object& obj, ObjField const& value)

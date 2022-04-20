@@ -60,7 +60,7 @@ namespace Ent
             case DataType::object:
                 if (meta.keyField.has_value())
                 {
-                    auto const keyNode = _child->at(meta.keyField->c_str());
+                    auto* const keyNode = _child->at(meta.keyField->c_str());
                     switch (keyNode->getDataType())
                     {
                     case DataType::string:
@@ -182,7 +182,7 @@ namespace Ent
             case DataType::object:
                 if (meta.keyField.has_value())
                 {
-                    auto const keyNode = _child->at(meta.keyField->c_str());
+                    const auto* const keyNode = _child->at(meta.keyField->c_str());
                     switch (keyNode->getDataType())
                     {
                     case DataType::string: return keyNode->getString(); break;
@@ -482,7 +482,7 @@ namespace Ent
         {
             for (auto const& key_index : m_itemMap)
             {
-                auto& elt = m_items[std::get<1>(key_index)];
+                const auto& elt = m_items[std::get<1>(key_index)];
                 if (notAGhostElement(elt))
                 {
                     result.push_back(elt.node.get());
@@ -560,14 +560,14 @@ namespace Ent
         ENTLIB_ASSERT(m_schema->singularItems != nullptr);
         auto const& overridePolicy = std::get<Subschema::ArrayMeta>(m_schema->meta).overridePolicy;
         ENTLIB_ASSERT(overridePolicy == "map" or overridePolicy == "set");
-        auto const singItem = &m_schema->singularItems->get();
-        for (auto& itm : m_items)
+        auto* const singItem = &m_schema->singularItems->get();
+        for (const auto& itm : m_items)
         {
             ENTLIB_ASSERT(singItem == itm.node->getSchema());
         }
-        for (auto& key_item : m_itemMap)
+        for (const auto& key_item : m_itemMap)
         {
-            auto const itemSchema = m_items.at(std::get<1>(key_item)).node->getSchema();
+            const auto* const itemSchema = m_items.at(std::get<1>(key_item)).node->getSchema();
             ENTLIB_ASSERT(singItem == itemSchema);
         }
     }
@@ -654,34 +654,19 @@ namespace Ent
     size_t Map::size() const
     {
         return static_cast<size_t>(std::count_if(
-            begin(m_items),
-            end(m_items),
-            [](auto&& d)
-            {
-                return d.isPresent.get();
-            }));
+            begin(m_items), end(m_items), [](auto&& d) { return d.isPresent.get(); }));
     }
 
     size_t Map::getDefaultSize() const
     {
         return static_cast<size_t>(std::count_if(
-            begin(m_items),
-            end(m_items),
-            [](Element const& d)
-            {
-                return d.isPresent.getDefault();
-            }));
+            begin(m_items), end(m_items), [](Element const& d) { return d.isPresent.getDefault(); }));
     }
 
     size_t Map::getPrefabSize() const
     {
         return static_cast<size_t>(std::count_if(
-            begin(m_items),
-            end(m_items),
-            [](Element const& d)
-            {
-                return d.isPresent.getPrefab();
-            }));
+            begin(m_items), end(m_items), [](Element const& d) { return d.isPresent.getPrefab(); }));
     }
 
     void Map::computeMemory(MemoryProfiler& _prof) const
@@ -748,7 +733,7 @@ namespace Ent
 
     void Map::checkParent(Node const* _parentNode) const
     {
-        for (auto& elt : m_items)
+        for (const auto& elt : m_items)
         {
             elt.node->checkParent(_parentNode);
         }
@@ -765,9 +750,9 @@ namespace Ent
         keys.reserve(m_items.size());
         if (_forceSort)
         {
-            for (auto& [key, idx] : m_itemMap)
+            for (const auto& [key, idx] : m_itemMap)
             {
-                auto& item = m_items[idx];
+                const auto& item = m_items[idx];
                 if (item.isPresent.get())
                 {
                     keys.push_back(std::get<String>(getChildKey(m_schema, item.node.get())));
@@ -776,7 +761,7 @@ namespace Ent
         }
         else
         {
-            for (auto& elt : m_items)
+            for (const auto& elt : m_items)
             {
                 if (elt.isPresent.get())
                 {
@@ -798,9 +783,9 @@ namespace Ent
         keys.reserve(m_items.size());
         if (_forceSort)
         {
-            for (auto& [key, idx] : m_itemMap)
+            for (const auto& [key, idx] : m_itemMap)
             {
-                auto& item = m_items[idx];
+                const auto& item = m_items[idx];
                 if (item.isPresent.get())
                 {
                     keys.push_back(std::get<int64_t>(getChildKey(m_schema, item.node.get())));
@@ -809,7 +794,7 @@ namespace Ent
         }
         else
         {
-            for (auto& elt : m_items)
+            for (const auto& elt : m_items)
             {
                 if (elt.isPresent.get())
                 {
@@ -859,9 +844,9 @@ namespace Ent
 
     NodeRef Map::computeNodeRefToChild(Node const* _child) const
     {
-        for (auto& [key, idx] : m_itemMap)
+        for (const auto& [key, idx] : m_itemMap)
         {
-            auto& item = m_items[idx];
+            const auto& item = m_items[idx];
             if (item.isPresent.get() and getEltValue(m_schema, item) == _child)
             {
                 return std::visit(KeyToString{}, key);

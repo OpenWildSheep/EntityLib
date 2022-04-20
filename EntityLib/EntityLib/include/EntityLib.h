@@ -175,7 +175,7 @@ namespace Ent
 
         Node* getParentEntity(Node* _node) const; ///< Get the parent Entity Node
         Node const* getParentEntity(Node const* _node) const; ///< Get the parent Entity Node
-        std::optional<Property> getParentEntity(Property _node) const; ///< Get the parent Entity Property
+        std::optional<Property> getParentEntity(const Property& _node) const; ///< Get the parent Entity Property
 
         nlohmann::json& readJsonFile(char const* _filepath) const;
         nlohmann::json& createTempJsonFile() const;

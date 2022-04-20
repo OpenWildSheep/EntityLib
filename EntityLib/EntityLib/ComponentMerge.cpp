@@ -131,7 +131,7 @@ namespace Ent
         {
             json mergedDefinition = *defs.defintions.back();
             defs.defintions.pop_back();
-            for (auto* def : defs.defintions)
+            for (const auto* def : defs.defintions)
             {
                 printf("Merged type : %s\n", name.c_str());
                 if (def->count("properties") != 0)
@@ -182,7 +182,7 @@ namespace Ent
     void updateComponents(std::filesystem::path const& _toolsDir)
     {
         json sceneSch = mergeComponents(_toolsDir);
-        auto mergedComponentsSchemaLocation = "WildPipeline/Schema/MergedComponents.json";
+        const auto* mergedComponentsSchemaLocation = "WildPipeline/Schema/MergedComponents.json";
         auto mergedSchemaPath = _toolsDir / mergedComponentsSchemaLocation;
         {
             std::stringstream buffer;
@@ -226,7 +226,7 @@ namespace Ent
         EntityLib entlib(_toolsDir.parent_path());
         json fullWildSchema = createValidationSchema(entlib.schema.schema);
         {
-            auto fullWildSchemaLocation = "WildPipeline/Schema/TextEditorsSchema.json";
+            const auto* fullWildSchemaLocation = "WildPipeline/Schema/TextEditorsSchema.json";
             std::stringstream buffer;
             buffer << fullWildSchema.dump(4);
 

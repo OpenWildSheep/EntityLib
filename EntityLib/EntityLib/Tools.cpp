@@ -50,9 +50,9 @@ namespace Ent
 
     std::string_view getRefTypeName(char const* link)
     {
-        if (auto const defPos = strrchr(link, '/'))
+        if (const auto* const defPos = strrchr(link, '/'))
         {
-            if (auto const dotjson = strstr(defPos + 1, ".json"))
+            if (const auto* const dotjson = strstr(defPos + 1, ".json"))
             {
                 return {defPos + 1, static_cast<size_t>(dotjson - (defPos + 1))};
             }

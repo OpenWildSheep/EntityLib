@@ -137,14 +137,15 @@ namespace Ent
         Meta meta{}; ///< Contains meta data for any type of Node
 
         // helper methods
-        bool IsDeprecated() const; ///< Is this node deprecated? (access to meta data)
-        bool IsUsedInEditor() const; ///< Is this node used in editor? (access to meta data)
-        bool IsUsedInRuntime() const; ///< Is this node used in runtime? (access to meta data)
-        bool IsRuntimeOnly() const /// Is this node used in runtime only? (access to meta data)
+        [[nodiscard]] bool IsDeprecated() const; ///< Is this node deprecated? (access to meta data)
+        [[nodiscard]] bool IsUsedInEditor() const; ///< Is this node used in editor? (access to meta data)
+        [[nodiscard]] bool IsUsedInRuntime() const; ///< Is this node used in runtime? (access to meta data)
+        [[nodiscard]] bool IsRuntimeOnly() const /// Is this node used in runtime only? (access to meta data)
         {
             return IsUsedInRuntime() && !IsUsedInEditor();
         }
-        bool IsEditorOnly() const /// Is this node used in editor only? (access to meta data)
+
+        [[nodiscard]] bool IsEditorOnly() const /// Is this node used in editor only? (access to meta data)
         {
             return !IsUsedInRuntime() && IsUsedInEditor();
         }
@@ -152,7 +153,7 @@ namespace Ent
         /// @brief Get all types acceptable in the union, with their names
         /// @throw BadType if the schema is not a oneOf
         /// @throw MissingMetadata if the schema doesn't have a meta className and classData
-        std::map<std::string, Subschema const*> getUnionTypesMap() const;
+        [[nodiscard]] std::map<std::string, Subschema const*> getUnionTypesMap() const;
 
         /// @brief Get the Subschema related to the given \p _type (className)
         /// @throw BadType if the schema is not a oneOf
@@ -163,19 +164,19 @@ namespace Ent
         /// @brief Get the name of the json field containing the type name
         /// @throw BadType if the schema is not a oneOf
         /// @throw MissingMetadata if the schema doesn't have a meta className and classData
-        char const* getUnionNameField() const;
+        [[nodiscard]] char const* getUnionNameField() const;
 
         /// @brief Get the name of the json field containing the data
         /// @throw BadType if the schema is not a oneOf
         /// @throw MissingMetadata if the schema doesn't have a meta className and classData
-        char const* getUnionDataField() const;
+        [[nodiscard]] char const* getUnionDataField() const;
 
-        char const* getUnionDefaultTypeName() const;
+        [[nodiscard]] char const* getUnionDefaultTypeName() const;
 
         /// @brief Get the type of the Key of a map or set
-        DataType getMapKeyType() const;
+        [[nodiscard]] DataType getMapKeyType() const;
 
-        DataKind getDataKind() const;
+        [[nodiscard]] DataKind getDataKind() const;
 
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue = nlohmann::json;
@@ -227,7 +228,7 @@ namespace Ent
         DeleteCheck deleteCheck;
         /// @endcond
 
-        Subschema const& get() const; //!< Get the referenced subschema
+        [[nodiscard]] Subschema const& get() const; //!< Get the referenced subschema
         Subschema& get(); //!< Get the referenced subschema
 
         Subschema const& operator*() const; //!< Get the referenced subschema
@@ -236,7 +237,7 @@ namespace Ent
         Subschema* operator->(); //!< Get the referenced subschema
 
         /// Get the default values beside a "$ref", or nullptr
-        DefaultValue const* getRefDefaultValues() const
+        [[nodiscard]] DefaultValue const* getRefDefaultValues() const
         {
             if (std::holds_alternative<Ref>(subSchemaOrRef)
                 && !std::get<Ref>(subSchemaOrRef).defaultValue.is_null())
@@ -246,13 +247,13 @@ namespace Ent
             return nullptr;
         }
 
-        char const* getDescription() const
+        [[nodiscard]] char const* getDescription() const
         {
-            if (auto const ref = std::get_if<Ref>(&subSchemaOrRef))
+            if (const auto* const ref = std::get_if<Ref>(&subSchemaOrRef))
             {
                 return ref->description.c_str();
             }
-            if (auto const schema = std::get_if<Subschema>(&subSchemaOrRef))
+            if (const auto* const schema = std::get_if<Subschema>(&subSchemaOrRef))
             {
                 return schema->description.c_str();
             }

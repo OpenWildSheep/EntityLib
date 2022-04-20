@@ -15,7 +15,7 @@ class PrintNode : public RecursiveVisitor
 {
     size_t tab = 0;
 
-    std::string getTab() const
+    [[nodiscard]] std::string getTab() const
     {
         return std::string(tab * 4, ' ');
     }
@@ -71,11 +71,11 @@ public:
     {
         --tab;
     }
-    void inPrimSet([[maybe_unused]] Property& _prop, DataType) override
+    void inPrimSet([[maybe_unused]] Property& _prop, DataType /*_dataType*/) override
     {
         ++tab;
     }
-    void inArrayElement([[maybe_unused]] Property& _prop, size_t) override
+    void inArrayElement([[maybe_unused]] Property& _prop, size_t /*_index*/) override
     {
     }
     void outArrayElement([[maybe_unused]] Property& _prop) override
@@ -168,7 +168,7 @@ class CompareNode : public RecursiveVisitor
     std::vector<Node*> nodes;
 
 public:
-    CompareNode(Node* n)
+    explicit CompareNode(Node* n)
         : nodes({n})
     {
     }
@@ -189,7 +189,7 @@ public:
     void outObject([[maybe_unused]] Property& _prop) override
     {
     }
-    void inUnion([[maybe_unused]] Property& _prop, char const*) override
+    void inUnion([[maybe_unused]] Property& _prop, char const* /*_type*/) override
     {
         //ENTLIB_ASSERT(strcmp(expl.getUnionType(), nodes.back()->getUnionType()) == 0);
         //ENTLIB_ASSERT(strcmp(nodes.back()->getUnionType(), type) == 0);
@@ -218,7 +218,7 @@ public:
             if (nodes.back()->getKeysString().size() != expl.getMapKeysString().size())
             {
                 std::cout << nodes.back()->getKeysString().size() << " "
-                    << expl.getMapKeysString().size() << std::endl;
+                          << expl.getMapKeysString().size() << std::endl;
             }
             ENTLIB_ASSERT(nodes.back()->getKeysString().size() == expl.getMapKeysString().size());
             break;
@@ -246,10 +246,10 @@ public:
     {
         nodes.pop_back();
     }
-    void inPrimSet(Property& expl, DataType) override
+    void inPrimSet(Property& expl, DataType /*_dataType*/) override
     {
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
-        auto const& itemType = expl.getSchema()->singularItems.get()->get();
+        auto const& itemType = expl.getSchema()->singularItems->get();
         switch (itemType.type)
         {
         case DataType::string:
@@ -291,7 +291,7 @@ public:
     }
     void inUnionSetElement([[maybe_unused]] Property& _prop, char const* type) override
     {
-        auto const union_ = nodes.back()->mapGet(type);
+        auto* const union_ = nodes.back()->mapGet(type);
         ENTLIB_ASSERT(union_ != nullptr);
         nodes.push_back(union_->getUnionData());
         ENTLIB_ASSERT(nodes.back() != nullptr);
@@ -379,7 +379,7 @@ public:
         if (strcmp(expl.getString(), nodes.back()->getString()) != 0)
         {
             std::cout << expl.getString() << " " << nodes.back()->getString() << std::endl;
-            [[maybe_unused]] auto val = expl.getString();
+            [[maybe_unused]] const auto* val = expl.getString();
         }
         ENTLIB_ASSERT(strcmp(expl.getString(), nodes.back()->getString()) == 0);
     }
@@ -405,7 +405,7 @@ class CompareCursor : public RecursiveVisitor
     }
 
 public:
-    CompareCursor(Property _expl2)
+    explicit CompareCursor(Property _expl2)
         : expl2(std::move(_expl2))
     {
     }
@@ -416,8 +416,8 @@ public:
             ENTLIB_ASSERT(expl2.hasPrefab());
             ENTLIB_ASSERT(_prop.getPrefab().getRawJson() == expl2.getPrefab().getRawJson());
         }
-        auto const a = _prop.getInstanceOf();
-        auto const b = expl2.getInstanceOf();
+        const auto* const a = _prop.getInstanceOf();
+        const auto* const b = expl2.getInstanceOf();
         ENTLIB_ASSERT(
             (a == nullptr and b == nullptr)
             or (a != nullptr and b != nullptr and a == std::string_view(b)));
@@ -470,10 +470,10 @@ public:
     {
         pop();
     }
-    void inPrimSet(Property& _prop, DataType) override
+    void inPrimSet(Property& _prop, DataType /*_dataType*/) override
     {
         ENTLIB_ASSERT(expl2.size() == _prop.size());
-        auto const& itemType = _prop.getSchema()->singularItems.get()->get();
+        auto const& itemType = _prop.getSchema()->singularItems->get();
         switch (itemType.type)
         {
         case DataType::string:
@@ -533,7 +533,7 @@ public:
             auto const b = _prop.getObjectSetKeysString();
             ENTLIB_ASSERT(a.size() == b.size());
             ENTLIB_ASSERT(expl2.getSchema() == _prop.getSchema());
-            for (auto name : a)
+            for (const auto* name : a)
             {
                 ENTLIB_ASSERT(b.count(name));
             }
@@ -551,8 +551,8 @@ public:
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
-            auto const a = _prop.getPrefab().getRawJson();
-            auto const b = expl2.getPrefab().getRawJson();
+            const auto* const a = _prop.getPrefab().getRawJson();
+            const auto* const b = expl2.getPrefab().getRawJson();
             ENTLIB_ASSERT(a == b);
         }
     }
@@ -614,11 +614,11 @@ class PrimitiveCounterVisitor : public RecursiveVisitor
 public:
     size_t primitiveCount = 0;
 
-    void key([[maybe_unused]] Property& _prop, char const*) override
+    void key([[maybe_unused]] Property& _prop, char const* /*_key*/) override
     {
         ++primitiveCount;
     }
-    void key([[maybe_unused]] Property& _prop, int64_t) override
+    void key([[maybe_unused]] Property& _prop, int64_t /*_key*/) override
     {
         ++primitiveCount;
     }
@@ -688,7 +688,7 @@ size_t countNodes(Node* node)
             break;
         case "set"_hash:
         {
-            auto& itemType = node->getSchema()->singularItems.get()->get();
+            auto& itemType = node->getSchema()->singularItems->get();
             switch (itemType.type)
             {
             case DataType::integer:
@@ -763,7 +763,7 @@ void testCursor(EntityLib& entlib)
         std::string filedata;
         std::getline(ifstr, filedata, static_cast<char>(0));
         auto& d = entlib.readJsonFile("test.SeedPatch.node");
-        auto& schema = d["$schema"].get_ref<nlohmann::json::string_t const&>();
+        const auto& schema = d["$schema"].get_ref<nlohmann::json::string_t const&>();
         auto typeName = std::string(getRefTypeName(schema.c_str()));
         Property simpleObject(&entlib, entlib.getSchema(typeName.c_str()), "test.SeedPatch.node", &d);
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeX").getFloat() == 1.f);

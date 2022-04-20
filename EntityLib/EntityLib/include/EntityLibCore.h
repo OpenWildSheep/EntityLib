@@ -30,15 +30,15 @@ namespace Ent
     struct JsonValidation : std::runtime_error
     {
         /// Make a JsonValidation with the given _message
-        JsonValidation(std::string _message)
-            : std::runtime_error(std::move(_message)){};
+        explicit JsonValidation(const std::string& _message)
+            : std::runtime_error(_message){};
     };
 
     /// A printf-like function which return a std::string
     template <typename... Args>
     std::string format(char const* message, Args&&... args)
     {
-        size_t const len =
+        auto const len =
             static_cast<size_t>(snprintf(nullptr, 0, message, std::forward<Args>(args)...));
         std::string buffer(len, ' ');
         snprintf(buffer.data(), len + 1, message, std::forward<Args>(args)...);
@@ -257,11 +257,7 @@ namespace Ent
         {
             if (str == nullptr)
             {
-                if (ot.str == nullptr)
-                {
-                    return false;
-                }
-                return true;
+                return ot.str != nullptr;
             }
             if (ot.str == nullptr)
             {
@@ -270,17 +266,17 @@ namespace Ent
             return strcmp(str.get(), ot.str.get()) < 0;
         }
 
-        char const* c_str() const
+        [[nodiscard]] char const* c_str() const
         {
             return str == nullptr ? "" : str.get();
         }
 
-        size_t capacity() const
+        [[nodiscard]] size_t capacity() const
         {
             return size();
         }
 
-        size_t size() const
+        [[nodiscard]] size_t size() const
         {
             if (str == nullptr)
             {
@@ -289,7 +285,7 @@ namespace Ent
             return strlen(str.get());
         }
 
-        bool empty() const
+        [[nodiscard]] bool empty() const
         {
             return str == nullptr || size() == 0;
         }
@@ -298,7 +294,7 @@ namespace Ent
         {
             if (str == nullptr)
             {
-                return std::string();
+                return {};
             }
             return std::string(str.get());
         }
@@ -351,8 +347,12 @@ namespace Ent
     struct InvalidKey : std::logic_error
     {
         template <typename Map>
-        static std::string
-        makeError(Map const&, std::string const& key, char const* file, long line, char const* func)
+        static std::string makeError(
+            [[maybe_unused]] Map const& _map,
+            std::string const& key,
+            char const* file,
+            long line,
+            char const* func)
         {
             return format(
                 "%s(%d) : (%s) Can't find key '%s' in map of type '%s'",
@@ -395,18 +395,18 @@ namespace Ent
 
     struct Exception : std::runtime_error
     {
-        Exception(char const* _message = nullptr); ///< ctor
+        explicit Exception(char const* _message = nullptr); ///< ctor
     };
 
     /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
     struct BadType : ContextException
     {
-        BadType(char const* _message = nullptr); ///< ctor
+        explicit BadType(char const* _message = nullptr); ///< ctor
     };
 
     struct BadArrayType : ContextException
     {
-        BadArrayType(char const* _message = nullptr); ///< ctor
+        explicit BadArrayType(char const* _message = nullptr); ///< ctor
     };
 
     /// Exception thrown when a metadata is missing in the json schema
@@ -414,27 +414,27 @@ namespace Ent
     /// Example : oneOf need className and classData
     struct MissingMetadata : ContextException
     {
-        MissingMetadata(char const* _schemaName); ///< ctor
+        explicit MissingMetadata(char const* _schemaName); ///< ctor
     };
 
     /// Exception thrown when trying to switch a Union to a type that woesn't exit
     struct BadUnionType : ContextException
     {
         /// ctor
-        BadUnionType(char const* _type ///< The type/className that doen't exist in this union
+        explicit BadUnionType(char const* _type ///< The type/className that doen't exist in this union
         );
     };
 
     /// Exception thrown when a schema is ill-formed
     struct IllFormedSchema : ContextException
     {
-        IllFormedSchema(char const* _message); ///< ctor
+        explicit IllFormedSchema(char const* _message); ///< ctor
     };
 
     /// Exception thrown when some json data are invalid
     struct InvalidJsonData : ContextException
     {
-        InvalidJsonData(char const* _message); ///< ctor
+        explicit InvalidJsonData(char const* _message); ///< ctor
     };
 
     /// Use FileSystemError rather than filesystem_error, since
@@ -458,7 +458,7 @@ namespace Ent
     /// Exception thrown when some json data are invalid
     struct CantRename : ContextException
     {
-        CantRename(char const* _message) ///< ctor
+        explicit CantRename(char const* _message) ///< ctor
             : ContextException(_message)
         {
         }
@@ -466,7 +466,7 @@ namespace Ent
 
     struct DuplicateKey : ContextException
     {
-        DuplicateKey(std::string const& _message) ///< ctor
+        explicit DuplicateKey(std::string const& _message) ///< ctor
             : ContextException(_message)
         {
         }
@@ -475,7 +475,7 @@ namespace Ent
     /// Exception thrown when some json data are invalid
     struct EmptyKey : ContextException
     {
-        EmptyKey(char const* _message) ///< ctor
+        explicit EmptyKey(char const* _message) ///< ctor
             : ContextException(_message)
         {
         }
@@ -516,20 +516,20 @@ namespace Ent
 
     struct WrongPath : ContextException
     {
-        WrongPath(char const* _message)
+        explicit WrongPath(char const* _message)
             : ContextException(_message)
         {
         }
     };
 
     template <typename V, typename F>
-    static constexpr decltype(std::is_invocable_v<F, V>) doesCompile(F&&)
+    static constexpr decltype(std::is_invocable_v<F, V>) doesCompile([[maybe_unused]] F&& _lambda)
     {
         return std::is_invocable_v<F, V>;
     }
 
 #define ENT_IF_COMPILE(TYPE, PARAM, CODE)                                                          \
-    if constexpr (Ent::doesCompile<TYPE>([](auto&& PARAM) -> decltype(CODE) {}))
+    if constexpr (Ent::doesCompile<TYPE>([](auto && (PARAM)) -> decltype(CODE) {}))
 
     struct Node;
     struct NodeDeleter

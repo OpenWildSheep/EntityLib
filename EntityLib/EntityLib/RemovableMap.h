@@ -28,11 +28,13 @@ namespace Ent
             {
                 return Removable{value->clone(), isPresent.clone(), index};
             }
-            bool hasOverride() const
+
+            [[nodiscard]] bool hasOverride() const
             {
                 return value->hasOverride() || isPresent.hasOverride();
             }
-            bool hasPrefabValue() const
+
+            [[nodiscard]] bool hasPrefabValue() const
             {
                 return value->hasPrefabValue() || isPresent.hasPrefabValue();
             }
@@ -60,7 +62,7 @@ namespace Ent
 
         Value* at(Key const& key);
 
-        size_t size() const;
+        [[nodiscard]] size_t size() const;
 
         void clear();
 
@@ -116,10 +118,7 @@ namespace Ent
         return static_cast<size_t>(std::count_if(
             begin(map),
             end(map),
-            [](auto&& name_removable)
-            {
-                return name_removable.second.isPresent.get();
-            }));
+            [](auto&& name_removable) { return name_removable.second.isPresent.get(); }));
     }
 
     template <typename Key, typename Value>

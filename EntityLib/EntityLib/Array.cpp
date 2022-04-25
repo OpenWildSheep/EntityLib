@@ -118,12 +118,12 @@ namespace Ent
         return std::get<Vector>(m_data).isTuple();
     }
 
-    Node* Array::initAdd(OverrideValueLocation loc, NodeUniquePtr _node, bool _addedInInstance)
+    Node* Array::initAdd(OverrideValueLocation _loc, NodeUniquePtr _node, bool _addedInInstance)
     {
         if (hasKey())
         {
             auto const key = getChildKey(_node.get());
-            return std::get<Map>(m_data).insert(loc, key, std::move(_node), _addedInInstance);
+            return std::get<Map>(m_data).insert(_loc, key, std::move(_node), _addedInInstance);
         }
         return std::get<Vector>(m_data).initPush(std::move(_node), _addedInInstance);
     }

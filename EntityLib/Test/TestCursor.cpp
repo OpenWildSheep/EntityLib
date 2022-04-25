@@ -71,11 +71,11 @@ public:
     {
         --tab;
     }
-    void inPrimSet([[maybe_unused]] Property& _prop, DataType /*_dataType*/) override
+    void inPrimSet([[maybe_unused]] Property& _prop, [[maybe_unused]] DataType _dataType) override
     {
         ++tab;
     }
-    void inArrayElement([[maybe_unused]] Property& _prop, size_t /*_index*/) override
+    void inArrayElement([[maybe_unused]] Property& _prop, [[maybe_unused]] size_t _index) override
     {
     }
     void outArrayElement([[maybe_unused]] Property& _prop) override
@@ -189,7 +189,7 @@ public:
     void outObject([[maybe_unused]] Property& _prop) override
     {
     }
-    void inUnion([[maybe_unused]] Property& _prop, char const* /*_type*/) override
+    void inUnion([[maybe_unused]] Property& _prop, [[maybe_unused]] char const* _type) override
     {
         //ENTLIB_ASSERT(strcmp(expl.getUnionType(), nodes.back()->getUnionType()) == 0);
         //ENTLIB_ASSERT(strcmp(nodes.back()->getUnionType(), type) == 0);
@@ -246,7 +246,7 @@ public:
     {
         nodes.pop_back();
     }
-    void inPrimSet(Property& expl, DataType /*_dataType*/) override
+    void inPrimSet(Property& expl, [[maybe_unused]] DataType _dataType) override
     {
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         auto const& itemType = expl.getSchema()->singularItems->get();
@@ -470,7 +470,7 @@ public:
     {
         pop();
     }
-    void inPrimSet(Property& _prop, DataType /*_dataType*/) override
+    void inPrimSet(Property& _prop, [[maybe_unused]] DataType _dataType) override
     {
         ENTLIB_ASSERT(expl2.size() == _prop.size());
         auto const& itemType = _prop.getSchema()->singularItems->get();
@@ -614,11 +614,11 @@ class PrimitiveCounterVisitor : public RecursiveVisitor
 public:
     size_t primitiveCount = 0;
 
-    void key([[maybe_unused]] Property& _prop, char const* /*_key*/) override
+    void key([[maybe_unused]] Property& _prop, [[maybe_unused]] char const* _key) override
     {
         ++primitiveCount;
     }
-    void key([[maybe_unused]] Property& _prop, int64_t /*_key*/) override
+    void key([[maybe_unused]] Property& _prop, [[maybe_unused]] int64_t _key) override
     {
         ++primitiveCount;
     }

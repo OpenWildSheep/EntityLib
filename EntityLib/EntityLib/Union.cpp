@@ -88,7 +88,7 @@ namespace Ent
     {
         Subschema const* subTypeSchema{};
         std::tie(subTypeSchema, typeIndex) = schema->getUnionTypeWrapper(_type);
-        // TODO(lolo): Loïc - low prio - Find a way to get the super.
+        // TODO : Loïc - low prio - Find a way to get the super.
         //   It could be hard because we are no more in the loading phase, so the super is
         //   now delete.
         Node* unionNode = wrapper->getParentNode();

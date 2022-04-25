@@ -383,7 +383,7 @@ namespace Ent
         }
         if (_data.count("required") != 0u)
         {
-            // TODO(lolo): required
+            // TODO required
         }
         if (_data.count("title") != 0u)
         {
@@ -421,7 +421,7 @@ namespace Ent
         }
     }
 
-    // TODO(lolo): Loïc : (Low prio) It could be good to use a real logger system. (like spdlog for example)
+    // TODO Loïc : (Low prio) It could be good to use a real logger system. (like spdlog for example)
 #ifdef ENTLIB_DEBUG_READSCHEMA
 #define ENTLIB_DEBUG_PRINTF(message, ...) printf(message, __VA_ARGS__);
 #else

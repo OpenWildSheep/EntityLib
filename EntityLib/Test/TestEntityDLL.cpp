@@ -1085,7 +1085,7 @@ try
         ENTLIB_ASSERT(testSetOfObject.SetOfObject().get("A").has_value() == false);
         // - Not possible
         ENTLIB_ASSERT(testSetOfObject.SetOfObject().get("D")->Value().get() == std::string("d"));
-        // TODO(lolo): decomment!!
+        // TODO : decomment!!
         ENTLIB_CHECK_EXCEPTION(
             testSetOfObject.SetOfObject().getProperty().objectSetRename("D", "D2"), Ent::CantRename);
 

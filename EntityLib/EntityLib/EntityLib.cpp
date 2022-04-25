@@ -605,7 +605,7 @@ namespace Ent
             }
             struct NodeWrapper
             {
-                // TODO(lolo): Add default values when C++17
+                //TODO : Add default values when C++17
                 NodeUniquePtr node;
                 OverrideValueLocation loc;
                 bool removed;
@@ -1428,7 +1428,7 @@ namespace Ent
                 json data;
                 uint32_t index = 0;
 
-                // TODO(lolo): Remove when C++20
+                // TODO : Remove when C++20
                 JsonField(char const* _name, json _data, uint32_t _index = 0)
                     : name(_name)
                     , data(std::move(_data))

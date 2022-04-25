@@ -386,7 +386,7 @@ namespace Ent
         { // It is a Union in a UnionSet and the Union object is still declared in json
             auto&& unionSchema = _parent.getSchema()->singularItems->get();
             auto const* dataField = unionSchema.getUnionDataField();
-            // TODO(lolo): Change to default value according to type
+            // TODO : Change to default value according to type
             setRawJson(&((*m_wrapper)[dataField] = json::object()));
             return;
         }
@@ -495,8 +495,7 @@ namespace Ent
             auto* unionSchema = &_parent.m_schema.base->singularItems->get();
             auto const* typeField = unionSchema->getUnionNameField();
             auto const* dataField = unionSchema->getUnionDataField();
-            wrapper[dataField] = json::object();
-            // TODO(lolo): Change to default value according to type
+            wrapper[dataField] = json::object(); // TODO : Change to default value according to type
             wrapper[typeField] = fieldName;
             _parent.m_values->push_back(std::move(wrapper));
             newLayerJson = &(*_parent.m_values)[(*_parent.m_values).size() - 1][dataField];

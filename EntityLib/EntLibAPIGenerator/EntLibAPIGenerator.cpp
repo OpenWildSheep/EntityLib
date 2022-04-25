@@ -602,7 +602,7 @@ static void giveNameToAnonymousObjectRef(
             if (not _ref->name.empty())
             {
                 // The same enum can be descibe several time
-                // TODO(lolo): Loïc : Fix the export of enums in Wild (Export each enum only one time, like classes)
+                // TODO : Loïc : Fix the export of enums in Wild (Export each enum only one time, like classes)
                 addDef(_ref->name, &(*_ref), "", true);
             }
             else

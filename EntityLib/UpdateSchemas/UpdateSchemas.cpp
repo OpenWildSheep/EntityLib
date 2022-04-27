@@ -19,9 +19,9 @@ try
         return EXIT_FAILURE;
     }
 
-    char const* mergedCompSchemaPath = "WildPipeline/Schema/MergedComponents.json";
-    char const* textEditorSchemaPath = "WildPipeline/Schema/TextEditorsSchema.json";
-    char const* allSingleSchemaPath = "WildPipeline/Schema/all";
+    auto const* mergedCompSchemaPath = "WildPipeline/Schema/MergedComponents.json";
+    auto const* textEditorSchemaPath = "WildPipeline/Schema/TextEditorsSchema.json";
+    auto const* allSingleSchemaPath = "WildPipeline/Schema/all";
     char editCmd[1024];
     // Edit MergedComponents.json
     sprintf_s(editCmd, sizeof(editCmd), R"(p4 edit "%s/%s")", argv[1], mergedCompSchemaPath);
@@ -46,8 +46,8 @@ try
     Ent::updateComponents(argv[1]);
 
     // Make the list of files to restore and files to add
-    auto fileToRestorePath = std::filesystem::temp_directory_path() / "tempRestoreFileList.txt";
-    auto fileToAddPath = std::filesystem::temp_directory_path() / "tempAddFileList.txt";
+    auto fileToRestorePath = temp_directory_path() / "tempRestoreFileList.txt";
+    auto fileToAddPath = temp_directory_path() / "tempAddFileList.txt";
     {
         std::ofstream fileToRestore(fileToRestorePath);
         if (not fileToRestore.is_open())

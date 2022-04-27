@@ -3,9 +3,7 @@
 
 namespace Ent
 {
-    void Property::copyInto(
-        Property& _dest, CopyMode // _copyMode
-    )
+    void Property::copyInto(Property& _dest, [[maybe_unused]] CopyMode _copyMode)
     {
         CopyProperty copier(_dest, OverrideValueSource::OverrideOrPrefab);
         visitRecursive(*this, copier);
@@ -24,15 +22,15 @@ namespace Ent
     void Property::applyToPrefab()
     {
         // Have to remove removed items in arrays
-        auto prefabSource = getPrefab();
-        auto prefabPath = prefabSource.getFilePath();
+        auto const prefabSource = getPrefab();
+        auto const* const prefabPath = prefabSource.getFilePath();
         auto& newJson = getEntityLib()->createTempJsonFile();
         newJson = getEntityLib()->readJsonFile(prefabPath);
-        auto clonedPrefab = Property(getEntityLib(), getSchema(), prefabPath, &newJson);
+        auto const clonedPrefab = Property(getEntityLib(), getSchema(), prefabPath, &newJson);
         CopyProperty copier(clonedPrefab, OverrideValueSource::Override, false);
         visitRecursive(*this, copier);
         clonedPrefab.save();
-        for (auto field : getFieldNames())
+        for (auto const* const field : getFieldNames())
         {
             getObjectField(field).unset();
         }
@@ -47,7 +45,7 @@ namespace Ent
         visitRecursive(currentItem, copier);
         return newItem;
     }
-    Property Property::mapRename(int64_t _current, int64_t _new)
+    Property Property::mapRename(int64_t _current, int64_t _new) const
     {
         auto newItem = insertMapItem(_new);
         CopyProperty copier(newItem, OverrideValueSource::OverrideOrPrefab, true);
@@ -56,7 +54,7 @@ namespace Ent
         eraseMapItem(_current);
         return newItem;
     }
-    Property Property::unionSetRename(char const* _current, char const* _new)
+    Property Property::unionSetRename(char const* _current, char const* _new) const
     {
         auto newItem = insertUnionSetItem(_new);
         CopyProperty copier(newItem, OverrideValueSource::OverrideOrPrefab, true);
@@ -65,9 +63,9 @@ namespace Ent
         eraseUnionSetItem(_current);
         return newItem;
     }
-    Property Property::objectSetRename(char const* _current, char const* _new)
+    Property Property::objectSetRename(char const* _current, char const* _new) const
     {
-        auto prefab = getPrefab();
+        auto const prefab = getPrefab();
         if (prefab.objectSetContains(_current))
         {
             throw CantRename(staticFormat(
@@ -82,7 +80,7 @@ namespace Ent
         ENTLIB_DBG_ASSERT(objectSetContains(_new));
         return newItem;
     }
-    Property Property::objectSetRename(int64_t _current, int64_t _new)
+    Property Property::objectSetRename(int64_t _current, int64_t _new) const
     {
         auto newItem = insertObjectSetItem(_new);
         CopyProperty copier(newItem, OverrideValueSource::OverrideOrPrefab, true);

@@ -15,7 +15,7 @@ namespace Ent
             Subschema const* _schema,
             NodeUniquePtr _wrapper,
             size_t _typeIndex,
-            Override<Ent::String> _instanceOf);
+            Override<String> _instanceOf);
         Union(Union const& _other);
         Union(Union&&) = default;
         Union& operator=(Union const& _other);
@@ -25,16 +25,17 @@ namespace Ent
         Subschema const* schema = nullptr; ///< The schema of the object containing the oneOf field
         size_t typeIndex = 0; ///< Index of the type
         NodeUniquePtr wrapper; ///< Node containing the className/classData
-        Ent::Subschema::UnionMeta const* metaData = nullptr;
-        Override<Ent::String> instanceOf;
+        Subschema::UnionMeta const* metaData = nullptr;
+        Override<String> instanceOf;
 
         bool typeOverriden = false;
 
-        bool hasOverride() const; ///< Recursively check if there is an override inside.
-        bool hasDefaultValue() const;
-        Node* getUnionData(); ///< return the underlying data (The type is given by getUnionType)
-        Node const* getUnionData() const; ///< return the underlying data (The type is given by getUnionType)
-        char const* getUnionType() const; ///< Get the type inside the union
+        [[nodiscard]] bool hasOverride() const; ///< Recursively check if there is an override inside.
+        [[nodiscard]] bool hasDefaultValue() const;
+        [[nodiscard]] Node* getUnionData(); ///< return the underlying data (The type is given by getUnionType)
+        [[nodiscard]] Node const*
+        getUnionData() const; ///< return the underlying data (The type is given by getUnionType)
+        [[nodiscard]] char const* getUnionType() const; ///< Get the type inside the union
         /// @brief Change the type inside the union
         /// @pre type match with a type declared inside the json "oneOf"
         Node* setUnionType(char const* _type);
@@ -45,16 +46,16 @@ namespace Ent
 
         void applyAllValues(Union& _dest, CopyMode _copyMode) const;
 
-        Union detach() const;
+        [[nodiscard]] Union detach() const;
 
-        Union makeInstanceOf() const;
+        [[nodiscard]] Union makeInstanceOf() const;
 
-        bool hasPrefabValue() const;
+        [[nodiscard]] bool hasPrefabValue() const;
 
-        void setParentNode(Node* _parentNode);
+        void setParentNode(Node* _parentNode) const;
         void checkParent(Node const* _parentNode) const;
 
-        std::unique_ptr<Union> clone() const;
+        [[nodiscard]] std::unique_ptr<Union> clone() const;
 
         /// @brief Get the child type
         /// @pre \b _child is actually the data contained by this Union

@@ -21,22 +21,22 @@ namespace Ent
 
 using namespace Ent;
 
-static void printNode(char const* name, Ent::Property const& node, std::string const& tab)
+static void printNode(char const* name, Property const& node, std::string const& tab)
 {
     using namespace Ent;
     switch (node.getDataType())
     {
-    case Ent::DataType::null: printfmt("%s%s [null]\n", tab.c_str(), name); break;
-    case Ent::DataType::string:
+    case DataType::null: printfmt("%s%s [null]\n", tab.c_str(), name); break;
+    case DataType::string:
         printfmt("%s%s [string] : %s\n", tab.c_str(), name, node.getString());
         break;
-    case Ent::DataType::number:
+    case DataType::number:
         printfmt("%s%s [number] : %f\n", tab.c_str(), name, node.getFloat());
         break;
-    case Ent::DataType::integer:
+    case DataType::integer:
         printfmt("%s%s [integer] : %lld\n", tab.c_str(), name, node.getInt());
         break;
-    case Ent::DataType::object:
+    case DataType::object:
         printfmt("%s%s [object]\n", tab.c_str(), name);
         for (char const* field : node.getFieldNames())
         {
@@ -45,7 +45,7 @@ static void printNode(char const* name, Ent::Property const& node, std::string c
             printNode(field, sub, tab + "    ");
         }
         break;
-    case Ent::DataType::array:
+    case DataType::array:
         printfmt("%s%s [array]\n", tab.c_str(), name);
         for (size_t i = 0; i < node.size(); ++i)
         {
@@ -54,61 +54,61 @@ static void printNode(char const* name, Ent::Property const& node, std::string c
             printNode(ss.str().c_str(), node.getArrayItem(i), tab + "    ");
         }
         break;
-    case Ent::DataType::boolean:
+    case DataType::boolean:
         printfmt("%s%s [boolean] : %s\n", tab.c_str(), name, node.getBool() ? "true" : "false");
         break;
-    case Ent::DataType::entityRef:
+    case DataType::entityRef:
         printfmt(
             "%s%s [EntityRef] : %s\n", tab.c_str(), name, node.getEntityRef().entityPath.c_str());
         break;
-    case Ent::DataType::oneOf:
+    case DataType::oneOf:
         printfmt("%s%s [Union]\n", tab.c_str(), name);
         printNode("Data", node.getUnionData(), tab + "    ");
         break;
-    case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
+    case DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
     }
 }
 
 static void
-displaySubSchema(std::string const& name, Ent::Subschema const& subschema, std::string const& indent)
+displaySubSchema(std::string const& name, Subschema const& subschema, std::string const& indent)
 {
     if (size(indent) > 80)
     {
         return;
     }
-    Ent::printfmt("%s%s : ", indent.c_str(), name.c_str());
+    printfmt("%s%s : ", indent.c_str(), name.c_str());
     switch (subschema.type)
     {
-    case Ent::DataType::array:
-        Ent::printfmt("array\n");
+    case DataType::array:
+        printfmt("array\n");
         if (subschema.minItems != 0)
         {
-            Ent::printfmt("%s  minItems:%d\n", indent.c_str(), subschema.minItems);
+            printfmt("%s  minItems:%d\n", indent.c_str(), subschema.minItems);
         }
-        if (subschema.maxItems != size_t(-1))
+        if (subschema.maxItems != static_cast<size_t>(-1))
         {
-            Ent::printfmt("%s  maxItems:%d\n", indent.c_str(), subschema.maxItems);
+            printfmt("%s  maxItems:%d\n", indent.c_str(), subschema.maxItems);
         }
         if (subschema.singularItems != nullptr)
         {
             displaySubSchema("items", subschema.singularItems->get(), indent + "  ");
         }
         break;
-    case Ent::DataType::boolean: Ent::printfmt("boolean\n"); break;
-    case Ent::DataType::integer: Ent::printfmt("integer\n"); break;
-    case Ent::DataType::null: Ent::printfmt("null\n"); break;
-    case Ent::DataType::number: Ent::printfmt("number\n"); break;
-    case Ent::DataType::object:
-        Ent::printfmt("object\n");
+    case DataType::boolean: printfmt("boolean\n"); break;
+    case DataType::integer: printfmt("integer\n"); break;
+    case DataType::null: printfmt("null\n"); break;
+    case DataType::number: printfmt("number\n"); break;
+    case DataType::object:
+        printfmt("object\n");
         for (auto&& [propname, sub] : subschema.properties)
         {
             displaySubSchema(propname, *sub, indent + "  ");
         }
         break;
-    case Ent::DataType::string: Ent::printfmt("string\n"); break;
-    case Ent::DataType::entityRef: Ent::printfmt("entity ref\n"); break;
-    case Ent::DataType::oneOf: Ent::printfmt("oneOf\n"); break;
-    case Ent::DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
+    case DataType::string: printfmt("string\n"); break;
+    case DataType::entityRef: printfmt("entity ref\n"); break;
+    case DataType::oneOf: printfmt("oneOf\n"); break;
+    case DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
     }
 }
 
@@ -170,12 +170,12 @@ try
     bool const doMergeComponents = true;
 #endif
 
-    Ent::EntityLib entlib("X:/RawData/..", doMergeComponents);
+    EntityLib entlib("X:/RawData/..", doMergeComponents);
     using namespace std::filesystem;
 
-    entlib.setLogicErrorPolicy(Ent::LogicErrorPolicy::Throw);
+    EntityLib::setLogicErrorPolicy(LogicErrorPolicy::Throw);
     ENTLIB_CHECK_EXCEPTION(ENTLIB_LOGIC_ERROR("Test logic error"), std::logic_error);
-    entlib.setLogicErrorPolicy(Ent::LogicErrorPolicy::Terminate);
+    EntityLib::setLogicErrorPolicy(LogicErrorPolicy::Terminate);
 
     entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
 #ifdef _DEBUG
@@ -198,13 +198,13 @@ try
     }
 
     // Test $ref links in entlib.schema.schema.allDefinitions
-    char const* colorRef = "Color";
+    auto const* colorRef = "Color";
     ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(colorRef) == 1);
 
     // Check Ent::Subschema::getUnionTypesMap
-    char const* cinematicGDRef = "CinematicGD";
-    Ent::Subschema const& cinematicGDSchema = entlib.schema.schema.allDefinitions.at(cinematicGDRef);
-    Ent::Subschema const& scriptEventUnionSchema =
+    auto const* cinematicGDRef = "CinematicGD";
+    Subschema const& cinematicGDSchema = entlib.schema.schema.allDefinitions.at(cinematicGDRef);
+    Subschema const& scriptEventUnionSchema =
         cinematicGDSchema.properties.at("ScriptEvents")->singularItems->get();
     auto&& nameToTypeMap = scriptEventUnionSchema.getUnionTypesMap();
     ENTLIB_ASSERT(size(nameToTypeMap) == 9);
@@ -261,8 +261,8 @@ try
             "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
             "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
             entlib.schema.schema.allDefinitions["Entity"]);
-        auto nodeRef = "Components/SubScene/Embedded/ShamanFullBlue_ent_001";
-        auto ent = node->resolveNodeRef(nodeRef);
+        auto const* nodeRef = "Components/SubScene/Embedded/ShamanFullBlue_ent_001";
+        auto* ent = node->resolveNodeRef(nodeRef);
         auto entpath = node->makeNodeRef(ent);
         ENTLIB_ASSERT(entpath == nodeRef);
         entpath = ent->makeAbsoluteNodeRef();
@@ -285,9 +285,9 @@ try
             "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
             "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
             entlib.schema.schema.allDefinitions["Entity"]);
-        auto nodeRef =
+        auto const* nodeRef =
             R"(Components/SubScene/Embedded/ShamanFullBlue_ent_001/Components/TransformGD)";
-        auto ent = node->resolveNodeRef(nodeRef);
+        auto* ent = node->resolveNodeRef(nodeRef);
         auto entpath = node->makeNodeRef(ent);
         ENTLIB_ASSERT(entpath == nodeRef);
         auto prefabHisto = ent->getPrefabHistory();
@@ -304,28 +304,29 @@ try
     {
         auto node =
             entlib.loadFileAsNode("instance.entity", entlib.schema.schema.allDefinitions["Entity"]);
-        auto nodeRef = R"(Components/SubScene/Embedded/EP1-Spout_LINK_001/Components/NetworkLink)";
-        auto ent = node->resolveNodeRef(nodeRef);
+        auto const* nodeRef =
+            R"(Components/SubScene/Embedded/EP1-Spout_LINK_001/Components/NetworkLink)";
+        auto* ent = node->resolveNodeRef(nodeRef);
         auto entpath = node->makeNodeRef(ent);
         ENTLIB_ASSERT(entpath == nodeRef);
         auto nullPath = ent->makeNodeRef(ent);
         ENTLIB_ASSERT(nullPath.empty() or nullPath == ".");
         // Test Union
-        auto typedValueUnion = node->at("Components")
-                                   ->mapInsert("ScriptComponentGD")
-                                   ->getUnionData()
-                                   ->at("CommonDataMap")
-                                   ->mapInsert("Test")
-                                   ->at("Value");
-        auto typeValueRef = R"(Components/ScriptComponentGD/CommonDataMap/Test/Value)";
+        auto* typedValueUnion = node->at("Components")
+                                    ->mapInsert("ScriptComponentGD")
+                                    ->getUnionData()
+                                    ->at("CommonDataMap")
+                                    ->mapInsert("Test")
+                                    ->at("Value");
+        auto const* typeValueRef = R"(Components/ScriptComponentGD/CommonDataMap/Test/Value)";
         ENTLIB_ASSERT(node->makeNodeRef(typedValueUnion) == typeValueRef);
-        auto stringUnionData = typedValueUnion->setUnionType("string");
-        auto strRef = R"(Components/ScriptComponentGD/CommonDataMap/Test/Value/string)";
+        auto* stringUnionData = typedValueUnion->setUnionType("string");
+        auto const* strRef = R"(Components/ScriptComponentGD/CommonDataMap/Test/Value/string)";
         ENTLIB_ASSERT(node->makeNodeRef(stringUnionData) == strRef);
         ENTLIB_ASSERT(typedValueUnion->makeNodeRef(stringUnionData) == "string");
     }
     entlib.clearCache();
-    auto testPrefabEntity = [&entlib](Ent::Gen::Entity ent)
+    auto testPrefabEntity = [&entlib](Gen::Entity ent)
     {
         // ActorStates
         auto actorStates = ent.ActorStates();
@@ -333,7 +334,7 @@ try
         ENTLIB_ASSERT(actorStates.size() == 2);
         auto actorState = actorStates.ActorStateHoldingItem();
         ENTLIB_ASSERT(actorState.has_value());
-        static_assert(std::is_same_v<decltype(*actorState), Ent::Gen::ActorStateHoldingItem&>);
+        static_assert(std::is_same_v<decltype(*actorState), Gen::ActorStateHoldingItem&>);
         ENTLIB_ASSERT(actorState->getProperty().hasValue());
         auto exitRequired = actorState->ItemEntityRef();
         ENTLIB_ASSERT(exitRequired.getProperty().hasValue());
@@ -488,11 +489,11 @@ try
 
         // Test title/description
         {
-            auto rigodBodyCoeffSchema = ent.Components()
-                                            .CharacterControllerGD()
-                                            ->HeadCollisionData()
-                                            .softCollisionRigidbodyCoeff()
-                                            .getSchema();
+            auto const* rigodBodyCoeffSchema = ent.Components()
+                                                   .CharacterControllerGD()
+                                                   ->HeadCollisionData()
+                                                   .softCollisionRigidbodyCoeff()
+                                                   .getSchema();
             ENTLIB_ASSERT(rigodBodyCoeffSchema->title.find("Rigidbody") != std::string::npos);
             ENTLIB_ASSERT(rigodBodyCoeffSchema->description.find("rigidbody") != std::string::npos);
         }
@@ -598,7 +599,7 @@ try
         ENTLIB_ASSERT(newUnion.getType() == std::string("s32"));
 
         // TEST MaxActivationLevel
-        ent.MaxActivationLevel().set(Ent::Gen::MaxActivationLevelEnum::InWorld);
+        ent.MaxActivationLevel().set(Gen::MaxActivationLevelEnum::InWorld);
 
         auto sysCreat = ent.Components().SystemicCreature();
         ENTLIB_ASSERT(sysCreat->Name().get() == std::string()); // default
@@ -619,7 +620,7 @@ try
         ent.Components().removeTransformGD();
         auto transformGD = ent.Components().addTransformGD();
         auto mat33 = transformGD.Matrix();
-        auto testMat33 = [&]()
+        auto testMat33 = [&]
         {
             ENTLIB_ASSERT(mat33[0].get() == 1.);
             ENTLIB_ASSERT(mat33[0].getDefault() == 1.);
@@ -649,12 +650,12 @@ try
 
         auto comp = ent.Components().TestArrays();
         ENTLIB_ASSERT(comp);
-        const auto testArrayMember = [&](char const* _arrayName,
+        auto const testArrayMember = [&](char const* _arrayName,
                                          size_t defaultSize,
                                          std::optional<size_t> prefabSize,
                                          std::optional<size_t> overrideSize)
         {
-            auto node = comp->getProperty().getObjectField(_arrayName);
+            auto const node = comp->getProperty().getObjectField(_arrayName);
             ENTLIB_ASSERT(node.hasValue());
             ENTLIB_ASSERT(node.hasPrefabValue() == prefabSize.has_value());
             ENTLIB_ASSERT(node.hasOverride() == overrideSize.has_value());
@@ -684,7 +685,7 @@ try
         auto testEntityRef = ent.Components().TestEntityRef();
         ENTLIB_ASSERT(testEntityRef.has_value());
         ENTLIB_ASSERT(testEntityRef->TestRef().isSet());
-        Ent::EntityRef entityRef = testEntityRef->TestRef().get();
+        EntityRef entityRef = testEntityRef->TestRef().get();
         auto resolvedEntity = entlib.resolveEntityRef(ent.getProperty(), entityRef);
         ENTLIB_ASSERT(resolvedEntity.hasValue());
 
@@ -750,7 +751,7 @@ try
         auto testEntityRef = ent.Components().TestEntityRef();
         ENTLIB_ASSERT(testEntityRef.has_value());
         ENTLIB_ASSERT(testEntityRef->TestRef().isSet());
-        Ent::EntityRef entityRef = testEntityRef->TestRef().get();
+        EntityRef entityRef = testEntityRef->TestRef().get();
         auto resolvedEntity = entlib.resolveEntityRef(ent.getProperty(), entityRef);
         ENTLIB_ASSERT(resolvedEntity.hasValue());
 
@@ -785,15 +786,15 @@ try
         ENTLIB_ASSERT(strcmp(C.Name(), "C") == 0);
 
         // TEST entity ref creation
-        Ent::EntityRef BToInstanceOfAref =
+        EntityRef BToInstanceOfAref =
             entlib.makeEntityRef(B.getProperty(), instanceOfA.getProperty());
         ENTLIB_ASSERT(BToInstanceOfAref.entityPath == "..");
-        Ent::EntityRef InstanceOfAToBref =
+        EntityRef InstanceOfAToBref =
             entlib.makeEntityRef(instanceOfA.getProperty(), B.getProperty());
         ENTLIB_ASSERT(InstanceOfAToBref.entityPath == "B");
-        Ent::EntityRef CToBref = entlib.makeEntityRef(C.getProperty(), B.getProperty());
+        EntityRef CToBref = entlib.makeEntityRef(C.getProperty(), B.getProperty());
         ENTLIB_ASSERT(CToBref.entityPath == "../InstanceOfA/B");
-        Ent::EntityRef BToCref = entlib.makeEntityRef(B.getProperty(), C.getProperty());
+        EntityRef BToCref = entlib.makeEntityRef(B.getProperty(), C.getProperty());
         ENTLIB_ASSERT(BToCref.entityPath == "../../C");
 
         // TEST entity ref resolution
@@ -821,7 +822,7 @@ try
             == C.getProperty());
     }
 
-    auto testInstanceOf = [](Ent::Gen::Entity ent, bool testIsSet = true, bool testPrefab = true)
+    auto testInstanceOf = [](Gen::Entity const& ent, bool testIsSet = true, bool testPrefab = true)
     {
         // ActorStates
         auto actorStates = ent.ActorStates();
@@ -885,7 +886,7 @@ try
         // "InstanceOf" in sub entitites
         auto entityWithInstanceOf = *subScene->Embedded().get(R"(EntityWithInstanceOf)");
         ENTLIB_ASSERT(entityWithInstanceOf.Name() == std::string("EntityWithInstanceOf"));
-        if (auto instOf = entityWithInstanceOf.getProperty().getInstanceOf())
+        if (auto const* instOf = entityWithInstanceOf.getProperty().getInstanceOf())
         {
             ENTLIB_ASSERT(instOf == std::string("subentity2.entity"));
         }
@@ -942,8 +943,7 @@ try
             std::ofstream outEnt("instance_applied.entity");
             outEnt << entJson.dump(4);
         }
-        std::filesystem::copy_file(
-            "prefab.entity", "prefab_updated.entity", copy_options::overwrite_existing);
+        copy_file("prefab.entity", "prefab_updated.entity", copy_options::overwrite_existing);
 
         // Do the applyToPrefab
         ent = Gen::Entity::loadCopy(entlib, "instance_applied.entity");
@@ -1181,10 +1181,10 @@ try
         ENTLIB_ASSERT(setOfObject3.get("G")->Value().get() == std::string());
     }
 
-    auto test_erase = [](Ent::Gen::Entity ent)
+    auto test_erase = [](Gen::Entity const& ent)
     {
         auto actorStates = ent.ActorStates();
-        auto pathNodeGD = *ent.Components().TestTagsList();
+        auto const pathNodeGD = *ent.Components().TestTagsList();
         auto tags = pathNodeGD.Tags().Tags();
 
         // Test erase in map (+save/load)
@@ -1192,7 +1192,7 @@ try
         ENTLIB_ASSERT(not tags.get("c").has_value());
 
         // Test insert in map (+save/load)
-        auto e = tags.get("A");
+        auto const e = tags.get("A");
         ENTLIB_ASSERT(e.has_value());
         ENTLIB_ASSERT(e->getDataType() == Ent::DataType::array);
 
@@ -1256,16 +1256,16 @@ try
         auto ent = Gen::Entity::loadCopy(entlib, "instance2.entity");
         testInstanceOf(ent, true, false);
     }
-    auto testInstanceOverrideSubscene = [](Ent::Gen::Entity ent)
+    auto testInstanceOverrideSubscene = [](Gen::Entity const& ent)
     {
         // TEST SubScene (with override)
-        auto subScene = ent.Components().SubScene();
+        auto const subScene = ent.Components().SubScene();
         ENTLIB_ASSERT(subScene.has_value());
-        auto subObj = subScene->Embedded().get("EP1-Spout_LINK_001");
+        auto const subObj = subScene->Embedded().get("EP1-Spout_LINK_001");
         ENTLIB_ASSERT(subObj->Name() == std::string("EP1-Spout_LINK_001"));
 
         // Test an overrided Component
-        auto netLink = subObj->Components().NetworkLink();
+        auto const netLink = subObj->Components().NetworkLink();
         ENTLIB_ASSERT(netLink.has_value());
         ENTLIB_ASSERT(netLink->Source().get() == std::string(".EP1-Spout_"));
         ENTLIB_ASSERT(netLink->Source().isSet() == false);
@@ -1273,7 +1273,7 @@ try
         ENTLIB_ASSERT(netLink->Target().isSet());
 
         // Test a not overrided Component
-        auto trans = subObj->Components().TransformGD();
+        auto const trans = subObj->Components().TransformGD();
         ENTLIB_ASSERT(trans.has_value());
         ENTLIB_ASSERT(trans->Position()[0].get() == 0.0);
     };
@@ -1501,7 +1501,7 @@ try
     auto testCreateInstanceOf = [&entlib](char const* _instancePath)
     {
         // Test read instance of
-        auto ent = Gen::Entity::loadCopy(entlib, _instancePath);
+        auto const ent = Gen::Entity::loadCopy(entlib, _instancePath);
 
         // Test instanciation of a prefab Property
         auto stickToTerrain = *ent.Components().StickToTerrain();
@@ -1512,7 +1512,7 @@ try
         ENTLIB_ASSERT(fabs(stickToTerrain.ZOffset().get() - 10.) < 0.0001);
 
         // TEST read inherited values in inherited component
-        auto heightObj = ent.Components().HeightObj();
+        auto const heightObj = ent.Components().HeightObj();
         ENTLIB_ASSERT(heightObj.has_value());
         ENTLIB_ASSERT(heightObj->Subdivision().get() == 0);
         ENTLIB_ASSERT(not heightObj->Subdivision().isSet());
@@ -1520,7 +1520,7 @@ try
         ENTLIB_ASSERT(not heightObj->DisplaceNoiseList()[0].MapChannel().isSet());
 
         // Test read prefab
-        auto sysCreat = ent.Components().SystemicCreature();
+        auto const sysCreat = ent.Components().SystemicCreature();
         ENTLIB_ASSERT(sysCreat.has_value());
 
         // TEST read setted values
@@ -1579,10 +1579,10 @@ try
     }
 
     // ******************* Test the override of an entity in a SubScene ***************************
-    auto testOverrideSubEntity = [](Ent::Gen::Entity ent)
+    auto testOverrideSubEntity = [](Gen::Entity const& ent)
     {
-        auto subScenecomp = *ent.Components().SubScene();
-        auto allSubEntities = subScenecomp.Embedded();
+        auto const subScenecomp = *ent.Components().SubScene();
+        auto const allSubEntities = subScenecomp.Embedded();
         ENTLIB_ASSERT(allSubEntities.size() == PrefabSubEntityCount);
         ENTLIB_ASSERT(subScenecomp.Embedded().get("EP1-Spout_LINK_001")->Color()[0].get() == 42);
     };
@@ -1595,15 +1595,15 @@ try
     }
 
     // ******************* Test the add of an entity in a SubScene *****************************
-    auto testAddSubEntity = [](Ent::Gen::Entity ent)
+    auto testAddSubEntity = [](Gen::Entity const& ent)
     {
-        auto subScenecomp = *ent.Components().SubScene();
-        auto allSubEntities = subScenecomp.Embedded();
+        auto const subScenecomp = *ent.Components().SubScene();
+        auto const allSubEntities = subScenecomp.Embedded();
         ENTLIB_ASSERT(allSubEntities.size() == PrefabSubEntityCount + 1);
-        auto ent0 = subScenecomp.Embedded().get("EP1-Spout_LINK_001");
-        auto ent1 = subScenecomp.Embedded().get("EP1-Spout_LINK_001_added");
+        auto const ent0 = subScenecomp.Embedded().get("EP1-Spout_LINK_001");
+        auto const ent1 = subScenecomp.Embedded().get("EP1-Spout_LINK_001_added");
         ENTLIB_ASSERT(ent0->Name() == std::string("EP1-Spout_LINK_001"));
-        auto red = ent0->Color()[0];
+        auto const red = ent0->Color()[0];
         ENTLIB_ASSERT(not ent0->hasOverride());
         ENTLIB_ASSERT(red.get() == 255);
         ENTLIB_ASSERT(ent1->Name() == std::string("EP1-Spout_LINK_001_added"));
@@ -1637,7 +1637,7 @@ try
     {
         auto ent = Gen::Entity::loadCopy(entlib, R"(Creature/my_creature_level2.entity)");
         auto subscene =
-            Ent::Gen::Entity(ent.Components().SubScene()->Embedded().getProperty().getArrayItem(0llu))
+            Gen::Entity(ent.Components().SubScene()->Embedded().getProperty().getArrayItem(0llu))
                 .Components()
                 .SubScene()
                 ->Embedded();
@@ -1716,7 +1716,7 @@ try
     auto cinematicCmp = addedEntity.Components().CinematicGD();
     ENTLIB_ASSERT(cinematicCmp.has_value());
 
-    Ent::printfmt("Done\n");
+    printfmt("Done\n");
     return EXIT_SUCCESS;
 }
 catch (std::exception& ex)

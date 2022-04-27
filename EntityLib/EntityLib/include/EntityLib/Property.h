@@ -14,7 +14,8 @@ namespace Ent
             : m_self(_other.m_self == nullptr ? nullptr : _other.m_self->sharedFromThis())
         {
         }
-        Property(PropImplPtr _prop)
+
+        explicit Property(PropImplPtr _prop)
             : m_self(std::move(_prop))
         {
         }
@@ -55,7 +56,7 @@ namespace Ent
             SubschemaRef const* _fieldRef = nullptr ///< Schema of this field (for performance)
         ) const
         {
-            return Property(getPimpl().getObjectField(_field, _fieldRef));
+            return Property{getPimpl().getObjectField(_field, _fieldRef)};
         }
         /// @brief Get the internal data of the union
         /// @pre It is a Union
@@ -183,7 +184,7 @@ namespace Ent
         /// @pre array
         [[nodiscard]] Property push_back() const
         {
-            return getPimpl().push_back();
+            return Property{getPimpl().push_back()};
         }
         [[nodiscard]] bool contains(Key const& _key) const ///< @pre map/set. @return true if it contains _key.
         {
@@ -239,40 +240,40 @@ namespace Ent
 
         /// @brief Ket keys removed in the instance
         /// @pre Is a Map with string keys
-        [[nodiscard]] std::set<char const*, CmpStr> getMapRemovedKeysString()
+        [[nodiscard]] std::set<char const*, CmpStr> getMapRemovedKeysString() const
         {
             return getPimpl().getMapRemovedKeysString();
         }
         /// @brief Ket keys removed in the instance
         /// @pre Is a Map with integer keys
-        [[nodiscard]] std::set<int64_t> getMapRemovedKeysInt()
+        [[nodiscard]] std::set<int64_t> getMapRemovedKeysInt() const
         {
             return getPimpl().getMapRemovedKeysInt();
         }
         /// @brief Ket keys removed in the instance
         /// @pre Is a UnionSet
-        [[nodiscard]] std::map<char const*, Subschema const*, CmpStr> getUnionSetRemovedKeysString()
+        [[nodiscard]] std::map<char const*, Subschema const*, CmpStr> getUnionSetRemovedKeysString() const
         {
             return getPimpl().getUnionSetRemovedKeysString();
         }
         /// @brief Ket keys removed in the instance
         /// @pre Is an ObjectSet with string keys
-        [[nodiscard]] std::set<char const*, CmpStr> getObjectSetRemovedKeysString()
+        [[nodiscard]] std::set<char const*, CmpStr> getObjectSetRemovedKeysString() const
         {
             return getPimpl().getObjectSetRemovedKeysString();
         }
         /// @brief Ket keys removed in the instance
         /// @pre Is an ObjectSet with integer keys
-        [[nodiscard]] std::set<int64_t> getObjectSetRemovedKeysInt()
+        [[nodiscard]] std::set<int64_t> getObjectSetRemovedKeysInt() const
         {
             return getPimpl().getObjectSetRemovedKeysInt();
         }
 
         Property mapRename(char const* _current, char const* _new);
-        Property mapRename(int64_t _current, int64_t _new);
-        Property unionSetRename(char const* _current, char const* _new);
-        Property objectSetRename(char const* _current, char const* _new);
-        Property objectSetRename(int64_t _current, int64_t _new);
+        [[nodiscard]] Property mapRename(int64_t _current, int64_t _new) const;
+        Property unionSetRename(char const* _current, char const* _new) const;
+        Property objectSetRename(char const* _current, char const* _new) const;
+        [[nodiscard]] Property objectSetRename(int64_t _current, int64_t _new) const;
 
         [[nodiscard]] bool mapContains(char const* _key) const ///< Check if the map contains this _key
         {
@@ -371,7 +372,7 @@ namespace Ent
         }
         Property setUnionType(char const* _type) const ///< @pre type==union. @brief Set _value in the instance
         {
-            return getPimpl().setUnionType(_type);
+            return Property{getPimpl().setUnionType(_type)};
         }
 
         void buildPath() const ///< Build json path but not set any value. Usefull for UnionSet items
@@ -391,21 +392,21 @@ namespace Ent
         /// @return The element with key _key
         Property insertUnionSetItem(char const* _key) const
         {
-            return getPimpl().insertUnionSetItem(_key);
+            return Property{getPimpl().insertUnionSetItem(_key)};
         }
         /// @brief Insert _key in the ObjectSet (or do nothing if already in)
         /// @pre is an ObjectSet
         /// @return The element with key _key
         Property insertObjectSetItem(char const* _key) const
         {
-            return getPimpl().insertObjectSetItem(_key);
+            return Property{getPimpl().insertObjectSetItem(_key)};
         }
         /// @brief Insert _key in the ObjectSet (or do nothing if already in)
         /// @pre is an ObjectSet
         /// @return The element with key _key
         Property insertObjectSetItem(int64_t _key) const
         {
-            return getPimpl().insertObjectSetItem(_key);
+            return Property{getPimpl().insertObjectSetItem(_key)};
         }
         /// @brief Insert an element with the given prefab
         ///
@@ -415,21 +416,21 @@ namespace Ent
         /// @return The element with prefab _prefabPath
         Property insertInstanceObjectSetItem(char const* _prefabPath) const
         {
-            return getPimpl().insertInstanceObjectSetItem(_prefabPath);
+            return Property{getPimpl().insertInstanceObjectSetItem(_prefabPath)};
         }
         /// @brief Insert _key in the Map (or do nothing if already in)
         /// @pre is a Map with string keys
         /// @return The element with key _key
         Property insertMapItem(char const* _key) const
         {
-            return getPimpl().insertMapItem(_key);
+            return Property{getPimpl().insertMapItem(_key)};
         }
         /// @brief Insert _key in the Map (or do nothing if already in)
         /// @pre is a Map with integer keys
         /// @return The element with key _key
         Property insertMapItem(int64_t _key) const
         {
-            return getPimpl().insertMapItem(_key);
+            return Property{getPimpl().insertMapItem(_key)};
         }
 
         /// @brief Erase the item _key in the set of string
@@ -580,19 +581,16 @@ namespace Ent
 
         [[nodiscard]] Property getPrefab() const ///< Get the prefab of the Property
         {
-            if (auto prefab = m_self->getPrefab())
+            if (auto* const prefab = m_self->getPrefab())
             {
-                return Property(prefab->sharedFromThis());
+                return Property{prefab->sharedFromThis()};
             }
-            else
-            {
-                return Property();
-            }
+            return {};
         }
 
         [[nodiscard]] Property getParent() const ///< Get the Property which own this one
         {
-            return m_self->getParent();
+            return Property{m_self->getParent()};
         }
 
         [[nodiscard]] EntityLib* getEntityLib() const

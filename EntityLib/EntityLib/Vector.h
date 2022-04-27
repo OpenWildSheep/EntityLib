@@ -21,40 +21,40 @@ namespace Ent
     struct Vector
     {
         explicit Vector(EntityLib const* _entlib = nullptr, Subschema const* _schema = nullptr);
-        Vector(Vector const&);
+        Vector(Vector const& _other);
         Vector(Vector&&) = default;
-        Vector& operator=(Vector const&);
+        Vector& operator=(Vector const& _other);
         Vector& operator=(Vector&&) = default;
 
-        size_t size() const;
+        [[nodiscard]] size_t size() const;
 
-        size_t getDefaultSize() const;
+        [[nodiscard]] size_t getDefaultSize() const;
 
-        size_t getPrefabSize() const;
+        [[nodiscard]] size_t getPrefabSize() const;
 
-        bool hasOverride() const;
-        bool hasPrefabValue() const;
-        bool hasDefaultValue() const;
+        [[nodiscard]] bool hasOverride() const;
+        [[nodiscard]] bool hasPrefabValue() const;
+        [[nodiscard]] bool hasDefaultValue() const;
         Node* at(uint64_t _index);
-        Node const* at(uint64_t _index) const;
+        [[nodiscard]] Node const* at(uint64_t _index) const;
         void checkInvariants() const;
-        std::vector<Node const*> getItems() const;
+        [[nodiscard]] std::vector<Node const*> getItems() const;
         std::vector<Node*> getItems();
         void pop();
-        bool isTuple() const;
+        [[nodiscard]] bool isTuple() const;
         void clear();
         void computeMemory(MemoryProfiler& prof) const;
         Node* push();
         Node* initPush(NodeUniquePtr _node, bool _addedInInstance);
-        Vector detach() const;
-        Vector makeInstanceOf() const;
-        EntityLib const* getEntityLib() const;
-        std::unique_ptr<Vector> clone() const;
-        std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
+        [[nodiscard]] Vector detach() const;
+        [[nodiscard]] Vector makeInstanceOf() const;
+        [[nodiscard]] EntityLib const* getEntityLib() const;
+        [[nodiscard]] std::unique_ptr<Vector> clone() const;
+        [[nodiscard]] std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         void unset();
         void setSize(Override<size_t> _size);
         void applyAllValues(Vector& _dest, CopyMode _copyMode) const;
-        void setParentNode(Node* _parentNode);
+        void setParentNode(Node* _parentNode) const;
         void checkParent(Node const* _parentNode) const;
         std::vector<NodeUniquePtr> releaseAllElements();
         /// Get the child index as a string

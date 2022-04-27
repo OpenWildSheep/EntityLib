@@ -39,9 +39,9 @@ namespace Ent
         return *this;
     }
 
-    void Object::unset()
+    void Object::unset() const
     {
-        for (ObjField& field : nodes)
+        for (ObjField const& field : nodes)
         {
             field.node->unset();
         }
@@ -70,7 +70,7 @@ namespace Ent
             newnodes.emplace_back(name, node->makeInstanceOf(), fieldIdx);
         }
         std::sort(begin(newnodes), end(newnodes), CompObject());
-        return Object(schema, std::move(newnodes), instanceOf.makeInstanceOf(), 0, true);
+        return {schema, std::move(newnodes), instanceOf.makeInstanceOf(), 0, true};
     }
 
     Object Object::detach() const
@@ -82,7 +82,7 @@ namespace Ent
             newnodes.emplace_back(name, node->detach(), fieldIdx);
         }
         std::sort(begin(newnodes), end(newnodes), CompObject());
-        return Object(schema, std::move(newnodes));
+        return {schema, std::move(newnodes)};
     }
 
     void Object::resetInstanceOf(char const* _prefabNodePath)
@@ -90,15 +90,15 @@ namespace Ent
         auto const* entlib = schema->rootSchema->entityLib;
         if (_prefabNodePath == nullptr or strlen(_prefabNodePath) == 0)
         {
-            auto prefabNode = entlib->loadNode(*schema, json{}, nullptr);
+            auto const prefabNode = entlib->loadNode(*schema, json{}, nullptr);
             (*this) = std::get<ObjectPtr>(prefabNode->GetRawValue())->makeInstanceOf();
             instanceOf.set("");
         }
         else
         {
-            auto relPath = entlib->getRelativePath(_prefabNodePath).generic_u8string();
-            json nodeData = loadJsonFile(entlib->rawdataPath, _prefabNodePath);
-            auto prefabNode = entlib->loadNode(*schema, nodeData, nullptr);
+            auto const relPath = entlib->getRelativePath(_prefabNodePath).generic_u8string();
+            json const nodeData = loadJsonFile(entlib->rawdataPath, _prefabNodePath);
+            auto const prefabNode = entlib->loadNode(*schema, nodeData, nullptr);
             // Get the keyfield
             NodeUniquePtr keyField;
             for (ObjField& objfield : nodes)
@@ -193,7 +193,7 @@ namespace Ent
 
     NodeRef Object::computeNodeRefToChild(Node const* _child) const
     {
-        for (auto& field : nodes)
+        for (auto const& field : nodes)
         {
             if (_child == field.node.get())
             {
@@ -205,12 +205,13 @@ namespace Ent
 
     size_t count(Object const& obj, char const* key)
     {
-        auto range = std::equal_range(begin(obj), end(obj), ObjField{key, nullptr, 0}, CompObject());
-        return (size_t)std::distance(range.first, range.second);
+        auto const range =
+            std::equal_range(begin(obj), end(obj), ObjField{key, nullptr, 0}, CompObject());
+        return static_cast<size_t>(std::distance(range.first, range.second));
     }
     void emplace(Object& obj, ObjField const& value)
     {
-        auto range = std::equal_range(begin(obj), end(obj), value, CompObject());
+        auto const range = std::equal_range(begin(obj), end(obj), value, CompObject());
         if (range.first == range.second)
         {
             obj.nodes.insert(range.first, value);

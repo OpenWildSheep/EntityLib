@@ -16,14 +16,11 @@ namespace Ent
         {
             throw MissingMetadata(name.c_str());
         }
-        if (auto iter = unionTypeMap.find(_subtype); iter != unionTypeMap.end())
+        if (auto const iter = unionTypeMap.find(_subtype); iter != unionTypeMap.end())
         {
             return {iter->second.wrapperSchema, iter->second.index};
         }
-        else
-        {
-            throw BadUnionType(_subtype);
-        }
+        throw BadUnionType(_subtype);
     }
     /// @endcond
 
@@ -92,8 +89,8 @@ namespace Ent
 
     char const* Subschema::getUnionDefaultTypeName() const
     {
-        auto fieldName = getUnionNameField();
-        auto& typeSchema = oneOf->front()->properties.at(fieldName);
+        auto const* const fieldName = getUnionNameField();
+        auto const& typeSchema = oneOf->front()->properties.at(fieldName);
         return typeSchema->constValue->get_ptr<nlohmann::json::string_t const*>()->c_str();
     }
 
@@ -109,7 +106,7 @@ namespace Ent
         case DataType::entityRef: return DataKind::entityRef;
         case DataType::oneOf: return DataKind::union_;
         case DataType::array:
-            switch (hash(std::get<Subschema::ArrayMeta>(meta).overridePolicy))
+            switch (hash(std::get<ArrayMeta>(meta).overridePolicy))
             {
             case "map"_hash: return DataKind::map;
             case "set"_hash:

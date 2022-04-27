@@ -26,7 +26,7 @@ namespace Ent
 
             auto const length = file.tellg();
             file.seekg(0, std::ios::beg);
-            std::vector<char> data((size_t(length)));
+            std::vector<char> data(static_cast<size_t>(length));
             file.read(data.data(), length);
             json doc = json::parse(
                 data,
@@ -50,9 +50,9 @@ namespace Ent
 
     std::string_view getRefTypeName(char const* link)
     {
-        if (auto const defPos = strrchr(link, '/'))
+        if (auto const* const defPos = strrchr(link, '/'))
         {
-            if (auto const dotjson = strstr(defPos + 1, ".json"))
+            if (auto const* const dotjson = strstr(defPos + 1, ".json"))
             {
                 return {defPos + 1, static_cast<size_t>(dotjson - (defPos + 1))};
             }
@@ -61,7 +61,7 @@ namespace Ent
         return link;
     }
 
-    std::vector<std::string> splitString(const std::string& _str, char _delimiter, bool _keepEmptyToken)
+    std::vector<std::string> splitString(std::string const& _str, char _delimiter, bool _keepEmptyToken)
     {
         std::vector<std::string> tokens;
         std::string token;
@@ -82,14 +82,14 @@ namespace Ent
         bool _leavesAreLast)
     {
         using PopRootFun = void (*)(std::vector<std::string>&);
-        const auto popRoot =
+        auto const popRoot =
             _leavesAreLast ?
                 static_cast<PopRootFun>([](std::vector<std::string>& _path)
                                         { _path.erase(_path.begin()); }) :
                 static_cast<PopRootFun>([](std::vector<std::string>& _path) { _path.pop_back(); });
 
         using GetRootFun = std::string& (*)(std::vector<std::string>&);
-        const auto getRoot =
+        auto const getRoot =
             _leavesAreLast ?
                 static_cast<GetRootFun>(
                     [](std::vector<std::string>& _path) -> std::string& { return _path.front(); }) :
@@ -112,7 +112,7 @@ namespace Ent
         }
 
         // then go forward to the target
-        const auto appendToPath = [&relativePath](std::string& _pathPart)
+        auto const appendToPath = [&relativePath](std::string& _pathPart)
         {
             relativePath << _pathPart << '/';
         };
@@ -145,7 +145,7 @@ namespace Ent
 
     static double round_n(double value, double multiplier)
     {
-        const auto scaled_value = value * multiplier;
+        auto const scaled_value = value * multiplier;
         return std::round(scaled_value) / multiplier;
     }
 
@@ -160,12 +160,12 @@ namespace Ent
         for (size_t multiplier = 0; multiplier < 100; ++multiplier)
         {
             result = round_n(_val, pow(10, multiplier));
-            if (float(result) == _val)
+            if (static_cast<float>(result) == _val)
             {
                 break;
             }
         }
-        ENTLIB_ASSERT(float(result) == _val);
+        ENTLIB_ASSERT(static_cast<float>(result) == _val);
 
         return result;
     }

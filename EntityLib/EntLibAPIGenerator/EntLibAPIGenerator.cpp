@@ -24,14 +24,14 @@ std::map<std::string, Ent::Subschema const*> allDefs;
 std::map<Ent::Subschema const*, std::string> schemaName;
 json allDefinitions(json::value_t::array);
 
-std::ofstream openOfstream(std::filesystem::path const& _filepath)
+std::ofstream openOfstream(path const& _filepath)
 {
     std::ofstream file;
     file.exceptions(std::ios::badbit | std::ios::eofbit | std::ios::goodbit);
     file.open(_filepath);
     if (not file.is_open())
     {
-        throw FileSystemError("Trying to open file for write", std::filesystem::path(), _filepath);
+        throw FileSystemError("Trying to open file for write", path(), _filepath);
     }
     return file;
 }
@@ -59,13 +59,13 @@ data jsonToMustache(json const& _input)
         }
         return result;
     }
-    case json::value_t::boolean: return data(_input.get<bool>());
+    case json::value_t::boolean: return {_input.get<bool>()};
     case json::value_t::number_float: return data(std::to_string(_input.get<double>()));
     case json::value_t::number_integer: return data(std::to_string(_input.get<int64_t>()));
     case json::value_t::number_unsigned: return data(std::to_string(_input.get<uint64_t>()));
     case json::value_t::string: return data(_input.get<std::string>());
     }
-    return data(false);
+    return {false};
 }
 
 /// @brief In _input, replace all occurences of _before by _after
@@ -93,9 +93,9 @@ static std::string escapeName(std::string _name, std::string_view _toAvoid = {})
     static std::set<std::string> cppKeywordTypes = {
         "float", "bool", "from", "in", "None", "Type", "throw", "do", "default", "class"};
 
-    std::regex eastlNS(R"regex(eastl::(\w+))regex");
+    std::regex const eastlNS(R"regex(eastl::(\w+))regex");
     _name = std::regex_replace(_name, eastlNS, "$1");
-    std::regex vector(R"regex(vector\<(\w+)\>)regex");
+    std::regex const vector(R"regex(vector\<(\w+)\>)regex");
     std::string name2;
     while (name2 != _name)
     {
@@ -132,7 +132,7 @@ static void addDef(
     {
         return;
     }
-    auto escapedName = escapeName(_name);
+    auto const escapedName = escapeName(_name);
     if (allDefs.count(escapedName) == 0)
     {
         allDefs[escapedName] = _def;
@@ -165,8 +165,8 @@ static std::string getRefTypeName(std::string _link)
     _link = escapeName(_link);
 
     // Force to create the definition (do nothing if already exist)
-    static char const* definitionsStr = "#/definitions/";
-    size_t pos = _link.find(definitionsStr);
+    static auto const* definitionsStr = "#/definitions/";
+    size_t const pos = _link.find(definitionsStr);
     if (pos == std::string::npos)
     {
         return _link;
@@ -197,7 +197,7 @@ static json prim(char const* _name)
 {
     json type = makeNewType();
     json ref;
-    ref["name"] = (char)toupper(_name[0]) + std::string((_name + 1));
+    ref["name"] = static_cast<char>(toupper(_name[0])) + std::string((_name + 1));
     if (_name == std::string("String"))
     {
         ref["py_native"] = "str";
@@ -213,7 +213,7 @@ static json prim(char const* _name)
     return type;
 }
 
-static std::set<Ent::DataType> primitiveTypes = {
+static std::set primitiveTypes = {
     Ent::DataType::boolean,
     Ent::DataType::integer,
     Ent::DataType::number,
@@ -237,14 +237,11 @@ char const* primitiveName(Ent::DataType _type)
 /// @return true if it is an array of primitive type
 static bool isPrimArray(Ent::Subschema const& _ref)
 {
-    if (auto singularItems = _ref.singularItems.get())
+    if (auto* const singularItems = _ref.singularItems.get())
     {
         return primitiveTypes.count(singularItems->get().type) != 0;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 /// @brief Get a json describing the type of a given  _schema
@@ -263,6 +260,7 @@ static json getSchemaType(Ent::Subschema const& _schema)
         return type;
     }
     case Ent::DataType::array:
+    {
         if (_schema.singularItems != nullptr)
         {
             auto const& meta = std::get<Ent::Subschema::ArrayMeta>(_schema.meta);
@@ -277,7 +275,7 @@ static json getSchemaType(Ent::Subschema const& _schema)
                     type["ref"] = std::move(ref);
                     return type;
                 }
-                else if (singularType == Ent::DataType::object)
+                if (singularType == Ent::DataType::object)
                 {
                     json array;
                     array["type"] = getSchemaRefType(*_schema.singularItems);
@@ -287,8 +285,7 @@ static json getSchemaType(Ent::Subschema const& _schema)
                     type["object_set"] = std::move(array);
                     return type;
                 }
-                else if (
-                    singularType == Ent::DataType::boolean || singularType == Ent::DataType::entityRef
+                if (singularType == Ent::DataType::boolean || singularType == Ent::DataType::entityRef
                     || singularType == Ent::DataType::integer || singularType == Ent::DataType::number
                     || singularType == Ent::DataType::string)
                 {
@@ -297,16 +294,13 @@ static json getSchemaType(Ent::Subschema const& _schema)
                     type["prim_set"] = std::move(array);
                     return type;
                 }
-                else
-                {
-                    // Don't know how to handle this kind of set, so let's keep it as a simple array
-                    json array;
-                    array["type"] = getSchemaRefType(*_schema.singularItems);
-                    type["array"] = std::move(array);
-                    return type;
-                }
+                // Don't know how to handle this kind of set, so let's keep it as a simple array
+                json array;
+                array["type"] = getSchemaRefType(*_schema.singularItems);
+                type["array"] = std::move(array);
+                return type;
             }
-            else if (meta.overridePolicy == "map")
+            if (meta.overridePolicy == "map")
             {
                 json array;
                 auto& pair = *_schema.singularItems;
@@ -315,42 +309,37 @@ static json getSchemaType(Ent::Subschema const& _schema)
                 type["map"] = std::move(array);
                 return type;
             }
-            else if (isPrimArray(_schema))
+            if (isPrimArray(_schema))
             {
                 json array;
                 array["type"] = getSchemaRefType(*_schema.singularItems);
                 type["prim_array"] = std::move(array);
                 return type;
             }
-            else
-            {
-                json array;
-                array["type"] = getSchemaRefType(*_schema.singularItems);
-                type["array"] = std::move(array);
-                return type;
-            }
-        }
-        else
-        {
-            json tuple;
-            json types(json::value_t::array);
-            size_t index = 0;
-
-            for (auto& itemRef : *_schema.linearItems)
-            {
-                auto subtype = getSchemaRefType(itemRef);
-                if (index != _schema.linearItems->size() - 1)
-                {
-                    subtype["comma"] = true;
-                }
-                subtype["index"] = index;
-                types.push_back(subtype);
-                ++index;
-            }
-            tuple["types"] = std::move(types);
-            type["tuple"] = std::move(tuple);
+            json array;
+            array["type"] = getSchemaRefType(*_schema.singularItems);
+            type["array"] = std::move(array);
             return type;
         }
+        json tuple;
+        json types(json::value_t::array);
+        size_t index = 0;
+
+        for (auto const& itemRef : *_schema.linearItems)
+        {
+            auto subtype = getSchemaRefType(itemRef);
+            if (index != _schema.linearItems->size() - 1)
+            {
+                subtype["comma"] = true;
+            }
+            subtype["index"] = index;
+            types.push_back(subtype);
+            ++index;
+        }
+        tuple["types"] = std::move(types);
+        type["tuple"] = std::move(tuple);
+        return type;
+    }
     case Ent::DataType::oneOf:
     {
         std::string typeDispName = schemaName[&_schema];
@@ -364,6 +353,7 @@ static json getSchemaType(Ent::Subschema const& _schema)
     case Ent::DataType::number: [[fallthrough]];
     case Ent::DataType::string: [[fallthrough]];
     case Ent::DataType::entityRef:
+    {
         if (auto iter = schemaName.find(&_schema); iter != schemaName.end())
         {
             std::string const& typeDispName = iter->second;
@@ -376,10 +366,8 @@ static json getSchemaType(Ent::Subschema const& _schema)
             type["ref"]["settable"] = true;
             return type;
         }
-        else
-        {
-            return prim(primitiveName(_schema.type));
-        }
+        return prim(primitiveName(_schema.type));
+    }
     }
     return json{};
 }
@@ -391,17 +379,14 @@ static json getSchemaRefType(Ent::SubschemaRef const& _ref)
     {
         return getSchemaType(*_ref);
     }
-    else
-    {
-        std::string singItmRef = std::get<Ent::SubschemaRef::Ref>(_ref.subSchemaOrRef).ref;
-        auto name = getRefTypeName(singItmRef);
-        json typeref;
-        typeref["name"] = name;
-        typeref["settable"] = isPrimArray(*_ref) or primitiveTypes.count(_ref->type) != 0;
-        json type = makeNewType();
-        type["ref"] = std::move(typeref);
-        return type;
-    }
+    std::string const singItmRef = std::get<Ent::SubschemaRef::Ref>(_ref.subSchemaOrRef).ref;
+    auto name = getRefTypeName(singItmRef);
+    json typeref;
+    typeref["name"] = name;
+    typeref["settable"] = isPrimArray(*_ref) or primitiveTypes.count(_ref->type) != 0;
+    json type = makeNewType();
+    type["ref"] = std::move(typeref);
+    return type;
 }
 
 /// @brief Get a json describing the data of a given _schema
@@ -442,15 +427,14 @@ static json getSchemaData(Ent::Subschema const& _schema)
                     defData["includes"].emplace_back(getSchemaRefType(*_schema.singularItems));
                     break;
                 }
-                else if (singularType == Ent::DataType::object)
+                if (singularType == Ent::DataType::object)
                 {
                     Ent::Subschema const& unionSchema = **_schema.singularItems;
                     defData["object_set"] = getSchemaData(unionSchema);
                     defData["object_set"]["items"] = getSchemaRefType(*_schema.singularItems);
                     break;
                 }
-                else if (
-                    singularType == Ent::DataType::boolean || singularType == Ent::DataType::entityRef
+                if (singularType == Ent::DataType::boolean || singularType == Ent::DataType::entityRef
                     || singularType == Ent::DataType::integer || singularType == Ent::DataType::number
                     || singularType == Ent::DataType::string)
                 {
@@ -485,7 +469,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
             size_t index = 0;
             std::set<json> includes;
 
-            for (auto& itemRef : *_schema.linearItems)
+            for (auto const& itemRef : *_schema.linearItems)
             {
                 auto subtype = getSchemaRefType(itemRef);
                 if (index != _schema.linearItems->size() - 1)
@@ -539,7 +523,7 @@ static json getSchemaData(Ent::Subschema const& _schema)
         json object(json::value_t::object);
         json properties(json::value_t::array);
         std::set<json> includes;
-        for (auto& [propName, propRef] : _schema.properties)
+        for (auto const& [propName, propRef] : _schema.properties)
         {
             json prop(json::value_t::object);
             auto propData = getSchemaRefType(propRef);
@@ -648,9 +632,10 @@ static void giveNameToAnonymousObject(
         if (_subschema.linearItems.has_value())
         {
             size_t index = 0;
-            for (auto& subref : *_subschema.linearItems)
+            for (auto const& subref : *_subschema.linearItems)
             {
-                giveNameToAnonymousObjectRef(subref, _hint + "_" + char('A' + index), _morehint);
+                giveNameToAnonymousObjectRef(
+                    subref, _hint + "_" + static_cast<char>('A' + index), _morehint);
             }
             ++index;
         }
@@ -673,7 +658,7 @@ static void giveNameToAnonymousObject(
         break;
     }
     case Ent::DataType::object:
-        for (auto& [propName, propRef] : _subschema.properties)
+        for (auto const& [propName, propRef] : _subschema.properties)
         {
             giveNameToAnonymousObjectRef(propRef, propName, _hint);
         }
@@ -682,26 +667,26 @@ static void giveNameToAnonymousObject(
 }
 
 /// @brief Generate the cpp EntGen API
-void gencpp(std::filesystem::path const& _resourcePath, std::filesystem::path const& _destinationPath)
+void gencpp(path const& _resourcePath, path const& _destinationPath)
 {
     data rootData;
     rootData["all_definitions"] = jsonToMustache(allDefinitions);
     rootData["tuple_type"] =
-        partial([]() { return R"cpp(Ent::Gen::Tuple<{{#types}}{{>display_type}}{{/types}}>)cpp"; });
+        partial([] { return R"cpp(Ent::Gen::Tuple<{{#types}}{{>display_type}}{{/types}}>)cpp"; });
     rootData["prim_set_type"] =
-        partial([]() { return R"cpp(Ent::Gen::PrimitiveSet<{{type.ref.cpp_native}}>)cpp"; });
+        partial([] { return R"cpp(Ent::Gen::PrimitiveSet<{{type.ref.cpp_native}}>)cpp"; });
     rootData["object_set_type"] = partial(
-        []()
+        []
         {
             return R"cpp(Ent::Gen::ObjectSet<{{key_type.ref.cpp_native}}, {{#type}}{{>display_type}}{{/type}}>)cpp";
         });
     rootData["map_type"] = partial(
-        []()
+        []
         {
             return R"cpp(Ent::Gen::Map<{{key_type.ref.cpp_native}}, {{#value_type}}{{>display_type}}{{/value_type}}>)cpp";
         });
     rootData["display_type"] = partial(
-        []()
+        []
         {
             return R"({{#object_set}}{{>object_set_type}}{{/object_set}})"
                    R"({{#prim_set}}{{>prim_set_type}}{{/prim_set}})"
@@ -858,26 +843,26 @@ namespace Ent
 }
 
 /// @brief Generate the cpp EntGen API
-void gencppProp(std::filesystem::path const& _resourcePath, std::filesystem::path const& _destinationPath)
+void gencppProp(path const& _resourcePath, path const& _destinationPath)
 {
     data rootData;
     rootData["all_definitions"] = jsonToMustache(allDefinitions);
     rootData["tuple_type"] =
-        partial([]() { return R"cpp(Ent::Gen2::Tuple<{{#types}}{{>display_type}}{{/types}}>)cpp"; });
+        partial([] { return R"cpp(Ent::Gen2::Tuple<{{#types}}{{>display_type}}{{/types}}>)cpp"; });
     rootData["prim_set_type"] =
-        partial([]() { return R"cpp(Ent::Gen2::PrimitiveSet<{{type.ref.cpp_native}}>)cpp"; });
+        partial([] { return R"cpp(Ent::Gen2::PrimitiveSet<{{type.ref.cpp_native}}>)cpp"; });
     rootData["object_set_type"] = partial(
-        []()
+        []
         {
             return R"cpp(Ent::Gen2::ObjectSet<{{key_type.ref.cpp_native}}, {{#type}}{{>display_type}}{{/type}}>)cpp";
         });
     rootData["map_type"] = partial(
-        []()
+        []
         {
             return R"cpp(Ent::Gen2::Map<{{key_type.ref.cpp_native}}, {{#value_type}}{{>display_type}}{{/value_type}}>)cpp";
         });
     rootData["display_type"] = partial(
-        []()
+        []
         {
             return R"({{#object_set}}{{>object_set_type}}{{/object_set}})"
                    R"({{#prim_set}}{{>prim_set_type}}{{/prim_set}})"
@@ -1048,14 +1033,14 @@ namespace Ent
 }
 
 /// @brief Generate the python EntGen API
-void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path const& _destinationPath)
+void genpy(path const& _resourcePath, path const& _destinationPath)
 {
     create_directories(_destinationPath / "entgen");
 
     auto add_partials = [](data& root)
     {
         root["display_type_hint"] = partial(
-            []()
+            []
             {
                 return R"({{#object_set}}ObjectSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/object_set}})"
                        R"({{#prim_set}}PrimitiveSet[{{type.ref.py_native}}]{{/prim_set}})"
@@ -1068,19 +1053,19 @@ void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path con
             });
 
         root["display_type_comma"] = partial(
-            []()
+            []
             {
                 return R"({{>display_type_hint}})"
                        R"({{#comma}}, {{/comma}})";
             });
         root["type_ctor_comma"] = partial(
-            []()
+            []
             {
                 return R"({{>type_ctor}})"
                        R"({{#comma}}, {{/comma}})";
             });
         root["type_ctor"] = partial(
-            []()
+            []
             {
                 return R"({{#object_set}}(lambda n: ObjectSet({{#type}}{{>type_ctor}}{{/type}}, n)){{/object_set}})"
                        R"({{#prim_set}}(lambda n: PrimitiveSet({{type.ref.py_native}}, n)){{/prim_set}})"
@@ -1092,7 +1077,7 @@ void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path con
                        R"({{#tuple}}TupleNode{{/tuple}})";
             });
         root["print_import"] = partial(
-            []()
+            []
             {
                 return R"({{#object_set}}{{#type}}{{>print_import}}{{/type}}{{/object_set}})"
                        R"({{#prim_set}}{{#type}}{{>print_import}}{{/type}}{{/prim_set}})"
@@ -1103,7 +1088,7 @@ void genpy(std::filesystem::path const& _resourcePath, std::filesystem::path con
                        R"({{#prim_array}}{{#type}}{{>print_import}}{{/type}}{{/prim_array}})";
             });
         root["print_type_definition"] = partial(
-            []()
+            []
             {
                 return R"py(from EntityLibPy import Node
 {{#schema}}{{#union_set}}
@@ -1214,7 +1199,7 @@ import EntityLibPy
     {
         std::ifstream primFile(_resourcePath / "entgen" / filename);
         std::string data;
-        std::getline(primFile, data, char(0));
+        std::getline(primFile, data, static_cast<char>(0));
         rootData["primitives"].push_back(data);
     }
 
@@ -1315,7 +1300,7 @@ public:
         std::reverse(begin(order), end(order));
     }
 
-    void print_order()
+    void print_order() const
     {
         for (auto const& ele : order)
         {
@@ -1329,7 +1314,7 @@ std::set<std::string> getDependencies(std::map<std::string, json> const& nameToS
     std::set<std::string> deps;
     if (include["ref"].is_object())
     {
-        auto ref = include["ref"]["name"].get<std::string>();
+        auto const ref = include["ref"]["name"].get<std::string>();
         if (nameToSchema.count(ref) != 0)
         {
             deps.insert(ref);
@@ -1386,8 +1371,8 @@ try
         fprintf(stderr, "Missing resourcesPath and destinationPath, and p4_root arguments");
         return EXIT_FAILURE;
     }
-    auto resourcePath = std::filesystem::path(argv[1]);
-    auto destinationPath = std::filesystem::path(argv[2]);
+    auto resourcePath = path(argv[1]);
+    auto destinationPath = path(argv[2]);
 
     Ent::EntityLib entlib(argv[3], true);
 
@@ -1462,7 +1447,7 @@ try
     g.topological_dfs();
 
     // Transfert nameToSchema into allDefinitions
-    for (auto& id : g.getOrder())
+    for (auto const& id : g.getOrder())
     {
         auto& schema = nameToSchema.at(id);
         allDefinitions.push_back(std::move(schema));

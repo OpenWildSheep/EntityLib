@@ -15,7 +15,7 @@ class PrintNode : public RecursiveVisitor
 {
     size_t tab = 0;
 
-    std::string getTab() const
+    [[nodiscard]] std::string getTab() const
     {
         return std::string(tab * 4, ' ');
     }
@@ -71,11 +71,11 @@ public:
     {
         --tab;
     }
-    void inPrimSet([[maybe_unused]] Property& _prop, DataType) override
+    void inPrimSet([[maybe_unused]] Property& _prop, [[maybe_unused]] DataType _dataType) override
     {
         ++tab;
     }
-    void inArrayElement([[maybe_unused]] Property& _prop, size_t) override
+    void inArrayElement([[maybe_unused]] Property& _prop, [[maybe_unused]] size_t _index) override
     {
     }
     void outArrayElement([[maybe_unused]] Property& _prop) override
@@ -168,7 +168,7 @@ class CompareNode : public RecursiveVisitor
     std::vector<Node*> nodes;
 
 public:
-    CompareNode(Node* n)
+    explicit CompareNode(Node* n)
         : nodes({n})
     {
     }
@@ -189,7 +189,7 @@ public:
     void outObject([[maybe_unused]] Property& _prop) override
     {
     }
-    void inUnion([[maybe_unused]] Property& _prop, char const*) override
+    void inUnion([[maybe_unused]] Property& _prop, [[maybe_unused]] char const* _type) override
     {
         //ENTLIB_ASSERT(strcmp(expl.getUnionType(), nodes.back()->getUnionType()) == 0);
         //ENTLIB_ASSERT(strcmp(nodes.back()->getUnionType(), type) == 0);
@@ -216,8 +216,10 @@ public:
         {
         case DataType::string:
             if (nodes.back()->getKeysString().size() != expl.getMapKeysString().size())
+            {
                 std::cout << nodes.back()->getKeysString().size() << " "
                           << expl.getMapKeysString().size() << std::endl;
+            }
             ENTLIB_ASSERT(nodes.back()->getKeysString().size() == expl.getMapKeysString().size());
             break;
         case DataType::integer:
@@ -244,10 +246,10 @@ public:
     {
         nodes.pop_back();
     }
-    void inPrimSet(Property& expl, DataType) override
+    void inPrimSet(Property& expl, [[maybe_unused]] DataType _dataType) override
     {
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
-        auto& itemType = expl.getSchema()->singularItems.get()->get();
+        auto const& itemType = expl.getSchema()->singularItems->get();
         switch (itemType.type)
         {
         case DataType::string:
@@ -281,15 +283,15 @@ public:
     }
     void inUnionSet(Property& expl) override
     {
-        auto a = nodes.back()->getKeysString();
-        auto b = expl.getUnionSetKeysString();
+        auto const a = nodes.back()->getKeysString();
+        auto const b = expl.getUnionSetKeysString();
         ENTLIB_ASSERT(a.size() == b.size());
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         ENTLIB_ASSERT(nodes.back()->getSchema() == expl.getSchema());
     }
     void inUnionSetElement([[maybe_unused]] Property& _prop, char const* type) override
     {
-        auto union_ = nodes.back()->mapGet(type);
+        auto* const union_ = nodes.back()->mapGet(type);
         ENTLIB_ASSERT(union_ != nullptr);
         nodes.push_back(union_->getUnionData());
         ENTLIB_ASSERT(nodes.back() != nullptr);
@@ -377,7 +379,7 @@ public:
         if (strcmp(expl.getString(), nodes.back()->getString()) != 0)
         {
             std::cout << expl.getString() << " " << nodes.back()->getString() << std::endl;
-            [[maybe_unused]] auto val = expl.getString();
+            [[maybe_unused]] auto const* val = expl.getString();
         }
         ENTLIB_ASSERT(strcmp(expl.getString(), nodes.back()->getString()) == 0);
     }
@@ -403,7 +405,7 @@ class CompareCursor : public RecursiveVisitor
     }
 
 public:
-    CompareCursor(Property _expl2)
+    explicit CompareCursor(Property _expl2)
         : expl2(std::move(_expl2))
     {
     }
@@ -414,8 +416,8 @@ public:
             ENTLIB_ASSERT(expl2.hasPrefab());
             ENTLIB_ASSERT(_prop.getPrefab().getRawJson() == expl2.getPrefab().getRawJson());
         }
-        auto a = _prop.getInstanceOf();
-        auto b = expl2.getInstanceOf();
+        auto const* const a = _prop.getInstanceOf();
+        auto const* const b = expl2.getInstanceOf();
         ENTLIB_ASSERT(
             (a == nullptr and b == nullptr)
             or (a != nullptr and b != nullptr and a == std::string_view(b)));
@@ -468,10 +470,10 @@ public:
     {
         pop();
     }
-    void inPrimSet(Property& _prop, DataType) override
+    void inPrimSet(Property& _prop, [[maybe_unused]] DataType _dataType) override
     {
         ENTLIB_ASSERT(expl2.size() == _prop.size());
-        auto& itemType = _prop.getSchema()->singularItems.get()->get();
+        auto const& itemType = _prop.getSchema()->singularItems->get();
         switch (itemType.type)
         {
         case DataType::string:
@@ -499,7 +501,7 @@ public:
             ENTLIB_ASSERT(_prop.getPrefab().getRawJson() == expl2.getPrefab().getRawJson());
         }
         auto a = expl2.getUnionSetKeysString();
-        auto b = _prop.getUnionSetKeysString();
+        auto const b = _prop.getUnionSetKeysString();
         ENTLIB_ASSERT(a.size() == b.size());
         ENTLIB_ASSERT(expl2.getSchema() == _prop.getSchema());
         for (auto [name, type] : a)
@@ -527,11 +529,11 @@ public:
         {
         case DataType::string:
         {
-            auto a = expl2.getObjectSetKeysString();
-            auto b = _prop.getObjectSetKeysString();
+            auto const a = expl2.getObjectSetKeysString();
+            auto const b = _prop.getObjectSetKeysString();
             ENTLIB_ASSERT(a.size() == b.size());
             ENTLIB_ASSERT(expl2.getSchema() == _prop.getSchema());
-            for (auto name : a)
+            for (auto const* name : a)
             {
                 ENTLIB_ASSERT(b.count(name));
             }
@@ -549,8 +551,8 @@ public:
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
-            auto a = _prop.getPrefab().getRawJson();
-            auto b = expl2.getPrefab().getRawJson();
+            auto const* const a = _prop.getPrefab().getRawJson();
+            auto const* const b = expl2.getPrefab().getRawJson();
             ENTLIB_ASSERT(a == b);
         }
     }
@@ -612,11 +614,11 @@ class PrimitiveCounterVisitor : public RecursiveVisitor
 public:
     size_t primitiveCount = 0;
 
-    void key([[maybe_unused]] Property& _prop, char const*) override
+    void key([[maybe_unused]] Property& _prop, [[maybe_unused]] char const* _key) override
     {
         ++primitiveCount;
     }
-    void key([[maybe_unused]] Property& _prop, int64_t) override
+    void key([[maybe_unused]] Property& _prop, [[maybe_unused]] int64_t _key) override
     {
         ++primitiveCount;
     }
@@ -676,7 +678,7 @@ size_t countNodes(Node* node)
                 }
                 break;
             case DataType::integer:
-                for (int64_t key : node->getKeysInt())
+                for (int64_t const key : node->getKeysInt())
                 {
                     nodeCount += countNodes(node->mapGet(key));
                 }
@@ -686,11 +688,11 @@ size_t countNodes(Node* node)
             break;
         case "set"_hash:
         {
-            auto& itemType = node->getSchema()->singularItems.get()->get();
+            auto& itemType = node->getSchema()->singularItems->get();
             switch (itemType.type)
             {
             case DataType::integer:
-                for (int64_t key : node->getKeysInt())
+                for (int64_t const key : node->getKeysInt())
                 {
                     nodeCount += countNodes(node->mapGet(key));
                 }
@@ -708,7 +710,7 @@ size_t countNodes(Node* node)
                 }
                 break;
             case DataType::object:
-                auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
+                auto const& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                 switch (keyFieldSchema.type)
                 {
                 case DataType::string:
@@ -759,9 +761,9 @@ void testCursor(EntityLib& entlib)
     {
         std::ifstream ifstr("test.SeedPatch.node");
         std::string filedata;
-        std::getline(ifstr, filedata, char(0));
+        std::getline(ifstr, filedata, static_cast<char>(0));
         auto& d = entlib.readJsonFile("test.SeedPatch.node");
-        auto& schema = d["$schema"].get_ref<nlohmann::json::string_t const&>();
+        auto const& schema = d["$schema"].get_ref<nlohmann::json::string_t const&>();
         auto typeName = std::string(getRefTypeName(schema.c_str()));
         Property simpleObject(&entlib, entlib.getSchema(typeName.c_str()), "test.SeedPatch.node", &d);
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeX").getFloat() == 1.f);
@@ -770,7 +772,7 @@ void testCursor(EntityLib& entlib)
     {
         std::ifstream ifstr("test.SeedPatch.node");
         std::string filedata;
-        std::getline(ifstr, filedata, char(0));
+        std::getline(ifstr, filedata, static_cast<char>(0));
         auto& d = entlib.readJsonFile("test.SeedPatch.node");
         auto typeName =
             std::string(getRefTypeName(d["$schema"].get_ref<std::string const&>().c_str()));
@@ -890,13 +892,13 @@ void testCursor(EntityLib& entlib)
 
         auto ent = entlib.loadEntityAsNode(R"(instance.entity)");
 
-        std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
+        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
         CompareNode compare(ent.get());
         std::cout << "Visit all" << std::endl;
         start = clock();
         visitRecursive(expl, compare);
         end = clock();
-        std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
+        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
 
         nlohmann::json newDoc = nlohmann::json::object();
         Property destExpl(&entlib, expl.getSchema(), "", &newDoc);
@@ -915,7 +917,7 @@ void testCursor(EntityLib& entlib)
             entlib.getSchema(entitySchemaName),
             R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
         clock_t end = clock();
-        std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
+        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
 
         bool testCopy = true;
         if (testCopy)
@@ -939,13 +941,13 @@ void testCursor(EntityLib& entlib)
         auto ent = entlib.loadEntityAsNode(
             R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
         end = clock();
-        std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
+        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
 
         std::cout << "Travserse SceneKOM.scene with NodeLib" << std::endl;
         start = clock();
         auto nodeCount = countNodes(ent.get());
         end = clock();
-        std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
+        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << nodeCount << std::endl;
 
         PrimitiveCounterVisitor visitor;
@@ -953,7 +955,7 @@ void testCursor(EntityLib& entlib)
         start = clock();
         visitRecursive(expl, visitor);
         end = clock();
-        std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
+        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;
     }
     bool testCompare = true;
@@ -967,20 +969,20 @@ void testCursor(EntityLib& entlib)
             entlib.getSchema(entitySchemaName),
             R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
         clock_t end = clock();
-        std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
+        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
 
         std::cout << "Read SceneKOM.scene with NodeLib" << std::endl;
         start = clock();
         auto ent = entlib.loadEntityAsNode(
             R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
         end = clock();
-        std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
+        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
 
         std::cout << "Travserse SceneKOM.scene with NodeLib" << std::endl;
         start = clock();
         auto nodeCount = countNodes(ent.get());
         end = clock();
-        std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
+        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << nodeCount << std::endl;
 
         std::cout << "Compare both" << std::endl;
@@ -988,6 +990,6 @@ void testCursor(EntityLib& entlib)
         CompareNode comparator(ent.get());
         visitRecursive(expl, comparator);
         end = clock();
-        std::cout << float(end - start) / CLOCKS_PER_SEC << std::endl;
+        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
     }
 }

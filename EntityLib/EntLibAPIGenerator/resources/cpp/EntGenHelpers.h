@@ -16,7 +16,7 @@ namespace Ent::Gen
     {
         Node* node{};
 
-        explicit Base(Node* _node)
+        Base(Node* _node)
             : node(_node)
         {
         }
@@ -113,7 +113,7 @@ namespace Ent::Gen
             return iterator{node, node->size()};
         }
 
-        explicit Array(Node* _node)
+        Array(Node* _node)
             : Base(_node)
         {
         }
@@ -148,7 +148,7 @@ namespace Ent::Gen
     template <typename T>
     struct PrimArray : Array<T>
     {
-        explicit PrimArray(Node* _node)
+        PrimArray(Node* _node)
             : Array<T>(_node)
         {
         }
@@ -193,7 +193,7 @@ namespace Ent::Gen
         }
 
         template <typename V>
-        explicit operator V()
+        operator V()
         {
             V result;
             ENT_IF_COMPILE(V, arr, std::get<0>(arr)) // tuple, c-style array and std::array
@@ -271,7 +271,7 @@ namespace Ent::Gen
     {
         using Union = U;
 
-        explicit UnionSetBase(Node* _node)
+        UnionSetBase(Node* _node)
             : Base(_node)
         {
         }
@@ -441,7 +441,7 @@ namespace Ent::Gen
     template <typename T>
     struct PrimitiveSet : Base
     {
-        explicit PrimitiveSet(Node* _node)
+        PrimitiveSet(Node* _node)
             : Base(_node)
         {
         }
@@ -531,7 +531,7 @@ namespace Ent::Gen
     template <typename K, typename O>
     struct ObjectSet : Base
     {
-        explicit ObjectSet(Node* _node)
+        ObjectSet(Node* _node)
             : Base(_node)
         {
         }
@@ -652,7 +652,7 @@ namespace Ent::Gen
     template <typename... Args>
     struct Tuple : Base
     {
-        explicit Tuple(Node* _node)
+        Tuple(Node* _node)
             : Base(_node)
         {
         }
@@ -672,7 +672,7 @@ namespace Ent::Gen
     template <typename K, typename V>
     struct Map : Base
     {
-        explicit Map(Node* _node)
+        Map(Node* _node)
             : Base(_node)
         {
         }
@@ -805,7 +805,7 @@ namespace Ent::Gen
     {
         using InternalType = T;
 
-        explicit PropHelper(Node* _node)
+        PropHelper(Node* _node)
             : Base(_node)
         {
         }
@@ -816,7 +816,7 @@ namespace Ent::Gen
             return *this;
         }
 
-        explicit operator T() const
+        operator T() const
         {
             return static_cast<P const*>(this)->get();
         }
@@ -827,7 +827,7 @@ namespace Ent::Gen
     {
         using Enum = E;
 
-        explicit EnumPropHelper(Node* _node)
+        EnumPropHelper(Node* _node)
             : PropHelper<Child, Enum>(_node)
         {
         }
@@ -850,7 +850,7 @@ namespace Ent::Gen
 
     struct HelperObject : Base
     {
-        explicit HelperObject(Node* _node)
+        HelperObject(Node* _node)
             : Base(_node)
         {
         }
@@ -897,7 +897,7 @@ namespace Ent::Gen
 
     struct Bool : PropHelper<Bool, bool>
     {
-        explicit Bool(Node* _node)
+        Bool(Node* _node)
             : PropHelper<Bool, bool>(_node)
         {
         }
@@ -920,7 +920,7 @@ namespace Ent::Gen
 
     struct Int : PropHelper<Int, int64_t>
     {
-        explicit Int(Node* _node)
+        Int(Node* _node)
             : PropHelper<Int, int64_t>(_node)
         {
         }
@@ -943,7 +943,7 @@ namespace Ent::Gen
 
     struct Float : PropHelper<Float, double>
     {
-        explicit Float(Node* _node)
+        Float(Node* _node)
             : PropHelper<Float, double>(_node)
         {
         }
@@ -963,7 +963,7 @@ namespace Ent::Gen
             return node->getDefaultFloat();
         }
 
-        explicit operator float() const
+        operator float() const
         {
             return static_cast<float>(node->getFloat());
         }
@@ -976,7 +976,7 @@ namespace Ent::Gen
 
     struct String : PropHelper<String, char const*>
     {
-        explicit String(Node* _node)
+        String(Node* _node)
             : PropHelper<String, char const*>(_node)
         {
         }
@@ -1011,7 +1011,7 @@ namespace Ent::Gen
             return *this;
         }
 
-        explicit operator std::string() const
+        operator std::string() const
         {
             return get();
         }
@@ -1026,7 +1026,7 @@ namespace Ent::Gen
             return get() != value;
         }
 
-        explicit operator std::filesystem::path() const
+        operator std::filesystem::path() const
         {
             return get();
         }
@@ -1039,7 +1039,7 @@ namespace Ent::Gen
 
     struct EntityRef : PropHelper<EntityRef, Ent::EntityRef>
     {
-        explicit EntityRef(Node* _node)
+        EntityRef(Node* _node)
             : PropHelper<EntityRef, Ent::EntityRef>(_node)
         {
         }

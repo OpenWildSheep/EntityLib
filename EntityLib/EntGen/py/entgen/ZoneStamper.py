@@ -4,7 +4,9 @@
 from entgen_helpers import *
 import EntityLibPy
 
+from entgen.NavMeshArea import *
 from entgen.String import *
+from entgen.Float import *
 from entgen.GeometryStamper import *
 
 from EntityLibPy import Node
@@ -25,8 +27,23 @@ class ZoneStamper(HelperObject):
     @ConvexZoneFilePath.setter
     def ConvexZoneFilePath(self, val): self.ConvexZoneFilePath.set(val)
     @property
+    def DownwardOffset(self):  # type: ()->Float
+        return Float(self._node.at("DownwardOffset"))
+    @DownwardOffset.setter
+    def DownwardOffset(self, val): self.DownwardOffset.set(val)
+    @property
+    def NavMeshArea(self):  # type: ()->NavMeshArea
+        return NavMeshArea(self._node.at("NavMeshArea"))
+    @NavMeshArea.setter
+    def NavMeshArea(self, val): self.NavMeshArea.set(val)
+    @property
     def Super(self):  # type: ()->GeometryStamper
         return GeometryStamper(self._node.at("Super"))
+    @property
+    def UpwardOffset(self):  # type: ()->Float
+        return Float(self._node.at("UpwardOffset"))
+    @UpwardOffset.setter
+    def UpwardOffset(self, val): self.UpwardOffset.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

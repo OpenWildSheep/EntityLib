@@ -437,10 +437,35 @@ class InGameCameraParams(HelperObject):
     @LockYawSpeedClose.setter
     def LockYawSpeedClose(self, val): self.LockYawSpeedClose.set(val)
     @property
+    def LookAtOffsetPitch(self):  # type: ()->Float
+        return Float(self._node.at("LookAtOffsetPitch"))
+    @LookAtOffsetPitch.setter
+    def LookAtOffsetPitch(self, val): self.LookAtOffsetPitch.set(val)
+    @property
+    def LookAtOffsetYaw(self):  # type: ()->Float
+        return Float(self._node.at("LookAtOffsetYaw"))
+    @LookAtOffsetYaw.setter
+    def LookAtOffsetYaw(self, val): self.LookAtOffsetYaw.set(val)
+    @property
     def NearPlane(self):  # type: ()->Float
         return Float(self._node.at("NearPlane"))
     @NearPlane.setter
     def NearPlane(self, val): self.NearPlane.set(val)
+    @property
+    def PitchConstraintAnticipation(self):  # type: ()->Float
+        return Float(self._node.at("PitchConstraintAnticipation"))
+    @PitchConstraintAnticipation.setter
+    def PitchConstraintAnticipation(self, val): self.PitchConstraintAnticipation.set(val)
+    @property
+    def PitchConstraintMax(self):  # type: ()->Float
+        return Float(self._node.at("PitchConstraintMax"))
+    @PitchConstraintMax.setter
+    def PitchConstraintMax(self, val): self.PitchConstraintMax.set(val)
+    @property
+    def PitchConstraintMin(self):  # type: ()->Float
+        return Float(self._node.at("PitchConstraintMin"))
+    @PitchConstraintMin.setter
+    def PitchConstraintMin(self, val): self.PitchConstraintMin.set(val)
     @property
     def PitchToFOV(self):  # type: ()->Float
         return Float(self._node.at("PitchToFOV"))

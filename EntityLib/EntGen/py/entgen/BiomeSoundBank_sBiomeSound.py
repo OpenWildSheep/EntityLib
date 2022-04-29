@@ -48,6 +48,11 @@ class BiomeSoundBank_sBiomeSound(HelperObject):
     def Super(self):  # type: ()->BiomeSoundBank_sBiomeEnv
         return BiomeSoundBank_sBiomeEnv(self._node.at("Super"))
     @property
+    def Tag(self):  # type: ()->String
+        return String(self._node.at("Tag"))
+    @Tag.setter
+    def Tag(self, val): self.Tag.set(val)
+    @property
     def Volume(self):  # type: ()->String
         return String(self._node.at("Volume"))
     @Volume.setter

@@ -16,7 +16,7 @@ namespace Ent
         Subschema const* _schema,
         NodeUniquePtr _wrapper,
         size_t _typeIndex,
-        Override<Ent::String> _instanceOf)
+        Override<String> _instanceOf)
         : entityLib(_entityLib)
         , schema(_schema)
         , typeIndex(_typeIndex)
@@ -24,7 +24,7 @@ namespace Ent
         , metaData(&(std::get<Subschema::UnionMeta>(schema->meta)))
         , instanceOf(std::move(_instanceOf))
     {
-        auto* typeNode = wrapper->at(metaData->typeField.c_str());
+        auto const* typeNode = wrapper->at(metaData->typeField.c_str());
         typeOverriden = typeNode->hasOverride();
     }
 
@@ -66,10 +66,7 @@ namespace Ent
         {
             return wrapper->at(metaData->dataField.c_str());
         }
-        else
-        {
-            return nullptr;
-        }
+        return nullptr;
     }
 
     char const* Union::getUnionType() const
@@ -80,14 +77,11 @@ namespace Ent
                 wrapper->count(metaData->typeField.c_str()),
                 "Field %s not found in union",
                 metaData->typeField.c_str());
-            auto typeNode = wrapper->at(metaData->typeField.c_str());
+            auto* const typeNode = wrapper->at(metaData->typeField.c_str());
             ENTLIB_ASSERT(typeNode);
             return typeNode->getString();
         }
-        else
-        {
-            return nullptr;
-        }
+        return nullptr;
     }
 
     Node* Union::resetUnionTypeWithoutOverride(char const* _type)
@@ -101,12 +95,12 @@ namespace Ent
         if (unionNode != nullptr)
         {
             Node* parrentNode = unionNode->getParentNode();
-            if (parrentNode != nullptr and parrentNode->getSchema()->type == Ent::DataType::array)
+            if (parrentNode != nullptr and parrentNode->getSchema()->type == DataType::array)
             {
-                auto& meta = std::get<Subschema::ArrayMeta>(parrentNode->getSchema()->meta);
+                auto const& meta = std::get<Subschema::ArrayMeta>(parrentNode->getSchema()->meta);
                 if (meta.overridePolicy == "set")
                 {
-                    throw Ent::BadType("Can't change union type inside a set of union");
+                    throw BadType("Can't change union type inside a set of union");
                 }
             }
         }
@@ -122,7 +116,7 @@ namespace Ent
         {
             throw NullPointerArgument("_type", "Union::setUnionType");
         }
-        auto unionType = getUnionType();
+        auto const* const unionType = getUnionType();
         if (unionType == nullptr or strcmp(_type, unionType) != 0)
         {
             auto* unionData = resetUnionTypeWithoutOverride(_type);
@@ -130,10 +124,7 @@ namespace Ent
             wrapper->at(schema->getUnionNameField())->setString(_type);
             return unionData;
         }
-        else
-        {
-            return getUnionData();
-        }
+        return getUnionData();
     }
 
     void Union::computeMemory(MemoryProfiler& prof) const
@@ -183,7 +174,7 @@ namespace Ent
         return wrapper->hasPrefabValue() or instanceOf.hasPrefabValue();
     }
 
-    void Union::setParentNode(Node* _parentNode)
+    void Union::setParentNode(Node* _parentNode) const
     {
         wrapper->setParentNode(_parentNode);
     }
@@ -209,15 +200,15 @@ namespace Ent
         auto const* entlib = schema->rootSchema->entityLib;
         if (_prefabNodePath == nullptr or strlen(_prefabNodePath) == 0)
         {
-            auto prefabNode = entlib->loadNode(*schema, json{}, nullptr);
+            auto const prefabNode = entlib->loadNode(*schema, json{}, nullptr);
             (*this) = std::get<UnionPtr>(prefabNode->GetRawValue())->makeInstanceOf();
             instanceOf.set("");
         }
         else
         {
-            auto relPath = entlib->getRelativePath(_prefabNodePath).generic_u8string();
-            json nodeData = loadJsonFile(entlib->rawdataPath, _prefabNodePath);
-            auto prefabNode = entlib->loadNode(*schema, nodeData, nullptr);
+            auto const relPath = entlib->getRelativePath(_prefabNodePath).generic_u8string();
+            json const nodeData = loadJsonFile(entlib->rawdataPath, _prefabNodePath);
+            auto const prefabNode = entlib->loadNode(*schema, nodeData, nullptr);
             (*this) = std::get<UnionPtr>(prefabNode->GetRawValue())->makeInstanceOf();
             instanceOf.set(relPath);
         }

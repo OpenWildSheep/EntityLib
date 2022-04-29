@@ -24,61 +24,62 @@ namespace Ent
         using KeyType = std::variant<String, int64_t>;
 
         explicit Map(EntityLib const* _entlib = nullptr, Subschema const* _schema = nullptr);
-        Map(Map const&);
+        Map(Map const& _other);
         Map(Map&&) noexcept = default;
-        Map& operator=(Map const&);
+        Map& operator=(Map const& _other);
         Map& operator=(Map&&) = default;
 
         struct Element
         {
             NodeUniquePtr node;
             Override<bool> isPresent;
-            Element(NodeUniquePtr _node = {})
+
+            explicit Element(NodeUniquePtr _node = {})
                 : node(std::move(_node))
             {
             }
-            Element(Element const&);
+            Element(Element const& _other);
             Element(Element&&) = default;
-            Element& operator=(Element const&);
+            Element& operator=(Element const& _other);
             Element& operator=(Element&&) = default;
 
-            bool hasOverride() const;
-            bool hasPrefabValue() const;
-            bool hasDefaultValue() const;
-            Element makeInstanceOf() const;
+            [[nodiscard]] bool hasOverride() const;
+            [[nodiscard]] bool hasPrefabValue() const;
+            [[nodiscard]] bool hasDefaultValue() const;
+            [[nodiscard]] Element makeInstanceOf() const;
         };
 
-        size_t size() const;
+        [[nodiscard]] size_t size() const;
 
-        size_t getDefaultSize() const;
+        [[nodiscard]] size_t getDefaultSize() const;
 
-        size_t getPrefabSize() const;
+        [[nodiscard]] size_t getPrefabSize() const;
 
-        bool hasOverride() const;
-        bool hasPrefabValue() const;
-        bool hasDefaultValue() const;
+        [[nodiscard]] bool hasOverride() const;
+        [[nodiscard]] bool hasPrefabValue() const;
+        [[nodiscard]] bool hasDefaultValue() const;
 
         Node* at(uint64_t _index);
-        Node const* at(uint64_t _index) const;
+        [[nodiscard]] Node const* at(uint64_t _index) const;
 
         bool erase(KeyType const& _key);
-        Node const* get(KeyType const& _key) const;
+        [[nodiscard]] Node const* get(KeyType const& _key) const;
         Node* get(KeyType const& _key);
         Node* insert(KeyType const& _key);
         void insert(KeyType const& _key, NodeUniquePtr _newNode);
-        bool isErased(KeyType const& _key) const;
+        [[nodiscard]] bool isErased(KeyType const& _key) const;
         Node*
         insert(OverrideValueLocation _loc, KeyType _key, NodeUniquePtr _node, bool _addedInInstance);
         Node* rename(KeyType const& _key, KeyType const& _newKey);
         void checkInvariants() const;
-        std::vector<Node const*> getItemsWithRemoved() const;
-        std::vector<Node const*> getItems() const;
+        [[nodiscard]] std::vector<Node const*> getItemsWithRemoved() const;
+        [[nodiscard]] std::vector<Node const*> getItems() const;
         std::vector<Node*> getItems();
         void clear();
         void computeMemory(MemoryProfiler& _prof) const;
-        Map detach() const;
-        Map makeInstanceOf() const;
-        std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
+        [[nodiscard]] Map detach() const;
+        [[nodiscard]] Map makeInstanceOf() const;
+        [[nodiscard]] std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         static KeyType getChildKey(Subschema const* _schema, Node const* _child);
         static DataType getKeyType(Subschema const* _schema);
         void unset();
@@ -87,9 +88,9 @@ namespace Ent
         void checkParent(Node const* _parentNode) const;
         std::vector<NodeUniquePtr> releaseAllElements();
 
-        std::vector<String> getKeysString(bool _forceSort) const;
-        std::vector<int64_t> getKeysInt(bool _forceSort) const;
-        EntityLib const* getEntityLib() const;
+        [[nodiscard]] std::vector<String> getKeysString(bool _forceSort) const;
+        [[nodiscard]] std::vector<int64_t> getKeysInt(bool _forceSort) const;
+        [[nodiscard]] EntityLib const* getEntityLib() const;
 
         /// Get the key containing this \b _child node
         /// @pre \b _child is a child field of this map

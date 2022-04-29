@@ -62,10 +62,10 @@ namespace Ent
         EntityLib& operator=(EntityLib const&) = delete;
         DeleteCheck deleteCheck;
 
-        PropImplPtr newPropImpl();
+        PropImplPtr newPropImpl() const;
         PropImplPtr newPropImpl(
             PropImplPtr _parent,
-            Ent::Subschema const* _schema,
+            Subschema const* _schema,
             char const* _filename,
             nlohmann::json* _doc = nullptr);
         /// @endcond
@@ -90,10 +90,10 @@ namespace Ent
         NodeUniquePtr loadFileAsNode(std::filesystem::path const& _nodePath) const;
 
         /// Save the Entity at path _entityPath
-        void saveNodeAsEntity(Node const* _entity, char const* _relEntityPath) const;
+        static void saveNodeAsEntity(Node const* _entity, char const* _relEntityPath);
 
         /// Save the Scene at path _scenePath
-        void saveNodeAsScene(Node const* _scene, char const* _scenePath) const;
+        static void saveNodeAsScene(Node const* _scene, char const* _scenePath);
 
         /// Dump the given Node with the given schema in json format
         static nlohmann::json dumpNode(
@@ -137,7 +137,7 @@ namespace Ent
         };
         std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> const& getJsonDatabase() const;
 
-        void clearCache();
+        void clearCache() const;
 
         std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
         /// @param _path : A file path absolute or relative but inside the rawdata path
@@ -151,34 +151,35 @@ namespace Ent
 
         /// @brief Resolve an EntityRef relative to this Node/Entity.
         /// Returns nullptr in case of failure.
-        Node const* resolveEntityRef(Node const* _node, const EntityRef& _entityRef) const;
+        Node const* resolveEntityRef(Node const* _node, EntityRef const& _entityRef) const;
         /// @brief Resolve an EntityRef relative to this Node/Entity.
         /// Returns nullptr in case of failure.
-        Node* resolveEntityRef(Node* _node, const EntityRef& _entityRef) const;
+        Node* resolveEntityRef(Node* _node, EntityRef const& _entityRef) const;
 
         Subschema const* getSchema(char const* _schemaName) const;
         Subschema const* getEntitySchema() const;
         Subschema const* getSceneSchema() const;
 
-        void setLogicErrorPolicy(LogicErrorPolicy _LogicErrorPolicy);
-        LogicErrorPolicy getLogicErrorPolicy() const;
+        static void setLogicErrorPolicy(LogicErrorPolicy _LogicErrorPolicy);
+        static LogicErrorPolicy getLogicErrorPolicy();
         /// @brief Compute the EntityRef going from the Entity _from, to the Entity _to
         /// @pre _from and _to are Entity nodes
-        EntityRef makeEntityRef(Node const& _from, Node const& _to);
+        EntityRef makeEntityRef(Node const& _from, Node const& _to) const;
 
         /// @brief Resolve an EntityRef relative to this Node/Entity.
         /// Returns nullptr in case of failure.
-        Property resolveEntityRef(Property const& _node, const EntityRef& _entityRef) const;
+        Property resolveEntityRef(Property const& _node, EntityRef const& _entityRef) const;
         /// @brief Compute the EntityRef going from the Entity _from, to the Entity _to
         /// @pre _from and _to are Entity nodes
-        EntityRef makeEntityRef(Property const& _from, Property const& _to);
+        EntityRef makeEntityRef(Property const& _from, Property const& _to) const;
 
-        Node* getParentEntity(Node* _node); ///< Get the parent Entity Node
-        Node const* getParentEntity(Node const* _node); ///< Get the parent Entity Node
+        Node* getParentEntity(Node* _node) const; ///< Get the parent Entity Node
+        Node const* getParentEntity(Node const* _node) const; ///< Get the parent Entity Node
+        std::optional<Property> getParentEntity(Property const& _node) const; ///< Get the parent Entity Property
 
-        nlohmann::json& readJsonFile(char const* _filepath);
-        nlohmann::json& createTempJsonFile();
-        void saveJsonFile(nlohmann::json const* doc, char const* _filepath, char const* _schema);
+        nlohmann::json& readJsonFile(char const* _filepath) const;
+        nlohmann::json& createTempJsonFile() const;
+        void saveJsonFile(nlohmann::json const* doc, char const* _filepath, char const* _schema) const;
 
     private:
         /// Load an Entity or a Scene, using the given cache

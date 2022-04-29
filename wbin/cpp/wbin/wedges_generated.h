@@ -18,6 +18,8 @@ struct MeshEdgesT : public flatbuffers::NativeTable {
   typedef MeshEdges TableType;
   std::unique_ptr<WBIN::Float3ChannelT> position{};
   std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf{};
+  float EdgeToEdgeAngleMin = 0.0f;
+  float EdgeToEdgeAngleMax = 0.0f;
 };
 
 struct MeshEdges FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -25,7 +27,9 @@ struct MeshEdges FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef MeshEdgesBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_POSITION = 4,
-    VT_SOURCEFILEINF = 6
+    VT_SOURCEFILEINF = 6,
+    VT_EDGETOEDGEANGLEMIN = 8,
+    VT_EDGETOEDGEANGLEMAX = 10
   };
   const WBIN::Float3Channel *position() const {
     return GetPointer<const WBIN::Float3Channel *>(VT_POSITION);
@@ -39,12 +43,26 @@ struct MeshEdges FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   WBIN::SourceFileInf *mutable_sourceFileInf() {
     return GetPointer<WBIN::SourceFileInf *>(VT_SOURCEFILEINF);
   }
+  float EdgeToEdgeAngleMin() const {
+    return GetField<float>(VT_EDGETOEDGEANGLEMIN, 0.0f);
+  }
+  bool mutate_EdgeToEdgeAngleMin(float _EdgeToEdgeAngleMin) {
+    return SetField<float>(VT_EDGETOEDGEANGLEMIN, _EdgeToEdgeAngleMin, 0.0f);
+  }
+  float EdgeToEdgeAngleMax() const {
+    return GetField<float>(VT_EDGETOEDGEANGLEMAX, 0.0f);
+  }
+  bool mutate_EdgeToEdgeAngleMax(float _EdgeToEdgeAngleMax) {
+    return SetField<float>(VT_EDGETOEDGEANGLEMAX, _EdgeToEdgeAngleMax, 0.0f);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_POSITION) &&
            verifier.VerifyTable(position()) &&
            VerifyOffset(verifier, VT_SOURCEFILEINF) &&
            verifier.VerifyTable(sourceFileInf()) &&
+           VerifyField<float>(verifier, VT_EDGETOEDGEANGLEMIN) &&
+           VerifyField<float>(verifier, VT_EDGETOEDGEANGLEMAX) &&
            verifier.EndTable();
   }
   MeshEdgesT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -62,6 +80,12 @@ struct MeshEdgesBuilder {
   void add_sourceFileInf(flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf) {
     fbb_.AddOffset(MeshEdges::VT_SOURCEFILEINF, sourceFileInf);
   }
+  void add_EdgeToEdgeAngleMin(float EdgeToEdgeAngleMin) {
+    fbb_.AddElement<float>(MeshEdges::VT_EDGETOEDGEANGLEMIN, EdgeToEdgeAngleMin, 0.0f);
+  }
+  void add_EdgeToEdgeAngleMax(float EdgeToEdgeAngleMax) {
+    fbb_.AddElement<float>(MeshEdges::VT_EDGETOEDGEANGLEMAX, EdgeToEdgeAngleMax, 0.0f);
+  }
   explicit MeshEdgesBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -77,8 +101,12 @@ struct MeshEdgesBuilder {
 inline flatbuffers::Offset<MeshEdges> CreateMeshEdges(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<WBIN::Float3Channel> position = 0,
-    flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf = 0) {
+    flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf = 0,
+    float EdgeToEdgeAngleMin = 0.0f,
+    float EdgeToEdgeAngleMax = 0.0f) {
   MeshEdgesBuilder builder_(_fbb);
+  builder_.add_EdgeToEdgeAngleMax(EdgeToEdgeAngleMax);
+  builder_.add_EdgeToEdgeAngleMin(EdgeToEdgeAngleMin);
   builder_.add_sourceFileInf(sourceFileInf);
   builder_.add_position(position);
   return builder_.Finish();
@@ -97,6 +125,8 @@ inline void MeshEdges::UnPackTo(MeshEdgesT *_o, const flatbuffers::resolver_func
   (void)_resolver;
   { auto _e = position(); if (_e) _o->position = std::unique_ptr<WBIN::Float3ChannelT>(_e->UnPack(_resolver)); }
   { auto _e = sourceFileInf(); if (_e) _o->sourceFileInf = std::unique_ptr<WBIN::SourceFileInfT>(_e->UnPack(_resolver)); }
+  { auto _e = EdgeToEdgeAngleMin(); _o->EdgeToEdgeAngleMin = _e; }
+  { auto _e = EdgeToEdgeAngleMax(); _o->EdgeToEdgeAngleMax = _e; }
 }
 
 inline flatbuffers::Offset<MeshEdges> MeshEdges::Pack(flatbuffers::FlatBufferBuilder &_fbb, const MeshEdgesT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -109,10 +139,14 @@ inline flatbuffers::Offset<MeshEdges> CreateMeshEdges(flatbuffers::FlatBufferBui
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const MeshEdgesT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _position = _o->position ? CreateFloat3Channel(_fbb, _o->position.get(), _rehasher) : 0;
   auto _sourceFileInf = _o->sourceFileInf ? CreateSourceFileInf(_fbb, _o->sourceFileInf.get(), _rehasher) : 0;
+  auto _EdgeToEdgeAngleMin = _o->EdgeToEdgeAngleMin;
+  auto _EdgeToEdgeAngleMax = _o->EdgeToEdgeAngleMax;
   return WBIN::CreateMeshEdges(
       _fbb,
       _position,
-      _sourceFileInf);
+      _sourceFileInf,
+      _EdgeToEdgeAngleMin,
+      _EdgeToEdgeAngleMax);
 }
 
 inline const WBIN::MeshEdges *GetMeshEdges(const void *buf) {

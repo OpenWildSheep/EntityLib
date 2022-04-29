@@ -33,13 +33,17 @@ namespace Ent
         }
         Override(V _defaultValue, std::optional<V> _prefabValue, std::optional<V> _overrideValue)
             : m_defaultValue(std::move(_defaultValue))
+            , m_hasPrefab(_prefabValue.has_value())
+            , m_hasOverride(_overrideValue.has_value())
         {
-            m_hasPrefab = _prefabValue.has_value();
-            m_hasOverride = _overrideValue.has_value();
             if (m_hasPrefab)
+            {
                 m_prefabValue = std::move(*_prefabValue);
+            }
             if (m_hasOverride)
+            {
                 m_overrideValue = std::move(*_overrideValue);
+            }
         }
         Override(V _defaultValue, V _prefabValue, V _overrideValue, bool _hasPrefab, bool _hasOverride)
             : m_defaultValue(std::move(_defaultValue))
@@ -55,48 +59,57 @@ namespace Ent
             , m_hasOverride(_overrideValue != nullptr)
         {
             if (m_hasPrefab)
+            {
                 m_prefabValue = *_prefabValue;
+            }
             if (m_hasOverride)
+            {
                 m_overrideValue = *_overrideValue;
+            }
         }
-        Override(V _defaultVal)
+
+        explicit Override(V _defaultVal)
             : m_defaultValue(_defaultVal)
             , m_hasPrefab(false)
             , m_hasOverride(false)
         {
         }
 
-        V const& get() const;
+        [[nodiscard]] V const& get() const;
 
         void set(V _newVal);
 
-        bool isSet() const;
+        [[nodiscard]] bool isSet() const;
 
         void unset();
 
-        Override<V> detach() const;
+        [[nodiscard]] Override<V> detach() const;
 
-        Override<V> makeInstanceOf() const;
+        [[nodiscard]] Override<V> makeInstanceOf() const;
 
-        Override<V> clone() const
+        [[nodiscard]] Override<V> clone() const
         {
             return *this;
         }
 
         /// makeInstanceOf, then set a value
-        Override<V> makeOverridedInstanceOf(std::optional<V> _overrideValue) const
+        [[nodiscard]] Override<V> makeOverridedInstanceOf(std::optional<V> _overrideValue) const
         {
             Override<V> result = makeInstanceOf();
             result.m_hasOverride = _overrideValue.has_value();
             if (result.m_hasOverride)
+            {
                 result.m_overrideValue = *_overrideValue;
+            }
             else
+            {
                 result.m_overrideValue = {};
+            }
             return result;
         }
 
         /// True if no value was set in template or in instance
-        bool isDefault() const
+        [[nodiscard]] bool isDefault() const
         {
             return !(m_hasPrefab || m_hasOverride);
         }
@@ -120,7 +133,8 @@ namespace Ent
             }
         }
 
-        std::optional<std::reference_wrapper<V const>> getRaw(OverrideValueLocation _location) const
+        [[nodiscard]] std::optional<std::reference_wrapper<V const>>
+        getRaw(OverrideValueLocation _location) const
         {
             switch (_location)
             {
@@ -140,7 +154,8 @@ namespace Ent
         {
             return m_hasPrefab ? m_prefabValue : m_defaultValue;
         }
-        V const& getPrefab() const
+
+        [[nodiscard]] V const& getPrefab() const
         {
             return m_hasPrefab ? m_prefabValue : m_defaultValue;
         }
@@ -149,7 +164,8 @@ namespace Ent
         {
             return m_defaultValue;
         }
-        V const& getDefault() const
+
+        [[nodiscard]] V const& getDefault() const
         {
             return m_defaultValue;
         }
@@ -164,28 +180,32 @@ namespace Ent
                     _dest.set(get());
                 }
                 else if (get() != _dest.get())
+                {
                     _dest.set(get()); // If no override, minimize modification in _dest
+                }
                 break;
             case CopyMode::MinimalOverride:
                 // Try to set a minimum of values
                 _dest.unset();
                 if (get() != _dest.get())
+                {
                     _dest.set(get());
+                }
                 break;
             }
         }
 
-        bool hasPrefabValue() const
+        [[nodiscard]] bool hasPrefabValue() const
         {
             return m_hasPrefab;
         }
 
-        bool hasOverride() const
+        [[nodiscard]] bool hasOverride() const
         {
             return m_hasOverride;
         }
 
-        bool hasDefaultValue() const
+        [[nodiscard]] bool hasDefaultValue() const
         {
             return !hasPrefabValue() && !hasOverride();
         }
@@ -247,18 +267,20 @@ namespace Ent
     Override<V> Override<V>::detach() const
     {
         if (m_hasOverride)
+        {
             return Override<V>(m_defaultValue, V{}, m_overrideValue, false, m_hasOverride);
-        else
-            return Override<V>(m_defaultValue, V{}, m_prefabValue, false, m_hasPrefab);
+        }
+        return Override<V>(m_defaultValue, V{}, m_prefabValue, false, m_hasPrefab);
     }
 
     template <typename V>
     Override<V> Override<V>::makeInstanceOf() const
     {
         if (m_hasOverride)
+        {
             return Override<V>(m_defaultValue, m_overrideValue, V{}, m_hasOverride, false);
-        else
-            return Override<V>(m_defaultValue, m_prefabValue, V{}, m_hasPrefab, false);
+        }
+        return Override<V>(m_defaultValue, m_prefabValue, V{}, m_hasPrefab, false);
     }
 
     struct Memory
@@ -266,7 +288,7 @@ namespace Ent
         MemoryProfiler* prof;
 
         template <typename T>
-        void operator()(T) const
+        void operator()([[maybe_unused]] T _value) const
         {
         }
 
@@ -282,8 +304,12 @@ namespace Ent
         Memory compute{&prof};
         compute(m_defaultValue);
         if (hasPrefabValue())
+        {
             compute(m_prefabValue);
+        }
         if (hasOverride())
+        {
             compute(m_overrideValue);
+        }
     }
 } // namespace Ent

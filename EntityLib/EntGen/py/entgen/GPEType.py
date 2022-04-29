@@ -10,6 +10,7 @@ class GPETypeEnum(Enum):
     BendTree = "BendTree"
     Geyser = "Geyser"
     PossessFlocking = "PossessFlocking"
+    Bridge = "Bridge"
     GPEType_COUNT = "GPEType_COUNT"
 
 

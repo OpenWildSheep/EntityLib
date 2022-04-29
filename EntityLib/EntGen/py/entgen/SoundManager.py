@@ -85,16 +85,6 @@ class SoundManager(HelperObject):
     def CreatureType(self):  # type: ()->Array[CreatureTypeData]
         return (lambda n: Array(CreatureTypeData, n))(self._node.at("CreatureType"))
     @property
-    def DefaultAmbiantBank(self):  # type: ()->String
-        return String(self._node.at("DefaultAmbiantBank"))
-    @DefaultAmbiantBank.setter
-    def DefaultAmbiantBank(self, val): self.DefaultAmbiantBank.set(val)
-    @property
-    def DefaultAmbiantEvent(self):  # type: ()->String
-        return String(self._node.at("DefaultAmbiantEvent"))
-    @DefaultAmbiantEvent.setter
-    def DefaultAmbiantEvent(self, val): self.DefaultAmbiantEvent.set(val)
-    @property
     def DisplayListener(self):  # type: ()->Bool
         return Bool(self._node.at("DisplayListener"))
     @DisplayListener.setter

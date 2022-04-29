@@ -118,17 +118,14 @@ namespace Ent
         return std::get<Vector>(m_data).isTuple();
     }
 
-    Node* Array::initAdd(OverrideValueLocation loc, NodeUniquePtr _node, bool _addedInInstance)
+    Node* Array::initAdd(OverrideValueLocation _loc, NodeUniquePtr _node, bool _addedInInstance)
     {
         if (hasKey())
         {
-            auto key = getChildKey(_node.get());
-            return std::get<Map>(m_data).insert(loc, key, std::move(_node), _addedInInstance);
+            auto const key = getChildKey(_node.get());
+            return std::get<Map>(m_data).insert(_loc, key, std::move(_node), _addedInInstance);
         }
-        else
-        {
-            return std::get<Vector>(m_data).initPush(std::move(_node), _addedInInstance);
-        }
+        return std::get<Vector>(m_data).initPush(std::move(_node), _addedInInstance);
     }
 
     Node* Array::mapInitInsert(
@@ -194,7 +191,7 @@ namespace Ent
 
     Array Array::detach() const
     {
-        auto entitylib = std::visit([](auto& a) { return a.getEntityLib(); }, m_data);
+        auto const* const entitylib = std::visit([](auto& a) { return a.getEntityLib(); }, m_data);
         Array result{entitylib, m_schema};
         result.m_data = std::visit([](auto& a) { return MapOrVector(a.detach()); }, m_data);
         result.checkInvariants();
@@ -203,7 +200,7 @@ namespace Ent
 
     Array Array::makeInstanceOf() const
     {
-        auto entitylib = std::visit([](auto& a) { return a.getEntityLib(); }, m_data);
+        auto const* const entitylib = std::visit([](auto& a) { return a.getEntityLib(); }, m_data);
         Array result{entitylib, m_schema};
         result.m_data = std::visit([](auto& a) { return MapOrVector(a.makeInstanceOf()); }, m_data);
         return result;

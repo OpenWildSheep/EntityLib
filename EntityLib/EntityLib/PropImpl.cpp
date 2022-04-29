@@ -12,18 +12,9 @@ namespace Ent
         m_default = FileProperty{_schema, _filePath, const_cast<nlohmann::json*>(_document)};
     }
 
-    FileProperty* PropImpl::getDefault()
+    FileProperty const& PropImpl::getDefault() const
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-        return const_cast<FileProperty*>(std::as_const(*this).getDefault());
-    }
-    FileProperty const* PropImpl::getDefault() const
-    {
-        if (not m_default.has_value())
-        {
-            return nullptr;
-        }
-        return &(*m_default);
+        return m_default;
     }
 
     bool PropImpl::isSet() const
@@ -38,24 +29,21 @@ namespace Ent
         {
             return m_instance.get<V>();
         }
-        else if (m_prefab != nullptr)
+        if (m_prefab != nullptr)
         {
             return m_prefab->get<V>();
         }
-        else if (auto* defaultVal = getDefault(); defaultVal != nullptr and defaultVal->isSet())
+        if (getDefault().isSet())
         {
-            return defaultVal->get<V>();
+            return getDefault().get<V>();
         }
-        else if constexpr (std::is_same_v<char const*, V>)
+        if constexpr (std::is_same_v<char const*, V>)
         {
             if (not getSchema()->enumValues.empty())
             {
                 return getSchema()->enumValues.front().c_str();
             }
-            else
-            {
-                return "";
-            }
+            return "";
         }
         else
         {
@@ -122,7 +110,7 @@ namespace Ent
 
     bool PropImpl::isDefault() const
     {
-        auto& newLayer = *this;
+        auto const& newLayer = *this;
         if (m_instance.isSet())
         {
             return false;
@@ -136,20 +124,22 @@ namespace Ent
 
     bool PropImpl::_loadInstanceOf()
     {
-        auto* subschema = m_instance.getSchema();
+        auto const* subschema = m_instance.getSchema();
         if ((subschema->type == DataType::object or subschema->type == DataType::oneOf)
             and m_instance.isSet())
         {
-            auto* doc = m_instance.getRawJson();
-            if (auto member = doc->find("InstanceOf"); member != doc->end())
+            if (auto const* doc = m_instance.getRawJson())
             {
-                if (auto const& prefabPath = member->get_ref<std::string const&>();
-                    not prefabPath.empty())
+                if (auto const member = doc->find("InstanceOf"); member != doc->end())
                 {
-                    m_prefab =
-                        m_entityLib->newPropImpl(nullptr, subschema, prefabPath.c_str(), nullptr);
+                    if (auto const& prefabPath = member->get_ref<std::string const&>();
+                        not prefabPath.empty())
+                    {
+                        m_prefab = m_entityLib->newPropImpl(
+                            nullptr, subschema, prefabPath.c_str(), nullptr);
+                    }
+                    return true;
                 }
-                return true;
             }
         }
         return false;
@@ -160,24 +150,23 @@ namespace Ent
         _checkInvariants();
         ENTLIB_DBG_ASSERT(getDataType() == DataType::object);
         auto newLayer = m_entityLib->newPropImpl();
-        ENTLIB_DBG_ASSERT(
-            getDefault() == nullptr or getDefault()->getSchema()->type == DataType::object);
+        ENTLIB_DBG_ASSERT(getDefault().getSchema()->type == DataType::object);
         newLayer->m_instance = m_instance.getObjectField(_field, _fieldRef);
         newLayer->m_entityLib = m_entityLib;
         newLayer->m_parent = sharedFromThis();
-        auto* subschema = newLayer->getSchema();
+        auto const* subschema = newLayer->getSchema();
         if (not newLayer->_loadInstanceOf())
         {
-            if (m_prefab != nullptr)
+            if (not m_instance.isRemovedObject() and m_prefab != nullptr)
             {
                 newLayer->m_prefab = m_prefab->getObjectField(_field, _fieldRef);
             }
         }
         bool defaultFound = false;
-        auto* defaultVal = getDefault();
-        if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
+        auto const& defaultVal = getDefault();
+        if (defaultVal.isSet()) // If there is default, enter in
         {
-            auto const objectField = defaultVal->getObjectField(_field, _fieldRef);
+            auto objectField = defaultVal.getObjectField(_field, _fieldRef);
             if (objectField.isSet())
             {
                 defaultFound = true;
@@ -186,7 +175,7 @@ namespace Ent
         }
         if (not defaultFound)
         {
-            auto propDefVal = newLayer->m_instance.getPropertyDefaultValue();
+            auto const* const propDefVal = newLayer->m_instance.getPropertyDefaultValue();
             if (propDefVal != nullptr) // If there is property default, use them
             {
                 newLayer->setDefault(subschema, nullptr, propDefVal);
@@ -194,6 +183,10 @@ namespace Ent
             else if (not subschema->defaultValue.is_null())
             {
                 newLayer->setDefault(subschema, nullptr, &subschema->defaultValue);
+            }
+            else
+            {
+                newLayer->setDefault(subschema, nullptr, nullptr);
             }
         }
         return newLayer;
@@ -213,7 +206,7 @@ namespace Ent
     {
         if (_dataSchema == nullptr)
         {
-            auto& singularItems = m_instance.getSchema()->singularItems;
+            auto const& singularItems = m_instance.getSchema()->singularItems;
             if (singularItems != nullptr)
             {
                 Subschema const& unionSchema = singularItems->get();
@@ -221,8 +214,8 @@ namespace Ent
                 {
                     throw BadType("PropImpl::enterUnionSetItem : Not an UnionSet");
                 }
-                auto& unionTypeMap = unionSchema.unionTypeMap;
-                if (auto iter = unionTypeMap.find(_type); iter != unionTypeMap.end())
+                auto const& unionTypeMap = unionSchema.unionTypeMap;
+                if (auto const iter = unionTypeMap.find(_type); iter != unionTypeMap.end())
                 {
                     _dataSchema = iter->second.dataSchema;
                 }
@@ -250,13 +243,13 @@ namespace Ent
         newLayer.m_entityLib = m_entityLib;
         newLayer.m_instance = _enter(m_instance);
         newLayer.m_parent = sharedFromThis();
-        auto* subschema = newLayer.getSchema();
-        auto* defaultVal = getDefault();
-        if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
+        auto const* subschema = newLayer.getSchema();
+        auto const& defaultVal = getDefault();
+        if (defaultVal.isSet()) // If there is default, enter in
         {
-            newLayer.m_default = _enter(*defaultVal);
+            newLayer.m_default = _enter(defaultVal);
         }
-        else if (auto* propDefVal = newLayer.m_instance.getPropertyDefaultValue()) // If there is property default, use them
+        else if (auto const* propDefVal = newLayer.m_instance.getPropertyDefaultValue()) // If there is property default, use them
         {
             newLayer.setDefault(subschema, nullptr, propDefVal);
         }
@@ -274,11 +267,16 @@ namespace Ent
                 }
             }
         }
+        if (newLayerPtr->getDefault().getSchema() == nullptr)
+        {
+            newLayerPtr->setDefault(subschema, nullptr, nullptr);
+        }
         return newLayerPtr;
     }
 
     PropImplPtr PropImpl::getObjectSetItem(char const* _key)
     {
+        ENTLIB_ASSERT(getDataKind() == DataKind::objectSet);
         return _enterItem([_key](auto&& _cur) { return _cur.getObjectSetItem(_key); });
     }
 
@@ -306,7 +304,7 @@ namespace Ent
         ENTLIB_DBG_ASSERT(m_instance.getSchema()->type == DataType::array);
         newLayer.m_instance = m_instance.getArrayItem(_index);
         newLayer.m_parent = sharedFromThis();
-        auto* subschema = newLayer.getSchema();
+        auto const* subschema = newLayer.getSchema();
         if (not isDefault())
         {
             if (not newLayer._loadInstanceOf())
@@ -317,10 +315,10 @@ namespace Ent
                 }
             }
         }
-        auto* defaultVal = getDefault();
-        if (defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
+        auto const& defaultVal = getDefault();
+        if (defaultVal.isSet()) // If there is default, enter in
         {
-            newLayer.m_default = defaultVal->getArrayItem(_index);
+            newLayer.m_default = defaultVal.getArrayItem(_index);
         }
         else if (newLayer.m_instance.getPropertyDefaultValue() != nullptr) // If there is property default, use them
         {
@@ -340,7 +338,7 @@ namespace Ent
         schema.type = DataType::string;
         SubschemaRef ref;
         ref.subSchemaOrRef = std::move(schema);
-        auto field = getObjectField("InstanceOf", &ref);
+        auto const field = getObjectField("InstanceOf", &ref);
         if (not field->isSet())
         {
             return nullptr;
@@ -349,7 +347,13 @@ namespace Ent
         return instanceOf;
     }
 
-    void PropImpl::setInstanceOf(char const* _instanceOf)
+    void PropImpl::resetInstanceOf(char const* _instanceOf)
+    {
+        unset();
+        changeInstanceOf(_instanceOf);
+    }
+
+    void PropImpl::changeInstanceOf(char const* _instanceOf)
     {
         if (_instanceOf == nullptr)
         {
@@ -360,7 +364,8 @@ namespace Ent
         schema.type = DataType::string;
         SubschemaRef ref;
         ref.subSchemaOrRef = std::move(schema);
-        getObjectField("InstanceOf", &ref)->setString(_instanceOf);
+        getObjectField("InstanceOf", &ref)
+            ->setString(m_entityLib->getRelativePath(_instanceOf).generic_u8string().c_str());
         if (strlen(_instanceOf) != 0)
         {
             m_prefab = m_entityLib->newPropImpl(nullptr, getSchema(), _instanceOf, nullptr);
@@ -371,33 +376,39 @@ namespace Ent
         }
     }
 
-    char const* PropImpl::getUnionType()
+    PropImplPtr PropImpl::makeInstanceOf()
+    {
+        auto& jsonDoc = m_entityLib->createTempJsonFile();
+        jsonDoc["InstanceOf"] = m_instance.getFilePath();
+        auto instProp = m_entityLib->newPropImpl(nullptr, getSchema(), "", &jsonDoc);
+        instProp->m_prefab = sharedFromThis();
+        return instProp;
+    }
+
+    char const* PropImpl::getUnionType() const
     {
         ENTLIB_ASSERT(getSchema()->type == DataType::oneOf);
         if (char const* type = m_instance.getUnionType())
         {
             return type;
         }
-        else if (m_prefab != nullptr)
+        if (m_prefab != nullptr)
         {
             if (char const* type2 = m_prefab->getUnionType())
             {
                 return type2;
             }
         }
-        else if (auto* defaultVal = getDefault())
+        else if (char const* type3 = getDefault().getUnionType())
         {
-            if (char const* type3 = defaultVal->getUnionType())
-            {
-                return type3;
-            }
+            return type3;
         }
         return getSchema()->getUnionDefaultTypeName();
     }
 
-    size_t PropImpl::getUnionTypeIndex()
+    size_t PropImpl::getUnionTypeIndex() const
     {
-        auto type = getUnionType();
+        auto const* const type = getUnionType();
         return AT(getSchema()->unionTypeMap, type).index;
     }
 
@@ -405,9 +416,7 @@ namespace Ent
     {
 #ifdef _DEBUG
         ENTLIB_DBG_ASSERT(m_instance.getSchema() != nullptr);
-        ENTLIB_DBG_ASSERT(
-            getDefault() == nullptr
-            or getDefault()->getSchema()->type == m_instance.getSchema()->type);
+        ENTLIB_DBG_ASSERT(getDefault().getSchema()->type == m_instance.getSchema()->type);
         if (m_prefab != nullptr)
         {
             m_prefab->_checkInvariants();
@@ -432,13 +441,13 @@ namespace Ent
 
     DataType PropImpl::getMapKeyType() const
     {
-        return m_instance.getSchema()->singularItems->get().linearItems->at(0)->type;
+        return m_instance.getMapKeyType();
     }
 
     DataType PropImpl::getObjectSetKeyType() const
     {
-        auto& schema = *m_instance.getSchema();
-        if (auto arrayMeta = std::get_if<Subschema::ArrayMeta>(&schema.meta))
+        auto const& schema = *m_instance.getSchema();
+        if (auto const* const arrayMeta = std::get_if<Subschema::ArrayMeta>(&schema.meta))
         {
             if (arrayMeta->keyField.has_value())
             {
@@ -449,39 +458,33 @@ namespace Ent
             "In PropImpl::getObjectSetKeyType : Expected ObjectSet. Got %s", schema.name.c_str()));
     }
 
-    size_t PropImpl::arraySize()
+    size_t PropImpl::arraySize() const
     {
-        auto& jsonExplLayer = m_instance;
-        auto* schema = jsonExplLayer.getSchema();
+        auto const& jsonExplLayer = m_instance;
+        auto const* schema = jsonExplLayer.getSchema();
         if (schema->linearItems.has_value())
         {
             return schema->linearItems->size();
         }
-        else
+        if (isSet())
         {
-            if (isSet())
-            {
-                return jsonExplLayer.size();
-            }
-            else if (m_prefab != nullptr)
-            {
-                return m_prefab->arraySize();
-            }
-            else if (auto* defaultVal = getDefault(); defaultVal != nullptr and defaultVal->isSet())
-            {
-                return defaultVal->getRawJson()->size();
-            }
-            else
-            {
-                return schema->minItems;
-            }
+            return jsonExplLayer.size();
         }
+        if (m_prefab != nullptr)
+        {
+            return m_prefab->arraySize();
+        }
+        if (getDefault().isSet())
+        {
+            return getDefault().getRawJson()->size();
+        }
+        return schema->minItems;
     }
 
     size_t PropImpl::size()
     {
-        auto& jsonExplLayer = m_instance;
-        auto* schema = jsonExplLayer.getSchema();
+        auto const& jsonExplLayer = m_instance;
+        auto const* schema = jsonExplLayer.getSchema();
         if (schema->linearItems.has_value())
         {
             return schema->linearItems->size();
@@ -512,7 +515,7 @@ namespace Ent
                 case DataType::string: return getPrimSetKeysString().size();
                 case DataType::oneOf: return getUnionSetKeysString().size();
                 case DataType::object:
-                    auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
+                    auto const& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                     switch (keyFieldSchema.type)
                     {
                     case DataType::string: return getObjectSetKeysString().size();
@@ -542,8 +545,8 @@ namespace Ent
 
     bool PropImpl::contains(Key const& _key)
     {
-        auto& jsonExplLayer = m_instance;
-        auto* schema = jsonExplLayer.getSchema();
+        auto const& jsonExplLayer = m_instance;
+        auto const* schema = jsonExplLayer.getSchema();
         if (schema->linearItems.has_value())
         {
             return false; // Not a map/set
@@ -574,7 +577,7 @@ namespace Ent
                 case DataType::string: return primSetContains(std::get<std::string>(_key).c_str());
                 case DataType::oneOf: return unionSetContains(std::get<std::string>(_key).c_str());
                 case DataType::object:
-                    auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
+                    auto const& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                     switch (keyFieldSchema.type)
                     {
                     case DataType::string:
@@ -608,49 +611,27 @@ namespace Ent
         return size() == 0;
     }
 
+    template <typename Container, typename F>
+    Container PropImpl::getKeys(F const& getKeysInFile)
+    {
+        Container keys;
+        if (m_prefab != nullptr) // If there is a prefab, get prefab's keys
+        {
+            keys = m_prefab->getKeys<Container, F>(getKeysInFile);
+        }
+        else // else, get the dfault keys
+        {
+            getKeysInFile(getDefault(), keys);
+        }
+        // Anyway, add or remove keys from instance
+        getKeysInFile(m_instance, keys);
+        return keys;
+    }
+
     std::set<char const*, CmpStr> PropImpl::getMapKeysString()
     {
-        std::set<char const*, CmpStr> keys;
-        if (m_prefab != nullptr)
-        {
-            keys = m_prefab->getMapKeysString();
-        }
-        else if (auto* defaultVal = getDefault();
-                 defaultVal != nullptr and defaultVal->isSet()) // If there is default, enter in
-        {
-            auto* node = defaultVal->getRawJson();
-            ENTLIB_DBG_ASSERT(node->is_array());
-            for (auto const& k_v : *node)
-            {
-                ENTLIB_DBG_ASSERT(node->is_array());
-                auto& key = k_v[0].get_ref<std::string const&>();
-                ENTLIB_DBG_ASSERT(node->is_array());
-                keys.insert(key.c_str());
-                ENTLIB_DBG_ASSERT(node->is_array());
-            }
-        }
-        if (m_instance.isSet())
-        {
-            auto* node = m_instance.getRawJson();
-            ENTLIB_DBG_ASSERT(node->is_array());
-            for (size_t i = 0; i < node->size(); ++i)
-            {
-                ENTLIB_DBG_ASSERT(node->is_array());
-                auto pairLayer = getArrayItem(i);
-                auto key = pairLayer->getArrayItem(0)->getString();
-                ENTLIB_DBG_ASSERT(node->is_array());
-                if (pairLayer->getArrayItem(1llu)->isNull())
-                {
-                    keys.erase(key);
-                }
-                else
-                {
-                    keys.insert(key);
-                }
-                ENTLIB_DBG_ASSERT(node->is_array());
-            }
-        }
-        return keys;
+        return getKeys<std::set<char const*, CmpStr>>([](FileProperty const& _file, auto& _keys)
+                                                      { _file.updateMapKeysString(_keys); });
     }
 
     bool PropImpl::isNull() const
@@ -659,152 +640,65 @@ namespace Ent
         {
             return m_instance.isNull();
         }
-        else if (m_prefab != nullptr)
+        if (m_prefab != nullptr)
         {
             return m_prefab->isNull();
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
     std::set<int64_t> PropImpl::getMapKeysInt()
     {
-        std::set<int64_t> keys;
-        if (m_prefab != nullptr)
-        {
-            keys = m_prefab->getMapKeysInt();
-        }
-        if (m_instance.isSet())
-        {
-            auto const arraySize = m_instance.getRawJson()->size();
-            for (size_t i = 0; i < arraySize; ++i)
-            {
-                auto pairLayer = getArrayItem(i);
-                auto key = pairLayer->getArrayItem(0llu)->getInt();
-                if (pairLayer->getArrayItem(1llu)->isNull())
-                {
-                    keys.erase(key);
-                }
-                else
-                {
-                    keys.insert(key);
-                }
-            }
-        }
-        return keys;
+        return getKeys<std::set<int64_t>>([](FileProperty const& _file, auto& _keys)
+                                          { _file.updateMapKeysInt(_keys); });
     }
     std::set<int64_t> PropImpl::getPrimSetKeysInt()
     {
-        std::set<int64_t> keys;
-        if (m_instance.isSet())
-        {
-            for (size_t i = 0; i < arraySize(); ++i)
-            {
-                keys.insert(getArrayItem(i)->getInt());
-            }
-        }
-        if (m_prefab != nullptr)
-        {
-            keys.merge(m_prefab->getPrimSetKeysInt());
-        }
-        return keys;
+        return getKeys<std::set<int64_t>>([](FileProperty const& _file, auto& _keys)
+                                          { _file.updatePrimSetKeysInt(_keys); });
     }
     std::set<char const*, CmpStr> PropImpl::getPrimSetKeysString()
     {
-        std::set<char const*, CmpStr> keys;
-        if (m_instance.isSet())
-        {
-            for (size_t i = 0; i < arraySize(); ++i)
-            {
-                keys.insert(getArrayItem(i)->getString());
-            }
-        }
-        if (m_prefab != nullptr)
-        {
-            keys.merge(m_prefab->getPrimSetKeysString());
-        }
-        return keys;
+        return getKeys<std::set<char const*, CmpStr>>([](FileProperty const& _file, auto& _keys)
+                                                      { _file.updatePrimSetKeysString(_keys); });
     }
 
     std::map<char const*, Subschema const*, CmpStr> PropImpl::getUnionSetKeysString()
     {
-        std::map<char const*, Subschema const*, CmpStr> keys;
-        if (m_prefab != nullptr)
-        {
-            keys = m_prefab->getUnionSetKeysString();
-        }
-        if (m_instance.isSet())
-        {
-            for (size_t i = 0; i < arraySize(); ++i)
-            {
-                auto arrayItem = m_instance.getArrayItem(i);
-                auto unionSchema = arrayItem.getUnionSchema();
-                bool const isRemoved = (unionSchema == nullptr) or arrayItem.isUnionRemoved();
-                if (isRemoved)
-                {
-                    keys.erase(arrayItem.getUnionType());
-                }
-                else
-                {
-                    keys.emplace(arrayItem.getUnionType(), unionSchema);
-                }
-            }
-        }
-        return keys;
+        return getKeys<std::map<char const*, Subschema const*, CmpStr>>(
+            [](FileProperty const& _file, auto& _keys) { _file.updateUnionSetKeysString(_keys); });
     }
 
     std::set<char const*, CmpStr> PropImpl::getObjectSetKeysString()
     {
-        auto const& meta = std::get<Subschema::ArrayMeta>(getSchema()->meta);
-        std::set<char const*, CmpStr> keys;
-        if (m_prefab != nullptr)
-        {
-            keys = m_prefab->getObjectSetKeysString();
-        }
-        if (m_instance.isSet())
-        {
-            for (size_t i = 0; i < arraySize(); ++i)
-            {
-                auto objectLayer = getArrayItem(i);
-                if (objectLayer->m_instance.isRemovedObject())
-                {
-                    keys.erase(objectLayer->getObjectField(meta.keyField->c_str())->getString());
-                }
-                else
-                {
-                    keys.insert(objectLayer->getObjectField(meta.keyField->c_str())->getString());
-                }
-            }
-        }
-        return keys;
+        return getKeys<std::set<char const*, CmpStr>>([](FileProperty const& _file, auto& _keys)
+                                                      { _file.updateObjectSetKeysString(_keys); });
     }
 
     std::set<int64_t> PropImpl::getObjectSetKeysInt()
     {
-        auto const& meta = std::get<Subschema::ArrayMeta>(getSchema()->meta);
-        std::set<int64_t> keys;
-        if (m_instance.isSet())
-        {
-            for (size_t i = 0; i < arraySize(); ++i)
-            {
-                auto objLayer = getArrayItem(i);
-                if (objLayer->m_instance.isSet()
-                    and objLayer->m_instance.getRawJson()->count("__removed__") != 0)
-                {
-                    keys.erase(getObjectField(meta.keyField->c_str())->getInt());
-                }
-                else
-                {
-                    keys.insert(getObjectField(meta.keyField->c_str())->getInt());
-                }
-            }
-        }
-        if (m_prefab != nullptr)
-        {
-            keys.merge(m_prefab->getObjectSetKeysInt());
-        }
-        return keys;
+        return getKeys<std::set<int64_t>>([](FileProperty const& _file, auto& _keys)
+                                          { _file.updateObjectSetKeysInt(_keys); });
+    }
+
+    std::set<char const*, CmpStr> PropImpl::getMapRemovedKeysString() const
+    {
+        return m_instance.getMapRemovedKeysString();
+    }
+    std::set<int64_t> PropImpl::getMapRemovedKeysInt() const
+    {
+        return m_instance.getMapRemovedKeysInt();
+    }
+    std::map<char const*, Subschema const*, CmpStr> PropImpl::getUnionSetRemovedKeysString() const
+    {
+        return m_instance.getUnionSetRemovedKeysString();
+    }
+    std::set<char const*, CmpStr> PropImpl::getObjectSetRemovedKeysString() const
+    {
+        return m_instance.getObjectSetRemovedKeysString();
+    }
+    std::set<int64_t> PropImpl::getObjectSetRemovedKeysInt() const
+    {
+        return m_instance.getObjectSetRemovedKeysInt();
     }
 
     bool PropImpl::mapContains(char const* _key)
@@ -817,15 +711,11 @@ namespace Ent
     }
     bool PropImpl::primSetContains(char const* _key)
     {
-        return _countPrimSetKeyImpl(
-            _key,
-            [this](PropImpl& primLayer, char const* _key)
-            { return strcmp(primLayer.getString(), _key) == 0; });
+        return _countPrimSetKeyImpl(_key);
     }
     bool PropImpl::primSetContains(int64_t _key)
     {
-        return _countPrimSetKeyImpl(
-            _key, [this](PropImpl& primLayer, int64_t _key) { return primLayer.getInt() == _key; });
+        return _countPrimSetKeyImpl(_key);
     }
     bool PropImpl::unionSetContains(char const* _key)
     {
@@ -844,7 +734,7 @@ namespace Ent
     {
         _checkInvariants();
         std::vector<PropImpl*> allLayers;
-        for (PropImpl* iter = this; iter != nullptr; iter = iter->m_parent.get())
+        for (auto* iter = this; iter != nullptr; iter = iter->m_parent.get())
         {
             allLayers.push_back(iter);
         }
@@ -855,10 +745,10 @@ namespace Ent
             [](PropImpl const* l) { return not l->m_instance.isSet(); });
         ENTLIB_ASSERT(firstNotSet != allLayers.begin());
         auto firstNotSetIdx = std::distance(begin(allLayers), firstNotSet);
-        ENTLIB_ASSERT(firstNotSetIdx <= ptrdiff_t(allLayers.size()));
+        ENTLIB_ASSERT(firstNotSetIdx <= static_cast<ptrdiff_t>(allLayers.size()));
         auto lastSet = firstNotSet;
         --lastSet;
-        auto endIter = allLayers.end();
+        auto const endIter = allLayers.end();
         for (; firstNotSet != endIter; ++lastSet, ++firstNotSet, ++firstNotSetIdx)
         {
             (*firstNotSet)->m_instance.createChildNode((*lastSet)->m_instance);
@@ -870,6 +760,22 @@ namespace Ent
     {
         _buildPath();
         m_instance.setSize(_size);
+    }
+
+    void PropImpl::clear()
+    {
+        setSize(0);
+    }
+
+    PropImplPtr PropImpl::push_back()
+    {
+        setSize(arraySize() + 1);
+        return getArrayItem(arraySize() - 1);
+    }
+
+    void PropImpl::pop_back()
+    {
+        setSize(arraySize() - 1);
     }
 
     void PropImpl::setFloat(double _value)
@@ -898,30 +804,27 @@ namespace Ent
         _buildPath();
         m_instance.setEntityRef(_value);
     }
-    void PropImpl::setUnionType(char const* _type)
+    PropImplPtr PropImpl::setUnionType(char const* _type)
     {
+        if (getSchema()->unionTypeMap.count(_type) == 0)
+        {
+            throw BadUnionType(_type);
+        }
         _buildPath();
         m_instance.setUnionType(_type);
+        return getUnionData();
     }
     void PropImpl::buildPath()
     {
         _buildPath();
     }
 
-    template <typename K, typename E>
-    bool PropImpl::_countPrimSetKeyImpl(K _key, E&& _isEqual)
+    template <typename K>
+    bool PropImpl::_countPrimSetKeyImpl(K _key)
     {
-        if (m_instance.isSet())
+        if (m_instance.countPrimSetKey(_key))
         {
-            for (size_t i = 0; i < arraySize(); ++i)
-            {
-                auto item = getArrayItem(i);
-                bool const equal = _isEqual(*item, _key);
-                if (equal)
-                {
-                    return true;
-                }
-            }
+            return true;
         }
         if (m_prefab != nullptr)
         {
@@ -947,9 +850,215 @@ namespace Ent
         }
     }
 
-    nlohmann::json const* PropImpl::getRawJson()
+    PropImplPtr PropImpl::insertUnionSetItem(char const* _key)
+    {
+        auto newItem = getUnionSetItem(_key);
+        newItem->buildPath();
+        return newItem;
+    }
+
+    PropImplPtr PropImpl::insertMapItem(char const* _key)
+    {
+        auto newItem = getMapItem(_key);
+        newItem->buildPath();
+        return newItem;
+    }
+
+    PropImplPtr PropImpl::insertMapItem(int64_t _key)
+    {
+        auto newItem = getMapItem(_key);
+        newItem->buildPath();
+        return newItem;
+    }
+
+    PropImplPtr PropImpl::insertObjectSetItem(char const* _key)
+    {
+        auto newItem = getObjectSetItem(_key);
+        newItem->buildPath();
+        return newItem;
+    }
+
+    PropImplPtr PropImpl::insertInstanceObjectSetItem(char const* _prefabPath)
+    {
+        auto const prefab =
+            m_entityLib->newPropImpl(nullptr, &getSchema()->singularItems->get(), _prefabPath);
+        auto const& arrayMeta = std::get<Subschema::ArrayMeta>(getSchema()->meta);
+        auto const key = prefab->getObjectField(arrayMeta.keyField->c_str());
+        PropImplPtr newObj;
+        if (key->getDataType() == DataType::integer)
+        {
+            newObj = insertObjectSetItem(key->getInt());
+        }
+        else
+        {
+            newObj = insertObjectSetItem(key->getString());
+        }
+        newObj->changeInstanceOf(_prefabPath);
+        return newObj;
+    }
+
+    PropImplPtr PropImpl::insertObjectSetItem(int64_t _key)
+    {
+        auto newItem = getObjectSetItem(_key);
+        newItem->buildPath();
+        return newItem;
+    }
+
+    bool PropImpl::erasePrimSetKey(char const* _key)
+    {
+        bool const isInPrefab = (m_prefab == nullptr) ? false : m_prefab->primSetContains(_key);
+        if (isInPrefab)
+        {
+            throw BadArrayType("Can't erase in a primitive set if the key is still in the prefab");
+        }
+        return m_instance.erasePrimSetKey(_key);
+    }
+    bool PropImpl::erasePrimSetKey(int64_t _key)
+    {
+        return m_instance.erasePrimSetKey(_key);
+    }
+    bool PropImpl::eraseObjectSetItem(char const* _key)
+    {
+        bool const isInPrefab = (m_prefab == nullptr) ? false : m_prefab->objectSetContains(_key);
+        if (isInPrefab)
+        {
+            buildPath();
+        }
+        return m_instance.eraseObjectSetItem(_key, isInPrefab);
+    }
+    bool PropImpl::eraseObjectSetItem(int64_t _key)
+    {
+        bool const isInPrefab = (m_prefab == nullptr) ? false : m_prefab->objectSetContains(_key);
+        if (isInPrefab)
+        {
+            buildPath();
+        }
+        return m_instance.eraseObjectSetItem(_key, isInPrefab);
+    }
+    bool PropImpl::eraseUnionSetItem(char const* _key)
+    {
+        bool const isInPrefab = (m_prefab == nullptr) ? false : m_prefab->unionSetContains(_key);
+        if (isInPrefab)
+        {
+            buildPath();
+        }
+        return m_instance.eraseUnionSetItem(_key, isInPrefab);
+    }
+    bool PropImpl::eraseMapItem(char const* _key)
+    {
+        bool const isInPrefab = (m_prefab == nullptr) ? false : m_prefab->mapContains(_key);
+        if (isInPrefab)
+        {
+            buildPath();
+        }
+        return m_instance.eraseMapItem(_key, isInPrefab);
+    }
+    bool PropImpl::eraseMapItem(int64_t _key)
+    {
+        bool const isInPrefab = (m_prefab == nullptr) ? false : m_prefab->mapContains(_key);
+        if (isInPrefab)
+        {
+            buildPath();
+        }
+        return m_instance.eraseMapItem(_key, isInPrefab);
+    }
+
+    nlohmann::json const* PropImpl::getRawJson() const
     {
         return m_instance.getRawJson();
+    }
+
+    double PropImpl::getDefaultFloat() const
+    {
+        return m_default.getFloat();
+    }
+    int64_t PropImpl::getDefaultInt() const
+    {
+        return m_default.getInt();
+    }
+    char const* PropImpl::getDefaultString() const
+    {
+        return m_default.getString();
+    }
+    bool PropImpl::getDefaultBool() const
+    {
+        return m_default.getBool();
+    }
+    EntityRef PropImpl::getDefaultEntityRef() const
+    {
+        return m_default.getEntityRef();
+    }
+
+    size_t PropImpl::getDefaultSize() const
+    {
+        return m_default.size();
+    }
+
+    PropImplPtr PropImpl::getLastSetPrefab() const
+    {
+        if (m_prefab == nullptr)
+        {
+            return nullptr;
+        }
+        if (m_prefab->isSet())
+        {
+            return m_prefab->sharedFromThis();
+        }
+        return m_prefab->getLastSetPrefab();
+    }
+
+    bool PropImpl::hasPrefabValue() const
+    {
+        return getLastSetPrefab() != nullptr;
+    }
+
+    double PropImpl::getPrefabFloat() const
+    {
+        if (auto const lastSetPrefab = getLastSetPrefab())
+        {
+            return lastSetPrefab->getFloat();
+        }
+        return getDefaultFloat();
+    }
+    int64_t PropImpl::getPrefabInt() const
+    {
+        if (auto const lastSetPrefab = getLastSetPrefab())
+        {
+            return lastSetPrefab->getInt();
+        }
+        return getDefaultInt();
+    }
+    char const* PropImpl::getPrefabString() const
+    {
+        if (auto const lastSetPrefab = getLastSetPrefab())
+        {
+            return lastSetPrefab->getString();
+        }
+        return getDefaultString();
+    }
+    bool PropImpl::getPrefabBool() const
+    {
+        if (auto const lastSetPrefab = getLastSetPrefab())
+        {
+            return lastSetPrefab->getBool();
+        }
+        return getDefaultBool();
+    }
+    EntityRef PropImpl::getPrefabEntityRef() const
+    {
+        if (auto const lastSetPrefab = getLastSetPrefab())
+        {
+            return lastSetPrefab->getEntityRef();
+        }
+        return getDefaultEntityRef();
+    }
+    std::optional<int64_t> PropImpl::getPrefabSize() const
+    {
+        if (auto const lastSetPrefab = getLastSetPrefab())
+        {
+            return lastSetPrefab->m_instance.size();
+        }
+        return std::nullopt;
     }
 
     void decRef(PropImpl* self)
@@ -966,4 +1075,53 @@ namespace Ent
         }
     }
 
+    void PropImpl::unset()
+    {
+        if (not isSet())
+        {
+            return;
+        }
+        _checkInvariants();
+        std::vector<PropImpl*> allLayers;
+        if (m_parent != nullptr)
+        {
+            auto const* const parentSchema = m_parent->getSchema();
+            switch (parentSchema->getDataKind())
+            {
+            case DataKind::object: m_parent->m_instance.unsetObjectField(m_instance); break;
+            case DataKind::union_:
+                m_parent->m_instance.unsetUnionData();
+                m_instance.setRawJson(nullptr);
+                break;
+            case DataKind::map: m_instance.setToDefault(parentSchema); break;
+            case DataKind::objectSet: m_instance.setToDefault(parentSchema); break;
+            case DataKind::unionSet: m_instance.setToDefault(parentSchema); break;
+            case DataKind::primitiveSet:
+                ENTLIB_LOGIC_ERROR("Unexpected unset on a pripitive in a set !");
+            case DataKind::array: m_instance.setToNull(); break;
+            case DataKind::boolean: [[fallthrough]];
+            case DataKind::integer: [[fallthrough]];
+            case DataKind::number: [[fallthrough]];
+            case DataKind::string: [[fallthrough]];
+            case DataKind::entityRef: [[fallthrough]];
+            case DataKind::COUNT: [[fallthrough]];
+            default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
+            }
+        }
+        else
+        {
+            m_instance.setToDefault(getSchema());
+        }
+        _checkInvariants();
+    }
+
+    std::vector<char const*> PropImpl::getFieldNames() const
+    {
+        std::vector<char const*> fields;
+        for (auto&& [field, schema] : getSchema()->properties)
+        {
+            fields.push_back(field.c_str());
+        }
+        return fields;
+    }
 } // namespace Ent

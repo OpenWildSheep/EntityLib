@@ -6,7 +6,6 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.Int import *
-from entgen.Bool import *
 from entgen.GameInfoDB import *
 from entgen.EntityStateSet import *
 from entgen.EntityRef import *
@@ -36,20 +35,10 @@ class PlayerState(HelperObject):
     def GameInfoDB(self):  # type: ()->GameInfoDB
         return GameInfoDB(self._node.at("GameInfoDB"))
     @property
-    def MainScene(self):  # type: ()->String
-        return String(self._node.at("MainScene"))
-    @MainScene.setter
-    def MainScene(self, val): self.MainScene.set(val)
-    @property
     def Version(self):  # type: ()->Int
         return Int(self._node.at("Version"))
     @Version.setter
     def Version(self, val): self.Version.set(val)
-    @property
-    def WEDMode(self):  # type: ()->Bool
-        return Bool(self._node.at("WEDMode"))
-    @WEDMode.setter
-    def WEDMode(self, val): self.WEDMode.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

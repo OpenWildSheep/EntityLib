@@ -7,7 +7,6 @@ import EntityLibPy
 from entgen.EnergyValue import *
 from entgen.String import *
 from entgen.Int import *
-from entgen.Bool import *
 from entgen.Float import *
 from entgen.Manager import *
 from entgen.RegenerationManager_EnergyAreaSetting import *
@@ -91,11 +90,6 @@ class RegenerationManager(HelperObject):
     @property
     def Super(self):  # type: ()->Manager
         return Manager(self._node.at("Super"))
-    @property
-    def UseNewRegenSystem(self):  # type: ()->Bool
-        return Bool(self._node.at("UseNewRegenSystem"))
-    @UseNewRegenSystem.setter
-    def UseNewRegenSystem(self, val): self.UseNewRegenSystem.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

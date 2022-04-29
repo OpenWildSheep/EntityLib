@@ -27,6 +27,11 @@ class BiomeSoundBank(HelperObject):
     def BiomeSounds(self):  # type: ()->Array[BiomeSoundBank_sBiomeSound]
         return (lambda n: Array(BiomeSoundBank_sBiomeSound, n))(self._node.at("BiomeSounds"))
     @property
+    def DefaultBiomeName(self):  # type: ()->String
+        return String(self._node.at("DefaultBiomeName"))
+    @DefaultBiomeName.setter
+    def DefaultBiomeName(self, val): self.DefaultBiomeName.set(val)
+    @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
     @_comment.setter

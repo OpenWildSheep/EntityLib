@@ -5,9 +5,11 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.NavMeshActionType import *
+from entgen.NavMeshArea import *
 from entgen.String import *
 from entgen.Bool import *
 from entgen.EntityRef import *
+from entgen.Float import *
 
 from EntityLibPy import Node
 
@@ -32,6 +34,11 @@ class OffMeshLink(HelperObject):
     @action.setter
     def action(self, val): self.action.set(val)
     @property
+    def area(self):  # type: ()->NavMeshArea
+        return NavMeshArea(self._node.at("area"))
+    @area.setter
+    def area(self, val): self.area.set(val)
+    @property
     def bidirectional(self):  # type: ()->Bool
         return Bool(self._node.at("bidirectional"))
     @bidirectional.setter
@@ -41,6 +48,11 @@ class OffMeshLink(HelperObject):
         return EntityRef(self._node.at("destination"))
     @destination.setter
     def destination(self, val): self.destination.set(val)
+    @property
+    def radius(self):  # type: ()->Float
+        return Float(self._node.at("radius"))
+    @radius.setter
+    def radius(self, val): self.radius.set(val)
     pass
 
 

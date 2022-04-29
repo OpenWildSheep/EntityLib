@@ -29,7 +29,8 @@ namespace Ent
     static std::string filterError(char const* message)
     {
         // Remove messages to say that all other components doesn't match
-        std::regex r(R"regex(Failed to validate against schema associated with property name \'Type\'\.
+        std::regex const r(
+            R"regex(Failed to validate against schema associated with property name \'Type\'\.
 In node \: \<root\>(\/\[Objects\]\/\[\d+\]|)\/\[Components\]\/\[\d+\]
 
 Failed to validate against child schema #\d+.
@@ -40,7 +41,8 @@ In node : \<root\>(\/\[Objects\]\/\[\d+\]|)\/\[Components\]\/\[\d+\]\/\[Type\]
 
 )regex");
         std::string const message2 = std::regex_replace(message, r, "");
-        std::regex r2(R"regex(Failed to validate against schema associated with property name \'Type\'\.
+        std::regex const r2(
+            R"regex(Failed to validate against schema associated with property name \'Type\'\.
 In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/\[Embedded\]\/\[\d+\]|)\/\[Components\]\/\[\d+\]
 
 Failed to validate against child schema #\d+.
@@ -55,7 +57,7 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
 
     static std::string convertLink(std::string link)
     {
-        if (auto slash = link.find_last_of('/'); slash != std::string::npos)
+        if (auto const slash = link.find_last_of('/'); slash != std::string::npos)
         {
             link = link.substr(slash + 1);
         }
@@ -104,7 +106,7 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
         {
             instSchema["enum"] = tmplSchema.enumValues;
         }
-        if (tmplSchema.maxItems != size_t(-1))
+        if (tmplSchema.maxItems != static_cast<size_t>(-1))
         {
             instSchema["maxItems"] = tmplSchema.maxItems;
         }
@@ -118,7 +120,7 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
 
         std::array<char const*, static_cast<size_t>(DataType::COUNT)> typeToStr = {
             "null", "string", "number", "integer", "object", "array", "boolean", "string", "object"};
-        instSchema["type"] = typeToStr[size_t(tmplSchema.type)];
+        instSchema["type"] = typeToStr[static_cast<size_t>(tmplSchema.type)];
         std::vector<char const*> requiredList;
         for (auto&& [name, prop] : tmplSchema.properties)
         {
@@ -220,9 +222,9 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
         return instSchema;
     }
 
-    static json const* fetchDocument(const std::string& uri)
+    static json const* fetchDocument(std::string const& uri)
     {
-        std::unique_ptr<json> fetchedRoot = std::make_unique<json>();
+        auto fetchedRoot = std::make_unique<json>();
         char buff[1024] = {};
         sprintf_s(
             buff,
@@ -263,14 +265,12 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
         return fullMessage;
     }
 
-    void validateScene(
-        Schema const& _schema, std::filesystem::path const& _toolsDir, nlohmann::json const& _scene)
+    void validateScene(Schema const& _schema, std::filesystem::path const& _toolsDir, json const& _scene)
     {
         validateJson(_schema, _toolsDir, _scene, "Scene");
     }
 
-    void validateEntity(
-        Schema const& _schema, std::filesystem::path const& _toolsDir, nlohmann::json const& _entity)
+    void validateEntity(Schema const& _schema, std::filesystem::path const& _toolsDir, json const& _entity)
     {
         validateJson(_schema, _toolsDir, _entity, "Entity");
     }
@@ -278,7 +278,7 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
     void validateJson(
         Schema const& _schema,
         std::filesystem::path const& _toolsDir,
-        nlohmann::json const& _entity,
+        json const& _entity,
         char const* rootName)
     {
         // valid the scene using schema
@@ -300,12 +300,12 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
             freeDocument);
 
         valijson::Validator validator;
-        valijson::adapters::NlohmannJsonAdapter myTargetAdapter(_entity);
+        valijson::adapters::NlohmannJsonAdapter const myTargetAdapter(_entity);
         valijson::ValidationResults result;
         if (!validator.validate(vjSchema, myTargetAdapter, &result))
         {
             /// @todo un-comment soon
-            std::string message = createMessageFromValidationResult(result);
+            std::string const message = createMessageFromValidationResult(result);
             throw JsonValidation(filterError(message.c_str()));
         }
     }

@@ -80,7 +80,8 @@ namespace Ent
         DataType type = DataType::null; ///< type of this Subschema. @see Ent::DataType
         bool required = false; ///< Is this property required?
         std::map<std::string, SubschemaRef> properties; ///< If type == Ent::DataType::object, child properties
-        size_t maxItems = size_t(-1); ///< Maximum size of the array. (inclusive) [min, max]
+        size_t maxItems =
+            static_cast<size_t>(-1); ///< Maximum size of the array. (inclusive) [min, max]
         size_t minItems = 0; ///< @brief Minimum size of an array
         std::optional<std::vector<SubschemaRef>> oneOf; ///< This object have to match with one of thos schema (union)
         std::string name; ///< This is not a constraint. Just the name of the definition
@@ -136,14 +137,15 @@ namespace Ent
         Meta meta{}; ///< Contains meta data for any type of Node
 
         // helper methods
-        bool IsDeprecated() const; ///< Is this node deprecated? (access to meta data)
-        bool IsUsedInEditor() const; ///< Is this node used in editor? (access to meta data)
-        bool IsUsedInRuntime() const; ///< Is this node used in runtime? (access to meta data)
-        bool IsRuntimeOnly() const /// Is this node used in runtime only? (access to meta data)
+        [[nodiscard]] bool IsDeprecated() const; ///< Is this node deprecated? (access to meta data)
+        [[nodiscard]] bool IsUsedInEditor() const; ///< Is this node used in editor? (access to meta data)
+        [[nodiscard]] bool IsUsedInRuntime() const; ///< Is this node used in runtime? (access to meta data)
+        [[nodiscard]] bool IsRuntimeOnly() const /// Is this node used in runtime only? (access to meta data)
         {
             return IsUsedInRuntime() && !IsUsedInEditor();
         }
-        bool IsEditorOnly() const /// Is this node used in editor only? (access to meta data)
+
+        [[nodiscard]] bool IsEditorOnly() const /// Is this node used in editor only? (access to meta data)
         {
             return !IsUsedInRuntime() && IsUsedInEditor();
         }
@@ -151,7 +153,7 @@ namespace Ent
         /// @brief Get all types acceptable in the union, with their names
         /// @throw BadType if the schema is not a oneOf
         /// @throw MissingMetadata if the schema doesn't have a meta className and classData
-        std::map<std::string, Subschema const*> getUnionTypesMap() const;
+        [[nodiscard]] std::map<std::string, Subschema const*> getUnionTypesMap() const;
 
         /// @brief Get the Subschema related to the given \p _type (className)
         /// @throw BadType if the schema is not a oneOf
@@ -162,19 +164,19 @@ namespace Ent
         /// @brief Get the name of the json field containing the type name
         /// @throw BadType if the schema is not a oneOf
         /// @throw MissingMetadata if the schema doesn't have a meta className and classData
-        char const* getUnionNameField() const;
+        [[nodiscard]] char const* getUnionNameField() const;
 
         /// @brief Get the name of the json field containing the data
         /// @throw BadType if the schema is not a oneOf
         /// @throw MissingMetadata if the schema doesn't have a meta className and classData
-        char const* getUnionDataField() const;
+        [[nodiscard]] char const* getUnionDataField() const;
 
-        char const* getUnionDefaultTypeName() const;
+        [[nodiscard]] char const* getUnionDefaultTypeName() const;
 
         /// @brief Get the type of the Key of a map or set
-        DataType getMapKeyType() const;
+        [[nodiscard]] DataType getMapKeyType() const;
 
-        DataKind getDataKind() const;
+        [[nodiscard]] DataKind getDataKind() const;
 
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue = nlohmann::json;
@@ -226,7 +228,7 @@ namespace Ent
         DeleteCheck deleteCheck;
         /// @endcond
 
-        Subschema const& get() const; //!< Get the referenced subschema
+        [[nodiscard]] Subschema const& get() const; //!< Get the referenced subschema
         Subschema& get(); //!< Get the referenced subschema
 
         Subschema const& operator*() const; //!< Get the referenced subschema
@@ -235,26 +237,23 @@ namespace Ent
         Subschema* operator->(); //!< Get the referenced subschema
 
         /// Get the default values beside a "$ref", or nullptr
-        DefaultValue const* getRefDefaultValues() const
+        [[nodiscard]] DefaultValue const* getRefDefaultValues() const
         {
             if (std::holds_alternative<Ref>(subSchemaOrRef)
                 && !std::get<Ref>(subSchemaOrRef).defaultValue.is_null())
             {
                 return &std::get<Ref>(subSchemaOrRef).defaultValue;
             }
-            else
-            {
-                return nullptr;
-            }
+            return nullptr;
         }
 
-        char const* getDescription() const
+        [[nodiscard]] char const* getDescription() const
         {
-            if (auto ref = std::get_if<Ref>(&subSchemaOrRef))
+            if (auto const* const ref = std::get_if<Ref>(&subSchemaOrRef))
             {
                 return ref->description.c_str();
             }
-            else if (auto schema = std::get_if<Subschema>(&subSchemaOrRef))
+            if (auto const* const schema = std::get_if<Subschema>(&subSchemaOrRef))
             {
                 return schema->description.c_str();
             }
@@ -286,10 +285,10 @@ namespace Ent
     /// variant visitor to get a specifique field in a Subschema::BaseMeta
     struct BasicFieldGetter
     {
-        std::function<bool(const Subschema::BaseMeta*)> _fieldSelector;
+        std::function<bool(Subschema::BaseMeta const*)> _fieldSelector;
 
         template <class MetaT>
-        bool operator()(const MetaT& _meta)
+        bool operator()(MetaT const& _meta)
         {
             return _fieldSelector(&_meta);
         }
@@ -298,7 +297,7 @@ namespace Ent
     inline bool Subschema::IsDeprecated() const
     {
         return std::visit(
-            BasicFieldGetter{[](const Subschema::BaseMeta* _meta)
+            BasicFieldGetter{[](BaseMeta const* _meta)
                              {
                                  return _meta->deprecated;
                              }},
@@ -308,7 +307,7 @@ namespace Ent
     inline bool Subschema::IsUsedInEditor() const
     {
         return std::visit(
-            BasicFieldGetter{[](const Subschema::BaseMeta* _meta)
+            BasicFieldGetter{[](BaseMeta const* _meta)
                              {
                                  return _meta->usedInEditor;
                              }},
@@ -318,7 +317,7 @@ namespace Ent
     inline bool Subschema::IsUsedInRuntime() const
     {
         return std::visit(
-            BasicFieldGetter{[](const Subschema::BaseMeta* _meta)
+            BasicFieldGetter{[](BaseMeta const* _meta)
                              {
                                  return _meta->usedInRuntime;
                              }},
@@ -337,15 +336,12 @@ namespace Ent
             Ref const& ref = std::get<Ref>(subSchemaOrRef);
             return AT(ref.schema->allDefinitions, ref.ref);
         }
-        else if (std::holds_alternative<Subschema>(subSchemaOrRef))
+        if (std::holds_alternative<Subschema>(subSchemaOrRef))
         {
             return std::get<Subschema>(subSchemaOrRef);
         }
-        else
-        {
-            ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
-            return std::get<Subschema>(subSchemaOrRef);
-        }
+        ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
+        return std::get<Subschema>(subSchemaOrRef);
     }
 
     inline Subschema& SubschemaRef::get()
@@ -355,15 +351,12 @@ namespace Ent
             Ref const& ref = std::get<Ref>(subSchemaOrRef);
             return AT(ref.schema->allDefinitions, ref.ref);
         }
-        else if (std::holds_alternative<Subschema>(subSchemaOrRef))
+        if (std::holds_alternative<Subschema>(subSchemaOrRef))
         {
             return std::get<Subschema>(subSchemaOrRef);
         }
-        else
-        {
-            ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
-            return std::get<Subschema>(subSchemaOrRef);
-        }
+        ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
+        return std::get<Subschema>(subSchemaOrRef);
     }
 
     inline Subschema const& SubschemaRef::operator*() const

@@ -196,11 +196,6 @@ class GameManager(HelperObject):
     def PropelData(self):  # type: ()->GamePropelData
         return GamePropelData(self._node.at("PropelData"))
     @property
-    def QuickLaunch(self):  # type: ()->Bool
-        return Bool(self._node.at("QuickLaunch"))
-    @QuickLaunch.setter
-    def QuickLaunch(self, val): self.QuickLaunch.set(val)
-    @property
     def RespawnData(self):  # type: ()->GameRespawnData
         return GameRespawnData(self._node.at("RespawnData"))
     @property

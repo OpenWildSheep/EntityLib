@@ -24,12 +24,12 @@ namespace Ent
     {
     }
 
-    void FileProperty::pushBack(char const* _key)
+    void FileProperty::pushBack(char const* _key) const
     {
         _getRawJson()->push_back(_key);
     }
 
-    void FileProperty::pushBack(int64_t _key)
+    void FileProperty::pushBack(int64_t _key) const
     {
         _getRawJson()->push_back(_key);
     }
@@ -84,8 +84,8 @@ namespace Ent
         ENTLIB_DBG_ASSERT(m_schema.base->type == DataType::object);
         if (_fieldRef == nullptr)
         {
-            auto& properties = m_schema.base->properties;
-            if (auto propIter = properties.find(_field); propIter != properties.end())
+            auto const& properties = m_schema.base->properties;
+            if (auto const propIter = properties.find(_field); propIter != properties.end())
             {
                 _field = propIter->first.c_str(); // Convert _field to static string
                 _fieldRef = &propIter->second;
@@ -100,9 +100,9 @@ namespace Ent
         newLayer.m_schema = Schema{subschema, _fieldRef->getRefDefaultValues()};
         if (hasJsonPointer() and not m_values->is_null())
         {
-            auto lastNode = m_values;
+            auto* const lastNode = m_values;
             ENTLIB_DBG_ASSERT(lastNode->is_object());
-            if (auto memiter = lastNode->find(_field); memiter != lastNode->end())
+            if (auto const memiter = lastNode->find(_field); memiter != lastNode->end())
             {
                 newLayer.m_values = &(*memiter);
             }
@@ -114,7 +114,7 @@ namespace Ent
     FileProperty FileProperty::getUnionSetItem(char const* _key, Subschema const* _dataSchema) const
     {
         FileProperty newLayer;
-        auto& lastschema = *m_schema.base;
+        auto const& lastschema = *m_schema.base;
         if (lastschema.singularItems == nullptr)
         {
             throw BadArrayType(staticFormat(
@@ -124,7 +124,7 @@ namespace Ent
         auto& unionSchema = lastschema.singularItems->get();
         if (_dataSchema == nullptr)
         {
-            if (auto iter = unionSchema.unionTypeMap.find(_key);
+            if (auto const iter = unionSchema.unionTypeMap.find(_key);
                 iter != unionSchema.unionTypeMap.end())
             {
                 newLayer.m_schema = Schema{iter->second.dataSchema, nullptr};
@@ -143,12 +143,12 @@ namespace Ent
 
         if (isSet())
         {
-            auto dataField = unionSchema.getUnionDataField();
+            auto const* dataField = unionSchema.getUnionDataField();
 
-            if (auto jsonIter = _findUnionSetItem(_key, true); jsonIter != m_values->end())
+            if (auto const jsonIter = _findUnionSetItem(_key, true); jsonIter != m_values->end())
             {
                 newLayer.m_wrapper = &(*jsonIter);
-                if (auto dataIter = jsonIter->find(dataField); dataIter != jsonIter->end())
+                if (auto const dataIter = jsonIter->find(dataField); dataIter != jsonIter->end())
                 {
                     if (not dataIter->is_null())
                     { // Item found!
@@ -165,11 +165,11 @@ namespace Ent
     FileProperty FileProperty::_enterObjectSetItemImpl(K _key) const
     {
         FileProperty newLayer;
-        auto& setSchema = *m_schema.base;
+        auto const& setSchema = *m_schema.base;
         ENTLIB_ASSERT(setSchema.type == DataType::array);
-        auto& objectSchema = setSchema.singularItems->get();
+        auto const& objectSchema = setSchema.singularItems->get();
         char const* keyFieldName = nullptr;
-        if (auto meta = std::get_if<Subschema::ArrayMeta>(&setSchema.meta))
+        if (auto const* const meta = std::get_if<Subschema::ArrayMeta>(&setSchema.meta))
         {
             if (meta->keyField.has_value())
             {
@@ -248,9 +248,9 @@ namespace Ent
     {
         FileProperty newLayer;
         ENTLIB_DBG_ASSERT(m_schema.base->type == DataType::array);
-        if (auto item = m_schema.base->singularItems.get())
+        if (auto* const item = m_schema.base->singularItems.get())
         {
-            auto& subschema = item->get();
+            auto const& subschema = item->get();
             newLayer.m_schema = Schema{&subschema, nullptr};
         }
         else
@@ -260,15 +260,15 @@ namespace Ent
             {
                 throw ContextException("Out of range in tuple");
             }
-            auto& subschema = m_schema.base->linearItems->at(_index).get();
+            auto const& subschema = m_schema.base->linearItems->at(_index).get();
             newLayer.m_schema = Schema{&subschema, nullptr};
         }
-        newLayer.m_key = int64_t(_index);
-        if (auto lastNode = _getRawJson())
+        newLayer.m_key = static_cast<int64_t>(_index);
+        if (auto* const lastNode = _getRawJson())
         {
             if (lastNode->size() > _index)
             {
-                auto newValue = &(*lastNode)[_index];
+                auto* const newValue = &(*lastNode)[_index];
                 if (newLayer.m_schema.base->type == DataType::string
                     or newLayer.m_schema.base->type == DataType::entityRef)
                 {
@@ -285,10 +285,10 @@ namespace Ent
     {
         if (isSet())
         {
-            auto typeField = m_schema.base->getUnionNameField();
-            auto lastNode = m_values;
+            auto const* typeField = m_schema.base->getUnionNameField();
+            auto* const lastNode = m_values;
             ENTLIB_DBG_ASSERT(lastNode->is_object());
-            if (auto memiter = lastNode->find(typeField); memiter != lastNode->end())
+            if (auto const memiter = lastNode->find(typeField); memiter != lastNode->end())
             {
                 return memiter->get_ref<std::string const&>().c_str();
             }
@@ -311,15 +311,15 @@ namespace Ent
 
     bool FileProperty::isUnionRemoved() const
     {
-        auto unionSchema = m_schema.base;
+        auto const* const unionSchema = m_schema.base;
         if (isSet())
         {
-            auto lastNode = m_values;
+            auto* const lastNode = m_values;
             ENTLIB_DBG_ASSERT(lastNode->is_object());
-            auto dataField = unionSchema->getUnionDataField();
-            if (auto memiter = lastNode->find(dataField); memiter != lastNode->end())
+            auto const* dataField = unionSchema->getUnionDataField();
+            if (auto const memiter = lastNode->find(dataField); memiter != lastNode->end())
             {
-                auto unionValue = &(*memiter);
+                auto const* const unionValue = &(*memiter);
                 if (unionSchema->type == DataType::string or unionSchema->type == DataType::entityRef)
                 {
                     ENTLIB_DBG_ASSERT(unionValue->is_string());
@@ -337,20 +337,20 @@ namespace Ent
             _unionType = getUnionType();
         }
         FileProperty newLayer;
-        auto dataSchema = m_schema.base->getUnionType(_unionType);
-        auto unionSchema = m_schema.base;
+        auto const* const dataSchema = m_schema.base->getUnionType(_unionType);
+        auto const* const unionSchema = m_schema.base;
         newLayer.m_key = _unionType;
         if (isSet())
         {
-            auto unionType = getUnionType();
+            auto const* const unionType = getUnionType();
             if (unionType != nullptr and strcmp(_unionType, unionType) == 0)
             {
-                auto lastNode = m_values;
+                auto* const lastNode = m_values;
                 ENTLIB_DBG_ASSERT(lastNode->is_object());
-                auto dataField = unionSchema->getUnionDataField();
-                if (auto memiter = lastNode->find(dataField); memiter != lastNode->end())
+                auto const* dataField = unionSchema->getUnionDataField();
+                if (auto const memiter = lastNode->find(dataField); memiter != lastNode->end())
                 {
-                    auto newValue = &(*memiter);
+                    auto* const newValue = &(*memiter);
                     if (unionSchema->type == DataType::string
                         or unionSchema->type == DataType::entityRef)
                     {
@@ -385,15 +385,16 @@ namespace Ent
         if (m_wrapper != nullptr)
         { // It is a Union in a UnionSet and the Union object is still declared in json
             auto&& unionSchema = _parent.getSchema()->singularItems->get();
-            auto dataField = unionSchema.getUnionDataField();
+            auto const* dataField = unionSchema.getUnionDataField();
             // TODO : Change to default value according to type
-            setRawJson(&((*m_wrapper)[dataField] = nlohmann::json::object()));
+            setRawJson(&((*m_wrapper)[dataField] = json::object()));
             return;
         }
 
         auto&& childName = getPathToken();
 
-        ENTLIB_DBG_ASSERT(int(_parent.m_values->type()) < int(json::value_t::discarded));
+        ENTLIB_DBG_ASSERT(
+            static_cast<int>(_parent.m_values->type()) < static_cast<int>(json::value_t::discarded));
         json* newLayerJson = nullptr;
         switch (_parent.m_schema.base->getDataKind())
         {
@@ -403,7 +404,7 @@ namespace Ent
             {
                 (*_parent.m_values) = json::object();
             }
-            auto fieldName = std::get<char const*>(childName);
+            auto const* fieldName = std::get<char const*>(childName);
             (*_parent.m_values)[fieldName] = {};
             newLayerJson = &(*_parent.m_values)[fieldName];
         }
@@ -414,9 +415,9 @@ namespace Ent
             {
                 (*_parent.m_values) = json::object();
             }
-            auto fieldName = std::get<char const*>(childName);
-            auto typeField = _parent.m_schema.base->getUnionNameField();
-            auto dataField = _parent.m_schema.base->getUnionDataField();
+            auto const* fieldName = std::get<char const*>(childName);
+            auto const* typeField = _parent.m_schema.base->getUnionNameField();
+            auto const* dataField = _parent.m_schema.base->getUnionDataField();
             (*_parent.m_values)[typeField] = fieldName;
             (*_parent.m_values)[dataField] = {};
             newLayerJson = &(*_parent.m_values)[dataField];
@@ -433,7 +434,7 @@ namespace Ent
             {
             case DataType::string:
             {
-                auto key = std::get<char const*>(childName);
+                auto const* key = std::get<char const*>(childName);
                 auto pairNode = json::array();
                 pairNode.push_back(key);
                 pairNode.emplace_back();
@@ -475,7 +476,7 @@ namespace Ent
             }
             case DataType::string: // String set
             {
-                auto key = std::get<char const*>(childName);
+                auto const* key = std::get<char const*>(childName);
                 _parent.m_values->push_back(key);
                 ENTLIB_ASSERT(newLayerJson != nullptr);
                 break;
@@ -490,10 +491,10 @@ namespace Ent
                 (*_parent.m_values) = json::array();
             }
             auto wrapper = json::object();
-            auto fieldName = std::get<char const*>(childName);
-            auto unionSchema = &_parent.m_schema.base->singularItems->get();
-            auto typeField = unionSchema->getUnionNameField();
-            auto dataField = unionSchema->getUnionDataField();
+            auto const* fieldName = std::get<char const*>(childName);
+            auto* unionSchema = &_parent.m_schema.base->singularItems->get();
+            auto const* typeField = unionSchema->getUnionNameField();
+            auto const* dataField = unionSchema->getUnionDataField();
             wrapper[dataField] = json::object(); // TODO : Change to default value according to type
             wrapper[typeField] = fieldName;
             _parent.m_values->push_back(std::move(wrapper));
@@ -515,7 +516,7 @@ namespace Ent
             {
             case DataType::string:
             {
-                auto key = std::get<char const*>(childName);
+                auto const* key = std::get<char const*>(childName);
                 object[*meta.keyField] = key;
                 break;
             }
@@ -541,7 +542,7 @@ namespace Ent
                 (*_parent.m_values) = json::array();
             }
             auto index = std::get<int64_t>(childName);
-            while (int64_t(_parent.m_values->size()) <= index)
+            while (static_cast<int64_t>(_parent.m_values->size()) <= index)
             {
                 _parent.m_values->emplace_back();
             }
@@ -571,7 +572,7 @@ namespace Ent
         setRawJson(newLayerJson);
     }
 
-    void FileProperty::setSize(size_t _size)
+    void FileProperty::setSize(size_t _size) const
     {
         if (m_values->is_null())
         {
@@ -624,11 +625,11 @@ namespace Ent
     {
         set(_value);
     }
-    void FileProperty::setUnionType(char const* type)
+    void FileProperty::setUnionType(char const* type) const
     {
         auto& wrapper = (*m_values);
-        auto dataFieldName = getSchema()->getUnionDataField();
-        auto nameFieldName = getSchema()->getUnionNameField();
+        auto const* const dataFieldName = getSchema()->getUnionDataField();
+        auto const* const nameFieldName = getSchema()->getUnionNameField();
         wrapper[nameFieldName] = type;
         wrapper.erase(dataFieldName);
     }
@@ -636,7 +637,7 @@ namespace Ent
     template <typename T>
     T FileProperty::get() const
     {
-        if constexpr (std::is_same_v<T, const char*>)
+        if constexpr (std::is_same_v<T, char const*>)
         {
             return getRawJson()->get_ref<std::string const&>().c_str();
         }
@@ -736,8 +737,8 @@ namespace Ent
 
     json::iterator FileProperty::_findUnionSetItem(char const* _key, bool _withRemoved) const
     {
-        auto dataField = getSchema()->singularItems->get().getUnionDataField();
-        auto typeField = getSchema()->singularItems->get().getUnionNameField();
+        auto const* dataField = getSchema()->singularItems->get().getUnionDataField();
+        auto const* typeField = getSchema()->singularItems->get().getUnionNameField();
         return _findArrayItem(
             _withRemoved,
             _key,
@@ -760,9 +761,9 @@ namespace Ent
     template <typename K>
     json::iterator FileProperty::_findObjectSetItem(K _key, bool _withRemoved) const
     {
-        auto&& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
+        auto&& meta = std::get<Subschema::ArrayMeta>(getSchema()->meta);
         ENTLIB_ASSERT(meta.keyField.has_value());
-        auto keyFieldName = meta.keyField->c_str();
+        auto const* keyFieldName = meta.keyField->c_str();
         return _findArrayItem(
             _withRemoved,
             _key,
@@ -794,11 +795,11 @@ namespace Ent
     {
         if (isSet())
         {
-            auto* node = getRawJson();
+            auto const* node = getRawJson();
             ENTLIB_DBG_ASSERT(node->is_array());
-            for (auto& pair : *node)
+            for (auto const& pair : *node)
             {
-                auto key = pair[0].get_ref<std::string const&>().c_str();
+                auto const* key = pair[0].get_ref<std::string const&>().c_str();
                 bool const removed = mapRemoved(pair);
                 if (removed and not onlyRemoved)
                 {
@@ -816,9 +817,9 @@ namespace Ent
     {
         if (isSet())
         {
-            auto* node = getRawJson();
+            auto const* node = getRawJson();
             ENTLIB_DBG_ASSERT(node->is_array());
-            for (auto& pair : *node)
+            for (auto const& pair : *node)
             {
                 auto key = pair[0].get<int64_t>();
                 bool const removed = mapRemoved(pair);
@@ -838,7 +839,7 @@ namespace Ent
     {
         if (isSet())
         {
-            for (auto& prim : *getRawJson())
+            for (auto const& prim : *getRawJson())
             {
                 _keys.insert(prim.get_ref<std::string const&>().c_str());
             }
@@ -848,7 +849,7 @@ namespace Ent
     {
         if (isSet())
         {
-            for (auto& prim : *getRawJson())
+            for (auto const& prim : *getRawJson())
             {
                 _keys.insert(prim.get<int64_t>());
             }
@@ -860,11 +861,11 @@ namespace Ent
     {
         if (isSet())
         {
-            auto* node = getRawJson();
+            auto const* node = getRawJson();
             for (size_t i = 0; i < node->size(); ++i)
             {
                 auto arrayItem = getArrayItem(i);
-                auto unionSchema = arrayItem.getUnionSchema();
+                auto const* unionSchema = arrayItem.getUnionSchema();
                 bool const removed = (unionSchema == nullptr) or arrayItem.isUnionRemoved();
                 if (removed and not onlyRemoved)
                 {
@@ -884,7 +885,7 @@ namespace Ent
         if (isSet())
         {
             auto const& meta = std::get<Subschema::ArrayMeta>(getSchema()->meta);
-            for (auto& object : *getRawJson())
+            for (auto const& object : *getRawJson())
             {
                 auto const& key = object.at(*meta.keyField).get_ref<std::string const&>();
                 auto const removed = objectIsRemoved(object);
@@ -905,7 +906,7 @@ namespace Ent
         if (isSet())
         {
             auto const& meta = std::get<Subschema::ArrayMeta>(getSchema()->meta);
-            for (auto& object : *getRawJson())
+            for (auto const& object : *getRawJson())
             {
                 auto key = object.at(*meta.keyField).get<int64_t>();
                 auto const removed = objectIsRemoved(object);
@@ -1013,8 +1014,8 @@ namespace Ent
     template <typename K>
     bool FileProperty::_eraseObjectSetItemImpl(K _key, bool _isInPrefab)
     {
-        auto&& meta = std::get<Ent::Subschema::ArrayMeta>(getSchema()->meta);
-        auto keyFieldName = meta.keyField->c_str();
+        auto&& meta = std::get<Subschema::ArrayMeta>(getSchema()->meta);
+        auto const* keyFieldName = meta.keyField->c_str();
         return _eraseImpl(
             _key,
             _isInPrefab,
@@ -1037,8 +1038,8 @@ namespace Ent
 
     bool FileProperty::eraseUnionSetItem(char const* _key, bool _isInPrefab)
     {
-        auto dataField = getSchema()->singularItems->get().getUnionDataField();
-        auto typeField = getSchema()->singularItems->get().getUnionNameField();
+        auto const* dataField = getSchema()->singularItems->get().getUnionDataField();
+        auto const* typeField = getSchema()->singularItems->get().getUnionNameField();
         auto isRemoved = [dataField](auto& node)
         {
             if (auto iter = node.find(dataField); iter != node.end())
@@ -1089,7 +1090,7 @@ namespace Ent
         return _eraseMapItemImpl(_key, _isInPrefab);
     }
 
-    void FileProperty::unsetObjectField(FileProperty& _field)
+    void FileProperty::unsetObjectField(FileProperty& _field) const
     {
         if (not isSet())
         {
@@ -1106,17 +1107,17 @@ namespace Ent
         _field.m_values = nullptr;
     }
 
-    void FileProperty::unsetUnionData()
+    void FileProperty::unsetUnionData() const
     {
         if (not isSet())
         {
             return;
         }
-        auto const dataFieldName = getSchema()->getUnionDataField();
+        auto const* const dataFieldName = getSchema()->getUnionDataField();
         m_values->erase(dataFieldName);
     }
 
-    void FileProperty::setToDefault(Subschema const* _parentSchema)
+    void FileProperty::setToDefault(Subschema const* _parentSchema) const
     {
         if (not isSet())
         {
@@ -1128,11 +1129,11 @@ namespace Ent
         case DataType::object:
         {
             json newObj = json::object();
-            if (auto arrayMeta = std::get_if<Subschema::ArrayMeta>(&_parentSchema->meta))
+            if (auto const* const arrayMeta = std::get_if<Subschema::ArrayMeta>(&_parentSchema->meta))
             {
-                if (auto keyField = arrayMeta->keyField)
+                if (auto const keyField = arrayMeta->keyField)
                 {
-                    auto keyFieldName = keyField->c_str();
+                    auto const* keyFieldName = keyField->c_str();
                     auto key = m_values->at(keyFieldName);
                     *m_values = json::object({{keyFieldName, key}});
                     break;
@@ -1153,7 +1154,7 @@ namespace Ent
         }
     }
 
-    void FileProperty::setToNull()
+    void FileProperty::setToNull() const
     {
         if (not isSet())
         {
@@ -1167,12 +1168,12 @@ namespace Ent
         return m_values != nullptr and objectIsRemoved(*m_values);
     }
 
-    void FileProperty::unRemoveObject()
+    void FileProperty::unRemoveObject() const
     {
         m_values->erase("__removed__");
     }
 
-    char const* FileProperty::getFilePath()
+    char const* FileProperty::getFilePath() const
     {
         return m_filePath.c_str();
     }

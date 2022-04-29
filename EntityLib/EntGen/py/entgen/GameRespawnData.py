@@ -20,6 +20,11 @@ class GameRespawnData(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def RespawnDelayOnDeath(self):  # type: ()->Float
+        return Float(self._node.at("RespawnDelayOnDeath"))
+    @RespawnDelayOnDeath.setter
+    def RespawnDelayOnDeath(self, val): self.RespawnDelayOnDeath.set(val)
+    @property
     def SetRespawnPlaceAsCheckpointDuration(self):  # type: ()->Float
         return Float(self._node.at("SetRespawnPlaceAsCheckpointDuration"))
     @SetRespawnPlaceAsCheckpointDuration.setter

@@ -22,16 +22,6 @@ class SpiritAnimalShrineGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def Radius(self):  # type: ()->Float
-        return Float(self._node.at("Radius"))
-    @Radius.setter
-    def Radius(self, val): self.Radius.set(val)
-    @property
-    def RangeHysteresis(self):  # type: ()->Float
-        return Float(self._node.at("RangeHysteresis"))
-    @RangeHysteresis.setter
-    def RangeHysteresis(self, val): self.RangeHysteresis.set(val)
-    @property
     def Specie(self):  # type: ()->Specie
         return Specie(self._node.at("Specie"))
     @Specie.setter

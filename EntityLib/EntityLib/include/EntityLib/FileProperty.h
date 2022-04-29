@@ -39,9 +39,9 @@ namespace Ent
 
         FileProperty(Subschema const* _schema, char const* m_filePath, nlohmann::json* _document);
 
-        void pushBack(char const* _key); ///< @pre json is an array. @brief Push back _key in json
+        void pushBack(char const* _key) const; ///< @pre json is an array. @brief Push back _key in json
 
-        void pushBack(int64_t _key); ///< @pre json is an array. @brief Push back _key in json
+        void pushBack(int64_t _key) const; ///< @pre json is an array. @brief Push back _key in json
 
         /// Save to _filename or to the source file
         void save(char const* _filename = nullptr) const;
@@ -116,7 +116,7 @@ namespace Ent
         void createChildNode(FileProperty& _parent);
 
         [[nodiscard]] size_t size() const; ///< @pre type==array. @brief Get the size of the array.
-        void setSize(size_t _size); ///< @pre type==array. @brief Set the size of the array.
+        void setSize(size_t _size) const; ///< @pre type==array. @brief Set the size of the array.
         template <typename T>
         void set(T&& _value); ///< @pre node os a primitive of type T. Set _value into the instance
         void setFloat(double _value); ///< @pre type==number. @brief Set _value in the instance
@@ -124,7 +124,7 @@ namespace Ent
         void setString(char const* _value); ///< @pre type==string. @brief Set _value in the instance
         void setBool(bool _value); ///< @pre type==bool. @brief Set _value in the instance
         void setEntityRef(EntityRef const& _value); ///< @pre type==entityref. @brief Set _value in the instance
-        void setUnionType(char const* _type); ///< @pre type==union. @brief Set inner type of the union
+        void setUnionType(char const* _type) const; ///< @pre type==union. @brief Set inner type of the union
         template <typename T>
         [[nodiscard]] T get() const; ///< @pre Node is of type V. @brief Get the value in the given V type
         [[nodiscard]] double getFloat() const; ///< @pre type==number. @brief Get the value as double
@@ -165,15 +165,15 @@ namespace Ent
         [[nodiscard]] bool eraseMapItem(char const* _key, bool _isInPrefab);
         [[nodiscard]] bool eraseMapItem(int64_t _key, bool _isInPrefab);
 
-        void unsetObjectField(FileProperty& _field);
-        void unsetUnionData();
-        void setToDefault(Subschema const* _parentSchema);
-        void setToNull();
+        void unsetObjectField(FileProperty& _field) const;
+        void unsetUnionData() const;
+        void setToDefault(Subschema const* _parentSchema) const;
+        void setToNull() const;
 
         [[nodiscard]] bool isRemovedObject() const;
-        void unRemoveObject();
+        void unRemoveObject() const;
 
-        [[nodiscard]] char const* getFilePath();
+        [[nodiscard]] char const* getFilePath() const;
 
     private:
         [[nodiscard]] nlohmann::json::iterator

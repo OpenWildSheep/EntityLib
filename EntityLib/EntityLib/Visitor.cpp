@@ -9,7 +9,7 @@ namespace Ent
     {
         switch (_expl.getDataType())
         {
-        case Ent::DataType::object:
+        case DataType::object:
         {
             _visitor.inObject(_expl);
             for (auto&& [name, schemaref] : _expl.getSchema()->properties)
@@ -24,7 +24,7 @@ namespace Ent
             _visitor.outObject(_expl);
             break;
         }
-        case Ent::DataType::oneOf:
+        case DataType::oneOf:
         {
             _visitor.inUnion(_expl, _expl.getUnionType());
             auto data = _expl.getUnionData();
@@ -32,16 +32,16 @@ namespace Ent
             _visitor.outUnion(_expl);
             break;
         }
-        case Ent::DataType::array:
+        case DataType::array:
         {
-            auto meta = std::get<Ent::Subschema::ArrayMeta>(_expl.getSchema()->meta);
+            auto meta = std::get<Subschema::ArrayMeta>(_expl.getSchema()->meta);
             switch (hash(meta.overridePolicy))
             {
             case "map"_hash:
                 _visitor.inMap(_expl);
                 switch (_expl.getMapKeyType())
                 {
-                case Ent::DataType::string:
+                case DataType::string:
                     for (char const* key : _expl.getMapKeysString())
                     {
                         auto value = _expl.getMapItem(key);
@@ -50,8 +50,8 @@ namespace Ent
                         _visitor.outMapElement(value);
                     }
                     break;
-                case Ent::DataType::integer:
-                    for (int64_t key : _expl.getMapKeysInt())
+                case DataType::integer:
+                    for (int64_t const key : _expl.getMapKeysInt())
                     {
                         auto value = _expl.getMapItem(key);
                         _visitor.inMapElement(value, key);
@@ -68,15 +68,15 @@ namespace Ent
                 auto& itemType = _expl.getSchema()->singularItems->get();
                 switch (itemType.type)
                 {
-                case Ent::DataType::integer:
+                case DataType::integer:
                     _visitor.inPrimSet(_expl, itemType.type);
-                    for (int64_t key : _expl.getPrimSetKeysInt())
+                    for (int64_t const key : _expl.getPrimSetKeysInt())
                     {
                         _visitor.key(_expl, key);
                     }
                     _visitor.outPrimSet(_expl);
                     break;
-                case Ent::DataType::string:
+                case DataType::string:
                     _visitor.inPrimSet(_expl, itemType.type);
                     for (char const* key : _expl.getPrimSetKeysString())
                     {
@@ -84,7 +84,7 @@ namespace Ent
                     }
                     _visitor.outPrimSet(_expl);
                     break;
-                case Ent::DataType::oneOf:
+                case DataType::oneOf:
                     _visitor.inUnionSet(_expl);
                     for (auto&& [name, schema] : _expl.getUnionSetKeysString())
                     {
@@ -95,12 +95,12 @@ namespace Ent
                     }
                     _visitor.outUnionSet(_expl);
                     break;
-                case Ent::DataType::object:
+                case DataType::object:
                     _visitor.inObjectSet(_expl);
-                    auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
+                    auto const& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                     switch (keyFieldSchema.type)
                     {
-                    case Ent::DataType::string:
+                    case DataType::string:
                         for (auto&& key : _expl.getObjectSetKeysString())
                         {
                             auto data = _expl.getObjectSetItem(key);
@@ -109,7 +109,7 @@ namespace Ent
                             _visitor.outObjectSetElement(data);
                         }
                         break;
-                    case Ent::DataType::integer:
+                    case DataType::integer:
                         for (auto&& key : _expl.getObjectSetKeysInt())
                         {
                             auto data = _expl.getObjectSetItem(key);
@@ -139,13 +139,13 @@ namespace Ent
             }
         }
         break;
-        case Ent::DataType::null: _visitor.nullProperty(_expl); break;
-        case Ent::DataType::boolean: _visitor.boolProperty(_expl); break;
-        case Ent::DataType::integer: _visitor.intProperty(_expl); break;
-        case Ent::DataType::number: _visitor.floatProperty(_expl); break;
-        case Ent::DataType::string: _visitor.stringProperty(_expl); break;
-        case Ent::DataType::entityRef: _visitor.entityRefProperty(_expl); break;
-        case Ent::DataType::COUNT:
+        case DataType::null: _visitor.nullProperty(_expl); break;
+        case DataType::boolean: _visitor.boolProperty(_expl); break;
+        case DataType::integer: _visitor.intProperty(_expl); break;
+        case DataType::number: _visitor.floatProperty(_expl); break;
+        case DataType::string: _visitor.stringProperty(_expl); break;
+        case DataType::entityRef: _visitor.entityRefProperty(_expl); break;
+        case DataType::COUNT:
         default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
         }
     }
@@ -157,23 +157,23 @@ namespace Ent
     {
         switch (_expl.getDataType())
         {
-        case Ent::DataType::object: _visitor.inObject(); break;
-        case Ent::DataType::oneOf: _visitor.inUnion(_expl.getUnionType()); break;
-        case Ent::DataType::array:
+        case DataType::object: _visitor.inObject(); break;
+        case DataType::oneOf: _visitor.inUnion(_expl.getUnionType()); break;
+        case DataType::array:
         {
-            auto meta = std::get<Ent::Subschema::ArrayMeta>(_expl.getSchema()->meta);
+            auto meta = std::get<Subschema::ArrayMeta>(_expl.getSchema()->meta);
             switch (hash(meta.overridePolicy))
             {
             case "map"_hash: _visitor.inMap(); break;
             case "set"_hash:
             {
-                auto& itemType = _expl.getSchema()->singularItems->get();
+                auto const& itemType = _expl.getSchema()->singularItems->get();
                 switch (itemType.type)
                 {
-                case Ent::DataType::integer:
-                case Ent::DataType::string: _visitor.inPrimSet(itemType.type); break;
-                case Ent::DataType::oneOf: _visitor.inUnionSet(); break;
-                case Ent::DataType::object: _visitor.inObjectSet(); break;
+                case DataType::integer:
+                case DataType::string: _visitor.inPrimSet(itemType.type); break;
+                case DataType::oneOf: _visitor.inUnionSet(); break;
+                case DataType::object: _visitor.inObjectSet(); break;
                 }
             }
             break;
@@ -181,13 +181,13 @@ namespace Ent
             }
         }
         break;
-        case Ent::DataType::null: _visitor.nullProperty(); break;
-        case Ent::DataType::boolean: _visitor.boolProperty(); break;
-        case Ent::DataType::integer: _visitor.intProperty(); break;
-        case Ent::DataType::number: _visitor.floatProperty(); break;
-        case Ent::DataType::string: _visitor.stringProperty(); break;
-        case Ent::DataType::entityRef: _visitor.entityRefProperty(); break;
-        case Ent::DataType::COUNT:
+        case DataType::null: _visitor.nullProperty(); break;
+        case DataType::boolean: _visitor.boolProperty(); break;
+        case DataType::integer: _visitor.intProperty(); break;
+        case DataType::number: _visitor.floatProperty(); break;
+        case DataType::string: _visitor.stringProperty(); break;
+        case DataType::entityRef: _visitor.entityRefProperty(); break;
+        case DataType::COUNT:
         default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
         }
     }

@@ -34,6 +34,11 @@ class GamePadSpeedBehaviorData(HelperObject):
     @PostponeDelayMax.setter
     def PostponeDelayMax(self, val): self.PostponeDelayMax.set(val)
     @property
+    def PostponeNormMax(self):  # type: ()->Float
+        return Float(self._node.at("PostponeNormMax"))
+    @PostponeNormMax.setter
+    def PostponeNormMax(self, val): self.PostponeNormMax.set(val)
+    @property
     def SpeedFastMinDuration(self):  # type: ()->Float
         return Float(self._node.at("SpeedFastMinDuration"))
     @SpeedFastMinDuration.setter

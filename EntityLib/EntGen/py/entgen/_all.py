@@ -20,6 +20,7 @@ from .computePitchAngle import *
 from .allowedTypesItem import *
 from .WindTurbulenceType import *
 from .WaveRenderingType import *
+from .Walkability import *
 from .sPhysicsShapeBox import *
 from .sEnvStamp import *
 from .retiming import *
@@ -77,6 +78,8 @@ from .SeedPatchDataList import *
 from .ScriptPathAndDataSet import *
 from .ScaleFactor import *
 from .ScaleConverter import *
+from .RigidbodyScalingSpeed import *
+from .RigidbodyScaleMultiplier import *
 from .RigidBodyUserData import *
 from .RigidBodyUserDataLedges import *
 from .RigidBodyUserDataImpact import *
@@ -92,6 +95,8 @@ from .RenderManager_DepthOfFieldConfig import *
 from .RegenerationManager_EnergyAreaSetting import *
 from .RegenSwitchBehavior import *
 from .RegenField import *
+from .RegenAreaTransitionSettings import *
+from .TransitionSettings import *
 from .ReflectionTools_EnumSchema import *
 from .ReflectionTools_ClassReflectionSchema_ClassReflectionSchemaMethods import *
 from .ReflectionTools_ClassReflectionSchema_ClassReflectionSchemaMetaData import *
@@ -131,6 +136,7 @@ from .ProjectileTrajectory import *
 from .PlayRatio import *
 from .PhysicsMaterial import *
 from .PhysicsLayer import *
+from .PhysicsEffectsManager_PhysicsLimits import *
 from .PerceiverComponentInput_usePerception import *
 from .Pasta_Easing_Curve import *
 from .RadiusChange import *
@@ -223,6 +229,8 @@ from .MoveCapacityData_ReachSpeed import *
 from .ListItem import *
 from .LightType import *
 from .Light import *
+from .LightAttackData import *
+from .lightAttackData import *
 from .LedgePositionInfo import *
 from .JumpHeightMultiplier import *
 from .Invincible import *
@@ -254,6 +262,7 @@ from .GraspableInteractionData import *
 from .GraspType import *
 from .GeometryStamper import *
 from .ZoneStamper import *
+from .SkinnedPhysMeshStamper import *
 from .MeshStamper import *
 from .Game_VoxelsPile import *
 from .Game_VoxelsColumn import *
@@ -282,6 +291,7 @@ from .GameFluidData_HeightThreshold import *
 from .GameFluidData import *
 from .GameFeetCatchUpData import *
 from .GameFallData import *
+from .GameEdgeData import *
 from .GameDeathData import *
 from .GameClockManager_TimeOfDay import *
 from .GameClockManager_GameDate import *
@@ -333,6 +343,7 @@ from .EnergySideEvent import *
 from .EnergyIntensity import *
 from .RegenerationManager import *
 from .EnergyPoolGD_EnergyArea import *
+from .EndPosition import *
 from .Enabled import *
 from .EDITOR_Mesh import *
 from .EDITOR_LODsItem import *
@@ -359,7 +370,7 @@ from .ComponentInput import *
 from .WallRunComponentInput import *
 from .VelocityObstacleComponentInput import *
 from .UnifiedPhysicsDataComponentInput import *
-from .StrongAttackComponentInput import *
+from .SpiritAnimalShrineComponentInput import *
 from .SoundEmitterComponentInput import *
 from .SmoothScaleComponentInput import *
 from .ReviveEnergyComponentInput import *
@@ -382,7 +393,9 @@ from .ChargedJumpComponentInput import *
 from .CharacterControllerComponentInput import *
 from .BreakableComponentInput import *
 from .BeamTargetComponentInput import *
+from .BeamGeneratorComponentInput import *
 from .AttackTriggerComponentInput import *
+from .AttackComponentInput import *
 from .AnimationTransformDriverComponentInput import *
 from .ComponentGD import *
 from .WorldScalePathFindGD import *
@@ -445,7 +458,6 @@ from .PhysicsGD import *
 from .PhysicsDataGD import *
 from .PerceiverGD import *
 from .PerceivableGD import *
-from .PathFinderGD import *
 from .OutfitWearerGD import *
 from .OutfitGD import *
 from .NotVisibleInSubscene import *
@@ -517,7 +529,6 @@ from .CharacterPlatformGD import *
 from .CameraDataGD import *
 from .BreakableGD import *
 from .BittenGD import *
-from .BeamGeneratorGD import *
 from .AttackTriggerGD import *
 from .AssemblyGD import *
 from .AnimationTransformDriverGD import *
@@ -562,6 +573,7 @@ from .CineEventTriggerPlaySound import *
 from .CineEventTriggerPlaySequence import *
 from .CineEventTriggerGameStateChange import *
 from .CineEventTriggerEventHandlerPost import *
+from .CineEventTriggerDisplayUIMessage import *
 from .CineEventTest import *
 from .CineEventTestIsCanceled import *
 from .CineEventTestInput import *
@@ -582,6 +594,8 @@ from .ExplosionEffect import *
 from .CameraFreeData import *
 from .CameraEditorData import *
 from .CameraManager import *
+from .BoneStartPoint import *
+from .BeamGeneratorGD import *
 from .BoneAnimation import *
 from .BoidSpeedMaxData import *
 from .BoidGoalMode import *
@@ -608,12 +622,16 @@ from .Hit import *
 from .AutoRotationType import *
 from .AttitudeMode import *
 from .AttackType import *
+from .AttackPositionRetimingData_SpecieRetimingCoeff import *
+from .AttackPositionRetimingData import *
 from .AttackPhysicsForceData import *
 from .AttackImpactData import *
 from .AttackData import *
 from .AttackDamageData import *
 from .GameAttackData import *
 from .GameManager import *
+from .AreaNavigation import *
+from .PathFinderGD import *
 from .Archetype import *
 from .AnimationTreeConstraintsGD_GrowData import *
 from .AnimationTreeConstraintsGD_ForceData import *
@@ -646,10 +664,14 @@ from .AnimMirroringSpecData import *
 from .AnimMirroringData import *
 from .AnimationControllerGD import *
 from .AnimAdditionalTag import *
-from .StrongAttackChargedData import *
-from .StrongAttackGD import *
+from .AttackChargedData import *
+from .StrongAttackData import *
+from .strongAttackData import *
 from .AnalyticsManager_MongoDBConnection import *
 from .AnalyticsManager import *
+from .AerialAttackData import *
+from .AttackComponentGD_AerialAttackData import *
+from .AttackComponentGD import *
 from .AdditionnalTag import *
 from .Object import *
 from .UnitTestComponent import *
@@ -684,7 +706,10 @@ from .EntityStateStrafeDodge import *
 from .EntityStateStickedLand import *
 from .EntityStateStalactiteReadyToFall import *
 from .EntityStateStalactiteFallen import *
+from .EntityStateStaffVertebrasAutoRefill import *
 from .EntityStateStaffOwnedVertebras import *
+from .EntityStateSpiritShrineEnabled import *
+from .EntityStateSpiritShrineDisabled import *
 from .EntityStateSpiritAttacked import *
 from .EntityStateSpiritAttack import *
 from .EntityStateSpiritAnimalSoulForm import *
@@ -723,8 +748,10 @@ from .EntityStateMask import *
 from .EntityStateManageChildEntityPool import *
 from .EntityStateLateralLand import *
 from .EntityStateLateralDodge import *
+from .EntityStateJustStarted import *
 from .EntityStateJumpHeightMultiplier import *
 from .EntityStateInteractedGPE import *
+from .EntityStateInjured import *
 from .EntityStateInconvertible import *
 from .EntityStateIncapacitated import *
 from .EntityStateInVertebraeArea import *
@@ -1046,6 +1073,7 @@ from .ClimbData import *
 from .CloudsGenerator import *
 from .ConditionalRigidityAttribute_ActorStateName import *
 from .ContactActor import *
+from .Edge import *
 from .EntityArchive_MetaData import *
 from .EntityGD import *
 from .EntityGDRef import *

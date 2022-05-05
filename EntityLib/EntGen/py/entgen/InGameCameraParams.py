@@ -11,7 +11,9 @@ from entgen.CameraType import *
 from entgen.String import *
 from entgen.Bool import *
 from entgen.Float import *
+from entgen.Position import *
 from entgen.ScaleConverter import *
+from entgen.Vector3 import *
 
 from EntityLibPy import Node
 
@@ -305,6 +307,24 @@ class InGameCameraParams(HelperObject):
         return Float(self._node.at("FightSpeedRationImpactCoeff"))
     @FightSpeedRationImpactCoeff.setter
     def FightSpeedRationImpactCoeff(self, val): self.FightSpeedRationImpactCoeff.set(val)
+    @property
+    def InterestPointPosition(self):  # type: ()->Position
+        return Position(self._node.at("InterestPointPosition"))
+    @property
+    def InterestPointSight(self):  # type: ()->Vector3
+        return Vector3(self._node.at("InterestPointSight"))
+    @InterestPointSight.setter
+    def InterestPointSight(self, val): self.InterestPointSight.set(val)
+    @property
+    def InterestPointSightAngleSpeed(self):  # type: ()->Float
+        return Float(self._node.at("InterestPointSightAngleSpeed"))
+    @InterestPointSightAngleSpeed.setter
+    def InterestPointSightAngleSpeed(self, val): self.InterestPointSightAngleSpeed.set(val)
+    @property
+    def InterestPointTimeToReachMaxWeight(self):  # type: ()->Float
+        return Float(self._node.at("InterestPointTimeToReachMaxWeight"))
+    @InterestPointTimeToReachMaxWeight.setter
+    def InterestPointTimeToReachMaxWeight(self, val): self.InterestPointTimeToReachMaxWeight.set(val)
     @property
     def JoyAccelerationBoostChangingSideH(self):  # type: ()->Float
         return Float(self._node.at("JoyAccelerationBoostChangingSideH"))

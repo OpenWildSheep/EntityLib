@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ActorState import *
+from entgen.Float import *
 
 from EntityLibPy import Node
 
@@ -19,6 +20,11 @@ class EntityStateSpeedLimiter(HelperObject):
         return EntityStateSpeedLimiter(entlib.make_node(EntityStateSpeedLimiter.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def SpeedMax(self):  # type: ()->Float
+        return Float(self._node.at("SpeedMax"))
+    @SpeedMax.setter
+    def SpeedMax(self, val): self.SpeedMax.set(val)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))

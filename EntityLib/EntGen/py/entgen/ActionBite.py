@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ActorState import *
+from entgen.Float import *
 
 from EntityLibPy import Node
 
@@ -19,6 +20,11 @@ class ActionBite(HelperObject):
         return ActionBite(entlib.make_node(ActionBite.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def RadiusMultiplier(self):  # type: ()->Float
+        return Float(self._node.at("RadiusMultiplier"))
+    @RadiusMultiplier.setter
+    def RadiusMultiplier(self, val): self.RadiusMultiplier.set(val)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))

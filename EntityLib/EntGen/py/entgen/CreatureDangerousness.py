@@ -6,7 +6,6 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.Int import *
-from entgen.Float import *
 
 from EntityLibPy import Node
 
@@ -30,11 +29,6 @@ class CreatureDangerousness(HelperObject):
         return Int(self._node.at("dangerousness"))
     @dangerousness.setter
     def dangerousness(self, val): self.dangerousness.set(val)
-    @property
-    def multiplierWhenInjured(self):  # type: ()->Float
-        return Float(self._node.at("multiplierWhenInjured"))
-    @multiplierWhenInjured.setter
-    def multiplierWhenInjured(self, val): self.multiplierWhenInjured.set(val)
     pass
 
 

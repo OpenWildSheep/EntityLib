@@ -7,6 +7,7 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Bool import *
 from entgen.ComponentGD import *
+from entgen.TransitionSettings import *
 from entgen.String import *
 from entgen.EnergyPoolGD_EnergyArea import *
 
@@ -38,6 +39,9 @@ class EnergyPoolGD(HelperObject):
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
+    @property
+    def TransitionSettings(self):  # type: ()->TransitionSettings
+        return TransitionSettings(self._node.at("TransitionSettings"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

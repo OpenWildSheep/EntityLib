@@ -6,9 +6,8 @@ import EntityLibPy
 
 from entgen.Size import *
 from entgen.String import *
-from entgen.Bool import *
+from entgen.AreaNavigation import *
 from entgen.ComponentGD import *
-from entgen.Float import *
 
 from EntityLibPy import Node
 
@@ -23,20 +22,8 @@ class PathFinderGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def GroundAreaCost(self):  # type: ()->Float
-        return Float(self._node.at("GroundAreaCost"))
-    @GroundAreaCost.setter
-    def GroundAreaCost(self, val): self.GroundAreaCost.set(val)
-    @property
-    def MovesInWater(self):  # type: ()->Bool
-        return Bool(self._node.at("MovesInWater"))
-    @MovesInWater.setter
-    def MovesInWater(self, val): self.MovesInWater.set(val)
-    @property
-    def MovesOnGround(self):  # type: ()->Bool
-        return Bool(self._node.at("MovesOnGround"))
-    @MovesOnGround.setter
-    def MovesOnGround(self, val): self.MovesOnGround.set(val)
+    def AreaNavigation(self):  # type: ()->AreaNavigation
+        return AreaNavigation(self._node.at("AreaNavigation"))
     @property
     def Size(self):  # type: ()->Size
         return Size(self._node.at("Size"))
@@ -45,11 +32,6 @@ class PathFinderGD(HelperObject):
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
-    @property
-    def WaterAreaCost(self):  # type: ()->Float
-        return Float(self._node.at("WaterAreaCost"))
-    @WaterAreaCost.setter
-    def WaterAreaCost(self, val): self.WaterAreaCost.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

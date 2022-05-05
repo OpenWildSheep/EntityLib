@@ -31,6 +31,11 @@ class EntityStateManageChildEntityPool_Inputs(HelperObject):
     @DistanceMaxFromSpawner.setter
     def DistanceMaxFromSpawner(self, val): self.DistanceMaxFromSpawner.set(val)
     @property
+    def SafeDistanceAroundPlayer(self):  # type: ()->Float
+        return Float(self._node.at("SafeDistanceAroundPlayer"))
+    @SafeDistanceAroundPlayer.setter
+    def SafeDistanceAroundPlayer(self, val): self.SafeDistanceAroundPlayer.set(val)
+    @property
     def SpawnerEntityRef(self):  # type: ()->EntityRef
         return EntityRef(self._node.at("SpawnerEntityRef"))
     @SpawnerEntityRef.setter

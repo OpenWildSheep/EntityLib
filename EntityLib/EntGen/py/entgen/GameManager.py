@@ -15,6 +15,7 @@ from entgen.GameAttackData import *
 from entgen.GameBeamSnapData import *
 from entgen.GameBiteData import *
 from entgen.GameDeathData import *
+from entgen.GameEdgeData import *
 from entgen.GameFallData import *
 from entgen.GameFeetCatchUpData import *
 from entgen.GameFluidData import *
@@ -86,6 +87,9 @@ class GameManager(HelperObject):
         return Int(self._node.at("DefaultGamePadID"))
     @DefaultGamePadID.setter
     def DefaultGamePadID(self, val): self.DefaultGamePadID.set(val)
+    @property
+    def EdgeData(self):  # type: ()->GameEdgeData
+        return GameEdgeData(self._node.at("EdgeData"))
     @property
     def EnableSplashScreen(self):  # type: ()->Bool
         return Bool(self._node.at("EnableSplashScreen"))
@@ -189,6 +193,11 @@ class GameManager(HelperObject):
         return Bool(self._node.at("MountOnlyOnFollower"))
     @MountOnlyOnFollower.setter
     def MountOnlyOnFollower(self, val): self.MountOnlyOnFollower.set(val)
+    @property
+    def NewGameVideo(self):  # type: ()->String
+        return String(self._node.at("NewGameVideo"))
+    @NewGameVideo.setter
+    def NewGameVideo(self, val): self.NewGameVideo.set(val)
     @property
     def ParryData(self):  # type: ()->GameParryData
         return GameParryData(self._node.at("ParryData"))

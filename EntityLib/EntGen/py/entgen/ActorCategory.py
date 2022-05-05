@@ -49,6 +49,7 @@ class ActorCategoryEnum(Enum):
     CATEGORY_Respawn = "CATEGORY_Respawn"
     CATEGORY_Save = "CATEGORY_Save"
     CATEGORY_Cinematic = "CATEGORY_Cinematic"
+    CATEGORY_Loading = "CATEGORY_Loading"
     ActorCategory_COUNT = "ActorCategory_COUNT"
 
 

@@ -47,10 +47,10 @@ class LifeComponentGD(HelperObject):
     @DeathThreshold.setter
     def DeathThreshold(self, val): self.DeathThreshold.set(val)
     @property
-    def InjuredDamagesRatio(self):  # type: ()->Float
-        return Float(self._node.at("InjuredDamagesRatio"))
-    @InjuredDamagesRatio.setter
-    def InjuredDamagesRatio(self, val): self.InjuredDamagesRatio.set(val)
+    def InjuredDamagesThreshold(self):  # type: ()->Float
+        return Float(self._node.at("InjuredDamagesThreshold"))
+    @InjuredDamagesThreshold.setter
+    def InjuredDamagesThreshold(self, val): self.InjuredDamagesThreshold.set(val)
     @property
     def MinLifeWhenSpending(self):  # type: ()->Float
         return Float(self._node.at("MinLifeWhenSpending"))

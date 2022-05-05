@@ -303,6 +303,11 @@ class MoveCapacityData(HelperObject):
     @reactToOtherCharacterBodyCollision.setter
     def reactToOtherCharacterBodyCollision(self, val): self.reactToOtherCharacterBodyCollision.set(val)
     @property
+    def rigidbodyScalingSpeed(self):  # type: ()->Float
+        return Float(self._node.at("rigidbodyScalingSpeed"))
+    @rigidbodyScalingSpeed.setter
+    def rigidbodyScalingSpeed(self, val): self.rigidbodyScalingSpeed.set(val)
+    @property
     def sphereCastRadiusRatio(self):  # type: ()->Float
         return Float(self._node.at("sphereCastRadiusRatio"))
     @sphereCastRadiusRatio.setter

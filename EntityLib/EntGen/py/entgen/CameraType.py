@@ -21,6 +21,7 @@ class CameraTypeEnum(Enum):
     OnBones = "OnBones"
     TopView = "TopView"
     EntitySwap = "EntitySwap"
+    SightConstraint = "SightConstraint"
     Locked = "Locked"
     Pan = "Pan"
     CameraType_COUNT = "CameraType_COUNT"

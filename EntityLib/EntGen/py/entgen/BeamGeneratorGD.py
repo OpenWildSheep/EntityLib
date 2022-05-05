@@ -5,7 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
-from entgen.Int import *
+from entgen.BoneStartPoint import *
 from entgen.ComponentGD import *
 from entgen.Float import *
 from entgen.String import *
@@ -23,30 +23,18 @@ class BeamGeneratorGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def BonesStartPoints(self):  # type: ()->PrimArray[String]
-        return (lambda n: PrimArray(String, n))(self._node.at("BonesStartPoints"))
-    @BonesStartPoints.setter
-    def BonesStartPoints(self, val): self.BonesStartPoints.set(val)
+    def BeamEffectsNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.at("BeamEffectsNames"))
+    @BeamEffectsNames.setter
+    def BeamEffectsNames(self, val): self.BeamEffectsNames.set(val)
     @property
-    def ExtraDistanceBeyondTarget(self):  # type: ()->Float
-        return Float(self._node.at("ExtraDistanceBeyondTarget"))
-    @ExtraDistanceBeyondTarget.setter
-    def ExtraDistanceBeyondTarget(self, val): self.ExtraDistanceBeyondTarget.set(val)
+    def BoneStartPoint(self):  # type: ()->BoneStartPoint
+        return BoneStartPoint(self._node.at("BoneStartPoint"))
     @property
-    def LengthDuration(self):  # type: ()->Float
-        return Float(self._node.at("LengthDuration"))
-    @LengthDuration.setter
-    def LengthDuration(self, val): self.LengthDuration.set(val)
-    @property
-    def PathBeamEffect(self):  # type: ()->String
-        return String(self._node.at("PathBeamEffect"))
-    @PathBeamEffect.setter
-    def PathBeamEffect(self, val): self.PathBeamEffect.set(val)
-    @property
-    def PointsPerBeam(self):  # type: ()->Int
-        return Int(self._node.at("PointsPerBeam"))
-    @PointsPerBeam.setter
-    def PointsPerBeam(self, val): self.PointsPerBeam.set(val)
+    def MaxBeamRange(self):  # type: ()->Float
+        return Float(self._node.at("MaxBeamRange"))
+    @MaxBeamRange.setter
+    def MaxBeamRange(self, val): self.MaxBeamRange.set(val)
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))

@@ -21,6 +21,11 @@ class EntityStateBridgeBeingControlled(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def CollisionRaycastLength(self):  # type: ()->Float
+        return Float(self._node.at("CollisionRaycastLength"))
+    @CollisionRaycastLength.setter
+    def CollisionRaycastLength(self, val): self.CollisionRaycastLength.set(val)
+    @property
     def HorizontalSpeed(self):  # type: ()->Float
         return Float(self._node.at("HorizontalSpeed"))
     @HorizontalSpeed.setter

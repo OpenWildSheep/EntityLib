@@ -9,14 +9,14 @@ from entgen.ComponentInput import *
 
 from EntityLibPy import Node
 
-class StrongAttackComponentInput(HelperObject):
-    schema_name = "StrongAttackComponentInput"
+class SpiritAnimalShrineComponentInput(HelperObject):
+    schema_name = "SpiritAnimalShrineComponentInput"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->StrongAttackComponentInput
-        return StrongAttackComponentInput(entlib.load_node_file(sourcefile, entlib.get_schema(StrongAttackComponentInput.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->SpiritAnimalShrineComponentInput
+        return SpiritAnimalShrineComponentInput(entlib.load_node_file(sourcefile, entlib.get_schema(SpiritAnimalShrineComponentInput.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->StrongAttackComponentInput
-        return StrongAttackComponentInput(entlib.make_node(StrongAttackComponentInput.schema_name))
+    def create(entlib):  # type: (EntityLib)->SpiritAnimalShrineComponentInput
+        return SpiritAnimalShrineComponentInput(entlib.make_node(SpiritAnimalShrineComponentInput.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

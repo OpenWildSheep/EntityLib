@@ -10,14 +10,14 @@ from entgen.FloatRange import *
 
 from EntityLibPy import Node
 
-class StrongAttackChargedData(HelperObject):
-    schema_name = "StrongAttackChargedData"
+class AttackChargedData(HelperObject):
+    schema_name = "AttackChargedData"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->StrongAttackChargedData
-        return StrongAttackChargedData(entlib.load_node_file(sourcefile, entlib.get_schema(StrongAttackChargedData.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->AttackChargedData
+        return AttackChargedData(entlib.load_node_file(sourcefile, entlib.get_schema(AttackChargedData.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->StrongAttackChargedData
-        return StrongAttackChargedData(entlib.make_node(StrongAttackChargedData.schema_name))
+    def create(entlib):  # type: (EntityLib)->AttackChargedData
+        return AttackChargedData(entlib.make_node(AttackChargedData.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

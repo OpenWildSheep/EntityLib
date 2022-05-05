@@ -136,6 +136,11 @@ class PhysicsGD(HelperObject):
     @OffsetRotation.setter
     def OffsetRotation(self, val): self.OffsetRotation.set(val)
     @property
+    def OneWayBodiesDriveTransform(self):  # type: ()->Bool
+        return Bool(self._node.at("OneWayBodiesDriveTransform"))
+    @OneWayBodiesDriveTransform.setter
+    def OneWayBodiesDriveTransform(self, val): self.OneWayBodiesDriveTransform.set(val)
+    @property
     def PhysicsMaterial(self):  # type: ()->String
         return String(self._node.at("PhysicsMaterial"))
     @PhysicsMaterial.setter

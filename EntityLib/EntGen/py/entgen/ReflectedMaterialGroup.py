@@ -25,6 +25,11 @@ class ReflectedMaterialGroup(HelperObject):
     @Materials.setter
     def Materials(self, val): self.Materials.set(val)
     @property
+    def Tags(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.at("Tags"))
+    @Tags.setter
+    def Tags(self, val): self.Tags.set(val)
+    @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
     @_comment.setter

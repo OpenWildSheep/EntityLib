@@ -1454,6 +1454,7 @@ namespace Ent
         struct EntityStateGrabbed;
         struct EntityStateGrabOut;
         struct EntityStateGrabIn;
+        struct EntityStateGrabAttack;
         struct EntityStateGrab;
         struct EntityStateForceCanBeTargeted;
         struct EntityStateFastRun;
@@ -1848,6 +1849,7 @@ namespace Ent
             callanswer,
             scream,
             grab,
+            grabattack,
             grabbed,
             grabbedin,
             grabbedout,
@@ -4840,6 +4842,8 @@ namespace Ent
             Ent::Gen2::EntityStateForceCanBeTargeted setEntityStateForceCanBeTargeted();
             std::optional<Ent::Gen2::EntityStateGrab> EntityStateGrab();
             Ent::Gen2::EntityStateGrab setEntityStateGrab();
+            std::optional<Ent::Gen2::EntityStateGrabAttack> EntityStateGrabAttack();
+            Ent::Gen2::EntityStateGrabAttack setEntityStateGrabAttack();
             std::optional<Ent::Gen2::EntityStateGrabIn> EntityStateGrabIn();
             Ent::Gen2::EntityStateGrabIn setEntityStateGrabIn();
             std::optional<Ent::Gen2::EntityStateGrabOut> EntityStateGrabOut();
@@ -5595,6 +5599,7 @@ namespace Ent
                 return ReflectedMaterialGroup(getProperty().makeInstanceOf());
             }
             PrimArray<Ent::Gen2::String> Materials() const;
+            PrimArray<Ent::Gen2::String> Tags() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -9657,6 +9662,7 @@ namespace Ent
             }
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Float anticipationSpeedFactor() const;
+            Ent::Gen2::Float attackDamages() const;
             Ent::Gen2::Float deltaAngleMax() const;
             Ent::Gen2::Float distanceHysteris() const;
             Ent::Gen2::Float distanceMax() const;
@@ -9690,10 +9696,11 @@ namespace Ent
                 return GraspableInteractionData(getProperty().makeInstanceOf());
             }
             Ent::Gen2::String _comment() const;
+            Ent::Gen2::Float damageAccumulatedRequiredToIncapacitate() const;
+            Ent::Gen2::Float graspedDurationMax() const;
             Ent::Gen2::HotSpotType hotspotType() const;
             Ent::Gen2::ScaleConverter impactRetiming() const;
             Ent::Gen2::Float incapacitatedTime() const;
-            Ent::Gen2::Float interactDuration() const;
             Ent::Gen2::String interactableBoneName() const;
             Ent::Gen2::Float visualRotationRate() const;
         };
@@ -12314,6 +12321,7 @@ namespace Ent
             Ent::Gen2::Bool DisplayAutonomousSound() const;
             Ent::Gen2::Bool DisplayAutonomousUnlocked() const;
             Ent::Gen2::Bool DisplayBehavior() const;
+            Ent::Gen2::Bool DisplayBlendShapeDebug() const;
             Ent::Gen2::Bool DisplayBrainMonitor() const;
             Ent::Gen2::Bool DisplayCPU() const;
             Ent::Gen2::Bool DisplayCompass() const;
@@ -24421,6 +24429,9 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateGrab> EntityStateGrab();
             Ent::Gen2::EntityStateGrab addEntityStateGrab();
             void removeEntityStateGrab();
+            std::optional<Ent::Gen2::EntityStateGrabAttack> EntityStateGrabAttack();
+            Ent::Gen2::EntityStateGrabAttack addEntityStateGrabAttack();
+            void removeEntityStateGrabAttack();
             std::optional<Ent::Gen2::EntityStateGrabIn> EntityStateGrabIn();
             Ent::Gen2::EntityStateGrabIn addEntityStateGrabIn();
             void removeEntityStateGrabIn();
@@ -27438,6 +27449,34 @@ namespace Ent
             EntityStateGrabIn makeInstanceOf()
             {
                 return EntityStateGrabIn(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateGrabAttack : HelperObject<EntityStateGrabAttack> // Object
+        {
+            explicit EntityStateGrabAttack(Ent::Property _node): HelperObject<EntityStateGrabAttack>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateGrabAttack";
+            static EntityStateGrabAttack load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateGrabAttack(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateGrabAttack loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateGrabAttack(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateGrabAttack create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateGrabAttack(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateGrabAttack makeInstanceOf()
+            {
+                return EntityStateGrabAttack(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
@@ -35035,6 +35074,7 @@ namespace Ent
                 "callanswer",
                 "scream",
                 "grab",
+                "grabattack",
                 "grabbed",
                 "grabbedin",
                 "grabbedout",
@@ -35255,6 +35295,8 @@ namespace Ent
             Ent::Gen2::Float TargetOffsetX() const;
             Ent::Gen2::Float TargetOffsetY() const;
             Ent::Gen2::Float TargetOffsetZ() const;
+            Ent::Gen2::Float TargetSmoothMultiplier() const;
+            Ent::Gen2::Float TargetSmoothMultiplierZ() const;
             Ent::Gen2::Float TargetXOffsetFromYawForce() const;
             Ent::Gen2::Float TargetXOffsetFromYawSmooth() const;
             Ent::Gen2::Float TargetZOffsetFromPitchForce() const;
@@ -42353,6 +42395,17 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateGrab(getProperty().setUnionType("EntityStateGrab"));
         }
+        inline std::optional<Ent::Gen2::EntityStateGrabAttack> ResponsiblePointer_ActorState_::EntityStateGrabAttack()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateGrabAttack") != 0?
+                    std::optional<Ent::Gen2::EntityStateGrabAttack>{}:
+                    std::optional<Ent::Gen2::EntityStateGrabAttack>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateGrabAttack ResponsiblePointer_ActorState_::setEntityStateGrabAttack()
+        {
+            return Ent::Gen2::EntityStateGrabAttack(getProperty().setUnionType("EntityStateGrabAttack"));
+        }
         inline std::optional<Ent::Gen2::EntityStateGrabIn> ResponsiblePointer_ActorState_::EntityStateGrabIn()
         {
             return strcmp(
@@ -43617,6 +43670,10 @@ namespace Ent
         inline PrimArray<Ent::Gen2::String> ReflectedMaterialGroup::Materials() const
         {
             return PrimArray<Ent::Gen2::String>(getProperty().getObjectField("Materials"));
+        }
+        inline PrimArray<Ent::Gen2::String> ReflectedMaterialGroup::Tags() const
+        {
+            return PrimArray<Ent::Gen2::String>(getProperty().getObjectField("Tags"));
         }
         inline Ent::Gen2::String ReflectedMaterialGroup::_comment() const
         {
@@ -46017,6 +46074,10 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("anticipationSpeedFactor"));
         }
+        inline Ent::Gen2::Float GrasperInteractionData::attackDamages() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("attackDamages"));
+        }
         inline Ent::Gen2::Float GrasperInteractionData::deltaAngleMax() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("deltaAngleMax"));
@@ -46046,6 +46107,14 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        inline Ent::Gen2::Float GraspableInteractionData::damageAccumulatedRequiredToIncapacitate() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("damageAccumulatedRequiredToIncapacitate"));
+        }
+        inline Ent::Gen2::Float GraspableInteractionData::graspedDurationMax() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("graspedDurationMax"));
+        }
         inline Ent::Gen2::HotSpotType GraspableInteractionData::hotspotType() const
         {
             return Ent::Gen2::HotSpotType(getProperty().getObjectField("hotspotType"));
@@ -46057,10 +46126,6 @@ namespace Ent
         inline Ent::Gen2::Float GraspableInteractionData::incapacitatedTime() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("incapacitatedTime"));
-        }
-        inline Ent::Gen2::Float GraspableInteractionData::interactDuration() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("interactDuration"));
         }
         inline Ent::Gen2::String GraspableInteractionData::interactableBoneName() const
         {
@@ -47985,6 +48050,10 @@ namespace Ent
         inline Ent::Gen2::Bool DebugDisplayFlags::DisplayBehavior() const
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("DisplayBehavior"));
+        }
+        inline Ent::Gen2::Bool DebugDisplayFlags::DisplayBlendShapeDebug() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("DisplayBlendShapeDebug"));
         }
         inline Ent::Gen2::Bool DebugDisplayFlags::DisplayBrainMonitor() const
         {
@@ -64478,6 +64547,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateGrab");
         }
+        inline std::optional<Ent::Gen2::EntityStateGrabAttack> ActorStates::EntityStateGrabAttack()
+        {
+            return std::optional<Ent::Gen2::EntityStateGrabAttack>(getSubNode("EntityStateGrabAttack"));
+        }
+        inline Ent::Gen2::EntityStateGrabAttack ActorStates::addEntityStateGrabAttack()
+        {
+            return Ent::Gen2::EntityStateGrabAttack(addSubNode("EntityStateGrabAttack"));
+        }
+        inline void ActorStates::removeEntityStateGrabAttack()
+        {
+            getProperty().eraseUnionSetItem("EntityStateGrabAttack");
+        }
         inline std::optional<Ent::Gen2::EntityStateGrabIn> ActorStates::EntityStateGrabIn()
         {
             return std::optional<Ent::Gen2::EntityStateGrabIn>(getSubNode("EntityStateGrabIn"));
@@ -66555,6 +66636,15 @@ namespace Ent
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String EntityStateGrabIn::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateGrabAttack
+        inline Ent::Gen2::ActorState EntityStateGrabAttack::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateGrabAttack::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -69878,6 +69968,14 @@ namespace Ent
         inline Ent::Gen2::Float InGameCameraParams::TargetOffsetZ() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("TargetOffsetZ"));
+        }
+        inline Ent::Gen2::Float InGameCameraParams::TargetSmoothMultiplier() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("TargetSmoothMultiplier"));
+        }
+        inline Ent::Gen2::Float InGameCameraParams::TargetSmoothMultiplierZ() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("TargetSmoothMultiplierZ"));
         }
         inline Ent::Gen2::Float InGameCameraParams::TargetXOffsetFromYawForce() const
         {

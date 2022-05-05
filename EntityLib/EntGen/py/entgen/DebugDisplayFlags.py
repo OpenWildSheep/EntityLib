@@ -126,6 +126,11 @@ class DebugDisplayFlags(HelperObject):
     @DisplayBehavior.setter
     def DisplayBehavior(self, val): self.DisplayBehavior.set(val)
     @property
+    def DisplayBlendShapeDebug(self):  # type: ()->Bool
+        return Bool(self._node.at("DisplayBlendShapeDebug"))
+    @DisplayBlendShapeDebug.setter
+    def DisplayBlendShapeDebug(self, val): self.DisplayBlendShapeDebug.set(val)
+    @property
     def DisplayBrainMonitor(self):  # type: ()->Bool
         return Bool(self._node.at("DisplayBrainMonitor"))
     @DisplayBrainMonitor.setter

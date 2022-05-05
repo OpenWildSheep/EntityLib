@@ -31,6 +31,11 @@ class GrasperInteractionData(HelperObject):
     @anticipationSpeedFactor.setter
     def anticipationSpeedFactor(self, val): self.anticipationSpeedFactor.set(val)
     @property
+    def attackDamages(self):  # type: ()->Float
+        return Float(self._node.at("attackDamages"))
+    @attackDamages.setter
+    def attackDamages(self, val): self.attackDamages.set(val)
+    @property
     def deltaAngleMax(self):  # type: ()->Float
         return Float(self._node.at("deltaAngleMax"))
     @deltaAngleMax.setter

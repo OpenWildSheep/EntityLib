@@ -548,6 +548,16 @@ class InGameCameraParams(HelperObject):
     @TargetOffsetZ.setter
     def TargetOffsetZ(self, val): self.TargetOffsetZ.set(val)
     @property
+    def TargetSmoothMultiplier(self):  # type: ()->Float
+        return Float(self._node.at("TargetSmoothMultiplier"))
+    @TargetSmoothMultiplier.setter
+    def TargetSmoothMultiplier(self, val): self.TargetSmoothMultiplier.set(val)
+    @property
+    def TargetSmoothMultiplierZ(self):  # type: ()->Float
+        return Float(self._node.at("TargetSmoothMultiplierZ"))
+    @TargetSmoothMultiplierZ.setter
+    def TargetSmoothMultiplierZ(self, val): self.TargetSmoothMultiplierZ.set(val)
+    @property
     def TargetXOffsetFromYawForce(self):  # type: ()->Float
         return Float(self._node.at("TargetXOffsetFromYawForce"))
     @TargetXOffsetFromYawForce.setter

@@ -27,6 +27,16 @@ class GraspableInteractionData(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
+    def damageAccumulatedRequiredToIncapacitate(self):  # type: ()->Float
+        return Float(self._node.at("damageAccumulatedRequiredToIncapacitate"))
+    @damageAccumulatedRequiredToIncapacitate.setter
+    def damageAccumulatedRequiredToIncapacitate(self, val): self.damageAccumulatedRequiredToIncapacitate.set(val)
+    @property
+    def graspedDurationMax(self):  # type: ()->Float
+        return Float(self._node.at("graspedDurationMax"))
+    @graspedDurationMax.setter
+    def graspedDurationMax(self, val): self.graspedDurationMax.set(val)
+    @property
     def hotspotType(self):  # type: ()->HotSpotType
         return HotSpotType(self._node.at("hotspotType"))
     @hotspotType.setter
@@ -39,11 +49,6 @@ class GraspableInteractionData(HelperObject):
         return Float(self._node.at("incapacitatedTime"))
     @incapacitatedTime.setter
     def incapacitatedTime(self, val): self.incapacitatedTime.set(val)
-    @property
-    def interactDuration(self):  # type: ()->Float
-        return Float(self._node.at("interactDuration"))
-    @interactDuration.setter
-    def interactDuration(self, val): self.interactDuration.set(val)
     @property
     def interactableBoneName(self):  # type: ()->String
         return String(self._node.at("interactableBoneName"))

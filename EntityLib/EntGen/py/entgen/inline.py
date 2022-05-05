@@ -3497,6 +3497,11 @@ class ReflectedMaterialGroup(HelperObject):
     @Materials.setter
     def Materials(self, val): self.Materials.set(val)
     @property
+    def Tags(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.at("Tags"))
+    @Tags.setter
+    def Tags(self, val): self.Tags.set(val)
+    @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
     @_comment.setter
@@ -8403,6 +8408,11 @@ class GrasperInteractionData(HelperObject):
     @anticipationSpeedFactor.setter
     def anticipationSpeedFactor(self, val): self.anticipationSpeedFactor.set(val)
     @property
+    def attackDamages(self):  # type: ()->Float
+        return Float(self._node.at("attackDamages"))
+    @attackDamages.setter
+    def attackDamages(self, val): self.attackDamages.set(val)
+    @property
     def deltaAngleMax(self):  # type: ()->Float
         return Float(self._node.at("deltaAngleMax"))
     @deltaAngleMax.setter
@@ -8449,6 +8459,16 @@ class GraspableInteractionData(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
+    def damageAccumulatedRequiredToIncapacitate(self):  # type: ()->Float
+        return Float(self._node.at("damageAccumulatedRequiredToIncapacitate"))
+    @damageAccumulatedRequiredToIncapacitate.setter
+    def damageAccumulatedRequiredToIncapacitate(self, val): self.damageAccumulatedRequiredToIncapacitate.set(val)
+    @property
+    def graspedDurationMax(self):  # type: ()->Float
+        return Float(self._node.at("graspedDurationMax"))
+    @graspedDurationMax.setter
+    def graspedDurationMax(self, val): self.graspedDurationMax.set(val)
+    @property
     def hotspotType(self):  # type: ()->HotSpotType
         return HotSpotType(self._node.at("hotspotType"))
     @hotspotType.setter
@@ -8461,11 +8481,6 @@ class GraspableInteractionData(HelperObject):
         return Float(self._node.at("incapacitatedTime"))
     @incapacitatedTime.setter
     def incapacitatedTime(self, val): self.incapacitatedTime.set(val)
-    @property
-    def interactDuration(self):  # type: ()->Float
-        return Float(self._node.at("interactDuration"))
-    @interactDuration.setter
-    def interactDuration(self, val): self.interactDuration.set(val)
     @property
     def interactableBoneName(self):  # type: ()->String
         return String(self._node.at("interactableBoneName"))
@@ -11941,6 +11956,11 @@ class DebugDisplayFlags(HelperObject):
         return Bool(self._node.at("DisplayBehavior"))
     @DisplayBehavior.setter
     def DisplayBehavior(self, val): self.DisplayBehavior.set(val)
+    @property
+    def DisplayBlendShapeDebug(self):  # type: ()->Bool
+        return Bool(self._node.at("DisplayBlendShapeDebug"))
+    @DisplayBlendShapeDebug.setter
+    def DisplayBlendShapeDebug(self, val): self.DisplayBlendShapeDebug.set(val)
     @property
     def DisplayBrainMonitor(self):  # type: ()->Bool
         return Bool(self._node.at("DisplayBrainMonitor"))
@@ -27875,6 +27895,29 @@ class EntityStateGrabIn(HelperObject):
 
 from EntityLibPy import Node
 
+class EntityStateGrabAttack(HelperObject):
+    schema_name = "EntityStateGrabAttack"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateGrabAttack
+        return EntityStateGrabAttack(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateGrabAttack.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateGrabAttack
+        return EntityStateGrabAttack(entlib.make_node(EntityStateGrabAttack.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class EntityStateGrab(HelperObject):
     schema_name = "EntityStateGrab"
     @staticmethod
@@ -34659,6 +34702,7 @@ class ActionModeEnum(Enum):
     callanswer = "callanswer"
     scream = "scream"
     grab = "grab"
+    grabattack = "grabattack"
     grabbed = "grabbed"
     grabbedin = "grabbedin"
     grabbedout = "grabbedout"
@@ -35281,6 +35325,16 @@ class InGameCameraParams(HelperObject):
         return Float(self._node.at("TargetOffsetZ"))
     @TargetOffsetZ.setter
     def TargetOffsetZ(self, val): self.TargetOffsetZ.set(val)
+    @property
+    def TargetSmoothMultiplier(self):  # type: ()->Float
+        return Float(self._node.at("TargetSmoothMultiplier"))
+    @TargetSmoothMultiplier.setter
+    def TargetSmoothMultiplier(self, val): self.TargetSmoothMultiplier.set(val)
+    @property
+    def TargetSmoothMultiplierZ(self):  # type: ()->Float
+        return Float(self._node.at("TargetSmoothMultiplierZ"))
+    @TargetSmoothMultiplierZ.setter
+    def TargetSmoothMultiplierZ(self, val): self.TargetSmoothMultiplierZ.set(val)
     @property
     def TargetXOffsetFromYawForce(self):  # type: ()->Float
         return Float(self._node.at("TargetXOffsetFromYawForce"))

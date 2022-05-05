@@ -770,6 +770,7 @@ from .EntityStateGrabbedIn import *
 from .EntityStateGrabbed import *
 from .EntityStateGrabOut import *
 from .EntityStateGrabIn import *
+from .EntityStateGrabAttack import *
 from .EntityStateGrab import *
 from .EntityStateForceCanBeTargeted import *
 from .EntityStateFastRun import *

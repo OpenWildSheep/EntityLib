@@ -1657,7 +1657,14 @@ namespace Ent
         auto timestamp = last_write_time(absPath, error);
         if (error)
         {
-            throw FileSystemError("Trying to open file for read", rawdataPath, relPath, error);
+            if (m_fallbackEntity.empty())
+            {
+                throw FileSystemError("Trying to open file for read", rawdataPath, relPath, error);
+            }
+            else
+            {
+                relPath = m_fallbackEntity.c_str();
+            }
         }
         auto iter = cache.find(relPath);
         if (iter == cache.end())
@@ -1959,6 +1966,16 @@ namespace Ent
     void EntityLib::saveNodeAsScene(Node const* _scene, char const* _scenePath)
     {
         _scene->saveNode(_scenePath);
+    }
+
+    void EntityLib::setFallBackEntityPath(char const* _filePath)
+    {
+        m_fallbackEntity = _filePath;
+    }
+
+    char const* EntityLib::getFallBackEntityPath() const
+    {
+        return m_fallbackEntity.c_str();
     }
 
     /// \endcond

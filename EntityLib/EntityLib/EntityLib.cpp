@@ -388,7 +388,7 @@ namespace Ent
     }
 
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    LogicErrorPolicy EntityLib::getLogicErrorPolicy()
+    LogicErrorPolicy EntityLib::getLogicErrorPolicy() const
     {
         return s_LogicErrorPolicy;
     }
@@ -1950,13 +1950,13 @@ namespace Ent
     }
 
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    void EntityLib::saveNodeAsEntity(Node const* _entity, char const* _relEntityPath)
+    void EntityLib::saveNodeAsEntity(Node const* _entity, char const* _relEntityPath) const
     {
         _entity->saveNode(_relEntityPath);
     }
 
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    void EntityLib::saveNodeAsScene(Node const* _scene, char const* _scenePath)
+    void EntityLib::saveNodeAsScene(Node const* _scene, char const* _scenePath) const
     {
         _scene->saveNode(_scenePath);
     }

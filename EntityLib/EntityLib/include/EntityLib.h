@@ -90,10 +90,10 @@ namespace Ent
         NodeUniquePtr loadFileAsNode(std::filesystem::path const& _nodePath) const;
 
         /// Save the Entity at path _entityPath
-        static void saveNodeAsEntity(Node const* _entity, char const* _relEntityPath);
+        void saveNodeAsEntity(Node const* _entity, char const* _relEntityPath) const;
 
         /// Save the Scene at path _scenePath
-        static void saveNodeAsScene(Node const* _scene, char const* _scenePath);
+        void saveNodeAsScene(Node const* _scene, char const* _scenePath) const;
 
         /// Dump the given Node with the given schema in json format
         static nlohmann::json dumpNode(
@@ -160,8 +160,8 @@ namespace Ent
         Subschema const* getEntitySchema() const;
         Subschema const* getSceneSchema() const;
 
-        static void setLogicErrorPolicy(LogicErrorPolicy _LogicErrorPolicy);
-        static LogicErrorPolicy getLogicErrorPolicy();
+        void setLogicErrorPolicy(LogicErrorPolicy _LogicErrorPolicy);
+        LogicErrorPolicy getLogicErrorPolicy() const;
         /// @brief Compute the EntityRef going from the Entity _from, to the Entity _to
         /// @pre _from and _to are Entity nodes
         EntityRef makeEntityRef(Node const& _from, Node const& _to) const;

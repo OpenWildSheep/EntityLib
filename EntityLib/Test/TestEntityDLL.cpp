@@ -173,9 +173,9 @@ try
     EntityLib entlib("X:/RawData/..", doMergeComponents);
     using namespace std::filesystem;
 
-    EntityLib::setLogicErrorPolicy(LogicErrorPolicy::Throw);
+    entlib.setLogicErrorPolicy(LogicErrorPolicy::Throw);
     ENTLIB_CHECK_EXCEPTION(ENTLIB_LOGIC_ERROR("Test logic error"), std::logic_error);
-    EntityLib::setLogicErrorPolicy(LogicErrorPolicy::Terminate);
+    entlib.setLogicErrorPolicy(LogicErrorPolicy::Terminate);
 
     entlib.rawdataPath = current_path(); // It is a hack to work in the working dir
 #ifdef _DEBUG

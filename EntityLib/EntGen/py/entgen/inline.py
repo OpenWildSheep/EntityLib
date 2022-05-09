@@ -23566,6 +23566,11 @@ class GameManager(HelperObject):
     @NewGameVideo.setter
     def NewGameVideo(self, val): self.NewGameVideo.set(val)
     @property
+    def NewGameVideoMusicStart(self):  # type: ()->String
+        return String(self._node.at("NewGameVideoMusicStart"))
+    @NewGameVideoMusicStart.setter
+    def NewGameVideoMusicStart(self, val): self.NewGameVideoMusicStart.set(val)
+    @property
     def ParryData(self):  # type: ()->GameParryData
         return GameParryData(self._node.at("ParryData"))
     @property

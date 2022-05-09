@@ -16321,6 +16321,7 @@ namespace Ent
             Ent::Gen::Float Long_Press_Duration() const;
             Ent::Gen::Bool MountOnlyOnFollower() const;
             Ent::Gen::String NewGameVideo() const;
+            Ent::Gen::String NewGameVideoMusicStart() const;
             Ent::Gen::GameParryData ParryData() const;
             Ent::Gen::GamePropelData PropelData() const;
             Ent::Gen::GameRespawnData RespawnData() const;
@@ -47552,6 +47553,10 @@ namespace Ent
         inline Ent::Gen::String GameManager::NewGameVideo() const
         {
             return Ent::Gen::String(node->at("NewGameVideo"));
+        }
+        inline Ent::Gen::String GameManager::NewGameVideoMusicStart() const
+        {
+            return Ent::Gen::String(node->at("NewGameVideoMusicStart"));
         }
         inline Ent::Gen::GameParryData GameManager::ParryData() const
         {

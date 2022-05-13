@@ -38,6 +38,7 @@ Global
 		Release-2.7|x64 = Release-2.7|x64
 		Release-3.7|x64 = Release-3.7|x64
 		Release-3.8|x64 = Release-3.8|x64
+		Release-3.9|x64 = Release-3.9|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{69315629-1871-49B2-AE40-1C2337E5DCA0}.Debug-2.7|x64.ActiveCfg = Debug|x64
@@ -52,6 +53,8 @@ Global
 		{69315629-1871-49B2-AE40-1C2337E5DCA0}.Release-3.7|x64.Build.0 = Release|x64
 		{69315629-1871-49B2-AE40-1C2337E5DCA0}.Release-3.8|x64.ActiveCfg = Release|x64
 		{69315629-1871-49B2-AE40-1C2337E5DCA0}.Release-3.8|x64.Build.0 = Release|x64
+		{69315629-1871-49B2-AE40-1C2337E5DCA0}.Release-3.9|x64.ActiveCfg = Release-3.9|x64
+		{69315629-1871-49B2-AE40-1C2337E5DCA0}.Release-3.9|x64.Build.0 = Release-3.9|x64
 		{32B035E3-0599-4031-ABB0-0101601F1663}.Debug-2.7|x64.ActiveCfg = Debug-2.7|x64
 		{32B035E3-0599-4031-ABB0-0101601F1663}.Debug-2.7|x64.Build.0 = Debug-2.7|x64
 		{32B035E3-0599-4031-ABB0-0101601F1663}.Debug-3.7|x64.ActiveCfg = Debug-3.7|x64
@@ -64,6 +67,8 @@ Global
 		{32B035E3-0599-4031-ABB0-0101601F1663}.Release-3.7|x64.Build.0 = Release-3.7|x64
 		{32B035E3-0599-4031-ABB0-0101601F1663}.Release-3.8|x64.ActiveCfg = Release-3.8|x64
 		{32B035E3-0599-4031-ABB0-0101601F1663}.Release-3.8|x64.Build.0 = Release-3.8|x64
+		{32B035E3-0599-4031-ABB0-0101601F1663}.Release-3.9|x64.ActiveCfg = Release-3.9|x64
+		{32B035E3-0599-4031-ABB0-0101601F1663}.Release-3.9|x64.Build.0 = Release-3.9|x64
 		{233BD777-9A51-4BAE-AFF2-8E37B96ACF3A}.Debug-2.7|x64.ActiveCfg = Debug|x64
 		{233BD777-9A51-4BAE-AFF2-8E37B96ACF3A}.Debug-2.7|x64.Build.0 = Debug|x64
 		{233BD777-9A51-4BAE-AFF2-8E37B96ACF3A}.Debug-3.7|x64.ActiveCfg = Debug|x64
@@ -76,6 +81,8 @@ Global
 		{233BD777-9A51-4BAE-AFF2-8E37B96ACF3A}.Release-3.7|x64.Build.0 = Release|x64
 		{233BD777-9A51-4BAE-AFF2-8E37B96ACF3A}.Release-3.8|x64.ActiveCfg = Release|x64
 		{233BD777-9A51-4BAE-AFF2-8E37B96ACF3A}.Release-3.8|x64.Build.0 = Release|x64
+		{233BD777-9A51-4BAE-AFF2-8E37B96ACF3A}.Release-3.9|x64.ActiveCfg = Release-3.9|x64
+		{233BD777-9A51-4BAE-AFF2-8E37B96ACF3A}.Release-3.9|x64.Build.0 = Release-3.9|x64
 		{24CCEE4D-6C6E-4741-9311-7EA23EAEA05E}.Debug-2.7|x64.ActiveCfg = Debug|x64
 		{24CCEE4D-6C6E-4741-9311-7EA23EAEA05E}.Debug-2.7|x64.Build.0 = Debug|x64
 		{24CCEE4D-6C6E-4741-9311-7EA23EAEA05E}.Debug-3.7|x64.ActiveCfg = Debug|x64
@@ -88,6 +95,8 @@ Global
 		{24CCEE4D-6C6E-4741-9311-7EA23EAEA05E}.Release-3.7|x64.Build.0 = Release|x64
 		{24CCEE4D-6C6E-4741-9311-7EA23EAEA05E}.Release-3.8|x64.ActiveCfg = Release|x64
 		{24CCEE4D-6C6E-4741-9311-7EA23EAEA05E}.Release-3.8|x64.Build.0 = Release|x64
+		{24CCEE4D-6C6E-4741-9311-7EA23EAEA05E}.Release-3.9|x64.ActiveCfg = Release-3.9|x64
+		{24CCEE4D-6C6E-4741-9311-7EA23EAEA05E}.Release-3.9|x64.Build.0 = Release-3.9|x64
 		{9D1FF8F5-57EA-484C-AE6B-2CBFE897714D}.Debug-2.7|x64.ActiveCfg = Debug|x64
 		{9D1FF8F5-57EA-484C-AE6B-2CBFE897714D}.Debug-2.7|x64.Build.0 = Debug|x64
 		{9D1FF8F5-57EA-484C-AE6B-2CBFE897714D}.Debug-3.7|x64.ActiveCfg = Debug|x64
@@ -100,6 +109,8 @@ Global
 		{9D1FF8F5-57EA-484C-AE6B-2CBFE897714D}.Release-3.7|x64.Build.0 = Release|x64
 		{9D1FF8F5-57EA-484C-AE6B-2CBFE897714D}.Release-3.8|x64.ActiveCfg = Release|x64
 		{9D1FF8F5-57EA-484C-AE6B-2CBFE897714D}.Release-3.8|x64.Build.0 = Release|x64
+		{9D1FF8F5-57EA-484C-AE6B-2CBFE897714D}.Release-3.9|x64.ActiveCfg = Release-3.9|Win32
+		{9D1FF8F5-57EA-484C-AE6B-2CBFE897714D}.Release-3.9|x64.Build.0 = Release-3.9|Win32
 		{C3FB78F1-3CCD-4591-95AF-C1A623416A17}.Debug-2.7|x64.ActiveCfg = Debug|x64
 		{C3FB78F1-3CCD-4591-95AF-C1A623416A17}.Debug-2.7|x64.Build.0 = Debug|x64
 		{C3FB78F1-3CCD-4591-95AF-C1A623416A17}.Debug-3.7|x64.ActiveCfg = Debug|x64
@@ -112,6 +123,8 @@ Global
 		{C3FB78F1-3CCD-4591-95AF-C1A623416A17}.Release-3.7|x64.Build.0 = Release|x64
 		{C3FB78F1-3CCD-4591-95AF-C1A623416A17}.Release-3.8|x64.ActiveCfg = Release|x64
 		{C3FB78F1-3CCD-4591-95AF-C1A623416A17}.Release-3.8|x64.Build.0 = Release|x64
+		{C3FB78F1-3CCD-4591-95AF-C1A623416A17}.Release-3.9|x64.ActiveCfg = Release-3.9|Win32
+		{C3FB78F1-3CCD-4591-95AF-C1A623416A17}.Release-3.9|x64.Build.0 = Release-3.9|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

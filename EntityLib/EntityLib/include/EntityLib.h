@@ -181,6 +181,9 @@ namespace Ent
         nlohmann::json& createTempJsonFile() const;
         void saveJsonFile(nlohmann::json const* doc, char const* _filepath, char const* _schema) const;
 
+        void setFallBackEntityPath(char const* _filepath);
+        char const* getFallBackEntityPath() const;
+
     private:
         /// Load an Entity or a Scene, using the given cache
         template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
@@ -219,6 +222,7 @@ namespace Ent
         mutable std::map<std::filesystem::path, NodeFile> m_nodeCache;
         mutable std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> m_jsonDatabase;
         mutable std::vector<std::unique_ptr<nlohmann::json>> m_tempJsonFiles;
+        String m_fallbackEntity;
     };
 
 } // namespace Ent

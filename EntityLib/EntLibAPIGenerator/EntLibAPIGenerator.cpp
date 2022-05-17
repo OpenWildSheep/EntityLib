@@ -23,6 +23,7 @@ using namespace std::filesystem;
 std::map<std::string, Ent::Subschema const*> allDefs;
 std::map<Ent::Subschema const*, std::string> schemaName;
 json allDefinitions(json::value_t::array);
+std::vector<path> outputFiles;
 
 std::ofstream openOfstream(path const& _filepath)
 {
@@ -34,6 +35,72 @@ std::ofstream openOfstream(path const& _filepath)
         throw FileSystemError("Trying to open file for write", path(), _filepath);
     }
     return file;
+}
+
+/// @brief Check if _file1 is identical to _file2
+/// @return true if _file1 is identical to _file2
+bool compareFiles(path const& _file1, std::filesystem::path const& _file2)
+{
+    std::ifstream f1(_file1, std::ifstream::binary | std::ifstream::ate);
+    std::ifstream f2(_file2, std::ifstream::binary | std::ifstream::ate);
+
+    if (f1.fail() || f2.fail())
+    {
+        return false; // file problem
+    }
+
+    if (f1.tellg() != f2.tellg())
+    {
+        return false; // size mismatch
+    }
+
+    // seek back to beginning and use std::equal to compare contents
+    f1.seekg(0, std::ifstream::beg);
+    f2.seekg(0, std::ifstream::beg);
+    return std::equal(
+        std::istreambuf_iterator(f1.rdbuf()),
+        std::istreambuf_iterator<char>(),
+        std::istreambuf_iterator(f2.rdbuf()));
+}
+
+void moveIfDifferent(path const& _source, path const& _dest)
+{
+    outputFiles.push_back(_dest.lexically_normal());
+    if (not compareFiles(_source, _dest))
+    {
+        rename(_source, _dest);
+    }
+}
+
+void copyIfDifferent(path const& _source, path const& _dest)
+{
+    outputFiles.push_back(_dest.lexically_normal());
+    if (not compareFiles(_source, _dest))
+    {
+        copy_file(_source, _dest, copy_options::overwrite_existing);
+    }
+}
+
+/// @brief Create a file at the _destinationPath, using the _output function to fill it
+/// @remark Will not change the destination file if the created file is identical
+template <typename Output>
+void createFile(
+    path const& _destinationPath, ///< Path of the file to create
+    Output&& _output ///< Function taking a std::ostream to fill the created file
+)
+{
+    create_directories(_destinationPath.parent_path());
+    auto const tempPath = temp_directory_path() / _destinationPath.filename();
+    {
+        std::ofstream output = openOfstream(tempPath);
+        _output(output);
+    }
+    moveIfDifferent(tempPath, _destinationPath);
+}
+
+void renderToFile(mustache& tmpl, data const& rootData, path const& _destinationPath)
+{
+    createFile(_destinationPath, [&](std::ostream& _output) { tmpl.render(rootData, _output); });
 }
 
 /// @brief Convert a json to a mustache data
@@ -836,10 +903,8 @@ namespace Ent
 } // Ent
 )cpp"};
 
-    create_directories(_destinationPath);
-    std::ofstream output = openOfstream(_destinationPath / "EntGen.h");
-    tmpl.render(rootData, output);
-    copy_file(_resourcePath / "EntGenHelpers.h", _destinationPath / "EntGenHelpers.h");
+    renderToFile(tmpl, rootData, _destinationPath / "EntGen.h");
+    copyIfDifferent(_resourcePath / "EntGenHelpers.h", _destinationPath / "EntGenHelpers.h");
 }
 
 /// @brief Generate the cpp EntGen API
@@ -1026,10 +1091,8 @@ namespace Ent
 } // Ent
 )cpp"};
 
-    create_directories(_destinationPath);
-    std::ofstream output = openOfstream(_destinationPath / "EntGen.h");
-    tmpl.render(rootData, output);
-    copy_file(_resourcePath / "EntGenHelpers.h", _destinationPath / "EntGenHelpers.h");
+    renderToFile(tmpl, rootData, _destinationPath / "EntGen.h");
+    copyIfDifferent(_resourcePath / "EntGenHelpers.h", _destinationPath / "EntGenHelpers.h");
 }
 
 /// @brief Generate the python EntGen API
@@ -1187,8 +1250,7 @@ import EntityLibPy
 
 )py"};
         auto shortTypeName = refSchema["schema"]["type_name"].get<std::string>();
-        std::ofstream output = openOfstream(_destinationPath / "entgen" / (shortTypeName + ".py"));
-        tmpl.render(rootData, output);
+        renderToFile(tmpl, rootData, _destinationPath / "entgen" / (shortTypeName + ".py"));
     }
 
     data rootData;
@@ -1222,8 +1284,7 @@ from enum import Enum
 
 )py"};
 
-    std::ofstream outputCommon = openOfstream(_destinationPath / "entgen/inline.py");
-    allInline.render(rootData, outputCommon);
+    renderToFile(allInline, rootData, _destinationPath / "entgen/inline.py");
 
     mustache all{R"py(
 ### /!\ This code is GENERATED! Do not modify it.
@@ -1242,18 +1303,14 @@ from .String import *
 
 )py"};
 
-    std::ofstream outputAll = openOfstream(_destinationPath / "entgen/_all.py");
-    all.render(rootData, outputAll);
+    renderToFile(all, rootData, _destinationPath / "entgen/_all.py");
 
-    copy_file(_resourcePath / "entgen_helpers.py", _destinationPath / "entgen_helpers.py");
-    std::ofstream init1(_destinationPath / "__init__.py");
-    std::ofstream init2(_destinationPath / "entgen" / "__init__.py");
+    copyIfDifferent(_resourcePath / "entgen_helpers.py", _destinationPath / "entgen_helpers.py");
+    createFile(_destinationPath / "__init__.py", [](std::ostream&) {});
+    createFile(_destinationPath / "entgen" / "__init__.py", [](std::ostream&) {});
     for (auto&& file : {"Bool.py", "EntityRef.py", "Float.py", "Int.py", "String.py"})
     {
-        copy_file(
-            _resourcePath / "entgen" / file,
-            _destinationPath / "entgen" / file,
-            copy_options::overwrite_existing);
+        copyIfDifferent(_resourcePath / "entgen" / file, _destinationPath / "entgen" / file);
     }
 }
 
@@ -1399,9 +1456,15 @@ try
         allDefinitions.push_back(refSchema);
     }
 
-    std::error_code er;
-    remove_all(destinationPath, er);
     create_directories(destinationPath);
+    std::vector<path> previousFiles;
+    for (auto const& file : recursive_directory_iterator(destinationPath))
+    {
+        if (file.is_regular_file())
+        {
+            previousFiles.push_back(file.path());
+        }
+    }
 
     auto getTypeID = [](json const& type)
     {
@@ -1459,14 +1522,29 @@ try
     }
 
     // Export the mustache json input (for debug purpose)
-    {
-        std::ofstream schemaOutput = openOfstream(destinationPath / "schemaOutput.json");
-        schemaOutput << allDefinitions.dump(4);
-    }
+    createFile(
+        destinationPath / "schemaOutput.json",
+        [&](std::ostream& schemaOutput) { schemaOutput << allDefinitions.dump(4); });
 
     gencpp(resourcePath / "cpp", destinationPath / "cpp");
     gencppProp(resourcePath / "cpp2", destinationPath / "cpp2");
     genpy(resourcePath / "py", destinationPath / "py");
+
+    // Remove old files which was not re-created
+    std::sort(begin(outputFiles), end(outputFiles));
+    std::sort(begin(previousFiles), end(previousFiles));
+    std::vector<path> toRemove;
+    std::set_difference(
+        begin(previousFiles),
+        end(previousFiles),
+        begin(outputFiles),
+        end(outputFiles),
+        std::back_inserter(toRemove));
+    for (auto const& obsoleteFile : toRemove)
+    {
+        printf("Remove file : %ls\n", obsoleteFile.c_str());
+        std::filesystem::remove(obsoleteFile);
+    }
 
     std::cout << "EntGen generation done" << std::endl;
     return EXIT_SUCCESS;

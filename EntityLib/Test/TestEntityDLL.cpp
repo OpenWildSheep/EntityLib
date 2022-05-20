@@ -257,6 +257,19 @@ try
     entlib.validationEnabled = false;
     {
         entlib.rawdataPath = "X:/RawData"; // It is a hack to work in the working dir
+        auto node = Property(
+            &entlib,
+            entlib.getSchema("Entity"),
+            "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
+            "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene");
+
+        auto const* nodeRef = "Components/SubScene/Embedded/ShamanFullBlue_ent_001";
+        auto ent = node.resolveNodeRef(nodeRef);
+        ENTLIB_ASSERT(ent.has_value());
+        ENTLIB_ASSERT(
+            ent->getObjectField("Name").getString() == std::string("ShamanFullBlue_ent_001"));
+    }
+    {
         auto node = entlib.loadFileAsNode(
             "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
             "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",

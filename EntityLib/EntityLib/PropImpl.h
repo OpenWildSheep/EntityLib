@@ -8,7 +8,7 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4464)
-#include "../Tools.h"
+#include "Tools.h"
 #pragma warning(pop)
 
 namespace Ent
@@ -243,6 +243,8 @@ namespace Ent
         [[nodiscard]] char const* getFilePath() const;
 
         [[nodiscard]] DataKind getDataKind() const;
+
+        [[nodiscard]] PropImplPtr resolveNodeRef(char const* _nodeRef);
 
     private:
         friend void decRef(PropImpl* self);

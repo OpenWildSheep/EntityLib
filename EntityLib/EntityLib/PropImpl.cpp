@@ -1124,4 +1124,107 @@ namespace Ent
         }
         return fields;
     }
+
+    PropImplPtr PropImpl::resolveNodeRef(char const* _nodeRef)
+    {
+        auto const* tokenStart = _nodeRef;
+        auto const* const nodeRefEnd = _nodeRef + strlen(_nodeRef);
+
+        auto const* tokenStop = strchr(tokenStart, '/');
+        if (tokenStop == nullptr)
+        {
+            tokenStop = nodeRefEnd;
+        }
+        auto current = sharedFromThis();
+
+        auto nextToken = [&tokenStart, &tokenStop, nodeRefEnd]
+        {
+            if (tokenStop == nodeRefEnd)
+            {
+                tokenStart = nodeRefEnd;
+            }
+            else
+            {
+                tokenStart = tokenStop + 1;
+                tokenStop = strchr(tokenStart, '/');
+                if (tokenStop == nullptr)
+                {
+                    tokenStop = nodeRefEnd;
+                }
+            }
+        };
+
+        // For each token in _nodeRef
+        std::string token;
+        for (; tokenStart != nodeRefEnd; nextToken())
+        {
+            // Get the child, using the token and the DataType
+            token.assign(tokenStart, tokenStop - tokenStart);
+            if (token == ".")
+            {
+                continue;
+            }
+            ENTLIB_ASSERT(not token.empty());
+            switch (auto kind = current->getDataKind(); kind)
+            {
+            case DataKind::object:
+            {
+                current = current->getObjectField(token.c_str());
+                break;
+            }
+            case DataKind::union_:
+            {
+                if (token != current->getUnionType())
+                {
+                    throw WrongPath("Wrong union type. Path doesn't exist.");
+                }
+                current = current->getUnionData();
+                break;
+            }
+            case DataKind::unionSet:
+            {
+                current = current->getUnionSetItem(token.c_str());
+                break;
+            }
+            case DataKind::objectSet:
+            {
+                current = current->getObjectSetItem(token.c_str());
+                break;
+            }
+            case DataKind::map:
+            {
+                if (current->getMapKeyType() == DataType::integer)
+                {
+                    // current is any other map/set kind, with an integer key
+                    auto const key = atoi(token.c_str());
+                    current = current->getMapItem(key);
+                }
+                else
+                {
+                    // current is any other map/set kind, with a string, or EntityRef key
+                    current = current->getMapItem(token.c_str());
+                }
+                break;
+            }
+            case DataKind::array:
+            {
+                // current is an array
+                auto const index = atoi(token.c_str());
+                current = current->getArrayItem(index);
+                break;
+            }
+            case DataKind::primitiveSet: [[fallthrough]];
+            case DataKind::boolean: [[fallthrough]];
+            case DataKind::entityRef: [[fallthrough]];
+            case DataKind::integer: [[fallthrough]];
+            case DataKind::number: [[fallthrough]];
+            case DataKind::string: [[fallthrough]];
+            case DataKind::COUNT:
+            default:
+                ENTLIB_LOGIC_ERROR("Unexpected DataKind in PropImpl::resolveNodeRef : %d", kind);
+            }
+        }
+        return current;
+    }
+
 } // namespace Ent

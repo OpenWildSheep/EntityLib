@@ -660,6 +660,19 @@ namespace Ent
             return *m_self;
         }
 
+        /// @brief Get the target pointed by _nodeRef, starting from this
+        [[nodiscard]] std::optional<Property> resolveNodeRef(char const* _nodeRef) const
+        {
+            if (auto prop = m_self->resolveNodeRef(_nodeRef); prop != nullptr)
+            {
+                return Property(std::move(prop));
+            }
+            else
+            {
+                return std::nullopt;
+            }
+        }
+
     private:
         PropImplPtr m_self{};
     };

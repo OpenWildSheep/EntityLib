@@ -1227,4 +1227,75 @@ namespace Ent
         return current;
     }
 
+    PropImplPtr PropImpl::getRootNode() const
+    {
+        auto rootParent = this;
+        while (rootParent->m_parent != nullptr)
+        {
+            rootParent = rootParent->m_parent.get();
+        }
+        return rootParent->sharedFromThis();
+    }
+
+    static [[nodiscard]] std::string keyToString(FileProperty::Key _key)
+    {
+        return std::visit(
+            [](auto const& _key)
+            {
+                using KeyType = std::remove_const_t<std::remove_reference_t<decltype(_key)>>;
+                if constexpr (std::is_same_v<KeyType, char const*>)
+                {
+                    return std::string(_key);
+                }
+                else if constexpr (std::is_same_v<KeyType, int64_t>)
+                {
+                    char buff[64];
+                    _ltoa_s(static_cast<long>(_key), buff, 10);
+                    return std::string(buff);
+                }
+                else
+                {
+                    static_assert(false, "Unknown type in FileProperty::Key");
+                }
+            },
+            _key);
+    }
+
+    // Get the path from _root to _child, but reversed.
+    static [[nodiscard]] std::vector<std::string> makeNodeRefReversed(PropImpl const* _root, PropImpl const& _child)
+    {
+        PropImplPtr propPtr = _child.sharedFromThis();
+        std::vector<std::string> tokens;
+        while (propPtr.get() != _root and propPtr->getParent() != nullptr)
+        {
+            tokens.push_back(keyToString(propPtr->getPathToken()));
+            propPtr = propPtr->getParent();
+        }
+        return tokens;
+    }
+
+    NodeRef PropImpl::makeNodeRef(PropImpl const& _target) const
+    {
+        auto const thisRoot = getRootNode();
+        auto const targetRoot = _target.getRootNode();
+        if (thisRoot != targetRoot)
+        {
+            throw UnrelatedNodes();
+        }
+        // get the two absolute path
+        auto thisPath = makeNodeRefReversed(thisRoot.get(), *this);
+        auto targetPath = makeNodeRefReversed(targetRoot.get(), _target);
+
+        // Get path from this to target
+        std::string relativePath =
+            computeRelativePath(std::move(thisPath), std::move(targetPath), false);
+
+        return relativePath;
+    }
+
+    NodeRef PropImpl::makeAbsoluteNodeRef() const
+    {
+        return getRootNode()->makeNodeRef(*this);
+    }
+
 } // namespace Ent

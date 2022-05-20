@@ -667,10 +667,29 @@ namespace Ent
             {
                 return Property(std::move(prop));
             }
-            else
-            {
-                return std::nullopt;
-            }
+            return std::nullopt;
+        }
+
+        [[nodiscard]] Property getRootNode() const
+        {
+            return Property(m_self->getRootNode());
+        }
+
+        /// @brief Make a NodeRef going from this to _target
+        [[nodiscard]] NodeRef makeNodeRef(Property const& _target) const
+        {
+            return m_self->makeNodeRef(*_target.m_self);
+        }
+
+        /// @brief Get the NodeRef from root to this
+        [[nodiscard]] NodeRef makeAbsoluteNodeRef() const
+        {
+            return m_self->makeAbsoluteNodeRef();
+        }
+
+        [[nodiscard]] FileProperty::Key getPathToken() const
+        {
+            return m_self->getPathToken();
         }
 
     private:

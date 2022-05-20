@@ -713,6 +713,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property_readonly("prefab", &Property::getPrefab, py::keep_alive<0, 1>())
         .def_property_readonly("parent", &Property::getParent, py::keep_alive<0, 1>())
         .def_property_readonly("file_path", &Property::getFilePath)
+        .def_property_readonly("root_node", &Property::getRootNode)
+        .def_property_readonly("noderef", &Property::makeNodeRef)
+        .def_property_readonly("absolute_noderef", &Property::makeAbsoluteNodeRef)
+        .def_property_readonly("path_token", &Property::getPathToken)
         ;
 
     py::register_exception<JsonValidation>(ent, "JsonValidation");

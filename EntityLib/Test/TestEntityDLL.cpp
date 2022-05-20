@@ -265,9 +265,12 @@ try
 
         auto const* nodeRef = "Components/SubScene/Embedded/ShamanFullBlue_ent_001";
         auto ent = node.resolveNodeRef(nodeRef);
-        ENTLIB_ASSERT(ent.has_value());
-        ENTLIB_ASSERT(
-            ent->getObjectField("Name").getString() == std::string("ShamanFullBlue_ent_001"));
+        auto entpath = node.makeNodeRef(*ent);
+        ENTLIB_ASSERT(entpath == nodeRef);
+        entpath = ent->makeAbsoluteNodeRef();
+        ENTLIB_ASSERT(entpath == nodeRef);
+        entpath = node.makeAbsoluteNodeRef();
+        ENTLIB_ASSERT(entpath == ".");
     }
     {
         auto node = entlib.loadFileAsNode(

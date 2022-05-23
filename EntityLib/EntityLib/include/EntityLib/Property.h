@@ -4,6 +4,7 @@
 
 namespace Ent
 {
+    struct PrefabInfo;
     struct ENTLIB_DLLEXPORT Property
     {
     public:
@@ -692,7 +693,27 @@ namespace Ent
             return m_self->getPathToken();
         }
 
+        friend std::vector<PrefabInfo> getPrefabHistory(Property const& _prop);
+
     private:
         PropImplPtr m_self{};
     };
+
+    /// Information about a prefab in the prefab history of a Node
+    /// @see Ent::getPrefabHistory
+    struct PrefabInfo
+    {
+        std::string prefabPath; ///< Path to the prefab's file
+        NodeRef nodeRef; ///< NodeRef from the prefab root the the pointed Node
+        Property prop; ///< \b Read-only. Pointed Node in this prefab (if it exist).
+
+        // TODO : Remove when C++20
+        PrefabInfo(std::string _prefabPath, NodeRef _nodeRef, PropImplPtr _prop)
+            : prefabPath(std::move(_prefabPath))
+            , nodeRef(std::move(_nodeRef))
+            , prop(std::move(_prop))
+        {
+        }
+    };
+    std::vector<PrefabInfo> getPrefabHistory(Property const& _prop);
 } // namespace Ent

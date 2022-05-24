@@ -372,7 +372,7 @@ namespace Ent::Gen
             using reference = Union;
 
             Node* node = nullptr;
-            std::vector<String> keys;
+            std::vector<::Ent::String> keys;
             size_t index = 0;
 
             iterator& operator++()
@@ -433,7 +433,7 @@ namespace Ent::Gen
         return value;
     }
 
-    inline char const* toInternal(String const& value)
+    inline char const* toInternal(::Ent::String const& value)
     {
         return value.c_str();
     }

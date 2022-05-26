@@ -837,6 +837,7 @@ namespace Ent
         struct SmoothScaleComponentInput;
         struct ReviveEnergyComponentInput;
         struct RespawnabilityComponentInput;
+        struct RagdollComponentInput;
         struct PhysicsImpactMakerComponentInput;
         struct PhysicsComponentInput;
         struct PerceiverComponentInput;
@@ -5806,6 +5807,7 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::Int HotspotID() const;
+            Ent::Gen::EntityRef MountableEntity() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -9780,6 +9782,22 @@ namespace Ent
         {
             RespawnabilityComponentInput(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "RespawnabilityComponentInput";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ComponentInput Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct RagdollComponentInput : HelperObject // Object
+        {
+            RagdollComponentInput(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "RagdollComponentInput";
             static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
@@ -31739,6 +31757,10 @@ namespace Ent
         {
             return Ent::Gen::Int(node->at("HotspotID"));
         }
+        inline Ent::Gen::EntityRef MountableData::MountableEntity() const
+        {
+            return Ent::Gen::EntityRef(node->at("MountableEntity"));
+        }
         inline Ent::Gen::String MountableData::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
@@ -35825,6 +35847,15 @@ namespace Ent
             return Ent::Gen::ComponentInput(node->at("Super"));
         }
         inline Ent::Gen::String RespawnabilityComponentInput::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // RagdollComponentInput
+        inline Ent::Gen::ComponentInput RagdollComponentInput::Super() const
+        {
+            return Ent::Gen::ComponentInput(node->at("Super"));
+        }
+        inline Ent::Gen::String RagdollComponentInput::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }

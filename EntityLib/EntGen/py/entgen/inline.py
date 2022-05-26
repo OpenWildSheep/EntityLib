@@ -5307,6 +5307,11 @@ class MountableData(HelperObject):
     @HotspotID.setter
     def HotspotID(self, val): self.HotspotID.set(val)
     @property
+    def MountableEntity(self):  # type: ()->EntityRef
+        return EntityRef(self._node.at("MountableEntity"))
+    @MountableEntity.setter
+    def MountableEntity(self, val): self.MountableEntity.set(val)
+    @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
     @_comment.setter
@@ -12924,6 +12929,29 @@ class RespawnabilityComponentInput(HelperObject):
     @staticmethod
     def create(entlib):  # type: (EntityLib)->RespawnabilityComponentInput
         return RespawnabilityComponentInput(entlib.make_node(RespawnabilityComponentInput.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ComponentInput
+        return ComponentInput(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class RagdollComponentInput(HelperObject):
+    schema_name = "RagdollComponentInput"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->RagdollComponentInput
+        return RagdollComponentInput(entlib.load_node_file(sourcefile, entlib.get_schema(RagdollComponentInput.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->RagdollComponentInput
+        return RagdollComponentInput(entlib.make_node(RagdollComponentInput.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

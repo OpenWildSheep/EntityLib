@@ -375,6 +375,7 @@ from .SoundEmitterComponentInput import *
 from .SmoothScaleComponentInput import *
 from .ReviveEnergyComponentInput import *
 from .RespawnabilityComponentInput import *
+from .RagdollComponentInput import *
 from .PhysicsImpactMakerComponentInput import *
 from .PhysicsComponentInput import *
 from .PerceiverComponentInput import *

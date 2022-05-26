@@ -837,6 +837,7 @@ namespace Ent
         struct SmoothScaleComponentInput;
         struct ReviveEnergyComponentInput;
         struct RespawnabilityComponentInput;
+        struct RagdollComponentInput;
         struct PhysicsImpactMakerComponentInput;
         struct PhysicsComponentInput;
         struct PerceiverComponentInput;
@@ -7018,6 +7019,7 @@ namespace Ent
                 return MountableData(getProperty().makeInstanceOf());
             }
             Ent::Gen2::Int HotspotID() const;
+            Ent::Gen2::EntityRef MountableEntity() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -13015,6 +13017,34 @@ namespace Ent
             RespawnabilityComponentInput makeInstanceOf()
             {
                 return RespawnabilityComponentInput(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ComponentInput Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct RagdollComponentInput : HelperObject<RagdollComponentInput> // Object
+        {
+            explicit RagdollComponentInput(Ent::Property _node): HelperObject<RagdollComponentInput>(std::move(_node)) {}
+            static constexpr char schemaName[] = "RagdollComponentInput";
+            static RagdollComponentInput load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return RagdollComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static RagdollComponentInput loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return RagdollComponentInput(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static RagdollComponentInput create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return RagdollComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            RagdollComponentInput makeInstanceOf()
+            {
+                return RagdollComponentInput(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ComponentInput Super() const;
             Ent::Gen2::String _comment() const;
@@ -44561,6 +44591,10 @@ namespace Ent
         {
             return Ent::Gen2::Int(getProperty().getObjectField("HotspotID"));
         }
+        inline Ent::Gen2::EntityRef MountableData::MountableEntity() const
+        {
+            return Ent::Gen2::EntityRef(getProperty().getObjectField("MountableEntity"));
+        }
         inline Ent::Gen2::String MountableData::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
@@ -48647,6 +48681,15 @@ namespace Ent
             return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String RespawnabilityComponentInput::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // RagdollComponentInput
+        inline Ent::Gen2::ComponentInput RagdollComponentInput::Super() const
+        {
+            return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String RagdollComponentInput::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }

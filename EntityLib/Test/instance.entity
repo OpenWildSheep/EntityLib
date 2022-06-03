@@ -7,15 +7,13 @@
     ],
     "ActorStates":[
         {
-            "className": "ActionChosen",
+            "className": "ActorStateDead",
             "classData":{
-                "ExitRequired": true
             }
         },
         {
-            "className": "ActionCinematic",
+            "className": "EntityStatePlayer",
             "classData":{
-                "Type": 13
             }
         }
     ],	
@@ -26,12 +24,10 @@
                 "ScriptList": [
                     "a1", "b2", null ]
             },
-            "Type": "SystemicCreature",
-            "Version": 1
+            "Type": "SystemicCreature"
         },
         {
-            "Version": 1,
-            "Type": "PathNodeGD",
+            "Type": "TestTagsList",
             "Data": {
                 "Radius": 30.0,
                 "Tags": {
@@ -60,26 +56,20 @@
                 "InstanceOf": "test.StickToTerrain.node",
                 "NormalRatio": 0.6
             },
-            "Type": "StickToTerrain",
-            "Version": 1
+            "Type": "StickToTerrain"
         }, {
             "Data": {
                 "InstanceOf": "test.SeedPatch2.node",
                 "NoiseOffsetY" : 3
             },
-            "Type": "SeedPatch",
-            "Version": 1
+            "Type": "SeedPatch"
         }, {
-            "Version": 1,
             "Type": "SubScene",
             "Data": {
-                "isEmbedded": true,
-                "File": "",
                 "Embedded": [{
                         "Name": "EntityWithInstanceOf",
                         "Color": [255, 120, 220, 255],
                         "Components": [{
-                                "Version": 1,
                                 "Type": "NetworkLink",
                                 "Data": {
                                     "Source": "instance"
@@ -113,8 +103,7 @@
                     }
                 ]
             },
-            "Type": "TestSetOfObject",
-            "Version": 1
+            "Type": "TestSetOfObject"
         }
     ],
     "InstanceOf": "prefab.entity",

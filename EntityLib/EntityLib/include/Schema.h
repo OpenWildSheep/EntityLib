@@ -4,9 +4,9 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <variant>
+#include <optional>
 
-#include "../../../external/mapbox/variant.hpp"
-#include "../external/optional.hpp"
 #include "../external/json.hpp"
 #pragma warning(pop)
 
@@ -27,6 +27,25 @@ namespace Ent
         boolean, ///< Contains a boolean value
         entityRef, ///< Contains a string which is a path to an Entity
         oneOf, ///< It is actually a union type, but union is a C keyword
+        COUNT
+    };
+
+    /// Detailed schema type.
+    /// Especially with array, which can be unionSet, map, objectSet, primitiveSet or simple array
+    enum class DataKind
+    {
+        string, ///< Contains a string
+        number, ///< Contains a number (real)
+        integer, ///< Contains an integer
+        object, ///< Contains a json object (it has properties)
+        array, ///< Contains an array . It can be singular (one type for all) or linear (one type per element)
+        boolean, ///< Contains a boolean value
+        entityRef, ///< Contains a string which is a path to an Entity
+        union_, ///< It is actually a union type, but union is a C keyword
+        unionSet,
+        map,
+        objectSet,
+        primitiveSet,
         COUNT
     };
 
@@ -61,12 +80,24 @@ namespace Ent
         DataType type = DataType::null; ///< type of this Subschema. @see Ent::DataType
         bool required = false; ///< Is this property required?
         std::map<std::string, SubschemaRef> properties; ///< If type == Ent::DataType::object, child properties
-        size_t maxItems = size_t(-1); ///< Maximum size of the array. (inclusive) [min, max]
+        size_t maxItems =
+            static_cast<size_t>(-1); ///< Maximum size of the array. (inclusive) [min, max]
         size_t minItems = 0; ///< @brief Minimum size of an array
-        tl::optional<std::vector<SubschemaRef>> oneOf; ///< This object have to match with one of thos schema (union)
+        std::optional<std::vector<SubschemaRef>> oneOf; ///< This object have to match with one of thos schema (union)
         std::string name; ///< This is not a constraint. Just the name of the definition
         nlohmann::json userMeta;
         bool isKeyField = false;
+        std::string title;
+        std::string description;
+
+        struct UnionSubTypeInfo
+        {
+            Subschema const* wrapperSchema = nullptr;
+            Subschema const* dataSchema = nullptr;
+            size_t index = 0;
+        };
+        /// @brief Fast lookup in union types
+        std::map<std::string, UnionSubTypeInfo> unionTypeMap;
 
         // Meta informations
         /// Store metadata for any type
@@ -87,7 +118,7 @@ namespace Ent
         {
             std::string dataField; ///< Name of the field containing the data (ex : classData)
             std::string typeField; ///< Name of the field containing the type of the data (ex : className)
-            tl::optional<std::string> indexField; ///< Name of the field containing the index of the type
+            std::optional<std::string> indexField; ///< Name of the field containing the index of the type
         };
         /// Store metadata for array type
         struct ArrayMeta : BaseMeta
@@ -95,25 +126,26 @@ namespace Ent
             std::string overridePolicy; ///< Policy used to override the array from the prefab
             bool ordered = true;
             bool isMapItem = false; ///< Can't be discarded at write (neither null)
-            tl::optional<std::string> keyField;
+            std::optional<std::string> keyField;
         };
         /// Store metadata for all schema which doesn't have specific field
         struct GenericMeta : BaseMeta
         {
         };
         /// Meta data for any type of Node
-        using Meta = mapbox::util::variant<GenericMeta, NumberMeta, UnionMeta, ArrayMeta>;
-        Meta meta; ///< Contains meta data for any type of Node
+        using Meta = std::variant<GenericMeta, NumberMeta, UnionMeta, ArrayMeta>;
+        Meta meta{}; ///< Contains meta data for any type of Node
 
         // helper methods
-        bool IsDeprecated() const; ///< Is this node deprecated? (access to meta data)
-        bool IsUsedInEditor() const; ///< Is this node used in editor? (access to meta data)
-        bool IsUsedInRuntime() const; ///< Is this node used in runtime? (access to meta data)
-        bool IsRuntimeOnly() const /// Is this node used in runtime only? (access to meta data)
+        [[nodiscard]] bool IsDeprecated() const; ///< Is this node deprecated? (access to meta data)
+        [[nodiscard]] bool IsUsedInEditor() const; ///< Is this node used in editor? (access to meta data)
+        [[nodiscard]] bool IsUsedInRuntime() const; ///< Is this node used in runtime? (access to meta data)
+        [[nodiscard]] bool IsRuntimeOnly() const /// Is this node used in runtime only? (access to meta data)
         {
             return IsUsedInRuntime() && !IsUsedInEditor();
         }
-        bool IsEditorOnly() const /// Is this node used in editor only? (access to meta data)
+
+        [[nodiscard]] bool IsEditorOnly() const /// Is this node used in editor only? (access to meta data)
         {
             return !IsUsedInRuntime() && IsUsedInEditor();
         }
@@ -121,7 +153,7 @@ namespace Ent
         /// @brief Get all types acceptable in the union, with their names
         /// @throw BadType if the schema is not a oneOf
         /// @throw MissingMetadata if the schema doesn't have a meta className and classData
-        std::map<std::string, Subschema const*> getUnionTypesMap() const;
+        [[nodiscard]] std::map<std::string, Subschema const*> getUnionTypesMap() const;
 
         /// @brief Get the Subschema related to the given \p _type (className)
         /// @throw BadType if the schema is not a oneOf
@@ -132,17 +164,24 @@ namespace Ent
         /// @brief Get the name of the json field containing the type name
         /// @throw BadType if the schema is not a oneOf
         /// @throw MissingMetadata if the schema doesn't have a meta className and classData
-        char const* getUnionNameField() const;
+        [[nodiscard]] char const* getUnionNameField() const;
 
         /// @brief Get the name of the json field containing the data
         /// @throw BadType if the schema is not a oneOf
         /// @throw MissingMetadata if the schema doesn't have a meta className and classData
-        char const* getUnionDataField() const;
+        [[nodiscard]] char const* getUnionDataField() const;
+
+        [[nodiscard]] char const* getUnionDefaultTypeName() const;
+
+        /// @brief Get the type of the Key of a map or set
+        [[nodiscard]] DataType getMapKeyType() const;
+
+        [[nodiscard]] DataKind getDataKind() const;
 
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue = nlohmann::json;
         DefaultValue defaultValue; ///< @brief Contains the data according to the type
-        tl::optional<DefaultValue> constValue; ///< This property can only have this value
+        std::optional<DefaultValue> constValue; ///< This property can only have this value
 
         /// @brief Subschema of the unique type of item
         ///
@@ -155,7 +194,7 @@ namespace Ent
         /// If type == Ent::DataType::array,
         ///   If all items have a different type (LinearItem),
         ///     This is the description of each items
-        tl::optional<std::vector<SubschemaRef>> linearItems;
+        std::optional<std::vector<SubschemaRef>> linearItems;
         std::vector<std::string> enumValues; ///< List of all posible values for enum
     };
 
@@ -181,13 +220,15 @@ namespace Ent
             Schema* schema; //!< Schema of the referenced object
             std::string ref; //!< Name of the referenced object
             DefaultValue defaultValue; ///< Additional default values (beside a "$ref")
+            std::string title;
+            std::string description;
         };
 
-        mapbox::util::variant<Null, Ref, Subschema> subSchemaOrRef;
+        std::variant<Null, Ref, Subschema> subSchemaOrRef;
         DeleteCheck deleteCheck;
         /// @endcond
 
-        Subschema const& get() const; //!< Get the referenced subschema
+        [[nodiscard]] Subschema const& get() const; //!< Get the referenced subschema
         Subschema& get(); //!< Get the referenced subschema
 
         Subschema const& operator*() const; //!< Get the referenced subschema
@@ -196,16 +237,27 @@ namespace Ent
         Subschema* operator->(); //!< Get the referenced subschema
 
         /// Get the default values beside a "$ref", or nullptr
-        DefaultValue const* getRefDefaultValues() const
+        [[nodiscard]] DefaultValue const* getRefDefaultValues() const
         {
-            if (subSchemaOrRef.is<Ref>() && !subSchemaOrRef.get<Ref>().defaultValue.is_null())
+            if (std::holds_alternative<Ref>(subSchemaOrRef)
+                && !std::get<Ref>(subSchemaOrRef).defaultValue.is_null())
             {
-                return &subSchemaOrRef.get<Ref>().defaultValue;
+                return &std::get<Ref>(subSchemaOrRef).defaultValue;
             }
-            else
+            return nullptr;
+        }
+
+        [[nodiscard]] char const* getDescription() const
+        {
+            if (auto const* const ref = std::get_if<Ref>(&subSchemaOrRef))
             {
-                return nullptr;
+                return ref->description.c_str();
             }
+            if (auto const* const schema = std::get_if<Subschema>(&subSchemaOrRef))
+            {
+                return schema->description.c_str();
+            }
+            return nullptr;
         }
     };
 
@@ -218,7 +270,6 @@ namespace Ent
         Schema() = default;
         Schema(Schema const&) = delete;
         Schema& operator=(Schema const&) = delete;
-        SubschemaRef root; ///< Root Schema : Schema of the scene
         std::map<std::string, Subschema> allDefinitions; ///< Definition of everything, by type name
         EntityLib* entityLib = nullptr;
 
@@ -234,10 +285,10 @@ namespace Ent
     /// variant visitor to get a specifique field in a Subschema::BaseMeta
     struct BasicFieldGetter
     {
-        std::function<bool(const Subschema::BaseMeta*)> _fieldSelector;
+        std::function<bool(Subschema::BaseMeta const*)> _fieldSelector;
 
         template <class MetaT>
-        bool operator()(const MetaT& _meta)
+        bool operator()(MetaT const& _meta)
         {
             return _fieldSelector(&_meta);
         }
@@ -245,61 +296,67 @@ namespace Ent
 
     inline bool Subschema::IsDeprecated() const
     {
-        return mapbox::util::apply_visitor(
-            BasicFieldGetter{[](const Subschema::BaseMeta* _meta) {
-                return _meta->deprecated;
-            }},
+        return std::visit(
+            BasicFieldGetter{[](BaseMeta const* _meta)
+                             {
+                                 return _meta->deprecated;
+                             }},
             meta);
     }
 
     inline bool Subschema::IsUsedInEditor() const
     {
-        return mapbox::util::apply_visitor(
-            BasicFieldGetter{[](const Subschema::BaseMeta* _meta) {
-                return _meta->usedInEditor;
-            }},
+        return std::visit(
+            BasicFieldGetter{[](BaseMeta const* _meta)
+                             {
+                                 return _meta->usedInEditor;
+                             }},
             meta);
     }
 
     inline bool Subschema::IsUsedInRuntime() const
     {
-        return mapbox::util::apply_visitor(
-            BasicFieldGetter{[](const Subschema::BaseMeta* _meta) {
-                return _meta->usedInRuntime;
-            }},
+        return std::visit(
+            BasicFieldGetter{[](BaseMeta const* _meta)
+                             {
+                                 return _meta->usedInRuntime;
+                             }},
             meta);
+    }
+
+    inline DataType Subschema::getMapKeyType() const
+    {
+        return singularItems->get().linearItems->at(0)->type;
     }
 
     inline Subschema const& SubschemaRef::get() const
     {
-        if (subSchemaOrRef.is<Ref>())
+        if (std::holds_alternative<Ref>(subSchemaOrRef))
         {
-            Ref const& ref = subSchemaOrRef.get<Ref>();
+            Ref const& ref = std::get<Ref>(subSchemaOrRef);
             return AT(ref.schema->allDefinitions, ref.ref);
         }
-        else if (subSchemaOrRef.is<Subschema>())
-            return subSchemaOrRef.get<Subschema>();
-        else
+        if (std::holds_alternative<Subschema>(subSchemaOrRef))
         {
-            ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
-            return subSchemaOrRef.get<Subschema>();
+            return std::get<Subschema>(subSchemaOrRef);
         }
+        ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
+        return std::get<Subschema>(subSchemaOrRef);
     }
 
     inline Subschema& SubschemaRef::get()
     {
-        if (subSchemaOrRef.is<Ref>())
+        if (std::holds_alternative<Ref>(subSchemaOrRef))
         {
-            Ref const& ref = subSchemaOrRef.get<Ref>();
+            Ref const& ref = std::get<Ref>(subSchemaOrRef);
             return AT(ref.schema->allDefinitions, ref.ref);
         }
-        else if (subSchemaOrRef.is<Subschema>())
-            return subSchemaOrRef.get<Subschema>();
-        else
+        if (std::holds_alternative<Subschema>(subSchemaOrRef))
         {
-            ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
-            return subSchemaOrRef.get<Subschema>();
+            return std::get<Subschema>(subSchemaOrRef);
         }
+        ENTLIB_LOGIC_ERROR("Uninitialized SubschemaRef!");
+        return std::get<Subschema>(subSchemaOrRef);
     }
 
     inline Subschema const& SubschemaRef::operator*() const

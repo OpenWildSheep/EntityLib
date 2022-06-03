@@ -1,22 +1,19 @@
 {
+    "$schema": "wildschema:/all/Entity.json",
     "ActorStates": [
         {
             "classData": {
-                "locomotionMode": "crouch"
+                "ItemEntityRef": "tutu"
             },
-            "className": "ActionClimbEdge"
+            "className": "ActorStateHoldingItem"
         },
         {
-            "classData": {
-                "Type": 13
-            },
-            "className": "ActionCinematic"
+            "classData": {},
+            "className": "EntityStatePlayer"
         },
         {
-            "classData": {
-                "ExitRequired": true
-            },
-            "className": "ActionChosen"
+            "classData": {},
+            "className": "ActorStateDead"
         }
     ],
     "Color": [
@@ -28,134 +25,99 @@
     "Components": [
         {
             "Data": {
-                "InSpiritWorld": false
+                "Orientation": [
+                    -0.0032736328,
+                    -0.00733923,
+                    -0.12891139,
+                    0.99162364
+                ],
+                "Position": [
+                    105.2244,
+                    152.7811,
+                    29.6635
+                ],
+                "Scale": [
+                    1.0000386,
+                    0.99995625,
+                    1.0000291
+                ]
             },
-            "Type": "ActorGD",
-            "Version": 1
+            "Type": "TransformGD"
         },
         {
             "Data": {
-                "Embedded": [
-                    {
-                        "Color": [
-                            255.0,
-                            120.0,
-                            220.0,
-                            255.0
-                        ],
-                        "Components": [
-                            {
-                                "Data": {
-                                    "Source": ".EP1-Spout_",
-                                    "Target": ".EP1-crook_",
-                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
-                                },
-                                "Type": "NetworkLink",
-                                "Version": 1
-                            },
-                            {
-                                "Data": {
-                                    "Matrix": [
-                                        -0.0057,
-                                        -0.4374,
-                                        74.1085,
-                                        0.0,
-                                        0.8993,
-                                        36.0432,
-                                        -1.0,
-                                        0.0025,
-                                        -0.4247
-                                    ],
-                                    "Position": [
-                                        0.0,
-                                        0.0,
-                                        0.0
-                                    ]
-                                },
-                                "Type": "TransformGD",
-                                "Version": 1
-                            }
-                        ],
-                        "Name": "EP1-Spout_LINK_001_detached"
-                    },
-                    {
-                        "Color": [
-                            255.0,
-                            120.0,
-                            220.0,
-                            255.0
-                        ],
-                        "Components": [
-                            {
-                                "Data": {
-                                    "Source": "instance",
-                                    "Target": "subentity2"
-                                },
-                                "Type": "NetworkLink",
-                                "Version": 1
-                            }
-                        ],
-                        "Name": "EntityWithInstanceOf_detached"
-                    },
-                    {
-                        "Components": [
-                            {
-                                "Data": {
-                                    "Source": "subentity2",
-                                    "Target": "subentity2"
-                                },
-                                "Type": "NetworkLink",
-                                "Version": 1
-                            }
-                        ],
-                        "Name": "EntityWithInstanceOfButNoOverride_detached"
-                    },
-                    {
-                        "Color": [
-                            255.0,
-                            120.0,
-                            220.0,
-                            255.0
-                        ],
-                        "Components": [
-                            {
-                                "Data": {},
-                                "Type": "TransformGD",
-                                "Version": 1
-                            }
-                        ],
-                        "Name": "TestRemove_detached"
-                    },
-                    {
-                        "Color": [
-                            255.0,
-                            120.0,
-                            220.0,
-                            255.0
-                        ],
-                        "Components": [
-                            {
-                                "Data": {},
-                                "Type": "NetworkLink",
-                                "Version": 1
-                            }
-                        ],
-                        "Name": "TestSaveEntWithOverride_detached"
-                    }
-                ]
+                "Tag": "ShamanPlayerSpawner",
+                "ThumbnailMesh": "02_creature/human/male/clothstrong/bodykai/CLOTH_Body.wbm",
+                "Type": "Spawner"
             },
-            "Type": "SubScene",
-            "Version": 1
+            "Type": "NetworkNode"
         },
         {
             "Data": {},
-            "Type": "BeamGeneratorGD",
-            "Version": 1
+            "Type": "StaffVertebrasGD"
+        },
+        {
+            "Data": {
+                "BehaviorPath": "Pesto/Behavior/FSMDefaultBehavior.pesto",
+                "BehaviorState": "W/*at*/c//h",
+                "CanBeMaster": false,
+                "Faction": "Plouf",
+                "Inventory": "KaiWOLgrey",
+                "Invincible": false,
+                "Life": 1000.0,
+                "PlayerSpawn": true,
+                "ScriptList": [
+                    "a1",
+                    "b2",
+                    "c1"
+                ],
+                "Spawner": "ShamanPlayerSpawner.gd",
+                "UniqueID": "Shaman_male_Bobby",
+                "Warrior": false
+            },
+            "Type": "SystemicCreature"
+        },
+        {
+            "Data": {
+                "DisplaceNoiseList": [
+                    {
+                        "DisplaceDistance": 0.0,
+                        "LuminanceCenter": 0.0,
+                        "MapChannel": 51248,
+                        "MotifName": "",
+                        "MotifOffsetX": 0.0,
+                        "MotifOffsetY": 0.0,
+                        "MotifRotationZ": 0.0,
+                        "MotifSizeX": 0.0,
+                        "MotifSizeY": 0.0
+                    }
+                ],
+                "Subdivision": 0
+            },
+            "Type": "HeightObj"
         },
         {
             "Data": {},
-            "Type": "CharacterControllerGD",
-            "Version": 1
+            "Type": "NetGD"
+        },
+        {
+            "Data": {},
+            "Type": "SmoothScaleComponentGD"
+        },
+        {
+            "Data": {},
+            "Type": "PhysicsGD"
+        },
+        {
+            "Data": {
+                "FactionName": "2254016666",
+                "InSpiritWorld": false
+            },
+            "Type": "ActorGD"
+        },
+        {
+            "Data": {},
+            "Type": "BeamGeneratorGD"
         },
         {
             "Data": {
@@ -180,28 +142,7 @@
                     }
                 ]
             },
-            "Type": "CinematicGD",
-            "Version": 1
-        },
-        {
-            "Data": {
-                "DisplaceNoiseList": [
-                    {
-                        "DisplaceDistance": 0.0,
-                        "LuminanceCenter": 0.0,
-                        "MapChannel": 51248,
-                        "MotifName": "",
-                        "MotifOffsetX": 0.0,
-                        "MotifOffsetY": 0.0,
-                        "MotifRotationZ": 0.0,
-                        "MotifSizeX": 0.0,
-                        "MotifSizeY": 0.0
-                    }
-                ],
-                "Subdivision": 0
-            },
-            "Type": "HeightObj",
-            "Version": 1
+            "Type": "CinematicGD"
         },
         {
             "Data": {
@@ -213,22 +154,294 @@
                 },
                 "PrimitiveType": "test"
             },
-            "Type": "LDPrimitive",
-            "Version": 1
-        },
-        {
-            "Data": {},
-            "Type": "NetGD",
-            "Version": 1
+            "Type": "LDPrimitive"
         },
         {
             "Data": {
-                "Tag": "ShamanPlayerSpawner",
-                "ThumbnailMesh": "02_creature/human/male/clothstrong/bodykai/CLOTH_Body.wbm",
-                "Type": "Spawner"
+                "Embedded": [
+                    {
+                        "Color": [
+                            255.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Source": ".EP1-Spout_",
+                                    "Target": ".EP1-crook_",
+                                    "ThumbnailMesh": "WildMaxScript/Resources/DefaultLinkVisual.wbm"
+                                },
+                                "Type": "NetworkLink"
+                            },
+                            {
+                                "Data": {
+                                    "Matrix": [
+                                        -0.0057,
+                                        -0.4374,
+                                        74.1085,
+                                        0.0,
+                                        0.8993,
+                                        36.0432,
+                                        -1.0,
+                                        0.0025,
+                                        -0.4247
+                                    ],
+                                    "Position": [
+                                        0.0,
+                                        0.0,
+                                        0.0
+                                    ]
+                                },
+                                "Type": "TransformGD"
+                            }
+                        ],
+                        "Name": "EP1-Spout_LINK_001"
+                    },
+                    {
+                        "Color": [
+                            255.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Source": "instance",
+                                    "Target": "subentity2"
+                                },
+                                "Type": "NetworkLink"
+                            }
+                        ],
+                        "Name": "EntityWithInstanceOf"
+                    },
+                    {
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Source": "subentity2",
+                                    "Target": "subentity2"
+                                },
+                                "Type": "NetworkLink"
+                            }
+                        ],
+                        "Name": "EntityWithInstanceOfButNoOverride"
+                    },
+                    {
+                        "Color": [
+                            255.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [
+                            {
+                                "Data": {},
+                                "Type": "TransformGD"
+                            }
+                        ],
+                        "Name": "TestRemove"
+                    },
+                    {
+                        "Color": [
+                            255.0,
+                            120.0,
+                            220.0,
+                            255.0
+                        ],
+                        "Components": [
+                            {
+                                "Data": {},
+                                "Type": "NetworkLink"
+                            }
+                        ],
+                        "Name": "TestSaveEntWithOverride"
+                    }
+                ]
             },
-            "Type": "NetworkNode",
-            "Version": 1
+            "Type": "SubScene"
+        },
+        {
+            "Data": {},
+            "Type": "VoxelSimulationGD"
+        },
+        {
+            "Data": {
+                "ClamberData": {
+                    "VerticalOrientationRatio": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    }
+                },
+                "FallData": {
+                    "DamagesPerHeightFall": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    }
+                },
+                "HeadCollisionData": {
+                    "slopeInfluence": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "speedInfluence": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "visualSmoothOut": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    }
+                },
+                "ImmersedData": {
+                    "depthMaxRange": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "slowDowns": [
+                        [
+                            "lava",
+                            {
+                                "easing": {
+                                    "variantData": "Linear",
+                                    "variantType": "Pasta::Easing::Curve"
+                                }
+                            }
+                        ],
+                        [
+                            "mud",
+                            {
+                                "easing": {
+                                    "variantData": "Linear",
+                                    "variantType": "Pasta::Easing::Curve"
+                                }
+                            }
+                        ],
+                        [
+                            "water",
+                            {
+                                "easing": {
+                                    "variantData": "Linear",
+                                    "variantType": "Pasta::Easing::Curve"
+                                }
+                            }
+                        ]
+                    ]
+                },
+                "SlideData": {
+                    "adherenceRecoverSpeedDependingOnTheSlope": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "adherenceThresholdRequiredToKeepControl": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "speedMediumCoeffIn": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    }
+                },
+                "moveCapacityData": {
+                    "constraintDetectionAnticipation": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "constraintDetectionRadius": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "dropPlaneLegLenFactor": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "extirpateObstacleAcceleration": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "flyCentrifugalCoeff": {
+                        "easing": {
+                            "variantData": "Linear",
+                            "variantType": "Pasta::Easing::Curve"
+                        }
+                    },
+                    "orientationSpeedFly": {
+                        "rotationRollFromAngularSpeed": {
+                            "easing": {
+                                "variantData": "Linear",
+                                "variantType": "Pasta::Easing::Curve"
+                            }
+                        },
+                        "speedFactorFromSpeedSlow": {
+                            "easing": {
+                                "variantData": "Linear",
+                                "variantType": "Pasta::Easing::Curve"
+                            }
+                        }
+                    },
+                    "orientationSpeedGround": {
+                        "rotationRollFromAngularSpeed": {
+                            "easing": {
+                                "variantData": "Linear",
+                                "variantType": "Pasta::Easing::Curve"
+                            }
+                        },
+                        "speedFactorFromSpeedSlow": {
+                            "easing": {
+                                "variantData": "Linear",
+                                "variantType": "Pasta::Easing::Curve"
+                            }
+                        }
+                    },
+                    "orientationSpeedWater": {
+                        "rotationRollFromAngularSpeed": {
+                            "easing": {
+                                "variantData": "Linear",
+                                "variantType": "Pasta::Easing::Curve"
+                            }
+                        },
+                        "speedFactorFromSpeedSlow": {
+                            "easing": {
+                                "variantData": "Linear",
+                                "variantType": "Pasta::Easing::Curve"
+                            }
+                        }
+                    }
+                }
+            },
+            "Type": "CharacterControllerGD"
+        },
+        {
+            "Data": {},
+            "Type": "TestDefaultValues"
         },
         {
             "Data": {
@@ -260,77 +473,7 @@
                     ]
                 }
             },
-            "Type": "PathNodeGD",
-            "Version": 1
-        },
-        {
-            "Data": {},
-            "Type": "PhysicsGD",
-            "Version": 1
-        },
-        {
-            "Data": {
-                "Scripts": [
-                    {
-                        "DataSet": [
-                            {
-                                "Float": 7.0,
-                                "Name": "BlendDurationIn"
-                            },
-                            {
-                                "Float": 10.0,
-                                "Name": "BlendDurationOut"
-                            }
-                        ],
-                        "Path": "Pesto/Clouds/CloudStorm.pesto"
-                    }
-                ]
-            },
-            "Type": "ScriptComponentGD",
-            "Version": 1
-        },
-        {
-            "Data": {
-                "NoiseOffsetY": 3.0,
-                "NoiseSizeY": 3.0
-            },
-            "Type": "SeedPatch",
-            "Version": 1
-        },
-        {
-            "Data": {},
-            "Type": "SmoothScaleComponentGD",
-            "Version": 1
-        },
-        {
-            "Data": {
-                "NormalRatio": 0.6,
-                "ZOffset": 10.0
-            },
-            "Type": "StickToTerrain",
-            "Version": 1
-        },
-        {
-            "Data": {
-                "BehaviorPath": "Pesto/Behavior/FSMDefaultBehavior.pesto",
-                "BehaviorState": "W/*at*/c//h",
-                "CanBeMaster": false,
-                "Faction": "Plouf",
-                "Inventory": "KaiWOLgrey",
-                "Invincible": false,
-                "Life": 1000.0,
-                "PlayerSpawn": true,
-                "ScriptList": [
-                    "a1",
-                    "b2",
-                    "c1"
-                ],
-                "Spawner": "ShamanPlayerSpawner.gd",
-                "UniqueID": "Shaman_male_Bobby",
-                "Warrior": false
-            },
-            "Type": "SystemicCreature",
-            "Version": 1
+            "Type": "TestTagsList"
         },
         {
             "Data": {
@@ -339,13 +482,48 @@
                     "variantType": "float"
                 }
             },
-            "Type": "TestArrays",
-            "Version": 1
+            "Type": "TestArrays"
         },
         {
-            "Data": {},
-            "Type": "TestDefaultValues",
-            "Version": 1
+            "Data": {
+                "ScriptsMap": [
+                    [
+                        "CloudStorm",
+                        {
+                            "DataMap": [
+                                [
+                                    "BlendDurationIn",
+                                    {
+                                        "Value": {
+                                            "variantData": 7.0,
+                                            "variantType": "float"
+                                        },
+                                        "_comment": "This script makes us all happy"
+                                    }
+                                ],
+                                [
+                                    "BlendDurationOut",
+                                    {
+                                        "Value": {
+                                            "variantData": 10.0,
+                                            "variantType": "float"
+                                        }
+                                    }
+                                ]
+                            ],
+                            "Path": "Pesto/Clouds/CloudStorm.pesto"
+                        }
+                    ]
+                ]
+            },
+            "Type": "ScriptComponentGD"
+        },
+        {
+            "Data": {
+                "NoiseOffsetY": 3.0,
+                "NoiseSizeY": 3.0
+            },
+            "Type": "SeedPatch"
         },
         {
             "Data": {
@@ -386,37 +564,16 @@
                     }
                 ]
             },
-            "Type": "TestSetOfObject",
-            "Version": 1
+            "Type": "TestSetOfObject"
         },
         {
             "Data": {
-                "Matrix": [
-                    0.9667,
-                    0.2557,
-                    -0.0137,
-                    -0.2556,
-                    0.9667,
-                    0.0084,
-                    0.0154,
-                    -0.0046,
-                    0.9999
-                ],
-                "Position": [
-                    105.2244,
-                    152.7811,
-                    29.6635
-                ]
+                "NormalRatio": 0.6,
+                "ZOffset": 10.0
             },
-            "Type": "TransformGD",
-            "Version": 1
-        },
-        {
-            "Data": {},
-            "Type": "VoxelSimulationGD",
-            "Version": 1
+            "Type": "StickToTerrain"
         }
     ],
-    "Name": "PlayerSpawner__detached",
+    "Name": "PlayerSpawner_",
     "Thumbnail": "prout"
 }

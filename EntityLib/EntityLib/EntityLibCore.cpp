@@ -13,13 +13,14 @@ namespace Ent
     void fprintfImpl(FILE* file, char const* message)
     {
         fprintf(file, message);
-        if (::IsDebuggerPresent() != 0)
+        if (IsDebuggerPresent() != 0)
         {
-            ::OutputDebugStringA(message);
+            OutputDebugStringA(message);
         }
     }
 
-    char const* formatPath(std::filesystem::path const&, std::filesystem::path const& _rel)
+    char const* formatPath(
+        [[maybe_unused]] std::filesystem::path const& _basePath, std::filesystem::path const& _rel)
     {
         thread_local static char buffer[2048];
         sprintf_s(buffer, sizeof(buffer), R"("%s")", _rel.generic_string().c_str());
@@ -30,20 +31,32 @@ namespace Ent
     {
         // CP_ACP is the system default Windows ANSI code page.
         // ANSI to utf16
-        int convertResult =
-            MultiByteToWideChar(CP_ACP, 0, _message.c_str(), (int)_message.size(), nullptr, 0);
+        int convertResult = MultiByteToWideChar(
+            CP_ACP, 0, _message.c_str(), static_cast<int>(_message.size()), nullptr, 0);
         std::wstring wide;
-        wide.resize((size_t)convertResult);
+        wide.resize(static_cast<size_t>(convertResult));
         MultiByteToWideChar(
-            CP_ACP, 0, _message.c_str(), (int)_message.size(), &wide[0], (int)wide.size());
+            CP_ACP,
+            0,
+            _message.c_str(),
+            static_cast<int>(_message.size()),
+            &wide[0],
+            static_cast<int>(wide.size()));
         // utf16 to utf8
         convertResult = WideCharToMultiByte(
-            CP_UTF8, 0, wide.c_str(), (int)wide.size(), nullptr, 0, nullptr, nullptr);
+            CP_UTF8, 0, wide.c_str(), static_cast<int>(wide.size()), nullptr, 0, nullptr, nullptr);
         std::string result;
-        result.resize((size_t)convertResult);
+        result.resize(static_cast<size_t>(convertResult));
         WideCharToMultiByte(
-            CP_UTF8, 0, wide.c_str(), (int)wide.size(), &result[0], (int)result.size(), nullptr, nullptr);
-        result.resize((size_t)convertResult);
+            CP_UTF8,
+            0,
+            wide.c_str(),
+            static_cast<int>(wide.size()),
+            &result[0],
+            static_cast<int>(result.size()),
+            nullptr,
+            nullptr);
+        result.resize(static_cast<size_t>(convertResult));
         return result;
     }
 
@@ -60,8 +73,8 @@ namespace Ent
             InitBuffSize,
             R"msg(%s - %s : %s)msg",
             _msg.c_str(),
-            Ent::convertANSIToUTF8(_error.message()).c_str(),
-            Ent::formatPath(_rootPath, _relPath));
+            convertANSIToUTF8(_error.message()).c_str(),
+            formatPath(_rootPath, _relPath));
         return buffer;
     }
 

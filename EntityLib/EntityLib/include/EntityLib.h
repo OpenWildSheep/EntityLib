@@ -9,18 +9,14 @@
 #include "../Union.h"
 #include "../Object.h"
 #include "../Node.h"
-#include "../Component.h"
-#include "../Scene.h"
-#include "../Entity.h"
-#include "../SubSceneComponent.h"
+#include "../PropImpl.h"
 #pragma warning(pop)
 
 namespace Ent
 {
     struct Node;
-    struct Scene;
     class EntityLib;
-    struct Entity;
+    struct Property;
 
     // ********************************** Static data *********************************************
 
@@ -46,7 +42,8 @@ namespace Ent
     class ENTLIB_DLLEXPORT EntityLib
     {
     public:
-        Pool<Node> nodePool;
+        mutable Pool<Node> nodePool;
+        mutable Pool<PropImpl> propertyPool;
         /// @todo Make public attribute private?
         std::filesystem::path rootPath; ///< Path to the perforce root (X:/)
         std::filesystem::path rawdataPath; ///< Path to the RawData dir in the perforce root (X:/RawData)
@@ -64,55 +61,33 @@ namespace Ent
         EntityLib(EntityLib const&) = delete;
         EntityLib& operator=(EntityLib const&) = delete;
         DeleteCheck deleteCheck;
+
+        PropImplPtr newPropImpl() const;
+        PropImplPtr newPropImpl(
+            PropImplPtr _parent,
+            Subschema const* _schema,
+            char const* _filename,
+            nlohmann::json* _doc = nullptr);
         /// @endcond
-
-        /// Load the Entity at path _entityPath then return a pointer to the cached data
-        std::shared_ptr<Entity const> loadEntityReadOnly(
-            std::filesystem::path const& _entityPath, Ent::Entity const* _super = nullptr) const;
-
-        /// Load the Scene at path _scenePath then return a pointer to the cached data
-        std::shared_ptr<Scene const> loadSceneReadOnly(std::filesystem::path const& _scenePath) const;
 
         /// Load the Node at path _nodeSchema then return a pointer to the cached data
         std::shared_ptr<Node const> loadNodeReadOnly(
-            Ent::Subschema const& _nodeSchema,
-            char const* _nodePath,
-            Ent::Node const* _super = nullptr) const;
+            Subschema const& _nodeSchema, char const* _nodePath, Node const* _super = nullptr) const;
 
         /// Load the Node at path _nodeSchema then return a pointer to the cached data
         std::shared_ptr<Node const> loadNodeEntityReadOnly(char const* _nodePath) const;
 
-        /// Load the Scene in legacy format at path _scenePath then return a pointer to the cached data
-        std::shared_ptr<Scene const>
-        loadLegacySceneReadOnly(std::filesystem::path const& _scenePath) const;
-
         /// Load an entity file into a Node
-        Node loadEntityAsNode(std::filesystem::path const& _entityPath) const;
+        NodeUniquePtr loadEntityAsNode(std::filesystem::path const& _entityPath) const;
 
         /// Load a scene file into a Node
-        Node loadSceneAsNode(std::filesystem::path const& _scenePath) const;
+        NodeUniquePtr loadSceneAsNode(std::filesystem::path const& _scenePath) const;
 
         /// Load any entitylib file into a Node, giving a schema
-        Node loadFileAsNode(std::filesystem::path const& _path, Ent::Subschema const& _schema) const;
+        NodeUniquePtr loadFileAsNode(std::filesystem::path const& _path, Subschema const& _schema) const;
 
-        /// Load the Entity at path _entityPath
-        std::unique_ptr<Entity> loadEntity(
-            std::filesystem::path const& _entityPath, Ent::Entity const* _super = nullptr) const;
-
-        std::unique_ptr<Ent::Entity> loadEntityFromJson(
-            nlohmann::json const& _entNode, Ent::Entity const* _superEntityFromParentEntity) const;
-
-        /// Load the Scene at path _scenePath
-        std::unique_ptr<Scene> loadScene(std::filesystem::path const& _scenePath) const;
-
-        /// Load the Scene in legacy format at path _scenePath
-        std::unique_ptr<Scene> loadLegacyScene(std::filesystem::path const& _scenePath) const;
-
-        /// Save the Entity at path _entityPath
-        void saveEntity(Entity const& _entity, std::filesystem::path const& _relEntityPath) const;
-
-        /// Save the Scene at path _scenePath
-        void saveScene(Scene const& _scene, std::filesystem::path const& _scenePath) const;
+        /// Load any entitylib file into a Node, reading the schema name inside the file
+        NodeUniquePtr loadFileAsNode(std::filesystem::path const& _nodePath) const;
 
         /// Save the Entity at path _entityPath
         void saveNodeAsEntity(Node const* _entity, char const* _relEntityPath) const;
@@ -129,67 +104,57 @@ namespace Ent
             bool _superKeyIsTypeName =
                 false, ///< Super sub-node are dumped using their type name for key instead of "Super"
             std::function<void(EntityRef&)> const& _entityRefPreProc = {},
-            bool _saveUnionIndex = false);
+            bool _saveUnionIndex = false,
+            bool _forceWriteKey = false);
 
         /// Instanciate the given _prefab Node
-        Node makeNodeInstanceOf(
+        NodeUniquePtr makeNodeInstanceOf(
             char const* _schemaName, ///< Name of the schema
             char const* _prefab ///< Path to the prefab Entity
         ) const;
 
         /// Instanciate the given _prefab Entity
-        Node makeEntityNodeInstanceOf(char const* _instanceOf ///< Path to the prefab Entity
+        NodeUniquePtr makeEntityNodeInstanceOf(char const* _prefab ///< Path to the prefab Entity
         ) const;
 
         /// Create a Node with the given _schemaName
-        Node makeNode(char const* _schemaName) const;
+        NodeUniquePtr makeNode(char const* _schemaName) const;
+
+        NodeUniquePtr newNode(Node::Value val, Subschema const* _subschema) const;
 
         /// Create a Node with the Entity's schema
-        Node makeEntityNode() const;
+        NodeUniquePtr makeEntityNode() const;
 
-        /// @brief Create an Entity which instanciate an other.
-        ///
-        /// This allow to override some properties without change the prefab properties.
-        std::unique_ptr<Entity> makeInstanceOf(std::string const& _instanceOf ///< Path to the prefab Entity
-        ) const;
-
-        struct EntityFile
-        {
-            std::shared_ptr<Entity> data;
-            std::filesystem::file_time_type time;
-        };
-        struct SceneFile
-        {
-            std::shared_ptr<Scene> data;
-            std::filesystem::file_time_type time;
-        };
         struct NodeFile
         {
             std::shared_ptr<Node> data;
             std::filesystem::file_time_type time;
         };
-        std::map<std::filesystem::path, EntityFile> const& getEntityCache() const;
-        std::map<std::filesystem::path, SceneFile> const& getSceneCache() const;
         std::map<std::filesystem::path, NodeFile> const& getNodeCache() const;
+        struct HashPath
+        {
+            auto operator()(std::filesystem::path const& p) const;
+        };
+        std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> const& getJsonDatabase() const;
 
-        void clearCache();
+        void clearCache() const;
 
         std::filesystem::path getAbsolutePath(std::filesystem::path const& _path) const;
         /// @param _path : A file path absolute or relative but inside the rawdata path
         std::filesystem::path getRelativePath(std::filesystem::path const& _path) const;
 
-        Ent::Node loadNode(
-            Ent::Subschema const& _nodeSchema,
+        NodeUniquePtr loadNode(
+            Subschema const& _nodeSchema,
             nlohmann::json const& _data,
-            Ent::Node const* _super,
+            Node const* _super,
             nlohmann::json const* _default = nullptr) const;
 
         /// @brief Resolve an EntityRef relative to this Node/Entity.
         /// Returns nullptr in case of failure.
-        Node const* resolveEntityRef(Node const* _node, const EntityRef& _entityRef) const;
+        Node const* resolveEntityRef(Node const* _node, EntityRef const& _entityRef) const;
         /// @brief Resolve an EntityRef relative to this Node/Entity.
         /// Returns nullptr in case of failure.
-        Node* resolveEntityRef(Node* _node, const EntityRef& _entityRef) const;
+        Node* resolveEntityRef(Node* _node, EntityRef const& _entityRef) const;
 
         Subschema const* getSchema(char const* _schemaName) const;
         Subschema const* getEntitySchema() const;
@@ -199,10 +164,25 @@ namespace Ent
         LogicErrorPolicy getLogicErrorPolicy() const;
         /// @brief Compute the EntityRef going from the Entity _from, to the Entity _to
         /// @pre _from and _to are Entity nodes
-        EntityRef makeEntityRef(Node const& _from, Node const& _to);
+        EntityRef makeEntityRef(Node const& _from, Node const& _to) const;
 
-        Node* getParentEntity(Node* _node); ///< Get the parent Entity Node
-        Node const* getParentEntity(Node const* _node); ///< Get the parent Entity Node
+        /// @brief Resolve an EntityRef relative to this Node/Entity.
+        /// Returns nullptr in case of failure.
+        Property resolveEntityRef(Property const& _node, EntityRef const& _entityRef) const;
+        /// @brief Compute the EntityRef going from the Entity _from, to the Entity _to
+        /// @pre _from and _to are Entity nodes
+        EntityRef makeEntityRef(Property const& _from, Property const& _to) const;
+
+        Node* getParentEntity(Node* _node) const; ///< Get the parent Entity Node
+        Node const* getParentEntity(Node const* _node) const; ///< Get the parent Entity Node
+        std::optional<Property> getParentEntity(Property const& _node) const; ///< Get the parent Entity Property
+
+        nlohmann::json& readJsonFile(char const* _filepath) const;
+        nlohmann::json& createTempJsonFile() const;
+        void saveJsonFile(nlohmann::json const* doc, char const* _filepath, char const* _schema) const;
+
+        void setFallBackEntityPath(char const* _filepath);
+        char const* getFallBackEntityPath() const;
 
     private:
         /// Load an Entity or a Scene, using the given cache
@@ -214,9 +194,35 @@ namespace Ent
             LoadFunc&& load,
             Type const* _super) const;
 
-        mutable std::map<std::filesystem::path, EntityFile> m_entityCache;
-        mutable std::map<std::filesystem::path, SceneFile> m_sceneCache;
+        NodeUniquePtr loadObject(
+            Subschema const& _nodeSchema,
+            nlohmann::json const& _data,
+            Node const* _super,
+            nlohmann::json const* _default = nullptr,
+            bool _ignoreInstanceOf = false) const;
+
+        NodeUniquePtr loadUnion(
+            Subschema const& _nodeSchema,
+            nlohmann::json const& _data,
+            Node const* _super,
+            nlohmann::json const* _default = nullptr) const;
+
+        NodeUniquePtr loadArray(
+            Subschema const& _nodeSchema,
+            nlohmann::json const& _data,
+            Node const* _super,
+            nlohmann::json const* _default = nullptr) const;
+
+        NodeUniquePtr loadPrimitive(
+            Subschema const& _nodeSchema,
+            nlohmann::json const& _data,
+            Node const* _super,
+            nlohmann::json const* _default = nullptr) const;
+
         mutable std::map<std::filesystem::path, NodeFile> m_nodeCache;
+        mutable std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> m_jsonDatabase;
+        mutable std::vector<std::unique_ptr<nlohmann::json>> m_tempJsonFiles;
+        String m_fallbackEntity;
     };
 
 } // namespace Ent

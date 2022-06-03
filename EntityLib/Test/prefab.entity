@@ -2,46 +2,46 @@
     "Thumbnail": "TestThumbnail",
     "ActorStates":[
         {
-            "className": "ActionClimbEdge",
+            "className": "ActorStateHoldingItem",
             "classData":{
-                "locomotionMode": "crouch"
+                "ItemEntityRef": "tutu"
             }
         },
         {
-            "className": "ActionCinematic",
+            "className": "EntityStatePlayer",
             "classData":{
             }
         }
     ],
     "Components": [{
             "Data": {
-                "Matrix": [
-                    0.9667,
-                    0.2557,
-                    -0.0137,
-                    -0.2556,
-                    0.9667,
-                    0.0084,
-                    0.0154,
-                    -0.0046,
-                    0.9999
+                "Orientation": [
+                    -0.0032736328430473804,
+                    -0.007339229807257652,
+                    -0.12891139090061188,
+                    0.9916236400604248
                 ],
                 "Position": [
                     105.2244,
                     152.7811,
                     29.6635
+                ],
+                "Scale": [
+                    1.0000386238098145,
+                    0.9999562501907349,
+                    1.0000290870666504
                 ]
             },
-            "Type": "TransformGD",
-            "Version": 1
+            "Type": "TransformGD"
         }, {
             "Data": {
                 "Tag": "ShamanPlayerSpawner",
                 "ThumbnailMesh": "02_creature/human/male/clothstrong/bodykai/CLOTH_Body.wbm",
                 "Type": "Spawner"
             },
-            "Type": "NetworkNode",
-            "Version": 1
+            "Type": "NetworkNode"
+        }, {
+            "Type": "StaffVertebrasGD"
         }, {
             "Data": {
                 "BehaviorModifierTagList": [],
@@ -59,8 +59,7 @@
                 "UniqueID": "Shaman_male_Bobby",
                 "Warrior": false
             },
-            "Type": "SystemicCreature",
-            "Version": 1
+            "Type": "SystemicCreature"
         }, {
             "Data": {
                 "DisplaceNoiseList": [{
@@ -77,43 +76,33 @@
                 ],
                 "Subdivision": 0
             },
-            "Type": "HeightObj",
-            "Version": 1
+            "Type": "HeightObj"
         }, {
             "Data": {},
-            "Type": "NetGD",
-            "Version": 1
+            "Type": "NetGD"
         }, {
             "Data": {},
-            "Type": "SmoothScaleComponentGD",
-            "Version": 1
+            "Type": "SmoothScaleComponentGD"
         }, {
             "Data": {},
-            "Type": "PhysicsGD",
-            "Version": 1
+            "Type": "PhysicsGD"
         }, {
             "Data": {
-                "Faction": 2254016666,
-                "InSpiritWorld": false,
-                "Visible": true
+                "FactionName": "2254016666",
+                "InSpiritWorld": false
             },
-            "Type": "ActorGD",
-            "Version": 1
+            "Type": "ActorGD"
         }, {
             "Data": {},
-            "Type": "BeamGeneratorGD",
-            "Version": 1
+            "Type": "BeamGeneratorGD"
         }, {
             "Data": {
                 "ScriptEvents": [
                     {
                         "className": "CineEventTriggerEventHandlerPost",
                         "classData": {
-                            "EventName": "Toto",
-                            "Super": {
-                                "InvertTest": true
+                            "EventName": "Toto"
                             }
-                        }
                     },
                     {
                         "className": "CineEventTriggerEventHandlerPost",
@@ -129,8 +118,7 @@
                     }
                 ]
             },
-            "Type": "CinematicGD",
-            "Version": 1
+            "Type": "CinematicGD"
         }, {
             "Data": {
                 "NonDisuptive": true,
@@ -144,26 +132,21 @@
                     "Height": 42.0
                 }
             },
-            "Type": "LDPrimitive",
-            "Version": 1
+            "Type": "LDPrimitive"
         }, {
-            "Version": 1,
             "Type": "SubScene",
             "Data": {
-                "isEmbedded": true,
-                "File": "",
                 "Embedded": [{
                         "Name": "EP1-Spout_LINK_001",
                         "Color": [255, 120, 220, 255],
+                        "InstanceOf": "test_prefab_history.entity",
                         "Components": [{
-                                "Version": 1,
                                 "Type": "TransformGD",
                                 "Data": {
                                     "Matrix": [-0.0057, -0.4374, 74.1085, 0.0000, 0.8993, 36.0432, -1.0000, 0.0025, -0.4247],
                                     "Position": [0.0000, 0.0000, 0.0000]
                                 }
                             }, {
-                                "Version": 1,
                                 "Type": "NetworkLink",
                                 "Data": {
                                     "Source": ".EP1-Spout_",
@@ -176,7 +159,6 @@
                         "Name": "EntityWithInstanceOf",
                         "Color": [255, 120, 220, 255],
                         "Components": [{
-                                "Version": 1,
                                 "Type": "NetworkLink",
                                 "Data": {
                                     "Source": ".EP1-Spout_",
@@ -190,7 +172,6 @@
                         "Name": "TestRemove",
                         "Color": [255, 120, 220, 255],
                         "Components": [{
-                                "Version": 1,
                                 "Type": "TransformGD",
                                 "Data": {}
                             }
@@ -199,7 +180,6 @@
                         "Name": "TestSaveEntWithOverride",
                         "Color": [255, 120, 220, 255],
                         "Components": [{
-                                "Version": 1,
                                 "Type": "NetworkLink",
                                 "Data": {
                                 }
@@ -209,7 +189,6 @@
                         "Name": "EntityWithInstanceOfButNoOverride",
                         "Color": [255, 120, 220, 255],
                         "Components": [{
-                                "Version": 1,
                                 "Type": "NetworkLink",
                                 "Data": {
                                     "Source": ".EP1-Spout_",
@@ -224,19 +203,15 @@
             }
         }, {
             "Data": {},
-            "Type": "VoxelSimulationGD",
-            "Version": 1
+            "Type": "VoxelSimulationGD"
         }, {
             "Data": {},
-            "Type": "CharacterControllerGD",
-            "Version": 1
+            "Type": "CharacterControllerGD"
         }, {
             "Data": {},
-            "Type": "TestDefaultValues",
-            "Version": 1
-        }, {            
-            "Version": 1,
-            "Type": "PathNodeGD",
+            "Type": "TestDefaultValues"
+        }, {
+            "Type": "TestTagsList",
             "Data": {
                 "Radius": 30.0,
                 "Tags": {
@@ -263,27 +238,37 @@
                     "variantData": 3.1416
                 }
             },
-            "Type": "TestArrays",
-            "Version": 1
+            "Type": "TestArrays"
         },
         {
-            "Version": 1,
             "Type": "ScriptComponentGD",
             "Data": {
-                "Scripts": [
-                    {
-                        "Path": "Pesto/Clouds/CloudStorm.pesto",
-                        "DataSet": [
-                            {
-                                "Name": "BlendDurationIn",
-                                "Float": 7.0
-                            },
-                            {
-                                "Name": "BlendDurationOut",
-                                "Float": 10.0
-                            }
-                        ]
-                    }
+                "ScriptsMap": [[
+                        "CloudStorm",
+                        {
+                            "Path": "Pesto/Clouds/CloudStorm.pesto",
+                            "DataMap": [
+                                [
+                                    "BlendDurationIn",
+                                    {
+                                        "Value": {
+                                            "InstanceOf": "BlendDurationIn.node"
+                                        },
+                                        "_comment": "This script makes us all happy"
+                                    }
+                                ],
+                                [
+                                    "BlendDurationOut",
+                                    {
+                                        "Value": {
+                                            "variantData": 10.0,
+                                            "variantType": "float"
+                                        }
+                                    }
+                                ]
+                            ]
+                        }
+                    ]
                 ]
             }
         }, {
@@ -291,8 +276,7 @@
                 "InstanceOf": "test.SeedPatch.node",
                 "NoiseOffsetX" : 2
             },
-            "Type": "SeedPatch",
-            "Version": 1
+            "Type": "SeedPatch"
         }, {
             "Data": {
                 "SetOfObject": [{
@@ -311,8 +295,7 @@
                     ["OldNode2", {}]
                 ]
             },
-            "Type": "TestSetOfObject",
-            "Version": 1
+            "Type": "TestSetOfObject"
         }
     ],
     "Name": "PlayerSpawner_"

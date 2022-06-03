@@ -1,5 +1,5 @@
 {
-    "$schema": "./EditionComponents.json#/definitions/HeightObj",
+    "$schema": "wildschema:/all/HeightObj.json",
     "DisplaceNoiseList": [
         {
             "DisplaceDistance": 0.0,

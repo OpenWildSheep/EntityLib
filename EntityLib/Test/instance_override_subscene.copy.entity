@@ -1,4 +1,5 @@
 {
+    "$schema": "wildschema:/all/Entity.json",
     "Color": [
         27.0,
         177.0,
@@ -15,8 +16,7 @@
                     null
                 ]
             },
-            "Type": "SystemicCreature",
-            "Version": 1
+            "Type": "SystemicCreature"
         },
         {
             "Data": {
@@ -33,16 +33,14 @@
                                 "Data": {
                                     "Target": ".EP1-crook_2"
                                 },
-                                "Type": "NetworkLink",
-                                "Version": 1
+                                "Type": "NetworkLink"
                             }
                         ],
                         "Name": "EP1-Spout_LINK_001"
                     }
                 ]
             },
-            "Type": "SubScene",
-            "Version": 1
+            "Type": "SubScene"
         }
     ],
     "InstanceOf": "prefab.entity",

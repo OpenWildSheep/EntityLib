@@ -2,13 +2,11 @@
     "Components": [
         {
             "Data": {},
-            "Type": "TransformGD",
-            "Version": 1
+            "Type": "TransformGD"
         },
         {
             "Data": {},
-            "Type": "EventHandlerGD",
-            "Version": 1
+            "Type": "EventHandlerGD"
         },
         {
             "Data": {
@@ -23,18 +21,15 @@
                                         0
                                     ]
                                 },
-                                "Type": "TransformGD",
-                                "Version": 1
+                                "Type": "TransformGD"
                             }
                         ],
                         "InstanceOf": "Creature/my_inventory_level2.entity",
                         "Name": "inventory"
                     }
-                ],
-                "isEmbedded": true
+                ]
             },
-            "Type": "SubScene",
-            "Version": 1
+            "Type": "SubScene"
         }
     ],
     "InstanceOf": "Creature/my_creature_level1.entity",

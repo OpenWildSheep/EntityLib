@@ -5,8 +5,7 @@
             "Data": {
                 "TestRef": "B"
             },
-            "Type": "TestEntityRef",
-            "Version": 1
+            "Type": "TestEntityRef"
         },
         {
             "Data": {
@@ -18,17 +17,13 @@
                                 "Data": {
                                     "TestRef": ".."
                                 },
-                                "Type": "TestEntityRef",
-                                "Version": 1
+                                "Type": "TestEntityRef"
                             }
                         ]
                     }
-                ],
-                "File": "",
-                "isEmbedded": true
+                ]
             },
-            "Type": "SubScene",
-            "Version": 1
+            "Type": "SubScene"
         }
     ],
     "Name": "A"

@@ -8,9 +8,9 @@
 #include <vector>
 #include <stdexcept>
 #include <array>
+#include <filesystem>
 
 #pragma warning(push, 0)
-#include "../external/filesystem.hpp"
 #include "../../../Core/WildShared/Exception.h"
 #pragma warning(pop)
 
@@ -30,17 +30,18 @@ namespace Ent
     struct JsonValidation : std::runtime_error
     {
         /// Make a JsonValidation with the given _message
-        JsonValidation(std::string _message)
-            : std::runtime_error(std::move(_message)){};
+        explicit JsonValidation(std::string const& _message)
+            : std::runtime_error(_message){};
     };
 
     /// A printf-like function which return a std::string
     template <typename... Args>
     std::string format(char const* message, Args&&... args)
     {
-        size_t const len = (size_t)snprintf(nullptr, 0, message, std::forward<Args>(args)...);
+        auto const len =
+            static_cast<size_t>(snprintf(nullptr, 0, message, std::forward<Args>(args)...));
         std::string buffer(len, ' ');
-        snprintf((char*)buffer.data(), len + 1, message, std::forward<Args>(args)...);
+        snprintf(buffer.data(), len + 1, message, std::forward<Args>(args)...);
         return buffer;
     }
 
@@ -104,8 +105,9 @@ namespace Ent
 
 } // namespace Ent
 
-/// Call it when a logic error (a bug) happen
-/// format and print the message into stderr and call terminate
+/// Call it when a logic error (a bug) happen.
+/// Format and print the message into stderr then call terminate or throw
+///( depending on LogicErrorPolicy)
 #define ENTLIB_LOGIC_ERROR(message, ...)                                                           \
     do                                                                                             \
     {                                                                                              \
@@ -114,6 +116,17 @@ namespace Ent
             terminate();                                                                           \
         else                                                                                       \
             throw std::logic_error(Ent::format(message, __VA_ARGS__));                             \
+    } while (0)
+
+/// Call it when a logic error (a bug) happen in a destructor.
+/// Format and print the message into stderr then call terminate or not
+///( depending on LogicErrorPolicy)
+#define ENTLIB_LOGIC_ERROR_NOTHROW(message, ...)                                                   \
+    do                                                                                             \
+    {                                                                                              \
+        ::Ent::logError(__FILE__, __LINE__, message, __VA_ARGS__);                                 \
+        if (Ent::s_LogicErrorPolicy == Ent::LogicErrorPolicy::Terminate)                           \
+            terminate();                                                                           \
     } while (0)
 
 #define ENTLIB_LOG(message, ...)                                                                   \
@@ -128,9 +141,21 @@ namespace Ent
     else                                                                                           \
         (void)0
 
+#define ENTLIB_ASSERT_NOTHROW(expression)                                                          \
+    if (!(expression))                                                                             \
+        ENTLIB_LOGIC_ERROR_NOTHROW(#expression);                                                   \
+    else                                                                                           \
+        (void)0
+
 #define ENTLIB_ASSERT_MSG(expression, message, ...)                                                \
     if (!(expression))                                                                             \
         ENTLIB_LOGIC_ERROR(message, __VA_ARGS__);                                                  \
+    else                                                                                           \
+        (void)0
+
+#define ENTLIB_ASSERT_MSG_NOTHROW(expression, message, ...)                                        \
+    if (!(expression))                                                                             \
+        ENTLIB_LOGIC_ERROR_NOTHROW(message, __VA_ARGS__);                                          \
     else                                                                                           \
         (void)0
 
@@ -173,21 +198,23 @@ namespace Ent
         String() = default;
         String(char const* _str)
         {
-            auto len = strlen(_str);
+            auto const len = strlen(_str);
             str = std::make_unique<char[]>(len + 1);
             strcpy_s(str.get(), len + 1, _str);
         }
         String(std::string const& _str)
         {
-            auto len = _str.size();
+            auto const len = _str.size();
             str = std::make_unique<char[]>(len + 1);
             strcpy_s(str.get(), len + 1, _str.c_str());
         }
         String(String const& ot)
         {
             if (ot.str == nullptr)
+            {
                 return;
-            auto len = ot.size();
+            }
+            auto const len = ot.size();
             str = std::make_unique<char[]>(len + 1);
             strcpy_s(str.get(), len + 1, ot.str.get());
         }
@@ -199,7 +226,7 @@ namespace Ent
             }
             else
             {
-                auto len = ot.size();
+                auto const len = ot.size();
                 str = std::make_unique<char[]>(len + 1);
                 strcpy_s(str.get(), len + 1, ot.str.get());
             }
@@ -230,12 +257,7 @@ namespace Ent
         {
             if (str == nullptr)
             {
-                if (ot.str == nullptr)
-                {
-                    return false;
-                }
-                else
-                    return true;
+                return ot.str != nullptr;
             }
             if (ot.str == nullptr)
             {
@@ -244,24 +266,26 @@ namespace Ent
             return strcmp(str.get(), ot.str.get()) < 0;
         }
 
-        char const* c_str() const
+        [[nodiscard]] char const* c_str() const
         {
-            return str.get();
+            return str == nullptr ? "" : str.get();
         }
 
-        size_t capacity() const
+        [[nodiscard]] size_t capacity() const
         {
             return size();
         }
 
-        size_t size() const
+        [[nodiscard]] size_t size() const
         {
             if (str == nullptr)
+            {
                 return 0;
+            }
             return strlen(str.get());
         }
 
-        bool empty() const
+        [[nodiscard]] bool empty() const
         {
             return str == nullptr || size() == 0;
         }
@@ -269,7 +293,9 @@ namespace Ent
         operator std::string() const
         {
             if (str == nullptr)
-                return std::string();
+            {
+                return {};
+            }
             return std::string(str.get());
         }
     };
@@ -288,7 +314,7 @@ namespace Ent
         }
         size_t allocatedCount = 0;
         std::vector<void*> freePtr;
-        std::vector<std::vector<typename std::aligned_storage<sizeof(T), alignof(T)>::type>> buckets;
+        std::vector<std::vector<std::aligned_storage_t<sizeof(T), alignof(T)>>> buckets;
         void* alloc()
         {
             if (freePtr.empty())
@@ -308,131 +334,11 @@ namespace Ent
 
         void free(void* ptr)
         {
+            ENTLIB_ASSERT(allocatedCount > 0);
             --allocatedCount;
             freePtr.push_back(ptr);
         }
     };
-
-    /// @brief smart-pointer with deep-copy
-    ///
-    /// It is like a unique_ptr but copyable (deep-copy)
-    /// It is like an optional but heap allocated
-    /// It is like a vector with a size of 1
-    ///
-    /// This class is only for the Node type
-    template <typename T>
-    struct value_ptr
-    {
-        struct Deleter
-        {
-            void operator()(T* ptr) const
-            {
-                destroyAndFree(ptr);
-            }
-        };
-
-        std::unique_ptr<T, Deleter> ptr;
-
-        value_ptr() = default;
-        value_ptr(value_ptr const& ot)
-        {
-            *this = ot;
-        }
-
-        template <typename... Args>
-        void initPtr(Pool<T>& pool, Args&&... args)
-        {
-            ptr.reset(new (pool.alloc()) T(std::forward<Args>(args)...));
-        }
-
-        value_ptr(T const& data)
-        {
-            initPtr(getPool(&data), data);
-        }
-        explicit value_ptr(T const* data)
-        {
-            if (data != nullptr)
-                initPtr(getPool(data), *data);
-        }
-        value_ptr(T&& data)
-        {
-            initPtr(getPool(&data), std::move(data));
-        }
-        value_ptr(nullptr_t)
-        {
-        }
-        value_ptr& operator=(value_ptr const& ot)
-        {
-            if (ptr != nullptr)
-            {
-                if (ot.ptr != nullptr)
-                    *ptr = *ot.ptr;
-                else
-                    ptr.reset();
-            }
-            else
-            {
-                if (ot.ptr != nullptr)
-                    initPtr(getPool(ot.ptr.get()), *ot);
-            }
-            return *this;
-        }
-        value_ptr(value_ptr&& ot) = default;
-        value_ptr& operator=(value_ptr&& ot) = default;
-
-        ~value_ptr() = default;
-
-        T& operator*()
-        {
-            return *ptr;
-        }
-        T const& operator*() const
-        {
-            return *ptr;
-        }
-        T* operator->()
-        {
-            return ptr.get();
-        }
-        T const* operator->() const
-        {
-            return ptr.get();
-        }
-        T* get()
-        {
-            return ptr.get();
-        }
-        T const* get() const
-        {
-            return ptr.get();
-        }
-
-        bool operator==(nullptr_t) const
-        {
-            return ptr == nullptr;
-        }
-
-        bool operator!=(nullptr_t) const
-        {
-            return ptr != nullptr;
-        }
-
-        operator bool() const
-        {
-            return ptr == nullptr;
-        }
-
-        bool has_value() const
-        {
-            return ptr != nullptr;
-        }
-    };
-
-    template <typename T, typename... Args>
-    value_ptr<T> make_value(Args&&... args)
-    {
-        return value_ptr<T>(T(std::forward<Args>(args)...));
-    }
 
     std::string convertANSIToUTF8(std::string const& _message);
 
@@ -441,8 +347,12 @@ namespace Ent
     struct InvalidKey : std::logic_error
     {
         template <typename Map>
-        std::string
-        makeError(Map const&, std::string const& key, char const* file, long line, char const* func)
+        static std::string makeError(
+            [[maybe_unused]] Map const& _map,
+            std::string const& key,
+            char const* file,
+            long line,
+            char const* func)
         {
             return format(
                 "%s(%d) : (%s) Can't find key '%s' in map of type '%s'",
@@ -472,9 +382,10 @@ namespace Ent
     {
         auto iter = map.find(key);
         if (iter != map.end())
+        {
             return iter->second;
-        else
-            throw InvalidKey(map, key, file, line, func);
+        }
+        throw InvalidKey(map, key, file, line, func);
     }
 
 #define AT(MAP, KEY) ::Ent::at(MAP, KEY, __FILE__, __LINE__, __func__)
@@ -484,18 +395,18 @@ namespace Ent
 
     struct Exception : std::runtime_error
     {
-        Exception(char const* _message = nullptr); ///< ctor
+        explicit Exception(char const* _message = nullptr); ///< ctor
     };
 
     /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
     struct BadType : ContextException
     {
-        BadType(char const* _message = nullptr); ///< ctor
+        explicit BadType(char const* _message = nullptr); ///< ctor
     };
 
     struct BadArrayType : ContextException
     {
-        BadArrayType(char const* _message = nullptr); ///< ctor
+        explicit BadArrayType(char const* _message = nullptr); ///< ctor
     };
 
     /// Exception thrown when a metadata is missing in the json schema
@@ -503,27 +414,27 @@ namespace Ent
     /// Example : oneOf need className and classData
     struct MissingMetadata : ContextException
     {
-        MissingMetadata(char const* _schemaName); ///< ctor
+        explicit MissingMetadata(char const* _schemaName); ///< ctor
     };
 
     /// Exception thrown when trying to switch a Union to a type that woesn't exit
     struct BadUnionType : ContextException
     {
         /// ctor
-        BadUnionType(char const* _type ///< The type/className that doen't exist in this union
+        explicit BadUnionType(char const* _type ///< The type/className that doen't exist in this union
         );
     };
 
     /// Exception thrown when a schema is ill-formed
     struct IllFormedSchema : ContextException
     {
-        IllFormedSchema(char const* _message); ///< ctor
+        explicit IllFormedSchema(char const* _message); ///< ctor
     };
 
     /// Exception thrown when some json data are invalid
     struct InvalidJsonData : ContextException
     {
-        InvalidJsonData(char const* _message); ///< ctor
+        explicit InvalidJsonData(char const* _message); ///< ctor
     };
 
     /// Use FileSystemError rather than filesystem_error, since
@@ -547,7 +458,15 @@ namespace Ent
     /// Exception thrown when some json data are invalid
     struct CantRename : ContextException
     {
-        CantRename(char const* _message) ///< ctor
+        explicit CantRename(char const* _message) ///< ctor
+            : ContextException(_message)
+        {
+        }
+    };
+
+    struct DuplicateKey : ContextException
+    {
+        explicit DuplicateKey(std::string const& _message) ///< ctor
             : ContextException(_message)
         {
         }
@@ -556,10 +475,107 @@ namespace Ent
     /// Exception thrown when some json data are invalid
     struct EmptyKey : ContextException
     {
-        EmptyKey(char const* _message) ///< ctor
+        explicit EmptyKey(char const* _message) ///< ctor
             : ContextException(_message)
         {
         }
     };
 
+    struct NullPointerArgument : ContextException
+    {
+        NullPointerArgument(char const* _argName, char const* funcName)
+            : ContextException("'%s' is null in function '%s'", _argName, funcName)
+        {
+        }
+    };
+
+    struct BadKey : ContextException
+    {
+        BadKey(char const* key, char const* funcName, char const* schemaName)
+            : ContextException(
+                "Unknown key '%s' in function '%s', in schema '%s'", key, funcName, schemaName)
+        {
+        }
+    };
+
+    struct UnknownSchema : ContextException
+    {
+        UnknownSchema(char const* rootPath, char const* filenameName)
+            : ContextException("Can't find schema of file %s", formatPath(rootPath, filenameName))
+        {
+        }
+    };
+
+    struct UnrelatedNodes : ContextException
+    {
+        UnrelatedNodes()
+            : ContextException("Nodes from different documents")
+        {
+        }
+    };
+
+    struct WrongPath : ContextException
+    {
+        explicit WrongPath(char const* _message)
+            : ContextException(_message)
+        {
+        }
+    };
+
+    template <typename V, typename F>
+    static constexpr decltype(std::is_invocable_v<F, V>) doesCompile([[maybe_unused]] F&& _lambda)
+    {
+        return std::is_invocable_v<F, V>;
+    }
+
+#define ENT_IF_COMPILE(TYPE, PARAM, CODE)                                                          \
+    if constexpr (Ent::doesCompile<TYPE>([](auto && (PARAM)) -> decltype(CODE) {}))
+
+    struct Node;
+    struct NodeDeleter
+    {
+        template <typename T>
+        void operator()(T* ptr) const
+        {
+            destroyAndFree(ptr);
+        }
+    };
+    using NodeUniquePtr = std::unique_ptr<Node, NodeDeleter>;
+
+    /// @brief Path to found a Node, from an other Node.
+    ///
+    /// Token are separated by slashes.
+    ///
+    /// Sample of how to get a sub entity : `Components/SubScene/Embedded/Wolf1`
+    /// - In an Object, the expected token is the field.
+    /// - In a Union, the expected token is the inner type of the Union.
+    /// - In an Array, the expected token is the index.
+    /// - In a Map or Set, the expected token is the key.
+    ///     - In a UnionSet, the key is the type. No need to explicit the Union type again.
+    ///         - ex : good : `Components/TransformGD/Position`
+    ///         - ex : bad : `Components/TransformGD/TransformGD/Position`
+    ///
+    using NodeRef = std::string;
+
+    struct EntityRef
+    {
+        /// @brief string representation of this entity ref, works like a file path, always relative.
+        String entityPath;
+
+        bool operator==(EntityRef const& _rho) const
+        {
+            return entityPath == _rho.entityPath;
+        }
+
+        bool operator!=(EntityRef const& _rho) const
+        {
+            return !(*this == _rho);
+        }
+    };
+
+    enum class CopyMode
+    {
+        CopyOverride, ///< Always override in dest when there is override in source
+        MinimalOverride ///< Do not override when values are identicals
+    };
 } // namespace Ent

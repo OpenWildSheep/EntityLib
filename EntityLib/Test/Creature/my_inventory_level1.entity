@@ -2,8 +2,7 @@
     "Components": [
         {
             "Data": {},
-            "Type": "EventHandlerGD",
-            "Version": 1
+            "Type": "EventHandlerGD"
         },
         {
             "Data": {
@@ -18,17 +17,14 @@
                                         0
                                     ]
                                 },
-                                "Type": "TransformGD",
-                                "Version": 1
+                                "Type": "TransformGD"
                             }
                         ],
                         "Name": "default_level1"
                     }
-                ],
-                "isEmbedded": true
+                ]
             },
-            "Type": "SubScene",
-            "Version": 1
+            "Type": "SubScene"
         }
     ],
     "Name": "my_inventory_level1_ent"

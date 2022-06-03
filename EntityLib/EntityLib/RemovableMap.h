@@ -28,11 +28,13 @@ namespace Ent
             {
                 return Removable{value->clone(), isPresent.clone(), index};
             }
-            bool hasOverride() const
+
+            [[nodiscard]] bool hasOverride() const
             {
                 return value->hasOverride() || isPresent.hasOverride();
             }
-            bool hasPrefabValue() const
+
+            [[nodiscard]] bool hasPrefabValue() const
             {
                 return value->hasPrefabValue() || isPresent.hasPrefabValue();
             }
@@ -60,7 +62,7 @@ namespace Ent
 
         Value* at(Key const& key);
 
-        size_t size() const;
+        [[nodiscard]] size_t size() const;
 
         void clear();
 
@@ -101,8 +103,7 @@ namespace Ent
         {
             return iter->second.value.get();
         }
-        else
-            return nullptr;
+        return nullptr;
     }
 
     template <typename Key, typename Value>
@@ -114,9 +115,10 @@ namespace Ent
     template <typename Key, typename Value>
     size_t RemovableMap<Key, Value>::size() const
     {
-        return (size_t)std::count_if(begin(map), end(map), [](auto&& name_removable) {
-            return name_removable.second.isPresent.get();
-        });
+        return static_cast<size_t>(std::count_if(
+            begin(map),
+            end(map),
+            [](auto&& name_removable) { return name_removable.second.isPresent.get(); }));
     }
 
     template <typename Key, typename Value>
@@ -152,11 +154,11 @@ namespace Ent
     template <typename Key, typename Value>
     void RemovableMap<Key, Value>::computeMemory(MemoryProfiler& prof) const
     {
-        for (auto&& k_v : map)
+        for (auto&& [key, value] : map)
         {
-            prof.addMem("RemovableMap_pair", sizeof(k_v));
-            prof.addMem("RemovableMap_key", std::get<0>(k_v).capacity());
-            std::get<1>(k_v).computeMemory(prof);
+            prof.addMem("RemovableMap_pair", sizeof(decltype(map)::value_type));
+            prof.addMem("RemovableMap_key", key.capacity());
+            value.computeMemory(prof);
         }
     }
 

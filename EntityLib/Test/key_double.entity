@@ -2,18 +2,18 @@
     "Thumbnail": "TestThumbnail",
     "ActorStates":[
         {
-            "className": "ActionClimbEdge",
+            "className": "ActorStateAlive",
             "classData":{
-                "locomotionMode": "crouch"
+                "Damages": 12
             }
         },
         {
-            "className": "ActionCinematic",
+            "className": "ActorStateBeingImmersed",
             "classData":{
             }
         },
         {
-            "className": "ActionClimbEdge",
+            "className": "ActorStateAlive",
             "classData":{
             }
         }

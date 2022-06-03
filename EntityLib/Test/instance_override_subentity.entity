@@ -15,15 +15,11 @@
 					null
 				]
 			},
-			"Type": "SystemicCreature",
-			"Version": 1
+			"Type": "SystemicCreature"
 		},
 		{
-			"Version": 1,
 			"Type": "SubScene",
 			"Data": {
-				"isEmbedded": true,
-				"File": "",
 				"Embedded": [
 					{
 						"Name": "EP1-Spout_LINK_001",

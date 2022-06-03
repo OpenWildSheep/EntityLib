@@ -13,87 +13,110 @@ namespace Ent
 {
     bool Object::hasDefaultValue() const
     {
-        return std::all_of(nodes.begin(), nodes.end(), [](ObjField const& field) {
-            return field.node->hasDefaultValue();
-        });
+        return std::all_of(
+            nodes.begin(),
+            nodes.end(),
+            [](ObjField const& field) { return field.node->hasDefaultValue(); });
     }
 
     // ************************************* Object ***********************************************
 
-    void Ent::Object::unset()
+    ObjField::ObjField(ObjField const& _other)
+        : name(_other.name)
+        , node(_other.node->clone())
+        , fieldIdx(_other.fieldIdx)
+
     {
-        for (ObjField& field : nodes)
+    }
+
+    ObjField& ObjField::operator=(ObjField const& _other)
+    {
+        if (&_other != this)
+        {
+            ObjField tmp(_other);
+            std::swap(tmp, *this);
+        }
+        return *this;
+    }
+
+    void Object::unset() const
+    {
+        for (ObjField const& field : nodes)
         {
             field.node->unset();
         }
     }
 
-    void Ent::Object::applyAllValues(Object& _dest, CopyMode _copyMode) const
+    void Object::applyAllValues(Object& _dest, CopyMode _copyMode) const
     {
         applyInstanceOfField(*this, _dest, _copyMode);
+        applyAllValuesButPrefab(_dest, _copyMode);
+    }
+
+    void Object::applyAllValuesButPrefab(Object& _dest, CopyMode _copyMode) const
+    {
         for (size_t i = 0; i < nodes.size(); ++i)
         {
             nodes[i].node->applyAllValues(*_dest.nodes[i].node, _copyMode);
         }
     }
 
-    Ent::Object Ent::Object::makeInstanceOf() const
+    Object Object::makeInstanceOf() const
     {
-        Object out(schema);
-        out.instanceOf = instanceOf.makeInstanceOf();
-        out.nodes.reserve(size());
+        std::vector<ObjField> newnodes;
+        newnodes.reserve(size());
         for (auto&& [name, node, fieldIdx] : *this)
         {
-            out.nodes.push_back(ObjField{name, node->makeInstanceOf(), fieldIdx});
+            newnodes.emplace_back(name, node->makeInstanceOf(), fieldIdx);
         }
-        std::sort(begin(out), end(out), CompObject());
-        return out;
+        std::sort(begin(newnodes), end(newnodes), CompObject());
+        return {schema, std::move(newnodes), instanceOf.makeInstanceOf(), 0, true};
     }
 
-    Object Ent::Object::detach() const
+    Object Object::detach() const
     {
-        Object out(schema);
-        out.nodes.reserve(size());
+        std::vector<ObjField> newnodes;
+        newnodes.reserve(size());
         for (auto&& [name, node, fieldIdx] : *this)
         {
-            out.nodes.emplace_back(ObjField{name, node->detach(), fieldIdx});
+            newnodes.emplace_back(name, node->detach(), fieldIdx);
         }
-        std::sort(begin(out), end(out), CompObject());
-        return out;
+        std::sort(begin(newnodes), end(newnodes), CompObject());
+        return {schema, std::move(newnodes)};
     }
 
-    void Ent::Object::resetInstanceOf(char const* _prefabNodePath)
+    void Object::resetInstanceOf(char const* _prefabNodePath)
     {
         auto const* entlib = schema->rootSchema->entityLib;
         if (_prefabNodePath == nullptr or strlen(_prefabNodePath) == 0)
         {
-            Node prefabNode = entlib->loadNode(*schema, json{}, nullptr);
-            (*this) = prefabNode.GetRawValue().get<Object>().makeInstanceOf();
+            auto const prefabNode = entlib->loadNode(*schema, json{}, nullptr);
+            (*this) = std::get<ObjectPtr>(prefabNode->GetRawValue())->makeInstanceOf();
             instanceOf.set("");
         }
         else
         {
-            auto relPath = entlib->getRelativePath(_prefabNodePath).generic_u8string();
-            json nodeData = loadJsonFile(entlib->rawdataPath, _prefabNodePath);
-            Node prefabNode = entlib->loadNode(*schema, nodeData, nullptr);
+            auto const relPath = entlib->getRelativePath(_prefabNodePath).generic_u8string();
+            json const nodeData = loadJsonFile(entlib->rawdataPath, _prefabNodePath);
+            auto const prefabNode = entlib->loadNode(*schema, nodeData, nullptr);
             // Get the keyfield
-            tl::optional<Node> keyField;
+            NodeUniquePtr keyField;
             for (ObjField& objfield : nodes)
             {
                 auto&& field = objfield.node;
                 if (field->getSchema()->isKeyField)
                 {
-                    if (keyField.has_value())
+                    if (keyField != nullptr)
                     {
                         throw IllFormedSchema(
                             R"(An Object is used in two set with different keyField)");
                     }
-                    keyField = *field;
+                    keyField = field->clone();
                 }
             }
-            (*this) = prefabNode.GetRawValue().get<Object>().makeInstanceOf();
+            (*this) = std::get<ObjectPtr>(prefabNode->GetRawValue())->makeInstanceOf();
             // Set the keyField
-            if (keyField.has_value())
+            if (keyField != nullptr and keyField->isSet()) // Only report the previus ID if it is set
             {
                 for (ObjField& objfield : nodes)
                 {
@@ -140,7 +163,7 @@ namespace Ent
         return false;
     }
 
-    void Ent::Object::setParentNode(Node* _parentNode)
+    void Object::setParentNode(Node* _parentNode)
     {
         for (auto&& [name, node, fieldIndex] : nodes)
         {
@@ -148,7 +171,7 @@ namespace Ent
         }
     }
 
-    void Ent::Object::checkParent(Node const* _parentNode) const
+    void Object::checkParent(Node const* _parentNode) const
     {
         for (auto&& [name, node, fieldIndex] : nodes)
         {
@@ -163,19 +186,32 @@ namespace Ent
         for (ObjField const& field : nodes)
         {
             field.node->computeMemory(prof);
-            prof.addMem("Object::value_ptr", sizeof(Ent::Node));
+            prof.addMem("Object::value_ptr", sizeof(Node));
         }
         prof.addNodes(size());
     }
 
+    NodeRef Object::computeNodeRefToChild(Node const* _child) const
+    {
+        for (auto const& field : nodes)
+        {
+            if (_child == field.node.get())
+            {
+                return field.name;
+            }
+        }
+        ENTLIB_LOGIC_ERROR("_child is not a child of this Object");
+    }
+
     size_t count(Object const& obj, char const* key)
     {
-        auto range = std::equal_range(begin(obj), end(obj), ObjField{key, nullptr, 0}, CompObject());
-        return (size_t)std::distance(range.first, range.second);
+        auto const range =
+            std::equal_range(begin(obj), end(obj), ObjField{key, nullptr, 0}, CompObject());
+        return static_cast<size_t>(std::distance(range.first, range.second));
     }
     void emplace(Object& obj, ObjField const& value)
     {
-        auto range = std::equal_range(begin(obj), end(obj), value, CompObject());
+        auto const range = std::equal_range(begin(obj), end(obj), value, CompObject());
         if (range.first == range.second)
         {
             obj.nodes.insert(range.first, value);
@@ -183,27 +219,10 @@ namespace Ent
     }
     Node const& at(Object const& obj, char const* key)
     {
-        auto range = std::equal_range(begin(obj), end(obj), ObjField{key, nullptr, 0}, CompObject());
-        if (range.first == range.second)
-        {
-            throw std::logic_error(std::string("Bad key : ") + key);
-        }
-        else
-        {
-            return *range.first->node;
-        }
+        return *obj.at(key).node;
     }
     Node& at(Object& obj, char const* key)
     {
-        auto range = std::equal_range(
-            begin(obj), end(obj), ObjField{key, value_ptr<Node>(), 0}, CompObject());
-        if (range.first == range.second)
-        {
-            throw std::logic_error(std::string("Bad key : ") + key);
-        }
-        else
-        {
-            return *range.first->node;
-        }
+        return *obj.at(key).node;
     }
 } // namespace Ent

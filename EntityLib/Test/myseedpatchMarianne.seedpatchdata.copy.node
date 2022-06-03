@@ -1,5 +1,5 @@
 {
-    "$schema": "./EditionComponents.json#/definitions/SeedPatchDataList",
+    "$schema": "wildschema:/all/SeedPatchDataList.json",
     "Data": [
         {
             "NoiseName": "Clouds3",

@@ -1,22 +1,24 @@
 #pragma once
 
+#include <filesystem>
+#include <string_view>
+
 #pragma warning(push, 0)
 #include "external/json.hpp"
-#include "external/filesystem.hpp"
 #pragma warning(pop)
-
-nlohmann::json loadJsonFile(std::filesystem::path const& _root, std::filesystem::path const& _rel);
 
 namespace Ent
 {
+    nlohmann::json loadJsonFile(std::filesystem::path const& _root, std::filesystem::path const& _rel);
+
     /// @cond PRIVATE
     /// @brief Given a link to a definition, get the name of the definition.
     ///
     /// Example : "./EditionComponents.json#/definitions/HeightObj" => "HeightObj"
-    char const* getRefTypeName(char const* link);
+    std::string_view getRefTypeName(char const* link);
 
     std::vector<std::string>
-    splitString(const std::string& _str, char _delimiter, bool _keepEmptyToken = false);
+    splitString(std::string const& _str, char _delimiter, bool _keepEmptyToken = false);
 
     /// @brief Given two absolute path,
     ///   compute the shorter relative path to go from _fromAbsolute to _toAbsolute
@@ -33,7 +35,7 @@ namespace Ent
     template <>
     struct hasher<std::string>
     {
-        uint32_t constexpr HashStrRecur(uint32_t _hash, const char* _str) const
+        static uint32_t constexpr HashStrRecur(uint32_t _hash, char const* _str)
         {
             return (*_str == 0) ? _hash : HashStrRecur(((_hash << 5) + _hash) + *_str, _str + 1);
         }
@@ -42,7 +44,7 @@ namespace Ent
         {
             return (*_str == 0) ? 0 : HashStrRecur(5381, _str);
         }
-        std::size_t operator()(const std::string& str) const
+        std::size_t operator()(std::string const& str) const
         {
             return (*this)(str.c_str());
         }
@@ -50,14 +52,30 @@ namespace Ent
     template <typename T>
     std::size_t constexpr hash(T&& t)
     {
-        return hasher<typename std::decay<T>::type>()(std::forward<T>(t));
+        return hasher<std::decay_t<T>>()(std::forward<T>(t));
     }
     inline namespace literals
     {
-        std::size_t constexpr operator"" _hash(const char* s, size_t)
+        std::size_t constexpr operator"" _hash(char const* s, [[maybe_unused]] size_t _size)
         {
             return hasher<std::string>()(s);
         }
     } // namespace literals
+
+    inline std::string strToLower(std::string s)
+    {
+        std::transform(
+            s.begin(),
+            s.end(),
+            s.begin(),
+            [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+        return s;
+    }
+
+    ///< Ensure a float to be print rounded in a json even if it is printed as a double
+    double truncFloat(float _val);
+
+    constexpr char const* schemaFormat = "wildschema:/all/%s.json";
+
     /// @endcond PRIVATE
 } // namespace Ent

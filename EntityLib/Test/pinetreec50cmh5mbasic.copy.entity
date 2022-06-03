@@ -1,12 +1,17 @@
 {
+    "$schema": "wildschema:/all/Entity.json",
     "Components": [
+        {
+            "Data": {},
+            "Type": "TransformGD"
+        },
         {
             "Data": {
                 "EDITOR_skeleton": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/editor/skeleton/pinetreec50cmh5mbasic.wskl",
+                "animDatabase": "03_Environment/Tree/Pine/Tree/PineTreeC50cmH5mBasic/Animation",
                 "skeleton": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/skeleton/pinetreec50cmh5mbasic.skl"
             },
-            "Type": "AnimationControllerGD",
-            "Version": 1
+            "Type": "AnimationControllerGD"
         },
         {
             "Data": {
@@ -40,224 +45,191 @@
                     }
                 }
             },
-            "Type": "AnimationTreeConstraintsGD",
-            "Version": 1
+            "Type": "AnimationTreeConstraintsGD"
         },
         {
             "Data": {
                 "HotspotType": "ride",
-                "Mode": "Creature"
+                "Mode": "PossessingGPE"
             },
-            "Type": "BeamTargetGD",
-            "Version": 1
-        },
-        {
-            "Data": {},
-            "Type": "CameraDataGD",
-            "Version": 1
+            "Type": "BeamTargetGD"
         },
         {
             "Data": {
-                "hotspots": [
-                    {
-                        "Bone": "PineTreeC50cmH5mBasicBone04",
-                        "InitPosition": [
-                            0.1,
-                            0.0,
-                            0.0
-                        ],
-                        "Matrix": [
-                            0.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            -1.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Target": "SquirrelTree",
-                        "Type": "spawnlife"
-                    },
-                    {
-                        "InitPosition": [
-                            0.0,
-                            0.0,
-                            5.0
-                        ],
-                        "Matrix": [
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            -1.0,
-                            0.0
-                        ],
-                        "Target": "pinetopbranch",
-                        "Type": "spawnlife"
-                    },
-                    {
-                        "InitPosition": [
-                            0.0,
-                            2.0,
-                            0.0
-                        ],
-                        "Matrix": [
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            -1.0,
-                            0.0
-                        ],
-                        "Target": "LittleCreatureHelmetWildLife",
-                        "Type": "spawnlife"
-                    },
-                    {
-                        "InitPosition": [
-                            2.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Matrix": [
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            -1.0,
-                            0.0
-                        ],
-                        "Target": "SquirrelWildLife",
-                        "Type": "spawnlife"
-                    },
-                    {
-                        "InitPosition": [
-                            1.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Matrix": [
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0
-                        ],
-                        "Target": "RabbitWildLife",
-                        "Type": "spawnlife"
-                    },
-                    {
-                        "InitPosition": [
-                            0.0,
-                            3.0,
-                            0.0
-                        ],
-                        "Matrix": [
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0
-                        ],
-                        "Target": "LittleCreatureBushAlone",
-                        "Type": "spawnlife"
-                    },
-                    {
-                        "InitPosition": [
-                            0.0,
-                            -3.0,
-                            0.0
-                        ],
-                        "Matrix": [
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0
-                        ],
-                        "Target": "LittleCreatureFernAlone",
-                        "Type": "spawnlife"
-                    },
-                    {
-                        "Bone": "PineTreeC50cmH5mBasicBone04",
-                        "Type": "ride"
-                    },
-                    {
-                        "Bone": "PineTreeC50cmH5mBasicBone04",
-                        "Type": "center"
-                    }
+                "CameraDataResourcePath": "01_Common/CameraParams/Resources/pinetreec50cmh5mbasic_entity.cameradata"
+            },
+            "Type": "CameraDataGD"
+        },
+        {
+            "Data": {
+                "HotspotsMap": [
+                    [
+                        "CenterPineTreeC50cmH5mBasicBone04",
+                        {
+                            "Bone": "PineTreeC50cmH5mBasicBone04",
+                            "Type": "center"
+                        }
+                    ],
+                    [
+                        "RidePineTreeC50cmH5mBasicBone04",
+                        {
+                            "Bone": "PineTreeC50cmH5mBasicBone04",
+                            "Type": "ride"
+                        }
+                    ],
+                    [
+                        "Spawnlife",
+                        {
+                            "Offset": [
+                                0.0,
+                                0.0,
+                                5.0
+                            ],
+                            "Orientation": [
+                                -0.7071068,
+                                null,
+                                null,
+                                0.7071068
+                            ],
+                            "Type": "spawnlife"
+                        }
+                    ],
+                    [
+                        "SpawnlifePineTreeC50cmH5mBasicBone04",
+                        {
+                            "Bone": "PineTreeC50cmH5mBasicBone04",
+                            "Offset": [
+                                0.1,
+                                0.0,
+                                0.0
+                            ],
+                            "Orientation": [
+                                null,
+                                0.7071068,
+                                null,
+                                0.7071068
+                            ],
+                            "Type": "spawnlife"
+                        }
+                    ],
+                    [
+                        "Spawnlife_2",
+                        {
+                            "Offset": [
+                                0.0,
+                                2.0,
+                                0.0
+                            ],
+                            "Orientation": [
+                                -0.7071068,
+                                null,
+                                null,
+                                0.7071068
+                            ],
+                            "Type": "spawnlife"
+                        }
+                    ],
+                    [
+                        "Spawnlife_3",
+                        {
+                            "Offset": [
+                                2.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Orientation": [
+                                -0.7071068,
+                                null,
+                                null,
+                                0.7071068
+                            ],
+                            "Type": "spawnlife"
+                        }
+                    ],
+                    [
+                        "Spawnlife_4",
+                        {
+                            "Offset": [
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Type": "spawnlife"
+                        }
+                    ],
+                    [
+                        "Spawnlife_5",
+                        {
+                            "Offset": [
+                                0.0,
+                                3.0,
+                                0.0
+                            ],
+                            "Type": "spawnlife"
+                        }
+                    ],
+                    [
+                        "Spawnlife_6",
+                        {
+                            "Offset": [
+                                0.0,
+                                -3.0,
+                                0.0
+                            ],
+                            "Type": "spawnlife"
+                        }
+                    ]
                 ]
             },
-            "Type": "HotspotsGD",
-            "Version": 1
+            "Type": "HotspotsGD"
         },
         {
             "Data": {
                 "CameraIgnored": true,
                 "EDITOR_MeshColliders": [
-                    "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/editor/phys/pinetreec50cmh5mbasic_phys_walkable_tiny_small_medium_big.wphys"
+                    "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/editor/phys/pinetreec50cmh5mbasic_phys_walkable_cameraignored_tiny_small_medium_big_enormous.wphys"
                 ],
-                "EDITOR_NavMeshStamper": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/editor/phys/pinetreec50cmh5mbasic_phys_navmesh_tiny_small_medium_big.wphys",
+                "EDITOR_NavMeshStamper": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/editor/phys/pinetreec50cmh5mbasic_navmesh_tiny_small_medium_big.wphys",
                 "MeshColliders": [
-                    "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/phys/pinetreec50cmh5mbasic_phys_walkable_tiny_small_medium_big.phys"
+                    "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/phys/pinetreec50cmh5mbasic_walkable_cameraignored_tiny_small_medium_big.phys"
                 ],
                 "MotionType": "Fixed",
-                "NavMeshStamper": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/phys/pinetreec50cmh5mbasic_phys_navmesh_tiny_small_medium_big.phys",
+                "NavMeshStamper": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/phys/pinetreec50cmh5mbasic_navmesh_tiny_small_medium_big.phys",
                 "PhysicsMaterial": "Climbable",
                 "Walkable": true
             },
-            "Type": "PhysicsGD",
-            "Version": 1
+            "Type": "PhysicsGD"
         },
         {
             "Data": {},
-            "Type": "PhysicsMeshProviderGD",
-            "Version": 1
+            "Type": "PhysicsMeshProviderGD"
         },
         {
             "Data": {
                 "GPEActorStateName": "ActorStateBendingTree",
                 "GPEType": "BendTree",
-                "HotspotID": 7
+                "HotspotName": "RidePineTreeC50cmH5mBasicBone04"
             },
-            "Type": "PossessableGPEGD",
-            "Version": 1
+            "Type": "PossessableGPEGD"
         },
         {
             "Data": {
-                "Scripts": [
-                    {
-                        "Path": "Pesto/Tree/FXTreeWind.pesto"
-                    },
-                    {
-                        "Path": "Pesto/Fx/smartFx/FxLogTreeTransform_01.pesto"
-                    }
+                "ScriptsMap": [
+                    [
+                        "FXTreeWind",
+                        {
+                            "Path": "Pesto/Tree/FXTreeWind.pesto"
+                        }
+                    ],
+                    [
+                        "FxLogTreeTransform_01",
+                        {
+                            "Path": "Pesto/Fx/smartFx/FxLogTreeTransform_01.pesto"
+                        }
+                    ]
                 ]
             },
-            "Type": "ScriptComponentGD",
-            "Version": 1
+            "Type": "ScriptComponentGD"
         },
         {
             "Data": {
@@ -333,50 +305,29 @@
                 ],
                 "VisualResourcePath": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/visual/pinetreec50cmh5mbasic.grc"
             },
-            "Type": "VisualGD",
-            "Version": 1
+            "Type": "VisualGD"
         },
         {
             "Data": {},
-            "Type": "EventHandlerGD",
-            "Version": 1
+            "Type": "EventHandlerGD"
         },
         {
             "Data": {},
-            "Type": "TransformGD",
-            "Version": 1
+            "Type": "NetGD"
         },
         {
             "Data": {},
-            "Type": "ActorGD",
-            "Version": 1
+            "Type": "UnifiedPhysicsDataGD"
         },
         {
             "Data": {},
-            "Type": "SmallActorSpawnerGD",
-            "Version": 1
+            "Type": "PhysicsMeshDeformerGD"
         },
         {
             "Data": {},
-            "Type": "NetGD",
-            "Version": 1
-        },
-        {
-            "Data": {},
-            "Type": "UnifiedPhysicsDataGD",
-            "Version": 1
-        },
-        {
-            "Data": {},
-            "Type": "PhysicsMeshDeformerGD",
-            "Version": 1
-        },
-        {
-            "Data": {},
-            "Type": "HealerGD",
-            "Version": 1
+            "Type": "HealerGD"
         }
     ],
     "Name": "Tree_PineTreeC50cmH5mBasic",
-    "Thumbnail": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/cache/pinetreec50cmh5mbasic.wthumb"
+    "Thumbnail": "03_environment/tree/pine/tree/pinetreec50cmh5mbasic/editor/thumbnail/pinetreec50cmh5mbasic.wthumb"
 }

@@ -5,8 +5,7 @@
 #include <algorithm>
 
 #pragma warning(push, 0)
-#pragma warning(disable : 4996)
-#include "../../../external/mapbox/variant.hpp"
+#include <variant>
 #pragma warning(pop)
 
 #include "include/EntityLibCore.h"
@@ -22,39 +21,49 @@ namespace Ent
     struct Vector
     {
         explicit Vector(EntityLib const* _entlib = nullptr, Subschema const* _schema = nullptr);
+        Vector(Vector const& _other);
+        Vector(Vector&&) = default;
+        Vector& operator=(Vector const& _other);
+        Vector& operator=(Vector&&) = default;
 
-        size_t size() const;
+        [[nodiscard]] size_t size() const;
 
-        size_t getDefaultSize() const;
+        [[nodiscard]] size_t getDefaultSize() const;
 
-        size_t getPrefabSize() const;
+        [[nodiscard]] size_t getPrefabSize() const;
 
-        bool hasOverride() const;
-        bool hasPrefabValue() const;
-        bool hasDefaultValue() const;
+        [[nodiscard]] bool hasOverride() const;
+        [[nodiscard]] bool hasPrefabValue() const;
+        [[nodiscard]] bool hasDefaultValue() const;
         Node* at(uint64_t _index);
-        Node const* at(uint64_t _index) const;
+        [[nodiscard]] Node const* at(uint64_t _index) const;
         void checkInvariants() const;
-        std::vector<Node const*> getItems() const;
+        [[nodiscard]] std::vector<Node const*> getItems() const;
+        std::vector<Node*> getItems();
         void pop();
-        bool isTuple() const;
+        [[nodiscard]] bool isTuple() const;
         void clear();
         void computeMemory(MemoryProfiler& prof) const;
         Node* push();
-        Node* initPush(Node _node, bool _addedInInstance);
-        Vector detach() const;
-        Vector makeInstanceOf() const;
-        tl::optional<size_t> getRawSize(OverrideValueLocation _location) const;
+        Node* initPush(NodeUniquePtr _node, bool _addedInInstance);
+        [[nodiscard]] Vector detach() const;
+        [[nodiscard]] Vector makeInstanceOf() const;
+        [[nodiscard]] EntityLib const* getEntityLib() const;
+        [[nodiscard]] std::unique_ptr<Vector> clone() const;
+        [[nodiscard]] std::optional<size_t> getRawSize(OverrideValueLocation _location) const;
         void unset();
         void setSize(Override<size_t> _size);
         void applyAllValues(Vector& _dest, CopyMode _copyMode) const;
-        void setParentNode(Node* _parentNode);
+        void setParentNode(Node* _parentNode) const;
         void checkParent(Node const* _parentNode) const;
+        std::vector<NodeUniquePtr> releaseAllElements();
+        /// Get the child index as a string
+        NodeRef computeNodeRefToChild(Node const* child) const;
 
     private:
         EntityLib const* m_entlib = nullptr;
         Subschema const* m_schema = nullptr;
-        std::vector<value_ptr<Node>> m_data; ///< List of items of the array
+        std::vector<NodeUniquePtr> m_data; ///< List of items of the array
         Override<uint64_t> m_arraySize; ///< Size of the array, to keep track on array size changes
     };
 } // namespace Ent

@@ -47,6 +47,12 @@ namespace WildRpcApiGenerator
 
 			foreach (var getter in cls.methods)
 			{
+				if (getter.inputs.Length > 0)
+                {
+					// getter should have no input parameters
+					continue;
+                }
+
 				var setterName = getter.name.Replace("_Get", "_Set");
 				if (setterName == getter.name)
 				{
@@ -60,7 +66,7 @@ namespace WildRpcApiGenerator
 				}
 
 				// TODO check types match
-
+				
 				properties.Add(new ReflectionProperty
 				{
 					name = niceName(getter.name.Replace("_Get", "_")),

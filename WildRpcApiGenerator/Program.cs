@@ -73,7 +73,7 @@ namespace WildRpcApiGenerator
 
 	class Program
 	{
-		const string inputSchema = @"X:\BIN_PC\wild_api.json";
+		const string inputSchema = @"X:\Tools\WildPipeline\Schema\wild_rpc_api.json";
 		static readonly BaseApiGenerator[] generators =
 		{
 			new PythonApiGenerator {outputDir = @"D:\WildCode\WildScripts\WildDcc\wild\core\rpc_api\wild_api.py"},

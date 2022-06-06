@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CodeDom" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Generators\BaseApiGenerator.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>BaseApiGenerator.cs</LastGenOutput>
+      <CustomToolNamespace>WildRpcApiGenerator</CustomToolNamespace>
+    </None>
+    <None Update="Generators\MaxApiGenerator.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>MaxApiGenerator.cs</LastGenOutput>
+      <CustomToolNamespace>WildRpcApiGenerator</CustomToolNamespace>
+    </None>
+    <None Update="Generators\PythonApiGenerator.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PythonApiGenerator.cs</LastGenOutput>
+      <CustomToolNamespace>WildRpcApiGenerator</CustomToolNamespace>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Generators\BaseApiGenerator.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>BaseApiGenerator.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Generators\MaxApiGenerator.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MaxApiGenerator.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Generators\PythonApiGenerator.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PythonApiGenerator.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

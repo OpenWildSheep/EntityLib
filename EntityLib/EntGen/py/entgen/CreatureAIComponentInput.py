@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ComponentInput import *
+from entgen.resetCreatureRequest import *
 from entgen.usePerception import *
 
 from EntityLibPy import Node
@@ -28,6 +29,9 @@ class CreatureAIComponentInput(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    @property
+    def resetCreatureRequest(self):  # type: ()->resetCreatureRequest
+        return resetCreatureRequest(self._node.at("resetCreatureRequest"))
     @property
     def usePerception(self):  # type: ()->usePerception
         return usePerception(self._node.at("usePerception"))

@@ -10,7 +10,6 @@ from entgen.BiteData import *
 from entgen.Bool import *
 from entgen.CreatureDangerousness import *
 from entgen.Float import *
-from entgen.InteractData import *
 from entgen.RevivedData import *
 from entgen.SpeedFastMinDuration import *
 
@@ -83,9 +82,6 @@ class CreatureGD(HelperObject):
     @property
     def dangerousnessData(self):  # type: ()->CreatureDangerousness
         return CreatureDangerousness(self._node.at("dangerousnessData"))
-    @property
-    def interactData(self):  # type: ()->InteractData
-        return InteractData(self._node.at("interactData"))
     @property
     def revivedData(self):  # type: ()->RevivedData
         return RevivedData(self._node.at("revivedData"))

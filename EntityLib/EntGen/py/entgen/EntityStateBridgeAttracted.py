@@ -42,6 +42,16 @@ class EntityStateBridgeAttracted(HelperObject):
     @BridgeLinkRef.setter
     def BridgeLinkRef(self, val): self.BridgeLinkRef.set(val)
     @property
+    def GroundAttachRaycastLength(self):  # type: ()->Float
+        return Float(self._node.at("GroundAttachRaycastLength"))
+    @GroundAttachRaycastLength.setter
+    def GroundAttachRaycastLength(self, val): self.GroundAttachRaycastLength.set(val)
+    @property
+    def HotspotName(self):  # type: ()->String
+        return String(self._node.at("HotspotName"))
+    @HotspotName.setter
+    def HotspotName(self, val): self.HotspotName.set(val)
+    @property
     def MaximalAttachDistance(self):  # type: ()->Float
         return Float(self._node.at("MaximalAttachDistance"))
     @MaximalAttachDistance.setter

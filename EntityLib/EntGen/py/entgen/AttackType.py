@@ -13,6 +13,7 @@ class AttackTypeEnum(Enum):
     JumpOnto = "JumpOnto"
     Bite = "Bite"
     Stomp = "Stomp"
+    Dive = "Dive"
     AttackType_COUNT = "AttackType_COUNT"
 
 

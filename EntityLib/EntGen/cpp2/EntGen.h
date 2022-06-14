@@ -13,6 +13,7 @@ namespace Ent
         struct variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_; // Union
         struct variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_; // Union
         struct variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_; // Union
+        struct variant_ZoneCylinderShape_ZoneMeshShape_; // Union
         struct variant_Pasta_Easing_Curve_string_; // Union
         struct variant_MeshShape_ShapeSphere_ShapeBox_; // Union
         struct usePerception;
@@ -23,6 +24,7 @@ namespace Ent
         struct sPhysicsShapeCapsule;
         struct sJointFixedDesc;
         struct sJointBallDesc;
+        struct resetCreatureRequest;
         struct jumpPower;
         struct isPerceivableForEnemies;
         struct isPerceivable;
@@ -44,6 +46,7 @@ namespace Ent
             Mesh,
             WaveRenderingType_COUNT,
         };
+        struct Walkability;
         struct sPhysicsShapeBox;
         struct sEnvStamp;
         struct retiming;
@@ -207,6 +210,7 @@ namespace Ent
             SoundEmissionStrength_COUNT,
         };
         struct soundEmissionStrength;
+        struct SoftCollisionGD_VegetationDetectionParameters;
         struct SmoothScaleComponentInput_Parameters;
         struct Size; // enum
         enum class SizeEnum
@@ -231,6 +235,15 @@ namespace Ent
         struct ScriptPathAndDataSet;
         struct ScaleFactor;
         struct ScaleConverter;
+        struct RuntimeMode; // enum
+        enum class RuntimeModeEnum
+        {
+            None_,
+            Container,
+            Compound,
+        };
+        struct RigidbodyScalingSpeed;
+        struct RigidbodyScaleMultiplier;
         struct RigidBodyUserData;
         struct RigidBodyUserDataLedges;
         struct RigidBodyUserDataImpact;
@@ -269,6 +282,8 @@ namespace Ent
             absorption,
             RegenField_COUNT,
         };
+        struct RegenAreaTransitionSettings;
+        struct TransitionSettings;
         struct ReflectionTools_EnumSchema;
         struct ReflectionTools_ClassReflectionSchema_ClassReflectionSchemaMethods;
         struct ReflectionTools_ClassReflectionSchema_ClassReflectionSchemaMetaData;
@@ -351,10 +366,12 @@ namespace Ent
             PhysicsGPE,
             Interactable,
             Creature,
+            Debris,
             None_,
             All,
             PHYSICLAYER_COUNT,
         };
+        struct PhysicsEffectsManager_PhysicsLimits;
         struct PerceiverComponentInput_usePerception;
         struct Pasta_Easing_Curve; // enum
         enum class Pasta_Easing_CurveEnum
@@ -435,15 +452,13 @@ namespace Ent
         enum class NavMeshActionTypeEnum
         {
             none,
+            walk,
             jump,
             NavMeshActionType_COUNT,
         };
         struct OffMeshLink;
         struct NavMesh;
         struct MusicCategory;
-        struct MoveTo;
-        struct MoveToPosition;
-        struct MoveToAlongSpline;
         struct MoveCapacityData_OrientationSpeed;
         struct MountableSnapLine_ControlPoint;
         struct MountableData;
@@ -556,8 +571,11 @@ namespace Ent
             LightType_Count,
         };
         struct Light;
+        struct LightAttackData;
+        struct lightAttackData;
         struct LedgePositionInfo;
         struct JumpHeightMultiplier;
+        struct IsActive;
         struct Invincible;
         struct InventoryTags; // enum
         enum class InventoryTagsEnum
@@ -583,7 +601,6 @@ namespace Ent
         };
         struct TrailProperties;
         struct Interactor;
-        struct InteractData;
         struct InputCollisionBehaviorData;
         struct InertiaTensor;
         struct ImpactAndSolidityData;
@@ -680,12 +697,14 @@ namespace Ent
         };
         struct GeometryStamper;
         struct ZoneStamper;
+        struct SkinnedPhysMeshStamper;
         struct MeshStamper;
         struct Game_VoxelsPile;
         struct Game_VoxelsColumn;
         struct Game_VoxelsVolume;
         struct GameTimeInMs;
         struct GameProfile;
+        struct GameSoftCollisionData;
         struct GameSnapData;
         struct GameSlopeData;
         struct GameShamanVisionData;
@@ -708,6 +727,7 @@ namespace Ent
         struct GameFluidData;
         struct GameFeetCatchUpData;
         struct GameFallData;
+        struct GameEdgeData;
         struct GameDeathData;
         struct GameClockManager_TimeOfDay;
         struct GameClockManager_GameDate;
@@ -794,6 +814,7 @@ namespace Ent
         };
         struct RegenerationManager;
         struct EnergyPoolGD_EnergyArea;
+        struct EndPosition;
         struct Enabled;
         struct EDITOR_Mesh;
         struct EDITOR_LODsItem;
@@ -820,11 +841,14 @@ namespace Ent
         struct WallRunComponentInput;
         struct VelocityObstacleComponentInput;
         struct UnifiedPhysicsDataComponentInput;
-        struct StrongAttackComponentInput;
+        struct SpiritAnimalShrineComponentInput;
         struct SoundEmitterComponentInput;
+        struct SoftCollisionComponentInput;
         struct SmoothScaleComponentInput;
+        struct ScriptComponentInput;
         struct ReviveEnergyComponentInput;
         struct RespawnabilityComponentInput;
+        struct RagdollComponentInput;
         struct PhysicsImpactMakerComponentInput;
         struct PhysicsComponentInput;
         struct PerceiverComponentInput;
@@ -832,6 +856,7 @@ namespace Ent
         struct OutfitWearerComponentInput;
         struct MountIKControllerComponentInput;
         struct LifeComponentInput;
+        struct InteractorComponentInput;
         struct InteractableGPEComponentInput;
         struct GrasperComponentInput;
         struct GraspableComponentInput;
@@ -844,6 +869,7 @@ namespace Ent
         struct BreakableComponentInput;
         struct BeamTargetComponentInput;
         struct AttackTriggerComponentInput;
+        struct AttackComponentInput;
         struct AnimationTransformDriverComponentInput;
         struct ComponentGD;
         struct WorldScalePathFindGD;
@@ -877,6 +903,7 @@ namespace Ent
         struct SoundEmitterGD;
         struct SoundAreaGD;
         struct SoulRespawnOpportunityGD;
+        struct SoftCollisionGD;
         struct SmoothScaleComponentGD;
         struct SideMapGateGD;
         struct ShapeshiftStatueGD;
@@ -906,7 +933,6 @@ namespace Ent
         struct PhysicsDataGD;
         struct PerceiverGD;
         struct PerceivableGD;
-        struct PathFinderGD;
         struct OutfitWearerGD;
         struct OutfitGD;
         struct NotVisibleInSubscene;
@@ -978,7 +1004,6 @@ namespace Ent
         struct CameraDataGD;
         struct BreakableGD;
         struct BittenGD;
-        struct BeamGeneratorGD;
         struct AttackTriggerGD;
         struct AssemblyGD;
         struct AnimationTransformDriverGD;
@@ -1033,6 +1058,7 @@ namespace Ent
         struct CineEventTriggerPlaySequence;
         struct CineEventTriggerGameStateChange;
         struct CineEventTriggerEventHandlerPost;
+        struct CineEventTriggerDisplayUIMessage;
         struct CineEventTest;
         struct CineEventTestIsCanceled;
         struct CineEventTestInput;
@@ -1068,6 +1094,7 @@ namespace Ent
             OnBones,
             TopView,
             EntitySwap,
+            SightConstraint,
             Locked,
             Pan,
             CameraType_COUNT,
@@ -1079,6 +1106,8 @@ namespace Ent
         struct CameraFreeData;
         struct CameraEditorData;
         struct CameraManager;
+        struct BoneStartPoint;
+        struct InteractorGD;
         struct BoneAnimation;
         struct BoidSpeedMaxData;
         struct BoidGoalMode; // enum
@@ -1141,13 +1170,12 @@ namespace Ent
             Searching,
             Creature,
             InteractingGPE,
-            Shapeshifting,
             Item,
-            UpgradeStaff,
             PickUp,
             Hatching,
             SetRespawnPlaceAsCheckpoint,
             SetSavePoint,
+            EnableSpiritShrine,
             Any,
             BeamStaffMode_COUNT,
         };
@@ -1182,14 +1210,19 @@ namespace Ent
             JumpOnto,
             Bite,
             Stomp,
+            Dive,
             AttackType_COUNT,
         };
+        struct AttackPositionRetimingData_SpecieRetimingCoeff;
+        struct AttackPositionRetimingData;
         struct AttackPhysicsForceData;
         struct AttackImpactData;
         struct AttackData;
         struct AttackDamageData;
         struct GameAttackData;
         struct GameManager;
+        struct AreaNavigation;
+        struct PathFinderGD;
         struct Archetype; // enum
         enum class ArchetypeEnum
         {
@@ -1318,10 +1351,14 @@ namespace Ent
             bounce,
             AnimAdditionalTag_COUNT,
         };
-        struct StrongAttackChargedData;
-        struct StrongAttackGD;
+        struct AttackChargedData;
+        struct StrongAttackData;
+        struct strongAttackData;
         struct AnalyticsManager_MongoDBConnection;
         struct AnalyticsManager;
+        struct AerialAttackData;
+        struct AttackComponentGD_AerialAttackData;
+        struct AttackComponentGD;
         struct AdditionnalTag;
         struct ActorStates; // union_set
         struct Object;
@@ -1366,13 +1403,17 @@ namespace Ent
         struct EntityStateStickedLand;
         struct EntityStateStalactiteReadyToFall;
         struct EntityStateStalactiteFallen;
+        struct EntityStateStaffVertebrasAutoRefill;
         struct EntityStateStaffOwnedVertebras;
+        struct EntityStateSpiritShrineEnabled;
+        struct EntityStateSpiritShrineDisabled;
         struct EntityStateSpiritAttacked;
         struct EntityStateSpiritAttack;
         struct EntityStateSpiritAnimalSoulForm;
         struct EntityStateSpiritAnimalFleshForm;
         struct EntityStateSpiritAnimalBeingCalled;
         struct EntityStateSpeedLimiter;
+        struct EntityStateSoftCollide;
         struct EntityStateSnappedToHatchingTarget;
         struct EntityStateSlowMotion;
         struct EntityStateShootHatchingEnergy;
@@ -1405,8 +1446,10 @@ namespace Ent
         struct EntityStateManageChildEntityPool;
         struct EntityStateLateralLand;
         struct EntityStateLateralDodge;
+        struct EntityStateJustStarted;
         struct EntityStateJumpHeightMultiplier;
         struct EntityStateInteractedGPE;
+        struct EntityStateInjured;
         struct EntityStateInconvertible;
         struct EntityStateIncapacitated;
         struct EntityStateInVertebraeArea;
@@ -1425,6 +1468,7 @@ namespace Ent
         struct EntityStateGrabbed;
         struct EntityStateGrabOut;
         struct EntityStateGrabIn;
+        struct EntityStateGrabAttack;
         struct EntityStateGrab;
         struct EntityStateForceCanBeTargeted;
         struct EntityStateFastRun;
@@ -1474,6 +1518,7 @@ namespace Ent
         struct EntityStateBounce;
         struct EntityStateBoidsHomePos;
         struct EntityStateBeingOnSpike;
+        struct EntityStateBeingInReeds;
         struct EntityStateBeingBlockedByVine;
         struct EntityStateBackwardDodge;
         struct EntityStateAttackDive;
@@ -1694,6 +1739,7 @@ namespace Ent
             CATEGORY_Health,
             CATEGORY_HealthAlive,
             CATEGORY_HealthDead,
+            CATEGORY_KnockedOut,
             CATEGORY_EntitySwitchTransition,
             CATEGORY_EnergyRoot,
             CATEGORY_EnergySpout,
@@ -1704,7 +1750,8 @@ namespace Ent
             CATEGORY_Respawn,
             CATEGORY_Save,
             CATEGORY_Cinematic,
-            ActorCategory_COUNT,
+            CATEGORY_Loading,
+            CATEGORY_NoCategory,
         };
         struct ConditionalRigidityAttribute_Conditions;
         struct ConditionalRigidityAttribute;
@@ -1818,6 +1865,7 @@ namespace Ent
             callanswer,
             scream,
             grab,
+            grabattack,
             grabbed,
             grabbedin,
             grabbedout,
@@ -1954,6 +2002,7 @@ namespace Ent
         struct CloudsGenerator;
         struct ConditionalRigidityAttribute_ActorStateName;
         struct ContactActor;
+        struct Edge;
         struct EntityArchive_MetaData;
         struct EntityGD;
         struct EntityGDRef;
@@ -1989,6 +2038,8 @@ namespace Ent
         struct VegetationResourceData;
         struct VegetationVisibilityDistanceCategory;
         struct VisualResourceBuildData;
+        struct ZoneCylinderShape;
+        struct ZoneMeshShape;
         struct sBiomeSFXResult;
         struct sBiomeSoundResult;
         struct sJointMotorDesc;
@@ -2101,6 +2152,17 @@ namespace Ent
             Ent::Gen2::Quat setQuat();
             std::optional<Ent::Gen2::Position> Position();
             Ent::Gen2::Position setPosition();
+        };
+
+        struct variant_ZoneCylinderShape_ZoneMeshShape_ : Base // Union
+        {
+            explicit variant_ZoneCylinderShape_ZoneMeshShape_(Ent::Property _node): Base(std::move(_node)) {}
+            static constexpr char schemaName[] = "eastl::variant<ZoneCylinderShape,ZoneMeshShape>";
+            char const* getType() const;
+            std::optional<Ent::Gen2::ZoneCylinderShape> ZoneCylinderShape();
+            Ent::Gen2::ZoneCylinderShape setZoneCylinderShape();
+            std::optional<Ent::Gen2::ZoneMeshShape> ZoneMeshShape();
+            Ent::Gen2::ZoneMeshShape setZoneMeshShape();
         };
 
         struct variant_Pasta_Easing_Curve_string_ : Base // Union
@@ -2313,6 +2375,15 @@ namespace Ent
         
         };
 
+        struct resetCreatureRequest : HelperObject<resetCreatureRequest> // Object
+        {
+            explicit resetCreatureRequest(Ent::Property _node): HelperObject<resetCreatureRequest>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::Bool val() const;
+        };
+
         struct jumpPower : HelperObject<jumpPower> // Object
         {
             explicit jumpPower(Ent::Property _node): HelperObject<jumpPower>(std::move(_node)) {}
@@ -2423,6 +2494,15 @@ namespace Ent
         {
             return static_cast<WaveRenderingTypeEnum>(details::indexInEnum(value, WaveRenderingType::enumToString));
         }
+
+        struct Walkability : HelperObject<Walkability> // Object
+        {
+            explicit Walkability(Ent::Property _node): HelperObject<Walkability>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::Bool val() const;
+        };
 
 
 
@@ -3546,6 +3626,37 @@ namespace Ent
             Ent::Gen2::SoundEmissionStrength val() const;
         };
 
+        struct SoftCollisionGD_VegetationDetectionParameters : HelperObject<SoftCollisionGD_VegetationDetectionParameters> // Object
+        {
+            explicit SoftCollisionGD_VegetationDetectionParameters(Ent::Property _node): HelperObject<SoftCollisionGD_VegetationDetectionParameters>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SoftCollisionGD::VegetationDetectionParameters";
+            static SoftCollisionGD_VegetationDetectionParameters load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return SoftCollisionGD_VegetationDetectionParameters(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static SoftCollisionGD_VegetationDetectionParameters loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return SoftCollisionGD_VegetationDetectionParameters(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static SoftCollisionGD_VegetationDetectionParameters create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return SoftCollisionGD_VegetationDetectionParameters(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            SoftCollisionGD_VegetationDetectionParameters makeInstanceOf()
+            {
+                return SoftCollisionGD_VegetationDetectionParameters(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::String BoneName() const;
+            Ent::Gen2::Vector3 BoneOffset() const;
+            Ent::Gen2::Float Radius() const;
+            PrimArray<Ent::Gen2::String> VegetationTagList() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct SmoothScaleComponentInput_Parameters : HelperObject<SmoothScaleComponentInput_Parameters> // Object
         {
             explicit SmoothScaleComponentInput_Parameters(Ent::Property _node): HelperObject<SmoothScaleComponentInput_Parameters>(std::move(_node)) {}
@@ -3995,6 +4106,48 @@ namespace Ent
             Ent::Gen2::String outText() const;
         };
 
+        struct RuntimeMode : EnumPropHelper<RuntimeMode, RuntimeModeEnum> // Enum
+        {
+            using Enum = RuntimeModeEnum;
+            using PropHelper<RuntimeMode, Enum>::operator=;
+            explicit RuntimeMode(Ent::Property _node): EnumPropHelper<RuntimeMode, Enum>(std::move(_node)) {}
+            
+            static constexpr char const* enumToString[] = {
+                "None",
+                "Container",
+                "Compound",
+            };
+        };
+        inline char const* toString(RuntimeModeEnum value)
+        {
+            if(size_t(value) >= std::size(RuntimeMode::enumToString))
+                throw std::runtime_error("Wrong enum value");
+            return RuntimeMode::enumToString[size_t(value)];
+        }
+        inline char const* toInternal(RuntimeModeEnum value) { return toString(value); }
+        template<> inline RuntimeModeEnum strToEnum<RuntimeModeEnum>(char const* value)
+        {
+            return static_cast<RuntimeModeEnum>(details::indexInEnum(value, RuntimeMode::enumToString));
+        }
+
+        struct RigidbodyScalingSpeed : HelperObject<RigidbodyScalingSpeed> // Object
+        {
+            explicit RigidbodyScalingSpeed(Ent::Property _node): HelperObject<RigidbodyScalingSpeed>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::Float val() const;
+        };
+
+        struct RigidbodyScaleMultiplier : HelperObject<RigidbodyScaleMultiplier> // Object
+        {
+            explicit RigidbodyScaleMultiplier(Ent::Property _node): HelperObject<RigidbodyScaleMultiplier>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::Float val() const;
+        };
+
         struct RigidBodyUserData : HelperObject<RigidBodyUserData> // Object
         {
             explicit RigidBodyUserData(Ent::Property _node): HelperObject<RigidBodyUserData>(std::move(_node)) {}
@@ -4260,6 +4413,8 @@ namespace Ent
             Ent::Gen2::CineEventTestInput setCineEventTestInput();
             std::optional<Ent::Gen2::CineEventTestIsCanceled> CineEventTestIsCanceled();
             Ent::Gen2::CineEventTestIsCanceled setCineEventTestIsCanceled();
+            std::optional<Ent::Gen2::CineEventTriggerDisplayUIMessage> CineEventTriggerDisplayUIMessage();
+            Ent::Gen2::CineEventTriggerDisplayUIMessage setCineEventTriggerDisplayUIMessage();
             std::optional<Ent::Gen2::CineEventTriggerEventHandlerPost> CineEventTriggerEventHandlerPost();
             Ent::Gen2::CineEventTriggerEventHandlerPost setCineEventTriggerEventHandlerPost();
             std::optional<Ent::Gen2::CineEventTriggerGameStateChange> CineEventTriggerGameStateChange();
@@ -4682,6 +4837,8 @@ namespace Ent
             Ent::Gen2::EntityStateBackwardDodge setEntityStateBackwardDodge();
             std::optional<Ent::Gen2::EntityStateBeingBlockedByVine> EntityStateBeingBlockedByVine();
             Ent::Gen2::EntityStateBeingBlockedByVine setEntityStateBeingBlockedByVine();
+            std::optional<Ent::Gen2::EntityStateBeingInReeds> EntityStateBeingInReeds();
+            Ent::Gen2::EntityStateBeingInReeds setEntityStateBeingInReeds();
             std::optional<Ent::Gen2::EntityStateBeingOnSpike> EntityStateBeingOnSpike();
             Ent::Gen2::EntityStateBeingOnSpike setEntityStateBeingOnSpike();
             std::optional<Ent::Gen2::EntityStateBoidsHomePos> EntityStateBoidsHomePos();
@@ -4780,6 +4937,8 @@ namespace Ent
             Ent::Gen2::EntityStateForceCanBeTargeted setEntityStateForceCanBeTargeted();
             std::optional<Ent::Gen2::EntityStateGrab> EntityStateGrab();
             Ent::Gen2::EntityStateGrab setEntityStateGrab();
+            std::optional<Ent::Gen2::EntityStateGrabAttack> EntityStateGrabAttack();
+            Ent::Gen2::EntityStateGrabAttack setEntityStateGrabAttack();
             std::optional<Ent::Gen2::EntityStateGrabIn> EntityStateGrabIn();
             Ent::Gen2::EntityStateGrabIn setEntityStateGrabIn();
             std::optional<Ent::Gen2::EntityStateGrabOut> EntityStateGrabOut();
@@ -4816,10 +4975,14 @@ namespace Ent
             Ent::Gen2::EntityStateIncapacitated setEntityStateIncapacitated();
             std::optional<Ent::Gen2::EntityStateInconvertible> EntityStateInconvertible();
             Ent::Gen2::EntityStateInconvertible setEntityStateInconvertible();
+            std::optional<Ent::Gen2::EntityStateInjured> EntityStateInjured();
+            Ent::Gen2::EntityStateInjured setEntityStateInjured();
             std::optional<Ent::Gen2::EntityStateInteractedGPE> EntityStateInteractedGPE();
             Ent::Gen2::EntityStateInteractedGPE setEntityStateInteractedGPE();
             std::optional<Ent::Gen2::EntityStateJumpHeightMultiplier> EntityStateJumpHeightMultiplier();
             Ent::Gen2::EntityStateJumpHeightMultiplier setEntityStateJumpHeightMultiplier();
+            std::optional<Ent::Gen2::EntityStateJustStarted> EntityStateJustStarted();
+            Ent::Gen2::EntityStateJustStarted setEntityStateJustStarted();
             std::optional<Ent::Gen2::EntityStateLateralDodge> EntityStateLateralDodge();
             Ent::Gen2::EntityStateLateralDodge setEntityStateLateralDodge();
             std::optional<Ent::Gen2::EntityStateLateralLand> EntityStateLateralLand();
@@ -4884,6 +5047,8 @@ namespace Ent
             Ent::Gen2::EntityStateSlowMotion setEntityStateSlowMotion();
             std::optional<Ent::Gen2::EntityStateSnappedToHatchingTarget> EntityStateSnappedToHatchingTarget();
             Ent::Gen2::EntityStateSnappedToHatchingTarget setEntityStateSnappedToHatchingTarget();
+            std::optional<Ent::Gen2::EntityStateSoftCollide> EntityStateSoftCollide();
+            Ent::Gen2::EntityStateSoftCollide setEntityStateSoftCollide();
             std::optional<Ent::Gen2::EntityStateSpeedLimiter> EntityStateSpeedLimiter();
             Ent::Gen2::EntityStateSpeedLimiter setEntityStateSpeedLimiter();
             std::optional<Ent::Gen2::EntityStateSpiritAnimalBeingCalled> EntityStateSpiritAnimalBeingCalled();
@@ -4896,8 +5061,14 @@ namespace Ent
             Ent::Gen2::EntityStateSpiritAttack setEntityStateSpiritAttack();
             std::optional<Ent::Gen2::EntityStateSpiritAttacked> EntityStateSpiritAttacked();
             Ent::Gen2::EntityStateSpiritAttacked setEntityStateSpiritAttacked();
+            std::optional<Ent::Gen2::EntityStateSpiritShrineDisabled> EntityStateSpiritShrineDisabled();
+            Ent::Gen2::EntityStateSpiritShrineDisabled setEntityStateSpiritShrineDisabled();
+            std::optional<Ent::Gen2::EntityStateSpiritShrineEnabled> EntityStateSpiritShrineEnabled();
+            Ent::Gen2::EntityStateSpiritShrineEnabled setEntityStateSpiritShrineEnabled();
             std::optional<Ent::Gen2::EntityStateStaffOwnedVertebras> EntityStateStaffOwnedVertebras();
             Ent::Gen2::EntityStateStaffOwnedVertebras setEntityStateStaffOwnedVertebras();
+            std::optional<Ent::Gen2::EntityStateStaffVertebrasAutoRefill> EntityStateStaffVertebrasAutoRefill();
+            Ent::Gen2::EntityStateStaffVertebrasAutoRefill setEntityStateStaffVertebrasAutoRefill();
             std::optional<Ent::Gen2::EntityStateStalactiteFallen> EntityStateStalactiteFallen();
             Ent::Gen2::EntityStateStalactiteFallen setEntityStateStalactiteFallen();
             std::optional<Ent::Gen2::EntityStateStalactiteReadyToFall> EntityStateStalactiteReadyToFall();
@@ -5071,6 +5242,44 @@ namespace Ent
         {
             return static_cast<RegenFieldEnum>(details::indexInEnum(value, RegenField::enumToString));
         }
+
+        struct RegenAreaTransitionSettings : HelperObject<RegenAreaTransitionSettings> // Object
+        {
+            explicit RegenAreaTransitionSettings(Ent::Property _node): HelperObject<RegenAreaTransitionSettings>(std::move(_node)) {}
+            static constexpr char schemaName[] = "RegenAreaTransitionSettings";
+            static RegenAreaTransitionSettings load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return RegenAreaTransitionSettings(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static RegenAreaTransitionSettings loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return RegenAreaTransitionSettings(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static RegenAreaTransitionSettings create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return RegenAreaTransitionSettings(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            RegenAreaTransitionSettings makeInstanceOf()
+            {
+                return RegenAreaTransitionSettings(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ScaleConverter TransitionWaveRadialSpeed() const;
+            Ent::Gen2::Float TransitionWaveWidth() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct TransitionSettings : HelperObject<TransitionSettings> // Object
+        {
+            explicit TransitionSettings(Ent::Property _node): HelperObject<TransitionSettings>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::RegenAreaTransitionSettings val() const;
+        };
 
         struct ReflectionTools_EnumSchema : HelperObject<ReflectionTools_EnumSchema> // Object
         {
@@ -5487,6 +5696,7 @@ namespace Ent
                 return ReflectedMaterialGroup(getProperty().makeInstanceOf());
             }
             PrimArray<Ent::Gen2::String> Materials() const;
+            PrimArray<Ent::Gen2::String> Tags() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -5608,8 +5818,6 @@ namespace Ent
             Array<Ent::Gen2::ReflectedDetailMaterialVariants> Bank() const;
             PrimArray<Ent::Gen2::String> Filters() const;
             Ent::Gen2::ReflectedMaterialGroupVector Groups() const;
-            Ent::Gen2::Bool NeedMaterialGroupsTable() const;
-            Ent::Gen2::Bool RangeOverride() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -5639,11 +5847,11 @@ namespace Ent
             }
             Ent::Gen2::Float CreatureHeight() const;
             Ent::Gen2::Float CreatureRadius() const;
+            Ent::Gen2::String CreatureType() const;
             Ent::Gen2::Bool MarkWaterAreas() const;
             Ent::Gen2::Float MaxClimbHeight() const;
             Ent::Gen2::Float MaxWalkableSlopeAngle() const;
             Ent::Gen2::Float MinWaterDepth() const;
-            PrimArray<Ent::Gen2::String> SizeLayerMask() const;
             Ent::Gen2::Float VoxelPrecision() const;
             Ent::Gen2::String _comment() const;
         };
@@ -6230,6 +6438,7 @@ namespace Ent
                 "PhysicsGPE",
                 "Interactable",
                 "Creature",
+                "Debris",
                 "None",
                 "All",
                 "PHYSICLAYER_COUNT",
@@ -6246,6 +6455,38 @@ namespace Ent
         {
             return static_cast<PhysicsLayerEnum>(details::indexInEnum(value, PhysicsLayer::enumToString));
         }
+
+        struct PhysicsEffectsManager_PhysicsLimits : HelperObject<PhysicsEffectsManager_PhysicsLimits> // Object
+        {
+            explicit PhysicsEffectsManager_PhysicsLimits(Ent::Property _node): HelperObject<PhysicsEffectsManager_PhysicsLimits>(std::move(_node)) {}
+            static constexpr char schemaName[] = "PhysicsEffectsManager::PhysicsLimits";
+            static PhysicsEffectsManager_PhysicsLimits load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return PhysicsEffectsManager_PhysicsLimits(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static PhysicsEffectsManager_PhysicsLimits loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return PhysicsEffectsManager_PhysicsLimits(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static PhysicsEffectsManager_PhysicsLimits create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return PhysicsEffectsManager_PhysicsLimits(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            PhysicsEffectsManager_PhysicsLimits makeInstanceOf()
+            {
+                return PhysicsEffectsManager_PhysicsLimits(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Int AvgShapesPerRigidBody() const;
+            Ent::Gen2::Int MaxDynamicRigidBodies() const;
+            Ent::Gen2::Int MaxNonContactPairs() const;
+            Ent::Gen2::Int MaxStaticRigidBodies() const;
+            Ent::Gen2::Int MaxTriggerRigidBodies() const;
+            Ent::Gen2::String _comment() const;
+        };
 
         struct PerceiverComponentInput_usePerception : HelperObject<PerceiverComponentInput_usePerception> // Object
         {
@@ -6592,6 +6833,7 @@ namespace Ent
             static constexpr char schemaName[] = "NavMeshActionType";
             static constexpr char const* enumToString[] = {
                 "none",
+                "walk",
                 "jump",
                 "NavMeshActionType_COUNT",
             };
@@ -6700,89 +6942,6 @@ namespace Ent
             Ent::Gen2::String EventName() const;
             Ent::Gen2::String Name() const;
             Ent::Gen2::Int Weight() const;
-            Ent::Gen2::String _comment() const;
-        };
-
-        struct MoveTo : HelperObject<MoveTo> // Object
-        {
-            explicit MoveTo(Ent::Property _node): HelperObject<MoveTo>(std::move(_node)) {}
-            static constexpr char schemaName[] = "MoveTo";
-            static MoveTo load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return MoveTo(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static MoveTo loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return MoveTo(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static MoveTo create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return MoveTo(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            MoveTo makeInstanceOf()
-            {
-                return MoveTo(getProperty().makeInstanceOf());
-            }
-        
-        };
-
-        struct MoveToPosition : HelperObject<MoveToPosition> // Object
-        {
-            explicit MoveToPosition(Ent::Property _node): HelperObject<MoveToPosition>(std::move(_node)) {}
-            static constexpr char schemaName[] = "MoveToPosition";
-            static MoveToPosition load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return MoveToPosition(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static MoveToPosition loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return MoveToPosition(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static MoveToPosition create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return MoveToPosition(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            MoveToPosition makeInstanceOf()
-            {
-                return MoveToPosition(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::MoveTo Super() const;
-            Ent::Gen2::String _comment() const;
-        };
-
-        struct MoveToAlongSpline : HelperObject<MoveToAlongSpline> // Object
-        {
-            explicit MoveToAlongSpline(Ent::Property _node): HelperObject<MoveToAlongSpline>(std::move(_node)) {}
-            static constexpr char schemaName[] = "MoveToAlongSpline";
-            static MoveToAlongSpline load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return MoveToAlongSpline(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static MoveToAlongSpline loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return MoveToAlongSpline(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static MoveToAlongSpline create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return MoveToAlongSpline(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            MoveToAlongSpline makeInstanceOf()
-            {
-                return MoveToAlongSpline(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::MoveTo Super() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -7862,6 +8021,7 @@ namespace Ent
                 return PhysicsEffectsManager(getProperty().makeInstanceOf());
             }
             Ent::Gen2::Float GravityConstant() const;
+            Ent::Gen2::PhysicsEffectsManager_PhysicsLimits Limits() const;
             Array<Ent::Gen2::PhysicsMaterial> MaterialBank() const;
             Ent::Gen2::Manager Super() const;
             Ent::Gen2::String _comment() const;
@@ -7979,10 +8139,11 @@ namespace Ent
             }
             Ent::Gen2::Float NavMeshMaxHeight() const;
             Ent::Gen2::Float NavMeshMaxSize() const;
-            Ent::Gen2::RecastNavmeshGenerationParameters RecastParameters() const;
+            Ent::Gen2::Map<char const*, Ent::Gen2::RecastNavmeshGenerationParameters> RecastParameters() const;
             Ent::Gen2::Manager Super() const;
             Ent::Gen2::Float TileMargin() const;
             Ent::Gen2::Float TileSize() const;
+            Ent::Gen2::Float VerticalTolerance() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -8739,6 +8900,43 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct LightAttackData : HelperObject<LightAttackData> // Object
+        {
+            explicit LightAttackData(Ent::Property _node): HelperObject<LightAttackData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "LightAttackData";
+            static LightAttackData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return LightAttackData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static LightAttackData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return LightAttackData(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static LightAttackData create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return LightAttackData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            LightAttackData makeInstanceOf()
+            {
+                return LightAttackData(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ResponsiblePointer_ActorState_ LightAttackState() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct lightAttackData : HelperObject<lightAttackData> // Object
+        {
+            explicit lightAttackData(Ent::Property _node): HelperObject<lightAttackData>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::LightAttackData val() const;
+        };
+
         struct LedgePositionInfo : HelperObject<LedgePositionInfo> // Object
         {
             explicit LedgePositionInfo(Ent::Property _node): HelperObject<LedgePositionInfo>(std::move(_node)) {}
@@ -8773,6 +8971,15 @@ namespace Ent
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Bool engaged() const;
             Ent::Gen2::Float val() const;
+        };
+
+        struct IsActive : HelperObject<IsActive> // Object
+        {
+            explicit IsActive(Ent::Property _node): HelperObject<IsActive>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::Bool val() const;
         };
 
         struct Invincible : HelperObject<Invincible> // Object
@@ -8922,34 +9129,6 @@ namespace Ent
             
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Bool engaged() const;
-        };
-
-        struct InteractData : HelperObject<InteractData> // Object
-        {
-            explicit InteractData(Ent::Property _node): HelperObject<InteractData>(std::move(_node)) {}
-            static constexpr char schemaName[] = "InteractData";
-            static InteractData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return InteractData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static InteractData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return InteractData(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static InteractData create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return InteractData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            InteractData makeInstanceOf()
-            {
-                return InteractData(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::String _comment() const;
-            Ent::Gen2::Float distance() const;
         };
 
         struct InputCollisionBehaviorData : HelperObject<InputCollisionBehaviorData> // Object
@@ -9480,6 +9659,7 @@ namespace Ent
             }
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Float anticipationSpeedFactor() const;
+            Ent::Gen2::Float attackDamages() const;
             Ent::Gen2::Float deltaAngleMax() const;
             Ent::Gen2::Float distanceHysteris() const;
             Ent::Gen2::Float distanceMax() const;
@@ -9513,10 +9693,11 @@ namespace Ent
                 return GraspableInteractionData(getProperty().makeInstanceOf());
             }
             Ent::Gen2::String _comment() const;
+            Ent::Gen2::Float damageAccumulatedRequiredToIncapacitate() const;
+            Ent::Gen2::Float graspedDurationMax() const;
             Ent::Gen2::HotSpotType hotspotType() const;
             Ent::Gen2::ScaleConverter impactRetiming() const;
             Ent::Gen2::Float incapacitatedTime() const;
-            Ent::Gen2::Float interactDuration() const;
             Ent::Gen2::String interactableBoneName() const;
             Ent::Gen2::Float visualRotationRate() const;
         };
@@ -9598,11 +9779,40 @@ namespace Ent
             {
                 return ZoneStamper(getProperty().makeInstanceOf());
             }
-            Ent::Gen2::String ConvexZoneFilePath() const;
             Ent::Gen2::Float DownwardOffset() const;
             Ent::Gen2::NavMeshArea NavMeshArea() const;
+            Ent::Gen2::Int Priority() const;
+            Ent::Gen2::variant_ZoneCylinderShape_ZoneMeshShape_ Shape() const;
             Ent::Gen2::GeometryStamper Super() const;
             Ent::Gen2::Float UpwardOffset() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct SkinnedPhysMeshStamper : HelperObject<SkinnedPhysMeshStamper> // Object
+        {
+            explicit SkinnedPhysMeshStamper(Ent::Property _node): HelperObject<SkinnedPhysMeshStamper>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SkinnedPhysMeshStamper";
+            static SkinnedPhysMeshStamper load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return SkinnedPhysMeshStamper(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static SkinnedPhysMeshStamper loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return SkinnedPhysMeshStamper(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static SkinnedPhysMeshStamper create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return SkinnedPhysMeshStamper(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            SkinnedPhysMeshStamper makeInstanceOf()
+            {
+                return SkinnedPhysMeshStamper(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::GeometryStamper Super() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -9632,6 +9842,7 @@ namespace Ent
             }
             Ent::Gen2::String MeshFilePath() const;
             Ent::Gen2::GeometryStamper Super() const;
+            Ent::Gen2::Walkability Walkability() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -9777,6 +9988,40 @@ namespace Ent
                 return GameProfile(getProperty().makeInstanceOf());
             }
             Ent::Gen2::Map<char const*, Array<Array<Ent::Gen2::Tuple<Ent::Gen2::GameTimeInMs, Ent::Gen2::Float>>>> TypedScoreOverTimeList() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct GameSoftCollisionData : HelperObject<GameSoftCollisionData> // Object
+        {
+            explicit GameSoftCollisionData(Ent::Property _node): HelperObject<GameSoftCollisionData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "GameSoftCollisionData";
+            static GameSoftCollisionData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return GameSoftCollisionData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static GameSoftCollisionData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return GameSoftCollisionData(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static GameSoftCollisionData create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return GameSoftCollisionData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            GameSoftCollisionData makeInstanceOf()
+            {
+                return GameSoftCollisionData(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Float DecelerationFactor() const;
+            Ent::Gen2::Float InsidePenetrationCoeff() const;
+            Ent::Gen2::Float MaxSpeedFactor() const;
+            Ent::Gen2::Float MinSpeedFactor() const;
+            Ent::Gen2::SpeedMode MinSpeedMode() const;
+            Ent::Gen2::Float StuckDuration() const;
+            Ent::Gen2::Float StuckPenetrationCoeff() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -10469,6 +10714,35 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct GameEdgeData : HelperObject<GameEdgeData> // Object
+        {
+            explicit GameEdgeData(Ent::Property _node): HelperObject<GameEdgeData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "GameEdgeData";
+            static GameEdgeData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return GameEdgeData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static GameEdgeData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return GameEdgeData(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static GameEdgeData create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return GameEdgeData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            GameEdgeData makeInstanceOf()
+            {
+                return GameEdgeData(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Float EdgeAngleMax() const;
+            Ent::Gen2::Float EdgeSizeMin() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct GameDeathData : HelperObject<GameDeathData> // Object
         {
             explicit GameDeathData(Ent::Property _node): HelperObject<GameDeathData>(std::move(_node)) {}
@@ -10708,11 +10982,17 @@ namespace Ent
             {
                 return FurProperties(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::Float AngularShift() const;
+            Ent::Gen2::Float AzimuthalRoughness() const;
             Ent::Gen2::Float FinsMaskUScale() const;
             Ent::Gen2::Int FinsTextureArrayIndex() const;
+            Ent::Gen2::Float MultiScatteringPower() const;
+            Ent::Gen2::Float MultiScatteringWrap() const;
             Ent::Gen2::Float Roughness() const;
+            Ent::Gen2::Vector3 SpecularFactor() const;
             Ent::Gen2::Float Stiffness() const;
             Ent::Gen2::Float Thickness() const;
+            Ent::Gen2::Bool UseNewLighting() const;
             Ent::Gen2::Float Weight() const;
             Ent::Gen2::String _comment() const;
         };
@@ -11468,6 +11748,7 @@ namespace Ent
             }
             Ent::Gen2::Float DistanceMaxFromCamera() const;
             Ent::Gen2::Float DistanceMaxFromSpawner() const;
+            Ent::Gen2::Float SafeDistanceAroundPlayer() const;
             Ent::Gen2::EntityRef SpawnerEntityRef() const;
             Ent::Gen2::Float UnspawnDelay() const;
             Ent::Gen2::Float UnspawnRadius() const;
@@ -11853,6 +12134,7 @@ namespace Ent
             Ent::Gen2::Float DefaultLostRatio() const;
             Ent::Gen2::Float DefaultMaxLossPerSecond() const;
             Ent::Gen2::Float DefaultMaxTransmissionPerSecond() const;
+            Ent::Gen2::RegenAreaTransitionSettings DefaultTransitionWaveSettings() const;
             Ent::Gen2::Float DefaultTransmittedRatio() const;
             Ent::Gen2::Map<EnergyIntensityEnum, Ent::Gen2::RegenerationManager_EnergyAreaSetting> EnergyAreaSettingsMap() const;
             Ent::Gen2::Float EnergyMaxValue() const;
@@ -11862,6 +12144,9 @@ namespace Ent
             Ent::Gen2::Float InjectedEvaporationMultiplier() const;
             Ent::Gen2::Int MaxDispatchedRegenQueries() const;
             Ent::Gen2::Int MaxDynamicRegenEffectCount() const;
+            Ent::Gen2::Int MaxRegenAreaPerCluster() const;
+            Ent::Gen2::Int RegenAreaClusterWorldSize() const;
+            Ent::Gen2::Bool RegenAreaClustering() const;
             Ent::Gen2::Manager Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -11895,6 +12180,15 @@ namespace Ent
             Ent::Gen2::Int Priority() const;
             Ent::Gen2::variant_MeshShape_ShapeSphere_ShapeBox_ Shape() const;
             Ent::Gen2::String _comment() const;
+        };
+
+        struct EndPosition : HelperObject<EndPosition> // Object
+        {
+            explicit EndPosition(Ent::Property _node): HelperObject<EndPosition>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::Position val() const;
         };
 
         struct Enabled : HelperObject<Enabled> // Object
@@ -12059,6 +12353,7 @@ namespace Ent
             Ent::Gen2::Bool DisplayAutonomousSound() const;
             Ent::Gen2::Bool DisplayAutonomousUnlocked() const;
             Ent::Gen2::Bool DisplayBehavior() const;
+            Ent::Gen2::Bool DisplayBlendShapeDebug() const;
             Ent::Gen2::Bool DisplayBrainMonitor() const;
             Ent::Gen2::Bool DisplayCPU() const;
             Ent::Gen2::Bool DisplayCompass() const;
@@ -12113,8 +12408,6 @@ namespace Ent
             Ent::Gen2::Bool DisplayRPCCalls() const;
             Ent::Gen2::Bool DisplayReloadNotifications() const;
             Ent::Gen2::Bool DisplaySelectedPestoEntity() const;
-            Ent::Gen2::Bool DisplaySplinePilot() const;
-            Ent::Gen2::Bool DisplaySplinePilotTool() const;
             Ent::Gen2::Bool DisplayStringHashTranslator() const;
             Ent::Gen2::Bool DisplayTimer() const;
             Ent::Gen2::Bool DisplayTreesStates() const;
@@ -12318,7 +12611,6 @@ namespace Ent
             }
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Int dangerousness() const;
-            Ent::Gen2::Float multiplierWhenInjured() const;
         };
 
         struct ConstrainedMoveContextInput : HelperObject<ConstrainedMoveContextInput> // Object
@@ -12614,29 +12906,29 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
-        struct StrongAttackComponentInput : HelperObject<StrongAttackComponentInput> // Object
+        struct SpiritAnimalShrineComponentInput : HelperObject<SpiritAnimalShrineComponentInput> // Object
         {
-            explicit StrongAttackComponentInput(Ent::Property _node): HelperObject<StrongAttackComponentInput>(std::move(_node)) {}
-            static constexpr char schemaName[] = "StrongAttackComponentInput";
-            static StrongAttackComponentInput load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            explicit SpiritAnimalShrineComponentInput(Ent::Property _node): HelperObject<SpiritAnimalShrineComponentInput>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SpiritAnimalShrineComponentInput";
+            static SpiritAnimalShrineComponentInput load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
-                return StrongAttackComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+                return SpiritAnimalShrineComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
             }
-            static StrongAttackComponentInput loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static SpiritAnimalShrineComponentInput loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 auto& storage = _entlib.createTempJsonFile();
                 storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return StrongAttackComponentInput(Ent::Property(
+                return SpiritAnimalShrineComponentInput(Ent::Property(
                     &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
             }
-            static StrongAttackComponentInput create(Ent::EntityLib& _entlib)
+            static SpiritAnimalShrineComponentInput create(Ent::EntityLib& _entlib)
             {
                 auto& storage = _entlib.createTempJsonFile();
-                return StrongAttackComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+                return SpiritAnimalShrineComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
             }
-            StrongAttackComponentInput makeInstanceOf()
+            SpiritAnimalShrineComponentInput makeInstanceOf()
             {
-                return StrongAttackComponentInput(getProperty().makeInstanceOf());
+                return SpiritAnimalShrineComponentInput(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ComponentInput Super() const;
             Ent::Gen2::String _comment() const;
@@ -12671,6 +12963,34 @@ namespace Ent
             Ent::Gen2::computePitchAngle computePitchAngle() const;
         };
 
+        struct SoftCollisionComponentInput : HelperObject<SoftCollisionComponentInput> // Object
+        {
+            explicit SoftCollisionComponentInput(Ent::Property _node): HelperObject<SoftCollisionComponentInput>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SoftCollisionComponentInput";
+            static SoftCollisionComponentInput load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return SoftCollisionComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static SoftCollisionComponentInput loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return SoftCollisionComponentInput(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static SoftCollisionComponentInput create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return SoftCollisionComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            SoftCollisionComponentInput makeInstanceOf()
+            {
+                return SoftCollisionComponentInput(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ComponentInput Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct SmoothScaleComponentInput : HelperObject<SmoothScaleComponentInput> // Object
         {
             explicit SmoothScaleComponentInput(Ent::Property _node): HelperObject<SmoothScaleComponentInput>(std::move(_node)) {}
@@ -12697,6 +13017,34 @@ namespace Ent
             }
             Ent::Gen2::Parameters Parameters() const;
             Ent::Gen2::ScaleFactor ScaleFactor() const;
+            Ent::Gen2::ComponentInput Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct ScriptComponentInput : HelperObject<ScriptComponentInput> // Object
+        {
+            explicit ScriptComponentInput(Ent::Property _node): HelperObject<ScriptComponentInput>(std::move(_node)) {}
+            static constexpr char schemaName[] = "ScriptComponentInput";
+            static ScriptComponentInput load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return ScriptComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static ScriptComponentInput loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return ScriptComponentInput(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static ScriptComponentInput create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return ScriptComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            ScriptComponentInput makeInstanceOf()
+            {
+                return ScriptComponentInput(getProperty().makeInstanceOf());
+            }
             Ent::Gen2::ComponentInput Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -12753,6 +13101,34 @@ namespace Ent
             RespawnabilityComponentInput makeInstanceOf()
             {
                 return RespawnabilityComponentInput(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ComponentInput Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct RagdollComponentInput : HelperObject<RagdollComponentInput> // Object
+        {
+            explicit RagdollComponentInput(Ent::Property _node): HelperObject<RagdollComponentInput>(std::move(_node)) {}
+            static constexpr char schemaName[] = "RagdollComponentInput";
+            static RagdollComponentInput load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return RagdollComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static RagdollComponentInput loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return RagdollComponentInput(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static RagdollComponentInput create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return RagdollComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            RagdollComponentInput makeInstanceOf()
+            {
+                return RagdollComponentInput(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ComponentInput Super() const;
             Ent::Gen2::String _comment() const;
@@ -12963,6 +13339,36 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct InteractorComponentInput : HelperObject<InteractorComponentInput> // Object
+        {
+            explicit InteractorComponentInput(Ent::Property _node): HelperObject<InteractorComponentInput>(std::move(_node)) {}
+            static constexpr char schemaName[] = "InteractorComponentInput";
+            static InteractorComponentInput load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return InteractorComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static InteractorComponentInput loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return InteractorComponentInput(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static InteractorComponentInput create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return InteractorComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            InteractorComponentInput makeInstanceOf()
+            {
+                return InteractorComponentInput(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::EndPosition EndPosition() const;
+            Ent::Gen2::IsActive IsActive() const;
+            Ent::Gen2::ComponentInput Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct InteractableGPEComponentInput : HelperObject<InteractableGPEComponentInput> // Object
         {
             explicit InteractableGPEComponentInput(Ent::Property _node): HelperObject<InteractableGPEComponentInput>(std::move(_node)) {}
@@ -13135,6 +13541,7 @@ namespace Ent
             }
             Ent::Gen2::ComponentInput Super() const;
             Ent::Gen2::String _comment() const;
+            Ent::Gen2::resetCreatureRequest resetCreatureRequest() const;
             Ent::Gen2::usePerception usePerception() const;
         };
 
@@ -13220,6 +13627,8 @@ namespace Ent
                 return CharacterControllerComponentInput(getProperty().makeInstanceOf());
             }
             Ent::Gen2::JumpHeightMultiplier JumpHeightMultiplier() const;
+            Ent::Gen2::RigidbodyScaleMultiplier RigidbodyScaleMultiplier() const;
+            Ent::Gen2::RigidbodyScalingSpeed RigidbodyScalingSpeed() const;
             Ent::Gen2::ComponentInput Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -13303,6 +13712,34 @@ namespace Ent
             AttackTriggerComponentInput makeInstanceOf()
             {
                 return AttackTriggerComponentInput(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ComponentInput Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct AttackComponentInput : HelperObject<AttackComponentInput> // Object
+        {
+            explicit AttackComponentInput(Ent::Property _node): HelperObject<AttackComponentInput>(std::move(_node)) {}
+            static constexpr char schemaName[] = "AttackComponentInput";
+            static AttackComponentInput load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return AttackComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static AttackComponentInput loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return AttackComponentInput(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static AttackComponentInput create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return AttackComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            AttackComponentInput makeInstanceOf()
+            {
+                return AttackComponentInput(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ComponentInput Super() const;
             Ent::Gen2::String _comment() const;
@@ -13567,6 +14004,7 @@ namespace Ent
             Ent::Gen2::Bool AlwaysStatic() const;
             Ent::Gen2::Bool EDITOR_GenerateFur() const;
             Array<Ent::Gen2::EDITOR_LODsItem> EDITOR_LODs() const;
+            Ent::Gen2::String MaterialGroup() const;
             Ent::Gen2::Float RUNTIME_LODScale() const;
             Array<Ent::Gen2::RUNTIME_LODsItem> RUNTIME_LODs() const;
             Ent::Gen2::ComponentGD Super() const;
@@ -14194,9 +14632,12 @@ namespace Ent
             {
                 return StaffVertebrasGD(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::Int BeginVertebraRefillThreshold() const;
+            Ent::Gen2::Int EndVertebraRefillThreshold() const;
             PrimArray<Ent::Gen2::String> HotspotNames() const;
             Ent::Gen2::Int MaxVertebraCount() const;
             Ent::Gen2::Int OwnedVertebraStartCount() const;
+            Ent::Gen2::Float RefillVertebraTimer() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::String VertebraGRCPath1() const;
             Ent::Gen2::String VertebraGRCPath2() const;
@@ -14258,6 +14699,7 @@ namespace Ent
             {
                 return SpiritAnimalShrineGD(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::Float InteractionDuration() const;
             Ent::Gen2::Specie Specie() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::Float TimeHysteresis() const;
@@ -14410,6 +14852,36 @@ namespace Ent
             Ent::Gen2::Int SlotCount() const;
             Ent::Gen2::Specie Specie() const;
             Ent::Gen2::ComponentGD Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct SoftCollisionGD : HelperObject<SoftCollisionGD> // Object
+        {
+            explicit SoftCollisionGD(Ent::Property _node): HelperObject<SoftCollisionGD>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SoftCollisionGD";
+            static SoftCollisionGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return SoftCollisionGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static SoftCollisionGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return SoftCollisionGD(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static SoftCollisionGD create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return SoftCollisionGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            SoftCollisionGD makeInstanceOf()
+            {
+                return SoftCollisionGD(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Float PenetrationCoeffSmoothRate() const;
+            Ent::Gen2::ComponentGD Super() const;
+            Ent::Gen2::SoftCollisionGD_VegetationDetectionParameters VegetationDetectionParam() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -15215,6 +15687,7 @@ namespace Ent
             Ent::Gen2::String NavMeshStamper() const;
             Ent::Gen2::Vector3 Offset() const;
             Ent::Gen2::Vector3 OffsetRotation() const;
+            Ent::Gen2::Bool OneWayBodiesDriveTransform() const;
             Ent::Gen2::String PhysicsMaterial() const;
             Ent::Gen2::PrimitiveColliderType PrimitiveCollider() const;
             PrimArray<Ent::Gen2::Size> PrimitiveColliderSizeLayerMask() const;
@@ -15332,39 +15805,6 @@ namespace Ent
             Ent::Gen2::SoundEmissionStrength m_soundRun() const;
             Ent::Gen2::SoundEmissionStrength m_soundWalk() const;
             PrimArray<Ent::Gen2::String> m_tags() const;
-        };
-
-        struct PathFinderGD : HelperObject<PathFinderGD> // Object
-        {
-            explicit PathFinderGD(Ent::Property _node): HelperObject<PathFinderGD>(std::move(_node)) {}
-            static constexpr char schemaName[] = "PathFinderGD";
-            static PathFinderGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return PathFinderGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static PathFinderGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return PathFinderGD(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static PathFinderGD create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return PathFinderGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            PathFinderGD makeInstanceOf()
-            {
-                return PathFinderGD(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::Float GroundAreaCost() const;
-            Ent::Gen2::Bool MovesInWater() const;
-            Ent::Gen2::Bool MovesOnGround() const;
-            Ent::Gen2::Size Size() const;
-            Ent::Gen2::ComponentGD Super() const;
-            Ent::Gen2::Float WaterAreaCost() const;
-            Ent::Gen2::String _comment() const;
         };
 
         struct OutfitWearerGD : HelperObject<OutfitWearerGD> // Object
@@ -15579,8 +16019,10 @@ namespace Ent
             {
                 return NavMeshStamperGD(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::Bool IsActive() const;
             Array<Ent::Gen2::MeshStamper> MeshStampers() const;
             Array<Ent::Gen2::OffMeshLink> OffMeshLinks() const;
+            Array<Ent::Gen2::SkinnedPhysMeshStamper> SkinnedMeshStampers() const;
             Ent::Gen2::ComponentGD Super() const;
             Array<Ent::Gen2::ZoneStamper> ZoneStampers() const;
             Ent::Gen2::String _comment() const;
@@ -15877,7 +16319,7 @@ namespace Ent
             Ent::Gen2::Float DamagesRecoverSpeed() const;
             Ent::Gen2::Float DamagesShield() const;
             Ent::Gen2::Float DeathThreshold() const;
-            Ent::Gen2::Float InjuredDamagesRatio() const;
+            Ent::Gen2::Float InjuredDamagesThreshold() const;
             Ent::Gen2::Float MinLifeWhenSpending() const;
             Ent::Gen2::Bool ShouldCrashWhenFlyingInjured() const;
             Ent::Gen2::ComponentGD Super() const;
@@ -16095,6 +16537,7 @@ namespace Ent
             PrimArray<Ent::Gen2::HitStyle> HitStyleTriggers() const;
             Ent::Gen2::ScaleConverter ImpactMultiplierCurve() const;
             Ent::Gen2::ScaleConverter IncapacitateTimeCurve() const;
+            Ent::Gen2::ScaleConverter IncapacitateTimeMultiplierCurve() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -16945,8 +17388,8 @@ namespace Ent
             }
             Array<Ent::Gen2::EnergyPoolGD_EnergyArea> EnergyAreas() const;
             Ent::Gen2::Bool FactionOverride() const;
-            PrimArray<Ent::Gen2::String> RegenEffectsOnConversion() const;
             Ent::Gen2::ComponentGD Super() const;
+            Ent::Gen2::TransitionSettings TransitionSettings() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -17476,14 +17919,16 @@ namespace Ent
             {
                 return BreakableGD(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::EntityRef AssemblyEntity() const;
             Ent::Gen2::String BreakSoundBank() const;
             Ent::Gen2::String BreakSoundEvent() const;
+            Ent::Gen2::EntityRef ChildEntity() const;
             Ent::Gen2::Float FadeoutDuration() const;
             Ent::Gen2::String GameEffectOnBreaking() const;
             Ent::Gen2::Float MaxContactAngle() const;
-            Ent::Gen2::EntityRef ParentEntity() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::Float TimeBeforeFade() const;
+            Ent::Gen2::EntityRef UnbrokenEntity() const;
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Bool isBreakableWithAttack() const;
         };
@@ -17513,39 +17958,6 @@ namespace Ent
                 return BittenGD(getProperty().makeInstanceOf());
             }
             Ent::Gen2::Float MaxAngle() const;
-            Ent::Gen2::ComponentGD Super() const;
-            Ent::Gen2::String _comment() const;
-        };
-
-        struct BeamGeneratorGD : HelperObject<BeamGeneratorGD> // Object
-        {
-            explicit BeamGeneratorGD(Ent::Property _node): HelperObject<BeamGeneratorGD>(std::move(_node)) {}
-            static constexpr char schemaName[] = "BeamGeneratorGD";
-            static BeamGeneratorGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return BeamGeneratorGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static BeamGeneratorGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return BeamGeneratorGD(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static BeamGeneratorGD create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return BeamGeneratorGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            BeamGeneratorGD makeInstanceOf()
-            {
-                return BeamGeneratorGD(getProperty().makeInstanceOf());
-            }
-            PrimArray<Ent::Gen2::String> BonesStartPoints() const;
-            Ent::Gen2::Float ExtraDistanceBeyondTarget() const;
-            Ent::Gen2::Float LengthDuration() const;
-            Ent::Gen2::String PathBeamEffect() const;
-            Ent::Gen2::Int PointsPerBeam() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -17790,10 +18202,10 @@ namespace Ent
             Ent::Gen2::AnimationTreeConstraintsGD setAnimationTreeConstraintsGD();
             std::optional<Ent::Gen2::AssemblyGD> AssemblyGD();
             Ent::Gen2::AssemblyGD setAssemblyGD();
+            std::optional<Ent::Gen2::AttackComponentGD> AttackComponentGD();
+            Ent::Gen2::AttackComponentGD setAttackComponentGD();
             std::optional<Ent::Gen2::AttackTriggerGD> AttackTriggerGD();
             Ent::Gen2::AttackTriggerGD setAttackTriggerGD();
-            std::optional<Ent::Gen2::BeamGeneratorGD> BeamGeneratorGD();
-            Ent::Gen2::BeamGeneratorGD setBeamGeneratorGD();
             std::optional<Ent::Gen2::BeamTargetGD> BeamTargetGD();
             Ent::Gen2::BeamTargetGD setBeamTargetGD();
             std::optional<Ent::Gen2::BittenGD> BittenGD();
@@ -17912,6 +18324,8 @@ namespace Ent
             Ent::Gen2::InfoboardRegistererGD setInfoboardRegistererGD();
             std::optional<Ent::Gen2::InteractableGPEGD> InteractableGPEGD();
             Ent::Gen2::InteractableGPEGD setInteractableGPEGD();
+            std::optional<Ent::Gen2::InteractorGD> InteractorGD();
+            Ent::Gen2::InteractorGD setInteractorGD();
             std::optional<Ent::Gen2::InterestPointGD> InterestPointGD();
             Ent::Gen2::InterestPointGD setInterestPointGD();
             std::optional<Ent::Gen2::InventoryGD> InventoryGD();
@@ -18018,6 +18432,8 @@ namespace Ent
             Ent::Gen2::SideMapGateGD setSideMapGateGD();
             std::optional<Ent::Gen2::SmoothScaleComponentGD> SmoothScaleComponentGD();
             Ent::Gen2::SmoothScaleComponentGD setSmoothScaleComponentGD();
+            std::optional<Ent::Gen2::SoftCollisionGD> SoftCollisionGD();
+            Ent::Gen2::SoftCollisionGD setSoftCollisionGD();
             std::optional<Ent::Gen2::SoulRespawnOpportunityGD> SoulRespawnOpportunityGD();
             Ent::Gen2::SoulRespawnOpportunityGD setSoulRespawnOpportunityGD();
             std::optional<Ent::Gen2::SoundAreaGD> SoundAreaGD();
@@ -18036,8 +18452,6 @@ namespace Ent
             Ent::Gen2::StaticObjectGD setStaticObjectGD();
             std::optional<Ent::Gen2::StickToTerrain> StickToTerrain();
             Ent::Gen2::StickToTerrain setStickToTerrain();
-            std::optional<Ent::Gen2::StrongAttackGD> StrongAttackGD();
-            Ent::Gen2::StrongAttackGD setStrongAttackGD();
             std::optional<Ent::Gen2::SubScene> SubScene();
             Ent::Gen2::SubScene setSubScene();
             std::optional<Ent::Gen2::SubSceneContainerGD> SubSceneContainerGD();
@@ -18138,12 +18552,12 @@ namespace Ent
             std::optional<Ent::Gen2::AssemblyGD> AssemblyGD();
             Ent::Gen2::AssemblyGD addAssemblyGD();
             void removeAssemblyGD();
+            std::optional<Ent::Gen2::AttackComponentGD> AttackComponentGD();
+            Ent::Gen2::AttackComponentGD addAttackComponentGD();
+            void removeAttackComponentGD();
             std::optional<Ent::Gen2::AttackTriggerGD> AttackTriggerGD();
             Ent::Gen2::AttackTriggerGD addAttackTriggerGD();
             void removeAttackTriggerGD();
-            std::optional<Ent::Gen2::BeamGeneratorGD> BeamGeneratorGD();
-            Ent::Gen2::BeamGeneratorGD addBeamGeneratorGD();
-            void removeBeamGeneratorGD();
             std::optional<Ent::Gen2::BeamTargetGD> BeamTargetGD();
             Ent::Gen2::BeamTargetGD addBeamTargetGD();
             void removeBeamTargetGD();
@@ -18321,6 +18735,9 @@ namespace Ent
             std::optional<Ent::Gen2::InteractableGPEGD> InteractableGPEGD();
             Ent::Gen2::InteractableGPEGD addInteractableGPEGD();
             void removeInteractableGPEGD();
+            std::optional<Ent::Gen2::InteractorGD> InteractorGD();
+            Ent::Gen2::InteractorGD addInteractorGD();
+            void removeInteractorGD();
             std::optional<Ent::Gen2::InterestPointGD> InterestPointGD();
             Ent::Gen2::InterestPointGD addInterestPointGD();
             void removeInterestPointGD();
@@ -18480,6 +18897,9 @@ namespace Ent
             std::optional<Ent::Gen2::SmoothScaleComponentGD> SmoothScaleComponentGD();
             Ent::Gen2::SmoothScaleComponentGD addSmoothScaleComponentGD();
             void removeSmoothScaleComponentGD();
+            std::optional<Ent::Gen2::SoftCollisionGD> SoftCollisionGD();
+            Ent::Gen2::SoftCollisionGD addSoftCollisionGD();
+            void removeSoftCollisionGD();
             std::optional<Ent::Gen2::SoulRespawnOpportunityGD> SoulRespawnOpportunityGD();
             Ent::Gen2::SoulRespawnOpportunityGD addSoulRespawnOpportunityGD();
             void removeSoulRespawnOpportunityGD();
@@ -18507,9 +18927,6 @@ namespace Ent
             std::optional<Ent::Gen2::StickToTerrain> StickToTerrain();
             Ent::Gen2::StickToTerrain addStickToTerrain();
             void removeStickToTerrain();
-            std::optional<Ent::Gen2::StrongAttackGD> StrongAttackGD();
-            Ent::Gen2::StrongAttackGD addStrongAttackGD();
-            void removeStrongAttackGD();
             std::optional<Ent::Gen2::SubScene> SubScene();
             Ent::Gen2::SubScene addSubScene();
             void removeSubScene();
@@ -18645,8 +19062,12 @@ namespace Ent
             {
                 return WindTurbulenceEffect(getProperty().makeInstanceOf());
             }
-            Ent::Gen2::Float Strength() const;
+            Ent::Gen2::Float BendStrength() const;
+            Ent::Gen2::Float GlobalStrength() const;
             Ent::Gen2::GameEffect Super() const;
+            Ent::Gen2::Float TurbulenceStrength() const;
+            Ent::Gen2::Bool UseGlobalStrength() const;
+            Ent::Gen2::Float WindShakeStrength() const;
             Ent::Gen2::WindTurbulenceType WindTurbulenceType() const;
             Ent::Gen2::String _comment() const;
         };
@@ -18705,6 +19126,7 @@ namespace Ent
             {
                 return RepulseEffect(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::Bool ApplyOnTrees() const;
             Ent::Gen2::Float DistanceAttenuation() const;
             Ent::Gen2::Float Strength() const;
             Ent::Gen2::GameEffect Super() const;
@@ -18954,12 +19376,12 @@ namespace Ent
             std::optional<Ent::Gen2::AssemblyGD> AssemblyGD();
             Ent::Gen2::AssemblyGD addAssemblyGD();
             void removeAssemblyGD();
+            std::optional<Ent::Gen2::AttackComponentGD> AttackComponentGD();
+            Ent::Gen2::AttackComponentGD addAttackComponentGD();
+            void removeAttackComponentGD();
             std::optional<Ent::Gen2::AttackTriggerGD> AttackTriggerGD();
             Ent::Gen2::AttackTriggerGD addAttackTriggerGD();
             void removeAttackTriggerGD();
-            std::optional<Ent::Gen2::BeamGeneratorGD> BeamGeneratorGD();
-            Ent::Gen2::BeamGeneratorGD addBeamGeneratorGD();
-            void removeBeamGeneratorGD();
             std::optional<Ent::Gen2::BeamTargetGD> BeamTargetGD();
             Ent::Gen2::BeamTargetGD addBeamTargetGD();
             void removeBeamTargetGD();
@@ -19137,6 +19559,9 @@ namespace Ent
             std::optional<Ent::Gen2::InteractableGPEGD> InteractableGPEGD();
             Ent::Gen2::InteractableGPEGD addInteractableGPEGD();
             void removeInteractableGPEGD();
+            std::optional<Ent::Gen2::InteractorGD> InteractorGD();
+            Ent::Gen2::InteractorGD addInteractorGD();
+            void removeInteractorGD();
             std::optional<Ent::Gen2::InterestPointGD> InterestPointGD();
             Ent::Gen2::InterestPointGD addInterestPointGD();
             void removeInterestPointGD();
@@ -19296,6 +19721,9 @@ namespace Ent
             std::optional<Ent::Gen2::SmoothScaleComponentGD> SmoothScaleComponentGD();
             Ent::Gen2::SmoothScaleComponentGD addSmoothScaleComponentGD();
             void removeSmoothScaleComponentGD();
+            std::optional<Ent::Gen2::SoftCollisionGD> SoftCollisionGD();
+            Ent::Gen2::SoftCollisionGD addSoftCollisionGD();
+            void removeSoftCollisionGD();
             std::optional<Ent::Gen2::SoulRespawnOpportunityGD> SoulRespawnOpportunityGD();
             Ent::Gen2::SoulRespawnOpportunityGD addSoulRespawnOpportunityGD();
             void removeSoulRespawnOpportunityGD();
@@ -19323,9 +19751,6 @@ namespace Ent
             std::optional<Ent::Gen2::StickToTerrain> StickToTerrain();
             Ent::Gen2::StickToTerrain addStickToTerrain();
             void removeStickToTerrain();
-            std::optional<Ent::Gen2::StrongAttackGD> StrongAttackGD();
-            Ent::Gen2::StrongAttackGD addStrongAttackGD();
-            void removeStrongAttackGD();
             std::optional<Ent::Gen2::SubScene> SubScene();
             Ent::Gen2::SubScene addSubScene();
             void removeSubScene();
@@ -19532,6 +19957,7 @@ namespace Ent
             Ent::Gen2::String RTPC_3DFrontBack() const;
             Ent::Gen2::String RTPC_3DLeftRight() const;
             Ent::Gen2::String RTPC_AbsoluteHeight() const;
+            Ent::Gen2::String RTPC_AmbSDFDistance() const;
             Ent::Gen2::String RTPC_AmbientRegenLevel() const;
             Ent::Gen2::String RTPC_AngleToListener() const;
             Ent::Gen2::String RTPC_BoidLeavesCount() const;
@@ -19718,7 +20144,6 @@ namespace Ent
             Ent::Gen2::Bool CastShadow() const;
             Ent::Gen2::Color Color() const;
             Ent::Gen2::Vector3 Direction() const;
-            Ent::Gen2::Bool Enabled() const;
             Ent::Gen2::Float LinearAttenuationStart() const;
             Ent::Gen2::Float LinearAttenuationStop() const;
             Ent::Gen2::Vector3 Offset() const;
@@ -20403,6 +20828,35 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct CineEventTriggerDisplayUIMessage : HelperObject<CineEventTriggerDisplayUIMessage> // Object
+        {
+            explicit CineEventTriggerDisplayUIMessage(Ent::Property _node): HelperObject<CineEventTriggerDisplayUIMessage>(std::move(_node)) {}
+            static constexpr char schemaName[] = "CineEventTriggerDisplayUIMessage";
+            static CineEventTriggerDisplayUIMessage load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return CineEventTriggerDisplayUIMessage(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static CineEventTriggerDisplayUIMessage loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return CineEventTriggerDisplayUIMessage(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static CineEventTriggerDisplayUIMessage create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return CineEventTriggerDisplayUIMessage(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            CineEventTriggerDisplayUIMessage makeInstanceOf()
+            {
+                return CineEventTriggerDisplayUIMessage(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::CineEventTrigger Super() const;
+            Ent::Gen2::UIMessage UIMessage() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct CineEventTest : HelperObject<CineEventTest> // Object
         {
             explicit CineEventTest(Ent::Property _node): HelperObject<CineEventTest>(std::move(_node)) {}
@@ -20768,6 +21222,7 @@ namespace Ent
                 "OnBones",
                 "TopView",
                 "EntitySwap",
+                "SightConstraint",
                 "Locked",
                 "Pan",
                 "CameraType_COUNT",
@@ -21030,6 +21485,50 @@ namespace Ent
             Ent::Gen2::Float SpeedHorizontal() const;
             Ent::Gen2::Float SpeedVertical() const;
             Ent::Gen2::Manager Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct BoneStartPoint : HelperObject<BoneStartPoint> // Object
+        {
+            explicit BoneStartPoint(Ent::Property _node): HelperObject<BoneStartPoint>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::String val() const;
+        };
+
+        struct InteractorGD : HelperObject<InteractorGD> // Object
+        {
+            explicit InteractorGD(Ent::Property _node): HelperObject<InteractorGD>(std::move(_node)) {}
+            static constexpr char schemaName[] = "InteractorGD";
+            static InteractorGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return InteractorGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static InteractorGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return InteractorGD(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static InteractorGD create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return InteractorGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            InteractorGD makeInstanceOf()
+            {
+                return InteractorGD(getProperty().makeInstanceOf());
+            }
+            PrimArray<Ent::Gen2::String> BeamEffectsNames() const;
+            Ent::Gen2::BoneStartPoint BoneStartPoint() const;
+            Ent::Gen2::Float MaxBeamRange() const;
+            Ent::Gen2::Float RandomSphereCastsAngle() const;
+            Ent::Gen2::Int RandomSphereCastsNb() const;
+            Ent::Gen2::Float RememberTargetMaxTime() const;
+            Ent::Gen2::Float SphereCastRadius() const;
+            Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -21624,13 +22123,12 @@ namespace Ent
                 "Searching",
                 "Creature",
                 "InteractingGPE",
-                "Shapeshifting",
                 "Item",
-                "UpgradeStaff",
                 "PickUp",
                 "Hatching",
                 "SetRespawnPlaceAsCheckpoint",
                 "SetSavePoint",
+                "EnableSpiritShrine",
                 "Any",
                 "BeamStaffMode_COUNT",
             };
@@ -21671,14 +22169,11 @@ namespace Ent
             {
                 return BeamTargetGD(getProperty().makeInstanceOf());
             }
-            Ent::Gen2::Bool CheckHotspotOrientation() const;
             Ent::Gen2::String EventTriggered() const;
             Ent::Gen2::HotSpotType HotspotType() const;
-            Ent::Gen2::Bool IsCollectable() const;
-            Ent::Gen2::Bool Levitate() const;
-            Ent::Gen2::Float MaxTargetableDistance() const;
+            Ent::Gen2::Float InteractMaxDistance() const;
+            Ent::Gen2::Float InteractionRadius() const;
             Ent::Gen2::BeamStaffMode Mode() const;
-            Ent::Gen2::Bool SpendEnergy() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -21815,6 +22310,7 @@ namespace Ent
                 "JumpOnto",
                 "Bite",
                 "Stomp",
+                "Dive",
                 "AttackType_COUNT",
             };
         };
@@ -21829,6 +22325,67 @@ namespace Ent
         {
             return static_cast<AttackTypeEnum>(details::indexInEnum(value, AttackType::enumToString));
         }
+
+        struct AttackPositionRetimingData_SpecieRetimingCoeff : HelperObject<AttackPositionRetimingData_SpecieRetimingCoeff> // Object
+        {
+            explicit AttackPositionRetimingData_SpecieRetimingCoeff(Ent::Property _node): HelperObject<AttackPositionRetimingData_SpecieRetimingCoeff>(std::move(_node)) {}
+            static constexpr char schemaName[] = "AttackPositionRetimingData::SpecieRetimingCoeff";
+            static AttackPositionRetimingData_SpecieRetimingCoeff load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return AttackPositionRetimingData_SpecieRetimingCoeff(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static AttackPositionRetimingData_SpecieRetimingCoeff loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return AttackPositionRetimingData_SpecieRetimingCoeff(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static AttackPositionRetimingData_SpecieRetimingCoeff create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return AttackPositionRetimingData_SpecieRetimingCoeff(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            AttackPositionRetimingData_SpecieRetimingCoeff makeInstanceOf()
+            {
+                return AttackPositionRetimingData_SpecieRetimingCoeff(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Float defaultCoeff() const;
+            Ent::Gen2::Float masterCoeff() const;
+        };
+
+        struct AttackPositionRetimingData : HelperObject<AttackPositionRetimingData> // Object
+        {
+            explicit AttackPositionRetimingData(Ent::Property _node): HelperObject<AttackPositionRetimingData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "AttackPositionRetimingData";
+            static AttackPositionRetimingData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return AttackPositionRetimingData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static AttackPositionRetimingData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return AttackPositionRetimingData(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static AttackPositionRetimingData create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return AttackPositionRetimingData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            AttackPositionRetimingData makeInstanceOf()
+            {
+                return AttackPositionRetimingData(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Float animTranslationCoeff() const;
+            Ent::Gen2::Map<SpecieEnum, Ent::Gen2::AttackPositionRetimingData_SpecieRetimingCoeff> backwardRetimingCoeffBySpecie() const;
+            Ent::Gen2::Float lengthMax() const;
+            Ent::Gen2::Float lengthMin() const;
+            Ent::Gen2::Float spherecastRadiusCoeff() const;
+        };
 
         struct AttackPhysicsForceData : HelperObject<AttackPhysicsForceData> // Object
         {
@@ -22015,6 +22572,7 @@ namespace Ent
             Ent::Gen2::GameDeathData DeathData() const;
             Ent::Gen2::Float DefaultCameraParamsSmoothValue() const;
             Ent::Gen2::Int DefaultGamePadID() const;
+            Ent::Gen2::GameEdgeData EdgeData() const;
             Ent::Gen2::Bool EnableSplashScreen() const;
             Ent::Gen2::GameFallData FallData() const;
             Ent::Gen2::GameFeetCatchUpData FeetCatchUpData() const;
@@ -22040,6 +22598,9 @@ namespace Ent
             Ent::Gen2::Float LockTargetScreenViewDistance() const;
             Ent::Gen2::Float Long_Press_Duration() const;
             Ent::Gen2::Bool MountOnlyOnFollower() const;
+            Ent::Gen2::String NewGameVideo() const;
+            Ent::Gen2::String NewGameVideoMusicStart() const;
+            Ent::Gen2::String NewGameVideoMusicStop() const;
             Ent::Gen2::GameParryData ParryData() const;
             Ent::Gen2::GamePropelData PropelData() const;
             Ent::Gen2::GameRespawnData RespawnData() const;
@@ -22047,6 +22608,7 @@ namespace Ent
             Ent::Gen2::GameShamanVisionData ShamanVisionData() const;
             Ent::Gen2::GameSlopeData SlopeData() const;
             Ent::Gen2::GameSnapData SnapData() const;
+            Ent::Gen2::GameSoftCollisionData SoftCollisionData() const;
             Ent::Gen2::String Sound_TopView_Start() const;
             Ent::Gen2::String Sound_TopView_Stop() const;
             Ent::Gen2::Map<SizeEnum, Ent::Gen2::Float> SpeedMaxInUndergroundCavity() const;
@@ -22054,6 +22616,67 @@ namespace Ent
             Ent::Gen2::String SplashScreenSoundStop() const;
             Ent::Gen2::Manager Super() const;
             Ent::Gen2::GameImmersionData WaterImmersionData() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct AreaNavigation : HelperObject<AreaNavigation> // Object
+        {
+            explicit AreaNavigation(Ent::Property _node): HelperObject<AreaNavigation>(std::move(_node)) {}
+            static constexpr char schemaName[] = "AreaNavigation";
+            static AreaNavigation load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return AreaNavigation(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static AreaNavigation loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return AreaNavigation(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static AreaNavigation create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return AreaNavigation(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            AreaNavigation makeInstanceOf()
+            {
+                return AreaNavigation(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Float GroundAreaCost() const;
+            Ent::Gen2::Bool MovesInWater() const;
+            Ent::Gen2::Bool MovesOnGround() const;
+            Ent::Gen2::Float WaterAreaCost() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct PathFinderGD : HelperObject<PathFinderGD> // Object
+        {
+            explicit PathFinderGD(Ent::Property _node): HelperObject<PathFinderGD>(std::move(_node)) {}
+            static constexpr char schemaName[] = "PathFinderGD";
+            static PathFinderGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return PathFinderGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static PathFinderGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return PathFinderGD(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static PathFinderGD create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return PathFinderGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            PathFinderGD makeInstanceOf()
+            {
+                return PathFinderGD(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::AreaNavigation AreaNavigation() const;
+            Ent::Gen2::ComponentGD Super() const;
+            Ent::Gen2::String UsedNavMeshName() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -22682,7 +23305,7 @@ namespace Ent
             Ent::Gen2::Float capsuleTinyRadius() const;
             Ent::Gen2::ScaleConverter constraintDetectionAnticipation() const;
             Ent::Gen2::Vector3 constraintDetectionOffset() const;
-            Ent::Gen2::ScaleConverter constraintDetectionRadius() const;
+            Ent::Gen2::Float constraintDetectionRadiusMultiplier() const;
             Ent::Gen2::Float coyoteJumpMaxTime() const;
             Ent::Gen2::Float crashPreventionSafeguardFactor() const;
             Ent::Gen2::Float defaultWorldUpSpeedFactor() const;
@@ -22690,6 +23313,9 @@ namespace Ent
             Ent::Gen2::Bool doubleJump() const;
             Ent::Gen2::ScaleConverter dropPlaneLegLenFactor() const;
             Ent::Gen2::Bool dropSyncTrajectoryAndVisual() const;
+            Ent::Gen2::ScaleConverter edgeDetectionAnticipation() const;
+            Ent::Gen2::Vector3 edgeDetectionOffset() const;
+            Ent::Gen2::Float edgeDetectionRadiusMultiplier() const;
             Ent::Gen2::Float ellipseCoeff() const;
             Ent::Gen2::ScaleConverter extirpateObstacleAcceleration() const;
             Ent::Gen2::Float extirpateObstacleDuration() const;
@@ -22722,6 +23348,7 @@ namespace Ent
             Array<Ent::Gen2::MoveCapacityData_ReachSpeed> reachSpeedByLocomotion() const;
             Ent::Gen2::Float reachSpeedDeceleration() const;
             Ent::Gen2::Bool reactToOtherCharacterBodyCollision() const;
+            Ent::Gen2::Float rigidbodyScalingSpeed() const;
             Ent::Gen2::Float sphereCastRadiusRatio() const;
             Ent::Gen2::Float sphereOverrideRadius() const;
             Ent::Gen2::Float strafeBlendIn() const;
@@ -23028,65 +23655,75 @@ namespace Ent
             return static_cast<AnimAdditionalTagEnum>(details::indexInEnum(value, AnimAdditionalTag::enumToString));
         }
 
-        struct StrongAttackChargedData : HelperObject<StrongAttackChargedData> // Object
+        struct AttackChargedData : HelperObject<AttackChargedData> // Object
         {
-            explicit StrongAttackChargedData(Ent::Property _node): HelperObject<StrongAttackChargedData>(std::move(_node)) {}
-            static constexpr char schemaName[] = "StrongAttackChargedData";
-            static StrongAttackChargedData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            explicit AttackChargedData(Ent::Property _node): HelperObject<AttackChargedData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "AttackChargedData";
+            static AttackChargedData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
-                return StrongAttackChargedData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+                return AttackChargedData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
             }
-            static StrongAttackChargedData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static AttackChargedData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 auto& storage = _entlib.createTempJsonFile();
                 storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return StrongAttackChargedData(Ent::Property(
+                return AttackChargedData(Ent::Property(
                     &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
             }
-            static StrongAttackChargedData create(Ent::EntityLib& _entlib)
+            static AttackChargedData create(Ent::EntityLib& _entlib)
             {
                 auto& storage = _entlib.createTempJsonFile();
-                return StrongAttackChargedData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+                return AttackChargedData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
             }
-            StrongAttackChargedData makeInstanceOf()
+            AttackChargedData makeInstanceOf()
             {
-                return StrongAttackChargedData(getProperty().makeInstanceOf());
+                return AttackChargedData(getProperty().makeInstanceOf());
             }
             Ent::Gen2::AnimAdditionalTag AnimationTag() const;
             Ent::Gen2::FloatRange ChargeRatio() const;
             Ent::Gen2::String _comment() const;
         };
 
-        struct StrongAttackGD : HelperObject<StrongAttackGD> // Object
+        struct StrongAttackData : HelperObject<StrongAttackData> // Object
         {
-            explicit StrongAttackGD(Ent::Property _node): HelperObject<StrongAttackGD>(std::move(_node)) {}
-            static constexpr char schemaName[] = "StrongAttackGD";
-            static StrongAttackGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            explicit StrongAttackData(Ent::Property _node): HelperObject<StrongAttackData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "StrongAttackData";
+            static StrongAttackData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
-                return StrongAttackGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+                return StrongAttackData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
             }
-            static StrongAttackGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static StrongAttackData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 auto& storage = _entlib.createTempJsonFile();
                 storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return StrongAttackGD(Ent::Property(
+                return StrongAttackData(Ent::Property(
                     &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
             }
-            static StrongAttackGD create(Ent::EntityLib& _entlib)
+            static StrongAttackData create(Ent::EntityLib& _entlib)
             {
                 auto& storage = _entlib.createTempJsonFile();
-                return StrongAttackGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+                return StrongAttackData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
             }
-            StrongAttackGD makeInstanceOf()
+            StrongAttackData makeInstanceOf()
             {
-                return StrongAttackGD(getProperty().makeInstanceOf());
+                return StrongAttackData(getProperty().makeInstanceOf());
             }
-            Ent::Gen2::ComponentGD Super() const;
+            Ent::Gen2::ResponsiblePointer_ActorState_ StrongAttackState() const;
             Ent::Gen2::String _comment() const;
-            Array<Ent::Gen2::StrongAttackChargedData> chargedDatas() const;
+            Ent::Gen2::Float attackOrientationRate() const;
+            Array<Ent::Gen2::AttackChargedData> chargedDatas() const;
+            Ent::Gen2::Float chargedMaxDuration() const;
             Ent::Gen2::Float chargingDeceleration() const;
             Ent::Gen2::Float chargingOrientationRate() const;
-            Ent::Gen2::ResponsiblePointer_ActorState_ strongAttackState() const;
+        };
+
+        struct strongAttackData : HelperObject<strongAttackData> // Object
+        {
+            explicit strongAttackData(Ent::Property _node): HelperObject<strongAttackData>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::StrongAttackData val() const;
         };
 
         struct AnalyticsManager_MongoDBConnection : HelperObject<AnalyticsManager_MongoDBConnection> // Object
@@ -23150,6 +23787,76 @@ namespace Ent
             Ent::Gen2::Bool StartPaused() const;
             Ent::Gen2::Manager Super() const;
             Ent::Gen2::String _comment() const;
+        };
+
+        struct AerialAttackData : HelperObject<AerialAttackData> // Object
+        {
+            explicit AerialAttackData(Ent::Property _node): HelperObject<AerialAttackData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "AerialAttackData";
+            static AerialAttackData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return AerialAttackData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static AerialAttackData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return AerialAttackData(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static AerialAttackData create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return AerialAttackData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            AerialAttackData makeInstanceOf()
+            {
+                return AerialAttackData(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ResponsiblePointer_ActorState_ AerialAttackState() const;
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Float attackOrientationRate() const;
+        };
+
+        struct AttackComponentGD_AerialAttackData : HelperObject<AttackComponentGD_AerialAttackData> // Object
+        {
+            explicit AttackComponentGD_AerialAttackData(Ent::Property _node): HelperObject<AttackComponentGD_AerialAttackData>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::AerialAttackData val() const;
+        };
+
+        struct AttackComponentGD : HelperObject<AttackComponentGD> // Object
+        {
+            explicit AttackComponentGD(Ent::Property _node): HelperObject<AttackComponentGD>(std::move(_node)) {}
+            static constexpr char schemaName[] = "AttackComponentGD";
+            static AttackComponentGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return AttackComponentGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static AttackComponentGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return AttackComponentGD(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static AttackComponentGD create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return AttackComponentGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            AttackComponentGD makeInstanceOf()
+            {
+                return AttackComponentGD(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::AttackComponentGD_AerialAttackData AerialAttackData() const;
+            Ent::Gen2::ComponentGD Super() const;
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::AttackPositionRetimingData attackPositionRetimingData() const;
+            Ent::Gen2::lightAttackData lightAttackData() const;
+            Ent::Gen2::strongAttackData strongAttackData() const;
         };
 
         struct AdditionnalTag : HelperObject<AdditionnalTag> // Object
@@ -23739,6 +24446,9 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateBeingBlockedByVine> EntityStateBeingBlockedByVine();
             Ent::Gen2::EntityStateBeingBlockedByVine addEntityStateBeingBlockedByVine();
             void removeEntityStateBeingBlockedByVine();
+            std::optional<Ent::Gen2::EntityStateBeingInReeds> EntityStateBeingInReeds();
+            Ent::Gen2::EntityStateBeingInReeds addEntityStateBeingInReeds();
+            void removeEntityStateBeingInReeds();
             std::optional<Ent::Gen2::EntityStateBeingOnSpike> EntityStateBeingOnSpike();
             Ent::Gen2::EntityStateBeingOnSpike addEntityStateBeingOnSpike();
             void removeEntityStateBeingOnSpike();
@@ -23886,6 +24596,9 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateGrab> EntityStateGrab();
             Ent::Gen2::EntityStateGrab addEntityStateGrab();
             void removeEntityStateGrab();
+            std::optional<Ent::Gen2::EntityStateGrabAttack> EntityStateGrabAttack();
+            Ent::Gen2::EntityStateGrabAttack addEntityStateGrabAttack();
+            void removeEntityStateGrabAttack();
             std::optional<Ent::Gen2::EntityStateGrabIn> EntityStateGrabIn();
             Ent::Gen2::EntityStateGrabIn addEntityStateGrabIn();
             void removeEntityStateGrabIn();
@@ -23940,12 +24653,18 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateInconvertible> EntityStateInconvertible();
             Ent::Gen2::EntityStateInconvertible addEntityStateInconvertible();
             void removeEntityStateInconvertible();
+            std::optional<Ent::Gen2::EntityStateInjured> EntityStateInjured();
+            Ent::Gen2::EntityStateInjured addEntityStateInjured();
+            void removeEntityStateInjured();
             std::optional<Ent::Gen2::EntityStateInteractedGPE> EntityStateInteractedGPE();
             Ent::Gen2::EntityStateInteractedGPE addEntityStateInteractedGPE();
             void removeEntityStateInteractedGPE();
             std::optional<Ent::Gen2::EntityStateJumpHeightMultiplier> EntityStateJumpHeightMultiplier();
             Ent::Gen2::EntityStateJumpHeightMultiplier addEntityStateJumpHeightMultiplier();
             void removeEntityStateJumpHeightMultiplier();
+            std::optional<Ent::Gen2::EntityStateJustStarted> EntityStateJustStarted();
+            Ent::Gen2::EntityStateJustStarted addEntityStateJustStarted();
+            void removeEntityStateJustStarted();
             std::optional<Ent::Gen2::EntityStateLateralDodge> EntityStateLateralDodge();
             Ent::Gen2::EntityStateLateralDodge addEntityStateLateralDodge();
             void removeEntityStateLateralDodge();
@@ -24042,6 +24761,9 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateSnappedToHatchingTarget> EntityStateSnappedToHatchingTarget();
             Ent::Gen2::EntityStateSnappedToHatchingTarget addEntityStateSnappedToHatchingTarget();
             void removeEntityStateSnappedToHatchingTarget();
+            std::optional<Ent::Gen2::EntityStateSoftCollide> EntityStateSoftCollide();
+            Ent::Gen2::EntityStateSoftCollide addEntityStateSoftCollide();
+            void removeEntityStateSoftCollide();
             std::optional<Ent::Gen2::EntityStateSpeedLimiter> EntityStateSpeedLimiter();
             Ent::Gen2::EntityStateSpeedLimiter addEntityStateSpeedLimiter();
             void removeEntityStateSpeedLimiter();
@@ -24060,9 +24782,18 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateSpiritAttacked> EntityStateSpiritAttacked();
             Ent::Gen2::EntityStateSpiritAttacked addEntityStateSpiritAttacked();
             void removeEntityStateSpiritAttacked();
+            std::optional<Ent::Gen2::EntityStateSpiritShrineDisabled> EntityStateSpiritShrineDisabled();
+            Ent::Gen2::EntityStateSpiritShrineDisabled addEntityStateSpiritShrineDisabled();
+            void removeEntityStateSpiritShrineDisabled();
+            std::optional<Ent::Gen2::EntityStateSpiritShrineEnabled> EntityStateSpiritShrineEnabled();
+            Ent::Gen2::EntityStateSpiritShrineEnabled addEntityStateSpiritShrineEnabled();
+            void removeEntityStateSpiritShrineEnabled();
             std::optional<Ent::Gen2::EntityStateStaffOwnedVertebras> EntityStateStaffOwnedVertebras();
             Ent::Gen2::EntityStateStaffOwnedVertebras addEntityStateStaffOwnedVertebras();
             void removeEntityStateStaffOwnedVertebras();
+            std::optional<Ent::Gen2::EntityStateStaffVertebrasAutoRefill> EntityStateStaffVertebrasAutoRefill();
+            Ent::Gen2::EntityStateStaffVertebrasAutoRefill addEntityStateStaffVertebrasAutoRefill();
+            void removeEntityStateStaffVertebrasAutoRefill();
             std::optional<Ent::Gen2::EntityStateStalactiteFallen> EntityStateStalactiteFallen();
             Ent::Gen2::EntityStateStalactiteFallen addEntityStateStalactiteFallen();
             void removeEntityStateStalactiteFallen();
@@ -24257,6 +24988,7 @@ namespace Ent
                 return SubScene(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ObjectSet<char const*, Ent::Gen2::Entity> Embedded() const;
+            Ent::Gen2::RuntimeMode RuntimeMode() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -25085,6 +25817,34 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct EntityStateStaffVertebrasAutoRefill : HelperObject<EntityStateStaffVertebrasAutoRefill> // Object
+        {
+            explicit EntityStateStaffVertebrasAutoRefill(Ent::Property _node): HelperObject<EntityStateStaffVertebrasAutoRefill>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateStaffVertebrasAutoRefill";
+            static EntityStateStaffVertebrasAutoRefill load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateStaffVertebrasAutoRefill(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateStaffVertebrasAutoRefill loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateStaffVertebrasAutoRefill(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateStaffVertebrasAutoRefill create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateStaffVertebrasAutoRefill(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateStaffVertebrasAutoRefill makeInstanceOf()
+            {
+                return EntityStateStaffVertebrasAutoRefill(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct EntityStateStaffOwnedVertebras : HelperObject<EntityStateStaffOwnedVertebras> // Object
         {
             explicit EntityStateStaffOwnedVertebras(Ent::Property _node): HelperObject<EntityStateStaffOwnedVertebras>(std::move(_node)) {}
@@ -25110,6 +25870,62 @@ namespace Ent
                 return EntityStateStaffOwnedVertebras(getProperty().makeInstanceOf());
             }
             Ent::Gen2::EntityStateStaffOwnedVertebras_Inputs Inputs() const;
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateSpiritShrineEnabled : HelperObject<EntityStateSpiritShrineEnabled> // Object
+        {
+            explicit EntityStateSpiritShrineEnabled(Ent::Property _node): HelperObject<EntityStateSpiritShrineEnabled>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateSpiritShrineEnabled";
+            static EntityStateSpiritShrineEnabled load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateSpiritShrineEnabled(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateSpiritShrineEnabled loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateSpiritShrineEnabled(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateSpiritShrineEnabled create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateSpiritShrineEnabled(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateSpiritShrineEnabled makeInstanceOf()
+            {
+                return EntityStateSpiritShrineEnabled(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateSpiritShrineDisabled : HelperObject<EntityStateSpiritShrineDisabled> // Object
+        {
+            explicit EntityStateSpiritShrineDisabled(Ent::Property _node): HelperObject<EntityStateSpiritShrineDisabled>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateSpiritShrineDisabled";
+            static EntityStateSpiritShrineDisabled load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateSpiritShrineDisabled(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateSpiritShrineDisabled loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateSpiritShrineDisabled(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateSpiritShrineDisabled create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateSpiritShrineDisabled(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateSpiritShrineDisabled makeInstanceOf()
+            {
+                return EntityStateSpiritShrineDisabled(getProperty().makeInstanceOf());
+            }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -25277,6 +26093,35 @@ namespace Ent
             EntityStateSpeedLimiter makeInstanceOf()
             {
                 return EntityStateSpeedLimiter(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Float SpeedMax() const;
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateSoftCollide : HelperObject<EntityStateSoftCollide> // Object
+        {
+            explicit EntityStateSoftCollide(Ent::Property _node): HelperObject<EntityStateSoftCollide>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateSoftCollide";
+            static EntityStateSoftCollide load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateSoftCollide(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateSoftCollide loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateSoftCollide(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateSoftCollide create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateSoftCollide(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateSoftCollide makeInstanceOf()
+            {
+                return EntityStateSoftCollide(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
@@ -26189,6 +27034,34 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct EntityStateJustStarted : HelperObject<EntityStateJustStarted> // Object
+        {
+            explicit EntityStateJustStarted(Ent::Property _node): HelperObject<EntityStateJustStarted>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateJustStarted";
+            static EntityStateJustStarted load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateJustStarted(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateJustStarted loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateJustStarted(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateJustStarted create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateJustStarted(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateJustStarted makeInstanceOf()
+            {
+                return EntityStateJustStarted(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct EntityStateJumpHeightMultiplier : HelperObject<EntityStateJumpHeightMultiplier> // Object
         {
             explicit EntityStateJumpHeightMultiplier(Ent::Property _node): HelperObject<EntityStateJumpHeightMultiplier>(std::move(_node)) {}
@@ -26241,6 +27114,34 @@ namespace Ent
             EntityStateInteractedGPE makeInstanceOf()
             {
                 return EntityStateInteractedGPE(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateInjured : HelperObject<EntityStateInjured> // Object
+        {
+            explicit EntityStateInjured(Ent::Property _node): HelperObject<EntityStateInjured>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateInjured";
+            static EntityStateInjured load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateInjured(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateInjured loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateInjured(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateInjured create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateInjured(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateInjured makeInstanceOf()
+            {
+                return EntityStateInjured(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
@@ -26747,6 +27648,34 @@ namespace Ent
             EntityStateGrabIn makeInstanceOf()
             {
                 return EntityStateGrabIn(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateGrabAttack : HelperObject<EntityStateGrabAttack> // Object
+        {
+            explicit EntityStateGrabAttack(Ent::Property _node): HelperObject<EntityStateGrabAttack>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateGrabAttack";
+            static EntityStateGrabAttack load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateGrabAttack(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateGrabAttack loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateGrabAttack(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateGrabAttack create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateGrabAttack(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateGrabAttack makeInstanceOf()
+            {
+                return EntityStateGrabAttack(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
@@ -27876,6 +28805,7 @@ namespace Ent
             {
                 return EntityStateBridgeBeingControlled(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::Float CollisionRaycastLength() const;
             Ent::Gen2::Float HorizontalSpeed() const;
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::Float VerticalSpeed() const;
@@ -27910,6 +28840,8 @@ namespace Ent
             Ent::Gen2::Float AttachTime() const;
             Ent::Gen2::Position AttractionTarget() const;
             Ent::Gen2::EntityRef BridgeLinkRef() const;
+            Ent::Gen2::Float GroundAttachRaycastLength() const;
+            Ent::Gen2::String HotspotName() const;
             Ent::Gen2::Float MaximalAttachDistance() const;
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
@@ -28138,8 +29070,37 @@ namespace Ent
             }
             Ent::Gen2::Float SpikeCooldown() const;
             Ent::Gen2::Float SpikeDamage() const;
+            Ent::Gen2::Int SpikeDeadlyHitCount() const;
             Ent::Gen2::Bool SpikeEject() const;
             Ent::Gen2::Float SpikeImpact() const;
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateBeingInReeds : HelperObject<EntityStateBeingInReeds> // Object
+        {
+            explicit EntityStateBeingInReeds(Ent::Property _node): HelperObject<EntityStateBeingInReeds>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateBeingInReeds";
+            static EntityStateBeingInReeds load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateBeingInReeds(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateBeingInReeds loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateBeingInReeds(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateBeingInReeds create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateBeingInReeds(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateBeingInReeds makeInstanceOf()
+            {
+                return EntityStateBeingInReeds(getProperty().makeInstanceOf());
+            }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -33328,6 +34289,7 @@ namespace Ent
             {
                 return ActionBite(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::Float RadiusMultiplier() const;
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -33384,6 +34346,7 @@ namespace Ent
             {
                 return ActionAttackJumpOnto(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::Float RadiusMultiplier() const;
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -33427,6 +34390,7 @@ namespace Ent
                 "CATEGORY_Health",
                 "CATEGORY_HealthAlive",
                 "CATEGORY_HealthDead",
+                "CATEGORY_KnockedOut",
                 "CATEGORY_EntitySwitchTransition",
                 "CATEGORY_EnergyRoot",
                 "CATEGORY_EnergySpout",
@@ -33437,7 +34401,8 @@ namespace Ent
                 "CATEGORY_Respawn",
                 "CATEGORY_Save",
                 "CATEGORY_Cinematic",
-                "ActorCategory_COUNT",
+                "CATEGORY_Loading",
+                "CATEGORY_NoCategory",
             };
         };
         inline char const* toString(ActorCategoryEnum value)
@@ -33732,7 +34697,7 @@ namespace Ent
             {
                 return ActionStateArbiter_StateOrderPass(getProperty().makeInstanceOf());
             }
-            PrimArray<Ent::Gen2::String> Order() const;
+            Array<Ent::Gen2::Tuple<Ent::Gen2::String, Ent::Gen2::String>> Dependencies() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -34338,6 +35303,7 @@ namespace Ent
                 "callanswer",
                 "scream",
                 "grab",
+                "grabattack",
                 "grabbed",
                 "grabbedin",
                 "grabbedout",
@@ -34508,6 +35474,10 @@ namespace Ent
             Ent::Gen2::Float FightRotationOutDuration() const;
             Ent::Gen2::Float FightRotationSpeed() const;
             Ent::Gen2::Float FightSpeedRationImpactCoeff() const;
+            Ent::Gen2::Position InterestPointPosition() const;
+            Ent::Gen2::Vector3 InterestPointSight() const;
+            Ent::Gen2::Float InterestPointSightAngleSpeed() const;
+            Ent::Gen2::Float InterestPointTimeToReachMaxWeight() const;
             Ent::Gen2::Float JoyAccelerationBoostChangingSideH() const;
             Ent::Gen2::Float JoyAccelerationBoostChangingSideV() const;
             Ent::Gen2::Float JoyAccelerationH() const;
@@ -34554,6 +35524,8 @@ namespace Ent
             Ent::Gen2::Float TargetOffsetX() const;
             Ent::Gen2::Float TargetOffsetY() const;
             Ent::Gen2::Float TargetOffsetZ() const;
+            Ent::Gen2::Float TargetSmoothMultiplier() const;
+            Ent::Gen2::Float TargetSmoothMultiplierZ() const;
             Ent::Gen2::Float TargetXOffsetFromYawForce() const;
             Ent::Gen2::Float TargetXOffsetFromYawSmooth() const;
             Ent::Gen2::Float TargetZOffsetFromPitchForce() const;
@@ -34594,6 +35566,7 @@ namespace Ent
             Ent::Gen2::InGameCameraParams lock() const;
             Ent::Gen2::InGameCameraParams motionconstraint() const;
             Ent::Gen2::InGameCameraParams shoulder() const;
+            Ent::Gen2::InGameCameraParams sightconstraint() const;
             Ent::Gen2::InGameCameraParams strongattack() const;
             Ent::Gen2::InGameCameraParams thirdperson() const;
             Ent::Gen2::InGameCameraParams zoom() const;
@@ -35114,7 +36087,6 @@ namespace Ent
             Ent::Gen2::String _comment() const;
             Ent::Gen2::BiteData biteData() const;
             Ent::Gen2::CreatureDangerousness dangerousnessData() const;
-            Ent::Gen2::InteractData interactData() const;
             Ent::Gen2::RevivedData revivedData() const;
         };
 
@@ -35843,6 +36815,33 @@ namespace Ent
             ContactActor makeInstanceOf()
             {
                 return ContactActor(getProperty().makeInstanceOf());
+            }
+        
+        };
+
+        struct Edge : HelperObject<Edge> // Object
+        {
+            explicit Edge(Ent::Property _node): HelperObject<Edge>(std::move(_node)) {}
+            static constexpr char schemaName[] = "Edge";
+            static Edge load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return Edge(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static Edge loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return Edge(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static Edge create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return Edge(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            Edge makeInstanceOf()
+            {
+                return Edge(getProperty().makeInstanceOf());
             }
         
         };
@@ -36851,6 +37850,63 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct ZoneCylinderShape : HelperObject<ZoneCylinderShape> // Object
+        {
+            explicit ZoneCylinderShape(Ent::Property _node): HelperObject<ZoneCylinderShape>(std::move(_node)) {}
+            static constexpr char schemaName[] = "ZoneCylinderShape";
+            static ZoneCylinderShape load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return ZoneCylinderShape(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static ZoneCylinderShape loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return ZoneCylinderShape(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static ZoneCylinderShape create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return ZoneCylinderShape(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            ZoneCylinderShape makeInstanceOf()
+            {
+                return ZoneCylinderShape(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Float DistanceBetweenPoints() const;
+            Ent::Gen2::Float Radius() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct ZoneMeshShape : HelperObject<ZoneMeshShape> // Object
+        {
+            explicit ZoneMeshShape(Ent::Property _node): HelperObject<ZoneMeshShape>(std::move(_node)) {}
+            static constexpr char schemaName[] = "ZoneMeshShape";
+            static ZoneMeshShape load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return ZoneMeshShape(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static ZoneMeshShape loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return ZoneMeshShape(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static ZoneMeshShape create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return ZoneMeshShape(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            ZoneMeshShape makeInstanceOf()
+            {
+                return ZoneMeshShape(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::String ConvexZoneFilePath() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct sBiomeSFXResult : HelperObject<sBiomeSFXResult> // Object
         {
             explicit sBiomeSFXResult(Ent::Property _node): HelperObject<sBiomeSFXResult>(std::move(_node)) {}
@@ -37370,6 +38426,33 @@ namespace Ent
         {
             return Ent::Gen2::Position(getProperty().setUnionType("Position"));
         }
+        // variant_ZoneCylinderShape_ZoneMeshShape_
+        inline char const* variant_ZoneCylinderShape_ZoneMeshShape_::getType() const
+        {
+            return getProperty().getUnionType();
+        }
+        inline std::optional<Ent::Gen2::ZoneCylinderShape> variant_ZoneCylinderShape_ZoneMeshShape_::ZoneCylinderShape()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "ZoneCylinderShape") != 0?
+                    std::optional<Ent::Gen2::ZoneCylinderShape>{}:
+                    std::optional<Ent::Gen2::ZoneCylinderShape>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::ZoneCylinderShape variant_ZoneCylinderShape_ZoneMeshShape_::setZoneCylinderShape()
+        {
+            return Ent::Gen2::ZoneCylinderShape(getProperty().setUnionType("ZoneCylinderShape"));
+        }
+        inline std::optional<Ent::Gen2::ZoneMeshShape> variant_ZoneCylinderShape_ZoneMeshShape_::ZoneMeshShape()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "ZoneMeshShape") != 0?
+                    std::optional<Ent::Gen2::ZoneMeshShape>{}:
+                    std::optional<Ent::Gen2::ZoneMeshShape>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::ZoneMeshShape variant_ZoneCylinderShape_ZoneMeshShape_::setZoneMeshShape()
+        {
+            return Ent::Gen2::ZoneMeshShape(getProperty().setUnionType("ZoneMeshShape"));
+        }
         // variant_Pasta_Easing_Curve_string_
         inline char const* variant_Pasta_Easing_Curve_string_::getType() const
         {
@@ -37507,6 +38590,19 @@ namespace Ent
         }
         // sJointFixedDesc
         // sJointBallDesc
+        // resetCreatureRequest
+        inline Ent::Gen2::String resetCreatureRequest::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool resetCreatureRequest::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::Bool resetCreatureRequest::val() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("val"));
+        }
         // jumpPower
         inline Ent::Gen2::String jumpPower::_comment() const
         {
@@ -37595,6 +38691,19 @@ namespace Ent
             return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
         }
         inline Ent::Gen2::Bool allowedTypesItem::val() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("val"));
+        }
+        // Walkability
+        inline Ent::Gen2::String Walkability::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool Walkability::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::Bool Walkability::val() const
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("val"));
         }
@@ -38247,6 +39356,27 @@ namespace Ent
         {
             return Ent::Gen2::SoundEmissionStrength(getProperty().getObjectField("val"));
         }
+        // SoftCollisionGD_VegetationDetectionParameters
+        inline Ent::Gen2::String SoftCollisionGD_VegetationDetectionParameters::BoneName() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("BoneName"));
+        }
+        inline Ent::Gen2::Vector3 SoftCollisionGD_VegetationDetectionParameters::BoneOffset() const
+        {
+            return Ent::Gen2::Vector3(getProperty().getObjectField("BoneOffset"));
+        }
+        inline Ent::Gen2::Float SoftCollisionGD_VegetationDetectionParameters::Radius() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("Radius"));
+        }
+        inline PrimArray<Ent::Gen2::String> SoftCollisionGD_VegetationDetectionParameters::VegetationTagList() const
+        {
+            return PrimArray<Ent::Gen2::String>(getProperty().getObjectField("VegetationTagList"));
+        }
+        inline Ent::Gen2::String SoftCollisionGD_VegetationDetectionParameters::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // SmoothScaleComponentInput_Parameters
         inline Ent::Gen2::Float SmoothScaleComponentInput_Parameters::Scale() const
         {
@@ -38653,6 +39783,32 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("outText"));
         }
+        // RigidbodyScalingSpeed
+        inline Ent::Gen2::String RigidbodyScalingSpeed::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool RigidbodyScalingSpeed::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::Float RigidbodyScalingSpeed::val() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("val"));
+        }
+        // RigidbodyScaleMultiplier
+        inline Ent::Gen2::String RigidbodyScaleMultiplier::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool RigidbodyScaleMultiplier::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::Float RigidbodyScaleMultiplier::val() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("val"));
+        }
         // RigidBodyUserData
         // RigidBodyUserDataLedges
         inline Ent::Gen2::RigidBodyUserData RigidBodyUserDataLedges::Super() const
@@ -38894,6 +40050,17 @@ namespace Ent
         inline Ent::Gen2::CineEventTestIsCanceled ResponsiblePointer_CineEvent_::setCineEventTestIsCanceled()
         {
             return Ent::Gen2::CineEventTestIsCanceled(getProperty().setUnionType("CineEventTestIsCanceled"));
+        }
+        inline std::optional<Ent::Gen2::CineEventTriggerDisplayUIMessage> ResponsiblePointer_CineEvent_::CineEventTriggerDisplayUIMessage()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "CineEventTriggerDisplayUIMessage") != 0?
+                    std::optional<Ent::Gen2::CineEventTriggerDisplayUIMessage>{}:
+                    std::optional<Ent::Gen2::CineEventTriggerDisplayUIMessage>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::CineEventTriggerDisplayUIMessage ResponsiblePointer_CineEvent_::setCineEventTriggerDisplayUIMessage()
+        {
+            return Ent::Gen2::CineEventTriggerDisplayUIMessage(getProperty().setUnionType("CineEventTriggerDisplayUIMessage"));
         }
         inline std::optional<Ent::Gen2::CineEventTriggerEventHandlerPost> ResponsiblePointer_CineEvent_::CineEventTriggerEventHandlerPost()
         {
@@ -41035,6 +42202,17 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateBeingBlockedByVine(getProperty().setUnionType("EntityStateBeingBlockedByVine"));
         }
+        inline std::optional<Ent::Gen2::EntityStateBeingInReeds> ResponsiblePointer_ActorState_::EntityStateBeingInReeds()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateBeingInReeds") != 0?
+                    std::optional<Ent::Gen2::EntityStateBeingInReeds>{}:
+                    std::optional<Ent::Gen2::EntityStateBeingInReeds>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateBeingInReeds ResponsiblePointer_ActorState_::setEntityStateBeingInReeds()
+        {
+            return Ent::Gen2::EntityStateBeingInReeds(getProperty().setUnionType("EntityStateBeingInReeds"));
+        }
         inline std::optional<Ent::Gen2::EntityStateBeingOnSpike> ResponsiblePointer_ActorState_::EntityStateBeingOnSpike()
         {
             return strcmp(
@@ -41574,6 +42752,17 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateGrab(getProperty().setUnionType("EntityStateGrab"));
         }
+        inline std::optional<Ent::Gen2::EntityStateGrabAttack> ResponsiblePointer_ActorState_::EntityStateGrabAttack()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateGrabAttack") != 0?
+                    std::optional<Ent::Gen2::EntityStateGrabAttack>{}:
+                    std::optional<Ent::Gen2::EntityStateGrabAttack>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateGrabAttack ResponsiblePointer_ActorState_::setEntityStateGrabAttack()
+        {
+            return Ent::Gen2::EntityStateGrabAttack(getProperty().setUnionType("EntityStateGrabAttack"));
+        }
         inline std::optional<Ent::Gen2::EntityStateGrabIn> ResponsiblePointer_ActorState_::EntityStateGrabIn()
         {
             return strcmp(
@@ -41772,6 +42961,17 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateInconvertible(getProperty().setUnionType("EntityStateInconvertible"));
         }
+        inline std::optional<Ent::Gen2::EntityStateInjured> ResponsiblePointer_ActorState_::EntityStateInjured()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateInjured") != 0?
+                    std::optional<Ent::Gen2::EntityStateInjured>{}:
+                    std::optional<Ent::Gen2::EntityStateInjured>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateInjured ResponsiblePointer_ActorState_::setEntityStateInjured()
+        {
+            return Ent::Gen2::EntityStateInjured(getProperty().setUnionType("EntityStateInjured"));
+        }
         inline std::optional<Ent::Gen2::EntityStateInteractedGPE> ResponsiblePointer_ActorState_::EntityStateInteractedGPE()
         {
             return strcmp(
@@ -41793,6 +42993,17 @@ namespace Ent
         inline Ent::Gen2::EntityStateJumpHeightMultiplier ResponsiblePointer_ActorState_::setEntityStateJumpHeightMultiplier()
         {
             return Ent::Gen2::EntityStateJumpHeightMultiplier(getProperty().setUnionType("EntityStateJumpHeightMultiplier"));
+        }
+        inline std::optional<Ent::Gen2::EntityStateJustStarted> ResponsiblePointer_ActorState_::EntityStateJustStarted()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateJustStarted") != 0?
+                    std::optional<Ent::Gen2::EntityStateJustStarted>{}:
+                    std::optional<Ent::Gen2::EntityStateJustStarted>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateJustStarted ResponsiblePointer_ActorState_::setEntityStateJustStarted()
+        {
+            return Ent::Gen2::EntityStateJustStarted(getProperty().setUnionType("EntityStateJustStarted"));
         }
         inline std::optional<Ent::Gen2::EntityStateLateralDodge> ResponsiblePointer_ActorState_::EntityStateLateralDodge()
         {
@@ -42146,6 +43357,17 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateSnappedToHatchingTarget(getProperty().setUnionType("EntityStateSnappedToHatchingTarget"));
         }
+        inline std::optional<Ent::Gen2::EntityStateSoftCollide> ResponsiblePointer_ActorState_::EntityStateSoftCollide()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateSoftCollide") != 0?
+                    std::optional<Ent::Gen2::EntityStateSoftCollide>{}:
+                    std::optional<Ent::Gen2::EntityStateSoftCollide>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateSoftCollide ResponsiblePointer_ActorState_::setEntityStateSoftCollide()
+        {
+            return Ent::Gen2::EntityStateSoftCollide(getProperty().setUnionType("EntityStateSoftCollide"));
+        }
         inline std::optional<Ent::Gen2::EntityStateSpeedLimiter> ResponsiblePointer_ActorState_::EntityStateSpeedLimiter()
         {
             return strcmp(
@@ -42212,6 +43434,28 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateSpiritAttacked(getProperty().setUnionType("EntityStateSpiritAttacked"));
         }
+        inline std::optional<Ent::Gen2::EntityStateSpiritShrineDisabled> ResponsiblePointer_ActorState_::EntityStateSpiritShrineDisabled()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateSpiritShrineDisabled") != 0?
+                    std::optional<Ent::Gen2::EntityStateSpiritShrineDisabled>{}:
+                    std::optional<Ent::Gen2::EntityStateSpiritShrineDisabled>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateSpiritShrineDisabled ResponsiblePointer_ActorState_::setEntityStateSpiritShrineDisabled()
+        {
+            return Ent::Gen2::EntityStateSpiritShrineDisabled(getProperty().setUnionType("EntityStateSpiritShrineDisabled"));
+        }
+        inline std::optional<Ent::Gen2::EntityStateSpiritShrineEnabled> ResponsiblePointer_ActorState_::EntityStateSpiritShrineEnabled()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateSpiritShrineEnabled") != 0?
+                    std::optional<Ent::Gen2::EntityStateSpiritShrineEnabled>{}:
+                    std::optional<Ent::Gen2::EntityStateSpiritShrineEnabled>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateSpiritShrineEnabled ResponsiblePointer_ActorState_::setEntityStateSpiritShrineEnabled()
+        {
+            return Ent::Gen2::EntityStateSpiritShrineEnabled(getProperty().setUnionType("EntityStateSpiritShrineEnabled"));
+        }
         inline std::optional<Ent::Gen2::EntityStateStaffOwnedVertebras> ResponsiblePointer_ActorState_::EntityStateStaffOwnedVertebras()
         {
             return strcmp(
@@ -42222,6 +43466,17 @@ namespace Ent
         inline Ent::Gen2::EntityStateStaffOwnedVertebras ResponsiblePointer_ActorState_::setEntityStateStaffOwnedVertebras()
         {
             return Ent::Gen2::EntityStateStaffOwnedVertebras(getProperty().setUnionType("EntityStateStaffOwnedVertebras"));
+        }
+        inline std::optional<Ent::Gen2::EntityStateStaffVertebrasAutoRefill> ResponsiblePointer_ActorState_::EntityStateStaffVertebrasAutoRefill()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateStaffVertebrasAutoRefill") != 0?
+                    std::optional<Ent::Gen2::EntityStateStaffVertebrasAutoRefill>{}:
+                    std::optional<Ent::Gen2::EntityStateStaffVertebrasAutoRefill>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateStaffVertebrasAutoRefill ResponsiblePointer_ActorState_::setEntityStateStaffVertebrasAutoRefill()
+        {
+            return Ent::Gen2::EntityStateStaffVertebrasAutoRefill(getProperty().setUnionType("EntityStateStaffVertebrasAutoRefill"));
         }
         inline std::optional<Ent::Gen2::EntityStateStalactiteFallen> ResponsiblePointer_ActorState_::EntityStateStalactiteFallen()
         {
@@ -42532,6 +43787,32 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // RegenAreaTransitionSettings
+        inline Ent::Gen2::ScaleConverter RegenAreaTransitionSettings::TransitionWaveRadialSpeed() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("TransitionWaveRadialSpeed"));
+        }
+        inline Ent::Gen2::Float RegenAreaTransitionSettings::TransitionWaveWidth() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("TransitionWaveWidth"));
+        }
+        inline Ent::Gen2::String RegenAreaTransitionSettings::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // TransitionSettings
+        inline Ent::Gen2::String TransitionSettings::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool TransitionSettings::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::RegenAreaTransitionSettings TransitionSettings::val() const
+        {
+            return Ent::Gen2::RegenAreaTransitionSettings(getProperty().getObjectField("val"));
+        }
         // ReflectionTools_EnumSchema
         inline Ent::Gen2::String ReflectionTools_EnumSchema::Name() const
         {
@@ -42758,6 +44039,10 @@ namespace Ent
         {
             return PrimArray<Ent::Gen2::String>(getProperty().getObjectField("Materials"));
         }
+        inline PrimArray<Ent::Gen2::String> ReflectedMaterialGroup::Tags() const
+        {
+            return PrimArray<Ent::Gen2::String>(getProperty().getObjectField("Tags"));
+        }
         inline Ent::Gen2::String ReflectedMaterialGroup::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
@@ -42830,14 +44115,6 @@ namespace Ent
         {
             return Ent::Gen2::ReflectedMaterialGroupVector(getProperty().getObjectField("Groups"));
         }
-        inline Ent::Gen2::Bool ReflectedDetailMaterialBank::NeedMaterialGroupsTable() const
-        {
-            return Ent::Gen2::Bool(getProperty().getObjectField("NeedMaterialGroupsTable"));
-        }
-        inline Ent::Gen2::Bool ReflectedDetailMaterialBank::RangeOverride() const
-        {
-            return Ent::Gen2::Bool(getProperty().getObjectField("RangeOverride"));
-        }
         inline Ent::Gen2::String ReflectedDetailMaterialBank::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
@@ -42850,6 +44127,10 @@ namespace Ent
         inline Ent::Gen2::Float RecastNavmeshGenerationParameters::CreatureRadius() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("CreatureRadius"));
+        }
+        inline Ent::Gen2::String RecastNavmeshGenerationParameters::CreatureType() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("CreatureType"));
         }
         inline Ent::Gen2::Bool RecastNavmeshGenerationParameters::MarkWaterAreas() const
         {
@@ -42866,10 +44147,6 @@ namespace Ent
         inline Ent::Gen2::Float RecastNavmeshGenerationParameters::MinWaterDepth() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("MinWaterDepth"));
-        }
-        inline PrimArray<Ent::Gen2::String> RecastNavmeshGenerationParameters::SizeLayerMask() const
-        {
-            return PrimArray<Ent::Gen2::String>(getProperty().getObjectField("SizeLayerMask"));
         }
         inline Ent::Gen2::Float RecastNavmeshGenerationParameters::VoxelPrecision() const
         {
@@ -43356,6 +44633,31 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // PhysicsEffectsManager_PhysicsLimits
+        inline Ent::Gen2::Int PhysicsEffectsManager_PhysicsLimits::AvgShapesPerRigidBody() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("AvgShapesPerRigidBody"));
+        }
+        inline Ent::Gen2::Int PhysicsEffectsManager_PhysicsLimits::MaxDynamicRigidBodies() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("MaxDynamicRigidBodies"));
+        }
+        inline Ent::Gen2::Int PhysicsEffectsManager_PhysicsLimits::MaxNonContactPairs() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("MaxNonContactPairs"));
+        }
+        inline Ent::Gen2::Int PhysicsEffectsManager_PhysicsLimits::MaxStaticRigidBodies() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("MaxStaticRigidBodies"));
+        }
+        inline Ent::Gen2::Int PhysicsEffectsManager_PhysicsLimits::MaxTriggerRigidBodies() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("MaxTriggerRigidBodies"));
+        }
+        inline Ent::Gen2::String PhysicsEffectsManager_PhysicsLimits::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // PerceiverComponentInput_usePerception
         inline Ent::Gen2::String PerceiverComponentInput_usePerception::_comment() const
         {
@@ -43553,25 +44855,6 @@ namespace Ent
             return Ent::Gen2::Int(getProperty().getObjectField("Weight"));
         }
         inline Ent::Gen2::String MusicCategory::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        // MoveTo
-        // MoveToPosition
-        inline Ent::Gen2::MoveTo MoveToPosition::Super() const
-        {
-            return Ent::Gen2::MoveTo(getProperty().getObjectField("Super"));
-        }
-        inline Ent::Gen2::String MoveToPosition::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        // MoveToAlongSpline
-        inline Ent::Gen2::MoveTo MoveToAlongSpline::Super() const
-        {
-            return Ent::Gen2::MoveTo(getProperty().getObjectField("Super"));
-        }
-        inline Ent::Gen2::String MoveToAlongSpline::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -44214,6 +45497,10 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("GravityConstant"));
         }
+        inline Ent::Gen2::PhysicsEffectsManager_PhysicsLimits PhysicsEffectsManager::Limits() const
+        {
+            return Ent::Gen2::PhysicsEffectsManager_PhysicsLimits(getProperty().getObjectField("Limits"));
+        }
         inline Array<Ent::Gen2::PhysicsMaterial> PhysicsEffectsManager::MaterialBank() const
         {
             return Array<Ent::Gen2::PhysicsMaterial>(getProperty().getObjectField("MaterialBank"));
@@ -44270,9 +45557,9 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("NavMeshMaxSize"));
         }
-        inline Ent::Gen2::RecastNavmeshGenerationParameters NavMeshManager::RecastParameters() const
+        inline Ent::Gen2::Map<char const*, Ent::Gen2::RecastNavmeshGenerationParameters> NavMeshManager::RecastParameters() const
         {
-            return Ent::Gen2::RecastNavmeshGenerationParameters(getProperty().getObjectField("RecastParameters"));
+            return Ent::Gen2::Map<char const*, Ent::Gen2::RecastNavmeshGenerationParameters>(getProperty().getObjectField("RecastParameters"));
         }
         inline Ent::Gen2::Manager NavMeshManager::Super() const
         {
@@ -44285,6 +45572,10 @@ namespace Ent
         inline Ent::Gen2::Float NavMeshManager::TileSize() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("TileSize"));
+        }
+        inline Ent::Gen2::Float NavMeshManager::VerticalTolerance() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("VerticalTolerance"));
         }
         inline Ent::Gen2::String NavMeshManager::_comment() const
         {
@@ -44658,6 +45949,28 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // LightAttackData
+        inline Ent::Gen2::ResponsiblePointer_ActorState_ LightAttackData::LightAttackState() const
+        {
+            return Ent::Gen2::ResponsiblePointer_ActorState_(getProperty().getObjectField("LightAttackState"));
+        }
+        inline Ent::Gen2::String LightAttackData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // lightAttackData
+        inline Ent::Gen2::String lightAttackData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool lightAttackData::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::LightAttackData lightAttackData::val() const
+        {
+            return Ent::Gen2::LightAttackData(getProperty().getObjectField("val"));
+        }
         // LedgePositionInfo
         // JumpHeightMultiplier
         inline Ent::Gen2::String JumpHeightMultiplier::_comment() const
@@ -44671,6 +45984,19 @@ namespace Ent
         inline Ent::Gen2::Float JumpHeightMultiplier::val() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("val"));
+        }
+        // IsActive
+        inline Ent::Gen2::String IsActive::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool IsActive::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::Bool IsActive::val() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("val"));
         }
         // Invincible
         inline Ent::Gen2::String Invincible::_comment() const
@@ -44795,15 +46121,6 @@ namespace Ent
         inline Ent::Gen2::Bool Interactor::engaged() const
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
-        }
-        // InteractData
-        inline Ent::Gen2::String InteractData::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        inline Ent::Gen2::Float InteractData::distance() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("distance"));
         }
         // InputCollisionBehaviorData
         inline Ent::Gen2::Float InputCollisionBehaviorData::AltitudeMax() const
@@ -45114,6 +46431,10 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("anticipationSpeedFactor"));
         }
+        inline Ent::Gen2::Float GrasperInteractionData::attackDamages() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("attackDamages"));
+        }
         inline Ent::Gen2::Float GrasperInteractionData::deltaAngleMax() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("deltaAngleMax"));
@@ -45143,6 +46464,14 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        inline Ent::Gen2::Float GraspableInteractionData::damageAccumulatedRequiredToIncapacitate() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("damageAccumulatedRequiredToIncapacitate"));
+        }
+        inline Ent::Gen2::Float GraspableInteractionData::graspedDurationMax() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("graspedDurationMax"));
+        }
         inline Ent::Gen2::HotSpotType GraspableInteractionData::hotspotType() const
         {
             return Ent::Gen2::HotSpotType(getProperty().getObjectField("hotspotType"));
@@ -45154,10 +46483,6 @@ namespace Ent
         inline Ent::Gen2::Float GraspableInteractionData::incapacitatedTime() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("incapacitatedTime"));
-        }
-        inline Ent::Gen2::Float GraspableInteractionData::interactDuration() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("interactDuration"));
         }
         inline Ent::Gen2::String GraspableInteractionData::interactableBoneName() const
         {
@@ -45177,10 +46502,6 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // ZoneStamper
-        inline Ent::Gen2::String ZoneStamper::ConvexZoneFilePath() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("ConvexZoneFilePath"));
-        }
         inline Ent::Gen2::Float ZoneStamper::DownwardOffset() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("DownwardOffset"));
@@ -45188,6 +46509,14 @@ namespace Ent
         inline Ent::Gen2::NavMeshArea ZoneStamper::NavMeshArea() const
         {
             return Ent::Gen2::NavMeshArea(getProperty().getObjectField("NavMeshArea"));
+        }
+        inline Ent::Gen2::Int ZoneStamper::Priority() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("Priority"));
+        }
+        inline Ent::Gen2::variant_ZoneCylinderShape_ZoneMeshShape_ ZoneStamper::Shape() const
+        {
+            return Ent::Gen2::variant_ZoneCylinderShape_ZoneMeshShape_(getProperty().getObjectField("Shape"));
         }
         inline Ent::Gen2::GeometryStamper ZoneStamper::Super() const
         {
@@ -45201,6 +46530,15 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // SkinnedPhysMeshStamper
+        inline Ent::Gen2::GeometryStamper SkinnedPhysMeshStamper::Super() const
+        {
+            return Ent::Gen2::GeometryStamper(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String SkinnedPhysMeshStamper::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // MeshStamper
         inline Ent::Gen2::String MeshStamper::MeshFilePath() const
         {
@@ -45209,6 +46547,10 @@ namespace Ent
         inline Ent::Gen2::GeometryStamper MeshStamper::Super() const
         {
             return Ent::Gen2::GeometryStamper(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::Walkability MeshStamper::Walkability() const
+        {
+            return Ent::Gen2::Walkability(getProperty().getObjectField("Walkability"));
         }
         inline Ent::Gen2::String MeshStamper::_comment() const
         {
@@ -45272,6 +46614,39 @@ namespace Ent
             return Ent::Gen2::Map<char const*, Array<Array<Ent::Gen2::Tuple<Ent::Gen2::GameTimeInMs, Ent::Gen2::Float>>>>(getProperty().getObjectField("TypedScoreOverTimeList"));
         }
         inline Ent::Gen2::String GameProfile::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // GameSoftCollisionData
+        inline Ent::Gen2::Float GameSoftCollisionData::DecelerationFactor() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("DecelerationFactor"));
+        }
+        inline Ent::Gen2::Float GameSoftCollisionData::InsidePenetrationCoeff() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("InsidePenetrationCoeff"));
+        }
+        inline Ent::Gen2::Float GameSoftCollisionData::MaxSpeedFactor() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("MaxSpeedFactor"));
+        }
+        inline Ent::Gen2::Float GameSoftCollisionData::MinSpeedFactor() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("MinSpeedFactor"));
+        }
+        inline Ent::Gen2::SpeedMode GameSoftCollisionData::MinSpeedMode() const
+        {
+            return Ent::Gen2::SpeedMode(getProperty().getObjectField("MinSpeedMode"));
+        }
+        inline Ent::Gen2::Float GameSoftCollisionData::StuckDuration() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("StuckDuration"));
+        }
+        inline Ent::Gen2::Float GameSoftCollisionData::StuckPenetrationCoeff() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("StuckPenetrationCoeff"));
+        }
+        inline Ent::Gen2::String GameSoftCollisionData::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -45765,6 +47140,19 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // GameEdgeData
+        inline Ent::Gen2::Float GameEdgeData::EdgeAngleMax() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("EdgeAngleMax"));
+        }
+        inline Ent::Gen2::Float GameEdgeData::EdgeSizeMin() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("EdgeSizeMin"));
+        }
+        inline Ent::Gen2::String GameEdgeData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // GameDeathData
         inline Ent::Gen2::String GameDeathData::_comment() const
         {
@@ -45904,6 +47292,14 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // FurProperties
+        inline Ent::Gen2::Float FurProperties::AngularShift() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("AngularShift"));
+        }
+        inline Ent::Gen2::Float FurProperties::AzimuthalRoughness() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("AzimuthalRoughness"));
+        }
         inline Ent::Gen2::Float FurProperties::FinsMaskUScale() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("FinsMaskUScale"));
@@ -45912,9 +47308,21 @@ namespace Ent
         {
             return Ent::Gen2::Int(getProperty().getObjectField("FinsTextureArrayIndex"));
         }
+        inline Ent::Gen2::Float FurProperties::MultiScatteringPower() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("MultiScatteringPower"));
+        }
+        inline Ent::Gen2::Float FurProperties::MultiScatteringWrap() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("MultiScatteringWrap"));
+        }
         inline Ent::Gen2::Float FurProperties::Roughness() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("Roughness"));
+        }
+        inline Ent::Gen2::Vector3 FurProperties::SpecularFactor() const
+        {
+            return Ent::Gen2::Vector3(getProperty().getObjectField("SpecularFactor"));
         }
         inline Ent::Gen2::Float FurProperties::Stiffness() const
         {
@@ -45923,6 +47331,10 @@ namespace Ent
         inline Ent::Gen2::Float FurProperties::Thickness() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("Thickness"));
+        }
+        inline Ent::Gen2::Bool FurProperties::UseNewLighting() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("UseNewLighting"));
         }
         inline Ent::Gen2::Float FurProperties::Weight() const
         {
@@ -46566,6 +47978,10 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("DistanceMaxFromSpawner"));
         }
+        inline Ent::Gen2::Float EntityStateManageChildEntityPool_Inputs::SafeDistanceAroundPlayer() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("SafeDistanceAroundPlayer"));
+        }
         inline Ent::Gen2::EntityRef EntityStateManageChildEntityPool_Inputs::SpawnerEntityRef() const
         {
             return Ent::Gen2::EntityRef(getProperty().getObjectField("SpawnerEntityRef"));
@@ -46730,6 +48146,10 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("DefaultMaxTransmissionPerSecond"));
         }
+        inline Ent::Gen2::RegenAreaTransitionSettings RegenerationManager::DefaultTransitionWaveSettings() const
+        {
+            return Ent::Gen2::RegenAreaTransitionSettings(getProperty().getObjectField("DefaultTransitionWaveSettings"));
+        }
         inline Ent::Gen2::Float RegenerationManager::DefaultTransmittedRatio() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("DefaultTransmittedRatio"));
@@ -46766,6 +48186,18 @@ namespace Ent
         {
             return Ent::Gen2::Int(getProperty().getObjectField("MaxDynamicRegenEffectCount"));
         }
+        inline Ent::Gen2::Int RegenerationManager::MaxRegenAreaPerCluster() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("MaxRegenAreaPerCluster"));
+        }
+        inline Ent::Gen2::Int RegenerationManager::RegenAreaClusterWorldSize() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("RegenAreaClusterWorldSize"));
+        }
+        inline Ent::Gen2::Bool RegenerationManager::RegenAreaClustering() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("RegenAreaClustering"));
+        }
         inline Ent::Gen2::Manager RegenerationManager::Super() const
         {
             return Ent::Gen2::Manager(getProperty().getObjectField("Super"));
@@ -46794,6 +48226,19 @@ namespace Ent
         inline Ent::Gen2::String EnergyPoolGD_EnergyArea::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EndPosition
+        inline Ent::Gen2::String EndPosition::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool EndPosition::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::Position EndPosition::val() const
+        {
+            return Ent::Gen2::Position(getProperty().getObjectField("val"));
         }
         // Enabled
         inline Ent::Gen2::String Enabled::_comment() const
@@ -46999,6 +48444,10 @@ namespace Ent
         inline Ent::Gen2::Bool DebugDisplayFlags::DisplayBehavior() const
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("DisplayBehavior"));
+        }
+        inline Ent::Gen2::Bool DebugDisplayFlags::DisplayBlendShapeDebug() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("DisplayBlendShapeDebug"));
         }
         inline Ent::Gen2::Bool DebugDisplayFlags::DisplayBrainMonitor() const
         {
@@ -47216,14 +48665,6 @@ namespace Ent
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("DisplaySelectedPestoEntity"));
         }
-        inline Ent::Gen2::Bool DebugDisplayFlags::DisplaySplinePilot() const
-        {
-            return Ent::Gen2::Bool(getProperty().getObjectField("DisplaySplinePilot"));
-        }
-        inline Ent::Gen2::Bool DebugDisplayFlags::DisplaySplinePilotTool() const
-        {
-            return Ent::Gen2::Bool(getProperty().getObjectField("DisplaySplinePilotTool"));
-        }
         inline Ent::Gen2::Bool DebugDisplayFlags::DisplayStringHashTranslator() const
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("DisplayStringHashTranslator"));
@@ -47395,10 +48836,6 @@ namespace Ent
         {
             return Ent::Gen2::Int(getProperty().getObjectField("dangerousness"));
         }
-        inline Ent::Gen2::Float CreatureDangerousness::multiplierWhenInjured() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("multiplierWhenInjured"));
-        }
         // ConstrainedMoveContextInput
         inline Ent::Gen2::Float ConstrainedMoveContextInput::CurvatureNormalizationRadius() const
         {
@@ -47537,12 +48974,12 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
-        // StrongAttackComponentInput
-        inline Ent::Gen2::ComponentInput StrongAttackComponentInput::Super() const
+        // SpiritAnimalShrineComponentInput
+        inline Ent::Gen2::ComponentInput SpiritAnimalShrineComponentInput::Super() const
         {
             return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
         }
-        inline Ent::Gen2::String StrongAttackComponentInput::_comment() const
+        inline Ent::Gen2::String SpiritAnimalShrineComponentInput::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -47559,6 +48996,15 @@ namespace Ent
         {
             return Ent::Gen2::computePitchAngle(getProperty().getObjectField("computePitchAngle"));
         }
+        // SoftCollisionComponentInput
+        inline Ent::Gen2::ComponentInput SoftCollisionComponentInput::Super() const
+        {
+            return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String SoftCollisionComponentInput::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // SmoothScaleComponentInput
         inline Ent::Gen2::Parameters SmoothScaleComponentInput::Parameters() const
         {
@@ -47573,6 +49019,15 @@ namespace Ent
             return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String SmoothScaleComponentInput::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // ScriptComponentInput
+        inline Ent::Gen2::ComponentInput ScriptComponentInput::Super() const
+        {
+            return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String ScriptComponentInput::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -47595,6 +49050,15 @@ namespace Ent
             return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String RespawnabilityComponentInput::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // RagdollComponentInput
+        inline Ent::Gen2::ComponentInput RagdollComponentInput::Super() const
+        {
+            return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String RagdollComponentInput::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -47697,6 +49161,23 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // InteractorComponentInput
+        inline Ent::Gen2::EndPosition InteractorComponentInput::EndPosition() const
+        {
+            return Ent::Gen2::EndPosition(getProperty().getObjectField("EndPosition"));
+        }
+        inline Ent::Gen2::IsActive InteractorComponentInput::IsActive() const
+        {
+            return Ent::Gen2::IsActive(getProperty().getObjectField("IsActive"));
+        }
+        inline Ent::Gen2::ComponentInput InteractorComponentInput::Super() const
+        {
+            return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String InteractorComponentInput::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // InteractableGPEComponentInput
         inline Ent::Gen2::Interactor InteractableGPEComponentInput::Interactor() const
         {
@@ -47775,6 +49256,10 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        inline Ent::Gen2::resetCreatureRequest CreatureAIComponentInput::resetCreatureRequest() const
+        {
+            return Ent::Gen2::resetCreatureRequest(getProperty().getObjectField("resetCreatureRequest"));
+        }
         inline Ent::Gen2::usePerception CreatureAIComponentInput::usePerception() const
         {
             return Ent::Gen2::usePerception(getProperty().getObjectField("usePerception"));
@@ -47805,6 +49290,14 @@ namespace Ent
         inline Ent::Gen2::JumpHeightMultiplier CharacterControllerComponentInput::JumpHeightMultiplier() const
         {
             return Ent::Gen2::JumpHeightMultiplier(getProperty().getObjectField("JumpHeightMultiplier"));
+        }
+        inline Ent::Gen2::RigidbodyScaleMultiplier CharacterControllerComponentInput::RigidbodyScaleMultiplier() const
+        {
+            return Ent::Gen2::RigidbodyScaleMultiplier(getProperty().getObjectField("RigidbodyScaleMultiplier"));
+        }
+        inline Ent::Gen2::RigidbodyScalingSpeed CharacterControllerComponentInput::RigidbodyScalingSpeed() const
+        {
+            return Ent::Gen2::RigidbodyScalingSpeed(getProperty().getObjectField("RigidbodyScalingSpeed"));
         }
         inline Ent::Gen2::ComponentInput CharacterControllerComponentInput::Super() const
         {
@@ -47838,6 +49331,15 @@ namespace Ent
             return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String AttackTriggerComponentInput::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // AttackComponentInput
+        inline Ent::Gen2::ComponentInput AttackComponentInput::Super() const
+        {
+            return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String AttackComponentInput::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -48056,6 +49558,10 @@ namespace Ent
         inline Array<Ent::Gen2::EDITOR_LODsItem> VisualGD::EDITOR_LODs() const
         {
             return Array<Ent::Gen2::EDITOR_LODsItem>(getProperty().getObjectField("EDITOR_LODs"));
+        }
+        inline Ent::Gen2::String VisualGD::MaterialGroup() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("MaterialGroup"));
         }
         inline Ent::Gen2::Float VisualGD::RUNTIME_LODScale() const
         {
@@ -48608,6 +50114,14 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // StaffVertebrasGD
+        inline Ent::Gen2::Int StaffVertebrasGD::BeginVertebraRefillThreshold() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("BeginVertebraRefillThreshold"));
+        }
+        inline Ent::Gen2::Int StaffVertebrasGD::EndVertebraRefillThreshold() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("EndVertebraRefillThreshold"));
+        }
         inline PrimArray<Ent::Gen2::String> StaffVertebrasGD::HotspotNames() const
         {
             return PrimArray<Ent::Gen2::String>(getProperty().getObjectField("HotspotNames"));
@@ -48619,6 +50133,10 @@ namespace Ent
         inline Ent::Gen2::Int StaffVertebrasGD::OwnedVertebraStartCount() const
         {
             return Ent::Gen2::Int(getProperty().getObjectField("OwnedVertebraStartCount"));
+        }
+        inline Ent::Gen2::Float StaffVertebrasGD::RefillVertebraTimer() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("RefillVertebraTimer"));
         }
         inline Ent::Gen2::ComponentGD StaffVertebrasGD::Super() const
         {
@@ -48658,6 +50176,10 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // SpiritAnimalShrineGD
+        inline Ent::Gen2::Float SpiritAnimalShrineGD::InteractionDuration() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("InteractionDuration"));
+        }
         inline Ent::Gen2::Specie SpiritAnimalShrineGD::Specie() const
         {
             return Ent::Gen2::Specie(getProperty().getObjectField("Specie"));
@@ -48855,6 +50377,23 @@ namespace Ent
             return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String SoulRespawnOpportunityGD::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // SoftCollisionGD
+        inline Ent::Gen2::Float SoftCollisionGD::PenetrationCoeffSmoothRate() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("PenetrationCoeffSmoothRate"));
+        }
+        inline Ent::Gen2::ComponentGD SoftCollisionGD::Super() const
+        {
+            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::SoftCollisionGD_VegetationDetectionParameters SoftCollisionGD::VegetationDetectionParam() const
+        {
+            return Ent::Gen2::SoftCollisionGD_VegetationDetectionParameters(getProperty().getObjectField("VegetationDetectionParam"));
+        }
+        inline Ent::Gen2::String SoftCollisionGD::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -49396,6 +50935,10 @@ namespace Ent
         {
             return Ent::Gen2::Vector3(getProperty().getObjectField("OffsetRotation"));
         }
+        inline Ent::Gen2::Bool PhysicsGD::OneWayBodiesDriveTransform() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("OneWayBodiesDriveTransform"));
+        }
         inline Ent::Gen2::String PhysicsGD::PhysicsMaterial() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("PhysicsMaterial"));
@@ -49555,35 +51098,6 @@ namespace Ent
         {
             return PrimArray<Ent::Gen2::String>(getProperty().getObjectField("m_tags"));
         }
-        // PathFinderGD
-        inline Ent::Gen2::Float PathFinderGD::GroundAreaCost() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("GroundAreaCost"));
-        }
-        inline Ent::Gen2::Bool PathFinderGD::MovesInWater() const
-        {
-            return Ent::Gen2::Bool(getProperty().getObjectField("MovesInWater"));
-        }
-        inline Ent::Gen2::Bool PathFinderGD::MovesOnGround() const
-        {
-            return Ent::Gen2::Bool(getProperty().getObjectField("MovesOnGround"));
-        }
-        inline Ent::Gen2::Size PathFinderGD::Size() const
-        {
-            return Ent::Gen2::Size(getProperty().getObjectField("Size"));
-        }
-        inline Ent::Gen2::ComponentGD PathFinderGD::Super() const
-        {
-            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
-        }
-        inline Ent::Gen2::Float PathFinderGD::WaterAreaCost() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("WaterAreaCost"));
-        }
-        inline Ent::Gen2::String PathFinderGD::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
         // OutfitWearerGD
         inline Ent::Gen2::EntityRef OutfitWearerGD::InventoryEntityRef() const
         {
@@ -49719,6 +51233,10 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // NavMeshStamperGD
+        inline Ent::Gen2::Bool NavMeshStamperGD::IsActive() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("IsActive"));
+        }
         inline Array<Ent::Gen2::MeshStamper> NavMeshStamperGD::MeshStampers() const
         {
             return Array<Ent::Gen2::MeshStamper>(getProperty().getObjectField("MeshStampers"));
@@ -49726,6 +51244,10 @@ namespace Ent
         inline Array<Ent::Gen2::OffMeshLink> NavMeshStamperGD::OffMeshLinks() const
         {
             return Array<Ent::Gen2::OffMeshLink>(getProperty().getObjectField("OffMeshLinks"));
+        }
+        inline Array<Ent::Gen2::SkinnedPhysMeshStamper> NavMeshStamperGD::SkinnedMeshStampers() const
+        {
+            return Array<Ent::Gen2::SkinnedPhysMeshStamper>(getProperty().getObjectField("SkinnedMeshStampers"));
         }
         inline Ent::Gen2::ComponentGD NavMeshStamperGD::Super() const
         {
@@ -49881,9 +51403,9 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("DeathThreshold"));
         }
-        inline Ent::Gen2::Float LifeComponentGD::InjuredDamagesRatio() const
+        inline Ent::Gen2::Float LifeComponentGD::InjuredDamagesThreshold() const
         {
-            return Ent::Gen2::Float(getProperty().getObjectField("InjuredDamagesRatio"));
+            return Ent::Gen2::Float(getProperty().getObjectField("InjuredDamagesThreshold"));
         }
         inline Ent::Gen2::Float LifeComponentGD::MinLifeWhenSpending() const
         {
@@ -50031,6 +51553,10 @@ namespace Ent
         inline Ent::Gen2::ScaleConverter IncapacitateComponentGD::IncapacitateTimeCurve() const
         {
             return Ent::Gen2::ScaleConverter(getProperty().getObjectField("IncapacitateTimeCurve"));
+        }
+        inline Ent::Gen2::ScaleConverter IncapacitateComponentGD::IncapacitateTimeMultiplierCurve() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("IncapacitateTimeMultiplierCurve"));
         }
         inline Ent::Gen2::ComponentGD IncapacitateComponentGD::Super() const
         {
@@ -50548,13 +52074,13 @@ namespace Ent
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("FactionOverride"));
         }
-        inline PrimArray<Ent::Gen2::String> EnergyPoolGD::RegenEffectsOnConversion() const
-        {
-            return PrimArray<Ent::Gen2::String>(getProperty().getObjectField("RegenEffectsOnConversion"));
-        }
         inline Ent::Gen2::ComponentGD EnergyPoolGD::Super() const
         {
             return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::TransitionSettings EnergyPoolGD::TransitionSettings() const
+        {
+            return Ent::Gen2::TransitionSettings(getProperty().getObjectField("TransitionSettings"));
         }
         inline Ent::Gen2::String EnergyPoolGD::_comment() const
         {
@@ -50818,6 +52344,10 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // BreakableGD
+        inline Ent::Gen2::EntityRef BreakableGD::AssemblyEntity() const
+        {
+            return Ent::Gen2::EntityRef(getProperty().getObjectField("AssemblyEntity"));
+        }
         inline Ent::Gen2::String BreakableGD::BreakSoundBank() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("BreakSoundBank"));
@@ -50825,6 +52355,10 @@ namespace Ent
         inline Ent::Gen2::String BreakableGD::BreakSoundEvent() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("BreakSoundEvent"));
+        }
+        inline Ent::Gen2::EntityRef BreakableGD::ChildEntity() const
+        {
+            return Ent::Gen2::EntityRef(getProperty().getObjectField("ChildEntity"));
         }
         inline Ent::Gen2::Float BreakableGD::FadeoutDuration() const
         {
@@ -50838,10 +52372,6 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("MaxContactAngle"));
         }
-        inline Ent::Gen2::EntityRef BreakableGD::ParentEntity() const
-        {
-            return Ent::Gen2::EntityRef(getProperty().getObjectField("ParentEntity"));
-        }
         inline Ent::Gen2::ComponentGD BreakableGD::Super() const
         {
             return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
@@ -50849,6 +52379,10 @@ namespace Ent
         inline Ent::Gen2::Float BreakableGD::TimeBeforeFade() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("TimeBeforeFade"));
+        }
+        inline Ent::Gen2::EntityRef BreakableGD::UnbrokenEntity() const
+        {
+            return Ent::Gen2::EntityRef(getProperty().getObjectField("UnbrokenEntity"));
         }
         inline Ent::Gen2::String BreakableGD::_comment() const
         {
@@ -50868,35 +52402,6 @@ namespace Ent
             return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String BittenGD::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        // BeamGeneratorGD
-        inline PrimArray<Ent::Gen2::String> BeamGeneratorGD::BonesStartPoints() const
-        {
-            return PrimArray<Ent::Gen2::String>(getProperty().getObjectField("BonesStartPoints"));
-        }
-        inline Ent::Gen2::Float BeamGeneratorGD::ExtraDistanceBeyondTarget() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("ExtraDistanceBeyondTarget"));
-        }
-        inline Ent::Gen2::Float BeamGeneratorGD::LengthDuration() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("LengthDuration"));
-        }
-        inline Ent::Gen2::String BeamGeneratorGD::PathBeamEffect() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("PathBeamEffect"));
-        }
-        inline Ent::Gen2::Int BeamGeneratorGD::PointsPerBeam() const
-        {
-            return Ent::Gen2::Int(getProperty().getObjectField("PointsPerBeam"));
-        }
-        inline Ent::Gen2::ComponentGD BeamGeneratorGD::Super() const
-        {
-            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
-        }
-        inline Ent::Gen2::String BeamGeneratorGD::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -51166,6 +52671,17 @@ namespace Ent
         {
             return Ent::Gen2::AssemblyGD(getProperty().setUnionType("AssemblyGD"));
         }
+        inline std::optional<Ent::Gen2::AttackComponentGD> Component::AttackComponentGD()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "AttackComponentGD") != 0?
+                    std::optional<Ent::Gen2::AttackComponentGD>{}:
+                    std::optional<Ent::Gen2::AttackComponentGD>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::AttackComponentGD Component::setAttackComponentGD()
+        {
+            return Ent::Gen2::AttackComponentGD(getProperty().setUnionType("AttackComponentGD"));
+        }
         inline std::optional<Ent::Gen2::AttackTriggerGD> Component::AttackTriggerGD()
         {
             return strcmp(
@@ -51176,17 +52692,6 @@ namespace Ent
         inline Ent::Gen2::AttackTriggerGD Component::setAttackTriggerGD()
         {
             return Ent::Gen2::AttackTriggerGD(getProperty().setUnionType("AttackTriggerGD"));
-        }
-        inline std::optional<Ent::Gen2::BeamGeneratorGD> Component::BeamGeneratorGD()
-        {
-            return strcmp(
-                getProperty().getUnionType(), "BeamGeneratorGD") != 0?
-                    std::optional<Ent::Gen2::BeamGeneratorGD>{}:
-                    std::optional<Ent::Gen2::BeamGeneratorGD>(getProperty().getUnionData());
-        }
-        inline Ent::Gen2::BeamGeneratorGD Component::setBeamGeneratorGD()
-        {
-            return Ent::Gen2::BeamGeneratorGD(getProperty().setUnionType("BeamGeneratorGD"));
         }
         inline std::optional<Ent::Gen2::BeamTargetGD> Component::BeamTargetGD()
         {
@@ -51837,6 +53342,17 @@ namespace Ent
         {
             return Ent::Gen2::InteractableGPEGD(getProperty().setUnionType("InteractableGPEGD"));
         }
+        inline std::optional<Ent::Gen2::InteractorGD> Component::InteractorGD()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "InteractorGD") != 0?
+                    std::optional<Ent::Gen2::InteractorGD>{}:
+                    std::optional<Ent::Gen2::InteractorGD>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::InteractorGD Component::setInteractorGD()
+        {
+            return Ent::Gen2::InteractorGD(getProperty().setUnionType("InteractorGD"));
+        }
         inline std::optional<Ent::Gen2::InterestPointGD> Component::InterestPointGD()
         {
             return strcmp(
@@ -52420,6 +53936,17 @@ namespace Ent
         {
             return Ent::Gen2::SmoothScaleComponentGD(getProperty().setUnionType("SmoothScaleComponentGD"));
         }
+        inline std::optional<Ent::Gen2::SoftCollisionGD> Component::SoftCollisionGD()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "SoftCollisionGD") != 0?
+                    std::optional<Ent::Gen2::SoftCollisionGD>{}:
+                    std::optional<Ent::Gen2::SoftCollisionGD>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::SoftCollisionGD Component::setSoftCollisionGD()
+        {
+            return Ent::Gen2::SoftCollisionGD(getProperty().setUnionType("SoftCollisionGD"));
+        }
         inline std::optional<Ent::Gen2::SoulRespawnOpportunityGD> Component::SoulRespawnOpportunityGD()
         {
             return strcmp(
@@ -52518,17 +54045,6 @@ namespace Ent
         inline Ent::Gen2::StickToTerrain Component::setStickToTerrain()
         {
             return Ent::Gen2::StickToTerrain(getProperty().setUnionType("StickToTerrain"));
-        }
-        inline std::optional<Ent::Gen2::StrongAttackGD> Component::StrongAttackGD()
-        {
-            return strcmp(
-                getProperty().getUnionType(), "StrongAttackGD") != 0?
-                    std::optional<Ent::Gen2::StrongAttackGD>{}:
-                    std::optional<Ent::Gen2::StrongAttackGD>(getProperty().getUnionData());
-        }
-        inline Ent::Gen2::StrongAttackGD Component::setStrongAttackGD()
-        {
-            return Ent::Gen2::StrongAttackGD(getProperty().setUnionType("StrongAttackGD"));
         }
         inline std::optional<Ent::Gen2::SubScene> Component::SubScene()
         {
@@ -52967,6 +54483,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("AssemblyGD");
         }
+        inline std::optional<Ent::Gen2::AttackComponentGD> Object_Components::AttackComponentGD()
+        {
+            return std::optional<Ent::Gen2::AttackComponentGD>(getSubNode("AttackComponentGD"));
+        }
+        inline Ent::Gen2::AttackComponentGD Object_Components::addAttackComponentGD()
+        {
+            return Ent::Gen2::AttackComponentGD(addSubNode("AttackComponentGD"));
+        }
+        inline void Object_Components::removeAttackComponentGD()
+        {
+            getProperty().eraseUnionSetItem("AttackComponentGD");
+        }
         inline std::optional<Ent::Gen2::AttackTriggerGD> Object_Components::AttackTriggerGD()
         {
             return std::optional<Ent::Gen2::AttackTriggerGD>(getSubNode("AttackTriggerGD"));
@@ -52978,18 +54506,6 @@ namespace Ent
         inline void Object_Components::removeAttackTriggerGD()
         {
             getProperty().eraseUnionSetItem("AttackTriggerGD");
-        }
-        inline std::optional<Ent::Gen2::BeamGeneratorGD> Object_Components::BeamGeneratorGD()
-        {
-            return std::optional<Ent::Gen2::BeamGeneratorGD>(getSubNode("BeamGeneratorGD"));
-        }
-        inline Ent::Gen2::BeamGeneratorGD Object_Components::addBeamGeneratorGD()
-        {
-            return Ent::Gen2::BeamGeneratorGD(addSubNode("BeamGeneratorGD"));
-        }
-        inline void Object_Components::removeBeamGeneratorGD()
-        {
-            getProperty().eraseUnionSetItem("BeamGeneratorGD");
         }
         inline std::optional<Ent::Gen2::BeamTargetGD> Object_Components::BeamTargetGD()
         {
@@ -53699,6 +55215,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("InteractableGPEGD");
         }
+        inline std::optional<Ent::Gen2::InteractorGD> Object_Components::InteractorGD()
+        {
+            return std::optional<Ent::Gen2::InteractorGD>(getSubNode("InteractorGD"));
+        }
+        inline Ent::Gen2::InteractorGD Object_Components::addInteractorGD()
+        {
+            return Ent::Gen2::InteractorGD(addSubNode("InteractorGD"));
+        }
+        inline void Object_Components::removeInteractorGD()
+        {
+            getProperty().eraseUnionSetItem("InteractorGD");
+        }
         inline std::optional<Ent::Gen2::InterestPointGD> Object_Components::InterestPointGD()
         {
             return std::optional<Ent::Gen2::InterestPointGD>(getSubNode("InterestPointGD"));
@@ -54335,6 +55863,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("SmoothScaleComponentGD");
         }
+        inline std::optional<Ent::Gen2::SoftCollisionGD> Object_Components::SoftCollisionGD()
+        {
+            return std::optional<Ent::Gen2::SoftCollisionGD>(getSubNode("SoftCollisionGD"));
+        }
+        inline Ent::Gen2::SoftCollisionGD Object_Components::addSoftCollisionGD()
+        {
+            return Ent::Gen2::SoftCollisionGD(addSubNode("SoftCollisionGD"));
+        }
+        inline void Object_Components::removeSoftCollisionGD()
+        {
+            getProperty().eraseUnionSetItem("SoftCollisionGD");
+        }
         inline std::optional<Ent::Gen2::SoulRespawnOpportunityGD> Object_Components::SoulRespawnOpportunityGD()
         {
             return std::optional<Ent::Gen2::SoulRespawnOpportunityGD>(getSubNode("SoulRespawnOpportunityGD"));
@@ -54442,18 +55982,6 @@ namespace Ent
         inline void Object_Components::removeStickToTerrain()
         {
             getProperty().eraseUnionSetItem("StickToTerrain");
-        }
-        inline std::optional<Ent::Gen2::StrongAttackGD> Object_Components::StrongAttackGD()
-        {
-            return std::optional<Ent::Gen2::StrongAttackGD>(getSubNode("StrongAttackGD"));
-        }
-        inline Ent::Gen2::StrongAttackGD Object_Components::addStrongAttackGD()
-        {
-            return Ent::Gen2::StrongAttackGD(addSubNode("StrongAttackGD"));
-        }
-        inline void Object_Components::removeStrongAttackGD()
-        {
-            getProperty().eraseUnionSetItem("StrongAttackGD");
         }
         inline std::optional<Ent::Gen2::SubScene> Object_Components::SubScene()
         {
@@ -54789,13 +56317,29 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // WindTurbulenceEffect
-        inline Ent::Gen2::Float WindTurbulenceEffect::Strength() const
+        inline Ent::Gen2::Float WindTurbulenceEffect::BendStrength() const
         {
-            return Ent::Gen2::Float(getProperty().getObjectField("Strength"));
+            return Ent::Gen2::Float(getProperty().getObjectField("BendStrength"));
+        }
+        inline Ent::Gen2::Float WindTurbulenceEffect::GlobalStrength() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("GlobalStrength"));
         }
         inline Ent::Gen2::GameEffect WindTurbulenceEffect::Super() const
         {
             return Ent::Gen2::GameEffect(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::Float WindTurbulenceEffect::TurbulenceStrength() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("TurbulenceStrength"));
+        }
+        inline Ent::Gen2::Bool WindTurbulenceEffect::UseGlobalStrength() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("UseGlobalStrength"));
+        }
+        inline Ent::Gen2::Float WindTurbulenceEffect::WindShakeStrength() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("WindShakeStrength"));
         }
         inline Ent::Gen2::WindTurbulenceType WindTurbulenceEffect::WindTurbulenceType() const
         {
@@ -54823,6 +56367,10 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // RepulseEffect
+        inline Ent::Gen2::Bool RepulseEffect::ApplyOnTrees() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("ApplyOnTrees"));
+        }
         inline Ent::Gen2::Float RepulseEffect::DistanceAttenuation() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("DistanceAttenuation"));
@@ -55166,6 +56714,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("AssemblyGD");
         }
+        inline std::optional<Ent::Gen2::AttackComponentGD> Components::AttackComponentGD()
+        {
+            return std::optional<Ent::Gen2::AttackComponentGD>(getSubNode("AttackComponentGD"));
+        }
+        inline Ent::Gen2::AttackComponentGD Components::addAttackComponentGD()
+        {
+            return Ent::Gen2::AttackComponentGD(addSubNode("AttackComponentGD"));
+        }
+        inline void Components::removeAttackComponentGD()
+        {
+            getProperty().eraseUnionSetItem("AttackComponentGD");
+        }
         inline std::optional<Ent::Gen2::AttackTriggerGD> Components::AttackTriggerGD()
         {
             return std::optional<Ent::Gen2::AttackTriggerGD>(getSubNode("AttackTriggerGD"));
@@ -55177,18 +56737,6 @@ namespace Ent
         inline void Components::removeAttackTriggerGD()
         {
             getProperty().eraseUnionSetItem("AttackTriggerGD");
-        }
-        inline std::optional<Ent::Gen2::BeamGeneratorGD> Components::BeamGeneratorGD()
-        {
-            return std::optional<Ent::Gen2::BeamGeneratorGD>(getSubNode("BeamGeneratorGD"));
-        }
-        inline Ent::Gen2::BeamGeneratorGD Components::addBeamGeneratorGD()
-        {
-            return Ent::Gen2::BeamGeneratorGD(addSubNode("BeamGeneratorGD"));
-        }
-        inline void Components::removeBeamGeneratorGD()
-        {
-            getProperty().eraseUnionSetItem("BeamGeneratorGD");
         }
         inline std::optional<Ent::Gen2::BeamTargetGD> Components::BeamTargetGD()
         {
@@ -55898,6 +57446,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("InteractableGPEGD");
         }
+        inline std::optional<Ent::Gen2::InteractorGD> Components::InteractorGD()
+        {
+            return std::optional<Ent::Gen2::InteractorGD>(getSubNode("InteractorGD"));
+        }
+        inline Ent::Gen2::InteractorGD Components::addInteractorGD()
+        {
+            return Ent::Gen2::InteractorGD(addSubNode("InteractorGD"));
+        }
+        inline void Components::removeInteractorGD()
+        {
+            getProperty().eraseUnionSetItem("InteractorGD");
+        }
         inline std::optional<Ent::Gen2::InterestPointGD> Components::InterestPointGD()
         {
             return std::optional<Ent::Gen2::InterestPointGD>(getSubNode("InterestPointGD"));
@@ -56534,6 +58094,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("SmoothScaleComponentGD");
         }
+        inline std::optional<Ent::Gen2::SoftCollisionGD> Components::SoftCollisionGD()
+        {
+            return std::optional<Ent::Gen2::SoftCollisionGD>(getSubNode("SoftCollisionGD"));
+        }
+        inline Ent::Gen2::SoftCollisionGD Components::addSoftCollisionGD()
+        {
+            return Ent::Gen2::SoftCollisionGD(addSubNode("SoftCollisionGD"));
+        }
+        inline void Components::removeSoftCollisionGD()
+        {
+            getProperty().eraseUnionSetItem("SoftCollisionGD");
+        }
         inline std::optional<Ent::Gen2::SoulRespawnOpportunityGD> Components::SoulRespawnOpportunityGD()
         {
             return std::optional<Ent::Gen2::SoulRespawnOpportunityGD>(getSubNode("SoulRespawnOpportunityGD"));
@@ -56641,18 +58213,6 @@ namespace Ent
         inline void Components::removeStickToTerrain()
         {
             getProperty().eraseUnionSetItem("StickToTerrain");
-        }
-        inline std::optional<Ent::Gen2::StrongAttackGD> Components::StrongAttackGD()
-        {
-            return std::optional<Ent::Gen2::StrongAttackGD>(getSubNode("StrongAttackGD"));
-        }
-        inline Ent::Gen2::StrongAttackGD Components::addStrongAttackGD()
-        {
-            return Ent::Gen2::StrongAttackGD(addSubNode("StrongAttackGD"));
-        }
-        inline void Components::removeStrongAttackGD()
-        {
-            getProperty().eraseUnionSetItem("StrongAttackGD");
         }
         inline std::optional<Ent::Gen2::SubScene> Components::SubScene()
         {
@@ -57165,6 +58725,10 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("RTPC_AbsoluteHeight"));
         }
+        inline Ent::Gen2::String SoundManager::RTPC_AmbSDFDistance() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("RTPC_AmbSDFDistance"));
+        }
         inline Ent::Gen2::String SoundManager::RTPC_AmbientRegenLevel() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("RTPC_AmbientRegenLevel"));
@@ -57599,10 +59163,6 @@ namespace Ent
         inline Ent::Gen2::Vector3 LightComponentGD::Direction() const
         {
             return Ent::Gen2::Vector3(getProperty().getObjectField("Direction"));
-        }
-        inline Ent::Gen2::Bool LightComponentGD::Enabled() const
-        {
-            return Ent::Gen2::Bool(getProperty().getObjectField("Enabled"));
         }
         inline Ent::Gen2::Float LightComponentGD::LinearAttenuationStart() const
         {
@@ -58168,6 +59728,19 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // CineEventTriggerDisplayUIMessage
+        inline Ent::Gen2::CineEventTrigger CineEventTriggerDisplayUIMessage::Super() const
+        {
+            return Ent::Gen2::CineEventTrigger(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::UIMessage CineEventTriggerDisplayUIMessage::UIMessage() const
+        {
+            return Ent::Gen2::UIMessage(getProperty().getObjectField("UIMessage"));
+        }
+        inline Ent::Gen2::String CineEventTriggerDisplayUIMessage::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // CineEventTest
         inline Ent::Gen2::Bool CineEventTest::InvertTest() const
         {
@@ -58666,6 +60239,56 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // BoneStartPoint
+        inline Ent::Gen2::String BoneStartPoint::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool BoneStartPoint::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::String BoneStartPoint::val() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("val"));
+        }
+        // InteractorGD
+        inline PrimArray<Ent::Gen2::String> InteractorGD::BeamEffectsNames() const
+        {
+            return PrimArray<Ent::Gen2::String>(getProperty().getObjectField("BeamEffectsNames"));
+        }
+        inline Ent::Gen2::BoneStartPoint InteractorGD::BoneStartPoint() const
+        {
+            return Ent::Gen2::BoneStartPoint(getProperty().getObjectField("BoneStartPoint"));
+        }
+        inline Ent::Gen2::Float InteractorGD::MaxBeamRange() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("MaxBeamRange"));
+        }
+        inline Ent::Gen2::Float InteractorGD::RandomSphereCastsAngle() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("RandomSphereCastsAngle"));
+        }
+        inline Ent::Gen2::Int InteractorGD::RandomSphereCastsNb() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("RandomSphereCastsNb"));
+        }
+        inline Ent::Gen2::Float InteractorGD::RememberTargetMaxTime() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("RememberTargetMaxTime"));
+        }
+        inline Ent::Gen2::Float InteractorGD::SphereCastRadius() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("SphereCastRadius"));
+        }
+        inline Ent::Gen2::ComponentGD InteractorGD::Super() const
+        {
+            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String InteractorGD::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // BoneAnimation
         inline Ent::Gen2::String BoneAnimation::Name() const
         {
@@ -59041,10 +60664,6 @@ namespace Ent
             return Ent::Gen2::Float(getProperty().getObjectField("m_timerBeforeSuspicious"));
         }
         // BeamTargetGD
-        inline Ent::Gen2::Bool BeamTargetGD::CheckHotspotOrientation() const
-        {
-            return Ent::Gen2::Bool(getProperty().getObjectField("CheckHotspotOrientation"));
-        }
         inline Ent::Gen2::String BeamTargetGD::EventTriggered() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("EventTriggered"));
@@ -59053,25 +60672,17 @@ namespace Ent
         {
             return Ent::Gen2::HotSpotType(getProperty().getObjectField("HotspotType"));
         }
-        inline Ent::Gen2::Bool BeamTargetGD::IsCollectable() const
+        inline Ent::Gen2::Float BeamTargetGD::InteractMaxDistance() const
         {
-            return Ent::Gen2::Bool(getProperty().getObjectField("IsCollectable"));
+            return Ent::Gen2::Float(getProperty().getObjectField("InteractMaxDistance"));
         }
-        inline Ent::Gen2::Bool BeamTargetGD::Levitate() const
+        inline Ent::Gen2::Float BeamTargetGD::InteractionRadius() const
         {
-            return Ent::Gen2::Bool(getProperty().getObjectField("Levitate"));
-        }
-        inline Ent::Gen2::Float BeamTargetGD::MaxTargetableDistance() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("MaxTargetableDistance"));
+            return Ent::Gen2::Float(getProperty().getObjectField("InteractionRadius"));
         }
         inline Ent::Gen2::BeamStaffMode BeamTargetGD::Mode() const
         {
             return Ent::Gen2::BeamStaffMode(getProperty().getObjectField("Mode"));
-        }
-        inline Ent::Gen2::Bool BeamTargetGD::SpendEnergy() const
-        {
-            return Ent::Gen2::Bool(getProperty().getObjectField("SpendEnergy"));
         }
         inline Ent::Gen2::ComponentGD BeamTargetGD::Super() const
         {
@@ -59138,6 +60749,44 @@ namespace Ent
         inline Ent::Gen2::String Hit::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // AttackPositionRetimingData_SpecieRetimingCoeff
+        inline Ent::Gen2::String AttackPositionRetimingData_SpecieRetimingCoeff::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Float AttackPositionRetimingData_SpecieRetimingCoeff::defaultCoeff() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("defaultCoeff"));
+        }
+        inline Ent::Gen2::Float AttackPositionRetimingData_SpecieRetimingCoeff::masterCoeff() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("masterCoeff"));
+        }
+        // AttackPositionRetimingData
+        inline Ent::Gen2::String AttackPositionRetimingData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Float AttackPositionRetimingData::animTranslationCoeff() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("animTranslationCoeff"));
+        }
+        inline Ent::Gen2::Map<SpecieEnum, Ent::Gen2::AttackPositionRetimingData_SpecieRetimingCoeff> AttackPositionRetimingData::backwardRetimingCoeffBySpecie() const
+        {
+            return Ent::Gen2::Map<SpecieEnum, Ent::Gen2::AttackPositionRetimingData_SpecieRetimingCoeff>(getProperty().getObjectField("backwardRetimingCoeffBySpecie"));
+        }
+        inline Ent::Gen2::Float AttackPositionRetimingData::lengthMax() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("lengthMax"));
+        }
+        inline Ent::Gen2::Float AttackPositionRetimingData::lengthMin() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("lengthMin"));
+        }
+        inline Ent::Gen2::Float AttackPositionRetimingData::spherecastRadiusCoeff() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("spherecastRadiusCoeff"));
         }
         // AttackPhysicsForceData
         inline Ent::Gen2::String AttackPhysicsForceData::_comment() const
@@ -59269,6 +60918,10 @@ namespace Ent
         {
             return Ent::Gen2::Int(getProperty().getObjectField("DefaultGamePadID"));
         }
+        inline Ent::Gen2::GameEdgeData GameManager::EdgeData() const
+        {
+            return Ent::Gen2::GameEdgeData(getProperty().getObjectField("EdgeData"));
+        }
         inline Ent::Gen2::Bool GameManager::EnableSplashScreen() const
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("EnableSplashScreen"));
@@ -59369,6 +61022,18 @@ namespace Ent
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("MountOnlyOnFollower"));
         }
+        inline Ent::Gen2::String GameManager::NewGameVideo() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("NewGameVideo"));
+        }
+        inline Ent::Gen2::String GameManager::NewGameVideoMusicStart() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("NewGameVideoMusicStart"));
+        }
+        inline Ent::Gen2::String GameManager::NewGameVideoMusicStop() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("NewGameVideoMusicStop"));
+        }
         inline Ent::Gen2::GameParryData GameManager::ParryData() const
         {
             return Ent::Gen2::GameParryData(getProperty().getObjectField("ParryData"));
@@ -59396,6 +61061,10 @@ namespace Ent
         inline Ent::Gen2::GameSnapData GameManager::SnapData() const
         {
             return Ent::Gen2::GameSnapData(getProperty().getObjectField("SnapData"));
+        }
+        inline Ent::Gen2::GameSoftCollisionData GameManager::SoftCollisionData() const
+        {
+            return Ent::Gen2::GameSoftCollisionData(getProperty().getObjectField("SoftCollisionData"));
         }
         inline Ent::Gen2::String GameManager::Sound_TopView_Start() const
         {
@@ -59426,6 +61095,44 @@ namespace Ent
             return Ent::Gen2::GameImmersionData(getProperty().getObjectField("WaterImmersionData"));
         }
         inline Ent::Gen2::String GameManager::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // AreaNavigation
+        inline Ent::Gen2::Float AreaNavigation::GroundAreaCost() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("GroundAreaCost"));
+        }
+        inline Ent::Gen2::Bool AreaNavigation::MovesInWater() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("MovesInWater"));
+        }
+        inline Ent::Gen2::Bool AreaNavigation::MovesOnGround() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("MovesOnGround"));
+        }
+        inline Ent::Gen2::Float AreaNavigation::WaterAreaCost() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("WaterAreaCost"));
+        }
+        inline Ent::Gen2::String AreaNavigation::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // PathFinderGD
+        inline Ent::Gen2::AreaNavigation PathFinderGD::AreaNavigation() const
+        {
+            return Ent::Gen2::AreaNavigation(getProperty().getObjectField("AreaNavigation"));
+        }
+        inline Ent::Gen2::ComponentGD PathFinderGD::Super() const
+        {
+            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String PathFinderGD::UsedNavMeshName() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("UsedNavMeshName"));
+        }
+        inline Ent::Gen2::String PathFinderGD::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -59891,9 +61598,9 @@ namespace Ent
         {
             return Ent::Gen2::Vector3(getProperty().getObjectField("constraintDetectionOffset"));
         }
-        inline Ent::Gen2::ScaleConverter MoveCapacityData::constraintDetectionRadius() const
+        inline Ent::Gen2::Float MoveCapacityData::constraintDetectionRadiusMultiplier() const
         {
-            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("constraintDetectionRadius"));
+            return Ent::Gen2::Float(getProperty().getObjectField("constraintDetectionRadiusMultiplier"));
         }
         inline Ent::Gen2::Float MoveCapacityData::coyoteJumpMaxTime() const
         {
@@ -59922,6 +61629,18 @@ namespace Ent
         inline Ent::Gen2::Bool MoveCapacityData::dropSyncTrajectoryAndVisual() const
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("dropSyncTrajectoryAndVisual"));
+        }
+        inline Ent::Gen2::ScaleConverter MoveCapacityData::edgeDetectionAnticipation() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("edgeDetectionAnticipation"));
+        }
+        inline Ent::Gen2::Vector3 MoveCapacityData::edgeDetectionOffset() const
+        {
+            return Ent::Gen2::Vector3(getProperty().getObjectField("edgeDetectionOffset"));
+        }
+        inline Ent::Gen2::Float MoveCapacityData::edgeDetectionRadiusMultiplier() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("edgeDetectionRadiusMultiplier"));
         }
         inline Ent::Gen2::Float MoveCapacityData::ellipseCoeff() const
         {
@@ -60050,6 +61769,10 @@ namespace Ent
         inline Ent::Gen2::Bool MoveCapacityData::reactToOtherCharacterBodyCollision() const
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("reactToOtherCharacterBodyCollision"));
+        }
+        inline Ent::Gen2::Float MoveCapacityData::rigidbodyScalingSpeed() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("rigidbodyScalingSpeed"));
         }
         inline Ent::Gen2::Float MoveCapacityData::sphereCastRadiusRatio() const
         {
@@ -60299,43 +62022,60 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("syncDataName"));
         }
-        // StrongAttackChargedData
-        inline Ent::Gen2::AnimAdditionalTag StrongAttackChargedData::AnimationTag() const
+        // AttackChargedData
+        inline Ent::Gen2::AnimAdditionalTag AttackChargedData::AnimationTag() const
         {
             return Ent::Gen2::AnimAdditionalTag(getProperty().getObjectField("AnimationTag"));
         }
-        inline Ent::Gen2::FloatRange StrongAttackChargedData::ChargeRatio() const
+        inline Ent::Gen2::FloatRange AttackChargedData::ChargeRatio() const
         {
             return Ent::Gen2::FloatRange(getProperty().getObjectField("ChargeRatio"));
         }
-        inline Ent::Gen2::String StrongAttackChargedData::_comment() const
+        inline Ent::Gen2::String AttackChargedData::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
-        // StrongAttackGD
-        inline Ent::Gen2::ComponentGD StrongAttackGD::Super() const
+        // StrongAttackData
+        inline Ent::Gen2::ResponsiblePointer_ActorState_ StrongAttackData::StrongAttackState() const
         {
-            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
+            return Ent::Gen2::ResponsiblePointer_ActorState_(getProperty().getObjectField("StrongAttackState"));
         }
-        inline Ent::Gen2::String StrongAttackGD::_comment() const
+        inline Ent::Gen2::String StrongAttackData::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
-        inline Array<Ent::Gen2::StrongAttackChargedData> StrongAttackGD::chargedDatas() const
+        inline Ent::Gen2::Float StrongAttackData::attackOrientationRate() const
         {
-            return Array<Ent::Gen2::StrongAttackChargedData>(getProperty().getObjectField("chargedDatas"));
+            return Ent::Gen2::Float(getProperty().getObjectField("attackOrientationRate"));
         }
-        inline Ent::Gen2::Float StrongAttackGD::chargingDeceleration() const
+        inline Array<Ent::Gen2::AttackChargedData> StrongAttackData::chargedDatas() const
+        {
+            return Array<Ent::Gen2::AttackChargedData>(getProperty().getObjectField("chargedDatas"));
+        }
+        inline Ent::Gen2::Float StrongAttackData::chargedMaxDuration() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("chargedMaxDuration"));
+        }
+        inline Ent::Gen2::Float StrongAttackData::chargingDeceleration() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("chargingDeceleration"));
         }
-        inline Ent::Gen2::Float StrongAttackGD::chargingOrientationRate() const
+        inline Ent::Gen2::Float StrongAttackData::chargingOrientationRate() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("chargingOrientationRate"));
         }
-        inline Ent::Gen2::ResponsiblePointer_ActorState_ StrongAttackGD::strongAttackState() const
+        // strongAttackData
+        inline Ent::Gen2::String strongAttackData::_comment() const
         {
-            return Ent::Gen2::ResponsiblePointer_ActorState_(getProperty().getObjectField("strongAttackState"));
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool strongAttackData::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::StrongAttackData strongAttackData::val() const
+        {
+            return Ent::Gen2::StrongAttackData(getProperty().getObjectField("val"));
         }
         // AnalyticsManager_MongoDBConnection
         inline Ent::Gen2::String AnalyticsManager_MongoDBConnection::_comment() const
@@ -60382,6 +62122,57 @@ namespace Ent
         inline Ent::Gen2::String AnalyticsManager::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // AerialAttackData
+        inline Ent::Gen2::ResponsiblePointer_ActorState_ AerialAttackData::AerialAttackState() const
+        {
+            return Ent::Gen2::ResponsiblePointer_ActorState_(getProperty().getObjectField("AerialAttackState"));
+        }
+        inline Ent::Gen2::String AerialAttackData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Float AerialAttackData::attackOrientationRate() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("attackOrientationRate"));
+        }
+        // AttackComponentGD_AerialAttackData
+        inline Ent::Gen2::String AttackComponentGD_AerialAttackData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool AttackComponentGD_AerialAttackData::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::AerialAttackData AttackComponentGD_AerialAttackData::val() const
+        {
+            return Ent::Gen2::AerialAttackData(getProperty().getObjectField("val"));
+        }
+        // AttackComponentGD
+        inline Ent::Gen2::AttackComponentGD_AerialAttackData AttackComponentGD::AerialAttackData() const
+        {
+            return Ent::Gen2::AttackComponentGD_AerialAttackData(getProperty().getObjectField("AerialAttackData"));
+        }
+        inline Ent::Gen2::ComponentGD AttackComponentGD::Super() const
+        {
+            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String AttackComponentGD::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::AttackPositionRetimingData AttackComponentGD::attackPositionRetimingData() const
+        {
+            return Ent::Gen2::AttackPositionRetimingData(getProperty().getObjectField("attackPositionRetimingData"));
+        }
+        inline Ent::Gen2::lightAttackData AttackComponentGD::lightAttackData() const
+        {
+            return Ent::Gen2::lightAttackData(getProperty().getObjectField("lightAttackData"));
+        }
+        inline Ent::Gen2::strongAttackData AttackComponentGD::strongAttackData() const
+        {
+            return Ent::Gen2::strongAttackData(getProperty().getObjectField("strongAttackData"));
         }
         // AdditionnalTag
         inline Ent::Gen2::String AdditionnalTag::_comment() const
@@ -62681,6 +64472,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateBeingBlockedByVine");
         }
+        inline std::optional<Ent::Gen2::EntityStateBeingInReeds> ActorStates::EntityStateBeingInReeds()
+        {
+            return std::optional<Ent::Gen2::EntityStateBeingInReeds>(getSubNode("EntityStateBeingInReeds"));
+        }
+        inline Ent::Gen2::EntityStateBeingInReeds ActorStates::addEntityStateBeingInReeds()
+        {
+            return Ent::Gen2::EntityStateBeingInReeds(addSubNode("EntityStateBeingInReeds"));
+        }
+        inline void ActorStates::removeEntityStateBeingInReeds()
+        {
+            getProperty().eraseUnionSetItem("EntityStateBeingInReeds");
+        }
         inline std::optional<Ent::Gen2::EntityStateBeingOnSpike> ActorStates::EntityStateBeingOnSpike()
         {
             return std::optional<Ent::Gen2::EntityStateBeingOnSpike>(getSubNode("EntityStateBeingOnSpike"));
@@ -63269,6 +65072,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateGrab");
         }
+        inline std::optional<Ent::Gen2::EntityStateGrabAttack> ActorStates::EntityStateGrabAttack()
+        {
+            return std::optional<Ent::Gen2::EntityStateGrabAttack>(getSubNode("EntityStateGrabAttack"));
+        }
+        inline Ent::Gen2::EntityStateGrabAttack ActorStates::addEntityStateGrabAttack()
+        {
+            return Ent::Gen2::EntityStateGrabAttack(addSubNode("EntityStateGrabAttack"));
+        }
+        inline void ActorStates::removeEntityStateGrabAttack()
+        {
+            getProperty().eraseUnionSetItem("EntityStateGrabAttack");
+        }
         inline std::optional<Ent::Gen2::EntityStateGrabIn> ActorStates::EntityStateGrabIn()
         {
             return std::optional<Ent::Gen2::EntityStateGrabIn>(getSubNode("EntityStateGrabIn"));
@@ -63485,6 +65300,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateInconvertible");
         }
+        inline std::optional<Ent::Gen2::EntityStateInjured> ActorStates::EntityStateInjured()
+        {
+            return std::optional<Ent::Gen2::EntityStateInjured>(getSubNode("EntityStateInjured"));
+        }
+        inline Ent::Gen2::EntityStateInjured ActorStates::addEntityStateInjured()
+        {
+            return Ent::Gen2::EntityStateInjured(addSubNode("EntityStateInjured"));
+        }
+        inline void ActorStates::removeEntityStateInjured()
+        {
+            getProperty().eraseUnionSetItem("EntityStateInjured");
+        }
         inline std::optional<Ent::Gen2::EntityStateInteractedGPE> ActorStates::EntityStateInteractedGPE()
         {
             return std::optional<Ent::Gen2::EntityStateInteractedGPE>(getSubNode("EntityStateInteractedGPE"));
@@ -63508,6 +65335,18 @@ namespace Ent
         inline void ActorStates::removeEntityStateJumpHeightMultiplier()
         {
             getProperty().eraseUnionSetItem("EntityStateJumpHeightMultiplier");
+        }
+        inline std::optional<Ent::Gen2::EntityStateJustStarted> ActorStates::EntityStateJustStarted()
+        {
+            return std::optional<Ent::Gen2::EntityStateJustStarted>(getSubNode("EntityStateJustStarted"));
+        }
+        inline Ent::Gen2::EntityStateJustStarted ActorStates::addEntityStateJustStarted()
+        {
+            return Ent::Gen2::EntityStateJustStarted(addSubNode("EntityStateJustStarted"));
+        }
+        inline void ActorStates::removeEntityStateJustStarted()
+        {
+            getProperty().eraseUnionSetItem("EntityStateJustStarted");
         }
         inline std::optional<Ent::Gen2::EntityStateLateralDodge> ActorStates::EntityStateLateralDodge()
         {
@@ -63893,6 +65732,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateSnappedToHatchingTarget");
         }
+        inline std::optional<Ent::Gen2::EntityStateSoftCollide> ActorStates::EntityStateSoftCollide()
+        {
+            return std::optional<Ent::Gen2::EntityStateSoftCollide>(getSubNode("EntityStateSoftCollide"));
+        }
+        inline Ent::Gen2::EntityStateSoftCollide ActorStates::addEntityStateSoftCollide()
+        {
+            return Ent::Gen2::EntityStateSoftCollide(addSubNode("EntityStateSoftCollide"));
+        }
+        inline void ActorStates::removeEntityStateSoftCollide()
+        {
+            getProperty().eraseUnionSetItem("EntityStateSoftCollide");
+        }
         inline std::optional<Ent::Gen2::EntityStateSpeedLimiter> ActorStates::EntityStateSpeedLimiter()
         {
             return std::optional<Ent::Gen2::EntityStateSpeedLimiter>(getSubNode("EntityStateSpeedLimiter"));
@@ -63965,6 +65816,30 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateSpiritAttacked");
         }
+        inline std::optional<Ent::Gen2::EntityStateSpiritShrineDisabled> ActorStates::EntityStateSpiritShrineDisabled()
+        {
+            return std::optional<Ent::Gen2::EntityStateSpiritShrineDisabled>(getSubNode("EntityStateSpiritShrineDisabled"));
+        }
+        inline Ent::Gen2::EntityStateSpiritShrineDisabled ActorStates::addEntityStateSpiritShrineDisabled()
+        {
+            return Ent::Gen2::EntityStateSpiritShrineDisabled(addSubNode("EntityStateSpiritShrineDisabled"));
+        }
+        inline void ActorStates::removeEntityStateSpiritShrineDisabled()
+        {
+            getProperty().eraseUnionSetItem("EntityStateSpiritShrineDisabled");
+        }
+        inline std::optional<Ent::Gen2::EntityStateSpiritShrineEnabled> ActorStates::EntityStateSpiritShrineEnabled()
+        {
+            return std::optional<Ent::Gen2::EntityStateSpiritShrineEnabled>(getSubNode("EntityStateSpiritShrineEnabled"));
+        }
+        inline Ent::Gen2::EntityStateSpiritShrineEnabled ActorStates::addEntityStateSpiritShrineEnabled()
+        {
+            return Ent::Gen2::EntityStateSpiritShrineEnabled(addSubNode("EntityStateSpiritShrineEnabled"));
+        }
+        inline void ActorStates::removeEntityStateSpiritShrineEnabled()
+        {
+            getProperty().eraseUnionSetItem("EntityStateSpiritShrineEnabled");
+        }
         inline std::optional<Ent::Gen2::EntityStateStaffOwnedVertebras> ActorStates::EntityStateStaffOwnedVertebras()
         {
             return std::optional<Ent::Gen2::EntityStateStaffOwnedVertebras>(getSubNode("EntityStateStaffOwnedVertebras"));
@@ -63976,6 +65851,18 @@ namespace Ent
         inline void ActorStates::removeEntityStateStaffOwnedVertebras()
         {
             getProperty().eraseUnionSetItem("EntityStateStaffOwnedVertebras");
+        }
+        inline std::optional<Ent::Gen2::EntityStateStaffVertebrasAutoRefill> ActorStates::EntityStateStaffVertebrasAutoRefill()
+        {
+            return std::optional<Ent::Gen2::EntityStateStaffVertebrasAutoRefill>(getSubNode("EntityStateStaffVertebrasAutoRefill"));
+        }
+        inline Ent::Gen2::EntityStateStaffVertebrasAutoRefill ActorStates::addEntityStateStaffVertebrasAutoRefill()
+        {
+            return Ent::Gen2::EntityStateStaffVertebrasAutoRefill(addSubNode("EntityStateStaffVertebrasAutoRefill"));
+        }
+        inline void ActorStates::removeEntityStateStaffVertebrasAutoRefill()
+        {
+            getProperty().eraseUnionSetItem("EntityStateStaffVertebrasAutoRefill");
         }
         inline std::optional<Ent::Gen2::EntityStateStalactiteFallen> ActorStates::EntityStateStalactiteFallen()
         {
@@ -64341,6 +66228,10 @@ namespace Ent
         {
             return Ent::Gen2::ObjectSet<char const*, Ent::Gen2::Entity>(getProperty().getObjectField("Embedded"));
         }
+        inline Ent::Gen2::RuntimeMode SubScene::RuntimeMode() const
+        {
+            return Ent::Gen2::RuntimeMode(getProperty().getObjectField("RuntimeMode"));
+        }
         inline Ent::Gen2::ComponentGD SubScene::Super() const
         {
             return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
@@ -64649,6 +66540,15 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // EntityStateStaffVertebrasAutoRefill
+        inline Ent::Gen2::ActorState EntityStateStaffVertebrasAutoRefill::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateStaffVertebrasAutoRefill::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // EntityStateStaffOwnedVertebras
         inline Ent::Gen2::EntityStateStaffOwnedVertebras_Inputs EntityStateStaffOwnedVertebras::Inputs() const
         {
@@ -64659,6 +66559,24 @@ namespace Ent
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String EntityStateStaffOwnedVertebras::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateSpiritShrineEnabled
+        inline Ent::Gen2::ActorState EntityStateSpiritShrineEnabled::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateSpiritShrineEnabled::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateSpiritShrineDisabled
+        inline Ent::Gen2::ActorState EntityStateSpiritShrineDisabled::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateSpiritShrineDisabled::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -64708,11 +66626,24 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // EntityStateSpeedLimiter
+        inline Ent::Gen2::Float EntityStateSpeedLimiter::SpeedMax() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("SpeedMax"));
+        }
         inline Ent::Gen2::ActorState EntityStateSpeedLimiter::Super() const
         {
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String EntityStateSpeedLimiter::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateSoftCollide
+        inline Ent::Gen2::ActorState EntityStateSoftCollide::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateSoftCollide::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -65048,6 +66979,15 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // EntityStateJustStarted
+        inline Ent::Gen2::ActorState EntityStateJustStarted::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateJustStarted::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // EntityStateJumpHeightMultiplier
         inline Ent::Gen2::Float EntityStateJumpHeightMultiplier::JumpHeightMultiplier() const
         {
@@ -65067,6 +67007,15 @@ namespace Ent
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String EntityStateInteractedGPE::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateInjured
+        inline Ent::Gen2::ActorState EntityStateInjured::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateInjured::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -65237,6 +67186,15 @@ namespace Ent
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String EntityStateGrabIn::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateGrabAttack
+        inline Ent::Gen2::ActorState EntityStateGrabAttack::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateGrabAttack::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -65624,6 +67582,10 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // EntityStateBridgeBeingControlled
+        inline Ent::Gen2::Float EntityStateBridgeBeingControlled::CollisionRaycastLength() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("CollisionRaycastLength"));
+        }
         inline Ent::Gen2::Float EntityStateBridgeBeingControlled::HorizontalSpeed() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("HorizontalSpeed"));
@@ -65656,6 +67618,14 @@ namespace Ent
         inline Ent::Gen2::EntityRef EntityStateBridgeAttracted::BridgeLinkRef() const
         {
             return Ent::Gen2::EntityRef(getProperty().getObjectField("BridgeLinkRef"));
+        }
+        inline Ent::Gen2::Float EntityStateBridgeAttracted::GroundAttachRaycastLength() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("GroundAttachRaycastLength"));
+        }
+        inline Ent::Gen2::String EntityStateBridgeAttracted::HotspotName() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("HotspotName"));
         }
         inline Ent::Gen2::Float EntityStateBridgeAttracted::MaximalAttachDistance() const
         {
@@ -65745,6 +67715,10 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("SpikeDamage"));
         }
+        inline Ent::Gen2::Int EntityStateBeingOnSpike::SpikeDeadlyHitCount() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("SpikeDeadlyHitCount"));
+        }
         inline Ent::Gen2::Bool EntityStateBeingOnSpike::SpikeEject() const
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("SpikeEject"));
@@ -65758,6 +67732,15 @@ namespace Ent
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String EntityStateBeingOnSpike::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateBeingInReeds
+        inline Ent::Gen2::ActorState EntityStateBeingInReeds::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateBeingInReeds::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -67656,6 +69639,10 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // ActionBite
+        inline Ent::Gen2::Float ActionBite::RadiusMultiplier() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("RadiusMultiplier"));
+        }
         inline Ent::Gen2::ActorState ActionBite::Super() const
         {
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
@@ -67674,6 +69661,10 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // ActionAttackJumpOnto
+        inline Ent::Gen2::Float ActionAttackJumpOnto::RadiusMultiplier() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("RadiusMultiplier"));
+        }
         inline Ent::Gen2::ActorState ActionAttackJumpOnto::Super() const
         {
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
@@ -67874,9 +69865,9 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // ActionStateArbiter_StateOrderPass
-        inline PrimArray<Ent::Gen2::String> ActionStateArbiter_StateOrderPass::Order() const
+        inline Array<Ent::Gen2::Tuple<Ent::Gen2::String, Ent::Gen2::String>> ActionStateArbiter_StateOrderPass::Dependencies() const
         {
-            return PrimArray<Ent::Gen2::String>(getProperty().getObjectField("Order"));
+            return Array<Ent::Gen2::Tuple<Ent::Gen2::String, Ent::Gen2::String>>(getProperty().getObjectField("Dependencies"));
         }
         inline Ent::Gen2::String ActionStateArbiter_StateOrderPass::_comment() const
         {
@@ -68341,6 +70332,22 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("FightSpeedRationImpactCoeff"));
         }
+        inline Ent::Gen2::Position InGameCameraParams::InterestPointPosition() const
+        {
+            return Ent::Gen2::Position(getProperty().getObjectField("InterestPointPosition"));
+        }
+        inline Ent::Gen2::Vector3 InGameCameraParams::InterestPointSight() const
+        {
+            return Ent::Gen2::Vector3(getProperty().getObjectField("InterestPointSight"));
+        }
+        inline Ent::Gen2::Float InGameCameraParams::InterestPointSightAngleSpeed() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("InterestPointSightAngleSpeed"));
+        }
+        inline Ent::Gen2::Float InGameCameraParams::InterestPointTimeToReachMaxWeight() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("InterestPointTimeToReachMaxWeight"));
+        }
         inline Ent::Gen2::Float InGameCameraParams::JoyAccelerationBoostChangingSideH() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("JoyAccelerationBoostChangingSideH"));
@@ -68525,6 +70532,14 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("TargetOffsetZ"));
         }
+        inline Ent::Gen2::Float InGameCameraParams::TargetSmoothMultiplier() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("TargetSmoothMultiplier"));
+        }
+        inline Ent::Gen2::Float InGameCameraParams::TargetSmoothMultiplierZ() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("TargetSmoothMultiplierZ"));
+        }
         inline Ent::Gen2::Float InGameCameraParams::TargetXOffsetFromYawForce() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("TargetXOffsetFromYawForce"));
@@ -68581,6 +70596,10 @@ namespace Ent
         inline Ent::Gen2::InGameCameraParams InGameCameraObservationParams::shoulder() const
         {
             return Ent::Gen2::InGameCameraParams(getProperty().getObjectField("shoulder"));
+        }
+        inline Ent::Gen2::InGameCameraParams InGameCameraObservationParams::sightconstraint() const
+        {
+            return Ent::Gen2::InGameCameraParams(getProperty().getObjectField("sightconstraint"));
         }
         inline Ent::Gen2::InGameCameraParams InGameCameraObservationParams::strongattack() const
         {
@@ -69197,10 +71216,6 @@ namespace Ent
         {
             return Ent::Gen2::CreatureDangerousness(getProperty().getObjectField("dangerousnessData"));
         }
-        inline Ent::Gen2::InteractData CreatureGD::interactData() const
-        {
-            return Ent::Gen2::InteractData(getProperty().getObjectField("interactData"));
-        }
         inline Ent::Gen2::RevivedData CreatureGD::revivedData() const
         {
             return Ent::Gen2::RevivedData(getProperty().getObjectField("revivedData"));
@@ -69710,6 +71725,7 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // ContactActor
+        // Edge
         // EntityArchive_MetaData
         inline Ent::Gen2::String EntityArchive_MetaData::Name() const
         {
@@ -70038,6 +72054,28 @@ namespace Ent
             return PrimArray<Ent::Gen2::Int>(getProperty().getObjectField("LODs"));
         }
         inline Ent::Gen2::String VisualResourceBuildData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // ZoneCylinderShape
+        inline Ent::Gen2::Float ZoneCylinderShape::DistanceBetweenPoints() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("DistanceBetweenPoints"));
+        }
+        inline Ent::Gen2::Float ZoneCylinderShape::Radius() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("Radius"));
+        }
+        inline Ent::Gen2::String ZoneCylinderShape::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // ZoneMeshShape
+        inline Ent::Gen2::String ZoneMeshShape::ConvexZoneFilePath() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("ConvexZoneFilePath"));
+        }
+        inline Ent::Gen2::String ZoneMeshShape::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }

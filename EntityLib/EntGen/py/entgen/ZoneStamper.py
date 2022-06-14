@@ -6,8 +6,10 @@ import EntityLibPy
 
 from entgen.NavMeshArea import *
 from entgen.String import *
+from entgen.Int import *
 from entgen.Float import *
 from entgen.GeometryStamper import *
+from entgen.variant_ZoneCylinderShape_ZoneMeshShape_ import *
 
 from EntityLibPy import Node
 
@@ -22,11 +24,6 @@ class ZoneStamper(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def ConvexZoneFilePath(self):  # type: ()->String
-        return String(self._node.at("ConvexZoneFilePath"))
-    @ConvexZoneFilePath.setter
-    def ConvexZoneFilePath(self, val): self.ConvexZoneFilePath.set(val)
-    @property
     def DownwardOffset(self):  # type: ()->Float
         return Float(self._node.at("DownwardOffset"))
     @DownwardOffset.setter
@@ -36,6 +33,14 @@ class ZoneStamper(HelperObject):
         return NavMeshArea(self._node.at("NavMeshArea"))
     @NavMeshArea.setter
     def NavMeshArea(self, val): self.NavMeshArea.set(val)
+    @property
+    def Priority(self):  # type: ()->Int
+        return Int(self._node.at("Priority"))
+    @Priority.setter
+    def Priority(self, val): self.Priority.set(val)
+    @property
+    def Shape(self):  # type: ()->variant_ZoneCylinderShape_ZoneMeshShape_
+        return variant_ZoneCylinderShape_ZoneMeshShape_(self._node.at("Shape"))
     @property
     def Super(self):  # type: ()->GeometryStamper
         return GeometryStamper(self._node.at("Super"))

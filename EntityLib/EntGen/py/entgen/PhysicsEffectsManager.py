@@ -7,6 +7,7 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Float import *
 from entgen.Manager import *
+from entgen.PhysicsEffectsManager_PhysicsLimits import *
 from entgen.PhysicsMaterial import *
 
 from EntityLibPy import Node
@@ -26,6 +27,9 @@ class PhysicsEffectsManager(HelperObject):
         return Float(self._node.at("GravityConstant"))
     @GravityConstant.setter
     def GravityConstant(self, val): self.GravityConstant.set(val)
+    @property
+    def Limits(self):  # type: ()->PhysicsEffectsManager_PhysicsLimits
+        return PhysicsEffectsManager_PhysicsLimits(self._node.at("Limits"))
     @property
     def MaterialBank(self):  # type: ()->Array[PhysicsMaterial]
         return (lambda n: Array(PhysicsMaterial, n))(self._node.at("MaterialBank"))

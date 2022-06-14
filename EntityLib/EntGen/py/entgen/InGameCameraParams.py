@@ -11,7 +11,9 @@ from entgen.CameraType import *
 from entgen.String import *
 from entgen.Bool import *
 from entgen.Float import *
+from entgen.Position import *
 from entgen.ScaleConverter import *
+from entgen.Vector3 import *
 
 from EntityLibPy import Node
 
@@ -306,6 +308,24 @@ class InGameCameraParams(HelperObject):
     @FightSpeedRationImpactCoeff.setter
     def FightSpeedRationImpactCoeff(self, val): self.FightSpeedRationImpactCoeff.set(val)
     @property
+    def InterestPointPosition(self):  # type: ()->Position
+        return Position(self._node.at("InterestPointPosition"))
+    @property
+    def InterestPointSight(self):  # type: ()->Vector3
+        return Vector3(self._node.at("InterestPointSight"))
+    @InterestPointSight.setter
+    def InterestPointSight(self, val): self.InterestPointSight.set(val)
+    @property
+    def InterestPointSightAngleSpeed(self):  # type: ()->Float
+        return Float(self._node.at("InterestPointSightAngleSpeed"))
+    @InterestPointSightAngleSpeed.setter
+    def InterestPointSightAngleSpeed(self, val): self.InterestPointSightAngleSpeed.set(val)
+    @property
+    def InterestPointTimeToReachMaxWeight(self):  # type: ()->Float
+        return Float(self._node.at("InterestPointTimeToReachMaxWeight"))
+    @InterestPointTimeToReachMaxWeight.setter
+    def InterestPointTimeToReachMaxWeight(self, val): self.InterestPointTimeToReachMaxWeight.set(val)
+    @property
     def JoyAccelerationBoostChangingSideH(self):  # type: ()->Float
         return Float(self._node.at("JoyAccelerationBoostChangingSideH"))
     @JoyAccelerationBoostChangingSideH.setter
@@ -527,6 +547,16 @@ class InGameCameraParams(HelperObject):
         return Float(self._node.at("TargetOffsetZ"))
     @TargetOffsetZ.setter
     def TargetOffsetZ(self, val): self.TargetOffsetZ.set(val)
+    @property
+    def TargetSmoothMultiplier(self):  # type: ()->Float
+        return Float(self._node.at("TargetSmoothMultiplier"))
+    @TargetSmoothMultiplier.setter
+    def TargetSmoothMultiplier(self, val): self.TargetSmoothMultiplier.set(val)
+    @property
+    def TargetSmoothMultiplierZ(self):  # type: ()->Float
+        return Float(self._node.at("TargetSmoothMultiplierZ"))
+    @TargetSmoothMultiplierZ.setter
+    def TargetSmoothMultiplierZ(self, val): self.TargetSmoothMultiplierZ.set(val)
     @property
     def TargetXOffsetFromYawForce(self):  # type: ()->Float
         return Float(self._node.at("TargetXOffsetFromYawForce"))

@@ -7,6 +7,7 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Int import *
 from entgen.ComponentGD import *
+from entgen.Float import *
 from entgen.String import *
 
 from EntityLibPy import Node
@@ -22,6 +23,16 @@ class StaffVertebrasGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def BeginVertebraRefillThreshold(self):  # type: ()->Int
+        return Int(self._node.at("BeginVertebraRefillThreshold"))
+    @BeginVertebraRefillThreshold.setter
+    def BeginVertebraRefillThreshold(self, val): self.BeginVertebraRefillThreshold.set(val)
+    @property
+    def EndVertebraRefillThreshold(self):  # type: ()->Int
+        return Int(self._node.at("EndVertebraRefillThreshold"))
+    @EndVertebraRefillThreshold.setter
+    def EndVertebraRefillThreshold(self, val): self.EndVertebraRefillThreshold.set(val)
+    @property
     def HotspotNames(self):  # type: ()->PrimArray[String]
         return (lambda n: PrimArray(String, n))(self._node.at("HotspotNames"))
     @HotspotNames.setter
@@ -36,6 +47,11 @@ class StaffVertebrasGD(HelperObject):
         return Int(self._node.at("OwnedVertebraStartCount"))
     @OwnedVertebraStartCount.setter
     def OwnedVertebraStartCount(self, val): self.OwnedVertebraStartCount.set(val)
+    @property
+    def RefillVertebraTimer(self):  # type: ()->Float
+        return Float(self._node.at("RefillVertebraTimer"))
+    @RefillVertebraTimer.setter
+    def RefillVertebraTimer(self, val): self.RefillVertebraTimer.set(val)
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))

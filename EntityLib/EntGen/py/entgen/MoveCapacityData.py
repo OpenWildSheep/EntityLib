@@ -119,8 +119,10 @@ class MoveCapacityData(HelperObject):
     @constraintDetectionOffset.setter
     def constraintDetectionOffset(self, val): self.constraintDetectionOffset.set(val)
     @property
-    def constraintDetectionRadius(self):  # type: ()->ScaleConverter
-        return ScaleConverter(self._node.at("constraintDetectionRadius"))
+    def constraintDetectionRadiusMultiplier(self):  # type: ()->Float
+        return Float(self._node.at("constraintDetectionRadiusMultiplier"))
+    @constraintDetectionRadiusMultiplier.setter
+    def constraintDetectionRadiusMultiplier(self, val): self.constraintDetectionRadiusMultiplier.set(val)
     @property
     def coyoteJumpMaxTime(self):  # type: ()->Float
         return Float(self._node.at("coyoteJumpMaxTime"))
@@ -154,6 +156,19 @@ class MoveCapacityData(HelperObject):
         return Bool(self._node.at("dropSyncTrajectoryAndVisual"))
     @dropSyncTrajectoryAndVisual.setter
     def dropSyncTrajectoryAndVisual(self, val): self.dropSyncTrajectoryAndVisual.set(val)
+    @property
+    def edgeDetectionAnticipation(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("edgeDetectionAnticipation"))
+    @property
+    def edgeDetectionOffset(self):  # type: ()->Vector3
+        return Vector3(self._node.at("edgeDetectionOffset"))
+    @edgeDetectionOffset.setter
+    def edgeDetectionOffset(self, val): self.edgeDetectionOffset.set(val)
+    @property
+    def edgeDetectionRadiusMultiplier(self):  # type: ()->Float
+        return Float(self._node.at("edgeDetectionRadiusMultiplier"))
+    @edgeDetectionRadiusMultiplier.setter
+    def edgeDetectionRadiusMultiplier(self, val): self.edgeDetectionRadiusMultiplier.set(val)
     @property
     def ellipseCoeff(self):  # type: ()->Float
         return Float(self._node.at("ellipseCoeff"))
@@ -302,6 +317,11 @@ class MoveCapacityData(HelperObject):
         return Bool(self._node.at("reactToOtherCharacterBodyCollision"))
     @reactToOtherCharacterBodyCollision.setter
     def reactToOtherCharacterBodyCollision(self, val): self.reactToOtherCharacterBodyCollision.set(val)
+    @property
+    def rigidbodyScalingSpeed(self):  # type: ()->Float
+        return Float(self._node.at("rigidbodyScalingSpeed"))
+    @rigidbodyScalingSpeed.setter
+    def rigidbodyScalingSpeed(self, val): self.rigidbodyScalingSpeed.set(val)
     @property
     def sphereCastRadiusRatio(self):  # type: ()->Float
         return Float(self._node.at("sphereCastRadiusRatio"))

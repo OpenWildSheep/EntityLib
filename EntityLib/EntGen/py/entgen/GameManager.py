@@ -15,6 +15,7 @@ from entgen.GameAttackData import *
 from entgen.GameBeamSnapData import *
 from entgen.GameBiteData import *
 from entgen.GameDeathData import *
+from entgen.GameEdgeData import *
 from entgen.GameFallData import *
 from entgen.GameFeetCatchUpData import *
 from entgen.GameFluidData import *
@@ -30,6 +31,7 @@ from entgen.GameReviveData import *
 from entgen.GameShamanVisionData import *
 from entgen.GameSlopeData import *
 from entgen.GameSnapData import *
+from entgen.GameSoftCollisionData import *
 from entgen.Manager import *
 from entgen.ScaleConverter import *
 from entgen.Float import *
@@ -86,6 +88,9 @@ class GameManager(HelperObject):
         return Int(self._node.at("DefaultGamePadID"))
     @DefaultGamePadID.setter
     def DefaultGamePadID(self, val): self.DefaultGamePadID.set(val)
+    @property
+    def EdgeData(self):  # type: ()->GameEdgeData
+        return GameEdgeData(self._node.at("EdgeData"))
     @property
     def EnableSplashScreen(self):  # type: ()->Bool
         return Bool(self._node.at("EnableSplashScreen"))
@@ -190,6 +195,21 @@ class GameManager(HelperObject):
     @MountOnlyOnFollower.setter
     def MountOnlyOnFollower(self, val): self.MountOnlyOnFollower.set(val)
     @property
+    def NewGameVideo(self):  # type: ()->String
+        return String(self._node.at("NewGameVideo"))
+    @NewGameVideo.setter
+    def NewGameVideo(self, val): self.NewGameVideo.set(val)
+    @property
+    def NewGameVideoMusicStart(self):  # type: ()->String
+        return String(self._node.at("NewGameVideoMusicStart"))
+    @NewGameVideoMusicStart.setter
+    def NewGameVideoMusicStart(self, val): self.NewGameVideoMusicStart.set(val)
+    @property
+    def NewGameVideoMusicStop(self):  # type: ()->String
+        return String(self._node.at("NewGameVideoMusicStop"))
+    @NewGameVideoMusicStop.setter
+    def NewGameVideoMusicStop(self, val): self.NewGameVideoMusicStop.set(val)
+    @property
     def ParryData(self):  # type: ()->GameParryData
         return GameParryData(self._node.at("ParryData"))
     @property
@@ -210,6 +230,9 @@ class GameManager(HelperObject):
     @property
     def SnapData(self):  # type: ()->GameSnapData
         return GameSnapData(self._node.at("SnapData"))
+    @property
+    def SoftCollisionData(self):  # type: ()->GameSoftCollisionData
+        return GameSoftCollisionData(self._node.at("SoftCollisionData"))
     @property
     def Sound_TopView_Start(self):  # type: ()->String
         return String(self._node.at("Sound_TopView_Start"))

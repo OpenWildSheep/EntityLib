@@ -39,6 +39,7 @@ class ActorCategoryEnum(Enum):
     CATEGORY_Health = "CATEGORY_Health"
     CATEGORY_HealthAlive = "CATEGORY_HealthAlive"
     CATEGORY_HealthDead = "CATEGORY_HealthDead"
+    CATEGORY_KnockedOut = "CATEGORY_KnockedOut"
     CATEGORY_EntitySwitchTransition = "CATEGORY_EntitySwitchTransition"
     CATEGORY_EnergyRoot = "CATEGORY_EnergyRoot"
     CATEGORY_EnergySpout = "CATEGORY_EnergySpout"
@@ -49,7 +50,8 @@ class ActorCategoryEnum(Enum):
     CATEGORY_Respawn = "CATEGORY_Respawn"
     CATEGORY_Save = "CATEGORY_Save"
     CATEGORY_Cinematic = "CATEGORY_Cinematic"
-    ActorCategory_COUNT = "ActorCategory_COUNT"
+    CATEGORY_Loading = "CATEGORY_Loading"
+    CATEGORY_NoCategory = "CATEGORY_NoCategory"
 
 
 class ActorCategory(Primitive[ActorCategoryEnum]):  # Enum

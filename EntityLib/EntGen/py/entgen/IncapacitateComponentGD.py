@@ -33,6 +33,9 @@ class IncapacitateComponentGD(HelperObject):
     def IncapacitateTimeCurve(self):  # type: ()->ScaleConverter
         return ScaleConverter(self._node.at("IncapacitateTimeCurve"))
     @property
+    def IncapacitateTimeMultiplierCurve(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("IncapacitateTimeMultiplierCurve"))
+    @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
     @property

@@ -22,6 +22,11 @@ class SpiritAnimalShrineGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def InteractionDuration(self):  # type: ()->Float
+        return Float(self._node.at("InteractionDuration"))
+    @InteractionDuration.setter
+    def InteractionDuration(self, val): self.InteractionDuration.set(val)
+    @property
     def Specie(self):  # type: ()->Specie
         return Specie(self._node.at("Specie"))
     @Specie.setter

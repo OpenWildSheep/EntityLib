@@ -7,7 +7,6 @@ import EntityLibPy
 from entgen.BeamStaffMode import *
 from entgen.HotSpotType import *
 from entgen.String import *
-from entgen.Bool import *
 from entgen.ComponentGD import *
 from entgen.Float import *
 
@@ -24,11 +23,6 @@ class BeamTargetGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def CheckHotspotOrientation(self):  # type: ()->Bool
-        return Bool(self._node.at("CheckHotspotOrientation"))
-    @CheckHotspotOrientation.setter
-    def CheckHotspotOrientation(self, val): self.CheckHotspotOrientation.set(val)
-    @property
     def EventTriggered(self):  # type: ()->String
         return String(self._node.at("EventTriggered"))
     @EventTriggered.setter
@@ -39,30 +33,20 @@ class BeamTargetGD(HelperObject):
     @HotspotType.setter
     def HotspotType(self, val): self.HotspotType.set(val)
     @property
-    def IsCollectable(self):  # type: ()->Bool
-        return Bool(self._node.at("IsCollectable"))
-    @IsCollectable.setter
-    def IsCollectable(self, val): self.IsCollectable.set(val)
+    def InteractMaxDistance(self):  # type: ()->Float
+        return Float(self._node.at("InteractMaxDistance"))
+    @InteractMaxDistance.setter
+    def InteractMaxDistance(self, val): self.InteractMaxDistance.set(val)
     @property
-    def Levitate(self):  # type: ()->Bool
-        return Bool(self._node.at("Levitate"))
-    @Levitate.setter
-    def Levitate(self, val): self.Levitate.set(val)
-    @property
-    def MaxTargetableDistance(self):  # type: ()->Float
-        return Float(self._node.at("MaxTargetableDistance"))
-    @MaxTargetableDistance.setter
-    def MaxTargetableDistance(self, val): self.MaxTargetableDistance.set(val)
+    def InteractionRadius(self):  # type: ()->Float
+        return Float(self._node.at("InteractionRadius"))
+    @InteractionRadius.setter
+    def InteractionRadius(self, val): self.InteractionRadius.set(val)
     @property
     def Mode(self):  # type: ()->BeamStaffMode
         return BeamStaffMode(self._node.at("Mode"))
     @Mode.setter
     def Mode(self, val): self.Mode.set(val)
-    @property
-    def SpendEnergy(self):  # type: ()->Bool
-        return Bool(self._node.at("SpendEnergy"))
-    @SpendEnergy.setter
-    def SpendEnergy(self, val): self.SpendEnergy.set(val)
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))

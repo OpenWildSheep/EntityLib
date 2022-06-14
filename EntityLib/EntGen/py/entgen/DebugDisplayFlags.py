@@ -401,16 +401,6 @@ class DebugDisplayFlags(HelperObject):
     @DisplaySelectedPestoEntity.setter
     def DisplaySelectedPestoEntity(self, val): self.DisplaySelectedPestoEntity.set(val)
     @property
-    def DisplaySplinePilot(self):  # type: ()->Bool
-        return Bool(self._node.at("DisplaySplinePilot"))
-    @DisplaySplinePilot.setter
-    def DisplaySplinePilot(self, val): self.DisplaySplinePilot.set(val)
-    @property
-    def DisplaySplinePilotTool(self):  # type: ()->Bool
-        return Bool(self._node.at("DisplaySplinePilotTool"))
-    @DisplaySplinePilotTool.setter
-    def DisplaySplinePilotTool(self, val): self.DisplaySplinePilotTool.set(val)
-    @property
     def DisplayStringHashTranslator(self):  # type: ()->Bool
         return Bool(self._node.at("DisplayStringHashTranslator"))
     @DisplayStringHashTranslator.setter

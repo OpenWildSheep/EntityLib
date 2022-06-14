@@ -8,6 +8,7 @@ from entgen.String import *
 from entgen.Float import *
 from entgen.Manager import *
 from entgen.RecastNavmeshGenerationParameters import *
+from entgen.String import *
 
 from EntityLibPy import Node
 
@@ -32,8 +33,8 @@ class NavMeshManager(HelperObject):
     @NavMeshMaxSize.setter
     def NavMeshMaxSize(self, val): self.NavMeshMaxSize.set(val)
     @property
-    def RecastParameters(self):  # type: ()->RecastNavmeshGenerationParameters
-        return RecastNavmeshGenerationParameters(self._node.at("RecastParameters"))
+    def RecastParameters(self):  # type: ()->Map[str, RecastNavmeshGenerationParameters]
+        return (lambda n: Map(str, RecastNavmeshGenerationParameters, n))(self._node.at("RecastParameters"))
     @property
     def Super(self):  # type: ()->Manager
         return Manager(self._node.at("Super"))
@@ -47,6 +48,11 @@ class NavMeshManager(HelperObject):
         return Float(self._node.at("TileSize"))
     @TileSize.setter
     def TileSize(self, val): self.TileSize.set(val)
+    @property
+    def VerticalTolerance(self):  # type: ()->Float
+        return Float(self._node.at("VerticalTolerance"))
+    @VerticalTolerance.setter
+    def VerticalTolerance(self, val): self.VerticalTolerance.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

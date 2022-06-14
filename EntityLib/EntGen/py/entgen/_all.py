@@ -11,6 +11,7 @@ from .sPhysicsShapeCylinder import *
 from .sPhysicsShapeCapsule import *
 from .sJointFixedDesc import *
 from .sJointBallDesc import *
+from .resetCreatureRequest import *
 from .jumpPower import *
 from .isPerceivableForEnemies import *
 from .isPerceivable import *
@@ -63,6 +64,7 @@ from .SoundManager_BiomeSoundBank import *
 from .SoundEventMapping import *
 from .SoundEmissionStrength import *
 from .soundEmissionStrength import *
+from .SoftCollisionGD_VegetationDetectionParameters import *
 from .SmoothScaleComponentInput_Parameters import *
 from .Size import *
 from .ShowdownSpeciesAudioData import *
@@ -78,6 +80,7 @@ from .SeedPatchDataList import *
 from .ScriptPathAndDataSet import *
 from .ScaleFactor import *
 from .ScaleConverter import *
+from .RuntimeMode import *
 from .RigidbodyScalingSpeed import *
 from .RigidbodyScaleMultiplier import *
 from .RigidBodyUserData import *
@@ -155,9 +158,6 @@ from .NavMeshActionType import *
 from .OffMeshLink import *
 from .NavMesh import *
 from .MusicCategory import *
-from .MoveTo import *
-from .MoveToPosition import *
-from .MoveToAlongSpline import *
 from .MoveCapacityData_OrientationSpeed import *
 from .MountableSnapLine_ControlPoint import *
 from .MountableData import *
@@ -233,13 +233,13 @@ from .LightAttackData import *
 from .lightAttackData import *
 from .LedgePositionInfo import *
 from .JumpHeightMultiplier import *
+from .IsActive import *
 from .Invincible import *
 from .InventoryTags import *
 from .TaggedEntityRef import *
 from .InterpolationMethod import *
 from .TrailProperties import *
 from .Interactor import *
-from .InteractData import *
 from .InputCollisionBehaviorData import *
 from .InertiaTensor import *
 from .ImpactAndSolidityData import *
@@ -269,6 +269,7 @@ from .Game_VoxelsColumn import *
 from .Game_VoxelsVolume import *
 from .GameTimeInMs import *
 from .GameProfile import *
+from .GameSoftCollisionData import *
 from .GameSnapData import *
 from .GameSlopeData import *
 from .GameShamanVisionData import *
@@ -372,7 +373,9 @@ from .VelocityObstacleComponentInput import *
 from .UnifiedPhysicsDataComponentInput import *
 from .SpiritAnimalShrineComponentInput import *
 from .SoundEmitterComponentInput import *
+from .SoftCollisionComponentInput import *
 from .SmoothScaleComponentInput import *
+from .ScriptComponentInput import *
 from .ReviveEnergyComponentInput import *
 from .RespawnabilityComponentInput import *
 from .RagdollComponentInput import *
@@ -383,6 +386,7 @@ from .PerceivableComponentInput import *
 from .OutfitWearerComponentInput import *
 from .MountIKControllerComponentInput import *
 from .LifeComponentInput import *
+from .InteractorComponentInput import *
 from .InteractableGPEComponentInput import *
 from .GrasperComponentInput import *
 from .GraspableComponentInput import *
@@ -394,7 +398,6 @@ from .ChargedJumpComponentInput import *
 from .CharacterControllerComponentInput import *
 from .BreakableComponentInput import *
 from .BeamTargetComponentInput import *
-from .BeamGeneratorComponentInput import *
 from .AttackTriggerComponentInput import *
 from .AttackComponentInput import *
 from .AnimationTransformDriverComponentInput import *
@@ -430,6 +433,7 @@ from .SpiritAnimalGD import *
 from .SoundEmitterGD import *
 from .SoundAreaGD import *
 from .SoulRespawnOpportunityGD import *
+from .SoftCollisionGD import *
 from .SmoothScaleComponentGD import *
 from .SideMapGateGD import *
 from .ShapeshiftStatueGD import *
@@ -596,7 +600,7 @@ from .CameraFreeData import *
 from .CameraEditorData import *
 from .CameraManager import *
 from .BoneStartPoint import *
-from .BeamGeneratorGD import *
+from .InteractorGD import *
 from .BoneAnimation import *
 from .BoidSpeedMaxData import *
 from .BoidGoalMode import *
@@ -717,6 +721,7 @@ from .EntityStateSpiritAnimalSoulForm import *
 from .EntityStateSpiritAnimalFleshForm import *
 from .EntityStateSpiritAnimalBeingCalled import *
 from .EntityStateSpeedLimiter import *
+from .EntityStateSoftCollide import *
 from .EntityStateSnappedToHatchingTarget import *
 from .EntityStateSlowMotion import *
 from .EntityStateShootHatchingEnergy import *
@@ -821,6 +826,7 @@ from .EntityStateBounceLand import *
 from .EntityStateBounce import *
 from .EntityStateBoidsHomePos import *
 from .EntityStateBeingOnSpike import *
+from .EntityStateBeingInReeds import *
 from .EntityStateBeingBlockedByVine import *
 from .EntityStateBackwardDodge import *
 from .EntityStateAttackDive import *
@@ -1111,6 +1117,8 @@ from .TravelParams import *
 from .VegetationResourceData import *
 from .VegetationVisibilityDistanceCategory import *
 from .VisualResourceBuildData import *
+from .ZoneCylinderShape import *
+from .ZoneMeshShape import *
 from .sBiomeSFXResult import *
 from .sBiomeSoundResult import *
 from .sJointMotorDesc import *

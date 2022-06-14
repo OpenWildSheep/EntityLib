@@ -8,7 +8,6 @@ from entgen.String import *
 from entgen.Bool import *
 from entgen.ComponentGD import *
 from entgen.TransitionSettings import *
-from entgen.String import *
 from entgen.EnergyPoolGD_EnergyArea import *
 
 from EntityLibPy import Node
@@ -31,11 +30,6 @@ class EnergyPoolGD(HelperObject):
         return Bool(self._node.at("FactionOverride"))
     @FactionOverride.setter
     def FactionOverride(self, val): self.FactionOverride.set(val)
-    @property
-    def RegenEffectsOnConversion(self):  # type: ()->PrimArray[String]
-        return (lambda n: PrimArray(String, n))(self._node.at("RegenEffectsOnConversion"))
-    @RegenEffectsOnConversion.setter
-    def RegenEffectsOnConversion(self, val): self.RegenEffectsOnConversion.set(val)
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))

@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.WindTurbulenceType import *
 from entgen.String import *
+from entgen.Bool import *
 from entgen.Float import *
 from entgen.GameEffect import *
 
@@ -22,13 +23,33 @@ class WindTurbulenceEffect(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def Strength(self):  # type: ()->Float
-        return Float(self._node.at("Strength"))
-    @Strength.setter
-    def Strength(self, val): self.Strength.set(val)
+    def BendStrength(self):  # type: ()->Float
+        return Float(self._node.at("BendStrength"))
+    @BendStrength.setter
+    def BendStrength(self, val): self.BendStrength.set(val)
+    @property
+    def GlobalStrength(self):  # type: ()->Float
+        return Float(self._node.at("GlobalStrength"))
+    @GlobalStrength.setter
+    def GlobalStrength(self, val): self.GlobalStrength.set(val)
     @property
     def Super(self):  # type: ()->GameEffect
         return GameEffect(self._node.at("Super"))
+    @property
+    def TurbulenceStrength(self):  # type: ()->Float
+        return Float(self._node.at("TurbulenceStrength"))
+    @TurbulenceStrength.setter
+    def TurbulenceStrength(self, val): self.TurbulenceStrength.set(val)
+    @property
+    def UseGlobalStrength(self):  # type: ()->Bool
+        return Bool(self._node.at("UseGlobalStrength"))
+    @UseGlobalStrength.setter
+    def UseGlobalStrength(self, val): self.UseGlobalStrength.set(val)
+    @property
+    def WindShakeStrength(self):  # type: ()->Float
+        return Float(self._node.at("WindShakeStrength"))
+    @WindShakeStrength.setter
+    def WindShakeStrength(self, val): self.WindShakeStrength.set(val)
     @property
     def WindTurbulenceType(self):  # type: ()->WindTurbulenceType
         return WindTurbulenceType(self._node.at("WindTurbulenceType"))

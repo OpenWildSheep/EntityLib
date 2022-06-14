@@ -13,6 +13,7 @@ namespace Ent
         struct variant_string_bool_s32_float_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_Vector2Vec_Vector3Vec_PositionVec_; // Union
         struct variant_string_bool_s32_float_EntityRef_Vector2_Vector3_Position_stringVec_boolVec_s32Vec_floatVec_EntityRefVec_Vector2Vec_Vector3Vec_PositionVec_; // Union
         struct variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_; // Union
+        struct variant_ZoneCylinderShape_ZoneMeshShape_; // Union
         struct variant_Pasta_Easing_Curve_string_; // Union
         struct variant_MeshShape_ShapeSphere_ShapeBox_; // Union
         struct usePerception;
@@ -23,6 +24,7 @@ namespace Ent
         struct sPhysicsShapeCapsule;
         struct sJointFixedDesc;
         struct sJointBallDesc;
+        struct resetCreatureRequest;
         struct jumpPower;
         struct isPerceivableForEnemies;
         struct isPerceivable;
@@ -208,6 +210,7 @@ namespace Ent
             SoundEmissionStrength_COUNT,
         };
         struct soundEmissionStrength;
+        struct SoftCollisionGD_VegetationDetectionParameters;
         struct SmoothScaleComponentInput_Parameters;
         struct Size; // enum
         enum class SizeEnum
@@ -232,6 +235,13 @@ namespace Ent
         struct ScriptPathAndDataSet;
         struct ScaleFactor;
         struct ScaleConverter;
+        struct RuntimeMode; // enum
+        enum class RuntimeModeEnum
+        {
+            None_,
+            Container,
+            Compound,
+        };
         struct RigidbodyScalingSpeed;
         struct RigidbodyScaleMultiplier;
         struct RigidBodyUserData;
@@ -442,15 +452,13 @@ namespace Ent
         enum class NavMeshActionTypeEnum
         {
             none,
+            walk,
             jump,
             NavMeshActionType_COUNT,
         };
         struct OffMeshLink;
         struct NavMesh;
         struct MusicCategory;
-        struct MoveTo;
-        struct MoveToPosition;
-        struct MoveToAlongSpline;
         struct MoveCapacityData_OrientationSpeed;
         struct MountableSnapLine_ControlPoint;
         struct MountableData;
@@ -567,6 +575,7 @@ namespace Ent
         struct lightAttackData;
         struct LedgePositionInfo;
         struct JumpHeightMultiplier;
+        struct IsActive;
         struct Invincible;
         struct InventoryTags; // enum
         enum class InventoryTagsEnum
@@ -592,7 +601,6 @@ namespace Ent
         };
         struct TrailProperties;
         struct Interactor;
-        struct InteractData;
         struct InputCollisionBehaviorData;
         struct InertiaTensor;
         struct ImpactAndSolidityData;
@@ -696,6 +704,7 @@ namespace Ent
         struct Game_VoxelsVolume;
         struct GameTimeInMs;
         struct GameProfile;
+        struct GameSoftCollisionData;
         struct GameSnapData;
         struct GameSlopeData;
         struct GameShamanVisionData;
@@ -834,7 +843,9 @@ namespace Ent
         struct UnifiedPhysicsDataComponentInput;
         struct SpiritAnimalShrineComponentInput;
         struct SoundEmitterComponentInput;
+        struct SoftCollisionComponentInput;
         struct SmoothScaleComponentInput;
+        struct ScriptComponentInput;
         struct ReviveEnergyComponentInput;
         struct RespawnabilityComponentInput;
         struct RagdollComponentInput;
@@ -845,6 +856,7 @@ namespace Ent
         struct OutfitWearerComponentInput;
         struct MountIKControllerComponentInput;
         struct LifeComponentInput;
+        struct InteractorComponentInput;
         struct InteractableGPEComponentInput;
         struct GrasperComponentInput;
         struct GraspableComponentInput;
@@ -856,7 +868,6 @@ namespace Ent
         struct CharacterControllerComponentInput;
         struct BreakableComponentInput;
         struct BeamTargetComponentInput;
-        struct BeamGeneratorComponentInput;
         struct AttackTriggerComponentInput;
         struct AttackComponentInput;
         struct AnimationTransformDriverComponentInput;
@@ -892,6 +903,7 @@ namespace Ent
         struct SoundEmitterGD;
         struct SoundAreaGD;
         struct SoulRespawnOpportunityGD;
+        struct SoftCollisionGD;
         struct SmoothScaleComponentGD;
         struct SideMapGateGD;
         struct ShapeshiftStatueGD;
@@ -1095,7 +1107,7 @@ namespace Ent
         struct CameraEditorData;
         struct CameraManager;
         struct BoneStartPoint;
-        struct BeamGeneratorGD;
+        struct InteractorGD;
         struct BoneAnimation;
         struct BoidSpeedMaxData;
         struct BoidGoalMode; // enum
@@ -1401,6 +1413,7 @@ namespace Ent
         struct EntityStateSpiritAnimalFleshForm;
         struct EntityStateSpiritAnimalBeingCalled;
         struct EntityStateSpeedLimiter;
+        struct EntityStateSoftCollide;
         struct EntityStateSnappedToHatchingTarget;
         struct EntityStateSlowMotion;
         struct EntityStateShootHatchingEnergy;
@@ -1505,6 +1518,7 @@ namespace Ent
         struct EntityStateBounce;
         struct EntityStateBoidsHomePos;
         struct EntityStateBeingOnSpike;
+        struct EntityStateBeingInReeds;
         struct EntityStateBeingBlockedByVine;
         struct EntityStateBackwardDodge;
         struct EntityStateAttackDive;
@@ -1725,6 +1739,7 @@ namespace Ent
             CATEGORY_Health,
             CATEGORY_HealthAlive,
             CATEGORY_HealthDead,
+            CATEGORY_KnockedOut,
             CATEGORY_EntitySwitchTransition,
             CATEGORY_EnergyRoot,
             CATEGORY_EnergySpout,
@@ -1736,7 +1751,7 @@ namespace Ent
             CATEGORY_Save,
             CATEGORY_Cinematic,
             CATEGORY_Loading,
-            ActorCategory_COUNT,
+            CATEGORY_NoCategory,
         };
         struct ConditionalRigidityAttribute_Conditions;
         struct ConditionalRigidityAttribute;
@@ -2023,6 +2038,8 @@ namespace Ent
         struct VegetationResourceData;
         struct VegetationVisibilityDistanceCategory;
         struct VisualResourceBuildData;
+        struct ZoneCylinderShape;
+        struct ZoneMeshShape;
         struct sBiomeSFXResult;
         struct sBiomeSoundResult;
         struct sJointMotorDesc;
@@ -2135,6 +2152,17 @@ namespace Ent
             Ent::Gen::Quat setQuat() const;
             std::optional<Ent::Gen::Position> Position() const;
             Ent::Gen::Position setPosition() const;
+        };
+
+        struct variant_ZoneCylinderShape_ZoneMeshShape_ : Base // Union
+        {
+            variant_ZoneCylinderShape_ZoneMeshShape_(Ent::Node* _node): Base(_node) {}
+            static constexpr char schemaName[] = "eastl::variant<ZoneCylinderShape,ZoneMeshShape>";
+            char const* getType() const;
+            std::optional<Ent::Gen::ZoneCylinderShape> ZoneCylinderShape() const;
+            Ent::Gen::ZoneCylinderShape setZoneCylinderShape() const;
+            std::optional<Ent::Gen::ZoneMeshShape> ZoneMeshShape() const;
+            Ent::Gen::ZoneMeshShape setZoneMeshShape() const;
         };
 
         struct variant_Pasta_Easing_Curve_string_ : Base // Union
@@ -2273,6 +2301,15 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
         
+        };
+
+        struct resetCreatureRequest : HelperObject // Object
+        {
+            resetCreatureRequest(Ent::Node* _node): HelperObject(_node) {}
+            
+            Ent::Gen::String _comment() const;
+            Ent::Gen::Bool engaged() const;
+            Ent::Gen::Bool val() const;
         };
 
         struct jumpPower : HelperObject // Object
@@ -3229,6 +3266,25 @@ namespace Ent
             Ent::Gen::SoundEmissionStrength val() const;
         };
 
+        struct SoftCollisionGD_VegetationDetectionParameters : HelperObject // Object
+        {
+            SoftCollisionGD_VegetationDetectionParameters(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "SoftCollisionGD::VegetationDetectionParameters";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::String BoneName() const;
+            Ent::Gen::Vector3 BoneOffset() const;
+            Ent::Gen::Float Radius() const;
+            PrimArray<Ent::Gen::String> VegetationTagList() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct SmoothScaleComponentInput_Parameters : HelperObject // Object
         {
             SmoothScaleComponentInput_Parameters(Ent::Node* _node): HelperObject(_node) {}
@@ -3533,6 +3589,30 @@ namespace Ent
             Ent::Gen::Vector2 out() const;
             Ent::Gen::String outText() const;
         };
+
+        struct RuntimeMode : EnumPropHelper<RuntimeMode, RuntimeModeEnum> // Enum
+        {
+            using Enum = RuntimeModeEnum;
+            using PropHelper<RuntimeMode, Enum>::operator=;
+            RuntimeMode(Ent::Node* _node): EnumPropHelper<RuntimeMode, Enum>(_node) {}
+            
+            static constexpr char const* enumToString[] = {
+                "None",
+                "Container",
+                "Compound",
+            };
+        };
+        inline char const* toString(RuntimeModeEnum value)
+        {
+            if(size_t(value) >= std::size(RuntimeMode::enumToString))
+                throw std::runtime_error("Wrong enum value");
+            return RuntimeMode::enumToString[size_t(value)];
+        }
+        inline char const* toInternal(RuntimeModeEnum value) { return toString(value); }
+        template<> inline RuntimeModeEnum strToEnum<RuntimeModeEnum>(char const* value)
+        {
+            return static_cast<RuntimeModeEnum>(details::indexInEnum(value, RuntimeMode::enumToString));
+        }
 
         struct RigidbodyScalingSpeed : HelperObject // Object
         {
@@ -4145,6 +4225,8 @@ namespace Ent
             Ent::Gen::EntityStateBackwardDodge setEntityStateBackwardDodge() const;
             std::optional<Ent::Gen::EntityStateBeingBlockedByVine> EntityStateBeingBlockedByVine() const;
             Ent::Gen::EntityStateBeingBlockedByVine setEntityStateBeingBlockedByVine() const;
+            std::optional<Ent::Gen::EntityStateBeingInReeds> EntityStateBeingInReeds() const;
+            Ent::Gen::EntityStateBeingInReeds setEntityStateBeingInReeds() const;
             std::optional<Ent::Gen::EntityStateBeingOnSpike> EntityStateBeingOnSpike() const;
             Ent::Gen::EntityStateBeingOnSpike setEntityStateBeingOnSpike() const;
             std::optional<Ent::Gen::EntityStateBoidsHomePos> EntityStateBoidsHomePos() const;
@@ -4353,6 +4435,8 @@ namespace Ent
             Ent::Gen::EntityStateSlowMotion setEntityStateSlowMotion() const;
             std::optional<Ent::Gen::EntityStateSnappedToHatchingTarget> EntityStateSnappedToHatchingTarget() const;
             Ent::Gen::EntityStateSnappedToHatchingTarget setEntityStateSnappedToHatchingTarget() const;
+            std::optional<Ent::Gen::EntityStateSoftCollide> EntityStateSoftCollide() const;
+            Ent::Gen::EntityStateSoftCollide setEntityStateSoftCollide() const;
             std::optional<Ent::Gen::EntityStateSpeedLimiter> EntityStateSpeedLimiter() const;
             Ent::Gen::EntityStateSpeedLimiter setEntityStateSpeedLimiter() const;
             std::optional<Ent::Gen::EntityStateSpiritAnimalBeingCalled> EntityStateSpiritAnimalBeingCalled() const;
@@ -4887,11 +4971,11 @@ namespace Ent
             }
             Ent::Gen::Float CreatureHeight() const;
             Ent::Gen::Float CreatureRadius() const;
+            Ent::Gen::String CreatureType() const;
             Ent::Gen::Bool MarkWaterAreas() const;
             Ent::Gen::Float MaxClimbHeight() const;
             Ent::Gen::Float MaxWalkableSlopeAngle() const;
             Ent::Gen::Float MinWaterDepth() const;
-            PrimArray<Ent::Gen::String> SizeLayerMask() const;
             Ent::Gen::Float VoxelPrecision() const;
             Ent::Gen::String _comment() const;
         };
@@ -5633,6 +5717,7 @@ namespace Ent
             static constexpr char schemaName[] = "NavMeshActionType";
             static constexpr char const* enumToString[] = {
                 "none",
+                "walk",
                 "jump",
                 "NavMeshActionType_COUNT",
             };
@@ -5708,53 +5793,6 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
-        struct MoveTo : HelperObject // Object
-        {
-            MoveTo(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "MoveTo";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-        
-        };
-
-        struct MoveToPosition : HelperObject // Object
-        {
-            MoveToPosition(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "MoveToPosition";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::MoveTo Super() const;
-            Ent::Gen::String _comment() const;
-        };
-
-        struct MoveToAlongSpline : HelperObject // Object
-        {
-            MoveToAlongSpline(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "MoveToAlongSpline";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::MoveTo Super() const;
-            Ent::Gen::String _comment() const;
-        };
-
         struct MoveCapacityData_OrientationSpeed : HelperObject // Object
         {
             MoveCapacityData_OrientationSpeed(Ent::Node* _node): HelperObject(_node) {}
@@ -5807,7 +5845,6 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::Int HotspotID() const;
-            Ent::Gen::EntityRef MountableEntity() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -6518,10 +6555,11 @@ namespace Ent
             }
             Ent::Gen::Float NavMeshMaxHeight() const;
             Ent::Gen::Float NavMeshMaxSize() const;
-            Ent::Gen::RecastNavmeshGenerationParameters RecastParameters() const;
+            Ent::Gen::Map<char const*, Ent::Gen::RecastNavmeshGenerationParameters> RecastParameters() const;
             Ent::Gen::Manager Super() const;
             Ent::Gen::Float TileMargin() const;
             Ent::Gen::Float TileSize() const;
+            Ent::Gen::Float VerticalTolerance() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -7051,6 +7089,15 @@ namespace Ent
             Ent::Gen::Float val() const;
         };
 
+        struct IsActive : HelperObject // Object
+        {
+            IsActive(Ent::Node* _node): HelperObject(_node) {}
+            
+            Ent::Gen::String _comment() const;
+            Ent::Gen::Bool engaged() const;
+            Ent::Gen::Bool val() const;
+        };
+
         struct Invincible : HelperObject // Object
         {
             Invincible(Ent::Node* _node): HelperObject(_node) {}
@@ -7174,22 +7221,6 @@ namespace Ent
             
             Ent::Gen::String _comment() const;
             Ent::Gen::Bool engaged() const;
-        };
-
-        struct InteractData : HelperObject // Object
-        {
-            InteractData(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "InteractData";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::String _comment() const;
-            Ent::Gen::Float distance() const;
         };
 
         struct InputCollisionBehaviorData : HelperObject // Object
@@ -7672,9 +7703,10 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::String ConvexZoneFilePath() const;
             Ent::Gen::Float DownwardOffset() const;
             Ent::Gen::NavMeshArea NavMeshArea() const;
+            Ent::Gen::Int Priority() const;
+            Ent::Gen::variant_ZoneCylinderShape_ZoneMeshShape_ Shape() const;
             Ent::Gen::GeometryStamper Super() const;
             Ent::Gen::Float UpwardOffset() const;
             Ent::Gen::String _comment() const;
@@ -7796,6 +7828,28 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::Map<char const*, Array<Array<Ent::Gen::Tuple<Ent::Gen::GameTimeInMs, Ent::Gen::Float>>>> TypedScoreOverTimeList() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct GameSoftCollisionData : HelperObject // Object
+        {
+            GameSoftCollisionData(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "GameSoftCollisionData";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float DecelerationFactor() const;
+            Ent::Gen::Float InsidePenetrationCoeff() const;
+            Ent::Gen::Float MaxSpeedFactor() const;
+            Ent::Gen::Float MinSpeedFactor() const;
+            Ent::Gen::SpeedMode MinSpeedMode() const;
+            Ent::Gen::Float StuckDuration() const;
+            Ent::Gen::Float StuckPenetrationCoeff() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -9402,8 +9456,6 @@ namespace Ent
             Ent::Gen::Bool DisplayRPCCalls() const;
             Ent::Gen::Bool DisplayReloadNotifications() const;
             Ent::Gen::Bool DisplaySelectedPestoEntity() const;
-            Ent::Gen::Bool DisplaySplinePilot() const;
-            Ent::Gen::Bool DisplaySplinePilotTool() const;
             Ent::Gen::Bool DisplayStringHashTranslator() const;
             Ent::Gen::Bool DisplayTimer() const;
             Ent::Gen::Bool DisplayTreesStates() const;
@@ -9743,6 +9795,22 @@ namespace Ent
             Ent::Gen::computePitchAngle computePitchAngle() const;
         };
 
+        struct SoftCollisionComponentInput : HelperObject // Object
+        {
+            SoftCollisionComponentInput(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "SoftCollisionComponentInput";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ComponentInput Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct SmoothScaleComponentInput : HelperObject // Object
         {
             SmoothScaleComponentInput(Ent::Node* _node): HelperObject(_node) {}
@@ -9757,6 +9825,22 @@ namespace Ent
             }
             Ent::Gen::Parameters Parameters() const;
             Ent::Gen::ScaleFactor ScaleFactor() const;
+            Ent::Gen::ComponentInput Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct ScriptComponentInput : HelperObject // Object
+        {
+            ScriptComponentInput(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "ScriptComponentInput";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
             Ent::Gen::ComponentInput Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -9931,6 +10015,24 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
+        struct InteractorComponentInput : HelperObject // Object
+        {
+            InteractorComponentInput(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "InteractorComponentInput";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::EndPosition EndPosition() const;
+            Ent::Gen::IsActive IsActive() const;
+            Ent::Gen::ComponentInput Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct InteractableGPEComponentInput : HelperObject // Object
         {
             InteractableGPEComponentInput(Ent::Node* _node): HelperObject(_node) {}
@@ -10031,6 +10133,7 @@ namespace Ent
             }
             Ent::Gen::ComponentInput Super() const;
             Ent::Gen::String _comment() const;
+            Ent::Gen::resetCreatureRequest resetCreatureRequest() const;
             Ent::Gen::usePerception usePerception() const;
         };
 
@@ -10114,23 +10217,6 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::ComponentInput Super() const;
-            Ent::Gen::String _comment() const;
-        };
-
-        struct BeamGeneratorComponentInput : HelperObject // Object
-        {
-            BeamGeneratorComponentInput(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "BeamGeneratorComponentInput";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::EndPosition EndPosition() const;
             Ent::Gen::ComponentInput Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -10878,6 +10964,24 @@ namespace Ent
             Ent::Gen::Int SlotCount() const;
             Ent::Gen::Specie Specie() const;
             Ent::Gen::ComponentGD Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct SoftCollisionGD : HelperObject // Object
+        {
+            SoftCollisionGD(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "SoftCollisionGD";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float PenetrationCoeffSmoothRate() const;
+            Ent::Gen::ComponentGD Super() const;
+            Ent::Gen::SoftCollisionGD_VegetationDetectionParameters VegetationDetectionParam() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -12412,7 +12516,6 @@ namespace Ent
             }
             Array<Ent::Gen::EnergyPoolGD_EnergyArea> EnergyAreas() const;
             Ent::Gen::Bool FactionOverride() const;
-            PrimArray<Ent::Gen::String> RegenEffectsOnConversion() const;
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::TransitionSettings TransitionSettings() const;
             Ent::Gen::String _comment() const;
@@ -12919,8 +13022,6 @@ namespace Ent
             Ent::Gen::AttackComponentGD setAttackComponentGD() const;
             std::optional<Ent::Gen::AttackTriggerGD> AttackTriggerGD() const;
             Ent::Gen::AttackTriggerGD setAttackTriggerGD() const;
-            std::optional<Ent::Gen::BeamGeneratorGD> BeamGeneratorGD() const;
-            Ent::Gen::BeamGeneratorGD setBeamGeneratorGD() const;
             std::optional<Ent::Gen::BeamTargetGD> BeamTargetGD() const;
             Ent::Gen::BeamTargetGD setBeamTargetGD() const;
             std::optional<Ent::Gen::BittenGD> BittenGD() const;
@@ -13039,6 +13140,8 @@ namespace Ent
             Ent::Gen::InfoboardRegistererGD setInfoboardRegistererGD() const;
             std::optional<Ent::Gen::InteractableGPEGD> InteractableGPEGD() const;
             Ent::Gen::InteractableGPEGD setInteractableGPEGD() const;
+            std::optional<Ent::Gen::InteractorGD> InteractorGD() const;
+            Ent::Gen::InteractorGD setInteractorGD() const;
             std::optional<Ent::Gen::InterestPointGD> InterestPointGD() const;
             Ent::Gen::InterestPointGD setInterestPointGD() const;
             std::optional<Ent::Gen::InventoryGD> InventoryGD() const;
@@ -13145,6 +13248,8 @@ namespace Ent
             Ent::Gen::SideMapGateGD setSideMapGateGD() const;
             std::optional<Ent::Gen::SmoothScaleComponentGD> SmoothScaleComponentGD() const;
             Ent::Gen::SmoothScaleComponentGD setSmoothScaleComponentGD() const;
+            std::optional<Ent::Gen::SoftCollisionGD> SoftCollisionGD() const;
+            Ent::Gen::SoftCollisionGD setSoftCollisionGD() const;
             std::optional<Ent::Gen::SoulRespawnOpportunityGD> SoulRespawnOpportunityGD() const;
             Ent::Gen::SoulRespawnOpportunityGD setSoulRespawnOpportunityGD() const;
             std::optional<Ent::Gen::SoundAreaGD> SoundAreaGD() const;
@@ -13269,9 +13374,6 @@ namespace Ent
             std::optional<Ent::Gen::AttackTriggerGD> AttackTriggerGD() const;
             Ent::Gen::AttackTriggerGD addAttackTriggerGD() const;
             void removeAttackTriggerGD() const;
-            std::optional<Ent::Gen::BeamGeneratorGD> BeamGeneratorGD() const;
-            Ent::Gen::BeamGeneratorGD addBeamGeneratorGD() const;
-            void removeBeamGeneratorGD() const;
             std::optional<Ent::Gen::BeamTargetGD> BeamTargetGD() const;
             Ent::Gen::BeamTargetGD addBeamTargetGD() const;
             void removeBeamTargetGD() const;
@@ -13449,6 +13551,9 @@ namespace Ent
             std::optional<Ent::Gen::InteractableGPEGD> InteractableGPEGD() const;
             Ent::Gen::InteractableGPEGD addInteractableGPEGD() const;
             void removeInteractableGPEGD() const;
+            std::optional<Ent::Gen::InteractorGD> InteractorGD() const;
+            Ent::Gen::InteractorGD addInteractorGD() const;
+            void removeInteractorGD() const;
             std::optional<Ent::Gen::InterestPointGD> InterestPointGD() const;
             Ent::Gen::InterestPointGD addInterestPointGD() const;
             void removeInterestPointGD() const;
@@ -13608,6 +13713,9 @@ namespace Ent
             std::optional<Ent::Gen::SmoothScaleComponentGD> SmoothScaleComponentGD() const;
             Ent::Gen::SmoothScaleComponentGD addSmoothScaleComponentGD() const;
             void removeSmoothScaleComponentGD() const;
+            std::optional<Ent::Gen::SoftCollisionGD> SoftCollisionGD() const;
+            Ent::Gen::SoftCollisionGD addSoftCollisionGD() const;
+            void removeSoftCollisionGD() const;
             std::optional<Ent::Gen::SoulRespawnOpportunityGD> SoulRespawnOpportunityGD() const;
             Ent::Gen::SoulRespawnOpportunityGD addSoulRespawnOpportunityGD() const;
             void removeSoulRespawnOpportunityGD() const;
@@ -13746,8 +13854,12 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::Float Strength() const;
+            Ent::Gen::Float BendStrength() const;
+            Ent::Gen::Float GlobalStrength() const;
             Ent::Gen::GameEffect Super() const;
+            Ent::Gen::Float TurbulenceStrength() const;
+            Ent::Gen::Bool UseGlobalStrength() const;
+            Ent::Gen::Float WindShakeStrength() const;
             Ent::Gen::WindTurbulenceType WindTurbulenceType() const;
             Ent::Gen::String _comment() const;
         };
@@ -13966,9 +14078,6 @@ namespace Ent
             std::optional<Ent::Gen::AttackTriggerGD> AttackTriggerGD() const;
             Ent::Gen::AttackTriggerGD addAttackTriggerGD() const;
             void removeAttackTriggerGD() const;
-            std::optional<Ent::Gen::BeamGeneratorGD> BeamGeneratorGD() const;
-            Ent::Gen::BeamGeneratorGD addBeamGeneratorGD() const;
-            void removeBeamGeneratorGD() const;
             std::optional<Ent::Gen::BeamTargetGD> BeamTargetGD() const;
             Ent::Gen::BeamTargetGD addBeamTargetGD() const;
             void removeBeamTargetGD() const;
@@ -14146,6 +14255,9 @@ namespace Ent
             std::optional<Ent::Gen::InteractableGPEGD> InteractableGPEGD() const;
             Ent::Gen::InteractableGPEGD addInteractableGPEGD() const;
             void removeInteractableGPEGD() const;
+            std::optional<Ent::Gen::InteractorGD> InteractorGD() const;
+            Ent::Gen::InteractorGD addInteractorGD() const;
+            void removeInteractorGD() const;
             std::optional<Ent::Gen::InterestPointGD> InterestPointGD() const;
             Ent::Gen::InterestPointGD addInterestPointGD() const;
             void removeInterestPointGD() const;
@@ -14305,6 +14417,9 @@ namespace Ent
             std::optional<Ent::Gen::SmoothScaleComponentGD> SmoothScaleComponentGD() const;
             Ent::Gen::SmoothScaleComponentGD addSmoothScaleComponentGD() const;
             void removeSmoothScaleComponentGD() const;
+            std::optional<Ent::Gen::SoftCollisionGD> SoftCollisionGD() const;
+            Ent::Gen::SoftCollisionGD addSoftCollisionGD() const;
+            void removeSoftCollisionGD() const;
             std::optional<Ent::Gen::SoulRespawnOpportunityGD> SoulRespawnOpportunityGD() const;
             Ent::Gen::SoulRespawnOpportunityGD addSoulRespawnOpportunityGD() const;
             void removeSoulRespawnOpportunityGD() const;
@@ -14502,6 +14617,7 @@ namespace Ent
             Ent::Gen::String RTPC_3DFrontBack() const;
             Ent::Gen::String RTPC_3DLeftRight() const;
             Ent::Gen::String RTPC_AbsoluteHeight() const;
+            Ent::Gen::String RTPC_AmbSDFDistance() const;
             Ent::Gen::String RTPC_AmbientRegenLevel() const;
             Ent::Gen::String RTPC_AngleToListener() const;
             Ent::Gen::String RTPC_BoidLeavesCount() const;
@@ -14652,7 +14768,6 @@ namespace Ent
             Ent::Gen::Bool CastShadow() const;
             Ent::Gen::Color Color() const;
             Ent::Gen::Vector3 Direction() const;
-            Ent::Gen::Bool Enabled() const;
             Ent::Gen::Float LinearAttenuationStart() const;
             Ent::Gen::Float LinearAttenuationStop() const;
             Ent::Gen::Vector3 Offset() const;
@@ -15550,10 +15665,10 @@ namespace Ent
             Ent::Gen::String val() const;
         };
 
-        struct BeamGeneratorGD : HelperObject // Object
+        struct InteractorGD : HelperObject // Object
         {
-            BeamGeneratorGD(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "BeamGeneratorGD";
+            InteractorGD(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "InteractorGD";
             static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
@@ -15565,6 +15680,10 @@ namespace Ent
             PrimArray<Ent::Gen::String> BeamEffectsNames() const;
             Ent::Gen::BoneStartPoint BoneStartPoint() const;
             Ent::Gen::Float MaxBeamRange() const;
+            Ent::Gen::Float RandomSphereCastsAngle() const;
+            Ent::Gen::Int RandomSphereCastsNb() const;
+            Ent::Gen::Float RememberTargetMaxTime() const;
+            Ent::Gen::Float SphereCastRadius() const;
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -16026,14 +16145,11 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            Ent::Gen::Bool CheckHotspotOrientation() const;
             Ent::Gen::String EventTriggered() const;
             Ent::Gen::HotSpotType HotspotType() const;
-            Ent::Gen::Bool IsCollectable() const;
-            Ent::Gen::Bool Levitate() const;
-            Ent::Gen::Float MaxTargetableDistance() const;
+            Ent::Gen::Float InteractMaxDistance() const;
+            Ent::Gen::Float InteractionRadius() const;
             Ent::Gen::BeamStaffMode Mode() const;
-            Ent::Gen::Bool SpendEnergy() const;
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -16340,6 +16456,7 @@ namespace Ent
             Ent::Gen::Bool MountOnlyOnFollower() const;
             Ent::Gen::String NewGameVideo() const;
             Ent::Gen::String NewGameVideoMusicStart() const;
+            Ent::Gen::String NewGameVideoMusicStop() const;
             Ent::Gen::GameParryData ParryData() const;
             Ent::Gen::GamePropelData PropelData() const;
             Ent::Gen::GameRespawnData RespawnData() const;
@@ -16347,6 +16464,7 @@ namespace Ent
             Ent::Gen::GameShamanVisionData ShamanVisionData() const;
             Ent::Gen::GameSlopeData SlopeData() const;
             Ent::Gen::GameSnapData SnapData() const;
+            Ent::Gen::GameSoftCollisionData SoftCollisionData() const;
             Ent::Gen::String Sound_TopView_Start() const;
             Ent::Gen::String Sound_TopView_Stop() const;
             Ent::Gen::Map<SizeEnum, Ent::Gen::Float> SpeedMaxInUndergroundCavity() const;
@@ -16389,8 +16507,8 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::AreaNavigation AreaNavigation() const;
-            Ent::Gen::Size Size() const;
             Ent::Gen::ComponentGD Super() const;
+            Ent::Gen::String UsedNavMeshName() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -16863,7 +16981,7 @@ namespace Ent
             Ent::Gen::Float capsuleTinyRadius() const;
             Ent::Gen::ScaleConverter constraintDetectionAnticipation() const;
             Ent::Gen::Vector3 constraintDetectionOffset() const;
-            Ent::Gen::ScaleConverter constraintDetectionRadius() const;
+            Ent::Gen::Float constraintDetectionRadiusMultiplier() const;
             Ent::Gen::Float coyoteJumpMaxTime() const;
             Ent::Gen::Float crashPreventionSafeguardFactor() const;
             Ent::Gen::Float defaultWorldUpSpeedFactor() const;
@@ -16871,6 +16989,9 @@ namespace Ent
             Ent::Gen::Bool doubleJump() const;
             Ent::Gen::ScaleConverter dropPlaneLegLenFactor() const;
             Ent::Gen::Bool dropSyncTrajectoryAndVisual() const;
+            Ent::Gen::ScaleConverter edgeDetectionAnticipation() const;
+            Ent::Gen::Vector3 edgeDetectionOffset() const;
+            Ent::Gen::Float edgeDetectionRadiusMultiplier() const;
             Ent::Gen::Float ellipseCoeff() const;
             Ent::Gen::ScaleConverter extirpateObstacleAcceleration() const;
             Ent::Gen::Float extirpateObstacleDuration() const;
@@ -17845,6 +17966,9 @@ namespace Ent
             std::optional<Ent::Gen::EntityStateBeingBlockedByVine> EntityStateBeingBlockedByVine() const;
             Ent::Gen::EntityStateBeingBlockedByVine addEntityStateBeingBlockedByVine() const;
             void removeEntityStateBeingBlockedByVine() const;
+            std::optional<Ent::Gen::EntityStateBeingInReeds> EntityStateBeingInReeds() const;
+            Ent::Gen::EntityStateBeingInReeds addEntityStateBeingInReeds() const;
+            void removeEntityStateBeingInReeds() const;
             std::optional<Ent::Gen::EntityStateBeingOnSpike> EntityStateBeingOnSpike() const;
             Ent::Gen::EntityStateBeingOnSpike addEntityStateBeingOnSpike() const;
             void removeEntityStateBeingOnSpike() const;
@@ -18157,6 +18281,9 @@ namespace Ent
             std::optional<Ent::Gen::EntityStateSnappedToHatchingTarget> EntityStateSnappedToHatchingTarget() const;
             Ent::Gen::EntityStateSnappedToHatchingTarget addEntityStateSnappedToHatchingTarget() const;
             void removeEntityStateSnappedToHatchingTarget() const;
+            std::optional<Ent::Gen::EntityStateSoftCollide> EntityStateSoftCollide() const;
+            Ent::Gen::EntityStateSoftCollide addEntityStateSoftCollide() const;
+            void removeEntityStateSoftCollide() const;
             std::optional<Ent::Gen::EntityStateSpeedLimiter> EntityStateSpeedLimiter() const;
             Ent::Gen::EntityStateSpeedLimiter addEntityStateSpeedLimiter() const;
             void removeEntityStateSpeedLimiter() const;
@@ -18333,6 +18460,7 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::ObjectSet<char const*, Ent::Gen::Entity> Embedded() const;
+            Ent::Gen::RuntimeMode RuntimeMode() const;
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -18983,6 +19111,22 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::Float SpeedMax() const;
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EntityStateSoftCollide : HelperObject // Object
+        {
+            EntityStateSoftCollide(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateSoftCollide";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
             Ent::Gen::ActorState Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -20682,8 +20826,25 @@ namespace Ent
             }
             Ent::Gen::Float SpikeCooldown() const;
             Ent::Gen::Float SpikeDamage() const;
+            Ent::Gen::Int SpikeDeadlyHitCount() const;
             Ent::Gen::Bool SpikeEject() const;
             Ent::Gen::Float SpikeImpact() const;
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EntityStateBeingInReeds : HelperObject // Object
+        {
+            EntityStateBeingInReeds(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateBeingInReeds";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
             Ent::Gen::ActorState Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -23753,6 +23914,7 @@ namespace Ent
                 "CATEGORY_Health",
                 "CATEGORY_HealthAlive",
                 "CATEGORY_HealthDead",
+                "CATEGORY_KnockedOut",
                 "CATEGORY_EntitySwitchTransition",
                 "CATEGORY_EnergyRoot",
                 "CATEGORY_EnergySpout",
@@ -23764,7 +23926,7 @@ namespace Ent
                 "CATEGORY_Save",
                 "CATEGORY_Cinematic",
                 "CATEGORY_Loading",
-                "ActorCategory_COUNT",
+                "CATEGORY_NoCategory",
             };
         };
         inline char const* toString(ActorCategoryEnum value)
@@ -23963,7 +24125,7 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
-            PrimArray<Ent::Gen::String> Order() const;
+            Array<Ent::Gen::Tuple<Ent::Gen::String, Ent::Gen::String>> Dependencies() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -24945,7 +25107,6 @@ namespace Ent
             Ent::Gen::String _comment() const;
             Ent::Gen::BiteData biteData() const;
             Ent::Gen::CreatureDangerousness dangerousnessData() const;
-            Ent::Gen::InteractData interactData() const;
             Ent::Gen::RevivedData revivedData() const;
         };
 
@@ -26025,6 +26186,39 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
+        struct ZoneCylinderShape : HelperObject // Object
+        {
+            ZoneCylinderShape(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "ZoneCylinderShape";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float DistanceBetweenPoints() const;
+            Ent::Gen::Float Radius() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct ZoneMeshShape : HelperObject // Object
+        {
+            ZoneMeshShape(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "ZoneMeshShape";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::String ConvexZoneFilePath() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct sBiomeSFXResult : HelperObject // Object
         {
             sBiomeSFXResult(Ent::Node* _node): HelperObject(_node) {}
@@ -26394,6 +26588,27 @@ namespace Ent
         {
             return Ent::Gen::Position(node->setUnionType("Position"));
         }
+        // variant_ZoneCylinderShape_ZoneMeshShape_
+        inline char const* variant_ZoneCylinderShape_ZoneMeshShape_::getType() const
+        {
+            return node->getUnionType();
+        }
+        inline std::optional<Ent::Gen::ZoneCylinderShape> variant_ZoneCylinderShape_ZoneMeshShape_::ZoneCylinderShape() const
+        {
+            return strcmp(node->getUnionType(), "ZoneCylinderShape") != 0? std::optional<Ent::Gen::ZoneCylinderShape>{}: std::optional<Ent::Gen::ZoneCylinderShape>(node->getUnionData());
+        }
+        inline Ent::Gen::ZoneCylinderShape variant_ZoneCylinderShape_ZoneMeshShape_::setZoneCylinderShape() const
+        {
+            return Ent::Gen::ZoneCylinderShape(node->setUnionType("ZoneCylinderShape"));
+        }
+        inline std::optional<Ent::Gen::ZoneMeshShape> variant_ZoneCylinderShape_ZoneMeshShape_::ZoneMeshShape() const
+        {
+            return strcmp(node->getUnionType(), "ZoneMeshShape") != 0? std::optional<Ent::Gen::ZoneMeshShape>{}: std::optional<Ent::Gen::ZoneMeshShape>(node->getUnionData());
+        }
+        inline Ent::Gen::ZoneMeshShape variant_ZoneCylinderShape_ZoneMeshShape_::setZoneMeshShape() const
+        {
+            return Ent::Gen::ZoneMeshShape(node->setUnionType("ZoneMeshShape"));
+        }
         // variant_Pasta_Easing_Curve_string_
         inline char const* variant_Pasta_Easing_Curve_string_::getType() const
         {
@@ -26516,6 +26731,19 @@ namespace Ent
         }
         // sJointFixedDesc
         // sJointBallDesc
+        // resetCreatureRequest
+        inline Ent::Gen::String resetCreatureRequest::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Ent::Gen::Bool resetCreatureRequest::engaged() const
+        {
+            return Ent::Gen::Bool(node->at("engaged"));
+        }
+        inline Ent::Gen::Bool resetCreatureRequest::val() const
+        {
+            return Ent::Gen::Bool(node->at("val"));
+        }
         // jumpPower
         inline Ent::Gen::String jumpPower::_comment() const
         {
@@ -27268,6 +27496,27 @@ namespace Ent
         inline Ent::Gen::SoundEmissionStrength soundEmissionStrength::val() const
         {
             return Ent::Gen::SoundEmissionStrength(node->at("val"));
+        }
+        // SoftCollisionGD_VegetationDetectionParameters
+        inline Ent::Gen::String SoftCollisionGD_VegetationDetectionParameters::BoneName() const
+        {
+            return Ent::Gen::String(node->at("BoneName"));
+        }
+        inline Ent::Gen::Vector3 SoftCollisionGD_VegetationDetectionParameters::BoneOffset() const
+        {
+            return Ent::Gen::Vector3(node->at("BoneOffset"));
+        }
+        inline Ent::Gen::Float SoftCollisionGD_VegetationDetectionParameters::Radius() const
+        {
+            return Ent::Gen::Float(node->at("Radius"));
+        }
+        inline PrimArray<Ent::Gen::String> SoftCollisionGD_VegetationDetectionParameters::VegetationTagList() const
+        {
+            return PrimArray<Ent::Gen::String>(node->at("VegetationTagList"));
+        }
+        inline Ent::Gen::String SoftCollisionGD_VegetationDetectionParameters::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
         }
         // SmoothScaleComponentInput_Parameters
         inline Ent::Gen::Float SmoothScaleComponentInput_Parameters::Scale() const
@@ -29464,6 +29713,14 @@ namespace Ent
         {
             return Ent::Gen::EntityStateBeingBlockedByVine(node->setUnionType("EntityStateBeingBlockedByVine"));
         }
+        inline std::optional<Ent::Gen::EntityStateBeingInReeds> ResponsiblePointer_ActorState_::EntityStateBeingInReeds() const
+        {
+            return strcmp(node->getUnionType(), "EntityStateBeingInReeds") != 0? std::optional<Ent::Gen::EntityStateBeingInReeds>{}: std::optional<Ent::Gen::EntityStateBeingInReeds>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStateBeingInReeds ResponsiblePointer_ActorState_::setEntityStateBeingInReeds() const
+        {
+            return Ent::Gen::EntityStateBeingInReeds(node->setUnionType("EntityStateBeingInReeds"));
+        }
         inline std::optional<Ent::Gen::EntityStateBeingOnSpike> ResponsiblePointer_ActorState_::EntityStateBeingOnSpike() const
         {
             return strcmp(node->getUnionType(), "EntityStateBeingOnSpike") != 0? std::optional<Ent::Gen::EntityStateBeingOnSpike>{}: std::optional<Ent::Gen::EntityStateBeingOnSpike>(node->getUnionData());
@@ -30296,6 +30553,14 @@ namespace Ent
         {
             return Ent::Gen::EntityStateSnappedToHatchingTarget(node->setUnionType("EntityStateSnappedToHatchingTarget"));
         }
+        inline std::optional<Ent::Gen::EntityStateSoftCollide> ResponsiblePointer_ActorState_::EntityStateSoftCollide() const
+        {
+            return strcmp(node->getUnionType(), "EntityStateSoftCollide") != 0? std::optional<Ent::Gen::EntityStateSoftCollide>{}: std::optional<Ent::Gen::EntityStateSoftCollide>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStateSoftCollide ResponsiblePointer_ActorState_::setEntityStateSoftCollide() const
+        {
+            return Ent::Gen::EntityStateSoftCollide(node->setUnionType("EntityStateSoftCollide"));
+        }
         inline std::optional<Ent::Gen::EntityStateSpeedLimiter> ResponsiblePointer_ActorState_::EntityStateSpeedLimiter() const
         {
             return strcmp(node->getUnionType(), "EntityStateSpeedLimiter") != 0? std::optional<Ent::Gen::EntityStateSpeedLimiter>{}: std::optional<Ent::Gen::EntityStateSpeedLimiter>(node->getUnionData());
@@ -30957,6 +31222,10 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("CreatureRadius"));
         }
+        inline Ent::Gen::String RecastNavmeshGenerationParameters::CreatureType() const
+        {
+            return Ent::Gen::String(node->at("CreatureType"));
+        }
         inline Ent::Gen::Bool RecastNavmeshGenerationParameters::MarkWaterAreas() const
         {
             return Ent::Gen::Bool(node->at("MarkWaterAreas"));
@@ -30972,10 +31241,6 @@ namespace Ent
         inline Ent::Gen::Float RecastNavmeshGenerationParameters::MinWaterDepth() const
         {
             return Ent::Gen::Float(node->at("MinWaterDepth"));
-        }
-        inline PrimArray<Ent::Gen::String> RecastNavmeshGenerationParameters::SizeLayerMask() const
-        {
-            return PrimArray<Ent::Gen::String>(node->at("SizeLayerMask"));
         }
         inline Ent::Gen::Float RecastNavmeshGenerationParameters::VoxelPrecision() const
         {
@@ -31687,25 +31952,6 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
-        // MoveTo
-        // MoveToPosition
-        inline Ent::Gen::MoveTo MoveToPosition::Super() const
-        {
-            return Ent::Gen::MoveTo(node->at("Super"));
-        }
-        inline Ent::Gen::String MoveToPosition::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        // MoveToAlongSpline
-        inline Ent::Gen::MoveTo MoveToAlongSpline::Super() const
-        {
-            return Ent::Gen::MoveTo(node->at("Super"));
-        }
-        inline Ent::Gen::String MoveToAlongSpline::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
         // MoveCapacityData_OrientationSpeed
         inline Ent::Gen::String MoveCapacityData_OrientationSpeed::_comment() const
         {
@@ -31756,10 +32002,6 @@ namespace Ent
         inline Ent::Gen::Int MountableData::HotspotID() const
         {
             return Ent::Gen::Int(node->at("HotspotID"));
-        }
-        inline Ent::Gen::EntityRef MountableData::MountableEntity() const
-        {
-            return Ent::Gen::EntityRef(node->at("MountableEntity"));
         }
         inline Ent::Gen::String MountableData::_comment() const
         {
@@ -32409,9 +32651,9 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("NavMeshMaxSize"));
         }
-        inline Ent::Gen::RecastNavmeshGenerationParameters NavMeshManager::RecastParameters() const
+        inline Ent::Gen::Map<char const*, Ent::Gen::RecastNavmeshGenerationParameters> NavMeshManager::RecastParameters() const
         {
-            return Ent::Gen::RecastNavmeshGenerationParameters(node->at("RecastParameters"));
+            return Ent::Gen::Map<char const*, Ent::Gen::RecastNavmeshGenerationParameters>(node->at("RecastParameters"));
         }
         inline Ent::Gen::Manager NavMeshManager::Super() const
         {
@@ -32424,6 +32666,10 @@ namespace Ent
         inline Ent::Gen::Float NavMeshManager::TileSize() const
         {
             return Ent::Gen::Float(node->at("TileSize"));
+        }
+        inline Ent::Gen::Float NavMeshManager::VerticalTolerance() const
+        {
+            return Ent::Gen::Float(node->at("VerticalTolerance"));
         }
         inline Ent::Gen::String NavMeshManager::_comment() const
         {
@@ -32833,6 +33079,19 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("val"));
         }
+        // IsActive
+        inline Ent::Gen::String IsActive::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Ent::Gen::Bool IsActive::engaged() const
+        {
+            return Ent::Gen::Bool(node->at("engaged"));
+        }
+        inline Ent::Gen::Bool IsActive::val() const
+        {
+            return Ent::Gen::Bool(node->at("val"));
+        }
         // Invincible
         inline Ent::Gen::String Invincible::_comment() const
         {
@@ -32956,15 +33215,6 @@ namespace Ent
         inline Ent::Gen::Bool Interactor::engaged() const
         {
             return Ent::Gen::Bool(node->at("engaged"));
-        }
-        // InteractData
-        inline Ent::Gen::String InteractData::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        inline Ent::Gen::Float InteractData::distance() const
-        {
-            return Ent::Gen::Float(node->at("distance"));
         }
         // InputCollisionBehaviorData
         inline Ent::Gen::Float InputCollisionBehaviorData::AltitudeMax() const
@@ -33346,10 +33596,6 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // ZoneStamper
-        inline Ent::Gen::String ZoneStamper::ConvexZoneFilePath() const
-        {
-            return Ent::Gen::String(node->at("ConvexZoneFilePath"));
-        }
         inline Ent::Gen::Float ZoneStamper::DownwardOffset() const
         {
             return Ent::Gen::Float(node->at("DownwardOffset"));
@@ -33357,6 +33603,14 @@ namespace Ent
         inline Ent::Gen::NavMeshArea ZoneStamper::NavMeshArea() const
         {
             return Ent::Gen::NavMeshArea(node->at("NavMeshArea"));
+        }
+        inline Ent::Gen::Int ZoneStamper::Priority() const
+        {
+            return Ent::Gen::Int(node->at("Priority"));
+        }
+        inline Ent::Gen::variant_ZoneCylinderShape_ZoneMeshShape_ ZoneStamper::Shape() const
+        {
+            return Ent::Gen::variant_ZoneCylinderShape_ZoneMeshShape_(node->at("Shape"));
         }
         inline Ent::Gen::GeometryStamper ZoneStamper::Super() const
         {
@@ -33454,6 +33708,39 @@ namespace Ent
             return Ent::Gen::Map<char const*, Array<Array<Ent::Gen::Tuple<Ent::Gen::GameTimeInMs, Ent::Gen::Float>>>>(node->at("TypedScoreOverTimeList"));
         }
         inline Ent::Gen::String GameProfile::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // GameSoftCollisionData
+        inline Ent::Gen::Float GameSoftCollisionData::DecelerationFactor() const
+        {
+            return Ent::Gen::Float(node->at("DecelerationFactor"));
+        }
+        inline Ent::Gen::Float GameSoftCollisionData::InsidePenetrationCoeff() const
+        {
+            return Ent::Gen::Float(node->at("InsidePenetrationCoeff"));
+        }
+        inline Ent::Gen::Float GameSoftCollisionData::MaxSpeedFactor() const
+        {
+            return Ent::Gen::Float(node->at("MaxSpeedFactor"));
+        }
+        inline Ent::Gen::Float GameSoftCollisionData::MinSpeedFactor() const
+        {
+            return Ent::Gen::Float(node->at("MinSpeedFactor"));
+        }
+        inline Ent::Gen::SpeedMode GameSoftCollisionData::MinSpeedMode() const
+        {
+            return Ent::Gen::SpeedMode(node->at("MinSpeedMode"));
+        }
+        inline Ent::Gen::Float GameSoftCollisionData::StuckDuration() const
+        {
+            return Ent::Gen::Float(node->at("StuckDuration"));
+        }
+        inline Ent::Gen::Float GameSoftCollisionData::StuckPenetrationCoeff() const
+        {
+            return Ent::Gen::Float(node->at("StuckPenetrationCoeff"));
+        }
+        inline Ent::Gen::String GameSoftCollisionData::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -35472,14 +35759,6 @@ namespace Ent
         {
             return Ent::Gen::Bool(node->at("DisplaySelectedPestoEntity"));
         }
-        inline Ent::Gen::Bool DebugDisplayFlags::DisplaySplinePilot() const
-        {
-            return Ent::Gen::Bool(node->at("DisplaySplinePilot"));
-        }
-        inline Ent::Gen::Bool DebugDisplayFlags::DisplaySplinePilotTool() const
-        {
-            return Ent::Gen::Bool(node->at("DisplaySplinePilotTool"));
-        }
         inline Ent::Gen::Bool DebugDisplayFlags::DisplayStringHashTranslator() const
         {
             return Ent::Gen::Bool(node->at("DisplayStringHashTranslator"));
@@ -35811,6 +36090,15 @@ namespace Ent
         {
             return Ent::Gen::computePitchAngle(node->at("computePitchAngle"));
         }
+        // SoftCollisionComponentInput
+        inline Ent::Gen::ComponentInput SoftCollisionComponentInput::Super() const
+        {
+            return Ent::Gen::ComponentInput(node->at("Super"));
+        }
+        inline Ent::Gen::String SoftCollisionComponentInput::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // SmoothScaleComponentInput
         inline Ent::Gen::Parameters SmoothScaleComponentInput::Parameters() const
         {
@@ -35825,6 +36113,15 @@ namespace Ent
             return Ent::Gen::ComponentInput(node->at("Super"));
         }
         inline Ent::Gen::String SmoothScaleComponentInput::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // ScriptComponentInput
+        inline Ent::Gen::ComponentInput ScriptComponentInput::Super() const
+        {
+            return Ent::Gen::ComponentInput(node->at("Super"));
+        }
+        inline Ent::Gen::String ScriptComponentInput::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -35958,6 +36255,23 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // InteractorComponentInput
+        inline Ent::Gen::EndPosition InteractorComponentInput::EndPosition() const
+        {
+            return Ent::Gen::EndPosition(node->at("EndPosition"));
+        }
+        inline Ent::Gen::IsActive InteractorComponentInput::IsActive() const
+        {
+            return Ent::Gen::IsActive(node->at("IsActive"));
+        }
+        inline Ent::Gen::ComponentInput InteractorComponentInput::Super() const
+        {
+            return Ent::Gen::ComponentInput(node->at("Super"));
+        }
+        inline Ent::Gen::String InteractorComponentInput::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // InteractableGPEComponentInput
         inline Ent::Gen::Interactor InteractableGPEComponentInput::Interactor() const
         {
@@ -36036,6 +36350,10 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        inline Ent::Gen::resetCreatureRequest CreatureAIComponentInput::resetCreatureRequest() const
+        {
+            return Ent::Gen::resetCreatureRequest(node->at("resetCreatureRequest"));
+        }
         inline Ent::Gen::usePerception CreatureAIComponentInput::usePerception() const
         {
             return Ent::Gen::usePerception(node->at("usePerception"));
@@ -36098,19 +36416,6 @@ namespace Ent
             return Ent::Gen::ComponentInput(node->at("Super"));
         }
         inline Ent::Gen::String BeamTargetComponentInput::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        // BeamGeneratorComponentInput
-        inline Ent::Gen::EndPosition BeamGeneratorComponentInput::EndPosition() const
-        {
-            return Ent::Gen::EndPosition(node->at("EndPosition"));
-        }
-        inline Ent::Gen::ComponentInput BeamGeneratorComponentInput::Super() const
-        {
-            return Ent::Gen::ComponentInput(node->at("Super"));
-        }
-        inline Ent::Gen::String BeamGeneratorComponentInput::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -37166,6 +37471,23 @@ namespace Ent
             return Ent::Gen::ComponentGD(node->at("Super"));
         }
         inline Ent::Gen::String SoulRespawnOpportunityGD::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // SoftCollisionGD
+        inline Ent::Gen::Float SoftCollisionGD::PenetrationCoeffSmoothRate() const
+        {
+            return Ent::Gen::Float(node->at("PenetrationCoeffSmoothRate"));
+        }
+        inline Ent::Gen::ComponentGD SoftCollisionGD::Super() const
+        {
+            return Ent::Gen::ComponentGD(node->at("Super"));
+        }
+        inline Ent::Gen::SoftCollisionGD_VegetationDetectionParameters SoftCollisionGD::VegetationDetectionParam() const
+        {
+            return Ent::Gen::SoftCollisionGD_VegetationDetectionParameters(node->at("VegetationDetectionParam"));
+        }
+        inline Ent::Gen::String SoftCollisionGD::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -38846,10 +39168,6 @@ namespace Ent
         {
             return Ent::Gen::Bool(node->at("FactionOverride"));
         }
-        inline PrimArray<Ent::Gen::String> EnergyPoolGD::RegenEffectsOnConversion() const
-        {
-            return PrimArray<Ent::Gen::String>(node->at("RegenEffectsOnConversion"));
-        }
         inline Ent::Gen::ComponentGD EnergyPoolGD::Super() const
         {
             return Ent::Gen::ComponentGD(node->at("Super"));
@@ -39421,14 +39739,6 @@ namespace Ent
         {
             return Ent::Gen::AttackTriggerGD(node->setUnionType("AttackTriggerGD"));
         }
-        inline std::optional<Ent::Gen::BeamGeneratorGD> Component::BeamGeneratorGD() const
-        {
-            return strcmp(node->getUnionType(), "BeamGeneratorGD") != 0? std::optional<Ent::Gen::BeamGeneratorGD>{}: std::optional<Ent::Gen::BeamGeneratorGD>(node->getUnionData());
-        }
-        inline Ent::Gen::BeamGeneratorGD Component::setBeamGeneratorGD() const
-        {
-            return Ent::Gen::BeamGeneratorGD(node->setUnionType("BeamGeneratorGD"));
-        }
         inline std::optional<Ent::Gen::BeamTargetGD> Component::BeamTargetGD() const
         {
             return strcmp(node->getUnionType(), "BeamTargetGD") != 0? std::optional<Ent::Gen::BeamTargetGD>{}: std::optional<Ent::Gen::BeamTargetGD>(node->getUnionData());
@@ -39901,6 +40211,14 @@ namespace Ent
         {
             return Ent::Gen::InteractableGPEGD(node->setUnionType("InteractableGPEGD"));
         }
+        inline std::optional<Ent::Gen::InteractorGD> Component::InteractorGD() const
+        {
+            return strcmp(node->getUnionType(), "InteractorGD") != 0? std::optional<Ent::Gen::InteractorGD>{}: std::optional<Ent::Gen::InteractorGD>(node->getUnionData());
+        }
+        inline Ent::Gen::InteractorGD Component::setInteractorGD() const
+        {
+            return Ent::Gen::InteractorGD(node->setUnionType("InteractorGD"));
+        }
         inline std::optional<Ent::Gen::InterestPointGD> Component::InterestPointGD() const
         {
             return strcmp(node->getUnionType(), "InterestPointGD") != 0? std::optional<Ent::Gen::InterestPointGD>{}: std::optional<Ent::Gen::InterestPointGD>(node->getUnionData());
@@ -40324,6 +40642,14 @@ namespace Ent
         inline Ent::Gen::SmoothScaleComponentGD Component::setSmoothScaleComponentGD() const
         {
             return Ent::Gen::SmoothScaleComponentGD(node->setUnionType("SmoothScaleComponentGD"));
+        }
+        inline std::optional<Ent::Gen::SoftCollisionGD> Component::SoftCollisionGD() const
+        {
+            return strcmp(node->getUnionType(), "SoftCollisionGD") != 0? std::optional<Ent::Gen::SoftCollisionGD>{}: std::optional<Ent::Gen::SoftCollisionGD>(node->getUnionData());
+        }
+        inline Ent::Gen::SoftCollisionGD Component::setSoftCollisionGD() const
+        {
+            return Ent::Gen::SoftCollisionGD(node->setUnionType("SoftCollisionGD"));
         }
         inline std::optional<Ent::Gen::SoulRespawnOpportunityGD> Component::SoulRespawnOpportunityGD() const
         {
@@ -40801,19 +41127,6 @@ namespace Ent
         inline void Object_Components::removeAttackTriggerGD() const
         {
             node->mapErase("AttackTriggerGD");
-        }
-        inline std::optional<Ent::Gen::BeamGeneratorGD> Object_Components::BeamGeneratorGD() const
-        {
-            auto sub = getSubNode("BeamGeneratorGD");
-            return sub == nullptr? std::optional<Ent::Gen::BeamGeneratorGD>{}: std::optional<Ent::Gen::BeamGeneratorGD>(getSubNode("BeamGeneratorGD"));
-        }
-        inline Ent::Gen::BeamGeneratorGD Object_Components::addBeamGeneratorGD() const
-        {
-            return Ent::Gen::BeamGeneratorGD(addSubNode("BeamGeneratorGD"));
-        }
-        inline void Object_Components::removeBeamGeneratorGD() const
-        {
-            node->mapErase("BeamGeneratorGD");
         }
         inline std::optional<Ent::Gen::BeamTargetGD> Object_Components::BeamTargetGD() const
         {
@@ -41582,6 +41895,19 @@ namespace Ent
         {
             node->mapErase("InteractableGPEGD");
         }
+        inline std::optional<Ent::Gen::InteractorGD> Object_Components::InteractorGD() const
+        {
+            auto sub = getSubNode("InteractorGD");
+            return sub == nullptr? std::optional<Ent::Gen::InteractorGD>{}: std::optional<Ent::Gen::InteractorGD>(getSubNode("InteractorGD"));
+        }
+        inline Ent::Gen::InteractorGD Object_Components::addInteractorGD() const
+        {
+            return Ent::Gen::InteractorGD(addSubNode("InteractorGD"));
+        }
+        inline void Object_Components::removeInteractorGD() const
+        {
+            node->mapErase("InteractorGD");
+        }
         inline std::optional<Ent::Gen::InterestPointGD> Object_Components::InterestPointGD() const
         {
             auto sub = getSubNode("InterestPointGD");
@@ -42271,6 +42597,19 @@ namespace Ent
         {
             node->mapErase("SmoothScaleComponentGD");
         }
+        inline std::optional<Ent::Gen::SoftCollisionGD> Object_Components::SoftCollisionGD() const
+        {
+            auto sub = getSubNode("SoftCollisionGD");
+            return sub == nullptr? std::optional<Ent::Gen::SoftCollisionGD>{}: std::optional<Ent::Gen::SoftCollisionGD>(getSubNode("SoftCollisionGD"));
+        }
+        inline Ent::Gen::SoftCollisionGD Object_Components::addSoftCollisionGD() const
+        {
+            return Ent::Gen::SoftCollisionGD(addSubNode("SoftCollisionGD"));
+        }
+        inline void Object_Components::removeSoftCollisionGD() const
+        {
+            node->mapErase("SoftCollisionGD");
+        }
         inline std::optional<Ent::Gen::SoulRespawnOpportunityGD> Object_Components::SoulRespawnOpportunityGD() const
         {
             auto sub = getSubNode("SoulRespawnOpportunityGD");
@@ -42746,13 +43085,29 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // WindTurbulenceEffect
-        inline Ent::Gen::Float WindTurbulenceEffect::Strength() const
+        inline Ent::Gen::Float WindTurbulenceEffect::BendStrength() const
         {
-            return Ent::Gen::Float(node->at("Strength"));
+            return Ent::Gen::Float(node->at("BendStrength"));
+        }
+        inline Ent::Gen::Float WindTurbulenceEffect::GlobalStrength() const
+        {
+            return Ent::Gen::Float(node->at("GlobalStrength"));
         }
         inline Ent::Gen::GameEffect WindTurbulenceEffect::Super() const
         {
             return Ent::Gen::GameEffect(node->at("Super"));
+        }
+        inline Ent::Gen::Float WindTurbulenceEffect::TurbulenceStrength() const
+        {
+            return Ent::Gen::Float(node->at("TurbulenceStrength"));
+        }
+        inline Ent::Gen::Bool WindTurbulenceEffect::UseGlobalStrength() const
+        {
+            return Ent::Gen::Bool(node->at("UseGlobalStrength"));
+        }
+        inline Ent::Gen::Float WindTurbulenceEffect::WindShakeStrength() const
+        {
+            return Ent::Gen::Float(node->at("WindShakeStrength"));
         }
         inline Ent::Gen::WindTurbulenceType WindTurbulenceEffect::WindTurbulenceType() const
         {
@@ -43166,19 +43521,6 @@ namespace Ent
         inline void Components::removeAttackTriggerGD() const
         {
             node->mapErase("AttackTriggerGD");
-        }
-        inline std::optional<Ent::Gen::BeamGeneratorGD> Components::BeamGeneratorGD() const
-        {
-            auto sub = getSubNode("BeamGeneratorGD");
-            return sub == nullptr? std::optional<Ent::Gen::BeamGeneratorGD>{}: std::optional<Ent::Gen::BeamGeneratorGD>(getSubNode("BeamGeneratorGD"));
-        }
-        inline Ent::Gen::BeamGeneratorGD Components::addBeamGeneratorGD() const
-        {
-            return Ent::Gen::BeamGeneratorGD(addSubNode("BeamGeneratorGD"));
-        }
-        inline void Components::removeBeamGeneratorGD() const
-        {
-            node->mapErase("BeamGeneratorGD");
         }
         inline std::optional<Ent::Gen::BeamTargetGD> Components::BeamTargetGD() const
         {
@@ -43947,6 +44289,19 @@ namespace Ent
         {
             node->mapErase("InteractableGPEGD");
         }
+        inline std::optional<Ent::Gen::InteractorGD> Components::InteractorGD() const
+        {
+            auto sub = getSubNode("InteractorGD");
+            return sub == nullptr? std::optional<Ent::Gen::InteractorGD>{}: std::optional<Ent::Gen::InteractorGD>(getSubNode("InteractorGD"));
+        }
+        inline Ent::Gen::InteractorGD Components::addInteractorGD() const
+        {
+            return Ent::Gen::InteractorGD(addSubNode("InteractorGD"));
+        }
+        inline void Components::removeInteractorGD() const
+        {
+            node->mapErase("InteractorGD");
+        }
         inline std::optional<Ent::Gen::InterestPointGD> Components::InterestPointGD() const
         {
             auto sub = getSubNode("InterestPointGD");
@@ -44636,6 +44991,19 @@ namespace Ent
         {
             node->mapErase("SmoothScaleComponentGD");
         }
+        inline std::optional<Ent::Gen::SoftCollisionGD> Components::SoftCollisionGD() const
+        {
+            auto sub = getSubNode("SoftCollisionGD");
+            return sub == nullptr? std::optional<Ent::Gen::SoftCollisionGD>{}: std::optional<Ent::Gen::SoftCollisionGD>(getSubNode("SoftCollisionGD"));
+        }
+        inline Ent::Gen::SoftCollisionGD Components::addSoftCollisionGD() const
+        {
+            return Ent::Gen::SoftCollisionGD(addSubNode("SoftCollisionGD"));
+        }
+        inline void Components::removeSoftCollisionGD() const
+        {
+            node->mapErase("SoftCollisionGD");
+        }
         inline std::optional<Ent::Gen::SoulRespawnOpportunityGD> Components::SoulRespawnOpportunityGD() const
         {
             auto sub = getSubNode("SoulRespawnOpportunityGD");
@@ -45288,6 +45656,10 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("RTPC_AbsoluteHeight"));
         }
+        inline Ent::Gen::String SoundManager::RTPC_AmbSDFDistance() const
+        {
+            return Ent::Gen::String(node->at("RTPC_AmbSDFDistance"));
+        }
         inline Ent::Gen::String SoundManager::RTPC_AmbientRegenLevel() const
         {
             return Ent::Gen::String(node->at("RTPC_AmbientRegenLevel"));
@@ -45722,10 +46094,6 @@ namespace Ent
         inline Ent::Gen::Vector3 LightComponentGD::Direction() const
         {
             return Ent::Gen::Vector3(node->at("Direction"));
-        }
-        inline Ent::Gen::Bool LightComponentGD::Enabled() const
-        {
-            return Ent::Gen::Bool(node->at("Enabled"));
         }
         inline Ent::Gen::Float LightComponentGD::LinearAttenuationStart() const
         {
@@ -46815,24 +47183,40 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("val"));
         }
-        // BeamGeneratorGD
-        inline PrimArray<Ent::Gen::String> BeamGeneratorGD::BeamEffectsNames() const
+        // InteractorGD
+        inline PrimArray<Ent::Gen::String> InteractorGD::BeamEffectsNames() const
         {
             return PrimArray<Ent::Gen::String>(node->at("BeamEffectsNames"));
         }
-        inline Ent::Gen::BoneStartPoint BeamGeneratorGD::BoneStartPoint() const
+        inline Ent::Gen::BoneStartPoint InteractorGD::BoneStartPoint() const
         {
             return Ent::Gen::BoneStartPoint(node->at("BoneStartPoint"));
         }
-        inline Ent::Gen::Float BeamGeneratorGD::MaxBeamRange() const
+        inline Ent::Gen::Float InteractorGD::MaxBeamRange() const
         {
             return Ent::Gen::Float(node->at("MaxBeamRange"));
         }
-        inline Ent::Gen::ComponentGD BeamGeneratorGD::Super() const
+        inline Ent::Gen::Float InteractorGD::RandomSphereCastsAngle() const
+        {
+            return Ent::Gen::Float(node->at("RandomSphereCastsAngle"));
+        }
+        inline Ent::Gen::Int InteractorGD::RandomSphereCastsNb() const
+        {
+            return Ent::Gen::Int(node->at("RandomSphereCastsNb"));
+        }
+        inline Ent::Gen::Float InteractorGD::RememberTargetMaxTime() const
+        {
+            return Ent::Gen::Float(node->at("RememberTargetMaxTime"));
+        }
+        inline Ent::Gen::Float InteractorGD::SphereCastRadius() const
+        {
+            return Ent::Gen::Float(node->at("SphereCastRadius"));
+        }
+        inline Ent::Gen::ComponentGD InteractorGD::Super() const
         {
             return Ent::Gen::ComponentGD(node->at("Super"));
         }
-        inline Ent::Gen::String BeamGeneratorGD::_comment() const
+        inline Ent::Gen::String InteractorGD::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -47211,10 +47595,6 @@ namespace Ent
             return Ent::Gen::Float(node->at("m_timerBeforeSuspicious"));
         }
         // BeamTargetGD
-        inline Ent::Gen::Bool BeamTargetGD::CheckHotspotOrientation() const
-        {
-            return Ent::Gen::Bool(node->at("CheckHotspotOrientation"));
-        }
         inline Ent::Gen::String BeamTargetGD::EventTriggered() const
         {
             return Ent::Gen::String(node->at("EventTriggered"));
@@ -47223,25 +47603,17 @@ namespace Ent
         {
             return Ent::Gen::HotSpotType(node->at("HotspotType"));
         }
-        inline Ent::Gen::Bool BeamTargetGD::IsCollectable() const
+        inline Ent::Gen::Float BeamTargetGD::InteractMaxDistance() const
         {
-            return Ent::Gen::Bool(node->at("IsCollectable"));
+            return Ent::Gen::Float(node->at("InteractMaxDistance"));
         }
-        inline Ent::Gen::Bool BeamTargetGD::Levitate() const
+        inline Ent::Gen::Float BeamTargetGD::InteractionRadius() const
         {
-            return Ent::Gen::Bool(node->at("Levitate"));
-        }
-        inline Ent::Gen::Float BeamTargetGD::MaxTargetableDistance() const
-        {
-            return Ent::Gen::Float(node->at("MaxTargetableDistance"));
+            return Ent::Gen::Float(node->at("InteractionRadius"));
         }
         inline Ent::Gen::BeamStaffMode BeamTargetGD::Mode() const
         {
             return Ent::Gen::BeamStaffMode(node->at("Mode"));
-        }
-        inline Ent::Gen::Bool BeamTargetGD::SpendEnergy() const
-        {
-            return Ent::Gen::Bool(node->at("SpendEnergy"));
         }
         inline Ent::Gen::ComponentGD BeamTargetGD::Super() const
         {
@@ -47589,6 +47961,10 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("NewGameVideoMusicStart"));
         }
+        inline Ent::Gen::String GameManager::NewGameVideoMusicStop() const
+        {
+            return Ent::Gen::String(node->at("NewGameVideoMusicStop"));
+        }
         inline Ent::Gen::GameParryData GameManager::ParryData() const
         {
             return Ent::Gen::GameParryData(node->at("ParryData"));
@@ -47616,6 +47992,10 @@ namespace Ent
         inline Ent::Gen::GameSnapData GameManager::SnapData() const
         {
             return Ent::Gen::GameSnapData(node->at("SnapData"));
+        }
+        inline Ent::Gen::GameSoftCollisionData GameManager::SoftCollisionData() const
+        {
+            return Ent::Gen::GameSoftCollisionData(node->at("SoftCollisionData"));
         }
         inline Ent::Gen::String GameManager::Sound_TopView_Start() const
         {
@@ -47675,13 +48055,13 @@ namespace Ent
         {
             return Ent::Gen::AreaNavigation(node->at("AreaNavigation"));
         }
-        inline Ent::Gen::Size PathFinderGD::Size() const
-        {
-            return Ent::Gen::Size(node->at("Size"));
-        }
         inline Ent::Gen::ComponentGD PathFinderGD::Super() const
         {
             return Ent::Gen::ComponentGD(node->at("Super"));
+        }
+        inline Ent::Gen::String PathFinderGD::UsedNavMeshName() const
+        {
+            return Ent::Gen::String(node->at("UsedNavMeshName"));
         }
         inline Ent::Gen::String PathFinderGD::_comment() const
         {
@@ -48149,9 +48529,9 @@ namespace Ent
         {
             return Ent::Gen::Vector3(node->at("constraintDetectionOffset"));
         }
-        inline Ent::Gen::ScaleConverter MoveCapacityData::constraintDetectionRadius() const
+        inline Ent::Gen::Float MoveCapacityData::constraintDetectionRadiusMultiplier() const
         {
-            return Ent::Gen::ScaleConverter(node->at("constraintDetectionRadius"));
+            return Ent::Gen::Float(node->at("constraintDetectionRadiusMultiplier"));
         }
         inline Ent::Gen::Float MoveCapacityData::coyoteJumpMaxTime() const
         {
@@ -48180,6 +48560,18 @@ namespace Ent
         inline Ent::Gen::Bool MoveCapacityData::dropSyncTrajectoryAndVisual() const
         {
             return Ent::Gen::Bool(node->at("dropSyncTrajectoryAndVisual"));
+        }
+        inline Ent::Gen::ScaleConverter MoveCapacityData::edgeDetectionAnticipation() const
+        {
+            return Ent::Gen::ScaleConverter(node->at("edgeDetectionAnticipation"));
+        }
+        inline Ent::Gen::Vector3 MoveCapacityData::edgeDetectionOffset() const
+        {
+            return Ent::Gen::Vector3(node->at("edgeDetectionOffset"));
+        }
+        inline Ent::Gen::Float MoveCapacityData::edgeDetectionRadiusMultiplier() const
+        {
+            return Ent::Gen::Float(node->at("edgeDetectionRadiusMultiplier"));
         }
         inline Ent::Gen::Float MoveCapacityData::ellipseCoeff() const
         {
@@ -51201,6 +51593,19 @@ namespace Ent
         {
             node->mapErase("EntityStateBeingBlockedByVine");
         }
+        inline std::optional<Ent::Gen::EntityStateBeingInReeds> ActorStates::EntityStateBeingInReeds() const
+        {
+            auto sub = getSubNode("EntityStateBeingInReeds");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStateBeingInReeds>{}: std::optional<Ent::Gen::EntityStateBeingInReeds>(getSubNode("EntityStateBeingInReeds"));
+        }
+        inline Ent::Gen::EntityStateBeingInReeds ActorStates::addEntityStateBeingInReeds() const
+        {
+            return Ent::Gen::EntityStateBeingInReeds(addSubNode("EntityStateBeingInReeds"));
+        }
+        inline void ActorStates::removeEntityStateBeingInReeds() const
+        {
+            node->mapErase("EntityStateBeingInReeds");
+        }
         inline std::optional<Ent::Gen::EntityStateBeingOnSpike> ActorStates::EntityStateBeingOnSpike() const
         {
             auto sub = getSubNode("EntityStateBeingOnSpike");
@@ -52553,6 +52958,19 @@ namespace Ent
         {
             node->mapErase("EntityStateSnappedToHatchingTarget");
         }
+        inline std::optional<Ent::Gen::EntityStateSoftCollide> ActorStates::EntityStateSoftCollide() const
+        {
+            auto sub = getSubNode("EntityStateSoftCollide");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStateSoftCollide>{}: std::optional<Ent::Gen::EntityStateSoftCollide>(getSubNode("EntityStateSoftCollide"));
+        }
+        inline Ent::Gen::EntityStateSoftCollide ActorStates::addEntityStateSoftCollide() const
+        {
+            return Ent::Gen::EntityStateSoftCollide(addSubNode("EntityStateSoftCollide"));
+        }
+        inline void ActorStates::removeEntityStateSoftCollide() const
+        {
+            node->mapErase("EntityStateSoftCollide");
+        }
         inline std::optional<Ent::Gen::EntityStateSpeedLimiter> ActorStates::EntityStateSpeedLimiter() const
         {
             auto sub = getSubNode("EntityStateSpeedLimiter");
@@ -53070,6 +53488,10 @@ namespace Ent
         {
             return Ent::Gen::ObjectSet<char const*, Ent::Gen::Entity>(node->at("Embedded"));
         }
+        inline Ent::Gen::RuntimeMode SubScene::RuntimeMode() const
+        {
+            return Ent::Gen::RuntimeMode(node->at("RuntimeMode"));
+        }
         inline Ent::Gen::ComponentGD SubScene::Super() const
         {
             return Ent::Gen::ComponentGD(node->at("Super"));
@@ -53473,6 +53895,15 @@ namespace Ent
             return Ent::Gen::ActorState(node->at("Super"));
         }
         inline Ent::Gen::String EntityStateSpeedLimiter::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EntityStateSoftCollide
+        inline Ent::Gen::ActorState EntityStateSoftCollide::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateSoftCollide::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -54544,6 +54975,10 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("SpikeDamage"));
         }
+        inline Ent::Gen::Int EntityStateBeingOnSpike::SpikeDeadlyHitCount() const
+        {
+            return Ent::Gen::Int(node->at("SpikeDeadlyHitCount"));
+        }
         inline Ent::Gen::Bool EntityStateBeingOnSpike::SpikeEject() const
         {
             return Ent::Gen::Bool(node->at("SpikeEject"));
@@ -54557,6 +54992,15 @@ namespace Ent
             return Ent::Gen::ActorState(node->at("Super"));
         }
         inline Ent::Gen::String EntityStateBeingOnSpike::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EntityStateBeingInReeds
+        inline Ent::Gen::ActorState EntityStateBeingInReeds::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateBeingInReeds::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -56681,9 +57125,9 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // ActionStateArbiter_StateOrderPass
-        inline PrimArray<Ent::Gen::String> ActionStateArbiter_StateOrderPass::Order() const
+        inline Array<Ent::Gen::Tuple<Ent::Gen::String, Ent::Gen::String>> ActionStateArbiter_StateOrderPass::Dependencies() const
         {
-            return PrimArray<Ent::Gen::String>(node->at("Order"));
+            return Array<Ent::Gen::Tuple<Ent::Gen::String, Ent::Gen::String>>(node->at("Dependencies"));
         }
         inline Ent::Gen::String ActionStateArbiter_StateOrderPass::_comment() const
         {
@@ -58032,10 +58476,6 @@ namespace Ent
         {
             return Ent::Gen::CreatureDangerousness(node->at("dangerousnessData"));
         }
-        inline Ent::Gen::InteractData CreatureGD::interactData() const
-        {
-            return Ent::Gen::InteractData(node->at("interactData"));
-        }
         inline Ent::Gen::RevivedData CreatureGD::revivedData() const
         {
             return Ent::Gen::RevivedData(node->at("revivedData"));
@@ -58874,6 +59314,28 @@ namespace Ent
             return PrimArray<Ent::Gen::Int>(node->at("LODs"));
         }
         inline Ent::Gen::String VisualResourceBuildData::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // ZoneCylinderShape
+        inline Ent::Gen::Float ZoneCylinderShape::DistanceBetweenPoints() const
+        {
+            return Ent::Gen::Float(node->at("DistanceBetweenPoints"));
+        }
+        inline Ent::Gen::Float ZoneCylinderShape::Radius() const
+        {
+            return Ent::Gen::Float(node->at("Radius"));
+        }
+        inline Ent::Gen::String ZoneCylinderShape::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // ZoneMeshShape
+        inline Ent::Gen::String ZoneMeshShape::ConvexZoneFilePath() const
+        {
+            return Ent::Gen::String(node->at("ConvexZoneFilePath"));
+        }
+        inline Ent::Gen::String ZoneMeshShape::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }

@@ -4,7 +4,6 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.Size import *
 from entgen.String import *
 from entgen.AreaNavigation import *
 from entgen.ComponentGD import *
@@ -25,13 +24,13 @@ class PathFinderGD(HelperObject):
     def AreaNavigation(self):  # type: ()->AreaNavigation
         return AreaNavigation(self._node.at("AreaNavigation"))
     @property
-    def Size(self):  # type: ()->Size
-        return Size(self._node.at("Size"))
-    @Size.setter
-    def Size(self, val): self.Size.set(val)
-    @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
+    @property
+    def UsedNavMeshName(self):  # type: ()->String
+        return String(self._node.at("UsedNavMeshName"))
+    @UsedNavMeshName.setter
+    def UsedNavMeshName(self, val): self.UsedNavMeshName.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

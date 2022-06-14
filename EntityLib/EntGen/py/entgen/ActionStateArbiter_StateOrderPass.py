@@ -5,7 +5,6 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
-from entgen.String import *
 
 from EntityLibPy import Node
 
@@ -20,10 +19,8 @@ class ActionStateArbiter_StateOrderPass(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def Order(self):  # type: ()->PrimArray[String]
-        return (lambda n: PrimArray(String, n))(self._node.at("Order"))
-    @Order.setter
-    def Order(self, val): self.Order.set(val)
+    def Dependencies(self):  # type: ()->Array[TupleNode[Type[String], Type[String]]]
+        return (lambda n: Array(TupleNode, n))(self._node.at("Dependencies"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

@@ -7,6 +7,8 @@ import EntityLibPy
 from entgen.String import *
 from entgen.ComponentInput import *
 from entgen.JumpHeightMultiplier import *
+from entgen.RigidbodyScaleMultiplier import *
+from entgen.RigidbodyScalingSpeed import *
 
 from EntityLibPy import Node
 
@@ -23,6 +25,12 @@ class CharacterControllerComponentInput(HelperObject):
     @property
     def JumpHeightMultiplier(self):  # type: ()->JumpHeightMultiplier
         return JumpHeightMultiplier(self._node.at("JumpHeightMultiplier"))
+    @property
+    def RigidbodyScaleMultiplier(self):  # type: ()->RigidbodyScaleMultiplier
+        return RigidbodyScaleMultiplier(self._node.at("RigidbodyScaleMultiplier"))
+    @property
+    def RigidbodyScalingSpeed(self):  # type: ()->RigidbodyScalingSpeed
+        return RigidbodyScalingSpeed(self._node.at("RigidbodyScalingSpeed"))
     @property
     def Super(self):  # type: ()->ComponentInput
         return ComponentInput(self._node.at("Super"))

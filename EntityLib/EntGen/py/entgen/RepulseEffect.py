@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.Bool import *
 from entgen.Float import *
 from entgen.GameEffect import *
 
@@ -20,6 +21,11 @@ class RepulseEffect(HelperObject):
         return RepulseEffect(entlib.make_node(RepulseEffect.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def ApplyOnTrees(self):  # type: ()->Bool
+        return Bool(self._node.at("ApplyOnTrees"))
+    @ApplyOnTrees.setter
+    def ApplyOnTrees(self, val): self.ApplyOnTrees.set(val)
     @property
     def DistanceAttenuation(self):  # type: ()->Float
         return Float(self._node.at("DistanceAttenuation"))

@@ -7,7 +7,6 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Bool import *
 from entgen.Float import *
-from entgen.String import *
 
 from EntityLibPy import Node
 
@@ -32,6 +31,11 @@ class RecastNavmeshGenerationParameters(HelperObject):
     @CreatureRadius.setter
     def CreatureRadius(self, val): self.CreatureRadius.set(val)
     @property
+    def CreatureType(self):  # type: ()->String
+        return String(self._node.at("CreatureType"))
+    @CreatureType.setter
+    def CreatureType(self, val): self.CreatureType.set(val)
+    @property
     def MarkWaterAreas(self):  # type: ()->Bool
         return Bool(self._node.at("MarkWaterAreas"))
     @MarkWaterAreas.setter
@@ -51,11 +55,6 @@ class RecastNavmeshGenerationParameters(HelperObject):
         return Float(self._node.at("MinWaterDepth"))
     @MinWaterDepth.setter
     def MinWaterDepth(self, val): self.MinWaterDepth.set(val)
-    @property
-    def SizeLayerMask(self):  # type: ()->PrimArray[String]
-        return (lambda n: PrimArray(String, n))(self._node.at("SizeLayerMask"))
-    @SizeLayerMask.setter
-    def SizeLayerMask(self, val): self.SizeLayerMask.set(val)
     @property
     def VoxelPrecision(self):  # type: ()->Float
         return Float(self._node.at("VoxelPrecision"))

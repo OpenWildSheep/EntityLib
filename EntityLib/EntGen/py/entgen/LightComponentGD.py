@@ -50,11 +50,6 @@ class LightComponentGD(HelperObject):
     @Direction.setter
     def Direction(self, val): self.Direction.set(val)
     @property
-    def Enabled(self):  # type: ()->Bool
-        return Bool(self._node.at("Enabled"))
-    @Enabled.setter
-    def Enabled(self, val): self.Enabled.set(val)
-    @property
     def LinearAttenuationStart(self):  # type: ()->Float
         return Float(self._node.at("LinearAttenuationStart"))
     @LinearAttenuationStart.setter

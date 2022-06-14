@@ -5,9 +5,11 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.Bool import *
 from entgen.ComponentGD import *
 from entgen.MeshStamper import *
 from entgen.OffMeshLink import *
+from entgen.SkinnedPhysMeshStamper import *
 from entgen.ZoneStamper import *
 
 from EntityLibPy import Node
@@ -23,11 +25,19 @@ class NavMeshStamperGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def IsActive(self):  # type: ()->Bool
+        return Bool(self._node.at("IsActive"))
+    @IsActive.setter
+    def IsActive(self, val): self.IsActive.set(val)
+    @property
     def MeshStampers(self):  # type: ()->Array[MeshStamper]
         return (lambda n: Array(MeshStamper, n))(self._node.at("MeshStampers"))
     @property
     def OffMeshLinks(self):  # type: ()->Array[OffMeshLink]
         return (lambda n: Array(OffMeshLink, n))(self._node.at("OffMeshLinks"))
+    @property
+    def SkinnedMeshStampers(self):  # type: ()->Array[SkinnedPhysMeshStamper]
+        return (lambda n: Array(SkinnedPhysMeshStamper, n))(self._node.at("SkinnedMeshStampers"))
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))

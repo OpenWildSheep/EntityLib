@@ -8,6 +8,7 @@ import EntityLibPy
 from EntityLibPy import Node
 class NavMeshActionTypeEnum(Enum):
     none = "none"
+    walk = "walk"
     jump = "jump"
     NavMeshActionType_COUNT = "NavMeshActionType_COUNT"
 

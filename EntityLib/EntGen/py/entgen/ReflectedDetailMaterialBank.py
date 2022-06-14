@@ -5,7 +5,6 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
-from entgen.Bool import *
 from entgen.ReflectedMaterialGroupVector import *
 from entgen.String import *
 from entgen.ReflectedDetailMaterialVariants import *
@@ -33,16 +32,6 @@ class ReflectedDetailMaterialBank(HelperObject):
     @property
     def Groups(self):  # type: ()->ReflectedMaterialGroupVector
         return ReflectedMaterialGroupVector(self._node.at("Groups"))
-    @property
-    def NeedMaterialGroupsTable(self):  # type: ()->Bool
-        return Bool(self._node.at("NeedMaterialGroupsTable"))
-    @NeedMaterialGroupsTable.setter
-    def NeedMaterialGroupsTable(self, val): self.NeedMaterialGroupsTable.set(val)
-    @property
-    def RangeOverride(self):  # type: ()->Bool
-        return Bool(self._node.at("RangeOverride"))
-    @RangeOverride.setter
-    def RangeOverride(self, val): self.RangeOverride.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

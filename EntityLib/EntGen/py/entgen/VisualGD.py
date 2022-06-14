@@ -37,6 +37,11 @@ class VisualGD(HelperObject):
     def EDITOR_LODs(self):  # type: ()->Array[EDITOR_LODsItem]
         return (lambda n: Array(EDITOR_LODsItem, n))(self._node.at("EDITOR_LODs"))
     @property
+    def MaterialGroup(self):  # type: ()->String
+        return String(self._node.at("MaterialGroup"))
+    @MaterialGroup.setter
+    def MaterialGroup(self, val): self.MaterialGroup.set(val)
+    @property
     def RUNTIME_LODScale(self):  # type: ()->Float
         return Float(self._node.at("RUNTIME_LODScale"))
     @RUNTIME_LODScale.setter

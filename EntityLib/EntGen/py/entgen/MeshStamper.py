@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.GeometryStamper import *
+from entgen.Walkability import *
 
 from EntityLibPy import Node
 
@@ -27,6 +28,9 @@ class MeshStamper(HelperObject):
     @property
     def Super(self):  # type: ()->GeometryStamper
         return GeometryStamper(self._node.at("Super"))
+    @property
+    def Walkability(self):  # type: ()->Walkability
+        return Walkability(self._node.at("Walkability"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

@@ -4,6 +4,7 @@
 from entgen_helpers import *
 import EntityLibPy
 
+from entgen.RuntimeMode import *
 from entgen.String import *
 from entgen.ComponentGD import *
 from entgen.Entity import *
@@ -23,6 +24,11 @@ class SubScene(HelperObject):
     @property
     def Embedded(self):  # type: ()->ObjectSet[Entity]
         return (lambda n: ObjectSet(Entity, n))(self._node.at("Embedded"))
+    @property
+    def RuntimeMode(self):  # type: ()->RuntimeMode
+        return RuntimeMode(self._node.at("RuntimeMode"))
+    @RuntimeMode.setter
+    def RuntimeMode(self, val): self.RuntimeMode.set(val)
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))

@@ -23,6 +23,11 @@ class BreakableGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def AssemblyEntity(self):  # type: ()->EntityRef
+        return EntityRef(self._node.at("AssemblyEntity"))
+    @AssemblyEntity.setter
+    def AssemblyEntity(self, val): self.AssemblyEntity.set(val)
+    @property
     def BreakSoundBank(self):  # type: ()->String
         return String(self._node.at("BreakSoundBank"))
     @BreakSoundBank.setter
@@ -32,6 +37,11 @@ class BreakableGD(HelperObject):
         return String(self._node.at("BreakSoundEvent"))
     @BreakSoundEvent.setter
     def BreakSoundEvent(self, val): self.BreakSoundEvent.set(val)
+    @property
+    def ChildEntity(self):  # type: ()->EntityRef
+        return EntityRef(self._node.at("ChildEntity"))
+    @ChildEntity.setter
+    def ChildEntity(self, val): self.ChildEntity.set(val)
     @property
     def FadeoutDuration(self):  # type: ()->Float
         return Float(self._node.at("FadeoutDuration"))
@@ -48,11 +58,6 @@ class BreakableGD(HelperObject):
     @MaxContactAngle.setter
     def MaxContactAngle(self, val): self.MaxContactAngle.set(val)
     @property
-    def ParentEntity(self):  # type: ()->EntityRef
-        return EntityRef(self._node.at("ParentEntity"))
-    @ParentEntity.setter
-    def ParentEntity(self, val): self.ParentEntity.set(val)
-    @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
     @property
@@ -60,6 +65,11 @@ class BreakableGD(HelperObject):
         return Float(self._node.at("TimeBeforeFade"))
     @TimeBeforeFade.setter
     def TimeBeforeFade(self, val): self.TimeBeforeFade.set(val)
+    @property
+    def UnbrokenEntity(self):  # type: ()->EntityRef
+        return EntityRef(self._node.at("UnbrokenEntity"))
+    @UnbrokenEntity.setter
+    def UnbrokenEntity(self, val): self.UnbrokenEntity.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

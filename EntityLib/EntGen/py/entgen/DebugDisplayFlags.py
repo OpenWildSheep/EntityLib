@@ -126,6 +126,11 @@ class DebugDisplayFlags(HelperObject):
     @DisplayBehavior.setter
     def DisplayBehavior(self, val): self.DisplayBehavior.set(val)
     @property
+    def DisplayBlendShapeDebug(self):  # type: ()->Bool
+        return Bool(self._node.at("DisplayBlendShapeDebug"))
+    @DisplayBlendShapeDebug.setter
+    def DisplayBlendShapeDebug(self, val): self.DisplayBlendShapeDebug.set(val)
+    @property
     def DisplayBrainMonitor(self):  # type: ()->Bool
         return Bool(self._node.at("DisplayBrainMonitor"))
     @DisplayBrainMonitor.setter
@@ -395,16 +400,6 @@ class DebugDisplayFlags(HelperObject):
         return Bool(self._node.at("DisplaySelectedPestoEntity"))
     @DisplaySelectedPestoEntity.setter
     def DisplaySelectedPestoEntity(self, val): self.DisplaySelectedPestoEntity.set(val)
-    @property
-    def DisplaySplinePilot(self):  # type: ()->Bool
-        return Bool(self._node.at("DisplaySplinePilot"))
-    @DisplaySplinePilot.setter
-    def DisplaySplinePilot(self, val): self.DisplaySplinePilot.set(val)
-    @property
-    def DisplaySplinePilotTool(self):  # type: ()->Bool
-        return Bool(self._node.at("DisplaySplinePilotTool"))
-    @DisplaySplinePilotTool.setter
-    def DisplaySplinePilotTool(self, val): self.DisplaySplinePilotTool.set(val)
     @property
     def DisplayStringHashTranslator(self):  # type: ()->Bool
         return Bool(self._node.at("DisplayStringHashTranslator"))

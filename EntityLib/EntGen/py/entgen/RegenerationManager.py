@@ -7,8 +7,10 @@ import EntityLibPy
 from entgen.EnergyValue import *
 from entgen.String import *
 from entgen.Int import *
+from entgen.Bool import *
 from entgen.Float import *
 from entgen.Manager import *
+from entgen.RegenAreaTransitionSettings import *
 from entgen.RegenerationManager_EnergyAreaSetting import *
 from entgen.EnergyIntensity import *
 
@@ -44,6 +46,9 @@ class RegenerationManager(HelperObject):
         return Float(self._node.at("DefaultMaxTransmissionPerSecond"))
     @DefaultMaxTransmissionPerSecond.setter
     def DefaultMaxTransmissionPerSecond(self, val): self.DefaultMaxTransmissionPerSecond.set(val)
+    @property
+    def DefaultTransitionWaveSettings(self):  # type: ()->RegenAreaTransitionSettings
+        return RegenAreaTransitionSettings(self._node.at("DefaultTransitionWaveSettings"))
     @property
     def DefaultTransmittedRatio(self):  # type: ()->Float
         return Float(self._node.at("DefaultTransmittedRatio"))
@@ -87,6 +92,21 @@ class RegenerationManager(HelperObject):
         return Int(self._node.at("MaxDynamicRegenEffectCount"))
     @MaxDynamicRegenEffectCount.setter
     def MaxDynamicRegenEffectCount(self, val): self.MaxDynamicRegenEffectCount.set(val)
+    @property
+    def MaxRegenAreaPerCluster(self):  # type: ()->Int
+        return Int(self._node.at("MaxRegenAreaPerCluster"))
+    @MaxRegenAreaPerCluster.setter
+    def MaxRegenAreaPerCluster(self, val): self.MaxRegenAreaPerCluster.set(val)
+    @property
+    def RegenAreaClusterWorldSize(self):  # type: ()->Int
+        return Int(self._node.at("RegenAreaClusterWorldSize"))
+    @RegenAreaClusterWorldSize.setter
+    def RegenAreaClusterWorldSize(self, val): self.RegenAreaClusterWorldSize.set(val)
+    @property
+    def RegenAreaClustering(self):  # type: ()->Bool
+        return Bool(self._node.at("RegenAreaClustering"))
+    @RegenAreaClustering.setter
+    def RegenAreaClustering(self, val): self.RegenAreaClustering.set(val)
     @property
     def Super(self):  # type: ()->Manager
         return Manager(self._node.at("Super"))

@@ -79,6 +79,7 @@ class ActionModeEnum(Enum):
     callanswer = "callanswer"
     scream = "scream"
     grab = "grab"
+    grabattack = "grabattack"
     grabbed = "grabbed"
     grabbedin = "grabbedin"
     grabbedout = "grabbedout"

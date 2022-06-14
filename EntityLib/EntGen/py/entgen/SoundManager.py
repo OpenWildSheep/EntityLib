@@ -171,6 +171,11 @@ class SoundManager(HelperObject):
     @RTPC_AbsoluteHeight.setter
     def RTPC_AbsoluteHeight(self, val): self.RTPC_AbsoluteHeight.set(val)
     @property
+    def RTPC_AmbSDFDistance(self):  # type: ()->String
+        return String(self._node.at("RTPC_AmbSDFDistance"))
+    @RTPC_AmbSDFDistance.setter
+    def RTPC_AmbSDFDistance(self, val): self.RTPC_AmbSDFDistance.set(val)
+    @property
     def RTPC_AmbientRegenLevel(self):  # type: ()->String
         return String(self._node.at("RTPC_AmbientRegenLevel"))
     @RTPC_AmbientRegenLevel.setter

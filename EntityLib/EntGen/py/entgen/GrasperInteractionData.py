@@ -51,6 +51,16 @@ class GrasperInteractionData(HelperObject):
     @distanceMax.setter
     def distanceMax(self, val): self.distanceMax.set(val)
     @property
+    def graspDurationMax(self):  # type: ()->Float
+        return Float(self._node.at("graspDurationMax"))
+    @graspDurationMax.setter
+    def graspDurationMax(self, val): self.graspDurationMax.set(val)
+    @property
+    def graspOutVisualRotationRate(self):  # type: ()->Float
+        return Float(self._node.at("graspOutVisualRotationRate"))
+    @graspOutVisualRotationRate.setter
+    def graspOutVisualRotationRate(self, val): self.graspOutVisualRotationRate.set(val)
+    @property
     def interactableBoneName(self):  # type: ()->String
         return String(self._node.at("interactableBoneName"))
     @interactableBoneName.setter

@@ -99,6 +99,11 @@ class variant_MeshShape_ShapeSphere_ShapeBox_(Union):
 
 
 from EntityLibPy import Node
+class variant_EntityRef_NavMeshArea_(Union):
+    pass
+
+
+from EntityLibPy import Node
 
 class usePerception(HelperObject):
 
@@ -3760,6 +3765,11 @@ class RecastNavmeshGenerationParameters(HelperObject):
     @CreatureType.setter
     def CreatureType(self, val): self.CreatureType.set(val)
     @property
+    def DeepWaterDepth(self):  # type: ()->Float
+        return Float(self._node.at("DeepWaterDepth"))
+    @DeepWaterDepth.setter
+    def DeepWaterDepth(self, val): self.DeepWaterDepth.set(val)
+    @property
     def MarkWaterAreas(self):  # type: ()->Bool
         return Bool(self._node.at("MarkWaterAreas"))
     @MarkWaterAreas.setter
@@ -5065,90 +5075,53 @@ class NavMeshTile(HelperObject):
 
 
 from EntityLibPy import Node
-class NavMeshAreaEnum(Enum):
-    Hole = "Hole"
-    Water = "Water"
-    Ground = "Ground"
-    VegetationLush = "VegetationLush"
-    VegetationCursed = "VegetationCursed"
-    NavMeshArea_COUNT = "NavMeshArea_COUNT"
+class NavMeshTagEnum(Enum):
+    Lush = "Lush"
+    Corrupted = "Corrupted"
+    Spirit = "Spirit"
+    NonSpirit = "NonSpirit"
+    NavMeshTag_COUNT = "NavMeshTag_COUNT"
 
 
-class NavMeshArea(Primitive[NavMeshAreaEnum]):  # Enum
+class NavMeshTag(Primitive[NavMeshTagEnum]):  # Enum
     def __init__(self, node):
-        super(NavMeshArea, self).__init__(NavMeshAreaEnum, node)
-    schema_name = "NavMeshArea"
-    def __call__(self, node):  # type: (EntityLibPy.Node) -> NavMeshArea
-        return NavMeshArea(node)
-    def set(self, val):  # type: (NavMeshAreaEnum) -> None
+        super(NavMeshTag, self).__init__(NavMeshTagEnum, node)
+    schema_name = "NavMeshTag"
+    def __call__(self, node):  # type: (EntityLibPy.Node) -> NavMeshTag
+        return NavMeshTag(node)
+    def set(self, val):  # type: (NavMeshTagEnum) -> None
         return self._node.set_string(val.value)
     def get(self):  # type: () -> T
         return self._item_type(self._node.value)
 
 
 from EntityLibPy import Node
-class NavMeshActionTypeEnum(Enum):
-    none = "none"
-    walk = "walk"
-    jump = "jump"
-    NavMeshActionType_COUNT = "NavMeshActionType_COUNT"
+class NavMeshCapabilityEnum(Enum):
+    Walk = "Walk"
+    SwimShallow = "SwimShallow"
+    SwimDeep = "SwimDeep"
+    LongJump = "LongJump"
+    HighJump = "HighJump"
+    EdgeWalk = "EdgeWalk"
+    TunnelCross = "TunnelCross"
+    Jump = "Jump"
+    WallRun = "WallRun"
+    WaterFall = "WaterFall"
+    Climb = "Climb"
+    UnderwaterTunnelCross = "UnderwaterTunnelCross"
+    NavMeshCapability_COUNT = "NavMeshCapability_COUNT"
 
 
-class NavMeshActionType(Primitive[NavMeshActionTypeEnum]):  # Enum
+class NavMeshCapability(Primitive[NavMeshCapabilityEnum]):  # Enum
     def __init__(self, node):
-        super(NavMeshActionType, self).__init__(NavMeshActionTypeEnum, node)
-    schema_name = "NavMeshActionType"
-    def __call__(self, node):  # type: (EntityLibPy.Node) -> NavMeshActionType
-        return NavMeshActionType(node)
-    def set(self, val):  # type: (NavMeshActionTypeEnum) -> None
+        super(NavMeshCapability, self).__init__(NavMeshCapabilityEnum, node)
+    schema_name = "NavMeshCapability"
+    def __call__(self, node):  # type: (EntityLibPy.Node) -> NavMeshCapability
+        return NavMeshCapability(node)
+    def set(self, val):  # type: (NavMeshCapabilityEnum) -> None
         return self._node.set_string(val.value)
     def get(self):  # type: () -> T
         return self._item_type(self._node.value)
-
-
-from EntityLibPy import Node
-
-class OffMeshLink(HelperObject):
-    schema_name = "OffMeshLink"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->OffMeshLink
-        return OffMeshLink(entlib.load_node_file(sourcefile, entlib.get_schema(OffMeshLink.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->OffMeshLink
-        return OffMeshLink(entlib.make_node(OffMeshLink.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    @property
-    def action(self):  # type: ()->NavMeshActionType
-        return NavMeshActionType(self._node.at("action"))
-    @action.setter
-    def action(self, val): self.action.set(val)
-    @property
-    def area(self):  # type: ()->NavMeshArea
-        return NavMeshArea(self._node.at("area"))
-    @area.setter
-    def area(self, val): self.area.set(val)
-    @property
-    def bidirectional(self):  # type: ()->Bool
-        return Bool(self._node.at("bidirectional"))
-    @bidirectional.setter
-    def bidirectional(self, val): self.bidirectional.set(val)
-    @property
-    def destination(self):  # type: ()->EntityRef
-        return EntityRef(self._node.at("destination"))
-    @destination.setter
-    def destination(self, val): self.destination.set(val)
-    @property
-    def radius(self):  # type: ()->Float
-        return Float(self._node.at("radius"))
-    @radius.setter
-    def radius(self, val): self.radius.set(val)
-    pass
 
 
 from EntityLibPy import Node
@@ -8456,6 +8429,16 @@ class GrasperInteractionData(HelperObject):
     @distanceMax.setter
     def distanceMax(self, val): self.distanceMax.set(val)
     @property
+    def graspDurationMax(self):  # type: ()->Float
+        return Float(self._node.at("graspDurationMax"))
+    @graspDurationMax.setter
+    def graspDurationMax(self, val): self.graspDurationMax.set(val)
+    @property
+    def graspOutVisualRotationRate(self):  # type: ()->Float
+        return Float(self._node.at("graspOutVisualRotationRate"))
+    @graspOutVisualRotationRate.setter
+    def graspOutVisualRotationRate(self, val): self.graspOutVisualRotationRate.set(val)
+    @property
     def interactableBoneName(self):  # type: ()->String
         return String(self._node.at("interactableBoneName"))
     @interactableBoneName.setter
@@ -8557,52 +8540,6 @@ class GeometryStamper(HelperObject):
     @property
     def Transform(self):  # type: ()->Transform3D
         return Transform3D(self._node.at("Transform"))
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
-class ZoneStamper(HelperObject):
-    schema_name = "ZoneStamper"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ZoneStamper
-        return ZoneStamper(entlib.load_node_file(sourcefile, entlib.get_schema(ZoneStamper.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->ZoneStamper
-        return ZoneStamper(entlib.make_node(ZoneStamper.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def DownwardOffset(self):  # type: ()->Float
-        return Float(self._node.at("DownwardOffset"))
-    @DownwardOffset.setter
-    def DownwardOffset(self, val): self.DownwardOffset.set(val)
-    @property
-    def NavMeshArea(self):  # type: ()->NavMeshArea
-        return NavMeshArea(self._node.at("NavMeshArea"))
-    @NavMeshArea.setter
-    def NavMeshArea(self, val): self.NavMeshArea.set(val)
-    @property
-    def Priority(self):  # type: ()->Int
-        return Int(self._node.at("Priority"))
-    @Priority.setter
-    def Priority(self, val): self.Priority.set(val)
-    @property
-    def Shape(self):  # type: ()->variant_ZoneCylinderShape_ZoneMeshShape_
-        return variant_ZoneCylinderShape_ZoneMeshShape_(self._node.at("Shape"))
-    @property
-    def Super(self):  # type: ()->GeometryStamper
-        return GeometryStamper(self._node.at("Super"))
-    @property
-    def UpwardOffset(self):  # type: ()->Float
-        return Float(self._node.at("UpwardOffset"))
-    @UpwardOffset.setter
-    def UpwardOffset(self, val): self.UpwardOffset.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
@@ -10049,6 +9986,16 @@ class FurProperties(HelperObject):
     @FinsTextureArrayIndex.setter
     def FinsTextureArrayIndex(self, val): self.FinsTextureArrayIndex.set(val)
     @property
+    def FocusShadowDistanceOffset(self):  # type: ()->Float
+        return Float(self._node.at("FocusShadowDistanceOffset"))
+    @FocusShadowDistanceOffset.setter
+    def FocusShadowDistanceOffset(self, val): self.FocusShadowDistanceOffset.set(val)
+    @property
+    def LinearAbsorption(self):  # type: ()->Float
+        return Float(self._node.at("LinearAbsorption"))
+    @LinearAbsorption.setter
+    def LinearAbsorption(self, val): self.LinearAbsorption.set(val)
+    @property
     def MultiScatteringPower(self):  # type: ()->Float
         return Float(self._node.at("MultiScatteringPower"))
     @MultiScatteringPower.setter
@@ -10093,6 +10040,11 @@ class FurProperties(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    @property
+    def focusShadowRelativeThickness(self):  # type: ()->Float
+        return Float(self._node.at("focusShadowRelativeThickness"))
+    @focusShadowRelativeThickness.setter
+    def focusShadowRelativeThickness(self, val): self.focusShadowRelativeThickness.set(val)
     pass
 
 
@@ -14769,34 +14721,6 @@ class SystemicCreature(HelperObject):
 
 from EntityLibPy import Node
 
-class SubSceneContainerGD(HelperObject):
-    schema_name = "SubSceneContainerGD"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->SubSceneContainerGD
-        return SubSceneContainerGD(entlib.load_node_file(sourcefile, entlib.get_schema(SubSceneContainerGD.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->SubSceneContainerGD
-        return SubSceneContainerGD(entlib.make_node(SubSceneContainerGD.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def SubEntities(self):  # type: ()->PrimArray[EntityRef]
-        return (lambda n: PrimArray(EntityRef, n))(self._node.at("SubEntities"))
-    @SubEntities.setter
-    def SubEntities(self, val): self.SubEntities.set(val)
-    @property
-    def Super(self):  # type: ()->ComponentGD
-        return ComponentGD(self._node.at("Super"))
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
 class StickToTerrain(HelperObject):
     schema_name = "StickToTerrain"
     @staticmethod
@@ -16732,46 +16656,6 @@ class NetGD(HelperObject):
 
 from EntityLibPy import Node
 
-class NavMeshStamperGD(HelperObject):
-    schema_name = "NavMeshStamperGD"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->NavMeshStamperGD
-        return NavMeshStamperGD(entlib.load_node_file(sourcefile, entlib.get_schema(NavMeshStamperGD.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->NavMeshStamperGD
-        return NavMeshStamperGD(entlib.make_node(NavMeshStamperGD.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def IsActive(self):  # type: ()->Bool
-        return Bool(self._node.at("IsActive"))
-    @IsActive.setter
-    def IsActive(self, val): self.IsActive.set(val)
-    @property
-    def MeshStampers(self):  # type: ()->Array[MeshStamper]
-        return (lambda n: Array(MeshStamper, n))(self._node.at("MeshStampers"))
-    @property
-    def OffMeshLinks(self):  # type: ()->Array[OffMeshLink]
-        return (lambda n: Array(OffMeshLink, n))(self._node.at("OffMeshLinks"))
-    @property
-    def SkinnedMeshStampers(self):  # type: ()->Array[SkinnedPhysMeshStamper]
-        return (lambda n: Array(SkinnedPhysMeshStamper, n))(self._node.at("SkinnedMeshStampers"))
-    @property
-    def Super(self):  # type: ()->ComponentGD
-        return ComponentGD(self._node.at("Super"))
-    @property
-    def ZoneStampers(self):  # type: ()->Array[ZoneStamper]
-        return (lambda n: Array(ZoneStamper, n))(self._node.at("ZoneStampers"))
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
 class NavMeshRasterizerGD(HelperObject):
     schema_name = "NavMeshRasterizerGD"
     @staticmethod
@@ -17674,6 +17558,16 @@ class GrasperGD(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    @property
+    def bestInteractionDeltaAngleCoeff(self):  # type: ()->Float
+        return Float(self._node.at("bestInteractionDeltaAngleCoeff"))
+    @bestInteractionDeltaAngleCoeff.setter
+    def bestInteractionDeltaAngleCoeff(self, val): self.bestInteractionDeltaAngleCoeff.set(val)
+    @property
+    def bestInteractionDistanceCoeff(self):  # type: ()->Float
+        return Float(self._node.at("bestInteractionDistanceCoeff"))
+    @bestInteractionDistanceCoeff.setter
+    def bestInteractionDistanceCoeff(self, val): self.bestInteractionDistanceCoeff.set(val)
     @property
     def interactionDatas(self):  # type: ()->Map[GraspTypeEnum, GrasperInteractionData]
         return (lambda n: Map(GraspTypeEnum, GrasperInteractionData, n))(self._node.at("interactionDatas"))
@@ -21812,6 +21706,157 @@ class CarryMode(Primitive[CarryModeEnum]):  # Enum
 
 from EntityLibPy import Node
 
+class CapabilitiesAndTags(HelperObject):
+    schema_name = "CapabilitiesAndTags"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->CapabilitiesAndTags
+        return CapabilitiesAndTags(entlib.load_node_file(sourcefile, entlib.get_schema(CapabilitiesAndTags.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->CapabilitiesAndTags
+        return CapabilitiesAndTags(entlib.make_node(CapabilitiesAndTags.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Capabilities(self):  # type: ()->PrimitiveSet[NavMeshCapabilityEnum]
+        return (lambda n: PrimitiveSet(NavMeshCapabilityEnum, n))(self._node.at("Capabilities"))
+    @property
+    def Tags(self):  # type: ()->PrimitiveSet[NavMeshTagEnum]
+        return (lambda n: PrimitiveSet(NavMeshTagEnum, n))(self._node.at("Tags"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class ZoneStamper(HelperObject):
+    schema_name = "ZoneStamper"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->ZoneStamper
+        return ZoneStamper(entlib.load_node_file(sourcefile, entlib.get_schema(ZoneStamper.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->ZoneStamper
+        return ZoneStamper(entlib.make_node(ZoneStamper.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def CapabilitiesAndTags(self):  # type: ()->CapabilitiesAndTags
+        return CapabilitiesAndTags(self._node.at("CapabilitiesAndTags"))
+    @property
+    def DownwardOffset(self):  # type: ()->Float
+        return Float(self._node.at("DownwardOffset"))
+    @DownwardOffset.setter
+    def DownwardOffset(self, val): self.DownwardOffset.set(val)
+    @property
+    def NavMeshArea(self):  # type: ()->variant_EntityRef_NavMeshArea_
+        return variant_EntityRef_NavMeshArea_(self._node.at("NavMeshArea"))
+    @property
+    def Priority(self):  # type: ()->Int
+        return Int(self._node.at("Priority"))
+    @Priority.setter
+    def Priority(self, val): self.Priority.set(val)
+    @property
+    def Shape(self):  # type: ()->variant_ZoneCylinderShape_ZoneMeshShape_
+        return variant_ZoneCylinderShape_ZoneMeshShape_(self._node.at("Shape"))
+    @property
+    def Super(self):  # type: ()->GeometryStamper
+        return GeometryStamper(self._node.at("Super"))
+    @property
+    def UpwardOffset(self):  # type: ()->Float
+        return Float(self._node.at("UpwardOffset"))
+    @UpwardOffset.setter
+    def UpwardOffset(self, val): self.UpwardOffset.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class OffMeshLink(HelperObject):
+    schema_name = "OffMeshLink"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->OffMeshLink
+        return OffMeshLink(entlib.load_node_file(sourcefile, entlib.get_schema(OffMeshLink.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->OffMeshLink
+        return OffMeshLink(entlib.make_node(OffMeshLink.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def bidirectional(self):  # type: ()->Bool
+        return Bool(self._node.at("bidirectional"))
+    @bidirectional.setter
+    def bidirectional(self, val): self.bidirectional.set(val)
+    @property
+    def capabilitiesAndTags(self):  # type: ()->CapabilitiesAndTags
+        return CapabilitiesAndTags(self._node.at("capabilitiesAndTags"))
+    @property
+    def destination(self):  # type: ()->EntityRef
+        return EntityRef(self._node.at("destination"))
+    @destination.setter
+    def destination(self, val): self.destination.set(val)
+    @property
+    def radius(self):  # type: ()->Float
+        return Float(self._node.at("radius"))
+    @radius.setter
+    def radius(self, val): self.radius.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class NavMeshStamperGD(HelperObject):
+    schema_name = "NavMeshStamperGD"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->NavMeshStamperGD
+        return NavMeshStamperGD(entlib.load_node_file(sourcefile, entlib.get_schema(NavMeshStamperGD.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->NavMeshStamperGD
+        return NavMeshStamperGD(entlib.make_node(NavMeshStamperGD.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def IsActive(self):  # type: ()->Bool
+        return Bool(self._node.at("IsActive"))
+    @IsActive.setter
+    def IsActive(self, val): self.IsActive.set(val)
+    @property
+    def MeshStampers(self):  # type: ()->Array[MeshStamper]
+        return (lambda n: Array(MeshStamper, n))(self._node.at("MeshStampers"))
+    @property
+    def OffMeshLinks(self):  # type: ()->Array[OffMeshLink]
+        return (lambda n: Array(OffMeshLink, n))(self._node.at("OffMeshLinks"))
+    @property
+    def SkinnedMeshStampers(self):  # type: ()->Array[SkinnedPhysMeshStamper]
+        return (lambda n: Array(SkinnedPhysMeshStamper, n))(self._node.at("SkinnedMeshStampers"))
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
+    @property
+    def ZoneStampers(self):  # type: ()->Array[ZoneStamper]
+        return (lambda n: Array(ZoneStamper, n))(self._node.at("ZoneStampers"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class CanTakeHit(HelperObject):
 
     @property
@@ -23324,6 +23369,7 @@ class AttitudeModeEnum(Enum):
     injured = "injured"
     dead = "dead"
     aggressive = "aggressive"
+    groggy = "groggy"
     bitten = "bitten"
     charge = "charge"
     AttitudeMode_COUNT = "AttitudeMode_COUNT"
@@ -23851,20 +23897,13 @@ class AreaNavigation(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def CapabilitiesAndTags(self):  # type: ()->CapabilitiesAndTags
+        return CapabilitiesAndTags(self._node.at("CapabilitiesAndTags"))
+    @property
     def GroundAreaCost(self):  # type: ()->Float
         return Float(self._node.at("GroundAreaCost"))
     @GroundAreaCost.setter
     def GroundAreaCost(self, val): self.GroundAreaCost.set(val)
-    @property
-    def MovesInWater(self):  # type: ()->Bool
-        return Bool(self._node.at("MovesInWater"))
-    @MovesInWater.setter
-    def MovesInWater(self, val): self.MovesInWater.set(val)
-    @property
-    def MovesOnGround(self):  # type: ()->Bool
-        return Bool(self._node.at("MovesOnGround"))
-    @MovesOnGround.setter
-    def MovesOnGround(self, val): self.MovesOnGround.set(val)
     @property
     def WaterAreaCost(self):  # type: ()->Float
         return Float(self._node.at("WaterAreaCost"))
@@ -23891,8 +23930,8 @@ class PathFinderGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def AreaNavigation(self):  # type: ()->AreaNavigation
-        return AreaNavigation(self._node.at("AreaNavigation"))
+    def NavigationCapacities(self):  # type: ()->AreaNavigation
+        return AreaNavigation(self._node.at("NavigationCapacities"))
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
@@ -24921,6 +24960,11 @@ class MoveCapacityData(HelperObject):
         return Float(self._node.at("maxTimeBetweenFlaps"))
     @maxTimeBetweenFlaps.setter
     def maxTimeBetweenFlaps(self, val): self.maxTimeBetweenFlaps.set(val)
+    @property
+    def maxUnmountRetimingDist(self):  # type: ()->Float
+        return Float(self._node.at("maxUnmountRetimingDist"))
+    @maxUnmountRetimingDist.setter
+    def maxUnmountRetimingDist(self, val): self.maxUnmountRetimingDist.set(val)
     @property
     def minFlapTime(self):  # type: ()->Float
         return Float(self._node.at("minFlapTime"))
@@ -26230,6 +26274,29 @@ class EntityStateUndergroundCavity(HelperObject):
     @staticmethod
     def create(entlib):  # type: (EntityLib)->EntityStateUndergroundCavity
         return EntityStateUndergroundCavity(entlib.make_node(EntityStateUndergroundCavity.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateTryUnmount(HelperObject):
+    schema_name = "EntityStateTryUnmount"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateTryUnmount
+        return EntityStateTryUnmount(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateTryUnmount.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateTryUnmount
+        return EntityStateTryUnmount(entlib.make_node(EntityStateTryUnmount.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
@@ -29363,6 +29430,121 @@ class EntityStateBoidsHomePos(HelperObject):
 
 from EntityLibPy import Node
 
+class EntityStateBitten(HelperObject):
+    schema_name = "EntityStateBitten"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBitten
+        return EntityStateBitten(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBitten.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateBitten
+        return EntityStateBitten(entlib.make_node(EntityStateBitten.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateBiteOut(HelperObject):
+    schema_name = "EntityStateBiteOut"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBiteOut
+        return EntityStateBiteOut(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBiteOut.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateBiteOut
+        return EntityStateBiteOut(entlib.make_node(EntityStateBiteOut.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateBiteIn(HelperObject):
+    schema_name = "EntityStateBiteIn"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBiteIn
+        return EntityStateBiteIn(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBiteIn.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateBiteIn
+        return EntityStateBiteIn(entlib.make_node(EntityStateBiteIn.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateBiteAttack(HelperObject):
+    schema_name = "EntityStateBiteAttack"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBiteAttack
+        return EntityStateBiteAttack(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBiteAttack.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateBiteAttack
+        return EntityStateBiteAttack(entlib.make_node(EntityStateBiteAttack.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateBite(HelperObject):
+    schema_name = "EntityStateBite"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBite
+        return EntityStateBite(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBite.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateBite
+        return EntityStateBite(entlib.make_node(EntityStateBite.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class EntityStateBeingOnSpike(HelperObject):
     schema_name = "EntityStateBeingOnSpike"
     @staticmethod
@@ -29398,6 +29580,52 @@ class EntityStateBeingOnSpike(HelperObject):
         return Float(self._node.at("SpikeImpact"))
     @SpikeImpact.setter
     def SpikeImpact(self, val): self.SpikeImpact.set(val)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateBeingOnSlope(HelperObject):
+    schema_name = "EntityStateBeingOnSlope"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBeingOnSlope
+        return EntityStateBeingOnSlope(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBeingOnSlope.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateBeingOnSlope
+        return EntityStateBeingOnSlope(entlib.make_node(EntityStateBeingOnSlope.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateBeingLinked(HelperObject):
+    schema_name = "EntityStateBeingLinked"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBeingLinked
+        return EntityStateBeingLinked(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBeingLinked.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateBeingLinked
+        return EntityStateBeingLinked(entlib.make_node(EntityStateBeingLinked.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))
@@ -29462,6 +29690,29 @@ class EntityStateBeingBlockedByVine(HelperObject):
 
 from EntityLibPy import Node
 
+class EntityStateBackwardLand(HelperObject):
+    schema_name = "EntityStateBackwardLand"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBackwardLand
+        return EntityStateBackwardLand(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBackwardLand.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateBackwardLand
+        return EntityStateBackwardLand(entlib.make_node(EntityStateBackwardLand.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class EntityStateBackwardDodge(HelperObject):
     schema_name = "EntityStateBackwardDodge"
     @staticmethod
@@ -29470,6 +29721,29 @@ class EntityStateBackwardDodge(HelperObject):
     @staticmethod
     def create(entlib):  # type: (EntityLib)->EntityStateBackwardDodge
         return EntityStateBackwardDodge(entlib.make_node(EntityStateBackwardDodge.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateAttitudeGroggy(HelperObject):
+    schema_name = "EntityStateAttitudeGroggy"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateAttitudeGroggy
+        return EntityStateAttitudeGroggy(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateAttitudeGroggy.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateAttitudeGroggy
+        return EntityStateAttitudeGroggy(entlib.make_node(EntityStateAttitudeGroggy.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
@@ -29631,6 +29905,29 @@ class EntityStateAerialJump(HelperObject):
     @staticmethod
     def create(entlib):  # type: (EntityLib)->EntityStateAerialJump
         return EntityStateAerialJump(entlib.make_node(EntityStateAerialJump.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateAboutToBeHatched(HelperObject):
+    schema_name = "EntityStateAboutToBeHatched"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateAboutToBeHatched
+        return EntityStateAboutToBeHatched(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateAboutToBeHatched.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateAboutToBeHatched
+        return EntityStateAboutToBeHatched(entlib.make_node(EntityStateAboutToBeHatched.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
@@ -34013,6 +34310,8 @@ class ActorCategoryEnum(Enum):
     CATEGORY_Environment = "CATEGORY_Environment"
     CATEGORY_Fall = "CATEGORY_Fall"
     CATEGORY_ActionGrab = "CATEGORY_ActionGrab"
+    CATEGORY_ActionGrasp = "CATEGORY_ActionGrasp"
+    CATEGORY_ActionBite = "CATEGORY_ActionBite"
     CATEGORY_Hint = "CATEGORY_Hint"
     CATEGORY_LookAt = "CATEGORY_LookAt"
     CATEGORY_ActionJump = "CATEGORY_ActionJump"
@@ -34922,6 +35221,7 @@ class ActionModeEnum(Enum):
     attackpush = "attackpush"
     attackjumponto = "attackjumponto"
     bite = "bite"
+    biteattack = "biteattack"
     stun = "stun"
     collapse = "collapse"
     throw_ = "throw"
@@ -36677,6 +36977,11 @@ class RenderManager_RenderConfig(HelperObject):
     @EnableDepthOfField.setter
     def EnableDepthOfField(self, val): self.EnableDepthOfField.set(val)
     @property
+    def EnableFurTranslucency(self):  # type: ()->Int
+        return Int(self._node.at("EnableFurTranslucency"))
+    @EnableFurTranslucency.setter
+    def EnableFurTranslucency(self, val): self.EnableFurTranslucency.set(val)
+    @property
     def EnableLensFlare(self):  # type: ()->Int
         return Int(self._node.at("EnableLensFlare"))
     @EnableLensFlare.setter
@@ -36726,6 +37031,11 @@ class RenderManager_RenderConfig(HelperObject):
         return Int(self._node.at("EnableVegetationDrawDatabase"))
     @EnableVegetationDrawDatabase.setter
     def EnableVegetationDrawDatabase(self, val): self.EnableVegetationDrawDatabase.set(val)
+    @property
+    def FurFocusShadowMapResolution(self):  # type: ()->Int
+        return Int(self._node.at("FurFocusShadowMapResolution"))
+    @FurFocusShadowMapResolution.setter
+    def FurFocusShadowMapResolution(self, val): self.FurFocusShadowMapResolution.set(val)
     @property
     def GlobalLODBias(self):  # type: ()->Float
         return Float(self._node.at("GlobalLODBias"))
@@ -37855,6 +38165,28 @@ class MeshShape(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     pass
+
+
+from EntityLibPy import Node
+class NavMeshAreaEnum(Enum):
+    Hole = "Hole"
+    Ground = "Ground"
+    ShallowWater = "ShallowWater"
+    DeepWater = "DeepWater"
+    Special = "Special"
+    NavMeshArea_COUNT = "NavMeshArea_COUNT"
+
+
+class NavMeshArea(Primitive[NavMeshAreaEnum]):  # Enum
+    def __init__(self, node):
+        super(NavMeshArea, self).__init__(NavMeshAreaEnum, node)
+    schema_name = "NavMeshArea"
+    def __call__(self, node):  # type: (EntityLibPy.Node) -> NavMeshArea
+        return NavMeshArea(node)
+    def set(self, val):  # type: (NavMeshAreaEnum) -> None
+        return self._node.set_string(val.value)
+    def get(self):  # type: () -> T
+        return self._item_type(self._node.value)
 
 
 from EntityLibPy import Node

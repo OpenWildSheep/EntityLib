@@ -8,10 +8,10 @@ import EntityLibPy
 from EntityLibPy import Node
 class NavMeshAreaEnum(Enum):
     Hole = "Hole"
-    Water = "Water"
     Ground = "Ground"
-    VegetationLush = "VegetationLush"
-    VegetationCursed = "VegetationCursed"
+    ShallowWater = "ShallowWater"
+    DeepWater = "DeepWater"
+    Special = "Special"
     NavMeshArea_COUNT = "NavMeshArea_COUNT"
 
 

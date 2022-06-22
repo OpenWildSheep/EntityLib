@@ -153,9 +153,8 @@ from .Online import *
 from .Object_MaxActivationLevel import *
 from .NavmeshGenerationParameters import *
 from .NavMeshTile import *
-from .NavMeshArea import *
-from .NavMeshActionType import *
-from .OffMeshLink import *
+from .NavMeshTag import *
+from .NavMeshCapability import *
 from .NavMesh import *
 from .MusicCategory import *
 from .MoveCapacityData_OrientationSpeed import *
@@ -261,7 +260,6 @@ from .GrasperInteractionData import *
 from .GraspableInteractionData import *
 from .GraspType import *
 from .GeometryStamper import *
-from .ZoneStamper import *
 from .SkinnedPhysMeshStamper import *
 from .MeshStamper import *
 from .Game_VoxelsPile import *
@@ -423,7 +421,6 @@ from .TerrainSurfaceObject import *
 from .TerrainGD import *
 from .TeamGD import *
 from .SystemicCreature import *
-from .SubSceneContainerGD import *
 from .StickToTerrain import *
 from .StaticObjectGD import *
 from .StaffVertebrasGD import *
@@ -469,7 +466,6 @@ from .NotVisibleInSubscene import *
 from .NetworkNode import *
 from .NetworkLink import *
 from .NetGD import *
-from .NavMeshStamperGD import *
 from .NavMeshRasterizerGD import *
 from .NavMeshActivatorGD import *
 from .MultiThumbnail import *
@@ -589,6 +585,10 @@ from .CharacterControllerGroundNormalData import *
 from .CharacterControllerFallData import *
 from .CharacterControllerClamberData import *
 from .CarryMode import *
+from .CapabilitiesAndTags import *
+from .ZoneStamper import *
+from .OffMeshLink import *
+from .NavMeshStamperGD import *
 from .CanTakeHit import *
 from .CreatureComponentInput import *
 from .CameraType import *
@@ -696,6 +696,7 @@ from .EntityStateWaitToJumpAgain import *
 from .EntityStateVoxelsVolume import *
 from .EntityStateUseAsActiveCheckpoint import *
 from .EntityStateUndergroundCavity import *
+from .EntityStateTryUnmount import *
 from .EntityStateTriggerBeamTargetEvent import *
 from .EntityStateTreeTurretTargeting import *
 from .EntityStateTreeSwitchTransition import *
@@ -825,10 +826,19 @@ from .EntityStateBreakableBreaking import *
 from .EntityStateBounceLand import *
 from .EntityStateBounce import *
 from .EntityStateBoidsHomePos import *
+from .EntityStateBitten import *
+from .EntityStateBiteOut import *
+from .EntityStateBiteIn import *
+from .EntityStateBiteAttack import *
+from .EntityStateBite import *
 from .EntityStateBeingOnSpike import *
+from .EntityStateBeingOnSlope import *
+from .EntityStateBeingLinked import *
 from .EntityStateBeingInReeds import *
 from .EntityStateBeingBlockedByVine import *
+from .EntityStateBackwardLand import *
 from .EntityStateBackwardDodge import *
+from .EntityStateAttitudeGroggy import *
 from .EntityStateAttackDive import *
 from .EntityStateAttackCharge import *
 from .EntityStateAskStaffGuide import *
@@ -836,6 +846,7 @@ from .EntityStateApplyExtraLife import *
 from .EntityStateAirControl import *
 from .EntityStateAimAt import *
 from .EntityStateAerialJump import *
+from .EntityStateAboutToBeHatched import *
 from .ActorStateTryUpgradeShamanStaff import *
 from .ActorStateTryEquipShamanStaff import *
 from .ActorStateTeleportWhileMoving import *
@@ -1095,6 +1106,7 @@ from .IOnlineApi import *
 from .InputController import *
 from .MeshNavigationBehavior import *
 from .MeshShape import *
+from .NavMeshArea import *
 from .NetRoot import *
 from .OutfitFadeParameter import *
 from .OwnershipModule import *

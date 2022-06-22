@@ -31,6 +31,16 @@ class GrasperGD(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
+    def bestInteractionDeltaAngleCoeff(self):  # type: ()->Float
+        return Float(self._node.at("bestInteractionDeltaAngleCoeff"))
+    @bestInteractionDeltaAngleCoeff.setter
+    def bestInteractionDeltaAngleCoeff(self, val): self.bestInteractionDeltaAngleCoeff.set(val)
+    @property
+    def bestInteractionDistanceCoeff(self):  # type: ()->Float
+        return Float(self._node.at("bestInteractionDistanceCoeff"))
+    @bestInteractionDistanceCoeff.setter
+    def bestInteractionDistanceCoeff(self, val): self.bestInteractionDistanceCoeff.set(val)
+    @property
     def interactionDatas(self):  # type: ()->Map[GraspTypeEnum, GrasperInteractionData]
         return (lambda n: Map(GraspTypeEnum, GrasperInteractionData, n))(self._node.at("interactionDatas"))
     @property

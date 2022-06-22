@@ -11,6 +11,7 @@ class AttitudeModeEnum(Enum):
     injured = "injured"
     dead = "dead"
     aggressive = "aggressive"
+    groggy = "groggy"
     bitten = "bitten"
     charge = "charge"
     AttitudeMode_COUNT = "AttitudeMode_COUNT"

@@ -14,6 +14,7 @@ class ActionModeEnum(Enum):
     attackpush = "attackpush"
     attackjumponto = "attackjumponto"
     bite = "bite"
+    biteattack = "biteattack"
     stun = "stun"
     collapse = "collapse"
     throw_ = "throw"

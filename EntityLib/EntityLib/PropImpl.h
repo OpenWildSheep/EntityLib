@@ -252,7 +252,7 @@ namespace Ent
 
         [[nodiscard]] NodeRef makeAbsoluteNodeRef() const;
 
-        [[nodiscard]] FileProperty::Key getPathToken() const; 
+        [[nodiscard]] FileProperty::Key getPathToken() const;
 
     private:
         friend void decRef(PropImpl* self);

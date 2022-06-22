@@ -29,7 +29,7 @@ namespace Ent
         Property(Property&& _other) noexcept = default;
         Property& operator=(Property&& _other) noexcept = default;
         Property(EntityLib* _entityLib, Subschema const* _schema, char const* _filename)
-            : m_self(_entityLib->newPropImpl(nullptr, _schema, _filename, nullptr))
+            : m_self(_entityLib->newPropImpl(nullptr, _schema, _filename))
         {
         }
         Property(

@@ -1262,7 +1262,8 @@ namespace Ent
     }
 
     // Get the path from _root to _child, but reversed.
-    static [[nodiscard]] std::vector<std::string> makeNodeRefReversed(PropImpl const* _root, PropImpl const& _child)
+    static [[nodiscard]] std::vector<std::string>
+    makeNodeRefReversed(PropImpl const* _root, PropImpl const& _child)
     {
         PropImplPtr propPtr = _child.sharedFromThis();
         std::vector<std::string> tokens;

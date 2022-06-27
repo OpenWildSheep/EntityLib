@@ -21,6 +21,8 @@ class ActorCategoryEnum(Enum):
     CATEGORY_Environment = "CATEGORY_Environment"
     CATEGORY_Fall = "CATEGORY_Fall"
     CATEGORY_ActionGrab = "CATEGORY_ActionGrab"
+    CATEGORY_ActionGrasp = "CATEGORY_ActionGrasp"
+    CATEGORY_ActionBite = "CATEGORY_ActionBite"
     CATEGORY_Hint = "CATEGORY_Hint"
     CATEGORY_LookAt = "CATEGORY_LookAt"
     CATEGORY_ActionJump = "CATEGORY_ActionJump"

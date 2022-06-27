@@ -62,6 +62,11 @@ class RenderManager_RenderConfig(HelperObject):
     @EnableDepthOfField.setter
     def EnableDepthOfField(self, val): self.EnableDepthOfField.set(val)
     @property
+    def EnableFurTranslucency(self):  # type: ()->Int
+        return Int(self._node.at("EnableFurTranslucency"))
+    @EnableFurTranslucency.setter
+    def EnableFurTranslucency(self, val): self.EnableFurTranslucency.set(val)
+    @property
     def EnableLensFlare(self):  # type: ()->Int
         return Int(self._node.at("EnableLensFlare"))
     @EnableLensFlare.setter
@@ -111,6 +116,11 @@ class RenderManager_RenderConfig(HelperObject):
         return Int(self._node.at("EnableVegetationDrawDatabase"))
     @EnableVegetationDrawDatabase.setter
     def EnableVegetationDrawDatabase(self, val): self.EnableVegetationDrawDatabase.set(val)
+    @property
+    def FurFocusShadowMapResolution(self):  # type: ()->Int
+        return Int(self._node.at("FurFocusShadowMapResolution"))
+    @FurFocusShadowMapResolution.setter
+    def FurFocusShadowMapResolution(self, val): self.FurFocusShadowMapResolution.set(val)
     @property
     def GlobalLODBias(self):  # type: ()->Float
         return Float(self._node.at("GlobalLODBias"))

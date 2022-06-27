@@ -163,7 +163,7 @@ namespace Ent::Gen
         struct What;
 
         template <typename V>
-        Array<T>& operator=(V const& rho)
+        PrimArray<T>& operator=(V const& rho)
         {
             ENT_IF_COMPILE(V, arr, std::get<0>(arr)) // tuple, c-style array and std::array
             {

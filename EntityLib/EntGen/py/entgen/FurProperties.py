@@ -43,6 +43,16 @@ class FurProperties(HelperObject):
     @FinsTextureArrayIndex.setter
     def FinsTextureArrayIndex(self, val): self.FinsTextureArrayIndex.set(val)
     @property
+    def FocusShadowDistanceOffset(self):  # type: ()->Float
+        return Float(self._node.at("FocusShadowDistanceOffset"))
+    @FocusShadowDistanceOffset.setter
+    def FocusShadowDistanceOffset(self, val): self.FocusShadowDistanceOffset.set(val)
+    @property
+    def LinearAbsorption(self):  # type: ()->Float
+        return Float(self._node.at("LinearAbsorption"))
+    @LinearAbsorption.setter
+    def LinearAbsorption(self, val): self.LinearAbsorption.set(val)
+    @property
     def MultiScatteringPower(self):  # type: ()->Float
         return Float(self._node.at("MultiScatteringPower"))
     @MultiScatteringPower.setter
@@ -87,6 +97,11 @@ class FurProperties(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    @property
+    def focusShadowRelativeThickness(self):  # type: ()->Float
+        return Float(self._node.at("focusShadowRelativeThickness"))
+    @focusShadowRelativeThickness.setter
+    def focusShadowRelativeThickness(self, val): self.focusShadowRelativeThickness.set(val)
     pass
 
 

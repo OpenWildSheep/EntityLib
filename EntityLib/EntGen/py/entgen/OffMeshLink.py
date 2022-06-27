@@ -4,10 +4,9 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.NavMeshActionType import *
-from entgen.NavMeshArea import *
 from entgen.String import *
 from entgen.Bool import *
+from entgen.CapabilitiesAndTags import *
 from entgen.EntityRef import *
 from entgen.Float import *
 
@@ -29,20 +28,13 @@ class OffMeshLink(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
-    def action(self):  # type: ()->NavMeshActionType
-        return NavMeshActionType(self._node.at("action"))
-    @action.setter
-    def action(self, val): self.action.set(val)
-    @property
-    def area(self):  # type: ()->NavMeshArea
-        return NavMeshArea(self._node.at("area"))
-    @area.setter
-    def area(self, val): self.area.set(val)
-    @property
     def bidirectional(self):  # type: ()->Bool
         return Bool(self._node.at("bidirectional"))
     @bidirectional.setter
     def bidirectional(self, val): self.bidirectional.set(val)
+    @property
+    def capabilitiesAndTags(self):  # type: ()->CapabilitiesAndTags
+        return CapabilitiesAndTags(self._node.at("capabilitiesAndTags"))
     @property
     def destination(self):  # type: ()->EntityRef
         return EntityRef(self._node.at("destination"))

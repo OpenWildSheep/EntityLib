@@ -27,10 +27,10 @@ class GraspableInteractionData(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
-    def damageAccumulatedRequiredToIncapacitate(self):  # type: ()->Float
-        return Float(self._node.at("damageAccumulatedRequiredToIncapacitate"))
-    @damageAccumulatedRequiredToIncapacitate.setter
-    def damageAccumulatedRequiredToIncapacitate(self, val): self.damageAccumulatedRequiredToIncapacitate.set(val)
+    def graspStrength(self):  # type: ()->Float
+        return Float(self._node.at("graspStrength"))
+    @graspStrength.setter
+    def graspStrength(self, val): self.graspStrength.set(val)
     @property
     def graspedDurationMax(self):  # type: ()->Float
         return Float(self._node.at("graspedDurationMax"))

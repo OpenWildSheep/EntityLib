@@ -7,6 +7,7 @@ import EntityLibPy
 from entgen.String import *
 from entgen.ComponentGD import *
 from entgen.Float import *
+from entgen.GraspResistanceData import *
 from entgen.GrasperInteractionData import *
 from entgen.GraspType import *
 
@@ -31,6 +32,16 @@ class GrasperGD(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
+    def bestInteractionDeltaAngleCoeff(self):  # type: ()->Float
+        return Float(self._node.at("bestInteractionDeltaAngleCoeff"))
+    @bestInteractionDeltaAngleCoeff.setter
+    def bestInteractionDeltaAngleCoeff(self, val): self.bestInteractionDeltaAngleCoeff.set(val)
+    @property
+    def bestInteractionDistanceCoeff(self):  # type: ()->Float
+        return Float(self._node.at("bestInteractionDistanceCoeff"))
+    @bestInteractionDistanceCoeff.setter
+    def bestInteractionDistanceCoeff(self, val): self.bestInteractionDistanceCoeff.set(val)
+    @property
     def interactionDatas(self):  # type: ()->Map[GraspTypeEnum, GrasperInteractionData]
         return (lambda n: Map(GraspTypeEnum, GrasperInteractionData, n))(self._node.at("interactionDatas"))
     @property
@@ -38,6 +49,9 @@ class GrasperGD(HelperObject):
         return Float(self._node.at("jumpRiseMinCoeffToEnter"))
     @jumpRiseMinCoeffToEnter.setter
     def jumpRiseMinCoeffToEnter(self, val): self.jumpRiseMinCoeffToEnter.set(val)
+    @property
+    def resistanceData(self):  # type: ()->GraspResistanceData
+        return GraspResistanceData(self._node.at("resistanceData"))
     @property
     def sensorHotspotName(self):  # type: ()->String
         return String(self._node.at("sensorHotspotName"))

@@ -256,6 +256,11 @@ class MoveCapacityData(HelperObject):
     @maxTimeBetweenFlaps.setter
     def maxTimeBetweenFlaps(self, val): self.maxTimeBetweenFlaps.set(val)
     @property
+    def maxUnmountRetimingDist(self):  # type: ()->Float
+        return Float(self._node.at("maxUnmountRetimingDist"))
+    @maxUnmountRetimingDist.setter
+    def maxUnmountRetimingDist(self, val): self.maxUnmountRetimingDist.set(val)
+    @property
     def minFlapTime(self):  # type: ()->Float
         return Float(self._node.at("minFlapTime"))
     @minFlapTime.setter

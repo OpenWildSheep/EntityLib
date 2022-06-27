@@ -21,8 +21,8 @@ class PathFinderGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def AreaNavigation(self):  # type: ()->AreaNavigation
-        return AreaNavigation(self._node.at("AreaNavigation"))
+    def NavigationCapacities(self):  # type: ()->AreaNavigation
+        return AreaNavigation(self._node.at("NavigationCapacities"))
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))

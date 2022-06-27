@@ -5,7 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
-from entgen.Bool import *
+from entgen.CapabilitiesAndTags import *
 from entgen.Float import *
 
 from EntityLibPy import Node
@@ -21,20 +21,13 @@ class AreaNavigation(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def CapabilitiesAndTags(self):  # type: ()->CapabilitiesAndTags
+        return CapabilitiesAndTags(self._node.at("CapabilitiesAndTags"))
+    @property
     def GroundAreaCost(self):  # type: ()->Float
         return Float(self._node.at("GroundAreaCost"))
     @GroundAreaCost.setter
     def GroundAreaCost(self, val): self.GroundAreaCost.set(val)
-    @property
-    def MovesInWater(self):  # type: ()->Bool
-        return Bool(self._node.at("MovesInWater"))
-    @MovesInWater.setter
-    def MovesInWater(self, val): self.MovesInWater.set(val)
-    @property
-    def MovesOnGround(self):  # type: ()->Bool
-        return Bool(self._node.at("MovesOnGround"))
-    @MovesOnGround.setter
-    def MovesOnGround(self, val): self.MovesOnGround.set(val)
     @property
     def WaterAreaCost(self):  # type: ()->Float
         return Float(self._node.at("WaterAreaCost"))

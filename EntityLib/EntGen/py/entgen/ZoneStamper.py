@@ -4,11 +4,12 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.NavMeshArea import *
 from entgen.String import *
 from entgen.Int import *
+from entgen.CapabilitiesAndTags import *
 from entgen.Float import *
 from entgen.GeometryStamper import *
+from entgen.variant_EntityRef_NavMeshArea_ import *
 from entgen.variant_ZoneCylinderShape_ZoneMeshShape_ import *
 
 from EntityLibPy import Node
@@ -24,15 +25,16 @@ class ZoneStamper(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def CapabilitiesAndTags(self):  # type: ()->CapabilitiesAndTags
+        return CapabilitiesAndTags(self._node.at("CapabilitiesAndTags"))
+    @property
     def DownwardOffset(self):  # type: ()->Float
         return Float(self._node.at("DownwardOffset"))
     @DownwardOffset.setter
     def DownwardOffset(self, val): self.DownwardOffset.set(val)
     @property
-    def NavMeshArea(self):  # type: ()->NavMeshArea
-        return NavMeshArea(self._node.at("NavMeshArea"))
-    @NavMeshArea.setter
-    def NavMeshArea(self, val): self.NavMeshArea.set(val)
+    def NavMeshArea(self):  # type: ()->variant_EntityRef_NavMeshArea_
+        return variant_EntityRef_NavMeshArea_(self._node.at("NavMeshArea"))
     @property
     def Priority(self):  # type: ()->Int
         return Int(self._node.at("Priority"))

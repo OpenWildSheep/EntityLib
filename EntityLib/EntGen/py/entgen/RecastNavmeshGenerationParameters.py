@@ -36,6 +36,11 @@ class RecastNavmeshGenerationParameters(HelperObject):
     @CreatureType.setter
     def CreatureType(self, val): self.CreatureType.set(val)
     @property
+    def DeepWaterDepth(self):  # type: ()->Float
+        return Float(self._node.at("DeepWaterDepth"))
+    @DeepWaterDepth.setter
+    def DeepWaterDepth(self, val): self.DeepWaterDepth.set(val)
+    @property
     def MarkWaterAreas(self):  # type: ()->Bool
         return Bool(self._node.at("MarkWaterAreas"))
     @MarkWaterAreas.setter

@@ -6079,6 +6079,29 @@ class SyncTempoManager(HelperObject):
 
 from EntityLibPy import Node
 
+class StreamingManager(HelperObject):
+    schema_name = "StreamingManager"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->StreamingManager
+        return StreamingManager(entlib.load_node_file(sourcefile, entlib.get_schema(StreamingManager.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->StreamingManager
+        return StreamingManager(entlib.make_node(StreamingManager.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->Manager
+        return Manager(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class SpatialMapManager(HelperObject):
     schema_name = "SpatialMapManager"
     @staticmethod
@@ -8439,6 +8462,11 @@ class GrasperInteractionData(HelperObject):
     @graspOutVisualRotationRate.setter
     def graspOutVisualRotationRate(self, val): self.graspOutVisualRotationRate.set(val)
     @property
+    def graspStrength(self):  # type: ()->Float
+        return Float(self._node.at("graspStrength"))
+    @graspStrength.setter
+    def graspStrength(self, val): self.graspStrength.set(val)
+    @property
     def interactableBoneName(self):  # type: ()->String
         return String(self._node.at("interactableBoneName"))
     @interactableBoneName.setter
@@ -8470,10 +8498,10 @@ class GraspableInteractionData(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
-    def damageAccumulatedRequiredToIncapacitate(self):  # type: ()->Float
-        return Float(self._node.at("damageAccumulatedRequiredToIncapacitate"))
-    @damageAccumulatedRequiredToIncapacitate.setter
-    def damageAccumulatedRequiredToIncapacitate(self, val): self.damageAccumulatedRequiredToIncapacitate.set(val)
+    def graspStrength(self):  # type: ()->Float
+        return Float(self._node.at("graspStrength"))
+    @graspStrength.setter
+    def graspStrength(self, val): self.graspStrength.set(val)
     @property
     def graspedDurationMax(self):  # type: ()->Float
         return Float(self._node.at("graspedDurationMax"))
@@ -8523,6 +8551,34 @@ class GraspType(Primitive[GraspTypeEnum]):  # Enum
         return self._node.set_string(val.value)
     def get(self):  # type: () -> T
         return self._item_type(self._node.value)
+
+
+from EntityLibPy import Node
+
+class GraspResistanceData(HelperObject):
+    schema_name = "GraspResistanceData"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->GraspResistanceData
+        return GraspResistanceData(entlib.load_node_file(sourcefile, entlib.get_schema(GraspResistanceData.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->GraspResistanceData
+        return GraspResistanceData(entlib.make_node(GraspResistanceData.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def resistanceMax(self):  # type: ()->Float
+        return Float(self._node.at("resistanceMax"))
+    @resistanceMax.setter
+    def resistanceMax(self, val): self.resistanceMax.set(val)
+    @property
+    def strengthMultiplierCurve(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("strengthMultiplierCurve"))
+    pass
 
 
 from EntityLibPy import Node
@@ -14721,6 +14777,100 @@ class SystemicCreature(HelperObject):
 
 from EntityLibPy import Node
 
+class StreamingLocatorGD(HelperObject):
+    schema_name = "StreamingLocatorGD"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->StreamingLocatorGD
+        return StreamingLocatorGD(entlib.load_node_file(sourcefile, entlib.get_schema(StreamingLocatorGD.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->StreamingLocatorGD
+        return StreamingLocatorGD(entlib.make_node(StreamingLocatorGD.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def CenterOffset(self):  # type: ()->Vector3
+        return Vector3(self._node.at("CenterOffset"))
+    @CenterOffset.setter
+    def CenterOffset(self, val): self.CenterOffset.set(val)
+    @property
+    def Radius(self):  # type: ()->Float
+        return Float(self._node.at("Radius"))
+    @Radius.setter
+    def Radius(self, val): self.Radius.set(val)
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class StreamableUnitGD(HelperObject):
+    schema_name = "StreamableUnitGD"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->StreamableUnitGD
+        return StreamableUnitGD(entlib.load_node_file(sourcefile, entlib.get_schema(StreamableUnitGD.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->StreamableUnitGD
+        return StreamableUnitGD(entlib.make_node(StreamableUnitGD.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def BaseImpostor(self):  # type: ()->EntityRef
+        return EntityRef(self._node.at("BaseImpostor"))
+    @BaseImpostor.setter
+    def BaseImpostor(self, val): self.BaseImpostor.set(val)
+    @property
+    def BoxSize(self):  # type: ()->Vector3
+        return Vector3(self._node.at("BoxSize"))
+    @BoxSize.setter
+    def BoxSize(self, val): self.BoxSize.set(val)
+    @property
+    def CenterOffset(self):  # type: ()->Vector3
+        return Vector3(self._node.at("CenterOffset"))
+    @CenterOffset.setter
+    def CenterOffset(self, val): self.CenterOffset.set(val)
+    @property
+    def EnergyPool(self):  # type: ()->EntityRef
+        return EntityRef(self._node.at("EnergyPool"))
+    @EnergyPool.setter
+    def EnergyPool(self, val): self.EnergyPool.set(val)
+    @property
+    def FullEntities(self):  # type: ()->PrimArray[EntityRef]
+        return (lambda n: PrimArray(EntityRef, n))(self._node.at("FullEntities"))
+    @FullEntities.setter
+    def FullEntities(self, val): self.FullEntities.set(val)
+    @property
+    def FullEntitiesHolder(self):  # type: ()->EntityRef
+        return EntityRef(self._node.at("FullEntitiesHolder"))
+    @FullEntitiesHolder.setter
+    def FullEntitiesHolder(self, val): self.FullEntitiesHolder.set(val)
+    @property
+    def Hysteresis(self):  # type: ()->Float
+        return Float(self._node.at("Hysteresis"))
+    @Hysteresis.setter
+    def Hysteresis(self, val): self.Hysteresis.set(val)
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
+    @property
+    def VariantImpostors(self):  # type: ()->Map[str, EntityRef]
+        return (lambda n: Map(str, EntityRef, n))(self._node.at("VariantImpostors"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class StickToTerrain(HelperObject):
     schema_name = "StickToTerrain"
     @staticmethod
@@ -17577,6 +17727,9 @@ class GrasperGD(HelperObject):
     @jumpRiseMinCoeffToEnter.setter
     def jumpRiseMinCoeffToEnter(self, val): self.jumpRiseMinCoeffToEnter.set(val)
     @property
+    def resistanceData(self):  # type: ()->GraspResistanceData
+        return GraspResistanceData(self._node.at("resistanceData"))
+    @property
     def sensorHotspotName(self):  # type: ()->String
         return String(self._node.at("sensorHotspotName"))
     @sensorHotspotName.setter
@@ -17607,6 +17760,9 @@ class GraspableGD(HelperObject):
     @property
     def interactionDatas(self):  # type: ()->Map[GraspTypeEnum, GraspableInteractionData]
         return (lambda n: Map(GraspTypeEnum, GraspableInteractionData, n))(self._node.at("interactionDatas"))
+    @property
+    def resistanceData(self):  # type: ()->GraspResistanceData
+        return GraspResistanceData(self._node.at("resistanceData"))
     pass
 
 
@@ -29417,6 +29573,29 @@ class EntityStateBoidsHomePos(HelperObject):
     @property
     def HomePosition(self):  # type: ()->Position
         return Position(self._node.at("HomePosition"))
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateBittenDefense(HelperObject):
+    schema_name = "EntityStateBittenDefense"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBittenDefense
+        return EntityStateBittenDefense(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBittenDefense.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateBittenDefense
+        return EntityStateBittenDefense(entlib.make_node(EntityStateBittenDefense.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))

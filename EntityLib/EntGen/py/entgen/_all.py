@@ -184,6 +184,7 @@ from .VegetationManager import *
 from .TrailManager import *
 from .TerrainManager import *
 from .SyncTempoManager import *
+from .StreamingManager import *
 from .SpatialMapManager import *
 from .ShamanVisionManager import *
 from .SensorManager import *
@@ -259,6 +260,7 @@ from .GroundTypeData import *
 from .GrasperInteractionData import *
 from .GraspableInteractionData import *
 from .GraspType import *
+from .GraspResistanceData import *
 from .GeometryStamper import *
 from .SkinnedPhysMeshStamper import *
 from .MeshStamper import *
@@ -421,6 +423,8 @@ from .TerrainSurfaceObject import *
 from .TerrainGD import *
 from .TeamGD import *
 from .SystemicCreature import *
+from .StreamingLocatorGD import *
+from .StreamableUnitGD import *
 from .StickToTerrain import *
 from .StaticObjectGD import *
 from .StaffVertebrasGD import *
@@ -826,6 +830,7 @@ from .EntityStateBreakableBreaking import *
 from .EntityStateBounceLand import *
 from .EntityStateBounce import *
 from .EntityStateBoidsHomePos import *
+from .EntityStateBittenDefense import *
 from .EntityStateBitten import *
 from .EntityStateBiteOut import *
 from .EntityStateBiteIn import *

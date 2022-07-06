@@ -85,7 +85,31 @@ class Skl(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         return o == 0
 
-def Start(builder): builder.StartObject(3)
+    # Skl
+    def BindPose(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 64
+            from WBIN.BoneMatrix import BoneMatrix
+            obj = BoneMatrix()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # Skl
+    def BindPoseLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # Skl
+    def BindPoseIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        return o == 0
+
+def Start(builder): builder.StartObject(4)
 def SklStart(builder):
     """This method is deprecated. Please switch to Start."""
     return Start(builder)
@@ -109,12 +133,21 @@ def StartBlendShapesVector(builder, numElems): return builder.StartVector(4, num
 def SklStartBlendShapesVector(builder, numElems):
     """This method is deprecated. Please switch to Start."""
     return StartBlendShapesVector(builder, numElems)
+def AddBindPose(builder, bindPose): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(bindPose), 0)
+def SklAddBindPose(builder, bindPose):
+    """This method is deprecated. Please switch to AddBindPose."""
+    return AddBindPose(builder, bindPose)
+def StartBindPoseVector(builder, numElems): return builder.StartVector(64, numElems, 4)
+def SklStartBindPoseVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartBindPoseVector(builder, numElems)
 def End(builder): return builder.EndObject()
 def SklEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
 import WBIN.BlendShapeData
 import WBIN.BoneData
+import WBIN.BoneMatrix
 import WBIN.SourceFileInf
 try:
     from typing import List, Optional
@@ -128,6 +161,7 @@ class SklT(object):
         self.skeleton = None  # type: List[WBIN.BoneData.BoneDataT]
         self.sourceFileInf = None  # type: Optional[WBIN.SourceFileInf.SourceFileInfT]
         self.blendShapes = None  # type: List[WBIN.BlendShapeData.BlendShapeDataT]
+        self.bindPose = None  # type: List[WBIN.BoneMatrix.BoneMatrixT]
 
     @classmethod
     def InitFromBuf(cls, buf, pos):
@@ -163,6 +197,14 @@ class SklT(object):
                 else:
                     blendShapeData_ = WBIN.BlendShapeData.BlendShapeDataT.InitFromObj(skl.BlendShapes(i))
                     self.blendShapes.append(blendShapeData_)
+        if not skl.BindPoseIsNone():
+            self.bindPose = []
+            for i in range(skl.BindPoseLength()):
+                if skl.BindPose(i) is None:
+                    self.bindPose.append(None)
+                else:
+                    boneMatrix_ = WBIN.BoneMatrix.BoneMatrixT.InitFromObj(skl.BindPose(i))
+                    self.bindPose.append(boneMatrix_)
 
     # SklT
     def Pack(self, builder):
@@ -184,6 +226,11 @@ class SklT(object):
             for i in reversed(range(len(self.blendShapes))):
                 builder.PrependUOffsetTRelative(blendShapeslist[i])
             blendShapes = builder.EndVector()
+        if self.bindPose is not None:
+            StartBindPoseVector(builder, len(self.bindPose))
+            for i in reversed(range(len(self.bindPose))):
+                self.bindPose[i].Pack(builder)
+            bindPose = builder.EndVector()
         Start(builder)
         if self.skeleton is not None:
             AddSkeleton(builder, skeleton)
@@ -191,5 +238,7 @@ class SklT(object):
             AddSourceFileInf(builder, sourceFileInf)
         if self.blendShapes is not None:
             AddBlendShapes(builder, blendShapes)
+        if self.bindPose is not None:
+            AddBindPose(builder, bindPose)
         skl = End(builder)
         return skl

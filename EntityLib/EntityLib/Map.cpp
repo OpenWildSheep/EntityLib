@@ -685,10 +685,19 @@ namespace Ent
     {
         for (auto& elt : m_items)
         {
+            bool const presentBeforeUnset = elt.isPresent.get();
             elt.isPresent.unset();
-            elt.node->unset();
             elt.node->setAddedInInsance(false);
-            if (elt.isPresent.get() and elt.isPresent.hasDefaultValue())
+            if (elt.node->getSchema()->oneOf.has_value())
+            {
+                // Avoid to change the key of the union, since it is the key of the item
+                elt.node->getUnionData()->unset();
+            }
+            else
+            {
+                elt.node->unset();
+            }
+            if (presentBeforeUnset and not elt.isPresent.get())
             {
                 elt.node->setAddedInInsance(true);
             }

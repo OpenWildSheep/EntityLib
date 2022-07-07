@@ -6,7 +6,6 @@ table BiomePatch
 {
 	aabb:AABB;
 	position:Float3Channel (required);
-	name:string (required);
 	sourceFileInf:SourceFileInf;
 }
 

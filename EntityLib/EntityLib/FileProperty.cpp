@@ -138,6 +138,7 @@ namespace Ent
         else
         {
             newLayer.m_schema = Schema{_dataSchema, nullptr};
+            _key = _dataSchema->name.c_str(); // Convert _key to a long living memory
         }
         newLayer.m_key = _key;
 
@@ -193,6 +194,11 @@ namespace Ent
             }
         }
         ENTLIB_DBG_ASSERT(newLayer.m_schema.base != nullptr);
+        auto keyField = newLayer.getObjectField(keyFieldName);
+        if (keyField.isSet())
+        {
+            newLayer.m_key = keyField.getString(); // Convert _key to a long living memory
+        }
         return newLayer;
     }
 

@@ -257,6 +257,34 @@ try
     entlib.validationEnabled = false;
     {
         entlib.rawdataPath = "X:/RawData"; // It is a hack to work in the working dir
+        auto node = Property(
+            &entlib,
+            entlib.getSchema("Entity"),
+            "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
+            "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene");
+
+        auto const* nodeRef = "Components/SubScene/Embedded/ShamanFullBlue_ent_001";
+        auto ent = node.resolveNodeRef(nodeRef);
+        auto entpath = node.makeNodeRef(*ent);
+        ENTLIB_ASSERT(entpath == nodeRef);
+        entpath = ent->makeAbsoluteNodeRef();
+        ENTLIB_ASSERT(entpath == nodeRef);
+        entpath = node.makeAbsoluteNodeRef();
+        ENTLIB_ASSERT(entpath == ".");
+
+        auto prefabHisto = getPrefabHistory(*ent);
+        ENTLIB_ASSERT(prefabHisto.size() == 3);
+        ENTLIB_ASSERT(
+            prefabHisto[0].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
+        ENTLIB_ASSERT(
+            prefabHisto[1].prefabPath
+            == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
+        ENTLIB_ASSERT(
+            prefabHisto[2].prefabPath
+            == "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
+               "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene");
+    }
+    {
         auto node = entlib.loadFileAsNode(
             "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
             "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
@@ -271,13 +299,11 @@ try
         ENTLIB_ASSERT(entpath == ".");
 
         auto prefabHisto = ent->getPrefabHistory();
-        ENTLIB_ASSERT(prefabHisto.size() == 3);
+        ENTLIB_ASSERT(prefabHisto.size() == 2);
         ENTLIB_ASSERT(
             prefabHisto[0].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
         ENTLIB_ASSERT(
-            prefabHisto[1].prefabPath == "02_creature/human/male/entity/legacy/shaman_male.entity");
-        ENTLIB_ASSERT(
-            prefabHisto[2].prefabPath
+            prefabHisto[1].prefabPath
             == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
     }
     {
@@ -294,9 +320,7 @@ try
         ENTLIB_ASSERT(
             prefabHisto[0].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
         ENTLIB_ASSERT(
-            prefabHisto[1].prefabPath == "02_creature/human/male/entity/legacy/shaman_male.entity");
-        ENTLIB_ASSERT(
-            prefabHisto[2].prefabPath
+            prefabHisto[1].prefabPath
             == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
         entlib.rawdataPath = current_path(); // Work in Test dir
     }

@@ -89,4 +89,20 @@ namespace Ent
         eraseObjectSetItem(_current);
         return newItem;
     }
+
+    std::vector<PrefabInfo> getPrefabHistory(Property const& _prop)
+    {
+        std::vector<PrefabInfo> result;
+        // Follow the prefab links
+        auto prefab = _prop.m_self.get();
+        while (prefab != nullptr)
+        {
+            auto path = prefab->getRootNode()->getFilePath();
+            auto nodeRef = prefab->makeAbsoluteNodeRef();
+            result.emplace_back(std::move(path), std::move(nodeRef), prefab->sharedFromThis());
+            prefab = prefab->getPrefab();
+        }
+        std::reverse(begin(result), end(result));
+        return result;
+    }
 } // namespace Ent

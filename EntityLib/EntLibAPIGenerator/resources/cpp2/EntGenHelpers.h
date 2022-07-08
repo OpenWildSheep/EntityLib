@@ -122,12 +122,12 @@ namespace Ent
                     return !(*this == rho);
                 }
 
-                [[nodiscard]] T operator*()
+                [[nodiscard]] T operator*() const
                 {
                     return T(m_property.getArrayItem(index));
                 }
 
-                [[nodiscard]] std::optional<T> operator->()
+                [[nodiscard]] std::optional<T> operator->() const
                 {
                     return T(m_property.getArrayItem(index));
                 }
@@ -191,7 +191,7 @@ namespace Ent
             struct What;
 
             template <typename V>
-            Array<T>& operator=(V const& rho)
+            PrimArray<T>& operator=(V const& rho)
             {
                 ENT_IF_COMPILE(V, arr, std::get<0>(arr)) // tuple, c-style array and std::array
                 {
@@ -542,7 +542,12 @@ namespace Ent
                 }
                 else if constexpr (std::is_same_v<T, char const*>)
                 {
-                    return iterator{getProperty(), getProperty().getPrimSetKeysString(), 0};
+                    std::vector<T> strings;
+                    for (auto&& str : getProperty().getPrimSetKeysString())
+                    {
+                        strings.push_back(str);
+                    }
+                    return iterator{getProperty(), std::move(strings), 0};
                 }
                 else
                 {
@@ -621,7 +626,7 @@ namespace Ent
 
             [[nodiscard]] auto getKeys() const
             {
-                if constexpr (std::is_enum_v<K> or std::is_same_v<K, char const*>)
+                if constexpr (std::is_enum_v<K> || std::is_same_v<K, char const*>)
                 {
                     return getProperty().getObjectSetKeysString();
                 }
@@ -773,7 +778,7 @@ namespace Ent
 
             [[nodiscard]] auto getKeysImpl()
             {
-                if constexpr (std::is_enum_v<K> or std::is_same_v<K, char const*>)
+                if constexpr (std::is_enum_v<K> || std::is_same_v<K, char const*>)
                 {
                     return getProperty().getMapKeysString();
                 }
@@ -939,7 +944,7 @@ namespace Ent
             }
 
             /// path to the prefab Node
-            [[nodiscard]] char const* getInstanceOf()
+            [[nodiscard]] char const* getInstanceOf() const
             {
                 return getProperty().getInstanceOf();
             }

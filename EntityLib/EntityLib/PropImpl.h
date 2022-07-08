@@ -8,7 +8,7 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4464)
-#include "../Tools.h"
+#include "Tools.h"
 #pragma warning(pop)
 
 namespace Ent
@@ -234,7 +234,7 @@ namespace Ent
         [[nodiscard]] PropImpl* getPrefab() const; ///< Get the PropImpl of the prefab
         [[nodiscard]] nlohmann::json const* getRawJson() const; ///< Get the underlying json node of the instance
 
-        [[nodiscard]] PropImplPtr sharedFromThis(); ///< Create a new smart pointer to this
+        [[nodiscard]] PropImplPtr sharedFromThis() const; ///< Create a new smart pointer to this
 
         [[nodiscard]] PropImplPtr getParent() const; ///< Get the PropImpl which created this one
 
@@ -243,6 +243,16 @@ namespace Ent
         [[nodiscard]] char const* getFilePath() const;
 
         [[nodiscard]] DataKind getDataKind() const;
+
+        [[nodiscard]] PropImplPtr resolveNodeRef(char const* _nodeRef);
+
+        [[nodiscard]] PropImplPtr getRootNode() const;
+
+        [[nodiscard]] NodeRef makeNodeRef(PropImpl const& _target) const;
+
+        [[nodiscard]] NodeRef makeAbsoluteNodeRef() const;
+
+        [[nodiscard]] FileProperty::Key getPathToken() const;
 
     private:
         friend void decRef(PropImpl* self);
@@ -272,10 +282,10 @@ namespace Ent
         return m_prefab.get();
     }
 
-    inline PropImplPtr PropImpl::sharedFromThis()
+    inline PropImplPtr PropImpl::sharedFromThis() const
     {
         ++m_refCount;
-        return PropImplPtr(this);
+        return PropImplPtr(const_cast<PropImpl*>(this));
     }
 
     inline PropImplPtr PropImpl::getParent() const
@@ -300,6 +310,11 @@ namespace Ent
     inline DataKind PropImpl::getDataKind() const
     {
         return m_instance.getSchema()->getDataKind();
+    }
+
+    inline FileProperty::Key PropImpl::getPathToken() const
+    {
+        return m_instance.getPathToken();
     }
 
 } // namespace Ent

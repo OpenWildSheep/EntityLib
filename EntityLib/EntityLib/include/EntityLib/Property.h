@@ -4,6 +4,7 @@
 
 namespace Ent
 {
+    struct PrefabInfo;
     struct ENTLIB_DLLEXPORT Property
     {
     public:
@@ -28,7 +29,7 @@ namespace Ent
         Property(Property&& _other) noexcept = default;
         Property& operator=(Property&& _other) noexcept = default;
         Property(EntityLib* _entityLib, Subschema const* _schema, char const* _filename)
-            : m_self(_entityLib->newPropImpl(nullptr, _schema, _filename, nullptr))
+            : m_self(_entityLib->newPropImpl(nullptr, _schema, _filename))
         {
         }
         Property(
@@ -660,7 +661,59 @@ namespace Ent
             return *m_self;
         }
 
+        /// @brief Get the target pointed by _nodeRef, starting from this
+        [[nodiscard]] std::optional<Property> resolveNodeRef(char const* _nodeRef) const
+        {
+            if (auto prop = m_self->resolveNodeRef(_nodeRef); prop != nullptr)
+            {
+                return Property(std::move(prop));
+            }
+            return std::nullopt;
+        }
+
+        [[nodiscard]] Property getRootNode() const
+        {
+            return Property(m_self->getRootNode());
+        }
+
+        /// @brief Make a NodeRef going from this to _target
+        [[nodiscard]] NodeRef makeNodeRef(Property const& _target) const
+        {
+            return m_self->makeNodeRef(*_target.m_self);
+        }
+
+        /// @brief Get the NodeRef from root to this
+        [[nodiscard]] NodeRef makeAbsoluteNodeRef() const
+        {
+            return m_self->makeAbsoluteNodeRef();
+        }
+
+        [[nodiscard]] FileProperty::Key getPathToken() const
+        {
+            return m_self->getPathToken();
+        }
+
+        friend std::vector<PrefabInfo> getPrefabHistory(Property const& _prop);
+
     private:
         PropImplPtr m_self{};
     };
+
+    /// Information about a prefab in the prefab history of a Node
+    /// @see Ent::getPrefabHistory
+    struct PrefabInfo
+    {
+        std::string prefabPath; ///< Path to the prefab's file
+        NodeRef nodeRef; ///< NodeRef from the prefab root the the pointed Node
+        Property prop; ///< \b Read-only. Pointed Node in this prefab (if it exist).
+
+        // TODO : Remove when C++20
+        PrefabInfo(std::string _prefabPath, NodeRef _nodeRef, PropImplPtr _prop)
+            : prefabPath(std::move(_prefabPath))
+            , nodeRef(std::move(_nodeRef))
+            , prop(std::move(_prop))
+        {
+        }
+    };
+    std::vector<PrefabInfo> getPrefabHistory(Property const& _prop);
 } // namespace Ent

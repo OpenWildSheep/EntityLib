@@ -122,12 +122,12 @@ namespace Ent
                     return !(*this == rho);
                 }
 
-                [[nodiscard]] T operator*()
+                [[nodiscard]] T operator*() const
                 {
                     return T(m_property.getArrayItem(index));
                 }
 
-                [[nodiscard]] std::optional<T> operator->()
+                [[nodiscard]] std::optional<T> operator->() const
                 {
                     return T(m_property.getArrayItem(index));
                 }
@@ -621,7 +621,7 @@ namespace Ent
 
             [[nodiscard]] auto getKeys() const
             {
-                if constexpr (std::is_enum_v<K> or std::is_same_v<K, char const*>)
+                if constexpr (std::is_enum_v<K> || std::is_same_v<K, char const*>)
                 {
                     return getProperty().getObjectSetKeysString();
                 }
@@ -773,7 +773,7 @@ namespace Ent
 
             [[nodiscard]] auto getKeysImpl()
             {
-                if constexpr (std::is_enum_v<K> or std::is_same_v<K, char const*>)
+                if constexpr (std::is_enum_v<K> || std::is_same_v<K, char const*>)
                 {
                     return getProperty().getMapKeysString();
                 }
@@ -939,7 +939,7 @@ namespace Ent
             }
 
             /// path to the prefab Node
-            [[nodiscard]] char const* getInstanceOf()
+            [[nodiscard]] char const* getInstanceOf() const
             {
                 return getProperty().getInstanceOf();
             }

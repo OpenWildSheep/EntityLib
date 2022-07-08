@@ -6,7 +6,6 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ComponentGD import *
-from entgen.GraspResistanceData import *
 from entgen.GraspableInteractionData import *
 from entgen.GraspType import *
 
@@ -33,9 +32,6 @@ class GraspableGD(HelperObject):
     @property
     def interactionDatas(self):  # type: ()->Map[GraspTypeEnum, GraspableInteractionData]
         return (lambda n: Map(GraspTypeEnum, GraspableInteractionData, n))(self._node.at("interactionDatas"))
-    @property
-    def resistanceData(self):  # type: ()->GraspResistanceData
-        return GraspResistanceData(self._node.at("resistanceData"))
     pass
 
 

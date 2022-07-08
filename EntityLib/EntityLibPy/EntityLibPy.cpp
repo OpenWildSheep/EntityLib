@@ -433,12 +433,19 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pyEntityRef = py::class_<EntityRef>(ent, "EntityRef");
     auto pyNodeFile = py::class_<EntityLib::NodeFile>(ent, "NodeFile");
     auto pyPrefabInfo = py::class_<Node::PrefabInfo>(ent, "Node_PrefabInfo");
+    auto pyPropPrefabInfo = py::class_<PrefabInfo>(ent, "Prop_PrefabInfo");
     auto pyProperty = py::class_<Property>(ent, "Property");
 
     pyPrefabInfo
         .def_readonly("node", &Node::PrefabInfo::node)
         .def_readonly("noderef", &Node::PrefabInfo::nodeRef)
         .def_readonly("prefab_path", &Node::PrefabInfo::prefabPath)
+        ;
+
+    pyPropPrefabInfo
+        .def_readonly("node", &PrefabInfo::prop)
+        .def_readonly("noderef", &PrefabInfo::nodeRef)
+        .def_readonly("prefab_path", &PrefabInfo::prefabPath)
         ;
 
     pyNode
@@ -655,18 +662,18 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readonly("time", &EntityLib::NodeFile::time, py::return_value_policy::reference_internal);
 
     pyProperty
-        .def(py::init<EntityLib*, Subschema const*, char const*>())
-        .def(py::init<EntityLib*, Subschema const*, char const*, nlohmann::json*>())
+        .def(py::init<EntityLib*, Subschema const*, char const*>(), py::keep_alive<1, 2>())
+        .def(py::init<EntityLib*, Subschema const*, char const*, nlohmann::json*>(), py::keep_alive<1, 2>())
         .def("save", &Property::save)
         .def_property_readonly("is_default", &Property::isDefault)
-        .def("get_object_field", &Property::getObjectField, py::arg("field"), py::arg("field_schema") = nullptr)
-        .def("get_union_data", &Property::getUnionData)
-        .def("get_unionset_item", &Property::getUnionSetItem, py::arg("type"), py::arg("schema") = nullptr)
-        .def("get_objectset_item", [](Property& _self, char const* _key){return _self.getObjectSetItem(_key);})
-        .def("get_objectset_item", [](Property& _self, int64_t _key){return _self.getObjectSetItem(_key);})
-        .def("get_map_item", [](Property& _self, char const* _key){return _self.getMapItem(_key);})
-        .def("get_map_item", [](Property& _self, int64_t _key){return _self.getMapItem(_key);})
-        .def("get_array_item", &Property::getArrayItem)
+        .def("get_object_field", &Property::getObjectField, py::arg("field"), py::arg("field_schema") = nullptr, py::keep_alive<0, 1>())
+        .def("get_union_data", &Property::getUnionData, py::keep_alive<0, 1>())
+        .def("get_unionset_item", &Property::getUnionSetItem, py::arg("type"), py::arg("schema") = nullptr, py::keep_alive<0, 1>())
+        .def("get_objectset_item", [](Property& _self, char const* _key){return _self.getObjectSetItem(_key);}, py::keep_alive<0, 1>())
+        .def("get_objectset_item", [](Property& _self, int64_t _key){return _self.getObjectSetItem(_key);}, py::keep_alive<0, 1>())
+        .def("get_map_item", [](Property& _self, char const* _key){return _self.getMapItem(_key);}, py::keep_alive<0, 1>())
+        .def("get_map_item", [](Property& _self, int64_t _key){return _self.getMapItem(_key);}, py::keep_alive<0, 1>())
+        .def("get_array_item", &Property::getArrayItem, py::keep_alive<0, 1>())
         .def_property("instance_of", &Property::getInstanceOf, &Property::changeInstanceOf)
         .def_property_readonly("union_type", &Property::getUnionType) // or read/write ?
         .def_property_readonly("data_type", &Property::getDataType)
@@ -702,15 +709,22 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("set_string", &Property::setString)
         .def("set_bool", &Property::setBool)
         .def("set_entityref", &Property::setEntityRef)
-        .def("set_union_type", &Property::setUnionType)
+        .def("set_union_type", &Property::setUnionType, py::keep_alive<0, 1>())
         .def("build_path", &Property::buildPath)
         .def("primset_insert", [](Property& _self, char const* _key){return _self.insertPrimSetKey(_key);})
         .def("primset_insert", [](Property& _self, int64_t _key){return _self.insertPrimSetKey(_key);})
+        .def("resolve_noderef", &Property::resolveNodeRef, py::keep_alive<0, 1>())
         .def_property_readonly("raw_json", &Property::getRawJson)
         .def_property_readonly("has_value", &Property::hasValue)
         .def_property_readonly("has_prefab", &Property::hasPrefab)
-        .def_property_readonly("prefab", &Property::getPrefab)
-        .def_property_readonly("parent", &Property::getParent)
+        .def_property_readonly("prefab", &Property::getPrefab, py::keep_alive<0, 1>())
+        .def_property_readonly("parent", &Property::getParent, py::keep_alive<0, 1>())
+        .def_property_readonly("file_path", &Property::getFilePath)
+        .def_property_readonly("root_node", &Property::getRootNode, py::keep_alive<0, 1>())
+        .def_property_readonly("noderef", &Property::makeNodeRef)
+        .def_property_readonly("absolute_noderef", &Property::makeAbsoluteNodeRef)
+        .def_property_readonly("path_token", &Property::getPathToken)
+        .def_property_readonly("get_prefab_history", &getPrefabHistory, py::keep_alive<0, 1>())
         ;
 
     py::register_exception<JsonValidation>(ent, "JsonValidation");

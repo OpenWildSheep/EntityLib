@@ -902,8 +902,6 @@ namespace Ent
         struct TerrainGD;
         struct TeamGD;
         struct SystemicCreature;
-        struct StreamingLocatorGD;
-        struct StreamableUnitGD;
         struct StickToTerrain;
         struct StaticObjectGD;
         struct StaffVertebrasGD;
@@ -1532,7 +1530,6 @@ namespace Ent
         struct EntityStateBounceLand;
         struct EntityStateBounce;
         struct EntityStateBoidsHomePos;
-        struct EntityStateBittenDefense;
         struct EntityStateBitten;
         struct EntityStateBiteOut;
         struct EntityStateBiteIn;
@@ -4299,8 +4296,6 @@ namespace Ent
             Ent::Gen::EntityStateBiteOut setEntityStateBiteOut() const;
             std::optional<Ent::Gen::EntityStateBitten> EntityStateBitten() const;
             Ent::Gen::EntityStateBitten setEntityStateBitten() const;
-            std::optional<Ent::Gen::EntityStateBittenDefense> EntityStateBittenDefense() const;
-            Ent::Gen::EntityStateBittenDefense setEntityStateBittenDefense() const;
             std::optional<Ent::Gen::EntityStateBoidsHomePos> EntityStateBoidsHomePos() const;
             Ent::Gen::EntityStateBoidsHomePos setEntityStateBoidsHomePos() const;
             std::optional<Ent::Gen::EntityStateBounce> EntityStateBounce() const;
@@ -7704,7 +7699,6 @@ namespace Ent
             Ent::Gen::Float distanceMax() const;
             Ent::Gen::Float graspDurationMax() const;
             Ent::Gen::Float graspOutVisualRotationRate() const;
-            Ent::Gen::Float graspStrength() const;
             Ent::Gen::String interactableBoneName() const;
             Ent::Gen::ScaleConverter syncDeltaRotationDuration() const;
             Ent::Gen::ScaleConverter syncDeltaTranslationDuration() const;
@@ -7772,22 +7766,6 @@ namespace Ent
             Ent::Gen::String _comment() const;
             Ent::Gen::Float resistanceMax() const;
             Ent::Gen::ScaleConverter strengthMultiplierCurve() const;
-        };
-
-        struct GeometryStamper : HelperObject // Object
-        {
-            GeometryStamper(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "GeometryStamper";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::Transform3D Transform() const;
-            Ent::Gen::String _comment() const;
         };
 
         struct SkinnedPhysMeshStamper : HelperObject // Object
@@ -10826,48 +10804,6 @@ namespace Ent
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String UniqueID() const;
             Ent::Gen::Bool Warrior() const;
-            Ent::Gen::String _comment() const;
-        };
-
-        struct StreamingLocatorGD : HelperObject // Object
-        {
-            StreamingLocatorGD(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "StreamingLocatorGD";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::Vector3 CenterOffset() const;
-            Ent::Gen::Float Radius() const;
-            Ent::Gen::ComponentGD Super() const;
-            Ent::Gen::String _comment() const;
-        };
-
-        struct StreamableUnitGD : HelperObject // Object
-        {
-            StreamableUnitGD(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "StreamableUnitGD";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::EntityRef BaseImpostor() const;
-            Ent::Gen::Vector3 BoxSize() const;
-            Ent::Gen::Vector3 CenterOffset() const;
-            Ent::Gen::EntityRef EnergyPool() const;
-            PrimArray<Ent::Gen::EntityRef> FullEntities() const;
-            Ent::Gen::EntityRef FullEntitiesHolder() const;
-            Ent::Gen::Float Hysteresis() const;
-            Ent::Gen::ComponentGD Super() const;
-            Ent::Gen::Map<char const*, Ent::Gen::EntityRef> VariantImpostors() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -18179,9 +18115,6 @@ namespace Ent
             std::optional<Ent::Gen::EntityStateBitten> EntityStateBitten() const;
             Ent::Gen::EntityStateBitten addEntityStateBitten() const;
             void removeEntityStateBitten() const;
-            std::optional<Ent::Gen::EntityStateBittenDefense> EntityStateBittenDefense() const;
-            Ent::Gen::EntityStateBittenDefense addEntityStateBittenDefense() const;
-            void removeEntityStateBittenDefense() const;
             std::optional<Ent::Gen::EntityStateBoidsHomePos> EntityStateBoidsHomePos() const;
             Ent::Gen::EntityStateBoidsHomePos addEntityStateBoidsHomePos() const;
             void removeEntityStateBoidsHomePos() const;
@@ -21037,22 +20970,6 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::Position HomePosition() const;
-            Ent::Gen::ActorState Super() const;
-            Ent::Gen::String _comment() const;
-        };
-
-        struct EntityStateBittenDefense : HelperObject // Object
-        {
-            EntityStateBittenDefense(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "EntityStateBittenDefense";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
             Ent::Gen::ActorState Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -30267,14 +30184,6 @@ namespace Ent
         {
             return Ent::Gen::EntityStateBitten(node->setUnionType("EntityStateBitten"));
         }
-        inline std::optional<Ent::Gen::EntityStateBittenDefense> ResponsiblePointer_ActorState_::EntityStateBittenDefense() const
-        {
-            return strcmp(node->getUnionType(), "EntityStateBittenDefense") != 0? std::optional<Ent::Gen::EntityStateBittenDefense>{}: std::optional<Ent::Gen::EntityStateBittenDefense>(node->getUnionData());
-        }
-        inline Ent::Gen::EntityStateBittenDefense ResponsiblePointer_ActorState_::setEntityStateBittenDefense() const
-        {
-            return Ent::Gen::EntityStateBittenDefense(node->setUnionType("EntityStateBittenDefense"));
-        }
         inline std::optional<Ent::Gen::EntityStateBoidsHomePos> ResponsiblePointer_ActorState_::EntityStateBoidsHomePos() const
         {
             return strcmp(node->getUnionType(), "EntityStateBoidsHomePos") != 0? std::optional<Ent::Gen::EntityStateBoidsHomePos>{}: std::optional<Ent::Gen::EntityStateBoidsHomePos>(node->getUnionData());
@@ -34091,10 +34000,6 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("graspOutVisualRotationRate"));
         }
-        inline Ent::Gen::Float GrasperInteractionData::graspStrength() const
-        {
-            return Ent::Gen::Float(node->at("graspStrength"));
-        }
         inline Ent::Gen::String GrasperInteractionData::interactableBoneName() const
         {
             return Ent::Gen::String(node->at("interactableBoneName"));
@@ -34142,23 +34047,6 @@ namespace Ent
         }
         // GraspResistanceData
         inline Ent::Gen::String GraspResistanceData::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        inline Ent::Gen::Float GraspResistanceData::resistanceMax() const
-        {
-            return Ent::Gen::Float(node->at("resistanceMax"));
-        }
-        inline Ent::Gen::ScaleConverter GraspResistanceData::strengthMultiplierCurve() const
-        {
-            return Ent::Gen::ScaleConverter(node->at("strengthMultiplierCurve"));
-        }
-        // GeometryStamper
-        inline Ent::Gen::Transform3D GeometryStamper::Transform() const
-        {
-            return Ent::Gen::Transform3D(node->at("Transform"));
-        }
-        inline Ent::Gen::String GeometryStamper::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -37695,64 +37583,6 @@ namespace Ent
             return Ent::Gen::Bool(node->at("Warrior"));
         }
         inline Ent::Gen::String SystemicCreature::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        // StreamingLocatorGD
-        inline Ent::Gen::Vector3 StreamingLocatorGD::CenterOffset() const
-        {
-            return Ent::Gen::Vector3(node->at("CenterOffset"));
-        }
-        inline Ent::Gen::Float StreamingLocatorGD::Radius() const
-        {
-            return Ent::Gen::Float(node->at("Radius"));
-        }
-        inline Ent::Gen::ComponentGD StreamingLocatorGD::Super() const
-        {
-            return Ent::Gen::ComponentGD(node->at("Super"));
-        }
-        inline Ent::Gen::String StreamingLocatorGD::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        // StreamableUnitGD
-        inline Ent::Gen::EntityRef StreamableUnitGD::BaseImpostor() const
-        {
-            return Ent::Gen::EntityRef(node->at("BaseImpostor"));
-        }
-        inline Ent::Gen::Vector3 StreamableUnitGD::BoxSize() const
-        {
-            return Ent::Gen::Vector3(node->at("BoxSize"));
-        }
-        inline Ent::Gen::Vector3 StreamableUnitGD::CenterOffset() const
-        {
-            return Ent::Gen::Vector3(node->at("CenterOffset"));
-        }
-        inline Ent::Gen::EntityRef StreamableUnitGD::EnergyPool() const
-        {
-            return Ent::Gen::EntityRef(node->at("EnergyPool"));
-        }
-        inline PrimArray<Ent::Gen::EntityRef> StreamableUnitGD::FullEntities() const
-        {
-            return PrimArray<Ent::Gen::EntityRef>(node->at("FullEntities"));
-        }
-        inline Ent::Gen::EntityRef StreamableUnitGD::FullEntitiesHolder() const
-        {
-            return Ent::Gen::EntityRef(node->at("FullEntitiesHolder"));
-        }
-        inline Ent::Gen::Float StreamableUnitGD::Hysteresis() const
-        {
-            return Ent::Gen::Float(node->at("Hysteresis"));
-        }
-        inline Ent::Gen::ComponentGD StreamableUnitGD::Super() const
-        {
-            return Ent::Gen::ComponentGD(node->at("Super"));
-        }
-        inline Ent::Gen::Map<char const*, Ent::Gen::EntityRef> StreamableUnitGD::VariantImpostors() const
-        {
-            return Ent::Gen::Map<char const*, Ent::Gen::EntityRef>(node->at("VariantImpostors"));
-        }
-        inline Ent::Gen::String StreamableUnitGD::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -41316,18 +41146,6 @@ namespace Ent
         inline std::optional<Ent::Gen::StreamingLocatorGD> Component::StreamingLocatorGD() const
         {
             return strcmp(node->getUnionType(), "StreamingLocatorGD") != 0? std::optional<Ent::Gen::StreamingLocatorGD>{}: std::optional<Ent::Gen::StreamingLocatorGD>(node->getUnionData());
-        }
-        inline Ent::Gen::StreamingLocatorGD Component::setStreamingLocatorGD() const
-        {
-            return Ent::Gen::StreamingLocatorGD(node->setUnionType("StreamingLocatorGD"));
-        }
-        inline std::optional<Ent::Gen::SubScene> Component::SubScene() const
-        {
-            return strcmp(node->getUnionType(), "SubScene") != 0? std::optional<Ent::Gen::SubScene>{}: std::optional<Ent::Gen::SubScene>(node->getUnionData());
-        }
-        inline Ent::Gen::SubScene Component::setSubScene() const
-        {
-            return Ent::Gen::SubScene(node->setUnionType("SubScene"));
         }
         inline std::optional<Ent::Gen::SystemicCreature> Component::SystemicCreature() const
         {
@@ -52461,19 +52279,6 @@ namespace Ent
         {
             node->mapErase("EntityStateBitten");
         }
-        inline std::optional<Ent::Gen::EntityStateBittenDefense> ActorStates::EntityStateBittenDefense() const
-        {
-            auto sub = getSubNode("EntityStateBittenDefense");
-            return sub == nullptr? std::optional<Ent::Gen::EntityStateBittenDefense>{}: std::optional<Ent::Gen::EntityStateBittenDefense>(getSubNode("EntityStateBittenDefense"));
-        }
-        inline Ent::Gen::EntityStateBittenDefense ActorStates::addEntityStateBittenDefense() const
-        {
-            return Ent::Gen::EntityStateBittenDefense(addSubNode("EntityStateBittenDefense"));
-        }
-        inline void ActorStates::removeEntityStateBittenDefense() const
-        {
-            node->mapErase("EntityStateBittenDefense");
-        }
         inline std::optional<Ent::Gen::EntityStateBoidsHomePos> ActorStates::EntityStateBoidsHomePos() const
         {
             auto sub = getSubNode("EntityStateBoidsHomePos");
@@ -55840,15 +55645,6 @@ namespace Ent
             return Ent::Gen::ActorState(node->at("Super"));
         }
         inline Ent::Gen::String EntityStateBoidsHomePos::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        // EntityStateBittenDefense
-        inline Ent::Gen::ActorState EntityStateBittenDefense::Super() const
-        {
-            return Ent::Gen::ActorState(node->at("Super"));
-        }
-        inline Ent::Gen::String EntityStateBittenDefense::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }

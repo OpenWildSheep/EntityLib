@@ -248,6 +248,8 @@ from .PhysicsReplicateData import *
 from .HotSpotType import *
 from .PickableDistributorComponentData import *
 from .HotspotData import *
+from .HitWallEnvironmentData import *
+from .HitWallData import *
 from .HitType import *
 from .HitStyle import *
 from .HeightGrid import *
@@ -423,6 +425,8 @@ from .TerrainSurfaceObject import *
 from .TerrainGD import *
 from .TeamGD import *
 from .SystemicCreature import *
+from .StreamingLocatorGD import *
+from .StreamableUnitGD import *
 from .StickToTerrain import *
 from .StaticObjectGD import *
 from .StaffVertebrasGD import *
@@ -747,7 +751,9 @@ from .EntityStatePhysicsIdle import *
 from .EntityStateParryCooldown import *
 from .EntityStateParry import *
 from .EntityStateParried import *
+from .EntityStateOrientedDrift import *
 from .EntityStateOrderingAttack import *
+from .EntityStateMoveOnOffMeshLink import *
 from .EntityStateMotionConstrainedLand import *
 from .EntityStateMotionConstrained import *
 from .EntityStateMineScaling import *
@@ -766,6 +772,7 @@ from .EntityStateIncapacitated import *
 from .EntityStateInVertebraeArea import *
 from .EntityStateImmersedJump import *
 from .EntityStateHoldingStaffVertebras import *
+from .EntityStateHitWall import *
 from .EntityStateHintNone import *
 from .EntityStateHintLight import *
 from .EntityStateHintFull import *
@@ -828,6 +835,7 @@ from .EntityStateBreakableBreaking import *
 from .EntityStateBounceLand import *
 from .EntityStateBounce import *
 from .EntityStateBoidsHomePos import *
+from .EntityStateBittenDefense import *
 from .EntityStateBitten import *
 from .EntityStateBiteOut import *
 from .EntityStateBiteIn import *
@@ -842,7 +850,6 @@ from .EntityStateBackwardLand import *
 from .EntityStateBackwardDodge import *
 from .EntityStateAttitudeGroggy import *
 from .EntityStateAttackDive import *
-from .EntityStateAttackCharge import *
 from .EntityStateAskStaffGuide import *
 from .EntityStateApplyExtraLife import *
 from .EntityStateAirControl import *
@@ -859,8 +866,6 @@ from .ActorStateStopAttitudeAggressive import *
 from .ActorStateSpeedMultiplier import *
 from .ActorStateSoulWaitingToRespawn import *
 from .ActorStateSoulRespawn import *
-from .ActorStateSoulPathfindAndMove import *
-from .ActorStateSoulMove import *
 from .ActorStateSlope import *
 from .ActorStateSleeping import *
 from .ActorStateSkeletonPartPickUpState import *
@@ -902,7 +907,6 @@ from .ActorStateHasNoBody import *
 from .ActorStateForceAgainstSlope import *
 from .ActorStateFluidSlowDown import *
 from .ActorStateFlockingRigidbodyBeingActive import *
-from .ActorStateFlockingPathfindingAndMoving import *
 from .ActorStateFlockingLiving import *
 from .ActorStateFlockingIndividualSpawning import *
 from .ActorStateFlockingChangingParams import *

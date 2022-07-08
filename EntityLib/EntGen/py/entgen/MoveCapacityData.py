@@ -377,6 +377,16 @@ class MoveCapacityData(HelperObject):
         return Float(self._node.at("turnAroundInputDirectionAngleDeltaMin"))
     @turnAroundInputDirectionAngleDeltaMin.setter
     def turnAroundInputDirectionAngleDeltaMin(self, val): self.turnAroundInputDirectionAngleDeltaMin.set(val)
+    @property
+    def turnRotationMinRatioForNewTurn(self):  # type: ()->Float
+        return Float(self._node.at("turnRotationMinRatioForNewTurn"))
+    @turnRotationMinRatioForNewTurn.setter
+    def turnRotationMinRatioForNewTurn(self, val): self.turnRotationMinRatioForNewTurn.set(val)
+    @property
+    def turnRotationMinRatioToFinish(self):  # type: ()->Float
+        return Float(self._node.at("turnRotationMinRatioToFinish"))
+    @turnRotationMinRatioToFinish.setter
+    def turnRotationMinRatioToFinish(self, val): self.turnRotationMinRatioToFinish.set(val)
     pass
 
 

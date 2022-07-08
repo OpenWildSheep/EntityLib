@@ -12,6 +12,7 @@ from entgen.CharacterControllerGroundNormalData import *
 from entgen.CharacterControllerSlideData import *
 from entgen.ComponentGD import *
 from entgen.HeadCollisionBehaviorData import *
+from entgen.HitWallData import *
 from entgen.ImmersedBehaviorData import *
 from entgen.InputCollisionBehaviorData import *
 from entgen.MeshNavigationBehaviorData import *
@@ -48,6 +49,9 @@ class CharacterControllerGD(HelperObject):
     @property
     def HeadCollisionData(self):  # type: ()->HeadCollisionBehaviorData
         return HeadCollisionBehaviorData(self._node.at("HeadCollisionData"))
+    @property
+    def HitWallData(self):  # type: ()->HitWallData
+        return HitWallData(self._node.at("HitWallData"))
     @property
     def ImmersedData(self):  # type: ()->ImmersedBehaviorData
         return ImmersedBehaviorData(self._node.at("ImmersedData"))

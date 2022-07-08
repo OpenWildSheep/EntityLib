@@ -191,7 +191,7 @@ namespace Ent
             struct What;
 
             template <typename V>
-            Array<T>& operator=(V const& rho)
+            PrimArray<T>& operator=(V const& rho)
             {
                 ENT_IF_COMPILE(V, arr, std::get<0>(arr)) // tuple, c-style array and std::array
                 {
@@ -542,7 +542,12 @@ namespace Ent
                 }
                 else if constexpr (std::is_same_v<T, char const*>)
                 {
-                    return iterator{getProperty(), getProperty().getPrimSetKeysString(), 0};
+                    std::vector<T> strings;
+                    for (auto&& str : getProperty().getPrimSetKeysString())
+                    {
+                        strings.push_back(str);
+                    }
+                    return iterator{getProperty(), std::move(strings), 0};
                 }
                 else
                 {

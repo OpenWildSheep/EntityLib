@@ -7,6 +7,7 @@ import EntityLibPy
 from entgen.String import *
 from entgen.ComponentGD import *
 from entgen.Float import *
+from entgen.GraspResistanceData import *
 from entgen.GrasperInteractionData import *
 from entgen.GraspType import *
 
@@ -48,6 +49,9 @@ class GrasperGD(HelperObject):
         return Float(self._node.at("jumpRiseMinCoeffToEnter"))
     @jumpRiseMinCoeffToEnter.setter
     def jumpRiseMinCoeffToEnter(self, val): self.jumpRiseMinCoeffToEnter.set(val)
+    @property
+    def resistanceData(self):  # type: ()->GraspResistanceData
+        return GraspResistanceData(self._node.at("resistanceData"))
     @property
     def sensorHotspotName(self):  # type: ()->String
         return String(self._node.at("sensorHotspotName"))

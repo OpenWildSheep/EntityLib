@@ -10,8 +10,10 @@ from entgen.CharacterControllerClamberData import *
 from entgen.CharacterControllerFallData import *
 from entgen.CharacterControllerGroundNormalData import *
 from entgen.CharacterControllerSlideData import *
+from entgen.ClimbEdgeData import *
 from entgen.ComponentGD import *
 from entgen.HeadCollisionBehaviorData import *
+from entgen.HitWallData import *
 from entgen.ImmersedBehaviorData import *
 from entgen.InputCollisionBehaviorData import *
 from entgen.MeshNavigationBehaviorData import *
@@ -49,6 +51,9 @@ class CharacterControllerGD(HelperObject):
     def HeadCollisionData(self):  # type: ()->HeadCollisionBehaviorData
         return HeadCollisionBehaviorData(self._node.at("HeadCollisionData"))
     @property
+    def HitWallData(self):  # type: ()->HitWallData
+        return HitWallData(self._node.at("HitWallData"))
+    @property
     def ImmersedData(self):  # type: ()->ImmersedBehaviorData
         return ImmersedBehaviorData(self._node.at("ImmersedData"))
     @property
@@ -76,6 +81,9 @@ class CharacterControllerGD(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    @property
+    def climbEdgeData(self):  # type: ()->ClimbEdgeData
+        return ClimbEdgeData(self._node.at("climbEdgeData"))
     @property
     def moveCapacityData(self):  # type: ()->MoveCapacityData
         return MoveCapacityData(self._node.at("moveCapacityData"))

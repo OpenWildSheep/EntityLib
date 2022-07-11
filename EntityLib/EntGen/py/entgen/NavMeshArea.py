@@ -11,6 +11,7 @@ class NavMeshAreaEnum(Enum):
     Ground = "Ground"
     ShallowWater = "ShallowWater"
     DeepWater = "DeepWater"
+    Beach = "Beach"
     Special = "Special"
     NavMeshArea_COUNT = "NavMeshArea_COUNT"
 

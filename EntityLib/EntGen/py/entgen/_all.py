@@ -59,6 +59,7 @@ from .SpeedModeMax import *
 from .SpeedFastMinDuration import *
 from .Specie import *
 from .SpawningParameter import *
+from .SoundOpportunityRangeDescription import *
 from .SoundOcclusionData import *
 from .SoundManager_BiomeSoundBank import *
 from .SoundEventMapping import *
@@ -151,11 +152,8 @@ from .OutfitPiece import *
 from .Orientation import *
 from .Online import *
 from .Object_MaxActivationLevel import *
-from .NavmeshGenerationParameters import *
-from .NavMeshTile import *
 from .NavMeshTag import *
 from .NavMeshCapability import *
-from .NavMesh import *
 from .MusicCategory import *
 from .MoveCapacityData_OrientationSpeed import *
 from .MountableSnapLine_ControlPoint import *
@@ -178,7 +176,6 @@ from .Manager import *
 from .WorldManager import *
 from .WaveManager import *
 from .WaterManager import *
-from .VoxelSimulationManager import *
 from .VisualManager import *
 from .VegetationManager import *
 from .TrailManager import *
@@ -193,7 +190,6 @@ from .SceneManager import *
 from .ResourceDebugger import *
 from .ReloadManager import *
 from .RegionManager import *
-from .RecastPathFindManager import *
 from .RPCServerManager import *
 from .RPCMarshallingTests import *
 from .QualityManager import *
@@ -248,10 +244,10 @@ from .PhysicsReplicateData import *
 from .HotSpotType import *
 from .PickableDistributorComponentData import *
 from .HotspotData import *
+from .HitWallEnvironmentData import *
+from .HitWallData import *
 from .HitType import *
 from .HitStyle import *
-from .HeightGrid import *
-from .NavMeshSet import *
 from .HeadCollisionBehaviorData import *
 from .GrowingState import *
 from .GroupAvoidanceEnum import *
@@ -264,9 +260,6 @@ from .GraspResistanceData import *
 from .GeometryStamper import *
 from .SkinnedPhysMeshStamper import *
 from .MeshStamper import *
-from .Game_VoxelsPile import *
-from .Game_VoxelsColumn import *
-from .Game_VoxelsVolume import *
 from .GameTimeInMs import *
 from .GameProfile import *
 from .GameSoftCollisionData import *
@@ -402,7 +395,6 @@ from .AttackTriggerComponentInput import *
 from .AttackComponentInput import *
 from .AnimationTransformDriverComponentInput import *
 from .ComponentGD import *
-from .WorldScalePathFindGD import *
 from .WildObject import *
 from .WallRunGD import *
 from .VoxelSimulationGD import *
@@ -423,12 +415,15 @@ from .TerrainSurfaceObject import *
 from .TerrainGD import *
 from .TeamGD import *
 from .SystemicCreature import *
+from .StreamingLocatorGD import *
+from .StreamableUnitGD import *
 from .StickToTerrain import *
 from .StaticObjectGD import *
 from .StaffVertebrasGD import *
 from .SpiritAnimalsHolderGD import *
 from .SpiritAnimalShrineGD import *
 from .SpiritAnimalGD import *
+from .SoundOpportunityComponentGD import *
 from .SoundEmitterGD import *
 from .SoundAreaGD import *
 from .SoulRespawnOpportunityGD import *
@@ -468,7 +463,6 @@ from .NotVisibleInSubscene import *
 from .NetworkNode import *
 from .NetworkLink import *
 from .NetGD import *
-from .NavMeshRasterizerGD import *
 from .NavMeshActivatorGD import *
 from .MultiThumbnail import *
 from .MounterGD import *
@@ -500,8 +494,6 @@ from .GameEffectSpawnerGD import *
 from .FurComponentGD import *
 from .FluidVolumeComponentGD import *
 from .FluidViewGD import *
-from .FluidToRegenInjectorGD import *
-from .FluidNavMeshTaggerGD import *
 from .FluidGD import *
 from .FluidFXEntitySpawnerGD import *
 from .FireSensorGD import *
@@ -509,9 +501,7 @@ from .EventTriggerGD import *
 from .EventHandlerGD import *
 from .EnvStampGD import *
 from .EnergySpoutGD import *
-from .EnergySourceGD import *
 from .EnergySideSwitcherGD import *
-from .EnergyPoolTaggerGD import *
 from .EnergyPoolGD import *
 from .EnergyNetworkListenerGD import *
 from .EnergyDrainGD import *
@@ -562,6 +552,8 @@ from .Collider import *
 from .Codec import *
 from .Zlib import *
 from .Lz4Fast import *
+from .ClimbEdgeData_LedgeData import *
+from .ClimbEdgeData import *
 from .ClassMemberRef import *
 from .ComponentSignalRef import *
 from .ComponentMethodRef import *
@@ -695,7 +687,6 @@ from .EntityStateWallRunJump import *
 from .EntityStateWallRunDrop import *
 from .EntityStateWallRun import *
 from .EntityStateWaitToJumpAgain import *
-from .EntityStateVoxelsVolume import *
 from .EntityStateUseAsActiveCheckpoint import *
 from .EntityStateUndergroundCavity import *
 from .EntityStateTryUnmount import *
@@ -747,7 +738,9 @@ from .EntityStatePhysicsIdle import *
 from .EntityStateParryCooldown import *
 from .EntityStateParry import *
 from .EntityStateParried import *
+from .EntityStateOrientedDrift import *
 from .EntityStateOrderingAttack import *
+from .EntityStateMoveOnOffMeshLink import *
 from .EntityStateMotionConstrainedLand import *
 from .EntityStateMotionConstrained import *
 from .EntityStateMineScaling import *
@@ -766,6 +759,7 @@ from .EntityStateIncapacitated import *
 from .EntityStateInVertebraeArea import *
 from .EntityStateImmersedJump import *
 from .EntityStateHoldingStaffVertebras import *
+from .EntityStateHitWall import *
 from .EntityStateHintNone import *
 from .EntityStateHintLight import *
 from .EntityStateHintFull import *
@@ -828,6 +822,7 @@ from .EntityStateBreakableBreaking import *
 from .EntityStateBounceLand import *
 from .EntityStateBounce import *
 from .EntityStateBoidsHomePos import *
+from .EntityStateBittenDefense import *
 from .EntityStateBitten import *
 from .EntityStateBiteOut import *
 from .EntityStateBiteIn import *
@@ -842,7 +837,6 @@ from .EntityStateBackwardLand import *
 from .EntityStateBackwardDodge import *
 from .EntityStateAttitudeGroggy import *
 from .EntityStateAttackDive import *
-from .EntityStateAttackCharge import *
 from .EntityStateAskStaffGuide import *
 from .EntityStateApplyExtraLife import *
 from .EntityStateAirControl import *
@@ -859,8 +853,6 @@ from .ActorStateStopAttitudeAggressive import *
 from .ActorStateSpeedMultiplier import *
 from .ActorStateSoulWaitingToRespawn import *
 from .ActorStateSoulRespawn import *
-from .ActorStateSoulPathfindAndMove import *
-from .ActorStateSoulMove import *
 from .ActorStateSlope import *
 from .ActorStateSleeping import *
 from .ActorStateSkeletonPartPickUpState import *
@@ -872,8 +864,6 @@ from .ActorStateShamanItemPartState import *
 from .ActorStateShamanItemLiving import *
 from .ActorStateSendMission import *
 from .ActorStateScreaming import *
-from .ActorStateRespawnOnPossessGPE import *
-from .ActorStateRespawnOnMount import *
 from .ActorStateRequestingWaiting import *
 from .ActorStateRequestingHealing import *
 from .ActorStateRecover import *
@@ -902,14 +892,12 @@ from .ActorStateHasNoBody import *
 from .ActorStateForceAgainstSlope import *
 from .ActorStateFluidSlowDown import *
 from .ActorStateFlockingRigidbodyBeingActive import *
-from .ActorStateFlockingPathfindingAndMoving import *
 from .ActorStateFlockingLiving import *
 from .ActorStateFlockingIndividualSpawning import *
 from .ActorStateFlockingChangingParams import *
 from .ActorStateFlockingAttackFlocking import *
 from .ActorStateExitingFly import *
 from .ActorStateEnergyShooting import *
-from .ActorStateEnergyProtected import *
 from .ActorStateDucking import *
 from .ActorStateDodge3D import *
 from .ActorStateDisabledOut import *
@@ -980,7 +968,6 @@ from .ActionMoveProjectile import *
 from .ActionMove import *
 from .ActionMountReception import *
 from .ActionLookAt import *
-from .ActionLevitate import *
 from .ActionLandingMount import *
 from .ActionLand import *
 from .ActionJumpOnto import *
@@ -994,7 +981,6 @@ from .ActionFlyFlap import *
 from .ActionFlyDown import *
 from .ActionFlyDive import *
 from .ActionFlyCrash import *
-from .ActionFloatToPosition import *
 from .ActionDrop import *
 from .ActionDrift import *
 from .ActionDrawWeaponState import *
@@ -1090,7 +1076,6 @@ from .AudioEventData import *
 from .BehaviorPesto import *
 from .CheatCodeReplication import *
 from .ClassRef import *
-from .ClimbData import *
 from .CloudsGenerator import *
 from .ConditionalRigidityAttribute_ActorStateName import *
 from .ContactActor import *
@@ -1099,10 +1084,8 @@ from .EntityArchive_MetaData import *
 from .EntityGD import *
 from .EntityGDRef import *
 from .FadeEffect import *
-from .FlyingPathParameters import *
 from .GRC import *
 from .GVoxelVolumeCollection import *
-from .Game_Voxel import *
 from .IMatchMakerApi import *
 from .IOnlineApi import *
 from .InputController import *

@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.AirControlData import *
 from entgen.Float import *
 from entgen.ScaleConverter import *
 
@@ -21,23 +22,21 @@ class CharacterControllerFallData(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def AirControlBrake(self):  # type: ()->Float
-        return Float(self._node.at("AirControlBrake"))
-    @AirControlBrake.setter
-    def AirControlBrake(self, val): self.AirControlBrake.set(val)
+    def Acceleration(self):  # type: ()->Float
+        return Float(self._node.at("Acceleration"))
+    @Acceleration.setter
+    def Acceleration(self, val): self.Acceleration.set(val)
     @property
-    def AirControlSmooth(self):  # type: ()->Float
-        return Float(self._node.at("AirControlSmooth"))
-    @AirControlSmooth.setter
-    def AirControlSmooth(self, val): self.AirControlSmooth.set(val)
-    @property
-    def AirControlSpeed(self):  # type: ()->Float
-        return Float(self._node.at("AirControlSpeed"))
-    @AirControlSpeed.setter
-    def AirControlSpeed(self, val): self.AirControlSpeed.set(val)
+    def AirControlData(self):  # type: ()->AirControlData
+        return AirControlData(self._node.at("AirControlData"))
     @property
     def DamagesPerHeightFall(self):  # type: ()->ScaleConverter
         return ScaleConverter(self._node.at("DamagesPerHeightFall"))
+    @property
+    def Friction(self):  # type: ()->Float
+        return Float(self._node.at("Friction"))
+    @Friction.setter
+    def Friction(self, val): self.Friction.set(val)
     @property
     def MinHeightForDamageFall(self):  # type: ()->Float
         return Float(self._node.at("MinHeightForDamageFall"))

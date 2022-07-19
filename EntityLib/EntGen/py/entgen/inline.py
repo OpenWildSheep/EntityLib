@@ -1838,6 +1838,11 @@ class SoundOpportunityRangeDescription(HelperObject):
     @ChunkSize.setter
     def ChunkSize(self, val): self.ChunkSize.set(val)
     @property
+    def EDITOR_SelectionProbabilityFactor(self):  # type: ()->Float
+        return Float(self._node.at("EDITOR_SelectionProbabilityFactor"))
+    @EDITOR_SelectionProbabilityFactor.setter
+    def EDITOR_SelectionProbabilityFactor(self, val): self.EDITOR_SelectionProbabilityFactor.set(val)
+    @property
     def MaxDistance(self):  # type: ()->Float
         return Float(self._node.at("MaxDistance"))
     @MaxDistance.setter
@@ -3730,6 +3735,11 @@ class ReflectedDetailMaterialVariants(HelperObject):
         return String(self._node.at("Name"))
     @Name.setter
     def Name(self, val): self.Name.set(val)
+    @property
+    def PhysicsMaterialName(self):  # type: ()->String
+        return String(self._node.at("PhysicsMaterialName"))
+    @PhysicsMaterialName.setter
+    def PhysicsMaterialName(self, val): self.PhysicsMaterialName.set(val)
     @property
     def Variants(self):  # type: ()->Map[str, ReflectedDetailMaterial]
         return (lambda n: Map(str, ReflectedDetailMaterial, n))(self._node.at("Variants"))
@@ -9438,49 +9448,6 @@ class GameFeetCatchUpData(HelperObject):
 
 from EntityLibPy import Node
 
-class GameFallData(HelperObject):
-    schema_name = "GameFallData"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->GameFallData
-        return GameFallData(entlib.load_node_file(sourcefile, entlib.get_schema(GameFallData.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->GameFallData
-        return GameFallData(entlib.make_node(GameFallData.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def Acceleration(self):  # type: ()->Float
-        return Float(self._node.at("Acceleration"))
-    @Acceleration.setter
-    def Acceleration(self, val): self.Acceleration.set(val)
-    @property
-    def AirControlBrakeAngleMin(self):  # type: ()->Float
-        return Float(self._node.at("AirControlBrakeAngleMin"))
-    @AirControlBrakeAngleMin.setter
-    def AirControlBrakeAngleMin(self, val): self.AirControlBrakeAngleMin.set(val)
-    @property
-    def AirControlDirection(self):  # type: ()->ScaleConverter
-        return ScaleConverter(self._node.at("AirControlDirection"))
-    @property
-    def AirControlSpeedAngleMax(self):  # type: ()->Float
-        return Float(self._node.at("AirControlSpeedAngleMax"))
-    @AirControlSpeedAngleMax.setter
-    def AirControlSpeedAngleMax(self, val): self.AirControlSpeedAngleMax.set(val)
-    @property
-    def Friction(self):  # type: ()->Float
-        return Float(self._node.at("Friction"))
-    @Friction.setter
-    def Friction(self, val): self.Friction.set(val)
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
 class GameEdgeData(HelperObject):
     schema_name = "GameEdgeData"
     @staticmethod
@@ -14818,6 +14785,11 @@ class SoundOpportunityComponentGD(HelperObject):
         return SoundOpportunityComponentGD(entlib.make_node(SoundOpportunityComponentGD.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def EDITOR_FilterTag(self):  # type: ()->String
+        return String(self._node.at("EDITOR_FilterTag"))
+    @EDITOR_FilterTag.setter
+    def EDITOR_FilterTag(self, val): self.EDITOR_FilterTag.set(val)
     @property
     def RangeDescriptions(self):  # type: ()->Array[SoundOpportunityRangeDescription]
         return (lambda n: Array(SoundOpportunityRangeDescription, n))(self._node.at("RangeDescriptions"))
@@ -21369,59 +21341,6 @@ class CharacterControllerGroundNormalData(HelperObject):
 
 from EntityLibPy import Node
 
-class CharacterControllerFallData(HelperObject):
-    schema_name = "CharacterControllerFallData"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->CharacterControllerFallData
-        return CharacterControllerFallData(entlib.load_node_file(sourcefile, entlib.get_schema(CharacterControllerFallData.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->CharacterControllerFallData
-        return CharacterControllerFallData(entlib.make_node(CharacterControllerFallData.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def AirControlBrake(self):  # type: ()->Float
-        return Float(self._node.at("AirControlBrake"))
-    @AirControlBrake.setter
-    def AirControlBrake(self, val): self.AirControlBrake.set(val)
-    @property
-    def AirControlSmooth(self):  # type: ()->Float
-        return Float(self._node.at("AirControlSmooth"))
-    @AirControlSmooth.setter
-    def AirControlSmooth(self, val): self.AirControlSmooth.set(val)
-    @property
-    def AirControlSpeed(self):  # type: ()->Float
-        return Float(self._node.at("AirControlSpeed"))
-    @AirControlSpeed.setter
-    def AirControlSpeed(self, val): self.AirControlSpeed.set(val)
-    @property
-    def DamagesPerHeightFall(self):  # type: ()->ScaleConverter
-        return ScaleConverter(self._node.at("DamagesPerHeightFall"))
-    @property
-    def MinHeightForDamageFall(self):  # type: ()->Float
-        return Float(self._node.at("MinHeightForDamageFall"))
-    @MinHeightForDamageFall.setter
-    def MinHeightForDamageFall(self, val): self.MinHeightForDamageFall.set(val)
-    @property
-    def MinHeightForDeathFall(self):  # type: ()->Float
-        return Float(self._node.at("MinHeightForDeathFall"))
-    @MinHeightForDeathFall.setter
-    def MinHeightForDeathFall(self, val): self.MinHeightForDeathFall.set(val)
-    @property
-    def MinHeightForRecoveryFall(self):  # type: ()->Float
-        return Float(self._node.at("MinHeightForRecoveryFall"))
-    @MinHeightForRecoveryFall.setter
-    def MinHeightForRecoveryFall(self, val): self.MinHeightForRecoveryFall.set(val)
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
 class CharacterControllerClamberData(HelperObject):
     schema_name = "CharacterControllerClamberData"
     @staticmethod
@@ -23489,9 +23408,6 @@ class GameManager(HelperObject):
     @EnableSplashScreen.setter
     def EnableSplashScreen(self, val): self.EnableSplashScreen.set(val)
     @property
-    def FallData(self):  # type: ()->GameFallData
-        return GameFallData(self._node.at("FallData"))
-    @property
     def FeetCatchUpData(self):  # type: ()->GameFeetCatchUpData
         return GameFeetCatchUpData(self._node.at("FeetCatchUpData"))
     @property
@@ -24832,75 +24748,6 @@ class MoveCapacityData(HelperObject):
 
 from EntityLibPy import Node
 
-class CharacterControllerGD(HelperObject):
-    schema_name = "CharacterControllerGD"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->CharacterControllerGD
-        return CharacterControllerGD(entlib.load_node_file(sourcefile, entlib.get_schema(CharacterControllerGD.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->CharacterControllerGD
-        return CharacterControllerGD(entlib.make_node(CharacterControllerGD.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def AllowHeightMapFallback(self):  # type: ()->Bool
-        return Bool(self._node.at("AllowHeightMapFallback"))
-    @AllowHeightMapFallback.setter
-    def AllowHeightMapFallback(self, val): self.AllowHeightMapFallback.set(val)
-    @property
-    def ClamberData(self):  # type: ()->CharacterControllerClamberData
-        return CharacterControllerClamberData(self._node.at("ClamberData"))
-    @property
-    def FallData(self):  # type: ()->CharacterControllerFallData
-        return CharacterControllerFallData(self._node.at("FallData"))
-    @property
-    def GroundNormalData(self):  # type: ()->CharacterControllerGroundNormalData
-        return CharacterControllerGroundNormalData(self._node.at("GroundNormalData"))
-    @property
-    def HeadCollisionData(self):  # type: ()->HeadCollisionBehaviorData
-        return HeadCollisionBehaviorData(self._node.at("HeadCollisionData"))
-    @property
-    def HitWallData(self):  # type: ()->HitWallData
-        return HitWallData(self._node.at("HitWallData"))
-    @property
-    def ImmersedData(self):  # type: ()->ImmersedBehaviorData
-        return ImmersedBehaviorData(self._node.at("ImmersedData"))
-    @property
-    def InputCollisionData(self):  # type: ()->InputCollisionBehaviorData
-        return InputCollisionBehaviorData(self._node.at("InputCollisionData"))
-    @property
-    def MeshNavigationData(self):  # type: ()->MeshNavigationBehaviorData
-        return MeshNavigationBehaviorData(self._node.at("MeshNavigationData"))
-    @property
-    def PredictionData(self):  # type: ()->PredictionBehaviorData
-        return PredictionBehaviorData(self._node.at("PredictionData"))
-    @property
-    def RotationSmooth(self):  # type: ()->Vector3
-        return Vector3(self._node.at("RotationSmooth"))
-    @RotationSmooth.setter
-    def RotationSmooth(self, val): self.RotationSmooth.set(val)
-    @property
-    def SlideData(self):  # type: ()->CharacterControllerSlideData
-        return CharacterControllerSlideData(self._node.at("SlideData"))
-    @property
-    def Super(self):  # type: ()->ComponentGD
-        return ComponentGD(self._node.at("Super"))
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    @property
-    def climbEdgeData(self):  # type: ()->ClimbEdgeData
-        return ClimbEdgeData(self._node.at("climbEdgeData"))
-    @property
-    def moveCapacityData(self):  # type: ()->MoveCapacityData
-        return MoveCapacityData(self._node.at("moveCapacityData"))
-    pass
-
-
-from EntityLibPy import Node
-
 class DirectionSync(HelperObject):
     schema_name = "DirectionSync"
     @staticmethod
@@ -25385,6 +25232,174 @@ class AnalyticsManager(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class AirControlData(HelperObject):
+    schema_name = "AirControlData"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->AirControlData
+        return AirControlData(entlib.load_node_file(sourcefile, entlib.get_schema(AirControlData.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->AirControlData
+        return AirControlData(entlib.make_node(AirControlData.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def AirControlBrake(self):  # type: ()->Float
+        return Float(self._node.at("AirControlBrake"))
+    @AirControlBrake.setter
+    def AirControlBrake(self, val): self.AirControlBrake.set(val)
+    @property
+    def AirControlBrakeAngleMin(self):  # type: ()->Float
+        return Float(self._node.at("AirControlBrakeAngleMin"))
+    @AirControlBrakeAngleMin.setter
+    def AirControlBrakeAngleMin(self, val): self.AirControlBrakeAngleMin.set(val)
+    @property
+    def AirControlDirection(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("AirControlDirection"))
+    @property
+    def AirControlSmooth(self):  # type: ()->Float
+        return Float(self._node.at("AirControlSmooth"))
+    @AirControlSmooth.setter
+    def AirControlSmooth(self, val): self.AirControlSmooth.set(val)
+    @property
+    def AirControlSpeed(self):  # type: ()->Float
+        return Float(self._node.at("AirControlSpeed"))
+    @AirControlSpeed.setter
+    def AirControlSpeed(self, val): self.AirControlSpeed.set(val)
+    @property
+    def AirControlSpeedAngleMax(self):  # type: ()->Float
+        return Float(self._node.at("AirControlSpeedAngleMax"))
+    @AirControlSpeedAngleMax.setter
+    def AirControlSpeedAngleMax(self, val): self.AirControlSpeedAngleMax.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class CharacterControllerFallData(HelperObject):
+    schema_name = "CharacterControllerFallData"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->CharacterControllerFallData
+        return CharacterControllerFallData(entlib.load_node_file(sourcefile, entlib.get_schema(CharacterControllerFallData.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->CharacterControllerFallData
+        return CharacterControllerFallData(entlib.make_node(CharacterControllerFallData.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Acceleration(self):  # type: ()->Float
+        return Float(self._node.at("Acceleration"))
+    @Acceleration.setter
+    def Acceleration(self, val): self.Acceleration.set(val)
+    @property
+    def AirControlData(self):  # type: ()->AirControlData
+        return AirControlData(self._node.at("AirControlData"))
+    @property
+    def DamagesPerHeightFall(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("DamagesPerHeightFall"))
+    @property
+    def Friction(self):  # type: ()->Float
+        return Float(self._node.at("Friction"))
+    @Friction.setter
+    def Friction(self, val): self.Friction.set(val)
+    @property
+    def MinHeightForDamageFall(self):  # type: ()->Float
+        return Float(self._node.at("MinHeightForDamageFall"))
+    @MinHeightForDamageFall.setter
+    def MinHeightForDamageFall(self, val): self.MinHeightForDamageFall.set(val)
+    @property
+    def MinHeightForDeathFall(self):  # type: ()->Float
+        return Float(self._node.at("MinHeightForDeathFall"))
+    @MinHeightForDeathFall.setter
+    def MinHeightForDeathFall(self, val): self.MinHeightForDeathFall.set(val)
+    @property
+    def MinHeightForRecoveryFall(self):  # type: ()->Float
+        return Float(self._node.at("MinHeightForRecoveryFall"))
+    @MinHeightForRecoveryFall.setter
+    def MinHeightForRecoveryFall(self, val): self.MinHeightForRecoveryFall.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class CharacterControllerGD(HelperObject):
+    schema_name = "CharacterControllerGD"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->CharacterControllerGD
+        return CharacterControllerGD(entlib.load_node_file(sourcefile, entlib.get_schema(CharacterControllerGD.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->CharacterControllerGD
+        return CharacterControllerGD(entlib.make_node(CharacterControllerGD.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def AllowHeightMapFallback(self):  # type: ()->Bool
+        return Bool(self._node.at("AllowHeightMapFallback"))
+    @AllowHeightMapFallback.setter
+    def AllowHeightMapFallback(self, val): self.AllowHeightMapFallback.set(val)
+    @property
+    def ClamberData(self):  # type: ()->CharacterControllerClamberData
+        return CharacterControllerClamberData(self._node.at("ClamberData"))
+    @property
+    def FallData(self):  # type: ()->CharacterControllerFallData
+        return CharacterControllerFallData(self._node.at("FallData"))
+    @property
+    def GroundNormalData(self):  # type: ()->CharacterControllerGroundNormalData
+        return CharacterControllerGroundNormalData(self._node.at("GroundNormalData"))
+    @property
+    def HeadCollisionData(self):  # type: ()->HeadCollisionBehaviorData
+        return HeadCollisionBehaviorData(self._node.at("HeadCollisionData"))
+    @property
+    def HitWallData(self):  # type: ()->HitWallData
+        return HitWallData(self._node.at("HitWallData"))
+    @property
+    def ImmersedData(self):  # type: ()->ImmersedBehaviorData
+        return ImmersedBehaviorData(self._node.at("ImmersedData"))
+    @property
+    def InputCollisionData(self):  # type: ()->InputCollisionBehaviorData
+        return InputCollisionBehaviorData(self._node.at("InputCollisionData"))
+    @property
+    def MeshNavigationData(self):  # type: ()->MeshNavigationBehaviorData
+        return MeshNavigationBehaviorData(self._node.at("MeshNavigationData"))
+    @property
+    def PredictionData(self):  # type: ()->PredictionBehaviorData
+        return PredictionBehaviorData(self._node.at("PredictionData"))
+    @property
+    def RotationSmooth(self):  # type: ()->Vector3
+        return Vector3(self._node.at("RotationSmooth"))
+    @RotationSmooth.setter
+    def RotationSmooth(self, val): self.RotationSmooth.set(val)
+    @property
+    def SlideData(self):  # type: ()->CharacterControllerSlideData
+        return CharacterControllerSlideData(self._node.at("SlideData"))
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def climbEdgeData(self):  # type: ()->ClimbEdgeData
+        return ClimbEdgeData(self._node.at("climbEdgeData"))
+    @property
+    def moveCapacityData(self):  # type: ()->MoveCapacityData
+        return MoveCapacityData(self._node.at("moveCapacityData"))
     pass
 
 

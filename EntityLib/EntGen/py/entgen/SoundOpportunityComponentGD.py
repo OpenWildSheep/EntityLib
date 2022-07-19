@@ -21,6 +21,11 @@ class SoundOpportunityComponentGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def EDITOR_FilterTag(self):  # type: ()->String
+        return String(self._node.at("EDITOR_FilterTag"))
+    @EDITOR_FilterTag.setter
+    def EDITOR_FilterTag(self, val): self.EDITOR_FilterTag.set(val)
+    @property
     def RangeDescriptions(self):  # type: ()->Array[SoundOpportunityRangeDescription]
         return (lambda n: Array(SoundOpportunityRangeDescription, n))(self._node.at("RangeDescriptions"))
     @property

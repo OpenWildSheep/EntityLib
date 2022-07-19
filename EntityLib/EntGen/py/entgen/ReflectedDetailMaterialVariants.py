@@ -26,6 +26,11 @@ class ReflectedDetailMaterialVariants(HelperObject):
     @Name.setter
     def Name(self, val): self.Name.set(val)
     @property
+    def PhysicsMaterialName(self):  # type: ()->String
+        return String(self._node.at("PhysicsMaterialName"))
+    @PhysicsMaterialName.setter
+    def PhysicsMaterialName(self, val): self.PhysicsMaterialName.set(val)
+    @property
     def Variants(self):  # type: ()->Map[str, ReflectedDetailMaterial]
         return (lambda n: Map(str, ReflectedDetailMaterial, n))(self._node.at("Variants"))
     @property

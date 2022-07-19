@@ -728,7 +728,6 @@ namespace Ent
         struct GameFluidData_HeightThreshold;
         struct GameFluidData;
         struct GameFeetCatchUpData;
-        struct GameFallData;
         struct GameEdgeData;
         struct GameDeathData;
         struct GameClockManager_TimeOfDay;
@@ -1065,7 +1064,6 @@ namespace Ent
         struct CineEventTestCurrentGameState;
         struct CharacterControllerSlideData;
         struct CharacterControllerGroundNormalData;
-        struct CharacterControllerFallData;
         struct CharacterControllerClamberData;
         struct CarryMode; // enum
         enum class CarryModeEnum
@@ -1308,7 +1306,6 @@ namespace Ent
         struct MoveCapacityData_AnimTagTimelineTransitionItem;
         struct MoveCapacityData_AnimTagTimelineTransitionTable;
         struct MoveCapacityData;
-        struct CharacterControllerGD;
         struct DirectionSync;
         struct DirectionSyncData;
         struct AnimationManager;
@@ -1360,6 +1357,9 @@ namespace Ent
         struct strongAttackData;
         struct AnalyticsManager_MongoDBConnection;
         struct AnalyticsManager;
+        struct AirControlData;
+        struct CharacterControllerFallData;
+        struct CharacterControllerGD;
         struct AerialAttackData;
         struct AttackComponentGD_AerialAttackData;
         struct AttackComponentGD;
@@ -3578,6 +3578,7 @@ namespace Ent
                 return SoundOpportunityRangeDescription(getProperty().makeInstanceOf());
             }
             Ent::Gen2::Float ChunkSize() const;
+            Ent::Gen2::Float EDITOR_SelectionProbabilityFactor() const;
             Ent::Gen2::Float MaxDistance() const;
             Ent::Gen2::String PCloudPath() const;
             Ent::Gen2::String _comment() const;
@@ -5858,6 +5859,7 @@ namespace Ent
                 return ReflectedDetailMaterialVariants(getProperty().makeInstanceOf());
             }
             Ent::Gen2::String Name() const;
+            Ent::Gen2::String PhysicsMaterialName() const;
             Ent::Gen2::Map<char const*, Ent::Gen2::ReflectedDetailMaterial> Variants() const;
             Ent::Gen2::String _comment() const;
         };
@@ -10518,38 +10520,6 @@ namespace Ent
             Ent::Gen2::Map<SizeEnum, Ent::Gen2::Bool> useHeightmapPerSize() const;
         };
 
-        struct GameFallData : HelperObject<GameFallData> // Object
-        {
-            explicit GameFallData(Ent::Property _node): HelperObject<GameFallData>(std::move(_node)) {}
-            static constexpr char schemaName[] = "GameFallData";
-            static GameFallData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return GameFallData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static GameFallData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return GameFallData(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static GameFallData create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return GameFallData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            GameFallData makeInstanceOf()
-            {
-                return GameFallData(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::Float Acceleration() const;
-            Ent::Gen2::Float AirControlBrakeAngleMin() const;
-            Ent::Gen2::ScaleConverter AirControlDirection() const;
-            Ent::Gen2::Float AirControlSpeedAngleMax() const;
-            Ent::Gen2::Float Friction() const;
-            Ent::Gen2::String _comment() const;
-        };
-
         struct GameEdgeData : HelperObject<GameEdgeData> // Object
         {
             explicit GameEdgeData(Ent::Property _node): HelperObject<GameEdgeData>(std::move(_node)) {}
@@ -14595,6 +14565,7 @@ namespace Ent
             {
                 return SoundOpportunityComponentGD(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::String EDITOR_FilterTag() const;
             Array<Ent::Gen2::SoundOpportunityRangeDescription> RangeDescriptions() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::String _comment() const;
@@ -20787,40 +20758,6 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
-        struct CharacterControllerFallData : HelperObject<CharacterControllerFallData> // Object
-        {
-            explicit CharacterControllerFallData(Ent::Property _node): HelperObject<CharacterControllerFallData>(std::move(_node)) {}
-            static constexpr char schemaName[] = "CharacterControllerFallData";
-            static CharacterControllerFallData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return CharacterControllerFallData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static CharacterControllerFallData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return CharacterControllerFallData(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static CharacterControllerFallData create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return CharacterControllerFallData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            CharacterControllerFallData makeInstanceOf()
-            {
-                return CharacterControllerFallData(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::Float AirControlBrake() const;
-            Ent::Gen2::Float AirControlSmooth() const;
-            Ent::Gen2::Float AirControlSpeed() const;
-            Ent::Gen2::ScaleConverter DamagesPerHeightFall() const;
-            Ent::Gen2::Float MinHeightForDamageFall() const;
-            Ent::Gen2::Float MinHeightForDeathFall() const;
-            Ent::Gen2::Float MinHeightForRecoveryFall() const;
-            Ent::Gen2::String _comment() const;
-        };
-
         struct CharacterControllerClamberData : HelperObject<CharacterControllerClamberData> // Object
         {
             explicit CharacterControllerClamberData(Ent::Property _node): HelperObject<CharacterControllerClamberData>(std::move(_node)) {}
@@ -22418,7 +22355,6 @@ namespace Ent
             Ent::Gen2::Int DefaultGamePadID() const;
             Ent::Gen2::GameEdgeData EdgeData() const;
             Ent::Gen2::Bool EnableSplashScreen() const;
-            Ent::Gen2::GameFallData FallData() const;
             Ent::Gen2::GameFeetCatchUpData FeetCatchUpData() const;
             Ent::Gen2::GameFluidData FluidData() const;
             Ent::Gen2::GameFlyData FlyData() const;
@@ -23198,48 +23134,6 @@ namespace Ent
             Ent::Gen2::Float turnRotationMinRatioToFinish() const;
         };
 
-        struct CharacterControllerGD : HelperObject<CharacterControllerGD> // Object
-        {
-            explicit CharacterControllerGD(Ent::Property _node): HelperObject<CharacterControllerGD>(std::move(_node)) {}
-            static constexpr char schemaName[] = "CharacterControllerGD";
-            static CharacterControllerGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return CharacterControllerGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static CharacterControllerGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return CharacterControllerGD(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static CharacterControllerGD create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return CharacterControllerGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            CharacterControllerGD makeInstanceOf()
-            {
-                return CharacterControllerGD(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::Bool AllowHeightMapFallback() const;
-            Ent::Gen2::CharacterControllerClamberData ClamberData() const;
-            Ent::Gen2::CharacterControllerFallData FallData() const;
-            Ent::Gen2::CharacterControllerGroundNormalData GroundNormalData() const;
-            Ent::Gen2::HeadCollisionBehaviorData HeadCollisionData() const;
-            Ent::Gen2::HitWallData HitWallData() const;
-            Ent::Gen2::ImmersedBehaviorData ImmersedData() const;
-            Ent::Gen2::InputCollisionBehaviorData InputCollisionData() const;
-            Ent::Gen2::MeshNavigationBehaviorData MeshNavigationData() const;
-            Ent::Gen2::PredictionBehaviorData PredictionData() const;
-            Ent::Gen2::Vector3 RotationSmooth() const;
-            Ent::Gen2::CharacterControllerSlideData SlideData() const;
-            Ent::Gen2::ComponentGD Super() const;
-            Ent::Gen2::String _comment() const;
-            Ent::Gen2::ClimbEdgeData climbEdgeData() const;
-            Ent::Gen2::MoveCapacityData moveCapacityData() const;
-        };
-
         struct DirectionSync : HelperObject<DirectionSync> // Object
         {
             explicit DirectionSync(Ent::Property _node): HelperObject<DirectionSync>(std::move(_node)) {}
@@ -23626,6 +23520,115 @@ namespace Ent
             Ent::Gen2::Bool StartPaused() const;
             Ent::Gen2::Manager Super() const;
             Ent::Gen2::String _comment() const;
+        };
+
+        struct AirControlData : HelperObject<AirControlData> // Object
+        {
+            explicit AirControlData(Ent::Property _node): HelperObject<AirControlData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "AirControlData";
+            static AirControlData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return AirControlData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static AirControlData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return AirControlData(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static AirControlData create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return AirControlData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            AirControlData makeInstanceOf()
+            {
+                return AirControlData(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Float AirControlBrake() const;
+            Ent::Gen2::Float AirControlBrakeAngleMin() const;
+            Ent::Gen2::ScaleConverter AirControlDirection() const;
+            Ent::Gen2::Float AirControlSmooth() const;
+            Ent::Gen2::Float AirControlSpeed() const;
+            Ent::Gen2::Float AirControlSpeedAngleMax() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct CharacterControllerFallData : HelperObject<CharacterControllerFallData> // Object
+        {
+            explicit CharacterControllerFallData(Ent::Property _node): HelperObject<CharacterControllerFallData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "CharacterControllerFallData";
+            static CharacterControllerFallData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return CharacterControllerFallData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static CharacterControllerFallData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return CharacterControllerFallData(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static CharacterControllerFallData create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return CharacterControllerFallData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            CharacterControllerFallData makeInstanceOf()
+            {
+                return CharacterControllerFallData(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Float Acceleration() const;
+            Ent::Gen2::AirControlData AirControlData() const;
+            Ent::Gen2::ScaleConverter DamagesPerHeightFall() const;
+            Ent::Gen2::Float Friction() const;
+            Ent::Gen2::Float MinHeightForDamageFall() const;
+            Ent::Gen2::Float MinHeightForDeathFall() const;
+            Ent::Gen2::Float MinHeightForRecoveryFall() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct CharacterControllerGD : HelperObject<CharacterControllerGD> // Object
+        {
+            explicit CharacterControllerGD(Ent::Property _node): HelperObject<CharacterControllerGD>(std::move(_node)) {}
+            static constexpr char schemaName[] = "CharacterControllerGD";
+            static CharacterControllerGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return CharacterControllerGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static CharacterControllerGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return CharacterControllerGD(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static CharacterControllerGD create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return CharacterControllerGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            CharacterControllerGD makeInstanceOf()
+            {
+                return CharacterControllerGD(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Bool AllowHeightMapFallback() const;
+            Ent::Gen2::CharacterControllerClamberData ClamberData() const;
+            Ent::Gen2::CharacterControllerFallData FallData() const;
+            Ent::Gen2::CharacterControllerGroundNormalData GroundNormalData() const;
+            Ent::Gen2::HeadCollisionBehaviorData HeadCollisionData() const;
+            Ent::Gen2::HitWallData HitWallData() const;
+            Ent::Gen2::ImmersedBehaviorData ImmersedData() const;
+            Ent::Gen2::InputCollisionBehaviorData InputCollisionData() const;
+            Ent::Gen2::MeshNavigationBehaviorData MeshNavigationData() const;
+            Ent::Gen2::PredictionBehaviorData PredictionData() const;
+            Ent::Gen2::Vector3 RotationSmooth() const;
+            Ent::Gen2::CharacterControllerSlideData SlideData() const;
+            Ent::Gen2::ComponentGD Super() const;
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::ClimbEdgeData climbEdgeData() const;
+            Ent::Gen2::MoveCapacityData moveCapacityData() const;
         };
 
         struct AerialAttackData : HelperObject<AerialAttackData> // Object
@@ -39263,6 +39266,10 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("ChunkSize"));
         }
+        inline Ent::Gen2::Float SoundOpportunityRangeDescription::EDITOR_SelectionProbabilityFactor() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("EDITOR_SelectionProbabilityFactor"));
+        }
         inline Ent::Gen2::Float SoundOpportunityRangeDescription::MaxDistance() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("MaxDistance"));
@@ -44124,6 +44131,10 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("Name"));
         }
+        inline Ent::Gen2::String ReflectedDetailMaterialVariants::PhysicsMaterialName() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("PhysicsMaterialName"));
+        }
         inline Ent::Gen2::Map<char const*, Ent::Gen2::ReflectedDetailMaterial> ReflectedDetailMaterialVariants::Variants() const
         {
             return Ent::Gen2::Map<char const*, Ent::Gen2::ReflectedDetailMaterial>(getProperty().getObjectField("Variants"));
@@ -46996,31 +47007,6 @@ namespace Ent
         inline Ent::Gen2::Map<SizeEnum, Ent::Gen2::Bool> GameFeetCatchUpData::useHeightmapPerSize() const
         {
             return Ent::Gen2::Map<SizeEnum, Ent::Gen2::Bool>(getProperty().getObjectField("useHeightmapPerSize"));
-        }
-        // GameFallData
-        inline Ent::Gen2::Float GameFallData::Acceleration() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("Acceleration"));
-        }
-        inline Ent::Gen2::Float GameFallData::AirControlBrakeAngleMin() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("AirControlBrakeAngleMin"));
-        }
-        inline Ent::Gen2::ScaleConverter GameFallData::AirControlDirection() const
-        {
-            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("AirControlDirection"));
-        }
-        inline Ent::Gen2::Float GameFallData::AirControlSpeedAngleMax() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("AirControlSpeedAngleMax"));
-        }
-        inline Ent::Gen2::Float GameFallData::Friction() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("Friction"));
-        }
-        inline Ent::Gen2::String GameFallData::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // GameEdgeData
         inline Ent::Gen2::Float GameEdgeData::EdgeAngleMax() const
@@ -50092,6 +50078,10 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // SoundOpportunityComponentGD
+        inline Ent::Gen2::String SoundOpportunityComponentGD::EDITOR_FilterTag() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("EDITOR_FilterTag"));
+        }
         inline Array<Ent::Gen2::SoundOpportunityRangeDescription> SoundOpportunityComponentGD::RangeDescriptions() const
         {
             return Array<Ent::Gen2::SoundOpportunityRangeDescription>(getProperty().getObjectField("RangeDescriptions"));
@@ -59575,39 +59565,6 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
-        // CharacterControllerFallData
-        inline Ent::Gen2::Float CharacterControllerFallData::AirControlBrake() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("AirControlBrake"));
-        }
-        inline Ent::Gen2::Float CharacterControllerFallData::AirControlSmooth() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("AirControlSmooth"));
-        }
-        inline Ent::Gen2::Float CharacterControllerFallData::AirControlSpeed() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("AirControlSpeed"));
-        }
-        inline Ent::Gen2::ScaleConverter CharacterControllerFallData::DamagesPerHeightFall() const
-        {
-            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("DamagesPerHeightFall"));
-        }
-        inline Ent::Gen2::Float CharacterControllerFallData::MinHeightForDamageFall() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("MinHeightForDamageFall"));
-        }
-        inline Ent::Gen2::Float CharacterControllerFallData::MinHeightForDeathFall() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("MinHeightForDeathFall"));
-        }
-        inline Ent::Gen2::Float CharacterControllerFallData::MinHeightForRecoveryFall() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("MinHeightForRecoveryFall"));
-        }
-        inline Ent::Gen2::String CharacterControllerFallData::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
         // CharacterControllerClamberData
         inline Ent::Gen2::Float CharacterControllerClamberData::DropOffAngle() const
         {
@@ -60721,10 +60678,6 @@ namespace Ent
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("EnableSplashScreen"));
         }
-        inline Ent::Gen2::GameFallData GameManager::FallData() const
-        {
-            return Ent::Gen2::GameFallData(getProperty().getObjectField("FallData"));
-        }
         inline Ent::Gen2::GameFeetCatchUpData GameManager::FeetCatchUpData() const
         {
             return Ent::Gen2::GameFeetCatchUpData(getProperty().getObjectField("FeetCatchUpData"));
@@ -61581,71 +61534,6 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("turnRotationMinRatioToFinish"));
         }
-        // CharacterControllerGD
-        inline Ent::Gen2::Bool CharacterControllerGD::AllowHeightMapFallback() const
-        {
-            return Ent::Gen2::Bool(getProperty().getObjectField("AllowHeightMapFallback"));
-        }
-        inline Ent::Gen2::CharacterControllerClamberData CharacterControllerGD::ClamberData() const
-        {
-            return Ent::Gen2::CharacterControllerClamberData(getProperty().getObjectField("ClamberData"));
-        }
-        inline Ent::Gen2::CharacterControllerFallData CharacterControllerGD::FallData() const
-        {
-            return Ent::Gen2::CharacterControllerFallData(getProperty().getObjectField("FallData"));
-        }
-        inline Ent::Gen2::CharacterControllerGroundNormalData CharacterControllerGD::GroundNormalData() const
-        {
-            return Ent::Gen2::CharacterControllerGroundNormalData(getProperty().getObjectField("GroundNormalData"));
-        }
-        inline Ent::Gen2::HeadCollisionBehaviorData CharacterControllerGD::HeadCollisionData() const
-        {
-            return Ent::Gen2::HeadCollisionBehaviorData(getProperty().getObjectField("HeadCollisionData"));
-        }
-        inline Ent::Gen2::HitWallData CharacterControllerGD::HitWallData() const
-        {
-            return Ent::Gen2::HitWallData(getProperty().getObjectField("HitWallData"));
-        }
-        inline Ent::Gen2::ImmersedBehaviorData CharacterControllerGD::ImmersedData() const
-        {
-            return Ent::Gen2::ImmersedBehaviorData(getProperty().getObjectField("ImmersedData"));
-        }
-        inline Ent::Gen2::InputCollisionBehaviorData CharacterControllerGD::InputCollisionData() const
-        {
-            return Ent::Gen2::InputCollisionBehaviorData(getProperty().getObjectField("InputCollisionData"));
-        }
-        inline Ent::Gen2::MeshNavigationBehaviorData CharacterControllerGD::MeshNavigationData() const
-        {
-            return Ent::Gen2::MeshNavigationBehaviorData(getProperty().getObjectField("MeshNavigationData"));
-        }
-        inline Ent::Gen2::PredictionBehaviorData CharacterControllerGD::PredictionData() const
-        {
-            return Ent::Gen2::PredictionBehaviorData(getProperty().getObjectField("PredictionData"));
-        }
-        inline Ent::Gen2::Vector3 CharacterControllerGD::RotationSmooth() const
-        {
-            return Ent::Gen2::Vector3(getProperty().getObjectField("RotationSmooth"));
-        }
-        inline Ent::Gen2::CharacterControllerSlideData CharacterControllerGD::SlideData() const
-        {
-            return Ent::Gen2::CharacterControllerSlideData(getProperty().getObjectField("SlideData"));
-        }
-        inline Ent::Gen2::ComponentGD CharacterControllerGD::Super() const
-        {
-            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
-        }
-        inline Ent::Gen2::String CharacterControllerGD::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        inline Ent::Gen2::ClimbEdgeData CharacterControllerGD::climbEdgeData() const
-        {
-            return Ent::Gen2::ClimbEdgeData(getProperty().getObjectField("climbEdgeData"));
-        }
-        inline Ent::Gen2::MoveCapacityData CharacterControllerGD::moveCapacityData() const
-        {
-            return Ent::Gen2::MoveCapacityData(getProperty().getObjectField("moveCapacityData"));
-        }
         // DirectionSync
         inline Ent::Gen2::String DirectionSync::_comment() const
         {
@@ -61897,6 +61785,133 @@ namespace Ent
         inline Ent::Gen2::String AnalyticsManager::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // AirControlData
+        inline Ent::Gen2::Float AirControlData::AirControlBrake() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("AirControlBrake"));
+        }
+        inline Ent::Gen2::Float AirControlData::AirControlBrakeAngleMin() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("AirControlBrakeAngleMin"));
+        }
+        inline Ent::Gen2::ScaleConverter AirControlData::AirControlDirection() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("AirControlDirection"));
+        }
+        inline Ent::Gen2::Float AirControlData::AirControlSmooth() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("AirControlSmooth"));
+        }
+        inline Ent::Gen2::Float AirControlData::AirControlSpeed() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("AirControlSpeed"));
+        }
+        inline Ent::Gen2::Float AirControlData::AirControlSpeedAngleMax() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("AirControlSpeedAngleMax"));
+        }
+        inline Ent::Gen2::String AirControlData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // CharacterControllerFallData
+        inline Ent::Gen2::Float CharacterControllerFallData::Acceleration() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("Acceleration"));
+        }
+        inline Ent::Gen2::AirControlData CharacterControllerFallData::AirControlData() const
+        {
+            return Ent::Gen2::AirControlData(getProperty().getObjectField("AirControlData"));
+        }
+        inline Ent::Gen2::ScaleConverter CharacterControllerFallData::DamagesPerHeightFall() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("DamagesPerHeightFall"));
+        }
+        inline Ent::Gen2::Float CharacterControllerFallData::Friction() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("Friction"));
+        }
+        inline Ent::Gen2::Float CharacterControllerFallData::MinHeightForDamageFall() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("MinHeightForDamageFall"));
+        }
+        inline Ent::Gen2::Float CharacterControllerFallData::MinHeightForDeathFall() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("MinHeightForDeathFall"));
+        }
+        inline Ent::Gen2::Float CharacterControllerFallData::MinHeightForRecoveryFall() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("MinHeightForRecoveryFall"));
+        }
+        inline Ent::Gen2::String CharacterControllerFallData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // CharacterControllerGD
+        inline Ent::Gen2::Bool CharacterControllerGD::AllowHeightMapFallback() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("AllowHeightMapFallback"));
+        }
+        inline Ent::Gen2::CharacterControllerClamberData CharacterControllerGD::ClamberData() const
+        {
+            return Ent::Gen2::CharacterControllerClamberData(getProperty().getObjectField("ClamberData"));
+        }
+        inline Ent::Gen2::CharacterControllerFallData CharacterControllerGD::FallData() const
+        {
+            return Ent::Gen2::CharacterControllerFallData(getProperty().getObjectField("FallData"));
+        }
+        inline Ent::Gen2::CharacterControllerGroundNormalData CharacterControllerGD::GroundNormalData() const
+        {
+            return Ent::Gen2::CharacterControllerGroundNormalData(getProperty().getObjectField("GroundNormalData"));
+        }
+        inline Ent::Gen2::HeadCollisionBehaviorData CharacterControllerGD::HeadCollisionData() const
+        {
+            return Ent::Gen2::HeadCollisionBehaviorData(getProperty().getObjectField("HeadCollisionData"));
+        }
+        inline Ent::Gen2::HitWallData CharacterControllerGD::HitWallData() const
+        {
+            return Ent::Gen2::HitWallData(getProperty().getObjectField("HitWallData"));
+        }
+        inline Ent::Gen2::ImmersedBehaviorData CharacterControllerGD::ImmersedData() const
+        {
+            return Ent::Gen2::ImmersedBehaviorData(getProperty().getObjectField("ImmersedData"));
+        }
+        inline Ent::Gen2::InputCollisionBehaviorData CharacterControllerGD::InputCollisionData() const
+        {
+            return Ent::Gen2::InputCollisionBehaviorData(getProperty().getObjectField("InputCollisionData"));
+        }
+        inline Ent::Gen2::MeshNavigationBehaviorData CharacterControllerGD::MeshNavigationData() const
+        {
+            return Ent::Gen2::MeshNavigationBehaviorData(getProperty().getObjectField("MeshNavigationData"));
+        }
+        inline Ent::Gen2::PredictionBehaviorData CharacterControllerGD::PredictionData() const
+        {
+            return Ent::Gen2::PredictionBehaviorData(getProperty().getObjectField("PredictionData"));
+        }
+        inline Ent::Gen2::Vector3 CharacterControllerGD::RotationSmooth() const
+        {
+            return Ent::Gen2::Vector3(getProperty().getObjectField("RotationSmooth"));
+        }
+        inline Ent::Gen2::CharacterControllerSlideData CharacterControllerGD::SlideData() const
+        {
+            return Ent::Gen2::CharacterControllerSlideData(getProperty().getObjectField("SlideData"));
+        }
+        inline Ent::Gen2::ComponentGD CharacterControllerGD::Super() const
+        {
+            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String CharacterControllerGD::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::ClimbEdgeData CharacterControllerGD::climbEdgeData() const
+        {
+            return Ent::Gen2::ClimbEdgeData(getProperty().getObjectField("climbEdgeData"));
+        }
+        inline Ent::Gen2::MoveCapacityData CharacterControllerGD::moveCapacityData() const
+        {
+            return Ent::Gen2::MoveCapacityData(getProperty().getObjectField("moveCapacityData"));
         }
         // AerialAttackData
         inline Ent::Gen2::ResponsiblePointer_ActorState_ AerialAttackData::AerialAttackState() const

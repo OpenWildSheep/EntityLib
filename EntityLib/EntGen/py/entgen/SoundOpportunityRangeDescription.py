@@ -25,6 +25,11 @@ class SoundOpportunityRangeDescription(HelperObject):
     @ChunkSize.setter
     def ChunkSize(self, val): self.ChunkSize.set(val)
     @property
+    def EDITOR_SelectionProbabilityFactor(self):  # type: ()->Float
+        return Float(self._node.at("EDITOR_SelectionProbabilityFactor"))
+    @EDITOR_SelectionProbabilityFactor.setter
+    def EDITOR_SelectionProbabilityFactor(self, val): self.EDITOR_SelectionProbabilityFactor.set(val)
+    @property
     def MaxDistance(self):  # type: ()->Float
         return Float(self._node.at("MaxDistance"))
     @MaxDistance.setter

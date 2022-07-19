@@ -284,7 +284,6 @@ from .GameFlyData import *
 from .GameFluidData_HeightThreshold import *
 from .GameFluidData import *
 from .GameFeetCatchUpData import *
-from .GameFallData import *
 from .GameEdgeData import *
 from .GameDeathData import *
 from .GameClockManager_TimeOfDay import *
@@ -576,7 +575,6 @@ from .CineEventTestEndCurrentSequence import *
 from .CineEventTestCurrentGameState import *
 from .CharacterControllerSlideData import *
 from .CharacterControllerGroundNormalData import *
-from .CharacterControllerFallData import *
 from .CharacterControllerClamberData import *
 from .CarryMode import *
 from .CapabilitiesAndTags import *
@@ -654,7 +652,6 @@ from .MoveCapacityData_AnimTagTransitionGroup import *
 from .MoveCapacityData_AnimTagTimelineTransitionItem import *
 from .MoveCapacityData_AnimTagTimelineTransitionTable import *
 from .MoveCapacityData import *
-from .CharacterControllerGD import *
 from .DirectionSync import *
 from .DirectionSyncData import *
 from .AnimationManager import *
@@ -668,6 +665,9 @@ from .StrongAttackData import *
 from .strongAttackData import *
 from .AnalyticsManager_MongoDBConnection import *
 from .AnalyticsManager import *
+from .AirControlData import *
+from .CharacterControllerFallData import *
+from .CharacterControllerGD import *
 from .AerialAttackData import *
 from .AttackComponentGD_AerialAttackData import *
 from .AttackComponentGD import *

@@ -728,7 +728,6 @@ namespace Ent
         struct GameFluidData_HeightThreshold;
         struct GameFluidData;
         struct GameFeetCatchUpData;
-        struct GameFallData;
         struct GameEdgeData;
         struct GameDeathData;
         struct GameClockManager_TimeOfDay;
@@ -1065,7 +1064,6 @@ namespace Ent
         struct CineEventTestCurrentGameState;
         struct CharacterControllerSlideData;
         struct CharacterControllerGroundNormalData;
-        struct CharacterControllerFallData;
         struct CharacterControllerClamberData;
         struct CarryMode; // enum
         enum class CarryModeEnum
@@ -1308,7 +1306,6 @@ namespace Ent
         struct MoveCapacityData_AnimTagTimelineTransitionItem;
         struct MoveCapacityData_AnimTagTimelineTransitionTable;
         struct MoveCapacityData;
-        struct CharacterControllerGD;
         struct DirectionSync;
         struct DirectionSyncData;
         struct AnimationManager;
@@ -1360,6 +1357,9 @@ namespace Ent
         struct strongAttackData;
         struct AnalyticsManager_MongoDBConnection;
         struct AnalyticsManager;
+        struct AirControlData;
+        struct CharacterControllerFallData;
+        struct CharacterControllerGD;
         struct AerialAttackData;
         struct AttackComponentGD_AerialAttackData;
         struct AttackComponentGD;
@@ -3230,6 +3230,7 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::Float ChunkSize() const;
+            Ent::Gen::Float EDITOR_SelectionProbabilityFactor() const;
             Ent::Gen::Float MaxDistance() const;
             Ent::Gen::String PCloudPath() const;
             Ent::Gen::String _comment() const;
@@ -4994,6 +4995,7 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::String Name() const;
+            Ent::Gen::String PhysicsMaterialName() const;
             Ent::Gen::Map<char const*, Ent::Gen::ReflectedDetailMaterial> Variants() const;
             Ent::Gen::String _comment() const;
         };
@@ -8178,26 +8180,6 @@ namespace Ent
             Ent::Gen::Map<SizeEnum, Ent::Gen::Bool> useHeightmapPerSize() const;
         };
 
-        struct GameFallData : HelperObject // Object
-        {
-            GameFallData(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "GameFallData";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::Float Acceleration() const;
-            Ent::Gen::Float AirControlBrakeAngleMin() const;
-            Ent::Gen::ScaleConverter AirControlDirection() const;
-            Ent::Gen::Float AirControlSpeedAngleMax() const;
-            Ent::Gen::Float Friction() const;
-            Ent::Gen::String _comment() const;
-        };
-
         struct GameEdgeData : HelperObject // Object
         {
             GameEdgeData(Ent::Node* _node): HelperObject(_node) {}
@@ -10815,6 +10797,7 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
+            Ent::Gen::String EDITOR_FilterTag() const;
             Array<Ent::Gen::SoundOpportunityRangeDescription> RangeDescriptions() const;
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String _comment() const;
@@ -15195,28 +15178,6 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
-        struct CharacterControllerFallData : HelperObject // Object
-        {
-            CharacterControllerFallData(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "CharacterControllerFallData";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::Float AirControlBrake() const;
-            Ent::Gen::Float AirControlSmooth() const;
-            Ent::Gen::Float AirControlSpeed() const;
-            Ent::Gen::ScaleConverter DamagesPerHeightFall() const;
-            Ent::Gen::Float MinHeightForDamageFall() const;
-            Ent::Gen::Float MinHeightForDeathFall() const;
-            Ent::Gen::Float MinHeightForRecoveryFall() const;
-            Ent::Gen::String _comment() const;
-        };
-
         struct CharacterControllerClamberData : HelperObject // Object
         {
             CharacterControllerClamberData(Ent::Node* _node): HelperObject(_node) {}
@@ -16346,7 +16307,6 @@ namespace Ent
             Ent::Gen::Int DefaultGamePadID() const;
             Ent::Gen::GameEdgeData EdgeData() const;
             Ent::Gen::Bool EnableSplashScreen() const;
-            Ent::Gen::GameFallData FallData() const;
             Ent::Gen::GameFeetCatchUpData FeetCatchUpData() const;
             Ent::Gen::GameFluidData FluidData() const;
             Ent::Gen::GameFlyData FlyData() const;
@@ -16946,36 +16906,6 @@ namespace Ent
             Ent::Gen::Float turnRotationMinRatioToFinish() const;
         };
 
-        struct CharacterControllerGD : HelperObject // Object
-        {
-            CharacterControllerGD(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "CharacterControllerGD";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::Bool AllowHeightMapFallback() const;
-            Ent::Gen::CharacterControllerClamberData ClamberData() const;
-            Ent::Gen::CharacterControllerFallData FallData() const;
-            Ent::Gen::CharacterControllerGroundNormalData GroundNormalData() const;
-            Ent::Gen::HeadCollisionBehaviorData HeadCollisionData() const;
-            Ent::Gen::HitWallData HitWallData() const;
-            Ent::Gen::ImmersedBehaviorData ImmersedData() const;
-            Ent::Gen::InputCollisionBehaviorData InputCollisionData() const;
-            Ent::Gen::MeshNavigationBehaviorData MeshNavigationData() const;
-            Ent::Gen::PredictionBehaviorData PredictionData() const;
-            Ent::Gen::Vector3 RotationSmooth() const;
-            Ent::Gen::CharacterControllerSlideData SlideData() const;
-            Ent::Gen::ComponentGD Super() const;
-            Ent::Gen::String _comment() const;
-            Ent::Gen::ClimbEdgeData climbEdgeData() const;
-            Ent::Gen::MoveCapacityData moveCapacityData() const;
-        };
-
         struct DirectionSync : HelperObject // Object
         {
             DirectionSync(Ent::Node* _node): HelperObject(_node) {}
@@ -17242,6 +17172,79 @@ namespace Ent
             Ent::Gen::Bool StartPaused() const;
             Ent::Gen::Manager Super() const;
             Ent::Gen::String _comment() const;
+        };
+
+        struct AirControlData : HelperObject // Object
+        {
+            AirControlData(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "AirControlData";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float AirControlBrake() const;
+            Ent::Gen::Float AirControlBrakeAngleMin() const;
+            Ent::Gen::ScaleConverter AirControlDirection() const;
+            Ent::Gen::Float AirControlSmooth() const;
+            Ent::Gen::Float AirControlSpeed() const;
+            Ent::Gen::Float AirControlSpeedAngleMax() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct CharacterControllerFallData : HelperObject // Object
+        {
+            CharacterControllerFallData(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "CharacterControllerFallData";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float Acceleration() const;
+            Ent::Gen::AirControlData AirControlData() const;
+            Ent::Gen::ScaleConverter DamagesPerHeightFall() const;
+            Ent::Gen::Float Friction() const;
+            Ent::Gen::Float MinHeightForDamageFall() const;
+            Ent::Gen::Float MinHeightForDeathFall() const;
+            Ent::Gen::Float MinHeightForRecoveryFall() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct CharacterControllerGD : HelperObject // Object
+        {
+            CharacterControllerGD(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "CharacterControllerGD";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Bool AllowHeightMapFallback() const;
+            Ent::Gen::CharacterControllerClamberData ClamberData() const;
+            Ent::Gen::CharacterControllerFallData FallData() const;
+            Ent::Gen::CharacterControllerGroundNormalData GroundNormalData() const;
+            Ent::Gen::HeadCollisionBehaviorData HeadCollisionData() const;
+            Ent::Gen::HitWallData HitWallData() const;
+            Ent::Gen::ImmersedBehaviorData ImmersedData() const;
+            Ent::Gen::InputCollisionBehaviorData InputCollisionData() const;
+            Ent::Gen::MeshNavigationBehaviorData MeshNavigationData() const;
+            Ent::Gen::PredictionBehaviorData PredictionData() const;
+            Ent::Gen::Vector3 RotationSmooth() const;
+            Ent::Gen::CharacterControllerSlideData SlideData() const;
+            Ent::Gen::ComponentGD Super() const;
+            Ent::Gen::String _comment() const;
+            Ent::Gen::ClimbEdgeData climbEdgeData() const;
+            Ent::Gen::MoveCapacityData moveCapacityData() const;
         };
 
         struct AerialAttackData : HelperObject // Object
@@ -27446,6 +27449,10 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("ChunkSize"));
         }
+        inline Ent::Gen::Float SoundOpportunityRangeDescription::EDITOR_SelectionProbabilityFactor() const
+        {
+            return Ent::Gen::Float(node->at("EDITOR_SelectionProbabilityFactor"));
+        }
         inline Ent::Gen::Float SoundOpportunityRangeDescription::MaxDistance() const
         {
             return Ent::Gen::Float(node->at("MaxDistance"));
@@ -31245,6 +31252,10 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("Name"));
         }
+        inline Ent::Gen::String ReflectedDetailMaterialVariants::PhysicsMaterialName() const
+        {
+            return Ent::Gen::String(node->at("PhysicsMaterialName"));
+        }
         inline Ent::Gen::Map<char const*, Ent::Gen::ReflectedDetailMaterial> ReflectedDetailMaterialVariants::Variants() const
         {
             return Ent::Gen::Map<char const*, Ent::Gen::ReflectedDetailMaterial>(node->at("Variants"));
@@ -34117,31 +34128,6 @@ namespace Ent
         inline Ent::Gen::Map<SizeEnum, Ent::Gen::Bool> GameFeetCatchUpData::useHeightmapPerSize() const
         {
             return Ent::Gen::Map<SizeEnum, Ent::Gen::Bool>(node->at("useHeightmapPerSize"));
-        }
-        // GameFallData
-        inline Ent::Gen::Float GameFallData::Acceleration() const
-        {
-            return Ent::Gen::Float(node->at("Acceleration"));
-        }
-        inline Ent::Gen::Float GameFallData::AirControlBrakeAngleMin() const
-        {
-            return Ent::Gen::Float(node->at("AirControlBrakeAngleMin"));
-        }
-        inline Ent::Gen::ScaleConverter GameFallData::AirControlDirection() const
-        {
-            return Ent::Gen::ScaleConverter(node->at("AirControlDirection"));
-        }
-        inline Ent::Gen::Float GameFallData::AirControlSpeedAngleMax() const
-        {
-            return Ent::Gen::Float(node->at("AirControlSpeedAngleMax"));
-        }
-        inline Ent::Gen::Float GameFallData::Friction() const
-        {
-            return Ent::Gen::Float(node->at("Friction"));
-        }
-        inline Ent::Gen::String GameFallData::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
         }
         // GameEdgeData
         inline Ent::Gen::Float GameEdgeData::EdgeAngleMax() const
@@ -37213,6 +37199,10 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // SoundOpportunityComponentGD
+        inline Ent::Gen::String SoundOpportunityComponentGD::EDITOR_FilterTag() const
+        {
+            return Ent::Gen::String(node->at("EDITOR_FilterTag"));
+        }
         inline Array<Ent::Gen::SoundOpportunityRangeDescription> SoundOpportunityComponentGD::RangeDescriptions() const
         {
             return Array<Ent::Gen::SoundOpportunityRangeDescription>(node->at("RangeDescriptions"));
@@ -46537,39 +46527,6 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
-        // CharacterControllerFallData
-        inline Ent::Gen::Float CharacterControllerFallData::AirControlBrake() const
-        {
-            return Ent::Gen::Float(node->at("AirControlBrake"));
-        }
-        inline Ent::Gen::Float CharacterControllerFallData::AirControlSmooth() const
-        {
-            return Ent::Gen::Float(node->at("AirControlSmooth"));
-        }
-        inline Ent::Gen::Float CharacterControllerFallData::AirControlSpeed() const
-        {
-            return Ent::Gen::Float(node->at("AirControlSpeed"));
-        }
-        inline Ent::Gen::ScaleConverter CharacterControllerFallData::DamagesPerHeightFall() const
-        {
-            return Ent::Gen::ScaleConverter(node->at("DamagesPerHeightFall"));
-        }
-        inline Ent::Gen::Float CharacterControllerFallData::MinHeightForDamageFall() const
-        {
-            return Ent::Gen::Float(node->at("MinHeightForDamageFall"));
-        }
-        inline Ent::Gen::Float CharacterControllerFallData::MinHeightForDeathFall() const
-        {
-            return Ent::Gen::Float(node->at("MinHeightForDeathFall"));
-        }
-        inline Ent::Gen::Float CharacterControllerFallData::MinHeightForRecoveryFall() const
-        {
-            return Ent::Gen::Float(node->at("MinHeightForRecoveryFall"));
-        }
-        inline Ent::Gen::String CharacterControllerFallData::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
         // CharacterControllerClamberData
         inline Ent::Gen::Float CharacterControllerClamberData::DropOffAngle() const
         {
@@ -47683,10 +47640,6 @@ namespace Ent
         {
             return Ent::Gen::Bool(node->at("EnableSplashScreen"));
         }
-        inline Ent::Gen::GameFallData GameManager::FallData() const
-        {
-            return Ent::Gen::GameFallData(node->at("FallData"));
-        }
         inline Ent::Gen::GameFeetCatchUpData GameManager::FeetCatchUpData() const
         {
             return Ent::Gen::GameFeetCatchUpData(node->at("FeetCatchUpData"));
@@ -48543,71 +48496,6 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("turnRotationMinRatioToFinish"));
         }
-        // CharacterControllerGD
-        inline Ent::Gen::Bool CharacterControllerGD::AllowHeightMapFallback() const
-        {
-            return Ent::Gen::Bool(node->at("AllowHeightMapFallback"));
-        }
-        inline Ent::Gen::CharacterControllerClamberData CharacterControllerGD::ClamberData() const
-        {
-            return Ent::Gen::CharacterControllerClamberData(node->at("ClamberData"));
-        }
-        inline Ent::Gen::CharacterControllerFallData CharacterControllerGD::FallData() const
-        {
-            return Ent::Gen::CharacterControllerFallData(node->at("FallData"));
-        }
-        inline Ent::Gen::CharacterControllerGroundNormalData CharacterControllerGD::GroundNormalData() const
-        {
-            return Ent::Gen::CharacterControllerGroundNormalData(node->at("GroundNormalData"));
-        }
-        inline Ent::Gen::HeadCollisionBehaviorData CharacterControllerGD::HeadCollisionData() const
-        {
-            return Ent::Gen::HeadCollisionBehaviorData(node->at("HeadCollisionData"));
-        }
-        inline Ent::Gen::HitWallData CharacterControllerGD::HitWallData() const
-        {
-            return Ent::Gen::HitWallData(node->at("HitWallData"));
-        }
-        inline Ent::Gen::ImmersedBehaviorData CharacterControllerGD::ImmersedData() const
-        {
-            return Ent::Gen::ImmersedBehaviorData(node->at("ImmersedData"));
-        }
-        inline Ent::Gen::InputCollisionBehaviorData CharacterControllerGD::InputCollisionData() const
-        {
-            return Ent::Gen::InputCollisionBehaviorData(node->at("InputCollisionData"));
-        }
-        inline Ent::Gen::MeshNavigationBehaviorData CharacterControllerGD::MeshNavigationData() const
-        {
-            return Ent::Gen::MeshNavigationBehaviorData(node->at("MeshNavigationData"));
-        }
-        inline Ent::Gen::PredictionBehaviorData CharacterControllerGD::PredictionData() const
-        {
-            return Ent::Gen::PredictionBehaviorData(node->at("PredictionData"));
-        }
-        inline Ent::Gen::Vector3 CharacterControllerGD::RotationSmooth() const
-        {
-            return Ent::Gen::Vector3(node->at("RotationSmooth"));
-        }
-        inline Ent::Gen::CharacterControllerSlideData CharacterControllerGD::SlideData() const
-        {
-            return Ent::Gen::CharacterControllerSlideData(node->at("SlideData"));
-        }
-        inline Ent::Gen::ComponentGD CharacterControllerGD::Super() const
-        {
-            return Ent::Gen::ComponentGD(node->at("Super"));
-        }
-        inline Ent::Gen::String CharacterControllerGD::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        inline Ent::Gen::ClimbEdgeData CharacterControllerGD::climbEdgeData() const
-        {
-            return Ent::Gen::ClimbEdgeData(node->at("climbEdgeData"));
-        }
-        inline Ent::Gen::MoveCapacityData CharacterControllerGD::moveCapacityData() const
-        {
-            return Ent::Gen::MoveCapacityData(node->at("moveCapacityData"));
-        }
         // DirectionSync
         inline Ent::Gen::String DirectionSync::_comment() const
         {
@@ -48859,6 +48747,133 @@ namespace Ent
         inline Ent::Gen::String AnalyticsManager::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
+        }
+        // AirControlData
+        inline Ent::Gen::Float AirControlData::AirControlBrake() const
+        {
+            return Ent::Gen::Float(node->at("AirControlBrake"));
+        }
+        inline Ent::Gen::Float AirControlData::AirControlBrakeAngleMin() const
+        {
+            return Ent::Gen::Float(node->at("AirControlBrakeAngleMin"));
+        }
+        inline Ent::Gen::ScaleConverter AirControlData::AirControlDirection() const
+        {
+            return Ent::Gen::ScaleConverter(node->at("AirControlDirection"));
+        }
+        inline Ent::Gen::Float AirControlData::AirControlSmooth() const
+        {
+            return Ent::Gen::Float(node->at("AirControlSmooth"));
+        }
+        inline Ent::Gen::Float AirControlData::AirControlSpeed() const
+        {
+            return Ent::Gen::Float(node->at("AirControlSpeed"));
+        }
+        inline Ent::Gen::Float AirControlData::AirControlSpeedAngleMax() const
+        {
+            return Ent::Gen::Float(node->at("AirControlSpeedAngleMax"));
+        }
+        inline Ent::Gen::String AirControlData::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // CharacterControllerFallData
+        inline Ent::Gen::Float CharacterControllerFallData::Acceleration() const
+        {
+            return Ent::Gen::Float(node->at("Acceleration"));
+        }
+        inline Ent::Gen::AirControlData CharacterControllerFallData::AirControlData() const
+        {
+            return Ent::Gen::AirControlData(node->at("AirControlData"));
+        }
+        inline Ent::Gen::ScaleConverter CharacterControllerFallData::DamagesPerHeightFall() const
+        {
+            return Ent::Gen::ScaleConverter(node->at("DamagesPerHeightFall"));
+        }
+        inline Ent::Gen::Float CharacterControllerFallData::Friction() const
+        {
+            return Ent::Gen::Float(node->at("Friction"));
+        }
+        inline Ent::Gen::Float CharacterControllerFallData::MinHeightForDamageFall() const
+        {
+            return Ent::Gen::Float(node->at("MinHeightForDamageFall"));
+        }
+        inline Ent::Gen::Float CharacterControllerFallData::MinHeightForDeathFall() const
+        {
+            return Ent::Gen::Float(node->at("MinHeightForDeathFall"));
+        }
+        inline Ent::Gen::Float CharacterControllerFallData::MinHeightForRecoveryFall() const
+        {
+            return Ent::Gen::Float(node->at("MinHeightForRecoveryFall"));
+        }
+        inline Ent::Gen::String CharacterControllerFallData::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // CharacterControllerGD
+        inline Ent::Gen::Bool CharacterControllerGD::AllowHeightMapFallback() const
+        {
+            return Ent::Gen::Bool(node->at("AllowHeightMapFallback"));
+        }
+        inline Ent::Gen::CharacterControllerClamberData CharacterControllerGD::ClamberData() const
+        {
+            return Ent::Gen::CharacterControllerClamberData(node->at("ClamberData"));
+        }
+        inline Ent::Gen::CharacterControllerFallData CharacterControllerGD::FallData() const
+        {
+            return Ent::Gen::CharacterControllerFallData(node->at("FallData"));
+        }
+        inline Ent::Gen::CharacterControllerGroundNormalData CharacterControllerGD::GroundNormalData() const
+        {
+            return Ent::Gen::CharacterControllerGroundNormalData(node->at("GroundNormalData"));
+        }
+        inline Ent::Gen::HeadCollisionBehaviorData CharacterControllerGD::HeadCollisionData() const
+        {
+            return Ent::Gen::HeadCollisionBehaviorData(node->at("HeadCollisionData"));
+        }
+        inline Ent::Gen::HitWallData CharacterControllerGD::HitWallData() const
+        {
+            return Ent::Gen::HitWallData(node->at("HitWallData"));
+        }
+        inline Ent::Gen::ImmersedBehaviorData CharacterControllerGD::ImmersedData() const
+        {
+            return Ent::Gen::ImmersedBehaviorData(node->at("ImmersedData"));
+        }
+        inline Ent::Gen::InputCollisionBehaviorData CharacterControllerGD::InputCollisionData() const
+        {
+            return Ent::Gen::InputCollisionBehaviorData(node->at("InputCollisionData"));
+        }
+        inline Ent::Gen::MeshNavigationBehaviorData CharacterControllerGD::MeshNavigationData() const
+        {
+            return Ent::Gen::MeshNavigationBehaviorData(node->at("MeshNavigationData"));
+        }
+        inline Ent::Gen::PredictionBehaviorData CharacterControllerGD::PredictionData() const
+        {
+            return Ent::Gen::PredictionBehaviorData(node->at("PredictionData"));
+        }
+        inline Ent::Gen::Vector3 CharacterControllerGD::RotationSmooth() const
+        {
+            return Ent::Gen::Vector3(node->at("RotationSmooth"));
+        }
+        inline Ent::Gen::CharacterControllerSlideData CharacterControllerGD::SlideData() const
+        {
+            return Ent::Gen::CharacterControllerSlideData(node->at("SlideData"));
+        }
+        inline Ent::Gen::ComponentGD CharacterControllerGD::Super() const
+        {
+            return Ent::Gen::ComponentGD(node->at("Super"));
+        }
+        inline Ent::Gen::String CharacterControllerGD::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Ent::Gen::ClimbEdgeData CharacterControllerGD::climbEdgeData() const
+        {
+            return Ent::Gen::ClimbEdgeData(node->at("climbEdgeData"));
+        }
+        inline Ent::Gen::MoveCapacityData CharacterControllerGD::moveCapacityData() const
+        {
+            return Ent::Gen::MoveCapacityData(node->at("moveCapacityData"));
         }
         // AerialAttackData
         inline Ent::Gen::ResponsiblePointer_ActorState_ AerialAttackData::AerialAttackState() const

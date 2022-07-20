@@ -1953,7 +1953,6 @@ namespace Ent
     void EntityLib::clearCache() const
     {
         m_nodeCache.clear();
-        m_jsonDatabase.clear();
     }
 
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)

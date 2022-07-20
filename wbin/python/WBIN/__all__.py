@@ -1,4 +1,5 @@
 from . import AABB
+from . import BiomePatch
 from . import BlendShape
 from . import BlendShapeData
 from . import BoneData

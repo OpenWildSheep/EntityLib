@@ -11,6 +11,7 @@ from entgen.Float import *
 from entgen.Manager import *
 from entgen.ScaleConverter import *
 from entgen.SoundManager_BiomeSoundBank import *
+from entgen.SoundOpportunitiesConfig import *
 from entgen.String import *
 from entgen.String import *
 from entgen.Specie import *
@@ -19,8 +20,6 @@ from entgen.StyleMode import *
 from entgen.String import *
 from entgen.String import *
 from entgen.Color import *
-from entgen.String import *
-from entgen.SmallActorSpawnPointData import *
 from entgen.String import *
 from entgen.CreatureTypeData import *
 from entgen.GroundTypeData import *
@@ -381,8 +380,8 @@ class SoundManager(HelperObject):
     @RainLevelStart.setter
     def RainLevelStart(self, val): self.RainLevelStart.set(val)
     @property
-    def SmallActorSpawnRules(self):  # type: ()->Map[str, SmallActorSpawnPointData]
-        return (lambda n: Map(str, SmallActorSpawnPointData, n))(self._node.at("SmallActorSpawnRules"))
+    def SoundOpportunitiesConfig(self):  # type: ()->SoundOpportunitiesConfig
+        return SoundOpportunitiesConfig(self._node.at("SoundOpportunitiesConfig"))
     @property
     def SoundTagDataFile(self):  # type: ()->String
         return String(self._node.at("SoundTagDataFile"))

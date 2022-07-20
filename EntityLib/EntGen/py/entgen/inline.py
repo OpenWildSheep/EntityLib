@@ -524,6 +524,67 @@ class Walkability(HelperObject):
 
 
 from EntityLibPy import Node
+
+class VegetationData(HelperObject):
+    schema_name = "VegetationData"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->VegetationData
+        return VegetationData(entlib.load_node_file(sourcefile, entlib.get_schema(VegetationData.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->VegetationData
+        return VegetationData(entlib.make_node(VegetationData.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def GRCPath(self):  # type: ()->String
+        return String(self._node.at("GRCPath"))
+    @GRCPath.setter
+    def GRCPath(self, val): self.GRCPath.set(val)
+    @property
+    def Name(self):  # type: ()->String
+        return String(self._node.at("Name"))
+    @Name.setter
+    def Name(self, val): self.Name.set(val)
+    @property
+    def Tags(self):  # type: ()->PrimitiveSet[str]
+        return (lambda n: PrimitiveSet(str, n))(self._node.at("Tags"))
+    @property
+    def VisibilityDistanceCategory(self):  # type: ()->String
+        return String(self._node.at("VisibilityDistanceCategory"))
+    @VisibilityDistanceCategory.setter
+    def VisibilityDistanceCategory(self, val): self.VisibilityDistanceCategory.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class VegetationDataList(HelperObject):
+    schema_name = "VegetationDataList"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->VegetationDataList
+        return VegetationDataList(entlib.load_node_file(sourcefile, entlib.get_schema(VegetationDataList.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->VegetationDataList
+        return VegetationDataList(entlib.make_node(VegetationDataList.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Data(self):  # type: ()->Array[VegetationData]
+        return (lambda n: Array(VegetationData, n))(self._node.at("Data"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
 Vector4 = (lambda n: PrimArray(Float, n))
 from EntityLibPy import Node
 Vector3i = (lambda n: PrimArray(Int, n))
@@ -1404,6 +1465,54 @@ class TaggedSDF(HelperObject):
         return String(self._node.at("Tag"))
     @Tag.setter
     def Tag(self, val): self.Tag.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class TagInfo(HelperObject):
+    schema_name = "TagInfo"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->TagInfo
+        return TagInfo(entlib.load_node_file(sourcefile, entlib.get_schema(TagInfo.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->TagInfo
+        return TagInfo(entlib.make_node(TagInfo.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def AudioWeight(self):  # type: ()->Int
+        return Int(self._node.at("AudioWeight"))
+    @AudioWeight.setter
+    def AudioWeight(self, val): self.AudioWeight.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class TagDB(HelperObject):
+    schema_name = "TagDB"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->TagDB
+        return TagDB(entlib.load_node_file(sourcefile, entlib.get_schema(TagDB.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->TagDB
+        return TagDB(entlib.make_node(TagDB.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def TagInfoTable(self):  # type: ()->Map[str, TagInfo]
+        return (lambda n: Map(str, TagInfo, n))(self._node.at("TagInfoTable"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
@@ -10332,6 +10441,29 @@ class SmallActorSpawnPointData(HelperObject):
 
 from EntityLibPy import Node
 
+class SoundOpportunitiesConfig(HelperObject):
+    schema_name = "SoundOpportunitiesConfig"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->SoundOpportunitiesConfig
+        return SoundOpportunitiesConfig(entlib.load_node_file(sourcefile, entlib.get_schema(SoundOpportunitiesConfig.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->SoundOpportunitiesConfig
+        return SoundOpportunitiesConfig(entlib.make_node(SoundOpportunitiesConfig.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def SmallActorSpawnRules(self):  # type: ()->Map[str, SmallActorSpawnPointData]
+        return (lambda n: Map(str, SmallActorSpawnPointData, n))(self._node.at("SmallActorSpawnRules"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class FadeDuration(HelperObject):
 
     @property
@@ -13968,6 +14100,11 @@ class TestDefaultValues(HelperObject):
         return TestDefaultValues(entlib.make_node(TestDefaultValues.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def DoubleWithDefaultValue(self):  # type: ()->Float
+        return Float(self._node.at("DoubleWithDefaultValue"))
+    @DoubleWithDefaultValue.setter
+    def DoubleWithDefaultValue(self, val): self.DoubleWithDefaultValue.set(val)
     @property
     def Matrix(self):  # type: ()->Matrix33
         return Matrix33(self._node.at("Matrix"))
@@ -19632,8 +19769,8 @@ class SoundManager(HelperObject):
     @RainLevelStart.setter
     def RainLevelStart(self, val): self.RainLevelStart.set(val)
     @property
-    def SmallActorSpawnRules(self):  # type: ()->Map[str, SmallActorSpawnPointData]
-        return (lambda n: Map(str, SmallActorSpawnPointData, n))(self._node.at("SmallActorSpawnRules"))
+    def SoundOpportunitiesConfig(self):  # type: ()->SoundOpportunitiesConfig
+        return SoundOpportunitiesConfig(self._node.at("SoundOpportunitiesConfig"))
     @property
     def SoundTagDataFile(self):  # type: ()->String
         return String(self._node.at("SoundTagDataFile"))
@@ -37992,31 +38129,6 @@ from EntityLibPy import Node
 StringHash = String
 from EntityLibPy import Node
 
-class TagInfo(HelperObject):
-    schema_name = "TagInfo"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->TagInfo
-        return TagInfo(entlib.load_node_file(sourcefile, entlib.get_schema(TagInfo.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->TagInfo
-        return TagInfo(entlib.make_node(TagInfo.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def AudioWeight(self):  # type: ()->Int
-        return Int(self._node.at("AudioWeight"))
-    @AudioWeight.setter
-    def AudioWeight(self, val): self.AudioWeight.set(val)
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
 class Team_PlayerData(HelperObject):
     schema_name = "Team::PlayerData"
     @staticmethod
@@ -38132,44 +38244,6 @@ class TravelParams(HelperObject):
         return Bool(self._node.at("UseFlyingNavMesh"))
     @UseFlyingNavMesh.setter
     def UseFlyingNavMesh(self, val): self.UseFlyingNavMesh.set(val)
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
-class VegetationResourceData(HelperObject):
-    schema_name = "VegetationResourceData"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->VegetationResourceData
-        return VegetationResourceData(entlib.load_node_file(sourcefile, entlib.get_schema(VegetationResourceData.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->VegetationResourceData
-        return VegetationResourceData(entlib.make_node(VegetationResourceData.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def GRCPath(self):  # type: ()->String
-        return String(self._node.at("GRCPath"))
-    @GRCPath.setter
-    def GRCPath(self, val): self.GRCPath.set(val)
-    @property
-    def Name(self):  # type: ()->String
-        return String(self._node.at("Name"))
-    @Name.setter
-    def Name(self, val): self.Name.set(val)
-    @property
-    def Tags(self):  # type: ()->PrimitiveSet[str]
-        return (lambda n: PrimitiveSet(str, n))(self._node.at("Tags"))
-    @property
-    def VisibilityDistanceCategory(self):  # type: ()->String
-        return String(self._node.at("VisibilityDistanceCategory"))
-    @VisibilityDistanceCategory.setter
-    def VisibilityDistanceCategory(self, val): self.VisibilityDistanceCategory.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

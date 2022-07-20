@@ -22,6 +22,8 @@ from .allowedTypesItem import *
 from .WindTurbulenceType import *
 from .WaveRenderingType import *
 from .Walkability import *
+from .VegetationData import *
+from .VegetationDataList import *
 from .sPhysicsShapeBox import *
 from .sEnvStamp import *
 from .retiming import *
@@ -48,6 +50,8 @@ from .Terrain_TerrainMeta import *
 from .TargetCollision import *
 from .TagsList import *
 from .TaggedSDF import *
+from .TagInfo import *
+from .TagDB import *
 from .SyncTempoMode import *
 from .UIMusic import *
 from .StyleMode import *
@@ -306,6 +310,7 @@ from .FluidData import *
 from .FloatRange import *
 from .SmallActorSpawnRuleData import *
 from .SmallActorSpawnPointData import *
+from .SoundOpportunitiesConfig import *
 from .FadeDuration import *
 from .FadeDelay import *
 from .FactionSpecieRelationData import *
@@ -1105,13 +1110,11 @@ from .SceneNodeGraph import *
 from .Sensor import *
 from .SmallActorSpawnRuleExchangeData import *
 from .StateGauge import *
-from .TagInfo import *
 from .Team_PlayerData import *
 from .TextureGroundTypeMap import *
 from .TextureHeightMap import *
 from .Timer import *
 from .TravelParams import *
-from .VegetationResourceData import *
 from .VegetationVisibilityDistanceCategory import *
 from .VisualResourceBuildData import *
 from .ZoneCylinderShape import *

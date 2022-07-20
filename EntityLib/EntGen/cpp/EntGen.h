@@ -48,6 +48,8 @@ namespace Ent
             WaveRenderingType_COUNT,
         };
         struct Walkability;
+        struct VegetationData;
+        struct VegetationDataList;
         struct sPhysicsShapeBox;
         struct sEnvStamp;
         struct retiming;
@@ -102,6 +104,8 @@ namespace Ent
         struct TargetCollision;
         struct TagsList;
         struct TaggedSDF;
+        struct TagInfo;
+        struct TagDB;
         struct SyncTempoMode; // enum
         enum class SyncTempoModeEnum
         {
@@ -765,6 +769,7 @@ namespace Ent
         struct FloatRange;
         struct SmallActorSpawnRuleData;
         struct SmallActorSpawnPointData;
+        struct SoundOpportunitiesConfig;
         struct FadeDuration;
         struct FadeDelay;
         struct FactionSpecieRelationData;
@@ -2049,13 +2054,11 @@ namespace Ent
         struct Sensor;
         struct SmallActorSpawnRuleExchangeData;
         struct StateGauge;
-        struct TagInfo;
         struct Team_PlayerData;
         struct TextureGroundTypeMap;
         struct TextureHeightMap;
         struct Timer;
         struct TravelParams;
-        struct VegetationResourceData;
         struct VegetationVisibilityDistanceCategory;
         struct VisualResourceBuildData;
         struct ZoneCylinderShape;
@@ -2461,6 +2464,41 @@ namespace Ent
             Ent::Gen::String _comment() const;
             Ent::Gen::Bool engaged() const;
             Ent::Gen::Bool val() const;
+        };
+
+        struct VegetationData : HelperObject // Object
+        {
+            VegetationData(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "VegetationData";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::String GRCPath() const;
+            Ent::Gen::String Name() const;
+            Ent::Gen::PrimitiveSet<char const*> Tags() const;
+            Ent::Gen::String VisibilityDistanceCategory() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct VegetationDataList : HelperObject // Object
+        {
+            VegetationDataList(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "VegetationDataList";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Array<Ent::Gen::VegetationData> Data() const;
+            Ent::Gen::String _comment() const;
         };
 
 
@@ -2945,6 +2983,38 @@ namespace Ent
             Ent::Gen::Vector3 Offset() const;
             Ent::Gen::variant_MeshShape_ShapeSphere_ShapeBox_ Shape() const;
             Ent::Gen::String Tag() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct TagInfo : HelperObject // Object
+        {
+            TagInfo(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "TagInfo";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Int AudioWeight() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct TagDB : HelperObject // Object
+        {
+            TagDB(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "TagDB";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Map<char const*, Ent::Gen::TagInfo> TagInfoTable() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -8606,6 +8676,22 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
+        struct SoundOpportunitiesConfig : HelperObject // Object
+        {
+            SoundOpportunitiesConfig(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "SoundOpportunitiesConfig";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Map<char const*, Ent::Gen::SmallActorSpawnPointData> SmallActorSpawnRules() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct FadeDuration : HelperObject // Object
         {
             FadeDuration(Ent::Node* _node): HelperObject(_node) {}
@@ -10461,6 +10547,7 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
+            Ent::Gen::Float DoubleWithDefaultValue() const;
             Ent::Gen::Matrix33 Matrix() const;
             Ent::Gen::Matrix33 Matrix2() const;
             Ent::Gen::ComponentGD Super() const;
@@ -14434,7 +14521,7 @@ namespace Ent
             Ent::Gen::String RTPC_UnderwaterCameraActivator() const;
             Ent::Gen::String RTPC_UnderwaterDepth() const;
             Ent::Gen::Float RainLevelStart() const;
-            Ent::Gen::Map<char const*, Ent::Gen::SmallActorSpawnPointData> SmallActorSpawnRules() const;
+            Ent::Gen::SoundOpportunitiesConfig SoundOpportunitiesConfig() const;
             Ent::Gen::String SoundTagDataFile() const;
             Ent::Gen::String Sound_GameEntity_Stop_All() const;
             Ent::Gen::String Sound_GameObject_Dial_Stop() const;
@@ -26016,22 +26103,6 @@ namespace Ent
         };
 
 
-        struct TagInfo : HelperObject // Object
-        {
-            TagInfo(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "TagInfo";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::Int AudioWeight() const;
-            Ent::Gen::String _comment() const;
-        };
-
         struct Team_PlayerData : HelperObject // Object
         {
             Team_PlayerData(Ent::Node* _node): HelperObject(_node) {}
@@ -26112,25 +26183,6 @@ namespace Ent
             Ent::Gen::Float MoveBlend() const;
             Ent::Gen::Float TravelSpeed() const;
             Ent::Gen::Bool UseFlyingNavMesh() const;
-            Ent::Gen::String _comment() const;
-        };
-
-        struct VegetationResourceData : HelperObject // Object
-        {
-            VegetationResourceData(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "VegetationResourceData";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::String GRCPath() const;
-            Ent::Gen::String Name() const;
-            Ent::Gen::PrimitiveSet<char const*> Tags() const;
-            Ent::Gen::String VisibilityDistanceCategory() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -26851,6 +26903,36 @@ namespace Ent
         {
             return Ent::Gen::Bool(node->at("val"));
         }
+        // VegetationData
+        inline Ent::Gen::String VegetationData::GRCPath() const
+        {
+            return Ent::Gen::String(node->at("GRCPath"));
+        }
+        inline Ent::Gen::String VegetationData::Name() const
+        {
+            return Ent::Gen::String(node->at("Name"));
+        }
+        inline Ent::Gen::PrimitiveSet<char const*> VegetationData::Tags() const
+        {
+            return Ent::Gen::PrimitiveSet<char const*>(node->at("Tags"));
+        }
+        inline Ent::Gen::String VegetationData::VisibilityDistanceCategory() const
+        {
+            return Ent::Gen::String(node->at("VisibilityDistanceCategory"));
+        }
+        inline Ent::Gen::String VegetationData::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // VegetationDataList
+        inline Array<Ent::Gen::VegetationData> VegetationDataList::Data() const
+        {
+            return Array<Ent::Gen::VegetationData>(node->at("Data"));
+        }
+        inline Ent::Gen::String VegetationDataList::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // sPhysicsShapeBox
         inline Ent::Gen::String sPhysicsShapeBox::_comment() const
         {
@@ -27282,6 +27364,24 @@ namespace Ent
             return Ent::Gen::String(node->at("Tag"));
         }
         inline Ent::Gen::String TaggedSDF::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // TagInfo
+        inline Ent::Gen::Int TagInfo::AudioWeight() const
+        {
+            return Ent::Gen::Int(node->at("AudioWeight"));
+        }
+        inline Ent::Gen::String TagInfo::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // TagDB
+        inline Ent::Gen::Map<char const*, Ent::Gen::TagInfo> TagDB::TagInfoTable() const
+        {
+            return Ent::Gen::Map<char const*, Ent::Gen::TagInfo>(node->at("TagInfoTable"));
+        }
+        inline Ent::Gen::String TagDB::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -34625,6 +34725,15 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // SoundOpportunitiesConfig
+        inline Ent::Gen::Map<char const*, Ent::Gen::SmallActorSpawnPointData> SoundOpportunitiesConfig::SmallActorSpawnRules() const
+        {
+            return Ent::Gen::Map<char const*, Ent::Gen::SmallActorSpawnPointData>(node->at("SmallActorSpawnRules"));
+        }
+        inline Ent::Gen::String SoundOpportunitiesConfig::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // FadeDuration
         inline Ent::Gen::String FadeDuration::_comment() const
         {
@@ -36680,6 +36789,10 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // TestDefaultValues
+        inline Ent::Gen::Float TestDefaultValues::DoubleWithDefaultValue() const
+        {
+            return Ent::Gen::Float(node->at("DoubleWithDefaultValue"));
+        }
         inline Ent::Gen::Matrix33 TestDefaultValues::Matrix() const
         {
             return Ent::Gen::Matrix33(node->at("Matrix"));
@@ -45478,9 +45591,9 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("RainLevelStart"));
         }
-        inline Ent::Gen::Map<char const*, Ent::Gen::SmallActorSpawnPointData> SoundManager::SmallActorSpawnRules() const
+        inline Ent::Gen::SoundOpportunitiesConfig SoundManager::SoundOpportunitiesConfig() const
         {
-            return Ent::Gen::Map<char const*, Ent::Gen::SmallActorSpawnPointData>(node->at("SmallActorSpawnRules"));
+            return Ent::Gen::SoundOpportunitiesConfig(node->at("SoundOpportunitiesConfig"));
         }
         inline Ent::Gen::String SoundManager::SoundTagDataFile() const
         {
@@ -59080,15 +59193,6 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("m_pendingDiff"));
         }
-        // TagInfo
-        inline Ent::Gen::Int TagInfo::AudioWeight() const
-        {
-            return Ent::Gen::Int(node->at("AudioWeight"));
-        }
-        inline Ent::Gen::String TagInfo::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
         // Team_PlayerData
         inline Ent::Gen::Int Team_PlayerData::PlayerID() const
         {
@@ -59131,27 +59235,6 @@ namespace Ent
             return Ent::Gen::Bool(node->at("UseFlyingNavMesh"));
         }
         inline Ent::Gen::String TravelParams::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        // VegetationResourceData
-        inline Ent::Gen::String VegetationResourceData::GRCPath() const
-        {
-            return Ent::Gen::String(node->at("GRCPath"));
-        }
-        inline Ent::Gen::String VegetationResourceData::Name() const
-        {
-            return Ent::Gen::String(node->at("Name"));
-        }
-        inline Ent::Gen::PrimitiveSet<char const*> VegetationResourceData::Tags() const
-        {
-            return Ent::Gen::PrimitiveSet<char const*>(node->at("Tags"));
-        }
-        inline Ent::Gen::String VegetationResourceData::VisibilityDistanceCategory() const
-        {
-            return Ent::Gen::String(node->at("VisibilityDistanceCategory"));
-        }
-        inline Ent::Gen::String VegetationResourceData::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }

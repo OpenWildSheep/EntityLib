@@ -48,6 +48,8 @@ namespace Ent
             WaveRenderingType_COUNT,
         };
         struct Walkability;
+        struct VegetationData;
+        struct VegetationDataList;
         struct sPhysicsShapeBox;
         struct sEnvStamp;
         struct retiming;
@@ -102,6 +104,8 @@ namespace Ent
         struct TargetCollision;
         struct TagsList;
         struct TaggedSDF;
+        struct TagInfo;
+        struct TagDB;
         struct SyncTempoMode; // enum
         enum class SyncTempoModeEnum
         {
@@ -765,6 +769,7 @@ namespace Ent
         struct FloatRange;
         struct SmallActorSpawnRuleData;
         struct SmallActorSpawnPointData;
+        struct SoundOpportunitiesConfig;
         struct FadeDuration;
         struct FadeDelay;
         struct FactionSpecieRelationData;
@@ -2049,13 +2054,11 @@ namespace Ent
         struct Sensor;
         struct SmallActorSpawnRuleExchangeData;
         struct StateGauge;
-        struct TagInfo;
         struct Team_PlayerData;
         struct TextureGroundTypeMap;
         struct TextureHeightMap;
         struct Timer;
         struct TravelParams;
-        struct VegetationResourceData;
         struct VegetationVisibilityDistanceCategory;
         struct VisualResourceBuildData;
         struct ZoneCylinderShape;
@@ -2533,6 +2536,65 @@ namespace Ent
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Bool engaged() const;
             Ent::Gen2::Bool val() const;
+        };
+
+        struct VegetationData : HelperObject<VegetationData> // Object
+        {
+            explicit VegetationData(Ent::Property _node): HelperObject<VegetationData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "VegetationData";
+            static VegetationData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return VegetationData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static VegetationData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return VegetationData(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static VegetationData create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return VegetationData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            VegetationData makeInstanceOf()
+            {
+                return VegetationData(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::String GRCPath() const;
+            Ent::Gen2::String Name() const;
+            Ent::Gen2::PrimitiveSet<char const*> Tags() const;
+            Ent::Gen2::String VisibilityDistanceCategory() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct VegetationDataList : HelperObject<VegetationDataList> // Object
+        {
+            explicit VegetationDataList(Ent::Property _node): HelperObject<VegetationDataList>(std::move(_node)) {}
+            static constexpr char schemaName[] = "VegetationDataList";
+            static VegetationDataList load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return VegetationDataList(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static VegetationDataList loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return VegetationDataList(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static VegetationDataList create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return VegetationDataList(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            VegetationDataList makeInstanceOf()
+            {
+                return VegetationDataList(getProperty().makeInstanceOf());
+            }
+            Array<Ent::Gen2::VegetationData> Data() const;
+            Ent::Gen2::String _comment() const;
         };
 
 
@@ -3233,6 +3295,62 @@ namespace Ent
             Ent::Gen2::Vector3 Offset() const;
             Ent::Gen2::variant_MeshShape_ShapeSphere_ShapeBox_ Shape() const;
             Ent::Gen2::String Tag() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct TagInfo : HelperObject<TagInfo> // Object
+        {
+            explicit TagInfo(Ent::Property _node): HelperObject<TagInfo>(std::move(_node)) {}
+            static constexpr char schemaName[] = "TagInfo";
+            static TagInfo load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return TagInfo(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static TagInfo loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return TagInfo(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static TagInfo create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return TagInfo(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            TagInfo makeInstanceOf()
+            {
+                return TagInfo(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Int AudioWeight() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct TagDB : HelperObject<TagDB> // Object
+        {
+            explicit TagDB(Ent::Property _node): HelperObject<TagDB>(std::move(_node)) {}
+            static constexpr char schemaName[] = "TagDB";
+            static TagDB load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return TagDB(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static TagDB loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return TagDB(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static TagDB create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return TagDB(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            TagDB makeInstanceOf()
+            {
+                return TagDB(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Map<char const*, Ent::Gen2::TagInfo> TagInfoTable() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -11150,6 +11268,34 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct SoundOpportunitiesConfig : HelperObject<SoundOpportunitiesConfig> // Object
+        {
+            explicit SoundOpportunitiesConfig(Ent::Property _node): HelperObject<SoundOpportunitiesConfig>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SoundOpportunitiesConfig";
+            static SoundOpportunitiesConfig load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return SoundOpportunitiesConfig(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static SoundOpportunitiesConfig loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return SoundOpportunitiesConfig(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static SoundOpportunitiesConfig create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return SoundOpportunitiesConfig(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            SoundOpportunitiesConfig makeInstanceOf()
+            {
+                return SoundOpportunitiesConfig(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData> SmallActorSpawnRules() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct FadeDuration : HelperObject<FadeDuration> // Object
         {
             explicit FadeDuration(Ent::Property _node): HelperObject<FadeDuration>(std::move(_node)) {}
@@ -14049,6 +14195,7 @@ namespace Ent
             {
                 return TestDefaultValues(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::Float DoubleWithDefaultValue() const;
             Ent::Gen2::Matrix33 Matrix() const;
             Ent::Gen2::Matrix33 Matrix2() const;
             Ent::Gen2::ComponentGD Super() const;
@@ -19618,7 +19765,7 @@ namespace Ent
             Ent::Gen2::String RTPC_UnderwaterCameraActivator() const;
             Ent::Gen2::String RTPC_UnderwaterDepth() const;
             Ent::Gen2::Float RainLevelStart() const;
-            Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData> SmallActorSpawnRules() const;
+            Ent::Gen2::SoundOpportunitiesConfig SoundOpportunitiesConfig() const;
             Ent::Gen2::String SoundTagDataFile() const;
             Ent::Gen2::String Sound_GameEntity_Stop_All() const;
             Ent::Gen2::String Sound_GameObject_Dial_Stop() const;
@@ -37524,34 +37671,6 @@ namespace Ent
         };
 
 
-        struct TagInfo : HelperObject<TagInfo> // Object
-        {
-            explicit TagInfo(Ent::Property _node): HelperObject<TagInfo>(std::move(_node)) {}
-            static constexpr char schemaName[] = "TagInfo";
-            static TagInfo load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return TagInfo(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static TagInfo loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return TagInfo(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static TagInfo create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return TagInfo(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            TagInfo makeInstanceOf()
-            {
-                return TagInfo(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::Int AudioWeight() const;
-            Ent::Gen2::String _comment() const;
-        };
-
         struct Team_PlayerData : HelperObject<Team_PlayerData> // Object
         {
             explicit Team_PlayerData(Ent::Property _node): HelperObject<Team_PlayerData>(std::move(_node)) {}
@@ -37692,37 +37811,6 @@ namespace Ent
             Ent::Gen2::Float MoveBlend() const;
             Ent::Gen2::Float TravelSpeed() const;
             Ent::Gen2::Bool UseFlyingNavMesh() const;
-            Ent::Gen2::String _comment() const;
-        };
-
-        struct VegetationResourceData : HelperObject<VegetationResourceData> // Object
-        {
-            explicit VegetationResourceData(Ent::Property _node): HelperObject<VegetationResourceData>(std::move(_node)) {}
-            static constexpr char schemaName[] = "VegetationResourceData";
-            static VegetationResourceData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return VegetationResourceData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static VegetationResourceData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return VegetationResourceData(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static VegetationResourceData create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return VegetationResourceData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            VegetationResourceData makeInstanceOf()
-            {
-                return VegetationResourceData(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::String GRCPath() const;
-            Ent::Gen2::String Name() const;
-            Ent::Gen2::PrimitiveSet<char const*> Tags() const;
-            Ent::Gen2::String VisibilityDistanceCategory() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -38668,6 +38756,36 @@ namespace Ent
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("val"));
         }
+        // VegetationData
+        inline Ent::Gen2::String VegetationData::GRCPath() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("GRCPath"));
+        }
+        inline Ent::Gen2::String VegetationData::Name() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("Name"));
+        }
+        inline Ent::Gen2::PrimitiveSet<char const*> VegetationData::Tags() const
+        {
+            return Ent::Gen2::PrimitiveSet<char const*>(getProperty().getObjectField("Tags"));
+        }
+        inline Ent::Gen2::String VegetationData::VisibilityDistanceCategory() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("VisibilityDistanceCategory"));
+        }
+        inline Ent::Gen2::String VegetationData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // VegetationDataList
+        inline Array<Ent::Gen2::VegetationData> VegetationDataList::Data() const
+        {
+            return Array<Ent::Gen2::VegetationData>(getProperty().getObjectField("Data"));
+        }
+        inline Ent::Gen2::String VegetationDataList::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // sPhysicsShapeBox
         inline Ent::Gen2::String sPhysicsShapeBox::_comment() const
         {
@@ -39099,6 +39217,24 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("Tag"));
         }
         inline Ent::Gen2::String TaggedSDF::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // TagInfo
+        inline Ent::Gen2::Int TagInfo::AudioWeight() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("AudioWeight"));
+        }
+        inline Ent::Gen2::String TagInfo::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // TagDB
+        inline Ent::Gen2::Map<char const*, Ent::Gen2::TagInfo> TagDB::TagInfoTable() const
+        {
+            return Ent::Gen2::Map<char const*, Ent::Gen2::TagInfo>(getProperty().getObjectField("TagInfoTable"));
+        }
+        inline Ent::Gen2::String TagDB::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -47504,6 +47640,15 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // SoundOpportunitiesConfig
+        inline Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData> SoundOpportunitiesConfig::SmallActorSpawnRules() const
+        {
+            return Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData>(getProperty().getObjectField("SmallActorSpawnRules"));
+        }
+        inline Ent::Gen2::String SoundOpportunitiesConfig::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // FadeDuration
         inline Ent::Gen2::String FadeDuration::_comment() const
         {
@@ -49559,6 +49704,10 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // TestDefaultValues
+        inline Ent::Gen2::Float TestDefaultValues::DoubleWithDefaultValue() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("DoubleWithDefaultValue"));
+        }
         inline Ent::Gen2::Matrix33 TestDefaultValues::Matrix() const
         {
             return Ent::Gen2::Matrix33(getProperty().getObjectField("Matrix"));
@@ -58516,9 +58665,9 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("RainLevelStart"));
         }
-        inline Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData> SoundManager::SmallActorSpawnRules() const
+        inline Ent::Gen2::SoundOpportunitiesConfig SoundManager::SoundOpportunitiesConfig() const
         {
-            return Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData>(getProperty().getObjectField("SmallActorSpawnRules"));
+            return Ent::Gen2::SoundOpportunitiesConfig(getProperty().getObjectField("SoundOpportunitiesConfig"));
         }
         inline Ent::Gen2::String SoundManager::SoundTagDataFile() const
         {
@@ -71784,15 +71933,6 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("m_pendingDiff"));
         }
-        // TagInfo
-        inline Ent::Gen2::Int TagInfo::AudioWeight() const
-        {
-            return Ent::Gen2::Int(getProperty().getObjectField("AudioWeight"));
-        }
-        inline Ent::Gen2::String TagInfo::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
         // Team_PlayerData
         inline Ent::Gen2::Int Team_PlayerData::PlayerID() const
         {
@@ -71835,27 +71975,6 @@ namespace Ent
             return Ent::Gen2::Bool(getProperty().getObjectField("UseFlyingNavMesh"));
         }
         inline Ent::Gen2::String TravelParams::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        // VegetationResourceData
-        inline Ent::Gen2::String VegetationResourceData::GRCPath() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("GRCPath"));
-        }
-        inline Ent::Gen2::String VegetationResourceData::Name() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("Name"));
-        }
-        inline Ent::Gen2::PrimitiveSet<char const*> VegetationResourceData::Tags() const
-        {
-            return Ent::Gen2::PrimitiveSet<char const*>(getProperty().getObjectField("Tags"));
-        }
-        inline Ent::Gen2::String VegetationResourceData::VisibilityDistanceCategory() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("VisibilityDistanceCategory"));
-        }
-        inline Ent::Gen2::String VegetationResourceData::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }

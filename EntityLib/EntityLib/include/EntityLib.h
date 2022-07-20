@@ -62,7 +62,7 @@ namespace Ent
         EntityLib& operator=(EntityLib const&) = delete;
         DeleteCheck deleteCheck;
 
-        PropImplPtr newPropImpl() const;
+        PropImplPtr newPropImpl();
         PropImplPtr newPropImpl(
             PropImplPtr _parent,
             Subschema const* _schema,

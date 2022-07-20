@@ -38,7 +38,7 @@ namespace Ent
     public:
         using Key = std::variant<std::string, size_t>;
 
-        PropImpl();
+        PropImpl(EntityLib* _entityLib);
         PropImpl(PropImpl const&) = delete;
         PropImpl& operator=(PropImpl const&) = delete;
         PropImpl(PropImpl&&) = delete;

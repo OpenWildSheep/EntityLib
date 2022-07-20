@@ -72,7 +72,10 @@ namespace Ent
         return get<EntityRef>();
     }
 
-    PropImpl::PropImpl() = default;
+    PropImpl::PropImpl(EntityLib* _entityLib)
+        : m_entityLib(_entityLib)
+    {
+    }
 
     PropImpl::PropImpl(
         EntityLib* _entityLib,

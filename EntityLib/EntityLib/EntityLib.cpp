@@ -1850,13 +1850,13 @@ namespace Ent
                                                       Node(std::move(val), _subschema));
     }
 
-    PropImplPtr EntityLib::newPropImpl() const
+    PropImplPtr EntityLib::newPropImpl()
     {
         PropImpl* property{};
         auto* mem = propertyPool.alloc();
         try
         {
-            property = new (mem) PropImpl();
+            property = new (mem) PropImpl(this);
         }
         catch (...)
         {

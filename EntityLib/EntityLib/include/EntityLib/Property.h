@@ -28,15 +28,12 @@ namespace Ent
         }
         Property(Property&& _other) noexcept = default;
         Property& operator=(Property&& _other) noexcept = default;
-        Property(EntityLib* _entityLib, Subschema const* _schema, char const* _filename)
-            : m_self(_entityLib->newPropImpl(nullptr, _schema, _filename))
-        {
-        }
+        Property(EntityLib* _entityLib, Subschema const* _schema, char const* _filename);
         Property(
-            EntityLib* _entityLib, Subschema const* _schema, char const* _filename, nlohmann::json* _doc)
-            : m_self(_entityLib->newPropImpl(nullptr, _schema, _filename, _doc))
-        {
-        }
+            EntityLib* _entityLib,
+            Subschema const* _schema,
+            char const* _filename,
+            nlohmann::json* _doc);
 
         /// Save to _filename or to the source file
         void save(char const* _filename = nullptr) const

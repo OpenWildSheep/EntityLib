@@ -3,6 +3,16 @@
 
 namespace Ent
 {
+    Property::Property(EntityLib* _entityLib, Subschema const* _schema, char const* _filename)
+        : m_self(_entityLib->newPropImpl(nullptr, _schema, _filename))
+    {
+    }
+    Property::Property(
+        EntityLib* _entityLib, Subschema const* _schema, char const* _filename, nlohmann::json* _doc)
+        : m_self(_entityLib->newPropImpl(nullptr, _schema, _filename, _doc))
+    {
+    }
+
     void Property::copyInto(Property& _dest, [[maybe_unused]] CopyMode _copyMode)
     {
         CopyProperty copier(_dest, OverrideValueSource::OverrideOrPrefab);

@@ -87,7 +87,6 @@ namespace Ent
             auto const& properties = m_schema.base->properties;
             if (auto const propIter = properties.find(_field); propIter != properties.end())
             {
-                _field = propIter->first.c_str(); // Convert _field to static string
                 _fieldRef = &propIter->second;
             }
             else
@@ -128,7 +127,6 @@ namespace Ent
                 iter != unionSchema.unionTypeMap.end())
             {
                 newLayer.m_schema = Schema{iter->second.dataSchema, nullptr};
-                _key = iter->first.c_str(); // Convert _key to a long living memory
             }
             else
             {
@@ -138,7 +136,6 @@ namespace Ent
         else
         {
             newLayer.m_schema = Schema{_dataSchema, nullptr};
-            _key = _dataSchema->name.c_str(); // Convert _key to a long living memory
         }
         newLayer.m_key = _key;
 
@@ -194,11 +191,6 @@ namespace Ent
             }
         }
         ENTLIB_DBG_ASSERT(newLayer.m_schema.base != nullptr);
-        auto keyField = newLayer.getObjectField(keyFieldName);
-        if (keyField.isSet())
-        {
-            newLayer.m_key = keyField.getString(); // Convert _key to a long living memory
-        }
         return newLayer;
     }
 
@@ -410,7 +402,7 @@ namespace Ent
             {
                 (*_parent.m_values) = json::object();
             }
-            auto const* fieldName = std::get<char const*>(childName);
+            auto const& fieldName = std::get<std::string>(childName);
             (*_parent.m_values)[fieldName] = {};
             newLayerJson = &(*_parent.m_values)[fieldName];
         }
@@ -421,7 +413,7 @@ namespace Ent
             {
                 (*_parent.m_values) = json::object();
             }
-            auto const* fieldName = std::get<char const*>(childName);
+            auto const& fieldName = std::get<std::string>(childName);
             auto const* typeField = _parent.m_schema.base->getUnionNameField();
             auto const* dataField = _parent.m_schema.base->getUnionDataField();
             (*_parent.m_values)[typeField] = fieldName;
@@ -440,7 +432,7 @@ namespace Ent
             {
             case DataType::string:
             {
-                auto const* key = std::get<char const*>(childName);
+                auto const& key = std::get<std::string>(childName);
                 auto pairNode = json::array();
                 pairNode.push_back(key);
                 pairNode.emplace_back();
@@ -482,7 +474,7 @@ namespace Ent
             }
             case DataType::string: // String set
             {
-                auto const* key = std::get<char const*>(childName);
+                auto const& key = std::get<std::string>(childName);
                 _parent.m_values->push_back(key);
                 ENTLIB_ASSERT(newLayerJson != nullptr);
                 break;
@@ -497,7 +489,7 @@ namespace Ent
                 (*_parent.m_values) = json::array();
             }
             auto wrapper = json::object();
-            auto const* fieldName = std::get<char const*>(childName);
+            auto const& fieldName = std::get<std::string>(childName);
             auto* unionSchema = &_parent.m_schema.base->singularItems->get();
             auto const* typeField = unionSchema->getUnionNameField();
             auto const* dataField = unionSchema->getUnionDataField();
@@ -522,7 +514,7 @@ namespace Ent
             {
             case DataType::string:
             {
-                auto const* key = std::get<char const*>(childName);
+                auto const& key = std::get<std::string>(childName);
                 object[*meta.keyField] = key;
                 break;
             }

@@ -26,7 +26,11 @@ namespace Ent
     /// @remark FileProperty know nothing about prefab ("InstanceOf"). It only know about one file.
     struct ENTLIB_DLLEXPORT FileProperty
     {
-        using Key = std::variant<char const*, int64_t>;
+        /// Token of the NodeRef used to access to this FileProperty
+        ///
+        /// @remark It is not possible to ensure that the "char*" will be kept in memory, so it is needed to
+        /// own the memory inside a std::string.
+        using Key = std::variant<std::string, int64_t>;
         struct Schema
         {
             Subschema const* base = nullptr;

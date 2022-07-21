@@ -1332,9 +1332,9 @@ namespace Ent
             [](auto const& _key)
             {
                 using KeyType = std::remove_const_t<std::remove_reference_t<decltype(_key)>>;
-                if constexpr (std::is_same_v<KeyType, char const*>)
+                if constexpr (std::is_same_v<KeyType, std::string>)
                 {
-                    return std::string(_key);
+                    return _key;
                 }
                 else if constexpr (std::is_same_v<KeyType, int64_t>)
                 {

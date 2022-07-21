@@ -266,6 +266,7 @@ namespace Ent
         void _checkInvariants() const;
         template <typename Container, typename F>
         [[nodiscard]] Container getKeys(F const& getKeysInFile);
+        void _checkKind(DataKind _expectedKind, char const* _funcName) const;
 
         EntityLib* m_entityLib = nullptr;
         PropImplPtr m_prefab = nullptr;

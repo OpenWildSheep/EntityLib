@@ -3,6 +3,22 @@
 
 namespace Ent
 {
+
+    void PropImpl::_checkKind(DataKind _expectedKind, char const* _funcName) const
+    {
+        if (auto kind = getDataKind(); kind != _expectedKind)
+        {
+            throw BadType(staticFormat(
+                "In %s : Expected %s. Got %s (schema : %s)",
+                _funcName,
+                DataKindStr[static_cast<size_t>(_expectedKind)],
+                DataKindStr[static_cast<size_t>(kind)],
+                getSchema()->name.c_str()));
+        }
+    }
+
+#define CHECK_TYPE(KIND) _checkKind(KIND, __func__)
+
     void PropImpl::setDefault(
         Subschema const* _schema, char const* _filePath, nlohmann::json const* _document)
     {
@@ -53,22 +69,27 @@ namespace Ent
 
     double PropImpl::getFloat() const
     {
+        CHECK_TYPE(DataKind::number);
         return get<double>();
     }
     int64_t PropImpl::getInt() const
     {
+        CHECK_TYPE(DataKind::integer);
         return get<int64_t>();
     }
     char const* PropImpl::getString() const
     {
+        CHECK_TYPE(DataKind::string);
         return get<char const*>();
     }
     bool PropImpl::getBool() const
     {
+        CHECK_TYPE(DataKind::boolean);
         return get<bool>();
     }
     EntityRef PropImpl::getEntityRef() const
     {
+        CHECK_TYPE(DataKind::entityRef);
         return get<EntityRef>();
     }
 
@@ -151,6 +172,7 @@ namespace Ent
     PropImplPtr PropImpl::getObjectField(char const* _field, SubschemaRef const* _fieldRef)
     {
         _checkInvariants();
+        CHECK_TYPE(DataKind::object);
         ENTLIB_DBG_ASSERT(getDataType() == DataType::object);
         auto newLayer = m_entityLib->newPropImpl();
         ENTLIB_DBG_ASSERT(getDefault().getSchema()->type == DataType::object);
@@ -197,6 +219,7 @@ namespace Ent
 
     PropImplPtr PropImpl::getUnionData(char const* _type)
     {
+        CHECK_TYPE(DataKind::union_);
         ENTLIB_ASSERT(getSchema()->type == DataType::oneOf);
         if (_type == nullptr)
         {
@@ -207,6 +230,7 @@ namespace Ent
 
     PropImplPtr PropImpl::getUnionSetItem(char const* _type, Subschema const* _dataSchema)
     {
+        CHECK_TYPE(DataKind::unionSet);
         if (_dataSchema == nullptr)
         {
             auto const& singularItems = m_instance.getSchema()->singularItems;
@@ -285,16 +309,19 @@ namespace Ent
 
     PropImplPtr PropImpl::getObjectSetItem(int64_t _key)
     {
+        CHECK_TYPE(DataKind::objectSet);
         return _enterItem([_key](auto&& _cur) { return _cur.getObjectSetItem(_key); });
     }
 
     PropImplPtr PropImpl::getMapItem(char const* _key)
     {
+        CHECK_TYPE(DataKind::map);
         return _enterItem([_key](auto&& _cur) { return _cur.getMapItem(_key); });
     }
 
     PropImplPtr PropImpl::getMapItem(int64_t _field)
     {
+        CHECK_TYPE(DataKind::map);
         return _enterItem([_field](auto&& _cur) { return _cur.getMapItem(_field); });
     }
 
@@ -390,6 +417,7 @@ namespace Ent
 
     char const* PropImpl::getUnionType() const
     {
+        CHECK_TYPE(DataKind::union_);
         ENTLIB_ASSERT(getSchema()->type == DataType::oneOf);
         if (char const* type = m_instance.getUnionType())
         {
@@ -411,6 +439,7 @@ namespace Ent
 
     size_t PropImpl::getUnionTypeIndex() const
     {
+        CHECK_TYPE(DataKind::union_);
         auto const* const type = getUnionType();
         return AT(getSchema()->unionTypeMap, type).index;
     }
@@ -444,11 +473,13 @@ namespace Ent
 
     DataType PropImpl::getMapKeyType() const
     {
+        CHECK_TYPE(DataKind::map);
         return m_instance.getMapKeyType();
     }
 
     DataType PropImpl::getObjectSetKeyType() const
     {
+        CHECK_TYPE(DataKind::objectSet);
         auto const& schema = *m_instance.getSchema();
         if (auto const* const arrayMeta = std::get_if<Subschema::ArrayMeta>(&schema.meta))
         {
@@ -463,6 +494,7 @@ namespace Ent
 
     size_t PropImpl::arraySize() const
     {
+        CHECK_TYPE(DataKind::array);
         auto const& jsonExplLayer = m_instance;
         auto const* schema = jsonExplLayer.getSchema();
         if (schema->linearItems.has_value())
@@ -633,6 +665,7 @@ namespace Ent
 
     std::set<char const*, CmpStr> PropImpl::getMapKeysString()
     {
+        CHECK_TYPE(DataKind::map);
         return getKeys<std::set<char const*, CmpStr>>([](FileProperty const& _file, auto& _keys)
                                                       { _file.updateMapKeysString(_keys); });
     }
@@ -651,85 +684,103 @@ namespace Ent
     }
     std::set<int64_t> PropImpl::getMapKeysInt()
     {
+        CHECK_TYPE(DataKind::map);
         return getKeys<std::set<int64_t>>([](FileProperty const& _file, auto& _keys)
                                           { _file.updateMapKeysInt(_keys); });
     }
     std::set<int64_t> PropImpl::getPrimSetKeysInt()
     {
+        CHECK_TYPE(DataKind::primitiveSet);
         return getKeys<std::set<int64_t>>([](FileProperty const& _file, auto& _keys)
                                           { _file.updatePrimSetKeysInt(_keys); });
     }
     std::set<char const*, CmpStr> PropImpl::getPrimSetKeysString()
     {
+        CHECK_TYPE(DataKind::primitiveSet);
         return getKeys<std::set<char const*, CmpStr>>([](FileProperty const& _file, auto& _keys)
                                                       { _file.updatePrimSetKeysString(_keys); });
     }
 
     std::map<char const*, Subschema const*, CmpStr> PropImpl::getUnionSetKeysString()
     {
+        CHECK_TYPE(DataKind::unionSet);
         return getKeys<std::map<char const*, Subschema const*, CmpStr>>(
             [](FileProperty const& _file, auto& _keys) { _file.updateUnionSetKeysString(_keys); });
     }
 
     std::set<char const*, CmpStr> PropImpl::getObjectSetKeysString()
     {
+        CHECK_TYPE(DataKind::objectSet);
         return getKeys<std::set<char const*, CmpStr>>([](FileProperty const& _file, auto& _keys)
                                                       { _file.updateObjectSetKeysString(_keys); });
     }
 
     std::set<int64_t> PropImpl::getObjectSetKeysInt()
     {
+        CHECK_TYPE(DataKind::objectSet);
         return getKeys<std::set<int64_t>>([](FileProperty const& _file, auto& _keys)
                                           { _file.updateObjectSetKeysInt(_keys); });
     }
 
     std::set<char const*, CmpStr> PropImpl::getMapRemovedKeysString() const
     {
+        CHECK_TYPE(DataKind::map);
         return m_instance.getMapRemovedKeysString();
     }
     std::set<int64_t> PropImpl::getMapRemovedKeysInt() const
     {
+        CHECK_TYPE(DataKind::map);
         return m_instance.getMapRemovedKeysInt();
     }
     std::map<char const*, Subschema const*, CmpStr> PropImpl::getUnionSetRemovedKeysString() const
     {
+        CHECK_TYPE(DataKind::unionSet);
         return m_instance.getUnionSetRemovedKeysString();
     }
     std::set<char const*, CmpStr> PropImpl::getObjectSetRemovedKeysString() const
     {
+        CHECK_TYPE(DataKind::objectSet);
         return m_instance.getObjectSetRemovedKeysString();
     }
     std::set<int64_t> PropImpl::getObjectSetRemovedKeysInt() const
     {
+        CHECK_TYPE(DataKind::objectSet);
         return m_instance.getObjectSetRemovedKeysInt();
     }
 
     bool PropImpl::mapContains(char const* _key)
     {
+        CHECK_TYPE(DataKind::map);
         return getMapKeysString().count(_key) != 0;
     }
     bool PropImpl::mapContains(int64_t _key)
     {
+        CHECK_TYPE(DataKind::map);
         return getMapKeysInt().count(_key) != 0;
     }
     bool PropImpl::primSetContains(char const* _key)
     {
+        CHECK_TYPE(DataKind::primitiveSet);
         return _countPrimSetKeyImpl(_key);
     }
     bool PropImpl::primSetContains(int64_t _key)
     {
+        CHECK_TYPE(DataKind::primitiveSet);
         return _countPrimSetKeyImpl(_key);
     }
     bool PropImpl::unionSetContains(char const* _key)
     {
+        CHECK_TYPE(DataKind::unionSet);
         return getUnionSetKeysString().count(_key) != 0;
     }
     bool PropImpl::objectSetContains(char const* _key)
     {
+        CHECK_TYPE(DataKind::objectSet);
         return getObjectSetKeysString().count(_key) != 0;
     }
     bool PropImpl::objectSetContains(int64_t _key)
     {
+        CHECK_TYPE(DataKind::objectSet);
         return getObjectSetKeysInt().count(_key) != 0;
     }
 
@@ -761,6 +812,7 @@ namespace Ent
     }
     void PropImpl::setSize(size_t _size)
     {
+        CHECK_TYPE(DataKind::array);
         _buildPath();
         m_instance.setSize(_size);
     }
@@ -772,43 +824,51 @@ namespace Ent
 
     PropImplPtr PropImpl::push_back()
     {
+        CHECK_TYPE(DataKind::array);
         setSize(arraySize() + 1);
         return getArrayItem(arraySize() - 1);
     }
 
     void PropImpl::pop_back()
     {
+        CHECK_TYPE(DataKind::array);
         setSize(arraySize() - 1);
     }
 
     void PropImpl::setFloat(double _value)
     {
+        CHECK_TYPE(DataKind::number);
         _buildPath();
         m_instance.setFloat(_value);
     }
     void PropImpl::setInt(int64_t _value)
     {
+        CHECK_TYPE(DataKind::integer);
         _buildPath();
         m_instance.setInt(_value);
     }
     void PropImpl::setString(char const* _value)
     {
+        CHECK_TYPE(DataKind::string);
         ENTLIB_ASSERT(_value != nullptr);
         _buildPath();
         m_instance.setString(_value);
     }
     void PropImpl::setBool(bool _value)
     {
+        CHECK_TYPE(DataKind::boolean);
         _buildPath();
         m_instance.setBool(_value);
     }
     void PropImpl::setEntityRef(EntityRef const& _value)
     {
+        CHECK_TYPE(DataKind::entityRef);
         _buildPath();
         m_instance.setEntityRef(_value);
     }
     PropImplPtr PropImpl::setUnionType(char const* _type)
     {
+        CHECK_TYPE(DataKind::union_);
         if (getSchema()->unionTypeMap.count(_type) == 0)
         {
             throw BadUnionType(_type);
@@ -838,6 +898,7 @@ namespace Ent
 
     void PropImpl::insertPrimSetKey(char const* _key)
     {
+        CHECK_TYPE(DataKind::primitiveSet);
         if (not primSetContains(_key))
         {
             _buildPath();
@@ -846,6 +907,7 @@ namespace Ent
     }
     void PropImpl::insertPrimSetKey(int64_t _key)
     {
+        CHECK_TYPE(DataKind::primitiveSet);
         if (not primSetContains(_key))
         {
             _buildPath();
@@ -855,6 +917,7 @@ namespace Ent
 
     PropImplPtr PropImpl::insertUnionSetItem(char const* _key)
     {
+        CHECK_TYPE(DataKind::unionSet);
         auto newItem = getUnionSetItem(_key);
         newItem->buildPath();
         return newItem;
@@ -862,6 +925,7 @@ namespace Ent
 
     PropImplPtr PropImpl::insertMapItem(char const* _key)
     {
+        CHECK_TYPE(DataKind::map);
         auto newItem = getMapItem(_key);
         newItem->buildPath();
         return newItem;
@@ -869,6 +933,7 @@ namespace Ent
 
     PropImplPtr PropImpl::insertMapItem(int64_t _key)
     {
+        CHECK_TYPE(DataKind::map);
         auto newItem = getMapItem(_key);
         newItem->buildPath();
         return newItem;
@@ -876,6 +941,7 @@ namespace Ent
 
     PropImplPtr PropImpl::insertObjectSetItem(char const* _key)
     {
+        CHECK_TYPE(DataKind::objectSet);
         auto newItem = getObjectSetItem(_key);
         newItem->buildPath();
         return newItem;
@@ -883,6 +949,7 @@ namespace Ent
 
     PropImplPtr PropImpl::insertInstanceObjectSetItem(char const* _prefabPath)
     {
+        CHECK_TYPE(DataKind::objectSet);
         auto const prefab =
             m_entityLib->newPropImpl(nullptr, &getSchema()->singularItems->get(), _prefabPath);
         auto const& arrayMeta = std::get<Subschema::ArrayMeta>(getSchema()->meta);
@@ -902,6 +969,7 @@ namespace Ent
 
     PropImplPtr PropImpl::insertObjectSetItem(int64_t _key)
     {
+        CHECK_TYPE(DataKind::objectSet);
         auto newItem = getObjectSetItem(_key);
         newItem->buildPath();
         return newItem;
@@ -909,6 +977,7 @@ namespace Ent
 
     bool PropImpl::erasePrimSetKey(char const* _key)
     {
+        CHECK_TYPE(DataKind::primitiveSet);
         bool const isInPrefab = (m_prefab == nullptr) ? false : m_prefab->primSetContains(_key);
         if (isInPrefab)
         {
@@ -918,10 +987,12 @@ namespace Ent
     }
     bool PropImpl::erasePrimSetKey(int64_t _key)
     {
+        CHECK_TYPE(DataKind::primitiveSet);
         return m_instance.erasePrimSetKey(_key);
     }
     bool PropImpl::eraseObjectSetItem(char const* _key)
     {
+        CHECK_TYPE(DataKind::objectSet);
         bool const isInPrefab = (m_prefab == nullptr) ? false : m_prefab->objectSetContains(_key);
         if (isInPrefab)
         {
@@ -931,6 +1002,7 @@ namespace Ent
     }
     bool PropImpl::eraseObjectSetItem(int64_t _key)
     {
+        CHECK_TYPE(DataKind::objectSet);
         bool const isInPrefab = (m_prefab == nullptr) ? false : m_prefab->objectSetContains(_key);
         if (isInPrefab)
         {
@@ -940,6 +1012,7 @@ namespace Ent
     }
     bool PropImpl::eraseUnionSetItem(char const* _key)
     {
+        CHECK_TYPE(DataKind::unionSet);
         bool const isInPrefab = (m_prefab == nullptr) ? false : m_prefab->unionSetContains(_key);
         if (isInPrefab)
         {
@@ -949,6 +1022,7 @@ namespace Ent
     }
     bool PropImpl::eraseMapItem(char const* _key)
     {
+        CHECK_TYPE(DataKind::map);
         bool const isInPrefab = (m_prefab == nullptr) ? false : m_prefab->mapContains(_key);
         if (isInPrefab)
         {
@@ -958,6 +1032,7 @@ namespace Ent
     }
     bool PropImpl::eraseMapItem(int64_t _key)
     {
+        CHECK_TYPE(DataKind::map);
         bool const isInPrefab = (m_prefab == nullptr) ? false : m_prefab->mapContains(_key);
         if (isInPrefab)
         {
@@ -973,22 +1048,27 @@ namespace Ent
 
     double PropImpl::getDefaultFloat() const
     {
+        CHECK_TYPE(DataKind::number);
         return m_default.getFloat();
     }
     int64_t PropImpl::getDefaultInt() const
     {
+        CHECK_TYPE(DataKind::integer);
         return m_default.getInt();
     }
     char const* PropImpl::getDefaultString() const
     {
+        CHECK_TYPE(DataKind::string);
         return m_default.getString();
     }
     bool PropImpl::getDefaultBool() const
     {
+        CHECK_TYPE(DataKind::boolean);
         return m_default.getBool();
     }
     EntityRef PropImpl::getDefaultEntityRef() const
     {
+        CHECK_TYPE(DataKind::entityRef);
         return m_default.getEntityRef();
     }
 
@@ -1017,6 +1097,7 @@ namespace Ent
 
     double PropImpl::getPrefabFloat() const
     {
+        CHECK_TYPE(DataKind::number);
         if (auto const lastSetPrefab = getLastSetPrefab())
         {
             return lastSetPrefab->getFloat();
@@ -1025,6 +1106,7 @@ namespace Ent
     }
     int64_t PropImpl::getPrefabInt() const
     {
+        CHECK_TYPE(DataKind::integer);
         if (auto const lastSetPrefab = getLastSetPrefab())
         {
             return lastSetPrefab->getInt();
@@ -1033,6 +1115,7 @@ namespace Ent
     }
     char const* PropImpl::getPrefabString() const
     {
+        CHECK_TYPE(DataKind::string);
         if (auto const lastSetPrefab = getLastSetPrefab())
         {
             return lastSetPrefab->getString();
@@ -1041,6 +1124,7 @@ namespace Ent
     }
     bool PropImpl::getPrefabBool() const
     {
+        CHECK_TYPE(DataKind::boolean);
         if (auto const lastSetPrefab = getLastSetPrefab())
         {
             return lastSetPrefab->getBool();
@@ -1049,6 +1133,7 @@ namespace Ent
     }
     EntityRef PropImpl::getPrefabEntityRef() const
     {
+        CHECK_TYPE(DataKind::entityRef);
         if (auto const lastSetPrefab = getLastSetPrefab())
         {
             return lastSetPrefab->getEntityRef();
@@ -1120,6 +1205,7 @@ namespace Ent
 
     std::vector<char const*> PropImpl::getFieldNames() const
     {
+        CHECK_TYPE(DataKind::object);
         std::vector<char const*> fields;
         for (auto&& [field, schema] : getSchema()->properties)
         {

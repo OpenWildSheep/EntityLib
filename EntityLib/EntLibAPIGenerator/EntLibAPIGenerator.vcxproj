@@ -79,6 +79,7 @@
     <EnableMicrosoftCodeAnalysis>true</EnableMicrosoftCodeAnalysis>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
     <ExternalIncludePath>external/Mustache;$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
+    <CodeAnalysisRuleSet>..\..\WildShared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -89,6 +90,7 @@
     <EnableMicrosoftCodeAnalysis>true</EnableMicrosoftCodeAnalysis>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
     <ExternalIncludePath>external/Mustache;$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
+    <CodeAnalysisRuleSet>..\..\WildShared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

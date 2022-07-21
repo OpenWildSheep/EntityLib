@@ -643,6 +643,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("save_node_as_scene", &EntityLib::saveNodeAsScene)
         .def("get_parent_entity", static_cast<Node*(EntityLib::*)(Node*) const>(&EntityLib::getParentEntity), py::return_value_policy::reference_internal)
         .def("get_schema", &EntityLib::getSchema, py::return_value_policy::reference_internal)
+        .def("load_property", &EntityLib::loadProperty)
+        .def("load_property_copy", &EntityLib::loadPropertyCopy)
     ;
 
     pyEntityRef

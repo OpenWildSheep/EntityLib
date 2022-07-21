@@ -177,6 +177,18 @@ namespace Ent
         Node const* getParentEntity(Node const* _node) const; ///< Get the parent Entity Node
         std::optional<Property> getParentEntity(Property const& _node) const; ///< Get the parent Entity Property
 
+        /// Load a file into a Property
+        ///
+        /// The Property and its prefabs will share json data with other loaded Property
+        Property loadProperty(char const* _schemaName, char const* _filepath);
+
+        /// Load and copy file into a Property
+        ///
+        /// The Property will not share its json data with other loaded Properties.
+        /// It is considered as a new file.
+        /// However, the prefabs are not copied and still share their data with other Properties.
+        Property loadPropertyCopy(char const* _schemaName, char const* _filepath);
+
         nlohmann::json& readJsonFile(char const* _filepath) const;
         nlohmann::json& createTempJsonFile() const;
         void saveJsonFile(nlohmann::json const* doc, char const* _filepath, char const* _schema) const;

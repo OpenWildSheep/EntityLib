@@ -543,6 +543,18 @@ namespace Ent
         return std::nullopt;
     }
 
+    Property EntityLib::loadProperty(char const* _schemaName, char const* _filepath)
+    {
+        return Property(this, getSchema(_schemaName), _filepath);
+    }
+
+    Property EntityLib::loadPropertyCopy(char const* _schemaName, char const* _filepath)
+    {
+        auto& storage = createTempJsonFile();
+        storage = readJsonFile(_filepath);
+        return Property(this, getSchema(_schemaName), _filepath, &storage);
+    }
+
     json& EntityLib::readJsonFile(char const* _filepath) const
     {
         std::filesystem::path const filepath = very_weakly_canonical(_filepath);

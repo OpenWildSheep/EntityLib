@@ -56,10 +56,6 @@ namespace Ent
             Subschema const* _schema, ///< Schema of the file to load
             char const* _filename);
 
-        void
-        setDefault(Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
-        [[nodiscard]] FileProperty const& getDefault() const;
-
         /// Save to _filename or to the source file
         void save(char const* _filename = nullptr) const;
 
@@ -137,6 +133,7 @@ namespace Ent
         [[nodiscard]] DataType getMapKeyType() const; ///< @pre Map @brief Get the key type current Map
         [[nodiscard]] DataType
         getObjectSetKeyType() const; ///< @pre ObjectSet @brief Get the key type current ObjectSet
+        [[nodiscard]] DataType getPrimSetKeyType() const; ///< @pre PrimitiveSet @brief Get the key type Set
 
         [[nodiscard]] size_t size(); ///< @return the size the this Node whatever it is.
         [[nodiscard]] bool contains(Key const& _key); ///< @pre map/set. @return true if it contains _key.
@@ -267,6 +264,10 @@ namespace Ent
         template <typename Container, typename F>
         [[nodiscard]] Container getKeys(F const& getKeysInFile);
         void _checkKind(DataKind _expectedKind, char const* _funcName) const;
+
+        void _setDefault(
+            Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
+        [[nodiscard]] FileProperty const& _getDefault() const;
 
         EntityLib* m_entityLib = nullptr;
         PropImplPtr m_prefab = nullptr;

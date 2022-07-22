@@ -19,7 +19,7 @@ namespace Ent
 
 #define CHECK_TYPE(KIND) _checkKind(KIND, __func__)
 
-    void PropImpl::setDefault(
+    void PropImpl::_setDefault(
         Subschema const* _schema, char const* _filePath, nlohmann::json const* _document)
     {
         // Loïc : To fix this aweful const_cast, FileProperty need a const version 'ConstFileCursor'.
@@ -28,7 +28,7 @@ namespace Ent
         m_default = FileProperty{_schema, _filePath, const_cast<nlohmann::json*>(_document)};
     }
 
-    FileProperty const& PropImpl::getDefault() const
+    FileProperty const& PropImpl::_getDefault() const
     {
         return m_default;
     }
@@ -49,9 +49,9 @@ namespace Ent
         {
             return m_prefab->get<V>();
         }
-        if (getDefault().isSet())
+        if (_getDefault().isSet())
         {
-            return getDefault().get<V>();
+            return _getDefault().get<V>();
         }
         if constexpr (std::is_same_v<char const*, V>)
         {
@@ -113,7 +113,7 @@ namespace Ent
         m_entityLib = _entityLib;
         m_parent = std::move(_parent);
 
-        setDefault(_schema, nullptr, &_schema->defaultValue);
+        _setDefault(_schema, nullptr, &_schema->defaultValue);
         m_instance = FileProperty(_schema, _filename, _doc);
         ENTLIB_ASSERT(_doc != nullptr);
         ENTLIB_ASSERT(_doc->is_object());
@@ -175,7 +175,7 @@ namespace Ent
         CHECK_TYPE(DataKind::object);
         ENTLIB_DBG_ASSERT(getDataType() == DataType::object);
         auto newLayer = m_entityLib->newPropImpl();
-        ENTLIB_DBG_ASSERT(getDefault().getSchema()->type == DataType::object);
+        ENTLIB_DBG_ASSERT(_getDefault().getSchema()->type == DataType::object);
         newLayer->m_instance = m_instance.getObjectField(_field, _fieldRef);
         newLayer->m_entityLib = m_entityLib;
         newLayer->m_parent = sharedFromThis();
@@ -188,7 +188,7 @@ namespace Ent
             }
         }
         bool defaultFound = false;
-        auto const& defaultVal = getDefault();
+        auto const& defaultVal = _getDefault();
         if (defaultVal.isSet()) // If there is default, enter in
         {
             auto objectField = defaultVal.getObjectField(_field, _fieldRef);
@@ -203,15 +203,15 @@ namespace Ent
             auto const* const propDefVal = newLayer->m_instance.getPropertyDefaultValue();
             if (propDefVal != nullptr) // If there is property default, use them
             {
-                newLayer->setDefault(subschema, nullptr, propDefVal);
+                newLayer->_setDefault(subschema, nullptr, propDefVal);
             }
             else if (not subschema->defaultValue.is_null())
             {
-                newLayer->setDefault(subschema, nullptr, &subschema->defaultValue);
+                newLayer->_setDefault(subschema, nullptr, &subschema->defaultValue);
             }
             else
             {
-                newLayer->setDefault(subschema, nullptr, nullptr);
+                newLayer->_setDefault(subschema, nullptr, nullptr);
             }
         }
         return newLayer;
@@ -271,18 +271,18 @@ namespace Ent
         newLayer.m_instance = _enter(m_instance);
         newLayer.m_parent = sharedFromThis();
         auto const* subschema = newLayer.getSchema();
-        auto const& defaultVal = getDefault();
+        auto const& defaultVal = _getDefault();
         if (defaultVal.isSet()) // If there is default, enter in
         {
             newLayer.m_default = _enter(defaultVal);
         }
         else if (auto const* propDefVal = newLayer.m_instance.getPropertyDefaultValue()) // If there is property default, use them
         {
-            newLayer.setDefault(subschema, nullptr, propDefVal);
+            newLayer._setDefault(subschema, nullptr, propDefVal);
         }
         else // Use type default
         {
-            newLayer.setDefault(subschema, nullptr, &subschema->defaultValue);
+            newLayer._setDefault(subschema, nullptr, &subschema->defaultValue);
         }
         if (not isDefault())
         {
@@ -294,9 +294,9 @@ namespace Ent
                 }
             }
         }
-        if (newLayerPtr->getDefault().getSchema() == nullptr)
+        if (newLayerPtr->_getDefault().getSchema() == nullptr)
         {
-            newLayerPtr->setDefault(subschema, nullptr, nullptr);
+            newLayerPtr->_setDefault(subschema, nullptr, nullptr);
         }
         return newLayerPtr;
     }
@@ -345,18 +345,18 @@ namespace Ent
                 }
             }
         }
-        auto const& defaultVal = getDefault();
+        auto const& defaultVal = _getDefault();
         if (defaultVal.isSet()) // If there is default, enter in
         {
             newLayer.m_default = defaultVal.getArrayItem(_index);
         }
         else if (newLayer.m_instance.getPropertyDefaultValue() != nullptr) // If there is property default, use them
         {
-            newLayer.setDefault(subschema, nullptr, newLayer.m_instance.getPropertyDefaultValue());
+            newLayer._setDefault(subschema, nullptr, newLayer.m_instance.getPropertyDefaultValue());
         }
         else // Use type default
         {
-            newLayer.setDefault(subschema, nullptr, &subschema->defaultValue);
+            newLayer._setDefault(subschema, nullptr, &subschema->defaultValue);
         }
         return newLayerPtr;
     }
@@ -430,7 +430,7 @@ namespace Ent
                 return type2;
             }
         }
-        else if (char const* type3 = getDefault().getUnionType())
+        else if (char const* type3 = _getDefault().getUnionType())
         {
             return type3;
         }
@@ -448,7 +448,7 @@ namespace Ent
     {
 #ifdef _DEBUG
         ENTLIB_DBG_ASSERT(m_instance.getSchema() != nullptr);
-        ENTLIB_DBG_ASSERT(getDefault().getSchema()->type == m_instance.getSchema()->type);
+        ENTLIB_DBG_ASSERT(_getDefault().getSchema()->type == m_instance.getSchema()->type);
         if (m_prefab != nullptr)
         {
             m_prefab->_checkInvariants();
@@ -492,6 +492,14 @@ namespace Ent
             "In PropImpl::getObjectSetKeyType : Expected ObjectSet. Got %s", schema.name.c_str()));
     }
 
+    DataType PropImpl::getPrimSetKeyType() const
+    {
+        CHECK_TYPE(DataKind::primitiveSet);
+        _checkInvariants();
+        auto const& schema = *m_instance.getSchema();
+        return schema.singularItems->get().type;
+    }
+
     size_t PropImpl::arraySize() const
     {
         CHECK_TYPE(DataKind::array);
@@ -509,9 +517,9 @@ namespace Ent
         {
             return m_prefab->arraySize();
         }
-        if (getDefault().isSet())
+        if (_getDefault().isSet())
         {
-            return getDefault().getRawJson()->size();
+            return _getDefault().getRawJson()->size();
         }
         return schema->minItems;
     }
@@ -656,7 +664,7 @@ namespace Ent
         }
         else // else, get the dfault keys
         {
-            getKeysInFile(getDefault(), keys);
+            getKeysInFile(_getDefault(), keys);
         }
         // Anyway, add or remove keys from instance
         getKeysInFile(m_instance, keys);

@@ -174,6 +174,10 @@ namespace Ent
         {
             return getPimpl().getObjectSetKeyType();
         }
+        [[nodiscard]] DataType getPrimSetKeyType() const ///< @pre PrimitiveSet @brief Get the key type Set
+        {
+            return getPimpl().getPrimSetKeyType();
+        }
         [[nodiscard]] size_t size() const ///< @return the size the this Property whatever it is.
         {
             return getPimpl().size();

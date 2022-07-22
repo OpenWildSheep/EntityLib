@@ -58,48 +58,79 @@ namespace Ent
         }
         /// @brief Get the internal data of the union
         /// @pre It is a Union
-        [[nodiscard]] Property getUnionData(
-            char const* _type = nullptr ///< type of the internal data of the union
+        [[nodiscard]] std::optional<Property>
+        getUnionData(char const* _type ///< type of the internal data of the union
         ) const
         {
-            return Property{getPimpl().getUnionData(_type)};
+            if (auto unionData = getPimpl().getUnionData(_type))
+            {
+                return Property{std::move(unionData)};
+            }
+            return std::nullopt;
         }
+        [[nodiscard]] Property getUnionData() const
+        {
+            auto unionData = getPimpl().getUnionData();
+            ENTLIB_ASSERT(unionData != nullptr);
+            return Property{std::move(unionData)};
+        }
+
         /// @brief Get an item in a UnionSet
         /// @pre It is a UnionSet
-        [[nodiscard]] Property getUnionSetItem(
+        [[nodiscard]] std::optional<Property> getUnionSetItem(
             char const* _type, ///< Type of the item
             Subschema const* _dataSchema = nullptr ///< Schema of the item (For performance)
         ) const
         {
-            return Property{getPimpl().getUnionSetItem(_type, _dataSchema)};
+            if (auto item = getPimpl().getUnionSetItem(_type, _dataSchema))
+            {
+                return Property{std::move(item)};
+            }
+            return std::nullopt;
         }
         /// @brief Get the object in an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] Property getObjectSetItem(char const* _key ///< Key of the object
+        [[nodiscard]] std::optional<Property> getObjectSetItem(char const* _key ///< Key of the object
         ) const
         {
-            return Property{getPimpl().getObjectSetItem(_key)};
+            if (auto item = getPimpl().getObjectSetItem(_key))
+            {
+                return Property{std::move(item)};
+            }
+            return std::nullopt;
         }
         /// @brief Get the object in an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] Property getObjectSetItem(int64_t _key ///< Key of the object
+        [[nodiscard]] std::optional<Property> getObjectSetItem(int64_t _key ///< Key of the object
         ) const
         {
-            return Property{getPimpl().getObjectSetItem(_key)};
+            if (auto item = getPimpl().getObjectSetItem(_key))
+            {
+                return Property{std::move(item)};
+            }
+            return std::nullopt;
         }
         /// @brief Given a key, get the related value in a Map
         /// @pre It is an Map
-        [[nodiscard]] Property getMapItem(char const* _key ///< Key of the value
+        [[nodiscard]] std::optional<Property> getMapItem(char const* _key ///< Key of the value
         ) const
         {
-            return Property{getPimpl().getMapItem(_key)};
+            if (auto item = getPimpl().getMapItem(_key))
+            {
+                return Property{std::move(item)};
+            }
+            return std::nullopt;
         }
         /// @brief Given a key, get the related value in a Map
         /// @pre It is an Map
-        [[nodiscard]] Property getMapItem(int64_t _field ///< Key of the value
+        [[nodiscard]] std::optional<Property> getMapItem(int64_t _key ///< Key of the value
         ) const
         {
-            return Property{getPimpl().getMapItem(_field)};
+            if (auto item = getPimpl().getMapItem(_key))
+            {
+                return Property{std::move(item)};
+            }
+            return std::nullopt;
         }
         /// @brief Get the element in a Array
         /// @pre It is an Array
@@ -433,6 +464,61 @@ namespace Ent
         Property insertMapItem(int64_t _key) const
         {
             return Property{getPimpl().insertMapItem(_key)};
+        }
+
+        /// @brief Get the data of the union, as the given _type and a bool to inform if it is the actual data type
+        ///
+        /// @remark If not the right type, the type will be changed on writing.
+        [[nodiscard]] std::pair<Property, bool> forceGetUnionData(char const* _type = nullptr) const
+        {
+            auto [ptr, found] = getPimpl().forceGetUnionData(_type);
+            return {Property{std::move(ptr)}, found};
+        }
+
+        /// @brief Get the data in the union set and a bool to inform if it is actually in the unionset
+        ///
+        /// @remark If not in the unionset, it will be added only when writing.
+        [[nodiscard]] std::pair<Property, bool>
+        forceGetUnionSetItem(char const* _type, Subschema const* _dataSchema = nullptr) const
+        {
+            auto [ptr, found] = getPimpl().forceGetUnionSetItem(_type, _dataSchema);
+            return {Property{std::move(ptr)}, found};
+        }
+
+        /// @brief Get the data in the objectset and a bool to inform if it is actually in the objectset
+        ///
+        /// @remark If not in the objectset, it will be added only when writing.
+        [[nodiscard]] std::pair<Property, bool> forceGetObjectSetItem(char const* _key) const
+        {
+            auto [ptr, found] = getPimpl().forceGetObjectSetItem(_key);
+            return {Property{std::move(ptr)}, found};
+        }
+
+        /// @brief Get the data in the objectset and a bool to inform if it is actually in the objectset
+        ///
+        /// @remark If not in the map, it will be added only when writing.
+        [[nodiscard]] std::pair<Property, bool> forceGetObjectSetItem(int64_t _key) const
+        {
+            auto [ptr, found] = getPimpl().forceGetObjectSetItem(_key);
+            return {Property{std::move(ptr)}, found};
+        }
+
+        /// @brief Get the data in the map and a bool to inform if it is actually in the map
+        ///
+        /// @remark If not in the map, it will be added only when writing.
+        [[nodiscard]] std::pair<Property, bool> forceGetMapItem(char const* _key) const
+        {
+            auto [ptr, found] = getPimpl().forceGetMapItem(_key);
+            return {Property{std::move(ptr)}, found};
+        }
+
+        /// @brief Get the data in the map and a bool to inform if it is actually in the map
+        ///
+        /// @remark If not in the map, it will be added only when writing.
+        [[nodiscard]] std::pair<Property, bool> forceGetMapItem(int64_t _field) const
+        {
+            auto [ptr, found] = getPimpl().forceGetMapItem(_field);
+            return {Property{std::move(ptr)}, found};
         }
 
         /// @brief Erase the item _key in the set of string

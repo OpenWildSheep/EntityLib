@@ -219,22 +219,34 @@ namespace Ent
 
     PropImplPtr PropImpl::getUnionData(char const* _type)
     {
+        auto [data, exists] = forceGetUnionData(_type);
+        if (exists)
+        {
+            return std::move(data);
+        }
+        return nullptr;
+    }
+
+    std::pair<PropImplPtr, bool> PropImpl::forceGetUnionData(char const* _type)
+    {
         CHECK_TYPE(DataKind::union_);
-        ENTLIB_ASSERT(getSchema()->type == DataType::oneOf);
         if (_type == nullptr)
         {
             _type = getUnionType();
         }
-        return _enterItem([_type](auto&& _cur) { return _cur.getUnionData(_type); });
+        bool const isDefaultUnionType = strcmp(getSchema()->getUnionDefaultTypeName(), _type) == 0;
+        auto res = _enterItem(
+            [_type](auto&& _cur) { return _cur.forceGetUnionData(_type); }, isDefaultUnionType);
+        return res;
     }
 
-    PropImplPtr PropImpl::getUnionSetItem(char const* _type, Subschema const* _dataSchema)
+    std::pair<PropImplPtr, bool>
+    PropImpl::forceGetUnionSetItem(char const* _type, Subschema const* _dataSchema)
     {
         CHECK_TYPE(DataKind::unionSet);
         if (_dataSchema == nullptr)
         {
-            auto const& singularItems = m_instance.getSchema()->singularItems;
-            if (singularItems != nullptr)
+            if (auto const& singularItems = m_instance.getSchema()->singularItems)
             {
                 Subschema const& unionSchema = singularItems->get();
                 if (unionSchema.type != DataType::oneOf)
@@ -258,23 +270,72 @@ namespace Ent
             }
         }
         return _enterItem([_type, _dataSchema](auto&& _cur)
-                          { return _cur.getUnionSetItem(_type, _dataSchema); });
+                          { return _cur.forceGetUnionSetItem(_type, _dataSchema); });
+    }
+
+    PropImplPtr PropImpl::getUnionSetItem(char const* _type, Subschema const* _dataSchema)
+    {
+        if (auto [item, exist] = forceGetUnionSetItem(_type, _dataSchema); exist)
+        {
+            return std::move(item);
+        }
+        return nullptr;
+    }
+
+    PropImplPtr PropImpl::getObjectSetItem(char const* _key)
+    {
+        if (auto [item, exist] = forceGetObjectSetItem(_key); exist)
+        {
+            return std::move(item);
+        }
+        return nullptr;
+    }
+    PropImplPtr PropImpl::getObjectSetItem(int64_t _key)
+    {
+        if (auto [item, exist] = forceGetObjectSetItem(_key); exist)
+        {
+            return std::move(item);
+        }
+        return nullptr;
+    }
+    PropImplPtr PropImpl::getMapItem(char const* _key)
+    {
+        if (auto [item, exist] = forceGetMapItem(_key); exist)
+        {
+            return std::move(item);
+        }
+        return nullptr;
+    }
+    PropImplPtr PropImpl::getMapItem(int64_t _field)
+    {
+        if (auto [item, exist] = forceGetMapItem(_field); exist)
+        {
+            return std::move(item);
+        }
+        return nullptr;
     }
 
     template <typename E>
-    PropImplPtr PropImpl::_enterItem(E&& _enter)
+    std::pair<PropImplPtr, bool> PropImpl::_enterItem(
+        E&& _enter,
+        bool _isDefaultUnionType // = false
+    )
     {
         _checkInvariants();
         auto newLayerPtr = m_entityLib->newPropImpl();
         PropImpl& newLayer = *newLayerPtr;
         newLayer.m_entityLib = m_entityLib;
-        newLayer.m_instance = _enter(m_instance);
+        auto foundInInst = FileProperty::MapItemAction::None;
+        auto foundInDefault = FileProperty::MapItemAction::None;
+        bool found = false;
+        std::tie(newLayer.m_instance, foundInInst) = _enter(m_instance);
         newLayer.m_parent = sharedFromThis();
         auto const* subschema = newLayer.getSchema();
         auto const& defaultVal = _getDefault();
         if (defaultVal.isSet()) // If there is default, enter in
         {
-            newLayer.m_default = _enter(defaultVal);
+            std::tie(newLayer.m_default, foundInDefault) = _enter(defaultVal);
+            found = foundInDefault == FileProperty::MapItemAction::Add;
         }
         else if (auto const* propDefVal = newLayer.m_instance.getPropertyDefaultValue()) // If there is property default, use them
         {
@@ -283,6 +344,10 @@ namespace Ent
         else // Use type default
         {
             newLayer._setDefault(subschema, nullptr, &subschema->defaultValue);
+            if (_isDefaultUnionType)
+            {
+                found = true;
+            }
         }
         if (not isDefault())
         {
@@ -290,7 +355,7 @@ namespace Ent
             {
                 if (m_prefab != nullptr)
                 {
-                    newLayer.m_prefab = _enter(*m_prefab);
+                    std::tie(newLayer.m_prefab, found) = _enter(*m_prefab);
                 }
             }
         }
@@ -298,31 +363,34 @@ namespace Ent
         {
             newLayerPtr->_setDefault(subschema, nullptr, nullptr);
         }
-        return newLayerPtr;
+        found = foundInInst == FileProperty::MapItemAction::Add    ? true :
+                foundInInst == FileProperty::MapItemAction::Remove ? false :
+                                                                     found;
+        return std::pair{std::move(newLayerPtr), found};
     }
 
-    PropImplPtr PropImpl::getObjectSetItem(char const* _key)
-    {
-        ENTLIB_ASSERT(getDataKind() == DataKind::objectSet);
-        return _enterItem([_key](auto&& _cur) { return _cur.getObjectSetItem(_key); });
-    }
-
-    PropImplPtr PropImpl::getObjectSetItem(int64_t _key)
+    std::pair<PropImplPtr, bool> PropImpl::forceGetObjectSetItem(char const* _key)
     {
         CHECK_TYPE(DataKind::objectSet);
-        return _enterItem([_key](auto&& _cur) { return _cur.getObjectSetItem(_key); });
+        return _enterItem([_key](auto&& _cur) { return _cur.forceGetObjectSetItem(_key); });
     }
 
-    PropImplPtr PropImpl::getMapItem(char const* _key)
+    std::pair<PropImplPtr, bool> PropImpl::forceGetObjectSetItem(int64_t _key)
     {
-        CHECK_TYPE(DataKind::map);
-        return _enterItem([_key](auto&& _cur) { return _cur.getMapItem(_key); });
+        CHECK_TYPE(DataKind::objectSet);
+        return _enterItem([_key](auto&& _cur) { return _cur.forceGetObjectSetItem(_key); });
     }
 
-    PropImplPtr PropImpl::getMapItem(int64_t _field)
+    std::pair<PropImplPtr, bool> PropImpl::forceGetMapItem(char const* _key)
     {
         CHECK_TYPE(DataKind::map);
-        return _enterItem([_field](auto&& _cur) { return _cur.getMapItem(_field); });
+        return _enterItem([_key](auto&& _cur) { return _cur.forceGetMapItem(_key); });
+    }
+
+    std::pair<PropImplPtr, bool> PropImpl::forceGetMapItem(int64_t _field)
+    {
+        CHECK_TYPE(DataKind::map);
+        return _enterItem([_field](auto&& _cur) { return _cur.forceGetMapItem(_field); });
     }
 
     PropImplPtr PropImpl::getArrayItem(size_t _index)
@@ -1022,33 +1090,33 @@ namespace Ent
     PropImplPtr PropImpl::insertUnionSetItem(char const* _key)
     {
         CHECK_TYPE(DataKind::unionSet);
-        auto newItem = getUnionSetItem(_key);
+        auto [newItem, exists] = forceGetUnionSetItem(_key);
         newItem->buildPath();
-        return newItem;
+        return std::move(newItem);
     }
 
     PropImplPtr PropImpl::insertMapItem(char const* _key)
     {
         CHECK_TYPE(DataKind::map);
-        auto newItem = getMapItem(_key);
+        auto [newItem, found] = forceGetMapItem(_key);
         newItem->buildPath();
-        return newItem;
+        return std::move(newItem);
     }
 
     PropImplPtr PropImpl::insertMapItem(int64_t _key)
     {
         CHECK_TYPE(DataKind::map);
-        auto newItem = getMapItem(_key);
+        auto [newItem, found] = forceGetMapItem(_key);
         newItem->buildPath();
-        return newItem;
+        return std::move(newItem);
     }
 
     PropImplPtr PropImpl::insertObjectSetItem(char const* _key)
     {
         CHECK_TYPE(DataKind::objectSet);
-        auto newItem = getObjectSetItem(_key);
+        auto [newItem, found] = forceGetObjectSetItem(_key);
         newItem->buildPath();
-        return newItem;
+        return std::move(newItem);
     }
 
     PropImplPtr PropImpl::insertInstanceObjectSetItem(char const* _prefabPath)
@@ -1074,9 +1142,9 @@ namespace Ent
     PropImplPtr PropImpl::insertObjectSetItem(int64_t _key)
     {
         CHECK_TYPE(DataKind::objectSet);
-        auto newItem = getObjectSetItem(_key);
+        auto [newItem, found] = forceGetObjectSetItem(_key);
         newItem->buildPath();
-        return newItem;
+        return std::move(newItem);
     }
 
     bool PropImpl::erasePrimSetKey(char const* _key)

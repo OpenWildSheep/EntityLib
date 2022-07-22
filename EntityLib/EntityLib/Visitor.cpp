@@ -44,7 +44,7 @@ namespace Ent
                 case DataType::string:
                     for (char const* key : _expl.getMapKeysString())
                     {
-                        auto value = _expl.getMapItem(key);
+                        auto value = *_expl.getMapItem(key);
                         _visitor.inMapElement(value, key);
                         visitRecursive(value, _visitor);
                         _visitor.outMapElement(value);
@@ -53,7 +53,7 @@ namespace Ent
                 case DataType::integer:
                     for (int64_t const key : _expl.getMapKeysInt())
                     {
-                        auto value = _expl.getMapItem(key);
+                        auto value = *_expl.getMapItem(key);
                         _visitor.inMapElement(value, key);
                         visitRecursive(value, _visitor);
                         _visitor.outMapElement(value);
@@ -90,7 +90,7 @@ namespace Ent
                     {
                         auto data = _expl.getUnionSetItem(name, schema);
                         _visitor.inUnionSetElement(_expl, name);
-                        visitRecursive(data, _visitor);
+                        visitRecursive(*data, _visitor);
                         _visitor.outUnionSetElement(_expl);
                     }
                     _visitor.outUnionSet(_expl);
@@ -103,7 +103,7 @@ namespace Ent
                     case DataType::string:
                         for (auto&& key : _expl.getObjectSetKeysString())
                         {
-                            auto data = _expl.getObjectSetItem(key);
+                            auto data = *_expl.getObjectSetItem(key);
                             _visitor.inObjectSetElement(data, key);
                             visitRecursive(data, _visitor);
                             _visitor.outObjectSetElement(data);
@@ -112,7 +112,7 @@ namespace Ent
                     case DataType::integer:
                         for (auto&& key : _expl.getObjectSetKeysInt())
                         {
-                            auto data = _expl.getObjectSetItem(key);
+                            auto data = *_expl.getObjectSetItem(key);
                             _visitor.inObjectSetElement(data, key);
                             visitRecursive(data, _visitor);
                             _visitor.outObjectSetElement(data);

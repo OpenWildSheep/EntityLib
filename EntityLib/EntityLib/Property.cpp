@@ -52,7 +52,7 @@ namespace Ent
         CopyProperty copier(newItem, OverrideValueSource::OverrideOrPrefab, true);
         visitRecursive(*this, copier);
         auto currentItem = getMapItem(_current);
-        visitRecursive(currentItem, copier);
+        visitRecursive(*currentItem, copier);
         return newItem;
     }
     Property Property::mapRename(int64_t _current, int64_t _new) const
@@ -60,7 +60,7 @@ namespace Ent
         auto newItem = insertMapItem(_new);
         CopyProperty copier(newItem, OverrideValueSource::OverrideOrPrefab, true);
         auto currentItem = getMapItem(_current);
-        visitRecursive(currentItem, copier);
+        visitRecursive(*currentItem, copier);
         eraseMapItem(_current);
         return newItem;
     }
@@ -68,7 +68,7 @@ namespace Ent
     {
         auto newItem = insertUnionSetItem(_new);
         CopyProperty copier(newItem, OverrideValueSource::OverrideOrPrefab, true);
-        auto currentItem = getUnionSetItem(_current);
+        auto currentItem = *getUnionSetItem(_current);
         visitRecursive(currentItem, copier);
         eraseUnionSetItem(_current);
         return newItem;
@@ -85,7 +85,7 @@ namespace Ent
         auto newItem = insertObjectSetItem(_new);
         CopyProperty copier(newItem, OverrideValueSource::OverrideOrPrefab, true);
         auto currentItem = getObjectSetItem(_current);
-        visitRecursive(currentItem, copier);
+        visitRecursive(*currentItem, copier);
         eraseObjectSetItem(_current);
         ENTLIB_DBG_ASSERT(objectSetContains(_new));
         return newItem;
@@ -95,7 +95,7 @@ namespace Ent
         auto newItem = insertObjectSetItem(_new);
         CopyProperty copier(newItem, OverrideValueSource::OverrideOrPrefab, true);
         auto currentItem = getObjectSetItem(_current);
-        visitRecursive(currentItem, copier);
+        visitRecursive(*currentItem, copier);
         eraseObjectSetItem(_current);
         return newItem;
     }

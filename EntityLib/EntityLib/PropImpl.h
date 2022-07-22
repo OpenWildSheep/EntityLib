@@ -256,6 +256,14 @@ namespace Ent
 
         [[nodiscard]] FileProperty::Key getPathToken() const;
 
+        [[nodiscard]] std::pair<PropImplPtr, bool> forceGetUnionData(char const* _type = nullptr);
+        [[nodiscard]] std::pair<PropImplPtr, bool>
+        forceGetUnionSetItem(char const* _type, Subschema const* _dataSchema = nullptr);
+        [[nodiscard]] std::pair<PropImplPtr, bool> forceGetObjectSetItem(char const* _key);
+        [[nodiscard]] std::pair<PropImplPtr, bool> forceGetObjectSetItem(int64_t _key);
+        [[nodiscard]] std::pair<PropImplPtr, bool> forceGetMapItem(char const* _key);
+        [[nodiscard]] std::pair<PropImplPtr, bool> forceGetMapItem(int64_t _field);
+
     private:
         friend void decRef(PropImpl* self);
 
@@ -264,7 +272,8 @@ namespace Ent
         template <typename K>
         [[nodiscard]] bool _countPrimSetKeyImpl(K _key);
         template <typename E>
-        [[nodiscard]] PropImplPtr _enterItem(E&& _enter);
+        [[nodiscard]] std::pair<PropImplPtr, bool>
+        _enterItem(E&& _enter, bool _isDefaultUnionType = false);
         void _checkInvariants() const;
         template <typename Container, typename F>
         [[nodiscard]] Container getKeys(F const& getKeysInFile);

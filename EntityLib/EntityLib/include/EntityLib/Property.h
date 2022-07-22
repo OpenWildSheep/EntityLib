@@ -485,6 +485,23 @@ namespace Ent
             return getPimpl().eraseUnionSetItem(_key);
         }
 
+        void clearMap() const
+        {
+            return getPimpl().clearMap();
+        }
+        void clearPrimSet() const
+        {
+            return getPimpl().clearPrimSet();
+        }
+        void clearObjectSet() const
+        {
+            return getPimpl().clearObjectSet();
+        }
+        void clearUnionSet() const
+        {
+            return getPimpl().clearUnionSet();
+        }
+
         /// Get the default number
         [[nodiscard]] double getDefaultFloat() const
         {

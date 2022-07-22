@@ -201,13 +201,18 @@ namespace Ent
         [[nodiscard]] PropImplPtr insertMapItem(char const* _key);
         [[nodiscard]] PropImplPtr insertMapItem(int64_t _key);
 
-        [[nodiscard]] bool erasePrimSetKey(char const* _key);
-        [[nodiscard]] bool erasePrimSetKey(int64_t _key);
-        [[nodiscard]] bool eraseObjectSetItem(char const* _key);
-        [[nodiscard]] bool eraseObjectSetItem(int64_t _key);
-        [[nodiscard]] bool eraseUnionSetItem(char const* _key);
-        [[nodiscard]] bool eraseMapItem(char const* _key);
-        [[nodiscard]] bool eraseMapItem(int64_t _key);
+        bool erasePrimSetKey(char const* _key);
+        bool erasePrimSetKey(int64_t _key);
+        bool eraseObjectSetItem(char const* _key);
+        bool eraseObjectSetItem(int64_t _key);
+        bool eraseUnionSetItem(char const* _key);
+        bool eraseMapItem(char const* _key);
+        bool eraseMapItem(int64_t _key);
+
+        void clearMap();
+        void clearPrimSet();
+        void clearObjectSet();
+        void clearUnionSet();
 
         [[nodiscard]] double getDefaultFloat() const;
         [[nodiscard]] int64_t getDefaultInt() const;

@@ -488,6 +488,11 @@ namespace Ent
                 return getProperty().empty();
             }
 
+             void clear()
+            {
+                getProperty().clear();
+            }
+
             struct iterator
             {
                 using iterator_category = std::forward_iterator_tag;

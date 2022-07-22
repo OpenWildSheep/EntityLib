@@ -728,6 +728,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property_readonly("absolute_noderef", &Property::makeAbsoluteNodeRef)
         .def_property_readonly("path_token", &Property::getPathToken)
         .def_property_readonly("get_prefab_history", &getPrefabHistory, py::keep_alive<0, 1>())
+        .def("clear", &Property::clear)
         ;
 
     py::register_exception<JsonValidation>(ent, "JsonValidation");

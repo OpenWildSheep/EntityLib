@@ -825,9 +825,105 @@ namespace Ent
         m_instance.setSize(_size);
     }
 
+    void PropImpl::clearMap()
+    {
+        CHECK_TYPE(DataKind::map);
+        switch (getMapKeyType()) // NOLINT(clang-diagnostic-switch-enum)
+        {
+        case DataType::integer:
+            for (auto const key : getMapKeysInt())
+            {
+                eraseMapItem(key);
+            }
+            break;
+        case DataType::string:
+        case DataType::entityRef:
+            for (auto const key : getMapKeysString())
+            {
+                eraseMapItem(key);
+            }
+            break;
+        default: ENTLIB_LOGIC_ERROR("Unexpected map key type");
+        }
+    }
+
+    void PropImpl::clearPrimSet()
+    {
+        CHECK_TYPE(DataKind::primitiveSet);
+        switch (getPrimSetKeyType()) // NOLINT(clang-diagnostic-switch-enum)
+        {
+        case DataType::integer:
+            for (auto const key : getPrimSetKeysInt())
+            {
+                erasePrimSetKey(key);
+            }
+            break;
+        case DataType::string:
+        case DataType::entityRef:
+            for (auto const key : getPrimSetKeysString())
+            {
+                erasePrimSetKey(key);
+            }
+            break;
+        default: ENTLIB_LOGIC_ERROR("Unexpected primitiveSet key type");
+        }
+    }
+
+    void PropImpl::clearObjectSet()
+    {
+        CHECK_TYPE(DataKind::objectSet);
+        switch (getObjectSetKeyType()) // NOLINT(clang-diagnostic-switch-enum)
+        {
+        case DataType::integer:
+            for (auto const key : getObjectSetKeysInt())
+            {
+                eraseObjectSetItem(key);
+            }
+            break;
+        case DataType::string:
+        case DataType::entityRef:
+            for (auto const key : getObjectSetKeysString())
+            {
+                eraseObjectSetItem(key);
+            }
+            break;
+        default: ENTLIB_LOGIC_ERROR("Unexpected objectSet key type");
+        }
+    }
+
+    void PropImpl::clearUnionSet()
+    {
+        CHECK_TYPE(DataKind::unionSet);
+        for (auto const [key, schema] : getUnionSetKeysString())
+        {
+            eraseUnionSetItem(key);
+        }
+    }
+
     void PropImpl::clear()
     {
-        setSize(0);
+        auto const kind = getDataKind();
+        switch (kind)
+        {
+        case DataKind::array: setSize(0); break;
+        case DataKind::map: clearMap(); break;
+        case DataKind::unionSet: clearUnionSet(); break;
+        case DataKind::objectSet: clearObjectSet(); break;
+        case DataKind::primitiveSet: clearPrimSet(); break;
+        case DataKind::entityRef: [[fallthrough]];
+        case DataKind::boolean: [[fallthrough]];
+        case DataKind::number: [[fallthrough]];
+        case DataKind::integer: [[fallthrough]];
+        case DataKind::object: [[fallthrough]];
+        case DataKind::string: [[fallthrough]];
+        case DataKind::union_: [[fallthrough]];
+        default:
+            throw BadType(staticFormat(
+                "In %s : Expected Array, Map or Set. Got %s (schema : %s)",
+                "clear",
+                DataKindStr[static_cast<size_t>(kind)],
+                getSchema()->name.c_str()));
+        }
     }
 
     PropImplPtr PropImpl::push_back()

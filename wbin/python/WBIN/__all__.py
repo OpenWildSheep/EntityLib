@@ -5,6 +5,8 @@ from . import BoneData
 from . import BoneMatrix
 from . import BoneWeight
 from . import Bool3
+from . import CloudPoint
+from . import CloudPointsChunk
 from . import doubleval
 from . import Float2
 from . import Float2Channel
@@ -27,6 +29,7 @@ from . import Mesh
 from . import MeshEdges
 from . import PCloud
 from . import Phys
+from . import RuntimePointCloud
 from . import SDF
 from . import SDFValues
 from . import SeedPatch

@@ -19,7 +19,9 @@ from . import GVoxelData
 from . import GVoxelPile
 from . import GVoxelVolume
 from . import HeightObj
+from . import Int3
 from . import MaterialRef
+from . import Matrix43
 from . import Matrix44
 from . import Mesh
 from . import MeshEdges

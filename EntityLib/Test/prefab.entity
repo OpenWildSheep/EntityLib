@@ -93,9 +93,6 @@
             },
             "Type": "ActorGD"
         }, {
-            "Data": {},
-            "Type": "BeamGeneratorGD"
-        }, {
             "Data": {
                 "ScriptEvents": [
                     {

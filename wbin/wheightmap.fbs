@@ -1,0 +1,29 @@
+include "wbin.fbs";
+
+namespace WBIN;
+
+struct HeightMapLayer
+{
+	normal:Float3;
+	height:float;
+	physicsmaterialid:uint8;
+}
+
+table HeightMapPixel
+{
+	layers:[HeightMapLayer] (required);
+}
+
+table HeightMap
+{
+	xmin:uint;
+	xmax:uint;
+	ymin:uint;
+	ymax:uint;
+	width:uint;
+	height:uint;
+	pixels:[HeightMapPixel] (required);
+}
+
+root_type HeightMap;
+

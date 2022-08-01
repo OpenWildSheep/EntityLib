@@ -183,6 +183,21 @@ class InGameCameraParams(HelperObject):
     @CollisionCorrectionSpeed.setter
     def CollisionCorrectionSpeed(self, val): self.CollisionCorrectionSpeed.set(val)
     @property
+    def CollisionSlowBackToPosSpeed(self):  # type: ()->Float
+        return Float(self._node.at("CollisionSlowBackToPosSpeed"))
+    @CollisionSlowBackToPosSpeed.setter
+    def CollisionSlowBackToPosSpeed(self, val): self.CollisionSlowBackToPosSpeed.set(val)
+    @property
+    def CollisionTouchGroundBackToPosSpeed(self):  # type: ()->Float
+        return Float(self._node.at("CollisionTouchGroundBackToPosSpeed"))
+    @CollisionTouchGroundBackToPosSpeed.setter
+    def CollisionTouchGroundBackToPosSpeed(self, val): self.CollisionTouchGroundBackToPosSpeed.set(val)
+    @property
+    def CollisionTouchGroundModePitchThreshold(self):  # type: ()->Float
+        return Float(self._node.at("CollisionTouchGroundModePitchThreshold"))
+    @CollisionTouchGroundModePitchThreshold.setter
+    def CollisionTouchGroundModePitchThreshold(self, val): self.CollisionTouchGroundModePitchThreshold.set(val)
+    @property
     def CollisionWantedNearPlane(self):  # type: ()->Float
         return Float(self._node.at("CollisionWantedNearPlane"))
     @CollisionWantedNearPlane.setter

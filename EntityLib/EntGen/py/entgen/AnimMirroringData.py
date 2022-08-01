@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.String import *
 from entgen.AnimMirroringSpecData import *
 
 from EntityLibPy import Node
@@ -24,6 +25,11 @@ class AnimMirroringData(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    @property
+    def handBaseBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.at("handBaseBoneNames"))
+    @handBaseBoneNames.setter
+    def handBaseBoneNames(self, val): self.handBaseBoneNames.set(val)
     @property
     def specs(self):  # type: ()->Array[AnimMirroringSpecData]
         return (lambda n: Array(AnimMirroringSpecData, n))(self._node.at("specs"))

@@ -159,6 +159,7 @@ from .Object_MaxActivationLevel import *
 from .NavMeshTag import *
 from .NavMeshCapability import *
 from .MusicCategory import *
+from .MoveCapacityData_TurnJump import *
 from .MoveCapacityData_OrientationSpeed import *
 from .MountableSnapLine_ControlPoint import *
 from .MountableData import *
@@ -756,6 +757,7 @@ from .EntityStateManageChildEntityPool import *
 from .EntityStateLateralLand import *
 from .EntityStateLateralDodge import *
 from .EntityStateJustStarted import *
+from .EntityStateJumpOriented import *
 from .EntityStateJumpHeightMultiplier import *
 from .EntityStateInteractedGPE import *
 from .EntityStateInjured import *
@@ -802,6 +804,7 @@ from .EntityStateDeathLand import *
 from .EntityStateDamageLand import *
 from .EntityStateCreatureProfile import *
 from .EntityStateCreatureHatching import *
+from .EntityStateCoyoteJump import *
 from .EntityStateControlGPE import *
 from .EntityStateConstrainedMove import *
 from .EntityStateConstrainedInput import *
@@ -829,6 +832,9 @@ from .EntityStateBounce import *
 from .EntityStateBoidsHomePos import *
 from .EntityStateBittenDefense import *
 from .EntityStateBitten import *
+from .EntityStateBiteOutWin import *
+from .EntityStateBiteOutTie import *
+from .EntityStateBiteOutLose import *
 from .EntityStateBiteOut import *
 from .EntityStateBiteIn import *
 from .EntityStateBiteAttack import *

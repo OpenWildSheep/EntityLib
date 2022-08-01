@@ -3737,6 +3737,11 @@ class ReflectedMaterialGroup(HelperObject):
     @Materials.setter
     def Materials(self, val): self.Materials.set(val)
     @property
+    def OverrideGroups(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.at("OverrideGroups"))
+    @OverrideGroups.setter
+    def OverrideGroups(self, val): self.OverrideGroups.set(val)
+    @property
     def Tags(self):  # type: ()->PrimArray[String]
         return (lambda n: PrimArray(String, n))(self._node.at("Tags"))
     @Tags.setter
@@ -5220,6 +5225,39 @@ class MusicCategory(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class MoveCapacityData_TurnJump(HelperObject):
+    schema_name = "MoveCapacityData::TurnJump"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->MoveCapacityData_TurnJump
+        return MoveCapacityData_TurnJump(entlib.load_node_file(sourcefile, entlib.get_schema(MoveCapacityData_TurnJump.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->MoveCapacityData_TurnJump
+        return MoveCapacityData_TurnJump(entlib.make_node(MoveCapacityData_TurnJump.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def isAllowed(self):  # type: ()->Bool
+        return Bool(self._node.at("isAllowed"))
+    @isAllowed.setter
+    def isAllowed(self, val): self.isAllowed.set(val)
+    @property
+    def jumpReleaseToApexRatio(self):  # type: ()->Float
+        return Float(self._node.at("jumpReleaseToApexRatio"))
+    @jumpReleaseToApexRatio.setter
+    def jumpReleaseToApexRatio(self, val): self.jumpReleaseToApexRatio.set(val)
+    @property
+    def orientationYawRateFactorPerSpeed(self):  # type: ()->Map[SpeedModeEnum, Float]
+        return (lambda n: Map(SpeedModeEnum, Float, n))(self._node.at("orientationYawRateFactorPerSpeed"))
     pass
 
 
@@ -8487,6 +8525,11 @@ class GraspableInteractionData(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    @property
+    def damagesAppliedToGrasperOnWin(self):  # type: ()->Float
+        return Float(self._node.at("damagesAppliedToGrasperOnWin"))
+    @damagesAppliedToGrasperOnWin.setter
+    def damagesAppliedToGrasperOnWin(self, val): self.damagesAppliedToGrasperOnWin.set(val)
     @property
     def graspStrength(self):  # type: ()->Float
         return Float(self._node.at("graspStrength"))
@@ -12447,6 +12490,9 @@ class ConstrainedMoveContextInput(HelperObject):
         return ConstrainedMoveContextInput(entlib.make_node(ConstrainedMoveContextInput.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def CoeffSmooth(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("CoeffSmooth"))
     @property
     def CurvatureNormalizationRadius(self):  # type: ()->Float
         return Float(self._node.at("CurvatureNormalizationRadius"))
@@ -18742,11 +18788,6 @@ class AnimationModelGD(HelperObject):
     def additionalSpeedDebug(self):  # type: ()->Map[LocomotionModeEnum, Map[SpeedModeEnum, Float]]
         return (lambda n: Map(LocomotionModeEnum, (lambda n: Map(SpeedModeEnum, Float, n)), n))(self._node.at("additionalSpeedDebug"))
     @property
-    def isLandAnimDriven(self):  # type: ()->Bool
-        return Bool(self._node.at("isLandAnimDriven"))
-    @isLandAnimDriven.setter
-    def isLandAnimDriven(self, val): self.isLandAnimDriven.set(val)
-    @property
     def isTurnAllowed(self):  # type: ()->Bool
         return Bool(self._node.at("isTurnAllowed"))
     @isTurnAllowed.setter
@@ -21969,10 +22010,8 @@ class CameraFreeData(HelperObject):
     @Deceleration.setter
     def Deceleration(self, val): self.Deceleration.set(val)
     @property
-    def JoyThreshold(self):  # type: ()->Float
-        return Float(self._node.at("JoyThreshold"))
-    @JoyThreshold.setter
-    def JoyThreshold(self, val): self.JoyThreshold.set(val)
+    def JoyThreshold(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("JoyThreshold"))
     @property
     def MoveBlend(self):  # type: ()->Float
         return Float(self._node.at("MoveBlend"))
@@ -22043,6 +22082,9 @@ class CameraEditorData(HelperObject):
         return Float(self._node.at("DistanceMin"))
     @DistanceMin.setter
     def DistanceMin(self, val): self.DistanceMin.set(val)
+    @property
+    def JoyThreshold(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("JoyThreshold"))
     @property
     def MoveBlend(self):  # type: ()->Float
         return Float(self._node.at("MoveBlend"))
@@ -22159,6 +22201,9 @@ class CameraManager(HelperObject):
         return Vector2(self._node.at("HeightLevel"))
     @HeightLevel.setter
     def HeightLevel(self, val): self.HeightLevel.set(val)
+    @property
+    def JoyThreshold(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("JoyThreshold"))
     @property
     def RotatePitchIn(self):  # type: ()->Float
         return Float(self._node.at("RotatePitchIn"))
@@ -23505,6 +23550,11 @@ class GameManager(HelperObject):
         return Float(self._node.at("ActionAttackValidityTime"))
     @ActionAttackValidityTime.setter
     def ActionAttackValidityTime(self, val): self.ActionAttackValidityTime.set(val)
+    @property
+    def ActionJumpValidityTime(self):  # type: ()->Float
+        return Float(self._node.at("ActionJumpValidityTime"))
+    @ActionJumpValidityTime.setter
+    def ActionJumpValidityTime(self, val): self.ActionJumpValidityTime.set(val)
     @property
     def AttackData(self):  # type: ()->GameAttackData
         return GameAttackData(self._node.at("AttackData"))
@@ -24871,6 +24921,9 @@ class MoveCapacityData(HelperObject):
     @turnAroundInputDirectionAngleDeltaMin.setter
     def turnAroundInputDirectionAngleDeltaMin(self, val): self.turnAroundInputDirectionAngleDeltaMin.set(val)
     @property
+    def turnJump(self):  # type: ()->MoveCapacityData_TurnJump
+        return MoveCapacityData_TurnJump(self._node.at("turnJump"))
+    @property
     def turnRotationMinRatioForNewTurn(self):  # type: ()->Float
         return Float(self._node.at("turnRotationMinRatioForNewTurn"))
     @turnRotationMinRatioForNewTurn.setter
@@ -25091,6 +25144,11 @@ class AnimMirroringData(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    @property
+    def handBaseBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.at("handBaseBoneNames"))
+    @handBaseBoneNames.setter
+    def handBaseBoneNames(self, val): self.handBaseBoneNames.set(val)
     @property
     def specs(self):  # type: ()->Array[AnimMirroringSpecData]
         return (lambda n: Array(AnimMirroringSpecData, n))(self._node.at("specs"))
@@ -27645,6 +27703,29 @@ class EntityStateJustStarted(HelperObject):
 
 from EntityLibPy import Node
 
+class EntityStateJumpOriented(HelperObject):
+    schema_name = "EntityStateJumpOriented"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateJumpOriented
+        return EntityStateJumpOriented(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateJumpOriented.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateJumpOriented
+        return EntityStateJumpOriented(entlib.make_node(EntityStateJumpOriented.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class EntityStateJumpHeightMultiplier(HelperObject):
     schema_name = "EntityStateJumpHeightMultiplier"
     @staticmethod
@@ -28740,6 +28821,29 @@ class EntityStateCreatureHatching(HelperObject):
 
 from EntityLibPy import Node
 
+class EntityStateCoyoteJump(HelperObject):
+    schema_name = "EntityStateCoyoteJump"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateCoyoteJump
+        return EntityStateCoyoteJump(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateCoyoteJump.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateCoyoteJump
+        return EntityStateCoyoteJump(entlib.make_node(EntityStateCoyoteJump.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class EntityStateControlGPE(HelperObject):
     schema_name = "EntityStateControlGPE"
     @staticmethod
@@ -29405,6 +29509,75 @@ class EntityStateBitten(HelperObject):
     @staticmethod
     def create(entlib):  # type: (EntityLib)->EntityStateBitten
         return EntityStateBitten(entlib.make_node(EntityStateBitten.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateBiteOutWin(HelperObject):
+    schema_name = "EntityStateBiteOutWin"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBiteOutWin
+        return EntityStateBiteOutWin(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBiteOutWin.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateBiteOutWin
+        return EntityStateBiteOutWin(entlib.make_node(EntityStateBiteOutWin.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateBiteOutTie(HelperObject):
+    schema_name = "EntityStateBiteOutTie"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBiteOutTie
+        return EntityStateBiteOutTie(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBiteOutTie.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateBiteOutTie
+        return EntityStateBiteOutTie(entlib.make_node(EntityStateBiteOutTie.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateBiteOutLose(HelperObject):
+    schema_name = "EntityStateBiteOutLose"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBiteOutLose
+        return EntityStateBiteOutLose(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBiteOutLose.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateBiteOutLose
+        return EntityStateBiteOutLose(entlib.make_node(EntityStateBiteOutLose.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
@@ -34977,6 +35150,9 @@ class ActionModeEnum(Enum):
     attackjumponto = "attackjumponto"
     bite = "bite"
     biteattack = "biteattack"
+    bitewin = "bitewin"
+    bitelose = "bitelose"
+    bitetie = "bitetie"
     stun = "stun"
     collapse = "collapse"
     throw_ = "throw"
@@ -34987,6 +35163,7 @@ class ActionModeEnum(Enum):
     hitwall = "hitwall"
     hitjump = "hitjump"
     landing = "landing"
+    landingfromspeed3 = "landingfromspeed3"
     landingfail = "landingfail"
     landingcatapult = "landingcatapult"
     landingrecover = "landingrecover"
@@ -35300,6 +35477,21 @@ class InGameCameraParams(HelperObject):
         return Float(self._node.at("CollisionCorrectionSpeed"))
     @CollisionCorrectionSpeed.setter
     def CollisionCorrectionSpeed(self, val): self.CollisionCorrectionSpeed.set(val)
+    @property
+    def CollisionSlowBackToPosSpeed(self):  # type: ()->Float
+        return Float(self._node.at("CollisionSlowBackToPosSpeed"))
+    @CollisionSlowBackToPosSpeed.setter
+    def CollisionSlowBackToPosSpeed(self, val): self.CollisionSlowBackToPosSpeed.set(val)
+    @property
+    def CollisionTouchGroundBackToPosSpeed(self):  # type: ()->Float
+        return Float(self._node.at("CollisionTouchGroundBackToPosSpeed"))
+    @CollisionTouchGroundBackToPosSpeed.setter
+    def CollisionTouchGroundBackToPosSpeed(self, val): self.CollisionTouchGroundBackToPosSpeed.set(val)
+    @property
+    def CollisionTouchGroundModePitchThreshold(self):  # type: ()->Float
+        return Float(self._node.at("CollisionTouchGroundModePitchThreshold"))
+    @CollisionTouchGroundModePitchThreshold.setter
+    def CollisionTouchGroundModePitchThreshold(self, val): self.CollisionTouchGroundModePitchThreshold.set(val)
     @property
     def CollisionWantedNearPlane(self):  # type: ()->Float
         return Float(self._node.at("CollisionWantedNearPlane"))

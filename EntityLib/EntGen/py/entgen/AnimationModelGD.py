@@ -36,11 +36,6 @@ class AnimationModelGD(HelperObject):
     def additionalSpeedDebug(self):  # type: ()->Map[LocomotionModeEnum, Map[SpeedModeEnum, Float]]
         return (lambda n: Map(LocomotionModeEnum, (lambda n: Map(SpeedModeEnum, Float, n)), n))(self._node.at("additionalSpeedDebug"))
     @property
-    def isLandAnimDriven(self):  # type: ()->Bool
-        return Bool(self._node.at("isLandAnimDriven"))
-    @isLandAnimDriven.setter
-    def isLandAnimDriven(self, val): self.isLandAnimDriven.set(val)
-    @property
     def isTurnAllowed(self):  # type: ()->Bool
         return Bool(self._node.at("isTurnAllowed"))
     @isTurnAllowed.setter

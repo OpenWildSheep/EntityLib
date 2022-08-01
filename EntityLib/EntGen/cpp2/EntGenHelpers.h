@@ -411,7 +411,7 @@ namespace Ent
 
                 [[nodiscard]] reference operator*() const
                 {
-                    return m_property.getUnionSetItem(keys[index]);
+                    return *m_property.getUnionSetItem(keys[index]);
                 }
 
                 [[nodiscard]] pointer operator->() const
@@ -486,6 +486,11 @@ namespace Ent
             [[nodiscard]] bool empty() const
             {
                 return getProperty().empty();
+            }
+
+            void clear()
+            {
+                getProperty().clear();
             }
 
             struct iterator
@@ -682,7 +687,7 @@ namespace Ent
                 std::vector<Property> subProps;
                 for (auto const& key : getKeys())
                 {
-                    subProps.push_back(getProperty().getObjectSetItem(key));
+                    subProps.push_back(*getProperty().getObjectSetItem(key));
                 }
                 return iterator{getProperty(), subProps, 0};
             }
@@ -866,7 +871,7 @@ namespace Ent
                 std::vector<std::pair<K, V>> properties;
                 for (auto&& key : getKeys())
                 {
-                    properties.emplace_back(key, getProperty().getMapItem(toInternal(key)));
+                    properties.emplace_back(key, *getProperty().getMapItem(toInternal(key)));
                 }
                 return iterator{getProperty(), std::move(properties), 0};
             }

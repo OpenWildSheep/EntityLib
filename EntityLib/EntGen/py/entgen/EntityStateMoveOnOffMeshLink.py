@@ -9,14 +9,14 @@ from entgen.ActorState import *
 
 from EntityLibPy import Node
 
-class ActorStateRespawnOnMount(HelperObject):
-    schema_name = "ActorStateRespawnOnMount"
+class EntityStateMoveOnOffMeshLink(HelperObject):
+    schema_name = "EntityStateMoveOnOffMeshLink"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateRespawnOnMount
-        return ActorStateRespawnOnMount(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateRespawnOnMount.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateMoveOnOffMeshLink
+        return EntityStateMoveOnOffMeshLink(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateMoveOnOffMeshLink.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->ActorStateRespawnOnMount
-        return ActorStateRespawnOnMount(entlib.make_node(ActorStateRespawnOnMount.schema_name))
+    def create(entlib):  # type: (EntityLib)->EntityStateMoveOnOffMeshLink
+        return EntityStateMoveOnOffMeshLink(entlib.make_node(EntityStateMoveOnOffMeshLink.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

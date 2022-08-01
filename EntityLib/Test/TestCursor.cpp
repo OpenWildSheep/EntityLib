@@ -438,7 +438,7 @@ public:
     }
     void inUnion([[maybe_unused]] Property& _prop, char const* _type) override
     {
-        expl2 = expl2.getUnionData(_type);
+        expl2 = *expl2.getUnionData(_type);
     }
     void outUnion([[maybe_unused]] Property& _prop) override
     {
@@ -460,11 +460,11 @@ public:
     }
     void inMapElement([[maybe_unused]] Property& _prop, char const* _key) override
     {
-        expl2 = expl2.getMapItem(_key);
+        expl2 = *expl2.getMapItem(_key);
     }
     void inMapElement([[maybe_unused]] Property& _prop, int64_t _key) override
     {
-        expl2 = expl2.getMapItem(_key);
+        expl2 = *expl2.getMapItem(_key);
     }
     void outMapElement([[maybe_unused]] Property& _prop) override
     {
@@ -511,7 +511,7 @@ public:
     }
     void inUnionSetElement([[maybe_unused]] Property& _prop, char const* _type) override
     {
-        expl2 = expl2.getUnionSetItem(_type);
+        expl2 = *expl2.getUnionSetItem(_type);
     }
     void outUnionSetElement([[maybe_unused]] Property& _prop) override
     {
@@ -547,7 +547,7 @@ public:
     }
     void inObjectSetElement(Property& _prop, char const* _key) override
     {
-        expl2 = expl2.getObjectSetItem(_key);
+        expl2 = *expl2.getObjectSetItem(_key);
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
@@ -558,7 +558,7 @@ public:
     }
     void inObjectSetElement([[maybe_unused]] Property& _prop, int64_t _key) override
     {
-        expl2 = expl2.getObjectSetItem(_key);
+        expl2 = *expl2.getObjectSetItem(_key);
     }
     void outObjectSetElement([[maybe_unused]] Property& _prop) override
     {
@@ -762,7 +762,7 @@ void testCursor(EntityLib& entlib)
         std::ifstream ifstr("test.SeedPatch.node");
         std::string filedata;
         std::getline(ifstr, filedata, static_cast<char>(0));
-        auto& d = entlib.readJsonFile("test.SeedPatch.node");
+        auto d = entlib.readJsonFile("test.SeedPatch.node");
         auto const& schema = d["$schema"].get_ref<nlohmann::json::string_t const&>();
         auto typeName = std::string(getRefTypeName(schema.c_str()));
         Property simpleObject(&entlib, entlib.getSchema(typeName.c_str()), "test.SeedPatch.node", &d);
@@ -773,7 +773,7 @@ void testCursor(EntityLib& entlib)
         std::ifstream ifstr("test.SeedPatch.node");
         std::string filedata;
         std::getline(ifstr, filedata, static_cast<char>(0));
-        auto& d = entlib.readJsonFile("test.SeedPatch.node");
+        auto d = entlib.readJsonFile("test.SeedPatch.node");
         auto typeName =
             std::string(getRefTypeName(d["$schema"].get_ref<std::string const&>().c_str()));
         Property simpleObject(&entlib, entlib.getSchema(typeName.c_str()), "test.SeedPatch.node", &d);
@@ -783,31 +783,31 @@ void testCursor(EntityLib& entlib)
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeY").getFloat() == 2.f);
     }
     {
-        Property expl(&entlib, entlib.getSchema(entitySchemaName), "prefab.entity");
+        Property expl = entlib.loadPropertyCopy("Entity", "prefab.entity");
         ENTLIB_ASSERT(expl.getObjectField("Name").getString() == std::string("PlayerSpawner_"));
         {
             ENTLIB_ASSERT(
                 expl.getObjectField("Components")
                     .getUnionSetItem("NetworkNode")
-                    .getObjectField("Type")
+                    ->getObjectField("Type")
                     .getString()
                 == std::string("Spawner"));
         }
         auto posX = expl.getObjectField("Components")
                         .getUnionSetItem("TransformGD")
-                        .getObjectField("Position")
+                        ->getObjectField("Position")
                         .getArrayItem(0llu);
         std::cout << posX.getFloat() << std::endl;
         ENTLIB_ASSERT(posX.getFloat() == 105.2244);
         auto& entityRung = expl;
         auto floatA = entityRung.getObjectField("Components")
                           .getUnionSetItem("TransformGD")
-                          .getObjectField("Position")
+                          ->getObjectField("Position")
                           .getArrayItem(0llu)
                           .getFloat();
         auto floatB = entityRung.getObjectField("Components")
                           .getUnionSetItem("TransformGD")
-                          .getObjectField("Position")
+                          ->getObjectField("Position")
                           .getArrayItem(0llu)
                           .getFloat();
         ENTLIB_ASSERT(floatA == 105.2244);
@@ -816,9 +816,9 @@ void testCursor(EntityLib& entlib)
         ENTLIB_ASSERT(
             expl.getObjectField("Components")
                 .getUnionSetItem("SubScene")
-                .getObjectField("Embedded")
+                ->getObjectField("Embedded")
                 .getObjectSetItem("EP1-Spout_LINK_001")
-                .getObjectField("Name")
+                ->getObjectField("Name")
                 .getString()
             == std::string("EP1-Spout_LINK_001"));
     }
@@ -826,49 +826,52 @@ void testCursor(EntityLib& entlib)
         Property expl(&entlib, entlib.getSchema(entitySchemaName), "instance.entity");
         ENTLIB_ASSERT(expl.getObjectField("Name").getString() == std::string("PlayerSpawner_"));
         auto type =
-            expl.getObjectField("Components").getUnionSetItem("NetworkNode").getObjectField("Type");
+            expl.getObjectField("Components").getUnionSetItem("NetworkNode")->getObjectField("Type");
         std::cout << type.getString() << std::endl;
         ENTLIB_ASSERT(
-            expl.getObjectField("Components").getUnionSetItem("NetworkNode").getObjectField("Type").getString()
+            expl.getObjectField("Components").getUnionSetItem("NetworkNode")->getObjectField("Type").getString()
             == std::string("Spawner"));
         std::cout << expl.getObjectField("Components")
                          .getUnionSetItem("TransformGD")
-                         .getObjectField("Matrix")
+                         ->getObjectField("Matrix")
                          .getArrayItem(3llu)
                          .getFloat()
                   << std::endl;
         auto pos2 = expl.getObjectField("Components")
                         .getUnionSetItem("TransformGD")
-                        .getObjectField("Position")
+                        ->getObjectField("Position")
                         .getArrayItem(2llu)
                         .getFloat();
         ENTLIB_ASSERT(fabs(pos2 - 29.6635) < FLT_EPSILON);
         ENTLIB_ASSERT(
             expl.getObjectField("Components")
                 .getUnionSetItem("SubScene")
-                .getObjectField("Embedded")
+                ->getObjectField("Embedded")
                 .getObjectSetItem("EP1-Spout_LINK_001")
-                .getObjectField("Name")
+                ->getObjectField("Name")
                 .getString()
             == std::string("EP1-Spout_LINK_001"));
         ENTLIB_ASSERT(
             expl.getObjectField("ActorStates")
                 .getUnionSetItem("ActorStateHoldingItem")
-                .getObjectField("ItemEntityRef")
-                .getString()
+                ->getObjectField("ItemEntityRef")
+                .getEntityRef()
+                .entityPath
             == std::string("tutu"));
         auto components = expl.getObjectField("Components");
         auto ori3 =
-            components.getUnionSetItem("TransformGD").getObjectField("Orientation").getArrayItem(3llu);
+            components.getUnionSetItem("TransformGD")->getObjectField("Orientation").getArrayItem(3llu);
         ENTLIB_ASSERT(fabs(ori3.getFloat() - 0.9916236400604248) < FLT_EPSILON);
         ori3.setFloat(2.);
         ENTLIB_ASSERT(ori3.getFloat() == 2.);
-        auto soundAreaGD = expl.getObjectField("Components").getUnionSetItem("SoundAreaGD");
+        auto soundAreaGD =
+            expl.getObjectField("Components").forceGetUnionSetItem("SoundAreaGD").first;
         ENTLIB_ASSERT(soundAreaGD.isSet() == false);
         ENTLIB_ASSERT(soundAreaGD.isDefault() == true);
         auto keys = components.getUnionSetKeysString();
         keys = components.getUnionSetKeysString();
-        auto staffVertebrasGD = expl.getObjectField("Components").getUnionSetItem("StaffVertebrasGD");
+        auto staffVertebrasGD =
+            *expl.getObjectField("Components").getUnionSetItem("StaffVertebrasGD");
         ENTLIB_ASSERT(staffVertebrasGD.isSet() == false);
         ENTLIB_ASSERT(staffVertebrasGD.isDefault() == true);
         keys = components.getUnionSetKeysString();
@@ -877,7 +880,7 @@ void testCursor(EntityLib& entlib)
         // Must not crash
         Property prefab2(&entlib, entlib.getSchema(entitySchemaName), "instance.prout.entity");
         auto comp2 = prefab2.getObjectField("Components");
-        auto characterControllerGD = comp2.getUnionSetItem("CharacterControllerGD");
+        auto characterControllerGD = *comp2.getUnionSetItem("CharacterControllerGD");
         auto clamberData = characterControllerGD.getObjectField("ClamberData");
         auto vertOriRatio = clamberData.getObjectField("VerticalOrientationRatio");
         auto in = vertOriRatio.getObjectField("in");
@@ -910,40 +913,40 @@ void testCursor(EntityLib& entlib)
     if (testLoading)
     {
         entlib.rawdataPath = "X:/RawData";
-        std::cout << "Read SceneKOM.scene with LazyLib" << std::endl;
+        std::cout << "Read WhistlingPlainsFPMain.scene with LazyLib" << std::endl;
         clock_t start = clock();
         Property expl(
             &entlib,
             entlib.getSchema(entitySchemaName),
-            R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
+            R"(20_Scene/FP2021/NewLayoutFPSubscenes/WhistlingPlainsFPMain/editor/WhistlingPlainsFPMain.scene)");
         clock_t end = clock();
         std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
 
         bool testCopy = true;
         if (testCopy)
         {
-            std::cout << "Copy SceneKOM.scene with LazyLib" << std::endl;
+            std::cout << "Copy WhistlingPlainsFPMain.scene with LazyLib" << std::endl;
             nlohmann::json newDoc = nlohmann::json::object();
             Property destExpl(&entlib, expl.getSchema(), "", &newDoc);
             CopyProperty copier(destExpl, OverrideValueSource::Override, true);
             visitRecursive(expl, copier);
 
-            std::cout << "Save SceneKOM.scene with LazyLib" << std::endl;
-            entlib.saveJsonFile(&newDoc, "SceneKOM.scene", expl.getSchema()->name.c_str());
+            std::cout << "Save WhistlingPlainsFPMain.scene with LazyLib" << std::endl;
+            entlib.saveJsonFile(&newDoc, "WhistlingPlainsFPMain.scene", expl.getSchema()->name.c_str());
 
-            std::cout << "CompareCursor SceneKOM.scene wth the clone" << std::endl;
+            std::cout << "CompareCursor WhistlingPlainsFPMain.scene wth the clone" << std::endl;
             CompareCursor comparator(destExpl);
             visitRecursive(expl, comparator);
         }
 
-        std::cout << "Read SceneKOM.scene with NodeLib" << std::endl;
+        std::cout << "Read WhistlingPlainsFPMain.scene with NodeLib" << std::endl;
         start = clock();
         auto ent = entlib.loadEntityAsNode(
-            R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
+            R"(20_Scene/FP2021/NewLayoutFPSubscenes/WhistlingPlainsFPMain/editor/WhistlingPlainsFPMain.scene)");
         end = clock();
         std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
 
-        std::cout << "Travserse SceneKOM.scene with NodeLib" << std::endl;
+        std::cout << "Travserse WhistlingPlainsFPMain.scene with NodeLib" << std::endl;
         start = clock();
         auto nodeCount = countNodes(ent.get());
         end = clock();
@@ -951,7 +954,7 @@ void testCursor(EntityLib& entlib)
         std::cout << "Primitive count : " << nodeCount << std::endl;
 
         PrimitiveCounterVisitor visitor;
-        std::cout << "Travserse SceneKOM.scene with LazyLib" << std::endl;
+        std::cout << "Travserse WhistlingPlainsFPMain.scene with LazyLib" << std::endl;
         start = clock();
         visitRecursive(expl, visitor);
         end = clock();
@@ -962,23 +965,23 @@ void testCursor(EntityLib& entlib)
     if (testCompare)
     {
         entlib.rawdataPath = "X:/RawData";
-        std::cout << "Read SceneKOM.scene with LazyLib" << std::endl;
+        std::cout << "Read WhistlingPlainsFPMain.scene with LazyLib" << std::endl;
         clock_t start = clock();
         Property expl(
             &entlib,
             entlib.getSchema(entitySchemaName),
-            R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
+            R"(20_Scene/FP2021/NewLayoutFPSubscenes/WhistlingPlainsFPMain/editor/WhistlingPlainsFPMain.scene)");
         clock_t end = clock();
         std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
 
-        std::cout << "Read SceneKOM.scene with NodeLib" << std::endl;
+        std::cout << "Read WhistlingPlainsFPMain.scene with NodeLib" << std::endl;
         start = clock();
         auto ent = entlib.loadEntityAsNode(
-            R"(X:\RawData\20_scene\KOM2021\SceneKOM\SceneKOM\editor\SceneKOM.scene)");
+            R"(20_Scene/FP2021/NewLayoutFPSubscenes/WhistlingPlainsFPMain/editor/WhistlingPlainsFPMain.scene)");
         end = clock();
         std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
 
-        std::cout << "Travserse SceneKOM.scene with NodeLib" << std::endl;
+        std::cout << "Travserse WhistlingPlainsFPMain.scene with NodeLib" << std::endl;
         start = clock();
         auto nodeCount = countNodes(ent.get());
         end = clock();

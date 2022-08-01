@@ -191,7 +191,7 @@ namespace Ent
             struct What;
 
             template <typename V>
-            Array<T>& operator=(V const& rho)
+            PrimArray<T>& operator=(V const& rho)
             {
                 ENT_IF_COMPILE(V, arr, std::get<0>(arr)) // tuple, c-style array and std::array
                 {
@@ -411,7 +411,7 @@ namespace Ent
 
                 [[nodiscard]] reference operator*() const
                 {
-                    return m_property.getUnionSetItem(keys[index]);
+                    return *m_property.getUnionSetItem(keys[index]);
                 }
 
                 [[nodiscard]] pointer operator->() const
@@ -488,6 +488,11 @@ namespace Ent
                 return getProperty().empty();
             }
 
+            void clear()
+            {
+                getProperty().clear();
+            }
+
             struct iterator
             {
                 using iterator_category = std::forward_iterator_tag;
@@ -542,7 +547,12 @@ namespace Ent
                 }
                 else if constexpr (std::is_same_v<T, char const*>)
                 {
-                    return iterator{getProperty(), getProperty().getPrimSetKeysString(), 0};
+                    std::vector<T> strings;
+                    for (auto&& str : getProperty().getPrimSetKeysString())
+                    {
+                        strings.push_back(str);
+                    }
+                    return iterator{getProperty(), std::move(strings), 0};
                 }
                 else
                 {
@@ -677,7 +687,7 @@ namespace Ent
                 std::vector<Property> subProps;
                 for (auto const& key : getKeys())
                 {
-                    subProps.push_back(getProperty().getObjectSetItem(key));
+                    subProps.push_back(*getProperty().getObjectSetItem(key));
                 }
                 return iterator{getProperty(), subProps, 0};
             }
@@ -861,7 +871,7 @@ namespace Ent
                 std::vector<std::pair<K, V>> properties;
                 for (auto&& key : getKeys())
                 {
-                    properties.emplace_back(key, getProperty().getMapItem(toInternal(key)));
+                    properties.emplace_back(key, *getProperty().getMapItem(toInternal(key)));
                 }
                 return iterator{getProperty(), std::move(properties), 0};
             }

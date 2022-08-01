@@ -104,6 +104,7 @@
     <EnableMicrosoftCodeAnalysis>true</EnableMicrosoftCodeAnalysis>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
     <ExternalIncludePath>..\..\..\ExternalTools\pybind11\include;..\..\..\ExternalTools\Python27\include;..\EntityLib\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
+    <CodeAnalysisRuleSet>..\..\WildShared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-3.7|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -112,6 +113,7 @@
     <EnableMicrosoftCodeAnalysis>true</EnableMicrosoftCodeAnalysis>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
     <ExternalIncludePath>..\..\..\ExternalTools\pybind11\include;..\..\..\ExternalTools\Python37\include;..\EntityLib\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
+    <CodeAnalysisRuleSet>..\..\WildShared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-3.8|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -120,6 +122,7 @@
     <EnableMicrosoftCodeAnalysis>true</EnableMicrosoftCodeAnalysis>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
     <ExternalIncludePath>..\..\..\ExternalTools\pybind11\include;..\..\..\ExternalTools\Python38\include;..\EntityLib\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
+    <CodeAnalysisRuleSet>..\..\WildShared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-2.7|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -128,6 +131,7 @@
     <EnableMicrosoftCodeAnalysis>true</EnableMicrosoftCodeAnalysis>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
     <ExternalIncludePath>..\..\..\ExternalTools\pybind11\include;..\..\..\ExternalTools\Python27\include;..\EntityLib\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
+    <CodeAnalysisRuleSet>..\..\WildShared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-3.7|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -136,6 +140,7 @@
     <EnableMicrosoftCodeAnalysis>true</EnableMicrosoftCodeAnalysis>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
     <ExternalIncludePath>..\..\..\ExternalTools\pybind11\include;..\..\..\ExternalTools\Python37\include;..\EntityLib\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
+    <CodeAnalysisRuleSet>..\..\WildShared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-3.8|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -144,6 +149,7 @@
     <EnableMicrosoftCodeAnalysis>true</EnableMicrosoftCodeAnalysis>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
     <ExternalIncludePath>..\..\..\ExternalTools\pybind11\include;..\..\..\ExternalTools\Python38\include;..\EntityLib\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
+    <CodeAnalysisRuleSet>..\..\WildShared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-2.7|x64'">
     <ClCompile>

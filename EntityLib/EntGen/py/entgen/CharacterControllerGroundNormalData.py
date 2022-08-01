@@ -7,6 +7,7 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Bool import *
 from entgen.Float import *
+from entgen.ScaleConverter import *
 
 from EntityLibPy import Node
 
@@ -35,6 +36,14 @@ class CharacterControllerGroundNormalData(HelperObject):
         return Float(self._node.at("PercentageExtirpate"))
     @PercentageExtirpate.setter
     def PercentageExtirpate(self, val): self.PercentageExtirpate.set(val)
+    @property
+    def WallAngle(self):  # type: ()->Float
+        return Float(self._node.at("WallAngle"))
+    @WallAngle.setter
+    def WallAngle(self, val): self.WallAngle.set(val)
+    @property
+    def WallCosAngleSpeedXYFactor(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("WallCosAngleSpeedXYFactor"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

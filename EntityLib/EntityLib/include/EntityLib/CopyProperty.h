@@ -98,7 +98,7 @@ namespace Ent
             {
                 _back().setUnionType(_type);
             }
-            _push(_back().getUnionData(_type));
+            _push(_back().forceGetUnionData(_type).first);
         }
         void outUnion([[maybe_unused]] Property& m_source) override
         {
@@ -106,11 +106,11 @@ namespace Ent
         }
         void inMapElement([[maybe_unused]] Property& m_source, char const* _key) override
         {
-            _push(_back().getMapItem(_key));
+            _push(_back().forceGetMapItem(_key).first);
         }
         void inMapElement([[maybe_unused]] Property& m_source, int64_t _key) override
         {
-            _push(_back().getMapItem(_key));
+            _push(_back().forceGetMapItem(_key).first);
         }
         void outMapElement([[maybe_unused]] Property& m_source) override
         {
@@ -134,7 +134,7 @@ namespace Ent
         }
         void inUnionSetElement(Property& m_source, char const* _type) override
         {
-            _push(_back().getUnionSetItem(_type));
+            _push(_back().forceGetUnionSetItem(_type).first);
             if (doNeedCopy(m_source))
             {
                 _back().buildPath(); // Force it to set
@@ -147,12 +147,12 @@ namespace Ent
         void inObjectSetElement([[maybe_unused]] Property& m_source, char const* _key) override
         {
             ENTLIB_ASSERT(_back().getDataKind() == DataKind::objectSet);
-            _push(_back().getObjectSetItem(_key));
+            _push(_back().forceGetObjectSetItem(_key).first);
         }
         void inObjectSetElement([[maybe_unused]] Property& m_source, int64_t _key) override
         {
             ENTLIB_ASSERT(_back().getDataKind() == DataKind::objectSet);
-            _push(_back().getObjectSetItem(_key));
+            _push(_back().forceGetObjectSetItem(_key).first);
         }
         void outObjectSetElement([[maybe_unused]] Property& m_source) override
         {

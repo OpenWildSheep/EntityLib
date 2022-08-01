@@ -92,6 +92,11 @@ class RenderManager_RenderConfig(HelperObject):
     @EnableSSAO.setter
     def EnableSSAO(self, val): self.EnableSSAO.set(val)
     @property
+    def EnableSSCS(self):  # type: ()->Int
+        return Int(self._node.at("EnableSSCS"))
+    @EnableSSCS.setter
+    def EnableSSCS(self, val): self.EnableSSCS.set(val)
+    @property
     def EnableSSR(self):  # type: ()->Int
         return Int(self._node.at("EnableSSR"))
     @EnableSSR.setter

@@ -9,14 +9,14 @@ from entgen.ActorState import *
 
 from EntityLibPy import Node
 
-class ActorStateSoulMove(HelperObject):
-    schema_name = "ActorStateSoulMove"
+class EntityStateOrientedDrift(HelperObject):
+    schema_name = "EntityStateOrientedDrift"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateSoulMove
-        return ActorStateSoulMove(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateSoulMove.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateOrientedDrift
+        return EntityStateOrientedDrift(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateOrientedDrift.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->ActorStateSoulMove
-        return ActorStateSoulMove(entlib.make_node(ActorStateSoulMove.schema_name))
+    def create(entlib):  # type: (EntityLib)->EntityStateOrientedDrift
+        return EntityStateOrientedDrift(entlib.make_node(EntityStateOrientedDrift.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

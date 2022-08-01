@@ -9,14 +9,14 @@ from entgen.ActorState import *
 
 from EntityLibPy import Node
 
-class ActorStateSoulPathfindAndMove(HelperObject):
-    schema_name = "ActorStateSoulPathfindAndMove"
+class EntityStateHitWall(HelperObject):
+    schema_name = "EntityStateHitWall"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ActorStateSoulPathfindAndMove
-        return ActorStateSoulPathfindAndMove(entlib.load_node_file(sourcefile, entlib.get_schema(ActorStateSoulPathfindAndMove.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateHitWall
+        return EntityStateHitWall(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateHitWall.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->ActorStateSoulPathfindAndMove
-        return ActorStateSoulPathfindAndMove(entlib.make_node(ActorStateSoulPathfindAndMove.schema_name))
+    def create(entlib):  # type: (EntityLib)->EntityStateHitWall
+        return EntityStateHitWall(entlib.make_node(EntityStateHitWall.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

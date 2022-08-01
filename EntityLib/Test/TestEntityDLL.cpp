@@ -386,10 +386,10 @@ try
         }
 
         // Test default value
-        auto voxelSimulationGD = ent.Components().VoxelSimulationGD();
-        ENTLIB_ASSERT(voxelSimulationGD->TransmissionBySecond().get() == 3.402823466385289e+38);
-        ENTLIB_ASSERT(voxelSimulationGD->TransmissionBySecond().isDefault());
-        ENTLIB_ASSERT(voxelSimulationGD->schemaName == std::string("VoxelSimulationGD"));
+        auto testDefaultValues = ent.Components().TestDefaultValues();
+        ENTLIB_ASSERT(testDefaultValues->DoubleWithDefaultValue().get() == 1.23456);
+        ENTLIB_ASSERT(testDefaultValues->DoubleWithDefaultValue().isDefault());
+        ENTLIB_ASSERT(testDefaultValues->schemaName == std::string("TestDefaultValues"));
 
         // TEST read inherited values in inherited component
         auto heightObj = ent.Components().HeightObj();
@@ -480,7 +480,6 @@ try
         ENTLIB_ASSERT(in[1].get() == 0.5);
 
         // Ensure that default values of property are not poluted by default values of pointer class
-        auto testDefaultValues = ent.Components().TestDefaultValues();
         ENTLIB_ASSERT(testDefaultValues.has_value());
         auto propertyWithDefault = testDefaultValues->propertyWithDefault();
         auto propertyWithDefault2 = propertyWithDefault.propertyWithDefault2();
@@ -1137,9 +1136,9 @@ try
         ENTLIB_ASSERT(
             comp.getProperty().getParent().hasOverride()); // A new item in an array in always override
         // Component with override
-        ent.Components().VoxelSimulationGD()->LossBySecond().set(36.);
-        ENTLIB_ASSERT(ent.Components().VoxelSimulationGD().has_value());
-        ENTLIB_ASSERT(ent.Components().VoxelSimulationGD()->hasOverride());
+        ent.Components().TestDefaultValues()->DoubleWithDefaultValue().set(36.);
+        ENTLIB_ASSERT(ent.Components().TestDefaultValues().has_value());
+        ENTLIB_ASSERT(ent.Components().TestDefaultValues()->hasOverride());
         // Component with instanceOf overriden
         auto compWithInstOf = *ent.Components().CharacterControllerGD();
         compWithInstOf.resetInstanceOf("test.CharacterControllerGD.node");
@@ -1372,9 +1371,9 @@ try
         ENTLIB_ASSERT(
             ent.Components().AnimationEventsGeneratorGD()->getProperty().getParent().hasOverride());
         // Component with override
-        ENTLIB_ASSERT(ent.Components().VoxelSimulationGD().has_value());
-        ENTLIB_ASSERT(ent.Components().VoxelSimulationGD()->LossBySecond().get() == 36.);
-        ENTLIB_ASSERT(ent.Components().VoxelSimulationGD()->hasOverride());
+        ENTLIB_ASSERT(ent.Components().TestDefaultValues().has_value());
+        ENTLIB_ASSERT(ent.Components().TestDefaultValues()->DoubleWithDefaultValue().get() == 36.);
+        ENTLIB_ASSERT(ent.Components().TestDefaultValues()->hasOverride());
         // Component with instanceOf overriden
         auto compWithInstOf = *ent.Components().CharacterControllerGD();
         ENTLIB_ASSERT(

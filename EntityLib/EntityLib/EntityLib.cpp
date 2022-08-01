@@ -543,6 +543,18 @@ namespace Ent
         return std::nullopt;
     }
 
+    Property EntityLib::loadProperty(char const* _schemaName, char const* _filepath)
+    {
+        return Property(this, getSchema(_schemaName), _filepath);
+    }
+
+    Property EntityLib::loadPropertyCopy(char const* _schemaName, char const* _filepath)
+    {
+        auto& storage = createTempJsonFile();
+        storage = readJsonFile(_filepath);
+        return Property(this, getSchema(_schemaName), _filepath, &storage);
+    }
+
     json& EntityLib::readJsonFile(char const* _filepath) const
     {
         std::filesystem::path const filepath = very_weakly_canonical(_filepath);
@@ -1850,13 +1862,13 @@ namespace Ent
                                                       Node(std::move(val), _subschema));
     }
 
-    PropImplPtr EntityLib::newPropImpl() const
+    PropImplPtr EntityLib::newPropImpl()
     {
         PropImpl* property{};
         auto* mem = propertyPool.alloc();
         try
         {
-            property = new (mem) PropImpl();
+            property = new (mem) PropImpl(this);
         }
         catch (...)
         {
@@ -1953,7 +1965,6 @@ namespace Ent
     void EntityLib::clearCache() const
     {
         m_nodeCache.clear();
-        m_jsonDatabase.clear();
     }
 
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)

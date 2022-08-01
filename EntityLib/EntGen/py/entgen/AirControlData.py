@@ -10,21 +10,21 @@ from entgen.ScaleConverter import *
 
 from EntityLibPy import Node
 
-class GameFallData(HelperObject):
-    schema_name = "GameFallData"
+class AirControlData(HelperObject):
+    schema_name = "AirControlData"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->GameFallData
-        return GameFallData(entlib.load_node_file(sourcefile, entlib.get_schema(GameFallData.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->AirControlData
+        return AirControlData(entlib.load_node_file(sourcefile, entlib.get_schema(AirControlData.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->GameFallData
-        return GameFallData(entlib.make_node(GameFallData.schema_name))
+    def create(entlib):  # type: (EntityLib)->AirControlData
+        return AirControlData(entlib.make_node(AirControlData.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def Acceleration(self):  # type: ()->Float
-        return Float(self._node.at("Acceleration"))
-    @Acceleration.setter
-    def Acceleration(self, val): self.Acceleration.set(val)
+    def AirControlBrake(self):  # type: ()->Float
+        return Float(self._node.at("AirControlBrake"))
+    @AirControlBrake.setter
+    def AirControlBrake(self, val): self.AirControlBrake.set(val)
     @property
     def AirControlBrakeAngleMin(self):  # type: ()->Float
         return Float(self._node.at("AirControlBrakeAngleMin"))
@@ -34,15 +34,20 @@ class GameFallData(HelperObject):
     def AirControlDirection(self):  # type: ()->ScaleConverter
         return ScaleConverter(self._node.at("AirControlDirection"))
     @property
+    def AirControlSmooth(self):  # type: ()->Float
+        return Float(self._node.at("AirControlSmooth"))
+    @AirControlSmooth.setter
+    def AirControlSmooth(self, val): self.AirControlSmooth.set(val)
+    @property
+    def AirControlSpeed(self):  # type: ()->Float
+        return Float(self._node.at("AirControlSpeed"))
+    @AirControlSpeed.setter
+    def AirControlSpeed(self, val): self.AirControlSpeed.set(val)
+    @property
     def AirControlSpeedAngleMax(self):  # type: ()->Float
         return Float(self._node.at("AirControlSpeedAngleMax"))
     @AirControlSpeedAngleMax.setter
     def AirControlSpeedAngleMax(self, val): self.AirControlSpeedAngleMax.set(val)
-    @property
-    def Friction(self):  # type: ()->Float
-        return Float(self._node.at("Friction"))
-    @Friction.setter
-    def Friction(self, val): self.Friction.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

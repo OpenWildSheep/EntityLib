@@ -4,7 +4,6 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.AnimTag import *
 from entgen.SpeedMode import *
 from entgen.String import *
 from entgen.ActionTurn_Inputs import *
@@ -32,11 +31,6 @@ class ActionTurn(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
-    @property
-    def animTag(self):  # type: ()->AnimTag
-        return AnimTag(self._node.at("animTag"))
-    @animTag.setter
-    def animTag(self, val): self.animTag.set(val)
     @property
     def direction(self):  # type: ()->Vector3
         return Vector3(self._node.at("direction"))

@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.Bool import *
 from entgen.Manager import *
 
 from EntityLibPy import Node
@@ -19,6 +20,11 @@ class StreamingManager(HelperObject):
         return StreamingManager(entlib.make_node(StreamingManager.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def DisableStreaming(self):  # type: ()->Bool
+        return Bool(self._node.at("DisableStreaming"))
+    @DisableStreaming.setter
+    def DisableStreaming(self, val): self.DisableStreaming.set(val)
     @property
     def Super(self):  # type: ()->Manager
         return Manager(self._node.at("Super"))

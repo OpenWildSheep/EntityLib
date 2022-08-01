@@ -1314,6 +1314,178 @@ from .String import *
     }
 }
 
+/// @brief Generate the python EntGen API
+void genpyProp(std::filesystem::path const& _resourcePath, std::filesystem::path const& _destinationPath)
+{
+    create_directories(_destinationPath / "entgen2");
+
+    auto add_partials = [](data& root)
+    {
+        root["display_type_hint"] = partial(
+            []()
+            {
+                return R"({{#object_set}}ObjectSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/object_set}})"
+                       R"({{#prim_set}}PrimitiveSet[{{type.ref.py_native}}]{{/prim_set}})"
+                       R"({{#map}}Map[{{key_type.ref.py_native}}, {{#value_type}}{{>display_type_comma}}{{/value_type}}]{{/map}})"
+                       R"({{#ref}}{{name}}{{/ref}})"
+                       R"({{#array}}Array[{{#type}}{{>display_type_comma}}{{/type}}]{{/array}})"
+                       R"({{#prim_array}}PrimArray[{{#type}}{{>display_type_comma}}{{/type}}]{{/prim_array}})"
+                       R"({{#union_set}}UnionSet[{{#type}}{{>display_type_comma}}{{/type}}]{{/union_set}})"
+                       R"({{#tuple}}TupleNode[{{#types}}Type[{{>display_type_hint}}]{{#comma}}, {{/comma}}{{/types}}]{{/tuple}})";
+            });
+
+        root["display_type_comma"] = partial(
+            []()
+            {
+                return R"({{>display_type_hint}})"
+                       R"({{#comma}}, {{/comma}})";
+            });
+        root["type_ctor_comma"] = partial(
+            []()
+            {
+                return R"({{>type_ctor}})"
+                       R"({{#comma}}, {{/comma}})";
+            });
+        root["type_ctor"] = partial(
+            []()
+            {
+                return R"({{#object_set}}(lambda n: ObjectSet({{#type}}{{>type_ctor}}{{/type}}, n)){{/object_set}})"
+                       R"({{#prim_set}}(lambda n: PrimitiveSet({{type.ref.py_native}}, n)){{/prim_set}})"
+                       R"({{#map}}(lambda n: Map({{key_type.ref.py_native}}, {{#value_type}}{{>type_ctor}}{{/value_type}}, n)){{/map}})"
+                       R"({{#ref}}{{name}}{{/ref}})"
+                       R"({{#array}}(lambda n: Array({{#type}}{{>type_ctor}}{{/type}}, n)){{/array}})"
+                       R"({{#prim_array}}(lambda n: PrimArray({{#type}}{{>type_ctor}}{{/type}}, n)){{/prim_array}})"
+                       R"({{#union_set}}(lambda n: UnionSet({{#items}}{{>type_ctor}}{{/items}}, n)){{/union_set}})"
+                       R"({{#tuple}}TupleNode{{/tuple}})";
+            });
+        root["print_import"] = partial(
+            []()
+            {
+                return R"({{#object_set}}{{#type}}{{>print_import}}{{/type}}{{/object_set}})"
+                       R"({{#prim_set}}{{#type}}{{>print_import}}{{/type}}{{/prim_set}})"
+                       R"({{#map}}{{#value_type}}{{>print_import}}{{/value_type}}{{#key_type}}{{>print_import}}{{/key_type}}{{/map}})"
+                       R"({{#ref}}from entgen.{{name}} import *
+{{/ref}})"
+                       R"({{#array}}{{#type}}{{>print_import}}{{/type}}{{/array}})"
+                       R"({{#prim_array}}{{#type}}{{>print_import}}{{/type}}{{/prim_array}})";
+            });
+        root["print_type_definition"] = partial(
+            []()
+            {
+                return R"py(from EntityLibPy import Property
+{{#schema}}{{#union_set}}
+{{schema.type_name}} = (lambda n: UnionSet({{#items}}{{>type_ctor}}{{/items}}, n))
+{{/union_set}}{{#object_set}}
+class {{schema.display_type_comma}}(ObjectSet):
+    {{#schema.schema_name}}schema_name = "{{.}}"{{/schema.schema_name}}
+    pass
+{{/object_set}}{{#enum}}
+class {{schema.type_name}}Enum(Enum):
+    {{#values}}{{escaped_name}} = "{{name}}"
+    {{/values}}
+
+
+{{/enum}}{{#alias}}
+{{schema.type_name}} = {{#type}}{{>type_ctor}}{{/type}}
+{{/alias}}{{#object}}
+
+class {{schema.type_name}}(HelperObject):
+{{#schema.schema_name}}
+    schema_name = "{{.}}"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->{{schema.type_name}}
+        return {{schema.type_name}}(Property(entlib, entlib.get_schema({{schema.type_name}}.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->{{schema.type_name}}
+        return {{schema.type_name}}(Property.create(entlib, entlib.get_schema({{schema.type_name}}.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+{{/schema.schema_name}}
+{{#properties}}{{#type}}    @property
+    def {{escaped_prop_name}}(self):  # type: ()->{{>display_type_comma}}
+        return {{>type_ctor}}(self._node.get_object_field("{{prop_name}}")){{#prim_array}}
+    @{{escaped_prop_name}}.setter
+    def {{escaped_prop_name}}(self, val): self.{{escaped_prop_name}}.set(val)
+{{/prim_array}}{{#ref.settable}}
+    @{{escaped_prop_name}}.setter
+    def {{escaped_prop_name}}(self, val): self.{{escaped_prop_name}}.set(val)
+{{/ref.settable}}{{/type}}
+{{/properties}}    pass
+
+
+{{/object}}{{#union}}
+class {{schema.type_name}}(Union):
+    pass
+
+
+{{/union}}{{#enum}}
+class {{schema.type_name}}(Primitive[{{schema.type_name}}Enum]):  # Enum
+    def __init__(self, node):
+        super({{schema.type_name}}, self).__init__({{schema.type_name}}Enum, node)
+    {{#schema_name}}schema_name = "{{.}}"{{/schema_name}}
+    def __call__(self, node):  # type: (EntityLibPy.Node) -> {{schema.type_name}}
+        return {{schema.type_name}}(node)
+    def set(self, val):  # type: ({{schema.type_name}}Enum) -> None
+        return self._node.set_string(val.value)
+    def get(self):  # type: () -> T
+        return self._item_type(self._node.value)
+
+
+{{/enum}}{{#tuple}}
+class {{type_name}}(TupleNode[Tuple[{{#types}}Type[{{>display_type_hint}}]{{#comma}}, {{/comma}}{{/types}}]]):
+    def __init__(self, node=None):  # type: (EntityLibPy.Node) -> None
+        super({{type_name}}, self).__init__((Int, Int, Float, Float, Float), node)
+    {{#schema_name}}schema_name = "{{.}}"{{/schema_name}}
+
+{{#types}}    def get_{{index}}(self):  # type: () -> {{>display_type_hint}}
+        return {{>type_ctor}}(self._node.at({{index}}))
+{{/types}}
+
+{{/tuple}}{{/schema}})py";
+            });
+    };
+
+    data rootData;
+    rootData["all_definitions"] = jsonToMustache(allDefinitions);
+
+    rootData["primitives"] = data::type::list;
+    for (auto&& filename : {"Bool.py", "EntityRef.py", "Float.py", "Int.py", "String.py"})
+    {
+        std::ifstream primFile(_resourcePath / "entgen2" / filename);
+        std::string data;
+        std::getline(primFile, data, char(0));
+        rootData["primitives"].push_back(data);
+    }
+
+    add_partials(rootData);
+
+    mustache allInline{R"py(
+### /!\ This code is GENERATED! Do not modify it.
+
+from entgen2_helpers import *
+import EntityLibPy
+from enum import Enum
+
+{{#primitives}}
+{{{.}}}
+{{/primitives}}
+
+{{#all_definitions}}
+{{>print_type_definition}}
+{{/all_definitions}}
+
+)py"};
+
+    auto inlinePath = (_destinationPath / "entgen2/inline.py").lexically_normal();
+    std::ofstream outputCommon = openOfstream(inlinePath);
+    outputFiles.push_back(inlinePath);
+    allInline.render(rootData, outputCommon);
+
+    copyIfDifferent(_resourcePath / "entgen2_helpers.py", _destinationPath / "entgen2_helpers.py");
+    createFile(_destinationPath / "__init__.py", [](std::ostream&) {});
+    createFile(_destinationPath / "entgen2" / "__init__.py", [](std::ostream&) {});
+}
+
 // Used to make a topological sort to the generated types
 class Graph
 {
@@ -1462,7 +1634,7 @@ try
     {
         if (file.is_regular_file())
         {
-            previousFiles.push_back(file.path());
+            previousFiles.push_back(file.path().lexically_normal()); // Ensure paths are comparable
         }
     }
 
@@ -1529,6 +1701,7 @@ try
     gencpp(resourcePath / "cpp", destinationPath / "cpp");
     gencppProp(resourcePath / "cpp2", destinationPath / "cpp2");
     genpy(resourcePath / "py", destinationPath / "py");
+    genpyProp(resourcePath / "py2", destinationPath / "py2");
 
     // Remove old files which was not re-created
     std::sort(begin(outputFiles), end(outputFiles));

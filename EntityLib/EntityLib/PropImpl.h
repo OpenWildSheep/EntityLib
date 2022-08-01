@@ -38,7 +38,7 @@ namespace Ent
     public:
         using Key = std::variant<std::string, size_t>;
 
-        PropImpl();
+        PropImpl(EntityLib* _entityLib);
         PropImpl(PropImpl const&) = delete;
         PropImpl& operator=(PropImpl const&) = delete;
         PropImpl(PropImpl&&) = delete;
@@ -55,10 +55,6 @@ namespace Ent
             PropImplPtr _parent,
             Subschema const* _schema, ///< Schema of the file to load
             char const* _filename);
-
-        void
-        setDefault(Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
-        [[nodiscard]] FileProperty const& getDefault() const;
 
         /// Save to _filename or to the source file
         void save(char const* _filename = nullptr) const;
@@ -137,6 +133,7 @@ namespace Ent
         [[nodiscard]] DataType getMapKeyType() const; ///< @pre Map @brief Get the key type current Map
         [[nodiscard]] DataType
         getObjectSetKeyType() const; ///< @pre ObjectSet @brief Get the key type current ObjectSet
+        [[nodiscard]] DataType getPrimSetKeyType() const; ///< @pre PrimitiveSet @brief Get the key type Set
 
         [[nodiscard]] size_t size(); ///< @return the size the this Node whatever it is.
         [[nodiscard]] bool contains(Key const& _key); ///< @pre map/set. @return true if it contains _key.
@@ -204,13 +201,18 @@ namespace Ent
         [[nodiscard]] PropImplPtr insertMapItem(char const* _key);
         [[nodiscard]] PropImplPtr insertMapItem(int64_t _key);
 
-        [[nodiscard]] bool erasePrimSetKey(char const* _key);
-        [[nodiscard]] bool erasePrimSetKey(int64_t _key);
-        [[nodiscard]] bool eraseObjectSetItem(char const* _key);
-        [[nodiscard]] bool eraseObjectSetItem(int64_t _key);
-        [[nodiscard]] bool eraseUnionSetItem(char const* _key);
-        [[nodiscard]] bool eraseMapItem(char const* _key);
-        [[nodiscard]] bool eraseMapItem(int64_t _key);
+        bool erasePrimSetKey(char const* _key);
+        bool erasePrimSetKey(int64_t _key);
+        bool eraseObjectSetItem(char const* _key);
+        bool eraseObjectSetItem(int64_t _key);
+        bool eraseUnionSetItem(char const* _key);
+        bool eraseMapItem(char const* _key);
+        bool eraseMapItem(int64_t _key);
+
+        void clearMap();
+        void clearPrimSet();
+        void clearObjectSet();
+        void clearUnionSet();
 
         [[nodiscard]] double getDefaultFloat() const;
         [[nodiscard]] int64_t getDefaultInt() const;
@@ -254,6 +256,14 @@ namespace Ent
 
         [[nodiscard]] FileProperty::Key getPathToken() const;
 
+        [[nodiscard]] std::pair<PropImplPtr, bool> forceGetUnionData(char const* _type = nullptr);
+        [[nodiscard]] std::pair<PropImplPtr, bool>
+        forceGetUnionSetItem(char const* _type, Subschema const* _dataSchema = nullptr);
+        [[nodiscard]] std::pair<PropImplPtr, bool> forceGetObjectSetItem(char const* _key);
+        [[nodiscard]] std::pair<PropImplPtr, bool> forceGetObjectSetItem(int64_t _key);
+        [[nodiscard]] std::pair<PropImplPtr, bool> forceGetMapItem(char const* _key);
+        [[nodiscard]] std::pair<PropImplPtr, bool> forceGetMapItem(int64_t _field);
+
     private:
         friend void decRef(PropImpl* self);
 
@@ -262,10 +272,16 @@ namespace Ent
         template <typename K>
         [[nodiscard]] bool _countPrimSetKeyImpl(K _key);
         template <typename E>
-        [[nodiscard]] PropImplPtr _enterItem(E&& _enter);
+        [[nodiscard]] std::pair<PropImplPtr, bool>
+        _enterItem(E&& _enter, bool _isDefaultUnionType = false);
         void _checkInvariants() const;
         template <typename Container, typename F>
         [[nodiscard]] Container getKeys(F const& getKeysInFile);
+        void _checkKind(DataKind _expectedKind, char const* _funcName) const;
+
+        void _setDefault(
+            Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
+        [[nodiscard]] FileProperty const& _getDefault() const;
 
         EntityLib* m_entityLib = nullptr;
         PropImplPtr m_prefab = nullptr;

@@ -6,6 +6,8 @@
 #pragma warning(push, 0)
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+
+#include "EntityLib/DumpProperty.h"
 #include "external/pybind11_json.hpp"
 #pragma warning(pop)
 
@@ -251,6 +253,14 @@ static py::list propObjSetGetKeys(Property& _prop)
         throw std::runtime_error("Unexpected key type");
     }
     return arr;
+}
+
+nlohmann::json dumpProperty(Property _prop, bool _superKeyIsTypeName = false)
+{
+    nlohmann::json result;
+    DumpProperty dumper(result, _superKeyIsTypeName);
+    visitRecursive(_prop, dumper);
+    return result;
 }
 
 using namespace pybind11::literals;
@@ -738,6 +748,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property_readonly("get_prefab_history", &getPrefabHistory, py::keep_alive<0, 1>())
         .def("detach", &Property::detach, py::keep_alive<0, 1>())
         .def("clear", &Property::clear)
+        .def("dumps", &dumpProperty, py::arg("superKeyIsTypeName") = false)
         ;
 
     py::register_exception<JsonValidation>(ent, "JsonValidation");

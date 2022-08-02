@@ -469,6 +469,7 @@ namespace Ent
             NavMeshCapability_COUNT,
         };
         struct MusicCategory;
+        struct MoveCapacityData_TurnJump;
         struct MoveCapacityData_OrientationSpeed;
         struct MountableSnapLine_ControlPoint;
         struct MountableData;
@@ -1458,6 +1459,7 @@ namespace Ent
         struct EntityStateLateralLand;
         struct EntityStateLateralDodge;
         struct EntityStateJustStarted;
+        struct EntityStateJumpOriented;
         struct EntityStateJumpHeightMultiplier;
         struct EntityStateInteractedGPE;
         struct EntityStateInjured;
@@ -1504,6 +1506,7 @@ namespace Ent
         struct EntityStateDamageLand;
         struct EntityStateCreatureProfile;
         struct EntityStateCreatureHatching;
+        struct EntityStateCoyoteJump;
         struct EntityStateControlGPE;
         struct EntityStateConstrainedMove;
         struct EntityStateConstrainedInput;
@@ -1531,6 +1534,9 @@ namespace Ent
         struct EntityStateBoidsHomePos;
         struct EntityStateBittenDefense;
         struct EntityStateBitten;
+        struct EntityStateBiteOutWin;
+        struct EntityStateBiteOutTie;
+        struct EntityStateBiteOutLose;
         struct EntityStateBiteOut;
         struct EntityStateBiteIn;
         struct EntityStateBiteAttack;
@@ -1817,6 +1823,9 @@ namespace Ent
             attackjumponto,
             bite,
             biteattack,
+            bitewin,
+            bitelose,
+            bitetie,
             stun,
             collapse,
             throw_,
@@ -1827,6 +1836,7 @@ namespace Ent
             hitwall,
             hitjump,
             landing,
+            landingfromspeed3,
             landingfail,
             landingcatapult,
             landingrecover,
@@ -4349,6 +4359,12 @@ namespace Ent
             Ent::Gen::EntityStateBiteIn setEntityStateBiteIn() const;
             std::optional<Ent::Gen::EntityStateBiteOut> EntityStateBiteOut() const;
             Ent::Gen::EntityStateBiteOut setEntityStateBiteOut() const;
+            std::optional<Ent::Gen::EntityStateBiteOutLose> EntityStateBiteOutLose() const;
+            Ent::Gen::EntityStateBiteOutLose setEntityStateBiteOutLose() const;
+            std::optional<Ent::Gen::EntityStateBiteOutTie> EntityStateBiteOutTie() const;
+            Ent::Gen::EntityStateBiteOutTie setEntityStateBiteOutTie() const;
+            std::optional<Ent::Gen::EntityStateBiteOutWin> EntityStateBiteOutWin() const;
+            Ent::Gen::EntityStateBiteOutWin setEntityStateBiteOutWin() const;
             std::optional<Ent::Gen::EntityStateBitten> EntityStateBitten() const;
             Ent::Gen::EntityStateBitten setEntityStateBitten() const;
             std::optional<Ent::Gen::EntityStateBittenDefense> EntityStateBittenDefense() const;
@@ -4403,6 +4419,8 @@ namespace Ent
             Ent::Gen::EntityStateConstrainedMove setEntityStateConstrainedMove() const;
             std::optional<Ent::Gen::EntityStateControlGPE> EntityStateControlGPE() const;
             Ent::Gen::EntityStateControlGPE setEntityStateControlGPE() const;
+            std::optional<Ent::Gen::EntityStateCoyoteJump> EntityStateCoyoteJump() const;
+            Ent::Gen::EntityStateCoyoteJump setEntityStateCoyoteJump() const;
             std::optional<Ent::Gen::EntityStateCreatureHatching> EntityStateCreatureHatching() const;
             Ent::Gen::EntityStateCreatureHatching setEntityStateCreatureHatching() const;
             std::optional<Ent::Gen::EntityStateCreatureProfile> EntityStateCreatureProfile() const;
@@ -4495,6 +4513,8 @@ namespace Ent
             Ent::Gen::EntityStateInteractedGPE setEntityStateInteractedGPE() const;
             std::optional<Ent::Gen::EntityStateJumpHeightMultiplier> EntityStateJumpHeightMultiplier() const;
             Ent::Gen::EntityStateJumpHeightMultiplier setEntityStateJumpHeightMultiplier() const;
+            std::optional<Ent::Gen::EntityStateJumpOriented> EntityStateJumpOriented() const;
+            Ent::Gen::EntityStateJumpOriented setEntityStateJumpOriented() const;
             std::optional<Ent::Gen::EntityStateJustStarted> EntityStateJustStarted() const;
             Ent::Gen::EntityStateJustStarted setEntityStateJustStarted() const;
             std::optional<Ent::Gen::EntityStateLateralDodge> EntityStateLateralDodge() const;
@@ -5010,6 +5030,7 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             PrimArray<Ent::Gen::String> Materials() const;
+            PrimArray<Ent::Gen::String> OverrideGroups() const;
             PrimArray<Ent::Gen::String> Tags() const;
             Ent::Gen::String _comment() const;
         };
@@ -5850,6 +5871,24 @@ namespace Ent
             Ent::Gen::String Name() const;
             Ent::Gen::Int Weight() const;
             Ent::Gen::String _comment() const;
+        };
+
+        struct MoveCapacityData_TurnJump : HelperObject // Object
+        {
+            MoveCapacityData_TurnJump(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "MoveCapacityData::TurnJump";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::String _comment() const;
+            Ent::Gen::Bool isAllowed() const;
+            Ent::Gen::Float jumpReleaseToApexRatio() const;
+            Ent::Gen::Map<SpeedModeEnum, Ent::Gen::Float> orientationYawRateFactorPerSpeed() const;
         };
 
         struct MoveCapacityData_OrientationSpeed : HelperObject // Object
@@ -7691,6 +7730,7 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::String _comment() const;
+            Ent::Gen::Float damagesAppliedToGrasperOnWin() const;
             Ent::Gen::Float graspStrength() const;
             Ent::Gen::Float graspedDurationMax() const;
             Ent::Gen::HotSpotType hotspotType() const;
@@ -9584,6 +9624,7 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
+            Ent::Gen::ScaleConverter CoeffSmooth() const;
             Ent::Gen::Float CurvatureNormalizationRadius() const;
             Ent::Gen::Int PowerMethodIterationMaxCount() const;
             Ent::Gen::Float PowerMethodIterationThreshold() const;
@@ -12855,7 +12896,6 @@ namespace Ent
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String _comment() const;
             Ent::Gen::Map<LocomotionModeEnum, Ent::Gen::Map<SpeedModeEnum, Ent::Gen::Float>> additionalSpeedDebug() const;
-            Ent::Gen::Bool isLandAnimDriven() const;
             Ent::Gen::Bool isTurnAllowed() const;
             Ent::Gen::Float playRatioFactor() const;
             Ent::Gen::Float scalePlayRatioCoeffInfluence() const;
@@ -15548,7 +15588,7 @@ namespace Ent
             }
             Ent::Gen::Float Acceleration() const;
             Ent::Gen::Float Deceleration() const;
-            Ent::Gen::Float JoyThreshold() const;
+            Ent::Gen::ScaleConverter JoyThreshold() const;
             Ent::Gen::Float MoveBlend() const;
             Ent::Gen::Float MoveSpeed() const;
             Ent::Gen::Float MoveSpeedZ() const;
@@ -15574,6 +15614,7 @@ namespace Ent
             }
             Ent::Gen::Float DistanceMax() const;
             Ent::Gen::Float DistanceMin() const;
+            Ent::Gen::ScaleConverter JoyThreshold() const;
             Ent::Gen::Float MoveBlend() const;
             Ent::Gen::Float MoveSpeedAtScreenWidthMax() const;
             Ent::Gen::Float MoveSpeedAtScreenWidthMin() const;
@@ -15609,6 +15650,7 @@ namespace Ent
             Ent::Gen::CameraEditorData Editor() const;
             Ent::Gen::CameraFreeData Free() const;
             Ent::Gen::Vector2 HeightLevel() const;
+            Ent::Gen::ScaleConverter JoyThreshold() const;
             Ent::Gen::Float RotatePitchIn() const;
             Ent::Gen::Float RotatePitchOut() const;
             Ent::Gen::Float RotateYawIn() const;
@@ -16383,6 +16425,7 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::Float ActionAttackValidityTime() const;
+            Ent::Gen::Float ActionJumpValidityTime() const;
             Ent::Gen::GameAttackData AttackData() const;
             Ent::Gen::FreezeData BeamFreezeData() const;
             Ent::Gen::GameBeamSnapData BeamSnapData() const;
@@ -16989,6 +17032,7 @@ namespace Ent
             Ent::Gen::Float strafeTurnAngleMin() const;
             Ent::Gen::Float trajectoryRateFactorDuringLateralLand() const;
             Ent::Gen::Float turnAroundInputDirectionAngleDeltaMin() const;
+            Ent::Gen::MoveCapacityData_TurnJump turnJump() const;
             Ent::Gen::Float turnRotationMinRatioForNewTurn() const;
             Ent::Gen::Float turnRotationMinRatioToFinish() const;
         };
@@ -17094,6 +17138,7 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::String _comment() const;
+            PrimArray<Ent::Gen::String> handBaseBoneNames() const;
             Array<Ent::Gen::AnimMirroringSpecData> specs() const;
         };
 
@@ -17973,6 +18018,15 @@ namespace Ent
             std::optional<Ent::Gen::EntityStateBiteOut> EntityStateBiteOut() const;
             Ent::Gen::EntityStateBiteOut addEntityStateBiteOut() const;
             void removeEntityStateBiteOut() const;
+            std::optional<Ent::Gen::EntityStateBiteOutLose> EntityStateBiteOutLose() const;
+            Ent::Gen::EntityStateBiteOutLose addEntityStateBiteOutLose() const;
+            void removeEntityStateBiteOutLose() const;
+            std::optional<Ent::Gen::EntityStateBiteOutTie> EntityStateBiteOutTie() const;
+            Ent::Gen::EntityStateBiteOutTie addEntityStateBiteOutTie() const;
+            void removeEntityStateBiteOutTie() const;
+            std::optional<Ent::Gen::EntityStateBiteOutWin> EntityStateBiteOutWin() const;
+            Ent::Gen::EntityStateBiteOutWin addEntityStateBiteOutWin() const;
+            void removeEntityStateBiteOutWin() const;
             std::optional<Ent::Gen::EntityStateBitten> EntityStateBitten() const;
             Ent::Gen::EntityStateBitten addEntityStateBitten() const;
             void removeEntityStateBitten() const;
@@ -18054,6 +18108,9 @@ namespace Ent
             std::optional<Ent::Gen::EntityStateControlGPE> EntityStateControlGPE() const;
             Ent::Gen::EntityStateControlGPE addEntityStateControlGPE() const;
             void removeEntityStateControlGPE() const;
+            std::optional<Ent::Gen::EntityStateCoyoteJump> EntityStateCoyoteJump() const;
+            Ent::Gen::EntityStateCoyoteJump addEntityStateCoyoteJump() const;
+            void removeEntityStateCoyoteJump() const;
             std::optional<Ent::Gen::EntityStateCreatureHatching> EntityStateCreatureHatching() const;
             Ent::Gen::EntityStateCreatureHatching addEntityStateCreatureHatching() const;
             void removeEntityStateCreatureHatching() const;
@@ -18192,6 +18249,9 @@ namespace Ent
             std::optional<Ent::Gen::EntityStateJumpHeightMultiplier> EntityStateJumpHeightMultiplier() const;
             Ent::Gen::EntityStateJumpHeightMultiplier addEntityStateJumpHeightMultiplier() const;
             void removeEntityStateJumpHeightMultiplier() const;
+            std::optional<Ent::Gen::EntityStateJumpOriented> EntityStateJumpOriented() const;
+            Ent::Gen::EntityStateJumpOriented addEntityStateJumpOriented() const;
+            void removeEntityStateJumpOriented() const;
             std::optional<Ent::Gen::EntityStateJustStarted> EntityStateJustStarted() const;
             Ent::Gen::EntityStateJustStarted addEntityStateJustStarted() const;
             void removeEntityStateJustStarted() const;
@@ -19717,6 +19777,22 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
+        struct EntityStateJumpOriented : HelperObject // Object
+        {
+            EntityStateJumpOriented(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateJumpOriented";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct EntityStateJumpHeightMultiplier : HelperObject // Object
         {
             EntityStateJumpHeightMultiplier(Ent::Node* _node): HelperObject(_node) {}
@@ -20462,6 +20538,22 @@ namespace Ent
             Ent::Gen::String _comment() const;
         };
 
+        struct EntityStateCoyoteJump : HelperObject // Object
+        {
+            EntityStateCoyoteJump(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateCoyoteJump";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct EntityStateControlGPE : HelperObject // Object
         {
             EntityStateControlGPE(Ent::Node* _node): HelperObject(_node) {}
@@ -20895,6 +20987,54 @@ namespace Ent
         {
             EntityStateBitten(Ent::Node* _node): HelperObject(_node) {}
             static constexpr char schemaName[] = "EntityStateBitten";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EntityStateBiteOutWin : HelperObject // Object
+        {
+            EntityStateBiteOutWin(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateBiteOutWin";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EntityStateBiteOutTie : HelperObject // Object
+        {
+            EntityStateBiteOutTie(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateBiteOutTie";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EntityStateBiteOutLose : HelperObject // Object
+        {
+            EntityStateBiteOutLose(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateBiteOutLose";
             static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
@@ -24547,6 +24687,9 @@ namespace Ent
                 "attackjumponto",
                 "bite",
                 "biteattack",
+                "bitewin",
+                "bitelose",
+                "bitetie",
                 "stun",
                 "collapse",
                 "throw",
@@ -24557,6 +24700,7 @@ namespace Ent
                 "hitwall",
                 "hitjump",
                 "landing",
+                "landingfromspeed3",
                 "landingfail",
                 "landingcatapult",
                 "landingrecover",
@@ -24746,6 +24890,9 @@ namespace Ent
             Ent::Gen::CameraType CameraType() const;
             Ent::Gen::Float CollisionBackToPosSpeed() const;
             Ent::Gen::Float CollisionCorrectionSpeed() const;
+            Ent::Gen::Float CollisionSlowBackToPosSpeed() const;
+            Ent::Gen::Float CollisionTouchGroundBackToPosSpeed() const;
+            Ent::Gen::Float CollisionTouchGroundModePitchThreshold() const;
             Ent::Gen::Float CollisionWantedNearPlane() const;
             Ent::Gen::Float CollisionZOffset() const;
             Ent::Gen::Float CollisionZOffsetMaxRadius() const;
@@ -29853,6 +30000,30 @@ namespace Ent
         {
             return Ent::Gen::EntityStateBiteOut(node->setUnionType("EntityStateBiteOut"));
         }
+        inline std::optional<Ent::Gen::EntityStateBiteOutLose> ResponsiblePointer_ActorState_::EntityStateBiteOutLose() const
+        {
+            return strcmp(node->getUnionType(), "EntityStateBiteOutLose") != 0? std::optional<Ent::Gen::EntityStateBiteOutLose>{}: std::optional<Ent::Gen::EntityStateBiteOutLose>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStateBiteOutLose ResponsiblePointer_ActorState_::setEntityStateBiteOutLose() const
+        {
+            return Ent::Gen::EntityStateBiteOutLose(node->setUnionType("EntityStateBiteOutLose"));
+        }
+        inline std::optional<Ent::Gen::EntityStateBiteOutTie> ResponsiblePointer_ActorState_::EntityStateBiteOutTie() const
+        {
+            return strcmp(node->getUnionType(), "EntityStateBiteOutTie") != 0? std::optional<Ent::Gen::EntityStateBiteOutTie>{}: std::optional<Ent::Gen::EntityStateBiteOutTie>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStateBiteOutTie ResponsiblePointer_ActorState_::setEntityStateBiteOutTie() const
+        {
+            return Ent::Gen::EntityStateBiteOutTie(node->setUnionType("EntityStateBiteOutTie"));
+        }
+        inline std::optional<Ent::Gen::EntityStateBiteOutWin> ResponsiblePointer_ActorState_::EntityStateBiteOutWin() const
+        {
+            return strcmp(node->getUnionType(), "EntityStateBiteOutWin") != 0? std::optional<Ent::Gen::EntityStateBiteOutWin>{}: std::optional<Ent::Gen::EntityStateBiteOutWin>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStateBiteOutWin ResponsiblePointer_ActorState_::setEntityStateBiteOutWin() const
+        {
+            return Ent::Gen::EntityStateBiteOutWin(node->setUnionType("EntityStateBiteOutWin"));
+        }
         inline std::optional<Ent::Gen::EntityStateBitten> ResponsiblePointer_ActorState_::EntityStateBitten() const
         {
             return strcmp(node->getUnionType(), "EntityStateBitten") != 0? std::optional<Ent::Gen::EntityStateBitten>{}: std::optional<Ent::Gen::EntityStateBitten>(node->getUnionData());
@@ -30068,6 +30239,14 @@ namespace Ent
         inline Ent::Gen::EntityStateControlGPE ResponsiblePointer_ActorState_::setEntityStateControlGPE() const
         {
             return Ent::Gen::EntityStateControlGPE(node->setUnionType("EntityStateControlGPE"));
+        }
+        inline std::optional<Ent::Gen::EntityStateCoyoteJump> ResponsiblePointer_ActorState_::EntityStateCoyoteJump() const
+        {
+            return strcmp(node->getUnionType(), "EntityStateCoyoteJump") != 0? std::optional<Ent::Gen::EntityStateCoyoteJump>{}: std::optional<Ent::Gen::EntityStateCoyoteJump>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStateCoyoteJump ResponsiblePointer_ActorState_::setEntityStateCoyoteJump() const
+        {
+            return Ent::Gen::EntityStateCoyoteJump(node->setUnionType("EntityStateCoyoteJump"));
         }
         inline std::optional<Ent::Gen::EntityStateCreatureHatching> ResponsiblePointer_ActorState_::EntityStateCreatureHatching() const
         {
@@ -30436,6 +30615,14 @@ namespace Ent
         inline Ent::Gen::EntityStateJumpHeightMultiplier ResponsiblePointer_ActorState_::setEntityStateJumpHeightMultiplier() const
         {
             return Ent::Gen::EntityStateJumpHeightMultiplier(node->setUnionType("EntityStateJumpHeightMultiplier"));
+        }
+        inline std::optional<Ent::Gen::EntityStateJumpOriented> ResponsiblePointer_ActorState_::EntityStateJumpOriented() const
+        {
+            return strcmp(node->getUnionType(), "EntityStateJumpOriented") != 0? std::optional<Ent::Gen::EntityStateJumpOriented>{}: std::optional<Ent::Gen::EntityStateJumpOriented>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStateJumpOriented ResponsiblePointer_ActorState_::setEntityStateJumpOriented() const
+        {
+            return Ent::Gen::EntityStateJumpOriented(node->setUnionType("EntityStateJumpOriented"));
         }
         inline std::optional<Ent::Gen::EntityStateJustStarted> ResponsiblePointer_ActorState_::EntityStateJustStarted() const
         {
@@ -31297,6 +31484,10 @@ namespace Ent
         {
             return PrimArray<Ent::Gen::String>(node->at("Materials"));
         }
+        inline PrimArray<Ent::Gen::String> ReflectedMaterialGroup::OverrideGroups() const
+        {
+            return PrimArray<Ent::Gen::String>(node->at("OverrideGroups"));
+        }
         inline PrimArray<Ent::Gen::String> ReflectedMaterialGroup::Tags() const
         {
             return PrimArray<Ent::Gen::String>(node->at("Tags"));
@@ -32019,6 +32210,23 @@ namespace Ent
         inline Ent::Gen::String MusicCategory::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
+        }
+        // MoveCapacityData_TurnJump
+        inline Ent::Gen::String MoveCapacityData_TurnJump::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Ent::Gen::Bool MoveCapacityData_TurnJump::isAllowed() const
+        {
+            return Ent::Gen::Bool(node->at("isAllowed"));
+        }
+        inline Ent::Gen::Float MoveCapacityData_TurnJump::jumpReleaseToApexRatio() const
+        {
+            return Ent::Gen::Float(node->at("jumpReleaseToApexRatio"));
+        }
+        inline Ent::Gen::Map<SpeedModeEnum, Ent::Gen::Float> MoveCapacityData_TurnJump::orientationYawRateFactorPerSpeed() const
+        {
+            return Ent::Gen::Map<SpeedModeEnum, Ent::Gen::Float>(node->at("orientationYawRateFactorPerSpeed"));
         }
         // MoveCapacityData_OrientationSpeed
         inline Ent::Gen::String MoveCapacityData_OrientationSpeed::_comment() const
@@ -33644,6 +33852,10 @@ namespace Ent
         inline Ent::Gen::String GraspableInteractionData::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Ent::Gen::Float GraspableInteractionData::damagesAppliedToGrasperOnWin() const
+        {
+            return Ent::Gen::Float(node->at("damagesAppliedToGrasperOnWin"));
         }
         inline Ent::Gen::Float GraspableInteractionData::graspStrength() const
         {
@@ -35915,6 +36127,10 @@ namespace Ent
             return Ent::Gen::Int(node->at("dangerousness"));
         }
         // ConstrainedMoveContextInput
+        inline Ent::Gen::ScaleConverter ConstrainedMoveContextInput::CoeffSmooth() const
+        {
+            return Ent::Gen::ScaleConverter(node->at("CoeffSmooth"));
+        }
         inline Ent::Gen::Float ConstrainedMoveContextInput::CurvatureNormalizationRadius() const
         {
             return Ent::Gen::Float(node->at("CurvatureNormalizationRadius"));
@@ -39475,10 +39691,6 @@ namespace Ent
         inline Ent::Gen::Map<LocomotionModeEnum, Ent::Gen::Map<SpeedModeEnum, Ent::Gen::Float>> AnimationModelGD::additionalSpeedDebug() const
         {
             return Ent::Gen::Map<LocomotionModeEnum, Ent::Gen::Map<SpeedModeEnum, Ent::Gen::Float>>(node->at("additionalSpeedDebug"));
-        }
-        inline Ent::Gen::Bool AnimationModelGD::isLandAnimDriven() const
-        {
-            return Ent::Gen::Bool(node->at("isLandAnimDriven"));
         }
         inline Ent::Gen::Bool AnimationModelGD::isTurnAllowed() const
         {
@@ -46900,9 +47112,9 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("Deceleration"));
         }
-        inline Ent::Gen::Float CameraFreeData::JoyThreshold() const
+        inline Ent::Gen::ScaleConverter CameraFreeData::JoyThreshold() const
         {
-            return Ent::Gen::Float(node->at("JoyThreshold"));
+            return Ent::Gen::ScaleConverter(node->at("JoyThreshold"));
         }
         inline Ent::Gen::Float CameraFreeData::MoveBlend() const
         {
@@ -46948,6 +47160,10 @@ namespace Ent
         inline Ent::Gen::Float CameraEditorData::DistanceMin() const
         {
             return Ent::Gen::Float(node->at("DistanceMin"));
+        }
+        inline Ent::Gen::ScaleConverter CameraEditorData::JoyThreshold() const
+        {
+            return Ent::Gen::ScaleConverter(node->at("JoyThreshold"));
         }
         inline Ent::Gen::Float CameraEditorData::MoveBlend() const
         {
@@ -47033,6 +47249,10 @@ namespace Ent
         inline Ent::Gen::Vector2 CameraManager::HeightLevel() const
         {
             return Ent::Gen::Vector2(node->at("HeightLevel"));
+        }
+        inline Ent::Gen::ScaleConverter CameraManager::JoyThreshold() const
+        {
+            return Ent::Gen::ScaleConverter(node->at("JoyThreshold"));
         }
         inline Ent::Gen::Float CameraManager::RotatePitchIn() const
         {
@@ -47708,6 +47928,10 @@ namespace Ent
         inline Ent::Gen::Float GameManager::ActionAttackValidityTime() const
         {
             return Ent::Gen::Float(node->at("ActionAttackValidityTime"));
+        }
+        inline Ent::Gen::Float GameManager::ActionJumpValidityTime() const
+        {
+            return Ent::Gen::Float(node->at("ActionJumpValidityTime"));
         }
         inline Ent::Gen::GameAttackData GameManager::AttackData() const
         {
@@ -48601,6 +48825,10 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("turnAroundInputDirectionAngleDeltaMin"));
         }
+        inline Ent::Gen::MoveCapacityData_TurnJump MoveCapacityData::turnJump() const
+        {
+            return Ent::Gen::MoveCapacityData_TurnJump(node->at("turnJump"));
+        }
         inline Ent::Gen::Float MoveCapacityData::turnRotationMinRatioForNewTurn() const
         {
             return Ent::Gen::Float(node->at("turnRotationMinRatioForNewTurn"));
@@ -48722,6 +48950,10 @@ namespace Ent
         inline Ent::Gen::String AnimMirroringData::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
+        }
+        inline PrimArray<Ent::Gen::String> AnimMirroringData::handBaseBoneNames() const
+        {
+            return PrimArray<Ent::Gen::String>(node->at("handBaseBoneNames"));
         }
         inline Array<Ent::Gen::AnimMirroringSpecData> AnimMirroringData::specs() const
         {
@@ -51553,6 +51785,45 @@ namespace Ent
         {
             node->mapErase("EntityStateBiteOut");
         }
+        inline std::optional<Ent::Gen::EntityStateBiteOutLose> ActorStates::EntityStateBiteOutLose() const
+        {
+            auto sub = getSubNode("EntityStateBiteOutLose");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStateBiteOutLose>{}: std::optional<Ent::Gen::EntityStateBiteOutLose>(getSubNode("EntityStateBiteOutLose"));
+        }
+        inline Ent::Gen::EntityStateBiteOutLose ActorStates::addEntityStateBiteOutLose() const
+        {
+            return Ent::Gen::EntityStateBiteOutLose(addSubNode("EntityStateBiteOutLose"));
+        }
+        inline void ActorStates::removeEntityStateBiteOutLose() const
+        {
+            node->mapErase("EntityStateBiteOutLose");
+        }
+        inline std::optional<Ent::Gen::EntityStateBiteOutTie> ActorStates::EntityStateBiteOutTie() const
+        {
+            auto sub = getSubNode("EntityStateBiteOutTie");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStateBiteOutTie>{}: std::optional<Ent::Gen::EntityStateBiteOutTie>(getSubNode("EntityStateBiteOutTie"));
+        }
+        inline Ent::Gen::EntityStateBiteOutTie ActorStates::addEntityStateBiteOutTie() const
+        {
+            return Ent::Gen::EntityStateBiteOutTie(addSubNode("EntityStateBiteOutTie"));
+        }
+        inline void ActorStates::removeEntityStateBiteOutTie() const
+        {
+            node->mapErase("EntityStateBiteOutTie");
+        }
+        inline std::optional<Ent::Gen::EntityStateBiteOutWin> ActorStates::EntityStateBiteOutWin() const
+        {
+            auto sub = getSubNode("EntityStateBiteOutWin");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStateBiteOutWin>{}: std::optional<Ent::Gen::EntityStateBiteOutWin>(getSubNode("EntityStateBiteOutWin"));
+        }
+        inline Ent::Gen::EntityStateBiteOutWin ActorStates::addEntityStateBiteOutWin() const
+        {
+            return Ent::Gen::EntityStateBiteOutWin(addSubNode("EntityStateBiteOutWin"));
+        }
+        inline void ActorStates::removeEntityStateBiteOutWin() const
+        {
+            node->mapErase("EntityStateBiteOutWin");
+        }
         inline std::optional<Ent::Gen::EntityStateBitten> ActorStates::EntityStateBitten() const
         {
             auto sub = getSubNode("EntityStateBitten");
@@ -51903,6 +52174,19 @@ namespace Ent
         inline void ActorStates::removeEntityStateControlGPE() const
         {
             node->mapErase("EntityStateControlGPE");
+        }
+        inline std::optional<Ent::Gen::EntityStateCoyoteJump> ActorStates::EntityStateCoyoteJump() const
+        {
+            auto sub = getSubNode("EntityStateCoyoteJump");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStateCoyoteJump>{}: std::optional<Ent::Gen::EntityStateCoyoteJump>(getSubNode("EntityStateCoyoteJump"));
+        }
+        inline Ent::Gen::EntityStateCoyoteJump ActorStates::addEntityStateCoyoteJump() const
+        {
+            return Ent::Gen::EntityStateCoyoteJump(addSubNode("EntityStateCoyoteJump"));
+        }
+        inline void ActorStates::removeEntityStateCoyoteJump() const
+        {
+            node->mapErase("EntityStateCoyoteJump");
         }
         inline std::optional<Ent::Gen::EntityStateCreatureHatching> ActorStates::EntityStateCreatureHatching() const
         {
@@ -52501,6 +52785,19 @@ namespace Ent
         inline void ActorStates::removeEntityStateJumpHeightMultiplier() const
         {
             node->mapErase("EntityStateJumpHeightMultiplier");
+        }
+        inline std::optional<Ent::Gen::EntityStateJumpOriented> ActorStates::EntityStateJumpOriented() const
+        {
+            auto sub = getSubNode("EntityStateJumpOriented");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStateJumpOriented>{}: std::optional<Ent::Gen::EntityStateJumpOriented>(getSubNode("EntityStateJumpOriented"));
+        }
+        inline Ent::Gen::EntityStateJumpOriented ActorStates::addEntityStateJumpOriented() const
+        {
+            return Ent::Gen::EntityStateJumpOriented(addSubNode("EntityStateJumpOriented"));
+        }
+        inline void ActorStates::removeEntityStateJumpOriented() const
+        {
+            node->mapErase("EntityStateJumpOriented");
         }
         inline std::optional<Ent::Gen::EntityStateJustStarted> ActorStates::EntityStateJustStarted() const
         {
@@ -54261,6 +54558,15 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // EntityStateJumpOriented
+        inline Ent::Gen::ActorState EntityStateJumpOriented::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateJumpOriented::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // EntityStateJumpHeightMultiplier
         inline Ent::Gen::Float EntityStateJumpHeightMultiplier::JumpHeightMultiplier() const
         {
@@ -54711,6 +55017,15 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("_comment"));
         }
+        // EntityStateCoyoteJump
+        inline Ent::Gen::ActorState EntityStateCoyoteJump::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateCoyoteJump::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // EntityStateControlGPE
         inline Ent::Gen::ActorState EntityStateControlGPE::Super() const
         {
@@ -55003,6 +55318,33 @@ namespace Ent
             return Ent::Gen::ActorState(node->at("Super"));
         }
         inline Ent::Gen::String EntityStateBitten::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EntityStateBiteOutWin
+        inline Ent::Gen::ActorState EntityStateBiteOutWin::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateBiteOutWin::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EntityStateBiteOutTie
+        inline Ent::Gen::ActorState EntityStateBiteOutTie::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateBiteOutTie::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EntityStateBiteOutLose
+        inline Ent::Gen::ActorState EntityStateBiteOutLose::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateBiteOutLose::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -57527,6 +57869,18 @@ namespace Ent
         inline Ent::Gen::Float InGameCameraParams::CollisionCorrectionSpeed() const
         {
             return Ent::Gen::Float(node->at("CollisionCorrectionSpeed"));
+        }
+        inline Ent::Gen::Float InGameCameraParams::CollisionSlowBackToPosSpeed() const
+        {
+            return Ent::Gen::Float(node->at("CollisionSlowBackToPosSpeed"));
+        }
+        inline Ent::Gen::Float InGameCameraParams::CollisionTouchGroundBackToPosSpeed() const
+        {
+            return Ent::Gen::Float(node->at("CollisionTouchGroundBackToPosSpeed"));
+        }
+        inline Ent::Gen::Float InGameCameraParams::CollisionTouchGroundModePitchThreshold() const
+        {
+            return Ent::Gen::Float(node->at("CollisionTouchGroundModePitchThreshold"));
         }
         inline Ent::Gen::Float InGameCameraParams::CollisionWantedNearPlane() const
         {

@@ -27,6 +27,11 @@ class GraspableInteractionData(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
+    def damagesAppliedToGrasperOnWin(self):  # type: ()->Float
+        return Float(self._node.at("damagesAppliedToGrasperOnWin"))
+    @damagesAppliedToGrasperOnWin.setter
+    def damagesAppliedToGrasperOnWin(self, val): self.damagesAppliedToGrasperOnWin.set(val)
+    @property
     def graspStrength(self):  # type: ()->Float
         return Float(self._node.at("graspStrength"))
     @graspStrength.setter

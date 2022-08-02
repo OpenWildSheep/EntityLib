@@ -40,8 +40,7 @@ class CloudPointsChunk(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             x = self._tab.Vector(o)
-            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
-            x = self._tab.Indirect(x)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 52
             from WBIN.CloudPoint import CloudPoint
             obj = CloudPoint()
             obj.Init(self._tab.Bytes, x)
@@ -72,7 +71,7 @@ def AddPoints(builder, points): builder.PrependUOffsetTRelativeSlot(1, flatbuffe
 def CloudPointsChunkAddPoints(builder, points):
     """This method is deprecated. Please switch to AddPoints."""
     return AddPoints(builder, points)
-def StartPointsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def StartPointsVector(builder, numElems): return builder.StartVector(52, numElems, 4)
 def CloudPointsChunkStartPointsVector(builder, numElems):
     """This method is deprecated. Please switch to Start."""
     return StartPointsVector(builder, numElems)
@@ -124,12 +123,9 @@ class CloudPointsChunkT(object):
     # CloudPointsChunkT
     def Pack(self, builder):
         if self.points is not None:
-            pointslist = []
-            for i in range(len(self.points)):
-                pointslist.append(self.points[i].Pack(builder))
             StartPointsVector(builder, len(self.points))
             for i in reversed(range(len(self.points))):
-                builder.PrependUOffsetTRelative(pointslist[i])
+                self.points[i].Pack(builder)
             points = builder.EndVector()
         Start(builder)
         if self.coords is not None:

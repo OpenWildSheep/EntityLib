@@ -10,54 +10,30 @@ class CloudPoint(object):
     __slots__ = ['_tab']
 
     @classmethod
-    def GetRootAs(cls, buf, offset=0):
-        n = flatbuffers.encode.Get(flatbuffers.packer.uoffset, buf, offset)
-        x = CloudPoint()
-        x.Init(buf, n + offset)
-        return x
+    def SizeOf(cls):
+        return 52
 
-    @classmethod
-    def GetRootAsCloudPoint(cls, buf, offset=0):
-        """This method is deprecated. Please switch to GetRootAs."""
-        return cls.GetRootAs(buf, offset)
     # CloudPoint
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # CloudPoint
-    def NameIndex(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
-        if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Uint16Flags, o + self._tab.Pos)
-        return 0
-
+    def NameIndex(self): return self._tab.Get(flatbuffers.number_types.Uint16Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0))
     # CloudPoint
-    def Matrix(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
-        if o != 0:
-            x = o + self._tab.Pos
-            from WBIN.Matrix43 import Matrix43
-            obj = Matrix43()
-            obj.Init(self._tab.Bytes, x)
-            return obj
-        return None
+    def Matrix(self, obj):
+        obj.Init(self._tab.Bytes, self._tab.Pos + 4)
+        return obj
 
-def Start(builder): builder.StartObject(2)
-def CloudPointStart(builder):
-    """This method is deprecated. Please switch to Start."""
-    return Start(builder)
-def AddNameIndex(builder, nameIndex): builder.PrependUint16Slot(0, nameIndex, 0)
-def CloudPointAddNameIndex(builder, nameIndex):
-    """This method is deprecated. Please switch to AddNameIndex."""
-    return AddNameIndex(builder, nameIndex)
-def AddMatrix(builder, matrix): builder.PrependStructSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(matrix), 0)
-def CloudPointAddMatrix(builder, matrix):
-    """This method is deprecated. Please switch to AddMatrix."""
-    return AddMatrix(builder, matrix)
-def End(builder): return builder.EndObject()
-def CloudPointEnd(builder):
-    """This method is deprecated. Please switch to End."""
-    return End(builder)
+
+def CreateCloudPoint(builder, nameIndex, matrix_values):
+    builder.Prep(4, 52)
+    builder.Prep(4, 48)
+    for _idx0 in range(12 , 0, -1):
+        builder.PrependFloat32(matrix_values[_idx0-1])
+    builder.Pad(2)
+    builder.PrependUint16(nameIndex)
+    return builder.Offset()
+
 import WBIN.Matrix43
 try:
     from typing import Optional
@@ -88,15 +64,9 @@ class CloudPointT(object):
         if cloudPoint is None:
             return
         self.nameIndex = cloudPoint.NameIndex()
-        if cloudPoint.Matrix() is not None:
-            self.matrix = WBIN.Matrix43.Matrix43T.InitFromObj(cloudPoint.Matrix())
+        if cloudPoint.Matrix(WBIN.Matrix43.Matrix43()) is not None:
+            self.matrix = WBIN.Matrix43.Matrix43T.InitFromObj(cloudPoint.Matrix(WBIN.Matrix43.Matrix43()))
 
     # CloudPointT
     def Pack(self, builder):
-        Start(builder)
-        AddNameIndex(builder, self.nameIndex)
-        if self.matrix is not None:
-            matrix = self.matrix.Pack(builder)
-            AddMatrix(builder, matrix)
-        cloudPoint = End(builder)
-        return cloudPoint
+        return CreateCloudPoint(builder, self.nameIndex, self.matrix.values)

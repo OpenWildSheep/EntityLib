@@ -11,8 +11,6 @@
 namespace WBIN {
 
 struct CloudPoint;
-struct CloudPointBuilder;
-struct CloudPointT;
 
 struct CloudPointsChunk;
 struct CloudPointsChunkBuilder;
@@ -22,79 +20,44 @@ struct RuntimePointCloud;
 struct RuntimePointCloudBuilder;
 struct RuntimePointCloudT;
 
-struct CloudPointT : public flatbuffers::NativeTable {
-  typedef CloudPoint TableType;
-  uint16_t nameIndex = 0;
-  std::unique_ptr<WBIN::Matrix43> matrix{};
-};
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) CloudPoint FLATBUFFERS_FINAL_CLASS {
+ private:
+  uint16_t nameIndex_;
+  int16_t padding0__;
+  WBIN::Matrix43 matrix_;
 
-struct CloudPoint FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef CloudPointT NativeTableType;
-  typedef CloudPointBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_NAMEINDEX = 4,
-    VT_MATRIX = 6
-  };
+ public:
+  CloudPoint()
+      : nameIndex_(0),
+        padding0__(0),
+        matrix_() {
+    (void)padding0__;
+  }
+  CloudPoint(uint16_t _nameIndex, const WBIN::Matrix43 &_matrix)
+      : nameIndex_(flatbuffers::EndianScalar(_nameIndex)),
+        padding0__(0),
+        matrix_(_matrix) {
+    (void)padding0__;
+  }
   uint16_t nameIndex() const {
-    return GetField<uint16_t>(VT_NAMEINDEX, 0);
+    return flatbuffers::EndianScalar(nameIndex_);
   }
-  bool mutate_nameIndex(uint16_t _nameIndex) {
-    return SetField<uint16_t>(VT_NAMEINDEX, _nameIndex, 0);
+  void mutate_nameIndex(uint16_t _nameIndex) {
+    flatbuffers::WriteScalar(&nameIndex_, _nameIndex);
   }
-  const WBIN::Matrix43 *matrix() const {
-    return GetStruct<const WBIN::Matrix43 *>(VT_MATRIX);
+  const WBIN::Matrix43 &matrix() const {
+    return matrix_;
   }
-  WBIN::Matrix43 *mutable_matrix() {
-    return GetStruct<WBIN::Matrix43 *>(VT_MATRIX);
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<uint16_t>(verifier, VT_NAMEINDEX) &&
-           VerifyField<WBIN::Matrix43>(verifier, VT_MATRIX) &&
-           verifier.EndTable();
-  }
-  CloudPointT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(CloudPointT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<CloudPoint> Pack(flatbuffers::FlatBufferBuilder &_fbb, const CloudPointT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct CloudPointBuilder {
-  typedef CloudPoint Table;
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_nameIndex(uint16_t nameIndex) {
-    fbb_.AddElement<uint16_t>(CloudPoint::VT_NAMEINDEX, nameIndex, 0);
-  }
-  void add_matrix(const WBIN::Matrix43 *matrix) {
-    fbb_.AddStruct(CloudPoint::VT_MATRIX, matrix);
-  }
-  explicit CloudPointBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  flatbuffers::Offset<CloudPoint> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<CloudPoint>(end);
-    return o;
+  WBIN::Matrix43 &mutable_matrix() {
+    return matrix_;
   }
 };
-
-inline flatbuffers::Offset<CloudPoint> CreateCloudPoint(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    uint16_t nameIndex = 0,
-    const WBIN::Matrix43 *matrix = 0) {
-  CloudPointBuilder builder_(_fbb);
-  builder_.add_matrix(matrix);
-  builder_.add_nameIndex(nameIndex);
-  return builder_.Finish();
-}
-
-flatbuffers::Offset<CloudPoint> CreateCloudPoint(flatbuffers::FlatBufferBuilder &_fbb, const CloudPointT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+FLATBUFFERS_STRUCT_END(CloudPoint, 52);
 
 struct CloudPointsChunkT : public flatbuffers::NativeTable {
   typedef CloudPointsChunk TableType;
   std::unique_ptr<WBIN::Int3> coords{};
-  std::vector<std::unique_ptr<WBIN::CloudPointT>> points{};
+  std::vector<WBIN::CloudPoint> points{};
 };
 
 struct CloudPointsChunk FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -110,18 +73,17 @@ struct CloudPointsChunk FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   WBIN::Int3 *mutable_coords() {
     return GetStruct<WBIN::Int3 *>(VT_COORDS);
   }
-  const flatbuffers::Vector<flatbuffers::Offset<WBIN::CloudPoint>> *points() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<WBIN::CloudPoint>> *>(VT_POINTS);
+  const flatbuffers::Vector<const WBIN::CloudPoint *> *points() const {
+    return GetPointer<const flatbuffers::Vector<const WBIN::CloudPoint *> *>(VT_POINTS);
   }
-  flatbuffers::Vector<flatbuffers::Offset<WBIN::CloudPoint>> *mutable_points() {
-    return GetPointer<flatbuffers::Vector<flatbuffers::Offset<WBIN::CloudPoint>> *>(VT_POINTS);
+  flatbuffers::Vector<const WBIN::CloudPoint *> *mutable_points() {
+    return GetPointer<flatbuffers::Vector<const WBIN::CloudPoint *> *>(VT_POINTS);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<WBIN::Int3>(verifier, VT_COORDS) &&
            VerifyOffset(verifier, VT_POINTS) &&
            verifier.VerifyVector(points()) &&
-           verifier.VerifyVectorOfTables(points()) &&
            verifier.EndTable();
   }
   CloudPointsChunkT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -136,7 +98,7 @@ struct CloudPointsChunkBuilder {
   void add_coords(const WBIN::Int3 *coords) {
     fbb_.AddStruct(CloudPointsChunk::VT_COORDS, coords);
   }
-  void add_points(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<WBIN::CloudPoint>>> points) {
+  void add_points(flatbuffers::Offset<flatbuffers::Vector<const WBIN::CloudPoint *>> points) {
     fbb_.AddOffset(CloudPointsChunk::VT_POINTS, points);
   }
   explicit CloudPointsChunkBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -153,7 +115,7 @@ struct CloudPointsChunkBuilder {
 inline flatbuffers::Offset<CloudPointsChunk> CreateCloudPointsChunk(
     flatbuffers::FlatBufferBuilder &_fbb,
     const WBIN::Int3 *coords = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<WBIN::CloudPoint>>> points = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<const WBIN::CloudPoint *>> points = 0) {
   CloudPointsChunkBuilder builder_(_fbb);
   builder_.add_points(points);
   builder_.add_coords(coords);
@@ -163,8 +125,8 @@ inline flatbuffers::Offset<CloudPointsChunk> CreateCloudPointsChunk(
 inline flatbuffers::Offset<CloudPointsChunk> CreateCloudPointsChunkDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const WBIN::Int3 *coords = 0,
-    const std::vector<flatbuffers::Offset<WBIN::CloudPoint>> *points = nullptr) {
-  auto points__ = points ? _fbb.CreateVector<flatbuffers::Offset<WBIN::CloudPoint>>(*points) : 0;
+    const std::vector<WBIN::CloudPoint> *points = nullptr) {
+  auto points__ = points ? _fbb.CreateVectorOfStructs<WBIN::CloudPoint>(*points) : 0;
   return WBIN::CreateCloudPointsChunk(
       _fbb,
       coords,
@@ -274,35 +236,6 @@ inline flatbuffers::Offset<RuntimePointCloud> CreateRuntimePointCloudDirect(
 
 flatbuffers::Offset<RuntimePointCloud> CreateRuntimePointCloud(flatbuffers::FlatBufferBuilder &_fbb, const RuntimePointCloudT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
-inline CloudPointT *CloudPoint::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::unique_ptr<CloudPointT>(new CloudPointT());
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void CloudPoint::UnPackTo(CloudPointT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = nameIndex(); _o->nameIndex = _e; }
-  { auto _e = matrix(); if (_e) _o->matrix = std::unique_ptr<WBIN::Matrix43>(new WBIN::Matrix43(*_e)); }
-}
-
-inline flatbuffers::Offset<CloudPoint> CloudPoint::Pack(flatbuffers::FlatBufferBuilder &_fbb, const CloudPointT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateCloudPoint(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<CloudPoint> CreateCloudPoint(flatbuffers::FlatBufferBuilder &_fbb, const CloudPointT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const CloudPointT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _nameIndex = _o->nameIndex;
-  auto _matrix = _o->matrix ? _o->matrix.get() : 0;
-  return WBIN::CreateCloudPoint(
-      _fbb,
-      _nameIndex,
-      _matrix);
-}
-
 inline CloudPointsChunkT *CloudPointsChunk::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::unique_ptr<CloudPointsChunkT>(new CloudPointsChunkT());
   UnPackTo(_o.get(), _resolver);
@@ -313,7 +246,7 @@ inline void CloudPointsChunk::UnPackTo(CloudPointsChunkT *_o, const flatbuffers:
   (void)_o;
   (void)_resolver;
   { auto _e = coords(); if (_e) _o->coords = std::unique_ptr<WBIN::Int3>(new WBIN::Int3(*_e)); }
-  { auto _e = points(); if (_e) { _o->points.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->points[_i] = std::unique_ptr<WBIN::CloudPointT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = points(); if (_e) { _o->points.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->points[_i] = *_e->Get(_i); } } }
 }
 
 inline flatbuffers::Offset<CloudPointsChunk> CloudPointsChunk::Pack(flatbuffers::FlatBufferBuilder &_fbb, const CloudPointsChunkT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -325,7 +258,7 @@ inline flatbuffers::Offset<CloudPointsChunk> CreateCloudPointsChunk(flatbuffers:
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const CloudPointsChunkT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _coords = _o->coords ? _o->coords.get() : 0;
-  auto _points = _o->points.size() ? _fbb.CreateVector<flatbuffers::Offset<WBIN::CloudPoint>> (_o->points.size(), [](size_t i, _VectorArgs *__va) { return CreateCloudPoint(*__va->__fbb, __va->__o->points[i].get(), __va->__rehasher); }, &_va ) : 0;
+  auto _points = _o->points.size() ? _fbb.CreateVectorOfStructs(_o->points) : 0;
   return WBIN::CreateCloudPointsChunk(
       _fbb,
       _coords,

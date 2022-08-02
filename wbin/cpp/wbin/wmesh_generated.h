@@ -17,13 +17,15 @@ struct MeshT;
 struct MeshT : public flatbuffers::NativeTable {
   typedef Mesh TableType;
   std::unique_ptr<WBIN::Float3ChannelT> position{};
+  std::vector<WBIN::Bool3> edgeVisibility{};
 };
 
 struct Mesh FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef MeshT NativeTableType;
   typedef MeshBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_POSITION = 4
+    VT_POSITION = 4,
+    VT_EDGEVISIBILITY = 6
   };
   const WBIN::Float3Channel *position() const {
     return GetPointer<const WBIN::Float3Channel *>(VT_POSITION);
@@ -31,10 +33,18 @@ struct Mesh FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   WBIN::Float3Channel *mutable_position() {
     return GetPointer<WBIN::Float3Channel *>(VT_POSITION);
   }
+  const flatbuffers::Vector<const WBIN::Bool3 *> *edgeVisibility() const {
+    return GetPointer<const flatbuffers::Vector<const WBIN::Bool3 *> *>(VT_EDGEVISIBILITY);
+  }
+  flatbuffers::Vector<const WBIN::Bool3 *> *mutable_edgeVisibility() {
+    return GetPointer<flatbuffers::Vector<const WBIN::Bool3 *> *>(VT_EDGEVISIBILITY);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_POSITION) &&
            verifier.VerifyTable(position()) &&
+           VerifyOffset(verifier, VT_EDGEVISIBILITY) &&
+           verifier.VerifyVector(edgeVisibility()) &&
            verifier.EndTable();
   }
   MeshT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -48,6 +58,9 @@ struct MeshBuilder {
   flatbuffers::uoffset_t start_;
   void add_position(flatbuffers::Offset<WBIN::Float3Channel> position) {
     fbb_.AddOffset(Mesh::VT_POSITION, position);
+  }
+  void add_edgeVisibility(flatbuffers::Offset<flatbuffers::Vector<const WBIN::Bool3 *>> edgeVisibility) {
+    fbb_.AddOffset(Mesh::VT_EDGEVISIBILITY, edgeVisibility);
   }
   explicit MeshBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -63,10 +76,23 @@ struct MeshBuilder {
 
 inline flatbuffers::Offset<Mesh> CreateMesh(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<WBIN::Float3Channel> position = 0) {
+    flatbuffers::Offset<WBIN::Float3Channel> position = 0,
+    flatbuffers::Offset<flatbuffers::Vector<const WBIN::Bool3 *>> edgeVisibility = 0) {
   MeshBuilder builder_(_fbb);
+  builder_.add_edgeVisibility(edgeVisibility);
   builder_.add_position(position);
   return builder_.Finish();
+}
+
+inline flatbuffers::Offset<Mesh> CreateMeshDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<WBIN::Float3Channel> position = 0,
+    const std::vector<WBIN::Bool3> *edgeVisibility = nullptr) {
+  auto edgeVisibility__ = edgeVisibility ? _fbb.CreateVectorOfStructs<WBIN::Bool3>(*edgeVisibility) : 0;
+  return WBIN::CreateMesh(
+      _fbb,
+      position,
+      edgeVisibility__);
 }
 
 flatbuffers::Offset<Mesh> CreateMesh(flatbuffers::FlatBufferBuilder &_fbb, const MeshT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -81,6 +107,7 @@ inline void Mesh::UnPackTo(MeshT *_o, const flatbuffers::resolver_function_t *_r
   (void)_o;
   (void)_resolver;
   { auto _e = position(); if (_e) _o->position = std::unique_ptr<WBIN::Float3ChannelT>(_e->UnPack(_resolver)); }
+  { auto _e = edgeVisibility(); if (_e) { _o->edgeVisibility.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->edgeVisibility[_i] = *_e->Get(_i); } } }
 }
 
 inline flatbuffers::Offset<Mesh> Mesh::Pack(flatbuffers::FlatBufferBuilder &_fbb, const MeshT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -92,9 +119,11 @@ inline flatbuffers::Offset<Mesh> CreateMesh(flatbuffers::FlatBufferBuilder &_fbb
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const MeshT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _position = _o->position ? CreateFloat3Channel(_fbb, _o->position.get(), _rehasher) : 0;
+  auto _edgeVisibility = _o->edgeVisibility.size() ? _fbb.CreateVectorOfStructs(_o->edgeVisibility) : 0;
   return WBIN::CreateMesh(
       _fbb,
-      _position);
+      _position,
+      _edgeVisibility);
 }
 
 inline const WBIN::Mesh *GetMesh(const void *buf) {

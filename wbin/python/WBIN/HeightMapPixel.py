@@ -29,7 +29,7 @@ class HeightMapPixel(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             x = self._tab.Vector(o)
-            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 20
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 12
             from WBIN.HeightMapLayer import HeightMapLayer
             obj = HeightMapLayer()
             obj.Init(self._tab.Bytes, x)
@@ -56,7 +56,7 @@ def AddLayers(builder, layers): builder.PrependUOffsetTRelativeSlot(0, flatbuffe
 def HeightMapPixelAddLayers(builder, layers):
     """This method is deprecated. Please switch to AddLayers."""
     return AddLayers(builder, layers)
-def StartLayersVector(builder, numElems): return builder.StartVector(20, numElems, 4)
+def StartLayersVector(builder, numElems): return builder.StartVector(12, numElems, 4)
 def HeightMapPixelStartLayersVector(builder, numElems):
     """This method is deprecated. Please switch to Start."""
     return StartLayersVector(builder, numElems)

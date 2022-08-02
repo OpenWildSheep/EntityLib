@@ -4,7 +4,8 @@ namespace WBIN;
 
 struct HeightMapLayer
 {
-	normal:Float3;
+	normalX:uint16;
+	normalY:uint16;
 	height:float;
 	physicsmaterialid:uint8;
 }

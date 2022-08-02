@@ -11,44 +11,37 @@ class HeightMapLayer(object):
 
     @classmethod
     def SizeOf(cls):
-        return 20
+        return 12
 
     # HeightMapLayer
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # HeightMapLayer
-    def Normal(self, obj):
-        obj.Init(self._tab.Bytes, self._tab.Pos + 0)
-        return obj
-
+    def NormalX(self): return self._tab.Get(flatbuffers.number_types.Uint16Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0))
     # HeightMapLayer
-    def Height(self): return self._tab.Get(flatbuffers.number_types.Float32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(12))
+    def NormalY(self): return self._tab.Get(flatbuffers.number_types.Uint16Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(2))
     # HeightMapLayer
-    def Physicsmaterialid(self): return self._tab.Get(flatbuffers.number_types.Uint8Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(16))
+    def Height(self): return self._tab.Get(flatbuffers.number_types.Float32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(4))
+    # HeightMapLayer
+    def Physicsmaterialid(self): return self._tab.Get(flatbuffers.number_types.Uint8Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(8))
 
-def CreateHeightMapLayer(builder, normal_x, normal_y, normal_z, height, physicsmaterialid):
-    builder.Prep(4, 20)
+def CreateHeightMapLayer(builder, normalX, normalY, height, physicsmaterialid):
+    builder.Prep(4, 12)
     builder.Pad(3)
     builder.PrependUint8(physicsmaterialid)
     builder.PrependFloat32(height)
-    builder.Prep(4, 12)
-    builder.PrependFloat32(normal_z)
-    builder.PrependFloat32(normal_y)
-    builder.PrependFloat32(normal_x)
+    builder.PrependUint16(normalY)
+    builder.PrependUint16(normalX)
     return builder.Offset()
 
-import WBIN.Float3
-try:
-    from typing import Optional
-except:
-    pass
 
 class HeightMapLayerT(object):
 
     # HeightMapLayerT
     def __init__(self):
-        self.normal = None  # type: Optional[WBIN.Float3.Float3T]
+        self.normalX = 0  # type: int
+        self.normalY = 0  # type: int
         self.height = 0.0  # type: float
         self.physicsmaterialid = 0  # type: int
 
@@ -68,11 +61,11 @@ class HeightMapLayerT(object):
     def _UnPack(self, heightMapLayer):
         if heightMapLayer is None:
             return
-        if heightMapLayer.Normal(WBIN.Float3.Float3()) is not None:
-            self.normal = WBIN.Float3.Float3T.InitFromObj(heightMapLayer.Normal(WBIN.Float3.Float3()))
+        self.normalX = heightMapLayer.NormalX()
+        self.normalY = heightMapLayer.NormalY()
         self.height = heightMapLayer.Height()
         self.physicsmaterialid = heightMapLayer.Physicsmaterialid()
 
     # HeightMapLayerT
     def Pack(self, builder):
-        return CreateHeightMapLayer(builder, self.normal.x, self.normal.y, self.normal.z, self.height, self.physicsmaterialid)
+        return CreateHeightMapLayer(builder, self.normalX, self.normalY, self.height, self.physicsmaterialid)

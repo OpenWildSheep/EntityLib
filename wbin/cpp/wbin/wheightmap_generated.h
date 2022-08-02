@@ -22,14 +22,16 @@ struct HeightMapT;
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) HeightMapLayer FLATBUFFERS_FINAL_CLASS {
  private:
-  WBIN::Float3 normal_;
+  uint16_t normalX_;
+  uint16_t normalY_;
   float height_;
   uint8_t physicsmaterialid_;
   int8_t padding0__;  int16_t padding1__;
 
  public:
   HeightMapLayer()
-      : normal_(),
+      : normalX_(0),
+        normalY_(0),
         height_(0),
         physicsmaterialid_(0),
         padding0__(0),
@@ -37,8 +39,9 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) HeightMapLayer FLATBUFFERS_FINAL_CLASS {
     (void)padding0__;
     (void)padding1__;
   }
-  HeightMapLayer(const WBIN::Float3 &_normal, float _height, uint8_t _physicsmaterialid)
-      : normal_(_normal),
+  HeightMapLayer(uint16_t _normalX, uint16_t _normalY, float _height, uint8_t _physicsmaterialid)
+      : normalX_(flatbuffers::EndianScalar(_normalX)),
+        normalY_(flatbuffers::EndianScalar(_normalY)),
         height_(flatbuffers::EndianScalar(_height)),
         physicsmaterialid_(flatbuffers::EndianScalar(_physicsmaterialid)),
         padding0__(0),
@@ -46,11 +49,17 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) HeightMapLayer FLATBUFFERS_FINAL_CLASS {
     (void)padding0__;
     (void)padding1__;
   }
-  const WBIN::Float3 &normal() const {
-    return normal_;
+  uint16_t normalX() const {
+    return flatbuffers::EndianScalar(normalX_);
   }
-  WBIN::Float3 &mutable_normal() {
-    return normal_;
+  void mutate_normalX(uint16_t _normalX) {
+    flatbuffers::WriteScalar(&normalX_, _normalX);
+  }
+  uint16_t normalY() const {
+    return flatbuffers::EndianScalar(normalY_);
+  }
+  void mutate_normalY(uint16_t _normalY) {
+    flatbuffers::WriteScalar(&normalY_, _normalY);
   }
   float height() const {
     return flatbuffers::EndianScalar(height_);
@@ -65,7 +74,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) HeightMapLayer FLATBUFFERS_FINAL_CLASS {
     flatbuffers::WriteScalar(&physicsmaterialid_, _physicsmaterialid);
   }
 };
-FLATBUFFERS_STRUCT_END(HeightMapLayer, 20);
+FLATBUFFERS_STRUCT_END(HeightMapLayer, 12);
 
 struct HeightMapPixelT : public flatbuffers::NativeTable {
   typedef HeightMapPixel TableType;

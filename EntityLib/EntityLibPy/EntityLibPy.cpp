@@ -677,6 +677,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pyProperty
         .def(py::init<EntityLib*, Subschema const*, char const*>(), py::keep_alive<1, 2>())
         .def(py::init<EntityLib*, Subschema const*, char const*, nlohmann::json*>(), py::keep_alive<1, 2>())
+        .def_static("create", [](EntityLib* _lib, Subschema const* _schema, char const* _path)
+        {
+            return Property(_lib, _schema, _path, &_lib->createTempJsonFile());
+        }, py::arg("entlib"), py::arg("schema"), py::arg("path") = "", py::keep_alive<1, 2>())
         .def("save", &Property::save)
         .def_property_readonly("is_default", &Property::isDefault)
         .def("get_object_field", &Property::getObjectField, py::arg("field"), py::arg("field_schema") = nullptr, py::keep_alive<0, 1>())
@@ -749,6 +753,14 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("detach", &Property::detach, py::keep_alive<0, 1>())
         .def("clear", &Property::clear)
         .def("dumps", &dumpProperty, py::arg("superKeyIsTypeName") = false)
+        .def("erase_primset_key", [](Property& _self, char const* _key){return _self.erasePrimSetKey(_key);})
+        .def("erase_primset_key", [](Property& _self, int64_t _key){return _self.erasePrimSetKey(_key);})
+        .def("erase_objectset_item", [](Property& _self, char const* _key){return _self.eraseObjectSetItem(_key);})
+        .def("erase_objectset_item", [](Property& _self, int64_t _key){return _self.eraseObjectSetItem(_key);})
+        .def("erase_map_item", [](Property& _self, char const* _key){return _self.eraseMapItem(_key);})
+        .def("erase_map_item", [](Property& _self, int64_t _key){return _self.eraseMapItem(_key);})
+        .def("erase_unionset_item", &Property::eraseUnionSetItem)
+        .def("copy_into", &Property::copyInto)
         ;
 
     py::register_exception<JsonValidation>(ent, "JsonValidation");

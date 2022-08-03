@@ -7,6 +7,7 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Int import *
 from entgen.Float import *
+from entgen.ScaleConverter import *
 
 from EntityLibPy import Node
 
@@ -20,6 +21,9 @@ class ConstrainedMoveContextInput(HelperObject):
         return ConstrainedMoveContextInput(entlib.make_node(ConstrainedMoveContextInput.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def CoeffSmooth(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("CoeffSmooth"))
     @property
     def CurvatureNormalizationRadius(self):  # type: ()->Float
         return Float(self._node.at("CurvatureNormalizationRadius"))

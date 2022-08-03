@@ -10,6 +10,7 @@ from entgen.CameraEditorData import *
 from entgen.CameraFreeData import *
 from entgen.Float import *
 from entgen.Manager import *
+from entgen.ScaleConverter import *
 from entgen.Vector2 import *
 
 from EntityLibPy import Node
@@ -60,6 +61,9 @@ class CameraManager(HelperObject):
         return Vector2(self._node.at("HeightLevel"))
     @HeightLevel.setter
     def HeightLevel(self, val): self.HeightLevel.set(val)
+    @property
+    def JoyThreshold(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("JoyThreshold"))
     @property
     def RotatePitchIn(self):  # type: ()->Float
         return Float(self._node.at("RotatePitchIn"))

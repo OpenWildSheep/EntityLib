@@ -6,6 +6,8 @@
 #pragma warning(push, 0)
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+
+#include "EntityLib/DumpProperty.h"
 #include "external/pybind11_json.hpp"
 #pragma warning(pop)
 
@@ -251,6 +253,14 @@ static py::list propObjSetGetKeys(Property& _prop)
         throw std::runtime_error("Unexpected key type");
     }
     return arr;
+}
+
+nlohmann::json dumpProperty(Property _prop, bool _superKeyIsTypeName = false)
+{
+    nlohmann::json result;
+    DumpProperty dumper(result, _superKeyIsTypeName);
+    visitRecursive(_prop, dumper);
+    return result;
 }
 
 using namespace pybind11::literals;
@@ -642,6 +652,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("save_node_as_entity", &EntityLib::saveNodeAsEntity)
         .def("save_node_as_scene", &EntityLib::saveNodeAsScene)
         .def("get_parent_entity", static_cast<Node*(EntityLib::*)(Node*) const>(&EntityLib::getParentEntity), py::return_value_policy::reference_internal)
+        .def("get_parent_entity", static_cast<std::optional<Property>(EntityLib::*)(Property const&) const>(&EntityLib::getParentEntity), py::return_value_policy::reference_internal)
         .def("get_schema", &EntityLib::getSchema, py::return_value_policy::reference_internal)
         .def("load_property", &EntityLib::loadProperty)
         .def("load_property_copy", &EntityLib::loadPropertyCopy)
@@ -666,6 +677,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pyProperty
         .def(py::init<EntityLib*, Subschema const*, char const*>(), py::keep_alive<1, 2>())
         .def(py::init<EntityLib*, Subschema const*, char const*, nlohmann::json*>(), py::keep_alive<1, 2>())
+        .def_static("create", [](EntityLib* _lib, Subschema const* _schema, char const* _path)
+        {
+            return Property(_lib, _schema, _path, &_lib->createTempJsonFile());
+        }, py::arg("entlib"), py::arg("schema"), py::arg("path") = "", py::keep_alive<1, 2>())
         .def("save", &Property::save)
         .def_property_readonly("is_default", &Property::isDefault)
         .def("get_object_field", &Property::getObjectField, py::arg("field"), py::arg("field_schema") = nullptr, py::keep_alive<0, 1>())
@@ -715,8 +730,14 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("set_entityref", &Property::setEntityRef)
         .def("set_union_type", &Property::setUnionType, py::keep_alive<0, 1>())
         .def("build_path", &Property::buildPath)
-        .def("primset_insert", [](Property& _self, char const* _key){return _self.insertPrimSetKey(_key);})
-        .def("primset_insert", [](Property& _self, int64_t _key){return _self.insertPrimSetKey(_key);})
+        .def("insert_primset_item", [](Property const& _self, char const* _key){return _self.insertPrimSetKey(_key);})
+        .def("insert_primset_item", [](Property const& _self, int64_t _key){return _self.insertPrimSetKey(_key);})
+        .def("insert_unionset_item", &Property::insertUnionSetItem, py::keep_alive<0, 1>())
+        .def("insert_instance_objectset_item", &Property::insertInstanceObjectSetItem, py::keep_alive<0, 1>())
+        .def("insert_map_item", [](Property const& _self, char const* _key){return _self.insertMapItem(_key);}, py::keep_alive<0, 1>())
+        .def("insert_map_item", [](Property const& _self, int64_t _key){return _self.insertMapItem(_key);}, py::keep_alive<0, 1>())
+        .def("insert_objectset_item", [](Property const& _self, char const* _key){return _self.insertObjectSetItem(_key);}, py::keep_alive<0, 1>())
+        .def("insert_objectset_item", [](Property const& _self, int64_t _key){return _self.insertObjectSetItem(_key);}, py::keep_alive<0, 1>())
         .def("resolve_noderef", &Property::resolveNodeRef, py::keep_alive<0, 1>())
         .def_property_readonly("raw_json", &Property::getRawJson)
         .def_property_readonly("has_value", &Property::hasValue)
@@ -729,7 +750,17 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property_readonly("absolute_noderef", &Property::makeAbsoluteNodeRef)
         .def_property_readonly("path_token", &Property::getPathToken)
         .def_property_readonly("get_prefab_history", &getPrefabHistory, py::keep_alive<0, 1>())
+        .def("detach", &Property::detach, py::keep_alive<0, 1>())
         .def("clear", &Property::clear)
+        .def("dumps", &dumpProperty, py::arg("superKeyIsTypeName") = false)
+        .def("erase_primset_key", [](Property& _self, char const* _key){return _self.erasePrimSetKey(_key);})
+        .def("erase_primset_key", [](Property& _self, int64_t _key){return _self.erasePrimSetKey(_key);})
+        .def("erase_objectset_item", [](Property& _self, char const* _key){return _self.eraseObjectSetItem(_key);})
+        .def("erase_objectset_item", [](Property& _self, int64_t _key){return _self.eraseObjectSetItem(_key);})
+        .def("erase_map_item", [](Property& _self, char const* _key){return _self.eraseMapItem(_key);})
+        .def("erase_map_item", [](Property& _self, int64_t _key){return _self.eraseMapItem(_key);})
+        .def("erase_unionset_item", &Property::eraseUnionSetItem)
+        .def("copy_into", &Property::copyInto)
         ;
 
     py::register_exception<JsonValidation>(ent, "JsonValidation");

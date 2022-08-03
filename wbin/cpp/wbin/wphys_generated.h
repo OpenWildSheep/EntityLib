@@ -18,6 +18,7 @@ struct PhysT : public flatbuffers::NativeTable {
   typedef Phys TableType;
   std::unique_ptr<WBIN::AABB> aabb{};
   std::unique_ptr<WBIN::Float3ChannelT> position{};
+  std::vector<WBIN::Bool3> edgeVisibility{};
   std::vector<uint32_t> materials{};
   std::unique_ptr<WBIN::SkinT> skin{};
   std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf{};
@@ -29,9 +30,10 @@ struct Phys FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_AABB = 4,
     VT_POSITION = 6,
-    VT_MATERIALS = 8,
-    VT_SKIN = 10,
-    VT_SOURCEFILEINF = 12
+    VT_EDGEVISIBILITY = 8,
+    VT_MATERIALS = 10,
+    VT_SKIN = 12,
+    VT_SOURCEFILEINF = 14
   };
   const WBIN::AABB *aabb() const {
     return GetStruct<const WBIN::AABB *>(VT_AABB);
@@ -44,6 +46,12 @@ struct Phys FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   WBIN::Float3Channel *mutable_position() {
     return GetPointer<WBIN::Float3Channel *>(VT_POSITION);
+  }
+  const flatbuffers::Vector<const WBIN::Bool3 *> *edgeVisibility() const {
+    return GetPointer<const flatbuffers::Vector<const WBIN::Bool3 *> *>(VT_EDGEVISIBILITY);
+  }
+  flatbuffers::Vector<const WBIN::Bool3 *> *mutable_edgeVisibility() {
+    return GetPointer<flatbuffers::Vector<const WBIN::Bool3 *> *>(VT_EDGEVISIBILITY);
   }
   const flatbuffers::Vector<uint32_t> *materials() const {
     return GetPointer<const flatbuffers::Vector<uint32_t> *>(VT_MATERIALS);
@@ -68,6 +76,8 @@ struct Phys FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<WBIN::AABB>(verifier, VT_AABB) &&
            VerifyOffsetRequired(verifier, VT_POSITION) &&
            verifier.VerifyTable(position()) &&
+           VerifyOffset(verifier, VT_EDGEVISIBILITY) &&
+           verifier.VerifyVector(edgeVisibility()) &&
            VerifyOffset(verifier, VT_MATERIALS) &&
            verifier.VerifyVector(materials()) &&
            VerifyOffset(verifier, VT_SKIN) &&
@@ -90,6 +100,9 @@ struct PhysBuilder {
   }
   void add_position(flatbuffers::Offset<WBIN::Float3Channel> position) {
     fbb_.AddOffset(Phys::VT_POSITION, position);
+  }
+  void add_edgeVisibility(flatbuffers::Offset<flatbuffers::Vector<const WBIN::Bool3 *>> edgeVisibility) {
+    fbb_.AddOffset(Phys::VT_EDGEVISIBILITY, edgeVisibility);
   }
   void add_materials(flatbuffers::Offset<flatbuffers::Vector<uint32_t>> materials) {
     fbb_.AddOffset(Phys::VT_MATERIALS, materials);
@@ -116,6 +129,7 @@ inline flatbuffers::Offset<Phys> CreatePhys(
     flatbuffers::FlatBufferBuilder &_fbb,
     const WBIN::AABB *aabb = 0,
     flatbuffers::Offset<WBIN::Float3Channel> position = 0,
+    flatbuffers::Offset<flatbuffers::Vector<const WBIN::Bool3 *>> edgeVisibility = 0,
     flatbuffers::Offset<flatbuffers::Vector<uint32_t>> materials = 0,
     flatbuffers::Offset<WBIN::Skin> skin = 0,
     flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf = 0) {
@@ -123,6 +137,7 @@ inline flatbuffers::Offset<Phys> CreatePhys(
   builder_.add_sourceFileInf(sourceFileInf);
   builder_.add_skin(skin);
   builder_.add_materials(materials);
+  builder_.add_edgeVisibility(edgeVisibility);
   builder_.add_position(position);
   builder_.add_aabb(aabb);
   return builder_.Finish();
@@ -132,14 +147,17 @@ inline flatbuffers::Offset<Phys> CreatePhysDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const WBIN::AABB *aabb = 0,
     flatbuffers::Offset<WBIN::Float3Channel> position = 0,
+    const std::vector<WBIN::Bool3> *edgeVisibility = nullptr,
     const std::vector<uint32_t> *materials = nullptr,
     flatbuffers::Offset<WBIN::Skin> skin = 0,
     flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf = 0) {
+  auto edgeVisibility__ = edgeVisibility ? _fbb.CreateVectorOfStructs<WBIN::Bool3>(*edgeVisibility) : 0;
   auto materials__ = materials ? _fbb.CreateVector<uint32_t>(*materials) : 0;
   return WBIN::CreatePhys(
       _fbb,
       aabb,
       position,
+      edgeVisibility__,
       materials__,
       skin,
       sourceFileInf);
@@ -158,6 +176,7 @@ inline void Phys::UnPackTo(PhysT *_o, const flatbuffers::resolver_function_t *_r
   (void)_resolver;
   { auto _e = aabb(); if (_e) _o->aabb = std::unique_ptr<WBIN::AABB>(new WBIN::AABB(*_e)); }
   { auto _e = position(); if (_e) _o->position = std::unique_ptr<WBIN::Float3ChannelT>(_e->UnPack(_resolver)); }
+  { auto _e = edgeVisibility(); if (_e) { _o->edgeVisibility.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->edgeVisibility[_i] = *_e->Get(_i); } } }
   { auto _e = materials(); if (_e) { _o->materials.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->materials[_i] = _e->Get(_i); } } }
   { auto _e = skin(); if (_e) _o->skin = std::unique_ptr<WBIN::SkinT>(_e->UnPack(_resolver)); }
   { auto _e = sourceFileInf(); if (_e) _o->sourceFileInf = std::unique_ptr<WBIN::SourceFileInfT>(_e->UnPack(_resolver)); }
@@ -173,6 +192,7 @@ inline flatbuffers::Offset<Phys> CreatePhys(flatbuffers::FlatBufferBuilder &_fbb
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const PhysT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _aabb = _o->aabb ? _o->aabb.get() : 0;
   auto _position = _o->position ? CreateFloat3Channel(_fbb, _o->position.get(), _rehasher) : 0;
+  auto _edgeVisibility = _o->edgeVisibility.size() ? _fbb.CreateVectorOfStructs(_o->edgeVisibility) : 0;
   auto _materials = _o->materials.size() ? _fbb.CreateVector(_o->materials) : 0;
   auto _skin = _o->skin ? CreateSkin(_fbb, _o->skin.get(), _rehasher) : 0;
   auto _sourceFileInf = _o->sourceFileInf ? CreateSourceFileInf(_fbb, _o->sourceFileInf.get(), _rehasher) : 0;
@@ -180,6 +200,7 @@ inline flatbuffers::Offset<Phys> CreatePhys(flatbuffers::FlatBufferBuilder &_fbb
       _fbb,
       _aabb,
       _position,
+      _edgeVisibility,
       _materials,
       _skin,
       _sourceFileInf);

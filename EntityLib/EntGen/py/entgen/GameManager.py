@@ -57,6 +57,11 @@ class GameManager(HelperObject):
     @ActionAttackValidityTime.setter
     def ActionAttackValidityTime(self, val): self.ActionAttackValidityTime.set(val)
     @property
+    def ActionJumpValidityTime(self):  # type: ()->Float
+        return Float(self._node.at("ActionJumpValidityTime"))
+    @ActionJumpValidityTime.setter
+    def ActionJumpValidityTime(self, val): self.ActionJumpValidityTime.set(val)
+    @property
     def AttackData(self):  # type: ()->GameAttackData
         return GameAttackData(self._node.at("AttackData"))
     @property

@@ -11,6 +11,7 @@ from entgen.Bool import *
 from entgen.Float import *
 from entgen.MoveCapacityData_AnimTagTimelineTransitionTable import *
 from entgen.MoveCapacityData_OrientationSpeed import *
+from entgen.MoveCapacityData_TurnJump import *
 from entgen.ScaleConverter import *
 from entgen.Vector3 import *
 from entgen.MoveCapacityData_ReachSpeed import *
@@ -334,6 +335,9 @@ class MoveCapacityData(HelperObject):
         return Float(self._node.at("turnAroundInputDirectionAngleDeltaMin"))
     @turnAroundInputDirectionAngleDeltaMin.setter
     def turnAroundInputDirectionAngleDeltaMin(self, val): self.turnAroundInputDirectionAngleDeltaMin.set(val)
+    @property
+    def turnJump(self):  # type: ()->MoveCapacityData_TurnJump
+        return MoveCapacityData_TurnJump(self._node.at("turnJump"))
     @property
     def turnRotationMinRatioForNewTurn(self):  # type: ()->Float
         return Float(self._node.at("turnRotationMinRatioForNewTurn"))

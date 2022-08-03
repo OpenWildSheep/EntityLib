@@ -47,8 +47,32 @@ class Phys(object):
         return None
 
     # Phys
-    def Materials(self, j):
+    def EdgeVisibility(self, j):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 3
+            from WBIN.Bool3 import Bool3
+            obj = Bool3()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # Phys
+    def EdgeVisibilityLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # Phys
+    def EdgeVisibilityIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        return o == 0
+
+    # Phys
+    def Materials(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             a = self._tab.Vector(o)
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
@@ -56,26 +80,26 @@ class Phys(object):
 
     # Phys
     def MaterialsAsNumpy(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.GetVectorAsNumpy(flatbuffers.number_types.Uint32Flags, o)
         return 0
 
     # Phys
     def MaterialsLength(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.VectorLen(o)
         return 0
 
     # Phys
     def MaterialsIsNone(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         return o == 0
 
     # Phys
     def Skin(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from WBIN.Skin import Skin
@@ -86,7 +110,7 @@ class Phys(object):
 
     # Phys
     def SourceFileInf(self):
-        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from WBIN.SourceFileInf import SourceFileInf
@@ -95,7 +119,7 @@ class Phys(object):
             return obj
         return None
 
-def Start(builder): builder.StartObject(5)
+def Start(builder): builder.StartObject(6)
 def PhysStart(builder):
     """This method is deprecated. Please switch to Start."""
     return Start(builder)
@@ -107,7 +131,15 @@ def AddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(1, flatb
 def PhysAddPosition(builder, position):
     """This method is deprecated. Please switch to AddPosition."""
     return AddPosition(builder, position)
-def AddMaterials(builder, materials): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(materials), 0)
+def AddEdgeVisibility(builder, edgeVisibility): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(edgeVisibility), 0)
+def PhysAddEdgeVisibility(builder, edgeVisibility):
+    """This method is deprecated. Please switch to AddEdgeVisibility."""
+    return AddEdgeVisibility(builder, edgeVisibility)
+def StartEdgeVisibilityVector(builder, numElems): return builder.StartVector(3, numElems, 1)
+def PhysStartEdgeVisibilityVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartEdgeVisibilityVector(builder, numElems)
+def AddMaterials(builder, materials): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(materials), 0)
 def PhysAddMaterials(builder, materials):
     """This method is deprecated. Please switch to AddMaterials."""
     return AddMaterials(builder, materials)
@@ -115,11 +147,11 @@ def StartMaterialsVector(builder, numElems): return builder.StartVector(4, numEl
 def PhysStartMaterialsVector(builder, numElems):
     """This method is deprecated. Please switch to Start."""
     return StartMaterialsVector(builder, numElems)
-def AddSkin(builder, skin): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(skin), 0)
+def AddSkin(builder, skin): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(skin), 0)
 def PhysAddSkin(builder, skin):
     """This method is deprecated. Please switch to AddSkin."""
     return AddSkin(builder, skin)
-def AddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
+def AddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(sourceFileInf), 0)
 def PhysAddSourceFileInf(builder, sourceFileInf):
     """This method is deprecated. Please switch to AddSourceFileInf."""
     return AddSourceFileInf(builder, sourceFileInf)
@@ -128,6 +160,7 @@ def PhysEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
 import WBIN.AABB
+import WBIN.Bool3
 import WBIN.Float3Channel
 import WBIN.Skin
 import WBIN.SourceFileInf
@@ -142,6 +175,7 @@ class PhysT(object):
     def __init__(self):
         self.aabb = None  # type: Optional[WBIN.AABB.AABBT]
         self.position = None  # type: Optional[WBIN.Float3Channel.Float3ChannelT]
+        self.edgeVisibility = None  # type: List[WBIN.Bool3.Bool3T]
         self.materials = None  # type: List[int]
         self.skin = None  # type: Optional[WBIN.Skin.SkinT]
         self.sourceFileInf = None  # type: Optional[WBIN.SourceFileInf.SourceFileInfT]
@@ -166,6 +200,14 @@ class PhysT(object):
             self.aabb = WBIN.AABB.AABBT.InitFromObj(phys.Aabb())
         if phys.Position() is not None:
             self.position = WBIN.Float3Channel.Float3ChannelT.InitFromObj(phys.Position())
+        if not phys.EdgeVisibilityIsNone():
+            self.edgeVisibility = []
+            for i in range(phys.EdgeVisibilityLength()):
+                if phys.EdgeVisibility(i) is None:
+                    self.edgeVisibility.append(None)
+                else:
+                    bool3_ = WBIN.Bool3.Bool3T.InitFromObj(phys.EdgeVisibility(i))
+                    self.edgeVisibility.append(bool3_)
         if not phys.MaterialsIsNone():
             if np is None:
                 self.materials = []
@@ -182,6 +224,11 @@ class PhysT(object):
     def Pack(self, builder):
         if self.position is not None:
             position = self.position.Pack(builder)
+        if self.edgeVisibility is not None:
+            StartEdgeVisibilityVector(builder, len(self.edgeVisibility))
+            for i in reversed(range(len(self.edgeVisibility))):
+                self.edgeVisibility[i].Pack(builder)
+            edgeVisibility = builder.EndVector()
         if self.materials is not None:
             if np is not None and type(self.materials) is np.ndarray:
                 materials = builder.CreateNumpyVector(self.materials)
@@ -200,6 +247,8 @@ class PhysT(object):
             AddAabb(builder, aabb)
         if self.position is not None:
             AddPosition(builder, position)
+        if self.edgeVisibility is not None:
+            AddEdgeVisibility(builder, edgeVisibility)
         if self.materials is not None:
             AddMaterials(builder, materials)
         if self.skin is not None:

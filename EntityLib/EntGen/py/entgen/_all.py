@@ -385,7 +385,7 @@ from .OutfitWearerComponentInput import *
 from .MountIKControllerComponentInput import *
 from .LifeComponentInput import *
 from .InteractorComponentInput import *
-from .InteractableGPEComponentInput import *
+from .InteractableComponentInput import *
 from .GrasperComponentInput import *
 from .GraspableComponentInput import *
 from .FluidComponentInput import *
@@ -481,7 +481,7 @@ from .LDPrimitive import *
 from .ItemHolderGD import *
 from .InventoryGD import *
 from .InterestPointGD import *
-from .InteractableGPEGD import *
+from .InteractableGD import *
 from .InfoboardRegistererGD import *
 from .IncapacitateComponentGD import *
 from .HotspotsGD import *
@@ -527,6 +527,7 @@ from .CharacterPlatformGD import *
 from .CameraDataGD import *
 from .BreakableGD import *
 from .BittenGD import *
+from .BiomePatch import *
 from .AttackTriggerGD import *
 from .AssemblyGD import *
 from .AnimationTransformDriverGD import *

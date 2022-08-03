@@ -13186,14 +13186,14 @@ class InteractorComponentInput(HelperObject):
 
 from EntityLibPy import Node
 
-class InteractableGPEComponentInput(HelperObject):
-    schema_name = "InteractableGPEComponentInput"
+class InteractableComponentInput(HelperObject):
+    schema_name = "InteractableComponentInput"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->InteractableGPEComponentInput
-        return InteractableGPEComponentInput(entlib.load_node_file(sourcefile, entlib.get_schema(InteractableGPEComponentInput.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->InteractableComponentInput
+        return InteractableComponentInput(entlib.load_node_file(sourcefile, entlib.get_schema(InteractableComponentInput.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->InteractableGPEComponentInput
-        return InteractableGPEComponentInput(entlib.make_node(InteractableGPEComponentInput.schema_name))
+    def create(entlib):  # type: (EntityLib)->InteractableComponentInput
+        return InteractableComponentInput(entlib.make_node(InteractableComponentInput.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
@@ -17090,14 +17090,14 @@ class InterestPointGD(HelperObject):
 
 from EntityLibPy import Node
 
-class InteractableGPEGD(HelperObject):
-    schema_name = "InteractableGPEGD"
+class InteractableGD(HelperObject):
+    schema_name = "InteractableGD"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->InteractableGPEGD
-        return InteractableGPEGD(entlib.load_node_file(sourcefile, entlib.get_schema(InteractableGPEGD.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->InteractableGD
+        return InteractableGD(entlib.load_node_file(sourcefile, entlib.get_schema(InteractableGD.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->InteractableGPEGD
-        return InteractableGPEGD(entlib.make_node(InteractableGPEGD.schema_name))
+    def create(entlib):  # type: (EntityLib)->InteractableGD
+        return InteractableGD(entlib.make_node(InteractableGD.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
@@ -18618,6 +18618,44 @@ class BittenGD(HelperObject):
         return Float(self._node.at("MaxAngle"))
     @MaxAngle.setter
     def MaxAngle(self, val): self.MaxAngle.set(val)
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class BiomePatch(HelperObject):
+    schema_name = "BiomePatch"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->BiomePatch
+        return BiomePatch(entlib.load_node_file(sourcefile, entlib.get_schema(BiomePatch.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->BiomePatch
+        return BiomePatch(entlib.make_node(BiomePatch.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def LocalMatrix(self):  # type: ()->Matrix33
+        return Matrix33(self._node.at("LocalMatrix"))
+    @LocalMatrix.setter
+    def LocalMatrix(self, val): self.LocalMatrix.set(val)
+    @property
+    def MaterialGroupName(self):  # type: ()->String
+        return String(self._node.at("MaterialGroupName"))
+    @MaterialGroupName.setter
+    def MaterialGroupName(self, val): self.MaterialGroupName.set(val)
+    @property
+    def MeshFile(self):  # type: ()->String
+        return String(self._node.at("MeshFile"))
+    @MeshFile.setter
+    def MeshFile(self, val): self.MeshFile.set(val)
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))

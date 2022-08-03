@@ -864,7 +864,7 @@ namespace Ent
         struct MountIKControllerComponentInput;
         struct LifeComponentInput;
         struct InteractorComponentInput;
-        struct InteractableGPEComponentInput;
+        struct InteractableComponentInput;
         struct GrasperComponentInput;
         struct GraspableComponentInput;
         struct FluidComponentInput;
@@ -960,7 +960,7 @@ namespace Ent
         struct ItemHolderGD;
         struct InventoryGD;
         struct InterestPointGD;
-        struct InteractableGPEGD;
+        struct InteractableGD;
         struct InfoboardRegistererGD;
         struct IncapacitateComponentGD;
         struct HotspotsGD;
@@ -1006,6 +1006,7 @@ namespace Ent
         struct CameraDataGD;
         struct BreakableGD;
         struct BittenGD;
+        struct BiomePatch;
         struct AttackTriggerGD;
         struct AssemblyGD;
         struct AnimationTransformDriverGD;
@@ -13369,29 +13370,29 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
-        struct InteractableGPEComponentInput : HelperObject<InteractableGPEComponentInput> // Object
+        struct InteractableComponentInput : HelperObject<InteractableComponentInput> // Object
         {
-            explicit InteractableGPEComponentInput(Ent::Property _node): HelperObject<InteractableGPEComponentInput>(std::move(_node)) {}
-            static constexpr char schemaName[] = "InteractableGPEComponentInput";
-            static InteractableGPEComponentInput load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            explicit InteractableComponentInput(Ent::Property _node): HelperObject<InteractableComponentInput>(std::move(_node)) {}
+            static constexpr char schemaName[] = "InteractableComponentInput";
+            static InteractableComponentInput load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
-                return InteractableGPEComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+                return InteractableComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
             }
-            static InteractableGPEComponentInput loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static InteractableComponentInput loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 auto& storage = _entlib.createTempJsonFile();
                 storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return InteractableGPEComponentInput(Ent::Property(
+                return InteractableComponentInput(Ent::Property(
                     &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
             }
-            static InteractableGPEComponentInput create(Ent::EntityLib& _entlib)
+            static InteractableComponentInput create(Ent::EntityLib& _entlib)
             {
                 auto& storage = _entlib.createTempJsonFile();
-                return InteractableGPEComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+                return InteractableComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
             }
-            InteractableGPEComponentInput makeInstanceOf()
+            InteractableComponentInput makeInstanceOf()
             {
-                return InteractableGPEComponentInput(getProperty().makeInstanceOf());
+                return InteractableComponentInput(getProperty().makeInstanceOf());
             }
             Ent::Gen2::Interactor Interactor() const;
             Ent::Gen2::ComponentInput Super() const;
@@ -16420,29 +16421,29 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
-        struct InteractableGPEGD : HelperObject<InteractableGPEGD> // Object
+        struct InteractableGD : HelperObject<InteractableGD> // Object
         {
-            explicit InteractableGPEGD(Ent::Property _node): HelperObject<InteractableGPEGD>(std::move(_node)) {}
-            static constexpr char schemaName[] = "InteractableGPEGD";
-            static InteractableGPEGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            explicit InteractableGD(Ent::Property _node): HelperObject<InteractableGD>(std::move(_node)) {}
+            static constexpr char schemaName[] = "InteractableGD";
+            static InteractableGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
-                return InteractableGPEGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+                return InteractableGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
             }
-            static InteractableGPEGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static InteractableGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 auto& storage = _entlib.createTempJsonFile();
                 storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return InteractableGPEGD(Ent::Property(
+                return InteractableGD(Ent::Property(
                     &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
             }
-            static InteractableGPEGD create(Ent::EntityLib& _entlib)
+            static InteractableGD create(Ent::EntityLib& _entlib)
             {
                 auto& storage = _entlib.createTempJsonFile();
-                return InteractableGPEGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+                return InteractableGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
             }
-            InteractableGPEGD makeInstanceOf()
+            InteractableGD makeInstanceOf()
             {
-                return InteractableGPEGD(getProperty().makeInstanceOf());
+                return InteractableGD(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ResponsiblePointer_ActorState_ GPEActorState() const;
             Ent::Gen2::GPEType GPEType() const;
@@ -17813,6 +17814,37 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct BiomePatch : HelperObject<BiomePatch> // Object
+        {
+            explicit BiomePatch(Ent::Property _node): HelperObject<BiomePatch>(std::move(_node)) {}
+            static constexpr char schemaName[] = "BiomePatch";
+            static BiomePatch load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return BiomePatch(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static BiomePatch loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return BiomePatch(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static BiomePatch create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return BiomePatch(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            BiomePatch makeInstanceOf()
+            {
+                return BiomePatch(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Matrix33 LocalMatrix() const;
+            Ent::Gen2::String MaterialGroupName() const;
+            Ent::Gen2::String MeshFile() const;
+            Ent::Gen2::ComponentGD Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct AttackTriggerGD : HelperObject<AttackTriggerGD> // Object
         {
             explicit AttackTriggerGD(Ent::Property _node): HelperObject<AttackTriggerGD>(std::move(_node)) {}
@@ -18058,6 +18090,8 @@ namespace Ent
             Ent::Gen2::AttackTriggerGD setAttackTriggerGD();
             std::optional<Ent::Gen2::BeamTargetGD> BeamTargetGD();
             Ent::Gen2::BeamTargetGD setBeamTargetGD();
+            std::optional<Ent::Gen2::BiomePatch> BiomePatch();
+            Ent::Gen2::BiomePatch setBiomePatch();
             std::optional<Ent::Gen2::BittenGD> BittenGD();
             Ent::Gen2::BittenGD setBittenGD();
             std::optional<Ent::Gen2::BoidsGD> BoidsGD();
@@ -18164,8 +18198,8 @@ namespace Ent
             Ent::Gen2::IncapacitateComponentGD setIncapacitateComponentGD();
             std::optional<Ent::Gen2::InfoboardRegistererGD> InfoboardRegistererGD();
             Ent::Gen2::InfoboardRegistererGD setInfoboardRegistererGD();
-            std::optional<Ent::Gen2::InteractableGPEGD> InteractableGPEGD();
-            Ent::Gen2::InteractableGPEGD setInteractableGPEGD();
+            std::optional<Ent::Gen2::InteractableGD> InteractableGD();
+            Ent::Gen2::InteractableGD setInteractableGD();
             std::optional<Ent::Gen2::InteractorGD> InteractorGD();
             Ent::Gen2::InteractorGD setInteractorGD();
             std::optional<Ent::Gen2::InterestPointGD> InterestPointGD();
@@ -18403,6 +18437,9 @@ namespace Ent
             std::optional<Ent::Gen2::BeamTargetGD> BeamTargetGD();
             Ent::Gen2::BeamTargetGD addBeamTargetGD();
             void removeBeamTargetGD();
+            std::optional<Ent::Gen2::BiomePatch> BiomePatch();
+            Ent::Gen2::BiomePatch addBiomePatch();
+            void removeBiomePatch();
             std::optional<Ent::Gen2::BittenGD> BittenGD();
             Ent::Gen2::BittenGD addBittenGD();
             void removeBittenGD();
@@ -18562,9 +18599,9 @@ namespace Ent
             std::optional<Ent::Gen2::InfoboardRegistererGD> InfoboardRegistererGD();
             Ent::Gen2::InfoboardRegistererGD addInfoboardRegistererGD();
             void removeInfoboardRegistererGD();
-            std::optional<Ent::Gen2::InteractableGPEGD> InteractableGPEGD();
-            Ent::Gen2::InteractableGPEGD addInteractableGPEGD();
-            void removeInteractableGPEGD();
+            std::optional<Ent::Gen2::InteractableGD> InteractableGD();
+            Ent::Gen2::InteractableGD addInteractableGD();
+            void removeInteractableGD();
             std::optional<Ent::Gen2::InteractorGD> InteractorGD();
             Ent::Gen2::InteractorGD addInteractorGD();
             void removeInteractorGD();
@@ -19215,6 +19252,9 @@ namespace Ent
             std::optional<Ent::Gen2::BeamTargetGD> BeamTargetGD();
             Ent::Gen2::BeamTargetGD addBeamTargetGD();
             void removeBeamTargetGD();
+            std::optional<Ent::Gen2::BiomePatch> BiomePatch();
+            Ent::Gen2::BiomePatch addBiomePatch();
+            void removeBiomePatch();
             std::optional<Ent::Gen2::BittenGD> BittenGD();
             Ent::Gen2::BittenGD addBittenGD();
             void removeBittenGD();
@@ -19374,9 +19414,9 @@ namespace Ent
             std::optional<Ent::Gen2::InfoboardRegistererGD> InfoboardRegistererGD();
             Ent::Gen2::InfoboardRegistererGD addInfoboardRegistererGD();
             void removeInfoboardRegistererGD();
-            std::optional<Ent::Gen2::InteractableGPEGD> InteractableGPEGD();
-            Ent::Gen2::InteractableGPEGD addInteractableGPEGD();
-            void removeInteractableGPEGD();
+            std::optional<Ent::Gen2::InteractableGD> InteractableGD();
+            Ent::Gen2::InteractableGD addInteractableGD();
+            void removeInteractableGD();
             std::optional<Ent::Gen2::InteractorGD> InteractorGD();
             Ent::Gen2::InteractorGD addInteractorGD();
             void removeInteractorGD();
@@ -49474,16 +49514,16 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
-        // InteractableGPEComponentInput
-        inline Ent::Gen2::Interactor InteractableGPEComponentInput::Interactor() const
+        // InteractableComponentInput
+        inline Ent::Gen2::Interactor InteractableComponentInput::Interactor() const
         {
             return Ent::Gen2::Interactor(getProperty().getObjectField("Interactor"));
         }
-        inline Ent::Gen2::ComponentInput InteractableGPEComponentInput::Super() const
+        inline Ent::Gen2::ComponentInput InteractableComponentInput::Super() const
         {
             return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
         }
-        inline Ent::Gen2::String InteractableGPEComponentInput::_comment() const
+        inline Ent::Gen2::String InteractableComponentInput::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -51786,28 +51826,28 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
-        // InteractableGPEGD
-        inline Ent::Gen2::ResponsiblePointer_ActorState_ InteractableGPEGD::GPEActorState() const
+        // InteractableGD
+        inline Ent::Gen2::ResponsiblePointer_ActorState_ InteractableGD::GPEActorState() const
         {
             return Ent::Gen2::ResponsiblePointer_ActorState_(getProperty().getObjectField("GPEActorState"));
         }
-        inline Ent::Gen2::GPEType InteractableGPEGD::GPEType() const
+        inline Ent::Gen2::GPEType InteractableGD::GPEType() const
         {
             return Ent::Gen2::GPEType(getProperty().getObjectField("GPEType"));
         }
-        inline Ent::Gen2::String InteractableGPEGD::HotspotName() const
+        inline Ent::Gen2::String InteractableGD::HotspotName() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("HotspotName"));
         }
-        inline Ent::Gen2::ResponsiblePointer_ActorState_ InteractableGPEGD::InteractionModeActorState() const
+        inline Ent::Gen2::ResponsiblePointer_ActorState_ InteractableGD::InteractionModeActorState() const
         {
             return Ent::Gen2::ResponsiblePointer_ActorState_(getProperty().getObjectField("InteractionModeActorState"));
         }
-        inline Ent::Gen2::ComponentGD InteractableGPEGD::Super() const
+        inline Ent::Gen2::ComponentGD InteractableGD::Super() const
         {
             return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
         }
-        inline Ent::Gen2::String InteractableGPEGD::_comment() const
+        inline Ent::Gen2::String InteractableGD::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -52620,6 +52660,27 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // BiomePatch
+        inline Ent::Gen2::Matrix33 BiomePatch::LocalMatrix() const
+        {
+            return Ent::Gen2::Matrix33(getProperty().getObjectField("LocalMatrix"));
+        }
+        inline Ent::Gen2::String BiomePatch::MaterialGroupName() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("MaterialGroupName"));
+        }
+        inline Ent::Gen2::String BiomePatch::MeshFile() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("MeshFile"));
+        }
+        inline Ent::Gen2::ComponentGD BiomePatch::Super() const
+        {
+            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String BiomePatch::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // AttackTriggerGD
         inline Ent::Gen2::ComponentGD AttackTriggerGD::Super() const
         {
@@ -52914,6 +52975,17 @@ namespace Ent
         inline Ent::Gen2::BeamTargetGD Component::setBeamTargetGD()
         {
             return Ent::Gen2::BeamTargetGD(getProperty().setUnionType("BeamTargetGD"));
+        }
+        inline std::optional<Ent::Gen2::BiomePatch> Component::BiomePatch()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "BiomePatch") != 0?
+                    std::optional<Ent::Gen2::BiomePatch>{}:
+                    std::optional<Ent::Gen2::BiomePatch>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::BiomePatch Component::setBiomePatch()
+        {
+            return Ent::Gen2::BiomePatch(getProperty().setUnionType("BiomePatch"));
         }
         inline std::optional<Ent::Gen2::BittenGD> Component::BittenGD()
         {
@@ -53498,16 +53570,16 @@ namespace Ent
         {
             return Ent::Gen2::InfoboardRegistererGD(getProperty().setUnionType("InfoboardRegistererGD"));
         }
-        inline std::optional<Ent::Gen2::InteractableGPEGD> Component::InteractableGPEGD()
+        inline std::optional<Ent::Gen2::InteractableGD> Component::InteractableGD()
         {
             return strcmp(
-                getProperty().getUnionType(), "InteractableGPEGD") != 0?
-                    std::optional<Ent::Gen2::InteractableGPEGD>{}:
-                    std::optional<Ent::Gen2::InteractableGPEGD>(getProperty().getUnionData());
+                getProperty().getUnionType(), "InteractableGD") != 0?
+                    std::optional<Ent::Gen2::InteractableGD>{}:
+                    std::optional<Ent::Gen2::InteractableGD>(getProperty().getUnionData());
         }
-        inline Ent::Gen2::InteractableGPEGD Component::setInteractableGPEGD()
+        inline Ent::Gen2::InteractableGD Component::setInteractableGD()
         {
-            return Ent::Gen2::InteractableGPEGD(getProperty().setUnionType("InteractableGPEGD"));
+            return Ent::Gen2::InteractableGD(getProperty().setUnionType("InteractableGD"));
         }
         inline std::optional<Ent::Gen2::InteractorGD> Component::InteractorGD()
         {
@@ -54686,6 +54758,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("BeamTargetGD");
         }
+        inline std::optional<Ent::Gen2::BiomePatch> Object_Components::BiomePatch()
+        {
+            return std::optional<Ent::Gen2::BiomePatch>(getSubNode("BiomePatch"));
+        }
+        inline Ent::Gen2::BiomePatch Object_Components::addBiomePatch()
+        {
+            return Ent::Gen2::BiomePatch(addSubNode("BiomePatch"));
+        }
+        inline void Object_Components::removeBiomePatch()
+        {
+            getProperty().eraseUnionSetItem("BiomePatch");
+        }
         inline std::optional<Ent::Gen2::BittenGD> Object_Components::BittenGD()
         {
             return std::optional<Ent::Gen2::BittenGD>(getSubNode("BittenGD"));
@@ -55322,17 +55406,17 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("InfoboardRegistererGD");
         }
-        inline std::optional<Ent::Gen2::InteractableGPEGD> Object_Components::InteractableGPEGD()
+        inline std::optional<Ent::Gen2::InteractableGD> Object_Components::InteractableGD()
         {
-            return std::optional<Ent::Gen2::InteractableGPEGD>(getSubNode("InteractableGPEGD"));
+            return std::optional<Ent::Gen2::InteractableGD>(getSubNode("InteractableGD"));
         }
-        inline Ent::Gen2::InteractableGPEGD Object_Components::addInteractableGPEGD()
+        inline Ent::Gen2::InteractableGD Object_Components::addInteractableGD()
         {
-            return Ent::Gen2::InteractableGPEGD(addSubNode("InteractableGPEGD"));
+            return Ent::Gen2::InteractableGD(addSubNode("InteractableGD"));
         }
-        inline void Object_Components::removeInteractableGPEGD()
+        inline void Object_Components::removeInteractableGD()
         {
-            getProperty().eraseUnionSetItem("InteractableGPEGD");
+            getProperty().eraseUnionSetItem("InteractableGD");
         }
         inline std::optional<Ent::Gen2::InteractorGD> Object_Components::InteractorGD()
         {
@@ -56869,6 +56953,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("BeamTargetGD");
         }
+        inline std::optional<Ent::Gen2::BiomePatch> Components::BiomePatch()
+        {
+            return std::optional<Ent::Gen2::BiomePatch>(getSubNode("BiomePatch"));
+        }
+        inline Ent::Gen2::BiomePatch Components::addBiomePatch()
+        {
+            return Ent::Gen2::BiomePatch(addSubNode("BiomePatch"));
+        }
+        inline void Components::removeBiomePatch()
+        {
+            getProperty().eraseUnionSetItem("BiomePatch");
+        }
         inline std::optional<Ent::Gen2::BittenGD> Components::BittenGD()
         {
             return std::optional<Ent::Gen2::BittenGD>(getSubNode("BittenGD"));
@@ -57505,17 +57601,17 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("InfoboardRegistererGD");
         }
-        inline std::optional<Ent::Gen2::InteractableGPEGD> Components::InteractableGPEGD()
+        inline std::optional<Ent::Gen2::InteractableGD> Components::InteractableGD()
         {
-            return std::optional<Ent::Gen2::InteractableGPEGD>(getSubNode("InteractableGPEGD"));
+            return std::optional<Ent::Gen2::InteractableGD>(getSubNode("InteractableGD"));
         }
-        inline Ent::Gen2::InteractableGPEGD Components::addInteractableGPEGD()
+        inline Ent::Gen2::InteractableGD Components::addInteractableGD()
         {
-            return Ent::Gen2::InteractableGPEGD(addSubNode("InteractableGPEGD"));
+            return Ent::Gen2::InteractableGD(addSubNode("InteractableGD"));
         }
-        inline void Components::removeInteractableGPEGD()
+        inline void Components::removeInteractableGD()
         {
-            getProperty().eraseUnionSetItem("InteractableGPEGD");
+            getProperty().eraseUnionSetItem("InteractableGD");
         }
         inline std::optional<Ent::Gen2::InteractorGD> Components::InteractorGD()
         {

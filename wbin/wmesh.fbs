@@ -5,6 +5,7 @@ namespace WBIN;
 table Mesh
 {
 	position:Float3Channel (required);
+	edgeVisibility:[Bool3];
 }
 
 root_type Mesh;

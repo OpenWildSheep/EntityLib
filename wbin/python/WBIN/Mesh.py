@@ -35,7 +35,31 @@ class Mesh(object):
             return obj
         return None
 
-def Start(builder): builder.StartObject(1)
+    # Mesh
+    def EdgeVisibility(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 3
+            from WBIN.Bool3 import Bool3
+            obj = Bool3()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # Mesh
+    def EdgeVisibilityLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # Mesh
+    def EdgeVisibilityIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        return o == 0
+
+def Start(builder): builder.StartObject(2)
 def MeshStart(builder):
     """This method is deprecated. Please switch to Start."""
     return Start(builder)
@@ -43,13 +67,22 @@ def AddPosition(builder, position): builder.PrependUOffsetTRelativeSlot(0, flatb
 def MeshAddPosition(builder, position):
     """This method is deprecated. Please switch to AddPosition."""
     return AddPosition(builder, position)
+def AddEdgeVisibility(builder, edgeVisibility): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(edgeVisibility), 0)
+def MeshAddEdgeVisibility(builder, edgeVisibility):
+    """This method is deprecated. Please switch to AddEdgeVisibility."""
+    return AddEdgeVisibility(builder, edgeVisibility)
+def StartEdgeVisibilityVector(builder, numElems): return builder.StartVector(3, numElems, 1)
+def MeshStartEdgeVisibilityVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartEdgeVisibilityVector(builder, numElems)
 def End(builder): return builder.EndObject()
 def MeshEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+import WBIN.Bool3
 import WBIN.Float3Channel
 try:
-    from typing import Optional
+    from typing import List, Optional
 except:
     pass
 
@@ -58,6 +91,7 @@ class MeshT(object):
     # MeshT
     def __init__(self):
         self.position = None  # type: Optional[WBIN.Float3Channel.Float3ChannelT]
+        self.edgeVisibility = None  # type: List[WBIN.Bool3.Bool3T]
 
     @classmethod
     def InitFromBuf(cls, buf, pos):
@@ -77,13 +111,28 @@ class MeshT(object):
             return
         if mesh.Position() is not None:
             self.position = WBIN.Float3Channel.Float3ChannelT.InitFromObj(mesh.Position())
+        if not mesh.EdgeVisibilityIsNone():
+            self.edgeVisibility = []
+            for i in range(mesh.EdgeVisibilityLength()):
+                if mesh.EdgeVisibility(i) is None:
+                    self.edgeVisibility.append(None)
+                else:
+                    bool3_ = WBIN.Bool3.Bool3T.InitFromObj(mesh.EdgeVisibility(i))
+                    self.edgeVisibility.append(bool3_)
 
     # MeshT
     def Pack(self, builder):
         if self.position is not None:
             position = self.position.Pack(builder)
+        if self.edgeVisibility is not None:
+            StartEdgeVisibilityVector(builder, len(self.edgeVisibility))
+            for i in reversed(range(len(self.edgeVisibility))):
+                self.edgeVisibility[i].Pack(builder)
+            edgeVisibility = builder.EndVector()
         Start(builder)
         if self.position is not None:
             AddPosition(builder, position)
+        if self.edgeVisibility is not None:
+            AddEdgeVisibility(builder, edgeVisibility)
         mesh = End(builder)
         return mesh

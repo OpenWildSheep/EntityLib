@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ComponentGD import *
+from entgen.Float import *
 from entgen.Matrix33 import *
 from entgen.TestPropertyDefaultValues2 import *
 
@@ -21,6 +22,11 @@ class TestDefaultValues(HelperObject):
         return TestDefaultValues(entlib.make_node(TestDefaultValues.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def DoubleWithDefaultValue(self):  # type: ()->Float
+        return Float(self._node.at("DoubleWithDefaultValue"))
+    @DoubleWithDefaultValue.setter
+    def DoubleWithDefaultValue(self, val): self.DoubleWithDefaultValue.set(val)
     @property
     def Matrix(self):  # type: ()->Matrix33
         return Matrix33(self._node.at("Matrix"))

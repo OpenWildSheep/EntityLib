@@ -9,14 +9,14 @@ from entgen.String import *
 
 from EntityLibPy import Node
 
-class VegetationResourceData(HelperObject):
-    schema_name = "VegetationResourceData"
+class VegetationData(HelperObject):
+    schema_name = "VegetationData"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->VegetationResourceData
-        return VegetationResourceData(entlib.load_node_file(sourcefile, entlib.get_schema(VegetationResourceData.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->VegetationData
+        return VegetationData(entlib.load_node_file(sourcefile, entlib.get_schema(VegetationData.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->VegetationResourceData
-        return VegetationResourceData(entlib.make_node(VegetationResourceData.schema_name))
+    def create(entlib):  # type: (EntityLib)->VegetationData
+        return VegetationData(entlib.make_node(VegetationData.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

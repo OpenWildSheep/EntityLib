@@ -11,6 +11,7 @@ from entgen.Bool import *
 from entgen.Float import *
 from entgen.MoveCapacityData_AnimTagTimelineTransitionTable import *
 from entgen.MoveCapacityData_OrientationSpeed import *
+from entgen.MoveCapacityData_TurnJump import *
 from entgen.ScaleConverter import *
 from entgen.Vector3 import *
 from entgen.MoveCapacityData_ReachSpeed import *
@@ -157,19 +158,6 @@ class MoveCapacityData(HelperObject):
     @dropSyncTrajectoryAndVisual.setter
     def dropSyncTrajectoryAndVisual(self, val): self.dropSyncTrajectoryAndVisual.set(val)
     @property
-    def edgeDetectionAnticipation(self):  # type: ()->ScaleConverter
-        return ScaleConverter(self._node.at("edgeDetectionAnticipation"))
-    @property
-    def edgeDetectionOffset(self):  # type: ()->Vector3
-        return Vector3(self._node.at("edgeDetectionOffset"))
-    @edgeDetectionOffset.setter
-    def edgeDetectionOffset(self, val): self.edgeDetectionOffset.set(val)
-    @property
-    def edgeDetectionRadiusMultiplier(self):  # type: ()->Float
-        return Float(self._node.at("edgeDetectionRadiusMultiplier"))
-    @edgeDetectionRadiusMultiplier.setter
-    def edgeDetectionRadiusMultiplier(self, val): self.edgeDetectionRadiusMultiplier.set(val)
-    @property
     def ellipseCoeff(self):  # type: ()->Float
         return Float(self._node.at("ellipseCoeff"))
     @ellipseCoeff.setter
@@ -200,36 +188,6 @@ class MoveCapacityData(HelperObject):
         return Bool(self._node.at("jumpOntoPosition"))
     @jumpOntoPosition.setter
     def jumpOntoPosition(self, val): self.jumpOntoPosition.set(val)
-    @property
-    def ledgeApproachSpeedMaxZ(self):  # type: ()->Float
-        return Float(self._node.at("ledgeApproachSpeedMaxZ"))
-    @ledgeApproachSpeedMaxZ.setter
-    def ledgeApproachSpeedMaxZ(self, val): self.ledgeApproachSpeedMaxZ.set(val)
-    @property
-    def ledgeDepthRadiusCoeff(self):  # type: ()->Float
-        return Float(self._node.at("ledgeDepthRadiusCoeff"))
-    @ledgeDepthRadiusCoeff.setter
-    def ledgeDepthRadiusCoeff(self, val): self.ledgeDepthRadiusCoeff.set(val)
-    @property
-    def ledgeMaxDistance(self):  # type: ()->Float
-        return Float(self._node.at("ledgeMaxDistance"))
-    @ledgeMaxDistance.setter
-    def ledgeMaxDistance(self, val): self.ledgeMaxDistance.set(val)
-    @property
-    def ledgeMaxHeightEpsilon(self):  # type: ()->Float
-        return Float(self._node.at("ledgeMaxHeightEpsilon"))
-    @ledgeMaxHeightEpsilon.setter
-    def ledgeMaxHeightEpsilon(self, val): self.ledgeMaxHeightEpsilon.set(val)
-    @property
-    def ledgeMinDepthEpsilon(self):  # type: ()->Float
-        return Float(self._node.at("ledgeMinDepthEpsilon"))
-    @ledgeMinDepthEpsilon.setter
-    def ledgeMinDepthEpsilon(self, val): self.ledgeMinDepthEpsilon.set(val)
-    @property
-    def ledgeMinWidthEpsilon(self):  # type: ()->Float
-        return Float(self._node.at("ledgeMinWidthEpsilon"))
-    @ledgeMinWidthEpsilon.setter
-    def ledgeMinWidthEpsilon(self, val): self.ledgeMinWidthEpsilon.set(val)
     @property
     def legLength(self):  # type: ()->Float
         return Float(self._node.at("legLength"))
@@ -377,6 +335,9 @@ class MoveCapacityData(HelperObject):
         return Float(self._node.at("turnAroundInputDirectionAngleDeltaMin"))
     @turnAroundInputDirectionAngleDeltaMin.setter
     def turnAroundInputDirectionAngleDeltaMin(self, val): self.turnAroundInputDirectionAngleDeltaMin.set(val)
+    @property
+    def turnJump(self):  # type: ()->MoveCapacityData_TurnJump
+        return MoveCapacityData_TurnJump(self._node.at("turnJump"))
     @property
     def turnRotationMinRatioForNewTurn(self):  # type: ()->Float
         return Float(self._node.at("turnRotationMinRatioForNewTurn"))

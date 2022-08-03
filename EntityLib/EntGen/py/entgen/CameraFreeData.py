@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.Float import *
+from entgen.ScaleConverter import *
 
 from EntityLibPy import Node
 
@@ -30,10 +31,8 @@ class CameraFreeData(HelperObject):
     @Deceleration.setter
     def Deceleration(self, val): self.Deceleration.set(val)
     @property
-    def JoyThreshold(self):  # type: ()->Float
-        return Float(self._node.at("JoyThreshold"))
-    @JoyThreshold.setter
-    def JoyThreshold(self, val): self.JoyThreshold.set(val)
+    def JoyThreshold(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("JoyThreshold"))
     @property
     def MoveBlend(self):  # type: ()->Float
         return Float(self._node.at("MoveBlend"))

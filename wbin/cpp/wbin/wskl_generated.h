@@ -175,6 +175,7 @@ struct SklT : public flatbuffers::NativeTable {
   std::vector<std::unique_ptr<WBIN::BoneDataT>> skeleton{};
   std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf{};
   std::vector<std::unique_ptr<WBIN::BlendShapeDataT>> blendShapes{};
+  std::vector<WBIN::BoneMatrix> bindPose{};
 };
 
 struct Skl FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -183,7 +184,8 @@ struct Skl FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SKELETON = 4,
     VT_SOURCEFILEINF = 6,
-    VT_BLENDSHAPES = 8
+    VT_BLENDSHAPES = 8,
+    VT_BINDPOSE = 10
   };
   const flatbuffers::Vector<flatbuffers::Offset<WBIN::BoneData>> *skeleton() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<WBIN::BoneData>> *>(VT_SKELETON);
@@ -203,6 +205,12 @@ struct Skl FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   flatbuffers::Vector<flatbuffers::Offset<WBIN::BlendShapeData>> *mutable_blendShapes() {
     return GetPointer<flatbuffers::Vector<flatbuffers::Offset<WBIN::BlendShapeData>> *>(VT_BLENDSHAPES);
   }
+  const flatbuffers::Vector<const WBIN::BoneMatrix *> *bindPose() const {
+    return GetPointer<const flatbuffers::Vector<const WBIN::BoneMatrix *> *>(VT_BINDPOSE);
+  }
+  flatbuffers::Vector<const WBIN::BoneMatrix *> *mutable_bindPose() {
+    return GetPointer<flatbuffers::Vector<const WBIN::BoneMatrix *> *>(VT_BINDPOSE);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_SKELETON) &&
@@ -213,6 +221,8 @@ struct Skl FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_BLENDSHAPES) &&
            verifier.VerifyVector(blendShapes()) &&
            verifier.VerifyVectorOfTables(blendShapes()) &&
+           VerifyOffsetRequired(verifier, VT_BINDPOSE) &&
+           verifier.VerifyVector(bindPose()) &&
            verifier.EndTable();
   }
   SklT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -233,6 +243,9 @@ struct SklBuilder {
   void add_blendShapes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<WBIN::BlendShapeData>>> blendShapes) {
     fbb_.AddOffset(Skl::VT_BLENDSHAPES, blendShapes);
   }
+  void add_bindPose(flatbuffers::Offset<flatbuffers::Vector<const WBIN::BoneMatrix *>> bindPose) {
+    fbb_.AddOffset(Skl::VT_BINDPOSE, bindPose);
+  }
   explicit SklBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -241,6 +254,7 @@ struct SklBuilder {
     const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Skl>(end);
     fbb_.Required(o, Skl::VT_SKELETON);
+    fbb_.Required(o, Skl::VT_BINDPOSE);
     return o;
   }
 };
@@ -249,8 +263,10 @@ inline flatbuffers::Offset<Skl> CreateSkl(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<WBIN::BoneData>>> skeleton = 0,
     flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<WBIN::BlendShapeData>>> blendShapes = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<WBIN::BlendShapeData>>> blendShapes = 0,
+    flatbuffers::Offset<flatbuffers::Vector<const WBIN::BoneMatrix *>> bindPose = 0) {
   SklBuilder builder_(_fbb);
+  builder_.add_bindPose(bindPose);
   builder_.add_blendShapes(blendShapes);
   builder_.add_sourceFileInf(sourceFileInf);
   builder_.add_skeleton(skeleton);
@@ -261,14 +277,17 @@ inline flatbuffers::Offset<Skl> CreateSklDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<flatbuffers::Offset<WBIN::BoneData>> *skeleton = nullptr,
     flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf = 0,
-    const std::vector<flatbuffers::Offset<WBIN::BlendShapeData>> *blendShapes = nullptr) {
+    const std::vector<flatbuffers::Offset<WBIN::BlendShapeData>> *blendShapes = nullptr,
+    const std::vector<WBIN::BoneMatrix> *bindPose = nullptr) {
   auto skeleton__ = skeleton ? _fbb.CreateVector<flatbuffers::Offset<WBIN::BoneData>>(*skeleton) : 0;
   auto blendShapes__ = blendShapes ? _fbb.CreateVector<flatbuffers::Offset<WBIN::BlendShapeData>>(*blendShapes) : 0;
+  auto bindPose__ = bindPose ? _fbb.CreateVectorOfStructs<WBIN::BoneMatrix>(*bindPose) : 0;
   return WBIN::CreateSkl(
       _fbb,
       skeleton__,
       sourceFileInf,
-      blendShapes__);
+      blendShapes__,
+      bindPose__);
 }
 
 flatbuffers::Offset<Skl> CreateSkl(flatbuffers::FlatBufferBuilder &_fbb, const SklT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -340,6 +359,7 @@ inline void Skl::UnPackTo(SklT *_o, const flatbuffers::resolver_function_t *_res
   { auto _e = skeleton(); if (_e) { _o->skeleton.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->skeleton[_i] = std::unique_ptr<WBIN::BoneDataT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = sourceFileInf(); if (_e) _o->sourceFileInf = std::unique_ptr<WBIN::SourceFileInfT>(_e->UnPack(_resolver)); }
   { auto _e = blendShapes(); if (_e) { _o->blendShapes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->blendShapes[_i] = std::unique_ptr<WBIN::BlendShapeDataT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = bindPose(); if (_e) { _o->bindPose.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->bindPose[_i] = *_e->Get(_i); } } }
 }
 
 inline flatbuffers::Offset<Skl> Skl::Pack(flatbuffers::FlatBufferBuilder &_fbb, const SklT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -353,11 +373,13 @@ inline flatbuffers::Offset<Skl> CreateSkl(flatbuffers::FlatBufferBuilder &_fbb, 
   auto _skeleton = _fbb.CreateVector<flatbuffers::Offset<WBIN::BoneData>> (_o->skeleton.size(), [](size_t i, _VectorArgs *__va) { return CreateBoneData(*__va->__fbb, __va->__o->skeleton[i].get(), __va->__rehasher); }, &_va );
   auto _sourceFileInf = _o->sourceFileInf ? CreateSourceFileInf(_fbb, _o->sourceFileInf.get(), _rehasher) : 0;
   auto _blendShapes = _o->blendShapes.size() ? _fbb.CreateVector<flatbuffers::Offset<WBIN::BlendShapeData>> (_o->blendShapes.size(), [](size_t i, _VectorArgs *__va) { return CreateBlendShapeData(*__va->__fbb, __va->__o->blendShapes[i].get(), __va->__rehasher); }, &_va ) : 0;
+  auto _bindPose = _fbb.CreateVectorOfStructs(_o->bindPose);
   return WBIN::CreateSkl(
       _fbb,
       _skeleton,
       _sourceFileInf,
-      _blendShapes);
+      _blendShapes,
+      _bindPose);
 }
 
 inline const WBIN::Skl *GetSkl(const void *buf) {

@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.Float import *
+from entgen.ScaleConverter import *
 
 from EntityLibPy import Node
 
@@ -29,6 +30,9 @@ class CameraEditorData(HelperObject):
         return Float(self._node.at("DistanceMin"))
     @DistanceMin.setter
     def DistanceMin(self, val): self.DistanceMin.set(val)
+    @property
+    def JoyThreshold(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("JoyThreshold"))
     @property
     def MoveBlend(self):  # type: ()->Float
         return Float(self._node.at("MoveBlend"))

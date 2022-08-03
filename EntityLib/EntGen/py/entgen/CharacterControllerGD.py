@@ -10,6 +10,7 @@ from entgen.CharacterControllerClamberData import *
 from entgen.CharacterControllerFallData import *
 from entgen.CharacterControllerGroundNormalData import *
 from entgen.CharacterControllerSlideData import *
+from entgen.ClimbEdgeData import *
 from entgen.ComponentGD import *
 from entgen.HeadCollisionBehaviorData import *
 from entgen.HitWallData import *
@@ -80,6 +81,9 @@ class CharacterControllerGD(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    @property
+    def climbEdgeData(self):  # type: ()->ClimbEdgeData
+        return ClimbEdgeData(self._node.at("climbEdgeData"))
     @property
     def moveCapacityData(self):  # type: ()->MoveCapacityData
         return MoveCapacityData(self._node.at("moveCapacityData"))

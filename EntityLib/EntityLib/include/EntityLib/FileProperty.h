@@ -26,11 +26,22 @@ namespace Ent
     /// @remark FileProperty know nothing about prefab ("InstanceOf"). It only know about one file.
     struct ENTLIB_DLLEXPORT FileProperty
     {
-        using Key = std::variant<char const*, int64_t>;
+        /// Token of the NodeRef used to access to this FileProperty
+        ///
+        /// @remark It is not possible to ensure that the "char*" will be kept in memory, so it is needed to
+        /// own the memory inside a std::string.
+        using Key = std::variant<std::string, int64_t>;
         struct Schema
         {
             Subschema const* base = nullptr;
             nlohmann::json const* propDefVal = nullptr; ///< Property default values
+        };
+
+        enum class MapItemAction
+        {
+            None,
+            Add,
+            Remove
         };
 
         FileProperty();
@@ -67,24 +78,24 @@ namespace Ent
 
         /// @brief Enter in the item of a UnionSet
         /// @pre It is a UnionSet
-        [[nodiscard]] FileProperty
-        getUnionSetItem(char const* _key, Subschema const* _dataSchema = nullptr) const;
+        [[nodiscard]] std::pair<FileProperty, MapItemAction>
+        forceGetUnionSetItem(char const* _key, Subschema const* _dataSchema = nullptr) const;
 
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] FileProperty getObjectSetItem(char const* _key) const;
+        [[nodiscard]] std::pair<FileProperty, MapItemAction> forceGetObjectSetItem(char const* _key) const;
 
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
-        [[nodiscard]] FileProperty getObjectSetItem(int64_t _key) const;
+        [[nodiscard]] std::pair<FileProperty, MapItemAction> forceGetObjectSetItem(int64_t _key) const;
 
         /// @brief Enter in the value of a Map
         /// @pre It is an Map
-        [[nodiscard]] FileProperty getMapItem(char const* _key) const;
+        [[nodiscard]] std::pair<FileProperty, MapItemAction> forceGetMapItem(char const* _key) const;
 
         /// @brief Enter in the value of a Map
         /// @pre It is an Map
-        [[nodiscard]] FileProperty getMapItem(int64_t _key) const;
+        [[nodiscard]] std::pair<FileProperty, MapItemAction> forceGetMapItem(int64_t _key) const;
 
         /// @brief Enter in the element of an Array
         /// @pre It is an Array
@@ -102,7 +113,8 @@ namespace Ent
 
         /// @brief Enter in the internal data of the union
         /// @pre It is a Union
-        [[nodiscard]] FileProperty getUnionData(char const* _unionType) const;
+        [[nodiscard]] std::pair<FileProperty, MapItemAction>
+        forceGetUnionData(char const* _unionType) const;
 
         [[nodiscard]] Subschema const* getSchema() const; ///< Get the Schema of the curent Node
 
@@ -229,11 +241,11 @@ namespace Ent
         /// @brief Enter in the object of an ObjectSet
         /// @pre It is an ObjectSet
         template <typename K>
-        [[nodiscard]] FileProperty _enterObjectSetItemImpl(K _key) const;
+        [[nodiscard]] std::pair<FileProperty, MapItemAction> _enterObjectSetItemImpl(K _key) const;
         /// @brief Enter in the value of a Map
         /// @pre It is an Map
         template <typename K>
-        [[nodiscard]] FileProperty _enterMapItemImpl(K _key) const;
+        [[nodiscard]] std::pair<FileProperty, MapItemAction> _enterMapItemImpl(K _key) const;
         /// Get the mutable json node of the instance (or nullptr)
         [[nodiscard]] nlohmann::json* _getRawJson() const;
 

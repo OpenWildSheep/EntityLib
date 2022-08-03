@@ -16,7 +16,6 @@ from entgen.GameBeamSnapData import *
 from entgen.GameBiteData import *
 from entgen.GameDeathData import *
 from entgen.GameEdgeData import *
-from entgen.GameFallData import *
 from entgen.GameFeetCatchUpData import *
 from entgen.GameFluidData import *
 from entgen.GameFlyData import *
@@ -58,6 +57,11 @@ class GameManager(HelperObject):
     @ActionAttackValidityTime.setter
     def ActionAttackValidityTime(self, val): self.ActionAttackValidityTime.set(val)
     @property
+    def ActionJumpValidityTime(self):  # type: ()->Float
+        return Float(self._node.at("ActionJumpValidityTime"))
+    @ActionJumpValidityTime.setter
+    def ActionJumpValidityTime(self, val): self.ActionJumpValidityTime.set(val)
+    @property
     def AttackData(self):  # type: ()->GameAttackData
         return GameAttackData(self._node.at("AttackData"))
     @property
@@ -96,9 +100,6 @@ class GameManager(HelperObject):
         return Bool(self._node.at("EnableSplashScreen"))
     @EnableSplashScreen.setter
     def EnableSplashScreen(self, val): self.EnableSplashScreen.set(val)
-    @property
-    def FallData(self):  # type: ()->GameFallData
-        return GameFallData(self._node.at("FallData"))
     @property
     def FeetCatchUpData(self):  # type: ()->GameFeetCatchUpData
         return GameFeetCatchUpData(self._node.at("FeetCatchUpData"))

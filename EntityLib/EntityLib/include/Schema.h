@@ -49,6 +49,21 @@ namespace Ent
         COUNT
     };
 
+    constexpr char const* DataKindStr[static_cast<size_t>(DataKind::COUNT)] = {
+        "string",
+        "number",
+        "integer",
+        "object",
+        "array",
+        "boolean",
+        "entityRef",
+        "union_",
+        "unionSet",
+        "map",
+        "objectSet",
+        "primitiveSet"};
+    static_assert(std::size(DataKindStr) == static_cast<size_t>(DataKind::COUNT));
+
     /// @cond PRIVATE
     using Null = std::nullptr_t;
     /// @endcond

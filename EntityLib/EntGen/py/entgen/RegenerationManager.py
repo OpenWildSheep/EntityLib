@@ -32,56 +32,16 @@ class RegenerationManager(HelperObject):
     @BackgroundEnergyValue.setter
     def BackgroundEnergyValue(self, val): self.BackgroundEnergyValue.set(val)
     @property
-    def DefaultLostRatio(self):  # type: ()->Float
-        return Float(self._node.at("DefaultLostRatio"))
-    @DefaultLostRatio.setter
-    def DefaultLostRatio(self, val): self.DefaultLostRatio.set(val)
-    @property
-    def DefaultMaxLossPerSecond(self):  # type: ()->Float
-        return Float(self._node.at("DefaultMaxLossPerSecond"))
-    @DefaultMaxLossPerSecond.setter
-    def DefaultMaxLossPerSecond(self, val): self.DefaultMaxLossPerSecond.set(val)
-    @property
-    def DefaultMaxTransmissionPerSecond(self):  # type: ()->Float
-        return Float(self._node.at("DefaultMaxTransmissionPerSecond"))
-    @DefaultMaxTransmissionPerSecond.setter
-    def DefaultMaxTransmissionPerSecond(self, val): self.DefaultMaxTransmissionPerSecond.set(val)
-    @property
     def DefaultTransitionWaveSettings(self):  # type: ()->RegenAreaTransitionSettings
         return RegenAreaTransitionSettings(self._node.at("DefaultTransitionWaveSettings"))
     @property
-    def DefaultTransmittedRatio(self):  # type: ()->Float
-        return Float(self._node.at("DefaultTransmittedRatio"))
-    @DefaultTransmittedRatio.setter
-    def DefaultTransmittedRatio(self, val): self.DefaultTransmittedRatio.set(val)
-    @property
     def EnergyAreaSettingsMap(self):  # type: ()->Map[EnergyIntensityEnum, RegenerationManager_EnergyAreaSetting]
         return (lambda n: Map(EnergyIntensityEnum, RegenerationManager_EnergyAreaSetting, n))(self._node.at("EnergyAreaSettingsMap"))
-    @property
-    def EnergyMaxValue(self):  # type: ()->Float
-        return Float(self._node.at("EnergyMaxValue"))
-    @EnergyMaxValue.setter
-    def EnergyMaxValue(self, val): self.EnergyMaxValue.set(val)
     @property
     def EnergyStrongValueThreshold(self):  # type: ()->Float
         return Float(self._node.at("EnergyStrongValueThreshold"))
     @EnergyStrongValueThreshold.setter
     def EnergyStrongValueThreshold(self, val): self.EnergyStrongValueThreshold.set(val)
-    @property
-    def EvaporationDecreaseSpeed(self):  # type: ()->Float
-        return Float(self._node.at("EvaporationDecreaseSpeed"))
-    @EvaporationDecreaseSpeed.setter
-    def EvaporationDecreaseSpeed(self, val): self.EvaporationDecreaseSpeed.set(val)
-    @property
-    def EvaporationMaxValue(self):  # type: ()->Float
-        return Float(self._node.at("EvaporationMaxValue"))
-    @EvaporationMaxValue.setter
-    def EvaporationMaxValue(self, val): self.EvaporationMaxValue.set(val)
-    @property
-    def InjectedEvaporationMultiplier(self):  # type: ()->Float
-        return Float(self._node.at("InjectedEvaporationMultiplier"))
-    @InjectedEvaporationMultiplier.setter
-    def InjectedEvaporationMultiplier(self, val): self.InjectedEvaporationMultiplier.set(val)
     @property
     def MaxDispatchedRegenQueries(self):  # type: ()->Int
         return Int(self._node.at("MaxDispatchedRegenQueries"))

@@ -281,6 +281,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
      * but it just seemed safer in case we add new methods with new dependencies.
      */
     auto pyDataType = py::enum_<DataType>(ent, "DataType");
+    auto pyDataKind = py::enum_<DataKind>(ent, "DataKind");
     auto pyLogicErrorPolicy = py::enum_<LogicErrorPolicy>(ent, "LogicErrorPolicy");
     auto pyOverrideValueSource = py::enum_<OverrideValueSource>(ent, "OverrideValueSource");
     auto pyOverrideValueLocation = py::enum_<OverrideValueLocation>(ent, "OverrideValueLocation");
@@ -312,6 +313,20 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .value("boolean", DataType::boolean)
         .value("entityRef", DataType::entityRef)
         .value("union", DataType::oneOf)
+        .export_values();
+
+    pyDataKind
+        .value("string", DataKind::string)
+        .value("number", DataKind::number)
+        .value("integer", DataKind::integer)
+        .value("object", DataKind::object)
+        .value("array", DataKind::array)
+        .value("boolean", DataKind::boolean)
+        .value("union", DataKind::union_)
+        .value("unionSet", DataKind::unionSet)
+        .value("map", DataKind::map)
+        .value("objectSet", DataKind::objectSet)
+        .value("primitiveSet", DataKind::primitiveSet)
         .export_values();
 
     pyOverrideValueSource
@@ -412,7 +427,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         // .def("linear_items", &Subschema::linearItems, py::return_value_policy::reference_internal)
         .def("has_linear_items", [](Subschema const& s) { return s.linearItems.has_value(); })
         .def_readonly("enum_values", &Subschema::enumValues, py::return_value_policy::reference_internal)
-        .def_property_readonly("is_deprecated", [](Subschema const& s) { return s.IsDeprecated(); });
+        .def_property_readonly("is_deprecated", [](Subschema const& s) { return s.IsDeprecated(); })
+        .def_property_readonly("data_kind", &Subschema::getDataKind)
+    ;
 
     pySubschemaRef
         .def(py::init<>())
@@ -695,6 +712,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_map_item", [](Property& _self, char const* _key){return _self.getMapItem(_key);}, py::keep_alive<0, 1>())
         .def("get_map_item", [](Property& _self, int64_t _key){return _self.getMapItem(_key);}, py::keep_alive<0, 1>())
         .def("get_array_item", &Property::getArrayItem, py::keep_alive<0, 1>())
+        .def("get_instance_of", &Property::getInstanceOf)
         .def_property("instance_of", &Property::getInstanceOf, &Property::changeInstanceOf)
         .def_property_readonly("union_type", &Property::getUnionType) // or read/write ?
         .def_property_readonly("data_type", &Property::getDataType)

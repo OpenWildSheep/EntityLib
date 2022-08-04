@@ -168,7 +168,7 @@ namespace Ent
 
         /// @brief Resolve an EntityRef relative to this Node/Entity.
         /// Returns nullptr in case of failure.
-        Property resolveEntityRef(Property const& _node, EntityRef const& _entityRef) const;
+        std::optional<Property> resolveEntityRef(Property const& _node, EntityRef const& _entityRef) const;
         /// @brief Compute the EntityRef going from the Entity _from, to the Entity _to
         /// @pre _from and _to are Entity nodes
         EntityRef makeEntityRef(Property const& _from, Property const& _to) const;

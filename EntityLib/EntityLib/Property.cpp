@@ -33,7 +33,11 @@ namespace Ent
     {
         // Have to remove removed items in arrays
         auto const prefabSource = getPrefab();
-        auto const* const prefabPath = prefabSource.getFilePath();
+        if (not prefabSource.has_value())
+        {
+            throw ContextException("Can't applyToPrefab since Property has no prefab");
+        }
+        auto const* const prefabPath = prefabSource->getFilePath();
         auto& newJson = getEntityLib()->createTempJsonFile();
         newJson = getEntityLib()->readJsonFile(prefabPath);
         auto const clonedPrefab = Property(getEntityLib(), getSchema(), prefabPath, &newJson);
@@ -76,7 +80,11 @@ namespace Ent
     Property Property::objectSetRename(char const* _current, char const* _new) const
     {
         auto const prefab = getPrefab();
-        if (prefab.objectSetContains(_current))
+        if (not prefab.has_value())
+        {
+            throw ContextException("Can't applyToPrefab since Property has no prefab");
+        }
+        if (prefab->objectSetContains(_current))
         {
             throw CantRename(staticFormat(
                 "Cant rename %s into %s, because it is already in prefab", _current, _new));

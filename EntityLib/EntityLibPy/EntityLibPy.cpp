@@ -613,6 +613,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("resolve_entityref",
             static_cast<Node*(EntityLib::*)(Node*, EntityRef const&) const>(&EntityLib::resolveEntityRef),
             py::return_value_policy::reference_internal)
+        .def("resolve_entityref",
+            static_cast<std::optional<Property>(EntityLib::*)(Property const&, EntityRef const&) const>(&EntityLib::resolveEntityRef),
+            py::keep_alive<0, 1>())
         .def_readonly(
             "component_dependencies",
             &EntityLib::componentDependencies,

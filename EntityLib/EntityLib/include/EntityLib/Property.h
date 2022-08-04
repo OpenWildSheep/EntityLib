@@ -762,6 +762,7 @@ namespace Ent
 
         [[nodiscard]] PropImpl& getPimpl() const
         {
+            ENTLIB_ASSERT(m_self != nullptr);
             return *m_self;
         }
 

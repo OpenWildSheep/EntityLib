@@ -469,14 +469,15 @@ namespace Ent
         return {relativePath};
     }
 
-    Property EntityLib::resolveEntityRef(Property const& _node, EntityRef const& _entityRef) const
+    std::optional<Property>
+    EntityLib::resolveEntityRef(Property const& _node, EntityRef const& _entityRef) const
     {
         if (_node.getDataType() == DataType::array) // This is a scene
         {
             if (_entityRef.entityPath.empty())
             {
                 // empty ref
-                return {};
+                return std::nullopt;
             }
 
             // split around '/'
@@ -486,10 +487,18 @@ namespace Ent
             PropImplPtr down = _node.getPimpl().sharedFromThis();
             PropImplPtr up = current == nullptr ? nullptr : current->getParent();
 
-            return Property(resolveEntityRefRecursive(
-                std::move(current), std::move(up), std::move(down), parts));
+            if (auto propptr = resolveEntityRefRecursive(
+                    std::move(current), std::move(up), std::move(down), parts))
+            {
+                return Property(std::move(propptr));
+            }
+            return std::nullopt;
         }
-        return Property(resolveEntityRefImpl(_node.getPimpl().sharedFromThis(), _entityRef));
+        if (auto propPtr = resolveEntityRefImpl(_node.getPimpl().sharedFromThis(), _entityRef))
+        {
+            return Property(std::move(propPtr));
+        }
+        return std::nullopt;
     }
     EntityRef EntityLib::makeEntityRef(Property const& _from, Property const& _to) const
     {

@@ -6,10 +6,10 @@ table Phys
 {
 	aabb:AABB;
 	position:Float3Channel (required);
-	edgeVisibility:[Bool3];
 	materials:[uint];
 	skin:Skin;
 	sourceFileInf:SourceFileInf;
+	edgeVisibility:[Bool3];
 }
 
 root_type Phys;

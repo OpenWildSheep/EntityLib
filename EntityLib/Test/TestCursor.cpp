@@ -401,7 +401,7 @@ class CompareCursor : public RecursiveVisitor
     }
     void pop()
     {
-        expl2 = expl2.getParent();
+        expl2 = *expl2.getParent();
     }
 
 public:
@@ -414,7 +414,7 @@ public:
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
-            ENTLIB_ASSERT(_prop.getPrefab().getRawJson() == expl2.getPrefab().getRawJson());
+            ENTLIB_ASSERT(_prop.getPrefab()->getRawJson() == expl2.getPrefab()->getRawJson());
         }
         auto const* const a = _prop.getInstanceOf();
         auto const* const b = expl2.getInstanceOf();
@@ -428,7 +428,7 @@ public:
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
-            ENTLIB_ASSERT(_prop.getPrefab().getRawJson() == expl2.getPrefab().getRawJson());
+            ENTLIB_ASSERT(_prop.getPrefab()->getRawJson() == expl2.getPrefab()->getRawJson());
         }
         return true;
     }
@@ -498,7 +498,7 @@ public:
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
-            ENTLIB_ASSERT(_prop.getPrefab().getRawJson() == expl2.getPrefab().getRawJson());
+            ENTLIB_ASSERT(_prop.getPrefab()->getRawJson() == expl2.getPrefab()->getRawJson());
         }
         auto a = expl2.getUnionSetKeysString();
         auto const b = _prop.getUnionSetKeysString();
@@ -522,7 +522,7 @@ public:
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
-            ENTLIB_ASSERT(_prop.getPrefab().getRawJson() == expl2.getPrefab().getRawJson());
+            ENTLIB_ASSERT(_prop.getPrefab()->getRawJson() == expl2.getPrefab()->getRawJson());
         }
         ENTLIB_ASSERT(expl2.size() == _prop.size());
         switch (expl2.getObjectSetKeyType())
@@ -551,8 +551,8 @@ public:
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
-            auto const* const a = _prop.getPrefab().getRawJson();
-            auto const* const b = expl2.getPrefab().getRawJson();
+            auto const* const a = _prop.getPrefab()->getRawJson();
+            auto const* const b = expl2.getPrefab()->getRawJson();
             ENTLIB_ASSERT(a == b);
         }
     }
@@ -592,7 +592,7 @@ public:
             if (_prop.hasPrefab())
             {
                 ENTLIB_ASSERT(expl2.hasPrefab());
-                ENTLIB_ASSERT(_prop.getPrefab().getRawJson() == expl2.getPrefab().getRawJson());
+                ENTLIB_ASSERT(_prop.getPrefab()->getRawJson() == expl2.getPrefab()->getRawJson());
             }
         }
         ENTLIB_ASSERT(_prop.getFloat() == expl2.getFloat());
@@ -932,7 +932,8 @@ void testCursor(EntityLib& entlib)
             visitRecursive(expl, copier);
 
             std::cout << "Save WhistlingPlainsFPMain.scene with LazyLib" << std::endl;
-            entlib.saveJsonFile(&newDoc, "WhistlingPlainsFPMain.scene", expl.getSchema()->name.c_str());
+            entlib.saveJsonFile(
+                &newDoc, "WhistlingPlainsFPMain.scene", expl.getSchema()->name.c_str());
 
             std::cout << "CompareCursor WhistlingPlainsFPMain.scene wth the clone" << std::endl;
             CompareCursor comparator(destExpl);

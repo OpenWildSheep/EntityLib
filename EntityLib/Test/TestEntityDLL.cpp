@@ -273,14 +273,14 @@ try
         ENTLIB_ASSERT(entpath == ".");
 
         auto prefabHisto = getPrefabHistory(*ent);
-        ENTLIB_ASSERT(prefabHisto.size() == 3);
+        ENTLIB_ASSERT(prefabHisto.size() == 6);
         ENTLIB_ASSERT(
-            prefabHisto[0].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
+            prefabHisto[3].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
         ENTLIB_ASSERT(
-            prefabHisto[1].prefabPath
+            prefabHisto[4].prefabPath
             == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
         ENTLIB_ASSERT(
-            prefabHisto[2].prefabPath
+            prefabHisto[5].prefabPath
             == "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
                "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene");
     }
@@ -299,11 +299,11 @@ try
         ENTLIB_ASSERT(entpath == ".");
 
         auto prefabHisto = ent->getPrefabHistory();
-        ENTLIB_ASSERT(prefabHisto.size() == 2);
+        ENTLIB_ASSERT(prefabHisto.size() == 5);
         ENTLIB_ASSERT(
-            prefabHisto[0].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
+            prefabHisto[3].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
         ENTLIB_ASSERT(
-            prefabHisto[1].prefabPath
+            prefabHisto[4].prefabPath
             == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
     }
     {
@@ -318,9 +318,9 @@ try
         ENTLIB_ASSERT(entpath == nodeRef);
         auto prefabHisto = ent->getPrefabHistory();
         ENTLIB_ASSERT(
-            prefabHisto[0].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
+            prefabHisto[3].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
         ENTLIB_ASSERT(
-            prefabHisto[1].prefabPath
+            prefabHisto[4].prefabPath
             == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
         entlib.rawdataPath = current_path(); // Work in Test dir
     }
@@ -526,8 +526,8 @@ try
         auto mapTest = setOfObject->MapOfObject();
         auto testParent = mapTest.add("Should_not_appear_in_diff");
         ENTLIB_ASSERT(
-            testParent.getProperty().getParent().getDataKind() == DataKind::map); // parent is the map
-        ENTLIB_ASSERT(testParent.getProperty().getParent().isMapOrSet());
+            testParent.getProperty().getParent()->getDataKind() == DataKind::map); // parent is the map
+        ENTLIB_ASSERT(testParent.getProperty().getParent()->isMapOrSet());
         mapTest.remove("Should_not_appear_in_diff");
         ENTLIB_ASSERT(not mapTest.get("Should_not_appear_in_diff").has_value());
 
@@ -556,7 +556,7 @@ try
         pathNodeGD = pathNodeGD->makeInstanceOf(); // erasePrimSetKey fail only if key exist in prefab
         auto tags = pathNodeGD->Tags().Tags();
         auto primSet = tags.get("a");
-        ENTLIB_ASSERT(primSet->getProperty().getParent().getDataKind() == DataKind::map);
+        ENTLIB_ASSERT(primSet->getProperty().getParent()->getDataKind() == DataKind::map);
         ENTLIB_CHECK_EXCEPTION(primSet->getProperty().erasePrimSetKey("1"), Ent::BadArrayType);
 
         // Set Union type and override
@@ -657,7 +657,7 @@ try
         };
 
         auto testDefaultValues = ent.Components().addTestDefaultValues();
-        ENTLIB_ASSERT(testDefaultValues.getProperty().getParent().hasOverride());
+        ENTLIB_ASSERT(testDefaultValues.getProperty().getParent()->hasOverride());
         mat33 = testDefaultValues.Matrix();
         testMat33();
         mat33 = testDefaultValues.Matrix2();
@@ -710,7 +710,7 @@ try
         ENTLIB_ASSERT(testEntityRef->TestRef().isSet());
         EntityRef entityRef = testEntityRef->TestRef().get();
         auto resolvedEntity = entlib.resolveEntityRef(ent.getProperty(), entityRef);
-        ENTLIB_ASSERT(resolvedEntity.hasValue());
+        ENTLIB_ASSERT(resolvedEntity.has_value());
 
         auto subScenecomp = ent.Components().SubScene();
         auto allSubEntities = subScenecomp->Embedded();
@@ -776,7 +776,7 @@ try
         ENTLIB_ASSERT(testEntityRef->TestRef().isSet());
         EntityRef entityRef = testEntityRef->TestRef().get();
         auto resolvedEntity = entlib.resolveEntityRef(ent.getProperty(), entityRef);
-        ENTLIB_ASSERT(resolvedEntity.hasValue());
+        ENTLIB_ASSERT(resolvedEntity.has_value());
 
         auto subScenecomp = *ent.Components().SubScene();
         auto allSubEntities = subScenecomp.Embedded();
@@ -822,7 +822,7 @@ try
 
         // TEST entity ref resolution
         auto resolvedEmptyRef = entlib.resolveEntityRef(instanceOfA.getProperty(), {});
-        ENTLIB_ASSERT(not resolvedEmptyRef.hasValue());
+        ENTLIB_ASSERT(not resolvedEmptyRef.has_value());
         auto resolvedInstanceOfA = entlib.resolveEntityRef(B.getProperty(), {".."});
         ENTLIB_ASSERT(resolvedInstanceOfA == instanceOfA.getProperty());
         auto resolvedB = entlib.resolveEntityRef(instanceOfA.getProperty(), {"B"});
@@ -833,7 +833,7 @@ try
         ENTLIB_ASSERT(resolvedC == C.getProperty());
 
         // TEST entity ref resolution from scenes
-        ENTLIB_ASSERT(not entlib.resolveEntityRef(scene.getProperty(), {".."}).hasValue());
+        ENTLIB_ASSERT(not entlib.resolveEntityRef(scene.getProperty(), {".."}).has_value());
         ENTLIB_ASSERT(
             entlib.resolveEntityRef(scene.getProperty(), {"InstanceOfA"})
             == instanceOfA.getProperty());
@@ -868,7 +868,7 @@ try
         // Map and Set overridePolicy
         auto pathNodeGD = *ent.Components().TestTagsList();
         auto tags = pathNodeGD.Tags().Tags();
-        ENTLIB_ASSERT(tags.getProperty().getParent().getParent() == pathNodeGD.getProperty());
+        ENTLIB_ASSERT(tags.getProperty().getParent()->getParent().value() == pathNodeGD.getProperty());
         ENTLIB_ASSERT(tags.size() == 3);
         ENTLIB_ASSERT(tags.get("a")->getProperty().getParent() == tags.getProperty());
         ENTLIB_ASSERT(tags.get("a")->getProperty().hasValue());
@@ -916,7 +916,7 @@ try
         else
         {
             ENTLIB_ASSERT(
-                entityWithInstanceOf.getProperty().getPrefab().getInstanceOf()
+                entityWithInstanceOf.getProperty().getPrefab()->getInstanceOf()
                 == std::string("subentity2.entity"));
         }
         auto networkLink = *entityWithInstanceOf.Components().NetworkLink();
@@ -930,9 +930,9 @@ try
         {
             if (stickToTerrain.getInstanceOf() == nullptr)
             {
-                ENTLIB_ASSERT(stickToTerrain.getProperty().getPrefab().getInstanceOf() != nullptr);
+                ENTLIB_ASSERT(stickToTerrain.getProperty().getPrefab()->getInstanceOf() != nullptr);
                 ENTLIB_ASSERT(
-                    stickToTerrain.getProperty().getPrefab().getInstanceOf()
+                    stickToTerrain.getProperty().getPrefab()->getInstanceOf()
                     == std::string("test.StickToTerrain.node"));
             }
             else
@@ -1134,7 +1134,7 @@ try
         auto comp = ent.Components().addAnimationEventsGeneratorGD();
         ENTLIB_ASSERT(ent.Components().AnimationEventsGeneratorGD().has_value());
         ENTLIB_ASSERT(
-            comp.getProperty().getParent().hasOverride()); // A new item in an array in always override
+            comp.getProperty().getParent()->hasOverride()); // A new item in an array in always override
         // Component with override
         ent.Components().TestDefaultValues()->DoubleWithDefaultValue().set(36.);
         ENTLIB_ASSERT(ent.Components().TestDefaultValues().has_value());
@@ -1369,7 +1369,7 @@ try
         // new Component (A new component is override true)
         ENTLIB_ASSERT(ent.Components().AnimationEventsGeneratorGD().has_value());
         ENTLIB_ASSERT(
-            ent.Components().AnimationEventsGeneratorGD()->getProperty().getParent().hasOverride());
+            ent.Components().AnimationEventsGeneratorGD()->getProperty().getParent()->hasOverride());
         // Component with override
         ENTLIB_ASSERT(ent.Components().TestDefaultValues().has_value());
         ENTLIB_ASSERT(ent.Components().TestDefaultValues()->DoubleWithDefaultValue().get() == 36.);

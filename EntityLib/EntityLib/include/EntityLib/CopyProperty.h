@@ -66,16 +66,15 @@ namespace Ent
         }
         bool inObjectField([[maybe_unused]] Property& m_source, char const* _key) override
         {
-            if (Property const parentProp = m_source.getParent(); parentProp.hasValue())
+            if (auto const parentProp = m_source.getParent())
             {
-                if (Property const grandParentProp = parentProp.getParent();
-                    grandParentProp.hasValue())
+                if (auto const grandParentProp = parentProp->getParent())
                 {
-                    auto const grandParentKind = grandParentProp.getDataKind();
+                    auto const grandParentKind = grandParentProp->getDataKind();
                     if (grandParentKind == DataKind::objectSet)
                     {
                         auto const& meta =
-                            std::get<Subschema::ArrayMeta>(grandParentProp.getSchema()->meta);
+                            std::get<Subschema::ArrayMeta>(grandParentProp->getSchema()->meta);
                         if (meta.keyField.has_value() and *meta.keyField == _key)
                         {
                             m_isKeyField = true;

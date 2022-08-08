@@ -29,6 +29,7 @@ from .sEnvStamp import *
 from .retiming import *
 from .WaveRendererProperties import *
 from .WaveProperties import *
+from .WallRunData import *
 from .sJointUniversalDesc import *
 from .sJointSwingTwistDesc import *
 from .sJointSliderDesc import *
@@ -165,6 +166,7 @@ from .MountableSnapLine_ControlPoint import *
 from .MountableData import *
 from .MinReviveRatio import *
 from .MinRespawnDistance import *
+from .MinModifParams import *
 from .MinDistanceToRespawnPosition import *
 from .MeshesItem import *
 from .RUNTIME_LODsItem import *
@@ -263,6 +265,7 @@ from .GraspableInteractionData import *
 from .GraspType import *
 from .GraspResistanceData import *
 from .GeometryStamper import *
+from .VolumeConstraintStamper import *
 from .SkinnedPhysMeshStamper import *
 from .MeshStamper import *
 from .GameTimeInMs import *
@@ -784,6 +787,7 @@ from .EntityStateGrabIn import *
 from .EntityStateGrabAttack import *
 from .EntityStateGrab import *
 from .EntityStateForceCanBeTargeted import *
+from .EntityStateFollowWallRun import *
 from .EntityStateFastRun import *
 from .EntityStateFallSafe import *
 from .EntityStateFallInjured import *

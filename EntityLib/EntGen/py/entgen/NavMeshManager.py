@@ -7,6 +7,7 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Float import *
 from entgen.Manager import *
+from entgen.MinModifParams import *
 from entgen.RecastNavmeshGenerationParameters import *
 from entgen.String import *
 
@@ -22,6 +23,9 @@ class NavMeshManager(HelperObject):
         return NavMeshManager(entlib.make_node(NavMeshManager.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def MinModifParams(self):  # type: ()->MinModifParams
+        return MinModifParams(self._node.at("MinModifParams"))
     @property
     def NavMeshMaxHeight(self):  # type: ()->Float
         return Float(self._node.at("NavMeshMaxHeight"))

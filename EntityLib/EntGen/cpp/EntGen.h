@@ -55,6 +55,7 @@ namespace Ent
         struct retiming;
         struct WaveRendererProperties;
         struct WaveProperties;
+        struct WallRunData;
         struct sJointUniversalDesc;
         struct sJointSwingTwistDesc;
         struct sJointSliderDesc;
@@ -475,6 +476,7 @@ namespace Ent
         struct MountableData;
         struct MinReviveRatio;
         struct MinRespawnDistance;
+        struct MinModifParams;
         struct MinDistanceToRespawnPosition;
         struct MeshesItem;
         struct RUNTIME_LODsItem;
@@ -707,6 +709,7 @@ namespace Ent
         };
         struct GraspResistanceData;
         struct GeometryStamper;
+        struct VolumeConstraintStamper;
         struct SkinnedPhysMeshStamper;
         struct MeshStamper;
         struct GameTimeInMs;
@@ -1486,6 +1489,7 @@ namespace Ent
         struct EntityStateGrabAttack;
         struct EntityStateGrab;
         struct EntityStateForceCanBeTargeted;
+        struct EntityStateFollowWallRun;
         struct EntityStateFastRun;
         struct EntityStateFallSafe;
         struct EntityStateFallInjured;
@@ -2616,6 +2620,24 @@ namespace Ent
             Ent::Gen::WaveRenderingType RenderingType() const;
             Ent::Gen::Int Width() const;
             Ent::Gen::String _comment() const;
+        };
+
+        struct WallRunData : HelperObject // Object
+        {
+            WallRunData(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "WallRunData";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float JumpAngle() const;
+            Ent::Gen::String _comment() const;
+            Ent::Gen::Vector3 moveDirection() const;
+            PrimArray<Ent::Gen::EntityRef> wallRunLinks() const;
         };
 
 
@@ -4464,6 +4486,8 @@ namespace Ent
             Ent::Gen::EntityStateFallSafe setEntityStateFallSafe() const;
             std::optional<Ent::Gen::EntityStateFastRun> EntityStateFastRun() const;
             Ent::Gen::EntityStateFastRun setEntityStateFastRun() const;
+            std::optional<Ent::Gen::EntityStateFollowWallRun> EntityStateFollowWallRun() const;
+            Ent::Gen::EntityStateFollowWallRun setEntityStateFollowWallRun() const;
             std::optional<Ent::Gen::EntityStateForceCanBeTargeted> EntityStateForceCanBeTargeted() const;
             Ent::Gen::EntityStateForceCanBeTargeted setEntityStateForceCanBeTargeted() const;
             std::optional<Ent::Gen::EntityStateGrab> EntityStateGrab() const;
@@ -5965,6 +5989,25 @@ namespace Ent
             Ent::Gen::Float val() const;
         };
 
+        struct MinModifParams : HelperObject // Object
+        {
+            MinModifParams(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "MinModifParams";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Int BorderSize() const;
+            Ent::Gen::Float CellSize() const;
+            Ent::Gen::Int MergeRegionArea() const;
+            Ent::Gen::Int MinRegionArea() const;
+            Ent::Gen::String _comment() const;
+        };
+
         struct MinDistanceToRespawnPosition : HelperObject // Object
         {
             MinDistanceToRespawnPosition(Ent::Node* _node): HelperObject(_node) {}
@@ -6636,6 +6679,7 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
+            Ent::Gen::MinModifParams MinModifParams() const;
             Ent::Gen::Float NavMeshMaxHeight() const;
             Ent::Gen::Float NavMeshMaxSize() const;
             Ent::Gen::Map<char const*, Ent::Gen::RecastNavmeshGenerationParameters> RecastParameters() const;
@@ -7796,6 +7840,22 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::Transform3D Transform() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct VolumeConstraintStamper : HelperObject // Object
+        {
+            VolumeConstraintStamper(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "VolumeConstraintStamper";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::GeometryStamper Super() const;
             Ent::Gen::String _comment() const;
         };
 
@@ -15432,7 +15492,9 @@ namespace Ent
             Ent::Gen::Bool bidirectional() const;
             Ent::Gen::CapabilitiesAndTags capabilitiesAndTags() const;
             Ent::Gen::EntityRef destination() const;
+            Ent::Gen::WallRunData offMeshLinkData() const;
             Ent::Gen::Float radius() const;
+            Ent::Gen::Bool shouldBeAddedToMinModif() const;
         };
 
         struct NavMeshStamperGD : HelperObject // Object
@@ -18202,6 +18264,9 @@ namespace Ent
             std::optional<Ent::Gen::EntityStateFastRun> EntityStateFastRun() const;
             Ent::Gen::EntityStateFastRun addEntityStateFastRun() const;
             void removeEntityStateFastRun() const;
+            std::optional<Ent::Gen::EntityStateFollowWallRun> EntityStateFollowWallRun() const;
+            Ent::Gen::EntityStateFollowWallRun addEntityStateFollowWallRun() const;
+            void removeEntityStateFollowWallRun() const;
             std::optional<Ent::Gen::EntityStateForceCanBeTargeted> EntityStateForceCanBeTargeted() const;
             Ent::Gen::EntityStateForceCanBeTargeted addEntityStateForceCanBeTargeted() const;
             void removeEntityStateForceCanBeTargeted() const;
@@ -20221,6 +20286,22 @@ namespace Ent
                 return _entlib.makeNode(schemaName);
             }
             Ent::Gen::Bool CanBeTargeted() const;
+            Ent::Gen::ActorState Super() const;
+            Ent::Gen::String _comment() const;
+        };
+
+        struct EntityStateFollowWallRun : HelperObject // Object
+        {
+            EntityStateFollowWallRun(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "EntityStateFollowWallRun";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
             Ent::Gen::ActorState Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -25097,6 +25178,8 @@ namespace Ent
             Ent::Gen::Float bounceJumpTimeWindow() const;
             Array<Ent::Gen::ChargedJumpAnimation> chargedJumpAnimations() const;
             Ent::Gen::Float chargingDecelerationFactor() const;
+            Ent::Gen::Float jumpPowerAddByBounce() const;
+            Ent::Gen::Float maxSpeedToClampJumpSpeed() const;
             Ent::Gen::ScaleConverter nextJumpPowerByFallHeight() const;
         };
 
@@ -25448,6 +25531,7 @@ namespace Ent
             Ent::Gen::Int EnableComputeForUnderWater() const;
             Ent::Gen::Int EnableDepthOfField() const;
             Ent::Gen::Int EnableFurTranslucency() const;
+            Ent::Gen::Int EnableLPV() const;
             Ent::Gen::Int EnableLensFlare() const;
             Ent::Gen::Int EnableMTR() const;
             Ent::Gen::Int EnableMotionBlur() const;
@@ -27276,6 +27360,23 @@ namespace Ent
         inline Ent::Gen::String WaveProperties::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
+        }
+        // WallRunData
+        inline Ent::Gen::Float WallRunData::JumpAngle() const
+        {
+            return Ent::Gen::Float(node->at("JumpAngle"));
+        }
+        inline Ent::Gen::String WallRunData::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        inline Ent::Gen::Vector3 WallRunData::moveDirection() const
+        {
+            return Ent::Gen::Vector3(node->at("moveDirection"));
+        }
+        inline PrimArray<Ent::Gen::EntityRef> WallRunData::wallRunLinks() const
+        {
+            return PrimArray<Ent::Gen::EntityRef>(node->at("wallRunLinks"));
         }
         // sJointUniversalDesc
         inline Ent::Gen::String sJointUniversalDesc::_comment() const
@@ -30444,6 +30545,14 @@ namespace Ent
         {
             return Ent::Gen::EntityStateFastRun(node->setUnionType("EntityStateFastRun"));
         }
+        inline std::optional<Ent::Gen::EntityStateFollowWallRun> ResponsiblePointer_ActorState_::EntityStateFollowWallRun() const
+        {
+            return strcmp(node->getUnionType(), "EntityStateFollowWallRun") != 0? std::optional<Ent::Gen::EntityStateFollowWallRun>{}: std::optional<Ent::Gen::EntityStateFollowWallRun>(node->getUnionData());
+        }
+        inline Ent::Gen::EntityStateFollowWallRun ResponsiblePointer_ActorState_::setEntityStateFollowWallRun() const
+        {
+            return Ent::Gen::EntityStateFollowWallRun(node->setUnionType("EntityStateFollowWallRun"));
+        }
         inline std::optional<Ent::Gen::EntityStateForceCanBeTargeted> ResponsiblePointer_ActorState_::EntityStateForceCanBeTargeted() const
         {
             return strcmp(node->getUnionType(), "EntityStateForceCanBeTargeted") != 0? std::optional<Ent::Gen::EntityStateForceCanBeTargeted>{}: std::optional<Ent::Gen::EntityStateForceCanBeTargeted>(node->getUnionData());
@@ -32337,6 +32446,27 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("val"));
         }
+        // MinModifParams
+        inline Ent::Gen::Int MinModifParams::BorderSize() const
+        {
+            return Ent::Gen::Int(node->at("BorderSize"));
+        }
+        inline Ent::Gen::Float MinModifParams::CellSize() const
+        {
+            return Ent::Gen::Float(node->at("CellSize"));
+        }
+        inline Ent::Gen::Int MinModifParams::MergeRegionArea() const
+        {
+            return Ent::Gen::Int(node->at("MergeRegionArea"));
+        }
+        inline Ent::Gen::Int MinModifParams::MinRegionArea() const
+        {
+            return Ent::Gen::Int(node->at("MinRegionArea"));
+        }
+        inline Ent::Gen::String MinModifParams::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
         // MinDistanceToRespawnPosition
         inline Ent::Gen::String MinDistanceToRespawnPosition::_comment() const
         {
@@ -32938,6 +33068,10 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // NavMeshManager
+        inline Ent::Gen::MinModifParams NavMeshManager::MinModifParams() const
+        {
+            return Ent::Gen::MinModifParams(node->at("MinModifParams"));
+        }
         inline Ent::Gen::Float NavMeshManager::NavMeshMaxHeight() const
         {
             return Ent::Gen::Float(node->at("NavMeshMaxHeight"));
@@ -33932,6 +34066,15 @@ namespace Ent
             return Ent::Gen::Transform3D(node->at("Transform"));
         }
         inline Ent::Gen::String GeometryStamper::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // VolumeConstraintStamper
+        inline Ent::Gen::GeometryStamper VolumeConstraintStamper::Super() const
+        {
+            return Ent::Gen::GeometryStamper(node->at("Super"));
+        }
+        inline Ent::Gen::String VolumeConstraintStamper::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -47023,9 +47166,17 @@ namespace Ent
         {
             return Ent::Gen::EntityRef(node->at("destination"));
         }
+        inline Ent::Gen::WallRunData OffMeshLink::offMeshLinkData() const
+        {
+            return Ent::Gen::WallRunData(node->at("offMeshLinkData"));
+        }
         inline Ent::Gen::Float OffMeshLink::radius() const
         {
             return Ent::Gen::Float(node->at("radius"));
+        }
+        inline Ent::Gen::Bool OffMeshLink::shouldBeAddedToMinModif() const
+        {
+            return Ent::Gen::Bool(node->at("shouldBeAddedToMinModif"));
         }
         // NavMeshStamperGD
         inline Ent::Gen::Bool NavMeshStamperGD::IsActive() const
@@ -52544,6 +52695,19 @@ namespace Ent
         {
             node->mapErase("EntityStateFastRun");
         }
+        inline std::optional<Ent::Gen::EntityStateFollowWallRun> ActorStates::EntityStateFollowWallRun() const
+        {
+            auto sub = getSubNode("EntityStateFollowWallRun");
+            return sub == nullptr? std::optional<Ent::Gen::EntityStateFollowWallRun>{}: std::optional<Ent::Gen::EntityStateFollowWallRun>(getSubNode("EntityStateFollowWallRun"));
+        }
+        inline Ent::Gen::EntityStateFollowWallRun ActorStates::addEntityStateFollowWallRun() const
+        {
+            return Ent::Gen::EntityStateFollowWallRun(addSubNode("EntityStateFollowWallRun"));
+        }
+        inline void ActorStates::removeEntityStateFollowWallRun() const
+        {
+            node->mapErase("EntityStateFollowWallRun");
+        }
         inline std::optional<Ent::Gen::EntityStateForceCanBeTargeted> ActorStates::EntityStateForceCanBeTargeted() const
         {
             auto sub = getSubNode("EntityStateForceCanBeTargeted");
@@ -54888,6 +55052,15 @@ namespace Ent
             return Ent::Gen::ActorState(node->at("Super"));
         }
         inline Ent::Gen::String EntityStateForceCanBeTargeted::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        // EntityStateFollowWallRun
+        inline Ent::Gen::ActorState EntityStateFollowWallRun::Super() const
+        {
+            return Ent::Gen::ActorState(node->at("Super"));
+        }
+        inline Ent::Gen::String EntityStateFollowWallRun::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
         }
@@ -58449,6 +58622,14 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("chargingDecelerationFactor"));
         }
+        inline Ent::Gen::Float ChargedJumpGD::jumpPowerAddByBounce() const
+        {
+            return Ent::Gen::Float(node->at("jumpPowerAddByBounce"));
+        }
+        inline Ent::Gen::Float ChargedJumpGD::maxSpeedToClampJumpSpeed() const
+        {
+            return Ent::Gen::Float(node->at("maxSpeedToClampJumpSpeed"));
+        }
         inline Ent::Gen::ScaleConverter ChargedJumpGD::nextJumpPowerByFallHeight() const
         {
             return Ent::Gen::ScaleConverter(node->at("nextJumpPowerByFallHeight"));
@@ -59014,6 +59195,10 @@ namespace Ent
         inline Ent::Gen::Int RenderManager_RenderConfig::EnableFurTranslucency() const
         {
             return Ent::Gen::Int(node->at("EnableFurTranslucency"));
+        }
+        inline Ent::Gen::Int RenderManager_RenderConfig::EnableLPV() const
+        {
+            return Ent::Gen::Int(node->at("EnableLPV"));
         }
         inline Ent::Gen::Int RenderManager_RenderConfig::EnableLensFlare() const
         {

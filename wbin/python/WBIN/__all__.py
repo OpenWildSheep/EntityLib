@@ -18,6 +18,9 @@ from . import GVoxelColumn
 from . import GVoxelData
 from . import GVoxelPile
 from . import GVoxelVolume
+from . import HeightMap
+from . import HeightMapLayer
+from . import HeightMapPixel
 from . import HeightObj
 from . import MaterialRef
 from . import Matrix44

@@ -571,6 +571,10 @@ namespace Ent
         {
             return iter->second;
         }
+        if (m_newDepFileCallback)
+        {
+            m_newDepFileCallback(_filepath);
+        }
         json data = loadJsonFile(rawdataPath, filepath);
         return m_jsonDatabase.emplace(filepath, std::move(data)).first->second;
     }
@@ -1998,5 +2002,9 @@ namespace Ent
         return m_fallbackEntity.c_str();
     }
 
+    void EntityLib::setNewDepFileCallBack(NewDepFileCallback _callback)
+    {
+        m_newDepFileCallback = std::move(_callback);
+    }
     /// \endcond
 } // namespace Ent

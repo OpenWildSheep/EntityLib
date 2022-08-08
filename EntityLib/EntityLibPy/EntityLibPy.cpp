@@ -6,6 +6,7 @@
 #pragma warning(push, 0)
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/functional.h>
 
 #include "EntityLib/DumpProperty.h"
 #include "external/pybind11_json.hpp"
@@ -676,6 +677,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_schema", &EntityLib::getSchema, py::return_value_policy::reference_internal)
         .def("load_property", &EntityLib::loadProperty)
         .def("load_property_copy", &EntityLib::loadPropertyCopy)
+        .def("set_dep_file_callback", &EntityLib::setNewDepFileCallBack)
     ;
 
     pyEntityRef

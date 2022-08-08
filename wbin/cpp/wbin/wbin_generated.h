@@ -8,6 +8,8 @@
 
 namespace WBIN {
 
+struct Int3;
+
 struct UInt3;
 
 struct Float3;
@@ -19,6 +21,8 @@ struct Float4;
 struct Bool3;
 
 struct Matrix44;
+
+struct Matrix43;
 
 struct AABB;
 
@@ -53,6 +57,44 @@ struct SkinT;
 struct SourceFileInf;
 struct SourceFileInfBuilder;
 struct SourceFileInfT;
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Int3 FLATBUFFERS_FINAL_CLASS {
+ private:
+  int32_t x_;
+  int32_t y_;
+  int32_t z_;
+
+ public:
+  Int3()
+      : x_(0),
+        y_(0),
+        z_(0) {
+  }
+  Int3(int32_t _x, int32_t _y, int32_t _z)
+      : x_(flatbuffers::EndianScalar(_x)),
+        y_(flatbuffers::EndianScalar(_y)),
+        z_(flatbuffers::EndianScalar(_z)) {
+  }
+  int32_t x() const {
+    return flatbuffers::EndianScalar(x_);
+  }
+  void mutate_x(int32_t _x) {
+    flatbuffers::WriteScalar(&x_, _x);
+  }
+  int32_t y() const {
+    return flatbuffers::EndianScalar(y_);
+  }
+  void mutate_y(int32_t _y) {
+    flatbuffers::WriteScalar(&y_, _y);
+  }
+  int32_t z() const {
+    return flatbuffers::EndianScalar(z_);
+  }
+  void mutate_z(int32_t _z) {
+    flatbuffers::WriteScalar(&z_, _z);
+  }
+};
+FLATBUFFERS_STRUCT_END(Int3, 12);
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) UInt3 FLATBUFFERS_FINAL_CLASS {
  private:
@@ -263,6 +305,26 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Matrix44 FLATBUFFERS_FINAL_CLASS {
   }
 };
 FLATBUFFERS_STRUCT_END(Matrix44, 64);
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Matrix43 FLATBUFFERS_FINAL_CLASS {
+ private:
+  float values_[12];
+
+ public:
+  Matrix43()
+      : values_() {
+  }
+  Matrix43(flatbuffers::span<const float, 12> _values) {
+    flatbuffers::CastToArray(values_).CopyFromSpan(_values);
+  }
+  const flatbuffers::Array<float, 12> *values() const {
+    return &flatbuffers::CastToArray(values_);
+  }
+  flatbuffers::Array<float, 12> *mutable_values() {
+    return &flatbuffers::CastToArray(values_);
+  }
+};
+FLATBUFFERS_STRUCT_END(Matrix43, 48);
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) AABB FLATBUFFERS_FINAL_CLASS {
  private:

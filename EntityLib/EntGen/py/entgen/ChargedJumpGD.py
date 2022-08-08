@@ -44,6 +44,16 @@ class ChargedJumpGD(HelperObject):
     @chargingDecelerationFactor.setter
     def chargingDecelerationFactor(self, val): self.chargingDecelerationFactor.set(val)
     @property
+    def jumpPowerAddByBounce(self):  # type: ()->Float
+        return Float(self._node.at("jumpPowerAddByBounce"))
+    @jumpPowerAddByBounce.setter
+    def jumpPowerAddByBounce(self, val): self.jumpPowerAddByBounce.set(val)
+    @property
+    def maxSpeedToClampJumpSpeed(self):  # type: ()->Float
+        return Float(self._node.at("maxSpeedToClampJumpSpeed"))
+    @maxSpeedToClampJumpSpeed.setter
+    def maxSpeedToClampJumpSpeed(self, val): self.maxSpeedToClampJumpSpeed.set(val)
+    @property
     def nextJumpPowerByFallHeight(self):  # type: ()->ScaleConverter
         return ScaleConverter(self._node.at("nextJumpPowerByFallHeight"))
     pass

@@ -67,6 +67,11 @@ class RenderManager_RenderConfig(HelperObject):
     @EnableFurTranslucency.setter
     def EnableFurTranslucency(self, val): self.EnableFurTranslucency.set(val)
     @property
+    def EnableLPV(self):  # type: ()->Int
+        return Int(self._node.at("EnableLPV"))
+    @EnableLPV.setter
+    def EnableLPV(self, val): self.EnableLPV.set(val)
+    @property
     def EnableLensFlare(self):  # type: ()->Int
         return Int(self._node.at("EnableLensFlare"))
     @EnableLensFlare.setter

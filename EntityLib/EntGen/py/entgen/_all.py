@@ -29,6 +29,7 @@ from .sEnvStamp import *
 from .retiming import *
 from .WaveRendererProperties import *
 from .WaveProperties import *
+from .WallRunData import *
 from .sJointUniversalDesc import *
 from .sJointSwingTwistDesc import *
 from .sJointSliderDesc import *
@@ -165,6 +166,7 @@ from .MountableSnapLine_ControlPoint import *
 from .MountableData import *
 from .MinReviveRatio import *
 from .MinRespawnDistance import *
+from .MinModifParams import *
 from .MinDistanceToRespawnPosition import *
 from .MeshesItem import *
 from .RUNTIME_LODsItem import *
@@ -263,6 +265,7 @@ from .GraspableInteractionData import *
 from .GraspType import *
 from .GraspResistanceData import *
 from .GeometryStamper import *
+from .VolumeConstraintStamper import *
 from .SkinnedPhysMeshStamper import *
 from .MeshStamper import *
 from .GameTimeInMs import *
@@ -385,7 +388,7 @@ from .OutfitWearerComponentInput import *
 from .MountIKControllerComponentInput import *
 from .LifeComponentInput import *
 from .InteractorComponentInput import *
-from .InteractableGPEComponentInput import *
+from .InteractableComponentInput import *
 from .GrasperComponentInput import *
 from .GraspableComponentInput import *
 from .FluidComponentInput import *
@@ -481,7 +484,7 @@ from .LDPrimitive import *
 from .ItemHolderGD import *
 from .InventoryGD import *
 from .InterestPointGD import *
-from .InteractableGPEGD import *
+from .InteractableGD import *
 from .InfoboardRegistererGD import *
 from .IncapacitateComponentGD import *
 from .HotspotsGD import *
@@ -527,6 +530,7 @@ from .CharacterPlatformGD import *
 from .CameraDataGD import *
 from .BreakableGD import *
 from .BittenGD import *
+from .BiomePatch import *
 from .AttackTriggerGD import *
 from .AssemblyGD import *
 from .AnimationTransformDriverGD import *
@@ -783,6 +787,7 @@ from .EntityStateGrabIn import *
 from .EntityStateGrabAttack import *
 from .EntityStateGrab import *
 from .EntityStateForceCanBeTargeted import *
+from .EntityStateFollowWallRun import *
 from .EntityStateFastRun import *
 from .EntityStateFallSafe import *
 from .EntityStateFallInjured import *

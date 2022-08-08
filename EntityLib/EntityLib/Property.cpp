@@ -108,6 +108,61 @@ namespace Ent
         return newItem;
     }
 
+    std::map<char const*, Property> Property::getMapStringItems() const
+    {
+        std::map<char const*, Property> result;
+        for (char const* key : getPimpl().getMapKeysString())
+        {
+            result.emplace(key, getPimpl().getMapItem(key));
+        }
+        return result;
+    }
+
+    std::map<int64_t, Property> Property::getMapIntItems() const
+    {
+        std::map<int64_t, Property> result;
+        for (int64_t key : getPimpl().getMapKeysInt())
+        {
+            result.emplace(key, getPimpl().getMapItem(key));
+        }
+        return result;
+    }
+
+    std::vector<Property> Property::getObjectSetItems() const
+    {
+        std::vector<Property> result;
+        auto const keyType = getPimpl().getObjectSetKeyType();
+        if (keyType == DataType::string or keyType == DataType::entityRef)
+        {
+            for (char const* key : getPimpl().getObjectSetKeysString())
+            {
+                result.emplace_back(getPimpl().getObjectSetItem(key));
+            }
+        }
+        else if (keyType == DataType::integer)
+        {
+            for (auto const key : getPimpl().getObjectSetKeysInt())
+            {
+                result.emplace_back(getPimpl().getObjectSetItem(key));
+            }
+        }
+        else
+        {
+            ENTLIB_LOGIC_ERROR("Unexpected ObjectSetKeyType in getObjectSetItems()");
+        }
+        return result;
+    }
+
+    std::map<char const*, Property> Property::getUnionSetItems() const
+    {
+        std::map<char const*, Property> result;
+        for (auto&& [key, schema] : getPimpl().getUnionSetKeysString())
+        {
+            result.emplace(key, getPimpl().getUnionSetItem(key));
+        }
+        return result;
+    }
+
     std::vector<PrefabInfo> getPrefabHistory(Property const& _prop)
     {
         std::vector<PrefabInfo> result;

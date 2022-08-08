@@ -204,6 +204,31 @@ static py::list propMapGetKeys(Property& _prop)
     return arr;
 }
 
+static py::list propMapGetItems(Property& _prop)
+{
+    auto const type = _prop.getMapKeyType();
+    py::list arr;
+    if (type == DataType::string || type == DataType::entityRef)
+    {
+        for (auto&& [key, value] : _prop.getMapStringItems())
+        {
+            arr.append(make_tuple(py::str(key), py::cast(value)));
+        }
+    }
+    else if (type == DataType::integer)
+    {
+        for (auto&& [key, value] : _prop.getMapIntItems())
+        {
+            arr.append(make_tuple(key, py::cast(value)));
+        }
+    }
+    else
+    {
+        throw std::runtime_error("Unexpected key type");
+    }
+    return arr;
+}
+
 static py::list propPrimSetGetKeys(Property& _prop)
 {
     auto const& type = _prop.getSchema()->singularItems->get().type;
@@ -732,6 +757,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property_readonly("primset_keys", &propPrimSetGetKeys)
         .def_property_readonly("unionset_keys", &Property::getUnionSetKeysString)
         .def_property_readonly("objectset_keys", &propObjSetGetKeys)
+        .def_property_readonly("map_items", &propMapGetItems)
+        .def_property_readonly("objectset_items", &Property::getObjectSetItems)
+        .def_property_readonly("unionset_items", &Property::getUnionSetItems)    
         .def("map_contains", [](Property& _self, char const* _key){return _self.mapContains(_key);})
         .def("map_contains", [](Property& _self, int64_t _key){return _self.mapContains(_key);})
         .def("primset_contains", [](Property& _self, char const* _key){return _self.primSetContains(_key);})

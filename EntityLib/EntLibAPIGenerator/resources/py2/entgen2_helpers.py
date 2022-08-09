@@ -30,15 +30,15 @@ class Base(object):
 
     @property
     def is_default(self):
-        return self._node.is_default()
+        return self._node.is_default
 
     @property
     def has_default_value(self):
-        return self._node.has_default_value()
+        return self._node.has_default_value
 
     @property
     def has_override(self):
-        return self._node.has_override()
+        return self._node.has_override
 
 
 class Primitive(Base, Generic[T]):

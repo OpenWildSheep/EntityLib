@@ -813,7 +813,6 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("erase_unionset_item", &Property::eraseUnionSetItem)
         .def("copy_into", &Property::copyInto)
         .def("unset", [](Property& _self) { return _self.unset(); })
-        .def("has_override", &Property::hasOverride)
         ;
 
     py::register_exception<JsonValidation>(ent, "JsonValidation");

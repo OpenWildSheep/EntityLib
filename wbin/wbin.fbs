@@ -1,6 +1,13 @@
 
 namespace WBIN;
 
+struct Int3
+{
+	x:int;
+	y:int;
+	z:int;
+}
+
 struct UInt3 
 {
 	x:uint;
@@ -39,6 +46,11 @@ struct Bool3
 struct Matrix44
 {
 	values:[float:16];
+}
+
+struct Matrix43
+{
+	values:[float:12];
 }
 
 // Bounding Volume

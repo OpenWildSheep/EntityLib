@@ -55,6 +55,7 @@ namespace Ent
         struct retiming;
         struct WaveRendererProperties;
         struct WaveProperties;
+        struct WallRunData;
         struct sJointUniversalDesc;
         struct sJointSwingTwistDesc;
         struct sJointSliderDesc;
@@ -475,6 +476,7 @@ namespace Ent
         struct MountableData;
         struct MinReviveRatio;
         struct MinRespawnDistance;
+        struct MinModifParams;
         struct MinDistanceToRespawnPosition;
         struct MeshesItem;
         struct RUNTIME_LODsItem;
@@ -707,6 +709,7 @@ namespace Ent
         };
         struct GraspResistanceData;
         struct GeometryStamper;
+        struct VolumeConstraintStamper;
         struct SkinnedPhysMeshStamper;
         struct MeshStamper;
         struct GameTimeInMs;
@@ -1486,6 +1489,7 @@ namespace Ent
         struct EntityStateGrabAttack;
         struct EntityStateGrab;
         struct EntityStateForceCanBeTargeted;
+        struct EntityStateFollowWallRun;
         struct EntityStateFastRun;
         struct EntityStateFallSafe;
         struct EntityStateFallInjured;
@@ -2760,6 +2764,36 @@ namespace Ent
             Ent::Gen2::WaveRenderingType RenderingType() const;
             Ent::Gen2::Int Width() const;
             Ent::Gen2::String _comment() const;
+        };
+
+        struct WallRunData : HelperObject<WallRunData> // Object
+        {
+            explicit WallRunData(Ent::Property _node): HelperObject<WallRunData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "WallRunData";
+            static WallRunData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return WallRunData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static WallRunData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return WallRunData(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static WallRunData create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return WallRunData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            WallRunData makeInstanceOf()
+            {
+                return WallRunData(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Float JumpAngle() const;
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Vector3 moveDirection() const;
+            PrimArray<Ent::Gen2::EntityRef> wallRunLinks() const;
         };
 
 
@@ -5136,6 +5170,8 @@ namespace Ent
             Ent::Gen2::EntityStateFallSafe setEntityStateFallSafe();
             std::optional<Ent::Gen2::EntityStateFastRun> EntityStateFastRun();
             Ent::Gen2::EntityStateFastRun setEntityStateFastRun();
+            std::optional<Ent::Gen2::EntityStateFollowWallRun> EntityStateFollowWallRun();
+            Ent::Gen2::EntityStateFollowWallRun setEntityStateFollowWallRun();
             std::optional<Ent::Gen2::EntityStateForceCanBeTargeted> EntityStateForceCanBeTargeted();
             Ent::Gen2::EntityStateForceCanBeTargeted setEntityStateForceCanBeTargeted();
             std::optional<Ent::Gen2::EntityStateGrab> EntityStateGrab();
@@ -7177,6 +7213,37 @@ namespace Ent
             Ent::Gen2::Float val() const;
         };
 
+        struct MinModifParams : HelperObject<MinModifParams> // Object
+        {
+            explicit MinModifParams(Ent::Property _node): HelperObject<MinModifParams>(std::move(_node)) {}
+            static constexpr char schemaName[] = "MinModifParams";
+            static MinModifParams load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return MinModifParams(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static MinModifParams loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return MinModifParams(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static MinModifParams create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return MinModifParams(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            MinModifParams makeInstanceOf()
+            {
+                return MinModifParams(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Int BorderSize() const;
+            Ent::Gen2::Float CellSize() const;
+            Ent::Gen2::Int MergeRegionArea() const;
+            Ent::Gen2::Int MinRegionArea() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct MinDistanceToRespawnPosition : HelperObject<MinDistanceToRespawnPosition> // Object
         {
             explicit MinDistanceToRespawnPosition(Ent::Property _node): HelperObject<MinDistanceToRespawnPosition>(std::move(_node)) {}
@@ -8232,6 +8299,7 @@ namespace Ent
             {
                 return NavMeshManager(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::MinModifParams MinModifParams() const;
             Ent::Gen2::Float NavMeshMaxHeight() const;
             Ent::Gen2::Float NavMeshMaxSize() const;
             Ent::Gen2::Map<char const*, Ent::Gen2::RecastNavmeshGenerationParameters> RecastParameters() const;
@@ -9884,6 +9952,34 @@ namespace Ent
                 return GeometryStamper(getProperty().makeInstanceOf());
             }
             Ent::Gen2::Transform3D Transform() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct VolumeConstraintStamper : HelperObject<VolumeConstraintStamper> // Object
+        {
+            explicit VolumeConstraintStamper(Ent::Property _node): HelperObject<VolumeConstraintStamper>(std::move(_node)) {}
+            static constexpr char schemaName[] = "VolumeConstraintStamper";
+            static VolumeConstraintStamper load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return VolumeConstraintStamper(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static VolumeConstraintStamper loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return VolumeConstraintStamper(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static VolumeConstraintStamper create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return VolumeConstraintStamper(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            VolumeConstraintStamper makeInstanceOf()
+            {
+                return VolumeConstraintStamper(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::GeometryStamper Super() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -21144,7 +21240,9 @@ namespace Ent
             Ent::Gen2::Bool bidirectional() const;
             Ent::Gen2::CapabilitiesAndTags capabilitiesAndTags() const;
             Ent::Gen2::EntityRef destination() const;
+            Ent::Gen2::WallRunData offMeshLinkData() const;
             Ent::Gen2::Float radius() const;
+            Ent::Gen2::Bool shouldBeAddedToMinModif() const;
         };
 
         struct NavMeshStamperGD : HelperObject<NavMeshStamperGD> // Object
@@ -24694,6 +24792,9 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateFastRun> EntityStateFastRun();
             Ent::Gen2::EntityStateFastRun addEntityStateFastRun();
             void removeEntityStateFastRun();
+            std::optional<Ent::Gen2::EntityStateFollowWallRun> EntityStateFollowWallRun();
+            Ent::Gen2::EntityStateFollowWallRun addEntityStateFollowWallRun();
+            void removeEntityStateFollowWallRun();
             std::optional<Ent::Gen2::EntityStateForceCanBeTargeted> EntityStateForceCanBeTargeted();
             Ent::Gen2::EntityStateForceCanBeTargeted addEntityStateForceCanBeTargeted();
             void removeEntityStateForceCanBeTargeted();
@@ -27961,6 +28062,34 @@ namespace Ent
                 return EntityStateForceCanBeTargeted(getProperty().makeInstanceOf());
             }
             Ent::Gen2::Bool CanBeTargeted() const;
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateFollowWallRun : HelperObject<EntityStateFollowWallRun> // Object
+        {
+            explicit EntityStateFollowWallRun(Ent::Property _node): HelperObject<EntityStateFollowWallRun>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateFollowWallRun";
+            static EntityStateFollowWallRun load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateFollowWallRun(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateFollowWallRun loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateFollowWallRun(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateFollowWallRun create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateFollowWallRun(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateFollowWallRun makeInstanceOf()
+            {
+                return EntityStateFollowWallRun(getProperty().makeInstanceOf());
+            }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -36077,6 +36206,8 @@ namespace Ent
             Ent::Gen2::Float bounceJumpTimeWindow() const;
             Array<Ent::Gen2::ChargedJumpAnimation> chargedJumpAnimations() const;
             Ent::Gen2::Float chargingDecelerationFactor() const;
+            Ent::Gen2::Float jumpPowerAddByBounce() const;
+            Ent::Gen2::Float maxSpeedToClampJumpSpeed() const;
             Ent::Gen2::ScaleConverter nextJumpPowerByFallHeight() const;
         };
 
@@ -36584,6 +36715,7 @@ namespace Ent
             Ent::Gen2::Int EnableComputeForUnderWater() const;
             Ent::Gen2::Int EnableDepthOfField() const;
             Ent::Gen2::Int EnableFurTranslucency() const;
+            Ent::Gen2::Int EnableLPV() const;
             Ent::Gen2::Int EnableLensFlare() const;
             Ent::Gen2::Int EnableMTR() const;
             Ent::Gen2::Int EnableMotionBlur() const;
@@ -39213,6 +39345,23 @@ namespace Ent
         inline Ent::Gen2::String WaveProperties::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // WallRunData
+        inline Ent::Gen2::Float WallRunData::JumpAngle() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("JumpAngle"));
+        }
+        inline Ent::Gen2::String WallRunData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Vector3 WallRunData::moveDirection() const
+        {
+            return Ent::Gen2::Vector3(getProperty().getObjectField("moveDirection"));
+        }
+        inline PrimArray<Ent::Gen2::EntityRef> WallRunData::wallRunLinks() const
+        {
+            return PrimArray<Ent::Gen2::EntityRef>(getProperty().getObjectField("wallRunLinks"));
         }
         // sJointUniversalDesc
         inline Ent::Gen2::String sJointUniversalDesc::_comment() const
@@ -43173,6 +43322,17 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateFastRun(getProperty().setUnionType("EntityStateFastRun"));
         }
+        inline std::optional<Ent::Gen2::EntityStateFollowWallRun> ResponsiblePointer_ActorState_::EntityStateFollowWallRun()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateFollowWallRun") != 0?
+                    std::optional<Ent::Gen2::EntityStateFollowWallRun>{}:
+                    std::optional<Ent::Gen2::EntityStateFollowWallRun>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateFollowWallRun ResponsiblePointer_ActorState_::setEntityStateFollowWallRun()
+        {
+            return Ent::Gen2::EntityStateFollowWallRun(getProperty().setUnionType("EntityStateFollowWallRun"));
+        }
         inline std::optional<Ent::Gen2::EntityStateForceCanBeTargeted> ResponsiblePointer_ActorState_::EntityStateForceCanBeTargeted()
         {
             return strcmp(
@@ -45351,6 +45511,27 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("val"));
         }
+        // MinModifParams
+        inline Ent::Gen2::Int MinModifParams::BorderSize() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("BorderSize"));
+        }
+        inline Ent::Gen2::Float MinModifParams::CellSize() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("CellSize"));
+        }
+        inline Ent::Gen2::Int MinModifParams::MergeRegionArea() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("MergeRegionArea"));
+        }
+        inline Ent::Gen2::Int MinModifParams::MinRegionArea() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("MinRegionArea"));
+        }
+        inline Ent::Gen2::String MinModifParams::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // MinDistanceToRespawnPosition
         inline Ent::Gen2::String MinDistanceToRespawnPosition::_comment() const
         {
@@ -45952,6 +46133,10 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // NavMeshManager
+        inline Ent::Gen2::MinModifParams NavMeshManager::MinModifParams() const
+        {
+            return Ent::Gen2::MinModifParams(getProperty().getObjectField("MinModifParams"));
+        }
         inline Ent::Gen2::Float NavMeshManager::NavMeshMaxHeight() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("NavMeshMaxHeight"));
@@ -46946,6 +47131,15 @@ namespace Ent
             return Ent::Gen2::Transform3D(getProperty().getObjectField("Transform"));
         }
         inline Ent::Gen2::String GeometryStamper::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // VolumeConstraintStamper
+        inline Ent::Gen2::GeometryStamper VolumeConstraintStamper::Super() const
+        {
+            return Ent::Gen2::GeometryStamper(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String VolumeConstraintStamper::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -60197,9 +60391,17 @@ namespace Ent
         {
             return Ent::Gen2::EntityRef(getProperty().getObjectField("destination"));
         }
+        inline Ent::Gen2::WallRunData OffMeshLink::offMeshLinkData() const
+        {
+            return Ent::Gen2::WallRunData(getProperty().getObjectField("offMeshLinkData"));
+        }
         inline Ent::Gen2::Float OffMeshLink::radius() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("radius"));
+        }
+        inline Ent::Gen2::Bool OffMeshLink::shouldBeAddedToMinModif() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("shouldBeAddedToMinModif"));
         }
         // NavMeshStamperGD
         inline Ent::Gen2::Bool NavMeshStamperGD::IsActive() const
@@ -65474,6 +65676,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateFastRun");
         }
+        inline std::optional<Ent::Gen2::EntityStateFollowWallRun> ActorStates::EntityStateFollowWallRun()
+        {
+            return std::optional<Ent::Gen2::EntityStateFollowWallRun>(getSubNode("EntityStateFollowWallRun"));
+        }
+        inline Ent::Gen2::EntityStateFollowWallRun ActorStates::addEntityStateFollowWallRun()
+        {
+            return Ent::Gen2::EntityStateFollowWallRun(addSubNode("EntityStateFollowWallRun"));
+        }
+        inline void ActorStates::removeEntityStateFollowWallRun()
+        {
+            getProperty().eraseUnionSetItem("EntityStateFollowWallRun");
+        }
         inline std::optional<Ent::Gen2::EntityStateForceCanBeTargeted> ActorStates::EntityStateForceCanBeTargeted()
         {
             return std::optional<Ent::Gen2::EntityStateForceCanBeTargeted>(getSubNode("EntityStateForceCanBeTargeted"));
@@ -67723,6 +67937,15 @@ namespace Ent
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String EntityStateForceCanBeTargeted::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateFollowWallRun
+        inline Ent::Gen2::ActorState EntityStateFollowWallRun::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateFollowWallRun::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -71284,6 +71507,14 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("chargingDecelerationFactor"));
         }
+        inline Ent::Gen2::Float ChargedJumpGD::jumpPowerAddByBounce() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("jumpPowerAddByBounce"));
+        }
+        inline Ent::Gen2::Float ChargedJumpGD::maxSpeedToClampJumpSpeed() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("maxSpeedToClampJumpSpeed"));
+        }
         inline Ent::Gen2::ScaleConverter ChargedJumpGD::nextJumpPowerByFallHeight() const
         {
             return Ent::Gen2::ScaleConverter(getProperty().getObjectField("nextJumpPowerByFallHeight"));
@@ -71849,6 +72080,10 @@ namespace Ent
         inline Ent::Gen2::Int RenderManager_RenderConfig::EnableFurTranslucency() const
         {
             return Ent::Gen2::Int(getProperty().getObjectField("EnableFurTranslucency"));
+        }
+        inline Ent::Gen2::Int RenderManager_RenderConfig::EnableLPV() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("EnableLPV"));
         }
         inline Ent::Gen2::Int RenderManager_RenderConfig::EnableLensFlare() const
         {

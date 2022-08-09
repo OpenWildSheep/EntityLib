@@ -9,6 +9,7 @@ from entgen.Bool import *
 from entgen.CapabilitiesAndTags import *
 from entgen.EntityRef import *
 from entgen.Float import *
+from entgen.WallRunData import *
 
 from EntityLibPy import Node
 
@@ -41,10 +42,18 @@ class OffMeshLink(HelperObject):
     @destination.setter
     def destination(self, val): self.destination.set(val)
     @property
+    def offMeshLinkData(self):  # type: ()->WallRunData
+        return WallRunData(self._node.at("offMeshLinkData"))
+    @property
     def radius(self):  # type: ()->Float
         return Float(self._node.at("radius"))
     @radius.setter
     def radius(self, val): self.radius.set(val)
+    @property
+    def shouldBeAddedToMinModif(self):  # type: ()->Bool
+        return Bool(self._node.at("shouldBeAddedToMinModif"))
+    @shouldBeAddedToMinModif.setter
+    def shouldBeAddedToMinModif(self, val): self.shouldBeAddedToMinModif.set(val)
     pass
 
 

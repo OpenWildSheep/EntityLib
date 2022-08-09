@@ -1,0 +1,25 @@
+include "wbin.fbs";
+
+namespace WBIN;
+
+// RTPCLD -> RunTime Point Cloud format
+struct CloudPoint
+{
+	nameIndex:ushort;
+	matrix:Matrix43;
+}
+
+table CloudPointsChunk
+{
+	coords:Int3;
+	points:[CloudPoint];
+}
+
+table RuntimePointCloud
+{
+	chunkSize:float;
+	names:[string];
+	chunks:[CloudPointsChunk];
+}
+
+root_type RuntimePointCloud;

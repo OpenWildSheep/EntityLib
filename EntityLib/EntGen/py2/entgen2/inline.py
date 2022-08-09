@@ -861,6 +861,41 @@ class WaveProperties(HelperObject):
 
 
 from EntityLibPy import Property
+
+class WallRunData(HelperObject):
+    schema_name = "WallRunData"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->WallRunData
+        return WallRunData(Property(entlib, entlib.get_schema(WallRunData.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->WallRunData
+        return WallRunData(Property.create(entlib, entlib.get_schema(WallRunData.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def JumpAngle(self):  # type: ()->Float
+        return Float(self._node.get_object_field("JumpAngle"))
+    @JumpAngle.setter
+    def JumpAngle(self, val): self.JumpAngle.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def moveDirection(self):  # type: ()->Vector3
+        return Vector3(self._node.get_object_field("moveDirection"))
+    @moveDirection.setter
+    def moveDirection(self, val): self.moveDirection.set(val)
+    @property
+    def wallRunLinks(self):  # type: ()->PrimArray[EntityRef]
+        return (lambda n: PrimArray(EntityRef, n))(self._node.get_object_field("wallRunLinks"))
+    @wallRunLinks.setter
+    def wallRunLinks(self, val): self.wallRunLinks.set(val)
+    pass
+
+
+from EntityLibPy import Property
 Vector2 = (lambda n: PrimArray(Float, n))
 from EntityLibPy import Property
 
@@ -5413,6 +5448,46 @@ class MinRespawnDistance(HelperObject):
 
 from EntityLibPy import Property
 
+class MinModifParams(HelperObject):
+    schema_name = "MinModifParams"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->MinModifParams
+        return MinModifParams(Property(entlib, entlib.get_schema(MinModifParams.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->MinModifParams
+        return MinModifParams(Property.create(entlib, entlib.get_schema(MinModifParams.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def BorderSize(self):  # type: ()->Int
+        return Int(self._node.get_object_field("BorderSize"))
+    @BorderSize.setter
+    def BorderSize(self, val): self.BorderSize.set(val)
+    @property
+    def CellSize(self):  # type: ()->Float
+        return Float(self._node.get_object_field("CellSize"))
+    @CellSize.setter
+    def CellSize(self, val): self.CellSize.set(val)
+    @property
+    def MergeRegionArea(self):  # type: ()->Int
+        return Int(self._node.get_object_field("MergeRegionArea"))
+    @MergeRegionArea.setter
+    def MergeRegionArea(self, val): self.MergeRegionArea.set(val)
+    @property
+    def MinRegionArea(self):  # type: ()->Int
+        return Int(self._node.get_object_field("MinRegionArea"))
+    @MinRegionArea.setter
+    def MinRegionArea(self, val): self.MinRegionArea.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
 class MinDistanceToRespawnPosition(HelperObject):
 
     @property
@@ -6612,6 +6687,9 @@ class NavMeshManager(HelperObject):
         return NavMeshManager(Property.create(entlib, entlib.get_schema(NavMeshManager.schema_name)))
     def save(self, destfile):
         self.node.save(destfile)
+    @property
+    def MinModifParams(self):  # type: ()->MinModifParams
+        return MinModifParams(self._node.get_object_field("MinModifParams"))
     @property
     def NavMeshMaxHeight(self):  # type: ()->Float
         return Float(self._node.get_object_field("NavMeshMaxHeight"))
@@ -8629,6 +8707,29 @@ class GeometryStamper(HelperObject):
     @property
     def Transform(self):  # type: ()->Transform3D
         return Transform3D(self._node.get_object_field("Transform"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class VolumeConstraintStamper(HelperObject):
+    schema_name = "VolumeConstraintStamper"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->VolumeConstraintStamper
+        return VolumeConstraintStamper(Property(entlib, entlib.get_schema(VolumeConstraintStamper.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->VolumeConstraintStamper
+        return VolumeConstraintStamper(Property.create(entlib, entlib.get_schema(VolumeConstraintStamper.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def Super(self):  # type: ()->GeometryStamper
+        return GeometryStamper(self._node.get_object_field("Super"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.get_object_field("_comment"))
@@ -21721,10 +21822,18 @@ class OffMeshLink(HelperObject):
     @destination.setter
     def destination(self, val): self.destination.set(val)
     @property
+    def offMeshLinkData(self):  # type: ()->WallRunData
+        return WallRunData(self._node.get_object_field("offMeshLinkData"))
+    @property
     def radius(self):  # type: ()->Float
         return Float(self._node.get_object_field("radius"))
     @radius.setter
     def radius(self, val): self.radius.set(val)
+    @property
+    def shouldBeAddedToMinModif(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("shouldBeAddedToMinModif"))
+    @shouldBeAddedToMinModif.setter
+    def shouldBeAddedToMinModif(self, val): self.shouldBeAddedToMinModif.set(val)
     pass
 
 
@@ -28344,6 +28453,29 @@ class EntityStateForceCanBeTargeted(HelperObject):
         return Bool(self._node.get_object_field("CanBeTargeted"))
     @CanBeTargeted.setter
     def CanBeTargeted(self, val): self.CanBeTargeted.set(val)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class EntityStateFollowWallRun(HelperObject):
+    schema_name = "EntityStateFollowWallRun"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateFollowWallRun
+        return EntityStateFollowWallRun(Property(entlib, entlib.get_schema(EntityStateFollowWallRun.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateFollowWallRun
+        return EntityStateFollowWallRun(Property.create(entlib, entlib.get_schema(EntityStateFollowWallRun.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.get_object_field("Super"))
@@ -36129,6 +36261,16 @@ class ChargedJumpGD(HelperObject):
     @chargingDecelerationFactor.setter
     def chargingDecelerationFactor(self, val): self.chargingDecelerationFactor.set(val)
     @property
+    def jumpPowerAddByBounce(self):  # type: ()->Float
+        return Float(self._node.get_object_field("jumpPowerAddByBounce"))
+    @jumpPowerAddByBounce.setter
+    def jumpPowerAddByBounce(self, val): self.jumpPowerAddByBounce.set(val)
+    @property
+    def maxSpeedToClampJumpSpeed(self):  # type: ()->Float
+        return Float(self._node.get_object_field("maxSpeedToClampJumpSpeed"))
+    @maxSpeedToClampJumpSpeed.setter
+    def maxSpeedToClampJumpSpeed(self, val): self.maxSpeedToClampJumpSpeed.set(val)
+    @property
     def nextJumpPowerByFallHeight(self):  # type: ()->ScaleConverter
         return ScaleConverter(self._node.get_object_field("nextJumpPowerByFallHeight"))
     pass
@@ -36966,6 +37108,11 @@ class RenderManager_RenderConfig(HelperObject):
         return Int(self._node.get_object_field("EnableFurTranslucency"))
     @EnableFurTranslucency.setter
     def EnableFurTranslucency(self, val): self.EnableFurTranslucency.set(val)
+    @property
+    def EnableLPV(self):  # type: ()->Int
+        return Int(self._node.get_object_field("EnableLPV"))
+    @EnableLPV.setter
+    def EnableLPV(self, val): self.EnableLPV.set(val)
     @property
     def EnableLensFlare(self):  # type: ()->Int
         return Int(self._node.get_object_field("EnableLensFlare"))

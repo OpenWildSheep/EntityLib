@@ -6,6 +6,7 @@
 #pragma warning(push, 0)
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/functional.h>
 
 #include "EntityLib/DumpProperty.h"
 #include "external/pybind11_json.hpp"
@@ -194,6 +195,31 @@ static py::list propMapGetKeys(Property& _prop)
         for (auto key : _prop.getMapKeysInt())
         {
             arr.append(key);
+        }
+    }
+    else
+    {
+        throw std::runtime_error("Unexpected key type");
+    }
+    return arr;
+}
+
+static py::list propMapGetItems(Property& _prop)
+{
+    auto const type = _prop.getMapKeyType();
+    py::list arr;
+    if (type == DataType::string || type == DataType::entityRef)
+    {
+        for (auto&& [key, value] : _prop.getMapStringItems())
+        {
+            arr.append(make_tuple(py::str(key), py::cast(value)));
+        }
+    }
+    else if (type == DataType::integer)
+    {
+        for (auto&& [key, value] : _prop.getMapIntItems())
+        {
+            arr.append(make_tuple(key, py::cast(value)));
         }
     }
     else
@@ -676,6 +702,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_schema", &EntityLib::getSchema, py::return_value_policy::reference_internal)
         .def("load_property", &EntityLib::loadProperty)
         .def("load_property_copy", &EntityLib::loadPropertyCopy)
+        .def("set_dep_file_callback", &EntityLib::setNewDepFileCallBack)
     ;
 
     pyEntityRef
@@ -730,6 +757,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property_readonly("primset_keys", &propPrimSetGetKeys)
         .def_property_readonly("unionset_keys", &Property::getUnionSetKeysString)
         .def_property_readonly("objectset_keys", &propObjSetGetKeys)
+        .def_property_readonly("map_items", &propMapGetItems)
+        .def_property_readonly("objectset_items", &Property::getObjectSetItems)
+        .def_property_readonly("unionset_items", &Property::getUnionSetItems)    
         .def("map_contains", [](Property& _self, char const* _key){return _self.mapContains(_key);})
         .def("map_contains", [](Property& _self, int64_t _key){return _self.mapContains(_key);})
         .def("primset_contains", [](Property& _self, char const* _key){return _self.primSetContains(_key);})

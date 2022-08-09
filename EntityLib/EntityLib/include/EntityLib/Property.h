@@ -271,6 +271,13 @@ namespace Ent
             return getPimpl().getObjectSetKeysInt();
         }
 
+        /// TODO : PropImpl should implement getMapStringItems, and return a view, for efficiency
+        ///                   https://wildsheepstudio.atlassian.net/browse/WLD-8887
+        [[nodiscard]] std::map<char const*, Property> getMapStringItems() const;
+        [[nodiscard]] std::map<int64_t, Property> getMapIntItems() const;
+        [[nodiscard]] std::vector<Property> getObjectSetItems() const;
+        [[nodiscard]] std::map<char const*, Property> getUnionSetItems() const;
+
         /// @brief Ket keys removed in the instance
         /// @pre Is a Map with string keys
         [[nodiscard]] std::set<char const*, CmpStr> getMapRemovedKeysString() const

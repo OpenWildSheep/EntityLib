@@ -23,7 +23,7 @@ class Base(object):
 
     @property
     def is_set(self):
-        return self._node.is_set()
+        return self._node.is_set
 
     def unset(self):
         return self._node.unset()
@@ -56,9 +56,6 @@ class Primitive(Base, Generic[T]):
 
     def get(self):  # type: () -> T
         return self._item_type(self._node.value)
-
-    def is_set(self):  # type: (...) -> bool
-        return self._node.is_set()
 
     def unset(self):
         return self._node.unset()

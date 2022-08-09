@@ -23,22 +23,22 @@ class Base(object):
 
     @property
     def is_set(self):
-        return self._node.is_set()
+        return self._node.is_set
 
     def unset(self):
         return self._node.unset()
 
     @property
     def is_default(self):
-        return self._node.is_default()
+        return self._node.is_default
 
     @property
     def has_default_value(self):
-        return self._node.has_default_value()
+        return self._node.has_default_value
 
     @property
     def has_override(self):
-        return self._node.has_override()
+        return self._node.has_override
 
 
 class Primitive(Base, Generic[T]):
@@ -56,9 +56,6 @@ class Primitive(Base, Generic[T]):
 
     def get(self):  # type: () -> T
         return self._item_type(self._node.value)
-
-    def is_set(self):  # type: (...) -> bool
-        return self._node.is_set()
 
     def unset(self):
         return self._node.unset()

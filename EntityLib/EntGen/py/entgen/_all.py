@@ -21,6 +21,7 @@ from .computePitchAngle import *
 from .allowedTypesItem import *
 from .WindTurbulenceType import *
 from .WaveRenderingType import *
+from .WallRunData import *
 from .Walkability import *
 from .VegetationData import *
 from .VegetationDataList import *
@@ -29,7 +30,6 @@ from .sEnvStamp import *
 from .retiming import *
 from .WaveRendererProperties import *
 from .WaveProperties import *
-from .WallRunData import *
 from .sJointUniversalDesc import *
 from .sJointSwingTwistDesc import *
 from .sJointSliderDesc import *
@@ -86,6 +86,7 @@ from .SeedPatchDataList import *
 from .ScriptPathAndDataSet import *
 from .ScaleFactor import *
 from .ScaleConverter import *
+from .SamplesPerAudioFrame import *
 from .RuntimeMode import *
 from .RigidbodyScalingSpeed import *
 from .RigidbodyScaleMultiplier import *

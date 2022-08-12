@@ -6,7 +6,6 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.Float import *
-from entgen.Vector3 import *
 from entgen.EntityRef import *
 
 from EntityLibPy import Node
@@ -31,11 +30,6 @@ class WallRunData(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
-    @property
-    def moveDirection(self):  # type: ()->Vector3
-        return Vector3(self._node.at("moveDirection"))
-    @moveDirection.setter
-    def moveDirection(self, val): self.moveDirection.set(val)
     @property
     def wallRunLinks(self):  # type: ()->PrimArray[EntityRef]
         return (lambda n: PrimArray(EntityRef, n))(self._node.at("wallRunLinks"))

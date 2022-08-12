@@ -503,6 +503,36 @@ class WaveRenderingType(Primitive[WaveRenderingTypeEnum]):  # Enum
 
 from EntityLibPy import Node
 
+class WallRunData(HelperObject):
+    schema_name = "WallRunData"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->WallRunData
+        return WallRunData(entlib.load_node_file(sourcefile, entlib.get_schema(WallRunData.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->WallRunData
+        return WallRunData(entlib.make_node(WallRunData.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def JumpAngle(self):  # type: ()->Float
+        return Float(self._node.at("JumpAngle"))
+    @JumpAngle.setter
+    def JumpAngle(self, val): self.JumpAngle.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def wallRunLinks(self):  # type: ()->PrimArray[EntityRef]
+        return (lambda n: PrimArray(EntityRef, n))(self._node.at("wallRunLinks"))
+    @wallRunLinks.setter
+    def wallRunLinks(self, val): self.wallRunLinks.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class Walkability(HelperObject):
 
     @property
@@ -857,41 +887,6 @@ class WaveProperties(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Node
-
-class WallRunData(HelperObject):
-    schema_name = "WallRunData"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->WallRunData
-        return WallRunData(entlib.load_node_file(sourcefile, entlib.get_schema(WallRunData.schema_name)))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->WallRunData
-        return WallRunData(entlib.make_node(WallRunData.schema_name))
-    def save(self, destfile):
-        self.node.save_node(destfile)
-    @property
-    def JumpAngle(self):  # type: ()->Float
-        return Float(self._node.at("JumpAngle"))
-    @JumpAngle.setter
-    def JumpAngle(self, val): self.JumpAngle.set(val)
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.at("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    @property
-    def moveDirection(self):  # type: ()->Vector3
-        return Vector3(self._node.at("moveDirection"))
-    @moveDirection.setter
-    def moveDirection(self, val): self.moveDirection.set(val)
-    @property
-    def wallRunLinks(self):  # type: ()->PrimArray[EntityRef]
-        return (lambda n: PrimArray(EntityRef, n))(self._node.at("wallRunLinks"))
-    @wallRunLinks.setter
-    def wallRunLinks(self, val): self.wallRunLinks.set(val)
     pass
 
 
@@ -2850,6 +2845,26 @@ class ScaleConverter(HelperObject):
     @outText.setter
     def outText(self, val): self.outText.set(val)
     pass
+
+
+from EntityLibPy import Node
+class SamplesPerAudioFrameEnum(Enum):
+    _256 = "256"
+    _512 = "512"
+    _1024 = "1024"
+    _2048 = "2048"
+
+
+class SamplesPerAudioFrame(Primitive[SamplesPerAudioFrameEnum]):  # Enum
+    def __init__(self, node):
+        super(SamplesPerAudioFrame, self).__init__(SamplesPerAudioFrameEnum, node)
+    schema_name = "SamplesPerAudioFrame"
+    def __call__(self, node):  # type: (EntityLibPy.Node) -> SamplesPerAudioFrame
+        return SamplesPerAudioFrame(node)
+    def set(self, val):  # type: (SamplesPerAudioFrameEnum) -> None
+        return self._node.set_string(val.value)
+    def get(self):  # type: () -> T
+        return self._item_type(self._node.value)
 
 
 from EntityLibPy import Node
@@ -5603,6 +5618,16 @@ class MeshNavigationBehaviorData(HelperObject):
     @MeshNavigationAllowedMode.setter
     def MeshNavigationAllowedMode(self, val): self.MeshNavigationAllowedMode.set(val)
     @property
+    def MinPlayRatioInConstrainedMove(self):  # type: ()->Float
+        return Float(self._node.at("MinPlayRatioInConstrainedMove"))
+    @MinPlayRatioInConstrainedMove.setter
+    def MinPlayRatioInConstrainedMove(self, val): self.MinPlayRatioInConstrainedMove.set(val)
+    @property
+    def MinSpeedInConstrainedMove(self):  # type: ()->Float
+        return Float(self._node.at("MinSpeedInConstrainedMove"))
+    @MinSpeedInConstrainedMove.setter
+    def MinSpeedInConstrainedMove(self, val): self.MinSpeedInConstrainedMove.set(val)
+    @property
     def OrientationRateToPrepareToHoldingOnToNavigationMesh(self):  # type: ()->Float
         return Float(self._node.at("OrientationRateToPrepareToHoldingOnToNavigationMesh"))
     @OrientationRateToPrepareToHoldingOnToNavigationMesh.setter
@@ -6797,6 +6822,11 @@ class InputManager(HelperObject):
         return InputManager(entlib.make_node(InputManager.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def JoyThreshold(self):  # type: ()->Float
+        return Float(self._node.at("JoyThreshold"))
+    @JoyThreshold.setter
+    def JoyThreshold(self, val): self.JoyThreshold.set(val)
     @property
     def Super(self):  # type: ()->Manager
         return Manager(self._node.at("Super"))
@@ -18758,6 +18788,11 @@ class BiomePatch(HelperObject):
     @MeshFile.setter
     def MeshFile(self, val): self.MeshFile.set(val)
     @property
+    def Priority(self):  # type: ()->Int
+        return Int(self._node.at("Priority"))
+    @Priority.setter
+    def Priority(self, val): self.Priority.set(val)
+    @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
     @property
@@ -19948,6 +19983,11 @@ class SoundManager(HelperObject):
         return Float(self._node.at("RainLevelStart"))
     @RainLevelStart.setter
     def RainLevelStart(self, val): self.RainLevelStart.set(val)
+    @property
+    def SamplesPerAudioFrame(self):  # type: ()->SamplesPerAudioFrame
+        return SamplesPerAudioFrame(self._node.at("SamplesPerAudioFrame"))
+    @SamplesPerAudioFrame.setter
+    def SamplesPerAudioFrame(self, val): self.SamplesPerAudioFrame.set(val)
     @property
     def SoundOpportunitiesConfig(self):  # type: ()->SoundOpportunitiesConfig
         return SoundOpportunitiesConfig(self._node.at("SoundOpportunitiesConfig"))
@@ -22229,9 +22269,6 @@ class CameraEditorData(HelperObject):
         return Float(self._node.at("DistanceMin"))
     @DistanceMin.setter
     def DistanceMin(self, val): self.DistanceMin.set(val)
-    @property
-    def JoyThreshold(self):  # type: ()->ScaleConverter
-        return ScaleConverter(self._node.at("JoyThreshold"))
     @property
     def MoveBlend(self):  # type: ()->Float
         return Float(self._node.at("MoveBlend"))

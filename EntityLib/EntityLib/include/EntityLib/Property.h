@@ -10,7 +10,6 @@ namespace Ent
     public:
         using Key = std::variant<std::string, size_t>;
 
-        Property() = default;
         Property(Property const& _other)
             : m_self(_other.m_self == nullptr ? nullptr : _other.m_self->sharedFromThis())
         {
@@ -19,6 +18,7 @@ namespace Ent
         explicit Property(PropImplPtr _prop)
             : m_self(std::move(_prop))
         {
+            ENTLIB_ASSERT(m_self != nullptr);
         }
         Property& operator=(Property const& _other)
         {
@@ -270,6 +270,13 @@ namespace Ent
         {
             return getPimpl().getObjectSetKeysInt();
         }
+
+        /// TODO : PropImpl should implement getMapStringItems, and return a view, for efficiency
+        ///                   https://wildsheepstudio.atlassian.net/browse/WLD-8887
+        [[nodiscard]] std::map<char const*, Property> getMapStringItems() const;
+        [[nodiscard]] std::map<int64_t, Property> getMapIntItems() const;
+        [[nodiscard]] std::vector<Property> getObjectSetItems() const;
+        [[nodiscard]] std::map<char const*, Property> getUnionSetItems() const;
 
         /// @brief Ket keys removed in the instance
         /// @pre Is a Map with string keys
@@ -684,18 +691,22 @@ namespace Ent
             return m_self->getFieldNames();
         }
 
-        [[nodiscard]] Property getPrefab() const ///< Get the prefab of the Property
+        [[nodiscard]] std::optional<Property> getPrefab() const ///< Get the prefab of the Property
         {
             if (auto* const prefab = m_self->getPrefab())
             {
                 return Property{prefab->sharedFromThis()};
             }
-            return {};
+            return std::nullopt;
         }
 
-        [[nodiscard]] Property getParent() const ///< Get the Property which own this one
+        [[nodiscard]] std::optional<Property> getParent() const ///< Get the Property which own this one
         {
-            return Property{m_self->getParent()};
+            if (auto parent = m_self->getParent())
+            {
+                return Property{std::move(parent)};
+            }
+            return std::nullopt;
         }
 
         [[nodiscard]] EntityLib* getEntityLib() const
@@ -762,6 +773,7 @@ namespace Ent
 
         [[nodiscard]] PropImpl& getPimpl() const
         {
+            ENTLIB_ASSERT(m_self != nullptr);
             return *m_self;
         }
 

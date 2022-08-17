@@ -23,22 +23,22 @@ class Base(object):
 
     @property
     def is_set(self):
-        return self._node.is_set()
+        return self._node.is_set
 
     def unset(self):
         return self._node.unset()
 
     @property
     def is_default(self):
-        return self._node.is_default()
+        return self._node.is_default
 
     @property
     def has_default_value(self):
-        return self._node.has_default_value()
+        return self._node.has_default_value
 
     @property
     def has_override(self):
-        return self._node.has_override()
+        return self._node.has_override
 
 
 class Primitive(Base, Generic[T]):
@@ -56,9 +56,6 @@ class Primitive(Base, Generic[T]):
 
     def get(self):  # type: () -> T
         return self._item_type(self._node.value)
-
-    def is_set(self):  # type: (...) -> bool
-        return self._node.is_set()
 
     def unset(self):
         return self._node.unset()
@@ -107,8 +104,8 @@ class UnionSet(Base, Generic[T]):
         return self._node.unionset_keys
 
     def __iter__(self):   # type: () -> Iterator[EntityLibPy.Property]
-        for key in self._node.unionset_keys:
-            yield self._node.get_unionset_item(key)
+        for key, prop in self._node.unionset_items:
+            yield prop
 
 
 class Union(Base):
@@ -204,11 +201,11 @@ class ObjectSet(Base, Generic[T]):
         return self._node.size
 
     def __iter__(self):
-        for key in self._node.objectset_keys:
-            yield self._item_ctor(self._node.get_objectset_item(key))
+        for obj in self._node.objectset_items:
+            yield self._item_ctor(obj)
 
     def insert_instanceof(self, instance_path):  # type: (str) -> T
-        return self._item_ctor(self._node.map_insert_instanceof(instance_path))
+        return self._item_ctor(self._node.insert_instance_objectset_item(instance_path))
 
     def keys(self):
         return self._node.objectset_keys
@@ -264,8 +261,8 @@ class Map(Base, Generic[K, V]):
         return self._node.map_keys
 
     def __iter__(self):  # type: () -> Iterator[Tuple[K, V]]
-        for key in self._node.map_keys:
-            yield (key, self._item_ctor(self._node.get_map_item(key))) # (K, V)
+        for key, value in self._node.map_items:
+            yield (key, self._item_ctor(value)) # (K, V)
 
 
 class PrimitiveSet(Base, Generic[T]):

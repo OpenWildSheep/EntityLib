@@ -1,4 +1,5 @@
 from . import AABB
+from . import BiomePatch
 from . import BlendShape
 from . import BlendShapeData
 from . import BoneData
@@ -20,6 +21,9 @@ from . import GVoxelColumn
 from . import GVoxelData
 from . import GVoxelPile
 from . import GVoxelVolume
+from . import HeightMap
+from . import HeightMapLayer
+from . import HeightMapPixel
 from . import HeightObj
 from . import Int3
 from . import MaterialRef

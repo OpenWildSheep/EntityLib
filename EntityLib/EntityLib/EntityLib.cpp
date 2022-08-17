@@ -469,14 +469,15 @@ namespace Ent
         return {relativePath};
     }
 
-    Property EntityLib::resolveEntityRef(Property const& _node, EntityRef const& _entityRef) const
+    std::optional<Property>
+    EntityLib::resolveEntityRef(Property const& _node, EntityRef const& _entityRef) const
     {
         if (_node.getDataType() == DataType::array) // This is a scene
         {
             if (_entityRef.entityPath.empty())
             {
                 // empty ref
-                return {};
+                return std::nullopt;
             }
 
             // split around '/'
@@ -486,10 +487,18 @@ namespace Ent
             PropImplPtr down = _node.getPimpl().sharedFromThis();
             PropImplPtr up = current == nullptr ? nullptr : current->getParent();
 
-            return Property(resolveEntityRefRecursive(
-                std::move(current), std::move(up), std::move(down), parts));
+            if (auto propptr = resolveEntityRefRecursive(
+                    std::move(current), std::move(up), std::move(down), parts))
+            {
+                return Property(std::move(propptr));
+            }
+            return std::nullopt;
         }
-        return Property(resolveEntityRefImpl(_node.getPimpl().sharedFromThis(), _entityRef));
+        if (auto propPtr = resolveEntityRefImpl(_node.getPimpl().sharedFromThis(), _entityRef))
+        {
+            return Property(std::move(propPtr));
+        }
+        return std::nullopt;
     }
     EntityRef EntityLib::makeEntityRef(Property const& _from, Property const& _to) const
     {
@@ -561,6 +570,10 @@ namespace Ent
         if (auto const iter = m_jsonDatabase.find(filepath); iter != m_jsonDatabase.end())
         {
             return iter->second;
+        }
+        if (m_newDepFileCallback)
+        {
+            m_newDepFileCallback(_filepath);
         }
         json data = loadJsonFile(rawdataPath, filepath);
         return m_jsonDatabase.emplace(filepath, std::move(data)).first->second;
@@ -1989,5 +2002,9 @@ namespace Ent
         return m_fallbackEntity.c_str();
     }
 
+    void EntityLib::setNewDepFileCallBack(NewDepFileCallback _callback)
+    {
+        m_newDepFileCallback = std::move(_callback);
+    }
     /// \endcond
 } // namespace Ent

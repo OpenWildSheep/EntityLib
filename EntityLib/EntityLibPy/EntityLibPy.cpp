@@ -6,6 +6,9 @@
 #pragma warning(push, 0)
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/functional.h>
+
+#include "EntityLib/DumpProperty.h"
 #include "external/pybind11_json.hpp"
 #pragma warning(pop)
 
@@ -201,6 +204,31 @@ static py::list propMapGetKeys(Property& _prop)
     return arr;
 }
 
+static py::list propMapGetItems(Property& _prop)
+{
+    auto const type = _prop.getMapKeyType();
+    py::list arr;
+    if (type == DataType::string || type == DataType::entityRef)
+    {
+        for (auto&& [key, value] : _prop.getMapStringItems())
+        {
+            arr.append(make_tuple(py::str(key), py::cast(value)));
+        }
+    }
+    else if (type == DataType::integer)
+    {
+        for (auto&& [key, value] : _prop.getMapIntItems())
+        {
+            arr.append(make_tuple(key, py::cast(value)));
+        }
+    }
+    else
+    {
+        throw std::runtime_error("Unexpected key type");
+    }
+    return arr;
+}
+
 static py::list propPrimSetGetKeys(Property& _prop)
 {
     auto const& type = _prop.getSchema()->singularItems->get().type;
@@ -253,6 +281,14 @@ static py::list propObjSetGetKeys(Property& _prop)
     return arr;
 }
 
+nlohmann::json dumpProperty(Property _prop, bool _superKeyIsTypeName = false)
+{
+    nlohmann::json result;
+    DumpProperty dumper(result, _superKeyIsTypeName);
+    visitRecursive(_prop, dumper);
+    return result;
+}
+
 using namespace pybind11::literals;
 
 // clang-format off
@@ -271,6 +307,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
      * but it just seemed safer in case we add new methods with new dependencies.
      */
     auto pyDataType = py::enum_<DataType>(ent, "DataType");
+    auto pyDataKind = py::enum_<DataKind>(ent, "DataKind");
     auto pyLogicErrorPolicy = py::enum_<LogicErrorPolicy>(ent, "LogicErrorPolicy");
     auto pyOverrideValueSource = py::enum_<OverrideValueSource>(ent, "OverrideValueSource");
     auto pyOverrideValueLocation = py::enum_<OverrideValueLocation>(ent, "OverrideValueLocation");
@@ -302,6 +339,20 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .value("boolean", DataType::boolean)
         .value("entityRef", DataType::entityRef)
         .value("union", DataType::oneOf)
+        .export_values();
+
+    pyDataKind
+        .value("string", DataKind::string)
+        .value("number", DataKind::number)
+        .value("integer", DataKind::integer)
+        .value("object", DataKind::object)
+        .value("array", DataKind::array)
+        .value("boolean", DataKind::boolean)
+        .value("union", DataKind::union_)
+        .value("unionSet", DataKind::unionSet)
+        .value("map", DataKind::map)
+        .value("objectSet", DataKind::objectSet)
+        .value("primitiveSet", DataKind::primitiveSet)
         .export_values();
 
     pyOverrideValueSource
@@ -402,7 +453,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         // .def("linear_items", &Subschema::linearItems, py::return_value_policy::reference_internal)
         .def("has_linear_items", [](Subschema const& s) { return s.linearItems.has_value(); })
         .def_readonly("enum_values", &Subschema::enumValues, py::return_value_policy::reference_internal)
-        .def_property_readonly("is_deprecated", [](Subschema const& s) { return s.IsDeprecated(); });
+        .def_property_readonly("is_deprecated", [](Subschema const& s) { return s.IsDeprecated(); })
+        .def_property_readonly("data_kind", &Subschema::getDataKind)
+    ;
 
     pySubschemaRef
         .def(py::init<>())
@@ -603,6 +656,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("resolve_entityref",
             static_cast<Node*(EntityLib::*)(Node*, EntityRef const&) const>(&EntityLib::resolveEntityRef),
             py::return_value_policy::reference_internal)
+        .def("resolve_entityref",
+            static_cast<std::optional<Property>(EntityLib::*)(Property const&, EntityRef const&) const>(&EntityLib::resolveEntityRef),
+            py::keep_alive<0, 1>())
         .def_readonly(
             "component_dependencies",
             &EntityLib::componentDependencies,
@@ -646,6 +702,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_schema", &EntityLib::getSchema, py::return_value_policy::reference_internal)
         .def("load_property", &EntityLib::loadProperty)
         .def("load_property_copy", &EntityLib::loadPropertyCopy)
+        .def("set_dep_file_callback", &EntityLib::setNewDepFileCallBack)
     ;
 
     pyEntityRef
@@ -667,6 +724,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pyProperty
         .def(py::init<EntityLib*, Subschema const*, char const*>(), py::keep_alive<1, 2>())
         .def(py::init<EntityLib*, Subschema const*, char const*, nlohmann::json*>(), py::keep_alive<1, 2>())
+        .def_static("create", [](EntityLib* _lib, Subschema const* _schema, char const* _path)
+        {
+            return Property(_lib, _schema, _path, &_lib->createTempJsonFile());
+        }, py::arg("entlib"), py::arg("schema"), py::arg("path") = "", py::keep_alive<1, 2>())
         .def("save", &Property::save)
         .def_property_readonly("is_default", &Property::isDefault)
         .def("get_object_field", &Property::getObjectField, py::arg("field"), py::arg("field_schema") = nullptr, py::keep_alive<0, 1>())
@@ -678,6 +739,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_map_item", [](Property& _self, char const* _key){return _self.getMapItem(_key);}, py::keep_alive<0, 1>())
         .def("get_map_item", [](Property& _self, int64_t _key){return _self.getMapItem(_key);}, py::keep_alive<0, 1>())
         .def("get_array_item", &Property::getArrayItem, py::keep_alive<0, 1>())
+        .def("get_instance_of", &Property::getInstanceOf)
         .def_property("instance_of", &Property::getInstanceOf, &Property::changeInstanceOf)
         .def_property_readonly("union_type", &Property::getUnionType) // or read/write ?
         .def_property_readonly("data_type", &Property::getDataType)
@@ -695,6 +757,9 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property_readonly("primset_keys", &propPrimSetGetKeys)
         .def_property_readonly("unionset_keys", &Property::getUnionSetKeysString)
         .def_property_readonly("objectset_keys", &propObjSetGetKeys)
+        .def_property_readonly("map_items", &propMapGetItems)
+        .def_property_readonly("objectset_items", &Property::getObjectSetItems)
+        .def_property_readonly("unionset_items", &Property::getUnionSetItems)    
         .def("map_contains", [](Property& _self, char const* _key){return _self.mapContains(_key);})
         .def("map_contains", [](Property& _self, int64_t _key){return _self.mapContains(_key);})
         .def("primset_contains", [](Property& _self, char const* _key){return _self.primSetContains(_key);})
@@ -738,6 +803,16 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property_readonly("get_prefab_history", &getPrefabHistory, py::keep_alive<0, 1>())
         .def("detach", &Property::detach, py::keep_alive<0, 1>())
         .def("clear", &Property::clear)
+        .def("dumps", &dumpProperty, py::arg("superKeyIsTypeName") = false)
+        .def("erase_primset_key", [](Property& _self, char const* _key){return _self.erasePrimSetKey(_key);})
+        .def("erase_primset_key", [](Property& _self, int64_t _key){return _self.erasePrimSetKey(_key);})
+        .def("erase_objectset_item", [](Property& _self, char const* _key){return _self.eraseObjectSetItem(_key);})
+        .def("erase_objectset_item", [](Property& _self, int64_t _key){return _self.eraseObjectSetItem(_key);})
+        .def("erase_map_item", [](Property& _self, char const* _key){return _self.eraseMapItem(_key);})
+        .def("erase_map_item", [](Property& _self, int64_t _key){return _self.eraseMapItem(_key);})
+        .def("erase_unionset_item", &Property::eraseUnionSetItem)
+        .def("copy_into", &Property::copyInto)
+        .def("unset", [](Property& _self) { return _self.unset(); })
         ;
 
     py::register_exception<JsonValidation>(ent, "JsonValidation");

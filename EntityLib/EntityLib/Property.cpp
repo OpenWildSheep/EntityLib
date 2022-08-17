@@ -33,7 +33,11 @@ namespace Ent
     {
         // Have to remove removed items in arrays
         auto const prefabSource = getPrefab();
-        auto const* const prefabPath = prefabSource.getFilePath();
+        if (not prefabSource.has_value())
+        {
+            throw ContextException("Can't applyToPrefab since Property has no prefab");
+        }
+        auto const* const prefabPath = prefabSource->getFilePath();
         auto& newJson = getEntityLib()->createTempJsonFile();
         newJson = getEntityLib()->readJsonFile(prefabPath);
         auto const clonedPrefab = Property(getEntityLib(), getSchema(), prefabPath, &newJson);
@@ -76,7 +80,11 @@ namespace Ent
     Property Property::objectSetRename(char const* _current, char const* _new) const
     {
         auto const prefab = getPrefab();
-        if (prefab.objectSetContains(_current))
+        if (not prefab.has_value())
+        {
+            throw ContextException("Can't applyToPrefab since Property has no prefab");
+        }
+        if (prefab->objectSetContains(_current))
         {
             throw CantRename(staticFormat(
                 "Cant rename %s into %s, because it is already in prefab", _current, _new));
@@ -98,6 +106,61 @@ namespace Ent
         visitRecursive(*currentItem, copier);
         eraseObjectSetItem(_current);
         return newItem;
+    }
+
+    std::map<char const*, Property> Property::getMapStringItems() const
+    {
+        std::map<char const*, Property> result;
+        for (char const* key : getPimpl().getMapKeysString())
+        {
+            result.emplace(key, getPimpl().getMapItem(key));
+        }
+        return result;
+    }
+
+    std::map<int64_t, Property> Property::getMapIntItems() const
+    {
+        std::map<int64_t, Property> result;
+        for (int64_t key : getPimpl().getMapKeysInt())
+        {
+            result.emplace(key, getPimpl().getMapItem(key));
+        }
+        return result;
+    }
+
+    std::vector<Property> Property::getObjectSetItems() const
+    {
+        std::vector<Property> result;
+        auto const keyType = getPimpl().getObjectSetKeyType();
+        if (keyType == DataType::string or keyType == DataType::entityRef)
+        {
+            for (char const* key : getPimpl().getObjectSetKeysString())
+            {
+                result.emplace_back(getPimpl().getObjectSetItem(key));
+            }
+        }
+        else if (keyType == DataType::integer)
+        {
+            for (auto const key : getPimpl().getObjectSetKeysInt())
+            {
+                result.emplace_back(getPimpl().getObjectSetItem(key));
+            }
+        }
+        else
+        {
+            ENTLIB_LOGIC_ERROR("Unexpected ObjectSetKeyType in getObjectSetItems()");
+        }
+        return result;
+    }
+
+    std::map<char const*, Property> Property::getUnionSetItems() const
+    {
+        std::map<char const*, Property> result;
+        for (auto&& [key, schema] : getPimpl().getUnionSetKeysString())
+        {
+            result.emplace(key, getPimpl().getUnionSetItem(key));
+        }
+        return result;
     }
 
     std::vector<PrefabInfo> getPrefabHistory(Property const& _prop)

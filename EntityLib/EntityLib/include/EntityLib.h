@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #pragma warning(push)
 #pragma warning(disable : 4464)
 #include "../Override.h"
@@ -168,7 +170,7 @@ namespace Ent
 
         /// @brief Resolve an EntityRef relative to this Node/Entity.
         /// Returns nullptr in case of failure.
-        Property resolveEntityRef(Property const& _node, EntityRef const& _entityRef) const;
+        std::optional<Property> resolveEntityRef(Property const& _node, EntityRef const& _entityRef) const;
         /// @brief Compute the EntityRef going from the Entity _from, to the Entity _to
         /// @pre _from and _to are Entity nodes
         EntityRef makeEntityRef(Property const& _from, Property const& _to) const;
@@ -195,6 +197,11 @@ namespace Ent
 
         void setFallBackEntityPath(char const* _filepath);
         char const* getFallBackEntityPath() const;
+
+        using NewDepFileCallback = std::function<void(char const*)>;
+
+        /// Set a callback to be informed when EntityLin load a file. Useful to list dependencies.
+        void setNewDepFileCallBack(NewDepFileCallback _callback);
 
     private:
         /// Load an Entity or a Scene, using the given cache
@@ -235,6 +242,7 @@ namespace Ent
         mutable std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> m_jsonDatabase;
         mutable std::vector<std::unique_ptr<nlohmann::json>> m_tempJsonFiles;
         String m_fallbackEntity;
+        NewDepFileCallback m_newDepFileCallback;
     };
 
 } // namespace Ent

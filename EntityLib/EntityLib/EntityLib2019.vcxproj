@@ -143,6 +143,7 @@
     <ClInclude Include="include\EntityLib.h" />
     <ClInclude Include="include\EntityLibCore.h" />
     <ClInclude Include="include\EntityLib\CopyProperty.h" />
+    <ClInclude Include="include\EntityLib\DumpProperty.h" />
     <ClInclude Include="include\EntityLib\FileProperty.h" />
     <ClInclude Include="include\EntityLib\Property.h" />
     <ClInclude Include="include\EntityLib\Visitor.h" />

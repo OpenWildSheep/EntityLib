@@ -79,6 +79,18 @@ namespace Ent
         {
             _Pop();
         }
+        void inPrimSet([[maybe_unused]] Property& _prop, [[maybe_unused]] DataType _dataType) override
+        {
+            _Back() = nlohmann::json::array();
+        }
+        void inObjectSet([[maybe_unused]] Property& _prop) override
+        {
+            _Back() = nlohmann::json::array();
+        }
+        void inUnionSet([[maybe_unused]] Property& _prop) override
+        {
+            _Back() = nlohmann::json::array();
+        }
         void key([[maybe_unused]] Property& _source, char const* _key) override
         {
             _Back().push_back(_key);

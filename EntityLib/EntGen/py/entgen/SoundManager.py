@@ -4,6 +4,7 @@
 from entgen_helpers import *
 import EntityLibPy
 
+from entgen.SamplesPerAudioFrame import *
 from entgen.String import *
 from entgen.Int import *
 from entgen.Bool import *
@@ -379,6 +380,11 @@ class SoundManager(HelperObject):
         return Float(self._node.at("RainLevelStart"))
     @RainLevelStart.setter
     def RainLevelStart(self, val): self.RainLevelStart.set(val)
+    @property
+    def SamplesPerAudioFrame(self):  # type: ()->SamplesPerAudioFrame
+        return SamplesPerAudioFrame(self._node.at("SamplesPerAudioFrame"))
+    @SamplesPerAudioFrame.setter
+    def SamplesPerAudioFrame(self, val): self.SamplesPerAudioFrame.set(val)
     @property
     def SoundOpportunitiesConfig(self):  # type: ()->SoundOpportunitiesConfig
         return SoundOpportunitiesConfig(self._node.at("SoundOpportunitiesConfig"))

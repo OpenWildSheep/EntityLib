@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.Int import *
 from entgen.ComponentGD import *
 from entgen.Matrix33 import *
 
@@ -35,6 +36,11 @@ class BiomePatch(HelperObject):
         return String(self._node.at("MeshFile"))
     @MeshFile.setter
     def MeshFile(self, val): self.MeshFile.set(val)
+    @property
+    def Priority(self):  # type: ()->Int
+        return Int(self._node.at("Priority"))
+    @Priority.setter
+    def Priority(self, val): self.Priority.set(val)
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))

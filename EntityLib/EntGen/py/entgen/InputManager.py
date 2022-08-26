@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.Float import *
 from entgen.Manager import *
 
 from EntityLibPy import Node
@@ -19,6 +20,11 @@ class InputManager(HelperObject):
         return InputManager(entlib.make_node(InputManager.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def JoyThreshold(self):  # type: ()->Float
+        return Float(self._node.at("JoyThreshold"))
+    @JoyThreshold.setter
+    def JoyThreshold(self, val): self.JoyThreshold.set(val)
     @property
     def Super(self):  # type: ()->Manager
         return Manager(self._node.at("Super"))

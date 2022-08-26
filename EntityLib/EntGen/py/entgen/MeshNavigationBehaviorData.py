@@ -52,6 +52,16 @@ class MeshNavigationBehaviorData(HelperObject):
     @MeshNavigationAllowedMode.setter
     def MeshNavigationAllowedMode(self, val): self.MeshNavigationAllowedMode.set(val)
     @property
+    def MinPlayRatioInConstrainedMove(self):  # type: ()->Float
+        return Float(self._node.at("MinPlayRatioInConstrainedMove"))
+    @MinPlayRatioInConstrainedMove.setter
+    def MinPlayRatioInConstrainedMove(self, val): self.MinPlayRatioInConstrainedMove.set(val)
+    @property
+    def MinSpeedInConstrainedMove(self):  # type: ()->Float
+        return Float(self._node.at("MinSpeedInConstrainedMove"))
+    @MinSpeedInConstrainedMove.setter
+    def MinSpeedInConstrainedMove(self, val): self.MinSpeedInConstrainedMove.set(val)
+    @property
     def OrientationRateToPrepareToHoldingOnToNavigationMesh(self):  # type: ()->Float
         return Float(self._node.at("OrientationRateToPrepareToHoldingOnToNavigationMesh"))
     @OrientationRateToPrepareToHoldingOnToNavigationMesh.setter

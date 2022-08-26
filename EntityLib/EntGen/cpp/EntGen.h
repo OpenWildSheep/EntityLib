@@ -47,6 +47,7 @@ namespace Ent
             Mesh,
             WaveRenderingType_COUNT,
         };
+        struct WallRunData;
         struct Walkability;
         struct VegetationData;
         struct VegetationDataList;
@@ -55,7 +56,6 @@ namespace Ent
         struct retiming;
         struct WaveRendererProperties;
         struct WaveProperties;
-        struct WallRunData;
         struct sJointUniversalDesc;
         struct sJointSwingTwistDesc;
         struct sJointSliderDesc;
@@ -242,6 +242,14 @@ namespace Ent
         struct ScriptPathAndDataSet;
         struct ScaleFactor;
         struct ScaleConverter;
+        struct SamplesPerAudioFrame; // enum
+        enum class SamplesPerAudioFrameEnum
+        {
+            _256,
+            _512,
+            _1024,
+            _2048,
+        };
         struct RuntimeMode; // enum
         enum class RuntimeModeEnum
         {
@@ -2472,6 +2480,23 @@ namespace Ent
             return static_cast<WaveRenderingTypeEnum>(details::indexInEnum(value, WaveRenderingType::enumToString));
         }
 
+        struct WallRunData : HelperObject // Object
+        {
+            WallRunData(Ent::Node* _node): HelperObject(_node) {}
+            static constexpr char schemaName[] = "WallRunData";
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
+            }
+            static NodeUniquePtr create(Ent::EntityLib& _entlib)
+            {
+                return _entlib.makeNode(schemaName);
+            }
+            Ent::Gen::Float JumpAngle() const;
+            Ent::Gen::String _comment() const;
+            PrimArray<Ent::Gen::EntityRef> wallRunLinks() const;
+        };
+
         struct Walkability : HelperObject // Object
         {
             Walkability(Ent::Node* _node): HelperObject(_node) {}
@@ -2620,24 +2645,6 @@ namespace Ent
             Ent::Gen::WaveRenderingType RenderingType() const;
             Ent::Gen::Int Width() const;
             Ent::Gen::String _comment() const;
-        };
-
-        struct WallRunData : HelperObject // Object
-        {
-            WallRunData(Ent::Node* _node): HelperObject(_node) {}
-            static constexpr char schemaName[] = "WallRunData";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
-            }
-            static NodeUniquePtr create(Ent::EntityLib& _entlib)
-            {
-                return _entlib.makeNode(schemaName);
-            }
-            Ent::Gen::Float JumpAngle() const;
-            Ent::Gen::String _comment() const;
-            Ent::Gen::Vector3 moveDirection() const;
-            PrimArray<Ent::Gen::EntityRef> wallRunLinks() const;
         };
 
 
@@ -3742,6 +3749,31 @@ namespace Ent
             Ent::Gen::Vector2 out() const;
             Ent::Gen::String outText() const;
         };
+
+        struct SamplesPerAudioFrame : EnumPropHelper<SamplesPerAudioFrame, SamplesPerAudioFrameEnum> // Enum
+        {
+            using Enum = SamplesPerAudioFrameEnum;
+            using PropHelper<SamplesPerAudioFrame, Enum>::operator=;
+            SamplesPerAudioFrame(Ent::Node* _node): EnumPropHelper<SamplesPerAudioFrame, Enum>(_node) {}
+            static constexpr char schemaName[] = "SamplesPerAudioFrame";
+            static constexpr char const* enumToString[] = {
+                "256",
+                "512",
+                "1024",
+                "2048",
+            };
+        };
+        inline char const* toString(SamplesPerAudioFrameEnum value)
+        {
+            if(size_t(value) >= std::size(SamplesPerAudioFrame::enumToString))
+                throw std::runtime_error("Wrong enum value");
+            return SamplesPerAudioFrame::enumToString[size_t(value)];
+        }
+        inline char const* toInternal(SamplesPerAudioFrameEnum value) { return toString(value); }
+        template<> inline SamplesPerAudioFrameEnum strToEnum<SamplesPerAudioFrameEnum>(char const* value)
+        {
+            return static_cast<SamplesPerAudioFrameEnum>(details::indexInEnum(value, SamplesPerAudioFrame::enumToString));
+        }
 
         struct RuntimeMode : EnumPropHelper<RuntimeMode, RuntimeModeEnum> // Enum
         {
@@ -6076,6 +6108,8 @@ namespace Ent
             Ent::Gen::Float EdgeTransitionConstraintWallAngle() const;
             Ent::Gen::Float MaxNormalAngle() const;
             Ent::Gen::MeshNavigationAllowedMode MeshNavigationAllowedMode() const;
+            Ent::Gen::Float MinPlayRatioInConstrainedMove() const;
+            Ent::Gen::Float MinSpeedInConstrainedMove() const;
             Ent::Gen::Float OrientationRateToPrepareToHoldingOnToNavigationMesh() const;
             Ent::Gen::Float RayCastLengthLegFactor() const;
             Ent::Gen::Float RayCastLengthSpeedFactor() const;
@@ -6736,6 +6770,7 @@ namespace Ent
             {
                 return _entlib.makeNode(schemaName);
             }
+            Ent::Gen::Float JoyThreshold() const;
             Ent::Gen::Manager Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -12873,6 +12908,7 @@ namespace Ent
             Ent::Gen::Matrix33 LocalMatrix() const;
             Ent::Gen::String MaterialGroupName() const;
             Ent::Gen::String MeshFile() const;
+            Ent::Gen::Int Priority() const;
             Ent::Gen::ComponentGD Super() const;
             Ent::Gen::String _comment() const;
         };
@@ -14649,6 +14685,7 @@ namespace Ent
             Ent::Gen::String RTPC_UnderwaterCameraActivator() const;
             Ent::Gen::String RTPC_UnderwaterDepth() const;
             Ent::Gen::Float RainLevelStart() const;
+            Ent::Gen::SamplesPerAudioFrame SamplesPerAudioFrame() const;
             Ent::Gen::SoundOpportunitiesConfig SoundOpportunitiesConfig() const;
             Ent::Gen::String SoundTagDataFile() const;
             Ent::Gen::String Sound_GameEntity_Stop_All() const;
@@ -15704,7 +15741,6 @@ namespace Ent
             }
             Ent::Gen::Float DistanceMax() const;
             Ent::Gen::Float DistanceMin() const;
-            Ent::Gen::ScaleConverter JoyThreshold() const;
             Ent::Gen::Float MoveBlend() const;
             Ent::Gen::Float MoveSpeedAtScreenWidthMax() const;
             Ent::Gen::Float MoveSpeedAtScreenWidthMin() const;
@@ -27149,6 +27185,19 @@ namespace Ent
         {
             return Ent::Gen::Bool(node->at("val"));
         }
+        // WallRunData
+        inline Ent::Gen::Float WallRunData::JumpAngle() const
+        {
+            return Ent::Gen::Float(node->at("JumpAngle"));
+        }
+        inline Ent::Gen::String WallRunData::_comment() const
+        {
+            return Ent::Gen::String(node->at("_comment"));
+        }
+        inline PrimArray<Ent::Gen::EntityRef> WallRunData::wallRunLinks() const
+        {
+            return PrimArray<Ent::Gen::EntityRef>(node->at("wallRunLinks"));
+        }
         // Walkability
         inline Ent::Gen::String Walkability::_comment() const
         {
@@ -27360,23 +27409,6 @@ namespace Ent
         inline Ent::Gen::String WaveProperties::_comment() const
         {
             return Ent::Gen::String(node->at("_comment"));
-        }
-        // WallRunData
-        inline Ent::Gen::Float WallRunData::JumpAngle() const
-        {
-            return Ent::Gen::Float(node->at("JumpAngle"));
-        }
-        inline Ent::Gen::String WallRunData::_comment() const
-        {
-            return Ent::Gen::String(node->at("_comment"));
-        }
-        inline Ent::Gen::Vector3 WallRunData::moveDirection() const
-        {
-            return Ent::Gen::Vector3(node->at("moveDirection"));
-        }
-        inline PrimArray<Ent::Gen::EntityRef> WallRunData::wallRunLinks() const
-        {
-            return PrimArray<Ent::Gen::EntityRef>(node->at("wallRunLinks"));
         }
         // sJointUniversalDesc
         inline Ent::Gen::String sJointUniversalDesc::_comment() const
@@ -32523,6 +32555,14 @@ namespace Ent
         {
             return Ent::Gen::MeshNavigationAllowedMode(node->at("MeshNavigationAllowedMode"));
         }
+        inline Ent::Gen::Float MeshNavigationBehaviorData::MinPlayRatioInConstrainedMove() const
+        {
+            return Ent::Gen::Float(node->at("MinPlayRatioInConstrainedMove"));
+        }
+        inline Ent::Gen::Float MeshNavigationBehaviorData::MinSpeedInConstrainedMove() const
+        {
+            return Ent::Gen::Float(node->at("MinSpeedInConstrainedMove"));
+        }
         inline Ent::Gen::Float MeshNavigationBehaviorData::OrientationRateToPrepareToHoldingOnToNavigationMesh() const
         {
             return Ent::Gen::Float(node->at("OrientationRateToPrepareToHoldingOnToNavigationMesh"));
@@ -33131,6 +33171,10 @@ namespace Ent
             return Ent::Gen::String(node->at("_comment"));
         }
         // InputManager
+        inline Ent::Gen::Float InputManager::JoyThreshold() const
+        {
+            return Ent::Gen::Float(node->at("JoyThreshold"));
+        }
         inline Ent::Gen::Manager InputManager::Super() const
         {
             return Ent::Gen::Manager(node->at("Super"));
@@ -39802,6 +39846,10 @@ namespace Ent
         {
             return Ent::Gen::String(node->at("MeshFile"));
         }
+        inline Ent::Gen::Int BiomePatch::Priority() const
+        {
+            return Ent::Gen::Int(node->at("Priority"));
+        }
         inline Ent::Gen::ComponentGD BiomePatch::Super() const
         {
             return Ent::Gen::ComponentGD(node->at("Super"));
@@ -46029,6 +46077,10 @@ namespace Ent
         {
             return Ent::Gen::Float(node->at("RainLevelStart"));
         }
+        inline Ent::Gen::SamplesPerAudioFrame SoundManager::SamplesPerAudioFrame() const
+        {
+            return Ent::Gen::SamplesPerAudioFrame(node->at("SamplesPerAudioFrame"));
+        }
         inline Ent::Gen::SoundOpportunitiesConfig SoundManager::SoundOpportunitiesConfig() const
         {
             return Ent::Gen::SoundOpportunitiesConfig(node->at("SoundOpportunitiesConfig"));
@@ -47394,10 +47446,6 @@ namespace Ent
         inline Ent::Gen::Float CameraEditorData::DistanceMin() const
         {
             return Ent::Gen::Float(node->at("DistanceMin"));
-        }
-        inline Ent::Gen::ScaleConverter CameraEditorData::JoyThreshold() const
-        {
-            return Ent::Gen::ScaleConverter(node->at("JoyThreshold"));
         }
         inline Ent::Gen::Float CameraEditorData::MoveBlend() const
         {

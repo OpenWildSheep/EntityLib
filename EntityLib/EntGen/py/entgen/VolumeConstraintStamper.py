@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.CapabilitiesAndTags import *
 from entgen.GeometryStamper import *
 
 from EntityLibPy import Node
@@ -19,6 +20,9 @@ class VolumeConstraintStamper(HelperObject):
         return VolumeConstraintStamper(entlib.make_node(VolumeConstraintStamper.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def CapabilitiesAndTags(self):  # type: ()->CapabilitiesAndTags
+        return CapabilitiesAndTags(self._node.at("CapabilitiesAndTags"))
     @property
     def Super(self):  # type: ()->GeometryStamper
         return GeometryStamper(self._node.at("Super"))

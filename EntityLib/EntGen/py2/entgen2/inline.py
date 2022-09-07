@@ -514,6 +514,16 @@ class WallRunData(HelperObject):
     def save(self, destfile):
         self.node.save(destfile)
     @property
+    def AcceptanceRadius(self):  # type: ()->Float
+        return Float(self._node.get_object_field("AcceptanceRadius"))
+    @AcceptanceRadius.setter
+    def AcceptanceRadius(self, val): self.AcceptanceRadius.set(val)
+    @property
+    def ExitWithLongJump(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("ExitWithLongJump"))
+    @ExitWithLongJump.setter
+    def ExitWithLongJump(self, val): self.ExitWithLongJump.set(val)
+    @property
     def JumpAngle(self):  # type: ()->Float
         return Float(self._node.get_object_field("JumpAngle"))
     @JumpAngle.setter
@@ -3771,64 +3781,6 @@ class ReflectionDb(HelperObject):
 
 from EntityLibPy import Property
 
-class ReflectedMaterialGroup(HelperObject):
-    schema_name = "ReflectedMaterialGroup"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ReflectedMaterialGroup
-        return ReflectedMaterialGroup(Property(entlib, entlib.get_schema(ReflectedMaterialGroup.schema_name), sourcefile))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->ReflectedMaterialGroup
-        return ReflectedMaterialGroup(Property.create(entlib, entlib.get_schema(ReflectedMaterialGroup.schema_name)))
-    def save(self, destfile):
-        self.node.save(destfile)
-    @property
-    def Materials(self):  # type: ()->PrimArray[String]
-        return (lambda n: PrimArray(String, n))(self._node.get_object_field("Materials"))
-    @Materials.setter
-    def Materials(self, val): self.Materials.set(val)
-    @property
-    def OverrideGroups(self):  # type: ()->PrimArray[String]
-        return (lambda n: PrimArray(String, n))(self._node.get_object_field("OverrideGroups"))
-    @OverrideGroups.setter
-    def OverrideGroups(self, val): self.OverrideGroups.set(val)
-    @property
-    def Tags(self):  # type: ()->PrimArray[String]
-        return (lambda n: PrimArray(String, n))(self._node.get_object_field("Tags"))
-    @Tags.setter
-    def Tags(self, val): self.Tags.set(val)
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.get_object_field("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Property
-
-class ReflectedMaterialGroupVector(HelperObject):
-    schema_name = "ReflectedMaterialGroupVector"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ReflectedMaterialGroupVector
-        return ReflectedMaterialGroupVector(Property(entlib, entlib.get_schema(ReflectedMaterialGroupVector.schema_name), sourcefile))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->ReflectedMaterialGroupVector
-        return ReflectedMaterialGroupVector(Property.create(entlib, entlib.get_schema(ReflectedMaterialGroupVector.schema_name)))
-    def save(self, destfile):
-        self.node.save(destfile)
-    @property
-    def Groups(self):  # type: ()->Map[str, ReflectedMaterialGroup]
-        return (lambda n: Map(str, ReflectedMaterialGroup, n))(self._node.get_object_field("Groups"))
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.get_object_field("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Property
-
 class ReflectedDetailMaterial(HelperObject):
     schema_name = "ReflectedDetailMaterial"
     @staticmethod
@@ -3907,37 +3859,6 @@ class ReflectedDetailMaterialVariants(HelperObject):
     @property
     def Variants(self):  # type: ()->Map[str, ReflectedDetailMaterial]
         return (lambda n: Map(str, ReflectedDetailMaterial, n))(self._node.get_object_field("Variants"))
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.get_object_field("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Property
-
-class ReflectedDetailMaterialBank(HelperObject):
-    schema_name = "ReflectedDetailMaterialBank"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->ReflectedDetailMaterialBank
-        return ReflectedDetailMaterialBank(Property(entlib, entlib.get_schema(ReflectedDetailMaterialBank.schema_name), sourcefile))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->ReflectedDetailMaterialBank
-        return ReflectedDetailMaterialBank(Property.create(entlib, entlib.get_schema(ReflectedDetailMaterialBank.schema_name)))
-    def save(self, destfile):
-        self.node.save(destfile)
-    @property
-    def Bank(self):  # type: ()->Array[ReflectedDetailMaterialVariants]
-        return (lambda n: Array(ReflectedDetailMaterialVariants, n))(self._node.get_object_field("Bank"))
-    @property
-    def Filters(self):  # type: ()->PrimArray[String]
-        return (lambda n: PrimArray(String, n))(self._node.get_object_field("Filters"))
-    @Filters.setter
-    def Filters(self, val): self.Filters.set(val)
-    @property
-    def Groups(self):  # type: ()->ReflectedMaterialGroupVector
-        return ReflectedMaterialGroupVector(self._node.get_object_field("Groups"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.get_object_field("_comment"))
@@ -6029,6 +5950,16 @@ class VegetationManager(HelperObject):
     def save(self, destfile):
         self.node.save(destfile)
     @property
+    def BendDisplaceFadeStart(self):  # type: ()->Float
+        return Float(self._node.get_object_field("BendDisplaceFadeStart"))
+    @BendDisplaceFadeStart.setter
+    def BendDisplaceFadeStart(self, val): self.BendDisplaceFadeStart.set(val)
+    @property
+    def BendDisplaceFadeStop(self):  # type: ()->Float
+        return Float(self._node.get_object_field("BendDisplaceFadeStop"))
+    @BendDisplaceFadeStop.setter
+    def BendDisplaceFadeStop(self, val): self.BendDisplaceFadeStop.set(val)
+    @property
     def BuryDepth(self):  # type: ()->Float
         return Float(self._node.get_object_field("BuryDepth"))
     @BuryDepth.setter
@@ -6101,6 +6032,16 @@ class VegetationManager(HelperObject):
         return String(self._node.get_object_field("VegetationBankPath"))
     @VegetationBankPath.setter
     def VegetationBankPath(self, val): self.VegetationBankPath.set(val)
+    @property
+    def WindDisplaceFadeStart(self):  # type: ()->Float
+        return Float(self._node.get_object_field("WindDisplaceFadeStart"))
+    @WindDisplaceFadeStart.setter
+    def WindDisplaceFadeStart(self, val): self.WindDisplaceFadeStart.set(val)
+    @property
+    def WindDisplaceFadeStop(self):  # type: ()->Float
+        return Float(self._node.get_object_field("WindDisplaceFadeStop"))
+    @WindDisplaceFadeStop.setter
+    def WindDisplaceFadeStop(self, val): self.WindDisplaceFadeStop.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.get_object_field("_comment"))
@@ -7891,6 +7832,46 @@ class Interactor(HelperObject):
 
 from EntityLibPy import Property
 
+class InteractionInteractorEntityState(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->ResponsiblePointer_ActorState_
+        return ResponsiblePointer_ActorState_(self._node.get_object_field("val"))
+    pass
+
+
+from EntityLibPy import Property
+
+class InteractionInteractableEntityState(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->ResponsiblePointer_ActorState_
+        return ResponsiblePointer_ActorState_(self._node.get_object_field("val"))
+    pass
+
+
+from EntityLibPy import Property
+
 class InputCollisionBehaviorData(HelperObject):
     schema_name = "InputCollisionBehaviorData"
     @staticmethod
@@ -8064,6 +8045,7 @@ class HotSpotTypeEnum(Enum):
     takehandle = "takehandle"
     vertebra = "vertebra"
     respawnslot = "respawnslot"
+    perception = "perception"
     HotSpotType_COUNT = "HotSpotType_COUNT"
 
 
@@ -8747,29 +8729,6 @@ class GeometryStamper(HelperObject):
 
 from EntityLibPy import Property
 
-class VolumeConstraintStamper(HelperObject):
-    schema_name = "VolumeConstraintStamper"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->VolumeConstraintStamper
-        return VolumeConstraintStamper(Property(entlib, entlib.get_schema(VolumeConstraintStamper.schema_name), sourcefile))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->VolumeConstraintStamper
-        return VolumeConstraintStamper(Property.create(entlib, entlib.get_schema(VolumeConstraintStamper.schema_name)))
-    def save(self, destfile):
-        self.node.save(destfile)
-    @property
-    def Super(self):  # type: ()->GeometryStamper
-        return GeometryStamper(self._node.get_object_field("Super"))
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.get_object_field("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Property
-
 class SkinnedPhysMeshStamper(HelperObject):
     schema_name = "SkinnedPhysMeshStamper"
     @staticmethod
@@ -9236,6 +9195,9 @@ class GamePadSpeedBehaviorData(HelperObject):
     def save(self, destfile):
         self.node.save(destfile)
     @property
+    def AntiReboundDelayConverter(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.get_object_field("AntiReboundDelayConverter"))
+    @property
     def DeadZoneThreshold(self):  # type: ()->ScaleConverter
         return ScaleConverter(self._node.get_object_field("DeadZoneThreshold"))
     @property
@@ -9337,6 +9299,11 @@ class GameLODData(HelperObject):
     @CreatureDistance.setter
     def CreatureDistance(self, val): self.CreatureDistance.set(val)
     @property
+    def DistanceHysteresis(self):  # type: ()->Float
+        return Float(self._node.get_object_field("DistanceHysteresis"))
+    @DistanceHysteresis.setter
+    def DistanceHysteresis(self, val): self.DistanceHysteresis.set(val)
+    @property
     def _comment(self):  # type: ()->String
         return String(self._node.get_object_field("_comment"))
     @_comment.setter
@@ -9417,6 +9384,36 @@ class GameImmersionData(HelperObject):
         return Float(self._node.get_object_field("speedZMinToJump"))
     @speedZMinToJump.setter
     def speedZMinToJump(self, val): self.speedZMinToJump.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class GameGroundNormalData(HelperObject):
+    schema_name = "GameGroundNormalData"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->GameGroundNormalData
+        return GameGroundNormalData(Property(entlib, entlib.get_schema(GameGroundNormalData.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->GameGroundNormalData
+        return GameGroundNormalData(Property.create(entlib, entlib.get_schema(GameGroundNormalData.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def AgainstWallTimeHysteresis(self):  # type: ()->Float
+        return Float(self._node.get_object_field("AgainstWallTimeHysteresis"))
+    @AgainstWallTimeHysteresis.setter
+    def AgainstWallTimeHysteresis(self, val): self.AgainstWallTimeHysteresis.set(val)
+    @property
+    def IsOnStepTimeHysteresis(self):  # type: ()->Float
+        return Float(self._node.get_object_field("IsOnStepTimeHysteresis"))
+    @IsOnStepTimeHysteresis.setter
+    def IsOnStepTimeHysteresis(self, val): self.IsOnStepTimeHysteresis.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
     pass
 
 
@@ -10230,6 +10227,46 @@ class ForceBlendIn(HelperObject):
         return Float(self._node.get_object_field("val"))
     @val.setter
     def val(self, val): self.val.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class FocusInteractorEntityState(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->ResponsiblePointer_ActorState_
+        return ResponsiblePointer_ActorState_(self._node.get_object_field("val"))
+    pass
+
+
+from EntityLibPy import Property
+
+class FocusInteractableEntityState(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->ResponsiblePointer_ActorState_
+        return ResponsiblePointer_ActorState_(self._node.get_object_field("val"))
     pass
 
 
@@ -11339,6 +11376,46 @@ from EntityLibPy import Property
 
 class EntityID(HelperObject):
 
+    pass
+
+
+from EntityLibPy import Property
+
+class EntityExitedEntityState(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->ResponsiblePointer_ActorState_
+        return ResponsiblePointer_ActorState_(self._node.get_object_field("val"))
+    pass
+
+
+from EntityLibPy import Property
+
+class EntityEnteredEntityState(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->ResponsiblePointer_ActorState_
+        return ResponsiblePointer_ActorState_(self._node.get_object_field("val"))
     pass
 
 
@@ -12585,6 +12662,47 @@ class CreatureProfile(HelperObject):
 
 
 from EntityLibPy import Property
+class CreatureLODEnum(Enum):
+    High = "High"
+    Low = "Low"
+    CreatureLOD_COUNT = "CreatureLOD_COUNT"
+
+
+class CreatureLOD(Primitive[CreatureLODEnum]):  # Enum
+    def __init__(self, node):
+        super(CreatureLOD, self).__init__(CreatureLODEnum, node)
+    schema_name = "CreatureLOD"
+    def __call__(self, node):  # type: (EntityLibPy.Node) -> CreatureLOD
+        return CreatureLOD(node)
+    def set(self, val):  # type: (CreatureLODEnum) -> None
+        return self._node.set_string(val.value)
+    def get(self):  # type: () -> T
+        return self._item_type(self._node.value)
+
+
+from EntityLibPy import Property
+
+class creatureLOD(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->CreatureLOD
+        return CreatureLOD(self._node.get_object_field("val"))
+    @val.setter
+    def val(self, val): self.val.set(val)
+    pass
+
+
+from EntityLibPy import Property
 
 class CreatureDangerousness(HelperObject):
     schema_name = "CreatureDangerousness"
@@ -13262,6 +13380,29 @@ class MountIKControllerComponentInput(HelperObject):
 
 from EntityLibPy import Property
 
+class MeditateComponentInput(HelperObject):
+    schema_name = "MeditateComponentInput"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->MeditateComponentInput
+        return MeditateComponentInput(Property(entlib, entlib.get_schema(MeditateComponentInput.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->MeditateComponentInput
+        return MeditateComponentInput(Property.create(entlib, entlib.get_schema(MeditateComponentInput.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def Super(self):  # type: ()->ComponentInput
+        return ComponentInput(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
 class LifeComponentInput(HelperObject):
     schema_name = "LifeComponentInput"
     @staticmethod
@@ -13275,61 +13416,6 @@ class LifeComponentInput(HelperObject):
     @property
     def DamageGauge(self):  # type: ()->DamageGauge
         return DamageGauge(self._node.get_object_field("DamageGauge"))
-    @property
-    def Super(self):  # type: ()->ComponentInput
-        return ComponentInput(self._node.get_object_field("Super"))
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.get_object_field("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Property
-
-class InteractorComponentInput(HelperObject):
-    schema_name = "InteractorComponentInput"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->InteractorComponentInput
-        return InteractorComponentInput(Property(entlib, entlib.get_schema(InteractorComponentInput.schema_name), sourcefile))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->InteractorComponentInput
-        return InteractorComponentInput(Property.create(entlib, entlib.get_schema(InteractorComponentInput.schema_name)))
-    def save(self, destfile):
-        self.node.save(destfile)
-    @property
-    def EndPosition(self):  # type: ()->EndPosition
-        return EndPosition(self._node.get_object_field("EndPosition"))
-    @property
-    def IsActive(self):  # type: ()->IsActive
-        return IsActive(self._node.get_object_field("IsActive"))
-    @property
-    def Super(self):  # type: ()->ComponentInput
-        return ComponentInput(self._node.get_object_field("Super"))
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.get_object_field("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Property
-
-class InteractableComponentInput(HelperObject):
-    schema_name = "InteractableComponentInput"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->InteractableComponentInput
-        return InteractableComponentInput(Property(entlib, entlib.get_schema(InteractableComponentInput.schema_name), sourcefile))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->InteractableComponentInput
-        return InteractableComponentInput(Property.create(entlib, entlib.get_schema(InteractableComponentInput.schema_name)))
-    def save(self, destfile):
-        self.node.save(destfile)
-    @property
-    def Interactor(self):  # type: ()->Interactor
-        return Interactor(self._node.get_object_field("Interactor"))
     @property
     def Super(self):  # type: ()->ComponentInput
         return ComponentInput(self._node.get_object_field("Super"))
@@ -13555,6 +13641,9 @@ class CharacterControllerComponentInput(HelperObject):
         return String(self._node.get_object_field("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    @property
+    def creatureLOD(self):  # type: ()->creatureLOD
+        return creatureLOD(self._node.get_object_field("creatureLOD"))
     pass
 
 
@@ -13751,6 +13840,11 @@ class WallRunGD(HelperObject):
         return Float(self._node.get_object_field("dropCoyoteJumpMaxTime"))
     @dropCoyoteJumpMaxTime.setter
     def dropCoyoteJumpMaxTime(self, val): self.dropCoyoteJumpMaxTime.set(val)
+    @property
+    def dropDelayAfterInvalidDirectionRequested(self):  # type: ()->Float
+        return Float(self._node.get_object_field("dropDelayAfterInvalidDirectionRequested"))
+    @dropDelayAfterInvalidDirectionRequested.setter
+    def dropDelayAfterInvalidDirectionRequested(self, val): self.dropDelayAfterInvalidDirectionRequested.set(val)
     @property
     def dropTrajectoryRotationYaw(self):  # type: ()->Float
         return Float(self._node.get_object_field("dropTrajectoryRotationYaw"))
@@ -14884,6 +14978,11 @@ class StaticObjectGD(HelperObject):
         return Bool(self._node.get_object_field("EDITOR_IsCave"))
     @EDITOR_IsCave.setter
     def EDITOR_IsCave(self, val): self.EDITOR_IsCave.set(val)
+    @property
+    def EDITOR_MergeInNavMesh(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("EDITOR_MergeInNavMesh"))
+    @EDITOR_MergeInNavMesh.setter
+    def EDITOR_MergeInNavMesh(self, val): self.EDITOR_MergeInNavMesh.set(val)
     @property
     def EDITOR_UsedInMultiLayerHeightmap(self):  # type: ()->Bool
         return Bool(self._node.get_object_field("EDITOR_UsedInMultiLayerHeightmap"))
@@ -16069,6 +16168,12 @@ class PhysicsTriggerGD(HelperObject):
     def save(self, destfile):
         self.node.save(destfile)
     @property
+    def EntityEnteredEntityState(self):  # type: ()->EntityEnteredEntityState
+        return EntityEnteredEntityState(self._node.get_object_field("EntityEnteredEntityState"))
+    @property
+    def EntityExitedEntityState(self):  # type: ()->EntityExitedEntityState
+        return EntityExitedEntityState(self._node.get_object_field("EntityExitedEntityState"))
+    @property
     def RequiredComponents(self):  # type: ()->PrimArray[String]
         return (lambda n: PrimArray(String, n))(self._node.get_object_field("RequiredComponents"))
     @RequiredComponents.setter
@@ -17017,6 +17122,39 @@ class Mesh(HelperObject):
 
 from EntityLibPy import Property
 
+class MeditateGD(HelperObject):
+    schema_name = "MeditateGD"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->MeditateGD
+        return MeditateGD(Property(entlib, entlib.get_schema(MeditateGD.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->MeditateGD
+        return MeditateGD(Property.create(entlib, entlib.get_schema(MeditateGD.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def GameEffectNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.get_object_field("GameEffectNames"))
+    @GameEffectNames.setter
+    def GameEffectNames(self, val): self.GameEffectNames.set(val)
+    @property
+    def MinSpeedToLeave(self):  # type: ()->SpeedMode
+        return SpeedMode(self._node.get_object_field("MinSpeedToLeave"))
+    @MinSpeedToLeave.setter
+    def MinSpeedToLeave(self, val): self.MinSpeedToLeave.set(val)
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
 class LifeComponentGD(HelperObject):
     schema_name = "LifeComponentGD"
     @staticmethod
@@ -17232,8 +17370,11 @@ class InteractableGD(HelperObject):
     def save(self, destfile):
         self.node.save(destfile)
     @property
-    def GPEActorState(self):  # type: ()->ResponsiblePointer_ActorState_
-        return ResponsiblePointer_ActorState_(self._node.get_object_field("GPEActorState"))
+    def FocusInteractableEntityState(self):  # type: ()->FocusInteractableEntityState
+        return FocusInteractableEntityState(self._node.get_object_field("FocusInteractableEntityState"))
+    @property
+    def FocusInteractorEntityState(self):  # type: ()->FocusInteractorEntityState
+        return FocusInteractorEntityState(self._node.get_object_field("FocusInteractorEntityState"))
     @property
     def GPEType(self):  # type: ()->GPEType
         return GPEType(self._node.get_object_field("GPEType"))
@@ -17245,8 +17386,26 @@ class InteractableGD(HelperObject):
     @HotspotName.setter
     def HotspotName(self, val): self.HotspotName.set(val)
     @property
-    def InteractionModeActorState(self):  # type: ()->ResponsiblePointer_ActorState_
-        return ResponsiblePointer_ActorState_(self._node.get_object_field("InteractionModeActorState"))
+    def InteractMaxDistance(self):  # type: ()->Float
+        return Float(self._node.get_object_field("InteractMaxDistance"))
+    @InteractMaxDistance.setter
+    def InteractMaxDistance(self, val): self.InteractMaxDistance.set(val)
+    @property
+    def InteractMaxDistanceHysteresis(self):  # type: ()->Float
+        return Float(self._node.get_object_field("InteractMaxDistanceHysteresis"))
+    @InteractMaxDistanceHysteresis.setter
+    def InteractMaxDistanceHysteresis(self, val): self.InteractMaxDistanceHysteresis.set(val)
+    @property
+    def InteractionInteractableEntityState(self):  # type: ()->InteractionInteractableEntityState
+        return InteractionInteractableEntityState(self._node.get_object_field("InteractionInteractableEntityState"))
+    @property
+    def InteractionInteractorEntityState(self):  # type: ()->InteractionInteractorEntityState
+        return InteractionInteractorEntityState(self._node.get_object_field("InteractionInteractorEntityState"))
+    @property
+    def InteractionPriority(self):  # type: ()->Float
+        return Float(self._node.get_object_field("InteractionPriority"))
+    @InteractionPriority.setter
+    def InteractionPriority(self, val): self.InteractionPriority.set(val)
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.get_object_field("Super"))
@@ -17441,15 +17600,10 @@ class HeightMapComponentGD(HelperObject):
     def save(self, destfile):
         self.node.save(destfile)
     @property
-    def HeightMapArchivePath(self):  # type: ()->String
-        return String(self._node.get_object_field("HeightMapArchivePath"))
-    @HeightMapArchivePath.setter
-    def HeightMapArchivePath(self, val): self.HeightMapArchivePath.set(val)
-    @property
-    def HeightMapPaths(self):  # type: ()->PrimArray[String]
-        return (lambda n: PrimArray(String, n))(self._node.get_object_field("HeightMapPaths"))
-    @HeightMapPaths.setter
-    def HeightMapPaths(self, val): self.HeightMapPaths.set(val)
+    def HeightMapWBin(self):  # type: ()->String
+        return String(self._node.get_object_field("HeightMapWBin"))
+    @HeightMapWBin.setter
+    def HeightMapWBin(self, val): self.HeightMapWBin.set(val)
     @property
     def HeightScale(self):  # type: ()->Float
         return Float(self._node.get_object_field("HeightScale"))
@@ -18962,6 +19116,11 @@ class AnimationModelGD(HelperObject):
     def additionalSpeedDebug(self):  # type: ()->Map[LocomotionModeEnum, Map[SpeedModeEnum, Float]]
         return (lambda n: Map(LocomotionModeEnum, (lambda n: Map(SpeedModeEnum, Float, n)), n))(self._node.get_object_field("additionalSpeedDebug"))
     @property
+    def cancelOnJoyMinLandDuration(self):  # type: ()->Float
+        return Float(self._node.get_object_field("cancelOnJoyMinLandDuration"))
+    @cancelOnJoyMinLandDuration.setter
+    def cancelOnJoyMinLandDuration(self, val): self.cancelOnJoyMinLandDuration.set(val)
+    @property
     def isTurnAllowed(self):  # type: ()->Bool
         return Bool(self._node.get_object_field("isTurnAllowed"))
     @isTurnAllowed.setter
@@ -18982,10 +19141,10 @@ class AnimationModelGD(HelperObject):
     @startRunPlayRatioFactor.setter
     def startRunPlayRatioFactor(self, val): self.startRunPlayRatioFactor.set(val)
     @property
-    def turnPlayRatioFactor(self):  # type: ()->Float
-        return Float(self._node.get_object_field("turnPlayRatioFactor"))
-    @turnPlayRatioFactor.setter
-    def turnPlayRatioFactor(self, val): self.turnPlayRatioFactor.set(val)
+    def turnPlayRatio(self):  # type: ()->Float
+        return Float(self._node.get_object_field("turnPlayRatio"))
+    @turnPlayRatio.setter
+    def turnPlayRatio(self, val): self.turnPlayRatio.set(val)
     pass
 
 
@@ -19004,6 +19163,60 @@ class AnimationHitsConstraintsGD(HelperObject):
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class AirControlAssistGD(HelperObject):
+    schema_name = "AirControlAssistGD"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->AirControlAssistGD
+        return AirControlAssistGD(Property(entlib, entlib.get_schema(AirControlAssistGD.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->AirControlAssistGD
+        return AirControlAssistGD(Property.create(entlib, entlib.get_schema(AirControlAssistGD.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def MaxFallingDistance(self):  # type: ()->Float
+        return Float(self._node.get_object_field("MaxFallingDistance"))
+    @MaxFallingDistance.setter
+    def MaxFallingDistance(self, val): self.MaxFallingDistance.set(val)
+    @property
+    def MaxTrajectoryDistance(self):  # type: ()->Float
+        return Float(self._node.get_object_field("MaxTrajectoryDistance"))
+    @MaxTrajectoryDistance.setter
+    def MaxTrajectoryDistance(self, val): self.MaxTrajectoryDistance.set(val)
+    @property
+    def SmoothingAssistSpeed(self):  # type: ()->Float
+        return Float(self._node.get_object_field("SmoothingAssistSpeed"))
+    @SmoothingAssistSpeed.setter
+    def SmoothingAssistSpeed(self, val): self.SmoothingAssistSpeed.set(val)
+    @property
+    def SpeedAddDistanceFactor(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.get_object_field("SpeedAddDistanceFactor"))
+    @property
+    def SphereCastGrowFactor(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.get_object_field("SphereCastGrowFactor"))
+    @property
+    def SphereCastStartRigidbodyRadiusMultiplier(self):  # type: ()->Float
+        return Float(self._node.get_object_field("SphereCastStartRigidbodyRadiusMultiplier"))
+    @SphereCastStartRigidbodyRadiusMultiplier.setter
+    def SphereCastStartRigidbodyRadiusMultiplier(self, val): self.SphereCastStartRigidbodyRadiusMultiplier.set(val)
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.get_object_field("Super"))
+    @property
+    def TrajectoryDistanceSampling(self):  # type: ()->Float
+        return Float(self._node.get_object_field("TrajectoryDistanceSampling"))
+    @TrajectoryDistanceSampling.setter
+    def TrajectoryDistanceSampling(self, val): self.TrajectoryDistanceSampling.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.get_object_field("_comment"))
@@ -20248,6 +20461,103 @@ class SoundManager(HelperObject):
         return Float(self._node.get_object_field("VolumeRTPCScaleFactor"))
     @VolumeRTPCScaleFactor.setter
     def VolumeRTPCScaleFactor(self, val): self.VolumeRTPCScaleFactor.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class ReflectedMaterialGroup(HelperObject):
+    schema_name = "ReflectedMaterialGroup"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->ReflectedMaterialGroup
+        return ReflectedMaterialGroup(Property(entlib, entlib.get_schema(ReflectedMaterialGroup.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->ReflectedMaterialGroup
+        return ReflectedMaterialGroup(Property.create(entlib, entlib.get_schema(ReflectedMaterialGroup.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def Color(self):  # type: ()->Color
+        return Color(self._node.get_object_field("Color"))
+    @Color.setter
+    def Color(self, val): self.Color.set(val)
+    @property
+    def Materials(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.get_object_field("Materials"))
+    @Materials.setter
+    def Materials(self, val): self.Materials.set(val)
+    @property
+    def OverrideGroups(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.get_object_field("OverrideGroups"))
+    @OverrideGroups.setter
+    def OverrideGroups(self, val): self.OverrideGroups.set(val)
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.get_object_field("Super"))
+    @property
+    def Tags(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.get_object_field("Tags"))
+    @Tags.setter
+    def Tags(self, val): self.Tags.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class ReflectedMaterialGroupVector(HelperObject):
+    schema_name = "ReflectedMaterialGroupVector"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->ReflectedMaterialGroupVector
+        return ReflectedMaterialGroupVector(Property(entlib, entlib.get_schema(ReflectedMaterialGroupVector.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->ReflectedMaterialGroupVector
+        return ReflectedMaterialGroupVector(Property.create(entlib, entlib.get_schema(ReflectedMaterialGroupVector.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def Groups(self):  # type: ()->Map[str, ReflectedMaterialGroup]
+        return (lambda n: Map(str, ReflectedMaterialGroup, n))(self._node.get_object_field("Groups"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class ReflectedDetailMaterialBank(HelperObject):
+    schema_name = "ReflectedDetailMaterialBank"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->ReflectedDetailMaterialBank
+        return ReflectedDetailMaterialBank(Property(entlib, entlib.get_schema(ReflectedDetailMaterialBank.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->ReflectedDetailMaterialBank
+        return ReflectedDetailMaterialBank(Property.create(entlib, entlib.get_schema(ReflectedDetailMaterialBank.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def Bank(self):  # type: ()->Array[ReflectedDetailMaterialVariants]
+        return (lambda n: Array(ReflectedDetailMaterialVariants, n))(self._node.get_object_field("Bank"))
+    @property
+    def Filters(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.get_object_field("Filters"))
+    @Filters.setter
+    def Filters(self, val): self.Filters.set(val)
+    @property
+    def Groups(self):  # type: ()->ReflectedMaterialGroupVector
+        return ReflectedMaterialGroupVector(self._node.get_object_field("Groups"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.get_object_field("_comment"))
@@ -21633,10 +21943,23 @@ class CharacterControllerSlideData(HelperObject):
     @friction.setter
     def friction(self, val): self.friction.set(val)
     @property
+    def jumpInSlopeAngleThreshold(self):  # type: ()->Float
+        return Float(self._node.get_object_field("jumpInSlopeAngleThreshold"))
+    @jumpInSlopeAngleThreshold.setter
+    def jumpInSlopeAngleThreshold(self, val): self.jumpInSlopeAngleThreshold.set(val)
+    @property
     def maxSlopeAngle(self):  # type: ()->Float
         return Float(self._node.get_object_field("maxSlopeAngle"))
     @maxSlopeAngle.setter
     def maxSlopeAngle(self, val): self.maxSlopeAngle.set(val)
+    @property
+    def preventAscendAngle(self):  # type: ()->Float
+        return Float(self._node.get_object_field("preventAscendAngle"))
+    @preventAscendAngle.setter
+    def preventAscendAngle(self, val): self.preventAscendAngle.set(val)
+    @property
+    def preventAscendSpeedCoeffFromDist(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.get_object_field("preventAscendSpeedCoeffFromDist"))
     @property
     def speedMediumCoeffHysteresis(self):  # type: ()->Float
         return Float(self._node.get_object_field("speedMediumCoeffHysteresis"))
@@ -21670,6 +21993,11 @@ class CharacterControllerGroundNormalData(HelperObject):
         return Bool(self._node.get_object_field("AllowOtherCreatureCast"))
     @AllowOtherCreatureCast.setter
     def AllowOtherCreatureCast(self, val): self.AllowOtherCreatureCast.set(val)
+    @property
+    def Length_Offset_When_Against_Wall(self):  # type: ()->Float
+        return Float(self._node.get_object_field("Length Offset When Against Wall"))
+    @Length_Offset_When_Against_Wall.setter
+    def Length_Offset_When_Against_Wall(self, val): self.Length_Offset_When_Against_Wall.set(val)
     @property
     def PercentageEdgeTolerance(self):  # type: ()->Float
         return Float(self._node.get_object_field("PercentageEdgeTolerance"))
@@ -21833,6 +22161,32 @@ class ZoneStamper(HelperObject):
 
 from EntityLibPy import Property
 
+class VolumeConstraintStamper(HelperObject):
+    schema_name = "VolumeConstraintStamper"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->VolumeConstraintStamper
+        return VolumeConstraintStamper(Property(entlib, entlib.get_schema(VolumeConstraintStamper.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->VolumeConstraintStamper
+        return VolumeConstraintStamper(Property.create(entlib, entlib.get_schema(VolumeConstraintStamper.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def CapabilitiesAndTags(self):  # type: ()->CapabilitiesAndTags
+        return CapabilitiesAndTags(self._node.get_object_field("CapabilitiesAndTags"))
+    @property
+    def Super(self):  # type: ()->GeometryStamper
+        return GeometryStamper(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
 class OffMeshLink(HelperObject):
     schema_name = "OffMeshLink"
     @staticmethod
@@ -21901,11 +22255,16 @@ class NavMeshStamperGD(HelperObject):
     def OffMeshLinks(self):  # type: ()->Array[OffMeshLink]
         return (lambda n: Array(OffMeshLink, n))(self._node.get_object_field("OffMeshLinks"))
     @property
-    def SkinnedMeshStampers(self):  # type: ()->Array[SkinnedPhysMeshStamper]
-        return (lambda n: Array(SkinnedPhysMeshStamper, n))(self._node.get_object_field("SkinnedMeshStampers"))
-    @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.get_object_field("Super"))
+    @property
+    def UseSkinnedMeshStamper(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("UseSkinnedMeshStamper"))
+    @UseSkinnedMeshStamper.setter
+    def UseSkinnedMeshStamper(self, val): self.UseSkinnedMeshStamper.set(val)
+    @property
+    def VolumeConstraintStamper(self):  # type: ()->VolumeConstraintStamper
+        return VolumeConstraintStamper(self._node.get_object_field("VolumeConstraintStamper"))
     @property
     def ZoneStampers(self):  # type: ()->Array[ZoneStamper]
         return (lambda n: Array(ZoneStamper, n))(self._node.get_object_field("ZoneStampers"))
@@ -21960,6 +22319,111 @@ class CreatureComponentInput(HelperObject):
     @property
     def Invincible(self):  # type: ()->Invincible
         return Invincible(self._node.get_object_field("Invincible"))
+    @property
+    def Super(self):  # type: ()->ComponentInput
+        return ComponentInput(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class CanInteract(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("val"))
+    @val.setter
+    def val(self, val): self.val.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class InteractorComponentInput(HelperObject):
+    schema_name = "InteractorComponentInput"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->InteractorComponentInput
+        return InteractorComponentInput(Property(entlib, entlib.get_schema(InteractorComponentInput.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->InteractorComponentInput
+        return InteractorComponentInput(Property.create(entlib, entlib.get_schema(InteractorComponentInput.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def CanInteract(self):  # type: ()->CanInteract
+        return CanInteract(self._node.get_object_field("CanInteract"))
+    @property
+    def EndPosition(self):  # type: ()->EndPosition
+        return EndPosition(self._node.get_object_field("EndPosition"))
+    @property
+    def IsActive(self):  # type: ()->IsActive
+        return IsActive(self._node.get_object_field("IsActive"))
+    @property
+    def Super(self):  # type: ()->ComponentInput
+        return ComponentInput(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class CanBeInteractedWith(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("val"))
+    @val.setter
+    def val(self, val): self.val.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class InteractableComponentInput(HelperObject):
+    schema_name = "InteractableComponentInput"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->InteractableComponentInput
+        return InteractableComponentInput(Property(entlib, entlib.get_schema(InteractableComponentInput.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->InteractableComponentInput
+        return InteractableComponentInput(Property.create(entlib, entlib.get_schema(InteractableComponentInput.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def CanBeInteractedWith(self):  # type: ()->CanBeInteractedWith
+        return CanBeInteractedWith(self._node.get_object_field("CanBeInteractedWith"))
+    @property
+    def Interactor(self):  # type: ()->Interactor
+        return Interactor(self._node.get_object_field("Interactor"))
     @property
     def Super(self):  # type: ()->ComponentInput
         return ComponentInput(self._node.get_object_field("Super"))
@@ -22472,10 +22936,24 @@ class InteractorGD(HelperObject):
     def BoneStartPoint(self):  # type: ()->BoneStartPoint
         return BoneStartPoint(self._node.get_object_field("BoneStartPoint"))
     @property
+    def InteractionDistanceScore(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.get_object_field("InteractionDistanceScore"))
+    @property
+    def InteractionScreenRadiusScore(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.get_object_field("InteractionScreenRadiusScore"))
+    @property
+    def InteractionSightCosScore(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.get_object_field("InteractionSightCosScore"))
+    @property
     def MaxBeamRange(self):  # type: ()->Float
         return Float(self._node.get_object_field("MaxBeamRange"))
     @MaxBeamRange.setter
     def MaxBeamRange(self, val): self.MaxBeamRange.set(val)
+    @property
+    def MinScoreToInteract(self):  # type: ()->Float
+        return Float(self._node.get_object_field("MinScoreToInteract"))
+    @MinScoreToInteract.setter
+    def MinScoreToInteract(self, val): self.MinScoreToInteract.set(val)
     @property
     def RandomSphereCastsAngle(self):  # type: ()->Float
         return Float(self._node.get_object_field("RandomSphereCastsAngle"))
@@ -23819,6 +24297,9 @@ class GameManager(HelperObject):
     @GameSpawnFadeInDuration.setter
     def GameSpawnFadeInDuration(self, val): self.GameSpawnFadeInDuration.set(val)
     @property
+    def GroundNormalData(self):  # type: ()->GameGroundNormalData
+        return GameGroundNormalData(self._node.get_object_field("GroundNormalData"))
+    @property
     def HitShakeData(self):  # type: ()->CameraShakeData
         return CameraShakeData(self._node.get_object_field("HitShakeData"))
     @property
@@ -24035,6 +24516,58 @@ class Archetype(Primitive[ArchetypeEnum]):  # Enum
         return self._node.set_string(val.value)
     def get(self):  # type: () -> T
         return self._item_type(self._node.value)
+
+
+from EntityLibPy import Property
+
+class AnticipationJump(HelperObject):
+    schema_name = "AnticipationJump"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->AnticipationJump
+        return AnticipationJump(Property(entlib, entlib.get_schema(AnticipationJump.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->AnticipationJump
+        return AnticipationJump(Property.create(entlib, entlib.get_schema(AnticipationJump.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def AnticipationJumpMaxPitch(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.get_object_field("AnticipationJumpMaxPitch"))
+    @property
+    def AnticipationJumpMinPitch(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.get_object_field("AnticipationJumpMinPitch"))
+    @property
+    def AnticipationJumpSpeedPitchSmoothCoeff(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.get_object_field("AnticipationJumpSpeedPitchSmoothCoeff"))
+    @property
+    def AnticipationJumpTime(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.get_object_field("AnticipationJumpTime"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class InGameCameraParams_AnticipationJump(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->AnticipationJump
+        return AnticipationJump(self._node.get_object_field("val"))
+    pass
 
 
 from EntityLibPy import Property
@@ -24467,6 +25000,21 @@ class AnimationLegsConstraintsGD(HelperObject):
     def AscendingSlopeOffsetInfo(self):  # type: ()->AnimationLegsConstraints_SlopeOffsetInfo
         return AnimationLegsConstraints_SlopeOffsetInfo(self._node.get_object_field("AscendingSlopeOffsetInfo"))
     @property
+    def BackLeftBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.get_object_field("BackLeftBoneNames"))
+    @BackLeftBoneNames.setter
+    def BackLeftBoneNames(self, val): self.BackLeftBoneNames.set(val)
+    @property
+    def BackLeftFootCrushBoneName(self):  # type: ()->String
+        return String(self._node.get_object_field("BackLeftFootCrushBoneName"))
+    @BackLeftFootCrushBoneName.setter
+    def BackLeftFootCrushBoneName(self, val): self.BackLeftFootCrushBoneName.set(val)
+    @property
+    def BackLeftFootOrientationBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.get_object_field("BackLeftFootOrientationBoneNames"))
+    @BackLeftFootOrientationBoneNames.setter
+    def BackLeftFootOrientationBoneNames(self, val): self.BackLeftFootOrientationBoneNames.set(val)
+    @property
     def BackLegsCompensateExtensionThreshold(self):  # type: ()->Float
         return Float(self._node.get_object_field("BackLegsCompensateExtensionThreshold"))
     @BackLegsCompensateExtensionThreshold.setter
@@ -24476,6 +25024,21 @@ class AnimationLegsConstraintsGD(HelperObject):
         return Vector2(self._node.get_object_field("BackLegsHeightRangeForIKInfluence"))
     @BackLegsHeightRangeForIKInfluence.setter
     def BackLegsHeightRangeForIKInfluence(self, val): self.BackLegsHeightRangeForIKInfluence.set(val)
+    @property
+    def BackRightBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.get_object_field("BackRightBoneNames"))
+    @BackRightBoneNames.setter
+    def BackRightBoneNames(self, val): self.BackRightBoneNames.set(val)
+    @property
+    def BackRightFootCrushBoneName(self):  # type: ()->String
+        return String(self._node.get_object_field("BackRightFootCrushBoneName"))
+    @BackRightFootCrushBoneName.setter
+    def BackRightFootCrushBoneName(self, val): self.BackRightFootCrushBoneName.set(val)
+    @property
+    def BackRightFootOrientationBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.get_object_field("BackRightFootOrientationBoneNames"))
+    @BackRightFootOrientationBoneNames.setter
+    def BackRightFootOrientationBoneNames(self, val): self.BackRightFootOrientationBoneNames.set(val)
     @property
     def BoneBending(self):  # type: ()->Bool
         return Bool(self._node.get_object_field("BoneBending"))
@@ -24510,6 +25073,21 @@ class AnimationLegsConstraintsGD(HelperObject):
     @FeetInfluence.setter
     def FeetInfluence(self, val): self.FeetInfluence.set(val)
     @property
+    def FrontLeftBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.get_object_field("FrontLeftBoneNames"))
+    @FrontLeftBoneNames.setter
+    def FrontLeftBoneNames(self, val): self.FrontLeftBoneNames.set(val)
+    @property
+    def FrontLeftFootCrushBoneName(self):  # type: ()->String
+        return String(self._node.get_object_field("FrontLeftFootCrushBoneName"))
+    @FrontLeftFootCrushBoneName.setter
+    def FrontLeftFootCrushBoneName(self, val): self.FrontLeftFootCrushBoneName.set(val)
+    @property
+    def FrontLeftFootOrientationBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.get_object_field("FrontLeftFootOrientationBoneNames"))
+    @FrontLeftFootOrientationBoneNames.setter
+    def FrontLeftFootOrientationBoneNames(self, val): self.FrontLeftFootOrientationBoneNames.set(val)
+    @property
     def FrontLegsCompensateExtensionThreshold(self):  # type: ()->Float
         return Float(self._node.get_object_field("FrontLegsCompensateExtensionThreshold"))
     @FrontLegsCompensateExtensionThreshold.setter
@@ -24520,10 +25098,30 @@ class AnimationLegsConstraintsGD(HelperObject):
     @FrontLegsHeightRangeForIKInfluence.setter
     def FrontLegsHeightRangeForIKInfluence(self, val): self.FrontLegsHeightRangeForIKInfluence.set(val)
     @property
+    def FrontRightBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.get_object_field("FrontRightBoneNames"))
+    @FrontRightBoneNames.setter
+    def FrontRightBoneNames(self, val): self.FrontRightBoneNames.set(val)
+    @property
+    def FrontRightFootCrushBoneName(self):  # type: ()->String
+        return String(self._node.get_object_field("FrontRightFootCrushBoneName"))
+    @FrontRightFootCrushBoneName.setter
+    def FrontRightFootCrushBoneName(self, val): self.FrontRightFootCrushBoneName.set(val)
+    @property
+    def FrontRightFootOrientationBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.get_object_field("FrontRightFootOrientationBoneNames"))
+    @FrontRightFootOrientationBoneNames.setter
+    def FrontRightFootOrientationBoneNames(self, val): self.FrontRightFootOrientationBoneNames.set(val)
+    @property
     def GlobalInfluence(self):  # type: ()->Float
         return Float(self._node.get_object_field("GlobalInfluence"))
     @GlobalInfluence.setter
     def GlobalInfluence(self, val): self.GlobalInfluence.set(val)
+    @property
+    def HipsBoneNames(self):  # type: ()->String
+        return String(self._node.get_object_field("HipsBoneNames"))
+    @HipsBoneNames.setter
+    def HipsBoneNames(self, val): self.HipsBoneNames.set(val)
     @property
     def LegInfluence(self):  # type: ()->Float
         return Float(self._node.get_object_field("LegInfluence"))
@@ -24797,6 +25395,16 @@ class MoveCapacityData(HelperObject):
         return MoveCapacityData(Property.create(entlib, entlib.get_schema(MoveCapacityData.schema_name)))
     def save(self, destfile):
         self.node.save(destfile)
+    @property
+    def MaxAngleToDetectLandingGripDirection(self):  # type: ()->Float
+        return Float(self._node.get_object_field("MaxAngleToDetectLandingGripDirection"))
+    @MaxAngleToDetectLandingGripDirection.setter
+    def MaxAngleToDetectLandingGripDirection(self, val): self.MaxAngleToDetectLandingGripDirection.set(val)
+    @property
+    def MinAngleToAllowLeaveMotionConstraintCurve(self):  # type: ()->Float
+        return Float(self._node.get_object_field("MinAngleToAllowLeaveMotionConstraintCurve"))
+    @MinAngleToAllowLeaveMotionConstraintCurve.setter
+    def MinAngleToAllowLeaveMotionConstraintCurve(self, val): self.MinAngleToAllowLeaveMotionConstraintCurve.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.get_object_field("_comment"))
@@ -25691,11 +26299,6 @@ class CharacterControllerFallData(HelperObject):
     @Friction.setter
     def Friction(self, val): self.Friction.set(val)
     @property
-    def MinHeightForDamageFall(self):  # type: ()->Float
-        return Float(self._node.get_object_field("MinHeightForDamageFall"))
-    @MinHeightForDamageFall.setter
-    def MinHeightForDamageFall(self, val): self.MinHeightForDamageFall.set(val)
-    @property
     def MinHeightForDeathFall(self):  # type: ()->Float
         return Float(self._node.get_object_field("MinHeightForDeathFall"))
     @MinHeightForDeathFall.setter
@@ -26322,29 +26925,6 @@ class EntityStateWallRun(HelperObject):
     @staticmethod
     def create(entlib):  # type: (EntityLib)->EntityStateWallRun
         return EntityStateWallRun(Property.create(entlib, entlib.get_schema(EntityStateWallRun.schema_name)))
-    def save(self, destfile):
-        self.node.save(destfile)
-    @property
-    def Super(self):  # type: ()->ActorState
-        return ActorState(self._node.get_object_field("Super"))
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.get_object_field("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Property
-
-class EntityStateWaitToJumpAgain(HelperObject):
-    schema_name = "EntityStateWaitToJumpAgain"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateWaitToJumpAgain
-        return EntityStateWaitToJumpAgain(Property(entlib, entlib.get_schema(EntityStateWaitToJumpAgain.schema_name), sourcefile))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->EntityStateWaitToJumpAgain
-        return EntityStateWaitToJumpAgain(Property.create(entlib, entlib.get_schema(EntityStateWaitToJumpAgain.schema_name)))
     def save(self, destfile):
         self.node.save(destfile)
     @property
@@ -27355,6 +27935,29 @@ class EntityStateRaise(HelperObject):
 
 from EntityLibPy import Property
 
+class EntityStatePreventAscendInSlope(HelperObject):
+    schema_name = "EntityStatePreventAscendInSlope"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStatePreventAscendInSlope
+        return EntityStatePreventAscendInSlope(Property(entlib, entlib.get_schema(EntityStatePreventAscendInSlope.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStatePreventAscendInSlope
+        return EntityStatePreventAscendInSlope(Property.create(entlib, entlib.get_schema(EntityStatePreventAscendInSlope.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
 class EntityStatePrepareToHoldingOnToNavigationMesh(HelperObject):
     schema_name = "EntityStatePrepareToHoldingOnToNavigationMesh"
     @staticmethod
@@ -27764,6 +28367,75 @@ class EntityStateMeditateToInteract(HelperObject):
 
 from EntityLibPy import Property
 
+class EntityStateMeditateOut(HelperObject):
+    schema_name = "EntityStateMeditateOut"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateMeditateOut
+        return EntityStateMeditateOut(Property(entlib, entlib.get_schema(EntityStateMeditateOut.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateMeditateOut
+        return EntityStateMeditateOut(Property.create(entlib, entlib.get_schema(EntityStateMeditateOut.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class EntityStateMeditateIn(HelperObject):
+    schema_name = "EntityStateMeditateIn"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateMeditateIn
+        return EntityStateMeditateIn(Property(entlib, entlib.get_schema(EntityStateMeditateIn.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateMeditateIn
+        return EntityStateMeditateIn(Property.create(entlib, entlib.get_schema(EntityStateMeditateIn.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class EntityStateMeditate(HelperObject):
+    schema_name = "EntityStateMeditate"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateMeditate
+        return EntityStateMeditate(Property(entlib, entlib.get_schema(EntityStateMeditate.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateMeditate
+        return EntityStateMeditate(Property.create(entlib, entlib.get_schema(EntityStateMeditate.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
 class EntityStateMask(HelperObject):
     schema_name = "EntityStateMask"
     @staticmethod
@@ -27925,29 +28597,6 @@ class EntityStateJumpHeightMultiplier(HelperObject):
         return Float(self._node.get_object_field("JumpHeightMultiplier"))
     @JumpHeightMultiplier.setter
     def JumpHeightMultiplier(self, val): self.JumpHeightMultiplier.set(val)
-    @property
-    def Super(self):  # type: ()->ActorState
-        return ActorState(self._node.get_object_field("Super"))
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.get_object_field("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Property
-
-class EntityStateInteractedGPE(HelperObject):
-    schema_name = "EntityStateInteractedGPE"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateInteractedGPE
-        return EntityStateInteractedGPE(Property(entlib, entlib.get_schema(EntityStateInteractedGPE.schema_name), sourcefile))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->EntityStateInteractedGPE
-        return EntityStateInteractedGPE(Property.create(entlib, entlib.get_schema(EntityStateInteractedGPE.schema_name)))
-    def save(self, destfile):
-        self.node.save(destfile)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.get_object_field("Super"))
@@ -29002,6 +29651,52 @@ class EntityStateCreatureProfile(HelperObject):
 
 from EntityLibPy import Property
 
+class EntityStateCreatureLowLOD(HelperObject):
+    schema_name = "EntityStateCreatureLowLOD"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateCreatureLowLOD
+        return EntityStateCreatureLowLOD(Property(entlib, entlib.get_schema(EntityStateCreatureLowLOD.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateCreatureLowLOD
+        return EntityStateCreatureLowLOD(Property.create(entlib, entlib.get_schema(EntityStateCreatureLowLOD.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class EntityStateCreatureHighLOD(HelperObject):
+    schema_name = "EntityStateCreatureHighLOD"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateCreatureHighLOD
+        return EntityStateCreatureHighLOD(Property(entlib, entlib.get_schema(EntityStateCreatureHighLOD.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateCreatureHighLOD
+        return EntityStateCreatureHighLOD(Property.create(entlib, entlib.get_schema(EntityStateCreatureHighLOD.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
 class EntityStateCreatureHatching(HelperObject):
     schema_name = "EntityStateCreatureHatching"
     @staticmethod
@@ -29332,6 +30027,29 @@ class EntityStateChargingJump(HelperObject):
 
 from EntityLibPy import Property
 
+class EntityStateChargedJumpPower(HelperObject):
+    schema_name = "EntityStateChargedJumpPower"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateChargedJumpPower
+        return EntityStateChargedJumpPower(Property(entlib, entlib.get_schema(EntityStateChargedJumpPower.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateChargedJumpPower
+        return EntityStateChargedJumpPower(Property.create(entlib, entlib.get_schema(EntityStateChargedJumpPower.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
 class EntityStateChargedJump(HelperObject):
     schema_name = "EntityStateChargedJump"
     @staticmethod
@@ -29368,6 +30086,29 @@ class EntityStateChargeMode(HelperObject):
     @property
     def ChargeModeInputs(self):  # type: ()->EntityStateChargeMode_EntityStateChargeModeInputs
         return EntityStateChargeMode_EntityStateChargeModeInputs(self._node.get_object_field("ChargeModeInputs"))
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class EntityStateCancelSetSavePoint(HelperObject):
+    schema_name = "EntityStateCancelSetSavePoint"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateCancelSetSavePoint
+        return EntityStateCancelSetSavePoint(Property(entlib, entlib.get_schema(EntityStateCancelSetSavePoint.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateCancelSetSavePoint
+        return EntityStateCancelSetSavePoint(Property.create(entlib, entlib.get_schema(EntityStateCancelSetSavePoint.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.get_object_field("Super"))
@@ -29598,29 +30339,6 @@ class EntityStateBreakableBreaking(HelperObject):
     @staticmethod
     def create(entlib):  # type: (EntityLib)->EntityStateBreakableBreaking
         return EntityStateBreakableBreaking(Property.create(entlib, entlib.get_schema(EntityStateBreakableBreaking.schema_name)))
-    def save(self, destfile):
-        self.node.save(destfile)
-    @property
-    def Super(self):  # type: ()->ActorState
-        return ActorState(self._node.get_object_field("Super"))
-    @property
-    def _comment(self):  # type: ()->String
-        return String(self._node.get_object_field("_comment"))
-    @_comment.setter
-    def _comment(self, val): self._comment.set(val)
-    pass
-
-
-from EntityLibPy import Property
-
-class EntityStateBounceLand(HelperObject):
-    schema_name = "EntityStateBounceLand"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBounceLand
-        return EntityStateBounceLand(Property(entlib, entlib.get_schema(EntityStateBounceLand.schema_name), sourcefile))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->EntityStateBounceLand
-        return EntityStateBounceLand(Property.create(entlib, entlib.get_schema(EntityStateBounceLand.schema_name)))
     def save(self, destfile):
         self.node.save(destfile)
     @property
@@ -30009,6 +30727,29 @@ class EntityStateBeingInReeds(HelperObject):
 
 from EntityLibPy import Property
 
+class EntityStateBeingFocused(HelperObject):
+    schema_name = "EntityStateBeingFocused"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBeingFocused
+        return EntityStateBeingFocused(Property(entlib, entlib.get_schema(EntityStateBeingFocused.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateBeingFocused
+        return EntityStateBeingFocused(Property.create(entlib, entlib.get_schema(EntityStateBeingFocused.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
 class EntityStateBeingBlockedByVine(HelperObject):
     schema_name = "EntityStateBeingBlockedByVine"
     @staticmethod
@@ -30160,6 +30901,29 @@ class EntityStateApplyExtraLife(HelperObject):
     @staticmethod
     def create(entlib):  # type: (EntityLib)->EntityStateApplyExtraLife
         return EntityStateApplyExtraLife(Property.create(entlib, entlib.get_schema(EntityStateApplyExtraLife.schema_name)))
+    def save(self, destfile):
+        self.node.save(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.get_object_field("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.get_object_field("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Property
+
+class EntityStateAirControlAssistForLanding(HelperObject):
+    schema_name = "EntityStateAirControlAssistForLanding"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateAirControlAssistForLanding
+        return EntityStateAirControlAssistForLanding(Property(entlib, entlib.get_schema(EntityStateAirControlAssistForLanding.schema_name), sourcefile))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateAirControlAssistForLanding
+        return EntityStateAirControlAssistForLanding(Property.create(entlib, entlib.get_schema(EntityStateAirControlAssistForLanding.schema_name)))
     def save(self, destfile):
         self.node.save(destfile)
     @property
@@ -34444,6 +35208,7 @@ class ActorCategoryEnum(Enum):
     CATEGORY_Context = "CATEGORY_Context"
     CATEGORY_Control = "CATEGORY_Control"
     CATEGORY_ActionCosmetic = "CATEGORY_ActionCosmetic"
+    CATEGORY_CreatureLOD = "CATEGORY_CreatureLOD"
     CATEGORY_ActionDamage = "CATEGORY_ActionDamage"
     CATEGORY_ActionDefault = "CATEGORY_ActionDefault"
     CATEGORY_ActionDie = "CATEGORY_ActionDie"
@@ -34454,10 +35219,12 @@ class ActorCategoryEnum(Enum):
     CATEGORY_ActionBite = "CATEGORY_ActionBite"
     CATEGORY_Hint = "CATEGORY_Hint"
     CATEGORY_LookAt = "CATEGORY_LookAt"
+    CATEGORY_Interaction = "CATEGORY_Interaction"
     CATEGORY_ActionJump = "CATEGORY_ActionJump"
     CATEGORY_ActionLand = "CATEGORY_ActionLand"
     CATEGORY_Life = "CATEGORY_Life"
     CATEGORY_Locomotion = "CATEGORY_Locomotion"
+    CATEGORY_Meditate = "CATEGORY_Meditate"
     CATEGORY_ActionMove = "CATEGORY_ActionMove"
     CATEGORY_Persistent = "CATEGORY_Persistent"
     CATEGORY_Purgatory = "CATEGORY_Purgatory"
@@ -34479,6 +35246,7 @@ class ActorCategoryEnum(Enum):
     CATEGORY_SpiritAnimal = "CATEGORY_SpiritAnimal"
     CATEGORY_Hatching = "CATEGORY_Hatching"
     CATEGORY_Respawn = "CATEGORY_Respawn"
+    CATEGORY_RequireHighLOD = "CATEGORY_RequireHighLOD"
     CATEGORY_Save = "CATEGORY_Save"
     CATEGORY_Cinematic = "CATEGORY_Cinematic"
     CATEGORY_Loading = "CATEGORY_Loading"
@@ -35385,6 +36153,7 @@ class ActionModeEnum(Enum):
     mountreception = "mountreception"
     changeridingspot = "changeridingspot"
     goingtomountstate = "goingtomountstate"
+    meditate = "meditate"
     mount = "mount"
     unmount = "unmount"
     flap = "flap"
@@ -35555,6 +36324,9 @@ class InGameCameraParams(HelperObject):
     @AnticipationForceReset.setter
     def AnticipationForceReset(self, val): self.AnticipationForceReset.set(val)
     @property
+    def AnticipationJump(self):  # type: ()->InGameCameraParams_AnticipationJump
+        return InGameCameraParams_AnticipationJump(self._node.get_object_field("AnticipationJump"))
+    @property
     def AnticipationMaxPitch(self):  # type: ()->Float
         return Float(self._node.get_object_field("AnticipationMaxPitch"))
     @AnticipationMaxPitch.setter
@@ -35685,10 +36457,15 @@ class InGameCameraParams(HelperObject):
     @CollisionCorrectionSpeed.setter
     def CollisionCorrectionSpeed(self, val): self.CollisionCorrectionSpeed.set(val)
     @property
-    def CollisionSlowBackToPosSpeed(self):  # type: ()->Float
-        return Float(self._node.get_object_field("CollisionSlowBackToPosSpeed"))
-    @CollisionSlowBackToPosSpeed.setter
-    def CollisionSlowBackToPosSpeed(self, val): self.CollisionSlowBackToPosSpeed.set(val)
+    def CollisionDisabled(self):  # type: ()->Bool
+        return Bool(self._node.get_object_field("CollisionDisabled"))
+    @CollisionDisabled.setter
+    def CollisionDisabled(self, val): self.CollisionDisabled.set(val)
+    @property
+    def CollisionMoveCamBackToPosSpeed(self):  # type: ()->Float
+        return Float(self._node.get_object_field("CollisionMoveCamBackToPosSpeed"))
+    @CollisionMoveCamBackToPosSpeed.setter
+    def CollisionMoveCamBackToPosSpeed(self, val): self.CollisionMoveCamBackToPosSpeed.set(val)
     @property
     def CollisionTouchGroundBackToPosSpeed(self):  # type: ()->Float
         return Float(self._node.get_object_field("CollisionTouchGroundBackToPosSpeed"))
@@ -35837,11 +36614,6 @@ class InGameCameraParams(HelperObject):
         return Float(self._node.get_object_field("InterestPointSightAngleSpeed"))
     @InterestPointSightAngleSpeed.setter
     def InterestPointSightAngleSpeed(self, val): self.InterestPointSightAngleSpeed.set(val)
-    @property
-    def InterestPointTimeToReachMaxWeight(self):  # type: ()->Float
-        return Float(self._node.get_object_field("InterestPointTimeToReachMaxWeight"))
-    @InterestPointTimeToReachMaxWeight.setter
-    def InterestPointTimeToReachMaxWeight(self, val): self.InterestPointTimeToReachMaxWeight.set(val)
     @property
     def JoyAccelerationBoostChangingSideH(self):  # type: ()->Float
         return Float(self._node.get_object_field("JoyAccelerationBoostChangingSideH"))
@@ -36009,6 +36781,16 @@ class InGameCameraParams(HelperObject):
     @PitchToFOV.setter
     def PitchToFOV(self, val): self.PitchToFOV.set(val)
     @property
+    def RotationOffsetPitch(self):  # type: ()->Float
+        return Float(self._node.get_object_field("RotationOffsetPitch"))
+    @RotationOffsetPitch.setter
+    def RotationOffsetPitch(self, val): self.RotationOffsetPitch.set(val)
+    @property
+    def RotationOffsetYaw(self):  # type: ()->Float
+        return Float(self._node.get_object_field("RotationOffsetYaw"))
+    @RotationOffsetYaw.setter
+    def RotationOffsetYaw(self, val): self.RotationOffsetYaw.set(val)
+    @property
     def SpacePitchOffset(self):  # type: ()->Float
         return Float(self._node.get_object_field("SpacePitchOffset"))
     @SpacePitchOffset.setter
@@ -36035,10 +36817,16 @@ class InGameCameraParams(HelperObject):
     @TargetDistance.setter
     def TargetDistance(self, val): self.TargetDistance.set(val)
     @property
-    def TargetJumpSmooth(self):  # type: ()->Float
-        return Float(self._node.get_object_field("TargetJumpSmooth"))
-    @TargetJumpSmooth.setter
-    def TargetJumpSmooth(self, val): self.TargetJumpSmooth.set(val)
+    def TargetJumpDistOffset(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.get_object_field("TargetJumpDistOffset"))
+    @property
+    def TargetJumpDistOffsetSmooth(self):  # type: ()->Float
+        return Float(self._node.get_object_field("TargetJumpDistOffsetSmooth"))
+    @TargetJumpDistOffsetSmooth.setter
+    def TargetJumpDistOffsetSmooth(self, val): self.TargetJumpDistOffsetSmooth.set(val)
+    @property
+    def TargetJumpSmooth(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.get_object_field("TargetJumpSmooth"))
     @property
     def TargetMaxSpeed(self):  # type: ()->Float
         return Float(self._node.get_object_field("TargetMaxSpeed"))
@@ -36285,11 +37073,6 @@ class ChargedJumpGD(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
-    def bounceJumpTimeWindow(self):  # type: ()->Float
-        return Float(self._node.get_object_field("bounceJumpTimeWindow"))
-    @bounceJumpTimeWindow.setter
-    def bounceJumpTimeWindow(self, val): self.bounceJumpTimeWindow.set(val)
-    @property
     def chargedJumpAnimations(self):  # type: ()->Array[ChargedJumpAnimation]
         return (lambda n: Array(ChargedJumpAnimation, n))(self._node.get_object_field("chargedJumpAnimations"))
     @property
@@ -36297,6 +37080,11 @@ class ChargedJumpGD(HelperObject):
         return Float(self._node.get_object_field("chargingDecelerationFactor"))
     @chargingDecelerationFactor.setter
     def chargingDecelerationFactor(self, val): self.chargingDecelerationFactor.set(val)
+    @property
+    def jumpAfterLandTimeWindow(self):  # type: ()->Float
+        return Float(self._node.get_object_field("jumpAfterLandTimeWindow"))
+    @jumpAfterLandTimeWindow.setter
+    def jumpAfterLandTimeWindow(self, val): self.jumpAfterLandTimeWindow.set(val)
     @property
     def jumpPowerAddByBounce(self):  # type: ()->Float
         return Float(self._node.get_object_field("jumpPowerAddByBounce"))
@@ -38576,21 +39364,6 @@ class TextureGroundTypeMap(HelperObject):
     @staticmethod
     def create(entlib):  # type: (EntityLib)->TextureGroundTypeMap
         return TextureGroundTypeMap(Property.create(entlib, entlib.get_schema(TextureGroundTypeMap.schema_name)))
-    def save(self, destfile):
-        self.node.save(destfile)
-    pass
-
-
-from EntityLibPy import Property
-
-class TextureHeightMap(HelperObject):
-    schema_name = "TextureHeightMap"
-    @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->TextureHeightMap
-        return TextureHeightMap(Property(entlib, entlib.get_schema(TextureHeightMap.schema_name), sourcefile))
-    @staticmethod
-    def create(entlib):  # type: (EntityLib)->TextureHeightMap
-        return TextureHeightMap(Property.create(entlib, entlib.get_schema(TextureHeightMap.schema_name)))
     def save(self, destfile):
         self.node.save(destfile)
     pass

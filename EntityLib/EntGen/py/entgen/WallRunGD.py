@@ -40,6 +40,11 @@ class WallRunGD(HelperObject):
     @dropCoyoteJumpMaxTime.setter
     def dropCoyoteJumpMaxTime(self, val): self.dropCoyoteJumpMaxTime.set(val)
     @property
+    def dropDelayAfterInvalidDirectionRequested(self):  # type: ()->Float
+        return Float(self._node.at("dropDelayAfterInvalidDirectionRequested"))
+    @dropDelayAfterInvalidDirectionRequested.setter
+    def dropDelayAfterInvalidDirectionRequested(self, val): self.dropDelayAfterInvalidDirectionRequested.set(val)
+    @property
     def dropTrajectoryRotationYaw(self):  # type: ()->Float
         return Float(self._node.at("dropTrajectoryRotationYaw"))
     @dropTrajectoryRotationYaw.setter

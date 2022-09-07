@@ -62,10 +62,23 @@ class CharacterControllerSlideData(HelperObject):
     @friction.setter
     def friction(self, val): self.friction.set(val)
     @property
+    def jumpInSlopeAngleThreshold(self):  # type: ()->Float
+        return Float(self._node.at("jumpInSlopeAngleThreshold"))
+    @jumpInSlopeAngleThreshold.setter
+    def jumpInSlopeAngleThreshold(self, val): self.jumpInSlopeAngleThreshold.set(val)
+    @property
     def maxSlopeAngle(self):  # type: ()->Float
         return Float(self._node.at("maxSlopeAngle"))
     @maxSlopeAngle.setter
     def maxSlopeAngle(self, val): self.maxSlopeAngle.set(val)
+    @property
+    def preventAscendAngle(self):  # type: ()->Float
+        return Float(self._node.at("preventAscendAngle"))
+    @preventAscendAngle.setter
+    def preventAscendAngle(self, val): self.preventAscendAngle.set(val)
+    @property
+    def preventAscendSpeedCoeffFromDist(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("preventAscendSpeedCoeffFromDist"))
     @property
     def speedMediumCoeffHysteresis(self):  # type: ()->Float
         return Float(self._node.at("speedMediumCoeffHysteresis"))

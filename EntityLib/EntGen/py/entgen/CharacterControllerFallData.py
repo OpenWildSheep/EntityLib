@@ -38,11 +38,6 @@ class CharacterControllerFallData(HelperObject):
     @Friction.setter
     def Friction(self, val): self.Friction.set(val)
     @property
-    def MinHeightForDamageFall(self):  # type: ()->Float
-        return Float(self._node.at("MinHeightForDamageFall"))
-    @MinHeightForDamageFall.setter
-    def MinHeightForDamageFall(self, val): self.MinHeightForDamageFall.set(val)
-    @property
     def MinHeightForDeathFall(self):  # type: ()->Float
         return Float(self._node.at("MinHeightForDeathFall"))
     @MinHeightForDeathFall.setter

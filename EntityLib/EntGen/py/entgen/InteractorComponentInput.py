@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.CanInteract import *
 from entgen.ComponentInput import *
 from entgen.EndPosition import *
 from entgen.IsActive import *
@@ -21,6 +22,9 @@ class InteractorComponentInput(HelperObject):
         return InteractorComponentInput(entlib.make_node(InteractorComponentInput.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def CanInteract(self):  # type: ()->CanInteract
+        return CanInteract(self._node.at("CanInteract"))
     @property
     def EndPosition(self):  # type: ()->EndPosition
         return EndPosition(self._node.at("EndPosition"))

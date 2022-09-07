@@ -9,6 +9,7 @@ from entgen.Int import *
 from entgen.BoneStartPoint import *
 from entgen.ComponentGD import *
 from entgen.Float import *
+from entgen.ScaleConverter import *
 from entgen.String import *
 
 from EntityLibPy import Node
@@ -32,10 +33,24 @@ class InteractorGD(HelperObject):
     def BoneStartPoint(self):  # type: ()->BoneStartPoint
         return BoneStartPoint(self._node.at("BoneStartPoint"))
     @property
+    def InteractionDistanceScore(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("InteractionDistanceScore"))
+    @property
+    def InteractionScreenRadiusScore(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("InteractionScreenRadiusScore"))
+    @property
+    def InteractionSightCosScore(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("InteractionSightCosScore"))
+    @property
     def MaxBeamRange(self):  # type: ()->Float
         return Float(self._node.at("MaxBeamRange"))
     @MaxBeamRange.setter
     def MaxBeamRange(self, val): self.MaxBeamRange.set(val)
+    @property
+    def MinScoreToInteract(self):  # type: ()->Float
+        return Float(self._node.at("MinScoreToInteract"))
+    @MinScoreToInteract.setter
+    def MinScoreToInteract(self, val): self.MinScoreToInteract.set(val)
     @property
     def RandomSphereCastsAngle(self):  # type: ()->Float
         return Float(self._node.at("RandomSphereCastsAngle"))

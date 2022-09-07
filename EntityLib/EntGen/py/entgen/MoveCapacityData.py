@@ -29,6 +29,16 @@ class MoveCapacityData(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def MaxAngleToDetectLandingGripDirection(self):  # type: ()->Float
+        return Float(self._node.at("MaxAngleToDetectLandingGripDirection"))
+    @MaxAngleToDetectLandingGripDirection.setter
+    def MaxAngleToDetectLandingGripDirection(self, val): self.MaxAngleToDetectLandingGripDirection.set(val)
+    @property
+    def MinAngleToAllowLeaveMotionConstraintCurve(self):  # type: ()->Float
+        return Float(self._node.at("MinAngleToAllowLeaveMotionConstraintCurve"))
+    @MinAngleToAllowLeaveMotionConstraintCurve.setter
+    def MinAngleToAllowLeaveMotionConstraintCurve(self, val): self.MinAngleToAllowLeaveMotionConstraintCurve.set(val)
+    @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
     @_comment.setter

@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.Bool import *
 from entgen.Float import *
 from entgen.EntityRef import *
 
@@ -20,6 +21,16 @@ class WallRunData(HelperObject):
         return WallRunData(entlib.make_node(WallRunData.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def AcceptanceRadius(self):  # type: ()->Float
+        return Float(self._node.at("AcceptanceRadius"))
+    @AcceptanceRadius.setter
+    def AcceptanceRadius(self, val): self.AcceptanceRadius.set(val)
+    @property
+    def ExitWithLongJump(self):  # type: ()->Bool
+        return Bool(self._node.at("ExitWithLongJump"))
+    @ExitWithLongJump.setter
+    def ExitWithLongJump(self, val): self.ExitWithLongJump.set(val)
     @property
     def JumpAngle(self):  # type: ()->Float
         return Float(self._node.at("JumpAngle"))

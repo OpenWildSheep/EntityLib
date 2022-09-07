@@ -9,6 +9,7 @@ from entgen.ComponentInput import *
 from entgen.JumpHeightMultiplier import *
 from entgen.RigidbodyScaleMultiplier import *
 from entgen.RigidbodyScalingSpeed import *
+from entgen.creatureLOD import *
 
 from EntityLibPy import Node
 
@@ -39,6 +40,9 @@ class CharacterControllerComponentInput(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    @property
+    def creatureLOD(self):  # type: ()->creatureLOD
+        return creatureLOD(self._node.at("creatureLOD"))
     pass
 
 

@@ -9,6 +9,7 @@ from entgen.Int import *
 from entgen.BoneStartPoint import *
 from entgen.ComponentGD import *
 from entgen.Float import *
+from entgen.ScoreComputation import *
 from entgen.String import *
 
 from EntityLibPy import Node
@@ -24,6 +25,11 @@ class InteractorGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def BeamBonusPossessScore(self):  # type: ()->Float
+        return Float(self._node.at("BeamBonusPossessScore"))
+    @BeamBonusPossessScore.setter
+    def BeamBonusPossessScore(self, val): self.BeamBonusPossessScore.set(val)
+    @property
     def BeamEffectsNames(self):  # type: ()->PrimArray[String]
         return (lambda n: PrimArray(String, n))(self._node.at("BeamEffectsNames"))
     @BeamEffectsNames.setter
@@ -32,10 +38,16 @@ class InteractorGD(HelperObject):
     def BoneStartPoint(self):  # type: ()->BoneStartPoint
         return BoneStartPoint(self._node.at("BoneStartPoint"))
     @property
+    def InteractionScore(self):  # type: ()->ScoreComputation
+        return ScoreComputation(self._node.at("InteractionScore"))
+    @property
     def MaxBeamRange(self):  # type: ()->Float
         return Float(self._node.at("MaxBeamRange"))
     @MaxBeamRange.setter
     def MaxBeamRange(self, val): self.MaxBeamRange.set(val)
+    @property
+    def PossessScore(self):  # type: ()->ScoreComputation
+        return ScoreComputation(self._node.at("PossessScore"))
     @property
     def RandomSphereCastsAngle(self):  # type: ()->Float
         return Float(self._node.at("RandomSphereCastsAngle"))
@@ -59,6 +71,11 @@ class InteractorGD(HelperObject):
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
+    @property
+    def UnmountLongPressDuration(self):  # type: ()->Float
+        return Float(self._node.at("UnmountLongPressDuration"))
+    @UnmountLongPressDuration.setter
+    def UnmountLongPressDuration(self, val): self.UnmountLongPressDuration.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

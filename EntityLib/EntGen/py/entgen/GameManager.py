@@ -19,6 +19,7 @@ from entgen.GameEdgeData import *
 from entgen.GameFeetCatchUpData import *
 from entgen.GameFluidData import *
 from entgen.GameFlyData import *
+from entgen.GameGroundNormalData import *
 from entgen.GameImmersionData import *
 from entgen.GameLODData import *
 from entgen.GamePadNavigationData import *
@@ -140,6 +141,9 @@ class GameManager(HelperObject):
         return Float(self._node.at("GameSpawnFadeInDuration"))
     @GameSpawnFadeInDuration.setter
     def GameSpawnFadeInDuration(self, val): self.GameSpawnFadeInDuration.set(val)
+    @property
+    def GroundNormalData(self):  # type: ()->GameGroundNormalData
+        return GameGroundNormalData(self._node.at("GroundNormalData"))
     @property
     def HitShakeData(self):  # type: ()->CameraShakeData
         return CameraShakeData(self._node.at("HitShakeData"))

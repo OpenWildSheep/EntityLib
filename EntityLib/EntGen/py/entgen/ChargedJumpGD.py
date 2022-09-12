@@ -31,11 +31,6 @@ class ChargedJumpGD(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
-    def bounceJumpTimeWindow(self):  # type: ()->Float
-        return Float(self._node.at("bounceJumpTimeWindow"))
-    @bounceJumpTimeWindow.setter
-    def bounceJumpTimeWindow(self, val): self.bounceJumpTimeWindow.set(val)
-    @property
     def chargedJumpAnimations(self):  # type: ()->Array[ChargedJumpAnimation]
         return (lambda n: Array(ChargedJumpAnimation, n))(self._node.at("chargedJumpAnimations"))
     @property
@@ -43,6 +38,11 @@ class ChargedJumpGD(HelperObject):
         return Float(self._node.at("chargingDecelerationFactor"))
     @chargingDecelerationFactor.setter
     def chargingDecelerationFactor(self, val): self.chargingDecelerationFactor.set(val)
+    @property
+    def jumpAfterLandTimeWindow(self):  # type: ()->Float
+        return Float(self._node.at("jumpAfterLandTimeWindow"))
+    @jumpAfterLandTimeWindow.setter
+    def jumpAfterLandTimeWindow(self, val): self.jumpAfterLandTimeWindow.set(val)
     @property
     def jumpPowerAddByBounce(self):  # type: ()->Float
         return Float(self._node.at("jumpPowerAddByBounce"))

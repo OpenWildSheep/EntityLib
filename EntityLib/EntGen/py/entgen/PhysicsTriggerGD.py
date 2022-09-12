@@ -6,6 +6,8 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ComponentGD import *
+from entgen.EntityEnteredEntityState import *
+from entgen.EntityExitedEntityState import *
 from entgen.String import *
 
 from EntityLibPy import Node
@@ -20,6 +22,12 @@ class PhysicsTriggerGD(HelperObject):
         return PhysicsTriggerGD(entlib.make_node(PhysicsTriggerGD.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def EntityEnteredEntityState(self):  # type: ()->EntityEnteredEntityState
+        return EntityEnteredEntityState(self._node.at("EntityEnteredEntityState"))
+    @property
+    def EntityExitedEntityState(self):  # type: ()->EntityExitedEntityState
+        return EntityExitedEntityState(self._node.at("EntityExitedEntityState"))
     @property
     def RequiredComponents(self):  # type: ()->PrimArray[String]
         return (lambda n: PrimArray(String, n))(self._node.at("RequiredComponents"))

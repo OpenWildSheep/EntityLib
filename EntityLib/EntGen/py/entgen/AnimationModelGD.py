@@ -36,6 +36,11 @@ class AnimationModelGD(HelperObject):
     def additionalSpeedDebug(self):  # type: ()->Map[LocomotionModeEnum, Map[SpeedModeEnum, Float]]
         return (lambda n: Map(LocomotionModeEnum, (lambda n: Map(SpeedModeEnum, Float, n)), n))(self._node.at("additionalSpeedDebug"))
     @property
+    def cancelOnJoyMinLandDuration(self):  # type: ()->Float
+        return Float(self._node.at("cancelOnJoyMinLandDuration"))
+    @cancelOnJoyMinLandDuration.setter
+    def cancelOnJoyMinLandDuration(self, val): self.cancelOnJoyMinLandDuration.set(val)
+    @property
     def isTurnAllowed(self):  # type: ()->Bool
         return Bool(self._node.at("isTurnAllowed"))
     @isTurnAllowed.setter
@@ -56,10 +61,10 @@ class AnimationModelGD(HelperObject):
     @startRunPlayRatioFactor.setter
     def startRunPlayRatioFactor(self, val): self.startRunPlayRatioFactor.set(val)
     @property
-    def turnPlayRatioFactor(self):  # type: ()->Float
-        return Float(self._node.at("turnPlayRatioFactor"))
-    @turnPlayRatioFactor.setter
-    def turnPlayRatioFactor(self, val): self.turnPlayRatioFactor.set(val)
+    def turnPlayRatio(self):  # type: ()->Float
+        return Float(self._node.at("turnPlayRatio"))
+    @turnPlayRatio.setter
+    def turnPlayRatio(self, val): self.turnPlayRatio.set(val)
     pass
 
 

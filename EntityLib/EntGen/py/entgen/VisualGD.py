@@ -29,6 +29,11 @@ class VisualGD(HelperObject):
     @AlwaysStatic.setter
     def AlwaysStatic(self, val): self.AlwaysStatic.set(val)
     @property
+    def DetailMaterial(self):  # type: ()->String
+        return String(self._node.at("DetailMaterial"))
+    @DetailMaterial.setter
+    def DetailMaterial(self, val): self.DetailMaterial.set(val)
+    @property
     def EDITOR_GenerateFur(self):  # type: ()->Bool
         return Bool(self._node.at("EDITOR_GenerateFur"))
     @EDITOR_GenerateFur.setter

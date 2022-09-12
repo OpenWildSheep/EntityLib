@@ -27,6 +27,11 @@ class CharacterControllerGroundNormalData(HelperObject):
     @AllowOtherCreatureCast.setter
     def AllowOtherCreatureCast(self, val): self.AllowOtherCreatureCast.set(val)
     @property
+    def Length_Offset_When_Against_Wall(self):  # type: ()->Float
+        return Float(self._node.at("Length Offset When Against Wall"))
+    @Length_Offset_When_Against_Wall.setter
+    def Length_Offset_When_Against_Wall(self, val): self.Length_Offset_When_Against_Wall.set(val)
+    @property
     def PercentageEdgeTolerance(self):  # type: ()->Float
         return Float(self._node.at("PercentageEdgeTolerance"))
     @PercentageEdgeTolerance.setter

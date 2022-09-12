@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.CanBeInteractedWith import *
 from entgen.ComponentInput import *
 from entgen.Interactor import *
 
@@ -20,6 +21,9 @@ class InteractableComponentInput(HelperObject):
         return InteractableComponentInput(entlib.make_node(InteractableComponentInput.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def CanBeInteractedWith(self):  # type: ()->CanBeInteractedWith
+        return CanBeInteractedWith(self._node.at("CanBeInteractedWith"))
     @property
     def Interactor(self):  # type: ()->Interactor
         return Interactor(self._node.at("Interactor"))

@@ -38,6 +38,7 @@ from .ConditionalRigidityAttribute_Range import *
 from .VariantAllowed import *
 from .UnionObjectArrayItem import *
 from .TypedValue import *
+from .TweenableComponentGD_WayPoint_Position import *
 from .TransitionNeighborData import *
 from .TrailUVUnwrappingMode import *
 from .TrailRenderingType import *
@@ -73,6 +74,7 @@ from .soundEmissionStrength import *
 from .SoftCollisionGD_VegetationDetectionParameters import *
 from .SmoothScaleComponentInput_Parameters import *
 from .Size import *
+from .SimpleCurve1D import *
 from .ShowdownSpeciesAudioData import *
 from .ShowdownLayerInfo import *
 from .ShowdownLayerData import *
@@ -86,6 +88,8 @@ from .SeedPatchDataList import *
 from .ScriptPathAndDataSet import *
 from .ScaleFactor import *
 from .ScaleConverter import *
+from .ScoreComputation import *
+from .Scale import *
 from .SamplesPerAudioFrame import *
 from .RuntimeMode import *
 from .RigidbodyScalingSpeed import *
@@ -126,10 +130,13 @@ from .RecastNavmeshGenerationParameters import *
 from .sPhysicsJointDesc import *
 from .sPhysicShape import *
 from .sRigidBodyDesc import *
+from .TweenableComponentGD_WayPoint_Orientation import *
+from .TweenableComponentGD_WayPoint import *
 from .Transform3D import *
 from .ProjectileShooterData import *
 from .ProjectileData import *
 from .ProgressSoundEventData import *
+from .Progress import *
 from .PrimitiveShape import *
 from .ShapeSphere import *
 from .ShapeBox import *
@@ -378,6 +385,7 @@ from .ComponentInput import *
 from .WallRunComponentInput import *
 from .VelocityObstacleComponentInput import *
 from .UnifiedPhysicsDataComponentInput import *
+from .TweenableComponentInput import *
 from .SpiritAnimalShrineComponentInput import *
 from .SoundEmitterComponentInput import *
 from .SoftCollisionComponentInput import *
@@ -415,6 +423,7 @@ from .VolumeConstraintGD import *
 from .VisualGD import *
 from .VelocityObstacleGD import *
 from .UnifiedPhysicsDataGD import *
+from .TweenableComponentGD import *
 from .TriggerEventCameraGD import *
 from .TransformGD import *
 from .TestUnion import *
@@ -604,6 +613,7 @@ from .OffMeshLink import *
 from .NavMeshStamperGD import *
 from .CanTakeHit import *
 from .CreatureComponentInput import *
+from .CanPossess import *
 from .CanInteract import *
 from .InteractorComponentInput import *
 from .CanBeInteractedWith import *
@@ -715,6 +725,9 @@ from .EntityStateWallRunDrop import *
 from .EntityStateWallRun import *
 from .EntityStateUseAsActiveCheckpoint import *
 from .EntityStateUndergroundCavity import *
+from .EntityStateTweenableReset import *
+from .EntityStateTweenableInTransition import *
+from .EntityStateTweenableActivated import *
 from .EntityStateTryUnmount import *
 from .EntityStateTriggerBeamTargetEvent import *
 from .EntityStateTreeTurretTargeting import *
@@ -814,6 +827,7 @@ from .EntityStateFallDying import *
 from .EntityStateFall import *
 from .EntityStateFailingOrder import *
 from .EntityStateExtraLife import *
+from .EntityStateEnterDeathVolume import *
 from .EntityStateEnergySpoutState import *
 from .EntityStateEnergySide import *
 from .EntityStateEnergyRootHatching import *
@@ -870,7 +884,8 @@ from .EntityStateBeingOnSpike import *
 from .EntityStateBeingOnSlope import *
 from .EntityStateBeingLinked import *
 from .EntityStateBeingInReeds import *
-from .EntityStateBeingFocused import *
+from .EntityStateBeingFocusedToPossess import *
+from .EntityStateBeingFocusedToInteract import *
 from .EntityStateBeingBlockedByVine import *
 from .EntityStateBackwardLand import *
 from .EntityStateBackwardDodge import *

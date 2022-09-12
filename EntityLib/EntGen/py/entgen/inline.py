@@ -1119,6 +1119,28 @@ class TypedValue(HelperObject):
 
 from EntityLibPy import Node
 
+class TweenableComponentGD_WayPoint_Position(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.at("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->Vector3
+        return Vector3(self._node.at("val"))
+    @val.setter
+    def val(self, val): self.val.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class TransitionNeighborData(HelperObject):
     schema_name = "TransitionNeighborData"
     @staticmethod
@@ -2227,6 +2249,29 @@ class Size(Primitive[SizeEnum]):  # Enum
 
 from EntityLibPy import Node
 
+class SimpleCurve1D(HelperObject):
+    schema_name = "SimpleCurve1D"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->SimpleCurve1D
+        return SimpleCurve1D(entlib.load_node_file(sourcefile, entlib.get_schema(SimpleCurve1D.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->SimpleCurve1D
+        return SimpleCurve1D(entlib.make_node(SimpleCurve1D.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def easing(self):  # type: ()->variant_Pasta_Easing_Curve_string_
+        return variant_Pasta_Easing_Curve_string_(self._node.at("easing"))
+    pass
+
+
+from EntityLibPy import Node
+
 class ShowdownSpeciesAudioData(HelperObject):
     schema_name = "ShowdownSpeciesAudioData"
     @staticmethod
@@ -2854,6 +2899,70 @@ class ScaleConverter(HelperObject):
         return String(self._node.at("outText"))
     @outText.setter
     def outText(self, val): self.outText.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class ScoreComputation(HelperObject):
+    schema_name = "ScoreComputation"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->ScoreComputation
+        return ScoreComputation(entlib.load_node_file(sourcefile, entlib.get_schema(ScoreComputation.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->ScoreComputation
+        return ScoreComputation(entlib.make_node(ScoreComputation.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def DistanceScore(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("DistanceScore"))
+    @property
+    def MaxDistance(self):  # type: ()->Float
+        return Float(self._node.at("MaxDistance"))
+    @MaxDistance.setter
+    def MaxDistance(self, val): self.MaxDistance.set(val)
+    @property
+    def MinScore(self):  # type: ()->Float
+        return Float(self._node.at("MinScore"))
+    @MinScore.setter
+    def MinScore(self, val): self.MinScore.set(val)
+    @property
+    def ScreenDistXScore(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("ScreenDistXScore"))
+    @property
+    def ScreenDistYScore(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("ScreenDistYScore"))
+    @property
+    def SightCosScore(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("SightCosScore"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class Scale(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.at("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->Vector3
+        return Vector3(self._node.at("val"))
+    @val.setter
+    def val(self, val): self.val.set(val)
     pass
 
 
@@ -4132,6 +4241,65 @@ class sRigidBodyDesc(HelperObject):
 
 from EntityLibPy import Node
 
+class TweenableComponentGD_WayPoint_Orientation(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.at("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->Quat
+        return Quat(self._node.at("val"))
+    @val.setter
+    def val(self, val): self.val.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class TweenableComponentGD_WayPoint(HelperObject):
+    schema_name = "TweenableComponentGD::WayPoint"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->TweenableComponentGD_WayPoint
+        return TweenableComponentGD_WayPoint(entlib.load_node_file(sourcefile, entlib.get_schema(TweenableComponentGD_WayPoint.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->TweenableComponentGD_WayPoint
+        return TweenableComponentGD_WayPoint(entlib.make_node(TweenableComponentGD_WayPoint.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Easing(self):  # type: ()->SimpleCurve1D
+        return SimpleCurve1D(self._node.at("Easing"))
+    @property
+    def Orientation(self):  # type: ()->TweenableComponentGD_WayPoint_Orientation
+        return TweenableComponentGD_WayPoint_Orientation(self._node.at("Orientation"))
+    @property
+    def Position(self):  # type: ()->TweenableComponentGD_WayPoint_Position
+        return TweenableComponentGD_WayPoint_Position(self._node.at("Position"))
+    @property
+    def Scale(self):  # type: ()->Scale
+        return Scale(self._node.at("Scale"))
+    @property
+    def TimeScale(self):  # type: ()->Float
+        return Float(self._node.at("TimeScale"))
+    @TimeScale.setter
+    def TimeScale(self, val): self.TimeScale.set(val)
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class Transform3D(HelperObject):
     schema_name = "Transform3D"
     @staticmethod
@@ -4407,6 +4575,28 @@ class ProgressSoundEventData(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class Progress(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.at("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->Float
+        return Float(self._node.at("val"))
+    @val.setter
+    def val(self, val): self.val.set(val)
     pass
 
 
@@ -13020,6 +13210,32 @@ class UnifiedPhysicsDataComponentInput(HelperObject):
 
 from EntityLibPy import Node
 
+class TweenableComponentInput(HelperObject):
+    schema_name = "TweenableComponentInput"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->TweenableComponentInput
+        return TweenableComponentInput(entlib.load_node_file(sourcefile, entlib.get_schema(TweenableComponentInput.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->TweenableComponentInput
+        return TweenableComponentInput(entlib.make_node(TweenableComponentInput.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Progress(self):  # type: ()->Progress
+        return Progress(self._node.at("Progress"))
+    @property
+    def Super(self):  # type: ()->ComponentInput
+        return ComponentInput(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class SpiritAnimalShrineComponentInput(HelperObject):
     schema_name = "SpiritAnimalShrineComponentInput"
     @staticmethod
@@ -14040,6 +14256,11 @@ class VisualGD(HelperObject):
     @AlwaysStatic.setter
     def AlwaysStatic(self, val): self.AlwaysStatic.set(val)
     @property
+    def DetailMaterial(self):  # type: ()->String
+        return String(self._node.at("DetailMaterial"))
+    @DetailMaterial.setter
+    def DetailMaterial(self, val): self.DetailMaterial.set(val)
+    @property
     def EDITOR_GenerateFur(self):  # type: ()->Bool
         return Bool(self._node.at("EDITOR_GenerateFur"))
     @EDITOR_GenerateFur.setter
@@ -14124,6 +14345,37 @@ class UnifiedPhysicsDataGD(HelperObject):
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class TweenableComponentGD(HelperObject):
+    schema_name = "TweenableComponentGD"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->TweenableComponentGD
+        return TweenableComponentGD(entlib.load_node_file(sourcefile, entlib.get_schema(TweenableComponentGD.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->TweenableComponentGD
+        return TweenableComponentGD(entlib.make_node(TweenableComponentGD.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Local(self):  # type: ()->Bool
+        return Bool(self._node.at("Local"))
+    @Local.setter
+    def Local(self, val): self.Local.set(val)
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
+    @property
+    def WayPoints(self):  # type: ()->Array[TweenableComponentGD_WayPoint]
+        return (lambda n: Array(TweenableComponentGD_WayPoint, n))(self._node.at("WayPoints"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
@@ -21235,6 +21487,11 @@ class ClimbEdgeData(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def IsAllowed(self):  # type: ()->Bool
+        return Bool(self._node.at("IsAllowed"))
+    @IsAllowed.setter
+    def IsAllowed(self, val): self.IsAllowed.set(val)
+    @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
     @_comment.setter
@@ -22332,6 +22589,28 @@ class CreatureComponentInput(HelperObject):
 
 from EntityLibPy import Node
 
+class CanPossess(HelperObject):
+
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    @property
+    def engaged(self):  # type: ()->Bool
+        return Bool(self._node.at("engaged"))
+    @engaged.setter
+    def engaged(self, val): self.engaged.set(val)
+    @property
+    def val(self):  # type: ()->Bool
+        return Bool(self._node.at("val"))
+    @val.setter
+    def val(self, val): self.val.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class CanInteract(HelperObject):
 
     @property
@@ -22367,6 +22646,9 @@ class InteractorComponentInput(HelperObject):
     @property
     def CanInteract(self):  # type: ()->CanInteract
         return CanInteract(self._node.at("CanInteract"))
+    @property
+    def CanPossess(self):  # type: ()->CanPossess
+        return CanPossess(self._node.at("CanPossess"))
     @property
     def EndPosition(self):  # type: ()->EndPosition
         return EndPosition(self._node.at("EndPosition"))
@@ -22928,6 +23210,11 @@ class InteractorGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def BeamBonusPossessScore(self):  # type: ()->Float
+        return Float(self._node.at("BeamBonusPossessScore"))
+    @BeamBonusPossessScore.setter
+    def BeamBonusPossessScore(self, val): self.BeamBonusPossessScore.set(val)
+    @property
     def BeamEffectsNames(self):  # type: ()->PrimArray[String]
         return (lambda n: PrimArray(String, n))(self._node.at("BeamEffectsNames"))
     @BeamEffectsNames.setter
@@ -22936,24 +23223,16 @@ class InteractorGD(HelperObject):
     def BoneStartPoint(self):  # type: ()->BoneStartPoint
         return BoneStartPoint(self._node.at("BoneStartPoint"))
     @property
-    def InteractionDistanceScore(self):  # type: ()->ScaleConverter
-        return ScaleConverter(self._node.at("InteractionDistanceScore"))
-    @property
-    def InteractionScreenRadiusScore(self):  # type: ()->ScaleConverter
-        return ScaleConverter(self._node.at("InteractionScreenRadiusScore"))
-    @property
-    def InteractionSightCosScore(self):  # type: ()->ScaleConverter
-        return ScaleConverter(self._node.at("InteractionSightCosScore"))
+    def InteractionScore(self):  # type: ()->ScoreComputation
+        return ScoreComputation(self._node.at("InteractionScore"))
     @property
     def MaxBeamRange(self):  # type: ()->Float
         return Float(self._node.at("MaxBeamRange"))
     @MaxBeamRange.setter
     def MaxBeamRange(self, val): self.MaxBeamRange.set(val)
     @property
-    def MinScoreToInteract(self):  # type: ()->Float
-        return Float(self._node.at("MinScoreToInteract"))
-    @MinScoreToInteract.setter
-    def MinScoreToInteract(self, val): self.MinScoreToInteract.set(val)
+    def PossessScore(self):  # type: ()->ScoreComputation
+        return ScoreComputation(self._node.at("PossessScore"))
     @property
     def RandomSphereCastsAngle(self):  # type: ()->Float
         return Float(self._node.at("RandomSphereCastsAngle"))
@@ -22977,6 +23256,11 @@ class InteractorGD(HelperObject):
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
+    @property
+    def UnmountLongPressDuration(self):  # type: ()->Float
+        return Float(self._node.at("UnmountLongPressDuration"))
+    @UnmountLongPressDuration.setter
+    def UnmountLongPressDuration(self, val): self.UnmountLongPressDuration.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
@@ -26986,6 +27270,75 @@ class EntityStateUndergroundCavity(HelperObject):
 
 from EntityLibPy import Node
 
+class EntityStateTweenableReset(HelperObject):
+    schema_name = "EntityStateTweenableReset"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateTweenableReset
+        return EntityStateTweenableReset(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateTweenableReset.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateTweenableReset
+        return EntityStateTweenableReset(entlib.make_node(EntityStateTweenableReset.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateTweenableInTransition(HelperObject):
+    schema_name = "EntityStateTweenableInTransition"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateTweenableInTransition
+        return EntityStateTweenableInTransition(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateTweenableInTransition.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateTweenableInTransition
+        return EntityStateTweenableInTransition(entlib.make_node(EntityStateTweenableInTransition.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateTweenableActivated(HelperObject):
+    schema_name = "EntityStateTweenableActivated"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateTweenableActivated
+        return EntityStateTweenableActivated(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateTweenableActivated.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateTweenableActivated
+        return EntityStateTweenableActivated(entlib.make_node(EntityStateTweenableActivated.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class EntityStateTryUnmount(HelperObject):
     schema_name = "EntityStateTryUnmount"
     @staticmethod
@@ -29336,6 +29689,34 @@ class EntityStateExtraLife(HelperObject):
 
 from EntityLibPy import Node
 
+class EntityStateEnterDeathVolume(HelperObject):
+    schema_name = "EntityStateEnterDeathVolume"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateEnterDeathVolume
+        return EntityStateEnterDeathVolume(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateEnterDeathVolume.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateEnterDeathVolume
+        return EntityStateEnterDeathVolume(entlib.make_node(EntityStateEnterDeathVolume.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def AutorizedSpecies(self):  # type: ()->PrimArray[Specie]
+        return (lambda n: PrimArray(Specie, n))(self._node.at("AutorizedSpecies"))
+    @AutorizedSpecies.setter
+    def AutorizedSpecies(self, val): self.AutorizedSpecies.set(val)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
 class EntityStateEnergySpoutState(HelperObject):
     schema_name = "EntityStateEnergySpoutState"
     @staticmethod
@@ -30727,14 +31108,37 @@ class EntityStateBeingInReeds(HelperObject):
 
 from EntityLibPy import Node
 
-class EntityStateBeingFocused(HelperObject):
-    schema_name = "EntityStateBeingFocused"
+class EntityStateBeingFocusedToPossess(HelperObject):
+    schema_name = "EntityStateBeingFocusedToPossess"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBeingFocused
-        return EntityStateBeingFocused(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBeingFocused.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBeingFocusedToPossess
+        return EntityStateBeingFocusedToPossess(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBeingFocusedToPossess.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->EntityStateBeingFocused
-        return EntityStateBeingFocused(entlib.make_node(EntityStateBeingFocused.schema_name))
+    def create(entlib):  # type: (EntityLib)->EntityStateBeingFocusedToPossess
+        return EntityStateBeingFocusedToPossess(entlib.make_node(EntityStateBeingFocusedToPossess.schema_name))
+    def save(self, destfile):
+        self.node.save_node(destfile)
+    @property
+    def Super(self):  # type: ()->ActorState
+        return ActorState(self._node.at("Super"))
+    @property
+    def _comment(self):  # type: ()->String
+        return String(self._node.at("_comment"))
+    @_comment.setter
+    def _comment(self, val): self._comment.set(val)
+    pass
+
+
+from EntityLibPy import Node
+
+class EntityStateBeingFocusedToInteract(HelperObject):
+    schema_name = "EntityStateBeingFocusedToInteract"
+    @staticmethod
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBeingFocusedToInteract
+        return EntityStateBeingFocusedToInteract(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBeingFocusedToInteract.schema_name)))
+    @staticmethod
+    def create(entlib):  # type: (EntityLib)->EntityStateBeingFocusedToInteract
+        return EntityStateBeingFocusedToInteract(entlib.make_node(EntityStateBeingFocusedToInteract.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

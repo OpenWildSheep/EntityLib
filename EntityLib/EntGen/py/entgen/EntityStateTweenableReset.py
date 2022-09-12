@@ -9,14 +9,14 @@ from entgen.ActorState import *
 
 from EntityLibPy import Node
 
-class EntityStateBeingFocused(HelperObject):
-    schema_name = "EntityStateBeingFocused"
+class EntityStateTweenableReset(HelperObject):
+    schema_name = "EntityStateTweenableReset"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateBeingFocused
-        return EntityStateBeingFocused(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateBeingFocused.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateTweenableReset
+        return EntityStateTweenableReset(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateTweenableReset.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->EntityStateBeingFocused
-        return EntityStateBeingFocused(entlib.make_node(EntityStateBeingFocused.schema_name))
+    def create(entlib):  # type: (EntityLib)->EntityStateTweenableReset
+        return EntityStateTweenableReset(entlib.make_node(EntityStateTweenableReset.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

@@ -30,6 +30,7 @@ class HotSpotTypeEnum(Enum):
     takehandle = "takehandle"
     vertebra = "vertebra"
     respawnslot = "respawnslot"
+    perception = "perception"
     HotSpotType_COUNT = "HotSpotType_COUNT"
 
 

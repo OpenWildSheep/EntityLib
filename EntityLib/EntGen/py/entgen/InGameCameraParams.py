@@ -11,6 +11,7 @@ from entgen.CameraType import *
 from entgen.String import *
 from entgen.Bool import *
 from entgen.Float import *
+from entgen.InGameCameraParams_AnticipationJump import *
 from entgen.Position import *
 from entgen.ScaleConverter import *
 from entgen.Vector3 import *
@@ -52,6 +53,9 @@ class InGameCameraParams(HelperObject):
         return Bool(self._node.at("AnticipationForceReset"))
     @AnticipationForceReset.setter
     def AnticipationForceReset(self, val): self.AnticipationForceReset.set(val)
+    @property
+    def AnticipationJump(self):  # type: ()->InGameCameraParams_AnticipationJump
+        return InGameCameraParams_AnticipationJump(self._node.at("AnticipationJump"))
     @property
     def AnticipationMaxPitch(self):  # type: ()->Float
         return Float(self._node.at("AnticipationMaxPitch"))
@@ -183,10 +187,15 @@ class InGameCameraParams(HelperObject):
     @CollisionCorrectionSpeed.setter
     def CollisionCorrectionSpeed(self, val): self.CollisionCorrectionSpeed.set(val)
     @property
-    def CollisionSlowBackToPosSpeed(self):  # type: ()->Float
-        return Float(self._node.at("CollisionSlowBackToPosSpeed"))
-    @CollisionSlowBackToPosSpeed.setter
-    def CollisionSlowBackToPosSpeed(self, val): self.CollisionSlowBackToPosSpeed.set(val)
+    def CollisionDisabled(self):  # type: ()->Bool
+        return Bool(self._node.at("CollisionDisabled"))
+    @CollisionDisabled.setter
+    def CollisionDisabled(self, val): self.CollisionDisabled.set(val)
+    @property
+    def CollisionMoveCamBackToPosSpeed(self):  # type: ()->Float
+        return Float(self._node.at("CollisionMoveCamBackToPosSpeed"))
+    @CollisionMoveCamBackToPosSpeed.setter
+    def CollisionMoveCamBackToPosSpeed(self, val): self.CollisionMoveCamBackToPosSpeed.set(val)
     @property
     def CollisionTouchGroundBackToPosSpeed(self):  # type: ()->Float
         return Float(self._node.at("CollisionTouchGroundBackToPosSpeed"))
@@ -335,11 +344,6 @@ class InGameCameraParams(HelperObject):
         return Float(self._node.at("InterestPointSightAngleSpeed"))
     @InterestPointSightAngleSpeed.setter
     def InterestPointSightAngleSpeed(self, val): self.InterestPointSightAngleSpeed.set(val)
-    @property
-    def InterestPointTimeToReachMaxWeight(self):  # type: ()->Float
-        return Float(self._node.at("InterestPointTimeToReachMaxWeight"))
-    @InterestPointTimeToReachMaxWeight.setter
-    def InterestPointTimeToReachMaxWeight(self, val): self.InterestPointTimeToReachMaxWeight.set(val)
     @property
     def JoyAccelerationBoostChangingSideH(self):  # type: ()->Float
         return Float(self._node.at("JoyAccelerationBoostChangingSideH"))
@@ -507,6 +511,16 @@ class InGameCameraParams(HelperObject):
     @PitchToFOV.setter
     def PitchToFOV(self, val): self.PitchToFOV.set(val)
     @property
+    def RotationOffsetPitch(self):  # type: ()->Float
+        return Float(self._node.at("RotationOffsetPitch"))
+    @RotationOffsetPitch.setter
+    def RotationOffsetPitch(self, val): self.RotationOffsetPitch.set(val)
+    @property
+    def RotationOffsetYaw(self):  # type: ()->Float
+        return Float(self._node.at("RotationOffsetYaw"))
+    @RotationOffsetYaw.setter
+    def RotationOffsetYaw(self, val): self.RotationOffsetYaw.set(val)
+    @property
     def SpacePitchOffset(self):  # type: ()->Float
         return Float(self._node.at("SpacePitchOffset"))
     @SpacePitchOffset.setter
@@ -533,10 +547,16 @@ class InGameCameraParams(HelperObject):
     @TargetDistance.setter
     def TargetDistance(self, val): self.TargetDistance.set(val)
     @property
-    def TargetJumpSmooth(self):  # type: ()->Float
-        return Float(self._node.at("TargetJumpSmooth"))
-    @TargetJumpSmooth.setter
-    def TargetJumpSmooth(self, val): self.TargetJumpSmooth.set(val)
+    def TargetJumpDistOffset(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("TargetJumpDistOffset"))
+    @property
+    def TargetJumpDistOffsetSmooth(self):  # type: ()->Float
+        return Float(self._node.at("TargetJumpDistOffsetSmooth"))
+    @TargetJumpDistOffsetSmooth.setter
+    def TargetJumpDistOffsetSmooth(self, val): self.TargetJumpDistOffsetSmooth.set(val)
+    @property
+    def TargetJumpSmooth(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("TargetJumpSmooth"))
     @property
     def TargetMaxSpeed(self):  # type: ()->Float
         return Float(self._node.at("TargetMaxSpeed"))

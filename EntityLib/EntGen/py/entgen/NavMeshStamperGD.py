@@ -7,9 +7,9 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Bool import *
 from entgen.ComponentGD import *
+from entgen.VolumeConstraintStamper import *
 from entgen.MeshStamper import *
 from entgen.OffMeshLink import *
-from entgen.SkinnedPhysMeshStamper import *
 from entgen.ZoneStamper import *
 
 from EntityLibPy import Node
@@ -36,11 +36,16 @@ class NavMeshStamperGD(HelperObject):
     def OffMeshLinks(self):  # type: ()->Array[OffMeshLink]
         return (lambda n: Array(OffMeshLink, n))(self._node.at("OffMeshLinks"))
     @property
-    def SkinnedMeshStampers(self):  # type: ()->Array[SkinnedPhysMeshStamper]
-        return (lambda n: Array(SkinnedPhysMeshStamper, n))(self._node.at("SkinnedMeshStampers"))
-    @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
+    @property
+    def UseSkinnedMeshStamper(self):  # type: ()->Bool
+        return Bool(self._node.at("UseSkinnedMeshStamper"))
+    @UseSkinnedMeshStamper.setter
+    def UseSkinnedMeshStamper(self, val): self.UseSkinnedMeshStamper.set(val)
+    @property
+    def VolumeConstraintStamper(self):  # type: ()->VolumeConstraintStamper
+        return VolumeConstraintStamper(self._node.at("VolumeConstraintStamper"))
     @property
     def ZoneStampers(self):  # type: ()->Array[ZoneStamper]
         return (lambda n: Array(ZoneStamper, n))(self._node.at("ZoneStampers"))

@@ -43,6 +43,7 @@ class ActionModeEnum(Enum):
     mountreception = "mountreception"
     changeridingspot = "changeridingspot"
     goingtomountstate = "goingtomountstate"
+    meditate = "meditate"
     mount = "mount"
     unmount = "unmount"
     flap = "flap"

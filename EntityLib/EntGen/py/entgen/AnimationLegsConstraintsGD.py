@@ -11,6 +11,7 @@ from entgen.ComponentGD import *
 from entgen.Float import *
 from entgen.ScaleConverter import *
 from entgen.Vector2 import *
+from entgen.String import *
 
 from EntityLibPy import Node
 
@@ -33,6 +34,21 @@ class AnimationLegsConstraintsGD(HelperObject):
     def AscendingSlopeOffsetInfo(self):  # type: ()->AnimationLegsConstraints_SlopeOffsetInfo
         return AnimationLegsConstraints_SlopeOffsetInfo(self._node.at("AscendingSlopeOffsetInfo"))
     @property
+    def BackLeftBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.at("BackLeftBoneNames"))
+    @BackLeftBoneNames.setter
+    def BackLeftBoneNames(self, val): self.BackLeftBoneNames.set(val)
+    @property
+    def BackLeftFootCrushBoneName(self):  # type: ()->String
+        return String(self._node.at("BackLeftFootCrushBoneName"))
+    @BackLeftFootCrushBoneName.setter
+    def BackLeftFootCrushBoneName(self, val): self.BackLeftFootCrushBoneName.set(val)
+    @property
+    def BackLeftFootOrientationBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.at("BackLeftFootOrientationBoneNames"))
+    @BackLeftFootOrientationBoneNames.setter
+    def BackLeftFootOrientationBoneNames(self, val): self.BackLeftFootOrientationBoneNames.set(val)
+    @property
     def BackLegsCompensateExtensionThreshold(self):  # type: ()->Float
         return Float(self._node.at("BackLegsCompensateExtensionThreshold"))
     @BackLegsCompensateExtensionThreshold.setter
@@ -42,6 +58,21 @@ class AnimationLegsConstraintsGD(HelperObject):
         return Vector2(self._node.at("BackLegsHeightRangeForIKInfluence"))
     @BackLegsHeightRangeForIKInfluence.setter
     def BackLegsHeightRangeForIKInfluence(self, val): self.BackLegsHeightRangeForIKInfluence.set(val)
+    @property
+    def BackRightBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.at("BackRightBoneNames"))
+    @BackRightBoneNames.setter
+    def BackRightBoneNames(self, val): self.BackRightBoneNames.set(val)
+    @property
+    def BackRightFootCrushBoneName(self):  # type: ()->String
+        return String(self._node.at("BackRightFootCrushBoneName"))
+    @BackRightFootCrushBoneName.setter
+    def BackRightFootCrushBoneName(self, val): self.BackRightFootCrushBoneName.set(val)
+    @property
+    def BackRightFootOrientationBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.at("BackRightFootOrientationBoneNames"))
+    @BackRightFootOrientationBoneNames.setter
+    def BackRightFootOrientationBoneNames(self, val): self.BackRightFootOrientationBoneNames.set(val)
     @property
     def BoneBending(self):  # type: ()->Bool
         return Bool(self._node.at("BoneBending"))
@@ -76,6 +107,21 @@ class AnimationLegsConstraintsGD(HelperObject):
     @FeetInfluence.setter
     def FeetInfluence(self, val): self.FeetInfluence.set(val)
     @property
+    def FrontLeftBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.at("FrontLeftBoneNames"))
+    @FrontLeftBoneNames.setter
+    def FrontLeftBoneNames(self, val): self.FrontLeftBoneNames.set(val)
+    @property
+    def FrontLeftFootCrushBoneName(self):  # type: ()->String
+        return String(self._node.at("FrontLeftFootCrushBoneName"))
+    @FrontLeftFootCrushBoneName.setter
+    def FrontLeftFootCrushBoneName(self, val): self.FrontLeftFootCrushBoneName.set(val)
+    @property
+    def FrontLeftFootOrientationBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.at("FrontLeftFootOrientationBoneNames"))
+    @FrontLeftFootOrientationBoneNames.setter
+    def FrontLeftFootOrientationBoneNames(self, val): self.FrontLeftFootOrientationBoneNames.set(val)
+    @property
     def FrontLegsCompensateExtensionThreshold(self):  # type: ()->Float
         return Float(self._node.at("FrontLegsCompensateExtensionThreshold"))
     @FrontLegsCompensateExtensionThreshold.setter
@@ -86,10 +132,30 @@ class AnimationLegsConstraintsGD(HelperObject):
     @FrontLegsHeightRangeForIKInfluence.setter
     def FrontLegsHeightRangeForIKInfluence(self, val): self.FrontLegsHeightRangeForIKInfluence.set(val)
     @property
+    def FrontRightBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.at("FrontRightBoneNames"))
+    @FrontRightBoneNames.setter
+    def FrontRightBoneNames(self, val): self.FrontRightBoneNames.set(val)
+    @property
+    def FrontRightFootCrushBoneName(self):  # type: ()->String
+        return String(self._node.at("FrontRightFootCrushBoneName"))
+    @FrontRightFootCrushBoneName.setter
+    def FrontRightFootCrushBoneName(self, val): self.FrontRightFootCrushBoneName.set(val)
+    @property
+    def FrontRightFootOrientationBoneNames(self):  # type: ()->PrimArray[String]
+        return (lambda n: PrimArray(String, n))(self._node.at("FrontRightFootOrientationBoneNames"))
+    @FrontRightFootOrientationBoneNames.setter
+    def FrontRightFootOrientationBoneNames(self, val): self.FrontRightFootOrientationBoneNames.set(val)
+    @property
     def GlobalInfluence(self):  # type: ()->Float
         return Float(self._node.at("GlobalInfluence"))
     @GlobalInfluence.setter
     def GlobalInfluence(self, val): self.GlobalInfluence.set(val)
+    @property
+    def HipsBoneNames(self):  # type: ()->String
+        return String(self._node.at("HipsBoneNames"))
+    @HipsBoneNames.setter
+    def HipsBoneNames(self, val): self.HipsBoneNames.set(val)
     @property
     def LegInfluence(self):  # type: ()->Float
         return Float(self._node.at("LegInfluence"))

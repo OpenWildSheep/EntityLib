@@ -9,7 +9,6 @@ from entgen.Bool import *
 from entgen.ComponentGD import *
 from entgen.Float import *
 from entgen.Vector2 import *
-from entgen.String import *
 
 from EntityLibPy import Node
 
@@ -24,15 +23,10 @@ class HeightMapComponentGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def HeightMapArchivePath(self):  # type: ()->String
-        return String(self._node.at("HeightMapArchivePath"))
-    @HeightMapArchivePath.setter
-    def HeightMapArchivePath(self, val): self.HeightMapArchivePath.set(val)
-    @property
-    def HeightMapPaths(self):  # type: ()->PrimArray[String]
-        return (lambda n: PrimArray(String, n))(self._node.at("HeightMapPaths"))
-    @HeightMapPaths.setter
-    def HeightMapPaths(self, val): self.HeightMapPaths.set(val)
+    def HeightMapWBin(self):  # type: ()->String
+        return String(self._node.at("HeightMapWBin"))
+    @HeightMapWBin.setter
+    def HeightMapWBin(self, val): self.HeightMapWBin.set(val)
     @property
     def HeightScale(self):  # type: ()->Float
         return Float(self._node.at("HeightScale"))

@@ -22,6 +22,16 @@ class VegetationManager(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def BendDisplaceFadeStart(self):  # type: ()->Float
+        return Float(self._node.at("BendDisplaceFadeStart"))
+    @BendDisplaceFadeStart.setter
+    def BendDisplaceFadeStart(self, val): self.BendDisplaceFadeStart.set(val)
+    @property
+    def BendDisplaceFadeStop(self):  # type: ()->Float
+        return Float(self._node.at("BendDisplaceFadeStop"))
+    @BendDisplaceFadeStop.setter
+    def BendDisplaceFadeStop(self, val): self.BendDisplaceFadeStop.set(val)
+    @property
     def BuryDepth(self):  # type: ()->Float
         return Float(self._node.at("BuryDepth"))
     @BuryDepth.setter
@@ -94,6 +104,16 @@ class VegetationManager(HelperObject):
         return String(self._node.at("VegetationBankPath"))
     @VegetationBankPath.setter
     def VegetationBankPath(self, val): self.VegetationBankPath.set(val)
+    @property
+    def WindDisplaceFadeStart(self):  # type: ()->Float
+        return Float(self._node.at("WindDisplaceFadeStart"))
+    @WindDisplaceFadeStart.setter
+    def WindDisplaceFadeStart(self, val): self.WindDisplaceFadeStart.set(val)
+    @property
+    def WindDisplaceFadeStop(self):  # type: ()->Float
+        return Float(self._node.at("WindDisplaceFadeStop"))
+    @WindDisplaceFadeStop.setter
+    def WindDisplaceFadeStop(self, val): self.WindDisplaceFadeStop.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

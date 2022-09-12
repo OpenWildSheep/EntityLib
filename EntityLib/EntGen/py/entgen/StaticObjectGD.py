@@ -26,6 +26,11 @@ class StaticObjectGD(HelperObject):
     @EDITOR_IsCave.setter
     def EDITOR_IsCave(self, val): self.EDITOR_IsCave.set(val)
     @property
+    def EDITOR_MergeInNavMesh(self):  # type: ()->Bool
+        return Bool(self._node.at("EDITOR_MergeInNavMesh"))
+    @EDITOR_MergeInNavMesh.setter
+    def EDITOR_MergeInNavMesh(self, val): self.EDITOR_MergeInNavMesh.set(val)
+    @property
     def EDITOR_UsedInMultiLayerHeightmap(self):  # type: ()->Bool
         return Bool(self._node.at("EDITOR_UsedInMultiLayerHeightmap"))
     @EDITOR_UsedInMultiLayerHeightmap.setter

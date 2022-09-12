@@ -21,6 +21,9 @@ class GamePadSpeedBehaviorData(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def AntiReboundDelayConverter(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("AntiReboundDelayConverter"))
+    @property
     def DeadZoneThreshold(self):  # type: ()->ScaleConverter
         return ScaleConverter(self._node.at("DeadZoneThreshold"))
     @property

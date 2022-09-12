@@ -5,6 +5,8 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.Color import *
+from entgen.ComponentGD import *
 from entgen.String import *
 
 from EntityLibPy import Node
@@ -20,6 +22,11 @@ class ReflectedMaterialGroup(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def Color(self):  # type: ()->Color
+        return Color(self._node.at("Color"))
+    @Color.setter
+    def Color(self, val): self.Color.set(val)
+    @property
     def Materials(self):  # type: ()->PrimArray[String]
         return (lambda n: PrimArray(String, n))(self._node.at("Materials"))
     @Materials.setter
@@ -29,6 +36,9 @@ class ReflectedMaterialGroup(HelperObject):
         return (lambda n: PrimArray(String, n))(self._node.at("OverrideGroups"))
     @OverrideGroups.setter
     def OverrideGroups(self, val): self.OverrideGroups.set(val)
+    @property
+    def Super(self):  # type: ()->ComponentGD
+        return ComponentGD(self._node.at("Super"))
     @property
     def Tags(self):  # type: ()->PrimArray[String]
         return (lambda n: PrimArray(String, n))(self._node.at("Tags"))

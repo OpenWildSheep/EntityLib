@@ -7,7 +7,11 @@ import EntityLibPy
 from entgen.GPEType import *
 from entgen.String import *
 from entgen.ComponentGD import *
-from entgen.ResponsiblePointer_ActorState_ import *
+from entgen.Float import *
+from entgen.FocusInteractableEntityState import *
+from entgen.FocusInteractorEntityState import *
+from entgen.InteractionInteractableEntityState import *
+from entgen.InteractionInteractorEntityState import *
 
 from EntityLibPy import Node
 
@@ -22,8 +26,11 @@ class InteractableGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def GPEActorState(self):  # type: ()->ResponsiblePointer_ActorState_
-        return ResponsiblePointer_ActorState_(self._node.at("GPEActorState"))
+    def FocusInteractableEntityState(self):  # type: ()->FocusInteractableEntityState
+        return FocusInteractableEntityState(self._node.at("FocusInteractableEntityState"))
+    @property
+    def FocusInteractorEntityState(self):  # type: ()->FocusInteractorEntityState
+        return FocusInteractorEntityState(self._node.at("FocusInteractorEntityState"))
     @property
     def GPEType(self):  # type: ()->GPEType
         return GPEType(self._node.at("GPEType"))
@@ -35,8 +42,26 @@ class InteractableGD(HelperObject):
     @HotspotName.setter
     def HotspotName(self, val): self.HotspotName.set(val)
     @property
-    def InteractionModeActorState(self):  # type: ()->ResponsiblePointer_ActorState_
-        return ResponsiblePointer_ActorState_(self._node.at("InteractionModeActorState"))
+    def InteractMaxDistance(self):  # type: ()->Float
+        return Float(self._node.at("InteractMaxDistance"))
+    @InteractMaxDistance.setter
+    def InteractMaxDistance(self, val): self.InteractMaxDistance.set(val)
+    @property
+    def InteractMaxDistanceHysteresis(self):  # type: ()->Float
+        return Float(self._node.at("InteractMaxDistanceHysteresis"))
+    @InteractMaxDistanceHysteresis.setter
+    def InteractMaxDistanceHysteresis(self, val): self.InteractMaxDistanceHysteresis.set(val)
+    @property
+    def InteractionInteractableEntityState(self):  # type: ()->InteractionInteractableEntityState
+        return InteractionInteractableEntityState(self._node.at("InteractionInteractableEntityState"))
+    @property
+    def InteractionInteractorEntityState(self):  # type: ()->InteractionInteractorEntityState
+        return InteractionInteractorEntityState(self._node.at("InteractionInteractorEntityState"))
+    @property
+    def InteractionPriority(self):  # type: ()->Float
+        return Float(self._node.at("InteractionPriority"))
+    @InteractionPriority.setter
+    def InteractionPriority(self, val): self.InteractionPriority.set(val)
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))

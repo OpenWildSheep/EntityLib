@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.Float import *
+from entgen.Float import *
 
 from EntityLibPy import Node
 
@@ -24,6 +25,11 @@ class GameLODData(HelperObject):
         return (lambda n: PrimArray(Float, n))(self._node.at("CreatureDistance"))
     @CreatureDistance.setter
     def CreatureDistance(self, val): self.CreatureDistance.set(val)
+    @property
+    def DistanceHysteresis(self):  # type: ()->Float
+        return Float(self._node.at("DistanceHysteresis"))
+    @DistanceHysteresis.setter
+    def DistanceHysteresis(self, val): self.DistanceHysteresis.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

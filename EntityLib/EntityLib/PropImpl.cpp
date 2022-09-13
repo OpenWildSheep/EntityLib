@@ -1388,6 +1388,10 @@ namespace Ent
 
     PropImplPtr PropImpl::resolveNodeRef(char const* _nodeRef)
     {
+        if (_nodeRef == nullptr)
+        {
+            throw NullPointerArgument("resolveNodeRef", "nodeRef");
+        }
         auto const* tokenStart = _nodeRef;
         auto const* const nodeRefEnd = _nodeRef + strlen(_nodeRef);
 

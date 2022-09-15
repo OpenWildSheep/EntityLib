@@ -231,6 +231,10 @@ static py::list propMapGetItems(Property& _prop)
 
 static py::list propPrimSetGetKeys(Property& _prop)
 {
+    if (_prop.getSchema()->singularItems == nullptr)
+    {
+        throw std::runtime_error("Not an primitiveSet in 'primset_keys'");
+    }
     auto const& type = _prop.getSchema()->singularItems->get().type;
     py::list arr;
     if (type == DataType::string || type == DataType::entityRef)
@@ -256,6 +260,10 @@ static py::list propPrimSetGetKeys(Property& _prop)
 
 static py::list propObjSetGetKeys(Property& _prop)
 {
+    if (_prop.getSchema()->singularItems == nullptr)
+    {
+        throw std::runtime_error("Not an objectSet in 'objectset_keys'");
+    }
     auto& itemType = _prop.getSchema()->singularItems->get();
     auto const meta = std::get<Subschema::ArrayMeta>(_prop.getSchema()->meta);
     auto const type = itemType.properties.at(*meta.keyField).get().type;

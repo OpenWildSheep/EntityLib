@@ -126,7 +126,7 @@
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <EnableMicrosoftCodeAnalysis>true</EnableMicrosoftCodeAnalysis>
     <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
-    <ExternalIncludePath>..\..\..\ExternalTools\pybind11\include;..\..\..\ExternalTools\Python37\include;..\EntityLib\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
+    <ExternalIncludePath>..\..\..\ExternalTools\pybind11\include;..\..\..\ExternalTools\Python39\include;..\EntityLib\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</ExternalIncludePath>
     <CodeAnalysisRuleSet>..\..\WildShared.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-3.8|x64'">
@@ -215,7 +215,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\ExternalTools\Python37\libs;..\x64\Debug\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\ExternalTools\Python39\libs;..\x64\Debug\</AdditionalLibraryDirectories>
       <AdditionalDependencies>EntityLib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

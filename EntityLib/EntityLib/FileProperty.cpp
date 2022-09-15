@@ -473,6 +473,7 @@ namespace Ent
             }
             switch (itemType.linearItems->at(0)->type)
             {
+            case DataType::entityRef: [[fallthrough]];
             case DataType::string:
             {
                 auto const& key = std::get<std::string>(childName);
@@ -515,6 +516,7 @@ namespace Ent
                 ENTLIB_ASSERT(newLayerJson != nullptr);
                 break;
             }
+            case DataType::entityRef: [[fallthrough]]; // entityRef set
             case DataType::string: // String set
             {
                 auto const& key = std::get<std::string>(childName);
@@ -555,6 +557,7 @@ namespace Ent
             auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
             switch (keyFieldSchema.type)
             {
+            case DataType::entityRef: [[fallthrough]];
             case DataType::string:
             {
                 auto const& key = std::get<std::string>(childName);

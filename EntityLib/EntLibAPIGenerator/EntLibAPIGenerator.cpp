@@ -265,7 +265,7 @@ static json prim(char const* _name)
     json type = makeNewType();
     json ref;
     ref["name"] = static_cast<char>(toupper(_name[0])) + std::string((_name + 1));
-    if (_name == std::string("String"))
+    if (_name == std::string("String") or _name == std::string("EntityRef"))
     {
         ref["py_native"] = "str";
         ref["cpp_native"] = "char const*";

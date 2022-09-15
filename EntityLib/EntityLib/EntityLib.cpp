@@ -1186,6 +1186,12 @@ namespace Ent
                             },
                             doRemoveDefault);
                         break;
+                    case DataType::entityRef: // The key is the item itself
+                        arr = mergeMapOverride(
+                            [](json const& item) { return item.get<std::string>(); },
+                            [&](Node const* tmplItem) { return tmplItem->getEntityRef().entityPath; },
+                            doRemoveDefault);
+                        break;
                     case DataType::integer: // The key is the item itself
                         arr = mergeMapOverride(
                             [](json const& item) { return item.get<int64_t>(); },
@@ -1209,6 +1215,14 @@ namespace Ent
                                     { return item.at(key).get<std::string>(); },
                                     [key = meta.keyField->c_str()](Node const* tmplItem)
                                     { return tmplItem->at(key)->getString(); },
+                                    doRemoveSet);
+                                break;
+                            case DataType::entityRef:
+                                arr = mergeMapOverride(
+                                    [key = meta.keyField->c_str()](json const& item)
+                                    { return item.at(key).get<std::string>(); },
+                                    [key = meta.keyField->c_str()](Node const* tmplItem)
+                                    { return tmplItem->at(key)->getEntityRef().entityPath.c_str(); },
                                     doRemoveSet);
                                 break;
                             case DataType::integer:

@@ -113,6 +113,7 @@ namespace Ent
                 switch (singularItems->get().type)
                 {
                 case DataType::integer: [[fallthrough]];
+                case DataType::entityRef: [[fallthrough]];
                 case DataType::string: return DataKind::primitiveSet;
                 case DataType::oneOf: return DataKind::unionSet;
                 case DataType::object: return DataKind::objectSet;

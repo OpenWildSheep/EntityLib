@@ -612,6 +612,7 @@ namespace Ent
             case "map"_hash:
                 switch (getMapKeyType())
                 {
+                case DataType::entityRef: [[fallthrough]];
                 case DataType::string: return getMapKeysString().size();
                 case DataType::integer: return getMapKeysInt().size();
                 default: ENTLIB_LOGIC_ERROR("Unexpected key type");
@@ -623,12 +624,14 @@ namespace Ent
                 switch (itemType.type)
                 {
                 case DataType::integer: return getPrimSetKeysInt().size();
+                case DataType::entityRef: [[fallthrough]];
                 case DataType::string: return getPrimSetKeysString().size();
                 case DataType::oneOf: return getUnionSetKeysString().size();
                 case DataType::object:
                     auto const& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                     switch (keyFieldSchema.type)
                     {
+                    case DataType::entityRef: [[fallthrough]];
                     case DataType::string: return getObjectSetKeysString().size();
                     case DataType::integer: return getObjectSetKeysInt().size();
                     default: ENTLIB_LOGIC_ERROR("Unexpected key type");
@@ -674,6 +677,7 @@ namespace Ent
             case "map"_hash:
                 switch (getMapKeyType())
                 {
+                case DataType::entityRef: [[fallthrough]];
                 case DataType::string: return mapContains(std::get<std::string>(_key).c_str());
                 case DataType::integer: return mapContains(std::get<size_t>(_key));
                 default: ENTLIB_LOGIC_ERROR("Unexpected key type");
@@ -685,12 +689,14 @@ namespace Ent
                 switch (itemType.type)
                 {
                 case DataType::integer: return primSetContains(std::get<size_t>(_key));
+                case DataType::entityRef: [[fallthrough]];
                 case DataType::string: return primSetContains(std::get<std::string>(_key).c_str());
                 case DataType::oneOf: return unionSetContains(std::get<std::string>(_key).c_str());
                 case DataType::object:
                     auto const& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                     switch (keyFieldSchema.type)
                     {
+                    case DataType::entityRef: [[fallthrough]];
                     case DataType::string:
                         return objectSetContains(std::get<std::string>(_key).c_str());
                     case DataType::integer: return objectSetContains(std::get<size_t>(_key));

@@ -56,6 +56,10 @@ namespace Ent
             // The key is the item itself
             case DataType::string: _child->setString(std::get<String>(_key).c_str()); break;
             // The key is the item itself
+            case DataType::entityRef:
+                _child->setEntityRef(EntityRef{std::get<String>(_key)});
+                break;
+            // The key is the item itself
             case DataType::integer: _child->setInt(std::get<int64_t>(_key)); break;
             case DataType::object:
                 if (meta.keyField.has_value())
@@ -65,6 +69,9 @@ namespace Ent
                     {
                     case DataType::string:
                         keyNode->setString(std::get<String>(_key).c_str());
+                        break;
+                    case DataType::entityRef:
+                        keyNode->setEntityRef(EntityRef{std::get<String>(_key)});
                         break;
                     case DataType::integer: keyNode->setInt(std::get<int64_t>(_key)); break;
                     default:
@@ -105,6 +112,7 @@ namespace Ent
             {
             case DataType::oneOf: return DataType::string;
             case DataType::string: return DataType::string;
+            case DataType::entityRef: return DataType::string;
             case DataType::integer: return DataType::integer;
             case DataType::object:
             {
@@ -117,6 +125,7 @@ namespace Ent
                     {
                     case DataType::oneOf: return DataType::string;
                     case DataType::string: return DataType::string;
+                    case DataType::entityRef: return DataType::string;
                     case DataType::integer: return DataType::integer;
                     default:
                         throw ContextException(
@@ -178,6 +187,7 @@ namespace Ent
             case DataType::oneOf: return String(_child->getUnionType()); break;
             // The key is the item itself
             case DataType::string: return String(_child->getString());
+            case DataType::entityRef: return _child->getEntityRef().entityPath;
             case DataType::integer: return _child->getInt();
             case DataType::object:
                 if (meta.keyField.has_value())
@@ -186,6 +196,7 @@ namespace Ent
                     switch (keyNode->getDataType())
                     {
                     case DataType::string: return keyNode->getString(); break;
+                    case DataType::entityRef: return keyNode->getEntityRef().entityPath.c_str();
                     case DataType::integer: return keyNode->getInt(); break;
                     default:
                         throw ContextException(

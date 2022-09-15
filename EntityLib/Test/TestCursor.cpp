@@ -214,6 +214,7 @@ public:
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         switch (expl.getMapKeyType())
         {
+        case DataType::entityRef: [[fallthrough]];
         case DataType::string:
             if (nodes.back()->getKeysString().size() != expl.getMapKeysString().size())
             {
@@ -252,6 +253,7 @@ public:
         auto const& itemType = expl.getSchema()->singularItems->get();
         switch (itemType.type)
         {
+        case DataType::entityRef: [[fallthrough]];
         case DataType::string:
             ENTLIB_ASSERT(nodes.back()->getKeysString().size() == expl.getPrimSetKeysString().size());
             break;
@@ -308,6 +310,7 @@ public:
         ENTLIB_ASSERT(nodes.back()->size() == expl.size());
         switch (nodes.back()->getKeyType())
         {
+        case DataType::entityRef: [[fallthrough]];
         case DataType::string:
             ENTLIB_ASSERT(
                 nodes.back()->getKeysString().size() == expl.getObjectSetKeysString().size());
@@ -449,6 +452,7 @@ public:
         ENTLIB_ASSERT(expl2.size() == _prop.size());
         switch (_prop.getMapKeyType())
         {
+        case DataType::entityRef: [[fallthrough]];
         case DataType::string:
             ENTLIB_ASSERT(expl2.getMapKeysString().size() == _prop.getMapKeysString().size());
             break;
@@ -476,6 +480,7 @@ public:
         auto const& itemType = _prop.getSchema()->singularItems->get();
         switch (itemType.type)
         {
+        case DataType::entityRef: [[fallthrough]];
         case DataType::string:
             ENTLIB_ASSERT(expl2.getPrimSetKeysString() == _prop.getPrimSetKeysString());
             break;
@@ -527,6 +532,7 @@ public:
         ENTLIB_ASSERT(expl2.size() == _prop.size());
         switch (expl2.getObjectSetKeyType())
         {
+        case DataType::entityRef: [[fallthrough]];
         case DataType::string:
         {
             auto const a = expl2.getObjectSetKeysString();
@@ -671,6 +677,7 @@ size_t countNodes(Node* node)
         case "map"_hash:
             switch (node->getKeyType())
             {
+            case DataType::entityRef: [[fallthrough]];
             case DataType::string:
                 for (auto&& key : node->getKeysString())
                 {
@@ -697,6 +704,7 @@ size_t countNodes(Node* node)
                     nodeCount += countNodes(node->mapGet(key));
                 }
                 break;
+            case DataType::entityRef: [[fallthrough]];
             case DataType::string:
                 for (auto&& key : node->getKeysString())
                 {
@@ -713,6 +721,7 @@ size_t countNodes(Node* node)
                 auto const& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                 switch (keyFieldSchema.type)
                 {
+                case DataType::entityRef: [[fallthrough]];
                 case DataType::string:
                     for (auto&& key : node->getKeysString())
                     {

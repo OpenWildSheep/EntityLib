@@ -41,6 +41,7 @@ namespace Ent
                 _visitor.inMap(_expl);
                 switch (_expl.getMapKeyType())
                 {
+                case DataType::entityRef: [[fallthrough]];
                 case DataType::string:
                     for (char const* key : _expl.getMapKeysString())
                     {
@@ -76,6 +77,7 @@ namespace Ent
                     }
                     _visitor.outPrimSet(_expl);
                     break;
+                case DataType::entityRef: [[fallthrough]];
                 case DataType::string:
                     _visitor.inPrimSet(_expl, itemType.type);
                     for (char const* key : _expl.getPrimSetKeysString())
@@ -100,6 +102,7 @@ namespace Ent
                     auto const& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                     switch (keyFieldSchema.type)
                     {
+                    case DataType::entityRef: [[fallthrough]];
                     case DataType::string:
                         for (auto&& key : _expl.getObjectSetKeysString())
                         {
@@ -171,6 +174,7 @@ namespace Ent
                 switch (itemType.type)
                 {
                 case DataType::integer:
+                case DataType::entityRef: [[fallthrough]];
                 case DataType::string: _visitor.inPrimSet(itemType.type); break;
                 case DataType::oneOf: _visitor.inUnionSet(); break;
                 case DataType::object: _visitor.inObjectSet(); break;

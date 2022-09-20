@@ -1,0 +1,38 @@
+
+namespace MAX;
+
+enum TangentType : byte 
+{ 
+    Smooth = 1,
+    Linear,
+    Step,
+    Slow,
+    Fast,
+    Custom,
+    Auto 
+}
+
+table Keyframe
+{ 
+    time: float;
+    value: float;
+    tan_in: float;
+    tan_out: float;
+    tan_type_in: TangentType = Auto;
+    tan_type_out: TangentType = Auto;
+}
+
+table Animation
+{
+    position_x: [Keyframe];
+    position_y: [Keyframe];
+    position_z: [Keyframe];
+
+    orientation_x: [Keyframe];
+    orientation_y: [Keyframe];
+    orientation_z: [Keyframe];
+
+    scale: [Keyframe];
+}
+
+root_type Animation;

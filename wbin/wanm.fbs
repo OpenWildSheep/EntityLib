@@ -1,0 +1,19 @@
+include "wbin.fbs";
+
+namespace WBIN;
+
+table BoneAnimation
+{
+    name: string (required);
+    translations: [Float3];
+    orientations: [Float4];
+    scales: [Float3];
+}
+
+table Animation
+{
+    frame_rate: float;
+    bone_animations: [BoneAnimation] (required);
+}
+
+root_type Animation;

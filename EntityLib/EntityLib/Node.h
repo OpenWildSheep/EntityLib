@@ -70,6 +70,7 @@ namespace Ent
         getFields() const; ///< @pre type==Ent::DataType::object @brief Get all fields
         [[nodiscard]] char const*
         getInstanceOf() const; ///< @pre type==Ent::DataType::object @brief path to the tmpl Node
+        [[nodiscard]] char const* getRawInstanceOf(OverrideValueLocation _location) const;
 
         // Array
         Node* at(size_t _index); ///< @pre type==Ent::DataType::array. @brief Get the item at _index

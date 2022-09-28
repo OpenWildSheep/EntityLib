@@ -824,6 +824,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("erase_unionset_item", &Property::eraseUnionSetItem)
         .def("copy_into", &Property::copyInto)
         .def("unset", [](Property& _self) { return _self.unset(); })
+        .def("push_back", &Property::pushBack)
+        .def("pop_back", &Property::popBack)
         ;
 
     py::register_exception<JsonValidation>(ent, "JsonValidation");

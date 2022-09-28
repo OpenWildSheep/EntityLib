@@ -994,14 +994,14 @@ namespace Ent
         }
     }
 
-    PropImplPtr PropImpl::push_back()
+    PropImplPtr PropImpl::pushBack()
     {
         CHECK_TYPE(DataKind::array);
         setSize(arraySize() + 1);
         return getArrayItem(arraySize() - 1);
     }
 
-    void PropImpl::pop_back()
+    void PropImpl::popBack()
     {
         CHECK_TYPE(DataKind::array);
         setSize(arraySize() - 1);

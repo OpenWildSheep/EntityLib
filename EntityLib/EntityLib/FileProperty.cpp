@@ -150,7 +150,7 @@ namespace Ent
                 newLayer.m_wrapper = &(*jsonIter);
                 if (auto const dataIter = jsonIter->find(dataField); dataIter != jsonIter->end())
                 {
-                    if (not dataIter->is_null())  // In UnionSet, null dataField mean remove
+                    if (not dataIter->is_null()) // In UnionSet, null dataField mean remove
                     { // Item found!
                         newLayer.m_values = &(*dataIter);
                         subItemIsSet = MapItemAction::Add;
@@ -437,7 +437,8 @@ namespace Ent
         ENTLIB_DBG_ASSERT(
             static_cast<int>(_parent.m_values->type()) < static_cast<int>(json::value_t::discarded));
         json* newLayerJson = nullptr;
-        switch (_parent.m_schema.base->getDataKind())
+        auto& parentSchema = *_parent.m_schema.base;
+        switch (parentSchema.getDataKind())
         {
         case DataKind::object:
         {
@@ -457,8 +458,8 @@ namespace Ent
                 (*_parent.m_values) = json::object();
             }
             auto const& fieldName = std::get<std::string>(childName);
-            auto const* typeField = _parent.m_schema.base->getUnionNameField();
-            auto const* dataField = _parent.m_schema.base->getUnionDataField();
+            auto const* typeField = parentSchema.getUnionNameField();
+            auto const* dataField = parentSchema.getUnionDataField();
             (*_parent.m_values)[typeField] = fieldName;
             (*_parent.m_values)[dataField] = {};
             newLayerJson = &(*_parent.m_values)[dataField];
@@ -466,7 +467,7 @@ namespace Ent
         break;
         case DataKind::map:
         {
-            auto& itemType = _parent.m_schema.base->singularItems->get();
+            auto& itemType = parentSchema.singularItems->get();
             if (_parent.m_values->is_null())
             {
                 (*_parent.m_values) = json::array();
@@ -506,7 +507,7 @@ namespace Ent
             {
                 (*_parent.m_values) = json::array();
             }
-            auto& itemType = _parent.m_schema.base->singularItems->get();
+            auto& itemType = parentSchema.singularItems->get();
             switch (itemType.type)
             {
             case DataType::integer: // integer set
@@ -535,7 +536,7 @@ namespace Ent
             }
             auto wrapper = json::object();
             auto const& fieldName = std::get<std::string>(childName);
-            auto* unionSchema = &_parent.m_schema.base->singularItems->get();
+            auto* unionSchema = &parentSchema.singularItems->get();
             auto const* typeField = unionSchema->getUnionNameField();
             auto const* dataField = unionSchema->getUnionDataField();
             wrapper[dataField] = json::object(); // TODO : Change to default value according to type
@@ -551,8 +552,8 @@ namespace Ent
             {
                 (*_parent.m_values) = json::array();
             }
-            auto meta = std::get<Subschema::ArrayMeta>(_parent.m_schema.base->meta);
-            auto& itemType = _parent.m_schema.base->singularItems->get();
+            auto meta = std::get<Subschema::ArrayMeta>(parentSchema.meta);
+            auto& itemType = parentSchema.singularItems->get();
             auto object = json::object();
             auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
             switch (keyFieldSchema.type)
@@ -585,12 +586,14 @@ namespace Ent
             {
                 (*_parent.m_values) = json::array();
             }
-            auto index = std::get<int64_t>(childName);
-            while (static_cast<int64_t>(_parent.m_values->size()) <= index)
+            auto const index = std::get<int64_t>(childName);
+            auto const minSize = std::max(static_cast<int64_t>(parentSchema.minItems - 1), index);
+            while (static_cast<int64_t>(_parent.m_values->size()) <= minSize)
             {
                 _parent.m_values->emplace_back();
             }
             newLayerJson = &(*_parent.m_values)[index];
+            ENTLIB_ASSERT(_parent.m_values->size() <= parentSchema.maxItems);
             ENTLIB_ASSERT(newLayerJson != nullptr);
             break;
         }

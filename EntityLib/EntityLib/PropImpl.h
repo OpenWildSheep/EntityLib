@@ -178,8 +178,8 @@ namespace Ent
 
         void setSize(size_t _size); ///< @pre type==array. @brief Set the size of the array.
         void clear();
-        [[nodiscard]] PropImplPtr push_back();
-        void pop_back();
+        [[nodiscard]] PropImplPtr pushBack();
+        void popBack();
 
         void setFloat(double _value); ///< @pre type==number. @brief Set _value in the instance
         void setInt(int64_t _value); ///< @pre type==integer. @brief Set _value in the instance

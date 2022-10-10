@@ -231,6 +231,10 @@ static py::list propMapGetItems(Property& _prop)
 
 static py::list propPrimSetGetKeys(Property& _prop)
 {
+    if (_prop.getSchema()->singularItems == nullptr)
+    {
+        throw std::runtime_error("Not an primitiveSet in 'primset_keys'");
+    }
     auto const& type = _prop.getSchema()->singularItems->get().type;
     py::list arr;
     if (type == DataType::string || type == DataType::entityRef)
@@ -256,6 +260,10 @@ static py::list propPrimSetGetKeys(Property& _prop)
 
 static py::list propObjSetGetKeys(Property& _prop)
 {
+    if (_prop.getSchema()->singularItems == nullptr)
+    {
+        throw std::runtime_error("Not an objectSet in 'objectset_keys'");
+    }
     auto& itemType = _prop.getSchema()->singularItems->get();
     auto const meta = std::get<Subschema::ArrayMeta>(_prop.getSchema()->meta);
     auto const type = itemType.properties.at(*meta.keyField).get().type;
@@ -345,6 +353,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .value("string", DataKind::string)
         .value("number", DataKind::number)
         .value("integer", DataKind::integer)
+        .value("entityRef", DataKind::entityRef)
         .value("object", DataKind::object)
         .value("array", DataKind::array)
         .value("boolean", DataKind::boolean)
@@ -421,6 +430,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property_readonly("is_used_in_runtime", &Subschema::IsUsedInRuntime)
         .def_readonly("one_of", &Subschema::oneOf, py::return_value_policy::reference_internal)
         .def_readonly("default_value", &Subschema::defaultValue, py::return_value_policy::reference_internal)
+        .def_readonly("minimum", &Subschema::minimum, py::return_value_policy::reference_internal)
+        .def_readonly("maximum", &Subschema::maximum, py::return_value_policy::reference_internal)
         .def_readonly("meta", &Subschema::meta, py::return_value_policy::reference_internal)
         .def_readonly("user_meta", &Subschema::userMeta, py::return_value_policy::reference_internal)
         .def("get_union_name_field", &Subschema::getUnionNameField, py::return_value_policy::reference_internal)
@@ -813,6 +824,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("erase_unionset_item", &Property::eraseUnionSetItem)
         .def("copy_into", &Property::copyInto)
         .def("unset", [](Property& _self) { return _self.unset(); })
+        .def("push_back", &Property::pushBack)
+        .def("pop_back", &Property::popBack)
         ;
 
     py::register_exception<JsonValidation>(ent, "JsonValidation");

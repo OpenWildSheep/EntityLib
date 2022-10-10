@@ -1000,14 +1000,14 @@ namespace Ent
         }
     }
 
-    PropImplPtr PropImpl::push_back()
+    PropImplPtr PropImpl::pushBack()
     {
         CHECK_TYPE(DataKind::array);
         setSize(arraySize() + 1);
         return getArrayItem(arraySize() - 1);
     }
 
-    void PropImpl::pop_back()
+    void PropImpl::popBack()
     {
         CHECK_TYPE(DataKind::array);
         setSize(arraySize() - 1);
@@ -1394,6 +1394,10 @@ namespace Ent
 
     PropImplPtr PropImpl::resolveNodeRef(char const* _nodeRef)
     {
+        if (_nodeRef == nullptr)
+        {
+            throw NullPointerArgument("resolveNodeRef", "nodeRef");
+        }
         auto const* tokenStart = _nodeRef;
         auto const* const nodeRefEnd = _nodeRef + strlen(_nodeRef);
 

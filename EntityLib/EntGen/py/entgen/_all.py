@@ -5,6 +5,7 @@ from entgen_helpers import *
 
 from .usePerception import *
 from .tryGrasp import *
+from .timeSinceLastTurnForDecreasingSpeed import *
 from .sPhysicsShapeSphere import *
 from .sPhysicsShapeMesh import *
 from .sPhysicsShapeCylinder import *
@@ -36,6 +37,7 @@ from .sJointSliderDesc import *
 from .sJointHingeDesc import *
 from .ConditionalRigidityAttribute_Range import *
 from .VariantAllowed import *
+from .UpdateContinuousPositionOnGround import *
 from .UnionObjectArrayItem import *
 from .TypedValue import *
 from .TweenableComponentGD_WayPoint_Position import *
@@ -103,8 +105,13 @@ from .RevivedData import *
 from .ReviveSide import *
 from .sGameEffectTemplate import *
 from .ResponsiblePointer_AnalyticsObserverInterface_ import *
+from .StateCollectorCollecting import *
+from .StateCollectorCollected import *
+from .StateCollectibleCollecting import *
+from .StateCollectibleCollected import *
 from .SpawnState import *
 from .RespawnState import *
+from .ResetContinuousPositionOnGround import *
 from .RenderManager_DepthOfFieldConfig import *
 from .RegenerationManager_EnergyAreaSetting import *
 from .RegenSwitchBehavior import *
@@ -148,6 +155,7 @@ from .Precision import *
 from .constraintPlaneWorldPosition import *
 from .ProjectileTrajectory import *
 from .PlayRatio import *
+from .PhysicsMaterial_SoundTags import *
 from .PhysicsMaterial import *
 from .PhysicsLayer import *
 from .PhysicsEffectsManager_PhysicsLimits import *
@@ -250,6 +258,7 @@ from .TrailProperties import *
 from .Interactor import *
 from .InteractionInteractorEntityState import *
 from .InteractionInteractableEntityState import *
+from .InteractionExecutorEntityState import *
 from .InputCollisionBehaviorData import *
 from .InertiaTensor import *
 from .ImpactAndSolidityData import *
@@ -266,7 +275,6 @@ from .HeadCollisionBehaviorData import *
 from .GrowingState import *
 from .GroupAvoidanceEnum import *
 from .VelocityObstaclesManager import *
-from .GroundTypeData import *
 from .GrasperInteractionData import *
 from .GraspableInteractionData import *
 from .GraspType import *
@@ -314,6 +322,7 @@ from .ForceBlendInReachRequired import *
 from .ForceBlendIn import *
 from .FocusInteractorEntityState import *
 from .FocusInteractableEntityState import *
+from .FocusExecutorEntityState import *
 from .FluidVolumeComponentGD_SimulationParameters import *
 from .FluidVolumeComponentGD_HeightMapData import *
 from .FluidVolumeComponentGD_FluidVolumeData import *
@@ -336,6 +345,7 @@ from .EventCameraData import *
 from .EntityStateStaffOwnedVertebras_Inputs import *
 from .EntityStateSet import *
 from .PlayerState import *
+from .EntityStatePlayerHatchingPool_Inputs import *
 from .EntityStateMotionConstrained_Inputs import *
 from .EntityStateManageChildEntityPool_Inputs import *
 from .EntityStateIncapacitated_Inputs import *
@@ -351,6 +361,7 @@ from .EnergySideData import *
 from .EnergySide import *
 from .ReviveEnergyComponentInput_EnergySide import *
 from .EntityStateRevive_Inputs import *
+from .EntityStateEnergyRootHatching_Inputs import *
 from .EntityStateCreatureHatching_Inputs import *
 from .EnergySideEvent import *
 from .EnergyIntensity import *
@@ -373,7 +384,6 @@ from .CreatureTypeData import *
 from .CreatureProfile__CreatureProfileFact import *
 from .CreatureProfile import *
 from .CreatureLOD import *
-from .creatureLOD import *
 from .CreatureDangerousness import *
 from .ConstrainedMoveContextInput import *
 from .ConstrainedInputData import *
@@ -407,9 +417,9 @@ from .GraspableComponentInput import *
 from .FluidComponentInput import *
 from .EnergySpoutComponentInput import *
 from .CreatureAIComponentInput import *
+from .CollectibleComponentInput import *
 from .CinematicComponentInput import *
 from .ChargedJumpComponentInput import *
-from .CharacterControllerComponentInput import *
 from .BreakableComponentInput import *
 from .BeamTargetComponentInput import *
 from .AttackTriggerComponentInput import *
@@ -469,6 +479,7 @@ from .QuickCreatureSwitchGD import *
 from .ProtoComponentGD import *
 from .ProjectileShooterGD import *
 from .PlayerComponentGD import *
+from .PivotControllerGD import *
 from .PickableDistributorComponentGD import *
 from .PickableComponentGD import *
 from .PhysicsTriggerGD import *
@@ -533,8 +544,10 @@ from .DummyComponentGD import *
 from .DiveAttackGD import *
 from .DistanceTriggerGD import *
 from .FightDistanceTriggerGD import *
+from .DecalComponentGD import *
 from .DebugGridGD import *
 from .CustomThumbnail import *
+from .CustomStreamingBehavior import *
 from .CreatureUIGD import *
 from .ConstrainedMoveGD import *
 from .ConnectorGD import *
@@ -577,6 +590,9 @@ from .GradientColor import *
 from .EditorManager import *
 from .BoidsGD import *
 from .Collider import *
+from .CollectibleType import *
+from .CollectorGD import *
+from .CollectibleGD import *
 from .Codec import *
 from .Zlib import *
 from .Lz4Fast import *
@@ -603,8 +619,12 @@ from .CineEventTestInput import *
 from .CineEventTestEndCurrentSequence import *
 from .CineEventTestCurrentGameState import *
 from .CharacterControllerSlideData import *
+from .CharacterControllerPreventUndesiredMovementFromInertiaData import *
 from .CharacterControllerGroundNormalData import *
+from .CharacterControllerComponentInput_CreatureLOD import *
+from .CharacterControllerComponentInput import *
 from .CharacterControllerClamberData import *
+from .CharacterControllerAnticipationData import *
 from .CarryMode import *
 from .CapabilitiesAndTags import *
 from .ZoneStamper import *
@@ -612,12 +632,14 @@ from .VolumeConstraintStamper import *
 from .OffMeshLink import *
 from .NavMeshStamperGD import *
 from .CanTakeHit import *
-from .CreatureComponentInput import *
 from .CanPossess import *
 from .CanInteract import *
 from .InteractorComponentInput import *
+from .CanBePossessed import *
 from .CanBeInteractedWith import *
 from .InteractableComponentInput import *
+from .CanBeConverted import *
+from .CreatureComponentInput import *
 from .CameraType import *
 from .CameraSetterGD import *
 from .CameraSoundEvent import *
@@ -735,7 +757,9 @@ from .EntityStateTreeSwitchTransition import *
 from .EntityStateTreeMetamorphosisUsingScale import *
 from .EntityStateTreeMetamorphosis import *
 from .EntityStateTooDeep import *
+from .EntityStateTeleportToSafePosition import *
 from .EntityStateTakeDamageOnMount import *
+from .EntityStateStuck import *
 from .EntityStateStrongAttackJumped import *
 from .EntityStateStrongAttackCharging import *
 from .EntityStateStrongAttackCharged import *
@@ -758,19 +782,27 @@ from .EntityStateSoftCollide import *
 from .EntityStateSnappedToHatchingTarget import *
 from .EntityStateSlowMotion import *
 from .EntityStateShootHatchingEnergy import *
-from .EntityStateSetSavePoint import *
+from .EntityStateSaveWhenPossible import *
 from .EntityStateSavePointActivated import *
+from .EntityStateSaveNow import *
 from .EntityStateRevive import *
 from .EntityStateRespawnability import *
 from .EntityStateRespawn import *
 from .EntityStateReserveMountSlots import *
+from .EntityStateRepositionToLastSafeGroundedPosition import *
 from .EntityStateRegainCapacity import *
 from .EntityStateRecoverLand import *
 from .EntityStateReadyToGiveOrder import *
 from .EntityStateRaise import *
+from .EntityStatePreventUndesiredMovementDueToInertia import *
+from .EntityStatePreventSave import *
 from .EntityStatePreventAscendInSlope import *
 from .EntityStatePrepareToHoldingOnToNavigationMesh import *
 from .EntityStatePlungeLand import *
+from .EntityStatePlayerHatchingPoolSetup import *
+from .EntityStatePlayerHatchingPoolOut import *
+from .EntityStatePlayerHatchingPoolIn import *
+from .EntityStatePlayerHatchingPool import *
 from .EntityStatePlayer import *
 from .EntityStatePickableDistributor import *
 from .EntityStatePhysicsMove import *
@@ -793,6 +825,7 @@ from .EntityStateMask import *
 from .EntityStateManageChildEntityPool import *
 from .EntityStateLateralLand import *
 from .EntityStateLateralDodge import *
+from .EntityStateJustTeleported import *
 from .EntityStateJustStarted import *
 from .EntityStateJumpOriented import *
 from .EntityStateJumpHeightMultiplier import *
@@ -827,7 +860,6 @@ from .EntityStateFallDying import *
 from .EntityStateFall import *
 from .EntityStateFailingOrder import *
 from .EntityStateExtraLife import *
-from .EntityStateEnterDeathVolume import *
 from .EntityStateEnergySpoutState import *
 from .EntityStateEnergySide import *
 from .EntityStateEnergyRootHatching import *
@@ -849,6 +881,7 @@ from .EntityStateControlGPE import *
 from .EntityStateConstrainedMove import *
 from .EntityStateConstrainedInput import *
 from .EntityStateCombat import *
+from .EntityStateCollecting import *
 from .EntityStateCollectVertebrae import *
 from .EntityStateClimbWaterfallImpulse import *
 from .EntityStateClimbWaterfall import *
@@ -860,7 +893,7 @@ from .EntityStateChargingJump import *
 from .EntityStateChargedJumpPower import *
 from .EntityStateChargedJump import *
 from .EntityStateChargeMode import *
-from .EntityStateCancelSetSavePoint import *
+from .EntityStateCancelSave import *
 from .EntityStateCanNotBePerceived import *
 from .EntityStateCallAndMountSpiritAnimal import *
 from .EntityStateBridgeBeingControlled import *
@@ -884,9 +917,9 @@ from .EntityStateBeingOnSpike import *
 from .EntityStateBeingOnSlope import *
 from .EntityStateBeingLinked import *
 from .EntityStateBeingInReeds import *
+from .EntityStateBeingInPlantCage import *
 from .EntityStateBeingFocusedToPossess import *
 from .EntityStateBeingFocusedToInteract import *
-from .EntityStateBeingBlockedByVine import *
 from .EntityStateBackwardLand import *
 from .EntityStateBackwardDodge import *
 from .EntityStateAttitudeGroggy import *
@@ -898,13 +931,13 @@ from .EntityStateAirControl import *
 from .EntityStateAimAt import *
 from .EntityStateAerialJump import *
 from .EntityStateAboutToBeHatched import *
+from .EntityStateAI import *
 from .ActorStateTryUpgradeShamanStaff import *
 from .ActorStateTryEquipShamanStaff import *
 from .ActorStateTeleportWhileMoving import *
 from .ActorStateTeleportToTarget import *
 from .ActorStateTeleport import *
 from .ActorStateTaunting import *
-from .ActorStateStopAttitudeAggressive import *
 from .ActorStateSpeedMultiplier import *
 from .ActorStateSoulWaitingToRespawn import *
 from .ActorStateSoulRespawn import *
@@ -983,7 +1016,8 @@ from .ActorStateBeingImmersedFromOnGround import *
 from .ActorStateBeingImmersedFromInAir import *
 from .ActorStateBeingImmersed import *
 from .ActorStateBehaviorState import *
-from .ActorStateAttitudeAggressive import *
+from .ActorStateAttitudeAggressiveTemporary import *
+from .ActorStateAttitudeAggressivePersistent import *
 from .ActorStateApplyHit import *
 from .ActorStateAnsweringCall import *
 from .ActorStateAlive import *

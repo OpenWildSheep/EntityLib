@@ -4,12 +4,12 @@
 from entgen_helpers import *
 import EntityLibPy
 
+from entgen.EntityRef import *
 from entgen.String import *
 from entgen.Int import *
 from entgen.Bool import *
 from entgen.Color import *
 from entgen.ComponentGD import *
-from entgen.EntityRef import *
 from entgen.Float import *
 
 from EntityLibPy import Node

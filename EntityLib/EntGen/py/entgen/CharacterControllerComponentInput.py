@@ -5,11 +5,13 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.CharacterControllerComponentInput_CreatureLOD import *
 from entgen.ComponentInput import *
 from entgen.JumpHeightMultiplier import *
+from entgen.ResetContinuousPositionOnGround import *
 from entgen.RigidbodyScaleMultiplier import *
 from entgen.RigidbodyScalingSpeed import *
-from entgen.creatureLOD import *
+from entgen.UpdateContinuousPositionOnGround import *
 
 from EntityLibPy import Node
 
@@ -24,8 +26,14 @@ class CharacterControllerComponentInput(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def CreatureLOD(self):  # type: ()->CharacterControllerComponentInput_CreatureLOD
+        return CharacterControllerComponentInput_CreatureLOD(self._node.at("CreatureLOD"))
+    @property
     def JumpHeightMultiplier(self):  # type: ()->JumpHeightMultiplier
         return JumpHeightMultiplier(self._node.at("JumpHeightMultiplier"))
+    @property
+    def ResetContinuousPositionOnGround(self):  # type: ()->ResetContinuousPositionOnGround
+        return ResetContinuousPositionOnGround(self._node.at("ResetContinuousPositionOnGround"))
     @property
     def RigidbodyScaleMultiplier(self):  # type: ()->RigidbodyScaleMultiplier
         return RigidbodyScaleMultiplier(self._node.at("RigidbodyScaleMultiplier"))
@@ -36,13 +44,13 @@ class CharacterControllerComponentInput(HelperObject):
     def Super(self):  # type: ()->ComponentInput
         return ComponentInput(self._node.at("Super"))
     @property
+    def UpdateContinuousPositionOnGround(self):  # type: ()->UpdateContinuousPositionOnGround
+        return UpdateContinuousPositionOnGround(self._node.at("UpdateContinuousPositionOnGround"))
+    @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
-    @property
-    def creatureLOD(self):  # type: ()->creatureLOD
-        return creatureLOD(self._node.at("creatureLOD"))
     pass
 
 

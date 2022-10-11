@@ -4,10 +4,10 @@
 from entgen_helpers import *
 import EntityLibPy
 
+from entgen.EntityRef import *
 from entgen.String import *
 from entgen.Bool import *
 from entgen.CapabilitiesAndTags import *
-from entgen.EntityRef import *
 from entgen.Float import *
 from entgen.WallRunData import *
 

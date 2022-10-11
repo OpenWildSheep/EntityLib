@@ -22,6 +22,11 @@ class InterestPointGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def Height(self):  # type: ()->Float
+        return Float(self._node.at("Height"))
+    @Height.setter
+    def Height(self, val): self.Height.set(val)
+    @property
     def Radius(self):  # type: ()->Float
         return Float(self._node.at("Radius"))
     @Radius.setter

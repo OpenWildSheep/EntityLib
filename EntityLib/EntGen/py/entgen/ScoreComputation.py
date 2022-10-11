@@ -47,6 +47,11 @@ class ScoreComputation(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
+    @property
+    def maxAngle(self):  # type: ()->Float
+        return Float(self._node.at("maxAngle"))
+    @maxAngle.setter
+    def maxAngle(self, val): self.maxAngle.set(val)
     pass
 
 

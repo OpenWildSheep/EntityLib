@@ -30,10 +30,15 @@ class GameAttackData(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
-    def AggressiveDuration(self):  # type: ()->Float
-        return Float(self._node.at("AggressiveDuration"))
-    @AggressiveDuration.setter
-    def AggressiveDuration(self, val): self.AggressiveDuration.set(val)
+    def AggressiveDurationMax(self):  # type: ()->Float
+        return Float(self._node.at("AggressiveDurationMax"))
+    @AggressiveDurationMax.setter
+    def AggressiveDurationMax(self, val): self.AggressiveDurationMax.set(val)
+    @property
+    def AggressiveDurationMin(self):  # type: ()->Float
+        return Float(self._node.at("AggressiveDurationMin"))
+    @AggressiveDurationMin.setter
+    def AggressiveDurationMin(self, val): self.AggressiveDurationMin.set(val)
     @property
     def AttackCameraShakeData(self):  # type: ()->Map[str, CameraShakeData]
         return (lambda n: Map(str, CameraShakeData, n))(self._node.at("AttackCameraShakeData"))

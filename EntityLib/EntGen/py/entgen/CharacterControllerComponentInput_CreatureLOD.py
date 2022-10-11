@@ -10,7 +10,7 @@ from entgen.Bool import *
 
 from EntityLibPy import Node
 
-class creatureLOD(HelperObject):
+class CharacterControllerComponentInput_CreatureLOD(HelperObject):
 
     @property
     def _comment(self):  # type: ()->String

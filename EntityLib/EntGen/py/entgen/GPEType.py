@@ -11,6 +11,7 @@ class GPETypeEnum(Enum):
     Geyser = "Geyser"
     PossessFlocking = "PossessFlocking"
     Bridge = "Bridge"
+    EnergyPool = "EnergyPool"
     GPEType_COUNT = "GPEType_COUNT"
 
 

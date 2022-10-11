@@ -157,7 +157,7 @@ namespace Ent
             }
             T push()
             {
-                return T(getProperty().push_back());
+                return T(getProperty().pushBack());
             }
             void pop_back()
             {

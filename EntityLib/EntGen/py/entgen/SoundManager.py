@@ -23,7 +23,6 @@ from entgen.String import *
 from entgen.Color import *
 from entgen.String import *
 from entgen.CreatureTypeData import *
-from entgen.GroundTypeData import *
 
 from EntityLibPy import Node
 
@@ -119,9 +118,6 @@ class SoundManager(HelperObject):
         return String(self._node.at("GroundTypeWaterPuddle"))
     @GroundTypeWaterPuddle.setter
     def GroundTypeWaterPuddle(self, val): self.GroundTypeWaterPuddle.set(val)
-    @property
-    def GroundTypes(self):  # type: ()->Array[GroundTypeData]
-        return (lambda n: Array(GroundTypeData, n))(self._node.at("GroundTypes"))
     @property
     def HitIntensityHigh(self):  # type: ()->Float
         return Float(self._node.at("HitIntensityHigh"))
@@ -618,6 +614,9 @@ class SoundManager(HelperObject):
     def TagColors(self):  # type: ()->Map[str, Color]
         return (lambda n: Map(str, Color, n))(self._node.at("TagColors"))
     @property
+    def TagToMaterialMapping(self):  # type: ()->Map[str, String]
+        return (lambda n: Map(str, String, n))(self._node.at("TagToMaterialMapping"))
+    @property
     def UnderWaterBank(self):  # type: ()->String
         return String(self._node.at("UnderWaterBank"))
     @UnderWaterBank.setter
@@ -632,9 +631,6 @@ class SoundManager(HelperObject):
         return Float(self._node.at("UnderwaterOutZone"))
     @UnderwaterOutZone.setter
     def UnderwaterOutZone(self, val): self.UnderwaterOutZone.set(val)
-    @property
-    def VegetationTagMapping(self):  # type: ()->Map[str, String]
-        return (lambda n: Map(str, String, n))(self._node.at("VegetationTagMapping"))
     @property
     def VerticalUnderWaterOffset(self):  # type: ()->Float
         return Float(self._node.at("VerticalUnderWaterOffset"))

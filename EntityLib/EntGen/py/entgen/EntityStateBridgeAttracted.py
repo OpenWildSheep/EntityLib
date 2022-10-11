@@ -4,9 +4,9 @@
 from entgen_helpers import *
 import EntityLibPy
 
+from entgen.EntityRef import *
 from entgen.String import *
 from entgen.ActorState import *
-from entgen.EntityRef import *
 from entgen.Float import *
 from entgen.Position import *
 from entgen.EntityRef import *

@@ -14,6 +14,7 @@ from entgen.MoveCapacityData_OrientationSpeed import *
 from entgen.MoveCapacityData_TurnJump import *
 from entgen.ScaleConverter import *
 from entgen.Vector3 import *
+from entgen.timeSinceLastTurnForDecreasingSpeed import *
 from entgen.MoveCapacityData_ReachSpeed import *
 
 from EntityLibPy import Node
@@ -28,6 +29,11 @@ class MoveCapacityData(HelperObject):
         return MoveCapacityData(entlib.make_node(MoveCapacityData.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def LandingDecelerationFactor(self):  # type: ()->Float
+        return Float(self._node.at("LandingDecelerationFactor"))
+    @LandingDecelerationFactor.setter
+    def LandingDecelerationFactor(self, val): self.LandingDecelerationFactor.set(val)
     @property
     def MaxAngleToDetectLandingGripDirection(self):  # type: ()->Float
         return Float(self._node.at("MaxAngleToDetectLandingGripDirection"))
@@ -335,6 +341,9 @@ class MoveCapacityData(HelperObject):
         return Float(self._node.at("strafeTurnAngleMin"))
     @strafeTurnAngleMin.setter
     def strafeTurnAngleMin(self, val): self.strafeTurnAngleMin.set(val)
+    @property
+    def timeSinceLastTurnForDecreasingSpeed(self):  # type: ()->timeSinceLastTurnForDecreasingSpeed
+        return timeSinceLastTurnForDecreasingSpeed(self._node.at("timeSinceLastTurnForDecreasingSpeed"))
     @property
     def trajectoryRateFactorDuringLateralLand(self):  # type: ()->Float
         return Float(self._node.at("trajectoryRateFactorDuringLateralLand"))

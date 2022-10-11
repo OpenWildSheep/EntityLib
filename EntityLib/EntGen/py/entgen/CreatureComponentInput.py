@@ -5,6 +5,8 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.String import *
+from entgen.CanBeConverted import *
+from entgen.CanBePossessed import *
 from entgen.CanTakeHit import *
 from entgen.ComponentInput import *
 from entgen.DeltaTimeFactor import *
@@ -22,6 +24,12 @@ class CreatureComponentInput(HelperObject):
         return CreatureComponentInput(entlib.make_node(CreatureComponentInput.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def CanBeConverted(self):  # type: ()->CanBeConverted
+        return CanBeConverted(self._node.at("CanBeConverted"))
+    @property
+    def CanBePossessed(self):  # type: ()->CanBePossessed
+        return CanBePossessed(self._node.at("CanBePossessed"))
     @property
     def CanTakeHit(self):  # type: ()->CanTakeHit
         return CanTakeHit(self._node.at("CanTakeHit"))

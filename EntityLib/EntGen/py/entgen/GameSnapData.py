@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.Float import *
+from entgen.ScaleConverter import *
 
 from EntityLibPy import Node
 
@@ -30,15 +31,11 @@ class GameSnapData(HelperObject):
     @creatureSizeCoeff.setter
     def creatureSizeCoeff(self, val): self.creatureSizeCoeff.set(val)
     @property
-    def dirCoeff(self):  # type: ()->Float
-        return Float(self._node.at("dirCoeff"))
-    @dirCoeff.setter
-    def dirCoeff(self, val): self.dirCoeff.set(val)
+    def dirScoreCoeff(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("dirScoreCoeff"))
     @property
-    def distCoeff(self):  # type: ()->Float
-        return Float(self._node.at("distCoeff"))
-    @distCoeff.setter
-    def distCoeff(self, val): self.distCoeff.set(val)
+    def distScoreCoeff(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("distScoreCoeff"))
     @property
     def maxAngle(self):  # type: ()->Float
         return Float(self._node.at("maxAngle"))
@@ -49,6 +46,11 @@ class GameSnapData(HelperObject):
         return Float(self._node.at("maxDist"))
     @maxDist.setter
     def maxDist(self, val): self.maxDist.set(val)
+    @property
+    def minScore(self):  # type: ()->Float
+        return Float(self._node.at("minScore"))
+    @minScore.setter
+    def minScore(self, val): self.minScore.set(val)
     pass
 
 

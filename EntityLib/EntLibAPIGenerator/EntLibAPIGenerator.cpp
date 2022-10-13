@@ -89,15 +89,20 @@ void createFile(
     Output&& _output ///< Function taking a std::ostream to fill the created file
 )
 {
-    if (_destinationPath.native().size() < 255) // Can't write filename longer than 255 characters
+    auto const destinationPathAbsolute = std::filesystem::absolute(_destinationPath);
+    if (destinationPathAbsolute.native().size() < 255) // Can't write filename longer than 255 characters
     {
         create_directories(_destinationPath.parent_path());
         auto const tempPath = temp_directory_path() / _destinationPath.filename();
+        auto const tempPathAbsolute = std::filesystem::absolute(tempPath);
+        if (tempPathAbsolute.native().size() < 255) // Can't access filename longer than 255 characters
         {
-            std::ofstream output = openOfstream(tempPath);
-            _output(output);
+            {
+                std::ofstream output = openOfstream(tempPathAbsolute);
+                _output(output);
+            }
+            moveIfDifferent(tempPathAbsolute, destinationPathAbsolute);
         }
-        moveIfDifferent(tempPath, _destinationPath);
     }
 }
 

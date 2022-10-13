@@ -74,10 +74,12 @@ void moveIfDifferent(path const& _source, path const& _dest)
 
 void copyIfDifferent(path const& _source, path const& _dest)
 {
-    outputFiles.push_back(_dest.lexically_normal());
-    if (not compareFiles(_source, _dest))
+    auto const sourceAbsolute = std::filesystem::absolute(_source);
+    auto const destAbsolute = std::filesystem::absolute(_dest);
+    outputFiles.push_back(destAbsolute.lexically_normal());
+    if (not compareFiles(sourceAbsolute, destAbsolute))
     {
-        copy_file(_source, _dest, copy_options::overwrite_existing);
+        copy_file(sourceAbsolute, destAbsolute, copy_options::overwrite_existing);
     }
 }
 
@@ -1484,7 +1486,7 @@ from enum import Enum
 
 )py"};
 
-    auto inlinePath = (_destinationPath / "entgen2/inline.py").lexically_normal();
+    auto inlinePath = std::filesystem::absolute(_destinationPath / "entgen2/inline.py").lexically_normal();
     std::ofstream outputCommon = openOfstream(inlinePath);
     outputFiles.push_back(inlinePath);
     allInline.render(rootData, outputCommon);
@@ -1642,7 +1644,8 @@ try
     {
         if (file.is_regular_file())
         {
-            previousFiles.push_back(file.path().lexically_normal()); // Ensure paths are comparable
+            auto const filePathAbsolute = std::filesystem::absolute(file.path());
+            previousFiles.push_back(filePathAbsolute.lexically_normal()); // Ensure paths are comparable
         }
     }
 

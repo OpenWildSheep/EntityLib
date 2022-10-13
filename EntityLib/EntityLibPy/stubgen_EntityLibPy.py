@@ -90,12 +90,11 @@ print("reformat done")
 
 
 # write back to a location that Pylance can parse: EntityLibPy.pyi side-by-side with each of the .pyd versions
-for version in ("2.7", "3.7", "3.8"):
-	try:
-		with open(f"{output_path}/Release-{version}/EntityLibPy.pyi", "w") as file:
-			file.write(content)
-		print(f"EntityLibPy.pyi generated for version {version}")
-	except:
-		traceback.print_exc()
+try:
+	with open(f"{output_path}/Release-3.7/EntityLibPy.pyi", "w") as file:
+		file.write(content)
+	print(f"EntityLibPy.pyi generated for version 3.7")
+except:
+	traceback.print_exc()
 
 print("all done!")

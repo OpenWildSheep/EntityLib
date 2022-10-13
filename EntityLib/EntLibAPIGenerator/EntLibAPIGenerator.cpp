@@ -89,13 +89,16 @@ void createFile(
     Output&& _output ///< Function taking a std::ostream to fill the created file
 )
 {
-    create_directories(_destinationPath.parent_path());
-    auto const tempPath = temp_directory_path() / _destinationPath.filename();
+    if (_destinationPath.native().size() < 255) // Can't write filename longer than 255 characters
     {
-        std::ofstream output = openOfstream(tempPath);
-        _output(output);
+        create_directories(_destinationPath.parent_path());
+        auto const tempPath = temp_directory_path() / _destinationPath.filename();
+        {
+            std::ofstream output = openOfstream(tempPath);
+            _output(output);
+        }
+        moveIfDifferent(tempPath, _destinationPath);
     }
-    moveIfDifferent(tempPath, _destinationPath);
 }
 
 void renderToFile(mustache& tmpl, data const& rootData, path const& _destinationPath)

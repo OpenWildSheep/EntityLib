@@ -1111,7 +1111,11 @@ namespace Ent
                     DataType keyType = _nodeSchema.singularItems->get().linearItems->at(0)->type;
                     auto doRemove = [](json const& item)
                     {
-                        return item[1].is_null();
+                        if (item.size() != 2)
+                        {
+                            throw ContextException("In map, a pair should have two items but has %zu", item.size());
+                        }
+                        return item.at(1).is_null();
                     };
 #pragma warning(push)
 #pragma warning(disable : 4061) // There are switches with missing cases. This is wanted.

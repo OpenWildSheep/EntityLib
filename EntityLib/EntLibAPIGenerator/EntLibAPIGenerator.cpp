@@ -809,7 +809,7 @@ namespace Ent
             {{schema.type_name}}(Ent::Node* _node): HelperObject(_node) {}
             {{#schema.schema_name}}
             static constexpr char schemaName[] = "{{{.}}}";
-            static NodeUniquePtr load(Ent::EntityLib& _entlib, path const& _sourceFile)
+            static NodeUniquePtr load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return _entlib.loadFileAsNode(_sourceFile, *_entlib.getSchema(schemaName));
             }
@@ -983,11 +983,11 @@ namespace Ent
             explicit {{schema.type_name}}(Ent::Property _node): HelperObject<{{schema.type_name}}>(std::move(_node)) {}
             {{#schema.schema_name}}
             static constexpr char schemaName[] = "{{{.}}}";
-            static {{schema.type_name}} load(Ent::EntityLib& _entlib, path const& _sourceFile)
+            static {{schema.type_name}} load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 return {{schema.type_name}}(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
             }
-            static {{schema.type_name}} loadCopy(Ent::EntityLib& _entlib, path const& _sourceFile)
+            static {{schema.type_name}} loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 auto& storage = _entlib.createTempJsonFile();
                 storage = _entlib.readJsonFile(_sourceFile.string().c_str());

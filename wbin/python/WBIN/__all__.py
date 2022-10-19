@@ -33,6 +33,8 @@ from . import Mesh
 from . import MeshEdges
 from . import PCloud
 from . import Phys
+from . import Pivot
+from . import PivotSkeleton
 from . import RuntimePointCloud
 from . import SDF
 from . import SDFValues

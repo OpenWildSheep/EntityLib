@@ -826,6 +826,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("unset", [](Property& _self) { return _self.unset(); })
         .def("push_back", &Property::pushBack)
         .def("pop_back", &Property::popBack)
+        .def("apply_to_prefab", &Property::applyToPrefab)
         ;
 
     py::register_exception<JsonValidation>(ent, "JsonValidation");

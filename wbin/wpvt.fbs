@@ -17,9 +17,15 @@ struct Pivot
 	growth_progress_range: Float2;
 }
 
+struct PivotDebugInfo
+{
+	length: float;
+}
+
 table PivotSkeleton
 {
 	pivots: [Pivot] (required);
+	debug_info: [PivotDebugInfo];
 }
 
 root_type PivotSkeleton;

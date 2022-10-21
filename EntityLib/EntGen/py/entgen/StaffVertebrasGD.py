@@ -53,6 +53,16 @@ class StaffVertebrasGD(HelperObject):
     @RefillVertebraTimer.setter
     def RefillVertebraTimer(self, val): self.RefillVertebraTimer.set(val)
     @property
+    def ShardMaxCount(self):  # type: ()->Int
+        return Int(self._node.at("ShardMaxCount"))
+    @ShardMaxCount.setter
+    def ShardMaxCount(self, val): self.ShardMaxCount.set(val)
+    @property
+    def StartShardCount_(self):  # type: ()->Int
+        return Int(self._node.at("StartShardCount "))
+    @StartShardCount_.setter
+    def StartShardCount_(self, val): self.StartShardCount_.set(val)
+    @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
     @property

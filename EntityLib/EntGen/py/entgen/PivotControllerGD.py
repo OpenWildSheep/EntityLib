@@ -31,6 +31,11 @@ class PivotControllerGD(HelperObject):
     @InitialGrowth.setter
     def InitialGrowth(self, val): self.InitialGrowth.set(val)
     @property
+    def PivotSkeleton(self):  # type: ()->String
+        return String(self._node.at("PivotSkeleton"))
+    @PivotSkeleton.setter
+    def PivotSkeleton(self, val): self.PivotSkeleton.set(val)
+    @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
     @property

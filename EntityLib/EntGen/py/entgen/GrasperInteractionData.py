@@ -51,6 +51,11 @@ class GrasperInteractionData(HelperObject):
     @distanceMax.setter
     def distanceMax(self, val): self.distanceMax.set(val)
     @property
+    def distanceMin(self):  # type: ()->Float
+        return Float(self._node.at("distanceMin"))
+    @distanceMin.setter
+    def distanceMin(self, val): self.distanceMin.set(val)
+    @property
     def graspDurationMax(self):  # type: ()->Float
         return Float(self._node.at("graspDurationMax"))
     @graspDurationMax.setter

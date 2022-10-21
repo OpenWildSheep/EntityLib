@@ -26,6 +26,11 @@ class StaticObjectGD(HelperObject):
     @EDITOR_IsCave.setter
     def EDITOR_IsCave(self, val): self.EDITOR_IsCave.set(val)
     @property
+    def EDITOR_IsUnclosedMesh(self):  # type: ()->Bool
+        return Bool(self._node.at("EDITOR_IsUnclosedMesh"))
+    @EDITOR_IsUnclosedMesh.setter
+    def EDITOR_IsUnclosedMesh(self, val): self.EDITOR_IsUnclosedMesh.set(val)
+    @property
     def EDITOR_MergeInNavMesh(self):  # type: ()->Bool
         return Bool(self._node.at("EDITOR_MergeInNavMesh"))
     @EDITOR_MergeInNavMesh.setter

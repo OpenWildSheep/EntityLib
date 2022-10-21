@@ -19,6 +19,7 @@ struct Pivot
 
 struct PivotDebugInfo
 {
+	// The lenght of the pivot extent (based on the mesh vertices)
 	length: float;
 }
 

@@ -36,6 +36,7 @@ from . import MeshEdges
 from . import PCloud
 from . import Phys
 from . import Pivot
+from . import PivotDebugInfo
 from . import PivotSkeleton
 from . import RuntimePointCloud
 from . import SDF

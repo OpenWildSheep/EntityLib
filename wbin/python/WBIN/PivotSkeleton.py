@@ -48,7 +48,31 @@ class PivotSkeleton(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         return o == 0
 
-def Start(builder): builder.StartObject(1)
+    # PivotSkeleton
+    def DebugInfo(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
+            from WBIN.PivotDebugInfo import PivotDebugInfo
+            obj = PivotDebugInfo()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # PivotSkeleton
+    def DebugInfoLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # PivotSkeleton
+    def DebugInfoIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
+        return o == 0
+
+def Start(builder): builder.StartObject(2)
 def PivotSkeletonStart(builder):
     """This method is deprecated. Please switch to Start."""
     return Start(builder)
@@ -60,11 +84,20 @@ def StartPivotsVector(builder, numElems): return builder.StartVector(44, numElem
 def PivotSkeletonStartPivotsVector(builder, numElems):
     """This method is deprecated. Please switch to Start."""
     return StartPivotsVector(builder, numElems)
+def AddDebugInfo(builder, debugInfo): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(debugInfo), 0)
+def PivotSkeletonAddDebugInfo(builder, debugInfo):
+    """This method is deprecated. Please switch to AddDebugInfo."""
+    return AddDebugInfo(builder, debugInfo)
+def StartDebugInfoVector(builder, numElems): return builder.StartVector(4, numElems, 4)
+def PivotSkeletonStartDebugInfoVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartDebugInfoVector(builder, numElems)
 def End(builder): return builder.EndObject()
 def PivotSkeletonEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
 import WBIN.Pivot
+import WBIN.PivotDebugInfo
 try:
     from typing import List
 except:
@@ -75,6 +108,7 @@ class PivotSkeletonT(object):
     # PivotSkeletonT
     def __init__(self):
         self.pivots = None  # type: List[WBIN.Pivot.PivotT]
+        self.debugInfo = None  # type: List[WBIN.PivotDebugInfo.PivotDebugInfoT]
 
     @classmethod
     def InitFromBuf(cls, buf, pos):
@@ -100,6 +134,14 @@ class PivotSkeletonT(object):
                 else:
                     pivot_ = WBIN.Pivot.PivotT.InitFromObj(pivotSkeleton.Pivots(i))
                     self.pivots.append(pivot_)
+        if not pivotSkeleton.DebugInfoIsNone():
+            self.debugInfo = []
+            for i in range(pivotSkeleton.DebugInfoLength()):
+                if pivotSkeleton.DebugInfo(i) is None:
+                    self.debugInfo.append(None)
+                else:
+                    pivotDebugInfo_ = WBIN.PivotDebugInfo.PivotDebugInfoT.InitFromObj(pivotSkeleton.DebugInfo(i))
+                    self.debugInfo.append(pivotDebugInfo_)
 
     # PivotSkeletonT
     def Pack(self, builder):
@@ -108,8 +150,15 @@ class PivotSkeletonT(object):
             for i in reversed(range(len(self.pivots))):
                 self.pivots[i].Pack(builder)
             pivots = builder.EndVector()
+        if self.debugInfo is not None:
+            StartDebugInfoVector(builder, len(self.debugInfo))
+            for i in reversed(range(len(self.debugInfo))):
+                self.debugInfo[i].Pack(builder)
+            debugInfo = builder.EndVector()
         Start(builder)
         if self.pivots is not None:
             AddPivots(builder, pivots)
+        if self.debugInfo is not None:
+            AddDebugInfo(builder, debugInfo)
         pivotSkeleton = End(builder)
         return pivotSkeleton

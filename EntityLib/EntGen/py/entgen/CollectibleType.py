@@ -8,6 +8,7 @@ import EntityLibPy
 from EntityLibPy import Node
 class CollectibleTypeEnum(Enum):
     Vertebrae = "Vertebrae"
+    VertebraeShard = "VertebraeShard"
     Schmetre = "Schmetre"
     EnergyFruit = "EnergyFruit"
     UNDEFINED = "UNDEFINED"

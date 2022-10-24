@@ -20,6 +20,11 @@ class EntityStateStaffOwnedVertebras_Inputs(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def OwnedShardCount(self):  # type: ()->Int
+        return Int(self._node.at("OwnedShardCount"))
+    @OwnedShardCount.setter
+    def OwnedShardCount(self, val): self.OwnedShardCount.set(val)
+    @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
     @_comment.setter

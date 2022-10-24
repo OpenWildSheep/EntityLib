@@ -492,6 +492,7 @@ namespace Ent
         struct MusicCategory;
         struct MoveCapacityData_TurnJump;
         struct MoveCapacityData_OrientationSpeed;
+        struct MoveCapacityData_Dodge;
         struct MountableSnapLine_ControlPoint;
         struct MountableData;
         struct MinReviveRatio;
@@ -571,6 +572,13 @@ namespace Ent
         struct AnimalManager;
         struct ActorManager;
         struct ActionStateManager;
+        struct LodSelectionMode; // enum
+        enum class LodSelectionModeEnum
+        {
+            NoLod,
+            DistanceBased,
+            TriangleSizeBased,
+        };
         struct LocomotionMode; // enum
         enum class LocomotionModeEnum
         {
@@ -798,9 +806,6 @@ namespace Ent
         struct ImmersedBehaviorData;
         struct FluidData;
         struct FloatRange;
-        struct SmallActorSpawnRuleData;
-        struct SmallActorSpawnPointData;
-        struct SoundOpportunitiesConfig;
         struct FadeDuration;
         struct FadeDelay;
         struct FactionSpecieRelationData;
@@ -831,6 +836,9 @@ namespace Ent
             lush_strong,
         };
         struct VegetationPCloudData;
+        struct SmallActorSpawnRuleData;
+        struct SmallActorSpawnPointData;
+        struct SoundOpportunitiesConfig;
         struct RegenData;
         struct EnergySideData;
         struct EnergySide; // enum
@@ -1043,6 +1051,7 @@ namespace Ent
         struct CustomThumbnail;
         struct CustomStreamingBehavior;
         struct CreatureUIGD;
+        struct ConvertibleGD;
         struct ConstrainedMoveGD;
         struct ConnectorGD;
         struct ComponentWithProtoCodeGD;
@@ -1091,6 +1100,7 @@ namespace Ent
         enum class CollectibleTypeEnum
         {
             Vertebrae,
+            VertebraeShard,
             Schmetre,
             EnergyFruit,
             UNDEFINED,
@@ -1294,7 +1304,6 @@ namespace Ent
             Dive,
             AttackType_COUNT,
         };
-        struct AttackPositionRetimingData_SpecieRetimingCoeff;
         struct AttackPositionRetimingData;
         struct AttackPhysicsForceData;
         struct AttackImpactData;
@@ -1483,6 +1492,7 @@ namespace Ent
         struct EntityStateTooDeep;
         struct EntityStateTeleportToSafePosition;
         struct EntityStateTakeDamageOnMount;
+        struct EntityStateStuckOut;
         struct EntityStateStuck;
         struct EntityStateStrongAttackJumped;
         struct EntityStateStrongAttackCharging;
@@ -1567,6 +1577,7 @@ namespace Ent
         struct EntityStateHideIn;
         struct EntityStateHide;
         struct EntityStateGroundedJump;
+        struct EntityStateGraspIntention;
         struct EntityStateGrasp;
         struct EntityStateGrabbedOut;
         struct EntityStateGrabbedIn;
@@ -1601,11 +1612,14 @@ namespace Ent
         struct EntityStateCreatureHighLOD;
         struct EntityStateCreatureHatching;
         struct EntityStateCoyoteJump;
+        struct EntityStateConverted;
+        struct EntityStateConversionTransitionTo;
         struct EntityStateControlGPE;
         struct EntityStateConstrainedMove;
         struct EntityStateConstrainedInput;
         struct EntityStateCombat;
         struct EntityStateCollecting;
+        struct EntityStateCollectVertebraeShard;
         struct EntityStateCollectVertebrae;
         struct EntityStateClimbWaterfallImpulse;
         struct EntityStateClimbWaterfall;
@@ -1998,6 +2012,7 @@ namespace Ent
             call,
             callanswer,
             scream,
+            graspintention,
             grab,
             grabattack,
             grabbed,
@@ -2067,6 +2082,7 @@ namespace Ent
             parry,
             failingorder,
             settingrespawnplace,
+            stuck,
             romlookat,
             emoteshame,
             emotecrazy,
@@ -2166,6 +2182,8 @@ namespace Ent
         struct PointCloud;
         struct RagdollSetupData;
         struct ReplicaReplay;
+        struct SceneConverter_NavmeshOptions;
+        struct SceneConverter_StreamingOptions;
         struct SceneNode;
         struct SceneNodeGraph;
         struct Sensor;
@@ -4512,14 +4530,14 @@ namespace Ent
             {
                 return ScoreComputation(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::ScaleConverter CameraSightPitchAngleScore() const;
+            Ent::Gen2::ScaleConverter CameraSightYawAngleScore() const;
             Ent::Gen2::ScaleConverter DistanceScore() const;
+            Ent::Gen2::ScaleConverter InteractorSightAngleScore() const;
+            Ent::Gen2::ScaleConverter JoystickDirectionAngleScore() const;
             Ent::Gen2::Float MaxDistance() const;
             Ent::Gen2::Float MinScore() const;
-            Ent::Gen2::ScaleConverter ScreenDistXScore() const;
-            Ent::Gen2::ScaleConverter ScreenDistYScore() const;
-            Ent::Gen2::ScaleConverter SightCosScore() const;
             Ent::Gen2::String _comment() const;
-            Ent::Gen2::Float maxAngle() const;
         };
 
         struct Scale : HelperObject<Scale> // Object
@@ -5353,6 +5371,8 @@ namespace Ent
             Ent::Gen2::EntityStateClimbWaterfallImpulse setEntityStateClimbWaterfallImpulse();
             std::optional<Ent::Gen2::EntityStateCollectVertebrae> EntityStateCollectVertebrae();
             Ent::Gen2::EntityStateCollectVertebrae setEntityStateCollectVertebrae();
+            std::optional<Ent::Gen2::EntityStateCollectVertebraeShard> EntityStateCollectVertebraeShard();
+            Ent::Gen2::EntityStateCollectVertebraeShard setEntityStateCollectVertebraeShard();
             std::optional<Ent::Gen2::EntityStateCollecting> EntityStateCollecting();
             Ent::Gen2::EntityStateCollecting setEntityStateCollecting();
             std::optional<Ent::Gen2::EntityStateCombat> EntityStateCombat();
@@ -5363,6 +5383,10 @@ namespace Ent
             Ent::Gen2::EntityStateConstrainedMove setEntityStateConstrainedMove();
             std::optional<Ent::Gen2::EntityStateControlGPE> EntityStateControlGPE();
             Ent::Gen2::EntityStateControlGPE setEntityStateControlGPE();
+            std::optional<Ent::Gen2::EntityStateConversionTransitionTo> EntityStateConversionTransitionTo();
+            Ent::Gen2::EntityStateConversionTransitionTo setEntityStateConversionTransitionTo();
+            std::optional<Ent::Gen2::EntityStateConverted> EntityStateConverted();
+            Ent::Gen2::EntityStateConverted setEntityStateConverted();
             std::optional<Ent::Gen2::EntityStateCoyoteJump> EntityStateCoyoteJump();
             Ent::Gen2::EntityStateCoyoteJump setEntityStateCoyoteJump();
             std::optional<Ent::Gen2::EntityStateCreatureHatching> EntityStateCreatureHatching();
@@ -5431,6 +5455,8 @@ namespace Ent
             Ent::Gen2::EntityStateGrabbedOut setEntityStateGrabbedOut();
             std::optional<Ent::Gen2::EntityStateGrasp> EntityStateGrasp();
             Ent::Gen2::EntityStateGrasp setEntityStateGrasp();
+            std::optional<Ent::Gen2::EntityStateGraspIntention> EntityStateGraspIntention();
+            Ent::Gen2::EntityStateGraspIntention setEntityStateGraspIntention();
             std::optional<Ent::Gen2::EntityStateGroundedJump> EntityStateGroundedJump();
             Ent::Gen2::EntityStateGroundedJump setEntityStateGroundedJump();
             std::optional<Ent::Gen2::EntityStateHide> EntityStateHide();
@@ -5599,6 +5625,8 @@ namespace Ent
             Ent::Gen2::EntityStateStrongAttackJumped setEntityStateStrongAttackJumped();
             std::optional<Ent::Gen2::EntityStateStuck> EntityStateStuck();
             Ent::Gen2::EntityStateStuck setEntityStateStuck();
+            std::optional<Ent::Gen2::EntityStateStuckOut> EntityStateStuckOut();
+            Ent::Gen2::EntityStateStuckOut setEntityStateStuckOut();
             std::optional<Ent::Gen2::EntityStateTakeDamageOnMount> EntityStateTakeDamageOnMount();
             Ent::Gen2::EntityStateTakeDamageOnMount setEntityStateTakeDamageOnMount();
             std::optional<Ent::Gen2::EntityStateTeleportToSafePosition> EntityStateTeleportToSafePosition();
@@ -7447,6 +7475,37 @@ namespace Ent
             Ent::Gen2::Vector3 steeringAngle() const;
         };
 
+        struct MoveCapacityData_Dodge : HelperObject<MoveCapacityData_Dodge> // Object
+        {
+            explicit MoveCapacityData_Dodge(Ent::Property _node): HelperObject<MoveCapacityData_Dodge>(std::move(_node)) {}
+            static constexpr char schemaName[] = "MoveCapacityData::Dodge";
+            static MoveCapacityData_Dodge load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return MoveCapacityData_Dodge(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static MoveCapacityData_Dodge loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return MoveCapacityData_Dodge(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static MoveCapacityData_Dodge create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return MoveCapacityData_Dodge(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            MoveCapacityData_Dodge makeInstanceOf()
+            {
+                return MoveCapacityData_Dodge(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Float classicDodgeOrientationRate() const;
+            Ent::Gen2::Float cooldownTime() const;
+            Ent::Gen2::Float distance() const;
+            Ent::Gen2::ScaleConverter scalePlayRatioFactor() const;
+        };
+
         struct MountableSnapLine_ControlPoint : HelperObject<MountableSnapLine_ControlPoint> // Object
         {
             explicit MountableSnapLine_ControlPoint(Ent::Property _node): HelperObject<MountableSnapLine_ControlPoint>(std::move(_node)) {}
@@ -9235,6 +9294,30 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct LodSelectionMode : EnumPropHelper<LodSelectionMode, LodSelectionModeEnum> // Enum
+        {
+            using Enum = LodSelectionModeEnum;
+            using PropHelper<LodSelectionMode, Enum>::operator=;
+            explicit LodSelectionMode(Ent::Property _node): EnumPropHelper<LodSelectionMode, Enum>(std::move(_node)) {}
+            static constexpr char schemaName[] = "LodSelectionMode";
+            static constexpr char const* enumToString[] = {
+                "NoLod",
+                "DistanceBased",
+                "TriangleSizeBased",
+            };
+        };
+        inline char const* toString(LodSelectionModeEnum value)
+        {
+            if(size_t(value) >= std::size(LodSelectionMode::enumToString))
+                throw std::runtime_error("Wrong enum value");
+            return LodSelectionMode::enumToString[size_t(value)];
+        }
+        inline char const* toInternal(LodSelectionModeEnum value) { return toString(value); }
+        template<> inline LodSelectionModeEnum strToEnum<LodSelectionModeEnum>(char const* value)
+        {
+            return static_cast<LodSelectionModeEnum>(details::indexInEnum(value, LodSelectionMode::enumToString));
+        }
+
         struct LocomotionMode : EnumPropHelper<LocomotionMode, LocomotionModeEnum> // Enum
         {
             using Enum = LocomotionModeEnum;
@@ -10144,6 +10227,7 @@ namespace Ent
             Ent::Gen2::Float deltaAngleMax() const;
             Ent::Gen2::Float distanceHysteris() const;
             Ent::Gen2::Float distanceMax() const;
+            Ent::Gen2::Float distanceMin() const;
             Ent::Gen2::Float graspDurationMax() const;
             Ent::Gen2::Float graspOutVisualRotationRate() const;
             Ent::Gen2::Float graspStrength() const;
@@ -11700,97 +11784,6 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
-        struct SmallActorSpawnRuleData : HelperObject<SmallActorSpawnRuleData> // Object
-        {
-            explicit SmallActorSpawnRuleData(Ent::Property _node): HelperObject<SmallActorSpawnRuleData>(std::move(_node)) {}
-            static constexpr char schemaName[] = "SmallActorSpawnRuleData";
-            static SmallActorSpawnRuleData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return SmallActorSpawnRuleData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static SmallActorSpawnRuleData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return SmallActorSpawnRuleData(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static SmallActorSpawnRuleData create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return SmallActorSpawnRuleData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            SmallActorSpawnRuleData makeInstanceOf()
-            {
-                return SmallActorSpawnRuleData(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::String AudioEventName() const;
-            Ent::Gen2::String AudioEventSoundBank() const;
-            Ent::Gen2::FloatRange DayTimeRange() const;
-            Ent::Gen2::FloatRange DistanceRange() const;
-            Ent::Gen2::FloatRange PrecipitationRange() const;
-            Ent::Gen2::FloatRange RegenRange() const;
-            Ent::Gen2::Float SpawnProbability() const;
-            Ent::Gen2::String _comment() const;
-        };
-
-        struct SmallActorSpawnPointData : HelperObject<SmallActorSpawnPointData> // Object
-        {
-            explicit SmallActorSpawnPointData(Ent::Property _node): HelperObject<SmallActorSpawnPointData>(std::move(_node)) {}
-            static constexpr char schemaName[] = "SmallActorSpawnPointData";
-            static SmallActorSpawnPointData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return SmallActorSpawnPointData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static SmallActorSpawnPointData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return SmallActorSpawnPointData(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static SmallActorSpawnPointData create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return SmallActorSpawnPointData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            SmallActorSpawnPointData makeInstanceOf()
-            {
-                return SmallActorSpawnPointData(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::Float SelectionProbability() const;
-            Array<Ent::Gen2::SmallActorSpawnRuleData> SpawnRules() const;
-            Ent::Gen2::String _comment() const;
-        };
-
-        struct SoundOpportunitiesConfig : HelperObject<SoundOpportunitiesConfig> // Object
-        {
-            explicit SoundOpportunitiesConfig(Ent::Property _node): HelperObject<SoundOpportunitiesConfig>(std::move(_node)) {}
-            static constexpr char schemaName[] = "SoundOpportunitiesConfig";
-            static SoundOpportunitiesConfig load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return SoundOpportunitiesConfig(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static SoundOpportunitiesConfig loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return SoundOpportunitiesConfig(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static SoundOpportunitiesConfig create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return SoundOpportunitiesConfig(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            SoundOpportunitiesConfig makeInstanceOf()
-            {
-                return SoundOpportunitiesConfig(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData> SmallActorSpawnRules() const;
-            Ent::Gen2::String _comment() const;
-        };
-
         struct FadeDuration : HelperObject<FadeDuration> // Object
         {
             explicit FadeDuration(Ent::Property _node): HelperObject<FadeDuration>(std::move(_node)) {}
@@ -12079,6 +12072,7 @@ namespace Ent
             {
                 return EntityStateStaffOwnedVertebras_Inputs(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::Int OwnedShardCount() const;
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Int ownedVertebrasNumber() const;
         };
@@ -12398,6 +12392,97 @@ namespace Ent
             PrimArray<Ent::Gen2::EnergyValue> EnergyValues() const;
             Ent::Gen2::String PCloudPath() const;
             PrimArray<Ent::Gen2::String> UsedVegetations() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct SmallActorSpawnRuleData : HelperObject<SmallActorSpawnRuleData> // Object
+        {
+            explicit SmallActorSpawnRuleData(Ent::Property _node): HelperObject<SmallActorSpawnRuleData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SmallActorSpawnRuleData";
+            static SmallActorSpawnRuleData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return SmallActorSpawnRuleData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static SmallActorSpawnRuleData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return SmallActorSpawnRuleData(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static SmallActorSpawnRuleData create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return SmallActorSpawnRuleData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            SmallActorSpawnRuleData makeInstanceOf()
+            {
+                return SmallActorSpawnRuleData(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::String AudioEventName() const;
+            Ent::Gen2::String AudioEventSoundBank() const;
+            Ent::Gen2::FloatRange DayTimeRange() const;
+            Ent::Gen2::FloatRange DistanceRange() const;
+            PrimArray<Ent::Gen2::EnergyValue> EnergyValues() const;
+            Ent::Gen2::FloatRange PrecipitationRange() const;
+            Ent::Gen2::Float SpawnProbability() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct SmallActorSpawnPointData : HelperObject<SmallActorSpawnPointData> // Object
+        {
+            explicit SmallActorSpawnPointData(Ent::Property _node): HelperObject<SmallActorSpawnPointData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SmallActorSpawnPointData";
+            static SmallActorSpawnPointData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return SmallActorSpawnPointData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static SmallActorSpawnPointData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return SmallActorSpawnPointData(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static SmallActorSpawnPointData create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return SmallActorSpawnPointData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            SmallActorSpawnPointData makeInstanceOf()
+            {
+                return SmallActorSpawnPointData(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Float SelectionProbability() const;
+            Array<Ent::Gen2::SmallActorSpawnRuleData> SpawnRules() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct SoundOpportunitiesConfig : HelperObject<SoundOpportunitiesConfig> // Object
+        {
+            explicit SoundOpportunitiesConfig(Ent::Property _node): HelperObject<SoundOpportunitiesConfig>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SoundOpportunitiesConfig";
+            static SoundOpportunitiesConfig load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return SoundOpportunitiesConfig(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static SoundOpportunitiesConfig loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return SoundOpportunitiesConfig(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static SoundOpportunitiesConfig create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return SoundOpportunitiesConfig(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            SoundOpportunitiesConfig makeInstanceOf()
+            {
+                return SoundOpportunitiesConfig(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData> SmallActorSpawnRules() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -15177,6 +15262,7 @@ namespace Ent
                 return StaticObjectGD(getProperty().makeInstanceOf());
             }
             Ent::Gen2::Bool EDITOR_IsCave() const;
+            Ent::Gen2::Bool EDITOR_IsUnclosedMesh() const;
             Ent::Gen2::Bool EDITOR_MergeInNavMesh() const;
             Ent::Gen2::Bool EDITOR_UsedInMultiLayerHeightmap() const;
             Ent::Gen2::ComponentGD Super() const;
@@ -15214,6 +15300,8 @@ namespace Ent
             Ent::Gen2::Int MaxVertebraCount() const;
             Ent::Gen2::Int OwnedVertebraStartCount() const;
             Ent::Gen2::Float RefillVertebraTimer() const;
+            Ent::Gen2::Int ShardMaxCount() const;
+            Ent::Gen2::Int StartShardCount_() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::String VertebraGRCPath1() const;
             Ent::Gen2::String VertebraGRCPath2() const;
@@ -16089,6 +16177,7 @@ namespace Ent
             }
             Ent::Gen2::Float GrowthTime() const;
             Ent::Gen2::Float InitialGrowth() const;
+            Ent::Gen2::String PivotSkeleton() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -17458,6 +17547,9 @@ namespace Ent
             {
                 return GrasperGD(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::Float GraspIntentionDelayToAllowOrientation() const;
+            Ent::Gen2::Float GraspIntentionMaxHalfAngle() const;
+            Ent::Gen2::Float GraspIntentionOrientationYawRate() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Float bestInteractionDeltaAngleCoeff() const;
@@ -18240,6 +18332,35 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct ConvertibleGD : HelperObject<ConvertibleGD> // Object
+        {
+            explicit ConvertibleGD(Ent::Property _node): HelperObject<ConvertibleGD>(std::move(_node)) {}
+            static constexpr char schemaName[] = "ConvertibleGD";
+            static ConvertibleGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return ConvertibleGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static ConvertibleGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return ConvertibleGD(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static ConvertibleGD create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return ConvertibleGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            ConvertibleGD makeInstanceOf()
+            {
+                return ConvertibleGD(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::EntityRef ConvertedEntity() const;
+            Ent::Gen2::ComponentGD Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct ConstrainedMoveGD : HelperObject<ConstrainedMoveGD> // Object
         {
             explicit ConstrainedMoveGD(Ent::Property _node): HelperObject<ConstrainedMoveGD>(std::move(_node)) {}
@@ -18867,6 +18988,8 @@ namespace Ent
             Ent::Gen2::ConnectorGD setConnectorGD();
             std::optional<Ent::Gen2::ConstrainedMoveGD> ConstrainedMoveGD();
             Ent::Gen2::ConstrainedMoveGD setConstrainedMoveGD();
+            std::optional<Ent::Gen2::ConvertibleGD> ConvertibleGD();
+            Ent::Gen2::ConvertibleGD setConvertibleGD();
             std::optional<Ent::Gen2::CreatureAIGD> CreatureAIGD();
             Ent::Gen2::CreatureAIGD setCreatureAIGD();
             std::optional<Ent::Gen2::CreatureGD> CreatureGD();
@@ -19251,6 +19374,9 @@ namespace Ent
             std::optional<Ent::Gen2::ConstrainedMoveGD> ConstrainedMoveGD();
             Ent::Gen2::ConstrainedMoveGD addConstrainedMoveGD();
             void removeConstrainedMoveGD();
+            std::optional<Ent::Gen2::ConvertibleGD> ConvertibleGD();
+            Ent::Gen2::ConvertibleGD addConvertibleGD();
+            void removeConvertibleGD();
             std::optional<Ent::Gen2::CreatureAIGD> CreatureAIGD();
             Ent::Gen2::CreatureAIGD addCreatureAIGD();
             void removeCreatureAIGD();
@@ -20093,6 +20219,9 @@ namespace Ent
             std::optional<Ent::Gen2::ConstrainedMoveGD> ConstrainedMoveGD();
             Ent::Gen2::ConstrainedMoveGD addConstrainedMoveGD();
             void removeConstrainedMoveGD();
+            std::optional<Ent::Gen2::ConvertibleGD> ConvertibleGD();
+            Ent::Gen2::ConvertibleGD addConvertibleGD();
+            void removeConvertibleGD();
             std::optional<Ent::Gen2::CreatureAIGD> CreatureAIGD();
             Ent::Gen2::CreatureAIGD addCreatureAIGD();
             void removeCreatureAIGD();
@@ -21093,6 +21222,7 @@ namespace Ent
             static constexpr char schemaName[] = "CollectibleType";
             static constexpr char const* enumToString[] = {
                 "Vertebrae",
+                "VertebraeShard",
                 "Schmetre",
                 "EnergyFruit",
                 "UNDEFINED",
@@ -23594,35 +23724,6 @@ namespace Ent
             return static_cast<AttackTypeEnum>(details::indexInEnum(value, AttackType::enumToString));
         }
 
-        struct AttackPositionRetimingData_SpecieRetimingCoeff : HelperObject<AttackPositionRetimingData_SpecieRetimingCoeff> // Object
-        {
-            explicit AttackPositionRetimingData_SpecieRetimingCoeff(Ent::Property _node): HelperObject<AttackPositionRetimingData_SpecieRetimingCoeff>(std::move(_node)) {}
-            static constexpr char schemaName[] = "AttackPositionRetimingData::SpecieRetimingCoeff";
-            static AttackPositionRetimingData_SpecieRetimingCoeff load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return AttackPositionRetimingData_SpecieRetimingCoeff(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static AttackPositionRetimingData_SpecieRetimingCoeff loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return AttackPositionRetimingData_SpecieRetimingCoeff(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static AttackPositionRetimingData_SpecieRetimingCoeff create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return AttackPositionRetimingData_SpecieRetimingCoeff(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            AttackPositionRetimingData_SpecieRetimingCoeff makeInstanceOf()
-            {
-                return AttackPositionRetimingData_SpecieRetimingCoeff(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::String _comment() const;
-            Ent::Gen2::Float defaultCoeff() const;
-            Ent::Gen2::Float masterCoeff() const;
-        };
-
         struct AttackPositionRetimingData : HelperObject<AttackPositionRetimingData> // Object
         {
             explicit AttackPositionRetimingData(Ent::Property _node): HelperObject<AttackPositionRetimingData>(std::move(_node)) {}
@@ -23649,7 +23750,6 @@ namespace Ent
             }
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Float animTranslationCoeff() const;
-            Ent::Gen2::Map<SpecieEnum, Ent::Gen2::AttackPositionRetimingData_SpecieRetimingCoeff> backwardRetimingCoeffBySpecie() const;
             Ent::Gen2::Float lengthMax() const;
             Ent::Gen2::Float lengthMin() const;
             Ent::Gen2::Float spherecastRadiusCoeff() const;
@@ -24608,6 +24708,7 @@ namespace Ent
             {
                 return MoveCapacityData(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::MoveCapacityData_Dodge Dodge() const;
             Ent::Gen2::Float LandingDecelerationFactor() const;
             Ent::Gen2::Float MaxAngleToDetectLandingGripDirection() const;
             Ent::Gen2::Float MinAngleToAllowLeaveMotionConstraintCurve() const;
@@ -24634,7 +24735,6 @@ namespace Ent
             Ent::Gen2::Float coyoteJumpMaxTime() const;
             Ent::Gen2::Float crashPreventionSafeguardFactor() const;
             Ent::Gen2::Float defaultWorldUpSpeedFactor() const;
-            Ent::Gen2::Float dodgeCooldownTime() const;
             Ent::Gen2::Bool doubleJump() const;
             Ent::Gen2::ScaleConverter dropPlaneLegLenFactor() const;
             Ent::Gen2::Bool dropSyncTrajectoryAndVisual() const;
@@ -24666,6 +24766,7 @@ namespace Ent
             Ent::Gen2::Float reachSpeedDeceleration() const;
             Ent::Gen2::Bool reactToOtherCharacterBodyCollision() const;
             Ent::Gen2::Float rigidbodyScalingSpeed() const;
+            Ent::Gen2::Float rigidbodyScalingSpeedInAir() const;
             Ent::Gen2::Float sphereCastRadiusRatio() const;
             Ent::Gen2::Float sphereOverrideRadius() const;
             Ent::Gen2::Float strafeBlendIn() const;
@@ -25937,6 +26038,9 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateCollectVertebrae> EntityStateCollectVertebrae();
             Ent::Gen2::EntityStateCollectVertebrae addEntityStateCollectVertebrae();
             void removeEntityStateCollectVertebrae();
+            std::optional<Ent::Gen2::EntityStateCollectVertebraeShard> EntityStateCollectVertebraeShard();
+            Ent::Gen2::EntityStateCollectVertebraeShard addEntityStateCollectVertebraeShard();
+            void removeEntityStateCollectVertebraeShard();
             std::optional<Ent::Gen2::EntityStateCollecting> EntityStateCollecting();
             Ent::Gen2::EntityStateCollecting addEntityStateCollecting();
             void removeEntityStateCollecting();
@@ -25952,6 +26056,12 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateControlGPE> EntityStateControlGPE();
             Ent::Gen2::EntityStateControlGPE addEntityStateControlGPE();
             void removeEntityStateControlGPE();
+            std::optional<Ent::Gen2::EntityStateConversionTransitionTo> EntityStateConversionTransitionTo();
+            Ent::Gen2::EntityStateConversionTransitionTo addEntityStateConversionTransitionTo();
+            void removeEntityStateConversionTransitionTo();
+            std::optional<Ent::Gen2::EntityStateConverted> EntityStateConverted();
+            Ent::Gen2::EntityStateConverted addEntityStateConverted();
+            void removeEntityStateConverted();
             std::optional<Ent::Gen2::EntityStateCoyoteJump> EntityStateCoyoteJump();
             Ent::Gen2::EntityStateCoyoteJump addEntityStateCoyoteJump();
             void removeEntityStateCoyoteJump();
@@ -26054,6 +26164,9 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateGrasp> EntityStateGrasp();
             Ent::Gen2::EntityStateGrasp addEntityStateGrasp();
             void removeEntityStateGrasp();
+            std::optional<Ent::Gen2::EntityStateGraspIntention> EntityStateGraspIntention();
+            Ent::Gen2::EntityStateGraspIntention addEntityStateGraspIntention();
+            void removeEntityStateGraspIntention();
             std::optional<Ent::Gen2::EntityStateGroundedJump> EntityStateGroundedJump();
             Ent::Gen2::EntityStateGroundedJump addEntityStateGroundedJump();
             void removeEntityStateGroundedJump();
@@ -26306,6 +26419,9 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateStuck> EntityStateStuck();
             Ent::Gen2::EntityStateStuck addEntityStateStuck();
             void removeEntityStateStuck();
+            std::optional<Ent::Gen2::EntityStateStuckOut> EntityStateStuckOut();
+            Ent::Gen2::EntityStateStuckOut addEntityStateStuckOut();
+            void removeEntityStateStuckOut();
             std::optional<Ent::Gen2::EntityStateTakeDamageOnMount> EntityStateTakeDamageOnMount();
             Ent::Gen2::EntityStateTakeDamageOnMount addEntityStateTakeDamageOnMount();
             void removeEntityStateTakeDamageOnMount();
@@ -27172,6 +27288,34 @@ namespace Ent
             EntityStateTakeDamageOnMount makeInstanceOf()
             {
                 return EntityStateTakeDamageOnMount(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateStuckOut : HelperObject<EntityStateStuckOut> // Object
+        {
+            explicit EntityStateStuckOut(Ent::Property _node): HelperObject<EntityStateStuckOut>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateStuckOut";
+            static EntityStateStuckOut load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateStuckOut(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateStuckOut loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateStuckOut(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateStuckOut create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateStuckOut(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateStuckOut makeInstanceOf()
+            {
+                return EntityStateStuckOut(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
@@ -29547,6 +29691,34 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct EntityStateGraspIntention : HelperObject<EntityStateGraspIntention> // Object
+        {
+            explicit EntityStateGraspIntention(Ent::Property _node): HelperObject<EntityStateGraspIntention>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateGraspIntention";
+            static EntityStateGraspIntention load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateGraspIntention(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateGraspIntention loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateGraspIntention(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateGraspIntention create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateGraspIntention(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateGraspIntention makeInstanceOf()
+            {
+                return EntityStateGraspIntention(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct EntityStateGrasp : HelperObject<EntityStateGrasp> // Object
         {
             explicit EntityStateGrasp(Ent::Property _node): HelperObject<EntityStateGrasp>(std::move(_node)) {}
@@ -30506,6 +30678,62 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct EntityStateConverted : HelperObject<EntityStateConverted> // Object
+        {
+            explicit EntityStateConverted(Ent::Property _node): HelperObject<EntityStateConverted>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateConverted";
+            static EntityStateConverted load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateConverted(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateConverted loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateConverted(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateConverted create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateConverted(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateConverted makeInstanceOf()
+            {
+                return EntityStateConverted(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateConversionTransitionTo : HelperObject<EntityStateConversionTransitionTo> // Object
+        {
+            explicit EntityStateConversionTransitionTo(Ent::Property _node): HelperObject<EntityStateConversionTransitionTo>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateConversionTransitionTo";
+            static EntityStateConversionTransitionTo load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateConversionTransitionTo(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateConversionTransitionTo loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateConversionTransitionTo(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateConversionTransitionTo create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateConversionTransitionTo(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateConversionTransitionTo makeInstanceOf()
+            {
+                return EntityStateConversionTransitionTo(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct EntityStateControlGPE : HelperObject<EntityStateControlGPE> // Object
         {
             explicit EntityStateControlGPE(Ent::Property _node): HelperObject<EntityStateControlGPE>(std::move(_node)) {}
@@ -30641,6 +30869,34 @@ namespace Ent
             EntityStateCollecting makeInstanceOf()
             {
                 return EntityStateCollecting(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateCollectVertebraeShard : HelperObject<EntityStateCollectVertebraeShard> // Object
+        {
+            explicit EntityStateCollectVertebraeShard(Ent::Property _node): HelperObject<EntityStateCollectVertebraeShard>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateCollectVertebraeShard";
+            static EntityStateCollectVertebraeShard load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateCollectVertebraeShard(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateCollectVertebraeShard loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateCollectVertebraeShard(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateCollectVertebraeShard create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateCollectVertebraeShard(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateCollectVertebraeShard makeInstanceOf()
+            {
+                return EntityStateCollectVertebraeShard(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
@@ -37799,6 +38055,7 @@ namespace Ent
                 "call",
                 "callanswer",
                 "scream",
+                "graspintention",
                 "grab",
                 "grabattack",
                 "grabbed",
@@ -37868,6 +38125,7 @@ namespace Ent
                 "parry",
                 "failingorder",
                 "settingrespawnplace",
+                "stuck",
                 "romlookat",
                 "emoteshame",
                 "emotecrazy",
@@ -38702,7 +38960,7 @@ namespace Ent
             Ent::Gen2::Int FurFocusShadowMapResolution() const;
             Ent::Gen2::Float GlobalLODBias() const;
             Ent::Gen2::Float GlobalLODScale() const;
-            Ent::Gen2::Float LODDecimationFactor() const;
+            Ent::Gen2::LodSelectionMode LodSelectionMode() const;
             Ent::Gen2::String MaterialBank() const;
             Ent::Gen2::Int MaxActiveShadowLights() const;
             Ent::Gen2::Float MinTriangleSize() const;
@@ -39889,6 +40147,63 @@ namespace Ent
                 return ReplicaReplay(getProperty().makeInstanceOf());
             }
         
+        };
+
+        struct SceneConverter_NavmeshOptions : HelperObject<SceneConverter_NavmeshOptions> // Object
+        {
+            explicit SceneConverter_NavmeshOptions(Ent::Property _node): HelperObject<SceneConverter_NavmeshOptions>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SceneConverter::NavmeshOptions";
+            static SceneConverter_NavmeshOptions load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return SceneConverter_NavmeshOptions(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static SceneConverter_NavmeshOptions loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return SceneConverter_NavmeshOptions(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static SceneConverter_NavmeshOptions create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return SceneConverter_NavmeshOptions(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            SceneConverter_NavmeshOptions makeInstanceOf()
+            {
+                return SceneConverter_NavmeshOptions(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Bool KeepStaticObjectsNavMeshStampersOutOfTerrains() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct SceneConverter_StreamingOptions : HelperObject<SceneConverter_StreamingOptions> // Object
+        {
+            explicit SceneConverter_StreamingOptions(Ent::Property _node): HelperObject<SceneConverter_StreamingOptions>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SceneConverter::StreamingOptions";
+            static SceneConverter_StreamingOptions load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return SceneConverter_StreamingOptions(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static SceneConverter_StreamingOptions loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return SceneConverter_StreamingOptions(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static SceneConverter_StreamingOptions create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return SceneConverter_StreamingOptions(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            SceneConverter_StreamingOptions makeInstanceOf()
+            {
+                return SceneConverter_StreamingOptions(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Bool ExportStreamingEntities() const;
+            Ent::Gen2::Float StreamingUnitMaxLength() const;
+            Ent::Gen2::String _comment() const;
         };
 
         struct SceneNode : HelperObject<SceneNode> // Object
@@ -42307,9 +42622,25 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("outText"));
         }
         // ScoreComputation
+        inline Ent::Gen2::ScaleConverter ScoreComputation::CameraSightPitchAngleScore() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("CameraSightPitchAngleScore"));
+        }
+        inline Ent::Gen2::ScaleConverter ScoreComputation::CameraSightYawAngleScore() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("CameraSightYawAngleScore"));
+        }
         inline Ent::Gen2::ScaleConverter ScoreComputation::DistanceScore() const
         {
             return Ent::Gen2::ScaleConverter(getProperty().getObjectField("DistanceScore"));
+        }
+        inline Ent::Gen2::ScaleConverter ScoreComputation::InteractorSightAngleScore() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("InteractorSightAngleScore"));
+        }
+        inline Ent::Gen2::ScaleConverter ScoreComputation::JoystickDirectionAngleScore() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("JoystickDirectionAngleScore"));
         }
         inline Ent::Gen2::Float ScoreComputation::MaxDistance() const
         {
@@ -42319,25 +42650,9 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("MinScore"));
         }
-        inline Ent::Gen2::ScaleConverter ScoreComputation::ScreenDistXScore() const
-        {
-            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("ScreenDistXScore"));
-        }
-        inline Ent::Gen2::ScaleConverter ScoreComputation::ScreenDistYScore() const
-        {
-            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("ScreenDistYScore"));
-        }
-        inline Ent::Gen2::ScaleConverter ScoreComputation::SightCosScore() const
-        {
-            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("SightCosScore"));
-        }
         inline Ent::Gen2::String ScoreComputation::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        inline Ent::Gen2::Float ScoreComputation::maxAngle() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("maxAngle"));
         }
         // Scale
         inline Ent::Gen2::String Scale::_comment() const
@@ -45134,6 +45449,17 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateCollectVertebrae(getProperty().setUnionType("EntityStateCollectVertebrae"));
         }
+        inline std::optional<Ent::Gen2::EntityStateCollectVertebraeShard> ResponsiblePointer_ActorState_::EntityStateCollectVertebraeShard()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateCollectVertebraeShard") != 0?
+                    std::optional<Ent::Gen2::EntityStateCollectVertebraeShard>{}:
+                    std::optional<Ent::Gen2::EntityStateCollectVertebraeShard>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateCollectVertebraeShard ResponsiblePointer_ActorState_::setEntityStateCollectVertebraeShard()
+        {
+            return Ent::Gen2::EntityStateCollectVertebraeShard(getProperty().setUnionType("EntityStateCollectVertebraeShard"));
+        }
         inline std::optional<Ent::Gen2::EntityStateCollecting> ResponsiblePointer_ActorState_::EntityStateCollecting()
         {
             return strcmp(
@@ -45188,6 +45514,28 @@ namespace Ent
         inline Ent::Gen2::EntityStateControlGPE ResponsiblePointer_ActorState_::setEntityStateControlGPE()
         {
             return Ent::Gen2::EntityStateControlGPE(getProperty().setUnionType("EntityStateControlGPE"));
+        }
+        inline std::optional<Ent::Gen2::EntityStateConversionTransitionTo> ResponsiblePointer_ActorState_::EntityStateConversionTransitionTo()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateConversionTransitionTo") != 0?
+                    std::optional<Ent::Gen2::EntityStateConversionTransitionTo>{}:
+                    std::optional<Ent::Gen2::EntityStateConversionTransitionTo>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateConversionTransitionTo ResponsiblePointer_ActorState_::setEntityStateConversionTransitionTo()
+        {
+            return Ent::Gen2::EntityStateConversionTransitionTo(getProperty().setUnionType("EntityStateConversionTransitionTo"));
+        }
+        inline std::optional<Ent::Gen2::EntityStateConverted> ResponsiblePointer_ActorState_::EntityStateConverted()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateConverted") != 0?
+                    std::optional<Ent::Gen2::EntityStateConverted>{}:
+                    std::optional<Ent::Gen2::EntityStateConverted>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateConverted ResponsiblePointer_ActorState_::setEntityStateConverted()
+        {
+            return Ent::Gen2::EntityStateConverted(getProperty().setUnionType("EntityStateConverted"));
         }
         inline std::optional<Ent::Gen2::EntityStateCoyoteJump> ResponsiblePointer_ActorState_::EntityStateCoyoteJump()
         {
@@ -45562,6 +45910,17 @@ namespace Ent
         inline Ent::Gen2::EntityStateGrasp ResponsiblePointer_ActorState_::setEntityStateGrasp()
         {
             return Ent::Gen2::EntityStateGrasp(getProperty().setUnionType("EntityStateGrasp"));
+        }
+        inline std::optional<Ent::Gen2::EntityStateGraspIntention> ResponsiblePointer_ActorState_::EntityStateGraspIntention()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateGraspIntention") != 0?
+                    std::optional<Ent::Gen2::EntityStateGraspIntention>{}:
+                    std::optional<Ent::Gen2::EntityStateGraspIntention>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateGraspIntention ResponsiblePointer_ActorState_::setEntityStateGraspIntention()
+        {
+            return Ent::Gen2::EntityStateGraspIntention(getProperty().setUnionType("EntityStateGraspIntention"));
         }
         inline std::optional<Ent::Gen2::EntityStateGroundedJump> ResponsiblePointer_ActorState_::EntityStateGroundedJump()
         {
@@ -46486,6 +46845,17 @@ namespace Ent
         inline Ent::Gen2::EntityStateStuck ResponsiblePointer_ActorState_::setEntityStateStuck()
         {
             return Ent::Gen2::EntityStateStuck(getProperty().setUnionType("EntityStateStuck"));
+        }
+        inline std::optional<Ent::Gen2::EntityStateStuckOut> ResponsiblePointer_ActorState_::EntityStateStuckOut()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateStuckOut") != 0?
+                    std::optional<Ent::Gen2::EntityStateStuckOut>{}:
+                    std::optional<Ent::Gen2::EntityStateStuckOut>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateStuckOut ResponsiblePointer_ActorState_::setEntityStateStuckOut()
+        {
+            return Ent::Gen2::EntityStateStuckOut(getProperty().setUnionType("EntityStateStuckOut"));
         }
         inline std::optional<Ent::Gen2::EntityStateTakeDamageOnMount> ResponsiblePointer_ActorState_::EntityStateTakeDamageOnMount()
         {
@@ -47855,6 +48225,27 @@ namespace Ent
         inline Ent::Gen2::Vector3 MoveCapacityData_OrientationSpeed::steeringAngle() const
         {
             return Ent::Gen2::Vector3(getProperty().getObjectField("steeringAngle"));
+        }
+        // MoveCapacityData_Dodge
+        inline Ent::Gen2::String MoveCapacityData_Dodge::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Float MoveCapacityData_Dodge::classicDodgeOrientationRate() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("classicDodgeOrientationRate"));
+        }
+        inline Ent::Gen2::Float MoveCapacityData_Dodge::cooldownTime() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("cooldownTime"));
+        }
+        inline Ent::Gen2::Float MoveCapacityData_Dodge::distance() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("distance"));
+        }
+        inline Ent::Gen2::ScaleConverter MoveCapacityData_Dodge::scalePlayRatioFactor() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("scalePlayRatioFactor"));
         }
         // MountableSnapLine_ControlPoint
         inline Ent::Gen2::String MountableSnapLine_ControlPoint::_comment() const
@@ -49494,6 +49885,10 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("distanceMax"));
         }
+        inline Ent::Gen2::Float GrasperInteractionData::distanceMin() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("distanceMin"));
+        }
         inline Ent::Gen2::Float GrasperInteractionData::graspDurationMax() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("graspDurationMax"));
@@ -50625,61 +51020,6 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
-        // SmallActorSpawnRuleData
-        inline Ent::Gen2::String SmallActorSpawnRuleData::AudioEventName() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("AudioEventName"));
-        }
-        inline Ent::Gen2::String SmallActorSpawnRuleData::AudioEventSoundBank() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("AudioEventSoundBank"));
-        }
-        inline Ent::Gen2::FloatRange SmallActorSpawnRuleData::DayTimeRange() const
-        {
-            return Ent::Gen2::FloatRange(getProperty().getObjectField("DayTimeRange"));
-        }
-        inline Ent::Gen2::FloatRange SmallActorSpawnRuleData::DistanceRange() const
-        {
-            return Ent::Gen2::FloatRange(getProperty().getObjectField("DistanceRange"));
-        }
-        inline Ent::Gen2::FloatRange SmallActorSpawnRuleData::PrecipitationRange() const
-        {
-            return Ent::Gen2::FloatRange(getProperty().getObjectField("PrecipitationRange"));
-        }
-        inline Ent::Gen2::FloatRange SmallActorSpawnRuleData::RegenRange() const
-        {
-            return Ent::Gen2::FloatRange(getProperty().getObjectField("RegenRange"));
-        }
-        inline Ent::Gen2::Float SmallActorSpawnRuleData::SpawnProbability() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("SpawnProbability"));
-        }
-        inline Ent::Gen2::String SmallActorSpawnRuleData::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        // SmallActorSpawnPointData
-        inline Ent::Gen2::Float SmallActorSpawnPointData::SelectionProbability() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("SelectionProbability"));
-        }
-        inline Array<Ent::Gen2::SmallActorSpawnRuleData> SmallActorSpawnPointData::SpawnRules() const
-        {
-            return Array<Ent::Gen2::SmallActorSpawnRuleData>(getProperty().getObjectField("SpawnRules"));
-        }
-        inline Ent::Gen2::String SmallActorSpawnPointData::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        // SoundOpportunitiesConfig
-        inline Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData> SoundOpportunitiesConfig::SmallActorSpawnRules() const
-        {
-            return Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData>(getProperty().getObjectField("SmallActorSpawnRules"));
-        }
-        inline Ent::Gen2::String SoundOpportunitiesConfig::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
         // FadeDuration
         inline Ent::Gen2::String FadeDuration::_comment() const
         {
@@ -50970,6 +51310,10 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // EntityStateStaffOwnedVertebras_Inputs
+        inline Ent::Gen2::Int EntityStateStaffOwnedVertebras_Inputs::OwnedShardCount() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("OwnedShardCount"));
+        }
         inline Ent::Gen2::String EntityStateStaffOwnedVertebras_Inputs::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
@@ -51147,6 +51491,61 @@ namespace Ent
             return PrimArray<Ent::Gen2::String>(getProperty().getObjectField("UsedVegetations"));
         }
         inline Ent::Gen2::String VegetationPCloudData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // SmallActorSpawnRuleData
+        inline Ent::Gen2::String SmallActorSpawnRuleData::AudioEventName() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("AudioEventName"));
+        }
+        inline Ent::Gen2::String SmallActorSpawnRuleData::AudioEventSoundBank() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("AudioEventSoundBank"));
+        }
+        inline Ent::Gen2::FloatRange SmallActorSpawnRuleData::DayTimeRange() const
+        {
+            return Ent::Gen2::FloatRange(getProperty().getObjectField("DayTimeRange"));
+        }
+        inline Ent::Gen2::FloatRange SmallActorSpawnRuleData::DistanceRange() const
+        {
+            return Ent::Gen2::FloatRange(getProperty().getObjectField("DistanceRange"));
+        }
+        inline PrimArray<Ent::Gen2::EnergyValue> SmallActorSpawnRuleData::EnergyValues() const
+        {
+            return PrimArray<Ent::Gen2::EnergyValue>(getProperty().getObjectField("EnergyValues"));
+        }
+        inline Ent::Gen2::FloatRange SmallActorSpawnRuleData::PrecipitationRange() const
+        {
+            return Ent::Gen2::FloatRange(getProperty().getObjectField("PrecipitationRange"));
+        }
+        inline Ent::Gen2::Float SmallActorSpawnRuleData::SpawnProbability() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("SpawnProbability"));
+        }
+        inline Ent::Gen2::String SmallActorSpawnRuleData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // SmallActorSpawnPointData
+        inline Ent::Gen2::Float SmallActorSpawnPointData::SelectionProbability() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("SelectionProbability"));
+        }
+        inline Array<Ent::Gen2::SmallActorSpawnRuleData> SmallActorSpawnPointData::SpawnRules() const
+        {
+            return Array<Ent::Gen2::SmallActorSpawnRuleData>(getProperty().getObjectField("SpawnRules"));
+        }
+        inline Ent::Gen2::String SmallActorSpawnPointData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // SoundOpportunitiesConfig
+        inline Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData> SoundOpportunitiesConfig::SmallActorSpawnRules() const
+        {
+            return Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData>(getProperty().getObjectField("SmallActorSpawnRules"));
+        }
+        inline Ent::Gen2::String SoundOpportunitiesConfig::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -53202,6 +53601,10 @@ namespace Ent
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("EDITOR_IsCave"));
         }
+        inline Ent::Gen2::Bool StaticObjectGD::EDITOR_IsUnclosedMesh() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("EDITOR_IsUnclosedMesh"));
+        }
         inline Ent::Gen2::Bool StaticObjectGD::EDITOR_MergeInNavMesh() const
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("EDITOR_MergeInNavMesh"));
@@ -53246,6 +53649,14 @@ namespace Ent
         inline Ent::Gen2::Float StaffVertebrasGD::RefillVertebraTimer() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("RefillVertebraTimer"));
+        }
+        inline Ent::Gen2::Int StaffVertebrasGD::ShardMaxCount() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("ShardMaxCount"));
+        }
+        inline Ent::Gen2::Int StaffVertebrasGD::StartShardCount_() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("StartShardCount "));
         }
         inline Ent::Gen2::ComponentGD StaffVertebrasGD::Super() const
         {
@@ -53862,6 +54273,10 @@ namespace Ent
         inline Ent::Gen2::Float PivotControllerGD::InitialGrowth() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("InitialGrowth"));
+        }
+        inline Ent::Gen2::String PivotControllerGD::PivotSkeleton() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("PivotSkeleton"));
         }
         inline Ent::Gen2::ComponentGD PivotControllerGD::Super() const
         {
@@ -54910,6 +55325,18 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // GrasperGD
+        inline Ent::Gen2::Float GrasperGD::GraspIntentionDelayToAllowOrientation() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("GraspIntentionDelayToAllowOrientation"));
+        }
+        inline Ent::Gen2::Float GrasperGD::GraspIntentionMaxHalfAngle() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("GraspIntentionMaxHalfAngle"));
+        }
+        inline Ent::Gen2::Float GrasperGD::GraspIntentionOrientationYawRate() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("GraspIntentionOrientationYawRate"));
+        }
         inline Ent::Gen2::ComponentGD GrasperGD::Super() const
         {
             return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
@@ -55349,6 +55776,19 @@ namespace Ent
             return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String CreatureUIGD::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // ConvertibleGD
+        inline Ent::Gen2::EntityRef ConvertibleGD::ConvertedEntity() const
+        {
+            return Ent::Gen2::EntityRef(getProperty().getObjectField("ConvertedEntity"));
+        }
+        inline Ent::Gen2::ComponentGD ConvertibleGD::Super() const
+        {
+            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String ConvertibleGD::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -56098,6 +56538,17 @@ namespace Ent
         inline Ent::Gen2::ConstrainedMoveGD Component::setConstrainedMoveGD()
         {
             return Ent::Gen2::ConstrainedMoveGD(getProperty().setUnionType("ConstrainedMoveGD"));
+        }
+        inline std::optional<Ent::Gen2::ConvertibleGD> Component::ConvertibleGD()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "ConvertibleGD") != 0?
+                    std::optional<Ent::Gen2::ConvertibleGD>{}:
+                    std::optional<Ent::Gen2::ConvertibleGD>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::ConvertibleGD Component::setConvertibleGD()
+        {
+            return Ent::Gen2::ConvertibleGD(getProperty().setUnionType("ConvertibleGD"));
         }
         inline std::optional<Ent::Gen2::CreatureAIGD> Component::CreatureAIGD()
         {
@@ -57998,6 +58449,18 @@ namespace Ent
         inline void Object_Components::removeConstrainedMoveGD()
         {
             getProperty().eraseUnionSetItem("ConstrainedMoveGD");
+        }
+        inline std::optional<Ent::Gen2::ConvertibleGD> Object_Components::ConvertibleGD()
+        {
+            return std::optional<Ent::Gen2::ConvertibleGD>(getSubNode("ConvertibleGD"));
+        }
+        inline Ent::Gen2::ConvertibleGD Object_Components::addConvertibleGD()
+        {
+            return Ent::Gen2::ConvertibleGD(addSubNode("ConvertibleGD"));
+        }
+        inline void Object_Components::removeConvertibleGD()
+        {
+            getProperty().eraseUnionSetItem("ConvertibleGD");
         }
         inline std::optional<Ent::Gen2::CreatureAIGD> Object_Components::CreatureAIGD()
         {
@@ -60301,6 +60764,18 @@ namespace Ent
         inline void Components::removeConstrainedMoveGD()
         {
             getProperty().eraseUnionSetItem("ConstrainedMoveGD");
+        }
+        inline std::optional<Ent::Gen2::ConvertibleGD> Components::ConvertibleGD()
+        {
+            return std::optional<Ent::Gen2::ConvertibleGD>(getSubNode("ConvertibleGD"));
+        }
+        inline Ent::Gen2::ConvertibleGD Components::addConvertibleGD()
+        {
+            return Ent::Gen2::ConvertibleGD(addSubNode("ConvertibleGD"));
+        }
+        inline void Components::removeConvertibleGD()
+        {
+            getProperty().eraseUnionSetItem("ConvertibleGD");
         }
         inline std::optional<Ent::Gen2::CreatureAIGD> Components::CreatureAIGD()
         {
@@ -64652,19 +65127,6 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
-        // AttackPositionRetimingData_SpecieRetimingCoeff
-        inline Ent::Gen2::String AttackPositionRetimingData_SpecieRetimingCoeff::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        inline Ent::Gen2::Float AttackPositionRetimingData_SpecieRetimingCoeff::defaultCoeff() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("defaultCoeff"));
-        }
-        inline Ent::Gen2::Float AttackPositionRetimingData_SpecieRetimingCoeff::masterCoeff() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("masterCoeff"));
-        }
         // AttackPositionRetimingData
         inline Ent::Gen2::String AttackPositionRetimingData::_comment() const
         {
@@ -64673,10 +65135,6 @@ namespace Ent
         inline Ent::Gen2::Float AttackPositionRetimingData::animTranslationCoeff() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("animTranslationCoeff"));
-        }
-        inline Ent::Gen2::Map<SpecieEnum, Ent::Gen2::AttackPositionRetimingData_SpecieRetimingCoeff> AttackPositionRetimingData::backwardRetimingCoeffBySpecie() const
-        {
-            return Ent::Gen2::Map<SpecieEnum, Ent::Gen2::AttackPositionRetimingData_SpecieRetimingCoeff>(getProperty().getObjectField("backwardRetimingCoeffBySpecie"));
         }
         inline Ent::Gen2::Float AttackPositionRetimingData::lengthMax() const
         {
@@ -65514,6 +65972,10 @@ namespace Ent
             return Array<Ent::Gen2::MoveCapacityData_AnimTagTimelineTransitionItem>(getProperty().getObjectField("transitions"));
         }
         // MoveCapacityData
+        inline Ent::Gen2::MoveCapacityData_Dodge MoveCapacityData::Dodge() const
+        {
+            return Ent::Gen2::MoveCapacityData_Dodge(getProperty().getObjectField("Dodge"));
+        }
         inline Ent::Gen2::Float MoveCapacityData::LandingDecelerationFactor() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("LandingDecelerationFactor"));
@@ -65617,10 +66079,6 @@ namespace Ent
         inline Ent::Gen2::Float MoveCapacityData::defaultWorldUpSpeedFactor() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("defaultWorldUpSpeedFactor"));
-        }
-        inline Ent::Gen2::Float MoveCapacityData::dodgeCooldownTime() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("dodgeCooldownTime"));
         }
         inline Ent::Gen2::Bool MoveCapacityData::doubleJump() const
         {
@@ -65745,6 +66203,10 @@ namespace Ent
         inline Ent::Gen2::Float MoveCapacityData::rigidbodyScalingSpeed() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("rigidbodyScalingSpeed"));
+        }
+        inline Ent::Gen2::Float MoveCapacityData::rigidbodyScalingSpeedInAir() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("rigidbodyScalingSpeedInAir"));
         }
         inline Ent::Gen2::Float MoveCapacityData::sphereCastRadiusRatio() const
         {
@@ -68934,6 +69396,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateCollectVertebrae");
         }
+        inline std::optional<Ent::Gen2::EntityStateCollectVertebraeShard> ActorStates::EntityStateCollectVertebraeShard()
+        {
+            return std::optional<Ent::Gen2::EntityStateCollectVertebraeShard>(getSubNode("EntityStateCollectVertebraeShard"));
+        }
+        inline Ent::Gen2::EntityStateCollectVertebraeShard ActorStates::addEntityStateCollectVertebraeShard()
+        {
+            return Ent::Gen2::EntityStateCollectVertebraeShard(addSubNode("EntityStateCollectVertebraeShard"));
+        }
+        inline void ActorStates::removeEntityStateCollectVertebraeShard()
+        {
+            getProperty().eraseUnionSetItem("EntityStateCollectVertebraeShard");
+        }
         inline std::optional<Ent::Gen2::EntityStateCollecting> ActorStates::EntityStateCollecting()
         {
             return std::optional<Ent::Gen2::EntityStateCollecting>(getSubNode("EntityStateCollecting"));
@@ -68993,6 +69467,30 @@ namespace Ent
         inline void ActorStates::removeEntityStateControlGPE()
         {
             getProperty().eraseUnionSetItem("EntityStateControlGPE");
+        }
+        inline std::optional<Ent::Gen2::EntityStateConversionTransitionTo> ActorStates::EntityStateConversionTransitionTo()
+        {
+            return std::optional<Ent::Gen2::EntityStateConversionTransitionTo>(getSubNode("EntityStateConversionTransitionTo"));
+        }
+        inline Ent::Gen2::EntityStateConversionTransitionTo ActorStates::addEntityStateConversionTransitionTo()
+        {
+            return Ent::Gen2::EntityStateConversionTransitionTo(addSubNode("EntityStateConversionTransitionTo"));
+        }
+        inline void ActorStates::removeEntityStateConversionTransitionTo()
+        {
+            getProperty().eraseUnionSetItem("EntityStateConversionTransitionTo");
+        }
+        inline std::optional<Ent::Gen2::EntityStateConverted> ActorStates::EntityStateConverted()
+        {
+            return std::optional<Ent::Gen2::EntityStateConverted>(getSubNode("EntityStateConverted"));
+        }
+        inline Ent::Gen2::EntityStateConverted ActorStates::addEntityStateConverted()
+        {
+            return Ent::Gen2::EntityStateConverted(addSubNode("EntityStateConverted"));
+        }
+        inline void ActorStates::removeEntityStateConverted()
+        {
+            getProperty().eraseUnionSetItem("EntityStateConverted");
         }
         inline std::optional<Ent::Gen2::EntityStateCoyoteJump> ActorStates::EntityStateCoyoteJump()
         {
@@ -69401,6 +69899,18 @@ namespace Ent
         inline void ActorStates::removeEntityStateGrasp()
         {
             getProperty().eraseUnionSetItem("EntityStateGrasp");
+        }
+        inline std::optional<Ent::Gen2::EntityStateGraspIntention> ActorStates::EntityStateGraspIntention()
+        {
+            return std::optional<Ent::Gen2::EntityStateGraspIntention>(getSubNode("EntityStateGraspIntention"));
+        }
+        inline Ent::Gen2::EntityStateGraspIntention ActorStates::addEntityStateGraspIntention()
+        {
+            return Ent::Gen2::EntityStateGraspIntention(addSubNode("EntityStateGraspIntention"));
+        }
+        inline void ActorStates::removeEntityStateGraspIntention()
+        {
+            getProperty().eraseUnionSetItem("EntityStateGraspIntention");
         }
         inline std::optional<Ent::Gen2::EntityStateGroundedJump> ActorStates::EntityStateGroundedJump()
         {
@@ -70410,6 +70920,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateStuck");
         }
+        inline std::optional<Ent::Gen2::EntityStateStuckOut> ActorStates::EntityStateStuckOut()
+        {
+            return std::optional<Ent::Gen2::EntityStateStuckOut>(getSubNode("EntityStateStuckOut"));
+        }
+        inline Ent::Gen2::EntityStateStuckOut ActorStates::addEntityStateStuckOut()
+        {
+            return Ent::Gen2::EntityStateStuckOut(addSubNode("EntityStateStuckOut"));
+        }
+        inline void ActorStates::removeEntityStateStuckOut()
+        {
+            getProperty().eraseUnionSetItem("EntityStateStuckOut");
+        }
         inline std::optional<Ent::Gen2::EntityStateTakeDamageOnMount> ActorStates::EntityStateTakeDamageOnMount()
         {
             return std::optional<Ent::Gen2::EntityStateTakeDamageOnMount>(getSubNode("EntityStateTakeDamageOnMount"));
@@ -70990,6 +71512,15 @@ namespace Ent
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String EntityStateTakeDamageOnMount::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateStuckOut
+        inline Ent::Gen2::ActorState EntityStateStuckOut::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateStuckOut::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -71821,6 +72352,15 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // EntityStateGraspIntention
+        inline Ent::Gen2::ActorState EntityStateGraspIntention::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateGraspIntention::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // EntityStateGrasp
         inline Ent::Gen2::ActorState EntityStateGrasp::Super() const
         {
@@ -72155,6 +72695,24 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // EntityStateConverted
+        inline Ent::Gen2::ActorState EntityStateConverted::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateConverted::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateConversionTransitionTo
+        inline Ent::Gen2::ActorState EntityStateConversionTransitionTo::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateConversionTransitionTo::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // EntityStateControlGPE
         inline Ent::Gen2::ActorState EntityStateControlGPE::Super() const
         {
@@ -72197,6 +72755,15 @@ namespace Ent
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String EntityStateCollecting::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateCollectVertebraeShard
+        inline Ent::Gen2::ActorState EntityStateCollectVertebraeShard::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateCollectVertebraeShard::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -76207,9 +76774,9 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("GlobalLODScale"));
         }
-        inline Ent::Gen2::Float RenderManager_RenderConfig::LODDecimationFactor() const
+        inline Ent::Gen2::LodSelectionMode RenderManager_RenderConfig::LodSelectionMode() const
         {
-            return Ent::Gen2::Float(getProperty().getObjectField("LODDecimationFactor"));
+            return Ent::Gen2::LodSelectionMode(getProperty().getObjectField("LodSelectionMode"));
         }
         inline Ent::Gen2::String RenderManager_RenderConfig::MaterialBank() const
         {
@@ -76725,6 +77292,28 @@ namespace Ent
             return Ent::Gen2::Float(getProperty().getObjectField("jointsRigidity"));
         }
         // ReplicaReplay
+        // SceneConverter_NavmeshOptions
+        inline Ent::Gen2::Bool SceneConverter_NavmeshOptions::KeepStaticObjectsNavMeshStampersOutOfTerrains() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("KeepStaticObjectsNavMeshStampersOutOfTerrains"));
+        }
+        inline Ent::Gen2::String SceneConverter_NavmeshOptions::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // SceneConverter_StreamingOptions
+        inline Ent::Gen2::Bool SceneConverter_StreamingOptions::ExportStreamingEntities() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("ExportStreamingEntities"));
+        }
+        inline Ent::Gen2::Float SceneConverter_StreamingOptions::StreamingUnitMaxLength() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("StreamingUnitMaxLength"));
+        }
+        inline Ent::Gen2::String SceneConverter_StreamingOptions::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // SceneNode
         // SceneNodeGraph
         // Sensor

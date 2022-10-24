@@ -24,6 +24,21 @@ class GrasperGD(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def GraspIntentionDelayToAllowOrientation(self):  # type: ()->Float
+        return Float(self._node.at("GraspIntentionDelayToAllowOrientation"))
+    @GraspIntentionDelayToAllowOrientation.setter
+    def GraspIntentionDelayToAllowOrientation(self, val): self.GraspIntentionDelayToAllowOrientation.set(val)
+    @property
+    def GraspIntentionMaxHalfAngle(self):  # type: ()->Float
+        return Float(self._node.at("GraspIntentionMaxHalfAngle"))
+    @GraspIntentionMaxHalfAngle.setter
+    def GraspIntentionMaxHalfAngle(self, val): self.GraspIntentionMaxHalfAngle.set(val)
+    @property
+    def GraspIntentionOrientationYawRate(self):  # type: ()->Float
+        return Float(self._node.at("GraspIntentionOrientationYawRate"))
+    @GraspIntentionOrientationYawRate.setter
+    def GraspIntentionOrientationYawRate(self, val): self.GraspIntentionOrientationYawRate.set(val)
+    @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))
     @property

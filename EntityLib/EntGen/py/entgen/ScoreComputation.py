@@ -21,8 +21,20 @@ class ScoreComputation(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def CameraSightPitchAngleScore(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("CameraSightPitchAngleScore"))
+    @property
+    def CameraSightYawAngleScore(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("CameraSightYawAngleScore"))
+    @property
     def DistanceScore(self):  # type: ()->ScaleConverter
         return ScaleConverter(self._node.at("DistanceScore"))
+    @property
+    def InteractorSightAngleScore(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("InteractorSightAngleScore"))
+    @property
+    def JoystickDirectionAngleScore(self):  # type: ()->ScaleConverter
+        return ScaleConverter(self._node.at("JoystickDirectionAngleScore"))
     @property
     def MaxDistance(self):  # type: ()->Float
         return Float(self._node.at("MaxDistance"))
@@ -34,24 +46,10 @@ class ScoreComputation(HelperObject):
     @MinScore.setter
     def MinScore(self, val): self.MinScore.set(val)
     @property
-    def ScreenDistXScore(self):  # type: ()->ScaleConverter
-        return ScaleConverter(self._node.at("ScreenDistXScore"))
-    @property
-    def ScreenDistYScore(self):  # type: ()->ScaleConverter
-        return ScaleConverter(self._node.at("ScreenDistYScore"))
-    @property
-    def SightCosScore(self):  # type: ()->ScaleConverter
-        return ScaleConverter(self._node.at("SightCosScore"))
-    @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
-    @property
-    def maxAngle(self):  # type: ()->Float
-        return Float(self._node.at("maxAngle"))
-    @maxAngle.setter
-    def maxAngle(self, val): self.maxAngle.set(val)
     pass
 
 

@@ -7,6 +7,7 @@ import EntityLibPy
 from entgen.String import *
 from entgen.Float import *
 from entgen.FloatRange import *
+from entgen.EnergyValue import *
 
 from EntityLibPy import Node
 
@@ -37,11 +38,13 @@ class SmallActorSpawnRuleData(HelperObject):
     def DistanceRange(self):  # type: ()->FloatRange
         return FloatRange(self._node.at("DistanceRange"))
     @property
+    def EnergyValues(self):  # type: ()->PrimArray[EnergyValue]
+        return (lambda n: PrimArray(EnergyValue, n))(self._node.at("EnergyValues"))
+    @EnergyValues.setter
+    def EnergyValues(self, val): self.EnergyValues.set(val)
+    @property
     def PrecipitationRange(self):  # type: ()->FloatRange
         return FloatRange(self._node.at("PrecipitationRange"))
-    @property
-    def RegenRange(self):  # type: ()->FloatRange
-        return FloatRange(self._node.at("RegenRange"))
     @property
     def SpawnProbability(self):  # type: ()->Float
         return Float(self._node.at("SpawnProbability"))

@@ -263,6 +263,9 @@ try
             "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
             "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene");
 
+        auto const* falseNodeRef = "Components/SubScene/Embedded/XXXXX";
+        auto nullNode = node.resolveNodeRef(falseNodeRef);
+        ENTLIB_ASSERT(nullNode.has_value() == false);
         auto const* nodeRef = "Components/SubScene/Embedded/ShamanFullBlue_ent_001";
         auto ent = node.resolveNodeRef(nodeRef);
         auto entpath = node.makeNodeRef(*ent);

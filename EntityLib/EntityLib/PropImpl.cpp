@@ -477,7 +477,10 @@ namespace Ent
     PropImplPtr PropImpl::makeInstanceOf()
     {
         auto& jsonDoc = m_entityLib->createTempJsonFile();
-        jsonDoc["InstanceOf"] = m_instance.getFilePath();
+        if (auto prefabPath = m_instance.getFilePath())
+        {
+            jsonDoc["InstanceOf"] = prefabPath;
+        }
         auto instProp = m_entityLib->newPropImpl(nullptr, getSchema(), "", &jsonDoc);
         instProp->m_prefab = sharedFromThis();
         return instProp;
@@ -1493,6 +1496,10 @@ namespace Ent
             case DataKind::COUNT:
             default:
                 ENTLIB_LOGIC_ERROR("Unexpected DataKind in PropImpl::resolveNodeRef : %d", kind);
+            }
+            if (current == nullptr)
+            {
+                return current;
             }
         }
         return current;

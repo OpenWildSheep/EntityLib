@@ -91,9 +91,9 @@ namespace Ent
                     for (auto&& [name, schema] : _expl.getUnionSetKeysString())
                     {
                         auto data = _expl.getUnionSetItem(name, schema);
-                        _visitor.inUnionSetElement(_expl, name);
+                        _visitor.inUnionSetElement(*data, name);
                         visitRecursive(*data, _visitor);
-                        _visitor.outUnionSetElement(_expl);
+                        _visitor.outUnionSetElement(*data);
                     }
                     _visitor.outUnionSet(_expl);
                     break;

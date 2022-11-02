@@ -102,7 +102,7 @@ namespace Ent
         void inUnionSetElement(Property& _source, char const* _type) override
         {
             auto& newElt = _Back().emplace_back(nlohmann::json::object());
-            auto const& itemSchema = _source.getSchema()->singularItems->get();
+            auto const& itemSchema = _source.getParent()->getSchema()->singularItems->get();
             newElt[itemSchema.getUnionNameField()] = _type;
             _Push(newElt[itemSchema.getUnionDataField()]);
         }

@@ -349,14 +349,11 @@ namespace Ent
                 found = true;
             }
         }
-        if (not isDefault())
+        if (not newLayer._loadInstanceOf())
         {
-            if (not newLayer._loadInstanceOf())
+            if (m_prefab != nullptr)
             {
-                if (m_prefab != nullptr)
-                {
-                    std::tie(newLayer.m_prefab, found) = _enter(*m_prefab);
-                }
+                std::tie(newLayer.m_prefab, found) = _enter(*m_prefab);
             }
         }
         if (newLayerPtr->_getDefault().getSchema() == nullptr)
@@ -403,14 +400,11 @@ namespace Ent
         newLayer.m_instance = m_instance.getArrayItem(_index);
         newLayer.m_parent = sharedFromThis();
         auto const* subschema = newLayer.getSchema();
-        if (not isDefault())
+        if (not newLayer._loadInstanceOf())
         {
-            if (not newLayer._loadInstanceOf())
+            if (m_prefab != nullptr)
             {
-                if (m_prefab != nullptr)
-                {
-                    newLayer.m_prefab = m_prefab->getArrayItem(_index);
-                }
+                newLayer.m_prefab = m_prefab->getArrayItem(_index);
             }
         }
         auto const& defaultVal = _getDefault();

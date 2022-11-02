@@ -228,6 +228,15 @@ try
         ent.save("myseedpatchMarianne.seedpatchdata.copy.node");
     }
     {
+        // Check getPrefab when all prefabs are unset (should not null)
+        auto ent = Gen::Entity::create(entlib).makeInstanceOf();
+        auto entProp = ent.getProperty();
+        auto color = entProp.getObjectField("Color");
+        ENTLIB_ASSERT(color.getPrefab().has_value());
+        auto red = color.getArrayItem(0);
+        ENTLIB_ASSERT(red.getPrefab().has_value());
+    }
+    {
         // When there is a $schema field
         auto node = entlib.loadFileAsNode("myseedpatch_schema.node");
         ENTLIB_ASSERT(node->getSchema() == entlib.getSchema("SeedPatchDataList"));

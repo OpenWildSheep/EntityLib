@@ -115,8 +115,13 @@ namespace Ent
     {
     }
 
+    BreakSchemaRules::BreakSchemaRules(char const* _message)
+        : ContextException(_message)
+    {
+    }
+
     BadUnionType::BadUnionType(char const* _type)
-        : ContextException("Bad union type : %s", _type)
+        : BreakSchemaRules(staticFormat("Bad union type : %s", _type))
     {
     }
 

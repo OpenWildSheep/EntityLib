@@ -1006,6 +1006,11 @@ namespace Ent
     PropImplPtr PropImpl::pushBack()
     {
         CHECK_TYPE(DataKind::array);
+        if (arraySize() + 1 > getSchema()->maxItems)
+        {
+            throw BreakSchemaRules(
+                staticFormat("In pushBack : Can't push more than %d items", getSchema()->maxItems));
+        }
         setSize(arraySize() + 1);
         return getArrayItem(arraySize() - 1);
     }
@@ -1013,6 +1018,11 @@ namespace Ent
     void PropImpl::popBack()
     {
         CHECK_TYPE(DataKind::array);
+        if (arraySize() - 1 < getSchema()->minItems)
+        {
+            throw BreakSchemaRules(
+                staticFormat("In popBack : Can't pop less than %d items", getSchema()->minItems));
+        }
         setSize(arraySize() - 1);
     }
 

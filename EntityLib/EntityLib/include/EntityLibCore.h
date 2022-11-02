@@ -417,8 +417,15 @@ namespace Ent
         explicit MissingMetadata(char const* _schemaName); ///< ctor
     };
 
+    /// Exception thrown when trying to violate some Schema rules
+    struct BreakSchemaRules : ContextException
+    {
+        /// ctor
+        explicit BreakSchemaRules(char const* _message);
+    };
+
     /// Exception thrown when trying to switch a Union to a type that woesn't exit
-    struct BadUnionType : ContextException
+    struct BadUnionType : BreakSchemaRules
     {
         /// ctor
         explicit BadUnionType(char const* _type ///< The type/className that doen't exist in this union

@@ -264,6 +264,8 @@ namespace Ent
         [[nodiscard]] std::pair<PropImplPtr, bool> forceGetMapItem(char const* _key);
         [[nodiscard]] std::pair<PropImplPtr, bool> forceGetMapItem(int64_t _field);
 
+        [[nodiscard]] bool sameValue(PropImpl const& _other) const;
+
     private:
         friend void decRef(PropImpl* self);
 

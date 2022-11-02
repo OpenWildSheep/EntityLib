@@ -1581,4 +1581,24 @@ namespace Ent
         return getRootNode()->makeNodeRef(*this);
     }
 
+    bool PropImpl::sameValue(PropImpl const& _other) const
+    {
+        switch (getSchema()->getDataKind())
+        {
+        case DataKind::boolean: return getBool() == _other.getBool();
+        case DataKind::integer: return getInt() == _other.getInt();
+        case DataKind::number: return getFloat() == _other.getFloat();
+        case DataKind::string: return strcmp(getString(), _other.getString()) == 0;
+        case DataKind::entityRef: return getEntityRef() == _other.getEntityRef();
+        case DataKind::object: [[fallthrough]];
+        case DataKind::union_: [[fallthrough]];
+        case DataKind::map: [[fallthrough]];
+        case DataKind::objectSet: [[fallthrough]];
+        case DataKind::unionSet: [[fallthrough]];
+        case DataKind::primitiveSet: [[fallthrough]];
+        case DataKind::array: throw BadType("Called 'sameValue' on a none primitive type");
+        case DataKind::COUNT: [[fallthrough]];
+        default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
+        }
+    }
 } // namespace Ent

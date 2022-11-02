@@ -815,6 +815,12 @@ namespace Ent
             return m_self->getPathToken();
         }
 
+        /// @brief Get the primitive values are equal
+        [[nodiscard]] bool sameValue(Property const& _other) const
+        {
+            return getPimpl().sameValue(_other.getPimpl());
+        }
+
         friend std::vector<PrefabInfo> getPrefabHistory(Property const& _prop);
 
     private:

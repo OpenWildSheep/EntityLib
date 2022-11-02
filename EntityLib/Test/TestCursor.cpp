@@ -832,7 +832,7 @@ void testCursor(EntityLib& entlib)
             == std::string("EP1-Spout_LINK_001"));
     }
     {
-        Property expl(&entlib, entlib.getSchema(entitySchemaName), "instance.entity");
+        Property expl = entlib.loadPropertyCopy("Entity", "instance.entity");
         ENTLIB_ASSERT(expl.getObjectField("Name").getString() == std::string("PlayerSpawner_"));
         auto type =
             expl.getObjectField("Components").getUnionSetItem("NetworkNode")->getObjectField("Type");

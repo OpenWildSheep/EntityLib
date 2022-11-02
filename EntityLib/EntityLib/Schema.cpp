@@ -128,4 +128,10 @@ namespace Ent
         }
         ENTLIB_LOGIC_ERROR("Unexpected DataType !");
     }
+
+    [[nodiscard]] bool Subschema::isPrimitive() const
+    {
+        return type == DataType::string or type == DataType::integer or type == DataType::boolean
+               or type == DataType::number or type == DataType::entityRef;
+    }
 } // namespace Ent

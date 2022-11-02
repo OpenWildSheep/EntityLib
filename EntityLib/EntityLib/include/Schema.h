@@ -193,6 +193,8 @@ namespace Ent
 
         [[nodiscard]] DataKind getDataKind() const;
 
+        [[nodiscard]] bool isPrimitive() const;
+
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue = nlohmann::json;
         DefaultValue defaultValue; ///< @brief Contains the data according to the type

@@ -186,8 +186,7 @@ namespace Ent
         void setString(char const* _value); ///< @pre type==string. @brief Set _value in the instance
         void setBool(bool _value); ///< @pre type==bool. @brief Set _value in the instance
         void setEntityRef(EntityRef const& _value); ///< @pre type==entityref. @brief Set _value in the instance
-        [[nodiscard]] PropImplPtr
-        setUnionType(char const* _type); ///< @pre type==union. @brief Set _value in the instance
+        PropImplPtr setUnionType(char const* _type); ///< @pre type==union. @brief Set _value in the instance
 
         void buildPath(); ///< Build json path but not set any value. Usefull for UnionSet items
         void insertPrimSetKey(char const* _key); ///< Insert _key in the set (or do nothing if already in)
@@ -209,10 +208,13 @@ namespace Ent
         bool eraseMapItem(char const* _key);
         bool eraseMapItem(int64_t _key);
 
+        void clearArray();
         void clearMap();
         void clearPrimSet();
         void clearObjectSet();
         void clearUnionSet();
+        void clearObject();
+        void clearUnion();
 
         [[nodiscard]] double getDefaultFloat() const;
         [[nodiscard]] int64_t getDefaultInt() const;
@@ -220,6 +222,7 @@ namespace Ent
         [[nodiscard]] bool getDefaultBool() const;
         [[nodiscard]] EntityRef getDefaultEntityRef() const;
         [[nodiscard]] size_t getDefaultSize() const;
+        [[nodiscard]] char const* getDefaultUnionType() const;
 
         [[nodiscard]] PropImplPtr getLastSetPrefab() const;
         [[nodiscard]] bool hasPrefabValue() const;

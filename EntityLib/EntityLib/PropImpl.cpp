@@ -896,9 +896,28 @@ namespace Ent
         m_instance.setSize(_size);
     }
 
+    void PropImpl::clearArray()
+    {
+        if (not hasPrefabValue())
+        {
+            unset();
+            return;
+        }
+        setSize(getSchema()->minItems);
+        for (size_t i = 0; i < getSchema()->minItems; ++i)
+        {
+            getArrayItem(i)->clear();
+        }
+    }
+
     void PropImpl::clearMap()
     {
         CHECK_TYPE(DataKind::map);
+        if (not hasPrefabValue())
+        {
+            unset();
+            return;
+        }
         switch (getMapKeyType()) // NOLINT(clang-diagnostic-switch-enum)
         {
         case DataType::integer:
@@ -921,6 +940,11 @@ namespace Ent
     void PropImpl::clearPrimSet()
     {
         CHECK_TYPE(DataKind::primitiveSet);
+        if (not hasPrefabValue())
+        {
+            unset();
+            return;
+        }
         switch (getPrimSetKeyType()) // NOLINT(clang-diagnostic-switch-enum)
         {
         case DataType::integer:
@@ -943,6 +967,11 @@ namespace Ent
     void PropImpl::clearObjectSet()
     {
         CHECK_TYPE(DataKind::objectSet);
+        if (not hasPrefabValue())
+        {
+            unset();
+            return;
+        }
         switch (getObjectSetKeyType()) // NOLINT(clang-diagnostic-switch-enum)
         {
         case DataType::integer:
@@ -965,29 +994,74 @@ namespace Ent
     void PropImpl::clearUnionSet()
     {
         CHECK_TYPE(DataKind::unionSet);
+        if (not hasPrefabValue())
+        {
+            unset();
+            return;
+        }
         for (auto const [key, schema] : getUnionSetKeysString())
         {
             eraseUnionSetItem(key);
         }
     }
 
+    void PropImpl::clearObject()
+    {
+        if (not hasPrefabValue())
+        {
+            unset();
+            return;
+        }
+        for (auto&& [name, prop] : getSchema()->properties)
+        {
+            getObjectField(name.c_str())->clear();
+        }
+    }
+
+    void PropImpl::clearUnion()
+    {
+        if (not hasPrefabValue())
+        {
+            unset();
+            return;
+        }
+        setUnionType(getDefaultUnionType())->clear();
+    }
+
     void PropImpl::clear()
     {
+        auto clearPrim = [this](auto&& setDefault)
+        {
+            if (not hasPrefabValue())
+            {
+                unset();
+                return;
+            }
+            if (hasPrefabValue())
+            {
+                setDefault();
+            }
+            else
+            {
+                unset();
+            }
+        };
+
         auto const kind = getDataKind();
         switch (kind)
         {
-        case DataKind::array: setSize(0); break;
+        case DataKind::array: clearArray(); break;
         case DataKind::map: clearMap(); break;
         case DataKind::unionSet: clearUnionSet(); break;
         case DataKind::objectSet: clearObjectSet(); break;
         case DataKind::primitiveSet: clearPrimSet(); break;
-        case DataKind::entityRef: [[fallthrough]];
-        case DataKind::boolean: [[fallthrough]];
-        case DataKind::number: [[fallthrough]];
-        case DataKind::integer: [[fallthrough]];
-        case DataKind::object: [[fallthrough]];
-        case DataKind::string: [[fallthrough]];
-        case DataKind::union_: [[fallthrough]];
+        case DataKind::entityRef: clearPrim([this] { setEntityRef(getDefaultEntityRef()); }); break;
+        case DataKind::boolean: clearPrim([this] { setBool(getDefaultBool()); }); break;
+        case DataKind::number: clearPrim([this] { setFloat(getDefaultFloat()); }); break;
+        case DataKind::integer: clearPrim([this] { setInt(getDefaultInt()); }); break;
+        case DataKind::string: clearPrim([this] { setString(getDefaultString()); }); break;
+        case DataKind::object: clearObject(); break;
+        case DataKind::union_: clearUnion(); break;
         default:
             throw BadType(staticFormat(
                 "In %s : Expected Array, Map or Set. Got %s (schema : %s)",
@@ -1261,6 +1335,12 @@ namespace Ent
     {
         CHECK_TYPE(DataKind::entityRef);
         return m_default.getEntityRef();
+    }
+
+    char const* PropImpl::getDefaultUnionType() const
+    {
+        CHECK_TYPE(DataKind::union_);
+        return m_default.getUnionType();
     }
 
     size_t PropImpl::getDefaultSize() const

@@ -827,6 +827,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("push_back", &Property::pushBack)
         .def("pop_back", &Property::popBack)
         .def("apply_to_prefab", &Property::applyToPrefab)
+        .def_static("from_ptr", [](intptr_t _ptr) {return (Property*)_ptr;}, py::return_value_policy::reference_internal)
         ;
 
     py::register_exception<JsonValidation>(ent, "JsonValidation");

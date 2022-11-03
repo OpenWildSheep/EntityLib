@@ -224,6 +224,16 @@ try
     static constexpr auto PrefabSubEntityCount = 5;
 
     {
+        // Check insert a key which is an enum, but with a wrong value.
+        auto ent = Gen::Entity::create(entlib);
+        auto map = ent.Components()
+                       .addAnimationModelGD()
+                       .additionalSpeedDebug()
+                       .get(Gen::LocomotionModeEnum::buried)
+                       ->getProperty();
+        ENTLIB_CHECK_EXCEPTION(map.insertMapItem("test"), BreakSchemaRules)
+    }
+    {
         auto ent = Gen::SeedPatchDataList::loadCopy(entlib, "myseedpatchMarianne.seedpatchdata.node");
         ent.save("myseedpatchMarianne.seedpatchdata.copy.node");
     }

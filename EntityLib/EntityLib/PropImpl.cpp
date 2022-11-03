@@ -1084,6 +1084,12 @@ namespace Ent
     void PropImpl::insertPrimSetKey(char const* _key)
     {
         CHECK_TYPE(DataKind::primitiveSet);
+        auto& keySchema = getSchema()->singularItems->get();
+        if (not keySchema.isValidEnumString(_key))
+        {
+            throw BreakSchemaRules(staticFormat(
+                "The value '%s' is not accepted in enum type '%s'", _key, keySchema.name.c_str()));
+        }
         if (not primSetContains(_key))
         {
             _buildPath();

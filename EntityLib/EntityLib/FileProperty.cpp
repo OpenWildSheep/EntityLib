@@ -196,6 +196,15 @@ namespace Ent
             throw BadArrayType(staticFormat(
                 "In Property::enterObjectSet. Expected an ObjectSet. Got %s", setSchema.name.c_str()));
         }
+        auto& keySchema = objectSchema.properties.at(keyFieldName).get();
+        if constexpr (std::is_same_v<char const*, K>)
+        {
+            if (not keySchema.isValidEnumString(_key))
+            {
+                throw BreakSchemaRules(staticFormat(
+                    "The value '%s' is not accepted in enum type '%s'", _key, keySchema.name.c_str()));
+            }
+        }
 
         newLayer.m_schema = Schema{&objectSchema, nullptr};
         newLayer.m_key = _key;
@@ -244,6 +253,17 @@ namespace Ent
         auto& pairSchema = m_schema.base->singularItems->get();
         newLayer.m_schema = Schema{&pairSchema.linearItems->at(1).get(), nullptr};
         newLayer.m_key = _key;
+
+        auto keySchema = &pairSchema.linearItems->at(0).get();
+        if constexpr (std::is_same_v<char const*, K>)
+        {
+            if (not keySchema->isValidEnumString(_key))
+            {
+                throw BreakSchemaRules(staticFormat(
+                    "The value '%s' is not accepted in enum type '%s'", _key, keySchema->name.c_str()));
+            }
+        }
+
         MapItemAction itemAction = MapItemAction::None;
         if (isSet())
         {
@@ -472,12 +492,14 @@ namespace Ent
             {
                 (*_parent.m_values) = json::array();
             }
-            switch (itemType.linearItems->at(0)->type)
+            auto& keyType = itemType.linearItems->at(0).get();
+            switch (keyType.type)
             {
             case DataType::entityRef: [[fallthrough]];
             case DataType::string:
             {
                 auto const& key = std::get<std::string>(childName);
+                ENTLIB_ASSERT(keyType.enumValues.empty() or keyType.isValidEnumString(key));
                 auto pairNode = json::array();
                 pairNode.push_back(key);
                 pairNode.emplace_back();

@@ -12,10 +12,16 @@ namespace Ent
     {
         std::vector<Property> m_dest;
         OverrideValueSource m_overrideValueSource = {};
+        CopyMode m_copyMode = {};
         bool m_copyRootInstanceOf = false;
         bool m_isKeyField = false;
 
         [[nodiscard]] Property& _back()
+        {
+            return m_dest.back();
+        }
+
+        [[nodiscard]] Property const& _back() const
         {
             return m_dest.back();
         }
@@ -40,16 +46,34 @@ namespace Ent
                 case OverrideValueSource::Override: return _source.isSet();
                 case OverrideValueSource::Any: return true;
                 }
-                throw ContextException("Wrong OverrideValueSource given to CopyToEmptyNode");
+                ENTLIB_LOGIC_ERROR("Wrong OverrideValueSource given to CopyProperty");
             };
-            return !m_isKeyField && checkOVS();
+            auto checkCopyMode = [this, &_source]
+            {
+                if (not _source.getSchema()->isPrimitive())
+                {
+                    return true;
+                }
+                switch (m_copyMode)
+                {
+                case CopyMode::CopyOverride:
+                    return _source.hasOverride() or not _source.sameValue(_back());
+                case CopyMode::MinimalOverride: return not _source.sameValue(_back());
+                }
+                ENTLIB_LOGIC_ERROR("Wrong CopyMode given to CopyProperty");
+            };
+            return !m_isKeyField && checkOVS() && checkCopyMode();
         }
 
     public:
         CopyProperty(
-            Property _dest, OverrideValueSource _overrideValueSource, bool _copyRootInstanceOf = true)
+            Property _dest,
+            OverrideValueSource _overrideValueSource,
+            CopyMode _copyMode,
+            bool _copyRootInstanceOf = true)
             : m_dest({std::move(_dest)})
             , m_overrideValueSource(_overrideValueSource)
+            , m_copyMode(_copyMode)
             , m_copyRootInstanceOf(_copyRootInstanceOf)
         {
         }

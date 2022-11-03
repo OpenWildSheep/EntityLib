@@ -414,6 +414,7 @@ public:
     }
     void inObject(Property& _prop) override
     {
+        ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
@@ -428,6 +429,10 @@ public:
     bool inObjectField(Property& _prop, char const* key) override
     {
         expl2 = expl2.getObjectField(key);
+        ENTLIB_ASSERT(expl2.getSchema() == _prop.getSchema());
+        bool expl2_isSet = expl2.isSet();
+        bool _prop_isSet = _prop.isSet();
+        ENTLIB_ASSERT(expl2_isSet == _prop_isSet);
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
@@ -442,6 +447,7 @@ public:
     void inUnion([[maybe_unused]] Property& _prop, char const* _type) override
     {
         expl2 = *expl2.getUnionData(_type);
+        ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
     }
     void outUnion([[maybe_unused]] Property& _prop) override
     {
@@ -449,6 +455,7 @@ public:
     }
     void inMap(Property& _prop) override
     {
+        ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
         ENTLIB_ASSERT(expl2.size() == _prop.size());
         switch (_prop.getMapKeyType())
         {
@@ -465,10 +472,12 @@ public:
     void inMapElement([[maybe_unused]] Property& _prop, char const* _key) override
     {
         expl2 = *expl2.getMapItem(_key);
+        ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
     }
     void inMapElement([[maybe_unused]] Property& _prop, int64_t _key) override
     {
         expl2 = *expl2.getMapItem(_key);
+        ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
     }
     void outMapElement([[maybe_unused]] Property& _prop) override
     {
@@ -476,6 +485,7 @@ public:
     }
     void inPrimSet(Property& _prop, [[maybe_unused]] DataType _dataType) override
     {
+        ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
         ENTLIB_ASSERT(expl2.size() == _prop.size());
         auto const& itemType = _prop.getSchema()->singularItems->get();
         switch (itemType.type)
@@ -493,6 +503,7 @@ public:
     void inArrayElement([[maybe_unused]] Property& _prop, size_t i) override
     {
         expl2 = expl2.getArrayItem(i);
+        ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
     }
     void outArrayElement([[maybe_unused]] Property& _prop) override
     {
@@ -500,6 +511,7 @@ public:
     }
     void inUnionSet(Property& _prop) override
     {
+        ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
@@ -517,6 +529,9 @@ public:
     void inUnionSetElement([[maybe_unused]] Property& _prop, char const* _type) override
     {
         expl2 = *expl2.getUnionSetItem(_type);
+        auto expl2_isSet = expl2.isSet();
+        auto _prop_isSet = _prop.isSet();
+        ENTLIB_ASSERT(expl2_isSet == _prop_isSet);
     }
     void outUnionSetElement([[maybe_unused]] Property& _prop) override
     {
@@ -530,6 +545,7 @@ public:
             ENTLIB_ASSERT(_prop.getPrefab()->getRawJson() == expl2.getPrefab()->getRawJson());
         }
         ENTLIB_ASSERT(expl2.size() == _prop.size());
+        ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
         switch (expl2.getObjectSetKeyType())
         {
         case DataType::entityRef: [[fallthrough]];
@@ -554,6 +570,7 @@ public:
     void inObjectSetElement(Property& _prop, char const* _key) override
     {
         expl2 = *expl2.getObjectSetItem(_key);
+        ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
         if (_prop.hasPrefab())
         {
             ENTLIB_ASSERT(expl2.hasPrefab());
@@ -565,6 +582,7 @@ public:
     void inObjectSetElement([[maybe_unused]] Property& _prop, int64_t _key) override
     {
         expl2 = *expl2.getObjectSetItem(_key);
+        ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
     }
     void outObjectSetElement([[maybe_unused]] Property& _prop) override
     {
@@ -573,6 +591,7 @@ public:
     void inArray(Property& _prop) override
     {
         ENTLIB_ASSERT(expl2.size() == _prop.size());
+        ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
     }
     void nullProperty([[maybe_unused]] Property& _prop) override
     {
@@ -914,7 +933,8 @@ void testCursor(EntityLib& entlib)
 
         nlohmann::json newDoc = nlohmann::json::object();
         Property destExpl(&entlib, expl.getSchema(), "", &newDoc);
-        CopyProperty copier(destExpl, OverrideValueSource::OverrideOrPrefab, true);
+        CopyProperty copier(
+            destExpl, OverrideValueSource::OverrideOrPrefab, CopyMode::CopyOverride, true);
         visitRecursive(expl, copier);
         entlib.saveJsonFile(&newDoc, "instance.cursor.entity", "Entity");
     }
@@ -937,7 +957,8 @@ void testCursor(EntityLib& entlib)
             std::cout << "Copy WhistlingPlainsFPMain.scene with LazyLib" << std::endl;
             nlohmann::json newDoc = nlohmann::json::object();
             Property destExpl(&entlib, expl.getSchema(), "", &newDoc);
-            CopyProperty copier(destExpl, OverrideValueSource::Override, true);
+            CopyProperty copier(
+                destExpl, OverrideValueSource::Override, CopyMode::CopyOverride, true);
             visitRecursive(expl, copier);
 
             std::cout << "Save WhistlingPlainsFPMain.scene with LazyLib" << std::endl;

@@ -15,7 +15,7 @@ namespace Ent
 
     void Property::copyInto(Property& _dest, [[maybe_unused]] CopyMode _copyMode)
     {
-        CopyProperty copier(_dest, OverrideValueSource::OverrideOrPrefab);
+        CopyProperty copier(_dest, OverrideValueSource::OverrideOrPrefab, _copyMode);
         visitRecursive(*this, copier);
     }
 
@@ -23,8 +23,8 @@ namespace Ent
     {
         auto& jsonFile = getEntityLib()->createTempJsonFile();
         Property detached(getEntityLib()->newPropImpl(nullptr, getSchema(), "", &jsonFile));
-        // copyInto(detached, CopyMode::CopyOverride);
-        CopyProperty copier(detached, OverrideValueSource::OverrideOrPrefab, false);
+        CopyProperty copier(
+            detached, OverrideValueSource::OverrideOrPrefab, CopyMode::CopyOverride, false);
         visitRecursive(*this, copier);
         return detached;
     }
@@ -41,7 +41,8 @@ namespace Ent
         auto& newJson = getEntityLib()->createTempJsonFile();
         newJson = getEntityLib()->readJsonFile(prefabPath);
         auto const clonedPrefab = Property(getEntityLib(), getSchema(), prefabPath, &newJson);
-        CopyProperty copier(clonedPrefab, OverrideValueSource::Override, false);
+        CopyProperty copier(
+            clonedPrefab, OverrideValueSource::Override, CopyMode::CopyOverride, false);
         visitRecursive(*this, copier);
         clonedPrefab.save();
         for (auto const* const field : getFieldNames())
@@ -53,7 +54,8 @@ namespace Ent
     Property Property::mapRename(char const* _current, char const* _new)
     {
         auto newItem = insertMapItem(_new);
-        CopyProperty copier(newItem, OverrideValueSource::OverrideOrPrefab, true);
+        CopyProperty copier(
+            newItem, OverrideValueSource::OverrideOrPrefab, CopyMode::CopyOverride, true);
         visitRecursive(*this, copier);
         auto currentItem = getMapItem(_current);
         visitRecursive(*currentItem, copier);
@@ -62,7 +64,8 @@ namespace Ent
     Property Property::mapRename(int64_t _current, int64_t _new) const
     {
         auto newItem = insertMapItem(_new);
-        CopyProperty copier(newItem, OverrideValueSource::OverrideOrPrefab, true);
+        CopyProperty copier(
+            newItem, OverrideValueSource::OverrideOrPrefab, CopyMode::CopyOverride, true);
         auto currentItem = getMapItem(_current);
         visitRecursive(*currentItem, copier);
         eraseMapItem(_current);
@@ -71,7 +74,8 @@ namespace Ent
     Property Property::unionSetRename(char const* _current, char const* _new) const
     {
         auto newItem = insertUnionSetItem(_new);
-        CopyProperty copier(newItem, OverrideValueSource::OverrideOrPrefab, true);
+        CopyProperty copier(
+            newItem, OverrideValueSource::OverrideOrPrefab, CopyMode::CopyOverride, true);
         auto currentItem = *getUnionSetItem(_current);
         visitRecursive(currentItem, copier);
         eraseUnionSetItem(_current);
@@ -91,7 +95,8 @@ namespace Ent
         }
         ENTLIB_ASSERT(getDataKind() == DataKind::objectSet);
         auto newItem = insertObjectSetItem(_new);
-        CopyProperty copier(newItem, OverrideValueSource::OverrideOrPrefab, true);
+        CopyProperty copier(
+            newItem, OverrideValueSource::OverrideOrPrefab, CopyMode::CopyOverride, true);
         auto currentItem = getObjectSetItem(_current);
         visitRecursive(*currentItem, copier);
         eraseObjectSetItem(_current);
@@ -101,7 +106,8 @@ namespace Ent
     Property Property::objectSetRename(int64_t _current, int64_t _new) const
     {
         auto newItem = insertObjectSetItem(_new);
-        CopyProperty copier(newItem, OverrideValueSource::OverrideOrPrefab, true);
+        CopyProperty copier(
+            newItem, OverrideValueSource::OverrideOrPrefab, CopyMode::CopyOverride, true);
         auto currentItem = getObjectSetItem(_current);
         visitRecursive(*currentItem, copier);
         eraseObjectSetItem(_current);

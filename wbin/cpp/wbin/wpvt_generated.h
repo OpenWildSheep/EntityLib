@@ -12,6 +12,8 @@ namespace WBIN {
 
 struct Pivot;
 
+struct PivotDebugInfo;
+
 struct PivotSkeleton;
 struct PivotSkeletonBuilder;
 struct PivotSkeletonT;
@@ -81,16 +83,38 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Pivot FLATBUFFERS_FINAL_CLASS {
 };
 FLATBUFFERS_STRUCT_END(Pivot, 44);
 
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) PivotDebugInfo FLATBUFFERS_FINAL_CLASS {
+ private:
+  float length_;
+
+ public:
+  PivotDebugInfo()
+      : length_(0) {
+  }
+  PivotDebugInfo(float _length)
+      : length_(flatbuffers::EndianScalar(_length)) {
+  }
+  float length() const {
+    return flatbuffers::EndianScalar(length_);
+  }
+  void mutate_length(float _length) {
+    flatbuffers::WriteScalar(&length_, _length);
+  }
+};
+FLATBUFFERS_STRUCT_END(PivotDebugInfo, 4);
+
 struct PivotSkeletonT : public flatbuffers::NativeTable {
   typedef PivotSkeleton TableType;
   std::vector<WBIN::Pivot> pivots{};
+  std::vector<WBIN::PivotDebugInfo> debug_info{};
 };
 
 struct PivotSkeleton FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef PivotSkeletonT NativeTableType;
   typedef PivotSkeletonBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_PIVOTS = 4
+    VT_PIVOTS = 4,
+    VT_DEBUG_INFO = 6
   };
   const flatbuffers::Vector<const WBIN::Pivot *> *pivots() const {
     return GetPointer<const flatbuffers::Vector<const WBIN::Pivot *> *>(VT_PIVOTS);
@@ -98,10 +122,18 @@ struct PivotSkeleton FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   flatbuffers::Vector<const WBIN::Pivot *> *mutable_pivots() {
     return GetPointer<flatbuffers::Vector<const WBIN::Pivot *> *>(VT_PIVOTS);
   }
+  const flatbuffers::Vector<const WBIN::PivotDebugInfo *> *debug_info() const {
+    return GetPointer<const flatbuffers::Vector<const WBIN::PivotDebugInfo *> *>(VT_DEBUG_INFO);
+  }
+  flatbuffers::Vector<const WBIN::PivotDebugInfo *> *mutable_debug_info() {
+    return GetPointer<flatbuffers::Vector<const WBIN::PivotDebugInfo *> *>(VT_DEBUG_INFO);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_PIVOTS) &&
            verifier.VerifyVector(pivots()) &&
+           VerifyOffset(verifier, VT_DEBUG_INFO) &&
+           verifier.VerifyVector(debug_info()) &&
            verifier.EndTable();
   }
   PivotSkeletonT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -115,6 +147,9 @@ struct PivotSkeletonBuilder {
   flatbuffers::uoffset_t start_;
   void add_pivots(flatbuffers::Offset<flatbuffers::Vector<const WBIN::Pivot *>> pivots) {
     fbb_.AddOffset(PivotSkeleton::VT_PIVOTS, pivots);
+  }
+  void add_debug_info(flatbuffers::Offset<flatbuffers::Vector<const WBIN::PivotDebugInfo *>> debug_info) {
+    fbb_.AddOffset(PivotSkeleton::VT_DEBUG_INFO, debug_info);
   }
   explicit PivotSkeletonBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -130,19 +165,24 @@ struct PivotSkeletonBuilder {
 
 inline flatbuffers::Offset<PivotSkeleton> CreatePivotSkeleton(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<const WBIN::Pivot *>> pivots = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<const WBIN::Pivot *>> pivots = 0,
+    flatbuffers::Offset<flatbuffers::Vector<const WBIN::PivotDebugInfo *>> debug_info = 0) {
   PivotSkeletonBuilder builder_(_fbb);
+  builder_.add_debug_info(debug_info);
   builder_.add_pivots(pivots);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<PivotSkeleton> CreatePivotSkeletonDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<WBIN::Pivot> *pivots = nullptr) {
+    const std::vector<WBIN::Pivot> *pivots = nullptr,
+    const std::vector<WBIN::PivotDebugInfo> *debug_info = nullptr) {
   auto pivots__ = pivots ? _fbb.CreateVectorOfStructs<WBIN::Pivot>(*pivots) : 0;
+  auto debug_info__ = debug_info ? _fbb.CreateVectorOfStructs<WBIN::PivotDebugInfo>(*debug_info) : 0;
   return WBIN::CreatePivotSkeleton(
       _fbb,
-      pivots__);
+      pivots__,
+      debug_info__);
 }
 
 flatbuffers::Offset<PivotSkeleton> CreatePivotSkeleton(flatbuffers::FlatBufferBuilder &_fbb, const PivotSkeletonT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -157,6 +197,7 @@ inline void PivotSkeleton::UnPackTo(PivotSkeletonT *_o, const flatbuffers::resol
   (void)_o;
   (void)_resolver;
   { auto _e = pivots(); if (_e) { _o->pivots.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->pivots[_i] = *_e->Get(_i); } } }
+  { auto _e = debug_info(); if (_e) { _o->debug_info.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->debug_info[_i] = *_e->Get(_i); } } }
 }
 
 inline flatbuffers::Offset<PivotSkeleton> PivotSkeleton::Pack(flatbuffers::FlatBufferBuilder &_fbb, const PivotSkeletonT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -168,9 +209,11 @@ inline flatbuffers::Offset<PivotSkeleton> CreatePivotSkeleton(flatbuffers::FlatB
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const PivotSkeletonT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _pivots = _fbb.CreateVectorOfStructs(_o->pivots);
+  auto _debug_info = _o->debug_info.size() ? _fbb.CreateVectorOfStructs(_o->debug_info) : 0;
   return WBIN::CreatePivotSkeleton(
       _fbb,
-      _pivots);
+      _pivots,
+      _debug_info);
 }
 
 inline const WBIN::PivotSkeleton *GetPivotSkeleton(const void *buf) {

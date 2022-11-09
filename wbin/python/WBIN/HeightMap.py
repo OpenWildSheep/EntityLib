@@ -25,28 +25,28 @@ class HeightMap(object):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # HeightMap
-    def Xmin(self):
+    def XMin(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
     # HeightMap
-    def Xmax(self):
+    def XMax(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
     # HeightMap
-    def Ymin(self):
+    def YMin(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
         return 0
 
     # HeightMap
-    def Ymax(self):
+    def YMax(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
@@ -91,26 +91,37 @@ class HeightMap(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         return o == 0
 
-def Start(builder): builder.StartObject(7)
+    # HeightMap
+    def PixelMeterSize(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
+        if o != 0:
+            x = o + self._tab.Pos
+            from WBIN.Float2 import Float2
+            obj = Float2()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+def Start(builder): builder.StartObject(8)
 def HeightMapStart(builder):
     """This method is deprecated. Please switch to Start."""
     return Start(builder)
-def AddXmin(builder, xmin): builder.PrependUint32Slot(0, xmin, 0)
-def HeightMapAddXmin(builder, xmin):
-    """This method is deprecated. Please switch to AddXmin."""
-    return AddXmin(builder, xmin)
-def AddXmax(builder, xmax): builder.PrependUint32Slot(1, xmax, 0)
-def HeightMapAddXmax(builder, xmax):
-    """This method is deprecated. Please switch to AddXmax."""
-    return AddXmax(builder, xmax)
-def AddYmin(builder, ymin): builder.PrependUint32Slot(2, ymin, 0)
-def HeightMapAddYmin(builder, ymin):
-    """This method is deprecated. Please switch to AddYmin."""
-    return AddYmin(builder, ymin)
-def AddYmax(builder, ymax): builder.PrependUint32Slot(3, ymax, 0)
-def HeightMapAddYmax(builder, ymax):
-    """This method is deprecated. Please switch to AddYmax."""
-    return AddYmax(builder, ymax)
+def AddXMin(builder, xMin): builder.PrependUint32Slot(0, xMin, 0)
+def HeightMapAddXMin(builder, xMin):
+    """This method is deprecated. Please switch to AddXMin."""
+    return AddXMin(builder, xMin)
+def AddXMax(builder, xMax): builder.PrependUint32Slot(1, xMax, 0)
+def HeightMapAddXMax(builder, xMax):
+    """This method is deprecated. Please switch to AddXMax."""
+    return AddXMax(builder, xMax)
+def AddYMin(builder, yMin): builder.PrependUint32Slot(2, yMin, 0)
+def HeightMapAddYMin(builder, yMin):
+    """This method is deprecated. Please switch to AddYMin."""
+    return AddYMin(builder, yMin)
+def AddYMax(builder, yMax): builder.PrependUint32Slot(3, yMax, 0)
+def HeightMapAddYMax(builder, yMax):
+    """This method is deprecated. Please switch to AddYMax."""
+    return AddYMax(builder, yMax)
 def AddWidth(builder, width): builder.PrependUint32Slot(4, width, 0)
 def HeightMapAddWidth(builder, width):
     """This method is deprecated. Please switch to AddWidth."""
@@ -127,13 +138,18 @@ def StartPixelsVector(builder, numElems): return builder.StartVector(4, numElems
 def HeightMapStartPixelsVector(builder, numElems):
     """This method is deprecated. Please switch to Start."""
     return StartPixelsVector(builder, numElems)
+def AddPixelMeterSize(builder, pixelMeterSize): builder.PrependStructSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(pixelMeterSize), 0)
+def HeightMapAddPixelMeterSize(builder, pixelMeterSize):
+    """This method is deprecated. Please switch to AddPixelMeterSize."""
+    return AddPixelMeterSize(builder, pixelMeterSize)
 def End(builder): return builder.EndObject()
 def HeightMapEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+import WBIN.Float2
 import WBIN.HeightMapPixel
 try:
-    from typing import List
+    from typing import List, Optional
 except:
     pass
 
@@ -141,13 +157,14 @@ class HeightMapT(object):
 
     # HeightMapT
     def __init__(self):
-        self.xmin = 0  # type: int
-        self.xmax = 0  # type: int
-        self.ymin = 0  # type: int
-        self.ymax = 0  # type: int
+        self.xMin = 0  # type: int
+        self.xMax = 0  # type: int
+        self.yMin = 0  # type: int
+        self.yMax = 0  # type: int
         self.width = 0  # type: int
         self.height = 0  # type: int
         self.pixels = None  # type: List[WBIN.HeightMapPixel.HeightMapPixelT]
+        self.pixelMeterSize = None  # type: Optional[WBIN.Float2.Float2T]
 
     @classmethod
     def InitFromBuf(cls, buf, pos):
@@ -165,10 +182,10 @@ class HeightMapT(object):
     def _UnPack(self, heightMap):
         if heightMap is None:
             return
-        self.xmin = heightMap.Xmin()
-        self.xmax = heightMap.Xmax()
-        self.ymin = heightMap.Ymin()
-        self.ymax = heightMap.Ymax()
+        self.xMin = heightMap.XMin()
+        self.xMax = heightMap.XMax()
+        self.yMin = heightMap.YMin()
+        self.yMax = heightMap.YMax()
         self.width = heightMap.Width()
         self.height = heightMap.Height()
         if not heightMap.PixelsIsNone():
@@ -179,6 +196,8 @@ class HeightMapT(object):
                 else:
                     heightMapPixel_ = WBIN.HeightMapPixel.HeightMapPixelT.InitFromObj(heightMap.Pixels(i))
                     self.pixels.append(heightMapPixel_)
+        if heightMap.PixelMeterSize() is not None:
+            self.pixelMeterSize = WBIN.Float2.Float2T.InitFromObj(heightMap.PixelMeterSize())
 
     # HeightMapT
     def Pack(self, builder):
@@ -191,13 +210,16 @@ class HeightMapT(object):
                 builder.PrependUOffsetTRelative(pixelslist[i])
             pixels = builder.EndVector()
         Start(builder)
-        AddXmin(builder, self.xmin)
-        AddXmax(builder, self.xmax)
-        AddYmin(builder, self.ymin)
-        AddYmax(builder, self.ymax)
+        AddXMin(builder, self.xMin)
+        AddXMax(builder, self.xMax)
+        AddYMin(builder, self.yMin)
+        AddYMax(builder, self.yMax)
         AddWidth(builder, self.width)
         AddHeight(builder, self.height)
         if self.pixels is not None:
             AddPixels(builder, pixels)
+        if self.pixelMeterSize is not None:
+            pixelMeterSize = self.pixelMeterSize.Pack(builder)
+            AddPixelMeterSize(builder, pixelMeterSize)
         heightMap = End(builder)
         return heightMap

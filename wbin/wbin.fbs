@@ -15,6 +15,12 @@ struct UInt3
 	z:uint;
 }
 
+struct UInt2
+{
+	x:uint;
+	y:uint;
+}
+
 struct Float3
 {
 	x:float;

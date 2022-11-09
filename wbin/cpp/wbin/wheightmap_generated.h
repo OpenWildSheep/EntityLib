@@ -22,44 +22,44 @@ struct HeightMapT;
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) HeightMapLayer FLATBUFFERS_FINAL_CLASS {
  private:
-  uint16_t normalX_;
-  uint16_t normalY_;
+  uint16_t normal_x_;
+  uint16_t normal_y_;
   float height_;
-  uint8_t physicsmaterialid_;
+  uint8_t physics_material_id_;
   int8_t padding0__;  int16_t padding1__;
 
  public:
   HeightMapLayer()
-      : normalX_(0),
-        normalY_(0),
+      : normal_x_(0),
+        normal_y_(0),
         height_(0),
-        physicsmaterialid_(0),
+        physics_material_id_(0),
         padding0__(0),
         padding1__(0) {
     (void)padding0__;
     (void)padding1__;
   }
-  HeightMapLayer(uint16_t _normalX, uint16_t _normalY, float _height, uint8_t _physicsmaterialid)
-      : normalX_(flatbuffers::EndianScalar(_normalX)),
-        normalY_(flatbuffers::EndianScalar(_normalY)),
+  HeightMapLayer(uint16_t _normal_x, uint16_t _normal_y, float _height, uint8_t _physics_material_id)
+      : normal_x_(flatbuffers::EndianScalar(_normal_x)),
+        normal_y_(flatbuffers::EndianScalar(_normal_y)),
         height_(flatbuffers::EndianScalar(_height)),
-        physicsmaterialid_(flatbuffers::EndianScalar(_physicsmaterialid)),
+        physics_material_id_(flatbuffers::EndianScalar(_physics_material_id)),
         padding0__(0),
         padding1__(0) {
     (void)padding0__;
     (void)padding1__;
   }
-  uint16_t normalX() const {
-    return flatbuffers::EndianScalar(normalX_);
+  uint16_t normal_x() const {
+    return flatbuffers::EndianScalar(normal_x_);
   }
-  void mutate_normalX(uint16_t _normalX) {
-    flatbuffers::WriteScalar(&normalX_, _normalX);
+  void mutate_normal_x(uint16_t _normal_x) {
+    flatbuffers::WriteScalar(&normal_x_, _normal_x);
   }
-  uint16_t normalY() const {
-    return flatbuffers::EndianScalar(normalY_);
+  uint16_t normal_y() const {
+    return flatbuffers::EndianScalar(normal_y_);
   }
-  void mutate_normalY(uint16_t _normalY) {
-    flatbuffers::WriteScalar(&normalY_, _normalY);
+  void mutate_normal_y(uint16_t _normal_y) {
+    flatbuffers::WriteScalar(&normal_y_, _normal_y);
   }
   float height() const {
     return flatbuffers::EndianScalar(height_);
@@ -67,11 +67,11 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) HeightMapLayer FLATBUFFERS_FINAL_CLASS {
   void mutate_height(float _height) {
     flatbuffers::WriteScalar(&height_, _height);
   }
-  uint8_t physicsmaterialid() const {
-    return flatbuffers::EndianScalar(physicsmaterialid_);
+  uint8_t physics_material_id() const {
+    return flatbuffers::EndianScalar(physics_material_id_);
   }
-  void mutate_physicsmaterialid(uint8_t _physicsmaterialid) {
-    flatbuffers::WriteScalar(&physicsmaterialid_, _physicsmaterialid);
+  void mutate_physics_material_id(uint8_t _physics_material_id) {
+    flatbuffers::WriteScalar(&physics_material_id_, _physics_material_id);
   }
 };
 FLATBUFFERS_STRUCT_END(HeightMapLayer, 12);
@@ -144,50 +144,52 @@ flatbuffers::Offset<HeightMapPixel> CreateHeightMapPixel(flatbuffers::FlatBuffer
 
 struct HeightMapT : public flatbuffers::NativeTable {
   typedef HeightMap TableType;
-  uint32_t xmin = 0;
-  uint32_t xmax = 0;
-  uint32_t ymin = 0;
-  uint32_t ymax = 0;
+  uint32_t x_min = 0;
+  uint32_t x_max = 0;
+  uint32_t y_min = 0;
+  uint32_t y_max = 0;
   uint32_t width = 0;
   uint32_t height = 0;
   std::vector<std::unique_ptr<WBIN::HeightMapPixelT>> pixels{};
+  std::unique_ptr<WBIN::Float2> pixel_meter_size{};
 };
 
 struct HeightMap FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef HeightMapT NativeTableType;
   typedef HeightMapBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_XMIN = 4,
-    VT_XMAX = 6,
-    VT_YMIN = 8,
-    VT_YMAX = 10,
+    VT_X_MIN = 4,
+    VT_X_MAX = 6,
+    VT_Y_MIN = 8,
+    VT_Y_MAX = 10,
     VT_WIDTH = 12,
     VT_HEIGHT = 14,
-    VT_PIXELS = 16
+    VT_PIXELS = 16,
+    VT_PIXEL_METER_SIZE = 18
   };
-  uint32_t xmin() const {
-    return GetField<uint32_t>(VT_XMIN, 0);
+  uint32_t x_min() const {
+    return GetField<uint32_t>(VT_X_MIN, 0);
   }
-  bool mutate_xmin(uint32_t _xmin) {
-    return SetField<uint32_t>(VT_XMIN, _xmin, 0);
+  bool mutate_x_min(uint32_t _x_min) {
+    return SetField<uint32_t>(VT_X_MIN, _x_min, 0);
   }
-  uint32_t xmax() const {
-    return GetField<uint32_t>(VT_XMAX, 0);
+  uint32_t x_max() const {
+    return GetField<uint32_t>(VT_X_MAX, 0);
   }
-  bool mutate_xmax(uint32_t _xmax) {
-    return SetField<uint32_t>(VT_XMAX, _xmax, 0);
+  bool mutate_x_max(uint32_t _x_max) {
+    return SetField<uint32_t>(VT_X_MAX, _x_max, 0);
   }
-  uint32_t ymin() const {
-    return GetField<uint32_t>(VT_YMIN, 0);
+  uint32_t y_min() const {
+    return GetField<uint32_t>(VT_Y_MIN, 0);
   }
-  bool mutate_ymin(uint32_t _ymin) {
-    return SetField<uint32_t>(VT_YMIN, _ymin, 0);
+  bool mutate_y_min(uint32_t _y_min) {
+    return SetField<uint32_t>(VT_Y_MIN, _y_min, 0);
   }
-  uint32_t ymax() const {
-    return GetField<uint32_t>(VT_YMAX, 0);
+  uint32_t y_max() const {
+    return GetField<uint32_t>(VT_Y_MAX, 0);
   }
-  bool mutate_ymax(uint32_t _ymax) {
-    return SetField<uint32_t>(VT_YMAX, _ymax, 0);
+  bool mutate_y_max(uint32_t _y_max) {
+    return SetField<uint32_t>(VT_Y_MAX, _y_max, 0);
   }
   uint32_t width() const {
     return GetField<uint32_t>(VT_WIDTH, 0);
@@ -207,17 +209,24 @@ struct HeightMap FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   flatbuffers::Vector<flatbuffers::Offset<WBIN::HeightMapPixel>> *mutable_pixels() {
     return GetPointer<flatbuffers::Vector<flatbuffers::Offset<WBIN::HeightMapPixel>> *>(VT_PIXELS);
   }
+  const WBIN::Float2 *pixel_meter_size() const {
+    return GetStruct<const WBIN::Float2 *>(VT_PIXEL_METER_SIZE);
+  }
+  WBIN::Float2 *mutable_pixel_meter_size() {
+    return GetStruct<WBIN::Float2 *>(VT_PIXEL_METER_SIZE);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<uint32_t>(verifier, VT_XMIN) &&
-           VerifyField<uint32_t>(verifier, VT_XMAX) &&
-           VerifyField<uint32_t>(verifier, VT_YMIN) &&
-           VerifyField<uint32_t>(verifier, VT_YMAX) &&
+           VerifyField<uint32_t>(verifier, VT_X_MIN) &&
+           VerifyField<uint32_t>(verifier, VT_X_MAX) &&
+           VerifyField<uint32_t>(verifier, VT_Y_MIN) &&
+           VerifyField<uint32_t>(verifier, VT_Y_MAX) &&
            VerifyField<uint32_t>(verifier, VT_WIDTH) &&
            VerifyField<uint32_t>(verifier, VT_HEIGHT) &&
            VerifyOffsetRequired(verifier, VT_PIXELS) &&
            verifier.VerifyVector(pixels()) &&
            verifier.VerifyVectorOfTables(pixels()) &&
+           VerifyField<WBIN::Float2>(verifier, VT_PIXEL_METER_SIZE) &&
            verifier.EndTable();
   }
   HeightMapT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -229,17 +238,17 @@ struct HeightMapBuilder {
   typedef HeightMap Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_xmin(uint32_t xmin) {
-    fbb_.AddElement<uint32_t>(HeightMap::VT_XMIN, xmin, 0);
+  void add_x_min(uint32_t x_min) {
+    fbb_.AddElement<uint32_t>(HeightMap::VT_X_MIN, x_min, 0);
   }
-  void add_xmax(uint32_t xmax) {
-    fbb_.AddElement<uint32_t>(HeightMap::VT_XMAX, xmax, 0);
+  void add_x_max(uint32_t x_max) {
+    fbb_.AddElement<uint32_t>(HeightMap::VT_X_MAX, x_max, 0);
   }
-  void add_ymin(uint32_t ymin) {
-    fbb_.AddElement<uint32_t>(HeightMap::VT_YMIN, ymin, 0);
+  void add_y_min(uint32_t y_min) {
+    fbb_.AddElement<uint32_t>(HeightMap::VT_Y_MIN, y_min, 0);
   }
-  void add_ymax(uint32_t ymax) {
-    fbb_.AddElement<uint32_t>(HeightMap::VT_YMAX, ymax, 0);
+  void add_y_max(uint32_t y_max) {
+    fbb_.AddElement<uint32_t>(HeightMap::VT_Y_MAX, y_max, 0);
   }
   void add_width(uint32_t width) {
     fbb_.AddElement<uint32_t>(HeightMap::VT_WIDTH, width, 0);
@@ -249,6 +258,9 @@ struct HeightMapBuilder {
   }
   void add_pixels(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<WBIN::HeightMapPixel>>> pixels) {
     fbb_.AddOffset(HeightMap::VT_PIXELS, pixels);
+  }
+  void add_pixel_meter_size(const WBIN::Float2 *pixel_meter_size) {
+    fbb_.AddStruct(HeightMap::VT_PIXEL_METER_SIZE, pixel_meter_size);
   }
   explicit HeightMapBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -264,43 +276,47 @@ struct HeightMapBuilder {
 
 inline flatbuffers::Offset<HeightMap> CreateHeightMap(
     flatbuffers::FlatBufferBuilder &_fbb,
-    uint32_t xmin = 0,
-    uint32_t xmax = 0,
-    uint32_t ymin = 0,
-    uint32_t ymax = 0,
+    uint32_t x_min = 0,
+    uint32_t x_max = 0,
+    uint32_t y_min = 0,
+    uint32_t y_max = 0,
     uint32_t width = 0,
     uint32_t height = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<WBIN::HeightMapPixel>>> pixels = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<WBIN::HeightMapPixel>>> pixels = 0,
+    const WBIN::Float2 *pixel_meter_size = 0) {
   HeightMapBuilder builder_(_fbb);
+  builder_.add_pixel_meter_size(pixel_meter_size);
   builder_.add_pixels(pixels);
   builder_.add_height(height);
   builder_.add_width(width);
-  builder_.add_ymax(ymax);
-  builder_.add_ymin(ymin);
-  builder_.add_xmax(xmax);
-  builder_.add_xmin(xmin);
+  builder_.add_y_max(y_max);
+  builder_.add_y_min(y_min);
+  builder_.add_x_max(x_max);
+  builder_.add_x_min(x_min);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<HeightMap> CreateHeightMapDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    uint32_t xmin = 0,
-    uint32_t xmax = 0,
-    uint32_t ymin = 0,
-    uint32_t ymax = 0,
+    uint32_t x_min = 0,
+    uint32_t x_max = 0,
+    uint32_t y_min = 0,
+    uint32_t y_max = 0,
     uint32_t width = 0,
     uint32_t height = 0,
-    const std::vector<flatbuffers::Offset<WBIN::HeightMapPixel>> *pixels = nullptr) {
+    const std::vector<flatbuffers::Offset<WBIN::HeightMapPixel>> *pixels = nullptr,
+    const WBIN::Float2 *pixel_meter_size = 0) {
   auto pixels__ = pixels ? _fbb.CreateVector<flatbuffers::Offset<WBIN::HeightMapPixel>>(*pixels) : 0;
   return WBIN::CreateHeightMap(
       _fbb,
-      xmin,
-      xmax,
-      ymin,
-      ymax,
+      x_min,
+      x_max,
+      y_min,
+      y_max,
       width,
       height,
-      pixels__);
+      pixels__,
+      pixel_meter_size);
 }
 
 flatbuffers::Offset<HeightMap> CreateHeightMap(flatbuffers::FlatBufferBuilder &_fbb, const HeightMapT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -340,13 +356,14 @@ inline HeightMapT *HeightMap::UnPack(const flatbuffers::resolver_function_t *_re
 inline void HeightMap::UnPackTo(HeightMapT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = xmin(); _o->xmin = _e; }
-  { auto _e = xmax(); _o->xmax = _e; }
-  { auto _e = ymin(); _o->ymin = _e; }
-  { auto _e = ymax(); _o->ymax = _e; }
+  { auto _e = x_min(); _o->x_min = _e; }
+  { auto _e = x_max(); _o->x_max = _e; }
+  { auto _e = y_min(); _o->y_min = _e; }
+  { auto _e = y_max(); _o->y_max = _e; }
   { auto _e = width(); _o->width = _e; }
   { auto _e = height(); _o->height = _e; }
   { auto _e = pixels(); if (_e) { _o->pixels.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->pixels[_i] = std::unique_ptr<WBIN::HeightMapPixelT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = pixel_meter_size(); if (_e) _o->pixel_meter_size = std::unique_ptr<WBIN::Float2>(new WBIN::Float2(*_e)); }
 }
 
 inline flatbuffers::Offset<HeightMap> HeightMap::Pack(flatbuffers::FlatBufferBuilder &_fbb, const HeightMapT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -357,22 +374,24 @@ inline flatbuffers::Offset<HeightMap> CreateHeightMap(flatbuffers::FlatBufferBui
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const HeightMapT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _xmin = _o->xmin;
-  auto _xmax = _o->xmax;
-  auto _ymin = _o->ymin;
-  auto _ymax = _o->ymax;
+  auto _x_min = _o->x_min;
+  auto _x_max = _o->x_max;
+  auto _y_min = _o->y_min;
+  auto _y_max = _o->y_max;
   auto _width = _o->width;
   auto _height = _o->height;
   auto _pixels = _fbb.CreateVector<flatbuffers::Offset<WBIN::HeightMapPixel>> (_o->pixels.size(), [](size_t i, _VectorArgs *__va) { return CreateHeightMapPixel(*__va->__fbb, __va->__o->pixels[i].get(), __va->__rehasher); }, &_va );
+  auto _pixel_meter_size = _o->pixel_meter_size ? _o->pixel_meter_size.get() : 0;
   return WBIN::CreateHeightMap(
       _fbb,
-      _xmin,
-      _xmax,
-      _ymin,
-      _ymax,
+      _x_min,
+      _x_max,
+      _y_min,
+      _y_max,
       _width,
       _height,
-      _pixels);
+      _pixels,
+      _pixel_meter_size);
 }
 
 inline const WBIN::HeightMap *GetHeightMap(const void *buf) {

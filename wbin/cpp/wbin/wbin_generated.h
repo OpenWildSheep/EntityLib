@@ -12,6 +12,8 @@ struct Int3;
 
 struct UInt3;
 
+struct UInt2;
+
 struct Float3;
 
 struct Float2;
@@ -133,6 +135,35 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) UInt3 FLATBUFFERS_FINAL_CLASS {
   }
 };
 FLATBUFFERS_STRUCT_END(UInt3, 12);
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) UInt2 FLATBUFFERS_FINAL_CLASS {
+ private:
+  uint32_t x_;
+  uint32_t y_;
+
+ public:
+  UInt2()
+      : x_(0),
+        y_(0) {
+  }
+  UInt2(uint32_t _x, uint32_t _y)
+      : x_(flatbuffers::EndianScalar(_x)),
+        y_(flatbuffers::EndianScalar(_y)) {
+  }
+  uint32_t x() const {
+    return flatbuffers::EndianScalar(x_);
+  }
+  void mutate_x(uint32_t _x) {
+    flatbuffers::WriteScalar(&x_, _x);
+  }
+  uint32_t y() const {
+    return flatbuffers::EndianScalar(y_);
+  }
+  void mutate_y(uint32_t _y) {
+    flatbuffers::WriteScalar(&y_, _y);
+  }
+};
+FLATBUFFERS_STRUCT_END(UInt2, 8);
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Float3 FLATBUFFERS_FINAL_CLASS {
  private:

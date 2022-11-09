@@ -24,12 +24,12 @@ class HeightMapLayer(object):
     # HeightMapLayer
     def Height(self): return self._tab.Get(flatbuffers.number_types.Float32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(4))
     # HeightMapLayer
-    def Physicsmaterialid(self): return self._tab.Get(flatbuffers.number_types.Uint8Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(8))
+    def PhysicsMaterialId(self): return self._tab.Get(flatbuffers.number_types.Uint8Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(8))
 
-def CreateHeightMapLayer(builder, normalX, normalY, height, physicsmaterialid):
+def CreateHeightMapLayer(builder, normalX, normalY, height, physicsMaterialId):
     builder.Prep(4, 12)
     builder.Pad(3)
-    builder.PrependUint8(physicsmaterialid)
+    builder.PrependUint8(physicsMaterialId)
     builder.PrependFloat32(height)
     builder.PrependUint16(normalY)
     builder.PrependUint16(normalX)
@@ -43,7 +43,7 @@ class HeightMapLayerT(object):
         self.normalX = 0  # type: int
         self.normalY = 0  # type: int
         self.height = 0.0  # type: float
-        self.physicsmaterialid = 0  # type: int
+        self.physicsMaterialId = 0  # type: int
 
     @classmethod
     def InitFromBuf(cls, buf, pos):
@@ -64,8 +64,8 @@ class HeightMapLayerT(object):
         self.normalX = heightMapLayer.NormalX()
         self.normalY = heightMapLayer.NormalY()
         self.height = heightMapLayer.Height()
-        self.physicsmaterialid = heightMapLayer.Physicsmaterialid()
+        self.physicsMaterialId = heightMapLayer.PhysicsMaterialId()
 
     # HeightMapLayerT
     def Pack(self, builder):
-        return CreateHeightMapLayer(builder, self.normalX, self.normalY, self.height, self.physicsmaterialid)
+        return CreateHeightMapLayer(builder, self.normalX, self.normalY, self.height, self.physicsMaterialId)

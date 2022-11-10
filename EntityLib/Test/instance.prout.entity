@@ -6,12 +6,8 @@
             "className": "ActorStateDead"
         },
         {
-            "classData": null,
-            "className": "EntityStatePlayer"
-        },
-        {
             "classData": {},
-            "className": "ActorStateAlive"
+            "className": "EntityStatePlayer"
         }
     ],
     "Color": [
@@ -50,15 +46,14 @@
                         ],
                         [
                             "c",
-                            null
+                            [
+                                "1",
+                                "3"
+                            ]
                         ],
                         [
                             "d",
                             null
-                        ],
-                        [
-                            "A",
-                            []
                         ]
                     ]
                 }
@@ -80,7 +75,32 @@
             "Type": "SeedPatch"
         },
         {
-            "Data": null,
+            "Data": {
+                "Embedded": [
+                    {
+                        "Color": [
+                            255,
+                            120,
+                            220,
+                            255
+                        ],
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Source": "instance"
+                                },
+                                "Type": "NetworkLink"
+                            }
+                        ],
+                        "InstanceOf": "subentity2.entity",
+                        "Name": "EntityWithInstanceOf"
+                    },
+                    {
+                        "InstanceOf": "subentity2.entity",
+                        "Name": "EntityWithInstanceOfButNoOverride"
+                    }
+                ]
+            },
             "Type": "SubScene"
         },
         {
@@ -111,7 +131,14 @@
             "Type": "TestSetOfObject"
         },
         {
-            "Data": null,
+            "Data": {
+                "Orientation": [
+                    null,
+                    null,
+                    null,
+                    2.0
+                ]
+            },
             "Type": "TransformGD"
         }
     ],

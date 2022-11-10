@@ -9,6 +9,5 @@
             "Type": "StickToTerrain"
         }
     ],
-    "InstanceOf": "prefab.entity",
-    "Name": "TestResetInstanceOf"
+    "InstanceOf": "prefab.entity"
 }

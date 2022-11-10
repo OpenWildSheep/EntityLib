@@ -10,6 +10,5 @@
             "Type": "StickToTerrain"
         }
     ],
-    "InstanceOf": "prefab.entity",
-    "Name": "PlayerSpawner_"
+    "InstanceOf": "prefab.entity"
 }

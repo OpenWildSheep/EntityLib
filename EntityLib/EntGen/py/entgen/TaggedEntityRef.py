@@ -4,8 +4,8 @@
 from entgen_helpers import *
 import EntityLibPy
 
-from entgen.String import *
 from entgen.EntityRef import *
+from entgen.String import *
 from entgen.InventoryTags import *
 
 from EntityLibPy import Node

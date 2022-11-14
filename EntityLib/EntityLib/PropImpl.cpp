@@ -349,14 +349,11 @@ namespace Ent
                 found = true;
             }
         }
-        if (not isDefault())
+        if (not newLayer._loadInstanceOf())
         {
-            if (not newLayer._loadInstanceOf())
+            if (m_prefab != nullptr)
             {
-                if (m_prefab != nullptr)
-                {
-                    std::tie(newLayer.m_prefab, found) = _enter(*m_prefab);
-                }
+                std::tie(newLayer.m_prefab, found) = _enter(*m_prefab);
             }
         }
         if (newLayerPtr->_getDefault().getSchema() == nullptr)
@@ -403,14 +400,11 @@ namespace Ent
         newLayer.m_instance = m_instance.getArrayItem(_index);
         newLayer.m_parent = sharedFromThis();
         auto const* subschema = newLayer.getSchema();
-        if (not isDefault())
+        if (not newLayer._loadInstanceOf())
         {
-            if (not newLayer._loadInstanceOf())
+            if (m_prefab != nullptr)
             {
-                if (m_prefab != nullptr)
-                {
-                    newLayer.m_prefab = m_prefab->getArrayItem(_index);
-                }
+                newLayer.m_prefab = m_prefab->getArrayItem(_index);
             }
         }
         auto const& defaultVal = _getDefault();
@@ -477,7 +471,10 @@ namespace Ent
     PropImplPtr PropImpl::makeInstanceOf()
     {
         auto& jsonDoc = m_entityLib->createTempJsonFile();
-        jsonDoc["InstanceOf"] = m_instance.getFilePath();
+        if (auto prefabPath = m_instance.getFilePath())
+        {
+            jsonDoc["InstanceOf"] = prefabPath;
+        }
         auto instProp = m_entityLib->newPropImpl(nullptr, getSchema(), "", &jsonDoc);
         instProp->m_prefab = sharedFromThis();
         return instProp;
@@ -612,6 +609,7 @@ namespace Ent
             case "map"_hash:
                 switch (getMapKeyType())
                 {
+                case DataType::entityRef: [[fallthrough]];
                 case DataType::string: return getMapKeysString().size();
                 case DataType::integer: return getMapKeysInt().size();
                 default: ENTLIB_LOGIC_ERROR("Unexpected key type");
@@ -623,12 +621,14 @@ namespace Ent
                 switch (itemType.type)
                 {
                 case DataType::integer: return getPrimSetKeysInt().size();
+                case DataType::entityRef: [[fallthrough]];
                 case DataType::string: return getPrimSetKeysString().size();
                 case DataType::oneOf: return getUnionSetKeysString().size();
                 case DataType::object:
                     auto const& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                     switch (keyFieldSchema.type)
                     {
+                    case DataType::entityRef: [[fallthrough]];
                     case DataType::string: return getObjectSetKeysString().size();
                     case DataType::integer: return getObjectSetKeysInt().size();
                     default: ENTLIB_LOGIC_ERROR("Unexpected key type");
@@ -674,6 +674,7 @@ namespace Ent
             case "map"_hash:
                 switch (getMapKeyType())
                 {
+                case DataType::entityRef: [[fallthrough]];
                 case DataType::string: return mapContains(std::get<std::string>(_key).c_str());
                 case DataType::integer: return mapContains(std::get<size_t>(_key));
                 default: ENTLIB_LOGIC_ERROR("Unexpected key type");
@@ -685,12 +686,14 @@ namespace Ent
                 switch (itemType.type)
                 {
                 case DataType::integer: return primSetContains(std::get<size_t>(_key));
+                case DataType::entityRef: [[fallthrough]];
                 case DataType::string: return primSetContains(std::get<std::string>(_key).c_str());
                 case DataType::oneOf: return unionSetContains(std::get<std::string>(_key).c_str());
                 case DataType::object:
                     auto const& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
                     switch (keyFieldSchema.type)
                     {
+                    case DataType::entityRef: [[fallthrough]];
                     case DataType::string:
                         return objectSetContains(std::get<std::string>(_key).c_str());
                     case DataType::integer: return objectSetContains(std::get<size_t>(_key));
@@ -994,16 +997,26 @@ namespace Ent
         }
     }
 
-    PropImplPtr PropImpl::push_back()
+    PropImplPtr PropImpl::pushBack()
     {
         CHECK_TYPE(DataKind::array);
+        if (arraySize() + 1 > getSchema()->maxItems)
+        {
+            throw BreakSchemaRules(
+                staticFormat("In pushBack : Can't push more than %d items", getSchema()->maxItems));
+        }
         setSize(arraySize() + 1);
         return getArrayItem(arraySize() - 1);
     }
 
-    void PropImpl::pop_back()
+    void PropImpl::popBack()
     {
         CHECK_TYPE(DataKind::array);
+        if (arraySize() - 1 < getSchema()->minItems)
+        {
+            throw BreakSchemaRules(
+                staticFormat("In popBack : Can't pop less than %d items", getSchema()->minItems));
+        }
         setSize(arraySize() - 1);
     }
 
@@ -1388,6 +1401,10 @@ namespace Ent
 
     PropImplPtr PropImpl::resolveNodeRef(char const* _nodeRef)
     {
+        if (_nodeRef == nullptr)
+        {
+            throw NullPointerArgument("resolveNodeRef", "nodeRef");
+        }
         auto const* tokenStart = _nodeRef;
         auto const* const nodeRefEnd = _nodeRef + strlen(_nodeRef);
 
@@ -1484,6 +1501,10 @@ namespace Ent
             default:
                 ENTLIB_LOGIC_ERROR("Unexpected DataKind in PropImpl::resolveNodeRef : %d", kind);
             }
+            if (current == nullptr)
+            {
+                return current;
+            }
         }
         return current;
     }
@@ -1560,4 +1581,24 @@ namespace Ent
         return getRootNode()->makeNodeRef(*this);
     }
 
+    bool PropImpl::sameValue(PropImpl const& _other) const
+    {
+        switch (getSchema()->getDataKind())
+        {
+        case DataKind::boolean: return getBool() == _other.getBool();
+        case DataKind::integer: return getInt() == _other.getInt();
+        case DataKind::number: return getFloat() == _other.getFloat();
+        case DataKind::string: return strcmp(getString(), _other.getString()) == 0;
+        case DataKind::entityRef: return getEntityRef() == _other.getEntityRef();
+        case DataKind::object: [[fallthrough]];
+        case DataKind::union_: [[fallthrough]];
+        case DataKind::map: [[fallthrough]];
+        case DataKind::objectSet: [[fallthrough]];
+        case DataKind::unionSet: [[fallthrough]];
+        case DataKind::primitiveSet: [[fallthrough]];
+        case DataKind::array: throw BadType("Called 'sameValue' on a none primitive type");
+        case DataKind::COUNT: [[fallthrough]];
+        default: ENTLIB_LOGIC_ERROR("Unexpected DataType!");
+        }
+    }
 } // namespace Ent

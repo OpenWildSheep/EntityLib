@@ -5,6 +5,7 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.AaMode import *
+from entgen.LodSelectionMode import *
 from entgen.String import *
 from entgen.Int import *
 from entgen.Float import *
@@ -142,10 +143,10 @@ class RenderManager_RenderConfig(HelperObject):
     @GlobalLODScale.setter
     def GlobalLODScale(self, val): self.GlobalLODScale.set(val)
     @property
-    def LODDecimationFactor(self):  # type: ()->Float
-        return Float(self._node.at("LODDecimationFactor"))
-    @LODDecimationFactor.setter
-    def LODDecimationFactor(self, val): self.LODDecimationFactor.set(val)
+    def LodSelectionMode(self):  # type: ()->LodSelectionMode
+        return LodSelectionMode(self._node.at("LodSelectionMode"))
+    @LodSelectionMode.setter
+    def LodSelectionMode(self, val): self.LodSelectionMode.set(val)
     @property
     def MaterialBank(self):  # type: ()->String
         return String(self._node.at("MaterialBank"))

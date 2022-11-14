@@ -9,14 +9,14 @@ from entgen.ActorState import *
 
 from EntityLibPy import Node
 
-class EntityStateCancelSetSavePoint(HelperObject):
-    schema_name = "EntityStateCancelSetSavePoint"
+class EntityStateSaveNow(HelperObject):
+    schema_name = "EntityStateSaveNow"
     @staticmethod
-    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateCancelSetSavePoint
-        return EntityStateCancelSetSavePoint(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateCancelSetSavePoint.schema_name)))
+    def load(entlib, sourcefile):  # type: (EntityLib, str)->EntityStateSaveNow
+        return EntityStateSaveNow(entlib.load_node_file(sourcefile, entlib.get_schema(EntityStateSaveNow.schema_name)))
     @staticmethod
-    def create(entlib):  # type: (EntityLib)->EntityStateCancelSetSavePoint
-        return EntityStateCancelSetSavePoint(entlib.make_node(EntityStateCancelSetSavePoint.schema_name))
+    def create(entlib):  # type: (EntityLib)->EntityStateSaveNow
+        return EntityStateSaveNow(entlib.make_node(EntityStateSaveNow.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
     @property

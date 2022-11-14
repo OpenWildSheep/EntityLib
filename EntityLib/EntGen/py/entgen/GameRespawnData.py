@@ -25,10 +25,10 @@ class GameRespawnData(HelperObject):
     @RespawnDelayOnDeath.setter
     def RespawnDelayOnDeath(self, val): self.RespawnDelayOnDeath.set(val)
     @property
-    def SetRespawnPlaceAsCheckpointDuration(self):  # type: ()->Float
-        return Float(self._node.at("SetRespawnPlaceAsCheckpointDuration"))
-    @SetRespawnPlaceAsCheckpointDuration.setter
-    def SetRespawnPlaceAsCheckpointDuration(self, val): self.SetRespawnPlaceAsCheckpointDuration.set(val)
+    def SaveVolumeHysteresis(self):  # type: ()->Float
+        return Float(self._node.at("SaveVolumeHysteresis"))
+    @SaveVolumeHysteresis.setter
+    def SaveVolumeHysteresis(self, val): self.SaveVolumeHysteresis.set(val)
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

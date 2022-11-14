@@ -215,9 +215,15 @@ namespace Ent
         }
         /// @brief Push a new property in the array and return it
         /// @pre array
-        [[nodiscard]] Property push_back() const
+        [[nodiscard]] Property pushBack() const
         {
-            return Property{getPimpl().push_back()};
+            return Property{getPimpl().pushBack()};
+        }
+        /// @brief Pop the last property in the array
+        /// @pre array and size() != 0
+        void popBack() const
+        {
+            getPimpl().popBack();
         }
         [[nodiscard]] bool contains(Key const& _key) const ///< @pre map/set. @return true if it contains _key.
         {
@@ -807,6 +813,12 @@ namespace Ent
         [[nodiscard]] FileProperty::Key getPathToken() const
         {
             return m_self->getPathToken();
+        }
+
+        /// @brief Get the primitive values are equal
+        [[nodiscard]] bool sameValue(Property const& _other) const
+        {
+            return getPimpl().sameValue(_other.getPimpl());
         }
 
         friend std::vector<PrefabInfo> getPrefabHistory(Property const& _prop);

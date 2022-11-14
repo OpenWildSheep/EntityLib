@@ -6,7 +6,6 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ActorState import *
-from entgen.Float import *
 
 from EntityLibPy import Node
 
@@ -28,11 +27,6 @@ class EntityStateCollectVertebrae(HelperObject):
         return String(self._node.at("_comment"))
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
-    @property
-    def meditationDuration(self):  # type: ()->Float
-        return Float(self._node.at("meditationDuration"))
-    @meditationDuration.setter
-    def meditationDuration(self, val): self.meditationDuration.set(val)
     pass
 
 

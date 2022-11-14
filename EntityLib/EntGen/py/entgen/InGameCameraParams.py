@@ -15,6 +15,7 @@ from entgen.InGameCameraParams_AnticipationJump import *
 from entgen.Position import *
 from entgen.ScaleConverter import *
 from entgen.Vector3 import *
+from entgen.String import *
 
 from EntityLibPy import Node
 
@@ -182,6 +183,14 @@ class InGameCameraParams(HelperObject):
     @CollisionBackToPosSpeed.setter
     def CollisionBackToPosSpeed(self, val): self.CollisionBackToPosSpeed.set(val)
     @property
+    def CollisionCameraRadius(self):  # type: ()->Float
+        return Float(self._node.at("CollisionCameraRadius"))
+    @CollisionCameraRadius.setter
+    def CollisionCameraRadius(self, val): self.CollisionCameraRadius.set(val)
+    @property
+    def CollisionCheckBoneNames(self):  # type: ()->PrimitiveSet[str]
+        return (lambda n: PrimitiveSet(str, n))(self._node.at("CollisionCheckBoneNames"))
+    @property
     def CollisionCorrectionSpeed(self):  # type: ()->Float
         return Float(self._node.at("CollisionCorrectionSpeed"))
     @CollisionCorrectionSpeed.setter
@@ -206,11 +215,6 @@ class InGameCameraParams(HelperObject):
         return Float(self._node.at("CollisionTouchGroundModePitchThreshold"))
     @CollisionTouchGroundModePitchThreshold.setter
     def CollisionTouchGroundModePitchThreshold(self, val): self.CollisionTouchGroundModePitchThreshold.set(val)
-    @property
-    def CollisionWantedNearPlane(self):  # type: ()->Float
-        return Float(self._node.at("CollisionWantedNearPlane"))
-    @CollisionWantedNearPlane.setter
-    def CollisionWantedNearPlane(self, val): self.CollisionWantedNearPlane.set(val)
     @property
     def CollisionZOffset(self):  # type: ()->Float
         return Float(self._node.at("CollisionZOffset"))
@@ -485,11 +489,6 @@ class InGameCameraParams(HelperObject):
         return Float(self._node.at("LookAtOffsetYaw"))
     @LookAtOffsetYaw.setter
     def LookAtOffsetYaw(self, val): self.LookAtOffsetYaw.set(val)
-    @property
-    def NearPlane(self):  # type: ()->Float
-        return Float(self._node.at("NearPlane"))
-    @NearPlane.setter
-    def NearPlane(self, val): self.NearPlane.set(val)
     @property
     def PitchConstraintAnticipation(self):  # type: ()->Float
         return Float(self._node.at("PitchConstraintAnticipation"))

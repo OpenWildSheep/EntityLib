@@ -4,6 +4,7 @@
 from entgen_helpers import *
 import EntityLibPy
 
+from entgen.SpeedMode import *
 from entgen.String import *
 from entgen.Bool import *
 from entgen.Vector3 import *
@@ -31,10 +32,15 @@ class ActionTurn_Inputs(HelperObject):
     @checkDir.setter
     def checkDir(self, val): self.checkDir.set(val)
     @property
-    def directionREQUIRED(self):  # type: ()->Vector3
-        return Vector3(self._node.at("directionREQUIRED"))
-    @directionREQUIRED.setter
-    def directionREQUIRED(self, val): self.directionREQUIRED.set(val)
+    def directionRequired(self):  # type: ()->Vector3
+        return Vector3(self._node.at("directionRequired"))
+    @directionRequired.setter
+    def directionRequired(self, val): self.directionRequired.set(val)
+    @property
+    def speedMode(self):  # type: ()->SpeedMode
+        return SpeedMode(self._node.at("speedMode"))
+    @speedMode.setter
+    def speedMode(self, val): self.speedMode.set(val)
     @property
     def speedModeUpdateAllowed(self):  # type: ()->Bool
         return Bool(self._node.at("speedModeUpdateAllowed"))

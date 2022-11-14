@@ -113,6 +113,7 @@ namespace Ent
                 switch (singularItems->get().type)
                 {
                 case DataType::integer: [[fallthrough]];
+                case DataType::entityRef: [[fallthrough]];
                 case DataType::string: return DataKind::primitiveSet;
                 case DataType::oneOf: return DataKind::unionSet;
                 case DataType::object: return DataKind::objectSet;
@@ -126,5 +127,11 @@ namespace Ent
         case DataType::null: break;
         }
         ENTLIB_LOGIC_ERROR("Unexpected DataType !");
+    }
+
+    [[nodiscard]] bool Subschema::isPrimitive() const
+    {
+        return type == DataType::string or type == DataType::integer or type == DataType::boolean
+               or type == DataType::number or type == DataType::entityRef;
     }
 } // namespace Ent

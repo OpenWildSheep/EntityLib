@@ -6,7 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.Int import *
-from entgen.String import *
+from entgen.PhysicsMaterial_SoundTags import *
 from entgen.String import *
 
 from EntityLibPy import Node
@@ -37,8 +37,8 @@ class PhysicsMaterial(HelperObject):
     @Name.setter
     def Name(self, val): self.Name.set(val)
     @property
-    def Tags(self):  # type: ()->PrimitiveSet[str]
-        return (lambda n: PrimitiveSet(str, n))(self._node.at("Tags"))
+    def SoundTags(self):  # type: ()->PhysicsMaterial_SoundTags
+        return PhysicsMaterial_SoundTags(self._node.at("SoundTags"))
     @property
     def _comment(self):  # type: ()->String
         return String(self._node.at("_comment"))

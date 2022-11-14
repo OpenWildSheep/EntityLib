@@ -6,8 +6,6 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.Float import *
-from entgen.AttackPositionRetimingData_SpecieRetimingCoeff import *
-from entgen.Specie import *
 
 from EntityLibPy import Node
 
@@ -31,9 +29,6 @@ class AttackPositionRetimingData(HelperObject):
         return Float(self._node.at("animTranslationCoeff"))
     @animTranslationCoeff.setter
     def animTranslationCoeff(self, val): self.animTranslationCoeff.set(val)
-    @property
-    def backwardRetimingCoeffBySpecie(self):  # type: ()->Map[SpecieEnum, AttackPositionRetimingData_SpecieRetimingCoeff]
-        return (lambda n: Map(SpecieEnum, AttackPositionRetimingData_SpecieRetimingCoeff, n))(self._node.at("backwardRetimingCoeffBySpecie"))
     @property
     def lengthMax(self):  # type: ()->Float
         return Float(self._node.at("lengthMax"))

@@ -193,9 +193,13 @@ namespace Ent
 
         [[nodiscard]] DataKind getDataKind() const;
 
+        [[nodiscard]] bool isPrimitive() const;
+
         /// Contains the simple value of one of the possible Ent::DataType
         using DefaultValue = nlohmann::json;
         DefaultValue defaultValue; ///< @brief Contains the data according to the type
+        DefaultValue minimum; ///< Minimum accepted value
+        DefaultValue maximum; ///< Maximum accepted value
         std::optional<DefaultValue> constValue; ///< This property can only have this value
 
         /// @brief Subschema of the unique type of item

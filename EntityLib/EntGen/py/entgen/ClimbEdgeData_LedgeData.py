@@ -26,6 +26,11 @@ class ClimbEdgeData_LedgeData(HelperObject):
     @_comment.setter
     def _comment(self, val): self._comment.set(val)
     @property
+    def activationDelayAfterLeavingGround(self):  # type: ()->Float
+        return Float(self._node.at("activationDelayAfterLeavingGround"))
+    @activationDelayAfterLeavingGround.setter
+    def activationDelayAfterLeavingGround(self, val): self.activationDelayAfterLeavingGround.set(val)
+    @property
     def ledgeApproachSpeedMaxZ(self):  # type: ()->Float
         return Float(self._node.at("ledgeApproachSpeedMaxZ"))
     @ledgeApproachSpeedMaxZ.setter

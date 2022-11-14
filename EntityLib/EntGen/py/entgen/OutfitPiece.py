@@ -5,8 +5,8 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.OutfitPieceType import *
-from entgen.String import *
 from entgen.EntityRef import *
+from entgen.String import *
 
 from EntityLibPy import Node
 

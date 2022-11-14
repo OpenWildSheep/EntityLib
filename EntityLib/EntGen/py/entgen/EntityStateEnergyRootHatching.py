@@ -6,6 +6,7 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.ActorState import *
+from entgen.EntityStateEnergyRootHatching_Inputs import *
 
 from EntityLibPy import Node
 
@@ -19,6 +20,9 @@ class EntityStateEnergyRootHatching(HelperObject):
         return EntityStateEnergyRootHatching(entlib.make_node(EntityStateEnergyRootHatching.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def Inputs(self):  # type: ()->EntityStateEnergyRootHatching_Inputs
+        return EntityStateEnergyRootHatching_Inputs(self._node.at("Inputs"))
     @property
     def Super(self):  # type: ()->ActorState
         return ActorState(self._node.at("Super"))

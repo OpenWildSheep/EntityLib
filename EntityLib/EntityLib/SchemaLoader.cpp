@@ -309,6 +309,16 @@ namespace Ent
             case json::value_t::number_float: setType(DataType::number); break;
             }
         }
+        if (auto const minIterator = _data.find("minimum"); minIterator != _data.end())
+        {
+            json const& def = minIterator.value();
+            vis.setMinimumValue(def);
+        }
+        if (auto const maxIterator = _data.find("maximum"); maxIterator != _data.end())
+        {
+            json const& def = maxIterator.value();
+            vis.setMaximumValue(def);
+        }
         if (_data.count("const") != 0u)
         {
             json const& def = _data.at("const");
@@ -533,6 +543,16 @@ namespace Ent
             {
                 CHECK_WHOLE_STACK;
                 stack.back()->get().defaultValue = std::move(val);
+            }
+            void setMinimumValue(Subschema::DefaultValue val) override
+            {
+                CHECK_WHOLE_STACK;
+                stack.back()->get().minimum = std::move(val);
+            }
+            void setMaximumValue(Subschema::DefaultValue val) override
+            {
+                CHECK_WHOLE_STACK;
+                stack.back()->get().maximum = std::move(val);
             }
             void setRefDefaultValue(Subschema::DefaultValue val) override
             {

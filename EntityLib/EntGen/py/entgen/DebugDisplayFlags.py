@@ -396,6 +396,11 @@ class DebugDisplayFlags(HelperObject):
     @DisplayReloadNotifications.setter
     def DisplayReloadNotifications(self, val): self.DisplayReloadNotifications.set(val)
     @property
+    def DisplaySafeSavePosition(self):  # type: ()->Bool
+        return Bool(self._node.at("DisplaySafeSavePosition"))
+    @DisplaySafeSavePosition.setter
+    def DisplaySafeSavePosition(self, val): self.DisplaySafeSavePosition.set(val)
+    @property
     def DisplaySelectedPestoEntity(self):  # type: ()->Bool
         return Bool(self._node.at("DisplaySelectedPestoEntity"))
     @DisplaySelectedPestoEntity.setter

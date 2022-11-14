@@ -6,10 +6,13 @@ import EntityLibPy
 
 from entgen.GPEType import *
 from entgen.String import *
+from entgen.Bool import *
 from entgen.ComponentGD import *
 from entgen.Float import *
+from entgen.FocusExecutorEntityState import *
 from entgen.FocusInteractableEntityState import *
 from entgen.FocusInteractorEntityState import *
+from entgen.InteractionExecutorEntityState import *
 from entgen.InteractionInteractableEntityState import *
 from entgen.InteractionInteractorEntityState import *
 
@@ -25,6 +28,9 @@ class InteractableGD(HelperObject):
         return InteractableGD(entlib.make_node(InteractableGD.schema_name))
     def save(self, destfile):
         self.node.save_node(destfile)
+    @property
+    def FocusExecutorEntityState(self):  # type: ()->FocusExecutorEntityState
+        return FocusExecutorEntityState(self._node.at("FocusExecutorEntityState"))
     @property
     def FocusInteractableEntityState(self):  # type: ()->FocusInteractableEntityState
         return FocusInteractableEntityState(self._node.at("FocusInteractableEntityState"))
@@ -52,6 +58,19 @@ class InteractableGD(HelperObject):
     @InteractMaxDistanceHysteresis.setter
     def InteractMaxDistanceHysteresis(self, val): self.InteractMaxDistanceHysteresis.set(val)
     @property
+    def InteractWithAllies(self):  # type: ()->Bool
+        return Bool(self._node.at("InteractWithAllies"))
+    @InteractWithAllies.setter
+    def InteractWithAllies(self, val): self.InteractWithAllies.set(val)
+    @property
+    def InteractWithEnemies(self):  # type: ()->Bool
+        return Bool(self._node.at("InteractWithEnemies"))
+    @InteractWithEnemies.setter
+    def InteractWithEnemies(self, val): self.InteractWithEnemies.set(val)
+    @property
+    def InteractionExecutorEntityState(self):  # type: ()->InteractionExecutorEntityState
+        return InteractionExecutorEntityState(self._node.at("InteractionExecutorEntityState"))
+    @property
     def InteractionInteractableEntityState(self):  # type: ()->InteractionInteractableEntityState
         return InteractionInteractableEntityState(self._node.at("InteractionInteractableEntityState"))
     @property
@@ -62,6 +81,11 @@ class InteractableGD(HelperObject):
         return Float(self._node.at("InteractionPriority"))
     @InteractionPriority.setter
     def InteractionPriority(self, val): self.InteractionPriority.set(val)
+    @property
+    def ProximityInteractMaxDistance(self):  # type: ()->Float
+        return Float(self._node.at("ProximityInteractMaxDistance"))
+    @ProximityInteractMaxDistance.setter
+    def ProximityInteractMaxDistance(self, val): self.ProximityInteractMaxDistance.set(val)
     @property
     def Super(self):  # type: ()->ComponentGD
         return ComponentGD(self._node.at("Super"))

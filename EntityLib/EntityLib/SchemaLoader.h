@@ -50,6 +50,8 @@ namespace Ent
             virtual void setType(DataType) = 0;
             virtual void addEnumValue(char const*) = 0;
             virtual void setDefaultValue(Subschema::DefaultValue) = 0;
+            virtual void setMinimumValue(Subschema::DefaultValue) = 0;
+            virtual void setMaximumValue(Subschema::DefaultValue) = 0;
             virtual void setRefDefaultValue(Subschema::DefaultValue) = 0;
             virtual void setRefTitle(std::string) = 0;
             virtual void setRefDescription(std::string) = 0;

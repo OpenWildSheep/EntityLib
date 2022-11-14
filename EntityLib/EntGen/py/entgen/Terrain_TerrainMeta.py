@@ -21,6 +21,11 @@ class Terrain_TerrainMeta(HelperObject):
     def save(self, destfile):
         self.node.save_node(destfile)
     @property
+    def CosmeticTerrain(self):  # type: ()->Bool
+        return Bool(self._node.at("CosmeticTerrain"))
+    @CosmeticTerrain.setter
+    def CosmeticTerrain(self, val): self.CosmeticTerrain.set(val)
+    @property
     def DataPath(self):  # type: ()->String
         return String(self._node.at("DataPath"))
     @DataPath.setter
@@ -40,11 +45,6 @@ class Terrain_TerrainMeta(HelperObject):
         return Float(self._node.at("RegionWidthMeters"))
     @RegionWidthMeters.setter
     def RegionWidthMeters(self, val): self.RegionWidthMeters.set(val)
-    @property
-    def RimTerrain(self):  # type: ()->Bool
-        return Bool(self._node.at("RimTerrain"))
-    @RimTerrain.setter
-    def RimTerrain(self, val): self.RimTerrain.set(val)
     @property
     def SkirtScale(self):  # type: ()->Float
         return Float(self._node.at("SkirtScale"))

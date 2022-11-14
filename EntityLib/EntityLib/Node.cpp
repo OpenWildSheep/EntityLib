@@ -867,6 +867,29 @@ namespace Ent
         throw BadType();
     }
 
+    char const* Node::getRawInstanceOf(OverrideValueLocation _location) const
+    {
+        Override<String>* ovInstanceOf = nullptr;
+        if (auto const* const object = std::get_if<ObjectPtr>(&value))
+        {
+            ovInstanceOf = &(*object)->instanceOf;
+        }
+        else if (auto const* const unionPtr = std::get_if<UnionPtr>(&value))
+        {
+            ovInstanceOf = &(*unionPtr)->instanceOf;
+        }
+        else
+        {
+            throw BadType();
+        }
+        if (auto optStr = ovInstanceOf->getRaw(_location))
+        {
+            return optStr->get().c_str();
+        }
+        return nullptr;
+    }
+
+
     std::vector<Node const*> Node::getItems() const
     {
         if (std::holds_alternative<ArrayPtr>(value))

@@ -5,8 +5,8 @@ from entgen_helpers import *
 import EntityLibPy
 
 from entgen.HotSpotType import *
-from entgen.String import *
 from entgen.EntityRef import *
+from entgen.String import *
 from entgen.Float import *
 from entgen.Quat import *
 from entgen.Vector3 import *

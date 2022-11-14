@@ -25,6 +25,11 @@ class InputCollisionBehaviorData(HelperObject):
     @AltitudeMax.setter
     def AltitudeMax(self, val): self.AltitudeMax.set(val)
     @property
+    def AltitudeMin(self):  # type: ()->Float
+        return Float(self._node.at("AltitudeMin"))
+    @AltitudeMin.setter
+    def AltitudeMin(self, val): self.AltitudeMin.set(val)
+    @property
     def DepthMax(self):  # type: ()->Float
         return Float(self._node.at("DepthMax"))
     @DepthMax.setter

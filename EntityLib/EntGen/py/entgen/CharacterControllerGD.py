@@ -6,9 +6,11 @@ import EntityLibPy
 
 from entgen.String import *
 from entgen.Bool import *
+from entgen.CharacterControllerAnticipationData import *
 from entgen.CharacterControllerClamberData import *
 from entgen.CharacterControllerFallData import *
 from entgen.CharacterControllerGroundNormalData import *
+from entgen.CharacterControllerPreventUndesiredMovementFromInertiaData import *
 from entgen.CharacterControllerSlideData import *
 from entgen.ClimbEdgeData import *
 from entgen.ComponentGD import *
@@ -39,6 +41,9 @@ class CharacterControllerGD(HelperObject):
     @AllowHeightMapFallback.setter
     def AllowHeightMapFallback(self, val): self.AllowHeightMapFallback.set(val)
     @property
+    def AnticipationData(self):  # type: ()->CharacterControllerAnticipationData
+        return CharacterControllerAnticipationData(self._node.at("AnticipationData"))
+    @property
     def ClamberData(self):  # type: ()->CharacterControllerClamberData
         return CharacterControllerClamberData(self._node.at("ClamberData"))
     @property
@@ -65,6 +70,9 @@ class CharacterControllerGD(HelperObject):
     @property
     def PredictionData(self):  # type: ()->PredictionBehaviorData
         return PredictionBehaviorData(self._node.at("PredictionData"))
+    @property
+    def PreventUndesiredMovementFromInertiaData(self):  # type: ()->CharacterControllerPreventUndesiredMovementFromInertiaData
+        return CharacterControllerPreventUndesiredMovementFromInertiaData(self._node.at("PreventUndesiredMovementFromInertiaData"))
     @property
     def RotationSmooth(self):  # type: ()->Vector3
         return Vector3(self._node.at("RotationSmooth"))

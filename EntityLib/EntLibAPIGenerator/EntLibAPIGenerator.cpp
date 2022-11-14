@@ -39,7 +39,7 @@ std::ofstream openOfstream(path const& _filepath)
 
 /// @brief Check if _file1 is identical to _file2
 /// @return true if _file1 is identical to _file2
-bool compareFiles(path const& _file1, std::filesystem::path const& _file2)
+bool compareFiles(path const& _file1, path const& _file2)
 {
     std::ifstream f1(_file1, std::ifstream::binary | std::ifstream::ate);
     std::ifstream f2(_file2, std::ifstream::binary | std::ifstream::ate);
@@ -74,10 +74,12 @@ void moveIfDifferent(path const& _source, path const& _dest)
 
 void copyIfDifferent(path const& _source, path const& _dest)
 {
-    outputFiles.push_back(_dest.lexically_normal());
-    if (not compareFiles(_source, _dest))
+    auto const sourceAbsolute = absolute(_source);
+    auto const destAbsolute = absolute(_dest);
+    outputFiles.push_back(destAbsolute.lexically_normal());
+    if (not compareFiles(sourceAbsolute, destAbsolute))
     {
-        copy_file(_source, _dest, copy_options::overwrite_existing);
+        copy_file(sourceAbsolute, destAbsolute, copy_options::overwrite_existing);
     }
 }
 
@@ -89,13 +91,21 @@ void createFile(
     Output&& _output ///< Function taking a std::ostream to fill the created file
 )
 {
-    create_directories(_destinationPath.parent_path());
-    auto const tempPath = temp_directory_path() / _destinationPath.filename();
+    auto const destinationPathAbsolute = absolute(_destinationPath);
+    if (destinationPathAbsolute.native().size() < 255) // Can't write filename longer than 255 characters
     {
-        std::ofstream output = openOfstream(tempPath);
-        _output(output);
+        create_directories(_destinationPath.parent_path());
+        auto const tempPath = temp_directory_path() / "temp.py";
+        auto const tempPathAbsolute = absolute(tempPath);
+        if (tempPathAbsolute.native().size() < 255) // Can't access filename longer than 255 characters
+        {
+            {
+                std::ofstream output = openOfstream(tempPathAbsolute);
+                _output(output);
+            }
+            moveIfDifferent(tempPathAbsolute, destinationPathAbsolute);
+        }
     }
-    moveIfDifferent(tempPath, _destinationPath);
 }
 
 void renderToFile(mustache& tmpl, data const& rootData, path const& _destinationPath)
@@ -265,7 +275,7 @@ static json prim(char const* _name)
     json type = makeNewType();
     json ref;
     ref["name"] = static_cast<char>(toupper(_name[0])) + std::string((_name + 1));
-    if (_name == std::string("String"))
+    if (_name == std::string("String") or _name == std::string("EntityRef"))
     {
         ref["py_native"] = "str";
         ref["cpp_native"] = "char const*";
@@ -1315,7 +1325,7 @@ from .String import *
 }
 
 /// @brief Generate the python EntGen API
-void genpyProp(std::filesystem::path const& _resourcePath, std::filesystem::path const& _destinationPath)
+void genpyProp(path const& _resourcePath, path const& _destinationPath)
 {
     create_directories(_destinationPath / "entgen2");
 
@@ -1476,7 +1486,7 @@ from enum import Enum
 
 )py"};
 
-    auto inlinePath = (_destinationPath / "entgen2/inline.py").lexically_normal();
+    auto inlinePath = absolute(_destinationPath / "entgen2/inline.py").lexically_normal();
     std::ofstream outputCommon = openOfstream(inlinePath);
     outputFiles.push_back(inlinePath);
     allInline.render(rootData, outputCommon);
@@ -1634,7 +1644,8 @@ try
     {
         if (file.is_regular_file())
         {
-            previousFiles.push_back(file.path().lexically_normal()); // Ensure paths are comparable
+            auto const filePathAbsolute = absolute(file.path());
+            previousFiles.push_back(filePathAbsolute.lexically_normal()); // Ensure paths are comparable
         }
     }
 
@@ -1716,7 +1727,7 @@ try
     for (auto const& obsoleteFile : toRemove)
     {
         printf("Remove file : %ls\n", obsoleteFile.c_str());
-        std::filesystem::remove(obsoleteFile);
+        remove(obsoleteFile);
     }
 
     std::cout << "EntGen generation done" << std::endl;

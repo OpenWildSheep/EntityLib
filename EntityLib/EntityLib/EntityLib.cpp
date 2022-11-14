@@ -1111,7 +1111,11 @@ namespace Ent
                     DataType keyType = _nodeSchema.singularItems->get().linearItems->at(0)->type;
                     auto doRemove = [](json const& item)
                     {
-                        return item[1].is_null();
+                        if (item.size() != 2)
+                        {
+                            throw ContextException("In map, a pair should have two items but has %zu", item.size());
+                        }
+                        return item.at(1).is_null();
                     };
 #pragma warning(push)
 #pragma warning(disable : 4061) // There are switches with missing cases. This is wanted.
@@ -1186,6 +1190,12 @@ namespace Ent
                             },
                             doRemoveDefault);
                         break;
+                    case DataType::entityRef: // The key is the item itself
+                        arr = mergeMapOverride(
+                            [](json const& item) { return item.get<std::string>(); },
+                            [&](Node const* tmplItem) { return tmplItem->getEntityRef().entityPath; },
+                            doRemoveDefault);
+                        break;
                     case DataType::integer: // The key is the item itself
                         arr = mergeMapOverride(
                             [](json const& item) { return item.get<int64_t>(); },
@@ -1209,6 +1219,14 @@ namespace Ent
                                     { return item.at(key).get<std::string>(); },
                                     [key = meta.keyField->c_str()](Node const* tmplItem)
                                     { return tmplItem->at(key)->getString(); },
+                                    doRemoveSet);
+                                break;
+                            case DataType::entityRef:
+                                arr = mergeMapOverride(
+                                    [key = meta.keyField->c_str()](json const& item)
+                                    { return item.at(key).get<std::string>(); },
+                                    [key = meta.keyField->c_str()](Node const* tmplItem)
+                                    { return tmplItem->at(key)->getEntityRef().entityPath.c_str(); },
                                     doRemoveSet);
                                 break;
                             case DataType::integer:

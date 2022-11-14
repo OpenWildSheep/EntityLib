@@ -19,6 +19,7 @@ namespace Ent
         struct variant_EntityRef_NavMeshArea_; // Union
         struct usePerception;
         struct tryGrasp;
+        struct timeSinceLastTurnForDecreasingSpeed;
         struct sPhysicsShapeSphere;
         struct sPhysicsShapeMesh;
         struct sPhysicsShapeCylinder;
@@ -62,6 +63,7 @@ namespace Ent
         struct sJointHingeDesc;
         struct ConditionalRigidityAttribute_Range;
         struct VariantAllowed;
+        struct UpdateContinuousPositionOnGround;
         struct UnionObjectArrayItem;
         struct TypedValue;
         struct TweenableComponentGD_WayPoint_Position;
@@ -282,8 +284,13 @@ namespace Ent
         struct ResponsiblePointer_CineEvent_; // Union
         struct ResponsiblePointer_AnalyticsObserverInterface_;
         struct ResponsiblePointer_ActorState_; // Union
+        struct StateCollectorCollecting;
+        struct StateCollectorCollected;
+        struct StateCollectibleCollecting;
+        struct StateCollectibleCollected;
         struct SpawnState;
         struct RespawnState;
+        struct ResetContinuousPositionOnGround;
         struct RenderManager_DepthOfFieldConfig;
         struct RegenerationManager_EnergyAreaSetting;
         struct RegenSwitchBehavior; // enum
@@ -361,6 +368,7 @@ namespace Ent
         struct constraintPlaneWorldPosition;
         struct ProjectileTrajectory;
         struct PlayRatio;
+        struct PhysicsMaterial_SoundTags;
         struct PhysicsMaterial;
         struct PhysicsLayer; // enum
         enum class PhysicsLayerEnum
@@ -484,6 +492,7 @@ namespace Ent
         struct MusicCategory;
         struct MoveCapacityData_TurnJump;
         struct MoveCapacityData_OrientationSpeed;
+        struct MoveCapacityData_Dodge;
         struct MountableSnapLine_ControlPoint;
         struct MountableData;
         struct MinReviveRatio;
@@ -563,6 +572,13 @@ namespace Ent
         struct AnimalManager;
         struct ActorManager;
         struct ActionStateManager;
+        struct LodSelectionMode; // enum
+        enum class LodSelectionModeEnum
+        {
+            NoLod,
+            DistanceBased,
+            TriangleSizeBased,
+        };
         struct LocomotionMode; // enum
         enum class LocomotionModeEnum
         {
@@ -627,6 +643,7 @@ namespace Ent
         struct Interactor;
         struct InteractionInteractorEntityState;
         struct InteractionInteractableEntityState;
+        struct InteractionExecutorEntityState;
         struct InputCollisionBehaviorData;
         struct InertiaTensor;
         struct ImpactAndSolidityData;
@@ -711,7 +728,6 @@ namespace Ent
             GroupAvoidanceEnum_COUNT,
         };
         struct VelocityObstaclesManager;
-        struct GroundTypeData;
         struct GrasperInteractionData;
         struct GraspableInteractionData;
         struct GraspType; // enum
@@ -765,6 +781,7 @@ namespace Ent
             Geyser,
             PossessFlocking,
             Bridge,
+            EnergyPool,
             GPEType_COUNT,
         };
         struct FurProperties;
@@ -774,6 +791,7 @@ namespace Ent
         struct ForceBlendIn;
         struct FocusInteractorEntityState;
         struct FocusInteractableEntityState;
+        struct FocusExecutorEntityState;
         struct FluidVolumeComponentGD_SimulationParameters;
         struct FluidVolumeComponentGD_HeightMapData;
         struct FluidVolumeComponentGD_FluidVolumeData;
@@ -788,9 +806,6 @@ namespace Ent
         struct ImmersedBehaviorData;
         struct FluidData;
         struct FloatRange;
-        struct SmallActorSpawnRuleData;
-        struct SmallActorSpawnPointData;
-        struct SoundOpportunitiesConfig;
         struct FadeDuration;
         struct FadeDelay;
         struct FactionSpecieRelationData;
@@ -803,6 +818,7 @@ namespace Ent
         struct EntityStateStaffOwnedVertebras_Inputs;
         struct EntityStateSet;
         struct PlayerState;
+        struct EntityStatePlayerHatchingPool_Inputs;
         struct EntityStateMotionConstrained_Inputs;
         struct EntityStateManageChildEntityPool_Inputs;
         struct EntityStateIncapacitated_Inputs;
@@ -820,6 +836,9 @@ namespace Ent
             lush_strong,
         };
         struct VegetationPCloudData;
+        struct SmallActorSpawnRuleData;
+        struct SmallActorSpawnPointData;
+        struct SoundOpportunitiesConfig;
         struct RegenData;
         struct EnergySideData;
         struct EnergySide; // enum
@@ -832,6 +851,7 @@ namespace Ent
         };
         struct ReviveEnergyComponentInput_EnergySide;
         struct EntityStateRevive_Inputs;
+        struct EntityStateEnergyRootHatching_Inputs;
         struct EntityStateCreatureHatching_Inputs;
         struct EnergySideEvent;
         struct EnergyIntensity; // enum
@@ -866,7 +886,6 @@ namespace Ent
             Low,
             CreatureLOD_COUNT,
         };
-        struct creatureLOD;
         struct CreatureDangerousness;
         struct ConstrainedMoveContextInput;
         struct ConstrainedInputData;
@@ -900,9 +919,9 @@ namespace Ent
         struct FluidComponentInput;
         struct EnergySpoutComponentInput;
         struct CreatureAIComponentInput;
+        struct CollectibleComponentInput;
         struct CinematicComponentInput;
         struct ChargedJumpComponentInput;
-        struct CharacterControllerComponentInput;
         struct BreakableComponentInput;
         struct BeamTargetComponentInput;
         struct AttackTriggerComponentInput;
@@ -962,6 +981,7 @@ namespace Ent
         struct ProtoComponentGD;
         struct ProjectileShooterGD;
         struct PlayerComponentGD;
+        struct PivotControllerGD;
         struct PickableDistributorComponentGD;
         struct PickableComponentGD;
         struct PhysicsTriggerGD;
@@ -1026,9 +1046,12 @@ namespace Ent
         struct DiveAttackGD;
         struct DistanceTriggerGD;
         struct FightDistanceTriggerGD;
+        struct DecalComponentGD;
         struct DebugGridGD;
         struct CustomThumbnail;
+        struct CustomStreamingBehavior;
         struct CreatureUIGD;
+        struct ConvertibleGD;
         struct ConstrainedMoveGD;
         struct ConnectorGD;
         struct ComponentWithProtoCodeGD;
@@ -1073,6 +1096,17 @@ namespace Ent
         struct EditorManager;
         struct BoidsGD;
         struct Collider;
+        struct CollectibleType; // enum
+        enum class CollectibleTypeEnum
+        {
+            Vertebrae,
+            VertebraeShard,
+            Schmetre,
+            EnergyFruit,
+            UNDEFINED,
+        };
+        struct CollectorGD;
+        struct CollectibleGD;
         struct Codec;
         struct Zlib;
         struct Lz4Fast;
@@ -1106,8 +1140,12 @@ namespace Ent
         struct CineEventTestEndCurrentSequence;
         struct CineEventTestCurrentGameState;
         struct CharacterControllerSlideData;
+        struct CharacterControllerPreventUndesiredMovementFromInertiaData;
         struct CharacterControllerGroundNormalData;
+        struct CharacterControllerComponentInput_CreatureLOD;
+        struct CharacterControllerComponentInput;
         struct CharacterControllerClamberData;
+        struct CharacterControllerAnticipationData;
         struct CarryMode; // enum
         enum class CarryModeEnum
         {
@@ -1121,12 +1159,14 @@ namespace Ent
         struct OffMeshLink;
         struct NavMeshStamperGD;
         struct CanTakeHit;
-        struct CreatureComponentInput;
         struct CanPossess;
         struct CanInteract;
         struct InteractorComponentInput;
+        struct CanBePossessed;
         struct CanBeInteractedWith;
         struct InteractableComponentInput;
+        struct CanBeConverted;
+        struct CreatureComponentInput;
         struct CameraType; // enum
         enum class CameraTypeEnum
         {
@@ -1264,7 +1304,6 @@ namespace Ent
             Dive,
             AttackType_COUNT,
         };
-        struct AttackPositionRetimingData_SpecieRetimingCoeff;
         struct AttackPositionRetimingData;
         struct AttackPhysicsForceData;
         struct AttackImpactData;
@@ -1451,7 +1490,10 @@ namespace Ent
         struct EntityStateTreeMetamorphosisUsingScale;
         struct EntityStateTreeMetamorphosis;
         struct EntityStateTooDeep;
+        struct EntityStateTeleportToSafePosition;
         struct EntityStateTakeDamageOnMount;
+        struct EntityStateStuckOut;
+        struct EntityStateStuck;
         struct EntityStateStrongAttackJumped;
         struct EntityStateStrongAttackCharging;
         struct EntityStateStrongAttackCharged;
@@ -1474,19 +1516,27 @@ namespace Ent
         struct EntityStateSnappedToHatchingTarget;
         struct EntityStateSlowMotion;
         struct EntityStateShootHatchingEnergy;
-        struct EntityStateSetSavePoint;
+        struct EntityStateSaveWhenPossible;
         struct EntityStateSavePointActivated;
+        struct EntityStateSaveNow;
         struct EntityStateRevive;
         struct EntityStateRespawnability;
         struct EntityStateRespawn;
         struct EntityStateReserveMountSlots;
+        struct EntityStateRepositionToLastSafeGroundedPosition;
         struct EntityStateRegainCapacity;
         struct EntityStateRecoverLand;
         struct EntityStateReadyToGiveOrder;
         struct EntityStateRaise;
+        struct EntityStatePreventUndesiredMovementDueToInertia;
+        struct EntityStatePreventSave;
         struct EntityStatePreventAscendInSlope;
         struct EntityStatePrepareToHoldingOnToNavigationMesh;
         struct EntityStatePlungeLand;
+        struct EntityStatePlayerHatchingPoolSetup;
+        struct EntityStatePlayerHatchingPoolOut;
+        struct EntityStatePlayerHatchingPoolIn;
+        struct EntityStatePlayerHatchingPool;
         struct EntityStatePlayer;
         struct EntityStatePickableDistributor;
         struct EntityStatePhysicsMove;
@@ -1509,6 +1559,7 @@ namespace Ent
         struct EntityStateManageChildEntityPool;
         struct EntityStateLateralLand;
         struct EntityStateLateralDodge;
+        struct EntityStateJustTeleported;
         struct EntityStateJustStarted;
         struct EntityStateJumpOriented;
         struct EntityStateJumpHeightMultiplier;
@@ -1526,6 +1577,7 @@ namespace Ent
         struct EntityStateHideIn;
         struct EntityStateHide;
         struct EntityStateGroundedJump;
+        struct EntityStateGraspIntention;
         struct EntityStateGrasp;
         struct EntityStateGrabbedOut;
         struct EntityStateGrabbedIn;
@@ -1543,7 +1595,6 @@ namespace Ent
         struct EntityStateFall;
         struct EntityStateFailingOrder;
         struct EntityStateExtraLife;
-        struct EntityStateEnterDeathVolume;
         struct EntityStateEnergySpoutState;
         struct EntityStateEnergySide;
         struct EntityStateEnergyRootHatching;
@@ -1561,10 +1612,14 @@ namespace Ent
         struct EntityStateCreatureHighLOD;
         struct EntityStateCreatureHatching;
         struct EntityStateCoyoteJump;
+        struct EntityStateConverted;
+        struct EntityStateConversionTransitionTo;
         struct EntityStateControlGPE;
         struct EntityStateConstrainedMove;
         struct EntityStateConstrainedInput;
         struct EntityStateCombat;
+        struct EntityStateCollecting;
+        struct EntityStateCollectVertebraeShard;
         struct EntityStateCollectVertebrae;
         struct EntityStateClimbWaterfallImpulse;
         struct EntityStateClimbWaterfall;
@@ -1576,7 +1631,7 @@ namespace Ent
         struct EntityStateChargedJumpPower;
         struct EntityStateChargedJump;
         struct EntityStateChargeMode;
-        struct EntityStateCancelSetSavePoint;
+        struct EntityStateCancelSave;
         struct EntityStateCanNotBePerceived;
         struct EntityStateCallAndMountSpiritAnimal;
         struct EntityStateBridgeBeingControlled;
@@ -1600,9 +1655,9 @@ namespace Ent
         struct EntityStateBeingOnSlope;
         struct EntityStateBeingLinked;
         struct EntityStateBeingInReeds;
+        struct EntityStateBeingInPlantCage;
         struct EntityStateBeingFocusedToPossess;
         struct EntityStateBeingFocusedToInteract;
-        struct EntityStateBeingBlockedByVine;
         struct EntityStateBackwardLand;
         struct EntityStateBackwardDodge;
         struct EntityStateAttitudeGroggy;
@@ -1614,13 +1669,13 @@ namespace Ent
         struct EntityStateAimAt;
         struct EntityStateAerialJump;
         struct EntityStateAboutToBeHatched;
+        struct EntityStateAI;
         struct ActorStateTryUpgradeShamanStaff;
         struct ActorStateTryEquipShamanStaff;
         struct ActorStateTeleportWhileMoving;
         struct ActorStateTeleportToTarget;
         struct ActorStateTeleport;
         struct ActorStateTaunting;
-        struct ActorStateStopAttitudeAggressive;
         struct ActorStateSpeedMultiplier;
         struct ActorStateSoulWaitingToRespawn;
         struct ActorStateSoulRespawn;
@@ -1699,7 +1754,8 @@ namespace Ent
         struct ActorStateBeingImmersedFromInAir;
         struct ActorStateBeingImmersed;
         struct ActorStateBehaviorState;
-        struct ActorStateAttitudeAggressive;
+        struct ActorStateAttitudeAggressiveTemporary;
+        struct ActorStateAttitudeAggressivePersistent;
         struct ActorStateApplyHit;
         struct ActorStateAnsweringCall;
         struct ActorStateAlive;
@@ -1792,6 +1848,7 @@ namespace Ent
             CATEGORY_Attitude,
             CATEGORY_Context,
             CATEGORY_Control,
+            CATEGORY_Controller,
             CATEGORY_ActionCosmetic,
             CATEGORY_CreatureLOD,
             CATEGORY_ActionDamage,
@@ -1816,6 +1873,7 @@ namespace Ent
             CATEGORY_ActionSlide,
             CATEGORY_ActionStop,
             CATEGORY_ActionStrafe,
+            Category_Teleport,
             CATEGORY_Transition,
             CATEGORY_Trigger,
             CATEGORY_ActionWingFlutter,
@@ -1954,6 +2012,7 @@ namespace Ent
             call,
             callanswer,
             scream,
+            graspintention,
             grab,
             grabattack,
             grabbed,
@@ -2023,6 +2082,7 @@ namespace Ent
             parry,
             failingorder,
             settingrespawnplace,
+            stuck,
             romlookat,
             emoteshame,
             emotecrazy,
@@ -2122,6 +2182,8 @@ namespace Ent
         struct PointCloud;
         struct RagdollSetupData;
         struct ReplicaReplay;
+        struct SceneConverter_NavmeshOptions;
+        struct SceneConverter_StreamingOptions;
         struct SceneNode;
         struct SceneNodeGraph;
         struct Sensor;
@@ -2311,6 +2373,15 @@ namespace Ent
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Bool engaged() const;
             Ent::Gen2::Bool val() const;
+        };
+
+        struct timeSinceLastTurnForDecreasingSpeed : HelperObject<timeSinceLastTurnForDecreasingSpeed> // Object
+        {
+            explicit timeSinceLastTurnForDecreasingSpeed(Ent::Property _node): HelperObject<timeSinceLastTurnForDecreasingSpeed>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::Float val() const;
         };
 
         struct sPhysicsShapeSphere : HelperObject<sPhysicsShapeSphere> // Object
@@ -3008,6 +3079,15 @@ namespace Ent
             Ent::Gen2::Bool val() const;
         };
 
+        struct UpdateContinuousPositionOnGround : HelperObject<UpdateContinuousPositionOnGround> // Object
+        {
+            explicit UpdateContinuousPositionOnGround(Ent::Property _node): HelperObject<UpdateContinuousPositionOnGround>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::Bool val() const;
+        };
+
         struct UnionObjectArrayItem : HelperObject<UnionObjectArrayItem> // Object
         {
             explicit UnionObjectArrayItem(Ent::Property _node): HelperObject<UnionObjectArrayItem>(std::move(_node)) {}
@@ -3313,11 +3393,11 @@ namespace Ent
             {
                 return Terrain_TerrainMeta(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::Bool CosmeticTerrain() const;
             Ent::Gen2::String DataPath() const;
             Ent::Gen2::Float HeightScaleMeters() const;
             Ent::Gen2::String Material() const;
             Ent::Gen2::Float RegionWidthMeters() const;
-            Ent::Gen2::Bool RimTerrain() const;
             Ent::Gen2::Float SkirtScale() const;
             Ent::Gen2::Float TexelsPerMeter() const;
             Ent::Gen2::String _comment() const;
@@ -4450,12 +4530,13 @@ namespace Ent
             {
                 return ScoreComputation(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::ScaleConverter CameraSightPitchAngleScore() const;
+            Ent::Gen2::ScaleConverter CameraSightYawAngleScore() const;
             Ent::Gen2::ScaleConverter DistanceScore() const;
+            Ent::Gen2::ScaleConverter InteractorSightAngleScore() const;
+            Ent::Gen2::ScaleConverter JoystickDirectionAngleScore() const;
             Ent::Gen2::Float MaxDistance() const;
             Ent::Gen2::Float MinScore() const;
-            Ent::Gen2::ScaleConverter ScreenDistXScore() const;
-            Ent::Gen2::ScaleConverter ScreenDistYScore() const;
-            Ent::Gen2::ScaleConverter SightCosScore() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -5018,8 +5099,10 @@ namespace Ent
             Ent::Gen2::ActorStateAnsweringCall setActorStateAnsweringCall();
             std::optional<Ent::Gen2::ActorStateApplyHit> ActorStateApplyHit();
             Ent::Gen2::ActorStateApplyHit setActorStateApplyHit();
-            std::optional<Ent::Gen2::ActorStateAttitudeAggressive> ActorStateAttitudeAggressive();
-            Ent::Gen2::ActorStateAttitudeAggressive setActorStateAttitudeAggressive();
+            std::optional<Ent::Gen2::ActorStateAttitudeAggressivePersistent> ActorStateAttitudeAggressivePersistent();
+            Ent::Gen2::ActorStateAttitudeAggressivePersistent setActorStateAttitudeAggressivePersistent();
+            std::optional<Ent::Gen2::ActorStateAttitudeAggressiveTemporary> ActorStateAttitudeAggressiveTemporary();
+            Ent::Gen2::ActorStateAttitudeAggressiveTemporary setActorStateAttitudeAggressiveTemporary();
             std::optional<Ent::Gen2::ActorStateBehaviorState> ActorStateBehaviorState();
             Ent::Gen2::ActorStateBehaviorState setActorStateBehaviorState();
             std::optional<Ent::Gen2::ActorStateBeingImmersed> ActorStateBeingImmersed();
@@ -5176,8 +5259,6 @@ namespace Ent
             Ent::Gen2::ActorStateSoulWaitingToRespawn setActorStateSoulWaitingToRespawn();
             std::optional<Ent::Gen2::ActorStateSpeedMultiplier> ActorStateSpeedMultiplier();
             Ent::Gen2::ActorStateSpeedMultiplier setActorStateSpeedMultiplier();
-            std::optional<Ent::Gen2::ActorStateStopAttitudeAggressive> ActorStateStopAttitudeAggressive();
-            Ent::Gen2::ActorStateStopAttitudeAggressive setActorStateStopAttitudeAggressive();
             std::optional<Ent::Gen2::ActorStateTaunting> ActorStateTaunting();
             Ent::Gen2::ActorStateTaunting setActorStateTaunting();
             std::optional<Ent::Gen2::ActorStateTeleport> ActorStateTeleport();
@@ -5190,6 +5271,8 @@ namespace Ent
             Ent::Gen2::ActorStateTryEquipShamanStaff setActorStateTryEquipShamanStaff();
             std::optional<Ent::Gen2::ActorStateTryUpgradeShamanStaff> ActorStateTryUpgradeShamanStaff();
             Ent::Gen2::ActorStateTryUpgradeShamanStaff setActorStateTryUpgradeShamanStaff();
+            std::optional<Ent::Gen2::EntityStateAI> EntityStateAI();
+            Ent::Gen2::EntityStateAI setEntityStateAI();
             std::optional<Ent::Gen2::EntityStateAboutToBeHatched> EntityStateAboutToBeHatched();
             Ent::Gen2::EntityStateAboutToBeHatched setEntityStateAboutToBeHatched();
             std::optional<Ent::Gen2::EntityStateAerialJump> EntityStateAerialJump();
@@ -5212,12 +5295,12 @@ namespace Ent
             Ent::Gen2::EntityStateBackwardDodge setEntityStateBackwardDodge();
             std::optional<Ent::Gen2::EntityStateBackwardLand> EntityStateBackwardLand();
             Ent::Gen2::EntityStateBackwardLand setEntityStateBackwardLand();
-            std::optional<Ent::Gen2::EntityStateBeingBlockedByVine> EntityStateBeingBlockedByVine();
-            Ent::Gen2::EntityStateBeingBlockedByVine setEntityStateBeingBlockedByVine();
             std::optional<Ent::Gen2::EntityStateBeingFocusedToInteract> EntityStateBeingFocusedToInteract();
             Ent::Gen2::EntityStateBeingFocusedToInteract setEntityStateBeingFocusedToInteract();
             std::optional<Ent::Gen2::EntityStateBeingFocusedToPossess> EntityStateBeingFocusedToPossess();
             Ent::Gen2::EntityStateBeingFocusedToPossess setEntityStateBeingFocusedToPossess();
+            std::optional<Ent::Gen2::EntityStateBeingInPlantCage> EntityStateBeingInPlantCage();
+            Ent::Gen2::EntityStateBeingInPlantCage setEntityStateBeingInPlantCage();
             std::optional<Ent::Gen2::EntityStateBeingInReeds> EntityStateBeingInReeds();
             Ent::Gen2::EntityStateBeingInReeds setEntityStateBeingInReeds();
             std::optional<Ent::Gen2::EntityStateBeingLinked> EntityStateBeingLinked();
@@ -5264,8 +5347,8 @@ namespace Ent
             Ent::Gen2::EntityStateCallAndMountSpiritAnimal setEntityStateCallAndMountSpiritAnimal();
             std::optional<Ent::Gen2::EntityStateCanNotBePerceived> EntityStateCanNotBePerceived();
             Ent::Gen2::EntityStateCanNotBePerceived setEntityStateCanNotBePerceived();
-            std::optional<Ent::Gen2::EntityStateCancelSetSavePoint> EntityStateCancelSetSavePoint();
-            Ent::Gen2::EntityStateCancelSetSavePoint setEntityStateCancelSetSavePoint();
+            std::optional<Ent::Gen2::EntityStateCancelSave> EntityStateCancelSave();
+            Ent::Gen2::EntityStateCancelSave setEntityStateCancelSave();
             std::optional<Ent::Gen2::EntityStateChargeMode> EntityStateChargeMode();
             Ent::Gen2::EntityStateChargeMode setEntityStateChargeMode();
             std::optional<Ent::Gen2::EntityStateChargedJump> EntityStateChargedJump();
@@ -5288,6 +5371,10 @@ namespace Ent
             Ent::Gen2::EntityStateClimbWaterfallImpulse setEntityStateClimbWaterfallImpulse();
             std::optional<Ent::Gen2::EntityStateCollectVertebrae> EntityStateCollectVertebrae();
             Ent::Gen2::EntityStateCollectVertebrae setEntityStateCollectVertebrae();
+            std::optional<Ent::Gen2::EntityStateCollectVertebraeShard> EntityStateCollectVertebraeShard();
+            Ent::Gen2::EntityStateCollectVertebraeShard setEntityStateCollectVertebraeShard();
+            std::optional<Ent::Gen2::EntityStateCollecting> EntityStateCollecting();
+            Ent::Gen2::EntityStateCollecting setEntityStateCollecting();
             std::optional<Ent::Gen2::EntityStateCombat> EntityStateCombat();
             Ent::Gen2::EntityStateCombat setEntityStateCombat();
             std::optional<Ent::Gen2::EntityStateConstrainedInput> EntityStateConstrainedInput();
@@ -5296,6 +5383,10 @@ namespace Ent
             Ent::Gen2::EntityStateConstrainedMove setEntityStateConstrainedMove();
             std::optional<Ent::Gen2::EntityStateControlGPE> EntityStateControlGPE();
             Ent::Gen2::EntityStateControlGPE setEntityStateControlGPE();
+            std::optional<Ent::Gen2::EntityStateConversionTransitionTo> EntityStateConversionTransitionTo();
+            Ent::Gen2::EntityStateConversionTransitionTo setEntityStateConversionTransitionTo();
+            std::optional<Ent::Gen2::EntityStateConverted> EntityStateConverted();
+            Ent::Gen2::EntityStateConverted setEntityStateConverted();
             std::optional<Ent::Gen2::EntityStateCoyoteJump> EntityStateCoyoteJump();
             Ent::Gen2::EntityStateCoyoteJump setEntityStateCoyoteJump();
             std::optional<Ent::Gen2::EntityStateCreatureHatching> EntityStateCreatureHatching();
@@ -5330,8 +5421,6 @@ namespace Ent
             Ent::Gen2::EntityStateEnergySide setEntityStateEnergySide();
             std::optional<Ent::Gen2::EntityStateEnergySpoutState> EntityStateEnergySpoutState();
             Ent::Gen2::EntityStateEnergySpoutState setEntityStateEnergySpoutState();
-            std::optional<Ent::Gen2::EntityStateEnterDeathVolume> EntityStateEnterDeathVolume();
-            Ent::Gen2::EntityStateEnterDeathVolume setEntityStateEnterDeathVolume();
             std::optional<Ent::Gen2::EntityStateExtraLife> EntityStateExtraLife();
             Ent::Gen2::EntityStateExtraLife setEntityStateExtraLife();
             std::optional<Ent::Gen2::EntityStateFailingOrder> EntityStateFailingOrder();
@@ -5366,6 +5455,8 @@ namespace Ent
             Ent::Gen2::EntityStateGrabbedOut setEntityStateGrabbedOut();
             std::optional<Ent::Gen2::EntityStateGrasp> EntityStateGrasp();
             Ent::Gen2::EntityStateGrasp setEntityStateGrasp();
+            std::optional<Ent::Gen2::EntityStateGraspIntention> EntityStateGraspIntention();
+            Ent::Gen2::EntityStateGraspIntention setEntityStateGraspIntention();
             std::optional<Ent::Gen2::EntityStateGroundedJump> EntityStateGroundedJump();
             Ent::Gen2::EntityStateGroundedJump setEntityStateGroundedJump();
             std::optional<Ent::Gen2::EntityStateHide> EntityStateHide();
@@ -5400,6 +5491,8 @@ namespace Ent
             Ent::Gen2::EntityStateJumpOriented setEntityStateJumpOriented();
             std::optional<Ent::Gen2::EntityStateJustStarted> EntityStateJustStarted();
             Ent::Gen2::EntityStateJustStarted setEntityStateJustStarted();
+            std::optional<Ent::Gen2::EntityStateJustTeleported> EntityStateJustTeleported();
+            Ent::Gen2::EntityStateJustTeleported setEntityStateJustTeleported();
             std::optional<Ent::Gen2::EntityStateLateralDodge> EntityStateLateralDodge();
             Ent::Gen2::EntityStateLateralDodge setEntityStateLateralDodge();
             std::optional<Ent::Gen2::EntityStateLateralLand> EntityStateLateralLand();
@@ -5444,12 +5537,24 @@ namespace Ent
             Ent::Gen2::EntityStatePickableDistributor setEntityStatePickableDistributor();
             std::optional<Ent::Gen2::EntityStatePlayer> EntityStatePlayer();
             Ent::Gen2::EntityStatePlayer setEntityStatePlayer();
+            std::optional<Ent::Gen2::EntityStatePlayerHatchingPool> EntityStatePlayerHatchingPool();
+            Ent::Gen2::EntityStatePlayerHatchingPool setEntityStatePlayerHatchingPool();
+            std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolIn> EntityStatePlayerHatchingPoolIn();
+            Ent::Gen2::EntityStatePlayerHatchingPoolIn setEntityStatePlayerHatchingPoolIn();
+            std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolOut> EntityStatePlayerHatchingPoolOut();
+            Ent::Gen2::EntityStatePlayerHatchingPoolOut setEntityStatePlayerHatchingPoolOut();
+            std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolSetup> EntityStatePlayerHatchingPoolSetup();
+            Ent::Gen2::EntityStatePlayerHatchingPoolSetup setEntityStatePlayerHatchingPoolSetup();
             std::optional<Ent::Gen2::EntityStatePlungeLand> EntityStatePlungeLand();
             Ent::Gen2::EntityStatePlungeLand setEntityStatePlungeLand();
             std::optional<Ent::Gen2::EntityStatePrepareToHoldingOnToNavigationMesh> EntityStatePrepareToHoldingOnToNavigationMesh();
             Ent::Gen2::EntityStatePrepareToHoldingOnToNavigationMesh setEntityStatePrepareToHoldingOnToNavigationMesh();
             std::optional<Ent::Gen2::EntityStatePreventAscendInSlope> EntityStatePreventAscendInSlope();
             Ent::Gen2::EntityStatePreventAscendInSlope setEntityStatePreventAscendInSlope();
+            std::optional<Ent::Gen2::EntityStatePreventSave> EntityStatePreventSave();
+            Ent::Gen2::EntityStatePreventSave setEntityStatePreventSave();
+            std::optional<Ent::Gen2::EntityStatePreventUndesiredMovementDueToInertia> EntityStatePreventUndesiredMovementDueToInertia();
+            Ent::Gen2::EntityStatePreventUndesiredMovementDueToInertia setEntityStatePreventUndesiredMovementDueToInertia();
             std::optional<Ent::Gen2::EntityStateRaise> EntityStateRaise();
             Ent::Gen2::EntityStateRaise setEntityStateRaise();
             std::optional<Ent::Gen2::EntityStateReadyToGiveOrder> EntityStateReadyToGiveOrder();
@@ -5458,6 +5563,8 @@ namespace Ent
             Ent::Gen2::EntityStateRecoverLand setEntityStateRecoverLand();
             std::optional<Ent::Gen2::EntityStateRegainCapacity> EntityStateRegainCapacity();
             Ent::Gen2::EntityStateRegainCapacity setEntityStateRegainCapacity();
+            std::optional<Ent::Gen2::EntityStateRepositionToLastSafeGroundedPosition> EntityStateRepositionToLastSafeGroundedPosition();
+            Ent::Gen2::EntityStateRepositionToLastSafeGroundedPosition setEntityStateRepositionToLastSafeGroundedPosition();
             std::optional<Ent::Gen2::EntityStateReserveMountSlots> EntityStateReserveMountSlots();
             Ent::Gen2::EntityStateReserveMountSlots setEntityStateReserveMountSlots();
             std::optional<Ent::Gen2::EntityStateRespawn> EntityStateRespawn();
@@ -5466,10 +5573,12 @@ namespace Ent
             Ent::Gen2::EntityStateRespawnability setEntityStateRespawnability();
             std::optional<Ent::Gen2::EntityStateRevive> EntityStateRevive();
             Ent::Gen2::EntityStateRevive setEntityStateRevive();
+            std::optional<Ent::Gen2::EntityStateSaveNow> EntityStateSaveNow();
+            Ent::Gen2::EntityStateSaveNow setEntityStateSaveNow();
             std::optional<Ent::Gen2::EntityStateSavePointActivated> EntityStateSavePointActivated();
             Ent::Gen2::EntityStateSavePointActivated setEntityStateSavePointActivated();
-            std::optional<Ent::Gen2::EntityStateSetSavePoint> EntityStateSetSavePoint();
-            Ent::Gen2::EntityStateSetSavePoint setEntityStateSetSavePoint();
+            std::optional<Ent::Gen2::EntityStateSaveWhenPossible> EntityStateSaveWhenPossible();
+            Ent::Gen2::EntityStateSaveWhenPossible setEntityStateSaveWhenPossible();
             std::optional<Ent::Gen2::EntityStateShootHatchingEnergy> EntityStateShootHatchingEnergy();
             Ent::Gen2::EntityStateShootHatchingEnergy setEntityStateShootHatchingEnergy();
             std::optional<Ent::Gen2::EntityStateSlowMotion> EntityStateSlowMotion();
@@ -5514,8 +5623,14 @@ namespace Ent
             Ent::Gen2::EntityStateStrongAttackCharging setEntityStateStrongAttackCharging();
             std::optional<Ent::Gen2::EntityStateStrongAttackJumped> EntityStateStrongAttackJumped();
             Ent::Gen2::EntityStateStrongAttackJumped setEntityStateStrongAttackJumped();
+            std::optional<Ent::Gen2::EntityStateStuck> EntityStateStuck();
+            Ent::Gen2::EntityStateStuck setEntityStateStuck();
+            std::optional<Ent::Gen2::EntityStateStuckOut> EntityStateStuckOut();
+            Ent::Gen2::EntityStateStuckOut setEntityStateStuckOut();
             std::optional<Ent::Gen2::EntityStateTakeDamageOnMount> EntityStateTakeDamageOnMount();
             Ent::Gen2::EntityStateTakeDamageOnMount setEntityStateTakeDamageOnMount();
+            std::optional<Ent::Gen2::EntityStateTeleportToSafePosition> EntityStateTeleportToSafePosition();
+            Ent::Gen2::EntityStateTeleportToSafePosition setEntityStateTeleportToSafePosition();
             std::optional<Ent::Gen2::EntityStateTooDeep> EntityStateTooDeep();
             Ent::Gen2::EntityStateTooDeep setEntityStateTooDeep();
             std::optional<Ent::Gen2::EntityStateTreeMetamorphosis> EntityStateTreeMetamorphosis();
@@ -5550,6 +5665,42 @@ namespace Ent
             Ent::Gen2::EntityStateWaterfallEndJump setEntityStateWaterfallEndJump();
         };
 
+        struct StateCollectorCollecting : HelperObject<StateCollectorCollecting> // Object
+        {
+            explicit StateCollectorCollecting(Ent::Property _node): HelperObject<StateCollectorCollecting>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::ResponsiblePointer_ActorState_ val() const;
+        };
+
+        struct StateCollectorCollected : HelperObject<StateCollectorCollected> // Object
+        {
+            explicit StateCollectorCollected(Ent::Property _node): HelperObject<StateCollectorCollected>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::ResponsiblePointer_ActorState_ val() const;
+        };
+
+        struct StateCollectibleCollecting : HelperObject<StateCollectibleCollecting> // Object
+        {
+            explicit StateCollectibleCollecting(Ent::Property _node): HelperObject<StateCollectibleCollecting>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::ResponsiblePointer_ActorState_ val() const;
+        };
+
+        struct StateCollectibleCollected : HelperObject<StateCollectibleCollected> // Object
+        {
+            explicit StateCollectibleCollected(Ent::Property _node): HelperObject<StateCollectibleCollected>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::ResponsiblePointer_ActorState_ val() const;
+        };
+
         struct SpawnState : HelperObject<SpawnState> // Object
         {
             explicit SpawnState(Ent::Property _node): HelperObject<SpawnState>(std::move(_node)) {}
@@ -5566,6 +5717,15 @@ namespace Ent
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Bool engaged() const;
             Ent::Gen2::ResponsiblePointer_ActorState_ val() const;
+        };
+
+        struct ResetContinuousPositionOnGround : HelperObject<ResetContinuousPositionOnGround> // Object
+        {
+            explicit ResetContinuousPositionOnGround(Ent::Property _node): HelperObject<ResetContinuousPositionOnGround>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::Bool val() const;
         };
 
         struct RenderManager_DepthOfFieldConfig : HelperObject<RenderManager_DepthOfFieldConfig> // Object
@@ -6778,6 +6938,36 @@ namespace Ent
             Ent::Gen2::Float val() const;
         };
 
+        struct PhysicsMaterial_SoundTags : HelperObject<PhysicsMaterial_SoundTags> // Object
+        {
+            explicit PhysicsMaterial_SoundTags(Ent::Property _node): HelperObject<PhysicsMaterial_SoundTags>(std::move(_node)) {}
+            static constexpr char schemaName[] = "PhysicsMaterial::SoundTags";
+            static PhysicsMaterial_SoundTags load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return PhysicsMaterial_SoundTags(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static PhysicsMaterial_SoundTags loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return PhysicsMaterial_SoundTags(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static PhysicsMaterial_SoundTags create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return PhysicsMaterial_SoundTags(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            PhysicsMaterial_SoundTags makeInstanceOf()
+            {
+                return PhysicsMaterial_SoundTags(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::PrimitiveSet<char const*> Common() const;
+            Ent::Gen2::PrimitiveSet<char const*> Corrupted() const;
+            Ent::Gen2::PrimitiveSet<char const*> Lush() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct PhysicsMaterial : HelperObject<PhysicsMaterial> // Object
         {
             explicit PhysicsMaterial(Ent::Property _node): HelperObject<PhysicsMaterial>(std::move(_node)) {}
@@ -6805,7 +6995,7 @@ namespace Ent
             PrimArray<Ent::Gen2::String> ClimbablePerSize() const;
             Ent::Gen2::Int MaterialId() const;
             Ent::Gen2::String Name() const;
-            Ent::Gen2::PrimitiveSet<char const*> Tags() const;
+            Ent::Gen2::PhysicsMaterial_SoundTags SoundTags() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -7283,6 +7473,37 @@ namespace Ent
             Ent::Gen2::ScaleConverter speedFactorFromSpeedSlow() const;
             Ent::Gen2::Vector3 speedMax() const;
             Ent::Gen2::Vector3 steeringAngle() const;
+        };
+
+        struct MoveCapacityData_Dodge : HelperObject<MoveCapacityData_Dodge> // Object
+        {
+            explicit MoveCapacityData_Dodge(Ent::Property _node): HelperObject<MoveCapacityData_Dodge>(std::move(_node)) {}
+            static constexpr char schemaName[] = "MoveCapacityData::Dodge";
+            static MoveCapacityData_Dodge load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return MoveCapacityData_Dodge(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static MoveCapacityData_Dodge loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return MoveCapacityData_Dodge(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static MoveCapacityData_Dodge create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return MoveCapacityData_Dodge(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            MoveCapacityData_Dodge makeInstanceOf()
+            {
+                return MoveCapacityData_Dodge(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Float classicDodgeOrientationRate() const;
+            Ent::Gen2::Float cooldownTime() const;
+            Ent::Gen2::Float distance() const;
+            Ent::Gen2::ScaleConverter scalePlayRatioFactor() const;
         };
 
         struct MountableSnapLine_ControlPoint : HelperObject<MountableSnapLine_ControlPoint> // Object
@@ -9073,6 +9294,30 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct LodSelectionMode : EnumPropHelper<LodSelectionMode, LodSelectionModeEnum> // Enum
+        {
+            using Enum = LodSelectionModeEnum;
+            using PropHelper<LodSelectionMode, Enum>::operator=;
+            explicit LodSelectionMode(Ent::Property _node): EnumPropHelper<LodSelectionMode, Enum>(std::move(_node)) {}
+            static constexpr char schemaName[] = "LodSelectionMode";
+            static constexpr char const* enumToString[] = {
+                "NoLod",
+                "DistanceBased",
+                "TriangleSizeBased",
+            };
+        };
+        inline char const* toString(LodSelectionModeEnum value)
+        {
+            if(size_t(value) >= std::size(LodSelectionMode::enumToString))
+                throw std::runtime_error("Wrong enum value");
+            return LodSelectionMode::enumToString[size_t(value)];
+        }
+        inline char const* toInternal(LodSelectionModeEnum value) { return toString(value); }
+        template<> inline LodSelectionModeEnum strToEnum<LodSelectionModeEnum>(char const* value)
+        {
+            return static_cast<LodSelectionModeEnum>(details::indexInEnum(value, LodSelectionMode::enumToString));
+        }
+
         struct LocomotionMode : EnumPropHelper<LocomotionMode, LocomotionModeEnum> // Enum
         {
             using Enum = LocomotionModeEnum;
@@ -9467,6 +9712,15 @@ namespace Ent
             Ent::Gen2::ResponsiblePointer_ActorState_ val() const;
         };
 
+        struct InteractionExecutorEntityState : HelperObject<InteractionExecutorEntityState> // Object
+        {
+            explicit InteractionExecutorEntityState(Ent::Property _node): HelperObject<InteractionExecutorEntityState>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::ResponsiblePointer_ActorState_ val() const;
+        };
+
         struct InputCollisionBehaviorData : HelperObject<InputCollisionBehaviorData> // Object
         {
             explicit InputCollisionBehaviorData(Ent::Property _node): HelperObject<InputCollisionBehaviorData>(std::move(_node)) {}
@@ -9492,6 +9746,7 @@ namespace Ent
                 return InputCollisionBehaviorData(getProperty().makeInstanceOf());
             }
             Ent::Gen2::Float AltitudeMax() const;
+            Ent::Gen2::Float AltitudeMin() const;
             Ent::Gen2::Float DepthMax() const;
             Ent::Gen2::Float FrontAngle() const;
             Ent::Gen2::Float RadiusCoeff() const;
@@ -9942,38 +10197,6 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
-        struct GroundTypeData : HelperObject<GroundTypeData> // Object
-        {
-            explicit GroundTypeData(Ent::Property _node): HelperObject<GroundTypeData>(std::move(_node)) {}
-            static constexpr char schemaName[] = "GroundTypeData";
-            static GroundTypeData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return GroundTypeData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static GroundTypeData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return GroundTypeData(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static GroundTypeData create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return GroundTypeData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            GroundTypeData makeInstanceOf()
-            {
-                return GroundTypeData(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::Float GrainRangeMax() const;
-            Ent::Gen2::Float GrainRangeMin() const;
-            Ent::Gen2::String Name() const;
-            Ent::Gen2::Float RegenRangeMax() const;
-            Ent::Gen2::Float RegenRangeMin() const;
-            Ent::Gen2::String _comment() const;
-        };
-
         struct GrasperInteractionData : HelperObject<GrasperInteractionData> // Object
         {
             explicit GrasperInteractionData(Ent::Property _node): HelperObject<GrasperInteractionData>(std::move(_node)) {}
@@ -10004,6 +10227,7 @@ namespace Ent
             Ent::Gen2::Float deltaAngleMax() const;
             Ent::Gen2::Float distanceHysteris() const;
             Ent::Gen2::Float distanceMax() const;
+            Ent::Gen2::Float distanceMin() const;
             Ent::Gen2::Float graspDurationMax() const;
             Ent::Gen2::Float graspOutVisualRotationRate() const;
             Ent::Gen2::Float graspStrength() const;
@@ -10302,10 +10526,11 @@ namespace Ent
             }
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Float creatureSizeCoeff() const;
-            Ent::Gen2::Float dirCoeff() const;
-            Ent::Gen2::Float distCoeff() const;
+            Ent::Gen2::ScaleConverter dirScoreCoeff() const;
+            Ent::Gen2::ScaleConverter distScoreCoeff() const;
             Ent::Gen2::Float maxAngle() const;
             Ent::Gen2::Float maxDist() const;
+            Ent::Gen2::Float minScore() const;
         };
 
         struct GameSlopeData : HelperObject<GameSlopeData> // Object
@@ -10437,7 +10662,7 @@ namespace Ent
                 return GameRespawnData(getProperty().makeInstanceOf());
             }
             Ent::Gen2::Float RespawnDelayOnDeath() const;
-            Ent::Gen2::Float SetRespawnPlaceAsCheckpointDuration() const;
+            Ent::Gen2::Float SaveVolumeHysteresis() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -11193,6 +11418,7 @@ namespace Ent
                 "Geyser",
                 "PossessFlocking",
                 "Bridge",
+                "EnergyPool",
                 "GPEType_COUNT",
             };
         };
@@ -11321,6 +11547,15 @@ namespace Ent
         struct FocusInteractableEntityState : HelperObject<FocusInteractableEntityState> // Object
         {
             explicit FocusInteractableEntityState(Ent::Property _node): HelperObject<FocusInteractableEntityState>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::ResponsiblePointer_ActorState_ val() const;
+        };
+
+        struct FocusExecutorEntityState : HelperObject<FocusExecutorEntityState> // Object
+        {
+            explicit FocusExecutorEntityState(Ent::Property _node): HelperObject<FocusExecutorEntityState>(std::move(_node)) {}
             
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Bool engaged() const;
@@ -11546,97 +11781,6 @@ namespace Ent
                 return FloatRange(getProperty().makeInstanceOf());
             }
             Ent::Gen2::Vector2 MinMax() const;
-            Ent::Gen2::String _comment() const;
-        };
-
-        struct SmallActorSpawnRuleData : HelperObject<SmallActorSpawnRuleData> // Object
-        {
-            explicit SmallActorSpawnRuleData(Ent::Property _node): HelperObject<SmallActorSpawnRuleData>(std::move(_node)) {}
-            static constexpr char schemaName[] = "SmallActorSpawnRuleData";
-            static SmallActorSpawnRuleData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return SmallActorSpawnRuleData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static SmallActorSpawnRuleData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return SmallActorSpawnRuleData(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static SmallActorSpawnRuleData create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return SmallActorSpawnRuleData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            SmallActorSpawnRuleData makeInstanceOf()
-            {
-                return SmallActorSpawnRuleData(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::String AudioEventName() const;
-            Ent::Gen2::String AudioEventSoundBank() const;
-            Ent::Gen2::FloatRange DayTimeRange() const;
-            Ent::Gen2::FloatRange DistanceRange() const;
-            Ent::Gen2::FloatRange PrecipitationRange() const;
-            Ent::Gen2::FloatRange RegenRange() const;
-            Ent::Gen2::Float SpawnProbability() const;
-            Ent::Gen2::String _comment() const;
-        };
-
-        struct SmallActorSpawnPointData : HelperObject<SmallActorSpawnPointData> // Object
-        {
-            explicit SmallActorSpawnPointData(Ent::Property _node): HelperObject<SmallActorSpawnPointData>(std::move(_node)) {}
-            static constexpr char schemaName[] = "SmallActorSpawnPointData";
-            static SmallActorSpawnPointData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return SmallActorSpawnPointData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static SmallActorSpawnPointData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return SmallActorSpawnPointData(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static SmallActorSpawnPointData create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return SmallActorSpawnPointData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            SmallActorSpawnPointData makeInstanceOf()
-            {
-                return SmallActorSpawnPointData(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::Float SelectionProbability() const;
-            Array<Ent::Gen2::SmallActorSpawnRuleData> SpawnRules() const;
-            Ent::Gen2::String _comment() const;
-        };
-
-        struct SoundOpportunitiesConfig : HelperObject<SoundOpportunitiesConfig> // Object
-        {
-            explicit SoundOpportunitiesConfig(Ent::Property _node): HelperObject<SoundOpportunitiesConfig>(std::move(_node)) {}
-            static constexpr char schemaName[] = "SoundOpportunitiesConfig";
-            static SoundOpportunitiesConfig load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return SoundOpportunitiesConfig(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static SoundOpportunitiesConfig loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return SoundOpportunitiesConfig(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static SoundOpportunitiesConfig create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return SoundOpportunitiesConfig(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            SoundOpportunitiesConfig makeInstanceOf()
-            {
-                return SoundOpportunitiesConfig(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData> SmallActorSpawnRules() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -11928,6 +12072,7 @@ namespace Ent
             {
                 return EntityStateStaffOwnedVertebras_Inputs(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::Int OwnedShardCount() const;
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Int ownedVertebrasNumber() const;
         };
@@ -11988,6 +12133,36 @@ namespace Ent
             Ent::Gen2::Map<char const*, Ent::Gen2::Map<char const*, Ent::Gen2::EntityStateSet>> DynamicStates() const;
             Ent::Gen2::GameInfoDB GameInfoDB() const;
             Ent::Gen2::Int Version() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStatePlayerHatchingPool_Inputs : HelperObject<EntityStatePlayerHatchingPool_Inputs> // Object
+        {
+            explicit EntityStatePlayerHatchingPool_Inputs(Ent::Property _node): HelperObject<EntityStatePlayerHatchingPool_Inputs>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStatePlayerHatchingPool::Inputs";
+            static EntityStatePlayerHatchingPool_Inputs load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStatePlayerHatchingPool_Inputs(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStatePlayerHatchingPool_Inputs loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStatePlayerHatchingPool_Inputs(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStatePlayerHatchingPool_Inputs create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStatePlayerHatchingPool_Inputs(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStatePlayerHatchingPool_Inputs makeInstanceOf()
+            {
+                return EntityStatePlayerHatchingPool_Inputs(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Float DistanceFromPoolToPlayAnim() const;
+            Ent::Gen2::Float HatchingDuration() const;
+            Ent::Gen2::Float WalkSpeed() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -12220,6 +12395,97 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct SmallActorSpawnRuleData : HelperObject<SmallActorSpawnRuleData> // Object
+        {
+            explicit SmallActorSpawnRuleData(Ent::Property _node): HelperObject<SmallActorSpawnRuleData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SmallActorSpawnRuleData";
+            static SmallActorSpawnRuleData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return SmallActorSpawnRuleData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static SmallActorSpawnRuleData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return SmallActorSpawnRuleData(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static SmallActorSpawnRuleData create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return SmallActorSpawnRuleData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            SmallActorSpawnRuleData makeInstanceOf()
+            {
+                return SmallActorSpawnRuleData(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::String AudioEventName() const;
+            Ent::Gen2::String AudioEventSoundBank() const;
+            Ent::Gen2::FloatRange DayTimeRange() const;
+            Ent::Gen2::FloatRange DistanceRange() const;
+            PrimArray<Ent::Gen2::EnergyValue> EnergyValues() const;
+            Ent::Gen2::FloatRange PrecipitationRange() const;
+            Ent::Gen2::Float SpawnProbability() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct SmallActorSpawnPointData : HelperObject<SmallActorSpawnPointData> // Object
+        {
+            explicit SmallActorSpawnPointData(Ent::Property _node): HelperObject<SmallActorSpawnPointData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SmallActorSpawnPointData";
+            static SmallActorSpawnPointData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return SmallActorSpawnPointData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static SmallActorSpawnPointData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return SmallActorSpawnPointData(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static SmallActorSpawnPointData create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return SmallActorSpawnPointData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            SmallActorSpawnPointData makeInstanceOf()
+            {
+                return SmallActorSpawnPointData(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Float SelectionProbability() const;
+            Array<Ent::Gen2::SmallActorSpawnRuleData> SpawnRules() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct SoundOpportunitiesConfig : HelperObject<SoundOpportunitiesConfig> // Object
+        {
+            explicit SoundOpportunitiesConfig(Ent::Property _node): HelperObject<SoundOpportunitiesConfig>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SoundOpportunitiesConfig";
+            static SoundOpportunitiesConfig load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return SoundOpportunitiesConfig(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static SoundOpportunitiesConfig loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return SoundOpportunitiesConfig(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static SoundOpportunitiesConfig create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return SoundOpportunitiesConfig(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            SoundOpportunitiesConfig makeInstanceOf()
+            {
+                return SoundOpportunitiesConfig(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData> SmallActorSpawnRules() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct RegenData : HelperObject<RegenData> // Object
         {
             explicit RegenData(Ent::Property _node): HelperObject<RegenData>(std::move(_node)) {}
@@ -12337,6 +12603,35 @@ namespace Ent
             }
             Ent::Gen2::Float Damages() const;
             Ent::Gen2::EnergySide EnergySide() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateEnergyRootHatching_Inputs : HelperObject<EntityStateEnergyRootHatching_Inputs> // Object
+        {
+            explicit EntityStateEnergyRootHatching_Inputs(Ent::Property _node): HelperObject<EntityStateEnergyRootHatching_Inputs>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateEnergyRootHatching::Inputs";
+            static EntityStateEnergyRootHatching_Inputs load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateEnergyRootHatching_Inputs(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateEnergyRootHatching_Inputs loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateEnergyRootHatching_Inputs(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateEnergyRootHatching_Inputs create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateEnergyRootHatching_Inputs(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateEnergyRootHatching_Inputs makeInstanceOf()
+            {
+                return EntityStateEnergyRootHatching_Inputs(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Float HatchingDuration() const;
+            Ent::Gen2::EnergySide HatchingSide() const;
             Ent::Gen2::String _comment() const;
         };
 
@@ -12716,6 +13011,7 @@ namespace Ent
             Ent::Gen2::Bool DisplayQualityManager() const;
             Ent::Gen2::Bool DisplayRPCCalls() const;
             Ent::Gen2::Bool DisplayReloadNotifications() const;
+            Ent::Gen2::Bool DisplaySafeSavePosition() const;
             Ent::Gen2::Bool DisplaySelectedPestoEntity() const;
             Ent::Gen2::Bool DisplayStringHashTranslator() const;
             Ent::Gen2::Bool DisplayTimer() const;
@@ -12917,15 +13213,6 @@ namespace Ent
         {
             return static_cast<CreatureLODEnum>(details::indexInEnum(value, CreatureLOD::enumToString));
         }
-
-        struct creatureLOD : HelperObject<creatureLOD> // Object
-        {
-            explicit creatureLOD(Ent::Property _node): HelperObject<creatureLOD>(std::move(_node)) {}
-            
-            Ent::Gen2::String _comment() const;
-            Ent::Gen2::Bool engaged() const;
-            Ent::Gen2::CreatureLOD val() const;
-        };
 
         struct CreatureDangerousness : HelperObject<CreatureDangerousness> // Object
         {
@@ -13886,6 +14173,34 @@ namespace Ent
             Ent::Gen2::usePerception usePerception() const;
         };
 
+        struct CollectibleComponentInput : HelperObject<CollectibleComponentInput> // Object
+        {
+            explicit CollectibleComponentInput(Ent::Property _node): HelperObject<CollectibleComponentInput>(std::move(_node)) {}
+            static constexpr char schemaName[] = "CollectibleComponentInput";
+            static CollectibleComponentInput load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return CollectibleComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static CollectibleComponentInput loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return CollectibleComponentInput(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static CollectibleComponentInput create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return CollectibleComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            CollectibleComponentInput makeInstanceOf()
+            {
+                return CollectibleComponentInput(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ComponentInput Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct CinematicComponentInput : HelperObject<CinematicComponentInput> // Object
         {
             explicit CinematicComponentInput(Ent::Property _node): HelperObject<CinematicComponentInput>(std::move(_node)) {}
@@ -13941,38 +14256,6 @@ namespace Ent
             Ent::Gen2::ComponentInput Super() const;
             Ent::Gen2::String _comment() const;
             Ent::Gen2::jumpPower jumpPower() const;
-        };
-
-        struct CharacterControllerComponentInput : HelperObject<CharacterControllerComponentInput> // Object
-        {
-            explicit CharacterControllerComponentInput(Ent::Property _node): HelperObject<CharacterControllerComponentInput>(std::move(_node)) {}
-            static constexpr char schemaName[] = "CharacterControllerComponentInput";
-            static CharacterControllerComponentInput load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return CharacterControllerComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static CharacterControllerComponentInput loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return CharacterControllerComponentInput(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static CharacterControllerComponentInput create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return CharacterControllerComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            CharacterControllerComponentInput makeInstanceOf()
-            {
-                return CharacterControllerComponentInput(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::JumpHeightMultiplier JumpHeightMultiplier() const;
-            Ent::Gen2::RigidbodyScaleMultiplier RigidbodyScaleMultiplier() const;
-            Ent::Gen2::RigidbodyScalingSpeed RigidbodyScalingSpeed() const;
-            Ent::Gen2::ComponentInput Super() const;
-            Ent::Gen2::String _comment() const;
-            Ent::Gen2::creatureLOD creatureLOD() const;
         };
 
         struct BreakableComponentInput : HelperObject<BreakableComponentInput> // Object
@@ -14979,6 +15262,7 @@ namespace Ent
                 return StaticObjectGD(getProperty().makeInstanceOf());
             }
             Ent::Gen2::Bool EDITOR_IsCave() const;
+            Ent::Gen2::Bool EDITOR_IsUnclosedMesh() const;
             Ent::Gen2::Bool EDITOR_MergeInNavMesh() const;
             Ent::Gen2::Bool EDITOR_UsedInMultiLayerHeightmap() const;
             Ent::Gen2::ComponentGD Super() const;
@@ -15016,6 +15300,8 @@ namespace Ent
             Ent::Gen2::Int MaxVertebraCount() const;
             Ent::Gen2::Int OwnedVertebraStartCount() const;
             Ent::Gen2::Float RefillVertebraTimer() const;
+            Ent::Gen2::Int ShardMaxCount() const;
+            Ent::Gen2::Int StartShardCount_() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::String VertebraGRCPath1() const;
             Ent::Gen2::String VertebraGRCPath2() const;
@@ -15861,6 +16147,37 @@ namespace Ent
             {
                 return PlayerComponentGD(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::ComponentGD Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct PivotControllerGD : HelperObject<PivotControllerGD> // Object
+        {
+            explicit PivotControllerGD(Ent::Property _node): HelperObject<PivotControllerGD>(std::move(_node)) {}
+            static constexpr char schemaName[] = "PivotControllerGD";
+            static PivotControllerGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return PivotControllerGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static PivotControllerGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return PivotControllerGD(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static PivotControllerGD create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return PivotControllerGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            PivotControllerGD makeInstanceOf()
+            {
+                return PivotControllerGD(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Float GrowthTime() const;
+            Ent::Gen2::Float InitialGrowth() const;
+            Ent::Gen2::String PivotSkeleton() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -16821,6 +17138,7 @@ namespace Ent
             {
                 return InterestPointGD(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::Float Height() const;
             Ent::Gen2::Float Radius() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::TagsList Tags() const;
@@ -16851,15 +17169,20 @@ namespace Ent
             {
                 return InteractableGD(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::FocusExecutorEntityState FocusExecutorEntityState() const;
             Ent::Gen2::FocusInteractableEntityState FocusInteractableEntityState() const;
             Ent::Gen2::FocusInteractorEntityState FocusInteractorEntityState() const;
             Ent::Gen2::GPEType GPEType() const;
             Ent::Gen2::String HotspotName() const;
             Ent::Gen2::Float InteractMaxDistance() const;
             Ent::Gen2::Float InteractMaxDistanceHysteresis() const;
+            Ent::Gen2::Bool InteractWithAllies() const;
+            Ent::Gen2::Bool InteractWithEnemies() const;
+            Ent::Gen2::InteractionExecutorEntityState InteractionExecutorEntityState() const;
             Ent::Gen2::InteractionInteractableEntityState InteractionInteractableEntityState() const;
             Ent::Gen2::InteractionInteractorEntityState InteractionInteractorEntityState() const;
             Ent::Gen2::Float InteractionPriority() const;
+            Ent::Gen2::Float ProximityInteractMaxDistance() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -17224,6 +17547,9 @@ namespace Ent
             {
                 return GrasperGD(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::Float GraspIntentionDelayToAllowOrientation() const;
+            Ent::Gen2::Float GraspIntentionMaxHalfAngle() const;
+            Ent::Gen2::Float GraspIntentionOrientationYawRate() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Float bestInteractionDeltaAngleCoeff() const;
@@ -17857,6 +18183,35 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct DecalComponentGD : HelperObject<DecalComponentGD> // Object
+        {
+            explicit DecalComponentGD(Ent::Property _node): HelperObject<DecalComponentGD>(std::move(_node)) {}
+            static constexpr char schemaName[] = "DecalComponentGD";
+            static DecalComponentGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return DecalComponentGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static DecalComponentGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return DecalComponentGD(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static DecalComponentGD create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return DecalComponentGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            DecalComponentGD makeInstanceOf()
+            {
+                return DecalComponentGD(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::String Material() const;
+            Ent::Gen2::ComponentGD Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct DebugGridGD : HelperObject<DebugGridGD> // Object
         {
             explicit DebugGridGD(Ent::Property _node): HelperObject<DebugGridGD>(std::move(_node)) {}
@@ -17916,6 +18271,35 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct CustomStreamingBehavior : HelperObject<CustomStreamingBehavior> // Object
+        {
+            explicit CustomStreamingBehavior(Ent::Property _node): HelperObject<CustomStreamingBehavior>(std::move(_node)) {}
+            static constexpr char schemaName[] = "CustomStreamingBehavior";
+            static CustomStreamingBehavior load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return CustomStreamingBehavior(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static CustomStreamingBehavior loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return CustomStreamingBehavior(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static CustomStreamingBehavior create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return CustomStreamingBehavior(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            CustomStreamingBehavior makeInstanceOf()
+            {
+                return CustomStreamingBehavior(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Bool Ignore() const;
+            Ent::Gen2::ComponentGD Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct CreatureUIGD : HelperObject<CreatureUIGD> // Object
         {
             explicit CreatureUIGD(Ent::Property _node): HelperObject<CreatureUIGD>(std::move(_node)) {}
@@ -17944,6 +18328,35 @@ namespace Ent
             Ent::Gen2::Float LifeBarWidth() const;
             Ent::Gen2::Float LifeBarZOffset() const;
             Ent::Gen2::Bool ShowLifeBar() const;
+            Ent::Gen2::ComponentGD Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct ConvertibleGD : HelperObject<ConvertibleGD> // Object
+        {
+            explicit ConvertibleGD(Ent::Property _node): HelperObject<ConvertibleGD>(std::move(_node)) {}
+            static constexpr char schemaName[] = "ConvertibleGD";
+            static ConvertibleGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return ConvertibleGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static ConvertibleGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return ConvertibleGD(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static ConvertibleGD create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return ConvertibleGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            ConvertibleGD makeInstanceOf()
+            {
+                return ConvertibleGD(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::EntityRef ConvertedEntity() const;
             Ent::Gen2::ComponentGD Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -18565,22 +18978,32 @@ namespace Ent
             Ent::Gen2::ClothAnimationGD setClothAnimationGD();
             std::optional<Ent::Gen2::ClothGD> ClothGD();
             Ent::Gen2::ClothGD setClothGD();
+            std::optional<Ent::Gen2::CollectibleGD> CollectibleGD();
+            Ent::Gen2::CollectibleGD setCollectibleGD();
+            std::optional<Ent::Gen2::CollectorGD> CollectorGD();
+            Ent::Gen2::CollectorGD setCollectorGD();
             std::optional<Ent::Gen2::ComponentWithProtoCodeGD> ComponentWithProtoCodeGD();
             Ent::Gen2::ComponentWithProtoCodeGD setComponentWithProtoCodeGD();
             std::optional<Ent::Gen2::ConnectorGD> ConnectorGD();
             Ent::Gen2::ConnectorGD setConnectorGD();
             std::optional<Ent::Gen2::ConstrainedMoveGD> ConstrainedMoveGD();
             Ent::Gen2::ConstrainedMoveGD setConstrainedMoveGD();
+            std::optional<Ent::Gen2::ConvertibleGD> ConvertibleGD();
+            Ent::Gen2::ConvertibleGD setConvertibleGD();
             std::optional<Ent::Gen2::CreatureAIGD> CreatureAIGD();
             Ent::Gen2::CreatureAIGD setCreatureAIGD();
             std::optional<Ent::Gen2::CreatureGD> CreatureGD();
             Ent::Gen2::CreatureGD setCreatureGD();
             std::optional<Ent::Gen2::CreatureUIGD> CreatureUIGD();
             Ent::Gen2::CreatureUIGD setCreatureUIGD();
+            std::optional<Ent::Gen2::CustomStreamingBehavior> CustomStreamingBehavior();
+            Ent::Gen2::CustomStreamingBehavior setCustomStreamingBehavior();
             std::optional<Ent::Gen2::CustomThumbnail> CustomThumbnail();
             Ent::Gen2::CustomThumbnail setCustomThumbnail();
             std::optional<Ent::Gen2::DebugGridGD> DebugGridGD();
             Ent::Gen2::DebugGridGD setDebugGridGD();
+            std::optional<Ent::Gen2::DecalComponentGD> DecalComponentGD();
+            Ent::Gen2::DecalComponentGD setDecalComponentGD();
             std::optional<Ent::Gen2::DistanceTriggerGD> DistanceTriggerGD();
             Ent::Gen2::DistanceTriggerGD setDistanceTriggerGD();
             std::optional<Ent::Gen2::DiveAttackGD> DiveAttackGD();
@@ -18717,6 +19140,8 @@ namespace Ent
             Ent::Gen2::PickableComponentGD setPickableComponentGD();
             std::optional<Ent::Gen2::PickableDistributorComponentGD> PickableDistributorComponentGD();
             Ent::Gen2::PickableDistributorComponentGD setPickableDistributorComponentGD();
+            std::optional<Ent::Gen2::PivotControllerGD> PivotControllerGD();
+            Ent::Gen2::PivotControllerGD setPivotControllerGD();
             std::optional<Ent::Gen2::PlayerComponentGD> PlayerComponentGD();
             Ent::Gen2::PlayerComponentGD setPlayerComponentGD();
             std::optional<Ent::Gen2::ProjectileGD> ProjectileGD();
@@ -18934,6 +19359,12 @@ namespace Ent
             std::optional<Ent::Gen2::ClothGD> ClothGD();
             Ent::Gen2::ClothGD addClothGD();
             void removeClothGD();
+            std::optional<Ent::Gen2::CollectibleGD> CollectibleGD();
+            Ent::Gen2::CollectibleGD addCollectibleGD();
+            void removeCollectibleGD();
+            std::optional<Ent::Gen2::CollectorGD> CollectorGD();
+            Ent::Gen2::CollectorGD addCollectorGD();
+            void removeCollectorGD();
             std::optional<Ent::Gen2::ComponentWithProtoCodeGD> ComponentWithProtoCodeGD();
             Ent::Gen2::ComponentWithProtoCodeGD addComponentWithProtoCodeGD();
             void removeComponentWithProtoCodeGD();
@@ -18943,6 +19374,9 @@ namespace Ent
             std::optional<Ent::Gen2::ConstrainedMoveGD> ConstrainedMoveGD();
             Ent::Gen2::ConstrainedMoveGD addConstrainedMoveGD();
             void removeConstrainedMoveGD();
+            std::optional<Ent::Gen2::ConvertibleGD> ConvertibleGD();
+            Ent::Gen2::ConvertibleGD addConvertibleGD();
+            void removeConvertibleGD();
             std::optional<Ent::Gen2::CreatureAIGD> CreatureAIGD();
             Ent::Gen2::CreatureAIGD addCreatureAIGD();
             void removeCreatureAIGD();
@@ -18952,12 +19386,18 @@ namespace Ent
             std::optional<Ent::Gen2::CreatureUIGD> CreatureUIGD();
             Ent::Gen2::CreatureUIGD addCreatureUIGD();
             void removeCreatureUIGD();
+            std::optional<Ent::Gen2::CustomStreamingBehavior> CustomStreamingBehavior();
+            Ent::Gen2::CustomStreamingBehavior addCustomStreamingBehavior();
+            void removeCustomStreamingBehavior();
             std::optional<Ent::Gen2::CustomThumbnail> CustomThumbnail();
             Ent::Gen2::CustomThumbnail addCustomThumbnail();
             void removeCustomThumbnail();
             std::optional<Ent::Gen2::DebugGridGD> DebugGridGD();
             Ent::Gen2::DebugGridGD addDebugGridGD();
             void removeDebugGridGD();
+            std::optional<Ent::Gen2::DecalComponentGD> DecalComponentGD();
+            Ent::Gen2::DecalComponentGD addDecalComponentGD();
+            void removeDecalComponentGD();
             std::optional<Ent::Gen2::DistanceTriggerGD> DistanceTriggerGD();
             Ent::Gen2::DistanceTriggerGD addDistanceTriggerGD();
             void removeDistanceTriggerGD();
@@ -19162,6 +19602,9 @@ namespace Ent
             std::optional<Ent::Gen2::PickableDistributorComponentGD> PickableDistributorComponentGD();
             Ent::Gen2::PickableDistributorComponentGD addPickableDistributorComponentGD();
             void removePickableDistributorComponentGD();
+            std::optional<Ent::Gen2::PivotControllerGD> PivotControllerGD();
+            Ent::Gen2::PivotControllerGD addPivotControllerGD();
+            void removePivotControllerGD();
             std::optional<Ent::Gen2::PlayerComponentGD> PlayerComponentGD();
             Ent::Gen2::PlayerComponentGD addPlayerComponentGD();
             void removePlayerComponentGD();
@@ -19761,6 +20204,12 @@ namespace Ent
             std::optional<Ent::Gen2::ClothGD> ClothGD();
             Ent::Gen2::ClothGD addClothGD();
             void removeClothGD();
+            std::optional<Ent::Gen2::CollectibleGD> CollectibleGD();
+            Ent::Gen2::CollectibleGD addCollectibleGD();
+            void removeCollectibleGD();
+            std::optional<Ent::Gen2::CollectorGD> CollectorGD();
+            Ent::Gen2::CollectorGD addCollectorGD();
+            void removeCollectorGD();
             std::optional<Ent::Gen2::ComponentWithProtoCodeGD> ComponentWithProtoCodeGD();
             Ent::Gen2::ComponentWithProtoCodeGD addComponentWithProtoCodeGD();
             void removeComponentWithProtoCodeGD();
@@ -19770,6 +20219,9 @@ namespace Ent
             std::optional<Ent::Gen2::ConstrainedMoveGD> ConstrainedMoveGD();
             Ent::Gen2::ConstrainedMoveGD addConstrainedMoveGD();
             void removeConstrainedMoveGD();
+            std::optional<Ent::Gen2::ConvertibleGD> ConvertibleGD();
+            Ent::Gen2::ConvertibleGD addConvertibleGD();
+            void removeConvertibleGD();
             std::optional<Ent::Gen2::CreatureAIGD> CreatureAIGD();
             Ent::Gen2::CreatureAIGD addCreatureAIGD();
             void removeCreatureAIGD();
@@ -19779,12 +20231,18 @@ namespace Ent
             std::optional<Ent::Gen2::CreatureUIGD> CreatureUIGD();
             Ent::Gen2::CreatureUIGD addCreatureUIGD();
             void removeCreatureUIGD();
+            std::optional<Ent::Gen2::CustomStreamingBehavior> CustomStreamingBehavior();
+            Ent::Gen2::CustomStreamingBehavior addCustomStreamingBehavior();
+            void removeCustomStreamingBehavior();
             std::optional<Ent::Gen2::CustomThumbnail> CustomThumbnail();
             Ent::Gen2::CustomThumbnail addCustomThumbnail();
             void removeCustomThumbnail();
             std::optional<Ent::Gen2::DebugGridGD> DebugGridGD();
             Ent::Gen2::DebugGridGD addDebugGridGD();
             void removeDebugGridGD();
+            std::optional<Ent::Gen2::DecalComponentGD> DecalComponentGD();
+            Ent::Gen2::DecalComponentGD addDecalComponentGD();
+            void removeDecalComponentGD();
             std::optional<Ent::Gen2::DistanceTriggerGD> DistanceTriggerGD();
             Ent::Gen2::DistanceTriggerGD addDistanceTriggerGD();
             void removeDistanceTriggerGD();
@@ -19989,6 +20447,9 @@ namespace Ent
             std::optional<Ent::Gen2::PickableDistributorComponentGD> PickableDistributorComponentGD();
             Ent::Gen2::PickableDistributorComponentGD addPickableDistributorComponentGD();
             void removePickableDistributorComponentGD();
+            std::optional<Ent::Gen2::PivotControllerGD> PivotControllerGD();
+            Ent::Gen2::PivotControllerGD addPivotControllerGD();
+            void removePivotControllerGD();
             std::optional<Ent::Gen2::PlayerComponentGD> PlayerComponentGD();
             Ent::Gen2::PlayerComponentGD addPlayerComponentGD();
             void removePlayerComponentGD();
@@ -20283,7 +20744,6 @@ namespace Ent
             Ent::Gen2::String GroundTypeWater() const;
             Ent::Gen2::String GroundTypeWaterDeep() const;
             Ent::Gen2::String GroundTypeWaterPuddle() const;
-            Array<Ent::Gen2::GroundTypeData> GroundTypes() const;
             Ent::Gen2::Float HitIntensityHigh() const;
             Ent::Gen2::Float HitIntensityLow() const;
             Ent::Gen2::String InWaterEvent() const;
@@ -20385,10 +20845,10 @@ namespace Ent
             Ent::Gen2::String SwitchState_Level_VeryHigh() const;
             Ent::Gen2::String Switch_Ground_Prefix() const;
             Ent::Gen2::Map<char const*, Ent::Gen2::Color> TagColors() const;
+            Ent::Gen2::Map<char const*, Ent::Gen2::String> TagToMaterialMapping() const;
             Ent::Gen2::String UnderWaterBank() const;
             Ent::Gen2::Bool UnderWaterOnPlayer() const;
             Ent::Gen2::Float UnderwaterOutZone() const;
-            Ent::Gen2::Map<char const*, Ent::Gen2::String> VegetationTagMapping() const;
             Ent::Gen2::Float VerticalUnderWaterOffset() const;
             Ent::Gen2::Float VolumeRTPCScaleFactor() const;
             Ent::Gen2::String _comment() const;
@@ -20754,6 +21214,95 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct CollectibleType : EnumPropHelper<CollectibleType, CollectibleTypeEnum> // Enum
+        {
+            using Enum = CollectibleTypeEnum;
+            using PropHelper<CollectibleType, Enum>::operator=;
+            explicit CollectibleType(Ent::Property _node): EnumPropHelper<CollectibleType, Enum>(std::move(_node)) {}
+            static constexpr char schemaName[] = "CollectibleType";
+            static constexpr char const* enumToString[] = {
+                "Vertebrae",
+                "VertebraeShard",
+                "Schmetre",
+                "EnergyFruit",
+                "UNDEFINED",
+            };
+        };
+        inline char const* toString(CollectibleTypeEnum value)
+        {
+            if(size_t(value) >= std::size(CollectibleType::enumToString))
+                throw std::runtime_error("Wrong enum value");
+            return CollectibleType::enumToString[size_t(value)];
+        }
+        inline char const* toInternal(CollectibleTypeEnum value) { return toString(value); }
+        template<> inline CollectibleTypeEnum strToEnum<CollectibleTypeEnum>(char const* value)
+        {
+            return static_cast<CollectibleTypeEnum>(details::indexInEnum(value, CollectibleType::enumToString));
+        }
+
+        struct CollectorGD : HelperObject<CollectorGD> // Object
+        {
+            explicit CollectorGD(Ent::Property _node): HelperObject<CollectorGD>(std::move(_node)) {}
+            static constexpr char schemaName[] = "CollectorGD";
+            static CollectorGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return CollectorGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static CollectorGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return CollectorGD(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static CollectorGD create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return CollectorGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            CollectorGD makeInstanceOf()
+            {
+                return CollectorGD(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Map<CollectibleTypeEnum, Ent::Gen2::Float> CollectorRangeByType() const;
+            Ent::Gen2::ComponentGD Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct CollectibleGD : HelperObject<CollectibleGD> // Object
+        {
+            explicit CollectibleGD(Ent::Property _node): HelperObject<CollectibleGD>(std::move(_node)) {}
+            static constexpr char schemaName[] = "CollectibleGD";
+            static CollectibleGD load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return CollectibleGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static CollectibleGD loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return CollectibleGD(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static CollectibleGD create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return CollectibleGD(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            CollectibleGD makeInstanceOf()
+            {
+                return CollectibleGD(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::CollectibleType CollectibleType() const;
+            Ent::Gen2::Size CollectorSize() const;
+            Ent::Gen2::StateCollectibleCollected StateCollectibleCollected() const;
+            Ent::Gen2::StateCollectibleCollecting StateCollectibleCollecting() const;
+            Ent::Gen2::StateCollectorCollected StateCollectorCollected() const;
+            Ent::Gen2::StateCollectorCollecting StateCollectorCollecting() const;
+            Ent::Gen2::ComponentGD Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct Codec : HelperObject<Codec> // Object
         {
             explicit Codec(Ent::Property _node): HelperObject<Codec>(std::move(_node)) {}
@@ -20862,6 +21411,7 @@ namespace Ent
                 return ClimbEdgeData_LedgeData(getProperty().makeInstanceOf());
             }
             Ent::Gen2::String _comment() const;
+            Ent::Gen2::Float activationDelayAfterLeavingGround() const;
             Ent::Gen2::Float ledgeApproachSpeedMaxZ() const;
             Ent::Gen2::Float ledgeDepthRadiusCoeff() const;
             Ent::Gen2::Vector3 ledgeDetectionOffset() const;
@@ -21539,6 +22089,39 @@ namespace Ent
             Ent::Gen2::Float speedMediumCoeffMin() const;
         };
 
+        struct CharacterControllerPreventUndesiredMovementFromInertiaData : HelperObject<CharacterControllerPreventUndesiredMovementFromInertiaData> // Object
+        {
+            explicit CharacterControllerPreventUndesiredMovementFromInertiaData(Ent::Property _node): HelperObject<CharacterControllerPreventUndesiredMovementFromInertiaData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "CharacterControllerPreventUndesiredMovementFromInertiaData";
+            static CharacterControllerPreventUndesiredMovementFromInertiaData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return CharacterControllerPreventUndesiredMovementFromInertiaData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static CharacterControllerPreventUndesiredMovementFromInertiaData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return CharacterControllerPreventUndesiredMovementFromInertiaData(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static CharacterControllerPreventUndesiredMovementFromInertiaData create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return CharacterControllerPreventUndesiredMovementFromInertiaData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            CharacterControllerPreventUndesiredMovementFromInertiaData makeInstanceOf()
+            {
+                return CharacterControllerPreventUndesiredMovementFromInertiaData(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::ScaleConverter brakeAnalogicalSpeed() const;
+            Ent::Gen2::ScaleConverter brakeAnimationSpeed() const;
+            Ent::Gen2::ScaleConverter retimingInertia() const;
+            Ent::Gen2::ScaleConverter retimingPlayRatio() const;
+            Ent::Gen2::ScaleConverter retimingPosition() const;
+            Ent::Gen2::Float slopeAngleMaxInDegree() const;
+        };
+
         struct CharacterControllerGroundNormalData : HelperObject<CharacterControllerGroundNormalData> // Object
         {
             explicit CharacterControllerGroundNormalData(Ent::Property _node): HelperObject<CharacterControllerGroundNormalData>(std::move(_node)) {}
@@ -21572,6 +22155,49 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct CharacterControllerComponentInput_CreatureLOD : HelperObject<CharacterControllerComponentInput_CreatureLOD> // Object
+        {
+            explicit CharacterControllerComponentInput_CreatureLOD(Ent::Property _node): HelperObject<CharacterControllerComponentInput_CreatureLOD>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::CreatureLOD val() const;
+        };
+
+        struct CharacterControllerComponentInput : HelperObject<CharacterControllerComponentInput> // Object
+        {
+            explicit CharacterControllerComponentInput(Ent::Property _node): HelperObject<CharacterControllerComponentInput>(std::move(_node)) {}
+            static constexpr char schemaName[] = "CharacterControllerComponentInput";
+            static CharacterControllerComponentInput load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return CharacterControllerComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static CharacterControllerComponentInput loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return CharacterControllerComponentInput(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static CharacterControllerComponentInput create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return CharacterControllerComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            CharacterControllerComponentInput makeInstanceOf()
+            {
+                return CharacterControllerComponentInput(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::CharacterControllerComponentInput_CreatureLOD CreatureLOD() const;
+            Ent::Gen2::JumpHeightMultiplier JumpHeightMultiplier() const;
+            Ent::Gen2::ResetContinuousPositionOnGround ResetContinuousPositionOnGround() const;
+            Ent::Gen2::RigidbodyScaleMultiplier RigidbodyScaleMultiplier() const;
+            Ent::Gen2::RigidbodyScalingSpeed RigidbodyScalingSpeed() const;
+            Ent::Gen2::ComponentInput Super() const;
+            Ent::Gen2::UpdateContinuousPositionOnGround UpdateContinuousPositionOnGround() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct CharacterControllerClamberData : HelperObject<CharacterControllerClamberData> // Object
         {
             explicit CharacterControllerClamberData(Ent::Property _node): HelperObject<CharacterControllerClamberData>(std::move(_node)) {}
@@ -21602,6 +22228,37 @@ namespace Ent
             Ent::Gen2::Bool IsAllowed() const;
             Ent::Gen2::ScaleConverter VerticalOrientationRatio() const;
             Ent::Gen2::String _comment() const;
+        };
+
+        struct CharacterControllerAnticipationData : HelperObject<CharacterControllerAnticipationData> // Object
+        {
+            explicit CharacterControllerAnticipationData(Ent::Property _node): HelperObject<CharacterControllerAnticipationData>(std::move(_node)) {}
+            static constexpr char schemaName[] = "CharacterControllerAnticipationData";
+            static CharacterControllerAnticipationData load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return CharacterControllerAnticipationData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static CharacterControllerAnticipationData loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return CharacterControllerAnticipationData(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static CharacterControllerAnticipationData create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return CharacterControllerAnticipationData(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            CharacterControllerAnticipationData makeInstanceOf()
+            {
+                return CharacterControllerAnticipationData(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Float anticipationDuration() const;
+            Ent::Gen2::Float groundNormalPercentageEdgeTolerance() const;
+            Ent::Gen2::Float rigidBodySpeedMaxFactor() const;
+            Ent::Gen2::Float rigidBodySpeedMin() const;
         };
 
         struct CarryMode : EnumPropHelper<CarryMode, CarryModeEnum> // Enum
@@ -21796,37 +22453,6 @@ namespace Ent
             Ent::Gen2::Bool val() const;
         };
 
-        struct CreatureComponentInput : HelperObject<CreatureComponentInput> // Object
-        {
-            explicit CreatureComponentInput(Ent::Property _node): HelperObject<CreatureComponentInput>(std::move(_node)) {}
-            static constexpr char schemaName[] = "CreatureComponentInput";
-            static CreatureComponentInput load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return CreatureComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static CreatureComponentInput loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return CreatureComponentInput(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static CreatureComponentInput create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return CreatureComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            CreatureComponentInput makeInstanceOf()
-            {
-                return CreatureComponentInput(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::CanTakeHit CanTakeHit() const;
-            Ent::Gen2::DeltaTimeFactor DeltaTimeFactor() const;
-            Ent::Gen2::Invincible Invincible() const;
-            Ent::Gen2::ComponentInput Super() const;
-            Ent::Gen2::String _comment() const;
-        };
-
         struct CanPossess : HelperObject<CanPossess> // Object
         {
             explicit CanPossess(Ent::Property _node): HelperObject<CanPossess>(std::move(_node)) {}
@@ -21877,6 +22503,15 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct CanBePossessed : HelperObject<CanBePossessed> // Object
+        {
+            explicit CanBePossessed(Ent::Property _node): HelperObject<CanBePossessed>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::Bool val() const;
+        };
+
         struct CanBeInteractedWith : HelperObject<CanBeInteractedWith> // Object
         {
             explicit CanBeInteractedWith(Ent::Property _node): HelperObject<CanBeInteractedWith>(std::move(_node)) {}
@@ -21912,6 +22547,48 @@ namespace Ent
             }
             Ent::Gen2::CanBeInteractedWith CanBeInteractedWith() const;
             Ent::Gen2::Interactor Interactor() const;
+            Ent::Gen2::ComponentInput Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct CanBeConverted : HelperObject<CanBeConverted> // Object
+        {
+            explicit CanBeConverted(Ent::Property _node): HelperObject<CanBeConverted>(std::move(_node)) {}
+            
+            Ent::Gen2::String _comment() const;
+            Ent::Gen2::Bool engaged() const;
+            Ent::Gen2::Bool val() const;
+        };
+
+        struct CreatureComponentInput : HelperObject<CreatureComponentInput> // Object
+        {
+            explicit CreatureComponentInput(Ent::Property _node): HelperObject<CreatureComponentInput>(std::move(_node)) {}
+            static constexpr char schemaName[] = "CreatureComponentInput";
+            static CreatureComponentInput load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return CreatureComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static CreatureComponentInput loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return CreatureComponentInput(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static CreatureComponentInput create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return CreatureComponentInput(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            CreatureComponentInput makeInstanceOf()
+            {
+                return CreatureComponentInput(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::CanBeConverted CanBeConverted() const;
+            Ent::Gen2::CanBePossessed CanBePossessed() const;
+            Ent::Gen2::CanTakeHit CanTakeHit() const;
+            Ent::Gen2::DeltaTimeFactor DeltaTimeFactor() const;
+            Ent::Gen2::Invincible Invincible() const;
             Ent::Gen2::ComponentInput Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -23047,35 +23724,6 @@ namespace Ent
             return static_cast<AttackTypeEnum>(details::indexInEnum(value, AttackType::enumToString));
         }
 
-        struct AttackPositionRetimingData_SpecieRetimingCoeff : HelperObject<AttackPositionRetimingData_SpecieRetimingCoeff> // Object
-        {
-            explicit AttackPositionRetimingData_SpecieRetimingCoeff(Ent::Property _node): HelperObject<AttackPositionRetimingData_SpecieRetimingCoeff>(std::move(_node)) {}
-            static constexpr char schemaName[] = "AttackPositionRetimingData::SpecieRetimingCoeff";
-            static AttackPositionRetimingData_SpecieRetimingCoeff load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return AttackPositionRetimingData_SpecieRetimingCoeff(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static AttackPositionRetimingData_SpecieRetimingCoeff loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return AttackPositionRetimingData_SpecieRetimingCoeff(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static AttackPositionRetimingData_SpecieRetimingCoeff create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return AttackPositionRetimingData_SpecieRetimingCoeff(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            AttackPositionRetimingData_SpecieRetimingCoeff makeInstanceOf()
-            {
-                return AttackPositionRetimingData_SpecieRetimingCoeff(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::String _comment() const;
-            Ent::Gen2::Float defaultCoeff() const;
-            Ent::Gen2::Float masterCoeff() const;
-        };
-
         struct AttackPositionRetimingData : HelperObject<AttackPositionRetimingData> // Object
         {
             explicit AttackPositionRetimingData(Ent::Property _node): HelperObject<AttackPositionRetimingData>(std::move(_node)) {}
@@ -23102,7 +23750,6 @@ namespace Ent
             }
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Float animTranslationCoeff() const;
-            Ent::Gen2::Map<SpecieEnum, Ent::Gen2::AttackPositionRetimingData_SpecieRetimingCoeff> backwardRetimingCoeffBySpecie() const;
             Ent::Gen2::Float lengthMax() const;
             Ent::Gen2::Float lengthMin() const;
             Ent::Gen2::Float spherecastRadiusCoeff() const;
@@ -23244,7 +23891,8 @@ namespace Ent
             {
                 return GameAttackData(getProperty().makeInstanceOf());
             }
-            Ent::Gen2::Float AggressiveDuration() const;
+            Ent::Gen2::Float AggressiveDurationMax() const;
+            Ent::Gen2::Float AggressiveDurationMin() const;
             Ent::Gen2::Map<char const*, Ent::Gen2::CameraShakeData> AttackCameraShakeData() const;
             Ent::Gen2::Map<char const*, Ent::Gen2::AttackDamageData> AttackDamageData() const;
             Ent::Gen2::Map<char const*, Ent::Gen2::AttackImpactData> AttackImpactData() const;
@@ -24060,6 +24708,8 @@ namespace Ent
             {
                 return MoveCapacityData(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::MoveCapacityData_Dodge Dodge() const;
+            Ent::Gen2::Float LandingDecelerationFactor() const;
             Ent::Gen2::Float MaxAngleToDetectLandingGripDirection() const;
             Ent::Gen2::Float MinAngleToAllowLeaveMotionConstraintCurve() const;
             Ent::Gen2::String _comment() const;
@@ -24085,7 +24735,6 @@ namespace Ent
             Ent::Gen2::Float coyoteJumpMaxTime() const;
             Ent::Gen2::Float crashPreventionSafeguardFactor() const;
             Ent::Gen2::Float defaultWorldUpSpeedFactor() const;
-            Ent::Gen2::Float dodgeCooldownTime() const;
             Ent::Gen2::Bool doubleJump() const;
             Ent::Gen2::ScaleConverter dropPlaneLegLenFactor() const;
             Ent::Gen2::Bool dropSyncTrajectoryAndVisual() const;
@@ -24117,6 +24766,7 @@ namespace Ent
             Ent::Gen2::Float reachSpeedDeceleration() const;
             Ent::Gen2::Bool reactToOtherCharacterBodyCollision() const;
             Ent::Gen2::Float rigidbodyScalingSpeed() const;
+            Ent::Gen2::Float rigidbodyScalingSpeedInAir() const;
             Ent::Gen2::Float sphereCastRadiusRatio() const;
             Ent::Gen2::Float sphereOverrideRadius() const;
             Ent::Gen2::Float strafeBlendIn() const;
@@ -24125,6 +24775,7 @@ namespace Ent
             Ent::Gen2::SpeedMode strafeSpeedModeMax() const;
             Ent::Gen2::Float strafeStopOrientationRateFactor() const;
             Ent::Gen2::Float strafeTurnAngleMin() const;
+            Ent::Gen2::timeSinceLastTurnForDecreasingSpeed timeSinceLastTurnForDecreasingSpeed() const;
             Ent::Gen2::Float trajectoryRateFactorDuringLateralLand() const;
             Ent::Gen2::Float turnAroundInputDirectionAngleDeltaMin() const;
             Ent::Gen2::MoveCapacityData_TurnJump turnJump() const;
@@ -24612,6 +25263,7 @@ namespace Ent
                 return CharacterControllerGD(getProperty().makeInstanceOf());
             }
             Ent::Gen2::Bool AllowHeightMapFallback() const;
+            Ent::Gen2::CharacterControllerAnticipationData AnticipationData() const;
             Ent::Gen2::CharacterControllerClamberData ClamberData() const;
             Ent::Gen2::CharacterControllerFallData FallData() const;
             Ent::Gen2::CharacterControllerGroundNormalData GroundNormalData() const;
@@ -24621,6 +25273,7 @@ namespace Ent
             Ent::Gen2::InputCollisionBehaviorData InputCollisionData() const;
             Ent::Gen2::MeshNavigationBehaviorData MeshNavigationData() const;
             Ent::Gen2::PredictionBehaviorData PredictionData() const;
+            Ent::Gen2::CharacterControllerPreventUndesiredMovementFromInertiaData PreventUndesiredMovementFromInertiaData() const;
             Ent::Gen2::Vector3 RotationSmooth() const;
             Ent::Gen2::CharacterControllerSlideData SlideData() const;
             Ent::Gen2::ComponentGD Super() const;
@@ -24977,9 +25630,12 @@ namespace Ent
             std::optional<Ent::Gen2::ActorStateApplyHit> ActorStateApplyHit();
             Ent::Gen2::ActorStateApplyHit addActorStateApplyHit();
             void removeActorStateApplyHit();
-            std::optional<Ent::Gen2::ActorStateAttitudeAggressive> ActorStateAttitudeAggressive();
-            Ent::Gen2::ActorStateAttitudeAggressive addActorStateAttitudeAggressive();
-            void removeActorStateAttitudeAggressive();
+            std::optional<Ent::Gen2::ActorStateAttitudeAggressivePersistent> ActorStateAttitudeAggressivePersistent();
+            Ent::Gen2::ActorStateAttitudeAggressivePersistent addActorStateAttitudeAggressivePersistent();
+            void removeActorStateAttitudeAggressivePersistent();
+            std::optional<Ent::Gen2::ActorStateAttitudeAggressiveTemporary> ActorStateAttitudeAggressiveTemporary();
+            Ent::Gen2::ActorStateAttitudeAggressiveTemporary addActorStateAttitudeAggressiveTemporary();
+            void removeActorStateAttitudeAggressiveTemporary();
             std::optional<Ent::Gen2::ActorStateBehaviorState> ActorStateBehaviorState();
             Ent::Gen2::ActorStateBehaviorState addActorStateBehaviorState();
             void removeActorStateBehaviorState();
@@ -25214,9 +25870,6 @@ namespace Ent
             std::optional<Ent::Gen2::ActorStateSpeedMultiplier> ActorStateSpeedMultiplier();
             Ent::Gen2::ActorStateSpeedMultiplier addActorStateSpeedMultiplier();
             void removeActorStateSpeedMultiplier();
-            std::optional<Ent::Gen2::ActorStateStopAttitudeAggressive> ActorStateStopAttitudeAggressive();
-            Ent::Gen2::ActorStateStopAttitudeAggressive addActorStateStopAttitudeAggressive();
-            void removeActorStateStopAttitudeAggressive();
             std::optional<Ent::Gen2::ActorStateTaunting> ActorStateTaunting();
             Ent::Gen2::ActorStateTaunting addActorStateTaunting();
             void removeActorStateTaunting();
@@ -25235,6 +25888,9 @@ namespace Ent
             std::optional<Ent::Gen2::ActorStateTryUpgradeShamanStaff> ActorStateTryUpgradeShamanStaff();
             Ent::Gen2::ActorStateTryUpgradeShamanStaff addActorStateTryUpgradeShamanStaff();
             void removeActorStateTryUpgradeShamanStaff();
+            std::optional<Ent::Gen2::EntityStateAI> EntityStateAI();
+            Ent::Gen2::EntityStateAI addEntityStateAI();
+            void removeEntityStateAI();
             std::optional<Ent::Gen2::EntityStateAboutToBeHatched> EntityStateAboutToBeHatched();
             Ent::Gen2::EntityStateAboutToBeHatched addEntityStateAboutToBeHatched();
             void removeEntityStateAboutToBeHatched();
@@ -25268,15 +25924,15 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateBackwardLand> EntityStateBackwardLand();
             Ent::Gen2::EntityStateBackwardLand addEntityStateBackwardLand();
             void removeEntityStateBackwardLand();
-            std::optional<Ent::Gen2::EntityStateBeingBlockedByVine> EntityStateBeingBlockedByVine();
-            Ent::Gen2::EntityStateBeingBlockedByVine addEntityStateBeingBlockedByVine();
-            void removeEntityStateBeingBlockedByVine();
             std::optional<Ent::Gen2::EntityStateBeingFocusedToInteract> EntityStateBeingFocusedToInteract();
             Ent::Gen2::EntityStateBeingFocusedToInteract addEntityStateBeingFocusedToInteract();
             void removeEntityStateBeingFocusedToInteract();
             std::optional<Ent::Gen2::EntityStateBeingFocusedToPossess> EntityStateBeingFocusedToPossess();
             Ent::Gen2::EntityStateBeingFocusedToPossess addEntityStateBeingFocusedToPossess();
             void removeEntityStateBeingFocusedToPossess();
+            std::optional<Ent::Gen2::EntityStateBeingInPlantCage> EntityStateBeingInPlantCage();
+            Ent::Gen2::EntityStateBeingInPlantCage addEntityStateBeingInPlantCage();
+            void removeEntityStateBeingInPlantCage();
             std::optional<Ent::Gen2::EntityStateBeingInReeds> EntityStateBeingInReeds();
             Ent::Gen2::EntityStateBeingInReeds addEntityStateBeingInReeds();
             void removeEntityStateBeingInReeds();
@@ -25346,9 +26002,9 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateCanNotBePerceived> EntityStateCanNotBePerceived();
             Ent::Gen2::EntityStateCanNotBePerceived addEntityStateCanNotBePerceived();
             void removeEntityStateCanNotBePerceived();
-            std::optional<Ent::Gen2::EntityStateCancelSetSavePoint> EntityStateCancelSetSavePoint();
-            Ent::Gen2::EntityStateCancelSetSavePoint addEntityStateCancelSetSavePoint();
-            void removeEntityStateCancelSetSavePoint();
+            std::optional<Ent::Gen2::EntityStateCancelSave> EntityStateCancelSave();
+            Ent::Gen2::EntityStateCancelSave addEntityStateCancelSave();
+            void removeEntityStateCancelSave();
             std::optional<Ent::Gen2::EntityStateChargeMode> EntityStateChargeMode();
             Ent::Gen2::EntityStateChargeMode addEntityStateChargeMode();
             void removeEntityStateChargeMode();
@@ -25382,6 +26038,12 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateCollectVertebrae> EntityStateCollectVertebrae();
             Ent::Gen2::EntityStateCollectVertebrae addEntityStateCollectVertebrae();
             void removeEntityStateCollectVertebrae();
+            std::optional<Ent::Gen2::EntityStateCollectVertebraeShard> EntityStateCollectVertebraeShard();
+            Ent::Gen2::EntityStateCollectVertebraeShard addEntityStateCollectVertebraeShard();
+            void removeEntityStateCollectVertebraeShard();
+            std::optional<Ent::Gen2::EntityStateCollecting> EntityStateCollecting();
+            Ent::Gen2::EntityStateCollecting addEntityStateCollecting();
+            void removeEntityStateCollecting();
             std::optional<Ent::Gen2::EntityStateCombat> EntityStateCombat();
             Ent::Gen2::EntityStateCombat addEntityStateCombat();
             void removeEntityStateCombat();
@@ -25394,6 +26056,12 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateControlGPE> EntityStateControlGPE();
             Ent::Gen2::EntityStateControlGPE addEntityStateControlGPE();
             void removeEntityStateControlGPE();
+            std::optional<Ent::Gen2::EntityStateConversionTransitionTo> EntityStateConversionTransitionTo();
+            Ent::Gen2::EntityStateConversionTransitionTo addEntityStateConversionTransitionTo();
+            void removeEntityStateConversionTransitionTo();
+            std::optional<Ent::Gen2::EntityStateConverted> EntityStateConverted();
+            Ent::Gen2::EntityStateConverted addEntityStateConverted();
+            void removeEntityStateConverted();
             std::optional<Ent::Gen2::EntityStateCoyoteJump> EntityStateCoyoteJump();
             Ent::Gen2::EntityStateCoyoteJump addEntityStateCoyoteJump();
             void removeEntityStateCoyoteJump();
@@ -25445,9 +26113,6 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateEnergySpoutState> EntityStateEnergySpoutState();
             Ent::Gen2::EntityStateEnergySpoutState addEntityStateEnergySpoutState();
             void removeEntityStateEnergySpoutState();
-            std::optional<Ent::Gen2::EntityStateEnterDeathVolume> EntityStateEnterDeathVolume();
-            Ent::Gen2::EntityStateEnterDeathVolume addEntityStateEnterDeathVolume();
-            void removeEntityStateEnterDeathVolume();
             std::optional<Ent::Gen2::EntityStateExtraLife> EntityStateExtraLife();
             Ent::Gen2::EntityStateExtraLife addEntityStateExtraLife();
             void removeEntityStateExtraLife();
@@ -25499,6 +26164,9 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateGrasp> EntityStateGrasp();
             Ent::Gen2::EntityStateGrasp addEntityStateGrasp();
             void removeEntityStateGrasp();
+            std::optional<Ent::Gen2::EntityStateGraspIntention> EntityStateGraspIntention();
+            Ent::Gen2::EntityStateGraspIntention addEntityStateGraspIntention();
+            void removeEntityStateGraspIntention();
             std::optional<Ent::Gen2::EntityStateGroundedJump> EntityStateGroundedJump();
             Ent::Gen2::EntityStateGroundedJump addEntityStateGroundedJump();
             void removeEntityStateGroundedJump();
@@ -25550,6 +26218,9 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateJustStarted> EntityStateJustStarted();
             Ent::Gen2::EntityStateJustStarted addEntityStateJustStarted();
             void removeEntityStateJustStarted();
+            std::optional<Ent::Gen2::EntityStateJustTeleported> EntityStateJustTeleported();
+            Ent::Gen2::EntityStateJustTeleported addEntityStateJustTeleported();
+            void removeEntityStateJustTeleported();
             std::optional<Ent::Gen2::EntityStateLateralDodge> EntityStateLateralDodge();
             Ent::Gen2::EntityStateLateralDodge addEntityStateLateralDodge();
             void removeEntityStateLateralDodge();
@@ -25616,6 +26287,18 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStatePlayer> EntityStatePlayer();
             Ent::Gen2::EntityStatePlayer addEntityStatePlayer();
             void removeEntityStatePlayer();
+            std::optional<Ent::Gen2::EntityStatePlayerHatchingPool> EntityStatePlayerHatchingPool();
+            Ent::Gen2::EntityStatePlayerHatchingPool addEntityStatePlayerHatchingPool();
+            void removeEntityStatePlayerHatchingPool();
+            std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolIn> EntityStatePlayerHatchingPoolIn();
+            Ent::Gen2::EntityStatePlayerHatchingPoolIn addEntityStatePlayerHatchingPoolIn();
+            void removeEntityStatePlayerHatchingPoolIn();
+            std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolOut> EntityStatePlayerHatchingPoolOut();
+            Ent::Gen2::EntityStatePlayerHatchingPoolOut addEntityStatePlayerHatchingPoolOut();
+            void removeEntityStatePlayerHatchingPoolOut();
+            std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolSetup> EntityStatePlayerHatchingPoolSetup();
+            Ent::Gen2::EntityStatePlayerHatchingPoolSetup addEntityStatePlayerHatchingPoolSetup();
+            void removeEntityStatePlayerHatchingPoolSetup();
             std::optional<Ent::Gen2::EntityStatePlungeLand> EntityStatePlungeLand();
             Ent::Gen2::EntityStatePlungeLand addEntityStatePlungeLand();
             void removeEntityStatePlungeLand();
@@ -25625,6 +26308,12 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStatePreventAscendInSlope> EntityStatePreventAscendInSlope();
             Ent::Gen2::EntityStatePreventAscendInSlope addEntityStatePreventAscendInSlope();
             void removeEntityStatePreventAscendInSlope();
+            std::optional<Ent::Gen2::EntityStatePreventSave> EntityStatePreventSave();
+            Ent::Gen2::EntityStatePreventSave addEntityStatePreventSave();
+            void removeEntityStatePreventSave();
+            std::optional<Ent::Gen2::EntityStatePreventUndesiredMovementDueToInertia> EntityStatePreventUndesiredMovementDueToInertia();
+            Ent::Gen2::EntityStatePreventUndesiredMovementDueToInertia addEntityStatePreventUndesiredMovementDueToInertia();
+            void removeEntityStatePreventUndesiredMovementDueToInertia();
             std::optional<Ent::Gen2::EntityStateRaise> EntityStateRaise();
             Ent::Gen2::EntityStateRaise addEntityStateRaise();
             void removeEntityStateRaise();
@@ -25637,6 +26326,9 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateRegainCapacity> EntityStateRegainCapacity();
             Ent::Gen2::EntityStateRegainCapacity addEntityStateRegainCapacity();
             void removeEntityStateRegainCapacity();
+            std::optional<Ent::Gen2::EntityStateRepositionToLastSafeGroundedPosition> EntityStateRepositionToLastSafeGroundedPosition();
+            Ent::Gen2::EntityStateRepositionToLastSafeGroundedPosition addEntityStateRepositionToLastSafeGroundedPosition();
+            void removeEntityStateRepositionToLastSafeGroundedPosition();
             std::optional<Ent::Gen2::EntityStateReserveMountSlots> EntityStateReserveMountSlots();
             Ent::Gen2::EntityStateReserveMountSlots addEntityStateReserveMountSlots();
             void removeEntityStateReserveMountSlots();
@@ -25649,12 +26341,15 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateRevive> EntityStateRevive();
             Ent::Gen2::EntityStateRevive addEntityStateRevive();
             void removeEntityStateRevive();
+            std::optional<Ent::Gen2::EntityStateSaveNow> EntityStateSaveNow();
+            Ent::Gen2::EntityStateSaveNow addEntityStateSaveNow();
+            void removeEntityStateSaveNow();
             std::optional<Ent::Gen2::EntityStateSavePointActivated> EntityStateSavePointActivated();
             Ent::Gen2::EntityStateSavePointActivated addEntityStateSavePointActivated();
             void removeEntityStateSavePointActivated();
-            std::optional<Ent::Gen2::EntityStateSetSavePoint> EntityStateSetSavePoint();
-            Ent::Gen2::EntityStateSetSavePoint addEntityStateSetSavePoint();
-            void removeEntityStateSetSavePoint();
+            std::optional<Ent::Gen2::EntityStateSaveWhenPossible> EntityStateSaveWhenPossible();
+            Ent::Gen2::EntityStateSaveWhenPossible addEntityStateSaveWhenPossible();
+            void removeEntityStateSaveWhenPossible();
             std::optional<Ent::Gen2::EntityStateShootHatchingEnergy> EntityStateShootHatchingEnergy();
             Ent::Gen2::EntityStateShootHatchingEnergy addEntityStateShootHatchingEnergy();
             void removeEntityStateShootHatchingEnergy();
@@ -25721,9 +26416,18 @@ namespace Ent
             std::optional<Ent::Gen2::EntityStateStrongAttackJumped> EntityStateStrongAttackJumped();
             Ent::Gen2::EntityStateStrongAttackJumped addEntityStateStrongAttackJumped();
             void removeEntityStateStrongAttackJumped();
+            std::optional<Ent::Gen2::EntityStateStuck> EntityStateStuck();
+            Ent::Gen2::EntityStateStuck addEntityStateStuck();
+            void removeEntityStateStuck();
+            std::optional<Ent::Gen2::EntityStateStuckOut> EntityStateStuckOut();
+            Ent::Gen2::EntityStateStuckOut addEntityStateStuckOut();
+            void removeEntityStateStuckOut();
             std::optional<Ent::Gen2::EntityStateTakeDamageOnMount> EntityStateTakeDamageOnMount();
             Ent::Gen2::EntityStateTakeDamageOnMount addEntityStateTakeDamageOnMount();
             void removeEntityStateTakeDamageOnMount();
+            std::optional<Ent::Gen2::EntityStateTeleportToSafePosition> EntityStateTeleportToSafePosition();
+            Ent::Gen2::EntityStateTeleportToSafePosition addEntityStateTeleportToSafePosition();
+            void removeEntityStateTeleportToSafePosition();
             std::optional<Ent::Gen2::EntityStateTooDeep> EntityStateTooDeep();
             Ent::Gen2::EntityStateTooDeep addEntityStateTooDeep();
             void removeEntityStateTooDeep();
@@ -26529,6 +27233,38 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct EntityStateTeleportToSafePosition : HelperObject<EntityStateTeleportToSafePosition> // Object
+        {
+            explicit EntityStateTeleportToSafePosition(Ent::Property _node): HelperObject<EntityStateTeleportToSafePosition>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateTeleportToSafePosition";
+            static EntityStateTeleportToSafePosition load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateTeleportToSafePosition(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateTeleportToSafePosition loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateTeleportToSafePosition(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateTeleportToSafePosition create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateTeleportToSafePosition(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateTeleportToSafePosition makeInstanceOf()
+            {
+                return EntityStateTeleportToSafePosition(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Float FadeInDelay() const;
+            Ent::Gen2::Float FadeInTime() const;
+            Ent::Gen2::Float FadeOutDelay() const;
+            Ent::Gen2::Float FadeOutTime() const;
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct EntityStateTakeDamageOnMount : HelperObject<EntityStateTakeDamageOnMount> // Object
         {
             explicit EntityStateTakeDamageOnMount(Ent::Property _node): HelperObject<EntityStateTakeDamageOnMount>(std::move(_node)) {}
@@ -26552,6 +27288,62 @@ namespace Ent
             EntityStateTakeDamageOnMount makeInstanceOf()
             {
                 return EntityStateTakeDamageOnMount(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateStuckOut : HelperObject<EntityStateStuckOut> // Object
+        {
+            explicit EntityStateStuckOut(Ent::Property _node): HelperObject<EntityStateStuckOut>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateStuckOut";
+            static EntityStateStuckOut load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateStuckOut(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateStuckOut loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateStuckOut(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateStuckOut create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateStuckOut(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateStuckOut makeInstanceOf()
+            {
+                return EntityStateStuckOut(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateStuck : HelperObject<EntityStateStuck> // Object
+        {
+            explicit EntityStateStuck(Ent::Property _node): HelperObject<EntityStateStuck>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateStuck";
+            static EntityStateStuck load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateStuck(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateStuck loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateStuck(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateStuck create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateStuck(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateStuck makeInstanceOf()
+            {
+                return EntityStateStuck(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
@@ -27175,30 +27967,31 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
-        struct EntityStateSetSavePoint : HelperObject<EntityStateSetSavePoint> // Object
+        struct EntityStateSaveWhenPossible : HelperObject<EntityStateSaveWhenPossible> // Object
         {
-            explicit EntityStateSetSavePoint(Ent::Property _node): HelperObject<EntityStateSetSavePoint>(std::move(_node)) {}
-            static constexpr char schemaName[] = "EntityStateSetSavePoint";
-            static EntityStateSetSavePoint load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            explicit EntityStateSaveWhenPossible(Ent::Property _node): HelperObject<EntityStateSaveWhenPossible>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateSaveWhenPossible";
+            static EntityStateSaveWhenPossible load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
-                return EntityStateSetSavePoint(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+                return EntityStateSaveWhenPossible(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
             }
-            static EntityStateSetSavePoint loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static EntityStateSaveWhenPossible loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 auto& storage = _entlib.createTempJsonFile();
                 storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return EntityStateSetSavePoint(Ent::Property(
+                return EntityStateSaveWhenPossible(Ent::Property(
                     &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
             }
-            static EntityStateSetSavePoint create(Ent::EntityLib& _entlib)
+            static EntityStateSaveWhenPossible create(Ent::EntityLib& _entlib)
             {
                 auto& storage = _entlib.createTempJsonFile();
-                return EntityStateSetSavePoint(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+                return EntityStateSaveWhenPossible(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
             }
-            EntityStateSetSavePoint makeInstanceOf()
+            EntityStateSaveWhenPossible makeInstanceOf()
             {
-                return EntityStateSetSavePoint(getProperty().makeInstanceOf());
+                return EntityStateSaveWhenPossible(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::EntityRef RespawnSlot() const;
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -27226,6 +28019,34 @@ namespace Ent
             EntityStateSavePointActivated makeInstanceOf()
             {
                 return EntityStateSavePointActivated(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateSaveNow : HelperObject<EntityStateSaveNow> // Object
+        {
+            explicit EntityStateSaveNow(Ent::Property _node): HelperObject<EntityStateSaveNow>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateSaveNow";
+            static EntityStateSaveNow load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateSaveNow(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateSaveNow loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateSaveNow(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateSaveNow create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateSaveNow(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateSaveNow makeInstanceOf()
+            {
+                return EntityStateSaveNow(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
@@ -27346,6 +28167,34 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct EntityStateRepositionToLastSafeGroundedPosition : HelperObject<EntityStateRepositionToLastSafeGroundedPosition> // Object
+        {
+            explicit EntityStateRepositionToLastSafeGroundedPosition(Ent::Property _node): HelperObject<EntityStateRepositionToLastSafeGroundedPosition>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateRepositionToLastSafeGroundedPosition";
+            static EntityStateRepositionToLastSafeGroundedPosition load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateRepositionToLastSafeGroundedPosition(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateRepositionToLastSafeGroundedPosition loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateRepositionToLastSafeGroundedPosition(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateRepositionToLastSafeGroundedPosition create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateRepositionToLastSafeGroundedPosition(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateRepositionToLastSafeGroundedPosition makeInstanceOf()
+            {
+                return EntityStateRepositionToLastSafeGroundedPosition(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct EntityStateRegainCapacity : HelperObject<EntityStateRegainCapacity> // Object
         {
             explicit EntityStateRegainCapacity(Ent::Property _node): HelperObject<EntityStateRegainCapacity>(std::move(_node)) {}
@@ -27460,6 +28309,62 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct EntityStatePreventUndesiredMovementDueToInertia : HelperObject<EntityStatePreventUndesiredMovementDueToInertia> // Object
+        {
+            explicit EntityStatePreventUndesiredMovementDueToInertia(Ent::Property _node): HelperObject<EntityStatePreventUndesiredMovementDueToInertia>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStatePreventUndesiredMovementDueToInertia";
+            static EntityStatePreventUndesiredMovementDueToInertia load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStatePreventUndesiredMovementDueToInertia(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStatePreventUndesiredMovementDueToInertia loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStatePreventUndesiredMovementDueToInertia(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStatePreventUndesiredMovementDueToInertia create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStatePreventUndesiredMovementDueToInertia(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStatePreventUndesiredMovementDueToInertia makeInstanceOf()
+            {
+                return EntityStatePreventUndesiredMovementDueToInertia(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStatePreventSave : HelperObject<EntityStatePreventSave> // Object
+        {
+            explicit EntityStatePreventSave(Ent::Property _node): HelperObject<EntityStatePreventSave>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStatePreventSave";
+            static EntityStatePreventSave load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStatePreventSave(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStatePreventSave loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStatePreventSave(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStatePreventSave create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStatePreventSave(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStatePreventSave makeInstanceOf()
+            {
+                return EntityStatePreventSave(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct EntityStatePreventAscendInSlope : HelperObject<EntityStatePreventAscendInSlope> // Object
         {
             explicit EntityStatePreventAscendInSlope(Ent::Property _node): HelperObject<EntityStatePreventAscendInSlope>(std::move(_node)) {}
@@ -27540,6 +28445,119 @@ namespace Ent
             {
                 return EntityStatePlungeLand(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStatePlayerHatchingPoolSetup : HelperObject<EntityStatePlayerHatchingPoolSetup> // Object
+        {
+            explicit EntityStatePlayerHatchingPoolSetup(Ent::Property _node): HelperObject<EntityStatePlayerHatchingPoolSetup>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStatePlayerHatchingPoolSetup";
+            static EntityStatePlayerHatchingPoolSetup load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStatePlayerHatchingPoolSetup(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStatePlayerHatchingPoolSetup loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStatePlayerHatchingPoolSetup(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStatePlayerHatchingPoolSetup create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStatePlayerHatchingPoolSetup(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStatePlayerHatchingPoolSetup makeInstanceOf()
+            {
+                return EntityStatePlayerHatchingPoolSetup(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStatePlayerHatchingPoolOut : HelperObject<EntityStatePlayerHatchingPoolOut> // Object
+        {
+            explicit EntityStatePlayerHatchingPoolOut(Ent::Property _node): HelperObject<EntityStatePlayerHatchingPoolOut>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStatePlayerHatchingPoolOut";
+            static EntityStatePlayerHatchingPoolOut load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStatePlayerHatchingPoolOut(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStatePlayerHatchingPoolOut loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStatePlayerHatchingPoolOut(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStatePlayerHatchingPoolOut create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStatePlayerHatchingPoolOut(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStatePlayerHatchingPoolOut makeInstanceOf()
+            {
+                return EntityStatePlayerHatchingPoolOut(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStatePlayerHatchingPoolIn : HelperObject<EntityStatePlayerHatchingPoolIn> // Object
+        {
+            explicit EntityStatePlayerHatchingPoolIn(Ent::Property _node): HelperObject<EntityStatePlayerHatchingPoolIn>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStatePlayerHatchingPoolIn";
+            static EntityStatePlayerHatchingPoolIn load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStatePlayerHatchingPoolIn(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStatePlayerHatchingPoolIn loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStatePlayerHatchingPoolIn(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStatePlayerHatchingPoolIn create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStatePlayerHatchingPoolIn(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStatePlayerHatchingPoolIn makeInstanceOf()
+            {
+                return EntityStatePlayerHatchingPoolIn(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStatePlayerHatchingPool : HelperObject<EntityStatePlayerHatchingPool> // Object
+        {
+            explicit EntityStatePlayerHatchingPool(Ent::Property _node): HelperObject<EntityStatePlayerHatchingPool>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStatePlayerHatchingPool";
+            static EntityStatePlayerHatchingPool load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStatePlayerHatchingPool(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStatePlayerHatchingPool loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStatePlayerHatchingPool(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStatePlayerHatchingPool create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStatePlayerHatchingPool(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStatePlayerHatchingPool makeInstanceOf()
+            {
+                return EntityStatePlayerHatchingPool(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::EntityStatePlayerHatchingPool_Inputs Inputs() const;
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -28166,6 +29184,34 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct EntityStateJustTeleported : HelperObject<EntityStateJustTeleported> // Object
+        {
+            explicit EntityStateJustTeleported(Ent::Property _node): HelperObject<EntityStateJustTeleported>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateJustTeleported";
+            static EntityStateJustTeleported load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateJustTeleported(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateJustTeleported loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateJustTeleported(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateJustTeleported create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateJustTeleported(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateJustTeleported makeInstanceOf()
+            {
+                return EntityStateJustTeleported(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct EntityStateJustStarted : HelperObject<EntityStateJustStarted> // Object
         {
             explicit EntityStateJustStarted(Ent::Property _node): HelperObject<EntityStateJustStarted>(std::move(_node)) {}
@@ -28640,6 +29686,34 @@ namespace Ent
             EntityStateGroundedJump makeInstanceOf()
             {
                 return EntityStateGroundedJump(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateGraspIntention : HelperObject<EntityStateGraspIntention> // Object
+        {
+            explicit EntityStateGraspIntention(Ent::Property _node): HelperObject<EntityStateGraspIntention>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateGraspIntention";
+            static EntityStateGraspIntention load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateGraspIntention(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateGraspIntention loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateGraspIntention(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateGraspIntention create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateGraspIntention(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateGraspIntention makeInstanceOf()
+            {
+                return EntityStateGraspIntention(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
@@ -29122,35 +30196,6 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
-        struct EntityStateEnterDeathVolume : HelperObject<EntityStateEnterDeathVolume> // Object
-        {
-            explicit EntityStateEnterDeathVolume(Ent::Property _node): HelperObject<EntityStateEnterDeathVolume>(std::move(_node)) {}
-            static constexpr char schemaName[] = "EntityStateEnterDeathVolume";
-            static EntityStateEnterDeathVolume load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return EntityStateEnterDeathVolume(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static EntityStateEnterDeathVolume loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return EntityStateEnterDeathVolume(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static EntityStateEnterDeathVolume create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return EntityStateEnterDeathVolume(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            EntityStateEnterDeathVolume makeInstanceOf()
-            {
-                return EntityStateEnterDeathVolume(getProperty().makeInstanceOf());
-            }
-            PrimArray<Ent::Gen2::Specie> AutorizedSpecies() const;
-            Ent::Gen2::ActorState Super() const;
-            Ent::Gen2::String _comment() const;
-        };
-
         struct EntityStateEnergySpoutState : HelperObject<EntityStateEnergySpoutState> // Object
         {
             explicit EntityStateEnergySpoutState(Ent::Property _node): HelperObject<EntityStateEnergySpoutState>(std::move(_node)) {}
@@ -29233,6 +30278,7 @@ namespace Ent
             {
                 return EntityStateEnergyRootHatching(getProperty().makeInstanceOf());
             }
+            Ent::Gen2::EntityStateEnergyRootHatching_Inputs Inputs() const;
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -29632,6 +30678,62 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct EntityStateConverted : HelperObject<EntityStateConverted> // Object
+        {
+            explicit EntityStateConverted(Ent::Property _node): HelperObject<EntityStateConverted>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateConverted";
+            static EntityStateConverted load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateConverted(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateConverted loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateConverted(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateConverted create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateConverted(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateConverted makeInstanceOf()
+            {
+                return EntityStateConverted(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateConversionTransitionTo : HelperObject<EntityStateConversionTransitionTo> // Object
+        {
+            explicit EntityStateConversionTransitionTo(Ent::Property _node): HelperObject<EntityStateConversionTransitionTo>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateConversionTransitionTo";
+            static EntityStateConversionTransitionTo load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateConversionTransitionTo(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateConversionTransitionTo loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateConversionTransitionTo(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateConversionTransitionTo create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateConversionTransitionTo(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateConversionTransitionTo makeInstanceOf()
+            {
+                return EntityStateConversionTransitionTo(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct EntityStateControlGPE : HelperObject<EntityStateControlGPE> // Object
         {
             explicit EntityStateControlGPE(Ent::Property _node): HelperObject<EntityStateControlGPE>(std::move(_node)) {}
@@ -29744,6 +30846,62 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct EntityStateCollecting : HelperObject<EntityStateCollecting> // Object
+        {
+            explicit EntityStateCollecting(Ent::Property _node): HelperObject<EntityStateCollecting>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateCollecting";
+            static EntityStateCollecting load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateCollecting(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateCollecting loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateCollecting(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateCollecting create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateCollecting(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateCollecting makeInstanceOf()
+            {
+                return EntityStateCollecting(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct EntityStateCollectVertebraeShard : HelperObject<EntityStateCollectVertebraeShard> // Object
+        {
+            explicit EntityStateCollectVertebraeShard(Ent::Property _node): HelperObject<EntityStateCollectVertebraeShard>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateCollectVertebraeShard";
+            static EntityStateCollectVertebraeShard load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateCollectVertebraeShard(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateCollectVertebraeShard loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateCollectVertebraeShard(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateCollectVertebraeShard create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateCollectVertebraeShard(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateCollectVertebraeShard makeInstanceOf()
+            {
+                return EntityStateCollectVertebraeShard(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct EntityStateCollectVertebrae : HelperObject<EntityStateCollectVertebrae> // Object
         {
             explicit EntityStateCollectVertebrae(Ent::Property _node): HelperObject<EntityStateCollectVertebrae>(std::move(_node)) {}
@@ -29770,7 +30928,6 @@ namespace Ent
             }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
-            Ent::Gen2::Float meditationDuration() const;
         };
 
         struct EntityStateClimbWaterfallImpulse : HelperObject<EntityStateClimbWaterfallImpulse> // Object
@@ -30054,29 +31211,29 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
-        struct EntityStateCancelSetSavePoint : HelperObject<EntityStateCancelSetSavePoint> // Object
+        struct EntityStateCancelSave : HelperObject<EntityStateCancelSave> // Object
         {
-            explicit EntityStateCancelSetSavePoint(Ent::Property _node): HelperObject<EntityStateCancelSetSavePoint>(std::move(_node)) {}
-            static constexpr char schemaName[] = "EntityStateCancelSetSavePoint";
-            static EntityStateCancelSetSavePoint load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            explicit EntityStateCancelSave(Ent::Property _node): HelperObject<EntityStateCancelSave>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateCancelSave";
+            static EntityStateCancelSave load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
-                return EntityStateCancelSetSavePoint(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+                return EntityStateCancelSave(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
             }
-            static EntityStateCancelSetSavePoint loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static EntityStateCancelSave loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 auto& storage = _entlib.createTempJsonFile();
                 storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return EntityStateCancelSetSavePoint(Ent::Property(
+                return EntityStateCancelSave(Ent::Property(
                     &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
             }
-            static EntityStateCancelSetSavePoint create(Ent::EntityLib& _entlib)
+            static EntityStateCancelSave create(Ent::EntityLib& _entlib)
             {
                 auto& storage = _entlib.createTempJsonFile();
-                return EntityStateCancelSetSavePoint(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+                return EntityStateCancelSave(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
             }
-            EntityStateCancelSetSavePoint makeInstanceOf()
+            EntityStateCancelSave makeInstanceOf()
             {
-                return EntityStateCancelSetSavePoint(getProperty().makeInstanceOf());
+                return EntityStateCancelSave(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
@@ -30742,6 +31899,36 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct EntityStateBeingInPlantCage : HelperObject<EntityStateBeingInPlantCage> // Object
+        {
+            explicit EntityStateBeingInPlantCage(Ent::Property _node): HelperObject<EntityStateBeingInPlantCage>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateBeingInPlantCage";
+            static EntityStateBeingInPlantCage load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateBeingInPlantCage(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateBeingInPlantCage loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateBeingInPlantCage(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateBeingInPlantCage create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateBeingInPlantCage(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateBeingInPlantCage makeInstanceOf()
+            {
+                return EntityStateBeingInPlantCage(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::EntityRef CageEntityRef() const;
+            Ent::Gen2::Float MinProgressToFree() const;
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct EntityStateBeingFocusedToPossess : HelperObject<EntityStateBeingFocusedToPossess> // Object
         {
             explicit EntityStateBeingFocusedToPossess(Ent::Property _node): HelperObject<EntityStateBeingFocusedToPossess>(std::move(_node)) {}
@@ -30794,35 +31981,6 @@ namespace Ent
             {
                 return EntityStateBeingFocusedToInteract(getProperty().makeInstanceOf());
             }
-            Ent::Gen2::ActorState Super() const;
-            Ent::Gen2::String _comment() const;
-        };
-
-        struct EntityStateBeingBlockedByVine : HelperObject<EntityStateBeingBlockedByVine> // Object
-        {
-            explicit EntityStateBeingBlockedByVine(Ent::Property _node): HelperObject<EntityStateBeingBlockedByVine>(std::move(_node)) {}
-            static constexpr char schemaName[] = "EntityStateBeingBlockedByVine";
-            static EntityStateBeingBlockedByVine load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return EntityStateBeingBlockedByVine(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static EntityStateBeingBlockedByVine loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return EntityStateBeingBlockedByVine(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static EntityStateBeingBlockedByVine create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return EntityStateBeingBlockedByVine(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            EntityStateBeingBlockedByVine makeInstanceOf()
-            {
-                return EntityStateBeingBlockedByVine(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::EntityRef Blocker() const;
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
         };
@@ -31135,6 +32293,34 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
+        struct EntityStateAI : HelperObject<EntityStateAI> // Object
+        {
+            explicit EntityStateAI(Ent::Property _node): HelperObject<EntityStateAI>(std::move(_node)) {}
+            static constexpr char schemaName[] = "EntityStateAI";
+            static EntityStateAI load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return EntityStateAI(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static EntityStateAI loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return EntityStateAI(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static EntityStateAI create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return EntityStateAI(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            EntityStateAI makeInstanceOf()
+            {
+                return EntityStateAI(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct ActorStateTryUpgradeShamanStaff : HelperObject<ActorStateTryUpgradeShamanStaff> // Object
         {
             explicit ActorStateTryUpgradeShamanStaff(Ent::Property _node): HelperObject<ActorStateTryUpgradeShamanStaff>(std::move(_node)) {}
@@ -31300,34 +32486,6 @@ namespace Ent
             ActorStateTaunting makeInstanceOf()
             {
                 return ActorStateTaunting(getProperty().makeInstanceOf());
-            }
-            Ent::Gen2::ActorState Super() const;
-            Ent::Gen2::String _comment() const;
-        };
-
-        struct ActorStateStopAttitudeAggressive : HelperObject<ActorStateStopAttitudeAggressive> // Object
-        {
-            explicit ActorStateStopAttitudeAggressive(Ent::Property _node): HelperObject<ActorStateStopAttitudeAggressive>(std::move(_node)) {}
-            static constexpr char schemaName[] = "ActorStateStopAttitudeAggressive";
-            static ActorStateStopAttitudeAggressive load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                return ActorStateStopAttitudeAggressive(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
-            }
-            static ActorStateStopAttitudeAggressive loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return ActorStateStopAttitudeAggressive(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
-            }
-            static ActorStateStopAttitudeAggressive create(Ent::EntityLib& _entlib)
-            {
-                auto& storage = _entlib.createTempJsonFile();
-                return ActorStateStopAttitudeAggressive(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
-            }
-            ActorStateStopAttitudeAggressive makeInstanceOf()
-            {
-                return ActorStateStopAttitudeAggressive(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
@@ -33539,29 +34697,57 @@ namespace Ent
             Ent::Gen2::String _comment() const;
         };
 
-        struct ActorStateAttitudeAggressive : HelperObject<ActorStateAttitudeAggressive> // Object
+        struct ActorStateAttitudeAggressiveTemporary : HelperObject<ActorStateAttitudeAggressiveTemporary> // Object
         {
-            explicit ActorStateAttitudeAggressive(Ent::Property _node): HelperObject<ActorStateAttitudeAggressive>(std::move(_node)) {}
-            static constexpr char schemaName[] = "ActorStateAttitudeAggressive";
-            static ActorStateAttitudeAggressive load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            explicit ActorStateAttitudeAggressiveTemporary(Ent::Property _node): HelperObject<ActorStateAttitudeAggressiveTemporary>(std::move(_node)) {}
+            static constexpr char schemaName[] = "ActorStateAttitudeAggressiveTemporary";
+            static ActorStateAttitudeAggressiveTemporary load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
-                return ActorStateAttitudeAggressive(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+                return ActorStateAttitudeAggressiveTemporary(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
             }
-            static ActorStateAttitudeAggressive loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            static ActorStateAttitudeAggressiveTemporary loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
                 auto& storage = _entlib.createTempJsonFile();
                 storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return ActorStateAttitudeAggressive(Ent::Property(
+                return ActorStateAttitudeAggressiveTemporary(Ent::Property(
                     &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
             }
-            static ActorStateAttitudeAggressive create(Ent::EntityLib& _entlib)
+            static ActorStateAttitudeAggressiveTemporary create(Ent::EntityLib& _entlib)
             {
                 auto& storage = _entlib.createTempJsonFile();
-                return ActorStateAttitudeAggressive(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+                return ActorStateAttitudeAggressiveTemporary(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
             }
-            ActorStateAttitudeAggressive makeInstanceOf()
+            ActorStateAttitudeAggressiveTemporary makeInstanceOf()
             {
-                return ActorStateAttitudeAggressive(getProperty().makeInstanceOf());
+                return ActorStateAttitudeAggressiveTemporary(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::ActorState Super() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct ActorStateAttitudeAggressivePersistent : HelperObject<ActorStateAttitudeAggressivePersistent> // Object
+        {
+            explicit ActorStateAttitudeAggressivePersistent(Ent::Property _node): HelperObject<ActorStateAttitudeAggressivePersistent>(std::move(_node)) {}
+            static constexpr char schemaName[] = "ActorStateAttitudeAggressivePersistent";
+            static ActorStateAttitudeAggressivePersistent load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return ActorStateAttitudeAggressivePersistent(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static ActorStateAttitudeAggressivePersistent loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return ActorStateAttitudeAggressivePersistent(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static ActorStateAttitudeAggressivePersistent create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return ActorStateAttitudeAggressivePersistent(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            ActorStateAttitudeAggressivePersistent makeInstanceOf()
+            {
+                return ActorStateAttitudeAggressivePersistent(getProperty().makeInstanceOf());
             }
             Ent::Gen2::ActorState Super() const;
             Ent::Gen2::String _comment() const;
@@ -35918,6 +37104,7 @@ namespace Ent
                 "CATEGORY_Attitude",
                 "CATEGORY_Context",
                 "CATEGORY_Control",
+                "CATEGORY_Controller",
                 "CATEGORY_ActionCosmetic",
                 "CATEGORY_CreatureLOD",
                 "CATEGORY_ActionDamage",
@@ -35942,6 +37129,7 @@ namespace Ent
                 "CATEGORY_ActionSlide",
                 "CATEGORY_ActionStop",
                 "CATEGORY_ActionStrafe",
+                "Category_Teleport",
                 "CATEGORY_Transition",
                 "CATEGORY_Trigger",
                 "CATEGORY_ActionWingFlutter",
@@ -36135,7 +37323,8 @@ namespace Ent
             }
             Ent::Gen2::String _comment() const;
             Ent::Gen2::Bool checkDir() const;
-            Ent::Gen2::Vector3 directionREQUIRED() const;
+            Ent::Gen2::Vector3 directionRequired() const;
+            Ent::Gen2::SpeedMode speedMode() const;
             Ent::Gen2::Bool speedModeUpdateAllowed() const;
             Ent::Gen2::Bool useRequest() const;
         };
@@ -36866,6 +38055,7 @@ namespace Ent
                 "call",
                 "callanswer",
                 "scream",
+                "graspintention",
                 "grab",
                 "grabattack",
                 "grabbed",
@@ -36935,6 +38125,7 @@ namespace Ent
                 "parry",
                 "failingorder",
                 "settingrespawnplace",
+                "stuck",
                 "romlookat",
                 "emoteshame",
                 "emotecrazy",
@@ -37013,12 +38204,13 @@ namespace Ent
             Ent::Gen2::Float AutoRotateYawSpeedSmooth() const;
             Ent::Gen2::CameraType CameraType() const;
             Ent::Gen2::Float CollisionBackToPosSpeed() const;
+            Ent::Gen2::Float CollisionCameraRadius() const;
+            Ent::Gen2::PrimitiveSet<char const*> CollisionCheckBoneNames() const;
             Ent::Gen2::Float CollisionCorrectionSpeed() const;
             Ent::Gen2::Bool CollisionDisabled() const;
             Ent::Gen2::Float CollisionMoveCamBackToPosSpeed() const;
             Ent::Gen2::Float CollisionTouchGroundBackToPosSpeed() const;
             Ent::Gen2::Float CollisionTouchGroundModePitchThreshold() const;
-            Ent::Gen2::Float CollisionWantedNearPlane() const;
             Ent::Gen2::Float CollisionZOffset() const;
             Ent::Gen2::Float CollisionZOffsetMaxRadius() const;
             Ent::Gen2::Float CollisionZOffsetSmooth() const;
@@ -37075,7 +38267,6 @@ namespace Ent
             Ent::Gen2::Float LockYawSpeedClose() const;
             Ent::Gen2::Float LookAtOffsetPitch() const;
             Ent::Gen2::Float LookAtOffsetYaw() const;
-            Ent::Gen2::Float NearPlane() const;
             Ent::Gen2::Float PitchConstraintAnticipation() const;
             Ent::Gen2::Float PitchConstraintMax() const;
             Ent::Gen2::Float PitchConstraintMin() const;
@@ -37769,7 +38960,7 @@ namespace Ent
             Ent::Gen2::Int FurFocusShadowMapResolution() const;
             Ent::Gen2::Float GlobalLODBias() const;
             Ent::Gen2::Float GlobalLODScale() const;
-            Ent::Gen2::Float LODDecimationFactor() const;
+            Ent::Gen2::LodSelectionMode LodSelectionMode() const;
             Ent::Gen2::String MaterialBank() const;
             Ent::Gen2::Int MaxActiveShadowLights() const;
             Ent::Gen2::Float MinTriangleSize() const;
@@ -38958,6 +40149,63 @@ namespace Ent
         
         };
 
+        struct SceneConverter_NavmeshOptions : HelperObject<SceneConverter_NavmeshOptions> // Object
+        {
+            explicit SceneConverter_NavmeshOptions(Ent::Property _node): HelperObject<SceneConverter_NavmeshOptions>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SceneConverter::NavmeshOptions";
+            static SceneConverter_NavmeshOptions load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return SceneConverter_NavmeshOptions(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static SceneConverter_NavmeshOptions loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return SceneConverter_NavmeshOptions(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static SceneConverter_NavmeshOptions create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return SceneConverter_NavmeshOptions(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            SceneConverter_NavmeshOptions makeInstanceOf()
+            {
+                return SceneConverter_NavmeshOptions(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Bool KeepStaticObjectsNavMeshStampersOutOfTerrains() const;
+            Ent::Gen2::String _comment() const;
+        };
+
+        struct SceneConverter_StreamingOptions : HelperObject<SceneConverter_StreamingOptions> // Object
+        {
+            explicit SceneConverter_StreamingOptions(Ent::Property _node): HelperObject<SceneConverter_StreamingOptions>(std::move(_node)) {}
+            static constexpr char schemaName[] = "SceneConverter::StreamingOptions";
+            static SceneConverter_StreamingOptions load(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                return SceneConverter_StreamingOptions(Ent::Property(&_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str()));
+            }
+            static SceneConverter_StreamingOptions loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
+                return SceneConverter_StreamingOptions(Ent::Property(
+                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+            }
+            static SceneConverter_StreamingOptions create(Ent::EntityLib& _entlib)
+            {
+                auto& storage = _entlib.createTempJsonFile();
+                return SceneConverter_StreamingOptions(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+            }
+            SceneConverter_StreamingOptions makeInstanceOf()
+            {
+                return SceneConverter_StreamingOptions(getProperty().makeInstanceOf());
+            }
+            Ent::Gen2::Bool ExportStreamingEntities() const;
+            Ent::Gen2::Float StreamingUnitMaxLength() const;
+            Ent::Gen2::String _comment() const;
+        };
+
         struct SceneNode : HelperObject<SceneNode> // Object
         {
             explicit SceneNode(Ent::Property _node): HelperObject<SceneNode>(std::move(_node)) {}
@@ -39996,6 +41244,19 @@ namespace Ent
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("val"));
         }
+        // timeSinceLastTurnForDecreasingSpeed
+        inline Ent::Gen2::String timeSinceLastTurnForDecreasingSpeed::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool timeSinceLastTurnForDecreasingSpeed::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::Float timeSinceLastTurnForDecreasingSpeed::val() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("val"));
+        }
         // sPhysicsShapeSphere
         inline Ent::Gen2::String sPhysicsShapeSphere::_comment() const
         {
@@ -40453,6 +41714,19 @@ namespace Ent
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("val"));
         }
+        // UpdateContinuousPositionOnGround
+        inline Ent::Gen2::String UpdateContinuousPositionOnGround::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool UpdateContinuousPositionOnGround::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::Bool UpdateContinuousPositionOnGround::val() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("val"));
+        }
         // UnionObjectArrayItem
         inline Ent::Gen2::variant_s32_float_bool_string_Vector2_Vector3_Quat_Position_ UnionObjectArrayItem::Union() const
         {
@@ -40586,6 +41860,10 @@ namespace Ent
             return Ent::Gen2::TestPropertyDefaultValues(getProperty().getObjectField("propertyWithDefault3"));
         }
         // Terrain_TerrainMeta
+        inline Ent::Gen2::Bool Terrain_TerrainMeta::CosmeticTerrain() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("CosmeticTerrain"));
+        }
         inline Ent::Gen2::String Terrain_TerrainMeta::DataPath() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("DataPath"));
@@ -40601,10 +41879,6 @@ namespace Ent
         inline Ent::Gen2::Float Terrain_TerrainMeta::RegionWidthMeters() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("RegionWidthMeters"));
-        }
-        inline Ent::Gen2::Bool Terrain_TerrainMeta::RimTerrain() const
-        {
-            return Ent::Gen2::Bool(getProperty().getObjectField("RimTerrain"));
         }
         inline Ent::Gen2::Float Terrain_TerrainMeta::SkirtScale() const
         {
@@ -41348,9 +42622,25 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("outText"));
         }
         // ScoreComputation
+        inline Ent::Gen2::ScaleConverter ScoreComputation::CameraSightPitchAngleScore() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("CameraSightPitchAngleScore"));
+        }
+        inline Ent::Gen2::ScaleConverter ScoreComputation::CameraSightYawAngleScore() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("CameraSightYawAngleScore"));
+        }
         inline Ent::Gen2::ScaleConverter ScoreComputation::DistanceScore() const
         {
             return Ent::Gen2::ScaleConverter(getProperty().getObjectField("DistanceScore"));
+        }
+        inline Ent::Gen2::ScaleConverter ScoreComputation::InteractorSightAngleScore() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("InteractorSightAngleScore"));
+        }
+        inline Ent::Gen2::ScaleConverter ScoreComputation::JoystickDirectionAngleScore() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("JoystickDirectionAngleScore"));
         }
         inline Ent::Gen2::Float ScoreComputation::MaxDistance() const
         {
@@ -41359,18 +42649,6 @@ namespace Ent
         inline Ent::Gen2::Float ScoreComputation::MinScore() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("MinScore"));
-        }
-        inline Ent::Gen2::ScaleConverter ScoreComputation::ScreenDistXScore() const
-        {
-            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("ScreenDistXScore"));
-        }
-        inline Ent::Gen2::ScaleConverter ScoreComputation::ScreenDistYScore() const
-        {
-            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("ScreenDistYScore"));
-        }
-        inline Ent::Gen2::ScaleConverter ScoreComputation::SightCosScore() const
-        {
-            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("SightCosScore"));
         }
         inline Ent::Gen2::String ScoreComputation::_comment() const
         {
@@ -42675,16 +43953,27 @@ namespace Ent
         {
             return Ent::Gen2::ActorStateApplyHit(getProperty().setUnionType("ActorStateApplyHit"));
         }
-        inline std::optional<Ent::Gen2::ActorStateAttitudeAggressive> ResponsiblePointer_ActorState_::ActorStateAttitudeAggressive()
+        inline std::optional<Ent::Gen2::ActorStateAttitudeAggressivePersistent> ResponsiblePointer_ActorState_::ActorStateAttitudeAggressivePersistent()
         {
             return strcmp(
-                getProperty().getUnionType(), "ActorStateAttitudeAggressive") != 0?
-                    std::optional<Ent::Gen2::ActorStateAttitudeAggressive>{}:
-                    std::optional<Ent::Gen2::ActorStateAttitudeAggressive>(getProperty().getUnionData());
+                getProperty().getUnionType(), "ActorStateAttitudeAggressivePersistent") != 0?
+                    std::optional<Ent::Gen2::ActorStateAttitudeAggressivePersistent>{}:
+                    std::optional<Ent::Gen2::ActorStateAttitudeAggressivePersistent>(getProperty().getUnionData());
         }
-        inline Ent::Gen2::ActorStateAttitudeAggressive ResponsiblePointer_ActorState_::setActorStateAttitudeAggressive()
+        inline Ent::Gen2::ActorStateAttitudeAggressivePersistent ResponsiblePointer_ActorState_::setActorStateAttitudeAggressivePersistent()
         {
-            return Ent::Gen2::ActorStateAttitudeAggressive(getProperty().setUnionType("ActorStateAttitudeAggressive"));
+            return Ent::Gen2::ActorStateAttitudeAggressivePersistent(getProperty().setUnionType("ActorStateAttitudeAggressivePersistent"));
+        }
+        inline std::optional<Ent::Gen2::ActorStateAttitudeAggressiveTemporary> ResponsiblePointer_ActorState_::ActorStateAttitudeAggressiveTemporary()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "ActorStateAttitudeAggressiveTemporary") != 0?
+                    std::optional<Ent::Gen2::ActorStateAttitudeAggressiveTemporary>{}:
+                    std::optional<Ent::Gen2::ActorStateAttitudeAggressiveTemporary>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::ActorStateAttitudeAggressiveTemporary ResponsiblePointer_ActorState_::setActorStateAttitudeAggressiveTemporary()
+        {
+            return Ent::Gen2::ActorStateAttitudeAggressiveTemporary(getProperty().setUnionType("ActorStateAttitudeAggressiveTemporary"));
         }
         inline std::optional<Ent::Gen2::ActorStateBehaviorState> ResponsiblePointer_ActorState_::ActorStateBehaviorState()
         {
@@ -43544,17 +44833,6 @@ namespace Ent
         {
             return Ent::Gen2::ActorStateSpeedMultiplier(getProperty().setUnionType("ActorStateSpeedMultiplier"));
         }
-        inline std::optional<Ent::Gen2::ActorStateStopAttitudeAggressive> ResponsiblePointer_ActorState_::ActorStateStopAttitudeAggressive()
-        {
-            return strcmp(
-                getProperty().getUnionType(), "ActorStateStopAttitudeAggressive") != 0?
-                    std::optional<Ent::Gen2::ActorStateStopAttitudeAggressive>{}:
-                    std::optional<Ent::Gen2::ActorStateStopAttitudeAggressive>(getProperty().getUnionData());
-        }
-        inline Ent::Gen2::ActorStateStopAttitudeAggressive ResponsiblePointer_ActorState_::setActorStateStopAttitudeAggressive()
-        {
-            return Ent::Gen2::ActorStateStopAttitudeAggressive(getProperty().setUnionType("ActorStateStopAttitudeAggressive"));
-        }
         inline std::optional<Ent::Gen2::ActorStateTaunting> ResponsiblePointer_ActorState_::ActorStateTaunting()
         {
             return strcmp(
@@ -43620,6 +44898,17 @@ namespace Ent
         inline Ent::Gen2::ActorStateTryUpgradeShamanStaff ResponsiblePointer_ActorState_::setActorStateTryUpgradeShamanStaff()
         {
             return Ent::Gen2::ActorStateTryUpgradeShamanStaff(getProperty().setUnionType("ActorStateTryUpgradeShamanStaff"));
+        }
+        inline std::optional<Ent::Gen2::EntityStateAI> ResponsiblePointer_ActorState_::EntityStateAI()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateAI") != 0?
+                    std::optional<Ent::Gen2::EntityStateAI>{}:
+                    std::optional<Ent::Gen2::EntityStateAI>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateAI ResponsiblePointer_ActorState_::setEntityStateAI()
+        {
+            return Ent::Gen2::EntityStateAI(getProperty().setUnionType("EntityStateAI"));
         }
         inline std::optional<Ent::Gen2::EntityStateAboutToBeHatched> ResponsiblePointer_ActorState_::EntityStateAboutToBeHatched()
         {
@@ -43742,17 +45031,6 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateBackwardLand(getProperty().setUnionType("EntityStateBackwardLand"));
         }
-        inline std::optional<Ent::Gen2::EntityStateBeingBlockedByVine> ResponsiblePointer_ActorState_::EntityStateBeingBlockedByVine()
-        {
-            return strcmp(
-                getProperty().getUnionType(), "EntityStateBeingBlockedByVine") != 0?
-                    std::optional<Ent::Gen2::EntityStateBeingBlockedByVine>{}:
-                    std::optional<Ent::Gen2::EntityStateBeingBlockedByVine>(getProperty().getUnionData());
-        }
-        inline Ent::Gen2::EntityStateBeingBlockedByVine ResponsiblePointer_ActorState_::setEntityStateBeingBlockedByVine()
-        {
-            return Ent::Gen2::EntityStateBeingBlockedByVine(getProperty().setUnionType("EntityStateBeingBlockedByVine"));
-        }
         inline std::optional<Ent::Gen2::EntityStateBeingFocusedToInteract> ResponsiblePointer_ActorState_::EntityStateBeingFocusedToInteract()
         {
             return strcmp(
@@ -43774,6 +45052,17 @@ namespace Ent
         inline Ent::Gen2::EntityStateBeingFocusedToPossess ResponsiblePointer_ActorState_::setEntityStateBeingFocusedToPossess()
         {
             return Ent::Gen2::EntityStateBeingFocusedToPossess(getProperty().setUnionType("EntityStateBeingFocusedToPossess"));
+        }
+        inline std::optional<Ent::Gen2::EntityStateBeingInPlantCage> ResponsiblePointer_ActorState_::EntityStateBeingInPlantCage()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateBeingInPlantCage") != 0?
+                    std::optional<Ent::Gen2::EntityStateBeingInPlantCage>{}:
+                    std::optional<Ent::Gen2::EntityStateBeingInPlantCage>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateBeingInPlantCage ResponsiblePointer_ActorState_::setEntityStateBeingInPlantCage()
+        {
+            return Ent::Gen2::EntityStateBeingInPlantCage(getProperty().setUnionType("EntityStateBeingInPlantCage"));
         }
         inline std::optional<Ent::Gen2::EntityStateBeingInReeds> ResponsiblePointer_ActorState_::EntityStateBeingInReeds()
         {
@@ -44028,16 +45317,16 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateCanNotBePerceived(getProperty().setUnionType("EntityStateCanNotBePerceived"));
         }
-        inline std::optional<Ent::Gen2::EntityStateCancelSetSavePoint> ResponsiblePointer_ActorState_::EntityStateCancelSetSavePoint()
+        inline std::optional<Ent::Gen2::EntityStateCancelSave> ResponsiblePointer_ActorState_::EntityStateCancelSave()
         {
             return strcmp(
-                getProperty().getUnionType(), "EntityStateCancelSetSavePoint") != 0?
-                    std::optional<Ent::Gen2::EntityStateCancelSetSavePoint>{}:
-                    std::optional<Ent::Gen2::EntityStateCancelSetSavePoint>(getProperty().getUnionData());
+                getProperty().getUnionType(), "EntityStateCancelSave") != 0?
+                    std::optional<Ent::Gen2::EntityStateCancelSave>{}:
+                    std::optional<Ent::Gen2::EntityStateCancelSave>(getProperty().getUnionData());
         }
-        inline Ent::Gen2::EntityStateCancelSetSavePoint ResponsiblePointer_ActorState_::setEntityStateCancelSetSavePoint()
+        inline Ent::Gen2::EntityStateCancelSave ResponsiblePointer_ActorState_::setEntityStateCancelSave()
         {
-            return Ent::Gen2::EntityStateCancelSetSavePoint(getProperty().setUnionType("EntityStateCancelSetSavePoint"));
+            return Ent::Gen2::EntityStateCancelSave(getProperty().setUnionType("EntityStateCancelSave"));
         }
         inline std::optional<Ent::Gen2::EntityStateChargeMode> ResponsiblePointer_ActorState_::EntityStateChargeMode()
         {
@@ -44160,6 +45449,28 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateCollectVertebrae(getProperty().setUnionType("EntityStateCollectVertebrae"));
         }
+        inline std::optional<Ent::Gen2::EntityStateCollectVertebraeShard> ResponsiblePointer_ActorState_::EntityStateCollectVertebraeShard()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateCollectVertebraeShard") != 0?
+                    std::optional<Ent::Gen2::EntityStateCollectVertebraeShard>{}:
+                    std::optional<Ent::Gen2::EntityStateCollectVertebraeShard>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateCollectVertebraeShard ResponsiblePointer_ActorState_::setEntityStateCollectVertebraeShard()
+        {
+            return Ent::Gen2::EntityStateCollectVertebraeShard(getProperty().setUnionType("EntityStateCollectVertebraeShard"));
+        }
+        inline std::optional<Ent::Gen2::EntityStateCollecting> ResponsiblePointer_ActorState_::EntityStateCollecting()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateCollecting") != 0?
+                    std::optional<Ent::Gen2::EntityStateCollecting>{}:
+                    std::optional<Ent::Gen2::EntityStateCollecting>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateCollecting ResponsiblePointer_ActorState_::setEntityStateCollecting()
+        {
+            return Ent::Gen2::EntityStateCollecting(getProperty().setUnionType("EntityStateCollecting"));
+        }
         inline std::optional<Ent::Gen2::EntityStateCombat> ResponsiblePointer_ActorState_::EntityStateCombat()
         {
             return strcmp(
@@ -44203,6 +45514,28 @@ namespace Ent
         inline Ent::Gen2::EntityStateControlGPE ResponsiblePointer_ActorState_::setEntityStateControlGPE()
         {
             return Ent::Gen2::EntityStateControlGPE(getProperty().setUnionType("EntityStateControlGPE"));
+        }
+        inline std::optional<Ent::Gen2::EntityStateConversionTransitionTo> ResponsiblePointer_ActorState_::EntityStateConversionTransitionTo()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateConversionTransitionTo") != 0?
+                    std::optional<Ent::Gen2::EntityStateConversionTransitionTo>{}:
+                    std::optional<Ent::Gen2::EntityStateConversionTransitionTo>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateConversionTransitionTo ResponsiblePointer_ActorState_::setEntityStateConversionTransitionTo()
+        {
+            return Ent::Gen2::EntityStateConversionTransitionTo(getProperty().setUnionType("EntityStateConversionTransitionTo"));
+        }
+        inline std::optional<Ent::Gen2::EntityStateConverted> ResponsiblePointer_ActorState_::EntityStateConverted()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateConverted") != 0?
+                    std::optional<Ent::Gen2::EntityStateConverted>{}:
+                    std::optional<Ent::Gen2::EntityStateConverted>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateConverted ResponsiblePointer_ActorState_::setEntityStateConverted()
+        {
+            return Ent::Gen2::EntityStateConverted(getProperty().setUnionType("EntityStateConverted"));
         }
         inline std::optional<Ent::Gen2::EntityStateCoyoteJump> ResponsiblePointer_ActorState_::EntityStateCoyoteJump()
         {
@@ -44391,17 +45724,6 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateEnergySpoutState(getProperty().setUnionType("EntityStateEnergySpoutState"));
         }
-        inline std::optional<Ent::Gen2::EntityStateEnterDeathVolume> ResponsiblePointer_ActorState_::EntityStateEnterDeathVolume()
-        {
-            return strcmp(
-                getProperty().getUnionType(), "EntityStateEnterDeathVolume") != 0?
-                    std::optional<Ent::Gen2::EntityStateEnterDeathVolume>{}:
-                    std::optional<Ent::Gen2::EntityStateEnterDeathVolume>(getProperty().getUnionData());
-        }
-        inline Ent::Gen2::EntityStateEnterDeathVolume ResponsiblePointer_ActorState_::setEntityStateEnterDeathVolume()
-        {
-            return Ent::Gen2::EntityStateEnterDeathVolume(getProperty().setUnionType("EntityStateEnterDeathVolume"));
-        }
         inline std::optional<Ent::Gen2::EntityStateExtraLife> ResponsiblePointer_ActorState_::EntityStateExtraLife()
         {
             return strcmp(
@@ -44589,6 +45911,17 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateGrasp(getProperty().setUnionType("EntityStateGrasp"));
         }
+        inline std::optional<Ent::Gen2::EntityStateGraspIntention> ResponsiblePointer_ActorState_::EntityStateGraspIntention()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateGraspIntention") != 0?
+                    std::optional<Ent::Gen2::EntityStateGraspIntention>{}:
+                    std::optional<Ent::Gen2::EntityStateGraspIntention>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateGraspIntention ResponsiblePointer_ActorState_::setEntityStateGraspIntention()
+        {
+            return Ent::Gen2::EntityStateGraspIntention(getProperty().setUnionType("EntityStateGraspIntention"));
+        }
         inline std::optional<Ent::Gen2::EntityStateGroundedJump> ResponsiblePointer_ActorState_::EntityStateGroundedJump()
         {
             return strcmp(
@@ -44775,6 +46108,17 @@ namespace Ent
         inline Ent::Gen2::EntityStateJustStarted ResponsiblePointer_ActorState_::setEntityStateJustStarted()
         {
             return Ent::Gen2::EntityStateJustStarted(getProperty().setUnionType("EntityStateJustStarted"));
+        }
+        inline std::optional<Ent::Gen2::EntityStateJustTeleported> ResponsiblePointer_ActorState_::EntityStateJustTeleported()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateJustTeleported") != 0?
+                    std::optional<Ent::Gen2::EntityStateJustTeleported>{}:
+                    std::optional<Ent::Gen2::EntityStateJustTeleported>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateJustTeleported ResponsiblePointer_ActorState_::setEntityStateJustTeleported()
+        {
+            return Ent::Gen2::EntityStateJustTeleported(getProperty().setUnionType("EntityStateJustTeleported"));
         }
         inline std::optional<Ent::Gen2::EntityStateLateralDodge> ResponsiblePointer_ActorState_::EntityStateLateralDodge()
         {
@@ -45018,6 +46362,50 @@ namespace Ent
         {
             return Ent::Gen2::EntityStatePlayer(getProperty().setUnionType("EntityStatePlayer"));
         }
+        inline std::optional<Ent::Gen2::EntityStatePlayerHatchingPool> ResponsiblePointer_ActorState_::EntityStatePlayerHatchingPool()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStatePlayerHatchingPool") != 0?
+                    std::optional<Ent::Gen2::EntityStatePlayerHatchingPool>{}:
+                    std::optional<Ent::Gen2::EntityStatePlayerHatchingPool>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStatePlayerHatchingPool ResponsiblePointer_ActorState_::setEntityStatePlayerHatchingPool()
+        {
+            return Ent::Gen2::EntityStatePlayerHatchingPool(getProperty().setUnionType("EntityStatePlayerHatchingPool"));
+        }
+        inline std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolIn> ResponsiblePointer_ActorState_::EntityStatePlayerHatchingPoolIn()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStatePlayerHatchingPoolIn") != 0?
+                    std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolIn>{}:
+                    std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolIn>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStatePlayerHatchingPoolIn ResponsiblePointer_ActorState_::setEntityStatePlayerHatchingPoolIn()
+        {
+            return Ent::Gen2::EntityStatePlayerHatchingPoolIn(getProperty().setUnionType("EntityStatePlayerHatchingPoolIn"));
+        }
+        inline std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolOut> ResponsiblePointer_ActorState_::EntityStatePlayerHatchingPoolOut()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStatePlayerHatchingPoolOut") != 0?
+                    std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolOut>{}:
+                    std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolOut>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStatePlayerHatchingPoolOut ResponsiblePointer_ActorState_::setEntityStatePlayerHatchingPoolOut()
+        {
+            return Ent::Gen2::EntityStatePlayerHatchingPoolOut(getProperty().setUnionType("EntityStatePlayerHatchingPoolOut"));
+        }
+        inline std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolSetup> ResponsiblePointer_ActorState_::EntityStatePlayerHatchingPoolSetup()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStatePlayerHatchingPoolSetup") != 0?
+                    std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolSetup>{}:
+                    std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolSetup>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStatePlayerHatchingPoolSetup ResponsiblePointer_ActorState_::setEntityStatePlayerHatchingPoolSetup()
+        {
+            return Ent::Gen2::EntityStatePlayerHatchingPoolSetup(getProperty().setUnionType("EntityStatePlayerHatchingPoolSetup"));
+        }
         inline std::optional<Ent::Gen2::EntityStatePlungeLand> ResponsiblePointer_ActorState_::EntityStatePlungeLand()
         {
             return strcmp(
@@ -45050,6 +46438,28 @@ namespace Ent
         inline Ent::Gen2::EntityStatePreventAscendInSlope ResponsiblePointer_ActorState_::setEntityStatePreventAscendInSlope()
         {
             return Ent::Gen2::EntityStatePreventAscendInSlope(getProperty().setUnionType("EntityStatePreventAscendInSlope"));
+        }
+        inline std::optional<Ent::Gen2::EntityStatePreventSave> ResponsiblePointer_ActorState_::EntityStatePreventSave()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStatePreventSave") != 0?
+                    std::optional<Ent::Gen2::EntityStatePreventSave>{}:
+                    std::optional<Ent::Gen2::EntityStatePreventSave>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStatePreventSave ResponsiblePointer_ActorState_::setEntityStatePreventSave()
+        {
+            return Ent::Gen2::EntityStatePreventSave(getProperty().setUnionType("EntityStatePreventSave"));
+        }
+        inline std::optional<Ent::Gen2::EntityStatePreventUndesiredMovementDueToInertia> ResponsiblePointer_ActorState_::EntityStatePreventUndesiredMovementDueToInertia()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStatePreventUndesiredMovementDueToInertia") != 0?
+                    std::optional<Ent::Gen2::EntityStatePreventUndesiredMovementDueToInertia>{}:
+                    std::optional<Ent::Gen2::EntityStatePreventUndesiredMovementDueToInertia>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStatePreventUndesiredMovementDueToInertia ResponsiblePointer_ActorState_::setEntityStatePreventUndesiredMovementDueToInertia()
+        {
+            return Ent::Gen2::EntityStatePreventUndesiredMovementDueToInertia(getProperty().setUnionType("EntityStatePreventUndesiredMovementDueToInertia"));
         }
         inline std::optional<Ent::Gen2::EntityStateRaise> ResponsiblePointer_ActorState_::EntityStateRaise()
         {
@@ -45095,6 +46505,17 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateRegainCapacity(getProperty().setUnionType("EntityStateRegainCapacity"));
         }
+        inline std::optional<Ent::Gen2::EntityStateRepositionToLastSafeGroundedPosition> ResponsiblePointer_ActorState_::EntityStateRepositionToLastSafeGroundedPosition()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateRepositionToLastSafeGroundedPosition") != 0?
+                    std::optional<Ent::Gen2::EntityStateRepositionToLastSafeGroundedPosition>{}:
+                    std::optional<Ent::Gen2::EntityStateRepositionToLastSafeGroundedPosition>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateRepositionToLastSafeGroundedPosition ResponsiblePointer_ActorState_::setEntityStateRepositionToLastSafeGroundedPosition()
+        {
+            return Ent::Gen2::EntityStateRepositionToLastSafeGroundedPosition(getProperty().setUnionType("EntityStateRepositionToLastSafeGroundedPosition"));
+        }
         inline std::optional<Ent::Gen2::EntityStateReserveMountSlots> ResponsiblePointer_ActorState_::EntityStateReserveMountSlots()
         {
             return strcmp(
@@ -45139,6 +46560,17 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateRevive(getProperty().setUnionType("EntityStateRevive"));
         }
+        inline std::optional<Ent::Gen2::EntityStateSaveNow> ResponsiblePointer_ActorState_::EntityStateSaveNow()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateSaveNow") != 0?
+                    std::optional<Ent::Gen2::EntityStateSaveNow>{}:
+                    std::optional<Ent::Gen2::EntityStateSaveNow>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateSaveNow ResponsiblePointer_ActorState_::setEntityStateSaveNow()
+        {
+            return Ent::Gen2::EntityStateSaveNow(getProperty().setUnionType("EntityStateSaveNow"));
+        }
         inline std::optional<Ent::Gen2::EntityStateSavePointActivated> ResponsiblePointer_ActorState_::EntityStateSavePointActivated()
         {
             return strcmp(
@@ -45150,16 +46582,16 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateSavePointActivated(getProperty().setUnionType("EntityStateSavePointActivated"));
         }
-        inline std::optional<Ent::Gen2::EntityStateSetSavePoint> ResponsiblePointer_ActorState_::EntityStateSetSavePoint()
+        inline std::optional<Ent::Gen2::EntityStateSaveWhenPossible> ResponsiblePointer_ActorState_::EntityStateSaveWhenPossible()
         {
             return strcmp(
-                getProperty().getUnionType(), "EntityStateSetSavePoint") != 0?
-                    std::optional<Ent::Gen2::EntityStateSetSavePoint>{}:
-                    std::optional<Ent::Gen2::EntityStateSetSavePoint>(getProperty().getUnionData());
+                getProperty().getUnionType(), "EntityStateSaveWhenPossible") != 0?
+                    std::optional<Ent::Gen2::EntityStateSaveWhenPossible>{}:
+                    std::optional<Ent::Gen2::EntityStateSaveWhenPossible>(getProperty().getUnionData());
         }
-        inline Ent::Gen2::EntityStateSetSavePoint ResponsiblePointer_ActorState_::setEntityStateSetSavePoint()
+        inline Ent::Gen2::EntityStateSaveWhenPossible ResponsiblePointer_ActorState_::setEntityStateSaveWhenPossible()
         {
-            return Ent::Gen2::EntityStateSetSavePoint(getProperty().setUnionType("EntityStateSetSavePoint"));
+            return Ent::Gen2::EntityStateSaveWhenPossible(getProperty().setUnionType("EntityStateSaveWhenPossible"));
         }
         inline std::optional<Ent::Gen2::EntityStateShootHatchingEnergy> ResponsiblePointer_ActorState_::EntityStateShootHatchingEnergy()
         {
@@ -45403,6 +46835,28 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateStrongAttackJumped(getProperty().setUnionType("EntityStateStrongAttackJumped"));
         }
+        inline std::optional<Ent::Gen2::EntityStateStuck> ResponsiblePointer_ActorState_::EntityStateStuck()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateStuck") != 0?
+                    std::optional<Ent::Gen2::EntityStateStuck>{}:
+                    std::optional<Ent::Gen2::EntityStateStuck>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateStuck ResponsiblePointer_ActorState_::setEntityStateStuck()
+        {
+            return Ent::Gen2::EntityStateStuck(getProperty().setUnionType("EntityStateStuck"));
+        }
+        inline std::optional<Ent::Gen2::EntityStateStuckOut> ResponsiblePointer_ActorState_::EntityStateStuckOut()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateStuckOut") != 0?
+                    std::optional<Ent::Gen2::EntityStateStuckOut>{}:
+                    std::optional<Ent::Gen2::EntityStateStuckOut>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateStuckOut ResponsiblePointer_ActorState_::setEntityStateStuckOut()
+        {
+            return Ent::Gen2::EntityStateStuckOut(getProperty().setUnionType("EntityStateStuckOut"));
+        }
         inline std::optional<Ent::Gen2::EntityStateTakeDamageOnMount> ResponsiblePointer_ActorState_::EntityStateTakeDamageOnMount()
         {
             return strcmp(
@@ -45413,6 +46867,17 @@ namespace Ent
         inline Ent::Gen2::EntityStateTakeDamageOnMount ResponsiblePointer_ActorState_::setEntityStateTakeDamageOnMount()
         {
             return Ent::Gen2::EntityStateTakeDamageOnMount(getProperty().setUnionType("EntityStateTakeDamageOnMount"));
+        }
+        inline std::optional<Ent::Gen2::EntityStateTeleportToSafePosition> ResponsiblePointer_ActorState_::EntityStateTeleportToSafePosition()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "EntityStateTeleportToSafePosition") != 0?
+                    std::optional<Ent::Gen2::EntityStateTeleportToSafePosition>{}:
+                    std::optional<Ent::Gen2::EntityStateTeleportToSafePosition>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::EntityStateTeleportToSafePosition ResponsiblePointer_ActorState_::setEntityStateTeleportToSafePosition()
+        {
+            return Ent::Gen2::EntityStateTeleportToSafePosition(getProperty().setUnionType("EntityStateTeleportToSafePosition"));
         }
         inline std::optional<Ent::Gen2::EntityStateTooDeep> ResponsiblePointer_ActorState_::EntityStateTooDeep()
         {
@@ -45590,6 +47055,58 @@ namespace Ent
         {
             return Ent::Gen2::EntityStateWaterfallEndJump(getProperty().setUnionType("EntityStateWaterfallEndJump"));
         }
+        // StateCollectorCollecting
+        inline Ent::Gen2::String StateCollectorCollecting::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool StateCollectorCollecting::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::ResponsiblePointer_ActorState_ StateCollectorCollecting::val() const
+        {
+            return Ent::Gen2::ResponsiblePointer_ActorState_(getProperty().getObjectField("val"));
+        }
+        // StateCollectorCollected
+        inline Ent::Gen2::String StateCollectorCollected::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool StateCollectorCollected::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::ResponsiblePointer_ActorState_ StateCollectorCollected::val() const
+        {
+            return Ent::Gen2::ResponsiblePointer_ActorState_(getProperty().getObjectField("val"));
+        }
+        // StateCollectibleCollecting
+        inline Ent::Gen2::String StateCollectibleCollecting::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool StateCollectibleCollecting::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::ResponsiblePointer_ActorState_ StateCollectibleCollecting::val() const
+        {
+            return Ent::Gen2::ResponsiblePointer_ActorState_(getProperty().getObjectField("val"));
+        }
+        // StateCollectibleCollected
+        inline Ent::Gen2::String StateCollectibleCollected::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool StateCollectibleCollected::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::ResponsiblePointer_ActorState_ StateCollectibleCollected::val() const
+        {
+            return Ent::Gen2::ResponsiblePointer_ActorState_(getProperty().getObjectField("val"));
+        }
         // SpawnState
         inline Ent::Gen2::String SpawnState::_comment() const
         {
@@ -45615,6 +47132,19 @@ namespace Ent
         inline Ent::Gen2::ResponsiblePointer_ActorState_ RespawnState::val() const
         {
             return Ent::Gen2::ResponsiblePointer_ActorState_(getProperty().getObjectField("val"));
+        }
+        // ResetContinuousPositionOnGround
+        inline Ent::Gen2::String ResetContinuousPositionOnGround::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool ResetContinuousPositionOnGround::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::Bool ResetContinuousPositionOnGround::val() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("val"));
         }
         // RenderManager_DepthOfFieldConfig
         inline Ent::Gen2::Float RenderManager_DepthOfFieldConfig::FarTransitionDistance() const
@@ -46491,6 +48021,23 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("val"));
         }
+        // PhysicsMaterial_SoundTags
+        inline Ent::Gen2::PrimitiveSet<char const*> PhysicsMaterial_SoundTags::Common() const
+        {
+            return Ent::Gen2::PrimitiveSet<char const*>(getProperty().getObjectField("Common"));
+        }
+        inline Ent::Gen2::PrimitiveSet<char const*> PhysicsMaterial_SoundTags::Corrupted() const
+        {
+            return Ent::Gen2::PrimitiveSet<char const*>(getProperty().getObjectField("Corrupted"));
+        }
+        inline Ent::Gen2::PrimitiveSet<char const*> PhysicsMaterial_SoundTags::Lush() const
+        {
+            return Ent::Gen2::PrimitiveSet<char const*>(getProperty().getObjectField("Lush"));
+        }
+        inline Ent::Gen2::String PhysicsMaterial_SoundTags::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // PhysicsMaterial
         inline PrimArray<Ent::Gen2::String> PhysicsMaterial::ClimbablePerSize() const
         {
@@ -46504,9 +48051,9 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("Name"));
         }
-        inline Ent::Gen2::PrimitiveSet<char const*> PhysicsMaterial::Tags() const
+        inline Ent::Gen2::PhysicsMaterial_SoundTags PhysicsMaterial::SoundTags() const
         {
-            return Ent::Gen2::PrimitiveSet<char const*>(getProperty().getObjectField("Tags"));
+            return Ent::Gen2::PhysicsMaterial_SoundTags(getProperty().getObjectField("SoundTags"));
         }
         inline Ent::Gen2::String PhysicsMaterial::_comment() const
         {
@@ -46678,6 +48225,27 @@ namespace Ent
         inline Ent::Gen2::Vector3 MoveCapacityData_OrientationSpeed::steeringAngle() const
         {
             return Ent::Gen2::Vector3(getProperty().getObjectField("steeringAngle"));
+        }
+        // MoveCapacityData_Dodge
+        inline Ent::Gen2::String MoveCapacityData_Dodge::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Float MoveCapacityData_Dodge::classicDodgeOrientationRate() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("classicDodgeOrientationRate"));
+        }
+        inline Ent::Gen2::Float MoveCapacityData_Dodge::cooldownTime() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("cooldownTime"));
+        }
+        inline Ent::Gen2::Float MoveCapacityData_Dodge::distance() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("distance"));
+        }
+        inline Ent::Gen2::ScaleConverter MoveCapacityData_Dodge::scalePlayRatioFactor() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("scalePlayRatioFactor"));
         }
         // MountableSnapLine_ControlPoint
         inline Ent::Gen2::String MountableSnapLine_ControlPoint::_comment() const
@@ -47984,10 +49552,27 @@ namespace Ent
         {
             return Ent::Gen2::ResponsiblePointer_ActorState_(getProperty().getObjectField("val"));
         }
+        // InteractionExecutorEntityState
+        inline Ent::Gen2::String InteractionExecutorEntityState::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool InteractionExecutorEntityState::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::ResponsiblePointer_ActorState_ InteractionExecutorEntityState::val() const
+        {
+            return Ent::Gen2::ResponsiblePointer_ActorState_(getProperty().getObjectField("val"));
+        }
         // InputCollisionBehaviorData
         inline Ent::Gen2::Float InputCollisionBehaviorData::AltitudeMax() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("AltitudeMax"));
+        }
+        inline Ent::Gen2::Float InputCollisionBehaviorData::AltitudeMin() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("AltitudeMin"));
         }
         inline Ent::Gen2::Float InputCollisionBehaviorData::DepthMax() const
         {
@@ -48275,31 +49860,6 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
-        // GroundTypeData
-        inline Ent::Gen2::Float GroundTypeData::GrainRangeMax() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("GrainRangeMax"));
-        }
-        inline Ent::Gen2::Float GroundTypeData::GrainRangeMin() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("GrainRangeMin"));
-        }
-        inline Ent::Gen2::String GroundTypeData::Name() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("Name"));
-        }
-        inline Ent::Gen2::Float GroundTypeData::RegenRangeMax() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("RegenRangeMax"));
-        }
-        inline Ent::Gen2::Float GroundTypeData::RegenRangeMin() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("RegenRangeMin"));
-        }
-        inline Ent::Gen2::String GroundTypeData::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
         // GrasperInteractionData
         inline Ent::Gen2::String GrasperInteractionData::_comment() const
         {
@@ -48324,6 +49884,10 @@ namespace Ent
         inline Ent::Gen2::Float GrasperInteractionData::distanceMax() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("distanceMax"));
+        }
+        inline Ent::Gen2::Float GrasperInteractionData::distanceMin() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("distanceMin"));
         }
         inline Ent::Gen2::Float GrasperInteractionData::graspDurationMax() const
         {
@@ -48486,13 +50050,13 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("creatureSizeCoeff"));
         }
-        inline Ent::Gen2::Float GameSnapData::dirCoeff() const
+        inline Ent::Gen2::ScaleConverter GameSnapData::dirScoreCoeff() const
         {
-            return Ent::Gen2::Float(getProperty().getObjectField("dirCoeff"));
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("dirScoreCoeff"));
         }
-        inline Ent::Gen2::Float GameSnapData::distCoeff() const
+        inline Ent::Gen2::ScaleConverter GameSnapData::distScoreCoeff() const
         {
-            return Ent::Gen2::Float(getProperty().getObjectField("distCoeff"));
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("distScoreCoeff"));
         }
         inline Ent::Gen2::Float GameSnapData::maxAngle() const
         {
@@ -48501,6 +50065,10 @@ namespace Ent
         inline Ent::Gen2::Float GameSnapData::maxDist() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("maxDist"));
+        }
+        inline Ent::Gen2::Float GameSnapData::minScore() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("minScore"));
         }
         // GameSlopeData
         inline Ent::Gen2::Float GameSlopeData::AngleMin() const
@@ -48614,9 +50182,9 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("RespawnDelayOnDeath"));
         }
-        inline Ent::Gen2::Float GameRespawnData::SetRespawnPlaceAsCheckpointDuration() const
+        inline Ent::Gen2::Float GameRespawnData::SaveVolumeHysteresis() const
         {
-            return Ent::Gen2::Float(getProperty().getObjectField("SetRespawnPlaceAsCheckpointDuration"));
+            return Ent::Gen2::Float(getProperty().getObjectField("SaveVolumeHysteresis"));
         }
         inline Ent::Gen2::String GameRespawnData::_comment() const
         {
@@ -49269,6 +50837,19 @@ namespace Ent
         {
             return Ent::Gen2::ResponsiblePointer_ActorState_(getProperty().getObjectField("val"));
         }
+        // FocusExecutorEntityState
+        inline Ent::Gen2::String FocusExecutorEntityState::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool FocusExecutorEntityState::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::ResponsiblePointer_ActorState_ FocusExecutorEntityState::val() const
+        {
+            return Ent::Gen2::ResponsiblePointer_ActorState_(getProperty().getObjectField("val"));
+        }
         // FluidVolumeComponentGD_SimulationParameters
         inline Ent::Gen2::Float FluidVolumeComponentGD_SimulationParameters::Evaporation() const
         {
@@ -49436,61 +51017,6 @@ namespace Ent
             return Ent::Gen2::Vector2(getProperty().getObjectField("MinMax"));
         }
         inline Ent::Gen2::String FloatRange::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        // SmallActorSpawnRuleData
-        inline Ent::Gen2::String SmallActorSpawnRuleData::AudioEventName() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("AudioEventName"));
-        }
-        inline Ent::Gen2::String SmallActorSpawnRuleData::AudioEventSoundBank() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("AudioEventSoundBank"));
-        }
-        inline Ent::Gen2::FloatRange SmallActorSpawnRuleData::DayTimeRange() const
-        {
-            return Ent::Gen2::FloatRange(getProperty().getObjectField("DayTimeRange"));
-        }
-        inline Ent::Gen2::FloatRange SmallActorSpawnRuleData::DistanceRange() const
-        {
-            return Ent::Gen2::FloatRange(getProperty().getObjectField("DistanceRange"));
-        }
-        inline Ent::Gen2::FloatRange SmallActorSpawnRuleData::PrecipitationRange() const
-        {
-            return Ent::Gen2::FloatRange(getProperty().getObjectField("PrecipitationRange"));
-        }
-        inline Ent::Gen2::FloatRange SmallActorSpawnRuleData::RegenRange() const
-        {
-            return Ent::Gen2::FloatRange(getProperty().getObjectField("RegenRange"));
-        }
-        inline Ent::Gen2::Float SmallActorSpawnRuleData::SpawnProbability() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("SpawnProbability"));
-        }
-        inline Ent::Gen2::String SmallActorSpawnRuleData::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        // SmallActorSpawnPointData
-        inline Ent::Gen2::Float SmallActorSpawnPointData::SelectionProbability() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("SelectionProbability"));
-        }
-        inline Array<Ent::Gen2::SmallActorSpawnRuleData> SmallActorSpawnPointData::SpawnRules() const
-        {
-            return Array<Ent::Gen2::SmallActorSpawnRuleData>(getProperty().getObjectField("SpawnRules"));
-        }
-        inline Ent::Gen2::String SmallActorSpawnPointData::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        // SoundOpportunitiesConfig
-        inline Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData> SoundOpportunitiesConfig::SmallActorSpawnRules() const
-        {
-            return Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData>(getProperty().getObjectField("SmallActorSpawnRules"));
-        }
-        inline Ent::Gen2::String SoundOpportunitiesConfig::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -49784,6 +51310,10 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // EntityStateStaffOwnedVertebras_Inputs
+        inline Ent::Gen2::Int EntityStateStaffOwnedVertebras_Inputs::OwnedShardCount() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("OwnedShardCount"));
+        }
         inline Ent::Gen2::String EntityStateStaffOwnedVertebras_Inputs::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
@@ -49819,6 +51349,23 @@ namespace Ent
             return Ent::Gen2::Int(getProperty().getObjectField("Version"));
         }
         inline Ent::Gen2::String PlayerState::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStatePlayerHatchingPool_Inputs
+        inline Ent::Gen2::Float EntityStatePlayerHatchingPool_Inputs::DistanceFromPoolToPlayAnim() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("DistanceFromPoolToPlayAnim"));
+        }
+        inline Ent::Gen2::Float EntityStatePlayerHatchingPool_Inputs::HatchingDuration() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("HatchingDuration"));
+        }
+        inline Ent::Gen2::Float EntityStatePlayerHatchingPool_Inputs::WalkSpeed() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("WalkSpeed"));
+        }
+        inline Ent::Gen2::String EntityStatePlayerHatchingPool_Inputs::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -49947,6 +51494,61 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // SmallActorSpawnRuleData
+        inline Ent::Gen2::String SmallActorSpawnRuleData::AudioEventName() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("AudioEventName"));
+        }
+        inline Ent::Gen2::String SmallActorSpawnRuleData::AudioEventSoundBank() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("AudioEventSoundBank"));
+        }
+        inline Ent::Gen2::FloatRange SmallActorSpawnRuleData::DayTimeRange() const
+        {
+            return Ent::Gen2::FloatRange(getProperty().getObjectField("DayTimeRange"));
+        }
+        inline Ent::Gen2::FloatRange SmallActorSpawnRuleData::DistanceRange() const
+        {
+            return Ent::Gen2::FloatRange(getProperty().getObjectField("DistanceRange"));
+        }
+        inline PrimArray<Ent::Gen2::EnergyValue> SmallActorSpawnRuleData::EnergyValues() const
+        {
+            return PrimArray<Ent::Gen2::EnergyValue>(getProperty().getObjectField("EnergyValues"));
+        }
+        inline Ent::Gen2::FloatRange SmallActorSpawnRuleData::PrecipitationRange() const
+        {
+            return Ent::Gen2::FloatRange(getProperty().getObjectField("PrecipitationRange"));
+        }
+        inline Ent::Gen2::Float SmallActorSpawnRuleData::SpawnProbability() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("SpawnProbability"));
+        }
+        inline Ent::Gen2::String SmallActorSpawnRuleData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // SmallActorSpawnPointData
+        inline Ent::Gen2::Float SmallActorSpawnPointData::SelectionProbability() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("SelectionProbability"));
+        }
+        inline Array<Ent::Gen2::SmallActorSpawnRuleData> SmallActorSpawnPointData::SpawnRules() const
+        {
+            return Array<Ent::Gen2::SmallActorSpawnRuleData>(getProperty().getObjectField("SpawnRules"));
+        }
+        inline Ent::Gen2::String SmallActorSpawnPointData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // SoundOpportunitiesConfig
+        inline Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData> SoundOpportunitiesConfig::SmallActorSpawnRules() const
+        {
+            return Ent::Gen2::Map<char const*, Ent::Gen2::SmallActorSpawnPointData>(getProperty().getObjectField("SmallActorSpawnRules"));
+        }
+        inline Ent::Gen2::String SoundOpportunitiesConfig::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // RegenData
         inline PrimArray<Ent::Gen2::EnergyValue> RegenData::EnergyValues() const
         {
@@ -49992,6 +51594,19 @@ namespace Ent
             return Ent::Gen2::EnergySide(getProperty().getObjectField("EnergySide"));
         }
         inline Ent::Gen2::String EntityStateRevive_Inputs::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateEnergyRootHatching_Inputs
+        inline Ent::Gen2::Float EntityStateEnergyRootHatching_Inputs::HatchingDuration() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("HatchingDuration"));
+        }
+        inline Ent::Gen2::EnergySide EntityStateEnergyRootHatching_Inputs::HatchingSide() const
+        {
+            return Ent::Gen2::EnergySide(getProperty().getObjectField("HatchingSide"));
+        }
+        inline Ent::Gen2::String EntityStateEnergyRootHatching_Inputs::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -50525,6 +52140,10 @@ namespace Ent
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("DisplayReloadNotifications"));
         }
+        inline Ent::Gen2::Bool DebugDisplayFlags::DisplaySafeSavePosition() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("DisplaySafeSavePosition"));
+        }
         inline Ent::Gen2::Bool DebugDisplayFlags::DisplaySelectedPestoEntity() const
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("DisplaySelectedPestoEntity"));
@@ -50690,19 +52309,6 @@ namespace Ent
         inline Ent::Gen2::String CreatureProfile::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        // creatureLOD
-        inline Ent::Gen2::String creatureLOD::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        inline Ent::Gen2::Bool creatureLOD::engaged() const
-        {
-            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
-        }
-        inline Ent::Gen2::CreatureLOD creatureLOD::val() const
-        {
-            return Ent::Gen2::CreatureLOD(getProperty().getObjectField("val"));
         }
         // CreatureDangerousness
         inline Ent::Gen2::String CreatureDangerousness::_comment() const
@@ -51137,6 +52743,15 @@ namespace Ent
         {
             return Ent::Gen2::usePerception(getProperty().getObjectField("usePerception"));
         }
+        // CollectibleComponentInput
+        inline Ent::Gen2::ComponentInput CollectibleComponentInput::Super() const
+        {
+            return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String CollectibleComponentInput::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // CinematicComponentInput
         inline Ent::Gen2::ComponentInput CinematicComponentInput::Super() const
         {
@@ -51158,31 +52773,6 @@ namespace Ent
         inline Ent::Gen2::jumpPower ChargedJumpComponentInput::jumpPower() const
         {
             return Ent::Gen2::jumpPower(getProperty().getObjectField("jumpPower"));
-        }
-        // CharacterControllerComponentInput
-        inline Ent::Gen2::JumpHeightMultiplier CharacterControllerComponentInput::JumpHeightMultiplier() const
-        {
-            return Ent::Gen2::JumpHeightMultiplier(getProperty().getObjectField("JumpHeightMultiplier"));
-        }
-        inline Ent::Gen2::RigidbodyScaleMultiplier CharacterControllerComponentInput::RigidbodyScaleMultiplier() const
-        {
-            return Ent::Gen2::RigidbodyScaleMultiplier(getProperty().getObjectField("RigidbodyScaleMultiplier"));
-        }
-        inline Ent::Gen2::RigidbodyScalingSpeed CharacterControllerComponentInput::RigidbodyScalingSpeed() const
-        {
-            return Ent::Gen2::RigidbodyScalingSpeed(getProperty().getObjectField("RigidbodyScalingSpeed"));
-        }
-        inline Ent::Gen2::ComponentInput CharacterControllerComponentInput::Super() const
-        {
-            return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
-        }
-        inline Ent::Gen2::String CharacterControllerComponentInput::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        inline Ent::Gen2::creatureLOD CharacterControllerComponentInput::creatureLOD() const
-        {
-            return Ent::Gen2::creatureLOD(getProperty().getObjectField("creatureLOD"));
         }
         // BreakableComponentInput
         inline Ent::Gen2::ComponentInput BreakableComponentInput::Super() const
@@ -52011,6 +53601,10 @@ namespace Ent
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("EDITOR_IsCave"));
         }
+        inline Ent::Gen2::Bool StaticObjectGD::EDITOR_IsUnclosedMesh() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("EDITOR_IsUnclosedMesh"));
+        }
         inline Ent::Gen2::Bool StaticObjectGD::EDITOR_MergeInNavMesh() const
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("EDITOR_MergeInNavMesh"));
@@ -52055,6 +53649,14 @@ namespace Ent
         inline Ent::Gen2::Float StaffVertebrasGD::RefillVertebraTimer() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("RefillVertebraTimer"));
+        }
+        inline Ent::Gen2::Int StaffVertebrasGD::ShardMaxCount() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("ShardMaxCount"));
+        }
+        inline Ent::Gen2::Int StaffVertebrasGD::StartShardCount_() const
+        {
+            return Ent::Gen2::Int(getProperty().getObjectField("StartShardCount "));
         }
         inline Ent::Gen2::ComponentGD StaffVertebrasGD::Super() const
         {
@@ -52660,6 +54262,27 @@ namespace Ent
             return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String PlayerComponentGD::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // PivotControllerGD
+        inline Ent::Gen2::Float PivotControllerGD::GrowthTime() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("GrowthTime"));
+        }
+        inline Ent::Gen2::Float PivotControllerGD::InitialGrowth() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("InitialGrowth"));
+        }
+        inline Ent::Gen2::String PivotControllerGD::PivotSkeleton() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("PivotSkeleton"));
+        }
+        inline Ent::Gen2::ComponentGD PivotControllerGD::Super() const
+        {
+            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String PivotControllerGD::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -53405,6 +55028,10 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // InterestPointGD
+        inline Ent::Gen2::Float InterestPointGD::Height() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("Height"));
+        }
         inline Ent::Gen2::Float InterestPointGD::Radius() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("Radius"));
@@ -53422,6 +55049,10 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // InteractableGD
+        inline Ent::Gen2::FocusExecutorEntityState InteractableGD::FocusExecutorEntityState() const
+        {
+            return Ent::Gen2::FocusExecutorEntityState(getProperty().getObjectField("FocusExecutorEntityState"));
+        }
         inline Ent::Gen2::FocusInteractableEntityState InteractableGD::FocusInteractableEntityState() const
         {
             return Ent::Gen2::FocusInteractableEntityState(getProperty().getObjectField("FocusInteractableEntityState"));
@@ -53446,6 +55077,18 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("InteractMaxDistanceHysteresis"));
         }
+        inline Ent::Gen2::Bool InteractableGD::InteractWithAllies() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("InteractWithAllies"));
+        }
+        inline Ent::Gen2::Bool InteractableGD::InteractWithEnemies() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("InteractWithEnemies"));
+        }
+        inline Ent::Gen2::InteractionExecutorEntityState InteractableGD::InteractionExecutorEntityState() const
+        {
+            return Ent::Gen2::InteractionExecutorEntityState(getProperty().getObjectField("InteractionExecutorEntityState"));
+        }
         inline Ent::Gen2::InteractionInteractableEntityState InteractableGD::InteractionInteractableEntityState() const
         {
             return Ent::Gen2::InteractionInteractableEntityState(getProperty().getObjectField("InteractionInteractableEntityState"));
@@ -53457,6 +55100,10 @@ namespace Ent
         inline Ent::Gen2::Float InteractableGD::InteractionPriority() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("InteractionPriority"));
+        }
+        inline Ent::Gen2::Float InteractableGD::ProximityInteractMaxDistance() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("ProximityInteractMaxDistance"));
         }
         inline Ent::Gen2::ComponentGD InteractableGD::Super() const
         {
@@ -53678,6 +55325,18 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // GrasperGD
+        inline Ent::Gen2::Float GrasperGD::GraspIntentionDelayToAllowOrientation() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("GraspIntentionDelayToAllowOrientation"));
+        }
+        inline Ent::Gen2::Float GrasperGD::GraspIntentionMaxHalfAngle() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("GraspIntentionMaxHalfAngle"));
+        }
+        inline Ent::Gen2::Float GrasperGD::GraspIntentionOrientationYawRate() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("GraspIntentionOrientationYawRate"));
+        }
         inline Ent::Gen2::ComponentGD GrasperGD::Super() const
         {
             return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
@@ -54039,6 +55698,19 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // DecalComponentGD
+        inline Ent::Gen2::String DecalComponentGD::Material() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("Material"));
+        }
+        inline Ent::Gen2::ComponentGD DecalComponentGD::Super() const
+        {
+            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String DecalComponentGD::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // DebugGridGD
         inline Ent::Gen2::Int DebugGridGD::Height() const
         {
@@ -54069,6 +55741,19 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // CustomStreamingBehavior
+        inline Ent::Gen2::Bool CustomStreamingBehavior::Ignore() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("Ignore"));
+        }
+        inline Ent::Gen2::ComponentGD CustomStreamingBehavior::Super() const
+        {
+            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String CustomStreamingBehavior::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // CreatureUIGD
         inline Ent::Gen2::Float CreatureUIGD::LifeBarLength() const
         {
@@ -54091,6 +55776,19 @@ namespace Ent
             return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String CreatureUIGD::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // ConvertibleGD
+        inline Ent::Gen2::EntityRef ConvertibleGD::ConvertedEntity() const
+        {
+            return Ent::Gen2::EntityRef(getProperty().getObjectField("ConvertedEntity"));
+        }
+        inline Ent::Gen2::ComponentGD ConvertibleGD::Super() const
+        {
+            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String ConvertibleGD::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -54786,6 +56484,28 @@ namespace Ent
         {
             return Ent::Gen2::ClothGD(getProperty().setUnionType("ClothGD"));
         }
+        inline std::optional<Ent::Gen2::CollectibleGD> Component::CollectibleGD()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "CollectibleGD") != 0?
+                    std::optional<Ent::Gen2::CollectibleGD>{}:
+                    std::optional<Ent::Gen2::CollectibleGD>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::CollectibleGD Component::setCollectibleGD()
+        {
+            return Ent::Gen2::CollectibleGD(getProperty().setUnionType("CollectibleGD"));
+        }
+        inline std::optional<Ent::Gen2::CollectorGD> Component::CollectorGD()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "CollectorGD") != 0?
+                    std::optional<Ent::Gen2::CollectorGD>{}:
+                    std::optional<Ent::Gen2::CollectorGD>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::CollectorGD Component::setCollectorGD()
+        {
+            return Ent::Gen2::CollectorGD(getProperty().setUnionType("CollectorGD"));
+        }
         inline std::optional<Ent::Gen2::ComponentWithProtoCodeGD> Component::ComponentWithProtoCodeGD()
         {
             return strcmp(
@@ -54818,6 +56538,17 @@ namespace Ent
         inline Ent::Gen2::ConstrainedMoveGD Component::setConstrainedMoveGD()
         {
             return Ent::Gen2::ConstrainedMoveGD(getProperty().setUnionType("ConstrainedMoveGD"));
+        }
+        inline std::optional<Ent::Gen2::ConvertibleGD> Component::ConvertibleGD()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "ConvertibleGD") != 0?
+                    std::optional<Ent::Gen2::ConvertibleGD>{}:
+                    std::optional<Ent::Gen2::ConvertibleGD>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::ConvertibleGD Component::setConvertibleGD()
+        {
+            return Ent::Gen2::ConvertibleGD(getProperty().setUnionType("ConvertibleGD"));
         }
         inline std::optional<Ent::Gen2::CreatureAIGD> Component::CreatureAIGD()
         {
@@ -54852,6 +56583,17 @@ namespace Ent
         {
             return Ent::Gen2::CreatureUIGD(getProperty().setUnionType("CreatureUIGD"));
         }
+        inline std::optional<Ent::Gen2::CustomStreamingBehavior> Component::CustomStreamingBehavior()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "CustomStreamingBehavior") != 0?
+                    std::optional<Ent::Gen2::CustomStreamingBehavior>{}:
+                    std::optional<Ent::Gen2::CustomStreamingBehavior>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::CustomStreamingBehavior Component::setCustomStreamingBehavior()
+        {
+            return Ent::Gen2::CustomStreamingBehavior(getProperty().setUnionType("CustomStreamingBehavior"));
+        }
         inline std::optional<Ent::Gen2::CustomThumbnail> Component::CustomThumbnail()
         {
             return strcmp(
@@ -54873,6 +56615,17 @@ namespace Ent
         inline Ent::Gen2::DebugGridGD Component::setDebugGridGD()
         {
             return Ent::Gen2::DebugGridGD(getProperty().setUnionType("DebugGridGD"));
+        }
+        inline std::optional<Ent::Gen2::DecalComponentGD> Component::DecalComponentGD()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "DecalComponentGD") != 0?
+                    std::optional<Ent::Gen2::DecalComponentGD>{}:
+                    std::optional<Ent::Gen2::DecalComponentGD>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::DecalComponentGD Component::setDecalComponentGD()
+        {
+            return Ent::Gen2::DecalComponentGD(getProperty().setUnionType("DecalComponentGD"));
         }
         inline std::optional<Ent::Gen2::DistanceTriggerGD> Component::DistanceTriggerGD()
         {
@@ -55621,6 +57374,17 @@ namespace Ent
         inline Ent::Gen2::PickableDistributorComponentGD Component::setPickableDistributorComponentGD()
         {
             return Ent::Gen2::PickableDistributorComponentGD(getProperty().setUnionType("PickableDistributorComponentGD"));
+        }
+        inline std::optional<Ent::Gen2::PivotControllerGD> Component::PivotControllerGD()
+        {
+            return strcmp(
+                getProperty().getUnionType(), "PivotControllerGD") != 0?
+                    std::optional<Ent::Gen2::PivotControllerGD>{}:
+                    std::optional<Ent::Gen2::PivotControllerGD>(getProperty().getUnionData());
+        }
+        inline Ent::Gen2::PivotControllerGD Component::setPivotControllerGD()
+        {
+            return Ent::Gen2::PivotControllerGD(getProperty().setUnionType("PivotControllerGD"));
         }
         inline std::optional<Ent::Gen2::PlayerComponentGD> Component::PlayerComponentGD()
         {
@@ -56626,6 +58390,30 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("ClothGD");
         }
+        inline std::optional<Ent::Gen2::CollectibleGD> Object_Components::CollectibleGD()
+        {
+            return std::optional<Ent::Gen2::CollectibleGD>(getSubNode("CollectibleGD"));
+        }
+        inline Ent::Gen2::CollectibleGD Object_Components::addCollectibleGD()
+        {
+            return Ent::Gen2::CollectibleGD(addSubNode("CollectibleGD"));
+        }
+        inline void Object_Components::removeCollectibleGD()
+        {
+            getProperty().eraseUnionSetItem("CollectibleGD");
+        }
+        inline std::optional<Ent::Gen2::CollectorGD> Object_Components::CollectorGD()
+        {
+            return std::optional<Ent::Gen2::CollectorGD>(getSubNode("CollectorGD"));
+        }
+        inline Ent::Gen2::CollectorGD Object_Components::addCollectorGD()
+        {
+            return Ent::Gen2::CollectorGD(addSubNode("CollectorGD"));
+        }
+        inline void Object_Components::removeCollectorGD()
+        {
+            getProperty().eraseUnionSetItem("CollectorGD");
+        }
         inline std::optional<Ent::Gen2::ComponentWithProtoCodeGD> Object_Components::ComponentWithProtoCodeGD()
         {
             return std::optional<Ent::Gen2::ComponentWithProtoCodeGD>(getSubNode("ComponentWithProtoCodeGD"));
@@ -56661,6 +58449,18 @@ namespace Ent
         inline void Object_Components::removeConstrainedMoveGD()
         {
             getProperty().eraseUnionSetItem("ConstrainedMoveGD");
+        }
+        inline std::optional<Ent::Gen2::ConvertibleGD> Object_Components::ConvertibleGD()
+        {
+            return std::optional<Ent::Gen2::ConvertibleGD>(getSubNode("ConvertibleGD"));
+        }
+        inline Ent::Gen2::ConvertibleGD Object_Components::addConvertibleGD()
+        {
+            return Ent::Gen2::ConvertibleGD(addSubNode("ConvertibleGD"));
+        }
+        inline void Object_Components::removeConvertibleGD()
+        {
+            getProperty().eraseUnionSetItem("ConvertibleGD");
         }
         inline std::optional<Ent::Gen2::CreatureAIGD> Object_Components::CreatureAIGD()
         {
@@ -56698,6 +58498,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("CreatureUIGD");
         }
+        inline std::optional<Ent::Gen2::CustomStreamingBehavior> Object_Components::CustomStreamingBehavior()
+        {
+            return std::optional<Ent::Gen2::CustomStreamingBehavior>(getSubNode("CustomStreamingBehavior"));
+        }
+        inline Ent::Gen2::CustomStreamingBehavior Object_Components::addCustomStreamingBehavior()
+        {
+            return Ent::Gen2::CustomStreamingBehavior(addSubNode("CustomStreamingBehavior"));
+        }
+        inline void Object_Components::removeCustomStreamingBehavior()
+        {
+            getProperty().eraseUnionSetItem("CustomStreamingBehavior");
+        }
         inline std::optional<Ent::Gen2::CustomThumbnail> Object_Components::CustomThumbnail()
         {
             return std::optional<Ent::Gen2::CustomThumbnail>(getSubNode("CustomThumbnail"));
@@ -56721,6 +58533,18 @@ namespace Ent
         inline void Object_Components::removeDebugGridGD()
         {
             getProperty().eraseUnionSetItem("DebugGridGD");
+        }
+        inline std::optional<Ent::Gen2::DecalComponentGD> Object_Components::DecalComponentGD()
+        {
+            return std::optional<Ent::Gen2::DecalComponentGD>(getSubNode("DecalComponentGD"));
+        }
+        inline Ent::Gen2::DecalComponentGD Object_Components::addDecalComponentGD()
+        {
+            return Ent::Gen2::DecalComponentGD(addSubNode("DecalComponentGD"));
+        }
+        inline void Object_Components::removeDecalComponentGD()
+        {
+            getProperty().eraseUnionSetItem("DecalComponentGD");
         }
         inline std::optional<Ent::Gen2::DistanceTriggerGD> Object_Components::DistanceTriggerGD()
         {
@@ -57537,6 +59361,18 @@ namespace Ent
         inline void Object_Components::removePickableDistributorComponentGD()
         {
             getProperty().eraseUnionSetItem("PickableDistributorComponentGD");
+        }
+        inline std::optional<Ent::Gen2::PivotControllerGD> Object_Components::PivotControllerGD()
+        {
+            return std::optional<Ent::Gen2::PivotControllerGD>(getSubNode("PivotControllerGD"));
+        }
+        inline Ent::Gen2::PivotControllerGD Object_Components::addPivotControllerGD()
+        {
+            return Ent::Gen2::PivotControllerGD(addSubNode("PivotControllerGD"));
+        }
+        inline void Object_Components::removePivotControllerGD()
+        {
+            getProperty().eraseUnionSetItem("PivotControllerGD");
         }
         inline std::optional<Ent::Gen2::PlayerComponentGD> Object_Components::PlayerComponentGD()
         {
@@ -58869,6 +60705,30 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("ClothGD");
         }
+        inline std::optional<Ent::Gen2::CollectibleGD> Components::CollectibleGD()
+        {
+            return std::optional<Ent::Gen2::CollectibleGD>(getSubNode("CollectibleGD"));
+        }
+        inline Ent::Gen2::CollectibleGD Components::addCollectibleGD()
+        {
+            return Ent::Gen2::CollectibleGD(addSubNode("CollectibleGD"));
+        }
+        inline void Components::removeCollectibleGD()
+        {
+            getProperty().eraseUnionSetItem("CollectibleGD");
+        }
+        inline std::optional<Ent::Gen2::CollectorGD> Components::CollectorGD()
+        {
+            return std::optional<Ent::Gen2::CollectorGD>(getSubNode("CollectorGD"));
+        }
+        inline Ent::Gen2::CollectorGD Components::addCollectorGD()
+        {
+            return Ent::Gen2::CollectorGD(addSubNode("CollectorGD"));
+        }
+        inline void Components::removeCollectorGD()
+        {
+            getProperty().eraseUnionSetItem("CollectorGD");
+        }
         inline std::optional<Ent::Gen2::ComponentWithProtoCodeGD> Components::ComponentWithProtoCodeGD()
         {
             return std::optional<Ent::Gen2::ComponentWithProtoCodeGD>(getSubNode("ComponentWithProtoCodeGD"));
@@ -58904,6 +60764,18 @@ namespace Ent
         inline void Components::removeConstrainedMoveGD()
         {
             getProperty().eraseUnionSetItem("ConstrainedMoveGD");
+        }
+        inline std::optional<Ent::Gen2::ConvertibleGD> Components::ConvertibleGD()
+        {
+            return std::optional<Ent::Gen2::ConvertibleGD>(getSubNode("ConvertibleGD"));
+        }
+        inline Ent::Gen2::ConvertibleGD Components::addConvertibleGD()
+        {
+            return Ent::Gen2::ConvertibleGD(addSubNode("ConvertibleGD"));
+        }
+        inline void Components::removeConvertibleGD()
+        {
+            getProperty().eraseUnionSetItem("ConvertibleGD");
         }
         inline std::optional<Ent::Gen2::CreatureAIGD> Components::CreatureAIGD()
         {
@@ -58941,6 +60813,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("CreatureUIGD");
         }
+        inline std::optional<Ent::Gen2::CustomStreamingBehavior> Components::CustomStreamingBehavior()
+        {
+            return std::optional<Ent::Gen2::CustomStreamingBehavior>(getSubNode("CustomStreamingBehavior"));
+        }
+        inline Ent::Gen2::CustomStreamingBehavior Components::addCustomStreamingBehavior()
+        {
+            return Ent::Gen2::CustomStreamingBehavior(addSubNode("CustomStreamingBehavior"));
+        }
+        inline void Components::removeCustomStreamingBehavior()
+        {
+            getProperty().eraseUnionSetItem("CustomStreamingBehavior");
+        }
         inline std::optional<Ent::Gen2::CustomThumbnail> Components::CustomThumbnail()
         {
             return std::optional<Ent::Gen2::CustomThumbnail>(getSubNode("CustomThumbnail"));
@@ -58964,6 +60848,18 @@ namespace Ent
         inline void Components::removeDebugGridGD()
         {
             getProperty().eraseUnionSetItem("DebugGridGD");
+        }
+        inline std::optional<Ent::Gen2::DecalComponentGD> Components::DecalComponentGD()
+        {
+            return std::optional<Ent::Gen2::DecalComponentGD>(getSubNode("DecalComponentGD"));
+        }
+        inline Ent::Gen2::DecalComponentGD Components::addDecalComponentGD()
+        {
+            return Ent::Gen2::DecalComponentGD(addSubNode("DecalComponentGD"));
+        }
+        inline void Components::removeDecalComponentGD()
+        {
+            getProperty().eraseUnionSetItem("DecalComponentGD");
         }
         inline std::optional<Ent::Gen2::DistanceTriggerGD> Components::DistanceTriggerGD()
         {
@@ -59780,6 +61676,18 @@ namespace Ent
         inline void Components::removePickableDistributorComponentGD()
         {
             getProperty().eraseUnionSetItem("PickableDistributorComponentGD");
+        }
+        inline std::optional<Ent::Gen2::PivotControllerGD> Components::PivotControllerGD()
+        {
+            return std::optional<Ent::Gen2::PivotControllerGD>(getSubNode("PivotControllerGD"));
+        }
+        inline Ent::Gen2::PivotControllerGD Components::addPivotControllerGD()
+        {
+            return Ent::Gen2::PivotControllerGD(addSubNode("PivotControllerGD"));
+        }
+        inline void Components::removePivotControllerGD()
+        {
+            getProperty().eraseUnionSetItem("PivotControllerGD");
         }
         inline std::optional<Ent::Gen2::PlayerComponentGD> Components::PlayerComponentGD()
         {
@@ -60644,10 +62552,6 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("GroundTypeWaterPuddle"));
         }
-        inline Array<Ent::Gen2::GroundTypeData> SoundManager::GroundTypes() const
-        {
-            return Array<Ent::Gen2::GroundTypeData>(getProperty().getObjectField("GroundTypes"));
-        }
         inline Ent::Gen2::Float SoundManager::HitIntensityHigh() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("HitIntensityHigh"));
@@ -61052,6 +62956,10 @@ namespace Ent
         {
             return Ent::Gen2::Map<char const*, Ent::Gen2::Color>(getProperty().getObjectField("TagColors"));
         }
+        inline Ent::Gen2::Map<char const*, Ent::Gen2::String> SoundManager::TagToMaterialMapping() const
+        {
+            return Ent::Gen2::Map<char const*, Ent::Gen2::String>(getProperty().getObjectField("TagToMaterialMapping"));
+        }
         inline Ent::Gen2::String SoundManager::UnderWaterBank() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("UnderWaterBank"));
@@ -61063,10 +62971,6 @@ namespace Ent
         inline Ent::Gen2::Float SoundManager::UnderwaterOutZone() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("UnderwaterOutZone"));
-        }
-        inline Ent::Gen2::Map<char const*, Ent::Gen2::String> SoundManager::VegetationTagMapping() const
-        {
-            return Ent::Gen2::Map<char const*, Ent::Gen2::String>(getProperty().getObjectField("VegetationTagMapping"));
         }
         inline Ent::Gen2::Float SoundManager::VerticalUnderWaterOffset() const
         {
@@ -61490,6 +63394,52 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // CollectorGD
+        inline Ent::Gen2::Map<CollectibleTypeEnum, Ent::Gen2::Float> CollectorGD::CollectorRangeByType() const
+        {
+            return Ent::Gen2::Map<CollectibleTypeEnum, Ent::Gen2::Float>(getProperty().getObjectField("CollectorRangeByType"));
+        }
+        inline Ent::Gen2::ComponentGD CollectorGD::Super() const
+        {
+            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String CollectorGD::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // CollectibleGD
+        inline Ent::Gen2::CollectibleType CollectibleGD::CollectibleType() const
+        {
+            return Ent::Gen2::CollectibleType(getProperty().getObjectField("CollectibleType"));
+        }
+        inline Ent::Gen2::Size CollectibleGD::CollectorSize() const
+        {
+            return Ent::Gen2::Size(getProperty().getObjectField("CollectorSize"));
+        }
+        inline Ent::Gen2::StateCollectibleCollected CollectibleGD::StateCollectibleCollected() const
+        {
+            return Ent::Gen2::StateCollectibleCollected(getProperty().getObjectField("StateCollectibleCollected"));
+        }
+        inline Ent::Gen2::StateCollectibleCollecting CollectibleGD::StateCollectibleCollecting() const
+        {
+            return Ent::Gen2::StateCollectibleCollecting(getProperty().getObjectField("StateCollectibleCollecting"));
+        }
+        inline Ent::Gen2::StateCollectorCollected CollectibleGD::StateCollectorCollected() const
+        {
+            return Ent::Gen2::StateCollectorCollected(getProperty().getObjectField("StateCollectorCollected"));
+        }
+        inline Ent::Gen2::StateCollectorCollecting CollectibleGD::StateCollectorCollecting() const
+        {
+            return Ent::Gen2::StateCollectorCollecting(getProperty().getObjectField("StateCollectorCollecting"));
+        }
+        inline Ent::Gen2::ComponentGD CollectibleGD::Super() const
+        {
+            return Ent::Gen2::ComponentGD(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String CollectibleGD::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // Codec
         // Zlib
         inline Ent::Gen2::Codec Zlib::Super() const
@@ -61513,6 +63463,10 @@ namespace Ent
         inline Ent::Gen2::String ClimbEdgeData_LedgeData::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Float ClimbEdgeData_LedgeData::activationDelayAfterLeavingGround() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("activationDelayAfterLeavingGround"));
         }
         inline Ent::Gen2::Float ClimbEdgeData_LedgeData::ledgeApproachSpeedMaxZ() const
         {
@@ -61951,6 +63905,35 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("speedMediumCoeffMin"));
         }
+        // CharacterControllerPreventUndesiredMovementFromInertiaData
+        inline Ent::Gen2::String CharacterControllerPreventUndesiredMovementFromInertiaData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::ScaleConverter CharacterControllerPreventUndesiredMovementFromInertiaData::brakeAnalogicalSpeed() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("brakeAnalogicalSpeed"));
+        }
+        inline Ent::Gen2::ScaleConverter CharacterControllerPreventUndesiredMovementFromInertiaData::brakeAnimationSpeed() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("brakeAnimationSpeed"));
+        }
+        inline Ent::Gen2::ScaleConverter CharacterControllerPreventUndesiredMovementFromInertiaData::retimingInertia() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("retimingInertia"));
+        }
+        inline Ent::Gen2::ScaleConverter CharacterControllerPreventUndesiredMovementFromInertiaData::retimingPlayRatio() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("retimingPlayRatio"));
+        }
+        inline Ent::Gen2::ScaleConverter CharacterControllerPreventUndesiredMovementFromInertiaData::retimingPosition() const
+        {
+            return Ent::Gen2::ScaleConverter(getProperty().getObjectField("retimingPosition"));
+        }
+        inline Ent::Gen2::Float CharacterControllerPreventUndesiredMovementFromInertiaData::slopeAngleMaxInDegree() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("slopeAngleMaxInDegree"));
+        }
         // CharacterControllerGroundNormalData
         inline Ent::Gen2::Bool CharacterControllerGroundNormalData::AllowOtherCreatureCast() const
         {
@@ -61980,6 +63963,52 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // CharacterControllerComponentInput_CreatureLOD
+        inline Ent::Gen2::String CharacterControllerComponentInput_CreatureLOD::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool CharacterControllerComponentInput_CreatureLOD::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::CreatureLOD CharacterControllerComponentInput_CreatureLOD::val() const
+        {
+            return Ent::Gen2::CreatureLOD(getProperty().getObjectField("val"));
+        }
+        // CharacterControllerComponentInput
+        inline Ent::Gen2::CharacterControllerComponentInput_CreatureLOD CharacterControllerComponentInput::CreatureLOD() const
+        {
+            return Ent::Gen2::CharacterControllerComponentInput_CreatureLOD(getProperty().getObjectField("CreatureLOD"));
+        }
+        inline Ent::Gen2::JumpHeightMultiplier CharacterControllerComponentInput::JumpHeightMultiplier() const
+        {
+            return Ent::Gen2::JumpHeightMultiplier(getProperty().getObjectField("JumpHeightMultiplier"));
+        }
+        inline Ent::Gen2::ResetContinuousPositionOnGround CharacterControllerComponentInput::ResetContinuousPositionOnGround() const
+        {
+            return Ent::Gen2::ResetContinuousPositionOnGround(getProperty().getObjectField("ResetContinuousPositionOnGround"));
+        }
+        inline Ent::Gen2::RigidbodyScaleMultiplier CharacterControllerComponentInput::RigidbodyScaleMultiplier() const
+        {
+            return Ent::Gen2::RigidbodyScaleMultiplier(getProperty().getObjectField("RigidbodyScaleMultiplier"));
+        }
+        inline Ent::Gen2::RigidbodyScalingSpeed CharacterControllerComponentInput::RigidbodyScalingSpeed() const
+        {
+            return Ent::Gen2::RigidbodyScalingSpeed(getProperty().getObjectField("RigidbodyScalingSpeed"));
+        }
+        inline Ent::Gen2::ComponentInput CharacterControllerComponentInput::Super() const
+        {
+            return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::UpdateContinuousPositionOnGround CharacterControllerComponentInput::UpdateContinuousPositionOnGround() const
+        {
+            return Ent::Gen2::UpdateContinuousPositionOnGround(getProperty().getObjectField("UpdateContinuousPositionOnGround"));
+        }
+        inline Ent::Gen2::String CharacterControllerComponentInput::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // CharacterControllerClamberData
         inline Ent::Gen2::Float CharacterControllerClamberData::DropOffAngle() const
         {
@@ -62004,6 +64033,27 @@ namespace Ent
         inline Ent::Gen2::String CharacterControllerClamberData::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // CharacterControllerAnticipationData
+        inline Ent::Gen2::String CharacterControllerAnticipationData::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Float CharacterControllerAnticipationData::anticipationDuration() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("anticipationDuration"));
+        }
+        inline Ent::Gen2::Float CharacterControllerAnticipationData::groundNormalPercentageEdgeTolerance() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("groundNormalPercentageEdgeTolerance"));
+        }
+        inline Ent::Gen2::Float CharacterControllerAnticipationData::rigidBodySpeedMaxFactor() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("rigidBodySpeedMaxFactor"));
+        }
+        inline Ent::Gen2::Float CharacterControllerAnticipationData::rigidBodySpeedMin() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("rigidBodySpeedMin"));
         }
         // CapabilitiesAndTags
         inline Ent::Gen2::PrimitiveSet<NavMeshCapabilityEnum> CapabilitiesAndTags::Capabilities() const
@@ -62139,27 +64189,6 @@ namespace Ent
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("val"));
         }
-        // CreatureComponentInput
-        inline Ent::Gen2::CanTakeHit CreatureComponentInput::CanTakeHit() const
-        {
-            return Ent::Gen2::CanTakeHit(getProperty().getObjectField("CanTakeHit"));
-        }
-        inline Ent::Gen2::DeltaTimeFactor CreatureComponentInput::DeltaTimeFactor() const
-        {
-            return Ent::Gen2::DeltaTimeFactor(getProperty().getObjectField("DeltaTimeFactor"));
-        }
-        inline Ent::Gen2::Invincible CreatureComponentInput::Invincible() const
-        {
-            return Ent::Gen2::Invincible(getProperty().getObjectField("Invincible"));
-        }
-        inline Ent::Gen2::ComponentInput CreatureComponentInput::Super() const
-        {
-            return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
-        }
-        inline Ent::Gen2::String CreatureComponentInput::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
         // CanPossess
         inline Ent::Gen2::String CanPossess::_comment() const
         {
@@ -62211,6 +64240,19 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // CanBePossessed
+        inline Ent::Gen2::String CanBePossessed::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool CanBePossessed::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::Bool CanBePossessed::val() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("val"));
+        }
         // CanBeInteractedWith
         inline Ent::Gen2::String CanBeInteractedWith::_comment() const
         {
@@ -62238,6 +64280,48 @@ namespace Ent
             return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String InteractableComponentInput::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // CanBeConverted
+        inline Ent::Gen2::String CanBeConverted::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        inline Ent::Gen2::Bool CanBeConverted::engaged() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("engaged"));
+        }
+        inline Ent::Gen2::Bool CanBeConverted::val() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("val"));
+        }
+        // CreatureComponentInput
+        inline Ent::Gen2::CanBeConverted CreatureComponentInput::CanBeConverted() const
+        {
+            return Ent::Gen2::CanBeConverted(getProperty().getObjectField("CanBeConverted"));
+        }
+        inline Ent::Gen2::CanBePossessed CreatureComponentInput::CanBePossessed() const
+        {
+            return Ent::Gen2::CanBePossessed(getProperty().getObjectField("CanBePossessed"));
+        }
+        inline Ent::Gen2::CanTakeHit CreatureComponentInput::CanTakeHit() const
+        {
+            return Ent::Gen2::CanTakeHit(getProperty().getObjectField("CanTakeHit"));
+        }
+        inline Ent::Gen2::DeltaTimeFactor CreatureComponentInput::DeltaTimeFactor() const
+        {
+            return Ent::Gen2::DeltaTimeFactor(getProperty().getObjectField("DeltaTimeFactor"));
+        }
+        inline Ent::Gen2::Invincible CreatureComponentInput::Invincible() const
+        {
+            return Ent::Gen2::Invincible(getProperty().getObjectField("Invincible"));
+        }
+        inline Ent::Gen2::ComponentInput CreatureComponentInput::Super() const
+        {
+            return Ent::Gen2::ComponentInput(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String CreatureComponentInput::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -63043,19 +65127,6 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
-        // AttackPositionRetimingData_SpecieRetimingCoeff
-        inline Ent::Gen2::String AttackPositionRetimingData_SpecieRetimingCoeff::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        inline Ent::Gen2::Float AttackPositionRetimingData_SpecieRetimingCoeff::defaultCoeff() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("defaultCoeff"));
-        }
-        inline Ent::Gen2::Float AttackPositionRetimingData_SpecieRetimingCoeff::masterCoeff() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("masterCoeff"));
-        }
         // AttackPositionRetimingData
         inline Ent::Gen2::String AttackPositionRetimingData::_comment() const
         {
@@ -63064,10 +65135,6 @@ namespace Ent
         inline Ent::Gen2::Float AttackPositionRetimingData::animTranslationCoeff() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("animTranslationCoeff"));
-        }
-        inline Ent::Gen2::Map<SpecieEnum, Ent::Gen2::AttackPositionRetimingData_SpecieRetimingCoeff> AttackPositionRetimingData::backwardRetimingCoeffBySpecie() const
-        {
-            return Ent::Gen2::Map<SpecieEnum, Ent::Gen2::AttackPositionRetimingData_SpecieRetimingCoeff>(getProperty().getObjectField("backwardRetimingCoeffBySpecie"));
         }
         inline Ent::Gen2::Float AttackPositionRetimingData::lengthMax() const
         {
@@ -63118,9 +65185,13 @@ namespace Ent
             return Ent::Gen2::Float(getProperty().getObjectField("amount"));
         }
         // GameAttackData
-        inline Ent::Gen2::Float GameAttackData::AggressiveDuration() const
+        inline Ent::Gen2::Float GameAttackData::AggressiveDurationMax() const
         {
-            return Ent::Gen2::Float(getProperty().getObjectField("AggressiveDuration"));
+            return Ent::Gen2::Float(getProperty().getObjectField("AggressiveDurationMax"));
+        }
+        inline Ent::Gen2::Float GameAttackData::AggressiveDurationMin() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("AggressiveDurationMin"));
         }
         inline Ent::Gen2::Map<char const*, Ent::Gen2::CameraShakeData> GameAttackData::AttackCameraShakeData() const
         {
@@ -63901,6 +65972,14 @@ namespace Ent
             return Array<Ent::Gen2::MoveCapacityData_AnimTagTimelineTransitionItem>(getProperty().getObjectField("transitions"));
         }
         // MoveCapacityData
+        inline Ent::Gen2::MoveCapacityData_Dodge MoveCapacityData::Dodge() const
+        {
+            return Ent::Gen2::MoveCapacityData_Dodge(getProperty().getObjectField("Dodge"));
+        }
+        inline Ent::Gen2::Float MoveCapacityData::LandingDecelerationFactor() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("LandingDecelerationFactor"));
+        }
         inline Ent::Gen2::Float MoveCapacityData::MaxAngleToDetectLandingGripDirection() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("MaxAngleToDetectLandingGripDirection"));
@@ -64000,10 +66079,6 @@ namespace Ent
         inline Ent::Gen2::Float MoveCapacityData::defaultWorldUpSpeedFactor() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("defaultWorldUpSpeedFactor"));
-        }
-        inline Ent::Gen2::Float MoveCapacityData::dodgeCooldownTime() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("dodgeCooldownTime"));
         }
         inline Ent::Gen2::Bool MoveCapacityData::doubleJump() const
         {
@@ -64129,6 +66204,10 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("rigidbodyScalingSpeed"));
         }
+        inline Ent::Gen2::Float MoveCapacityData::rigidbodyScalingSpeedInAir() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("rigidbodyScalingSpeedInAir"));
+        }
         inline Ent::Gen2::Float MoveCapacityData::sphereCastRadiusRatio() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("sphereCastRadiusRatio"));
@@ -64160,6 +66239,10 @@ namespace Ent
         inline Ent::Gen2::Float MoveCapacityData::strafeTurnAngleMin() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("strafeTurnAngleMin"));
+        }
+        inline Ent::Gen2::timeSinceLastTurnForDecreasingSpeed MoveCapacityData::timeSinceLastTurnForDecreasingSpeed() const
+        {
+            return Ent::Gen2::timeSinceLastTurnForDecreasingSpeed(getProperty().getObjectField("timeSinceLastTurnForDecreasingSpeed"));
         }
         inline Ent::Gen2::Float MoveCapacityData::trajectoryRateFactorDuringLateralLand() const
         {
@@ -64500,6 +66583,10 @@ namespace Ent
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("AllowHeightMapFallback"));
         }
+        inline Ent::Gen2::CharacterControllerAnticipationData CharacterControllerGD::AnticipationData() const
+        {
+            return Ent::Gen2::CharacterControllerAnticipationData(getProperty().getObjectField("AnticipationData"));
+        }
         inline Ent::Gen2::CharacterControllerClamberData CharacterControllerGD::ClamberData() const
         {
             return Ent::Gen2::CharacterControllerClamberData(getProperty().getObjectField("ClamberData"));
@@ -64535,6 +66622,10 @@ namespace Ent
         inline Ent::Gen2::PredictionBehaviorData CharacterControllerGD::PredictionData() const
         {
             return Ent::Gen2::PredictionBehaviorData(getProperty().getObjectField("PredictionData"));
+        }
+        inline Ent::Gen2::CharacterControllerPreventUndesiredMovementFromInertiaData CharacterControllerGD::PreventUndesiredMovementFromInertiaData() const
+        {
+            return Ent::Gen2::CharacterControllerPreventUndesiredMovementFromInertiaData(getProperty().getObjectField("PreventUndesiredMovementFromInertiaData"));
         }
         inline Ent::Gen2::Vector3 CharacterControllerGD::RotationSmooth() const
         {
@@ -65673,17 +67764,29 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("ActorStateApplyHit");
         }
-        inline std::optional<Ent::Gen2::ActorStateAttitudeAggressive> ActorStates::ActorStateAttitudeAggressive()
+        inline std::optional<Ent::Gen2::ActorStateAttitudeAggressivePersistent> ActorStates::ActorStateAttitudeAggressivePersistent()
         {
-            return std::optional<Ent::Gen2::ActorStateAttitudeAggressive>(getSubNode("ActorStateAttitudeAggressive"));
+            return std::optional<Ent::Gen2::ActorStateAttitudeAggressivePersistent>(getSubNode("ActorStateAttitudeAggressivePersistent"));
         }
-        inline Ent::Gen2::ActorStateAttitudeAggressive ActorStates::addActorStateAttitudeAggressive()
+        inline Ent::Gen2::ActorStateAttitudeAggressivePersistent ActorStates::addActorStateAttitudeAggressivePersistent()
         {
-            return Ent::Gen2::ActorStateAttitudeAggressive(addSubNode("ActorStateAttitudeAggressive"));
+            return Ent::Gen2::ActorStateAttitudeAggressivePersistent(addSubNode("ActorStateAttitudeAggressivePersistent"));
         }
-        inline void ActorStates::removeActorStateAttitudeAggressive()
+        inline void ActorStates::removeActorStateAttitudeAggressivePersistent()
         {
-            getProperty().eraseUnionSetItem("ActorStateAttitudeAggressive");
+            getProperty().eraseUnionSetItem("ActorStateAttitudeAggressivePersistent");
+        }
+        inline std::optional<Ent::Gen2::ActorStateAttitudeAggressiveTemporary> ActorStates::ActorStateAttitudeAggressiveTemporary()
+        {
+            return std::optional<Ent::Gen2::ActorStateAttitudeAggressiveTemporary>(getSubNode("ActorStateAttitudeAggressiveTemporary"));
+        }
+        inline Ent::Gen2::ActorStateAttitudeAggressiveTemporary ActorStates::addActorStateAttitudeAggressiveTemporary()
+        {
+            return Ent::Gen2::ActorStateAttitudeAggressiveTemporary(addSubNode("ActorStateAttitudeAggressiveTemporary"));
+        }
+        inline void ActorStates::removeActorStateAttitudeAggressiveTemporary()
+        {
+            getProperty().eraseUnionSetItem("ActorStateAttitudeAggressiveTemporary");
         }
         inline std::optional<Ent::Gen2::ActorStateBehaviorState> ActorStates::ActorStateBehaviorState()
         {
@@ -66621,18 +68724,6 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("ActorStateSpeedMultiplier");
         }
-        inline std::optional<Ent::Gen2::ActorStateStopAttitudeAggressive> ActorStates::ActorStateStopAttitudeAggressive()
-        {
-            return std::optional<Ent::Gen2::ActorStateStopAttitudeAggressive>(getSubNode("ActorStateStopAttitudeAggressive"));
-        }
-        inline Ent::Gen2::ActorStateStopAttitudeAggressive ActorStates::addActorStateStopAttitudeAggressive()
-        {
-            return Ent::Gen2::ActorStateStopAttitudeAggressive(addSubNode("ActorStateStopAttitudeAggressive"));
-        }
-        inline void ActorStates::removeActorStateStopAttitudeAggressive()
-        {
-            getProperty().eraseUnionSetItem("ActorStateStopAttitudeAggressive");
-        }
         inline std::optional<Ent::Gen2::ActorStateTaunting> ActorStates::ActorStateTaunting()
         {
             return std::optional<Ent::Gen2::ActorStateTaunting>(getSubNode("ActorStateTaunting"));
@@ -66704,6 +68795,18 @@ namespace Ent
         inline void ActorStates::removeActorStateTryUpgradeShamanStaff()
         {
             getProperty().eraseUnionSetItem("ActorStateTryUpgradeShamanStaff");
+        }
+        inline std::optional<Ent::Gen2::EntityStateAI> ActorStates::EntityStateAI()
+        {
+            return std::optional<Ent::Gen2::EntityStateAI>(getSubNode("EntityStateAI"));
+        }
+        inline Ent::Gen2::EntityStateAI ActorStates::addEntityStateAI()
+        {
+            return Ent::Gen2::EntityStateAI(addSubNode("EntityStateAI"));
+        }
+        inline void ActorStates::removeEntityStateAI()
+        {
+            getProperty().eraseUnionSetItem("EntityStateAI");
         }
         inline std::optional<Ent::Gen2::EntityStateAboutToBeHatched> ActorStates::EntityStateAboutToBeHatched()
         {
@@ -66837,18 +68940,6 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateBackwardLand");
         }
-        inline std::optional<Ent::Gen2::EntityStateBeingBlockedByVine> ActorStates::EntityStateBeingBlockedByVine()
-        {
-            return std::optional<Ent::Gen2::EntityStateBeingBlockedByVine>(getSubNode("EntityStateBeingBlockedByVine"));
-        }
-        inline Ent::Gen2::EntityStateBeingBlockedByVine ActorStates::addEntityStateBeingBlockedByVine()
-        {
-            return Ent::Gen2::EntityStateBeingBlockedByVine(addSubNode("EntityStateBeingBlockedByVine"));
-        }
-        inline void ActorStates::removeEntityStateBeingBlockedByVine()
-        {
-            getProperty().eraseUnionSetItem("EntityStateBeingBlockedByVine");
-        }
         inline std::optional<Ent::Gen2::EntityStateBeingFocusedToInteract> ActorStates::EntityStateBeingFocusedToInteract()
         {
             return std::optional<Ent::Gen2::EntityStateBeingFocusedToInteract>(getSubNode("EntityStateBeingFocusedToInteract"));
@@ -66872,6 +68963,18 @@ namespace Ent
         inline void ActorStates::removeEntityStateBeingFocusedToPossess()
         {
             getProperty().eraseUnionSetItem("EntityStateBeingFocusedToPossess");
+        }
+        inline std::optional<Ent::Gen2::EntityStateBeingInPlantCage> ActorStates::EntityStateBeingInPlantCage()
+        {
+            return std::optional<Ent::Gen2::EntityStateBeingInPlantCage>(getSubNode("EntityStateBeingInPlantCage"));
+        }
+        inline Ent::Gen2::EntityStateBeingInPlantCage ActorStates::addEntityStateBeingInPlantCage()
+        {
+            return Ent::Gen2::EntityStateBeingInPlantCage(addSubNode("EntityStateBeingInPlantCage"));
+        }
+        inline void ActorStates::removeEntityStateBeingInPlantCage()
+        {
+            getProperty().eraseUnionSetItem("EntityStateBeingInPlantCage");
         }
         inline std::optional<Ent::Gen2::EntityStateBeingInReeds> ActorStates::EntityStateBeingInReeds()
         {
@@ -67149,17 +69252,17 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateCanNotBePerceived");
         }
-        inline std::optional<Ent::Gen2::EntityStateCancelSetSavePoint> ActorStates::EntityStateCancelSetSavePoint()
+        inline std::optional<Ent::Gen2::EntityStateCancelSave> ActorStates::EntityStateCancelSave()
         {
-            return std::optional<Ent::Gen2::EntityStateCancelSetSavePoint>(getSubNode("EntityStateCancelSetSavePoint"));
+            return std::optional<Ent::Gen2::EntityStateCancelSave>(getSubNode("EntityStateCancelSave"));
         }
-        inline Ent::Gen2::EntityStateCancelSetSavePoint ActorStates::addEntityStateCancelSetSavePoint()
+        inline Ent::Gen2::EntityStateCancelSave ActorStates::addEntityStateCancelSave()
         {
-            return Ent::Gen2::EntityStateCancelSetSavePoint(addSubNode("EntityStateCancelSetSavePoint"));
+            return Ent::Gen2::EntityStateCancelSave(addSubNode("EntityStateCancelSave"));
         }
-        inline void ActorStates::removeEntityStateCancelSetSavePoint()
+        inline void ActorStates::removeEntityStateCancelSave()
         {
-            getProperty().eraseUnionSetItem("EntityStateCancelSetSavePoint");
+            getProperty().eraseUnionSetItem("EntityStateCancelSave");
         }
         inline std::optional<Ent::Gen2::EntityStateChargeMode> ActorStates::EntityStateChargeMode()
         {
@@ -67293,6 +69396,30 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateCollectVertebrae");
         }
+        inline std::optional<Ent::Gen2::EntityStateCollectVertebraeShard> ActorStates::EntityStateCollectVertebraeShard()
+        {
+            return std::optional<Ent::Gen2::EntityStateCollectVertebraeShard>(getSubNode("EntityStateCollectVertebraeShard"));
+        }
+        inline Ent::Gen2::EntityStateCollectVertebraeShard ActorStates::addEntityStateCollectVertebraeShard()
+        {
+            return Ent::Gen2::EntityStateCollectVertebraeShard(addSubNode("EntityStateCollectVertebraeShard"));
+        }
+        inline void ActorStates::removeEntityStateCollectVertebraeShard()
+        {
+            getProperty().eraseUnionSetItem("EntityStateCollectVertebraeShard");
+        }
+        inline std::optional<Ent::Gen2::EntityStateCollecting> ActorStates::EntityStateCollecting()
+        {
+            return std::optional<Ent::Gen2::EntityStateCollecting>(getSubNode("EntityStateCollecting"));
+        }
+        inline Ent::Gen2::EntityStateCollecting ActorStates::addEntityStateCollecting()
+        {
+            return Ent::Gen2::EntityStateCollecting(addSubNode("EntityStateCollecting"));
+        }
+        inline void ActorStates::removeEntityStateCollecting()
+        {
+            getProperty().eraseUnionSetItem("EntityStateCollecting");
+        }
         inline std::optional<Ent::Gen2::EntityStateCombat> ActorStates::EntityStateCombat()
         {
             return std::optional<Ent::Gen2::EntityStateCombat>(getSubNode("EntityStateCombat"));
@@ -67340,6 +69467,30 @@ namespace Ent
         inline void ActorStates::removeEntityStateControlGPE()
         {
             getProperty().eraseUnionSetItem("EntityStateControlGPE");
+        }
+        inline std::optional<Ent::Gen2::EntityStateConversionTransitionTo> ActorStates::EntityStateConversionTransitionTo()
+        {
+            return std::optional<Ent::Gen2::EntityStateConversionTransitionTo>(getSubNode("EntityStateConversionTransitionTo"));
+        }
+        inline Ent::Gen2::EntityStateConversionTransitionTo ActorStates::addEntityStateConversionTransitionTo()
+        {
+            return Ent::Gen2::EntityStateConversionTransitionTo(addSubNode("EntityStateConversionTransitionTo"));
+        }
+        inline void ActorStates::removeEntityStateConversionTransitionTo()
+        {
+            getProperty().eraseUnionSetItem("EntityStateConversionTransitionTo");
+        }
+        inline std::optional<Ent::Gen2::EntityStateConverted> ActorStates::EntityStateConverted()
+        {
+            return std::optional<Ent::Gen2::EntityStateConverted>(getSubNode("EntityStateConverted"));
+        }
+        inline Ent::Gen2::EntityStateConverted ActorStates::addEntityStateConverted()
+        {
+            return Ent::Gen2::EntityStateConverted(addSubNode("EntityStateConverted"));
+        }
+        inline void ActorStates::removeEntityStateConverted()
+        {
+            getProperty().eraseUnionSetItem("EntityStateConverted");
         }
         inline std::optional<Ent::Gen2::EntityStateCoyoteJump> ActorStates::EntityStateCoyoteJump()
         {
@@ -67545,18 +69696,6 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateEnergySpoutState");
         }
-        inline std::optional<Ent::Gen2::EntityStateEnterDeathVolume> ActorStates::EntityStateEnterDeathVolume()
-        {
-            return std::optional<Ent::Gen2::EntityStateEnterDeathVolume>(getSubNode("EntityStateEnterDeathVolume"));
-        }
-        inline Ent::Gen2::EntityStateEnterDeathVolume ActorStates::addEntityStateEnterDeathVolume()
-        {
-            return Ent::Gen2::EntityStateEnterDeathVolume(addSubNode("EntityStateEnterDeathVolume"));
-        }
-        inline void ActorStates::removeEntityStateEnterDeathVolume()
-        {
-            getProperty().eraseUnionSetItem("EntityStateEnterDeathVolume");
-        }
         inline std::optional<Ent::Gen2::EntityStateExtraLife> ActorStates::EntityStateExtraLife()
         {
             return std::optional<Ent::Gen2::EntityStateExtraLife>(getSubNode("EntityStateExtraLife"));
@@ -67761,6 +69900,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateGrasp");
         }
+        inline std::optional<Ent::Gen2::EntityStateGraspIntention> ActorStates::EntityStateGraspIntention()
+        {
+            return std::optional<Ent::Gen2::EntityStateGraspIntention>(getSubNode("EntityStateGraspIntention"));
+        }
+        inline Ent::Gen2::EntityStateGraspIntention ActorStates::addEntityStateGraspIntention()
+        {
+            return Ent::Gen2::EntityStateGraspIntention(addSubNode("EntityStateGraspIntention"));
+        }
+        inline void ActorStates::removeEntityStateGraspIntention()
+        {
+            getProperty().eraseUnionSetItem("EntityStateGraspIntention");
+        }
         inline std::optional<Ent::Gen2::EntityStateGroundedJump> ActorStates::EntityStateGroundedJump()
         {
             return std::optional<Ent::Gen2::EntityStateGroundedJump>(getSubNode("EntityStateGroundedJump"));
@@ -67964,6 +70115,18 @@ namespace Ent
         inline void ActorStates::removeEntityStateJustStarted()
         {
             getProperty().eraseUnionSetItem("EntityStateJustStarted");
+        }
+        inline std::optional<Ent::Gen2::EntityStateJustTeleported> ActorStates::EntityStateJustTeleported()
+        {
+            return std::optional<Ent::Gen2::EntityStateJustTeleported>(getSubNode("EntityStateJustTeleported"));
+        }
+        inline Ent::Gen2::EntityStateJustTeleported ActorStates::addEntityStateJustTeleported()
+        {
+            return Ent::Gen2::EntityStateJustTeleported(addSubNode("EntityStateJustTeleported"));
+        }
+        inline void ActorStates::removeEntityStateJustTeleported()
+        {
+            getProperty().eraseUnionSetItem("EntityStateJustTeleported");
         }
         inline std::optional<Ent::Gen2::EntityStateLateralDodge> ActorStates::EntityStateLateralDodge()
         {
@@ -68229,6 +70392,54 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStatePlayer");
         }
+        inline std::optional<Ent::Gen2::EntityStatePlayerHatchingPool> ActorStates::EntityStatePlayerHatchingPool()
+        {
+            return std::optional<Ent::Gen2::EntityStatePlayerHatchingPool>(getSubNode("EntityStatePlayerHatchingPool"));
+        }
+        inline Ent::Gen2::EntityStatePlayerHatchingPool ActorStates::addEntityStatePlayerHatchingPool()
+        {
+            return Ent::Gen2::EntityStatePlayerHatchingPool(addSubNode("EntityStatePlayerHatchingPool"));
+        }
+        inline void ActorStates::removeEntityStatePlayerHatchingPool()
+        {
+            getProperty().eraseUnionSetItem("EntityStatePlayerHatchingPool");
+        }
+        inline std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolIn> ActorStates::EntityStatePlayerHatchingPoolIn()
+        {
+            return std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolIn>(getSubNode("EntityStatePlayerHatchingPoolIn"));
+        }
+        inline Ent::Gen2::EntityStatePlayerHatchingPoolIn ActorStates::addEntityStatePlayerHatchingPoolIn()
+        {
+            return Ent::Gen2::EntityStatePlayerHatchingPoolIn(addSubNode("EntityStatePlayerHatchingPoolIn"));
+        }
+        inline void ActorStates::removeEntityStatePlayerHatchingPoolIn()
+        {
+            getProperty().eraseUnionSetItem("EntityStatePlayerHatchingPoolIn");
+        }
+        inline std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolOut> ActorStates::EntityStatePlayerHatchingPoolOut()
+        {
+            return std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolOut>(getSubNode("EntityStatePlayerHatchingPoolOut"));
+        }
+        inline Ent::Gen2::EntityStatePlayerHatchingPoolOut ActorStates::addEntityStatePlayerHatchingPoolOut()
+        {
+            return Ent::Gen2::EntityStatePlayerHatchingPoolOut(addSubNode("EntityStatePlayerHatchingPoolOut"));
+        }
+        inline void ActorStates::removeEntityStatePlayerHatchingPoolOut()
+        {
+            getProperty().eraseUnionSetItem("EntityStatePlayerHatchingPoolOut");
+        }
+        inline std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolSetup> ActorStates::EntityStatePlayerHatchingPoolSetup()
+        {
+            return std::optional<Ent::Gen2::EntityStatePlayerHatchingPoolSetup>(getSubNode("EntityStatePlayerHatchingPoolSetup"));
+        }
+        inline Ent::Gen2::EntityStatePlayerHatchingPoolSetup ActorStates::addEntityStatePlayerHatchingPoolSetup()
+        {
+            return Ent::Gen2::EntityStatePlayerHatchingPoolSetup(addSubNode("EntityStatePlayerHatchingPoolSetup"));
+        }
+        inline void ActorStates::removeEntityStatePlayerHatchingPoolSetup()
+        {
+            getProperty().eraseUnionSetItem("EntityStatePlayerHatchingPoolSetup");
+        }
         inline std::optional<Ent::Gen2::EntityStatePlungeLand> ActorStates::EntityStatePlungeLand()
         {
             return std::optional<Ent::Gen2::EntityStatePlungeLand>(getSubNode("EntityStatePlungeLand"));
@@ -68264,6 +70475,30 @@ namespace Ent
         inline void ActorStates::removeEntityStatePreventAscendInSlope()
         {
             getProperty().eraseUnionSetItem("EntityStatePreventAscendInSlope");
+        }
+        inline std::optional<Ent::Gen2::EntityStatePreventSave> ActorStates::EntityStatePreventSave()
+        {
+            return std::optional<Ent::Gen2::EntityStatePreventSave>(getSubNode("EntityStatePreventSave"));
+        }
+        inline Ent::Gen2::EntityStatePreventSave ActorStates::addEntityStatePreventSave()
+        {
+            return Ent::Gen2::EntityStatePreventSave(addSubNode("EntityStatePreventSave"));
+        }
+        inline void ActorStates::removeEntityStatePreventSave()
+        {
+            getProperty().eraseUnionSetItem("EntityStatePreventSave");
+        }
+        inline std::optional<Ent::Gen2::EntityStatePreventUndesiredMovementDueToInertia> ActorStates::EntityStatePreventUndesiredMovementDueToInertia()
+        {
+            return std::optional<Ent::Gen2::EntityStatePreventUndesiredMovementDueToInertia>(getSubNode("EntityStatePreventUndesiredMovementDueToInertia"));
+        }
+        inline Ent::Gen2::EntityStatePreventUndesiredMovementDueToInertia ActorStates::addEntityStatePreventUndesiredMovementDueToInertia()
+        {
+            return Ent::Gen2::EntityStatePreventUndesiredMovementDueToInertia(addSubNode("EntityStatePreventUndesiredMovementDueToInertia"));
+        }
+        inline void ActorStates::removeEntityStatePreventUndesiredMovementDueToInertia()
+        {
+            getProperty().eraseUnionSetItem("EntityStatePreventUndesiredMovementDueToInertia");
         }
         inline std::optional<Ent::Gen2::EntityStateRaise> ActorStates::EntityStateRaise()
         {
@@ -68313,6 +70548,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateRegainCapacity");
         }
+        inline std::optional<Ent::Gen2::EntityStateRepositionToLastSafeGroundedPosition> ActorStates::EntityStateRepositionToLastSafeGroundedPosition()
+        {
+            return std::optional<Ent::Gen2::EntityStateRepositionToLastSafeGroundedPosition>(getSubNode("EntityStateRepositionToLastSafeGroundedPosition"));
+        }
+        inline Ent::Gen2::EntityStateRepositionToLastSafeGroundedPosition ActorStates::addEntityStateRepositionToLastSafeGroundedPosition()
+        {
+            return Ent::Gen2::EntityStateRepositionToLastSafeGroundedPosition(addSubNode("EntityStateRepositionToLastSafeGroundedPosition"));
+        }
+        inline void ActorStates::removeEntityStateRepositionToLastSafeGroundedPosition()
+        {
+            getProperty().eraseUnionSetItem("EntityStateRepositionToLastSafeGroundedPosition");
+        }
         inline std::optional<Ent::Gen2::EntityStateReserveMountSlots> ActorStates::EntityStateReserveMountSlots()
         {
             return std::optional<Ent::Gen2::EntityStateReserveMountSlots>(getSubNode("EntityStateReserveMountSlots"));
@@ -68361,6 +70608,18 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateRevive");
         }
+        inline std::optional<Ent::Gen2::EntityStateSaveNow> ActorStates::EntityStateSaveNow()
+        {
+            return std::optional<Ent::Gen2::EntityStateSaveNow>(getSubNode("EntityStateSaveNow"));
+        }
+        inline Ent::Gen2::EntityStateSaveNow ActorStates::addEntityStateSaveNow()
+        {
+            return Ent::Gen2::EntityStateSaveNow(addSubNode("EntityStateSaveNow"));
+        }
+        inline void ActorStates::removeEntityStateSaveNow()
+        {
+            getProperty().eraseUnionSetItem("EntityStateSaveNow");
+        }
         inline std::optional<Ent::Gen2::EntityStateSavePointActivated> ActorStates::EntityStateSavePointActivated()
         {
             return std::optional<Ent::Gen2::EntityStateSavePointActivated>(getSubNode("EntityStateSavePointActivated"));
@@ -68373,17 +70632,17 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateSavePointActivated");
         }
-        inline std::optional<Ent::Gen2::EntityStateSetSavePoint> ActorStates::EntityStateSetSavePoint()
+        inline std::optional<Ent::Gen2::EntityStateSaveWhenPossible> ActorStates::EntityStateSaveWhenPossible()
         {
-            return std::optional<Ent::Gen2::EntityStateSetSavePoint>(getSubNode("EntityStateSetSavePoint"));
+            return std::optional<Ent::Gen2::EntityStateSaveWhenPossible>(getSubNode("EntityStateSaveWhenPossible"));
         }
-        inline Ent::Gen2::EntityStateSetSavePoint ActorStates::addEntityStateSetSavePoint()
+        inline Ent::Gen2::EntityStateSaveWhenPossible ActorStates::addEntityStateSaveWhenPossible()
         {
-            return Ent::Gen2::EntityStateSetSavePoint(addSubNode("EntityStateSetSavePoint"));
+            return Ent::Gen2::EntityStateSaveWhenPossible(addSubNode("EntityStateSaveWhenPossible"));
         }
-        inline void ActorStates::removeEntityStateSetSavePoint()
+        inline void ActorStates::removeEntityStateSaveWhenPossible()
         {
-            getProperty().eraseUnionSetItem("EntityStateSetSavePoint");
+            getProperty().eraseUnionSetItem("EntityStateSaveWhenPossible");
         }
         inline std::optional<Ent::Gen2::EntityStateShootHatchingEnergy> ActorStates::EntityStateShootHatchingEnergy()
         {
@@ -68649,6 +70908,30 @@ namespace Ent
         {
             getProperty().eraseUnionSetItem("EntityStateStrongAttackJumped");
         }
+        inline std::optional<Ent::Gen2::EntityStateStuck> ActorStates::EntityStateStuck()
+        {
+            return std::optional<Ent::Gen2::EntityStateStuck>(getSubNode("EntityStateStuck"));
+        }
+        inline Ent::Gen2::EntityStateStuck ActorStates::addEntityStateStuck()
+        {
+            return Ent::Gen2::EntityStateStuck(addSubNode("EntityStateStuck"));
+        }
+        inline void ActorStates::removeEntityStateStuck()
+        {
+            getProperty().eraseUnionSetItem("EntityStateStuck");
+        }
+        inline std::optional<Ent::Gen2::EntityStateStuckOut> ActorStates::EntityStateStuckOut()
+        {
+            return std::optional<Ent::Gen2::EntityStateStuckOut>(getSubNode("EntityStateStuckOut"));
+        }
+        inline Ent::Gen2::EntityStateStuckOut ActorStates::addEntityStateStuckOut()
+        {
+            return Ent::Gen2::EntityStateStuckOut(addSubNode("EntityStateStuckOut"));
+        }
+        inline void ActorStates::removeEntityStateStuckOut()
+        {
+            getProperty().eraseUnionSetItem("EntityStateStuckOut");
+        }
         inline std::optional<Ent::Gen2::EntityStateTakeDamageOnMount> ActorStates::EntityStateTakeDamageOnMount()
         {
             return std::optional<Ent::Gen2::EntityStateTakeDamageOnMount>(getSubNode("EntityStateTakeDamageOnMount"));
@@ -68660,6 +70943,18 @@ namespace Ent
         inline void ActorStates::removeEntityStateTakeDamageOnMount()
         {
             getProperty().eraseUnionSetItem("EntityStateTakeDamageOnMount");
+        }
+        inline std::optional<Ent::Gen2::EntityStateTeleportToSafePosition> ActorStates::EntityStateTeleportToSafePosition()
+        {
+            return std::optional<Ent::Gen2::EntityStateTeleportToSafePosition>(getSubNode("EntityStateTeleportToSafePosition"));
+        }
+        inline Ent::Gen2::EntityStateTeleportToSafePosition ActorStates::addEntityStateTeleportToSafePosition()
+        {
+            return Ent::Gen2::EntityStateTeleportToSafePosition(addSubNode("EntityStateTeleportToSafePosition"));
+        }
+        inline void ActorStates::removeEntityStateTeleportToSafePosition()
+        {
+            getProperty().eraseUnionSetItem("EntityStateTeleportToSafePosition");
         }
         inline std::optional<Ent::Gen2::EntityStateTooDeep> ActorStates::EntityStateTooDeep()
         {
@@ -69186,12 +71481,55 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // EntityStateTeleportToSafePosition
+        inline Ent::Gen2::Float EntityStateTeleportToSafePosition::FadeInDelay() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("FadeInDelay"));
+        }
+        inline Ent::Gen2::Float EntityStateTeleportToSafePosition::FadeInTime() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("FadeInTime"));
+        }
+        inline Ent::Gen2::Float EntityStateTeleportToSafePosition::FadeOutDelay() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("FadeOutDelay"));
+        }
+        inline Ent::Gen2::Float EntityStateTeleportToSafePosition::FadeOutTime() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("FadeOutTime"));
+        }
+        inline Ent::Gen2::ActorState EntityStateTeleportToSafePosition::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateTeleportToSafePosition::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // EntityStateTakeDamageOnMount
         inline Ent::Gen2::ActorState EntityStateTakeDamageOnMount::Super() const
         {
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String EntityStateTakeDamageOnMount::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateStuckOut
+        inline Ent::Gen2::ActorState EntityStateStuckOut::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateStuckOut::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateStuck
+        inline Ent::Gen2::ActorState EntityStateStuck::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateStuck::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -69401,12 +71739,16 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
-        // EntityStateSetSavePoint
-        inline Ent::Gen2::ActorState EntityStateSetSavePoint::Super() const
+        // EntityStateSaveWhenPossible
+        inline Ent::Gen2::EntityRef EntityStateSaveWhenPossible::RespawnSlot() const
+        {
+            return Ent::Gen2::EntityRef(getProperty().getObjectField("RespawnSlot"));
+        }
+        inline Ent::Gen2::ActorState EntityStateSaveWhenPossible::Super() const
         {
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
-        inline Ent::Gen2::String EntityStateSetSavePoint::_comment() const
+        inline Ent::Gen2::String EntityStateSaveWhenPossible::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -69416,6 +71758,15 @@ namespace Ent
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String EntityStateSavePointActivated::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateSaveNow
+        inline Ent::Gen2::ActorState EntityStateSaveNow::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateSaveNow::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -69467,6 +71818,15 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // EntityStateRepositionToLastSafeGroundedPosition
+        inline Ent::Gen2::ActorState EntityStateRepositionToLastSafeGroundedPosition::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateRepositionToLastSafeGroundedPosition::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // EntityStateRegainCapacity
         inline Ent::Gen2::ActorState EntityStateRegainCapacity::Super() const
         {
@@ -69511,6 +71871,24 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // EntityStatePreventUndesiredMovementDueToInertia
+        inline Ent::Gen2::ActorState EntityStatePreventUndesiredMovementDueToInertia::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStatePreventUndesiredMovementDueToInertia::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStatePreventSave
+        inline Ent::Gen2::ActorState EntityStatePreventSave::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStatePreventSave::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // EntityStatePreventAscendInSlope
         inline Ent::Gen2::ActorState EntityStatePreventAscendInSlope::Super() const
         {
@@ -69535,6 +71913,46 @@ namespace Ent
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String EntityStatePlungeLand::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStatePlayerHatchingPoolSetup
+        inline Ent::Gen2::ActorState EntityStatePlayerHatchingPoolSetup::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStatePlayerHatchingPoolSetup::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStatePlayerHatchingPoolOut
+        inline Ent::Gen2::ActorState EntityStatePlayerHatchingPoolOut::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStatePlayerHatchingPoolOut::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStatePlayerHatchingPoolIn
+        inline Ent::Gen2::ActorState EntityStatePlayerHatchingPoolIn::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStatePlayerHatchingPoolIn::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStatePlayerHatchingPool
+        inline Ent::Gen2::EntityStatePlayerHatchingPool_Inputs EntityStatePlayerHatchingPool::Inputs() const
+        {
+            return Ent::Gen2::EntityStatePlayerHatchingPool_Inputs(getProperty().getObjectField("Inputs"));
+        }
+        inline Ent::Gen2::ActorState EntityStatePlayerHatchingPool::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStatePlayerHatchingPool::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -69760,6 +72178,15 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // EntityStateJustTeleported
+        inline Ent::Gen2::ActorState EntityStateJustTeleported::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateJustTeleported::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // EntityStateJustStarted
         inline Ent::Gen2::ActorState EntityStateJustStarted::Super() const
         {
@@ -69925,6 +72352,15 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // EntityStateGraspIntention
+        inline Ent::Gen2::ActorState EntityStateGraspIntention::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateGraspIntention::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // EntityStateGrasp
         inline Ent::Gen2::ActorState EntityStateGrasp::Super() const
         {
@@ -70082,19 +72518,6 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
-        // EntityStateEnterDeathVolume
-        inline PrimArray<Ent::Gen2::Specie> EntityStateEnterDeathVolume::AutorizedSpecies() const
-        {
-            return PrimArray<Ent::Gen2::Specie>(getProperty().getObjectField("AutorizedSpecies"));
-        }
-        inline Ent::Gen2::ActorState EntityStateEnterDeathVolume::Super() const
-        {
-            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
-        }
-        inline Ent::Gen2::String EntityStateEnterDeathVolume::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
         // EntityStateEnergySpoutState
         inline Array<Ent::Gen2::EnergySideEvent> EntityStateEnergySpoutState::EnergySideEvents() const
         {
@@ -70122,6 +72545,10 @@ namespace Ent
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
         // EntityStateEnergyRootHatching
+        inline Ent::Gen2::EntityStateEnergyRootHatching_Inputs EntityStateEnergyRootHatching::Inputs() const
+        {
+            return Ent::Gen2::EntityStateEnergyRootHatching_Inputs(getProperty().getObjectField("Inputs"));
+        }
         inline Ent::Gen2::ActorState EntityStateEnergyRootHatching::Super() const
         {
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
@@ -70268,6 +72695,24 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // EntityStateConverted
+        inline Ent::Gen2::ActorState EntityStateConverted::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateConverted::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateConversionTransitionTo
+        inline Ent::Gen2::ActorState EntityStateConversionTransitionTo::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateConversionTransitionTo::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // EntityStateControlGPE
         inline Ent::Gen2::ActorState EntityStateControlGPE::Super() const
         {
@@ -70304,6 +72749,24 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // EntityStateCollecting
+        inline Ent::Gen2::ActorState EntityStateCollecting::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateCollecting::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // EntityStateCollectVertebraeShard
+        inline Ent::Gen2::ActorState EntityStateCollectVertebraeShard::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateCollectVertebraeShard::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // EntityStateCollectVertebrae
         inline Ent::Gen2::ActorState EntityStateCollectVertebrae::Super() const
         {
@@ -70312,10 +72775,6 @@ namespace Ent
         inline Ent::Gen2::String EntityStateCollectVertebrae::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        inline Ent::Gen2::Float EntityStateCollectVertebrae::meditationDuration() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("meditationDuration"));
         }
         // EntityStateClimbWaterfallImpulse
         inline Ent::Gen2::ActorState EntityStateClimbWaterfallImpulse::Super() const
@@ -70411,12 +72870,12 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
-        // EntityStateCancelSetSavePoint
-        inline Ent::Gen2::ActorState EntityStateCancelSetSavePoint::Super() const
+        // EntityStateCancelSave
+        inline Ent::Gen2::ActorState EntityStateCancelSave::Super() const
         {
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
-        inline Ent::Gen2::String EntityStateCancelSetSavePoint::_comment() const
+        inline Ent::Gen2::String EntityStateCancelSave::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -70691,6 +73150,23 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // EntityStateBeingInPlantCage
+        inline Ent::Gen2::EntityRef EntityStateBeingInPlantCage::CageEntityRef() const
+        {
+            return Ent::Gen2::EntityRef(getProperty().getObjectField("CageEntityRef"));
+        }
+        inline Ent::Gen2::Float EntityStateBeingInPlantCage::MinProgressToFree() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("MinProgressToFree"));
+        }
+        inline Ent::Gen2::ActorState EntityStateBeingInPlantCage::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateBeingInPlantCage::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // EntityStateBeingFocusedToPossess
         inline Ent::Gen2::ActorState EntityStateBeingFocusedToPossess::Super() const
         {
@@ -70706,19 +73182,6 @@ namespace Ent
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String EntityStateBeingFocusedToInteract::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        // EntityStateBeingBlockedByVine
-        inline Ent::Gen2::EntityRef EntityStateBeingBlockedByVine::Blocker() const
-        {
-            return Ent::Gen2::EntityRef(getProperty().getObjectField("Blocker"));
-        }
-        inline Ent::Gen2::ActorState EntityStateBeingBlockedByVine::Super() const
-        {
-            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
-        }
-        inline Ent::Gen2::String EntityStateBeingBlockedByVine::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -70821,6 +73284,15 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
+        // EntityStateAI
+        inline Ent::Gen2::ActorState EntityStateAI::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String EntityStateAI::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // ActorStateTryUpgradeShamanStaff
         inline Ent::Gen2::ActorState ActorStateTryUpgradeShamanStaff::Super() const
         {
@@ -70880,15 +73352,6 @@ namespace Ent
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
         inline Ent::Gen2::String ActorStateTaunting::_comment() const
-        {
-            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
-        }
-        // ActorStateStopAttitudeAggressive
-        inline Ent::Gen2::ActorState ActorStateStopAttitudeAggressive::Super() const
-        {
-            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
-        }
-        inline Ent::Gen2::String ActorStateStopAttitudeAggressive::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -71682,12 +74145,21 @@ namespace Ent
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
-        // ActorStateAttitudeAggressive
-        inline Ent::Gen2::ActorState ActorStateAttitudeAggressive::Super() const
+        // ActorStateAttitudeAggressiveTemporary
+        inline Ent::Gen2::ActorState ActorStateAttitudeAggressiveTemporary::Super() const
         {
             return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
         }
-        inline Ent::Gen2::String ActorStateAttitudeAggressive::_comment() const
+        inline Ent::Gen2::String ActorStateAttitudeAggressiveTemporary::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // ActorStateAttitudeAggressivePersistent
+        inline Ent::Gen2::ActorState ActorStateAttitudeAggressivePersistent::Super() const
+        {
+            return Ent::Gen2::ActorState(getProperty().getObjectField("Super"));
+        }
+        inline Ent::Gen2::String ActorStateAttitudeAggressivePersistent::_comment() const
         {
             return Ent::Gen2::String(getProperty().getObjectField("_comment"));
         }
@@ -72713,9 +75185,13 @@ namespace Ent
         {
             return Ent::Gen2::Bool(getProperty().getObjectField("checkDir"));
         }
-        inline Ent::Gen2::Vector3 ActionTurn_Inputs::directionREQUIRED() const
+        inline Ent::Gen2::Vector3 ActionTurn_Inputs::directionRequired() const
         {
-            return Ent::Gen2::Vector3(getProperty().getObjectField("directionREQUIRED"));
+            return Ent::Gen2::Vector3(getProperty().getObjectField("directionRequired"));
+        }
+        inline Ent::Gen2::SpeedMode ActionTurn_Inputs::speedMode() const
+        {
+            return Ent::Gen2::SpeedMode(getProperty().getObjectField("speedMode"));
         }
         inline Ent::Gen2::Bool ActionTurn_Inputs::speedModeUpdateAllowed() const
         {
@@ -73148,6 +75624,14 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("CollisionBackToPosSpeed"));
         }
+        inline Ent::Gen2::Float InGameCameraParams::CollisionCameraRadius() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("CollisionCameraRadius"));
+        }
+        inline Ent::Gen2::PrimitiveSet<char const*> InGameCameraParams::CollisionCheckBoneNames() const
+        {
+            return Ent::Gen2::PrimitiveSet<char const*>(getProperty().getObjectField("CollisionCheckBoneNames"));
+        }
         inline Ent::Gen2::Float InGameCameraParams::CollisionCorrectionSpeed() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("CollisionCorrectionSpeed"));
@@ -73167,10 +75651,6 @@ namespace Ent
         inline Ent::Gen2::Float InGameCameraParams::CollisionTouchGroundModePitchThreshold() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("CollisionTouchGroundModePitchThreshold"));
-        }
-        inline Ent::Gen2::Float InGameCameraParams::CollisionWantedNearPlane() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("CollisionWantedNearPlane"));
         }
         inline Ent::Gen2::Float InGameCameraParams::CollisionZOffset() const
         {
@@ -73395,10 +75875,6 @@ namespace Ent
         inline Ent::Gen2::Float InGameCameraParams::LookAtOffsetYaw() const
         {
             return Ent::Gen2::Float(getProperty().getObjectField("LookAtOffsetYaw"));
-        }
-        inline Ent::Gen2::Float InGameCameraParams::NearPlane() const
-        {
-            return Ent::Gen2::Float(getProperty().getObjectField("NearPlane"));
         }
         inline Ent::Gen2::Float InGameCameraParams::PitchConstraintAnticipation() const
         {
@@ -74298,9 +76774,9 @@ namespace Ent
         {
             return Ent::Gen2::Float(getProperty().getObjectField("GlobalLODScale"));
         }
-        inline Ent::Gen2::Float RenderManager_RenderConfig::LODDecimationFactor() const
+        inline Ent::Gen2::LodSelectionMode RenderManager_RenderConfig::LodSelectionMode() const
         {
-            return Ent::Gen2::Float(getProperty().getObjectField("LODDecimationFactor"));
+            return Ent::Gen2::LodSelectionMode(getProperty().getObjectField("LodSelectionMode"));
         }
         inline Ent::Gen2::String RenderManager_RenderConfig::MaterialBank() const
         {
@@ -74816,6 +77292,28 @@ namespace Ent
             return Ent::Gen2::Float(getProperty().getObjectField("jointsRigidity"));
         }
         // ReplicaReplay
+        // SceneConverter_NavmeshOptions
+        inline Ent::Gen2::Bool SceneConverter_NavmeshOptions::KeepStaticObjectsNavMeshStampersOutOfTerrains() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("KeepStaticObjectsNavMeshStampersOutOfTerrains"));
+        }
+        inline Ent::Gen2::String SceneConverter_NavmeshOptions::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
+        // SceneConverter_StreamingOptions
+        inline Ent::Gen2::Bool SceneConverter_StreamingOptions::ExportStreamingEntities() const
+        {
+            return Ent::Gen2::Bool(getProperty().getObjectField("ExportStreamingEntities"));
+        }
+        inline Ent::Gen2::Float SceneConverter_StreamingOptions::StreamingUnitMaxLength() const
+        {
+            return Ent::Gen2::Float(getProperty().getObjectField("StreamingUnitMaxLength"));
+        }
+        inline Ent::Gen2::String SceneConverter_StreamingOptions::_comment() const
+        {
+            return Ent::Gen2::String(getProperty().getObjectField("_comment"));
+        }
         // SceneNode
         // SceneNodeGraph
         // Sensor

@@ -1302,4 +1302,13 @@ namespace Ent
         }
     }
 
+    bool FileProperty::needRebuild() const
+    {
+        if (m_docMetaData == nullptr)
+        {
+            return false;
+        }
+        return m_docMetaData->version != m_lastAccessVersion;
+    }
+
 } // namespace Ent

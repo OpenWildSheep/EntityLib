@@ -194,6 +194,7 @@ namespace Ent
         void unRemoveObject();
 
         [[nodiscard]] char const* getFilePath() const;
+        [[nodiscard]] bool needRebuild() const;
 
     private:
         [[nodiscard]] nlohmann::json::iterator

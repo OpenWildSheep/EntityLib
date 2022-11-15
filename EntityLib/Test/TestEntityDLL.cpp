@@ -190,6 +190,34 @@ try
     entlib.rawdataPath = current_path();
     entlib.validationEnabled = prevValidationEnabled;
 
+    {
+        auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
+        // unset - unset children
+        auto comp = ent.Components();
+        ENTLIB_ASSERT(comp.isSet());
+        auto embedded = comp.SubScene()->Embedded();
+        ENTLIB_ASSERT(embedded.isSet());
+        auto subent = *embedded.get("EntityWithInstanceOf");
+        ENTLIB_ASSERT(subent.isSet());
+        comp.unset();
+        ENTLIB_ASSERT(comp.isSet() == false);
+        ENTLIB_ASSERT(embedded.isSet() == false);
+        ENTLIB_ASSERT(subent.isSet() == false);
+        // set - set parent
+        comp = ent.Components();
+        embedded = comp.SubScene()->Embedded();
+        subent = *embedded.get("EntityWithInstanceOf");
+        comp = ent.Components(); // Make a clone of the real parent
+        embedded = comp.SubScene()->Embedded();
+        ENTLIB_ASSERT(comp.isSet() == false);
+        ENTLIB_ASSERT(embedded.isSet() == false);
+        ENTLIB_ASSERT(subent.isSet() == false);
+        subent.Color()[0] = 3;
+        ENTLIB_ASSERT(subent.isSet());
+        ENTLIB_ASSERT(embedded.isSet());
+        ENTLIB_ASSERT(comp.isSet());
+    }
+
     ENTLIB_ASSERT(Ent::format("Toto %d", 37) == "Toto 37");
 
     {

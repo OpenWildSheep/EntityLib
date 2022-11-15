@@ -41,8 +41,6 @@ namespace Ent
         PropImpl(EntityLib* _entityLib);
         PropImpl(PropImpl const&) = delete;
         PropImpl& operator=(PropImpl const&) = delete;
-        PropImpl(PropImpl&&) = delete;
-        PropImpl& operator=(PropImpl&&) = delete;
         PropImpl(
             EntityLib* _entityLib,
             PropImplPtr _parent,
@@ -277,6 +275,9 @@ namespace Ent
         [[nodiscard]] bool sameValue(PropImpl& _other);
 
     private:
+        PropImpl(PropImpl&&) = default;
+        PropImpl& operator=(PropImpl&&) = default;
+
         friend void decRef(PropImpl* self);
 
         bool _loadInstanceOf();
@@ -294,6 +295,9 @@ namespace Ent
         void _setDefault(
             Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
         [[nodiscard]] FileProperty const& _getDefault() const;
+        void _reResolveFromRoot();
+        [[nodiscard]] bool _doNeedReResolve() const;
+        void _reResolveIfNeeded();
 
         EntityLib* m_entityLib = nullptr;
         PropImplPtr m_prefab = nullptr;
@@ -337,6 +341,7 @@ namespace Ent
 
     inline DataKind PropImpl::getDataKind()
     {
+        _reResolveIfNeeded();
         return m_instance.getSchema()->getDataKind();
     }
 

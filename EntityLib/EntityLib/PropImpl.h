@@ -57,10 +57,10 @@ namespace Ent
             char const* _filename);
 
         /// Save to _filename or to the source file
-        void save(char const* _filename = nullptr) const;
+        void save(char const* _filename = nullptr);
 
         /// @brief The Node is default if no values are set inside
-        [[nodiscard]] bool isDefault() const;
+        [[nodiscard]] bool isDefault();
 
         /// @brief Enter in the given field of the object
         /// @pre It is an object
@@ -119,27 +119,27 @@ namespace Ent
 
         /// @return The type of the Union
         /// @pre It is a Union
-        [[nodiscard]] char const* getUnionType() const;
+        [[nodiscard]] char const* getUnionType();
 
         /// @return The index of the type of the Union
         /// @pre It is a Union
-        [[nodiscard]] size_t getUnionTypeIndex() const;
-        [[nodiscard]] DataType getDataType() const; ///< Get the DataType of a Node
+        [[nodiscard]] size_t getUnionTypeIndex();
+        [[nodiscard]] DataType getDataType(); ///< Get the DataType of a Node
 
-        [[nodiscard]] Subschema const* getSchema() const; ///< Get the Schema of the current Node
+        [[nodiscard]] Subschema const* getSchema(); ///< Get the Schema of the current Node
 
-        [[nodiscard]] char const* getTypeName() const; ///< Get the Schema name of the current Node
+        [[nodiscard]] char const* getTypeName(); ///< Get the Schema name of the current Node
 
-        [[nodiscard]] DataType getMapKeyType() const; ///< @pre Map @brief Get the key type current Map
+        [[nodiscard]] DataType getMapKeyType(); ///< @pre Map @brief Get the key type current Map
         [[nodiscard]] DataType
-        getObjectSetKeyType() const; ///< @pre ObjectSet @brief Get the key type current ObjectSet
-        [[nodiscard]] DataType getPrimSetKeyType() const; ///< @pre PrimitiveSet @brief Get the key type Set
+        getObjectSetKeyType(); ///< @pre ObjectSet @brief Get the key type current ObjectSet
+        [[nodiscard]] DataType getPrimSetKeyType(); ///< @pre PrimitiveSet @brief Get the key type Set
 
         [[nodiscard]] size_t size(); ///< @return the size the this Node whatever it is.
         [[nodiscard]] bool contains(Key const& _key); ///< @pre map/set. @return true if it contains _key.
-        [[nodiscard]] size_t arraySize() const; ///< @return size of a simple array
+        [[nodiscard]] size_t arraySize(); ///< @return size of a simple array
         [[nodiscard]] bool empty(); ///< Check if size() == 0
-        [[nodiscard]] bool isNull() const; ///< @brief check if this Node is json null
+        [[nodiscard]] bool isNull(); ///< @brief check if this Node is json null
 
         [[nodiscard]] std::set<char const*, CmpStr> getMapKeysString(); ///< Get map keys as strings
         [[nodiscard]] std::set<int64_t> getMapKeysInt(); ///< Get map keys as ints
@@ -150,11 +150,11 @@ namespace Ent
         [[nodiscard]] std::set<char const*, CmpStr> getObjectSetKeysString(); ///< Get keys of objects as strings
         [[nodiscard]] std::set<int64_t> getObjectSetKeysInt(); ///< Get keys of objects as ints
 
-        [[nodiscard]] std::set<char const*, CmpStr> getMapRemovedKeysString() const;
-        [[nodiscard]] std::set<int64_t> getMapRemovedKeysInt() const;
-        [[nodiscard]] std::map<char const*, Subschema const*, CmpStr> getUnionSetRemovedKeysString() const;
-        [[nodiscard]] std::set<char const*, CmpStr> getObjectSetRemovedKeysString() const;
-        [[nodiscard]] std::set<int64_t> getObjectSetRemovedKeysInt() const;
+        [[nodiscard]] std::set<char const*, CmpStr> getMapRemovedKeysString();
+        [[nodiscard]] std::set<int64_t> getMapRemovedKeysInt();
+        [[nodiscard]] std::map<char const*, Subschema const*, CmpStr> getUnionSetRemovedKeysString();
+        [[nodiscard]] std::set<char const*, CmpStr> getObjectSetRemovedKeysString();
+        [[nodiscard]] std::set<int64_t> getObjectSetRemovedKeysInt();
 
         [[nodiscard]] bool mapContains(char const* _key); ///< Check if the map contains this _key
         [[nodiscard]] bool mapContains(int64_t _key); ///< Check if the map contains this _key
@@ -164,17 +164,17 @@ namespace Ent
         [[nodiscard]] bool objectSetContains(char const* _key); ///< Check if the ObjectSet contains this _key
         [[nodiscard]] bool objectSetContains(int64_t _key); ///< Check if the ObjectSet contains this _key
 
-        [[nodiscard]] bool isSet() const; ///< Check if the Node is set in the instance
+        [[nodiscard]] bool isSet(); ///< Check if the Node is set in the instance
         void unset(); ///< Remove values in instance
 
         template <typename V>
-        [[nodiscard]] V get() const; ///< @pre Node is of type V. @brief Get the value in the given V type
-        [[nodiscard]] double getFloat() const; ///< @pre type==number. @brief Get the value as double
-        [[nodiscard]] int64_t getInt() const; ///< @pre type==integer. @brief Get the value as int
-        [[nodiscard]] char const* getString() const; ///< @pre type==string. @brief Get the value as string
-        [[nodiscard]] bool getBool() const; ///< @pre type==boolean. @brief Get the value as bool
+        [[nodiscard]] V get(); ///< @pre Node is of type V. @brief Get the value in the given V type
+        [[nodiscard]] double getFloat(); ///< @pre type==number. @brief Get the value as double
+        [[nodiscard]] int64_t getInt(); ///< @pre type==integer. @brief Get the value as int
+        [[nodiscard]] char const* getString(); ///< @pre type==string. @brief Get the value as string
+        [[nodiscard]] bool getBool(); ///< @pre type==boolean. @brief Get the value as bool
         [[nodiscard]] EntityRef
-        getEntityRef() const; /// @pre type==entityRef. @brief Get the value as an Entity reference
+        getEntityRef(); /// @pre type==entityRef. @brief Get the value as an Entity reference
 
         void setSize(size_t _size); ///< @pre type==array. @brief Set the size of the array.
         void clear();
@@ -216,28 +216,28 @@ namespace Ent
         void clearObject();
         void clearUnion();
 
-        [[nodiscard]] double getDefaultFloat() const;
-        [[nodiscard]] int64_t getDefaultInt() const;
-        [[nodiscard]] char const* getDefaultString() const;
-        [[nodiscard]] bool getDefaultBool() const;
-        [[nodiscard]] EntityRef getDefaultEntityRef() const;
-        [[nodiscard]] size_t getDefaultSize() const;
-        [[nodiscard]] char const* getDefaultUnionType() const;
+        [[nodiscard]] double getDefaultFloat();
+        [[nodiscard]] int64_t getDefaultInt();
+        [[nodiscard]] char const* getDefaultString();
+        [[nodiscard]] bool getDefaultBool();
+        [[nodiscard]] EntityRef getDefaultEntityRef();
+        [[nodiscard]] size_t getDefaultSize();
+        [[nodiscard]] char const* getDefaultUnionType();
 
-        [[nodiscard]] PropImplPtr getLastSetPrefab() const;
-        [[nodiscard]] bool hasPrefabValue() const;
-        [[nodiscard]] double getPrefabFloat() const;
-        [[nodiscard]] int64_t getPrefabInt() const;
-        [[nodiscard]] char const* getPrefabString() const;
-        [[nodiscard]] bool getPrefabBool() const;
-        [[nodiscard]] EntityRef getPrefabEntityRef() const;
-        [[nodiscard]] std::optional<int64_t> getPrefabSize() const;
+        [[nodiscard]] PropImplPtr getLastSetPrefab();
+        [[nodiscard]] bool hasPrefabValue();
+        [[nodiscard]] double getPrefabFloat();
+        [[nodiscard]] int64_t getPrefabInt();
+        [[nodiscard]] char const* getPrefabString();
+        [[nodiscard]] bool getPrefabBool();
+        [[nodiscard]] EntityRef getPrefabEntityRef();
+        [[nodiscard]] std::optional<int64_t> getPrefabSize();
 
         [[nodiscard]] std::vector<char const*>
-        getFieldNames() const; ///< @pre type==Ent::DataType::object @brief Get all field names
+        getFieldNames(); ///< @pre type==Ent::DataType::object @brief Get all field names
 
         [[nodiscard]] PropImpl* getPrefab() const; ///< Get the PropImpl of the prefab
-        [[nodiscard]] nlohmann::json const* getRawJson() const; ///< Get the underlying json node of the instance
+        [[nodiscard]] nlohmann::json const* getRawJson(); ///< Get the underlying json node of the instance
 
         [[nodiscard]] PropImplPtr sharedFromThis() const; ///< Create a new smart pointer to this
 
@@ -247,7 +247,7 @@ namespace Ent
 
         [[nodiscard]] char const* getFilePath() const;
 
-        [[nodiscard]] DataKind getDataKind() const;
+        [[nodiscard]] DataKind getDataKind();
 
         [[nodiscard]] PropImplPtr resolveNodeRef(char const* _nodeRef);
 
@@ -267,7 +267,7 @@ namespace Ent
         [[nodiscard]] std::pair<PropImplPtr, bool> forceGetMapItem(char const* _key);
         [[nodiscard]] std::pair<PropImplPtr, bool> forceGetMapItem(int64_t _field);
 
-        [[nodiscard]] bool sameValue(PropImpl const& _other) const;
+        [[nodiscard]] bool sameValue(PropImpl& _other);
 
     private:
         friend void decRef(PropImpl* self);
@@ -282,7 +282,7 @@ namespace Ent
         void _checkInvariants() const;
         template <typename Container, typename F>
         [[nodiscard]] Container _getKeys(F const& getKeysInFile);
-        void _checkKind(DataKind _expectedKind, char const* _funcName) const;
+        void _checkKind(DataKind _expectedKind, char const* _funcName);
 
         void _setDefault(
             Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
@@ -328,7 +328,7 @@ namespace Ent
         return m_instance.getFilePath();
     }
 
-    inline DataKind PropImpl::getDataKind() const
+    inline DataKind PropImpl::getDataKind()
     {
         return m_instance.getSchema()->getDataKind();
     }

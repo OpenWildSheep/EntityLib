@@ -51,10 +51,6 @@ namespace Ent
 
     struct VersionedJson
     {
-        //VersionedJson() = default;
-        //VersionedJson(VersionedJson const&) = delete;
-        //VersionedJson& operator=(VersionedJson const&) = delete;
-
         JsonMetaData metadata;
         nlohmann::json document = nlohmann::json::object();
     };

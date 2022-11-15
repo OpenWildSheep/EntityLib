@@ -25,12 +25,12 @@ namespace Ent
     {
     }
 
-    void FileProperty::pushBack(char const* _key) const
+    void FileProperty::pushBack(char const* _key)
     {
         _getJson()->push_back(_key);
     }
 
-    void FileProperty::pushBack(int64_t _key) const
+    void FileProperty::pushBack(int64_t _key)
     {
         _getJson()->push_back(_key);
     }
@@ -642,7 +642,7 @@ namespace Ent
         setRawJson(newLayerJson);
     }
 
-    void FileProperty::setSize(size_t _size) const
+    void FileProperty::setSize(size_t _size)
     {
         if (m_values->is_null())
         {
@@ -695,7 +695,7 @@ namespace Ent
     {
         set(_value);
     }
-    void FileProperty::setUnionType(char const* type) const
+    void FileProperty::setUnionType(char const* type)
     {
         auto& wrapper = (*m_values);
         auto const* const dataFieldName = getSchema()->getUnionDataField();
@@ -1155,7 +1155,7 @@ namespace Ent
         return _eraseMapItemImpl(_key, _isInPrefab);
     }
 
-    void FileProperty::unsetObjectField(FileProperty& _field) const
+    void FileProperty::unsetObjectField(FileProperty& _field)
     {
         if (not isSet())
         {
@@ -1172,7 +1172,7 @@ namespace Ent
         _field.m_values = nullptr;
     }
 
-    void FileProperty::unsetUnionData() const
+    void FileProperty::unsetUnionData()
     {
         if (not isSet())
         {
@@ -1182,7 +1182,7 @@ namespace Ent
         m_values->erase(dataFieldName);
     }
 
-    void FileProperty::setToDefault(Subschema const* _parentSchema) const
+    void FileProperty::setToDefault(Subschema const* _parentSchema)
     {
         if (not isSet())
         {
@@ -1219,7 +1219,7 @@ namespace Ent
         }
     }
 
-    void FileProperty::setToNull() const
+    void FileProperty::setToNull()
     {
         if (not isSet())
         {
@@ -1233,7 +1233,7 @@ namespace Ent
         return m_values != nullptr and objectIsRemoved(*m_values);
     }
 
-    void FileProperty::unRemoveObject() const
+    void FileProperty::unRemoveObject()
     {
         m_values->erase("__removed__");
     }

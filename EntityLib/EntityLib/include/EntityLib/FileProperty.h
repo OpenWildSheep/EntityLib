@@ -68,8 +68,6 @@ namespace Ent
         /// Get the const pointer json node if it point to value data (not null)
         [[nodiscard]] nlohmann::json const* getJson() const;
 
-        void setRawJson(nlohmann::json* _jsonNode);
-
         /// Check if this Node exist
         [[nodiscard]] bool hasJsonPointer() const;
 
@@ -260,6 +258,7 @@ namespace Ent
         void _increaseVersion();
         [[nodiscard]] nlohmann::json const* _getRawJson() const;
         [[nodiscard]] nlohmann::json* _getRawJsonMutable() const;
+        void _setRawJson(nlohmann::json* _jsonNode);
 
         std::string m_filePath; ///< Path of the instance json file
         Schema m_schema{};

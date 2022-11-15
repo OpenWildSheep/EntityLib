@@ -23,7 +23,7 @@ namespace Ent
             m_filePath = _filePath;
         }
         m_schema = Schema{{_schema}};
-        setRawJson(_document);
+        _setRawJson(_document);
     }
 
     FileProperty::FileProperty(Subschema const* _schema, char const* _filePath, VersionedJson& _document)
@@ -71,7 +71,7 @@ namespace Ent
         return isSet() ? _getRawJson() : nullptr;
     }
 
-    void FileProperty::setRawJson(json* _jsonNode)
+    void FileProperty::_setRawJson(json* _jsonNode)
     {
         m_values = _jsonNode;
     }
@@ -117,7 +117,7 @@ namespace Ent
             ENTLIB_DBG_ASSERT(lastNode->is_object());
             if (auto const memiter = lastNode->find(_field); memiter != lastNode->end())
             {
-                newLayer.setRawJson(&(*memiter));
+                newLayer._setRawJson(&(*memiter));
             }
         }
         ENTLIB_DBG_ASSERT(m_schema.base != nullptr);
@@ -167,7 +167,7 @@ namespace Ent
                 {
                     if (not dataIter->is_null()) // In UnionSet, null dataField mean remove
                     { // Item found!
-                        newLayer.setRawJson(&(*dataIter));
+                        newLayer._setRawJson(&(*dataIter));
                         subItemIsSet = MapItemAction::Add;
                     }
                     else // Item is marked for remove
@@ -229,7 +229,7 @@ namespace Ent
             if (auto jsonIter = _findObjectSetItem(_key, true);
                 jsonIter != _getRawJsonMutable()->end())
             {
-                newLayer.setRawJson(&(*jsonIter));
+                newLayer._setRawJson(&(*jsonIter));
                 if (objectIsRemoved(*jsonIter))
                 {
                     itemAction = MapItemAction::Remove;
@@ -287,7 +287,7 @@ namespace Ent
             {
                 if (not mapRemoved(*jsonIter))
                 { // Item found!
-                    newLayer.setRawJson(&(*jsonIter)[1]);
+                    newLayer._setRawJson(&(*jsonIter)[1]);
                     itemAction = MapItemAction::Add;
                 }
                 else
@@ -341,7 +341,7 @@ namespace Ent
                 {
                     ENTLIB_DBG_ASSERT(newValue->is_string() or newValue->is_null());
                 }
-                newLayer.setRawJson(newValue);
+                newLayer._setRawJson(newValue);
             }
         }
         ENTLIB_DBG_ASSERT(newLayer.m_schema.base != nullptr);
@@ -428,7 +428,7 @@ namespace Ent
                         {
                             ENTLIB_DBG_ASSERT(newValue->is_string());
                         }
-                        newLayer.setRawJson(newValue);
+                        newLayer._setRawJson(newValue);
                     }
                 }
                 else
@@ -464,7 +464,7 @@ namespace Ent
             auto&& unionSchema = _parent.getSchema()->singularItems->get();
             auto const* dataField = unionSchema.getUnionDataField();
             // TODO : Change to default value according to type
-            setRawJson(&((*m_wrapper)[dataField] = json::object()));
+            _setRawJson(&((*m_wrapper)[dataField] = json::object()));
             return;
         }
 
@@ -658,7 +658,7 @@ namespace Ent
                 *newLayerJson = json::object();
             }
         }
-        setRawJson(newLayerJson);
+        _setRawJson(newLayerJson);
         _increaseVersion();
     }
 
@@ -1205,7 +1205,7 @@ namespace Ent
                 break;
             }
         }
-        _field.setRawJson(nullptr);
+        _field._setRawJson(nullptr);
     }
 
     void FileProperty::unsetUnionData()

@@ -13,6 +13,7 @@
 namespace Ent
 {
     struct VersionedJson;
+    struct JsonMetaData;
 
     struct CmpStr
     {
@@ -45,11 +46,17 @@ namespace Ent
             Remove
         };
 
-        FileProperty();
+        explicit FileProperty(JsonMetaData* _docMetaData = nullptr);
+
+        FileProperty(Subschema const* _schema, char const* _filePath, VersionedJson& _document);
 
         FileProperty(Subschema const* _schema, char const* _filePath);
 
-        FileProperty(Subschema const* _schema, char const* m_filePath, nlohmann::json* _document);
+        FileProperty(
+            Subschema const* _schema,
+            char const* m_filePath,
+            nlohmann::json* _document,
+            JsonMetaData* _docMetaData);
 
         void pushBack(char const* _key); ///< @pre json is an array. @brief Push back _key in json
 
@@ -257,6 +264,8 @@ namespace Ent
         nlohmann::json* m_wrapper{}; ///< Union wrapper if the Data in a UnionSet
         nlohmann::json* m_values{};
         Key m_key;
+        JsonMetaData* m_docMetaData = nullptr;
+        size_t m_lastAccessVersion = 0;
     };
 
     inline DataType FileProperty::getMapKeyType() const

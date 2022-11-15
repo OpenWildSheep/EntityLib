@@ -33,7 +33,10 @@ namespace Ent
             EntityLib* _entityLib,
             Subschema const* _schema,
             char const* _filename,
-            nlohmann::json* _doc);
+            nlohmann::json* _doc,
+            JsonMetaData* _metaData);
+        Property(
+            EntityLib* _entityLib, Subschema const* _schema, char const* _filename, VersionedJson& _doc);
 
         /// Save to _filename or to the source file
         void save(char const* _filename = nullptr) const

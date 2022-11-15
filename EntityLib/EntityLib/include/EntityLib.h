@@ -84,7 +84,8 @@ namespace Ent
             PropImplPtr _parent,
             Subschema const* _schema,
             char const* _filename,
-            nlohmann::json* _doc = nullptr);
+            nlohmann::json* _doc,
+            JsonMetaData* _metadata);
         /// @endcond
 
         /// Load the Node at path _nodeSchema then return a pointer to the cached data

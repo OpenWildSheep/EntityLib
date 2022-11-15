@@ -48,7 +48,14 @@ namespace Ent
             PropImplPtr _parent,
             Subschema const* _schema, ///< Schema of the file to load
             char const* _filename,
-            nlohmann::json* _doc);
+            VersionedJson& _document);
+        PropImpl(
+            EntityLib* _entityLib,
+            PropImplPtr _parent,
+            Subschema const* _schema, ///< Schema of the file to load
+            char const* _filename,
+            nlohmann::json* _doc,
+            JsonMetaData* _metaData);
 
         PropImpl(
             EntityLib* _entityLib,

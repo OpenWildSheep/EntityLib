@@ -4,12 +4,22 @@
 namespace Ent
 {
     Property::Property(EntityLib* _entityLib, Subschema const* _schema, char const* _filename)
-        : m_self(_entityLib->newPropImpl(nullptr, _schema, _filename))
+        : m_self(_entityLib->newPropImpl(nullptr, _schema, _filename, nullptr, nullptr))
     {
     }
     Property::Property(
-        EntityLib* _entityLib, Subschema const* _schema, char const* _filename, nlohmann::json* _doc)
-        : m_self(_entityLib->newPropImpl(nullptr, _schema, _filename, _doc))
+        EntityLib* _entityLib,
+        Subschema const* _schema,
+        char const* _filename,
+        nlohmann::json* _doc,
+        JsonMetaData* _metaData)
+        : m_self(_entityLib->newPropImpl(nullptr, _schema, _filename, _doc, _metaData))
+    {
+    }
+
+    Property::Property(
+        EntityLib* _entityLib, Subschema const* _schema, char const* _filename, VersionedJson& _doc)
+        : Property(_entityLib, _schema, _filename, &_doc.document, &_doc.metadata)
     {
     }
 
@@ -22,7 +32,8 @@ namespace Ent
     Property Property::detach()
     {
         auto& jsonFile = getEntityLib()->createTempJsonFile();
-        Property detached(getEntityLib()->newPropImpl(nullptr, getSchema(), "", &jsonFile.document));
+        Property detached(getEntityLib()->newPropImpl(
+            nullptr, getSchema(), "", &jsonFile.document, &jsonFile.metadata));
         CopyProperty copier(
             detached, OverrideValueSource::OverrideOrPrefab, CopyMode::CopyOverride, false);
         visitRecursive(*this, copier);
@@ -40,8 +51,7 @@ namespace Ent
         auto const* const prefabPath = prefabSource->getFilePath();
         auto& newJson = getEntityLib()->createTempJsonFile();
         newJson.document = getEntityLib()->readJsonFile(prefabPath).document;
-        auto const clonedPrefab =
-            Property(getEntityLib(), getSchema(), prefabPath, &newJson.document);
+        auto const clonedPrefab = Property(getEntityLib(), getSchema(), prefabPath, newJson);
         CopyProperty copier(
             clonedPrefab, OverrideValueSource::Override, CopyMode::CopyOverride, false);
         visitRecursive(*this, copier);

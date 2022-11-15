@@ -782,7 +782,7 @@ void testCursor(EntityLib& entlib)
 {
     {
         auto storage = nlohmann::json::object();
-        Property entity(&entlib, entlib.getEntitySchema(), nullptr, &storage);
+        Property entity(&entlib, entlib.getEntitySchema(), nullptr, &storage, nullptr);
         auto name = entity.getObjectField("Name");
         name.setString("Debug Quick Creatures Switch");
     }
@@ -793,7 +793,8 @@ void testCursor(EntityLib& entlib)
         auto d = loadJsonFile(std::filesystem::current_path(), "test.SeedPatch.node");
         auto const& schema = d["$schema"].get_ref<nlohmann::json::string_t const&>();
         auto typeName = std::string(getRefTypeName(schema.c_str()));
-        Property simpleObject(&entlib, entlib.getSchema(typeName.c_str()), "test.SeedPatch.node", &d);
+        Property simpleObject(
+            &entlib, entlib.getSchema(typeName.c_str()), "test.SeedPatch.node", &d, nullptr);
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeX").getFloat() == 1.f);
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeY").getFloat() == 2.f);
     }
@@ -804,7 +805,8 @@ void testCursor(EntityLib& entlib)
         auto d = loadJsonFile(std::filesystem::current_path(), "test.SeedPatch.node");
         auto typeName =
             std::string(getRefTypeName(d["$schema"].get_ref<std::string const&>().c_str()));
-        Property simpleObject(&entlib, entlib.getSchema(typeName.c_str()), "test.SeedPatch.node", &d);
+        Property simpleObject(
+            &entlib, entlib.getSchema(typeName.c_str()), "test.SeedPatch.node", &d, nullptr);
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeX").getFloat() == 1.f);
         simpleObject.getObjectField("NoiseSizeX").setFloat(2.);
         ENTLIB_ASSERT(simpleObject.getObjectField("NoiseSizeX").getFloat() == 2.);
@@ -932,7 +934,7 @@ void testCursor(EntityLib& entlib)
         std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
 
         nlohmann::json newDoc = nlohmann::json::object();
-        Property destExpl(&entlib, expl.getSchema(), "", &newDoc);
+        Property destExpl(&entlib, expl.getSchema(), "", &newDoc, nullptr);
         CopyProperty copier(
             destExpl, OverrideValueSource::OverrideOrPrefab, CopyMode::CopyOverride, true);
         visitRecursive(expl, copier);
@@ -956,7 +958,7 @@ void testCursor(EntityLib& entlib)
         {
             std::cout << "Copy WhistlingPlainsFPMain.scene with LazyLib" << std::endl;
             nlohmann::json newDoc = nlohmann::json::object();
-            Property destExpl(&entlib, expl.getSchema(), "", &newDoc);
+            Property destExpl(&entlib, expl.getSchema(), "", &newDoc, nullptr);
             CopyProperty copier(
                 destExpl, OverrideValueSource::Override, CopyMode::CopyOverride, true);
             visitRecursive(expl, copier);

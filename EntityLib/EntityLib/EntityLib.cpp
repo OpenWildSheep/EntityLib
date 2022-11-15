@@ -562,13 +562,13 @@ namespace Ent
         auto& copy = createTempJsonFile();
         auto& storage = readJsonFile(_filepath);
         copy.document = storage.document;
-        return Property(this, getSchema(_schemaName), _filepath, &copy.document);
+        return Property(this, getSchema(_schemaName), _filepath, copy);
     }
 
     Property EntityLib::newProperty(Subschema const* _schema)
     {
         auto& storage = createTempJsonFile();
-        return Property(this, _schema, "", &storage.document);
+        return Property(this, _schema, "", storage);
     }
 
     VersionedJson& EntityLib::readJsonFile(char const* _filepath) const
@@ -1924,13 +1924,18 @@ namespace Ent
     }
 
     PropImplPtr EntityLib::newPropImpl(
-        PropImplPtr _parent, Subschema const* _schema, char const* _filename, json* _doc)
+        PropImplPtr _parent,
+        Subschema const* _schema,
+        char const* _filename,
+        json* _doc,
+        JsonMetaData* _metadata)
     {
         PropImpl* property{};
         auto* mem = propertyPool.alloc();
         try
         {
-            property = new (mem) PropImpl(this, std::move(_parent), _schema, _filename, _doc);
+            property =
+                new (mem) PropImpl(this, std::move(_parent), _schema, _filename, _doc, _metadata);
         }
         catch (...)
         {

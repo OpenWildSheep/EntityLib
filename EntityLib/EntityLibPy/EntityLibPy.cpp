@@ -331,6 +331,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pySubschemaNumberMeta = py::class_<Subschema::NumberMeta>(ent, "Subschema_NumberMeta");
     auto pySubschemaUnionMeta = py::class_<Subschema::UnionMeta>(ent, "Subschema_UnionMeta");
     auto pySubschemaUnionSubTypeInfo = py::class_<Subschema::UnionSubTypeInfo>(ent, "Subschema_UnionSubTypeInfo");
+    auto pyJsonMetaData = py::class_<JsonMetaData>(ent, "JsonMetaData");
 
     pyLogicErrorPolicy
         .value("Terminate", LogicErrorPolicy::Terminate)
@@ -734,10 +735,11 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     pyProperty
         .def(py::init<EntityLib*, Subschema const*, char const*>(), py::keep_alive<1, 2>())
-        .def(py::init<EntityLib*, Subschema const*, char const*, nlohmann::json*>(), py::keep_alive<1, 2>())
+        .def(py::init<EntityLib*, Subschema const*, char const*, nlohmann::json*, JsonMetaData*>(), py::keep_alive<1, 2>())
         .def_static("create", [](EntityLib* _lib, Subschema const* _schema, char const* _path)
         {
-            return Property(_lib, _schema, _path, &_lib->createTempJsonFile().document);
+            auto& newFile = _lib->createTempJsonFile();
+            return Property(_lib, _schema, _path, newFile);
         }, py::arg("entlib"), py::arg("schema"), py::arg("path") = "", py::keep_alive<1, 2>())
         .def("save", &Property::save)
         .def_property_readonly("is_default", &Property::isDefault)

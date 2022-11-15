@@ -25,7 +25,7 @@ namespace Ent
         // Loïc : To fix this aweful const_cast, FileProperty need a const version 'ConstFileCursor'.
         // This is a "not-so-easy" task just to remove a const_cast so it is not a priority I guess.
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-        m_default = FileProperty{_schema, _filePath, const_cast<nlohmann::json*>(_document)};
+        m_default = FileProperty{_schema, _filePath, const_cast<nlohmann::json*>(_document), nullptr};
     }
 
     FileProperty const& PropImpl::_getDefault() const
@@ -103,31 +103,41 @@ namespace Ent
         PropImplPtr _parent,
         Subschema const* _schema,
         char const* _filename,
-        nlohmann::json* _doc)
+        nlohmann::json* _doc,
+        JsonMetaData* _metaData)
     {
         if (_doc == nullptr)
         {
-            _doc = &_entityLib->readJsonFile(_filename).document;
+            auto& versionedDoc = _entityLib->readJsonFile(_filename);
+            _doc = &versionedDoc.document;
+            _metaData = &versionedDoc.metadata;
         }
         ENTLIB_ASSERT(_schema != nullptr);
         m_entityLib = _entityLib;
         m_parent = std::move(_parent);
 
         _setDefault(_schema, nullptr, &_schema->defaultValue);
-        m_instance = FileProperty(_schema, _filename, _doc);
+        m_instance = FileProperty(_schema, _filename, _doc, _metaData);
         ENTLIB_ASSERT(_doc != nullptr);
         ENTLIB_ASSERT(_doc->is_object());
         _loadInstanceOf();
     }
 
     PropImpl::PropImpl(
+        EntityLib* _entityLib,
+        PropImplPtr _parent,
+        Subschema const* _schema,
+        char const* _filename,
+        VersionedJson& _document)
+        : PropImpl(
+            _entityLib, std::move(_parent), _schema, _filename, &_document.document, &_document.metadata)
+    {
+    }
+
+    PropImpl::PropImpl(
         EntityLib* _entityLib, PropImplPtr _parent, Subschema const* _schema, char const* _filename)
         : PropImpl(
-            _entityLib,
-            std::move(_parent),
-            _schema,
-            _filename,
-            &_entityLib->readJsonFile(_filename).document)
+            _entityLib, std::move(_parent), _schema, _filename, _entityLib->readJsonFile(_filename))
     {
     }
 
@@ -164,7 +174,7 @@ namespace Ent
                         not prefabPath.empty())
                     {
                         m_prefab = m_entityLib->newPropImpl(
-                            nullptr, subschema, prefabPath.c_str(), nullptr);
+                            nullptr, subschema, prefabPath.c_str(), nullptr, nullptr);
                     }
                     return true;
                 }
@@ -464,7 +474,7 @@ namespace Ent
             ->setString(m_entityLib->getRelativePath(_instanceOf).generic_u8string().c_str());
         if (strlen(_instanceOf) != 0)
         {
-            m_prefab = m_entityLib->newPropImpl(nullptr, getSchema(), _instanceOf, nullptr);
+            m_prefab = m_entityLib->newPropImpl(nullptr, getSchema(), _instanceOf, nullptr, nullptr);
         }
         else
         {
@@ -479,7 +489,8 @@ namespace Ent
         {
             jsonDoc.document["InstanceOf"] = prefabPath;
         }
-        auto instProp = m_entityLib->newPropImpl(nullptr, getSchema(), "", &jsonDoc.document);
+        auto instProp =
+            m_entityLib->newPropImpl(nullptr, getSchema(), "", &jsonDoc.document, &jsonDoc.metadata);
         instProp->m_prefab = sharedFromThis();
         return instProp;
     }
@@ -1239,8 +1250,8 @@ namespace Ent
     PropImplPtr PropImpl::insertInstanceObjectSetItem(char const* _prefabPath)
     {
         CHECK_TYPE(DataKind::objectSet);
-        auto const prefab =
-            m_entityLib->newPropImpl(nullptr, &getSchema()->singularItems->get(), _prefabPath);
+        auto const prefab = m_entityLib->newPropImpl(
+            nullptr, &getSchema()->singularItems->get(), _prefabPath, nullptr, nullptr);
         auto const& arrayMeta = std::get<Subschema::ArrayMeta>(getSchema()->meta);
         auto const key = prefab->getObjectField(arrayMeta.keyField->c_str());
         PropImplPtr newObj;

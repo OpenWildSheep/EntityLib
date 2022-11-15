@@ -20,7 +20,8 @@ namespace Ent
     }
 
     FileProperty::FileProperty(Subschema const* _schema, char const* _filePath)
-        : FileProperty(_schema, _filePath, &_schema->rootSchema->entityLib->readJsonFile(_filePath))
+        : FileProperty(
+            _schema, _filePath, &_schema->rootSchema->entityLib->readJsonFile(_filePath).document)
     {
     }
 

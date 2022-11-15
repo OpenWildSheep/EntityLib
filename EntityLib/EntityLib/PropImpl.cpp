@@ -107,7 +107,7 @@ namespace Ent
     {
         if (_doc == nullptr)
         {
-            _doc = &_entityLib->readJsonFile(_filename);
+            _doc = &_entityLib->readJsonFile(_filename).document;
         }
         ENTLIB_ASSERT(_schema != nullptr);
         m_entityLib = _entityLib;
@@ -123,7 +123,11 @@ namespace Ent
     PropImpl::PropImpl(
         EntityLib* _entityLib, PropImplPtr _parent, Subschema const* _schema, char const* _filename)
         : PropImpl(
-            _entityLib, std::move(_parent), _schema, _filename, &_entityLib->readJsonFile(_filename))
+            _entityLib,
+            std::move(_parent),
+            _schema,
+            _filename,
+            &_entityLib->readJsonFile(_filename).document)
     {
     }
 
@@ -473,9 +477,9 @@ namespace Ent
         auto& jsonDoc = m_entityLib->createTempJsonFile();
         if (auto prefabPath = m_instance.getFilePath())
         {
-            jsonDoc["InstanceOf"] = prefabPath;
+            jsonDoc.document["InstanceOf"] = prefabPath;
         }
-        auto instProp = m_entityLib->newPropImpl(nullptr, getSchema(), "", &jsonDoc);
+        auto instProp = m_entityLib->newPropImpl(nullptr, getSchema(), "", &jsonDoc.document);
         instProp->m_prefab = sharedFromThis();
         return instProp;
     }

@@ -40,6 +40,25 @@ namespace Ent
         /// @endcond
     };
 
+    struct JsonMetaData
+    {
+        JsonMetaData() = default;
+        JsonMetaData(JsonMetaData const&) = delete;
+        JsonMetaData& operator=(JsonMetaData const&) = delete;
+
+        size_t version = 0;
+    };
+
+    struct VersionedJson
+    {
+        //VersionedJson() = default;
+        //VersionedJson(VersionedJson const&) = delete;
+        //VersionedJson& operator=(VersionedJson const&) = delete;
+
+        JsonMetaData metadata;
+        nlohmann::json document = nlohmann::json::object();
+    };
+
     /// Entry point of the EntityLib. Used to load/save Scene/Entity and to parse the Schema
     class ENTLIB_DLLEXPORT EntityLib
     {
@@ -137,7 +156,8 @@ namespace Ent
         {
             auto operator()(std::filesystem::path const& p) const;
         };
-        std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> const& getJsonDatabase() const;
+        std::unordered_map<std::filesystem::path, std::unique_ptr<VersionedJson>, HashPath> const&
+        getJsonDatabase() const;
 
         void clearCache() const;
 
@@ -194,8 +214,8 @@ namespace Ent
         /// Create a new empty document with the given Schema
         Property newProperty(Subschema const* _schema);
 
-        nlohmann::json& readJsonFile(char const* _filepath) const;
-        nlohmann::json& createTempJsonFile() const;
+        VersionedJson& readJsonFile(char const* _filepath) const;
+        VersionedJson& createTempJsonFile() const;
         void saveJsonFile(nlohmann::json const* doc, char const* _filepath, char const* _schema) const;
 
         void setFallBackEntityPath(char const* _filepath);
@@ -242,8 +262,10 @@ namespace Ent
             nlohmann::json const* _default = nullptr) const;
 
         mutable std::map<std::filesystem::path, NodeFile> m_nodeCache;
-        mutable std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> m_jsonDatabase;
-        mutable std::vector<std::unique_ptr<nlohmann::json>> m_tempJsonFiles;
+
+        mutable std::unordered_map<std::filesystem::path, std::unique_ptr<VersionedJson>, HashPath>
+            m_jsonDatabase;
+        mutable std::vector<std::unique_ptr<VersionedJson>> m_tempJsonFiles;
         String m_fallbackEntity;
         NewDepFileCallback m_newDepFileCallback;
     };

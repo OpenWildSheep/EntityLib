@@ -22,7 +22,7 @@ namespace Ent
     Property Property::detach()
     {
         auto& jsonFile = getEntityLib()->createTempJsonFile();
-        Property detached(getEntityLib()->newPropImpl(nullptr, getSchema(), "", &jsonFile));
+        Property detached(getEntityLib()->newPropImpl(nullptr, getSchema(), "", &jsonFile.document));
         CopyProperty copier(
             detached, OverrideValueSource::OverrideOrPrefab, CopyMode::CopyOverride, false);
         visitRecursive(*this, copier);
@@ -39,8 +39,9 @@ namespace Ent
         }
         auto const* const prefabPath = prefabSource->getFilePath();
         auto& newJson = getEntityLib()->createTempJsonFile();
-        newJson = getEntityLib()->readJsonFile(prefabPath);
-        auto const clonedPrefab = Property(getEntityLib(), getSchema(), prefabPath, &newJson);
+        newJson.document = getEntityLib()->readJsonFile(prefabPath).document;
+        auto const clonedPrefab =
+            Property(getEntityLib(), getSchema(), prefabPath, &newJson.document);
         CopyProperty copier(
             clonedPrefab, OverrideValueSource::Override, CopyMode::CopyOverride, false);
         visitRecursive(*this, copier);

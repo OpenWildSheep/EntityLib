@@ -12,6 +12,7 @@
 
 namespace Ent
 {
+    struct VersionedJson;
 
     struct CmpStr
     {

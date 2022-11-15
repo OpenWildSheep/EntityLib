@@ -559,35 +559,37 @@ namespace Ent
 
     Property EntityLib::loadPropertyCopy(char const* _schemaName, char const* _filepath)
     {
-        auto& storage = createTempJsonFile();
-        storage = readJsonFile(_filepath);
-        return Property(this, getSchema(_schemaName), _filepath, &storage);
+        auto& copy = createTempJsonFile();
+        auto& storage = readJsonFile(_filepath);
+        copy.document = storage.document;
+        return Property(this, getSchema(_schemaName), _filepath, &copy.document);
     }
 
     Property EntityLib::newProperty(Subschema const* _schema)
     {
         auto& storage = createTempJsonFile();
-        return Ent::Property(this, _schema, "", &storage);
+        return Property(this, _schema, "", &storage.document);
     }
 
-    json& EntityLib::readJsonFile(char const* _filepath) const
+    VersionedJson& EntityLib::readJsonFile(char const* _filepath) const
     {
         std::filesystem::path const filepath = very_weakly_canonical(_filepath);
         if (auto const iter = m_jsonDatabase.find(filepath); iter != m_jsonDatabase.end())
         {
-            return iter->second;
+            return *iter->second;
         }
         if (m_newDepFileCallback)
         {
             m_newDepFileCallback(_filepath);
         }
-        json data = loadJsonFile(rawdataPath, filepath);
-        return m_jsonDatabase.emplace(filepath, std::move(data)).first->second;
+        auto file = std::make_unique<VersionedJson>();
+        file->document = loadJsonFile(rawdataPath, filepath);
+        return *m_jsonDatabase.emplace(filepath, std::move(file)).first->second;
     }
 
-    json& EntityLib::createTempJsonFile() const
+    VersionedJson& EntityLib::createTempJsonFile() const
     {
-        return *m_tempJsonFiles.emplace_back(std::make_unique<json>(json::object()));
+        return *m_tempJsonFiles.emplace_back(std::make_unique<VersionedJson>());
     }
 
     void EntityLib::saveJsonFile(json const* doc, char const* _filepath, char const* _schema) const
@@ -601,9 +603,14 @@ namespace Ent
         json copy = *doc;
         copy["$schema"] = format(schemaFormat, _schema);
         ofs << copy.dump(4);
-        if (&(m_jsonDatabase[filepath]) != doc)
+        if (m_jsonDatabase.count(filepath) == 0)
         {
-            m_jsonDatabase[filepath] = *doc;
+            m_jsonDatabase[filepath] = std::make_unique<VersionedJson>();
+        }
+        if (&(m_jsonDatabase[filepath]->document) != doc)
+        {
+            m_jsonDatabase[filepath]->document = *doc;
+            ++m_jsonDatabase[filepath]->metadata.version;
         }
     }
 
@@ -1994,7 +2001,7 @@ namespace Ent
         return hash_value(p);
     }
 
-    std::unordered_map<std::filesystem::path, json, EntityLib::HashPath> const&
+    std::unordered_map<std::filesystem::path, std::unique_ptr<VersionedJson>, EntityLib::HashPath> const&
     EntityLib::getJsonDatabase() const
     {
         return m_jsonDatabase;

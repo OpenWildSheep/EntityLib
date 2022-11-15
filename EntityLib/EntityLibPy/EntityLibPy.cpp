@@ -737,7 +737,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(py::init<EntityLib*, Subschema const*, char const*, nlohmann::json*>(), py::keep_alive<1, 2>())
         .def_static("create", [](EntityLib* _lib, Subschema const* _schema, char const* _path)
         {
-            return Property(_lib, _schema, _path, &_lib->createTempJsonFile());
+            return Property(_lib, _schema, _path, &_lib->createTempJsonFile().document);
         }, py::arg("entlib"), py::arg("schema"), py::arg("path") = "", py::keep_alive<1, 2>())
         .def("save", &Property::save)
         .def_property_readonly("is_default", &Property::isDefault)

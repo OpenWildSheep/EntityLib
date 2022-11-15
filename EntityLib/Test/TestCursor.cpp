@@ -790,7 +790,7 @@ void testCursor(EntityLib& entlib)
         std::ifstream ifstr("test.SeedPatch.node");
         std::string filedata;
         std::getline(ifstr, filedata, static_cast<char>(0));
-        auto d = entlib.readJsonFile("test.SeedPatch.node");
+        auto d = loadJsonFile(std::filesystem::current_path(), "test.SeedPatch.node");
         auto const& schema = d["$schema"].get_ref<nlohmann::json::string_t const&>();
         auto typeName = std::string(getRefTypeName(schema.c_str()));
         Property simpleObject(&entlib, entlib.getSchema(typeName.c_str()), "test.SeedPatch.node", &d);
@@ -801,7 +801,7 @@ void testCursor(EntityLib& entlib)
         std::ifstream ifstr("test.SeedPatch.node");
         std::string filedata;
         std::getline(ifstr, filedata, static_cast<char>(0));
-        auto d = entlib.readJsonFile("test.SeedPatch.node");
+        auto d = loadJsonFile(std::filesystem::current_path(), "test.SeedPatch.node");
         auto typeName =
             std::string(getRefTypeName(d["$schema"].get_ref<std::string const&>().c_str()));
         Property simpleObject(&entlib, entlib.getSchema(typeName.c_str()), "test.SeedPatch.node", &d);

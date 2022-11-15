@@ -256,6 +256,7 @@ namespace Ent
         [[nodiscard]] std::pair<FileProperty, MapItemAction> _enterMapItemImpl(K _key) const;
         /// Get the mutable json node of the instance IF it is set (or nullptr)
         [[nodiscard]] nlohmann::json* _getJson() const;
+        void _increaseVersion();
         [[nodiscard]] nlohmann::json const* _getRawJson() const;
         [[nodiscard]] nlohmann::json* _getRawJsonMutable() const;
 

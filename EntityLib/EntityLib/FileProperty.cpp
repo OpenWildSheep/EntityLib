@@ -39,11 +39,13 @@ namespace Ent
     void FileProperty::pushBack(char const* _key)
     {
         _getJson()->push_back(_key);
+        _increaseVersion();
     }
 
     void FileProperty::pushBack(int64_t _key)
     {
         _getJson()->push_back(_key);
+        _increaseVersion();
     }
 
     void FileProperty::save(char const* _filename) const
@@ -657,21 +659,30 @@ namespace Ent
             }
         }
         setRawJson(newLayerJson);
+        _increaseVersion();
     }
 
     void FileProperty::setSize(size_t _size)
     {
+        bool changed = false;
         if (_getRawJson()->is_null())
         {
             (*_getRawJsonMutable()) = json::array();
+            changed = true;
         }
         while (_size > _getRawJson()->size())
         {
             _getRawJsonMutable()->emplace_back();
+            changed = true;
         }
         while (_size < _getRawJson()->size())
         {
             _getRawJsonMutable()->erase(_getRawJson()->size() - 1);
+            changed = true;
+        }
+        if (changed)
+        {
+            _increaseVersion();
         }
     }
     template <typename T>
@@ -689,6 +700,7 @@ namespace Ent
         {
             *_getRawJsonMutable() = std::forward<T>(_value);
         }
+        _increaseVersion();
     }
 
     void FileProperty::setFloat(double _value)
@@ -719,6 +731,7 @@ namespace Ent
         auto const* const nameFieldName = getSchema()->getUnionNameField();
         wrapper[nameFieldName] = type;
         wrapper.erase(dataFieldName);
+        _increaseVersion();
     }
 
     template <typename T>
@@ -1041,6 +1054,7 @@ namespace Ent
         if (auto iter = _findPrimSetKey(_key); iter != _getRawJsonMutable()->end())
         {
             _getRawJsonMutable()->erase(iter);
+            _increaseVersion();
             return true;
         }
         return false;
@@ -1074,6 +1088,7 @@ namespace Ent
             {
                 auto const wasAlreadyRemoved = _isRemoved(*iter);
                 _getRawJsonMutable()->erase(iter);
+                _increaseVersion();
                 return not wasAlreadyRemoved;
             }
             return false;
@@ -1085,10 +1100,12 @@ namespace Ent
                 return false;
             }
             _markRemove(*iter);
+            _increaseVersion();
         }
         else
         {
             _pushBack(_key);
+            _increaseVersion();
         }
         return true;
     }
@@ -1184,6 +1201,7 @@ namespace Ent
             if (_field._getRawJson() == &data)
             {
                 _getRawJsonMutable()->erase(key);
+                _increaseVersion();
                 break;
             }
         }
@@ -1198,6 +1216,7 @@ namespace Ent
         }
         auto const* const dataFieldName = getSchema()->getUnionDataField();
         _getRawJsonMutable()->erase(dataFieldName);
+        _increaseVersion();
     }
 
     void FileProperty::setToDefault(Subschema const* _parentSchema)
@@ -1235,6 +1254,7 @@ namespace Ent
         case DataType::COUNT:
         default: ENTLIB_LOGIC_ERROR("Unexpected schema type");
         }
+        _increaseVersion();
     }
 
     void FileProperty::setToNull()
@@ -1244,6 +1264,7 @@ namespace Ent
             return;
         }
         *_getRawJsonMutable() = json();
+        _increaseVersion();
     }
 
     bool FileProperty::isRemovedObject() const
@@ -1254,6 +1275,7 @@ namespace Ent
     void FileProperty::unRemoveObject()
     {
         _getRawJsonMutable()->erase("__removed__");
+        _increaseVersion();
     }
 
     char const* FileProperty::getFilePath() const
@@ -1269,6 +1291,15 @@ namespace Ent
     json* FileProperty::_getRawJsonMutable() const
     {
         return m_values;
+    }
+
+    void FileProperty::_increaseVersion()
+    {
+        if (m_docMetaData != nullptr)
+        {
+            ++m_docMetaData->version;
+            m_lastAccessVersion = m_docMetaData->version;
+        }
     }
 
 } // namespace Ent

@@ -191,6 +191,9 @@ namespace Ent
         /// However, the prefabs are not copied and still share their data with other Properties.
         Property loadPropertyCopy(char const* _schemaName, char const* _filepath);
 
+        /// Create a new empty document with the given Schema
+        Property newProperty(Subschema const* _schema);
+
         nlohmann::json& readJsonFile(char const* _filepath) const;
         nlohmann::json& createTempJsonFile() const;
         void saveJsonFile(nlohmann::json const* doc, char const* _filepath, char const* _schema) const;

@@ -564,6 +564,12 @@ namespace Ent
         return Property(this, getSchema(_schemaName), _filepath, &storage);
     }
 
+    Property EntityLib::newProperty(Subschema const* _schema)
+    {
+        auto& storage = createTempJsonFile();
+        return Ent::Property(this, _schema, "", &storage);
+    }
+
     json& EntityLib::readJsonFile(char const* _filepath) const
     {
         std::filesystem::path const filepath = very_weakly_canonical(_filepath);

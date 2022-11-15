@@ -989,15 +989,11 @@ namespace Ent
             }
             static {{schema.type_name}} loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return {{schema.type_name}}(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+                return {{schema.type_name}}(_entlib.loadPropertyCopy(schemaName, _sourceFile.string().c_str()));
             }
             static {{schema.type_name}} create(Ent::EntityLib& _entlib)
             {
-                auto& storage = _entlib.createTempJsonFile();
-                return {{schema.type_name}}(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+                return {{schema.type_name}}(_entlib.newProperty(_entlib.getSchema(schemaName)));
             }
             {{schema.type_name}} makeInstanceOf()
             {

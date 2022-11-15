@@ -156,7 +156,7 @@ namespace Ent
         if ((subschema->type == DataType::object or subschema->type == DataType::oneOf)
             and m_instance.isSet())
         {
-            if (auto const* doc = m_instance.getRawJson())
+            if (auto const* doc = m_instance.getJson())
             {
                 if (auto const member = doc->find("InstanceOf"); member != doc->end())
                 {
@@ -588,7 +588,7 @@ namespace Ent
         }
         if (_getDefault().isSet())
         {
-            return _getDefault().getRawJson()->size();
+            return _getDefault().getJson()->size();
         }
         return schema->minItems;
     }
@@ -1312,7 +1312,7 @@ namespace Ent
 
     nlohmann::json const* PropImpl::getRawJson() const
     {
-        return m_instance.getRawJson();
+        return m_instance.getJson();
     }
 
     double PropImpl::getDefaultFloat() const

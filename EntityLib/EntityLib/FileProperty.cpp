@@ -27,12 +27,12 @@ namespace Ent
 
     void FileProperty::pushBack(char const* _key) const
     {
-        _getRawJson()->push_back(_key);
+        _getJson()->push_back(_key);
     }
 
     void FileProperty::pushBack(int64_t _key) const
     {
-        _getRawJson()->push_back(_key);
+        _getJson()->push_back(_key);
     }
 
     void FileProperty::save(char const* _filename) const
@@ -48,12 +48,12 @@ namespace Ent
             m_schema.base->name.c_str());
     }
 
-    json* FileProperty::_getRawJson() const
+    json* FileProperty::_getJson() const
     {
         return isSet() ? m_values : nullptr;
     }
 
-    json const* FileProperty::getRawJson() const
+    json const* FileProperty::getJson() const
     {
         return isSet() ? m_values : nullptr;
     }
@@ -316,7 +316,7 @@ namespace Ent
             newLayer.m_schema = Schema{&subschema, nullptr};
         }
         newLayer.m_key = static_cast<int64_t>(_index);
-        if (auto* const lastNode = _getRawJson())
+        if (auto* const lastNode = _getJson())
         {
             if (lastNode->size() > _index)
             {
@@ -709,7 +709,7 @@ namespace Ent
     {
         if constexpr (std::is_same_v<T, char const*>)
         {
-            return getRawJson()->get_ref<std::string const&>().c_str();
+            return getJson()->get_ref<std::string const&>().c_str();
         }
         else if constexpr (std::is_same_v<std::remove_const_t<std::remove_reference_t<T>>, EntityRef>)
         {
@@ -717,7 +717,7 @@ namespace Ent
         }
         else
         {
-            return getRawJson()->get<T>();
+            return getJson()->get<T>();
         }
     }
 
@@ -860,7 +860,7 @@ namespace Ent
     {
         if (isSet())
         {
-            auto const* node = getRawJson();
+            auto const* node = getJson();
             ENTLIB_DBG_ASSERT(node->is_array());
             for (auto const& pair : *node)
             {
@@ -882,7 +882,7 @@ namespace Ent
     {
         if (isSet())
         {
-            auto const* node = getRawJson();
+            auto const* node = getJson();
             ENTLIB_DBG_ASSERT(node->is_array());
             for (auto const& pair : *node)
             {
@@ -904,7 +904,7 @@ namespace Ent
     {
         if (isSet())
         {
-            for (auto const& prim : *getRawJson())
+            for (auto const& prim : *getJson())
             {
                 _keys.insert(prim.get_ref<std::string const&>().c_str());
             }
@@ -914,7 +914,7 @@ namespace Ent
     {
         if (isSet())
         {
-            for (auto const& prim : *getRawJson())
+            for (auto const& prim : *getJson())
             {
                 _keys.insert(prim.get<int64_t>());
             }
@@ -926,7 +926,7 @@ namespace Ent
     {
         if (isSet())
         {
-            auto const* node = getRawJson();
+            auto const* node = getJson();
             for (size_t i = 0; i < node->size(); ++i)
             {
                 auto arrayItem = getArrayItem(i);
@@ -950,7 +950,7 @@ namespace Ent
         if (isSet())
         {
             auto const& meta = std::get<Subschema::ArrayMeta>(getSchema()->meta);
-            for (auto const& object : *getRawJson())
+            for (auto const& object : *getJson())
             {
                 auto const& key = object.at(*meta.keyField).get_ref<std::string const&>();
                 auto const removed = objectIsRemoved(object);
@@ -971,7 +971,7 @@ namespace Ent
         if (isSet())
         {
             auto const& meta = std::get<Subschema::ArrayMeta>(getSchema()->meta);
-            for (auto const& object : *getRawJson())
+            for (auto const& object : *getJson())
             {
                 auto key = object.at(*meta.keyField).get<int64_t>();
                 auto const removed = objectIsRemoved(object);

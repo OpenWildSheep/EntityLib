@@ -58,8 +58,8 @@ namespace Ent
         /// Save to _filename or to the source file
         void save(char const* _filename = nullptr) const;
 
-        /// Get the const pointer json node
-        [[nodiscard]] nlohmann::json const* getRawJson() const;
+        /// Get the const pointer json node if it point to value data (not null)
+        [[nodiscard]] nlohmann::json const* getJson() const;
 
         void setRawJson(nlohmann::json* _jsonNode);
 
@@ -247,8 +247,8 @@ namespace Ent
         /// @pre It is an Map
         template <typename K>
         [[nodiscard]] std::pair<FileProperty, MapItemAction> _enterMapItemImpl(K _key) const;
-        /// Get the mutable json node of the instance (or nullptr)
-        [[nodiscard]] nlohmann::json* _getRawJson() const;
+        /// Get the mutable json node of the instance IF it is set (or nullptr)
+        [[nodiscard]] nlohmann::json* _getJson() const;
 
         std::string m_filePath; ///< Path of the instance json file
         Schema m_schema{};

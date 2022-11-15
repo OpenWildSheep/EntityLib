@@ -741,10 +741,7 @@ try
         ENTLIB_ASSERT(resolvedEntity == originalEnt->getProperty());
 
         auto newSubEnt = allSubEntities.add("prefab.entity");
-        newSubEnt.Name().set("newSubEnt");
-        ENTLIB_ASSERT(
-            entlib.makeEntityRef(ent.getProperty(), newSubEnt.getProperty()).entityPath
-            == "newSubEnt");
+        ENTLIB_CHECK_EXCEPTION(newSubEnt.Name().set("newSubEnt"), CantRename);
 
         auto embedded = ent.Components().SubScene()->Embedded();
         embedded.insertInstanceOf("prefab.entity");

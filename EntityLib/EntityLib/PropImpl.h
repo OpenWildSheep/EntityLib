@@ -283,7 +283,7 @@ namespace Ent
         template <typename Container, typename F>
         [[nodiscard]] Container _getKeys(F const& getKeysInFile);
         void _checkKind(DataKind _expectedKind, char const* _funcName);
-
+        auto _checkCanRename();
         void _setDefault(
             Subschema const* _schema, char const* _filePath, nlohmann::json const* _document);
         [[nodiscard]] FileProperty const& _getDefault() const;

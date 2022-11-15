@@ -1098,15 +1098,32 @@ namespace Ent
         setSize(arraySize() - 1);
     }
 
+    auto PropImpl::_checkCanRename()
+    {
+        if (getSchema()->isKeyField)
+        {
+            if (m_parent != nullptr and m_parent->getSchema()->type == DataType::object)
+            {
+                auto& map = m_parent->m_parent;
+                if (map != nullptr and map->getSchema()->getDataKind() == DataKind::objectSet)
+                {
+                    throw CantRename("Can't rename on object in an ObjectSet");
+                }
+            }
+        }
+    }
+
     void PropImpl::setFloat(double _value)
     {
         CHECK_TYPE(DataKind::number);
+        _checkCanRename();
         _buildPath();
         m_instance.setFloat(_value);
     }
     void PropImpl::setInt(int64_t _value)
     {
         CHECK_TYPE(DataKind::integer);
+        _checkCanRename();
         _buildPath();
         m_instance.setInt(_value);
     }
@@ -1114,18 +1131,21 @@ namespace Ent
     {
         CHECK_TYPE(DataKind::string);
         ENTLIB_ASSERT(_value != nullptr);
+        _checkCanRename();
         _buildPath();
         m_instance.setString(_value);
     }
     void PropImpl::setBool(bool _value)
     {
         CHECK_TYPE(DataKind::boolean);
+        _checkCanRename();
         _buildPath();
         m_instance.setBool(_value);
     }
     void PropImpl::setEntityRef(EntityRef const& _value)
     {
         CHECK_TYPE(DataKind::entityRef);
+        _checkCanRename();
         _buildPath();
         m_instance.setEntityRef(_value);
     }

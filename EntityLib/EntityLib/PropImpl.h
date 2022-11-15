@@ -281,7 +281,7 @@ namespace Ent
         _enterItem(E&& _enter, bool _isDefaultUnionType = false);
         void _checkInvariants() const;
         template <typename Container, typename F>
-        [[nodiscard]] Container getKeys(F const& getKeysInFile);
+        [[nodiscard]] Container _getKeys(F const& getKeysInFile);
         void _checkKind(DataKind _expectedKind, char const* _funcName) const;
 
         void _setDefault(

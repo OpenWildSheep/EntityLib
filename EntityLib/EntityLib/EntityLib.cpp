@@ -1113,7 +1113,8 @@ namespace Ent
                     {
                         if (item.size() != 2)
                         {
-                            throw ContextException("In map, a pair should have two items but has %zu", item.size());
+                            throw ContextException(
+                                "In map, a pair should have two items but has %zu", item.size());
                         }
                         return item.at(1).is_null();
                     };

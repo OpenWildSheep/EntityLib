@@ -726,12 +726,12 @@ namespace Ent
     }
 
     template <typename Container, typename F>
-    Container PropImpl::getKeys(F const& getKeysInFile)
+    Container PropImpl::_getKeys(F const& getKeysInFile)
     {
         Container keys;
         if (m_prefab != nullptr) // If there is a prefab, get prefab's keys
         {
-            keys = m_prefab->getKeys<Container, F>(getKeysInFile);
+            keys = m_prefab->_getKeys<Container, F>(getKeysInFile);
         }
         else // else, get the dfault keys
         {
@@ -745,8 +745,8 @@ namespace Ent
     std::set<char const*, CmpStr> PropImpl::getMapKeysString()
     {
         CHECK_TYPE(DataKind::map);
-        return getKeys<std::set<char const*, CmpStr>>([](FileProperty const& _file, auto& _keys)
-                                                      { _file.updateMapKeysString(_keys); });
+        return _getKeys<std::set<char const*, CmpStr>>([](FileProperty const& _file, auto& _keys)
+                                                       { _file.updateMapKeysString(_keys); });
     }
 
     bool PropImpl::isNull() const
@@ -764,41 +764,41 @@ namespace Ent
     std::set<int64_t> PropImpl::getMapKeysInt()
     {
         CHECK_TYPE(DataKind::map);
-        return getKeys<std::set<int64_t>>([](FileProperty const& _file, auto& _keys)
-                                          { _file.updateMapKeysInt(_keys); });
+        return _getKeys<std::set<int64_t>>([](FileProperty const& _file, auto& _keys)
+                                           { _file.updateMapKeysInt(_keys); });
     }
     std::set<int64_t> PropImpl::getPrimSetKeysInt()
     {
         CHECK_TYPE(DataKind::primitiveSet);
-        return getKeys<std::set<int64_t>>([](FileProperty const& _file, auto& _keys)
-                                          { _file.updatePrimSetKeysInt(_keys); });
+        return _getKeys<std::set<int64_t>>([](FileProperty const& _file, auto& _keys)
+                                           { _file.updatePrimSetKeysInt(_keys); });
     }
     std::set<char const*, CmpStr> PropImpl::getPrimSetKeysString()
     {
         CHECK_TYPE(DataKind::primitiveSet);
-        return getKeys<std::set<char const*, CmpStr>>([](FileProperty const& _file, auto& _keys)
-                                                      { _file.updatePrimSetKeysString(_keys); });
+        return _getKeys<std::set<char const*, CmpStr>>([](FileProperty const& _file, auto& _keys)
+                                                       { _file.updatePrimSetKeysString(_keys); });
     }
 
     std::map<char const*, Subschema const*, CmpStr> PropImpl::getUnionSetKeysString()
     {
         CHECK_TYPE(DataKind::unionSet);
-        return getKeys<std::map<char const*, Subschema const*, CmpStr>>(
+        return _getKeys<std::map<char const*, Subschema const*, CmpStr>>(
             [](FileProperty const& _file, auto& _keys) { _file.updateUnionSetKeysString(_keys); });
     }
 
     std::set<char const*, CmpStr> PropImpl::getObjectSetKeysString()
     {
         CHECK_TYPE(DataKind::objectSet);
-        return getKeys<std::set<char const*, CmpStr>>([](FileProperty const& _file, auto& _keys)
-                                                      { _file.updateObjectSetKeysString(_keys); });
+        return _getKeys<std::set<char const*, CmpStr>>([](FileProperty const& _file, auto& _keys)
+                                                       { _file.updateObjectSetKeysString(_keys); });
     }
 
     std::set<int64_t> PropImpl::getObjectSetKeysInt()
     {
         CHECK_TYPE(DataKind::objectSet);
-        return getKeys<std::set<int64_t>>([](FileProperty const& _file, auto& _keys)
-                                          { _file.updateObjectSetKeysInt(_keys); });
+        return _getKeys<std::set<int64_t>>([](FileProperty const& _file, auto& _keys)
+                                           { _file.updateObjectSetKeysInt(_keys); });
     }
 
     std::set<char const*, CmpStr> PropImpl::getMapRemovedKeysString() const

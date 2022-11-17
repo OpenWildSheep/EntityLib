@@ -4,10 +4,10 @@ namespace WBIN;
 
 struct HeightMapLayer
 {
-	normalX:uint16;
-	normalY:uint16;
-	height:float;
-	physicsmaterialid:uint8;
+	normal_x:uint16; // u16 encoding [-1, 1] -> [0, 65535]
+	normal_y:uint16; // u16 encoding [-1, 1] -> [0, 65535]
+	height:float; // absolute
+	physics_material_id:uint8;
 }
 
 table HeightMapPixel
@@ -17,13 +17,14 @@ table HeightMapPixel
 
 table HeightMap
 {
-	xmin:uint;
-	xmax:uint;
-	ymin:uint;
-	ymax:uint;
-	width:uint;
-	height:uint;
-	pixels:[HeightMapPixel] (required);
+	x_min:uint; // startx offset of actual data in pixels
+	x_max:uint; // endx offset of actual data in pixels
+	y_min:uint; // starty offset of actual data in pixels
+	y_max:uint; // endy offset of actual data in pixels
+	width:uint; // total virtual width in pixels
+	height:uint; // total virtual height in pixels
+	pixels:[HeightMapPixel] (required); // row major, y flipped
+	pixel_meter_size:Float2; // size in meter of one pixel
 }
 
 root_type HeightMap;

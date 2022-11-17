@@ -50,7 +50,10 @@ from . import Stamp
 from . import StampCloud
 from . import TargetShape
 from . import Thumb
+from . import TileDB
+from . import TileRef
 from . import TSO
+from . import UInt2
 from . import UInt3
 from . import VertexBoneWeight
 from . import Vis

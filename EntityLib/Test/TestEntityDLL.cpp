@@ -523,6 +523,7 @@ try
         auto ent = Gen::Entity::loadCopy(entlib, "prefab.entity");
 
         // Test title/description
+        /*
         {
             auto const* rigodBodyCoeffSchema = ent.Components()
                                                    .CharacterControllerGD()
@@ -532,6 +533,7 @@ try
             ENTLIB_ASSERT(rigodBodyCoeffSchema->title.find("Rigidbody") != std::string::npos);
             ENTLIB_ASSERT(rigodBodyCoeffSchema->description.find("rigidbody") != std::string::npos);
         }
+        */
 
         auto setOfObject = ent.Components().TestSetOfObject();
         ENTLIB_ASSERT(setOfObject);

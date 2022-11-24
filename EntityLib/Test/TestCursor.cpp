@@ -9,6 +9,8 @@
 #include <EntityLib/CopyProperty.h>
 #include <EntityLib/Property.h>
 
+#include "EntityLib/SearchProperty.h"
+
 using namespace Ent;
 
 class PrintNode : public RecursiveVisitor
@@ -939,6 +941,14 @@ void testCursor(EntityLib& entlib)
             destExpl, OverrideValueSource::OverrideOrPrefab, CopyMode::CopyOverride, true);
         visitRecursive(expl, copier);
         entlib.saveJsonFile(&newDoc, "instance.cursor.entity", "Entity");
+
+        // test SearchProperty
+        auto pattern = "eMbeDdEd";
+        SearchProperty searcher(pattern);
+        visitRecursive(expl, searcher);
+        auto matching = searcher.getMatchingProperties();
+        end = clock();
+        ENTLIB_ASSERT(matching.size() == 1);
     }
     bool testLoading = true;
     if (testLoading)
@@ -952,6 +962,21 @@ void testCursor(EntityLib& entlib)
             R"(20_Scene/FP2021/NewLayoutFPSubscenes/WhistlingPlainsFPMain/editor/WhistlingPlainsFPMain.scene)");
         clock_t end = clock();
         std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
+
+        bool perfTestSearch = true;
+        if (perfTestSearch)
+        {
+            start = clock();
+            auto pattern = "eMbeDdEd";
+            SearchProperty searcher(pattern);
+            visitRecursive(expl, searcher);
+            auto matching = searcher.getMatchingProperties();
+            end = clock();
+            ENTLIB_ASSERT(not matching.empty());
+            std::cout << matching.size() << " matching properties with pattern : " << pattern
+                      << std::endl;
+            std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
+        }
 
         bool testCopy = true;
         if (testCopy)

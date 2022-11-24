@@ -2,6 +2,7 @@
 
 #include <EntityLib.h>
 #include <EntityLib/Property.h>
+#include <EntityLib/SearchProperty.h>
 
 #pragma warning(push, 0)
 #include <pybind11/pybind11.h>
@@ -295,6 +296,13 @@ nlohmann::json dumpProperty(Property _prop, bool _superKeyIsTypeName = false)
     DumpProperty dumper(result, _superKeyIsTypeName);
     visitRecursive(_prop, dumper);
     return result;
+}
+
+std::vector<Property> searchChild(Property _prop, char const* _pattern)
+{
+    SearchProperty searcher(_pattern);
+    visitRecursive(_prop, searcher);
+    return searcher.getMatchingProperties();
 }
 
 using namespace pybind11::literals;
@@ -829,6 +837,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("push_back", &Property::pushBack)
         .def("pop_back", &Property::popBack)
         .def("apply_to_prefab", &Property::applyToPrefab)
+        .def("search_child", &searchChild)
         .def_static("from_ptr", [](intptr_t _ptr) {return (Property*)_ptr;}, py::return_value_policy::reference_internal)
         ;
 

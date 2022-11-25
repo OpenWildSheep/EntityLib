@@ -323,14 +323,14 @@ try
         ENTLIB_ASSERT(entpath == ".");
 
         auto prefabHisto = getPrefabHistory(*ent);
-        ENTLIB_ASSERT(prefabHisto.size() == 6);
+        ENTLIB_ASSERT(prefabHisto.size() == 8);
         ENTLIB_ASSERT(
             prefabHisto[3].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
         ENTLIB_ASSERT(
             prefabHisto[4].prefabPath
             == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
         ENTLIB_ASSERT(
-            prefabHisto[5].prefabPath
+            prefabHisto[7].prefabPath
             == "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
                "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene");
     }
@@ -349,7 +349,7 @@ try
         ENTLIB_ASSERT(entpath == ".");
 
         auto prefabHisto = ent->getPrefabHistory();
-        ENTLIB_ASSERT(prefabHisto.size() == 5);
+        ENTLIB_ASSERT(prefabHisto.size() == 7);
         ENTLIB_ASSERT(
             prefabHisto[3].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
         ENTLIB_ASSERT(

@@ -95,38 +95,6 @@ namespace Ent
         eraseUnionSetItem(_current);
         return newItem;
     }
-    Property Property::objectSetRename(char const* _current, char const* _new) const
-    {
-        auto const prefab = getPrefab();
-        if (not prefab.has_value())
-        {
-            throw ContextException("Can't applyToPrefab since Property has no prefab");
-        }
-        if (prefab->objectSetContains(_current))
-        {
-            throw CantRename(staticFormat(
-                "Cant rename %s into %s, because it is already in prefab", _current, _new));
-        }
-        ENTLIB_ASSERT(getDataKind() == DataKind::objectSet);
-        auto newItem = insertObjectSetItem(_new);
-        CopyProperty copier(
-            newItem, OverrideValueSource::OverrideOrPrefab, CopyMode::CopyOverride, true);
-        auto currentItem = getObjectSetItem(_current);
-        visitRecursive(*currentItem, copier);
-        eraseObjectSetItem(_current);
-        ENTLIB_DBG_ASSERT(objectSetContains(_new));
-        return newItem;
-    }
-    Property Property::objectSetRename(int64_t _current, int64_t _new) const
-    {
-        auto newItem = insertObjectSetItem(_new);
-        CopyProperty copier(
-            newItem, OverrideValueSource::OverrideOrPrefab, CopyMode::CopyOverride, true);
-        auto currentItem = getObjectSetItem(_current);
-        visitRecursive(*currentItem, copier);
-        eraseObjectSetItem(_current);
-        return newItem;
-    }
 
     std::map<char const*, Property> Property::getMapStringItems() const
     {

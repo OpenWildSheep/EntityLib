@@ -1133,33 +1133,7 @@ try
         subsceneCmp.Embedded().remove("TestRemove");
         ENTLIB_ASSERT(subsceneCmp.Embedded().size() == PrefabSubEntityCount - 1);
 
-        // Test rename Entity
-        // - Possible
-        auto uglyent = subsceneCmp.Embedded().add("UglyName");
-        ENTLIB_ASSERT(subsceneCmp.Embedded().get("UglyName")->Name() == std::string("UglyName"));
-        subsceneCmp.Embedded().getProperty().objectSetRename("UglyName", "PrettyName");
-        ENTLIB_ASSERT(subsceneCmp.Embedded().get("PrettyName")->Name() == std::string("PrettyName"));
-        subsceneCmp.Embedded().getProperty().objectSetRename("PrettyName", "PrettiestName");
-        ENTLIB_ASSERT(
-            subsceneCmp.Embedded().get("PrettiestName")->Name() == std::string("PrettiestName"));
-        // - Not possible
-        ENTLIB_CHECK_EXCEPTION(
-            subsceneCmp.Embedded().getProperty().objectSetRename(
-                "EntityWithInstanceOf", "EntityWithInstanceOf2"),
-            Ent::CantRename);
-
-        // Test rename object in set
-        // - Possible
-        ENTLIB_ASSERT(testSetOfObject.SetOfObject().get("A")->Value().get() == std::string("a"));
-        testSetOfObject.SetOfObject().getProperty().objectSetRename("A", "A3");
-        testSetOfObject.SetOfObject().getProperty().objectSetRename("A3", "A2");
-        ENTLIB_ASSERT(testSetOfObject.SetOfObject().get("A2")->Value().get() == std::string("a"));
-        ENTLIB_ASSERT(testSetOfObject.SetOfObject().get("A").has_value() == false);
-        // - Not possible
-        ENTLIB_ASSERT(testSetOfObject.SetOfObject().get("D")->Value().get() == std::string("d"));
-        // TODO : decomment!!
-        ENTLIB_CHECK_EXCEPTION(
-            testSetOfObject.SetOfObject().getProperty().objectSetRename("D", "D2"), Ent::CantRename);
+        subsceneCmp.Embedded().add("PrettiestName");
 
         // ****************************** Test hasASuper ******************************************
         // *************** ENTITY ***************
@@ -1388,14 +1362,6 @@ try
         auto subsceneCmp = *ent.Components().SubScene();
         // Removed : TestRemove. Added : PrettiestName, Entity
         ENTLIB_ASSERT(subsceneCmp.Embedded().size() == PrefabSubEntityCount + 1);
-
-        // Test rename Entity
-        ENTLIB_ASSERT(
-            subsceneCmp.Embedded().get("PrettiestName")->Name() == std::string("PrettiestName"));
-
-        // Test rename object in set
-        ENTLIB_ASSERT(testSetOfObject.SetOfObject().get("A2")->Value().get() == std::string("a"));
-        ENTLIB_ASSERT(testSetOfObject.SetOfObject().get("A").has_value() == false);
 
         // ****************************** Test hasASuper ******************************************
         // *************** ENTITY ***************

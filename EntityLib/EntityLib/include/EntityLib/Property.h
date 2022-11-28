@@ -321,8 +321,6 @@ namespace Ent
         Property mapRename(char const* _current, char const* _new);
         [[nodiscard]] Property mapRename(int64_t _current, int64_t _new) const;
         Property unionSetRename(char const* _current, char const* _new) const;
-        Property objectSetRename(char const* _current, char const* _new) const;
-        [[nodiscard]] Property objectSetRename(int64_t _current, int64_t _new) const;
 
         [[nodiscard]] bool mapContains(char const* _key) const ///< Check if the map contains this _key
         {

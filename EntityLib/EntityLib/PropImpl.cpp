@@ -514,7 +514,11 @@ namespace Ent
         auto& jsonDoc = m_entityLib->createTempJsonFile();
         if (auto prefabPath = m_instance.getFilePath())
         {
-            jsonDoc.document["InstanceOf"] = prefabPath;
+            // If it has no FilePath, it isn't a root node, so we can't reference it in an InstanceOf path
+            if (strlen(prefabPath) != 0)
+            {
+                jsonDoc.document["InstanceOf"] = prefabPath;
+            }
         }
         auto instProp =
             m_entityLib->newPropImpl(nullptr, getSchema(), "", &jsonDoc.document, &jsonDoc.metadata);

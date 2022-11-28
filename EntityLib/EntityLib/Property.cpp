@@ -23,9 +23,12 @@ namespace Ent
     {
     }
 
-    void Property::copyInto(Property& _dest, [[maybe_unused]] CopyMode _copyMode)
+    void Property::copyInto(
+        Property& _dest,
+        [[maybe_unused]] CopyMode _copyMode,
+        [[maybe_unused]] OverrideValueSource _overrideValueSource)
     {
-        CopyProperty copier(_dest, OverrideValueSource::OverrideOrPrefab, _copyMode);
+        CopyProperty copier(_dest, _overrideValueSource, _copyMode);
         visitRecursive(*this, copier);
     }
 

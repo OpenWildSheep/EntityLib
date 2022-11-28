@@ -741,7 +741,10 @@ namespace Ent
                    || kind == DataKind::unionSet || kind == DataKind::primitiveSet;
         }
 
-        void copyInto(Property& _dest, CopyMode _copyMode);
+        void copyInto(
+            Property& _dest,
+            CopyMode _copyMode,
+            OverrideValueSource _overrideValueSource = OverrideValueSource::OverrideOrPrefab);
 
         [[nodiscard]] Property detach();
 

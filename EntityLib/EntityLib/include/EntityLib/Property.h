@@ -746,6 +746,9 @@ namespace Ent
 
         [[nodiscard]] Property detach();
 
+        // Create a copy of this Property, but with no parent
+        [[nodiscard]] Property clone();
+
         void applyToPrefab();
 
         [[nodiscard]] bool operator==(Property const& _rho) const

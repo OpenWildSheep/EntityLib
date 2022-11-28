@@ -43,6 +43,27 @@ namespace Ent
         return detached;
     }
 
+    Property Property::clone()
+    {
+        if (auto prefab = getPimpl().getPrefab())
+        {
+            // If "this" has a prefab, make an instance of the prefab, then copy only overrides
+            auto copy = Property(prefab->makeInstanceOf());
+            ENTLIB_ASSERT(prefab == &copy.getPrefab()->getPimpl());
+            CopyProperty copier(copy, OverrideValueSource::Override, CopyMode::CopyOverride, false);
+            visitRecursive(*this, copier);
+            ENTLIB_ASSERT(prefab == &copy.getPrefab()->getPimpl());
+            return copy;
+        }
+        // If "this" has no prefab, create an empty document, then copy only overrides
+        auto& jsonFile = getEntityLib()->createTempJsonFile();
+        Property copy(getEntityLib()->newPropImpl(
+            nullptr, getSchema(), "", &jsonFile.document, &jsonFile.metadata));
+        CopyProperty copier(copy, OverrideValueSource::Override, CopyMode::CopyOverride);
+        visitRecursive(*this, copier);
+        return copy;
+    }
+
     void Property::applyToPrefab()
     {
         // Have to remove removed items in arrays

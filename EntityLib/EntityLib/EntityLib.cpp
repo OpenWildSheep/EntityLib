@@ -12,6 +12,7 @@
 #include <sstream>
 #include <utility>
 #include <ciso646>
+#include <thread>
 
 #include "external/json.hpp"
 #include "ValidJson.h"
@@ -592,17 +593,42 @@ namespace Ent
         return *m_tempJsonFiles.emplace_back(std::make_unique<VersionedJson>());
     }
 
+    template <typename Lambda>
+    static void try3Times(Lambda&& lambda)
+    {
+        for (size_t i = 0;; ++i)
+        {
+            try
+            {
+                lambda();
+                return;
+            }
+            catch (...)
+            {
+                if (i == 2)
+                {
+                    throw;
+                }
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+        }
+    }
+
     void EntityLib::saveJsonFile(json const* doc, char const* _filepath, char const* _schema) const
     {
         std::filesystem::path const filepath = very_weakly_canonical(_filepath);
-        std::ofstream ofs(rawdataPath / filepath);
-        if (not ofs.is_open())
+        auto const tempFilename = rawdataPath / (filepath.string() + ".tmp");
         {
-            throw ContextException("Can't open %s for write", filepath.string().c_str());
+            std::ofstream ofs(tempFilename);
+            if (not ofs.is_open())
+            {
+                throw ContextException("Can't open %s for write", filepath.string().c_str());
+            }
+            json copy = *doc;
+            copy["$schema"] = format(schemaFormat, _schema);
+            ofs << copy.dump(4);
         }
-        json copy = *doc;
-        copy["$schema"] = format(schemaFormat, _schema);
-        ofs << copy.dump(4);
+        try3Times([&] { rename(tempFilename, filepath); });
         if (m_jsonDatabase.count(filepath) == 0)
         {
             m_jsonDatabase[filepath] = std::make_unique<VersionedJson>();

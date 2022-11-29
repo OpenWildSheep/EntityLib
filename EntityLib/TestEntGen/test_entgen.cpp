@@ -141,6 +141,7 @@ try
     }
 
     // Test Map with enum key
+    /*
     Map<EnergySideEnum, Array<sEnvStamp>> stamps = ent.Components().add<EnvStampGD>().Stamps();
     stamps.add(EnergySideEnum::corrupted);
     stamps.add(EnergySideEnum::corrupted);
@@ -161,6 +162,7 @@ try
     }
     stamps.remove(EnergySideEnum::corrupted);
     ENTLIB_ASSERT(not stamps.get(EnergySideEnum::corrupted).has_value());
+    */
     return EXIT_SUCCESS;
 }
 catch (std::exception& ex)

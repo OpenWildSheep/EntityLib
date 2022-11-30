@@ -1035,6 +1035,14 @@ try
     }
 
     {
+        // ***** Test loadProperty without schemaName *****
+        // File without $schema inside
+        ENTLIB_CHECK_EXCEPTION(entlib.loadProperty("instance.entity"), Ent::UnknownSchema);
+        // File with $schema inside
+        auto ent = entlib.loadProperty("instance3.entity");
+        ENTLIB_ASSERT(ent.getSchema()->name == "Entity");
+    }
+    {
         // Test read instance of
         auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
         auto sysCreat = ent.Components().SystemicCreature();

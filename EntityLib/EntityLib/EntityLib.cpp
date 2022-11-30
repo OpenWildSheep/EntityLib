@@ -558,6 +558,25 @@ namespace Ent
         return Property(this, getSchema(_schemaName), _filepath);
     }
 
+    Property EntityLib::loadProperty(char const* _filepath)
+    {
+        auto loadFunc = [this, _filepath](json const& _document)
+        {
+            if (auto const schemaName = _document.find("$schema"); schemaName != _document.end())
+            {
+                // If $schema found, use it
+                return getRefTypeName(schemaName->get_ref<json::string_t const&>().c_str());
+            }
+
+            throw UnknownSchema(rawdataPath.string().c_str(), _filepath);
+        };
+
+        auto const& json = readJsonFile(_filepath);
+        auto const schemaName = std::string(loadFunc(json.document));
+
+        return Property(this, getSchema(schemaName.c_str()), _filepath);
+    }
+
     Property EntityLib::loadPropertyCopy(char const* _schemaName, char const* _filepath)
     {
         auto& copy = createTempJsonFile();

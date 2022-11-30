@@ -201,6 +201,12 @@ namespace Ent
         /// The Property and its prefabs will share json data with other loaded Property
         Property loadProperty(char const* _schemaName, char const* _filepath);
 
+        /// Load a file into a Property
+        ///
+        /// The Property and its prefabs will share json data with other loaded Property
+        /// @remark The Schema is auto-detected
+        Property loadProperty(char const* _filepath);
+
         /// Load and copy file into a Property
         ///
         /// The Property will not share its json data with other loaded Properties.

@@ -14,7 +14,6 @@ namespace Ent
         OverrideValueSource m_overrideValueSource = {};
         CopyMode m_copyMode = {};
         bool m_copyRootInstanceOf = false;
-        bool m_isKeyField = false;
 
         [[nodiscard]] Property& _back()
         {
@@ -62,7 +61,7 @@ namespace Ent
                 }
                 ENTLIB_LOGIC_ERROR("Wrong CopyMode given to CopyProperty");
             };
-            return !m_isKeyField && checkOVS() && checkCopyMode();
+            return checkOVS() && checkCopyMode();
         }
 
     public:
@@ -90,30 +89,18 @@ namespace Ent
         }
         bool inObjectField([[maybe_unused]] Property& m_source, char const* _key) override
         {
-            if (auto const parentProp = m_source.getParent())
-            {
-                if (auto const grandParentProp = parentProp->getParent())
-                {
-                    auto const grandParentKind = grandParentProp->getDataKind();
-                    if (grandParentKind == DataKind::objectSet)
-                    {
-                        auto const& meta =
-                            std::get<Subschema::ArrayMeta>(grandParentProp->getSchema()->meta);
-                        if (meta.keyField.has_value() and *meta.keyField == _key)
-                        {
-                            m_isKeyField = true;
-                        }
-                    }
-                }
-            }
-
             _push(_back().getObjectField(_key));
-            return true;
+            if (doNeedCopy(m_source))
+            {
+                return true;
+            }
+            // If no need to copy, no need to iterate
+            _pop();
+            return false;
         }
         void outObjectField([[maybe_unused]] Property& m_source, [[maybe_unused]] char const* _key) override
         {
             _pop();
-            m_isKeyField = false;
         }
         void inUnion(Property& m_source, char const* _type) override
         {
@@ -130,6 +117,10 @@ namespace Ent
         void inMapElement([[maybe_unused]] Property& m_source, char const* _key) override
         {
             _push(_back().forceGetMapItem(_key).first);
+            if (doNeedCopy(m_source))
+            {
+                _back().buildPath(); // Force it to set
+            }
         }
         void inMapElement([[maybe_unused]] Property& m_source, int64_t _key) override
         {
@@ -150,6 +141,10 @@ namespace Ent
         void key([[maybe_unused]] Property& m_source, char const* _key) override
         {
             _back().insertPrimSetKey(_key);
+            if (doNeedCopy(m_source))
+            {
+                _back().buildPath(); // Force it to set
+            }
         }
         void key([[maybe_unused]] Property& m_source, int64_t _key) override
         {
@@ -171,11 +166,19 @@ namespace Ent
         {
             ENTLIB_ASSERT(_back().getDataKind() == DataKind::objectSet);
             _push(_back().forceGetObjectSetItem(_key).first);
+            if (doNeedCopy(m_source))
+            {
+                _back().buildPath(); // Force it to set
+            }
         }
         void inObjectSetElement([[maybe_unused]] Property& m_source, int64_t _key) override
         {
             ENTLIB_ASSERT(_back().getDataKind() == DataKind::objectSet);
             _push(_back().forceGetObjectSetItem(_key).first);
+            if (doNeedCopy(m_source))
+            {
+                _back().buildPath(); // Force it to set
+            }
         }
         void outObjectSetElement([[maybe_unused]] Property& m_source) override
         {

@@ -1183,7 +1183,8 @@ namespace Ent
         setSize(arraySize() - 1);
     }
 
-    auto PropImpl::_checkCanRename()
+    template <typename K>
+    auto PropImpl::_checkCanRename(K _newName)
     {
         if (getSchema()->isKeyField)
         {
@@ -1192,6 +1193,32 @@ namespace Ent
                 auto& map = m_parent->m_parent;
                 if (map != nullptr and map->getSchema()->getDataKind() == DataKind::objectSet)
                 {
+                    // If the renaming doesn't change the NodePath of this Property,
+                    // it is not really a renaming
+                    using KeyType = std::remove_const_t<std::remove_reference_t<K>>;
+                    if constexpr (std::is_same_v<KeyType, char const*>)
+                    {
+                        if (std::get<std::string>(m_parent->getPathToken()) == _newName)
+                        {
+                            return;
+                        }
+                    }
+                    else if constexpr (std::is_same_v<KeyType, EntityRef>)
+                    {
+                        if (std::get<std::string>(m_parent->getPathToken())
+                            == _newName.entityPath.c_str())
+                        {
+                            return;
+                        }
+                    }
+                    else if constexpr (std::is_same_v<KeyType, int64_t>)
+                    {
+                        if (std::get<int64_t>(m_parent->getPathToken()) == _newName)
+                        {
+                            return;
+                        }
+                    }
+
                     throw CantRename("Can't rename on object in an ObjectSet");
                 }
             }
@@ -1202,7 +1229,7 @@ namespace Ent
     {
         _reResolveIfNeeded();
         CHECK_TYPE(DataKind::number);
-        _checkCanRename();
+        _checkCanRename(_value);
         _buildPath();
         m_instance.setFloat(_value);
     }
@@ -1210,7 +1237,7 @@ namespace Ent
     {
         _reResolveIfNeeded();
         CHECK_TYPE(DataKind::integer);
-        _checkCanRename();
+        _checkCanRename(_value);
         _buildPath();
         m_instance.setInt(_value);
     }
@@ -1219,7 +1246,7 @@ namespace Ent
         _reResolveIfNeeded();
         CHECK_TYPE(DataKind::string);
         ENTLIB_ASSERT(_value != nullptr);
-        _checkCanRename();
+        _checkCanRename(_value);
         _buildPath();
         m_instance.setString(_value);
     }
@@ -1227,7 +1254,7 @@ namespace Ent
     {
         _reResolveIfNeeded();
         CHECK_TYPE(DataKind::boolean);
-        _checkCanRename();
+        _checkCanRename(_value);
         _buildPath();
         m_instance.setBool(_value);
     }
@@ -1235,7 +1262,7 @@ namespace Ent
     {
         _reResolveIfNeeded();
         CHECK_TYPE(DataKind::entityRef);
-        _checkCanRename();
+        _checkCanRename(_value);
         _buildPath();
         m_instance.setEntityRef(_value);
     }

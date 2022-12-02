@@ -949,11 +949,12 @@ namespace Ent
         {
             allLayers.push_back(iter);
         }
+        auto needToCreateOrRestoreNode = [](PropImpl* _prop)
+        {
+            return not _prop->m_instance.hasJsonPointer() or _prop->m_instance.isRemovedObject();
+        };
         std::reverse(begin(allLayers), end(allLayers));
-        auto firstNotSet = std::find_if(
-            begin(allLayers),
-            end(allLayers),
-            [](PropImpl const* l) { return not l->m_instance.isSet(); });
+        auto firstNotSet = std::find_if(begin(allLayers), end(allLayers), needToCreateOrRestoreNode);
         ENTLIB_ASSERT(firstNotSet != allLayers.begin());
         auto firstNotSetIdx = std::distance(begin(allLayers), firstNotSet);
         ENTLIB_ASSERT(firstNotSetIdx <= static_cast<ptrdiff_t>(allLayers.size()));
@@ -963,7 +964,7 @@ namespace Ent
         for (; firstNotSet != endIter; ++lastSet, ++firstNotSet, ++firstNotSetIdx)
         {
             (*firstNotSet)->m_instance.createChildNode((*lastSet)->m_instance);
-            ENTLIB_ASSERT((*firstNotSet)->m_instance.hasJsonPointer());
+            ENTLIB_ASSERT(not needToCreateOrRestoreNode((*firstNotSet)));
         }
         _checkInvariants();
     }

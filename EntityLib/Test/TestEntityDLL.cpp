@@ -191,6 +191,13 @@ try
     entlib.validationEnabled = prevValidationEnabled;
 
     {
+        // Check the visitor, in case of map of primitive
+        auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
+        auto detached = ent.detach();
+        auto speed2 = detached.Components().TestSetOfObject()->MapOfPrimitive().get("speed2");
+        ENTLIB_ASSERT(speed2.has_value());
+    }
+    {
         auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
         // unset - unset children
         auto comp = ent.Components();
@@ -1130,6 +1137,8 @@ try
             //          => restore values since we dont know how to reset an element when saving
             ENTLIB_ASSERT(not setOfObject.contains("G"));
             ENTLIB_ASSERT(setOfObject.add("G").getProperty().hasValue());
+            ENTLIB_ASSERT(setOfObject.get("G").has_value());
+            ENTLIB_ASSERT(setOfObject.get("G")->getProperty().hasValue());
             ENTLIB_ASSERT(setOfObject.get("G")->hasOverride() == true);
             ENTLIB_ASSERT(setOfObject.get("G")->Value().get() == std::string("g"));
             setOfObject.remove("G");

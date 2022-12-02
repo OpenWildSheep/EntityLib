@@ -101,6 +101,16 @@
                         "Name": "G",
                         "__removed__": true
                     }
+                ],
+                "MapOfPrimitive": [
+                    [
+                        "speed2",
+                        2
+                    ],
+                    [
+                        "speed3",
+                        3
+                    ]
                 ]
             },
             "Type": "TestSetOfObject"

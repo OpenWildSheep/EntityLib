@@ -470,6 +470,7 @@ namespace Ent
 
         auto&& childName = getPathToken();
 
+        ENTLIB_ASSERT(not hasJsonPointer());
         ENTLIB_DBG_ASSERT(
             static_cast<int>(_parent._getRawJson()->type())
             < static_cast<int>(json::value_t::discarded));

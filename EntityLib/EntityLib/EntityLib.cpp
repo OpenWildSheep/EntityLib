@@ -558,21 +558,21 @@ namespace Ent
         return Property(this, getSchema(_schemaName), _filepath);
     }
 
+    static std::string_view loadFunc(json const& _document, char const* _filepath)
+    {
+        if (auto const schemaName = _document.find("$schema"); schemaName != _document.end())
+        {
+            // If $schema found, use it
+            return getRefTypeName(schemaName->get_ref<json::string_t const&>().c_str());
+        }
+
+        throw UnknownSchema("", _filepath);
+    };
+
     Property EntityLib::loadProperty(char const* _filepath)
     {
-        auto loadFunc = [this, _filepath](json const& _document)
-        {
-            if (auto const schemaName = _document.find("$schema"); schemaName != _document.end())
-            {
-                // If $schema found, use it
-                return getRefTypeName(schemaName->get_ref<json::string_t const&>().c_str());
-            }
-
-            throw UnknownSchema(rawdataPath.string().c_str(), _filepath);
-        };
-
         auto const& json = readJsonFile(_filepath);
-        auto const schemaName = std::string(loadFunc(json.document));
+        auto const schemaName = std::string(loadFunc(json.document, _filepath));
 
         return Property(this, getSchema(schemaName.c_str()), _filepath);
     }
@@ -583,6 +583,15 @@ namespace Ent
         auto& storage = readJsonFile(_filepath);
         copy.document = storage.document;
         return Property(this, getSchema(_schemaName), _filepath, copy);
+    }
+
+    Property EntityLib::loadPropertyCopy(char const* _filepath)
+    {
+        auto& copy = createTempJsonFile();
+        auto& storage = readJsonFile(_filepath);
+        copy.document = storage.document;
+        auto const schemaName = std::string(loadFunc(copy.document, _filepath));
+        return Property(this, getSchema(schemaName.c_str()), _filepath, copy);
     }
 
     Property EntityLib::newProperty(Subschema const* _schema)

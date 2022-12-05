@@ -214,6 +214,13 @@ namespace Ent
         /// However, the prefabs are not copied and still share their data with other Properties.
         Property loadPropertyCopy(char const* _schemaName, char const* _filepath);
 
+        /// Load and copy file into a Property
+        ///
+        /// The Property will not share its json data with other loaded Properties.
+        /// It is considered as a new file.
+        /// However, the prefabs are not copied and still share their data with other Properties.
+        Property loadPropertyCopy(char const* _filepath);
+
         /// Create a new empty document with the given Schema
         Property newProperty(Subschema const* _schema);
 

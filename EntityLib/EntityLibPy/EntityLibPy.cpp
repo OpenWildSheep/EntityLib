@@ -722,7 +722,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_schema", &EntityLib::getSchema, py::return_value_policy::reference_internal)
         .def("load_property", (Property (EntityLib::*)(char const*, char const*))&EntityLib::loadProperty, "schema_name"_a, "file_path"_a)
         .def("load_property", (Property (EntityLib::*)(char const*))&EntityLib::loadProperty, "file_path"_a)
-        .def("load_property_copy", &EntityLib::loadPropertyCopy)
+        .def("load_property_copy", (Property (EntityLib::*)(char const*, char const*))&EntityLib::loadPropertyCopy, "schema_name"_a, "file_path"_a)
+        .def("load_property_copy", (Property (EntityLib::*)(char const*))&EntityLib::loadPropertyCopy, "file_path"_a)
         .def("set_dep_file_callback", &EntityLib::setNewDepFileCallBack)
     ;
 

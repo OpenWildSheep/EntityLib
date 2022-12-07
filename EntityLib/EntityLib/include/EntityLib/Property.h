@@ -153,7 +153,7 @@ namespace Ent
         /// @brief Set the prefab (and reset all overriden values)
         /// @pre It is an Object
         /// @pre _instanceOf != nullptr
-        /// @remark setInstanceOf("") mean explicitly set
+        /// @remark resetInstanceOf("") mean explicitly set to InstanceOf : ""
         void resetInstanceOf(char const* _instanceOf) const
         {
             return getPimpl().resetInstanceOf(_instanceOf);
@@ -162,7 +162,7 @@ namespace Ent
         /// @brief Set the prefab (and keep overriden values)
         /// @pre It is an Object
         /// @pre _instanceOf != nullptr
-        /// @remark setInstanceOf("") mean explicitly set
+        /// @remark changeInstanceOf("") mean explicitly set to InstanceOf : ""
         void changeInstanceOf(char const* _instanceOf) const
         {
             return getPimpl().changeInstanceOf(_instanceOf);

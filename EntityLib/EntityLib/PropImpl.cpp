@@ -1873,7 +1873,8 @@ namespace Ent
             auto newThis = m_parent->resolveNodeRef(key.c_str());
             if (newThis == nullptr)
             {
-                newThis = m_parent->resolveNodeRef(key.c_str());
+                *this = PropImpl(m_entityLib);
+                return;
             }
             auto prevRefCount = m_refCount;
             auto prevNewRefCount = newThis->m_refCount;

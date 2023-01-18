@@ -89,6 +89,21 @@ namespace Ent
             {
                 return getProperty().getRawJson();
             }
+
+            [[nodiscard]] EntityLib* getEntityLib() const
+            {
+                return getProperty().getEntityLib();
+            }
+
+            [[nodiscard]] Property getRootNode() const
+            {
+                return getProperty().getRootNode();
+            }
+
+            [[nodiscard]] std::optional<Property> getPrefab() const
+            {
+                return getProperty().getPrefab();
+            }
         };
 
         template <typename T>
@@ -982,10 +997,11 @@ namespace Ent
                 getProperty().save(_destFile);
             }
 
-            O copyInto(O& _dest, CopyMode _copyMode)
+            void copyInto(O _dest, CopyMode _copyMode)
             {
-                return O(getProperty().copyInto(_dest, _copyMode));
+                getProperty().copyInto(_dest.getProperty(), _copyMode);
             }
+
             [[nodiscard]] O detach()
             {
                 return O(getProperty().detach());

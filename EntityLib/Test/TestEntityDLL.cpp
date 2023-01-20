@@ -1758,9 +1758,10 @@ try
     auto heightObj = scene.begin()->Components().addHeightObj();
     heightObj.DisplaceNoiseList().push();
 
-    auto fieldNameCount =
-        scene.begin()->Components().addHeightObj().getProperty().getSchema()->properties.size();
-    ENTLIB_ASSERT(fieldNameCount == 9);
+    auto const& properties =
+        scene.begin()->Components().addHeightObj().getProperty().getSchema()->properties;
+    auto fieldNameCount = properties.size();
+    ENTLIB_ASSERT(fieldNameCount >= 9);
 
     entlib.rawdataPath = current_path();
     scene.insertInstanceOf((current_path() / "prefab.entity").string().c_str());

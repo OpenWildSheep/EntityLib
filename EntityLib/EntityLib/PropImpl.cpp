@@ -967,6 +967,7 @@ namespace Ent
             ENTLIB_ASSERT(not needToCreateOrRestoreNode((*firstNotSet)));
         }
         _checkInvariants();
+        _updateParentToResolved();
     }
     void PropImpl::setSize(size_t _size)
     {
@@ -974,6 +975,7 @@ namespace Ent
         CHECK_TYPE(DataKind::array);
         _buildPath();
         m_instance.setSize(_size);
+        _updateParentToResolved();
     }
 
     void PropImpl::clearArray()
@@ -1233,6 +1235,7 @@ namespace Ent
         _checkCanRename(_value);
         _buildPath();
         m_instance.setFloat(_value);
+        _updateParentToResolved();
     }
     void PropImpl::setInt(int64_t _value)
     {
@@ -1241,6 +1244,7 @@ namespace Ent
         _checkCanRename(_value);
         _buildPath();
         m_instance.setInt(_value);
+        _updateParentToResolved();
     }
     void PropImpl::setString(char const* _value)
     {
@@ -1250,6 +1254,7 @@ namespace Ent
         _checkCanRename(_value);
         _buildPath();
         m_instance.setString(_value);
+        _updateParentToResolved();
     }
     void PropImpl::setBool(bool _value)
     {
@@ -1258,6 +1263,7 @@ namespace Ent
         _checkCanRename(_value);
         _buildPath();
         m_instance.setBool(_value);
+        _updateParentToResolved();
     }
     void PropImpl::setEntityRef(EntityRef const& _value)
     {
@@ -1266,6 +1272,7 @@ namespace Ent
         _checkCanRename(_value);
         _buildPath();
         m_instance.setEntityRef(_value);
+        _updateParentToResolved();
     }
     PropImplPtr PropImpl::setUnionType(char const* _type)
     {
@@ -1277,6 +1284,7 @@ namespace Ent
         }
         _buildPath();
         m_instance.setUnionType(_type);
+        _updateParentToResolved();
         return getUnionData();
     }
     void PropImpl::buildPath()
@@ -1313,6 +1321,7 @@ namespace Ent
         {
             _buildPath();
             m_instance.pushBack(_key);
+            _updateParentToResolved();
         }
     }
     void PropImpl::insertPrimSetKey(int64_t _key)
@@ -1323,6 +1332,7 @@ namespace Ent
         {
             _buildPath();
             m_instance.pushBack(_key);
+            _updateParentToResolved();
         }
     }
 
@@ -1401,13 +1411,17 @@ namespace Ent
         {
             throw BadArrayType("Can't erase in a primitive set if the key is still in the prefab");
         }
-        return m_instance.erasePrimSetKey(_key);
+        auto erased = m_instance.erasePrimSetKey(_key);
+        _updateParentToResolved();
+        return erased;
     }
     bool PropImpl::erasePrimSetKey(int64_t _key)
     {
         _reResolveIfNeeded();
         CHECK_TYPE(DataKind::primitiveSet);
-        return m_instance.erasePrimSetKey(_key);
+        auto erased = m_instance.erasePrimSetKey(_key);
+        _updateParentToResolved();
+        return erased;
     }
     bool PropImpl::eraseObjectSetItem(char const* _key)
     {
@@ -1418,7 +1432,9 @@ namespace Ent
         {
             buildPath();
         }
-        return m_instance.eraseObjectSetItem(_key, isInPrefab);
+        auto erased = m_instance.eraseObjectSetItem(_key, isInPrefab);
+        _updateParentToResolved();
+        return erased;
     }
     bool PropImpl::eraseObjectSetItem(int64_t _key)
     {
@@ -1429,7 +1445,9 @@ namespace Ent
         {
             buildPath();
         }
-        return m_instance.eraseObjectSetItem(_key, isInPrefab);
+        auto erased = m_instance.eraseObjectSetItem(_key, isInPrefab);
+        _updateParentToResolved();
+        return erased;
     }
     bool PropImpl::eraseUnionSetItem(char const* _key)
     {
@@ -1440,7 +1458,9 @@ namespace Ent
         {
             buildPath();
         }
-        return m_instance.eraseUnionSetItem(_key, isInPrefab);
+        auto erased = m_instance.eraseUnionSetItem(_key, isInPrefab);
+        _updateParentToResolved();
+        return erased;
     }
     bool PropImpl::eraseMapItem(char const* _key)
     {
@@ -1451,7 +1471,9 @@ namespace Ent
         {
             buildPath();
         }
-        return m_instance.eraseMapItem(_key, isInPrefab);
+        auto erased = m_instance.eraseMapItem(_key, isInPrefab);
+        _updateParentToResolved();
+        return erased;
     }
     bool PropImpl::eraseMapItem(int64_t _key)
     {
@@ -1462,7 +1484,9 @@ namespace Ent
         {
             buildPath();
         }
-        return m_instance.eraseMapItem(_key, isInPrefab);
+        auto erased = m_instance.eraseMapItem(_key, isInPrefab);
+        _updateParentToResolved();
+        return erased;
     }
 
     nlohmann::json const* PropImpl::getRawJson()
@@ -1894,6 +1918,15 @@ namespace Ent
         if (_doNeedReResolve())
         {
             _reResolveFromRoot();
+        }
+    }
+
+    void PropImpl::_updateParentToResolved()
+    {
+        m_instance.updateToResolved();
+        if (auto parent = getParent())
+        {
+            parent->_updateParentToResolved();
         }
     }
 

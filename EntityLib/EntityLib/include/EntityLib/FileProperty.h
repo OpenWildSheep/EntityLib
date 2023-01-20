@@ -194,6 +194,8 @@ namespace Ent
         [[nodiscard]] char const* getFilePath() const;
         [[nodiscard]] bool needRebuild() const;
 
+        void updateToResolved(); // Inform that m_lastAccessVersion is actually up to date
+
     private:
         [[nodiscard]] nlohmann::json::iterator
         _findUnionSetItem(char const* _key, bool _withRemoved) const;

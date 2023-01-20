@@ -1312,4 +1312,12 @@ namespace Ent
         return m_docMetaData->version != m_lastAccessVersion;
     }
 
+    void FileProperty::updateToResolved()
+    {
+        if (m_docMetaData != nullptr)
+        {
+            m_lastAccessVersion = m_docMetaData->version;
+        }
+    }
+
 } // namespace Ent

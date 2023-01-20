@@ -299,6 +299,7 @@ namespace Ent
         void _reResolveFromRoot();
         [[nodiscard]] bool _doNeedReResolve() const;
         void _reResolveIfNeeded();
+        void _updateParentToResolved(); // Inform all parents the m_instance it is actually up to date (called by child)
 
         EntityLib* m_entityLib = nullptr;
         PropImplPtr m_prefab = nullptr;

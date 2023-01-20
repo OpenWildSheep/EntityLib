@@ -117,9 +117,9 @@ namespace Ent
         return newItem;
     }
 
-    std::map<char const*, Property> Property::getMapStringItems() const
+    std::map<char const*, Property, CmpStr> Property::getMapStringItems() const
     {
-        std::map<char const*, Property> result;
+        std::map<char const*, Property, CmpStr> result;
         for (char const* key : getPimpl().getMapKeysString())
         {
             result.emplace(key, getPimpl().getMapItem(key));
@@ -162,9 +162,9 @@ namespace Ent
         return result;
     }
 
-    std::map<char const*, Property> Property::getUnionSetItems() const
+    std::map<char const*, Property, CmpStr> Property::getUnionSetItems() const
     {
-        std::map<char const*, Property> result;
+        std::map<char const*, Property, CmpStr> result;
         for (auto&& [key, schema] : getPimpl().getUnionSetKeysString())
         {
             result.emplace(key, getPimpl().getUnionSetItem(key));

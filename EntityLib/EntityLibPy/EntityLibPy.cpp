@@ -293,7 +293,8 @@ static py::list propObjSetGetKeys(Property& _prop)
 nlohmann::json dumpProperty(Property _prop, bool _superKeyIsTypeName = false)
 {
     nlohmann::json result;
-    DumpProperty dumper(result, _superKeyIsTypeName);
+    DumpProperty dumper(
+        result, Ent::OverrideValueSource::Any, _superKeyIsTypeName, [](Ent::EntityRef&) {});
     visitRecursive(_prop, dumper);
     return result;
 }

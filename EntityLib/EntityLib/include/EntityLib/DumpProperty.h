@@ -11,12 +11,17 @@ namespace Ent
     class DumpProperty final : public RecursiveVisitor
     {
     public:
+        using ResolveEntityRefFunction = std::function<void(EntityRef&)>;
+
         explicit DumpProperty(
             nlohmann::json& _dest, ///< output json node
-            bool _superKeyIsTypeName = false ///< Replace the "Super" field with the field's type
-            )
+            OverrideValueSource _valueSource,
+            bool _superKeyIsTypeName, ///< Replace the "Super" field with the field's type
+            ResolveEntityRefFunction _resolveEntityRef)
             : m_dest(_dest)
+            , m_valueSource(_valueSource)
             , m_superKeyIsTypeName(_superKeyIsTypeName)
+            , m_resolveEntityRef(std::move(_resolveEntityRef))
         {
             _Push(m_dest);
         }
@@ -144,7 +149,9 @@ namespace Ent
         }
         void entityRefProperty(Property& _source) override
         {
-            _Back() = _source.getEntityRef().entityPath;
+            EntityRef ref = _source.getEntityRef();
+            m_resolveEntityRef(ref);
+            _Back() = ref.entityPath;
         }
 
     private:
@@ -163,13 +170,21 @@ namespace Ent
             m_stack.pop_back();
         }
 
-        [[nodiscard]] static bool _DoNeedCopy(Property const& _source)
+        [[nodiscard]] bool _DoNeedCopy(Property const& _source)
         {
-            return _source.hasOverride();
+            switch (m_valueSource)
+            {
+            case OverrideValueSource::Override: return _source.hasOverride();
+            case OverrideValueSource::OverrideOrPrefab: return not _source.isDefault();
+            case OverrideValueSource::Any: return true;
+            }
+            ENTLIB_LOGIC_ERROR("Unknown m_valueSource");
         }
 
         nlohmann::json& m_dest;
         std::vector<nlohmann::json*> m_stack;
+        OverrideValueSource m_valueSource;
         bool m_superKeyIsTypeName = false;
+        ResolveEntityRefFunction m_resolveEntityRef;
     };
 } // namespace Ent

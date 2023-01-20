@@ -585,4 +585,15 @@ namespace Ent
         CopyOverride, ///< Always override in dest when there is override in source
         MinimalOverride ///< Do not override when values are identicals
     };
+
+    /// @brief The possible source of an Override value
+    enum class OverrideValueSource
+    {
+        /// Value is set in this Override. Write the "InstanceOf" field.
+        Override,
+        /// Value is set in the Prefab or in this Override. Don't write the "InstanceOf" field.
+        OverrideOrPrefab,
+        /// Value can be any source: Override, Prefab or the default value. Don't write the "InstaneOf" field.
+        Any,
+    };
 } // namespace Ent

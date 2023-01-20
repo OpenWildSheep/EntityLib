@@ -12,16 +12,6 @@
 
 namespace Ent
 {
-    /// @brief The possible source of an Override value
-    enum class OverrideValueSource
-    {
-        /// Value is set in this Override. Write the "InstanceOf" field.
-        Override,
-        /// Value is set in the Prefab or in this Override. Don't write the "InstanceOf" field.
-        OverrideOrPrefab,
-        /// Value can be any source: Override, Prefab or the default value. Don't write the "InstaneOf" field.
-        Any,
-    };
 
     /// \cond PRIVATE
     void destroyAndFree(Node* ptr); ///< Internally used by the Node memory Pool

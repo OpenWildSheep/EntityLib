@@ -25,11 +25,11 @@ namespace Ent
         {
             _Push(m_dest);
         }
-        void inObject([[maybe_unused]] Property& _source) override
+        void inObject([[maybe_unused]] Property const& _source) override
         {
             _Back() = nlohmann::json::object();
         }
-        bool inObjectField([[maybe_unused]] Property& _source, char const* _key) override
+        bool inObjectField([[maybe_unused]] Property const& _source, char const* _key) override
         {
             if (_DoNeedCopy(_source))
             {
@@ -42,112 +42,115 @@ namespace Ent
             }
             return false;
         }
-        void outObjectField([[maybe_unused]] Property& _source, [[maybe_unused]] char const* _key) override
+        void outObjectField(
+            [[maybe_unused]] Property const& _source, [[maybe_unused]] char const* _key) override
         {
             _Pop();
         }
-        void inUnion(Property& _source, char const* _type) override
+        void inUnion(Property const& _source, char const* _type) override
         {
             _Back() = nlohmann::json::object();
             _Back()[_source.getSchema()->getUnionNameField()] = _type;
             _Push(_Back()[_source.getSchema()->getUnionDataField()]);
         }
-        void outUnion([[maybe_unused]] Property& _source) override
+        void outUnion([[maybe_unused]] Property const& _source) override
         {
             _Pop();
         }
-        void inMap([[maybe_unused]] Property& _source) override
+        void inMap([[maybe_unused]] Property const& _source) override
         {
             _Back() = nlohmann::json::array();
         }
-        void inMapElement([[maybe_unused]] Property& _source, char const* _key) override
+        void inMapElement([[maybe_unused]] Property const& _source, char const* _key) override
         {
             auto&& newPair = _Back().emplace_back(nlohmann::json::array());
             newPair.emplace_back(_key);
             _Push(newPair.emplace_back(nlohmann::json::object()));
         }
-        void inMapElement([[maybe_unused]] Property& _source, int64_t _key) override
+        void inMapElement([[maybe_unused]] Property const& _source, int64_t _key) override
         {
             auto&& newPair = _Back().emplace_back(nlohmann::json::array());
             newPair.emplace_back(_key);
             _Push(newPair.emplace_back(nlohmann::json::object()));
         }
-        void outMapElement([[maybe_unused]] Property& _source) override
+        void outMapElement([[maybe_unused]] Property const& _source) override
         {
             _Pop();
         }
-        void inArrayElement([[maybe_unused]] Property& _source, size_t _index) override
+        void inArrayElement([[maybe_unused]] Property const& _source, size_t _index) override
         {
             _Push(_Back().emplace_back(_index));
         }
-        void outArrayElement([[maybe_unused]] Property& _source) override
+        void outArrayElement([[maybe_unused]] Property const& _source) override
         {
             _Pop();
         }
-        void inPrimSet([[maybe_unused]] Property& _prop, [[maybe_unused]] DataType _dataType) override
+        void inPrimSet([[maybe_unused]] Property const& _prop, [[maybe_unused]] DataType _dataType) override
         {
             _Back() = nlohmann::json::array();
         }
-        void inObjectSet([[maybe_unused]] Property& _prop) override
+        void inObjectSet([[maybe_unused]] Property const& _prop) override
         {
             _Back() = nlohmann::json::array();
         }
-        void inUnionSet([[maybe_unused]] Property& _prop) override
+        void inUnionSet([[maybe_unused]] Property const& _prop) override
         {
             _Back() = nlohmann::json::array();
         }
-        void key([[maybe_unused]] Property& _source, char const* _key) override
+        void key([[maybe_unused]] Property const& _source, char const* _key) override
         {
             _Back().push_back(_key);
         }
-        void key([[maybe_unused]] Property& _source, int64_t _key) override
+        void key([[maybe_unused]] Property const& _source, int64_t _key) override
         {
             _Back().push_back(_key);
         }
-        void inUnionSetElement(Property& _source, char const* _type) override
+        void inUnionSetElement(Property const& _source, char const* _type) override
         {
             auto& newElt = _Back().emplace_back(nlohmann::json::object());
             auto const& itemSchema = _source.getParent()->getSchema()->singularItems->get();
             newElt[itemSchema.getUnionNameField()] = _type;
             _Push(newElt[itemSchema.getUnionDataField()]);
         }
-        void outUnionSetElement([[maybe_unused]] Property& _source) override
+        void outUnionSetElement([[maybe_unused]] Property const& _source) override
         {
             _Pop();
         }
-        void inObjectSetElement([[maybe_unused]] Property& _source, [[maybe_unused]] char const* _key) override
+        void inObjectSetElement(
+            [[maybe_unused]] Property const& _source, [[maybe_unused]] char const* _key) override
         {
             _Push(_Back().emplace_back(nlohmann::json::object()));
         }
-        void inObjectSetElement([[maybe_unused]] Property& _source, [[maybe_unused]] int64_t _key) override
+        void inObjectSetElement(
+            [[maybe_unused]] Property const& _source, [[maybe_unused]] int64_t _key) override
         {
             _Push(_Back().emplace_back(nlohmann::json::object()));
         }
-        void outObjectSetElement([[maybe_unused]] Property& _source) override
+        void outObjectSetElement([[maybe_unused]] Property const& _source) override
         {
             _Pop();
         }
-        void inArray([[maybe_unused]] Property& _source) override
+        void inArray([[maybe_unused]] Property const& _source) override
         {
             _Back() = nlohmann::json::array();
         }
-        void boolProperty(Property& _source) override
+        void boolProperty(Property const& _source) override
         {
             _Back() = _source.getBool();
         }
-        void intProperty(Property& _source) override
+        void intProperty(Property const& _source) override
         {
             _Back() = _source.getInt();
         }
-        void floatProperty(Property& _source) override
+        void floatProperty(Property const& _source) override
         {
             _Back() = _source.getFloat();
         }
-        void stringProperty(Property& _source) override
+        void stringProperty(Property const& _source) override
         {
             _Back() = _source.getString();
         }
-        void entityRefProperty(Property& _source) override
+        void entityRefProperty(Property const& _source) override
         {
             EntityRef ref = _source.getEntityRef();
             m_resolveEntityRef(ref);

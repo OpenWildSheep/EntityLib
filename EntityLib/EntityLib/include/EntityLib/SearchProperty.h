@@ -51,44 +51,44 @@ namespace Ent
             return m_foundProperties;
         }
 
-        bool inObjectField([[maybe_unused]] Property& _source, char const* _key) override
+        bool inObjectField([[maybe_unused]] Property const& _source, char const* _key) override
         {
             _testMatch(_source, _key);
             return true;
         }
-        void inUnion(Property& _source, char const* _type) override
+        void inUnion(Property const& _source, char const* _type) override
         {
             _testMatch(_source, _type);
         }
-        void inMapElement([[maybe_unused]] Property& _source, char const* _key) override
+        void inMapElement([[maybe_unused]] Property const& _source, char const* _key) override
         {
             _testMatch(_source, _key);
         }
-        void inMapElement([[maybe_unused]] Property& _source, int64_t _key) override
+        void inMapElement([[maybe_unused]] Property const& _source, int64_t _key) override
         {
             _testMatch(_source, _key);
         }
-        void inArrayElement([[maybe_unused]] Property& _source, size_t _index) override
+        void inArrayElement([[maybe_unused]] Property const& _source, size_t _index) override
         {
             _testMatch(_source, static_cast<int64_t>(_index));
         }
-        void key([[maybe_unused]] Property& _source, char const* _key) override
+        void key([[maybe_unused]] Property const& _source, char const* _key) override
         {
             _testMatch(_source, _key);
         }
-        void key([[maybe_unused]] Property& _source, int64_t _key) override
+        void key([[maybe_unused]] Property const& _source, int64_t _key) override
         {
             _testMatch(_source, std::to_string(_key).c_str());
         }
-        void inUnionSetElement(Property& _source, char const* _type) override
+        void inUnionSetElement(Property const& _source, char const* _type) override
         {
             _testMatch(_source, _type);
         }
-        void inObjectSetElement([[maybe_unused]] Property& _source, char const* _key) override
+        void inObjectSetElement([[maybe_unused]] Property const& _source, char const* _key) override
         {
             _testMatch(_source, _key);
         }
-        void inObjectSetElement([[maybe_unused]] Property& _source, int64_t _key) override
+        void inObjectSetElement([[maybe_unused]] Property const& _source, int64_t _key) override
         {
             _testMatch(_source, _key);
         }

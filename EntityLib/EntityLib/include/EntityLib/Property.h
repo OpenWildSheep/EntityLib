@@ -740,9 +740,9 @@ namespace Ent
         }
 
         void copyInto(
-            Property& _dest,
+            Property const& _dest,
             CopyMode _copyMode,
-            OverrideValueSource _overrideValueSource = OverrideValueSource::OverrideOrPrefab);
+            OverrideValueSource _overrideValueSource = OverrideValueSource::OverrideOrPrefab) const;
 
         [[nodiscard]] Property detach();
 

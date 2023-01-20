@@ -15,7 +15,7 @@ namespace Ent
         CopyMode m_copyMode = {};
         bool m_copyRootInstanceOf = false;
 
-        [[nodiscard]] Property& _back()
+        [[nodiscard]] Property const& _back()
         {
             return m_dest.back();
         }
@@ -76,7 +76,7 @@ namespace Ent
             , m_copyRootInstanceOf(_copyRootInstanceOf)
         {
         }
-        void inObject(Property& m_source) override
+        void inObject(Property const& m_source) override
         {
             if (m_overrideValueSource == OverrideValueSource::Override
                 and (m_copyRootInstanceOf or m_dest.size() > 1))
@@ -87,7 +87,7 @@ namespace Ent
                 }
             }
         }
-        bool inObjectField([[maybe_unused]] Property& m_source, char const* _key) override
+        bool inObjectField([[maybe_unused]] Property const& m_source, char const* _key) override
         {
             _push(_back().getObjectField(_key));
             if (doNeedCopy(m_source))
@@ -98,11 +98,11 @@ namespace Ent
             _pop();
             return false;
         }
-        void outObjectField([[maybe_unused]] Property& m_source, [[maybe_unused]] char const* _key) override
+        void outObjectField([[maybe_unused]] Property const& m_source, [[maybe_unused]] char const* _key) override
         {
             _pop();
         }
-        void inUnion(Property& m_source, char const* _type) override
+        void inUnion(Property const& m_source, char const* _type) override
         {
             if (doNeedCopy(m_source))
             {
@@ -110,11 +110,11 @@ namespace Ent
             }
             _push(_back().forceGetUnionData(_type).first);
         }
-        void outUnion([[maybe_unused]] Property& m_source) override
+        void outUnion([[maybe_unused]] Property const& m_source) override
         {
             _pop();
         }
-        void inMapElement([[maybe_unused]] Property& m_source, char const* _key) override
+        void inMapElement([[maybe_unused]] Property const& m_source, char const* _key) override
         {
             _push(_back().forceGetMapItem(_key).first);
             if (doNeedCopy(m_source))
@@ -122,23 +122,23 @@ namespace Ent
                 _back().buildPath(); // Force it to set
             }
         }
-        void inMapElement([[maybe_unused]] Property& m_source, int64_t _key) override
+        void inMapElement([[maybe_unused]] Property const& m_source, int64_t _key) override
         {
             _push(_back().forceGetMapItem(_key).first);
         }
-        void outMapElement([[maybe_unused]] Property& m_source) override
+        void outMapElement([[maybe_unused]] Property const& m_source) override
         {
             _pop();
         }
-        void inArrayElement([[maybe_unused]] Property& m_source, size_t _index) override
+        void inArrayElement([[maybe_unused]] Property const& m_source, size_t _index) override
         {
             _push(_back().getArrayItem(_index));
         }
-        void outArrayElement([[maybe_unused]] Property& m_source) override
+        void outArrayElement([[maybe_unused]] Property const& m_source) override
         {
             _pop();
         }
-        void key([[maybe_unused]] Property& m_source, char const* _key) override
+        void key([[maybe_unused]] Property const& m_source, char const* _key) override
         {
             _back().insertPrimSetKey(_key);
             if (doNeedCopy(m_source))
@@ -146,11 +146,11 @@ namespace Ent
                 _back().buildPath(); // Force it to set
             }
         }
-        void key([[maybe_unused]] Property& m_source, int64_t _key) override
+        void key([[maybe_unused]] Property const& m_source, int64_t _key) override
         {
             _back().insertPrimSetKey(_key);
         }
-        void inUnionSetElement(Property& m_source, char const* _type) override
+        void inUnionSetElement(Property const& m_source, char const* _type) override
         {
             _push(_back().forceGetUnionSetItem(_type).first);
             if (doNeedCopy(m_source))
@@ -158,11 +158,11 @@ namespace Ent
                 _back().buildPath(); // Force it to set
             }
         }
-        void outUnionSetElement([[maybe_unused]] Property& m_source) override
+        void outUnionSetElement([[maybe_unused]] Property const& m_source) override
         {
             _pop();
         }
-        void inObjectSetElement([[maybe_unused]] Property& m_source, char const* _key) override
+        void inObjectSetElement([[maybe_unused]] Property const& m_source, char const* _key) override
         {
             ENTLIB_ASSERT(_back().getDataKind() == DataKind::objectSet);
             _push(_back().forceGetObjectSetItem(_key).first);
@@ -171,7 +171,7 @@ namespace Ent
                 _back().buildPath(); // Force it to set
             }
         }
-        void inObjectSetElement([[maybe_unused]] Property& m_source, int64_t _key) override
+        void inObjectSetElement([[maybe_unused]] Property const& m_source, int64_t _key) override
         {
             ENTLIB_ASSERT(_back().getDataKind() == DataKind::objectSet);
             _push(_back().forceGetObjectSetItem(_key).first);
@@ -180,18 +180,18 @@ namespace Ent
                 _back().buildPath(); // Force it to set
             }
         }
-        void outObjectSetElement([[maybe_unused]] Property& m_source) override
+        void outObjectSetElement([[maybe_unused]] Property const& m_source) override
         {
             _pop();
         }
-        void inArray(Property& m_source) override
+        void inArray(Property const& m_source) override
         {
             if (doNeedCopy(m_source))
             {
                 _back().setSize(m_source.size());
             }
         }
-        void outMap([[maybe_unused]] Property& m_source) override
+        void outMap([[maybe_unused]] Property const& m_source) override
         {
             if (m_overrideValueSource == OverrideValueSource::Override)
             {
@@ -214,7 +214,7 @@ namespace Ent
                 }
             }
         }
-        void outObjectSet([[maybe_unused]] Property& m_source) override
+        void outObjectSet([[maybe_unused]] Property const& m_source) override
         {
             if (m_overrideValueSource == OverrideValueSource::Override)
             {
@@ -237,7 +237,7 @@ namespace Ent
                 }
             }
         }
-        void outUnionSet([[maybe_unused]] Property& m_source) override
+        void outUnionSet([[maybe_unused]] Property const& m_source) override
         {
             if (m_overrideValueSource == OverrideValueSource::Override)
             {
@@ -247,35 +247,35 @@ namespace Ent
                 }
             }
         }
-        void boolProperty(Property& m_source) override
+        void boolProperty(Property const& m_source) override
         {
             if (doNeedCopy(m_source))
             {
                 _back().setBool(m_source.getBool());
             }
         }
-        void intProperty(Property& m_source) override
+        void intProperty(Property const& m_source) override
         {
             if (doNeedCopy(m_source))
             {
                 _back().setInt(m_source.getInt());
             }
         }
-        void floatProperty(Property& m_source) override
+        void floatProperty(Property const& m_source) override
         {
             if (doNeedCopy(m_source))
             {
                 _back().setFloat(m_source.getFloat());
             }
         }
-        void stringProperty(Property& m_source) override
+        void stringProperty(Property const& m_source) override
         {
             if (doNeedCopy(m_source))
             {
                 _back().setString(m_source.getString());
             }
         }
-        void entityRefProperty(Property& m_source) override
+        void entityRefProperty(Property const& m_source) override
         {
             if (doNeedCopy(m_source))
             {

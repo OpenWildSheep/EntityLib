@@ -316,14 +316,7 @@ namespace Ent
             }
             [[nodiscard]] std::optional<Property> getSubNode(char const* _typeName)
             {
-                if (count(_typeName))
-                {
-                    return getProperty().getUnionSetItem(_typeName);
-                }
-                else
-                {
-                    return std::nullopt;
-                }
+                return getProperty().getUnionSetItem(_typeName);
             }
             template <typename T>
             [[nodiscard]] std::optional<T> get()
@@ -339,14 +332,7 @@ namespace Ent
             }
             [[nodiscard]] std::optional<Property> get(char const* _typeName)
             {
-                if (count(_typeName))
-                {
-                    return getProperty().getUnionSetItem(_typeName);
-                }
-                else
-                {
-                    return std::nullopt;
-                }
+                return getProperty().getUnionSetItem(_typeName);
             }
             Property addSubNode(char const* str)
             {

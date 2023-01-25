@@ -46,13 +46,18 @@ namespace Ent
             Remove
         };
 
-        explicit FileProperty(JsonMetaData* _docMetaData = nullptr);
-
-        FileProperty(Subschema const* _schema, char const* _filePath, VersionedJson& _document);
-
-        FileProperty(Subschema const* _schema, char const* _filePath);
+        explicit FileProperty(EntityLib& _entitylib, JsonMetaData* _docMetaData = nullptr);
 
         FileProperty(
+            EntityLib& _entitylib,
+            Subschema const* _schema,
+            char const* _filePath,
+            VersionedJson& _document);
+
+        FileProperty(EntityLib& _entitylib, Subschema const* _schema, char const* _filePath);
+
+        FileProperty(
+            EntityLib& _entitylib,
             Subschema const* _schema,
             char const* m_filePath,
             nlohmann::json* _document,
@@ -193,6 +198,8 @@ namespace Ent
 
         [[nodiscard]] char const* getFilePath() const;
         [[nodiscard]] bool needRebuild() const;
+        /// Return true if any document has changed since the last access
+        [[nodiscard]] bool needRebuildGlobal() const;
 
         void updateToResolved(); // Inform that m_lastAccessVersion is actually up to date
 
@@ -262,6 +269,7 @@ namespace Ent
         [[nodiscard]] nlohmann::json* _getRawJsonMutable() const;
         void _setRawJson(nlohmann::json* _jsonNode);
 
+        EntityLib* m_entityLib = nullptr;
         std::string m_filePath; ///< Path of the instance json file
         Schema m_schema{};
         nlohmann::json* m_wrapper{}; ///< Union wrapper if the Data in a UnionSet
@@ -269,6 +277,7 @@ namespace Ent
         Key m_key;
         JsonMetaData* m_docMetaData = nullptr;
         size_t m_lastAccessVersion = 0;
+        size_t m_lastAccessGlobalVersion = 0;
     };
 
     inline DataType FileProperty::getMapKeyType() const

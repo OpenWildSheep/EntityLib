@@ -25,7 +25,8 @@ namespace Ent
         // Loïc : To fix this aweful const_cast, FileProperty need a const version 'ConstFileCursor'.
         // This is a "not-so-easy" task just to remove a const_cast so it is not a priority I guess.
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-        m_default = FileProperty{_schema, _filePath, const_cast<nlohmann::json*>(_document), nullptr};
+        m_default = FileProperty(
+            *m_entityLib, _schema, _filePath, const_cast<nlohmann::json*>(_document), nullptr);
     }
 
     FileProperty const& PropImpl::_getDefault() const
@@ -102,6 +103,8 @@ namespace Ent
 
     PropImpl::PropImpl(EntityLib* _entityLib)
         : m_entityLib(_entityLib)
+        , m_default(*_entityLib)
+        , m_instance(*_entityLib)
     {
     }
 
@@ -112,6 +115,8 @@ namespace Ent
         char const* _filename,
         nlohmann::json* _doc,
         JsonMetaData* _metaData)
+        : m_default(*_entityLib)
+        , m_instance(*_entityLib)
     {
         if (_doc == nullptr)
         {
@@ -124,7 +129,7 @@ namespace Ent
         m_parent = std::move(_parent);
 
         _setDefault(_schema, nullptr, &_schema->defaultValue);
-        m_instance = FileProperty(_schema, _filename, _doc, _metaData);
+        m_instance = FileProperty(*_entityLib, _schema, _filename, _doc, _metaData);
         ENTLIB_ASSERT(_doc != nullptr);
         ENTLIB_ASSERT(_doc->is_object());
         _loadInstanceOf();
@@ -1917,6 +1922,10 @@ namespace Ent
 
     bool PropImpl::_reResolveIfNeeded()
     {
+        if (not m_instance.needRebuildGlobal())
+        { // If nothing has changed since last access, no need to check prefabs
+            return false;
+        }
         bool prefabChanged = false;
         if (m_prefab)
         {

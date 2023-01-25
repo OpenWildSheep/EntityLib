@@ -7,16 +7,24 @@ using namespace nlohmann;
 
 namespace Ent
 {
-    FileProperty::FileProperty(JsonMetaData* _docMetaData)
-        : m_docMetaData(_docMetaData)
+    FileProperty::FileProperty(EntityLib& _entitylib, JsonMetaData* _docMetaData)
+        : m_entityLib(&_entitylib)
+        , m_docMetaData(_docMetaData)
         , m_lastAccessVersion(_docMetaData == nullptr ? 0 : _docMetaData->version)
+        , m_lastAccessGlobalVersion(_entitylib.getGlobalDocumentsVersion())
     {
     }
 
     FileProperty::FileProperty(
-        Subschema const* _schema, char const* _filePath, json* _document, JsonMetaData* _docMetaData)
-        : m_docMetaData(_docMetaData)
+        EntityLib& _entitylib,
+        Subschema const* _schema,
+        char const* _filePath,
+        json* _document,
+        JsonMetaData* _docMetaData)
+        : m_entityLib(&_entitylib)
+        , m_docMetaData(_docMetaData)
         , m_lastAccessVersion(_docMetaData == nullptr ? 0 : _docMetaData->version)
+        , m_lastAccessGlobalVersion(_entitylib.getGlobalDocumentsVersion())
     {
         if (_filePath != nullptr)
         {
@@ -26,13 +34,15 @@ namespace Ent
         _setRawJson(_document);
     }
 
-    FileProperty::FileProperty(Subschema const* _schema, char const* _filePath, VersionedJson& _document)
-        : FileProperty(_schema, _filePath, &_document.document, &_document.metadata)
+    FileProperty::FileProperty(
+        EntityLib& _entitylib, Subschema const* _schema, char const* _filePath, VersionedJson& _document)
+        : FileProperty(_entitylib, _schema, _filePath, &_document.document, &_document.metadata)
     {
     }
 
-    FileProperty::FileProperty(Subschema const* _schema, char const* _filePath)
-        : FileProperty(_schema, _filePath, _schema->rootSchema->entityLib->readJsonFile(_filePath))
+    FileProperty::FileProperty(EntityLib& _entitylib, Subschema const* _schema, char const* _filePath)
+        : FileProperty(
+            _entitylib, _schema, _filePath, _schema->rootSchema->entityLib->readJsonFile(_filePath))
     {
     }
 
@@ -94,7 +104,7 @@ namespace Ent
 
     FileProperty FileProperty::getObjectField(char const* _field, SubschemaRef const* _fieldRef) const
     {
-        FileProperty newLayer(m_docMetaData);
+        FileProperty newLayer(*m_entityLib, m_docMetaData);
         ENTLIB_DBG_ASSERT(m_schema.base->type == DataType::object);
         if (_fieldRef == nullptr)
         {
@@ -127,7 +137,7 @@ namespace Ent
     std::pair<FileProperty, FileProperty::MapItemAction>
     FileProperty::forceGetUnionSetItem(char const* _key, Subschema const* _dataSchema) const
     {
-        FileProperty newLayer(m_docMetaData);
+        FileProperty newLayer(*m_entityLib, m_docMetaData);
         auto const& lastschema = *m_schema.base;
         if (lastschema.singularItems == nullptr)
         {
@@ -193,7 +203,7 @@ namespace Ent
     template <typename K>
     std::pair<FileProperty, FileProperty::MapItemAction> FileProperty::_enterObjectSetItemImpl(K _key) const
     {
-        FileProperty newLayer(m_docMetaData);
+        FileProperty newLayer(*m_entityLib, m_docMetaData);
         auto const& setSchema = *m_schema.base;
         ENTLIB_ASSERT(setSchema.type == DataType::array);
         auto const& objectSchema = setSchema.singularItems->get();
@@ -264,7 +274,7 @@ namespace Ent
     template <typename K>
     std::pair<FileProperty, FileProperty::MapItemAction> FileProperty::_enterMapItemImpl(K _key) const
     {
-        FileProperty newLayer(m_docMetaData);
+        FileProperty newLayer(*m_entityLib, m_docMetaData);
 
         auto& pairSchema = m_schema.base->singularItems->get();
         newLayer.m_schema = Schema{&pairSchema.linearItems->at(1).get(), nullptr};
@@ -313,7 +323,7 @@ namespace Ent
 
     FileProperty FileProperty::getArrayItem(size_t _index) const
     {
-        FileProperty newLayer(m_docMetaData);
+        FileProperty newLayer(*m_entityLib, m_docMetaData);
         ENTLIB_DBG_ASSERT(m_schema.base->type == DataType::array);
         if (auto* const item = m_schema.base->singularItems.get())
         {
@@ -404,7 +414,7 @@ namespace Ent
         {
             _unionType = getUnionType();
         }
-        FileProperty newLayer(m_docMetaData);
+        FileProperty newLayer(*m_entityLib, m_docMetaData);
         auto const* const dataSchema = m_schema.base->getUnionType(_unionType);
         auto const* const unionSchema = m_schema.base;
         newLayer.m_key = _unionType;
@@ -1300,6 +1310,8 @@ namespace Ent
         {
             ++m_docMetaData->version;
             m_lastAccessVersion = m_docMetaData->version;
+            m_entityLib->incrementGlobalDocumentsVersion();
+            m_lastAccessGlobalVersion = m_entityLib->getGlobalDocumentsVersion();
         }
     }
 
@@ -1310,6 +1322,11 @@ namespace Ent
             return false;
         }
         return m_docMetaData->version != m_lastAccessVersion;
+    }
+
+    bool FileProperty::needRebuildGlobal() const
+    {
+        return m_entityLib->getGlobalDocumentsVersion() != m_lastAccessGlobalVersion;
     }
 
     void FileProperty::updateToResolved()

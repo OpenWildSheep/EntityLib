@@ -2098,5 +2098,16 @@ namespace Ent
     {
         m_newDepFileCallback = std::move(_callback);
     }
+
+    size_t EntityLib::getGlobalDocumentsVersion() const
+    {
+        return m_globalDocumentsVersion;
+    }
+
+    void EntityLib::incrementGlobalDocumentsVersion()
+    {
+        ++m_globalDocumentsVersion;
+    }
+
     /// \endcond
 } // namespace Ent

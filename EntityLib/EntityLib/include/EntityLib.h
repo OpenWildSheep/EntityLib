@@ -236,6 +236,12 @@ namespace Ent
         /// Set a callback to be informed when EntityLin load a file. Useful to list dependencies.
         void setNewDepFileCallBack(NewDepFileCallback _callback);
 
+        /// It is incremented each time a document is changed. 
+        /// So it is the version of the "document database".
+        size_t getGlobalDocumentsVersion() const;
+
+        void incrementGlobalDocumentsVersion();
+
     private:
         /// Load an Entity or a Scene, using the given cache
         template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
@@ -278,6 +284,7 @@ namespace Ent
         mutable std::vector<std::unique_ptr<VersionedJson>> m_tempJsonFiles;
         String m_fallbackEntity;
         NewDepFileCallback m_newDepFileCallback;
+        size_t m_globalDocumentsVersion = 0;
     };
 
 } // namespace Ent

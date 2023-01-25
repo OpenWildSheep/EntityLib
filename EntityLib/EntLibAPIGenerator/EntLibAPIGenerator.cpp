@@ -1043,9 +1043,9 @@ namespace Ent
             }
             {{#schema.schema_name}}static constexpr char schemaName[] = "{{{.}}}";{{/schema.schema_name}}
             char const* getType() const;{{#types}}
-            std::optional<{{#type}}{{>display_type}}{{/type}}> {{name}}();
-            {{#type}}{{>display_type}}{{/type}} add{{name}}();
-            void remove{{name}}();
+            std::optional<{{#type}}{{>display_type}}{{/type}}> {{name}}() const;
+            {{#type}}{{>display_type}}{{/type}} add{{name}}() const;
+            void remove{{name}}() const;
         {{/types}}
         };{{/union}}{{/schema.union_set}}
 
@@ -1078,15 +1078,15 @@ namespace Ent
         {
             return getProperty().getUnionType();
         }
-        {{#types}}inline std::optional<{{#type}}{{>display_type}}{{/type}}> {{schema.type_name}}::{{name}}()
+        {{#types}}inline std::optional<{{#type}}{{>display_type}}{{/type}}> {{schema.type_name}}::{{name}}() const
         {
             return std::optional<{{#type}}{{>display_type}}{{/type}}>(getSubNode("{{name}}"));
         }
-        inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::add{{name}}()
+        inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::add{{name}}() const
         {
             return {{#type}}{{>display_type}}{{/type}}(addSubNode("{{name}}"));
         }
-        inline void {{schema.type_name}}::remove{{name}}()
+        inline void {{schema.type_name}}::remove{{name}}() const
         {
             getProperty().eraseUnionSetItem("{{name}}");
         }

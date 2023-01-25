@@ -298,13 +298,12 @@ namespace Ent
         [[nodiscard]] FileProperty const& _getDefault() const;
         void _reResolveFromRoot();
         [[nodiscard]] bool _doNeedReResolve() const;
-        void _reResolveIfNeeded();
+        bool _reResolveIfNeeded();
         void _updateParentToResolved(); // Inform all parents the m_instance it is actually up to date (called by child)
 
         EntityLib* m_entityLib = nullptr;
         PropImplPtr m_prefab = nullptr;
         FileProperty m_default; ///< Used to explore the default value in the schema
-        size_t m_arraySize = 0;
         FileProperty m_instance;
         PropImplPtr m_parent = nullptr;
         mutable size_t m_refCount = 0;

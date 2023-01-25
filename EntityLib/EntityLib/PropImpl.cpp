@@ -1897,13 +1897,15 @@ namespace Ent
             auto newThis = m_parent->resolveNodeRef(key.c_str());
             if (newThis == nullptr)
             {
+                auto prevRefCount = m_refCount;
                 *this = PropImpl(m_entityLib);
+                m_refCount = prevRefCount; // Reapply the previous m_refCount (lost in move)
                 return;
             }
             auto prevRefCount = m_refCount;
             auto prevNewRefCount = newThis->m_refCount;
             *this = std::move(*newThis);
-            m_refCount = prevRefCount;
+            m_refCount = prevRefCount; // Reapply the previous m_refCount (lost in move)
             newThis->m_refCount = prevNewRefCount;
         }
     }
@@ -1913,12 +1915,19 @@ namespace Ent
         return m_instance.needRebuild();
     }
 
-    void PropImpl::_reResolveIfNeeded()
+    bool PropImpl::_reResolveIfNeeded()
     {
-        if (_doNeedReResolve())
+        bool prefabChanged = false;
+        if (m_prefab)
+        {
+            prefabChanged = m_prefab->_reResolveIfNeeded();
+        }
+        if (prefabChanged or _doNeedReResolve())
         {
             _reResolveFromRoot();
+            return true;
         }
+        return false;
     }
 
     void PropImpl::_updateParentToResolved()

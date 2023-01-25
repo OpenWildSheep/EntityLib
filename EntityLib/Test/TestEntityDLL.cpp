@@ -223,6 +223,20 @@ try
         ENTLIB_ASSERT(subent.isSet());
         ENTLIB_ASSERT(embedded.isSet());
         ENTLIB_ASSERT(comp.isSet());
+        // Remove component in prefab and still use the instance Prop of component
+        ent = Gen::Entity::loadCopy(entlib, "instance.entity");
+        ENTLIB_ASSERT(ent.getPrefab().has_value());
+        comp = ent.Components();
+        ENTLIB_ASSERT(comp.getPrefab().has_value());
+        auto instNetworkNode = comp.SmoothScaleComponentGD();
+        ENTLIB_ASSERT(instNetworkNode->getPrefab().has_value());
+        auto prefab = Gen::Entity::load(entlib, "prefab.entity");
+        ENTLIB_ASSERT(comp.SmoothScaleComponentGD().has_value());
+        ENTLIB_ASSERT(instNetworkNode->getPrefab().has_value());
+        prefab.Components().removeSmoothScaleComponentGD();
+        ENTLIB_ASSERT(comp.SmoothScaleComponentGD().has_value() == false);
+        ENTLIB_ASSERT(instNetworkNode->getSchema() == nullptr);
+        instNetworkNode.reset();
     }
 
     ENTLIB_ASSERT(Ent::format("Toto %d", 37) == "Toto 37");

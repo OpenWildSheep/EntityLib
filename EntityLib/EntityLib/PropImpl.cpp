@@ -482,6 +482,20 @@ namespace Ent
         return instanceOf;
     }
 
+    char const* PropImpl::getFirstInstanceOf()
+    {
+        auto prefab = this;
+        while (prefab->getPrefab() != nullptr)
+        {
+            if (char const* prefabName = prefab->getInstanceOf())
+            {
+                return prefabName;
+            }
+            prefab = prefab->getPrefab();
+        }
+        return nullptr;
+    }
+
     void PropImpl::resetInstanceOf(char const* _instanceOf)
     {
         _reResolveIfNeeded();

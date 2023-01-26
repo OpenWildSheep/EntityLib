@@ -142,12 +142,19 @@ namespace Ent
         {
             return Property{getPimpl().getArrayItem(_index)};
         }
-        /// @brief Get the "InstanceOf" field (path to prefab)
-        /// @remark Return an empty string if set to empty, or nullptr if unset.
+        /// @return The "InstanceOf" field, an empty string if set to empty, or nullptr if unset.
         /// @pre It is an Object
+        /// @remake only look in the instance
         [[nodiscard]] char const* getInstanceOf() const
         {
             return getPimpl().getInstanceOf();
+        }
+        /// @return The first "InstanceOf" field, following prefabs, an empty string if set to empty, or nullptr if no prefab.
+        /// @pre It is an Object
+        /// @remark Will follow the prefab chain until a InstanceOf is found
+        [[nodiscard]] char const* getFirstInstanceOf() const
+        {
+            return getPimpl().getFirstInstanceOf();
         }
 
         /// @brief Set the prefab (and reset all overriden values)

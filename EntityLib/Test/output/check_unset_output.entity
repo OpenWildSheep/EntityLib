@@ -1,0 +1,148 @@
+{
+    "$schema": "wildschema:/all/Entity.json",
+    "ActorStates": [
+        {
+            "classData": {},
+            "className": "ActorStateDead"
+        },
+        {
+            "classData": {},
+            "className": "EntityStatePlayer"
+        }
+    ],
+    "Color": [
+        27,
+        177,
+        27,
+        255
+    ],
+    "Components": [
+        {
+            "Data": {
+                "Faction": "Plouf",
+                "ScriptList": [
+                    "a1",
+                    "b2",
+                    null
+                ]
+            },
+            "Type": "SystemicCreature"
+        },
+        {
+            "Data": {
+                "Radius": 30.0,
+                "Tags": {
+                    "Tags": [
+                        [
+                            "a",
+                            []
+                        ],
+                        [
+                            "b",
+                            [
+                                "1",
+                                "2"
+                            ]
+                        ],
+                        [
+                            "c",
+                            [
+                                "1",
+                                "3"
+                            ]
+                        ],
+                        [
+                            "d",
+                            null
+                        ]
+                    ]
+                }
+            },
+            "Type": "TestTagsList"
+        },
+        {
+            "Data": {
+                "InstanceOf": "test.StickToTerrain.node",
+                "NormalRatio": 0.6
+            },
+            "Type": "StickToTerrain"
+        },
+        {
+            "Data": {
+                "InstanceOf": "test.SeedPatch2.node",
+                "NoiseOffsetY": 3
+            },
+            "Type": "SeedPatch"
+        },
+        {
+            "Data": {
+                "Embedded": [
+                    {
+                        "Color": [
+                            255,
+                            120,
+                            220,
+                            255
+                        ],
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Source": "instance"
+                                },
+                                "Type": "NetworkLink"
+                            }
+                        ],
+                        "InstanceOf": "subentity2.entity",
+                        "Name": "EntityWithInstanceOf"
+                    },
+                    {
+                        "InstanceOf": "subentity2.entity",
+                        "Name": "EntityWithInstanceOfButNoOverride"
+                    }
+                ]
+            },
+            "Type": "SubScene"
+        },
+        {
+            "Data": {
+                "MapOfObject": [],
+                "MapOfPrimitive": [
+                    [
+                        "speed2",
+                        2
+                    ],
+                    [
+                        "speed3",
+                        3
+                    ]
+                ],
+                "SetOfObject": [
+                    {
+                        "Name": "A",
+                        "Value": "a"
+                    },
+                    {
+                        "Name": "B",
+                        "Value": "b"
+                    },
+                    {
+                        "InstanceOf": "ObjectInSet.node",
+                        "Name": "E"
+                    },
+                    {
+                        "Name": "F",
+                        "Value": "f"
+                    },
+                    {
+                        "Name": "G",
+                        "__removed__": true
+                    }
+                ]
+            },
+            "Type": "TestSetOfObject"
+        }
+    ],
+    "InstanceOf": "prefab.entity",
+    "Name": "PlayerSpawner_",
+    "Thumbnail": "prout"
+}

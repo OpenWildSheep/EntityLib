@@ -1668,9 +1668,80 @@ namespace Ent
             {
             case DataKind::object: m_parent->m_instance.unsetObjectField(m_instance); break;
             case DataKind::union_: m_parent->m_instance.unsetUnionData(); break;
-            case DataKind::map: m_instance.setToDefault(parentSchema); break;
-            case DataKind::objectSet: m_instance.setToDefault(parentSchema); break;
-            case DataKind::unionSet: m_instance.setToDefault(parentSchema); break;
+            case DataKind::map:
+            {
+                // Check if the item is present in in the parent's prefab
+                bool isPresentInPrefab = false;
+                if (m_parent->getPrefab() != nullptr)
+                {
+                    if (m_parent->getPrefab()->getMapKeyType() == DataType::string)
+                    {
+                        isPresentInPrefab = m_parent->getPrefab()->mapContains(
+                            std::get<std::string>(m_instance.getPathToken()).c_str());
+                    }
+                    else
+                    {
+                        isPresentInPrefab = m_parent->getPrefab()->mapContains(
+                            std::get<int64_t>(m_instance.getPathToken()));
+                    }
+                }
+                if (isPresentInPrefab)
+                {
+                    // If it is present in the parent's prefab, we can erase the json node in the instance
+                    m_parent->m_instance.unsetMapItem(m_instance);
+                }
+                else
+                {
+                    // If not, we have to keep it to ensure to ADD.
+                    // It is not possible to ADD and to be unset...
+                    m_instance.setToDefault(parentSchema);
+                }
+                break;
+            }
+            case DataKind::objectSet:
+            {
+                bool isPresentInPrefab = false;
+                if (m_parent->getPrefab() != nullptr)
+                {
+                    if (m_parent->getPrefab()->getObjectSetKeyType() == DataType::string)
+                    {
+                        isPresentInPrefab = m_parent->getPrefab()->objectSetContains(
+                            std::get<std::string>(m_instance.getPathToken()).c_str());
+                    }
+                    else
+                    {
+                        isPresentInPrefab = m_parent->getPrefab()->objectSetContains(
+                            std::get<int64_t>(m_instance.getPathToken()));
+                    }
+                }
+                if (isPresentInPrefab)
+                {
+                    m_parent->m_instance.unsetObjectSetItem(m_instance);
+                }
+                else
+                {
+                    m_instance.setToDefault(parentSchema);
+                }
+                break;
+            }
+            case DataKind::unionSet:
+            {
+                bool isPresentInPrefab = false;
+                if (m_parent->getPrefab() != nullptr)
+                {
+                    isPresentInPrefab = m_parent->getPrefab()->unionSetContains(
+                            std::get<std::string>(m_instance.getPathToken()).c_str());
+                }
+                if (isPresentInPrefab)
+                {
+                    m_parent->m_instance.unsetUnionSetItem(m_instance);
+                }
+                else
+                {
+                    m_instance.setToDefault(parentSchema);
+                }
+                break;
+            }
             case DataKind::primitiveSet:
                 ENTLIB_LOGIC_ERROR("Unexpected unset on a pripitive in a set !");
             case DataKind::array: m_instance.setToNull(); break;

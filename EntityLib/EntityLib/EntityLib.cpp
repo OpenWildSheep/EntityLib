@@ -647,6 +647,7 @@ namespace Ent
         std::filesystem::path const filepath = very_weakly_canonical(_filepath);
         auto const absFilename = filepath.is_relative() ? rawdataPath / filepath : filepath;
         auto const tempFilename = std::filesystem::path(absFilename.string() + ".tmp");
+        create_directories(tempFilename.parent_path());
         {
             std::ofstream ofs(tempFilename);
             if (not ofs.is_open())

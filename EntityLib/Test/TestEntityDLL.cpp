@@ -198,6 +198,26 @@ try
         ENTLIB_ASSERT(speed2.has_value());
     }
     {
+        // Test unset
+        auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
+        // On unionset
+        auto netGD = ent.Components().addNetGD(); // exist in prefab but not in instance
+        ENTLIB_ASSERT(netGD.isSet());
+        netGD.unset();
+        ENTLIB_ASSERT(netGD.isSet() == false);
+        // On objectset
+        auto subent = ent.Components().SubScene()->Embedded().add("EP1-Spout_LINK_001"); // exist in prefab but not in instance
+        ENTLIB_ASSERT(subent.isSet());
+        subent.unset();
+        ENTLIB_ASSERT(subent.isSet() == false);
+        // On map
+        auto mapitem = ent.Components().TestSetOfObject()->MapOfObject().add("OldNode1"); // exist in prefab but not in instance
+        ENTLIB_ASSERT(mapitem.isSet());
+        mapitem.unset();
+        ENTLIB_ASSERT(mapitem.isSet() == false);
+        ent.save("output/check_unset_output.entity");
+    }
+    {
         auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
         // unset - unset children
         auto comp = ent.Components();

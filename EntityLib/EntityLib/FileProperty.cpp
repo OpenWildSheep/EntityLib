@@ -1230,6 +1230,78 @@ namespace Ent
         _increaseVersion();
     }
 
+    void FileProperty::unsetMapItem(FileProperty& _data)
+    {
+        if (not isSet())
+        {
+            return;
+        }
+        bool found = false;
+        auto map = _getRawJson();
+        for (size_t i = 0; i < map->size(); ++i)
+        {
+            auto const& pair = (*map)[i];
+            if (_data._getRawJson() == &pair[1])
+            {
+                _getRawJsonMutable()->erase(i);
+                _increaseVersion();
+                found = true;
+                break;
+            }
+        }
+        ENTLIB_ASSERT(found);
+        _data._setRawJson(nullptr);
+    }
+
+    void FileProperty::unsetObjectSetItem(FileProperty& _object)
+    {
+        if (not isSet())
+        {
+            return;
+        }
+        bool found = false;
+        auto unionset = _getRawJson();
+        for (size_t i = 0; i < unionset->size(); ++i)
+        {
+            if (_object._getRawJson() == &(*unionset)[i])
+            {
+                _getRawJsonMutable()->erase(i);
+                _increaseVersion();
+                found = true;
+                break;
+            }
+        }
+        ENTLIB_ASSERT(found);
+        _object._setRawJson(nullptr);
+    }
+
+    void FileProperty::unsetUnionSetItem(FileProperty& _data)
+    {
+        if (not isSet())
+        {
+            return;
+        }
+        bool found = false;
+        auto const* unionDataFieldName = getSchema()->singularItems->get().getUnionDataField();
+        auto unionset = _getRawJson();
+        for (size_t i = 0; i < unionset->size(); ++i)
+        {
+            auto const& union_ = (*unionset)[i];
+            if (auto dataIter = union_.find(unionDataFieldName); dataIter != union_.end())
+            {
+                if (_data._getRawJson() == &(*dataIter))
+                {
+                    _getRawJsonMutable()->erase(i);
+                    _increaseVersion();
+                    found = true;
+                    break;
+                }
+            }
+        }
+        ENTLIB_ASSERT(found);
+        _data._setRawJson(nullptr);
+    }
+
     void FileProperty::setToDefault(Subschema const* _parentSchema)
     {
         if (not isSet())

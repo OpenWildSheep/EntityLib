@@ -188,8 +188,16 @@ namespace Ent
         [[nodiscard]] bool eraseMapItem(char const* _key, bool _isInPrefab);
         [[nodiscard]] bool eraseMapItem(int64_t _key, bool _isInPrefab);
 
+        /// Remove the json node _field of the object this
         void unsetObjectField(FileProperty& _field);
+        /// Remove the data json node the union this
         void unsetUnionData();
+        /// Remove the json node _data of the map this
+        void unsetMapItem(FileProperty& _data);
+        /// Remove the json node _object of the ObjectSet this
+        void unsetObjectSetItem(FileProperty& _object);
+        /// Remove the json node _data of the UnionSet this
+        void unsetUnionSetItem(FileProperty& _data);
         void setToDefault(Subschema const* _parentSchema);
         void setToNull();
 

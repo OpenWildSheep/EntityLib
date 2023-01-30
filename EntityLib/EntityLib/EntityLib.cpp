@@ -12,6 +12,7 @@
 #include <sstream>
 #include <utility>
 #include <ciso646>
+#include <thread>
 
 #include "external/json.hpp"
 #include "ValidJson.h"
@@ -557,47 +558,115 @@ namespace Ent
         return Property(this, getSchema(_schemaName), _filepath);
     }
 
-    Property EntityLib::loadPropertyCopy(char const* _schemaName, char const* _filepath)
+    static std::string_view loadFunc(json const& _document, char const* _filepath)
     {
-        auto& storage = createTempJsonFile();
-        storage = readJsonFile(_filepath);
-        return Property(this, getSchema(_schemaName), _filepath, &storage);
+        if (auto const schemaName = _document.find("$schema"); schemaName != _document.end())
+        {
+            // If $schema found, use it
+            return getRefTypeName(schemaName->get_ref<json::string_t const&>().c_str());
+        }
+
+        throw UnknownSchema("", _filepath);
+    };
+
+    Property EntityLib::loadProperty(char const* _filepath)
+    {
+        auto const& json = readJsonFile(_filepath);
+        auto const schemaName = std::string(loadFunc(json.document, _filepath));
+
+        return Property(this, getSchema(schemaName.c_str()), _filepath);
     }
 
-    json& EntityLib::readJsonFile(char const* _filepath) const
+    Property EntityLib::loadPropertyCopy(char const* _schemaName, char const* _filepath)
+    {
+        auto& copy = createTempJsonFile();
+        auto& storage = readJsonFile(_filepath);
+        copy.document = storage.document;
+        return Property(this, getSchema(_schemaName), _filepath, copy);
+    }
+
+    Property EntityLib::loadPropertyCopy(char const* _filepath)
+    {
+        auto& copy = createTempJsonFile();
+        auto& storage = readJsonFile(_filepath);
+        copy.document = storage.document;
+        auto const schemaName = std::string(loadFunc(copy.document, _filepath));
+        return Property(this, getSchema(schemaName.c_str()), _filepath, copy);
+    }
+
+    Property EntityLib::newProperty(Subschema const* _schema)
+    {
+        auto& storage = createTempJsonFile();
+        return Property(this, _schema, "", storage);
+    }
+
+    VersionedJson& EntityLib::readJsonFile(char const* _filepath) const
     {
         std::filesystem::path const filepath = very_weakly_canonical(_filepath);
         if (auto const iter = m_jsonDatabase.find(filepath); iter != m_jsonDatabase.end())
         {
-            return iter->second;
+            return *iter->second;
         }
         if (m_newDepFileCallback)
         {
             m_newDepFileCallback(_filepath);
         }
-        json data = loadJsonFile(rawdataPath, filepath);
-        return m_jsonDatabase.emplace(filepath, std::move(data)).first->second;
+        auto file = std::make_unique<VersionedJson>();
+        file->document = loadJsonFile(rawdataPath, filepath);
+        return *m_jsonDatabase.emplace(filepath, std::move(file)).first->second;
     }
 
-    json& EntityLib::createTempJsonFile() const
+    VersionedJson& EntityLib::createTempJsonFile() const
     {
-        return *m_tempJsonFiles.emplace_back(std::make_unique<json>(json::object()));
+        return *m_tempJsonFiles.emplace_back(std::make_unique<VersionedJson>());
+    }
+
+    template <typename Lambda>
+    static void try3Times(Lambda&& lambda)
+    {
+        for (size_t i = 0;; ++i)
+        {
+            try
+            {
+                lambda();
+                return;
+            }
+            catch (...)
+            {
+                if (i == 2)
+                {
+                    throw;
+                }
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+        }
     }
 
     void EntityLib::saveJsonFile(json const* doc, char const* _filepath, char const* _schema) const
     {
         std::filesystem::path const filepath = very_weakly_canonical(_filepath);
-        std::ofstream ofs(rawdataPath / filepath);
-        if (not ofs.is_open())
+        auto const absFilename = filepath.is_relative() ? rawdataPath / filepath : filepath;
+        auto const tempFilename = std::filesystem::path(absFilename.string() + ".tmp");
+        create_directories(tempFilename.parent_path());
         {
-            throw ContextException("Can't open %s for write", filepath.string().c_str());
+            std::ofstream ofs(tempFilename);
+            if (not ofs.is_open())
+            {
+                throw ContextException("Can't open %s for write", tempFilename.string().c_str());
+            }
+            json copy = *doc;
+            copy["$schema"] = format(schemaFormat, _schema);
+            ofs << copy.dump(4);
         }
-        json copy = *doc;
-        copy["$schema"] = format(schemaFormat, _schema);
-        ofs << copy.dump(4);
-        if (&(m_jsonDatabase[filepath]) != doc)
+        try3Times([&] { rename(tempFilename, absFilename); });
+        if (m_jsonDatabase.count(filepath) == 0)
         {
-            m_jsonDatabase[filepath] = *doc;
+            m_jsonDatabase[filepath] = std::make_unique<VersionedJson>();
+        }
+        if (&(m_jsonDatabase[filepath]->document) != doc)
+        {
+            m_jsonDatabase[filepath]->document = *doc;
+            ++m_jsonDatabase[filepath]->metadata.version;
         }
     }
 
@@ -1113,7 +1182,8 @@ namespace Ent
                     {
                         if (item.size() != 2)
                         {
-                            throw ContextException("In map, a pair should have two items but has %zu", item.size());
+                            throw ContextException(
+                                "In map, a pair should have two items but has %zu", item.size());
                         }
                         return item.at(1).is_null();
                     };
@@ -1910,13 +1980,18 @@ namespace Ent
     }
 
     PropImplPtr EntityLib::newPropImpl(
-        PropImplPtr _parent, Subschema const* _schema, char const* _filename, json* _doc)
+        PropImplPtr _parent,
+        Subschema const* _schema,
+        char const* _filename,
+        json* _doc,
+        JsonMetaData* _metadata)
     {
         PropImpl* property{};
         auto* mem = propertyPool.alloc();
         try
         {
-            property = new (mem) PropImpl(this, std::move(_parent), _schema, _filename, _doc);
+            property =
+                new (mem) PropImpl(this, std::move(_parent), _schema, _filename, _doc, _metadata);
         }
         catch (...)
         {
@@ -1987,7 +2062,7 @@ namespace Ent
         return hash_value(p);
     }
 
-    std::unordered_map<std::filesystem::path, json, EntityLib::HashPath> const&
+    std::unordered_map<std::filesystem::path, std::unique_ptr<VersionedJson>, EntityLib::HashPath> const&
     EntityLib::getJsonDatabase() const
     {
         return m_jsonDatabase;
@@ -2024,5 +2099,16 @@ namespace Ent
     {
         m_newDepFileCallback = std::move(_callback);
     }
+
+    size_t EntityLib::getGlobalDocumentsVersion() const
+    {
+        return m_globalDocumentsVersion;
+    }
+
+    void EntityLib::incrementGlobalDocumentsVersion()
+    {
+        ++m_globalDocumentsVersion;
+    }
+
     /// \endcond
 } // namespace Ent

@@ -129,9 +129,22 @@ namespace Ent
         ENTLIB_LOGIC_ERROR("Unexpected DataType !");
     }
 
-    [[nodiscard]] bool Subschema::isPrimitive() const
+    bool Subschema::isPrimitive() const
     {
         return type == DataType::string or type == DataType::integer or type == DataType::boolean
                or type == DataType::number or type == DataType::entityRef;
     }
+
+    bool Subschema::isValidEnumString(std::string_view str) const
+    {
+        if (enumValues.empty())
+        {
+            return true;
+        }
+        return std::any_of(
+            begin(enumValues),
+            end(enumValues),
+            [str](std::string const& enumStr) { return enumStr == str; });
+    }
+
 } // namespace Ent

@@ -16,15 +16,15 @@
         {
             "Data": {
                 "Orientation": [
-                    -0.0032736328,
-                    -0.00733923,
-                    -0.12891139,
-                    0.99162364
+                    -0.0032736328430473804,
+                    -0.007339229807257652,
+                    -0.12891139090061188,
+                    0.9916236400604248
                 ],
                 "Scale": [
-                    1.0000386,
-                    0.99995625,
-                    1.0000291
+                    1.0000386238098145,
+                    0.9999562501907349,
+                    1.0000290870666504
                 ]
             },
             "Type": "TransformGD"
@@ -38,11 +38,11 @@
             "Type": "NetworkNode"
         },
         {
-            "Data": {},
             "Type": "StaffVertebrasGD"
         },
         {
             "Data": {
+                "BehaviorModifierTagList": [],
                 "BehaviorPath": "Pesto/Behavior/FSMDefaultBehavior.pesto",
                 "BehaviorState": "W/*at*/c//h",
                 "CanBeMaster": false,
@@ -102,10 +102,6 @@
             "Type": "ActorGD"
         },
         {
-            "Data": {},
-            "Type": "BeamGeneratorGD"
-        },
-        {
             "Data": {
                 "ScriptEvents": [
                     {
@@ -121,13 +117,9 @@
                         "className": "CineEventTestCurrentGameState"
                     },
                     {
-                        "classData": {},
                         "className": "CineEventTestCurrentGameState"
                     },
-                    {
-                        "classData": {},
-                        "className": "CineEventTestCurrentGameState"
-                    }
+                    null
                 ]
             },
             "Type": "CinematicGD"
@@ -164,8 +156,8 @@
                         [
                             "a",
                             [
-                                "1",
-                                "2"
+                                "2",
+                                "1"
                             ]
                         ],
                         [
@@ -230,7 +222,7 @@
         {
             "Data": {
                 "InstanceOf": "test.SeedPatch.node",
-                "NoiseOffsetX": 2.0
+                "NoiseOffsetX": 2
             },
             "Type": "SeedPatch"
         },
@@ -272,10 +264,10 @@
         {
             "Data": {
                 "UnionArray": [
-                    {}
+                    null
                 ],
                 "UnionObjectArray": [
-                    {}
+                    null
                 ]
             },
             "Type": "TestUnion"

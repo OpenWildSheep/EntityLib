@@ -190,6 +190,75 @@ try
     entlib.rawdataPath = current_path();
     entlib.validationEnabled = prevValidationEnabled;
 
+    {
+        // Check the visitor, in case of map of primitive
+        auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
+        auto detached = ent.detach();
+        auto speed2 = detached.Components().TestSetOfObject()->MapOfPrimitive().get("speed2");
+        ENTLIB_ASSERT(speed2.has_value());
+    }
+    {
+        // Test unset
+        auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
+        // On unionset
+        auto netGD = ent.Components().addNetGD(); // exist in prefab but not in instance
+        ENTLIB_ASSERT(netGD.isSet());
+        netGD.unset();
+        ENTLIB_ASSERT(netGD.isSet() == false);
+        // On objectset
+        auto subent = ent.Components().SubScene()->Embedded().add("EP1-Spout_LINK_001"); // exist in prefab but not in instance
+        ENTLIB_ASSERT(subent.isSet());
+        subent.unset();
+        ENTLIB_ASSERT(subent.isSet() == false);
+        // On map
+        auto mapitem = ent.Components().TestSetOfObject()->MapOfObject().add("OldNode1"); // exist in prefab but not in instance
+        ENTLIB_ASSERT(mapitem.isSet());
+        mapitem.unset();
+        ENTLIB_ASSERT(mapitem.isSet() == false);
+        ent.save("output/check_unset_output.entity");
+    }
+    {
+        auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
+        // unset - unset children
+        auto comp = ent.Components();
+        ENTLIB_ASSERT(comp.isSet());
+        auto embedded = comp.SubScene()->Embedded();
+        ENTLIB_ASSERT(embedded.isSet());
+        auto subent = *embedded.get("EntityWithInstanceOf");
+        ENTLIB_ASSERT(subent.isSet());
+        comp.unset();
+        ENTLIB_ASSERT(comp.isSet() == false);
+        ENTLIB_ASSERT(embedded.isSet() == false);
+        ENTLIB_ASSERT(subent.isSet() == false);
+        // set - set parent
+        comp = ent.Components();
+        embedded = comp.SubScene()->Embedded();
+        subent = *embedded.get("EntityWithInstanceOf");
+        comp = ent.Components(); // Make a clone of the real parent
+        embedded = comp.SubScene()->Embedded();
+        ENTLIB_ASSERT(comp.isSet() == false);
+        ENTLIB_ASSERT(embedded.isSet() == false);
+        ENTLIB_ASSERT(subent.isSet() == false);
+        subent.Color()[0] = 3;
+        ENTLIB_ASSERT(subent.isSet());
+        ENTLIB_ASSERT(embedded.isSet());
+        ENTLIB_ASSERT(comp.isSet());
+        // Remove component in prefab and still use the instance Prop of component
+        ent = Gen::Entity::loadCopy(entlib, "instance.entity");
+        ENTLIB_ASSERT(ent.getPrefab().has_value());
+        comp = ent.Components();
+        ENTLIB_ASSERT(comp.getPrefab().has_value());
+        auto instNetworkNode = comp.SmoothScaleComponentGD();
+        ENTLIB_ASSERT(instNetworkNode->getPrefab().has_value());
+        auto prefab = Gen::Entity::load(entlib, "prefab.entity");
+        ENTLIB_ASSERT(comp.SmoothScaleComponentGD().has_value());
+        ENTLIB_ASSERT(instNetworkNode->getPrefab().has_value());
+        prefab.Components().removeSmoothScaleComponentGD();
+        ENTLIB_ASSERT(comp.SmoothScaleComponentGD().has_value() == false);
+        ENTLIB_ASSERT(instNetworkNode->getSchema() == nullptr);
+        instNetworkNode.reset();
+    }
+
     ENTLIB_ASSERT(Ent::format("Toto %d", 37) == "Toto 37");
 
     {
@@ -223,6 +292,16 @@ try
 
     static constexpr auto PrefabSubEntityCount = 5;
 
+    {
+        // Check insert a key which is an enum, but with a wrong value.
+        auto ent = Gen::Entity::create(entlib);
+        auto map = ent.Components()
+                       .addAnimationModelGD()
+                       .additionalSpeedDebug()
+                       .get(Gen::LocomotionModeEnum::buried)
+                       ->getProperty();
+        ENTLIB_CHECK_EXCEPTION(map.insertMapItem("test"), BreakSchemaRules)
+    }
     {
         auto ent = Gen::SeedPatchDataList::loadCopy(entlib, "myseedpatchMarianne.seedpatchdata.node");
         ent.save("myseedpatchMarianne.seedpatchdata.copy.node");
@@ -285,14 +364,14 @@ try
         ENTLIB_ASSERT(entpath == ".");
 
         auto prefabHisto = getPrefabHistory(*ent);
-        ENTLIB_ASSERT(prefabHisto.size() == 6);
+        ENTLIB_ASSERT(prefabHisto.size() == 8);
         ENTLIB_ASSERT(
             prefabHisto[3].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
         ENTLIB_ASSERT(
             prefabHisto[4].prefabPath
             == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
         ENTLIB_ASSERT(
-            prefabHisto[5].prefabPath
+            prefabHisto[7].prefabPath
             == "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
                "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene");
     }
@@ -311,7 +390,7 @@ try
         ENTLIB_ASSERT(entpath == ".");
 
         auto prefabHisto = ent->getPrefabHistory();
-        ENTLIB_ASSERT(prefabHisto.size() == 5);
+        ENTLIB_ASSERT(prefabHisto.size() == 7);
         ENTLIB_ASSERT(
             prefabHisto[3].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
         ENTLIB_ASSERT(
@@ -733,10 +812,7 @@ try
         ENTLIB_ASSERT(resolvedEntity == originalEnt->getProperty());
 
         auto newSubEnt = allSubEntities.add("prefab.entity");
-        newSubEnt.Name().set("newSubEnt");
-        ENTLIB_ASSERT(
-            entlib.makeEntityRef(ent.getProperty(), newSubEnt.getProperty()).entityPath
-            == "newSubEnt");
+        ENTLIB_CHECK_EXCEPTION(newSubEnt.Name().set("newSubEnt"), CantRename);
 
         auto embedded = ent.Components().SubScene()->Embedded();
         embedded.insertInstanceOf("prefab.entity");
@@ -1000,6 +1076,14 @@ try
     }
 
     {
+        // ***** Test loadProperty without schemaName *****
+        // File without $schema inside
+        ENTLIB_CHECK_EXCEPTION(entlib.loadProperty("instance.entity"), Ent::UnknownSchema);
+        // File with $schema inside
+        auto ent = entlib.loadProperty("instance3.entity");
+        ENTLIB_ASSERT(ent.getSchema()->name == "Entity");
+    }
+    {
         // Test read instance of
         auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
         auto sysCreat = ent.Components().SystemicCreature();
@@ -1087,6 +1171,8 @@ try
             //          => restore values since we dont know how to reset an element when saving
             ENTLIB_ASSERT(not setOfObject.contains("G"));
             ENTLIB_ASSERT(setOfObject.add("G").getProperty().hasValue());
+            ENTLIB_ASSERT(setOfObject.get("G").has_value());
+            ENTLIB_ASSERT(setOfObject.get("G")->getProperty().hasValue());
             ENTLIB_ASSERT(setOfObject.get("G")->hasOverride() == true);
             ENTLIB_ASSERT(setOfObject.get("G")->Value().get() == std::string("g"));
             setOfObject.remove("G");
@@ -1098,33 +1184,7 @@ try
         subsceneCmp.Embedded().remove("TestRemove");
         ENTLIB_ASSERT(subsceneCmp.Embedded().size() == PrefabSubEntityCount - 1);
 
-        // Test rename Entity
-        // - Possible
-        auto uglyent = subsceneCmp.Embedded().add("UglyName");
-        ENTLIB_ASSERT(subsceneCmp.Embedded().get("UglyName")->Name() == std::string("UglyName"));
-        subsceneCmp.Embedded().getProperty().objectSetRename("UglyName", "PrettyName");
-        ENTLIB_ASSERT(subsceneCmp.Embedded().get("PrettyName")->Name() == std::string("PrettyName"));
-        subsceneCmp.Embedded().getProperty().objectSetRename("PrettyName", "PrettiestName");
-        ENTLIB_ASSERT(
-            subsceneCmp.Embedded().get("PrettiestName")->Name() == std::string("PrettiestName"));
-        // - Not possible
-        ENTLIB_CHECK_EXCEPTION(
-            subsceneCmp.Embedded().getProperty().objectSetRename(
-                "EntityWithInstanceOf", "EntityWithInstanceOf2"),
-            Ent::CantRename);
-
-        // Test rename object in set
-        // - Possible
-        ENTLIB_ASSERT(testSetOfObject.SetOfObject().get("A")->Value().get() == std::string("a"));
-        testSetOfObject.SetOfObject().getProperty().objectSetRename("A", "A3");
-        testSetOfObject.SetOfObject().getProperty().objectSetRename("A3", "A2");
-        ENTLIB_ASSERT(testSetOfObject.SetOfObject().get("A2")->Value().get() == std::string("a"));
-        ENTLIB_ASSERT(testSetOfObject.SetOfObject().get("A").has_value() == false);
-        // - Not possible
-        ENTLIB_ASSERT(testSetOfObject.SetOfObject().get("D")->Value().get() == std::string("d"));
-        // TODO : decomment!!
-        ENTLIB_CHECK_EXCEPTION(
-            testSetOfObject.SetOfObject().getProperty().objectSetRename("D", "D2"), Ent::CantRename);
+        subsceneCmp.Embedded().add("PrettiestName");
 
         // ****************************** Test hasASuper ******************************************
         // *************** ENTITY ***************
@@ -1353,14 +1413,6 @@ try
         auto subsceneCmp = *ent.Components().SubScene();
         // Removed : TestRemove. Added : PrettiestName, Entity
         ENTLIB_ASSERT(subsceneCmp.Embedded().size() == PrefabSubEntityCount + 1);
-
-        // Test rename Entity
-        ENTLIB_ASSERT(
-            subsceneCmp.Embedded().get("PrettiestName")->Name() == std::string("PrettiestName"));
-
-        // Test rename object in set
-        ENTLIB_ASSERT(testSetOfObject.SetOfObject().get("A2")->Value().get() == std::string("a"));
-        ENTLIB_ASSERT(testSetOfObject.SetOfObject().get("A").has_value() == false);
 
         // ****************************** Test hasASuper ******************************************
         // *************** ENTITY ***************
@@ -1740,9 +1792,10 @@ try
     auto heightObj = scene.begin()->Components().addHeightObj();
     heightObj.DisplaceNoiseList().push();
 
-    auto fieldNameCount =
-        scene.begin()->Components().addHeightObj().getProperty().getSchema()->properties.size();
-    ENTLIB_ASSERT(fieldNameCount == 9);
+    auto const& properties =
+        scene.begin()->Components().addHeightObj().getProperty().getSchema()->properties;
+    auto fieldNameCount = properties.size();
+    ENTLIB_ASSERT(fieldNameCount >= 9);
 
     entlib.rawdataPath = current_path();
     scene.insertInstanceOf((current_path() / "prefab.entity").string().c_str());

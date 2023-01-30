@@ -989,15 +989,11 @@ namespace Ent
             }
             static {{schema.type_name}} loadCopy(Ent::EntityLib& _entlib, std::filesystem::path const& _sourceFile)
             {
-                auto& storage = _entlib.createTempJsonFile();
-                storage = _entlib.readJsonFile(_sourceFile.string().c_str());
-                return {{schema.type_name}}(Ent::Property(
-                    &_entlib, _entlib.getSchema(schemaName), _sourceFile.string().c_str(), &storage));
+                return {{schema.type_name}}(_entlib.loadPropertyCopy(schemaName, _sourceFile.string().c_str()));
             }
             static {{schema.type_name}} create(Ent::EntityLib& _entlib)
             {
-                auto& storage = _entlib.createTempJsonFile();
-                return {{schema.type_name}}(Ent::Property(&_entlib, _entlib.getSchema(schemaName), "", &storage));
+                return {{schema.type_name}}(_entlib.newProperty(_entlib.getSchema(schemaName)));
             }
             {{schema.type_name}} makeInstanceOf()
             {
@@ -1047,9 +1043,9 @@ namespace Ent
             }
             {{#schema.schema_name}}static constexpr char schemaName[] = "{{{.}}}";{{/schema.schema_name}}
             char const* getType() const;{{#types}}
-            std::optional<{{#type}}{{>display_type}}{{/type}}> {{name}}();
-            {{#type}}{{>display_type}}{{/type}} add{{name}}();
-            void remove{{name}}();
+            std::optional<{{#type}}{{>display_type}}{{/type}}> {{name}}() const;
+            {{#type}}{{>display_type}}{{/type}} add{{name}}() const;
+            void remove{{name}}() const;
         {{/types}}
         };{{/union}}{{/schema.union_set}}
 
@@ -1082,15 +1078,15 @@ namespace Ent
         {
             return getProperty().getUnionType();
         }
-        {{#types}}inline std::optional<{{#type}}{{>display_type}}{{/type}}> {{schema.type_name}}::{{name}}()
+        {{#types}}inline std::optional<{{#type}}{{>display_type}}{{/type}}> {{schema.type_name}}::{{name}}() const
         {
             return std::optional<{{#type}}{{>display_type}}{{/type}}>(getSubNode("{{name}}"));
         }
-        inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::add{{name}}()
+        inline {{#type}}{{>display_type}}{{/type}} {{schema.type_name}}::add{{name}}() const
         {
             return {{#type}}{{>display_type}}{{/type}}(addSubNode("{{name}}"));
         }
-        inline void {{schema.type_name}}::remove{{name}}()
+        inline void {{schema.type_name}}::remove{{name}}() const
         {
             getProperty().eraseUnionSetItem("{{name}}");
         }

@@ -6,12 +6,8 @@
             "className": "ActorStateDead"
         },
         {
-            "classData": null,
-            "className": "EntityStatePlayer"
-        },
-        {
             "classData": {},
-            "className": "ActorStateAlive"
+            "className": "EntityStatePlayer"
         }
     ],
     "Color": [
@@ -50,15 +46,14 @@
                         ],
                         [
                             "c",
-                            null
+                            [
+                                "1",
+                                "3"
+                            ]
                         ],
                         [
                             "d",
                             null
-                        ],
-                        [
-                            "A",
-                            []
                         ]
                     ]
                 }
@@ -80,11 +75,47 @@
             "Type": "SeedPatch"
         },
         {
-            "Data": null,
+            "Data": {
+                "Embedded": [
+                    {
+                        "Color": [
+                            255,
+                            120,
+                            220,
+                            255
+                        ],
+                        "Components": [
+                            {
+                                "Data": {
+                                    "Source": "instance"
+                                },
+                                "Type": "NetworkLink"
+                            }
+                        ],
+                        "InstanceOf": "subentity2.entity",
+                        "Name": "EntityWithInstanceOf"
+                    },
+                    {
+                        "InstanceOf": "subentity2.entity",
+                        "Name": "EntityWithInstanceOfButNoOverride"
+                    }
+                ]
+            },
             "Type": "SubScene"
         },
         {
             "Data": {
+                "MapOfObject": [],
+                "MapOfPrimitive": [
+                    [
+                        "speed2",
+                        2
+                    ],
+                    [
+                        "speed3",
+                        3
+                    ]
+                ],
                 "SetOfObject": [
                     {
                         "Name": "A",
@@ -109,10 +140,6 @@
                 ]
             },
             "Type": "TestSetOfObject"
-        },
-        {
-            "Data": null,
-            "Type": "TransformGD"
         }
     ],
     "InstanceOf": "prefab.entity",

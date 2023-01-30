@@ -5,7 +5,7 @@ namespace Ent
     RecursiveVisitor::RecursiveVisitor() = default;
     RecursiveVisitor ::~RecursiveVisitor() = default;
 
-    void visitRecursive(Property& _expl, RecursiveVisitor& _visitor)
+    void visitRecursive(Property const& _expl, RecursiveVisitor& _visitor)
     {
         switch (_expl.getDataType())
         {
@@ -45,10 +45,11 @@ namespace Ent
                 case DataType::string:
                     for (char const* key : _expl.getMapKeysString())
                     {
-                        auto value = *_expl.getMapItem(key);
-                        _visitor.inMapElement(value, key);
-                        visitRecursive(value, _visitor);
-                        _visitor.outMapElement(value);
+                        auto value = _expl.getMapItem(key);
+                        ENTLIB_ASSERT(value.has_value());
+                        _visitor.inMapElement(*value, key);
+                        visitRecursive(*value, _visitor);
+                        _visitor.outMapElement(*value);
                     }
                     break;
                 case DataType::integer:
@@ -156,7 +157,7 @@ namespace Ent
     Visitor::Visitor() = default;
     Visitor::~Visitor() = default;
 
-    void visit(Property& _expl, Visitor& _visitor)
+    void visit(Property const& _expl, Visitor& _visitor)
     {
         switch (_expl.getDataType())
         {

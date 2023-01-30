@@ -66,7 +66,9 @@ namespace Ent
             [](auto&& typedvalue)
             {
                 using Type = std::remove_const_t<std::remove_reference_t<decltype(typedvalue)>>;
-                if constexpr (std::is_same_v<Type, ArrayPtr> or std::is_same_v<Type, UnionPtr> or std::is_same_v<Type, ObjectPtr>)
+                if constexpr (
+                    std::is_same_v<Type, ArrayPtr> or std::is_same_v<Type, UnionPtr>
+                    or std::is_same_v<Type, ObjectPtr>)
                 {
                     using EltType = typename Type::element_type;
                     return Node::Value(std::make_unique<EltType>(*typedvalue));
@@ -96,9 +98,8 @@ namespace Ent
             {
                 using NodeType = std::remove_const_t<std::remove_reference_t<decltype(_node)>>;
                 if constexpr (
-                    std::is_same_v<
-                        NodeType,
-                        ObjectPtr> or std::is_same_v<NodeType, UnionPtr> or std::is_same_v<NodeType, ArrayPtr>)
+                    std::is_same_v<NodeType, ObjectPtr> or std::is_same_v<NodeType, UnionPtr>
+                    or std::is_same_v<NodeType, ArrayPtr>)
                 {
                     // Call computeNodeRefToChild on any container type
                     return _node->computeNodeRefToChild(_child);
@@ -888,7 +889,6 @@ namespace Ent
         }
         return nullptr;
     }
-
 
     std::vector<Node const*> Node::getItems() const
     {

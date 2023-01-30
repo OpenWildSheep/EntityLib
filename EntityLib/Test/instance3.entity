@@ -3,6 +3,7 @@
     "Components": [
         {
             "Data": {
+                "MapOfObject": [],
                 "SetOfObject": [
                     {
                         "Name": "G"
@@ -12,5 +13,5 @@
             "Type": "TestSetOfObject"
         }
     ],
-    "Name": "PlayerSpawner_"
+    "InstanceOf": "instance.entity"
 }

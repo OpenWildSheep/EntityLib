@@ -20,6 +20,5 @@
             "Type": "SubScene"
         }
     ],
-    "InstanceOf": "entity-subscene.entity",
-    "Name": "entity-subscene"
+    "InstanceOf": "entity-subscene.entity"
 }

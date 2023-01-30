@@ -33,7 +33,10 @@ namespace Ent
             EntityLib* _entityLib,
             Subschema const* _schema,
             char const* _filename,
-            nlohmann::json* _doc);
+            nlohmann::json* _doc,
+            JsonMetaData* _metaData);
+        Property(
+            EntityLib* _entityLib, Subschema const* _schema, char const* _filename, VersionedJson& _doc);
 
         /// Save to _filename or to the source file
         void save(char const* _filename = nullptr) const
@@ -139,18 +142,25 @@ namespace Ent
         {
             return Property{getPimpl().getArrayItem(_index)};
         }
-        /// @brief Get the "InstanceOf" field (path to prefab)
-        /// @remark Return an empty string if set to empty, or nullptr if unset.
+        /// @return The "InstanceOf" field, an empty string if set to empty, or nullptr if unset.
         /// @pre It is an Object
+        /// @remake only look in the instance
         [[nodiscard]] char const* getInstanceOf() const
         {
             return getPimpl().getInstanceOf();
+        }
+        /// @return The first "InstanceOf" field, following prefabs, an empty string if set to empty, or nullptr if no prefab.
+        /// @pre It is an Object
+        /// @remark Will follow the prefab chain until a InstanceOf is found
+        [[nodiscard]] char const* getFirstInstanceOf() const
+        {
+            return getPimpl().getFirstInstanceOf();
         }
 
         /// @brief Set the prefab (and reset all overriden values)
         /// @pre It is an Object
         /// @pre _instanceOf != nullptr
-        /// @remark setInstanceOf("") mean explicitly set
+        /// @remark resetInstanceOf("") mean explicitly set to InstanceOf : ""
         void resetInstanceOf(char const* _instanceOf) const
         {
             return getPimpl().resetInstanceOf(_instanceOf);
@@ -159,7 +169,7 @@ namespace Ent
         /// @brief Set the prefab (and keep overriden values)
         /// @pre It is an Object
         /// @pre _instanceOf != nullptr
-        /// @remark setInstanceOf("") mean explicitly set
+        /// @remark changeInstanceOf("") mean explicitly set to InstanceOf : ""
         void changeInstanceOf(char const* _instanceOf) const
         {
             return getPimpl().changeInstanceOf(_instanceOf);
@@ -279,10 +289,10 @@ namespace Ent
 
         /// TODO : PropImpl should implement getMapStringItems, and return a view, for efficiency
         ///                   https://wildsheepstudio.atlassian.net/browse/WLD-8887
-        [[nodiscard]] std::map<char const*, Property> getMapStringItems() const;
+        [[nodiscard]] std::map<char const*, Property, CmpStr> getMapStringItems() const;
         [[nodiscard]] std::map<int64_t, Property> getMapIntItems() const;
         [[nodiscard]] std::vector<Property> getObjectSetItems() const;
-        [[nodiscard]] std::map<char const*, Property> getUnionSetItems() const;
+        [[nodiscard]] std::map<char const*, Property, CmpStr> getUnionSetItems() const;
 
         /// @brief Ket keys removed in the instance
         /// @pre Is a Map with string keys
@@ -318,8 +328,6 @@ namespace Ent
         Property mapRename(char const* _current, char const* _new);
         [[nodiscard]] Property mapRename(int64_t _current, int64_t _new) const;
         Property unionSetRename(char const* _current, char const* _new) const;
-        Property objectSetRename(char const* _current, char const* _new) const;
-        [[nodiscard]] Property objectSetRename(int64_t _current, int64_t _new) const;
 
         [[nodiscard]] bool mapContains(char const* _key) const ///< Check if the map contains this _key
         {
@@ -738,9 +746,15 @@ namespace Ent
                    || kind == DataKind::unionSet || kind == DataKind::primitiveSet;
         }
 
-        void copyInto(Property& _dest, CopyMode _copyMode);
+        void copyInto(
+            Property const& _dest,
+            CopyMode _copyMode,
+            OverrideValueSource _overrideValueSource = OverrideValueSource::OverrideOrPrefab) const;
 
         [[nodiscard]] Property detach();
+
+        // Create a copy of this Property, but with no parent
+        [[nodiscard]] Property clone();
 
         void applyToPrefab();
 

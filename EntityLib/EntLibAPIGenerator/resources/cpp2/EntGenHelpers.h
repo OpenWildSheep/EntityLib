@@ -89,6 +89,21 @@ namespace Ent
             {
                 return getProperty().getRawJson();
             }
+
+            [[nodiscard]] EntityLib* getEntityLib() const
+            {
+                return getProperty().getEntityLib();
+            }
+
+            [[nodiscard]] Property getRootNode() const
+            {
+                return getProperty().getRootNode();
+            }
+
+            [[nodiscard]] std::optional<Property> getPrefab() const
+            {
+                return getProperty().getPrefab();
+            }
         };
 
         template <typename T>
@@ -295,23 +310,16 @@ namespace Ent
                 else
                     return name.data() + colon + 1;
             }
-            [[nodiscard]] bool count(char const* str)
+            [[nodiscard]] bool count(char const* str) const
             {
                 return getProperty().unionSetContains(str);
             }
-            [[nodiscard]] std::optional<Property> getSubNode(char const* _typeName)
+            [[nodiscard]] std::optional<Property> getSubNode(char const* _typeName) const
             {
-                if (count(_typeName))
-                {
-                    return getProperty().getUnionSetItem(_typeName);
-                }
-                else
-                {
-                    return std::nullopt;
-                }
+                return getProperty().getUnionSetItem(_typeName);
             }
             template <typename T>
-            [[nodiscard]] std::optional<T> get()
+            [[nodiscard]] std::optional<T> get() const
             {
                 if (auto optProp = getSubNode(getTypeName<T>()))
                 {
@@ -322,23 +330,16 @@ namespace Ent
                     return std::nullopt;
                 }
             }
-            [[nodiscard]] std::optional<Property> get(char const* _typeName)
+            [[nodiscard]] std::optional<Property> get(char const* _typeName) const
             {
-                if (count(_typeName))
-                {
-                    return getProperty().getUnionSetItem(_typeName);
-                }
-                else
-                {
-                    return std::nullopt;
-                }
+                return getProperty().getUnionSetItem(_typeName);
             }
-            Property addSubNode(char const* str)
+            Property addSubNode(char const* str) const
             {
                 return getProperty().insertUnionSetItem(str);
             }
             template <typename T>
-            T add()
+            T add() const
             {
                 return T(addSubNode(getTypeName<T>()));
             }
@@ -347,7 +348,7 @@ namespace Ent
                 return getProperty().eraseUnionSetItem(str);
             }
             template <typename T>
-            bool remove()
+            bool remove() const
             {
                 return remove(getTypeName<T>());
             }
@@ -355,7 +356,7 @@ namespace Ent
             {
                 return get(str.c_str());
             }
-            [[nodiscard]] size_t size()
+            [[nodiscard]] size_t size() const
             {
                 return getProperty().size();
             }
@@ -364,12 +365,12 @@ namespace Ent
             {
                 return getProperty().empty();
             }
-            void clear()
+            void clear() const
             {
                 getProperty().clear();
             }
 
-            [[nodiscard]] std::set<char const*> getKeys()
+            [[nodiscard]] std::set<char const*> getKeys() const
             {
                 std::set<char const*> keys;
                 for (auto [key, schema] : getProperty().getUnionSetKeysString())
@@ -982,10 +983,11 @@ namespace Ent
                 getProperty().save(_destFile);
             }
 
-            O copyInto(O& _dest, CopyMode _copyMode)
+            void copyInto(O _dest, CopyMode _copyMode)
             {
-                return O(getProperty().copyInto(_dest, _copyMode));
+                getProperty().copyInto(_dest.getProperty(), _copyMode);
             }
+
             [[nodiscard]] O detach()
             {
                 return O(getProperty().detach());

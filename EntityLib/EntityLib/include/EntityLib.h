@@ -40,6 +40,21 @@ namespace Ent
         /// @endcond
     };
 
+    struct JsonMetaData
+    {
+        JsonMetaData() = default;
+        JsonMetaData(JsonMetaData const&) = delete;
+        JsonMetaData& operator=(JsonMetaData const&) = delete;
+
+        size_t version = 0;
+    };
+
+    struct VersionedJson
+    {
+        JsonMetaData metadata;
+        nlohmann::json document = nlohmann::json::object();
+    };
+
     /// Entry point of the EntityLib. Used to load/save Scene/Entity and to parse the Schema
     class ENTLIB_DLLEXPORT EntityLib
     {
@@ -69,7 +84,8 @@ namespace Ent
             PropImplPtr _parent,
             Subschema const* _schema,
             char const* _filename,
-            nlohmann::json* _doc = nullptr);
+            nlohmann::json* _doc,
+            JsonMetaData* _metadata);
         /// @endcond
 
         /// Load the Node at path _nodeSchema then return a pointer to the cached data
@@ -137,7 +153,8 @@ namespace Ent
         {
             auto operator()(std::filesystem::path const& p) const;
         };
-        std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> const& getJsonDatabase() const;
+        std::unordered_map<std::filesystem::path, std::unique_ptr<VersionedJson>, HashPath> const&
+        getJsonDatabase() const;
 
         void clearCache() const;
 
@@ -184,6 +201,12 @@ namespace Ent
         /// The Property and its prefabs will share json data with other loaded Property
         Property loadProperty(char const* _schemaName, char const* _filepath);
 
+        /// Load a file into a Property
+        ///
+        /// The Property and its prefabs will share json data with other loaded Property
+        /// @remark The Schema is auto-detected
+        Property loadProperty(char const* _filepath);
+
         /// Load and copy file into a Property
         ///
         /// The Property will not share its json data with other loaded Properties.
@@ -191,8 +214,18 @@ namespace Ent
         /// However, the prefabs are not copied and still share their data with other Properties.
         Property loadPropertyCopy(char const* _schemaName, char const* _filepath);
 
-        nlohmann::json& readJsonFile(char const* _filepath) const;
-        nlohmann::json& createTempJsonFile() const;
+        /// Load and copy file into a Property
+        ///
+        /// The Property will not share its json data with other loaded Properties.
+        /// It is considered as a new file.
+        /// However, the prefabs are not copied and still share their data with other Properties.
+        Property loadPropertyCopy(char const* _filepath);
+
+        /// Create a new empty document with the given Schema
+        Property newProperty(Subschema const* _schema);
+
+        VersionedJson& readJsonFile(char const* _filepath) const;
+        VersionedJson& createTempJsonFile() const;
         void saveJsonFile(nlohmann::json const* doc, char const* _filepath, char const* _schema) const;
 
         void setFallBackEntityPath(char const* _filepath);
@@ -202,6 +235,12 @@ namespace Ent
 
         /// Set a callback to be informed when EntityLin load a file. Useful to list dependencies.
         void setNewDepFileCallBack(NewDepFileCallback _callback);
+
+        /// It is incremented each time a document is changed. 
+        /// So it is the version of the "document database".
+        size_t getGlobalDocumentsVersion() const;
+
+        void incrementGlobalDocumentsVersion();
 
     private:
         /// Load an Entity or a Scene, using the given cache
@@ -239,10 +278,13 @@ namespace Ent
             nlohmann::json const* _default = nullptr) const;
 
         mutable std::map<std::filesystem::path, NodeFile> m_nodeCache;
-        mutable std::unordered_map<std::filesystem::path, nlohmann::json, HashPath> m_jsonDatabase;
-        mutable std::vector<std::unique_ptr<nlohmann::json>> m_tempJsonFiles;
+
+        mutable std::unordered_map<std::filesystem::path, std::unique_ptr<VersionedJson>, HashPath>
+            m_jsonDatabase;
+        mutable std::vector<std::unique_ptr<VersionedJson>> m_tempJsonFiles;
         String m_fallbackEntity;
         NewDepFileCallback m_newDepFileCallback;
+        size_t m_globalDocumentsVersion = 0;
     };
 
 } // namespace Ent

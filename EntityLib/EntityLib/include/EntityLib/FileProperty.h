@@ -12,6 +12,8 @@
 
 namespace Ent
 {
+    struct VersionedJson;
+    struct JsonMetaData;
 
     struct CmpStr
     {
@@ -44,23 +46,32 @@ namespace Ent
             Remove
         };
 
-        FileProperty();
+        explicit FileProperty(EntityLib& _entitylib, JsonMetaData* _docMetaData = nullptr);
 
-        FileProperty(Subschema const* _schema, char const* _filePath);
+        FileProperty(
+            EntityLib& _entitylib,
+            Subschema const* _schema,
+            char const* _filePath,
+            VersionedJson& _document);
 
-        FileProperty(Subschema const* _schema, char const* m_filePath, nlohmann::json* _document);
+        FileProperty(EntityLib& _entitylib, Subschema const* _schema, char const* _filePath);
 
-        void pushBack(char const* _key) const; ///< @pre json is an array. @brief Push back _key in json
+        FileProperty(
+            EntityLib& _entitylib,
+            Subschema const* _schema,
+            char const* m_filePath,
+            nlohmann::json* _document,
+            JsonMetaData* _docMetaData);
 
-        void pushBack(int64_t _key) const; ///< @pre json is an array. @brief Push back _key in json
+        void pushBack(char const* _key); ///< @pre json is an array. @brief Push back _key in json
+
+        void pushBack(int64_t _key); ///< @pre json is an array. @brief Push back _key in json
 
         /// Save to _filename or to the source file
         void save(char const* _filename = nullptr) const;
 
-        /// Get the const pointer json node
-        [[nodiscard]] nlohmann::json const* getRawJson() const;
-
-        void setRawJson(nlohmann::json* _jsonNode);
+        /// Get the const pointer json node if it point to value data (not null)
+        [[nodiscard]] nlohmann::json const* getJson() const;
 
         /// Check if this Node exist
         [[nodiscard]] bool hasJsonPointer() const;
@@ -128,7 +139,7 @@ namespace Ent
         void createChildNode(FileProperty& _parent);
 
         [[nodiscard]] size_t size() const; ///< @pre type==array. @brief Get the size of the array.
-        void setSize(size_t _size) const; ///< @pre type==array. @brief Set the size of the array.
+        void setSize(size_t _size); ///< @pre type==array. @brief Set the size of the array.
         template <typename T>
         void set(T&& _value); ///< @pre node os a primitive of type T. Set _value into the instance
         void setFloat(double _value); ///< @pre type==number. @brief Set _value in the instance
@@ -136,7 +147,7 @@ namespace Ent
         void setString(char const* _value); ///< @pre type==string. @brief Set _value in the instance
         void setBool(bool _value); ///< @pre type==bool. @brief Set _value in the instance
         void setEntityRef(EntityRef const& _value); ///< @pre type==entityref. @brief Set _value in the instance
-        void setUnionType(char const* _type) const; ///< @pre type==union. @brief Set inner type of the union
+        void setUnionType(char const* _type); ///< @pre type==union. @brief Set inner type of the union
         template <typename T>
         [[nodiscard]] T get() const; ///< @pre Node is of type V. @brief Get the value in the given V type
         [[nodiscard]] double getFloat() const; ///< @pre type==number. @brief Get the value as double
@@ -177,15 +188,28 @@ namespace Ent
         [[nodiscard]] bool eraseMapItem(char const* _key, bool _isInPrefab);
         [[nodiscard]] bool eraseMapItem(int64_t _key, bool _isInPrefab);
 
-        void unsetObjectField(FileProperty& _field) const;
-        void unsetUnionData() const;
-        void setToDefault(Subschema const* _parentSchema) const;
-        void setToNull() const;
+        /// Remove the json node _field of the object this
+        void unsetObjectField(FileProperty& _field);
+        /// Remove the data json node the union this
+        void unsetUnionData();
+        /// Remove the json node _data of the map this
+        void unsetMapItem(FileProperty& _data);
+        /// Remove the json node _object of the ObjectSet this
+        void unsetObjectSetItem(FileProperty& _object);
+        /// Remove the json node _data of the UnionSet this
+        void unsetUnionSetItem(FileProperty& _data);
+        void setToDefault(Subschema const* _parentSchema);
+        void setToNull();
 
         [[nodiscard]] bool isRemovedObject() const;
-        void unRemoveObject() const;
+        void unRemoveObject();
 
         [[nodiscard]] char const* getFilePath() const;
+        [[nodiscard]] bool needRebuild() const;
+        /// Return true if any document has changed since the last access
+        [[nodiscard]] bool needRebuildGlobal() const;
+
+        void updateToResolved(); // Inform that m_lastAccessVersion is actually up to date
 
     private:
         [[nodiscard]] nlohmann::json::iterator
@@ -246,14 +270,22 @@ namespace Ent
         /// @pre It is an Map
         template <typename K>
         [[nodiscard]] std::pair<FileProperty, MapItemAction> _enterMapItemImpl(K _key) const;
-        /// Get the mutable json node of the instance (or nullptr)
-        [[nodiscard]] nlohmann::json* _getRawJson() const;
+        /// Get the mutable json node of the instance IF it is set (or nullptr)
+        [[nodiscard]] nlohmann::json* _getJson() const;
+        void _increaseVersion();
+        [[nodiscard]] nlohmann::json const* _getRawJson() const;
+        [[nodiscard]] nlohmann::json* _getRawJsonMutable() const;
+        void _setRawJson(nlohmann::json* _jsonNode);
 
+        EntityLib* m_entityLib = nullptr;
         std::string m_filePath; ///< Path of the instance json file
         Schema m_schema{};
         nlohmann::json* m_wrapper{}; ///< Union wrapper if the Data in a UnionSet
         nlohmann::json* m_values{};
         Key m_key;
+        JsonMetaData* m_docMetaData = nullptr;
+        size_t m_lastAccessVersion = 0;
+        size_t m_lastAccessGlobalVersion = 0;
     };
 
     inline DataType FileProperty::getMapKeyType() const

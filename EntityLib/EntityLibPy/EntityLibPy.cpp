@@ -2,6 +2,7 @@
 
 #include <EntityLib.h>
 #include <EntityLib/Property.h>
+#include <EntityLib/SearchProperty.h>
 
 #pragma warning(push, 0)
 #include <pybind11/pybind11.h>
@@ -292,9 +293,17 @@ static py::list propObjSetGetKeys(Property& _prop)
 nlohmann::json dumpProperty(Property _prop, bool _superKeyIsTypeName = false)
 {
     nlohmann::json result;
-    DumpProperty dumper(result, _superKeyIsTypeName);
+    DumpProperty dumper(
+        result, Ent::OverrideValueSource::Any, _superKeyIsTypeName, [](Ent::EntityRef&) {});
     visitRecursive(_prop, dumper);
     return result;
+}
+
+std::vector<Property> searchChild(Property _prop, char const* _pattern)
+{
+    SearchProperty searcher(_pattern);
+    visitRecursive(_prop, searcher);
+    return searcher.getMatchingProperties();
 }
 
 using namespace pybind11::literals;
@@ -331,6 +340,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pySubschemaNumberMeta = py::class_<Subschema::NumberMeta>(ent, "Subschema_NumberMeta");
     auto pySubschemaUnionMeta = py::class_<Subschema::UnionMeta>(ent, "Subschema_UnionMeta");
     auto pySubschemaUnionSubTypeInfo = py::class_<Subschema::UnionSubTypeInfo>(ent, "Subschema_UnionSubTypeInfo");
+    auto pyJsonMetaData = py::class_<JsonMetaData>(ent, "JsonMetaData");
 
     pyLogicErrorPolicy
         .value("Terminate", LogicErrorPolicy::Terminate)
@@ -711,8 +721,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_parent_entity", static_cast<Node*(EntityLib::*)(Node*) const>(&EntityLib::getParentEntity), py::return_value_policy::reference_internal)
         .def("get_parent_entity", static_cast<std::optional<Property>(EntityLib::*)(Property const&) const>(&EntityLib::getParentEntity), py::return_value_policy::reference_internal)
         .def("get_schema", &EntityLib::getSchema, py::return_value_policy::reference_internal)
-        .def("load_property", &EntityLib::loadProperty)
-        .def("load_property_copy", &EntityLib::loadPropertyCopy)
+        .def("load_property", (Property (EntityLib::*)(char const*, char const*))&EntityLib::loadProperty, "schema_name"_a, "file_path"_a)
+        .def("load_property", (Property (EntityLib::*)(char const*))&EntityLib::loadProperty, "file_path"_a)
+        .def("load_property_copy", (Property (EntityLib::*)(char const*, char const*))&EntityLib::loadPropertyCopy, "schema_name"_a, "file_path"_a)
+        .def("load_property_copy", (Property (EntityLib::*)(char const*))&EntityLib::loadPropertyCopy, "file_path"_a)
         .def("set_dep_file_callback", &EntityLib::setNewDepFileCallBack)
     ;
 
@@ -734,10 +746,11 @@ PYBIND11_MODULE(EntityLibPy, ent)
 
     pyProperty
         .def(py::init<EntityLib*, Subschema const*, char const*>(), py::keep_alive<1, 2>())
-        .def(py::init<EntityLib*, Subschema const*, char const*, nlohmann::json*>(), py::keep_alive<1, 2>())
+        .def(py::init<EntityLib*, Subschema const*, char const*, nlohmann::json*, JsonMetaData*>(), py::keep_alive<1, 2>())
         .def_static("create", [](EntityLib* _lib, Subschema const* _schema, char const* _path)
         {
-            return Property(_lib, _schema, _path, &_lib->createTempJsonFile());
+            auto& newFile = _lib->createTempJsonFile();
+            return Property(_lib, _schema, _path, newFile);
         }, py::arg("entlib"), py::arg("schema"), py::arg("path") = "", py::keep_alive<1, 2>())
         .def("save", &Property::save)
         .def_property_readonly("is_default", &Property::isDefault)
@@ -752,6 +765,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_array_item", &Property::getArrayItem, py::keep_alive<0, 1>())
         .def("get_instance_of", &Property::getInstanceOf)
         .def_property("instance_of", &Property::getInstanceOf, &Property::changeInstanceOf)
+        .def_property_readonly("first_instance_of", &Property::getFirstInstanceOf)
         .def_property_readonly("union_type", &Property::getUnionType) // or read/write ?
         .def_property_readonly("data_type", &Property::getDataType)
         .def_property_readonly("schema", &Property::getSchema, py::return_value_policy::reference_internal)
@@ -822,11 +836,13 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("erase_map_item", [](Property& _self, char const* _key){return _self.eraseMapItem(_key);})
         .def("erase_map_item", [](Property& _self, int64_t _key){return _self.eraseMapItem(_key);})
         .def("erase_unionset_item", &Property::eraseUnionSetItem)
-        .def("copy_into", &Property::copyInto)
+        .def("copy_into", &Property::copyInto, py::arg("dest"), py::arg("copy_mode"), py::arg("override_value_source") = OverrideValueSource::OverrideOrPrefab)
         .def("unset", [](Property& _self) { return _self.unset(); })
         .def("push_back", &Property::pushBack)
         .def("pop_back", &Property::popBack)
         .def("apply_to_prefab", &Property::applyToPrefab)
+        .def("search_child", &searchChild)
+        .def_static("from_ptr", [](intptr_t _ptr) {return (Property*)_ptr;}, py::return_value_policy::reference_internal)
         ;
 
     py::register_exception<JsonValidation>(ent, "JsonValidation");

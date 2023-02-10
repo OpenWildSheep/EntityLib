@@ -93,7 +93,7 @@ namespace Ent
 
     bool FileProperty::isSet() const
     {
-        return _getRawJson() != nullptr and not _getRawJson()->is_null() and not isRemovedObject();
+        return _getRawJson() != nullptr and not _getRawJson()->is_null() and not isRemovedObject(nullptr);
     }
 
     bool FileProperty::isNull() const
@@ -295,13 +295,13 @@ namespace Ent
         {
             if (auto jsonIter = _findMapItem(_key, true); jsonIter != _getRawJsonMutable()->end())
             {
+                newLayer._setRawJson(&(*jsonIter)[1]); // Take this node even if it is a "null" node
                 if (not mapRemoved(*jsonIter))
-                { // Item found!
-                    newLayer._setRawJson(&(*jsonIter)[1]);
+                {   // Item found
                     itemAction = MapItemAction::Add;
                 }
                 else
-                {
+                {   // Item found but marked as removed
                     itemAction = MapItemAction::Remove;
                 }
             }
@@ -463,9 +463,9 @@ namespace Ent
 
     void FileProperty::createChildNode(FileProperty& _parent)
     {
-        if (isRemovedObject())
+        if (isRemovedObject(_parent.getSchema()))
         {
-            unRemoveObject();
+            unRemoveObject(_parent.getSchema());
             return;
         }
 
@@ -658,18 +658,22 @@ namespace Ent
         case DataKind::COUNT: ENTLIB_LOGIC_ERROR("Unexpected DataType");
         }
         ENTLIB_ASSERT(newLayerJson != nullptr);
-        if (newLayerJson->is_null())
+        _setRawJson(newLayerJson);
+        if (_getRawJson()->is_null())
         {
-            if (getSchema()->type == DataType::array)
+            if (getSchema()->type == DataType::array) // Replace "null" by [] for readability
             {
-                *newLayerJson = json::array();
+                *_getRawJsonMutable() = json::array();
             }
-            else if (getSchema()->type == DataType::object)
+            else if (getSchema()->type == DataType::object) // Replace "null" by [] for readability
             {
-                *newLayerJson = json::object();
+                *_getRawJsonMutable() = json::object();
+            }
+            else if (_parent.getSchema()->getDataKind() == DataKind::map)
+            {   // In map replace "null" by default value because "null" is a reserved value
+                setToDefault(_parent.getSchema(), true);
             }
         }
-        _setRawJson(newLayerJson);
         _increaseVersion();
     }
 
@@ -1302,9 +1306,9 @@ namespace Ent
         _data._setRawJson(nullptr);
     }
 
-    void FileProperty::setToDefault(Subschema const* _parentSchema)
+    void FileProperty::setToDefault(Subschema const* _parentSchema, bool _force)
     {
-        if (not isSet())
+        if (not _force and not isSet())
         {
             return;
         }
@@ -1324,7 +1328,7 @@ namespace Ent
                     break;
                 }
             }
-            _getRawJsonMutable()->clear();
+            *_getRawJsonMutable() = json::object();
             break;
         }
         case DataType::entityRef: *_getRawJsonMutable() = std::string(); break;
@@ -1350,15 +1354,27 @@ namespace Ent
         _increaseVersion();
     }
 
-    bool FileProperty::isRemovedObject() const
+    bool FileProperty::isRemovedObject(Subschema const* _parentSchema) const
     {
+        if (_parentSchema != nullptr  and _parentSchema->getDataKind() == DataKind::map and isNull())
+        {   // Take care of the case of null in a map item (mean marked for remove)
+            return true;
+        }
         return _getRawJson() != nullptr and objectIsRemoved(*_getRawJson());
     }
 
-    void FileProperty::unRemoveObject()
+    void FileProperty::unRemoveObject(Subschema const* _parentSchema)
     {
-        _getRawJsonMutable()->erase("__removed__");
+        if (_parentSchema != nullptr and _parentSchema->getDataKind() == DataKind::map and isNull())
+        {   // Take care of the case of null in a map item (mean marked for remove)
+            setToDefault(_parentSchema, true);
+        }
+        else
+        {
+            _getRawJsonMutable()->erase("__removed__");
+        }
         _increaseVersion();
+        ENTLIB_ASSERT(not isRemovedObject(_parentSchema));
     }
 
     char const* FileProperty::getFilePath() const

@@ -184,6 +184,10 @@ namespace Ent
             {
                 if (auto const member = doc->find("InstanceOf"); member != doc->end())
                 {
+                    if (member->is_null()) // InstanceOf is null, there is no prefab
+                    {
+                        return false;
+                    }
                     if (auto const& prefabPath = member->get_ref<std::string const&>();
                         not prefabPath.empty())
                     {
@@ -211,7 +215,8 @@ namespace Ent
         auto const* subschema = newLayer->getSchema();
         if (not newLayer->_loadInstanceOf())
         {
-            if (not m_instance.isRemovedObject() and m_prefab != nullptr)
+            auto const parent = getParent();
+            if (not m_instance.isRemovedObject(parent? parent->getSchema(): nullptr) and m_prefab != nullptr)
             {
                 newLayer->m_prefab = m_prefab->getObjectField(_field, _fieldRef);
             }
@@ -970,7 +975,9 @@ namespace Ent
         }
         auto needToCreateOrRestoreNode = [](PropImpl* _prop)
         {
-            return not _prop->m_instance.hasJsonPointer() or _prop->m_instance.isRemovedObject();
+            auto const parent = _prop->getParent();
+            return not _prop->m_instance.hasJsonPointer()
+                   or _prop->m_instance.isRemovedObject(parent? parent->getSchema(): nullptr);
         };
         std::reverse(begin(allLayers), end(allLayers));
         auto firstNotSet = std::find_if(begin(allLayers), end(allLayers), needToCreateOrRestoreNode);
@@ -983,7 +990,7 @@ namespace Ent
         for (; firstNotSet != endIter; ++lastSet, ++firstNotSet, ++firstNotSetIdx)
         {
             (*firstNotSet)->m_instance.createChildNode((*lastSet)->m_instance);
-            ENTLIB_ASSERT(not needToCreateOrRestoreNode((*firstNotSet)));
+            ENTLIB_ASSERT(not needToCreateOrRestoreNode(*firstNotSet));
         }
         _checkInvariants();
         _updateParentToResolved();

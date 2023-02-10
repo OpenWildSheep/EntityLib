@@ -132,6 +132,17 @@
         },
         {
             "Data": {
+                "CommonDataMap": [
+                    [
+                        "NbBeams",
+                        {}
+                    ]
+                ]
+            },
+            "Type": "ScriptComponentGD"
+        },
+        {
+            "Data": {
                 "Orientation": [
                     null,
                     null,

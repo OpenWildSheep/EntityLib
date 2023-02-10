@@ -240,6 +240,12 @@
         {
             "Type": "ScriptComponentGD",
             "Data": {
+                "CommonDataMap": [
+                    [
+                        "NbBeams",
+                        {}
+                    ]
+                ],
                 "ScriptsMap": [[
                         "CloudStorm",
                         {

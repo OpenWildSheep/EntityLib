@@ -191,6 +191,19 @@ try
     entlib.validationEnabled = prevValidationEnabled;
 
     {
+        // Check re-insertion of a deleted map item (avoid to create a 2nd json item)
+        auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
+        auto commonDataMap = ent.Components().ScriptComponentGD()->CommonDataMap();
+        ENTLIB_ASSERT(commonDataMap.get("NbBeams").has_value());
+        [[maybe_unused]] auto nbbeams = commonDataMap.get("NbBeams");
+        commonDataMap.remove("NbBeams");
+        ENTLIB_ASSERT(not commonDataMap.get("NbBeams").has_value());
+        auto nbbeams2 = commonDataMap.add("NbBeams");
+        ENTLIB_ASSERT(commonDataMap.get("NbBeams").has_value());
+        nbbeams2.unset(); // Do not remove it since it is present in prefab
+        ENTLIB_ASSERT(commonDataMap.get("NbBeams").has_value());
+    }
+    {
         // Check the visitor, in case of map of primitive
         auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
         auto detached = ent.detach();

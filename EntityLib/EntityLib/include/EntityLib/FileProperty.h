@@ -198,11 +198,14 @@ namespace Ent
         void unsetObjectSetItem(FileProperty& _object);
         /// Remove the json node _data of the UnionSet this
         void unsetUnionSetItem(FileProperty& _data);
-        void setToDefault(Subschema const* _parentSchema);
+        void setToDefault(
+            Subschema const* _parentSchema, ///< Schema of parent property
+            bool _force = false ///< Set to default even if it is not set
+        );
         void setToNull();
 
-        [[nodiscard]] bool isRemovedObject() const;
-        void unRemoveObject();
+        [[nodiscard]] bool isRemovedObject(Subschema const* _parentSchema) const;
+        void unRemoveObject(Subschema const* _parentSchema);
 
         [[nodiscard]] char const* getFilePath() const;
         [[nodiscard]] bool needRebuild() const;

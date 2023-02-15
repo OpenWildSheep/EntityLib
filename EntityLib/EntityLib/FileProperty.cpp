@@ -93,7 +93,8 @@ namespace Ent
 
     bool FileProperty::isSet() const
     {
-        return _getRawJson() != nullptr and not _getRawJson()->is_null() and not isRemovedObject(nullptr);
+        return _getRawJson() != nullptr and not _getRawJson()->is_null()
+               and not isRemovedObject(nullptr);
     }
 
     bool FileProperty::isNull() const
@@ -297,11 +298,11 @@ namespace Ent
             {
                 newLayer._setRawJson(&(*jsonIter)[1]); // Take this node even if it is a "null" node
                 if (not mapRemoved(*jsonIter))
-                {   // Item found
+                { // Item found
                     itemAction = MapItemAction::Add;
                 }
                 else
-                {   // Item found but marked as removed
+                { // Item found but marked as removed
                     itemAction = MapItemAction::Remove;
                 }
             }
@@ -670,11 +671,14 @@ namespace Ent
                 *_getRawJsonMutable() = json::object();
             }
             else if (_parent.getSchema()->getDataKind() == DataKind::map)
-            {   // In map replace "null" by default value because "null" is a reserved value
+            { // In map replace "null" by default value because "null" is a reserved value
                 setToDefault(_parent.getSchema(), true);
             }
         }
         _increaseVersion();
+        // The Parent property is up to date. Avoid to rebuild it.
+        _parent.m_lastAccessVersion = m_lastAccessVersion;
+        _parent.m_lastAccessGlobalVersion = m_lastAccessGlobalVersion;
     }
 
     void FileProperty::setSize(size_t _size)
@@ -1356,8 +1360,8 @@ namespace Ent
 
     bool FileProperty::isRemovedObject(Subschema const* _parentSchema) const
     {
-        if (_parentSchema != nullptr  and _parentSchema->getDataKind() == DataKind::map and isNull())
-        {   // Take care of the case of null in a map item (mean marked for remove)
+        if (_parentSchema != nullptr and _parentSchema->getDataKind() == DataKind::map and isNull())
+        { // Take care of the case of null in a map item (mean marked for remove)
             return true;
         }
         return _getRawJson() != nullptr and objectIsRemoved(*_getRawJson());
@@ -1366,7 +1370,7 @@ namespace Ent
     void FileProperty::unRemoveObject(Subschema const* _parentSchema)
     {
         if (_parentSchema != nullptr and _parentSchema->getDataKind() == DataKind::map and isNull())
-        {   // Take care of the case of null in a map item (mean marked for remove)
+        { // Take care of the case of null in a map item (mean marked for remove)
             setToDefault(_parentSchema, true);
         }
         else

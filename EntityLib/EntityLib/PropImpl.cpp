@@ -2017,6 +2017,10 @@ namespace Ent
 
     bool PropImpl::_reResolveIfNeeded()
     {
+        if (not m_entityLib->getRebuildPropertyEnabled())
+        {
+            return false;
+        }
         if (not m_instance.needRebuildGlobal())
         { // If nothing has changed since last access, no need to check prefabs
             return false;

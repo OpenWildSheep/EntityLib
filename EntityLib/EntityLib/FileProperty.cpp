@@ -861,7 +861,7 @@ namespace Ent
         return _findArrayItem(
             _withRemoved,
             _key,
-            [typeField](json const& _union) { return _union[typeField]; },
+            [typeField](json const& _union) -> json const& { return _union[typeField]; },
             [dataField](json const& _union) { return _union[dataField].is_null(); });
     }
 
@@ -869,7 +869,7 @@ namespace Ent
     json::iterator FileProperty::_findMapItem(K _key, bool _withRemoved) const
     {
         return _findArrayItem(
-            _withRemoved, _key, [](json const& _pair) { return _pair[0]; }, mapRemoved);
+            _withRemoved, _key, [](json const& _pair) -> json const& { return _pair[0]; }, mapRemoved);
     }
 
     template <typename K>
@@ -881,7 +881,7 @@ namespace Ent
         return _findArrayItem(
             _withRemoved,
             _key,
-            [keyFieldName](json const& _object) { return _object[keyFieldName]; },
+            [keyFieldName](json const& _object) -> json const& { return _object[keyFieldName]; },
             objectIsRemoved);
     }
 

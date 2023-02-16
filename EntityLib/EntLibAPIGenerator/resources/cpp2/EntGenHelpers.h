@@ -593,14 +593,7 @@ namespace Ent
             [[nodiscard]] std::optional<O> get(K key)
             {
                 auto internalKey = toInternal(key);
-                if (getProperty().objectSetContains(internalKey))
-                {
-                    return std::optional<O>(getProperty().getObjectSetItem(internalKey));
-                }
-                else
-                {
-                    return std::nullopt;
-                }
+                return std::optional<O>(getProperty().getObjectSetItem(internalKey));
             }
             [[nodiscard]] bool contains(K key) const
             {
@@ -746,14 +739,7 @@ namespace Ent
             [[nodiscard]] std::optional<V> get(K key)
             {
                 auto internKey = toInternal(key);
-                if (getProperty().mapContains(internKey))
-                {
-                    return std::optional<V>(getProperty().getMapItem(internKey));
-                }
-                else
-                {
-                    return std::nullopt;
-                }
+                return std::optional<V>(getProperty().getMapItem(internKey));
             }
             [[nodiscard]] std::optional<V> operator[](K key)
             {

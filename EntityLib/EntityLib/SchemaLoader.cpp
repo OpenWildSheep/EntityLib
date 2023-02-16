@@ -438,6 +438,40 @@ namespace Ent
 #define ENTLIB_DEBUG_PRINTF(message, ...)
 #endif
 
+    DataKind computeDataKind(Subschema const& _subschema)
+    {
+        switch (_subschema.type)
+        {
+        case DataType::string: return DataKind::string;
+        case DataType::number: return DataKind::number;
+        case DataType::integer: return DataKind::integer;
+        case DataType::object: return DataKind::object;
+        case DataType::boolean: return DataKind::boolean;
+        case DataType::entityRef: return DataKind::entityRef;
+        case DataType::oneOf: return DataKind::union_;
+        case DataType::array:
+            switch (hash(std::get<Subschema::ArrayMeta>(_subschema.meta).overridePolicy))
+            {
+            case "map"_hash: return DataKind::map;
+            case "set"_hash:
+                switch (_subschema.singularItems->get().type)
+                {
+                case DataType::integer: [[fallthrough]];
+                case DataType::entityRef: [[fallthrough]];
+                case DataType::string: return DataKind::primitiveSet;
+                case DataType::oneOf: return DataKind::unionSet;
+                case DataType::object: return DataKind::objectSet;
+                default: return DataKind::COUNT;
+                }
+            case ""_hash: return DataKind::array;
+            }
+            ENTLIB_LOGIC_ERROR("Unexpected overridePolicy !");
+        case DataType::COUNT: break;
+        case DataType::null: break;
+        }
+        ENTLIB_LOGIC_ERROR("Unexpected DataType !");
+    }
+
     void SchemaLoader::readSchema(
         Schema* globalSchema, std::string const& _filename, json const& _fileRoot, json const& _data)
     {
@@ -726,6 +760,7 @@ namespace Ent
                 }
                 {
                     auto& lastSchema = stack.back()->get();
+                    lastSchema.setDataKind(computeDataKind(lastSchema));
                     finalizeSubschema(lastSchema);
                 }
                 ENTLIB_DEBUG_PRINTF("%scloseSubschema\n", getTab());

@@ -242,6 +242,10 @@ namespace Ent
 
         void incrementGlobalDocumentsVersion();
 
+        bool getRebuildPropertyEnabled() const;
+
+        void setRebuildPropertyEnabled(bool _rebuildPropertyEnabled);
+
     private:
         /// Load an Entity or a Scene, using the given cache
         template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
@@ -285,6 +289,7 @@ namespace Ent
         String m_fallbackEntity;
         NewDepFileCallback m_newDepFileCallback;
         size_t m_globalDocumentsVersion = 0;
+        bool m_rebuildPropertyEnabled = true;
     };
 
 } // namespace Ent

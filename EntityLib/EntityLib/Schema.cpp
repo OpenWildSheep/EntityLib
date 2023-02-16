@@ -94,41 +94,6 @@ namespace Ent
         return typeSchema->constValue->get_ptr<nlohmann::json::string_t const*>()->c_str();
     }
 
-    DataKind Subschema::getDataKind() const
-    {
-        switch (type)
-        {
-        case DataType::string: return DataKind::string;
-        case DataType::number: return DataKind::number;
-        case DataType::integer: return DataKind::integer;
-        case DataType::object: return DataKind::object;
-        case DataType::boolean: return DataKind::boolean;
-        case DataType::entityRef: return DataKind::entityRef;
-        case DataType::oneOf: return DataKind::union_;
-        case DataType::array:
-            switch (hash(std::get<ArrayMeta>(meta).overridePolicy))
-            {
-            case "map"_hash: return DataKind::map;
-            case "set"_hash:
-                switch (singularItems->get().type)
-                {
-                case DataType::integer: [[fallthrough]];
-                case DataType::entityRef: [[fallthrough]];
-                case DataType::string: return DataKind::primitiveSet;
-                case DataType::oneOf: return DataKind::unionSet;
-                case DataType::object: return DataKind::objectSet;
-                default: break;
-                }
-                ENTLIB_LOGIC_ERROR("Unexpected DataType in singularItems of set !");
-            case ""_hash: return DataKind::array;
-            }
-            ENTLIB_LOGIC_ERROR("Unexpected overridePolicy !");
-        case DataType::COUNT: break;
-        case DataType::null: break;
-        }
-        ENTLIB_LOGIC_ERROR("Unexpected DataType !");
-    }
-
     bool Subschema::isPrimitive() const
     {
         return type == DataType::string or type == DataType::integer or type == DataType::boolean
@@ -145,6 +110,11 @@ namespace Ent
             begin(enumValues),
             end(enumValues),
             [str](std::string const& enumStr) { return enumStr == str; });
+    }
+
+    void Subschema::setDataKind(DataKind _dataKind)
+    {
+        m_kind = _dataKind;
     }
 
 } // namespace Ent

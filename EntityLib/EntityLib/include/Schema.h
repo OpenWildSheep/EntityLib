@@ -76,6 +76,10 @@ namespace Ent
     /// Definition of a json Node
     struct ENTLIB_DLLEXPORT Subschema
     {
+    private:
+        DataKind m_kind = DataKind::COUNT; ///< type of this Subschema. @see Ent::DataKind
+
+    public:
         /// @cond PRIVATE
         Subschema() = default;
         Subschema(Subschema const&) = delete;
@@ -89,6 +93,8 @@ namespace Ent
         /// @throw MissingMetadata if the schema doesn't have a meta className and classData
         /// @throw BadUnionType if \p _subtype is not listed in the oneOf field
         std::pair<Subschema const*, size_t> getUnionTypeWrapper(char const* _subtype) const;
+
+        void setDataKind(DataKind _dataKind);
         /// @endcond
 
         Schema* rootSchema{};
@@ -395,6 +401,11 @@ namespace Ent
     inline Subschema* SubschemaRef::operator->()
     {
         return &get();
+    }
+
+    inline DataKind Subschema::getDataKind() const
+    {
+        return m_kind;
     }
 
     /// @endcond

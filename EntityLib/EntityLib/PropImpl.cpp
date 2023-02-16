@@ -477,6 +477,7 @@ namespace Ent
         // The field InstanceOf is not a field of objects, so we have to fake it.
         Subschema schema;
         schema.type = DataType::string;
+        schema.setDataKind(DataKind::string);
         SubschemaRef ref;
         ref.subSchemaOrRef = std::move(schema);
         auto const field = getObjectField("InstanceOf", &ref);
@@ -519,6 +520,7 @@ namespace Ent
         // The field InstanceOf is not a field of objects, so we have to fake it.
         Subschema schema;
         schema.type = DataType::string;
+        schema.setDataKind(DataKind::string);
         SubschemaRef ref;
         ref.subSchemaOrRef = std::move(schema);
         getObjectField("InstanceOf", &ref)
@@ -2015,6 +2017,10 @@ namespace Ent
 
     bool PropImpl::_reResolveIfNeeded()
     {
+        if (not m_entityLib->getRebuildPropertyEnabled())
+        {
+            return false;
+        }
         if (not m_instance.needRebuildGlobal())
         { // If nothing has changed since last access, no need to check prefabs
             return false;

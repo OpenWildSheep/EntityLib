@@ -216,7 +216,8 @@ namespace Ent
         if (not newLayer->_loadInstanceOf())
         {
             auto const parent = getParent();
-            if (not m_instance.isRemovedObject(parent? parent->getSchema(): nullptr) and m_prefab != nullptr)
+            if (not m_instance.isRemovedObject(parent ? parent->getSchema() : nullptr)
+                and m_prefab != nullptr)
             {
                 newLayer->m_prefab = m_prefab->getObjectField(_field, _fieldRef);
             }
@@ -476,6 +477,7 @@ namespace Ent
         // The field InstanceOf is not a field of objects, so we have to fake it.
         Subschema schema;
         schema.type = DataType::string;
+        schema.setDataKind(DataKind::string);
         SubschemaRef ref;
         ref.subSchemaOrRef = std::move(schema);
         auto const field = getObjectField("InstanceOf", &ref);
@@ -518,6 +520,7 @@ namespace Ent
         // The field InstanceOf is not a field of objects, so we have to fake it.
         Subschema schema;
         schema.type = DataType::string;
+        schema.setDataKind(DataKind::string);
         SubschemaRef ref;
         ref.subSchemaOrRef = std::move(schema);
         getObjectField("InstanceOf", &ref)
@@ -977,7 +980,7 @@ namespace Ent
         {
             auto const parent = _prop->getParent();
             return not _prop->m_instance.hasJsonPointer()
-                   or _prop->m_instance.isRemovedObject(parent? parent->getSchema(): nullptr);
+                   or _prop->m_instance.isRemovedObject(parent ? parent->getSchema() : nullptr);
         };
         std::reverse(begin(allLayers), end(allLayers));
         auto firstNotSet = std::find_if(begin(allLayers), end(allLayers), needToCreateOrRestoreNode);
@@ -1737,7 +1740,7 @@ namespace Ent
                 if (m_parent->getPrefab() != nullptr)
                 {
                     isPresentInPrefab = m_parent->getPrefab()->unionSetContains(
-                            std::get<std::string>(m_instance.getPathToken()).c_str());
+                        std::get<std::string>(m_instance.getPathToken()).c_str());
                 }
                 if (isPresentInPrefab)
                 {
@@ -2014,6 +2017,10 @@ namespace Ent
 
     bool PropImpl::_reResolveIfNeeded()
     {
+        if (not m_entityLib->getRebuildPropertyEnabled())
+        {
+            return false;
+        }
         if (not m_instance.needRebuildGlobal())
         { // If nothing has changed since last access, no need to check prefabs
             return false;

@@ -2110,5 +2110,14 @@ namespace Ent
         ++m_globalDocumentsVersion;
     }
 
+    bool EntityLib::getRebuildPropertyEnabled() const
+    {
+        return m_rebuildPropertyEnabled;
+    }
+
+    void EntityLib::setRebuildPropertyEnabled(bool _rebuildPropertyEnabled)
+    {
+        m_rebuildPropertyEnabled = _rebuildPropertyEnabled;
+    }
     /// \endcond
 } // namespace Ent

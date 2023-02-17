@@ -462,7 +462,7 @@ namespace Ent
         return m_schema.propDefVal;
     }
 
-    void FileProperty::createChildNode(FileProperty& _parent)
+    void FileProperty::createChildNode(FileProperty& _parent, size_t _prefabSize)
     {
         if (isRemovedObject(_parent.getSchema()))
         {
@@ -665,6 +665,10 @@ namespace Ent
             if (getSchema()->type == DataType::array) // Replace "null" by [] for readability
             {
                 *_getRawJsonMutable() = json::array();
+                for (size_t i = 0; i < _prefabSize; ++i)
+                {
+                    _getRawJsonMutable()->emplace_back();
+                }
             }
             else if (getSchema()->type == DataType::object) // Replace "null" by [] for readability
             {

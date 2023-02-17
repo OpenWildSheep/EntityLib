@@ -299,6 +299,17 @@
                 ]
             },
             "Type": "TestSetOfObject"
+        }, {
+            "Data": {
+                "SimpleArray": [
+                    "A",
+                    "B",
+                    "C",
+                    "D",
+                    "E"
+                ]
+            },
+            "Type": "UnitTestComponent"
         }
     ],
     "Name": "PlayerSpawner_"

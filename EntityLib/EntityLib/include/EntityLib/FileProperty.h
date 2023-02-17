@@ -136,7 +136,8 @@ namespace Ent
         /// @brief Update this to become 'set' (has a m_values)
         /// @pre _parent.isSet()
         /// @param _parent last layer which was "set" (has a json node)
-        void createChildNode(FileProperty& _parent);
+        /// @param _prefabSize Size of the prefab node if it is an array
+        void createChildNode(FileProperty& _parent, size_t _prefabSize);
 
         [[nodiscard]] size_t size() const; ///< @pre type==array. @brief Get the size of the array.
         void setSize(size_t _size); ///< @pre type==array. @brief Set the size of the array.

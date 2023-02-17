@@ -249,6 +249,7 @@ namespace Ent
             DefaultValue defaultValue; ///< Additional default values (beside a "$ref")
             std::string title;
             std::string description;
+            Subschema* cache = nullptr;
         };
 
         std::variant<Null, Ref, Subschema> subSchemaOrRef;
@@ -375,8 +376,12 @@ namespace Ent
     {
         if (std::holds_alternative<Ref>(subSchemaOrRef))
         {
-            Ref const& ref = std::get<Ref>(subSchemaOrRef);
-            return AT(ref.schema->allDefinitions, ref.ref);
+            Ref& ref = std::get<Ref>(subSchemaOrRef);
+            if (ref.cache == nullptr)
+            {
+                ref.cache = &(AT(ref.schema->allDefinitions, ref.ref));
+            }
+            return *ref.cache;
         }
         if (std::holds_alternative<Subschema>(subSchemaOrRef))
         {

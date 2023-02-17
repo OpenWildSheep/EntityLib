@@ -191,6 +191,16 @@ try
     entlib.validationEnabled = prevValidationEnabled;
 
     {
+        auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
+        auto strings = ent.Components().UnitTestComponent()->SimpleArray();
+        ENTLIB_ASSERT(strings.getPrefab()->size() == 5);
+        ENTLIB_ASSERT(strings.size() == 5);
+        auto cel2 = strings[2].getProperty();
+        cel2.setString("test4851");
+        ENTLIB_ASSERT(strings.getPrefab()->size() == 5);
+        ENTLIB_ASSERT(strings.size() == 5);
+    }
+    {
         // Check re-insertion of a deleted map item (avoid to create a 2nd json item)
         auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
         auto commonDataMap = ent.Components().ScriptComponentGD()->CommonDataMap();

@@ -992,7 +992,15 @@ namespace Ent
         auto const endIter = allLayers.end();
         for (; firstNotSet != endIter; ++lastSet, ++firstNotSet, ++firstNotSetIdx)
         {
-            (*firstNotSet)->m_instance.createChildNode((*lastSet)->m_instance);
+            size_t _prefabSize = 0;
+            if (auto prefab = (*firstNotSet)->getPrefab())
+            {
+                if (prefab->getDataKind() == DataKind::array)
+                {
+                    _prefabSize = prefab->arraySize();
+                }
+            }
+            (*firstNotSet)->m_instance.createChildNode((*lastSet)->m_instance, _prefabSize);
             ENTLIB_ASSERT(not needToCreateOrRestoreNode(*firstNotSet));
         }
         _checkInvariants();

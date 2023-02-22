@@ -1,3 +1,0 @@
-library('jenkins-sharedlibs')
-
-wildToolsMaster()

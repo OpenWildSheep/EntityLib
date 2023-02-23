@@ -29,7 +29,7 @@ output_path = os.path.abspath("../x64")				# the path where stubgen will generat
 
 # we need to add the EntityLibPy module's directory to PYTHONPATH so that stubgen can access it
 os.environ["PYTHONPATH"] = f"{input_path};{os.environ['PYTHONPATH']}" if "PYTHONPATH" in os.environ else input_path
-subprocess.run(f"python {stubgen_path} EntityLibPy -o {output_path}", encoding="oem", check=True)
+subprocess.run(f"{sys.executable} {stubgen_path} EntityLibPy -o {output_path}", encoding="oem", check=True)
 print("stubgen done")
 
 

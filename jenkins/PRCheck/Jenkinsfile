@@ -1,3 +1,3 @@
-library('jenkins-sharedlibs')
+@Library('jenkins-sharedlibs') _
 
 wildSharedPRCheck()

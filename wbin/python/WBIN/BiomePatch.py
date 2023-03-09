@@ -57,7 +57,31 @@ class BiomePatch(object):
             return obj
         return None
 
-def Start(builder): builder.StartObject(3)
+    # BiomePatch
+    def EdgeVisibility(self, j):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            x = self._tab.Vector(o)
+            x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 3
+            from WBIN.Bool3 import Bool3
+            obj = Bool3()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+    # BiomePatch
+    def EdgeVisibilityLength(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        if o != 0:
+            return self._tab.VectorLen(o)
+        return 0
+
+    # BiomePatch
+    def EdgeVisibilityIsNone(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
+        return o == 0
+
+def Start(builder): builder.StartObject(4)
 def BiomePatchStart(builder):
     """This method is deprecated. Please switch to Start."""
     return Start(builder)
@@ -73,15 +97,24 @@ def AddSourceFileInf(builder, sourceFileInf): builder.PrependUOffsetTRelativeSlo
 def BiomePatchAddSourceFileInf(builder, sourceFileInf):
     """This method is deprecated. Please switch to AddSourceFileInf."""
     return AddSourceFileInf(builder, sourceFileInf)
+def AddEdgeVisibility(builder, edgeVisibility): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(edgeVisibility), 0)
+def BiomePatchAddEdgeVisibility(builder, edgeVisibility):
+    """This method is deprecated. Please switch to AddEdgeVisibility."""
+    return AddEdgeVisibility(builder, edgeVisibility)
+def StartEdgeVisibilityVector(builder, numElems): return builder.StartVector(3, numElems, 1)
+def BiomePatchStartEdgeVisibilityVector(builder, numElems):
+    """This method is deprecated. Please switch to Start."""
+    return StartEdgeVisibilityVector(builder, numElems)
 def End(builder): return builder.EndObject()
 def BiomePatchEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
 import WBIN.AABB
+import WBIN.Bool3
 import WBIN.Float3Channel
 import WBIN.SourceFileInf
 try:
-    from typing import Optional
+    from typing import List, Optional
 except:
     pass
 
@@ -92,6 +125,7 @@ class BiomePatchT(object):
         self.aabb = None  # type: Optional[WBIN.AABB.AABBT]
         self.position = None  # type: Optional[WBIN.Float3Channel.Float3ChannelT]
         self.sourceFileInf = None  # type: Optional[WBIN.SourceFileInf.SourceFileInfT]
+        self.edgeVisibility = None  # type: List[WBIN.Bool3.Bool3T]
 
     @classmethod
     def InitFromBuf(cls, buf, pos):
@@ -115,6 +149,14 @@ class BiomePatchT(object):
             self.position = WBIN.Float3Channel.Float3ChannelT.InitFromObj(biomePatch.Position())
         if biomePatch.SourceFileInf() is not None:
             self.sourceFileInf = WBIN.SourceFileInf.SourceFileInfT.InitFromObj(biomePatch.SourceFileInf())
+        if not biomePatch.EdgeVisibilityIsNone():
+            self.edgeVisibility = []
+            for i in range(biomePatch.EdgeVisibilityLength()):
+                if biomePatch.EdgeVisibility(i) is None:
+                    self.edgeVisibility.append(None)
+                else:
+                    bool3_ = WBIN.Bool3.Bool3T.InitFromObj(biomePatch.EdgeVisibility(i))
+                    self.edgeVisibility.append(bool3_)
 
     # BiomePatchT
     def Pack(self, builder):
@@ -122,6 +164,11 @@ class BiomePatchT(object):
             position = self.position.Pack(builder)
         if self.sourceFileInf is not None:
             sourceFileInf = self.sourceFileInf.Pack(builder)
+        if self.edgeVisibility is not None:
+            StartEdgeVisibilityVector(builder, len(self.edgeVisibility))
+            for i in reversed(range(len(self.edgeVisibility))):
+                self.edgeVisibility[i].Pack(builder)
+            edgeVisibility = builder.EndVector()
         Start(builder)
         if self.aabb is not None:
             aabb = self.aabb.Pack(builder)
@@ -130,5 +177,7 @@ class BiomePatchT(object):
             AddPosition(builder, position)
         if self.sourceFileInf is not None:
             AddSourceFileInf(builder, sourceFileInf)
+        if self.edgeVisibility is not None:
+            AddEdgeVisibility(builder, edgeVisibility)
         biomePatch = End(builder)
         return biomePatch

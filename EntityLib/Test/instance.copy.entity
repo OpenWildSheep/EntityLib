@@ -98,10 +98,6 @@
                         "Name": "EntityWithInstanceOf"
                     },
                     {
-                        "InstanceOf": "subentity2.entity",
-                        "Name": "EntityWithInstanceOfButNoOverride"
-                    },
-                    {
                         "Name": "TestRemove",
                         "__removed__": true
                     },
@@ -121,6 +117,10 @@
                             }
                         ],
                         "Name": "TestSaveEntWithOverride"
+                    },
+                    {
+                        "InstanceOf": "subentity2.entity",
+                        "Name": "EntityWithInstanceOfButNoOverride"
                     }
                 ]
             },
@@ -150,7 +150,21 @@
                         {}
                     ]
                 ],
+                "MapOfPrimitive": [
+                    [
+                        "speed2",
+                        2
+                    ],
+                    [
+                        "speed3",
+                        3
+                    ]
+                ],
                 "SetOfObject": [
+                    {
+                        "Name": "A",
+                        "Value": "a"
+                    },
                     {
                         "InstanceOf": "ObjectInSet.node",
                         "Name": "E"
@@ -165,14 +179,21 @@
                     {
                         "Name": "C",
                         "__removed__": true
-                    },
-                    {
-                        "Name": "A2",
-                        "Value": "a"
                     }
                 ]
             },
             "Type": "TestSetOfObject"
+        },
+        {
+            "Data": {
+                "CommonDataMap": [
+                    [
+                        "NbBeams",
+                        {}
+                    ]
+                ]
+            },
+            "Type": "ScriptComponentGD"
         },
         {
             "Data": {},

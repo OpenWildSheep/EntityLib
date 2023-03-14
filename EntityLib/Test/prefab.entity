@@ -94,26 +94,6 @@
             "Type": "ActorGD"
         }, {
             "Data": {
-                "ScriptEvents": [
-                    {
-                        "className": "CineEventTriggerEventHandlerPost",
-                        "classData": {
-                            "EventName": "Toto"
-                            }
-                    },
-                    {
-                        "className": "CineEventTriggerEventHandlerPost",
-                        "classData": {
-                            "EventName": "Tutu"
-                        }
-                    },
-                    {
-                        "className": "CineEventTriggerEventHandlerPost",
-                        "classData": {
-                            "EventName": "Titi"
-                        }
-                    }
-                ]
             },
             "Type": "CinematicGD"
         }, {

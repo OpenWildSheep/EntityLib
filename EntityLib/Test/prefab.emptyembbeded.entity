@@ -88,10 +88,6 @@
         },
         {
             "Data": {},
-            "Type": "SmoothScaleComponentGD"
-        },
-        {
-            "Data": {},
             "Type": "PhysicsGD"
         },
         {
@@ -102,26 +98,7 @@
             "Type": "ActorGD"
         },
         {
-            "Data": {
-                "ScriptEvents": [
-                    {
-                        "classData": {
-                            "EventName": "Toto"
-                        },
-                        "className": "CineEventTriggerEventHandlerPost"
-                    },
-                    {
-                        "classData": {
-                            "GameStateName": "Pouet!"
-                        },
-                        "className": "CineEventTestCurrentGameState"
-                    },
-                    {
-                        "className": "CineEventTestCurrentGameState"
-                    },
-                    null
-                ]
-            },
+            "Data": {},
             "Type": "CinematicGD"
         },
         {
@@ -188,6 +165,12 @@
         },
         {
             "Data": {
+                "CommonDataMap": [
+                    [
+                        "NbBeams",
+                        {}
+                    ]
+                ],
                 "ScriptsMap": [
                     [
                         "CloudStorm",
@@ -254,6 +237,18 @@
                 ]
             },
             "Type": "TestSetOfObject"
+        },
+        {
+            "Data": {
+                "SimpleArray": [
+                    "A",
+                    "B",
+                    "C",
+                    "D",
+                    "E"
+                ]
+            },
+            "Type": "UnitTestComponent"
         },
         {
             "Data": {

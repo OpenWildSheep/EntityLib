@@ -85,6 +85,16 @@
         },
         {
             "Data": {
+                "MapOfPrimitive": [
+                    [
+                        "speed2",
+                        2
+                    ],
+                    [
+                        "speed3",
+                        3
+                    ]
+                ],
                 "SetOfObject": [
                     {
                         "Name": "A",
@@ -109,6 +119,17 @@
                 ]
             },
             "Type": "TestSetOfObject"
+        },
+        {
+            "Data": {
+                "CommonDataMap": [
+                    [
+                        "NbBeams",
+                        {}
+                    ]
+                ]
+            },
+            "Type": "ScriptComponentGD"
         },
         {
             "Data": null,

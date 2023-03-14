@@ -34,28 +34,7 @@
             "Type": "CharacterControllerGD"
         },
         {
-            "Data": {
-                "ScriptEvents": [
-                    {
-                        "classData": {
-                            "EventName": "Toto"
-                        },
-                        "className": "CineEventTriggerEventHandlerPost"
-                    },
-                    {
-                        "classData": {
-                            "EventName": "Tutu"
-                        },
-                        "className": "CineEventTriggerEventHandlerPost"
-                    },
-                    {
-                        "classData": {
-                            "EventName": "Titi"
-                        },
-                        "className": "CineEventTriggerEventHandlerPost"
-                    }
-                ]
-            },
+            "Data": {},
             "Type": "CinematicGD"
         },
         {
@@ -101,6 +80,12 @@
         },
         {
             "Data": {
+                "CommonDataMap": [
+                    [
+                        "NbBeams",
+                        {}
+                    ]
+                ],
                 "ScriptsMap": [
                     [
                         "CloudStorm",
@@ -139,10 +124,6 @@
                 "NoiseSizeY": 3.0
             },
             "Type": "SeedPatch"
-        },
-        {
-            "Data": {},
-            "Type": "SmoothScaleComponentGD"
         },
         {
             "Data": {
@@ -292,6 +273,26 @@
         },
         {
             "Data": {
+                "MapOfObject": [
+                    [
+                        "OldNode1",
+                        {}
+                    ],
+                    [
+                        "OldNode2",
+                        {}
+                    ]
+                ],
+                "MapOfPrimitive": [
+                    [
+                        "speed2",
+                        2
+                    ],
+                    [
+                        "speed3",
+                        3
+                    ]
+                ],
                 "SetOfObject": [
                     {
                         "Name": "A",
@@ -373,6 +374,18 @@
                 ]
             },
             "Type": "TransformGD"
+        },
+        {
+            "Data": {
+                "SimpleArray": [
+                    "A",
+                    "B",
+                    "C",
+                    "D",
+                    "E"
+                ]
+            },
+            "Type": "UnitTestComponent"
         },
         {
             "Data": {},

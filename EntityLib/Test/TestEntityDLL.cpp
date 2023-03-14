@@ -229,12 +229,14 @@ try
         netGD.unset();
         ENTLIB_ASSERT(netGD.isSet() == false);
         // On objectset
-        auto subent = ent.Components().SubScene()->Embedded().add("EP1-Spout_LINK_001"); // exist in prefab but not in instance
+        auto subent = ent.Components().SubScene()->Embedded().add(
+            "EP1-Spout_LINK_001"); // exist in prefab but not in instance
         ENTLIB_ASSERT(subent.isSet());
         subent.unset();
         ENTLIB_ASSERT(subent.isSet() == false);
         // On map
-        auto mapitem = ent.Components().TestSetOfObject()->MapOfObject().add("OldNode1"); // exist in prefab but not in instance
+        auto mapitem = ent.Components().TestSetOfObject()->MapOfObject().add(
+            "OldNode1"); // exist in prefab but not in instance
         ENTLIB_ASSERT(mapitem.isSet());
         mapitem.unset();
         ENTLIB_ASSERT(mapitem.isSet() == false);
@@ -292,17 +294,6 @@ try
     // Test $ref links in entlib.schema.schema.allDefinitions
     auto const* colorRef = "Color";
     ENTLIB_ASSERT(entlib.schema.schema.allDefinitions.count(colorRef) == 1);
-
-    // Check Ent::Subschema::getUnionTypesMap
-    auto const* cinematicGDRef = "CinematicGD";
-    Subschema const& cinematicGDSchema = entlib.schema.schema.allDefinitions.at(cinematicGDRef);
-    Subschema const& scriptEventUnionSchema =
-        cinematicGDSchema.properties.at("ScriptEvents")->singularItems->get();
-    auto&& nameToTypeMap = scriptEventUnionSchema.getUnionTypesMap();
-    ENTLIB_ASSERT(size(nameToTypeMap) == 9);
-    ENTLIB_ASSERT(nameToTypeMap.count("CineEventTestCurrentGameState") == 1);
-    ENTLIB_ASSERT(nameToTypeMap.count("CineEventTriggerEventHandlerPost") == 1);
-    ENTLIB_ASSERT(nameToTypeMap.count("CineEventTestEndCurrentSequence") == 1);
 
     // Ensure that all components have a ref and is in entlib.schema.schema.allDefinitions
     for (auto&& name_schema : entlib.schema.components)
@@ -557,23 +548,6 @@ try
         ENTLIB_ASSERT(parent.has_value() and *parent == ent.getProperty());
         ENTLIB_ASSERT(entlib.getParentEntity(ent.getProperty()).has_value() == false);
 
-        // TEST union
-        auto cinematicGD = ent.Components().CinematicGD();
-        auto scriptEvents = cinematicGD->ScriptEvents();
-        ENTLIB_ASSERT(scriptEvents.getDataType() == Ent::DataType::array);
-
-        // Read Union type
-        auto oneOfScripts = scriptEvents[0llu];
-        ENTLIB_ASSERT(oneOfScripts.getDataType() == Ent::DataType::oneOf);
-        auto cineEvent = oneOfScripts.CineEventTriggerEventHandlerPost();
-        ENTLIB_ASSERT(cineEvent.has_value());
-        ENTLIB_ASSERT(cineEvent->schemaName == std::string("CineEventTriggerEventHandlerPost"));
-        cineEvent->Super(); // If it compile, it exust
-
-        auto nbEnt = cineEvent->EventName();
-        ENTLIB_ASSERT(nbEnt.getDataType() == Ent::DataType::string);
-        ENTLIB_ASSERT(nbEnt == std::string("Toto"));
-
         // TEST sub-object with non-default values
         auto ldprimitive = ent.Components().LDPrimitive();
         auto primitiveData = ldprimitive->PrimitiveData();
@@ -675,32 +649,6 @@ try
         ENTLIB_ASSERT(primSet->getProperty().getParent()->getDataKind() == DataKind::map);
         ENTLIB_CHECK_EXCEPTION(primSet->getProperty().erasePrimSetKey("1"), Ent::BadArrayType);
 
-        // Set Union type and override
-        auto cinematicGD = ent.Components().CinematicGD();
-        auto scriptEvents = cinematicGD->ScriptEvents();
-        auto oneOfScripts2 = scriptEvents[1];
-        ENTLIB_ASSERT(oneOfScripts2.getDataType() == Ent::DataType::oneOf);
-        ENTLIB_ASSERT(oneOfScripts2.getType() == std::string("CineEventTriggerEventHandlerPost"));
-        oneOfScripts2.setCineEventTestCurrentGameState();
-        ENTLIB_CHECK_EXCEPTION(
-            oneOfScripts2.getProperty().setUnionType("ThisTypeDoesntExist"), Ent::BadUnionType);
-        auto testCurrentState = oneOfScripts2.CineEventTestCurrentGameState();
-        ENTLIB_ASSERT(oneOfScripts2.getType() == std::string("CineEventTestCurrentGameState"));
-        testCurrentState->GameStateName().set("Pouet!");
-
-        // Set Union type without override
-        auto oneOfScripts3 = scriptEvents[2];
-        ENTLIB_ASSERT(oneOfScripts3.getDataType() == Ent::DataType::oneOf);
-        ENTLIB_ASSERT(oneOfScripts3.getType() == std::string("CineEventTriggerEventHandlerPost"));
-        oneOfScripts3.setCineEventTestCurrentGameState();
-
-        // Push in an array of Union
-        auto oneOfScripts4 = scriptEvents.push();
-        ENTLIB_ASSERT(oneOfScripts4.getDataType() == Ent::DataType::oneOf);
-        // CineEventTestCurrentGameState is the first one
-        ENTLIB_ASSERT(oneOfScripts4.getType() == std::string("CineEventTestCurrentGameState"));
-        ENTLIB_ASSERT(scriptEvents[3].getProperty() == oneOfScripts4.getProperty());
-
         // TEST simple entity ref creation
         auto testEntityRef = ent.Components().addTestEntityRef();
         ENTLIB_ASSERT(testEntityRef.TestRef().get().entityPath.empty());
@@ -736,6 +684,12 @@ try
         newUnion = obj.Union();
         ENTLIB_ASSERT(not newUnion.getProperty().getUnionData().hasOverride());
         ENTLIB_ASSERT(newUnion.getType() == std::string("s32"));
+        // Test getUnionTypesMap
+        auto&& nameToTypeMap = newUnion.getSchema()->getUnionTypesMap();
+        ENTLIB_ASSERT(size(nameToTypeMap) == 8);
+        ENTLIB_ASSERT(nameToTypeMap.count("s32") == 1);
+        ENTLIB_ASSERT(nameToTypeMap.count("float") == 1);
+        ENTLIB_ASSERT(nameToTypeMap.count("Vector3") == 1);
 
         // TEST MaxActivationLevel
         ent.MaxActivationLevel().set(Gen::MaxActivationLevelEnum::InWorld);

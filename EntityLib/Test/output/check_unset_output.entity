@@ -140,6 +140,17 @@
                 ]
             },
             "Type": "TestSetOfObject"
+        },
+        {
+            "Data": {
+                "CommonDataMap": [
+                    [
+                        "NbBeams",
+                        {}
+                    ]
+                ]
+            },
+            "Type": "ScriptComponentGD"
         }
     ],
     "InstanceOf": "prefab.entity",

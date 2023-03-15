@@ -70,7 +70,18 @@ class SDF(object):
             return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
         return 1.0
 
-def Start(builder): builder.StartObject(5)
+    # SDF
+    def BoundingVolume(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
+        if o != 0:
+            x = o + self._tab.Pos
+            from WBIN.AABB import AABB
+            obj = AABB()
+            obj.Init(self._tab.Bytes, x)
+            return obj
+        return None
+
+def Start(builder): builder.StartObject(6)
 def SDFStart(builder):
     """This method is deprecated. Please switch to Start."""
     return Start(builder)
@@ -94,10 +105,15 @@ def AddVoxelSize(builder, voxelSize): builder.PrependFloat32Slot(4, voxelSize, 1
 def SDFAddVoxelSize(builder, voxelSize):
     """This method is deprecated. Please switch to AddVoxelSize."""
     return AddVoxelSize(builder, voxelSize)
+def AddBoundingVolume(builder, boundingVolume): builder.PrependStructSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(boundingVolume), 0)
+def SDFAddBoundingVolume(builder, boundingVolume):
+    """This method is deprecated. Please switch to AddBoundingVolume."""
+    return AddBoundingVolume(builder, boundingVolume)
 def End(builder): return builder.EndObject()
 def SDFEnd(builder):
     """This method is deprecated. Please switch to End."""
     return End(builder)
+import WBIN.AABB
 import WBIN.Float3
 import WBIN.SDFValues
 import WBIN.UInt3
@@ -118,6 +134,7 @@ class SDFT(object):
         self.resolution = None  # type: Optional[WBIN.UInt3.UInt3T]
         self.originOffset = None  # type: Optional[WBIN.Float3.Float3T]
         self.voxelSize = 1.0  # type: float
+        self.boundingVolume = None  # type: Optional[WBIN.AABB.AABBT]
 
     @classmethod
     def InitFromBuf(cls, buf, pos):
@@ -142,6 +159,8 @@ class SDFT(object):
         if sDF.OriginOffset() is not None:
             self.originOffset = WBIN.Float3.Float3T.InitFromObj(sDF.OriginOffset())
         self.voxelSize = sDF.VoxelSize()
+        if sDF.BoundingVolume() is not None:
+            self.boundingVolume = WBIN.AABB.AABBT.InitFromObj(sDF.BoundingVolume())
 
     # SDFT
     def Pack(self, builder):
@@ -158,5 +177,8 @@ class SDFT(object):
             originOffset = self.originOffset.Pack(builder)
             AddOriginOffset(builder, originOffset)
         AddVoxelSize(builder, self.voxelSize)
+        if self.boundingVolume is not None:
+            boundingVolume = self.boundingVolume.Pack(builder)
+            AddBoundingVolume(builder, boundingVolume)
         sDF = End(builder)
         return sDF

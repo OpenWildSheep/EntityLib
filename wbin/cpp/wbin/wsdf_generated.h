@@ -343,6 +343,7 @@ struct SDFT : public flatbuffers::NativeTable {
   std::unique_ptr<WBIN::UInt3> resolution{};
   std::unique_ptr<WBIN::Float3> originOffset{};
   float voxelSize = 1.0f;
+  std::unique_ptr<WBIN::AABB> boundingVolume{};
 };
 
 struct SDF FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -353,7 +354,8 @@ struct SDF FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_VALUES = 6,
     VT_RESOLUTION = 8,
     VT_ORIGINOFFSET = 10,
-    VT_VOXELSIZE = 12
+    VT_VOXELSIZE = 12,
+    VT_BOUNDINGVOLUME = 14
   };
   WBIN::SDFValues values_type() const {
     return static_cast<WBIN::SDFValues>(GetField<uint8_t>(VT_VALUES_TYPE, 0));
@@ -392,6 +394,12 @@ struct SDF FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool mutate_voxelSize(float _voxelSize) {
     return SetField<float>(VT_VOXELSIZE, _voxelSize, 1.0f);
   }
+  const WBIN::AABB *boundingVolume() const {
+    return GetStruct<const WBIN::AABB *>(VT_BOUNDINGVOLUME);
+  }
+  WBIN::AABB *mutable_boundingVolume() {
+    return GetStruct<WBIN::AABB *>(VT_BOUNDINGVOLUME);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_VALUES_TYPE) &&
@@ -400,6 +408,7 @@ struct SDF FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyFieldRequired<WBIN::UInt3>(verifier, VT_RESOLUTION) &&
            VerifyFieldRequired<WBIN::Float3>(verifier, VT_ORIGINOFFSET) &&
            VerifyField<float>(verifier, VT_VOXELSIZE) &&
+           VerifyField<WBIN::AABB>(verifier, VT_BOUNDINGVOLUME) &&
            verifier.EndTable();
   }
   SDFT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -438,6 +447,9 @@ struct SDFBuilder {
   void add_voxelSize(float voxelSize) {
     fbb_.AddElement<float>(SDF::VT_VOXELSIZE, voxelSize, 1.0f);
   }
+  void add_boundingVolume(const WBIN::AABB *boundingVolume) {
+    fbb_.AddStruct(SDF::VT_BOUNDINGVOLUME, boundingVolume);
+  }
   explicit SDFBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -458,8 +470,10 @@ inline flatbuffers::Offset<SDF> CreateSDF(
     flatbuffers::Offset<void> values = 0,
     const WBIN::UInt3 *resolution = 0,
     const WBIN::Float3 *originOffset = 0,
-    float voxelSize = 1.0f) {
+    float voxelSize = 1.0f,
+    const WBIN::AABB *boundingVolume = 0) {
   SDFBuilder builder_(_fbb);
+  builder_.add_boundingVolume(boundingVolume);
   builder_.add_voxelSize(voxelSize);
   builder_.add_originOffset(originOffset);
   builder_.add_resolution(resolution);
@@ -562,6 +576,7 @@ inline void SDF::UnPackTo(SDFT *_o, const flatbuffers::resolver_function_t *_res
   { auto _e = resolution(); if (_e) _o->resolution = std::unique_ptr<WBIN::UInt3>(new WBIN::UInt3(*_e)); }
   { auto _e = originOffset(); if (_e) _o->originOffset = std::unique_ptr<WBIN::Float3>(new WBIN::Float3(*_e)); }
   { auto _e = voxelSize(); _o->voxelSize = _e; }
+  { auto _e = boundingVolume(); if (_e) _o->boundingVolume = std::unique_ptr<WBIN::AABB>(new WBIN::AABB(*_e)); }
 }
 
 inline flatbuffers::Offset<SDF> SDF::Pack(flatbuffers::FlatBufferBuilder &_fbb, const SDFT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -577,13 +592,15 @@ inline flatbuffers::Offset<SDF> CreateSDF(flatbuffers::FlatBufferBuilder &_fbb, 
   auto _resolution = _o->resolution ? _o->resolution.get() : 0;
   auto _originOffset = _o->originOffset ? _o->originOffset.get() : 0;
   auto _voxelSize = _o->voxelSize;
+  auto _boundingVolume = _o->boundingVolume ? _o->boundingVolume.get() : 0;
   return WBIN::CreateSDF(
       _fbb,
       _values_type,
       _values,
       _resolution,
       _originOffset,
-      _voxelSize);
+      _voxelSize,
+      _boundingVolume);
 }
 
 inline bool VerifySDFValues(flatbuffers::Verifier &verifier, const void *obj, SDFValues type) {

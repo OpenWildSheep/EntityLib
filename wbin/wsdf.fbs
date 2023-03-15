@@ -30,6 +30,7 @@ table SDF
 	resolution: UInt3 (required); // how many voxel per axis
 	originOffset: Float3(required);
 	voxelSize: float = 1; 
+	boundingVolume: AABB; // bounding volume of represented shape
 }
 
 root_type SDF;

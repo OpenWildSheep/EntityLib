@@ -121,7 +121,14 @@ namespace Ent
                     deps.push_back(dep["Name"].get<std::string>());
                 }
             }
-            componentDependencies.emplace(std::move(name), std::move(deps));
+            componentDependencies.emplace(name, std::move(deps));
+
+            std::vector<std::string> incompatibleComponents;
+            for (json const& incompatibility : comp["incompatibilities"])
+            {
+                incompatibleComponents.push_back(incompatibility["Name"].get<std::string>());
+            }
+            componentIncompatibilities.emplace(std::move(name), std::move(incompatibleComponents));
         }
     }
 

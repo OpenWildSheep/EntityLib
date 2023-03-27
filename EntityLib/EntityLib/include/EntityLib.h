@@ -71,6 +71,9 @@ namespace Ent
         /// Component needed for each type of components
         std::map<std::string, std::vector<std::string>> componentDependencies;
 
+        /// Incompatible components for each type of components
+        std::map<std::string, std::vector<std::string>> componentIncompatibilities;
+
         /// Load the EntityLib, given the path to the Tools directory
         explicit EntityLib(std::filesystem::path const& _rootPath, bool _doMergeComponents = false);
         ~EntityLib();

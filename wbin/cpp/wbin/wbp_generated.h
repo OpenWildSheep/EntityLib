@@ -19,6 +19,7 @@ struct BiomePatchT : public flatbuffers::NativeTable {
   std::unique_ptr<WBIN::AABB> aabb{};
   std::unique_ptr<WBIN::Float3ChannelT> position{};
   std::unique_ptr<WBIN::SourceFileInfT> sourceFileInf{};
+  std::vector<WBIN::Bool3> edgeVisibility{};
 };
 
 struct BiomePatch FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -27,7 +28,8 @@ struct BiomePatch FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_AABB = 4,
     VT_POSITION = 6,
-    VT_SOURCEFILEINF = 8
+    VT_SOURCEFILEINF = 8,
+    VT_EDGEVISIBILITY = 10
   };
   const WBIN::AABB *aabb() const {
     return GetStruct<const WBIN::AABB *>(VT_AABB);
@@ -47,6 +49,12 @@ struct BiomePatch FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   WBIN::SourceFileInf *mutable_sourceFileInf() {
     return GetPointer<WBIN::SourceFileInf *>(VT_SOURCEFILEINF);
   }
+  const flatbuffers::Vector<const WBIN::Bool3 *> *edgeVisibility() const {
+    return GetPointer<const flatbuffers::Vector<const WBIN::Bool3 *> *>(VT_EDGEVISIBILITY);
+  }
+  flatbuffers::Vector<const WBIN::Bool3 *> *mutable_edgeVisibility() {
+    return GetPointer<flatbuffers::Vector<const WBIN::Bool3 *> *>(VT_EDGEVISIBILITY);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<WBIN::AABB>(verifier, VT_AABB) &&
@@ -54,6 +62,8 @@ struct BiomePatch FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(position()) &&
            VerifyOffset(verifier, VT_SOURCEFILEINF) &&
            verifier.VerifyTable(sourceFileInf()) &&
+           VerifyOffset(verifier, VT_EDGEVISIBILITY) &&
+           verifier.VerifyVector(edgeVisibility()) &&
            verifier.EndTable();
   }
   BiomePatchT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -74,6 +84,9 @@ struct BiomePatchBuilder {
   void add_sourceFileInf(flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf) {
     fbb_.AddOffset(BiomePatch::VT_SOURCEFILEINF, sourceFileInf);
   }
+  void add_edgeVisibility(flatbuffers::Offset<flatbuffers::Vector<const WBIN::Bool3 *>> edgeVisibility) {
+    fbb_.AddOffset(BiomePatch::VT_EDGEVISIBILITY, edgeVisibility);
+  }
   explicit BiomePatchBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -90,12 +103,29 @@ inline flatbuffers::Offset<BiomePatch> CreateBiomePatch(
     flatbuffers::FlatBufferBuilder &_fbb,
     const WBIN::AABB *aabb = 0,
     flatbuffers::Offset<WBIN::Float3Channel> position = 0,
-    flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf = 0) {
+    flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf = 0,
+    flatbuffers::Offset<flatbuffers::Vector<const WBIN::Bool3 *>> edgeVisibility = 0) {
   BiomePatchBuilder builder_(_fbb);
+  builder_.add_edgeVisibility(edgeVisibility);
   builder_.add_sourceFileInf(sourceFileInf);
   builder_.add_position(position);
   builder_.add_aabb(aabb);
   return builder_.Finish();
+}
+
+inline flatbuffers::Offset<BiomePatch> CreateBiomePatchDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const WBIN::AABB *aabb = 0,
+    flatbuffers::Offset<WBIN::Float3Channel> position = 0,
+    flatbuffers::Offset<WBIN::SourceFileInf> sourceFileInf = 0,
+    const std::vector<WBIN::Bool3> *edgeVisibility = nullptr) {
+  auto edgeVisibility__ = edgeVisibility ? _fbb.CreateVectorOfStructs<WBIN::Bool3>(*edgeVisibility) : 0;
+  return WBIN::CreateBiomePatch(
+      _fbb,
+      aabb,
+      position,
+      sourceFileInf,
+      edgeVisibility__);
 }
 
 flatbuffers::Offset<BiomePatch> CreateBiomePatch(flatbuffers::FlatBufferBuilder &_fbb, const BiomePatchT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -112,6 +142,7 @@ inline void BiomePatch::UnPackTo(BiomePatchT *_o, const flatbuffers::resolver_fu
   { auto _e = aabb(); if (_e) _o->aabb = std::unique_ptr<WBIN::AABB>(new WBIN::AABB(*_e)); }
   { auto _e = position(); if (_e) _o->position = std::unique_ptr<WBIN::Float3ChannelT>(_e->UnPack(_resolver)); }
   { auto _e = sourceFileInf(); if (_e) _o->sourceFileInf = std::unique_ptr<WBIN::SourceFileInfT>(_e->UnPack(_resolver)); }
+  { auto _e = edgeVisibility(); if (_e) { _o->edgeVisibility.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->edgeVisibility[_i] = *_e->Get(_i); } } }
 }
 
 inline flatbuffers::Offset<BiomePatch> BiomePatch::Pack(flatbuffers::FlatBufferBuilder &_fbb, const BiomePatchT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -125,11 +156,13 @@ inline flatbuffers::Offset<BiomePatch> CreateBiomePatch(flatbuffers::FlatBufferB
   auto _aabb = _o->aabb ? _o->aabb.get() : 0;
   auto _position = _o->position ? CreateFloat3Channel(_fbb, _o->position.get(), _rehasher) : 0;
   auto _sourceFileInf = _o->sourceFileInf ? CreateSourceFileInf(_fbb, _o->sourceFileInf.get(), _rehasher) : 0;
+  auto _edgeVisibility = _o->edgeVisibility.size() ? _fbb.CreateVectorOfStructs(_o->edgeVisibility) : 0;
   return WBIN::CreateBiomePatch(
       _fbb,
       _aabb,
       _position,
-      _sourceFileInf);
+      _sourceFileInf,
+      _edgeVisibility);
 }
 
 inline const WBIN::BiomePatch *GetBiomePatch(const void *buf) {

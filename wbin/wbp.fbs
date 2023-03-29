@@ -7,6 +7,7 @@ table BiomePatch
 	aabb:AABB;
 	position:Float3Channel (required);
 	sourceFileInf:SourceFileInf;
+	edgeVisibility:[Bool3];
 }
 
 root_type BiomePatch;

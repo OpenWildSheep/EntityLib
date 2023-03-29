@@ -106,7 +106,8 @@ namespace Ent
     FileProperty FileProperty::getObjectField(char const* _field, SubschemaRef const* _fieldRef) const
     {
         FileProperty newLayer(*m_entityLib, m_docMetaData);
-        ENTLIB_DBG_ASSERT(m_schema.base->type == DataType::object);
+        ENTLIB_DBG_ASSERT(
+            m_schema.base->type == DataType::object or m_schema.base->type == DataType::oneOf);
         if (_fieldRef == nullptr)
         {
             auto const& properties = m_schema.base->properties;

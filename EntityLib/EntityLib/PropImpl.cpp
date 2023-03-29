@@ -201,14 +201,11 @@ namespace Ent
         return false;
     }
 
-    PropImplPtr PropImpl::getObjectField(char const* _field, SubschemaRef const* _fieldRef)
+    PropImplPtr PropImpl::_getField(char const* _field, SubschemaRef const* _fieldRef)
     {
         _reResolveIfNeeded();
         _checkInvariants();
-        CHECK_TYPE(DataKind::object);
-        ENTLIB_DBG_ASSERT(getDataType() == DataType::object);
         auto newLayer = m_entityLib->newPropImpl();
-        ENTLIB_DBG_ASSERT(_getDefault().getSchema()->type == DataType::object);
         newLayer->m_instance = m_instance.getObjectField(_field, _fieldRef);
         newLayer->m_entityLib = m_entityLib;
         newLayer->m_parent = sharedFromThis();
@@ -219,7 +216,7 @@ namespace Ent
             if (not m_instance.isRemovedObject(parent ? parent->getSchema() : nullptr)
                 and m_prefab != nullptr)
             {
-                newLayer->m_prefab = m_prefab->getObjectField(_field, _fieldRef);
+                newLayer->m_prefab = m_prefab->_getField(_field, _fieldRef);
             }
         }
         bool defaultFound = false;
@@ -250,6 +247,13 @@ namespace Ent
             }
         }
         return newLayer;
+    }
+
+    PropImplPtr PropImpl::getObjectField(char const* _field, SubschemaRef const* _fieldRef)
+    {
+        CHECK_TYPE(DataKind::object);
+        ENTLIB_DBG_ASSERT(_getDefault().getSchema()->type == DataType::object);
+        return _getField(_field, _fieldRef);
     }
 
     PropImplPtr PropImpl::getUnionData(char const* _type)
@@ -480,7 +484,7 @@ namespace Ent
         schema.setDataKind(DataKind::string);
         SubschemaRef ref;
         ref.subSchemaOrRef = std::move(schema);
-        auto const field = getObjectField("InstanceOf", &ref);
+        auto const field = _getField("InstanceOf", &ref);
         if (not field->isSet())
         {
             return nullptr;

@@ -1558,7 +1558,7 @@ namespace Ent
                 if (subNode->matchValueSource(_dumpedValueSource) or sub.get().isKeyField)
                 {
                     json subJson = dumpNode(
-                        *sub, *subNode, _dumpedValueSource, _superKeyIsTypeName, _entityRefPreProc);
+                        *sub, *subNode, _dumpedValueSource, _superKeyIsTypeName, _entityRefPreProc, _saveUnionIndex);
                     // handle "Super" special key
                     if (_superKeyIsTypeName and name == "Super")
                     {
@@ -1686,7 +1686,8 @@ namespace Ent
                             *item,
                             _dumpedValueSource,
                             _superKeyIsTypeName,
-                            _entityRefPreProc);
+                            _entityRefPreProc,
+                            _saveUnionIndex);
                         data.emplace_back(std::move(tmpNode));
                     }
                     else
@@ -1731,7 +1732,8 @@ namespace Ent
                     *dataInsideUnion,
                     _dumpedValueSource,
                     _superKeyIsTypeName,
-                    _entityRefPreProc);
+                    _entityRefPreProc,
+                    _saveUnionIndex);
                 if (meta.indexField.has_value() and _saveUnionIndex)
                 {
                     data[*meta.indexField] = _node.getUnionTypeIndex();

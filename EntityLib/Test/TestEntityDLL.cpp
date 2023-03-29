@@ -201,6 +201,20 @@ try
         ENTLIB_ASSERT(strings.size() == 5);
     }
     {
+        // getInstanceOf in union
+        auto ent = Gen::Entity::loadCopy(entlib, "prefab.entity");
+        auto prop = ent.Components()
+                        .ScriptComponentGD()
+                        ->ScriptsMap()
+                        .get("CloudStorm")
+                        ->DataMap()
+                        .get("BlendDurationIn")
+                        ->Value()
+                        .getProperty();
+        auto unionInstanceOf = prop.getInstanceOf();
+        ENTLIB_ASSERT(unionInstanceOf == std::string_view("BlendDurationIn.node"));
+    }
+    {
         // Check re-insertion of a deleted map item (avoid to create a 2nd json item)
         auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
         auto commonDataMap = ent.Components().ScriptComponentGD()->CommonDataMap();

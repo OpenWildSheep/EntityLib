@@ -306,6 +306,10 @@ namespace Ent
         [[nodiscard]] bool _doNeedReResolve() const;
         bool _reResolveIfNeeded();
         void _updateParentToResolved(); // Inform all parents the m_instance it is actually up to date (called by child)
+        [[nodiscard]] PropImplPtr _getField(
+            char const* _field, ///< field to enter in
+            SubschemaRef const* _fieldRef = nullptr ///< SubschemaRef of the field (For performance)
+        );
 
         EntityLib* m_entityLib = nullptr;
         PropImplPtr m_prefab = nullptr;

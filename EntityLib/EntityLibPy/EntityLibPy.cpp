@@ -699,6 +699,15 @@ PYBIND11_MODULE(EntityLibPy, ent)
             py::return_value_policy::reference_internal
         )
         .def("get_node_cache", &EntityLib::getNodeCache, py::return_value_policy::reference_internal)
+        .def("get_json_database", [](EntityLib const& _entlib)
+        {
+            std::map<std::string, nlohmann::json*> allFiles;
+            for (auto& [path, doc]: _entlib.getJsonDatabase())
+            {
+                allFiles.emplace(path.generic_string(), &doc->document);
+            }
+            return allFiles;
+        })
         .def("clear_cache", &EntityLib::clearCache)
         .def("load_node_file",
             [](EntityLib* lib, std::filesystem::path const& _path, Subschema const& _schema)

@@ -702,7 +702,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_json_database", [](EntityLib const& _entlib)
         {
             std::map<std::string, nlohmann::json*> allFiles;
-            for (auto& [path, doc]: _entlib.getJsonDatabase())
+            for (auto const& [path, doc]: _entlib.getJsonDatabase())
+
             {
                 allFiles.emplace(path.generic_string(), &doc->document);
             }

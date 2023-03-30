@@ -290,11 +290,15 @@ static py::list propObjSetGetKeys(Property& _prop)
     return arr;
 }
 
-nlohmann::json dumpProperty(Property _prop, bool _superKeyIsTypeName = false)
+nlohmann::json dumpProperty(Property _prop, bool _superKeyIsTypeName = false, bool _saveUnionIndex = false)
 {
     nlohmann::json result;
     DumpProperty dumper(
-        result, Ent::OverrideValueSource::Any, _superKeyIsTypeName, [](Ent::EntityRef&) {});
+        result,
+        Ent::OverrideValueSource::Any,
+        _superKeyIsTypeName,
+        [](Ent::EntityRef&) {},
+        _saveUnionIndex);
     visitRecursive(_prop, dumper);
     return result;
 }
@@ -832,7 +836,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property_readonly("get_prefab_history", &getPrefabHistory, py::keep_alive<0, 1>())
         .def("detach", &Property::detach, py::keep_alive<0, 1>())
         .def("clear", &Property::clear)
-        .def("dumps", &dumpProperty, py::arg("superKeyIsTypeName") = false)
+        .def("dumps", &dumpProperty, py::arg("superKeyIsTypeName") = false, py::arg("saveUnionIndex") = false)
         .def("erase_primset_key", [](Property& _self, char const* _key){return _self.erasePrimSetKey(_key);})
         .def("erase_primset_key", [](Property& _self, int64_t _key){return _self.erasePrimSetKey(_key);})
         .def("erase_objectset_item", [](Property& _self, char const* _key){return _self.eraseObjectSetItem(_key);})

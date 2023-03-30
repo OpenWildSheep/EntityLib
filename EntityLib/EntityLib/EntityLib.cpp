@@ -109,7 +109,7 @@ namespace Ent
             schema.actorstates.emplace(actorstateName, &actorstateSchema);
         }
 
-        static constexpr std::string wildComponentNameSuffix = "GD";
+        static std::string const wildComponentNameSuffix = "GD";
         json dependencies = loadJsonFile(toolsDir, "WildPipeline/Schema/Dependencies.json");
         for (json const& comp : dependencies["Dependencies"])
         {

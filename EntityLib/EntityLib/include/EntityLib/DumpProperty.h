@@ -17,11 +17,13 @@ namespace Ent
             nlohmann::json& _dest, ///< output json node
             OverrideValueSource _valueSource,
             bool _superKeyIsTypeName, ///< Replace the "Super" field with the field's type
-            ResolveEntityRefFunction _resolveEntityRef)
+            ResolveEntityRefFunction _resolveEntityRef,
+            bool _saveUnionIndex)
             : m_dest(_dest)
             , m_valueSource(_valueSource)
             , m_superKeyIsTypeName(_superKeyIsTypeName)
             , m_resolveEntityRef(std::move(_resolveEntityRef))
+            , m_saveUnionIndex(_saveUnionIndex)
         {
             _Push(m_dest);
         }
@@ -50,8 +52,15 @@ namespace Ent
         void inUnion(Property const& _source, char const* _type) override
         {
             _Back() = nlohmann::json::object();
-            _Back()[_source.getSchema()->getUnionNameField()] = _type;
-            _Push(_Back()[_source.getSchema()->getUnionDataField()]);
+            auto const* schema = _source.getSchema();
+            auto const& meta = std::get<Subschema::UnionMeta>(schema->meta);
+            _Back()[meta.typeField] = _type;
+            if (meta.indexField.has_value() and m_saveUnionIndex)
+            {
+                auto [subSchema, index] = schema->getUnionTypeWrapper(_type);
+                _Back()[*meta.indexField] = index;
+            }
+            _Push(_Back()[meta.dataField]);
         }
         void outUnion([[maybe_unused]] Property const& _source) override
         {
@@ -188,6 +197,7 @@ namespace Ent
         std::vector<nlohmann::json*> m_stack;
         OverrideValueSource m_valueSource;
         bool m_superKeyIsTypeName = false;
+        bool m_saveUnionIndex = false;
         ResolveEntityRefFunction m_resolveEntityRef;
     };
 } // namespace Ent

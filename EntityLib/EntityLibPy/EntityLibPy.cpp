@@ -684,6 +684,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "component_dependencies",
             &EntityLib::componentDependencies,
             py::return_value_policy::reference_internal)
+        .def_readonly(
+            "component_incompatibilities",
+            &EntityLib::componentIncompatibilities,
+            py::return_value_policy::reference_internal)
         .def(
             "load_node_read_only",
             [](EntityLib* entlib, Subschema const* schema, char const* name){ return entlib->loadNodeReadOnly(*schema, name).get();},

@@ -109,16 +109,17 @@ namespace Ent
             schema.actorstates.emplace(actorstateName, &actorstateSchema);
         }
 
+        static constexpr std::string wildComponentNameSuffix = "GD";
         json dependencies = loadJsonFile(toolsDir, "WildPipeline/Schema/Dependencies.json");
         for (json const& comp : dependencies["Dependencies"])
         {
-            auto name = comp["className"].get<std::string>();
+            auto name = comp["className"].get<std::string>() + wildComponentNameSuffix;
             std::vector<std::string> deps;
             for (json const& dep : comp["dependencies"])
             {
                 if (not dep["Optional"].get<bool>())
                 {
-                    deps.push_back(dep["Name"].get<std::string>());
+                    deps.push_back(dep["Name"].get<std::string>() + wildComponentNameSuffix);
                 }
             }
             componentDependencies.emplace(name, std::move(deps));
@@ -126,7 +127,7 @@ namespace Ent
             std::vector<std::string> incompatibleComponents;
             for (json const& incompatibility : comp["incompatibilities"])
             {
-                incompatibleComponents.push_back(incompatibility["Name"].get<std::string>());
+                incompatibleComponents.push_back(incompatibility["Name"].get<std::string>() + wildComponentNameSuffix);
             }
             componentIncompatibilities.emplace(std::move(name), std::move(incompatibleComponents));
         }

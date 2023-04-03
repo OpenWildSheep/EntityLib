@@ -5,10 +5,6 @@ echo P4_ROOT is $p4_root
 echo Build EntityLib
 vs16path="C:/Program Files (x86)/SCE/Common/SceVSI-VS16/bin/vs16build.exe"
 
-if ! "$vs16path" EntityLib/EntityLib2019.sln //build "Release|x64" //project EntityLib/EntityLib/EntityLib2019.vcxproj //sn-dbs; then
-	echo Build EntityLib2019 Failed
-	exit 1
-fi
 if ! "$vs16path" EntityLib/EntityLib2019.sln //build "Release|x64" //project EntityLib/UpdateSchemas/UpdateSchemas2019.vcxproj //sn-dbs; then
 	echo Build UpdateSchemas2019 Failed
 	exit 1

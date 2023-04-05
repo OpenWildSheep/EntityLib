@@ -111,6 +111,11 @@
   <ItemGroup>
     <ClCompile Include="UpdateSchemas.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EntityLib\EntityLib2019.vcxproj">
+      <Project>{69315629-1871-49b2-ae40-1c2337e5dca0}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

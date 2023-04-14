@@ -765,11 +765,15 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pyProperty
         .def(py::init<EntityLib*, Subschema const*, char const*>(), py::keep_alive<1, 2>())
         .def(py::init<EntityLib*, Subschema const*, char const*, nlohmann::json*, JsonMetaData*>(), py::keep_alive<1, 2>())
-        .def_static("create", [](EntityLib* _lib, Subschema const* _schema, char const* _path)
+        .def_static("create", [](EntityLib* _lib, Subschema const* _schema, char const* _path, nlohmann::json* _data)
         {
             auto& newFile = _lib->createTempJsonFile();
+            if (_data != nullptr)
+            {
+                newFile.document = *_data;
+            }
             return Property(_lib, _schema, _path, newFile);
-        }, py::arg("entlib"), py::arg("schema"), py::arg("path") = "", py::keep_alive<1, 2>())
+        }, py::arg("entlib"), py::arg("schema"), py::arg("path") = "", py::arg("data") = nullptr, py::keep_alive<1, 2>())
         .def("save", &Property::save)
         .def_property_readonly("is_default", &Property::isDefault)
         .def("get_object_field", &Property::getObjectField, py::arg("field"), py::arg("field_schema") = nullptr, py::keep_alive<0, 1>())
@@ -782,6 +786,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("get_map_item", [](Property& _self, int64_t _key){return _self.getMapItem(_key);}, py::keep_alive<0, 1>())
         .def("get_array_item", &Property::getArrayItem, py::keep_alive<0, 1>())
         .def("get_instance_of", &Property::getInstanceOf)
+        .def("reset_instance_of", &Property::resetInstanceOf)
         .def_property("instance_of", &Property::getInstanceOf, &Property::changeInstanceOf)
         .def_property_readonly("first_instance_of", &Property::getFirstInstanceOf)
         .def_property_readonly("union_type", &Property::getUnionType) // or read/write ?

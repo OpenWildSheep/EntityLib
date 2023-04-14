@@ -111,7 +111,7 @@ class UnionSet(Base, Generic[T]):
 class Union(Base):
     @property
     def type(self):
-        return self._node.get_union_type()
+        return self._node.union_type
 
     @property
     def data(self):

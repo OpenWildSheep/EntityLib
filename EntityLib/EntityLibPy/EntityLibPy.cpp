@@ -765,11 +765,15 @@ PYBIND11_MODULE(EntityLibPy, ent)
     pyProperty
         .def(py::init<EntityLib*, Subschema const*, char const*>(), py::keep_alive<1, 2>())
         .def(py::init<EntityLib*, Subschema const*, char const*, nlohmann::json*, JsonMetaData*>(), py::keep_alive<1, 2>())
-        .def_static("create", [](EntityLib* _lib, Subschema const* _schema, char const* _path)
+        .def_static("create", [](EntityLib* _lib, Subschema const* _schema, char const* _path, nlohmann::json* _data)
         {
             auto& newFile = _lib->createTempJsonFile();
+            if (_data != nullptr)
+            {
+                newFile.document = *_data;
+            }
             return Property(_lib, _schema, _path, newFile);
-        }, py::arg("entlib"), py::arg("schema"), py::arg("path") = "", py::keep_alive<1, 2>())
+        }, py::arg("entlib"), py::arg("schema"), py::arg("path") = "", py::arg("data") = nullptr, py::keep_alive<1, 2>())
         .def("save", &Property::save)
         .def_property_readonly("is_default", &Property::isDefault)
         .def("get_object_field", &Property::getObjectField, py::arg("field"), py::arg("field_schema") = nullptr, py::keep_alive<0, 1>())

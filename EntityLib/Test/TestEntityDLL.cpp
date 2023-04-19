@@ -147,6 +147,7 @@ try
     bool doDisplayScene = false;
     bool doDisplaySubSchema = false;
     bool dumpNodes = false;
+    bool doTestLargeScene = false;
     std::filesystem::path rootPath = "X:";
     for (int i = 1; i < argc; ++i)
     {
@@ -167,6 +168,10 @@ try
             ++i;
             ENTLIB_ASSERT(i < argc);
             rootPath = argv[i];
+        }
+        else if (strcmp(argv[i], "--test-large-scene") == 0)
+        {
+            doTestLargeScene = true;
         }
     }
 
@@ -195,7 +200,7 @@ try
 
     auto prevValidationEnabled = entlib.validationEnabled;
     entlib.validationEnabled = false;
-    testCursor(entlib, rawdataPath);
+    testCursor(entlib, rawdataPath, doTestLargeScene);
     entlib.rawdataPath = current_path();
     entlib.validationEnabled = prevValidationEnabled;
 

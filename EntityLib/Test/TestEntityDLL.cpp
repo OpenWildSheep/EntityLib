@@ -147,6 +147,7 @@ try
     bool doDisplayScene = false;
     bool doDisplaySubSchema = false;
     bool dumpNodes = false;
+    std::filesystem::path rootPath = "X:/RawData/..";
     for (int i = 1; i < argc; ++i)
     {
         if (strcmp(argv[i], "--displaySchema") == 0)
@@ -161,6 +162,12 @@ try
         {
             dumpNodes = true;
         }
+        else if (strcmp(argv[i], "--rootPath") == 0)
+        {
+            ++i;
+            ENTLIB_ASSERT(i < argc);
+            rootPath = argv[i];
+        }
     }
 
     // Ent::updateComponents("X:/Tools");
@@ -170,7 +177,7 @@ try
     bool const doMergeComponents = true;
 #endif
 
-    EntityLib entlib("X:/RawData/..", doMergeComponents);
+    EntityLib entlib(rootPath, doMergeComponents);
     using namespace std::filesystem;
 
     entlib.setLogicErrorPolicy(LogicErrorPolicy::Throw);

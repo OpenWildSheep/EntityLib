@@ -117,6 +117,7 @@ namespace Ent
         /// @pre It is an Map
         [[nodiscard]] std::optional<Property> getMapItem(char const* _key ///< Key of the value
         ) const
+        try
         {
             if (auto item = getPimpl().getMapItem(_key))
             {
@@ -124,16 +125,27 @@ namespace Ent
             }
             return std::nullopt;
         }
+        catch (ContextException& ex)
+        {
+            ex.addContextMessage(getDebugString());
+            throw;
+        }
         /// @brief Given a key, get the related value in a Map
         /// @pre It is an Map
         [[nodiscard]] std::optional<Property> getMapItem(int64_t _key ///< Key of the value
         ) const
+        try
         {
             if (auto item = getPimpl().getMapItem(_key))
             {
                 return Property{std::move(item)};
             }
             return std::nullopt;
+        }
+        catch (ContextException& ex)
+        {
+            ex.addContextMessage(getDebugString());
+            throw;
         }
         /// @brief Get the element in a Array
         /// @pre It is an Array
@@ -476,17 +488,28 @@ namespace Ent
         /// @pre is a Map with string keys
         /// @return The element with key _key
         Property insertMapItem(char const* _key) const
+        try
         {
             return Property{getPimpl().insertMapItem(_key)};
+        }
+        catch (ContextException& ex)
+        {
+            ex.addContextMessage(getDebugString());
+            throw;
         }
         /// @brief Insert _key in the Map (or do nothing if already in)
         /// @pre is a Map with integer keys
         /// @return The element with key _key
         Property insertMapItem(int64_t _key) const
+        try
         {
             return Property{getPimpl().insertMapItem(_key)};
         }
-
+        catch (ContextException& ex)
+        {
+            ex.addContextMessage(getDebugString());
+            throw;
+        }
         /// @brief Get the data of the union, as the given _type and a bool to inform if it is the actual data type
         ///
         /// @remark If not the right type, the type will be changed on writing.
@@ -528,18 +551,30 @@ namespace Ent
         ///
         /// @remark If not in the map, it will be added only when writing.
         [[nodiscard]] std::pair<Property, bool> forceGetMapItem(char const* _key) const
+        try
         {
             auto [ptr, found] = getPimpl().forceGetMapItem(_key);
             return {Property{std::move(ptr)}, found};
+        }
+        catch (ContextException& ex)
+        {
+            ex.addContextMessage(getDebugString());
+            throw;
         }
 
         /// @brief Get the data in the map and a bool to inform if it is actually in the map
         ///
         /// @remark If not in the map, it will be added only when writing.
         [[nodiscard]] std::pair<Property, bool> forceGetMapItem(int64_t _field) const
+        try
         {
             auto [ptr, found] = getPimpl().forceGetMapItem(_field);
             return {Property{std::move(ptr)}, found};
+        }
+        catch (ContextException& ex)
+        {
+            ex.addContextMessage(getDebugString());
+            throw;
         }
 
         /// @brief Erase the item _key in the set of string
@@ -836,6 +871,8 @@ namespace Ent
         }
 
         friend std::vector<PrefabInfo> getPrefabHistory(Property const& _prop);
+
+        char const* getDebugString() const;
 
     private:
         PropImplPtr m_self{};

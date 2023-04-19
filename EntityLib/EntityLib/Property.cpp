@@ -87,6 +87,7 @@ namespace Ent
     }
 
     Property Property::mapRename(char const* _current, char const* _new)
+    try
     {
         auto newItem = insertMapItem(_new);
         CopyProperty copier(
@@ -96,7 +97,13 @@ namespace Ent
         visitRecursive(*currentItem, copier);
         return newItem;
     }
+    catch (ContextException& ex)
+    {
+        ex.addContextMessage(getDebugString());
+        throw;
+    }
     Property Property::mapRename(int64_t _current, int64_t _new) const
+    try
     {
         auto newItem = insertMapItem(_new);
         CopyProperty copier(
@@ -105,6 +112,11 @@ namespace Ent
         visitRecursive(*currentItem, copier);
         eraseMapItem(_current);
         return newItem;
+    }
+    catch (ContextException& ex)
+    {
+        ex.addContextMessage(getDebugString());
+        throw;
     }
     Property Property::unionSetRename(char const* _current, char const* _new) const
     {
@@ -118,6 +130,7 @@ namespace Ent
     }
 
     std::map<char const*, Property, CmpStr> Property::getMapStringItems() const
+    try
     {
         std::map<char const*, Property, CmpStr> result;
         for (char const* key : getPimpl().getMapKeysString())
@@ -126,8 +139,14 @@ namespace Ent
         }
         return result;
     }
+    catch (ContextException& ex)
+    {
+        ex.addContextMessage(getDebugString());
+        throw;
+    }
 
     std::map<int64_t, Property> Property::getMapIntItems() const
+    try
     {
         std::map<int64_t, Property> result;
         for (int64_t key : getPimpl().getMapKeysInt())
@@ -136,7 +155,11 @@ namespace Ent
         }
         return result;
     }
-
+    catch (ContextException& ex)
+    {
+        ex.addContextMessage(getDebugString());
+        throw;
+    }
     std::vector<Property> Property::getObjectSetItems() const
     {
         std::vector<Property> result;
@@ -186,5 +209,42 @@ namespace Ent
         }
         std::reverse(begin(result), end(result));
         return result;
+    }
+
+    char const* Property::getDebugString() const
+    {
+        auto getIsSetLevel = [](Property const& _prop)
+        {
+            // Get the distance to the first parent which is set
+            auto setLevel = 0;
+            std::optional parent = _prop;
+            while (parent.has_value() and not parent->isSet())
+            {
+                parent = parent->getParent();
+                ++setLevel;
+            }
+            return setLevel;
+        };
+
+        // Find the prefab which has json data closest to target property
+        auto minSetLevel = ~size_t();
+        PrefabInfo const* bestPrefabInfo = nullptr;
+        auto histories = getPrefabHistory(*this);
+        std::reverse(begin(histories), end(histories));
+        for (auto const& histo : histories)
+        {
+            auto const setLevel = getIsSetLevel(histo.prop);
+            if (setLevel < minSetLevel)
+            {
+                minSetLevel = setLevel;
+                bestPrefabInfo = &histo;
+            }
+        }
+        if (bestPrefabInfo != nullptr)
+        {
+            return staticFormat(
+                R"("%s" - "%s")", bestPrefabInfo->prefabPath.c_str(), bestPrefabInfo->nodeRef.c_str());
+        }
+        return staticFormat(R"("%s" - "%s")", histories[0].prefabPath.c_str(), histories[0].nodeRef.c_str());
     }
 } // namespace Ent

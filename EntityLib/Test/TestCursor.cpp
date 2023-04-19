@@ -780,7 +780,7 @@ size_t countNodes(Node* node)
     return nodeCount;
 }
 
-void testCursor(EntityLib& entlib)
+void testCursor(EntityLib& entlib, std::filesystem::path const& rawdataPath)
 {
     {
         auto storage = nlohmann::json::object();
@@ -953,7 +953,7 @@ void testCursor(EntityLib& entlib)
     bool testLoading = true;
     if (testLoading)
     {
-        entlib.rawdataPath = "X:/RawData";
+        entlib.rawdataPath = rawdataPath;
         std::cout << "Read WhistlingPlainsFPMain.scene with LazyLib" << std::endl;
         clock_t start = clock();
         Property expl(
@@ -1022,7 +1022,7 @@ void testCursor(EntityLib& entlib)
     bool testCompare = true;
     if (testCompare)
     {
-        entlib.rawdataPath = "X:/RawData";
+        entlib.rawdataPath = rawdataPath;
         std::cout << "Read WhistlingPlainsFPMain.scene with LazyLib" << std::endl;
         clock_t start = clock();
         Property expl(

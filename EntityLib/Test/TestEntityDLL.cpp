@@ -147,7 +147,7 @@ try
     bool doDisplayScene = false;
     bool doDisplaySubSchema = false;
     bool dumpNodes = false;
-    std::filesystem::path rootPath = "X:/RawData/..";
+    std::filesystem::path rootPath = "X:";
     for (int i = 1; i < argc; ++i)
     {
         if (strcmp(argv[i], "--displaySchema") == 0)
@@ -169,6 +169,8 @@ try
             rootPath = argv[i];
         }
     }
+
+    std::filesystem::path rawdataPath = rootPath / "RawData";
 
     // Ent::updateComponents("X:/Tools");
 #ifdef _DEBUG
@@ -193,7 +195,7 @@ try
 
     auto prevValidationEnabled = entlib.validationEnabled;
     entlib.validationEnabled = false;
-    testCursor(entlib);
+    testCursor(entlib, rawdataPath);
     entlib.rawdataPath = current_path();
     entlib.validationEnabled = prevValidationEnabled;
 
@@ -379,7 +381,7 @@ try
     // Temporarily disable validation to read some RawData files
     entlib.validationEnabled = false;
     {
-        entlib.rawdataPath = "X:/RawData"; // It is a hack to work in the working dir
+        entlib.rawdataPath = rawdataPath; // It is a hack to work in the working dir
         auto node = Property(
             &entlib,
             entlib.getSchema("Entity"),
@@ -1758,7 +1760,7 @@ try
         ENTLIB_ASSERT((std::array<double, 4>(ent.Color())) == (std::array<double, 4>{1., 1., 1., 1.}));
     }
     // ********************************** Test load/save scene ************************************
-    entlib.rawdataPath = "X:/RawData";
+    entlib.rawdataPath = rawdataPath;
 
     ENTLIB_LOG("Loading SceneWild.scene...");
     // auto scene = entlib.loadScene("X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene");

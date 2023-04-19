@@ -226,11 +226,12 @@ namespace Ent
             return setLevel;
         };
 
+        // Find the prefab which has json data closest to target property
         auto minSetLevel = ~size_t();
         PrefabInfo const* bestPrefabInfo = nullptr;
-        auto histos = getPrefabHistory(*this);
-        std::reverse(begin(histos), end(histos));
-        for (auto const& histo : histos)
+        auto histories = getPrefabHistory(*this);
+        std::reverse(begin(histories), end(histories));
+        for (auto const& histo : histories)
         {
             auto const setLevel = getIsSetLevel(histo.prop);
             if (setLevel < minSetLevel)
@@ -244,6 +245,6 @@ namespace Ent
             return staticFormat(
                 R"("%s" - "%s")", bestPrefabInfo->prefabPath.c_str(), bestPrefabInfo->nodeRef.c_str());
         }
-        return staticFormat(R"("%s" - "%s")", histos[0].prefabPath.c_str(), histos[0].nodeRef.c_str());
+        return staticFormat(R"("%s" - "%s")", histories[0].prefabPath.c_str(), histories[0].nodeRef.c_str());
     }
 } // namespace Ent

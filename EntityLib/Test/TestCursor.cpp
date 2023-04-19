@@ -780,7 +780,7 @@ size_t countNodes(Node* node)
     return nodeCount;
 }
 
-void testCursor(EntityLib& entlib, std::filesystem::path const& rawdataPath, bool doTestLargeScene)
+void testCursor(EntityLib& entlib, std::filesystem::path const& rawdataPath, bool doTestRawData)
 {
     {
         auto storage = nlohmann::json::object();
@@ -950,7 +950,7 @@ void testCursor(EntityLib& entlib, std::filesystem::path const& rawdataPath, boo
         end = clock();
         ENTLIB_ASSERT(matching.size() == 1);
     }
-    bool testLoading = doTestLargeScene;
+    bool testLoading = doTestRawData;
     if (testLoading)
     {
         entlib.rawdataPath = rawdataPath;
@@ -1019,7 +1019,7 @@ void testCursor(EntityLib& entlib, std::filesystem::path const& rawdataPath, boo
         std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;
     }
-    bool testCompare = doTestLargeScene;
+    bool testCompare = doTestRawData;
     if (testCompare)
     {
         entlib.rawdataPath = rawdataPath;

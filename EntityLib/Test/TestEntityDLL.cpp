@@ -147,7 +147,7 @@ try
     bool doDisplayScene = false;
     bool doDisplaySubSchema = false;
     bool dumpNodes = false;
-    bool doTestLargeScene = false;
+    bool doTestRawData = false;
     std::filesystem::path rootPath = "X:";
     for (int i = 1; i < argc; ++i)
     {
@@ -169,9 +169,9 @@ try
             ENTLIB_ASSERT(i < argc);
             rootPath = argv[i];
         }
-        else if (strcmp(argv[i], "--test-large-scene") == 0)
+        else if (strcmp(argv[i], "--test-raw_data") == 0)
         {
-            doTestLargeScene = true;
+            doTestRawData = true;
         }
     }
 
@@ -200,7 +200,7 @@ try
 
     auto prevValidationEnabled = entlib.validationEnabled;
     entlib.validationEnabled = false;
-    testCursor(entlib, rawdataPath, doTestLargeScene);
+    testCursor(entlib, rawdataPath, doTestRawData);
     entlib.rawdataPath = current_path();
     entlib.validationEnabled = prevValidationEnabled;
 
@@ -385,78 +385,85 @@ try
     }
     // Temporarily disable validation to read some RawData files
     entlib.validationEnabled = false;
+
+    if (doTestRawData)
     {
         entlib.rawdataPath = rawdataPath; // It is a hack to work in the working dir
-        auto node = Property(
-            &entlib,
-            entlib.getSchema("Entity"),
-            "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
-            "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene");
 
-        auto const* falseNodeRef = "Components/SubScene/Embedded/XXXXX";
-        auto nullNode = node.resolveNodeRef(falseNodeRef);
-        ENTLIB_ASSERT(nullNode.has_value() == false);
-        auto const* nodeRef = "Components/SubScene/Embedded/ShamanFullBlue_ent_001";
-        auto ent = node.resolveNodeRef(nodeRef);
-        auto entpath = node.makeNodeRef(*ent);
-        ENTLIB_ASSERT(entpath == nodeRef);
-        entpath = ent->makeAbsoluteNodeRef();
-        ENTLIB_ASSERT(entpath == nodeRef);
-        entpath = node.makeAbsoluteNodeRef();
-        ENTLIB_ASSERT(entpath == ".");
+        {
+            auto node = Property(
+                &entlib,
+                entlib.getSchema("Entity"),
+                "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
+                "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene");
 
-        auto prefabHisto = getPrefabHistory(*ent);
-        ENTLIB_ASSERT(prefabHisto.size() == 8);
-        ENTLIB_ASSERT(
-            prefabHisto[3].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
-        ENTLIB_ASSERT(
-            prefabHisto[4].prefabPath
-            == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
-        ENTLIB_ASSERT(
-            prefabHisto[7].prefabPath
-            == "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
-               "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene");
-    }
-    {
-        auto node = entlib.loadFileAsNode(
-            "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
-            "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
-            entlib.schema.schema.allDefinitions["Entity"]);
-        auto const* nodeRef = "Components/SubScene/Embedded/ShamanFullBlue_ent_001";
-        auto* ent = node->resolveNodeRef(nodeRef);
-        auto entpath = node->makeNodeRef(ent);
-        ENTLIB_ASSERT(entpath == nodeRef);
-        entpath = ent->makeAbsoluteNodeRef();
-        ENTLIB_ASSERT(entpath == nodeRef);
-        entpath = node->makeAbsoluteNodeRef();
-        ENTLIB_ASSERT(entpath == ".");
+            auto const* falseNodeRef = "Components/SubScene/Embedded/XXXXX";
+            auto nullNode = node.resolveNodeRef(falseNodeRef);
+            ENTLIB_ASSERT(nullNode.has_value() == false);
+            auto const* nodeRef = "Components/SubScene/Embedded/ShamanFullBlue_ent_001";
+            auto ent = node.resolveNodeRef(nodeRef);
+            auto entpath = node.makeNodeRef(*ent);
+            ENTLIB_ASSERT(entpath == nodeRef);
+            entpath = ent->makeAbsoluteNodeRef();
+            ENTLIB_ASSERT(entpath == nodeRef);
+            entpath = node.makeAbsoluteNodeRef();
+            ENTLIB_ASSERT(entpath == ".");
 
-        auto prefabHisto = ent->getPrefabHistory();
-        ENTLIB_ASSERT(prefabHisto.size() == 7);
-        ENTLIB_ASSERT(
-            prefabHisto[3].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
-        ENTLIB_ASSERT(
-            prefabHisto[4].prefabPath
-            == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
-    }
-    {
-        auto node = entlib.loadFileAsNode(
-            "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
-            "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
-            entlib.schema.schema.allDefinitions["Entity"]);
-        auto const* nodeRef =
-            R"(Components/SubScene/Embedded/ShamanFullBlue_ent_001/Components/TransformGD)";
-        auto* ent = node->resolveNodeRef(nodeRef);
-        auto entpath = node->makeNodeRef(ent);
-        ENTLIB_ASSERT(entpath == nodeRef);
-        auto prefabHisto = ent->getPrefabHistory();
-        ENTLIB_ASSERT(
-            prefabHisto[3].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
-        ENTLIB_ASSERT(
-            prefabHisto[4].prefabPath
-            == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
+            auto prefabHisto = getPrefabHistory(*ent);
+            ENTLIB_ASSERT(prefabHisto.size() == 8);
+            ENTLIB_ASSERT(
+                prefabHisto[3].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
+            ENTLIB_ASSERT(
+                prefabHisto[4].prefabPath
+                == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
+            ENTLIB_ASSERT(
+                prefabHisto[7].prefabPath
+                == "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
+                   "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene");
+        }
+        {
+            auto node = entlib.loadFileAsNode(
+                "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
+                "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
+                entlib.schema.schema.allDefinitions["Entity"]);
+            auto const* nodeRef = "Components/SubScene/Embedded/ShamanFullBlue_ent_001";
+            auto* ent = node->resolveNodeRef(nodeRef);
+            auto entpath = node->makeNodeRef(ent);
+            ENTLIB_ASSERT(entpath == nodeRef);
+            entpath = ent->makeAbsoluteNodeRef();
+            ENTLIB_ASSERT(entpath == nodeRef);
+            entpath = node->makeAbsoluteNodeRef();
+            ENTLIB_ASSERT(entpath == ".");
+
+            auto prefabHisto = ent->getPrefabHistory();
+            ENTLIB_ASSERT(prefabHisto.size() == 7);
+            ENTLIB_ASSERT(
+                prefabHisto[3].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
+            ENTLIB_ASSERT(
+                prefabHisto[4].prefabPath
+                == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
+        }
+        {
+            auto node = entlib.loadFileAsNode(
+                "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
+                "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
+                entlib.schema.schema.allDefinitions["Entity"]);
+            auto const* nodeRef =
+                R"(Components/SubScene/Embedded/ShamanFullBlue_ent_001/Components/TransformGD)";
+            auto* ent = node->resolveNodeRef(nodeRef);
+            auto entpath = node->makeNodeRef(ent);
+            ENTLIB_ASSERT(entpath == nodeRef);
+            auto prefabHisto = ent->getPrefabHistory();
+            ENTLIB_ASSERT(
+                prefabHisto[3].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
+            ENTLIB_ASSERT(
+                prefabHisto[4].prefabPath
+                == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
+        }
+
         entlib.rawdataPath = current_path(); // Work in Test dir
     }
+
     entlib.validationEnabled = prevValidationEnabled;
     {
         auto node =
@@ -1765,51 +1772,55 @@ try
         ENTLIB_ASSERT((std::array<double, 4>(ent.Color())) == (std::array<double, 4>{1., 1., 1., 1.}));
     }
     // ********************************** Test load/save scene ************************************
-    entlib.rawdataPath = rawdataPath;
 
-    ENTLIB_LOG("Loading SceneWild.scene...");
-    // auto scene = entlib.loadScene("X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene");
-    entlib.validationEnabled = false;
-    auto sceneent =
-        Gen::Entity::loadCopy(entlib, "20_scene/personal/simont/vfxGym/ScenevfxGym.scene");
-    auto scene = sceneent.Components().SubScene()->Embedded();
-
-    ENTLIB_LOG("Done");
-
-    if (doDisplayScene)
+    if (doTestRawData)
     {
-        using namespace Ent;
-        printfmt("Scene Loaded\n");
-        printfmt("Entity count : %zu\n", scene.size());
+        entlib.rawdataPath = rawdataPath;
 
-        for (auto ent : scene)
+        ENTLIB_LOG("Loading SceneWild.scene...");
+        // auto scene = entlib.loadScene("X:/RawData/01_World/Wild/scenewild/editor/SceneWild.scene");
+        entlib.validationEnabled = false;
+        auto sceneent =
+            Gen::Entity::loadCopy(entlib, "20_scene/personal/simont/vfxGym/ScenevfxGym.scene");
+        auto scene = sceneent.Components().SubScene()->Embedded();
+
+        ENTLIB_LOG("Done");
+
+        if (doDisplayScene)
         {
-            printfmt("  Name \"%s\"\n", ent.Name());
+            using namespace Ent;
+            printfmt("Scene Loaded\n");
+            printfmt("Entity count : %zu\n", scene.size());
 
-            for (auto comp : ent.Components())
+            for (auto ent : scene)
             {
-                printfmt("    Type \"%s\"\n", comp.getDataType());
-                printNode("", comp.getUnionData(), "      ");
+                printfmt("  Name \"%s\"\n", ent.Name());
+
+                for (auto comp : ent.Components())
+                {
+                    printfmt("    Type \"%s\"\n", comp.getDataType());
+                    printNode("", comp.getUnionData(), "      ");
+                }
             }
         }
+
+        auto heightObj = scene.begin()->Components().addHeightObj();
+        heightObj.DisplaceNoiseList().push();
+
+        auto const& properties =
+            scene.begin()->Components().addHeightObj().getProperty().getSchema()->properties;
+        auto fieldNameCount = properties.size();
+        ENTLIB_ASSERT(fieldNameCount >= 9);
+
+        entlib.rawdataPath = current_path();
+        scene.insertInstanceOf((current_path() / "prefab.entity").string().c_str());
+
+        sceneent.save((current_path() / "SceneWild.test.scene").string().c_str());
+
+        auto addedEntity = *scene.get("PlayerSpawner_");
+        auto cinematicCmp = addedEntity.Components().CinematicGD();
+        ENTLIB_ASSERT(cinematicCmp.has_value());
     }
-
-    auto heightObj = scene.begin()->Components().addHeightObj();
-    heightObj.DisplaceNoiseList().push();
-
-    auto const& properties =
-        scene.begin()->Components().addHeightObj().getProperty().getSchema()->properties;
-    auto fieldNameCount = properties.size();
-    ENTLIB_ASSERT(fieldNameCount >= 9);
-
-    entlib.rawdataPath = current_path();
-    scene.insertInstanceOf((current_path() / "prefab.entity").string().c_str());
-
-    sceneent.save((current_path() / "SceneWild.test.scene").string().c_str());
-
-    auto addedEntity = *scene.get("PlayerSpawner_");
-    auto cinematicCmp = addedEntity.Components().CinematicGD();
-    ENTLIB_ASSERT(cinematicCmp.has_value());
 
     printfmt("Done\n");
     return EXIT_SUCCESS;

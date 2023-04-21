@@ -47,6 +47,7 @@ namespace Ent
         JsonMetaData& operator=(JsonMetaData const&) = delete;
 
         size_t version = 0;
+        std::filesystem::file_time_type time;
     };
 
     struct VersionedJson
@@ -230,6 +231,8 @@ namespace Ent
         VersionedJson& readJsonFile(char const* _filepath) const;
         VersionedJson& createTempJsonFile() const;
         void saveJsonFile(nlohmann::json const* doc, char const* _filepath, char const* _schema) const;
+        std::vector<std::filesystem::path> collectOutdatedJsonFiles() const;
+        void reloadJsonFiles(std::vector<std::filesystem::path> const& _filePaths) const;
 
         void setFallBackEntityPath(char const* _filepath);
         char const* getFallBackEntityPath() const;

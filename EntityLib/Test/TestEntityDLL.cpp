@@ -168,7 +168,7 @@ try
             ++i;
             ENTLIB_ASSERT(i < argc);
             rootPath = argv[i];
-            if (rootPath.native().back() != L'/')
+            if (rootPath.native().back() != L'/' || rootPath.native().back() != L'\\')
             {
                 rootPath = (rootPath.native() + L'/');
             }

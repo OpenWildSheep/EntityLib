@@ -63,7 +63,7 @@ namespace Ent
         {
             c = (c.native() + L'/');
         }
-        return c.make_preferred();
+        return std::filesystem::path(strToLower(c.make_preferred().generic_string()));
     }
 
     EntityLib::EntityLib(std::filesystem::path const& _rootPath, bool _doMergeComponents)
@@ -610,8 +610,8 @@ namespace Ent
 
     VersionedJson& EntityLib::readJsonFile(char const* _filepath) const
     {
-        std::filesystem::path const filepath = very_weakly_canonical(_filepath);
-        if (auto const iter = m_jsonDatabase.find(filepath); iter != m_jsonDatabase.end())
+        auto const absPath = getAbsolutePath(_filepath);
+        if (auto const iter = m_jsonDatabase.find(absPath); iter != m_jsonDatabase.end())
         {
             return *iter->second;
         }
@@ -620,8 +620,18 @@ namespace Ent
             m_newDepFileCallback(_filepath);
         }
         auto file = std::make_unique<VersionedJson>();
-        file->document = loadJsonFile(rawdataPath, filepath);
-        return *m_jsonDatabase.emplace(filepath, std::move(file)).first->second;
+        file->document = loadJsonFile(rawdataPath, absPath);
+        auto error = std::error_code{};
+        auto const timestamp = last_write_time(absPath, error);
+        if (error)
+        {
+            throw FileSystemError("Trying to open file for read", rawdataPath, absPath, error);
+        }
+        else
+        {
+            file->metadata.time = timestamp;
+        }
+        return *m_jsonDatabase.emplace(absPath, std::move(file)).first->second;
     }
 
     VersionedJson& EntityLib::createTempJsonFile() const
@@ -652,9 +662,8 @@ namespace Ent
 
     void EntityLib::saveJsonFile(json const* doc, char const* _filepath, char const* _schema) const
     {
-        std::filesystem::path const filepath = very_weakly_canonical(_filepath);
-        auto const absFilename = filepath.is_relative() ? rawdataPath / filepath : filepath;
-        auto const tempFilename = std::filesystem::path(absFilename.string() + ".tmp");
+        auto const absPath = getAbsolutePath(_filepath);
+        auto const tempFilename = std::filesystem::path(absPath.string() + ".tmp");
         create_directories(tempFilename.parent_path());
         {
             std::ofstream ofs(tempFilename);
@@ -666,15 +675,73 @@ namespace Ent
             copy["$schema"] = format(schemaFormat, _schema);
             ofs << copy.dump(4);
         }
-        try3Times([&] { rename(tempFilename, absFilename); });
-        if (m_jsonDatabase.count(filepath) == 0)
+        try3Times([&] { rename(tempFilename, absPath); });
+        if (m_jsonDatabase.count(absPath) == 0)
         {
-            m_jsonDatabase[filepath] = std::make_unique<VersionedJson>();
+            m_jsonDatabase[absPath] = std::make_unique<VersionedJson>();
         }
-        if (&(m_jsonDatabase[filepath]->document) != doc)
+        if (&(m_jsonDatabase[absPath]->document) != doc)
         {
-            m_jsonDatabase[filepath]->document = *doc;
-            ++m_jsonDatabase[filepath]->metadata.version;
+            m_jsonDatabase[absPath]->document = *doc;
+            ++m_jsonDatabase[absPath]->metadata.version;
+            auto error = std::error_code{};
+            auto const timestamp = last_write_time(absPath, error);
+            if (error)
+            {
+                throw FileSystemError("Trying to open file for read", rawdataPath, absPath, error);
+            }
+            else
+            {
+                m_jsonDatabase[absPath]->metadata.time = timestamp;
+            }
+        }
+    }
+
+    std::vector<std::filesystem::path> EntityLib::collectOutdatedJsonFiles() const
+    {
+        std::vector<std::filesystem::path> collectedPaths;
+
+        for (auto const& iter : m_jsonDatabase)
+        {
+            auto error = std::error_code{};
+            auto const timestamp = last_write_time(iter.first, error);
+            if (error)
+            {
+                throw FileSystemError("Trying to open file for read", rawdataPath, iter.first, error);
+            }
+
+            if (timestamp > iter.second->metadata.time)
+            {
+                collectedPaths.push_back(iter.first);
+            }
+        }
+
+        return collectedPaths;
+    }
+
+    void EntityLib::reloadJsonFiles(std::vector<std::filesystem::path> const& _filePaths) const
+    {
+        for (auto const& absPath : _filePaths)
+        {
+            if (auto const iter = m_jsonDatabase.find(absPath); iter != m_jsonDatabase.end())
+            {
+                iter->second->document = loadJsonFile(rawdataPath, iter->first);
+                auto error = std::error_code{};
+                auto const timestamp = last_write_time(absPath, error);
+                if (error)
+                {
+                    throw FileSystemError(
+                        "Trying to open file for read", rawdataPath, absPath, error);
+                }
+                else
+                {
+                    iter->second->metadata.time = timestamp;
+                }
+            }
+            else
+            {
+                throw FileSystemError("Trying to reload file that was never loaded in the first place", rawdataPath, iter->first);
+            }
         }
     }
 

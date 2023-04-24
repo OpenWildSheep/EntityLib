@@ -902,11 +902,6 @@ void testCursor(EntityLib& entlib, std::filesystem::path const& rawdataPath, boo
         ENTLIB_ASSERT(soundAreaGD.isDefault() == true);
         auto keys = components.getUnionSetKeysString();
         keys = components.getUnionSetKeysString();
-        auto staffVertebrasGD =
-            *expl.getObjectField("Components").getUnionSetItem("StaffVertebrasGD");
-        ENTLIB_ASSERT(staffVertebrasGD.isSet() == false);
-        ENTLIB_ASSERT(staffVertebrasGD.isDefault() == true);
-        keys = components.getUnionSetKeysString();
 
         expl.save("instance.prout.entity");
         // Must not crash

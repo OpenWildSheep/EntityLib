@@ -168,6 +168,10 @@ try
             ++i;
             ENTLIB_ASSERT(i < argc);
             rootPath = argv[i];
+            if (rootPath.native().back() != L'/')
+            {
+                rootPath = (rootPath.native() + L'/');
+            }
         }
         else if (strcmp(argv[i], "--test-raw_data") == 0)
         {

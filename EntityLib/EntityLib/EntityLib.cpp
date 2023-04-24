@@ -625,7 +625,7 @@ namespace Ent
         auto const timestamp = last_write_time(absPath, error);
         if (error)
         {
-            throw FileSystemError("Trying to open file for read", rawdataPath, absPath, error);
+            throw FileSystemError("Trying to get last write time", rawdataPath, absPath, error);
         }
         else
         {
@@ -688,7 +688,7 @@ namespace Ent
             auto const timestamp = last_write_time(absPath, error);
             if (error)
             {
-                throw FileSystemError("Trying to open file for read", rawdataPath, absPath, error);
+                throw FileSystemError("Trying to get last write time", rawdataPath, absPath, error);
             }
             else
             {
@@ -707,7 +707,7 @@ namespace Ent
             auto const timestamp = last_write_time(iter.first, error);
             if (error)
             {
-                throw FileSystemError("Trying to open file for read", rawdataPath, iter.first, error);
+                throw FileSystemError("Trying to get last write time", rawdataPath, iter.first, error);
             }
 
             if (timestamp > iter.second->metadata.time)
@@ -731,7 +731,7 @@ namespace Ent
                 if (error)
                 {
                     throw FileSystemError(
-                        "Trying to open file for read", rawdataPath, absPath, error);
+                        "Trying to get last write time", rawdataPath, absPath, error);
                 }
                 else
                 {
@@ -1849,7 +1849,7 @@ namespace Ent
         {
             if (m_fallbackEntity.empty())
             {
-                throw FileSystemError("Trying to open file for read", rawdataPath, relPath, error);
+                throw FileSystemError("Trying to get last write time", rawdataPath, relPath, error);
             }
             else
             {

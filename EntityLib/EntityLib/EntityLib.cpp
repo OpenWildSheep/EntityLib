@@ -705,13 +705,9 @@ namespace Ent
         {
             auto error = std::error_code{};
             auto const timestamp = last_write_time(iter.first, error);
-            if (error)
+            if (error || timestamp > iter.second->metadata.time)
             {
-                throw FileSystemError("Trying to get last write time", rawdataPath, iter.first, error);
-            }
-
-            if (timestamp > iter.second->metadata.time)
-            {
+                // either the file does not exist on disk anymore, or it was changed and is now outdated
                 collectedPaths.push_back(iter.first);
             }
         }

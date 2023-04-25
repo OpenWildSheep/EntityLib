@@ -672,7 +672,10 @@ namespace Ent
                 throw ContextException("Can't open %s for write", tempFilename.string().c_str());
             }
             json copy = *doc;
-            copy["$schema"] = format(schemaFormat, _schema);
+            if (_schema != nullptr)
+            {
+                copy["$schema"] = format(schemaFormat, _schema);
+            }
             ofs << copy.dump(4);
         }
         try3Times([&] { rename(tempFilename, absPath); });
@@ -697,18 +700,47 @@ namespace Ent
         }
     }
 
-    std::vector<std::filesystem::path> EntityLib::collectOutdatedJsonFiles() const
+    void EntityLib::saveJsonFileDatabase(char const* _customRootpath) const
     {
-        std::vector<std::filesystem::path> collectedPaths;
+        for (auto const& iter : m_jsonDatabase)
+        {
+            std::filesystem::path savePath = iter.first;
+            if (_customRootpath != nullptr)
+            {
+                std::filesystem::path relPath = relative(savePath, rawdataPath);
+                savePath = _customRootpath / relPath;
+            }
+            auto const absPath = getAbsolutePath(savePath);
+            auto const tempFilename = std::filesystem::path(absPath.string() + ".tmp");
+            create_directories(tempFilename.parent_path());
+            {
+                std::ofstream ofs(tempFilename);
+                if (not ofs.is_open())
+                {
+                    throw ContextException("Can't open %s for write", tempFilename.string().c_str());
+                }
+                json copy = iter.second->document;
+                ofs << copy.dump(4);
+            }
+            try3Times([&] { rename(tempFilename, absPath); });
+        }
+    }
+
+    std::vector<std::pair<std::filesystem::path, JSonFileState>> EntityLib::collectOutdatedJsonFiles() const
+    {
+        std::vector<std::pair<std::filesystem::path, JSonFileState>> collectedPaths;
 
         for (auto const& iter : m_jsonDatabase)
         {
             auto error = std::error_code{};
             auto const timestamp = last_write_time(iter.first, error);
-            if (error || timestamp > iter.second->metadata.time)
+            if (error)
             {
-                // either the file does not exist on disk anymore, or it was changed and is now outdated
-                collectedPaths.push_back(iter.first);
+                collectedPaths.push_back(std::pair(iter.first, JSonFileState::DELETED));
+            }
+            else if (timestamp > iter.second->metadata.time)
+            {
+                collectedPaths.push_back(std::pair(iter.first, JSonFileState::MODIFIED));
             }
         }
 
@@ -2095,21 +2127,21 @@ namespace Ent
         if (_path.is_absolute())
         {
             // Check if _path is inside rawdataPath
-            std::filesystem::path parrent = _path;
+            std::filesystem::path parent = _path;
             std::filesystem::path relPath;
-            while (parrent != rawdataPath)
+            while (parent != rawdataPath)
             {
-                if (parrent.has_parent_path() and parrent.parent_path() != parrent)
+                if (parent.has_parent_path() and parent.parent_path() != parent)
                 {
                     if (relPath.empty())
                     {
-                        relPath = parrent.filename();
+                        relPath = parent.filename();
                     }
                     else
                     {
-                        relPath = parrent.filename() / relPath;
+                        relPath = parent.filename() / relPath;
                     }
-                    parrent = parrent.parent_path();
+                    parent = parent.parent_path();
                 }
                 else
                 {

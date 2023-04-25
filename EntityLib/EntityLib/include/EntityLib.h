@@ -55,6 +55,13 @@ namespace Ent
         JsonMetaData metadata;
         nlohmann::json document = nlohmann::json::object();
     };
+    
+    enum class JSonFileState
+    {
+        MODIFIED,
+        DELETED,
+        COUNT
+    };
 
     /// Entry point of the EntityLib. Used to load/save Scene/Entity and to parse the Schema
     class ENTLIB_DLLEXPORT EntityLib
@@ -231,7 +238,8 @@ namespace Ent
         VersionedJson& readJsonFile(char const* _filepath) const;
         VersionedJson& createTempJsonFile() const;
         void saveJsonFile(nlohmann::json const* doc, char const* _filepath, char const* _schema) const;
-        std::vector<std::filesystem::path> collectOutdatedJsonFiles() const;
+        void saveJsonFileDatabase(char const* _customRootpath) const;
+        std::vector<std::pair<std::filesystem::path, JSonFileState>> collectOutdatedJsonFiles() const;
         void reloadJsonFiles(std::vector<std::filesystem::path> const& _filePaths) const;
 
         void setFallBackEntityPath(char const* _filepath);

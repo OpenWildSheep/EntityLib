@@ -985,7 +985,7 @@ void testCursor(EntityLib& entlib, std::filesystem::path const& rawdataPath, boo
 
             std::cout << "Save WhistlingPlainsFPMain.scene with LazyLib" << std::endl;
             std::filesystem::path savePath =
-                std::filesystem::current_path() / "WhistlingPlainsFPMain.scene";
+                std::filesystem::current_path() / "test_output/WhistlingPlainsFPMain.scene";
             entlib.saveJsonFile(
                 &newDoc, savePath.generic_string().c_str(),
                 expl.getSchema()->name.c_str());

@@ -702,9 +702,9 @@ namespace Ent
 
     void EntityLib::saveJsonFileDatabase(char const* _customRootpath) const
     {
-        for (auto const& iter : m_jsonDatabase)
+        for (auto const& [path, versionedJson] : m_jsonDatabase)
         {
-            std::filesystem::path savePath = iter.first;
+            std::filesystem::path savePath = path;
             if (_customRootpath != nullptr)
             {
                 std::filesystem::path relPath = relative(savePath, rawdataPath);
@@ -719,7 +719,7 @@ namespace Ent
                 {
                     throw ContextException("Can't open %s for write", tempFilename.string().c_str());
                 }
-                json copy = iter.second->document;
+                json copy = versionedJson->document;
                 ofs << copy.dump(4);
             }
             try3Times([&] { rename(tempFilename, absPath); });
@@ -730,17 +730,17 @@ namespace Ent
     {
         std::vector<std::pair<std::filesystem::path, JSonFileState>> collectedPaths;
 
-        for (auto const& iter : m_jsonDatabase)
+        for (auto const& [path, versionedJson] : m_jsonDatabase)
         {
             auto error = std::error_code{};
-            auto const timestamp = last_write_time(iter.first, error);
+            auto const timestamp = last_write_time(path, error);
             if (error)
             {
-                collectedPaths.push_back(std::pair(iter.first, JSonFileState::DELETED));
+                collectedPaths.push_back(std::pair(path, JSonFileState::Deleted));
             }
-            else if (timestamp > iter.second->metadata.time)
+            else if (timestamp > versionedJson->metadata.time)
             {
-                collectedPaths.push_back(std::pair(iter.first, JSonFileState::MODIFIED));
+                collectedPaths.push_back(std::pair(path, JSonFileState::Modified));
             }
         }
 
@@ -753,7 +753,8 @@ namespace Ent
         {
             if (auto const iter = m_jsonDatabase.find(absPath); iter != m_jsonDatabase.end())
             {
-                iter->second->document = loadJsonFile(rawdataPath, iter->first);
+                auto const& [path, versionedJson] = *iter;
+                versionedJson->document = loadJsonFile(rawdataPath, path);
                 auto error = std::error_code{};
                 auto const timestamp = last_write_time(absPath, error);
                 if (error)
@@ -763,12 +764,15 @@ namespace Ent
                 }
                 else
                 {
-                    iter->second->metadata.time = timestamp;
+                    versionedJson->metadata.time = timestamp;
                 }
             }
             else
             {
-                throw FileSystemError("Trying to reload file that was never loaded in the first place", rawdataPath, iter->first);
+                throw FileSystemError(
+                    "Trying to reload file that was never loaded in the first place",
+                    rawdataPath,
+                    absPath);
             }
         }
     }

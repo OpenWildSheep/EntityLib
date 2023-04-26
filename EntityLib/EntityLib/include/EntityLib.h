@@ -58,9 +58,9 @@ namespace Ent
     
     enum class JSonFileState
     {
-        MODIFIED,
-        DELETED,
-        COUNT
+        Modified,
+        Deleted,
+        Count
     };
 
     /// Entry point of the EntityLib. Used to load/save Scene/Entity and to parse the Schema
